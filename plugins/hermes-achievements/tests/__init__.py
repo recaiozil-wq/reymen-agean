@@ -1,3 +1,0 @@
-"""tests paketi."""
-
-__all__ = ["AchievementEngineTests", "MODULE_PATH", "test_catalog_has_60_plus_unique_achievements", "test_config_surgeon_ignores_generic_config_mentions", "test_model_provider_metrics_are_aggregated", "test_multi_condition_unlock_requires_all_requirements", "test_open_weights_pilgrim_counts_only_local_model_metadata", "test_removed_noisy_achievements_are_not_in_catalog", "test_secret_achievement_stays_hidden_without_progress", "test_tiered_achievement_can_be_discovered_without_unlocking", "test_tiered_achievement_reaches_highest_matching_tier", "test_tool_call_stats_detect_tool_names_and_errors"]

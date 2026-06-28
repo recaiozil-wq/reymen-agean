@@ -1225,9 +1225,13 @@ class Beyin:
             girdi_token = (len(sistem_prompt) + sum(len(str(m)) for m in mesajlar)) // 4
             cikti_token = len(yanit) // 4
             toplam = girdi_token + cikti_token
-            maliyet = BudgetConfig().provider_maliyeti(adim.provider, toplam)
+            _bc = BudgetConfig()
+            if hasattr(_bc, 'provider_maliyeti'):
+                maliyet = _bc.provider_maliyeti(adim.provider, toplam)
+            else:
+                maliyet = toplam
             _au.ekle(adim.provider, adim.model, girdi_token, cikti_token, maliyet)
-        except Exception as _e:
+                            except Exception as _e:
             logger.warning("[Beyin] _kullanim_kaydet: %s", _e)
             pass
 

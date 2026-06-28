@@ -1,6 +1,0 @@
----
-name: powershell-claude-agent
----
-## Komut
-echo. | claude
-## Not: cmd /k ile çalışır, PowerShell değil

@@ -1,4 +1,0 @@
-name: model-providers/cohere
-description: "Cohere model provider"
-version: "1.0.0"
-type: model-provider

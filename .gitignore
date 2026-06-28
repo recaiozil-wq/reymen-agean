@@ -205,3 +205,4 @@ reymen/cereyan/.ReYMeN/ogrenmeler.db
 *.db
 .ReYMeN/hafiza.db
 .ReYMeN/memory.db
+hermes_legacy/
