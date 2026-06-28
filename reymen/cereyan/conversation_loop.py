@@ -27,6 +27,10 @@ logger = logging.getLogger(__name__)
 
 log = logging.getLogger("conversation_loop")
 
+# Kullaniciya gereksiz log gosterme - sadece ERROR ve uzeri
+logging.getLogger('reymen').setLevel(logging.ERROR)
+logging.getLogger('conversation_loop').setLevel(logging.INFO)
+
 # ── Yeni import'lar: circuit breaker, streaming, error classify ─────
 try:
     from reymen.cereyan.iteration_budget import IterationBudget

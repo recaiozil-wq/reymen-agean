@@ -1226,13 +1226,17 @@ class Beyin:
             cikti_token = len(yanit) // 4
             toplam = girdi_token + cikti_token
             _bc = BudgetConfig()
-            if hasattr(_bc, 'provider_maliyeti'):
+            try:
                 maliyet = _bc.provider_maliyeti(adim.provider, toplam)
-            else:
+            except Exception:
                 maliyet = toplam
-            _au.ekle(adim.provider, adim.model, girdi_token, cikti_token, maliyet)
-                            except Exception as _e:
-            logger.warning("[Beyin] _kullanim_kaydet: %s", _e)
+            try:
+                _au.ekle(adim.provider, adim.model, girdi_token, cikti_token, maliyet)
+            except Exception as _e2:
+                logger.debug("[Beyin] _kullanim_kaydet maliyet: %s", _e2)
+                _au.ekle(adim.provider, adim.model, girdi_token, cikti_token, toplam)
+        except Exception as _e:
+            logger.debug("[Beyin] _kullanim_kaydet: %s", _e)
             pass
 
     # ────────────────────────────────────────────────────────────────────────
