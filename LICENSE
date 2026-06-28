@@ -1,6 +1,7 @@
 MIT License
 
-Copyright (c) 2025 Nous Research
+Copyright (c) 2025 Nous Research (Hermes Agent)
+Copyright (c) 2026 Marko_Pasa_38 (ReYMeN Agent - based on Hermes Agent)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,16 +20,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-Acknowledgments / Teşekkürler
-
-This project is built upon Nous Research's Hermes Agent
-(https://github.com/NousResearch/hermes-agent).
-Thank you to the Nous Research team for their incredible open-source work.
-
-Bu proje, Nous Research'in Hermes Agent
-(https://github.com/NousResearch/hermes-agent)
-açık kaynak projesi temel alınarak geliştirilmiştir.
-Nous Research ekibine harika açık kaynak çalışmaları için teşekkür ederiz.
