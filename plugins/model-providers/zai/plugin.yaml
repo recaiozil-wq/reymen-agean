@@ -1,0 +1,5 @@
+name: model-providers-zai
+version: 1.0.0
+description: "ReYMeN plugin: model-providers-zai"
+kind: backend
+author: ReYMeN

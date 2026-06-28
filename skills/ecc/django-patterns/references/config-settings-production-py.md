@@ -1,0 +1,16 @@
+---
+skill_id: 3346f2072631
+usage_count: 1
+last_used: 2026-06-16
+---
+# config/settings/production.py
+from .base import *
+
+DEBUG = False
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True

@@ -1,0 +1,37 @@
+{
+  "hedef": "onay\n\n[Referanslar]\n  - {\\\"anahtar\\\": \\\"example_com_verisi\\\", \\\"deger\\\": {\\\"baslik\\\": \\\"Example Domain\\\", \\\"paragraflar\\\": [\\\"This domain is for use in documentation examples without needing permission. Avoid use in operations.\\\", \\\"Learn more\\\"], \\\"baglantilar\\\": [\\\"https://iana.org/domains/example\\\"]}, \\\"etiketler\\\": [\\\"example\\\", \\\"web_scraping\\\"]}: \n  - example_com_verisi|Bu veri Example Domain (example.com) sayfasından alınmıştır. Başlık: Example Domain. Paragraflar: This domain is for use in documentation examples without needing permission. Avoid use in operations. Learn more. Bağlantılar: https://iana.org/domains/example. Etiketler: example, web_scraping: \n  - drift_duzeltme_raporu_20260621|ReYMeN hafiza drift duzeltmesi tamamlandi. Tespit edilen sorunlar: 1) TEKRAR_EDEN_GRS - ayni girisler birden fazla kez kaydedilmis, 2) ASIRI_TEKRAR - ayni sorgular cok kez tekrarlanmis (ornek: kac skill var 5 kez), 3) TAMAMLANMAMIS_GOREV - tur asimi nedeniyle tamamlanamamis gorevler. Cozum onerileri: TEKRAR_SIL, BIRLESTIR, TEMIZLE. Kalici izleme mekanizmasi kuruldu (24 saatlik kontrol). Referans verisi example_com_verisi basariyla kaydedildi. Etiketler: drift_duzeltme, hafiza_yonetimi: ",
+  "model": "local",
+  "tamamlandi": true,
+  "adim_sayisi": 4,
+  "adimlar": [
+    {
+      "tur": 1,
+      "dusunce": "FC:2araç",
+      "eylem": "['REFERANS_ARA', 'WEB_ICERIK']",
+      "gozlem": "[Sayfa:urllib] URL: https://example.com\n\nExample Domain Example Domain This domain is for use in documentation examples without needing permission. Avoid use in operations. Learn more",
+      "zaman": "2026-06-24T02:37:20.085401"
+    },
+    {
+      "tur": 2,
+      "dusunce": "FC:1araç",
+      "eylem": "['EXECUTE_CODE']",
+      "gozlem": "[EXECUTE_CODE ❌]\n--- HATA ---\nSyntaxError: unexpected character after line continuation character (<string>, line 5)\nTraceback (most recent call last):\n  File \"C:\\Users\\marko\\Desktop\\Reymen Proje\\hermes_projesi\\tools\\execute_code_tool.py\", line 108, in _kod_calistir\n    exec(duzgun_kod, temiz_globals)\n  File \"<string>\", line 5\n    \\\"anahtar\\\": \\\"example_com_verisi\\\",\n     ^\nSyntaxError: unexpected character after line continuation character",
+      "zaman": "2026-06-24T02:37:27.463749"
+    },
+    {
+      "tur": 3,
+      "dusunce": "FC:1araç",
+      "eylem": "['EXECUTE_CODE']",
+      "gozlem": "[EXECUTE_CODE ❌]\n--- HATA ---\nSyntaxError: unexpected character after line continuation character (<string>, line 2)\nTraceback (most recent call last):\n  File \"C:\\Users\\marko\\Desktop\\Reymen Proje\\hermes_projesi\\tools\\execute_code_tool.py\", line 108, in _kod_calistir\n    exec(duzgun_kod, temiz_globals)\n  File \"<string>\", line 2\n    referans_baslik = \\\"Example Domain\\\"\n                       ^\nSyntaxError: unexpected character after line continuation character",
+      "zaman": "2026-06-24T02:37:31.554843"
+    },
+    {
+      "tur": 4,
+      "dusunce": "FC:1araç",
+      "eylem": "['EXECUTE_CODE']",
+      "gozlem": "[EXECUTE_CODE ✅]\n--- ÇIKTI ---\nKARSILASTIRMA SONUCU\n====================\n[OK] Baslik uyumlu: Example Domain\n[OK] Paragraf 1 uyumlu\n[OK] Paragraf 2 uyumlu\n[OK] Baglanti: https://iana.org/domains/example\n\nSONUC: ONAYLANDI - Tum veriler uyumlu",
+      "zaman": "2026-06-24T02:37:34.468796"
+    }
+  ],
+  "tool_istatistik": {}
+}

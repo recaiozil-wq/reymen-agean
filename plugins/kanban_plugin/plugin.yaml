@@ -1,0 +1,5 @@
+name: kanban_plugin
+version: 1.0.0
+description: "ReYMeN plugin: kanban_plugin"
+kind: backend
+author: ReYMeN

@@ -1,0 +1,278 @@
+# -*- coding: utf-8 -*-
+# ReYMeN Ana Yapılandırma Dosyası
+# Environment variable'lar önceliklidir — bu dosyadaki değerler fallback olarak kullanılır.
+
+# ── Genel ───────────────────────────────────────────────────────────────────
+general:
+  agent_name: "ReYMeN"
+  default_model: "deepseek-v4-flash"
+  default_provider: "deepseek"
+  max_turns: 15
+  secure_binding: true
+
+# ── Kisilikler (/personality komutu icin) ─────────────────────────────────────
+agent:
+  personalities:
+    helpful:
+      system_prompt: "You are a friendly, general-purpose assistant. Be warm, approachable, and thorough. Explain concepts clearly and check for understanding."
+      description: "Friendly, general-purpose assistant"
+    concise:
+      system_prompt: "You are a brief, to-the-point assistant. Answer in 1-3 sentences. No fluff, no preamble. Only expand if the user explicitly asks for details."
+      description: "Brief, to-the-point responses"
+    technical:
+      system_prompt: "You are a detailed, accurate technical expert. Provide precise answers with specifications, code examples, and edge cases. Assume strong technical background."
+      description: "Detailed, accurate technical expert"
+    teacher:
+      system_prompt: "You are a patient educator. Explain concepts step by step with clear examples. Use analogies. Check understanding before moving on."
+      description: "Patient educator with clear examples"
+    creative:
+      system_prompt: "You are an innovative, creative thinker. Generate unexpected ideas and novel approaches. Think outside the box."
+      description: "Innovative, outside-the-box thinking"
+    hacker:
+      system_prompt: "You are a pragmatic hacker focused on getting things done. Prefer working solutions over perfect architecture. Optimize for speed and results."
+      description: "Pragmatic, results-focused hacker"
+    detective:
+      system_prompt: "You are a meticulous debugger. Trace problems to root cause systematically. Question assumptions, verify with evidence."
+      description: "Meticulous debugger and problem solver"
+    architect:
+      system_prompt: "You think in systems. Design for scalability, maintainability, clarity. Consider trade-offs explicitly. Document decisions."
+      description: "Systems thinker, clean architecture"
+    minimalist:
+      system_prompt: "You believe less is more. Remove unnecessary code and complexity. Prefer simple, understandable solutions."
+      description: "Less is more, simplicity focused"
+    turkce:
+      system_prompt: "Tamamen Turkce konusursun. Kisa, net ve dogrudan cevaplar verirsin. Gereksiz detaydan kacinirsin."
+      description: "Tamamen Turkce, kisa ve oz"
+    socratic:
+      system_prompt: "You answer questions with questions. Guide discovery. Challenge assumptions. Never give direct answers."
+      description: "Answers with questions, Socratic method"
+    mentor:
+      system_prompt: "You are a senior developer mentoring a junior. Explain reasoning behind decisions. Point out pitfalls. Be supportive but honest."
+      description: "Senior dev mentoring a junior"
+    sysadmin:
+      system_prompt: "You are a seasoned sysadmin. Focus on reliability, security, observability. Check logs first. Automate everything."
+      description: "Reliability and security focused"
+    default: {}
+
+# ── Sağlayıcılar ─────────────────────────────────────────────────────────────
+providers:
+  openrouter:
+    base_url: "https://openrouter.ai/api"
+    api_key_env: "OPENROUTER_API_KEY"
+    priority: 1
+    api_key: ""  # .env'den okunur
+
+  lmstudio:
+    base_url: "http://localhost:1234"
+    api_key_env: ""  # LM Studio API anahtarı gerektirmez
+    priority: 2
+    api_key: "not-needed"
+
+  deepseek:
+    base_url: "https://api.deepseek.com"
+    api_key_env: "DEEPSEEK_API_KEY"
+    priority: 2
+    api_key: ""
+
+  # OpenAI — base_url SONU /v1 ILE BITMEMELI; kod otomatik /v1 ekler
+  openai:
+    base_url: "https://api.openai.com"
+    api_key_env: "OPENAI_API_KEY"
+    priority: 3
+    api_key: ""
+
+  anthropic:
+    base_url: "https://api.anthropic.com"
+    api_key_env: "ANTHROPIC_API_KEY"
+    priority: 4
+    api_key: ""
+
+  groq:
+    base_url: "https://api.groq.com/openai/v1"
+    api_key_env: "GROQ_API_KEY"
+    priority: 5
+    api_key: ""
+
+  azure:
+    base_url: ""
+    api_key_env: "AZURE_OPENAI_API_KEY"
+    priority: 6
+    api_key: ""
+
+  bedrock:
+    base_url: ""
+    api_key_env: "AWS_ACCESS_KEY_ID"
+    priority: 7
+    api_key: ""
+
+  gemini:
+    base_url: "https://generativelanguage.googleapis.com"
+    api_key_env: "GEMINI_API_KEY"
+    priority: 8
+    api_key: ""
+
+# ── Fallback Model (ana model başarısız olursa) ──────────────────────────────
+fallback_model:
+  provider: "deepseek"
+  model: "deepseek-chat"
+  base_url: "https://api.deepseek.com"
+  api_key_env: "DEEPSEEK_API_KEY"
+
+# ── Yardımcı Modeller ────────────────────────────────────────────────────────
+auxiliary:
+  vision:
+    provider: "lmstudio"
+    model: "llava-v1.6-mistral-7b"
+    base_url: "http://localhost:1234"
+  compression:
+    provider: "lmstudio"
+    model: "cognitivecomputations.dolphin3.0-llama3.1-8b"
+    base_url: "http://localhost:1234"
+
+# ── Telegram ─────────────────────────────────────────────────────────────────
+telegram:
+  token_env: "TELEGRAM_BOT_TOKEN"
+  chat_id_env: "TELEGRAM_CHAT_ID"
+  default_chat_id: "6328823909"
+
+# ── Durum Makinesi ───────────────────────────────────────────────────────────
+state_machine:
+  enabled: true
+  log_transitions: true
+  heartbeat_interval_sec: 30
+  stale_timeout_sec: 120  # Bu süre heartbeat alınmazsa STALE sayılır
+
+# ── Servis Köprüsü ───────────────────────────────────────────────────────────
+service_bridge:
+  enabled: true
+  max_queue_size: 1000
+  log_events: true
+
+# ── Otomatik Kurtarma ────────────────────────────────────────────────────────
+auto_recovery:
+  enabled: true
+  check_interval_sec: 15       # Her N saniyede bir sağlık kontrolü
+  max_restart_attempts: 3      # Bileşen başına maksimum yeniden başlatma
+  cooldown_sec: 60             # Aynı bileşen için yeniden deneme bekleme
+  max_concurrent_failures: 5   # Genel sistem çökme eşiği
+  notify_on_recovery: true     # Kurtarma yapılınca bildir
+  components:
+    provider:
+      heartbeat_interval_sec: 15
+      timeout_sec: 45
+    session:
+      heartbeat_interval_sec: 30
+      timeout_sec: 60
+    motor:
+      heartbeat_interval_sec: 20
+      timeout_sec: 60
+    bridge:
+      heartbeat_interval_sec: 30
+      timeout_sec: 90
+    state_machine:
+      heartbeat_interval_sec: 30
+      timeout_sec: 60
+
+# ── Ses Modu (Voice Mode) ────────────────────────────────
+voice:
+  default_voice: "tr-TR-AhmetNeural"
+  listen_seconds: 5
+  fallback_tts: true
+
+# ── Terminal Arka Uclari ──────────────────────────────────
+terminal_backends:
+  default: "local"
+  timeout: 60
+  ssh:
+    connect_timeout: 10
+  docker:
+    default_image: "python:3.11-slim"
+  wsl:
+    enabled: true
+
+# ── Hafiza Sistemi ────────────────────────────────────────
+memory:
+  max_records: 2000
+  dedup_threshold: 0.85
+  memory_char_limit: 50000
+  user_char_limit: 25000
+
+# ── Toolsets ──────────────────────────────────────────────
+toolsets:
+  enabled:
+    - terminal
+    - file
+    - web
+    - communication
+    - coding
+    - data
+    - delegation
+    - memory
+    - automation
+
+# ── Komut Onay Sistemi ───────────────────────────────────
+approvals:
+  mode: smart
+  timeout: 60
+  command_allowlist: []
+
+# ── Home Assistant ───────────────────────────────────────
+homeassistant:
+  base_url: ""
+  access_token: ""
+
+# ── Spotify ──────────────────────────────────────────────
+spotify:
+  enabled: true
+  client_id: ""
+  client_secret: ""
+
+# ── Loglama ──────────────────────────────────────────────────────────────────
+logging:
+  level: "INFO"
+  file: ".ReYMeN/logs/reymen.log"
+  max_size_mb: 10
+  backup_count: 5
+  format: "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+
+# ── Skills ───────────────────────────────────────────────────────────────────
+skills:
+  dir: ".ReYMeN/skills"
+
+# ── Checkpoint ───────────────────────────────────────────────────────────────
+checkpoint:
+  dir: ".ReYMeN/checkpoints"
+  enabled: true
+  max_restore_attempts: 3
+
+# ── MCP Sunuculari (Model Context Protocol) ───────────────────────────────────
+# ReYMeN'in harici MCP sunucularina baglanmasini saglar.
+# Ornek:
+#   github:
+#     command: "npx"
+#     args: ["-y", "@modelcontextprotocol/server-github"]
+#
+#   filesystem:
+#     command: "npx"
+#     args: ["-y", "@modelcontextprotocol/server-filesystem", "/home/user/projects"]
+#
+#   remote-api:
+#     url: "https://mcp.example.com/mcp"
+#     headers:
+#       Authorization: "Bearer TOKEN"
+mcp_servers:
+  powerbi-modeling:
+    command: "C:\\Users\\marko\\.vscode\\extensions\\analysis-services.powerbi-modeling-mcp-0.4.0-win32-x64\\server\\powerbi-modeling-mcp.exe"
+    args: []
+
+  filesystem:
+    command: npx
+    args: ["-y", "@modelcontextprotocol/server-filesystem", "."]
+
+  github:
+    command: npx
+    args: ["-y", "@modelcontextprotocol/server-github"]
+    env:
+      GITHUB_PERSONAL_ACCESS_TOKEN: "${GITHUB_PERSONAL_ACCESS_TOKEN}"
+
+# ── Oturum Ayarları ──────────────────────────────────────────

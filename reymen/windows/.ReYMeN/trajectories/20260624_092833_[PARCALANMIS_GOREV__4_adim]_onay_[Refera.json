@@ -1,0 +1,23 @@
+{
+  "hedef": "[PARCALANMIS GOREV: 4 adim]\nonay\n\n[Referanslar]\n  - anahtar: izleme_plani_20260623\ndeger: |\n  ## İZLEME VE BAKIM PLANI\n  \n  ### 1. TESPİT EDİLEN SORUNLAR (Gruplandırılmış)\n  \n  **Grup A - TEKRAR_EDEN_GRS (Veri Tekrarları)**\n  - Sorun: Aynı girişler birden fazla kez kaydedilmiş\n  - Örnek: example_com_verisi 3 kez, drift_duzeltme_raporu 2 kez\n  - Yöntem: TEKRAR_SIL + BİRLEŞTİR\n  - Durum: ✅ Çözüldü (clean_referanslar oluşturuldu)\n  \n  **Grup B - AŞIRI_TEKRAR (Sorgu Tekrarları)**\n  - Sorun: Aynı sorgular çok kez tekrarlanmış (örn: \\\"kaç skill var\\\" 5 kez)\n  - Yöntem: TEMİZLE + ÖNBELLEK\n  - Durum: ✅ Çözüldü\n  \n  **Grup C - TAMAMLANMAMIS_GÖREV (Tur Aşımı)**\n  - Sorun: Tur limiti nedeniyle tamamlanamayan görevler\n  - Yöntem: GÖREV_PARÇALA + ZAMAN_YÖNETİMİ\n\n[DEVAMI SONRAKI ADIMDA VERILECEK - 3 parca kaldi]",
+  "model": "local",
+  "tamamlandi": true,
+  "adim_sayisi": 2,
+  "adimlar": [
+    {
+      "tur": 1,
+      "dusunce": "FC:1araç",
+      "eylem": "['REFERANS_ARA']",
+      "gozlem": "[{'etiket': 'clean_referanslar|Temizlenmis ve birlestirilmis referans verisi. TEKRARLAR TEMIZLENDI. Orijinal example_com_verisi: Example Domain sayfasi. Orijinal drift_duzeltme_raporu_20260621: ReYMeN hafiza drift duzeltmesi. Etiketler: temiz, duzeltilmis, referans', 'icerik': '', 'kaynak': '', 'tarih': '2026-06-23'}, {'etiket': \"decisions_ve_plan_20260623|GUNCELLENMIS KARARLAR VE PLAN. Referanslar: [1] example_com_verisi - Example Domain sayfasindan alinan veri (tek kopya). [2] drift_duzeltme_r",
+      "zaman": "2026-06-24T09:31:00.455301"
+    },
+    {
+      "tur": 2,
+      "dusunce": "FC:1araç",
+      "eylem": "['REFERANS_EKLE']",
+      "gozlem": "[Referans]: Eklendi",
+      "zaman": "2026-06-24T09:31:10.448977"
+    }
+  ],
+  "tool_istatistik": {}
+}

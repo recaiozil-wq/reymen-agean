@@ -1,0 +1,4 @@
+name: model-providers/together
+description: "Together AI model provider"
+version: "1.0.0"
+type: model-provider

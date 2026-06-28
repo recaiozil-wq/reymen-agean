@@ -1,0 +1,5 @@
+name: memory-retaindb
+version: 1.0.0
+description: "ReYMeN plugin: memory-retaindb"
+kind: backend
+author: ReYMeN

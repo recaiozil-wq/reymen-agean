@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kali Terminal</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0d0d0d;
+    color: #e0e0e0;
+    font-family: 'Courier New', monospace;
+    padding: 20px;
+    min-height: 100vh;
+  }
+  h1 {
+    color: #00ff88;
+    font-size: 1.5em;
+    margin-bottom: 15px;
+    display: inline-block;
+  }
+  .status-bar {
+    float: right;
+    font-size: 0.9em;
+    margin-top: 5px;
+  }
+  .status-dot {
+    display: inline-block;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+  .status-green { background: #00ff88; box-shadow: 0 0 8px #00ff88; }
+  .status-red { background: #ff4444; box-shadow: 0 0 8px #ff4444; border-radius: 2px; }
+  .cmd-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 15px 0;
+  }
+  .cmd-buttons button {
+    background: #16213e;
+    color: #00ff88;
+    border: 1px solid #0f3460;
+    padding: 8px 14px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85em;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .cmd-buttons button:hover:not(:disabled) {
+    background: #0f3460;
+    border-color: #00ff88;
+  }
+  .cmd-buttons button:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+  .input-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 15px;
+  }
+  .input-row input {
+    flex: 1;
+    background: #1a1a2e;
+    color: #00ff00;
+    border: 1px solid #0f3460;
+    padding: 10px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.95em;
+  }
+  .input-row input:focus { outline: none; border-color: #00ff88; }
+  .input-row button {
+    background: #0f3460;
+    color: #00ff88;
+    border: 1px solid #00ff88;
+    padding: 10px 20px;
+    font-family: 'Courier New', monospace;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .input-row button:hover:not(:disabled) { background: #00ff88; color: #0d0d0d; }
+  .input-row button:disabled { opacity: 0.35; cursor: not-allowed; }
+  #output {
+    background: #0a0a0a;
+    border: 1px solid #1a1a2e;
+    padding: 15px;
+    min-height: 300px;
+    max-height: 70vh;
+    overflow-y: auto;
+    color: #00ff00;
+    font-size: 0.85em;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  #output .error { color: #ff6644; }
+  #output .info { color: #8888ff; }
+  .loading { display: none; }
+  .loading.active { display: inline-block; }
+</style>
+</head>
+<body>
+
+<h1>Kali Terminal</h1>
+<div class="status-bar">
+  <span class="status-dot status-red" id="status-dot"></span>
+  <span id="status-text">Bağlı Değil</span>
+</div>
+<div style="clear:both"></div>
+
+<div class="cmd-buttons" id="buttons">
+  <button data-cmd="whoami && hostname -I">whoami/ip</button>
+  <button data-cmd="df -h /">disk</button>
+  <button data-cmd="free -h">ram</button>
+  <button data-cmd="ps aux --sort=-%mem | head -15">process</button>
+  <button data-cmd="uptime && last -15">uptime</button>
+  <button data-cmd="sudo arp-scan -l 2>&1">arp-scan</button>
+  <button data-cmd="uname -a && cat /etc/os-release | head -5">OS info</button>
+  <button data-cmd="tmux capture-pane -t hermes -p -S -50">tmux son</button>
+</div>
+
+<div class="input-row">
+  <input type="text" id="cmd-input" placeholder="Komut girin..." disabled>
+  <button id="send-btn" disabled>Gönder</button>
+</div>
+
+<pre id="output">Başlamak için VM'e bağlanın...</pre>
+
+<script>
+const API = "";
+const VM_IP = "192.168.0.19";
+
+function statusDot() {
+  return document.getElementById("status-dot");
+}
+function statusText() {
+  return document.getElementById("status-text");
+}
+function output() {
+  return document.getElementById("output");
+}
+
+function updateUI(connected) {
+  document.querySelectorAll("button[data-cmd]").forEach(b => b.disabled = !connected);
+  document.getElementById("cmd-input").disabled = !connected;
+  document.getElementById("send-btn").disabled = !connected;
+  const dot = document.getElementById("status-dot");
+  const txt = document.getElementById("status-text");
+  if (connected) {
+    dot.className = "status-dot status-green";
+    txt.textContent = "Bağlı (" + VM_IP + ")";
+  } else {
+    dot.className = "status-dot status-red";
+    txt.textContent = "Bağlı Değil";
+  }
+}
+
+async function checkStatus() {
+  try {
+    const r = await fetch(API + "/status");
+    const d = await r.json();
+    updateUI(d.connected === true);
+  } catch(e) {
+    updateUI(false);
+  }
+}
+
+async function runCmd(cmd) {
+  const out = document.getElementById("output");
+  out.textContent = "$ " + cmd + "\nÇalıştırılıyor...";
+  try {
+    const r = await fetch(API + "/exec", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({cmd: cmd})
+    });
+    const d = await r.json();
+    let text = "$ " + cmd + "\n";
+    if (d.output) text += d.output;
+    if (d.error) text += "\n<span class='error'>" + d.error + "</span>";
+    if (d.output === "" && d.error === "") text += "(boş çıktı)";
+    out.innerHTML = text;
+    out.scrollTop = out.scrollHeight;
+  } catch(e) {
+    out.textContent = "$ " + cmd + "\nHATA: " + e.message;
+  }
+}
+
+// Preset buttons
+document.querySelectorAll("button[data-cmd]").forEach(btn => {
+  btn.addEventListener("click", () => runCmd(btn.getAttribute("data-cmd")));
+});
+
+// Send button
+document.getElementById("send-btn").addEventListener("click", () => {
+  const input = document.getElementById("cmd-input");
+  if (input.value.trim()) {
+    runCmd(input.value.trim());
+    input.value = "";
+  }
+});
+
+// Enter key
+document.getElementById("cmd-input").addEventListener("keydown", e => {
+  if (e.key === "Enter") {
+    document.getElementById("send-btn").click();
+  }
+});
+
+// Poll every 10 seconds
+checkStatus();
+setInterval(checkStatus, 10000);
+</script>
+
+</body>
+</html>

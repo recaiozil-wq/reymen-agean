@@ -1,0 +1,5 @@
+name: model-providers-ollama-cloud
+version: 1.0.0
+description: "ReYMeN plugin: model-providers-ollama-cloud"
+kind: backend
+author: ReYMeN

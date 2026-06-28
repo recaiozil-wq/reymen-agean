@@ -1,0 +1,68 @@
+# Telegram Gateway Monitor
+
+## Kural
+
+Bu skill; Telegram bağlantısının kopmaması ve kurulumun "her 30 dakikada bir test edilip hata alındığında otomatik düzeltilmeye çalışılması" için tasarlanmıştır.
+
+## Zorunlu adımlar
+
+1. `.env`’ye yeni bir `TELEGRAM_BOT_TOKEN` yazıldığında **her zaman** şu adımları sırasıyla uygula:
+    - `.env` yolu: `C:\Users\marko\AppData\Local\hermes\.env`
+    - PowerShell ile dışarıdan gateway restart: `powershell.exe -NoProfile -Command "Start-ScheduledTask -TaskName ReYMeN_Gateway"`
+      - Not: linux/workarounds veya `schtasks /Run` bash içinde güvenilir çalışmaz.
+    - Bekleme: restart sonrası bağlanma için 15-20 saniye bekle.
+    - Test et: `hermes send --to telegram:Q ! "Telegram bağlantı testi"`
+2. Token doğrulama:
+    - Test mesajı düzgün gittiyse tamam.
+    - “Not Found”/InvalidToken gelirse ne `.env`’ye ne de gateway yapısına müdahale et.
+    - Sonuç: kullanıcıya yeni bir bot token iste; yeni token ile sadece Adım 1’i baştan uygula.
+3. Gateway state takibi:
+    - `C:\Users\marko\AppData\Local\hermes\gateway_state.json` içindeki Telegram state `connected` olana kadar tekrar restart et.
+    - Eski hatalı token hatası (`115309...JhnYh` gibi) kalıntıysa, gateway process’ini öldür: `taskkill /F /PID <pid>` ardından scheduled task’ı tekrar başlat.
+4. Nihai durumu raporla:
+    - “Telegram bağlantı testi başarılı.”
+    - “Telegram bağlantı testi başarısız ve otomatik onarım denendi.”
+
+## Telegram test mesajı içeriği
+
+- Başarı: `[telegram-watchdog] Bağlantı testi başarılı.`
+- Düzeltme sonrası başarı: `[telegram-watchdog] Bağlantı testi başarılı. Otomatik onarım uygulandı.`
+- Son çare başarısızlık: `[telegram-watchdog] Bağlantı testi başarısız. Otomatik onarım denendi ancak sorun devam ediyor.`
+
+## Pitfall
+
+- Telekom gateway yeniden başlatma komutu **dışarıdan** çalıştırılmalı; gateway içinden gönderilerse reddedilir.
+  - Windows için güvenirlidir: `powershell.exe -NoProfile -Command "Start-ScheduledTask -TaskName ReYMeN_Gateway"`.
+- "T/F" sesi varsayılan Telegram hedefi listelemede `telegram:Q ! (dm)` olarak görünür; bu hedef mevcut değilse ana Telegram hedefini kullan.
+- `.env` okuma: linux PATH ve Windows YAML/CRLF ayrıntıları nedeniyle varsayılan `~/.hermes/.env` çoğu sistemde SIKINTI çıkarır.
+  - Bu ortamda doğru yol: `/c/Users/marko/AppData/Local/hermes/.env`
+  - `cat /c/Users/marko/AppData/Local/hermes/.env | grep <KEY> || true` kullan.
+- Telegram iletimi bir sonraki adım olarak yapılmalı.
+
+## Kazanımlar / Operasyon Notları (sessiz ve güvenli kullanım için)
+
+- Windows'ta aynı anda birden fazla Telegram bağlantı testi gönderme.
+- Eğer `Not Found` alırsan yanlış yol yol, eşleşmeyen PowerShell sırası ya da özel mod anahtarı sorunu olabilir. İlk bakılacak nokta: `telegram-gateway-monitor` skill referansları.
+- Güncellenmiş tekrar-okuma kuralı: `OLLAMA_VISION.md`’ye git, oradaki kuralı güncelle ve ek çözüm yapma.
+
+## Not
+
+- Cron job bu skill’i yükleyip her 30 dakikada bir çalıştıracaktır.
+- Kullanıcı bu kuralı ve cron job’u silmemiştir; koru ve çalıştır.
+
+## .env kalıcılığı kuralı
+
+`.env` dosyasındaki değişiklikler **tek seferlik değildir**. Her `.env` düzenlemesi şu şekilde sıralanmalı:
+1. `.env` dosyasına kaydet.
+2. Değişikliği ReYMeN skill olarak kaydet.
+3. Değişikliği Obsidian vault’a not olarak ekle.
+Kalıcı hafıza (MEMORY/USER) ilk kontrol noktası burası olmalıdır.
+
+## Obsidian kayıt
+
+Kullanıcının Obsidian vault yolunu `.env`’de güncelle:
+- Anahtar: `OBSIDIAN_VAULT_PATH`
+- Not dosyası: `<vault>/Telegram Gateway Monitor.md`
+
+Her test sonrasında aşağıdaki satırı bu dosyaya ekle:
+- `- <tarih> <saat> — <sonuç>` (örn. `2026-06-02 19:36 — Telegram bağlantı testi başarılı.`)

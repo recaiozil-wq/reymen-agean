@@ -1,0 +1,17 @@
+TEST GÖREVİ — ReYMeN Bot 5 Kural Testi
+
+Gönderilecek mesaj:
+========================
+https://youtu.be/dxKAhgKU53c?si=vpm-cJ-GnMpSovVX
+
+Bu videoyu analiz et, talimatları çıkar ve uygula. Karar döngüsüne kaydet.
+========================
+
+Beklenen davranış:
+1. ✅ YouTube transcript alır
+2. ✅ Talimatları çıkarır
+3. ✅ Terminal ile uygular
+4. ✅ Doğrular
+5. ✅ decisions.md'ye kaydeder (Ne yaptın? Neden? Alternatif?)
+6. ✅ Cave Modu: kısa/öz cevap, süslü yok
+7. ✅ No Goblins: gereksiz soru sormaz, direkt yapar

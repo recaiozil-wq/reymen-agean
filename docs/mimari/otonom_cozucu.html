@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReYMeN Otonom Görev Çözücü</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0f;color:#e0e0e0;font-family:system-ui,-apple-system,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem 1rem}
+h1{font-size:1.5rem;font-weight:600;margin-bottom:.25rem;background:linear-gradient(135deg,#22d3ee,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sub{color:#64748b;font-size:.85rem;margin-bottom:2rem}
+.container{max-width:900px;width:100%}
+
+/* Flow */
+.flow{display:flex;flex-direction:column;gap:0;position:relative}
+
+/* Nodes */
+.node{background:#13131f;border:1px solid #1e293b;border-radius:12px;padding:1rem;margin-bottom:1rem;cursor:pointer;transition:all .2s;position:relative;user-select:none}
+.node:hover{border-color:#22d3ee44;background:#1a1a2e;transform:translateX(4px)}
+.node:active{transform:scale(.98)}
+.node .icon{font-size:1.3rem;margin-right:.5rem}
+.node .title{font-weight:600;font-size:.9rem;color:#e0e0e0;display:flex;align-items:center}
+.node .desc{font-size:.75rem;color:#64748b;margin-top:.2rem;line-height:1.4}
+.node .badge{font-size:.6rem;padding:2px 8px;border-radius:20px;margin-left:auto}
+
+/* Colors */
+.node-start{border-left:3px solid #22d3ee}
+.node-orch{border-left:3px solid #a78bfa}
+.node-adapter{border-left:3px solid #34d399}
+.node-step{border-left:3px solid #fbbf24}
+.node-fix{border-left:3px solid #fb923c}
+.node-log{border-left:3px solid #f87171}
+
+/* Arrows (CSS-only) */
+.arrow-down{width:0;height:20px;border-left:2px dashed #1e293b;margin:-.5rem auto -0.5rem auto}
+
+/* Detail panel */
+.detail{display:none;background:#0d0d1a;border:1px solid #1e293b;border-radius:8px;padding:.75rem;margin-top:.5rem;font-size:.8rem;color:#94a3b8;line-height:1.5}
+.detail code{background:#1a1a2e;padding:1px 5px;border-radius:4px;color:#22d3ee;font-size:.75rem}
+.detail.show{display:block}
+
+/* Steps grid */
+.steps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-top:.5rem}
+.step-card{background:#13131f;border:1px solid #1e293b;border-radius:8px;padding:.5rem;text-align:center;cursor:pointer;transition:all .2s;font-size:.8rem}
+.step-card:hover{border-color:#fbbf24;background:#1a1a2e}
+
+/* Status bar */
+.status-bar{display:flex;gap:1rem;justify-content:center;margin:1.5rem 0;padding:.75rem;background:#13131f;border-radius:12px;border:1px solid #1e293b;font-size:.75rem;color:#64748b;flex-wrap:wrap}
+.status-item{display:flex;align-items:center;gap:4px}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.dot-green{background:#34d399}
+.dot-yellow{background:#fbbf24}
+.dot-red{background:#f87171}
+.dot-blue{background:#22d3ee}
+.dot-purple{background:#a78bfa}
+
+/* Cline panel mimic */
+.cline-bar{background:#13131f;border:1px solid #1e293b;border-radius:12px;padding:1rem;margin:1rem 0;display:flex;align-items:center;gap:.75rem}
+.cline-bar .model-badge{background:#1e293b;padding:4px 10px;border-radius:20px;font-size:.7rem;color:#22d3ee}
+.cline-bar .status-text{font-size:.8rem;color:#94a3b8}
+.cline-bar .pulse{width:8px;height:8px;background:#34d399;border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.8)}100%{opacity:1;transform:scale(1)}}
+
+/* Footer */
+.footer{text-align:center;font-size:.7rem;color:#334155;margin-top:2rem;border-top:1px solid #1e293b;padding-top:1rem}
+
+@media(max-width:600px){
+  .steps-grid{grid-template-columns:1fr}
+  .status-bar{flex-direction:column;align-items:center}
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+<h1>◈ ReYMeN Otonom Görev Çözücü</h1>
+<p class="sub">Model-agnostik · kendi hatalarını çözen · 3 retry · JSONL log</p>
+
+<!-- Status bar -->
+<div class="status-bar">
+  <span class="status-item"><span class="dot dot-purple"></span> Model-agnostik</span>
+  <span class="status-item"><span class="dot dot-blue"></span> 7+ provider</span>
+  <span class="status-item"><span class="dot dot-yellow"></span> 3 retry/adım</span>
+  <span class="status-item"><span class="dot dot-green"></span> Auto-detect</span>
+  <span class="status-item"><span class="dot dot-red"></span> Graceful degrade</span>
+</div>
+
+<!-- Cline status mimic -->
+<div class="cline-bar">
+  <span class="pulse"></span>
+  <span class="model-badge">⚡ Act Mode</span>
+  <span class="status-text">Cline — orkestratör · adımları sırayla çalıştırıyor</span>
+</div>
+
+<div class="flow">
+
+  <!-- 1. Görev dosyası -->
+  <div class="node node-start" onclick="toggleDetail('d1')">
+    <div class="title"><span class="icon">📝</span> Görev dosyası <span class="badge" style="background:#22d3ee22;color:#22d3ee">input</span></div>
+    <div class="desc">.ReYMeN/gorev_cozucu_sistemi.md — adımları ve kuralları içerir</div>
+    <div class="detail" id="d1">Cline okur, adımlara böler (pyproject.toml kur, shell=True temizle, CI/CD kur...). <code>Her adım bir STEPS listesi öğesi.</code></div>
+  </div>
+  <div class="arrow-down"></div>
+
+  <!-- 2. Cline Orkestratör -->
+  <div class="node node-orch" onclick="toggleDetail('d2')">
+    <div class="title"><span class="icon">🤖</span> Cline — Orkestratör <span class="badge" style="background:#a78bfa22;color:#a78bfa">Act Mode</span></div>
+    <div class="desc">Dosyayı okur · adımlara böler · sırayla çalıştırır · hata varsa modele sorar</div>
+    <div class="detail" id="d2">
+      <code>orchestrator.py</code> ana döngü:<br>
+      → <code>solve_step(ad, script)</code> çağrılır<br>
+      → <code>run_script()</code> ile Python script'i çalışır<br>
+      → exit code kontrolü<br>
+      → hata varsa <code>ask_model_to_fix()</code> çağrılır
+    </div>
+  </div>
+  <div class="arrow-down"></div>
+
+  <!-- 3. Model Adapter -->
+  <div class="node node-adapter" onclick="toggleDetail('d3')">
+    <div class="title"><span class="icon">⚙️</span> get_active_adapter() <span class="badge" style="background:#34d39922;color:#34d399">model</span></div>
+    <div class="desc">Hangi model aktifse onu alır — Ollama, LM Studio, GLM, DeepSeek, Claude, Gemini...</div>
+    <div class="detail" id="d3">
+      <code>REYMEN_MODEL</code> env var ile seçilir:<br>
+      • <code>auto</code> → sırayla yerel servisleri dener<br>
+      • <code>ollama:llama3</code> → direkt Ollama<br>
+      • <code>deepseek:deepseek-coder</code> → DeepSeek API<br>
+      • <code>lmstudio:local</code> → LM Studio<br><br>
+      Tüm adapter'lar aynı interface: <code>complete(prompt) → str</code>
+    </div>
+  </div>
+  <div class="arrow-down"></div>
+
+  <!-- 4. Adım döngüsü -->
+  <div class="node node-step" onclick="toggleDetail('d4')">
+    <div class="title"><span class="icon">🔄</span> Adım döngüsü <span class="badge" style="background:#fbbf2422;color:#fbbf24">run→check→fix</span></div>
+    <div class="desc">Her adımda script çalışır → exit code kontrolü → hata varsa düzeltme</div>
+    <div class="detail" id="d4">
+      1. <code>run_script("reymen/scripts/step_N.py")</code><br>
+      2. exit code = 0 ✅ → sonraki adım<br>
+      3. exit code ≠ 0 ❌ → stderr mesajını al<br>
+      4. <code>ask_model_to_fix(code, error)</code> ile hata mesajını LLM'e gönder<br>
+      5. LLM'den gelen düzeltilmiş kodu <code>fix/step_N_fix_vK.py</code>'ye yaz<br>
+      6. Tekrar çalıştır (max 3)<br>
+      7. 3'te de başarısız → fail_log.jsonl → sonraki adım
+    </div>
+  </div>
+  <div class="arrow-down"></div>
+
+  <!-- 5. Adımlar grid -->
+  <div class="node node-step" style="cursor:default">
+    <div class="title"><span class="icon">📋</span> STEPS (örnek) <span class="badge" style="background:#fbbf2422;color:#fbbf24">genişletilebilir</span></div>
+    <div class="steps-grid">
+      <div class="step-card" onclick="showPrompt(this,'pyproject.toml kurulumu ve paket metadata')">📦<br>pyproject.toml</div>
+      <div class="step-card" onclick="showPrompt(this,'shell=True lerin güvenli alternatiflerle değiştirilmesi')">🔒<br>shell=True fix</div>
+      <div class="step-card" onclick="showPrompt(this,'cli_main.py 12.8K satırının modüllere bölünmesi')">✂️<br>CLI böl</div>
+      <div class="step-card" onclick="showPrompt(this,'except:pass noktalarının tipli except ile değiştirilmesi')">🕳️<br>except:pass</div>
+      <div class="step-card" onclick="showPrompt(this,'GitHub Actions CI/CD pipeline kurulumu')">🔄<br>CI/CD</div>
+      <div class="step-card" onclick="showPrompt(this,'Dağınık cron dosyalarının tek noktada toplanması')">⏰<br>Cron topla</div>
+    </div>
+  </div>
+  <div class="arrow-down"></div>
+
+  <!-- 6. Çıktılar -->
+  <div style="display:flex;gap:1rem;flex-wrap:wrap">
+    <div class="node node-log" style="flex:1;min-width:200px" onclick="toggleDetail('d6a')">
+      <div class="title"><span class="icon">📋</span> run_log.jsonl</div>
+      <div class="desc">Başarılı adımlar</div>
+      <div class="detail" id="d6a"><code>{"ts": "...", "step": "ADIM_1", "attempt": 1, "ok": true, "tail": "..."}</code></div>
+    </div>
+    <div class="node node-log" style="flex:1;min-width:200px" onclick="toggleDetail('d6b')">
+      <div class="title"><span class="icon">⚠️</span> fail_log.jsonl</div>
+      <div class="desc">Başarısız adımlar (3 deneme sonrası)</div>
+      <div class="detail" id="d6b"><code>{"ts": "...", "step": "ADIM_4", "attempt": 3, "ok": false, "tail": "TimeoutError: ..."}</code></div>
+    </div>
+    <div class="node node-log" style="flex:1;min-width:200px" onclick="toggleDetail('d6c')">
+      <div class="title"><span class="icon">📊</span> GitHub Actions</div>
+      <div class="desc">Her push'ta tüm adımlar otomatik çalışır</div>
+      <div class="detail" id="d6c"><code>on: [push, pull_request] → jobs: build → steps: run orchestrator.py</code></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Prompt output -->
+<div id="promptArea" style="display:none;margin-top:1.5rem;background:#13131f;border:1px solid #22d3ee33;border-radius:12px;padding:1rem">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+    <span style="font-size:.8rem;color:#22d3ee">🔗 Cline'a gönder</span>
+    <span onclick="document.getElementById('promptArea').style.display='none'" style="cursor:pointer;color:#64748b;font-size:.8rem">✕ kapat</span>
+  </div>
+  <pre id="promptText" style="background:#0a0a0f;border:1px solid #1e293b;border-radius:8px;padding:.75rem;font-size:.75rem;color:#94a3b8;overflow-x:auto;white-space:pre-wrap;word-break:break-word;user-select:all"></pre>
+  <div style="font-size:.7rem;color:#334155;margin-top:.3rem">Tıkla seç → Ctrl+C kopyala → Cline'a yapıştır</div>
+</div>
+
+<div class="footer">
+  ReYMeN Otonom Görev Çözücü · model-agnostik · kod ile hata çözen · kendini iyileştiren sistem
+</div>
+</div>
+
+<script>
+function toggleDetail(id){
+  const el=document.getElementById(id);
+  el.classList.toggle('show');
+  document.querySelectorAll('.detail.show').forEach(d=>{if(d.id!==id) d.classList.remove('show')});
+}
+
+function showPrompt(el,context){
+  const step=el.textContent.trim().replace('📦','').replace('🔒','').replace('✂️','').replace('🕳️','').replace('🔄','').replace('⏰','').replace('📊','').trim();
+  const prompts={
+    'pyproject.toml':'Görev: ReYMeN projesine pyproject.toml ekle. Build sistemi (setuptools), bağımlılıklar (requests, openai, chromadb), opsiyonel bağımlılıklar (dev, web, telegram), CLI entry point, pytest+ruff+bandit yapılandırması içermeli.',
+    'shell=True fix':'Görev: reymen/ dizinindeki tüm shell=True kullanımlarını güvenli alternatiflerle değiştir. subprocess.run([...]) veya shlex.split() kullan. Browser için webbrowser modülü kullan.',
+    'CLI böl':'Görev: reymen/sistem/cli_main.py (12.8K satır) her biri tek sorumluluklu modüllere böl. Mevcut CLI bölme patternini kullan (cli_display, cli_commands, cli_helpers).',
+    'except:pass':'Görev: reymen/ dizinindeki tüm except:pass noktalarını tipli except handler\'larla değiştir. En az logging.warning() ekle.',
+    'CI/CD':'Görev: .github/workflows/ altına CI pipeline kur. Her push\'ta: ruff lint → pytest → bandit security. Python 3.10-3.12 matrix.',
+    'Cron topla':'Görev: Projedeki dağınık cron dosyalarını (cron/, cron_scheduler.py, reymen/sistem/cron_scheduler.py) tek bir cron_scheduler.py altında topla. Yinelenenleri temizle.'
+  };
+  const p=prompts[step]||`Görev: ${step} — ReYMeN projesinde uygula.`;
+  const full=`@/ReYMeN-Ajan\n\n${p}\n\nAct modunda çalıştır. Hata alırsan düzeltip tekrar dene (max 3). Her adımda ilerleme raporu ver.`;
+  document.getElementById('promptText').textContent=full;
+  document.getElementById('promptArea').style.display='block';
+  el.scrollIntoView({behavior:'smooth',block:'center'});
+}
+</script>
+
+</body>
+</html>

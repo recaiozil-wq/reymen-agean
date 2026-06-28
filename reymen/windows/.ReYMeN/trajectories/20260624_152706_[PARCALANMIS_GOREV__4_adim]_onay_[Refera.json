@@ -1,0 +1,58 @@
+{
+  "hedef": "[PARCALANMIS GOREV: 4 adim]\nonay\n\n[Referanslar]\n  - anahtar: izleme_plani_20260623\ndeger: |\n  ## İZLEME VE BAKIM PLANI\n  \n  ### 1. TESPİT EDİLEN SORUNLAR (Gruplandırılmış)\n  \n  **Grup A - TEKRAR_EDEN_GRS (Veri Tekrarları)**\n  - Sorun: Aynı girişler birden fazla kez kaydedilmiş\n  - Örnek: example_com_verisi 3 kez, drift_duzeltme_raporu 2 kez\n  - Yöntem: TEKRAR_SIL + BİRLEŞTİR\n  - Durum: ✅ Çözüldü (clean_referanslar oluşturuldu)\n  \n  **Grup B - AŞIRI_TEKRAR (Sorgu Tekrarları)**\n  - Sorun: Aynı sorgular çok kez tekrarlanmış (örn: \\\"kaç skill var\\\" 5 kez)\n  - Yöntem: TEMİZLE + ÖNBELLEK\n  - Durum: ✅ Çözüldü\n  \n  **Grup C - TAMAMLANMAMIS_GÖREV (Tur Aşımı)**\n  - Sorun: Tur limiti nedeniyle tamamlanamayan görevler\n  - Yöntem: GÖREV_PARÇALA + ZAMAN_YÖNETİMİ\n\n[DEVAMI SONRAKI ADIMDA VERILECEK - 3 parca kaldi]",
+  "model": "local",
+  "tamamlandi": true,
+  "adim_sayisi": 7,
+  "adimlar": [
+    {
+      "tur": 1,
+      "dusunce": "FC:1araç",
+      "eylem": "['REFERANS_ARA']",
+      "gozlem": "[Kanca]: [KANCA] Task default bloke: 'CRON_EKLE' 4kere art arda",
+      "zaman": "2026-06-24T15:29:49.640905"
+    },
+    {
+      "tur": 2,
+      "dusunce": "FC:1araç",
+      "eylem": "['MEMORY']",
+      "gozlem": "[Kanca]: [KANCA] Task default bloke: 'CRON_EKLE' 4kere art arda",
+      "zaman": "2026-06-24T15:29:56.998435"
+    },
+    {
+      "tur": 3,
+      "dusunce": "FC:1araç",
+      "eylem": "['REFERANS_OZET']",
+      "gozlem": "[Kanca]: [KANCA] Task default bloke: 'CRON_EKLE' 4kere art arda",
+      "zaman": "2026-06-24T15:30:04.967419"
+    },
+    {
+      "tur": 4,
+      "dusunce": "FC:1araç",
+      "eylem": "['CRON_DURUM']",
+      "gozlem": "[Kanca]: [KANCA] Task default bloke: 'CRON_EKLE' 4kere art arda",
+      "zaman": "2026-06-24T15:30:09.969202"
+    },
+    {
+      "tur": 5,
+      "dusunce": "FC:1araç",
+      "eylem": "['CRON_LISTELE']",
+      "gozlem": "[Kanca]: [KANCA] Task default bloke: 'CRON_EKLE' 4kere art arda",
+      "zaman": "2026-06-24T15:30:13.687912"
+    },
+    {
+      "tur": 6,
+      "dusunce": "FC:1araç",
+      "eylem": "['GUVENLIK_OZET']",
+      "gozlem": "[Kanca]: [KANCA] Task default bloke: 'CRON_EKLE' 4kere art arda",
+      "zaman": "2026-06-24T15:30:17.169701"
+    },
+    {
+      "tur": 7,
+      "dusunce": "FC:1araç",
+      "eylem": "['GUVENLIK_RISKLI']",
+      "gozlem": "[Kanca]: [KANCA] Task default bloke: 'CRON_EKLE' 4kere art arda",
+      "zaman": "2026-06-24T15:30:20.851293"
+    }
+  ],
+  "tool_istatistik": {}
+}

@@ -1,0 +1,37 @@
+{
+  "tarih": "2026-06-27T16:34:19.807085",
+  "kok": "C:\\Users\\marko\\Desktop\\Reymen Proje\\ReYMeN-Ajan",
+  "sonuclar": [
+    {
+      "no": 1,
+      "durum": "BULUNAMADI",
+      "mesaj": "C:\\Users\\marko\\Desktop\\Reymen Proje\\ReYMeN-Ajan\\reymen\\scripts\\fix_01_sessiz_except.py"
+    },
+    {
+      "no": 2,
+      "durum": "BULUNAMADI",
+      "mesaj": "C:\\Users\\marko\\Desktop\\Reymen Proje\\ReYMeN-Ajan\\reymen\\scripts\\fix_02_all_ekle.py"
+    },
+    {
+      "no": 3,
+      "durum": "BULUNAMADI",
+      "mesaj": "C:\\Users\\marko\\Desktop\\Reymen Proje\\ReYMeN-Ajan\\reymen\\scripts\\fix_03_coverage.py"
+    },
+    {
+      "no": 4,
+      "durum": "BULUNAMADI",
+      "mesaj": "C:\\Users\\marko\\Desktop\\Reymen Proje\\ReYMeN-Ajan\\reymen\\scripts\\fix_04_guvenlik.py"
+    },
+    {
+      "no": 5,
+      "durum": "BULUNAMADI",
+      "mesaj": "C:\\Users\\marko\\Desktop\\Reymen Proje\\ReYMeN-Ajan\\reymen\\scripts\\fix_05_cli_bolme.py"
+    }
+  ],
+  "toplam_sure": 0.0,
+  "ozet": {
+    "basarili": 0,
+    "hata": 0,
+    "timeout": 0
+  }
+}

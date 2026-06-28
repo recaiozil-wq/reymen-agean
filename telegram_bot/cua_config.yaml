@@ -1,0 +1,7 @@
+lm_studio_url: http://localhost:1234/v1/chat/completions
+lm_studio_model: llava-v1.6-mistral-7b
+max_deneme: 3
+tikla_bekleme: 1.0
+screenshot_dir: reymen_screenshots
+log_dosyasi: cua_log.txt
+guvenli_bolge: [10, 10]

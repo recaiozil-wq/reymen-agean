@@ -1,0 +1,242 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "reymen"
+version = "2.0.0"
+description = "ReYMeN — Otonom Uygulama Otomasyonu Ajani"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "ReYMeN" },
+]
+keywords = ["agent", "automation", "llm", "windows", "autonomous"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "requests>=2.31.0",
+    "pyyaml>=6.0",
+    "python-dotenv>=1.0.0",
+    "psutil>=5.9.0",
+    "pillow>=10.0.0",
+    "numpy>=1.24.0",
+    "openai>=1.0.0",
+    "anthropic>=0.30.0",
+    "chromadb>=1.5.0",
+    "pdfplumber>=0.9.0",
+    "openpyxl>=3.1.0",
+    "beautifulsoup4>=4.12.0",
+    "selenium>=4.15.0",
+    "opencv-python>=4.8.0",
+    "mss>=9.0.0",
+    "pytesseract>=0.3.10",
+    'pywin32>=306 ; sys_platform == "win32"',
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=4.1",
+    "pytest-xdist>=3.5",
+    "ruff>=0.4",
+    "bandit>=1.7",
+    "coverage>=7.4",
+]
+web = [
+    "fastapi>=0.110.0",
+    "uvicorn[standard]>=0.29.0",
+]
+telegram = [
+    "python-telegram-bot>=20.0",
+]
+tts = [
+    "edge-tts>=6.0.0",
+]
+ocr = [
+    "easyocr>=1.7.0",
+]
+build = [
+    "pyinstaller>=6.0.0",
+]
+
+[project.scripts]
+reymen = "reymen.__main__:main"
+
+[project.urls]
+Homepage = "https://github.com/reymen/ReYMeN-Ajan"
+Issues = "https://github.com/reymen/ReYMeN-Ajan/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["reymen*", "tools*", "gateway*", "agent*", "plugins*", "tui_gateway*"]
+exclude = [
+    "venv*",
+    "bot_venv*",
+    "tests*",
+    "skills*",
+    "optional-skills*",
+    "output*",
+    "logs*",
+    "screenshots*",
+    "references*",
+    "docs*",
+    "assets*",
+    "scripts*",
+    "rl_observation*",
+    "website*",
+    "chroma_db*",
+    "hermes-memory-backup*",
+    "ReYMeN-full-backup*",
+    "hermes_full_backup*",
+    "acp*",
+    "acp_adapter*",
+    "ReYMeN_cli*",
+    "dashboard*",
+    "desktop*",
+    "notion_writer*",
+    "providers*",
+    "packaging*",
+    "proxy*",
+    "processors*",
+    "cron*",
+    "apps*",
+]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+norecursedirs = [
+    "ReYMeN_reference",
+    "venv",
+    ".venv",
+    "bot_venv",
+    "skills",
+    "output",
+    "logs",
+    "gateway",
+    "plugins",
+    "tui_gateway",
+    "ReYMeN_cli",
+    "hermes-memory-backup",
+    "hermes_full_backup",
+    "acp",
+    "ReYMeN-full-backup",
+    "dashboard",
+    "desktop",
+    "notion_writer",
+    "providers",
+    "packaging",
+    "proxy",
+    "processors",
+    "acp_adapter",
+    "cron",
+    "apps",
+    "rl_observation",
+    "chroma_db",
+]
+addopts = "-ra"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]
+
+[tool.coverage.run]
+source = ["reymen", "tools", "agent", "gateway", "tui_gateway"]
+omit = [
+    "*/tests/*",
+    "*/venv/*",
+    "*/bot_venv/*",
+    "*/skills/*",
+    "*/ReYMeN_reference/*",
+    "*/hermes-memory-backup/*",
+    "*/ReYMeN-full-backup/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "pass",
+    "if TYPE_CHECKING:",
+]
+show_missing = true
+precision = 2
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+extend-exclude = [
+    "venv",
+    "bot_venv",
+    "skills",
+    "optional-skills",
+    "output",
+    "logs",
+    "hermes-memory-backup",
+    "ReYMeN-full-backup",
+    "hermes_full_backup",
+    "ReYMeN_cli",
+    "acp",
+    "acp_adapter",
+    "chroma_db",
+    "references",
+    "docs",
+    "assets",
+    "rl_observation",
+    "website",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+    "S",   # flake8-bandit (security)
+]
+ignore = [
+    "E501",   # line too long (formatter handles)
+    "S101",   # use of assert (tests)
+    "S603",   # subprocess call (audited)
+    "B008",   # function call in default argument
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S", "B", "E"]
+"reymen_analiz.py" = ["S", "E"]
+"reymen_setup.py" = ["S", "E"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+
+[tool.bandit]
+exclude_dirs = [
+    "tests",
+    "venv",
+    "bot_venv",
+    "skills",
+    "hermes-memory-backup",
+    "ReYMeN-full-backup",
+    "ReYMeN_cli",
+    "acp",
+    "acp_adapter",
+]
+skips = ["B101"]  # assert usage in tests

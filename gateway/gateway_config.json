@@ -1,0 +1,9 @@
+{
+  "genel": {
+    "max_mesaj_uzunlugu": 4096,
+    "varsayilan_platform": "telegram",
+    "zaman_asimi": 30,
+    "tekrar_deneme": 3
+  },
+  "platformlar": {}
+}

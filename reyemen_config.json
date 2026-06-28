@@ -1,0 +1,15 @@
+{
+  "default_model": "deepseek-v4-flash",
+  "default_provider": "deepseek",
+  "secure_binding": true,
+  "providers": {
+    "deepseek": {
+      "base_url": "https://api.deepseek.com",
+      "api_key": ""
+    }
+  },
+  "fallback_model": null,
+  "backend_mode": "local",
+  "skills_count": 333,
+  "skills_dir": ".reYMeN/skills"
+}

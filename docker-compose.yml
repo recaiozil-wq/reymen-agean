@@ -1,0 +1,15 @@
+services:
+  reymen:
+    build: .
+    container_name: reymen
+    volumes:
+      - .ReYMeN:/app/.ReYMeN
+      - logs:/app/logs
+    environment:
+      - REYMEN_MODEL=${REYMEN_MODEL:-auto}
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+    command: ["--gorev", ".ReYMeN/gorev_cozucu_sistemi.md"]
+
+volumes:
+  logs:

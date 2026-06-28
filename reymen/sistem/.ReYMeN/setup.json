@@ -1,0 +1,6 @@
+{
+  "tercih_provider": "deepseek",
+  "tercih_model": "deepseek-v4-flash",
+  "tercih_tarih": "2026-06-27",
+  "not": "Auto-setup: model secici atlanir, direkt deepseek-v4-flash baslar"
+}

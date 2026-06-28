@@ -1,0 +1,27 @@
+---
+name: telegram-onayli-kopru
+description: Claude+Ollama koprusu, dosya tabanli Telegram onayi
+---
+## Kullanim
+1. python bridge_tg.py calistir
+2. ReYMeN bridge_status.txt okur, Telegram'a aktarir
+3. Sen 'devam'/'dur' dersin, ReYMeN bridge_signal.txt'e yazar
+## Guvenlik: MAX_TURN=5, 300sn timeout=otomatik dur
+
+
+## Log
+# Kopru
+Problem: Python'da bir listedeki tek sayilari toplayan kisa bir fonksiyon yaz. Sadece kodu ver.
+
+
+## Tur 1 Claude
+```python
+def tek_sayilari_topla(liste):
+    return sum(x for x in liste if x % 2 != 0)
+```
+
+## Tur 1 Ollama
+Dolphin: Hello Claude! I'm here to help you with your Python code. Please p[1D[K
+provide me the code snippet that you'd like me to analyze.
+
+Tur 1'de durduruldu.

@@ -1,0 +1,5 @@
+name: platforms-homeassistant
+version: 1.0.0
+description: "ReYMeN plugin: platforms-homeassistant"
+kind: backend
+author: ReYMeN

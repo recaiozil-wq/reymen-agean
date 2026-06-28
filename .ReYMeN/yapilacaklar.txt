@@ -1,0 +1,119 @@
+# ReYMeN - Claude'a Verilecek Talimatlar
+# Olusturma: eksik_cozucu.py
+
+## GOREV A: Stub Class Doldur
+
+- _parser.py:27 -> `boya` (fonksiyon, docstring + return)
+- active_sessions.py:19 -> `_session_dosyasi` (fonksiyon, docstring + return)
+- auth.py:18 -> `AuthError` (class, docstring + pass)
+- auth.py:63 -> `_token_dosyasi` (fonksiyon, docstring + return)
+- auth.py:230 -> `_load_provider_state` (fonksiyon, docstring + return)
+- auth.py:257 -> `_resolve_kimi_base_url` (fonksiyon, docstring + return)
+- auth.py:262 -> `_resolve_zai_base_url` (fonksiyon, docstring + return)
+- auth.py:52 -> `__enter__` (fonksiyon, docstring + return)
+- azure_detect.py:177 -> `_strip_trailing_v1` (fonksiyon, docstring + return)
+- banner.py:15 -> `_banner_dosyasi` (fonksiyon, docstring + return)
+- banner.py:34 -> `build_welcome_banner` (fonksiyon, docstring + return)
+- broadcast.py:16 -> `_kanal_listesi` (fonksiyon, docstring + return)
+- bundles.py:16 -> `_bundle_dosyasi` (fonksiyon, docstring + return)
+- callbacks.py:18 -> `_callback_dosyasi` (fonksiyon, docstring + return)
+- callbacks_cli.py:16 -> `_callback_dosyasi` (fonksiyon, docstring + return)
+- checkpoints.py:19 -> `_checkpoint_dizini` (fonksiyon, docstring + return)
+- clipboard.py:18 -> `_pano_dosyasi` (fonksiyon, docstring + return)
+- colors.py:17 -> `_tema_dosyasi` (fonksiyon, docstring + return)
+- commands.py:60 -> `version` (fonksiyon, docstring + return)
+- commands.py:9 -> `__init__` (fonksiyon, pass govdeli)
+- commands.py:15 -> `__init__` (fonksiyon, pass govdeli)
+- config.py:71 -> `load_config` (fonksiyon, docstring + return)
+- copilot_auth.py:16 -> `_copilot_token_dosyasi` (fonksiyon, docstring + return)
+- curator_cli.py:16 -> `_curator_dosyasi` (fonksiyon, docstring + return)
+- dashboard_register.py:16 -> `_dashboard_dosyasi` (fonksiyon, docstring + return)
+- debug.py:19 -> `_debug_dosyasi` (fonksiyon, docstring + return)
+- dep_ensure.py:16 -> `_dep_dosyasi` (fonksiyon, docstring + return)
+- dump.py:18 -> `_sistem_bilgisi` (fonksiyon, docstring + return)
+- env_loader.py:16 -> `_env_dosyasi` (fonksiyon, docstring + return)
+- fallback_cmd.py:54 -> `FallbackCmdError` (class, docstring + pass)
+- fallback_config.py:16 -> `_fallback_dosyasi` (fonksiyon, docstring + return)
+- firewall.py:14 -> `_varsayilan_kurallar` (fonksiyon, docstring + return)
+- gateway_windows.py:223 -> `_launch_elevated_uninstall` (fonksiyon, docstring + return)
+- gateway_windows.py:248 -> `_sanitize_filename` (fonksiyon, docstring + return)
+- gateway_windows.py:287 -> `get_startup_entry_path` (fonksiyon, docstring + return)
+- gateway_windows.py:910 -> `is_installed` (fonksiyon, docstring + return)
+- goals.py:17 -> `_hedef_dosyasi` (fonksiyon, docstring + return)
+- hooks.py:18 -> `_hook_dosyasi` (fonksiyon, docstring + return)
+- hooks_cli.py:16 -> `_hook_dosyasi` (fonksiyon, docstring + return)
+- logs.py:18 -> `_log_dosyasi` (fonksiyon, docstring + return)
+- logs.py:23 -> `_log_ayar_dosyasi` (fonksiyon, docstring + return)
+- main.py:6866 -> `_desktop_dist_exists` (fonksiyon, docstring + return)
+- main.py:8818 -> `_resolve_update_branch` (fonksiyon, docstring + return)
+- mcp_picker.py:17 -> `_mcp_dosyasi` (fonksiyon, docstring + return)
+- mcp_security.py:18 -> `_guvenlik_dosyasi` (fonksiyon, docstring + return)
+- mcp_startup.py:17 -> `_startup_dosyasi` (fonksiyon, docstring + return)
+- metrics.py:15 -> `_ornek_metrikler` (fonksiyon, docstring + return)
+- middleware.py:18 -> `_middleware_dosyasi` (fonksiyon, docstring + return)
+- migrate.py:15 -> `_migrate_dosyasi` (fonksiyon, docstring + return)
+- model_catalog.py:15 -> `_model_katalog` (fonksiyon, docstring + return)
+- model_cost_guard.py:17 -> `_butce_dosyasi` (fonksiyon, docstring + return)
+- model_normalize.py:14 -> `_alias_map` (fonksiyon, docstring + return)
+- model_switch.py:15 -> `_kullanilabilir_modeller` (fonksiyon, docstring + return)
+- notifications.py:15 -> `_kanallar` (fonksiyon, docstring + return)
+- optimizer.py:15 -> `_tavsiyeler` (fonksiyon, docstring + return)
+- pairing.py:18 -> `_pairing_dosyasi` (fonksiyon, docstring + return)
+- permissions.py:14 -> `_varsayilan_roller` (fonksiyon, docstring + return)
+- platforms.py:18 -> `_platform_dosyasi` (fonksiyon, docstring + return)
+- plugins_cmd.py:19 -> `_plugin_dosyasi` (fonksiyon, docstring + return)
+- prompt_size.py:15 -> `_token_hesapla` (fonksiyon, docstring + return)
+- pty_bridge.py:83 -> `is_available` (fonksiyon, docstring + return)
+- recovery.py:16 -> `_kurtarma_noktalari` (fonksiyon, docstring + return)
+- registry_cli.py:14 -> `_registry_icerigi` (fonksiyon, docstring + return)
+- reporting.py:16 -> `_sistem_ozeti` (fonksiyon, docstring + return)
+- rollback.py:16 -> `_degisiklik_gecmisi` (fonksiyon, docstring + return)
+- routing.py:14 -> `_varsayilan_kurallar` (fonksiyon, docstring + return)
+- runtime_provider.py:74 -> `_saglayicilar` (fonksiyon, docstring + return)
+- secret_prompt.py:16 -> `_secret_dosyasi` (fonksiyon, docstring + return)
+- secrets_cli.py:17 -> `_sir_dosyasi` (fonksiyon, docstring + return)
+- service_manager.py:19 -> `_servis_dosyasi` (fonksiyon, docstring + return)
+- session_listing.py:18 -> `_session_dosyasi` (fonksiyon, docstring + return)
+- setup.py:18 -> `_gerekli_paketler` (fonksiyon, docstring + return)
+- skin_engine.py:15 -> `_mevcut_temalar` (fonksiyon, docstring + return)
+- suggestions_cmd.py:17 -> `_oneri_dosyasi` (fonksiyon, docstring + return)
+- telegram_managed_bot.py:15 -> `run_telegram` (fonksiyon, pass govdeli)
+- timeouts.py:91 -> `_timeout_dosyasi` (fonksiyon, docstring + return)
+- tips.py:19 -> `_tips_dosyasi` (fonksiyon, docstring + return)
+- tools_config.py:18 -> `_tools_dosyasi` (fonksiyon, docstring + return)
+- troubleshooting.py:14 -> `_sorun_cozumleri` (fonksiyon, docstring + return)
+- update_cli.py:17 -> `_surum_kontrol` (fonksiyon, docstring + return)
+- voice.py:18 -> `_voice_dosyasi` (fonksiyon, docstring + return)
+- watchdog.py:16 -> `_izlenecek_dizinler` (fonksiyon, docstring + return)
+- web_server.py:19 -> `_web_dosyasi` (fonksiyon, docstring + return)
+- webhook.py:18 -> `_webhook_dosyasi` (fonksiyon, docstring + return)
+
+## GOREV B: XFailed Custom Tipler
+
+Su testlerdeki custom tip argumanlari manuel doldur:
+- test_ReYMeN_bootstrap.py:7 -> `test_apply_windows_utf8_bootstrap()`
+- test_ReYMeN_constants.py:7 -> `test_set_ReYMeN_home_override()`
+- test_ReYMeN_constants.py:18 -> `test_reset_ReYMeN_home_override()`
+- test_ReYMeN_constants.py:29 -> `test_get_ReYMeN_home_override()`
+- test_ReYMeN_constants.py:40 -> `test_get_ReYMeN_home()`
+- test_ReYMeN_constants.py:51 -> `test_get_default_ReYMeN_root()`
+- test_ReYMeN_constants.py:62 -> `test_get_optional_skills_dir()`
+- test_ReYMeN_constants.py:73 -> `test_get_optional_mcps_dir()`
+- test_ReYMeN_constants.py:84 -> `test_get_bundled_skills_dir()`
+- test_ReYMeN_constants.py:95 -> `test_get_ReYMeN_dir()`
+- test_ReYMeN_constants.py:106 -> `test_display_ReYMeN_home()`
+- test_ReYMeN_constants.py:117 -> `test_secure_parent_dir()`
+- test_ReYMeN_constants.py:128 -> `test_get_subprocess_home()`
+- test_ReYMeN_constants.py:139 -> `test_parse_reasoning_effort()`
+- test_ReYMeN_constants.py:150 -> `test_is_termux()`
+- test_ReYMeN_constants.py:161 -> `test_is_wsl()`
+- test_ReYMeN_constants.py:172 -> `test_is_container()`
+- test_ReYMeN_constants.py:183 -> `test_get_config_path()`
+- test_ReYMeN_constants.py:194 -> `test_get_skills_dir()`
+- test_ReYMeN_constants.py:205 -> `test_get_env_path()`
+- ... ve 457 test daha
+
+## GOREV C: Script Sonrasi Coverage
+
+1. `pip install pytest-cov` (kurulu)
+2. `python -m pytest reymen/test/ --cov=reymen --cov-config=.coveragerc --cov-report=term-missing --tb=no -q`

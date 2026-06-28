@@ -1,0 +1,5 @@
+name: model-providers-alibaba-coding-plan
+version: 1.0.0
+description: "ReYMeN plugin: model-providers-alibaba-coding-plan"
+kind: backend
+author: ReYMeN

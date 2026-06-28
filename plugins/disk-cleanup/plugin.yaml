@@ -1,0 +1,5 @@
+name: disk-cleanup
+version: 1.0.0
+description: "ReYMeN plugin: disk-cleanup"
+kind: backend
+author: ReYMeN

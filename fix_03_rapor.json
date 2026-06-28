@@ -1,0 +1,43 @@
+{
+  "tarih": "2026-06-27T16:47:20.760882",
+  "kok": "C:\\Users\\marko\\Desktop\\Reymen Proje\\ReYMeN-Ajan",
+  "paket_kurulum": {
+    "pytest": "zaten_kurulu",
+    "pytest-cov": "zaten_kurulu",
+    "pytest-timeout": "zaten_kurulu"
+  },
+  "modül_testler": [
+    {
+      "modül": "sistem",
+      "dizin": "C:\\Users\\marko\\Desktop\\Reymen Proje\\ReYMeN-Ajan\\hermes-memory-backup\\tests",
+      "return_code": 1,
+      "ozet": "",
+      "coverage_satiri": ""
+    },
+    {
+      "modül": "hafiza",
+      "dizin": "C:\\Users\\marko\\Desktop\\Reymen Proje\\ReYMeN-Ajan\\hermes-memory-backup\\tests",
+      "return_code": 1,
+      "ozet": "",
+      "coverage_satiri": ""
+    },
+    {
+      "modül": "arac",
+      "dizin": "C:\\Users\\marko\\Desktop\\Reymen Proje\\ReYMeN-Ajan\\hermes-memory-backup\\tests",
+      "return_code": 1,
+      "ozet": "",
+      "coverage_satiri": ""
+    },
+    {
+      "modül": "guvenlik",
+      "dizin": "C:\\Users\\marko\\Desktop\\Reymen Proje\\ReYMeN-Ajan\\hermes-memory-backup\\tests",
+      "return_code": 1,
+      "ozet": "",
+      "coverage_satiri": ""
+    }
+  ],
+  "coverage": {},
+  "genel": {
+    "sure": 104.9
+  }
+}

@@ -1,0 +1,5 @@
+name: platforms-irc
+version: 1.0.0
+description: "ReYMeN plugin: platforms-irc"
+kind: backend
+author: ReYMeN

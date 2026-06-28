@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>R>eYMeN — Otonom Uygulama Ajani</title>
+<style>
+  :root { --bg: #0d1117; --fg: #c9d1d9; --accent: #58a6ff; --border: #30363d; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--fg); line-height: 1.6; }
+  .container { max-width: 900px; margin: 0 auto; padding: 2rem; }
+  h1 { font-size: 2.5rem; color: #fff; margin-bottom: 0.5rem; }
+  h1 span { color: var(--accent); }
+  h2 { font-size: 1.5rem; color: #fff; margin: 2rem 0 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+  p { margin-bottom: 1rem; }
+  .subtitle { font-size: 1.1rem; color: #8b949e; margin-bottom: 2rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+  .card { background: #161b22; border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; }
+  .card h3 { color: var(--accent); margin-bottom: 0.5rem; }
+  .card p { color: #8b949e; font-size: 0.9rem; }
+  code { background: #1c2128; padding: 0.2em 0.4em; border-radius: 4px; font-size: 0.9em; color: #f97583; }
+  pre { background: #1c2128; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; overflow-x: auto; margin: 1rem 0; }
+  .footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); color: #8b949e; font-size: 0.85rem; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .badge { display: inline-block; background: #1f6feb; color: #fff; padding: 0.2em 0.6em; border-radius: 12px; font-size: 0.8rem; margin-right: 0.3rem; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>R><span>eY</span>MeN</h1>
+  <p class="subtitle">Otonom Uygulama Otomasyonu Ajani — ReYMeN Agent cekirdegi uzerine kurulu</p>
+
+  <div class="grid">
+    <div class="card"><h3>Ekran OCR + Tiklama</h3><p>easyocr ile ekrandaki yaziyi bul, hassas noktaya tikla</p></div>
+    <div class="card"><h3>Makro Kaydetme/Oynatma</h3><p>Kullanim senaryolarini kaydet, tekrar oynat</p></div>
+    <div class="card"><h3>Uygulama Hafizasi</h3><p>Uygulamalarin adimlarini ogren ve hatirla</p></div>
+    <div class="card"><h3>Coklu LLM</h3><p>LM Studio, DeepSeek, OpenAI, Anthropic, Groq — fallback zincirli</p></div>
+    <div class="card"><h3>Web UI</h3><p>FastAPI + HTMX ile karanlik temali arayuz</p></div>
+    <div class="card"><h3>MCP Sunucu</h3><p>Model Context Protocol — diger ajanlarla iletisim</p></div>
+  </div>
+
+  <h2>Kurulum</h2>
+  <pre><code>git clone &lt;repo-url&gt;
+cd hermes_projesi
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+python reyment.py doctor</code></pre>
+
+  <h2>Kullanim</h2>
+  <pre><code># Ajani calistir
+python start.py
+
+# Sadece Web UI
+python start.py --dashboard-only
+
+# CLI ile hedef ver
+python reyment.py run "masaustunde test.txt olustur"
+
+# Gateway (Telegram + WebSocket)
+python reyment.py gateway start</code></pre>
+
+  <h2>Mimari</h2>
+  <pre><code>KULLANICI
+  |
+  v
+reyment.py (CLI)  --  web_ui.py (Web)  --  gateway_runner.py (Telegram/WS)
+  |                     |                       |
+  +---------------------+-----------------------+
+                      |
+              main.py (ReAct dongusu)
+                |           |
+           beyin.py     motor.py
+           (LLM)        (Araclar)
+                |           |
+           20+ provider   15+ arac
+           (fallback)     (ekran, makro, web, dosya...)</code></pre>
+
+  <h2>Providerlar</h2>
+  <p><span class="badge">LM Studio</span><span class="badge">DeepSeek</span><span class="badge">OpenAI</span><span class="badge">Anthropic</span><span class="badge">Groq</span><span class="badge">Together</span><span class="badge">Mistral</span><span class="badge">Cohere</span><span class="badge">Perplexity</span><span class="badge">Fireworks</span><span class="badge">OpenRouter</span><span class="badge">Google/Gemini</span><span class="badge">Azure</span><span class="badge">HuggingFace</span><span class="badge">NVIDIA</span><span class="badge">Alibaba</span><span class="badge">Moonshot</span><span class="badge">Zhipu</span><span class="badge">Anyscale</span><span class="badge">vLLM</span><span class="badge">Ollama</span><span class="badge">LiteLLM</span></p>
+
+  <h2>Gereksinimler</h2>
+  <ul style="margin-left:1.5rem;margin-bottom:1rem;">
+    <li>Python 3.10+</li>
+    <li>LM Studio (yerel LLM icin) veya API anahtari (bulut icin)</li>
+    <li>Windows 10+ (onerilen), Linux/macOS</li>
+    <li>Opsiyonel: easyocr, playwright, chromadb</li>
+  </ul>
+
+  <div class="footer">
+    <p>R>eYMeN — Unlicense (Public Domain). Istedigin gibi kullan, cogalt, degistir.</p>
+    <p>ReYMeN Agent (Nous Research) cekirdegi uzerine insa edilmistir.</p>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,15 @@
+[run]
+omit =
+    reymen/windows/*
+    reymen/test/*
+    */test_*
+    */__init__.py
+
+[report]
+show_missing = True
+skip_covered = True
+skip_empty = True
+exclude_lines =
+    pragma: no cover
+    raise NotImplementedError
+    if __name__ == "__main__":

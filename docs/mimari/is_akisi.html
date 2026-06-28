@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReYMeN Ajan — İş Akışı</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0f;color:#e0e0e0;font-family:system-ui,-apple-system,sans-serif;min-height:100vh;padding:2rem 1rem}
+.container{max-width:1000px;margin:0 auto}
+
+h1{font-size:1.8rem;font-weight:700;text-align:center;margin-bottom:.25rem;background:linear-gradient(135deg,#22d3ee,#a78bfa,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sub{text-align:center;color:#64748b;font-size:.85rem;margin-bottom:2rem}
+
+/* Agent Grid */
+.agents{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:2rem}
+.agent{background:#13131f;border:1px solid #1e293b;border-radius:16px;padding:1rem;text-align:center;transition:all .2s;cursor:pointer;position:relative}
+.agent:hover{transform:translateY(-4px)}
+.agent .icon{font-size:2rem;margin-bottom:.5rem}
+.agent .name{font-size:.9rem;font-weight:600;margin-bottom:.2rem}
+.agent .role{font-size:.7rem;color:#64748b;margin-bottom:.5rem}
+.agent .status{font-size:.6rem;padding:2px 10px;border-radius:20px;display:inline-block}
+.memory{border-top:3px solid #22d3ee}
+.skill{border-top:3px solid #34d399}
+.scanner{border-top:3px solid #fb923c}
+.analysis{border-top:3px solid #a78bfa}
+.comm{border-top:3px solid #22d3ee}
+
+/* Flow Diagram */
+.flow{margin:2rem 0}
+.flow-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;padding:8px 12px;background:#13131f;border-radius:10px;border:1px solid #1e293b;font-size:.8rem}
+.flow-row .step{background:#1e293b;padding:2px 8px;border-radius:12px;font-size:.65rem;color:#94a3b8;white-space:nowrap}
+.flow-row .desc{flex:1;color:#cbd5e1}
+.flow-row .file{color:#64748b;font-size:.7rem;font-family:monospace}
+.flow-arrow{text-align:center;color:#334155;font-size:.7rem;padding:2px 0}
+
+/* Detail Cards */
+.detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-top:1.5rem}
+.card{background:#13131f;border:1px solid #1e293b;border-radius:12px;padding:1rem}
+.card h3{font-size:.85rem;font-weight:600;margin-bottom:.5rem;display:flex;align-items:center;gap:6px}
+.card ul{list-style:none;font-size:.75rem;color:#94a3b8;line-height:1.6}
+.card ul li::before{content:"▸ ";color:#334155}
+
+table{width:100%;border-collapse:collapse;font-size:.75rem;margin:.5rem 0}
+th,td{padding:6px 8px;text-align:left;border-bottom:1px solid #1e293b}
+th{color:#64748b;font-weight:500}
+td{color:#94a3b8;font-family:monospace}
+tr:hover{background:#1a1a2e}
+
+.footer{text-align:center;font-size:.7rem;color:#334155;margin-top:2rem;border-top:1px solid #1e293b;padding-top:1rem}
+code{background:#1e293b;padding:1px 5px;border-radius:4px;font-size:.7rem;color:#22d3ee}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>◈ ReYMeN Ajan — İş Akışı</h1>
+<p class="sub">5 ajan · otonom · kendi kendine hata çözen · model-agnostik</p>
+
+<!-- Agent Grid -->
+<div class="agents">
+  <div class="agent memory" onclick="scrollTo('flow')">
+    <div class="icon">🧠</div>
+    <div class="name">Hafıza Ajan</div>
+    <div class="role">Veri saklama · öğrenme</div>
+    <span class="status" style="background:#22d3ee22;color:#22d3ee">once_hafiza.py</span>
+  </div>
+  <div class="agent skill" onclick="scrollTo('flow')">
+    <div class="icon">🛠️</div>
+    <div class="name">Beceri Ajan</div>
+    <div class="role">Araç çalıştırma · yetenek</div>
+    <span class="status" style="background:#34d39922;color:#34d399">motor.py</span>
+  </div>
+  <div class="agent scanner" onclick="scrollTo('flow')">
+    <div class="icon">🔍</div>
+    <div class="name">Tarayıcı Ajan</div>
+    <div class="role">Keşif · hata tespit</div>
+    <span class="status" style="background:#fb923c22;color:#fb923c">run_script()</span>
+  </div>
+  <div class="agent analysis" onclick="scrollTo('flow')">
+    <div class="icon">📊</div>
+    <div class="name">Analiz Ajan</div>
+    <div class="role">Hata çözüm · karar</div>
+    <span class="status" style="background:#a78bfa22;color:#a78bfa">orchestrator.py</span>
+  </div>
+  <div class="agent comm" onclick="scrollTo('flow')">
+    <div class="icon">📡</div>
+    <div class="name">İletişim Ajan</div>
+    <div class="role">Koordinasyon · rapor</div>
+    <span class="status" style="background:#22d3ee22;color:#22d3ee">telegram/cli</span>
+  </div>
+</div>
+
+<!-- Flow -->
+<div id="flow" class="flow">
+
+<div class="flow-row">
+  <span class="step">1</span>
+  <span class="desc">🧠 <b>Hafıza</b> — once_hafiza.hafizada_ara() ile önceki çözümleri tara</span>
+  <span class="file">guven > 0.8 → direkt döndür</span>
+</div>
+<div class="flow-arrow">▼</div>
+
+<div class="flow-row">
+  <span class="step">2</span>
+  <span class="desc">🔍 <b>Tarayıcı</b> — run_script() ile Python script çalıştır, çıktıyı kontrol et</span>
+  <span class="file">exit code ≠ 0 → hata yakala</span>
+</div>
+<div class="flow-arrow">▼</div>
+
+<div class="flow-row">
+  <span class="step">3</span>
+  <span class="desc">📊 <b>Analiz</b> — ask_model_to_fix() ile hata mesajını LLM'e gönder</span>
+  <span class="file">adapter.complete(prompt)</span>
+</div>
+<div class="flow-arrow">▼<br><span style="color:#64748b;font-size:.65rem">LLM (DeepSeek/GLM/Ollama/LM Studio)</span><br>▼</div>
+
+<div class="flow-row">
+  <span class="step">4</span>
+  <span class="desc">🛠️ <b>Beceri</b> — Gelen düzeltilmiş kodu fix/step_N_fix_vK.py'ye yaz</span>
+  <span class="file">tekrar dene (max 3)</span>
+</div>
+<div class="flow-arrow">▼<br><span style="color:#334155;font-size:.65rem">↻ başarısızsa Analiz'e geri dön (max 3)</span><br>▼</div>
+
+<div class="flow-row">
+  <span class="step">5</span>
+  <span class="desc">🧠 <b>Hafıza</b> — Sonucu kaydet: run_log.jsonl / fail_log.jsonl</span>
+  <span class="file">bir daha aynı hata → direkt çöz</span>
+</div>
+<div class="flow-arrow">▼</div>
+
+<div class="flow-row">
+  <span class="step">6</span>
+  <span class="desc">📡 <b>İletişim</b> — Raporu Telegram/CLI'ya gönder</span>
+  <span class="file">"ADIM_3 ✅ geçti" veya "⚠️ 3 deneme başarısız"</span>
+</div>
+
+</div>
+
+<!-- Detail Cards -->
+<div class="detail-grid">
+
+<div class="card">
+  <h3>🧠 Hafıza Ajan</h3>
+  <table>
+    <tr><th>Dosya</th><th>Görev</th></tr>
+    <tr><td>once_hafiza.py</td><td>guven > 0.8 → direkt döndür</td></tr>
+    <tr><td>run_log.jsonl</td><td>başarılı adımlar</td></tr>
+    <tr><td>fail_log.jsonl</td><td>başarısız adımlar</td></tr>
+    <tr><td>skills_index.db</td><td>FTS5 index</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <h3>🛠️ Beceri Ajan</h3>
+  <table>
+    <tr><th>Dosya</th><th>Görev</th></tr>
+    <tr><td>motor.py</td><td>gorev_coz() + hatadan_kurtul()</td></tr>
+    <tr><td>tool_registry.py</td><td>64 araç kaydı</td></tr>
+    <tr><td>run_script()</td><td>Python script çalıştır</td></tr>
+    <tr><td>fix/*.py</td><td>düzeltilmiş kodlar</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <h3>🔍 Tarayıcı Ajan</h3>
+  <table>
+    <tr><th>Dosya</th><th>Görev</th></tr>
+    <tr><td>run_script()</td><td>Python script çalıştır + exit code</td></tr>
+    <tr><td>compile()</td><td>syntax kontrol (fix öncesi)</td></tr>
+    <tr><td>pytest --collect</td><td>test toplama</td></tr>
+    <tr><td>reymen_analiz.py</td><td>proje sağlık taraması</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <h3>📊 Analiz Ajan</h3>
+  <table>
+    <tr><th>Dosya</th><th>Görev</th></tr>
+    <tr><td>orchestrator.py</td><td>solve_step() + solve_all()</td></tr>
+    <tr><td>model_adapter.py</td><td>7 provider, auto-detect</td></tr>
+    <tr><td>ask_model_to_fix()</td><td>hata → düzeltilmiş kod</td></tr>
+    <tr><td>coz_hata()</td><td>acil hata çözümü</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <h3>📡 İletişim Ajan</h3>
+  <table>
+    <tr><th>Dosya</th><th>Görev</th></tr>
+    <tr><td>telegram_bot.py</td><td>Telegram'da raporla</td></tr>
+    <tr><td>CLI</td><td>reymen --gorev ile başlat</td></tr>
+    <tr><td>gateway</td><td>multi-profile desteği</td></tr>
+    <tr><td>reymen_logging.py</td><td>logger ile kayıt</td></tr>
+  </table>
+</div>
+
+</div>
+
+<!-- Samples -->
+<div style="margin-top:2rem;background:#13131f;border:1px solid #1e293b;border-radius:12px;padding:1rem">
+  <h3 style="font-size:.85rem;font-weight:600;margin-bottom:.5rem">📋 Kullanım Örnekleri</h3>
+  <table>
+    <tr><th>Komut</th><th>Ne Yapar</th></tr>
+    <tr><td><code>motor.gorev_coz(".ReYMeN/gorev_cozucu_sistemi.md")</code></td><td>6 adımlık görevi başlat, hataları oto çöz</td></tr>
+    <tr><td><code>motor.hatadan_kurtul(kod, hata)</code></td><td>Herhangi bir hatayı LLM'e sor, düzeltilmiş kod al</td></tr>
+    <tr><td><code>once_hafiza.hafizada_ara("shell=True")</code></td><td>Hafızada benzer çözüm var mı kontrol et</td></tr>
+    <tr><td><code>orchestrator.solve_all(STEPS)</code></td><td>Tüm adımları sırayla çöz, hataları otomatik düzelt</td></tr>
+    <tr><td><code>model_adapter.get_active_adapter()</code></td><td>Aktif LLM provider'ını al (auto-detect)</td></tr>
+  </table>
+</div>
+
+<div class="footer">
+  ReYMeN — 5 ajanlı otonom görev çözücü · model-agnostik · kendi hatalarını çözen
+</div>
+
+</div>
+
+<script>
+function scrollTo(id){
+  document.getElementById(id).scrollIntoView({behavior:'smooth'});
+}
+</script>
+</body>
+</html>

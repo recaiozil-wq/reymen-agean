@@ -1,0 +1,1063 @@
+{
+  "skıl_dosyaları_ve_memory_kontorl_et": {
+    "ad": "skıl dosyaları ve memory kontorl et",
+    "aciklama": "skıl dosyaları ve memory kontorl et",
+    "tetikleyiciler": [
+      "ve",
+      "dosyaları",
+      "et",
+      "skıl",
+      "memory",
+      "kontorl"
+    ],
+    "adimlar": [
+      "KOMUT_CALISTIR",
+      "KOMUT_CALISTIR",
+      "KOMUT_CALISTIR",
+      "KOMUT_CALISTIR",
+      "KOMUT_CALISTIR",
+      "KOMUT_CALISTIR",
+      "KOMUT_CALISTIR",
+      "KOMUT_CALISTIR"
+    ],
+    "basari_kriteri": "Skill ve memory kontrolü tamamlandı. Toplam 9 adet skill bulunuyor (2___2_kac_ed",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-21",
+    "son_basari": "2026-06-21"
+  },
+  "deepseek_v4_flash___64_6k_1m________________6____2": {
+    "ad": "deepseek-v4-flash │ 64.6K/1M │ [█░░░░░░░░░] 6% │ 2",
+    "aciklama": "deepseek-v4-flash │ 64.6K/1M │ [█░░░░░░░░░] 6% │ 2",
+    "tetikleyiciler": [
+      "[█░░░░░░░░░]",
+      "deepseek-v4-flash",
+      "64.6k/1m",
+      "│",
+      "6%"
+    ],
+    "adimlar": [
+      "YARDIM_ISTE"
+    ],
+    "basari_kriteri": "Merhaba! Ben ReYMeN, otonom bir yazılım ajanıyım. Konuşma tarzımı şöyle ayarlaya",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-21",
+    "son_basari": "2026-06-21"
+  },
+  "termınalde_ac_ve__altın_ons_fıyatları_ıncele": {
+    "ad": "termınalde ac ve  altın ons fıyatları ıncele",
+    "aciklama": "termınalde ac ve  altın ons fıyatları ıncele",
+    "tetikleyiciler": [
+      "ve",
+      "fıyatları",
+      "termınalde",
+      "ons",
+      "altın",
+      "ac"
+    ],
+    "adimlar": [
+      "KOMUT_CALISTIR",
+      "KOMUT_CALISTIR",
+      "PYTHON_CALISTIR",
+      "KOMUT_CALISTIR"
+    ],
+    "basari_kriteri": "Altın ons fiyatı başarıyla alındı.\\n\\n📊 **Altın Ons Fiyatı: 4156.70 USD**\\n\\nFiy",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-21",
+    "son_basari": "2026-06-21"
+  },
+  "tor_browser_ac_ve_alanya_hava_durumu_hakkında_bılg": {
+    "ad": "Tor Browser ac ve alanya hava durumu hakkında bılg",
+    "aciklama": "Tor Browser ac ve alanya hava durumu hakkında bılg",
+    "tetikleyiciler": [
+      "browser",
+      "ve",
+      "tor",
+      "alanya",
+      "hava",
+      "ac"
+    ],
+    "adimlar": [
+      "KOMUT_CALISTIR",
+      "WEB_ARA",
+      "TARAYICI_AC",
+      "PYTHON_CALISTIR",
+      "KOMUT_CALISTIR",
+      "PYTHON_CALISTIR",
+      "KOMUT_CALISTIR"
+    ],
+    "basari_kriteri": "Tor Browser açıldı ancak internet bağlantısı sorunu nedeniyle Alanya hava durumu",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-21",
+    "son_basari": "2026-06-21"
+  },
+  "nasıl_yapacagın_memory_ve_skıller_den_kontol_etder": {
+    "ad": "nasıl yapacagın memory ve skıller den kontol etder",
+    "aciklama": "nasıl yapacagın memory ve skıller den kontol etder",
+    "tetikleyiciler": [
+      "skıller",
+      "ve",
+      "nasıl",
+      "yapacagın",
+      "den",
+      "memory"
+    ],
+    "adimlar": [
+      "HAFIZA_ARA",
+      "KOMUT_CALISTIR",
+      "KOMUT_CALISTIR",
+      "DOSYA_OKU",
+      "PYTHON_CALISTIR",
+      "KOMUT_CALISTIR",
+      "PYTHON_CALISTIR",
+      "PYTHON_CALISTIR"
+    ],
+    "basari_kriteri": "Web scraping için memory ve skill'leri kontrol ettim. İşte tüm yetenekler:\\n\\n##",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-21",
+    "son_basari": "2026-06-21"
+  },
+  "tor_tarayıcıyı_ac_ekranda": {
+    "ad": "tor tarayıcıyı ac ekranda",
+    "aciklama": "tor tarayıcıyı ac ekranda",
+    "tetikleyiciler": [
+      "tarayıcıyı",
+      "tor",
+      "ac",
+      "ekranda"
+    ],
+    "adimlar": [
+      "KOMUT_CALISTIR",
+      "EKRAN_OKU"
+    ],
+    "basari_kriteri": "Tor Browser sisteminizde kurulu görünmüyor. Tor Browser'ı kullanmak için:\\n\\n1. ",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-21",
+    "son_basari": "2026-06-21"
+  },
+  "reymen_test_gorevi_â___cok_kaynakli_aras_tirma___r": {
+    "ad": "REYMEN TEST GOREVI â€” COK KAYNAKLI ARAS+TIRMA + R",
+    "aciklama": "REYMEN TEST GOREVI â€” COK KAYNAKLI ARAS+TIRMA + R",
+    "tetikleyiciler": [
+      "gorevi",
+      "test",
+      "kaynakli",
+      "reymen",
+      "cok",
+      "â€”"
+    ],
+    "adimlar": [
+      "FC/CLARIFY",
+      "FC/MEMORY"
+    ],
+    "basari_kriteri": "Görev tanımı net olmadığı için tamamlanamadı. \\\"REYMEN TEST GOREVI - COK KAYNAKL",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-23",
+    "son_basari": "2026-06-23"
+  },
+  "gã_revi_reymen_bot_a_aynen_kopyala_yapä_åÿtä_r_yap": {
+    "ad": "GÃ¶revi ReYMeN bot'a aynen kopyala-yapÄ±ÅŸtÄ±r yap",
+    "aciklama": "GÃ¶revi ReYMeN bot'a aynen kopyala-yapÄ±ÅŸtÄ±r yap",
+    "tetikleyiciler": [
+      "yap:",
+      "aynen",
+      "reymen",
+      "bot'a",
+      "gã¶revi",
+      "kopyala-yapä±åÿtä±r"
+    ],
+    "adimlar": [
+      "FC/GOREV_DEVRET",
+      "FC/DOSYA_YAZ",
+      "FC/MEMORY",
+      "FC/EXECUTE_CODE",
+      "FC/GUVENLIK_OZET"
+    ],
+    "basari_kriteri": "PLAN başarıyla ReYMeN bot'a kopyala-yapıştır yapıldı. Plan metni aşağıda sunulmu",
+    "kullanim_sayisi": 2,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-23",
+    "son_basari": "2026-06-23"
+  },
+  "_____kopyala_basla_____": {
+    "ad": "---- KOPYALA BASLA ----",
+    "aciklama": "---- KOPYALA BASLA ----",
+    "tetikleyiciler": [
+      "----",
+      "basla",
+      "kopyala"
+    ],
+    "adimlar": [
+      "FC/EXECUTE_CODE",
+      "FC/EXECUTE_CODE",
+      "FC/EXECUTE_CODE",
+      "FC/EXECUTE_CODE",
+      "FC/DOSYA_YAZ",
+      "FC/EXECUTE_CODE",
+      "FC/EXECUTE_CODE",
+      "FC/EXECUTE_CODE",
+      "PYTHON_CALISTIR",
+      "KOMUT_CALISTIR",
+      "DOSYA_YAZ"
+    ],
+    "basari_kriteri": "\"Plan uygulandı:\n1",
+    "kullanim_sayisi": 3,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-23",
+    "son_basari": "2026-06-23"
+  },
+  "tã¼rkiye_deki_son_3_yapay_zeka_giriåÿimini__2026_": {
+    "ad": "TÃ¼rkiye'deki son 3 yapay zeka giriÅŸimini (2026) ",
+    "aciklama": "TÃ¼rkiye'deki son 3 yapay zeka giriÅŸimini (2026) ",
+    "tetikleyiciler": [
+      "son",
+      "3",
+      "giriåÿimini",
+      "yapay",
+      "zeka",
+      "tã¼rkiye'deki"
+    ],
+    "adimlar": [
+      "FC/WEB_ARAMA",
+      "FC/WEB_ARAMA",
+      "FC/WEB_ARA",
+      "FC/WEB_ARA",
+      "FC/WEB_ICERIK",
+      "FC/WEB_ICERIK",
+      "FC/WEB_ICERIK",
+      "FC/WEB_ARA"
+    ],
+    "basari_kriteri": "[Beyin Hatası] ❌ Tüm sağlayıcılar başarısız. Son hata: 400 Client Error: Bad Req",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-23",
+    "son_basari": "2026-06-23"
+  },
+  "1__web_den_gã¼ncel_tã¼rk_ai_giriåÿimlerini_ara__we": {
+    "ad": "1. Web'den gÃ¼ncel TÃ¼rk AI giriÅŸimlerini ara (we",
+    "aciklama": "1. Web'den gÃ¼ncel TÃ¼rk AI giriÅŸimlerini ara (we",
+    "tetikleyiciler": [
+      "web'den",
+      "1.",
+      "ai",
+      "tã¼rk",
+      "giriåÿimlerini",
+      "gã¼ncel"
+    ],
+    "adimlar": [
+      "PYTHON_CALISTIR",
+      "PYTHON_CALISTIR",
+      "KOMUT_CALISTIR",
+      "WEB_ARA"
+    ],
+    "basari_kriteri": "\"GOREV_BITTI(\\\"GÖREV TAMAMLANDI\n\nTürk AI girişimlerini başarıyla topladım ve ver",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-23",
+    "son_basari": "2026-06-23"
+  },
+  "2__bulduäÿun_her_giriåÿim_iã_in_detaylä__bilgi_top": {
+    "ad": "2. BulduÄŸun her giriÅŸim iÃ§in detaylÄ± bilgi top",
+    "aciklama": "2. BulduÄŸun her giriÅŸim iÃ§in detaylÄ± bilgi top",
+    "tetikleyiciler": [
+      "detaylä±",
+      "giriåÿim",
+      "iã§in",
+      "bulduäÿun",
+      "2.",
+      "her"
+    ],
+    "adimlar": [
+      "HAFIZA_ARA",
+      "WEB_ARA",
+      "TARAYICI_AC",
+      "WEB_ARA",
+      "WEB_ARA",
+      "WEB_ARA",
+      "KOMUT_CALISTIR",
+      "KOMUT_CALISTIR"
+    ],
+    "basari_kriteri": "\"DÜŞÜN: Sandbox zaman aşımına uğradı. İnternet bağlantısı sorunu ve araç kısıtla",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-23",
+    "son_basari": "2026-06-23"
+  },
+  "4__puanla__teknik__yenilik__yatä_rä_m__etki_kriter": {
+    "ad": "4. Puanla (teknik, yenilik, yatÄ±rÄ±m, etki kriter",
+    "aciklama": "4. Puanla (teknik, yenilik, yatÄ±rÄ±m, etki kriter",
+    "tetikleyiciler": [
+      "4.",
+      "puanla",
+      "yenilik,",
+      "etki",
+      "yatä±rä±m,",
+      "(teknik,"
+    ],
+    "adimlar": [
+      "KOMUT_CALISTIR",
+      "YARDIM_ISTE",
+      "KOMUT_CALISTIR",
+      "PYTHON_CALISTIR",
+      "PYTHON_CALISTIR",
+      "DOSYA_OKU",
+      "PYTHON_CALISTIR"
+    ],
+    "basari_kriteri": "GOREV_BITTI(\\\"{\\\\n  \\\\\\\"status\\\\\\\": 200,\\\\n  \\\\\\\"length\\\\\\\": 559,\\\\n  \\\\\\\"conten",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-23",
+    "son_basari": "2026-06-23"
+  },
+  "5__raporu_dosyaya_kaydet": {
+    "ad": "5. Raporu dosyaya kaydet",
+    "aciklama": "5. Raporu dosyaya kaydet",
+    "tetikleyiciler": [
+      "raporu",
+      "5.",
+      "dosyaya",
+      "kaydet"
+    ],
+    "adimlar": [
+      "HAFIZA_ARA",
+      "KOMUT_CALISTIR",
+      "DOSYA_YAZ",
+      "DOSYA_YAZ",
+      "KOMUT_CALISTIR",
+      "PYTHON_CALISTIR",
+      "PYTHON_CALISTIR"
+    ],
+    "basari_kriteri": "GOREV_BITTI(\\\"GOREV_BITTI(\\\\\\\"İşlem tamamlandı ancak bir hata daha var. \\\\\\\")\\\")",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-23",
+    "son_basari": "2026-06-23"
+  },
+  "6__ã_zet_tabloyu_buraya_yaz": {
+    "ad": "6. Ã–zet tabloyu buraya yaz",
+    "aciklama": "6. Ã–zet tabloyu buraya yaz",
+    "tetikleyiciler": [
+      "buraya",
+      "6.",
+      "tabloyu",
+      "yaz",
+      "ã–zet"
+    ],
+    "adimlar": [
+      "HAFIZA_ARA",
+      "KOMUT_CALISTIR",
+      "DOSYA_OKU"
+    ],
+    "basari_kriteri": "No | Konu | Değişiklikler | Önemi\\\\\\\\n----|------|---------------|-------\\\\\\\\n1 ",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-23",
+    "son_basari": "2026-06-23"
+  },
+  "_____kopyala_bitti_____": {
+    "ad": "---- KOPYALA BITTI ----",
+    "aciklama": "---- KOPYALA BITTI ----",
+    "tetikleyiciler": [
+      "----",
+      "kopyala",
+      "bitti"
+    ],
+    "adimlar": [
+      "PYTHON_CALISTIR",
+      "PYTHON_CALISTIR",
+      "PYTHON_CALISTIR",
+      "PYTHON_CALISTIR",
+      "PYTHON_CALISTIR"
+    ],
+    "basari_kriteri": "GOREV_BITTI(\\\"Plan basariyla uygulandi. Veri.json dosyasi C:\\\\\\\\Users\\\\\\\\marko\\\\",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-23",
+    "son_basari": "2026-06-23"
+  },
+  "__dosya_yapä_sä__ve_mimari": {
+    "ad": "- Dosya yapÄ±sÄ± ve mimari",
+    "aciklama": "- Dosya yapÄ±sÄ± ve mimari",
+    "tetikleyiciler": [
+      "yapä±sä±",
+      "ve",
+      "dosya",
+      "-",
+      "mimari"
+    ],
+    "adimlar": [
+      "KOMUT_CALISTIR"
+    ],
+    "basari_kriteri": "KOMUT_CALISTIR: \\\"ls -la\\\")\"",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-23",
+    "son_basari": "2026-06-23"
+  },
+  "__ã_alä_åÿma_dã_ngã¼sã¼__conversation_loop_vs_reac": {
+    "ad": "- Ã‡alÄ±ÅŸma dÃ¶ngÃ¼sÃ¼ (conversation_loop vs ReAc",
+    "aciklama": "- Ã‡alÄ±ÅŸma dÃ¶ngÃ¼sÃ¼ (conversation_loop vs ReAc",
+    "tetikleyiciler": [
+      "ã‡alä±åÿma",
+      "vs",
+      "react)",
+      "(conversation_loop",
+      "dã¶ngã¼sã¼",
+      "-"
+    ],
+    "adimlar": [
+      "PYTHON_CALISTIR",
+      "PYTHON_CALISTIR",
+      "PYTHON_CALISTIR",
+      "PYTHON_CALISTIR"
+    ],
+    "basari_kriteri": "\"GOREV_BITTI(\\\"Tüm adımlar başarıyla tamamlandı. Program:\n\n1. Python'da oluşturu",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-23",
+    "son_basari": "2026-06-23"
+  },
+  "__hafä_za_sistemi__oncehafiza__gorevhafiza_": {
+    "ad": "- HafÄ±za sistemi (OnceHafiza, GorevHafiza)",
+    "aciklama": "- HafÄ±za sistemi (OnceHafiza, GorevHafiza)",
+    "tetikleyiciler": [
+      "hafä±za",
+      "(oncehafiza,",
+      "-",
+      "gorevhafiza)",
+      "sistemi"
+    ],
+    "adimlar": [
+      "PYTHON_CALISTIR",
+      "PYTHON_CALISTIR",
+      "PYTHON_CALISTIR",
+      "DUSUN"
+    ],
+    "basari_kriteri": "Hafıza sistemi başarıyla oluşturuldu. **hafiza_sistemi/** klasörü altında iki JS",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-23",
+    "son_basari": "2026-06-23"
+  },
+  "__hata_yã_netimi__circuit_breaker__retry_": {
+    "ad": "- Hata yÃ¶netimi (circuit breaker, retry)",
+    "aciklama": "- Hata yÃ¶netimi (circuit breaker, retry)",
+    "tetikleyiciler": [
+      "retry)",
+      "(circuit",
+      "yã¶netimi",
+      "hata",
+      "-",
+      "breaker,"
+    ],
+    "adimlar": [
+      "PYTHON_CALISTIR",
+      "KOMUT_CALISTIR",
+      "KOMUT_CALISTIR",
+      "DOSYA_YAZ",
+      "DOSYA_YAZ",
+      "PYTHON_CALISTIR",
+      "KOMUT_CALISTIR",
+      "KOMUT_CALISTIR"
+    ],
+    "basari_kriteri": "Hata yönetimi (circuit breaker ve retry) çalışması başarıyla tamamlandı. `https:",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-23",
+    "son_basari": "2026-06-23"
+  },
+  "__skill_yã_netimi": {
+    "ad": "- Skill yÃ¶netimi",
+    "aciklama": "- Skill yÃ¶netimi",
+    "tetikleyiciler": [
+      "yã¶netimi",
+      "-",
+      "skill"
+    ],
+    "adimlar": [
+      "HAFIZA_ARA",
+      "WEB_ARA"
+    ],
+    "basari_kriteri": "\"DÜŞÜN: İnternet bağlantısı yok gibi görünüyor. Ancak kullanıcıya \\\\\\\"Skill yöne",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-23",
+    "son_basari": "2026-06-23"
+  },
+  "__ã_äÿrenme_dã_ngã¼sã¼__self_improvement_": {
+    "ad": "- Ã–ÄŸrenme dÃ¶ngÃ¼sÃ¼ (self-improvement)",
+    "aciklama": "- Ã–ÄŸrenme dÃ¶ngÃ¼sÃ¼ (self-improvement)",
+    "tetikleyiciler": [
+      "(self-improvement)",
+      "-",
+      "ã–äÿrenme",
+      "dã¶ngã¼sã¼"
+    ],
+    "adimlar": [
+      "HAFIZA_ARA",
+      "KOMUT_CALISTIR"
+    ],
+    "basari_kriteri": "KOMUT_CALISTIR: \\\"ls -la\\\")\"",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-23",
+    "son_basari": "2026-06-23"
+  },
+  "her_kategori_iã_in_": {
+    "ad": "Her kategori iÃ§in:",
+    "aciklama": "Her kategori iÃ§in:",
+    "tetikleyiciler": [
+      "iã§in:",
+      "kategori",
+      "her"
+    ],
+    "adimlar": [
+      "YARDIM_ISTE"
+    ],
+    "basari_kriteri": "Anlayamadım. \\\\\\\"Her kategori için:\\\\\\\" ifadesini tamamlar mısınız? Hangi katego",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-23",
+    "son_basari": "2026-06-23"
+  },
+  "__açıklama__kısa__kural_kısıt": {
+    "ad": "✅ Açıklama: kısa, kural/kısıt",
+    "aciklama": "✅ Açıklama: kısa, kural/kısıt",
+    "tetikleyiciler": [
+      "açıklama:",
+      "kısa,",
+      "kural/kısıt",
+      "✅"
+    ],
+    "adimlar": [
+      "FC/EXECUTE_CODE",
+      "FC/EXECUTE_CODE",
+      "FC/EXECUTE_CODE",
+      "FC/EXECUTE_CODE",
+      "FC/DOSYA_YAZ",
+      "FC/DOSYA_YAZ",
+      "FC/EXECUTE_CODE",
+      "FC/EXECUTE_CODE"
+    ],
+    "basari_kriteri": "\"Plan başarıyla uygulandı:\n1. ✅ https://example.com adresine GET isteği yapıldı ",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-23",
+    "son_basari": "2026-06-23"
+  },
+  "__tablo__sütun_başlıklı__düzenli": {
+    "ad": "✅ Tablo: sütun başlıklı, düzenli",
+    "aciklama": "✅ Tablo: sütun başlıklı, düzenli",
+    "tetikleyiciler": [
+      "başlıklı,",
+      "sütun",
+      "tablo:",
+      "✅",
+      "düzenli"
+    ],
+    "adimlar": [
+      "FC/EXECUTE_CODE",
+      "FC/EXECUTE_CODE",
+      "FC/DOSYA_YAZ",
+      "FC/DOSYA_YAZ",
+      "FC/EXECUTE_CODE",
+      "FC/KOMUT_CALISTIR",
+      "FC/EXECUTE_CODE",
+      "FC/EXECUTE_CODE"
+    ],
+    "basari_kriteri": "Plan uygulandı: 1) https://example.com adresine GET isteği yapıldı, 2) Beautiful",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-23",
+    "son_basari": "2026-06-23"
+  },
+  "__alt_yorum__ek_açıklama": {
+    "ad": "✅ Alt yorum: ek açıklama",
+    "aciklama": "✅ Alt yorum: ek açıklama",
+    "tetikleyiciler": [
+      "yorum:",
+      "ek",
+      "✅",
+      "alt",
+      "açıklama"
+    ],
+    "adimlar": [
+      "FC/CLARIFY"
+    ],
+    "basari_kriteri": "\"Merhaba! Planınızı aldım ancak **somut bir hedef** belirtilmemiş. Planın adımla",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-23",
+    "son_basari": "2026-06-23"
+  },
+  "__emoji_kullanımı_serbest": {
+    "ad": "✅ Emoji kullanımı serbest",
+    "aciklama": "✅ Emoji kullanımı serbest",
+    "tetikleyiciler": [
+      "emoji",
+      "serbest",
+      "kullanımı",
+      "✅"
+    ],
+    "adimlar": [
+      "FC/EXECUTE_CODE",
+      "FC/EXECUTE_CODE",
+      "FC/EXECUTE_CODE",
+      "FC/EXECUTE_CODE",
+      "FC/EXECUTE_CODE",
+      "FC/DOSYA_YAZ",
+      "FC/EXECUTE_CODE",
+      "FC/EXECUTE_CODE"
+    ],
+    "basari_kriteri": "Planın 7 adımı da başarıyla uygulandı: 1) https://example.com adresine GET isteğ",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-23",
+    "son_basari": "2026-06-23"
+  },
+  "duna_kupasında_durum_nedir": {
+    "ad": "duna kupasında durum nedir",
+    "aciklama": "duna kupasında durum nedir",
+    "tetikleyiciler": [
+      "durum",
+      "nedir",
+      "kupasında",
+      "duna"
+    ],
+    "adimlar": [
+      "FC/WEB_ARA",
+      "FC/WEB_ARA",
+      "FC/WEB_ARAMA",
+      "FC/MEMORY",
+      "FC/CLARIFY"
+    ],
+    "basari_kriteri": "\\\"Duna Kupası\\\" ifadesi hakkında web araması yapıldı ancak anlamlı bir sonuç bul",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-23",
+    "son_basari": "2026-06-23"
+  },
+  "dunya_kupasında_durum_nedir____yazdığımda_sorduğu": {
+    "ad": "dunya kupasında durum nedir ..(yazdığımda sorduğu ",
+    "aciklama": "dunya kupasında durum nedir ..(yazdığımda sorduğu ",
+    "tetikleyiciler": [
+      "durum",
+      "nedir",
+      "..(yazdığımda",
+      "dunya",
+      "sorduğu",
+      "kupasında"
+    ],
+    "adimlar": [
+      "FC/WEB_ARAMA",
+      "FC/WEB_ARA",
+      "FC/WEB_ICERIK",
+      "FC/WEB_ARA",
+      "FC/WEB_ICERIK",
+      "FC/EXECUTE_CODE"
+    ],
+    "basari_kriteri": "\"✅ **Dünya Kupası / FIFA Kulüpler Dünya Kupası 2025 Güncel Durum Raporu**\n\nWeb'd",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-23",
+    "son_basari": "2026-06-23"
+  },
+  "2026_yılında_iz": {
+    "ad": "2026 yılında iz",
+    "aciklama": "2026 yılında iz",
+    "tetikleyiciler": [
+      "2026",
+      "yılında",
+      "iz"
+    ],
+    "adimlar": [
+      "FC/CLARIFY"
+    ],
+    "basari_kriteri": "\"Kullanıcı netleştirme aracı çalıştı ama doğrudan soru sormam gerekiyor. Kullanı",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-23",
+    "son_basari": "2026-06-23"
+  },
+  "2026_yılında_dunya_kupasi_mac_durumu_nedir": {
+    "ad": "2026 yılında dunya kupasi mac durumu nedir",
+    "aciklama": "2026 yılında dunya kupasi mac durumu nedir",
+    "tetikleyiciler": [
+      "mac",
+      "2026",
+      "durumu",
+      "kupasi",
+      "yılında",
+      "dunya"
+    ],
+    "adimlar": [
+      "FC/WEB_ARAMA",
+      "FC/WEB_ARA",
+      "FC/WEB_ICERIK",
+      "FC/WEB_ICERIK",
+      "FC/WEB_ICERIK",
+      "FC/WEB_ICERIK",
+      "FC/WEB_ICERIK"
+    ],
+    "basari_kriteri": "2026 FIFA Dünya Kupası maç durumu araştırıldı. 11-16 Haziran arasında oynanan ma",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-23",
+    "son_basari": "2026-06-23"
+  },
+  "reymen___2026_dünya_kupası_durumu_nedir": {
+    "ad": "ReYMeN > 2026 dünya kupası durumu nedir",
+    "aciklama": "ReYMeN > 2026 dünya kupası durumu nedir",
+    "tetikleyiciler": [
+      "dünya",
+      "reymen",
+      "2026",
+      "kupası",
+      "durumu",
+      ">"
+    ],
+    "adimlar": [
+      "FC/WEB_ARA",
+      "FC/WEB_ICERIK",
+      "FC/WEB_ICERIK"
+    ],
+    "basari_kriteri": "2026 FIFA Dünya Kupası hakkında kapsamlı bilgi toplandı ve kullanıcıya sunuldu.",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-23",
+    "son_basari": "2026-06-23"
+  },
+  "__araştır___cevapla": {
+    "ad": "↓ araştır + cevapla",
+    "aciklama": "↓ araştır + cevapla",
+    "tetikleyiciler": [
+      "+",
+      "↓",
+      "araştır",
+      "cevapla"
+    ],
+    "adimlar": [
+      "FC/EXECUTE_CODE",
+      "FC/DOSYA_YAZ",
+      "FC/DOSYA_YAZ",
+      "FC/EXECUTE_CODE",
+      "FC/EXECUTE_CODE",
+      "FC/MEMORY",
+      "FC/REFERANS_EKLE",
+      "FC/REFERANS_ARA"
+    ],
+    "basari_kriteri": "\"Plan başarıyla uygulandı:\n1. ✅ https://example.com adresine GET isteği yapıldı ",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-23",
+    "son_basari": "2026-06-23"
+  },
+  "reymen___dosya_oluştur": {
+    "ad": "ReYMeN > dosya oluştur",
+    "aciklama": "ReYMeN > dosya oluştur",
+    "tetikleyiciler": [
+      "dosya",
+      "reymen",
+      "oluştur",
+      ">"
+    ],
+    "adimlar": [
+      "FC/EXECUTE_CODE",
+      "FC/EXECUTE_CODE",
+      "FC/EXECUTE_CODE",
+      "FC/EXECUTE_CODE",
+      "FC/EXECUTE_CODE",
+      "FC/DOSYA_YAZ",
+      "FC/EXECUTE_CODE",
+      "FC/EXECUTE_CODE"
+    ],
+    "basari_kriteri": "\"✅ **Dosya başarıyla oluşturuldu!**\n\nYapılan işlemler:\n1. **Web'den veri çekildi",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-23",
+    "son_basari": "2026-06-23"
+  },
+  "___görev_sınıflandırıcı____dosya__": {
+    "ad": "↓ (görev sınıflandırıcı → \"dosya\")",
+    "aciklama": "↓ (görev sınıflandırıcı → \"dosya\")",
+    "tetikleyiciler": [
+      "\"dosya\")",
+      "(görev",
+      "→",
+      "sınıflandırıcı",
+      "↓"
+    ],
+    "adimlar": [
+      "FC/EXECUTE_CODE",
+      "FC/WEB_ICERIK",
+      "FC/DOSYA_YAZ",
+      "FC/EXECUTE_CODE",
+      "FC/DOSYA_YAZ",
+      "FC/EXECUTE_CODE",
+      "FC/EXECUTE_CODE",
+      "FC/DOSYA_OKU"
+    ],
+    "basari_kriteri": "\"✅ Görev başarıyla tamamlandı!\n\n1. **GET isteği** — https://example.com adresine",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-23",
+    "son_basari": "2026-06-23"
+  },
+  "______referanslar_________anahtar______example_com": {
+    "ad": "\"\"\"\n\n[Referanslar]\n  - {\\\"anahtar\\\": \\\"example_com",
+    "aciklama": "\"\"\"\n\n[Referanslar]\n  - {\\\"anahtar\\\": \\\"example_com",
+    "tetikleyiciler": [
+      "-",
+      "[referanslar]",
+      "\"\"\"",
+      "{\\\"anahtar\\\":",
+      "\\\"deger\\\":",
+      "\\\"example_com_verisi\\\","
+    ],
+    "adimlar": [
+      "FC/REFERANS_ARA",
+      "FC/WEB_ICERIK",
+      "FC/CLARIFY",
+      "FC/DOSYA_YAZ",
+      "FC/EXECUTE_CODE"
+    ],
+    "basari_kriteri": "Verilen referansları ve planı analiz ettim. Example Domain (example.com) sayfası",
+    "kullanim_sayisi": 2,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-23",
+    "son_basari": "2026-06-23"
+  },
+  "duplicate_module_detector_py___referanslar________": {
+    "ad": "duplicate_module_detector.py\n\n[Referanslar]\n  - {\\",
+    "aciklama": "duplicate_module_detector.py\n\n[Referanslar]\n  - {\\",
+    "tetikleyiciler": [
+      "duplicate_module_detector.py",
+      "\\\"deger\\\":",
+      "\\\"example_com_verisi\\\",",
+      "[referanslar]",
+      "{\\\"anahtar\\\":",
+      "-"
+    ],
+    "adimlar": [
+      "FC/EXECUTE_CODE",
+      "FC/EXECUTE_CODE",
+      "FC/DOSYA_OKU",
+      "FC/DOSYA_YAZ",
+      "FC/GUVENLIK_OZET",
+      "FC/HAFIZA_ARA",
+      "FC/HAFIZA_ARA",
+      "FC/DOSYA_YAZ"
+    ],
+    "basari_kriteri": "\"duplicate_module_detector.py dosyası oluşturuldu ve test edildi.\n\n**Yapılanlar:",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-23",
+    "son_basari": "2026-06-23"
+  },
+  "decisions_md_ye_append___referanslar_________anaht": {
+    "ad": "decisions.md'ye append\n\n[Referanslar]\n  - {\\\"anaht",
+    "aciklama": "decisions.md'ye append\n\n[Referanslar]\n  - {\\\"anaht",
+    "tetikleyiciler": [
+      "append",
+      "\\\"example_com_verisi\\\",",
+      "[referanslar]",
+      "{\\\"anahtar\\\":",
+      "-",
+      "decisions.md'ye"
+    ],
+    "adimlar": [
+      "FC/EXECUTE_CODE",
+      "FC/EXECUTE_CODE",
+      "FC/EXECUTE_CODE",
+      "FC/CONTEXT",
+      "FC/REFERANS_EKLE",
+      "FC/EXECUTE_CODE",
+      "FC/EXECUTE_CODE",
+      "FC/EXECUTE_CODE"
+    ],
+    "basari_kriteri": "decisions.md'ye append işlemi gerçekleştirilemedi çünkü: 1) decisions.md dosyası",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-23",
+    "son_basari": "2026-06-23"
+  },
+  "tespit_edilinel_hatalari_duzel__ve_onar___referans": {
+    "ad": "tespit edilinel hatalari duzel  ve onar\n\n[Referans",
+    "aciklama": "tespit edilinel hatalari duzel  ve onar\n\n[Referans",
+    "tetikleyiciler": [
+      "hatalari",
+      "tespit",
+      "ve",
+      "duzel",
+      "onar",
+      "edilinel"
+    ],
+    "adimlar": [
+      "FC/REFERANS_ARA",
+      "FC/REFERANS_ARA",
+      "FC/REFERANS_OZET",
+      "FC/MEMORY",
+      "FC/REFERANS_EKLE",
+      "FC/DOSYA_YAZ",
+      "FC/REFERANS_EKLE",
+      "FC/REFERANS_EKLE"
+    ],
+    "basari_kriteri": "\"Tespit edilen hatalar düzeltildi ve onarıldı:\n\n1. **TEKRAR_EDEN_GRS Çözümü**: e",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-23",
+    "son_basari": "2026-06-23"
+  },
+  "onay___referanslar_________anahtar______example_co": {
+    "ad": "onay\n\n[Referanslar]\n  - {\\\"anahtar\\\": \\\"example_co",
+    "aciklama": "onay\n\n[Referanslar]\n  - {\\\"anahtar\\\": \\\"example_co",
+    "tetikleyiciler": [
+      "\\\"example_com_verisi\\\",",
+      "[referanslar]",
+      "{\\\"anahtar\\\":",
+      "onay",
+      "-",
+      "\\\"deger\\\":"
+    ],
+    "adimlar": [
+      "FC/REFERANS_ARA",
+      "FC/REFERANS_ARA",
+      "FC/MEMORY",
+      "FC/REFERANS_EKLE",
+      "FC/WEB_ICERIK",
+      "FC/REFERANS_OZET",
+      "FC/HA_DURUM",
+      "FC/Browser",
+      "FC/HAFIZA_ARA",
+      "FC/WEB_ARA",
+      "FC/CRON_EKLE",
+      "FC/TODO",
+      "FC/EXECUTE_CODE",
+      "FC/SKILL",
+      "FC/MEMORY_PROVIDER",
+      "FC/CLARIFY",
+      "FC/DOSYA_YAZ",
+      "FC/EKRAN_OKU",
+      "FC/EKRAN_TIKLA",
+      "FC/SISTEM_KAYNAK",
+      "FC/CONTEXT",
+      "FC/WEB_ARAMA"
+    ],
+    "basari_kriteri": "Onay süreci tamamlandı. Hafıza drift düzeltmesi (TEKRAR_SIL, BIRLESTIR, TEMIZLE)",
+    "kullanim_sayisi": 51,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-23",
+    "son_basari": "2026-06-24"
+  },
+  "onay___referanslar_________anahtar______drift_duze": {
+    "ad": "onay\n\n[Referanslar]\n  - {\\\"anahtar\\\": \\\"drift_duze",
+    "aciklama": "onay\n\n[Referanslar]\n  - {\\\"anahtar\\\": \\\"drift_duze",
+    "tetikleyiciler": [
+      "{\\\"anahtar\\\":",
+      "\\\"deger\\\":",
+      "-",
+      "\\\"drift_duzeltme_raporu_20260621\\\",",
+      "onay",
+      "[referanslar]"
+    ],
+    "adimlar": [
+      "FC/REFERANS_ARA",
+      "FC/REFERANS_ARA",
+      "FC/REFERANS_ARA",
+      "FC/MEMORY",
+      "FC/MEMORY",
+      "FC/REFERANS_EKLE",
+      "FC/EXECUTE_CODE",
+      "FC/HA_DURUM"
+    ],
+    "basari_kriteri": "\"✅ **Hedef: ONAY** başarıyla tamamlandı.\n\n1. **drift_duzeltme_raporu_20260621** ",
+    "kullanim_sayisi": 6,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-24",
+    "son_basari": "2026-06-24"
+  },
+  "onay___referanslar______anahtar__drift_duzeltme_ra": {
+    "ad": "onay\n\n[Referanslar]\n  - anahtar: drift_duzeltme_ra",
+    "aciklama": "onay\n\n[Referanslar]\n  - anahtar: drift_duzeltme_ra",
+    "tetikleyiciler": [
+      "[referanslar]",
+      "-",
+      "deger:",
+      "onay",
+      "drift_duzeltme_raporu_20260621,",
+      "anahtar:"
+    ],
+    "adimlar": [
+      "FC/REFERANS_ARA",
+      "FC/REFERANS_ARA",
+      "FC/REFERANS_ARA",
+      "FC/REFERANS_EKLE",
+      "FC/MEMORY",
+      "FC/CRON_LISTELE",
+      "FC/MEMORY_PROVIDER",
+      "FC/WEB_ARA"
+    ],
+    "basari_kriteri": "\"## ✅ Drift Düzeltme Onay Süreci — BAŞARIYLA TAMAMLANDI\n\nPlanın tüm adımları tek",
+    "kullanim_sayisi": 10,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-24",
+    "son_basari": "2026-06-24"
+  },
+  "onay___referanslar______anahtar__onay_dogrulama_ra": {
+    "ad": "onay\n\n[Referanslar]\n  - anahtar: onay_dogrulama_ra",
+    "aciklama": "onay\n\n[Referanslar]\n  - anahtar: onay_dogrulama_ra",
+    "tetikleyiciler": [
+      "onay",
+      "-",
+      "deger:",
+      "[referanslar]",
+      "onay_dogrulama_raporu_20260624,",
+      "anahtar:"
+    ],
+    "adimlar": [
+      "FC/REFERANS_ARA",
+      "FC/HAFIZA_ARA",
+      "FC/REFERANS_ARA",
+      "FC/REFERANS_EKLE"
+    ],
+    "basari_kriteri": "Onay işlemi başarıyla tamamlandı. Drift düzeltmesi zaten 3 kez onaylanmış durumd",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-24",
+    "son_basari": "2026-06-24"
+  },
+  "onay___referanslar______anahtar__drift_duzeltme_on": {
+    "ad": "onay\n\n[Referanslar]\n  - anahtar: drift_duzeltme_on",
+    "aciklama": "onay\n\n[Referanslar]\n  - anahtar: drift_duzeltme_on",
+    "tetikleyiciler": [
+      "[referanslar]",
+      "anahtar:",
+      "drift_duzeltme_onay_20260621,",
+      "deger:",
+      "onay",
+      "-"
+    ],
+    "adimlar": [
+      "FC/REFERANS_ARA",
+      "FC/REFERANS_ARA",
+      "FC/REFERANS_EKLE",
+      "FC/MEMORY",
+      "FC/REFERANS_OZET",
+      "FC/GUVENLIK_OZET",
+      "FC/CONTEXT",
+      "FC/GOREV_DEVRET",
+      "FC/HAFIZA_ARA"
+    ],
+    "basari_kriteri": "Onay talebi değerlendirildi. Mevcut referanslar incelendiğinde onay sürecinin da",
+    "kullanim_sayisi": 35,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-24",
+    "son_basari": "2026-06-24"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "olusturma": "2026-06-28T13:08:31.560861",
+  "toplam_istek": 4,
+  "toplam_token": 20,
+  "toplam_maliyet": 16.0003,
+  "providerlar": {
+    "test": {
+      "istek": 2,
+      "token": 4,
+      "maliyet": 0.0003,
+      "model": "m"
+    },
+    "lmstudio": {
+      "istek": 2,
+      "token": 16,
+      "maliyet": 16.0,
+      "model": "m"
+    }
+  },
+  "aylik_veri": {
+    "2026-06": {
+      "istek": 4,
+      "token": 20,
+      "maliyet": 16.0003
+    }
+  }
+}

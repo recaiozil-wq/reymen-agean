@@ -1,0 +1,7 @@
+---
+skill_id: 5415ad0a32e2
+usage_count: 1
+last_used: 2026-06-16
+---
+# Get metadata for a single file
+$GAPI drive get FILE_ID

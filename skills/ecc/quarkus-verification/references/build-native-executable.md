@@ -1,0 +1,7 @@
+---
+skill_id: 33df220600e3
+usage_count: 1
+last_used: 2026-06-16
+---
+# Build native executable
+mvn package -Dnative

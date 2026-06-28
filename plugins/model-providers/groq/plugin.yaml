@@ -1,0 +1,4 @@
+name: model-providers/groq
+description: "Groq model provider"
+version: "1.0.0"
+type: model-provider

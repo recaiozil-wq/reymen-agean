@@ -1,0 +1,41 @@
+{
+  "task": "rl_gun2_takip",
+  "version": 1,
+  "created": "2026-06-15",
+  "mod": "gozlem + 3 kucuk ticket. Buyuk ozellik EKLEME. Success gate hedeflerine DOKUNMA.",
+  "acik_ticketlar": [
+    {
+      "id": "T1_bos_mesaj_corr",
+      "oncelik": "orta",
+      "sorun": "reward_v2: bos/null next_msg'de corr hala -0.30 basiyor (senaryo 13/14). 'hash eslesmesi YOK' deniyor ama ceza geliyor — fallback yarim kalkmis.",
+      "yapilacak": "Bos next_msg'de correction KESIN 0 olmali. sil sinyali tek basina zayif, onu da gozden gecir. Fix sonrasi DONMUS surumde salt-okunur tekrar test et (senaryo 13/14 corr=0 olmali).",
+      "kapsam": "sadece sessizlik vakalari, seed'i etkilemez"
+    },
+    {
+      "id": "T2_profile_replace_append",
+      "oncelik": "orta",
+      "sorun": "self-improvement cron, user profili memory(replace) ile guncelliyor. Tek gunun etkilesiminden genelleme yapip eski veriyi siliyor (APK detaylari silindi). replace = uzerine yaz, gecmis kayboluyor.",
+      "yapilacak": "Profil guncellemelerini replace yerine APPEND + tarih damgasi yap. Eski entry'ler silinmesin, yeni gozlemler ustune EKLENSIN. Boylece tek gun tum profili ezemez.",
+      "not": "Bu kol calisiyor ve faydali (cikarim dogruydu) — oldurme, sadece silmeyi durdur."
+    },
+    {
+      "id": "T3_ilk_mab_karar_yakala",
+      "oncelik": "yuksek",
+      "sorun": "Pilot 15 skill shadow'da, 0 kullanim. 4 metrikten 2'si (MAB isabet, seed verimi) ilk gercek karar gelene kadar olculemez.",
+      "yapilacak": "Ilk gercek MAB karari VEYA pilot skill kullanimini yakala. Geldiginde tek mesajla bildir: hangi skill, hangi baglamda secildi, reward_v2 ne puan verdi. Bu, reward_v2'nin canli ilk sinavi.",
+      "not": "Bu olay gelene kadar gate sayilari sabit kalacak — bu NORMAL, alarm degil."
+    }
+  ],
+  "gunluk_gozlem": [
+    "Pilot 15 skill shadow'da izlenmeye devam. Mudahale yok.",
+    "20:00 cron raporuna 4 success gate metriginin guncel degerini ekle.",
+    "Beta>=5 olan 6 skill: T1 fix sonrasi auto_reward duzelirse zamanla dusmeli — takip et, MANUEL dokunma."
+  ],
+  "raporlama": "Hepsini tek 'Aksam Raporu' mesajinda topla (20:00 cron ile). Gun boyu ara mesaj atma. Kritik kirilma (cron fail, dosya hatasi, beklenmedik replace/silme) olursa DUR ve hemen yaz.",
+  "yasaklar": [
+    "Success gate hedeflerini degistirme.",
+    "Yeni skill seed'leme (pilot dilim degerlendirilmeden buyutme yok).",
+    "Test sirasinda canli dosya patchleme (donmus surum + salt-okunur kurali gecerli).",
+    "Onay almadan canli sisteme etki eden degisiklik yapma."
+  ]
+}

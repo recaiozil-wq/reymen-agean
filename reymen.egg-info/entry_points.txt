@@ -1,0 +1,2 @@
+[console_scripts]
+reymen = reymen.__main__:main

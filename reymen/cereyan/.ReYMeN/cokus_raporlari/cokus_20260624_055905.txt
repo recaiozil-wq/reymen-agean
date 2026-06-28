@@ -1,0 +1,46 @@
+============================================================
+🚨 [OTONOM SISTEM COKUS / TAHLIYE RAPORU] 🚨
+============================================================
+Kritik Zaman Dilimi    : 2026-06-24 05:59:05
+Basarisiz Olunan Gorev : onay
+
+[Referanslar]
+  - {\"anahtar\": \"example_com_verisi\", \"deger\": {\"baslik\": \"Example Domain\", \"paragraflar\": [\"This domain is for use in documentation examples without needing permission. Avoid use in operations.\", \"Learn more\"], \"baglantilar\": [\"https://iana.org/domains/example\"]}, \"etiketler\": [\"example\", \"web_scraping\"]}: 
+  - example_com_verisi|Bu veri Example Domain (example.com) sayfasından alınmıştır. Başlık: Example Domain. Paragraflar: This domain is for use in documentation examples without needing permission. Avoid use in operations. Learn more. Bağlantılar: https://iana.org/domains/example. Etiketler: example, web_scraping: 
+  - drift_duzeltme_raporu_20260621|ReYMeN hafiza drift duzeltmesi tamamlandi. Tespit edilen sorunlar: 1) TEKRAR_EDEN_GRS - ayni girisler birden fazla kez kaydedilmis, 2) ASIRI_TEKRAR - ayni sorgular cok kez tekrarlanmis (ornek: kac skill var 5 kez), 3) TAMAMLANMAMIS_GOREV - tur asimi nedeniyle tamamlanamamis gorevler. Cozum onerileri: TEKRAR_SIL, BIRLESTIR, TEMIZLE. Kalici izleme mekanizmasi kuruldu (24 saatlik kontrol). Referans verisi example_com_verisi basariyla kaydedildi. Etiketler: drift_duzeltme, hafiza_yonetimi: 
+Toplam Tuketilen Dongu : 90 Tur
+
+Sistem, otonom problem cozme sinirlarina ulasmis ve
+kritik kilitlenme yasamistir. Donem icinde devreye alinan
+tum uzman yapay zeka personalari basarisiz olmustur.
+
+------------------------------------------------------------
+🔍 [KRONOLOJIK HATA VE ADAPTASYON GECMISI]
+------------------------------------------------------------
+  (Hata kaydi yok)
+
+------------------------------------------------------------
+🧠 [GOREV SURESINCE DENENEN AJANLAR]
+------------------------------------------------------------
+genel_cozucu
+
+------------------------------------------------------------
+⚠️  [OLUMCUL KILITLENME NOKTASI (KOK NEDEN)]
+------------------------------------------------------------
+Son gozlem: Bilinmiyor
+
+============================================================
+🚨 KULLANICI ACIL MUDAHALE VE GOREV DEVRİ PROTOKOLU
+============================================================
+Otonom dongunun tiklanma noktasi yukarida teshis edilmistir.
+Sistemin kendini guncelleyerek genisleyebilmesi adina:
+
+  1. Yukaridaki verileri inceleyin
+  2. Bir COZUM ONERISI hazirlayin
+  3. Cozum onerisini sisteme YENI BIR GOREV olarak iletin
+  4. Ornek: "Su adimlari izle, su bagimliligi duzelt ve tekrar dene"
+
+Iletilen bu girdi, 'Yetenek Fabrikasi' tarafindan kalici bir
+sablon beceriye donusturulecek ve gelecekte benzer hatalarla
+karsilasildiginda otonom olarak kullanilacaktir.
+============================================================

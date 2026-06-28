@@ -1,0 +1,33 @@
+# LLM Provider Configuration
+# Supported providers: openai, anthropic, groq, ollama
+
+default_provider: openai
+
+providers:
+  openai:
+    api_key_env: OPENAI_API_KEY
+    model: gpt-4o
+    base_url: https://api.openai.com/v1
+    max_tokens: 4096
+    temperature: 0.7
+
+  anthropic:
+    api_key_env: ANTHROPIC_API_KEY
+    model: claude-3-opus-20240229
+    base_url: https://api.anthropic.com/v1
+    max_tokens: 4096
+    temperature: 0.7
+
+  groq:
+    api_key_env: GROQ_API_KEY
+    model: llama3-70b-8192
+    base_url: https://api.groq.com/openai/v1
+    max_tokens: 4096
+    temperature: 0.7
+
+  ollama:
+    api_key_env: ""  # Ollama does not require an API key
+    model: llama3
+    base_url: http://localhost:11434/v1
+    max_tokens: 4096
+    temperature: 0.7

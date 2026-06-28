@@ -1,0 +1,55 @@
+============================================================
+ReYMeN OTOMATİK SORUN TARAMA RAPORU
+Proje koku: C:\Users\marko\OneDrive\Desktop\Reymen Proje\hermes_projesi
+============================================================
+
+## 1. DOSYA TARAMA
+  Kok .py dosyasi: 172
+  Toplam .py (skills hariç): 2505
+  ReYMeN cekirdek dosyalari: 29 adet
+  Cok buyuk dosyalar (>200 KB):
+    - cli.py: 714.7 KB
+    - run_agent.py: 214.0 KB
+  Siniflandirilmamis kok dosyalari: ['async_utils.py', 'backup.py', 'browser_camofox.py', 'budget_config.py', 'checkpoint_manager.py', 'cli.py', 'codex_responses_adapter.py', 'codex_runtime.py', 'conftest.py', 'cron_scheduler.py', 'dispatcher.py', 'feishu_doc_tool.py', 'gateway_runner.py', 'homeassistant_tool.py', 'hook_dispatcher.py', 'kanban_orchestrator.py', 'mcp_oauth.py', 'mcp_oauth_manager.py', 'mcp_serve.py', 'mcp_tool.py', 'migrate_skills.py', 'mini_swe_runner.py', 'model_tools.py', 'motor_test.py', 'path_security.py', 'persistence.py', 'plugin_loader.py', 'plugin_manager.py', 'react_test.py', 'ReYMeN_bootstrap.py', 'ReYMeN_cli.py', 'ReYMeN_constants.py', 'ReYMeN_logging.py', 'ReYMeN_state.py', 'ReYMeN_time.py', 'robust_execution.py', 'run_agent.py', 'salted_gateway.py', 'security_audit.py', 'self_improvement.py', 'skills_hub.py', 'son_test.py', 'start.py', 'telegram_bot.py', 'temp_count.py', 'test_learning_loop.py', 'test_suite.py', 'threat_patterns.py', 'tirith_security.py', 'toolsets.py', 'toolset_distributions.py', 'tool_registry.py', 'trajectory_compressor.py', 'turn_context.py', 'url_safety.py', 'utils.py', 'web_ui.py', 'x_search_tool.py', 'yuanbao_tools.py']
+
+## 2. IMPORT TESTİ
+  Basarili: 29 dosya
+  Hatali:   0 dosya
+
+## 3. DERLEME KONTROLÜ (AST)
+  Temiz: 2500 dosya
+  Syntax hatasi: 5 dosya
+  Syntax hatalari:
+    !! hermes_cli\__init__.py satir 1: invalid non-printable character U+FEFF
+    !! hermes_cli\env_loader.py satir 1: invalid non-printable character U+FEFF
+    !! start.py satir 381: invalid character '║' (U+2551)
+    !! tools\skills_hub.py satir 1: invalid non-printable character U+FEFF
+    !! tools\tool_backend_helpers.py satir 1: invalid non-printable character U+FEFF
+
+## 4. BAĞIMLILIK ZİNCİRİ
+  Eksik modul sayisi: 4
+  Eksik moduller:
+    ?? araclar_ses.py → 'speech_recognition' bulunamadi
+    ?? araclar_ses.py → 'pyttsx3' bulunamadi
+    ?? izole_laboratuvar.py → 'docker' bulunamadi
+    ?? reyment.py → 'flask' bulunamadi
+
+## 5. ReYMeN vs ReYMeN KARŞILAŞTIRMA
+  Ayni ada sahip, farkli icerik: 83 dosya
+  Ayni ada sahip, ayni icerik (kopyalar): 0 dosya
+  Sadece ReYMeN kokunde: 30 dosya
+  Farkli icerikli dosyalar:
+    ~ account_usage.py: kok=5144B agent=12047B fark=-6903B
+    ~ agent_init.py: kok=6904B agent=85400B fark=-78496B
+    ~ agent_runtime_helpers.py: kok=6503B agent=105254B fark=-98751B
+    ~ anthropic_adapter.py: kok=12012B agent=99216B fark=-87204B
+    ~ async_utils.py: kok=1740B agent=2619B fark=-879B
+    ~ auxiliary_client.py: kok=8602B agent=255051B fark=-246449B
+    ~ azure_identity_adapter.py: kok=4872B agent=23621B fark=-18749B
+    ~ background_review.py: kok=8272B agent=30712B fark=-22440B
+    ~ bedrock_adapter.py: kok=3656B agent=51312B fark=-47656B
+    ~ browser_provider.py: kok=6286B agent=7302B fark=-1016B
+
+============================================================
+TARAMA TAMAMLANDI
+============================================================

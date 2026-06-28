@@ -1,0 +1,64 @@
+# ============================================================
+# ReYMeN — Gereksinimler
+# Güncellendi: FAZ 5 H10 (v2.0)
+#
+# KURULUM:
+#   pip install -r requirements.txt
+#
+# Opsiyonel kütüphaneler kurulu değilse ilgili araçlar
+# "kurulu değil" der — sistem çökmez (graceful degrade).
+# ============================================================
+
+# ── Temel (her platformda zorunlu) ──────────────────────────
+requests>=2.31.0
+pyyaml>=6.0
+python-dotenv>=1.0.0
+psutil>=5.9.0
+pillow>=10.0.0
+numpy>=1.24.0
+
+# ── LLM Provider ────────────────────────────────────────────
+openai>=1.0.0           # LM Studio / OpenAI / Groq / DeepSeek uyumlu
+anthropic>=0.30.0       # Claude API
+
+# ── Hafıza / RAG ────────────────────────────────────────────
+chromadb>=1.5.0         # Vektörel bellek (önerilir)
+# sentence-transformers>=2.7.0  # Semantic cache embed (opsiyonel)
+
+# ── Dosya Analizi ───────────────────────────────────────────
+pdfplumber>=0.9.0       # PDF metin çıkarma (önerilir)
+# PyPDF2>=3.0.0         # PDF yedek kütüphane
+openpyxl>=3.1.0         # Excel okuma (.xlsx)
+# xlrd>=2.0.0           # Excel yedek (.xls eski format)
+
+# ── Web Kazıma ──────────────────────────────────────────────
+beautifulsoup4>=4.12.0  # HTML ayrıştırma
+
+# ── Tarayıcı Otomasyonu ─────────────────────────────────────
+selenium>=4.15.0        # Tor browser otomasyonu (tor_otomasyonu.py)
+
+# ── Ekran / OCR / Otomasyon (opsiyonel) ─────────────────────
+opencv-python>=4.8.0    # Görüntü işleme, template matching
+mss>=9.0.0              # Hızlı ekran görüntüsü (hata_cozucu.py)
+pytesseract>=0.3.10     # OCR (hata_cozucu.py, araclar_nisan.py)
+# easyocr>=1.7.0        # OCR yedek (EKRAN_OKU aracı)
+# pyautogui>=0.9.54     # Fare/klavye (EKRAN_TIKLA aracı)
+# pynput>=1.7.0         # Klavye dinleme
+# playwright>=1.40.0    # Tarayıcı otomasyonu (yedek)
+
+# ── Ses / TTS (opsiyonel) ───────────────────────────────────
+# openai-whisper>=20231117   # Konuşma tanıma
+# edge-tts>=6.0.0            # Windows TTS
+
+# ── Telegram (opsiyonel) ─────────────────────────────────────
+# python-telegram-bot>=20.0  # Telegram bot entegrasyonu
+
+# ── Web UI (opsiyonel) ───────────────────────────────────────
+# fastapi>=0.110.0
+# uvicorn[standard]>=0.29.0
+
+# ── Sadece Windows ──────────────────────────────────────────
+pywin32>=306 ; sys_platform == "win32"
+
+# ── Paketleme (sadece .exe oluşturma sırasında) ─────────────
+# pyinstaller>=6.0.0

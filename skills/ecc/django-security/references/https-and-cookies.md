@@ -1,0 +1,10 @@
+---
+skill_id: 3d4bbb276e05
+usage_count: 1
+last_used: 2026-06-16
+---
+# HTTPS and Cookies
+SESSION_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = 'Lax'

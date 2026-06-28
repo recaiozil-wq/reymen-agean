@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" 
+          content="default-src 'self' http://localhost:*; 
+                   style-src 'self' 'unsafe-inline'; 
+                   script-src 'self' 'unsafe-inline'; 
+                   frame-src http://localhost:*;">
+    <title>ReYMeN</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a2e;
+            color: #e0e0e0;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* ── Ust Baslik ─────────────────────────────────── */
+        #titlebar {
+            -webkit-app-region: drag;
+            background: #16213e;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            user-select: none;
+            border-bottom: 1px solid #0f3460;
+            flex-shrink: 0;
+        }
+        
+        #titlebar .brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        #titlebar .brand h1 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #e94560;
+        }
+        
+        #titlebar .brand span {
+            font-size: 11px;
+            color: #888;
+        }
+        
+        #titlebar .controls {
+            -webkit-app-region: no-drag;
+            display: flex;
+            gap: 4px;
+        }
+        
+        #titlebar .controls button {
+            background: transparent;
+            border: none;
+            color: #888;
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+        
+        #titlebar .controls button:hover {
+            background: #0f3460;
+            color: #e0e0e0;
+        }
+        
+        #titlebar .controls .close:hover {
+            background: #e94560;
+            color: white;
+        }
+        
+        /* ── Durum Cubugu ───────────────────────────────── */
+        #statusbar {
+            background: #16213e;
+            padding: 4px 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 11px;
+            color: #666;
+            border-bottom: 1px solid #0f3460;
+            flex-shrink: 0;
+        }
+        
+        #statusbar .indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        #statusbar .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #555;
+        }
+        
+        #statusbar .dot.active { background: #4ecca3; box-shadow: 0 0 4px #4ecca3; }
+        #statusbar .dot.error  { background: #e94560; box-shadow: 0 0 4px #e94560; }
+        #statusbar .dot.busy   { background: #f0a500; box-shadow: 0 0 4px #f0a500; }
+        
+        /* ── Icerik ─────────────────────────────────────── */
+        #content {
+            flex: 1;
+            display: flex;
+            position: relative;
+        }
+        
+        #content iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #1a1a2e;
+        }
+        
+        /* ── Loading ────────────────────────────────────── */
+        #loading {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            background: #1a1a2e;
+            z-index: 10;
+            transition: opacity 0.5s;
+        }
+        
+        #loading.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #0f3460;
+            border-top: 3px solid #e94560;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        #loading p {
+            color: #888;
+            font-size: 13px;
+        }
+        
+        /* ── Error ──────────────────────────────────────── */
+        #error {
+            display: none;
+            position: absolute;
+            inset: 0;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            background: #1a1a2e;
+            z-index: 11;
+            padding: 32px;
+            text-align: center;
+        }
+        
+        #error.visible {
+            display: flex;
+        }
+        
+        #error h2 {
+            color: #e94560;
+            font-size: 18px;
+        }
+        
+        #error p {
+            color: #888;
+            font-size: 13px;
+            max-width: 400px;
+            line-height: 1.5;
+        }
+        
+        #error button {
+            background: #e94560;
+            color: white;
+            border: none;
+            padding: 8px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        
+        #error button:hover {
+            background: #d63851;
+        }
+    </style>
+</head>
+<body>
+    <!-- Title Bar -->
+    <div id="titlebar">
+        <div class="brand">
+            <h1>ReYMeN</h1>
+            <span id="version"></span>
+        </div>
+        <div class="controls">
+            <button onclick="window.reymen.minimize()" title="Kucult">─</button>
+            <button onclick="window.reymen.maximize()" title="Buyut">□</button>
+            <button class="close" onclick="window.reymen.close()" title="Kapat (tepside kalir)">✕</button>
+        </div>
+    </div>
+    
+    <!-- Status Bar -->
+    <div id="statusbar">
+        <div class="indicator">
+            <span class="dot" id="statusDot"></span>
+            <span id="statusText">Baslatiliyor...</span>
+        </div>
+        <span id="statusDetail"></span>
+    </div>
+    
+    <!-- Content -->
+    <div id="content">
+        <div id="loading">
+            <div class="spinner"></div>
+            <p>Web UI baslatiliyor...</p>
+        </div>
+        
+        <div id="error">
+            <h2>⚠️ Baglanti Hatasi</h2>
+            <p id="errorText">Web UI'a baglanilamadi. Python backend calismiyor olabilir.</p>
+            <button onclick="location.reload()">Yeniden Dene</button>
+        </div>
+        
+        <iframe id="webIframe" src="about:blank"></iframe>
+    </div>
+    
+    <script>
+        // ── Durum Guncelleme ──────────────────────────────
+        const dot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
+        const statusDetail = document.getElementById('statusDetail');
+        const loading = document.getElementById('loading');
+        const error = document.getElementById('error');
+        const errorText = document.getElementById('errorText');
+        const webIframe = document.getElementById('webIframe');
+        
+        async function updateStatus() {
+            try {
+                const status = await window.reymen.getStatus();
+                
+                if (status.backend === 'calisiyor') {
+                    dot.className = 'dot active';
+                    statusText.textContent = 'Bagli';
+                    statusDetail.textContent = `Port ${status.port} | ${status.uptime}`;
+                    
+                    // Web UI'yi yukle
+                    if (webIframe.src === 'about:blank' || webIframe.src.includes('about:')) {
+                        webIframe.src = window.reymen.getWebUiUrl();
+                    }
+                    
+                    loading.classList.add('hidden');
+                    error.classList.remove('visible');
+                    
+                } else {
+                    dot.className = 'dot error';
+                    statusText.textContent = 'Baglanti Yok';
+                    statusDetail.textContent = 'Backend calismiyor';
+                    throw new Error('Backend calismiyor');
+                }
+                
+            } catch (e) {
+                dot.className = 'dot error';
+                statusText.textContent = 'Hata';
+                statusDetail.textContent = e.message || 'Bilinmeyen hata';
+                
+                loading.classList.add('hidden');
+                error.classList.add('visible');
+                errorText.textContent = `Backend baglantisi kurulamadi: ${e.message}`;
+            }
+        }
+        
+        // ── Iframe yuklenme takibi ────────────────────────
+        webIframe.addEventListener('load', () => {
+            loading.classList.add('hidden');
+            error.classList.remove('visible');
+            dot.className = 'dot active';
+            statusText.textContent = 'Bagli';
+        });
+        
+        webIframe.addEventListener('error', () => {
+            error.classList.add('visible');
+            errorText.textContent = 'Sayfa yuklenemedi. Backend calismiyor olabilir.';
+        });
+        
+        // ── Versiyon ──────────────────────────────────────
+        document.getElementById('version').textContent = 
+            'v' + (window.reymen.version || '?');
+        
+        // ── Periyodik kontrol ─────────────────────────────
+        updateStatus();
+        setInterval(updateStatus, 10000);  // her 10 sn
+    </script>
+</body>
+</html>

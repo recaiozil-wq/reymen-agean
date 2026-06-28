@@ -1,0 +1,17 @@
+name: chromadb_vektor
+description: "ChromaDB ile anlamsal (vektörel) kalıcı hafıza"
+version: "1.0.0"
+author: "ReYMeN"
+category: memory
+hooks:
+  - sistem_prompt_bloku
+  - onceden_getir
+  - tur_senkronize
+  - oturum_bitti
+  - kapat
+tools:
+  - VEKTOR_ARA
+  - VEKTOR_KAYDET
+  - VEKTOR_ISTATISTIK
+requires:
+  - chromadb>=0.4

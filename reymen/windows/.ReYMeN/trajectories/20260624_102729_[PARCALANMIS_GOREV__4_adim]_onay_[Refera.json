@@ -1,0 +1,16 @@
+{
+  "hedef": "[PARCALANMIS GOREV: 4 adim]\nonay\n\n[Referanslar]\n  - anahtar: izleme_plani_20260623\ndeger: |\n  ## İZLEME VE BAKIM PLANI\n  \n  ### 1. TESPİT EDİLEN SORUNLAR (Gruplandırılmış)\n  \n  **Grup A - TEKRAR_EDEN_GRS (Veri Tekrarları)**\n  - Sorun: Aynı girişler birden fazla kez kaydedilmiş\n  - Örnek: example_com_verisi 3 kez, drift_duzeltme_raporu 2 kez\n  - Yöntem: TEKRAR_SIL + BİRLEŞTİR\n  - Durum: ✅ Çözüldü (clean_referanslar oluşturuldu)\n  \n  **Grup B - AŞIRI_TEKRAR (Sorgu Tekrarları)**\n  - Sorun: Aynı sorgular çok kez tekrarlanmış (örn: \\\"kaç skill var\\\" 5 kez)\n  - Yöntem: TEMİZLE + ÖNBELLEK\n  - Durum: ✅ Çözüldü\n  \n  **Grup C - TAMAMLANMAMIS_GÖREV (Tur Aşımı)**\n  - Sorun: Tur limiti nedeniyle tamamlanamayan görevler\n  - Yöntem: GÖREV_PARÇALA + ZAMAN_YÖNETİMİ\n\n[DEVAMI SONRAKI ADIMDA VERILECEK - 3 parca kaldi]",
+  "model": "local",
+  "tamamlandi": true,
+  "adim_sayisi": 1,
+  "adimlar": [
+    {
+      "tur": 1,
+      "dusunce": "FC:2araç",
+      "eylem": "['REFERANS_ARA', 'HAFIZA_ARA']",
+      "gozlem": "[Kanca]: [KANCA] Task default bloke: 'CRON_EKLE' 4kere art arda",
+      "zaman": "2026-06-24T10:31:10.882586"
+    }
+  ],
+  "tool_istatistik": {}
+}

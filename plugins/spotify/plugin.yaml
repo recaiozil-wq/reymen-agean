@@ -1,0 +1,5 @@
+name: spotify
+version: 1.0.0
+description: "ReYMeN plugin: spotify"
+kind: backend
+author: ReYMeN

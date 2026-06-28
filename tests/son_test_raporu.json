@@ -1,0 +1,49 @@
+{
+  "tarih": "2026-06-19T10:05:15.774639",
+  "kategori": "quick",
+  "genel_durum": false,
+  "dosya_sayisi": 40,
+  "gecen_test": 0,
+  "kalan_test": 1,
+  "sure": 116.88,
+  "oran": 0.0,
+  "kategoriler": [
+    {
+      "ad": "core",
+      "basari": false,
+      "toplam": 1,
+      "gecen": 0,
+      "kalan": 1,
+      "sure": 3.26,
+      "dosyalar": [
+        {
+          "dosya": "C:\\Users\\marko\\OneDrive\\Desktop\\Reymen Proje\\hermes_projesi\\test_suite.py",
+          "ad": "test_suite.py",
+          "basari": false,
+          "sure": 3.26,
+          "cikti": "============================= test session starts =============================\nplatform win32 -- Python 3.11.15, pytest-9.1.0, pluggy-1.6.0 -- C:\\Users\\marko\\AppData\\Local\\hermes\\hermes-agent\\venv\\Scripts\\pythonw.exe\ncachedir: .pytest_cache\nrootdir: C:\\Users\\marko\\OneDrive\\Desktop\\Reymen Proje\\hermes_projesi\nconfigfile: pytest.ini (WARNING: ignoring pytest config in pyproject.toml!)\nplugins: anyio-4.12.1, cov-7.1.0\ncollecting ... collected 36 items\n\ntest_suite.py::TestCore::test_core_imports FAILED\ntest_suite.py::TestCore::test_providers PASSED\ntest_suite.py::TestCore::test_config PASSED\ntest_suite.py::TestCore::test_agent_olusturma PASSED\ntest_suite.py::TestAgentModuller::test_iteration_budget PASSED\ntest_suite.py::TestAgentModuller::test_prompt_builder PASSED\ntest_suite.py::TestAgentModuller::test_trajectory PASSED\ntest_suite.py::TestAgentModuller::test_conversation_compression PASSED\ntest_suite.py::TestAgentModuller::test_prompt_caching PASSED\ntest_suite.py::TestAgentModuller::test_credential_pool PASSED\ntest_suite.py::TestAgentModuller::test_rate_guard PASSED\ntest_suite.py::TestAgentModuller::test_checkpoint PASSED\ntest_suite.py::TestGuvenlik::test_file_safety PASSED\ntest_suite.py::TestGuvenlik::test_path_security PASSED\ntest_suite.py::TestGuvenlik::test_url_safety PASSED\ntest_suite.py::TestGuvenlik::test_redact PASSED\ntest_suite.py::TestGuvenlik::test_threat_detection PASSED\ntest_suite.py::TestModel::test_model_metadata PASSED\ntest_suite.py::TestModel::test_model_recommend PASSED\ntest_suite.py::TestSkill::test_skill_utils PASSED\ntest_suite.py::TestSkill::test_skill_commands SKIPPED (skill_command...)\ntest_suite.py::TestTool::test_tool_registry PASSED\ntest_suite.py::TestTool::test_motor_registry_entegrasyon [Plugin] Yuklendi: browser\n[Plugin] Yuklendi: context_engine\n[Plugin] Yuklendi: dashboard_auth\n[Plugin] Yuklendi: disk-cleanup\n[Plugin] Yuklendi: disk_cleanup\n[Plugin] Yuklendi: google_meet\n[Plugin] Yuklendi: image_gen\n[Plugin] Yuklendi: kanban\n[Plugin] Yuklendi: kanban_plugin\n[Plugin] Yuklendi: memory\n[Plugin] Yuklendi: notion\n[Plugin] Yuklendi: notion_plugin\n[Plugin] Yuklendi: observability\n[Plugin] Yuklendi: ornek_plugin\n[Plugin] Yuklendi: platforms\n[Plugin] Yuklendi: security-guidance\n[Plugin] Yuklendi: security_guidance\n[Plugin] Yuklendi: spotify\n[Plugin] Yuklendi: teams_pipeline\n[Plugin] Yuklendi: video_gen\n[Plugin] Yuklendi: web\n[Plugin] Yuklendi: web_scraper\n[Plugin] Yuklendi: web_search_plugin\n[Config] config.yaml yuklendi ve birlestirildi\n[RateLimiter] TOKEN_RAPOR araci kayit edildi.\n[GelismisTools] 5 arac kayit edildi.\n[Skill v4] 937 skill yuklu.\n[Plugin] Yuklendi: browser\n[Plugin] Yuklendi: context_engine\n[Plugin] Yuklendi: dashboard_auth\n[Plugin] Yuklendi: disk-cleanup\n[Plugin] Yuklendi: disk_cleanup\n[Plugin] Yuklendi: google_meet\n[Plugin] Yuklendi: image_gen\n[Plugin] Yuklendi: kanban\n[Plugin] Yuklendi: kanban_plugin\n[Plugin] Yuklendi: memory\n[Plugin] Yuklendi: notion\n[Plugin] Yuklendi: notion_plugin\n[Plugin] Yuklendi: observability\n[Plugin] Yuklendi: ornek_plugin\n[Plugin] Yuklendi: platforms\n[Plugin] Yuklendi: security-guidance\n[Plugin] Yuklendi: security_guidance\n[Plugin] Yuklendi: spotify\n[Plugin] Yuklendi: teams_pipeline\n[Plugin] Yuklendi: video_gen\n[Plugin] Yuklendi: web\n[Plugin] Yuklendi: web_scraper\n[Plugin] Yuklendi: web_search_plugin\n[Plugin:browser] 4 arac kayit edildi (urllib-fallback).\n[Plugin] 'browser' motora kaydedildi\n[Plugin] 'context_engine' motora kaydedildi\n[Plugin] 'disk_cleanup' motora kaydedildi\n[Plugin] 'google_meet' motora kaydedildi\n[Plugin:image_gen] 2 arac kayit edildi.\n[Plugin] 'image_gen' motora kaydedildi\n[Plugin:kanban] 5 arac kayit edildi.\n[Plugin] 'kanban' motora kaydedildi\n[Plugin] 'kanban_plugin' motora kaydedildi\n[Plugin:notion] 5 arac kayit edildi.\n[Plugin] 'notion' motora kaydedildi\n[Plugin] 'notion_plugin' motora kaydedildi\n[Plugin] 'observability' motora kaydedildi\n[Plugin] 'ornek_plugin' motora kaydedildi\n[Plugin] 'security_guidance' motora kaydedildi\n[Plugin:spotify] 4 arac kayit edildi.\n[Plugin] 'spotify' motora kaydedildi\n[Plugin] 'teams_pipeline' motora kaydedildi\n[Plugin:video_gen] 3 arac kayit edildi.\n[Plugin] 'video_gen' motora kaydedildi\n[Plugin] 'web_scraper' motora kaydedildi\n[Plugin] 'web_search_plugin' motora kaydedildi\n[Plugin] 23 arac eklentisi yuklendi: ['browser', 'context_engine', 'dashboard_auth', 'disk-cleanup', 'disk_cleanup', 'google_meet', 'image_gen', 'kanban', 'kanban_plugin', 'memory', 'notion', 'notion_plugin', 'observability', 'ornek_plugin', 'platforms', 'security-guidance', 'security_guidance', 'spotify', 'teams_pipeline', 'video_gen', 'web', 'web_scraper', 'web_search_plugin']\n[HafızaPlugin] Yuklenemedi: HafizaPluginKayit.aktif_saglayici_sec() got an unexpected keyword argument 'ozet_saglayici'\n[StateMachine] Baslatildi\n[Bridge] Servis koprusu baslatildi\n[AutoRecovery] Baslatildi (0 bilesen izleniyor)\n[RateLimiter] TOKEN_RAPOR araci kayit edildi.\n[GelismisTools] 5 arac kayit edildi.\n[Skill v4] 937 skill yuklu.\n  [*] Komut çalıştırılıyor... [echo motor-registry-test]\nPASSED\ntest_suite.py::TestGateway::test_gateway_platforms PASSED\ntest_suite.py::TestGateway::test_gateway_session SKIPPED (gateway im...)\ntest_suite.py::TestGateway::test_gateway_platform_test FAILED\ntest_suite.py::TestACP::test_acp_import PASSED\ntest_suite.py::TestRateBudget::test_rate_limit PASSED\ntest_suite.py::TestRateBudget::test_budget PASSED\ntest_suite.py::TestRateBudget::test_usage_pricing PASSED\ntest_suite.py::TestRateBudget::test_account_usage PASSED\ntest_suite.py::TestEntegrasyon::test_cli_import PASSED\ntest_suite.py::TestEntegrasyon::test_tirith_entegrasyon PASSED\ntest_suite.py::TestEntegrasyon::test_mcp_serve_import PASSED\ntest_suite.py::TestEntegrasyon::test_message_sanitization PASSED\ntest_suite.py::TestEntegrasyon::test_plugin_sistemi PASSED\n\n================================== FAILURES ===================================\n_________________________ TestCore.test_core_imports __________________________\n\nself = <test_suite.TestCore object at 0x0000027E00B15E50>\n\n    def test_core_imports(self):\n        \"\"\"Tum ana moduller import edilebiliyor mu?\"\"\"\n        mods = ['main', 'motor', 'beyin', 'reyment', 'start', 'gateway_runner',\n                'mcp_serve', 'agent_runtime', 'web_ui', 'tool_registry']\n        for m in mods:\n>           __import__(m)\nE           ModuleNotFoundError: No module named 'gateway_runner'\n\ntest_suite.py:37: ModuleNotFoundError\n------------------------------ Captured log call ------------------------------\nWARNING  tools.environments.ssh:ssh.py:21 paramiko kurulu değil. SSH ortamı kullanılamaz.\nWARNING  tools.environments.modal:modal.py:21 modal kurulu değil. Modal ortamı kullanılamaz.\n___________________ TestGateway.test_gateway_platform_test ____________________\n\nself = <test_suite.TestGateway object at 0x0000027E03AC42D0>\n\n    def test_gateway_platform_test(self):\n        try:\n            from gateway.platforms import platform_listele, mesaj_gonder\n        except ImportError:\n            pytest.skip(\"gateway import edilemedi\")\n        p = platform_listele()\n>       assert len(p) >= 10\nE       AssertionError: assert 9 >= 10\nE        +  where 9 = len(['discord', 'signal', 'whatsapp', 'whatsapp_cloud', 'slack', 'matrix', ...])\n\ntest_suite.py:280: AssertionError\n============================== warnings summary ===============================\ntest_suite.py::TestCore::test_core_imports\n  C:\\Users\\marko\\AppData\\Local\\hermes\\hermes-agent\\venv\\Lib\\site-packages\\discord\\player.py:30: DeprecationWarning: 'audioop' is deprecated and slated for removal in Python 3.13\n    import audioop\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ===========================\nFAILED test_suite.py::TestCore::test_core_imports - ModuleNotFoundError: No m...\nFAILED test_suite.py::TestGateway::test_gateway_platform_test - AssertionErro...\n============= 2 failed, 32 passed, 2 skipped, 1 warning in 2.44s ==============\n",
+          "hata": ""
+        }
+      ]
+    },
+    {
+      "ad": "pytest",
+      "basari": false,
+      "toplam": 39,
+      "gecen": 0,
+      "kalan": 0,
+      "sure": 113.61
+    }
+  ],
+  "hatalar": [
+    {
+      "dosya": "test_suite.py",
+      "hata": ""
+    },
+    {
+      "dosya": "pytest (toplu)",
+      "hata": "============================= test session starts =============================\nplatform win32 -- Python 3.11.15, pytest-9.1.0, pluggy-1.6.0 -- C:\\Users\\marko\\AppData\\Local\\hermes\\hermes-agent\\venv\\Scripts\\pythonw.exe\ncachedir: .pytest_cache\nrootdir: C:\\Users\\marko\\OneDrive\\Desktop\\Reymen Proje\\hermes_projesi\nconfigfile: pytest.ini (WARNING: ignoring pytest config in pyproject.toml!)\nplugins: anyio-4.12.1, cov-7.1.0\ncollecting ... collected 945 items\n\ntests/test_achievements.py::TestCheckAchieve"
+    }
+  ],
+  "detay": {}
+}

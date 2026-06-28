@@ -1,0 +1,13 @@
+---
+name: powershell-claude-agent
+description: VS Code terminalinde Claude agent modunu baslatir
+---
+
+## Komut
+`powershell
+echo "" | claude
+
+Notlar
+ExecutionPolicy Bypass gerekli
+VS Code terminal sekmesinde calisir
+claude --version ile kurulum dogrulanabilir

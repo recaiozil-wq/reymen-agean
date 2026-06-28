@@ -1,0 +1,5 @@
+name: model-providers-nous
+version: 1.0.0
+description: "ReYMeN plugin: model-providers-nous"
+kind: backend
+author: ReYMeN

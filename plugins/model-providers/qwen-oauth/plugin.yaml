@@ -1,0 +1,5 @@
+name: model-providers-qwen-oauth
+version: 1.0.0
+description: "ReYMeN plugin: model-providers-qwen-oauth"
+kind: backend
+author: ReYMeN

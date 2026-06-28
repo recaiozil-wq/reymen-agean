@@ -1,0 +1,16 @@
+name: oturum_hafiza
+description: "JSON tabanlı oturum hafızası — her konuşma ayrı dosyaya kaydedilir"
+version: "1.0.0"
+author: "ReYMeN"
+category: memory
+hooks:
+  - sistem_prompt_bloku
+  - onceden_getir
+  - tur_senkronize
+  - oturum_bitti
+  - kapat
+tools:
+  - OTURUM_LISTELE
+  - OTURUM_OKU
+  - OTURUM_OZET
+requires: []

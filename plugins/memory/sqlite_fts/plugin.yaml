@@ -1,0 +1,16 @@
+name: sqlite_fts
+description: "SQLite FTS5 tabanlı kalıcı hafıza — dış bağımlılık gerektirmez"
+version: "1.0.0"
+author: "ReYMeN"
+category: memory
+hooks:
+  - sistem_prompt_bloku
+  - onceden_getir
+  - tur_senkronize
+  - oturum_bitti
+  - kapat
+tools:
+  - HAFIZA_ARA
+  - HAFIZA_KAYDET
+  - HAFIZA_LISTELE
+requires: []

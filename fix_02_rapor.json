@@ -1,0 +1,3059 @@
+{
+  "tarih": "2026-06-27T16:46:21.819698",
+  "kok": "C:\\Users\\marko\\Desktop\\Reymen Proje\\ReYMeN-Ajan",
+  "islenen": [
+    {
+      "dosya": "agent\\__init__.py",
+      "isim_sayisi": 0,
+      "isimler": [],
+      "test": "PASS"
+    },
+    {
+      "dosya": "agent\\secret_sources\\__init__.py",
+      "isim_sayisi": 0,
+      "isimler": [],
+      "test": "PASS"
+    },
+    {
+      "dosya": "agent\\transports\\__init__.py",
+      "isim_sayisi": 7,
+      "isimler": [
+        "NormalizedResponse",
+        "ToolCall",
+        "Usage",
+        "build_tool_call",
+        "get_transport",
+        "map_finish_reason",
+        "register_transport"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "apps\\__init__.py",
+      "isim_sayisi": 5,
+      "isimler": [
+        "Any",
+        "Path",
+        "import_module",
+        "listele",
+        "uygulama_cagir"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "cron\\__init__.py",
+      "isim_sayisi": 6,
+      "isimler": [
+        "datetime",
+        "job_kaydet",
+        "kayitli_joblar",
+        "timedelta",
+        "tum_joblari_calistir",
+        "zamanlayici_baslat"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "gateway\\__init__.py",
+      "isim_sayisi": 19,
+      "isimler": [
+        "api_server",
+        "authz_mixin",
+        "channel_directory",
+        "config",
+        "delivery",
+        "display_config",
+        "hooks",
+        "mirror",
+        "msgraph_webhook",
+        "pairing",
+        "platform_registry",
+        "platforms_api_server",
+        "response_filters",
+        "session",
+        "session_context",
+        "slash_commands",
+        "status",
+        "telegram_network",
+        "yuanbao_media"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "gateway\\qqbot\\__init__.py",
+      "isim_sayisi": 3,
+      "isimler": [
+        "baslat",
+        "durdur",
+        "mesaj_gonder"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\agent\\__init__.py",
+      "isim_sayisi": 0,
+      "isimler": [],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\agent\\lsp\\__init__.py",
+      "isim_sayisi": 8,
+      "isimler": [
+        "DESTEKLENEN_SUNUCULAR",
+        "Optional",
+        "baslat",
+        "durdur",
+        "get",
+        "listele",
+        "start_server",
+        "stop_server"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\agent\\secret_sources\\__init__.py",
+      "isim_sayisi": 6,
+      "isimler": [
+        "Any",
+        "BitwardenSource",
+        "Optional",
+        "get_kaynak",
+        "kayit_et",
+        "kaynak_listele"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\agent\\transports\\__init__.py",
+      "isim_sayisi": 4,
+      "isimler": [
+        "Path",
+        "get",
+        "kayitli",
+        "listele"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\apps\\__init__.py",
+      "isim_sayisi": 5,
+      "isimler": [
+        "Any",
+        "Path",
+        "import_module",
+        "listele",
+        "uygulama_cagir"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\cron\\__init__.py",
+      "isim_sayisi": 6,
+      "isimler": [
+        "datetime",
+        "job_kaydet",
+        "kayitli_joblar",
+        "timedelta",
+        "tum_joblari_calistir",
+        "zamanlayici_baslat"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\gateway\\__init__.py",
+      "isim_sayisi": 19,
+      "isimler": [
+        "api_server",
+        "authz_mixin",
+        "channel_directory",
+        "config",
+        "delivery",
+        "display_config",
+        "hooks",
+        "mirror",
+        "msgraph_webhook",
+        "pairing",
+        "platform_registry",
+        "platforms_api_server",
+        "response_filters",
+        "session",
+        "session_context",
+        "slash_commands",
+        "status",
+        "telegram_network",
+        "yuanbao_media"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\gateway\\qqbot\\__init__.py",
+      "isim_sayisi": 3,
+      "isimler": [
+        "baslat",
+        "durdur",
+        "mesaj_gonder"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\gateway_eski\\__init__.py",
+      "isim_sayisi": 19,
+      "isimler": [
+        "api_server",
+        "authz_mixin",
+        "channel_directory",
+        "config",
+        "delivery",
+        "display_config",
+        "hooks",
+        "mirror",
+        "msgraph_webhook",
+        "pairing",
+        "platform_registry",
+        "platforms_api_server",
+        "response_filters",
+        "session",
+        "session_context",
+        "slash_commands",
+        "status",
+        "telegram_network",
+        "yuanbao_media"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\gateway_eski\\qqbot\\__init__.py",
+      "isim_sayisi": 3,
+      "isimler": [
+        "baslat",
+        "durdur",
+        "mesaj_gonder"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\__init__.py",
+      "isim_sayisi": 2,
+      "isimler": [
+        "Path",
+        "PluginYukleyici"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\browser\\__init__.py",
+      "isim_sayisi": 11,
+      "isimler": [
+        "HTMLParser",
+        "P",
+        "browser_ac",
+        "browser_form",
+        "browser_oku",
+        "browser_tikla",
+        "handle_data",
+        "handle_endtag",
+        "handle_starttag",
+        "kaydet",
+        "sync_playwright"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\browser\\browser_use\\__init__.py",
+      "isim_sayisi": 3,
+      "isimler": [
+        "BrowserUseBrowserProvider",
+        "annotations",
+        "register"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\browser\\browserbase\\__init__.py",
+      "isim_sayisi": 3,
+      "isimler": [
+        "BrowserbaseBrowserProvider",
+        "annotations",
+        "register"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\browser\\firecrawl\\__init__.py",
+      "isim_sayisi": 3,
+      "isimler": [
+        "FirecrawlBrowserProvider",
+        "annotations",
+        "register"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\context_engine\\__init__.py",
+      "isim_sayisi": 4,
+      "isimler": [
+        "Path",
+        "baglam_al",
+        "baglam_guncelle",
+        "kaydet"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\dashboard_auth\\nous\\__init__.py",
+      "isim_sayisi": 20,
+      "isimler": [
+        "Any",
+        "DashboardAuthProvider",
+        "Dict",
+        "InvalidCodeError",
+        "LoginStart",
+        "NousDashboardAuthProvider",
+        "Optional",
+        "ProviderError",
+        "PyJWKClient",
+        "RefreshExpiredError",
+        "Session",
+        "annotations",
+        "cfg_get",
+        "complete_login",
+        "load_config",
+        "refresh_session",
+        "register",
+        "revoke_session",
+        "start_login",
+        "verify_session"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\disk-cleanup\\__init__.py",
+      "isim_sayisi": 8,
+      "isimler": [
+        "Any",
+        "Dict",
+        "Optional",
+        "Path",
+        "Set",
+        "annotations",
+        "dg",
+        "register"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\disk_cleanup\\__init__.py",
+      "isim_sayisi": 4,
+      "isimler": [
+        "Path",
+        "disk_durum",
+        "disk_temizle",
+        "kaydet"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\google_meet\\__init__.py",
+      "isim_sayisi": 5,
+      "isimler": [
+        "Credentials",
+        "build",
+        "kaydet",
+        "meet_katil",
+        "meet_olustur"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\image_gen\\__init__.py",
+      "isim_sayisi": 4,
+      "isimler": [
+        "Path",
+        "gorsel_kaydet",
+        "gorsel_uret",
+        "kaydet"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\image_gen\\fal\\__init__.py",
+      "isim_sayisi": 17,
+      "isimler": [
+        "Any",
+        "DEFAULT_ASPECT_RATIO",
+        "Dict",
+        "FalImageGenProvider",
+        "ImageGenProvider",
+        "List",
+        "Optional",
+        "annotations",
+        "default_model",
+        "display_name",
+        "generate",
+        "get_setup_schema",
+        "is_available",
+        "list_models",
+        "name",
+        "register",
+        "resolve_aspect_ratio"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\image_gen\\krea\\__init__.py",
+      "isim_sayisi": 22,
+      "isimler": [
+        "Any",
+        "DEFAULT_ASPECT_RATIO",
+        "Dict",
+        "ImageGenProvider",
+        "KreaImageGenProvider",
+        "List",
+        "Optional",
+        "Tuple",
+        "annotations",
+        "default_model",
+        "display_name",
+        "error_response",
+        "generate",
+        "get_setup_schema",
+        "is_available",
+        "list_models",
+        "load_config",
+        "name",
+        "register",
+        "resolve_aspect_ratio",
+        "save_url_image",
+        "success_response"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\image_gen\\openai\\__init__.py",
+      "isim_sayisi": 23,
+      "isimler": [
+        "Any",
+        "DEFAULT_ASPECT_RATIO",
+        "Dict",
+        "ImageGenProvider",
+        "List",
+        "OpenAIImageGenProvider",
+        "Optional",
+        "Tuple",
+        "annotations",
+        "default_model",
+        "display_name",
+        "error_response",
+        "generate",
+        "get_setup_schema",
+        "is_available",
+        "list_models",
+        "load_config",
+        "name",
+        "register",
+        "resolve_aspect_ratio",
+        "save_b64_image",
+        "save_url_image",
+        "success_response"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\image_gen\\openai-codex\\__init__.py",
+      "isim_sayisi": 23,
+      "isimler": [
+        "Any",
+        "DEFAULT_ASPECT_RATIO",
+        "Dict",
+        "ImageGenProvider",
+        "List",
+        "OpenAICodexImageGenProvider",
+        "Optional",
+        "Tuple",
+        "annotations",
+        "default_model",
+        "display_name",
+        "error_response",
+        "flush",
+        "generate",
+        "get_setup_schema",
+        "is_available",
+        "list_models",
+        "load_config",
+        "name",
+        "register",
+        "resolve_aspect_ratio",
+        "save_b64_image",
+        "success_response"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\image_gen\\xai\\__init__.py",
+      "isim_sayisi": 24,
+      "isimler": [
+        "Any",
+        "DEFAULT_ASPECT_RATIO",
+        "Dict",
+        "ImageGenProvider",
+        "List",
+        "Optional",
+        "ReYMeN_xai_user_agent",
+        "Tuple",
+        "XAIImageGenProvider",
+        "annotations",
+        "display_name",
+        "error_response",
+        "generate",
+        "get_setup_schema",
+        "is_available",
+        "list_models",
+        "load_config",
+        "name",
+        "register",
+        "resolve_aspect_ratio",
+        "resolve_xai_http_credentials",
+        "save_b64_image",
+        "save_url_image",
+        "success_response"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\kanban\\__init__.py",
+      "isim_sayisi": 9,
+      "isimler": [
+        "AdvancedKanbanOrchestrator",
+        "Path",
+        "kanban_ekle",
+        "kanban_guncelle",
+        "kanban_liste",
+        "kanban_ozet",
+        "kanban_tamamla",
+        "kaydet",
+        "yeni_calistir"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\kanban_plugin\\__init__.py",
+      "isim_sayisi": 4,
+      "isimler": [
+        "KanbanOrchestrator",
+        "kanban_ekle",
+        "kanban_listele",
+        "kaydet"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\memory\\__init__.py",
+      "isim_sayisi": 6,
+      "isimler": [
+        "ChromaBackend",
+        "DosyaBackend",
+        "ara",
+        "ekle",
+        "motor_kaydet",
+        "sil"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\memory\\byterover\\__init__.py",
+      "isim_sayisi": 24,
+      "isimler": [
+        "Any",
+        "ByteRoverMemoryProvider",
+        "Dict",
+        "List",
+        "MemoryProvider",
+        "Optional",
+        "Path",
+        "annotations",
+        "get_ReYMeN_home",
+        "get_config_schema",
+        "get_tool_schemas",
+        "handle_tool_call",
+        "initialize",
+        "is_available",
+        "name",
+        "on_memory_write",
+        "on_pre_compress",
+        "prefetch",
+        "queue_prefetch",
+        "register",
+        "shutdown",
+        "sync_turn",
+        "system_prompt_block",
+        "tool_error"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\memory\\chromadb_vektor\\__init__.py",
+      "isim_sayisi": 20,
+      "isimler": [
+        "AbstraktHafizaSaglayici",
+        "Any",
+        "ChromaDBVektor",
+        "Dict",
+        "HafizaPluginKayit",
+        "List",
+        "Optional",
+        "Path",
+        "Settings",
+        "ad",
+        "arac_cagri_isle",
+        "arac_sema_al",
+        "baslat",
+        "kapat",
+        "kaydet",
+        "konfig_sema_al",
+        "musait_mi",
+        "onceden_getir",
+        "oturum_bitti",
+        "sistem_prompt_bloku"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\memory\\hindsight\\__init__.py",
+      "isim_sayisi": 35,
+      "isimler": [
+        "Any",
+        "Console",
+        "Dict",
+        "Hindsight",
+        "HindsightEmbedded",
+        "HindsightMemoryProvider",
+        "List",
+        "MemoryProvider",
+        "Path",
+        "Version",
+        "annotations",
+        "atomic_json_write",
+        "cfg_get",
+        "datetime",
+        "get_ReYMeN_home",
+        "get_config_schema",
+        "get_tool_schemas",
+        "handle_tool_call",
+        "initialize",
+        "is_available",
+        "masked_secret_prompt",
+        "name",
+        "on_session_switch",
+        "pkg_version",
+        "post_setup",
+        "prefetch",
+        "queue_prefetch",
+        "register",
+        "safe_schedule_threadsafe",
+        "save_config",
+        "shutdown",
+        "sync_turn",
+        "system_prompt_block",
+        "timezone",
+        "tool_error"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\memory\\holographic\\__init__.py",
+      "isim_sayisi": 27,
+      "isimler": [
+        "Any",
+        "Dict",
+        "FactRetriever",
+        "HolographicMemoryProvider",
+        "List",
+        "MemoryProvider",
+        "MemoryStore",
+        "Path",
+        "annotations",
+        "cfg_get",
+        "display_ReYMeN_home",
+        "get_ReYMeN_home",
+        "get_config_schema",
+        "get_tool_schemas",
+        "handle_tool_call",
+        "initialize",
+        "is_available",
+        "name",
+        "on_memory_write",
+        "on_session_end",
+        "prefetch",
+        "register",
+        "save_config",
+        "shutdown",
+        "sync_turn",
+        "system_prompt_block",
+        "tool_error"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\memory\\honcho\\__init__.py",
+      "isim_sayisi": 34,
+      "isimler": [
+        "Any",
+        "Dict",
+        "HonchoClientConfig",
+        "HonchoMemoryProvider",
+        "HonchoSessionManager",
+        "List",
+        "MemoryProvider",
+        "Optional",
+        "Path",
+        "annotations",
+        "atomic_json_write",
+        "cmd_setup",
+        "get_ReYMeN_home",
+        "get_config_schema",
+        "get_honcho_client",
+        "get_tool_schemas",
+        "handle_tool_call",
+        "initialize",
+        "is_available",
+        "liveness_snapshot",
+        "name",
+        "on_memory_write",
+        "on_session_end",
+        "on_turn_start",
+        "post_setup",
+        "prefetch",
+        "queue_prefetch",
+        "register",
+        "sanitize_context",
+        "save_config",
+        "shutdown",
+        "sync_turn",
+        "system_prompt_block",
+        "tool_error"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\memory\\mem0\\__init__.py",
+      "isim_sayisi": 24,
+      "isimler": [
+        "Any",
+        "Dict",
+        "List",
+        "Mem0MemoryProvider",
+        "MemoryClient",
+        "MemoryProvider",
+        "Path",
+        "annotations",
+        "atomic_json_write",
+        "get_ReYMeN_home",
+        "get_config_schema",
+        "get_tool_schemas",
+        "handle_tool_call",
+        "initialize",
+        "is_available",
+        "name",
+        "prefetch",
+        "queue_prefetch",
+        "register",
+        "save_config",
+        "shutdown",
+        "sync_turn",
+        "system_prompt_block",
+        "tool_error"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\memory\\openviking\\__init__.py",
+      "isim_sayisi": 29,
+      "isimler": [
+        "Any",
+        "Dict",
+        "List",
+        "MemoryProvider",
+        "OpenVikingMemoryProvider",
+        "Optional",
+        "Path",
+        "annotations",
+        "get",
+        "get_config_schema",
+        "get_tool_schemas",
+        "handle_tool_call",
+        "health",
+        "initialize",
+        "is_available",
+        "name",
+        "on_memory_write",
+        "on_session_end",
+        "post",
+        "prefetch",
+        "queue_prefetch",
+        "register",
+        "shutdown",
+        "sync_turn",
+        "system_prompt_block",
+        "tool_error",
+        "upload_temp_file",
+        "url2pathname",
+        "urlparse"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\memory\\oturum_hafiza\\__init__.py",
+      "isim_sayisi": 19,
+      "isimler": [
+        "AbstraktHafizaSaglayici",
+        "Any",
+        "Dict",
+        "HafizaPluginKayit",
+        "List",
+        "Optional",
+        "OturumHafizasi",
+        "Path",
+        "ad",
+        "arac_cagri_isle",
+        "arac_sema_al",
+        "baslat",
+        "kapat",
+        "kaydet",
+        "konfig_sema_al",
+        "musait_mi",
+        "onceden_getir",
+        "oturum_bitti",
+        "sistem_prompt_bloku"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\memory\\retaindb\\__init__.py",
+      "isim_sayisi": 42,
+      "isimler": [
+        "Any",
+        "Dict",
+        "List",
+        "MemoryProvider",
+        "Path",
+        "RetainDBMemoryProvider",
+        "add_memory",
+        "annotations",
+        "ask_user",
+        "datetime",
+        "delete_file",
+        "delete_memory",
+        "enqueue",
+        "get_ReYMeN_home",
+        "get_agent_model",
+        "get_config_schema",
+        "get_file",
+        "get_profile",
+        "get_tool_schemas",
+        "handle_tool_call",
+        "ingest_file",
+        "ingest_session",
+        "initialize",
+        "is_available",
+        "list_files",
+        "name",
+        "on_memory_write",
+        "prefetch",
+        "query_context",
+        "queue_prefetch",
+        "quote",
+        "read_file_content",
+        "register",
+        "request",
+        "search",
+        "seed_agent_identity",
+        "shutdown",
+        "sync_turn",
+        "system_prompt_block",
+        "timezone",
+        "tool_error",
+        "upload_file"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\memory\\sqlite_fts\\__init__.py",
+      "isim_sayisi": 19,
+      "isimler": [
+        "AbstraktHafizaSaglayici",
+        "Any",
+        "Dict",
+        "HafizaPluginKayit",
+        "List",
+        "Path",
+        "SQLiteFTSHafiza",
+        "ad",
+        "arac_cagri_isle",
+        "arac_sema_al",
+        "baslat",
+        "kapat",
+        "kaydet",
+        "konfig_kaydet",
+        "konfig_sema_al",
+        "musait_mi",
+        "onceden_getir",
+        "oturum_bitti",
+        "sistem_prompt_bloku"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\memory\\supermemory\\__init__.py",
+      "isim_sayisi": 35,
+      "isimler": [
+        "Any",
+        "Dict",
+        "List",
+        "MemoryProvider",
+        "Optional",
+        "Path",
+        "Supermemory",
+        "SupermemoryMemoryProvider",
+        "add_memory",
+        "annotations",
+        "atomic_json_write",
+        "datetime",
+        "forget_by_query",
+        "forget_memory",
+        "get_ReYMeN_home",
+        "get_config_schema",
+        "get_profile",
+        "get_tool_schemas",
+        "handle_tool_call",
+        "ingest_conversation",
+        "initialize",
+        "is_available",
+        "name",
+        "on_memory_write",
+        "on_session_end",
+        "on_turn_start",
+        "prefetch",
+        "register",
+        "save_config",
+        "search_memories",
+        "shutdown",
+        "sync_turn",
+        "system_prompt_block",
+        "timezone",
+        "tool_error"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\model-providers\\alibaba-coding-plan\\__init__.py",
+      "isim_sayisi": 2,
+      "isimler": [
+        "ProviderProfile",
+        "register_provider"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\model-providers\\azure-foundry\\__init__.py",
+      "isim_sayisi": 2,
+      "isimler": [
+        "ProviderProfile",
+        "register_provider"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\model-providers\\copilot\\__init__.py",
+      "isim_sayisi": 6,
+      "isimler": [
+        "Any",
+        "CopilotProfile",
+        "ProviderProfile",
+        "build_api_kwargs_extras",
+        "github_model_reasoning_efforts",
+        "register_provider"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\model-providers\\copilot-acp\\__init__.py",
+      "isim_sayisi": 4,
+      "isimler": [
+        "CopilotACPProfile",
+        "ProviderProfile",
+        "fetch_models",
+        "register_provider"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\model-providers\\custom\\__init__.py",
+      "isim_sayisi": 6,
+      "isimler": [
+        "Any",
+        "CustomProfile",
+        "ProviderProfile",
+        "build_api_kwargs_extras",
+        "fetch_models",
+        "register_provider"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\model-providers\\deepseek\\__init__.py",
+      "isim_sayisi": 6,
+      "isimler": [
+        "Any",
+        "DeepSeekProfile",
+        "ProviderProfile",
+        "annotations",
+        "build_api_kwargs_extras",
+        "register_provider"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\model-providers\\gemini\\__init__.py",
+      "isim_sayisi": 5,
+      "isimler": [
+        "Any",
+        "GeminiProfile",
+        "ProviderProfile",
+        "build_extra_body",
+        "register_provider"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\model-providers\\kimi-coding\\__init__.py",
+      "isim_sayisi": 6,
+      "isimler": [
+        "Any",
+        "KimiProfile",
+        "OMIT_TEMPERATURE",
+        "ProviderProfile",
+        "build_api_kwargs_extras",
+        "register_provider"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\model-providers\\minimax\\__init__.py",
+      "isim_sayisi": 2,
+      "isimler": [
+        "ProviderProfile",
+        "register_provider"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\model-providers\\openai\\__init__.py",
+      "isim_sayisi": 4,
+      "isimler": [
+        "OpenAIProfile",
+        "ProviderProfile",
+        "fetch_models",
+        "register_provider"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\model-providers\\opencode-zen\\__init__.py",
+      "isim_sayisi": 7,
+      "isimler": [
+        "Any",
+        "OpenCodeGoProfile",
+        "ProviderProfile",
+        "annotations",
+        "build_api_kwargs_extras",
+        "get_max_tokens",
+        "register_provider"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\model_providers\\__init__.py",
+      "isim_sayisi": 1,
+      "isimler": [
+        "motor_kaydet"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\notion\\__init__.py",
+      "isim_sayisi": 2,
+      "isimler": [
+        "Path",
+        "kaydet"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\notion_plugin\\__init__.py",
+      "isim_sayisi": 4,
+      "isimler": [
+        "kaydet",
+        "notion_medya_yukle",
+        "notion_veritabani_sorgula",
+        "notion_yaz"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\observability\\__init__.py",
+      "isim_sayisi": 5,
+      "isimler": [
+        "Path",
+        "kaydet",
+        "obs_log",
+        "obs_metrik",
+        "obs_rapor"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\observability\\langfuse\\__init__.py",
+      "isim_sayisi": 20,
+      "isimler": [
+        "Any",
+        "CanonicalUsage",
+        "Decimal",
+        "Dict",
+        "Langfuse",
+        "Optional",
+        "TraceState",
+        "annotations",
+        "dataclass",
+        "estimate_usage_cost",
+        "field",
+        "get_pricing_entry",
+        "normalize_usage",
+        "on_post_llm_call",
+        "on_post_tool_call",
+        "on_pre_llm_call",
+        "on_pre_llm_request",
+        "on_pre_tool_call",
+        "propagate_attributes",
+        "register"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\ornek_plugin\\__init__.py",
+      "isim_sayisi": 2,
+      "isimler": [
+        "kaydet",
+        "ornek_fonksiyon"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\platforms\\__init__.py",
+      "isim_sayisi": 1,
+      "isimler": [
+        "motor_kaydet"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\platforms\\photon\\__init__.py",
+      "isim_sayisi": 5,
+      "isimler": [
+        "Any",
+        "Optional",
+        "PhotonPlugin",
+        "mesaj_gonder",
+        "run"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\security-guidance\\__init__.py",
+      "isim_sayisi": 7,
+      "isimler": [
+        "Any",
+        "Dict",
+        "List",
+        "Optional",
+        "Tuple",
+        "annotations",
+        "register"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\security_guidance\\__init__.py",
+      "isim_sayisi": 3,
+      "isimler": [
+        "guvenlik_denetle",
+        "guvenlik_temizle",
+        "kaydet"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\spotify\\__init__.py",
+      "isim_sayisi": 6,
+      "isimler": [
+        "SpotifyOAuth",
+        "kaydet",
+        "spotify_arama",
+        "spotify_dur",
+        "spotify_oynat",
+        "spotify_siradaki"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\teams_pipeline\\__init__.py",
+      "isim_sayisi": 4,
+      "isimler": [
+        "Path",
+        "kaydet",
+        "pipe_calistir",
+        "pipe_durum"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\video_gen\\__init__.py",
+      "isim_sayisi": 4,
+      "isimler": [
+        "kaydet",
+        "video_indir",
+        "video_ozetle",
+        "video_uret"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\video_gen\\fal\\__init__.py",
+      "isim_sayisi": 24,
+      "isimler": [
+        "Any",
+        "Dict",
+        "FALVideoGenProvider",
+        "List",
+        "Optional",
+        "Tuple",
+        "VideoGenProvider",
+        "annotations",
+        "capabilities",
+        "default_model",
+        "display_name",
+        "error_response",
+        "fal_key_is_configured",
+        "generate",
+        "get_setup_schema",
+        "import_fal_client",
+        "is_available",
+        "list_models",
+        "load_config",
+        "name",
+        "prefers_gateway",
+        "register",
+        "resolve_managed_tool_gateway",
+        "success_response"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\video_gen\\xai\\__init__.py",
+      "isim_sayisi": 21,
+      "isimler": [
+        "Any",
+        "Dict",
+        "List",
+        "Optional",
+        "ReYMeN_xai_user_agent",
+        "Tuple",
+        "VideoGenProvider",
+        "XAIVideoGenProvider",
+        "annotations",
+        "capabilities",
+        "default_model",
+        "display_name",
+        "error_response",
+        "generate",
+        "get_setup_schema",
+        "is_available",
+        "list_models",
+        "name",
+        "register",
+        "resolve_xai_http_credentials",
+        "success_response"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\web\\__init__.py",
+      "isim_sayisi": 3,
+      "isimler": [
+        "motor_kaydet",
+        "web_ara",
+        "web_getir"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\web\\brave_free\\__init__.py",
+      "isim_sayisi": 3,
+      "isimler": [
+        "BraveFreeWebSearchProvider",
+        "annotations",
+        "register"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\web\\ddgs\\__init__.py",
+      "isim_sayisi": 3,
+      "isimler": [
+        "DDGSWebSearchProvider",
+        "annotations",
+        "register"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\web\\exa\\__init__.py",
+      "isim_sayisi": 3,
+      "isimler": [
+        "ExaWebSearchProvider",
+        "annotations",
+        "register"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\web\\firecrawl\\__init__.py",
+      "isim_sayisi": 3,
+      "isimler": [
+        "FirecrawlWebSearchProvider",
+        "annotations",
+        "register"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\web\\parallel\\__init__.py",
+      "isim_sayisi": 3,
+      "isimler": [
+        "ParallelWebSearchProvider",
+        "annotations",
+        "register"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\web\\searxng\\__init__.py",
+      "isim_sayisi": 3,
+      "isimler": [
+        "SearXNGWebSearchProvider",
+        "annotations",
+        "register"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\web\\xai\\__init__.py",
+      "isim_sayisi": 3,
+      "isimler": [
+        "XAIWebSearchProvider",
+        "annotations",
+        "register"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\web_scraper\\__init__.py",
+      "isim_sayisi": 7,
+      "isimler": [
+        "HTMLParser",
+        "handle_data",
+        "handle_endtag",
+        "handle_starttag",
+        "kaydet",
+        "metin",
+        "web_getir"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\plugins\\web_search_plugin\\__init__.py",
+      "isim_sayisi": 3,
+      "isimler": [
+        "ara",
+        "kaydet",
+        "web_ara"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\providers\\__init__.py",
+      "isim_sayisi": 26,
+      "isimler": [
+        "AnthropicPlugin",
+        "CoherePlugin",
+        "DeepSeekPlugin",
+        "FireworksPlugin",
+        "GooglePlugin",
+        "GroqPlugin",
+        "LMStudioPlugin",
+        "MistralPlugin",
+        "OllamaPlugin",
+        "OpenAIPlugin",
+        "OpenRouterPlugin",
+        "Path",
+        "PerplexityPlugin",
+        "ProviderPlugin",
+        "ProviderProfile",
+        "TogetherPlugin",
+        "XAIPlugin",
+        "get_provider",
+        "list_providers",
+        "mevcut_providerlar",
+        "plugin_al",
+        "plugin_kaydet",
+        "plugin_listele",
+        "plugin_ping",
+        "plugin_test_hepsi",
+        "provider_kaydet"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\ReYMeN_cli\\__init__.py",
+      "isim_sayisi": 6,
+      "isimler": [
+        "Callable",
+        "kategorileri_listele",
+        "kaydet",
+        "komut_al",
+        "komut_listele",
+        "yuklenme_durumu"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "hermes-memory-backup\\tools\\computer_use\\__init__.py",
+      "isim_sayisi": 5,
+      "isimler": [
+        "annotations",
+        "check_computer_use_requirements",
+        "get_computer_use_schema",
+        "handle_computer_use",
+        "set_approval_callback"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\browser\\__init__.py",
+      "isim_sayisi": 11,
+      "isimler": [
+        "HTMLParser",
+        "P",
+        "browser_ac",
+        "browser_form",
+        "browser_oku",
+        "browser_tikla",
+        "handle_data",
+        "handle_endtag",
+        "handle_starttag",
+        "kaydet",
+        "sync_playwright"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\browser\\browser_use\\__init__.py",
+      "isim_sayisi": 3,
+      "isimler": [
+        "BrowserUseBrowserProvider",
+        "annotations",
+        "register"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\browser\\browserbase\\__init__.py",
+      "isim_sayisi": 3,
+      "isimler": [
+        "BrowserbaseBrowserProvider",
+        "annotations",
+        "register"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\browser\\firecrawl\\__init__.py",
+      "isim_sayisi": 3,
+      "isimler": [
+        "FirecrawlBrowserProvider",
+        "annotations",
+        "register"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\context_engine\\__init__.py",
+      "isim_sayisi": 4,
+      "isimler": [
+        "Path",
+        "baglam_al",
+        "baglam_guncelle",
+        "kaydet"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\dashboard_auth\\nous\\__init__.py",
+      "isim_sayisi": 20,
+      "isimler": [
+        "Any",
+        "DashboardAuthProvider",
+        "Dict",
+        "InvalidCodeError",
+        "LoginStart",
+        "NousDashboardAuthProvider",
+        "Optional",
+        "ProviderError",
+        "PyJWKClient",
+        "RefreshExpiredError",
+        "Session",
+        "annotations",
+        "cfg_get",
+        "complete_login",
+        "load_config",
+        "refresh_session",
+        "register",
+        "revoke_session",
+        "start_login",
+        "verify_session"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\disk-cleanup\\__init__.py",
+      "isim_sayisi": 8,
+      "isimler": [
+        "Any",
+        "Dict",
+        "Optional",
+        "Path",
+        "Set",
+        "annotations",
+        "dg",
+        "register"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\disk_cleanup\\__init__.py",
+      "isim_sayisi": 4,
+      "isimler": [
+        "Path",
+        "disk_durum",
+        "disk_temizle",
+        "kaydet"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\google_meet\\__init__.py",
+      "isim_sayisi": 5,
+      "isimler": [
+        "Credentials",
+        "build",
+        "kaydet",
+        "meet_katil",
+        "meet_olustur"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\image_gen\\__init__.py",
+      "isim_sayisi": 4,
+      "isimler": [
+        "Path",
+        "gorsel_kaydet",
+        "gorsel_uret",
+        "kaydet"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\image_gen\\fal\\__init__.py",
+      "isim_sayisi": 17,
+      "isimler": [
+        "Any",
+        "DEFAULT_ASPECT_RATIO",
+        "Dict",
+        "FalImageGenProvider",
+        "ImageGenProvider",
+        "List",
+        "Optional",
+        "annotations",
+        "default_model",
+        "display_name",
+        "generate",
+        "get_setup_schema",
+        "is_available",
+        "list_models",
+        "name",
+        "register",
+        "resolve_aspect_ratio"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\image_gen\\krea\\__init__.py",
+      "isim_sayisi": 22,
+      "isimler": [
+        "Any",
+        "DEFAULT_ASPECT_RATIO",
+        "Dict",
+        "ImageGenProvider",
+        "KreaImageGenProvider",
+        "List",
+        "Optional",
+        "Tuple",
+        "annotations",
+        "default_model",
+        "display_name",
+        "error_response",
+        "generate",
+        "get_setup_schema",
+        "is_available",
+        "list_models",
+        "load_config",
+        "name",
+        "register",
+        "resolve_aspect_ratio",
+        "save_url_image",
+        "success_response"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\image_gen\\openai\\__init__.py",
+      "isim_sayisi": 23,
+      "isimler": [
+        "Any",
+        "DEFAULT_ASPECT_RATIO",
+        "Dict",
+        "ImageGenProvider",
+        "List",
+        "OpenAIImageGenProvider",
+        "Optional",
+        "Tuple",
+        "annotations",
+        "default_model",
+        "display_name",
+        "error_response",
+        "generate",
+        "get_setup_schema",
+        "is_available",
+        "list_models",
+        "load_config",
+        "name",
+        "register",
+        "resolve_aspect_ratio",
+        "save_b64_image",
+        "save_url_image",
+        "success_response"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\image_gen\\openai-codex\\__init__.py",
+      "isim_sayisi": 23,
+      "isimler": [
+        "Any",
+        "DEFAULT_ASPECT_RATIO",
+        "Dict",
+        "ImageGenProvider",
+        "List",
+        "OpenAICodexImageGenProvider",
+        "Optional",
+        "Tuple",
+        "annotations",
+        "default_model",
+        "display_name",
+        "error_response",
+        "flush",
+        "generate",
+        "get_setup_schema",
+        "is_available",
+        "list_models",
+        "load_config",
+        "name",
+        "register",
+        "resolve_aspect_ratio",
+        "save_b64_image",
+        "success_response"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\image_gen\\xai\\__init__.py",
+      "isim_sayisi": 24,
+      "isimler": [
+        "Any",
+        "DEFAULT_ASPECT_RATIO",
+        "Dict",
+        "ImageGenProvider",
+        "List",
+        "Optional",
+        "ReYMeN_xai_user_agent",
+        "Tuple",
+        "XAIImageGenProvider",
+        "annotations",
+        "display_name",
+        "error_response",
+        "generate",
+        "get_setup_schema",
+        "is_available",
+        "list_models",
+        "load_config",
+        "name",
+        "register",
+        "resolve_aspect_ratio",
+        "resolve_xai_http_credentials",
+        "save_b64_image",
+        "save_url_image",
+        "success_response"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\kanban\\__init__.py",
+      "isim_sayisi": 9,
+      "isimler": [
+        "AdvancedKanbanOrchestrator",
+        "Path",
+        "kanban_ekle",
+        "kanban_guncelle",
+        "kanban_liste",
+        "kanban_ozet",
+        "kanban_tamamla",
+        "kaydet",
+        "yeni_calistir"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\kanban_plugin\\__init__.py",
+      "isim_sayisi": 4,
+      "isimler": [
+        "KanbanOrchestrator",
+        "kanban_ekle",
+        "kanban_listele",
+        "kaydet"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\memory\\__init__.py",
+      "isim_sayisi": 6,
+      "isimler": [
+        "ChromaBackend",
+        "DosyaBackend",
+        "ara",
+        "ekle",
+        "motor_kaydet",
+        "sil"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\memory\\byterover\\__init__.py",
+      "isim_sayisi": 24,
+      "isimler": [
+        "Any",
+        "ByteRoverMemoryProvider",
+        "Dict",
+        "List",
+        "MemoryProvider",
+        "Optional",
+        "Path",
+        "annotations",
+        "get_ReYMeN_home",
+        "get_config_schema",
+        "get_tool_schemas",
+        "handle_tool_call",
+        "initialize",
+        "is_available",
+        "name",
+        "on_memory_write",
+        "on_pre_compress",
+        "prefetch",
+        "queue_prefetch",
+        "register",
+        "shutdown",
+        "sync_turn",
+        "system_prompt_block",
+        "tool_error"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\memory\\chromadb_vektor\\__init__.py",
+      "isim_sayisi": 20,
+      "isimler": [
+        "AbstraktHafizaSaglayici",
+        "Any",
+        "ChromaDBVektor",
+        "Dict",
+        "HafizaPluginKayit",
+        "List",
+        "Optional",
+        "Path",
+        "Settings",
+        "ad",
+        "arac_cagri_isle",
+        "arac_sema_al",
+        "baslat",
+        "kapat",
+        "kaydet",
+        "konfig_sema_al",
+        "musait_mi",
+        "onceden_getir",
+        "oturum_bitti",
+        "sistem_prompt_bloku"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\memory\\hindsight\\__init__.py",
+      "isim_sayisi": 35,
+      "isimler": [
+        "Any",
+        "Console",
+        "Dict",
+        "Hindsight",
+        "HindsightEmbedded",
+        "HindsightMemoryProvider",
+        "List",
+        "MemoryProvider",
+        "Path",
+        "Version",
+        "annotations",
+        "atomic_json_write",
+        "cfg_get",
+        "datetime",
+        "get_ReYMeN_home",
+        "get_config_schema",
+        "get_tool_schemas",
+        "handle_tool_call",
+        "initialize",
+        "is_available",
+        "masked_secret_prompt",
+        "name",
+        "on_session_switch",
+        "pkg_version",
+        "post_setup",
+        "prefetch",
+        "queue_prefetch",
+        "register",
+        "safe_schedule_threadsafe",
+        "save_config",
+        "shutdown",
+        "sync_turn",
+        "system_prompt_block",
+        "timezone",
+        "tool_error"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\memory\\holographic\\__init__.py",
+      "isim_sayisi": 27,
+      "isimler": [
+        "Any",
+        "Dict",
+        "FactRetriever",
+        "HolographicMemoryProvider",
+        "List",
+        "MemoryProvider",
+        "MemoryStore",
+        "Path",
+        "annotations",
+        "cfg_get",
+        "display_ReYMeN_home",
+        "get_ReYMeN_home",
+        "get_config_schema",
+        "get_tool_schemas",
+        "handle_tool_call",
+        "initialize",
+        "is_available",
+        "name",
+        "on_memory_write",
+        "on_session_end",
+        "prefetch",
+        "register",
+        "save_config",
+        "shutdown",
+        "sync_turn",
+        "system_prompt_block",
+        "tool_error"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\memory\\honcho\\__init__.py",
+      "isim_sayisi": 34,
+      "isimler": [
+        "Any",
+        "Dict",
+        "HonchoClientConfig",
+        "HonchoMemoryProvider",
+        "HonchoSessionManager",
+        "List",
+        "MemoryProvider",
+        "Optional",
+        "Path",
+        "annotations",
+        "atomic_json_write",
+        "cmd_setup",
+        "get_ReYMeN_home",
+        "get_config_schema",
+        "get_honcho_client",
+        "get_tool_schemas",
+        "handle_tool_call",
+        "initialize",
+        "is_available",
+        "liveness_snapshot",
+        "name",
+        "on_memory_write",
+        "on_session_end",
+        "on_turn_start",
+        "post_setup",
+        "prefetch",
+        "queue_prefetch",
+        "register",
+        "sanitize_context",
+        "save_config",
+        "shutdown",
+        "sync_turn",
+        "system_prompt_block",
+        "tool_error"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\memory\\mem0\\__init__.py",
+      "isim_sayisi": 24,
+      "isimler": [
+        "Any",
+        "Dict",
+        "List",
+        "Mem0MemoryProvider",
+        "MemoryClient",
+        "MemoryProvider",
+        "Path",
+        "annotations",
+        "atomic_json_write",
+        "get_ReYMeN_home",
+        "get_config_schema",
+        "get_tool_schemas",
+        "handle_tool_call",
+        "initialize",
+        "is_available",
+        "name",
+        "prefetch",
+        "queue_prefetch",
+        "register",
+        "save_config",
+        "shutdown",
+        "sync_turn",
+        "system_prompt_block",
+        "tool_error"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\memory\\openviking\\__init__.py",
+      "isim_sayisi": 29,
+      "isimler": [
+        "Any",
+        "Dict",
+        "List",
+        "MemoryProvider",
+        "OpenVikingMemoryProvider",
+        "Optional",
+        "Path",
+        "annotations",
+        "get",
+        "get_config_schema",
+        "get_tool_schemas",
+        "handle_tool_call",
+        "health",
+        "initialize",
+        "is_available",
+        "name",
+        "on_memory_write",
+        "on_session_end",
+        "post",
+        "prefetch",
+        "queue_prefetch",
+        "register",
+        "shutdown",
+        "sync_turn",
+        "system_prompt_block",
+        "tool_error",
+        "upload_temp_file",
+        "url2pathname",
+        "urlparse"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\memory\\oturum_hafiza\\__init__.py",
+      "isim_sayisi": 19,
+      "isimler": [
+        "AbstraktHafizaSaglayici",
+        "Any",
+        "Dict",
+        "HafizaPluginKayit",
+        "List",
+        "Optional",
+        "OturumHafizasi",
+        "Path",
+        "ad",
+        "arac_cagri_isle",
+        "arac_sema_al",
+        "baslat",
+        "kapat",
+        "kaydet",
+        "konfig_sema_al",
+        "musait_mi",
+        "onceden_getir",
+        "oturum_bitti",
+        "sistem_prompt_bloku"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\memory\\retaindb\\__init__.py",
+      "isim_sayisi": 42,
+      "isimler": [
+        "Any",
+        "Dict",
+        "List",
+        "MemoryProvider",
+        "Path",
+        "RetainDBMemoryProvider",
+        "add_memory",
+        "annotations",
+        "ask_user",
+        "datetime",
+        "delete_file",
+        "delete_memory",
+        "enqueue",
+        "get_ReYMeN_home",
+        "get_agent_model",
+        "get_config_schema",
+        "get_file",
+        "get_profile",
+        "get_tool_schemas",
+        "handle_tool_call",
+        "ingest_file",
+        "ingest_session",
+        "initialize",
+        "is_available",
+        "list_files",
+        "name",
+        "on_memory_write",
+        "prefetch",
+        "query_context",
+        "queue_prefetch",
+        "quote",
+        "read_file_content",
+        "register",
+        "request",
+        "search",
+        "seed_agent_identity",
+        "shutdown",
+        "sync_turn",
+        "system_prompt_block",
+        "timezone",
+        "tool_error",
+        "upload_file"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\memory\\sqlite_fts\\__init__.py",
+      "isim_sayisi": 19,
+      "isimler": [
+        "AbstraktHafizaSaglayici",
+        "Any",
+        "Dict",
+        "HafizaPluginKayit",
+        "List",
+        "Path",
+        "SQLiteFTSHafiza",
+        "ad",
+        "arac_cagri_isle",
+        "arac_sema_al",
+        "baslat",
+        "kapat",
+        "kaydet",
+        "konfig_kaydet",
+        "konfig_sema_al",
+        "musait_mi",
+        "onceden_getir",
+        "oturum_bitti",
+        "sistem_prompt_bloku"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\memory\\supermemory\\__init__.py",
+      "isim_sayisi": 35,
+      "isimler": [
+        "Any",
+        "Dict",
+        "List",
+        "MemoryProvider",
+        "Optional",
+        "Path",
+        "Supermemory",
+        "SupermemoryMemoryProvider",
+        "add_memory",
+        "annotations",
+        "atomic_json_write",
+        "datetime",
+        "forget_by_query",
+        "forget_memory",
+        "get_ReYMeN_home",
+        "get_config_schema",
+        "get_profile",
+        "get_tool_schemas",
+        "handle_tool_call",
+        "ingest_conversation",
+        "initialize",
+        "is_available",
+        "name",
+        "on_memory_write",
+        "on_session_end",
+        "on_turn_start",
+        "prefetch",
+        "register",
+        "save_config",
+        "search_memories",
+        "shutdown",
+        "sync_turn",
+        "system_prompt_block",
+        "timezone",
+        "tool_error"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\model-providers\\alibaba-coding-plan\\__init__.py",
+      "isim_sayisi": 2,
+      "isimler": [
+        "ProviderProfile",
+        "register_provider"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\model-providers\\azure-foundry\\__init__.py",
+      "isim_sayisi": 2,
+      "isimler": [
+        "ProviderProfile",
+        "register_provider"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\model-providers\\copilot\\__init__.py",
+      "isim_sayisi": 6,
+      "isimler": [
+        "Any",
+        "CopilotProfile",
+        "ProviderProfile",
+        "build_api_kwargs_extras",
+        "github_model_reasoning_efforts",
+        "register_provider"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\model-providers\\copilot-acp\\__init__.py",
+      "isim_sayisi": 4,
+      "isimler": [
+        "CopilotACPProfile",
+        "ProviderProfile",
+        "fetch_models",
+        "register_provider"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\model-providers\\custom\\__init__.py",
+      "isim_sayisi": 6,
+      "isimler": [
+        "Any",
+        "CustomProfile",
+        "ProviderProfile",
+        "build_api_kwargs_extras",
+        "fetch_models",
+        "register_provider"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\model-providers\\deepseek\\__init__.py",
+      "isim_sayisi": 6,
+      "isimler": [
+        "Any",
+        "DeepSeekProfile",
+        "ProviderProfile",
+        "annotations",
+        "build_api_kwargs_extras",
+        "register_provider"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\model-providers\\gemini\\__init__.py",
+      "isim_sayisi": 5,
+      "isimler": [
+        "Any",
+        "GeminiProfile",
+        "ProviderProfile",
+        "build_extra_body",
+        "register_provider"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\model-providers\\kimi-coding\\__init__.py",
+      "isim_sayisi": 6,
+      "isimler": [
+        "Any",
+        "KimiProfile",
+        "OMIT_TEMPERATURE",
+        "ProviderProfile",
+        "build_api_kwargs_extras",
+        "register_provider"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\model-providers\\minimax\\__init__.py",
+      "isim_sayisi": 2,
+      "isimler": [
+        "ProviderProfile",
+        "register_provider"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\model-providers\\openai\\__init__.py",
+      "isim_sayisi": 4,
+      "isimler": [
+        "OpenAIProfile",
+        "ProviderProfile",
+        "fetch_models",
+        "register_provider"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\model-providers\\opencode-zen\\__init__.py",
+      "isim_sayisi": 7,
+      "isimler": [
+        "Any",
+        "OpenCodeGoProfile",
+        "ProviderProfile",
+        "annotations",
+        "build_api_kwargs_extras",
+        "get_max_tokens",
+        "register_provider"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\model_providers\\__init__.py",
+      "isim_sayisi": 1,
+      "isimler": [
+        "motor_kaydet"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\notion\\__init__.py",
+      "isim_sayisi": 2,
+      "isimler": [
+        "Path",
+        "kaydet"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\notion_plugin\\__init__.py",
+      "isim_sayisi": 4,
+      "isimler": [
+        "kaydet",
+        "notion_medya_yukle",
+        "notion_veritabani_sorgula",
+        "notion_yaz"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\observability\\__init__.py",
+      "isim_sayisi": 5,
+      "isimler": [
+        "Path",
+        "kaydet",
+        "obs_log",
+        "obs_metrik",
+        "obs_rapor"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\observability\\langfuse\\__init__.py",
+      "isim_sayisi": 20,
+      "isimler": [
+        "Any",
+        "CanonicalUsage",
+        "Decimal",
+        "Dict",
+        "Langfuse",
+        "Optional",
+        "TraceState",
+        "annotations",
+        "dataclass",
+        "estimate_usage_cost",
+        "field",
+        "get_pricing_entry",
+        "normalize_usage",
+        "on_post_llm_call",
+        "on_post_tool_call",
+        "on_pre_llm_call",
+        "on_pre_llm_request",
+        "on_pre_tool_call",
+        "propagate_attributes",
+        "register"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\ornek_plugin\\__init__.py",
+      "isim_sayisi": 2,
+      "isimler": [
+        "kaydet",
+        "ornek_fonksiyon"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\platforms\\__init__.py",
+      "isim_sayisi": 1,
+      "isimler": [
+        "motor_kaydet"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\platforms\\photon\\__init__.py",
+      "isim_sayisi": 5,
+      "isimler": [
+        "Any",
+        "Optional",
+        "PhotonPlugin",
+        "mesaj_gonder",
+        "run"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\security-guidance\\__init__.py",
+      "isim_sayisi": 7,
+      "isimler": [
+        "Any",
+        "Dict",
+        "List",
+        "Optional",
+        "Tuple",
+        "annotations",
+        "register"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\security_guidance\\__init__.py",
+      "isim_sayisi": 3,
+      "isimler": [
+        "guvenlik_denetle",
+        "guvenlik_temizle",
+        "kaydet"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\spotify\\__init__.py",
+      "isim_sayisi": 6,
+      "isimler": [
+        "SpotifyOAuth",
+        "kaydet",
+        "spotify_arama",
+        "spotify_dur",
+        "spotify_oynat",
+        "spotify_siradaki"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\teams_pipeline\\__init__.py",
+      "isim_sayisi": 4,
+      "isimler": [
+        "Path",
+        "kaydet",
+        "pipe_calistir",
+        "pipe_durum"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\video_gen\\__init__.py",
+      "isim_sayisi": 4,
+      "isimler": [
+        "kaydet",
+        "video_indir",
+        "video_ozetle",
+        "video_uret"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\video_gen\\fal\\__init__.py",
+      "isim_sayisi": 24,
+      "isimler": [
+        "Any",
+        "Dict",
+        "FALVideoGenProvider",
+        "List",
+        "Optional",
+        "Tuple",
+        "VideoGenProvider",
+        "annotations",
+        "capabilities",
+        "default_model",
+        "display_name",
+        "error_response",
+        "fal_key_is_configured",
+        "generate",
+        "get_setup_schema",
+        "import_fal_client",
+        "is_available",
+        "list_models",
+        "load_config",
+        "name",
+        "prefers_gateway",
+        "register",
+        "resolve_managed_tool_gateway",
+        "success_response"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\video_gen\\xai\\__init__.py",
+      "isim_sayisi": 21,
+      "isimler": [
+        "Any",
+        "Dict",
+        "List",
+        "Optional",
+        "ReYMeN_xai_user_agent",
+        "Tuple",
+        "VideoGenProvider",
+        "XAIVideoGenProvider",
+        "annotations",
+        "capabilities",
+        "default_model",
+        "display_name",
+        "error_response",
+        "generate",
+        "get_setup_schema",
+        "is_available",
+        "list_models",
+        "name",
+        "register",
+        "resolve_xai_http_credentials",
+        "success_response"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\web\\__init__.py",
+      "isim_sayisi": 3,
+      "isimler": [
+        "motor_kaydet",
+        "web_ara",
+        "web_getir"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\web\\brave_free\\__init__.py",
+      "isim_sayisi": 3,
+      "isimler": [
+        "BraveFreeWebSearchProvider",
+        "annotations",
+        "register"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\web\\ddgs\\__init__.py",
+      "isim_sayisi": 3,
+      "isimler": [
+        "DDGSWebSearchProvider",
+        "annotations",
+        "register"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\web\\exa\\__init__.py",
+      "isim_sayisi": 3,
+      "isimler": [
+        "ExaWebSearchProvider",
+        "annotations",
+        "register"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\web\\firecrawl\\__init__.py",
+      "isim_sayisi": 3,
+      "isimler": [
+        "FirecrawlWebSearchProvider",
+        "annotations",
+        "register"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\web\\parallel\\__init__.py",
+      "isim_sayisi": 3,
+      "isimler": [
+        "ParallelWebSearchProvider",
+        "annotations",
+        "register"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\web\\searxng\\__init__.py",
+      "isim_sayisi": 3,
+      "isimler": [
+        "SearXNGWebSearchProvider",
+        "annotations",
+        "register"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\web\\xai\\__init__.py",
+      "isim_sayisi": 3,
+      "isimler": [
+        "XAIWebSearchProvider",
+        "annotations",
+        "register"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\web_scraper\\__init__.py",
+      "isim_sayisi": 7,
+      "isimler": [
+        "HTMLParser",
+        "handle_data",
+        "handle_endtag",
+        "handle_starttag",
+        "kaydet",
+        "metin",
+        "web_getir"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "plugins\\web_search_plugin\\__init__.py",
+      "isim_sayisi": 3,
+      "isimler": [
+        "ara",
+        "kaydet",
+        "web_ara"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "providers\\__init__.py",
+      "isim_sayisi": 27,
+      "isimler": [
+        "AnthropicPlugin",
+        "CoherePlugin",
+        "DeepSeekPlugin",
+        "FireworksPlugin",
+        "GooglePlugin",
+        "GroqPlugin",
+        "LMStudioPlugin",
+        "MistralPlugin",
+        "OllamaPlugin",
+        "OpenAIPlugin",
+        "OpenRouterPlugin",
+        "Path",
+        "PerplexityPlugin",
+        "ProviderPlugin",
+        "ProviderProfile",
+        "TogetherPlugin",
+        "XAIPlugin",
+        "get_provider",
+        "list_providers",
+        "mevcut_providerlar",
+        "plugin_al",
+        "plugin_kaydet",
+        "plugin_listele",
+        "plugin_ping",
+        "plugin_test_hepsi",
+        "provider_kaydet",
+        "register_provider"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "reymen\\guvenlik\\__init__.py",
+      "isim_sayisi": 0,
+      "isimler": [],
+      "test": "PASS"
+    },
+    {
+      "dosya": "reymen\\hafiza\\__init__.py",
+      "isim_sayisi": 0,
+      "isimler": [],
+      "test": "PASS"
+    },
+    {
+      "dosya": "ReYMeN_cli\\__init__.py",
+      "isim_sayisi": 6,
+      "isimler": [
+        "Callable",
+        "kategorileri_listele",
+        "kaydet",
+        "komut_al",
+        "komut_listele",
+        "yuklenme_durumu"
+      ],
+      "test": "PASS"
+    },
+    {
+      "dosya": "tools\\computer_use\\__init__.py",
+      "isim_sayisi": 5,
+      "isimler": [
+        "annotations",
+        "check_computer_use_requirements",
+        "get_computer_use_schema",
+        "handle_computer_use",
+        "set_approval_callback"
+      ],
+      "test": "PASS"
+    }
+  ],
+  "zaten_var": [
+    "acp\\__init__.py",
+    "acp\\agent\\__init__.py",
+    "acp_adapter\\__init__.py",
+    "agent\\lsp\\__init__.py",
+    "cron\\scripts\\__init__.py",
+    "dashboard\\__init__.py",
+    "gateway\\builtin_hooks\\__init__.py",
+    "gateway\\platforms\\__init__.py",
+    "gateway\\platforms\\qqbot\\__init__.py",
+    "hermes-memory-backup\\.ReYMeN\\skills\\creative\\pixel-art\\scripts\\__init__.py",
+    "hermes-memory-backup\\.ReYMeN\\skills\\productivity\\powerpoint\\scripts\\__init__.py",
+    "hermes-memory-backup\\.ReYMeN\\skills\\productivity\\powerpoint\\scripts\\office\\helpers\\__init__.py",
+    "hermes-memory-backup\\acp\\__init__.py",
+    "hermes-memory-backup\\acp\\agent\\__init__.py",
+    "hermes-memory-backup\\acp_adapter\\__init__.py",
+    "hermes-memory-backup\\cron\\scripts\\__init__.py",
+    "hermes-memory-backup\\dashboard\\__init__.py",
+    "hermes-memory-backup\\gateway\\builtin_hooks\\__init__.py",
+    "hermes-memory-backup\\gateway\\platforms\\__init__.py",
+    "hermes-memory-backup\\gateway\\platforms\\qqbot\\__init__.py",
+    "hermes-memory-backup\\gateway_eski\\builtin_hooks\\__init__.py",
+    "hermes-memory-backup\\gateway_eski\\platforms\\__init__.py",
+    "hermes-memory-backup\\gateway_eski\\platforms\\qqbot\\__init__.py",
+    "hermes-memory-backup\\llm_provider\\__init__.py",
+    "hermes-memory-backup\\notion_writer\\__init__.py",
+    "hermes-memory-backup\\plugins\\dashboard_auth\\__init__.py",
+    "hermes-memory-backup\\plugins\\google_meet\\node\\__init__.py",
+    "hermes-memory-backup\\plugins\\google_meet\\realtime\\__init__.py",
+    "hermes-memory-backup\\plugins\\model-providers\\alibaba\\__init__.py",
+    "hermes-memory-backup\\plugins\\model-providers\\anthropic\\__init__.py",
+    "hermes-memory-backup\\plugins\\model-providers\\arcee\\__init__.py",
+    "hermes-memory-backup\\plugins\\model-providers\\bedrock\\__init__.py",
+    "hermes-memory-backup\\plugins\\model-providers\\cohere\\__init__.py",
+    "hermes-memory-backup\\plugins\\model-providers\\gmi\\__init__.py",
+    "hermes-memory-backup\\plugins\\model-providers\\groq\\__init__.py",
+    "hermes-memory-backup\\plugins\\model-providers\\huggingface\\__init__.py",
+    "hermes-memory-backup\\plugins\\model-providers\\kilocode\\__init__.py",
+    "hermes-memory-backup\\plugins\\model-providers\\mistral\\__init__.py",
+    "hermes-memory-backup\\plugins\\model-providers\\nous\\__init__.py",
+    "hermes-memory-backup\\plugins\\model-providers\\novita\\__init__.py",
+    "hermes-memory-backup\\plugins\\model-providers\\nvidia\\__init__.py",
+    "hermes-memory-backup\\plugins\\model-providers\\ollama-cloud\\__init__.py",
+    "hermes-memory-backup\\plugins\\model-providers\\openai-codex\\__init__.py",
+    "hermes-memory-backup\\plugins\\model-providers\\openrouter\\__init__.py",
+    "hermes-memory-backup\\plugins\\model-providers\\qwen-oauth\\__init__.py",
+    "hermes-memory-backup\\plugins\\model-providers\\stepfun\\__init__.py",
+    "hermes-memory-backup\\plugins\\model-providers\\together\\__init__.py",
+    "hermes-memory-backup\\plugins\\model-providers\\xai\\__init__.py",
+    "hermes-memory-backup\\plugins\\model-providers\\xiaomi\\__init__.py",
+    "hermes-memory-backup\\plugins\\model-providers\\zai\\__init__.py",
+    "hermes-memory-backup\\plugins\\platforms\\discord\\__init__.py",
+    "hermes-memory-backup\\plugins\\platforms\\google_chat\\__init__.py",
+    "hermes-memory-backup\\plugins\\platforms\\homeassistant\\__init__.py",
+    "hermes-memory-backup\\plugins\\platforms\\irc\\__init__.py",
+    "hermes-memory-backup\\plugins\\platforms\\line\\__init__.py",
+    "hermes-memory-backup\\plugins\\platforms\\mattermost\\__init__.py",
+    "hermes-memory-backup\\plugins\\platforms\\ntfy\\__init__.py",
+    "hermes-memory-backup\\plugins\\platforms\\simplex\\__init__.py",
+    "hermes-memory-backup\\plugins\\platforms\\teams\\__init__.py",
+    "hermes-memory-backup\\plugins\\web\\tavily\\__init__.py",
+    "hermes-memory-backup\\proxy\\__init__.py",
+    "hermes-memory-backup\\reymen\\__init__.py",
+    "hermes-memory-backup\\ReYMeN_cli\\dashboard_auth\\__init__.py",
+    "hermes-memory-backup\\ReYMeN_cli\\proxy\\__init__.py",
+    "hermes-memory-backup\\ReYMeN_cli\\proxy\\adapters\\__init__.py",
+    "hermes-memory-backup\\ReYMeN_cli\\subcommands\\__init__.py",
+    "hermes-memory-backup\\skills_backup_20260616_162201\\creative\\pixel-art\\scripts\\__init__.py",
+    "hermes-memory-backup\\skills_backup_20260616_162201\\productivity\\powerpoint\\scripts\\__init__.py",
+    "hermes-memory-backup\\skills_backup_20260616_162201\\productivity\\powerpoint\\scripts\\office\\helpers\\__init__.py",
+    "hermes-memory-backup\\skills_backup_20260616_162201\\user-preferences\\hersona\\hersona\\__init__.py",
+    "hermes-memory-backup\\skills_backup_20260616_162201\\user-preferences\\hersona\\hersona\\cli\\__init__.py",
+    "hermes-memory-backup\\skills_backup_20260616_162201\\user-preferences\\hersona\\hersona\\core\\__init__.py",
+    "hermes-memory-backup\\skills_backup_20260616_162201\\user-preferences\\hersona\\tests\\__init__.py",
+    "hermes-memory-backup\\telegram_bot\\__init__.py",
+    "hermes-memory-backup\\tests\\__init__.py",
+    "hermes-memory-backup\\tests\\cli\\__init__.py",
+    "hermes-memory-backup\\tests\\docker\\__init__.py",
+    "hermes-memory-backup\\tests\\e2e\\__init__.py",
+    "hermes-memory-backup\\tests\\fakes\\__init__.py",
+    "hermes-memory-backup\\tests\\gateway\\__init__.py",
+    "hermes-memory-backup\\tests\\hermes_reference\\acp\\__init__.py",
+    "hermes-memory-backup\\tests\\hermes_reference\\agent\\__init__.py",
+    "hermes-memory-backup\\tests\\hermes_reference\\agent\\lsp\\__init__.py",
+    "hermes-memory-backup\\tests\\hermes_reference\\agent\\transports\\__init__.py",
+    "hermes-memory-backup\\tests\\hermes_reference\\cli\\__init__.py",
+    "hermes-memory-backup\\tests\\hermes_reference\\cron\\__init__.py",
+    "hermes-memory-backup\\tests\\hermes_reference\\docker\\__init__.py",
+    "hermes-memory-backup\\tests\\hermes_reference\\e2e\\__init__.py",
+    "hermes-memory-backup\\tests\\hermes_reference\\fakes\\__init__.py",
+    "hermes-memory-backup\\tests\\hermes_reference\\gateway\\__init__.py",
+    "hermes-memory-backup\\tests\\hermes_reference\\gateway\\platforms\\__init__.py",
+    "hermes-memory-backup\\tests\\hermes_reference\\hermes_cli\\__init__.py",
+    "hermes-memory-backup\\tests\\hermes_reference\\honcho_plugin\\__init__.py",
+    "hermes-memory-backup\\tests\\hermes_reference\\integration\\__init__.py",
+    "hermes-memory-backup\\tests\\hermes_reference\\plugins\\__init__.py",
+    "hermes-memory-backup\\tests\\hermes_reference\\plugins\\browser\\__init__.py",
+    "hermes-memory-backup\\tests\\hermes_reference\\plugins\\image_gen\\__init__.py",
+    "hermes-memory-backup\\tests\\hermes_reference\\plugins\\memory\\__init__.py",
+    "hermes-memory-backup\\tests\\hermes_reference\\plugins\\transcription\\__init__.py",
+    "hermes-memory-backup\\tests\\hermes_reference\\plugins\\tts\\__init__.py",
+    "hermes-memory-backup\\tests\\hermes_reference\\plugins\\video_gen\\__init__.py",
+    "hermes-memory-backup\\tests\\hermes_reference\\plugins\\web\\__init__.py",
+    "hermes-memory-backup\\tests\\hermes_reference\\providers\\__init__.py",
+    "hermes-memory-backup\\tests\\hermes_reference\\run_agent\\__init__.py",
+    "hermes-memory-backup\\tests\\hermes_reference\\tools\\__init__.py",
+    "hermes-memory-backup\\tests\\hermes_reference\\tui_gateway\\__init__.py",
+    "hermes-memory-backup\\tests\\hermes_reference\\website\\__init__.py",
+    "hermes-memory-backup\\tests\\plugins\\__init__.py",
+    "hermes-memory-backup\\tests\\plugins\\platforms\\__init__.py",
+    "hermes-memory-backup\\tests\\plugins\\platforms\\irc\\__init__.py",
+    "hermes-memory-backup\\tests\\plugins\\platforms\\line\\__init__.py",
+    "hermes-memory-backup\\tests\\plugins\\platforms\\ntfy\\__init__.py",
+    "hermes-memory-backup\\tests\\plugins\\platforms\\simplex\\__init__.py",
+    "hermes-memory-backup\\tests\\plugins\\platforms\\teams\\__init__.py",
+    "hermes-memory-backup\\tests\\ReYMeN_cli\\__init__.py",
+    "hermes-memory-backup\\tests\\tools\\__init__.py",
+    "hermes-memory-backup\\tools\\__init__.py",
+    "hermes-memory-backup\\tools\\environments\\__init__.py",
+    "hermes-memory-backup\\tools\\memory_providers\\__init__.py",
+    "hermes-memory-backup\\tui_gateway\\__init__.py",
+    "llm_provider\\__init__.py",
+    "notion_writer\\__init__.py",
+    "plugins\\__init__.py",
+    "plugins\\dashboard_auth\\__init__.py",
+    "plugins\\google_meet\\node\\__init__.py",
+    "plugins\\google_meet\\realtime\\__init__.py",
+    "plugins\\model-providers\\alibaba\\__init__.py",
+    "plugins\\model-providers\\anthropic\\__init__.py",
+    "plugins\\model-providers\\arcee\\__init__.py",
+    "plugins\\model-providers\\bedrock\\__init__.py",
+    "plugins\\model-providers\\cohere\\__init__.py",
+    "plugins\\model-providers\\gmi\\__init__.py",
+    "plugins\\model-providers\\groq\\__init__.py",
+    "plugins\\model-providers\\huggingface\\__init__.py",
+    "plugins\\model-providers\\kilocode\\__init__.py",
+    "plugins\\model-providers\\mistral\\__init__.py",
+    "plugins\\model-providers\\nous\\__init__.py",
+    "plugins\\model-providers\\novita\\__init__.py",
+    "plugins\\model-providers\\nvidia\\__init__.py",
+    "plugins\\model-providers\\ollama-cloud\\__init__.py",
+    "plugins\\model-providers\\openai-codex\\__init__.py",
+    "plugins\\model-providers\\openrouter\\__init__.py",
+    "plugins\\model-providers\\qwen-oauth\\__init__.py",
+    "plugins\\model-providers\\stepfun\\__init__.py",
+    "plugins\\model-providers\\together\\__init__.py",
+    "plugins\\model-providers\\xai\\__init__.py",
+    "plugins\\model-providers\\xiaomi\\__init__.py",
+    "plugins\\model-providers\\zai\\__init__.py",
+    "plugins\\platforms\\discord\\__init__.py",
+    "plugins\\platforms\\google_chat\\__init__.py",
+    "plugins\\platforms\\homeassistant\\__init__.py",
+    "plugins\\platforms\\irc\\__init__.py",
+    "plugins\\platforms\\line\\__init__.py",
+    "plugins\\platforms\\mattermost\\__init__.py",
+    "plugins\\platforms\\ntfy\\__init__.py",
+    "plugins\\platforms\\simplex\\__init__.py",
+    "plugins\\platforms\\teams\\__init__.py",
+    "plugins\\web\\tavily\\__init__.py",
+    "proxy\\__init__.py",
+    "reymen\\__init__.py",
+    "reymen\\ag\\__init__.py",
+    "reymen\\arac\\__init__.py",
+    "reymen\\cereyan\\__init__.py",
+    "reymen\\sistem\\__init__.py",
+    "reymen\\windows\\__init__.py",
+    "ReYMeN_cli\\dashboard_auth\\__init__.py",
+    "ReYMeN_cli\\proxy\\__init__.py",
+    "ReYMeN_cli\\proxy\\adapters\\__init__.py",
+    "ReYMeN_cli\\subcommands\\__init__.py",
+    "skills\\creative\\pixel-art\\scripts\\__init__.py",
+    "skills\\productivity\\powerpoint\\scripts\\__init__.py",
+    "skills\\productivity\\powerpoint\\scripts\\office\\helpers\\__init__.py",
+    "skills\\user-preferences\\hersona\\hersona\\__init__.py",
+    "skills\\user-preferences\\hersona\\hersona\\cli\\__init__.py",
+    "skills\\user-preferences\\hersona\\hersona\\core\\__init__.py",
+    "skills\\user-preferences\\hersona\\tests\\__init__.py",
+    "telegram_bot\\__init__.py",
+    "tests\\__init__.py",
+    "tests\\cli\\__init__.py",
+    "tests\\docker\\__init__.py",
+    "tests\\e2e\\__init__.py",
+    "tests\\fakes\\__init__.py",
+    "tests\\gateway\\__init__.py",
+    "tests\\plugins\\__init__.py",
+    "tests\\plugins\\platforms\\__init__.py",
+    "tests\\plugins\\platforms\\irc\\__init__.py",
+    "tests\\plugins\\platforms\\line\\__init__.py",
+    "tests\\plugins\\platforms\\ntfy\\__init__.py",
+    "tests\\plugins\\platforms\\simplex\\__init__.py",
+    "tests\\plugins\\platforms\\teams\\__init__.py",
+    "tests\\ReYMeN_cli\\__init__.py",
+    "tests\\ReYMeN_reference\\__init__.py",
+    "tests\\ReYMeN_reference\\acp\\__init__.py",
+    "tests\\ReYMeN_reference\\acp_adapter\\__init__.py",
+    "tests\\ReYMeN_reference\\agent\\__init__.py",
+    "tests\\ReYMeN_reference\\agent\\lsp\\__init__.py",
+    "tests\\ReYMeN_reference\\agent\\transports\\__init__.py",
+    "tests\\ReYMeN_reference\\cli\\__init__.py",
+    "tests\\ReYMeN_reference\\cron\\__init__.py",
+    "tests\\ReYMeN_reference\\docker\\__init__.py",
+    "tests\\ReYMeN_reference\\e2e\\__init__.py",
+    "tests\\ReYMeN_reference\\fakes\\__init__.py",
+    "tests\\ReYMeN_reference\\gateway\\__init__.py",
+    "tests\\ReYMeN_reference\\gateway\\platforms\\__init__.py",
+    "tests\\ReYMeN_reference\\hermes_cli\\__init__.py",
+    "tests\\ReYMeN_reference\\honcho_plugin\\__init__.py",
+    "tests\\ReYMeN_reference\\integration\\__init__.py",
+    "tests\\ReYMeN_reference\\plugins\\__init__.py",
+    "tests\\ReYMeN_reference\\plugins\\browser\\__init__.py",
+    "tests\\ReYMeN_reference\\plugins\\image_gen\\__init__.py",
+    "tests\\ReYMeN_reference\\plugins\\memory\\__init__.py",
+    "tests\\ReYMeN_reference\\plugins\\transcription\\__init__.py",
+    "tests\\ReYMeN_reference\\plugins\\tts\\__init__.py",
+    "tests\\ReYMeN_reference\\plugins\\video_gen\\__init__.py",
+    "tests\\ReYMeN_reference\\plugins\\web\\__init__.py",
+    "tests\\ReYMeN_reference\\providers\\__init__.py",
+    "tests\\ReYMeN_reference\\run_agent\\__init__.py",
+    "tests\\ReYMeN_reference\\tools\\__init__.py",
+    "tests\\ReYMeN_reference\\tui_gateway\\__init__.py",
+    "tests\\ReYMeN_reference\\website\\__init__.py",
+    "tests\\tools\\__init__.py",
+    "tools\\__init__.py",
+    "tools\\environments\\__init__.py",
+    "tools\\memory_providers\\__init__.py",
+    "tui_gateway\\__init__.py"
+  ],
+  "test_gecen": [
+    "agent\\__init__.py",
+    "agent\\secret_sources\\__init__.py",
+    "agent\\transports\\__init__.py",
+    "apps\\__init__.py",
+    "cron\\__init__.py",
+    "gateway\\__init__.py",
+    "gateway\\qqbot\\__init__.py",
+    "hermes-memory-backup\\agent\\__init__.py",
+    "hermes-memory-backup\\agent\\lsp\\__init__.py",
+    "hermes-memory-backup\\agent\\secret_sources\\__init__.py",
+    "hermes-memory-backup\\agent\\transports\\__init__.py",
+    "hermes-memory-backup\\apps\\__init__.py",
+    "hermes-memory-backup\\cron\\__init__.py",
+    "hermes-memory-backup\\gateway\\__init__.py",
+    "hermes-memory-backup\\gateway\\qqbot\\__init__.py",
+    "hermes-memory-backup\\gateway_eski\\__init__.py",
+    "hermes-memory-backup\\gateway_eski\\qqbot\\__init__.py",
+    "hermes-memory-backup\\plugins\\__init__.py",
+    "hermes-memory-backup\\plugins\\browser\\__init__.py",
+    "hermes-memory-backup\\plugins\\browser\\browser_use\\__init__.py",
+    "hermes-memory-backup\\plugins\\browser\\browserbase\\__init__.py",
+    "hermes-memory-backup\\plugins\\browser\\firecrawl\\__init__.py",
+    "hermes-memory-backup\\plugins\\context_engine\\__init__.py",
+    "hermes-memory-backup\\plugins\\dashboard_auth\\nous\\__init__.py",
+    "hermes-memory-backup\\plugins\\disk-cleanup\\__init__.py",
+    "hermes-memory-backup\\plugins\\disk_cleanup\\__init__.py",
+    "hermes-memory-backup\\plugins\\google_meet\\__init__.py",
+    "hermes-memory-backup\\plugins\\image_gen\\__init__.py",
+    "hermes-memory-backup\\plugins\\image_gen\\fal\\__init__.py",
+    "hermes-memory-backup\\plugins\\image_gen\\krea\\__init__.py",
+    "hermes-memory-backup\\plugins\\image_gen\\openai\\__init__.py",
+    "hermes-memory-backup\\plugins\\image_gen\\openai-codex\\__init__.py",
+    "hermes-memory-backup\\plugins\\image_gen\\xai\\__init__.py",
+    "hermes-memory-backup\\plugins\\kanban\\__init__.py",
+    "hermes-memory-backup\\plugins\\kanban_plugin\\__init__.py",
+    "hermes-memory-backup\\plugins\\memory\\__init__.py",
+    "hermes-memory-backup\\plugins\\memory\\byterover\\__init__.py",
+    "hermes-memory-backup\\plugins\\memory\\chromadb_vektor\\__init__.py",
+    "hermes-memory-backup\\plugins\\memory\\hindsight\\__init__.py",
+    "hermes-memory-backup\\plugins\\memory\\holographic\\__init__.py",
+    "hermes-memory-backup\\plugins\\memory\\honcho\\__init__.py",
+    "hermes-memory-backup\\plugins\\memory\\mem0\\__init__.py",
+    "hermes-memory-backup\\plugins\\memory\\openviking\\__init__.py",
+    "hermes-memory-backup\\plugins\\memory\\oturum_hafiza\\__init__.py",
+    "hermes-memory-backup\\plugins\\memory\\retaindb\\__init__.py",
+    "hermes-memory-backup\\plugins\\memory\\sqlite_fts\\__init__.py",
+    "hermes-memory-backup\\plugins\\memory\\supermemory\\__init__.py",
+    "hermes-memory-backup\\plugins\\model-providers\\alibaba-coding-plan\\__init__.py",
+    "hermes-memory-backup\\plugins\\model-providers\\azure-foundry\\__init__.py",
+    "hermes-memory-backup\\plugins\\model-providers\\copilot\\__init__.py",
+    "hermes-memory-backup\\plugins\\model-providers\\copilot-acp\\__init__.py",
+    "hermes-memory-backup\\plugins\\model-providers\\custom\\__init__.py",
+    "hermes-memory-backup\\plugins\\model-providers\\deepseek\\__init__.py",
+    "hermes-memory-backup\\plugins\\model-providers\\gemini\\__init__.py",
+    "hermes-memory-backup\\plugins\\model-providers\\kimi-coding\\__init__.py",
+    "hermes-memory-backup\\plugins\\model-providers\\minimax\\__init__.py",
+    "hermes-memory-backup\\plugins\\model-providers\\openai\\__init__.py",
+    "hermes-memory-backup\\plugins\\model-providers\\opencode-zen\\__init__.py",
+    "hermes-memory-backup\\plugins\\model_providers\\__init__.py",
+    "hermes-memory-backup\\plugins\\notion\\__init__.py",
+    "hermes-memory-backup\\plugins\\notion_plugin\\__init__.py",
+    "hermes-memory-backup\\plugins\\observability\\__init__.py",
+    "hermes-memory-backup\\plugins\\observability\\langfuse\\__init__.py",
+    "hermes-memory-backup\\plugins\\ornek_plugin\\__init__.py",
+    "hermes-memory-backup\\plugins\\platforms\\__init__.py",
+    "hermes-memory-backup\\plugins\\platforms\\photon\\__init__.py",
+    "hermes-memory-backup\\plugins\\security-guidance\\__init__.py",
+    "hermes-memory-backup\\plugins\\security_guidance\\__init__.py",
+    "hermes-memory-backup\\plugins\\spotify\\__init__.py",
+    "hermes-memory-backup\\plugins\\teams_pipeline\\__init__.py",
+    "hermes-memory-backup\\plugins\\video_gen\\__init__.py",
+    "hermes-memory-backup\\plugins\\video_gen\\fal\\__init__.py",
+    "hermes-memory-backup\\plugins\\video_gen\\xai\\__init__.py",
+    "hermes-memory-backup\\plugins\\web\\__init__.py",
+    "hermes-memory-backup\\plugins\\web\\brave_free\\__init__.py",
+    "hermes-memory-backup\\plugins\\web\\ddgs\\__init__.py",
+    "hermes-memory-backup\\plugins\\web\\exa\\__init__.py",
+    "hermes-memory-backup\\plugins\\web\\firecrawl\\__init__.py",
+    "hermes-memory-backup\\plugins\\web\\parallel\\__init__.py",
+    "hermes-memory-backup\\plugins\\web\\searxng\\__init__.py",
+    "hermes-memory-backup\\plugins\\web\\xai\\__init__.py",
+    "hermes-memory-backup\\plugins\\web_scraper\\__init__.py",
+    "hermes-memory-backup\\plugins\\web_search_plugin\\__init__.py",
+    "hermes-memory-backup\\providers\\__init__.py",
+    "hermes-memory-backup\\ReYMeN_cli\\__init__.py",
+    "hermes-memory-backup\\tools\\computer_use\\__init__.py",
+    "plugins\\browser\\__init__.py",
+    "plugins\\browser\\browser_use\\__init__.py",
+    "plugins\\browser\\browserbase\\__init__.py",
+    "plugins\\browser\\firecrawl\\__init__.py",
+    "plugins\\context_engine\\__init__.py",
+    "plugins\\dashboard_auth\\nous\\__init__.py",
+    "plugins\\disk-cleanup\\__init__.py",
+    "plugins\\disk_cleanup\\__init__.py",
+    "plugins\\google_meet\\__init__.py",
+    "plugins\\image_gen\\__init__.py",
+    "plugins\\image_gen\\fal\\__init__.py",
+    "plugins\\image_gen\\krea\\__init__.py",
+    "plugins\\image_gen\\openai\\__init__.py",
+    "plugins\\image_gen\\openai-codex\\__init__.py",
+    "plugins\\image_gen\\xai\\__init__.py",
+    "plugins\\kanban\\__init__.py",
+    "plugins\\kanban_plugin\\__init__.py",
+    "plugins\\memory\\__init__.py",
+    "plugins\\memory\\byterover\\__init__.py",
+    "plugins\\memory\\chromadb_vektor\\__init__.py",
+    "plugins\\memory\\hindsight\\__init__.py",
+    "plugins\\memory\\holographic\\__init__.py",
+    "plugins\\memory\\honcho\\__init__.py",
+    "plugins\\memory\\mem0\\__init__.py",
+    "plugins\\memory\\openviking\\__init__.py",
+    "plugins\\memory\\oturum_hafiza\\__init__.py",
+    "plugins\\memory\\retaindb\\__init__.py",
+    "plugins\\memory\\sqlite_fts\\__init__.py",
+    "plugins\\memory\\supermemory\\__init__.py",
+    "plugins\\model-providers\\alibaba-coding-plan\\__init__.py",
+    "plugins\\model-providers\\azure-foundry\\__init__.py",
+    "plugins\\model-providers\\copilot\\__init__.py",
+    "plugins\\model-providers\\copilot-acp\\__init__.py",
+    "plugins\\model-providers\\custom\\__init__.py",
+    "plugins\\model-providers\\deepseek\\__init__.py",
+    "plugins\\model-providers\\gemini\\__init__.py",
+    "plugins\\model-providers\\kimi-coding\\__init__.py",
+    "plugins\\model-providers\\minimax\\__init__.py",
+    "plugins\\model-providers\\openai\\__init__.py",
+    "plugins\\model-providers\\opencode-zen\\__init__.py",
+    "plugins\\model_providers\\__init__.py",
+    "plugins\\notion\\__init__.py",
+    "plugins\\notion_plugin\\__init__.py",
+    "plugins\\observability\\__init__.py",
+    "plugins\\observability\\langfuse\\__init__.py",
+    "plugins\\ornek_plugin\\__init__.py",
+    "plugins\\platforms\\__init__.py",
+    "plugins\\platforms\\photon\\__init__.py",
+    "plugins\\security-guidance\\__init__.py",
+    "plugins\\security_guidance\\__init__.py",
+    "plugins\\spotify\\__init__.py",
+    "plugins\\teams_pipeline\\__init__.py",
+    "plugins\\video_gen\\__init__.py",
+    "plugins\\video_gen\\fal\\__init__.py",
+    "plugins\\video_gen\\xai\\__init__.py",
+    "plugins\\web\\__init__.py",
+    "plugins\\web\\brave_free\\__init__.py",
+    "plugins\\web\\ddgs\\__init__.py",
+    "plugins\\web\\exa\\__init__.py",
+    "plugins\\web\\firecrawl\\__init__.py",
+    "plugins\\web\\parallel\\__init__.py",
+    "plugins\\web\\searxng\\__init__.py",
+    "plugins\\web\\xai\\__init__.py",
+    "plugins\\web_scraper\\__init__.py",
+    "plugins\\web_search_plugin\\__init__.py",
+    "providers\\__init__.py",
+    "reymen\\guvenlik\\__init__.py",
+    "reymen\\hafiza\\__init__.py",
+    "ReYMeN_cli\\__init__.py",
+    "tools\\computer_use\\__init__.py"
+  ],
+  "test_hata": [],
+  "atlanan": [],
+  "sure": 1.5
+}

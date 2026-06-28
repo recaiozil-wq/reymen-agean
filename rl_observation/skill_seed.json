@@ -1,0 +1,217 @@
+{
+  "adb-sdk-path-fix": {
+    "alpha": 1,
+    "beta": 7,
+    "total": 6
+  },
+  "analiz": {
+    "alpha": 3,
+    "beta": 1,
+    "total": 2
+  },
+  "android-apk-hardening": {
+    "alpha": 15,
+    "beta": 7,
+    "total": 20
+  },
+  "code-exec": {
+    "alpha": 15,
+    "beta": 1,
+    "total": 14
+  },
+  "cronjob": {
+    "alpha": 12,
+    "beta": 1,
+    "total": 11
+  },
+  "goruntu-ekran": {
+    "alpha": 2,
+    "beta": 1,
+    "total": 1
+  },
+  "kali-linux-remote": {
+    "alpha": 4,
+    "beta": 7,
+    "total": 9
+  },
+  "kod": {
+    "alpha": 2,
+    "beta": 1,
+    "total": 1
+  },
+  "network-camera-discovery": {
+    "alpha": 15,
+    "beta": 1,
+    "total": 14
+  },
+  "nexus-core-omega-v5": {
+    "alpha": 2,
+    "beta": 1,
+    "total": 1
+  },
+  "none": {
+    "alpha": 13,
+    "beta": 2,
+    "total": 13
+  },
+  "obsidian": {
+    "alpha": 10,
+    "beta": 1,
+    "total": 9
+  },
+  "obsidian-first-check": {
+    "alpha": 2,
+    "beta": 1,
+    "total": 1
+  },
+  "ogrenme": {
+    "alpha": 3,
+    "beta": 1,
+    "total": 2
+  },
+  "python-testing": {
+    "alpha": 2,
+    "beta": 1,
+    "total": 1
+  },
+  "rl-agent-optimization": {
+    "alpha": 2,
+    "beta": 1,
+    "total": 1
+  },
+  "rl-agent-optimization,nexus-core-omega-v5": {
+    "alpha": 2,
+    "beta": 1,
+    "total": 1
+  },
+  "screen-vision-analiz": {
+    "alpha": 9,
+    "beta": 1,
+    "total": 8
+  },
+  "summarize": {
+    "alpha": 7,
+    "beta": 1,
+    "total": 6
+  },
+  "telegram-gateway-monitor": {
+    "alpha": 8,
+    "beta": 1,
+    "total": 7
+  },
+  "test-skill": {
+    "alpha": 2,
+    "beta": 1,
+    "total": 1
+  },
+  "tor-browser-arama": {
+    "alpha": 15,
+    "beta": 7,
+    "total": 20
+  },
+  "usb-driver-kontrol": {
+    "alpha": 2,
+    "beta": 7,
+    "total": 7
+  },
+  "windows-screen-capture": {
+    "alpha": 15,
+    "beta": 1,
+    "total": 14
+  },
+  "windows-system-automation": {
+    "alpha": 7,
+    "beta": 1,
+    "total": 6
+  },
+  "yardim": {
+    "alpha": 8,
+    "beta": 1,
+    "total": 7
+  },
+  "youtube-content": {
+    "alpha": 1,
+    "beta": 7,
+    "total": 6
+  },
+  "youtube-video-isleme": {
+    "alpha": 2,
+    "beta": 1,
+    "total": 1
+  },
+  "alt-d": {
+    "alpha": 1,
+    "beta": 1,
+    "total": 0
+  },
+  "alt-enter": {
+    "alpha": 1,
+    "beta": 1,
+    "total": 0
+  },
+  "alt-f4": {
+    "alpha": 1,
+    "beta": 1,
+    "total": 0
+  },
+  "alt-harf": {
+    "alpha": 1,
+    "beta": 1,
+    "total": 0
+  },
+  "alt-prtscn": {
+    "alpha": 1,
+    "beta": 1,
+    "total": 0
+  },
+  "alt-sag": {
+    "alpha": 1,
+    "beta": 1,
+    "total": 0
+  },
+  "alt-sol": {
+    "alpha": 1,
+    "beta": 1,
+    "total": 0
+  },
+  "alt-tab": {
+    "alpha": 1,
+    "beta": 1,
+    "total": 0
+  },
+  "alt-yukari": {
+    "alpha": 1,
+    "beta": 1,
+    "total": 0
+  },
+  "ctrl-0": {
+    "alpha": 1,
+    "beta": 1,
+    "total": 0
+  },
+  "ctrl-1-8": {
+    "alpha": 1,
+    "beta": 1,
+    "total": 0
+  },
+  "ctrl-9": {
+    "alpha": 1,
+    "beta": 1,
+    "total": 0
+  },
+  "ctrl-a": {
+    "alpha": 1,
+    "beta": 1,
+    "total": 0
+  },
+  "ctrl-alt-del": {
+    "alpha": 1,
+    "beta": 1,
+    "total": 0
+  },
+  "ctrl-alt-tab": {
+    "alpha": 1,
+    "beta": 1,
+    "total": 0
+  }
+}

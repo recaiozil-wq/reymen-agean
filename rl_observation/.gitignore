@@ -1,0 +1,6 @@
+# RL observation - log ve cache dosyaları hariç
+skill_log.jsonl
+skill_log_*.jsonl
+__pycache__/
+*.pyc
+rl_skill_chart.png

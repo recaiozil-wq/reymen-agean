@@ -1,0 +1,5 @@
+name: teams_pipeline
+version: 1.0.0
+description: "ReYMeN plugin: teams_pipeline"
+kind: backend
+author: ReYMeN
