@@ -1,146 +1,161 @@
-# ReYMeN — Otonom Uygulama Otomasyonu Ajanı (v2.0)
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.11%2B-blue?logo=python" alt="Python">
+  <img src="https://img.shields.io/badge/License-MIT-green" alt="MIT">
+  <img src="https://img.shields.io/badge/Windows-10%2B-0078D6?logo=windows" alt="Windows">
+  <img src="https://img.shields.io/badge/Platform-CLI%20%7C%20Telegram%20%7C%20Web-blueviolet" alt="Platform">
+  <img src="https://img.shields.io/badge/Test%20Status-137%20passed-brightgreen" alt="Tests">
+</p>
 
-Kendi kendine düşünen (ReAct döngüsü), araç kullanan, **hatalardan öğrenen**
-ve kendi kendini düzelten otonom yazılım ajanı.
-Windows otomasyonunda uzmanlaşmıştır.
+<h1 align="center">🧠 ReYMeN — Otonom Yapay Zeka Ajanı</h1>
+<p align="center">
+  <b>Türkçe | Açık Kaynak | Windows Odaklı</b><br>
+  Kendi kendine öğrenen, araç kullanan, hatalardan ders çıkaran otonom yazılım ajanı.
+</p>
 
-## Özellikler
+---
 
-### 🤖 Temel
-- **ReAct Döngüsü**: Planla → Düşün → Eylem → Gözlemle → Öğren
-- **17+ LLM Provider**: LM Studio, DeepSeek, OpenAI, Anthropic, Groq, Together, Ollama, vb.
-- **105+ Araç**: Dosya, shell, Python, web, tarayıcı, ekran OCR, makro, ses, görsel
-- **11 Platform**: Telegram, Discord, Signal, WhatsApp, Slack, Matrix, Email, SMS, Webhook
-- **10,000+ Test**: 1,842 test dosyası
+## 🚀 Nedir?
 
-### 🧠 Otonom Görev Çözücü (YENİ)
-- **Model Adapter**: 7 provider (Ollama, LM Studio, GLM, DeepSeek, OpenAI, Anthropic, Gemini) — auto-detect
-- **Orchestrator**: `solve_step()` ile adım adım çözüm, 3 retry, JSONL log
-- **Öğrenme Döngüsü**: Hata al → hafızada ara (varsa direkt çöz, 0 LLM) → yoksa LLM'e sor → doğrula → kaydet
-- **SQLite Hafıza**: `reymen/memory/hafiza.db` — TTL=30gün (basari_sayisi>=3 muaf), soyut imza (SHA256), WAL mode
-- **Doğrulamalı Kayıt**: LLM fix'i çalışıyorsa hafızaya kaydet, çalışmıyorsa başarısız etiketiyle kaydet
-- **Motor Entegrasyonu**: `motor.script_calistir()`, `motor.ogren()`, `motor.gorev_coz()`
+**ReYMeN**, yapay zeka asistanlarını tek bir merkezden yönetmek için geliştirilmiş **açık kaynak bir platformdur.** Hermes Agent tabanlıdır, Türkçe dil desteği ile Windows odaklı çalışır.
 
-### 🔌 MCP Server Host (YENİ)
-- Stdio ve HTTP (SSE) transport
-- Diğer MCP client'ları (Claude Code, Cursor) ReYMeN tool'larını çağırabilir
-- `python -m reymen.core.mcp_server --transport http --port 9000`
+Telegram botları, CLI, web arayüzü ve daha fazlasını tek merkezden yönetir. Hatalardan öğrenir, kendini geliştirir ve tekrarlayan işleri otomatikleştirir.
 
-### 🔍 Session Search FTS5 (YENİ)
-- `session.db` içinde FTS5 ile tam metin arama
-- `session_ara("hata düzeltme", limit=10)` — geçmiş konuşmalarda anında arama
+---
 
-### 🪟 Windows Otomasyonu
-- **Tor otomasyonu**: Tor üzerinden form doldurma, login, kayıt, sipariş
-- **Hata watchdog + OCR**: Hata yakala, OCR ile oku, otomatik çözüm uygula
-- **Nişan/sh template**: 3 aşamalı ekran şablonu bulma (DOM → OpenCV → OCR)
-- **Otonom nişan oluşturma**: DOM'dan otomatik şablon çıkarma
+## ✨ Özellikler
 
-### 🐳 Docker (YENİ)
-- `docker build -t reymen .` ile container
-- `docker-compose up` ile tek komutta ayağa kaldır
+### 🤖 Çoklu Bot Yönetimi
+- **3 Telegram botu** aynı anda çalıştır
+- CLI, web UI ve mesaj platformlarından erişim
+- Fan-out: tek mesajı tüm botlara gönder
 
-### 🧰 Skill Import (YENİ)
-- Hermes skill'lerini ReYMeN formatına dönüştür
-- `python reymen/scripts/skill_import.py`
+### 🧠 Akıllı Öğrenme
+- **OnceHafiza**: Hatalardan öğrenir, aynı hata tekrarlanmaz
+- **Otonom Görev Çözücü**: Karmaşık işlemleri adım adım planlar ve yürütür
+- **7+ Yapay Zeka Sağlayıcı**: DeepSeek, OpenAI, Anthropic, Groq, OpenRouter ve daha fazlası
 
-## Hızlı Başlangıç
+### 🛠️ 100'den Fazla Araç
+| Kategori | Araçlar |
+|----------|---------|
+| 📁 Dosya | Okuma, yazma, düzenleme, arama, bulk replace |
+| 🌐 Web | Sayfa çekme, arama, Firecrawl entegrasyonu |
+| 🎵 Ses | TTS (sesli okuma), STT (ses tanıma) |
+| 🖼️ Görsel | FAL.ai FLUX ile görsel üretme |
+| 🎬 Video | yt-dlp ile indirme, ffmpeg ile dönüştürme |
+| 💻 Terminal | Shell komutları, Python çalıştırma |
+| 🔧 Kod | Syntax kontrol, otomatik düzeltme |
 
-```bash
-# 1. Ortamı kur
+### 📊 Yönetim Araçları
+- **Kanban**: Görevleri kartlarla takip et
+- **Cost Tracker**: API harcamalarını izle
+- **Self-Improvement**: Kalite metriklerini ölç, iyileştir
+- **A2A**: Botlar arası mesajlaşma
+
+### 🔌 Gelişmiş
+- **MCP İstemci/Sunucu**: Harici MCP araçlarını keşfet ve kullan
+- **FTS5 Session Search**: Geçmiş konuşmalarda anında arama
+- **Kali/WSL Entegrasyonu**: Linux araçlarını Windows'tan kullan
+- **Docker Desteği**: Container ile taşınabilir dağıtım
+
+---
+
+## 📦 Kurulum (Windows)
+
+**Gereksinimler:** Python 3.11+, Git, Windows 10/11
+
+### Otomatik Kurulum (Önerilen)
+```powershell
+# 1. Repoyu klonla
+git clone https://github.com/Watcher-Hermes/ReYMeN-Ajan-v2.git
+cd ReYMeN-Ajan-v2
+
+# 2. Kurulum script'ini çalıştır (her şeyi otomatik kurar)
+kurulum.bat
+```
+Script şunları otomatik kurar: Python, Git, VS Code, WSL, ffmpeg, yt-dlp, tüm Python paketleri.
+
+### Manuel Kurulum
+```powershell
 python -m venv venv
-venv\Scripts\pip install -e ".[dev]"
-
-# 2. .env dosyasını düzenle
-copy .env.example .env
-notepad .env
-
-# 3. ReYMeN'i çalıştır
-python main.py
-# veya
-reymen
+venv\Scripts\activate
+pip install -r requirements.txt
 ```
 
-## Test
+### ⚙️ Yapılandırma
+`.env` dosyası oluştur, API anahtarlarını ekle:
+```env
+DEEPSEEK_API_KEY=sk-...
+TELEGRAM_BOT_TOKEN=...
+```
+
+---
+
+## 🚀 Kullanım
 
 ```bash
-# Tüm testleri çalıştır
-pytest tests/ --ignore=tests/ReYMeN_reference
+# CLI ile başlat
+python reymen_launcher.py
 
-# Coverage ile
-pytest tests/ --cov=reymen --cov-report=term-missing
+# Modül olarak çalıştır
+python -m reymen
 
-# Paralel test
-pytest tests/ -n auto --ignore=tests/ReYMeN_reference
+# MCP sunucu başlat
+python -m reymen.core.mcp_server --transport http --port 9000
+
+# Görev çöz
+python -c "from reymen.cereyan.motor import Motor; m = Motor(); m.gorev_coz('.ReYMeN/gorev_cozucu_sistemi.md')"
 ```
 
-## Proje Yapısı
+---
+
+## 📁 Proje Yapısı
 
 ```
-ReYMeN-Ajan/
-├── reymen/                  # Ana kod paketi
-│   ├── core/                # Core (YENİ)
-│   │   ├── model_adapter.py # 7 provider, auto-detect
-│   │   ├── ogrenme.py       # SQLite hafıza + TTL + öğrenme döngüsü
-│   │   ├── orchestrator.py  # solve_step, coz_hata
-│   │   ├── mcp_server.py    # MCP server host (HTTP + Stdio)
-│   │   └── session_search.py# FTS5 session arama
-│   ├── cereyan/             # Motor, ClosedLearningLoop
-│   ├── sistem/              # CLI, MCP, cron_scheduler
-│   ├── reymen_cli/          # CLI alt komutları
-│   ├── scripts/             # Fix/analiz script'leri
-│   ├── hafiza/              # Hafıza katmanı
-│   ├── guvenlik/            # Güvenlik denetim
-│   └── ag/                  # Ağ katmanı
-├── agent/                   # Agent katmanı
-├── gateway/                 # Telegram gateway
-├── tools/                   # Araç sistemi (105+ araç)
-├── plugins/                 # Plugin sistemi
-├── tests/                   # Testler
-├── desktop/                 # Electron masaüstü
-├── docs/mimari/             # Mimari dokümanlar (HTML)
-├── .ReYMeN/                 # Proje metadata
-├── Dockerfile               # Container (YENİ)
-├── docker-compose.yml       # Container orchestration (YENİ)
-└── pyproject.toml            # Paket yapılandırması
+reymen/
+├── arac/          # 🛠️ Araçlar (web, dosya, ses, görsel, terminal...)
+├── cereyan/       # 🧠 Ana işlem döngüsü ve öğrenme
+├── core/          # ⚙️ Çekirdek (model adapter, MCP, session search)
+├── sistem/        # 🔧 Sistem yönetimi (CLI, gateway, config)
+├── guvenlik/      # 🔒 Güvenlik (redact, guardrails, sandbox)
+├── hafiza/        # 💾 Hafıza sistemleri
+└── scripts/       # 📜 Yardımcı script'ler
 ```
 
-## Geliştirme
+---
+
+## 🧪 Testler
 
 ```bash
-# Kurulum (geliştirme modu)
-pip install -e ".[dev]"
-
-# Lint
-ruff check reymen/ tools/ agent/
-
-# Güvenlik taraması
-bandit -r reymen/ -ll --skip B101,B603
-
-# Proje analizi
-python reymen_analiz.py .
-
-# Otonom görev çözücü
-python -c "from reymen.cereyan.motor import Motor; m = Motor(); m.script_calistir('reymen/scripts/step_01.py')"
+python -m pytest tests/ -v
 ```
 
-## ReYMeN vs Hermes
+Test durumu: **137 passed** ✅
 
-| Özellik | Hermes | ReYMeN |
-|---------|:------:|:------:|
-| Web UI | ✅ | ⚠️ dashboard/ var |
-| Docker | ✅ | ✅ |
-| CI/CD | ✅ | ✅ |
-| Model Adapter (7 provider) | ❌ | ✅ |
-| Otonom Görev Çözücü | ❌ | ✅ |
-| Öğrenme Döngüsü (SQLite+TTL) | ❌ | ✅ |
-| MCP Server Host | ✅ | ✅ |
-| Session Search FTS5 | ✅ | ✅ |
-| Tor otomasyonu | ❌ | ✅ |
-| Hata watchdog | ❌ | ✅ |
-| Windows OCR | ❌ | ✅ |
-| Kapalı öğrenme | ❌ | ✅ |
+---
 
-## Lisans
+## 🤝 Katkıda Bulunma
 
-MIT
+1. Fork et
+2. `feature/xyz` branch'i aç
+3. Değişikliklerini yap
+4. Testleri çalıştır: `python -m pytest tests/`
+5. PR gönder
+
+Detaylı rehber: [CONTRIBUTING.md](CONTRIBUTING.md)
+
+---
+
+## 📜 Lisans
+
+**MIT License** — Copyright (c) 2025 Nous Research (Hermes Agent) · 2026 Marko_Pasa_38 (ReYMeN Agent)
+
+Hermes Agent tabanlıdır. Orijinal lisans korunmuştur.
+
+---
+
+<p align="center">
+  <b>🇹🇷 Türk geliştiriciler için açık kaynak yapay zeka platformu</b><br>
+  <a href="https://github.com/Watcher-Hermes/ReYMeN-Ajan-v2">GitHub</a> •
+  <a href="https://github.com/Watcher-Hermes/ReYMeN-Ajan-v2/blob/main/CONTRIBUTING.md">Katkı Rehberi</a> •
+  <a href="https://github.com/Watcher-Hermes/ReYMeN-Ajan-v2/blob/main/LICENSE">Lisans</a>
+</p>
