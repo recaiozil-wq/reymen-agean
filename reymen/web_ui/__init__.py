@@ -2382,6 +2382,132 @@ async def api_kalite():
         return HTMLResponse(content=f"<div class='alert alert-error'>Kalite raporu: {e}</div>")
 
 
+
+
+# ── Kalite & Analytics API ─────────────────────────────────────
+@app.get("/api/kalite/metrikler")
+async def api_kalite_metrikler():
+    """Metrik kartlari: coverage, skor, hata, ogrenme."""
+    try:
+        from reymen.cereyan.continuous_learning import continuous_learning_al
+        cl = continuous_learning_al()
+        ist = cl.istatistik()
+        ogrenme = ist.get("toplam_ogrenme", 0)
+        session = ist.get("toplam_session", 0)
+    except Exception:
+        ogrenme = session = 0
+    try:
+        from reymen.sistem.coverage_report import get_coverage_summary
+        cov = get_coverage_summary()
+        cov_pct = cov.get("coverage_pct", 0)
+    except Exception:
+        cov_pct = 0
+    try:
+        from reymen.self_improve import report
+        r = report()
+        skor = r.get("ortalama_skor", 0)
+    except Exception:
+        skor = 0
+    try:
+        import sqlite3
+        db = os.path.join(ROOT, "hata_toplama.db")
+        if os.path.exists(db):
+            con = sqlite3.connect(db)
+            hata = con.execute("SELECT COUNT(*) FROM hatalar").fetchone()[0]
+            con.close()
+        else:
+            hata = 0
+    except Exception:
+        hata = 0
+    html = """<div class="metrik-kart"><div class="metrik-deger" style="color:var(--mavi)">%{:.1f}</div><div class="metrik-etiket">Test Coverage</div></div>""".format(cov_pct)
+    html += """<div class="metrik-kart"><div class="metrik-deger" style="color:var(--sari)">{:.3f}</div><div class="metrik-etiket">Kalite Skoru</div></div>""".format(skor)
+    html += """<div class="metrik-kart"><div class="metrik-deger" style="color:var(--kirmizi)">{}</div><div class="metrik-etiket">Hata</div></div>""".format(hata)
+    html += """<div class="metrik-kart"><div class="metrik-deger" style="color:var(--yesil)">{}</div><div class="metrik-etiket">Ogrenme</div><div class="metrik-alt">{} session</div></div>""".format(ogrenme, session)
+    return HTMLResponse(html)
+
+@app.get("/api/kalite/coverage")
+async def api_kalite_coverage():
+    """Coverage trend grafigi."""
+    try:
+        from reymen.sistem.coverage_report import get_coverage_history
+        gecmis = get_coverage_history(limit=14)
+        if not gecmis:
+            gecmis = [{"tarih": "bugun", "coverage": 0}]
+    except Exception:
+        gecmis = [{"tarih": "yok", "coverage": 0}]
+    max_cov = max(g["coverage"] for g in gecmis) or 1
+    cubuklar = []
+    for g in gecmis[-14:]:
+        yukseklik = max(int(g["coverage"] / max_cov * 100), 4)
+        if g["coverage"] > 50:
+            renk = "var(--yesil)"
+        elif g["coverage"] > 20:
+            renk = "var(--sari)"
+        else:
+            renk = "var(--kirmizi)"
+        etiket = str(g.get("tarih", "?"))[-5:]
+        cubuklar.append(f'<div class="cubuk" style="height:{yukseklik}px;background:{renk}" title="%{g["coverage"]:.1f}"><span class="cubuk-etiket">{etiket}</span></div>')
+    html = "<div class='cizelge'>" + "".join(cubuklar) + "</div>"
+    html += f'<div class="gri" style="margin-top:24px;font-size:12px">Son {len(gecmis)} olcum</div>'
+    return HTMLResponse(html)
+
+@app.get("/api/kalite/hatalar")
+async def api_kalite_hatalar():
+    """Hata analizi."""
+    try:
+        import sqlite3
+        db = os.path.join(ROOT, "hata_toplama.db")
+        if os.path.exists(db):
+            con = sqlite3.connect(db)
+            tipler = con.execute("SELECT tip, COUNT(*) FROM hatalar GROUP BY tip ORDER BY COUNT(*) DESC LIMIT 5").fetchall()
+            toplam = con.execute("SELECT COUNT(*) FROM hatalar").fetchone()[0]
+            con.close()
+        else:
+            tipler, toplam = [], 0
+    except Exception:
+        tipler, toplam = [], 0
+    satirlar = "".join(f'<div class="istatistik-satir"><span>{t[0][:25]}</span><span class="tag tag-error">{t[1]}</span></div>' for t in tipler)
+    return HTMLResponse(f'<div class="istatistik-satir"><span>Toplam</span><span class="tag tag-error">{toplam}</span></div>' + satirlar)
+
+@app.get("/api/kalite/maliyet")
+async def api_kalite_maliyet():
+    """Maliyet analizi."""
+    try:
+        from reymen.sistem.cost_tracker import cost_tracker as ct
+        ozet = ct.ozet()
+        toplam = ozet.get("toplam_maliyet", 0)
+        session = ozet.get("session_sayisi", 0)
+        modeller = ozet.get("model_bazli", {})
+    except Exception:
+        toplam, session, modeller = 0, 0, {}
+    sirali = sorted(modeller.items(), key=lambda x: -x[1])[:5]
+    model_str = "".join(f'<div class="istatistik-satir"><span>{m[:20]}</span><span class="gri">${t:.4f}</span></div>' for m, t in sirali)
+    return HTMLResponse(f'<div class="istatistik-satir"><span>Toplam</span><span class="tag tag-warning">${toplam:.4f}</span></div><div class="istatistik-satir"><span>Session</span><span>{session}</span></div>' + model_str)
+
+@app.get("/api/kalite/ogrenme")
+async def api_kalite_ogrenme():
+    """Ogrenme ve skill istatistikleri."""
+    try:
+        from reymen.cereyan.continuous_learning import continuous_learning_al
+        cl = continuous_learning_al()
+        ist = cl.istatistik()
+        tipler = ist.get("tipler", {})
+    except Exception:
+        tipler = {}
+    try:
+        import sqlite3
+        db2 = os.path.join(ROOT, "cereyan/.ReYMeN/skills_index.db")
+        if os.path.exists(db2):
+            con = sqlite3.connect(db2)
+            skill_sayisi = con.execute("SELECT COUNT(*) FROM beceriler_meta").fetchone()[0]
+            con.close()
+        else:
+            skill_sayisi = 0
+    except Exception:
+        skill_sayisi = 0
+    sirali = sorted(tipler.items(), key=lambda x: -x[1])[:5]
+    tip_str = "".join(f'<div class="istatistik-satir"><span>{t[:20]}</span><span>{a}</span></div>' for t, a in sirali)
+    return HTMLResponse(f'<div class="istatistik-satir"><span>Skill</span><span class="tag tag-info">{skill_sayisi}</span></div>' + tip_str)
 @app.get("/api/kalite/analiz")
 async def api_kalite_analiz():
     """Kod kalite analizi HTML."""
@@ -3218,5 +3344,266 @@ def _web_ui_durdur(**kw) -> str:
     return "[WEB_UI] Zaten kapali"
 
 
+# ── Analitik Dashboard Routes ──────────────────────────────────────────────
+
+@app.get("/api/analytics/summary")
+async def api_analytics_summary(gun: int = 7):
+    """JSON analitik ozeti."""
+    try:
+        from reymen.sistem.analitik import ozet_son_n
+        return JSONResponse(ozet_son_n(gun))
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+
+@app.get("/api/analytics/providers")
+async def api_analytics_providers(gun: int = 7):
+    """Provider bazli kullanim."""
+    try:
+        from reymen.sistem.analitik import provider_raporu
+        return JSONResponse(provider_raporu(gun))
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+
+@app.get("/api/analytics/live")
+async def api_analytics_live(limit: int = 50):
+    """Canli olay akisi."""
+    try:
+        from reymen.sistem.analitik import canli_izle
+        return JSONResponse(canli_izle(limit))
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+
+@app.get("/analytics", response_class=HTMLResponse)
+async def analytics_dashboard_page():
+    """HTML analitik dashboard sayfasi."""
+    try:
+        from reymen.sistem.analitik import _dashboard_html
+        return HTMLResponse(_dashboard_html())
+    except Exception as e:
+        return HTMLResponse(f"<h2>Analitik Dashboard</h2><p>Hata: {e}</p>")
+
+
+@app.get("/api/analytics/record")
+async def api_analytics_record(
+    tur: str = "test",
+    kaynak: str = "",
+    sure_ms: int = 0,
+    token_giris: int = 0,
+    token_cikis: int = 0,
+    maliyet: float = 0.0,
+    basarili: bool = True,
+    hata_mesaji: str = "",
+):
+    """HTTP uzerinden analitik kaydi ekle."""
+    try:
+        from reymen.sistem.analitik import kaydet
+        _id = kaydet(
+            tur=tur, kaynak=kaynak, sure_ms=sure_ms,
+            token_giris=token_giris, token_cikis=token_cikis,
+            maliyet=maliyet, basarili=basarili, hata_mesaji=hata_mesaji,
+        )
+        return JSONResponse({"success": True, "id": _id})
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+
 if __name__ == "__main__":
     cli()
+
+
+# ── Skills Dashboard Routes ────────────────────────────────────────────────
+
+@app.get("/skills", response_class=HTMLResponse)
+async def skills_dashboard_page():
+    """HTML skill yonetim sayfasi."""
+    from pathlib import Path
+    template = Path(__file__).parent / "templates" / "skills.html"
+    if template.exists():
+        return HTMLResponse(template.read_text(encoding="utf-8"))
+    return HTMLResponse("<h2>Skills Dashboard</h2><p>Template bulunamadi.</p>")
+
+
+@app.get("/api/skills")
+async def api_skills_liste(kategori: str = ""):
+    """JSON skill listesi."""
+    try:
+        from reymen.cereyan.skill_library import SkillLibrary
+        lib = SkillLibrary()
+        skills = lib.tumu()
+        if kategori:
+            skills = [s for s in (skills or []) if kategori.lower() in str(s.get('kategori', '')).lower()]
+        return JSONResponse({"skills": (skills or [])[:200], "toplam": len(skills or [])})
+    except Exception as e:
+        return JSONResponse({"skills": [], "error": str(e)})
+
+
+@app.get("/api/skills/ara")
+async def api_skills_ara(q: str = ""):
+    """JSON skill arama."""
+    try:
+        from reymen.cereyan.skill_library import SkillLibrary
+        lib = SkillLibrary()
+        sonuc = lib.ara(q)
+        return JSONResponse({"results": sonuc[:50]})
+    except Exception as e:
+        return JSONResponse({"results": [], "error": str(e)})
+
+
+@app.get("/api/skills/kategoriler")
+async def api_skills_kategoriler():
+    """JSON kategori listesi."""
+    try:
+        from reymen.cereyan.skill_library import SkillLibrary
+        lib = SkillLibrary()
+        skills = lib.tumu() or []
+        kategoriler = sorted(set(s.get('kategori', '') for s in skills if s.get('kategori')))
+        return JSONResponse({"kategoriler": kategoriler})
+    except Exception as e:
+        return JSONResponse({"kategoriler": [], "error": str(e)})
+
+
+@app.post("/api/skills/aktif_et")
+async def api_skills_aktif_et(request: Request):
+    """Skill aktif et."""
+    try:
+        data = await request.json()
+        ad = data.get("ad", "")
+        from reymen.cereyan.skill_activator import skill_aktivat
+        sonuc = skill_aktivat(ad)
+        return JSONResponse({"message": f"'{ad}' aktif edildi" if sonuc else f"'{ad}' aktif edilemedi"})
+    except Exception as e:
+        return JSONResponse({"error": str(e)})
+
+
+@app.post("/api/skills/tumunu_aktif_et")
+async def api_skills_tumunu_aktif_et():
+    """Tum skill'leri aktif et."""
+    try:
+        from reymen.cereyan.skill_library import SkillLibrary
+        lib = SkillLibrary()
+        adet = lib.tumunu_aktif_et() if hasattr(lib, 'tumunu_aktif_et') else 0
+        return JSONResponse({"message": f"{adet} skill aktif edildi"})
+    except Exception as e:
+        return JSONResponse({"error": str(e)})
+
+
+@app.post("/api/skills/index_yenile")
+async def api_skills_index_yenile():
+    """Skill index'ini yenile."""
+    try:
+        from reymen.cereyan.skill_library import SkillLibrary
+        lib = SkillLibrary()
+        lib.index_yenile() if hasattr(lib, 'index_yenile') else None
+        return JSONResponse({"message": "Index yenilendi"})
+    except Exception as e:
+        return JSONResponse({"error": str(e)})
+
+
+# ═══════════════════════════════════════════════════════════════
+# Open WebUI / OpenAI-Compatible API
+# ═══════════════════════════════════════════════════════════════
+# Open WebUI, Cursor, Continue.dev ve diger araclar bu endpoint'e
+# "Custom OpenAI API" olarak baglanabilir.
+# Baglanti: http://localhost:5000/v1  (API Key: reymen)
+# ═══════════════════════════════════════════════════════════════
+
+from pydantic import BaseModel
+
+
+class V1ChatMessage(BaseModel):
+    role: str
+    content: str
+
+
+class V1ChatRequest(BaseModel):
+    model: str = "reymen/default"
+    messages: list[V1ChatMessage] = []
+    stream: bool = False
+    temperature: float = 0.7
+    max_tokens: int = 2048
+
+
+@app.get("/v1/models")
+async def v1_models():
+    """OpenAI uyumlu model listesi — Open WebUI bu endpoint'i sorgular."""
+    models = [
+        {
+            "id": "reymen/default",
+            "object": "model",
+            "created": int(time.time()),
+            "owned_by": "reymen",
+        },
+        {
+            "id": "reymen/deepseek",
+            "object": "model",
+            "created": int(time.time()),
+            "owned_by": "reymen",
+        },
+        {
+            "id": "reymen/openai",
+            "object": "model",
+            "created": int(time.time()),
+            "owned_by": "reymen",
+        },
+    ]
+    return {"object": "list", "data": models}
+
+
+@app.post("/v1/chat/completions")
+async def v1_chat_completions(req: V1ChatRequest):
+    """OpenAI uyumlu chat completions endpoint'i.
+
+    Open WebUI, Continue.dev ve diger araclar bu endpoint'e
+    OpenAI API formatinda istek gonderir.
+    """
+    try:
+        # ReYMeN motoru uzerinden yanit uret
+        from reymen.cereyan.motor import motor_havuzu
+
+        # Kullanici mesajini birlestir
+        prompt = "\n".join(
+            f"{m.role}: {m.content}" for m in req.messages
+        )
+
+        # Motor havuzundan uygun provider'a yonlendir
+        motor = motor_havuzu.get("default")
+        if motor is None:
+            # Fallback: dogrudan provider
+            from reymen.core.model_provider import ModelProvider
+            provider = ModelProvider()
+            yanit = provider.soru(prompt, system="Sen ReYMeN yapay zeka asistanisin.")
+        else:
+            yanit = motor.soru(prompt)
+
+        timestamp = int(time.time())
+
+        return {
+            "id": f"chatcmpl-{timestamp}",
+            "object": "chat.completion",
+            "created": timestamp,
+            "model": req.model,
+            "choices": [
+                {
+                    "index": 0,
+                    "message": {
+                        "role": "assistant",
+                        "content": str(yanit),
+                    },
+                    "finish_reason": "stop",
+                }
+            ],
+            "usage": {
+                "prompt_tokens": len(prompt) // 4,
+                "completion_tokens": len(str(yanit)) // 4,
+                "total_tokens": (len(prompt) + len(str(yanit))) // 4,
+            },
+        }
+    except Exception as e:
+        logger.error(f"V1 chat error: {e}")
+        return JSONResponse(
+            {"error": {"message": str(e), "type": "server_error"}},
+            status_code=500,
+        )
