@@ -346,6 +346,8 @@ class Motor:
             "reymen.a2a_integration",
             # TUI (Terminal UI - prompt_toolkit tabanli)
             "reymen.tui",
+            # Web UI (FastAPI + HTMX yonetim paneli)
+            "reymen.web_ui",
             # Checkpoint yönetimi (görev geri alma / rollback)
             "tools.checkpoint_manager",
         ]
