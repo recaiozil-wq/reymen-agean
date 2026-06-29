@@ -555,6 +555,86 @@ class PluginYoneticisi:
             return []
         return yaml_veri.get("providers", [])
 
+    def _provider_base_baslat(
+        self,
+        modul: object,
+        ad: str,
+        secilen_provider: str | None,
+    ) -> None:
+        """Modul icinde ProviderPluginBase alt sinifi varsa baslat.
+
+        Args:
+            modul: Plugin modulu (yl._yuklu[ad]).
+            ad: Plugin adi (sadece log icin).
+            secilen_provider: Kullanici tarafindan secilen provider adi.
+        """
+        try:
+            from reymen.sistem.provider_plugin_base import ProviderPluginBase
+        except ImportError:
+            return
+
+        if modul is None:
+            return
+
+        # Modul icinde ProviderPluginBase alt siniflarini bul
+        provider_instance = None
+        for attr_name in dir(modul):
+            attr = getattr(modul, attr_name, None)
+            if (
+                isinstance(attr, type)
+                and issubclass(attr, ProviderPluginBase)
+                and attr is not ProviderPluginBase
+            ):
+                try:
+                    instance = attr()
+                    # Provider listesini plugin.yaml'den oku
+                    yl = self.yukleyici
+                    if yl:
+                        yaml_veri = yl.plugin_yaml_bilgisi(ad) or {}
+                        provider_listesi = yaml_veri.get("providers", [])
+                        instance._providers = [
+                            p.get("name", p) if isinstance(p, dict) else p
+                            for p in provider_listesi
+                        ]
+
+                    # Provider secimi yap
+                    if secilen_provider:
+                        instance.set_provider(secilen_provider)
+                    elif instance._providers:
+                        # Varsayilani bul veya ilk provider'i sec
+                        default = None
+                        yl = self.yukleyici
+                        if yl:
+                            yaml_veri = yl.plugin_yaml_bilgisi(ad) or {}
+                            for p in yaml_veri.get("providers", []):
+                                if isinstance(p, dict) and p.get("default"):
+                                    default = p.get("name")
+                                    break
+                        if default and default in instance._providers:
+                            instance.set_provider(default)
+                        else:
+                            instance.set_provider(instance._providers[0])
+
+                    # Instance'i modul uzerinde sakla
+                    setattr(modul, "_provider_instance", instance)
+
+                    # init() cagir
+                    instance.init()
+
+                    logger.info(
+                        "[Plugin] ProviderPluginBase baslatildi: %s -> %s (provider: %s)",
+                        ad, instance.name, instance._active_provider,
+                    )
+                    provider_instance = instance
+                except Exception as exc:
+                    logger.error(
+                        "[Plugin] ProviderPluginBase baslatma hatasi [%s]: %s",
+                        ad, exc,
+                    )
+
+        if provider_instance is None:
+            logger.debug("[Plugin] '%s' icin ProviderPluginBase alt sinifi bulunamadi.", ad)
+
     def plugin_baslat(self, ad: str, provider: str | None = None) -> bool:
         """Bir plugini belirtilen provider ile baslat.
 
@@ -577,6 +657,13 @@ class PluginYoneticisi:
         yl = self.yukleyici
         if yl is None:
             return False
+
+        # plugin.yaml cache'ini doldur (henuz yuklenmemisse)
+        if ad not in yl._yaml_bilgisi:
+            klasor = self._dizin / ad
+            if klasor.exists() and klasor.is_dir():
+                yaml_veri = yl._yaml_yukle(klasor) or {}
+                yl._yaml_bilgisi[ad] = yaml_veri
 
         # Provider dogrulama
         secilen_provider = provider
@@ -605,6 +692,10 @@ class PluginYoneticisi:
         modul = yl._yuklu.get(ad)
         if modul is not None:
             setattr(modul, "_aktif_provider", secilen_provider)
+
+        # ── ProviderPluginBase entegrasyonu ───────────────────────────────
+        # Modul icinde ProviderPluginBase alt sinifi varsa, onu baslat
+        self._provider_base_baslat(modul, ad, secilen_provider)
 
         if secilen_provider:
             logger.info("[Plugin] '%s' baslatildi (provider: %s)", ad, secilen_provider)

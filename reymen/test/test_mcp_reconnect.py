@@ -24,6 +24,7 @@ from reymen.mcp.mcp_reconnect import (
     mcp_reconnect_durumu,
     mcp_reconnect_durum_raporu,
 )
+from reymen.mcp import baslangicta_baslat, _cift_mcp_uyar
 
 
 # ── Yardimci ────────────────────────────────────────────────────────
@@ -142,3 +143,49 @@ async def test_sunucu_yokken_heartbeat_sifir():
     assert durum["calisma_suresi_sn"] > 0
 
     mcp_reconnect_durdur()
+
+
+# ── Test 7: Auto-start (baslangicta_baslat) ──────────────────────────
+
+@pytest.mark.asyncio
+async def test_baslangicta_baslat():
+    """baslangicta_baslat() keşif ve reconnect'i başlatmali, crash yapmamali."""
+    # Önce durumu sıfırla
+    mcp_reconnect_durdur()
+    await asyncio.sleep(0.1)
+
+    # baslangicta_baslat çağır (senkron, hata yutmalı)
+    baslangicta_baslat()
+    await asyncio.sleep(0.3)
+
+    # Reconnect çalışıyor olmalı
+    durum = mcp_reconnect_durumu()
+    assert durum["aktif"] is True, "baslangicta_baslat reconnect'i başlatmali"
+
+    # İkinci kez çağır — zaten çalışıyor olduğu için sessizce dönmeli
+    baslangicta_baslat()
+    await asyncio.sleep(0.1)
+    durum2 = mcp_reconnect_durumu()
+    assert durum2["aktif"] is True, "İkinci çağrıda crash yapmamali"
+
+    # Temizlik
+    mcp_reconnect_durdur()
+    await asyncio.sleep(0.1)
+
+
+# ── Test 8: Çift MCP client uyarısı ─────────────────────────────────
+
+def test_cift_mcp_uyar_sessiz():
+    """_cift_mcp_uyar() crash yapmadan çalışmali."""
+    # native_mcp_client henüz import edilmemişken — sessiz çalışmalı
+    _cift_mcp_uyar()  # Exception fırlatmamalı
+
+    # native_mcp_client import et
+    try:
+        import reymen.arac.native_mcp_client  # noqa: F401
+        # Şimdi uyarı log'lanmalı ama crash olmamalı
+        _cift_mcp_uyar()  # Exception fırlatmamalı
+    except ImportError:
+        pass  # native_mcp_client yoksa test skip değil, sessiz geç
+
+    assert True  # Buraya kadar geldiysek başarılı

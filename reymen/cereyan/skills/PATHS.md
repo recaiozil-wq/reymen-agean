@@ -1,22 +1,31 @@
-# Skills Dizin Yapisi — Konsolidasyon Rehberi
+# Skills Dizin Yapisi — Path Cleanup
 
-## Kanonik Dizin
-**`reymen/cereyan/skills/`** — Tum skill'lerin ana deposu.
-Bu dizin altinda kategorilere ayrilmis skill klasorleri bulunur.
-Her skill klasoru bir `SKILL.md` dosyasi icerir.
+## Merkezi Dizin
+**`reymen/cereyan/skills/`** — tek merkezi skills dizini (kategorize edilmis yapi).
 
-## Legacy Dizinler (kullanilmiyor)
-| Eski Dizin | Durum | Aciklama |
-|------------|-------|----------|
-| `reymen/cereyan/skills_yeni/` | ✅ Tasi̇ndi → `skills/` | Icerik `skills/` altina merge edildi |
-| `reymen/cereyan/.ReYMeN/skills/` | 🔴 Legacy | Test skill'leri icerir, referans verilmez |
-| `reymen/hafiza/.ReYMeN/skills/` | 🟡 Hafiza | OnceHafiza modulu tarafindan kullanilir (farkli amac) |
+## Eski/Yedek Dizinler (artik kullanilmiyor)
+| Dizin | Durum | Aciklama |
+|-------|-------|----------|
+| `skills/` | YEDEK | Duz (flat) .md dosyalari, cogu merkezi dizinde zaten var |
+| `.ReYMeN/skills/` | BOS | Hub sistemi icin ayrilmis, su an bos |
+| `hermes_legacy/skills/` | LEGACY | Eski yedek, otomatik taranmiyor |
+| `reymen/cereyan/.ReYMeN/skills/` | TEST | Test skill'leri ve index-cache |
+| `reymen/hafiza/.ReYMeN/skills/` | MINIMAL | 17 .md, cogu eski |
 
-## Kod Referanslari
-- `skill_utils.py` (`SKILLS_KLASORLERI`): `reymen/arac/skills/`, `.ReYMeN/skills/`, `.agents/skills/`
-- `cron_skill_sync.py` (`SKILLS_DIR`): `reymen/cereyan/skills/`
-- `reymen_cli/skills_hub.py` (`SKILLS_KLASOR`): `ROOT/.ReYMeN/skills/`
+## Sync Komutu
+```bash
+# Merkezi dizin + root skills/ senkronizasyonu
+python -c "from reymen.cereyan.fix_skills_path import *; sync_all()"
 
-## Not
-Yeni skill eklemek icin `reymen/cereyan/skills/<kategori>/<skill_adi>/SKILL.md`
-formatini kullan. Bu dizin tum cron/activation/CLI islemleri icin kanonik kaynaktir.
+# Durum raporu
+python -c "from reymen.cereyan.fix_skills_path import *; durum_bildir()"
+```
+
+## Auto-Activation (yeni)
+Kullanici sorgusuna gore ilgili skill'ler otomatik aktif edilir:
+- `conversation_loop.py` -> `sorgudan_aktif_et()` (OnceHafiza kontrolunden sonra)
+- SkillLibrary SQLite DB: `reymen/cereyan/.ReYMeN/skill_library.db`
+
+## CLI Fix
+`/skills` slash command artik `cli_commands.tool_commands` uzerinden calisir.
+`cli_mixin_skillstools.py`'daki kirik `ChatConsole()` import'u duzeltildi.

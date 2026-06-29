@@ -24,6 +24,38 @@ plugin_araclar = ["MERHABA_SOYLE", "PLUGIN_BILGI", "MERHABA_VERSIYON"]
 plugin_providers = ["varsayilan", "gelismis"]  # runtime erişim için
 
 
+# ── ProviderPluginBase alt sinifi ─────────────────────────────────────────
+try:
+    from reymen.sistem.provider_plugin_base import ProviderPluginBase
+
+    class MerhabaProvider(ProviderPluginBase):
+        """Merhaba plugin'i icin provider yoneticisi."""
+
+        name = "merhaba_provider"
+        version = "1.0.0"
+
+        def init(self, config: dict | None = None) -> bool:
+            """Provider'i baslat."""
+            logger.info("[MerhabaProvider] Baslatildi (config: %s)", config)
+            return True
+
+        def health_check(self) -> dict:
+            """Saglik kontrolu."""
+            return {
+                "status": "ok",
+                "latency_ms": 0,
+                "message": f"MerhabaProvider aktif, provider: {self._active_provider}",
+            }
+
+        def shutdown(self) -> None:
+            """Provider'i kapat."""
+            logger.info("[MerhabaProvider] Kapatildi.")
+
+except ImportError:
+    # ProviderPluginBase yoksa sorunsuz devam et
+    MerhabaProvider = None  # type: ignore
+
+
 def _aktif_provider_al() -> str:
     """Plugin'in aktif provider'ını döndür (varsayılan: 'varsayilan')."""
     import sys

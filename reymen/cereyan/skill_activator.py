@@ -26,7 +26,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from skill_library import SkillLibrary, _yazma_kilit
+from reymen.cereyan.skill_library import SkillLibrary, _yazma_kilit
 
 logger = logging.getLogger(__name__)
 

@@ -379,9 +379,9 @@ class MixinSkillsTools:
 
 
     def _handle_skills_command(self, cmd: str):
-        """Handle /skills slash command — delegates to ReYMeN_cli.skills_hub."""
-        from reymen.reymen_cli.skills_hub import handle_skills_slash
-        handle_skills_slash(cmd, ChatConsole())
+        """Handle /skills slash command — delegates to cli_commands.tool_commands version."""
+        from reymen.sistem.cli_commands.tool_commands import MixinCommands
+        MixinCommands._handle_skills_command(self, cmd)
 
 
     def _handle_background_command(self, cmd: str):

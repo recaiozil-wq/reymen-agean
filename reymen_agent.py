@@ -20,37 +20,17 @@ import requests
 _WEB_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
 
 def _web_ara(sorgu: str, max_sonuc: int = 5) -> str:
-    """Web'de arama yapar, sonuçları döndürür."""
+    """Web'de arama yapar — SearchDispatcher uzerinden (coklu back-end).
+    
+    Kullanilabilir engine'ler: duckduckgo, google, bing, firecrawl,
+    brave, searxng, exa, auto (config'e gore en iyisi).
+    """
     try:
-        resp = requests.get(
-            "https://html.duckduckgo.com/html/",
-            params={"q": sorgu},
-            headers={"User-Agent": _WEB_USER_AGENT},
-            timeout=15
-        )
-        from html.parser import HTMLParser
-        class _MetinToplayici(HTMLParser):
-            def __init__(self):
-                super().__init__()
-                self._topla = False
-                self._metinler = []
-            def handle_starttag(self, tag, attrs):
-                d = dict(attrs)
-                if tag == "a" and d.get("class") == "result__a":
-                    self._topla = True
-            def handle_endtag(self, tag):
-                if self._topla and tag == "a":
-                    self._topla = False
-            def handle_data(self, data):
-                if self._topla:
-                    self._metinler.append(data.strip())
-
-        toplayici = _MetinToplayici()
-        toplayici.feed(resp.text)
-        sonuclar = [m for m in toplayici._metinler if m]
-        return "\n".join(f"• {s}" for s in sonuclar[:max_sonuc]) if sonuclar else ""
+        from reymen.arac.web_search_engine import _get_registry
+        dispatcher = _get_registry()
+        return dispatcher.ara(sorgu, engine="auto", max_sonuc=max_sonuc)
     except Exception as e:
-        _get_logger().debug(f"Web arama hatası: {e}")
+        _get_logger().debug(f"Web arama hatasi: {e}")
         return ""
 
 def _dosya_oku(yol: str) -> str:

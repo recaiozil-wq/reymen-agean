@@ -32,25 +32,102 @@ Kullanım:
     tools = mcp_manager().tum_araclari_getir()
 """
 
+import asyncio
+import logging
+import sys
+
 from reymen.mcp.mcp_tool import motor_kaydet as mcp_tool_kaydet
 from reymen.mcp.mcp_discovery import motor_kaydet as mcp_discovery_kaydet
 from reymen.mcp.mcp_reconnect import motor_kaydet as mcp_reconnect_kaydet
+from reymen.mcp.mcp_discovery import mcp_kesfet
+from reymen.mcp.mcp_reconnect import mcp_reconnect_baslat, mcp_reconnect_durumu
+
+logger = logging.getLogger(__name__)
 
 __all__ = [
     "mcp_tool_kaydet",
     "mcp_discovery_kaydet",
     "mcp_reconnect_kaydet",
+    "baslangicta_baslat",
+    "_cift_mcp_uyar",
 ]
+
+
+def _cift_mcp_uyar() -> None:
+    """reymen.arac.native_mcp_client import edilmisse uyar (çift MCP client)."""
+    try:
+        if "reymen.arac.native_mcp_client" in sys.modules:
+            logger.warning(
+                "[MCP] ⚠️ Çift MCP client tespit edildi! "
+                "reymen.mcp ve reymen.arac.native_mcp_client paralel çalışıyor. "
+                "Yeni geliştirmeler için reymen.mcp paketini kullanın."
+            )
+    except Exception:
+        pass
+
+
+def baslangicta_baslat() -> None:
+    """Motor yüklenirken otomatik MCP keşif ve reconnect başlat.
+
+    Motor başlatılırken motor_kaydet() içinden çağrılır:
+      1. config.yaml + .env'den MCP sunucularını keşfeder
+      2. Heartbeat + otomatik yeniden bağlanma döngüsünü başlatır
+
+    Hata varsa sessizce logla, crash yapma. Halihazırda reconnect
+    çalışıyorsa ikinci kez başlatma yapılmaz.
+    """
+    try:
+        # Halihazırda reconnect çalışıyorsa atla
+        if mcp_reconnect_durumu().get("aktif", False):
+            logger.debug("[MCP] baslangicta_baslat: reconnect zaten çalışıyor")
+            return
+
+        # 1. MCP sunucularını keşfet
+        yeni = mcp_kesfet(geri_bildirim=True)
+        if yeni > 0:
+            logger.info("[MCP] Baslangicta kesif: %d yeni sunucu bulundu", yeni)
+
+        # 2. Reconnect başlat
+        try:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            try:
+                loop.run_until_complete(mcp_reconnect_baslat())
+                logger.info("[MCP] Baslangicta reconnect baslatildi")
+            finally:
+                loop.close()
+        except Exception as e:
+            logger.warning(
+                "[MCP] Baslangicta reconnect baslatma hatasi (onemsiz): %s", e
+            )
+    except Exception as e:
+        logger.warning("[MCP] Baslangicta baslatma hatasi (onemsiz): %s", e)
 
 
 def motor_kaydet(motor) -> None:
     """Tüm MCP araçlarını Motor'a kaydet.
 
     Motor başlatılırken çağrılır. Sırasıyla:
-      1. MCP_TOOL_LISTELE / MCP_TOOL_CAGIR (mcp_tool)
-      2. MCP_DISCOVERY / MCP_DISCOVERY_DURUM (mcp_discovery)
-      3. MCP_RECONNECT_BASLAT / MCP_RECONNECT_DURDUR / MCP_RECONNECT_DURUM (mcp_reconnect)
+      1. Çift MCP client uyarısı (_cift_mcp_uyar)
+      2. MCP_TOOL_LISTELE / MCP_TOOL_CAGIR (mcp_tool)
+      3. MCP_DISCOVERY / MCP_DISCOVERY_DURUM (mcp_discovery)
+      4. MCP_RECONNECT_BASLAT / MCP_RECONNECT_DURDUR / MCP_RECONNECT_DURUM (mcp_reconnect)
+      5. MCP_OTOMATIK_BASLAT — keşif + reconnect'i tek adımda başlatır
     """
+    # Çift MCP client uyarısı
+    _cift_mcp_uyar()
+
+    # Alt modül araçlarını kaydet
     mcp_tool_kaydet(motor)
     mcp_discovery_kaydet(motor)
     mcp_reconnect_kaydet(motor)
+
+    # MCP_OTOMATIK_BASLAT — motor başlangıcında çağrılacak auto-start tool
+    if hasattr(motor, "_plugin_arac_kaydet"):
+        motor._plugin_arac_kaydet(
+            "MCP_OTOMATIK_BASLAT",
+            baslangicta_baslat,
+            "MCP sunucularını otomatik keşfeder, heartbeat + yeniden bağlanma "
+            "döngüsünü başlatır. Motor başlangıcında otomatik çağrılır. "
+            "Kullanım: MCP_OTOMATIK_BASLAT() — keşif + reconnect tek adımda.",
+        )

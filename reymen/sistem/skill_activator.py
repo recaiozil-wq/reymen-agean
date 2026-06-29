@@ -27,9 +27,9 @@ class SkillActivator:
 
     # ── Registry management ──────────────────────────────────────────────
 
-    def register(self, name: str, file_path: Path) -> None:
+    def register(self, name: str, file_path: str | Path) -> None:
         """Register a skill by name pointing to its .md file path."""
-        self._registry[name] = str(file_path.resolve())
+        self._registry[name] = str(Path(file_path).resolve())
         logger.debug("Skill registered: %s -> %s", name, file_path)
 
     def unregister(self, name: str) -> bool:

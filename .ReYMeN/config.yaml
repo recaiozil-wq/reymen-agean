@@ -9,6 +9,24 @@
 #
 # Detay: https://modelcontextprotocol.io
 
+# ── Web Arama Yapilandirmasi ──────────────────────────────────────────────
+# web:
+#   backend: "auto"              # Varsayilan: auto-detect
+#                                 # Secenekler: duckduckgo, google, bing,
+#                                 #             firecrawl, brave, searxng, exa, auto
+#   search_backend: "firecrawl"  # WEB_ARAMA icin spesifik backend (opsiyonel)
+#                                 # web.backend'den once aranir
+#
+# Ayrica WEB_SEARCH_BACKEND env var ile de backend secilebilir.
+#
+# Backend API Key'leri (env var):
+#   FIRECRAWL_API_KEY / FIRECRAWL_KEY  → Firecrawl
+#   BRAVE_API_KEY                       → Brave Search
+#   SEARXNG_URL                         → SearXNG instance URL
+#   EXA_API_KEY                         → Exa
+#   GOOGLE_API_KEY + GOOGLE_CX          → Google Custom Search
+#   BING_API_KEY                        → Bing Web Search
+
 mcp_servers:
   filesystem:
     command: "npx"

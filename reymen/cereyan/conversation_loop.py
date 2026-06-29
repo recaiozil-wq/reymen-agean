@@ -114,6 +114,15 @@ except ImportError:
     _hafizada_ara = None
     _ONCE_HAFIZA_AKTIF = False
 
+# ── Skill Activator (auto-activation) ────────────────────────────
+try:
+    from reymen.cereyan.skill_activator import SkillActivator as _SkillActivator
+    _SKILL_ACTIVATOR = _SkillActivator()
+    _SKILL_ACTIVATOR_AKTIF = True
+except ImportError:
+    _SKILL_ACTIVATOR = None
+    _SKILL_ACTIVATOR_AKTIF = False
+
 # ── Hata sınıflandırıcı ve mesaj tamirci ─────────────────────────
 try:
     from reymen.cereyan.hata_siniflandirici import (
@@ -183,16 +192,9 @@ except ImportError:
     _STREAM_DIAG_AKTIF = False
 
 # ── Web arama (halusinasyon onleme) ─────────────────────────────
-try:
-    from ddgs import DDGS as _DDGS
-    _WEB_ARAMA_AKTIF = True
-except ImportError:
-    try:
-        from duckduckgo_search import DDGS as _DDGS
-        _WEB_ARAMA_AKTIF = True
-    except ImportError:
-        _DDGS = None
-        _WEB_ARAMA_AKTIF = False
+# Artık doğrudan DDGS yerine web_search_engine'deki SearchDispatcher kullanılır.
+# _WEB_ARAMA_AKTIF, dispatcher her zaman hazır olduğu için True olarak kalır.
+_WEB_ARAMA_AKTIF = True
 
 
 # ── Sabitler ──────────────────────────────────────────────────────────
@@ -547,6 +549,55 @@ class ConversationLoop:
                 sonuc["sure"] = round(time.time() - baslama, 2)
                 self._durum = "tamamlandi"
                 return sonuc
+
+        # -- 2a. SKILL AUTO-ACTIVATION (sorgudan_aktif_et)
+        #    Kullanici sorgusundaki anahtar kelimelere gore ilgili skill'leri
+        #    otomatik aktif eder. Sonuclar system prompt'a eklenecek.
+        if _SKILL_ACTIVATOR_AKTIF and _SKILL_ACTIVATOR is not None:
+            try:
+                aktif_edilen = _SKILL_ACTIVATOR.sorgudan_aktif_et(hedef, max_aktif=3, min_skor=0.15)
+                if aktif_edilen:
+                    log.info("[%s] Skill auto-activation: %d skill aktif edildi: %s",
+                             task_id, len(aktif_edilen), aktif_edilen)
+                    # Aktif skill'lerin iceriklerini system prompt'a ekle
+                    # once active_skill_tracker uzerinden
+                    try:
+                        from reymen.cereyan.active_skill_tracker import aktif_skill_ayarla, aktif_skill_al
+                        # Aktif edilen ilk skill'i tracker'a ekle
+                        ilk_id = aktif_edilen[0]
+                        ilk_skill = _SKILL_ACTIVATOR._lib.get(ilk_id)
+                        if ilk_skill:
+                            skill_baslik = ilk_skill.get("baslik", ilk_id)
+                            skill_ozet = ilk_skill.get("icerik_ozeti", "")
+                            skill_etiket = ", ".join(ilk_skill.get("etiketler", []))
+                            tracker_icerik = (
+                                f"Skill: {skill_baslik}\n"
+                                f"Aciklama: {skill_ozet}\n"
+                                f"Etiketler: {skill_etiket}\n"
+                                f"Aktif edilen skill'ler: {', '.join(aktif_edilen)}"
+                            )
+                            aktif_skill_ayarla(ilk_id, tracker_icerik)
+                            log.info("[%s] Skill context enjekte edildi: %s", task_id, ilk_id)
+                    except Exception as _ste:
+                        log.warning("[%s] Skill tracker enjeksiyon hatasi: %s", task_id, _ste)
+
+                    # Ayrica sonuc'a not olarak ekle (loglama)
+                    aktif_detaylar = _SKILL_ACTIVATOR.durum()
+                    if aktif_detaylar:
+                        skill_notlari = []
+                        for s in aktif_detaylar:
+                            if s.get("id") in aktif_edilen:
+                                baslik = s.get("baslik", s["id"])
+                                ozet = s.get("icerik_ozeti", "")
+                                etiket = ", ".join(s.get("etiketler", []))
+                                skill_notlari.append(
+                                    f"- {baslik}: {ozet} ({etiket})"
+                                )
+                        if skill_notlari:
+                            sonuc["aktif_skill_notlari"] = skill_notlari
+                            log.info("[%s] Skill context: %s", task_id, skill_notlari)
+            except Exception as _se:
+                log.warning("[%s] Skill auto-activation hatasi: %s", task_id, _se)
 
         # -- 2b. OGRENME ATLAMA (imza tabanli cozum varsa direkt don)
         try:
@@ -1146,34 +1197,38 @@ class ConversationLoop:
         return sonuc
 
     def _web_ara(self, sorgu: str, maks_sonuc: int = 3) -> Optional[str]:
-        '''DuckDuckGo ile web ara, sonucu metin olarak don.
+        '''Web arama yap — SearchDispatcher uzerinden (coklu back-end).
         LLM atlanir, direkt web verisi kullanilir (halusinasyon onleme).
         Basarisiz olursa hata sayaci tutar, 3 hata sonra devre disi kalir.
+
+        Kullanilabilir engine'ler: duckduckgo, google, bing, firecrawl,
+        brave, searxng, exa, auto (config'e gore en iyisi).
         '''
-        import warnings
-        warnings.filterwarnings("ignore", message=".*renamed to `ddgs`.*")
-        if not _WEB_ARAMA_AKTIF or _DDGS is None:
+        if not _WEB_ARAMA_AKTIF:
             return None
         # Circuit breaker: 3 hata sonra web aramayi kapat
         if hasattr(self, '_web_hata') and self._web_hata >= 3:
             return None
         try:
-            with _DDGS() as ddgs:
-                sonuc = list(ddgs.text(sorgu, max_results=maks_sonuc, backend="html"))
-            if not sonuc:
-                return None
-            metin = ""
-            for idx, s in enumerate(sonuc, 1):
-                baslik = s.get("title", "").strip()
-                link = s.get("href", "").strip()
-                ozet = s.get("body", "").strip()[:120]
-                metin += f"| {idx} | {baslik} | {ozet} |\n|   | {link} | |\n"
-            return metin.strip() if metin.strip() else None
+            # Lazy import — circular import ihtimaline karsi
+            from reymen.arac.web_search_engine import _get_registry
+            dispatcher = _get_registry()
+            sonuc_str = dispatcher.ara(sorgu, engine="auto", max_sonuc=maks_sonuc)
         except Exception as _we:
-                self._web_hata = getattr(self, '_web_hata', 0) + 1
-                if self._web_hata >= 3:
-                    log.warning("Web arama 3 kez hata verdi - kalici olarak devre disi")
-                return None
+            self._web_hata = getattr(self, '_web_hata', 0) + 1
+            if self._web_hata >= 3:
+                log.warning("Web arama 3 kez hata verdi - kalici olarak devre disi")
+            return None
+
+        if not sonuc_str or sonuc_str.strip() in (
+            "", "Sonuc bulunamadi.", "[WEB_ARAMA] Kullanilabilir engine bulunamadi."
+        ):
+            self._web_hata = getattr(self, '_web_hata', 0) + 1
+            return None
+
+        # Circuit breaker basarili aramada sifirlanir
+        self._web_hata = 0
+        return sonuc_str
 
     # ══════════════════════════════════════════════════════════════════
     # YARDIMCI METODLAR — run_conversation

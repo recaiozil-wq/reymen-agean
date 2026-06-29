@@ -39,6 +39,9 @@ class ProviderPluginBase(abc.ABC):
     Attributes:
         name: Provider'in benzersiz adi (ornek: "openai", "postgresql").
         version: Provider surum numarasi.
+        _providers: Desteklenen provider adlari (get_providers() tarafindan
+                    donulur).
+        _active_provider: Su an aktif olan provider adi.
     """
 
     # ── Zorunlu sinif ozellikleri (override edilmelidir) ──────────────────
@@ -55,7 +58,11 @@ class ProviderPluginBase(abc.ABC):
         if not cls.version:
             raise TypeError(
                 f"{cls.__name__} must define a non-empty 'version' class attribute."
-        )
+            )
+
+    def __init__(self, config: dict | None = None) -> None:
+        self._providers: list[str] = []
+        self._active_provider: str | None = None
 
     # ── Zorunlu metotlar ──────────────────────────────────────────────────
 
@@ -91,10 +98,51 @@ class ProviderPluginBase(abc.ABC):
         """
         ...
 
+    # ── Provider listesi ve secimi ─────────────────────────────────────────
+
+    def get_providers(self) -> list[str]:
+        """Desteklenen provider adlarini dondur.
+
+        Returns:
+            Provider adi listesi (ornek: ["varsayilan", "gelismis"]).
+        """
+        return list(self._providers)
+
+    def set_provider(self, provider_name: str) -> bool:
+        """Aktif provider'i ayarla.
+
+        Args:
+            provider_name: Aktif edilecek provider adi.
+                          get_providers() tarafindan donulen adlardan biri
+                          olmalidir.
+
+        Returns:
+            Basarili ise True, gecersiz ad ise False.
+        """
+        if provider_name in self._providers:
+            self._active_provider = provider_name
+            logger.debug(
+                "[ProviderPluginBase] '%s' aktif provider: %s",
+                self.name, provider_name,
+            )
+            return True
+        logger.warning(
+            "[ProviderPluginBase] '%s' icin gecersiz provider: '%s'. "
+            "Secenekler: %s",
+            self.name, provider_name, self._providers,
+        )
+        return False
+
     # ── Opsiyonel yardimci metotlar ───────────────────────────────────────
 
     def __repr__(self) -> str:
-        return f"<{self.__class__.__name__} name={self.name!r} version={self.version!r}>"
+        active = self._active_provider or "(none)"
+        return (
+            f"<{self.__class__.__name__} name={self.name!r} "
+            f"version={self.version!r} active_provider={active!r}>"
+        )
 
     def __str__(self) -> str:
-        return f"{self.name} v{self.version}"
+        active = self._active_provider or ""
+        suffix = f" [{active}]" if active else ""
+        return f"{self.name} v{self.version}{suffix}"

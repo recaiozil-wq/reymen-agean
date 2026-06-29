@@ -290,10 +290,10 @@ def _cmd_plugin(args: argparse.Namespace) -> int:
         if not args.plugin_name:
             print("[Plugin] Plugin adi gerekli.")
             return 1
-        if yonetici.plugin_reload(args.plugin_name):
-            print(f"[Plugin] '{args.plugin_name}' yeniden yuklendi.")
+        if yonetici.hot_reload(args.plugin_name):
+            print(f"[Plugin] '{args.plugin_name}' hot-reload ile yeniden yuklendi.")
         else:
-            print(f"[Plugin] '{args.plugin_name}' yeniden yuklenemedi.")
+            print(f"[Plugin] '{args.plugin_name}' hot-reload ile yeniden yuklenemedi.")
 
     elif args.sub == "export":
         if not args.plugin_name:
