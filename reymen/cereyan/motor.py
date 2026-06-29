@@ -346,6 +346,8 @@ class Motor:
             "hafiza_genislet",
             # MCP Server Host (Streamable HTTP + Stdio)
             "reymen.core.mcp_server",
+            # Schema Manager (SQLite versiyonlama + idempotent CREATE)
+            "reymen.core.schema_manager",
             # ACP (Agent Communication Protocol)
             "acp_server",
             # A2A (Agent-to-Agent messaging)
