@@ -346,6 +346,8 @@ class Motor:
             "reymen.a2a_integration",
             # A2A Transport (HTTP/WS ag mesajlasmasi)
             "reymen.a2a_transport",
+            # A2A Distributed (config + otomatik baglanti)
+            "reymen.a2a_distributed",
             # TUI (Terminal UI - prompt_toolkit tabanli)
             "reymen.tui",
             # Web UI (FastAPI + HTMX yonetim paneli)

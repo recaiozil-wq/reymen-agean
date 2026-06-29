@@ -63,10 +63,19 @@ log_streamer = LogStreamer(LOG_DOSYASI)
 # ---------------------------------------------------------------------------
 
 def _get_user(token: Optional[str]) -> Optional[str]:
-    """Cookie'den kullanıcı adını çöz."""
+    """Cookie'den kullanıcı adını çöz (string döndürür)."""
     if not token:
         return None
-    return token_manager.verify(token)
+    data = token_manager.verify(token)
+    return data.get("user") if data else None
+
+
+def _get_role(token: Optional[str]) -> Optional[str]:
+    """Cookie'den kullanıcı rolünü çöz."""
+    if not token:
+        return None
+    data = token_manager.verify(token)
+    return data.get("role") if data else None
 
 
 def _require_auth(request: Request, token: Optional[str] = None) -> Optional[str]:
@@ -76,11 +85,17 @@ def _require_auth(request: Request, token: Optional[str] = None) -> Optional[str
         user = _get_user(request.cookies.get(token_manager.config.cookie_name))
     return user
 
+
+def _izin_kontrol(user: str, izin: str) -> bool:
+    """Kullanıcının belirli bir izni var mi?"""
+    return user_manager.has_permission(user, izin)
+
 # ---------------------------------------------------------------------------
 # Middleware — auth kontrolü
 # ---------------------------------------------------------------------------
 
-AUTH_ATLANACAK = {"/login", "/static", "/ws/logs", "/api/health"}
+AUTH_ATLANACAK = {"/login", "/static", "/ws/logs", "/api/health",
+                  "/docs", "/openapi.json", "/redoc"}
 
 
 @app.middleware("http")
@@ -96,7 +111,30 @@ async def auth_middleware(request: Request, call_next):
             return JSONResponse({"hata": "Yetkisiz"}, status_code=401)
         return RedirectResponse(url="/login")
     
+    role = _get_role(token)
     request.state.user = user
+    request.state.role = role or "viewer"
+
+    # Role-based API izin kontrolü
+    if path.startswith("/api/"):
+        # POST/PUT/DELETE işlemleri - operator+ gerektirir
+        if request.method in ("POST", "PUT", "DELETE"):
+            if role not in ("admin", "operator"):
+                return JSONResponse(
+                    {"hata": "Bu islem icin yetkiniz yok (operator/admin gerekli)"},
+                    status_code=403,
+                )
+        # Spesifik izin kontrolleri
+        if "gateway" in path and request.method == "POST":
+            if not _izin_kontrol(user, "gateway.baslat"):
+                return JSONResponse({"hata": "Gateway yonetim yetkiniz yok"}, status_code=403)
+        if "plugin" in path and request.method == "POST":
+            if not _izin_kontrol(user, "plugin.aktif_et"):
+                return JSONResponse({"hata": "Plugin yonetim yetkiniz yok"}, status_code=403)
+        if "user" in path:
+            if not _izin_kontrol(user, "user.ekle"):
+                return JSONResponse({"hata": "Kullanici yonetim yetkiniz yok"}, status_code=403)
+
     return await call_next(request)
 
 # ---------------------------------------------------------------------------
@@ -174,6 +212,13 @@ async def logs_sayfasi(request: Request):
 async def users_sayfasi(request: Request):
     return templates.TemplateResponse(
         request, "users.html", {}
+    )
+
+
+@app.get("/sandbox", response_class=HTMLResponse)
+async def sandbox_sayfasi(request: Request):
+    return templates.TemplateResponse(
+        request, "sandbox.html", {}
     )
 
 
@@ -363,13 +408,15 @@ async def api_plugins_tazele():
 async def api_users():
     """Kullanıcı listesi HTML tablosu."""
     kullanicilar = user_manager.list_users()
-    satirlar = ["<table><tr><th>#</th><th>Kullanıcı</th><th>İşlem</th></tr>"]
-    for i, k in enumerate(kullanicilar, 1):
+    satirlar = ['<table><tr><th>#</th><th>Kullanıcı</th><th>Rol</th><th>İşlem</th></tr>']
+    for i, u in enumerate(kullanicilar, 1):
+        username = u.get("username", "?")
+        role = u.get("role", "viewer")
         satirlar.append(
-            f"<tr><td>{i}</td><td>{k}</td>"
+            f"<tr><td>{i}</td><td>{username}</td><td>{role}</td>"
             f"<td><button class='btn btn-sm btn-danger' "
-            f"hx-post='/api/users/sil/{k}' hx-target='#sonuc' "
-            f"hx-confirm='{k} silinsin mi?'>🗑 Sil</button></td></tr>"
+            f"hx-post='/api/users/sil/{username}' hx-target='#sonuc' "
+            f"hx-confirm='{username} silinsin mi?'>🗙 Sil</button></td></tr>"
         )
     satirlar.append("</table>")
     return HTMLResponse(content="\n".join(satirlar))
@@ -377,19 +424,18 @@ async def api_users():
 
 @app.post("/api/users/ekle")
 async def api_users_ekle(request: Request):
-    """Yeni kullanıcı ekle."""
+    """Yeni kullanıcı ekle (admin/operator/viewer rolleriyle)."""
     form = await request.form()
     username = form.get("username", "").strip()
     password = form.get("password", "").strip()
+    role = form.get("role", "viewer").strip().lower()
     if not username or not password:
         return HTMLResponse(content="<div class='alert alert-error'>❌ Boş alan bırakma</div>")
     if len(password) < 4:
         return HTMLResponse(content="<div class='alert alert-error'>❌ Şifre en az 4 karakter</div>")
-    try:
-        user_manager.set_password(username, password)
-        return HTMLResponse(content=f"<div class='alert alert-success'>✅ {username} eklendi</div>")
-    except Exception as e:
-        return HTMLResponse(content=f"<div class='alert alert-error'>❌ {e}</div>")
+    ok, msg = user_manager.kullanici_ekle(username, password, role=role)
+    css = "success" if ok else "error"
+    return HTMLResponse(content=f"<div class='alert alert-{css}'>{'✅' if ok else '❌'} {msg}</div>")
 
 
 @app.post("/api/users/sifre")
@@ -400,13 +446,9 @@ async def api_users_sifre(request: Request):
     password = form.get("password", "").strip()
     if not username or not password:
         return HTMLResponse(content="<div class='alert alert-error'>❌ Boş alan bırakma</div>")
-    if username not in user_manager.list_users():
-        return HTMLResponse(content="<div class='alert alert-error'>❌ Kullanıcı bulunamadı</div>")
-    try:
-        user_manager.set_password(username, password)
-        return HTMLResponse(content=f"<div class='alert alert-success'>✅ {username} şifresi güncellendi</div>")
-    except Exception as e:
-        return HTMLResponse(content=f"<div class='alert alert-error'>❌ {e}</div>")
+    ok, msg = user_manager.set_password(username, password)
+    css = "success" if ok else "error"
+    return HTMLResponse(content=f"<div class='alert alert-{css}'>{'✅' if ok else '❌'} {msg}</div>")
 
 
 @app.post("/api/users/sil/{username}")
@@ -897,6 +939,106 @@ async def api_gateway_sms_gonder(request: Request):
         return HTMLResponse(content=f"<div class='alert alert-error'>❌ {sonuc.get('hata', '?')}</div>")
     except Exception as e:
         return HTMLResponse(content=f"<div class='alert alert-error'>❌ Hata: {e}</div>")
+
+
+# ---------------------------------------------------------------------------
+# API — Sandbox
+# ---------------------------------------------------------------------------
+
+from reymen.web_ui.sandbox import yonetici as sandbox_yoneticisi
+
+
+@app.get("/api/sandbox")
+async def api_sandbox():
+    """Sandbox listesi HTML tablosu."""
+    sandboxlar = sandbox_yoneticisi.listele(limit=30)
+    if not sandboxlar:
+        return HTMLResponse(content="<div class='gri'>Henüz sandbox yok</div>")
+
+    satirlar = ["<table><tr><th>ID</th><th>Durum</th><th>Exit</th><th>Süre</th><th>İşlem</th></tr>"]
+    for sb in sandboxlar:
+        durum = sb["durum"]
+        dot = "🟢" if durum == "basarili" else "🔴" if durum in ("hata", "zamanasimi") else "🟡"
+        satirlar.append(
+            f"<tr><td>{sb['id']}</td>"
+            f"<td>{dot} {durum}</td>"
+            f"<td>{sb['exit_code']}</td>"
+            f"<td>{sb['sure_sn']}s</td>"
+            f"<td><button class='btn btn-sm' hx-get='/api/sandbox/{sb['id']}' "
+            f"hx-target='#sandbox-detay'>🔍</button></td></tr>"
+        )
+    satirlar.append("</table>")
+    return HTMLResponse(content="\n".join(satirlar))
+
+
+@app.get("/api/sandbox/{sandbox_id}")
+async def api_sandbox_detay(sandbox_id: str):
+    """Tek sandbox detayi."""
+    sb = sandbox_yoneticisi.get(sandbox_id)
+    if not sb:
+        return HTMLResponse(content="<div class='alert alert-error'>Sandbox bulunamadi</div>")
+    r = sb.rapor()
+    satirlar = [
+        f"<div class='kart'><table>"
+        f"<tr><td>ID</td><td>{r['id']}</td></tr>"
+        f"<tr><td>Durum</td><td>{r['durum']}</td></tr>"
+        f"<tr><td>Exit Code</td><td>{r['exit_code']}</td></tr>"
+        f"<tr><td>Süre</td><td>{r['sure_sn']}s</td></tr>"
+        f"<tr><td>Dizin</td><td class='gri'>{r['dizin']}</td></tr>"
+        f"<tr><td>Çıktı</td><td><pre style='max-height:200px'>{r.get('cikti', '')[:1000]}</pre></td></tr>"
+    ]
+    if r.get("hata"):
+        satirlar.append(f"<tr><td>Hata</td><td><pre class='tag-no'>{r['hata'][:500]}</pre></td></tr>")
+    satirlar.append("</table></div>")
+    return HTMLResponse(content="\n".join(satirlar))
+
+
+@app.post("/api/sandbox/calistir")
+async def api_sandbox_calistir(request: Request):
+    """Sandbox'da komut çalıştır."""
+    form = await request.form()
+    dil = form.get("dil", "python")
+    kod = form.get("kod", "").strip()
+
+    if not kod:
+        return HTMLResponse(content="<div class='alert alert-error'>❌ Kod gerekli</div>")
+
+    sb = sandbox_yoneticisi.yeni()
+
+    if dil == "python":
+        sb.dosya_yaz("script.py", kod)
+        sonuc = sb.calistir([sys.executable, "script.py"])
+    elif dil == "shell":
+        sb.dosya_yaz("script.sh", kod)
+        # Windows'da bash yoksa cmd ile dene
+        shell_komut = ["bash", "script.sh"] if sys.platform != "win32" else ["cmd", "/c", kod]
+        sonuc = sb.calistir(shell_komut)
+    else:
+        return HTMLResponse(content=f"<div class='alert alert-error'>❌ Bilinmeyen dil: {dil}</div>")
+
+    cikti = sonuc.get("cikti", "")[:2000]
+    hata = sonuc.get("hata", "")[:500]
+    durum = sonuc["durum"]
+    dot = "🟢" if durum == "basarili" else "🔴"
+    sure = sonuc["sure_sn"]
+
+    html = [
+        f"<div class='alert alert-{'success' if durum == 'basarili' else 'error'}'>"
+        f"{dot} {durum} (exit: {sonuc['exit_code']}, {sure}s) — ID: {sb.id}</div>",
+    ]
+    if cikti:
+        html.append(f"<pre style='max-height:300px'>{cikti}</pre>")
+    if hata:
+        html.append(f"<pre class='tag-no'>{hata}</pre>")
+
+    return HTMLResponse(content="\n".join(html))
+
+
+@app.post("/api/sandbox/temizle")
+async def api_sandbox_temizle():
+    """Tüm sandbox'lari temizle."""
+    say = sandbox_yoneticisi.temizle_hepsi()
+    return HTMLResponse(content=f"<div class='alert alert-success'>🧹 {say} sandbox temizlendi</div>")
 
 
 # ---------------------------------------------------------------------------

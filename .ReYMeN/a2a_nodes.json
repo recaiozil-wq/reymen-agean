@@ -1,0 +1,10 @@
+{
+  "nodes": [
+    {
+      "name": "localhost",
+      "url": "http://localhost:9100",
+      "agent_id": "reymen_local"
+    }
+  ],
+  "heartbeat_interval": 30
+}
