@@ -26,6 +26,9 @@ from collections import deque
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Callable
+import logging
+
+logger = logging.getLogger(__name__)
 
 __all__ = [
     "MessageType",
@@ -155,7 +158,7 @@ class Broker:
         if handler is not None:
             try:
                 handler(message)
-            except Exception:
+            except Exception as _e:
                 pass  # Handler hatası mesaj akışını bozmamalı
 
     def broadcast(self, sender: str, content: Any, *, exclude: set[str] | None = None) -> list[str]:

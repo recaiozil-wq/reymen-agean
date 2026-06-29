@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Sandbox — ReYMeN Web UI{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2>🏖️ Sandbox — İzole Kod Çalıştırma</h2>
+    <button class="btn btn-danger" hx-post="/api/sandbox/temizle" hx-target="#sandbox-sonuc">🧹 Tümünü Temizle</button>
+</div>
+<div id="sandbox-sonuc" class="sonuc-alani"></div>
+
+<div class="grid-2">
+    <div class="kart">
+        <h2>▶️ Kod Çalıştır</h2>
+        <form hx-post="/api/sandbox/calistir" hx-target="#calistir-sonuc">
+            <div class="form-group">
+                <select name="dil">
+                    <option value="python">🐍 Python</option>
+                    <option value="shell">🐚 Shell (bash)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <textarea name="kod" rows="8" placeholder="Kodunu yaz..." required style="width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:8px;font-family:monospace;font-size:0.85rem"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">▶ Çalıştır</button>
+        </form>
+    </div>
+    <div class="kart">
+        <h2>📋 Geçmiş Sandbox'lar</h2>
+        <div hx-get="/api/sandbox" hx-trigger="load, every 10s" hx-swap="innerHTML">
+            Yükleniyor...
+        </div>
+    </div>
+</div>
+
+<div id="calistir-sonuc" class="sonuc-alani"></div>
+<div id="sandbox-detay"></div>
+
+{% endblock %}

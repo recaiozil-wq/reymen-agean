@@ -1,0 +1,2 @@
+[50/3000] B:50 H:0 | 25 soru/dk | kalan: 120dk
+[100/3000] B:100 H:0 | 24 soru/dk | kalan: 121dk

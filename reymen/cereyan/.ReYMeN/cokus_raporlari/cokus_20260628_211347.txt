@@ -1,0 +1,52 @@
+============================================================
+🚨 [OTONOM SISTEM COKUS / TAHLIYE RAPORU] 🚨
+============================================================
+Kritik Zaman Dilimi    : 2026-06-28 21:13:47
+Basarisiz Olunan Gorev : test mesaj (ignored)
+
+[Referanslar]
+  - {\"anahtar\": \"onay_sureci_tamamlandi_20260621\", \"deger\": \"ReYMeN onay süreci başarıyla tamamlandı. Drift düzeltmesi, example.com verisi kaydı ve izleme mekanizması doğrulandı. Tüm sistem normal çalışıyor.\", \"etiketler\": [\"onay\", \"tamamlandi\", \"sistem_durumu\"]}: 
+  - anahtar: drift_duzeltme_onayi_20260623, deger: ReYMeN hafıza drift düzeltmesi başarıyla tamamlandı ve onaylandı. Example.com verisi kaydedildi (tek kopya). İzleme mekanizması aktif (24 saat). Tüm tekrarlar temizlendi ve sistem optimize edildi., etiketler: onay, drift_duzeltme, basarili, tamam: 
+  - {\"anahtar\": \"drift_duzeltme_plani_onay\", \"deger\": \"Kullanici tarafindan onaylanan drift duzeltme plani: 1) TEKRAR_EDEN_GRS - veri sil, 2) ASIRI_TEKRAR - gorev sil, 3) TAMAMLANMAMIS_GOREV - birlestir, 4) BIRLESTIR - birlestir, 5) TEMIZLE - temizle. TUM SORUNLAR COZULDU.\", \"etiketler\": [\"onay\", \"drift_duzeltme\", \"plan\"]}: 
+Toplam Tuketilen Dongu : 90 Tur
+
+Sistem, otonom problem cozme sinirlarina ulasmis ve
+kritik kilitlenme yasamistir. Donem icinde devreye alinan
+tum uzman yapay zeka personalari basarisiz olmustur.
+
+------------------------------------------------------------
+🔍 [KRONOLOJIK HATA VE ADAPTASYON GECMISI]
+------------------------------------------------------------
+  [1] FC/HAFIZA_ARA: - 2
+
+[Referanslar]
+  - {\"anahtar\": \"onay_sureci_tamamlandi_20260621\", \"dege
+
+------------------------------------------------------------
+🧠 [GOREV SURESINCE DENENEN AJANLAR]
+------------------------------------------------------------
+genel_cozucu
+
+------------------------------------------------------------
+⚠️  [OLUMCUL KILITLENME NOKTASI (KOK NEDEN)]
+------------------------------------------------------------
+Son gozlem: - 2
+
+[Referanslar]
+  - {\"anahtar\": \"onay_sureci_tamamlandi_20260621\", \"deger\": \"ReYMeN onay süreci başarıyla tamamlandı. Drift düzeltmesi, example.com verisi kaydı ve izleme mekanizması doğrula
+
+============================================================
+🚨 KULLANICI ACIL MUDAHALE VE GOREV DEVRİ PROTOKOLU
+============================================================
+Otonom dongunun tiklanma noktasi yukarida teshis edilmistir.
+Sistemin kendini guncelleyerek genisleyebilmesi adina:
+
+  1. Yukaridaki verileri inceleyin
+  2. Bir COZUM ONERISI hazirlayin
+  3. Cozum onerisini sisteme YENI BIR GOREV olarak iletin
+  4. Ornek: "Su adimlari izle, su bagimliligi duzelt ve tekrar dene"
+
+Iletilen bu girdi, 'Yetenek Fabrikasi' tarafindan kalici bir
+sablon beceriye donusturulecek ve gelecekte benzer hatalarla
+karsilasildiginda otonom olarak kullanilacaktir.
+============================================================

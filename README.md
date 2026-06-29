@@ -1,161 +1,252 @@
-<p align="center">
-  <img src="https://img.shields.io/badge/Python-3.11%2B-blue?logo=python" alt="Python">
-  <img src="https://img.shields.io/badge/License-MIT-green" alt="MIT">
-  <img src="https://img.shields.io/badge/Windows-10%2B-0078D6?logo=windows" alt="Windows">
-  <img src="https://img.shields.io/badge/Platform-CLI%20%7C%20Telegram%20%7C%20Web-blueviolet" alt="Platform">
-  <img src="https://img.shields.io/badge/Test%20Status-137%20passed-brightgreen" alt="Tests">
-</p>
+# 🤖 ReYMeN — Otonom Görev Çözücü
 
-<h1 align="center">🧠 ReYMeN — Otonom Yapay Zeka Ajanı</h1>
-<p align="center">
-  <b>Türkçe | Açık Kaynak | Windows Odaklı</b><br>
-  Kendi kendine öğrenen, araç kullanan, hatalardan ders çıkaran otonom yazılım ajanı.
-</p>
+**Türkçe yapay zeka asistanı.** Çoklu-provider LLM katmanı, araç çağrı motoru, kapalı öğrenme döngüsü ve A2A mesajlaşma ile kendi kendini geliştiren otonom bir sistem.
+
+![Python](https://img.shields.io/badge/Python-3.11+-blue)
+![License](https://img.shields.io/badge/License-MIT-green)
+![Version](https://img.shields.io/badge/Version-0.9.0-orange)
 
 ---
 
-## 🚀 Nedir?
+## 📦 Özellikler
 
-**ReYMeN**, yapay zeka asistanlarını tek bir merkezden yönetmek için geliştirilmiş **açık kaynak bir platformdur.** Hermes Agent tabanlıdır, Türkçe dil desteği ile Windows odaklı çalışır.
-
-Telegram botları, CLI, web arayüzü ve daha fazlasını tek merkezden yönetir. Hatalardan öğrenir, kendini geliştirir ve tekrarlayan işleri otomatikleştirir.
-
----
-
-## ✨ Özellikler
-
-### 🤖 Çoklu Bot Yönetimi
-- **3 Telegram botu** aynı anda çalıştır
-- CLI, web UI ve mesaj platformlarından erişim
-- Fan-out: tek mesajı tüm botlara gönder
-
-### 🧠 Akıllı Öğrenme
-- **OnceHafiza**: Hatalardan öğrenir, aynı hata tekrarlanmaz
-- **Otonom Görev Çözücü**: Karmaşık işlemleri adım adım planlar ve yürütür
-- **7+ Yapay Zeka Sağlayıcı**: DeepSeek, OpenAI, Anthropic, Groq, OpenRouter ve daha fazlası
-
-### 🛠️ 100'den Fazla Araç
-| Kategori | Araçlar |
-|----------|---------|
-| 📁 Dosya | Okuma, yazma, düzenleme, arama, bulk replace |
-| 🌐 Web | Sayfa çekme, arama, Firecrawl entegrasyonu |
-| 🎵 Ses | TTS (sesli okuma), STT (ses tanıma) |
-| 🖼️ Görsel | FAL.ai FLUX ile görsel üretme |
-| 🎬 Video | yt-dlp ile indirme, ffmpeg ile dönüştürme |
-| 💻 Terminal | Shell komutları, Python çalıştırma |
-| 🔧 Kod | Syntax kontrol, otomatik düzeltme |
-
-### 📊 Yönetim Araçları
-- **Kanban**: Görevleri kartlarla takip et
-- **Cost Tracker**: API harcamalarını izle
-- **Self-Improvement**: Kalite metriklerini ölç, iyileştir
-- **A2A**: Botlar arası mesajlaşma
-
-### 🔌 Gelişmiş
-- **MCP İstemci/Sunucu**: Harici MCP araçlarını keşfet ve kullan
-- **FTS5 Session Search**: Geçmiş konuşmalarda anında arama
-- **Kali/WSL Entegrasyonu**: Linux araçlarını Windows'tan kullan
-- **Docker Desteği**: Container ile taşınabilir dağıtım
+| Özellik | Açıklama |
+|---------|----------|
+| 🧠 **Çoklu LLM** | DeepSeek, OpenAI, Anthropic, Gemini, Groq, LM Studio, Ollama, OpenRouter — 12+ provider |
+| 🛠️ **Araç Çağrı Sistemi** | 100+ araç: dosya, terminal, web, tarayıcı, görsel, video, ses |
+| 🔄 **A2A Mesajlaşma** | Agent'lar arası thread-safe kuyruk tabanlı iletişim |
+| 🧩 **Hook Sistemi** | 8 olay tipi (session/tur/araç/hata/context) |
+| 📊 **Kanban** | Kart/kolon/öncelik/deadline yönetimi, WIP limit |
+| 💰 **Cost Tracking** | SQLite tabanlı API harcama takibi |
+| 🎬 **Video Araçları** | yt-dlp + ffmpeg wrapper |
+| 🌐 **Web UI** | FastAPI + HTMX yönetim paneli |
+| 🔐 **Güvenlik** | Guardrails, sandbox, PII redaction, path doğrulama |
+| 🧠 **Hafıza** | OnceHafıza (vektör), FTS5 session search, context compression |
+| 📈 **Self-Improvement** | Kalite metrikleri, trend analizi, otomatik iyileştirme |
 
 ---
 
-## 📦 Kurulum (Windows)
-
-**Gereksinimler:** Python 3.11+, Git, Windows 10/11
-
-### Otomatik Kurulum (Önerilen)
-```powershell
-# 1. Repoyu klonla
-git clone https://github.com/Watcher-Hermes/ReYMeN-Ajan-v2.git
-cd ReYMeN-Ajan-v2
-
-# 2. Kurulum script'ini çalıştır (her şeyi otomatik kurar)
-kurulum.bat
-```
-Script şunları otomatik kurar: Python, Git, VS Code, WSL, ffmpeg, yt-dlp, tüm Python paketleri.
-
-### Manuel Kurulum
-```powershell
-python -m venv venv
-venv\Scripts\activate
-pip install -r requirements.txt
-```
-
-### ⚙️ Yapılandırma
-`.env` dosyası oluştur, API anahtarlarını ekle:
-```env
-DEEPSEEK_API_KEY=sk-...
-TELEGRAM_BOT_TOKEN=...
-```
-
----
-
-## 🚀 Kullanım
-
-```bash
-# CLI ile başlat
-python reymen_launcher.py
-
-# Modül olarak çalıştır
-python -m reymen
-
-# MCP sunucu başlat
-python -m reymen.core.mcp_server --transport http --port 9000
-
-# Görev çöz
-python -c "from reymen.cereyan.motor import Motor; m = Motor(); m.gorev_coz('.ReYMeN/gorev_cozucu_sistemi.md')"
-```
-
----
-
-## 📁 Proje Yapısı
+## 🏗️ Mimari
 
 ```
 reymen/
-├── arac/          # 🛠️ Araçlar (web, dosya, ses, görsel, terminal...)
-├── cereyan/       # 🧠 Ana işlem döngüsü ve öğrenme
-├── core/          # ⚙️ Çekirdek (model adapter, MCP, session search)
-├── sistem/        # 🔧 Sistem yönetimi (CLI, gateway, config)
-├── guvenlik/      # 🔒 Güvenlik (redact, guardrails, sandbox)
-├── hafiza/        # 💾 Hafıza sistemleri
-└── scripts/       # 📜 Yardımcı script'ler
+├── a2a.py                  # A2A mesajlaşma (Broker + Agent)
+├── cli.py                  # Görev 7 CLI
+├── cost_tracker.py         # API harcama takibi
+├── kanban.py               # Kanban Board + Worker
+├── platform_adapter.py     # WSL/Kali path çevirici
+├── self_improve.py         # Kalite metrikleri
+├── tui.py                  # Rich TUI (status bar, spinner)
+├── video_tools.py          # yt-dlp + ffmpeg
+├── web_ui.py               # FastAPI web paneli
+│
+├── ag/                     # Gateway & ACP
+├── arac/                   # Araç katmanı (100+ araç)
+├── cereyan/                # Ana işlem katmanı
+│   ├── conversation_loop.py    # Konuşma döngüsü
+│   ├── motor.py                # Eylem motoru
+│   ├── beyin.py                # LLM bağlantı katmanı
+│   ├── hook_dispatcher.py      # Olay/hook sistemi
+│   ├── broker.py               # Mesaj broker
+│   └── closed_learning_loop.py # Kapalı öğrenme döngüsü
+├── core/                   # Çekirdek modüller
+│   ├── model_adapter.py    # Model adapter (Ollama, OpenAI, Anthropic)
+│   ├── orchestrator.py     # Görev orkestratörü
+│   ├── ogrenme.py          # Hata→çözüm hafızası
+│   ├── mcp_server.py       # MCP sunucusu
+│   └── session_search.py   # FTS5 session arama
+├── guvenlik/               # Güvenlik katmanı
+├── hafiza/                 # Hafıza katmanı
+├── sistem/                 # CLI, agent lifecycle, sistem yönetimi
+└── windows/                # Windows otomasyon araçları
 ```
 
 ---
 
-## 🧪 Testler
+## 🚀 Kurulum
+
+### Gereksinimler
+
+- Python 3.11+
+- pip / venv
+
+### Adımlar
 
 ```bash
-python -m pytest tests/ -v
+# 1. Depoyu klonla
+git clone https://github.com/Q/reymen.git
+cd reymen
+
+# 2. Sanal ortam oluştur
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# veya Windows: venv\Scripts\activate
+
+# 3. Bağımlılıkları yükle
+pip install -r requirements.txt
+
+# 4. Playwright (tarayıcı otomasyonu için)
+pip install playwright
+playwright install chromium
+
+# 5. Ortam değişkenlerini ayarla
+cp .env.example .env
+# .env dosyasını düzenle: API key'lerini gir
 ```
 
-Test durumu: **137 passed** ✅
+### Ortam Değişkenleri
+
+| Değişken | Zorunlu | Açıklama |
+|----------|---------|----------|
+| `DEEPSEEK_API_KEY` | Evet | DeepSeek API anahtarı |
+| `OPENAI_API_KEY` | Hayır | OpenAI API anahtarı |
+| `ANTHROPIC_API_KEY` | Hayır | Anthropic Claude API anahtarı |
+| `REYMEN_MODEL` | Hayır | Varsayılan model (deepseek-v4-flash) |
+| `FAL_KEY` | Hayır | FAL.ai görsel oluşturma |
+| `CONTEXT_ESIK` | Hayır | Context sıkıştırma eşiği (0.50) |
 
 ---
 
-## 🤝 Katkıda Bulunma
+## 🎮 Kullanım
 
-1. Fork et
-2. `feature/xyz` branch'i aç
-3. Değişikliklerini yap
-4. Testleri çalıştır: `python -m pytest tests/`
-5. PR gönder
+### CLI Modu
 
-Detaylı rehber: [CONTRIBUTING.md](CONTRIBUTING.md)
+```bash
+# Interaktif CLI başlat
+python -m reymen
+
+# Durum kontrolü
+python -m reymen status
+
+# Maliyet görüntüle
+python -m reymen cost
+
+# Kalite raporu
+python -m reymen quality
+
+# Kanban yönetimi
+python -m reymen kanban
+
+# Video indirme
+python -m reymen video download <url>
+
+# A2A mesajlaşma testi
+python -m reymen a2a
+```
+
+### Python API
+
+```python
+from reymen.a2a import Broker, Agent, Message
+
+broker = Broker()
+alice = Agent("alice", broker)
+bob = Agent("bob", broker)
+
+alice.send("bob", "Merhaba!")
+msg = bob.receive()
+print(msg.content)  # Merhaba!
+```
+
+### Web UI
+
+```bash
+python -m reymen web
+# http://localhost:8080 adresinde açılır
+```
 
 ---
 
-## 📜 Lisans
+## 🧩 Araç Kataloğu
 
-**MIT License** — Copyright (c) 2025 Nous Research (Hermes Agent) · 2026 Marko_Pasa_38 (ReYMeN Agent)
-
-Hermes Agent tabanlıdır. Orijinal lisans korunmuştur.
+| Kategori | Araçlar |
+|----------|---------|
+| 🌐 **Tarayıcı** | BROWSER_HEADLESS, BROWSER_FILL, BROWSER_CLICK, BROWSER_WAIT, BROWSER_SELECT, BROWSER_SNAPSHOT, BROWSER_HTML, BROWSER_SCROLL, BROWSER_TABS, BROWSER_NEW_TAB, BROWSER_BACK/FORWARD, BROWSER_HOVER |
+| 📁 **Dosya** | DOSYA_OKU, DOSYA_YAZ, DOSYA_SIL, DOSYA_KOPYALA, DOSYA_TAŞI |
+| 💻 **Terminal** | KOMUT_CALISTIR, PYTHON_CALISTIR, SHELL_SCRIPT |
+| 🌍 **Web** | WEB_ARA, WEB_EXTRACT, SCREEN_SCRAPE |
+| 🖼️ **Görsel** | RESIM_OLUSTUR (FAL), VISION_ANALIZ, EKRAN_GORUNTUSU |
+| 🎵 **Ses** | SES_KAYDET, SES_OKU, TTS_SOYLE |
+| 🎬 **Video** | VIDEO_INDIR, VIDEO_DONUSTUR, VIDEO_KES, SES_CIKAR |
+| 📊 **Kanban** | KART_OLUSTUR, KART_LISTELE, KART_TAMAMLA, KART_ENGELLE |
+| 🔐 **Güvenlik** | ONAY_ISTE, GUVENLI_KONTROL, PII_TEMIZLE |
+| 🔄 **Sistem** | SUPERVISOR_RAPOR, HATA_COZ, OGREN, DURUM |
 
 ---
 
-<p align="center">
-  <b>🇹🇷 Türk geliştiriciler için açık kaynak yapay zeka platformu</b><br>
-  <a href="https://github.com/Watcher-Hermes/ReYMeN-Ajan-v2">GitHub</a> •
-  <a href="https://github.com/Watcher-Hermes/ReYMeN-Ajan-v2/blob/main/CONTRIBUTING.md">Katkı Rehberi</a> •
-  <a href="https://github.com/Watcher-Hermes/ReYMeN-Ajan-v2/blob/main/LICENSE">Lisans</a>
-</p>
+## 🔌 Entegrasyonlar
+
+| Servis | Tür | Açıklama |
+|--------|-----|----------|
+| **DeepSeek** | LLM | Varsayılan model sağlayıcı |
+| **OpenAI** | LLM | GPT-4o / GPT-4o-mini |
+| **Anthropic** | LLM | Claude 3.5 Sonnet / Haiku |
+| **Google Gemini** | LLM | Gemini 1.5 Pro / Flash |
+| **LM Studio** | Lokal LLM | Localhost API |
+| **Ollama** | Lokal LLM | Localhost API |
+| **OpenRouter** | LLM | Çoklu model yönlendirme |
+| **FAL.ai** | Görsel | Resim oluşturma + vision |
+| **yt-dlp** | Video | Video indirme |
+| **ffmpeg** | Medya | Dönüştürme/kırpma |
+| **Playwright** | Tarayıcı | Headless browser otomasyonu |
+| **MCP** | Protokol | Model Context Protocol sunucusu |
+
+---
+
+## 🧪 Test
+
+```bash
+# Tüm testler
+python -m pytest tests/
+
+# Belirli modül
+python -m pytest tests/test_a2a.py -v
+python -m pytest tests/test_hook_dispatcher.py -v
+
+# Coverage
+python -m pytest --cov=reymen tests/
+```
+
+---
+
+## 📚 Dokümantasyon
+
+- [API Referansı](docs/API.md) — Modül ve sınıf dokümantasyonu
+- [Değişiklik Günlüğü](CHANGELOG.md)
+- [Katkı Rehberi](CONTRIBUTING.md)
+
+---
+
+## 🛣️ Yol Haritası
+
+- [x] Çoklu LLM provider desteği
+- [x] Araç çağrı sistemi (100+ araç)
+- [x] A2A mesajlaşma prototipi
+- [x] Hook/olay sistemi
+- [x] Kanban board
+- [x] Web UI
+- [x] MCP Server
+- [x] Hata→çözüm öğrenme
+- [x] Tarayıcı otomasyonu
+- [ ] Çoklu agent orchestration
+- [ ] Dağıtık A2A (HTTP transport)
+- [ ] Görsel hafıza (multimodal log)
+- [ ] Eklenti/plugin marketi
+
+---
+
+## ⚖️ Lisans
+
+MIT License — bakınız [LICENSE](LICENSE)
+
+---
+
+## 🤝 Katkı
+
+Pull request'ler açıktır. Büyük değişikliklerden önce lütfen issue açın.
+
+```bash
+# Geliştirme kurulumu
+pip install -r requirements-dev.txt
+pre-commit install
+```

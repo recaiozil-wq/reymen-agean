@@ -34,6 +34,8 @@ logger = logging.getLogger(__name__)
 
 _FAL_RUN_URL = "https://api.fal.ai/v1/run/comfyhub/flux-1-1-pro"
 _FAL_VISION_URL = "https://api.fal.ai/v1/run/fal-ai/llavav15-13b"
+_OR_VISION_URL = "https://openrouter.ai/api/v1/chat/completions"
+_OR_VISION_MODEL = "meta-llama/llama-3.2-11b-vision-instruct"
 _OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434").rstrip("/")
 
 
@@ -67,6 +69,47 @@ def _kaynak_to_data_url(yol_veya_url: str) -> str:
     return f"data:{mime};base64,{base64.b64encode(veri).decode()}"
 
 
+# ── OpenRouter Görsel Üretim Fallback ──────────────────────────────
+
+_OR_IMAGE_URL = "https://openrouter.ai/api/v1/chat/completions"
+_OR_IMAGE_MODEL = "openai/dall-e-3"
+
+
+def _resim_openrouter_fallback(prompt: str, en: str = "1024", boy: str = "1024") -> str:
+    """OpenRouter uzerinden gorsel uret (FAL_KEY yoksa)."""
+    api_key = os.environ.get("OPENROUTER_API_KEY", "").strip()
+    if not api_key:
+        return ("[RESIM_OLUSTUR] Hata: FAL_KEY/FAL_API_KEY/OPENROUTER_API_KEY "
+                "tanimli degil. Gorsel uretim icin bir API anahtari gerekli.")
+
+    try:
+        size = f"{en}x{boy}"
+        payload = {
+            "model": _OR_IMAGE_MODEL,
+            "messages": [
+                {"role": "user", "content": f"Generate an image: {prompt}"}
+            ],
+        }
+        sonuc = _http_post_json(
+            _OR_IMAGE_URL,
+            payload,
+            headers={"Authorization": f"Bearer {api_key}",
+                      "HTTP-Referer": "https://github.com/Watcher-Hermes/ReYMeN-Ajan"},
+            timeout=90,
+        )
+        # OpenAI uyumlu yanıt
+        choices = sonuc.get("choices", [])
+        if choices:
+            msg = choices[0].get("message", {})
+            content = msg.get("content", "")
+            if content:
+                return _media("image", content, f"Prompt: {prompt}")
+        return f"[RESIM_OLUSTUR] OpenRouter yanit alinamadi: {json.dumps(sonuc)[:300]}"
+    except Exception as e:
+        logger.error("[RESIM_OLUSTUR] OpenRouter fallback hatasi: %s", e)
+        return f"[RESIM_OLUSTUR] Hata: FAL ve OpenRouter basarisiz: {e}"
+
+
 # ── RESIM_OLUSTUR ─────────────────────────────────────────────────────
 
 def resim_olustur(prompt: str, en: str = "1024", boy: str = "1024") -> str:
@@ -76,8 +119,10 @@ def resim_olustur(prompt: str, en: str = "1024", boy: str = "1024") -> str:
 
     api_key = os.environ.get("FAL_KEY", "").strip()
     if not api_key:
-        return ("[RESIM_OLUSTUR] Hata: FAL_KEY ortam değişkeni tanımlı değil. "
-                "https://fal.ai üzerinden anahtar alıp FAL_KEY olarak ayarlayın.")
+        api_key = os.environ.get("FAL_API_KEY", "").strip()
+    if not api_key:
+        # OpenRouter fallback dene
+        return _resim_openrouter_fallback(prompt.strip(), en, boy)
 
     try:
         en_i, boy_i = int(en), int(boy)
@@ -119,6 +164,8 @@ def vision_analiz(kaynak: str, soru: str = "Bu görselde ne var, detaylı açık
 
     api_key = os.environ.get("FAL_KEY", "").strip()
     if not api_key:
+        api_key = os.environ.get("FAL_API_KEY", "").strip()
+    if not api_key:
         return _ollama_fallback(kaynak, soru, neden="FAL_KEY tanımlı değil")
 
     try:
@@ -139,8 +186,40 @@ def vision_analiz(kaynak: str, soru: str = "Bu görselde ne var, detaylı açık
 
 
 def _ollama_fallback(kaynak: str, soru: str, neden: str = "") -> str:
-    sonuc = goruntu_analiz(kaynak, soru)
-    return f"[VISION_ANALIZ] FAL kullanılamadı ({neden}); Ollama LLaVA'ya düşüldü:\n{sonuc}"
+    """Fallback: OpenRouter vision API (Ollama kaldirildigi icin)."""
+    if neden:
+        logger.warning("[VISION] FAL basarisiz: %s → OpenRouter deneniyor", neden)
+    api_key = os.environ.get("OPENROUTER_API_KEY", "").strip()
+    if not api_key:
+        return f"[VISION] Görsel analizi icin OPENROUTER_API_KEY gerekli."
+    try:
+        if kaynak.startswith(("http://", "https://")):
+            with urllib.request.urlopen(kaynak, timeout=30) as r:
+                veri = r.read()
+        else:
+            with open(kaynak, "rb") as f:
+                veri = f.read()
+        b64 = base64.b64encode(veri).decode()
+        mime = mimetypes.guess_type(kaynak)[0] or "image/jpeg"
+        payload = {
+            "model": _OR_VISION_MODEL,
+            "messages": [{"role": "user", "content": [
+                {"type": "text", "text": soru},
+                {"type": "image_url", "image_url": {"url": f"data:{mime};base64,{b64}"}}
+            ]}],
+            "max_tokens": 1024,
+        }
+        req = urllib.request.Request(
+            _OR_VISION_URL, data=json.dumps(payload).encode(),
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json",
+                     "HTTP-Referer": "https://github.com/Watcher-Hermes/ReYMeN-Ajan"},
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=60) as r:
+            cevap = json.loads(r.read().decode())
+        return cevap.get("choices", [{}])[0].get("message", {}).get("content", "") or "Görsel analiz edilemedi."
+    except Exception as e:
+        return f"[VISION] OpenRouter hatasi: {e}"
 
 
 # ── GORUNTU_ANALIZ (Ollama LLaVA — yerel/offline fallback) ───────────

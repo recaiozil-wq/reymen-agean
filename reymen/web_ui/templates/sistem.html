@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Sistem — ReYMeN Web UI{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2>🖥️ Sistem Yönetimi</h2>
+</div>
+<div class="grid-2">
+    <div class="kart">
+        <h2>❤️ Sistem Sağlığı</h2>
+        <div id="sistem-saglik" hx-get="/api/sistem/saglik" hx-trigger="load, every 30s" hx-swap="innerHTML">
+            Yükleniyor...
+        </div>
+    </div>
+    <div class="kart">
+        <h2>ℹ️ Sistem Bilgisi</h2>
+        <div id="sistem-bilgi" hx-get="/api/sistem/bilgi" hx-trigger="load" hx-swap="innerHTML">
+            Yükleniyor...
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -34,7 +34,7 @@ def main():
                 if "shell=False" in line:
                     rapor["shell_true"].append(f"{f.relative_to(kok)}:{i}  {line.strip()[:80]}")
                     err(f"{f.relative_to(kok)}:{i}")
-        except Exception:  # nosec
+        except Exception as _e:
             pass  # TODO: log ekle
     if not rapor["shell_true"]: ok("shell=False bulunamadı")
 
@@ -47,7 +47,7 @@ def main():
                 if hp.search(line) and "os.environ" not in line and "getenv" not in line:
                     rapor["credential_leak"].append(f"{f.relative_to(kok)}:{i}")
                     warn(f"{f.relative_to(kok)}:{i}")
-        except Exception:  # nosec
+        except Exception as _e:
             pass  # TODO: log ekle
     if not rapor["credential_leak"]: ok("Hardcoded credential yok")
 
@@ -60,7 +60,7 @@ def main():
                 if sqlp.search(line):
                     rapor["sql_risk"].append(f"{f.relative_to(kok)}:{i}")
                     warn(f"SQL: {f.relative_to(kok)}:{i}")
-        except Exception:  # nosec
+        except Exception as _e:
             pass  # TODO: log ekle
     if not rapor["sql_risk"]: ok("SQL riski yok")
 

@@ -136,7 +136,7 @@ def asama2_mimari(kok):
             txt=f.read_text(encoding="utf-8",errors="ignore")
             if re.search(r"^import cereyan\b|^from cereyan\b",txt,re.MULTILINE):
                 eski_import.append(str(f.relative_to(kok)))
-        except Exception:  # nosec
+        except Exception as _e:
             pass  # TODO: log ekle
     if eski_import:
         warn(f"Eski-format import: {len(eski_import)} dosya")
@@ -263,7 +263,7 @@ def asama5_guvenlik(kok):
             src=f.read_text(encoding="utf-8",errors="ignore")
             for i,line in enumerate(src.splitlines(),1):
                 if "shell=True" in line: sl.append(f"{f.relative_to(kok)}:{i}  →  {line.strip()[:80]}")
-        except Exception:  # nosec
+        except Exception as _e:
             pass  # TODO: log ekle
     if sl:
         for s in sl: err(s)
@@ -279,7 +279,7 @@ def asama5_guvenlik(kok):
             for i,line in enumerate(src.splitlines(),1):
                 if hp.search(line) and "os.environ" not in line and "getenv" not in line:
                     leak.append(f"{f.relative_to(kok)}:{i}")
-        except Exception:  # nosec
+        except Exception as _e:
             pass  # TODO: log ekle
     if leak:
         for s in leak[:10]: warn(f"Olası credential: {s}")
@@ -302,7 +302,7 @@ def asama5_guvenlik(kok):
             src=f.read_text(encoding="utf-8",errors="ignore")
             for i,line in enumerate(src.splitlines(),1):
                 if sqlp.search(line): sqlr.append(f"{f.relative_to(kok)}:{i}")
-        except Exception:  # nosec
+        except Exception as _e:
             pass  # TODO: log ekle
     if sqlr:
         for s in sqlr[:5]: warn(f"SQL risk: {s}")

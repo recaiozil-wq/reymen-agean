@@ -267,6 +267,7 @@ class PluginYoneticisi:
             Her plugin icin sozluk: ad, versiyon, kind, aktif, aciklama, yuklu, arac_sayisi
         """
         self._aktif_durumlari_yukle()
+        self._tarayarak_yukle()  # plugin.yaml'lari parse et
         yl = self.yukleyici
         if yl is None:
             return []
@@ -315,6 +316,7 @@ class PluginYoneticisi:
         Returns:
             Detayli plugin bilgisi sozlugu.
         """
+        self._tarayarak_yukle()  # yaml'lari parse et
         yl = self.yukleyici
         if yl is None:
             return {"adi": ad, "error": "PluginYukleyici mevcut degil"}
@@ -428,6 +430,103 @@ class PluginYoneticisi:
             "backend": sum(1 for p in tumu if p["kind"] == "backend"),
             "tool": sum(1 for p in tumu if p["kind"] == "tool"),
         }
+
+    # ── .reyplugin Export/Import ─────────────────────────────────────────
+
+    def export_plugin(self, ad: str, cikti_yol: str | None = None) -> str:
+        """Plugin'i .reyplugin paketine dışa aktar.
+
+        Args:
+            ad: Plugin klasör adı.
+            cikti_yol: Çıktı dosya yolu (None = {ad}.reyplugin).
+
+        Returns:
+            Oluşturulan dosya yolu.
+        """
+        import json, zipfile, datetime
+
+        plugin_klasor = self._dizin / ad
+        if not plugin_klasor.exists() or not plugin_klasor.is_dir():
+            return f"[HATA] Plugin '{ad}' bulunamadi: {plugin_klasor}"
+
+        if cikti_yol is None:
+            cikti_yol = f"{ad}.reyplugin"
+
+        # Metadata
+        metadata = {
+            "export_tarih": datetime.datetime.now().isoformat(),
+            "kaynak": "ReYMeN",
+            "plugin_adi": ad,
+            "dosyalar": [],
+        }
+
+        with zipfile.ZipFile(cikti_yol, "w", zipfile.ZIP_DEFLATED) as zf:
+            for dosya in plugin_klasor.rglob("*"):
+                if dosya.is_file() and "__pycache__" not in str(dosya):
+                    arcname = str(dosya.relative_to(plugin_klasor.parent))
+                    zf.write(dosya, arcname)
+                    metadata["dosyalar"].append(arcname)
+
+            # Metadata ekle
+            zf.writestr("metadata.json", json.dumps(metadata, indent=2, ensure_ascii=False))
+
+        return f"[OK] '{ad}' -> {cikti_yol} ({len(metadata['dosyalar'])} dosya)"
+
+    def import_plugin(self, kaynak: str) -> str:
+        """.reyplugin paketini içe aktar.
+
+        Args:
+            kaynak: .reyplugin dosya yolu.
+
+        Returns:
+            İşlem sonucu mesajı.
+        """
+        import zipfile, json, shutil
+
+        dosya = Path(kaynak)
+        if not dosya.exists():
+            return f"[HATA] Dosya bulunamadi: {kaynak}"
+
+        if dosya.suffix != ".reyplugin":
+            return f"[HATA] Gecersiz format: {dosya.suffix}. .reyplugin bekleniyor."
+
+        try:
+            with zipfile.ZipFile(dosya, "r") as zf:
+                # Metadata oku
+                if "metadata.json" not in zf.namelist():
+                    return "[HATA] metadata.json bulunamadi."
+
+                metadata = json.loads(zf.read("metadata.json"))
+                plugin_adi = metadata.get("plugin_adi", dosya.stem)
+
+                # Hedef klasör
+                hedef = self._dizin / plugin_adi
+                if hedef.exists():
+                    return f"[HATA] '{plugin_adi}' zaten mevcut. Once silin veya farkli bir isim verin."
+
+                # Ayıkla
+                hedef.mkdir(parents=True, exist_ok=True)
+                for uye in zf.namelist():
+                    if uye.endswith("/") or uye == "metadata.json":
+                        continue
+                    zf.extract(uye, self._dizin)
+
+            # Cache'i temizle (yeniden yükleme için)
+            yl = self.yukleyici
+            if yl and plugin_adi in yl._yaml_bilgisi:
+                del yl._yaml_bilgisi[plugin_adi]
+            if yl and plugin_adi in yl._yuklu:
+                yl.plugin_kaldir(plugin_adi)
+
+            return f"[OK] '{plugin_adi}' iceri aktarildi ({len(metadata.get('dosyalar', []))} dosya)"
+
+        except zipfile.BadZipFile:
+            return f"[HATA] Gecersiz ZIP dosyasi: {kaynak}"
+        except json.JSONDecodeError:
+            return f"[HATA] metadata.json okunamadi."
+        except Exception as e:
+            return f"[HATA] Import hatasi: {e}"
+
 
 
 if __name__ == "__main__":

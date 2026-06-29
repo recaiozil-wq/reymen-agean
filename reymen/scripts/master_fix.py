@@ -66,7 +66,7 @@ def fix_calistir(fix_no, script_adi, aciklama, kok, script_dizin):
         rapor_icerik = {}
         if rapor_yolu.exists():
             try: rapor_icerik = json.loads(rapor_yolu.read_text(encoding="utf-8"))
-            except Exception:  # nosec
+            except Exception as _e:
                 pass  # TODO: log ekle
 
         git_commit_al(kok, f"post-fix-{fix_no:02d}: {aciklama}")

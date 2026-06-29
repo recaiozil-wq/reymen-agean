@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Kalite — ReYMeN Web UI{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2>📈 Kalite Raporu</h2>
+    <div class="flex">
+        <button class="btn btn-primary" hx-get="/api/kalite" hx-target="#kalite-icerik" hx-trigger="click">🔄 Yenile</button>
+    </div>
+</div>
+<div class="grid-2">
+    <div class="kart">
+        <h2>📊 Trend Raporu</h2>
+        <div id="kalite-icerik" hx-get="/api/kalite" hx-trigger="load" hx-swap="innerHTML">
+            Yükleniyor...
+        </div>
+    </div>
+    <div class="kart">
+        <h2>🔍 Kod Kalite Analizi</h2>
+        <div id="kalite-analiz" hx-get="/api/kalite/analiz" hx-trigger="load" hx-swap="innerHTML">
+            Yükleniyor...
+        </div>
+    </div>
+</div>
+{% endblock %}

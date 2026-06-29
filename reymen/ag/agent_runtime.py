@@ -72,23 +72,125 @@ class RuntimeHelpers:
 
     @staticmethod
     def hedef_analiz_et(hedef: str) -> dict:
-        """Hedefin karmasikligini ve turunu tahmin et."""
-        hedef_lower = hedef.lower()
-        ipuclari = {
-            "dosya_islemi": any(k in hedef_lower for k in
-                               ["dosya", "yaz", "oku", "kaydet", "olustur"]),
-            "web_islemi":   any(k in hedef_lower for k in
-                               ["web", "arama", "internet", "url", "site"]),
-            "kod_islemi":   any(k in hedef_lower for k in
-                               ["kod", "python", "script", "calistir", "analiz"]),
-            "hafiza_islemi":any(k in hedef_lower for k in
-                               ["hatirla", "unutma", "kaydet", "not"]),
-            "sistem_islemi":any(k in hedef_lower for k in
-                               ["komut", "terminal", "powershell", "sistem"]),
+        """Hedefin karmasikligini ve turunu tahmin et (1-5).
+
+        Kategori bazli hesaplama:
+          1 = selamlasma/sosyal/basit soru
+          2 = tek kategorili basit islem
+          3 = iki kategorili veya cok adimli islem
+          4 = 3+ kategori veya toplu gorev (swarm esigi)
+          5 = toplu + islem (swarm)
+        """
+        hedef_lower = hedef.lower().strip()
+
+        # ── 0. Selamlasma/sosyal → direkt 1 ─────────────────────────
+        _selam = any(k in hedef_lower for k in [
+            "merhaba", "selam", "naber", "nasılsın", "nasilsin",
+            "iyi misin", "teşekkür", "tesekkur", "sağol", "sagol",
+            "günaydın", "gunaydin", "iyi günler", "iyi gunler",
+            "iyi akşamlar", "iyi aksamlar", "iyi geceler",
+            "ne yapıyorsun", "ne yapiyorsun", "napıyorsun", "napiyorsun",
+            "kolay gelsin", "hayırlı", "hayirli",
+        ])
+        if _selam:
+            _ek_islem = any(k in hedef_lower for k in [
+                "yap", "ara", "oku", "yaz", "sil", "bul",
+                "calistir", "çalıştır", "indir", "yukle", "yükle",
+                "kur", "gönder", "gonder", "tara", "kontrol",
+                "düzelt", "duzelt", "temizle", "düzenle", "duzenle",
+                "raporla", "analiz", "incele", "güncelle", "guncelle",
+                "aç", "ac", "kapat", "kes",
+            ])
+            if not _ek_islem:
+                return {
+                    "hedef_tur": "selam",
+                    "karmasiklik": 1,
+                    "onerilen_max_tur": 6,
+                    "ipuclari": [],
+                }
+
+        # ── 1. Toplu gorev tespiti ─────────────────────────────────
+        _toplu = any(k in hedef_lower for k in [
+            "hepsini", "hepsin", "hepsi",
+            "tümünü", "tümü", "tüm", "tumu", "tumunu",
+            "bütün", "butun", "toplu",
+        ])
+        _islem = any(k in hedef_lower for k in [
+            "kontrol", "gider", "düzelt", "duzelt", "onar", "temizle",
+            "tara", "düzenle", "duzenle", "yap", "calistir", "çalıştır",
+            "incele", "dönüştür", "donustur", "güncelle", "guncelle",
+        ])
+
+        # ── 2. Cok adimli gorev tespiti ────────────────────────────
+        _cok_adim_baglac = any(k in hedef_lower for k in [
+            "ve", "sonra", "ardindan", "ardından", "daha sonra",
+            "once", "önce", "daha önce", "daha once",
+        ])
+        _cok_adim_virgul = hedef_lower.count(",") >= 2
+        _cok_adim = _cok_adim_baglac or _cok_adim_virgul
+
+        # ── 3. Kategori bazli ipucu tespiti ─────────────────────────
+        kategoriler = {
+            "dosya_islemi": ["dosya", "klasör", "klasor", "dizin", "belge",
+                            "uzanti"],
+            "web_islemi":   ["web", "arama", "internet", "url", "site", "sayfa",
+                            "link", "indir", "yukle", "yükle", "gönder", "gonder"],
+            "kod_islemi":   ["kod", "python", "script", "calistir", "çalıştır",
+                            "analiz", "derle", "debug", "test"],
+            "yazma_islem":  ["yaz", "oluştur", "olustur", "kaydet", "ekle",
+                            "güncelle", "guncelle", "sil", "düzenle", "duzenle",
+                            "temizle", "dönüştür", "donustur", "düzelt", "duzelt",
+                            "onar"],
+            "hafiza_islemi":["hatirla", "hatırla", "unutma", "not"],
+            "sistem_islemi":["komut", "terminal", "powershell", "sistem",
+                            "servis", "port", "ağ", "ag", "islem", "işlem",
+                            "durdur"],
+            "arama_islem":  ["ara", "bul", "tara", "sorgula", "keşfet", "kesfet",
+                            "listele", "getir", "incele"],
+            "guvenlik":     ["güvenlik", "guvenlik", "şifre", "sifre", "izin",
+                            "yetki", "erişim", "erisim"],
+            "github_islem": ["git", "github", "repo", "commit", "push", "pull",
+                            "clone", "branch", "merge"],
         }
-        aktif = [k for k, v in ipuclari.items() if v]
-        # Karmasiklik tahmini (1-5)
-        karmasiklik = min(5, max(1, len(hedef.split()) // 8 + len(aktif)))
+
+        # Ekstra puan veren kelimeler (kategori disi kapsam artirici)
+        _ekstra_kelimeler = ["raporla", "özet", "ozet", "karşılaştır", "karsilastir",
+                            "birleştir", "birlestir", "görsel", "gorsel", "grafik"]
+
+        aktif = []
+        _bulunan_kategori = 0
+        for kat_adi, kw_list in kategoriler.items():
+            if any(kw in hedef_lower for kw in kw_list):
+                aktif.append(kat_adi)
+                _bulunan_kategori += 1
+
+        if _toplu and _islem:
+            return {
+                "hedef_tur": aktif[0] if aktif else "toplu",
+                "karmasiklik": 5,
+                "onerilen_max_tur": 30,
+                "ipuclari": aktif,
+            }
+        if _toplu:
+            return {
+                "hedef_tur": aktif[0] if aktif else "toplu",
+                "karmasiklik": 4,
+                "onerilen_max_tur": 24,
+                "ipuclari": aktif,
+            }
+
+        # ── 4. Skor hesaplama ──────────────────────────────────────
+        skor = _bulunan_kategori
+        if _cok_adim:
+            skor += 1
+
+        # Ekstra kelime puani
+        for k in _ekstra_kelimeler:
+            if k in hedef_lower:
+                skor += 1
+                break
+
+        karmasiklik = max(1, min(skor, 5))
         return {
             "hedef_tur": aktif[0] if aktif else "genel",
             "karmasiklik": karmasiklik,

@@ -217,78 +217,19 @@ def csv_oku(dosya_yolu: str, ayirici: str = ",") -> str:
 # ── LLaVA Görüntü Analizi ─────────────────────────────────────────────────────
 
 def goruntu_analiz(goruntu_yolu: str, soru: str = "") -> str:
-    """LLaVA modeli ile goruntu analiz eder.
-
-    Args:
-        goruntu_yolu: Gorsel dosyanin yolu (.jpg, .png, .webp).
-        soru:         Modele sorulacak soru (bos = genel aciklama).
-
-    Returns:
-        Modelin goruntue hakkindaki aciklamasi veya hata mesaji.
-    """
+    """Goruntu analiz eder (OpenRouter vision uzerinden)."""
     if not os.path.exists(goruntu_yolu):
         return f"[Görüntü Hatası]: '{goruntu_yolu}' bulunamadı."
-
-    uzanti = os.path.splitext(goruntu_yolu)[1].lower()
-    if uzanti not in {".jpg", ".jpeg", ".png", ".webp", ".bmp", ".gif"}:
-        return "[Görüntü Hatası]: Desteklenen format: jpg, png, webp, bmp, gif."
-
-    prompt = soru.strip() or "Bu görseli Türkçe olarak detaylıca açıkla."
-
-    # 1. ollama kütüphanesiyle dene
-    if _OLLAMA_LIB_VAR:
-        try:
-            yanit = _ollama_lib.chat(
-                model=GORUNTU_MODEL,
-                messages=[{
-                    "role": "user",
-                    "content": prompt,
-                    "images": [goruntu_yolu],
-                }],
-            )
-            return f"[LLaVA]: {yanit['message']['content']}"
-        except Exception as e:
-            if "model" in str(e).lower() and "not found" in str(e).lower():
-                return f"[LLaVA]: '{GORUNTU_MODEL}' modeli yüklü değil. 'ollama pull llava' çalıştırın."
-            # 2. HTTP API ile dene
-            return _goruntu_http(goruntu_yolu, prompt, str(e))
-
-    # 2. Doğrudan HTTP API
-    return _goruntu_http(goruntu_yolu, prompt, "ollama kütüphanesi yüklü değil")
+    try:
+        from reymen.arac.araclar_goruntu import vision_analiz
+        return vision_analiz(kaynak=goruntu_yolu, soru=soru or "Bu görselde ne var, detaylı açıkla.")
+    except Exception as e:
+        return f"[Görüntü Hatası]: {e}"
 
 
 def _goruntu_http(goruntu_yolu: str, prompt: str, onceki_hata: str) -> str:
-    """Ollama HTTP API üzerinden goruntu analizi (yedek yol)."""
-    import base64
-    import json
-    try:
-        import urllib.request
-        with open(goruntu_yolu, "rb") as f:
-            goruntu_b64 = base64.b64encode(f.read()).decode("utf-8")
-
-        istek = {
-            "model": GORUNTU_MODEL,
-            "prompt": prompt,
-            "images": [goruntu_b64],
-            "stream": False,
-        }
-        veri = json.dumps(istek).encode("utf-8")
-        req = urllib.request.Request(
-            f"{OLLAMA_BASE}/api/generate",
-            data=veri,
-            headers={"Content-Type": "application/json"},
-            method="POST",
-        )
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            sonuc = json.loads(resp.read().decode("utf-8"))
-            return f"[LLaVA]: {sonuc.get('response', '(boş yanıt)')}"
-    except Exception as e:
-        return (
-            f"[LLaVA]: Görüntü analizi başarısız.\n"
-            f"  Sebep: {onceki_hata}\n"
-            f"  HTTP hatası: {e}\n"
-            f"  Çözüm: Ollama çalışıyor mu? 'ollama pull llava' deneyin."
-        )
+    """Artik kullanilmiyor (yerine vision_analiz kullan)."""
+    return goruntu_analiz(goruntu_yolu, prompt)
 
 
 # ── Dosya Tipi Tespiti (tek API noktası) ─────────────────────────────────────

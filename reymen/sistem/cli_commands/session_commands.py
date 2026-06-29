@@ -577,7 +577,7 @@ class MixinCommands:
                     tool_call_id=msg.get("tool_call_id"),
                     reasoning=msg.get("reasoning"),
                 )
-            except Exception:
+            except Exception as _e:
                 pass  # Best-effort copy
 
         # Set title on the branch
@@ -1456,9 +1456,9 @@ class MixinCommands:
                 try:
                     from reymen.reymen_cli.config import get_config_path as _get_cfg_path_resid
                     mark_seen(_get_cfg_path_resid(), OPENCLAW_RESIDUE_FLAG)
-                except Exception:
+                except Exception as _e:
                     pass  # best-effort — banner will fire again next session
-        except Exception:
+        except Exception as _e:
             pass  # banner is non-critical — never break startup
         # Show a random tip to help users discover features
         try:
@@ -1469,7 +1469,7 @@ class MixinCommands:
             except Exception:
                 _tip_color = "#B8860B"
             self._console_print(f"[dim {_tip_color}]✦ Tip: {_tip}[/]")
-        except Exception:
+        except Exception as _e:
             pass  # Tips are non-critical — never break startup
 
         # Curator — kick off a background skill-maintenance pass on startup
@@ -3550,7 +3550,7 @@ class MixinCommands:
                         _grace = 1.5
                     if _grace > 0:
                         time.sleep(_grace)
-            except Exception:
+            except Exception as _e:
                 pass  # never block signal handling
             # Prefer a clean prompt_toolkit exit over `raise KeyboardInterrupt()`.
             # Raising KBI from a signal handler unwinds into whatever Python
@@ -3613,7 +3613,7 @@ class MixinCommands:
                     # Claude Code's Windows handling).
                     return
                 _signal.signal(_signal.SIGINT, _sigint_absorb)
-        except Exception:
+        except Exception as _e:
             pass  # Signal handlers may fail in restricted environments
         
         # Install a custom asyncio exception handler that suppresses the

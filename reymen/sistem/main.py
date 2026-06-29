@@ -500,6 +500,7 @@ class AIAgentOrchestrator:
     # ── Ana ReAct dongusu ─────────────────────────────────────────────
 
     def run_conversation(self, hedef):
+        print("[TEST] burası çalışıyor")
         import time as _time
         _t_baslat = _time.time()
 
@@ -541,18 +542,15 @@ class AIAgentOrchestrator:
         _B, _R, _D = "\033[1m", "\033[0m", "\033[2m"
         _G = "\033[92m"
         _SEP = _D + "─" * 68 + _R
-        _real_stdout = sys.stdout
-        _real_stdout.write(f"\n{_SEP}\n")
+        sys.stdout.write(f"\n{_SEP}\n")
 
         if _verbose:
-            _real_stdout.write(f"{_B}▶ {hedef}{_R}  {_D}[k:{_karmasiklik}/5]{_R}\n")
+            sys.stdout.write(f"{_B}▶ {hedef}{_R}  {_D}[k:{_karmasiklik}/5]{_R}\n")
 
         # Basit sohbet: ic mesajlari gizle — sadece yanit goster
-        import io as _io_rc
         if _verbose:
             print(f"[Budget] Karmasiklik: {_karmasiklik}/5, Max tur: {max_tur}")
         else:
-            sys.stdout = _io_rc.StringIO()
 
         if Trajectory:
             self.trajectory = Trajectory(hedef)
@@ -972,25 +970,23 @@ class AIAgentOrchestrator:
                     logger.warning("[Main] except Exception (L953): %s", Exception)
                     pass
                 _SEPR = _D + "─" * 68 + _R
-                _real_stdout.write(f"\n{_SEPR}\n")
-                _real_stdout.write(f" {_D}─{_R}  {_G}⚕ ReYMeN{_R}\n")
-                _real_stdout.write(f"     {ozet}\n")
-                _real_stdout.write(f"{_SEPR}\n")
-                _real_stdout.write(
+                sys.stdout.write(f"\n{_SEPR}\n")
+                sys.stdout.write(f" {_D}─{_R}  {_G}⚕ ReYMeN{_R}\n")
+                sys.stdout.write(f"     {ozet}\n")
+                sys.stdout.write(f"{_SEPR}\n")
+                sys.stdout.write(
                     f" {_D}⚕ {_model_adi}{_R}"
                     f"{_D} │ {_prov_adi}{_R}"
                     f"{_token_str}"
                     f"  {_D}⏲ {_sure_sn:.1f}s{_R}"
                     f"  {_D}✓ tur {tur}/{max_tur}{_R}\n"
                 )
-                _real_stdout.write(f"{_SEPR}\n\n")
-                _real_stdout.flush()
+                sys.stdout.write(f"{_SEPR}\n\n")
+                sys.stdout.flush()
                 # Post-processing loglarini gizle ([Ogrenme], [OzGelistirme] vb.)
-                sys.stdout = _io_rc.StringIO()
                 try:
                     self._gorev_tamamla(hedef, adim_gecmisi, ozet)
                 finally:
-                    sys.stdout = _real_stdout
                 return ozet
 
             # Self-correction: PYTHON_CALISTIR hata alirsa LLM ile duzelt
@@ -1082,22 +1078,21 @@ class AIAgentOrchestrator:
             mesajlar.append({"role": "user", "content": f"Gozlem: {gozlem}"})
             self.session.gunluge_yaz(hedef, f"{arac}({ham})", gozlem[:200])
 
-        sys.stdout = _real_stdout  # her durumda geri ac
+
         _sure_toplam = _time.time() - _t_baslat
         _SEPR2 = _D + "─" * 68 + _R
-        _real_stdout.write(f"\n{_SEPR2}\n")
-        _real_stdout.write(
+        sys.stdout.write(f"\n{_SEPR2}\n")
+        sys.stdout.write(
             f" {_D}─{_R}  {_G}⚕ ReYMeN{_R}  "
             f"{_D}[TUR SINIRI: {max_tur}/{max_tur}  ⏲ {_sure_toplam:.0f}s]{_R}\n"
         )
-        _real_stdout.write(
+        sys.stdout.write(
             f"     Gorev {max_tur} turda tamamlanamadi.\n"
             f"     Ipucu: Gorevi parcalara ayir — ornegin once analiz, sonra duzelt.\n"
         )
-        _real_stdout.write(f"{_SEPR2}\n\n")
-        _real_stdout.flush()
+        sys.stdout.write(f"{_SEPR2}\n\n")
+        sys.stdout.flush()
         # Post-processing loglarini gizle
-        sys.stdout = _io_rc.StringIO()
         try:
             print("\n[MAKSIMUM TUR ASILDI]")
             try:
@@ -1115,7 +1110,6 @@ class AIAgentOrchestrator:
                 pass
             self._ogren(hedef, adim_gecmisi, "Tamamlanamadi: tur asimi")
         finally:
-            sys.stdout = _real_stdout
         if self.trajectory:
             self.trajectory.kaydet()
         return None

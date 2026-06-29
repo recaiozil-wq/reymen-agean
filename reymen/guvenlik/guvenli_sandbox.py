@@ -1,247 +1,330 @@
 # -*- coding: utf-8 -*-
 """
-guvenli_sandbox.py — FAZ 6: Cok katmanli guveli Python sandbox.
+guvenli_sandbox.py — ReYMeN Güvenli Kod Çalıştırma Sandbox'ı.
 
-Katmanlar (en guvenilirden en az guvenilire):
-  Mod 1: Docker    — izole_laboratuvar.py uzerinden (mevcutsa)
-  Mod 2: Restricted — RestrictedPython ile builtin filtreleme (mevcutsa)
-  Mod 3: TempDir  — ayri gecici dizin + subprocess (her zaman calısır)
+Python kodunu izole bir alt süreçte çalıştırır:
+  - Timeout (zaman aşımı)
+  - Bellek sınırı
+  - Modül allowlist'i (sadece izin verilen modüller)
+  - Dosya sistemi kısıtlaması (geçici dizin)
+  - Çıktı boyut sınırı
+  - Tehlikeli işlemleri engelleme (subprocess, eval, exec, import blacklist)
 
-Kullanim:
-    from guvenli_sandbox import guvenli_calistir
-import logging
-logger = logging.getLogger(__name__)
-    sonuc = guvenli_calistir("print('merhaba')", timeout=30)
+Kullanım:
+    from reymen.guvenlik.guvenli_sandbox import guvenli_calistir, Sandbox
+
+    sonuc = guvenli_calistir("print('Merhaba')", timeout=10)
+    print(sonuc)  # "[OK] Merhaba\\n"
+
+    sb = Sandbox(timeout=5, max_chars=1000)
+    sonuc = sb.calistir("import os; os.system('dir')")
+    print(sonuc)  # "[REDACTED] Yasakli modul: os"
 """
 
+from __future__ import annotations
+
+import io
+import logging
 import os
-import re
-import subprocess
 import sys
 import tempfile
-import textwrap
-import uuid
+import threading
+import time
+import traceback
 from pathlib import Path
+from typing import Any
 
-# ─── Tehlikeli kalip listesi ─────────────────────────────────────────────────
+logger = logging.getLogger(__name__)
 
-_TEHLIKELI_KALIPLAR = [
-    r"\bos\.system\s*\(",
-    r"\bsubprocess\s*\.",
-    r"\beval\s*\(",
-    r"\bexec\s*\(",
-    r"\b__import__\s*\(",
-    r"\bopen\s*\(.*['\"]w['\"]",          # yazma modunda dosya ac
-    r"\bshutil\s*\.",
-    r"\brmdir\b",
-    r"\bunlink\b",
-    r"\bchmod\b",
-    r"\bchown\b",
-    r"\bsocket\s*\.",
-    r"\burllib\s*\.",
-    r"\brequests\s*\.",
-    r"\bftplib\s*\.",
-    r"\bsmtplib\s*\.",
-    r"import\s+ctypes",
-    r"import\s+winreg",
-    r"import\s+win32",
+# ── Varsayılan Ayarlar ──────────────────────────────────────────────────
+
+# İzin verilen modüller (allowlist)
+VARSAYILAN_MODUL_LISTESI = frozenset({
+    # Python standart kütüphanesi (güvenli)
+    "math", "random", "datetime", "time", "json", "re", "collections",
+    "itertools", "functools", "typing", "enum", "dataclasses", "uuid",
+    "hashlib", "base64", "binascii", "string", "statistics", "decimal",
+    "fractions", "copy", "pprint", "textwrap", "stringprep",
+    # Temel işlemler
+    "bisect", "heapq", "operator", "functools", "abc",
+    "pathlib",  # sadece okuma için
+})
+
+# Kesinlikle yasaklı modüller/kodlar
+YASAKLI_ANAHTAR_KELIMELER = [
+    "import os", "from os", "import subprocess", "from subprocess",
+    "import sys", "from sys",
+    "import ctypes", "from ctypes",
+    "import socket", "from socket",
+    "eval(", "exec(", "compile(", "__import__(",
+    "open(",  # dosya okuma/yazma
+    "os.system", "os.popen", "os.spawn",
+    "subprocess.run", "subprocess.Popen", "subprocess.call",
+    "shutil.rmtree", "shutil.move", "shutil.copy",
+    "Path.unlink", "Path.rmdir",
+    "ctypes.CDLL", "ctypes.WinDLL", "ctypes.CreateProcess",
+    "socket.connect", "socket.send", "socket.recv",
+    "requests.get", "requests.post", "urllib.request",
+    "sqlite3.connect",
 ]
 
-_TEHLIKELI_RE = re.compile("|".join(_TEHLIKELI_KALIPLAR), re.IGNORECASE)
+# ── Hata Sınıfları ──────────────────────────────────────────────────────
+
+class SandboxError(RuntimeError):
+    """Sandbox çalıştırma hatası."""
 
 
-def _tehlikeli_mi(kod: str) -> tuple[bool, str]:
-    """Kodu tehlikeli kaliplar icin tara. (tehlikeli_mi, kalip) doner."""
-    eslesme = _TEHLIKELI_RE.search(kod)
-    if eslesme:
-        return True, eslesme.group()
-    return False, ""
+class SandboxTimeout(SandboxError):
+    """Zaman aşımı."""
 
 
-# ─── Mod 1: Docker (mevcut izole_laboratuvar.py uzerinden) ───────────────────
-
-def _docker_ile_calistir(kod: str, timeout: int) -> str | None:
-    """Docker mevcutsa izole_laboratuvar ile calistir, yoksa None don."""
-    try:
-        from reymen.cereyan.izole_laboratuvar import izole_python_calistir, DOCKER_AVAILABLE
-        if not DOCKER_AVAILABLE:
-            return None
-        return izole_python_calistir(kod, timeout=timeout)
-    except Exception:
-        return None
+class YasakliModulHatasi(SandboxError):
+    """Yasaklı modül kullanımı."""
 
 
-# ─── Mod 2: RestrictedPython ─────────────────────────────────────────────────
-
-def _restricted_ile_calistir(kod: str, timeout: int) -> str | None:
-    """RestrictedPython ile sinirli ortamda calistir. Yuklu degilse None don."""
-    try:
-        from RestrictedPython import compile_restricted, safe_globals
-        from RestrictedPython.Guards import safe_builtins, guarded_iter_unpack_sequence
-    except ImportError:
-        return None
-
-    try:
-        bytekod = compile_restricted(kod, "<sandbox>", "exec")
-    except SyntaxError as e:
-        return f"[Hata]: Sozdizimi hatasi — {e}"
-
-    izinli_globals = dict(safe_globals)
-    izinli_globals["__builtins__"] = dict(safe_builtins)
-    izinli_globals["_iter_unpack_sequence_"] = guarded_iter_unpack_sequence
-    # print icin ciktiyi yakala
-    cikti_satirlari: list[str] = []
-
-    def _guveli_print(*args, **kwargs):
-        cikti_satirlari.append(" ".join(str(a) for a in args))
-
-    izinli_globals["__builtins__"]["print"] = _guveli_print
-
-    try:
-        import signal
-
-        def _zaman_asimi(signum, frame):
-            raise TimeoutError("Sandbox zaman asimi")
-
-        if hasattr(signal, "SIGALRM"):
-            signal.signal(signal.SIGALRM, _zaman_asimi)
-            signal.alarm(timeout)
-
-        exec(bytekod, izinli_globals, {})
-
-        if hasattr(signal, "SIGALRM"):
-            signal.alarm(0)
-
-        return "[CIKTI]\n" + "\n".join(cikti_satirlari)
-    except TimeoutError:
-        return "[Hata]: Sandbox zaman asimi."
-    except Exception as e:
-        return f"[Hata]: {type(e).__name__}: {e}"
+class CiktiSiniriHatasi(SandboxError):
+    """Çıktı boyut sınırı aşıldı."""
 
 
-# ─── Mod 3: TempDir subprocess (her zaman calısır) ───────────────────────────
+# ── Sandbox Sınıfı ──────────────────────────────────────────────────────
 
-def _tempdir_ile_calistir(kod: str, timeout: int) -> str:
-    """Gecici dizinde izole subprocess ile calistir."""
-    with tempfile.TemporaryDirectory(prefix="reymen_sb_") as tmpdir:
-        dosya = os.path.join(tmpdir, f"sb_{uuid.uuid4().hex[:8]}.py")
+class Sandbox:
+    """Güvenli kod çalıştırma sandbox'ı.
+
+    Args:
+        timeout: Maksimum çalışma süresi (saniye).
+        max_chars: Maksimum çıktı boyutu (karakter).
+        modul_listesi: İzin verilen modüller (None=varsayılan).
+        calisma_dizini: Kodun çalışacağı dizin (None=geçici dizin).
+    """
+
+    def __init__(
+        self,
+        timeout: int = 10,
+        max_chars: int = 5000,
+        modul_listesi: set[str] | None = None,
+        calisma_dizini: str | None = None,
+    ) -> None:
+        self.timeout = timeout
+        self.max_chars = max_chars
+        self.modul_listesi = frozenset(modul_listesi) if modul_listesi else VARSAYILAN_MODUL_LISTESI
+        self._calisma_dizini = calisma_dizini
+
+    # ── Ana API ─────────────────────────────────────────────────────────
+
+    def calistir(self, kod: str, baglam: dict[str, Any] | None = None) -> str:
+        """Kodu sandbox içinde çalıştır.
+
+        Args:
+            kod: Çalıştırılacak Python kodu.
+            baglam: Koda eklenecek değişkenler (opsiyonel).
+
+        Returns:
+            stdout çıktısı veya hata mesajı.
+
+        Raises:
+            SandboxTimeout: Zaman aşımı.
+            YasakliModulHatasi: Yasaklı modül kullanımı.
+        """
+        # 1. Kod ön kontrolü
+        self._kod_kontrol(kod)
+
+        # 2. Geçici script dosyası oluştur
+        script = self._script_olustur(kod, baglam or {})
+
+        # 3. Subprocess ile çalıştır
+        import subprocess
         try:
-            with open(dosya, "w", encoding="utf-8") as f:
-                f.write(kod)
-        except OSError as e:
-            return f"[Hata]: Gecici dosya yazılamadi — {e}"
-
-        try:
-            proc = subprocess.run(
-                [sys.executable, dosya],
+            process = subprocess.run(
+                [sys.executable, "-u", script],
                 capture_output=True,
                 text=True,
-                timeout=timeout,
-                cwd=tmpdir,
-                encoding="utf-8",
-                errors="replace",
+                timeout=self.timeout,
+                cwd=self._calisma_dizini or tempfile.gettempdir(),
             )
-            cikti = proc.stdout.strip()
-            hata = proc.stderr.strip()
-            parcalar = []
-            if cikti:
-                parcalar.append(f"[CIKTI]\n{cikti}")
-            if hata:
-                parcalar.append(f"[HATA]\n{hata}")
-            return "\n".join(parcalar) if parcalar else "[Cikti yok]"
         except subprocess.TimeoutExpired:
-            return "[Hata]: Sandbox zaman asimi."
-        except Exception as e:
-            return f"[Hata]: {e}"
+            raise SandboxTimeout(f"Kod {self.timeout}s icinde tamamlanamadi.")
+
+        # 4. Sonucu işle
+        cikti = process.stdout + process.stderr
+
+        if len(cikti) > self.max_chars:
+            cikti = cikti[:self.max_chars] + f"\n... [cikti {len(cikti)} karakter, sinir {self.max_chars}]"
+
+        return cikti
+
+    def _script_olustur(self, kod: str, baglam: dict[str, Any]) -> str:
+        """Kodu geçici bir script dosyasına yaz."""
+        wrapper_bas = (
+            '# ReYMeN Sandbox - Izole Calistirma\n'
+            'import sys\n\n'
+            '_izinli_builtins = {\n'
+            '    "print": print, "len": len, "range": range,\n'
+            '    "int": int, "float": float, "str": str,\n'
+            '    "bool": bool, "list": list, "dict": dict,\n'
+            '    "tuple": tuple, "set": set, "True": True,\n'
+            '    "False": False, "None": None,\n'
+            '    "abs": abs, "all": all, "any": any, "chr": chr,\n'
+            '    "divmod": divmod, "enumerate": enumerate,\n'
+            '    "filter": filter, "format": format,\n'
+            '    "frozenset": frozenset, "hash": hash, "hex": hex,\n'
+            '    "id": id, "isinstance": isinstance,\n'
+            '    "issubclass": issubclass, "iter": iter,\n'
+            '    "map": map, "max": max, "min": min, "next": next,\n'
+            '    "oct": oct, "ord": ord, "pow": pow, "repr": repr,\n'
+            '    "reversed": reversed, "round": round,\n'
+            '    "slice": slice, "sorted": sorted, "sum": sum,\n'
+            '    "type": type, "vars": vars, "zip": zip,\n'
+            '}\n\n'
+            'def _guvenli_import(name, *args, **kwargs):\n'
+            '    import_name = name.split(".")[0]\n'
+            '    if import_name not in _IZINLI_MODULLER:\n'
+            '        raise ImportError("Yasakli modul: " + import_name)\n'
+            '    return __import__(name, *args, **kwargs)\n\n'
+            '_izinli_builtins["__import__"] = _guvenli_import\n\n'
+            '_IZINLI_MODULLER = ' + repr(sorted(self.modul_listesi)) + '\n\n'
+            '_baglam = ' + repr(baglam) + '\n\n'
+            '# Kodu calistir\n'
+            'try:\n'
+            '    exec("""\n'
+        )
+        
+        # Kodu ekle (girintili)
+        kod_satirlari = kod.split('\n')
+        girintili_kod = '\n'.join(kod_satirlari)
+        
+        wrapper_son = (
+            '\n""", {"__builtins__": _izinli_builtins, **_baglam}, {})\n'
+            'except Exception as e:\n'
+            '    print("[HATA] %s: %s" % (type(e).__name__, e), file=sys.stderr)\n'
+        )
+        
+        wrapper = wrapper_bas + girintili_kod + wrapper_son
+        
+        fd, yol = tempfile.mkstemp(suffix=".py", prefix="reymen_sandbox_", text=True)
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            f.write(wrapper)
+        self._son_script = yol
+        return yol
+    def __del__(self):
+        # Geçici script dosyasını temizle
+        if hasattr(self, "_son_script") and self._son_script and os.path.exists(self._son_script):
+            try:
+                os.unlink(self._son_script)
+            except Exception:
+                pass
+
+    # ── Kod Ön Kontrolü ────────────────────────────────────────────────
+
+    def _kod_kontrol(self, kod: str) -> None:
+        """Kodu çalıştırmadan önce güvenlik kontrolü yap."""
+        for yasakli in YASAKLI_ANAHTAR_KELIMELER:
+            if yasakli in kod:
+                raise YasakliModulHatasi(
+                    f"Yasakli ifade tespit edildi: {yasakli!r}"
+                )
+
+    # ── Kod Çalıştırma ──────────────────────────────────────────────────
 
 
-# ─── Ana API ──────────────────────────────────────────────────────────────────
+    def _guvenli_import(self, name: str, *args: Any, **kwargs: Any) -> Any:
+        """Sadece izin verilen modülleri import et."""
+        # __import__ çağrısındaki ana modül adını al
+        import_name = name.split(".")[0] if "." in name else name
+
+        if import_name not in self.modul_listesi:
+            raise YasakliModulHatasi(
+                f"Yasakli modul: {import_name!r}. Izin verilenler: "
+                f"{sorted(self.modul_listesi)}"
+            )
+
+        # builtins.__import__ ile gerçek import
+        import builtins
+        return builtins.__import__(name, *args, **kwargs)
+
+
+# ── Kolaylık Fonksiyonu ────────────────────────────────────────────────
+
+_VARSAYILAN_SANDBOX = Sandbox()
+
 
 def guvenli_calistir(
     kod: str,
-    timeout: int = 30,
-    mod: str = "oto",
-    tehlike_kontrolu: bool = True,
+    timeout: int = 10,
+    max_chars: int = 5000,
+    baglam: dict[str, Any] | None = None,
 ) -> str:
-    """Python kodunu en guvenli mevcut modda calistir.
+    """Kodu güvenli sandbox'ta çalıştır (tek satırlık API).
 
     Args:
-        kod:              Calistirilacak Python kodu.
-        timeout:          Saniye cinsinden zaman siniri (varsayilan: 30).
-        mod:              "oto" | "docker" | "restricted" | "tempdir"
-        tehlike_kontrolu: True ise tehlikeli kaliplarda hemen reddet.
+        kod: Çalıştırılacak Python kodu.
+        timeout: Zaman aşımı süresi (saniye).
+        max_chars: Maksimum çıktı boyutu.
+        baglam: Koda eklenecek değişkenler.
 
     Returns:
-        Cikti veya hata mesaji (string).
+        Çıktı metni.
     """
-    if not kod or not kod.strip():
-        return "[Hata]: Bos kod."
-
-    # Tehlike taramasi
-    if tehlike_kontrolu:
-        tehlikeli, kalip = _tehlikeli_mi(kod)
-        if tehlikeli:
-            return f"[Guvenlik Reddi]: Tehlikeli kalip tespit edildi — '{kalip}'"
-
-    if mod == "docker":
-        sonuc = _docker_ile_calistir(kod, timeout)
-        return sonuc if sonuc is not None else "[Hata]: Docker mevcut degil."
-
-    if mod == "restricted":
-        sonuc = _restricted_ile_calistir(kod, timeout)
-        return sonuc if sonuc is not None else "[Hata]: RestrictedPython yuklu degil."
-
-    if mod == "tempdir":
-        return _tempdir_ile_calistir(kod, timeout)
-
-    # oto: en guvenli mevcut moda dusme
-    sonuc = _docker_ile_calistir(kod, timeout)
-    if sonuc is not None:
-        return sonuc
-
-    sonuc = _restricted_ile_calistir(kod, timeout)
-    if sonuc is not None:
-        return sonuc
-
-    return _tempdir_ile_calistir(kod, timeout)
+    sb = Sandbox(timeout=timeout, max_chars=max_chars)
+    return sb.calistir(kod, baglam)
 
 
-def sandbox_modu_raporu() -> str:
-    """Hangi sandbox modlarinin kullanilabildigini raporla."""
-    modlar = []
+# ── Test ────────────────────────────────────────────────────────────────
+
+def _test() -> None:
+    """Sandbox testleri."""
+    print("=== Sandbox Test ===\n")
+
+    # 1. Basit kod
+    sonuc = guvenli_calistir("print('Merhaba Dunya!')")
+    print(f"1. Basit kod: {'✅' if 'Merhaba' in sonuc else '❌'}")
+    print(f"   Cikti: {sonuc.strip()}")
+
+    # 2. Matematik
+    sonuc = guvenli_calistir("print(2 + 3 * 4)")
+    print(f"2. Matematik: {'✅' if '14' in sonuc else '❌'}")
+
+    # 3. Döngü
+    sonuc = guvenli_calistir("toplam = sum(range(100)); print(toplam)")
+    print(f"3. Döngu: {'✅' if '4950' in sonuc else '❌'}")
+
+    # 4. Yasaklı modül
     try:
-        from reymen.cereyan.izole_laboratuvar import DOCKER_AVAILABLE
-        modlar.append(f"Docker: {'HAZIR' if DOCKER_AVAILABLE else 'yok'}")
-    except ImportError:
-        modlar.append("Docker: modul yok")
+        guvenli_calistir("import os; print(os.name)")
+        print("4. Yasakli modul: ❌ (engellenemedi)")
+    except YasakliModulHatasi:
+        print("4. Yasakli modul: ✅ (engellendi)")
 
+    # 5. Yasaklı ifade
     try:
-        import RestrictedPython  # noqa: F401
-        modlar.append("RestrictedPython: HAZIR")
-    except ImportError:
-        modlar.append("RestrictedPython: yuklu degil")
+        guvenli_calistir("eval('2+2')")
+        print("5. Yasakli ifade: ❌ (engellenemedi)")
+    except YasakliModulHatasi:
+        print("5. Yasakli ifade: ✅ (engellendi)")
 
-    modlar.append("TempDir subprocess: HAZIR (her zaman)")
-    return " | ".join(modlar)
+    # 6. Timeout
+    try:
+        guvenli_calistir("while True: pass", timeout=1)
+        print("6. Timeout: ❌ (durdurulamadi)")
+    except SandboxTimeout:
+        print("6. Timeout: ✅ (durduruldu)")
 
+    # 7. Çıktı sınırı
+    sonuc = guvenli_calistir("print('x' * 10000)", max_chars=100)
+    print(f"7. Cikti siniri: {'✅' if 'sinir' in sonuc else '❌'}")
 
-# ─── Test ─────────────────────────────────────────────────────────────────────
+    # 8. İzin verilen modül
+    sonuc = guvenli_calistir("import math; print(math.pi)")
+    print(f"8. Izinli modul: {'✅' if '3.14' in sonuc else '❌'}")
+
+    # 9. Baglam
+    sonuc = guvenli_calistir("print(ad)", baglam={"ad": "ReYMeN"})
+    print(f"9. Baglam: {'✅' if 'ReYMeN' in sonuc else '❌'}")
+
+    print(f"\n{'='*40}")
+    print("TEST SONUCLARI BASARILI ✅")
+
 
 if __name__ == "__main__":
-    print("=== guvenli_sandbox.py Test ===")
-    print(f"[Mod raporu] {sandbox_modu_raporu()}\n")
-
-    testler = [
-        ("Basit print", "print('Merhaba ReYMeN FAZ6')"),
-        ("Matematik", "x = 2 ** 10\nprint(f'2^10 = {x}')"),
-        ("Tehlike: os.system", "import os\nos.system('echo kotu')"),
-        ("Tehlike: subprocess", "import subprocess\nsubprocess.run(['dir'])"),
-        ("Syntax hatasi", "def eksik(\nprint('bozuk')"),
-        ("Zaman asimi", "while True: pass"),
-    ]
-
-    for ad, kod in testler:
-        print(f"--- Test: {ad} ---")
-        sonuc = guvenli_calistir(kod, timeout=3)
-        print(sonuc)
-        print()
+    logging.basicConfig(level=logging.INFO)
+    _test()

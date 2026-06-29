@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+*.egg
+*.whl
+*.egg-info/
+
+# Virtual env
+venv/
+bot_venv/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# ReYMeN
+.ReYMeN/
+chroma_db/
+vektor_hafizasi/
+logs/
+output/
+screenshots/
+references/
+docs/
+assets/
+scripts/__pycache__/
+
+# Hermes mirror
+hermes-memory-backup/
+ReYMeN-full-backup/
+ReYMeN_cli/
+skills/
+optional-skills/
+hermes_legacy/
+
+# Test / Coverage
+.coverage
+.pytest_cache/
+tests/
+coverage/
+htmlcov/
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Maliyet — ReYMeN Web UI{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2>💰 Maliyet Takibi</h2>
+    <div class="flex">
+        <button class="btn btn-primary" hx-get="/api/maliyet" hx-target="#maliyet-icerik" hx-trigger="click">🔄 Yenile</button>
+    </div>
+</div>
+<div class="grid-2">
+    <div class="kart">
+        <h2>📊 Özet</h2>
+        <div id="maliyet-icerik" hx-get="/api/maliyet" hx-trigger="load" hx-swap="innerHTML">
+            Yükleniyor...
+        </div>
+    </div>
+    <div class="kart">
+        <h2>📋 Detay</h2>
+        <div id="maliyet-detay" hx-get="/api/maliyet/detay" hx-trigger="load" hx-swap="innerHTML">
+            Yükleniyor...
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -198,7 +198,7 @@ class Beyin:
 
         # Sağlayıcı kayıt defterinden varsayılan base_url
         if _REGISTRY_AKTIF:
-            profil = _providers_registry.get_provider(provider)  # type: ignore[union-attr]
+            profil = _providers_registry.get_provider_profile(provider)  # type: ignore[union-attr]
             base_url = prov_conf.get("base_url") or (profil.base_url if profil else "http://localhost:1234")
         else:
             base_url = prov_conf.get("base_url", "http://localhost:1234")

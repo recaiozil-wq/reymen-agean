@@ -655,7 +655,7 @@ class SessionMixin:
                     tool_call_id=msg.get("tool_call_id"),
                     reasoning=msg.get("reasoning"),
                 )
-            except Exception:
+            except Exception as _e:
                 pass  # Best-effort copy
 
         # Set title on the branch

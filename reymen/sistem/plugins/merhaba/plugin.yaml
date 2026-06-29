@@ -1,0 +1,9 @@
+author: ReYMeN
+description: ReYMeN için örnek plugin — merhaba dünya!
+enabled: true
+kind: tool
+name: Merhaba Plugin
+tools:
+- MERHABA_SOYLE
+- PLUGIN_BILGI
+version: 1.0.0

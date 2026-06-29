@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Kanban — ReYMeN Web UI{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2>📋 Kanban Panosu</h2>
+    <div class="flex">
+        <button class="btn btn-primary" hx-get="/api/kanban" hx-target="#kanban-icerik" hx-trigger="click">🔄 Yenile</button>
+    </div>
+</div>
+<div class="kart">
+    <h2>📊 Pano Durumu</h2>
+    <div id="kanban-icerik" hx-get="/api/kanban" hx-trigger="load" hx-swap="innerHTML">
+        Yükleniyor...
+    </div>
+</div>
+<div class="kart">
+    <h2>📇 Kartlar</h2>
+    <div id="kanban-kartlar" hx-get="/api/kanban/kartlar" hx-trigger="load" hx-swap="innerHTML">
+        Yükleniyor...
+    </div>
+</div>
+{% endblock %}

@@ -87,7 +87,7 @@ def hook_cagir(olay: str, **kwargs: Any) -> List[Any]:
     for cb in callback_ler:
         t0 = time.monotonic()
         try:
-            sonuc = cb(**kwargs)
+            sonuc = cb(olay=olay, **kwargs)
             sonuclar.append(sonuc)
         except Exception as e:
             gecen = time.monotonic() - t0

@@ -27,7 +27,14 @@ from fastapi.templating import Jinja2Templates
 import uvicorn
 
 # Web UI modülleri
-from reymen.web_ui.auth import AuthConfig, UserManager, TokenManager, user_manager, token_manager
+from reymen.web_ui.auth import (
+    AuthConfig, UserManager, TokenManager, Session,
+    user_manager, token_manager,
+    get_provider, list_providers,
+    Role, ROLE_PERMISSIONS,
+    audit_log, AuditEvent,
+    InvalidCredentialsError, ProviderError,
+)
 from reymen.web_ui.module_discovery import ModulTarayici, modul_kategorileri
 from reymen.web_ui.process_manager import ProcessManager
 from reymen.web_ui.log_stream import LogStreamer, log_kuyrugu_oku
@@ -59,43 +66,12 @@ process_manager = ProcessManager()
 log_streamer = LogStreamer(LOG_DOSYASI)
 
 # ---------------------------------------------------------------------------
-# Auth yardımcıları
+# Middleware — auth kontrolü (Hermes pattern: provider registry + refresh token)
 # ---------------------------------------------------------------------------
 
-def _get_user(token: Optional[str]) -> Optional[str]:
-    """Cookie'den kullanıcı adını çöz (string döndürür)."""
-    if not token:
-        return None
-    data = token_manager.verify(token)
-    return data.get("user") if data else None
-
-
-def _get_role(token: Optional[str]) -> Optional[str]:
-    """Cookie'den kullanıcı rolünü çöz."""
-    if not token:
-        return None
-    data = token_manager.verify(token)
-    return data.get("role") if data else None
-
-
-def _require_auth(request: Request, token: Optional[str] = None) -> Optional[str]:
-    """Auth kontrolü, yoksa None döndür."""
-    user = _get_user(token)
-    if not user:
-        user = _get_user(request.cookies.get(token_manager.config.cookie_name))
-    return user
-
-
-def _izin_kontrol(user: str, izin: str) -> bool:
-    """Kullanıcının belirli bir izni var mi?"""
-    return user_manager.has_permission(user, izin)
-
-# ---------------------------------------------------------------------------
-# Middleware — auth kontrolü
-# ---------------------------------------------------------------------------
-
-AUTH_ATLANACAK = {"/login", "/static", "/ws/logs", "/api/health",
-                  "/docs", "/openapi.json", "/redoc"}
+AUTH_ATLANACAK = {"/auth/", "/login", "/static", "/ws/logs",
+                  "/api/health", "/docs", "/openapi.json", "/redoc",
+                  "/api/auth/providers", "/api/cron"}
 
 
 @app.middleware("http")
@@ -104,35 +80,66 @@ async def auth_middleware(request: Request, call_next):
     if any(path.startswith(a) for a in AUTH_ATLANACAK):
         return await call_next(request)
 
-    token = request.cookies.get(token_manager.config.cookie_name)
-    user = _get_user(token)
-    if not user:
+    # Hermes pattern: once access token, yoksa refresh token dene
+    at = request.cookies.get("hermes_session_at")
+    rt = request.cookies.get("hermes_session_rt")
+
+    session = None
+    if at:
+        for provider in list_providers():
+            try:
+                session = provider.verify_session(access_token=at)
+            except ProviderError:
+                continue
+            if session is not None:
+                break
+
+    # Access token gecersizse refresh token dene (Hermes transparent refresh)
+    if session is None and rt:
+        for provider in list_providers():
+            try:
+                session = provider.refresh_session(refresh_token=rt)
+            except (ProviderError, InvalidCredentialsError):
+                continue
+            if session is not None:
+                response = await call_next(request)
+                response.set_cookie(
+                    "hermes_session_at", session.access_token,
+                    max_age=token_manager.expires_in(session.access_token),
+                    httponly=True, samesite="lax",
+                )
+                if session.refresh_token:
+                    response.set_cookie(
+                        "hermes_session_rt", session.refresh_token,
+                        max_age=604800, httponly=True, samesite="lax",
+                    )
+                return response
+
+    if not session:
         if path.startswith("/api/"):
-            return JSONResponse({"hata": "Yetkisiz"}, status_code=401)
+            return JSONResponse({"hata": "Yetkisiz", "error": "unauthenticated"}, status_code=401)
         return RedirectResponse(url="/login")
-    
-    role = _get_role(token)
-    request.state.user = user
-    request.state.role = role or "viewer"
+
+    request.state.user = session.user_id
+    request.state.role = session.role
+    request.state.session = session
 
     # Role-based API izin kontrolü
     if path.startswith("/api/"):
-        # POST/PUT/DELETE işlemleri - operator+ gerektirir
         if request.method in ("POST", "PUT", "DELETE"):
-            if role not in ("admin", "operator"):
+            if session.role not in ("admin", "operator"):
                 return JSONResponse(
                     {"hata": "Bu islem icin yetkiniz yok (operator/admin gerekli)"},
                     status_code=403,
                 )
-        # Spesifik izin kontrolleri
         if "gateway" in path and request.method == "POST":
-            if not _izin_kontrol(user, "gateway.baslat"):
+            if not user_manager.has_permission(session.user_id, "gateway.baslat"):
                 return JSONResponse({"hata": "Gateway yonetim yetkiniz yok"}, status_code=403)
         if "plugin" in path and request.method == "POST":
-            if not _izin_kontrol(user, "plugin.aktif_et"):
+            if not user_manager.has_permission(session.user_id, "plugin.aktif_et"):
                 return JSONResponse({"hata": "Plugin yonetim yetkiniz yok"}, status_code=403)
         if "user" in path:
-            if not _izin_kontrol(user, "user.ekle"):
+            if not user_manager.has_permission(session.user_id, "user.ekle"):
                 return JSONResponse({"hata": "Kullanici yonetim yetkiniz yok"}, status_code=403)
 
     return await call_next(request)
@@ -151,33 +158,96 @@ async def login_sayfasi(request: Request, hata: str = ""):
 
 @app.post("/login")
 async def login_post(request: Request):
+    """Hermes pattern: PasswordAuthProvider ile giris + audit log + refresh token."""
     form = await request.form()
-    username = form.get("username", "")
-    password = form.get("password", "")
+    username = form.get("username", "").strip()
+    password = form.get("password", "").strip()
 
-    if user_manager.verify(username, password):
-        token = token_manager.create(username)
-        response = RedirectResponse(url="/", status_code=302)
-        response.set_cookie(
-            key=token_manager.config.cookie_name,
-            value=token,
-            max_age=token_manager.config.token_expiry,
-            httponly=True,
-            samesite="lax",
+    provider = get_provider("password")
+    if not provider:
+        audit_log(AuditEvent.LOGIN_FAILURE, reason="no_provider", ip=request.client.host if request.client else "")
+        return templates.TemplateResponse(
+            request, "login.html",
+            {"hata": "Giris sistemi hazir degil"},
         )
-        return response
 
-    return templates.TemplateResponse(
-        request, "login.html",
-        {"hata": "Hatalı kullanıcı adı veya şifre"},
+    try:
+        session = provider.complete_password_login(username, password)
+    except InvalidCredentialsError:
+        audit_log(AuditEvent.LOGIN_FAILURE, user_id=username, provider="password",
+                  ip=request.client.host if request.client else "", reason="invalid_credentials")
+        return templates.TemplateResponse(
+            request, "login.html",
+            {"hata": "Hatalı kullanıcı adı veya şifre"},
+        )
+
+    audit_log(AuditEvent.LOGIN_SUCCESS, user_id=session.user_id, provider="password",
+              ip=request.client.host if request.client else "")
+
+    response = RedirectResponse(url="/", status_code=302)
+    response.set_cookie(
+        "hermes_session_at", session.access_token,
+        max_age=token_manager.expires_in(session.access_token),
+        httponly=True, samesite="lax",
     )
+    if session.refresh_token:
+        response.set_cookie(
+            "hermes_session_rt", session.refresh_token,
+            max_age=604800, httponly=True, samesite="lax",
+        )
+    return response
 
 
 @app.get("/logout")
-async def logout():
+async def logout(request: Request):
+    """Hermes pattern: cookie temizle + audit log."""
+    user = getattr(request.state, "user", "?")
+    audit_log(AuditEvent.LOGOUT, user_id=user,
+              ip=request.client.host if request.client else "")
     response = RedirectResponse(url="/login")
-    response.delete_cookie(token_manager.config.cookie_name)
+    response.delete_cookie("hermes_session_at", path="/")
+    response.delete_cookie("hermes_session_rt", path="/")
     return response
+
+
+# ---------------------------------------------------------------------------
+# API — Auth (Hermes pattern: /api/auth/me + /api/auth/providers)
+# ---------------------------------------------------------------------------
+
+
+@app.get("/api/auth/me")
+async def api_auth_me(request: Request):
+    """Hermes'teki /api/auth/me — mevcut Session bilgisi."""
+    session: Session | None = getattr(request.state, "session", None)
+    if not session:
+        return JSONResponse({
+            "authenticated": False,
+            "error": "unauthenticated",
+            "login_url": "/login",
+        }, status_code=401)
+    return JSONResponse({
+        "authenticated": True,
+        "user_id": session.user_id,
+        "display_name": session.display_name,
+        "role": session.role,
+        "provider": session.provider,
+        "expires_at": session.expires_at,
+    })
+
+
+@app.get("/api/auth/providers")
+async def api_auth_providers():
+    """Hermes'teki /api/auth/providers — kayitli auth provider'lari listele."""
+    providers = list_providers()
+    return JSONResponse({
+        "providers": [
+            {
+                "name": p.name,
+                "display_name": p.display_name,
+            }
+            for p in providers
+        ],
+    })
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -1041,6 +1111,329 @@ async def api_sandbox_temizle():
     return HTMLResponse(content=f"<div class='alert alert-success'>🧹 {say} sandbox temizlendi</div>")
 
 
+# ═══════════════════════════════════════════════════════════════════
+# API — Cron Yönetimi
+# ═══════════════════════════════════════════════════════════════════
+
+@app.get("/cron", response_class=HTMLResponse)
+async def cron_sayfasi(request: Request):
+    """Cron yönetim sayfası."""
+    return templates.TemplateResponse(request, "cron.html", {})
+
+
+@app.get("/api/cron")
+async def api_cron_liste():
+    """Cron job listesi HTML tablosu."""
+    try:
+        jobs_path = Path.home() / ".hermes" / "cron" / "jobs.json"
+        if jobs_path.exists():
+            with open(jobs_path) as f:
+                data = json.load(f)
+            jobs = data if isinstance(data, list) else data.get("jobs", [])
+        else:
+            jobs = []
+    except Exception:
+        jobs = []
+
+    if not jobs:
+        return HTMLResponse(content='<div id="cron-liste"><div class="gri">⏰ Zamanlanmış görev yok</div></div>')
+
+    html = ['<div id="cron-liste">']
+    html.append('<table class="table"><thead><tr>')
+    html.append('<th>Ad</th><th>Schedule</th><th>Son Çalışma</th><th>Durum</th><th>İşlem</th>')
+    html.append('</tr></thead><tbody>')
+
+    now = datetime.now().isoformat()[:19]
+    for j in jobs:
+        if isinstance(j, dict):
+            durum_raw = j.get("last_status", "")
+            active = j.get("enabled", True)
+            durum = "✅" if active and durum_raw == "ok" else \
+                    "❌" if durum_raw == "error" else "⏸️" if not active else "🔄"
+            son = (j.get("last_run_at") or "-")[:16]
+            html.append("<tr>")
+            html.append(f"<td><b>{j.get('name', '?')}</b></td>")
+            html.append(f"<td><code>{j.get('schedule', '-')}</code></td>")
+            html.append(f"<td>{son}</td>")
+            html.append(f"<td>{durum}</td>")
+            html.append(f"<td class='islem'>")
+            job_id = j.get("job_id", j.get("id", ""))
+            if active:
+                html.append(f"<button class='btn btn-sm' onclick='cronDurdur(\"{job_id}\")'>⏸️</button>")
+            else:
+                html.append(f"<button class='btn btn-sm' onclick='cronDevam(\"{job_id}\")'>▶️</button>")
+            html.append(f"<button class='btn btn-sm' onclick='cronSil(\"{job_id}\")'>🗑️</button>")
+            html.append("</td></tr>")
+
+    html.append('</tbody></table></div>')
+    return HTMLResponse(content="\n".join(html))
+
+
+@app.post("/api/cron/ekle")
+async def api_cron_ekle(request: Request):
+    """Yeni cron job ekle."""
+    data = await request.form()
+    ad = data.get("ad", "").strip()
+    zaman = data.get("zaman", "").strip()
+    komut = data.get("komut", "").strip()
+
+    if not ad or not zaman or not komut:
+        return HTMLResponse(content='<div id="cron-liste" class="alert alert-error">Eksik alanlar var</div>')
+
+    try:
+        import uuid
+        jobs_path = Path.home() / ".hermes" / "cron" / "jobs.json"
+        jobs_path.parent.mkdir(parents=True, exist_ok=True)
+
+        jobs = []
+        if jobs_path.exists():
+            with open(jobs_path) as f:
+                jobs = json.load(f)
+
+        new_job = {
+            "job_id": uuid.uuid4().hex[:12],
+            "name": ad,
+            "schedule": zaman,
+            "prompt": komut,
+            "enabled": True,
+            "last_status": "",
+            "repeat": "forever",
+            "created_at": datetime.now().isoformat(),
+        }
+        if isinstance(jobs, list):
+            jobs.append(new_job)
+        else:
+            jobs = [new_job]
+
+        with open(jobs_path, "w") as f:
+            json.dump(jobs, f, indent=2)
+
+        return HTMLResponse(
+            content=f'<div id="cron-liste" hx-get="/api/cron" hx-trigger="load" hx-swap="outerHTML">'
+                    f'<div class="alert alert-success">✅ {ad} eklendi</div></div>'
+        )
+    except Exception as e:
+        return HTMLResponse(content=f'<div id="cron-liste" class="alert alert-error">{e}</div>')
+
+
+@app.post("/api/cron/sil/{job_id}")
+async def api_cron_sil(job_id: str):
+    """Cron job sil."""
+    try:
+        jobs_path = Path.home() / ".hermes" / "cron" / "jobs.json"
+        if not jobs_path.exists():
+            return HTMLResponse(content='<div id="cron-liste" class="alert alert-error">Cron dosyası yok</div>')
+
+        with open(jobs_path) as f:
+            jobs = json.load(f)
+
+        if isinstance(jobs, list):
+            jobs = [j for j in jobs if j.get("job_id") != job_id and j.get("id") != job_id]
+        elif isinstance(jobs, dict) and "jobs" in jobs:
+            jobs["jobs"] = [j for j in jobs["jobs"] if j.get("job_id") != job_id and j.get("id") != job_id]
+
+        with open(jobs_path, "w") as f:
+            json.dump(jobs, f, indent=2)
+
+        return HTMLResponse(
+            content=f'<div id="cron-liste" hx-get="/api/cron" hx-trigger="load" hx-swap="outerHTML">'
+                    f'<div class="alert alert-success">🗑️ Silindi</div></div>'
+        )
+    except Exception as e:
+        return HTMLResponse(content=f'<div id="cron-liste" class="alert alert-error">{e}</div>')
+
+
+@app.post("/api/cron/durdur/{job_id}")
+async def api_cron_durdur(job_id: str):
+    """Cron job durdur."""
+    try:
+        jobs_path = Path.home() / ".hermes" / "cron" / "jobs.json"
+        if jobs_path.exists():
+            with open(jobs_path) as f:
+                jobs = json.load(f)
+
+            def _toggle(j):
+                if j.get("job_id") == job_id or j.get("id") == job_id:
+                    j["enabled"] = False
+                return j
+
+            if isinstance(jobs, list):
+                jobs = [_toggle(j) for j in jobs]
+            elif isinstance(jobs, dict) and "jobs" in jobs:
+                jobs["jobs"] = [_toggle(j) for j in jobs["jobs"]]
+
+            with open(jobs_path, "w") as f:
+                json.dump(jobs, f, indent=2)
+
+        return HTMLResponse(
+            content=f'<div id="cron-liste" hx-get="/api/cron" hx-trigger="load" hx-swap="outerHTML">'
+                    f'<div class="alert alert-info">⏸️ Durduruldu</div></div>'
+        )
+    except Exception as e:
+        return HTMLResponse(content=f'<div id="cron-liste" class="alert alert-error">{e}</div>')
+
+
+@app.post("/api/cron/devam/{job_id}")
+async def api_cron_devam(job_id: str):
+    """Cron job devam ettir."""
+    try:
+        jobs_path = Path.home() / ".hermes" / "cron" / "jobs.json"
+        if jobs_path.exists():
+            with open(jobs_path) as f:
+                jobs = json.load(f)
+
+            def _toggle(j):
+                if j.get("job_id") == job_id or j.get("id") == job_id:
+                    j["enabled"] = True
+                return j
+
+            if isinstance(jobs, list):
+                jobs = [_toggle(j) for j in jobs]
+            elif isinstance(jobs, dict) and "jobs" in jobs:
+                jobs["jobs"] = [_toggle(j) for j in jobs["jobs"]]
+
+            with open(jobs_path, "w") as f:
+                json.dump(jobs, f, indent=2)
+
+        return HTMLResponse(
+            content=f'<div id="cron-liste" hx-get="/api/cron" hx-trigger="load" hx-swap="outerHTML">'
+                    f'<div class="alert alert-info">▶️ Devam ediyor</div></div>'
+        )
+    except Exception as e:
+        return HTMLResponse(content=f'<div id="cron-liste" class="alert alert-error">{e}</div>')
+
+
+@app.post("/api/cron/calistir/{job_id}")
+async def api_cron_calistir(job_id: str):
+    """Cron job'u hemen çalıştır."""
+    return HTMLResponse(
+        content=f'<div id="cron-liste" hx-get="/api/cron" hx-trigger="load" hx-swap="outerHTML">'
+                f'<div class="alert alert-info">🔁 Komut gönderildi (scheduler değerlendirecek)</div></div>'
+    )
+
+
+# ═══════════════════════════════════════════════════════════════════
+# API — Hata Yönetimi
+# ═══════════════════════════════════════════════════════════════════
+
+@app.get("/hatalar", response_class=HTMLResponse)
+async def hatalar_sayfasi(request: Request):
+    """Hata yönetim sayfası."""
+    return templates.TemplateResponse(request, "hatalar.html", {})
+
+
+@app.get("/api/hatalar")
+async def api_hatalar_liste(
+    limit: int = 50,
+    offset: int = 0,
+    seviye: str = "",
+    kaynak: str = "",
+):
+    """Hata listesi HTML."""
+    from reymen.sistem.hata_topla import hata_topla
+    depo = hata_topla().depo
+    kayitlar = depo.listele(limit=limit, offset=offset, seviye=seviye, kaynak=kaynak)
+
+    if not kayitlar:
+        return HTMLResponse(content='<div id="hata-liste"><div class="gri">✅ Hata kaydı yok</div></div>')
+
+    html = ['<div id="hata-liste">']
+    html.append('<table class="table"><thead><tr>')
+    html.append('<th>Zaman</th><th>Seviye</th><th>Kaynak</th><th>Mesaj</th><th>Detay</th>')
+    html.append('</tr></thead><tbody>')
+
+    for i, k in enumerate(kayitlar):
+        sev = k.get("seviye", "INFO")
+        ikon = {"CRITICAL": "🔴", "ERROR": "🟠", "WARNING": "🟡", "INFO": "🔵"}.get(sev, "⚪")
+        sinif = {"CRITICAL": "tag-critical", "ERROR": "tag-error",
+                 "WARNING": "tag-warning"}.get(sev, "")
+        trace = k.get("traceback", "")
+        tid = f"t{i}"
+
+        html.append(f"<tr class='{sinif}'>")
+        html.append(f"<td class='cizgi'>{k.get('zaman', '?')[:19]}</td>")
+        html.append(f"<td><b>{ikon} {sev}</b></td>")
+        html.append(f"<td class='cizgi'>{k.get('kaynak', '?')}</td>")
+        html.append(f"<td>{k.get('mesaj', '')[:100]}</td>")
+        html.append(f"<td>")
+        if trace:
+            html.append(f"<button class='btn btn-sm' onclick='traceToggle(\"{tid}\")'>📋</button>")
+        html.append(f"</td></tr>")
+        if trace:
+            html.append(f"<tr id='trace-{tid}' class='gizli'><td colspan='5'>"
+                        f"<pre style='max-height:200px;font-size:11px;'>{trace[:2000]}</pre></td></tr>")
+
+    html.append('</tbody></table>')
+    html.append(f'<div class="gri" style="text-align:center;padding:0.5rem;">'
+                f'Toplam {len(kayitlar)} kayıt</div>')
+    html.append('</div>')
+    return HTMLResponse(content="\n".join(html))
+
+
+@app.get("/api/hatalar/ozet")
+async def api_hatalar_ozet():
+    """Hata özet kartları HTML."""
+    from reymen.sistem.hata_topla import hata_topla
+    ozet = hata_topla().depo.ozet()
+
+    html = [
+        '<div class="cards" style="display:grid;grid-template-columns:repeat(5,1fr);gap:0.5rem;">',
+        f'<div class="card" style="text-align:center;"><h3>{ozet["toplam"]}</h3><div class="gri">Toplam</div></div>',
+        f'<div class="card" style="text-align:center;border-left:3px solid #ef4444;">'
+        f'<h3 style="color:#ef4444;">{ozet["CRITICAL"]}</h3><div class="gri">Kritik</div></div>',
+        f'<div class="card" style="text-align:center;border-left:3px solid #f97316;">'
+        f'<h3 style="color:#f97316;">{ozet["ERROR"]}</h3><div class="gri">Hata</div></div>',
+        f'<div class="card" style="text-align:center;border-left:3px solid #eab308;">'
+        f'<h3 style="color:#eab308;">{ozet["WARNING"]}</h3><div class="gri">Uyarı</div></div>',
+        f'<div class="card" style="text-align:center;border-left:3px solid #3b82f6;">'
+        f'<h3 style="color:#3b82f6;">{ozet["INFO"]}</h3><div class="gri">Bilgi</div></div>',
+        '</div>',
+    ]
+    return HTMLResponse(content="\n".join(html))
+
+
+@app.post("/api/hatalar/temizle")
+async def api_hatalar_temizle():
+    """Tüm hata kayıtlarını temizle."""
+    from reymen.sistem.hata_topla import hata_topla
+    say = hata_topla().depo.temizle()
+    return HTMLResponse(
+        content=f'<div id="hata-liste"><div class="alert alert-success">🧹 {say} kayıt silindi</div></div>'
+    )
+
+
+@app.post("/api/hatalar/test-bildirim")
+async def api_hatalar_test_bildirim():
+    """Test bildirimi gönder."""
+    from reymen.sistem.hata_topla import hata_topla
+    kayit = hata_topla().manuel_kaydet(
+        seviye="ERROR",
+        kaynak="web_ui.test",
+        mesaj="Bu bir test hata bildirimidir",
+    )
+    # Toast için HTML
+    html = (
+        '<div class="toast toast-success" hx-trigger="load delay:3s" '
+        'hx-swap="delete" hx-target="closest .toast">'
+        '✅ Test bildirimi gönderildi</div>'
+    )
+    return HTMLResponse(content=html)
+
+
+@app.post("/api/hatalar/bildirim-ayarla")
+async def api_hatalar_bildirim_ayarla(request: Request):
+    """Bildirim kanalı ayarla."""
+    data = await request.form()
+    tur = data.get("tur", "")
+    hedef = data.get("hedef", "")
+    esik = data.get("esik", "ERROR")
+
+    from reymen.sistem.hata_topla import bildirim_kanal_ekle
+    bildirim_kanal_ekle(tur, hedef, esik)
+
+    return HTMLResponse(content='<div class="alert alert-success">✅ Bildirim kanalı eklendi</div>')
+
+
 # ---------------------------------------------------------------------------
 # API — Plugin JSON
 # ---------------------------------------------------------------------------
@@ -1496,7 +1889,7 @@ async def health():
 
 @app.get("/konusmalar", response_class=HTMLResponse)
 async def konusmalar_sayfasi(request: Request):
-    user = _require_auth(request)
+    user = getattr(request.state, "user", None)
     if not user:
         return RedirectResponse(url="/login")
     konusmalar = _konusma_listele()
@@ -1507,7 +1900,7 @@ async def konusmalar_sayfasi(request: Request):
 
 @app.get("/api/konusmalar")
 async def api_konusmalar(request: Request):
-    user = _require_auth(request)
+    user = getattr(request.state, "user", None)
     if not user:
         return JSONResponse({"hata": "Yetkisiz"}, status_code=401)
     konusmalar = _konusma_listele()
@@ -1524,7 +1917,7 @@ async def api_konusmalar(request: Request):
 
 @app.get("/api/konusmalar/{konusma_id}/mesajlar")
 async def api_konusma_mesajlar(konusma_id: str, request: Request):
-    user = _require_auth(request)
+    user = getattr(request.state, "user", None)
     if not user:
         return JSONResponse({"hata": "Yetkisiz"}, status_code=401)
     mesajlar = _konusma_mesajlari_getir(konusma_id)
@@ -1541,7 +1934,7 @@ async def api_toast_gonder(request: Request):
     Kullanim: curl -X POST /api/toast/gonder -H "Cookie: ..." \\
               -d "mesaj=Islem tamam&tip=success"
     """
-    user = _require_auth(request)
+    user = getattr(request.state, "user", None)
     if not user:
         return JSONResponse({"hata": "Yetkisiz"}, status_code=401)
     data = await request.form()

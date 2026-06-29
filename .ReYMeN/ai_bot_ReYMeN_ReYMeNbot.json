@@ -1,0 +1,47 @@
+{
+  "offset": 649616147,
+  "model": "deepseek-v4-flash",
+  "provider": "deepseek",
+  "sistem_prompt": "Sen ReYMeN adinda yardimsever bir AI asistanisin. Kisa ve oz cevap ver. Turkce konus. Sohbet et, sorulari yanitla.",
+  "bilinen_chatler": [
+    6328823909
+  ],
+  "konusma_gecmisi": [
+    {
+      "kullanici": "Hey",
+      "asistan": "[Beyin Hatası] ❌ Hiçbir sağlayıcı çalışmıyor. API anahtarları geçersiz."
+    },
+    {
+      "kullanici": "Heylll",
+      "asistan": "[Beyin Hatası] ❌ Hiçbir sağlayıcı çalışmıyor. API anahtarları geçersiz."
+    },
+    {
+      "kullanici": "Hangi ajansin",
+      "asistan": "[Beyin Hatası] ❌ Hiçbir sağlayıcı çalışmıyor. API anahtarları geçersiz."
+    },
+    {
+      "kullanici": "Hangi ajansin",
+      "asistan": "[Beyin Hatası] ❌ Hiçbir sağlayıcı çalışmıyor. API anahtarları geçersiz."
+    },
+    {
+      "kullanici": "Slm",
+      "asistan": "[Beyin Hatası] ❌ Hiçbir sağlayıcı çalışmıyor. API anahtarları geçersiz."
+    },
+    {
+      "kullanici": "Hangi ajansin",
+      "asistan": "[Beyin Hatası] ❌ Hiçbir sağlayıcı çalışmıyor. API anahtarları geçersiz."
+    },
+    {
+      "kullanici": "Slm",
+      "asistan": "[Beyin Hatası] ❌ Hiçbir sağlayıcı çalışmıyor. API anahtarları geçersiz."
+    },
+    {
+      "kullanici": "Hey",
+      "asistan": "[Beyin Hatası] ❌ Hiçbir sağlayıcı çalışmıyor. API anahtarları geçersiz."
+    },
+    {
+      "kullanici": "Dunya nasil",
+      "asistan": "Dünya iyi, teşekkürler. Sen nasılsın? 😊"
+    }
+  ]
+}

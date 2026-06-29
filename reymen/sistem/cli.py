@@ -244,7 +244,7 @@ def main(
                     _grace = 1.5
                 if _grace > 0:
                     time.sleep(_grace)
-        except Exception:
+        except Exception as _e:
             pass  # never block signal handling
         # Kanban worker exit path (#28181): SIGTERM hits a dispatcher-spawned
         # worker that's likely in a non-daemon thread waiting on a child
@@ -285,7 +285,7 @@ def main(
         _signal.signal(_signal.SIGTERM, _signal_handler_q)
         if hasattr(_signal, "SIGHUP"):
             _signal.signal(_signal.SIGHUP, _signal_handler_q)
-    except Exception:
+    except Exception as _e:
         pass  # signal handler may fail in restricted environments
     
     # Handle single query mode

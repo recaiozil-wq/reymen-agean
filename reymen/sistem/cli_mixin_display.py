@@ -770,7 +770,7 @@ class MixinDisplay:
                         tools_str += f", +{len(item['tools'])-2} more"
                     self._console_print(f"   [dim]• {item['name']}[/] [dim italic]({', '.join(item['missing_vars'])})[/]")
                 self._console_print("[dim]   Run 'ReYMeN setup' to configure[/]")
-        except Exception:
+        except Exception as _e:
             pass  # Don't crash on import errors
 
 

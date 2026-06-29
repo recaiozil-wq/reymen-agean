@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Canlı Log — ReYMeN Web UI{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2>📋 Canlı Log</h2>
+    <div class="flex">
+        <button class="btn" onclick="document.getElementById('log-panel').scrollTop = 0">⬆ Başa Dön</button>
+        <button class="btn" onclick="document.getElementById('log-panel').scrollTop = document.getElementById('log-panel').scrollHeight">⬇ Sona Git</button>
+        <button class="btn" onclick="document.querySelector('#log-panel pre').innerHTML = ''">🧹 Temizle</button>
+    </div>
+</div>
+<div class="kart">
+    <p class="gri">Canlı log akışı — WebSocket bağlantısı otomatik</p>
+</div>
+<div id="log-panel" class="log-panel" hx-ext="ws" ws-connect="/ws/logs">
+    <div hx-get="/api/log/tail?n=100" hx-trigger="load" hx-swap="innerHTML">
+        Yükleniyor...
+    </div>
+    <pre></pre>
+</div>
+{% endblock %}

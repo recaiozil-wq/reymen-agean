@@ -231,6 +231,91 @@ def _cmd_a2a(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_plugin(args: argparse.Namespace) -> int:
+    """Plugin yönetimi komutları."""
+    try:
+        from reymen.sistem.plugin_manager import PluginYoneticisi
+        from pathlib import Path
+        yonetici = PluginYoneticisi(
+            plugin_dir=Path(__file__).parent / "sistem" / "plugins"
+        )
+    except ImportError as e:
+        print(f"[Plugin] Plugin sistemi yuklu degil: {e}", file=sys.stderr)
+        return 1
+
+    if args.sub == "list":
+        plugins = yonetici.list_plugins()
+        if not plugins:
+            print("[Plugin] Plugin bulunamadi.")
+            return 0
+        print(f"\n{'Durum':6s} {'Ad':25s} {'Versiyon':10s} {'Tür':10s} {'Açıklama'}")
+        print("-" * 80)
+        for p in plugins:
+            durum = "✓ aktif" if p["enabled"] else "✗ pasif"
+            yuklu = "Y" if p["loaded"] else "-"
+            print(f"{durum:6s} [{yuklu}] {p['name'][:24]:25s} {p['version'][:9]:10s} {p['kind'][:9]:10s} {p['description'][:50]}")
+        istatistik = yonetici.plugin_sayisi()
+        print(f"\n📊 {istatistik['toplam']} plugin, {istatistik['aktif']} aktif, {istatistik['devre_disi']} devre disi")
+
+    elif args.sub == "info":
+        if not args.plugin_name:
+            print("[Plugin] Plugin adi gerekli.")
+            return 1
+        bilgi = yonetici.plugin_info(args.plugin_name)
+        if not bilgi:
+            print(f"[Plugin] '{args.plugin_name}' bulunamadi.")
+            return 1
+        for k, v in bilgi.items():
+            print(f"  {k}: {v}")
+
+    elif args.sub == "enable":
+        if not args.plugin_name:
+            print("[Plugin] Plugin adi gerekli.")
+            return 1
+        if yonetici.enable_plugin(args.plugin_name):
+            print(f"[Plugin] '{args.plugin_name}' aktif edildi.")
+        else:
+            print(f"[Plugin] '{args.plugin_name}' aktif edilemedi.")
+
+    elif args.sub == "disable":
+        if not args.plugin_name:
+            print("[Plugin] Plugin adi gerekli.")
+            return 1
+        if yonetici.disable_plugin(args.plugin_name):
+            print(f"[Plugin] '{args.plugin_name}' devre disi birakildi.")
+        else:
+            print(f"[Plugin] '{args.plugin_name}' devre disi birakilamadi.")
+
+    elif args.sub == "reload":
+        if not args.plugin_name:
+            print("[Plugin] Plugin adi gerekli.")
+            return 1
+        if yonetici.plugin_reload(args.plugin_name):
+            print(f"[Plugin] '{args.plugin_name}' yeniden yuklendi.")
+        else:
+            print(f"[Plugin] '{args.plugin_name}' yeniden yuklenemedi.")
+
+    elif args.sub == "export":
+        if not args.plugin_name:
+            print("[Plugin] Plugin adi gerekli.")
+            return 1
+        sonuc = yonetici.export_plugin(args.plugin_name, getattr(args, "output", None))
+        print(sonuc)
+
+    elif args.sub == "import":
+        if not args.dosya:
+            print("[Plugin] .reyplugin dosya yolu gerekli.")
+            return 1
+        sonuc = yonetici.import_plugin(args.dosya)
+        print(sonuc)
+
+    else:
+        plugins = yonetici.list_plugins()
+        _print_json(plugins)
+
+    return 0
+
+
 # ---------------------------------------------------------------------------
 # Parser
 # ---------------------------------------------------------------------------
@@ -312,6 +397,25 @@ def build_parser() -> argparse.ArgumentParser:
     # a2a
     p_a2a = sub.add_parser("a2a", help="A2A mesajlaşma demo")
     p_a2a.set_defaults(func=_cmd_a2a)
+
+    # plugin
+    p_plugin = sub.add_parser("plugin", help="Plugin yönetimi")
+    p_plugin_sub = p_plugin.add_subparsers(dest="sub")
+    p_plugin_sub.add_parser("list", help="Pluginleri listele")
+    p_info = p_plugin_sub.add_parser("info", help="Plugin detayı")
+    p_info.add_argument("plugin_name", help="Plugin adı")
+    p_enable = p_plugin_sub.add_parser("enable", help="Plugin'i aktif et")
+    p_enable.add_argument("plugin_name", help="Plugin adı")
+    p_disable = p_plugin_sub.add_parser("disable", help="Plugin'i devre dışı bırak")
+    p_disable.add_argument("plugin_name", help="Plugin adı")
+    p_reload = p_plugin_sub.add_parser("reload", help="Plugin'i yeniden yükle")
+    p_reload.add_argument("plugin_name", help="Plugin adı")
+    p_export = p_plugin_sub.add_parser("export", help="Plugin'i .reyplugin paketine dışa aktar")
+    p_export.add_argument("plugin_name", help="Plugin adı")
+    p_export.add_argument("--output", "-o", default=None, help="Çıktı dosya yolu")
+    p_import = p_plugin_sub.add_parser("import", help=".reyplugin paketini içe aktar")
+    p_import.add_argument("dosya", help=".reyplugin dosya yolu")
+    p_plugin.set_defaults(func=_cmd_plugin, sub="list")
 
     return parser
 

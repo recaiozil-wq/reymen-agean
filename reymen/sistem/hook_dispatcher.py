@@ -44,7 +44,7 @@ class HookDispatcher:
         """Bir olay icin callback fonksiyonu kaydet.
 
         Args:
-            olay: Olay adi (ornek: "TOOL_CALLED", "TOOL_ERROR")
+            olay: Olay adi (ornek: "on_tool_call", "TOOL_CALLED")
             fn: Callback fonksiyonu
 
         Returns:
@@ -53,14 +53,17 @@ class HookDispatcher:
         try:
             if not callable(fn):
                 return "[HookDispatcher] fn cagrilabilir olmali."
-
+            # Ayni anda kendi havuzuna ve cereyan API'sina kaydet
             if fn not in self._hooks[olay]:
                 self._hooks[olay].append(fn)
-                logger.info(f"Hook kaydedildi: {olay} -> {fn.__name__}")
-                return f"[HookDispatcher] '{olay}' icin {fn.__name__} kaydedildi."
-            else:
-                return f"[HookDispatcher] {fn.__name__} zaten kayitli."
-
+            # Cereyan API'sina da kaydet (konusma dongusu ile uyum)
+            try:
+                from reymen.cereyan.hook_dispatcher import hook_kaydet as _hk
+                _hk(olay, fn)
+            except Exception:
+                pass
+            logger.info(f"Hook kaydedildi: {olay} -> {fn.__name__}")
+            return f"[HookDispatcher] '{olay}' icin {fn.__name__} kaydedildi."
         except Exception as e:
             logger.exception("Hook kayit hatasi")
             return f"[HookDispatcher] Kayit hatasi: {e}"
@@ -231,6 +234,10 @@ class HookDispatcher:
             return "[HookDispatcher] Dagitic kapatildi."
         except Exception as e:
             return f"[HookDispatcher] Kapatma hatasi: {e}"
+
+
+# Motor uyumlulugu icin alias
+AsynchronousHookDispatcher = HookDispatcher
 
 
 def run(**kwargs):

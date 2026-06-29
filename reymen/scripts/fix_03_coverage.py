@@ -83,7 +83,7 @@ def main():
                 cd = json.loads(cov_json.read_text()).get("totals",{})
                 rapor["coverage"] = {"toplam_satir":cd.get("num_statements"),"kapsanan":cd.get("covered_lines"),"yüzde":cd.get("percent_covered_display")}
                 ok(f"Coverage: %{cd.get('percent_covered_display','?')}")
-            except Exception:  # nosec
+            except Exception as _e:
                 pass  # TODO: log ekle
 
     hdr("4. cli.py Coverage")

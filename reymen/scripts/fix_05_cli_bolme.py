@@ -48,7 +48,7 @@ def main():
                         current_blok["fonksiyonlar"].append(node.name)
                     elif isinstance(node, ast.ClassDef):
                         current_blok["siniflar"].append(node.name)
-            except Exception:  # nosec
+            except Exception as _e:
                 pass  # TODO: log ekle
     if current_blok: bloklar.append(current_blok)
 

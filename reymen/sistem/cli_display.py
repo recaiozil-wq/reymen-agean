@@ -645,7 +645,7 @@ def _cprint(text: str):
                 _aio.ensure_future(coro)
             # else: run_in_terminal ran the lambda synchronously; nothing more
             # to do (double-scheduling would print twice).
-        except Exception:
+        except Exception as _e:
             pass  # best-effort; the line may already have been printed
 
     try:

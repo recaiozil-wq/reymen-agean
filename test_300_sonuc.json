@@ -1,0 +1,2105 @@
+{
+  "rapor": "\n========================================\nREYMEN 300 SORU TEST\n========================================\nToplam: 300 soru\nSure: 889s\nHata: 18\nBasari: 282 (%94)\n\nKAYNAK: cache=204 web=60 llm=19 oneri=17 hafiza=0\nORTALAMA SURE: 2.96s\n\nHATALAR:\n  [11] docker ne zaman -> HATA\n  [25] 123456b -> HATA\n  [61] populer hindistan egitim nerede -> HATA\n  [76] 123456c -> HATA\n  [77] spor 2026 ozellikleri -> HATA\n  [79] git haberleri -> HATA\n  [82] kubernetes nedir -> HATA\n  [88] 123456c -> HATA\n  [200] populer hindistan deprem kim -> HATA\n  [204] docker nerede -> HATA\n  ...ve 8 hata daha\n",
+  "sonuclar": [
+    {
+      "no": 1,
+      "soru": "qwertyb",
+      "kaynak": "oncelik_cache",
+      "sure": 0.05,
+      "sorun": ""
+    },
+    {
+      "no": 2,
+      "soru": "kucuk rusya ekonomi neden",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 3,
+      "soru": "windows fiyati",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 4,
+      "soru": "java ne zaman",
+      "kaynak": "web_arama",
+      "sure": 13.21,
+      "sorun": ""
+    },
+    {
+      "no": 5,
+      "soru": "2026 japonya deprem kim",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 6,
+      "soru": "yeni ispanya spor tarihi",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 7,
+      "soru": "git neden",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 8,
+      "soru": "foobarb",
+      "kaynak": "web_arama",
+      "sure": 7.44,
+      "sorun": ""
+    },
+    {
+      "no": 9,
+      "soru": "asdfb",
+      "kaynak": "web_arama",
+      "sure": 10.42,
+      "sorun": ""
+    },
+    {
+      "no": 10,
+      "soru": "guncel ispanya savas haberleri",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 11,
+      "soru": "docker ne zaman",
+      "kaynak": "llm",
+      "sure": 15.24,
+      "sorun": "HATA"
+    },
+    {
+      "no": 12,
+      "soru": "son ispanya spor ozellikleri",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 13,
+      "soru": "en iyi brezilya sanat haberleri",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 14,
+      "soru": "kucuk japonya secim tarihi",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 15,
+      "soru": "ok",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 16,
+      "soru": "buyuk japonya uzay nerede",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 17,
+      "soru": "onemli brezilya spor ne zaman",
+      "kaynak": "oncelik_cache",
+      "sure": 0.0,
+      "sorun": ""
+    },
+    {
+      "no": 18,
+      "soru": "windows neden",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 19,
+      "soru": "qwertya",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 20,
+      "soru": "git fiyati",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 21,
+      "soru": "zxcvbnb",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 22,
+      "soru": "merhaba",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 23,
+      "soru": "123456c",
+      "kaynak": "llm",
+      "sure": 4.88,
+      "sorun": ""
+    },
+    {
+      "no": 24,
+      "soru": "guncel fransa deprem haberleri",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 25,
+      "soru": "123456b",
+      "kaynak": "llm",
+      "sure": 4.55,
+      "sorun": "HATA"
+    },
+    {
+      "no": 26,
+      "soru": "son ispanya uzay nerede",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 27,
+      "soru": "python nasil yapilir",
+      "kaynak": "oncelik_cache",
+      "sure": 0.0,
+      "sorun": ""
+    },
+    {
+      "no": 28,
+      "soru": "yeni fransa iklim ne zaman",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 29,
+      "soru": "javascript kim",
+      "kaynak": "web_arama",
+      "sure": 11.4,
+      "sorun": ""
+    },
+    {
+      "no": 30,
+      "soru": "yeni brezilya secim kim",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 31,
+      "soru": "javascript kim",
+      "kaynak": "web_arama",
+      "sure": 8.42,
+      "sorun": ""
+    },
+    {
+      "no": 32,
+      "soru": "en kotu japonya sanat kim",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 33,
+      "soru": "xyzabca",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 34,
+      "soru": "selamun aleykum",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 35,
+      "soru": "en iyi rusya spor nedir",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 36,
+      "soru": "iyi misin",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 37,
+      "soru": "onemli ispanya savas tarihi",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 38,
+      "soru": "turkiye nedir",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 39,
+      "soru": "qwertyb",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 40,
+      "soru": "fransa kim",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 41,
+      "soru": "tesekkur",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 42,
+      "soru": "foobarb",
+      "kaynak": "web_arama",
+      "sure": 9.24,
+      "sorun": ""
+    },
+    {
+      "no": 43,
+      "soru": "123456a",
+      "kaynak": "web_arama",
+      "sure": 13.6,
+      "sorun": ""
+    },
+    {
+      "no": 44,
+      "soru": "saglik en iyi haberleri",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 45,
+      "soru": "xyzabca",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 46,
+      "soru": "xyzabcc",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 47,
+      "soru": "git neden",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 48,
+      "soru": "secim populer nerede",
+      "kaynak": "web_arama",
+      "sure": 8.09,
+      "sorun": ""
+    },
+    {
+      "no": 49,
+      "soru": "buyuk turkiye savas ozellikleri",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 50,
+      "soru": "almanya haberleri",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 51,
+      "soru": "foobarc",
+      "kaynak": "web_arama",
+      "sure": 7.52,
+      "sorun": ""
+    },
+    {
+      "no": 52,
+      "soru": "tesekkur",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 53,
+      "soru": "xyzabcc",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 54,
+      "soru": "javascript en iyi",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 55,
+      "soru": "ok",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 56,
+      "soru": "xyzabcc",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 57,
+      "soru": "saglik buyuk fiyati",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 58,
+      "soru": "go nerede",
+      "kaynak": "web_arama",
+      "sure": 10.49,
+      "sorun": ""
+    },
+    {
+      "no": 59,
+      "soru": "2026 almanya ekonomi nerede",
+      "kaynak": "oncelik_cache",
+      "sure": 0.91,
+      "sorun": ""
+    },
+    {
+      "no": 60,
+      "soru": "foobara",
+      "kaynak": "web_arama",
+      "sure": 5.67,
+      "sorun": ""
+    },
+    {
+      "no": 61,
+      "soru": "populer hindistan egitim nerede",
+      "kaynak": "llm",
+      "sure": 16.6,
+      "sorun": "HATA"
+    },
+    {
+      "no": 62,
+      "soru": "en iyi japonya savas kim",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 63,
+      "soru": "xyzabcb",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 64,
+      "soru": "xyzabcb",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 65,
+      "soru": "en kotu deprem",
+      "kaynak": "web_arama",
+      "sure": 1.75,
+      "sorun": ""
+    },
+    {
+      "no": 66,
+      "soru": "populer turkiye deprem haberleri",
+      "kaynak": "oncelik_cache",
+      "sure": 0.06,
+      "sorun": ""
+    },
+    {
+      "no": 67,
+      "soru": "2026 brezilya savas ne zaman",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 68,
+      "soru": "populer fransa egitim nedir",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 69,
+      "soru": "slm",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 70,
+      "soru": "2026 rusya spor nedir",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 71,
+      "soru": "asdfc",
+      "kaynak": "web_arama",
+      "sure": 13.18,
+      "sorun": ""
+    },
+    {
+      "no": 72,
+      "soru": "kubernetes en iyi",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 73,
+      "soru": "nasilsin",
+      "kaynak": "web_arama",
+      "sure": 13.11,
+      "sorun": ""
+    },
+    {
+      "no": 74,
+      "soru": "yeni rusya savas nasil yapilir",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 75,
+      "soru": "populer almanya sanat nerede",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 76,
+      "soru": "123456c",
+      "kaynak": "oneri_uret",
+      "sure": 4.98,
+      "sorun": "HATA"
+    },
+    {
+      "no": 77,
+      "soru": "spor 2026 ozellikleri",
+      "kaynak": "llm",
+      "sure": 13.54,
+      "sorun": "HATA"
+    },
+    {
+      "no": 78,
+      "soru": "onemli egitim",
+      "kaynak": "web_arama",
+      "sure": 1.87,
+      "sorun": ""
+    },
+    {
+      "no": 79,
+      "soru": "git haberleri",
+      "kaynak": "llm",
+      "sure": 14.67,
+      "sorun": "HATA"
+    },
+    {
+      "no": 80,
+      "soru": "sanat populer haberleri",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 81,
+      "soru": "rusya kim",
+      "kaynak": "oncelik_cache",
+      "sure": 0.0,
+      "sorun": ""
+    },
+    {
+      "no": 82,
+      "soru": "kubernetes nedir",
+      "kaynak": "oneri_uret",
+      "sure": 6.55,
+      "sorun": "HATA"
+    },
+    {
+      "no": 83,
+      "soru": "go kim",
+      "kaynak": "web_arama",
+      "sure": 5.34,
+      "sorun": ""
+    },
+    {
+      "no": 84,
+      "soru": "secim onemli fiyati",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 85,
+      "soru": "docker en iyi",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 86,
+      "soru": "javascript yeni",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 87,
+      "soru": "qwertyc",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 88,
+      "soru": "123456c",
+      "kaynak": "oneri_uret",
+      "sure": 5.09,
+      "sorun": "HATA"
+    },
+    {
+      "no": 89,
+      "soru": "go haberleri",
+      "kaynak": "web_arama",
+      "sure": 1.54,
+      "sorun": ""
+    },
+    {
+      "no": 90,
+      "soru": "qwertya",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 91,
+      "soru": "xyzabcb",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 92,
+      "soru": "japonya nerede",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 93,
+      "soru": "foobarc",
+      "kaynak": "web_arama",
+      "sure": 13.38,
+      "sorun": ""
+    },
+    {
+      "no": 94,
+      "soru": "en kotu ekonomi",
+      "kaynak": "llm",
+      "sure": 20.8,
+      "sorun": ""
+    },
+    {
+      "no": 95,
+      "soru": "onemli savas",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 96,
+      "soru": "java fiyati",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 97,
+      "soru": "iyi misin",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 98,
+      "soru": "linux kim",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 99,
+      "soru": "xyzabcc",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 100,
+      "soru": "go tarihi",
+      "kaynak": "web_arama",
+      "sure": 2.51,
+      "sorun": ""
+    },
+    {
+      "no": 101,
+      "soru": "yeni brezilya deprem neden",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 102,
+      "soru": "iklim en iyi neden",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 103,
+      "soru": "windows kim",
+      "kaynak": "web_arama",
+      "sure": 13.91,
+      "sorun": ""
+    },
+    {
+      "no": 104,
+      "soru": "go son",
+      "kaynak": "web_arama",
+      "sure": 11.95,
+      "sorun": ""
+    },
+    {
+      "no": 105,
+      "soru": "java kim",
+      "kaynak": "web_arama",
+      "sure": 11.96,
+      "sorun": ""
+    },
+    {
+      "no": 106,
+      "soru": "populer almanya spor kim",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 107,
+      "soru": "go ozellikleri",
+      "kaynak": "web_arama",
+      "sure": 7.3,
+      "sorun": ""
+    },
+    {
+      "no": 108,
+      "soru": "en kotu ispanya uzay haberleri",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 109,
+      "soru": "guncel savas",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 110,
+      "soru": "kucuk hindistan spor kim",
+      "kaynak": "web_arama",
+      "sure": 4.96,
+      "sorun": ""
+    },
+    {
+      "no": 111,
+      "soru": "en iyi almanya savas ozellikleri",
+      "kaynak": "oncelik_cache",
+      "sure": 0.04,
+      "sorun": ""
+    },
+    {
+      "no": 112,
+      "soru": "javascript kucuk",
+      "kaynak": "llm",
+      "sure": 16.69,
+      "sorun": ""
+    },
+    {
+      "no": 113,
+      "soru": "guncel cin sanat neden",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 114,
+      "soru": "kucuk japonya sanat nerede",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 115,
+      "soru": "selam",
+      "kaynak": "oncelik_cache",
+      "sure": 0.0,
+      "sorun": ""
+    },
+    {
+      "no": 116,
+      "soru": "fransa ne zaman",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 117,
+      "soru": "slm",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 118,
+      "soru": "go kim",
+      "kaynak": "web_arama",
+      "sure": 14.53,
+      "sorun": ""
+    },
+    {
+      "no": 119,
+      "soru": "guncel rusya savas nerede",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 120,
+      "soru": "son hindistan spor ne zaman",
+      "kaynak": "web_arama",
+      "sure": 2.44,
+      "sorun": ""
+    },
+    {
+      "no": 121,
+      "soru": "deprem kucuk neden",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 122,
+      "soru": "son brezilya ekonomi fiyati",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 123,
+      "soru": "neden",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 124,
+      "soru": "populer japonya secim ne zaman",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 125,
+      "soru": "go 2026",
+      "kaynak": "web_arama",
+      "sure": 6.75,
+      "sorun": ""
+    },
+    {
+      "no": 126,
+      "soru": "guncel japonya ekonomi neden",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 127,
+      "soru": "savas buyuk ne zaman",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 128,
+      "soru": "en kotu italya secim nedir",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 129,
+      "soru": "123456a",
+      "kaynak": "web_arama",
+      "sure": 8.02,
+      "sorun": ""
+    },
+    {
+      "no": 130,
+      "soru": "kubernetes haberleri",
+      "kaynak": "web_arama",
+      "sure": 4.46,
+      "sorun": ""
+    },
+    {
+      "no": 131,
+      "soru": "sanat en kotu tarihi",
+      "kaynak": "oncelik_cache",
+      "sure": 0.23,
+      "sorun": ""
+    },
+    {
+      "no": 132,
+      "soru": "foobarb",
+      "kaynak": "web_arama",
+      "sure": 12.73,
+      "sorun": ""
+    },
+    {
+      "no": 133,
+      "soru": "rust nasil yapilir",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 134,
+      "soru": "buyuk ispanya uzay tarihi",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 135,
+      "soru": "windows fiyati",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 136,
+      "soru": "en kotu japonya secim kim",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 137,
+      "soru": "egitim en iyi kim",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 138,
+      "soru": "savas onemli nedir",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 139,
+      "soru": "test123b",
+      "kaynak": "web_arama",
+      "sure": 8.01,
+      "sorun": ""
+    },
+    {
+      "no": 140,
+      "soru": "en iyi brezilya deprem ozellikleri",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 141,
+      "soru": "linux son",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 142,
+      "soru": "italya haberleri",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 143,
+      "soru": "cin tarihi",
+      "kaynak": "web_arama",
+      "sure": 12.6,
+      "sorun": ""
+    },
+    {
+      "no": 144,
+      "soru": "nasilsin",
+      "kaynak": "web_arama",
+      "sure": 14.0,
+      "sorun": ""
+    },
+    {
+      "no": 145,
+      "soru": "kubernetes fiyati",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 146,
+      "soru": "onemli turkiye savas nedir",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 147,
+      "soru": "guncel rusya deprem ozellikleri",
+      "kaynak": "oncelik_cache",
+      "sure": 0.04,
+      "sorun": ""
+    },
+    {
+      "no": 148,
+      "soru": "en kotu hindistan ekonomi nasil yapilir",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 149,
+      "soru": "y",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 150,
+      "soru": "iklim yeni nasil yapilir",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 151,
+      "soru": "git ne zaman",
+      "kaynak": "llm",
+      "sure": 14.46,
+      "sorun": ""
+    },
+    {
+      "no": 152,
+      "soru": "egitim yeni tarihi",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 153,
+      "soru": "asdfa",
+      "kaynak": "web_arama",
+      "sure": 12.63,
+      "sorun": ""
+    },
+    {
+      "no": 154,
+      "soru": "2026 hindistan spor nasil yapilir",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 155,
+      "soru": "go kim",
+      "kaynak": "web_arama",
+      "sure": 12.0,
+      "sorun": ""
+    },
+    {
+      "no": 156,
+      "soru": "docker son",
+      "kaynak": "web_arama",
+      "sure": 2.89,
+      "sorun": ""
+    },
+    {
+      "no": 157,
+      "soru": "kucuk almanya saglik haberleri",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 158,
+      "soru": "windows ne zaman",
+      "kaynak": "llm",
+      "sure": 14.68,
+      "sorun": ""
+    },
+    {
+      "no": 159,
+      "soru": "test123c",
+      "kaynak": "web_arama",
+      "sure": 15.28,
+      "sorun": ""
+    },
+    {
+      "no": 160,
+      "soru": "deprem 2026 kim",
+      "kaynak": "web_arama",
+      "sure": 11.38,
+      "sorun": ""
+    },
+    {
+      "no": 161,
+      "soru": "kubernetes kim",
+      "kaynak": "web_arama",
+      "sure": 12.49,
+      "sorun": ""
+    },
+    {
+      "no": 162,
+      "soru": "en kotu turkiye ekonomi neden",
+      "kaynak": "oncelik_cache",
+      "sure": 0.34,
+      "sorun": ""
+    },
+    {
+      "no": 163,
+      "soru": "test123c",
+      "kaynak": "web_arama",
+      "sure": 4.71,
+      "sorun": ""
+    },
+    {
+      "no": 164,
+      "soru": "en iyi rusya saglik neden",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 165,
+      "soru": "selam",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 166,
+      "soru": "123456b",
+      "kaynak": "oneri_uret",
+      "sure": 5.29,
+      "sorun": ""
+    },
+    {
+      "no": 167,
+      "soru": "ekonomi buyuk ne zaman",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 168,
+      "soru": "brezilya fiyati",
+      "kaynak": "oncelik_cache",
+      "sure": 0.09,
+      "sorun": ""
+    },
+    {
+      "no": 169,
+      "soru": "hey",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 170,
+      "soru": "windows nedir",
+      "kaynak": "web_arama",
+      "sure": 12.61,
+      "sorun": ""
+    },
+    {
+      "no": 171,
+      "soru": "cin neden",
+      "kaynak": "oncelik_cache",
+      "sure": 0.06,
+      "sorun": ""
+    },
+    {
+      "no": 172,
+      "soru": "bye",
+      "kaynak": "oncelik_cache",
+      "sure": 0.0,
+      "sorun": ""
+    },
+    {
+      "no": 173,
+      "soru": "qwertya",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 174,
+      "soru": "xyzabca",
+      "kaynak": "oncelik_cache",
+      "sure": 0.05,
+      "sorun": ""
+    },
+    {
+      "no": 175,
+      "soru": "yeni iklim",
+      "kaynak": "oncelik_cache",
+      "sure": 0.05,
+      "sorun": ""
+    },
+    {
+      "no": 176,
+      "soru": "nasilsin",
+      "kaynak": "web_arama",
+      "sure": 12.56,
+      "sorun": ""
+    },
+    {
+      "no": 177,
+      "soru": "buyuk turkiye savas nasil yapilir",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 178,
+      "soru": "neden",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 179,
+      "soru": "kubernetes haberleri",
+      "kaynak": "web_arama",
+      "sure": 3.29,
+      "sorun": ""
+    },
+    {
+      "no": 180,
+      "soru": "guncel turkiye egitim neden",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 181,
+      "soru": "go haberleri",
+      "kaynak": "llm",
+      "sure": 14.59,
+      "sorun": ""
+    },
+    {
+      "no": 182,
+      "soru": "docker son",
+      "kaynak": "web_arama",
+      "sure": 12.8,
+      "sorun": ""
+    },
+    {
+      "no": 183,
+      "soru": "123456b",
+      "kaynak": "oneri_uret",
+      "sure": 4.62,
+      "sorun": ""
+    },
+    {
+      "no": 184,
+      "soru": "linux nasil yapilir",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 185,
+      "soru": "en kotu almanya secim fiyati",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 186,
+      "soru": "buyuk almanya ekonomi ozellikleri",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 187,
+      "soru": "docker onemli",
+      "kaynak": "web_arama",
+      "sure": 3.46,
+      "sorun": ""
+    },
+    {
+      "no": 188,
+      "soru": "slm",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 189,
+      "soru": "linux tarihi",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 190,
+      "soru": "123456b",
+      "kaynak": "oneri_uret",
+      "sure": 11.7,
+      "sorun": ""
+    },
+    {
+      "no": 191,
+      "soru": "2026 almanya secim ne zaman",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 192,
+      "soru": "yeni brezilya uzay ne zaman",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 193,
+      "soru": "en iyi cin spor tarihi",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 194,
+      "soru": "test123b",
+      "kaynak": "web_arama",
+      "sure": 3.06,
+      "sorun": ""
+    },
+    {
+      "no": 195,
+      "soru": "qwertyb",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 196,
+      "soru": "go ne zaman",
+      "kaynak": "web_arama",
+      "sure": 9.46,
+      "sorun": ""
+    },
+    {
+      "no": 197,
+      "soru": "kubernetes ne zaman",
+      "kaynak": "llm",
+      "sure": 14.66,
+      "sorun": ""
+    },
+    {
+      "no": 198,
+      "soru": "yeni japonya secim kim",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 199,
+      "soru": "onemli saglik",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 200,
+      "soru": "populer hindistan deprem kim",
+      "kaynak": "llm",
+      "sure": 16.83,
+      "sorun": "HATA"
+    },
+    {
+      "no": 201,
+      "soru": "buyuk ispanya sanat nerede",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 202,
+      "soru": "guncel cin uzay nedir",
+      "kaynak": "oncelik_cache",
+      "sure": 0.04,
+      "sorun": ""
+    },
+    {
+      "no": 203,
+      "soru": "java haberleri",
+      "kaynak": "llm",
+      "sure": 14.64,
+      "sorun": ""
+    },
+    {
+      "no": 204,
+      "soru": "docker nerede",
+      "kaynak": "llm",
+      "sure": 18.35,
+      "sorun": "HATA"
+    },
+    {
+      "no": 205,
+      "soru": "python fiyati",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 206,
+      "soru": "populer italya savas nerede",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 207,
+      "soru": "qwertya",
+      "kaynak": "oncelik_cache",
+      "sure": 0.0,
+      "sorun": ""
+    },
+    {
+      "no": 208,
+      "soru": "deprem onemli nasil yapilir",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 209,
+      "soru": "qwertyb",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 210,
+      "soru": "qwertyb",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 211,
+      "soru": "populer japonya egitim ozellikleri",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 212,
+      "soru": "foobarc",
+      "kaynak": "oneri_uret",
+      "sure": 6.72,
+      "sorun": ""
+    },
+    {
+      "no": 213,
+      "soru": "test123a",
+      "kaynak": "web_arama",
+      "sure": 7.58,
+      "sorun": ""
+    },
+    {
+      "no": 214,
+      "soru": "test123b",
+      "kaynak": "web_arama",
+      "sure": 2.7,
+      "sorun": ""
+    },
+    {
+      "no": 215,
+      "soru": "naber",
+      "kaynak": "web_arama",
+      "sure": 2.51,
+      "sorun": ""
+    },
+    {
+      "no": 216,
+      "soru": "windows neden",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 217,
+      "soru": "cin fiyati",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 218,
+      "soru": "123456a",
+      "kaynak": "oneri_uret",
+      "sure": 2.78,
+      "sorun": ""
+    },
+    {
+      "no": 219,
+      "soru": "docker tarihi",
+      "kaynak": "oneri_uret",
+      "sure": 3.81,
+      "sorun": ""
+    },
+    {
+      "no": 220,
+      "soru": "rusya nedir",
+      "kaynak": "oncelik_cache",
+      "sure": 0.13,
+      "sorun": ""
+    },
+    {
+      "no": 221,
+      "soru": "tmm",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 222,
+      "soru": "hey",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 223,
+      "soru": "onemli almanya spor ne zaman",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 224,
+      "soru": "kubernetes nerede",
+      "kaynak": "web_arama",
+      "sure": 1.73,
+      "sorun": ""
+    },
+    {
+      "no": 225,
+      "soru": "son cin deprem kim",
+      "kaynak": "llm",
+      "sure": 16.17,
+      "sorun": ""
+    },
+    {
+      "no": 226,
+      "soru": "123456b",
+      "kaynak": "oneri_uret",
+      "sure": 7.5,
+      "sorun": ""
+    },
+    {
+      "no": 227,
+      "soru": "son italya uzay neden",
+      "kaynak": "oncelik_cache",
+      "sure": 0.47,
+      "sorun": ""
+    },
+    {
+      "no": 228,
+      "soru": "ok",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 229,
+      "soru": "python ozellikleri",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 230,
+      "soru": "y",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 231,
+      "soru": "en kotu saglik",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 232,
+      "soru": "rust haberleri",
+      "kaynak": "llm",
+      "sure": 14.71,
+      "sorun": "HATA"
+    },
+    {
+      "no": 233,
+      "soru": "java nasil yapilir",
+      "kaynak": "oncelik_cache",
+      "sure": 0.04,
+      "sorun": ""
+    },
+    {
+      "no": 234,
+      "soru": "linux haberleri",
+      "kaynak": "oncelik_cache",
+      "sure": 0.04,
+      "sorun": ""
+    },
+    {
+      "no": 235,
+      "soru": "onemli almanya secim nerede",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 236,
+      "soru": "kucuk almanya savas ozellikleri",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 237,
+      "soru": "go nerede",
+      "kaynak": "web_arama",
+      "sure": 14.43,
+      "sorun": ""
+    },
+    {
+      "no": 238,
+      "soru": "populer ispanya savas nasil yapilir",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 239,
+      "soru": "kubernetes neden",
+      "kaynak": "oncelik_cache",
+      "sure": 0.0,
+      "sorun": ""
+    },
+    {
+      "no": 240,
+      "soru": "rusya nedir",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 241,
+      "soru": "guncel almanya saglik nasil yapilir",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 242,
+      "soru": "buyuk hindistan uzay nedir",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 243,
+      "soru": "guncel turkiye iklim nasil yapilir",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 244,
+      "soru": "test123c",
+      "kaynak": "web_arama",
+      "sure": 13.92,
+      "sorun": ""
+    },
+    {
+      "no": 245,
+      "soru": "python nasil yapilir",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 246,
+      "soru": "guncel sanat",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 247,
+      "soru": "asdfa",
+      "kaynak": "web_arama",
+      "sure": 11.5,
+      "sorun": ""
+    },
+    {
+      "no": 248,
+      "soru": "go onemli",
+      "kaynak": "web_arama",
+      "sure": 12.11,
+      "sorun": ""
+    },
+    {
+      "no": 249,
+      "soru": "populer japonya saglik haberleri",
+      "kaynak": "oncelik_cache",
+      "sure": 0.4,
+      "sorun": ""
+    },
+    {
+      "no": 250,
+      "soru": "zxcvbnb",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 251,
+      "soru": "en iyi brezilya secim fiyati",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 252,
+      "soru": "nasilsin",
+      "kaynak": "oneri_uret",
+      "sure": 2.23,
+      "sorun": ""
+    },
+    {
+      "no": 253,
+      "soru": "y",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 254,
+      "soru": "spor populer fiyati",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 255,
+      "soru": "zxcvbnc",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 256,
+      "soru": "python nerede",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 257,
+      "soru": "kucuk hindistan secim tarihi",
+      "kaynak": "llm",
+      "sure": 17.46,
+      "sorun": "HATA"
+    },
+    {
+      "no": 258,
+      "soru": "ekonomi 2026 ozellikleri",
+      "kaynak": "web_arama",
+      "sure": 7.86,
+      "sorun": ""
+    },
+    {
+      "no": 259,
+      "soru": "guncel italya spor neden",
+      "kaynak": "oncelik_cache",
+      "sure": 1.41,
+      "sorun": ""
+    },
+    {
+      "no": 260,
+      "soru": "zxcvbnb",
+      "kaynak": "oncelik_cache",
+      "sure": 0.51,
+      "sorun": ""
+    },
+    {
+      "no": 261,
+      "soru": "son italya egitim fiyati",
+      "kaynak": "oncelik_cache",
+      "sure": 0.29,
+      "sorun": ""
+    },
+    {
+      "no": 262,
+      "soru": "2026 savas",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 263,
+      "soru": "son turkiye uzay fiyati",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 264,
+      "soru": "guncel turkiye secim kim",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 265,
+      "soru": "asdfb",
+      "kaynak": "oneri_uret",
+      "sure": 4.54,
+      "sorun": "HATA"
+    },
+    {
+      "no": 266,
+      "soru": "git kim",
+      "kaynak": "web_arama",
+      "sure": 4.91,
+      "sorun": ""
+    },
+    {
+      "no": 267,
+      "soru": "linux fiyati",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 268,
+      "soru": "kucuk brezilya deprem haberleri",
+      "kaynak": "oncelik_cache",
+      "sure": 0.08,
+      "sorun": ""
+    },
+    {
+      "no": 269,
+      "soru": "x",
+      "kaynak": "oncelik_cache",
+      "sure": 0.11,
+      "sorun": ""
+    },
+    {
+      "no": 270,
+      "soru": "kubernetes nasil yapilir",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 271,
+      "soru": "onemli ekonomi",
+      "kaynak": "llm",
+      "sure": 16.57,
+      "sorun": "HATA"
+    },
+    {
+      "no": 272,
+      "soru": "savas yeni kim",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 273,
+      "soru": "foobara",
+      "kaynak": "oneri_uret",
+      "sure": 3.99,
+      "sorun": ""
+    },
+    {
+      "no": 274,
+      "soru": "slm",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 275,
+      "soru": "onemli spor",
+      "kaynak": "oneri_uret",
+      "sure": 3.95,
+      "sorun": "HATA"
+    },
+    {
+      "no": 276,
+      "soru": "en iyi hindistan iklim ne zaman",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 277,
+      "soru": "2026 cin uzay tarihi",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 278,
+      "soru": "javascript fiyati",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 279,
+      "soru": "populer japonya savas nerede",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 280,
+      "soru": "yeni fransa egitim haberleri",
+      "kaynak": "oncelik_cache",
+      "sure": 0.03,
+      "sorun": ""
+    },
+    {
+      "no": 281,
+      "soru": "go nerede",
+      "kaynak": "web_arama",
+      "sure": 3.64,
+      "sorun": ""
+    },
+    {
+      "no": 282,
+      "soru": "buyuk italya savas ne zaman",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 283,
+      "soru": "en iyi fransa egitim ozellikleri",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 284,
+      "soru": "buyuk hindistan savas nedir",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 285,
+      "soru": "en iyi fransa secim fiyati",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 286,
+      "soru": "javascript fiyati",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 287,
+      "soru": "qwertya",
+      "kaynak": "oncelik_cache",
+      "sure": 0.07,
+      "sorun": ""
+    },
+    {
+      "no": 288,
+      "soru": "python haberleri",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 289,
+      "soru": "123456a",
+      "kaynak": "oneri_uret",
+      "sure": 4.87,
+      "sorun": "HATA"
+    },
+    {
+      "no": 290,
+      "soru": "foobarc",
+      "kaynak": "oneri_uret",
+      "sure": 2.31,
+      "sorun": "HATA"
+    },
+    {
+      "no": 291,
+      "soru": "foobarc",
+      "kaynak": "oneri_uret",
+      "sure": 2.38,
+      "sorun": "HATA"
+    },
+    {
+      "no": 292,
+      "soru": "son saglik",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 293,
+      "soru": "son hindistan spor haberleri",
+      "kaynak": "web_arama",
+      "sure": 2.87,
+      "sorun": ""
+    },
+    {
+      "no": 294,
+      "soru": "qwertyb",
+      "kaynak": "oncelik_cache",
+      "sure": 0.04,
+      "sorun": ""
+    },
+    {
+      "no": 295,
+      "soru": "secim guncel nerede",
+      "kaynak": "web_arama",
+      "sure": 10.67,
+      "sorun": ""
+    },
+    {
+      "no": 296,
+      "soru": "buyuk brezilya ekonomi neden",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 297,
+      "soru": "python ne zaman",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 298,
+      "soru": "2026 ispanya ekonomi fiyati",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    },
+    {
+      "no": 299,
+      "soru": "linux haberleri",
+      "kaynak": "oncelik_cache",
+      "sure": 0.01,
+      "sorun": ""
+    },
+    {
+      "no": 300,
+      "soru": "sanat buyuk neden",
+      "kaynak": "oncelik_cache",
+      "sure": 0.02,
+      "sorun": ""
+    }
+  ]
+}

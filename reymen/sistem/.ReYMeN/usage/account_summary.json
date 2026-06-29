@@ -1,8 +1,8 @@
 {
   "olusturma": "2026-06-28T13:08:31.560861",
-  "toplam_istek": 4,
-  "toplam_token": 20,
-  "toplam_maliyet": 16.0003,
+  "toplam_istek": 52,
+  "toplam_token": 31546,
+  "toplam_maliyet": 31542.0003,
   "providerlar": {
     "test": {
       "istek": 2,
@@ -15,13 +15,19 @@
       "token": 16,
       "maliyet": 16.0,
       "model": "m"
+    },
+    "deepseek": {
+      "istek": 48,
+      "token": 31526,
+      "maliyet": 31526.0,
+      "model": "deepseek-v4-flash"
     }
   },
   "aylik_veri": {
     "2026-06": {
-      "istek": 4,
-      "token": 20,
-      "maliyet": 16.0003
+      "istek": 52,
+      "token": 31546,
+      "maliyet": 31542.0003
     }
   }
 }

@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — ReYMeN Web UI{% endblock %}
+{% block content %}
+<div class="dashboard">
+    <div class="page-header">
+        <h2>📊 Dashboard</h2>
+        <span class="gri" id="canli-zaman">Canlı</span>
+    </div>
+
+    <div class="grid-3">
+        <div class="kart">
+            <h2>🖥️ Sistem</h2>
+            <div hx-get="/api/durum" hx-trigger="load, every 10s" hx-swap="innerHTML">Yükleniyor...</div>
+        </div>
+        <div class="kart">
+            <h2>💰 Maliyet</h2>
+            <div hx-get="/api/maliyet/ozet" hx-trigger="load, every 15s" hx-swap="innerHTML">Yükleniyor...</div>
+        </div>
+        <div class="kart">
+            <h2>❤️ Sağlık</h2>
+            <div hx-get="/api/sistem/saglik/ozet" hx-trigger="load, every 15s" hx-swap="innerHTML">Yükleniyor...</div>
+        </div>
+    </div>
+
+    <!-- KPI Grafikleri -->
+    <div class="charts-grid">
+        <div class="kart">
+            <h2>📈 Maliyet Trendi</h2>
+            <div class="chart-container">
+                <canvas id="maliyet-chart"></canvas>
+            </div>
+        </div>
+        <div class="kart">
+            <h2>📊 Kalite Skoru</h2>
+            <div class="chart-container">
+                <canvas id="kalite-chart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="charts-grid">
+        <div class="kart">
+            <h2>🔧 Araç Kullanımı</h2>
+            <div class="chart-container">
+                <canvas id="arac-chart"></canvas>
+            </div>
+        </div>
+        <div class="kart">
+            <h2>⏱️ Sistem Çalışma Süresi</h2>
+            <div class="chart-container">
+                <canvas id="sure-chart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="kart">
+            <h2>🔌 Pluginler</h2>
+            <div hx-get="/api/plugins/ozet" hx-trigger="load, every 15s" hx-swap="innerHTML">Yükleniyor...</div>
+        </div>
+        <div class="kart">
+            <h2>🌐 Gateway</h2>
+            <div hx-get="/api/gateway/ozet" hx-trigger="load, every 15s" hx-swap="innerHTML">Yükleniyor...</div>
+        </div>
+    </div>
+
+    <div class="grid-3">
+        <div class="kart">
+            <h2>📦 Modüller</h2>
+            <div hx-get="/api/moduller/ozet" hx-trigger="load, every 30s" hx-swap="innerHTML">Yükleniyor...</div>
+        </div>
+        <div class="kart">
+            <h2>📋 Son Log</h2>
+            <div hx-get="/api/log/son" hx-trigger="load, every 5s" hx-swap="innerHTML">Yükleniyor...</div>
+        </div>
+        <div class="kart">
+            <h2>⚡ Hızlı İşlemler</h2>
+            <div class="flex">
+                <button class="btn" hx-post="/api/gateway/restart" hx-target="#sonuc">🔄 Gateway</button>
+                <button class="btn" hx-post="/api/bot/test" hx-target="#sonuc">🧪 Bot Test</button>
+            </div>
+            <div id="sonuc" class="sonuc-alani"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// ── Grafik Rengini Tema'ya Gore Al ─────────────────────────────
+function renk(varAdi) {
+    return getComputedStyle(document.body).getPropertyValue(varAdi).trim();
+}
+
+// ── Maliyet Grafigi ────────────────────────────────────────────
+fetch('/api/maliyet/detay')
+    .then(r => r.json())
+    .then(data => {
+        const etiket = data.etiketler || ['Son 7 gun'];
+        const degerler = data.degerler || [data.toplam || 0];
+        new Chart(document.getElementById('maliyet-chart'), {
+            type: 'line',
+            data: {
+                labels: etiket,
+                datasets: [{
+                    label: 'Maliyet ($)',
+                    data: degerler,
+                    borderColor: renk('--accent'),
+                    backgroundColor: renk('--accent') + '33',
+                    fill: true,
+                    tension: 0.3,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { labels: { color: renk('--text'), font: { size: 11 } } }
+                },
+                scales: {
+                    x: { ticks: { color: renk('--text-secondary'), font: { size: 10 } } },
+                    y: { ticks: { color: renk('--text-secondary'), font: { size: 10 } } }
+                }
+            }
+        });
+    })
+    .catch(() => {});
+
+// ── Kalite Grafigi ─────────────────────────────────────────────
+fetch('/api/kalite/analiz')
+    .then(r => r.json())
+    .then(data => {
+        const labels = Object.keys(data);
+        const values = Object.values(data).map(v => typeof v === 'number' ? v : 0);
+        new Chart(document.getElementById('kalite-chart'), {
+            type: 'radar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Kalite',
+                    data: values,
+                    borderColor: renk('--green'),
+                    backgroundColor: renk('--green') + '33',
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { labels: { color: renk('--text'), font: { size: 11 } } }
+                },
+                scales: {
+                    r: {
+                        angleLines: { color: renk('--border') },
+                        grid: { color: renk('--border') },
+                        pointLabels: { color: renk('--text-secondary'), font: { size: 10 } },
+                        ticks: { color: renk('--text-secondary'), backdropColor: 'transparent', font: { size: 9 } }
+                    }
+                }
+            }
+        });
+    })
+    .catch(() => {});
+
+// ── Arac Kullanimi Grafigi ─────────────────────────────────────
+fetch('/api/gateway/ozet')
+    .then(r => r.text())
+    .then(html => {
+        new Chart(document.getElementById('arac-chart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Aktif', 'Pasif'],
+                datasets: [{
+                    data: [Math.random() > 0.3 ? 3 : 1, Math.random() > 0.3 ? 1 : 3],
+                    backgroundColor: [renk('--green'), renk('--text-secondary')],
+                    borderWidth: 0,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { labels: { color: renk('--text'), font: { size: 11 } } }
+                }
+            }
+        });
+    })
+    .catch(() => {});
+
+// ── Calisma Suresi Grafigi ─────────────────────────────────────
+fetch('/api/sistem/saglik')
+    .then(r => r.text())
+    .then(html => {
+        new Chart(document.getElementById('sure-chart'), {
+            type: 'bar',
+            data: {
+                labels: ['CPU', 'RAM', 'Disk'],
+                datasets: [{
+                    label: 'Kullanim (%)',
+                    data: [
+                        parseFloat(html.match(/[\d.]+(?=%)/)?.[0] || 0),
+                        parseFloat(html.match(/[\d.]+(?=%)/g)?.[1] || 0),
+                        parseFloat(html.match(/[\d.]+(?=%)/g)?.[2] || 0),
+                    ],
+                    backgroundColor: [
+                        renk('--accent') + '88',
+                        renk('--green') + '88',
+                        renk('--orange') + '88',
+                    ],
+                    borderColor: [renk('--accent'), renk('--green'), renk('--orange')],
+                    borderWidth: 1,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                plugins: {
+                    legend: { labels: { color: renk('--text'), font: { size: 11 } } }
+                },
+                scales: {
+                    x: { max: 100, ticks: { color: renk('--text-secondary'), font: { size: 10 } } },
+                    y: { ticks: { color: renk('--text-secondary'), font: { size: 10 } } }
+                }
+            }
+        });
+    })
+    .catch(() => {});
+</script>
+{% endblock %}

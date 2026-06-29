@@ -16,6 +16,9 @@ Kullanım:
 import os
 from datetime import datetime
 from pathlib import Path
+import logging
+
+logger = logging.getLogger(__name__)
 
 MEMORY_LIMIT_CHARS = 50000
 USER_LIMIT_CHARS = 50000
@@ -135,7 +138,8 @@ class MemoryManager:
         try:
             if dosya.exists():
                 return dosya.read_text(encoding="utf-8")
-        except Exception:
+        except Exception as _e:
+            logger.warning("[MemoryManager] except Exception (L138): %s", Exception)
             pass
         return ""
 

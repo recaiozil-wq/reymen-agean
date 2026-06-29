@@ -1,0 +1,31 @@
+target-version = "py311"
+line-length = 100
+
+[lint]
+select = [
+    "F",   # pyflakes
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "I",   # isort
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "SIM", # flake8-simplify
+    "ARG", # flake8-unused-arguments
+    "PT",  # flake8-pytest-style
+    "RUF", # ruff-specific
+]
+ignore = [
+    "E501",   # line too long (handled by formatter)
+    "E731",   # lambda assignment
+    "B008",   # function call in default argument
+    "B905",   # zip() without strict=True
+]
+
+[lint.per-file-ignores]
+"tests/**" = ["ARG", "PT009", "PT011", "SIM115"]
+
+[format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"

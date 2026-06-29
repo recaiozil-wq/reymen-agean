@@ -1,0 +1,242 @@
+[
+  {
+    "no": 1,
+    "soru": "slm",
+    "kaynak": "oncelik_cache",
+    "sure": 0.02,
+    "yanit": "Selam! Ne yapabilirim?",
+    "sorun": ""
+  },
+  {
+    "no": 2,
+    "soru": "merhaba",
+    "kaynak": "oncelik_cache",
+    "sure": 0.03,
+    "yanit": "Merhaba! Nasil yardimci olabilirim?",
+    "sorun": ""
+  },
+  {
+    "no": 3,
+    "soru": "selam",
+    "kaynak": "oncelik_cache",
+    "sure": 0.01,
+    "yanit": "Selam! Ne yapabilirim?",
+    "sorun": ""
+  },
+  {
+    "no": 4,
+    "soru": "tesekkur",
+    "kaynak": "oncelik_cache",
+    "sure": 0.01,
+    "yanit": "Rica ederim, baska bir sey?",
+    "sorun": ""
+  },
+  {
+    "no": 5,
+    "soru": "gorusuruz",
+    "kaynak": "oncelik_cache",
+    "sure": 0.01,
+    "yanit": "Gorusmek uzere!",
+    "sorun": ""
+  },
+  {
+    "no": 6,
+    "soru": "2026 dunya kupasi haberleri",
+    "kaynak": "web_arama",
+    "sure": 3.2,
+    "yanit": "Web'den buldugum bilgiler:  - Dünya Haberleri - uluslararası haberler ve son dakika haberler: 2026 D",
+    "sorun": ""
+  },
+  {
+    "no": 7,
+    "soru": "bugun hava durumu istanbul",
+    "kaynak": "web_arama",
+    "sure": 3.85,
+    "yanit": "Web'den buldugum bilgiler:  - turkce websites like tryama.net, antoloji.com and bugun.com.tr.: ... f",
+    "sorun": ""
+  },
+  {
+    "no": 8,
+    "soru": "bitcoin fiyati 2026",
+    "kaynak": "web_arama",
+    "sure": 5.47,
+    "yanit": "Web'den buldugum bilgiler:  - Bitcoin Fiyat Tahmini: 2026’da BTC’den Ne Beklenmeli?: Dec 30, 2025 · ",
+    "sorun": ""
+  },
+  {
+    "no": 9,
+    "soru": "2026 ramazan bayrami ne zaman",
+    "kaynak": "web_arama",
+    "sure": 2.34,
+    "yanit": "Web'den buldugum bilgiler:  - Bayram günleri ve tarihleri 2026 | Ramazan Bayramı 2026 ne ...: Feb 19",
+    "sorun": ""
+  },
+  {
+    "no": 10,
+    "soru": "windows 11 son surum",
+    "kaynak": "web_arama",
+    "sure": 3.45,
+    "yanit": "Web'den buldugum bilgiler:  - Windows 11'i indirin - microsoft.com: Windows 11 medyası yüklemek veya",
+    "sorun": ""
+  },
+  {
+    "no": 11,
+    "soru": "turk iye'nin baskenti neresi",
+    "kaynak": "web_arama",
+    "sure": 3.59,
+    "yanit": "Web'den buldugum bilgiler:  - Ankara-Kars demiryolu - Vikipedi: Ankara – Kars demiryolu, Türkiye'nin",
+    "sorun": ""
+  },
+  {
+    "no": 12,
+    "soru": "python nedir",
+    "kaynak": "web_arama",
+    "sure": 1.73,
+    "yanit": "Web'den buldugum bilgiler:  - Python Nedir - Jurassic Explorers: Python Nedir? Python Avantajlar ve ",
+    "sorun": ""
+  },
+  {
+    "no": 13,
+    "soru": "fiba dunya siralamasi 2026",
+    "kaynak": "web_arama",
+    "sure": 3.82,
+    "yanit": "Web'den buldugum bilgiler:  - FIBA Dünya Sıralaması - Vikipedi: Yeni FIBA sıralama sisteminin uygula",
+    "sorun": ""
+  },
+  {
+    "no": 14,
+    "soru": "en yuksek dag hangisi",
+    "kaynak": "web_arama",
+    "sure": 2.75,
+    "yanit": "Web'den buldugum bilgiler:  - En yüksek dağlar listesi - Vikipedi: En yüksek dağlar listesi, yeryüzü",
+    "sorun": ""
+  },
+  {
+    "no": 15,
+    "soru": "bir atomun yapisi nedir",
+    "kaynak": "llm",
+    "sure": 19.15,
+    "yanit": "Bir atom, merkezde bulunan ve protonlar ile nötronlardan oluşan bir çekirdek ve çekirdeğin etrafında",
+    "sorun": ""
+  },
+  {
+    "no": 16,
+    "soru": "sdfgh",
+    "kaynak": "llm",
+    "sure": 7.42,
+    "yanit": "Anlamadım, \"sdfgh\" bir yazım hatası veya test olabilir. Lütfen ne öğrenmek istediğinizi açıklar mısı",
+    "sorun": ""
+  },
+  {
+    "no": 17,
+    "soru": "x",
+    "kaynak": "llm",
+    "sure": 3.32,
+    "yanit": "[HATA: None]",
+    "sorun": "API HATA"
+  },
+  {
+    "no": 18,
+    "soru": "a b c",
+    "kaynak": "web_arama",
+    "sure": 3.22,
+    "yanit": "Web'den buldugum bilgiler:  - A-b-c-darian: A-B-C-darians, ABC-darians, or abecedarians were the you",
+    "sorun": ""
+  },
+  {
+    "no": 19,
+    "soru": "12345",
+    "kaynak": "llm",
+    "sure": 6.96,
+    "yanit": "Hedef 12345'i anlamadım. Lütfen ne yapmam gerektiğini açıklayın.  GOREV_BITTI(\"Hedef 12345'i anlamad",
+    "sorun": ""
+  },
+  {
+    "no": 20,
+    "soru": "?!?",
+    "kaynak": "llm",
+    "sure": 5.38,
+    "yanit": "Hedefinizi (?!?) anlayamadığım için görevi tamamlayamıyorum. Lütfen ne yapmam gerektiğini net bir şe",
+    "sorun": ""
+  },
+  {
+    "no": 21,
+    "soru": "linux terminalde dosya nasil silinir",
+    "kaynak": "llm",
+    "sure": 9.7,
+    "yanit": "Linux terminalinde bir dosyayı silmek için `rm` komutu kullanılır. Örneğin, `dosya.txt` adlı bir dos",
+    "sorun": ""
+  },
+  {
+    "no": 22,
+    "soru": "python list comprehension ornegi",
+    "kaynak": "web_arama",
+    "sure": 4.19,
+    "yanit": "Web'den buldugum bilgiler:  - ROT13 - Vikipedi: Python değiştir codecs modülü, 'rot13' metin dönüşüm",
+    "sorun": ""
+  },
+  {
+    "no": 23,
+    "soru": "git commit nasil yapilir",
+    "kaynak": "web_arama",
+    "sure": 1.53,
+    "yanit": "Web'den buldugum bilgiler:  - git annex linux repository | Senior Full Stack Developer,: add debhelp",
+    "sorun": ""
+  },
+  {
+    "no": 24,
+    "soru": "windows powershell ile klasor olusturma",
+    "kaynak": "web_arama",
+    "sure": 5.9,
+    "yanit": "Web'den buldugum bilgiler:  - PowerShell ile Dosya ve Klasör Yönetimi - komut.io: Jan 13, 2024 · Pow",
+    "sorun": ""
+  },
+  {
+    "no": 25,
+    "soru": "deepseek API kullanimi",
+    "kaynak": "web_arama",
+    "sure": 3.11,
+    "yanit": "Web'den buldugum bilgiler:  - Your First API Call | DeepSeek API Docs: The DeepSeek API is supported",
+    "sorun": ""
+  },
+  {
+    "no": 26,
+    "soru": "turkiye ekonomisi 2026",
+    "kaynak": "web_arama",
+    "sure": 1.71,
+    "yanit": "Web'den buldugum bilgiler:  - 2026'da Türkiye ekonomisini neler bekliyor? - dw.com: Dec 26, 2025 · Y",
+    "sorun": ""
+  },
+  {
+    "no": 27,
+    "soru": "en iyi telefon 2026",
+    "kaynak": "web_arama",
+    "sure": 3.45,
+    "yanit": "Web'den buldugum bilgiler:  - Dünyanın en iyi telefonları! İşte markalar, modeller ve ...: Oct 29, 2",
+    "sorun": ""
+  },
+  {
+    "no": 28,
+    "soru": "yapay zeka nedir kisa",
+    "kaynak": "oncelik_cache",
+    "sure": 0.02,
+    "yanit": "Merhaba! Nasil yardimci olabilirim?",
+    "sorun": ""
+  },
+  {
+    "no": 29,
+    "soru": "bugun ne yemeliyim",
+    "kaynak": "llm",
+    "sure": 13.07,
+    "yanit": "DÜŞÜN: Kullanıcı bugün ne yemesi gerektiğini soruyor. Hızlıca pratik bir öneri vermeliyim.  GOREV_BI",
+    "sorun": ""
+  },
+  {
+    "no": 30,
+    "soru": "hayatin anlami",
+    "kaynak": "web_arama",
+    "sure": 3.41,
+    "yanit": "Web'den buldugum bilgiler:  - Hayatın anlamı - Vikipedi: Bu madde hiçbir kaynak içermemektedir. Lütf",
+    "sorun": ""
+  }
+]

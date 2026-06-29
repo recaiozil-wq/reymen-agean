@@ -9,6 +9,8 @@ Bu paket, görev 7 kapsamındaki 7 düşük öncelikli özelliği barındırır:
 - ``kanban``            : Kart, kolon, öncelik, deadline
 - ``video_tools``       : yt-dlp + ffmpeg wrapper
 - ``a2a``               : Basit agent mesajlaşma (A2A prototip)
+- ``problem_solver``    : Ajanın sorun çözme doğası (retry, fallback, öğrenme)
+- ``learning_loop``     : Kendi kendine öğrenen çözüm bulma döngüsü
 
 Her modül kendi başına çalışabilir ve opsiyonel bağımlılıkların yokluğunda
 graceful fallback yapar.
@@ -16,7 +18,7 @@ graceful fallback yapar.
 
 from __future__ import annotations
 
-__version__ = "0.7.0"
+__version__ = "0.9.0"
 
 __all__ = [
     "__version__",
@@ -27,4 +29,6 @@ __all__ = [
     "kanban",
     "video_tools",
     "a2a",
+    "problem_solver",
+    "learning_loop",
 ]

@@ -68,7 +68,8 @@ def hata_handler(mesaj: Mesaj) -> None:
         try:
             from reymen.core.orchestrator import coz_hata
             _coz = coz_hata
-        except ImportError:
+        except ImportError as _e:
+            logger.warning("[WorkflowPipeline] Modul yuklenemedi (L71): %s", ImportError)
             pass
 
         if _coz:
@@ -85,7 +86,8 @@ def hata_handler(mesaj: Mesaj) -> None:
                 try:
                     from reymen.core.ogrenme import cozum_kaydet as _kaydet
                     _kaydet(hata_imza, "pipeline", hata[:200], fix_kod, str(fix_path), True)
-                except Exception:
+                except Exception as _e:
+                    logger.warning("[WorkflowPipeline] except Exception (L88): %s", Exception)
                     pass
 
                 broker = get_broker()
@@ -147,7 +149,8 @@ def cozum_kaydet_handler(mesaj: Mesaj) -> None:
             aciklama=veri.get("ozet", "")[:200],
             adimlar=veri.get("cozum", "")[:500],
         )
-    except Exception:
+    except Exception as _e:
+        logger.warning("[WorkflowPipeline] except Exception (L150): %s", Exception)
         pass
 
 

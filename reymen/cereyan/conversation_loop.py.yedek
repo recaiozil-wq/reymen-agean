@@ -1,0 +1,1437 @@
+# -*- coding: utf-8 -*-
+"""conversation_loop.py — ReYMeN Agent seviyesi konusma dongusu.
+
+Ajan ile kullanici arasindaki etkilesimi yonetir:
+- Amaç belirleme ve takip (task_id, budget)
+- Provider-agnostik API mesaj formati (OpenAI / Anthropic / Codex / LM Studio)
+- Context compression (esik asilinca otomatik sikistirma)
+- Prompt caching (Anthropic icin cache_control marker'lari)
+- Interruptible API call (Ctrl+C destekli, thread bazli)
+- Tool call dongusu (tool_calls geldikce calistir, sonuclari ekle, devam)
+- Iteration budget
+- Hata yonetimi: her adimda try/except
+- Loglama: her adimda logging.INFO / ERROR
+"""
+
+import json
+import logging
+import os
+import re
+import threading
+import time
+import traceback
+import uuid
+from typing import Any, Dict, List, Optional, Tuple
+import logging
+logger = logging.getLogger(__name__)
+
+log = logging.getLogger("conversation_loop")
+
+# Kullaniciya gereksiz log gosterme - sadece ERROR ve uzeri
+logging.getLogger('reymen').setLevel(logging.ERROR)
+logging.getLogger('conversation_loop').setLevel(logging.INFO)
+
+# ── Yeni import'lar: circuit breaker, streaming, error classify ─────
+try:
+    from reymen.cereyan.iteration_budget import IterationBudget
+except ImportError:
+    IterationBudget = None
+
+try:
+    from turn_retry_state import TurnRetryState
+except ImportError:
+    TurnRetryState = None
+
+# ── Opsiyonel modüller (graceful degrade) ─────────────────────────────
+
+try:
+    from turn_context import TurnYoneticisi, TurnContext
+except ImportError:
+    TurnYoneticisi = None
+    TurnContext = None
+
+try:
+    from reymen.cereyan.iteration_budget import IterationBudget, standart_budget
+    _BUDGET_AKTIF = True
+except ImportError:
+    IterationBudget = None
+    standart_budget = None
+    _BUDGET_AKTIF = False
+
+try:
+    from reymen.arac.prompt_builder import PromptBuilder
+    _BUILDER_AKTIF = True
+except ImportError:
+    PromptBuilder = None
+    _BUILDER_AKTIF = False
+
+try:
+    from reymen.hafiza.context_compressor import ContextCompressor as _Compressor
+    _COMPRESS_AKTIF = True
+except ImportError:
+    _Compressor = None
+    _COMPRESS_AKTIF = False
+
+# `_CACHING_AKTIF` — provider'a gore dinamik olarak hesaplanir.
+# ``caching_aktif_mi(provider)`` fonksiyonu ile provider prompt caching
+# destekliyorsa True doner. Ayrica ``agent._use_prompt_caching`` da dikkate
+# alinir (Anthropic / OpenRouter / DeepSeek / OpenAI).
+try:
+    from agent.prompt_caching import _prompt_caching_ekle, caching_aktif_mi
+    # _CACHING_AKTIF artik dinamik: provider'a gore hesaplanir.
+    # Dogrudan kullanim yerine caching_aktif_mi() fonksiyonu tercih edilir.
+    _CACHING_AKTIF = None  # None = "provider'a bak" anlaminda
+except ImportError:
+    _prompt_caching_ekle = None
+    caching_aktif_mi = None
+    _CACHING_AKTIF = False
+
+# Geriye uyumluluk: eski import hala calissin
+try:
+    from agent.prompt_caching import apply_anthropic_cache_control as _apply_anthropic_cache_control
+except ImportError:
+    _apply_anthropic_cache_control = None
+
+try:
+    from reymen.hafiza.session_db import AdvancedSessionStorage as _SessionStorage
+    _SESSION_AKTIF = True
+except ImportError:
+    _SessionStorage = None
+    _SESSION_AKTIF = False
+
+# ── Hata sınıflandırıcı ve mesaj tamirci ─────────────────────────
+try:
+    from reymen.cereyan.hata_siniflandirici import (
+        api_hatasini_siniflandir,
+        classify_api_error,
+        FailoverReason,
+        SiniflandirilmisHata,
+    )
+    _HATA_SINIFLANDIRICI_AKTIF = True
+except ImportError:
+    api_hatasini_siniflandir = None  # type: ignore[assignment]
+    classify_api_error = None  # type: ignore[assignment]
+    FailoverReason = None  # type: ignore[assignment]
+    SiniflandirilmisHata = None  # type: ignore[assignment]
+    _HATA_SINIFLANDIRICI_AKTIF = False
+
+try:
+    from reymen.cereyan.mesaj_tamirci import (
+        arac_cagri_argumanlarini_temizle,
+        mesaj_siralamasi_tamir_et,
+        surrogate_karakterleri_temizle,
+        sanitize_tool_call_arguments,
+        repair_message_sequence,
+    )
+    _MESAJ_TAMIRCI_AKTIF = True
+except ImportError:
+    arac_cagri_argumanlarini_temizle = None  # type: ignore[assignment]
+    mesaj_siralamasi_tamir_et = None  # type: ignore[assignment]
+    surrogate_karakterleri_temizle = None  # type: ignore[assignment]
+    sanitize_tool_call_arguments = None  # type: ignore[assignment]
+    repair_message_sequence = None  # type: ignore[assignment]
+    _MESAJ_TAMIRCI_AKTIF = False
+
+try:
+    from reymen.cereyan.hook_dispatcher import (
+        hook_cagir as _hook_cagir,
+        oturum_baslat_tetikle as _oturum_baslat_tetikle,
+        oturum_bitir_tetikle as _oturum_bitir_tetikle,
+        tur_baslat_tetikle as _tur_baslat_tetikle,
+        tur_bitir_tetikle as _tur_bitir_tetikle,
+        arac_cagri_tetikle as _arac_cagri_tetikle,
+        arac_sonuc_tetikle as _arac_sonuc_tetikle,
+        hata_tetikle as _hata_tetikle,
+        context_sikistirma_tetikle as _context_sikistirma_tetikle,
+    )
+    _HOOK_AKTIF = True
+except ImportError:
+    _hook_cagir = None  # type: ignore[assignment]
+    _oturum_baslat_tetikle = _oturum_bitir_tetikle = None  # type: ignore[assignment]
+    _tur_baslat_tetikle = _tur_bitir_tetikle = None  # type: ignore[assignment]
+    _arac_cagri_tetikle = _arac_sonuc_tetikle = None  # type: ignore[assignment]
+    _hata_tetikle = _context_sikistirma_tetikle = None  # type: ignore[assignment]
+    _HOOK_AKTIF = False
+
+try:
+    from reymen.cereyan.stream_diagnostics import StreamSaglikTakibi as _StreamSaglikTakibi
+    _STREAM_DIAG_AKTIF = True
+except ImportError:
+    _StreamSaglikTakibi = None  # type: ignore[assignment]
+    _STREAM_DIAG_AKTIF = False
+
+
+# ── Sabitler ──────────────────────────────────────────────────────────
+
+# %50'yi asince context sikistirma baslat (ENV ile yapilandirilabilir)
+CONTEXT_SIKISTIRMA_ESIGI = float(os.environ.get("CONTEXT_ESIK", "0.50"))
+
+# Provider'a gore token limitleri (modern modeller icin)
+# Envs: PROVIDER_LIMIT_<UPPER_NAME>=<TOKEN>
+PROVIDER_LIMITS = {
+    "deepseek":     int(os.environ.get("PROVIDER_LIMIT_DEEPSEEK", "128000")),
+    "claude":       int(os.environ.get("PROVIDER_LIMIT_CLAUDE",   "200000")),
+    "sonnet":       int(os.environ.get("PROVIDER_LIMIT_SONNET",   "200000")),
+    "anthropic":    int(os.environ.get("PROVIDER_LIMIT_ANTHROPIC","200000")),
+    "gpt4":         int(os.environ.get("PROVIDER_LIMIT_GPT4",     "128000")),
+    "gpt4o":        int(os.environ.get("PROVIDER_LIMIT_GPT4O",    "128000")),
+    "gemini":       int(os.environ.get("PROVIDER_LIMIT_GEMINI",   "128000")),
+    "codex":        int(os.environ.get("PROVIDER_LIMIT_CODEX",    "200000")),
+    "openrouter":   int(os.environ.get("PROVIDER_LIMIT_OPENROUTER","128000")),
+}
+# Varsayilan limit (hic eslesmezse)
+PROVIDER_LIMIT_VARSAYILAN = int(os.environ.get("PROVIDER_LIMIT_DEFAULT", "128000"))
+
+# Yanıttaki "gorev bitti" tetikleyicileri
+GOREV_BITTI_TETIK = ("GOREV_BITTI", "görev bitti", "tamamlandi", "TASK_DONE")
+
+
+def motor_tools_schema_al(motor, maks_arac: int = 64) -> list:
+    """Motor'daki araçlardan OpenAI-uyumlu tools schema listesi üretir.
+
+    _plugin_araclar değerleri iki formatta olabilir:
+      - {ad: callable}            — düz fonksiyon (açıklama yok)
+      - {ad: (callable, str)}     — (fonk, açıklama) tuple
+
+    Returns:
+        [{"type": "function", "function": {"name": ..., "description": ..., "parameters": ...}}]
+    """
+    try:
+        araclar: dict = {}
+        if hasattr(motor, "_plugin_araclar") and motor._plugin_araclar:
+            araclar.update(motor._plugin_araclar)
+        elif hasattr(motor, "araclar") and motor.araclar:
+            araclar.update(motor.araclar)
+
+        schema = []
+        for ad, deger in list(araclar.items())[:maks_arac]:
+            if isinstance(deger, tuple) and len(deger) >= 2:
+                aciklama = str(deger[1]) if deger[1] else ad
+            else:
+                aciklama = ad
+            schema.append({
+                "type": "function",
+                "function": {
+                    "name": ad,
+                    "description": aciklama,
+                    "parameters": {
+                        "type": "object",
+                        "properties": {"param": {"type": "string"}},
+                        "required": [],
+                    },
+                },
+            })
+        return schema
+    except Exception:
+        return []
+
+
+# Geriye uyumlu alias (alt çizgili)
+_motor_tools_schema_al = motor_tools_schema_al
+
+# Circuit breaker (ReYMeN Agent pattern'i)
+# İYİLEŞTİRME 2: max_deneme=3, 3 başarısızsa → dur + bildir
+CIRCUIT_BREAKER_MAX_HATA = int(os.environ.get("CB_MAX_HATA", "3"))
+CIRCUIT_BREAKER_SURESI = int(os.environ.get("CB_SURESI", "0"))  # 0 = otomatik açılmaz
+CIRCUIT_BREAKER_KALICI = True  # True = kullanıcı müdahalesi gerekene kadar kalıcı
+
+# Mekanik retry: max 3 deneme, sonra circuit breaker
+MAX_RETRY = int(os.environ.get("MAX_RETRY", "3"))
+
+# Exponential backoff için max retry denemesi
+MAX_API_RETRY = 3
+# Aynı eylem 3x = takılma
+TAKILMA_ESIĞI = 3
+
+# Streaming sabitleri
+STREAMING_AKTIF = os.environ.get("STREAMING_AKTIF", "true").lower() in ("true", "1")
+
+
+class ConversationLoop:
+    """Ana konusma dongusu — geriye uyumlu + ReYMeN Agent seviyesi.
+
+    Eski API:
+        loop = ConversationLoop(motor=motor, beyin=beyin, max_tur=30)
+        sonuc = loop.coz("bir dosya olustur")
+
+    Yeni API:
+        sonuc = loop.run_conversation(
+            hedef="bir dosya olustur",
+            provider="deepseek",
+            baglam={"kullanici": "Ahmet"},
+        )
+    """
+
+    def __init__(self, motor: Any = None, beyin: Any = None, max_tur: int = 30) -> None:
+        self.motor = motor
+        self.beyin = beyin
+        self.max_tur = max_tur
+        self.tur_yoneticisi = TurnYoneticisi(max_tur=max_tur) if TurnYoneticisi else None
+        self._durum = "hazir"
+        self._iptal_istegi = False
+        self._konusma_gecmisi: list = []
+        # Konusma gecmisi — son N mesaj (user/assistant) bir sonraki goreve aktarilir
+        self._gecmis_mesajlar: list[dict] = []
+        self._max_gecmis_mesaj = 10
+        # Circuit breaker state
+        self._cb_art_arda_hata = 0
+        self._cb_son_hata_zamani = 0.0
+        self._cb_acik = False
+        # İyileştirme #2: Mekanik retry sayacı
+        self._retry_sayaci = 0
+        self._max_retry = MAX_RETRY
+        self._retry_kalici_kilit = False
+        # Takılma dedektörü
+        self._onceki_eylemler: list[str] = []
+        # Streaming
+        self._stream_callback = None
+
+    # ══════════════════════════════════════════════════════════════════
+    # MEVCUT API — geriye uyumluluk
+    # ══════════════════════════════════════════════════════════════════
+
+    def coz(self, hedef: str, baglam: Optional[dict] = None) -> dict:
+        """Bir hedefi cozmek icin konusma dongusunu baslat (eski API).
+
+        Args:
+            hedef:  Kullanicinin hedefi.
+            baglam: Ek baglam (opsiyonel).
+
+        Returns:
+            Cozum sonucu dict'i.
+        """
+        self._durum = "calisiyor"
+        baslama = time.time()
+        tur = 0
+
+        if self.tur_yoneticisi:
+            ctx = self.tur_yoneticisi.yeni_tur()
+            ctx.toplam_gereksinim_sayisi = 1
+        else:
+            ctx = None
+
+        sonuc = {"hedef": hedef, "basarili": False, "turlar": 0, "hata": None}
+
+        try:
+            while tur < self.max_tur:
+                tur += 1
+
+                if self.beyin:
+                    eylem = self._beyin_eylem_sec(hedef, baglam)
+                else:
+                    eylem = {"tur": "mesaj", "icerik": "Beyin modulu bulunamadi"}
+
+                if eylem.get("tur") == "arac":
+                    if self.tur_yoneticisi and ctx:
+                        ctx.karar_ekle("arac_kullan", eylem.get("arac"))
+                    arac_sonuc = self._arac_calistir(eylem)
+                    if self.tur_yoneticisi and ctx:
+                        ctx.karar_bitir(
+                            arac_sonuc.get("basarili", False),
+                            sonuc=arac_sonuc.get("cikti"),
+                        )
+                    baglam = baglam or {}
+                    baglam["son_arac_sonucu"] = arac_sonuc
+
+                    if arac_sonuc.get("tamamlandi"):
+                        sonuc["basarili"] = True
+                        if ctx:
+                            ctx.cozum_ozeti = arac_sonuc.get("cikti", "")[:200]
+                        break
+
+                elif eylem.get("tur") == "mesaj":
+                    sonuc["mesaj"] = eylem.get("icerik")
+                    sonuc["basarili"] = True
+                    break
+
+                elif eylem.get("tur") == "hata":
+                    sonuc["hata"] = eylem.get("icerik")
+                    break
+
+        except Exception as e:
+            sonuc["hata"] = f"Dongu hatasi: {e}"
+            sonuc["traceback"] = traceback.format_exc()
+
+        sonuc["turlar"] = tur
+        sonuc["sure"] = round(time.time() - baslama, 2)
+        self._durum = "tamamlandi" if sonuc["basarili"] else "hata"
+
+        if self.tur_yoneticisi and ctx:
+            sonuc["tur_raporu"] = ctx.raporla()
+
+        return sonuc
+
+    # ══════════════════════════════════════════════════════════════════
+    # YENİ API — run_conversation (ReYMeN Agent seviyesi)
+    # ══════════════════════════════════════════════════════════════════
+
+    def run_conversation(
+        self,
+        hedef: str,
+        baglam: Optional[dict] = None,
+        provider: Optional[str] = None,
+    ) -> dict:
+        """Konusma dongusu - Hermes Agent pipeline ile birebir ayni.
+
+        Akis:
+          1. task_id uret + session baslat
+          2. Konusma gecmisi + sistem prompt
+          3. API call (exponential backoff retry + provider rotate)
+          4. Tool loop (tool_calls -> execute -> append -> repeat)
+          5. Text yanit -> return
+          6. Session kapat + log
+
+        Args:
+            hedef:    Kullanicinin hedefi.
+            baglam:   Ek baglam dicti (opsiyonel).
+            provider: Provider override.
+
+        Returns:
+            Sonuc dicti (task_id, basarili, turlar, sure, budget, ...).
+        """
+        # -- 1. task_id + session + budget -----------------------------
+        task_id = str(uuid.uuid4())[:8]
+        log.info("[%s] run_conversation basladi: %.60s", task_id, hedef)
+
+        baslama = time.time()
+        self._durum = "calisiyor"
+        self._iptal_istegi = False
+
+        sonuc: dict = {
+            "task_id":   task_id,
+            "hedef":     hedef,
+            "basarili":  False,
+            "turlar":    0,
+            "hata":      None,
+            "provider":  provider,
+            "yanit":     None,
+        }
+
+        # Session baslat
+        session_id = None
+        _storage = None
+        if _SESSION_AKTIF and _SessionStorage:
+            try:
+                _storage = _SessionStorage()
+                model_adi = (
+                    getattr(self.beyin, "model", None)
+                    if self.beyin else None
+                )
+                session_id = _storage.session_baslat(
+                    source="run_conversation",
+                    model=model_adi,
+                    system_prompt=hedef[:500] if hedef else None,
+                    billing_provider=provider,
+                )
+                sonuc["session_id"] = session_id
+                log.info("[%s] Session acildi: %s", task_id, session_id)
+            except Exception as _se:
+                log.warning("[%s] Session baslatma hatasi: %s", task_id, _se)
+
+        budget = self._budget_olustur(hedef)
+
+        # -- 2. Konusma gecmisi + sistem prompt ------------------------
+        self._konusma_gecmisi = [dict(m) for m in self._gecmis_mesajlar]
+        if baglam:
+            baglam_str = json.dumps(baglam, ensure_ascii=False)
+            self._konusma_gecmisi.append({
+                "role": "user",
+                "content": f"[Baglam]\n{baglam_str}",
+            })
+        self._konusma_gecmisi.append({"role": "user", "content": hedef})
+
+        sistem_prompt = self._sistem_promptu_olustur(hedef, baglam)
+        provider_tipi = self._provider_tipi_belirle(provider)
+        sonuc["provider"] = provider_tipi
+
+        # -- 3-5. Ana loop ---------------------------------------------
+        try:
+            while budget.devam_etmeli_mi():
+                budget.tur_basla()
+                tur = budget.tur
+                log.info(
+                    "[%s] Tur %d (provider=%s, gecmis=%d mesaj)",
+                    task_id, tur, provider_tipi, len(self._konusma_gecmisi),
+                )
+
+                # Context preflight
+                self._konusma_gecmisi = self._context_preflight(
+                    self._konusma_gecmisi, sistem_prompt, provider_tipi
+                )
+
+                # API mesajlari
+                api_mesajlari = self._api_mesajlari_olustur(
+                    sistem_prompt, self._konusma_gecmisi, provider_tipi
+                )
+
+                # Ephemeral layer
+                api_mesajlari = self._ephemeral_layerlar_ekle(
+                    api_mesajlari, budget, len(self._konusma_gecmisi)
+                )
+
+                # Prompt caching (Anthropic)
+                if provider_tipi == "anthropic":
+                    api_mesajlari = self._prompt_caching_ekle(api_mesajlari)
+
+                # API call with retry
+                try:
+                    yanit = self._api_call_with_retry(
+                        api_mesajlari, provider_tipi, task_id, budget,
+                    )
+                except KeyboardInterrupt:
+                    sonuc["hata"] = "Kullanici tarafindan iptal edildi (Ctrl+C)"
+                    self._durum = "iptal"
+                    log.warning("[%s] Ctrl+C ile iptal edildi", task_id)
+                    break
+
+                if yanit is None:
+                    log.warning(
+                        "[%s] API yanit vermedi - tum retryler basarisiz",
+                        task_id,
+                    )
+                    sonuc["hata"] = "API yanit vermedi"
+                    budget.tur_bitir(basarili=False)
+                    break
+
+                # Yaniti parse et
+                tool_calls = self._tool_calls_al(yanit)
+
+                if tool_calls:
+                    asistan_icerik = self._yanit_icerigi_al(yanit)
+                    for tc in tool_calls:
+                        arac_adi = (
+                            tc.get("name")
+                            or tc.get("function", {}).get("name", "")
+                        )
+                        arac_params = (
+                            tc.get("arguments")
+                            or tc.get("function", {}).get("arguments", {})
+                        )
+                        if isinstance(arac_params, str):
+                            try:
+                                arac_params = json.loads(arac_params)
+                            except Exception:
+                                arac_params = {"param": arac_params}
+
+                        log.info("[%s] Tool call: %s", task_id, arac_adi)
+                        budget.eylem_kaydet(arac_adi)
+
+                        _t_arac = time.monotonic()
+                        arac_sonuc = self._arac_calistir({
+                            "arac":       arac_adi,
+                            "parametreler": arac_params,
+                        })
+                        _arac_sure = time.monotonic() - _t_arac
+
+                        self._konusma_gecmisi.append({
+                            "role":       "assistant",
+                            "content":    asistan_icerik,
+                            "tool_calls": tool_calls,
+                        })
+                        self._konusma_gecmisi.append({
+                            "role":         "tool",
+                            "tool_call_id": tc.get("id", f"tc_{arac_adi}"),
+                            "content":      json.dumps(arac_sonuc, ensure_ascii=False),
+                        })
+
+                        if arac_sonuc.get("tamamlandi"):
+                            sonuc["basarili"] = True
+                            sonuc["sonuc"]    = arac_sonuc.get("cikti", "")
+                            budget.gorev_tamamla()
+                            log.info("[%s] Arac tamamlama sinyali: %s", task_id, arac_adi)
+                            break
+
+                    budget.tur_bitir(basarili=True)
+                    if sonuc["basarili"]:
+                        break
+                else:
+                    icerik = self._yanit_icerigi_al(yanit)
+                    self._konusma_gecmisi.append({
+                        "role":    "assistant",
+                        "content": icerik,
+                    })
+                    sonuc["basarili"] = True
+                    sonuc["yanit"]    = icerik
+                    budget.gorev_tamamla()
+                    budget.tur_bitir(basarili=True)
+                    log.info("[%s] Text yanit alindi, tamamlandi", task_id)
+                    break
+
+        except Exception as e:
+            sonuc["hata"]      = f"run_conversation hatasi: {e}"
+            sonuc["traceback"] = traceback.format_exc()
+            log.error("[%s] Hata: %s", task_id, e)
+
+        sonuc["turlar"] = budget.tur
+        sonuc["sure"]   = round(time.time() - baslama, 2)
+        sonuc["budget"] = budget.ozet_dict()
+        self._durum = "tamamlandi" if sonuc["basarili"] else "hata"
+
+        # Konusma gecmisini guncelle
+        self._gecmis_mesajlar = [
+            dict(m) for m in self._konusma_gecmisi
+            if m.get("role") in ("user", "assistant") and m.get("content")
+        ][-self._max_gecmis_mesaj:]
+
+        # Session kapat
+        if _storage and session_id:
+            try:
+                end_reason = "completed" if sonuc["basarili"] else (
+                    "cancelled" if self._durum == "iptal" else "error"
+                )
+                _storage.session_bitir(session_id, end_reason=end_reason)
+                log.info("[%s] Session kapatildi: %s (%s)", task_id, session_id, end_reason)
+            except Exception as _se:
+                log.warning("[%s] Session bitirme hatasi: %s", task_id, _se)
+
+        log.info(
+            "[%s] run_conversation bitti: basarili=%s, tur=%d, sure=%.1fs",
+            task_id, sonuc["basarili"], budget.tur, sonuc["sure"],
+        )
+
+        return sonuc
+
+    # YARDIMCI METODLAR — run_conversation
+    # ══════════════════════════════════════════════════════════════════
+
+    def _budget_olustur(self, hedef: str) -> Any:
+        """IterationBudget olustur; modul yoksa basit sayac doner."""
+        if _BUDGET_AKTIF and standart_budget:
+            try:
+                b = standart_budget(hedef)
+                # max_tur degeri ConversationLoop ile uyumlu kalsin
+                b.max_tur = max(b.max_tur, self.max_tur)
+                return b
+            except Exception as _e:
+                logger.warning("[ConversationLoop] except Exception (L866): %s", Exception)
+                pass
+
+        # Fallback: basit sayac nesnesi
+        class _SimpleBudget:
+            def __init__(self, max_tur: int) -> None:
+                self.max_tur = max_tur
+                self.tur = 0
+                self._bitti = False
+
+            def devam_etmeli_mi(self) -> bool:
+                return self.tur < self.max_tur and not self._bitti
+
+            def tur_basla(self) -> None:
+                self.tur += 1
+
+            def tur_bitir(self, basarili: bool = True, **_: Any) -> None:
+                self._bitti = basarili
+
+            def gorev_tamamla(self) -> None:
+                self._bitti = True
+
+            # API uyumluluğu
+            gorev_tamami = gorev_tamamla
+
+            def eylem_kaydet(self, _: Any) -> None:
+                pass  # API uyumlulugu
+
+            def ozet_dict(self) -> dict:
+                return {"tur": self.tur, "max_tur": self.max_tur}
+
+        return _SimpleBudget(self.max_tur)
+
+    def _sistem_promptu_olustur(self, hedef: str, baglam: Optional[dict] = None) -> str:
+        """PromptBuilder ile sistem promptu insa et."""
+        if _BUILDER_AKTIF and PromptBuilder:
+            try:
+                pb = PromptBuilder()
+                if self.motor and hasattr(self.motor, "arac_listesi"):
+                    try:
+                        pb.araclar_kaydet(self.motor.arac_listesi())
+                    except Exception as _e:
+                        logger.warning("[ConversationLoop] except Exception (L907): %s", Exception)
+                        pass
+                ek_bilgi = json.dumps(baglam, ensure_ascii=False) if baglam else ""
+                return pb.sistem_prompt(hedef=hedef, ek_bilgi=ek_bilgi)
+            except Exception as e:
+                log.warning("PromptBuilder hatasi: %s", e)
+
+        return (
+            "Sen ReYMeN, otonom bir yazilim ajanisin. "
+            "Hedefe odaklan, araclari kullan, Turkce yaz."
+        )
+
+    def _provider_tipi_belirle(self, provider: Optional[str] = None) -> str:
+        """Provider tipini belirle: 'anthropic' | 'codex' | 'chat_completions'."""
+        kaynak = (
+            provider
+            or (
+                getattr(self.beyin, "provider", None)
+                if self.beyin else None
+            )
+            or ""
+        ).lower()
+
+        if kaynak in ("anthropic", "claude", "bedrock"):
+            return "anthropic"
+        if kaynak in ("codex", "codex_responses", "o4", "o3", "o1"):
+            return "codex"
+        return "chat_completions"
+
+    def _context_preflight(
+        self, mesajlar: list, sistem_prompt: str, provider_tipi: Optional[str] = None
+    ) -> list:
+        """Context doluluk oranini kontrol et, asimi varsa sikistir.
+
+        Provider-aware limit kullanir. Provider eslesmezse varsayilan
+        128K token kullanilir.
+        """
+        if not mesajlar:
+            return mesajlar
+
+        # Provider limitini bul
+        limit_token = PROVIDER_LIMIT_VARSAYILAN
+        if provider_tipi:
+            for anahtar, limit in PROVIDER_LIMITS.items():
+                if anahtar in provider_tipi.lower():
+                    limit_token = limit
+                    break
+
+        # Token tahmini (4 karakter ≈ 1 token)
+        toplam_char = sum(len(m.get("content", "") or "") for m in mesajlar)
+        toplam_char += len(sistem_prompt)
+        limit_char = limit_token * 4  # char esdegeri
+
+        oran = toplam_char / limit_char if limit_char else 0
+        if oran < CONTEXT_SIKISTIRMA_ESIGI:
+            return mesajlar
+
+        log.info(
+            "Context doluluk: %.0f%% (limit=%dK token, provider=%s) — sikistirma basladi",
+            oran * 100, limit_token // 1000, provider_tipi or "varsayilan",
+        )
+
+        # Hook: context sıkıştırma
+        if _HOOK_AKTIF and _context_sikistirma_tetikle is not None:
+            try:
+                _context_sikistirma_tetikle(
+                    mesaj_sayisi=len(mesajlar),
+                    token_tahmini=int(toplam_char / 4),
+                )
+            except Exception as _e:
+                logger.warning("[ConversationLoop] except Exception (L976): %s", Exception)
+                pass
+
+        # Compressor varsa kullan
+        if _COMPRESS_AKTIF and _Compressor:
+            try:
+                comp = _Compressor(max_token=limit_token)
+                return comp.sikistir(mesajlar, max_token=limit_token)
+            except Exception as e:
+                log.warning("Compressor hatasi: %s", e)
+
+        # Fallback: asiri yuksekse yariya indir, degilse sadece ozet ekle
+        if oran >= 0.85:
+            # Kritik: mesaj sayisini yariya indir
+            koru = max(3, len(mesajlar) // 2)
+            ozet = (
+                f"[Context sikistirildi — {len(mesajlar)} → {koru} mesaj, "
+                f"doluluk: %{oran*100:.0f}]"
+            )
+            return [mesajlar[0]] + [{"role": "user", "content": ozet}] + mesajlar[-koru:]
+        elif oran >= 0.65:
+            # Orta: son mesajlari koru, sadece ozet ekle
+            ozet = (
+                f"[Context sikistirildi - {len(mesajlar)} mesaj, "
+                f"doluluk: %{oran*100:.0f}]"
+            )
+            return mesajlar[:1] + [{"role": "user", "content": ozet}] + mesajlar[-(len(mesajlar)//2):]
+        else:
+            # Hafif: ortadaki mesajlari tek ozete indirge
+            if len(mesajlar) > 8:
+                ozet = (
+                    f"[Context sikistirildi — {len(mesajlar)} mesaj, "
+                    f"doluluk: %{oran*100:.0f}]"
+                )
+                return (
+                    mesajlar[:2]
+                    + [{"role": "user", "content": ozet}]
+                    + mesajlar[-4:]
+                )
+            return mesajlar
+
+    def _api_mesajlari_olustur(
+        self,
+        sistem_prompt: str,
+        gecmis: list,
+        provider_tipi: str,
+    ) -> List[dict]:
+        """Provider tipine gore API mesaj listesi olustur."""
+        if provider_tipi == "anthropic":
+            # Anthropic: sistem ayri, kullanici mesajlari listede
+            mesajlar = [{"role": "system", "content": sistem_prompt}]
+            for m in gecmis:
+                rol = m.get("role", "user")
+                if rol == "system":
+                    continue
+                mesajlar.append({"role": rol, "content": m.get("content", "")})
+            return mesajlar
+
+        if provider_tipi == "codex":
+            # Codex / Responses API: input items formati
+            mesajlar = [{"role": "system", "content": sistem_prompt}]
+            for m in gecmis:
+                rol = m.get("role", "user")
+                if rol == "system":
+                    continue
+                mesajlar.append({
+                    "role":    "user" if rol not in ("assistant", "tool") else rol,
+                    "content": m.get("content", ""),
+                })
+            return mesajlar
+
+        # Default: chat_completions (OpenAI, LM Studio, DeepSeek)
+        mesajlar = [{"role": "system", "content": sistem_prompt}]
+        for m in gecmis:
+            rol = m.get("role", "user")
+            if rol == "system":
+                continue
+            mesaj = {"role": rol, "content": m.get("content", "")}
+            if m.get("tool_calls"):
+                mesaj["tool_calls"] = m["tool_calls"]
+            if m.get("tool_call_id"):
+                mesaj["tool_call_id"] = m["tool_call_id"]
+            mesajlar.append(mesaj)
+        return mesajlar
+
+    def _ephemeral_layerlar_ekle(
+        self,
+        mesajlar: List[dict],
+        budget: Any,
+        gecmis_uzunlugu: int,
+    ) -> List[dict]:
+        """Butce uyarisi ve context baskisi ephemeral katmanlari ekle."""
+        uyarilar: list[str] = []
+
+        kalan = getattr(budget, "kaldi", None)
+        if kalan is None:
+            kalan = getattr(budget, "max_tur", 0) - getattr(budget, "tur", 0)
+
+        if kalan is not None and kalan <= 3:
+            uyarilar.append(
+                f"[UYARI] Kalan tur: {kalan}. "
+                "Hedefe hemen odaklan veya GOREV_BITTI yaz."
+            )
+
+        if gecmis_uzunlugu > 20:
+            uyarilar.append(
+                f"[BAGLAM] Gecmis {gecmis_uzunlugu} mesaj. "
+                "Ozlu yaz, tekrar etme."
+            )
+
+        if not uyarilar:
+            return mesajlar
+
+        icerik = "\n".join(uyarilar)
+        return mesajlar + [{"role": "user", "content": icerik}]
+
+    def _prompt_caching_ekle(self, mesajlar: List[dict]) -> List[dict]:
+        """Provider'a gore prompt caching stratejisini uygula.
+
+        - Anthropic: cache_control marker'lari (system + son 3 mesaj)
+        - OpenRouter: x-request-prompt-caching header + marker'lar
+        - OpenAI: otomatik prefix caching
+        - DeepSeek: context caching marker'lari
+        - Diger: ``_use_prompt_caching`` aktifse Anthropic formati dene
+        """
+        try:
+            # Dinamik _CACHING_AKTIF kontrolu
+            if _CACHING_AKTIF is None:
+                # Provider'a gore hesapla — su an icin True kabul et
+                # (cogu modern provider otomatik prefix caching yapar)
+                caching_aktif = True
+            else:
+                caching_aktif = _CACHING_AKTIF
+
+            if not caching_aktif:
+                return mesajlar
+
+            # Yeni coklu-provider fonksiyonunu dene
+            if _prompt_caching_ekle is not None:
+                try:
+                    return _prompt_caching_ekle(self, mesajlar)
+                except Exception as _e:
+                    logger.warning("[ConversationLoop] except Exception (L1117): %s", Exception)
+                    pass
+
+            # Geriye uyumluluk: eski Anthropic yontemi
+            if _apply_anthropic_cache_control:
+                return _apply_anthropic_cache_control(
+                    mesajlar, cache_ttl="5m", native_anthropic=False
+                )
+            return mesajlar
+        except Exception as e:
+            log.warning("Prompt caching hatasi: %s", e)
+            return mesajlar
+
+    def _interruptible_api_call(
+        self, mesajlar: List[dict], provider_tipi: str
+    ) -> Optional[dict]:
+        """Thread bazli interruptible API cagri (Ctrl+C destekli).
+
+        Beyin modulu yoksa None doner (test/offline mod).
+        """
+        if not self.beyin:
+            log.debug("Beyin yok — API cagri atlanadi")
+            return None
+
+        sonuc_kutusu: list = [None]
+        hata_kutusu:  list = [None]
+
+        def _cagir() -> None:
+            try:
+                # Sistem ve kullanici mesajlarini ayir
+                sistem = ""
+                kullanici_mesajlari = []
+                for m in mesajlar:
+                    if m.get("role") == "system":
+                        sistem = m.get("content", "")
+                    else:
+                        kullanici_mesajlari.append(m)
+
+                if not kullanici_mesajlari:
+                    kullanici_mesajlari = [{"role": "user", "content": "devam"}]
+
+                # uret_v2 önceliği: beyin'de varsa ve motor tools sağlıyorsa kullan
+                _kullan_v2 = (
+                    hasattr(self.beyin, "uret_v2")
+                    and self.motor is not None
+                    and hasattr(self.motor, "_plugin_araclar")
+                )
+                if _kullan_v2:
+                    tools = motor_tools_schema_al(self.motor)
+                    if tools:
+                        sonuc_kutusu[0] = self.beyin.uret_v2(sistem, kullanici_mesajlari, tools=tools)
+                        return
+
+                if hasattr(self.beyin, "uret"):
+                    yanit_metin = self.beyin.uret(sistem, kullanici_mesajlari)
+                    sonuc_kutusu[0] = {
+                        "role":    "assistant",
+                        "content": yanit_metin or "",
+                    }
+                else:
+                    hata_kutusu[0] = RuntimeError("Beyin.uret() metodu bulunamadi")
+            except Exception as exc:
+                hata_kutusu[0] = exc
+
+        t = threading.Thread(target=_cagir, daemon=True)
+        t.start()
+
+        try:
+            t.join(timeout=300)  # 5 dakika max
+        except KeyboardInterrupt:
+            self._iptal_istegi = True
+            raise
+
+        if not t.is_alive() and hata_kutusu[0]:
+            log.error("API cagri hatasi: %s", hata_kutusu[0])
+            return None
+
+        return sonuc_kutusu[0]
+
+    def _tool_calls_al(self, yanit: dict) -> List[dict]:
+        """Yanit dict'inden tool call'lari cikar.
+
+        Desteklenen formatlar:
+          1. OpenAI standard: yanit["tool_calls"] → list
+          2. ReAct text: icerik icinde ARAÇ("param") pattern
+          GOREV_BITTI → tool call yok (bitti)
+        """
+        if not yanit:
+            return []
+
+        # 1. OpenAI format
+        if isinstance(yanit.get("tool_calls"), list):
+            return yanit["tool_calls"]
+
+        # 2. ReAct text format
+        icerik = yanit.get("content", "") or ""
+        if not icerik:
+            return []
+
+        # GOREV_BITTI → text yanit, tool yok
+        if any(t.lower() in icerik.lower() for t in GOREV_BITTI_TETIK):
+            return []
+
+        # ARAÇ_ADI("parametre") pattern
+        m = re.search(r'\b([A-Z][A-Z_]{2,})\s*\(([^)]*)\)', icerik)
+        if m:
+            arac_adi = m.group(1)
+            # Dusunce / yardim tool degil
+            if arac_adi in ("DUSUN", "YARDIM_ISTE", "DUSUNCE"):
+                return []
+            parametre = m.group(2).strip('"\'').strip()
+            return [{
+                "id":        f"tc_{arac_adi}_{uuid.uuid4().hex[:6]}",
+                "name":      arac_adi,
+                "arguments": {"param": parametre},
+            }]
+
+        return []
+
+    def _yanit_icerigi_al(self, yanit: dict) -> str:
+        """Yanit dict'inden metin icerigi cikar."""
+        if not yanit:
+            return ""
+        return yanit.get("content") or ""
+
+    # ══════════════════════════════════════════════════════════════════
+    # MEVCUT YARDIMCI METODLAR (coz() icin)
+    # ══════════════════════════════════════════════════════════════════
+
+    def _beyin_eylem_sec(self, hedef: str, baglam: Optional[dict] = None) -> dict:
+        """Beyin modulunu kullanarak bir sonraki eylemi sec."""
+        try:
+            if hasattr(self.beyin, "sihirbaz_karar"):
+                return self.beyin.sihirbaz_karar(hedef, baglam)
+            return {"tur": "mesaj", "icerik": "Beyin karar veremedi"}
+        except Exception as e:
+            return {"tur": "hata", "icerik": str(e)}
+
+    def _arac_calistir(self, eylem: dict) -> dict:
+        """Bir araci calistir ve sonucu dondur."""
+        arac       = eylem.get("arac", "")
+        parametreler = eylem.get("parametreler", {})
+        if isinstance(parametreler, str):
+            try:
+                parametreler = json.loads(parametreler)
+            except Exception:
+                parametreler = {}
+
+        if self.motor and hasattr(self.motor, "arac_calistir"):
+            try:
+                return self.motor.arac_calistir(arac, **parametreler)
+            except Exception as e:
+                return {"basarili": False, "hata": str(e)}
+
+        # Direkt tool modulu cagir
+        try:
+            mod_ad = f"tools.{arac.lower()}"
+            mod = __import__(mod_ad, fromlist=["run"])
+            if hasattr(mod, "run"):
+                sonuc = mod.run(**parametreler)
+                return {
+                    "basarili":   True,
+                    "cikti":      str(sonuc),
+                    "tamamlandi": False,
+                }
+        except ImportError:
+            return {"basarili": False, "hata": f"Arac bulunamadi: {arac}"}
+        except Exception as e:
+            return {"basarili": False, "hata": str(e)}
+
+        return {"basarili": False, "hata": "Motor kulanilamiyor"}
+
+    # ══════════════════════════════════════════════════════════════════
+    # DURUM / İSTATİSTİK
+    # ══════════════════════════════════════════════════════════════════
+
+    def durum(self) -> str:
+        """Dongu durumunu dondur."""
+        return self._durum
+
+    def istatistik(self) -> dict:
+        """Dongu istatistiklerini dondur."""
+        return {
+            "durum":     self._durum,
+            "max_tur":   self.max_tur,
+            "tur_raporu": (
+                self.tur_yoneticisi.genel_rapor()
+                if self.tur_yoneticisi
+                else {}
+            ),
+            # cb_durum: temizlendi
+        }
+
+    # ══════════════════════════════════════════════════════════════════
+    # YENİ METODLAR — ReYMeN Agent seviyesi
+    # ══════════════════════════════════════════════════════════════════
+
+    def set_stream_callback(self, callback: Any) -> None:
+        """Stream callback fonksiyonu ata.
+        callback(text: str) -> None seklinde cagrilir.
+        """
+        self._stream_callback = callback
+
+    def _streaming_api_call(self, mesajlar: List[dict], provider: str,
+                             task_id: str, budget: Any) -> Optional[dict]:
+        """Streaming API cagrisi. ReYMeN Agent streaming pattern'i."""
+        if not self.beyin:
+            return self._interruptible_api_call(mesajlar, provider)
+        try:
+            tam_yanit = ""
+            for chunk in self.beyin.uret_stream(mesajlar):
+                if chunk:
+                    tam_yanit += chunk
+                    if self._stream_callback:
+                        try:
+                            self._stream_callback(chunk)
+                        except Exception as _e:
+                            logger.warning("[ConversationLoop] except Exception (L1346): %s", Exception)
+                            pass
+            return {
+                "choices": [{"message": {"role": "assistant", "content": tam_yanit}}]
+            }
+        except NotImplementedError:
+            return self._interruptible_api_call(mesajlar, provider)
+        except Exception as e:
+            log.warning("Streaming hatasi (fallback): %s", e)
+            return self._interruptible_api_call(mesajlar, provider)
+
+    def _error_classify(self, hata: Exception, task_id: str) -> str:
+        """Hatayi siniflandir. ReYMeN Agent FailoverReason pattern'i.
+        Returns: 'retry' | 'abort' | 'compress' | 'rotate'
+        """
+        # Gelişmiş sınıflandırıcı varsa kullan
+        if _HATA_SINIFLANDIRICI_AKTIF and api_hatasini_siniflandir is not None:
+            try:
+                sinif = api_hatasini_siniflandir(hata)
+                neden = sinif.neden
+                if neden == FailoverReason.context_overflow:
+                    return "compress"
+                if neden in {FailoverReason.auth, FailoverReason.auth_permanent,
+                             FailoverReason.billing, FailoverReason.model_not_found,
+                             FailoverReason.provider_policy_blocked}:
+                    return "rotate"
+                if neden == FailoverReason.content_policy_blocked:
+                    return "abort"
+                if neden == FailoverReason.format_error:
+                    return "abort" if not sinif.yeniden_denenebilir else "retry"
+                return "retry"
+            except Exception as _e:
+                pass  # Sınıflandırıcı başarısız → basit fallback
+
+        # Basit fallback (sınıflandırıcı yoksa)
+        hata_str = str(hata).lower()
+        if any(t in hata_str for t in ("timeout", "timed out", "connection")):
+            return "retry"
+        if any(t in hata_str for t in ("429", "rate limit", "too many requests")):
+            return "retry"
+        if any(t in hata_str for t in ("401", "403", "auth", "unauthorized")):
+            return "rotate"
+        if any(t in hata_str for t in ("402", "billing", "insufficient_quota", "payment")):
+            return "rotate"
+        if any(t in hata_str for t in ("context_length", "too large", "maximum context")):
+            return "compress"
+        if any(t in hata_str for t in ("500", "502", "503", "internal", "overloaded")):
+            return "retry"
+        return "retry"
+
+    def circuit_breaker_durum(self) -> dict:
+        """Circuit breaker durum raporu."""
+        return {
+            "acik": self._cb_acik,
+            "ardisik_hata": self._cb_art_arda_hata,
+            "max_hata": CIRCUIT_BREAKER_MAX_HATA,
+            "sure": CIRCUIT_BREAKER_SURESI,
+            "kalan": max(0, CIRCUIT_BREAKER_SURESI - (time.time() - self._cb_son_hata_zamani)) if self._cb_acik else 0,
+        }
+
+    # ══════════════════════════════════════════════════════════════════
+    # RETRY — exponential backoff (ReYMeN Agent pattern)
+    # ══════════════════════════════════════════════════════════════════
+
+    def _api_call_with_retry(
+        self,
+        api_mesajlari: List[dict],
+        provider_tipi: str,
+        task_id: str,
+        budget: Any,
+    ) -> Optional[dict]:
+        """API cagrisini exponential backoff ile retry eder.
+
+        _error_classify 'retry' dondugunde bekler ve tekrar dener.
+        _error_classify 'rotate' dondugunde provider degistirir (fallback).
+        Max 3 retry, backoff: 1sn, 2sn, 4sn.
+        Hermes Agent retry pattern ile uyumlu calisir.
+
+        Provider rotate: beyin'in _fallback_zinciri'ndeki siradaki
+        saglayiciya gecer. Zincirdeki tum saglayicilar basarisizsa None doner.
+
+        Args:
+            api_mesajlari: Provider'a ozel mesaj listesi.
+            provider_tipi: Provider turu (anthropic/codex/chat_completions).
+            task_id:       Mevcut gorev ID'si (log icin).
+            budget:        IterationBudget nesnesi.
+
+        Returns:
+            API yaniti (dict) veya None (tum retry'ler basarisiz).
+        """
+        max_retry = 3
+        # Provider rotate icin fallback zincirini hazirla
+        fallback_providerlar: list[tuple[str, str]] = []  # (tip, ad)
+        if self.beyin and hasattr(self.beyin, "_fallback_zinciri"):
+            for adim in self.beyin._fallback_zinciri:
+                p_tip = self._provider_tipi_belirle(adim.provider)
+                fallback_providerlar.append((p_tip, adim.provider))
+
+        # Su anki provider tipini ilk adim olarak ekle
+        mevcut_tip = provider_tipi
+        mevcut_index = 0
+
+        # API'ye göndermeden önce mesaj geçmişini onar
+        if _MESAJ_TAMIRCI_AKTIF and mesaj_siralamasi_tamir_et is not None:
+            try:
+                n_tamirler = mesaj_siralamasi_tamir_et(api_mesajlari)
+                if n_tamirler:
+                    log.debug("[%s] Mesaj sıralaması tamiri: %d düzeltme", task_id, n_tamirler)
+                n_arg_tamirler = arac_cagri_argumanlarini_temizle(api_mesajlari, oturum_id=task_id)
+                if n_arg_tamirler:
+                    log.debug("[%s] Araç argümanı tamiri: %d düzeltme", task_id, n_arg_tamirler)
+            except Exception as _e:
+                log.debug("[%s] Mesaj tamiri başarısız (devam): %s", task_id, _e)
+
+        for deneme in range(max_retry + 1):
+            try:
+                if STREAMING_AKTIF and self._stream_callback:
+                    yanit = self._streaming_api_call(
+                        api_mesajlari, mevcut_tip, task_id, budget,
+                    )
+                else:
+                    yanit = self._interruptible_api_call(api_mesajlari, mevcut_tip)
+
+                # Beyin yoksa (offline/test modu) retry yapma
+                if yanit is None and self.beyin is None:
+                    return None
+
+                # Basarili yanit
+                if yanit is not None:
+                    return yanit
+
+                # yanit None ama beyin var -> hata olarak ele al
+                raise RuntimeError("API yanit vermedi (None)")
+
+            except KeyboardInterrupt:
+                raise
+            except Exception as e:
+                sinif = self._error_classify(e, task_id)
+                # Hook: hata olayı
+                if _HOOK_AKTIF and _hata_tetikle is not None:
+                    try:
+                        _hata_tetikle(hata=e, olay_baglami=f"api_retry deneme={deneme+1} sinif={sinif}", task_id=task_id)
+                    except Exception:
+                        logger.warning("[fix_01_sessiz_except] Exception")
+                if sinif == "abort" or deneme >= max_retry:
+                    log.error(
+                        "[%s] API cagri hatasi (%d/%d deneme, sinif=%s): %s",
+                        task_id, deneme + 1, max_retry + 1, sinif, e,
+                    )
+                    # Provider rotate dene (abort bile olsa zincirde baska provider varsa)
+                    if sinif == "rotate" or sinif == "abort":
+                        yeni_tip, yeni_provider = self._provider_rotate(
+                            mevcut_tip, fallback_providerlar, mevcut_index, task_id,
+                        )
+                        if yeni_tip != mevcut_tip:
+                            mevcut_tip = yeni_tip
+                            mevcut_index += 1
+                            # API mesajlarini yeni provider icin yeniden olustur
+                            api_mesajlari = self._api_mesajlari_olustur(
+                                self._sistem_promptu_olustur(
+                                    getattr(budget, "_hedef", ""),
+                                ),
+                                self._konusma_gecmisi,
+                                mevcut_tip,
+                            )
+                            log.info(
+                                "[%s] Provider rotate: %s -> %s (devam)",
+                                task_id, fallback_providerlar[mevcut_index - 1][1]
+                                if mevcut_index - 1 < len(fallback_providerlar) else "?",
+                                yeni_provider,
+                            )
+                            continue  # yeni provider ile tekrar dene
+                    return None
+
+                # 'retry' veya 'compress' — bekle ve tekrar dene
+                if sinif == "compress":
+                    # Context sikistirma iste: mesajlari yariya indir
+                    log.warning(
+                        "[%s] Context compression gerekiyor — mesajlar yarilaniyor",
+                        task_id,
+                    )
+                    if len(api_mesajlari) > 4:
+                        api_mesajlari = api_mesajlari[:2] + api_mesajlari[-(len(api_mesajlari)//2):]
+
+                bekle = 2 ** deneme  # 1sn, 2sn, 4sn
+                log.warning(
+                    "[%s] API cagri basarisiz (deneme %d/%d). "
+                    "%d saniye sonra tekrar deneniyor... (sebep: %s, sinif: %s)",
+                    task_id, deneme + 1, max_retry + 1, bekle, e, sinif,
+                )
+                time.sleep(bekle)
+
+        log.error(
+            "[%s] Tum %d retry denemesi basarisiz", task_id, max_retry + 1,
+        )
+        return None
+
+    def _provider_rotate(
+        self,
+        mevcut_tip: str,
+        fallback_providerlar: List[Tuple[str, str]],
+        mevcut_index: int,
+        task_id: str,
+    ) -> Tuple[str, str]:
+        """Fallback zincirinde siradaki provider'a gecer.
+
+        Args:
+            mevcut_tip: Su anki provider tipi.
+            fallback_providerlar: (tip, ad) tuple listesi.
+            mevcut_index: Su anki index.
+            task_id: Log icin task ID.
+
+        Returns:
+            (yeni_tip, yeni_provider_adi) — bulunamazsa (mevcut_tip, "?").
+        """
+        if mevcut_index + 1 < len(fallback_providerlar):
+            yeni_tip, yeni_ad = fallback_providerlar[mevcut_index + 1]
+            log.info(
+                "[%s] Provider rotate: %s -> %s",
+                task_id,
+                fallback_providerlar[mevcut_index][1] if mevcut_index < len(fallback_providerlar) else "?",
+                yeni_ad,
+            )
+            return yeni_tip, yeni_ad
+        return mevcut_tip, "?"
+
+    # ══════════════════════════════════════════════════════════════════
+    # SESSION CONTEXT INJECTION — onceki session ozetleri
+    # ══════════════════════════════════════════════════════════════════
+
+    def _session_context_injection(
+        self,
+        session_id: str,
+        storage: Any,
+        max_onceki: int = 3,
+    ) -> str:
+        """Onceki session ozetlerini alip baglam metni olarak doner.
+
+        Session storage'dan onceki session'larin ozet/sonuc bilgilerini
+        ceker ve konusma gecmisine eklenecek bir baglam metni olusturur.
+
+        Args:
+            session_id: Mevcut session ID (kendini disarda birakir).
+            storage:    SessionStorage instance (_SessionStorage).
+            max_onceki: Kac onceki session alinacak (default: 3).
+
+        Returns:
+            Baglam metni. Hata durumunda veya session yoksa bos string.
+        """
+        if not storage or not session_id:
+            return ""
+
+        try:
+            # Farkli storage API'lerini dene
+            if hasattr(storage, "session_gecmisi_al"):
+                oncekiler = storage.session_gecmisi_al(
+                    limit=max_onceki, exclude_current=session_id,
+                )
+            elif hasattr(storage, "session_listele"):
+                tumu = storage.session_listele(limit=max_onceki + 1)
+                oncekiler = [s for s in tumu if s.get("session_id") != session_id][:max_onceki]
+            else:
+                return ""
+        except Exception as e:
+            log.warning(
+                "[session=%s] Session gecmisi alinirken hata: %s",
+                session_id, e,
+            )
+            return ""
+
+        if not oncekiler:
+            return ""
+
+        satirlar = ["[Onceki Session Ozetleri]", ""]
+        for s in oncekiler[:max_onceki]:
+            sid = s.get("session_id") or s.get("id", "?")
+            ozet = (
+                s.get("ozet")
+                or s.get("summary")
+                or s.get("system_prompt", "")
+                or s.get("hedef", "")
+            )
+            sonuc = s.get("sonuc") or s.get("result") or ""
+            durum = s.get("end_reason") or s.get("durum", "")
+
+            satirlar.append(f"- Session {sid}: {str(ozet)[:200]}")
+            if sonuc:
+                satirlar.append(f"  Sonuc: {str(sonuc)[:100]}")
+            if durum:
+                satirlar.append(f"  Durum: {durum}")
+
+        satirlar.append("")
+        baglam_metni = "\n".join(satirlar)
+        log.info(
+            "[session=%s] Session context injection: %d onceki session eklendi",
+            session_id, len(oncekiler[:max_onceki]),
+        )
+        return baglam_metni
+
+
+# ── CLI girdi noktasi ─────────────────────────────────────────────────
+
+def run(**kwargs: Any) -> str:
+    """CLI giris noktasi."""
+    islem = kwargs.get("islem", "test")
+    hedef = kwargs.get("hedef", "test")
+
+    loop = ConversationLoop()
+    if islem == "coz":
+        sonuc = loop.coz(hedef)
+        return json.dumps(sonuc, ensure_ascii=False)
+    elif islem == "run":
+        sonuc = loop.run_conversation(hedef)
+        return json.dumps(sonuc, ensure_ascii=False)
+    elif islem == "durum":
+        return json.dumps(loop.istatistik(), ensure_ascii=False)
+    else:
+        return json.dumps(
+            {"durum": "hazir", "mesaj": f"{islem} test"},
+            ensure_ascii=False,
+        )
+
+
+if __name__ == "__main__":
+    import sys
+
+    print("=== ConversationLoop Basit Test ===")
+
+    # --- Test 1: coz() eski API ---
+    loop = ConversationLoop(motor=None, beyin=None, max_tur=3)
+    s = loop.coz("test hedef")
+    assert isinstance(s, dict), "coz() dict donmeli"
+    assert s["hedef"] == "test hedef"
+    print(f"coz() OK: basarili={s['basarili']}, tur={s['turlar']}")
+
+    # --- Test 2: run_conversation() yeni API ---
+    loop2 = ConversationLoop(max_tur=2)
+    s2 = loop2.run_conversation("dosya olustur", provider="lmstudio")
+    assert isinstance(s2, dict), "run_conversation() dict donmeli"
+    assert "task_id" in s2
+    assert "budget" in s2
+    print(f"run_conversation() OK: task_id={s2['task_id']}, tur={s2['turlar']}")
+
+    # --- Test 3: provider tipi ---
+    loop3 = ConversationLoop()
+    assert loop3._provider_tipi_belirle("anthropic") == "anthropic"
+    assert loop3._provider_tipi_belirle("codex")     == "codex"
+    assert loop3._provider_tipi_belirle("deepseek")  == "chat_completions"
+    print("Provider tipi OK")
+
+    # --- Test 4: tool_calls parse ---
+    yanit_arac  = {"content": 'DOSYA_OKU("test.txt")'}
+    yanit_bitti = {"content": "Hedef tamamlandi. GOREV_BITTI(ozet)"}
+    yanit_dusun = {"content": "DUSUN(icerik)"}
+    assert len(loop3._tool_calls_al(yanit_arac))  == 1
+    assert len(loop3._tool_calls_al(yanit_bitti)) == 0
+    assert len(loop3._tool_calls_al(yanit_dusun)) == 0
+    print("Tool call parse OK")
+
+    print("\nTum testler gecti!")
+    sys.exit(0)

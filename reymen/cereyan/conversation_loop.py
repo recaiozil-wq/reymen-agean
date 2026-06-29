@@ -8,7 +8,7 @@ Ajan ile kullanici arasindaki etkilesimi yonetir:
 - Prompt caching (Anthropic icin cache_control marker'lari)
 - Interruptible API call (Ctrl+C destekli, thread bazli)
 - Tool call dongusu (tool_calls geldikce calistir, sonuclari ekle, devam)
-- Iteration budget (tur siniri, circuit breaker, takilma tespiti)
+- Iteration budget
 - Hata yonetimi: her adimda try/except
 - Loglama: her adimda logging.INFO / ERROR
 """
@@ -21,8 +21,15 @@ import threading
 import time
 import traceback
 import uuid
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 import logging
+
+from dotenv import load_dotenv
+_env_yolu = Path(__file__).resolve().parent.parent.parent / ".env"
+if _env_yolu.exists():
+    load_dotenv(_env_yolu, override=True)
+
 logger = logging.getLogger(__name__)
 
 log = logging.getLogger("conversation_loop")
@@ -99,6 +106,14 @@ except ImportError:
     _SessionStorage = None
     _SESSION_AKTIF = False
 
+# ── OnceHafiza (bellegi-oncelikli kontrol) ───────────────────────
+try:
+    from reymen.sistem.once_hafiza import hafizada_ara as _hafizada_ara
+    _ONCE_HAFIZA_AKTIF = True
+except ImportError:
+    _hafizada_ara = None
+    _ONCE_HAFIZA_AKTIF = False
+
 # ── Hata sınıflandırıcı ve mesaj tamirci ─────────────────────────
 try:
     from reymen.cereyan.hata_siniflandirici import (
@@ -135,6 +150,7 @@ except ImportError:
 try:
     from reymen.cereyan.hook_dispatcher import (
         hook_cagir as _hook_cagir,
+        hook_kaydet as _hook_kaydet,
         oturum_baslat_tetikle as _oturum_baslat_tetikle,
         oturum_bitir_tetikle as _oturum_bitir_tetikle,
         tur_baslat_tetikle as _tur_baslat_tetikle,
@@ -145,6 +161,12 @@ try:
         context_sikistirma_tetikle as _context_sikistirma_tetikle,
     )
     _HOOK_AKTIF = True
+    # Self-improvement hook'unu otomatik kaydet (her tur sonu metrik)
+    try:
+        from reymen.self_improve import conversation_loop_hook as _si_hook
+        _hook_kaydet("on_turn_end", _si_hook)
+    except Exception:
+        pass
 except ImportError:
     _hook_cagir = None  # type: ignore[assignment]
     _oturum_baslat_tetikle = _oturum_bitir_tetikle = None  # type: ignore[assignment]
@@ -160,22 +182,17 @@ except ImportError:
     _StreamSaglikTakibi = None  # type: ignore[assignment]
     _STREAM_DIAG_AKTIF = False
 
-# ── İYİLEŞTİRME 3: Tool öncelik sırası için cache ────────────────
-# Basit response cache: selamlaşma, teşekkür gibi LLM gerektirmeyen yanıtlar
-ONCELIK_CACHE = {
-    "merhaba": "👋 Merhaba! Size nasıl yardımcı olabilirim?",
-    "selam": "👋 Selam! Ne yapalım?",
-    "teşekkür": "Rica ederim! Başka bir şey yapmamı ister misiniz?",
-    "tesekkur": "Rica ederim! Başka bir şey yapmamı ister misiniz?",
-    "sağol": "Ne demek! Her zaman buradayım.",
-    "sagol": "Ne demek! Her zaman buradayım.",
-    "görüşürüz": "Görüşmek üzere! 👋",
-    "gorusuruz": "Görüşmek üzere! 👋",
-    "bye": "Bye! 👋",
-    "hadi": "Hadi bakalım! 🚀",
-    "tamam": "Tamam, ne yapalım?",
-    "ok": "OK! Ne yapalım?",
-}
+# ── Web arama (halusinasyon onleme) ─────────────────────────────
+try:
+    from ddgs import DDGS as _DDGS
+    _WEB_ARAMA_AKTIF = True
+except ImportError:
+    try:
+        from duckduckgo_search import DDGS as _DDGS
+        _WEB_ARAMA_AKTIF = True
+    except ImportError:
+        _DDGS = None
+        _WEB_ARAMA_AKTIF = False
 
 
 # ── Sabitler ──────────────────────────────────────────────────────────
@@ -198,6 +215,26 @@ PROVIDER_LIMITS = {
 }
 # Varsayilan limit (hic eslesmezse)
 PROVIDER_LIMIT_VARSAYILAN = int(os.environ.get("PROVIDER_LIMIT_DEFAULT", "128000"))
+
+# Oncelik cache: basit selamlasma/kisa yanit patternleri icin
+# LLM cagrisi yapmadan direkt yanit ver (0 maliyet)
+ONCELIK_CACHE = {
+    "merhaba":       "Merhaba! Nasil yardimci olabilirim?",
+    "selam":         "Selam! Ne yapabilirim?",
+    "slm":           "Selam! Ne yapabilirim?",
+    "teşekkür":      "Rica ederim, baska bir sey?",
+    "tesekkur":      "Rica ederim, baska bir sey?",
+    "sagol":         "Ne demek, her zaman!",
+    "sağol":         "Ne demek, her zaman!",
+    "gorusuruz":     "Gorusmek uzere!",
+    "görüşürüz":     "Görüşmek üzere!",
+    "bye":           "Gorusmek uzere!",
+    "hadi":          "Hadi bakalim, kolay gelsin!",
+    "tamam":         "Tamam, hemen yapiyorum.",
+    "ok":            "OK, hemen basliyorum.",
+    "tmm":           "Tamam, hemen yapiyorum.",
+    "eyvallah":      "Eyvallah, görüşürüz!",
+}
 
 # Yanıttaki "gorev bitti" tetikleyicileri
 GOREV_BITTI_TETIK = ("GOREV_BITTI", "görev bitti", "tamamlandi", "TASK_DONE")
@@ -287,6 +324,9 @@ class ConversationLoop:
         self._durum = "hazir"
         self._iptal_istegi = False
         self._konusma_gecmisi: list = []
+        # Konusma gecmisi — son N mesaj (user/assistant) bir sonraki goreve aktarilir
+        self._gecmis_mesajlar: list[dict] = []
+        self._max_gecmis_mesaj = 10
         # Circuit breaker state
         self._cb_art_arda_hata = 0
         self._cb_son_hata_zamani = 0.0
@@ -299,6 +339,15 @@ class ConversationLoop:
         self._onceki_eylemler: list[str] = []
         # Streaming
         self._stream_callback = None
+        # A2A mesajlaşma
+        self._a2a_broker = None
+        self._a2a_agent = None
+        try:
+            from reymen.a2a import Broker as _Broker, Agent as _Agent
+            self._a2a_broker = _Broker()
+            self._a2a_agent = _Agent("conversation_loop", self._a2a_broker)
+        except Exception:
+            pass
 
     # ══════════════════════════════════════════════════════════════════
     # MEVCUT API — geriye uyumluluk
@@ -385,30 +434,33 @@ class ConversationLoop:
         baglam: Optional[dict] = None,
         provider: Optional[str] = None,
     ) -> dict:
-        """ReYMeN Agent run_conversation() seviyesinde konusma dongusu.
+        '''Konusma dongusu - Hermes Agent pipeline ile birebir ayni.
 
-        Akis:
-          1. task_id uret
-          2. Kullanici mesajini konusma gecmisine ekle
-          3. Sistem prompt'u insa et (prompt_builder)
-          4. Context preflight: >%50 ise sikistir
-          5. API mesajlarini build et (provider tipine gore)
-          6. Ephemeral layer'lar ekle (butce uyarisi, context pressure)
-          7. Prompt caching marker'lari ekle (Anthropic ise)
-          8. Interruptible API call (_interruptible_api_call)
-          9. Yaniti parse et:
-             - tool_calls → calistir, sonuclari ekle, 5'e don
-             - text response → persist, return
+        Akis (Ensemble - 7 kaynak):
+          1. SORGU (task_id + session + budget)
+          2. ONCE HAFIZA KONTROLU (OnceHafiza, guven>0.8 direkt don)
+          3. Session search (FTS5 gecmis konusma arama)
+          4. Skill tarama (FTS5 skills_index.db arama)
+          5. ENSEMBLE KARSILASTIR (7 kaynak):
+             a. DeepSeek (toolsuz, oncek kontrolesiz)
+             b. OnceHafiza (guven puanli)
+             c. Web arama (backend=html)
+             d. Gorsel analiz (URL/dosya icin)
+             e. Skill tarama (FTS5)
+             f. ONCELIK_CACHE (15 entry)
+             g. En yuksek puanli sec + dogrula
+          6. KAYDET (OnceHafiza ogrenme)
+          7. CEVAP (formatli yanit + session kapat)
 
         Args:
             hedef:    Kullanicinin hedefi.
-            baglam:   Ek baglam dict'i (opsiyonel).
-            provider: Provider override ("anthropic", "deepseek", "codex", ...).
+            baglam:   Ek baglam dicti (opsiyonel).
+            provider: Provider override.
 
         Returns:
-            Sonuc dict'i (task_id, basarili, turlar, sure, budget, ...).
-        """
-        # ── 1. task_id ────────────────────────────────────────────────
+            Sonuc dicti (task_id, basarili, turlar, sure, budget, ...).
+        '''
+        # -- 1. task_id + session + budget -----------------------------
         task_id = str(uuid.uuid4())[:8]
         log.info("[%s] run_conversation basladi: %.60s", task_id, hedef)
 
@@ -426,7 +478,7 @@ class ConversationLoop:
             "yanit":     None,
         }
 
-        # Session başlat
+        # Session baslat
         session_id = None
         _storage = None
         if _SESSION_AKTIF and _SessionStorage:
@@ -444,94 +496,78 @@ class ConversationLoop:
                 )
                 sonuc["session_id"] = session_id
                 log.info("[%s] Session acildi: %s", task_id, session_id)
+                # Hook: session baslangici
+                if _HOOK_AKTIF and _oturum_baslat_tetikle is not None:
+                    try:
+                        _oturum_baslat_tetikle(session_id=session_id, task_id=task_id, agent_adi="reymen")
+                    except Exception:
+                        logger.warning("[hook] sessiz_except")
             except Exception as _se:
                 log.warning("[%s] Session baslatma hatasi: %s", task_id, _se)
 
-        # Hook: oturum başlangıcı
-        if _HOOK_AKTIF and _oturum_baslat_tetikle is not None:
-            try:
-                _oturum_baslat_tetikle(
-                    session_id=session_id or task_id,
-                    agent_adi=getattr(self, "_ajan_adi", "ReYMeN"),
-                    hedef=hedef,
-                )
-            except Exception as _e:
-                logger.warning("[ConversationLoop] except Exception (L452): %s", Exception)
-                pass
-
-        # Budget olustur
         budget = self._budget_olustur(hedef)
 
-        # ── 2a. Görev öncesi hafıza kontrolü ─────────────────────────
-        # İyileştirme #1: OnceHafiza ile zorunlu kontrol
-        # guven_skoru > 0.8 ise → LLM çağırma, direkt döndür
-        try:
-            from reymen.hafiza.gorev_once_kontrol import hafizada_ara as _hafizada_ara
-            hafiza_sonuc = _hafizada_ara(hedef, kategori="")
-            if hafiza_sonuc and hafiza_sonuc.get("bulundu"):
-                guven = float(hafiza_sonuc.get("guven_skoru", 0))
-                log.info(
-                    "[%s] Hafizada bulundu: guven=%.2f, kaynak=%s",
-                    task_id, guven, hafiza_sonuc.get("kaynak", "?"),
-                )
-                self._onceki_bilgi = {
-                    "icerik": hafiza_sonuc.get("icerik", ""),
-                    "kaynak": hafiza_sonuc.get("kaynak", "hafiza"),
-                    "guven_skoru": guven,
-                    "kayit_id": hafiza_sonuc.get("kayit_id"),
-                }
-
-                # guven > 0.8 → LLM'i tamamen atla
-                if guven > 0.8:
-                    log.info(
-                        "[%s] HAFIZA ATLAMASI: guven=%.2f > 0.8, LLM cagrilmadi (%%60 maliyet dususu)",
-                        task_id, guven,
-                    )
-                    sonuc["basarili"] = True
-                    sonuc["yanit"] = f"[Hafizadan] {hafiza_sonuc.get('icerik', '')[:2000]}"
-                    sonuc["kaynak"] = hafiza_sonuc.get("kaynak", "memory")
-                    sonuc["hafiza_atlama"] = True
-                    sonuc["guven_skoru"] = guven
-                    sonuc["turlar"] = 0
-                    sonuc["sure"] = round(time.time() - baslama, 3)
-                    if budget:
-                        budget.gorev_tamamla()
-                    self._durum = "tamamlandi"
-                    return sonuc
-            else:
-                self._onceki_bilgi = None
-                log.info("[%s] Hafizada benzer gorev bulunamadi", task_id)
-        except ImportError:
-            self._onceki_bilgi = None
-            log.info("[%s] hafizada_ara modulu bulunamadi, hafiza kontrolu atlandi", task_id)
-        except Exception as _he:
-            self._onceki_bilgi = None
-            log.warning("[%s] Hafiza kontrol hatasi: %s", task_id, _he)
-
-        # ── İYİLEŞTİRME 4: BELİRSİZ GÖREV → HAFIZA TABANLI ÖNERİ ──
-        # Hafizada bulunamadiysa, oneri_uret ile kullaniciya tahmin sun
-        if not sonuc.get("hafiza_atlama"):
+        # Hook: tur baslangici
+        if _HOOK_AKTIF and _tur_baslat_tetikle is not None:
             try:
-                from reymen.hafiza.gorev_once_kontrol import oneri_uret as _oneri_uret
-                oneri = _oneri_uret(hedef)
-                if oneri.get("oneri_uretilen"):
-                    log.info(
-                        "[%s] ONERI: kategori=%s, guven=%.2f",
-                        task_id, oneri["kategori"], oneri["guven_skoru"],
-                    )
-                    self._onceki_oneri = oneri
-                else:
-                    self._onceki_oneri = None
-                    if oneri.get("sebep") == "selamlasma_tespit":
-                        log.info("[%s] Selamlasma tespit, oneri atlandi", task_id)
-            except ImportError:
-                self._onceki_oneri = None
-            except Exception as _oe:
-                self._onceki_oneri = None
-                log.warning("[%s] Oneri hatasi: %s", task_id, _oe)
+                _tur_baslat_tetikle(tur=1, task_id=task_id, hedef=hedef[:100])
+            except Exception:
+                logger.warning("[hook] sessiz_except")
 
-        # ── 2. Konusma gecmisi ────────────────────────────────────────
-        self._konusma_gecmisi = []
+        # -- A2A mesaj kontrolu (gelen mesaj varsa hedefe ekle)
+        if self._a2a_agent is not None:
+            try:
+                a2a_msg = self._a2a_agent.receive(timeout=0.1)
+                if a2a_msg is not None:
+                    log.info("[%s] A2A mesaj alindi: sender=%s icerik=%.60s", task_id, a2a_msg.sender, str(a2a_msg.content))
+                    self._konusma_gecmisi.append({
+                        "role": "user",
+                        "content": f"[A2A: {a2a_msg.sender}] {a2a_msg.content}",
+                    })
+            except Exception:
+                pass
+
+        # -- 2. ONCE HAFIZA KONTROLU (guven>0.8 ise direkt don)
+        hafiza_sonuc = None
+        if _ONCE_HAFIZA_AKTIF and _hafizada_ara is not None:
+            try:
+                hafiza_sonuc = _hafizada_ara(hedef)
+            except Exception as _he:
+                log.warning("[%s] OnceHafiza hatasi: %s", task_id, _he)
+                hafiza_sonuc = None
+
+        if hafiza_sonuc:
+            guven = hafiza_sonuc.get("guven", 0)
+            yanit = hafiza_sonuc.get("yanit") or hafiza_sonuc.get("sonuc", "")
+            if guven > 0.8 and yanit:
+                sonuc["basarili"] = True
+                sonuc["yanit"] = yanit
+                sonuc["kaynak"] = "once_hafiza"
+                sonuc["tur"] = 0
+                sonuc["sure"] = round(time.time() - baslama, 2)
+                self._durum = "tamamlandi"
+                return sonuc
+
+        # -- 2b. OGRENME ATLAMA (imza tabanli cozum varsa direkt don)
+        try:
+            from reymen.core.ogrenme import cozum_bul, imza_uret
+            _hata_on = Exception(hedef)
+            _imza_on = imza_uret(_hata_on)
+            _cozum_on = cozum_bul(_imza_on)
+            if _cozum_on:
+                sonuc["yanit"] = f"[Kayitli cozum]\n{_cozum_on}"
+                sonuc["basarili"] = True
+                sonuc["kaynak"] = "ogrenme_atlama"
+                sonuc["tur"] = 0
+                sonuc["sure"] = round(time.time() - baslama, 2)
+                self._durum = "tamamlandi"
+                log.info("[%s] Ogrenme atlama: cozum bulundu", task_id)
+                return sonuc
+        except Exception:
+            pass
+
+        # -- 3. DOGRUDAN LLM + TOOL LOOP (DeepSeek karar verir) ------------
+        self._konusma_gecmisi = [dict(m) for m in self._gecmis_mesajlar]
         if baglam:
             baglam_str = json.dumps(baglam, ensure_ascii=False)
             self._konusma_gecmisi.append({
@@ -540,246 +576,283 @@ class ConversationLoop:
             })
         self._konusma_gecmisi.append({"role": "user", "content": hedef})
 
-        # Hafıza bilgisi varsa konuşmaya ekle (LLM görsün)
-        hafiza_bilgi = getattr(self, '_onceki_bilgi', None)
-        if hafiza_bilgi:
-            kaynak = hafiza_bilgi.get("kaynak", "?")
-            icerik = hafiza_bilgi.get("icerik", "")
-            self._konusma_gecmisi.append({
-                "role": "system",
-                "content": (
-                    f"[Hafiza Bilgisi — {kaynak}]\n"
-                    f"Bu gorevle ilgili daha once islenmis kayit var:\n"
-                    f"{icerik}\n"
-                    f"Bunu referans olarak kullan, gereksiz tekrar yapma."
-                ),
-            })
-            log.info("Hafiza bilgisi konusmaya eklendi: %s (%d chars)", kaynak, len(icerik))
+        # -- 3b. SESSION CONTEXT INJECTION + SEARCH ------------------------
+        if _storage and session_id:
+            try:
+                session_baglam = self._session_context_injection(session_id, _storage)
+                if session_baglam:
+                    self._konusma_gecmisi.insert(0, {"role": "user", "content": session_baglam})
+            except Exception:
+                pass
+        try:
+            from reymen.hafiza.session_db import session_search
+            import concurrent.futures as _cf
+            with _cf.ThreadPoolExecutor(max_workers=1) as _ex:
+                _fut = _ex.submit(session_search, hedef, limit=2)
+                oncekiler = _fut.result(timeout=3)
+            if oncekiler and len(oncekiler) > 0:
+                for s in oncekiler[:2]:
+                    ozet = s.get("ozet") or s.get("summary", "") or ""
+                    if ozet:
+                        self._konusma_gecmisi.append({"role": "user", "content": f"[Onceki: {str(ozet)[:200]}]"})
+        except Exception:
+            pass
 
-        # ── 2b. Session context injection (onceki session ozetleri) ─────
-        if _SESSION_AKTIF and _storage and session_id:
-            session_baglam = self._session_context_injection(
-                session_id=session_id,
-                storage=_storage,
-                max_onceki=3,
-            )
-            if session_baglam:
-                self._konusma_gecmisi.append({
-                    "role": "user",
-                    "content": session_baglam,
-                })
-                log.info(
-                    "[%s] Session context injection: onceki session ozetleri eklendi",
-                    task_id,
-                )
+        # -- 3d. SKILL TARAMA (skills/ icinde query ile eslesen SKILL.md yukle)
+        try:
+            skill_icerik = self._skill_tara(hedef)
+            if skill_icerik:
+                self._konusma_gecmisi.append({"role": "user", "content": skill_icerik})
+                log.info("[%s] Skill tarama: eslesen skill eklendi", task_id)
+        except Exception:
+            pass
 
-        # ── İYİLEŞTİRME 3: ÖNCE HAFIZA → SONRA CACHE → EN SON LLM ──
-        # Cache kontrol: basit selamlaşma/teşekkür vs. direkt döndür
-        if hafiza_bilgi is None:  # hafıza zaten kontrol edildi, bulunamadi
-            hedef_alt = hedef.strip().lower()
-            for anahtar, yanit in ONCELIK_CACHE.items():
-                if hedef_alt == anahtar or hedef_alt.startswith(anahtar):
-                    log.info(
-                        "[%s] CACHE ATLAMASI: '%s' eslesmesi, LLM cagrilmadi",
-                        task_id, anahtar,
-                    )
-                    sonuc["basarili"] = True
-                    sonuc["yanit"] = yanit
-                    sonuc["kaynak"] = "cache"
-                    sonuc["turlar"] = 0
-                    sonuc["sure"] = round(time.time() - baslama, 3)
-                    budget.gorev_tamamla()
-                    self._durum = "tamamlandi"
-                    return sonuc
+        # -- 3e. TOOL ROUTING (sorgu tipini siniflandir, puanlari ayarla)
+        try:
+            route = self._tool_routing(hedef)
+            sonuc["route"] = route
+            log.info("[%s] Tool routing: %s", task_id, route)
+        except Exception:
+            pass
 
-        # ── 3. Sistem prompt'u ────────────────────────────────────────
         sistem_prompt = self._sistem_promptu_olustur(hedef, baglam)
-
-        # Provider tipini belirle
         provider_tipi = self._provider_tipi_belirle(provider)
         sonuc["provider"] = provider_tipi
 
+        # -- 4. ENSEMBLE: DeepSeek + OnceHafiza + Web + Cache karsilastir
+        ensemble = {}
+
+        # 4a. DeepSeek'e direkt sor (toolsuz, oncek kontrolesiz)
         try:
-            while budget.devam_etmeli_mi():
-                # ── Circuit breaker kontrolü ────────────────────────────
-                if self._cb_acik:
-                    # KALICI: otomatik açılmaz, kullanıcı bildirimi + dur
-                    sonuc["hata"] = (
-                        f"[KALICI DURDURMA] {self._cb_art_arda_hata}/{CIRCUIT_BREAKER_MAX_HATA} "
-                        f"ardisik hata. 3 deneme hakkiniz doldu."
-                    )
-                    sonuc["cb_kalici"] = True
-                    log.warning("[%s] %s", task_id, sonuc["hata"])
+            ds_mesaj = [
+                {"role": "system", "content": "Kisa, oz, dogrudan cevap ver."},
+                {"role": "user", "content": hedef}
+            ]
+            ds_yanit = self._direct_api_call(ds_mesaj, tools_bos=True)
+            ds_icerik = ""
+            if ds_yanit:
+                ds_icerik = ds_yanit.get("content", "") or ""
+            ensemble["deepseek"] = {
+                "yanit": ds_icerik,
+                "puan": 6 if len(ds_icerik.strip()) > 10 else 3,
+                "kaynak": "deepseek"
+            }
+        except Exception:
+            ensemble["deepseek"] = {"yanit": "", "puan": 0, "kaynak": "deepseek"}
+
+        # 4b. OnceHafiza
+        try:
+            oh_sonuc = _hafizada_ara(hedef) if _ONCE_HAFIZA_AKTIF and _hafizada_ara else None
+            if oh_sonuc:
+                oh_yanit = oh_sonuc.get("yanit") or oh_sonuc.get("sonuc") or oh_sonuc.get("cozum", "")
+                oh_guven = oh_sonuc.get("guven", 0)
+                ensemble["hafiza"] = {
+                    "yanit": oh_yanit,
+                    "puan": round(oh_guven * 10, 1),
+                    "kaynak": "once_hafiza"
+                }
+            else:
+                ensemble["hafiza"] = {"yanit": "", "puan": 0, "kaynak": "once_hafiza"}
+        except Exception:
+            ensemble["hafiza"] = {"yanit": "", "puan": 0, "kaynak": "once_hafiza"}
+
+        # 4c. Web ara
+        try:
+            web_sonuc = self._web_ara(hedef) if _WEB_ARAMA_AKTIF else None
+            if web_sonuc and len(web_sonuc) > 30:
+                ensemble["web"] = {
+                    "yanit": web_sonuc,
+                    "puan": 8,
+                    "kaynak": "web_arama"
+                }
+            else:
+                ensemble["web"] = {"yanit": "", "puan": 0, "kaynak": "web_arama"}
+        except Exception:
+            ensemble["web"] = {"yanit": "", "puan": 0, "kaynak": "web_arama"}
+
+        # 4d. GORSEL ANALIZ (fotograf/resim varsa)
+        try:
+            vision_yanit = self._vision_analiz(hedef)
+            if vision_yanit and len(vision_yanit.strip()) > 10:
+                ensemble["vision"] = {
+                    "yanit": vision_yanit,
+                    "puan": 7,
+                    "kaynak": "vision"
+                }
+            else:
+                ensemble["vision"] = {"yanit": "", "puan": 0, "kaynak": "vision"}
+        except Exception:
+            ensemble["vision"] = {"yanit": "", "puan": 0, "kaynak": "vision"}
+
+        # 4e. SKILL TARAMA (FTS5 skills_index.db)
+        try:
+            skill_yanit = self._skill_bul(hedef)
+            if skill_yanit:
+                ensemble["skill"] = {
+                    "yanit": skill_yanit,
+                    "puan": 8,
+                    "kaynak": "skill"
+                }
+            else:
+                ensemble["skill"] = {"yanit": "", "puan": 0, "kaynak": "skill"}
+        except Exception:
+            ensemble["skill"] = {"yanit": "", "puan": 0, "kaynak": "skill"}
+
+        # 4e. ONCELIK_CACHE
+        try:
+            hedef_kucuk = hedef.strip().lower()
+            cache_yanit = ""
+            for k, v in ONCELIK_CACHE.items():
+                if k in hedef_kucuk:
+                    cache_yanit = v
                     break
+            if cache_yanit:
+                ensemble["cache"] = {
+                    "yanit": cache_yanit,
+                    "puan": 9,
+                    "kaynak": "oncelik_cache"
+                }
+            else:
+                ensemble["cache"] = {"yanit": "", "puan": 0, "kaynak": "oncelik_cache"}
+        except Exception:
+            ensemble["cache"] = {"yanit": "", "puan": 0, "kaynak": "oncelik_cache"}
 
-                # ── Takılma dedektörü (önceki turdan) ──────────────────
-                if len(self._onceki_eylemler) >= TAKILMA_ESIĞI:
-                    son_3 = self._onceki_eylemler[-TAKILMA_ESIĞI:]
-                    if len(set(son_3)) == 1:
-                        log.warning(
-                            "[%s] Takilma tespit edildi: %s %dx tekrar",
-                            task_id, son_3[0], TAKILMA_ESIĞI,
-                        )
-                        sonuc["hata"] = (
-                            f"(takilma) '{son_3[0]}' {TAKILMA_ESIĞI}x tekrarlandi"
-                        )
-                        break
+        # 4e. KARSILASTIR + PUANLA - en yuksek puanliyi sec
+        en_iyi = max(ensemble.values(), key=lambda x: x["puan"])
+        en_iyi_kaynak = en_iyi["kaynak"]
+        en_iyi_yanit = en_iyi["yanit"]
 
-                budget.tur_basla()
-                tur = budget.tur
-                log.info(
-                    "[%s] Tur %d (provider=%s, gecmis=%d mesaj)",
-                    task_id, tur, provider_tipi, len(self._konusma_gecmisi),
-                )
-
-                # ── 4. Context preflight ──────────────────────────────
-                self._konusma_gecmisi = self._context_preflight(
-                    self._konusma_gecmisi, sistem_prompt, provider_tipi
-                )
-
-                # ── 5. API mesajlari ──────────────────────────────────
-                api_mesajlari = self._api_mesajlari_olustur(
-                    sistem_prompt, self._konusma_gecmisi, provider_tipi
-                )
-
-                # ── 6. Ephemeral layer'lar ────────────────────────────
-                api_mesajlari = self._ephemeral_layerlar_ekle(
-                    api_mesajlari, budget, len(self._konusma_gecmisi)
-                )
-
-                # ── 7. Prompt caching (Anthropic) ─────────────────────
-                if provider_tipi == "anthropic":
-                    api_mesajlari = self._prompt_caching_ekle(api_mesajlari)
-
-                # ── 8. API call — exponential backoff retry ile ────────────
-                try:
-                    yanit = self._api_call_with_retry(
-                        api_mesajlari, provider_tipi, task_id, budget,
-                    )
-                except KeyboardInterrupt:
-                    sonuc["hata"] = "Kullanici tarafindan iptal edildi (Ctrl+C)"
-                    self._durum = "iptal"
-                    self._cb_art_arda_hata = 0  # iptal sayilmaz
-                    log.warning("[%s] Ctrl+C ile iptal edildi", task_id)
-                    break
-
-                if yanit is None:
-                    self._cb_art_arda_hata += 1
-                    self._cb_son_hata_zamani = time.time()
-                    if self._cb_art_arda_hata >= CIRCUIT_BREAKER_MAX_HATA:
-                        self._cb_acik = True
-                        log.warning(
-                            "[%s] Circuit breaker acildi: %d ardisik hata",
-                            task_id, self._cb_art_arda_hata,
-                        )
-                    budget.tur_bitir(basarili=False)
-                    log.warning(
-                        "[%s] API yanit dondurmedi (hata #%d) — tum retry'ler basarisiz",
-                        task_id, self._cb_art_arda_hata,
-                    )
-                    continue
-
-                # ── 9. Yaniti parse et ────────────────────────────────
-                tool_calls = self._tool_calls_al(yanit)
-
-                if tool_calls:
-                    # Tool call dongusu
-                    asistan_icerik = self._yanit_icerigi_al(yanit)
-                    for tc in tool_calls:
-                        arac_adi = (
-                            tc.get("name")
-                            or tc.get("function", {}).get("name", "")
-                        )
-                        arac_params = (
-                            tc.get("arguments")
-                            or tc.get("function", {}).get("arguments", {})
-                        )
-                        if isinstance(arac_params, str):
-                            try:
-                                arac_params = json.loads(arac_params)
-                            except Exception:
-                                arac_params = {"param": arac_params}
-
-                        log.info("[%s] Tool call: %s", task_id, arac_adi)
-                        budget.eylem_kaydet(arac_adi)
-
-                        # Hook: araç çağrılmadan önce
-                        if _HOOK_AKTIF and _arac_cagri_tetikle is not None:
-                            try:
-                                _arac_cagri_tetikle(arac_adi=arac_adi, argumanlar=arac_params or {}, task_id=task_id)
-                            except Exception as _e:
-                                logger.warning("[ConversationLoop] except Exception (L703): %s", Exception)
-                                pass
-
-                        _t_arac = time.monotonic()
-                        arac_sonuc = self._arac_calistir({
-                            "arac":       arac_adi,
-                            "parametreler": arac_params,
-                        })
-                        _arac_sure = time.monotonic() - _t_arac
-
-                        # Hook: araç sonucu
-                        if _HOOK_AKTIF and _arac_sonuc_tetikle is not None:
-                            try:
-                                _arac_sonuc_tetikle(
-                                    arac_adi=arac_adi,
-                                    sonuc=str(arac_sonuc)[:500],
-                                    sure_sn=_arac_sure,
-                                    task_id=task_id,
-                                )
-                            except Exception as _e:
-                                logger.warning("[ConversationLoop] except Exception (L722): %s", Exception)
-                                pass
-
-                        # Asistan + tool sonuc mesajlarini ekle
-                        self._konusma_gecmisi.append({
-                            "role":       "assistant",
-                            "content":    asistan_icerik,
-                            "tool_calls": tool_calls,
-                        })
-                        self._konusma_gecmisi.append({
-                            "role":         "tool",
-                            "tool_call_id": tc.get("id", f"tc_{arac_adi}"),
-                            "content":      json.dumps(arac_sonuc, ensure_ascii=False),
-                        })
-
-                        if arac_sonuc.get("tamamlandi"):
+        sonuc["ensemble"] = ensemble
+        if en_iyi_yanit and len(en_iyi_yanit.strip()) > 3:
+            sonuc["basarili"] = True
+            sonuc["yanit"] = en_iyi_yanit
+            sonuc["kaynak"] = en_iyi_kaynak
+            sonuc["puan"] = en_iyi["puan"]
+            log.info(
+                "[%s] Ensemble kazanan: %s (puan=%.1f)",
+                task_id, en_iyi_kaynak, en_iyi["puan"],
+            )
+        else:
+            sonuc["hata"] = "Tum kaynaklar basarisiz"
+            log.warning("[%s] Ensemble: tum kaynaklar basarisiz", task_id)
+            # -- ONCEKI HATA COZUMUNU ARA (OnceHafiza'da kayitli mi?) ---
+            try:
+                if _ONCE_HAFIZA_AKTIF and _hafizada_ara is not None:
+                    gecmis_cozum = _hafizada_ara(hedef + " [hata]")
+                    if gecmis_cozum and gecmis_cozum.get("guven", 0) > 0.5:
+                        eski_cozum = gecmis_cozum.get("yanit") or gecmis_cozum.get("sonuc", "")
+                        if eski_cozum:
+                            sonuc["yanit"] = f"[Gecmis cozum bulundu]\n{eski_cozum}"
                             sonuc["basarili"] = True
-                            sonuc["sonuc"]    = arac_sonuc.get("cikti", "")
-                            budget.gorev_tamamla()
-                            log.info("[%s] Arac tamamlama sinyali: %s", task_id, arac_adi)
-                            break
+                            sonuc["kaynak"] = "once_hafiza_hata"
+                            log.info("[%s] Onceki hata cozumu bulundu", task_id)
+            except Exception:
+                pass
+            if not sonuc.get("basarili"):
+                # -- OGRENME.cozum_bul (imza tabanli hata cozumu) ----------
+                try:
+                    from reymen.core.ogrenme import cozum_bul, cozum_kaydet, imza_uret
+                    # imza_uret Exception ister, hata yoksa dummy ver
+                    _hata = Exception(sonuc.get("hata", "bilinmiyor"))
+                    imza = imza_uret(_hata)
+                    mevcut = cozum_bul(imza)
+                    if mevcut:
+                        sonuc["yanit"] = f"[Ogrenme hafizasindan cozum]\n{mevcut}"
+                        sonuc["basarili"] = True
+                        sonuc["kaynak"] = "ogrenme_hafiza"
+                        log.info("[%s] Ogrenme cozumu bulundu: %s", task_id, imza)
+                except Exception:
+                    pass
+            if not sonuc.get("basarili"):
+                # -- HATA ANALIZI + OnceHafiza + Ogrenme'ye kaydet -------
+                try:
+                    from reymen.hafiza.hata_analiz import hata_analiz_et
+                    ha = hata_analiz_et(hedef, sonuc.get("hata", ""))
+                    sonuc["hata_analizi"] = ha
+                    cozum = ha.get("cozum", "")
+                    if cozum:
+                        from reymen.core.ogrenme import cozum_kaydet, imza_uret
+                        _hata2 = Exception(sonuc.get("hata", "bilinmiyor"))
+                        imza2 = imza_uret(_hata2)
+                        cozum_kaydet(imza2, hata_tipi=ha.get("sinif","bilinmiyor"),
+                                     hata_ozet=sonuc.get("hata","")[:200],
+                                     cozum_kodu=cozum,
+                                     kaynak_script="conversation_loop",
+                                     basarili=False)
+                        if _ONCE_HAFIZA_AKTIF:
+                            try:
+                                from reymen.sistem.once_hafiza import kaydet as _oh_kaydet
+                                _oh_kaydet(hedef=hedef+" [hata]", cozum=cozum,
+                                           kategori="hata_cozumu", kaynak=f"hata_analiz_{task_id}")
+                            except Exception:
+                                pass
+                except Exception:
+                    pass
 
-                    budget.tur_bitir(basarili=True)
-
-                    if sonuc["basarili"]:
-                        break
-
-                else:
-                    # Text yanit → tamamlandi
-                    icerik = self._yanit_icerigi_al(yanit)
-                    self._konusma_gecmisi.append({
-                        "role":    "assistant",
-                        "content": icerik,
-                    })
-                    sonuc["basarili"] = True
-                    sonuc["yanit"]    = icerik
-                    budget.gorev_tamamla()
-                    budget.tur_bitir(basarili=True)
-                    log.info("[%s] Text yanit alindi, tamamlandi", task_id)
-                    break
-
-        except Exception as e:
-            sonuc["hata"]      = f"run_conversation hatasi: {e}"
-            sonuc["traceback"] = traceback.format_exc()
-            log.error("[%s] Hata: %s", task_id, e)
-
-        sonuc["turlar"] = budget.tur
-        sonuc["sure"]   = round(time.time() - baslama, 2)
-        sonuc["budget"] = budget.ozet_dict()
+        sonuc["tur"] = 1
+        sonuc["sure"] = round(time.time() - baslama, 2)
         self._durum = "tamamlandi" if sonuc["basarili"] else "hata"
 
-        # Session kapat
+        # Konusma gecmisini guncelle
+        if sonuc["basarili"] and (sonuc.get("yanit") or sonuc.get("sonuc")):
+            yanit_metin = sonuc.get("yanit") or sonuc.get("sonuc", "")
+            # Kanit kontrolu: yanit bos/None mi?
+            if not yanit_metin or len(str(yanit_metin).strip()) < 5:
+                log.warning(
+                    "[%s] DOGRULA: yanit cok kisa (%d char) - basarisiz sayiliyor",
+                    task_id, len(str(yanit_metin).strip()),
+                )
+                sonuc["basarili"] = False
+                sonuc["dogrulama_uyarisi"] = "yanit_cok_kisa"
+            else:
+                log.info("[%s] DOGRULA: basarili (%d char)", task_id, len(str(yanit_metin).strip()))
+
+        # -- 6. KAYDET (OnceHafiza ogrenme kaydi - _gorev_sonrasi_hafiza) ---
+        if sonuc["basarili"] and sonuc.get("kaynak") not in ("once_hafiza", "oncelik_cache", "oneri_uret"):
+            ogrenilecek_yanit = sonuc.get("yanit") or sonuc.get("sonuc", "")
+            if ogrenilecek_yanit and len(str(ogrenilecek_yanit).strip()) > 20:
+                try:
+                    self._gorev_sonrasi_hafiza(
+                        hedef=hedef,
+                        yanit=str(ogrenilecek_yanit)[:500],
+                        task_id=task_id,
+                    )
+                    sonuc["kaydedildi"] = True
+                except Exception as _ke:
+                    log.warning("[%s] KAYDET hatasi: %s", task_id, _ke)
+                    sonuc["kaydedildi"] = False
+
+        # Konusma gecmisini guncelle
+        self._gecmis_mesajlar = [
+            dict(m) for m in self._konusma_gecmisi
+            if m.get("role") in ("user", "assistant") and m.get("content")
+        ][-self._max_gecmis_mesaj:]
+
+        # Hook: tur bitisi
+        if _HOOK_AKTIF and _tur_bitir_tetikle is not None:
+            try:
+                _tur_bitir_tetikle(
+                    tur=1,
+                    basarili=sonuc["basarili"],
+                    task_id=task_id,
+                    kaynak=sonuc.get("kaynak", ""),
+                )
+            except Exception:
+                logger.warning("[hook] sessiz_except")
+
+        # -- A2A: yaniti broadcast et (diger agent'lar gor sunu)
+        if self._a2a_agent is not None and sonuc.get("yanit"):
+            try:
+                yanit_metin = str(sonuc["yanit"])[:200]
+                self._a2a_broker.broadcast(
+                    "conversation_loop",
+                    {"task_id": task_id, "yanit": yanit_metin},
+                    exclude={self._a2a_agent.id},
+                )
+            except Exception:
+                pass
+
+        # -- 7. CEVAP (formatli yanit + session kapat)
         if _storage and session_id:
             try:
                 end_reason = "completed" if sonuc["basarili"] else (
@@ -787,78 +860,320 @@ class ConversationLoop:
                 )
                 _storage.session_bitir(session_id, end_reason=end_reason)
                 log.info("[%s] Session kapatildi: %s (%s)", task_id, session_id, end_reason)
+                # Hook: session bitisi
+                if _HOOK_AKTIF and _oturum_bitir_tetikle is not None:
+                    try:
+                        _oturum_bitir_tetikle(
+                            session_id=session_id,
+                            tur_sayisi=budget.tur if hasattr(budget, 'tur') else 1,
+                            basarili=sonuc["basarili"],
+                            task_id=task_id,
+                        )
+                    except Exception:
+                        logger.warning("[hook] sessiz_except")
             except Exception as _se:
                 log.warning("[%s] Session bitirme hatasi: %s", task_id, _se)
-
-        # Hook: oturum bitişi
-        if _HOOK_AKTIF and _oturum_bitir_tetikle is not None:
-            try:
-                _oturum_bitir_tetikle(
-                    session_id=session_id or task_id,
-                    tur_sayisi=budget.tur if budget else 0,
-                    basarili=sonuc.get("basarili", False),
-                )
-            except Exception:
-                logger.warning("[fix_01_sessiz_except] Exception")
 
         log.info(
             "[%s] run_conversation bitti: basarili=%s, tur=%d, sure=%.1fs",
             task_id, sonuc["basarili"], budget.tur, sonuc["sure"],
         )
 
-        # Gorev sonrasi hafiza genisletme
+        # -- Self-improvement kalite kaydı
         try:
-            from reymen.hafiza.gorev_hafiza import gorev_sonrasi_hafiza
-            hf_sonuc = gorev_sonrasi_hafiza(
-                task_id, hedef, sonuc, session_id=session_id,
-                kategori=sonuc.get("kategori", ""),
-            )
-            log.info(
-                "[%s] Hafiza genisletme: hafiza=%s, dosya=%s, soul=%s",
-                task_id,
-                hf_sonuc.get("hafiza", {}).get("durum", "?"),
-                hf_sonuc.get("dosya", {}).get("durum", "?"),
-                hf_sonuc.get("soul", {}).get("durum", "?"),
-            )
-        except ImportError:
-            pass  # gorev_hafiza.py henuz yok
-        except Exception as e:
-            log.warning("[%s] Hafiza genisletme hatasi: %s", task_id, e)
-
-        # ── Gorev sonrasi hata analizi ────────────────────────────────
-        # Gorev basarisizsa => hata analizi yap
-        if not sonuc.get("basarili") and sonuc.get("hata"):
-            try:
-                from reymen.hafiza.hata_analiz import hata_analiz_et
-                hata_analizi = hata_analiz_et(
-                    str(sonuc["hata"]),
-                    hedef,
-                )
-                log.info(
-                    "[%s] Hata analizi: sinif=%s, otomatik=%s, hafizada=%s",
-                    task_id,
-                    hata_analizi.get("sinif", "?"),
-                    hata_analizi.get("otomatik", "?"),
-                    hata_analizi.get("hafizada_var", "?"),
-                )
-                sonuc["hata_analizi"] = hata_analizi
-            except ImportError:
-                logger.warning("[fix_01_sessiz_except] ImportError")
-            except Exception as _ae:
-                log.warning("[%s] Hata analizi hatasi: %s", task_id, _ae)
-
-        # ACP servis bildirimi (background)
-        try:
-            from reymen.ag.acp_server import _acp_durum as acp_durum
-            durum = acp_durum()
-            if "calisiyor" in durum:
-                log.info("[%s] ACP sunucu aktif: %s", task_id, durum[:60])
-        except ImportError:
-            logger.warning("[fix_01_sessiz_except] ImportError")
-        except Exception as e:
-            log.debug("[%s] ACP durum hatasi: %s", task_id, e)
+            from reymen.self_improve import record_step, QualityMetric
+            record_step(QualityMetric(
+                success=sonuc.get("basarili", False),
+                step_name=hedef[:60] if hedef else "",
+                errors=1 if not sonuc.get("basarili") else 0,
+                retries=getattr(self, "_retry_sayaci", 0),
+                duration=sonuc.get("sure", 0),
+                tokens_used=getattr(budget, "kullanilan_token", 0),
+            ))
+        except Exception:
+            pass
 
         return sonuc
+
+    # ══════════════════════════════════════════════════════════════════
+    # ONERI + DOGRULA + KAYDET + TAKILMA — yardimci metodlar
+    # ══════════════════════════════════════════════════════════════════
+
+    # ══════════════════════════════════════════════════════════════════
+    # HATA COZME + OGRENME + ANALIZ — yardimci metodlar
+    # ══════════════════════════════════════════════════════════════════
+
+    def _hata_coz(self, hata: Exception, hedef: str, task_id: str) -> Optional[str]:
+        '''Hata alinca OnceHafiza+ogrenme.py ile cozum bul, yoksa LLM'e sor.
+        Cozumu OnceHafiza'ya kaydeder, bir daha ayni hata gelmez.'''
+        # 1. Ogrenme modulunden imza + cozum ara
+        try:
+            from reymen.core.ogrenme import imza_uret, cozum_bul, cozum_kaydet
+            imza = imza_uret(hata)
+            if imza:
+                onceki_cozum = cozum_bul(imza)
+                if onceki_cozum:
+                    log.info("[%s] _hata_coz: onceki cozum bulundu: %.60s", task_id, str(onceki_cozum)[:60])
+                    return onceki_cozum
+        except ImportError:
+            imza = None
+            onceki_cozum = None
+
+        # 2. OnceHafiza'da hata cozumu ara
+        try:
+            from reymen.sistem.once_hafiza import hafizada_ara as _ha
+            hata_sorgu = f"hata: {str(hata)[:100]}"
+            oh_sonuc = _ha(hata_sorgu, kategori="hata")
+            if oh_sonuc:
+                cozum = oh_sonuc.get("yanit") or oh_sonuc.get("sonuc") or oh_sonuc.get("cozum", "")
+                if cozum:
+                    log.info("[%s] _hata_coz: OnceHafiza'da cozum bulundu", task_id)
+                    return cozum
+        except Exception:
+            pass
+
+        # 3. Yoksa LLM'e sor (cozum uret)
+        try:
+            cozum_soru = f"Hata alindi: {hata}. Cozum nedir? Kisa ve oz."
+            ds_mesaj = [
+                {"role": "system", "content": "Hata cozum onerisi ver. Kisa, oz, dogrudan."},
+                {"role": "user", "content": cozum_soru}
+            ]
+            ds_yanit = self._direct_api_call(ds_mesaj, tools_bos=True)
+            if ds_yanit:
+                cozum = ds_yanit.get("content", "") or ""
+                if cozum and len(cozum.strip()) > 5:
+                    # LLM cozumunu OnceHafiza'ya kaydet
+                    try:
+                        from reymen.sistem.once_hafiza import kaydet as _kaydet
+                        _kaydet(hedef=f"hata: {str(hata)[:100]}", cozum=str(cozum)[:500], kategori="hata", kaynak="hata_cozucu")
+                        log.info("[%s] _hata_coz: LLM cozumu OnceHafiza'ya kaydedildi", task_id)
+                    except Exception:
+                        pass
+                    # ogrenme.py'ye de kaydet
+                    try:
+                        if imza:
+                            cozum_kaydet(imza, type(hata).__name__, str(hata)[:100], str(cozum)[:500])
+                    except Exception:
+                        pass
+                    return cozum
+        except Exception:
+            pass
+
+        return None
+
+    def _hata_analiz_entegre(self, hata: Exception, task_id: str) -> None:
+        '''hata_analiz.py modulunu cagir (varsa).'''
+        try:
+            from reymen.cereyan.hata_cozucu import HataKaydi, HataWatchdog
+            watchdog = HataWatchdog()
+            watchdog.baslat()
+            kayit = HataKaydi(
+                kaynak="conversation_loop",
+                hata_tipi=type(hata).__name__,
+                mesaj=str(hata)[:200],
+            )
+            log.info("[%s] _hata_analiz_entegre: HataWatchdog calisti", task_id)
+        except Exception:
+            pass
+
+    def _oneri_uret(self, hedef: str) -> Optional[str]:
+        '''OnceHafiza tabanli belirsiz gorev onerisi.
+        Hedef cok kisa/belirsizse en alakali OnceHafiza kategorisini bulur.
+        TEK tahmin: "Sanirim X demek istiyorsun" formatinda.
+        '''
+        if not _ONCE_HAFIZA_AKTIF or _hafizada_ara is None:
+            return None
+        try:
+            sonuc = _hafizada_ara(hedef)
+            if sonuc and sonuc.get("guven", 0) > 0.3:
+                kate = sonuc.get("kategori") or sonuc.get("kaynak", "genel")
+                return f"Sanirim {kate} ile ilgili bir sey istiyorsun, dogru mu?"
+        except Exception:
+            pass
+        return None
+
+    def _takilma_kontrol(self, eylem_adi: str) -> bool:
+        '''Ayni eylem 3x tekrarlanirsa True doner (takilma tespiti).'''
+        self._onceki_eylemler.append(eylem_adi)
+        if len(self._onceki_eylemler) > TAKILMA_ESIĞI:
+            self._onceki_eylemler = self._onceki_eylemler[-TAKILMA_ESIĞI:]
+        return (
+            len(self._onceki_eylemler) >= TAKILMA_ESIĞI
+            and len(set(self._onceki_eylemler[-TAKILMA_ESIĞI:])) == 1
+        )
+
+    def _gorev_sonrasi_hafiza(self, hedef: str, yanit: str, task_id: str) -> None:
+        '''Gorev sonrasi OnceHafiza'yi guncelle (ogrenme).'''
+        if not _ONCE_HAFIZA_AKTIF:
+            return
+        try:
+            from reymen.sistem.once_hafiza import kaydet as _kaydet
+            _kaydet(
+                hedef=hedef,
+                cozum=str(yanit)[:500],
+                kategori="conversation",
+                kaynak=f"run_conversation_{task_id}",
+            )
+            log.debug("[%s] _gorev_sonrasi_hafiza: kaydedildi", task_id)
+        except Exception as _he:
+            log.warning("[%s] _gorev_sonrasi_hafiza hatasi: %s", task_id, _he)
+
+    def _vision_analiz(self, sorgu: str) -> Optional[str]:
+        '''Gorsel/resim analizi. Sorguda URL/dosya yolu varsa analiz et.
+        Once DeepSeek V4 Flash (multimodal) dene, olmazsa OpenRouter vision.
+        Dosya yolunu otomatik tani: C:\... veya ./... veya ~/...
+        '''
+        import re as _re
+        # URL bul
+        url_match = _re.search(r'https?://[^\s]+\.(jpg|jpeg|png|gif|webp|bmp)', sorgu, _re.IGNORECASE)
+        # Dosya yolu bul (Windows: C:\... , Unix: /... , relative: ./... veya ~/...)
+        dosya_match = None
+        if not url_match:
+            dosya_match = _re.search(r'([a-zA-Z]:\\[^\s]+\.(jpg|jpeg|png|gif|webp|bmp))', sorgu, _re.IGNORECASE)
+        if not url_match and not dosya_match:
+            dosya_match = _re.search(r'(\.\.?/[^\s]+\.(jpg|jpeg|png|gif|webp|bmp))', sorgu, _re.IGNORECASE)
+
+        if not url_match and not dosya_match:
+            gorsel_kelimeler = ["foto", "resim", "gorsel", "goruntu", "ekran", "ss", "screenshot", "image", "photo", "picture"]
+            if not any(k in sorgu.lower() for k in gorsel_kelimeler):
+                return None
+            return None
+
+        try:
+            from openai import OpenAI
+            import base64, os as _os
+
+            api_key = _os.environ.get("DEEPSEEK_API_KEY", "")
+            base_url = "https://api.deepseek.com"
+            model = "deepseek-v4-flash"
+
+            # Dosya varsa base64'e cevir
+            resim_url = url_match.group(0) if url_match else ""
+            if dosya_match:
+                dosya_yol = dosya_match.group(1)
+                if _os.path.exists(dosya_yol):
+                    with open(dosya_yol, "rb") as f:
+                        img_b64 = base64.b64encode(f.read()).decode()
+                    resim_url = f"data:image/jpeg;base64,{img_b64}"
+                else:
+                    return f"Dosya bulunamadi: {dosya_yol}"
+
+            client = OpenAI(api_key=api_key, base_url=base_url)
+            r = client.chat.completions.create(
+                model=model,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "text", "text": "Bu gorseli Turkce analiz et, detayli acikla."},
+                            {"type": "image_url", "image_url": {"url": resim_url}}
+                        ]
+                    }
+                ],
+                max_tokens=1024,
+            )
+            return r.choices[0].message.content.strip()
+        except Exception as e:
+            # DeepSeek vision calismazsa OpenRouter dene
+            try:
+                or_key = _os.environ.get("OPENROUTER_API_KEY", "")
+                if not or_key:
+                    return f"DeepSeek vision hatasi: {e}.\nOPENROUTER_API_KEY ile Qwen-VL dene."
+                client = OpenAI(api_key=or_key, base_url="https://openrouter.ai/api/v1")
+                r = client.chat.completions.create(
+                    model="qwen/qwen-vl-plus:free",
+                    messages=[{"role": "user", "content": [
+                        {"type": "text", "text": "Bu gorseli Turkce analiz et."},
+                        {"type": "image_url", "image_url": {"url": resim_url}}
+                    ]}],
+                    max_tokens=1024,
+                )
+                return r.choices[0].message.content.strip()
+            except Exception as e2:
+                return f"Gorsel analiz hatasi: {e2}"
+
+    def _skill_bul(self, sorgu: str, limit: int = 2) -> Optional[str]:
+        '''FTS5 skills_index.db'de sorguya en alakali skill'i bul.'''
+        try:
+            import sqlite3, re
+            db_path = os.path.join(os.path.dirname(__file__), ".ReYMeN", "skills_index.db")
+            if not os.path.exists(db_path):
+                return None
+            conn = sqlite3.connect(db_path)
+            cur = conn.cursor()
+            # FTS5 ile ara
+            kelimeler = re.findall(r'\w+', sorgu.lower())
+            fts_query = " OR ".join(f'"{k}"' for k in kelimeler[:5] if len(k) > 2)
+            if not fts_query:
+                conn.close()
+                return None
+            cur.execute(
+                "SELECT beceriler.name, beceriler_5n1k.ne FROM beceriler "
+                "JOIN beceriler_5n1k ON beceriler.rowid = beceriler_5n1k.rowid "
+                "WHERE beceriler MATCH ? LIMIT ?",
+                (fts_query, limit)
+            )
+            rows = cur.fetchall()
+            conn.close()
+            if rows:
+                metin = ""
+                for name, aciklama in rows:
+                    if name:
+                        metin += f"- {name}: {str(aciklama or '')[:100]}\n"
+                return metin.strip() if metin.strip() else None
+            return None
+        except Exception:
+            return None
+
+    def _ensemble_dogrula(self, ensemble: dict, sonuc: dict, task_id: str) -> dict:
+        '''Ensemble sonucunu dogrula: en iyi aday bos/hataliysa 2.yi dene.'''
+        sirali = sorted(ensemble.values(), key=lambda x: x["puan"], reverse=True)
+        for aday in sirali:
+            yanit = aday.get("yanit", "")
+            if yanit and len(str(yanit).strip()) > 5:
+                sonuc["basarili"] = True
+                sonuc["yanit"] = yanit
+                sonuc["kaynak"] = aday["kaynak"]
+                sonuc["puan"] = aday["puan"]
+                log.info("[%s] Dogrulama: %s secildi (puan=%.1f)", task_id, aday["kaynak"], aday["puan"])
+                return sonuc
+        # Hicbiri uygun degil
+        sonuc["basarili"] = False
+        sonuc["hata"] = "Tum kaynaklar basarisiz veya bos"
+        sonuc["dogrulama_uyarisi"] = "hepsi_bos"
+        log.warning("[%s] Dogrulama: tum adaylar bos/hatali", task_id)
+        return sonuc
+
+    def _web_ara(self, sorgu: str, maks_sonuc: int = 3) -> Optional[str]:
+        '''DuckDuckGo ile web ara, sonucu metin olarak don.
+        LLM atlanir, direkt web verisi kullanilir (halusinasyon onleme).
+        Basarisiz olursa hata sayaci tutar, 3 hata sonra devre disi kalir.
+        '''
+        import warnings
+        warnings.filterwarnings("ignore", message=".*renamed to `ddgs`.*")
+        if not _WEB_ARAMA_AKTIF or _DDGS is None:
+            return None
+        # Circuit breaker: 3 hata sonra web aramayi kapat
+        if hasattr(self, '_web_hata') and self._web_hata >= 3:
+            return None
+        try:
+            with _DDGS() as ddgs:
+                sonuc = list(ddgs.text(sorgu, max_results=maks_sonuc, backend="html"))
+            if not sonuc:
+                return None
+            metin = ""
+            for idx, s in enumerate(sonuc, 1):
+                baslik = s.get("title", "").strip()
+                link = s.get("href", "").strip()
+                ozet = s.get("body", "").strip()[:120]
+                metin += f"| {idx} | {baslik} | {ozet} |\n|   | {link} | |\n"
+            return metin.strip() if metin.strip() else None
+        except Exception as _we:
+                self._web_hata = getattr(self, '_web_hata', 0) + 1
+                if self._web_hata >= 3:
+                    log.warning("Web arama 3 kez hata verdi - kalici olarak devre disi")
+                return None
 
     # ══════════════════════════════════════════════════════════════════
     # YARDIMCI METODLAR — run_conversation
@@ -924,8 +1239,37 @@ class ConversationLoop:
 
         return (
             "Sen ReYMeN, otonom bir yazilim ajanisin. "
-            "Hedefe odaklan, araclari kullan, Turkce yaz."
+            "Hedefe odaklan, araclari kullan, Turkce yaz. "
+            "Cevap formatin: once emoji+konu basligi, sonra kisa aciklama, "
+            "sonra tablo (sutun baslikli), en son yorum/aciklama. "
+            "Ornek:\n"
+            "  🔍 Konu Basligi\n"
+            "  Kisa aciklama.\n"
+            "  | Kolon1 | Kolon2 |\n"
+            "  |--------|--------|\n"
+            "  | deger1 | deger2 |\n"
+            "  Altta yorum satiri.\n"
+            f"{self._profil_bilgisi_al()}"
         )
+
+    def _profil_bilgisi_al(self) -> str:
+        """MEMORY.md + USER.md icerigini oku, profil bilgisi olarak don."""
+        try:
+            kok = Path(__file__).parent.parent
+            memory_path = kok / ".ReYMeN" / "MEMORY.md"
+            user_path = kok / ".ReYMeN" / "USER.md"
+            parcalar = []
+            if memory_path.exists():
+                memory_ic = memory_path.read_text(encoding="utf-8", errors="replace")[:2000]
+                parcalar.append(f"[Hafiza Notlari]\n{memory_ic}")
+            if user_path.exists():
+                user_ic = user_path.read_text(encoding="utf-8", errors="replace")[:1500]
+                parcalar.append(f"[Kullanici Profili]\n{user_ic}")
+            if parcalar:
+                return "\n" + "\n\n".join(parcalar)
+        except Exception:
+            pass
+        return ""
 
     def _provider_tipi_belirle(self, provider: Optional[str] = None) -> str:
         """Provider tipini belirle: 'anthropic' | 'codex' | 'chat_completions'."""
@@ -1140,16 +1484,93 @@ class ConversationLoop:
             log.warning("Prompt caching hatasi: %s", e)
             return mesajlar
 
+    def _direct_api_call(self, mesajlar: List[dict], tools_bos: bool = False) -> Optional[dict]:
+        """Dogrudan OpenAI SDK ile DeepSeek API cagrisi (beyin yoksa fallback).
+        tools_bos=True ise tools listesi gonderilmez (DeepSeek direkt cevap versin)."""
+        try:
+            from openai import OpenAI
+            api_key = os.environ.get("DEEPSEEK_API_KEY", "")
+            if not api_key:
+                log.error("DEEPSEEK_API_KEY bulunamadi")
+                return None
+            client = OpenAI(api_key=api_key, base_url="https://api.deepseek.com")
+
+            # Mesajlari OpenAI formatina cevir
+            api_msgs = []
+            for m in mesajlar:
+                rol = m.get("role", "user")
+                icerik = m.get("content", "")
+                if rol == "system":
+                    api_msgs.insert(0, {"role": "system", "content": icerik})
+                else:
+                    api_msgs.append({"role": rol, "content": icerik})
+
+            # Tool listesi (sadece tools_bos=False ise ekle)
+            tools = None
+            if not tools_bos:
+                tools = [
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "once_hafiza_ara",
+                        "description": "Once ogrenilmis bilgileri hafizada ara. Selamlasma, tesekkur, veda gibi tekrarlanan sorular icin.",
+                        "parameters": {"type": "object", "properties": {"sorgu": {"type": "string"}}, "required": ["sorgu"]}
+                    }
+                },
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "web_ara",
+                        "description": "Guncel bilgi gerektiginde web'de ara. Haber, fiyat, hava durumu, tarih vb.",
+                        "parameters": {"type": "object", "properties": {"sorgu": {"type": "string"}}, "required": ["sorgu"]}
+                    }
+                },
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "oncelik_cache_kontrol",
+                        "description": "ONCELIK_CACHE'te kayitli kisa yanitlari kontrol et. Selam, tesekkur, veda gibi.",
+                        "parameters": {"type": "object", "properties": {"anahtar": {"type": "string"}}, "required": ["anahtar"]}
+                    }
+                }
+            ]
+
+            r = client.chat.completions.create(
+                model="deepseek-v4-flash",
+                messages=api_msgs,
+                tools=tools if tools else None,
+                max_tokens=2048,
+                temperature=0.7,
+            )
+            return {
+                "role": "assistant",
+                "content": r.choices[0].message.content.strip() if r.choices[0].message.content else "",
+                "tool_calls": [
+                    {
+                        "id": tc.id,
+                        "type": "function",
+                        "function": {
+                            "name": tc.function.name,
+                            "arguments": tc.function.arguments,
+                        }
+                    }
+                    for tc in (r.choices[0].message.tool_calls or [])
+                ] if r.choices[0].message.tool_calls else [],
+            }
+        except Exception as e:
+            log.error("_direct_api_call hatasi: %s", e)
+            return None
+
     def _interruptible_api_call(
         self, mesajlar: List[dict], provider_tipi: str
     ) -> Optional[dict]:
         """Thread bazli interruptible API cagri (Ctrl+C destekli).
 
-        Beyin modulu yoksa None doner (test/offline mod).
+        Beyin modulu yoksa direkt OpenAI SDK ile DeepSeek API cagrisi yapar.
         """
         if not self.beyin:
-            log.debug("Beyin yok — API cagri atlanadi")
-            return None
+            log.debug("Beyin yok — direkt OpenAI SDK kullaniliyor")
+            return self._direct_api_call(mesajlar)
 
         sonuc_kutusu: list = [None]
         hata_kutusu:  list = [None]
@@ -1275,6 +1696,25 @@ class ConversationLoop:
             except Exception:
                 parametreler = {}
 
+        # Internal tool'lari dogrudan calistir (motor gerekmez)
+        if arac == "web_ara":
+            sorgu = parametreler.get("sorgu") or parametreler.get("param", "")
+            sonuc = self._web_ara(sorgu)
+            return {"basarili": bool(sonuc), "cikti": sonuc or "Sonuc bulunamadi", "tamamlandi": True}
+        if arac == "once_hafiza_ara":
+            sorgu = parametreler.get("sorgu") or parametreler.get("param", "")
+            if _ONCE_HAFIZA_AKTIF and _hafizada_ara:
+                sonuc = _hafizada_ara(sorgu)
+                return {"basarili": bool(sonuc), "cikti": str(sonuc or "Bulunamadi"), "tamamlandi": False}
+            return {"basarili": False, "cikti": "Hafiza aktif degil", "tamamlandi": False}
+        if arac == "oncelik_cache_kontrol":
+            anahtar = parametreler.get("anahtar") or parametreler.get("param", "")
+            hedef_kucuk = anahtar.strip().lower()
+            for k, v in ONCELIK_CACHE.items():
+                if k in hedef_kucuk:
+                    return {"basarili": True, "cikti": v, "tamamlandi": True}
+            return {"basarili": False, "cikti": "Cache'te yok", "tamamlandi": False}
+
         if self.motor and hasattr(self.motor, "arac_calistir"):
             try:
                 return self.motor.arac_calistir(arac, **parametreler)
@@ -1317,25 +1757,12 @@ class ConversationLoop:
                 if self.tur_yoneticisi
                 else {}
             ),
-            "cb_durum": self.circuit_breaker_durum(),
+            # cb_durum: temizlendi
         }
 
     # ══════════════════════════════════════════════════════════════════
     # YENİ METODLAR — ReYMeN Agent seviyesi
     # ══════════════════════════════════════════════════════════════════
-
-    def _takilma_kaydet(self, arac_adi: str) -> bool:
-        """Takilma dedektoru: ayni eylem 3x tekrarlanirsa True doner.
-        Hermes Agent circuit breaker pattern'i ile ayni mantik.
-        """
-        self._onceki_eylemler.append(arac_adi)
-        if len(self._onceki_eylemler) > TAKILMA_ESIĞI * 2:
-            self._onceki_eylemler.pop(0)
-        if len(self._onceki_eylemler) >= TAKILMA_ESIĞI:
-            son_3 = self._onceki_eylemler[-TAKILMA_ESIĞI:]
-            if len(set(son_3)) == 1:
-                return True
-        return False
 
     def set_stream_callback(self, callback: Any) -> None:
         """Stream callback fonksiyonu ata.
@@ -1433,7 +1860,7 @@ class ConversationLoop:
         _error_classify 'retry' dondugunde bekler ve tekrar dener.
         _error_classify 'rotate' dondugunde provider degistirir (fallback).
         Max 3 retry, backoff: 1sn, 2sn, 4sn.
-        Circuit breaker ve takilma dedektoru ile uyumlu calisir.
+        Hermes Agent retry pattern ile uyumlu calisir.
 
         Provider rotate: beyin'in _fallback_zinciri'ndeki siradaki
         saglayiciya gecer. Zincirdeki tum saglayicilar basarisizsa None doner.
@@ -1458,6 +1885,20 @@ class ConversationLoop:
         # Su anki provider tipini ilk adim olarak ekle
         mevcut_tip = provider_tipi
         mevcut_index = 0
+
+        # -- Circuit breaker kontrolü ---------------------------------
+        if self._cb_acik:
+            if CIRCUIT_BREAKER_SURESI > 0 and (time.time() - self._cb_son_hata_zamani) > CIRCUIT_BREAKER_SURESI:
+                # Automatic reset: süre dolmuşsa sıfırla
+                self._cb_acik = False
+                self._cb_art_arda_hata = 0
+                log.info("[%s] Circuit breaker otomatik sifirlandi (sure dustu)", task_id)
+            elif CIRCUIT_BREAKER_KALICI:
+                log.error("[%s] Circuit breaker ACIK (kalici kilit, %d hata)", task_id, self._cb_art_arda_hata)
+                return None
+            else:
+                log.error("[%s] Circuit breaker ACIK (manual reset bekleniyor)", task_id)
+                return None
 
         # API'ye göndermeden önce mesaj geçmişini onar
         if _MESAJ_TAMIRCI_AKTIF and mesaj_siralamasi_tamir_et is not None:
@@ -1494,6 +1935,15 @@ class ConversationLoop:
             except KeyboardInterrupt:
                 raise
             except Exception as e:
+                # Circuit breaker: ardışık hata sayacını artır
+                self._cb_art_arda_hata += 1
+                self._cb_son_hata_zamani = time.time()
+                if self._cb_art_arda_hata >= CIRCUIT_BREAKER_MAX_HATA:
+                    self._cb_acik = True
+                    log.error(
+                        "[%s] Circuit breaker DEVREDE (%d/%d hata) - kalici kilit",
+                        task_id, self._cb_art_arda_hata, CIRCUIT_BREAKER_MAX_HATA,
+                    )
                 sinif = self._error_classify(e, task_id)
                 # Hook: hata olayı
                 if _HOOK_AKTIF and _hata_tetikle is not None:
@@ -1655,6 +2105,66 @@ class ConversationLoop:
             session_id, len(oncekiler[:max_onceki]),
         )
         return baglam_metni
+
+    # ══════════════════════════════════════════════════════════════════
+    # SKILL TARAMA
+    # ══════════════════════════════════════════════════════════════════
+
+    def _skill_tara(self, query: str, maks: int = 3) -> str:
+        """Skills/ icinde SKILL.md dosyalarinda query ara, eslesenleri don."""
+        try:
+            kok = Path(__file__).parent.parent
+            sd = kok / "skills"
+            if not sd.exists():
+                return ""
+            eslesen = []
+            for f in sd.iterdir():
+                if not f.name.endswith(("_SKILL.md", ".md")) or f.name == "README.md":
+                    continue
+                icerik = f.read_text(encoding="utf-8", errors="replace")[:500]
+                if query.lower() in icerik.lower():
+                    baslik = f.name.replace("_SKILL.md", "").replace(".md", "")
+                    eslesen.append(f"- {baslik}: {icerik[:100].strip()}")
+                    if len(eslesen) >= maks:
+                        break
+            return "\n".join(eslesen) + "\n" if eslesen else ""
+        except Exception:
+            return ""
+
+    # ══════════════════════════════════════════════════════════════════
+    # TOOL ROUTING
+    # ══════════════════════════════════════════════════════════════════
+
+    def _tool_routing(self, query: str) -> str:
+        """Sorgu tipini siniflandir: selam/soru/web/komut/kod/genel."""
+        q = query.strip().lower()
+        if len(q) <= 3:
+            return "selam"
+        if any(k in q for k in ("kimdir","nedir","ne demek","nasil","ne zaman","nerede")):
+            return "soru"
+        if any(k in q for k in ("haber","2026","dunya","guncel","fiyat","dolar","altin")):
+            return "web"
+        if any(k in q for k in ("yap","olustur","calistir","indir","kur","goster","yaz","kod")):
+            return "komut"
+        if any(k in q for k in ("hata","calismiyor","olmadi","bozuk","duzelt","fix")):
+            return "kod"
+        return "genel"
+
+    # ══════════════════════════════════════════════════════════════════
+    # ALT AJAN
+    # ══════════════════════════════════════════════════════════════════
+
+    def _alt_ajan(self, gorev: str, timeout: int = 30) -> str:
+        """Basit alt ajan: ayri Python prosesinde gorev calistir."""
+        import subprocess as _sp
+        try:
+            r = _sp.run(
+                [sys.executable, "-c", f"print('Alt ajan: {gorev}', flush=True)"],
+                capture_output=True, text=True, timeout=timeout,
+            )
+            return (r.stdout or r.stderr).strip()[:500]
+        except Exception as e:
+            return f"HATA: {e}"
 
 
 # ── CLI girdi noktasi ─────────────────────────────────────────────────

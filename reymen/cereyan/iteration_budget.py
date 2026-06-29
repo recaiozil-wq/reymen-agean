@@ -115,37 +115,110 @@ class IterationBudget:
         return {"tur": self._used, "max_tur": self.max_total}
 
     def analiz_et(self, gorev: str) -> dict:
-        """Eski API: gorev karmasikligini analiz et.
+        """Gorev karmasikligini analiz et (1-5).
 
-        Heuristic: bulk/toplu gorevlere karmasiklik=5 ver, digerleri keyword sayisi.
+        Kategori bazli hesaplama:
+          1 = selamlasma/sosyal/basit soru
+          2 = tek kategorili basit islem
+          3 = iki kategorili veya cok adimli islem
+          4 = 3+ kategori veya toplu gorev (swarm esigi)
+          5 = toplu + islem (swarm)
         """
-        hedef = gorev.lower()
+        hedef = gorev.lower().strip()
 
-        # Toplu görev tespiti: "hepsini", "tüm", "bütün" + eylem → karmaşıklık=5
+        # ── 0. Selamlasma/sosyal/basit soru → direkt 1 ──────────────
+        _selam = any(k in hedef for k in [
+            "merhaba", "selam", "naber", "nasılsın", "nasilsin",
+            "iyi misin", "teşekkür", "tesekkur", "sağol", "sagol",
+            "günaydın", "gunaydin", "iyi günler", "iyi gunler",
+            "iyi akşamlar", "iyi aksamlar", "iyi geceler",
+            "ne yapıyorsun", "ne yapiyorsun", "napıyorsun", "napiyorsun",
+            "kolay gelsin", "hayırlı", "hayirli",
+        ])
+        # Eger sadece selam kelimeleri varsa (ek istek yoksa)
+        if _selam:
+            # Icinde ek islem kelimesi yoksa direkt 1
+            _ek_islem = any(k in hedef for k in [
+                "yap", "ara", "oku", "yaz", "sil", "bul",
+                "calistir", "çalıştır", "indir", "yukle", "yükle",
+                "kur", "gönder", "gonder", "tara", "kontrol",
+                "düzelt", "duzelt", "temizle", "düzenle", "duzenle",
+                "raporla", "analiz", "incele", "güncelle", "guncelle",
+                "aç", "ac", "kapat", "kes", "koştur", "kostur",
+            ])
+            if not _ek_islem:
+                return {"karmasiklik": 1}
+
+        # ── 1. Toplu gorev tespiti ─────────────────────────────────
         _toplu = any(k in hedef for k in [
-            "hepsini", "hepsin", "hepsını", "hepsi",
+            "hepsini", "hepsin", "hepsi",
             "tümünü", "tümü", "tüm", "tumu", "tumunu",
             "bütün", "butun", "toplu",
-            "tum ", "tum\t",  # "tum " (tam kelime)
-        ]) or hedef.startswith("tum ")
+        ])
         _islem = any(k in hedef for k in [
             "kontrol", "gider", "düzelt", "duzelt", "onar", "temizle",
-            "tara", "düzenle", "duzenle", "yap", "calistir", "incele",
+            "tara", "düzenle", "duzenle", "yap", "calistir", "çalıştır",
+            "incele", "dönüştür", "donustur", "güncelle", "guncelle",
         ])
         if _toplu and _islem:
             return {"karmasiklik": 5}
         if _toplu:
             return {"karmasiklik": 4}
 
-        # Çok adımlı karmaşık görevler
-        _cok_adim = any(k in hedef for k in [
-            "ve", "sonra", "ardindan", "ardından", "daha sonra", "once", "önce",
+        # ── 2. Cok adimli gorev tespiti (baglac + virgul) ──────────
+        _cok_adim_baglac = any(k in hedef for k in [
+            "ve", "sonra", "ardindan", "ardından", "daha sonra",
+            "once", "önce", "daha önce", "daha once",
         ])
-        anahtarlar = [
-            "dosya", "web", "kod", "calistir", "ara", "yaz", "oku",
-            "sil", "guncelle", "indir", "yukle", "kur", "tara",
-        ]
-        sayac = sum(1 for k in anahtarlar if k in hedef)
+        _cok_adim_virgul = hedef.count(",") >= 2
+        _cok_adim = _cok_adim_baglac or _cok_adim_virgul
+
+        # ── 3. Kategori bazinda keyword sayisi ──────────────────────
+        # Her kategoriden ilk keyword sayilir, ayni kategoriden
+        # birden fazla keyword extra puan vermez
+        kategoriler = {
+            "dosya_islem": ["dosya", "klasör", "klasor", "dizin", "belge", "uzanti"],
+            "web_islem":   ["web", "internet", "url", "site", "sayfa", "link",
+                           "indir", "yukle", "yükle", "gönder", "gonder"],
+            "kod_islem":   ["kod", "python", "script", "calistir", "çalıştır",
+                           "analiz", "derle", "debug", "test"],
+            "sistem_islem":["sistem", "komut", "terminal", "powershell", "servis",
+                           "port", "ağ", "ag", "islem", "işlem", "proses", "durdur"],
+            "arama_islem": ["ara", "bul", "tara", "sorgula", "keşfet", "kesfet",
+                           "listele", "getir"],
+            "yazma_islem": ["yaz", "oluştur", "olustur", "kaydet", "ekle",
+                           "güncelle", "guncelle", "sil", "düzenle", "duzenle",
+                           "temizle", "dönüştür", "donustur", "düzelt", "duzelt",
+                           "onar"],
+            "guvenlik":    ["güvenlik", "guvenlik", "şifre", "sifre", "izin",
+                           "yetki", "erişim", "erisim"],
+            "github_islem":["git", "github", "repo", "commit", "push", "pull",
+                           "clone", "branch", "merge"],
+        }
+
+        # Ekstra puan veren kelimeler (kategori disi kapsam artirici)
+        _ekstra_kelimeler = ["raporla", "özet", "ozet", "karşılaştır", "karsilastir",
+                            "birleştir", "birlestir", "görsel", "gorsel", "grafik"]
+
+        # Kac farkli kategori bulundu
+        _bulunan_kategori = 0
+        for kategori, kw_list in kategoriler.items():
+            if any(kw in hedef for kw in kw_list):
+                _bulunan_kategori += 1
+
+        # ── 4. Skor hesaplama ──────────────────────────────────────
+        skor = _bulunan_kategori
         if _cok_adim:
-            sayac += 1
-        return {"karmasiklik": max(1, min(sayac, 5))}
+            skor += 1
+
+        # Ek keyword sayisi (kategori disi ekstra)
+        _ek_kelimeler = ["raporla", "özet", "ozet", "karşılaştır", "karsilastir",
+                        "donüştür", "donustur", "birleştir", "birlestir"]
+        for k in _ek_kelimeler:
+            if k in hedef:
+                # Sadece yeni kategori eklemediysek bonus
+                if not any(kw in hedef for kw in kategoriler.get("yazma_islem", [])):
+                    skor += 1
+                    break
+
+        return {"karmasiklik": max(1, min(skor, 5))}

@@ -1185,7 +1185,7 @@ class MixinCommands:
                         self.conversation_history,
                         self.conversation_history,
                     )
-                except Exception:
+                except Exception as _e:
                     pass  # Best-effort
 
             print(f"  ✅ Agent updated — {len(self.agent.tools if self.agent else [])} tool(s) available")

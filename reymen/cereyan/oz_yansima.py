@@ -100,10 +100,7 @@ class OzYansima:
                 oneri_sayisi = analiz.get("oneri_sayisi", 0)
                 if oneri_sayisi > 0:
                     with self._kilitli:
-                        self._bildirim = (
-                            f"[Oz-Yansima] {oneri_sayisi} oneri hazir "
-                            f"-- /yansima ile gor"
-                        )
+                        self._bildirim = None  # Kullanici istemedigi icin kapatildi
         except Exception as e:
             print(f"[OzYansima] Arka plan hatasi: {e}")
         finally:

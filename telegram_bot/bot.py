@@ -271,7 +271,7 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def mesaj_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Normal mesajlara AI ile yanit ver. OnceHafiza'ya bakar, varsa direkt dondur."""
+    """Normal mesajlara AI ile yanit ver."""
     if not update.message or not update.message.text:
         return
     metin = update.message.text.strip()
@@ -365,6 +365,42 @@ async def bot_komutlarini_ayarla(app):
         logger.warning(f"Komut listesi kaydedilemedi: {e}")
 
 
+# ── FOTOĞRAF HANDLER ──────────────────────────────────────────────
+async def foto_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Telegram'a gonderilen fotografi analiz et."""
+    if not update.message or not update.message.photo:
+        return
+    # En yuksek cozunurluklu fotografi al
+    foto = update.message.photo[-1]
+    dosya = await foto.get_file()
+    
+    import tempfile, os as _os
+    from pathlib import Path as _P
+    tmp = _P(tempfile.gettempdir()) / f"reymen_vision_{foto.file_id[:10]}.jpg"
+    
+    bekleme = await update.message.reply_text("🖼️ Görsel analiz ediliyor...")
+    try:
+        await dosya.download_to_drive(tmp)
+        # Proje root'u ekle
+        proje = _P(__file__).parent.parent.resolve()
+        import sys as _s
+        if str(proje) not in _s.path:
+            _s.path.insert(0, str(proje))
+        from dotenv import load_dotenv
+        load_dotenv(str(proje / ".env"))
+        # Analiz et
+        from reymen.arac.araclar_goruntu import vision_analiz
+        sonuc = vision_analiz(kaynak=str(tmp), soru="Bu görselde ne var? Detaylı Türkçe açıkla.")
+        # Sonucu formatla
+        yanit = f"🖼️ **Görsel Analiz**\n\n{sonuc[:1500]}"
+        await bekleme.edit_text(yanit, parse_mode="Markdown")
+    except Exception as e:
+        await bekleme.edit_text(f"❌ Görsel analiz hatası: {e}")
+    finally:
+        if tmp.exists():
+            tmp.unlink()
+
+
 # ── Main ────────────────────────────────────────────────────────────
 def main():
     """Start the Telegram bot."""
@@ -388,6 +424,9 @@ def main():
     # Normal mesaj handler (komut disi)
     from telegram.ext import MessageHandler, filters
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, mesaj_handler))
+
+    # Fotoğraf handler
+    app.add_handler(MessageHandler(filters.PHOTO, foto_handler))
 
     # Error handler
     app.add_error_handler(error_handler)

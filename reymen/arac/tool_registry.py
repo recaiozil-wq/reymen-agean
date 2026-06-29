@@ -176,48 +176,13 @@ class ToolRegistry:
         self._schemas: dict[str, dict] = {}       # arac_adi -> schema override
         self.toolset = ToolsetManager()
 
-        # Alias: eski -> yeni
-        self._aliases = {
-            "KOMUT_CALISTIR": "shell",
-            "PYTHON_CALISTIR": "python_exec",
-            "DOSYA_YAZ": "file_ops.yaz",
-            "DOSYA_OKU": "file_ops.oku",
-            "WEB_ARA": "web_search.ara",
-            "TARAYICI_AC": "browser.sayfa_ac",
-            "EKRAN_OKU": "screen.ekran_oku",
-            "EKRAN_TIKLA": "screen.tikla",
-            "EKRAN_NISAN": "screen.nisan_ciz",
-            "MAKRO_OYNAT": "macro.oynat",
-            "TELEGRAM_GONDER": "send_message_tool.telegram_gonder",
-            "HAFIZA_ARA": "memory_tool.memory_ara",
-            "GORSEL_ANALIZ": "image_generation_tool.gorsel_analiz_et",
-            "SESI_METNE_CEVIR": "transcription_tools.sesi_metne_cevir",
-            "METNI_SESE_CEVIR": "tts_tool.metni_sese_cevir",
-            "VIDEO_URET": "video_generation_tool.video_uret",
-            "MCP_TOOL_CAGIR": "mcp_tool.mcp_tool_cagir",
-            "X_ARA": "x_search_tool.x_ara",
-            "DELEGATE_TASK": "delegate_tool",
-            "DELEGATE_TOOL": "delegate_tool",
-            "VISION": "vision_tools",
-            "VISION_TOOLS": "vision_tools",
-            "SESSION_SEARCH": "session_search_tool",
-            "SESSION_SEARCH_TOOL": "session_search_tool",
-            "KANBAN": "kanban_tools",
-            "KANBAN_TOOL": "kanban_tools",
-            "KANBAN_TOOLS": "kanban_tools",
-            "ONAY": "approval",
-            "APPROVAL": "approval",
-            "BROWSER_CAMOFOX": "browser_camofox",
-            "BROWSER_CAMOFOX_TOOL": "browser_camofox",
-            "BROWSER_CDP": "browser_cdp_tool",
-            "BROWSER_CDP_TOOL": "browser_cdp_tool",
-            "DISCORD": "discord_tool",
-            "DISCORD_TOOL": "discord_tool",
-            "SKILL_MANAGER": "skill_manager_tool",
-            "SKILL_MANAGER_TOOL": "skill_manager_tool",
-            "WRITE_APPROVAL": "write_approval",
-            "YUANBAO": "yuanbao_tools",
-        }
+        # Alias: ReYMeN araclari.
+        # Onemli: _plugin_arac_kaydet ile kayitli araclar _tools'ta
+        # oldugu icin alias gerektirmez. Bu liste sadece dogrudan
+        # import gereken ReYMeN modulleri icindir.
+        # Hermes tools/ modullerine yonlendiren tum alias'lar
+        # kaldirildi — dispatch _fallback_calistir'a duser.
+        self._aliases: dict[str, str] = {}
         self._yukle()
 
     def _yukle(self) -> None:

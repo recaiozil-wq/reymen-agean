@@ -1059,5 +1059,49 @@
     "basari_orani": 1.0,
     "olusturma": "2026-06-24",
     "son_basari": "2026-06-24"
+  },
+  "2___referanslar_________anahtar______onay_sureci_t": {
+    "ad": "2\n\n[Referanslar]\n  - {\\\"anahtar\\\": \\\"onay_sureci_t",
+    "aciklama": "2\n\n[Referanslar]\n  - {\\\"anahtar\\\": \\\"onay_sureci_t",
+    "tetikleyiciler": [
+      "[referanslar]",
+      "2",
+      "\\\"deger\\\":",
+      "{\\\"anahtar\\\":",
+      "\\\"onay_sureci_tamamlandi_20260621\\\",",
+      "-"
+    ],
+    "adimlar": [
+      "FC/HAFIZA_DURUMU",
+      "FC/HAFIZA_DURUMU",
+      "FC/HAFIZA_KAYDET",
+      "FC/BROKER_DURUM",
+      "FC/WEB_ARA"
+    ],
+    "basari_kriteri": "Hedef 2 tamamlandı. Drift düzeltme planı kullanıcı onayıyla uygulandı: TEKRAR_ED",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-06-28",
+    "son_basari": "2026-06-28"
+  },
+  "test_mesaj__ignored____referanslar_________anahtar": {
+    "ad": "test mesaj (ignored)\n\n[Referanslar]\n  - {\\\"anahtar",
+    "aciklama": "test mesaj (ignored)\n\n[Referanslar]\n  - {\\\"anahtar",
+    "tetikleyiciler": [
+      "mesaj",
+      "{\\\"anahtar\\\":",
+      "test",
+      "-",
+      "(ignored)",
+      "[referanslar]"
+    ],
+    "adimlar": [
+      "FC/HAFIZA_ARA"
+    ],
+    "basari_kriteri": "Tamamlanamadi: tur asimi",
+    "kullanim_sayisi": 1,
+    "basari_orani": 0.7,
+    "olusturma": "2026-06-28",
+    "son_basari": "2026-06-28"
   }
 }

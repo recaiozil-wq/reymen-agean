@@ -1,255 +1,197 @@
 # -*- coding: utf-8 -*-
-"""
-prompt_assembly.py — Prompt birlestirme ve yonetim modulu.
+"""prompt_assembly.py — Sistem prompt'u tek noktadan topla.
 
-Template-based assembly ile prompt parcalarini birlestirir.
-insa_et() ile SOUL.md + MEMORY.md + beceri baglami + ReAct kurallari
-tek sistem promptuna donusturulur.
+Hedef yapi:
+    system_prompt = config.yaml → SOUL.md → USER.md
+
+conversation_loop ve diger moduller buradan okur, kendi icinde
+sabit string tutmaz. SOUL.md ve USER.md diskten her defasinda
+okunmaz — lru_cache ile bir kez yuklenir, bellekten servis edilir.
+
+Yol bilgileri:
+    SOUL.md  → ~/.hermes/profiles/<profil>/SOUL.md (oncelikli)
+              veya proje kokundeki SOUL.md (fallback)
+    USER.md  → reymen/hafiza/USER.md
+    config   → proje kokundeki config.yaml
 """
 
+import functools
+import logging
 import os
 from pathlib import Path
-import logging
-logger = logging.getLogger(__name__)
+from typing import Optional
+
+log = logging.getLogger(__name__)
+
+# ── Varsayilan yollar ──────────────────────────────────────────────────
+_PROJE_KOKU = Path(__file__).resolve().parent.parent.parent  # ReYMeN-Ajan/
+_VARSAYILAN_USER_MD = _PROJE_KOKU / "reymen" / "hafiza" / "USER.md"
+_VARSAYILAN_SOUL_MD = _PROJE_KOKU / "SOUL.md"
+_VARSAYILAN_CONFIG = _PROJE_KOKU / "config.yaml"
+
+# Hermes profil SOUL.md (varsa oncelikli)
+_HERMES_PROFIL = Path(os.environ.get("LOCALAPPDATA", "")) / "hermes" / "profiles" / "reymen" / "SOUL.md"
 
 
-class PromptAssembly:
-    """Prompt parcalarini birlestirir ve eksiksiz sistem promptu olusturur."""
+def _profil_soul_yolu() -> Path:
+    """Profil SOUL.md yolunu dondur; yoksa proje kokundekini dene."""
+    yol = Path(str(_HERMES_PROFIL))
+    if yol.exists():
+        return yol
+    if _VARSAYILAN_SOUL_MD.exists():
+        return _VARSAYILAN_SOUL_MD
+    return yol  # yoksa bile dondur, cagiran handle etsin
 
-    def __init__(self, depo_yolu=None, bounded_memory=None, learning_loop=None, **kwargs):
-        self._parcalar = {}
-        self._sablonlar = {}
-        self._bounded_memory = bounded_memory
-        self._learning_loop = learning_loop
 
-        if depo_yolu:
-            self._depo_yolu = Path(depo_yolu)
-        else:
-            self._depo_yolu = Path.cwd() / ".ReYMeN" / "prompts"
-        try:
-            self._depo_yolu.mkdir(parents=True, exist_ok=True)
-        except OSError as _prompt_a_e28:
-            print(f"[UYARI] prompt_assembly.py:29 - {_prompt_a_e28}")
-
-        # Context files yoneticisi
-        self._context_loader = None
-        try:
-            from agent.context_files import ContextFileLoader
-            self._context_loader = ContextFileLoader()
-        except ImportError as _prompt_a_e36:
-            print(f"[UYARI] prompt_assembly.py:37 - {_prompt_a_e36}")
-
-    # ── Ana metot: eksiksiz sistem promptu ─────────────────────────────
-
-    def insa_et(self, hedef, son_gozlem="", tur=1, toplam_tur=15,
-                ic_gozlem_modu=False):
-        """SOUL + MEMORY + beceri + ReAct kurallarindan sistem promptu olustur.
-
-        Args:
-            hedef:          Kullanicinin ana hedefi
-            son_gozlem:     Onceki turdan gelen gozlem metni
-            tur:            Mevcut tur numarasi
-            toplam_tur:     Maksimum tur sayisi
-            ic_gozlem_modu: True ise oz-degerlendirme talimatini ekle
-
-        Returns:
-            str: Birlestirilmis sistem promptu
-        """
-        parcalar = []
-
-        # 1. Kimlik katmani (SOUL.md)
-        soul = self._soul_oku()
-        if soul:
-            parcalar.append(f"## KIMLIK\n{soul}")
-
-        # 2. Kalici hafiza (MEMORY.md)
-        hafiza = self._memory_oku()
-        if hafiza:
-            parcalar.append(f"## KALICI HAFIZA\n{hafiza}")
-
-        # 3. Beceri baglami (ClosedLearningLoop)
-        beceri = self._beceri_baglamini_al(hedef)
-        if beceri:
-            parcalar.append(beceri)
-
-        # 3.5. Proje baglam dosyalari (AGENTS.md, CLAUDE.md, .cursorrules)
-        if self._context_loader:
-            ctx = self._context_loader.kok_yukle()
-            if ctx:
-                parcalar.append(f"## PROJE BAGLAMI\n{ctx}")
-
-        # 4. ReAct sistem talimati
-        try:
-            from sistem_talimati import sistem_talimatini_insa_et
-            # Eski parametreleri ek_bilgi'ye donustur
-            ek_bilgi_parcalari = []
-            if tur and toplam_tur:
-                ek_bilgi_parcalari.append(f"Tur {tur}/{toplam_tur}")
-            if ic_gozlem_modu:
-                ek_bilgi_parcalari.append("Ic gozlem modu aktif —"
-                                          " onceki adimlari degerlendir, gerekiyorsa strateji degistir.")
-            ek_bilgi = " | ".join(ek_bilgi_parcalari) if ek_bilgi_parcalari else ""
-
-            react = sistem_talimatini_insa_et(
-                hedef,
-                son_gozlem=son_gozlem,
-                ek_bilgi=ek_bilgi,
-            )
-        except ImportError:
-            react = self._varsayilan_react_talimati(hedef, son_gozlem, tur, toplam_tur)
-        parcalar.append(react)
-
-        return "\n\n".join(p for p in parcalar if p)
-
-    # ── Dosya okuma yardimcilari ───────────────────────────────────────
-
-    def _soul_oku(self) -> str:
-        """SOUL.md kimlik dosyasini oku."""
-        for aday in [
-            Path(".hermes") / "SOUL.md",
-            Path(".ReYMeN") / "SOUL.md",
-            Path("SOUL.md"),
-        ]:
-            try:
-                if aday.exists():
-                    return aday.read_text(encoding="utf-8").strip()
-            except OSError as _prompt_a_e113:
-                print(f"[UYARI] prompt_assembly.py:114 - {_prompt_a_e113}")
-        return ""
-
-    def _memory_oku(self) -> str:
-        """MEMORY.md kalici bellek dosyasini oku (son 2000 karakter)."""
-        ReYMeN_home = Path(os.environ.get("ReYMeN_HOME", ".ReYMeN"))
-        adaylar = [
-            ReYMeN_home / "memories" / "MEMORY.md",
-            Path(".hermes") / "memories" / "MEMORY.md",
-            Path("MEMORY.md"),
-        ]
-        for yol in adaylar:
-            try:
-                if yol.exists():
-                    icerik = yol.read_text(encoding="utf-8").strip()
-                    return icerik[-2000:] if len(icerik) > 2000 else icerik
-            except OSError as _prompt_a_e130:
-                print(f"[UYARI] prompt_assembly.py:131 - {_prompt_a_e130}")
-        return ""
-
-    def _beceri_baglamini_al(self, hedef: str) -> str:
-        """ClosedLearningLoop'tan ilgili beceri baglami al."""
-        if self._learning_loop is None:
-            return ""
-        try:
-            return self._learning_loop.beceri_baglamini_al(hedef, adet=3) or ""
-        except Exception:
-            return ""
-
-    def _varsayilan_react_talimati(self, hedef, son_gozlem, tur, toplam_tur) -> str:
-        """sistem_talimati import edilemezse basit yedek talimat."""
-        baz = (
-            "Sen ReYMeN adinda otonom bir ajansin.\n"
-            "ReAct dongusuyle calisirsin: Dusunce -> Eylem -> Gozlem -> Tekrar.\n"
-            "Her turda sadece bir Eylem uret. Hedef tamamlandiysa GOREV_BITTI kullan.\n\n"
-            "## YANIT FORMATI\n"
-            "Yanitlarini su formatta ver:\n"
-            "- Basliklari ## ile kullan\n"
-            "- Bilgiyi tablo (| | |), liste (-) veya gorev listesi (- [x]) ile sun\n"
-            "- Durum belirtmek icin emoji kullan: ✅ basarili, ❌ basarisiz, ⚠️ uyari, 🔴 kritik, 🟡 yuksek, 🟢 orta\n"
-            "- Kod bloklarini ``` ile cevir\n"
-            "- Karsilastirma gerekiyorsa tablo kullan\n"
-            "- Ozet bilgiyi en sonda ver\n"
-            "- Kisa ve oz ol: paragraf yerine liste/ tablo tercih et\n\n"
-            f"## HEDEF\n{hedef}\n\n"
-            f"## ILERLEME\nTur {tur}/{toplam_tur}"
-        )
-        if son_gozlem:
-            baz += f"\n\n## SON GOZLEM\n{son_gozlem}"
-        return baz
-
-    # ── Parcacik yonetim API ───────────────────────────────────────────
-
-    def ekle(self, ad, icerik):
-        """Prompt deposuna yeni bir parcacik ekle."""
-        if not ad or not isinstance(ad, str):
-            return False
-        if not icerik or not isinstance(icerik, str):
-            return False
-        self._parcalar[ad] = icerik.strip()
-        return True
-
-    def cikar(self, ad):
-        """Prompt deposundan bir parcacik cikar."""
-        if ad in self._parcalar:
-            del self._parcalar[ad]
-            return True
-        return False
-
-    def birlestir(self, parcalar, ayrac="\n\n", sablon=None):
-        """Parcacik adlarini birlestir."""
-        bolumler = []
-        for ad in parcalar:
-            if ad not in self._parcalar:
-                raise KeyError(f"Parca bulunamadi: {ad}")
-            bolumler.append(self._parcalar[ad])
-        birlestirilmis = ayrac.join(bolumler)
-        if sablon and sablon in self._sablonlar:
-            birlestirilmis = self._sablonlar[sablon].replace("{icerik}", birlestirilmis)
-        return birlestirilmis
-
-    def kaydet(self, ad):
-        """Parcacigi dosyaya kaydet."""
-        if ad not in self._parcalar:
-            return None
-        try:
-            dosya = self._depo_yolu / f"{ad}.txt"
-            dosya.write_text(self._parcalar[ad], encoding="utf-8")
-            return str(dosya)
-        except OSError:
-            return None
-
-    def yukle(self, ad):
-        """Parcacigi dosyadan yukle."""
-        try:
-            dosya = self._depo_yolu / f"{ad}.txt"
-            if not dosya.exists():
-                return None
-            icerik = dosya.read_text(encoding="utf-8").strip()
-            self._parcalar[ad] = icerik
+@functools.lru_cache(maxsize=1)
+def _dosya_oku(yol: Path) -> str:
+    """Dosyayi oku, yoksa bos string dondur. lru_cache ile bellekte tut."""
+    try:
+        if yol.exists():
+            icerik = yol.read_text(encoding="utf-8").strip()
+            log.debug("PromptAssembly: %s okundu (%d chars)", yol.name, len(icerik))
             return icerik
-        except OSError:
-            return None
-
-    def sabton_ekle(self, ad, sablon):
-        """Sablon ekle ({icerik} degiskenini icermeli)."""
-        if "{icerik}" not in sablon:
-            return False
-        self._sablonlar[ad] = sablon
-        return True
-
-    def liste(self):
-        return list(self._parcalar.keys())
-
-    def temizle(self):
-        sayi = len(self._parcalar)
-        self._parcalar.clear()
-        return sayi
-
-    def boyut(self, ad):
-        return len(self._parcalar.get(ad, ""))
-
-    def ara(self, kelime):
-        return [ad for ad, ic in self._parcalar.items() if kelime.lower() in ic.lower()]
+        else:
+            log.debug("PromptAssembly: %s bulunamadi, atlaniyor", yol)
+            return ""
+    except Exception as e:
+        log.warning("PromptAssembly: %s okuma hatasi: %s", yol, e)
+        return ""
 
 
-if __name__ == "__main__":
-    pa = PromptAssembly()
-    pa.ekle("giris", "Merhaba, ben ReYMeN asistaninim.")
-    pa.ekle("talimat", "Kullaniciya yardimci ol.")
-    print(f"Parcalar: {pa.liste()}")
-    print(f"Birlestirilmis:\n{pa.birlestir(['giris', 'talimat'])}")
-    print("\n--- insa_et testi ---")
-    prompt = pa.insa_et("Test hedefi", son_gozlem="onceki cikti ok", tur=2, toplam_tur=10)
-    print(prompt[:300])
+def _config_prompt_al() -> str:
+    """config.yaml'dan agent.system_prompt veya general.default_system_prompt
+    degerini oku. Yoksa bos string doner."""
+    try:
+        import yaml
+        yol = _VARSAYILAN_CONFIG
+        if yol.exists():
+            with open(yol, "r", encoding="utf-8") as f:
+                cfg = yaml.safe_load(f)
+            if not cfg:
+                return ""
+            aranacak = [
+                cfg.get("agent", {}).get("default_system_prompt"),
+                cfg.get("general", {}).get("default_system_prompt"),
+                cfg.get("personality", None),
+            ]
+            for val in aranacak:
+                if val and isinstance(val, str) and val.strip():
+                    return val.strip()
+            # agent.personalities altinda 'default' key'i varsa
+            personalities = cfg.get("agent", {}).get("personalities", {})
+            if isinstance(personalities, dict):
+                default_p = personalities.get("default", {})
+                if isinstance(default_p, dict) and default_p.get("system_prompt"):
+                    return default_p["system_prompt"].strip()
+        return ""
+    except ImportError:
+        log.debug("PromptAssembly: yaml modulu yok, config atlandi")
+        return ""
+    except Exception as e:
+        log.debug("PromptAssembly: config okuma hatasi (goz ardi): %s", e)
+        return ""
 
 
-# Eski ad uyumlulugu
-PromptAssemblyEngine = PromptAssembly
+def sistem_prompt_al(tema: Optional[str] = None, ek_bilgi: str = "") -> str:
+    """Sistem prompt'unu config→SOUL.md→USER.md sirasiyla birlestir.
+
+    Args:
+        tema:    Opsiyonel tema/task bilgisi (en alta eklenir).
+        ek_bilgi: Opsiyonel ek baglam metni.
+
+    Returns:
+        Birlestirilmis sistem prompt metni.
+    """
+    bolumler: list[str] = []
+
+    # 1. Config prompt (varsa)
+    config_prompt = _config_prompt_al()
+    if config_prompt:
+        bolumler.append(config_prompt)
+
+    # 2. SOUL.md — kisilik/identity
+    soul_yol = _profil_soul_yolu()
+    soul = _dosya_oku(soul_yol)
+    if soul:
+        bolumler.append(soul)
+
+    # 3. USER.md — kullanici profili
+    user = _dosya_oku(_VARSAYILAN_USER_MD)
+    if user:
+        bolumler.append(f"## Kullanici Profili\n{user}")
+
+    # 4. Tema (opsiyonel)
+    if tema:
+        bolumler.append(f"## Mevcut Gorev\n{tema}")
+
+    # 5. Ek bilgi (opsiyonel)
+    if ek_bilgi:
+        bolumler.append(f"## Ek Baglam\n{ek_bilgi}")
+
+    if not bolumler:
+        # Hicbiri yoksa minimum fallback
+        return "Sen ReYMeN, otonom bir yazilim ajanisin. Hedefe odaklan, araclari kullan, Turkce yaz."
+
+    sonuc = "\n\n".join(bolumler)
+    log.debug("PromptAssembly: sistem prompt olusturuldu (%d chars)", len(sonuc))
+    return sonuc
+
+
+class PromptAssemblyEngine:
+    """PromptAssemblyEngine — `sistem_prompt_al` fonksiyonlarini class arayuzuyle saran katman.
+
+    Kullanim:
+        engine = PromptAssemblyEngine(bounded_memory=..., learning_loop=...)
+        prompt = engine.sistem_prompt_al(tema="...")
+        engine.cache_tazele()
+    """
+
+    def __init__(self, bounded_memory=None, learning_loop=None):
+        self.bounded_memory = bounded_memory
+        self.learning_loop = learning_loop
+        log.debug("PromptAssemblyEngine baslatildi (bounded_memory=%s, learning_loop=%s)",
+                  bounded_memory is not None, learning_loop is not None)
+
+    def sistem_prompt_al(self, tema: Optional[str] = None, ek_bilgi: str = "") -> str:
+        """sistem_prompt_al fonksiyonuna yonlendir."""
+        return sistem_prompt_al(tema=tema, ek_bilgi=ek_bilgi)
+
+    def cache_tazele(self) -> None:
+        """Onbellekleri temizle."""
+        cache_tazele()
+
+    def kaynak_dosyalari(self) -> dict:
+        """Debug icin kaynak dosya yollari."""
+        return _kaynak_dosyalari()
+
+    def insa_et(self, hedef: str, son_gozlem: str = "",
+                 tur: int = 1, toplam_tur: int = 15,
+                 ic_gozlem_modu: bool = False) -> str:
+        """_sistem_promptu_insa_et fallback'i — prompt_assembly'den sistem prompt'u al.
+
+        Bu fonksiyon `AIAgentOrchestrator._sistem_promptu_insa_et()` tarafindan
+        PromptBuilder ve _sistem_talimati_fn yoksa cagrilir.
+        """
+        tema = hedef
+        if son_gozlem:
+            tema += f"\n\n[Son Gozlem]\n{son_gozlem[:500]}"
+        ek = f"Tur {tur}/{toplam_tur}"
+        if ic_gozlem_modu:
+            ek += "\n[Ic Gozlem Modu]"
+        return sistem_prompt_al(tema=tema, ek_bilgi=ek)
+
+
+def cache_tazele() -> None:
+    """SOUL.md/USER.md onbelleklerini sifirla (disk'ten tekrar okunur)."""
+    _dosya_oku.cache_clear()
+    log.info("PromptAssembly onbellekleri temizlendi")
+
+
+def _kaynak_dosyalari() -> dict:
+    """Debug icin: hangi dosyalardan okundugunu goster."""
+    return {
+        "config": str(_VARSAYILAN_CONFIG),
+        "soul": str(_profil_soul_yolu()),
+        "user": str(_VARSAYILAN_USER_MD),
+    }
