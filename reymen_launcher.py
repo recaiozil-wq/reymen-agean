@@ -399,34 +399,22 @@ def _spinner(stop_evt):
 _HERMES = shutil.which("hermes") or shutil.which("hermes") or "hermes"
 _ilk_tur = True
 
-# ── Basit Beyin: OpenAI-compatible API wrapper (ConversationLoop icin) ──────
-class _ReYMeNBeyin:
-    """ConversationLoop'un API cagrisi yapabilmesi icin minimal beyin."""
-    def __init__(self):
-        self.model = os.environ.get("REYMEN_MODEL", "deepseek-v4-flash")
-        self.provider = os.environ.get("REYMEN_PROVIDER", "deepseek")
-        base_url = os.environ.get("REYMEN_BASE_URL", "") or "https://api.deepseek.com"
-        api_key_env = {"deepseek": "DEEPSEEK_API_KEY", "xiaomi": "XIAOMI_API_KEY",
-                       "xai": "XAI_API_KEY", "openrouter": "OPENROUTER_API_KEY",
-                       "groq": "GROQ_API_KEY"}.get(self.provider, "DEEPSEEK_API_KEY")
-        self.api_key = os.environ.get(api_key_env, "")
-        self.base_url = base_url
-
-    def uret(self, sistem: str, mesajlar: list) -> str:
-        """OpenAI-uyumlu API cagrisi."""
-        from openai import OpenAI
-        client = OpenAI(api_key=self.api_key, base_url=self.base_url)
-        msgs = [{"role": "system", "content": sistem}] if sistem else []
-        msgs += [{"role": m.get("role", "user"), "content": m.get("content", "")} for m in mesajlar]
-        r = client.chat.completions.create(
-            model=self.model, messages=msgs, max_tokens=4096,
-            frequency_penalty=0.8,
-        )
-        return r.choices[0].message.content or ""
-
-    def uret_stream(self, mesajlar: list):
-        """Streaming (implementasyon yok)."""
-        raise NotImplementedError
+# ── Once tanimli config (Telegram bot ile ayni) ──────────────────────────────
+_REYMEN_CONFIG = {
+    "default_model":    "deepseek-v4-flash",
+    "default_provider": "deepseek",
+    "secure_binding": True,
+    "providers": {
+        "deepseek":     {"base_url": "https://api.deepseek.com",
+                         "api_key": os.environ.get("DEEPSEEK_API_KEY", "")},
+        "xiaomi":       {"base_url": os.environ.get("XIAOMI_BASE_URL", "https://api.xiaomimimo.com/v1"),
+                         "api_key": os.environ.get("XIAOMI_API_KEY", "")},
+        "xai":          {"base_url": "https://api.x.ai",
+                         "api_key": os.environ.get("XAI_API_KEY", "")},
+        "openrouter":   {"base_url": "https://openrouter.ai/api/v1",
+                         "api_key": os.environ.get("OPENROUTER_API_KEY", "")},
+    },
+}
 
 _KREDI_SINYALLER = (
     "insufficient_quota", "insufficient balance", "insufficient funds",
@@ -454,9 +442,33 @@ def _kaynak_ayikla(cevap: str) -> tuple[str, str]:
         return temiz, url
     return cevap, ""
 
+
+# ── SOUL.md oku (Telegram bot ile ayni system prompt) ────────────────────────
+def _sistem_prompu_al() -> str:
+    """Telegram bot ile aynı system prompt'u üret: SOUL.md + DURUM_OKU."""
+    try:
+        soul_path = Path(__file__).parent / "reymen" / "arac" / ".ReYMeN" / "SOUL.md"
+        if soul_path.exists():
+            soul = soul_path.read_text(encoding="utf-8")
+        else:
+            soul = ""
+    except Exception:
+        soul = ""
+
+    return (
+        "Sen ReYMeN adinda yardimsever bir AI asistanisin. "
+        "Kisa ve oz cevap ver. Turkce konus.\\n\\n"
+        "## DURUM_OKU() ZORUNLU TALIMAT\\n"
+        "ReYMeN durumu/projesi/eksikleri/kapasitesi hakkinda soru gelince "
+        "KESINLIKLE ONCE DOGRUDAN DURUM_OKU() tool'unu cagir. "
+        "Kendi bilginle asla liste olusturma. durum.json TEK KAYNAK.\\n"
+        + (f"\\n## SOUL.md\\n{soul[:2000]}\\n" if soul else "")
+    )
+
+
 def _sor(soru: str) -> tuple[str, str]:
-    """ReYMeN'e soru sor — Hermes flow (OnceHafiza + web + LLM + dogrula + kaydet).
-    Returns: (yanit, kaynak_url)
+    """ReYMeN'e soru sor — Telegram bot ile AYNI full pipeline.
+    Returns: (yanit, kaynak)
     """
     global _ilk_tur
     _ilk_tur = False
@@ -466,48 +478,31 @@ def _sor(soru: str) -> tuple[str, str]:
     t.start()
 
     try:
-        # ConversationLoop import et
+        # ── 1. GERCEK Beyin (Telegram bot ile ayni) ──────────────
+        from reymen.cereyan.beyin import Beyin
+        from reymen.cereyan.motor import Motor
         from reymen.cereyan.conversation_loop import ConversationLoop
-        beyin = _ReYMeNBeyin()
-        cl = ConversationLoop(motor=None, beyin=beyin, max_tur=3)
 
-        # run_conversation ile tüm adimlari calistir
-        # (OnceHafiza -> web ara -> ONCELIK_CACHE -> API call -> dogrula -> kaydet)
-        sonuc = cl.run_conversation(hedef=soru, provider="deepseek")
+        # Beyin'i Telegram bot ile ayni config ile baslat
+        beyin = Beyin(config=_REYMEN_CONFIG)
 
-        # Sonucu formatla
-        if sonuc.get("basarili"):
-            yanit = sonuc.get("yanit") or sonuc.get("sonuc", "")
-            kaynak = sonuc.get("kaynak", "llm")
-            if kaynak == "once_hafiza":
-                return f"{yanit}", f"(hafiza)"
-            elif kaynak == "web_arama":
-                return f"{yanit}", f"(web)"
-            elif kaynak == "oncelik_cache":
-                return f"{yanit}", f"(cache)"
-            else:
-                return f"{yanit}", f""
-        else:
-            hata = sonuc.get("hata", "Bilinmeyen hata")
-            return f"HATA: {hata}", ""
+        # Motor'u tool'lar ile baslat
+        motor = Motor()
+        motor._plugin_moduller_yukle()
 
-    except ImportError:
-        # Fallback: conversation_loop yoksa direkt API
-        return _sor_direkt_api(soru)
-    except Exception as e:
-        return f"HATA: {e}", ""
-    finally:
-        stop.set()
-        t.join(timeout=1)
+        # ConversationLoop — Telegram bot ile birebir ayni
+        cl = ConversationLoop(
+            motor=motor,
+            beyin=beyin,
+            max_tur=15,
+        )
 
+        # Telegram bot ile ayni: run_conversation
+        sonuc = cl.run_conversation(
+            hedef=soru,
+            provider="deepseek",
+        )
 
-def _sor_direkt_api(soru: str) -> tuple[str, str]:
-    """Fallback: conversation_loop'u tekrar dene (hatayı yutma)."""
-    try:
-        from reymen.cereyan.conversation_loop import ConversationLoop
-        beyin = _ReYMeNBeyin()
-        cl = ConversationLoop(motor=None, beyin=beyin, max_tur=3)
-        sonuc = cl.run_conversation(hedef=soru, provider="deepseek")
         if sonuc.get("basarili"):
             yanit = sonuc.get("yanit") or sonuc.get("sonuc", "")
             kaynak = sonuc.get("kaynak", "llm")
@@ -520,11 +515,28 @@ def _sor_direkt_api(soru: str) -> tuple[str, str]:
             else:
                 return f"{yanit}", ""
         else:
-            return f"HATA: {sonuc.get('hata', 'Bilinmeyen hata')}", ""
+            hata = sonuc.get("hata", "Bilinmeyen hata")
+            return f"HATA: {hata}", ""
+
+    except Exception as e:
+        return f"HATA: {e}", ""
+    finally:
+        stop.set()
+        t.join(timeout=1)
+
+
+def _sor_direkt_api(soru: str) -> tuple[str, str]:
+    """Fallback: gercek Beyin ile direkt API cagrisi."""
+    try:
+        from reymen.cereyan.beyin import Beyin as _Beyin
+        _b = _Beyin(config=_REYMEN_CONFIG)
+        _s = "Sen ReYMeN adinda yardimsever bir AI asistanisin. Kisa ve oz cevap ver. Turkce konus."
+        _c = _b.uret(_s, [{"role": "user", "content": soru}])
+        return _c or "Cevap alinamadi", ""
     except Exception as e:
         return f"HATA: {e}", ""
 
-# ── Komut yardımı ─────────────────────────────────────────────────────────────
+
 _YARDIM = f"""
   {_cb('ReYMeN Komutlar')}
 

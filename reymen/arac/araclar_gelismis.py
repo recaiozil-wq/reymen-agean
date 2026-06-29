@@ -646,8 +646,10 @@ _supervisor.izlemeyi_baslat()
 
 def motor_kaydet(motor, onay_tool: ApprovalTool = None):
     """motor.py'ye gelismis araclari kaydet."""
-    from plugins.kanban import _plugin_arac_kaydet
-
+    try:
+        from plugins.kanban import _plugin_arac_kaydet
+    except Exception:
+        return
     def browser_ac(ham: str) -> str:
         params = re.findall(r'"((?:[^"\\]|\\.)*)"', ham)
         return _browser.ac(params[0] if params else ham.strip('"'))

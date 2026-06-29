@@ -256,8 +256,8 @@ def _env_anahtar(anahtar, varsayilan=""):
 
 
 CONFIG = {
-    "default_model":    _env_anahtar("ReYMeN_DEFAULT_MODEL", "cognitivecomputations.dolphin3.0-llama3.1-8b"),
-    "default_provider": _env_anahtar("ReYMeN_DEFAULT_PROVIDER", "lmstudio"),
+    "default_model":    _env_anahtar("ReYMeN_DEFAULT_MODEL", "deepseek-v4-flash"),
+    "default_provider": _env_anahtar("ReYMeN_DEFAULT_PROVIDER", "deepseek"),
     "secure_binding": True,
     "providers": {
         "lmstudio":     {"base_url": _env_anahtar("LMSTUDIO_BASE_URL", "http://localhost:1234"), "api_key": "not-needed"},

@@ -9,6 +9,7 @@ import os
 import re
 import sys
 import time
+import asyncio
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
@@ -370,7 +371,6 @@ class Motor:
             # tools.context_tool
             "tools.context_tool",
             # tools.memory_providers
-from reymen.sistem.webhook import kaydet as webhook_kaydet, calistir as webhook_calistir
             "tools.memory_providers",
             # tools.clarify_tool ve tools.todo_tool
             "tools.clarify_tool", "tools.todo_tool",
@@ -520,6 +520,7 @@ from reymen.sistem.webhook import kaydet as webhook_kaydet, calistir as webhook_
             "reymen.arac.firecrawl_tool",
             "reymen.arac.homeassistant_tool",
             "reymen.arac.kanban_orchestrator",
+            "reymen.arac.konusmadan_skill",
             "reymen.arac.mcp_client_tool",
             "reymen.arac.mcp_tool",
             "reymen.arac.native_mcp_client",
@@ -694,6 +695,7 @@ from reymen.sistem.webhook import kaydet as webhook_kaydet, calistir as webhook_
         # MCP Reconnect — heartbeat + otomatik yeniden bağlanma
         # reymen.mcp modülü yukarıda yüklendiğinden mcp_reconnect zaten import edilebilir
         try:
+            import asyncio
             from reymen.mcp.mcp_reconnect import mcp_reconnect_baslat, mcp_reconnect_durumu
 
             # Mevcut event loop varsa onu kullan, yoksa yeni bir loop'ta başlat

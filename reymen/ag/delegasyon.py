@@ -1105,7 +1105,7 @@ def konusma_dongusu_hook_bul() -> Optional[Callable]:
     try:
         from reymen.cereyan.hook_dispatcher import hook_kaydet as _hook_kaydet
         
-        def _subagent_hook(tur, mesaj, baglam=None):
+        def _subagent_hook(tur, mesaj, baglam=None, **kwargs):
             """Her tur öncesi delegasyon kontrolü."""
             if not mesaj:
                 return None

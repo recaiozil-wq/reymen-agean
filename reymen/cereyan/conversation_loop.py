@@ -17,6 +17,7 @@ import json
 import logging
 import os
 import re
+import sys
 import threading
 import time
 import traceback
@@ -37,6 +38,13 @@ log = logging.getLogger("conversation_loop")
 # Kullaniciya gereksiz log gosterme - sadece ERROR ve uzeri
 logging.getLogger('reymen').setLevel(logging.ERROR)
 logging.getLogger('conversation_loop').setLevel(logging.INFO)
+
+# ── Konusmadan Skill Cikarma ────────────────────────────
+try:
+    from reymen.arac.konusmadan_skill import konusmadan_skill_cikar as _skill_cikar
+    _SKILL_CIKAR_AKTIF = True
+except ImportError:
+    _SKILL_CIKAR_AKTIF = False
 
 # ── Yeni import'lar: circuit breaker, streaming, error classify ─────
 try:
@@ -937,6 +945,17 @@ class ConversationLoop:
                     log.warning("[%s] KAYDET hatasi: %s", task_id, _ke)
                     sonuc["kaydedildi"] = False
 
+        # -- 6b. KONUSMADAN SKILL CIKAR (basarili gorev sonrasi) ----------
+        if sonuc["basarili"] and _SKILL_CIKAR_AKTIF:
+            try:
+                _skill_cikar(
+                    messages=self._konusma_gecmisi,
+                    basari=True,
+                    konu=hedef[:60],
+                )
+            except Exception as _sce:
+                log.debug("[%s] Skill cikarma atlandi: %s", task_id, _sce)
+
         # Konusma gecmisini guncelle
         self._gecmis_mesajlar = [
             dict(m) for m in self._konusma_gecmisi
@@ -1510,6 +1529,13 @@ class ConversationLoop:
                     ek_bilgi += durum
                 except Exception:
                     pass
+                # MEMORY.md + USER.md profil bilgisi
+                try:
+                    profil = self._profil_bilgisi_al()
+                    if profil:
+                        ek_bilgi += profil
+                except Exception:
+                    pass
                 return pb.sistem_prompt(hedef=hedef, ek_bilgi=ek_bilgi)
             except Exception as e:
                 log.warning("PromptBuilder hatasi: %s", e)
@@ -1549,16 +1575,32 @@ class ConversationLoop:
     def _profil_bilgisi_al(self) -> str:
         """MEMORY.md + USER.md icerigini oku, profil bilgisi olarak don."""
         try:
-            kok = Path(__file__).parent.parent
-            memory_path = kok / ".ReYMeN" / "MEMORY.md"
-            user_path = kok / ".ReYMeN" / "USER.md"
+            proje_kok = Path(__file__).parent.parent.parent
+            # Birden fazla lokasyon dene
+            aday_yollar = [
+                # 1. Proje koku .ReYMeN/memories/ (Hermes stili)
+                proje_kok / ".ReYMeN" / "memories",
+                # 2. Proje koku .ReYMeN/ (duz)
+                proje_kok / ".ReYMeN",
+                # 3. reymen/hafiza/ (ReYMeN hafiza sistemi)
+                proje_kok / "reymen" / "hafiza",
+                # 4. Calisma dizini
+                Path(sys.path[0]) / ".ReYMeN" / "memories" if sys.path[0] else None,
+                Path.cwd() / ".ReYMeN" / "memories",
+            ]
+
             parcalar = []
-            if memory_path.exists():
-                memory_ic = memory_path.read_text(encoding="utf-8", errors="replace")[:2000]
-                parcalar.append(f"[Hafiza Notlari]\n{memory_ic}")
-            if user_path.exists():
-                user_ic = user_path.read_text(encoding="utf-8", errors="replace")[:1500]
-                parcalar.append(f"[Kullanici Profili]\n{user_ic}")
+            # MEMORY.md ve USER.md ayri ayri bul (farkli yerde olabilir)
+            for dosya_adi, etiket in [("MEMORY.md", "Hafiza Notlari"), ("USER.md", "Kullanici Profili")]:
+                for aday in aday_yollar:
+                    if aday is None:
+                        continue
+                    yol = aday / dosya_adi
+                    if yol.exists():
+                        icerik = yol.read_text(encoding="utf-8", errors="replace")[:2000]
+                        parcalar.append(f"[{etiket}]\n{icerik}")
+                        break
+
             if parcalar:
                 return "\n" + "\n\n".join(parcalar)
         except Exception:

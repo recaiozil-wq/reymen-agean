@@ -251,16 +251,8 @@ def motor_kaydet(motor, rate_limited_provider=None) -> None:
     """Motor'a TOKEN_RAPOR araci ekle."""
     try:
         from plugins.kanban import _plugin_arac_kaydet
-
-        def _token_rapor(ham: str) -> str:
-            if rate_limited_provider:
-                return rate_limited_provider.rapor()
-            return "[TokenBudget] Rate-limited provider bagli degil."
-
-        _plugin_arac_kaydet(motor, "TOKEN_RAPOR", _token_rapor)
-        print("[RateLimiter] TOKEN_RAPOR araci kayit edildi.")
-    except Exception as e:
-        print(f"[RateLimiter] Motor kayit hatasi: {e}")
+    except Exception:
+        return
 
 
 # ── CLI ───────────────────────────────────────────────────────────────────────

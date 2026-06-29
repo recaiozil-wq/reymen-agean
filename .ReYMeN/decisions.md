@@ -102,3 +102,16 @@
 7. Security: network restriction (938s) + Docker sandbox entegrasyonu
 
 **Commit:** (son commit)
+
+## Karar #34 — PowerShell ajan hata düzeltmeleri
+**Tarih:** 2026-06-29 16:30
+**Ne yapıldı:** PowerShell launcher'in Telegram botuyla birebir calismasi icin 3 hata duzeltildi
+**Neden:** _sor() ConversationLoop kullaniyordu ama (1) hook parametre uyumsuzlugu, (2) kanban import hatasi, (3) MCP asyncio eksigi vardi
+**Alternatif:** Her hatayi ayri ayri cozmek yerine toplu fix yapildi
+**Dosyalar:**
+- reymen/ag/delegasyon.py: _subagent_hook(**kwargs)
+- reymen/ag/telegram_bot.py: plugins.kanban try/except
+- reymen/arac/araclar_gelismis.py: plugins.kanban try/except  
+- reymen/sistem/rate_limiter.py: plugins.kanban try/except
+- reymen/cereyan/motor.py: import asyncio
+- reymen/cereyan/conversation_loop.py: MEMORY/USER path fix + profil bilgisi ekleme

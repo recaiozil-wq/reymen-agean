@@ -389,9 +389,8 @@ def telegram_araclari_kaydet(motor) -> None:
     import re as _re
     try:
         from plugins.kanban import _plugin_arac_kaydet
-    except ImportError:
+    except Exception:
         return
-
     def _telegram_gonder(ham: str) -> str:
         params = _re.findall(r'"((?:[^"\\]|\\.)*)"', ham)
         mesaj = params[0] if params else ham.strip('"')
