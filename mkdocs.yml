@@ -1,0 +1,78 @@
+site_name: ReYMeN Dokümantasyonu
+site_description: ReYMeN - Otonom Görev Çözücü AI Asistanı
+site_author: ReYMeN Team
+repo_url: https://github.com/Watcher-Hermes/ReYMeN-Ajan-v2
+repo_name: ReYMeN-Ajan-v2
+edit_uri: edit/main/docs/
+copyright: Copyright &copy; 2026 Marko_Pasa_38
+
+theme:
+  name: material
+  language: tr
+  logo: assets/logo.png
+  favicon: assets/favicon.ico
+  palette:
+    - scheme: slate
+      primary: indigo
+      accent: deep purple
+      toggle:
+        icon: material/weather-night
+        name: Açık moda geç
+    - scheme: default
+      primary: indigo
+      accent: deep purple
+      toggle:
+        icon: material/weather-sunny
+        name: Karanlık moda geç
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.expand
+    - navigation.top
+    - navigation.indexes
+    - search.suggest
+    - search.highlight
+    - content.code.annotate
+    - content.code.copy
+    - content.tabs.link
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Watcher-Hermes/ReYMeN-Ajan-v2
+    - icon: fontawesome/brands/telegram
+      link: https://t.me/Pasa_38
+  generator: false
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - admonition
+  - pymdownx.details
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - tables
+  - toc:
+      permalink: true
+      title: İçindekiler
+
+nav:
+  - 🏠 Ana Sayfa: index.md
+  - 🚀 Quickstart: kurulum.md
+  - 📖 Kullanım: kullanim.md
+  - 🛠️ CLI Referansı: cli.md
+  - ⚙️ Özellikler: oezellikler.md
+  - 🏗️ Mimari: mimari.md
+  - 📡 API Referansı: API.md
+  - 🎬 Video: video.md
+  - 🤝 Katkıda Bulunma: katki.md
