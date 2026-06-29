@@ -99,6 +99,22 @@ KATALOG = {
         "env": {},
         "dokuman": "https://github.com/modelcontextprotocol/servers/tree/main/src/sequential-thinking",
     },
+    "playwright": {
+        "adi": "Playwright MCP",
+        "aciklama": "Tarayıcı otomasyonu: sayfa, tıklama, form, ekran görüntüsü",
+        "komut": "npx",
+        "args": ["-y", "@playwright/mcp"],
+        "env": {},
+        "dokuman": "https://github.com/microsoft/playwright-mcp",
+    },
+    "browser-use": {
+        "adi": "Browser Use",
+        "aciklama": "AI destekli tarayıcı otomasyonu: görsel + DOM tabanlı",
+        "komut": "python",
+        "args": ["-m", "browser_use"],
+        "env": {},
+        "dokuman": "https://github.com/browser-use/browser-use",
+    },
 }
 
 

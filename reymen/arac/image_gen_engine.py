@@ -35,6 +35,7 @@ log = logging.getLogger(__name__)
 
 _FAL_RUN_URL = "https://api.fal.ai/v1/run/comfyhub/flux-1-1-pro"
 _OPENAI_IMAGE_URL = "https://api.openai.com/v1/images/generations"
+_XAI_IMAGE_URL = "https://api.x.ai/v1/images/generations"
 _USER_AGENT = "ReYMeN-Ajan/1.0"
 
 
@@ -206,10 +207,12 @@ class OpenAIEngine(ImageGenEngine):
 # ═══════════════════════════════════════════════════════════════════════════════
 
 class xAIEngine(ImageGenEngine):
-    """xAI görsel üretim stub'ı. Henüz implemente edilmedi.
+    """xAI / Grok görsel üretim engine'i. XAI_API_KEY ortam değişkeni gerekli.
 
-    XAI_API_KEY ortam değişkeni kontrol edilir, ancak API endpoint'i
-    implemente edilmediğinde NotImplementedError döndürür.
+    xAI görsel üretim API'sini kullanır (OpenAI DALL-E ile benzer formatta).
+    Endpoint: https://api.x.ai/v1/images/generations
+    Model: grok-2-image
+    Desteklenen boyutlar: 1024x1024, 1024x1792, 1792x1024
     """
 
     @property
@@ -223,10 +226,53 @@ class xAIEngine(ImageGenEngine):
         api_key = os.environ.get("XAI_API_KEY", "").strip()
         if not api_key:
             return "[RESIM_OLUSTUR/xAI] Hata: XAI_API_KEY tanimli degil."
-        return (
-            "[RESIM_OLUSTUR/xAI] Uyari: xAI gorsel uretim henuz implemente edilmedi. "
-            "XAI_API_KEY ayarlandi ancak API endpoint implementasyonu eksik."
-        )
+
+        # Desteklenen boyut: "1024x1024", "1024x1792", "1792x1024"
+        size = f"{en}x{boy}"
+        valid_sizes = {"1024x1024", "1792x1024", "1024x1792"}
+        if size not in valid_sizes:
+            size = "1024x1024"
+
+        try:
+            sonuc = self._http_post_json(
+                _XAI_IMAGE_URL,
+                {
+                    "model": "grok-2-image",
+                    "prompt": prompt.strip(),
+                    "n": 1,
+                    "size": size,
+                },
+                headers={"Authorization": f"Bearer {api_key}"},
+                timeout=90,
+            )
+            data = sonuc.get("data", [])
+            if not data:
+                return (
+                    f"[RESIM_OLUSTUR/xAI] Hata: beklenmeyen cevap: "
+                    f"{json.dumps(sonuc)[:300]}"
+                )
+            url = data[0].get("url", "")
+            if not url:
+                # xAI bazen farkli formatta donebilir (revised_prompt, b64_json vb.)
+                b64 = data[0].get("b64_json", "")
+                if b64:
+                    return self._media(
+                        "image_b64", b64,
+                        f"Prompt: {prompt.strip()} [xAI Grok]",
+                    )
+                return "[RESIM_OLUSTUR/xAI] Hata: URL bulunamadi."
+            return self._media("image", url, f"Prompt: {prompt.strip()} [xAI Grok]")
+
+        except Exception as e:
+            log.exception("[xAIEngine] xAI API hatasi:")
+            import urllib.error as _ue
+            if hasattr(e, "read"):
+                try:
+                    govde = e.read().decode(errors="replace")[:300]
+                    return f"[RESIM_OLUSTUR/xAI] HTTP hatasi: {govde}"
+                except Exception:
+                    pass
+            return f"[RESIM_OLUSTUR/xAI] Hata: {e}"
 
 
 # ═══════════════════════════════════════════════════════════════════════════════

@@ -338,6 +338,8 @@ class Motor:
             "reymen.sistem.schema_manager",
             # Docker Sandbox + Threat Detection
             "reymen.guvenlik.docker_sandbox",
+            # Browser Engine (Playwright MCP + Browser Use)
+            "reymen.arac.browser_engine",
             # Web aramasi
             "reymen.arac.web_search_tool",
             # Web Search Engine (coklu back-end)
@@ -417,6 +419,38 @@ class Motor:
             discover_mcp_tools(self)
         except ImportError:
             pass
+
+        # MCP Reconnect — heartbeat + otomatik yeniden bağlanma
+        # reymen.mcp modülü yukarıda yüklendiğinden mcp_reconnect zaten import edilebilir
+        try:
+            from reymen.mcp.mcp_reconnect import mcp_reconnect_baslat, mcp_reconnect_durumu
+
+            # Mevcut event loop varsa onu kullan, yoksa yeni bir loop'ta başlat
+            try:
+                loop = asyncio.get_running_loop()
+                if loop.is_running():
+                    loop.create_task(mcp_reconnect_baslat())
+                else:
+                    loop.run_until_complete(mcp_reconnect_baslat())
+            except RuntimeError:
+                # Hiç event loop yok — arkaplan thread'de yeni loop başlat
+                import threading
+                def _reconnect_thread():
+                    _loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(_loop)
+                    try:
+                        _loop.run_until_complete(mcp_reconnect_baslat())
+                    except Exception:
+                        pass
+                    _loop.run_forever()
+
+                t = threading.Thread(target=_reconnect_thread, daemon=True, name="mcp-reconnect")
+                t.start()
+                print("[Motor] MCP Reconnect: arkaplan thread başlatıldı")
+        except ImportError:
+            pass
+        except Exception as e:
+            print(f"[Motor] MCP Reconnect başlatma hatası (önemsiz): {e}")
 
     def _skill_araclari_kaydet(self) -> None:
         """skill_utils modülünden SKILL_ araçlarını kaydet (v1 — geriye uyumluluk)."""

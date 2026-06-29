@@ -1,7 +1,19 @@
 # -*- coding: utf-8 -*-
-"""native_mcp_client.py — Hermes-tarzi Built-in Native MCP Client.
+"""
+native_mcp_client.py — LEGACY Native MCP Client (Korunuyor).
 
-Hermes Native MCP Client ozellikleri:
+⚠️  LEGACY / ESKI — Sadece geriye uyumluluk icin korunuyor.
+    Yeni gelistirmeler icin reymen/mcp/* paketini kullanin:
+      - reymen.mcp.mcp_manager      (async MCP yoneticisi)
+      - reymen.mcp.mcp_reconnect    (heartbeat + yeniden baglanma)
+      - reymen.mcp.mcp_discovery    (konfig + .env kesfi)
+      - reymen.mcp.mcp_tool         (motor arac kaydi)
+      - reymen.mcp.mcp_catalog      (onceden tanimli sunucu katalogu)
+
+    Bu modul silinmemeli, cunku dis bagimliliklar (plugin'ler, skill'ler,
+    dogrudan import eden kodlar) olabilir. Ancak yeni ozellik eklenmez.
+
+Hermes Native MCP Client ozellikleri (legacy):
   - Baslangicta otomatik kesif (discover_mcp_tools)
   - Her sunucu ayri arkaplan thread'de calisir
   - Otomatik yeniden baglanma (exponential backoff, max 5, 60s)

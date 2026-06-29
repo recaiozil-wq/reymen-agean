@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Görsel Üret — ReYMeN Web UI{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2>🎨 Görsel Üret — Çoklu Backend</h2>
+    <span class="gri" style="font-size:0.85rem">
+        Backend: FAL (FLUX) · OpenAI (DALL-E 3) · xAI (Grok) · Stub
+    </span>
+</div>
+<div id="media-sonuc" class="sonuc-alani"></div>
+
+<div class="grid-2">
+    <div class="kart">
+        <h2>📝 Prompt Gir</h2>
+        <form hx-post="/media/generate" hx-target="#media-sonuc">
+            <div class="form-group">
+                <label for="prompt">Görsel tanımı (prompt):</label>
+                <textarea name="prompt" id="prompt" rows="4"
+                    placeholder="Örn: 'snowy mountain peak at sunset, digital art'"
+                    required style="width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:8px;font-family:monospace;font-size:0.85rem"></textarea>
+            </div>
+            <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;">
+                <div class="form-group" style="flex:1;min-width:120px;">
+                    <label for="en">Genişlik:</label>
+                    <select name="en" id="en"
+                        style="width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:8px;">
+                        <option value="1024">1024</option>
+                        <option value="1792">1792</option>
+                    </select>
+                </div>
+                <div class="form-group" style="flex:1;min-width:120px;">
+                    <label for="boy">Yükseklik:</label>
+                    <select name="boy" id="boy"
+                        style="width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:8px;">
+                        <option value="1024" selected>1024</option>
+                        <option value="1792">1792</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="backend">Backend Engine:</label>
+                <select name="backend" id="backend"
+                    style="width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:8px;">
+                    <option value="">Varsayılan (oto-seç)</option>
+                    <option value="fal">FAL (FLUX)</option>
+                    <option value="openai">OpenAI (DALL-E 3)</option>
+                    <option value="xai">xAI (Grok)</option>
+                    <option value="stub">Stub (simülasyon)</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">🎨 Görsel Üret</button>
+        </form>
+        <div style="margin-top:0.5rem;">
+            <button class="btn btn-sm"
+                hx-get="/media/generate/list-backends"
+                hx-target="#backend-durum"
+                hx-swap="innerHTML">🔍 Backend Durumlarını Kontrol Et</button>
+            <div id="backend-durum" style="margin-top:0.5rem;"></div>
+        </div>
+    </div>
+    <div class="kart">
+        <h2>💡 İpuçları</h2>
+        <ul style="padding-left:1.2rem;font-size:0.9rem;line-height:1.6;">
+            <li><b>FAL (FLUX)</b> — en kaliteli, FAL_KEY gerekli. Her boyut desteklenir.</li>
+            <li><b>OpenAI (DALL-E 3)</b> — kaliteli, OPENAI_API_KEY gerekli. Boyut: 1024x1024, 1792x1024, 1024x1792.</li>
+            <li><b>xAI (Grok)</b> — XAI_API_KEY gerekli. Boyut: 1024x1024, 1792x1024, 1024x1792.</li>
+            <li><b>Stub</b> — simülasyon, API anahtarı gerekmez. Gerçek görsel üretmez.</li>
+            <li>Varsayılan sıra: FAL → OpenAI → xAI → Stub</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

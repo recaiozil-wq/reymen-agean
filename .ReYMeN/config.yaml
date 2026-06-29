@@ -31,10 +31,10 @@ mcp_servers:
   #   timeout: 30
 
   # Playwright (web otomasyonu)
-  # playwright:
-  #   command: "npx"
-  #   args: ["-y", "@playwright/mcp"]
-  #   timeout: 60
+  playwright:
+    command: "npx"
+    args: ["-y", "@playwright/mcp"]
+    timeout: 60
 
   # SQLite (veritabani sorgulama)
   # sqlite:

@@ -493,6 +493,99 @@ async def sistem_sayfasi(request: Request):
         request, "sistem.html", {}
     )
 
+
+# ---------------------------------------------------------------------------
+# Routes — Görsel Üretim (/media)
+# ---------------------------------------------------------------------------
+
+
+@app.get("/media", response_class=HTMLResponse)
+async def media_sayfasi(request: Request):
+    """Görsel üretim sayfası — prompt gir + backend seç."""
+    return templates.TemplateResponse(
+        request, "media.html", {}
+    )
+
+
+@app.post("/media/generate")
+async def media_generate(request: Request):
+    """Görsel üretim isteği — image_gen_engine.py resim_olustur() çağırır."""
+    form = await request.form()
+    prompt = form.get("prompt", "").strip()
+    en = form.get("en", "1024").strip()
+    boy = form.get("boy", "1024").strip()
+    backend = form.get("backend", "").strip()
+
+    if not prompt:
+        return HTMLResponse(
+            content='<div class="alert alert-error">❌ Prompt boş olamaz.</div>'
+        )
+
+    try:
+        from reymen.arac.image_gen_engine import resim_olustur
+
+        sonuc = resim_olustur(prompt=prompt, en=en, boy=boy, backend=backend)
+
+        # [MEDIA] bloklu sonucu güzel göster
+        if sonuc.startswith("[RESIM_OLUSTUR") and "Hata" in sonuc:
+            css = "alert alert-error"
+        elif sonuc.startswith("[RESIM_OLUSTUR") and "Uyari" in sonuc:
+            css = "alert alert-warning"
+        elif "[MEDIA" in sonuc:
+            # Görsel URL'sini çıkar
+            import re
+            src_match = re.search(r'src="([^"]+)"', sonuc)
+            aciklama_match = re.search(r'\[MEDIA[^\]]*\][\s\S]*?\n(.+?)\n\[/MEDIA\]', sonuc)
+            media_html = '<div class="alert alert-success">✅ Görsel başarıyla üretildi!</div>'
+            if src_match:
+                img_url = src_match.group(1)
+                media_html += '<div style="margin-top:1rem;text-align:center;">'
+                media_html += f'<img src="{img_url}" alt="Üretilen görsel" style="max-width:100%;max-height:500px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.3);">'
+                media_html += '<div style="margin-top:0.5rem;">'
+                media_html += f'<a href="{img_url}" target="_blank" class="btn btn-sm">🔗 Aç</a> '
+                media_html += f'<button class="btn btn-sm" onclick="navigator.clipboard.writeText(\'{img_url}\')">📋 Kopyala</button>'
+                media_html += '</div></div>'
+            if aciklama_match:
+                media_html += f'<div class="gri" style="margin-top:0.5rem;font-size:0.85rem;">{aciklama_match.group(1)}</div>'
+            return HTMLResponse(content=media_html)
+        else:
+            css = "alert"
+        return HTMLResponse(
+            content=f'<div class="{css}"><pre style="white-space:pre-wrap;margin:0;">{sonuc}</pre></div>'
+        )
+    except Exception as e:
+        import traceback
+        tb = traceback.format_exc()
+        logger.exception("[media/generate] Görsel üretim hatasi:")
+        return HTMLResponse(
+            content=f'<div class="alert alert-error">❌ Görsel üretim hatası: {e}<br><pre style="font-size:0.75rem;margin-top:0.5rem;">{tb[:500]}</pre></div>'
+        )
+
+
+@app.get("/media/generate/list-backends")
+async def media_list_backends():
+    """Kayıtlı backend'lerin durumunu listele."""
+    try:
+        from reymen.arac.image_gen_engine import image_gen_engine_listele
+        durum = image_gen_engine_listele()
+        html_lines = []
+        for line in durum.split("\n"):
+            line = line.strip()
+            if not line:
+                continue
+            if "hazir" in line:
+                html_lines.append(f'<div class="flex"><span>🟢 {line}</span></div>')
+            elif "eksik" in line or "Hata" in line:
+                html_lines.append(f'<div class="flex"><span>🔴 {line}</span></div>')
+            else:
+                html_lines.append(f'<div class="flex"><span>{line}</span></div>')
+        return HTMLResponse(content="\n".join(html_lines))
+    except Exception as e:
+        return HTMLResponse(
+            content=f'<div class="alert alert-error">❌ {e}</div>'
+        )
+
+
 # ---------------------------------------------------------------------------
 # Migration / Alembic
 # ---------------------------------------------------------------------------

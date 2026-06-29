@@ -3,7 +3,8 @@
 
 Subprocess sandbox'in otesinde:
   - Docker container'da tam izolasyon
-  - Ag erisimi kisitlamasi (--network=none)
+  - Ag erisimi kisitlamasi (--network=none veya kullanici-tanimli ag)
+  - Network restriction entegrasyonu (IP/CIDR bazli kisitlama)
   - Dosya sistemi kisitlamasi (read-only root, /sandbox yazilabilir)
   - Kaynak limiti (CPU, memory)
   - Gecici dizin temizligi
@@ -60,6 +61,16 @@ try:
 except ImportError:
     SUBPROCESS_SANDBOX_OK = False
 
+# Network restriction modulu (opsiyonel)
+try:
+    from reymen.guvenlik.network_restriction import (
+        NetworkRestriction as _NetworkRestriction,
+        DockerNetworkRestriction as _DockerNetworkRestriction,
+    )
+    NETWORK_RESTRICTION_OK = True
+except ImportError:
+    NETWORK_RESTRICTION_OK = False
+
 
 # ── Hata Siniflari ─────────────────────────────────────────────────────────
 
@@ -100,6 +111,8 @@ class DockerSandbox:
         memory: str = VARSAYILAN_MEMORY,
         cpu: float = VARSAYILAN_CPU,
         network_erisim: bool = False,
+        network_allowlist: Optional[list[str]] = None,
+        docker_network: Optional[str] = None,
     ):
         self.image = image
         self.timeout = timeout
@@ -107,7 +120,17 @@ class DockerSandbox:
         self.memory = memory
         self.cpu = cpu
         self.network_erisim = network_erisim
+        self.network_allowlist = network_allowlist or []
+        self.docker_network = docker_network
         self._container_id: Optional[str] = None
+        self._network_restriction = None  # Optional[NetworkRestriction]
+        self._docker_net_restriction = None  # Optional[DockerNetworkRestriction]
+
+        # Docker network restriction kurulumu
+        if NETWORK_RESTRICTION_OK and not network_erisim:
+            self._docker_net_restriction = _DockerNetworkRestriction(
+                network_adi=docker_network or "reymen-restricted"
+            )
 
     def calistir(self, kod: str, baglam: Optional[dict] = None) -> str:
         """Kodu Docker container'da calistir.
@@ -128,19 +151,18 @@ class DockerSandbox:
         # Kodu sarmala
         sarmalanmis_kod = self._kod_sarmala(kod, baglam or {})
 
+        # Docker network restriction hazirligi
+        network_args = self._docker_network_args()
+
         # Container argumanlari
         docker_args = [
             "docker", "run", "--rm",
-            "--network", "none",                          # ag kapali
             "--read-only",                                 # root salt-okunur
             "--tmpfs", "/sandbox:rw,noexec,nosuid,size=64m",  # yazilabilir tmp
             "--memory", self.memory,
             "--cpus", str(self.cpu),
             "--label", "reymen=sandbox",
-        ]
-
-        if not self.network_erisim:
-            docker_args.extend(["--network", "none"])
+        ] + network_args
 
         docker_args.extend([self.image, sarmalanmis_kod])
 
@@ -162,6 +184,33 @@ class DockerSandbox:
                 f"\n... [cikti {len(cikti)} karakter, sinir {self.max_chars}]"
             )
         return cikti
+
+    def _docker_network_args(self) -> list[str]:
+        """Docker network argumanlarini olustur.
+
+        Network restriction aktifse kullanici-tanimli ag kullan,
+        degilse --network=none ile agi tamamen kapat.
+
+        Returns:
+            ["--network", "none"] veya ["--network", "reymen-restricted"]
+        """
+        if self.network_erisim:
+            # Tam ag erisimi (dikkatli kullan)
+            return ["--network", "bridge"]
+
+        if self._docker_net_restriction is not None:
+            try:
+                # Kullanici-tanimli internal network olustur/hazirla
+                self._docker_net_restriction.network_hazirla()
+                return self._docker_net_restriction.container_baglanti_args()
+            except Exception as e:
+                logger.warning(
+                    "[Sandbox] Docker network restriction basarisiz, "
+                    "--network=none kullaniliyor: %s", e
+                )
+
+        # Varsayilan: ag tamamen kapali
+        return ["--network", "none"]
 
     def _kod_sarmala(self, kod: str, baglam: dict) -> str:
         """Kodu Docker icinde calismasi icin sarmala."""
@@ -412,11 +461,18 @@ def docker_image_build(zorla: bool = False) -> str:
 def sandbox_durum() -> dict:
     """Sandbox durum raporu."""
     builder = SandboxImageBuilder()
-    return {
+    durum = {
         "docker": builder.durum(),
         "subprocess": SUBPROCESS_SANDBOX_OK,
         "denetleyici": True,
     }
+    if NETWORK_RESTRICTION_OK:
+        try:
+            from reymen.guvenlik.network_restriction import network_durum
+            durum["network_restriction"] = network_durum()
+        except Exception:
+            durum["network_restriction"] = {"aktif": False, "sistem": "bilinmiyor"}
+    return durum
 
 
 def sandbox_durum_text() -> str:
@@ -425,12 +481,25 @@ def sandbox_durum_text() -> str:
     docker_ikon = "🟢" if d["docker"]["docker_mevcut"] else "🔴"
     image_ikon = "🟢" if d["docker"]["image_mevcut"] else "🟡"
     sp_ikon = "🟢" if d["subprocess"] else "🔴"
+
+    # Network restriction durumu
+    nr_ikon = "🔴"
+    nr_text = "yok"
+    nr_info = d.get("network_restriction", {})
+    if nr_info:
+        nr_ikon = "🟢" if nr_info.get("aktif") else "🟡"
+        nr_text = (
+            "aktif" if nr_info.get("aktif")
+            else "pasif (mevcut)"
+        )
+
     return (
         f"[Sandbox] Guvenlik Durumu:\n"
         f"  {docker_ikon} Docker: {'mevcut' if d['docker']['docker_mevcut'] else 'yok'}\n"
         f"  {image_ikon} Image: {'build edilmis' if d['docker']['image_mevcut'] else 'build edilmemis'}\n"
         f"  {sp_ikon} Subprocess: {'hazir' if d['subprocess'] else 'yok'}\n"
-        f"  🟢 Threat Denetleyici: aktif"
+        f"  🟢 Threat Denetleyici: aktif\n"
+        f"  {nr_ikon} Network Restriction: {nr_text}"
     )
 
 
@@ -455,6 +524,14 @@ def motor_kaydet(motor):
             "Bir kod parcacigini threat/PII icin kontrol et. Parametre: kod",
         )
         logger.info("[Sandbox] Motor'a 3 arac kaydedildi")
+
+    # Network restriction araclari
+    if NETWORK_RESTRICTION_OK:
+        try:
+            from reymen.guvenlik.network_restriction import motor_kaydet as _nr_motor_kaydet
+            _nr_motor_kaydet(motor)
+        except Exception as e:
+            logger.warning("[Sandbox] Network restriction kayit hatasi: %s", e)
 
 
 # ── CLI Test ───────────────────────────────────────────────────────────────

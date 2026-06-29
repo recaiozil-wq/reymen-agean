@@ -9,10 +9,16 @@ Engine'ler:
   - DuckDuckGoEngine  — duckduckgo-search kütüphanesi (öncelikli) / DDG Lite HTML (fallback)
   - GoogleEngine      — stub (GOOGLE_API_KEY gerektirir, NotImplementedError)
   - BingEngine        — stub (BING_API_KEY gerektirir, NotImplementedError)
+  - FirecrawlEngine   — Firecrawl API (FIRECRAWL_API_KEY)
+  - BraveSearchEngine — Brave Search API (BRAVE_API_KEY)
+  - SearXNGEngine     — SearXNG örnek (SEARXNG_URL)
+  - ExaEngine         — Exa API (EXA_API_KEY)
 
 WebSearchRegistry:
   - engine kaydet / seç (ad ile) / calistir (engine adı + sorgu ile)
-  - Varsayılan engine: duckduckgo
+  - Auto-detect: env var'larına göre hangi engine'lerin hazır olduğunu belirler
+  - Config backend seçimi: config'de web.backend veya web.search_backend varsa o engine kullanılır
+  - Varsayılan engine: duckduckgo (her zaman çalışır)
 
 Motor tool:
   WEB_ARAMA(sorgu, backend="duckduckgo") → str
@@ -31,6 +37,34 @@ from html.parser import HTMLParser
 from typing import Optional
 
 log = logging.getLogger(__name__)
+
+# Shared HTTP helpers
+_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+_HEADERS = {"User-Agent": _UA}
+
+
+def _http_get(url: str, params: dict = None, headers: dict = None,
+              timeout: int = 15) -> str:
+    if params:
+        url = url + "?" + urllib.parse.urlencode(params)
+    req = urllib.request.Request(
+        url, headers={**_HEADERS, **(headers or {})}
+    )
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        charset = r.headers.get_content_charset("utf-8") or "utf-8"
+        return r.read().decode(charset, errors="replace")
+
+
+def _http_post_json(url: str, data: dict, headers: dict = None,
+                    timeout: int = 20) -> str:
+    body = json.dumps(data).encode()
+    req = urllib.request.Request(
+        url, data=body,
+        headers={**_HEADERS, "Content-Type": "application/json",
+                 **(headers or {})}
+    )
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        return r.read().decode("utf-8", errors="replace")
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -61,6 +95,23 @@ class WebSearchEngine(ABC):
     def hazir(self) -> bool:
         """Engine kullanıma hazır mı?"""
         return self._hazir
+
+    @staticmethod
+    def _sonuc_formatla(results: list, kaynak: str) -> str:
+        """Sonuçları formatla — tüm engine'ler ortak kullanır."""
+        if not results:
+            return ""
+        satirlar = [f"[Web Arama — {kaynak}]:", "=" * 50]
+        for i, r in enumerate(results, 1):
+            title = r.get("title", "") or r.get("baslik", "") or ""
+            href = r.get("href", "") or r.get("url", "") or ""
+            body = r.get("body", "") or r.get("ozet", "") or ""
+            satirlar.append(f"\n{i}. {title}")
+            if href:
+                satirlar.append(f"   URL: {href}")
+            if body:
+                satirlar.append(f"   Özet: {body[:180]}")
+        return "\n".join(satirlar)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -229,15 +280,238 @@ class BingEngine(WebSearchEngine):
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# Web Search Registry
+# Firecrawl Engine
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class FirecrawlEngine(WebSearchEngine):
+    """Firecrawl API ile web araması. FIRECRAWL_API_KEY gerekli.
+
+    https://api.firecrawl.dev/v1/search endpoint'ini kullanır.
+    """
+
+    @property
+    def ad(self) -> str:
+        return "firecrawl"
+
+    def _bagimliliklari_kontrol_et(self) -> bool:
+        key = os.environ.get("FIRECRAWL_API_KEY") or os.environ.get("FIRECRAWL_KEY")
+        return bool(key and not key.startswith("***"))
+
+    def calistir(self, sorgu: str, max_sonuc: int = 5) -> str:
+        api_key = os.environ.get("FIRECRAWL_API_KEY") or os.environ.get("FIRECRAWL_KEY")
+        if not api_key or api_key.startswith("***"):
+            return "[FIRECRAWL] API key bulunamadi. FIRECRAWL_API_KEY ayarlayin."
+
+        try:
+            url = "https://api.firecrawl.dev/v1/search"
+            data = {"query": sorgu, "maxResults": max_sonuc, "lang": "tr"}
+            result_text = _http_post_json(
+                url, data,
+                headers={"Authorization": f"Bearer {api_key}"},
+                timeout=20,
+            )
+            sonuc = json.loads(result_text)
+            if sonuc.get("success") and "data" in sonuc:
+                results_data = sonuc["data"]
+                raw_results = results_data.get("results", [])
+                formatted = [
+                    {
+                        "title": r.get("title", ""),
+                        "url": r.get("url", ""),
+                        "body": (r.get("description", "") or r.get("content", "") or "")[:300],
+                    }
+                    for r in raw_results[:max_sonuc]
+                ]
+                if formatted:
+                    return self._sonuc_formatla(formatted, "Firecrawl")
+                return f"[FIRECRAWL] '{sorgu}' için sonuç bulunamadı."
+            hata = sonuc.get("error", "Bilinmeyen hata")
+            return f"[FIRECRAWL] Arama başarısız: {hata}"
+        except urllib.error.HTTPError as e:
+            if e.code == 401:
+                return "[FIRECRAWL] Kimlik doğrulama hatası. FIRECRAWL_API_KEY kontrol edin."
+            elif e.code == 402:
+                return "[FIRECRAWL] Kredi limiti doldu. Firecrawl dashboard'dan kredi yükleyin."
+            elif e.code == 429:
+                return "[FIRECRAWL] Rate limit aşıldı. Daha sonra tekrar deneyin."
+            return f"[FIRECRAWL] HTTP {e.code}: {e.reason}"
+        except Exception as e:
+            log.exception("[FirecrawlEngine] arama hatasi:")
+            return f"[FIRECRAWL] Hata: {e}"
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Brave Search Engine
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class BraveSearchEngine(WebSearchEngine):
+    """Brave Search API ile web araması. BRAVE_API_KEY gerekli.
+
+    https://api.search.brave.com/res/v1/web/search endpoint'ini kullanır.
+    """
+
+    @property
+    def ad(self) -> str:
+        return "brave"
+
+    def _bagimliliklari_kontrol_et(self) -> bool:
+        key = os.environ.get("BRAVE_API_KEY", "").strip()
+        return bool(key and not key.startswith("***"))
+
+    def calistir(self, sorgu: str, max_sonuc: int = 5) -> str:
+        api_key = os.environ.get("BRAVE_API_KEY", "").strip()
+        if not api_key or api_key.startswith("***"):
+            return "[BRAVE] API key bulunamadi. BRAVE_API_KEY ayarlayin."
+
+        try:
+            result_text = _http_get(
+                "https://api.search.brave.com/res/v1/web/search",
+                params={"q": sorgu, "count": max_sonuc, "safesearch": "off"},
+                headers={
+                    "Accept": "application/json",
+                    "Accept-Encoding": "gzip",
+                    "X-Subscription-Token": api_key,
+                },
+            )
+            veri = json.loads(result_text)
+            web_results = veri.get("web", {}).get("results", [])
+            formatted = [
+                {
+                    "title": r.get("title", ""),
+                    "url": r.get("url", ""),
+                    "body": r.get("description", ""),
+                }
+                for r in web_results[:max_sonuc]
+            ]
+            if formatted:
+                return self._sonuc_formatla(formatted, "Brave Search")
+            return f"[BRAVE] '{sorgu}' için sonuç bulunamadı."
+        except Exception as e:
+            log.exception("[BraveSearchEngine] arama hatasi:")
+            return f"[BRAVE] Hata: {e}"
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SearXNG Engine
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class SearXNGEngine(WebSearchEngine):
+    """SearXNG (kendi instance) ile web araması. SEARXNG_URL gerekli.
+
+    SearXNG instance'ının /search endpoint'ine JSON formatında sorgu gönderir.
+    """
+
+    @property
+    def ad(self) -> str:
+        return "searxng"
+
+    def _bagimliliklari_kontrol_et(self) -> bool:
+        url = os.environ.get("SEARXNG_URL", "").strip()
+        return bool(url)
+
+    def calistir(self, sorgu: str, max_sonuc: int = 5) -> str:
+        base_url = os.environ.get("SEARXNG_URL", "").strip().rstrip("/")
+        if not base_url:
+            return "[SEARXNG] URL bulunamadi. SEARXNG_URL ayarlayin."
+
+        try:
+            result_text = _http_get(
+                f"{base_url}/search",
+                params={"q": sorgu, "format": "json", "pageno": 1},
+            )
+            veri = json.loads(result_text)
+            raw_results = veri.get("results", [])
+            formatted = [
+                {
+                    "title": r.get("title", ""),
+                    "url": r.get("url", ""),
+                    "body": r.get("content", ""),
+                }
+                for r in raw_results[:max_sonuc]
+            ]
+            if formatted:
+                return self._sonuc_formatla(formatted, "SearXNG")
+            return f"[SEARXNG] '{sorgu}' için sonuç bulunamadı."
+        except Exception as e:
+            log.exception("[SearXNGEngine] arama hatasi:")
+            return f"[SEARXNG] Hata: {e}"
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Exa Engine
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class ExaEngine(WebSearchEngine):
+    """Exa API ile web araması. EXA_API_KEY gerekli.
+
+    https://api.exa.ai/search endpoint'ine POST JSON sorgu gönderir.
+    """
+
+    @property
+    def ad(self) -> str:
+        return "exa"
+
+    def _bagimliliklari_kontrol_et(self) -> bool:
+        key = os.environ.get("EXA_API_KEY", "").strip()
+        return bool(key and not key.startswith("***"))
+
+    def calistir(self, sorgu: str, max_sonuc: int = 5) -> str:
+        api_key = os.environ.get("EXA_API_KEY", "").strip()
+        if not api_key or api_key.startswith("***"):
+            return "[EXA] API key bulunamadi. EXA_API_KEY ayarlayin."
+
+        try:
+            data = {
+                "query": sorgu,
+                "numResults": max_sonuc,
+                "type": "keyword",
+                "contents": {"text": True},
+            }
+            result_text = _http_post_json(
+                "https://api.exa.ai/search",
+                data,
+                headers={"x-api-key": api_key},
+                timeout=20,
+            )
+            sonuc = json.loads(result_text)
+            raw_results = sonuc.get("results", []) or sonuc.get("data", [])
+            formatted = [
+                {
+                    "title": r.get("title", ""),
+                    "url": r.get("url", ""),
+                    "body": r.get("text", "") or r.get("content", "") or "",
+                }
+                for r in raw_results[:max_sonuc]
+            ]
+            if formatted:
+                return self._sonuc_formatla(formatted, "Exa")
+            return f"[EXA] '{sorgu}' için sonuç bulunamadı."
+        except urllib.error.HTTPError as e:
+            if e.code == 401:
+                return "[EXA] Kimlik doğrulama hatası. EXA_API_KEY kontrol edin."
+            elif e.code == 429:
+                return "[EXA] Rate limit aşıldı. Daha sonra tekrar deneyin."
+            return f"[EXA] HTTP {e.code}: {e.reason}"
+        except Exception as e:
+            log.exception("[ExaEngine] arama hatasi:")
+            return f"[EXA] Hata: {e}"
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Web Search Registry (Auto-detect + Config Backend)
 # ═══════════════════════════════════════════════════════════════════════════════
 
 class WebSearchRegistry:
-    """Web arama engine'lerini kaydet, seç ve çalıştır."""
+    """Web arama engine'lerini kaydet, seç ve çalıştır.
 
-    def __init__(self) -> None:
+    Auto-detect: env var'larına göre hangi engine'lerin hazır olduğunu belirler.
+    Config backend: config'de web.backend veya web.search_backend varsa o engine kullanılır.
+    """
+
+    def __init__(self, config: Optional[dict] = None) -> None:
         self._engines: dict[str, WebSearchEngine] = {}
         self._varsayilan: Optional[str] = None
+        self._config = config or {}
 
     def kaydet(self, engine: WebSearchEngine) -> None:
         """Bir engine kaydet."""
@@ -246,6 +520,71 @@ class WebSearchRegistry:
         if self._varsayilan is None:
             self._varsayilan = adi
         log.info("[WebSearchRegistry] Engine kaydedildi: %s", adi)
+
+    def _resolve_backend_from_config(self) -> Optional[str]:
+        """Config'den backend seçimini çözümle.
+
+        Öncelik sırası:
+          1. web.search_backend (per-capability override)
+          2. web.backend (genel web backend)
+        """
+        web_cfg = self._config.get("web")
+        if isinstance(web_cfg, dict):
+            # search_backend öncelikli
+            search_bk = web_cfg.get("search_backend")
+            if isinstance(search_bk, str) and search_bk.strip():
+                return search_bk.strip().lower()
+            # backend ikincil
+            backend = web_cfg.get("backend")
+            if isinstance(backend, str) and backend.strip():
+                return backend.strip().lower()
+        return None
+
+    def _auto_detect_best(self) -> str:
+        """En iyi kullanılabilir engine'i auto-detect et.
+
+        Öncelik sırası:
+          1. firecrawl (FIRECRAWL_API_KEY)
+          2. exa (EXA_API_KEY)
+          3. brave (BRAVE_API_KEY)
+          4. searxng (SEARXNG_URL)
+          5. duckduckgo (her zaman hazır, fallback)
+        """
+        # Firecrawl
+        fc_key = os.environ.get("FIRECRAWL_API_KEY") or os.environ.get("FIRECRAWL_KEY")
+        if fc_key and not fc_key.startswith("***") and "firecrawl" in self._engines:
+            return "firecrawl"
+        # Exa
+        exa_key = os.environ.get("EXA_API_KEY", "").strip()
+        if exa_key and not exa_key.startswith("***") and "exa" in self._engines:
+            return "exa"
+        # Brave
+        brave_key = os.environ.get("BRAVE_API_KEY", "").strip()
+        if brave_key and not brave_key.startswith("***") and "brave" in self._engines:
+            return "brave"
+        # SearXNG
+        searxng_url = os.environ.get("SEARXNG_URL", "").strip()
+        if searxng_url and "searxng" in self._engines:
+            return "searxng"
+        # Son çare: duckduckgo
+        return "duckduckgo"
+
+    def _sec_varsayilan(self) -> Optional[WebSearchEngine]:
+        """Config'den veya auto-detect'ten varsayılan engine'i seç."""
+        # 1. Config'den backend seçimi
+        config_backend = self._resolve_backend_from_config()
+        if config_backend and config_backend in self._engines:
+            eng = self._engines[config_backend]
+            if eng.hazir:
+                return eng
+        # 2. Config'de backend var ama hazır değil — auto-detect yap
+        # 3. Auto-detect en iyi engine
+        best = self._auto_detect_best()
+        eng = self._engines.get(best)
+        if eng and eng.hazir:
+            return eng
+        # 4. Hiçbiri hazır değilse duckduckgo'ya düş
+        return self._engines.get("duckduckgo")
 
     def sec(self, ad: str) -> Optional[WebSearchEngine]:
         """Ada göre engine seç. Varsayılana düş."""
@@ -257,22 +596,34 @@ class WebSearchRegistry:
 
     @property
     def varsayilan(self) -> Optional[WebSearchEngine]:
-        return self._engines.get(self._varsayilan) if self._varsayilan else None
+        return self._sec_varsayilan()
 
     def calistir(self, engin_adi: str, sorgu: str, max_sonuc: int = 5) -> str:
-        """Belirtilen engine ile arama yap."""
-        eng = self.sec(engin_adi)
+        """Belirtilen engine ile arama yap.
+
+        Eğer engin_adi "auto" veya boş ise, config/auto-detect ile en iyi engine seçilir.
+        """
+        if not engin_adi or engin_adi == "auto":
+            eng = self._sec_varsayilan()
+            if eng is None:
+                return "[WEB_ARAMA] Kullanilabilir engine bulunamadi."
+            adi = eng.ad
+        else:
+            eng = self.sec(engin_adi)
+            adi = engin_adi
+
         if eng is None:
             return f"[WEB_ARAMA] '{engin_adi}' engine'i bulunamadi ve varsayilan engine yok."
+
         if not eng.hazir:
-            return f"[WEB_ARAMA] '{engin_adi}' engine'i hazir degil (bagimlilik eksik)."
+            return f"[WEB_ARAMA] '{adi}' engine'i hazir degil (bagimlilik eksik)."
         try:
             return eng.calistir(sorgu, max_sonuc)
         except NotImplementedError as e:
-            return f"[WEB_ARAMA] '{engin_adi}' henuz implemente edilmemis: {e}"
+            return f"[WEB_ARAMA] '{adi}' henuz implemente edilmemis: {e}"
         except Exception as e:
-            log.exception("[WebSearchRegistry] '%s' calistirma hatasi:", engin_adi)
-            return f"[WEB_ARAMA] '{engin_adi}' hatasi: {e}"
+            log.exception("[WebSearchRegistry] '%s' calistirma hatasi:", adi)
+            return f"[WEB_ARAMA] '{adi}' hatasi: {e}"
 
 
 # ── Global registry singleton ──────────────────────────────────────────────────
@@ -280,14 +631,40 @@ class WebSearchRegistry:
 _registry: Optional[WebSearchRegistry] = None
 
 
+def _load_config_for_registry() -> dict:
+    """Config dosyasını oku — varsa web.backend/web.search_backend için."""
+    try:
+        from reymen_cli.config import load_config
+        return load_config() or {}
+    except Exception:
+        pass
+    try:
+        from ReYMeN_cli.config import load_config
+        return load_config() or {}
+    except Exception:
+        pass
+    return {}
+
+
 def _get_registry() -> WebSearchRegistry:
     global _registry
     if _registry is None:
-        _registry = WebSearchRegistry()
+        config = _load_config_for_registry()
+        _registry = WebSearchRegistry(config=config)
         _registry.kaydet(DuckDuckGoEngine())
         _registry.kaydet(GoogleEngine())
         _registry.kaydet(BingEngine())
+        _registry.kaydet(FirecrawlEngine())
+        _registry.kaydet(BraveSearchEngine())
+        _registry.kaydet(SearXNGEngine())
+        _registry.kaydet(ExaEngine())
     return _registry
+
+
+def reset_registry() -> None:
+    """Registry'i sıfırla (test / yeniden yapılandırma için)."""
+    global _registry
+    _registry = None
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -299,7 +676,9 @@ def web_arama(sorgu: str, backend: str = "duckduckgo", max_sonuc: int = 5) -> st
 
     Args:
         sorgu: Arama sorgusu.
-        backend: Kullanilacak engine adi (duckduckgo, google, bing).
+        backend: Kullanilacak engine adi (duckduckgo, google, bing,
+                 firecrawl, brave, searxng, exa, auto).
+                 "auto" veya boş: config/auto-detect ile en iyi engine seçilir.
         max_sonuc: Maksimum sonuc sayisi.
 
     Returns:
@@ -313,10 +692,18 @@ def web_search_engine_listele() -> str:
     """Kayitli engine'leri listele."""
     reg = _get_registry()
     satirlar = ["[WEB_ARAMA] Kayitli engine'ler:"]
-    for ad, eng in reg._engines.items():
+    default = reg.varsayilan
+    default_adi = default.ad if default else ""
+    for ad, eng in sorted(reg._engines.items()):
         durum = "hazir" if eng.hazir else "bagimlilik eksik"
-        isaret = " >" if ad == reg._varsayilan else "  "
+        isaret = " >" if ad == default_adi else "  "
         satirlar.append(f"  {isaret} {ad} ({durum})")
+    # Config backend bilgisi
+    backend_info = reg._resolve_backend_from_config()
+    if backend_info:
+        satirlar.append(f"\n[Config] web.backend/search_backend: {backend_info}")
+    else:
+        satirlar.append("\n[Config] Backend secimi: auto-detect")
     return "\n".join(satirlar)
 
 
@@ -336,9 +723,10 @@ def motor_kaydet(motor) -> None:
                 _web_arama_ayristir_ve_calistir(ham)
             ),
             "Web aramasi yapar (coklu back-end)."
-            " Kullanim: WEB_ARAMA(sorgu=\"...\", backend=\"duckduckgo|google|bing\")\n"
-            "Varsayilan backend: duckduckgo (API key gerekmez).\n"
-            "Google icin GOOGLE_API_KEY+GOOGLE_CX, Bing icin BING_API_KEY gerekli.",
+            " Kullanim: WEB_ARAMA(sorgu=\"...\", backend=\"duckduckgo|google|bing|firecrawl|brave|searxng|exa|auto\")\n"
+            "Varsayilan backend: auto-detect (config veya env var'larina gore en iyisi).\n"
+            "DuckDuckGo API key gerekmez. Firecrawl icin FIRECRAWL_API_KEY, Brave icin BRAVE_API_KEY,\n"
+            "SearXNG icin SEARXNG_URL, Exa icin EXA_API_KEY gerekli.",
         )
         motor._plugin_arac_kaydet(
             "WEB_ARAMA_BACKEND_LISTELE",
@@ -354,7 +742,7 @@ def _web_arama_ayristir_ve_calistir(ham: str) -> str:
     import re as _re
     # Pattern: WEB_ARAMA(sorgu="...", backend="...")
     sorgu = ""
-    backend = "duckduckgo"
+    backend = "auto"
     s_match = _re.search(r'sorgu\s*=\s*"([^"]*)"', ham)
     if s_match:
         sorgu = s_match.group(1)
@@ -377,5 +765,15 @@ if __name__ == "__main__":
     sorgu = " ".join(sys.argv[1:]) if len(sys.argv) > 1 else "python asyncio nedir"
     print("\n--- DuckDuckGo ---")
     print(web_arama(sorgu, backend="duckduckgo"))
+    print("\n--- Firecrawl (varsa) ---")
+    print(web_arama(sorgu, backend="firecrawl"))
+    print("\n--- Brave (varsa) ---")
+    print(web_arama(sorgu, backend="brave"))
+    print("\n--- SearXNG (varsa) ---")
+    print(web_arama(sorgu, backend="searxng"))
+    print("\n--- Exa (varsa) ---")
+    print(web_arama(sorgu, backend="exa"))
+    print("\n--- Auto ---")
+    print(web_arama(sorgu, backend="auto"))
     print("\n--- Google (stub) ---")
     print(web_arama(sorgu, backend="google"))

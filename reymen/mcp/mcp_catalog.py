@@ -64,6 +64,14 @@ KATALOG = {
         "transport": "stdio",
         "dokuman": "https://github.com/modelcontextprotocol/servers/tree/main/src/puppeteer",
     },
+    "playwright": {
+        "adi": "Playwright MCP",
+        "aciklama": "Tarayıcı otomasyonu: sayfa yükleme, tıklama, form doldurma, ekran görüntüsü",
+        "komut": "npx",
+        "args": ["-y", "@playwright/mcp"],
+        "transport": "stdio",
+        "dokuman": "https://github.com/microsoft/playwright-mcp",
+    },
     "brave-search": {
         "adi": "Brave Search MCP",
         "aciklama": "Brave Search API ile web arama",
