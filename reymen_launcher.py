@@ -241,7 +241,7 @@ def _hermes_welcome(model: str, session_id: str = ""):
             _orig_ver = _banner_mod.format_banner_version_label
             _banner_mod.HERMES_AGENT_LOGO = _REYMEN_AGENT_LOGO
             _banner_mod.HERMES_CADUCEUS = ""
-            _banner_mod.format_banner_version_label = lambda: "ReYMeN Agent v0.1.0 (2026.6.29)"
+            _banner_mod.format_banner_version_label = lambda: "R>eYMeN Ajan v0.1.0 (2026.6.29)"
             result = _orig_bwb(*args, **kwargs)
             _banner_mod.HERMES_AGENT_LOGO = _orig_logo
             _banner_mod.HERMES_CADUCEUS = _orig_cad
@@ -439,18 +439,10 @@ def main():
         print(f"  {_d('Varsayılan model ile devam ediliyor...')}\n")
 
     _hermes_welcome(cur_m, session_id)
-
-    try:
-        from hermes_cli.skin_engine import get_active_skin
-        _skin = get_active_skin()
-        _welcome_text = _skin.get_branding("welcome", "R>eYMeN Ajan'a hoş geldiniz! Mesajınızı yazın veya /yardım yazın.")
-        _welcome_color = _skin.get_color("banner_text", "#FFF8DC")
-    except Exception:
-        _welcome_text = "R>eYMeN Ajan'a hoş geldiniz! Mesajınızı yazın veya /yardım yazın."
-        _welcome_color = "#FFF8DC"
-
+    # 3. Welcome mesaji (skin'i pas gec, direkt Turkce yaz)
     from rich.console import Console
-    Console().print(f"[{_welcome_color}]{_welcome_text}[/]")
+    _welcome_text = "R>eYMeN Ajan'a hoş geldiniz! Mesajınızı yazın veya /yardım yazın."
+    Console().print(f"[#FFF8DC]{_welcome_text}[/]")
     print()
 
     _repl(session_id)
