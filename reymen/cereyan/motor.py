@@ -91,14 +91,14 @@ except ImportError:
 # Plugin Manager (ikincil arac kaynagi)
 try:
     from reymen.sistem.plugin_manager import PluginManager as _PluginManager
-    _PLUGIN_MGR = _PluginManager(str(ROOT / "plugins"))
+    _PLUGIN_MGR = _PluginManager(str(ROOT.parent / "sistem" / "plugins"))
 except ImportError:
     _PLUGIN_MGR = None
 
 # Plugin Yukleyici (ReYMeN seviyesi — plugin.yaml destegi)
 try:
     from reymen.sistem.plugin_loader import PluginYukleyici as _PluginYukleyici
-    _PLUGIN_YUKLEYICI = _PluginYukleyici(dizin=ROOT / "plugins")
+    _PLUGIN_YUKLEYICI = _PluginYukleyici(dizin=ROOT.parent / "sistem" / "plugins")
 except ImportError:
     _PLUGIN_YUKLEYICI = None
 
@@ -162,6 +162,13 @@ class Motor:
         try:
             from reymen.sistem.hook_dispatcher import AsynchronousHookDispatcher
             self._hooks = AsynchronousHookDispatcher()
+            # Varsayilan hook callback'lerini kaydet
+            try:
+                from reymen.cereyan.hook_handlers import varsayilan_hooklari_kaydet
+                varsayilan_hooklari_kaydet(self._hooks)
+                logger.info("[Motor] Varsayilan hook callback'ler kaydedildi")
+            except Exception as _he:
+                logger.warning("[Motor] Hook handler kayit hatasi: %s", _he)
         except ImportError:
             self._hooks = None
         # Skill tarama cache (tekrari onle)
@@ -300,6 +307,8 @@ class Motor:
             "araclar_makro", "araclar_ses", "araclar_telegram",
             "mcp_oauth", "batch_engine", "security_engine",
             "yetenek_fabrikasi", "sistem_sinyalleri",
+            # Gorsel analiz (FAL/OpenRouter/Ollama)
+            "araclar_goruntu",
             # Entegrasyon 5 — ek modüller
             "mcp_oauth_manager", "reymen_batch_runner", "models_dev",
             # Entegrasyon 6 — reyment CLI araçları
@@ -309,6 +318,8 @@ class Motor:
             "skill_bundles", "skill_commands", "telegram_bot",
             # Entegrasyon 8 — Claude Code işbirliği
             "tools.claude_code_tool",
+            # Kanban Board + Worker
+            "reymen.kanban",
             # Kopru (Bot1/Bot2 Bridge)
             "kopru",
             # LSP (Language Server Protocol)
@@ -317,14 +328,24 @@ class Motor:
             "cua_motor_araci",
             # MCP (Model Context Protocol)
             "tools.mcp_tool",
+            # Web aramasi (DuckDuckGo, API key gerekmez)
+            "reymen.arac.web_search_tool",
             # Personality (kisilik sistemi)
             "agent.personalities",
             # Kapali Ogrenme Dongusu
             "closed_learning_loop",
+            # Self-Improvement (kalite metrikleri + otomatik iyilestirme)
+            "reymen.self_improve",
             # SQLite FTS5 hafiza + session_search
             "hafiza_genislet",
+            # MCP Server Host (Streamable HTTP + Stdio)
+            "reymen.core.mcp_server",
             # ACP (Agent Communication Protocol)
             "acp_server",
+            # A2A (Agent-to-Agent messaging)
+            "reymen.a2a_integration",
+            # TUI (Terminal UI - prompt_toolkit tabanli)
+            "reymen.tui",
             # Checkpoint yönetimi (görev geri alma / rollback)
             "tools.checkpoint_manager",
         ]
@@ -354,12 +375,16 @@ class Motor:
         # PluginYukleyici (ReYMeN seviyesi — plugin.yaml destegi)
         try:
             from reymen.sistem.plugin_loader import PluginYukleyici
-            _py = PluginYukleyici(dizin=ROOT / "plugins")
+            _py = PluginYukleyici(dizin=ROOT.parent / "sistem" / "plugins")
             _py.hepsini_yukle()
+            _py.tool_pluginlerini_yukle()  # kind: tool pluginleri de yukle
             _py.motora_kaydet(self)
+            self._plugin_yukleyici = _py
         except ImportError as _e:
+            self._plugin_yukleyici = None
             pass  # plugin_loader yok
         except Exception as _e:
+            self._plugin_yukleyici = None
             print(f"[Motor] PluginYukleyici baslatma hatasi: {_e}")
 
     def _skill_araclari_kaydet(self) -> None:
@@ -532,21 +557,82 @@ class Motor:
                 aciklama = meta.get("aciklama", "") or meta.get("description", "")
             if not aciklama:
                 aciklama = ad.replace("_", " ").title()
+
+            # Bilinen tool'lar icin ozel parametre semalari
+            _OZEL_SCHEMALAR = {
+                "WEB_ARA": {
+                    "type": "object",
+                    "properties": {
+                        "sorgu": {
+                            "type": "string",
+                            "description": "Aranacak kelime veya cümle"
+                        }
+                    },
+                    "required": ["sorgu"]
+                },
+                "DOSYA_OKU": {
+                    "type": "object",
+                    "properties": {
+                        "dosya_yolu": {
+                            "type": "string",
+                            "description": "Okunacak dosyanın tam yolu"
+                        }
+                    },
+                    "required": ["dosya_yolu"]
+                },
+                "DOSYA_YAZ": {
+                    "type": "object",
+                    "properties": {
+                        "dosya_yolu": {
+                            "type": "string",
+                            "description": "Yazılacak dosyanın tam yolu"
+                        },
+                        "icerik": {
+                            "type": "string",
+                            "description": "Dosyaya yazılacak içerik"
+                        }
+                    },
+                    "required": ["dosya_yolu", "icerik"]
+                },
+                "PYTHON_CALISTIR": {
+                    "type": "object",
+                    "properties": {
+                        "kod": {
+                            "type": "string",
+                            "description": "Çalıştırılacak Python kodu"
+                        }
+                    },
+                    "required": ["kod"]
+                },
+                "KOMUT_CALISTIR": {
+                    "type": "object",
+                    "properties": {
+                        "komut": {
+                            "type": "string",
+                            "description": "Çalıştırılacak shell komutu"
+                        }
+                    },
+                    "required": ["komut"]
+                },
+            }
+
+            params = _OZEL_SCHEMALAR.get(ad, {
+                "type": "object",
+                "properties": {
+                    "param": {
+                        "type": "string",
+                        "description": f"{ad} için parametre"
+                    }
+                },
+                "required": []
+            })
+
             schema.append({
                 "type": "function",
                 "function": {
                     "name": ad,
                     "description": aciklama[:200],
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "param": {
-                                "type": "string",
-                                "description": f"{ad} için parametre"
-                            }
-                        },
-                        "required": []
-                    }
+                    "parameters": params,
                 }
             })
         return schema
@@ -1032,11 +1118,22 @@ class Motor:
 
     def _hook_tetikle(self, arac: str, params: List[str], sonuc: str) -> None:
         """Araç çalıştıktan sonra async hookları tetikle."""
-        if not self._hooks:
-            return
-        hata = "[Hata]" in sonuc or "[hata]" in sonuc.lower()
+        hata = "[Hata]" in sonuc or "[hata]" in sonuc.lower() if sonuc else False
         olay = "TOOL_ERROR" if hata else "TOOL_CALLED"
-        self._hooks.tetikle(olay, arac=arac, params=params, sonuc=sonuc[:200])
+
+        if self._hooks:
+            self._hooks.tetikle(olay, arac=arac, params=params, sonuc=sonuc[:200] if sonuc else "")
+
+        # conversation_loop hook'larını da tetikle (entegrasyon)
+        try:
+            from reymen.cereyan.hook_dispatcher import (
+                arac_cagri_tetikle as _ac_tetikle,
+                arac_sonuc_tetikle as _as_tetikle,
+            )
+            _ac_tetikle(arac_adi=arac, argumanlar={"params": params})
+            _as_tetikle(arac_adi=arac, sonuc=str(sonuc)[:200] if sonuc else "", sure_sn=0.0)
+        except Exception:
+            pass
 
     def _fallback_calistir(self, arac: str, params: List[str]) -> str:
         """Yedek if/else zinciri (registry calismazsa)."""
