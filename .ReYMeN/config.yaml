@@ -1,0 +1,49 @@
+# ── ReYMeN MCP Sunuculari ──────────────────────────────────────────────────
+# Model Context Protocol (MCP) sunucu konfigürasyonu.
+# Bu dosyadaki sunuculara ReYMeN otomatik bağlanır, tool'ları keşfeder ve motor'a kaydeder.
+#
+# Kullanım:
+#   filesystem:   Yerel dosya sistemi erişimi (npx ile)
+#   github:       GitHub API erişimi (opsiyonel, token gerekli)
+#   firecrawl:    Web scraping (opsiyonel, API key gerekli)
+#
+# Detay: https://modelcontextprotocol.io
+
+mcp_servers:
+  filesystem:
+    command: "npx"
+    args: ["-y", "@modelcontextprotocol/server-filesystem", "/tmp"]
+    timeout: 30
+
+  # GitHub (opsiyonel - GITHUB_TOKEN ayarlanmali)
+  # github:
+  #   command: "npx"
+  #   args: ["-y", "@modelcontextprotocol/server-github"]
+  #   env:
+  #     GITHUB_TOKEN: "${GITHUB_TOKEN}"
+  #   timeout: 60
+
+  # Firecrawl (opsiyonel)
+  # firecrawl:
+  #   url: "https://api.firecrawl.dev/v1/mcp"
+  #   headers:
+  #     Authorization: "Bearer ${FIRECRAWL_API_KEY}"
+  #   timeout: 30
+
+  # Playwright (web otomasyonu)
+  # playwright:
+  #   command: "npx"
+  #   args: ["-y", "@playwright/mcp"]
+  #   timeout: 60
+
+  # SQLite (veritabani sorgulama)
+  # sqlite:
+  #   command: "uvx"
+  #   args: ["mcp-server-sqlite", "--db", "${PROJE_KOK}/.ReYMeN/reymen.db"]
+  #   timeout: 30
+
+  # Memory (hafiza yonetimi)
+  # memory:
+  #   command: "npx"
+  #   args: ["-y", "@modelcontextprotocol/server-memory"]
+  #   timeout: 30

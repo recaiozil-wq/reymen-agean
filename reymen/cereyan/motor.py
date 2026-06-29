@@ -328,7 +328,13 @@ class Motor:
             "cua_motor_araci",
             # MCP (Model Context Protocol)
             "tools.mcp_tool",
-            # Web aramasi (DuckDuckGo, API key gerekmez)
+            # Native MCP Client (Hermes-tarzi otomatik kesif + background baglanti)
+            "reymen.arac.native_mcp_client",
+            # MCP Paket (async MCP manager + tool registry)
+            "reymen.mcp",
+            # Merkezi Hata Toplama + Bildirim
+            "reymen.sistem.hata_toplama",
+            # Web aramasi
             "reymen.arac.web_search_tool",
             # Personality (kisilik sistemi)
             "agent.personalities",
@@ -392,6 +398,13 @@ class Motor:
         except Exception as _e:
             self._plugin_yukleyici = None
             print(f"[Motor] PluginYukleyici baslatma hatasi: {_e}")
+
+        # Native MCP Client otomatik kesif (Hermes-tarzi)
+        try:
+            from reymen.arac.native_mcp_client import discover_mcp_tools
+            discover_mcp_tools(self)
+        except ImportError:
+            pass
 
     def _skill_araclari_kaydet(self) -> None:
         """skill_utils modülünden SKILL_ araçlarını kaydet (v1 — geriye uyumluluk)."""
