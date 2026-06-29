@@ -1,60 +1,50 @@
 {
   "proje": "ReYMeN-Ajan",
   "son_guncelleme": "2026-06-29T09:01:00+03:00",
-  "tamamlanan_ozellikler": {
-    "Kismen_Var_7": {
-      "durum": "tamam",
-      "commit": "6b3382cb",
-      "maddeler": {
-        "1_MCP_Client": "auto-discovery + reconnect + auto-start + test",
-        "2_Plugin_Sistemi": "hot-reload CLI + ProviderPluginBase aktif",
-        "3_Skills": "CLI fix + auto-activation + path temizligi 5972 skill",
-        "4_Web_Search": "7 engine (DDG/Google/Bing/Firecrawl/Brave/SearXNG/Exa)",
-        "5_Image_Gen": "FAL + OpenAI + xAI real API + /api/hermes/media/ JSON",
-        "6_Browser": "Playwright MCP calisiyor + config + browser-use",
-        "7_Security": "Network restriction (WFA/iptables/Docker) + sandbox"
-      }
-    },
-    "Tamamen_Eksik_10": {
-      "durum": "tamam",
-      "commit": "44de838a",
-      "maddeler": {
-        "1_Provider_Sistemi_P0": "model_provider.py - 5 provider zinciri failover circuit breaker",
-        "2_YAML_Config_P0": "config_manager.py - katmanli oku + profil + env override",
-        "3_Session_DB_P1": "session_db.py - FTS5 + trigram arama",
-        "4_Cron_Scheduler_P1": "cron_manager.py - watchdog 10s + timeout + retry + override",
-        "5_Gateway_P1": "gateway_manager.py - Telegram + Discord + CLI ABC multi-platform",
-        "6_Vector_Memory_P2": "vector_memory.py - DeepSeek embedding + SQLite",
-        "7_OAuth_P2": "oauth_manager.py - Google + GitHub + Discord token refresh",
-        "8_Delegation_P2": "delegation_manager.py - TEK/PARALEL task decomposition",
-        "9_Backup_P2": "backup_manager.py - partial/ZIP/git auto-cleanup",
-        "10_Guardrails_P3": "guardrails_manager.py - jailbreak/PII/code exec detection"
-      }
-    },
-    "Auth_Hermes_Pattern": {
-      "durum": "tamam",
-      "commit": "9a76bbc4",
-      "maddeler": {
-        "JWT_role_based": "AuthProvider ABC + Session + provider registry + /api/auth/me",
-        "Cookie_yonetimi": "hermes_session_at + hermes_session_rt refresh token rotate"
-      }
-    },
-    "CLI_Handler_Ayristirma": {
-      "durum": "tamam",
-      "commit": "7267f552",
-      "maddeler": {
-        "83_handler_ayri_dosya": "session/system/tools/config/edit handlers/ -> 40 dosya"
-      }
-    },
-    "reyplugin_CLI": {
-      "durum": "tamam",
-      "commit": "700269d7",
-      "maddeler": {
-        "export_import": "_cmd_plugin() CLI + schema konsolidasyon"
-      }
+  "guncelleyen_bot": "ReYMeN_Hermes",
+  "toplam_ozellik": 17,
+  "tamam": 17,
+  "isleniyor": 0,
+  "son_commit": "44de838a ✨ Tamamen Eksik (10) — Hepsi tamam",
+  "bot_uyari": "TUM botlar bu dosyayi okur. TEK kaynak burasi.",
+  "onceki_eksikler": {
+    "toplam": 7,
+    "tamam": 7,
+    "commit": "6b3382cb",
+    "maddeler": {
+      "1_MCP_Client": {"durum": "tamam", "detay": "auto-discovery + reconnect + auto-start + test", "commit": "6b3382cb"},
+      "2_Plugin_Sistemi": {"durum": "tamam", "detay": "hot-reload CLI + ProviderPluginBase aktif", "commit": "6b3382cb"},
+      "3_Skills": {"durum": "tamam", "detay": "CLI fix + auto-activation + path temizligi 5972 skill", "commit": "6b3382cb"},
+      "4_Web_Search": {"durum": "tamam", "detay": "7 engine (DDG/Google/Bing/Firecrawl/Brave/SearXNG/Exa)", "commit": "6b3382cb"},
+      "5_Image_Gen": {"durum": "tamam", "detay": "FAL + OpenAI + xAI real API + /api/hermes/media/ JSON", "commit": "6b3382cb"},
+      "6_Browser": {"durum": "tamam", "detay": "Playwright MCP calisiyor + config + browser-use", "commit": "6b3382cb"},
+      "7_Security": {"durum": "tamam", "detay": "Network restriction (WFA/iptables/Docker) + sandbox", "commit": "6b3382cb"}
     }
   },
-  "aktif_gorev": "",
-  "son_commit": "44de838a ✨ Tamamen Eksik (10) — Hepsi tamam",
-  "bot_uyari": "TUM botlar bu dosyayi okur. TEK kaynak burasi."
+  "tamamen_eksik_10": {
+    "toplam": 10,
+    "tamam": 10,
+    "commit": "44de838a",
+    "maddeler": {
+      "1_Provider_Sistemi": {"durum": "tamam", "oncelik": "P0", "detay": "model_provider.py - 5 provider zinciri failover circuit breaker"},
+      "2_YAML_Config": {"durum": "tamam", "oncelik": "P0", "detay": "config_manager.py - katmanli oku + profil + env override"},
+      "3_Session_DB": {"durum": "tamam", "oncelik": "P1", "detay": "session_db.py - FTS5 + trigram arama"},
+      "4_Cron_Scheduler": {"durum": "tamam", "oncelik": "P1", "detay": "cron_manager.py - watchdog 10s + timeout + retry + override"},
+      "5_Gateway": {"durum": "tamam", "oncelik": "P1", "detay": "gateway_manager.py - Telegram + Discord + CLI ABC multi-platform"},
+      "6_Vector_Memory": {"durum": "tamam", "oncelik": "P2", "detay": "vector_memory.py - DeepSeek embedding + SQLite"},
+      "7_OAuth_2.0": {"durum": "tamam", "oncelik": "P2", "detay": "oauth_manager.py - Google + GitHub + Discord token refresh"},
+      "8_Delegation": {"durum": "tamam", "oncelik": "P2", "detay": "delegation_manager.py - TEK/PARALEL task decomposition"},
+      "9_Backup": {"durum": "tamam", "oncelik": "P2", "detay": "backup_manager.py - partial/ZIP/git auto-cleanup"},
+      "10_Guardrails": {"durum": "tamam", "oncelik": "P3", "detay": "guardrails_manager.py - jailbreak/PII/code exec detection"}
+    }
+  },
+  "ek_duzeltmeler": {
+    "maddeler": [
+      "Auth Hermes pattern: JWT + role bazli + provider registry + /api/auth/me (commit 9a76bbc4)",
+      "CLI Handler ayristirma: 83 handler -> 40 ayri dosya (commit 7267f552)",
+      "reyplugin CLI: export/import + schema konsolidasyon (commit 700269d7)",
+      "Browser sayfa_basligi fix: browser_get_title -> browser_snapshot",
+      "Image Gen REST API: /api/hermes/media/backends + /api/hermes/media/generate"
+    ]
+  }
 }
