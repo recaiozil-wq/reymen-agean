@@ -631,5 +631,25 @@ def sil(skill_id: str) -> bool:
     return get_library().sil(skill_id)
 
 
+def motor_kaydet(motor) -> None:
+    """Motor'a skill kutuphane araclarini kaydet."""
+    if hasattr(motor, "_plugin_arac_kaydet"):
+        motor._plugin_arac_kaydet(
+            "SKILL_SENKRONIZE",
+            lambda kaynak="": sync(kaynak) if kaynak else {"hata": "kaynak_dizin parametresi gerekli"},
+            "Skill dosyalarini kutuphaneye senkronize et. Parametre: kaynak_dizin",
+        )
+        motor._plugin_arac_kaydet(
+            "SKILL_ARA",
+            lambda sorgu="": ara(sorgu) if sorgu else [],
+            "Skill kutuphanesinde ara. Parametre: sorgu",
+        )
+        motor._plugin_arac_kaydet(
+            "SKILL_DURUM",
+            lambda: get_library().istatistik(),
+            "Skill kutuphane istatistikleri",
+        )
+
+
 # ── İlk kurulum ────────────────────────────────────────────────────────────
 _db_kur()

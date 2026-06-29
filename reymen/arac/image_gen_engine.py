@@ -431,7 +431,7 @@ def motor_kaydet(motor) -> None:
             "Varsayilan: FAL (FAL_KEY) > OpenAI (OPENAI_API_KEY) > xAI (XAI_API_KEY) > stub\n"
             "FAL: FAL_KEY ortam degiskeni gerekli.\n"
             "OpenAI: OPENAI_API_KEY gerekli.\n"
-            "xAI: XAI_API_KEY gerekli (henuz implementasyon eksik).\n"
+            "xAI: XAI_API_KEY gerekli (Grok-2-image ile gorsel uretir).\n"
             "Stub: API key gerekmez, simulasyon yapar.",
         )
         motor._plugin_arac_kaydet(

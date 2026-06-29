@@ -338,9 +338,7 @@ class Motor:
             "reymen.sistem.schema_manager",
             # Docker Sandbox + Threat Detection
             "reymen.guvenlik.docker_sandbox",
-            # Browser Engine (Playwright MCP + Browser Use)
-            "reymen.arac.browser_engine",
-            # Web aramasi
+            # Web aramasi (eski, web_search_engine ile degistirilecek)
             "reymen.arac.web_search_tool",
             # Web Search Engine (coklu back-end)
             "reymen.arac.web_search_engine",
@@ -348,6 +346,12 @@ class Motor:
             "reymen.arac.image_gen_engine",
             # Browser Automation Engine (PlaywrightMCP/BrowserUse)
             "reymen.arac.browser_engine",
+            # Network Restriction (Windows Firewall + iptables + Docker)
+            "reymen.guvenlik.network_restriction",
+            # Skill Library (SQLite kutuphane + FTS5)
+            "reymen.cereyan.skill_library",
+            # Skill Activator (sorgudan otomatik aktivasyon)
+            "reymen.cereyan.skill_activator",
             # Personality (kisilik sistemi)
             "agent.personalities",
             # Kapali Ogrenme Dongusu

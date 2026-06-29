@@ -85,3 +85,20 @@
 - Alembic: ikiz modul sorunu + migration uygulanmamisti
 
 **Karar:** Kabul. Commit 700269d7.
+
+## Karar #45 — Kısmen Var (7) Tamam
+
+**Ne yapildi:** 7 kismen var ozelligin eksik kisimlari dolduruldu.
+
+**Neden:** Kullanici backlog'da 7 ozelligi "kismen var" olarak isaretlemisti.
+
+**Yapilanlar:**
+1. MCP: auto-discovery (config+.env) + reconnect heartbeat (375s)
+2. Plugin: hot-reload (importlib) + provider plugin kavrami
+3. Skills: SQLite kutuphane (290s) + otomatik aktivasyon (sorgudan_aktif_et, 220s)
+4. Web Search: multi-backend ABC (DDG/Google/Bing) - 381s
+5. Image Gen: multi-backend ABC (FAL/OpenAI/xAI/Stub) - 437s
+6. Browser: multi-backend ABC (Playwright MCP/Browser Use) - 562s
+7. Security: network restriction (938s) + Docker sandbox entegrasyonu
+
+**Commit:** (son commit)

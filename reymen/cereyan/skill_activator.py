@@ -568,3 +568,23 @@ def durum() -> list[dict[str, Any]]:
 def sorgu_tahmin(sorgu: str, limit: int = 5) -> list[dict[str, Any]]:
     """Sorgu tahmini (kolay kullanım)."""
     return get_activator().sorgu_tahmin(sorgu, limit)
+
+
+def motor_kaydet(motor) -> None:
+    """Motor'a skill aktivasyon araclarini kaydet."""
+    if hasattr(motor, "_plugin_arac_kaydet"):
+        motor._plugin_arac_kaydet(
+            "SKILL_AKTIF_ET",
+            lambda sorgu="": sorgudan_aktif_et(sorgu) if sorgu else [],
+            "Sorguya gore skill'leri otomatik aktif et. Parametre: sorgu",
+        )
+        motor._plugin_arac_kaydet(
+            "SKILL_AKTIF_DURUM",
+            lambda: durum(),
+            "Aktif skill listesi",
+        )
+        motor._plugin_arac_kaydet(
+            "SKILL_PASIF_YAP",
+            lambda skill_id="": devre_disina_al(skill_id) if skill_id else False,
+            "Skill'i devre disi birak. Parametre: skill_id",
+        )
