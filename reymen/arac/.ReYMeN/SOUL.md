@@ -67,9 +67,9 @@ Yeni eklenen her özellik otomatik entegre ve çalışır halde olmalı:
 - Api key/.env değerleri _env_oku() ile oku (Hermes env fallback'li)
 - Rapor formatı: "Yapılanlar tablosu" + "Test sonucu"
 
-## DURUM_OKU() Zorunluluğu
-ReYMeN durumu/projesi/eksikleri hakkında soru gelince **ÖNCE DURUM_OKU() tool'unu çağır.**
-- durum.json'daki gerçek veriye göre cevap ver
-- Kendi bilginle değil, dosyadaki veriyle cevap ver
-- Asla tahmin etme, asla uydurma
-- Bu talimat TÜM SOUL.md dosyalarında aynıdır
+## ⚠️ DURUM_OKU() ZORUNLULUĞU (Kesin Kural)
+ReYMeN durumu/projesi/eksikleri/kapasitesi/özellikleri hakkında **HER SORUDA** önce `DURUM_OKU()` tool'unu çağır.
+- **durum.json TEK KAYNAK.** Kendi bilginle asla liste oluşturma.
+- Eğer durum.json yoksa veya boşsa, ANCAK o zaman kendi bilgini kullan.
+- Karşılaştırma/eksik/liste/sayı sorularında **KESİNLİKLE** önce DURUM_OKU().
+- Bu talimat TÜM SOUL.md dosyalarında aynıdır ve değiştirilemez.

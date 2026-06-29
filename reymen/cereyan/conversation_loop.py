@@ -92,7 +92,7 @@ except ImportError:
 # destekliyorsa True doner. Ayrica ``agent._use_prompt_caching`` da dikkate
 # alinir (Anthropic / OpenRouter / DeepSeek / OpenAI).
 try:
-    from agent.prompt_caching import _prompt_caching_ekle, caching_aktif_mi
+    from reymen.arac.prompt_caching import _prompt_caching_ekle, caching_aktif_mi
     # _CACHING_AKTIF artik dinamik: provider'a gore hesaplanir.
     # Dogrudan kullanim yerine caching_aktif_mi() fonksiyonu tercih edilir.
     _CACHING_AKTIF = None  # None = "provider'a bak" anlaminda
@@ -103,7 +103,7 @@ except ImportError:
 
 # Geriye uyumluluk: eski import hala calissin
 try:
-    from agent.prompt_caching import apply_anthropic_cache_control as _apply_anthropic_cache_control
+    from reymen.arac.prompt_caching import apply_anthropic_cache_control as _apply_anthropic_cache_control
 except ImportError:
     _apply_anthropic_cache_control = None
 
@@ -2524,6 +2524,33 @@ def run(**kwargs: Any) -> str:
             {"durum": "hazir", "mesaj": f"{islem} test"},
             ensure_ascii=False,
         )
+
+
+# ── Motor entegrasyonu ────────────────────────────────────────────────────────
+def motor_kaydet(motor) -> None:
+    """ConversationLoop'u motor'a tool olarak kaydet."""
+    try:
+        def _konusma_baslat(hedef: str, provider: str = "deepseek") -> str:
+            """ConversationLoop ile bir konusma baslat."""
+            from reymen.cereyan.conversation_loop import ConversationLoop as _CL
+            try:
+                cl = _CL(motor=motor, max_tur=5)
+                sonuc = cl.run_conversation(hedef=hedef, provider=provider)
+                if sonuc.get("basarili"):
+                    return sonuc.get("yanit") or sonuc.get("sonuc", "")
+                return "HATA: " + str(sonuc.get('hata', 'Bilinmeyen hata'))
+            except Exception as e:
+                return "HATA: " + str(e)
+
+        motor._plugin_arac_kaydet(
+            "CONVERSATION_SOR",
+            _konusma_baslat,
+            "ConversationLoop ile kullanici sorusunu 5 kaynakli ensemble ile yanitla. "
+            "Parametre: hedef (soru metni), provider (deepseek/xiaomi/xai/openrouter/...). "
+            "OnceHafiza + web arama + cache + DeepSeek karsilastirmasi yapar."
+        )
+    except Exception:
+        pass
 
 
 if __name__ == "__main__":

@@ -163,6 +163,12 @@ _API_KONTROL_ENDPOINTS = [
     ("xiaomi",     "https://api.xiaomimimo.com/v1/models",       "XIAOMI_API_KEY"),
     ("xai",        "https://api.x.ai/v1/models",              "XAI_API_KEY"),
     ("openrouter", "https://openrouter.ai/api/v1/auth/key",   "OPENROUTER_API_KEY"),
+    # ── Yeni sağlayıcılar ─────────────────────────────────────────────
+    ("together",   "https://api.together.xyz/v1/models",      "TOGETHER_API_KEY"),
+    ("fireworks",  "https://api.fireworks.ai/v1/models",      "FIREWORKS_API_KEY"),
+    ("mistral",    "https://api.mistral.ai/v1/models",        "MISTRAL_API_KEY"),
+    ("cohere",     "https://api.cohere.ai/v1/models",         "COHERE_API_KEY"),
+    ("perplexity", "https://api.perplexity.ai/v1/models",     "PERPLEXITY_API_KEY"),
 ]
 
 def _tek_kontrol(prov, url, env_var, sonuclar, kilid):
@@ -458,10 +464,11 @@ def _sistem_prompu_al() -> str:
     return (
         "Sen ReYMeN adinda yardimsever bir AI asistanisin. "
         "Kisa ve oz cevap ver. Turkce konus.\\n\\n"
-        "## DURUM_OKU() ZORUNLU TALIMAT\\n"
+        "## \u26a0\ufe0f DURUM_OKU() ZORUNLU TALIMAT\\n"
         "ReYMeN durumu/projesi/eksikleri/kapasitesi hakkinda soru gelince "
         "KESINLIKLE ONCE DOGRUDAN DURUM_OKU() tool'unu cagir. "
         "Kendi bilginle asla liste olusturma. durum.json TEK KAYNAK.\\n"
+        "Karsilastirma/eksik/liste/sayi sorularinda ONCE DURUM_OKU().\\n"
         + (f"\\n## SOUL.md\\n{soul[:2000]}\\n" if soul else "")
     )
 

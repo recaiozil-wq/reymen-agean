@@ -33,7 +33,11 @@ log = logging.getLogger(__name__)
 # Sabitler
 # ═══════════════════════════════════════════════════════════════════════════════
 
-_FAL_RUN_URL = "https://api.fal.ai/v1/run/comfyhub/flux-1-1-pro"
+# Modern FAL.ai endpoint — https://fal.run/<model_id>
+# See https://fal.ai/docs for available models (flux-1-1-pro, flux-2-pro, flux-2/klein/9b, …)
+_FAL_RUN_URL = "https://fal.run/fal-ai/flux-1-1-pro"
+_FAL_RUN_PRO_URL = "https://fal.run/fal-ai/flux-2-pro"
+_FAL_RUN_KLEIN_URL = "https://fal.run/fal-ai/flux-2/klein/9b"
 _OPENAI_IMAGE_URL = "https://api.openai.com/v1/images/generations"
 _XAI_IMAGE_URL = "https://api.x.ai/v1/images/generations"
 _USER_AGENT = "ReYMeN-Ajan/1.0"
@@ -101,6 +105,25 @@ class FALEngine(ImageGenEngine):
             api_key = os.environ.get("FAL_API_KEY", "").strip()
         return bool(api_key)
 
+    def _get_fal_model_url(self) -> str:
+        """FAL model URL'sini environment/config'dan belirle.
+
+        Sıra: FAL_MODEL env > FAL_IMAGE_MODEL env > varsayılan flux-1-1-pro.
+        """
+        model = os.environ.get("FAL_MODEL", "").strip()
+        if not model:
+            model = os.environ.get("FAL_IMAGE_MODEL", "").strip()
+        if model:
+            return f"https://fal.run/{model.lstrip('/')}"
+        return _FAL_RUN_URL
+
+    def _get_fal_model_name(self) -> str:
+        """Kullanılan model adını döndür (log/teşhis için)."""
+        model = os.environ.get("FAL_MODEL", "").strip()
+        if not model:
+            model = os.environ.get("FAL_IMAGE_MODEL", "").strip()
+        return model or "fal-ai/flux-1-1-pro"
+
     def calistir(self, prompt: str, en: str = "1024", boy: str = "1024") -> str:
         api_key = os.environ.get("FAL_KEY", "").strip()
         if not api_key:
@@ -113,9 +136,12 @@ class FALEngine(ImageGenEngine):
         except (TypeError, ValueError):
             en_i, boy_i = 1024, 1024
 
+        model_url = self._get_fal_model_url()
+        model_name = self._get_fal_model_name()
+
         try:
             sonuc = self._http_post_json(
-                _FAL_RUN_URL,
+                model_url,
                 {"prompt": prompt.strip(), "image_size": {"width": en_i, "height": boy_i}},
                 headers={"Authorization": f"Key {api_key}"},
                 timeout=90,
@@ -127,10 +153,15 @@ class FALEngine(ImageGenEngine):
                 url = sonuc["image"].get("url")
             elif isinstance(sonuc.get("image"), str):
                 url = sonuc["image"]
+            elif isinstance(sonuc.get("output"), dict):
+                # FLUX.1 dev/general modellerde output dict icinde olabilir
+                output = sonuc["output"]
+                if isinstance(output, list) and output:
+                    url = output[0] if isinstance(output[0], str) else None
 
             if not url:
                 return f"[RESIM_OLUSTUR/FAL] Hata: beklenmeyen cevap: {json.dumps(sonuc)[:300]}"
-            return self._media("image", url, f"Prompt: {prompt.strip()} [FAL]")
+            return self._media("image", url, f"Prompt: {prompt.strip()} [FAL: {model_name}]")
 
         except Exception as e:
             log.exception("[FALEngine] FAL API hatasi:")
@@ -211,7 +242,7 @@ class xAIEngine(ImageGenEngine):
 
     xAI görsel üretim API'sini kullanır (OpenAI DALL-E ile benzer formatta).
     Endpoint: https://api.x.ai/v1/images/generations
-    Model: grok-2-image
+    Model: grok-imagine-image (varsayılan) veya grok-imagine-image-quality
     Desteklenen boyutlar: 1024x1024, 1024x1792, 1792x1024
     """
 
@@ -234,10 +265,21 @@ class xAIEngine(ImageGenEngine):
             size = "1024x1024"
 
         try:
+            # xAI model — FAL_MODEL tarzi env ile model secimi destegi
+            model = os.environ.get("XAI_MODEL", "").strip()
+            if not model:
+                model = os.environ.get("XAI_IMAGE_MODEL", "").strip()
+            if not model:
+                model = "grok-imagine-image"
+
+            valid_models = {"grok-imagine-image", "grok-imagine-image-quality", "grok-2-image"}
+            if model not in valid_models:
+                model = "grok-imagine-image"
+
             sonuc = self._http_post_json(
                 _XAI_IMAGE_URL,
                 {
-                    "model": "grok-2-image",
+                    "model": model,
                     "prompt": prompt.strip(),
                     "n": 1,
                     "size": size,
@@ -431,7 +473,7 @@ def motor_kaydet(motor) -> None:
             "Varsayilan: FAL (FAL_KEY) > OpenAI (OPENAI_API_KEY) > xAI (XAI_API_KEY) > stub\n"
             "FAL: FAL_KEY ortam degiskeni gerekli.\n"
             "OpenAI: OPENAI_API_KEY gerekli.\n"
-            "xAI: XAI_API_KEY gerekli (Grok-2-image ile gorsel uretir).\n"
+            "xAI: XAI_API_KEY gerekli (Grok-imagine-image ile gorsel uretir).\n"
             "Stub: API key gerekmez, simulasyon yapar.",
         )
         motor._plugin_arac_kaydet(

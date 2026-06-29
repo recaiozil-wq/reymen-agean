@@ -655,11 +655,28 @@ class TestSabitler:
         assert "openai" in _VARSAYILAN_MODELLER
         assert "anthropic" in _VARSAYILAN_MODELLER
         assert _VARSAYILAN_MODELLER["deepseek"] == "deepseek-chat"
+        # ── Yeni sağlayıcı varsayılan modelleri ──
+        assert "together" in _VARSAYILAN_MODELLER
+        assert "fireworks" in _VARSAYILAN_MODELLER
+        assert "mistral" in _VARSAYILAN_MODELLER
+        assert "cohere" in _VARSAYILAN_MODELLER
+        assert "perplexity" in _VARSAYILAN_MODELLER
+        assert _VARSAYILAN_MODELLER["together"] == "mistralai/Mixtral-8x7B-Instruct-v0.1"
+        assert _VARSAYILAN_MODELLER["fireworks"] == "accounts/fireworks/models/llama-v3p1-8b-instruct"
+        assert _VARSAYILAN_MODELLER["mistral"] == "mistral-small-latest"
+        assert _VARSAYILAN_MODELLER["cohere"] == "command-r-plus"
+        assert _VARSAYILAN_MODELLER["perplexity"] == "llama-3.1-sonar-small-128k-online"
 
     def test_provider_env(self):
         assert _PROVIDER_ENV["deepseek"] == "DEEPSEEK_API_KEY"
         assert _PROVIDER_ENV["openai"] == "OPENAI_API_KEY"
         assert _PROVIDER_ENV["groq"] == "GROQ_API_KEY"
+        # ── Yeni sağlayıcı env değişkenleri ──
+        assert _PROVIDER_ENV["together"] == "TOGETHER_API_KEY"
+        assert _PROVIDER_ENV["fireworks"] == "FIREWORKS_API_KEY"
+        assert _PROVIDER_ENV["mistral"] == "MISTRAL_API_KEY"
+        assert _PROVIDER_ENV["cohere"] == "COHERE_API_KEY"
+        assert _PROVIDER_ENV["perplexity"] == "PERPLEXITY_API_KEY"
 
     def test_timeout_sabiti(self):
         assert TIMEOUT_SANIYE == 300
@@ -853,3 +870,149 @@ class TestCagirBedrock:
             beyin = Beyin(cfg)
             with pytest.raises(RuntimeError, match="bedrock_adapter"):
                 beyin._cagir_bedrock("model", "sistem", [])
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# Yeni Provider Testleri (61-70)
+# ══════════════════════════════════════════════════════════════════════════
+
+class TestYeniProviderlar:
+    """together, fireworks, mistral, cohere, perplexity — OpenAI-uyumlu dispatch."""
+
+    def test_together_dispatch(self, minimal_config):
+        """Together AI dispatch _cagir_openai_uyumlu'ya yönlenmeli."""
+        with patch.object(Beyin, "_cagir_openai_uyumlu", return_value="together yanıtı"):
+            cfg = {
+                "default_provider": "together",
+                "providers": {
+                    "together": {"base_url": "https://api.together.xyz", "api_key": "sk-tog-test"},
+                },
+            }
+            beyin = Beyin(cfg)
+            adim = SaglayCiAdim("together", "mistralai/Mixtral-8x7B-Instruct-v0.1",
+                                "https://api.together.xyz", "sk-tog-test")
+            meta = beyin._cagir(adim, "sistem", [{"role": "user", "content": "merhaba"}])
+            assert meta.metin == "together yanıtı"
+            assert meta.provider == "together"
+
+    def test_fireworks_dispatch(self, minimal_config):
+        """Fireworks AI dispatch _cagir_openai_uyumlu'ya yönlenmeli."""
+        with patch.object(Beyin, "_cagir_openai_uyumlu", return_value="fireworks yanıtı"):
+            cfg = {
+                "default_provider": "fireworks",
+                "providers": {
+                    "fireworks": {"base_url": "https://api.fireworks.ai", "api_key": "sk-fw-test"},
+                },
+            }
+            beyin = Beyin(cfg)
+            adim = SaglayCiAdim("fireworks", "accounts/fireworks/models/llama-v3p1-8b-instruct",
+                                "https://api.fireworks.ai", "sk-fw-test")
+            meta = beyin._cagir(adim, "sistem", [{"role": "user", "content": "merhaba"}])
+            assert meta.metin == "fireworks yanıtı"
+            assert meta.provider == "fireworks"
+
+    def test_mistral_dispatch(self, minimal_config):
+        """Mistral AI dispatch _cagir_openai_uyumlu'ya yönlenmeli."""
+        with patch.object(Beyin, "_cagir_openai_uyumlu", return_value="mistral yanıtı"):
+            cfg = {
+                "default_provider": "mistral",
+                "providers": {
+                    "mistral": {"base_url": "https://api.mistral.ai", "api_key": "sk-mist-test"},
+                },
+            }
+            beyin = Beyin(cfg)
+            adim = SaglayCiAdim("mistral", "mistral-small-latest",
+                                "https://api.mistral.ai", "sk-mist-test")
+            meta = beyin._cagir(adim, "sistem", [{"role": "user", "content": "merhaba"}])
+            assert meta.metin == "mistral yanıtı"
+            assert meta.provider == "mistral"
+
+    def test_cohere_dispatch(self, minimal_config):
+        """Cohere dispatch _cagir_openai_uyumlu'ya yönlenmeli."""
+        with patch.object(Beyin, "_cagir_openai_uyumlu", return_value="cohere yanıtı"):
+            cfg = {
+                "default_provider": "cohere",
+                "providers": {
+                    "cohere": {"base_url": "https://api.cohere.ai", "api_key": "sk-coh-test"},
+                },
+            }
+            beyin = Beyin(cfg)
+            adim = SaglayCiAdim("cohere", "command-r-plus",
+                                "https://api.cohere.ai", "sk-coh-test")
+            meta = beyin._cagir(adim, "sistem", [{"role": "user", "content": "merhaba"}])
+            assert meta.metin == "cohere yanıtı"
+            assert meta.provider == "cohere"
+
+    def test_perplexity_dispatch(self, minimal_config):
+        """Perplexity dispatch _cagir_openai_uyumlu'ya yönlenmeli."""
+        with patch.object(Beyin, "_cagir_openai_uyumlu", return_value="perplexity yanıtı"):
+            cfg = {
+                "default_provider": "perplexity",
+                "providers": {
+                    "perplexity": {"base_url": "https://api.perplexity.ai", "api_key": "sk-pplx-test"},
+                },
+            }
+            beyin = Beyin(cfg)
+            adim = SaglayCiAdim("perplexity", "llama-3.1-sonar-small-128k-online",
+                                "https://api.perplexity.ai", "sk-pplx-test")
+            meta = beyin._cagir(adim, "sistem", [{"role": "user", "content": "merhaba"}])
+            assert meta.metin == "perplexity yanıtı"
+            assert meta.provider == "perplexity"
+
+    def test_yeni_provider_fallback_zinciri_calismasi(self):
+        """Yeni provider'lar fallback zincirinde düzgün sıralanmalı."""
+        cfg = {
+            "default_provider": "together",
+            "default_model": "test-model",
+            "providers": {
+                "together":   {"base_url": "https://api.together.xyz",   "api_key": "sk-tog-test"},
+                "fireworks":  {"base_url": "https://api.fireworks.ai",  "api_key": "sk-fw-test"},
+                "mistral":    {"base_url": "https://api.mistral.ai",    "api_key": "sk-mist-test"},
+                "cohere":     {"base_url": "https://api.cohere.ai",     "api_key": "sk-coh-test"},
+                "perplexity": {"base_url": "https://api.perplexity.ai", "api_key": "sk-pplx-test"},
+            },
+            "fallback_model": None,
+        }
+        beyin = Beyin(cfg)
+        prov_adlari = [a.provider for a in beyin._fallback_zinciri]
+        assert "together" in prov_adlari
+        assert "fireworks" in prov_adlari
+        assert "mistral" in prov_adlari
+        assert "cohere" in prov_adlari
+        assert "perplexity" in prov_adlari
+        # together birincil olmalı
+        assert prov_adlari[0] == "together"
+
+    def test_yeni_provider_env_anahtari(self):
+        """Yeni provider'lar env'den anahtar okuyabilmeli."""
+        with patch.dict(os.environ, {
+            "TOGETHER_API_KEY": "sk-tog-env",
+            "FIREWORKS_API_KEY": "sk-fw-env",
+            "MISTRAL_API_KEY": "sk-mist-env",
+            "COHERE_API_KEY": "sk-coh-env",
+            "PERPLEXITY_API_KEY": "sk-pplx-env",
+        }, clear=False):
+            cfg = {
+                "default_provider": "together",
+                "providers": {
+                    "together":   {"base_url": "https://api.together.xyz",   "api_key": ""},
+                    "fireworks":  {"base_url": "https://api.fireworks.ai",  "api_key": ""},
+                    "mistral":    {"base_url": "https://api.mistral.ai",    "api_key": ""},
+                    "cohere":     {"base_url": "https://api.cohere.ai",     "api_key": ""},
+                    "perplexity": {"base_url": "https://api.perplexity.ai", "api_key": ""},
+                },
+            }
+            beyin = Beyin(cfg)
+            assert beyin._anahtar_bul("together",   {"api_key": ""}) == "sk-tog-env"
+            assert beyin._anahtar_bul("fireworks",  {"api_key": ""}) == "sk-fw-env"
+            assert beyin._anahtar_bul("mistral",    {"api_key": ""}) == "sk-mist-env"
+            assert beyin._anahtar_bul("cohere",     {"api_key": ""}) == "sk-coh-env"
+            assert beyin._anahtar_bul("perplexity", {"api_key": ""}) == "sk-pplx-env"
+
+    def test_yeni_provider_varsayilan_model(self):
+        """Yeni provider'ların varsayılan modelleri doğru atanmalı."""
+        assert Beyin._varsayilan_model(None, "together") == "mistralai/Mixtral-8x7B-Instruct-v0.1"
+        assert Beyin._varsayilan_model(None, "fireworks") == "accounts/fireworks/models/llama-v3p1-8b-instruct"
+        assert Beyin._varsayilan_model(None, "mistral") == "mistral-small-latest"
+        assert Beyin._varsayilan_model(None, "cohere") == "command-r-plus"
+        assert Beyin._varsayilan_model(None, "perplexity") == "llama-3.1-sonar-small-128k-online"

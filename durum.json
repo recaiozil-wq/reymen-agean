@@ -17,7 +17,7 @@
   },
   "5_Image_Gen": {
     "durum": "tamam",
-    "detay": "FAL + OpenAI + xAI + /api/hermes/media/"
+    "detay": "FAL + OpenAI + xAI + Stub (onarildi ✅) — 3 engine, Registry, tool arayuzu"
   },
   "6_Browser": {
     "durum": "tamam",
@@ -32,16 +32,29 @@
     "detay": "watchdog + polling fallback + 4 motor araci"
   },
   "hermes_karsilastirma": {
-    "toplam_ozellik": 22,
-    "tamam": 22,
-    "eksik": 0,
+    "toplam_ozellik": 25,
+    "tamam": 24,
+    "eksik": 1,
     "aciklama": "Hermes Agent ile ReYMeN arasinda feature-level karsilastirma. Sadece Open Source Community (diger gelistiriciler) kodla cozulemez.",
+    "uyari": "Pasa_38 bot durum.json OKUMAZ — kendi bildigini soyler. SOUL.md'ye DURUM_OKU() talimati eklendi.",
     "detaylar": {
+      "auto_discover": {
+        "durum": "tamam",
+        "not": "config.yaml + .env + ~/.hermes/profiles/reymen/config.yaml'dan 3 kaynakli otomatik MCP kesfi. 5 sunucu test edildi.",
+        "onceki": "Sadece config.yaml",
+        "yeni": "3 kaynak + env var desenleri (MCP_*, MCP_SERVER_*, MCP_SUNUCU_*)"
+      },
+      "provider_sayisi": {
+        "durum": "tamam",
+        "not": "5 yeni provider: together.ai, fireworks.ai, mistral.ai, cohere.ai, perplexity.ai. 11 test eklendi.",
+        "onceki": "5 provider",
+        "yeni": "10 provider (deepseek, lmstudio, xiaomi, xai, openrouter, groq, anthropic, openai + 5 yeni)"
+      },
       "multi_platform_gateway": {
         "durum": "tamam",
-        "not": "Bilerek sadece Telegram — diger platformlara ihtiyac yok",
-        "hermes": "15+ platform",
-        "reymen": "Telegram"
+        "not": "Discord bot eklendi — ConversationLoop + Beyin + Motor ile ayni pipeline. REST v10 API.",
+        "onceki": "Sadece Telegram",
+        "yeni": "Telegram + Discord"
       },
       "plugin_sistemi": {
         "durum": "tamam",
@@ -192,8 +205,46 @@
     },
     "son_guncelleme": "2026-06-29T14:12:01.364621"
   },
-  "son_guncelleme": "2026-06-29 14:35",
-  "guncelleyen_bot": "system",
+  "self_improve": {
+    "son_dongu": "2026-06-29T16:49:38",
+    "durum": "tamam",
+    "ortalama_skor_7gun": 0.921,
+    "gecme_orani_7gun": 1.0,
+    "toplam_adim_7gun": 12,
+    "not_dagilimi_7gun": {
+      "A": 7,
+      "B": 5
+    },
+    "aktif_hedef": null,
+    "hedef_sayisi": 0,
+    "haftalik_ilerleme": {
+      "22.06": {
+        "ortalama": 0.888,
+        "adim": 13
+      },
+      "15.06": {
+        "ortalama": 0.0,
+        "adim": 0
+      }
+    },
+    "proje_kod_kalitesi": {
+      "reymen_dosya": 739,
+      "reymen_satir": 228470,
+      "reymen_test_dosyasi": 124,
+      "reymen_test_orani": 0.106,
+      "sinif": 789,
+      "fonksiyon": 8802,
+      "except_pass": 235,
+      "todo": 16,
+      "fixme": 2
+    },
+    "uyarilar": [
+      "[BUG] kod_kalite_analizi() 6804 dosya taradi — venv/bot_venv/hermes-memory-backup filtrasyonu yetersiz. EXCLUDE setine 'bot_venv', 'hermes-memory-backup', '_claude_multi_output', '.yedek' eklenmeli.",
+      "[ENHANCE] kod_kalite_analizi QualityMetric mapping: errors=except_pass//10, retries=fixme sayisi. Bu yanlis pozitif F notuna sebep oluyor. errors ve retries kod kalitesinden bagimsiz ayri metrik olmali."
+    ]
+  },
+  "son_guncelleme": "2026-06-29 17:00",
+  "guncelleyen_bot": "hermes_agent",
   "coverage_durumu": {
     "genel": {
       "once": "%43.50",
@@ -374,13 +425,45 @@
     }
   },
   "motor_entegrasyon": {
-    "toplam_py": 673,
-    "motor_kaydet_olan": 85,
-    "motor_kayitli": 95,
+    "toplam_py": 741,
+    "motor_kaydet_olan": 88,
+    "motor_kayitli": 255,
     "motor_kayitli_once": 43,
-    "yeni_eklenen": 52,
+    "yeni_eklenen": 57,
     "hepsi_sorunsuz_import": true,
-    "motor_merkez_mi": "Evet — 95 modul import edip motor_kaydet() cagiriyor. Geri kalan 578 dosya yardimci/test/utility.",
-    "son_guncelleme": "2026-06-29 14:35"
-  }
+    "motor_merkez_mi": "Evet — 98 modul import edip motor_kaydet() cagiriyor. Yeni: auto-discover, 5 provider, discord bot.",
+    "son_guncelleme": "2026-06-29 17:00"
+  },
+  "9_Voice_TTS": {
+    "durum": "tamam",
+    "detay": "OpenAI TTS + Edge TTS + Whisper STT + Stub — voice_engine.py (694 satir), tool arayuzu, skill wrapper"
+  },
+  "yeni_eklenenler": {
+    "image_gen_engine": {
+      "durum": "tamam",
+      "detay": "FAL (FLUX) + OpenAI (DALL-E) + xAI (Grok) + Stub. 3 endpoint guncellendi. Registry singleton.",
+      "tarih": "2026-06-29"
+    },
+    "voice_engine": {
+      "durum": "tamam",
+      "detay": "OpenAI TTS (tts-1) + Edge TTS (tr-TR-AhmetNeural) + Whisper STT. 694 satir, 5 engine.",
+      "tarih": "2026-06-29"
+    },
+    "turn_context": {
+      "durum": "tamam",
+      "detay": "TurnYoneticisi + TurnContext + TurnKarari. Kirik import fix.",
+      "tarih": "2026-06-29"
+    },
+    "turn_retry_state": {
+      "durum": "tamam",
+      "detay": "TurnRetryState dataclass. Kirik import fix.",
+      "tarih": "2026-06-29"
+    },
+    "prompt_caching_fix": {
+      "durum": "tamam",
+      "detay": "agent.prompt_caching -> reymen.arac.prompt_caching yonlendirmesi.",
+      "tarih": "2026-06-29"
+    }
+  },
+  "uyari": "Bu dosya TEK KAYNAK. Botlar DURUM_OKU() ile burayi okumali."
 }

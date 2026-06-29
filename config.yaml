@@ -139,6 +139,37 @@ providers:
     priority: 8
     api_key: ""
 
+  # ── Yeni OpenAI-uyumlu sağlayıcılar ─────────────────────────────────
+  together:
+    base_url: "https://api.together.xyz"
+    api_key_env: "TOGETHER_API_KEY"
+    priority: 9
+    api_key: ""
+
+  fireworks:
+    base_url: "https://api.fireworks.ai"
+    api_key_env: "FIREWORKS_API_KEY"
+    priority: 10
+    api_key: ""
+
+  mistral:
+    base_url: "https://api.mistral.ai"
+    api_key_env: "MISTRAL_API_KEY"
+    priority: 11
+    api_key: ""
+
+  cohere:
+    base_url: "https://api.cohere.ai"
+    api_key_env: "COHERE_API_KEY"
+    priority: 12
+    api_key: ""
+
+  perplexity:
+    base_url: "https://api.perplexity.ai"
+    api_key_env: "PERPLEXITY_API_KEY"
+    priority: 13
+    api_key: ""
+
 # ── Fallback Model (ana model başarısız olursa) ──────────────────────────────
 fallback_model:
   provider: "deepseek"
@@ -198,6 +229,24 @@ model_providers:
   local-model:              "lmstudio"
   # Amazon Bedrock
   bedrock/claude:           "bedrock"
+  # Together AI
+  together/mixtral:         "together"
+  together/llama:           "together"
+  together/deepseek:        "together"
+  # Fireworks AI
+  fireworks/llama:          "fireworks"
+  fireworks/mixtral:        "fireworks"
+  fireworks/deepseek:       "fireworks"
+  # Mistral AI
+  mistral-small:            "mistral"
+  mistral-medium:           "mistral"
+  mistral-large:            "mistral"
+  # Cohere
+  cohere/command-r:         "cohere"
+  cohere/command-r-plus:    "cohere"
+  # Perplexity AI
+  perplexity/sonar:         "perplexity"
+  perplexity/sonar-pro:     "perplexity"
 
 # ── Failover Zinciri (öncelik sırası) ────────────────────────────────────────
 # Her grup aynı öncelik seviyesindeki provider'ları temsil eder.
@@ -205,8 +254,10 @@ model_providers:
 failover_zinciri:
   - ["deepseek", "openrouter"]           # 1. tercih: ana API'ler
   - ["openai", "anthropic"]              # 2. tercih: alternatif API'ler
-  - ["groq", "gemini"]                   # 3. tercih: son çare
-  - ["lmstudio"]                         # 4. tercih: yerel (son çare)
+  - ["together", "mistral", "fireworks"] # 3. tercih: yeni nesil API'ler
+  - ["cohere", "perplexity"]             # 4. tercih: niş API'ler
+  - ["groq", "gemini"]                   # 5. tercih: son çare
+  - ["lmstudio"]                         # 6. tercih: yerel (son çare)
 
 # ── Telegram ─────────────────────────────────────────────────────────────────
 telegram:

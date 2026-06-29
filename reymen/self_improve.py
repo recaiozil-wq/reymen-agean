@@ -510,7 +510,9 @@ def kod_kalite_analizi(proje_yolu: str | None = None) -> dict[str, Any]:
 
     # Gizli, __pycache__, venv klasörlerini atla
     EXCLUDE = {".git", "__pycache__", ".venv", "venv", ".env",
-               "node_modules", ".ReYMeN", ".cron_logs", ".alt_ajan_gozlem"}
+               "node_modules", ".ReYMeN", ".cron_logs", ".alt_ajan_gozlem",
+               "bot_venv", "hermes-memory-backup", "_claude_multi_output",
+               ".yedek", "Lib", "site-packages"}
     py_dosyalari = [
         p for p in py_dosyalari
         if not any(part.startswith(".") or part in EXCLUDE

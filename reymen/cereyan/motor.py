@@ -553,6 +553,8 @@ class Motor:
             "reymen.mcp.mcp_discovery",
             "reymen.mcp.mcp_reconnect",
             "reymen.mcp.mcp_tool",
+            # ConversationLoop (CONVERSATION_SOR tool)
+            "reymen.cereyan.conversation_loop",
             "reymen.web_ui",
             "reymen.windows.tor_otomasyonu",
         ]

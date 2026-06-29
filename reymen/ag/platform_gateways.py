@@ -262,42 +262,30 @@ class WebGateway(GatewayBase):
 
 class DiscordGateway(GatewayBase):
     """
-    Discord platform gateway'i (hazirlik asamasinda).
+    Discord platform gateway'i — REST API uzerinden mesaj gonderimi.
 
-    Su an stub durumda. discord.py entegrasyonu icin
-    hazir bir cerceve saglar.
+    discord.py ile bagimsiz calisir.
+    Mesaj gondermek icin REST API kullanir (bot process'inden bagimsiz).
     """
 
     def __init__(self, config: Optional[Dict[str, Any]] = None):
         super().__init__("discord", config)
-        self._client = None
         self._token: Optional[str] = None
         self._gelen_kuyruk: asyncio.Queue = asyncio.Queue()
 
     async def connect(self) -> bool:
-        """Discord API'sine baglan."""
+        """Discord API'sine baglan (token dogrulama)."""
         try:
             token = self._config.get("token") or os.getenv("DISCORD_BOT_TOKEN", "")
-            if not token:
-                self._son_hata = "DISCORD_BOT_TOKEN bulunamadi"
+            if not token or token in ("", "YOUR_DISCORD_BOT_TOKEN_HERE"):
+                self._son_hata = "DISCORD_BOT_TOKEN gecerli degil"
                 logger.warning(f"[DiscordGateway] {self._son_hata}")
-                # Stub mod: token olmadan da bagli say
-                self._bagli = True
-                return True
+                self._bagli = False
+                return False
 
             self._token = token
-
-            try:
-                import discord
-                intents = discord.Intents.default()
-                intents.message_content = True
-                self._client = discord.Client(intents=intents)
-                self._bagli = True
-                logger.info("[DiscordGateway] Discord baglantisi hazir.")
-            except ImportError:
-                logger.warning("[DiscordGateway] discord.py yuklu degil, stub modda.")
-                self._bagli = True
-
+            self._bagli = True
+            logger.info("[DiscordGateway] Discord baglantisi hazir (REST).")
             return True
 
         except Exception as e:
@@ -308,9 +296,7 @@ class DiscordGateway(GatewayBase):
     async def disconnect(self) -> bool:
         """Discord baglantisini kes."""
         try:
-            if self._client:
-                await self._client.close()
-                self._client = None
+            self._token = None
             self._bagli = False
             logger.info("[DiscordGateway] Discord baglantisi kesildi.")
             return True
@@ -320,29 +306,46 @@ class DiscordGateway(GatewayBase):
 
     async def send(self, mesaj: str, hedef: Optional[str] = None,
                    meta: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-        """Discord kanalina mesaj gonder (stub)."""
+        """Discord kanalina mesaj gonder (REST API)."""
         try:
-            if not self._bagli:
+            if not self._bagli or not self._token:
                 return {"basarili": False, "hata": "Baglanti yok"}
 
             kanal_id = hedef or self._config.get("varsayilan_kanal_id")
+            if not kanal_id:
+                return {"basarili": False, "hata": "kanal_id gerekli (hedef veya config'de)"}
 
-            if self._client and kanal_id:
-                try:
-                    kanal = self._client.get_channel(int(kanal_id))
-                    if kanal:
-                        await kanal.send(mesaj)
-                except Exception as send_err:
-                    logger.warning(f"[DiscordGateway] Gonderim: {send_err}")
+            # REST API ile gonder
+            import urllib.request
+            import urllib.error
 
-            self._mesaj_sayaci += 1
-            return {"basarili": True, "platform": "discord", "hedef": kanal_id}
+            url = f"https://discord.com/api/v10/channels/{kanal_id}/messages"
+            data = json.dumps({"content": mesaj}).encode("utf-8")
+            headers = {
+                "Authorization": f"Bot {self._token}",
+                "Content-Type": "application/json",
+                "User-Agent": "DiscordBot (ReYMeN, 1.0)",
+            }
 
+            req = urllib.request.Request(url, data=data, headers=headers, method="POST")
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                resp_data = json.loads(resp.read())
+                self._mesaj_sayaci += 1
+                return {
+                    "basarili": True,
+                    "platform": "discord",
+                    "hedef": kanal_id,
+                    "mesaj_id": resp_data.get("id", "?"),
+                }
+
+        except urllib.error.HTTPError as e:
+            body = e.read().decode("utf-8", errors="replace")[:200]
+            return {"basarili": False, "hata": f"HTTP {e.code}: {body}"}
         except Exception as e:
             return {"basarili": False, "hata": str(e)}
 
     async def receive(self, timeout: float = 5.0) -> Optional[Dict[str, Any]]:
-        """Discord'dan gelen mesaji al (stub)."""
+        """Discord'dan gelen mesaji al (kuyruktan)."""
         try:
             mesaj = await asyncio.wait_for(self._gelen_kuyruk.get(), timeout=timeout)
             return mesaj
@@ -350,15 +353,17 @@ class DiscordGateway(GatewayBase):
             return None
 
     async def health_check(self) -> Dict[str, Any]:
-        """Discord baglanti sagligi (stub)."""
+        """Discord baglanti sagligi."""
         return {
-            "durum": "saglikli" if self._bagli else "kopuk",
+            "durum": "saglikli" if self._bagli and self._token else "kopuk",
             "platform": "discord",
-            "stub": True,
+            "token_var": bool(self._token),
         }
 
+    def mesaj_ekle(self, mesaj: Dict[str, Any]) -> None:
+        """Discord'dan gelen mesaji kuyruga ekle (bot tarafindan cagrilir)."""
+        self._gelen_kuyruk.put_nowait(mesaj)
 
-# ── Motor Kayit ─────────────────────────────────────────────────────
 
 def motor_kaydet(motor) -> None:
     """Motor'a platform gateway araçlarını kaydeder."""

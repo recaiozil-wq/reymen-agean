@@ -49,8 +49,38 @@ __all__ = [
     "mcp_discovery_kaydet",
     "mcp_reconnect_kaydet",
     "baslangicta_baslat",
+    "otomatik_kesif_yap",
     "_cift_mcp_uyar",
 ]
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Modül seviyesinde otomatik keşif (motor._plugin_moduller_yukle() sırasında)
+# ═══════════════════════════════════════════════════════════════════════════
+
+def otomatik_kesif_yap() -> int:
+    """Modül import edildiğinde MCP sunucularını otomatik keşfeder.
+
+    Motor._plugin_moduller_yukle() akışına entegredir:
+      "reymen.mcp" import edildiğinde bu fonksiyon çağrılır,
+      config.yaml + .env + Hermes profilinden MCP sunucularını bulur
+      ve mcp_manager'a otomatik kaydeder.
+
+    Returns:
+        Yeni bulunan MCP sunucu sayısı
+    """
+    try:
+        yeni = mcp_kesfet(geri_bildirim=True)
+        if yeni > 0:
+            logger.info("[MCP] Otomatik keşif: %d yeni sunucu bulundu (modül import)", yeni)
+        return yeni
+    except Exception as e:
+        logger.debug("[MCP] Otomatik keşif hatası (modül import): %s", e)
+        return 0
+
+
+# Modül import edildiğinde otomatik keşif çalıştır
+_otomatik_kesif_sonuc = otomatik_kesif_yap()
 
 
 def _cift_mcp_uyar() -> None:

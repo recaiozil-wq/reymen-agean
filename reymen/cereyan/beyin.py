@@ -115,6 +115,12 @@ _VARSAYILAN_MODELLER: dict[str, str] = {
     "openrouter":         "deepseek/deepseek-chat",
     "lmstudio_reasoning": "",          # env'den okunur
     "codex_responses":    "",          # env'den okunur
+    # ── Yeni OpenAI-uyumlu sağlayıcılar ──────────────────────────────
+    "together":           "mistralai/Mixtral-8x7B-Instruct-v0.1",
+    "fireworks":          "accounts/fireworks/models/llama-v3p1-8b-instruct",
+    "mistral":            "mistral-small-latest",
+    "cohere":             "command-r-plus",
+    "perplexity":         "llama-3.1-sonar-small-128k-online",
 }
 
 # Provider → env değişken adları
@@ -129,6 +135,12 @@ _PROVIDER_ENV: dict[str, str] = {
     "gemini":       "GEMINI_API_KEY",
     "gemini_cloud": "GEMINI_API_KEY",
     "openrouter":   "OPENROUTER_API_KEY",
+    # ── Yeni OpenAI-uyumlu sağlayıcılar ──────────────────────────────
+    "together":     "TOGETHER_API_KEY",
+    "fireworks":    "FIREWORKS_API_KEY",
+    "mistral":      "MISTRAL_API_KEY",
+    "cohere":       "COHERE_API_KEY",
+    "perplexity":   "PERPLEXITY_API_KEY",
 }
 
 
@@ -851,6 +863,12 @@ class Beyin:
             "openrouter":         lambda: self._cagir_openai_uyumlu(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
             "lmstudio_reasoning": lambda: self._cagir_lmstudio_reasoning(adim.model, sistem_prompt, mesajlar),
             "codex_responses":    lambda: self._cagir_codex_responses(adim.model, sistem_prompt, mesajlar),
+            # ── Yeni OpenAI-uyumlu sağlayıcılar ──────────────────────
+            "together":           lambda: self._cagir_openai_uyumlu(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
+            "fireworks":          lambda: self._cagir_openai_uyumlu(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
+            "mistral":            lambda: self._cagir_openai_uyumlu(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
+            "cohere":             lambda: self._cagir_openai_uyumlu(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
+            "perplexity":         lambda: self._cagir_openai_uyumlu(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
         }
 
         fn = dispatch.get(
@@ -921,6 +939,12 @@ class Beyin:
                 "gemini_cloud":       lambda: self._cagir_gemini(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
                 "openrouter":         lambda: self._cagir_openai_uyumlu(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
                 "openai":             lambda: self._cagir_openai_uyumlu(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
+                # ── Yeni OpenAI-uyumlu sağlayıcılar ──────────────────
+                "together":           lambda: self._cagir_openai_uyumlu(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
+                "fireworks":          lambda: self._cagir_openai_uyumlu(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
+                "mistral":            lambda: self._cagir_openai_uyumlu(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
+                "cohere":             lambda: self._cagir_openai_uyumlu(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
+                "perplexity":         lambda: self._cagir_openai_uyumlu(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
             }
 
             fn = dispatch.get(

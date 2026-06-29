@@ -1,21 +1,27 @@
 {
   "olusturma": "2026-06-29T12:11:58.687269",
-  "toplam_istek": 2,
-  "toplam_token": 4,
-  "toplam_maliyet": 0.0003,
+  "toplam_istek": 3,
+  "toplam_token": 6,
+  "toplam_maliyet": 2.0003,
   "providerlar": {
     "test": {
       "istek": 2,
       "token": 4,
       "maliyet": 0.0003,
       "model": "m"
+    },
+    "lmstudio": {
+      "istek": 1,
+      "token": 2,
+      "maliyet": 2.0,
+      "model": "m"
     }
   },
   "aylik_veri": {
     "2026-06": {
-      "istek": 2,
-      "token": 4,
-      "maliyet": 0.0003
+      "istek": 3,
+      "token": 6,
+      "maliyet": 2.0003
     }
   }
 }

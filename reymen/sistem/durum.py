@@ -31,11 +31,25 @@ PROJE_KOK: Path = Path(__file__).resolve().parent.parent.parent
 DURUM_DOSYASI: Path = PROJE_KOK / "durum.json"
 
 
-# ── Okuyucu ──────────────────────────────────────────────────────────────
+def _durum_yolu_bul() -> Path:
+    """durum.json dosyasini bul (once .ReYMeN/, sonra kok)."""
+    adaylar = [
+        PROJE_KOK / ".ReYMeN" / "durum.json",
+        PROJE_KOK / "durum.json",
+    ]
+    for aday in adaylar:
+        if aday.exists():
+            return aday
+    return adaylar[0]
+
 
 def _yukle() -> dict[str, Any]:
     """durum.json dosyasini okuyup dict olarak dondur."""
     if not DURUM_DOSYASI.exists():
+        # Fallback: .ReYMeN/ altinda dene
+        reymen_yol = PROJE_KOK / ".ReYMeN" / "durum.json"
+        if reymen_yol.exists():
+            return json.loads(reymen_yol.read_text(encoding="utf-8"))
         return {"hata": f"durum.json bulunamadi: {DURUM_DOSYASI}"}
     try:
         with open(DURUM_DOSYASI, "r", encoding="utf-8") as f:
