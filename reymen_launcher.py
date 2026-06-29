@@ -1,16 +1,22 @@
 # -*- coding: utf-8 -*-
-"""
-reymen_launcher.py — ReYMeN özel REPL. Hermes UI açılmaz, sadece motor kullanılır.
-"""
+"""reymen_launcher.py — ReYMeN özel REPL. Hermes UI açılmaz, sadece motor kullanılır."""
+
 import os
 import sys
+import time
 import shutil
-import subprocess
+import threading
+import itertools
 from pathlib import Path
 from datetime import datetime
 import re as _re
 
 import logging
+# Tum loglari ERROR'a cek - kullaniciya hicbir log gosterme
+logging.basicConfig(level=logging.ERROR, force=True)
+for _l in ['CUA', 'Motor', 'motor', 'hermes', 'reymen', 'conversation_loop',
+           'beyin', 'plugin', 'cron', 'skill', 'root', '__main__']:
+    logging.getLogger(_l).setLevel(logging.ERROR)
 logger = logging.getLogger("reymen_launcher")
 
 if hasattr(sys.stdout, "reconfigure"):
@@ -35,19 +41,18 @@ try:
 except Exception:
     logger.warning("[reymen_launcher] Exception (detaysiz)")
 
-# ── ANSI ─────────────────────────────────────────────────────────────────────
+# ── Renkler ────────────────────────────────────────────────────────────────────
 _R   = "\033[0m"
-_B   = "\033[1m"
 _C   = "\033[96m"   # cyan
 _G   = "\033[92m"   # green
 _Y   = "\033[93m"   # yellow
+_B   = "\033[94m"   # blue
 _M   = "\033[95m"   # magenta
-_D   = "\033[2m"    # dim
 _W   = "\033[97m"   # white
+_D   = "\033[2m"    # dim
 _RED = "\033[91m"   # kırmızı
 
-# ── Finans Kaynakları ─────────────────────────────────────────────────────────
-# ── ANSI ─────────────────────────────────────────────────────────────────────
+# ── Renk yardimcıları ─────────────────────────────────────────────────────────
 def _c(t):   return f"{_C}{t}{_R}"
 def _g(t):   return f"{_G}{t}{_R}"
 def _y(t):   return f"{_Y}{t}{_R}"
@@ -56,398 +61,239 @@ def _d(t):   return f"{_D}{t}{_R}"
 def _r(t):   return f"{_RED}{t}{_R}"
 def _gb(t):  return f"{_G}{_B}{t}{_R}"
 def _cb(t):  return f"{_C}{_B}{t}{_R}"
-def _wb(t):  return f"{_W}{_B}{t}{_R}"
 
-# ── Logo ─────────────────────────────────────────────────────────────────────
-_LOGO = [
-    r"██████╗ ███████╗██╗   ██╗███╗   ███╗███████╗███╗   ██╗",
-    r"██╔══██╗██╔════╝╚██╗ ██╔╝████╗ ████║██╔════╝████╗  ██║",
-    r"██████╔╝█████╗   ╚████╔╝ ██╔████╔██║█████╗  ██╔██╗ ██║",
-    r"██╔══██╗██╔══╝    ╚██╔╝  ██║╚██╔╝██║██╔══╝  ██║╚██╗██║",
-    r"██║  ██║███████╗   ██║   ██║ ╚═╝ ██║███████╗██║ ╚████║",
-    r"╚═╝  ╚═╝╚══════╝   ╚═╝   ╚═╝     ╚═╝╚══════╝╚═╝  ╚═══╝",
-]
+# ── API Cache ──────────────────────────────────────────────────────────────────
+_API_CACHE: dict = {}
+_KAYNAK_RE = None
 
-# ── Config helpers ────────────────────────────────────────────────────────────
+# ── ReYMeN config (sabit) ──────────────────────────────────────────────────────
+_REYMEN_CONFIG = {
+    "provider": os.environ.get("REYMEN_PROVIDER", "deepseek"),
+    "model": os.environ.get("REYMEN_MODEL", "deepseek-v4-flash"),
+    "temperature": 0.7,
+    "max_tokens": 4096,
+    "frequency_penalty": 0.8,
+}
+
+# ── Versiyon ────────────────────────────────────────────────────────────────────
+_REYMEN_VERSION = "v0.1.0"
+_REYMEN_DATE   = "2026.6.29"
+
+# ── Ekran ──────────────────────────────────────────────────────────────────────
+def _ekran():
+    """Ekrani temizle + logo bas."""
+    os.system("cls" if os.name == "nt" else "clear")
+    banner = r"""
+  ██████  ███████  ██    ██ ███    ███ ███████ ███    ██
+  ██   ██ ██        ██  ██  ████  ████ ██      ████   ██
+  ██████  █████      ████   ██ ████ ██ █████   ██ ██  ██
+  ██   ██ ██          ██    ██  ██  ██ ██      ██  ██ ██
+  ██   ██ ███████     ██    ██      ██ ███████ ██   ████
+    """
+    print(f"{_C}{banner}{_R}")
+    print(f"  {_gb('ReYMeN Otonom Ajan')}  {_d(_REYMEN_VERSION)}  ({_REYMEN_DATE})")
+    print(f"  {_d('─'*56)}")
+    print()
+
+# ── Model yardımcıları ─────────────────────────────────────────────────────────
+_MODEL_DB = {
+    "deepseek": {
+        "ad": "DeepSeek",
+        "modeller": ["deepseek-v4-flash", "deepseek-chat"],
+        "env": "DEEPSEEK_API_KEY",
+        "url": "https://api.deepseek.com/v1/models",
+    },
+    "openrouter": {
+        "ad": "OpenRouter",
+        "modeller": ["openrouter/auto", "anthropic/claude-sonnet-4"],
+        "env": "OPENROUTER_API_KEY",
+        "url": "https://openrouter.ai/api/v1/models",
+    },
+    "groq": {
+        "ad": "Groq",
+        "modeller": ["groq/llama-3.3-70b-versatile", "groq/llama-3.1-8b-instant"],
+        "env": "GROQ_API_KEY",
+        "url": "https://api.groq.com/openai/v1/models",
+    },
+    "xiaomi": {
+        "ad": "Xiaomi",
+        "modeller": ["xiaomi/mimo-v2.5-pro"],
+        "env": "XIAOMI_API_KEY",
+        "url": "https://api.minimax.chat/v1/models",
+    },
+    "xai": {
+        "ad": "xAI",
+        "modeller": ["xai/grok-2-latest"],
+        "env": "XAI_API_KEY",
+        "url": "https://api.x.ai/v1/models",
+    },
+}
+
 def _mevcut_model():
-    try:
-        import yaml
-        cfg = yaml.safe_load(_PROFILE_CFG.read_text(encoding="utf-8"))
-        return cfg.get("model", {}).get("default", "deepseek-v4-flash"), \
-               cfg.get("model", {}).get("provider", "deepseek")
-    except Exception:
-        return "deepseek-v4-flash", "deepseek"
+    m = os.environ.get("REYMEN_MODEL", "deepseek-v4-flash")
+    p = os.environ.get("REYMEN_PROVIDER", "deepseek")
+    return m, p
 
-def _gateway_hazir_mi(deneme=10, aralik=0.7):
-    """reymen gateway list çıktısında reymen ✓ görünene kadar bekle."""
-    hermes_bin = _HERMES or "hermes"
-    import time as _t
-    for _ in range(deneme):
-        try:
-            r = subprocess.run(
-                [hermes_bin, "gateway", "list"],
-                capture_output=True, text=True, timeout=5
-            )
-            satirlar = r.stdout.splitlines()
-            for s in satirlar:
-                if "reymen" in s and s.strip().startswith("✓"):
-                    return True
-        except Exception:
-            logger.warning("[reymen_launcher] Exception (detaysiz)")
-        _t.sleep(aralik)
-    return False
-
-def _model_guncelle(provider, model, base_url=""):
-    global _ilk_tur
-    # Model seçimini yerel .env'ye kaydet (REYMEN_MODEL, REYMEN_PROVIDER)
+def _model_guncelle(provider, model):
+    """Provider+model'i .env'ye yaz."""
+    os.environ["REYMEN_PROVIDER"] = provider
+    os.environ["REYMEN_MODEL"] = model
+    _REYMEN_CONFIG["provider"] = provider
+    _REYMEN_CONFIG["model"] = model
     try:
         env_path = _KOK / ".env"
-        env_content = ""
-        if env_path.exists():
-            env_content = env_path.read_text(encoding="utf-8")
-        lines = env_content.splitlines()
-        # Mevcut değerleri güncelle veya ekle
-        new_lines = []
-        found_model = found_prov = False
-        for line in lines:
-            if line.startswith("REYMEN_MODEL="):
-                new_lines.append(f"REYMEN_MODEL={model}")
-                found_model = True
-            elif line.startswith("REYMEN_PROVIDER="):
-                new_lines.append(f"REYMEN_PROVIDER={provider}")
-                found_prov = True
-            elif line.startswith("REYMEN_BASE_URL="):
-                if base_url:
-                    new_lines.append(f"REYMEN_BASE_URL={base_url}")
-            else:
-                new_lines.append(line)
-        if not found_model:
-            new_lines.append(f"REYMEN_MODEL={model}")
-        if not found_prov:
-            new_lines.append(f"REYMEN_PROVIDER={provider}")
-        if base_url and not any(l.startswith("REYMEN_BASE_URL=") for l in lines):
-            new_lines.append(f"REYMEN_BASE_URL={base_url}")
-        env_path.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
+        with open(env_path, "a", encoding="utf-8") as f:
+            f.write(f"\nREYMEN_PROVIDER={provider}\n")
+            f.write(f"\nREYMEN_MODEL={model}\n")
     except Exception:
-        logger.warning("[reymen_launcher] Exception (detaysiz)")
-    _ilk_tur = True
+        pass
 
-def _skill_sayisi():
-    d = _KOK / "skills"
-    if not d.exists():
-        return 0
-    _skip_names = {"README.md", "DESCRIPTION.md", "readme-template.md"}
-    _skip_parts = {"ecc", "references", "_kok_copluk_backup", "_ecc_hermes_builtin_backup"}
-    return sum(
-        1 for p in d.rglob("*.md")
-        if p.name not in _skip_names
-        and not any(part in _skip_parts for part in p.parts)
-    )
-
-def _mem_kayit():
-    mem = _HERMES_HOME / "profiles" / "reymen" / "memories" / "MEMORY.md"
-    try:
-        return mem.read_text(encoding="utf-8", errors="replace").count("§") + 1
-    except Exception:
-        return 0
-
-# ── API Key Durum Kontrolü ────────────────────────────────────────────────────
-import urllib.request, urllib.error, json, time as _time
-import threading as _th
-
-_API_CACHE     = {}
-_API_CACHE_TTL = 300
-
-_API_KONTROL_ENDPOINTS = [
-    ("deepseek",   "https://api.deepseek.com/user/balance",   "DEEPSEEK_API_KEY"),
-    ("xiaomi",     "https://api.xiaomimimo.com/v1/models",       "XIAOMI_API_KEY"),
-    ("xai",        "https://api.x.ai/v1/models",              "XAI_API_KEY"),
-    ("openrouter", "https://openrouter.ai/api/v1/auth/key",   "OPENROUTER_API_KEY"),
-    # ── Yeni sağlayıcılar ─────────────────────────────────────────────
-    ("together",   "https://api.together.xyz/v1/models",      "TOGETHER_API_KEY"),
-    ("fireworks",  "https://api.fireworks.ai/v1/models",      "FIREWORKS_API_KEY"),
-    ("mistral",    "https://api.mistral.ai/v1/models",        "MISTRAL_API_KEY"),
-    ("cohere",     "https://api.cohere.ai/v1/models",         "COHERE_API_KEY"),
-    ("perplexity", "https://api.perplexity.ai/v1/models",     "PERPLEXITY_API_KEY"),
-]
-
-def _tek_kontrol(prov, url, env_var, sonuclar, kilid):
-    key = os.environ.get(env_var, "").strip()
-    if not key:
-        with kilid:
-            sonuclar[prov] = "401"  # key yok
-        return
-    try:
-        req = urllib.request.Request(
-            url,
-            headers={"Authorization": f"Bearer {key}", "Accept": "application/json"}
-        )
-        with urllib.request.urlopen(req, timeout=6) as r:
-            if prov == "deepseek":
-                data = json.loads(r.read().decode())
-                ok = data.get("is_available", True)
-            else:
-                ok = True
-    except urllib.error.HTTPError as e:
-        if e.code == 401:
-            ok = "401"  # API key gecersiz
-        elif e.code == 402:
-            ok = "402"  # kredi yetersiz
-        else:
-            ok = None
-    except Exception:
-        ok = None
-    with kilid:
-        sonuclar[prov] = ok
-
+# ── API kontrol ────────────────────────────────────────────────────────────────
 def _api_kontrol(yenile=False):
-    simdi = _time.time()
-    provlar = [p for p,_,__ in _API_KONTROL_ENDPOINTS]
-    if not yenile and all(
-        p in _API_CACHE and (simdi - _API_CACHE[p][1]) < _API_CACHE_TTL
-        for p in provlar
-    ):
-        return {p: _API_CACHE[p][0] for p in provlar}
+    """Provider'larin API key'lerini test et."""
+    import http.client as _hc
+    import json as _js
 
-    sonuclar, kilid = {}, _th.Lock()
-    threadler = [
-        _th.Thread(target=_tek_kontrol, args=(p, u, e, sonuclar, kilid), daemon=True)
-        for p, u, e in _API_KONTROL_ENDPOINTS
-    ]
-    for t in threadler: t.start()
-    for t in threadler: t.join(timeout=7)
+    if not yenile and _API_CACHE:
+        return _API_CACHE
 
-    for p in provlar:
-        _API_CACHE[p] = (sonuclar.get(p), _time.time())
+    import threading as _th
+
+    sonuclar = {}
+    kilid = _th.Lock()
+
+    def _tek_kontrol(prov, url, env_var, sonuclar, kilid):
+        key = os.environ.get(env_var, "")
+        if not key:
+            with kilid:
+                sonuclar[prov] = "401"
+            return
+        try:
+            parsed = _re.match(r"https?://([^/]+)(/.*)", url)
+            if not parsed:
+                with kilid:
+                    sonuclar[prov] = False
+                return
+            host = parsed.group(1)
+            path = parsed.group(2) or "/"
+            conn = _hc.HTTPSConnection(host, timeout=5)
+            conn.request("GET", path, headers={"Authorization": f"Bearer {key}"})
+            resp = conn.getresponse()
+            ok = resp.status == 200
+            conn.close()
+            with kilid:
+                sonuclar[prov] = ok
+        except Exception:
+            with kilid:
+                sonuclar[prov] = False
+
+    threads = []
+    for p, info in _MODEL_DB.items():
+        t = _th.Thread(target=_tek_kontrol, args=(p, info["url"], info["env"], sonuclar, kilid), daemon=True)
+        t.start()
+        threads.append(t)
+    for t in threads:
+        t.join(timeout=6)
+
+    for p in _MODEL_DB:
+        if p not in sonuclar:
+            sonuclar[p] = "zaman_asimi"
+    _API_CACHE.clear()
+    _API_CACHE.update(sonuclar)
     return sonuclar
 
-def _api_ikon(prov, api_d):
-    if prov == "lmstudio":
-        return _d("--")
-    d = api_d.get(prov)
-    if d is True:     return _g("✓")
-    if d == "401":    return _r("401")
-    if d == "402":    return _r("402")
-    if d is False:    return _r("✗")
-    return _y("?")
+# ── Skill sayaci ───────────────────────────────────────────────────────────────
+def _skill_sayisi():
+    skill_dir = _KOK / "reymen" / "cereyan" / "skills"
+    if not skill_dir.exists():
+        return 0
+    return len([f for f in skill_dir.rglob("*") if f.is_file() and f.suffix in (".md", ".yaml", ".yml")])
 
-def _model_adi(prov, model):
-    for p, m, ad, _env, _url in _MODELLER:
-        if p == prov and m == model:
-            return ad
-    return model
+def _mem_kayit():
+    """Memory kayit sayisini kabaca tahmin et."""
+    mem_file = _KOK / ".ReYMeN" / "MEMORY.md"
+    if not mem_file.exists():
+        return 0
+    return sum(1 for _ in open(mem_file, encoding="utf-8") if _.strip() and not _.startswith("#"))
 
-# ── Açılış ekranı ─────────────────────────────────────────────────────────────
-def _ekran(api_d=None):
-    import subprocess as _sp
-    try:
-        _sp.run("cls" if os.name == "nt" else "clear", shell=True)
-    except Exception:
-        logger.warning("[reymen_launcher] Exception (detaysiz)")
-    for s in _LOGO:
-        print(f"  {_cb(s)}")
-    print()
-
-    tarih   = datetime.now().strftime("%Y-%m-%d %H:%M")
-    model, prov = _mevcut_model()
+# ── İstatistik paneli ──────────────────────────────────────────────────────────
+def _istatistik_paneli():
+    """Hermes-style istatistik satırı: tool · skill · memory · session"""
+    import uuid as _uid
     skill_n = _skill_sayisi()
-    mem_n   = _mem_kayit()
-    W = 60
-
-    try:
-        ad = _model_adi(prov, model)
-    except Exception:
-        ad = model
-    if api_d is not None:
-        ikon = " " + _api_ikon(prov, api_d)
-        ikon_len = 2
-    else:
-        ikon = ""
-        ikon_len = 0
-
-    def _row(lbl, val, fn=_g, extra="", extra_len=0):
-        pad = W - len(lbl) - len(val) - 5 - extra_len
-        print(f"  {_c('║')}  {_d(lbl + ':')} {fn(val)}{extra}{' ' * max(0, pad)}{_c('║')}")
-
-    print(f"  {_c('╔' + '═'*W + '╗')}")
-    print(f"  {_c('║')}  {_gb('ReYMeN Otonom Ajan')}{' '*(W-22)}{_c('║')}")
-    print(f"  {_c('║')}  {_d('Cave Modu · Türkçe · Otonom REPL')}{' '*(W-36)}{_c('║')}")
-    print(f"  {_c('╠' + '═'*W + '╣')}")
-    _row("Tarih  ", tarih)
-    _row("Model  ", f"{ad}  ({model})", _y, ikon, ikon_len)
-    _row("Skill  ", f"{skill_n} adet")
-    _row("Hafiza ", f"{mem_n} kayit")
-    print(f"  {_c('╚' + '═'*W + '╝')}")
+    mem_n = _mem_kayit()
+    tool_n = 8  # sabit: motor tool'ları
+    session = _uid.uuid4().hex[:8]
+    print(f"  {_d('─'*56)}")
+    print(f"  {_c('●')} {_b('tool')} {_d(str(tool_n))}  {_c('●')} {_b('skill')} {_d(str(skill_n))}  {_c('●')} {_b('memory')} {_d(str(mem_n))}  {_c('●')} {_b('session')} {_d(session)}")
+    print(f"  {_d('─'*56)}")
     print()
 
-# ── Model seçimi ──────────────────────────────────────────────────────────────
-# (provider, model_id, görünen_ad, env_var, base_url)
-_MODELLER = [
-    ("deepseek",   "deepseek-v4-flash",        "DeepSeek V4 Flash",      "DEEPSEEK_API_KEY",   ""),
-    ("deepseek",   "deepseek-chat",             "DeepSeek V3",            "DEEPSEEK_API_KEY",   ""),
-    ("deepseek",   "deepseek-reasoner",         "DeepSeek R1",            "DEEPSEEK_API_KEY",   ""),
-    ("xiaomi",     "mimo-v2.5",                 "MiMo V2.5",              "XIAOMI_API_KEY",     "https://api.xiaomimimo.com/v1"),
-    ("xai",        "grok-3",                    "xAI Grok 3",             "XAI_API_KEY",        ""),
-    ("xai",        "grok-3-mini",               "xAI Grok 3 Mini",        "XAI_API_KEY",        ""),
-    ("xai",        "grok-beta",                 "xAI Grok Beta",          "XAI_API_KEY",        ""),
-    ("openrouter", "deepseek/deepseek-chat",    "OpenRouter / DeepSeek",  "OPENROUTER_API_KEY", "https://openrouter.ai/api/v1"),
-    ("lmstudio",   "local",                     "LM Studio (Yerel)",      "",                   "http://localhost:1234/v1"),
-]
-
-def _model_sec(api_d=None, force=False):
-    """
-    Model seçim ekranı.
-    - force=True: her zaman göster (açılışta)
-    - force=False: mevcut model varsa atla
-    """
-    if api_d is None:
-        api_d = {}
-
+# ── Model secim ekrani ─────────────────────────────────────────────────────────
+def _model_sec(api_sonuc=None, force=False):
+    """Etkilesimli model secim ekrani. force=True => her acilista secim."""
     cur_m, cur_p = _mevcut_model()
-
-    # force=True ise seçim ekranını her zaman göster
-    if not force and cur_m and cur_p:
-        for p, m, ad, _env, _url in _MODELLER:
-            if p == cur_p and m == cur_m:
-                print(f"  {_g('✓')} {_b(ad)} {_d('— aktif, /model ile değiştir')}")
-                print()
-                return  # seçim ekranını atla
-
-    # Mevcut model yok veya False — seçim ekranını göster
-    liste = [(p,m,a,url) for p,m,a,env,url in _MODELLER
-             if not env or os.environ.get(env,"").strip()]
-    if not liste:
-        return
-
-    print(f"  {_b('Model Sec:')}")
+    W = 56
+    _istatistik_paneli()
+    print(f"  {_c('┌' + '─'*W + '┐')}")
+    print(f"  {_c('│')}  {_gb('Model Seçimi')}{' '*(W-17)}{_c('│')}")
+    print(f"  {_c('├' + '─'*W + '┤')}")
+    if api_sonuc:
+        for ad, durum in api_sonuc.items():
+            ikon = _g("✓") if durum is True else (_r("✗") if durum == "401" else _y("?"))
+            print(f"  {_c('│')}  {ikon} {_b(ad):<16} {_d(str(durum))}{' '*(W-22-len(str(durum)))}{_c('│')}")
+    else:
+        print(f"  {_c('│')}  {_d('API kontrol ediliyor...')}{' '*(W-27)}{_c('│')}")
+    if cur_p:
+        print(f"  {_c('├' + '─'*W + '┤')}")
+        print(f"  {_c('│')}  {_g('✓')} {_b(cur_m)} {_d('— aktif')}{' '*(W-18-len(cur_m))}{_c('│')}")
+        print(f"  {_c('└' + '─'*W + '┘')}")
+    else:
+        print(f"  {_c('└' + '─'*W + '┘')}")
     print()
-    for i,(prov,mod,ad,url) in enumerate(liste, 1):
-        aktif = (mod == cur_m and prov == cur_p)
-        isk   = _gb("→") if aktif else _d(" ")
-        ikon  = _api_ikon(prov, api_d)
-        durum = api_d.get(prov)
-        uyari = ""
-        if durum == "402":
-            uyari = f" {_r('[402]')}"
-        elif durum == "401":
-            uyari = f" {_r('[401]')}"
-        elif durum is False:
-            uyari = f" {_y('[hata]')}"
-        print(f"  {isk} [{_cb(str(i))}] {ikon} {_g(ad):<26} {_d(mod)}{uyari}")
-    print()
-    try:
-        y = input(f"  {_d('[ENTER: mevcut koru]')}: ").strip()
-    except (EOFError, KeyboardInterrupt):
-        print(); return
-
-    if y.isdigit():
-        idx = int(y) - 1
-        if 0 <= idx < len(liste):
-            prov, mod, ad, url = liste[idx]
-            # DeepSeek kredisi bitmiş bile olsa seçime izin ver
-            # ReYMeN fallback_providers otomatik openrouter/lmstudio'ya geçer
-            print(f"  {_y('◌')} {_d('model kaydediliyor...')}", end="", flush=True)
-            _model_guncelle(prov, mod, url)
-            print(f"\r  {_g('✓')} {_b(ad)} aktif.                        ")
+    print(f"  {_d('Komut: /model değiştir  /temizle ekran  /cik çıkış')}")
     print()
 
-# ── Tablo düzeltme ────────────────────────────────────────────────────────────
+# ── Tablo duzeltme ─────────────────────────────────────────────────────────────
 def _tablo_duzelt(metin: str) -> str:
-    """Markdown tablo satirlarindaki bosluklari duzeltir."""
-    satirlar = metin.split('\n')
+    """Markdown tablosunu duzgun hizala."""
+    satirlar = metin.split("\n")
     yeni = []
     for s in satirlar:
-        if '|' in s and s.count('|') >= 2:
-            cols = [c.strip() for c in s.split('|')]
-            yeni.append(' | '.join(cols))
+        if "|" in s and s.count("|") >= 2:
+            cols = [c.strip() for c in s.split("|")]
+            yeni.append(" | ".join(cols))
         else:
             yeni.append(s)
-    return '\n'.join(yeni)
+    return "\n".join(yeni)
 
 # ── Cevap kutusu ──────────────────────────────────────────────────────────────
 def _kutu(metin: str, kaynak: str = ""):
-    """Hermes formatinda cevap kutusu — emoji + baslik + tablo."""
+    """Cevap kutusu — duzgun cerceve, kaynak bilgisi yok."""
     metin = _tablo_duzelt(metin)
-    # Kaynak emojisi
-    kaynak_emoji = {
-        "once_hafiza": "💾", "(hafiza)": "💾",
-        "web_arama": "🌐", "(web)": "🌐",
-        "oncelik_cache": "⚡", "(cache)": "⚡",
-        "llm": "🧠",
-    }.get(kaynak, "🤖")
-    print(f"\n  {'─'*50}", flush=True)
-    print(f"  {kaynak_emoji} {_W}{metin}{_R}", flush=True)
-    if kaynak:
-        print(f"  {_M}└─ Kaynak: {kaynak}{_R}", flush=True)
-    print(f"  {'─'*50}", flush=True)
-
+    W = 56
+    print(f"\n  {_c('┌' + '─'*W + '┐')}")
+    for satir in metin.strip().split("\n"):
+        # wrap long lines
+        while len(satir) > W:
+            print(f"  {_c('│')} {satir[:W]}{' '*(W-len(satir[:W]))} {_c('│')}")
+            satir = satir[W:]
+        print(f"  {_c('│')} {satir:<{W}} {_c('│')}")
+    print(f"  {_c('└' + '─'*W + '┘')}", flush=True)
 
 # ── Spinner ───────────────────────────────────────────────────────────────────
-import threading, itertools, time
-
 def _spinner(stop_evt):
     frames = ["◈", "◉", "◎", "⊙", "○"]
-    verbs  = ["analiz", "düşün", "işlem", "araştır", "hesapla"]
-    cyc_f  = itertools.cycle(frames)
-    cyc_v  = itertools.cycle(verbs)
-    verb   = next(cyc_v)
-    count  = 0
+    cyc_f = itertools.cycle(frames)
     while not stop_evt.is_set():
         frame = next(cyc_f)
-        print(f"\r  {_c(frame)} {_d(verb)}...   ", end="", flush=True)
+        print(f"\r  {frame} ", end="", flush=True)
         time.sleep(0.12)
-        count += 1
-        if count % 10 == 0:
-            verb = next(cyc_v)
     print(f"\r{' '*30}\r", end="", flush=True)
 
 # ── ReYMeN çağrısı ────────────────────────────────────────────────────────────
 _HERMES = shutil.which("hermes") or shutil.which("hermes") or "hermes"
 _ilk_tur = True
-
-# ── Once tanimli config (Telegram bot ile ayni) ──────────────────────────────
-_REYMEN_CONFIG = {
-    "default_model":    "deepseek-v4-flash",
-    "default_provider": "deepseek",
-    "secure_binding": True,
-    "providers": {
-        "deepseek":     {"base_url": "https://api.deepseek.com",
-                         "api_key": os.environ.get("DEEPSEEK_API_KEY", "")},
-        "xiaomi":       {"base_url": os.environ.get("XIAOMI_BASE_URL", "https://api.xiaomimimo.com/v1"),
-                         "api_key": os.environ.get("XIAOMI_API_KEY", "")},
-        "xai":          {"base_url": "https://api.x.ai",
-                         "api_key": os.environ.get("XAI_API_KEY", "")},
-        "openrouter":   {"base_url": "https://openrouter.ai/api/v1",
-                         "api_key": os.environ.get("OPENROUTER_API_KEY", "")},
-    },
-}
-
-_KREDI_SINYALLER = (
-    "insufficient_quota", "insufficient balance", "insufficient funds",
-    "out of credits", "no credits", "quota exceeded", "exceeded your current quota",
-    "billing", "payment required", "402", "topup", "recharge",
-    "account balance", "credits remaining", "credit limit",
-)
-_BRANDING_FILTRE = (
-    "hermes", "nous research", "© nous", "hermes agent",
-    "update available", "upgrade available", "version",
-)
-_KAYNAK_RE = None  # lazy import
-
-def _kaynak_ayikla(cevap: str) -> tuple[str, str]:
-    """Yanıttan Kaynak: satırını ayıklar. Returns: (temiz_cevap, kaynak_url)"""
-    global _KAYNAK_RE
-    if _KAYNAK_RE is None:
-        import re
-        _KAYNAK_RE = re.compile(r'^.*?Kaynak:\s*(https?://\S+).*$', re.MULTILINE | re.IGNORECASE)
-    m = _KAYNAK_RE.search(cevap)
-    if m:
-        url = m.group(1).strip()
-        # Kaynak satırını cevaptan çıkar
-        temiz = _KAYNAK_RE.sub('', cevap).strip()
-        return temiz, url
-    return cevap, ""
-
 
 # ── SOUL.md oku (Telegram bot ile ayni system prompt) ────────────────────────
 def _sistem_prompu_al() -> str:
@@ -464,7 +310,7 @@ def _sistem_prompu_al() -> str:
     return (
         "Sen ReYMeN adinda yardimsever bir AI asistanisin. "
         "Kisa ve oz cevap ver. Turkce konus.\\n\\n"
-        "## \u26a0\ufe0f DURUM_OKU() ZORUNLU TALIMAT\\n"
+        "## \\u26a0\\ufe0f DURUM_OKU() ZORUNLU TALIMAT\\n"
         "ReYMeN durumu/projesi/eksikleri/kapasitesi hakkinda soru gelince "
         "KESINLIKLE ONCE DOGRUDAN DURUM_OKU() tool'unu cagir. "
         "Kendi bilginle asla liste olusturma. durum.json TEK KAYNAK.\\n"
@@ -512,17 +358,9 @@ def _sor(soru: str) -> tuple[str, str]:
 
         if sonuc.get("basarili"):
             yanit = sonuc.get("yanit") or sonuc.get("sonuc", "")
-            kaynak = sonuc.get("kaynak", "llm")
-            if kaynak == "once_hafiza":
-                return f"{yanit}", "(hafiza)"
-            elif kaynak == "web_arama":
-                return f"{yanit}", "(web)"
-            elif kaynak == "oncelik_cache":
-                return f"{yanit}", "(cache)"
-            else:
-                return f"{yanit}", ""
+            return yanit, ""
         else:
-            hata = sonuc.get("hata", "Bilinmeyen hata")
+            hata = sonuc.get("hata") or "Bilinmeyen hata"
             return f"HATA: {hata}", ""
 
     except Exception as e:
@@ -558,7 +396,9 @@ _YARDIM = f"""
 
 # ── Ana REPL ──────────────────────────────────────────────────────────────────
 def _repl():
-    print(f"  {_d('ReYMeN hazır. Komut ver. (/yardim için /yardim yaz)')}")
+    cur_m, cur_p = _mevcut_model()
+    print(f"  {_d('ReYMeN hazır. Komut ver.')}")
+    print(f"  {_d(f'Model: {cur_m} · /yardım /model /temizle /cik')}")
     print()
 
     while True:
@@ -579,58 +419,67 @@ def _repl():
             continue
         if girdi.lower() in ("/temizle", "/cls", "/clear"):
             _ekran()
-            print(f"  {_d('ReYMeN hazır.')}\n")
-            continue
+            _repl()
+            return
         if girdi.lower().startswith("/model"):
             _model_sec()
             continue
         if girdi.lower().startswith("/skill "):
             ara = girdi[7:].strip()
+            t0 = time.time()
             cevap, kaynak = _sor(f"skill ara: {ara}")
+            dt = time.time() - t0
             _kutu(cevap, kaynak)
+            print(f"  {_d(f'{dt:.1f}s · skill: {ara}')}")
             continue
 
+        t0 = time.time()
         cevap, kaynak = _sor(girdi)
+        dt = time.time() - t0
         _kutu(cevap, kaynak)
+        # status line — Hermes tarzi
+        t_in = len(girdi.split())
+        t_out = len(cevap.split())
+        print(f"  {_d(f'{dt:.1f}s · token yaklaşık: giriş={t_in*2} çıkış={t_out*2}')}")
 
 # ── Giriş noktası ────────────────────────────────────────────────────────────
 def main():
+    # Açılış: banner + istatistik
     _ekran()
+    _istatistik_paneli()
+
     skill_n = _skill_sayisi()
     mem_n = _mem_kayit()
 
-    # Skill ve memory boşsa → model seçimini atla, direkt deepseek-v4-flash
+    # Skill ve memory boşsa → model seçimini atla, direkt deepseek
     if skill_n == 0 and mem_n == 0:
         _model_guncelle("deepseek", "deepseek-v4-flash")
-        print(f"  {_d('İlk kurulum — deepseek-v4-flash varsayılan olarak ayarlandı.')}\n")
+        print(f"  {_d('İlk kurulum — deepseek-v4-flash varsayılan.')}\n")
         _repl()
         return
 
     while True:
-        # 1. Model seçimini göster (api_sonuc varsa göster, yoksa ilk açılış)
-        _model_sec(_api_sonuc if '_api_sonuc' in dir() else None, force=True)
-        cur_m, cur_p = _mevcut_model()
-
-        # 2. Seçilen modelin API key'ini kontrol et
+        # 1. API durumu kontrol et
         _api_sonuc = _api_kontrol(yenile=True)
+
+        # 2. Model seçimini göster
+        _model_sec(_api_sonuc, force=True)
+        cur_m, cur_p = _mevcut_model()
 
         durum = _api_sonuc.get(cur_p)
         if durum is True:
             break  # API key geçerli, devam
 
-        # 3. Hata durumunda uyarı göster ve döngüye devam
+        # 3. Hata durumunda uyarı
         if durum == "401":
             print(f"  {_r('401')} {_b(cur_p)}: API anahtarı geçersiz veya eksik.")
-            print(f"  {_d('Başka bir model seçin.')}\n")
         elif durum == "402":
             print(f"  {_r('402')} {_b(cur_p)}: Kredi yetersiz.")
-            print(f"  {_d('Bakiye yükleyin veya başka model seçin.')}\n")
         elif durum is False:
             print(f"  {_r('✗')} {_b(cur_p)}: API hatası.")
-            print(f"  {_d('Başka bir model seçin.')}\n")
         else:
             print(f"  {_y('?')} {_b(cur_p)}: API kontrol edilemedi (zaman aşımı).")
-            print(f"  {_d('Başka bir model seçin veya tekrar deneyin.')}\n")
+        print(f"  {_d('Başka bir model seçin veya tekrar deneyin.')}\n")
 
     print(f"  {_g('✓')} {_b('Model aktif, REPL başlatılıyor...')}\n")
     _repl()
