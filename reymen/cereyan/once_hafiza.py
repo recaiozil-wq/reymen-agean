@@ -89,9 +89,11 @@ def _kur(con: sqlite3.Connection) -> None:
     try:
         con.execute("ALTER TABLE ogrenmeler ADD COLUMN kaynak_url TEXT DEFAULT NULL")
     except Exception as _e:
-        __import__("logging").getLogger(__name__).warning(
-            "[SessizExcept] %%s: %%s", type(_e).__name__, _e
-        )  # Kolon zaten varsa hata verme
+        err_msg = str(_e)
+        if "duplicate column" not in err_msg.lower():
+            __import__("logging").getLogger(__name__).warning(
+                "[SessizExcept] %s: %s", type(_e).__name__, err_msg
+            )
 
 
 @contextmanager
