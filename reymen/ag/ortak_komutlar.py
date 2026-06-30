@@ -52,6 +52,8 @@ def cmd_help(gonder, cid, arg=""):
         "/clarify <soru>  — Talebi netlestir (| ile secenek)\n"
         "/exec <kod>      — Python kodu calistir\n"
         "/beceriler       — Kristallesmis beceriler\n"
+        "/doctor          — Sistem saglik kontrolu\n"
+        "/desktop         — Desktop uygulama durumu\n"
         "/model [model]   — Model goster/degistir\n"
         "/provider [p]    — Provider goster/degistir\n"
         "/sistem [p]      — Sistem prompt goster/degistir\n"
