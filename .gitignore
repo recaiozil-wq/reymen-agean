@@ -197,7 +197,6 @@ reymen/ReYMeN_mirror/
 reymen/cereyan/.ReYMeN/skills_index.db
 **/chroma_db/
 **/*.zip
-.ReYMeN/hata_kodlari/
 hermes_legacy/
 .ReYMeN/yedekler/
 .ReYMeN/yedekler
@@ -229,7 +228,6 @@ _*.cmd
 
 # Cache files
 .ReYMeN/semantic_cache/
-.ReYMeN/cron/output/
 
 # Temp files
 *.hermes-tmp.*
@@ -240,7 +238,6 @@ _*.cmd
 **/account_summary.json
 .ReYMeN/write_key.py
 reymen/desktop/.server_pid
-vektor_hafizasi/
 chroma_db/
 
 # Build çıktıları
@@ -264,7 +261,6 @@ reymen/video_cache/
 
 # Vector cache (regenerate edilebilir)
 chroma_db/
-vektor_hafizasi/*.bin
 
 # Opsiyonel/eklenti dizinleri (klonlanmaz)
 optional-mcps/
@@ -283,13 +279,6 @@ site/
 tests/ReYMeN_reference/
 tests/hermes_legacy/
 
-# Runtime state: bot session, cron, learning, hata kodlari
-.ReYMeN/ai_bot_*.json
-.ReYMeN/hata_kodlari/
-**/hata_kodlari/
-**/cron/jobs.json
-**/cron/skill_sync_log.md
-**/cron/output/
 **/self_improvement.json
 **/decisions.md
 **/mcp_client.json
