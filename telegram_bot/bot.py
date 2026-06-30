@@ -1,27 +1,19 @@
 # -*- coding: utf-8 -*-
 """
-telegram_bot/bot.py — ReYMeN Cron Botu (Wrapper).
-=================================================
+telegram_bot/bot.py — ReYMeN Cron Botu (Redirect).
 
-Bu dosya, birlesik telegram_bot.py'ye yonlendirme yapar.
-Tum ozellikler: reymen/ag/telegram_bot.py
-
-Kullanim:
-    python -m telegram_bot.bot
-    veya HERMES_GATEWAY=ptb python telegram_bot/bot.py
+Bu dosya yalnizca yonlendirme icindir.
+Tum ozellikler: reymen/ag/telegram_bot
 """
 
 from reymen.ag.telegram_bot import (
-    # Ana siniflar
     UnifiedBot,
     BotProcess,
     CronManager,
     _cron_manager,
-    # Yardimcilar
     _api,
     gonder,
     gonder_requests,
-    # Komut handler'lari (HTTP modu)
     polling,
     main,
     _cmd_start,
@@ -34,11 +26,9 @@ from reymen.ag.telegram_bot import (
     _cmd_exec,
     _cmd_beceriler,
     _cmd_cron,
-    # Motor entegrasyonu
     motor_bildirim_gonder,
     telegram_araclari_kaydet,
     motor_kaydet,
-    # Sabitler
     TOKEN,
     CHAT_ID,
     API_BASE,

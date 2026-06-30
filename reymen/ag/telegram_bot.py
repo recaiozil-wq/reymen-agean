@@ -128,17 +128,14 @@ def _env_yukle():
     if load_dotenv is None:
         return
 
-    # Sirasiyla dene
-    yollar = [
-        Path(__file__).parent / ".env",                # reymen/ag/.env
-        _PROJE_KOK / ".env",                           # proje koku/.env
-        _PROJE_KOK / "reymen" / "sistem" / ".env",     # reymen/sistem/.env
-    ]
-    for y in yollar:
-        if y.exists():
-            load_dotenv(str(y), override=True)
-            logger.info(".env yuklendi: %s", y)
-            return
+    # TEK KAYNAK: proje kokundeki .env
+    # (telegram_bot/.env ve reymen/sistem/.env kullanilmaz)
+    y = _PROJE_KOK / ".env"
+    if y.exists():
+        load_dotenv(str(y), override=True)
+        logger.info(".env yuklendi: %s", y)
+    else:
+        logger.warning(".env bulunamadi: %s", y)
 
 
 _env_yukle()
