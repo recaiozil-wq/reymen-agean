@@ -1,4 +1,5 @@
 @echo off
+chcp 65001 >nul
 cd /d "C:\Users\marko\Desktop\Reymen Proje\ReYMeN-Ajan"
 
 REM ReYMeN bot'larini sessiz baslat (pencere gosterme)

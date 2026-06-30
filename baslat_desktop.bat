@@ -1,4 +1,5 @@
 @echo off
+chcp 65001 >nul
 title ReYMeN Desktop
 cd /d "%~dp0"
 echo ReYMeN Desktop baslatiliyor...
