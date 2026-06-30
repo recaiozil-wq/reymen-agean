@@ -13,6 +13,18 @@
 
 Geliştiriciler, DevOps mühendisleri ve güvenlik araştırmacıları için tasarlandı: Telegram üzerinden komut verirsiniz, ReYMeN terminal, dosya sistemi, tarayıcı, görsel işleme ve 100'den fazla araçla sizin adınıza işlem yapar. Hatalarından öğrenir, çözümleri hafızasına kaydeder, tekrarında aynı hatayı yapmaz.
 
+## 🤔 Neden ReYMeN?
+
+ReYMeN, yalnızca bir araç değil; Türkçe konuşan geliştiricilere "AI ajan" (agent) mantığını öğretmek, birlikte geliştirmek ve katkıda bulunanların kendi fikirlerini hayata geçirmesine alan açmak için var. Projenin her satırı, bir geliştiricinin —kendi ihtiyacından yola çıkarak— tek başına başlattığı, sonra toplulukla büyümesini umduğu bir çabanın ürünüdür.
+
+Geliştirilmekte olan vizyon şu: ReYMeN'in kendi hatalarını tespit edip otonom şekilde Python kodu üreterek düzeltmesi. Bugün itibarıyla hata → çözüm hafızası (OnceHafıza) çalışıyor; self-heal ve otonom kod üretimi ise adım adım olgunlaştırılıyor. Bu, henüz "tam çalışan özellik" değil, **üzerinde çalışılan ve katkıya açık bir hedef**. Fikirleriniz, PR'larınız ve deneyimleriniz bu hedefi şekillendirecek.
+
+ReYMeN, Nous Research'in [Hermes Agent](https://hermes-agent.nousresearch.com) mimarisinden ilham alır. Hermes'in Linux/açık kaynak topluluğuna yaptığı karşılıksız katkı olmasaydı, bu proje bugünkü halinde olmazdı. Kendilerine teşekkür ederiz.
+
+Katkı, öneri ve gönüllülüğe açığız. Yol haritamıza göz atın, bir issue açın veya doğrudan PR gönderin: [CONTRIBUTING.md](CONTRIBUTING.md).
+
+Bağış mekanizması (GitHub Sponsors vb.) şu an aktif değil. İleride topluluk ilgisi olursa değerlendirilebilir.
+
 | Özellik | Açıklama |
 |:--------|:---------|
 | 🧠 **12+ LLM Provider** | DeepSeek, OpenAI, Anthropic, Gemini, Groq, xAI, OpenRouter, Ollama, LM Studio |
