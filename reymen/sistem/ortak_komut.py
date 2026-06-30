@@ -108,17 +108,40 @@ def tara_profil(profil: str) -> dict:
 
 
 def guncelle() -> dict:
-    """Tum profilleri tara, BOTLAR'i guncelle, durum.json'a yaz."""
+    """Tum profilleri tara, BOTLAR'i guncelle, durum.json'a yaz.
+    
+    Dinamik olarak eklenen botlari (yeni kullanicinin kendi botu gibi)
+    korur — sadece hardcoded BOTLAR'daki botlari degil, durum.json'da
+    zaten kayitli olan tum botlari muhafaza eder.
+    """
+    # Mevcut durum.json'u oku (dinamik botlari korumak icin)
+    mevcut_botlar = {}
+    if DURUM_JSON.exists():
+        try:
+            mevcut = json.loads(DURUM_JSON.read_text(encoding="utf-8"))
+            mevcut_botlar = mevcut.get("botlar", {})
+        except Exception:
+            mevcut_botlar = {}
+
+    # Hardcoded BOTLAR'i guncelle (profil durumlarini tara)
     for ad, bot in BOTLAR.items():
         durum = tara_profil(bot["profil"])
         bot["soul_boyut"] = durum["soul_boyut"]
         bot["browser"] = durum["browser"]
 
+    # Hardcoded ve dinamik botlari birlestir
+    # Hardcoded botlar kendi ayarlarini korur
+    # Dinamik botlar (hardcoded'da olmayan) oldugu gibi kalir
+    birlesik_botlar = dict(BOTLAR)  # hardcoded'lar
+    for anahtar, deger in mevcut_botlar.items():
+        if anahtar not in birlesik_botlar:
+            birlesik_botlar[anahtar] = deger  # dinamik botlari ekle
+
     # durum.json'u guncelle
     yeni_durum = {
         "proje": "ReYMeN Agent",
         "surum": "2026-06-30",
-        "botlar": BOTLAR,
+        "botlar": birlesik_botlar,
         "ortak_komutlar": ORTAK_KOMUTLAR,
         "esit_mi": _butun_botlar_esit_mi(),
     }
