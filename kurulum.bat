@@ -36,7 +36,7 @@ python --version >nul 2>&1
 if %errorlevel% neq 0 (
     echo [!!] Python bulunamadi! Yukleniyor...
     winget install Python.Python.3.11 --silent --accept-package-agreements
-    if %errorlevel% neq 0 (
+    if !errorlevel! neq 0 (
         echo [!] Otomatik basarisiz! Suradan el ile indir:
         echo     https://www.python.org/downloads/release/python-3119/
         echo     Kurarken "Add Python to PATH" isaretle
@@ -61,7 +61,7 @@ git --version >nul 2>&1
 if %errorlevel% neq 0 (
     echo [!!] Git bulunamadi! Yukleniyor...
     winget install Git.Git --silent --accept-package-agreements
-    if %errorlevel% neq 0 (
+    if !errorlevel! neq 0 (
         echo [!] Basarisiz! https://git-scm.com/download/win
         pause
         exit /b
@@ -77,7 +77,7 @@ node --version >nul 2>&1
 if %errorlevel% neq 0 (
     echo [!!] Node.js bulunamadi! Yukleniyor...
     winget install OpenJS.NodeJS.LTS --silent --accept-package-agreements
-    if %errorlevel% neq 0 (
+    if !errorlevel% neq 0 (
         echo [!] Basarisiz! https://nodejs.org adresinden el ile indir
         pause
         exit /b
@@ -95,7 +95,7 @@ if %errorlevel% neq 0 (
     winget install "FFmpeg (Shared)" --silent --accept-package-agreements 2>nul
     winget install Gyan.FFmpeg --silent --accept-package-agreements 2>nul
     where ffmpeg >nul 2>&1
-    if %errorlevel% neq 0 (
+    if !errorlevel! neq 0 (
         echo [!] Otomatik basarisiz! Elle indir:
         echo     https://ffmpeg.org/download.html
         echo     veya: winget install Gyan.FFmpeg
@@ -136,24 +136,26 @@ if defined FREE (
     )
 )
 
-:: Sanal ortam kontrolu - ayrik bloklar
+:: Sanal ortam kontrolu - if not exist bloklari ile (parantez hatasi yok)
 set VENV_DIR=reymen_venv
 
-:: 1) reymen_venv zaten varsa kullan
-if exist "%VENV_DIR%\Scripts\activate" goto venv_hazir
-
-:: 2) venv (standart ad) varsa kullan
-if exist "venv\Scripts\activate" set "VENV_DIR=venv" & goto venv_hazir
-
-:: 3) Hicbiri yoksa reymen_venv olustur
-echo [..] Sanal ortam bulunamadi, olusturuluyor: %VENV_DIR%
-python -m venv "%VENV_DIR%"
-if %errorlevel% neq 0 (
-    echo [!!] Sanal ortam olusturulamadi!
-    echo     Cozum: Gecici olarak Defender Gercek Zamanli Korumayi kapat:
-    echo     PowerShell (Yonetici): Set-MpPreference -DisableRealtimeMonitoring $true
-    pause
-    exit /b
+:: Varsayilan reymen_venv kontrolu
+if not exist "%VENV_DIR%\Scripts\activate" (
+    :: reymen_venv yoksa, venv (standart ad) var mi kontrol et
+    if not exist "venv\Scripts\activate" (
+        :: Hicbiri yoksa reymen_venv olustur
+        echo [..] Sanal ortam bulunamadi, olusturuluyor: %VENV_DIR%
+        python -m venv "%VENV_DIR%"
+        if !errorlevel! neq 0 (
+            echo [!!] Sanal ortam olusturulamadi!
+            echo     Cozum: Gecici olarak Defender Gercek Zamanli Korumayi kapat:
+            echo     PowerShell (Yonetici): Set-MpPreference -DisableRealtimeMonitoring $true
+            pause
+            exit /b
+        )
+    ) else (
+        set "VENV_DIR=venv"
+    )
 )
 :venv_hazir
 echo [OK] Sanal ortam: %VENV_DIR%
