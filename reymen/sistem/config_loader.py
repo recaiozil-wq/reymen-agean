@@ -295,3 +295,30 @@ if __name__ == "__main__":
     print(f"Auto recovery: {cfg.get('auto_recovery', {})}")
     print(f"Service bridge: {cfg.get('service_bridge', {})}")
     print("Tum testler GECTI")
+
+
+def config_guncelle(anahtar: str, deger: str) -> str:
+    """config.yaml'da bir anahtari guncelle. Basit metin degistirme."""
+    import re
+    yaml_path = Path(__file__).parent / "config.yaml"
+    if not yaml_path.exists():
+        return f"HATA: config.yaml bulunamadi: {yaml_path}"
+    
+    icerik = yaml_path.read_text(encoding="utf-8")
+    
+    if anahtar in ("model", "provider"):
+        # model: xxx veya provider: xxx satirini bul (basta bosluk olabilir)
+        yeni, sayi = re.subn(
+            rf"^(\s*){anahtar}:\s*.+$",
+            rf"\g<1>{anahtar}: {deger}",
+            icerik,
+            count=1,
+            flags=re.MULTILINE
+        )
+        if sayi == 0:
+            # Bulunamadiysa en basa ekle
+            yeni = f"{anahtar}: {deger}\n" + icerik
+        yaml_path.write_text(yeni, encoding="utf-8")
+        return f"config.yaml -> {anahtar}: {deger}"
+    
+    return f"Bilinmeyen anahtar: {anahtar} (model/provider desteklenir)"
