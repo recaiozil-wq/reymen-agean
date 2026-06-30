@@ -155,16 +155,28 @@ def guncelle() -> dict:
 
 
 def _butun_botlar_esit_mi() -> dict:
-    """3 botun da ayni yetkide olup olmadigini kontrol et.
+    """Tum botlarin (hardcoded + dinamik) ayni yetkide olup olmadigini kontrol et.
     Sadece permission/settings alanlarini karsilastir (profil/bot_adi haric)."""
     karsilastirilacak_alanlar = [
         "gateway", "yetki", "browser", "terminal",
         "web", "soul_boyut", "tools",
     ]
+    # Mevcut durum.json'daki tum botlari al (hardcoded + dinamik)
+    butun_botlar = dict(BOTLAR)
+    if DURUM_JSON.exists():
+        try:
+            mevcut = json.loads(DURUM_JSON.read_text(encoding="utf-8"))
+            for anahtar, deger in mevcut.get("botlar", {}).items():
+                if anahtar not in butun_botlar:
+                    butun_botlar[anahtar] = deger
+        except Exception:
+            pass
     yetkiler = [
-        [b[alan] for alan in karsilastirilacak_alanlar]
-        for b in BOTLAR.values()
+        [b.get(alan, "") for alan in karsilastirilacak_alanlar]
+        for b in butun_botlar.values()
     ]
+    if not yetkiler:
+        return {"esit": True, "aciklama": "Henuz bot yok"}
     ilk = yetkiler[0]
     esit = all(y == ilk for y in yetkiler)
     return {
