@@ -19,6 +19,7 @@ pip install -e ".[dev,full]"
 
 # 4. Pre-commit hook'larını kur
 pre-commit install
+bash scripts/install-hooks.sh
 
 # 5. Test et
 pytest tests/ -v
@@ -71,3 +72,9 @@ Issue template'ini kullan:
 
 - Telegram: @Pasa_38
 - GitHub Issues: Tercih edilen yöntem
+
+## 📌 Çoklu Kopya Uyarısı
+
+Bu repo birden fazla local kopyada çalışılıyor (ör. repo-kontrol + ReYMeN-Ajan).
+Klonladıktan sonra `bash scripts/install-hooks.sh` çalıştırıp commit-öncesi pull uyarısını aktif edin.
+Her commit öncesi `git fetch && git status` ile remote'un gerisinde olmadığınızı manuel de kontrol edebilirsiniz.
