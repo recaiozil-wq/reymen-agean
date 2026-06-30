@@ -9,6 +9,9 @@ import os
 import sys
 import time
 from pathlib import Path
+import logging
+
+logger = logging.getLogger(__name__)
 
 KOK = Path(__file__).parent.resolve()  # proje koku
 sys.path.insert(0, str(KOK))
@@ -42,7 +45,8 @@ def _py_dosyalari_tara():
                 except_pass += icerik.count("except:\n        pass") + icerik.count("except:\n            pass")
                 sinif += icerik.count("class ")
                 fonksiyon += icerik.count("def ")
-            except Exception:
+            except Exception as _e:
+                logger.warning("[DurumGuncelle] except Exception (L45): %s", Exception)
                 pass
 
     return {

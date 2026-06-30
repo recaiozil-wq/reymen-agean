@@ -477,7 +477,8 @@ class BotProcess:
             r = _api("getMe", timeout=5)
             if r.get("ok"):
                 return f"@{r['result']['username']}"
-        except Exception:
+        except Exception as _e:
+            logger.warning("[TelegramBot] except Exception (L480): %s", Exception)
             pass
         try:
             import requests
@@ -637,7 +638,8 @@ class BotProcess:
                         )
                         if cozum:
                             return cozum[:2000]
-            except Exception:
+            except Exception as _e:
+                logger.warning("[TelegramBot] except Exception (L640): %s", Exception)
                 pass
 
         # 2. Dogrudan Beyin (30sn timeout ile)
@@ -669,7 +671,8 @@ class BotProcess:
                         _durum = _durum_oku()
                         sistem += "\n\n📊 GUNCEL DURUM:\n"
                         sistem += _durum
-                    except Exception:
+                    except Exception as _e:
+                        logger.warning("[TelegramBot] except Exception (L672): %s", Exception)
                         pass
 
                     gecmis = self.ayarlar.get("konusma_gecmisi", [])
@@ -697,7 +700,8 @@ class BotProcess:
                 if ONCE_HAFIZA_KAYDET is not None:
                     try:
                         ONCE_HAFIZA_KAYDET(mesaj, "bot_sohbet", sonuc["cevap"], basari=True)
-                    except Exception:
+                    except Exception as _e:
+                        logger.warning("[TelegramBot] except Exception (L700): %s", Exception)
                         pass
                 self.konusma_ekle(mesaj, sonuc["cevap"])
 
@@ -715,7 +719,8 @@ class BotProcess:
         """Mesaj sil."""
         try:
             _api("deleteMessage", {"chat_id": chat_id, "message_id": msg_id}, timeout=5)
-        except Exception:
+        except Exception as _e:
+            logger.warning("[TelegramBot] except Exception (L718): %s", Exception)
             pass
 
     # ── Komut isleyici ────────────────────────────────────────────────
@@ -785,7 +790,8 @@ class BotProcess:
         if ortak_komut_isle is not None:
             try:
                 return ortak_komut_isle(text, self.mesaj_gonder, chat_id)
-            except Exception:
+            except Exception as _e:
+                logger.warning("[TelegramBot] except Exception (L788): %s", Exception)
                 pass
 
         return False
@@ -1032,7 +1038,8 @@ def _cmd_status(msg: dict):
             ozet = AdvancedKanbanOrchestrator().ozet()
             toplam = ozet.get("toplam", 0)
             satirlar.append(f"Kanban: {toplam} gorev")
-        except Exception:
+        except Exception as _e:
+            logger.warning("[TelegramBot] except Exception (L1035): %s", Exception)
             pass
 
         pid_dosyasi = Path(__file__).parent / ".ReYMeN" / "gateway.pid"
@@ -1263,7 +1270,8 @@ def _isle(msg: dict):
         try:
             if ortak_komut_isle(metin, gonder, cid):
                 return
-        except Exception:
+        except Exception as _e:
+            logger.warning("[TelegramBot] except Exception (L1266): %s", Exception)
             pass
 
     # ── Komut degilse /run olarak isle ───────────────────────────────
@@ -1271,7 +1279,8 @@ def _isle(msg: dict):
         try:
             ortak_cmd_run(gonder, cid, metin)
             return
-        except Exception:
+        except Exception as _e:
+            logger.warning("[TelegramBot] except Exception (L1274): %s", Exception)
             pass
 
     # ── Hicbiri eslesmezse AI yaniti ─────────────────────────────────
@@ -1408,7 +1417,8 @@ if PTB_AVAILABLE:
                 asyncio.set_event_loop(loop)
                 loop.run_until_complete(self._bot_komutlarini_ayarla())
                 loop.close()
-            except Exception:
+            except Exception as _e:
+                logger.warning("[TelegramBot] except Exception (L1411): %s", Exception)
                 pass
 
         async def _bot_komutlarini_ayarla(self):
@@ -1538,7 +1548,8 @@ if PTB_AVAILABLE:
                         if _cevap:
                             await update.message.reply_text(f"🧠 {_cevap}")
                             return
-                except Exception:
+                except Exception as _e:
+                    logger.warning("[TelegramBot] except Exception (L1541): %s", Exception)
                     pass
 
             bekleme = await update.message.reply_text("Dusunuyorum...")
@@ -1572,7 +1583,8 @@ if PTB_AVAILABLE:
                     if ONCE_HAFIZA_KAYDET is not None:
                         try:
                             ONCE_HAFIZA_KAYDET(metin, "bot_sohbet", _cevap, basari=True)
-                        except Exception:
+                        except Exception as _e:
+                            logger.warning("[TelegramBot] except Exception (L1575): %s", Exception)
                             pass
                 else:
                     _cevap = "AI modulu aktif degil."

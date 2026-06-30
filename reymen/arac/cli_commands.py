@@ -7,6 +7,9 @@ import json
 import subprocess
 import time
 from pathlib import Path
+import logging
+
+logger = logging.getLogger(__name__)
 
 _KOK = Path(__file__).parent.parent.parent.resolve()
 
@@ -207,6 +210,7 @@ def _session_listele(limit: int = 10) -> int:
                               f"{_d(str(ts)[:19]):<22} {cnt} mesaj")
                     return 0
             except Exception as e:
+                logger.warning("[CliCommands] except Exception (L209): %s", Exception)
                 pass
 
     print(f"  {_y('!')} Session kaydi bulunamadi")

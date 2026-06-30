@@ -237,7 +237,8 @@ class Beyin:
                     deger = _credential_pool.anahtar_al(env_adi)  # type: ignore[union-attr]
                     if deger:
                         return deger
-            except Exception:
+            except Exception as _e:
+                logger.warning("[Beyin] except Exception (L240): %s", Exception)
                 pass
 
         # 2. config

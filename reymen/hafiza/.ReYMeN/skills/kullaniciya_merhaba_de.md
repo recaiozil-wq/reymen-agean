@@ -8,7 +8,7 @@
 - *(belirtilmedi)*
 
 ## Oluşturulma Tarihi
-2026-06-30 19:47:32
+2026-06-30 20:01:39
 
 ## Ek Bilgiler
 | **Özellik** | **Değer** |

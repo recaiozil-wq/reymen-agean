@@ -811,7 +811,8 @@ class ConversationLoop:
                 _r = self._direct_api_call(_msg, tools_bos=True)
                 if _r and _r.get("content","").strip() and len(_r["content"]) < 200:
                     _basit_yanit = _r["content"].strip()
-        except Exception:
+        except Exception as _e:
+            logger.warning("[ConversationLoopRunConversationYedek] except Exception (L814): %s", Exception)
             pass
 
         # 4d. Web ara (sonucu LLM ile formatla)

@@ -70,7 +70,8 @@ def _hash_oku() -> str:
     if HASH_DOSYASI.exists():
         try:
             return json.loads(HASH_DOSYASI.read_text(encoding="utf-8")).get("hash", "")
-        except Exception:
+        except Exception as _e:
+            logger.warning("[OrtakWatchdog] except Exception (L73): %s", Exception)
             pass
     return ""
 

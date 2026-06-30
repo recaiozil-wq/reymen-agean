@@ -2346,7 +2346,8 @@ class Motor:
             ogrenme = istatistik()
         except ImportError:
             ogrenme = {"hata": "ogrenme modulu yok"}
-        except Exception:
+        except Exception as _e:
+            logger.warning("[Motor] except Exception (L2349): %s", Exception)
             pass
         try:
             from reymen.core.self_heal import istatistik_al

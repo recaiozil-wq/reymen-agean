@@ -1455,7 +1455,8 @@ class AgentMixin:
                 print()
                 print(format_rate_limit_display(rl_state))
                 print()
-            except ImportError:
+            except ImportError as _e:
+                logger.warning("[CliAgent] Modul yuklenemedi (L1458): %s", ImportError)
                 pass
 
         # ── Session token usage ─────────────────────────────────────

@@ -1371,7 +1371,8 @@ class ConversationLoop:
                             sonuc = baglanti.arac_cagir('search', {'query': sorgu, 'limit': maks_sonuc})
                             if sonuc and sonuc not in ('[]', '{}', '', '[MCP] Baglanti aktif degil'):
                                 return f"[MCP-{ad}] {sonuc}"
-            except Exception:
+            except Exception as _e:
+                logger.warning("[ConversationLoop] except Exception (L1374): %s", Exception)
                 pass
 
         # 2. MCP Client Tool
@@ -1384,7 +1385,8 @@ class ConversationLoop:
                         sonuc = yonetici.arac_cagir(ad, 'search', {'query': sorgu, 'limit': maks_sonuc})
                         if sonuc and not sonuc.startswith('[MCPClient]'):
                             return f"[MCP-{ad}] {sonuc}"
-            except Exception:
+            except Exception as _e:
+                logger.warning("[ConversationLoop] except Exception (L1387): %s", Exception)
                 pass
 
         # 3. MCP Tool (mcp_tool.py — MCPIstemci)
@@ -1398,7 +1400,8 @@ class ConversationLoop:
                             sonuc = istemci.arac_cagir(ad, 'search', {'query': sorgu, 'limit': maks_sonuc})
                             if sonuc and not sonuc.startswith('[MCP]'):
                                 return f"[MCP-{ad}] {sonuc}"
-            except Exception:
+            except Exception as _e:
+                logger.warning("[ConversationLoop] except Exception (L1401): %s", Exception)
                 pass
 
         return None
