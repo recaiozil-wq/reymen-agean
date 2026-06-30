@@ -74,9 +74,42 @@ if %errorlevel% neq 0 (
 for /f "tokens=*" %%i in ('git --version') do set GITVER=%%i
 echo [OK] %GITVER%
 
+:: 1.3 Node.js (MCP sunuculari icin)
+set /a ADIM+=1
+echo ^(4/7^) Node.js kontrolu...
+node --version >nul 2>&1
+if %errorlevel% neq 0 (
+    echo [!!] Node.js bulunamadi! Yukleniyor...
+    winget install OpenJS.NodeJS.LTS --silent --accept-package-agreements
+    if %errorlevel% neq 0 (
+        echo [!] Basarisiz! https://nodejs.org adresinden el ile indir
+        pause
+        exit /b
+    )
+)
+for /f "tokens=*" %%i in ('node --version') do set NODEVER=%%i
+echo [OK] Node.js %NODEVER%
+
+:: 1.4 FFmpeg (video/ses isleme)
+set /a ADIM+=1
+echo ^(5/7^) FFmpeg kontrolu...
+ffmpeg -version >nul 2>&1
+if %errorlevel% neq 0 (
+    echo [!!] FFmpeg bulunamadi! Yukleniyor...
+    winget install "FFmpeg (Shared)" --silent --accept-package-agreements 2>nul
+    winget install Gyan.FFmpeg --silent --accept-package-agreements 2>nul
+    where ffmpeg >nul 2>&1
+    if %errorlevel% neq 0 (
+        echo [!] Otomatik basarisiz! Elle indir:
+        echo     https://ffmpeg.org/download.html
+        echo     veya: winget install Gyan.FFmpeg
+    )
+)
+where ffmpeg >nul 2>&1 && echo [OK] FFmpeg || echo [-] FFmpeg kurulu degil (video/ses kisitli calisir)
+
 :: ---------- 2. REPO + VENV ----------
 set /a ADIM+=1
-echo ^(4/5^) Repo ve Python ortami...
+echo ^(6/7^) Repo ve Python ortami...
 
 :: Proje dizinini bul
 set "SCRIPT_DIR=%~dp0"
@@ -142,7 +175,7 @@ if %errorlevel% equ 0 (
 
 :: ---------- 3. .env API ANAHTARLARI ----------
 set /a ADIM+=1
-echo ^(5/5^) API anahtarlari...
+echo ^(7/7^) API anahtarlari...
 
 if not exist ".env" (
     (

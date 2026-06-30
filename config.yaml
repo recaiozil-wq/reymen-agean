@@ -62,15 +62,8 @@ max_concurrent_sessions: null
 mcp_servers:
   filesystem:
     args:
-    - C:\Users\marko\Desktop\Reymen Proje\ReYMeN-Ajan
+    - .
     command: mcp-server-filesystem
-    connect_timeout: 30
-    timeout: 60
-  github:
-    args:
-    - -y
-    - '@modelcontextprotocol/server-github'
-    command: npx
     connect_timeout: 30
     timeout: 60
   playwright:
@@ -79,12 +72,8 @@ mcp_servers:
     - '@playwright/mcp@latest'
     - --headless
     command: npx
-  powerbi:
-    command: python
-    args:
-    - C:\Users\marko\AppData\Local\hermes\scripts\mcp_stdout_wrapper.py
-    - powerbi-modeling-mcp
-    - --start
+    connect_timeout: 30
+    timeout: 60
 memory:
   max_chars: 10000
   memory_enabled: true
@@ -104,8 +93,7 @@ onboarding:
 provider: deepseek
 providers: {}
 skills:
-  external_dirs:
-  - C:\Users\marko\Desktop\Reymen Proje\hermes_projesi\skills
+  external_dirs: []
   inline_shell: false
   template_vars: true
   write_approval: false
@@ -115,7 +103,7 @@ telegram:
   reactions: false
 terminal:
   backend: local
-  cwd: C:\Users\marko\Desktop\Reymen Proje\ReYMeN-Ajan
+  cwd: .
   timeout: 180
 web:
   backend: firecrawl

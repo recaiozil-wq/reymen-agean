@@ -1,0 +1,33 @@
+{
+  "proje": "ReYMeN Ajan",
+  "surum": "2026-06-30",
+  "aktif_ajanlar": {},
+  "ozellikler": {},
+  "ReYMeN_karsilastirma": {},
+  "tohum_self_improve": {
+    "son_cycle": "2026-06-30T11:09:40",
+    "kod_kalitesi": {
+      "toplam_dosya": 56,
+      "toplam_satir": 9782,
+      "test_dosyasi": 13,
+      "test_orani": 0.232,
+      "sinif": 25,
+      "fonksiyon": 246,
+      "except_pass": 2,
+      "ortalama_dosya_boyu": 174.7
+    },
+    "reymen_kod": {
+      "kod_dosyasi": 56,
+      "test_dosyasi": 13,
+      "test_orani": 23.2
+    },
+    "trend_7gun": {
+      "donem_gun": 7,
+      "ortalama_skor": 0.766,
+      "gecme_orani": 0.95,
+      "toplam_adim": 1
+    }
+  },
+  "son_guncelleme": "2026-06-30 11:09",
+  "guncelleyen_bot": "ReYMeN_Cron_2100"
+}

@@ -1,0 +1,598 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e6]:
+      - navigation "Main" [ref=e7]:
+        - generic [ref=e8]:
+          - link "Kitco logo" [ref=e9] [cursor=pointer]:
+            - /url: /
+            - img "Kitco logo" [ref=e10]
+          - list [ref=e13]:
+            - listitem [ref=e14]:
+              - button "BUY/SELL GOLD & SILVER Bullion Coins and Bars" [ref=e15] [cursor=pointer]:
+                - link "BUY/SELL GOLD & SILVER Bullion Coins and Bars" [ref=e16]:
+                  - /url: https://online.kitco.com/
+                  - generic [ref=e17]:
+                    - paragraph [ref=e18]: BUY/SELL GOLD & SILVER
+                    - text: Bullion Coins and Bars
+            - listitem [ref=e19]:
+              - button "Precious Metals All Metal Quotes" [ref=e20] [cursor=pointer]:
+                - link "Precious Metals All Metal Quotes" [ref=e21]:
+                  - /url: /price/precious-metals
+                  - text: Precious Metals
+                  - paragraph [ref=e22]: All Metal Quotes
+            - listitem [ref=e23]:
+              - button "Cryptos" [ref=e24] [cursor=pointer]:
+                - link "Cryptos" [ref=e25]:
+                  - /url: /price/crypto
+            - listitem [ref=e26]:
+              - button "Base Metals" [ref=e27] [cursor=pointer]:
+                - link "Base Metals" [ref=e28]:
+                  - /url: /price/base-metals
+            - listitem [ref=e29]:
+              - button "Markets" [ref=e30] [cursor=pointer]:
+                - link "Markets" [ref=e31]:
+                  - /url: /markets
+            - listitem [ref=e32]:
+              - button "Mining" [ref=e33] [cursor=pointer]:
+                - link "Mining" [ref=e34]:
+                  - /url: /news/category/mining
+            - listitem [ref=e35]:
+              - button "News" [ref=e36] [cursor=pointer]:
+                - link "News" [ref=e37]:
+                  - /url: /news
+            - listitem [ref=e38]:
+              - button "About" [ref=e39]:
+                - generic [ref=e40]: About
+          - list [ref=e42]:
+            - link [ref=e43] [cursor=pointer]:
+              - /url: /search
+              - img [ref=e44]
+      - list [ref=e49]:
+        - listitem [ref=e50]:
+          - link "Video News" [ref=e52] [cursor=pointer]:
+            - /url: /news/video
+        - listitem [ref=e53]:
+          - link "Opinion" [ref=e55] [cursor=pointer]:
+            - /url: /opinion
+        - listitem [ref=e56]:
+          - link "Kitco Forum" [ref=e58] [cursor=pointer]:
+            - /url: https://forum.kitco.com/categories?utm_source=kitco_website&utm_medium=navbar&utm_campaign=forum_navigation
+        - listitem [ref=e59]:
+          - link "YouTube Channel" [ref=e61] [cursor=pointer]:
+            - /url: https://www.youtube.com/kitconews
+            - img "YouTube Channel" [ref=e62]
+        - listitem [ref=e63]:
+          - link "Jeweler Resources" [ref=e65] [cursor=pointer]:
+            - /url: /jeweler-resources
+        - listitem [ref=e66]:
+          - link "Newsletters" [ref=e68] [cursor=pointer]:
+            - /url: https://www.kitco.com/services
+    - main [ref=e70]:
+      - generic [ref=e71]:
+        - generic [ref=e72]:
+          - generic [ref=e75]:
+            - heading "Live Charts" [level=1] [ref=e76]
+            - heading / [level=1] [ref=e77]
+            - heading "gold" [level=1] [ref=e78]
+          - generic [ref=e79]:
+            - button [ref=e80] [cursor=pointer]:
+              - img [ref=e81]
+            - button [ref=e83] [cursor=pointer]:
+              - img [ref=e84]
+            - button [ref=e86] [cursor=pointer]:
+              - img [ref=e87]
+            - button [ref=e91] [cursor=pointer]:
+              - img [ref=e92]
+        - generic [ref=e95]:
+          - heading "Live gold Price" [level=2] [ref=e96]
+          - paragraph [ref=e97]: Jun 29, 2026 - 17:46 NY Time
+        - generic [ref=e98]:
+          - generic [ref=e99]:
+            - generic [ref=e100]:
+              - generic [ref=e101]:
+                - generic [ref=e102]:
+                  - generic [ref=e103]: Bid
+                  - generic [ref=e104]:
+                    - heading "4.015,60" [level=3] [ref=e105]:
+                      - generic [ref=e108]: 4.015,60
+                    - button "USA Dollar USD" [ref=e111] [cursor=pointer]:
+                      - generic [ref=e112]:
+                        - img "USA Dollar" [ref=e113]
+                        - generic [ref=e114]: USD
+                      - img [ref=e116]
+                    - generic [ref=e118]:
+                      - generic [ref=e119]: "-73.00"
+                      - generic [ref=e120]: (-1.79%)
+                - generic [ref=e121]:
+                  - generic [ref=e122]:
+                    - generic [ref=e123]: Ask
+                    - generic [ref=e124]: 4.017,60
+                  - list [ref=e126]:
+                    - listitem [ref=e127]:
+                      - paragraph [ref=e128]: ounce
+                      - paragraph [ref=e129]: 4.015,60
+                      - paragraph [ref=e130]: "-73.00"
+                    - listitem [ref=e131]:
+                      - paragraph [ref=e132]: gram
+                      - paragraph [ref=e133]: "129.10"
+                      - paragraph [ref=e134]: "-2,35"
+                    - listitem [ref=e135]:
+                      - paragraph [ref=e136]: Kilo
+                      - paragraph [ref=e137]: 129,106.52
+                      - paragraph [ref=e138]: "-2.347,00"
+                    - listitem [ref=e139]:
+                      - paragraph [ref=e140]: pennyweight
+                      - paragraph [ref=e141]: "200.78"
+                      - paragraph [ref=e142]: "-3,65"
+                    - listitem [ref=e143]:
+                      - paragraph [ref=e144]: tola
+                      - paragraph [ref=e145]: 1,505.85
+                      - paragraph [ref=e146]: "-27,38"
+                    - listitem [ref=e147]:
+                      - paragraph [ref=e148]: tael
+                      - paragraph [ref=e149]: 4,880.07
+                      - paragraph [ref=e150]: "-88,72"
+                  - generic [ref=e151]:
+                    - text: "|"
+                    - generic [ref=e152]: "4001.00"
+                    - generic [ref=e153]: "4089.40"
+                    - text: "|"
+                  - generic [ref=e154]: Day's Range
+              - button "Buy/Sell Gold & Silver" [ref=e156] [cursor=pointer]
+            - iframe [ref=e159]:
+              - generic [ref=f30e1]:
+                - link [ref=f30e2] [cursor=pointer]:
+                  - /url: https://googleads.g.doubleclick.net/pcs/click?xai=AKAOjsveDiamlb3rp7NL2vCbDhDaaSM6uucF09TD0mvvASyDTp33aRvYiakuquEU2PZYQS2a11_gFTH6ywHaccsuWkcA5AZzWjsa15cp_G7arRrwCFGPEJX2Kyse9zbCZs5WMm3KQaSjeYYlA9TT86Rvt03qJ_hH8l3kqbsYqmhqdpUin-IMdl8jLfjDqsem5CyItbDuHOvlXmcicD_vL4vO7vPc7KLlAH25JZD5m2HFCR-QnT7vsUmxL-UmdF6Nn0x8cnyiPNNd6dSsGf8NDfYNVLd2A8oc94oWEEQsm5er8BhT_ZtSYacTNTJo7SJJWTuvlGMNIiPwYgMntc_FCWMnZ1wOS3Zmg12NRxHD6DcJdrT8RA-RgBNL0l9oaT3jvdlak5JlLmjoCh58z9HB7IM3Q-8P__W9lbFYhMLGTRjuX-4q5rMPoNf7q6E&sai=AMfl-YRmeLxWauIJc-Z2gHVeEnRGFYupO21mmZKxHByVow_1lLNhaGVnOmZJpmaldFB5-vuickxjNeCWaximwBeqN9KT75WmeTYZYNLcfjUEus-kWdxAsWLuyPKSiwyi3X8ZJFW1tfVM9eLBnZSn3v2gK5Cfzn5Z_eV-oonJA5Uha54P_hQX3yvQVSZutpR8vh4ozb5GDK-5z0Uj0L1kNhG-fuI0WioT-rgMAWWG1BrhYpJKxETUIhN4CpoHNDZPbgyS_I3owJZu_6oBg_44xA9ZBHBgd72lUrI0qdDLV_iOgaknzzcRN4n7wqKjCSb2pFpOoBzpMOg7SIDkSWkFKl251sc0YOXDj564Wk1CIvvmZ4vMyckyKrj4igg&sig=Cg0ArKJSzHDp8HHiG8zL&fbs_aeid=%5Bgw_fbsaeid%5D&adurl=https://online.kitco.com/buy/322377/5-oz-Silver-FIFA-WORLD-CUP-2026TM-MC-THE-TROPHYCoin-322377%3Futm_source%3Dkitco.com-mobile%26utm_campaign%3D46202-Campaign-5oz-FIFA-Trophy-Coin-June29%26utm_medium%3Dbanner%26utm_content%3D300x250_all-pages-Worldwide
+                - img [ref=f30e6] [cursor=pointer]
+                - button [ref=f30e8] [cursor=pointer]:
+                  - img [ref=f30e9]
+            - complementary "Promoted ETF" [ref=e160]:
+              - iframe [ref=e161]:
+                
+          - generic [ref=e162]:
+            - generic [ref=e164]:
+              - iframe [ref=e167]:
+                - generic [ref=f31e2]:
+                  - toolbar [ref=f31e6]:
+                    - generic [ref=f31e10]:
+                      - generic [ref=f31e11]:
+                        - button "Symbol search" [ref=f31e12]:
+                          - img [ref=f31e13]:
+                            - img [ref=f31e14]
+                          - generic [ref=f31e16]: XAUUSD
+                        - button "Compare symbols" [ref=f31e17]:
+                          - img [ref=f31e18]:
+                            - img [ref=f31e19]
+                      - generic [ref=f31e25]:
+                        - radiogroup [ref=f31e26]:
+                          - radio "1 minute" [checked] [ref=f31e27]:
+                            - generic [ref=f31e29]: 1m
+                          - radio "30 minutes" [ref=f31e30]:
+                            - generic [ref=f31e32]: 30m
+                          - radio "1 hour" [ref=f31e33]:
+                            - generic [ref=f31e35]: 1h
+                        - button "Chart interval" [ref=f31e36]:
+                          - img [ref=f31e39]:
+                            - img [ref=f31e40]
+                      - generic [ref=f31e45]:
+                        - radiogroup [ref=f31e46]:
+                          - radio "Bars" [ref=f31e47]:
+                            - img [ref=f31e48]:
+                              - img [ref=f31e49]
+                          - radio "Candles" [checked] [ref=f31e51]:
+                            - img [ref=f31e52]:
+                              - img [ref=f31e53]
+                          - radio "Area" [ref=f31e58]:
+                            - img [ref=f31e59]:
+                              - img [ref=f31e60]
+                        - button "Bar's style" [ref=f31e62]:
+                          - img [ref=f31e65]:
+                            - img [ref=f31e66]
+                      - button "Indicators, metrics, and strategies" [ref=f31e72]:
+                        - img [ref=f31e73]:
+                          - img [ref=f31e74]
+                        - generic [ref=f31e77]: Indicators
+                  - generic [ref=f31e79]:
+                    - 'region "Chart #1" [ref=f31e82]':
+                      - generic [ref=f31e86]:
+                        - generic:
+                          - generic:
+                            - toolbar:
+                              - generic:
+                                - generic [ref=f31e87]:
+                                  - generic "Change symbol" [ref=f31e88]:
+                                    - generic [ref=f31e89]:
+                                      - img [ref=f31e91]
+                                      - generic [ref=f31e92]: X
+                                    - button "Change symbol" [ref=f31e93]: Gold Spot / U.S. Dollar
+                                  - generic "Change interval" [ref=f31e94]:
+                                    - text: ·
+                                    - button "Change interval" [ref=f31e95]: "1"
+                                  - generic [ref=f31e96]:
+                                    - text: ·
+                                    - generic [ref=f31e97]: OANDA
+                                - generic:
+                                  - generic:
+                                    - button "More":
+                                      - generic:
+                                        - img
+                                - button "Market open · One update every 5 seconds" [ref=f31e99]:
+                                  - img [ref=f31e100]:
+                                    - img [ref=f31e101]
+                                  - img [ref=f31e103]:
+                                    - img [ref=f31e104]
+                              - generic [ref=f31e107]:
+                                - generic [ref=f31e108]:
+                                  - generic [ref=f31e109]: O
+                                  - generic [ref=f31e110]: 4,016.570
+                                - generic [ref=f31e111]:
+                                  - generic [ref=f31e112]: H
+                                  - generic [ref=f31e113]: 4,016.955
+                                - generic [ref=f31e114]:
+                                  - generic [ref=f31e115]: L
+                                  - generic [ref=f31e116]: 4,016.545
+                                - generic [ref=f31e117]:
+                                  - generic [ref=f31e118]: C
+                                  - generic [ref=f31e119]: 4,016.955
+                                - generic [ref=f31e121]: +0.275 (+0.01%)
+                          - generic:
+                            - button "Hide indicator legend" [ref=f31e122]:
+                              - img [ref=f31e124]
+                            - generic:
+                              - toolbar:
+                                - generic:
+                                  - generic "Volume · Ticks" [ref=f31e127]:
+                                    - generic [ref=f31e128]: Vol · Ticks
+                                  - generic:
+                                    - generic:
+                                      - button "Hide":
+                                        - generic:
+                                          - img
+                                      - button "Settings":
+                                        - generic:
+                                          - img
+                                      - button "Remove":
+                                        - generic:
+                                          - img
+                                      - button "More":
+                                        - generic:
+                                          - img
+                                - generic "Volume" [ref=f31e132]: "25"
+                        - generic "Chart for OANDA:XAUUSD, 1 minute" [ref=f31e134]
+                    - toolbar [ref=f31e148]:
+                      - generic [ref=f31e151]:
+                        - button "1 day in 1 minute intervals" [ref=f31e152]:
+                          - generic [ref=f31e153]: 1D
+                        - button "5 days in 5 minutes intervals" [ref=f31e154]:
+                          - generic [ref=f31e155]: 5D
+                        - button "1 month in 30 minutes intervals" [ref=f31e156]:
+                          - generic [ref=f31e157]: 1M
+                        - button "3 months in 1 hour intervals" [ref=f31e158]:
+                          - generic [ref=f31e159]: 3M
+                        - button "6 months in 2 hours intervals" [ref=f31e160]:
+                          - generic [ref=f31e161]: 6M
+                        - button "Year to day in 1 day intervals" [ref=f31e162]:
+                          - generic [ref=f31e163]: YTD
+                        - button "1 year in 1 day intervals" [ref=f31e164]:
+                          - generic [ref=f31e165]: 1Y
+                        - button "5 years in 1 week intervals" [ref=f31e166]:
+                          - generic [ref=f31e167]: 5Y
+                        - button "All data in 1 month intervals" [ref=f31e168]:
+                          - generic [ref=f31e169]: All
+                      - button "17:46:43 UTC-4" [disabled] [ref=f31e173]:
+                        - generic [ref=f31e174]: 17:46:43 UTC-4
+              - generic [ref=e168]:
+                - link "XAUUSD Chart" [ref=e169] [cursor=pointer]:
+                  - /url: https://www.tradingview.com/symbols/XAUUSD?utm_source=www.kitco.com&utm_medium=widget_new&utm_campaign=chart&utm_term=XAUUSD
+                  - generic [ref=e170]: XAUUSD Chart
+                - text: By TradingView
+            - generic [ref=e171]:
+              - generic [ref=e172]:
+                - generic [ref=e173]: Currency
+                - button "USA Dollar USD" [ref=e175] [cursor=pointer]:
+                  - generic [ref=e176]:
+                    - img "USA Dollar" [ref=e177]
+                    - generic [ref=e178]: USD
+                  - img
+              - generic [ref=e180]:
+                - generic [ref=e181]: Unit
+                - combobox "Unit" [ref=e182]:
+                  - option "Ounce" [selected]
+                  - option "Gram"
+                  - option "Kilo - Coming Soon" [disabled]
+                  - option "Pennyweight - Coming Soon" [disabled]
+                  - option "Tola - Coming Soon" [disabled]
+                  - option "Tael - Coming Soon" [disabled]
+              - generic [ref=e183]:
+                - generic [ref=e184]: Theme
+                - group "Theme" [ref=e185]:
+                  - button "Dark theme" [pressed] [ref=e186] [cursor=pointer]:
+                    - img [ref=e187]
+                    - generic [ref=e189]: Dark
+                  - button "Light theme" [ref=e190] [cursor=pointer]:
+                    - img [ref=e191]
+                    - generic [ref=e194]: Light
+                - button "Refresh charts" [ref=e195] [cursor=pointer]:
+                  - img [ref=e196]
+            - generic [ref=e200]:
+              - img "Live gold chart" [ref=e202]
+              - generic:
+                - 'button "Expand image: Live gold chart"'
+            - generic [ref=e204]:
+              - img "Live New York gold Chart" [ref=e206]
+              - generic:
+                - 'button "Expand image: Live New York gold Chart"'
+            - generic [ref=e208]:
+              - generic [ref=e209]: Session
+              - group "Session" [ref=e210]:
+                - button "NY" [pressed] [ref=e211] [cursor=pointer]
+                - button "24h" [ref=e212] [cursor=pointer]
+            - iframe [ref=e214]:
+              - generic [ref=f14e3]:
+                - generic [ref=f14e6]:
+                  - generic [ref=f14e7]: Sponsored Financial Content
+                  - generic [ref=f14e8]:
+                    - link "Dianomi Logo" [ref=f14e9] [cursor=pointer]:
+                      - /url: https://www.dianomi.com/whats-this/?utm_source=pub.Kitco&utm_medium=smartad_sponsor_link
+                      - img "Dianomi Logo" [ref=f14e10]
+                    - link "Advertise Here" [ref=f14e11] [cursor=pointer]:
+                      - /url: https://www.dianomi.com/whats-this/?utm_source=pub.Kitco&utm_medium=smartad_sponsor_link
+                - generic [ref=f14e12]:
+                  - iframe [ref=f14e13]:
+                    - link "What is the latest on ETFs? MarketViews" [ref=f34e5] [cursor=pointer]:
+                      - /url: https://www.dianomi.com/click.epl?pn=85782&offer=18900901&savid=222436&can_cookie=1&unique_id=akLnwlB7SqaeVChZTh4fhQAAAAk&adv=14296&epoch=1782769602&said=11729&cf=1610.246.Kitco Oct22&smartreferer=http%3A%2F%2Fwww.kitco.com%2Fcharts%2Fgold
+                      - generic [ref=f34e6]:
+                        - generic [ref=f34e7]: What is the latest on ETFs?
+                        - generic [ref=f34e8]: MarketViews
+                  - iframe [ref=f14e14]:
+                    - generic [ref=f37e2]:
+                      - link "Get the latest commodity trends from industry experts. MarketViews" [ref=f37e5] [cursor=pointer]:
+                        - /url: https://www.dianomi.com/click.epl?pn=85783&offer=18900623&savid=339431&can_cookie=1&unique_id=akLnww8wuEy0LbcddUecaAAAAB8&adv=14297&epoch=1782769603&said=11730&cf=1610.246.Kitco Oct22&smartreferer=http%3A%2F%2Fwww.kitco.com%2Fcharts%2Fgold
+                        - generic [ref=f37e6]:
+                          - generic [ref=f37e7]: Get the latest commodity trends from industry experts.
+                          - generic [ref=f37e8]: MarketViews
+                      - link "Stay updated with the newest gold market developments. MarketViews" [ref=f37e11] [cursor=pointer]:
+                        - /url: https://www.dianomi.com/click.epl?pn=85784&offer=18901179&savid=339441&can_cookie=1&unique_id=akLnww8wuEy0LbcddUecaAAAAB8&adv=14297&epoch=1782769603&said=11730&cf=1610.246.Kitco Oct22&smartreferer=http%3A%2F%2Fwww.kitco.com%2Fcharts%2Fgold
+                        - generic [ref=f37e12]:
+                          - generic [ref=f37e13]: Stay updated with the newest gold market developments.
+                          - generic [ref=f37e14]: MarketViews
+                      - link "What is the latest on ETFs? MarketViews" [ref=f37e17] [cursor=pointer]:
+                        - /url: https://www.dianomi.com/click.epl?pn=85782&offer=18900901&savid=222436&can_cookie=1&unique_id=akLnww8wuEy0LbcddUecaAAAAB8&adv=14297&epoch=1782769603&said=11730&cf=1610.246.Kitco Oct22&smartreferer=http%3A%2F%2Fwww.kitco.com%2Fcharts%2Fgold
+                        - generic [ref=f37e18]:
+                          - generic [ref=f37e19]: What is the latest on ETFs?
+                          - generic [ref=f37e20]: MarketViews
+            - generic [ref=e215]:
+              - generic [ref=e217]:
+                - img "Live gold chart" [ref=e219]
+                - generic:
+                  - 'button "Expand image: Live gold chart"'
+              - generic [ref=e221]:
+                - img "Live gold chart" [ref=e223]
+                - generic:
+                  - 'button "Expand image: Live gold chart"'
+              - generic [ref=e225]:
+                - img "Live gold chart" [ref=e227]
+                - generic:
+                  - 'button "Expand image: Live gold chart"'
+              - generic [ref=e229]:
+                - img "Live gold chart" [ref=e231]
+                - generic:
+                  - 'button "Expand image: Live gold chart"'
+              - generic [ref=e233]:
+                - img "Live gold chart" [ref=e235]
+                - generic:
+                  - 'button "Expand image: Live gold chart"'
+              - generic [ref=e237]:
+                - img "Live gold chart" [ref=e239]
+                - generic:
+                  - 'button "Expand image: Live gold chart"'
+          - generic [ref=e240]:
+            - generic [ref=e242]:
+              - generic [ref=e243]:
+                - generic [ref=e244]:
+                  - img [ref=e245]
+                  - heading "Kitco News Channel" [level=3] [ref=e247]
+                - generic [ref=e248]:
+                  - button "Turn sound on" [ref=e249] [cursor=pointer]:
+                    - img [ref=e250]
+                  - button "Fullscreen" [ref=e254] [cursor=pointer]:
+                    - img [ref=e255]
+              - iframe [ref=e261]:
+                - generic [active] [ref=f10e1]:
+                  - generic "YouTube Video Oynatıcısı" [ref=f10e3]
+                  - generic [ref=f10e5]:
+                    - generic:
+                      - generic:
+                        - button "Videoyu oynat" [ref=f10e10] [cursor=pointer]
+                        - button "Oynatıcı kontrollerini gizle" [ref=f10e12] [cursor=pointer]
+                        - generic [ref=f10e19]:
+                          - generic [ref=f10e20]:
+                            - link "Missed the Gold Move? The Exact Level to Wait for the Next Leg Up | Chris Vermeulen" [ref=f10e21] [cursor=pointer]:
+                              - /url: https://www.youtube.com/watch?v=FGdnysiVKt8
+                            - link "Kitco NEWS" [ref=f10e22] [cursor=pointer]:
+                              - /url: /channel/UC9ijza42jVR3T6b8bColgvg
+                              - generic [ref=f10e23]: Kitco NEWS
+                          - generic [ref=f10e24]:
+                            - button [ref=f10e25] [cursor=pointer]
+                            - generic [ref=f10e27]:
+                              - generic: Kitco NEWS
+                              - generic: 772 B abone
+            - heading "Latest News" [level=2] [ref=e263]
+            - generic [ref=e264]:
+              - iframe [ref=e267]:
+                - generic [ref=f17e4]:
+                  - heading "Kitco Global Index (KGX)" [level=2] [ref=f17e5]
+                  - generic [ref=f17e6]: Separating Market Values from USD Influence
+                  - generic [ref=f17e7]:
+                    - combobox [ref=f17e8]:
+                      - option "Gold" [selected]
+                      - option "Silver"
+                      - option "Platinum"
+                      - option "Palladium"
+                      - option "Copper"
+                      - option "Nickel"
+                      - option "Aluminum"
+                      - option "Zinc"
+                      - option "Lead"
+                      - option "Oil"
+                      - option "Bitcoin"
+                      - option "Ethereum"
+                      - option "Solana"
+                      - option "Cardano"
+                      - option "Avalanche"
+                      - option "Chainlink"
+                      - option "TRON"
+                      - option "Ripple"
+                      - option "Binance Coin"
+                      - option "Sui"
+                    - combobox [ref=f17e9]:
+                      - option "Text"
+                      - option "Bubbles" [selected]
+                      - option "Pie Chart"
+                      - option "Charts"
+                  - generic [ref=f17e10]:
+                    - generic [ref=f17e11]: $4,015.60
+                    - generic [ref=f17e12]: "-73.00 (-1.79%)"
+                  - generic [ref=f17e13]:
+                    - generic [ref=f17e14]:
+                      - img [ref=f17e15]
+                      - generic [ref=f17e17]: USD
+                      - generic [ref=f17e18]: "10.09"
+                      - generic [ref=f17e19]: 0.25%
+                    - generic [ref=f17e20]:
+                      - img [ref=f17e21]
+                      - generic [ref=f17e26]: Gold Trade
+                      - generic [ref=f17e27]: "-83.09"
+                      - generic [ref=f17e28]: "-2.03%"
+                  - generic [ref=f17e30]:
+                    - img "logg" [ref=f17e31]
+                    - link "Powered by kitco.com" [ref=f17e32] [cursor=pointer]:
+                      - /url: https://www.kitco.com/?widget_name=KGX_Advanced&host_name=www.kitco.com
+              - iframe [ref=e270]:
+                - generic [ref=f13e4]:
+                  - generic [ref=f13e5]:
+                    - img "logo" [ref=f13e7]
+                    - heading "Price Calculator" [level=2] [ref=f13e9]
+                    - generic "Press to pause live prices" [ref=f13e11] [cursor=pointer]:
+                      - img [ref=f13e12]
+                      - generic [ref=f13e15]: Price Updating
+                  - generic [ref=f13e16]:
+                    - generic [ref=f13e17]:
+                      - textbox [ref=f13e18]: "1"
+                      - combobox [ref=f13e20]:
+                        - option "Ounce" [selected]
+                        - option "Gram"
+                        - option "Kilo"
+                        - option "Tola"
+                      - combobox [ref=f13e22]:
+                        - option "Gold" [selected]
+                        - option "Silver"
+                        - option "Platinum"
+                        - option "Palladium"
+                      - combobox [ref=f13e24]:
+                        - option "USD" [selected]
+                        - option "AUD"
+                        - option "CAD"
+                        - option "EUR"
+                        - option "GBP"
+                        - option "JPY"
+                        - option "CHF"
+                        - option "CNY"
+                        - option "HKD"
+                        - option "BRL"
+                        - option "INR"
+                        - option "MXN"
+                        - option "RUB"
+                        - option "ZAR"
+                    - generic [ref=f13e25]:
+                      - generic [ref=f13e26]: "Price per Ounce:"
+                      - textbox [ref=f13e27]: 4,015.60
+                    - generic [ref=f13e28]:
+                      - generic [ref=f13e29]: "Total:"
+                      - generic [ref=f13e30]: $4,015.60
+                    - generic [ref=f13e31]:
+                      - generic [ref=f13e32]: "Change:"
+                      - generic [ref=f13e33]:
+                        - text: "-$73.00"
+                        - generic [ref=f13e34]: (-1.79%)
+                  - generic [ref=f13e35]:
+                    - generic [ref=f13e36]: Jun 29, 2026, 10:00 AM NY Time
+                    - generic [ref=f13e37]:
+                      - img "logg" [ref=f13e38]
+                      - link "Powered by kitco.com" [ref=f13e39] [cursor=pointer]:
+                        - /url: https://www.kitco.com/?widget_name=Kitco_Price_Calculator&host_name=www.kitco.com
+      - text: X
+    - contentinfo [ref=e271]:
+      - generic [ref=e272]:
+        - generic [ref=e273]:
+          - img "Kitco logo for Kitco.com" [ref=e274]
+          - generic [ref=e275]:
+            - link [ref=e276] [cursor=pointer]:
+              - /url: https://www.facebook.com/KitcoNews
+              - img [ref=e278]
+            - link [ref=e280] [cursor=pointer]:
+              - /url: https://twitter.com/kitconewsnow
+              - img [ref=e282]
+            - link [ref=e284] [cursor=pointer]:
+              - /url: https://www.linkedin.com/company/kitco-metals-inc./
+              - img [ref=e286]
+            - link [ref=e290] [cursor=pointer]:
+              - /url: https://www.instagram.com/kitconews/
+              - img [ref=e292]
+            - link [ref=e295] [cursor=pointer]:
+              - /url: https://www.youtube.com/user/KitcoNews
+              - img [ref=e297]
+            - link [ref=e300] [cursor=pointer]:
+              - /url: https://www.tiktok.com/@kitconews
+              - img [ref=e302]:
+                - img [ref=e303]
+        - generic [ref=e305]:
+          - heading "KITCO" [level=3] [ref=e306]
+          - link "All Metal Quotes" [ref=e308] [cursor=pointer]:
+            - /url: /price/precious-metals
+          - link "Cryptocurrencies" [ref=e310] [cursor=pointer]:
+            - /url: /charts
+          - link "Markets" [ref=e312] [cursor=pointer]:
+            - /url: /markets
+          - link "News" [ref=e314] [cursor=pointer]:
+            - /url: /news
+          - link "Commentaries" [ref=e316] [cursor=pointer]:
+            - /url: /opinion
+          - link "Mining" [ref=e318] [cursor=pointer]:
+            - /url: /news/category/mining
+        - generic [ref=e319]:
+          - img "Kitco on AppStore" [ref=e320]
+          - generic [ref=e321]:
+            - img "Kitco QR Code" [ref=e322]
+            - paragraph [ref=e323]:
+              - link "Download Kitco on GooglePlay" [ref=e324] [cursor=pointer]:
+                - /url: https://play.google.com/store/apps/details?id=com.kitco.goldlive&hl=en&gl=US
+                - img "Download Kitco on GooglePlay" [ref=e325]
+              - link "Kitco on AppStore" [ref=e326] [cursor=pointer]:
+                - /url: https://apps.apple.com/ca/app/gold-live-gold-price-silver/id1444886741
+                - img "Kitco on AppStore" [ref=e327]
+        - generic [ref=e328]:
+          - generic [ref=e329]:
+            - img [ref=e330]
+            - paragraph [ref=e332]: We appreciate your feedback
+          - textbox "Name" [ref=e333]
+          - textbox "Email" [ref=e334]
+          - textbox "Subject" [ref=e335]
+          - textbox "Message" [ref=e336]
+          - button "Submit" [ref=e338] [cursor=pointer]
+      - generic [ref=e339]:
+        - generic [ref=e340]:
+          - link "Terms of Use" [ref=e341] [cursor=pointer]:
+            - /url: /terms-of-use
+          - link "Terms & Conditions" [ref=e342] [cursor=pointer]:
+            - /url: /legal/terms-and-conditions
+          - link "Privacy Policy" [ref=e343] [cursor=pointer]:
+            - /url: /legal/privacy-policy
+          - paragraph [ref=e344]: "|"
+          - button "Your Privacy Choices privacy opt out icon" [ref=e345] [cursor=pointer]:
+            - paragraph [ref=e346]: Your Privacy Choices
+            - paragraph [ref=e347]:
+              - img "privacy opt out icon" [ref=e348]
+        - paragraph [ref=e349]: © 2026 Kitco Metals Inc.
+  - text: "\" \""
+  - alert [ref=e350]

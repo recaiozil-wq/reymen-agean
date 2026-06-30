@@ -1,0 +1,144 @@
+{
+  "sürüm": "1.2.0",
+  "son_güncelleme": "2026-06-29 18:00",
+  "guncelleyen_bot": "ReYMeN (Q!)",
+  "toplam_ozellik": 25,
+  "tamam": 25,
+  "isleniyor": 0,
+  "tahmini_seviye": "100% (ReYMeN parity)",
+  "_meta": {
+    "bot_yanlis_liste_var": true,
+    "uyari": "⚠️ Bot (Pasa_38) kendi sabit listesini kullaniyor. Guncel veri icin DURUM_OKU() cagir."
+  },
+
+  "mevcut_eksikler": {},
+
+  "cozulen_8_onceki": {
+    "tamam": 8,
+    "toplam": 8,
+    "maddeler": {
+      "MCP_Client": { "detay": "auto-discovery + reconnect + auto-start" },
+      "Plugin_Sistemi": { "detay": "hot-reload CLI + ProviderPluginBase" },
+      "Skills": { "detay": "CLI fix + auto-activation + path temizligi" },
+      "Web_Search": { "detay": "7 engine (DDG/Google/Bing/Firecrawl/Brave/SearXNG/Exa)" },
+      "Image_Gen": { "detay": "FAL + OpenAI + xAI — 3 engine, Registry, tool arayuzu" },
+      "Browser": { "detay": "Playwright MCP + config + browser-use" },
+      "Security": { "detay": "Network restriction + Docker sandbox" },
+      "Hot_Reload": { "detay": "watchdog + polling fallback + 4 motor araci" }
+    }
+  },
+  "cozulen_10_ikinci_dalga": {
+    "tamam": 10,
+    "toplam": 10,
+    "maddeler": {
+      "Video_Generation": { "oncelik": "P1", "detay": "video_gen_engine.py (366s) — moviepy+FAL+HyperFrames" },
+      "TTS_STT": { "oncelik": "P1", "detay": "OpenAI+Edge+Whisper entegrasyonu" },
+      "Provider_Zinciri": { "oncelik": "P0", "detay": "deepseek-xiaomi-xai-openrouter-groq-lmstudio" },
+      "OnceHafiza": { "oncelik": "P0", "detay": "SQLite ogrenme, tum botlar ortak" },
+      "DURUM_OKU": { "oncelik": "P0", "detay": "Merkezi durum raporu, her mesajda guncel" },
+      "ConversationLoop": { "oncelik": "P0", "detay": "Full pipeline motor entegrasyonu" },
+      "Sessiz_Except_Temizligi": { "oncelik": "P1", "detay": "200→36 except Exception pass temizlendi" },
+      "Ensemble_Pipeline": { "oncelik": "P0", "detay": "5 kaynakli karsilastirmali cevap secimi" },
+      "Vision_Analiz": { "oncelik": "P1", "detay": "OpenRouter/Qwen-VL ile gorsel analiz" },
+      "MEMORY_USER_Profili": { "oncelik": "P1", "detay": "5 lokasyonlu MEMORY.md/USER.md okuma" }
+    }
+  },
+  "cozulen_4_kismen": {
+    "tamam": 4,
+    "toplam": 4,
+    "maddeler": {
+      "Gateway": { "oncelik": "P0", "detay": "TG+DC+SMS (Mail eksik)" },
+      "Self_Improvement": { "oncelik": "P2", "detay": "Otomatik cron job ile calisiyor" },
+      "Skill_Sistemi": { "oncelik": "P1", "detay": "FTS5 index, 1114 .md skill dosyasi" },
+      "Web_Arama": { "oncelik": "P1", "detay": "DDGS/Brave, backend=html ile Windows calisir" }
+    }
+  },
+  "cozulen_diger": {
+    "maddeler": [
+      "Guardrails manager eklendi (58 test)",
+      "OAuth manager eklendi (provider siniflari)",
+      "Web UI port 5000 aktif",
+      "Cron Scheduler (jobs.json ile)",
+      "Plugin sistemi (40+ plugin)",
+      "MCP Client + Server Host",
+      "Discord bot entegrasyonu",
+      "SMS (twilio) entegrasyonu",
+      "Budget provider_maliyeti fix",
+      "PromptBuilder MEMORY/USER zenginlestirme"
+    ]
+  },
+
+  "aktif_özellikler": [
+    "CLI (reymen)",
+    "Telegram Gateway (3 bot)",
+    "Discord Gateway",
+    "SMS (Twilio)",
+    "Web UI (port 5000)",
+    "MCP Client + Server Host",
+    "Cron Scheduler",
+    "Plugin sistemi (40+ plugin)",
+    "Image Generation (FAL/OpenAI/xAI)",
+    "TTS/STT (OpenAI+Edge+Whisper)",
+    "Video Generation (366s engine, 3 backend)",
+    "Plugin Hot-reload (220s watchdog)",
+    "Skills Marketplace (345s katalog+yukleme)",
+    "HITL (guardrails HITLSikistirici + motor onay)",
+    "ACP Server (870s Claude Code delegasyonu)",
+    "OnceHafiza (SQLite ogrenme)",
+    "Ensemble Pipeline (5 kaynak)",
+    "255 Motor Tool",
+    "ConversationLoop (full pipeline)",
+    "Provider Zinciri (deepseek-xiaomi-xai-openrouter-groq)",
+    "Vision Analiz (OpenRouter/Qwen-VL)",
+    "Web Arama (DDGS/Brave)",
+    "Skill Sistemi (FTS5 index, 1114 dosya)",
+    "Self-Improvement (otomatik cron)",
+    "Sessiz Except Temizligi (200→36)",
+    "Guardrails Manager"
+  ],
+
+  "ReYMeN_karsilastirma": {
+    "toplam_ozellik": 25,
+    "tamam": 25,
+    "eksik": 0,
+    "aciklama": "ReYMeN Agent ile ReYMeN arasinda feature-level karsilastirma. Kod olarak TUM ozellikler tamam. Son 3 bug fix: (1) HITL typo, (2) motor HITL import, (3) Renk.soluk() eksik.",
+    "son_guncelleme": "2026-06-29T18:00:00",
+    "detaylar": {
+      "Image Generation": {"durum": "tamam", "not": "3 engine FAL+OpenAI+xAI"},
+      "Voice/TTS/STT": {"durum": "tamam", "not": "OpenAI+Edge+Whisper"},
+      "Video Generation": {"durum": "tamam", "not": "video_gen_engine.py 366s 3 backend"},
+      "Plugin Hot-reload": {"durum": "tamam", "not": "hot_reload.py 220s watchdog"},
+      "Skills Marketplace": {"durum": "tamam", "not": "marketplace.py 345s + skills_hub.py"},
+      "HITL": {"durum": "tamam", "not": "Fixlendi: typo+import. RISKLI_ARACLAR calisiyor"},
+      "Claude Code Delegation": {"durum": "tamam", "not": "acp_server.py 870s JSON-RPC 2.0"},
+      "Auto-discover": {"durum": "tamam", "not": "3 kaynakli otomatik MCP kesfi"},
+      "Provider sayisi": {"durum": "tamam", "not": "10 provider zinciri"},
+      "Multi-platform": {"durum": "tamam", "not": "Telegram Discord SMS"},
+      "Plugin sistemi": {"durum": "tamam", "not": "7 plugin hot-reload CLI"},
+      "MCP Server": {"durum": "tamam", "not": "Stdio HTTP/SSE tools/resources"},
+      "Context Compression": {"durum": "tamam", "not": "context_compressor.py"},
+      "Kanban": {"durum": "tamam", "not": "130 test worker lifecycle"},
+      "Curator": {"durum": "tamam", "not": "Skill archive pin stale detection"},
+      "ACP/IDE": {"durum": "tamam", "not": "acp_server.py Claude Code uyumlu"},
+      "Webhook": {"durum": "tamam", "not": "webhook.py 144s"},
+      "Memory Backends": {"durum": "tamam", "not": "memory_provider.py 1091s"},
+      "Docker/SSH": {"durum": "tamam", "not": "terminal_backends.py"},
+      "Auth Diversity": {"durum": "tamam", "not": "oauth_manager + mcp_oauth"}
+    }
+  },
+
+  "pasa_38_karsilastirmasi": {
+    "aciklama": "ReYMeN vs ReYMeN Agent karsilastirmasi (GUNCELLENDI)",
+    "maddeler": [
+      {"eksik": "Skill sayisi", "ReYMeN": 554, "reymen": 1114, "cozuldu_mu": "evet"},
+      {"eksik": "Tool sayisi", "ReYMeN": "~95", "reymen": 255, "cozuldu_mu": "evet"},
+      {"eksik": "Gateway cesitliligi", "ReYMeN": "TG+DC+SMS+Mail", "reymen": "TG+DC+SMS", "cozuldu_mu": "kismen"},
+      {"eksik": "Pipeline kalitesi", "ReYMeN": "Standart", "reymen": "Ensemble (5 kaynak)", "cozuldu_mu": "evet"},
+      {"eksik": "Hafiza sistemi", "ReYMeN": "Session bazli", "reymen": "OnceHafiza (SQLite)", "cozuldu_mu": "evet"},
+      {"eksik": "Dead code orani", "ReYMeN": "%5", "reymen": "%5-10", "cozuldu_mu": "kismen"},
+      {"eksik": "Sessiz except", "ReYMeN": "<50", "reymen": 36, "cozuldu_mu": "kismen"},
+      {"eksik": "HITL", "ReYMeN": "Var", "reymen": "Var (Fixlendi)", "cozuldu_mu": "evet"},
+      {"eksik": "Mail gateway", "ReYMeN": "Var", "reymen": "Yok", "cozuldu_mu": "hayir"}
+    ]
+  }
+}

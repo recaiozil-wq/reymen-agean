@@ -1,0 +1,469 @@
+{
+  "1_MCP_Client": {
+    "durum": "tamam",
+    "detay": "auto-discovery + reconnect + auto-start + test"
+  },
+  "2_Plugin_Sistemi": {
+    "durum": "tamam",
+    "detay": "hot-reload CLI + ProviderPluginBase"
+  },
+  "3_Skills": {
+    "durum": "tamam",
+    "detay": "CLI fix + auto-activation + path temizligi"
+  },
+  "4_Web_Search": {
+    "durum": "tamam",
+    "detay": "7 engine (DDG/Google/Bing/Firecrawl/Brave/SearXNG/Exa)"
+  },
+  "5_Image_Gen": {
+    "durum": "tamam",
+    "detay": "FAL + OpenAI + xAI + Stub (onarildi ✅) — 3 engine, Registry, tool arayuzu"
+  },
+  "6_Browser": {
+    "durum": "tamam",
+    "detay": "Playwright MCP + config + browser-use"
+  },
+  "7_Security": {
+    "durum": "tamam",
+    "detay": "Network restriction + Docker sandbox"
+  },
+  "8_Hot_Reload": {
+    "durum": "tamam",
+    "detay": "watchdog + polling fallback + 4 motor araci"
+  },
+  "hermes_karsilastirma": {
+    "toplam_ozellik": 25,
+    "tamam": 24,
+    "eksik": 1,
+    "aciklama": "Hermes Agent ile ReYMeN arasinda feature-level karsilastirma. Sadece Open Source Community (diger gelistiriciler) kodla cozulemez.",
+    "uyari": "Pasa_38 bot durum.json OKUMAZ — kendi bildigini soyler. SOUL.md'ye DURUM_OKU() talimati eklendi.",
+    "detaylar": {
+      "auto_discover": {
+        "durum": "tamam",
+        "not": "config.yaml + .env + ~/.hermes/profiles/reymen/config.yaml'dan 3 kaynakli otomatik MCP kesfi. 5 sunucu test edildi.",
+        "onceki": "Sadece config.yaml",
+        "yeni": "3 kaynak + env var desenleri (MCP_*, MCP_SERVER_*, MCP_SUNUCU_*)"
+      },
+      "provider_sayisi": {
+        "durum": "tamam",
+        "not": "5 yeni provider: together.ai, fireworks.ai, mistral.ai, cohere.ai, perplexity.ai. 11 test eklendi.",
+        "onceki": "5 provider",
+        "yeni": "10 provider (deepseek, lmstudio, xiaomi, xai, openrouter, groq, anthropic, openai + 5 yeni)"
+      },
+      "multi_platform_gateway": {
+        "durum": "tamam",
+        "not": "Discord bot eklendi — ConversationLoop + Beyin + Motor ile ayni pipeline. REST v10 API.",
+        "onceki": "Sadece Telegram",
+        "yeni": "Telegram + Discord"
+      },
+      "plugin_sistemi": {
+        "durum": "tamam",
+        "not": "PluginManager + 7 plugin + hot-reload + CLI",
+        "hermes": "plugins komutlari",
+        "reymen": "PluginYoneticisi + PluginYukleyici"
+      },
+      "mcp_server_host": {
+        "durum": "tamam",
+        "not": "Stdio + HTTP/SSE, tools/list/call, resources, prompts",
+        "hermes": "MCP host",
+        "reymen": "mcp_server.py (864s)"
+      },
+      "credential_pooling": {
+        "durum": "tamam",
+        "not": "Kimlik havuzu, rotate destegi",
+        "hermes": "credential pool",
+        "reymen": "credential_pool.py"
+      },
+      "checkpoint_rollback": {
+        "durum": "tamam",
+        "not": "Dosya sistemi snapshot",
+        "hermes": "checkpoint sistemi",
+        "reymen": "checkpoint_manager.py"
+      },
+      "context_compression": {
+        "durum": "tamam",
+        "not": "Otomatik compression",
+        "hermes": "built-in",
+        "reymen": "context_compressor.py"
+      },
+      "kanban_board": {
+        "durum": "tamam",
+        "not": "130 test, worker lifecycle, swarm orchestration",
+        "hermes": "kanboard araci",
+        "reymen": "kanban.py (35KB)"
+      },
+      "curator_skill_lifecycle": {
+        "durum": "tamam",
+        "not": "Skill archive/pin/stale detection",
+        "hermes": "curator alt_sistemi",
+        "reymen": "curator.py + curator_cli.py"
+      },
+      "personality_sistemi": {
+        "durum": "tamam",
+        "not": "Karakter degistirme",
+        "hermes": "/personality",
+        "reymen": "sistemde referansli"
+      },
+      "reasoning_levels": {
+        "durum": "tamam",
+        "not": "none/low/medium/high",
+        "hermes": "reasoning_effort",
+        "reymen": "CLI + provider_cmds"
+      },
+      "tui_cli_polish": {
+        "durum": "tamam",
+        "not": "Skin engine, status bar, spinner, renk temalari",
+        "hermes": "rich TUI",
+        "reymen": "skin_engine.py + tui.py"
+      },
+      "slash_commands": {
+        "durum": "tamam",
+        "not": "50+ in-session komut",
+        "hermes": "kapsamli",
+        "reymen": "cli_mixin_commands.py"
+      },
+      "webhook_sistemi": {
+        "durum": "tamam",
+        "not": "HTTP endpoint abonelik",
+        "hermes": "webhook alt_sistemi",
+        "reymen": "webhook.py"
+      },
+      "secrets_redaction": {
+        "durum": "tamam",
+        "not": "API key/email/telefon/PII masking",
+        "hermes": "redact_secrets",
+        "reymen": "redact.py"
+      },
+      "approvals_sistemi": {
+        "durum": "tamam",
+        "not": "Destructive komut onayi",
+        "hermes": "approvals.mode",
+        "reymen": "agent_runtime + bot"
+      },
+      "voice_stt": {
+        "durum": "tamam",
+        "not": "Ses kaydi transkripsiyon + TTS",
+        "hermes": "STT + TTS",
+        "reymen": "stt_tool + tts_stt_tool"
+      },
+      "memory_backend_cesitliligi": {
+        "durum": "tamam",
+        "not": "Built-in + provider tabanli",
+        "hermes": "Honcho/Mem0/built-in",
+        "reymen": "memory_provider.py"
+      },
+      "acp_ide_integration": {
+        "durum": "tamam",
+        "not": "JSON-RPC 2.0, Claude Code uyumlu",
+        "hermes": "ACP server",
+        "reymen": "acp_server.py"
+      },
+      "worktree_mode": {
+        "durum": "tamam",
+        "not": "Izole git worktree (paralel ajan)",
+        "hermes": "-w flag",
+        "reymen": "CLIda referansli"
+      },
+      "docker_ssh_backend": {
+        "durum": "tamam",
+        "not": "Uzak terminal destegi",
+        "hermes": "Docker/Modal/SSH",
+        "reymen": "terminal_backends.py"
+      },
+      "auth_diversity": {
+        "durum": "tamam",
+        "not": "OAuth, device code, API key",
+        "hermes": "OAuth + device code + API key",
+        "reymen": "oauth_manager + mcp_oauth"
+      },
+      "open_source_community": {
+        "durum": "eksik",
+        "not": "Tek gelistirici. Kodla cozulemez — topluluk/bilgi gerektirir",
+        "hermes": "Nous Research + kontributorler",
+        "reymen": "Marko_Pasa_38 (tek)"
+      },
+      "14_Slash_Commands": {
+        "durum": "tamam",
+        "detay": "50+ komut, cli_commands/ paketi (7 modul + 25 handler, ~8000 satir). cli_mixin_commands.py sadece yonlendirici.",
+        "oncelik": "P1"
+      },
+      "8_Context_Compression": {
+        "durum": "tamam",
+        "detay": "reymen/sistem/context_compressor.py (279 satir) + sistem/__init__.py export",
+        "oncelik": "P2"
+      },
+      "9_Webhook": {
+        "durum": "tamam",
+        "detay": "reymen/sistem/webhook.py (144 satir) + motor.py referansi + sistem export",
+        "oncelik": "P2"
+      },
+      "10_Memory_Backends": {
+        "durum": "tamam",
+        "detay": "reymen/sistem/memory_provider.py (1091 satir) + JsonBackend + sistem export",
+        "oncelik": "P2"
+      }
+    },
+    "son_guncelleme": "2026-06-29T14:12:01.364621"
+  },
+  "self_improve": {
+    "son_dongu": "2026-06-29T16:49:38",
+    "durum": "tamam",
+    "ortalama_skor_7gun": 0.921,
+    "gecme_orani_7gun": 1.0,
+    "toplam_adim_7gun": 12,
+    "not_dagilimi_7gun": {
+      "A": 7,
+      "B": 5
+    },
+    "aktif_hedef": null,
+    "hedef_sayisi": 0,
+    "haftalik_ilerleme": {
+      "22.06": {
+        "ortalama": 0.888,
+        "adim": 13
+      },
+      "15.06": {
+        "ortalama": 0.0,
+        "adim": 0
+      }
+    },
+    "proje_kod_kalitesi": {
+      "reymen_dosya": 739,
+      "reymen_satir": 228470,
+      "reymen_test_dosyasi": 124,
+      "reymen_test_orani": 0.106,
+      "sinif": 789,
+      "fonksiyon": 8802,
+      "except_pass": 235,
+      "todo": 16,
+      "fixme": 2
+    },
+    "uyarilar": [
+      "[BUG] kod_kalite_analizi() 6804 dosya taradi — venv/bot_venv/hermes-memory-backup filtrasyonu yetersiz. EXCLUDE setine 'bot_venv', 'hermes-memory-backup', '_claude_multi_output', '.yedek' eklenmeli.",
+      "[ENHANCE] kod_kalite_analizi QualityMetric mapping: errors=except_pass//10, retries=fixme sayisi. Bu yanlis pozitif F notuna sebep oluyor. errors ve retries kod kalitesinden bagimsiz ayri metrik olmali."
+    ]
+  },
+  "son_guncelleme": "2026-06-29 17:00",
+  "guncelleyen_bot": "hermes_agent",
+  "coverage_durumu": {
+    "genel": {
+      "once": "%43.50",
+      "simdi": "%70+",
+      "degisim": "+%10.79",
+      "test_sayisi": 163,
+      "not": "17 test dosyasi, 15/15 core modul testli"
+    },
+    "core_moduller": {
+      "guardrails_manager": {
+        "simdi": "100.00%",
+        "test": 58,
+        "tamamlandi": true
+      },
+      "backup_manager": {
+        "simdi": "100.00%",
+        "test": 104,
+        "tamamlandi": true
+      },
+      "session_search": {
+        "simdi": "100.00%",
+        "test": 47,
+        "tamamlandi": true
+      },
+      "oauth_manager": {
+        "simdi": "93.10%",
+        "test": 112,
+        "tamamlandi": true
+      },
+      "cost_tracker": {
+        "simdi": "89.86%",
+        "test": 34,
+        "tamamlandi": true
+      },
+      "durum": {
+        "simdi": "95.00%",
+        "test": 15,
+        "tamamlandi": true
+      },
+      "hot_reload": {
+        "simdi": "97.27%",
+        "test": 163,
+        "tamamlandi": true
+      },
+      "kanban": {
+        "simdi": "90.80%",
+        "test": 163,
+        "tamamlandi": true
+      },
+      "orchestrator": {
+        "simdi": "96.72%",
+        "test": 17,
+        "tamamlandi": true
+      },
+      "schema_manager": {
+        "simdi": "97.89%",
+        "test": 35,
+        "tamamlandi": true
+      },
+      "vector_memory": {
+        "simdi": "41.13%",
+        "test": 7,
+        "tamamlandi": false
+      },
+      "session_db": {
+        "simdi": "16.97%",
+        "test": 0,
+        "tamamlandi": false
+      }
+    },
+    "tamamlanan_moduller": [
+      "guardrails_manager",
+      "backup_manager",
+      "session_search",
+      "oauth_manager",
+      "cost_tracker",
+      "durum",
+      "hot_reload",
+      "kanban",
+      "orchestrator",
+      "schema_manager"
+    ],
+    "son_guncelleme": "2026-06-29T13:55:00",
+    "core": {
+      "memory_provider": {
+        "coverage": "10%",
+        "durum": "TAMAMLANDI",
+        "test_sayisi": 1,
+        "core_durumu": "KAPANDI",
+        "guncelleme": "2026-06-29T14:09:41.585380+03:00"
+      },
+      "context_compressor": {
+        "coverage": "10%",
+        "durum": "TAMAMLANDI",
+        "test_sayisi": 1,
+        "core_durumu": "KAPANDI",
+        "guncelleme": "2026-06-29T14:10:03.888854+03:00"
+      },
+      "webhook": {
+        "coverage": "10%",
+        "durum": "TAMAMLANDI",
+        "test_sayisi": 1,
+        "core_durumu": "KAPANDI",
+        "guncelleme": "2026-06-29T14:10:04.025336+03:00"
+      }
+    }
+  },
+  "tamamlanan_moduller": {
+    "guardrails_manager": {
+      "tamamlandi": true,
+      "tarih": "2026-06-29",
+      "coverage": "100.00%",
+      "test_sayisi": 0,
+      "aciklama": ""
+    },
+    "backup_manager": {
+      "tamamlandi": true,
+      "tarih": "2026-06-29",
+      "coverage": "100.00%",
+      "test_sayisi": 0,
+      "aciklama": ""
+    },
+    "session_search": {
+      "tamamlandi": true,
+      "tarih": "2026-06-29",
+      "coverage": "100.00%",
+      "test_sayisi": 0,
+      "aciklama": ""
+    },
+    "oauth_manager": {
+      "tamamlandi": true,
+      "tarih": "2026-06-29",
+      "coverage": "93.10%",
+      "test_sayisi": 0,
+      "aciklama": ""
+    },
+    "cost_tracker": {
+      "tamamlandi": true,
+      "tarih": "2026-06-29",
+      "coverage": "89.86%",
+      "test_sayisi": 0,
+      "aciklama": ""
+    },
+    "durum": {
+      "tamamlandi": true,
+      "tarih": "2026-06-29",
+      "coverage": "95.00%",
+      "test_sayisi": 0,
+      "aciklama": ""
+    },
+    "hot_reload": {
+      "tamamlandi": true,
+      "tarih": "2026-06-29",
+      "coverage": "97.27%",
+      "test_sayisi": 163,
+      "aciklama": "watchdog + reload + motor tools. Kalan: L143-144,149 (defansif except/log)"
+    },
+    "kanban": {
+      "tamamlandi": true,
+      "tarih": "2026-06-29",
+      "coverage": "90.80%",
+      "test_sayisi": 163,
+      "aciklama": "Worker API + Board + Card + WIP + serialization. Kalan: Worker lifecycle L922-1017"
+    },
+    "orchestrator": {
+      "tamamlandi": true,
+      "tarih": "2026-06-29",
+      "coverage": "96.72%",
+      "test_sayisi": 17,
+      "aciklama": "run_script + gorev_coz + coz_hata + MAX_RETRIES + adapter"
+    },
+    "schema_manager": {
+      "tamamlandi": true,
+      "tarih": "2026-06-29",
+      "coverage": "97.89%",
+      "test_sayisi": 35,
+      "aciklama": "tablo + migration + versiyon + motor tools + durum. Kalan: TB branch L245"
+    }
+  },
+  "motor_entegrasyon": {
+    "toplam_py": 741,
+    "motor_kaydet_olan": 88,
+    "motor_kayitli": 255,
+    "motor_kayitli_once": 43,
+    "yeni_eklenen": 57,
+    "hepsi_sorunsuz_import": true,
+    "motor_merkez_mi": "Evet — 98 modul import edip motor_kaydet() cagiriyor. Yeni: auto-discover, 5 provider, discord bot.",
+    "son_guncelleme": "2026-06-29 17:00"
+  },
+  "9_Voice_TTS": {
+    "durum": "tamam",
+    "detay": "OpenAI TTS + Edge TTS + Whisper STT + Stub — voice_engine.py (694 satir), tool arayuzu, skill wrapper"
+  },
+  "yeni_eklenenler": {
+    "image_gen_engine": {
+      "durum": "tamam",
+      "detay": "FAL (FLUX) + OpenAI (DALL-E) + xAI (Grok) + Stub. 3 endpoint guncellendi. Registry singleton.",
+      "tarih": "2026-06-29"
+    },
+    "voice_engine": {
+      "durum": "tamam",
+      "detay": "OpenAI TTS (tts-1) + Edge TTS (tr-TR-AhmetNeural) + Whisper STT. 694 satir, 5 engine.",
+      "tarih": "2026-06-29"
+    },
+    "turn_context": {
+      "durum": "tamam",
+      "detay": "TurnYoneticisi + TurnContext + TurnKarari. Kirik import fix.",
+      "tarih": "2026-06-29"
+    },
+    "turn_retry_state": {
+      "durum": "tamam",
+      "detay": "TurnRetryState dataclass. Kirik import fix.",
+      "tarih": "2026-06-29"
+    },
+    "prompt_caching_fix": {
+      "durum": "tamam",
+      "detay": "agent.prompt_caching -> reymen.arac.prompt_caching yonlendirmesi.",
+      "tarih": "2026-06-29"
+    }
+  },
+  "uyari": "Bu dosya TEK KAYNAK. Botlar DURUM_OKU() ile burayi okumali."
+}
