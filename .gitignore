@@ -194,7 +194,6 @@ bot_venv/
 # GitHub 100MB limitini asan dosyalar
 reymen/ReYMeN_mirror/
 .ReYMeN/backups/
-reymen/cereyan/.ReYMeN/skills_index.db
 **/chroma_db/
 **/*.zip
 hermes_legacy/
@@ -289,3 +288,4 @@ tests/hermes_legacy/
 # Coverage (runtime)
 .coverage
 .cov_*.json
+reymen/cereyan/.ReYMeN/skills_index.db
