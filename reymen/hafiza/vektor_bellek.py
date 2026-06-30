@@ -47,7 +47,7 @@ except ImportError:
 # ── Varsayilan sabitler ───────────────────────────────────────────────────────
 VARSAYILAN_DIZIN = str(Path(__file__).parent.parent.parent / "vektor_hafizasi")
 VARSAYILAN_MODEL = "all-MiniLM-L6-v2"
-MAKS_KAYIT = 5000
+MAKS_KAYIT = 8000          # Baslangic 5000'di, 8000'e yukseltildi
 ESIK_BENZERLIK = 0.15       # Arama esigi (altindaki sonuclar filtrelenir)
 ESIK_DEDUP = 0.85           # Dedup esigi (ustundeki kayit tekrar eklenmez)
 

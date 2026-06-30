@@ -159,8 +159,6 @@ desktop/node_modules/
 !skills/
 
 # ReYMeN generated files (SQLite DBs, cache, locks, logs)
-.ReYMeN/session.db
-.ReYMeN/hafiza.db
 .reymen_hafiza/
 .background_checkpoints/
 .alt_ajan_hafiza/
@@ -197,14 +195,9 @@ bot_venv/
 reymen/ReYMeN_mirror/
 .ReYMeN/backups/
 reymen/cereyan/.ReYMeN/skills_index.db
-reymen/cereyan/.ReYMeN/ogrenmeler.db
 **/chroma_db/
 **/*.zip
-**/*.db
 .ReYMeN/hata_kodlari/
-*.db
-.ReYMeN/hafiza.db
-.ReYMeN/memory.db
 hermes_legacy/
 .ReYMeN/yedekler/
 .ReYMeN/yedekler
@@ -227,8 +220,6 @@ _*.bat
 _*.cmd
 
 # SQLite WAL/SHM (run-time)
-*.db-shm
-*.db-wal
 
 # PID files
 *.pid
@@ -294,7 +285,6 @@ tests/hermes_legacy/
 
 # Runtime state: bot session, cron, learning, hata kodlari
 .ReYMeN/ai_bot_*.json
-.ReYMeN/ogrenmeler.jsonl
 .ReYMeN/hata_kodlari/
 **/hata_kodlari/
 **/cron/jobs.json
