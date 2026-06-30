@@ -16,22 +16,18 @@ setlocal enabledelayedexpansion
 :: ---------- 1. GEREKSINIM KONTROLLERI ----------
 set ADIM=0
 
-:: 1.0 Windows surumu
+:: 1.0 Windows surumu (ayrik blok, parantez yok)
 set /a ADIM+=1
 echo ^(1/5^) Windows kontrolu...
-ver | find "10." >nul
-if %errorlevel% neq 0 (
-    ver | find "11." >nul
-)
-if %errorlevel% neq 0 (
-    echo [!] Windows 10 veya 11 gerekli!
-    echo     Mevcut: 
-    ver
-    pause
-    exit /b
-) else (
-    echo [OK] Windows 10+
-)
+ver | find "10." >nul && goto win_ok
+ver | find "11." >nul && goto win_ok
+echo [!] Windows 10 veya 11 gerekli!
+echo     Mevcut:
+ver
+pause
+exit /b
+:win_ok
+echo [OK] Windows 10+
 
 :: 1.1 Python
 set /a ADIM+=1
@@ -140,20 +136,29 @@ if defined FREE (
     )
 )
 
-if not exist "reymen_venv" (
-    python -m venv reymen_venv
-    if %errorlevel% neq 0 (
-        echo [!!] Sanal ortam olusturulamadi!
-        echo     Olası neden: Windows Defender/AppLocker engelliyor olabilir.
-        echo     Cozum: Gecici olarak Defender Gercek Zamanli Korumayi kapat:
-        echo     PowerShell (Yonetici): Set-MpPreference -DisableRealtimeMonitoring $true
-        pause
-        exit /b
-    )
-    echo [OK] Sanal ortam: reymen_venv
-)
+:: Sanal ortam kontrolu - ayrik bloklar
+set VENV_DIR=reymen_venv
 
-call reymen_venv\Scripts\activate
+:: 1) reymen_venv zaten varsa kullan
+if exist "%VENV_DIR%\Scripts\activate" goto venv_hazir
+
+:: 2) venv (standart ad) varsa kullan
+if exist "venv\Scripts\activate" set "VENV_DIR=venv" & goto venv_hazir
+
+:: 3) Hicbiri yoksa reymen_venv olustur
+echo [..] Sanal ortam bulunamadi, olusturuluyor: %VENV_DIR%
+python -m venv "%VENV_DIR%"
+if %errorlevel% neq 0 (
+    echo [!!] Sanal ortam olusturulamadi!
+    echo     Cozum: Gecici olarak Defender Gercek Zamanli Korumayi kapat:
+    echo     PowerShell (Yonetici): Set-MpPreference -DisableRealtimeMonitoring $true
+    pause
+    exit /b
+)
+:venv_hazir
+echo [OK] Sanal ortam: %VENV_DIR%
+
+call "%VENV_DIR%\Scripts\activate"
 
 :: pip'i guncelle
 python -m pip install --upgrade pip --quiet
