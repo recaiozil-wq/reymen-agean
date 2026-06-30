@@ -1,7 +1,7 @@
-[![CI](https://github.com/Watcher-Hermes/ReYMeN-Ajan/actions/workflows/ci.yml/badge.svg)](https://github.com/Watcher-Hermes/ReYMeN-Ajan/actions/workflows/ci.yml)
+[![CI](https://github.com/recaiozil-wq/R-eYMeN-/actions/workflows/ci.yml/badge.svg)](https://github.com/recaiozil-wq/R-eYMeN-/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue)](https://python.org)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-0.9.0--beta-orange)](https://github.com/Watcher-Hermes/ReYMeN-Ajan/releases)
+[![Version](https://img.shields.io/badge/Version-0.9.0--beta-orange)](https://github.com/recaiozil-wq/R-eYMeN-/releases)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](CONTRIBUTING.md)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 
@@ -39,7 +39,7 @@
 
 ```powershell
 # 1. Projeyi indir
-git clone https://github.com/Watcher-Hermes/ReYMeN-Ajan.git
+git clone https://github.com/recaiozil-wq/R-eYMeN-.git
 cd ReYMeN-Ajan
 
 # 2. Sanal ortam oluştur
@@ -61,7 +61,7 @@ cp .env.example .env
 
 ```bash
 # 1. Projeyi indir
-git clone https://github.com/Watcher-Hermes/ReYMeN-Ajan.git
+git clone https://github.com/recaiozil-wq/R-eYMeN-.git
 cd ReYMeN-Ajan
 
 # 2. Sanal ortam oluştur
@@ -84,10 +84,10 @@ nano .env
 
 ```bash
 # Linux/Mac
-curl -fsSL https://raw.githubusercontent.com/Watcher-Hermes/ReYMeN-Ajan/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/recaiozil-wq/R-eYMeN-main/install.sh | bash
 
 # Windows PowerShell
-irm https://raw.githubusercontent.com/Watcher-Hermes/ReYMeN-Ajan/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/recaiozil-wq/R-eYMeN-main/install.ps1 | iex
 ```
 
 ---
@@ -264,6 +264,6 @@ Pull request'ler açıktır! [CONTRIBUTING.md](CONTRIBUTING.md) dosyasına bak.
 
 | Kanal | Link |
 |:------|:-----|
-| GitHub Issues | [Hata bildir / Öneri yap](https://github.com/Watcher-Hermes/ReYMeN-Ajan/issues/new/choose) |
+| GitHub Issues | [Hata bildir / Öneri yap](https://github.com/recaiozil-wq/R-eYMeN-/issues/new/choose) |
 | Telegram | @Pasa_38 |
 | Discord | (yakında) |

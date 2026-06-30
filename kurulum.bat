@@ -121,7 +121,7 @@ if not exist "reymen_launcher.py" (
     ) else (
         echo [!!] Proje dosyalari bulunamadi!
         echo     Bu script ReYMeN-Ajan klasoru icinde calistirilmali.
-        echo     veya: git clone https://github.com/Watcher-Hermes/ReYMeN-Ajan-v2.git
+        echo     veya: git clone https://github.com/recaiozil-wq/R-eYMeN-.git
         pause
         exit /b
     )
@@ -264,6 +264,6 @@ echo     PowerShell (Yonetici):
 echo     Set-MpPreference -DisableRealtimeMonitoring $true
 echo     Sonra tekrar dene
 echo.
-echo  GitHub: https://github.com/Watcher-Hermes/ReYMeN-Ajan-v2
+echo  GitHub: https://github.com/recaiozil-wq/R-eYMeN-
 echo.
 pause

@@ -1,8 +1,8 @@
 # ReYMeN — Tek komut kurulum (Windows PowerShell)
-# Kullanım: irm https://raw.githubusercontent.com/Watcher-Hermes/ReYMeN-Ajan/main/install.ps1 | iex
+# Kullanım: irm https://raw.githubusercontent.com/recaiozil-wq/R-eYMeN-main/install.ps1 | iex
 
 $ErrorActionPreference = "Stop"
-$Repo = "Watcher-Hermes/ReYMeN-Ajan-v2"
+$Repo = "recaiozil-wq/R-eYMeN-"
 $Branch = "main"
 
 Write-Host "=== ReYMeN Agent Kurulumu ===" -ForegroundColor Green

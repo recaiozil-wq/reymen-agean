@@ -47,5 +47,5 @@ packages = [
 py-modules = ["reymen_launcher"]
 
 [project.urls]
-Homepage = "https://github.com/Watcher-Hermes/ReYMeN-Ajan-v2"
-Source = "https://github.com/Watcher-Hermes/ReYMeN-Ajan-v2"
+Homepage = "https://github.com/recaiozil-wq/R-eYMeN-"
+Source = "https://github.com/recaiozil-wq/R-eYMeN-"

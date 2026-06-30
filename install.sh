@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # ReYMeN — Tek komut kurulum (Linux/Mac)
-# Kullanım: curl -fsSL https://raw.githubusercontent.com/Watcher-Hermes/ReYMeN-Ajan/main/install.sh | bash
+# Kullanım: curl -fsSL https://raw.githubusercontent.com/recaiozil-wq/R-eYMeN-main/install.sh | bash
 set -euo pipefail
 
-REPO="Watcher-Hermes/ReYMeN-Ajan"
+REPO="recaiozil-wq/R-eYMeN-
 BRANCH="main"
 RED='\033[0;31m'
 GREEN='\033[0;32m'

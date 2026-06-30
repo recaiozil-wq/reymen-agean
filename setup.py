@@ -9,10 +9,10 @@ setup(
     long_description_content_type="text/markdown",
     author="ReYMeN Team",
     author_email="",
-    url="https://github.com/Watcher-Hermes/ReYMeN-Ajan-v2",
+    url="https://github.com/recaiozil-wq/R-eYMeN-",
     project_urls={
-        "Hata Bildir": "https://github.com/Watcher-Hermes/ReYMeN-Ajan-v2/issues/new/choose",
-        "Kaynak": "https://github.com/Watcher-Hermes/ReYMeN-Ajan-v2",
+        "Hata Bildir": "https://github.com/recaiozil-wq/R-eYMeN-/issues/new/choose",
+        "Kaynak": "https://github.com/recaiozil-wq/R-eYMeN-",
     },
     license="MIT",
     classifiers=[
