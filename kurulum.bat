@@ -21,7 +21,7 @@ set /a ADIM+=1
 echo ^(1/5^) Windows kontrolu...
 ver | find "10." >nul && goto win_ok
 ver | find "11." >nul && goto win_ok
-echo [!] Windows 10 veya 11 gerekli!
+echo [^^!] Windows 10 veya 11 gerekli^^!
 echo     Mevcut:
 ver
 pause
@@ -46,7 +46,7 @@ if !errorlevel! neq 0 (
 )
 python -c "import sys; exit(0) if sys.version_info >= (3,11) else exit(1)" >nul 2>&1
 if !errorlevel! neq 0 (
-    echo [!] Python 3.11+ gerekli!
+    echo [^^!] Python 3.11+ gerekli^^!
     python --version
     pause
     exit /b
@@ -96,7 +96,7 @@ if !errorlevel! neq 0 (
     winget install Gyan.FFmpeg --silent --accept-package-agreements 2>nul
     where ffmpeg >nul 2>&1
     if !errorlevel! neq 0 (
-        echo [!] Otomatik basarisiz! Elle indir:
+        echo [^^!] Otomatik basarisiz^^! Elle indir:
         echo     https://ffmpeg.org/download.html
         echo     veya: winget install Gyan.FFmpeg
     )
@@ -132,7 +132,7 @@ if not defined FREE (
 set FREE=%FREE:,=%
 if defined FREE (
     if %FREE% LSS 500000000 (
-        echo [!] Uyari: Disk alani az (500MB alti)!
+        echo [^^!] Uyari: Disk alani az (500MB alti)^^!
     )
 )
 
@@ -180,7 +180,7 @@ if exist pyproject.toml (
 if !errorlevel! equ 0 (
     echo [OK] Tüm paketler basariyla yuklendi.
 ) else (
-    echo [!] Paket yukleme hatasi!
+    echo [^^!] Paket yukleme hatasi^^!
     echo     Cozum: Manuel olarak terminalde 'pip install -e .' komutunu calistirin.
     pause
     exit /b
