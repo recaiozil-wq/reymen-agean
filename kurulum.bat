@@ -33,7 +33,7 @@ echo [OK] Windows 10+
 set /a ADIM+=1
 echo ^(2/5^) Python kontrolu...
 python --version >nul 2>&1
-if %errorlevel% neq 0 (
+if !errorlevel! neq 0 (
     echo [!!] Python bulunamadi! Yukleniyor...
     winget install Python.Python.3.11 --silent --accept-package-agreements
     if !errorlevel! neq 0 (
@@ -45,7 +45,7 @@ if %errorlevel% neq 0 (
     )
 )
 python -c "import sys; exit(0) if sys.version_info >= (3,11) else exit(1)" >nul 2>&1
-if %errorlevel% neq 0 (
+if !errorlevel! neq 0 (
     echo [!] Python 3.11+ gerekli!
     python --version
     pause
@@ -58,7 +58,7 @@ echo [OK] %PYVER%
 set /a ADIM+=1
 echo ^(3/5^) Git kontrolu...
 git --version >nul 2>&1
-if %errorlevel% neq 0 (
+if !errorlevel! neq 0 (
     echo [!!] Git bulunamadi! Yukleniyor...
     winget install Git.Git --silent --accept-package-agreements
     if !errorlevel! neq 0 (
@@ -74,10 +74,10 @@ echo [OK] %GITVER%
 set /a ADIM+=1
 echo ^(4/7^) Node.js kontrolu...
 node --version >nul 2>&1
-if %errorlevel% neq 0 (
+if !errorlevel! neq 0 (
     echo [!!] Node.js bulunamadi! Yukleniyor...
     winget install OpenJS.NodeJS.LTS --silent --accept-package-agreements
-    if !errorlevel% neq 0 (
+    if !errorlevel! neq 0 (
         echo [!] Basarisiz! https://nodejs.org adresinden el ile indir
         pause
         exit /b
@@ -90,7 +90,7 @@ echo [OK] Node.js %NODEVER%
 set /a ADIM+=1
 echo ^(5/7^) FFmpeg kontrolu...
 ffmpeg -version >nul 2>&1
-if %errorlevel% neq 0 (
+if !errorlevel! neq 0 (
     echo [!!] FFmpeg bulunamadi! Yukleniyor...
     winget install "FFmpeg (Shared)" --silent --accept-package-agreements 2>nul
     winget install Gyan.FFmpeg --silent --accept-package-agreements 2>nul
@@ -172,7 +172,7 @@ if exist pyproject.toml (
 ) else (
     pip install requests python-dotenv --quiet
 )
-if %errorlevel% equ 0 (
+if !errorlevel! equ 0 (
     echo [OK] Paketler yuklendi
 ) else (
     echo [!] Paket hatasi!
