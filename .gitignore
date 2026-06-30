@@ -286,3 +286,26 @@ apps/
 .ReYMeN/watchdog_hash.json
 **/account_summary.json
 site/
+
+# ReYMeN reference test kopyalari (Hermes Agent legacy, bagimlilik cozulemez)
+tests/ReYMeN_reference/
+tests/hermes_legacy/
+
+# Runtime state: bot session, cron, learning, hata kodlari
+.ReYMeN/ai_bot_*.json
+.ReYMeN/ogrenmeler.jsonl
+.ReYMeN/hata_kodlari/
+**/hata_kodlari/
+**/cron/jobs.json
+**/cron/skill_sync_log.md
+**/cron/output/
+**/self_improvement.json
+**/decisions.md
+**/mcp_client.json
+
+# Cron artifacts (runtime, regenerated)
+.hermes_cron/
+
+# Coverage (runtime)
+.coverage
+.cov_*.json
