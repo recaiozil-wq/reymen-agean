@@ -19,7 +19,7 @@ ReYMeN, yalnızca bir araç değil; Türkçe konuşan geliştiricilere "AI ajan"
 
 Geliştirilmekte olan vizyon şu: ReYMeN'in kendi hatalarını tespit edip otonom şekilde Python kodu üreterek düzeltmesi. Bugün itibarıyla hata → çözüm hafızası (OnceHafıza) çalışıyor; self-heal ve otonom kod üretimi ise adım adım olgunlaştırılıyor. Bu, henüz "tam çalışan özellik" değil, **üzerinde çalışılan ve katkıya açık bir hedef**. Fikirleriniz, PR'larınız ve deneyimleriniz bu hedefi şekillendirecek.
 
-ReYMeN, Nous Research'in [Hermes Agent](https://hermes-agent.nousresearch.com) mimarisinden ilham alır. Hermes'in Linux/açık kaynak topluluğuna yaptığı karşılıksız katkı olmasaydı, bu proje bugünkü halinde olmazdı. Kendilerine teşekkür ederiz.
+ReYMeN, Nous Research'in [Hermes Agent](https://hermes-agent.nousresearch.com) mimarisinden ilham alır. Ayrıca Linux ve açık kaynak ekosisteminin yıllardır süren karşılıksız emeği olmasaydı, bu proje bugünkü halinde olmazdı. Hepsine teşekkür ederiz.
 
 Katkı, öneri ve gönüllülüğe açığız. Yol haritamıza göz atın, bir issue açın veya doğrudan PR gönderin: [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -35,7 +35,7 @@ ReYMeN exists to help Turkish-speaking developers understand the "AI agent" para
 
 The longer-term vision: ReYMeN detecting its own errors and autonomously fixing them by generating Python code. Today, the error → solution memory (OnceHafıza) is working; self-heal and autonomous code generation are being iterated on. This is **not a finished feature — it's a work-in-progress goal, open to contribution**. Your ideas, PRs, and experience will shape it.
 
-ReYMeN is inspired by Nous Research's [Hermes Agent](https://hermes-agent.nousresearch.com) architecture. Without Hermes' and the open-source community's unpaid contributions, this project wouldn't exist. Thank you.
+ReYMeN is inspired by Nous Research's [Hermes Agent](https://hermes-agent.nousresearch.com) architecture. Separately, the Linux and open-source ecosystem's years of unpaid labor made this project possible. Thank you to all.
 
 Contributions, suggestions, and volunteering are welcome. Check the roadmap, open an issue, or send a PR: [CONTRIBUTING.md](CONTRIBUTING.md).
 
