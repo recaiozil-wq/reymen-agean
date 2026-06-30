@@ -25,6 +25,24 @@ Katkı, öneri ve gönüllülüğe açığız. Yol haritamıza göz atın, bir i
 
 Bağış mekanizması (GitHub Sponsors vb.) şu an aktif değil. İleride topluluk ilgisi olursa değerlendirilebilir.
 
+> *For English readers: see below for the English version.*
+
+---
+
+### Why ReYMeN? (English)
+
+ReYMeN exists to help Turkish-speaking developers understand the "AI agent" paradigm, build together, and create space for contributors to grow their own ideas. Every line of this project started as a single developer's need — built alone, then opened up for the community to shape.
+
+The longer-term vision: ReYMeN detecting its own errors and autonomously fixing them by generating Python code. Today, the error → solution memory (OnceHafıza) is working; self-heal and autonomous code generation are being iterated on. This is **not a finished feature — it's a work-in-progress goal, open to contribution**. Your ideas, PRs, and experience will shape it.
+
+ReYMeN is inspired by Nous Research's [Hermes Agent](https://hermes-agent.nousresearch.com) architecture. Without Hermes' and the open-source community's unpaid contributions, this project wouldn't exist. Thank you.
+
+Contributions, suggestions, and volunteering are welcome. Check the roadmap, open an issue, or send a PR: [CONTRIBUTING.md](CONTRIBUTING.md).
+
+Donations (GitHub Sponsors, etc.) are not active yet. Will be considered if there's community interest.
+
+---
+
 | Özellik | Açıklama |
 |:--------|:---------|
 | 🧠 **12+ LLM Provider** | DeepSeek, OpenAI, Anthropic, Gemini, Groq, xAI, OpenRouter, Ollama, LM Studio |
