@@ -120,7 +120,13 @@ _ENV_YUKLENDI = False
 
 
 def _env_yukle():
-    """.env dosyasini yukle (sadece 1 kere)."""
+    """.env dosyasini yukle (sadece 1 kere).
+
+    Oncelik sirasi:
+      1. Ortam degiskeni (bot_supervisor.py ile gelen TELEGRAM_BOT_TOKEN)
+      2. Proje kokundeki .env
+      3. Hermes profil .env'si (HERMES_PROFILE'a gore)
+    """
     global _ENV_YUKLENDI
     if _ENV_YUKLENDI:
         return
@@ -128,17 +134,21 @@ def _env_yukle():
     if load_dotenv is None:
         return
 
-    # TEK KAYNAK: proje kokundeki .env
-    # (telegram_bot/.env ve reymen/sistem/.env kullanilmaz)
+    # 1. Proje kokundeki .env
     y = _PROJE_KOK / ".env"
     if y.exists():
         load_dotenv(str(y), override=True)
         logger.info(".env yuklendi: %s", y)
-    else:
-        logger.warning(".env bulunamadi: %s", y)
+
+    # 2. Hermes profil .env (fallback)
+    profil = os.environ.get("HERMES_PROFILE", "reymen")
+    hermes_env = Path.home() / "AppData" / "Local" / "hermes" / "profiles" / profil / ".env"
+    if hermes_env.exists():
+        load_dotenv(str(hermes_env), override=False)
+        logger.info("Hermes profil .env yuklendi: %s", hermes_env)
 
 
-_env_yukle()
+_ = _env_yukle()
 
 TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
 CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "").strip()  # "" = herkese acik
@@ -146,6 +156,10 @@ API_BASE = f"https://api.telegram.org/bot{TOKEN}"
 
 # Gateway modu: "ptb" veya "http" (default: http)
 GATEWAY_MOD = os.environ.get("HERMES_GATEWAY", "http").strip().lower()
+
+# ── Reconnection ayarlari ─────────────────────────────────────────────────
+_MAX_BACKOFF = 60  # maksimum bekleme saniyesi (exponential backoff)
+_MAX_RETRY = 10    # maksimum ardışık hata sayisi -> bot restart sinyali
 
 # ============================================================================
 # OTOMATIK DURUM GUNCELLEME
@@ -779,7 +793,7 @@ class BotProcess:
     # ── Polling dongusu ──────────────────────────────────────────────
 
     def poll(self, durma_events: Optional[list] = None):
-        """Ana polling dongusu — sonsuz calisir, mesajlari dinler.
+        """Ana polling dongusu — exponential backoff supervisor ile.
 
         Args:
             durma_events: Event listesi — herhangi biri set edilirse dongu durur.
@@ -800,54 +814,48 @@ class BotProcess:
         for cid in self.ayarlar.get("bilinen_chatler", []):
             self.mesaj_gonder(cid, f"{self.bot_ad} Gateway Starting")
 
-        while True:
+        def _tur():
+            nonlocal offset
             for evt in durma_events:
                 if evt and evt.is_set():
                     logger.info("[%s] Durma istegi alindi.", self.bot_ad)
-                    return
+                    raise SystemExit(0)
 
-            try:
-                r = _api(
-                    "getUpdates",
-                    {"offset": offset, "timeout": 30, "allowed_updates": ["message"]},
-                    timeout=35,
-                )
-                if not r.get("ok"):
-                    if "409" in str(r.get("error", "")):
-                        logger.warning("[%s] 409 Conflict — 10sn bekleniyor...", self.bot_ad)
-                        time.sleep(10)
-                        continue
-                    logger.warning("[%s] API hatasi: %s", self.bot_ad, r)
-                    time.sleep(3)
+            r = _api(
+                "getUpdates",
+                {"offset": offset, "timeout": 30, "allowed_updates": ["message"]},
+                timeout=45,
+            )
+            if not r.get("ok"):
+                if "409" in str(r.get("error", "")):
+                    logger.warning("[%s] 409 Conflict — offset sifirlaniyor.", self.bot_ad)
+                    offset = 0
+                raise RuntimeError(f"[{self.bot_ad}] API hatasi: {r}")
+
+            for update in r.get("result", []):
+                yeni_offset = update["update_id"] + 1
+                msg = update.get("message", {})
+                text = msg.get("text", "")
+                chat_id = msg.get("chat", {}).get("id", 0)
+                from_user = msg.get("from", {}).get("first_name", "?")
+
+                offset = yeni_offset
+                self.offset_guncelle(yeni_offset)
+
+                if chat_id:
+                    self.chat_ekle(chat_id)
+                if not text:
                     continue
 
-                for update in r.get("result", []):
-                    yeni_offset = update["update_id"] + 1
-                    msg = update.get("message", {})
-                    text = msg.get("text", "")
-                    chat_id = msg.get("chat", {}).get("id", 0)
-                    from_user = msg.get("from", {}).get("first_name", "?")
+                logger.info("[%s] [%s] %s: %.60s", self.bot_ad, chat_id, from_user, text)
 
-                    offset = yeni_offset
-                    self.offset_guncelle(yeni_offset)
+                if self.komut_isle(chat_id, text):
+                    continue
 
-                    if chat_id:
-                        self.chat_ekle(chat_id)
-                    if not text:
-                        continue
+                cevap = self.ai_yanit_uret(text)
+                self.mesaj_gonder(chat_id, cevap)
 
-                    logger.info("[%s] [%s] %s: %.60s", self.bot_ad, chat_id, from_user, text)
-
-                    if self.komut_isle(chat_id, text):
-                        continue
-
-                    cevap = self.ai_yanit_uret(text)
-                    self.mesaj_gonder(chat_id, cevap)
-
-            except Exception as e:
-                logger.error("[%s] Dongu hatasi: %s", self.bot_ad, e)
-                time.sleep(3)
-                continue
+        _polling_yonetici(self.bot_ad, _tur)
 
     # ── Context manager ──────────────────────────────────────────────
 
@@ -1275,6 +1283,47 @@ def _isle(msg: dict):
 # POLLING (HTTP API modu)
 # ============================================================================
 
+def _polling_yonetici(ad: str, poll_fn, durma_events: Optional[list] = None):
+    """Polling supervisor — exponential backoff + maksimum deneme + restart.
+
+    Args:
+        ad: Bot adi (loglama icin)
+        poll_fn: Polling fonksiyonu (tek tur)
+        durma_events: Event listesi
+    """
+    if durma_events is None:
+        durma_events = []
+    ardisik_hata = 0
+    while True:
+        for evt in durma_events:
+            if evt and evt.is_set():
+                logger.info("[%s] Supervisor: durma istegi alindi.", ad)
+                return
+        try:
+            poll_fn()
+            # Basarili tur — hatayi sifirla
+            ardisik_hata = 0
+        except KeyboardInterrupt:
+            logger.info("[%s] Supervisor: KeyboardInterrupt", ad)
+            return
+        except Exception as e:
+            ardisik_hata += 1
+            backoff = min(2 ** ardisik_hata, _MAX_BACKOFF)
+            logger.error(
+                "[%s] Polling hatasi (%d/%d): %s — %ds bekleniyor...",
+                ad, ardisik_hata, _MAX_RETRY, e, backoff,
+            )
+            if ardisik_hata >= _MAX_RETRY:
+                logger.critical(
+                    "[%s] %d ardısık hata — bot yeniden baslatiliyor...",
+                    ad, _MAX_RETRY,
+                )
+                time.sleep(5)
+                ardisik_hata = 0  # restart dongusu
+                continue
+            time.sleep(backoff)
+
+
 def polling():
     """Uzun polling ile Telegram'dan mesaj al — HTTP API modu."""
     if not TOKEN or TOKEN.startswith("***"):
@@ -1282,30 +1331,28 @@ def polling():
         return
 
     logger.info("Polling basliyor... (chat_id filtresi: %s)", CHAT_ID or "yok")
-    offset = 0
+    offset_ = [0]  # mutable box
 
     if CHAT_ID:
         gonder(CHAT_ID, "ReYMeN botu aktif. /help yazin.")
 
-    while True:
-        try:
-            sonuc = _api("getUpdates", {"offset": offset, "timeout": 30}, timeout=40)
-            if not sonuc.get("ok"):
-                time.sleep(5)
-                continue
+    def _tur():
+        nonlocal offset_
+        sonuc = _api("getUpdates", {"offset": offset_[0], "timeout": 30}, timeout=45)
+        if not sonuc.get("ok"):
+            hata = sonuc.get("error", "")
+            if "409" in str(hata):
+                logger.warning("Polling: 409 Conflict — offset sifirlaniyor.")
+                offset_[0] = 0
+            raise RuntimeError(f"API hatasi: {sonuc}")
+        for upd in sonuc.get("result", []):
+            offset_[0] = upd["update_id"] + 1
+            msg = upd.get("message") or upd.get("edited_message")
+            if msg:
+                threading.Thread(target=_isle, args=(msg,), daemon=True).start()
+        return True
 
-            for upd in sonuc.get("result", []):
-                offset = upd["update_id"] + 1
-                msg = upd.get("message") or upd.get("edited_message")
-                if msg:
-                    threading.Thread(target=_isle, args=(msg,), daemon=True).start()
-
-        except KeyboardInterrupt:
-            logger.info("Durduruldu.")
-            break
-        except Exception as e:
-            logger.error("Polling hatasi: %s", e)
-            time.sleep(5)
+    _polling_yonetici("HTTP", _tur)
 
 
 # ============================================================================

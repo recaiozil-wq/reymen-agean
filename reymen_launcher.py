@@ -471,7 +471,7 @@ def _build_parser():
         if hasattr(action, 'required') and hasattr(action, 'choices'):
             action.required = False
 
-    # Launcher'a özel: model komutu handler'ı (_model_sec_interactive launcher'da tanımlı)
+    # Launcher'a özel: model komutu handler'ı
     for action in p._actions:
         if hasattr(action, 'choices') and action.choices is not None:
             if 'status' in action.choices or 'cost' in action.choices:
@@ -479,6 +479,21 @@ def _build_parser():
                     p_model = action.add_parser("model", help="Model seçimi")
                     p_model.set_defaults(func=lambda a: _model_sec_interactive())
                 break
+
+    # start komutu (eski .bat/.vbs dosyalarinin yerine)
+    _sub = None
+    for action in p._actions:
+        if hasattr(action, 'choices') and action.choices is not None:
+            _sub = action
+            break
+
+    if _sub is not None:
+        p_start = _sub.add_parser("start", help="ReYMeN bileşenlerini başlat")
+        p_start.add_argument("--mode", choices=["bot", "gateway", "tray", "web", "doctor"],
+                             default="bot", help="Başlatılacak modül")
+        p_start.add_argument("--bot-name", default="all",
+                             help="Bot adı (pasa, reymen, kiral38, all)")
+        p_start.set_defaults(func=_cmd_start)
 
     # Cost handler override (launcher'daki _cmd_cost_alt console.py'ye yönlendirir)
     for action in p._actions:
@@ -488,7 +503,7 @@ def _build_parser():
                     func=lambda a: _cmd_cost_alt(a)
                 )
 
-    # Status handler override (launcher'daki _cmd_status)
+    # Status handler override
     for action in p._actions:
         if hasattr(action, 'choices') and action.choices:
             if 'status' in action.choices:
@@ -507,6 +522,59 @@ from reymen.arac.cli_commands import (
     cmd_doctor as _cmd_doctor,
     cmd_backup as _cmd_backup,
 )
+
+# ── start komutu (eski .bat/.vbs dosyalari yerine) ──────────────────────────
+def _cmd_start(args):
+    """reymen start --mode bot --bot-name all (veya gateway/tray/web/doctor)"""
+    mode = args.mode
+    bot_name = args.bot_name
+
+    if mode == "doctor":
+        return _cmd_doctor(args)
+
+    if mode == "gateway":
+        print(f"  Gateway başlatılıyor...")
+        return _cmd_gateway(args)
+
+    if mode == "tray":
+        print(f"  Sistem tepsisi başlatılıyor...")
+        import subprocess as _sp
+        _pyw = sys.executable.replace("python.exe", "pythonw.exe")
+        if not os.path.isfile(_pyw):
+            _pyw = sys.executable
+        _sp.Popen([_pyw, str(_KOK / "reymen" / "desktop" / "tray.py")],
+                  creationflags=_sp.CREATE_NO_WINDOW if os.name == "nt" else 0)
+        print(f"  {_g('✓')} Tray arkaplanda başlatıldı")
+        return 0
+
+    if mode == "web":
+        print(f"  Web UI başlatılıyor...")
+        from reymen.arac.cli_commands import cmd_web as _cmd_web
+        return _cmd_web(args)
+
+    # mode == "bot" (varsayilan)
+    print(f"  Telegram Bot ({bot_name}) başlatılıyor...")
+    if bot_name == "all":
+        print(f"  Tüm botlar başlatılıyor...")
+        _bat = _KOK / "baslat_reymen_bot.bat"
+        if _bat.exists():
+            import subprocess as _sp
+            _sp.Popen(["cmd", "/c", "start", str(_bat)], shell=True)
+    else:
+        _token_map = {
+            "pasa": "TELEGRAM_BOT_TOKEN",
+            "reymen": "TELEGRAM_BOT_TOKEN",
+            "kiral38": "TELEGRAM_BOT_TOKEN",
+        }
+        token_var = _token_map.get(bot_name, "TELEGRAM_BOT_TOKEN")
+        token = os.environ.get(token_var, "")
+        if token:
+            from reymen.ag.telegram_bot import BotProcess
+            bot = BotProcess(token)
+            bot.poll()
+        else:
+            print(f"  {_r('✗')} {bot_name} için token bulunamadi (.env kontrol et)")
+    return 0
 # ── Cron komutu — reymen.cli._cmd_cron kullanılır (build_parser üzerinden)
 # ── Cost komutu proxy (console.py'ye) ──────────────────────────────────────
 def _cmd_cost_alt(args):

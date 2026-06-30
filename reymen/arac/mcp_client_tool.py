@@ -44,7 +44,7 @@ from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
-_CONFIG_YOLU = Path(__file__).parent.parent.parent / ".ReYMeN" / "mcp_client.json"
+_CONFIG_YOLU = Path(__file__).parent.parent / ".ReYMeN" / "mcp_client.json"
 
 # aiohttp opsiyonel
 try:
@@ -148,8 +148,17 @@ class MCPClientStdio:
 
     def baglan(self) -> bool:
         try:
+            # Windows: npx gibi script'ler CreateProcess ile bulunamaz.
+            # shutil.which ile .cmd/.exe yolunu coz.
+            komut = self.komut[:]
+            if os.name == "nt":
+                import shutil
+                ilk = komut[0]
+                tam_yol = shutil.which(ilk)
+                if tam_yol and tam_yol != ilk:
+                    komut[0] = tam_yol
             self._proses = subprocess.Popen(
-                self.komut,
+                komut,
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
@@ -219,35 +228,65 @@ class MCPClientYoneticisi:
 
     def __init__(self):
         self._sunucular: dict[str, Any] = {}  # ad -> MCPClientHTTP | MCPClientStdio
+        self._konfig: dict = {}               # ad -> ayar (ham config)
         self._konfig_yukle()
 
     def _konfig_yukle(self):
-        """JSON config'den sunucuları yükle."""
+        """JSON config'den sunucu ayarlarını yükle (sadece ayar, bağlanma)."""
         if not _CONFIG_YOLU.exists():
             return
         try:
             konfig = json.loads(_CONFIG_YOLU.read_text(encoding="utf-8"))
-            for ad, ayar in konfig.get("servers", {}).items():
-                transport = ayar.get("transport", "stdio")
-                if transport == "http":
-                    url = ayar.get("url", "")
-                    headers = ayar.get("headers", {})
-                    if url:
-                        self._sunucular[ad] = MCPClientHTTP(ad, url, headers)
-                else:  # stdio
-                    komut = ayar.get("command", "")
-                    if isinstance(komut, str):
-                        komut = komut.split()
-                    args = ayar.get("args", [])
-                    env = ayar.get("env", {})
-                    cwd = ayar.get("cwd", "")
-                    if komut:
-                        self._sunucular[ad] = MCPClientStdio(
-                            ad, komut + args, env, cwd
-                        )
-            logger.info("[MCPClient] %d sunucu config'den yüklendi", len(self._sunucular))
+            self._konfig = konfig.get("servers", {})
+            logger.info("[MCPClient] %d sunucu config'den yüklendi", len(self._konfig))
         except Exception as e:
             logger.error("[MCPClient] Config yükleme hatası: %s", e)
+
+    def _sunucu_al(self, ad: str) -> Any:
+        """Sunucu objesini döndür, gerekirse bağlan."""
+        # Zaten bağlıysa döndür
+        if ad in self._sunucular:
+            s = self._sunucular[ad]
+            if isinstance(s, MCPClientStdio) and len(s.araclar()) == 0:
+                # Config'den yüklenmiş ama bağlanmamış, bağlan
+                if s.baglan():
+                    return s
+                return None
+            return s
+        # Config'de var mı kontrol et
+        ayar = self._konfig.get(ad)
+        if not ayar:
+            return None
+        transport = ayar.get("transport", "stdio")
+        if transport == "http":
+            url = ayar.get("url", "")
+            headers = ayar.get("headers", {})
+            if not url:
+                return None
+            sunucu = MCPClientHTTP(ad, url, headers)
+            loop = asyncio.new_event_loop()
+            try:
+                basarili = loop.run_until_complete(sunucu.baglan())
+            finally:
+                loop.close()
+            if basarili:
+                self._sunucular[ad] = sunucu
+                return sunucu
+            return None
+        else:
+            komut = ayar.get("command", "")
+            if isinstance(komut, str):
+                komut = komut.split()
+            args = ayar.get("args", [])
+            env = ayar.get("env", {})
+            cwd = ayar.get("cwd", "")
+            if not komut:
+                return None
+            sunucu = MCPClientStdio(ad, komut + args, env, cwd)
+            if sunucu.baglan():
+                self._sunucular[ad] = sunucu
+                return sunucu
+            return None
 
     def sunucu_ekle_http(self, ad: str, url: str, headers: Optional[dict] = None) -> bool:
         """HTTP tabanlı MCP sunucusu ekle ve bağlan."""
@@ -296,9 +335,9 @@ class MCPClientYoneticisi:
 
     def arac_cagir(self, sunucu: str, arac: str, params: dict) -> str:
         """Bir sunucudaki bir aracı çağır."""
-        if sunucu not in self._sunucular:
-            return f"[MCPClient] '{sunucu}' sunucusu bulunamadı."
-        s = self._sunucular[sunucu]
+        s = self._sunucu_al(sunucu)
+        if s is None:
+            return f"[MCPClient] '{sunucu}' sunucusu bulunamadı veya bağlanamadı."
         if isinstance(s, MCPClientHTTP):
             loop = asyncio.new_event_loop()
             try:
@@ -310,17 +349,27 @@ class MCPClientYoneticisi:
 
     def tum_araclar(self) -> dict[str, list[dict]]:
         """Tüm sunucuların tool'larını döndür."""
-        return {ad: s.araclar() for ad, s in self._sunucular.items()}
+        # Önce config'deki tüm sunucuları dene (bağlı/bağlananlar)
+        sonuc = {}
+        for ad in list(self._sunucular.keys()):
+            sonuc[ad] = self._sunucular[ad].araclar()
+        for ad in self._konfig:
+            if ad not in sonuc:
+                s = self._sunucu_al(ad)
+                if s:
+                    sonuc[ad] = s.araclar()
+        return sonuc
 
     def durum(self) -> dict:
         """Sunucu durum raporu."""
-        return {
-            ad: {
+        sonuc = {}
+        for ad in list(self._sunucular.keys()):
+            s = self._sunucular[ad]
+            sonuc[ad] = {
                 "arac_sayisi": len(s.araclar()),
                 "transport": "http" if isinstance(s, MCPClientHTTP) else "stdio",
             }
-            for ad, s in self._sunucular.items()
-        }
+        return sonuc
 
     def motor_kaydet(self, motor):
         """Tüm MCP tool'larını motora kaydet."""
@@ -373,36 +422,12 @@ def mcp_client_baglan(sunucu_adi: str) -> str:
         str: Bağlantı sonucu mesajı
     """
     yonetici = mcp_client()
-    if sunucu_adi in yonetici._sunucular:
-        return f"[MCPClient] '{sunucu_adi}' zaten bağlı. {len(yonetici._sunucular[sunucu_adi].araclar())} tool mevcut."
-
-    # Config'de var mı kontrol et
-    if _CONFIG_YOLU.exists():
-        try:
-            konfig = json.loads(_CONFIG_YOLU.read_text(encoding="utf-8"))
-            ayar = konfig.get("servers", {}).get(sunucu_adi)
-            if ayar:
-                transport = ayar.get("transport", "stdio")
-                if transport == "http":
-                    url = ayar.get("url", "")
-                    headers = ayar.get("headers", {})
-                    if yonetici.sunucu_ekle_http(sunucu_adi, url, headers):
-                        return f"[MCPClient] '{sunucu_adi}' (HTTP) bağlandı. {len(yonetici._sunucular[sunucu_adi].araclar())} tool keşfedildi."
-                    return f"[MCPClient] '{sunucu_adi}' (HTTP) bağlantı başarısız."
-                else:
-                    komut = ayar.get("command", "")
-                    if isinstance(komut, str):
-                        komut = komut.split()
-                    args = ayar.get("args", [])
-                    env = ayar.get("env", {})
-                    cwd = ayar.get("cwd", "")
-                    if yonetici.sunucu_ekle_stdio(sunucu_adi, komut + args, env, cwd):
-                        return f"[MCPClient] '{sunucu_adi}' (stdio) bağlandı. {len(yonetici._sunucular[sunucu_adi].araclar())} tool keşfedildi."
-                    return f"[MCPClient] '{sunucu_adi}' (stdio) bağlantı başarısız."
-        except Exception as e:
-            return f"[MCPClient] Config okuma hatası: {e}"
-
-    return f"[MCPClient] '{sunucu_adi}' config'de bulunamadı. {_CONFIG_YOLU} kontrol edin."
+    # _sunucu_al otomatik bağlanır, zaten bağlıysa direkt döndürür
+    s = yonetici._sunucu_al(sunucu_adi)
+    if s is None:
+        return f"[MCPClient] '{sunucu_adi}' bağlantı başarısız. Config ve ağ bağlantınızı kontrol edin."
+    transport = "HTTP" if isinstance(s, MCPClientHTTP) else "STDIO"
+    return f"[MCPClient] '{sunucu_adi}' ({transport}) bağlandı. {len(s.araclar())} tool keşfedildi."
 
 
 def mcp_client_listele() -> str:

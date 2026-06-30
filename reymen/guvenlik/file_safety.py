@@ -20,6 +20,9 @@ YASAK_DIZINLER = [
     "C:\\Windows\\System",
     "C:\\Program Files",
     "C:\\Program Files (x86)",
+    "C:\\etc",
+    "C:\\boot",
+    "C:\\dev",
     "/etc",
     "/bin",
     "/sbin",
@@ -51,13 +54,22 @@ def guvenli_mi(dosya_yolu: str) -> tuple[bool, str]:
         (guvenli_mi, hata_mesaji)
     """
     try:
-        yol = Path(dosya_yolu).resolve()
+        raw_yol = str(Path(dosya_yolu))
     except Exception:
         return False, "Gecersiz dosya yolu."
 
-    # Path traversal kontrolu
-    if ".." in str(yol):
+    # Bos yol kontrolu
+    if not dosya_yolu or not dosya_yolu.strip():
+        return False, "Bos dosya yolu."
+
+    # Path traversal kontrolu — resolve ONCESI (ham string'teki '..')
+    if ".." in dosya_yolu or ".." in raw_yol:
         return False, "Path traversal engellendi."
+
+    try:
+        yol = Path(dosya_yolu).resolve()
+    except Exception:
+        return False, "Gecersiz dosya yolu."
 
     # Yasak dizin kontrolu
     for yasak in YASAK_DIZINLER:

@@ -274,11 +274,15 @@ def motor_kaydet(motor) -> None:
             "FAL.ai vision modeliyle görseli analiz eder (FAL_KEY gerekli; yoksa "
             "otomatik olarak Ollama LLaVA'ya düşer). Parametreler: kaynak (url/yol), soru.",
         )
+        # GORUNTU_ANALIZ sadece henuz kaydedilmemisse eklenir.
+        # reymen.cereyan.tools.vision_tools (DeepSeek V4 Flash + OpenRouter)
+        # overwrite edebilsin diye once kayitli mi kontrol et.
         motor._plugin_arac_kaydet(
             "GORUNTU_ANALIZ",
             goruntu_analiz,
             "Ollama LLaVA ile yerel/offline görsel analiz eder. "
             "Parametreler: kaynak (url/yol), soru, model.",
+            only_if_missing=True,
         )
     except Exception as e:
         print(f"[AraclarGoruntu] Motor kayıt hatası: {e}")

@@ -333,7 +333,7 @@ class Motor:
             # Batch 8 - Yeni araclar
             "tools.delegate_tool", "tools.kanban_tools", "tools.voice_mode",
             "tools.clarify_tool", "tools.blueprints",
-            "tools.mixture_of_agents_tool", "tools.vision_tools",
+            "tools.mixture_of_agents_tool",
             "tools.code_execution_tool", "tools.osv_check", "tools.todo_tool",
             "tools.skills_hub", "tools.skills_sync",
             "tools.feishu_doc_tool", "tools.feishu_drive_tool",
@@ -390,6 +390,9 @@ class Motor:
             "yetenek_fabrikasi", "sistem_sinyalleri",
             # Gorsel analiz (FAL/OpenRouter/Ollama)
             "araclar_goruntu",
+            # Gorsel analiz v2 (DeepSeek V4 Flash + OpenRouter Qwen-VL) — araclar_goruntu'dan SONRA
+            # yuklenir ki GORUNTU_ANALIZ tool'unu overwrite edip kazansin
+            "reymen.cereyan.tools.vision_tools",
             # Entegrasyon 5 — ek modüller
             "mcp_oauth_manager", "reymen_batch_runner", "models_dev",
             # Entegrasyon 6 — reyment CLI araçları
@@ -838,9 +841,11 @@ class Motor:
             pass
 
     # ── Plugin API ────────────────────────────────────────────────────
-    def _plugin_arac_kaydet(self, ad: str, fonk: Any, aciklama: str = "") -> None:
+    def _plugin_arac_kaydet(self, ad: str, fonk: Any, aciklama: str = "", only_if_missing: bool = False) -> None:
         """Plugin modüllerinin araç kaydetmesi için ortak API."""
         if _REGISTRY:
+            if only_if_missing and ad in _REGISTRY._tools:
+                return
             _REGISTRY.kaydet(ad, fonk)
 
     # ── Native Function Calling desteği ──────────────────────────────────────
@@ -1028,6 +1033,7 @@ class Motor:
             "PLUGIN_MARKET_LISTE", "PLUGIN_MARKET_ARAMA",
             "PLUGIN_MARKET_YUKLE", "PLUGIN_MARKET_BILGI",
             "TTS_KONUS", "TTS_SES_LISTE", "STT_DINLE",
+            "GORUNTU_ANALIZ",
         }
         for satir in llm_cikti.splitlines():
             satir_s = satir.strip()

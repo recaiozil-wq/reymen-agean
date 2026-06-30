@@ -1,4 +1,4 @@
-# ReYMeN Agent vs ReYMeN Agent — Güncel Karşılaştırma
+# ReYMeN Agent vs Hermes Agent — Güncel Karşılaştırma
 
 **Tarih:** 2026-06-29 (Güncellendi)
 **Önceki Rapora Göre Fark:** 6 yeni özellik tamamlandı (Provider, Profile, Gateway Multi, Vector Memory, OAuth 2.0, Delegation)

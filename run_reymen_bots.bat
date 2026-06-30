@@ -2,6 +2,7 @@
 chcp 65001 >nul
 cd /d "C:\Users\marko\Desktop\Reymen Proje\ReYMeN-Ajan"
 
-REM ReYMeN bot'larini sessiz baslat (pencere gosterme)
-start /B "" python telegram_bot/ai_bot.py
-start /B "" python telegram_bot/ai_bot.py
+:: Bu bot su anda bot_supervisor.py ile yonetiliyor.
+:: Supervisor: 3 bot, 3 farkli token, crash'te restart.
+echo ReYMeN bot supervisor ile baslatiliyor...
+call baslat_tum_botlar.bat

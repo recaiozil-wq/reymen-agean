@@ -1,4 +1,4 @@
-# ReYMeN Agent vs ReYMeN Agent — Kapsamlı Özellik Karşılaştırması
+# ReYMeN Agent vs Hermes Agent — Kapsamlı Özellik Karşılaştırması
 
 **Tarih:** 2026-06-29
 **Kapsam:** Kod taraması (reymen/ altındaki 400+ .py dosyası) + ReYMeN Agent dokümantasyonu

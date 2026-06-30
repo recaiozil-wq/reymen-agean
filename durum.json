@@ -1,9 +1,6 @@
 {
   "proje": "ReYMeN Agent",
   "surum": "2026-06-30",
-  "son_guncelleme": "2026-06-30",
-  "guncelleyen_bot": "ReYMeN",
-  "bot_uyari": "🚨 ZORUNLU: Bu dosyayi kullan. Kendi bilginle asla liste olusturma. Once DURUM_OKU() cagir.",
   "botlar": {
     "pasa_38": {
       "profil": "default",
@@ -39,11 +36,6 @@
       "tools": "tum"
     }
   },
-  "aktif_ajanlar": {
-    "@ReYMeN_ReYMeNbot": {"durum": "aktif", "profil": "reymen", "provider": "deepseek"},
-    "@Kiral38bot": {"durum": "aktif", "profil": "kiral38", "provider": "deepseek"},
-    "@Pasa_38_bot": {"durum": "aktif", "profil": "default", "provider": "deepseek"}
-  },
   "ortak_komutlar": {
     "cevap_formati": "emoji+baslik+tablo+yorum",
     "dil": "Turkce",
@@ -52,53 +44,10 @@
     "side_quest": "sub_agent'a yonlendir",
     "durum_oku_zorunlu": true,
     "kendi_bilgisiyle_cevap_yasak": true,
-    "kaynak": "durum.json TEK KAYNAK",
-    "komut_sayisi": 26,
-    "yeni_komutlar": "/doctor, /desktop"
+    "kaynak": "durum.json TEK KAYNAK"
   },
   "esit_mi": {
     "esit": true,
-    "aciklama": "Tum botlar esit — 26 komut, tam yetki"
-  },
-  "toplam_ozellik": 24,
-  "tamam": 14,
-  "kismen": 5,
-  "yok": 5,
-  "ozellikler": {
-    "beyin_llm": {"durum": "tamam", "detay": "DeepSeek v4-flash (birincil), OpenRouter (fallback). 7 provider destegi."},
-    "konusma_dongusu": {"durum": "tamam", "detay": "conversation_loop.py — ReAct loop, tool_call, OnceHafiza, web arama, vision"},
-    "motor_tool_engine": {"durum": "tamam", "detay": "motor.py — 675+ tool, DURUM_OKU, PROFIL, SKILL, GUVENLI_CALISTIR"},
-    "once_hafiza": {"durum": "tamam", "detay": "SQLite ogrenme hafizasi, kademeli guven, TTL, soyut imza"},
-    "session_db": {"durum": "tamam", "detay": "FTS5 tam metin arama, konusma gecmisi saklama"},
-    "cron_scheduler": {"durum": "tamam", "detay": "cron_manager.py — zamanlanmis gorev calistirma"},
-    "telegram_gateway": {"durum": "tamam", "detay": "3 bot aktif — 26 komut, tam yetki"},
-    "cli": {"durum": "tamam", "detay": "reymen_launcher.py — REPL + one-shot, renkli output, status bar"},
-    "soul_kisilik": {"durum": "tamam", "detay": "SOUL.md + AGENTS.md, profil bazli kisilik sistemi"},
-    "doktor_komutu": {"durum": "tamam", "detay": "/doctor ile sistem saglik kontrolu (Python, proje, .env, API, disk)"},
-    "desktop_komutu": {"durum": "tamam", "detay": "/desktop ile desktop uygulama durumu"},
-    "script_fix_sistemi": {"durum": "tamam", "detay": "54 script, otonom hata cozme"},
-    "bagimsizlik": {"durum": "tamam", "detay": "0 Hermes import bagimliligi, tam bagimsiz"},
-    "self_improve": {"durum": "tamam", "detay": "auto_improve_cycle() + SQLite + kod kalite analizi + trend"},
-    "ortak_komut_mimarisi": {"durum": "tamam", "detay": "ortak_komutlar.py — 26 komut tek kaynak, 3 bot ayni"},
-    "turkce_dokuman": {"durum": "tamam", "detay": "READMe, CONTRIBUTING, CHANGELOG, AGENTS.md Turkce"},
-    "mcp_client": {"durum": "kismen", "detay": "MCP dosya sistemi + Playwright — Node.js gerektirir"},
-    "skills": {"durum": "kismen", "detay": "5 SKILL.md — Hermes'te 554, buyuk eksik"},
-    "vision": {"durum": "kismen", "detay": "OpenRouter vision (LLaMA 3.2 11B)"},
-    "web_arama": {"durum": "kismen", "detay": "DDGS backend ile calisiyor"},
-    "coverage": {"durum": "kismen", "detay": "516 dosya, %0.8 coverage — dusuk"},
-    "plugin_sistemi": {"durum": "yok", "detay": "Hermes'te plugins/ var"},
-    "web_ui": {"durum": "yok", "detay": "Hermes'te Electron + web UI var"},
-    "image_gen": {"durum": "yok", "detay": "Hermes'te FAL.ai FLUX var"},
-    "browser_automation": {"durum": "yok", "detay": "Hermes'te Browser Use var"}
-  },
-  "ReYMeN_karsilastirma": {
-    "aciklama": "ReYMeN vs Hermes — karsilastirma",
-    "toplam_ozellik": 24,
-    "tamam": 14,
-    "kismen": 5,
-    "yok": 5,
-    "eksik_listesi": ["plugin_sistemi", "web_ui", "image_gen", "browser_automation"],
-    "reymen_ozel": ["self_improve", "doktor_komutu", "desktop_komutu", "ortak_komut_mimarisi", "turkce_dokuman", "bagimsizlik"],
-    "sonuc": "ReYMeN Hermes'e %58 yetismis durumda"
+    "aciklama": "Tum botlar esit"
   }
 }

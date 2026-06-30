@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 
 PROJE_KOK = Path(__file__).resolve().parent.parent.parent
 HASH_DOSYASI = PROJE_KOK / ".ReYMeN" / "watchdog_hash.json"
-SCAN_ARALIGI = 30  # saniye (hizli tespit icin dusuk)
+SCAN_ARALIGI = 120  # saniye (30sn cok agresif, disk I/O patlamasi engelle)
 POLLUTION_DOSYALARI = {"__pycache__", ".git", ".venv", "venv", "node_modules"}
 
 # ── Hash Islemleri ────────────────────────────────────────────────────────

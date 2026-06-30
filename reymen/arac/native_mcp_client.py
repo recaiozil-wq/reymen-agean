@@ -48,11 +48,11 @@ from typing import Any, Callable, Optional
 logger = logging.getLogger(__name__)
 
 # ── Varsayilan konfig yollari ──────────────────────────────────────────────
-PROJE_KOK = Path(__file__).parent.parent.parent  # ReYMeN-Ajan/
+REYMEN_KOK = Path(__file__).parent.parent  # reymen/
 CONFIG_YOLLARI = [
-    PROJE_KOK / ".ReYMeN" / "config.yaml",
-    PROJE_KOK / ".ReYMeN" / "mcp_client.json",
-    PROJE_KOK / "config.yaml",
+    REYMEN_KOK / ".ReYMeN" / "config.yaml",
+    REYMEN_KOK / ".ReYMeN" / "mcp_client.json",
+    REYMEN_KOK.parent / "config.yaml",
     Path.home() / ".ReYMeN" / "config.yaml",
 ]
 
@@ -286,6 +286,14 @@ class MCPBaglanti:
             komut = [self.config.komut] + self.config.args if self.config.komut else []
             if not komut:
                 return False
+            # Windows: npx gibi script'ler CreateProcess ile bulunamaz.
+            # shutil.which ile .cmd/.exe yolunu coz.
+            if os.name == "nt":
+                import shutil
+                ilk = komut[0]
+                tam_yol = shutil.which(ilk)
+                if tam_yol and tam_yol != ilk:
+                    komut[0] = tam_yol
             env = {**os.environ, **self.config.env}
             self._proses = subprocess.Popen(
                 komut,

@@ -395,6 +395,18 @@ TAKILMA_ESIĞI = 3
 STREAMING_AKTIF = os.environ.get("STREAMING_AKTIF", "true").lower() in ("true", "1")
 
 
+class VisionAdapter:
+    """Vision tool wrapper — conversation_loop.py'deki _vision_analiz'e kopru."""
+
+    def __init__(self):
+        self._loop_ref = None
+
+    def _vision_analiz(self, sorgu: str) -> Optional[str]:
+        if self._loop_ref is None:
+            return "[VISION] ConversationLoop referansi yok."
+        return self._loop_ref._vision_analiz(sorgu)
+
+
 class ConversationLoop:
     """Ana konusma dongusu — geriye uyumlu + ReYMeN Agent seviyesi.
 
@@ -479,6 +491,13 @@ class ConversationLoop:
                         _mcp_client_motor_kaydet(self.motor)
             except Exception as _mcp_e:
                 log.warning("[MCPClient] Baslatma hatasi: %s", _mcp_e)
+
+        # ── VisionAdapter baglantisi ──────────────────────────
+        try:
+            self._vision_adapter = VisionAdapter()
+            self._vision_adapter._loop_ref = self
+        except Exception:
+            self._vision_adapter = None
 
     # ══════════════════════════════════════════════════════════════════
     # MEVCUT API — geriye uyumluluk
@@ -1086,7 +1105,12 @@ class ConversationLoop:
             dosya_match = _re.search(r'(\.\.?/[^\s]+\.(jpg|jpeg|png|gif|webp|bmp))', sorgu, _re.IGNORECASE)
 
         if not url_match and not dosya_match:
-            gorsel_kelimeler = ["foto", "resim", "gorsel", "goruntu", "ekran", "ss", "screenshot", "image", "photo", "picture"]
+            gorsel_kelimeler = [
+            "foto", "fotoğraf", "fotograf", "resim", "gorsel", "görsel",
+            "goruntu", "görüntü", "ekran", "ss", "screenshot", "screenshot",
+            "image", "photo", "picture", "capture", "snapshot",
+            "ne var", "bak", "göster", "goster", "analiz et", "incele",
+        ]
             if not any(k in sorgu.lower() for k in gorsel_kelimeler):
                 return None
             return None

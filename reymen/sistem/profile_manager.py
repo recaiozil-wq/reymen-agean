@@ -93,7 +93,7 @@ class ProfileManager:
         self._profil_override_yukle()
 
     def _profil_override_yukle(self) -> None:
-        """Profil-specific config dosyasini yukle (config.reyment.yaml, config.dev.yaml vb.)"""
+        """Profil-specific config dosyasini yukle (config.reymen.yaml, config.dev.yaml vb.)"""
         override_dosyasi = self._config_yolu.parent / f"config.{self._aktif_profil}.yaml"
         if not override_dosyasi.exists():
             return

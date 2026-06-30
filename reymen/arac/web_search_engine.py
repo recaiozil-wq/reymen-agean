@@ -98,6 +98,10 @@ class WebSearchEngine(ABC):
         """Engine kullanıma hazır mı?"""
         return self._hazir
 
+    def hazir_degilse_hata(self) -> Optional[str]:
+        """Engine hazır değilse açıklayıcı hata mesajı döndür, yoksa None."""
+        return None
+
     @staticmethod
     def _sonuc_formatla(results: list, kaynak: str) -> str:
         """Sonuçları formatla — tüm engine'ler ortak kullanır."""
@@ -350,6 +354,8 @@ class BraveSearchEngine(WebSearchEngine):
     """Brave Search API ile web araması. BRAVE_API_KEY gerekli.
 
     https://api.search.brave.com/res/v1/web/search endpoint'ini kullanır.
+    Brave Search API, API key olmadan calismaz (rate-limited endpoint yoktur).
+    Ucretsiz API key: https://brave.com/search/api/
     """
 
     @property
@@ -359,6 +365,16 @@ class BraveSearchEngine(WebSearchEngine):
     def _bagimliliklari_kontrol_et(self) -> bool:
         key = os.environ.get("BRAVE_API_KEY", "").strip()
         return bool(key and not key.startswith("***"))
+
+    def hazir_degilse_hata(self) -> Optional[str]:
+        key = os.environ.get("BRAVE_API_KEY", "").strip()
+        if not key or key.startswith("***"):
+            return (
+                "[BRAVE] BRAVE_API_KEY bulunamadi.\n"
+                "  Ucretsiz API key almak icin: https://brave.com/search/api/\n"
+                "  Ardindan BRAVE_API_KEY=.env dosyasina ekleyin."
+            )
+        return None
 
     def calistir(self, sorgu: str, max_sonuc: int = 5) -> str:
         api_key = os.environ.get("BRAVE_API_KEY", "").strip()
@@ -401,7 +417,16 @@ class SearXNGEngine(WebSearchEngine):
     """SearXNG (kendi instance) ile web araması. SEARXNG_URL gerekli.
 
     SearXNG instance'ının /search endpoint'ine JSON formatında sorgu gönderir.
+    Eğer SEARXNG_URL ayarlanmamışsa, herkese açık instance'ları dener.
     """
+
+    # Herkese açık SearXNG instance'ları (son çare fallback)
+    PUBLIC_INSTANCES = [
+        "https://searx.be",
+        "https://search.sapti.me",
+        "https://searx.work",
+        "https://search.mdosch.de",
+    ]
 
     @property
     def ad(self) -> str:
@@ -411,32 +436,53 @@ class SearXNGEngine(WebSearchEngine):
         url = os.environ.get("SEARXNG_URL", "").strip()
         return bool(url)
 
+    def hazir_degilse_hata(self) -> Optional[str]:
+        url = os.environ.get("SEARXNG_URL", "").strip()
+        if not url:
+            return (
+                "[SEARXNG] SEARXNG_URL ayarlanmamis. "
+                "Kendi SearXNG instance'inizi kurun veya SEARXNG_URL=.env dosyasina ekleyin.\n"
+                "  Ornek: SEARXNG_URL=http://localhost:8888\n"
+                "  Kurulum: docker run --name searxng -p 8888:8080 searxng/searxng"
+            )
+        return None
+
     def calistir(self, sorgu: str, max_sonuc: int = 5) -> str:
         base_url = os.environ.get("SEARXNG_URL", "").strip().rstrip("/")
-        if not base_url:
-            return "[SEARXNG] URL bulunamadi. SEARXNG_URL ayarlayin."
+        instances_to_try = []
+        if base_url:
+            instances_to_try.append(base_url)
+        instances_to_try.extend(self.PUBLIC_INSTANCES)
 
-        try:
-            result_text = _http_get(
-                f"{base_url}/search",
-                params={"q": sorgu, "format": "json", "pageno": 1},
-            )
-            veri = json.loads(result_text)
-            raw_results = veri.get("results", [])
-            formatted = [
-                {
-                    "title": r.get("title", ""),
-                    "url": r.get("url", ""),
-                    "body": r.get("content", ""),
-                }
-                for r in raw_results[:max_sonuc]
-            ]
-            if formatted:
-                return self._sonuc_formatla(formatted, "SearXNG")
-            return f"[SEARXNG] '{sorgu}' için sonuç bulunamadı."
-        except Exception as e:
-            log.exception("[SearXNGEngine] arama hatasi:")
-            return f"[SEARXNG] Hata: {e}"
+        last_error = None
+        for url in instances_to_try:
+            try:
+                result_text = _http_get(
+                    f"{url}/search",
+                    params={"q": sorgu, "format": "json", "pageno": 1},
+                    headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"},
+                )
+                veri = json.loads(result_text)
+                raw_results = veri.get("results", [])
+                formatted = [
+                    {
+                        "title": r.get("title", ""),
+                        "url": r.get("url", ""),
+                        "body": r.get("content", ""),
+                    }
+                    for r in raw_results[:max_sonuc]
+                ]
+                if formatted:
+                    return self._sonuc_formatla(formatted, "SearXNG")
+                return f"[SEARXNG] '{sorgu}' icin sonuc bulunamadi."
+            except urllib.error.HTTPError as e:
+                last_error = f"HTTP {e.code}: {e.reason} ({url})"
+                continue
+            except Exception as e:
+                last_error = f"{e} ({url})"
+                continue
+
+        return f"[SEARXNG] Hicbir instance calismadi. {last_error}"
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -685,7 +731,7 @@ def _load_config_for_registry() -> dict:
             return cfg
     except Exception as _e:
         __import__("logging").getLogger(__name__).warning(
-            "[SessizExcept] %%s: %%s", type(_e).__name__, _e
+            "[SessizExcept] %s: %s", type(_e).__name__, _e
         )
     try:
         from ReYMeN_cli.config import load_config
@@ -694,7 +740,7 @@ def _load_config_for_registry() -> dict:
             return cfg
     except Exception as _e:
         __import__("logging").getLogger(__name__).warning(
-            "[SessizExcept] %%s: %%s", type(_e).__name__, _e
+            "[SessizExcept] %s: %s", type(_e).__name__, _e
         )
 
     # 2. Proje kökü config.yaml

@@ -159,8 +159,9 @@ call reymen_venv\Scripts\activate
 python -m pip install --upgrade pip --quiet
 
 :: pip paketleri
-if exist requirements.txt (
-    pip install -r requirements.txt --quiet
+:: pip ile yukle (pyproject.toml uzerinden)
+if exist pyproject.toml (
+    pip install -e . --quiet
 ) else (
     pip install requests python-dotenv --quiet
 )
@@ -168,7 +169,7 @@ if %errorlevel% equ 0 (
     echo [OK] Paketler yuklendi
 ) else (
     echo [!] Paket hatasi!
-    echo     Cozum: Elle dene: pip install -r requirements.txt
+    echo     Cozum: Elle dene: pip install -e .
     pause
     exit /b
 )
@@ -257,7 +258,7 @@ echo     Yeni tokeni .env'ye yaz, tekrar baslat
 echo.
 echo  "ModuleNotFoundError" / "No module named 'beyin'":
 echo     reymen_venv\Scripts\activate
-echo     pip install -r requirements.txt
+echo     pip install -e .
 echo.
 echo  "pip/pyton komutu calismiyor" (AppLocker):
 echo     PowerShell (Yonetici):

@@ -46,11 +46,14 @@ cd ReYMeN-Ajan
 python -m venv venv
 venv\Scripts\activate
 
-# 3. Bağımlılıkları yükle (temel)
-pip install -r requirements.txt
+# 3. Bağımlılıkları yükle
+pip install -e .
 
-# 4. (Opsiyonel) Tüm özellikler için
+# 4. (Opsiyonel) Tüm özellikler için (chromadb, torch, opencv, vb.)
 pip install -e ".[full]"
+
+# 5. (Opsiyonel) Geliştirme araçları
+pip install -e ".[dev]"
 
 # 5. API anahtarlarını ayarla
 cp .env.example .env
@@ -131,20 +134,32 @@ python reymen_launcher.py -z "merhaba"
 python reymen_launcher.py --version
 ```
 
-### Telegram Bot
+### Bileşen Başlatma
 
 ```bash
-# Bot'u başlat
-python reymen_launcher.py --bot pasa
+# Telegram Bot (tümü)
+python reymen_launcher.py start --mode bot --bot-name all
 
-# Tüm botlar
-python reymen_launcher.py --bot all
+# Belirli bot
+python reymen_launcher.py start --mode bot --bot-name pasa
+
+# Gateway
+python reymen_launcher.py start --mode gateway
+
+# Web UI
+python reymen_launcher.py start --mode web
+
+# Sistem tepsisi (arkaplan)
+python reymen_launcher.py start --mode tray
+
+# Sistem kontrolü
+python reymen_launcher.py start --mode doctor
 ```
 
 ### Web UI
 
 ```bash
-python -m reymen web
+python reymen_launcher.py start --mode web
 # http://localhost:8080
 ```
 

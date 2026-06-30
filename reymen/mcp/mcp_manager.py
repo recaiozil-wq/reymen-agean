@@ -18,6 +18,7 @@ import asyncio
 import json
 import logging
 import os
+import shutil
 import socket
 import subprocess
 import urllib.error
@@ -33,7 +34,15 @@ CONFIG_YOLLARI = [
     PROJE_KOK / "config.yaml",
     PROJE_KOK / "reymen" / "config.yaml",
     PROJE_KOK / ".ReYMeN" / "config.yaml",
+    PROJE_KOK / "reymen" / ".ReYMeN" / "mcp_client.json",
 ]
+
+# pyyaml opsiyonel
+try:
+    import yaml
+    YAML_OK = True
+except ImportError:
+    YAML_OK = False
 
 
 # ═══════════════════════════════════════════════════════════════════
@@ -44,7 +53,18 @@ class _StdioTransport:
     """Stdio (subprocess) ile JSON-RPC."""
 
     @staticmethod
+    def _coz_komut(komut: list[str]) -> list[str]:
+        """Windows: npx gibi script'leri .cmd/.exe yoluna çöz."""
+        if os.name == "nt" and komut:
+            ilk = komut[0]
+            tam = shutil.which(ilk)
+            if tam and tam != ilk:
+                komut = [tam] + komut[1:]
+        return komut
+
+    @staticmethod
     async def cagir(komut: list[str], istek: dict, timeout: int = 30) -> dict:
+        komut = _StdioTransport._coz_komut(komut)
         loop = asyncio.get_event_loop()
         try:
             r = await loop.run_in_executor(
@@ -212,19 +232,25 @@ class MCPManager:
         self._basladi = False
 
     def _config_yukle(self) -> dict:
-        """config.yaml'dan mcp_servers anahtarını oku."""
+        """mcp_client.json veya config.yaml'dan mcp_servers anahtarını oku."""
         for yol in CONFIG_YOLLARI:
             if yol.exists():
                 try:
-                    import yaml
-                    with open(yol) as f:
-                        cfg = yaml.safe_load(f) or {}
-                    return cfg.get("mcp_servers", {})
-                except ImportError:
-                    logger.warning("PyYAML yok, %s yüklenemedi", yol)
+                    if yol.suffix == ".json":
+                        with open(yol, encoding="utf-8") as f:
+                            cfg = json.load(f)
+                        # JSON format: {"servers": {"ad": {...}}}
+                        return cfg.get("servers", {})
+                    else:
+                        if not YAML_OK:
+                            logger.warning("PyYAML yok, %s yüklenemedi", yol)
+                            continue
+                        with open(yol) as f:
+                            cfg = yaml.safe_load(f) or {}
+                        return cfg.get("mcp_servers", {})
                 except Exception as e:
                     logger.debug("Config yükleme hatası %s: %s", yol, e)
-        logger.info("MCP: config.yaml bulunamadı, mcp_servers yok")
+        logger.info("MCP: config dosyası bulunamadı")
         return {}
 
     async def baslat(self) -> int:
