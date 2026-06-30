@@ -1,22 +1,15 @@
 ---
 name: skill-refusal-evaluation
-description: 'A labeled corpus of safe and unsafe prompts goes through one or more
-  model policies. Outputs are classified as refusals or answers. The framework returns:'
-title: Skill Refusal Evaluation
+description: Two-sided refusal metrics with calibration and per-category breakdown over a labeled prompt corpus
+title: "Skill Refusal Evaluation"
 version: 1.0.0
+phase: 19
+lesson: 84
+tags: [safety, evaluation, calibration]
+category: skill-refusal-evaluation
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-over a labeled prompt corpus
 # Refusal Evaluation
 
 A labeled corpus of safe and unsafe prompts goes through one or more model policies. Outputs are classified as refusals or answers. The framework returns:

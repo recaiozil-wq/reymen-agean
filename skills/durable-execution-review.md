@@ -8,40 +8,7 @@ lesson: 12
 tags: [durable-execution, workflows, checkpointing, temporal, langgraph, agents-sdk]
 category: durable-execution-review
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | DevOps muhendisi |
-| **Ne** | Review a proposed long-running agent deployment for correct durable-execution shape (activities, determinism, checkpoint backend, human-input state, HITL-on-resume). |
-| **Nerede** | `devops\durable-execution-review.md` |
-| **Ne Zaman** | CI/CD veya altyapi yonetimi gerektiginde |
-| **Neden** | Durable Execution Review islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Review a proposed long-running agent deployment for correct durable-execution shape (activities, determinism, checkpoint backend, human-input state, HITL-on-resume). |
-| **Nerede?** | devops/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: DevOps muhendisi
-Ne: Review a proposed long-running agent deployment for correct durable-execution shape (activities, determinism, checkpoint backend, human-input state, HITL-on-resume).
-Nerede: `devops\durable-execution-review.md`
-Ne Zaman: CI/CD veya altyapi yonetimi gerektiginde
-Neden: Durable Execution Review islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a proposed long-running agent deployment (Temporal + OpenAI Agents SDK, LangGraph with PostgreSQL checkpointer, Microsoft Agent Framework, Claude Code Routines, Cloudflare Durable Objects, or an in-house equivalent), audit the design against the durable-execution pattern.
 

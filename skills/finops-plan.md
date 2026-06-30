@@ -8,40 +8,7 @@ lesson: 27
 tags: [finops, cost-attribution, multi-tenant, kill-switch, unit-economics, rate-limit]
 category: finops-plan
 audience: maintainer
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | DevOps muhendisi |
-| **Ne** | Design an LLM FinOps program — attribution schema (user/task/tenant + four token layers), three-tier enforcement ladder, and unit metric (cost per resolved / artifact). |
-| **Nerede** | `devops\finops-plan.md` |
-| **Ne Zaman** | CI/CD veya altyapi yonetimi gerektiginde |
-| **Neden** | Finops Plan islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Design an LLM FinOps program — attribution schema (user/task/tenant + four token layers), three-tier enforcement ladder, and unit metric (cost per resolved / artifact). |
-| **Nerede?** | devops/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: DevOps muhendisi
-Ne: Design an LLM FinOps program — attribution schema (user/task/tenant + four token layers), three-tier enforcement ladder, and unit metric (cost per resolved / artifact).
-Nerede: `devops\finops-plan.md`
-Ne Zaman: CI/CD veya altyapi yonetimi gerektiginde
-Neden: Finops Plan islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given product surface, tenant tiers, monthly spend, and current attribution state, produce a FinOps plan.
 

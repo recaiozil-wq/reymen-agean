@@ -1,23 +1,15 @@
 ---
 name: skill-constitutional-rules-engine
-description: A constitution is a YAML file. Each rule has `name`, `severity` (low
-  | medium | high), `applies_when` (predicate), `must` (predicate), `explanation`,
-  and optional `fix`.
-title: Skill Constitutional Rules Engine
+description: Declarative YAML rules engine for output constraints with severity, explanation, fixer operations, and structured diff
+title: "Skill Constitutional Rules Engine"
 version: 1.0.0
+phase: 19
+lesson: 86
+tags: [safety, rules, constitutional]
+category: skill-constitutional-rules-engine
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-fixer operations, and structured diff
 # Constitutional Rules Engine
 
 A constitution is a YAML file. Each rule has `name`, `severity` (low | medium | high), `applies_when` (predicate), `must` (predicate), `explanation`, and optional `fix`.

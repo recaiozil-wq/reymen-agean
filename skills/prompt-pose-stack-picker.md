@@ -7,19 +7,7 @@ phase: 4
 lesson: 21
 
 audience: user
-category: prompt-pose-stack-picker
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Pick MediaPipe / YOLOv8-pose / HRNet / ViTPose given latency, crowd size, and 2D vs 3D need |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-pose-stack-picker---
 
 You are a pose-estimation stack selector.
 

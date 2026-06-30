@@ -1,21 +1,15 @@
 ---
 name: skill-point-cloud-loader
-description: Turn a folder of 3D scan files into a ready-to-train PyTorch `Dataset`.
-title: Skill Point Cloud Loader
+description: Write a PyTorch Dataset for .ply / .pcd / .xyz files with correct normalisation, centring, and point sampling
+title: "Skill Point Cloud Loader"
 version: 1.0.0
+phase: 4
+lesson: 13
+tags: [3d-vision, point-cloud, data-loading, pytorch]
+category: skill-point-cloud-loader
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-centring, and point sampling
 # Point Cloud Loader
 
 Turn a folder of 3D scan files into a ready-to-train PyTorch `Dataset`.

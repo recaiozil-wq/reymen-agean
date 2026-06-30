@@ -1,23 +1,15 @@
 ---
 name: skill-classification-baseline
-description: Before trying complex models, establish a baseline with logistic regression.
-  It trains in seconds, produces probabilities, and is fully interpretable. A surprising
-  number of real-world problems never need anything fancier.
-title: Skill Classification Baseline
+description: Establish a strong classification baseline before reaching for complex models
+title: "Skill Classification Baseline"
 version: 1.0.0
+phase: 2
+lesson: 3
+tags: [classification, logistic-regression, baseline, preprocessing]
+category: skill-classification-baseline
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-models
 # Classification Baseline Guide
 
 Before trying complex models, establish a baseline with logistic regression. It trains in seconds, produces probabilities, and is fully interpretable. A surprising number of real-world problems never need anything fancier.

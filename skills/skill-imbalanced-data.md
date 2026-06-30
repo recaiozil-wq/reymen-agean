@@ -1,20 +1,14 @@
 ---
 name: skill-imbalanced-data
-description: A decision checklist for handling imbalanced classification. Follow this
-  sequence to pick the right approach for your problem.
-title: Skill Imbalanced Data
+description: Decision checklist for handling imbalanced classification problems
+title: "Skill Imbalanced Data"
 version: 1.0.0
+phase: 2
+lesson: 17
+tags: [imbalanced-data, smote, class-weights, threshold-tuning, evaluation]
+category: skill-imbalanced-data
+audience: user
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
 
 # Imbalanced Data Strategy
 

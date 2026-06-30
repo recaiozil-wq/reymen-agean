@@ -1,21 +1,15 @@
 ---
 name: skill-cmer-monitor
-description: Treat cross-modal alignment as a first-class production KPI.
-title: Skill Cmer Monitor
+description: Instrument a production VLM endpoint with Cross-Modal Error Rate monitoring, dashboards, and alerts
+title: "Skill Cmer Monitor"
 version: 1.0.0
+phase: 4
+lesson: 25
+tags: [vlm, production, monitoring, hallucination]
+category: skill-cmer-monitor
+audience: maintainer
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-dashboards, and alerts
 # CMER Monitor
 
 Treat cross-modal alignment as a first-class production KPI.

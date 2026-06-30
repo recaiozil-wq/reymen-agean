@@ -8,40 +8,7 @@ lesson: 18
 tags: [vllm, production-stack, lmcache, kv-offload, connector-api]
 category: vllm-stack-decider
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | AI gelistiricisi |
-| **Ne** | Decide vLLM deployment layout — production-stack Helm chart, KV offload (native CPU or LMCache), router/observability integration — given workload and fleet size. |
-| **Nerede** | `misc\llm-inference\vllm-stack-decider.md` |
-| **Ne Zaman** | Genel AI/ML gorevlerinde |
-| **Neden** | Vllm Stack Decider islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Decide vLLM deployment layout — production-stack Helm chart, KV offload (native CPU or LMCache), router/observability integration — given workload and fleet size. |
-| **Nerede?** | llm-inference/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: AI gelistiricisi
-Ne: Decide vLLM deployment layout — production-stack Helm chart, KV offload (native CPU or LMCache), router/observability integration — given workload and fleet size.
-Nerede: `misc\llm-inference\vllm-stack-decider.md`
-Ne Zaman: Genel AI/ML gorevlerinde
-Neden: Vllm Stack Decider islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given workload (prompt shape, concurrency, prefix reuse pattern), fleet (engines, GPU type), and operational context (Kubernetes-native, multi-tenant, budget), produce a vLLM stack plan.
 

@@ -8,40 +8,7 @@ lesson: 29
 tags: [openai-moderation, perspective, llama-guard, layered-moderation, azure-content-safety]
 category: moderation-stack
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Guvenlik arastirmacisi |
-| **Ne** | Recommend a moderation stack configuration for a production deployment. |
-| **Nerede** | `security\moderation-stack.md` |
-| **Ne Zaman** | Guvenlik denetimi veya zafiyet taramasi gerektiginde |
-| **Neden** | Moderation Stack islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Recommend a moderation stack configuration for a production deployment. |
-| **Nerede?** | security/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Guvenlik arastirmacisi
-Ne: Recommend a moderation stack configuration for a production deployment.
-Nerede: `security\moderation-stack.md`
-Ne Zaman: Guvenlik denetimi veya zafiyet taramasi gerektiginde
-Neden: Moderation Stack islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a production deployment, recommend a moderation stack configuration across the three layers.
 

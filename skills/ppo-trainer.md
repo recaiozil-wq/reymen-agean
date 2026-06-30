@@ -8,21 +8,7 @@ lesson: 8
 tags: [rl, ppo, policy-gradient]
 category: ppo-trainer
 audience: user
-
-
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | ML eğitim mühendisi |
-| **Ne?** | Produce a PPO training config and a diagnostic plan for a given environment. |
-| **Nerede?** | AI_ML/training/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
 
 Given an environment and training budget, output:
 

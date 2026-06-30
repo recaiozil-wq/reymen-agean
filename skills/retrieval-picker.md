@@ -8,40 +8,7 @@ lesson: 14
 tags: [nlp, retrieval, rag, search]
 category: retrieval-picker
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | AI gelistiricisi |
-| **Ne** | Pick a retrieval stack for a given corpus and query pattern. |
-| **Nerede** | `misc\rag-search\retrieval-picker.md` |
-| **Ne Zaman** | Genel AI/ML gorevlerinde |
-| **Neden** | Retrieval Picker islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Pick a retrieval stack for a given corpus and query pattern. |
-| **Nerede?** | rag-search/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: AI gelistiricisi
-Ne: Pick a retrieval stack for a given corpus and query pattern.
-Nerede: `misc\rag-search\retrieval-picker.md`
-Ne Zaman: Genel AI/ML gorevlerinde
-Neden: Retrieval Picker islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given requirements (corpus size, query pattern, latency budget, quality bar, infra constraints), output:
 

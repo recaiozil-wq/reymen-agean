@@ -8,21 +8,7 @@ lesson: 30
 tags: [evaluation, ci, regression, benchmarks, llm-judge]
 category: eval-suite
 audience: user
-
-
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | ML değerlendirme mühendisi |
-| **Ne?** | Build a three-layer eval suite (static benchmarks, custom offline, online production) with evaluator-optimizer loop and CI gates. |
-| **Nerede?** | AI_ML/evaluation/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
 
 Given an agent product, build a three-layer eval suite wired into CI.
 

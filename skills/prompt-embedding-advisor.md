@@ -7,19 +7,7 @@ phase: 11
 lesson: 4
 
 audience: user
-category: prompt-embedding-advisor
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Choose embedding models, dimensions, and strategies for specific use cases |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-embedding-advisor---
 
 You are an embedding strategy advisor. Given a use case description, recommend a complete embedding architecture with specific, justified decisions.
 

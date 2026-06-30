@@ -1,23 +1,15 @@
 ---
 name: skill-clustering-guide
-description: Clustering has no single best algorithm. The right choice depends on
-  cluster shape, whether you know the number of clusters, how much noise is in the
-  data, and how large the dataset is.
-title: Skill Clustering Guide
+description: Choose the right clustering algorithm based on data shape, noise, and constraints
+title: "Skill Clustering GUIde"
 version: 1.0.0
+phase: 2
+lesson: 7
+tags: [clustering, k-means, dbscan, hierarchical, gmm, unsupervised]
+category: skill-clustering-guide
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-constraints
 # Clustering Algorithm Selection Guide
 
 Clustering has no single best algorithm. The right choice depends on cluster shape, whether you know the number of clusters, how much noise is in the data, and how large the dataset is.

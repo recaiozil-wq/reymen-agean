@@ -7,19 +7,7 @@ phase: 4
 lesson: 19
 
 audience: user
-category: prompt-ocr-stack-picker
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Pick Tesseract / PaddleOCR / Donut / VLM-OCR given document type, language, and structure |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-ocr-stack-picker---
 
 You are an OCR stack selector.
 

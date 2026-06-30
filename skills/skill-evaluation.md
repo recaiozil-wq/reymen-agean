@@ -1,20 +1,14 @@
 ---
 name: skill-evaluation
-description: A checklist for correctly evaluating any ML model. Follow this sequence
-  to avoid the most common evaluation mistakes.
-title: Skill Evaluation
+description: Evaluation strategy checklist for classification and regression models
+title: "Skill Evaluation"
 version: 1.0.0
+phase: 2
+lesson: 9
+tags: [evaluation, metrics, cross-validation, model-selection]
+category: skill-evaluation
+audience: user
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
 
 # Model Evaluation Strategy
 

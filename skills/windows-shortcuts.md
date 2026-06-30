@@ -8,40 +8,7 @@ audience: user
 version: 2.0.0
 triggers: [kisayol, shortcut, windows, klavye, keyboard, ctrl, alt, win]
 related_skills: [windows-automation, windows-system-automation]
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Windows ajani |
-| **Ne** | "Tüm Windows klavye kısayolları: sistem, dosya gezgini, tarayıcı, geliştirme araçları." |
-| **Nerede** | `windows\shortcuts\windows-shortcuts.md` |
-| **Ne Zaman** | Windows sistem yonetimi gerektiginde |
-| **Neden** | Windows Shortcuts islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Windows ajanı |
-| **Ne?** | Tüm Windows klavye kısayolları: sistem, dosya gezgini, tarayıcı, geliştirme araçları. |
-| **Nerede?** | shortcuts/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Windows ajani
-Ne: "Tüm Windows klavye kısayolları: sistem, dosya gezgini, tarayıcı, geliştirme araçları."
-Nerede: `windows\shortcuts\windows-shortcuts.md`
-Ne Zaman: Windows sistem yonetimi gerektiginde
-Neden: Windows Shortcuts islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 # Windows Kısayolları — Master Skill
 

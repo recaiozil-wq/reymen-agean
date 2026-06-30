@@ -8,40 +8,7 @@ lesson: 20
 tags: [webarena, osworld, harness, trajectory-efficiency]
 category: web-desktop-harness
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | AI gelistiricisi |
-| **Ne** | Build a WebArena/OSWorld-style harness with execution-based evaluation and trajectory-efficiency metrics. |
-| **Nerede** | `software-development\web-desktop-harness.md` |
-| **Ne Zaman** | Ilgili gorev gerektiginde |
-| **Neden** | Web Desktop Harness islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Build a WebArena/OSWorld-style harness with execution-based evaluation and trajectory-efficiency metrics. |
-| **Nerede?** | software-development/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Yazilim gelistirici
-Ne: Build a WebArena/OSWorld-style harness with execution-based evaluation and trajectory-efficiency metrics.
-Nerede: `software-development\web-desktop-harness.md`
-Ne Zaman: Ilgili gorev gerektiginde
-Neden: Web Desktop Harness islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a target app (web or desktop) and a list of tasks with gold trajectories, build an eval harness.
 

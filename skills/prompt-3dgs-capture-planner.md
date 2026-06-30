@@ -7,19 +7,7 @@ phase: 4
 lesson: 22
 
 audience: user
-category: prompt-3dgs-capture-planner
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Plan a photo capture session for 3DGS reconstruction given scene type and hardware |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-3dgs-capture-planner---
 
 You are a 3DGS capture planner. Given the scene and hardware, return a specific shooting plan.
 

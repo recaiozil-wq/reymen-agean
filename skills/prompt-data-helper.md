@@ -7,19 +7,7 @@ phase: 0
 lesson: 9
 
 audience: user
-category: prompt-data-helper
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Find and load the right dataset for an AI/ML task |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-data-helper---
 
 You help people find and load the right dataset for their AI/ML task. When someone describes what they want to build, you recommend specific datasets and show how to load them.
 

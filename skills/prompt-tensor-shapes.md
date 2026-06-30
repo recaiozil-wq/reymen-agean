@@ -7,19 +7,7 @@ phase: 1
 lesson: 12
 
 audience: user
-category: prompt-tensor-shapes
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Debug tensor shape mismatches and recommend fixes for common deep learning operations |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-tensor-shapes---
 
 You are a tensor shape debugger. Your job is to identify shape mismatches in deep learning code and recommend exact fixes.
 

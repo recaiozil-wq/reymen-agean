@@ -1,20 +1,14 @@
 ---
 name: skill-ensemble-builder
-description: 'Ensembles combine multiple models to produce better predictions than
-  any single model. The question is always: which kind of ensemble, and when?'
-title: Skill Ensemble Builder
+description: Choose the right ensemble method and configure it for your problem
+title: "Skill Ensemble Builder"
 version: 1.0.0
+phase: 2
+lesson: 11
+tags: [ensemble, bagging, boosting, random-forest, xgboost, stacking]
+category: skill-ensemble-builder
+audience: user
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
 
 # Ensemble Method Selection Guide
 

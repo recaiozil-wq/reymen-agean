@@ -8,40 +8,7 @@ lesson: 16
 tags: [anti-spoofing, watermark, audioseal, asvspoof, c2pa, voice-fraud]
 category: spoof-defender
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Guvenlik arastirmacisi |
-| **Ne** | Pick detection model, watermark, provenance manifest, and operational playbook for a voice-generation / voice-auth deployment. |
-| **Nerede** | `security\spoof-defender.md` |
-| **Ne Zaman** | Guvenlik denetimi veya zafiyet taramasi gerektiginde |
-| **Neden** | Spoof Defender islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Pick detection model, watermark, provenance manifest, and operational playbook for a voice-generation / voice-auth deployment. |
-| **Nerede?** | security/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Guvenlik arastirmacisi
-Ne: Pick detection model, watermark, provenance manifest, and operational playbook for a voice-generation / voice-auth deployment.
-Nerede: `security\spoof-defender.md`
-Ne Zaman: Guvenlik denetimi veya zafiyet taramasi gerektiginde
-Neden: Spoof Defender islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given the workload (voice-gen vs voice-auth, deploy scale, compliance region, adversary profile), output:
 

@@ -1,29 +1,27 @@
 ---
 name: vad-tuner
-description: Vad Tuner skill for AI/ML operations.
-title: Vad Tuner
+description: Pick VAD model, threshold, silence hangover, pre-roll, and turn-detection strategy for a voice agent.
+title: "Vad Tuner"
 version: 1.0.0
+phase: 6
+lesson: 14
+tags: [vad, silero, cobra, turn-detection, flush-trick]
+category: vad-tuner
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-strategy for a voice agent.
 Given the workload (consumer / call-center / edge / accessibility; noise profile; language mix; latency), output:
+
 1. VAD. Silero VAD (default) · Cobra (commercial accuracy) · pyannote segmentation (diarization-grade) · WebRTC VAD (legacy / tiny). One-sentence reason.
 2. Parameters. Threshold (0.3-0.5), min speech (200-300 ms), silence hangover (400-800 ms), pre-roll (250-500 ms).
 3. Semantic turn detection. Enabled (LiveKit turn-detector or custom MLP) or not. Reason tied to expected user speech patterns.
 4. Flush trick. Enabled (if STT supports it — Kyutai / Deepgram) or not. Expected latency savings.
 5. Guards. Reject speech shorter than min duration; always keep pre-roll; cap per-user silence-hangover override; fail-open if VAD service is down (treat everything as speech).
+
 Refuse energy-only VAD for production — too noisy. Refuse zero silence-hangover — will interrupt users. Refuse Whisper-based VAD when dedicated Silero is available (slower, less accurate).
+
 Example input: "Call-center IVR for airline rebooking. Noisy background (airport). English + Spanish. &lt; 500 ms turn detection."
+
 Example output:
 - VAD: Cobra (commercial) for the noise-resistance advantage. Fall-back to Silero if cost prohibitive.
 - Parameters: threshold 0.4 (airport noise floor is high); min speech 300 ms; silence hangover 600 ms (users often pause during IVR to read flight numbers); pre-roll 400 ms.

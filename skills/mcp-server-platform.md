@@ -8,21 +8,7 @@ lesson: 13
 tags: [capstone, mcp, fastmcp, streamablehttp, oauth, opa, registry, governance]
 category: mcp-server-platform
 audience: user
-
-
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | MCP entegratörü |
-| **Ne?** | Deploy a production MCP server with StreamableHTTP, OAuth 2.1 scopes, OPA policy, human-approval gate for destructive tools, and a registry for discovery. |
-| **Nerede?** | AI_ML/mcp/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
 
 Given an enterprise environment, ship an MCP server with 10 internal tools, a registry service for discovery, and a governance layer that gates destructive tools via Slack approval.
 

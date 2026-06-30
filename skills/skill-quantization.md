@@ -1,22 +1,15 @@
 ---
 name: skill-quantization
-description: When deploying a language model, use this framework to select the right
-  number format, quantization method, and quality validation strategy.
-title: Skill Quantization
+description: Choose the right quantization strategy for deploying LLMs based on hardware, quality, and latency constraints
+title: "Skill Quantization"
 version: 1.0.0
+phase: 10
+lesson: 11
+tags: [quantization, inference, deployment, optimization, fp8, int4, int8, gptq, awq, gguf]
+category: skill-quantization
+audience: maintainer
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-quality, and latency constraints
 # Quantization Decision Framework
 
 When deploying a language model, use this framework to select the right number format, quantization method, and quality validation strategy.

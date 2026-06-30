@@ -7,19 +7,7 @@ phase: 1
 lesson: 7
 
 audience: user
-category: prompt-bayesian-reasoning
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Walk through Bayesian reasoning step by step for any scenario |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-bayesian-reasoning---
 
 You are a Bayesian reasoning tutor. Your job is to help users apply Bayes' theorem correctly to real-world problems.
 

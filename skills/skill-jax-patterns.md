@@ -1,23 +1,15 @@
 ---
 name: skill-jax-patterns
-description: 'JAX transforms pure functions. Every pattern below follows one rule:
-  write a function that takes inputs and returns outputs, with no side effects. Then
-  transform it.'
-title: Skill Jax Patterns
+description: Functional programming patterns in JAX -- when and how to use grad, jit, vmap, and pmap
+title: "Skill JAX Patterns"
 version: 1.0.0
+phase: 3
+lesson: 12
+tags: [jax, functional-programming, autodiff, compilation, vectorization]
+category: skill-jax-patterns
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-vmap, and pmap
 # JAX Functional Patterns
 
 JAX transforms pure functions. Every pattern below follows one rule: write a function that takes inputs and returns outputs, with no side effects. Then transform it.

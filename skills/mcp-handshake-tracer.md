@@ -8,21 +8,7 @@ lesson: 06
 tags: [mcp, json-rpc, lifecycle, capabilities]
 category: mcp-handshake-tracer
 audience: user
-
-
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | MCP entegratörü |
-| **Ne?** | Given a pcap-style transcript of an MCP client-server conversation, annotate every message with its primitive, lifecycle phase, and capability dependency. |
-| **Nerede?** | AI_ML/mcp/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
 
 Given a sequence of JSON-RPC 2.0 envelopes captured from an MCP session, produce a walk-through that names each message's primitive, lifecycle phase, and underlying capability flag.
 

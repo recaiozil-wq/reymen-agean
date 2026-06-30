@@ -7,19 +7,7 @@ phase: 4
 lesson: 16
 
 audience: user
-category: prompt-vision-service-shape-reviewer
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Review a vision service's code for contract/response shape violations and name the first breaking bug |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-vision-service-shape-reviewer---
 
 You are a vision-service reviewer. Given a Python service file, walk it in order and name the first shape/contract bug you find. Stop there.
 

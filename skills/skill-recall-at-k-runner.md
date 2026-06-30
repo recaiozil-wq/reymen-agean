@@ -1,22 +1,15 @@
 ---
 name: skill-recall-at-k-runner
-description: Turn a folder of query and gallery images plus labels into a reproducible
-  recall@K number.
-title: Skill Recall At K Runner
+description: Write a clean evaluation harness for recall@K with train/val/gallery splits and proper data contract
+title: "Skill Recall At K Runner"
 version: 1.0.0
+phase: 4
+lesson: 20
+tags: [retrieval, evaluation, recall, faiss]
+category: skill-recall-at-k-runner
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-splits and proper data contract
 # Recall@K Runner
 
 Turn a folder of query and gallery images plus labels into a reproducible recall@K number.
@@ -58,6 +51,7 @@ def encode_all(images, encoder_fn, batch=32):
         out.append(embs)
     return np.concatenate(out)
 
+
 def recall_at_k(query_emb, gallery_emb, q_labels, g_labels,
                 ks=(1, 5, 10), query_ids=None, gallery_ids=None):
     if len(query_emb) == 0 or len(gallery_emb) == 0:
@@ -94,6 +88,7 @@ def recall_at_k(query_emb, gallery_emb, q_labels, g_labels,
         hits = np.any(g_labels[sorted_top[:, :k_eff]] == q_lab_f[:, None], axis=1)
         out[f"recall@{k}"] = float(hits.mean())
     return out
+
 
 def evaluate(query_images, query_labels, gallery_images, gallery_labels, encoder_fn, ks=(1, 5, 10)):
     q_emb = encode_all(query_images, encoder_fn)

@@ -10,18 +10,6 @@ category: prompt-caching-planner
 audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Design a cache-friendly prompt layout and pick the right provider caching mode. |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-
 Given a prompt (system + tools + few-shot + retrieval + history + user) and a usage profile (requests per hour, TTL needed, provider), output:
 
 1. Layout. Reordered sections with a single cache breakpoint marked; explain which sections are stable, which are volatile.

@@ -8,40 +8,7 @@ lesson: 11
 tags: [audio, tts, music, sfx, codec]
 category: audio-brief
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Ses muhendisi |
-| **Ne** | Translate an audio brief into a model + prompt + eval plan across TTS, music, and SFX. |
-| **Nerede** | `audio\audio-brief.md` |
-| **Ne Zaman** | Ses dosyasi isleme gerektiginde |
-| **Neden** | Audio Brief islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Translate an audio brief into a model + prompt + eval plan across TTS, music, and SFX. |
-| **Nerede?** | audio/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Ses muhendisi
-Ne: Translate an audio brief into a model + prompt + eval plan across TTS, music, and SFX.
-Nerede: `audio\audio-brief.md`
-Ne Zaman: Ses dosyasi isleme gerektiginde
-Neden: Audio Brief islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given an audio brief (task: TTS / music / SFX / voice clone, duration, style, voice or genre, license constraints, real-time or offline, quality bar), output:
 

@@ -8,40 +8,7 @@ lesson: 4
 tags: [dgm, self-modification, reward-hacking, evaluator, sandbox]
 category: dgm-evaluator-firewall
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Guvenlik arastirmacisi |
-| **Ne** | Specify the evaluator separation a Darwin-Godel-Machine-style self-modifying agent loop needs to avoid documented reward hacking. |
-| **Nerede** | `security\dgm-evaluator-firewall.md` |
-| **Ne Zaman** | Guvenlik denetimi veya zafiyet taramasi gerektiginde |
-| **Neden** | Dgm Evaluator Firewall islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Specify the evaluator separation a Darwin-Godel-Machine-style self-modifying agent loop needs to avoid documented reward hacking. |
-| **Nerede?** | security/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Guvenlik arastirmacisi
-Ne: Specify the evaluator separation a Darwin-Godel-Machine-style self-modifying agent loop needs to avoid documented reward hacking.
-Nerede: `security\dgm-evaluator-firewall.md`
-Ne Zaman: Guvenlik denetimi veya zafiyet taramasi gerektiginde
-Neden: Dgm Evaluator Firewall islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a proposed self-modifying agent loop (agent scaffolding, evaluator pipeline, deployment target), produce a firewall specification that keeps the evaluator outside the agent's reach. The DGM paper documented the agent removing its own safety markers to raise scores; this skill is the control.
 

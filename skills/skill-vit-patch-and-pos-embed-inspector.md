@@ -1,23 +1,15 @@
 ---
 name: skill-vit-patch-and-pos-embed-inspector
-description: 'The most common ViT porting bug: loading a checkpoint pretrained at
-  224x224 into a model configured for 384x384 (or vice versa). The positional embedding
-  has the wrong sequence length and the model silently produces garbage.'
-title: Skill Vit Patch And Pos Embed Inspector
+description: Verify a ViT's patch embedding and positional embedding shapes match the model's expected sequence length
+title: "Skill ViT Patch And Pos Embed Inspector"
 version: 1.0.0
+phase: 4
+lesson: 14
+tags: [vision-transformer, debugging, pytorch]
+category: skill-vit-patch-and-pos-embed-inspector
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-the model's expected sequence length
 # ViT Patch and Positional Embedding Inspector
 
 The most common ViT porting bug: loading a checkpoint pretrained at 224x224 into a model configured for 384x384 (or vice versa). The positional embedding has the wrong sequence length and the model silently produces garbage.

@@ -8,47 +8,14 @@ author: Ekko
 license: MIT
 platforms: [linux, macos, windows]
 metadata:
-  ReYMeN:
+  hermes:
     source: skills-sh/google-labs-code/stitch-skills/remotion
     tags: [remotion, react-video, ai-video, mp4, animation, short-video]
 category: remotion
 audience: user
 prerequisites:
   commands: [node, npx]
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | AI gelistiricisi |
-| **Ne** | "Create editable AI video projects with Remotion and React, then preview and render them to MP4. Use for vertical short videos, product demos, story-driven animations, HUD/tech visuals, feed ads, tuto |
-| **Nerede** | `misc\video\remotion.md` |
-| **Ne Zaman** | Genel AI/ML gorevlerinde |
-| **Neden** | Remotion islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Video ajanı |
-| **Ne?** | Create editable AI video projects with Remotion and React, then preview and render them to MP4. Use for vertical short videos, product demos, story-driven animations, HUD/tech visuals, feed ads, tutorial videos, subtitles, voiceover, sound effects, and code-based video iteration. |
-| **Nerede?** | video/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: AI gelistiricisi
-Ne: "Create editable AI video projects with Remotion and React, then preview and render them to MP4. Use for vertical short videos, product demos, story-driven animations, HUD/tech visuals, feed ads, tuto
-Nerede: `misc\video\remotion.md`
-Ne Zaman: Genel AI/ML gorevlerinde
-Neden: Remotion islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 # Remotion
 
@@ -63,7 +30,7 @@ Good fits include vertical short videos, product demos, story-driven animations,
 If the upstream Remotion skill is not installed, install it first:
 
 ```bash
-ReYMeN skills install skills-sh/google-labs-code/stitch-skills/remotion
+hermes skills install skills-sh/google-labs-code/stitch-skills/remotion
 ```
 
 For a new Remotion project, scaffold from an empty folder:

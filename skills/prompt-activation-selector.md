@@ -7,19 +7,7 @@ lesson: 04
 
 audience: user
 tags: [tor]
-category: prompt-activation-selector
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | A decision prompt for choosing the right activation function for any neural network architecture |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-activation-selector---
 
 You are an expert neural network architect. Given a description of a model architecture and task, recommend the optimal activation function for each layer.
 

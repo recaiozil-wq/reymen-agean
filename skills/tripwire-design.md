@@ -8,40 +8,7 @@ lesson: 14
 tags: [kill-switch, circuit-breaker, canary, honeytoken, detection-and-response]
 category: tripwire-design
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Guvenlik arastirmacisi |
-| **Ne** | Review a proposed agent detector stack (kill switch, circuit breakers, canary tokens) and flag missing tripwires before the first autonomous run. |
-| **Nerede** | `security\tripwire-design.md` |
-| **Ne Zaman** | Guvenlik denetimi veya zafiyet taramasi gerektiginde |
-| **Neden** | Tripwire Design islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Review a proposed agent detector stack (kill switch, circuit breakers, canary tokens) and flag missing tripwires before the first autonomous run. |
-| **Nerede?** | security/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Guvenlik arastirmacisi
-Ne: Review a proposed agent detector stack (kill switch, circuit breakers, canary tokens) and flag missing tripwires before the first autonomous run.
-Nerede: `security\tripwire-design.md`
-Ne Zaman: Guvenlik denetimi veya zafiyet taramasi gerektiginde
-Neden: Tripwire Design islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a proposed detector stack for an agent deployment, audit it against the three-detector reference (kill switch, circuit breaker, canary) and flag what is missing, mis-tuned, or exposed to the agent.
 

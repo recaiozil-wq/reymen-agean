@@ -8,40 +8,7 @@ lesson: 01
 tags: [audio, speech, preprocessing]
 category: audio-loader
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Ses muhendisi |
-| **Ne** | Validate a raw audio file against a target model's expectations and resample it safely. |
-| **Nerede** | `audio\audio-loader.md` |
-| **Ne Zaman** | Ses dosyasi isleme gerektiginde |
-| **Neden** | Audio Loader islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Validate a raw audio file against a target model's expectations and resample it safely. |
-| **Nerede?** | audio/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Ses muhendisi
-Ne: Validate a raw audio file against a target model's expectations and resample it safely.
-Nerede: `audio\audio-loader.md`
-Ne Zaman: Ses dosyasi isleme gerektiginde
-Neden: Audio Loader islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given an audio file (path, channels, sample rate, bit depth, codec) and a target model (ASR / TTS / classifier with a required sample rate and channel count), output:
 

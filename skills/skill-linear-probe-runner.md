@@ -1,22 +1,15 @@
 ---
 name: skill-linear-probe-runner
-description: Evaluate a frozen encoder's features by training a single linear classifier
-  on top. The standard evaluation for every self-supervised paper.
-title: Skill Linear Probe Runner
+description: Write the complete linear-probe evaluation for any frozen encoder and labelled dataset
+title: "Skill Linear PRobe Runner"
 version: 1.0.0
+phase: 4
+lesson: 17
+tags: [self-supervised, evaluation, linear-probe, pytorch]
+category: skill-linear-probe-runner
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-labelled dataset
 # Linear Probe Runner
 
 Evaluate a frozen encoder's features by training a single linear classifier on top. The standard evaluation for every self-supervised paper.
@@ -63,6 +56,7 @@ def extract(encoder, loader, device="cpu"):
             feats.append(f)
             labels.append(y)
     return torch.cat(feats), torch.cat(labels)
+
 
 def linear_probe(encoder, feature_dim, train_loader, val_loader,
                  num_classes, epochs=50, lr=0.1, device="cpu"):

@@ -8,40 +8,7 @@ lesson: 15
 tags: [statistics, hypothesis-testing, model-comparison]
 category: skill-statistical-testing
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | ML/Veri bilimci |
-| **Ne** | Choose the right statistical test for comparing ML models and evaluating experiments |
-| **Nerede** | `mlops\skills\skill-statistical-testing.md` |
-| **Ne Zaman** | ML modeli egitimi veya deploy gerektiginde |
-| **Neden** | Skill Statistical Testing islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Choose the right statistical test for comparing ML models and evaluating experiments |
-| **Nerede?** | skills/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: ML/Veri bilimci
-Ne: Choose the right statistical test for comparing ML models and evaluating experiments
-Nerede: `mlops\skills\skill-statistical-testing.md`
-Ne Zaman: ML modeli egitimi veya deploy gerektiginde
-Neden: Skill Statistical Testing islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 # Statistical Testing for ML
 

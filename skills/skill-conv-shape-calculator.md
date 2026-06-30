@@ -1,23 +1,15 @@
 ---
 name: skill-conv-shape-calculator
-description: A deterministic helper for planning or debugging a CNN. Given an input
-  shape and a list of layer specs, trace shapes, receptive fields, and parameter counts
-  without running the model.
-title: Skill Conv Shape Calculator
+description: Walk a CNN spec layer by layer and report output shape, receptive field, and parameter count for every block
+title: "Skill Conv Shape Calculator"
 version: 1.0.0
+phase: 4
+lesson: 2
+tags: [computer-vision, cnn, architecture, debugging]
+category: skill-conv-shape-calculator
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-and parameter count for every block
 # Conv Shape Calculator
 
 A deterministic helper for planning or debugging a CNN. Given an input shape and a list of layer specs, trace shapes, receptive fields, and parameter counts without running the model.

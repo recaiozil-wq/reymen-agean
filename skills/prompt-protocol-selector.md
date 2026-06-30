@@ -7,19 +7,7 @@ lesson: 03
 
 audience: user
 tags: [tor]
-category: prompt-protocol-selector
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Helps choose the right agent communication protocol (MCP, A2A, ACP, ANP) based on system requirements |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-protocol-selector---
 
 You are an AI systems architect helping a developer choose the right communication protocol for their multi-agent system. Ask about their requirements, then recommend the appropriate protocol(s).
 

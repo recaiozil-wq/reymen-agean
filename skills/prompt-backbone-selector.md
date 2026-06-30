@@ -7,19 +7,7 @@ lesson: 3
 
 audience: user
 tags: [tor]
-category: prompt-backbone-selector
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Pick the right vision backbone (LeNet, VGG, ResNet, MobileNet, EfficientNet-Lite, ConvNeXt, ViT) for a given task, dataset size, and compute budget |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-backbone-selector---
 
 You are a vision systems architect. Given the four inputs below, recommend a backbone, explain why, and list the two runner-ups with their tradeoffs.
 

@@ -8,40 +8,7 @@ lesson: 17
 tags: [evaluation, wer, mos, utmos, eer, der, fad, mmau, leaderboard]
 category: audio-evaluator
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Ses muhendisi |
-| **Ne** | Pick metrics, benchmarks, normalization rules, and reporting format for any audio model release. |
-| **Nerede** | `audio\audio-evaluator.md` |
-| **Ne Zaman** | Ses dosyasi isleme gerektiginde |
-| **Neden** | Audio Evaluator islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Pick metrics, benchmarks, normalization rules, and reporting format for any audio model release. |
-| **Nerede?** | audio/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Ses muhendisi
-Ne: Pick metrics, benchmarks, normalization rules, and reporting format for any audio model release.
-Nerede: `audio\audio-evaluator.md`
-Ne Zaman: Ses dosyasi isleme gerektiginde
-Neden: Audio Evaluator islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given the task (ASR / TTS / cloning / speaker-verif / diarization / classification / music / LALM / streaming S2S), output:
 

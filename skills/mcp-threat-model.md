@@ -8,21 +8,7 @@ lesson: 15
 tags: [mcp, security, tool-poisoning, threat-model, rule-of-two]
 category: mcp-threat-model
 audience: user
-
-
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | MCP entegratörü |
-| **Ne?** | Produce a threat model for an MCP deployment naming the applicable attack classes, defenses in place, and Rule-of-Two violations. |
-| **Nerede?** | AI_ML/mcp/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
 
 Given an MCP deployment (list of servers, list of tools, list of permissions), produce a threat model.
 

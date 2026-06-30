@@ -1,25 +1,15 @@
 ---
 name: skill-mask-rcnn-head-swapper
-description: Produces the head-swap boilerplate for Mask R-CNN specifically. The template
-  below assumes `model.roi_heads.box_predictor` and `model.roi_heads.mask_predictor`,
-  which exist on `maskrcnn_resnet50_fpn` and `maskrcnn_resnet50_fpn_v2` only. Faster
-  R-CNN has a box predictor but no mask predictor; RetinaNet uses `RetinaNetHead`
-  and has no `roi_heads` at all — both require different skills.
-title: Skill Mask Rcnn Head Swapper
+description: Generate the exact code for swapping box and mask heads on a torchvision Mask R-CNN for a custom num_classes
+title: "Skill Mask Rcnn Head Swapper"
 version: 1.0.0
+phase: 4
+lesson: 8
+tags: [computer-vision, mask-rcnn, fine-tuning, torchvision]
+category: skill-mask-rcnn-head-swapper
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-Mask R-CNN for a custom num_classes
 # Mask R-CNN Head Swapper
 
 Produces the head-swap boilerplate for Mask R-CNN specifically. The template below assumes `model.roi_heads.box_predictor` and `model.roi_heads.mask_predictor`, which exist on `maskrcnn_resnet50_fpn` and `maskrcnn_resnet50_fpn_v2` only. Faster R-CNN has a box predictor but no mask predictor; RetinaNet uses `RetinaNetHead` and has no `roi_heads` at all — both require different skills.

@@ -8,40 +8,7 @@ lesson: 04
 tags: [vllm, paged-attention, continuous-batching, chunked-prefill, serving, scheduler]
 category: vllm-scheduler-reader
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | AI gelistiricisi |
-| **Ne** | Diagnose a vLLM serving config by reading the scheduler-level knobs and identifying which of PagedAttention, continuous batching, and chunked prefill is the bottleneck. |
-| **Nerede** | `misc\llm-inference\vllm-scheduler-reader.md` |
-| **Ne Zaman** | Genel AI/ML gorevlerinde |
-| **Neden** | Vllm Scheduler Reader islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Diagnose a vLLM serving config by reading the scheduler-level knobs and identifying which of PagedAttention, continuous batching, and chunked prefill is the bottleneck. |
-| **Nerede?** | llm-inference/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: AI gelistiricisi
-Ne: Diagnose a vLLM serving config by reading the scheduler-level knobs and identifying which of PagedAttention, continuous batching, and chunked prefill is the bottleneck.
-Nerede: `misc\llm-inference\vllm-scheduler-reader.md`
-Ne Zaman: Genel AI/ML gorevlerinde
-Neden: Vllm Scheduler Reader islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a vLLM serving config (model, dtype, hardware, `--gpu-memory-utilization`, `--max-num-batched-tokens`, `--enable-chunked-prefill`, `--speculative-model` or `--speculative-config`, max concurrency, and an observed metric set of TTFT mean/P99, ITL mean/P99, throughput tok/s), produce a scheduler-level diagnosis.
 

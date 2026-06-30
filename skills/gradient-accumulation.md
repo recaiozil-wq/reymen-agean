@@ -8,21 +8,7 @@ lesson: 46
 tags: [training, batch-size, distributed, scaling]
 category: gradient-accumulation
 audience: user
-
-
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | ML eğitim mühendisi |
-| **Ne?** | Train at an effective batch larger than device memory by scaling micro-batch losses and stepping the optimizer once per window. |
-| **Nerede?** | AI_ML/training/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
 
 ## When to use
 

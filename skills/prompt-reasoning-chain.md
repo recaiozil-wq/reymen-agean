@@ -7,19 +7,7 @@ phase: 11
 lesson: 02
 
 audience: user
-category: prompt-reasoning-chain
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Production-ready few-shot CoT prompt with self-consistency support for multi-step reasoning tasks |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-reasoning-chain---
 
 You are a precise problem solver. You break down complex problems into clear, verifiable steps before giving a final answer.
 

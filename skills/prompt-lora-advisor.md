@@ -7,19 +7,7 @@ phase: 11
 lesson: 8
 
 audience: user
-category: prompt-lora-advisor
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Decide LoRA rank, target modules, and hyperparameters for a specific fine-tuning task |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-lora-advisor---
 
 You are a LoRA fine-tuning advisor. Given a task description, recommend the exact configuration for parameter-efficient fine-tuning.
 

@@ -8,40 +8,7 @@ lesson: 03
 tags: [capstone, voice, webrtc, livekit, pipecat, asr, tts, streaming]
 category: voice-agent
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Ses/video muhendisi |
-| **Ne** | Build a real-time voice agent with sub-800ms first-audio-out, barge-in handling, and mid-conversation tool use. |
-| **Nerede** | `voice\voice-agent.md` |
-| **Ne Zaman** | Ses isleme veya TTS/STT gerektiginde |
-| **Neden** | Voice Agent islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Build a real-time voice agent with sub-800ms first-audio-out, barge-in handling, and mid-conversation tool use. |
-| **Nerede?** | voice/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Ses/video muhendisi
-Ne: Build a real-time voice agent with sub-800ms first-audio-out, barge-in handling, and mid-conversation tool use.
-Nerede: `voice\voice-agent.md`
-Ne Zaman: Ses isleme veya TTS/STT gerektiginde
-Neden: Voice Agent islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a domain (customer support, scheduling, retail assistant), deploy a WebRTC voice agent that keeps end-to-end first-audio-out under 800ms while handling barge-in, tool calls, and packet loss.
 

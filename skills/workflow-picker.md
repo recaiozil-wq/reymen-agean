@@ -8,40 +8,7 @@ lesson: 12
 tags: [anthropic, workflows, agents, patterns, minimal]
 category: workflow-picker
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Tum kullanicilar |
-| **Ne** | Pick the right pattern (prompt chain, router, parallel, orchestrator-workers, evaluator-optimizer, or full agent) for a given task and produce the minimal implementation. |
-| **Nerede** | `productivity\workflow-picker.md` |
-| **Ne Zaman** | Gunluk is akisi iyilestirmesi gerektiginde |
-| **Neden** | Workflow Picker islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Pick the right pattern (prompt chain, router, parallel, orchestrator-workers, evaluator-optimizer, or full agent) for a given task and produce the minimal implementation. |
-| **Nerede?** | productivity/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Tum kullanicilar
-Ne: Pick the right pattern (prompt chain, router, parallel, orchestrator-workers, evaluator-optimizer, or full agent) for a given task and produce the minimal implementation.
-Nerede: `productivity\workflow-picker.md`
-Ne Zaman: Gunluk is akisi iyilestirmesi gerektiginde
-Neden: Workflow Picker islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a task description, pick the minimal pattern that fits and produce the smallest correct implementation.
 

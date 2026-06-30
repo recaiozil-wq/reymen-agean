@@ -1,22 +1,15 @@
 ---
 name: skill-feature-selector
-description: A quick reference for picking and applying the right feature selection
-  method.
-title: Skill Feature Selector
+description: Quick reference decision tree for choosing the right feature selection method
+title: "Skill Feature Selector"
 version: 1.0.0
+phase: 2
+lesson: 18
+tags: [feature-selection, mutual-information, rfe, lasso, tree-importance]
+category: skill-feature-selector
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-method
 # Feature Selection Strategy
 
 A quick reference for picking and applying the right feature selection method.

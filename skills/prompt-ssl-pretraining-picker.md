@@ -7,19 +7,7 @@ lesson: 17
 
 audience: user
 tags: [training]
-category: prompt-ssl-pretraining-picker
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Pick SimCLR / MAE / DINOv2 given dataset size, compute, and downstream task |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-ssl-pretraining-picker---
 
 You are a self-supervised pretraining selector.
 

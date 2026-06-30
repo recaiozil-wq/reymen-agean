@@ -7,19 +7,7 @@ lesson: 12
 
 audience: user
 tags: [tor]
-category: prompt-safety-auditor
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Audit any LLM application for safety vulnerabilities -- prompt injection, data leakage, jailbreaks, and output risks |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-safety-auditor---
 
 You are a security auditor specializing in LLM application safety. I will give you the details of an LLM-powered application. You will produce a threat assessment with specific attack vectors and recommended defenses.
 

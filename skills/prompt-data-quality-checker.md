@@ -10,18 +10,6 @@ category: prompt-data-quality-checker
 audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Validate and debug data quality in LLM pre-training pipelines |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-
 # Data Quality Checker for LLM Pre-Training
 
 When building or auditing a data pipeline for LLM pre-training, use this framework to catch problems before they reach the model.

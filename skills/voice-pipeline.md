@@ -8,40 +8,7 @@ lesson: 22
 tags: [voice, pipecat, livekit, webrtc, latency]
 category: voice-pipeline
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Ses/video muhendisi |
-| **Ne** | Scaffold a Pipecat-shaped voice pipeline (VAD + STT + LLM + TTS + transport) with barge-in, confidence gating, and latency budget enforcement. |
-| **Nerede** | `voice\voice-pipeline.md` |
-| **Ne Zaman** | Ses isleme veya TTS/STT gerektiginde |
-| **Neden** | Voice Pipeline islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Scaffold a Pipecat-shaped voice pipeline (VAD + STT + LLM + TTS + transport) with barge-in, confidence gating, and latency budget enforcement. |
-| **Nerede?** | voice/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Ses/video muhendisi
-Ne: Scaffold a Pipecat-shaped voice pipeline (VAD + STT + LLM + TTS + transport) with barge-in, confidence gating, and latency budget enforcement.
-Nerede: `voice\voice-pipeline.md`
-Ne Zaman: Ses isleme veya TTS/STT gerektiginde
-Neden: Voice Pipeline islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a voice product spec (language, transport, providers), scaffold a frame-based pipeline.
 

@@ -1,21 +1,3 @@
-
-> **Kategori:** video
-
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Video ajanı |
-| **Ne?** | Prompt Video Model Picker |
-| **Nerede?** | video/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
 ---
 name: prompt-video-model-picker
 description: Pick Sora 2 / Runway Gen-5 / Wan-Video / HunyuanVideo / Cosmos for a given task, license, and latency target

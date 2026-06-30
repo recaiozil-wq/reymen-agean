@@ -1,22 +1,15 @@
 ---
 name: spec-decode-picker
-description: Help an engineer choose between vanilla speculative, Medusa, EAGLE, or
-  lookahead decoding, and tune `N` (draft length) for a specific workload.
-title: Spec Decode Picker
+description: Pick a speculative decoding strategy (vanilla / Medusa / EAGLE / lookahead) and tuning parameters for a new LLM inference workload.
+title: "Spec Decode Picker"
 version: 1.0.0
+phase: 7
+lesson: 16
+tags: [inference, decoding, latency, speculative, optimization]
+category: spec-decode-picker
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-and tuning parameters for a new LLM inference workload.
 # Speculative Decoding Picker
 
 Help an engineer choose between vanilla speculative, Medusa, EAGLE, or lookahead decoding, and tune `N` (draft length) for a specific workload.

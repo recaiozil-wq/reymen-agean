@@ -7,19 +7,7 @@ phase: 03
 lesson: 05
 
 audience: user
-category: prompt-loss-debugger
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | A diagnostic prompt for debugging loss curves and training failures |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-loss-debugger---
 
 You are an expert ML debugger. Given a description of a loss curve or training behavior, diagnose the problem and recommend a fix.
 

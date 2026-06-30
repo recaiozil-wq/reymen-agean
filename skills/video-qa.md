@@ -8,40 +8,7 @@ lesson: 12
 tags: [capstone, video, multimodal, gemini, qwen-vl, molmo, transnet, qdrant]
 category: video-qa
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Medya uzmani |
-| **Ne** | Build a video understanding pipeline with scene segmentation, multi-vector indexing, temporal grounding, and timestamped citations. |
-| **Nerede** | `media\video-qa.md` |
-| **Ne Zaman** | Medya dosyasi isleme gerektiginde |
-| **Neden** | Video Qa islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Video ajanı |
-| **Ne?** | Build a video understanding pipeline with scene segmentation, multi-vector indexing, temporal grounding, and timestamped citations. |
-| **Nerede?** | media/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Medya uzmani
-Ne: Build a video understanding pipeline with scene segmentation, multi-vector indexing, temporal grounding, and timestamped citations.
-Nerede: `media\video-qa.md`
-Ne Zaman: Medya dosyasi isleme gerektiginde
-Neden: Video Qa islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given 100 hours of video, build an ingestion pipeline and a query system that answers natural-language questions with (start, end) timestamps plus frame previews.
 

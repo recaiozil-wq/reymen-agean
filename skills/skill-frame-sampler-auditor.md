@@ -1,22 +1,15 @@
 ---
 name: skill-frame-sampler-auditor
-description: Frame sampling is where video pipelines break. Bugs here propagate into
-  every downstream metric.
-title: Skill Frame Sampler Auditor
+description: Audit a video pipeline's frame sampler for off-by-one, short-clip handling, and crop consistency
+title: "Skill Frame SAMpler Auditor"
 version: 1.0.0
+phase: 4
+lesson: 12
+tags: [computer-vision, video, sampling, debugging]
+category: skill-frame-sampler-auditor
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-and crop consistency
 # Frame Sampler Auditor
 
 Frame sampling is where video pipelines break. Bugs here propagate into every downstream metric.

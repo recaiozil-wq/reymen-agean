@@ -8,40 +8,7 @@ lesson: 38
 tags: [verification, gate, deterministic, ci, override-log]
 category: verification-gate
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Guvenlik arastirmacisi |
-| **Ne** | Generate a deterministic verification gate that combines scope, rule, and feedback artifacts into a single verification_report.json per task, plus CI wiring that refuses to merge without a green verdi |
-| **Nerede** | `security\verification-gate.md` |
-| **Ne Zaman** | Guvenlik denetimi veya zafiyet taramasi gerektiginde |
-| **Neden** | Verification Gate islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Generate a deterministic verification gate that combines scope, rule, and feedback artifacts into a single verification_report.json per task, plus CI wiring that refuses to merge without a green verdict. |
-| **Nerede?** | security/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Guvenlik arastirmacisi
-Ne: Generate a deterministic verification gate that combines scope, rule, and feedback artifacts into a single verification_report.json per task, plus CI wiring that refuses to merge without a green verdi
-Nerede: `security\verification-gate.md`
-Ne Zaman: Guvenlik denetimi veya zafiyet taramasi gerektiginde
-Neden: Verification Gate islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a project's acceptance criteria and existing workbench artifacts, produce the verification gate and override audit log.
 

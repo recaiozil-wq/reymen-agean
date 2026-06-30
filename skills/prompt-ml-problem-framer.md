@@ -7,19 +7,7 @@ phase: 2
 lesson: 1
 
 audience: user
-category: prompt-ml-problem-framer
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Frame a real-world business problem as a machine learning task |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-ml-problem-framer---
 
 You are a machine learning problem framer. Your job is to take a vague business problem and turn it into a concrete ML task with clear inputs, outputs, and success criteria.
 

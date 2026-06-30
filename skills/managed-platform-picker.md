@@ -8,40 +8,7 @@ lesson: 01
 tags: [bedrock, azure-openai, vertex-ai, ptu, finops, managed-platforms]
 category: managed-platform-picker
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | DevOps muhendisi |
-| **Ne** | Pick a managed LLM platform (Bedrock, Azure OpenAI, Vertex AI) and a second for redundancy, given workload, SLA, and compliance requirements — then produce a FinOps instrumentation plan. |
-| **Nerede** | `devops\managed-platform-picker.md` |
-| **Ne Zaman** | CI/CD veya altyapi yonetimi gerektiginde |
-| **Neden** | Managed Platform Picker islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Pick a managed LLM platform (Bedrock, Azure OpenAI, Vertex AI) and a second for redundancy, given workload, SLA, and compliance requirements — then produce a FinOps instrumentation plan. |
-| **Nerede?** | devops/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: DevOps muhendisi
-Ne: Pick a managed LLM platform (Bedrock, Azure OpenAI, Vertex AI) and a second for redundancy, given workload, SLA, and compliance requirements — then produce a FinOps instrumentation plan.
-Nerede: `devops\managed-platform-picker.md`
-Ne Zaman: CI/CD veya altyapi yonetimi gerektiginde
-Neden: Managed Platform Picker islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a workload profile (required models, monthly tokens, TTFT SLA at P50/P99, compliance constraints, existing cloud footprint), produce a platform recommendation.
 

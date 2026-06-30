@@ -8,40 +8,7 @@ lesson: 1
 tags: [rlhf, instructgpt, sft, reward-model, ppo, alignment]
 category: instructgpt-explainer
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Arastirmaci |
-| **Ne** | Diagnose an RLHF-family paper or pipeline against the three-stage InstructGPT reference. |
-| **Nerede** | `research\instructgpt-explainer.md` |
-| **Ne Zaman** | Arastirma veya literatur taramasi gerektiginde |
-| **Neden** | Instructgpt Explainer islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Diagnose an RLHF-family paper or pipeline against the three-stage InstructGPT reference. |
-| **Nerede?** | research/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Arastirmaci
-Ne: Diagnose an RLHF-family paper or pipeline against the three-stage InstructGPT reference.
-Nerede: `research\instructgpt-explainer.md`
-Ne Zaman: Arastirma veya literatur taramasi gerektiginde
-Neden: Instructgpt Explainer islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a paper abstract, blog post, or pipeline description that claims to "align" a language model, identify which stages of the InstructGPT reference (SFT + RM + PPO-ptx with KL penalty) the method modifies, and what is at risk when each stage changes.
 

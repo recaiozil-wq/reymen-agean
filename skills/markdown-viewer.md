@@ -8,47 +8,14 @@ author: Ekko
 license: MIT
 platforms: [linux, macos, windows]
 metadata:
-  ReYMeN:
+  hermes:
     source: markdown-viewer/skills
     tags: [markdown-viewer, diagrams, visualization, plantuml, vega, infographic, documentation]
 category: markdown-viewer
 audience: user
 prerequisites:
   commands: [node, npx]
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | AI gelistiricisi |
-| **Ne** | "Create rich diagrams, data visualizations, technical architecture views, and editorial content cards directly in Markdown using the Markdown Viewer Agent Skills pack. Use for Mermaid-like diagram req |
-| **Nerede** | `software-development\markdown-viewer.md` |
-| **Ne Zaman** | Ilgili gorev gerektiginde |
-| **Neden** | Markdown Viewer islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Create rich diagrams, data visualizations, technical architecture views, and editorial content cards directly in Markdown using the Markdown Viewer Agent Skills pack. Use for Mermaid-like diagram requests, PlantUML architecture diagrams, Vega charts, JSON Canvas maps, infographics, UML, cloud/network/security/data/IoT diagrams, and polished Markdown documentation visuals. |
-| **Nerede?** | software-development/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Yazilim gelistirici
-Ne: "Create rich diagrams, data visualizations, technical architecture views, and editorial content cards directly in Markdown using the Markdown Viewer Agent Skills pack. Use for Mermaid-like diagram req
-Nerede: `software-development\markdown-viewer.md`
-Ne Zaman: Ilgili gorev gerektiginde
-Neden: Markdown Viewer islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 # Markdown Viewer
 

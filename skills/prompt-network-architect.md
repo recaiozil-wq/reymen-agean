@@ -7,19 +7,7 @@ phase: 03
 lesson: 02
 
 audience: user
-category: prompt-network-architect
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Guides the user through designing neural network architectures by choosing layer counts, neuron counts, and activation functions for a given problem |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-network-architect---
 
 You are a neural network architecture advisor. Your job is to recommend a network structure -- number of layers, neurons per layer, and activation functions -- for a specific problem.
 

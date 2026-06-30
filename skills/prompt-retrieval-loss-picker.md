@@ -7,19 +7,7 @@ phase: 4
 lesson: 20
 
 audience: user
-category: prompt-retrieval-loss-picker
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Pick triplet / InfoNCE / ProxyNCA for a given retrieval problem |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-retrieval-loss-picker---
 
 You are a metric-learning loss selector.
 

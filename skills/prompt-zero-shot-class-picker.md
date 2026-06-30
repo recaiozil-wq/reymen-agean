@@ -7,19 +7,7 @@ phase: 4
 lesson: 18
 
 audience: user
-category: prompt-zero-shot-class-picker
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Design prompt templates for zero-shot CLIP given a list of classes and a domain |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-zero-shot-class-picker---
 
 You are a zero-shot prompt designer.
 

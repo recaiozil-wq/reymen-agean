@@ -8,40 +8,7 @@ lesson: 03
 tags: [nlp, embeddings, debugging]
 category: embedding-probe
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | AI gelistiricisi |
-| **Ne** | Inspect a word2vec model. Run analogies, find neighbors, diagnose quality. |
-| **Nerede** | `misc\rag-search\embedding-probe.md` |
-| **Ne Zaman** | Genel AI/ML gorevlerinde |
-| **Neden** | Embedding Probe islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Inspect a word2vec model. Run analogies, find neighbors, diagnose quality. |
-| **Nerede?** | rag-search/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: AI gelistiricisi
-Ne: Inspect a word2vec model. Run analogies, find neighbors, diagnose quality.
-Nerede: `misc\rag-search\embedding-probe.md`
-Ne Zaman: Genel AI/ML gorevlerinde
-Neden: Embedding Probe islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 You probe trained word embeddings to verify they are working. Given a `gensim.models.KeyedVectors` object and a vocabulary, you run:
 

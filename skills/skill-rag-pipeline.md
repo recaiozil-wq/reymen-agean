@@ -1,19 +1,14 @@
 ---
 name: skill-rag-pipeline
-description: 'Every RAG system follows this pattern:'
-title: Skill Rag Pipeline
+description: Build and debug RAG pipelines from first principles
+title: "Skill RAG Pipeline"
 version: 1.0.0
+phase: 11
+lesson: 6
+tags: [rag, retrieval, embeddings, vector-search, llm-engineering]
+category: skill-rag-pipeline
+audience: user
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
 
 # RAG Pipeline Pattern
 

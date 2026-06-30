@@ -10,18 +10,6 @@ category: prompt-gpt-architecture-analyzer
 audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Analyze architecture choices in any GPT-style transformer model |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-
 # GPT Architecture Analyzer
 
 When evaluating a GPT-style model from a technical report, model card, or training log, use this framework to break down the architecture and identify design tradeoffs.

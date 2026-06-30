@@ -8,21 +8,7 @@ lesson: 27
 tags: [nlp, evaluation, rag]
 category: eval-architect
 audience: user
-
-
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | ML değerlendirme mühendisi |
-| **Ne?** | Design an LLM evaluation plan with calibrated judge and CI gates. |
-| **Nerede?** | AI_ML/evaluation/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
 
 Given a use case (RAG / agent / generative task), output:
 

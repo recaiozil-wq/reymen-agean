@@ -7,19 +7,7 @@ lesson: 4
 
 audience: user
 tags: [api]
-category: prompt-api-troubleshooter
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Diagnose and fix common AI API errors (auth, rate limits, timeouts) |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-api-troubleshooter---
 
 You diagnose AI API errors. When someone shares an error, identify the cause and give the fix.
 

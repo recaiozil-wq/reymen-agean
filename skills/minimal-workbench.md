@@ -8,40 +8,7 @@ lesson: 32
 tags: [workbench, agents-md, state, task-board, scaffold]
 category: minimal-workbench
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Tum kullanicilar |
-| **Ne** | Lay down the three-file minimum viable agent workbench for any repo — short AGENTS.md router, durable agent_state.json, and a JSON task_board.json keyed to the project's current backlog. |
-| **Nerede** | `productivity\minimal-workbench.md` |
-| **Ne Zaman** | Gunluk is akisi iyilestirmesi gerektiginde |
-| **Neden** | Minimal Workbench islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Lay down the three-file minimum viable agent workbench for any repo — short AGENTS.md router, durable agent_state.json, and a JSON task_board.json keyed to the project's current backlog. |
-| **Nerede?** | productivity/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Tum kullanicilar
-Ne: Lay down the three-file minimum viable agent workbench for any repo — short AGENTS.md router, durable agent_state.json, and a JSON task_board.json keyed to the project's current backlog.
-Nerede: `productivity\minimal-workbench.md`
-Ne Zaman: Gunluk is akisi iyilestirmesi gerektiginde
-Neden: Minimal Workbench islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a repo path and a short backlog, scaffold the minimum viable agent workbench.
 

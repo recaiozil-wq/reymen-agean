@@ -1,22 +1,15 @@
 ---
 name: skill-gradient-computation
-description: Practical reference for computing gradients of loss functions, activation
-  functions, and layer operations used in neural networks.
-title: Skill Gradient Computation
+description: Compute gradients of common ML loss functions and choose the right derivative approach
+title: "Skill Gradient Computation"
 version: 1.0.0
+phase: 1
+lesson: 4
+tags: [calculus, gradients, backpropagation]
+category: skill-gradient-computation
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-approach
 # Gradient Computation for ML
 
 Practical reference for computing gradients of loss functions, activation functions, and layer operations used in neural networks.

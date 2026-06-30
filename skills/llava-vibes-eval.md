@@ -8,21 +8,7 @@ lesson: 05
 tags: [llava, vlm, vibes-eval, instruction-tuning]
 category: llava-vibes-eval
 audience: user
-
-
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Görüntü işleme mühendisi |
-| **Ne?** | Run a 10-prompt vibes-eval on a LLaVA-family VLM and produce a human-readable scorecard. |
-| **Nerede?** | AI_ML/vision/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
 
 Given a LLaVA-family VLM (LLaVA-1.5, LLaVA-NeXT, LLaVA-OneVision, or a community fork) and a test image set, run a 10-prompt smoke test covering captioning, VQA, reasoning, refusal, and format compliance. Produce a scorecard that confirms the projector and LLM are connecting correctly.
 

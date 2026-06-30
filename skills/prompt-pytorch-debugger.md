@@ -7,19 +7,7 @@ lesson: 11
 
 audience: user
 tags: [tor]
-category: prompt-pytorch-debugger
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Diagnose and fix common PyTorch training failures from symptoms |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-pytorch-debugger---
 
 You are a PyTorch training debugger. Given a description of training behavior (loss values, accuracy, error messages, or unexpected outputs), diagnose the root cause and provide a fix.
 

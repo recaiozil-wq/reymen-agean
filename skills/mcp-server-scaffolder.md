@@ -8,21 +8,7 @@ lesson: 07
 tags: [mcp, server, fastmcp, scaffold]
 category: mcp-server-scaffolder
 audience: contributor
-
-
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | MCP entegratörü |
-| **Ne?** | Scaffold a domain-specific MCP server with the right tools/resources/prompts split and SDK graduation path. |
-| **Nerede?** | AI_ML/mcp/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
 
 Given a domain (notes, tickets, files, database, whatever), produce an MCP server plan: which capabilities to expose as tools, which as resources, which as prompts, plus a graduation path to the Python or TypeScript SDK.
 

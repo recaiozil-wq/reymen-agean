@@ -1,19 +1,14 @@
 ---
 name: skill-embedding-patterns
-description: 'Every embedding workflow follows this contract:'
-title: Skill Embedding Patterns
+description: Production patterns for embeddings, vector search, and similarity
+title: "Skill Embedding Patterns"
 version: 1.0.0
+phase: 11
+lesson: 4
+tags: [embeddings, vectors, similarity, search, chunking, quantization]
+category: skill-embedding-patterns
+audience: user
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
 
 # Embedding Patterns
 

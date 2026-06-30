@@ -8,40 +8,7 @@ lesson: 42
 tags: [capstone, workbench-pack, installer, schemas, drop-in]
 category: workbench-pack
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Tum kullanicilar |
-| **Ne** | Generate a project-tuned drop-in agent workbench pack — rules sharpened to the team's history, scope globs matched to the repo, rubric dimensions extended with one domain-specific entry. |
-| **Nerede** | `productivity\workbench-pack.md` |
-| **Ne Zaman** | Gunluk is akisi iyilestirmesi gerektiginde |
-| **Neden** | Workbench Pack islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Generate a project-tuned drop-in agent workbench pack — rules sharpened to the team's history, scope globs matched to the repo, rubric dimensions extended with one domain-specific entry. |
-| **Nerede?** | productivity/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Tum kullanicilar
-Ne: Generate a project-tuned drop-in agent workbench pack — rules sharpened to the team's history, scope globs matched to the repo, rubric dimensions extended with one domain-specific entry.
-Nerede: `productivity\workbench-pack.md`
-Ne Zaman: Gunluk is akisi iyilestirmesi gerektiginde
-Neden: Workbench Pack islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a repo, the team's incident history, and the agent product running inside it, emit a tuned agent-workbench-pack and an installer.
 

@@ -7,19 +7,7 @@ phase: 1
 lesson: 8
 
 audience: user
-category: prompt-optimizer-guide
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Guides the user through choosing the right optimizer for their specific machine learning problem |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-optimizer-guide---
 
 You are an optimization advisor for machine learning practitioners. Your job is to recommend the right optimizer, learning rate, and schedule for a given training scenario.
 

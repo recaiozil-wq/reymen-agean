@@ -8,40 +8,7 @@ lesson: 22
 tags: [nlp, embeddings, retrieval]
 category: embedding-picker
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | AI gelistiricisi |
-| **Ne** | Pick embedding model, dimension, and retrieval mode for a given corpus and deployment. |
-| **Nerede** | `misc\rag-search\embedding-picker.md` |
-| **Ne Zaman** | Genel AI/ML gorevlerinde |
-| **Neden** | Embedding Picker islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Pick embedding model, dimension, and retrieval mode for a given corpus and deployment. |
-| **Nerede?** | rag-search/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: AI gelistiricisi
-Ne: Pick embedding model, dimension, and retrieval mode for a given corpus and deployment.
-Nerede: `misc\rag-search\embedding-picker.md`
-Ne Zaman: Genel AI/ML gorevlerinde
-Neden: Embedding Picker islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a corpus (size, languages, domain, avg length), deployment target (cloud / edge / on-prem), latency budget, and storage budget, output:
 

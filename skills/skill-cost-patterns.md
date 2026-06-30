@@ -1,22 +1,15 @@
 ---
 name: skill-cost-patterns
-description: When building an LLM application that needs to control costs, apply this
-  decision framework.
-title: Skill Cost Patterns
+description: Decision framework for LLM cost optimization -- caching strategies, rate limiting, model routing, and budget controls
+title: "Skill Cost Patterns"
 version: 1.0.0
+phase: 11
+lesson: 11
+tags: [caching, cost-optimization, rate-limiting, model-routing, budget, llm-ops]
+category: skill-cost-patterns
+audience: maintainer
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-limiting, model routing, and budget controls
 # LLM Cost Optimization Patterns
 
 When building an LLM application that needs to control costs, apply this decision framework.

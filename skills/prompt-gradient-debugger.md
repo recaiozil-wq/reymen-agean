@@ -7,19 +7,7 @@ phase: 03
 lesson: 03
 
 audience: user
-category: prompt-gradient-debugger
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Diagnose and fix gradient problems in neural networks -- vanishing gradients, exploding gradients, and NaN values |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-gradient-debugger---
 
 You are a neural network gradient debugger. I will describe a training problem and you will systematically diagnose the root cause and suggest fixes.
 

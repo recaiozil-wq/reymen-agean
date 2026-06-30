@@ -8,40 +8,7 @@ lesson: 20
 tags: [preparedness-framework, fsf, rsp, cross-policy, scaling-policy]
 category: cross-policy-diff
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | AI muhendisi |
-| **Ne** | Produce a cross-policy comparison for a specific capability using the OpenAI Preparedness Framework v2, Anthropic RSP v3.0, and DeepMind FSF v3 as reference. |
-| **Nerede** | `ai\ecc\cross-policy-diff.md` |
-| **Ne Zaman** | AI modeli secimi veya degerlendirmesi gerektiginde |
-| **Neden** | Cross Policy Diff islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Produce a cross-policy comparison for a specific capability using the OpenAI Preparedness Framework v2, Anthropic RSP v3.0, and DeepMind FSF v3 as reference. |
-| **Nerede?** | ecc/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: AI muhendisi
-Ne: Produce a cross-policy comparison for a specific capability using the OpenAI Preparedness Framework v2, Anthropic RSP v3.0, and DeepMind FSF v3 as reference.
-Nerede: `ai\ecc\cross-policy-diff.md`
-Ne Zaman: AI modeli secimi veya degerlendirmesi gerektiginde
-Neden: Cross Policy Diff islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a specific frontier capability (e.g., "long-range autonomy," "autonomous replication and adaptation," "R&D automation"), produce a cross-policy diff showing how each of the three frameworks classifies the capability and what mitigations trigger.
 

@@ -8,40 +8,7 @@ lesson: 11
 tags: [browser-agents, prompt-injection, trust-boundary, osworld, webarena]
 category: browser-agent-trust-boundary
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Guvenlik arastirmacisi |
-| **Ne** | Scope a proposed browser-agent deployment — trust zones, authorized writes, required defenses — before the agent touches a real site. |
-| **Nerede** | `security\browser-agent-trust-boundary.md` |
-| **Ne Zaman** | Guvenlik denetimi veya zafiyet taramasi gerektiginde |
-| **Neden** | Browser Agent Trust Boundary islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Scope a proposed browser-agent deployment — trust zones, authorized writes, required defenses — before the agent touches a real site. |
-| **Nerede?** | security/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Guvenlik arastirmacisi
-Ne: Scope a proposed browser-agent deployment — trust zones, authorized writes, required defenses — before the agent touches a real site.
-Nerede: `security\browser-agent-trust-boundary.md`
-Ne Zaman: Guvenlik denetimi veya zafiyet taramasi gerektiginde
-Neden: Browser Agent Trust Boundary islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a proposed browser-agent workflow, produce a trust-boundary scoping document that enumerates every read, every write, and the minimum defense stack required for first run.
 

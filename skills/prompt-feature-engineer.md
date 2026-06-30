@@ -7,19 +7,7 @@ phase: 2
 lesson: 8
 
 audience: user
-category: prompt-feature-engineer
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Systematic prompt for engineering features from raw tabular data |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-feature-engineer---
 
 # Feature Engineering Prompt
 

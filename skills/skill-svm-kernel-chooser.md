@@ -1,22 +1,14 @@
 ---
 name: skill-svm-kernel-chooser
-description: 'SVMs are defined by two choices: the kernel (which determines the shape
-  of the decision boundary) and the regularization parameters (which control the tradeoff
-  between margin width and classification errors). Getting these right is the difference
-  between a useless model and a strong one.'
-title: Skill Svm Kernel Chooser
+description: Choose the right SVM kernel and tune C and gamma for your problem
+title: "Skill Svm Kernel Chooser"
 version: 1.0.0
+phase: 2
+lesson: 5
+tags: [svm, kernel, classification, hyperparameter-tuning]
+category: skill-svm-kernel-chooser
+audience: user
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
 
 # SVM Kernel Selection Guide
 

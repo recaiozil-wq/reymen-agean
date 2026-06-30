@@ -1,22 +1,15 @@
 ---
 name: skill-structured-outputs
-description: When building an LLM application that requires structured data, apply
-  this decision framework.
-title: Skill Structured Outputs
+description: Decision framework for choosing the right structured output strategy based on provider, reliability, and complexity
+title: "Skill Structured Outputs"
 version: 1.0.0
+phase: 11
+lesson: 03
+tags: [structured-output, json, schema, constrained-decoding, pydantic, function-calling]
+category: skill-structured-outputs
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-based on provider, reliability, and complexity
 # Structured Output Strategy
 
 When building an LLM application that requires structured data, apply this decision framework.

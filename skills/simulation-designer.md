@@ -8,40 +8,7 @@ lesson: 17
 tags: [multi-agent, simulation, generative-agents, emergence, memory]
 category: simulation-designer
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | DevOps muhendisi |
-| **Ne** | Design a generative-agent simulation (Smallville-style) for a given scenario. Specifies memory schema, reflection cadence, plan horizon, spatial/social constraints, and evaluation metrics. |
-| **Nerede** | `devops\simulation-designer.md` |
-| **Ne Zaman** | CI/CD veya altyapi yonetimi gerektiginde |
-| **Neden** | Simulation Designer islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Design a generative-agent simulation (Smallville-style) for a given scenario. Specifies memory schema, reflection cadence, plan horizon, spatial/social constraints, and evaluation metrics. |
-| **Nerede?** | devops/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: DevOps muhendisi
-Ne: Design a generative-agent simulation (Smallville-style) for a given scenario. Specifies memory schema, reflection cadence, plan horizon, spatial/social constraints, and evaluation metrics.
-Nerede: `devops\simulation-designer.md`
-Ne Zaman: CI/CD veya altyapi yonetimi gerektiginde
-Neden: Simulation Designer islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a scenario that requires emergent behavior from a population of agents (social simulation, game NPCs, policy rehearsal, market dynamics), design the simulation.
 

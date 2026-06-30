@@ -1,23 +1,15 @@
 ---
 name: skill-residual-block-reviewer
-description: A focused reviewer for any PyTorch `nn.Module` claiming to implement
-  a residual block. Catches the four mistakes that account for almost every broken
-  ResNet rewrite.
-title: Skill Residual Block Reviewer
+description: Review a PyTorch residual block for skip-connection correctness, BN placement, activation order, and shape alignment
+title: "Skill Residual Block Reviewer"
 version: 1.0.0
+phase: 4
+lesson: 3
+tags: [computer-vision, resnet, code-review, pytorch]
+category: skill-residual-block-reviewer
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-activation order, and shape alignment
 # Residual Block Reviewer
 
 A focused reviewer for any PyTorch `nn.Module` claiming to implement a residual block. Catches the four mistakes that account for almost every broken ResNet rewrite.

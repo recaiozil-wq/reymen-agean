@@ -8,40 +8,7 @@ lesson: 41
 tags: [benchmark, before-after, evaluation, workbench, sample-app]
 category: workbench-benchmark
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Tum kullanicilar |
-| **Ne** | Run the same task through prompt-only and workbench-guided pipelines on a project's own sample app and emit a five-outcome before/after report. |
-| **Nerede** | `productivity\workbench-benchmark.md` |
-| **Ne Zaman** | Gunluk is akisi iyilestirmesi gerektiginde |
-| **Neden** | Workbench Benchmark islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Run the same task through prompt-only and workbench-guided pipelines on a project's own sample app and emit a five-outcome before/after report. |
-| **Nerede?** | productivity/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Tum kullanicilar
-Ne: Run the same task through prompt-only and workbench-guided pipelines on a project's own sample app and emit a five-outcome before/after report.
-Nerede: `productivity\workbench-benchmark.md`
-Ne Zaman: Gunluk is akisi iyilestirmesi gerektiginde
-Neden: Workbench Benchmark islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a repo, an agent product, and a small sample app, produce a portable evaluation harness that compares prompt-only against workbench-guided pipelines.
 

@@ -1,22 +1,15 @@
 ---
 name: skill-context-engineering
-description: When building an LLM application, apply this framework to design the
-  context assembly pipeline.
-title: Skill Context Engineering
+description: Decision framework for designing context assembly pipelines based on task type, window size, and latency budget
+title: "Skill Context Engineering"
 version: 1.0.0
+phase: 11
+lesson: 05
+tags: [context-engineering, context-window, rag, memory, tool-selection, lost-in-the-middle]
+category: skill-context-engineering
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-task type, window size, and latency budget
 # Context Engineering
 
 When building an LLM application, apply this framework to design the context assembly pipeline.

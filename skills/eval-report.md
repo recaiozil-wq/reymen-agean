@@ -7,21 +7,7 @@ phase: 8
 lesson: 14
 tags: [evaluation, fid, clip, elo]
 audience: user
-
-
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | ML değerlendirme mühendisi |
-| **Ne?** | Plan a full generative-model evaluation: sample quality, adherence, preference, failure audit. |
-| **Nerede?** | AI_ML/evaluation/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
 
 Given a new generative-model checkpoint, a reference baseline, and a modality (image / video / audio / 3D), output a full eval plan:
 

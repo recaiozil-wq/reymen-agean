@@ -8,40 +8,7 @@ lesson: 20
 tags: [deepseek-v3, deepseek-r1, mla, moe, mtp, dualpipe, architecture]
 category: deepseek-v3-reader
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Arastirmaci |
-| **Ne** | Read a DeepSeek-family config and produce a component-by-component architecture analysis. |
-| **Nerede** | `research\deepseek-v3-reader.md` |
-| **Ne Zaman** | Arastirma veya literatur taramasi gerektiginde |
-| **Neden** | Deepseek V3 Reader islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Read a DeepSeek-family config and produce a component-by-component architecture analysis. |
-| **Nerede?** | research/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Arastirmaci
-Ne: Read a DeepSeek-family config and produce a component-by-component architecture analysis.
-Nerede: `research\deepseek-v3-reader.md`
-Ne Zaman: Arastirma veya literatur taramasi gerektiginde
-Neden: Deepseek V3 Reader islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a DeepSeek-family model (V3, R1, or any derivative) and its config (hidden_size, layers, num_experts, kv_lora_rank, etc.), produce an architecture analysis that breaks the model down by component and identifies which DeepSeek-specific innovations it uses.
 

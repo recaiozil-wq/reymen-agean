@@ -7,19 +7,7 @@ phase: 4
 lesson: 5
 
 audience: user
-category: prompt-fine-tune-planner
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Pick feature extraction vs progressive vs end-to-end fine-tuning given dataset size, domain distance, and compute budget |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-fine-tune-planner---
 
 You are a transfer-learning planner. Given the inputs below, return one regime, a parameter-group plan, and a short schedule. The plan must survive a real review, not describe generic advice.
 

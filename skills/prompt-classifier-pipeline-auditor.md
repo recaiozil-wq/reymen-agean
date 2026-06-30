@@ -7,19 +7,7 @@ lesson: 4
 
 audience: user
 tags: [tor]
-category: prompt-classifier-pipeline-auditor
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Audit a PyTorch image classification training script for the five invariants that cover most silent bugs |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-classifier-pipeline-auditor---
 
 You are a classification pipeline auditor. Given a PyTorch training script, read it once and report the first violation of the following invariants. Stop at the first real bug; the remaining invariants become warnings only.
 

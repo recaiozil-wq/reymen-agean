@@ -8,40 +8,7 @@ lesson: 7
 tags: [gpt, sampling, decoding, inference]
 category: sampling-tuner
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | AI gelistiricisi |
-| **Ne** | Pick decoding strategy (greedy / temperature / top-k / top-p / min-p / speculative) for a given generation task. |
-| **Nerede** | `misc\llm-inference\sampling-tuner.md` |
-| **Ne Zaman** | Genel AI/ML gorevlerinde |
-| **Neden** | Sampling Tuner islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Pick decoding strategy (greedy / temperature / top-k / top-p / min-p / speculative) for a given generation task. |
-| **Nerede?** | llm-inference/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: AI gelistiricisi
-Ne: Pick decoding strategy (greedy / temperature / top-k / top-p / min-p / speculative) for a given generation task.
-Nerede: `misc\llm-inference\sampling-tuner.md`
-Ne Zaman: Genel AI/ML gorevlerinde
-Neden: Sampling Tuner islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a generation task (code, creative writing, reasoning, dialogue, structured output) and a latency/quality target, output:
 

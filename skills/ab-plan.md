@@ -8,40 +8,7 @@ lesson: 21
 tags: [ab-testing, statsig, growthbook, cuped, sequential, benjamini-hochberg, srm]
 category: ab-plan
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Tum kullanicilar |
-| **Ne** | Design an LLM A/B test — pick platform (Statsig or GrowthBook), primary metric, guardrails, sample size with LLM-noise buffer, CUPED, sequential stopping, and multiple-comparison correction. |
-| **Nerede** | `productivity\ab-plan.md` |
-| **Ne Zaman** | Gunluk is akisi iyilestirmesi gerektiginde |
-| **Neden** | Ab Plan islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Design an LLM A/B test — pick platform (Statsig or GrowthBook), primary metric, guardrails, sample size with LLM-noise buffer, CUPED, sequential stopping, and multiple-comparison correction. |
-| **Nerede?** | productivity/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Tum kullanicilar
-Ne: Design an LLM A/B test — pick platform (Statsig or GrowthBook), primary metric, guardrails, sample size with LLM-noise buffer, CUPED, sequential stopping, and multiple-comparison correction.
-Nerede: `productivity\ab-plan.md`
-Ne Zaman: Gunluk is akisi iyilestirmesi gerektiginde
-Neden: Ab Plan islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given the feature change (prompt / model / generation parameter), baseline metrics, expected lift, and team posture (warehouse-native OSS vs bundled SaaS), produce an A/B plan.
 

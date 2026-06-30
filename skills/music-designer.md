@@ -8,40 +8,7 @@ lesson: 09
 tags: [music-generation, musicgen, stable-audio, suno, licensing]
 category: music-designer
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Icerik ureticisi |
-| **Ne** | Pick a music-generation model, license strategy, length plan, and disclosure metadata for a deployment. |
-| **Nerede** | `creative\music-designer.md` |
-| **Ne Zaman** | Gorsel/yaratici icerik uretimi gerektiginde |
-| **Neden** | Music Designer islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Pick a music-generation model, license strategy, length plan, and disclosure metadata for a deployment. |
-| **Nerede?** | creative/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Icerik ureticisi
-Ne: Pick a music-generation model, license strategy, length plan, and disclosure metadata for a deployment.
-Nerede: `creative\music-designer.md`
-Ne Zaman: Gorsel/yaratici icerik uretimi gerektiginde
-Neden: Music Designer islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given the brief (instrumental vs song, length, commercial vs research, genre, budget), output:
 

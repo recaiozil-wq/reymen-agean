@@ -1,22 +1,15 @@
 ---
 name: skill-guardrail-patterns
-description: When building an LLM application that needs safety layers, apply this
-  decision framework.
-title: Skill Guardrail Patterns
+description: Decision framework for choosing and implementing guardrails in production -- tool selection, layering strategy, and cost-performance tradeoffs
+title: "Skill Guardrail Patterns"
 version: 1.0.0
+phase: 11
+lesson: 12
+tags: [guardrails, safety, content-filtering, prompt-injection, pii, moderation, llamaguard, nemo]
+category: skill-guardrail-patterns
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
--- tool selection, layering strategy, and cost-performance tradeoffs
 # Guardrail Patterns
 
 When building an LLM application that needs safety layers, apply this decision framework.
@@ -160,6 +153,78 @@ Total added latency: ~500-800ms. Cost: GPU infrastructure. Catches: ~99% of atta
 | Rate limit bypass via multiple accounts | Per-account limits only | Add IP-based and fingerprint-based limits |
 | Jailbreak via multi-turn manipulation | Only checking individual messages | Track conversation-level risk scores |
 | Indirect injection in RAG | Trusting retrieved content as instructions | Isolate data from instructions with delimiters |
+
+## LLM Output Degeneration Detection
+
+Models can degenerate into repeating patterns — this is distinct from hallucination (fabricating facts) and requires different detection.
+
+### Degeneration Types
+
+| Type | Example | Detection |
+|:-----|:--------|:----------|
+| **Character repeat** | `因为因为因为因为...` (thousands of times) | Regex: `(.)\1{19,}` |
+| **Word repeat** | `çünkü çünkü çünkü çünkü...` | Regex: `(\b\w{2,}\b)(?:\s+\1){4,}` |
+| **CJK spam** | Mixed Turkish + Chinese characters in non-Chinese context | Count CJK chars > 10 in non-CJK context |
+| **Token loop** | Same sentence repeated with slight variation | Word frequency: top word > 30% of total |
+| **Runaway generation** | 4000+ character response for simple question | Length check |
+
+### Detection Code Pattern
+
+```python
+import re
+from collections import Counter
+
+def detect_degeneration(text: str) -> dict:
+    """Detect LLM output degeneration."""
+    if not text:
+        return {"valid": True}
+
+    # 1. Single character repeat (因为因为因为...)
+    if re.search(r'(.)\1{19,}', text):
+        match = re.search(r'(.)\1{19,}', text)
+        return {"valid": False, "type": "char_repeat", "clean": text[:match.start()].rstrip()}
+
+    # 2. Word repeat (çünkü çünkü çünkü...)
+    if re.search(r'(\b\w{2,}\b)(?:\s+\1){4,}', text):
+        match = re.search(r'(\b\w{2,}\b)(?:\s+\1){4,}', text)
+        return {"valid": False, "type": "word_repeat", "clean": text[:match.start()].rstrip()}
+
+    # 3. CJK spam in non-CJK context
+    cjk = re.findall(r'[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af]', text)
+    if len(cjk) > 10:
+        first_cjk = re.search(r'[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af]', text)
+        return {"valid": False, "type": "cjk_spam", "clean": text[:first_cjk.start()].rstrip()}
+
+    # 4. Top word dominance
+    words = text.split()
+    if len(words) > 20:
+        top_word, top_count = Counter(words).most_common(1)[0]
+        if top_count / len(words) > 0.3:
+            return {"valid": False, "type": "word_dominance"}
+
+    # 5. Runaway length
+    if len(text) > 4000:
+        return {"valid": False, "type": "runaway", "clean": text[:4000]}
+
+    return {"valid": True}
+```
+
+### Integration Point
+
+Run degeneration detection **immediately after LLM response, before displaying to user**. If detected:
+1. Log the degeneration type and original length
+2. Use the cleaned version if available
+3. If no clean version (complete degeneration), return error message
+4. Optionally retry with simplified prompt
+
+### Why This Is Different From Hallucination
+
+| | Hallucination | Degeneration |
+|:--|:--|:--|
+| **What** | Model invents plausible facts | Model outputs garbage/repetition |
+| **Cause** | Missing data + strong "answer" instruction | Model instability, context overflow, bad temperature |
+| **Detection** | Fact-check against source | Pattern matching (repetition, CJK, length) |
+| **Fix** | Conditional prompt ("if data exists") | Output validator + retry |
 
 ## Red team checklist
 

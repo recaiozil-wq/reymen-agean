@@ -1,21 +1,3 @@
-
-> **Kategori:** devops
-
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | __Cleanup_Deprecated_Obsidian_Vault_Path_Fix |
-| **Nerede?** | devops/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
 ---
 name: obsidian-vault-path-fix
 description: "Use whenever reading, writing, or syncing anything to Obsidian. Contains correct vault path and sync rules so cached wrong paths are never used again."
@@ -40,7 +22,7 @@ Always use the correct vault path for every Obsidian read/create/edit operation.
 Run first on ReYMeN open:
 
 ```
-python C:\Users\marko\ReYMeN-ai\venv\Scripts\python.exe -c "from pathlib import Path; v=Path(r'C:\Users\marko\OneDrive\Belgeler\Obsidian Vault'); print('[OK]' if v.exists() else '[HATA]', v)"
+python C:\Users\marko\hermes-ai\venv\Scripts\python.exe -c "from pathlib import Path; v=Path(r'C:\Users\marko\OneDrive\Belgeler\Obsidian Vault'); print('[OK]' if v.exists() else '[HATA]', v)"
 ```
 
 ## Skill sync target

@@ -8,40 +8,7 @@ lesson: 11
 tags: [rl, sim2real, robotics, domain-randomization]
 category: sim2real-planner
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | DevOps muhendisi |
-| **Ne** | Plan a sim-to-real transfer pipeline for a given robot + task, covering DR, SI, and safety. |
-| **Nerede** | `devops\sim2real-planner.md` |
-| **Ne Zaman** | CI/CD veya altyapi yonetimi gerektiginde |
-| **Neden** | Sim2Real Planner islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Plan a sim-to-real transfer pipeline for a given robot + task, covering DR, SI, and safety. |
-| **Nerede?** | devops/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: DevOps muhendisi
-Ne: Plan a sim-to-real transfer pipeline for a given robot + task, covering DR, SI, and safety.
-Nerede: `devops\sim2real-planner.md`
-Ne Zaman: CI/CD veya altyapi yonetimi gerektiginde
-Neden: Sim2Real Planner islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a robot platform, a task, and access to real hardware time, output:
 

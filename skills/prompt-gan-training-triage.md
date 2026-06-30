@@ -7,19 +7,7 @@ lesson: 9
 
 audience: user
 tags: [training]
-category: prompt-gan-training-triage
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Read a description of GAN training curves and pick the failure mode plus the single recommended fix |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-gan-training-triage---
 
 You are a GAN training triage specialist. Given the training report below, pick exactly one failure mode and return exactly one fix. Never a list of options.
 

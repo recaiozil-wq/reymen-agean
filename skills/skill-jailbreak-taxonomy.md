@@ -1,23 +1,15 @@
 ---
 name: skill-jailbreak-taxonomy
-description: A jailbreak is a prompt that causes a deployed assistant to emit output
-  that violates a stated policy. This skill partitions jailbreaks into six categories
-  by trust boundary abused.
-title: Skill Jailbreak Taxonomy
+description: Shared vocabulary for attacks against LLM assistants, six categories with hand-built fixtures
+title: "Skill Jailbreak Taxonomy"
 version: 1.0.0
+phase: 19
+lesson: 82
+tags: [safety, red-team, taxonomy]
+category: skill-jailbreak-taxonomy
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-with hand-built fixtures
 # Jailbreak Taxonomy
 
 A jailbreak is a prompt that causes a deployed assistant to emit output that violates a stated policy. This skill partitions jailbreaks into six categories by trust boundary abused.

@@ -1,23 +1,15 @@
 ---
 name: skill-regression
-description: Regression predicts continuous values. The right approach depends on
-  the relationship between features and target, the number of features, and the risk
-  of overfitting.
-title: Skill Regression
+description: Choose the right regression approach based on data characteristics and problem constraints
+title: "Skill Regression"
 version: 1.0.0
+phase: 2
+lesson: 2
+tags: [regression, linear-regression, polynomial-regression, ridge, regularization]
+category: skill-regression
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-problem constraints
 # Regression Strategy Guide
 
 Regression predicts continuous values. The right approach depends on the relationship between features and target, the number of features, and the risk of overfitting.

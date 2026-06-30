@@ -1,24 +1,15 @@
 ---
 name: skill-freeze-inspector
-description: 'Transfer-learning bugs hide in three places: parameters that should
-  be frozen but are not, parameters that should be trainable but are not, and optimizers
-  that were built before the freeze state changed. This skill surfaces all three in
-  one pass.'
-title: Skill Freeze Inspector
+description: Report which parameters are trainable, which BatchNorm layers are in eval mode, and whether the optimizer is actually consuming the trainable parameters
+title: "Skill Freeze Inspector"
 version: 1.0.0
+phase: 4
+lesson: 5
+tags: [computer-vision, transfer-learning, debugging, pytorch]
+category: skill-freeze-inspector
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-eval mode, and whether the optimizer is actually consuming the trainable parameters
 # Freeze Inspector
 
 Transfer-learning bugs hide in three places: parameters that should be frozen but are not, parameters that should be trainable but are not, and optimizers that were built before the freeze state changed. This skill surfaces all three in one pass.

@@ -7,31 +7,13 @@ author: Ekko
 license: MIT
 platforms: [linux, macos, windows]
 metadata:
-  ReYMeN:
+  hermes:
     tags: [xAI, Grok, image-to-video, video-generation, media]
 category: grok-image-to-video
 audience: user
 tags: [image, video]
 prerequisites:
   commands: [curl]
----
-
-
-> **Kategori:** video
-
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Video ajanı |
-| **Ne?** | Animate a local image into a short mp4 video through ReYMeN Web UI using xAI Grok Imagine. |
-| **Nerede?** | video/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
 ---
 
 # Grok Image To Video
@@ -47,7 +29,7 @@ Call the local ReYMeN Web UI media endpoint. Pass a local image path; the server
 Endpoint:
 
 ```bash
-POST <Hermes Web UI base URL>/api/hermes/media/grok-image-to-video
+POST <ReYMeN Web UI base URL>/api/hermes/media/grok-image-to-video
 ```
 
 Resolve the ReYMeN Web UI base URL in this order:
@@ -79,7 +61,7 @@ If the run instructions include `[Current ReYMeN profile: <name>]`, include:
 -H "X-ReYMeN-Profile: <name>"
 ```
 
-Replace `<name>` with the exact profile name from the run instructions. Never send a placeholder value such as `<name>` or `<current-ReYMeN-profile>`.
+Replace `<name>` with the exact profile name from the run instructions. Never send a placeholder value such as `<name>` or `<current-hermes-profile>`.
 
 If no current profile is provided, omit the header and let the server fall back to the current ReYMeN active profile.
 
@@ -104,11 +86,11 @@ fi
 if [ -z "$TOKEN" ] && [ -n "${HERMES_WEBUI_STATE_DIR:-}" ] && [ -f "$HERMES_WEBUI_STATE_DIR/.token" ]; then
   TOKEN="$(cat "$HERMES_WEBUI_STATE_DIR/.token")"
 fi
-if [ -z "$TOKEN" ] && [ -f "$HOME/.ReYMeN-web-ui/.token" ]; then
-  TOKEN="$(cat "$HOME/.ReYMeN-web-ui/.token")"
+if [ -z "$TOKEN" ] && [ -f "$HOME/.hermes-web-ui/.token" ]; then
+  TOKEN="$(cat "$HOME/.hermes-web-ui/.token")"
 fi
 if [ -z "$TOKEN" ]; then
-  echo "Missing Hermes Web UI token. Check AUTH_TOKEN, HERMES_WEB_UI_HOME, HERMES_WEBUI_STATE_DIR, or ~/.hermes-web-ui/.token." >&2
+  echo "Missing ReYMeN Web UI token. Check AUTH_TOKEN, HERMES_WEB_UI_HOME, HERMES_WEBUI_STATE_DIR, or ~/.hermes-web-ui/.token." >&2
   exit 1
 fi
 

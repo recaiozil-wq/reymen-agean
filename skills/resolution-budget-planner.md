@@ -8,40 +8,7 @@ lesson: 06
 tags: [vlm, patch-n-pack, naflex, anyres, m-rope, token-budget]
 category: resolution-budget-planner
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Video icerik ureticisi |
-| **Ne** | Pick between square-resize, AnyRes, M-RoPE, and NaFlex for a mixed-aspect-ratio VLM workload and emit a per-task token budget plan. |
-| **Nerede** | `video\resolution-budget-planner.md` |
-| **Ne Zaman** | Video isleme veya analiz gerektiginde |
-| **Neden** | Resolution Budget Planner islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Video ajanı |
-| **Ne?** | Pick between square-resize, AnyRes, M-RoPE, and NaFlex for a mixed-aspect-ratio VLM workload and emit a per-task token budget plan. |
-| **Nerede?** | video/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Video icerik ureticisi
-Ne: Pick between square-resize, AnyRes, M-RoPE, and NaFlex for a mixed-aspect-ratio VLM workload and emit a per-task token budget plan.
-Nerede: `video\resolution-budget-planner.md`
-Ne Zaman: Video isleme veya analiz gerektiginde
-Neden: Resolution Budget Planner islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a workload — a description of the images the VLM will see (OCR documents, charts, UI screenshots, natural photos, video frames) and a total per-request token budget — pick one resolution strategy per image class and produce a runnable configuration.
 

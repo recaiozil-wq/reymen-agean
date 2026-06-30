@@ -8,40 +8,7 @@ lesson: 02
 tags: [capstone, rag, code-search, tree-sitter, qdrant, bm25, hybrid-retrieval]
 category: codebase-rag
 audience: contributor
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | AI gelistiricisi |
-| **Ne** | Build a cross-repo semantic search system with AST-aware chunking, hybrid retrieval, incremental re-index, and cited answers. |
-| **Nerede** | `software-development\codebase-rag.md` |
-| **Ne Zaman** | Ilgili gorev gerektiginde |
-| **Neden** | Codebase Rag islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Build a cross-repo semantic search system with AST-aware chunking, hybrid retrieval, incremental re-index, and cited answers. |
-| **Nerede?** | software-development/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Yazilim gelistirici
-Ne: Build a cross-repo semantic search system with AST-aware chunking, hybrid retrieval, incremental re-index, and cited answers.
-Nerede: `software-development\codebase-rag.md`
-Ne Zaman: Ilgili gorev gerektiginde
-Neden: Codebase Rag islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given 10+ repositories totaling at least 2M lines of code, build an ingestion pipeline, a hybrid index, and a citation-enforced query agent that answers cross-repo questions with verifiable file:line anchors.
 

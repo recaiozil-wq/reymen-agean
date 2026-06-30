@@ -8,40 +8,7 @@ lesson: 18
 tags: [rsp, pf, fsf, frontier-safety, safety-case]
 category: framework-diff
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | AI gelistiricisi |
-| **Ne** | Compare a new safety framework or release note against RSP v3.0, PF v2, FSF v3.0. |
-| **Nerede** | `software-development\framework-diff.md` |
-| **Ne Zaman** | Ilgili gorev gerektiginde |
-| **Neden** | Framework Diff islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Compare a new safety framework or release note against RSP v3.0, PF v2, FSF v3.0. |
-| **Nerede?** | software-development/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Yazilim gelistirici
-Ne: Compare a new safety framework or release note against RSP v3.0, PF v2, FSF v3.0.
-Nerede: `software-development\framework-diff.md`
-Ne Zaman: Ilgili gorev gerektiginde
-Neden: Framework Diff islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a new safety framework, policy, or release note, compare it against Anthropic RSP v3.0, OpenAI PF v2, DeepMind FSF v3.0 along the five structural axes.
 

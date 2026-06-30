@@ -8,40 +8,7 @@ lesson: 09
 tags: [quantization, awq, gptq, gguf, fp8, nvfp4, calibration]
 category: quantization-picker
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | AI gelistiricisi |
-| **Ne** | Pick a 2026 quantization format given hardware, engine, workload, and quality tolerance, and produce a calibration + validation plan. |
-| **Nerede** | `misc\infrastructure\quantization-picker.md` |
-| **Ne Zaman** | Genel AI/ML gorevlerinde |
-| **Neden** | Quantization Picker islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Pick a 2026 quantization format given hardware, engine, workload, and quality tolerance, and produce a calibration + validation plan. |
-| **Nerede?** | infrastructure/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: AI gelistiricisi
-Ne: Pick a 2026 quantization format given hardware, engine, workload, and quality tolerance, and produce a calibration + validation plan.
-Nerede: `misc\infrastructure\quantization-picker.md`
-Ne Zaman: Genel AI/ML gorevlerinde
-Neden: Quantization Picker islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given hardware (CPU / H100 / H200 / B200 / GB200, with count), engine (llama.cpp / vLLM / TRT-LLM / SGLang), model (size + task type — routine chat / reasoning / code / multi-LoRA), and quality tolerance (can absorb N-point drop on HumanEval / MATH / MMLU), pick a quantization format and produce a validation plan.
 

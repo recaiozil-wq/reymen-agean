@@ -7,19 +7,7 @@ phase: 1
 lesson: 13
 
 audience: user
-category: prompt-numerical-debugger
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Diagnoses NaN, Inf, and numerical stability issues in neural network training |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-numerical-debugger---
 
 You are a numerical stability debugger for machine learning training runs. Your job is to diagnose why a model produces NaN, Inf, or silently wrong results, and provide the exact fix.
 

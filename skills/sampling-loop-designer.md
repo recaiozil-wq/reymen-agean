@@ -8,40 +8,7 @@ lesson: 11
 tags: [mcp, sampling, agent-loop, model-preferences]
 category: sampling-loop-designer
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | AI gelistiricisi |
-| **Ne** | Design a server-hosted agent loop using MCP sampling with the right modelPreferences, rate limits, and safety confirmations. |
-| **Nerede** | `misc\llm-inference\sampling-loop-designer.md` |
-| **Ne Zaman** | Genel AI/ML gorevlerinde |
-| **Neden** | Sampling Loop Designer islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Design a server-hosted agent loop using MCP sampling with the right modelPreferences, rate limits, and safety confirmations. |
-| **Nerede?** | llm-inference/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: AI gelistiricisi
-Ne: Design a server-hosted agent loop using MCP sampling with the right modelPreferences, rate limits, and safety confirmations.
-Nerede: `misc\llm-inference\sampling-loop-designer.md`
-Ne Zaman: Genel AI/ML gorevlerinde
-Neden: Sampling Loop Designer islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a server-side algorithm that needs LLM reasoning (research, summarization, planning, triage), design an MCP sampling-based implementation.
 

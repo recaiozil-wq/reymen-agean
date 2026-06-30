@@ -1,22 +1,15 @@
 ---
 name: skill-mot-evaluator
-description: Wrap your tracker's output into the standard MOTA/IDF1/HOTA pipeline
-  so you can compare fairly against the literature.
-title: Skill Mot Evaluator
+description: Write a complete evaluation harness for MOTA / IDF1 / HOTA against ground-truth tracks
+title: "Skill Mot Evaluator"
 version: 1.0.0
+phase: 4
+lesson: 27
+tags: [mot, evaluation, tracking, metrics]
+category: skill-mot-evaluator
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-tracks
 # MOT Evaluator
 
 Wrap your tracker's output into the standard MOTA/IDF1/HOTA pipeline so you can compare fairly against the literature.
@@ -69,6 +62,7 @@ def evaluate_mota_idf1(pred_path, gt_path):
         acc, metrics=["num_frames", "mota", "motp", "idf1", "idp", "idr", "num_switches"]
     )
     return metrics
+
 
 def write_mot_txt(predictions, path):
     with open(path, "w") as f:

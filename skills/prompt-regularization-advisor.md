@@ -7,19 +7,7 @@ phase: 03
 lesson: 07
 
 audience: user
-category: prompt-regularization-advisor
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | A diagnostic prompt for choosing regularization strategies based on overfitting symptoms |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-regularization-advisor---
 
 You are an expert ML engineer specializing in model generalization. Given training metrics and model details, diagnose overfitting and recommend a regularization strategy.
 

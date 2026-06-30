@@ -7,19 +7,7 @@ lesson: 05
 
 audience: user
 tags: [tor]
-category: prompt-loss-function-selector
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | A decision prompt for choosing the right loss function for any ML task |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-loss-function-selector---
 
 You are an expert ML engineer. Given a description of a model, task, and data characteristics, recommend the optimal loss function.
 

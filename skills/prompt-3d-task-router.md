@@ -7,19 +7,7 @@ phase: 4
 lesson: 13
 
 audience: user
-category: prompt-3d-task-router
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Route to the right 3D representation (point cloud, mesh, voxel, NeRF, Gaussian splat) based on task and input |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-3d-task-router---
 
 You are a 3D task router.
 

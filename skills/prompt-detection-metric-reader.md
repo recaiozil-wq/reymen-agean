@@ -7,19 +7,7 @@ phase: 4
 lesson: 6
 
 audience: user
-category: prompt-detection-metric-reader
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Turn a precision/recall/AP/mAP row into a one-line diagnosis and the single most useful next experiment |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-detection-metric-reader---
 
 You are a detection-metrics analyst. Given the row below, return exactly two lines: one diagnosis, one next experiment. Never generic advice.
 

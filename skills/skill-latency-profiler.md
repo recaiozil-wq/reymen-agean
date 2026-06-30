@@ -1,22 +1,15 @@
 ---
 name: skill-latency-profiler
-description: Produce a disciplined latency benchmark for any PyTorch model. Reports
-  that anyone downstream can actually trust.
-title: Skill Latency Profiler
+description: Write a complete latency-benchmarking script with warmup, synchronisation, percentiles, and memory tracking
+title: "Skill Latency PRofiler"
 version: 1.0.0
+phase: 4
+lesson: 15
+tags: [edge, deployment, profiling, benchmarking]
+category: skill-latency-profiler
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-percentiles, and memory tracking
 # Latency Profiler
 
 Produce a disciplined latency benchmark for any PyTorch model. Reports that anyone downstream can actually trust.

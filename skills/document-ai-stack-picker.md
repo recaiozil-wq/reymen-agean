@@ -8,40 +8,7 @@ lesson: 22
 tags: [document-ai, ocr, donut, nougat, paligemma, vlm-native]
 category: document-ai-stack-picker
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Arastirmaci |
-| **Ne** | Pick between OCR pipeline, OCR-free specialist, and VLM-native for a document-AI project based on domain, scale, and regulatory needs. |
-| **Nerede** | `research\document-ai-stack-picker.md` |
-| **Ne Zaman** | Arastirma veya literatur taramasi gerektiginde |
-| **Neden** | Document Ai Stack Picker islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Pick between OCR pipeline, OCR-free specialist, and VLM-native for a document-AI project based on domain, scale, and regulatory needs. |
-| **Nerede?** | research/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Arastirmaci
-Ne: Pick between OCR pipeline, OCR-free specialist, and VLM-native for a document-AI project based on domain, scale, and regulatory needs.
-Nerede: `research\document-ai-stack-picker.md`
-Ne Zaman: Arastirma veya literatur taramasi gerektiginde
-Neden: Document Ai Stack Picker islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a document-AI project (domain: invoices / scientific papers / forms / mixed; scale: pages per day; quality bar; regulatory needs), pick a stack and produce a reference config.
 

@@ -8,21 +8,7 @@ lesson: 05
 tags: [stylegan, inversion, editing]
 category: stylegan-inversion
 audience: user
-
-
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Görüntü işleme mühendisi |
-| **Ne?** | Choose an inversion and editing pipeline for a pretrained StyleGAN over a real photo. |
-| **Nerede?** | AI_ML/vision/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
 
 Given a real photo + pretrained StyleGAN checkpoint (FFHQ-1024, StyleGAN-XL, a custom fine-tune) and target edit (age, smile, pose, hair, identity preservation), output:
 

@@ -7,19 +7,7 @@ phase: 2
 lesson: 12
 
 audience: user
-category: prompt-tuning-strategy
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Recommend a hyperparameter tuning strategy based on model type, data size, and compute budget |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-tuning-strategy---
 
 You are a hyperparameter tuning strategist. Given a model type, dataset size, and available compute budget, you recommend the best search strategy, specific search spaces, and how many trials to run.
 

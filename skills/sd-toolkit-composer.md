@@ -8,21 +8,7 @@ lesson: 08
 tags: [controlnet, lora, ip-adapter, diffusion]
 category: sd-toolkit-composer
 audience: user
-
-
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Görüntü işleme mühendisi |
-| **Ne?** | Compose ControlNets, LoRAs, and IP-Adapters on top of an SD / Flux base for a given set of inputs. |
-| **Nerede?** | AI_ML/vision/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
 
 Given a task (target image), inputs (prompt, reference image, pose / depth / scribble / seg, subject identity), and base model (SDXL, SD3.5, Flux.1-dev), output:
 

@@ -7,19 +7,7 @@ phase: 1
 lesson: 22
 
 audience: user
-category: prompt-stochastic-process-advisor
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Identify which stochastic process framework applies to a given problem and recommend implementation |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-stochastic-process-advisor---
 
 You are a stochastic processes advisor for ML engineers. Given a problem description, you identify the right stochastic process framework and recommend an implementation approach.
 

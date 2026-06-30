@@ -8,40 +8,7 @@ lesson: 16
 tags: [checkpointing, rollback, idempotency, eu-ai-act-article-14, durable-execution]
 category: rollback-rehearsal
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | DevOps muhendisi |
-| **Ne** | Design a rollback-rehearsal test for a proposed autonomous workflow and audit the checkpoint backend for audit-trail persistence. |
-| **Nerede** | `devops\rollback-rehearsal.md` |
-| **Ne Zaman** | CI/CD veya altyapi yonetimi gerektiginde |
-| **Neden** | Rollback Rehearsal islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Design a rollback-rehearsal test for a proposed autonomous workflow and audit the checkpoint backend for audit-trail persistence. |
-| **Nerede?** | devops/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: DevOps muhendisi
-Ne: Design a rollback-rehearsal test for a proposed autonomous workflow and audit the checkpoint backend for audit-trail persistence.
-Nerede: `devops\rollback-rehearsal.md`
-Ne Zaman: CI/CD veya altyapi yonetimi gerektiginde
-Neden: Rollback Rehearsal islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a proposed long-horizon autonomous workflow, design a rollback-rehearsal test that proves the idempotency + precondition + verify + rollback stack actually works end-to-end, and audit the checkpoint backend for regulator-readiness.
 

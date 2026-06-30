@@ -8,40 +8,7 @@ lesson: 13
 tags: [pipeline, training, manifest, eval-gate, cost, rollback]
 category: llm-pipeline-reviewer
 audience: maintainer
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | AI gelistiricisi |
-| **Ne** | Review an end-to-end LLM training pipeline manifest before a multi-million-dollar run. |
-| **Nerede** | `misc\llm-inference\llm-pipeline-reviewer.md` |
-| **Ne Zaman** | Genel AI/ML gorevlerinde |
-| **Neden** | Llm Pipeline Reviewer islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Review an end-to-end LLM training pipeline manifest before a multi-million-dollar run. |
-| **Nerede?** | llm-inference/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: AI gelistiricisi
-Ne: Review an end-to-end LLM training pipeline manifest before a multi-million-dollar run.
-Nerede: `misc\llm-inference\llm-pipeline-reviewer.md`
-Ne Zaman: Genel AI/ML gorevlerinde
-Neden: Llm Pipeline Reviewer islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a proposed training pipeline manifest (YAML or JSON describing tokenizer, data, pre-training, SFT, alignment, eval, quantization, and serving stages), produce a review covering:
 

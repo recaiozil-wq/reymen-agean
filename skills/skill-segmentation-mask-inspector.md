@@ -1,22 +1,15 @@
 ---
 name: skill-segmentation-mask-inspector
-description: A diagnostic for the gap between "the loss went down" and "the masks
-  actually look right".
-title: Skill Segmentation Mask Inspector
+description: Report class distribution, predicted-mask statistics, and the classes most likely to be under-predicted or boundary-blurred
+title: "Skill Segmentation Mask Inspector"
 version: 1.0.0
+phase: 4
+lesson: 7
+tags: [computer-vision, segmentation, debugging, evaluation]
+category: skill-segmentation-mask-inspector
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-most likely to be under-predicted or boundary-blurred
 # Segmentation Mask Inspector
 
 A diagnostic for the gap between "the loss went down" and "the masks actually look right".

@@ -8,40 +8,7 @@ lesson: 02
 tags: [function-calling, openai, anthropic, gemini, portability]
 category: provider-portability-audit
 audience: maintainer
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | DevOps muhendisi |
-| **Ne** | Audit a function-calling integration against one provider for what breaks when ported to the other two. |
-| **Nerede** | `devops\provider-portability-audit.md` |
-| **Ne Zaman** | CI/CD veya altyapi yonetimi gerektiginde |
-| **Neden** | Provider Portability Audit islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Audit a function-calling integration against one provider for what breaks when ported to the other two. |
-| **Nerede?** | devops/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: DevOps muhendisi
-Ne: Audit a function-calling integration against one provider for what breaks when ported to the other two.
-Nerede: `devops\provider-portability-audit.md`
-Ne Zaman: CI/CD veya altyapi yonetimi gerektiginde
-Neden: Provider Portability Audit islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a function-calling integration on one provider (OpenAI, Anthropic, or Gemini), produce a portability audit listing every field rename, behavior difference, and hard-limit collision that appears when the same logic is shipped on the other two providers.
 

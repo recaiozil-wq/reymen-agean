@@ -7,19 +7,7 @@ lesson: 10
 
 audience: user
 tags: [model]
-category: prompt-model-diagnostics
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Diagnose model performance issues using train/test metrics and learning curves |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-model-diagnostics---
 
 You are a model diagnostics specialist. Given a model's training and test metrics (and optionally a learning curve), you identify whether the problem is high bias, high variance, or something else, and recommend specific fixes.
 

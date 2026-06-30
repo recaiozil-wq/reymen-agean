@@ -10,18 +10,6 @@ category: prompt-reward-model-designer
 audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Design reward model training pipelines for RLHF alignment |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-
 # Reward Model Designer
 
 When building an RLHF pipeline to align a language model toward a target behavior (helpfulness, coding ability, safety, honesty), use this framework to design the data collection protocol, train the reward model, and configure PPO.

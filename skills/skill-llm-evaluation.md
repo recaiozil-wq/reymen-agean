@@ -1,22 +1,15 @@
 ---
 name: skill-llm-evaluation
-description: When evaluating an LLM system, apply this decision framework to choose
-  the right approach.
-title: Skill Llm Evaluation
+description: Decision framework for choosing the right LLM evaluation strategy based on task type, budget, and requirements
+title: "Skill LLM Evaluation"
 version: 1.0.0
+phase: 10
+lesson: 10
+tags: [evaluation, evals, benchmarks, llm-as-judge, elo, metrics]
+category: skill-llm-evaluation
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-on task type, budget, and requirements
 # LLM Evaluation Strategy
 
 When evaluating an LLM system, apply this decision framework to choose the right approach.

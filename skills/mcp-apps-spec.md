@@ -8,21 +8,7 @@ lesson: 14
 tags: [mcp, apps, ui-resources, csp, iframe-sandbox]
 category: mcp-apps-spec
 audience: user
-
-
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | MCP entegratörü |
-| **Ne?** | Produce the full MCP Apps contract for a tool that needs an interactive UI resource. |
-| **Nerede?** | AI_ML/mcp/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
 
 Given a tool that would benefit from an interactive UI (timeline, form, dashboard, map, chart), produce the MCP Apps contract.
 

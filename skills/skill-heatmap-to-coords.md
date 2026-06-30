@@ -1,22 +1,15 @@
 ---
 name: skill-heatmap-to-coords
-description: Turn raw keypoint heatmaps into sub-pixel precise coordinates. The cheapest
-  accuracy upgrade in every pose pipeline.
-title: Skill Heatmap To Coords
+description: Write the sub-pixel heatmap-to-coordinate routine used by every production pose model
+title: "Skill Heatmap To Coords"
 version: 1.0.0
+phase: 4
+lesson: 21
+tags: [keypoint, pose, subpixel, inference]
+category: skill-heatmap-to-coords
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-pose model
 # Heatmap to Coords
 
 Turn raw keypoint heatmaps into sub-pixel precise coordinates. The cheapest accuracy upgrade in every pose pipeline.

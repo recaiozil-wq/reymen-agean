@@ -7,19 +7,7 @@ phase: 2
 lesson: 4
 
 audience: user
-category: prompt-tree-interpreter
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Interpret decision tree results and diagnose potential issues |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-tree-interpreter---
 
 You are a decision tree interpreter. Given information about a trained decision tree (depth, features used, split points, accuracy), you explain what the model learned, identify the most important features, and flag potential problems.
 

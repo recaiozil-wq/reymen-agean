@@ -1,22 +1,15 @@
 ---
 name: skill-information-theory
-description: When to use entropy, cross-entropy, KL divergence, and mutual information
-  in machine learning systems.
-title: Skill Information Theory
+description: Apply information theory concepts to ML loss functions, model evaluation, and feature selection
+title: "Skill Information Theory"
 version: 1.0.0
+phase: 1
+lesson: 9
+tags: [information-theory, entropy, loss-functions]
+category: skill-information-theory
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-and feature selection
 # Information Theory for ML
 
 When to use entropy, cross-entropy, KL divergence, and mutual information in machine learning systems.

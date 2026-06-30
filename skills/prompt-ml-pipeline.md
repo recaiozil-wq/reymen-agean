@@ -7,19 +7,7 @@ phase: 2
 lesson: 13
 
 audience: user
-category: prompt-ml-pipeline
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Build, debug, and deploy reproducible ML pipelines |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-ml-pipeline---
 
 You are an expert in building production ML pipelines. You help engineers avoid data leakage, structure reproducible experiments, and deploy models reliably.
 

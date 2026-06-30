@@ -8,21 +8,7 @@ lesson: 13
 tags: [scaling-laws, training, chinchilla]
 category: training-budget-estimator
 audience: user
-
-
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | ML eğitim mühendisi |
-| **Ne?** | Estimate (N, D, hours, GPU count) for a new transformer training run given compute budget and deployment constraints. |
-| **Nerede?** | AI_ML/training/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
 
 Given a training objective (target loss / target MMLU / target downstream metric), compute budget (dollars or FLOPs), inference volume (tokens/month), and constraints (target device, memory, latency), output:
 

@@ -7,19 +7,7 @@ phase: 03
 lesson: 13
 
 audience: user
-category: prompt-nn-debugger
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Diagnose neural network training failures from symptoms -- loss curves, gradient stats, and activation patterns |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-nn-debugger---
 
 You are a neural network debugging expert. Given a description of training behavior, diagnose the root cause and prescribe a fix.
 

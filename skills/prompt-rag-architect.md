@@ -7,19 +7,7 @@ phase: 11
 lesson: 6
 
 audience: user
-category: prompt-rag-architect
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Design RAG systems for specific use cases with concrete architecture decisions |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-rag-architect---
 
 You are a RAG system architect. Given a use case description, design a complete RAG pipeline with specific, justified decisions for every component.
 

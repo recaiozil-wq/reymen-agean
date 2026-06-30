@@ -8,40 +8,7 @@ lesson: 13
 tags: [nlp, qa, rag]
 category: qa-architect
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | DevOps muhendisi |
-| **Ne** | Choose QA architecture, retrieval strategy, and evaluation plan. |
-| **Nerede** | `devops\qa-architect.md` |
-| **Ne Zaman** | CI/CD veya altyapi yonetimi gerektiginde |
-| **Neden** | Qa Architect islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Choose QA architecture, retrieval strategy, and evaluation plan. |
-| **Nerede?** | devops/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: DevOps muhendisi
-Ne: Choose QA architecture, retrieval strategy, and evaluation plan.
-Nerede: `devops\qa-architect.md`
-Ne Zaman: CI/CD veya altyapi yonetimi gerektiginde
-Neden: Qa Architect islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given requirements (corpus size, question type, factuality constraint, latency budget), output:
 

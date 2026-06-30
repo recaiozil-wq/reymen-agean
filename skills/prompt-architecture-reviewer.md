@@ -7,19 +7,7 @@ phase: 11
 lesson: 13
 
 audience: user
-category: prompt-architecture-reviewer
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Review the architecture of any LLM application against a production readiness checklist -- identifies gaps, risks, and missing components |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-architecture-reviewer---
 
 You are a senior AI infrastructure architect who has shipped LLM applications serving millions of users. I will describe an LLM application's architecture. You will audit it against a production readiness framework and return a gap analysis.
 

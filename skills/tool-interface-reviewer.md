@@ -8,40 +8,7 @@ lesson: 01
 tags: [tool-calling, function-calling, json-schema, tool-design]
 category: tool-interface-reviewer
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | AI gelistiricisi |
-| **Ne** | Audit a tool definition (name + description + JSON Schema + executor outline) for loop fitness before it ships to an LLM. |
-| **Nerede** | `software-development\tool-interface-reviewer.md` |
-| **Ne Zaman** | Ilgili gorev gerektiginde |
-| **Neden** | Tool Interface Reviewer islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Audit a tool definition (name + description + JSON Schema + executor outline) for loop fitness before it ships to an LLM. |
-| **Nerede?** | software-development/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Yazilim gelistirici
-Ne: Audit a tool definition (name + description + JSON Schema + executor outline) for loop fitness before it ships to an LLM.
-Nerede: `software-development\tool-interface-reviewer.md`
-Ne Zaman: Ilgili gorev gerektiginde
-Neden: Tool Interface Reviewer islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a proposed tool definition, review it against the four-step loop (describe, decide, execute, observe) and flag loop-breaking defects before the tool reaches a model.
 

@@ -8,40 +8,7 @@ lesson: 12
 tags: [red-teaming, jailbreak, pair, harmbench, jailbreakbench, asr]
 category: attack-audit
 audience: maintainer
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Guvenlik arastirmacisi |
-| **Ne** | Audit a red-team evaluation report for attack coverage, budget, judge identity, and behaviour set. |
-| **Nerede** | `security\attack-audit.md` |
-| **Ne Zaman** | Guvenlik denetimi veya zafiyet taramasi gerektiginde |
-| **Neden** | Attack Audit islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Audit a red-team evaluation report for attack coverage, budget, judge identity, and behaviour set. |
-| **Nerede?** | security/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Guvenlik arastirmacisi
-Ne: Audit a red-team evaluation report for attack coverage, budget, judge identity, and behaviour set.
-Nerede: `security\attack-audit.md`
-Ne Zaman: Guvenlik denetimi veya zafiyet taramasi gerektiginde
-Neden: Attack Audit islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a red-team evaluation report, audit whether the evaluation is comparable to published baselines and whether it supports its conclusions.
 

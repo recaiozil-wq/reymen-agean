@@ -7,19 +7,7 @@ lesson: 1
 
 audience: user
 tags: [tor]
-category: prompt-linear-algebra-tutor
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Teach linear algebra through geometric intuition and AI applications |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-linear-algebra-tutor---
 
 You are a linear algebra tutor for AI engineers. Your approach:
 

@@ -7,47 +7,14 @@ author: Ekko
 license: MIT
 platforms: [linux, macos, windows, termux]
 metadata:
-  ReYMeN:
+  hermes:
     tags: [api.apikey.fun, image-generation, image-editing, media]
 category: apikey-image-gen
 audience: user
 tags: [api, image]
 prerequisites:
   commands: [curl]
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Icerik ureticisi |
-| **Ne** | "Generate or edit images through ReYMeN Web UI using the selected/requested profile's fun-codex provider from config.yaml." |
-| **Nerede** | `creative\apikey-image-gen.md` |
-| **Ne Zaman** | Gorsel/yaratici icerik uretimi gerektiginde |
-| **Neden** | Apikey Image Gen islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Generate or edit images through ReYMeN Web UI using the selected/requested profile's fun-codex provider from config.yaml. |
-| **Nerede?** | creative/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Icerik ureticisi
-Ne: "Generate or edit images through ReYMeN Web UI using the selected/requested profile's fun-codex provider from config.yaml."
-Nerede: `creative\apikey-image-gen.md`
-Ne Zaman: Gorsel/yaratici icerik uretimi gerektiginde
-Neden: Apikey Image Gen islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 # APIKEY Image Generation
 
@@ -69,7 +36,7 @@ custom_providers:
 Endpoint:
 
 ```bash
-POST <Hermes Web UI base URL>/api/hermes/media/apikey-image-generate
+POST <ReYMeN Web UI base URL>/api/hermes/media/apikey-image-generate
 ```
 
 Resolve the ReYMeN Web UI base URL in this order:
@@ -101,7 +68,7 @@ If the run instructions include `[Current ReYMeN profile: <name>]`, include:
 -H "X-ReYMeN-Profile: <name>"
 ```
 
-Replace `<name>` with the exact profile name from the run instructions. Never send a placeholder value such as `<name>` or `<current-ReYMeN-profile>`.
+Replace `<name>` with the exact profile name from the run instructions. Never send a placeholder value such as `<name>` or `<current-hermes-profile>`.
 
 If no current profile is provided, omit the header and let the server fall back to the current ReYMeN active profile.
 
@@ -179,11 +146,11 @@ fi
 if [ -z "$TOKEN" ] && [ -n "${HERMES_WEBUI_STATE_DIR:-}" ] && [ -f "$HERMES_WEBUI_STATE_DIR/.token" ]; then
   TOKEN="$(cat "$HERMES_WEBUI_STATE_DIR/.token")"
 fi
-if [ -z "$TOKEN" ] && [ -f "$HOME/.ReYMeN-web-ui/.token" ]; then
-  TOKEN="$(cat "$HOME/.ReYMeN-web-ui/.token")"
+if [ -z "$TOKEN" ] && [ -f "$HOME/.hermes-web-ui/.token" ]; then
+  TOKEN="$(cat "$HOME/.hermes-web-ui/.token")"
 fi
 if [ -z "$TOKEN" ]; then
-  echo "Missing Hermes Web UI token. Check AUTH_TOKEN, HERMES_WEB_UI_HOME, HERMES_WEBUI_STATE_DIR, or ~/.hermes-web-ui/.token." >&2
+  echo "Missing ReYMeN Web UI token. Check AUTH_TOKEN, HERMES_WEB_UI_HOME, HERMES_WEBUI_STATE_DIR, or ~/.hermes-web-ui/.token." >&2
   exit 1
 fi
 

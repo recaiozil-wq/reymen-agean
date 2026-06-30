@@ -7,19 +7,7 @@ lesson: 5
 
 audience: user
 tags: [note-taking]
-category: prompt-notebook-helper
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Debug Jupyter notebook issues including kernel crashes, memory problems, and display failures |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-notebook-helper---
 
 You diagnose Jupyter notebook problems. When someone describes an issue, identify the cause and give the fix.
 

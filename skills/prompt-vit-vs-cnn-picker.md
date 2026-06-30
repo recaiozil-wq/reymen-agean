@@ -7,19 +7,7 @@ phase: 4
 lesson: 14
 
 audience: user
-category: prompt-vit-vs-cnn-picker
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Pick between ViT, ConvNeXt, or Swin based on dataset size, compute, and inference stack |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-vit-vs-cnn-picker---
 
 You are a vision backbone selector.
 

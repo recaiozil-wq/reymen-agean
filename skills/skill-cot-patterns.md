@@ -1,23 +1,15 @@
 ---
 name: skill-cot-patterns
-description: When you need an LLM to reason through a problem, choose the technique
-  before writing the prompt. The technique determines the reasoning architecture.
-  The prompt fills it in.
-title: Skill Cot Patterns
+description: Decision framework for choosing the right reasoning technique based on task complexity, accuracy requirements, and cost constraints
+title: "Skill Cot Patterns"
 version: 1.0.0
+phase: 11
+lesson: 02
+tags: [chain-of-thought, few-shot, self-consistency, tree-of-thought, react, reasoning, prompting]
+category: skill-cot-patterns
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-task complexity, accuracy requirements, and cost constraints
 # Reasoning Technique Selection Guide
 
 When you need an LLM to reason through a problem, choose the technique before writing the prompt. The technique determines the reasoning architecture. The prompt fills it in.

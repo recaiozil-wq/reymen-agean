@@ -8,40 +8,7 @@ lesson: 31
 tags: [workbench, audit, reliability, agent-engineering]
 category: workbench-audit
 audience: maintainer
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Tum kullanicilar |
-| **Ne** | Audit a repo for the seven agent workbench surfaces and report which are missing, partial, or healthy before any agent work begins. |
-| **Nerede** | `productivity\workbench-audit.md` |
-| **Ne Zaman** | Gunluk is akisi iyilestirmesi gerektiginde |
-| **Neden** | Workbench Audit islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Audit a repo for the seven agent workbench surfaces and report which are missing, partial, or healthy before any agent work begins. |
-| **Nerede?** | productivity/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Tum kullanicilar
-Ne: Audit a repo for the seven agent workbench surfaces and report which are missing, partial, or healthy before any agent work begins.
-Nerede: `productivity\workbench-audit.md`
-Ne Zaman: Gunluk is akisi iyilestirmesi gerektiginde
-Neden: Workbench Audit islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a repository path and the agent product that will run inside it, audit the seven workbench surfaces and produce a readiness report.
 

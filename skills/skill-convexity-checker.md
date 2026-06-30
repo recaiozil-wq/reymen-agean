@@ -1,20 +1,14 @@
 ---
 name: skill-convexity-checker
-description: How to verify whether an optimization problem is convex, and what to
-  do with the answer.
-title: Skill Convexity Checker
+description: Determine if an optimization problem is convex and choose the right solver
+title: "Skill Convexity Checker"
 version: 1.0.0
+phase: 1
+lesson: 18
+tags: [optimization, convexity, solvers]
+category: skill-convexity-checker
+audience: user
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
 
 # Convexity Checker
 

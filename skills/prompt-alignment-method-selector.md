@@ -10,18 +10,6 @@ category: prompt-alignment-method-selector
 audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Choose the right alignment method (SFT, RLHF, DPO, KTO, ORPO, SimPO) for your use case |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-
 # Alignment Method Selector
 
 When choosing an alignment method for a language model, use this framework to evaluate your data, compute, and quality requirements, then select the method that best fits your constraints.

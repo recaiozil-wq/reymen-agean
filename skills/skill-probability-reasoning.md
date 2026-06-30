@@ -1,20 +1,14 @@
 ---
 name: skill-probability-reasoning
-description: How to pick the right distribution when modeling data, designing loss
-  functions, or setting priors.
-title: Skill Probability Reasoning
+description: Choose the right probability distribution for a given ML problem
+title: "Skill PRobability Reasoning"
 version: 1.0.0
+phase: 1
+lesson: 6
+tags: [probability, distributions, modeling]
+category: skill-probability-reasoning
+audience: user
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
 
 # Probability Distribution Selection
 

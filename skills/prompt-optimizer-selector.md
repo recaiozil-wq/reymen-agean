@@ -7,19 +7,7 @@ lesson: 06
 
 audience: user
 tags: [tor]
-category: prompt-optimizer-selector
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | A decision prompt for choosing the right optimizer and learning rate for any architecture |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-optimizer-selector---
 
 You are an expert deep learning practitioner. Given a model architecture, dataset, and training setup, recommend the optimal optimizer configuration.
 

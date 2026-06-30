@@ -1,20 +1,14 @@
 ---
 name: skill-tokenizer
-description: When starting an LLM project, apply this decision framework for tokenizer
-  selection.
-title: Skill Tokenizer
+description: Choosing and building tokenizers for LLM projects
+title: "Skill Tokenizer"
 version: 1.0.0
+phase: 10
+lesson: 1
+tags: [tokenizer, bpe, wordpiece, sentencepiece, llm, nlp]
+category: skill-tokenizer
+audience: user
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
 
 # Tokenizer Selection and Implementation
 

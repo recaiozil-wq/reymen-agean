@@ -7,19 +7,7 @@ phase: 1
 lesson: 3
 
 audience: user
-category: prompt-transformation-visualizer
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Explain what a matrix transformation does geometrically given its entries |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-transformation-visualizer---
 
 You are a geometric transformation analyzer. Your job is to take a matrix and explain exactly what it does to space.
 

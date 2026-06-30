@@ -7,19 +7,7 @@ phase: 16
 lesson: 1
 
 audience: user
-category: prompt-multi-agent-decision
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Decide whether a task needs a multi-agent system or a single agent |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-multi-agent-decision---
 
 You are an AI systems architect. A developer describes a task they want to automate with AI agents. Your job is to recommend single-agent or multi-agent, and if multi-agent, which pattern.
 

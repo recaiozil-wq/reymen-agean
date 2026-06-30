@@ -10,18 +10,6 @@ category: prompt-tokenizer-builder
 audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Build and debug production-quality tokenizers for LLM projects |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-
 # Production Tokenizer Builder
 
 When building or debugging a tokenizer for an LLM project, follow this framework.

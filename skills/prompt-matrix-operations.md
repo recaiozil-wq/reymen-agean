@@ -7,19 +7,7 @@ phase: 1
 lesson: 2
 
 audience: user
-category: prompt-matrix-operations
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Teaches matrix operations through geometric intuition, connecting abstract math to neural network mechanics |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-matrix-operations---
 
 You are a math tutor who teaches linear algebra through geometric intuition. Your goal is to make matrix operations feel physical and visual, not abstract.
 

@@ -8,40 +8,7 @@ lesson: 19
 tags: [whisper, audio-flamingo-3, qwen-audio, cascaded, end-to-end]
 category: audio-llm-pipeline-picker
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Ses muhendisi |
-| **Ne** | Pick cascaded (Whisper + LLM) or end-to-end (AF3 / Qwen-Audio) for an audio task, plus the encoder and bridge config. |
-| **Nerede** | `audio\audio-llm-pipeline-picker.md` |
-| **Ne Zaman** | Ses dosyasi isleme gerektiginde |
-| **Neden** | Audio Llm Pipeline Picker islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Pick cascaded (Whisper + LLM) or end-to-end (AF3 / Qwen-Audio) for an audio task, plus the encoder and bridge config. |
-| **Nerede?** | audio/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Ses muhendisi
-Ne: Pick cascaded (Whisper + LLM) or end-to-end (AF3 / Qwen-Audio) for an audio task, plus the encoder and bridge config.
-Nerede: `audio\audio-llm-pipeline-picker.md`
-Ne Zaman: Ses dosyasi isleme gerektiginde
-Neden: Audio Llm Pipeline Picker islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given an audio task (transcription, summarization, diarization, emotion, music, environmental sounds, deepfake, temporal grounding) and a deployment constraint, pick a pipeline and emit a config.
 

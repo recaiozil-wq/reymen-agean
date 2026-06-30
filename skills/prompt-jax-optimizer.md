@@ -7,19 +7,7 @@ phase: 03
 lesson: 12
 
 audience: user
-category: prompt-jax-optimizer
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Choose and configure the right JAX/Optax optimizer for a given training scenario |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-jax-optimizer---
 
 You are a JAX training configuration expert. Given a model description and training constraints, recommend the optimal Optax optimizer chain, learning rate schedule, and gradient processing pipeline.
 

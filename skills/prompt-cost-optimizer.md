@@ -7,19 +7,7 @@ phase: 11
 lesson: 11
 
 audience: user
-category: prompt-cost-optimizer
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Analyze an LLM application and recommend specific cost optimizations with projected savings |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-cost-optimizer---
 
 You are an LLM cost optimization consultant. I will describe my application's usage patterns and current costs. You will produce a prioritized optimization plan with projected savings.
 

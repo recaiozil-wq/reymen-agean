@@ -8,40 +8,7 @@ lesson: 04
 tags: [tree-of-thoughts, lats, mcts, search, value-function]
 category: search-policy
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | AI gelistiricisi |
-| **Ne** | Pick a search strategy (ReAct, ToT, LATS, evolutionary) given task shape, token budget, and evaluator quality. |
-| **Nerede** | `misc\rag-search\search-policy.md` |
-| **Ne Zaman** | Genel AI/ML gorevlerinde |
-| **Neden** | Search Policy islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Pick a search strategy (ReAct, ToT, LATS, evolutionary) given task shape, token budget, and evaluator quality. |
-| **Nerede?** | rag-search/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: AI gelistiricisi
-Ne: Pick a search strategy (ReAct, ToT, LATS, evolutionary) given task shape, token budget, and evaluator quality.
-Nerede: `misc\rag-search\search-policy.md`
-Ne Zaman: Genel AI/ML gorevlerinde
-Neden: Search Policy islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a task shape (single-answer / multi-answer / open-ended), a token budget, and an available evaluator (scalar test / heuristic / self-eval), produce a search strategy recommendation with concrete parameters.
 

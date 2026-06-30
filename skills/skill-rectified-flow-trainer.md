@@ -1,22 +1,15 @@
 ---
 name: skill-rectified-flow-trainer
-description: Produce a clean, minimal training loop that would successfully train
-  a small DiT with rectified flow on any image tensor dataset.
-title: Skill Rectified Flow Trainer
+description: Write a complete rectified-flow training loop with AdaLN DiT and Euler sampling
+title: "Skill Rectified Flow Trainer"
 version: 1.0.0
+phase: 4
+lesson: 23
+tags: [diffusion, rectified-flow, DiT, training]
+category: skill-rectified-flow-trainer
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-sampling
 # Rectified Flow Trainer
 
 Produce a clean, minimal training loop that would successfully train a small DiT with rectified flow on any image tensor dataset.

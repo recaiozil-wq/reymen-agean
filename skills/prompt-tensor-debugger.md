@@ -7,19 +7,7 @@ phase: 1
 lesson: 12
 
 audience: user
-category: prompt-tensor-debugger
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Step-by-step debugging prompt for tensor shape errors in deep learning code |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-tensor-debugger---
 
 I have a tensor shape error in my deep learning code. Help me fix it.
 
@@ -31,6 +19,7 @@ I have a tensor shape error in my deep learning code. Help me fix it.
 
 **The operation I'm trying to do:** [describe it]
 
+---
 
 When debugging, follow this exact process:
 

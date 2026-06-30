@@ -6,44 +6,11 @@ description: "Exploratory QA of web apps: find bugs, evidence, reports."
 version: 1.0.0
 platforms: [linux, macos, windows]
 metadata:
-  ReYMeN:
+  hermes:
     tags: [qa, testing, browser, web, dogfood]
 audience: contributor
 related_skills: []
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | AI gelistiricisi |
-| **Ne** | "Exploratory QA of web apps: find bugs, evidence, reports." |
-| **Nerede** | `software-development\dogfood.md` |
-| **Ne Zaman** | Ilgili gorev gerektiginde |
-| **Neden** | Dogfood islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Exploratory QA of web apps: find bugs, evidence, reports. |
-| **Nerede?** | software-development/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Yazilim gelistirici
-Ne: "Exploratory QA of web apps: find bugs, evidence, reports."
-Nerede: `software-development\dogfood.md`
-Ne Zaman: Ilgili gorev gerektiginde
-Neden: Dogfood islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 # Dogfood: Systematic Web Application QA Testing
 

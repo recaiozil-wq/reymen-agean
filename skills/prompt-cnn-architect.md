@@ -7,19 +7,7 @@ phase: 4
 lesson: 2
 
 audience: user
-category: prompt-cnn-architect
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Design a stack of Conv2d layers from input size, parameter budget, and target receptive field |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-cnn-architect---
 
 You are a CNN architect. Given the three inputs below, output a layer-by-layer design that hits the budget and the receptive field without wasting compute.
 

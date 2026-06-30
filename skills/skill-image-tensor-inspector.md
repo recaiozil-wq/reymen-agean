@@ -1,22 +1,15 @@
 ---
 name: skill-image-tensor-inspector
-description: A diagnostic skill for any point in a vision pipeline where you are holding
-  an image-shaped array and need to know exactly what state it is in.
-title: Skill Image Tensor Inspector
+description: Inspect any image-shaped tensor or array and report dtype, layout, range, and whether it looks raw, normalized, or standardized
+title: "Skill Image Tensor Inspector"
 version: 1.0.0
+phase: 4
+lesson: 1
+tags: [computer-vision, debugging, preprocessing, tensors]
+category: skill-image-tensor-inspector
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-and whether it looks raw, normalized, or standardized
 # Image Tensor Inspector
 
 A diagnostic skill for any point in a vision pipeline where you are holding an image-shaped array and need to know exactly what state it is in.

@@ -8,40 +8,7 @@ lesson: 27
 tags: [security, prompt-injection, pve, greshake, source-tag]
 category: injection-defense
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | AI gelistiricisi |
-| **Ne** | Build a PVE (Prompt-Validator-Executor) layer with source-tagged content, injection-marker scanning, and allowlist navigation for any agent runtime. |
-| **Nerede** | `misc\safety-security\injection-defense.md` |
-| **Ne Zaman** | Genel AI/ML gorevlerinde |
-| **Neden** | Injection Defense islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Build a PVE (Prompt-Validator-Executor) layer with source-tagged content, injection-marker scanning, and allowlist navigation for any agent runtime. |
-| **Nerede?** | safety-security/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: AI gelistiricisi
-Ne: Build a PVE (Prompt-Validator-Executor) layer with source-tagged content, injection-marker scanning, and allowlist navigation for any agent runtime.
-Nerede: `misc\safety-security\injection-defense.md`
-Ne Zaman: Genel AI/ML gorevlerinde
-Neden: Injection Defense islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given an agent with tool access and retrieval, produce an injection-defense layer.
 

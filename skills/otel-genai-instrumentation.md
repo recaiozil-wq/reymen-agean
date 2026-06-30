@@ -8,40 +8,7 @@ lesson: 19
 tags: [otel, observability, gen-ai, tracing]
 category: otel-genai-instrumentation
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | DevOps muhendisi |
-| **Ne** | Produce an instrumentation plan for an agent codebase to emit OTel GenAI spans end-to-end. |
-| **Nerede** | `devops\otel-genai-instrumentation.md` |
-| **Ne Zaman** | CI/CD veya altyapi yonetimi gerektiginde |
-| **Neden** | Otel Genai Instrumentation islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Produce an instrumentation plan for an agent codebase to emit OTel GenAI spans end-to-end. |
-| **Nerede?** | devops/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: DevOps muhendisi
-Ne: Produce an instrumentation plan for an agent codebase to emit OTel GenAI spans end-to-end.
-Nerede: `devops\otel-genai-instrumentation.md`
-Ne Zaman: CI/CD veya altyapi yonetimi gerektiginde
-Neden: Otel Genai Instrumentation islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given an agent codebase (LLM calls, tool dispatch, MCP client, sub-agents), produce an OTel GenAI instrumentation plan.
 

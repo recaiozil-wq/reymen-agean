@@ -8,21 +8,7 @@ lesson: 16
 tags: [oauth, pkce, resource-indicators, step-up, sep-835]
 category: oauth-scope-planner
 audience: user
-
-
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | MCP entegratörü |
-| **Ne?** | Design the OAuth 2.1 scope set, pinning rules, and step-up policy for a remote MCP server. |
-| **Nerede?** | AI_ML/mcp/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
 
 Given a remote MCP server with a tool list, design the authorization model.
 

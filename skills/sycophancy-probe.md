@@ -8,40 +8,7 @@ lesson: 4
 tags: [sycophancy, rlhf, evaluation, calibration]
 category: sycophancy-probe
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Guvenlik arastirmacisi |
-| **Ne** | Generate matched user-belief / third-party-belief prompts and score a model's sycophancy. |
-| **Nerede** | `security\sycophancy-probe.md` |
-| **Ne Zaman** | Guvenlik denetimi veya zafiyet taramasi gerektiginde |
-| **Neden** | Sycophancy Probe islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Generate matched user-belief / third-party-belief prompts and score a model's sycophancy. |
-| **Nerede?** | security/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Guvenlik arastirmacisi
-Ne: Generate matched user-belief / third-party-belief prompts and score a model's sycophancy.
-Nerede: `security\sycophancy-probe.md`
-Ne Zaman: Guvenlik denetimi veya zafiyet taramasi gerektiginde
-Neden: Sycophancy Probe islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a model endpoint and a set of factual questions (with known true and false answers), produce matched user-belief / third-party-belief prompt pairs, query the model, and compute a sycophancy score with confidence interval.
 

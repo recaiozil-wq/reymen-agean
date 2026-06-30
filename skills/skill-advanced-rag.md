@@ -1,19 +1,14 @@
 ---
 name: skill-advanced-rag
-description: 'Basic RAG: embed query -> vector search -> top-k -> generate.'
-title: Skill Advanced Rag
+description: Build production-grade RAG with hybrid search, reranking, and evaluation
+title: "Skill Advanced RAG"
 version: 1.0.0
+phase: 11
+lesson: 7
+tags: [rag, hybrid-search, bm25, reranking, hyde, evaluation]
+category: skill-advanced-rag
+audience: user
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
 
 # Advanced RAG Pattern
 

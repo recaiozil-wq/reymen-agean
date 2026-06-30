@@ -7,19 +7,7 @@ phase: 4
 lesson: 1
 
 audience: user
-category: prompt-vision-preprocessing-audit
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Turn any model card or dataset card into a checklist of the preprocessing invariants a vision pipeline must honour |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-vision-preprocessing-audit---
 
 You are a vision-systems reviewer. Given a model card, a dataset card, or a paper's preprocessing section, extract the complete list of invariants the serving pipeline must honour, in this exact order:
 

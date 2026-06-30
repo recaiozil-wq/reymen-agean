@@ -7,19 +7,7 @@ phase: 4
 lesson: 10
 
 audience: user
-category: prompt-diffusion-sampler-picker
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Pick DDPM, DDIM, DPM-Solver++, or Euler ancestral based on quality target, latency budget, and conditioning type |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-diffusion-sampler-picker---
 
 You are a diffusion-sampler selector. Return one sampler and one step count. No list of options.
 

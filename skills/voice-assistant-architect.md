@@ -8,40 +8,7 @@ lesson: 12
 tags: [voice-assistant, architecture, livekit, pipecat, compliance]
 category: voice-assistant-architect
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Ses/video muhendisi |
-| **Ne** | Produce a full-stack voice-assistant spec — components, latency budget, observability, compliance — for a given workload. |
-| **Nerede** | `voice\voice-assistant-architect.md` |
-| **Ne Zaman** | Ses isleme veya TTS/STT gerektiginde |
-| **Neden** | Voice Assistant Architect islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Produce a full-stack voice-assistant spec — components, latency budget, observability, compliance — for a given workload. |
-| **Nerede?** | voice/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Ses/video muhendisi
-Ne: Produce a full-stack voice-assistant spec — components, latency budget, observability, compliance — for a given workload.
-Nerede: `voice\voice-assistant-architect.md`
-Ne Zaman: Ses isleme veya TTS/STT gerektiginde
-Neden: Voice Assistant Architect islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given the use case (consumer / customer-support / accessibility / edge), expected scale (concurrent sessions, minutes/month), language, latency targets, compliance (HIPAA, PCI, EU AI Act, CA SB 942), output:
 

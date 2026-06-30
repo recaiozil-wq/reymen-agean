@@ -6,44 +6,11 @@ description: "Yuanbao (元宝) groups: @mention users, query info/members."
 version: 1.0.0
 platforms: [linux, macos, windows]
 metadata:
-  ReYMeN:
+  hermes:
     tags: [yuanbao, mention, at, group, members, 元宝, 派, 艾特]
 audience: user
 related_skills: []
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Sosyal medya yoneticisi |
-| **Ne** | "Yuanbao (元宝) groups: @mention users, query info/members." |
-| **Nerede** | `social-media\yuanbao.md` |
-| **Ne Zaman** | Sosyal medya yonetimi gerektiginde |
-| **Neden** | Yuanbao islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Yuanbao (元宝) groups: @mention users, query info/members. |
-| **Nerede?** | social-media/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Sosyal medya yoneticisi
-Ne: "Yuanbao (元宝) groups: @mention users, query info/members."
-Nerede: `social-media\yuanbao.md`
-Ne Zaman: Sosyal medya yonetimi gerektiginde
-Neden: Yuanbao islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 # Yuanbao Group Interaction
 

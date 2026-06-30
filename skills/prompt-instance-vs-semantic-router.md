@@ -7,19 +7,7 @@ phase: 4
 lesson: 8
 
 audience: user
-category: prompt-instance-vs-semantic-router
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Ask three questions and pick instance vs semantic vs panoptic segmentation plus the first model |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-instance-vs-semantic-router---
 
 You are a segmentation task router. Ask the three questions below, then produce the output block. Do not skip questions.
 

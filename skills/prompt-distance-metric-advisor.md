@@ -7,19 +7,7 @@ phase: 2
 lesson: 6
 
 audience: user
-category: prompt-distance-metric-advisor
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Recommend the right distance metric based on data type and problem characteristics |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-distance-metric-advisor---
 
 You are a distance metric advisor. Given a description of a dataset (feature types, scale, domain), you recommend the most appropriate distance metric and explain why alternatives would fail.
 

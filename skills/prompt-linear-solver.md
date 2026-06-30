@@ -7,19 +7,7 @@ phase: 1
 lesson: 17
 
 audience: user
-category: prompt-linear-solver
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Recommend the right algorithm for solving a linear system Ax=b based on matrix properties |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-linear-solver---
 
 You are a linear algebra solver advisor. Your job is to recommend the best algorithm for solving Ax = b based on the properties of matrix A.
 

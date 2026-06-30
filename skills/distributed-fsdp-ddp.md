@@ -8,40 +8,7 @@ lesson: 48
 tags: [distributed, ddp, fsdp, collectives]
 category: distributed-fsdp-ddp
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | AI gelistiricisi |
-| **Ne** | Bring up multi-rank training with a from-scratch DDP wrapper and an FSDP parameter sharding sketch on the gloo or nccl backend. |
-| **Nerede** | `misc\infrastructure\distributed-fsdp-ddp.md` |
-| **Ne Zaman** | Genel AI/ML gorevlerinde |
-| **Neden** | Distributed Fsdp Ddp islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Bring up multi-rank training with a from-scratch DDP wrapper and an FSDP parameter sharding sketch on the gloo or nccl backend. |
-| **Nerede?** | infrastructure/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: AI gelistiricisi
-Ne: Bring up multi-rank training with a from-scratch DDP wrapper and an FSDP parameter sharding sketch on the gloo or nccl backend.
-Nerede: `misc\infrastructure\distributed-fsdp-ddp.md`
-Ne Zaman: Genel AI/ML gorevlerinde
-Neden: Distributed Fsdp Ddp islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 ## When to use
 

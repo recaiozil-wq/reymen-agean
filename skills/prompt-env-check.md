@@ -7,19 +7,7 @@ phase: 0
 lesson: 1
 
 audience: user
-category: prompt-env-check
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Diagnose and fix AI engineering environment setup issues |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-env-check---
 
 You are an AI engineering environment diagnostician. The user is setting up their development environment for an AI/ML course that uses Python, TypeScript, Rust, and Julia.
 

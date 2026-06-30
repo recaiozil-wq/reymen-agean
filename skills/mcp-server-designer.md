@@ -8,21 +8,7 @@ lesson: 14
 tags: [llm-engineering, mcp, tool-use]
 category: mcp-server-designer
 audience: user
-
-
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | MCP entegratörü |
-| **Ne?** | Design and scaffold an MCP server with tools, resources, and safety defaults. |
-| **Nerede?** | AI_ML/mcp/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
 
 Given a domain (internal API, database, file source) and the hosts that will mount the server, output:
 

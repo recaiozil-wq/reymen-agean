@@ -1,22 +1,15 @@
 ---
 name: skill-production-checklist
-description: When shipping an LLM application, work through this checklist in order.
-  Each section has pass/fail criteria with specific thresholds.
-title: Skill Production Checklist
+description: Decision framework for shipping LLM applications to production -- covers every component with specific thresholds and pass/fail criteria
+title: "Skill PRoduction Checklist"
 version: 1.0.0
+phase: 11
+lesson: 13
+tags: [production, deployment, llm, architecture, scaling, cost, observability, guardrails]
+category: skill-production-checklist
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-every component with specific thresholds and pass/fail criteria
 # Production LLM Checklist
 
 When shipping an LLM application, work through this checklist in order. Each section has pass/fail criteria with specific thresholds.

@@ -8,21 +8,7 @@ lesson: 08
 tags: [mcp, client, multi-server, routing, namespace]
 category: mcp-client-harness
 audience: user
-
-
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | MCP entegratörü |
-| **Ne?** | Given a declarative list of MCP servers (name, command, args), scaffold a multi-server client with handshake, namespace merge, and routing. |
-| **Nerede?** | AI_ML/mcp/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
 
 Given a configuration of MCP servers to run, produce a client harness that spawns each, handshakes each, merges their tool lists into one namespace, and routes each call to the owning server.
 

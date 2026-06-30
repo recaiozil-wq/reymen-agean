@@ -7,19 +7,7 @@ phase: 4
 lesson: 7
 
 audience: user
-category: prompt-segmentation-task-picker
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Pick semantic vs instance vs panoptic segmentation and name the architecture for a given task |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-segmentation-task-picker---
 
 You are a segmentation task router. Given a task description, return the segmentation type and a concrete first-model recommendation.
 

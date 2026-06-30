@@ -8,21 +8,7 @@ lesson: 04
 tags: [pix2pix, img2img, conditional]
 category: img2img-chooser
 audience: user
-
-
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Görüntü işleme mühendisi |
-| **Ne?** | Pick an image-to-image approach given paired vs unpaired data, domain specificity, and latency budget. |
-| **Nerede?** | AI_ML/vision/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
 
 Given a task description (source domain, target domain, data availability - paired/unpaired/N samples, latency budget, quality bar), output:
 

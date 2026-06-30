@@ -1,23 +1,15 @@
 ---
 name: skill-perceptron
-description: A perceptron computes a weighted sum of inputs plus a bias, then applies
-  a step function to produce a binary output. It is the fundamental unit of neural
-  networks.
-title: Skill Perceptron
+description: Understand the perceptron pattern and when to use single-layer vs multi-layer architectures
+title: "Skill Perceptron"
 version: 1.0.0
+phase: 3
+lesson: 1
+tags: [perceptron, neural-networks, classification, deep-learning]
+category: skill-perceptron
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-architectures
 # The Perceptron Pattern
 
 A perceptron computes a weighted sum of inputs plus a bias, then applies a step function to produce a binary output. It is the fundamental unit of neural networks.

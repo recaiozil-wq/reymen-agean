@@ -1,22 +1,15 @@
 ---
 name: skill-classification-diagnostics
-description: A reading lens for confusion matrices. Aggregate accuracy tells you a
-  classifier works. The confusion matrix tells you *what it does not know yet*.
-title: Skill Classification Diagnostics
+description: Given a confusion matrix and class names, surface per-class failures and propose the single most impactful fix
+title: "Skill Classification Diagnostics"
 version: 1.0.0
+phase: 4
+lesson: 4
+tags: [computer-vision, classification, evaluation, debugging]
+category: skill-classification-diagnostics
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-and propose the single most impactful fix
 # Classification Diagnostics
 
 A reading lens for confusion matrices. Aggregate accuracy tells you a classifier works. The confusion matrix tells you *what it does not know yet*.

@@ -1,22 +1,15 @@
 ---
 name: skill-inference-optimization
-description: 'Two phases: prefill (compute-bound, parallel) and decode (memory-bound,
-  sequential).'
-title: Skill Inference Optimization
+description: Diagnose and optimize LLM inference serving throughput, latency, and cost
+title: "Skill Inference Optimization"
 version: 1.0.0
+phase: 10
+lesson: 12
+tags: [inference, kv-cache, batching, speculative-decoding, vllm, optimization]
+category: skill-inference-optimization
+audience: maintainer
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-cost
 # LLM Inference Optimization Pattern
 
 Two phases: prefill (compute-bound, parallel) and decode (memory-bound, sequential).

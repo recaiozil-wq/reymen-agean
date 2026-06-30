@@ -8,40 +8,7 @@ lesson: 10
 tags: [video, diffusion, sora, veo, kling]
 category: video-brief
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Medya uzmani |
-| **Ne** | Translate a video brief into a model + prompt + shot plan for a 2026 video generator. |
-| **Nerede** | `media\video-brief.md` |
-| **Ne Zaman** | Medya dosyasi isleme gerektiginde |
-| **Neden** | Video Brief islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Video ajanı |
-| **Ne?** | Translate a video brief into a model + prompt + shot plan for a 2026 video generator. |
-| **Nerede?** | media/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Medya uzmani
-Ne: Translate a video brief into a model + prompt + shot plan for a 2026 video generator.
-Nerede: `media\video-brief.md`
-Ne Zaman: Medya dosyasi isleme gerektiginde
-Neden: Video Brief islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a video brief (duration, aspect ratio, style, subject, camera plan, audio needs, fidelity bar, budget), output:
 

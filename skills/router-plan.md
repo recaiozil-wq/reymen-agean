@@ -8,40 +8,7 @@ lesson: 16
 tags: [routing, cascade, model-cascade, routellm, notdiamond, cost-reduction]
 category: router-plan
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | AI gelistiricisi |
-| **Ne** | Design an LLM model-routing plan — pick pattern (pre-route, cascade, ensemble), signals (task, length, embedding, confidence), and online quality gates. |
-| **Nerede** | `misc\infrastructure\router-plan.md` |
-| **Ne Zaman** | Genel AI/ML gorevlerinde |
-| **Neden** | Router Plan islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Design an LLM model-routing plan — pick pattern (pre-route, cascade, ensemble), signals (task, length, embedding, confidence), and online quality gates. |
-| **Nerede?** | infrastructure/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: AI gelistiricisi
-Ne: Design an LLM model-routing plan — pick pattern (pre-route, cascade, ensemble), signals (task, length, embedding, confidence), and online quality gates.
-Nerede: `misc\infrastructure\router-plan.md`
-Ne Zaman: Genel AI/ML gorevlerinde
-Neden: Router Plan islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given workload mix (task classification sample), quality floor, latency tolerance, and current monthly spend, produce a routing plan.
 

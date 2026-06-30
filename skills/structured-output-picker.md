@@ -8,21 +8,7 @@ lesson: 20
 tags: [nlp, llm, structured-output]
 category: structured-output-picker
 audience: user
-
-
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Choose a structured output approach, schema design, and validation plan. |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
 
 Given a use case (provider, latency budget, schema complexity, failure tolerance), output:
 

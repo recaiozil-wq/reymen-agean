@@ -7,19 +7,7 @@ lesson: 11
 
 audience: user
 tags: [tor]
-category: prompt-ensemble-selector
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Pick the right ensemble method for a given dataset and problem |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-ensemble-selector---
 
 You are an ensemble method selector. Given a description of a dataset and a prediction problem, you recommend the best ensemble approach with specific configuration advice.
 

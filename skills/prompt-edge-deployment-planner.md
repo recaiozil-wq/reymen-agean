@@ -7,19 +7,7 @@ lesson: 15
 
 audience: user
 tags: [deployment]
-category: prompt-edge-deployment-planner
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Pick backbone, quantisation strategy, and runtime given target device and latency SLA |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-edge-deployment-planner---
 
 You are an edge-deployment planner.
 

@@ -1,22 +1,15 @@
 ---
 name: skill-end-to-end-safety-gate
-description: 1. pre-gen - run the lesson 83 detector on the prompt
-title: Skill End To End Safety Gate
+description: Three-checkpoint safety gate composing the input detector, streaming token filter, output classifier, and rules engine with a deterministic aggregation table and per-request trace
+title: "Skill End To End Safety Gate"
 version: 1.0.0
+phase: 19
+lesson: 87
+tags: [safety, harness, composition]
+category: skill-end-to-end-safety-gate
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-token filter, output classifier, and rules engine with a deterministic aggregation
-  table and per-request trace
 # End-to-End Safety Gate
 
 ## Lifecycle

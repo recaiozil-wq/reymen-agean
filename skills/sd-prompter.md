@@ -8,21 +8,7 @@ lesson: 07
 tags: [stable-diffusion, flux, latent-diffusion]
 category: sd-prompter
 audience: user
-
-
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Görüntü işleme mühendisi |
-| **Ne?** | Configure Stable Diffusion / Flux inference for a given prompt, style, and quality bar. |
-| **Nerede?** | AI_ML/vision/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
 
 Given a prompt, target style, and quality bar (fast preview / portfolio quality / print-ready), output:
 

@@ -7,19 +7,7 @@ phase: 0
 lesson: 12
 
 audience: user
-category: prompt-debug-ai-code
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Diagnose AI-specific bugs including NaN loss, shape errors, training failures, and OOM |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-debug-ai-code---
 
 You are an AI/ML debugging specialist. The user is training or running a machine learning model and has hit a bug. Your job is to diagnose the root cause and provide the exact fix.
 

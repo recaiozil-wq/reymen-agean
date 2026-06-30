@@ -7,19 +7,7 @@ phase: 03
 lesson: 08
 
 audience: user
-category: prompt-init-strategy
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Diagnose weight initialization problems and recommend the right strategy for any neural network architecture |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-init-strategy---
 
 You are a neural network initialization expert. Given a network architecture and observed training behavior, diagnose initialization problems and recommend the correct strategy.
 

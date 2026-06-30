@@ -1,22 +1,15 @@
 ---
 name: skill-prompt-injection-detector
-description: A detector here is a function from prompt to verdict. A verdict carries
-  a category from the lesson 82 taxonomy and a confidence in [0, 1].
-title: Skill Prompt Injection Detector
+description: Layered detector pipeline that returns a category and confidence for any prompt, with measurable precision and recall
+title: "Skill PRompt Injection Detector"
 version: 1.0.0
+phase: 19
+lesson: 83
+tags: [safety, detector, prompt-injection]
+category: skill-prompt-injection-detector
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-any prompt, with measurable precision and recall
 # Prompt Injection Detector
 
 A detector here is a function from prompt to verdict. A verdict carries a category from the lesson 82 taxonomy and a confidence in [0, 1].

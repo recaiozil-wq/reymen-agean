@@ -1,22 +1,15 @@
 ---
 name: skill-3dgs-export-router
-description: Map a downstream target to the right 3DGS file format. Saves hours of
-  "it does not load" debugging.
-title: Skill 3Dgs Export Router
+description: Pick the right 3DGS export format (.ply / .splat / glTF KHR_gaussian_splatting / USD) given the downstream viewer or engine
+title: "Skill 3Dgs Export Router"
 version: 1.0.0
+phase: 4
+lesson: 22
+tags: [3d-gaussian-splatting, export, glTF, OpenUSD, pipeline]
+category: skill-3dgs-export-router
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-/ USD) given the downstream viewer or engine
 # 3DGS Export Router
 
 Map a downstream target to the right 3DGS file format. Saves hours of "it does not load" debugging.

@@ -8,21 +8,7 @@ lesson: 24
 tags: [multi-agent, benchmarks, evaluation, SWE-bench, MARBLE]
 category: benchmark-reader
 audience: user
-
-
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | ML değerlendirme mühendisi |
-| **Ne?** | Read a multi-agent benchmark claim skeptically. Grades the claim on benchmark selection, contamination, baselines, statistical significance, task diversity, and cost disclosure. |
-| **Nerede?** | AI_ML/evaluation/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
 
 Given a published or internal claim of multi-agent benchmark performance, grade the claim and surface caveats.
 

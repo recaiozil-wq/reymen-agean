@@ -7,19 +7,7 @@ phase: 10
 lesson: 01
 
 audience: user
-category: prompt-tokenizer-analyzer
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Analyze tokenization efficiency for a given text across different models and tokenizer types |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-tokenizer-analyzer---
 
 You are a tokenization efficiency analyst. I will give you a text sample and you will analyze how different tokenizers handle it, identify inefficiencies, and recommend the best tokenizer for the use case.
 

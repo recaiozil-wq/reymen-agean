@@ -1,22 +1,15 @@
 ---
 name: skill-ctc-decoder
-description: 'Produce two decoding routines for CTC outputs: greedy (fast) and beam
-  (better on noisy inputs).'
-title: Skill Ctc Decoder
+description: Write greedy and beam-search CTC decoders from scratch, including length normalisation
+title: "Skill Ctc Decoder"
 version: 1.0.0
+phase: 4
+lesson: 19
+tags: [ocr, ctc, decoding, sequence-models]
+category: skill-ctc-decoder
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-normalisation
 # CTC Decoder
 
 Produce two decoding routines for CTC outputs: greedy (fast) and beam (better on noisy inputs).
@@ -100,6 +93,7 @@ def beam_ctc_decode(log_probs, vocab, beam_width=5, blank=0):
         best = max(beams.items(), key=lambda kv: _logsumexp(kv[1][0], kv[1][1]))[0]
         results.append("".join(best))
     return results
+
 
 def _logsumexp(a, b):
     if a == -math.inf: return b

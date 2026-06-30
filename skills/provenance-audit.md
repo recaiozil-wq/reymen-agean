@@ -8,40 +8,7 @@ lesson: 23
 tags: [watermarking, synthid, stable-signature, c2pa, provenance]
 category: provenance-audit
 audience: maintainer
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Guvenlik arastirmacisi |
-| **Ne** | Audit a content deployment's provenance chain across watermarking and C2PA metadata. |
-| **Nerede** | `security\provenance-audit.md` |
-| **Ne Zaman** | Guvenlik denetimi veya zafiyet taramasi gerektiginde |
-| **Neden** | Provenance Audit islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Audit a content deployment's provenance chain across watermarking and C2PA metadata. |
-| **Nerede?** | security/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Guvenlik arastirmacisi
-Ne: Audit a content deployment's provenance chain across watermarking and C2PA metadata.
-Nerede: `security\provenance-audit.md`
-Ne Zaman: Guvenlik denetimi veya zafiyet taramasi gerektiginde
-Neden: Provenance Audit islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a content deployment with a provenance claim, audit the provenance chain.
 

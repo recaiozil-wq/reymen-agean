@@ -8,21 +8,7 @@ lesson: 19
 tags: [swe-bench, gaia, agentbench, harness, evaluation]
 category: benchmark-harness
 audience: user
-
-
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | ML değerlendirme mühendisi |
-| **Ne?** | Build a SWE-bench-style harness for a codebase with FAIL_TO_PASS / PASS_TO_PASS gating, contamination checks, and step-count metrics. |
-| **Nerede?** | AI_ML/evaluation/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
 
 Given a codebase and a list of (bug, fix) pairs, build a benchmark harness that gates on real unit tests and records operational metrics.
 

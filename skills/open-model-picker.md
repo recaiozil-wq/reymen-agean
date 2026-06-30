@@ -8,40 +8,7 @@ lesson: 14
 tags: [open-models, llama, deepseek, mixtral, qwen, gemma, moe, gqa, mla, quantization]
 category: open-model-picker
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Arastirmaci |
-| **Ne** | Pick an open LLM family, quantization, and inference stack for a given deployment target. |
-| **Nerede** | `research\open-model-picker.md` |
-| **Ne Zaman** | Arastirma veya literatur taramasi gerektiginde |
-| **Neden** | Open Model Picker islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Pick an open LLM family, quantization, and inference stack for a given deployment target. |
-| **Nerede?** | research/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Arastirmaci
-Ne: Pick an open LLM family, quantization, and inference stack for a given deployment target.
-Nerede: `research\open-model-picker.md`
-Ne Zaman: Arastirma veya literatur taramasi gerektiginde
-Neden: Open Model Picker islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a deployment target (GPU type, VRAM per GPU, number of GPUs, target context length, target p50/p99 latency, peak concurrent requests) and a task profile (chat, code, reasoning, long-context retrieval, tool use), recommend an open model plus serving stack with explicit reasoning about each of the six architectural knobs from Lesson 14.
 

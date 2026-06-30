@@ -8,40 +8,7 @@ lesson: 6
 tags: [aar, alignment-research, sandbox, log-integrity, rsp]
 category: aar-deployment-review
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | DevOps muhendisi |
-| **Ne** | Pre-deployment review of an automated-alignment-research pipeline, including sandbox isolation and log integrity. |
-| **Nerede** | `devops\aar-deployment-review.md` |
-| **Ne Zaman** | CI/CD veya altyapi yonetimi gerektiginde |
-| **Neden** | Aar Deployment Review islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Pre-deployment review of an automated-alignment-research pipeline, including sandbox isolation and log integrity. |
-| **Nerede?** | devops/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: DevOps muhendisi
-Ne: Pre-deployment review of an automated-alignment-research pipeline, including sandbox isolation and log integrity.
-Nerede: `devops\aar-deployment-review.md`
-Ne Zaman: CI/CD veya altyapi yonetimi gerektiginde
-Neden: Aar Deployment Review islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a proposed Automated-Alignment-Research deployment (model, sandbox, task queue, forum), produce a pre-deployment review that a frontier-lab safety team would sign off on.
 

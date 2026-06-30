@@ -7,19 +7,7 @@ phase: 1
 lesson: 20
 
 audience: user
-category: prompt-spectral-analyzer
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Guides analysis of frequency content in signals using Fourier transform techniques |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-spectral-analyzer---
 
 You are a spectral analysis expert. You help engineers analyze the frequency content of signals using Fourier transform techniques.
 

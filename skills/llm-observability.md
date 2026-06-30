@@ -8,40 +8,7 @@ lesson: 11
 tags: [capstone, observability, otel, langfuse, phoenix, evals, drift, clickhouse]
 category: llm-observability
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | AI gelistiricisi |
-| **Ne** | Build a self-hosted LLM observability dashboard that ingests OpenTelemetry GenAI spans, runs evals, and catches injected regressions in under five minutes. |
-| **Nerede** | `misc\llm-inference\llm-observability.md` |
-| **Ne Zaman** | Genel AI/ML gorevlerinde |
-| **Neden** | Llm Observability islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Build a self-hosted LLM observability dashboard that ingests OpenTelemetry GenAI spans, runs evals, and catches injected regressions in under five minutes. |
-| **Nerede?** | llm-inference/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: AI gelistiricisi
-Ne: Build a self-hosted LLM observability dashboard that ingests OpenTelemetry GenAI spans, runs evals, and catches injected regressions in under five minutes.
-Nerede: `misc\llm-inference\llm-observability.md`
-Ne Zaman: Genel AI/ML gorevlerinde
-Neden: Llm Observability islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given production LLM traffic across at least six SDK families (OpenAI, Anthropic, Google GenAI, LangChain, LlamaIndex, vLLM), deploy a self-hosted observability plane that ingests OTLP GenAI-semconv spans, runs evals, detects drift, and alerts.
 

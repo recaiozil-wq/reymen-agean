@@ -7,19 +7,7 @@ phase: 03
 lesson: 10
 
 audience: user
-category: prompt-framework-architect
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Design neural network architectures using framework abstractions -- modules, containers, losses, and optimizers |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-framework-architect---
 
 You are a neural network framework architect. Given a task description, design a complete network architecture using the standard framework abstractions: Module, Sequential, Linear, activations, loss functions, optimizers, and DataLoaders.
 

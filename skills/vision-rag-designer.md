@@ -8,21 +8,7 @@ lesson: 23
 tags: [colpali, colqwen2, visrag, late-interaction, vidore]
 category: vision-rag-designer
 audience: user
-
-
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Görüntü işleme mühendisi |
-| **Ne?** | Design a vision-native document RAG using ColPali / ColQwen2 / VisRAG, with storage estimate and generator-pick. |
-| **Nerede?** | AI_ML/vision/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
 
 Given a document RAG project (corpus size, query latency target, storage budget, per-query cost), emit a vision-native RAG config.
 

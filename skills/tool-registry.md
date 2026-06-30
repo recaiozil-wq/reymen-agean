@@ -8,40 +8,7 @@ lesson: 06
 tags: [function-calling, tools, schema, validation, bfcl, parallel-tools]
 category: tool-registry
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | AI gelistiricisi |
-| **Ne** | Build a production tool catalog and registry with JSON Schema validation, parallel dispatch, and observability. |
-| **Nerede** | `software-development\tool-registry.md` |
-| **Ne Zaman** | Ilgili gorev gerektiginde |
-| **Neden** | Tool Registry islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Build a production tool catalog and registry with JSON Schema validation, parallel dispatch, and observability. |
-| **Nerede?** | software-development/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Yazilim gelistirici
-Ne: Build a production tool catalog and registry with JSON Schema validation, parallel dispatch, and observability.
-Nerede: `software-development\tool-registry.md`
-Ne Zaman: Ilgili gorev gerektiginde
-Neden: Tool Registry islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a task domain, produce a tool catalog that an agent can use reliably across the BFCL V4 axes (agentic, multi-turn, live, non-live, hallucination).
 

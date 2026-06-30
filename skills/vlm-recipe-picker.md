@@ -8,21 +8,7 @@ lesson: 07
 tags: [vlm, mm1, idefics2, molmo, cambrian, prismatic, ablation]
 category: vlm-recipe-picker
 audience: user
-
-
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Görüntü işleme mühendisi |
-| **Ne?** | Pick an open-weight VLM recipe (encoder, connector, LLM, data mix, resolution schedule) with ablation-table citations for every choice. |
-| **Nerede?** | AI_ML/vision/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
 
 Given a task mix (OCR, chart, UI agent, reasoning, grounding), a compute budget (LLM params, training GPU hours, or inference latency target), and a deployment constraint (edge, cloud, on-device), emit a full open-weight VLM recipe with citations.
 

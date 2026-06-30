@@ -1,20 +1,14 @@
 ---
 name: skill-debug-checklist
-description: Systematic debugging protocol for when training goes wrong. Work through
-  these in order -- most bugs are caught in the first 3 steps.
-title: Skill Debug Checklist
+description: Decision-tree checklist for debugging neural network training failures
+title: "Skill Debug Checklist"
 version: 1.0.0
+phase: 3
+lesson: 13
+tags: [debugging, neural-networks, training, diagnostics, deep-learning]
+category: skill-debug-checklist
+audience: user
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
 
 # Neural Network Debug Checklist
 

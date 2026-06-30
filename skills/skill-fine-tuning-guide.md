@@ -1,19 +1,14 @@
 ---
 name: skill-fine-tuning-guide
-description: 'Before fine-tuning, try these in order:'
-title: Skill Fine Tuning Guide
+description: Decision tree for when and how to fine-tune LLMs with LoRA and QLoRA
+title: "Skill Fine Tuning GUIde"
 version: 1.0.0
+phase: 11
+lesson: 8
+tags: [fine-tuning, lora, qlora, peft, llm-engineering]
+category: skill-fine-tuning-guide
+audience: user
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
 
 # Fine-Tuning Decision Guide
 

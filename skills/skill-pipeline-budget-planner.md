@@ -1,22 +1,15 @@
 ---
 name: skill-pipeline-budget-planner
-description: Turn a latency/throughput target into a stage-by-stage budget so every
-  team member knows what number they are engineering toward.
-title: Skill Pipeline Budget Planner
+description: Given target latency and throughput, assign a time budget to every pipeline stage and flag which stage will miss its budget first
+title: "Skill Pipeline Budget Planner"
 version: 1.0.0
+phase: 4
+lesson: 16
+tags: [vision, pipeline, performance, deployment]
+category: skill-pipeline-budget-planner
+audience: maintainer
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-stage and flag which stage will miss its budget first
 # Pipeline Budget Planner
 
 Turn a latency/throughput target into a stage-by-stage budget so every team member knows what number they are engineering toward.

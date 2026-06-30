@@ -1,20 +1,12 @@
 ---
 name: check-understanding
-description: Test your knowledge of a completed phase from the AI Engineering from
-  Scratch course.
-title: Check Understanding
 version: 1.0.0
----
+description: Phase quiz for AI Engineering from Scratch. Trigger with "quiz me", "test phase", "check my understanding", "do I know phase 3", or `/check-understanding <phase>`.
+title: "Check Understanding"
+tags: [general]
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+audience: user
+category: check-understanding---
 
 # Check Understanding
 

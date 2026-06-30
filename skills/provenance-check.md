@@ -8,40 +8,7 @@ lesson: 27
 tags: [data-provenance, ab-2013, tdm-opt-out, legitimate-interest, dpa]
 category: provenance-check
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Guvenlik arastirmacisi |
-| **Ne** | Check a training dataset against California AB 2013 and EU TDM opt-out obligations. |
-| **Nerede** | `security\provenance-check.md` |
-| **Ne Zaman** | Guvenlik denetimi veya zafiyet taramasi gerektiginde |
-| **Neden** | Provenance Check islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Check a training dataset against California AB 2013 and EU TDM opt-out obligations. |
-| **Nerede?** | security/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Guvenlik arastirmacisi
-Ne: Check a training dataset against California AB 2013 and EU TDM opt-out obligations.
-Nerede: `security\provenance-check.md`
-Ne Zaman: Guvenlik denetimi veya zafiyet taramasi gerektiginde
-Neden: Provenance Check islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a training dataset used by a deployment, check compliance against California AB 2013 and EU TDM opt-out.
 

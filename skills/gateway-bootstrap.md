@@ -8,21 +8,7 @@ lesson: 17
 tags: [mcp, gateway, rbac, audit, policy]
 category: gateway-bootstrap
 audience: maintainer
-
-
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | MCP entegratörü |
-| **Ne?** | Produce a gateway configuration spec given users, backends, and compliance constraints. |
-| **Nerede?** | AI_ML/mcp/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
 
 Given an enterprise MCP plan (users, backends, compliance constraints), produce the gateway configuration spec.
 

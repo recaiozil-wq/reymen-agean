@@ -1,20 +1,14 @@
 ---
 name: skill-sampling-strategy
-description: How to pick the right sampling method for text generation, Bayesian inference,
-  Monte Carlo estimation, and training.
-title: Skill Sampling Strategy
+description: Choose the right sampling method for generation, estimation, or inference
+title: "Skill SAMpling Strategy"
 version: 1.0.0
+phase: 1
+lesson: 16
+tags: [sampling, mcmc, generation]
+category: skill-sampling-strategy
+audience: user
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
 
 # Sampling Strategy Selection
 

@@ -8,40 +8,7 @@ lesson: 04
 tags: [capstone, multimodal, rag, colpali, colqwen, late-interaction, pdf]
 category: doc-qa
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | AI gelistiricisi |
-| **Ne** | Build a vision-first multimodal document QA system on 10k pages with late-interaction retrieval and evidence-region citations. |
-| **Nerede** | `misc\rag-search\doc-qa.md` |
-| **Ne Zaman** | Genel AI/ML gorevlerinde |
-| **Neden** | Doc Qa islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Build a vision-first multimodal document QA system on 10k pages with late-interaction retrieval and evidence-region citations. |
-| **Nerede?** | rag-search/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: AI gelistiricisi
-Ne: Build a vision-first multimodal document QA system on 10k pages with late-interaction retrieval and evidence-region citations.
-Nerede: `misc\rag-search\doc-qa.md`
-Ne Zaman: Genel AI/ML gorevlerinde
-Neden: Doc Qa islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a corpus of PDFs (10-Ks, scientific papers, scanned documents), build a pipeline that indexes pages as images using ColPali-style late interaction and answers questions with page-level evidence regions.
 

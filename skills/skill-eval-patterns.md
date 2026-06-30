@@ -1,22 +1,15 @@
 ---
 name: skill-eval-patterns
-description: When building evaluation for an LLM application, apply this decision
-  framework.
-title: Skill Eval Patterns
+description: Decision framework for choosing evaluation strategies -- when to use which method, how to size test suites, and how to integrate evals into CI/CD
+title: "Skill Eval Patterns"
 version: 1.0.0
+phase: 11
+lesson: 10
+tags: [evaluation, testing, llm-as-judge, regression, confidence-intervals, ci-cd]
+category: skill-eval-patterns
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-which method, how to size test suites, and how to integrate evals into CI/CD
 # Eval Patterns
 
 When building evaluation for an LLM application, apply this decision framework.

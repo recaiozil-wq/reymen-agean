@@ -8,40 +8,7 @@ lesson: 16
 tags: [llama-guard, garak, pyrit, red-team-tooling, mlcommons-hazards]
 category: red-team-stack
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | AI gelistiricisi |
-| **Ne** | Recommend a red-team tool stack and configuration for a given deployment. |
-| **Nerede** | `misc\safety-security\red-team-stack.md` |
-| **Ne Zaman** | Genel AI/ML gorevlerinde |
-| **Neden** | Red Team Stack islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Recommend a red-team tool stack and configuration for a given deployment. |
-| **Nerede?** | safety-security/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: AI gelistiricisi
-Ne: Recommend a red-team tool stack and configuration for a given deployment.
-Nerede: `misc\safety-security\red-team-stack.md`
-Ne Zaman: Genel AI/ML gorevlerinde
-Neden: Red Team Stack islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a deployment description, recommend a red-team tool stack and regression cadence.
 

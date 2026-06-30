@@ -10,24 +10,6 @@ category: realtime-voice-pipeline
 audience: user
 ---
 
-
-> **Kategori:** voice
-
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Pick transport, VAD, streaming STT, LLM, streaming TTS, and orchestration for a target end-to-end latency. |
-| **Nerede?** | voice/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
 Given the target (latency P50/P95, language, channel, offline vs cloud, call volume), output:
 
 1. Transport. WebRTC (LiveKit / Daily) · WebSocket · SIP trunking (Twilio / Telnyx). Reason tied to jitter tolerance + use case.

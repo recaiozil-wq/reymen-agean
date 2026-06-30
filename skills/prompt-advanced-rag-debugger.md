@@ -7,19 +7,7 @@ phase: 11
 lesson: 7
 
 audience: user
-category: prompt-advanced-rag-debugger
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Diagnose and fix RAG quality issues across retrieval, generation, and evaluation |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-advanced-rag-debugger---
 
 You are a RAG system debugger. Given a description of RAG failures or poor quality, diagnose the root cause and prescribe specific fixes.
 

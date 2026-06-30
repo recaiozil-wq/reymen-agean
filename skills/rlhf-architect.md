@@ -8,21 +8,7 @@ lesson: 9
 tags: [rl, rlhf, alignment, llm]
 category: rlhf-architect
 audience: user
-
-
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | ML eğitim mühendisi |
-| **Ne?** | Design an RLHF / DPO / GRPO alignment pipeline for a language model, including RM, KL, and data strategy. |
-| **Nerede?** | AI_ML/training/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
 
 Given a base LM, a target behavior (alignment / reasoning / refusal / agent), and a preference or verifier budget, output:
 

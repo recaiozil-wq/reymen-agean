@@ -8,40 +8,7 @@ lesson: 12
 tags: [transformers, inference, flash-attention, kv-cache]
 category: inference-optimizer
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | AI gelistiricisi |
-| **Ne** | Pick attention implementation, KV cache strategy, quantization, and speculative decoding for a new inference deployment. |
-| **Nerede** | `misc\llm-inference\inference-optimizer.md` |
-| **Ne Zaman** | Genel AI/ML gorevlerinde |
-| **Neden** | Inference Optimizer islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Pick attention implementation, KV cache strategy, quantization, and speculative decoding for a new inference deployment. |
-| **Nerede?** | llm-inference/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: AI gelistiricisi
-Ne: Pick attention implementation, KV cache strategy, quantization, and speculative decoding for a new inference deployment.
-Nerede: `misc\llm-inference\inference-optimizer.md`
-Ne Zaman: Genel AI/ML gorevlerinde
-Neden: Inference Optimizer islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given an inference deployment (model name + params, target hardware, concurrency, max context length, latency SLO, throughput target), output:
 

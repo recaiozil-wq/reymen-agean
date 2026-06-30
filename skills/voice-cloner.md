@@ -8,40 +8,7 @@ lesson: 08
 tags: [voice-cloning, voice-conversion, watermark, consent, safety]
 category: voice-cloner
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Ses/video muhendisi |
-| **Ne** | Pick cloning approach (zero-shot / conversion / adaptation), consent artifact, watermark, and safety filters for a voice-cloning deployment. |
-| **Nerede** | `voice\voice-cloner.md` |
-| **Ne Zaman** | Ses isleme veya TTS/STT gerektiginde |
-| **Neden** | Voice Cloner islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Pick cloning approach (zero-shot / conversion / adaptation), consent artifact, watermark, and safety filters for a voice-cloning deployment. |
-| **Nerede?** | voice/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Ses/video muhendisi
-Ne: Pick cloning approach (zero-shot / conversion / adaptation), consent artifact, watermark, and safety filters for a voice-cloning deployment.
-Nerede: `voice\voice-cloner.md`
-Ne Zaman: Ses isleme veya TTS/STT gerektiginde
-Neden: Voice Cloner islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given the task (language, reference length available, adaptation budget, license constraints, consent status, deployment scale), output:
 

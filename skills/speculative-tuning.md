@@ -8,40 +8,7 @@ lesson: 25
 tags: [speculative-decoding, draft-model, alpha, throughput, inference, decode-latency]
 category: speculative-tuning
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | AI gelistiricisi |
-| **Ne** | Profile a decode workload and pick draft model, draft length K, temperature gate, and fallback policy for speculative decoding. |
-| **Nerede** | `misc\llm-inference\speculative-tuning.md` |
-| **Ne Zaman** | Genel AI/ML gorevlerinde |
-| **Neden** | Speculative Tuning islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Profile a decode workload and pick draft model, draft length K, temperature gate, and fallback policy for speculative decoding. |
-| **Nerede?** | llm-inference/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: AI gelistiricisi
-Ne: Profile a decode workload and pick draft model, draft length K, temperature gate, and fallback policy for speculative decoding.
-Nerede: `misc\llm-inference\speculative-tuning.md`
-Ne Zaman: Genel AI/ML gorevlerinde
-Neden: Speculative Tuning islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given the target model (size, family, tokenizer), the workload telemetry (task mix, prompt-vs-decode token ratio, p50/p99 decode latency, accelerator and HBM headroom, average batch size, sampling temperature distribution), and the available draft checkpoints, output:
 

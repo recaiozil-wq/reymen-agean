@@ -8,40 +8,7 @@ lesson: 12
 tags: [rl, alphazero, muzero, grpo, self-play]
 category: game-rl-designer
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | ML/Veri bilimci |
-| **Ne** | Design a game-RL or reasoning-RL training pipeline (AlphaZero / MuZero / GRPO) for a given domain. |
-| **Nerede** | `mlops\training\game-rl-designer.md` |
-| **Ne Zaman** | ML modeli egitimi veya deploy gerektiginde |
-| **Neden** | Game Rl Designer islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Design a game-RL or reasoning-RL training pipeline (AlphaZero / MuZero / GRPO) for a given domain. |
-| **Nerede?** | training/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: ML/Veri bilimci
-Ne: Design a game-RL or reasoning-RL training pipeline (AlphaZero / MuZero / GRPO) for a given domain.
-Nerede: `mlops\training\game-rl-designer.md`
-Ne Zaman: ML modeli egitimi veya deploy gerektiginde
-Neden: Game Rl Designer islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a target (perfect-info game / imperfect-info / Atari / LLM reasoning / combinatorial), output:
 

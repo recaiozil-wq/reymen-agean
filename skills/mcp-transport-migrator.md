@@ -8,21 +8,7 @@ lesson: 09
 tags: [mcp, streamable-http, sse-migration, session-id, origin]
 category: mcp-transport-migrator
 audience: user
-
-
 ---
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | MCP entegratörü |
-| **Ne?** | Produce a migration plan from legacy HTTP+SSE to Streamable HTTP with session id continuity and Origin validation. |
-| **Nerede?** | AI_ML/mcp/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
 
 Given an existing HTTP+SSE (legacy) MCP server, produce a migration plan to single-endpoint Streamable HTTP.
 

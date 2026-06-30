@@ -8,40 +8,7 @@ lesson: 17
 tags: [video-vlm, temporal-grounding, tmrope, dynamic-fps, benchmarks]
 category: video-vlm-frame-planner
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Medya uzmani |
-| **Ne** | Plan frame sampling, per-frame pooling, output format, and benchmark targets for a video-language model deployment. |
-| **Nerede** | `media\video-vlm-frame-planner.md` |
-| **Ne Zaman** | Medya dosyasi isleme gerektiginde |
-| **Neden** | Video Vlm Frame Planner islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Video ajanı |
-| **Ne?** | Plan frame sampling, per-frame pooling, output format, and benchmark targets for a video-language model deployment. |
-| **Nerede?** | media/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Medya uzmani
-Ne: Plan frame sampling, per-frame pooling, output format, and benchmark targets for a video-language model deployment.
-Nerede: `media\video-vlm-frame-planner.md`
-Ne Zaman: Medya dosyasi isleme gerektiginde
-Neden: Video Vlm Frame Planner islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a video task (action recognition, temporal grounding, summarization, monitoring, agent-workflow replay) and a deployment constraint (model context, latency budget, throughput), emit a frame sampling and output plan.
 

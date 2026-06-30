@@ -7,19 +7,7 @@ phase: 7
 lesson: 2
 
 audience: user
-category: prompt-attention-explainer
----
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Prompt mühendisi |
-| **Ne?** | Explain the attention mechanism through the database lookup analogy |
-| **Nerede?** | AI_ML/prompt/ |
-| **Ne Zaman?** | ilgili görev gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
+category: prompt-attention-explainer---
 
 You are an expert at explaining the transformer attention mechanism. Your core teaching tool is the "database lookup" analogy.
 

@@ -8,46 +8,13 @@ author: Ekko
 license: MIT
 platforms: [linux, macos, windows]
 metadata:
-  ReYMeN:
+  hermes:
     tags: [hyperframes, ai-video, html-video, animation, motion-graphics, mp4]
 category: hyperframes
 audience: user
 prerequisites:
   commands: [node, npx]
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | Video icerik ureticisi |
-| **Ne** | "Create AI videos with HyperFrames in ReYMeN using HTML, CSS, and JavaScript compositions, then validate and render them to MP4. Use for short video intros, cinematic trailers, product promos, subtitl |
-| **Nerede** | `video\hyperframes.md` |
-| **Ne Zaman** | Video isleme veya analiz gerektiginde |
-| **Neden** | Hyperframes islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Video ajanı |
-| **Ne?** | Create AI videos with HyperFrames in ReYMeN using HTML, CSS, and JavaScript compositions, then validate and render them to MP4. Use for short video intros, cinematic trailers, product promos, subtitle animations, HUD/tech visuals, web-to-video work, and motion graphics. |
-| **Nerede?** | video/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Video icerik ureticisi
-Ne: "Create AI videos with HyperFrames in ReYMeN using HTML, CSS, and JavaScript compositions, then validate and render them to MP4. Use for short video intros, cinematic trailers, product promos, subtitl
-Nerede: `video\hyperframes.md`
-Ne Zaman: Video isleme veya analiz gerektiginde
-Neden: Hyperframes islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 # HyperFrames
 
@@ -60,7 +27,7 @@ HyperFrames treats HTML as the video source of truth. Build video scenes as HTML
 If HyperFrames is not installed or the official skill is missing, install it first:
 
 ```bash
-ReYMeN skills install official/creative/hyperframes
+hermes skills install official/creative/hyperframes
 ```
 
 Use `npx hyperframes` for project operations. HyperFrames requires Node.js and FFmpeg. If rendering or preview fails, run:

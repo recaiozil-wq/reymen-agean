@@ -1,22 +1,15 @@
 ---
 name: skill-lora-training-setup
-description: Turn a description of the fine-tune intent into a concrete training config
-  that is ready to pass to `diffusers` or `kohya_ss`.
-title: Skill Lora Training Setup
+description: Write a full LoRA training config for a custom dataset, including captions, rank, batch size, and learning rate
+title: "Skill Lora Training Setup"
 version: 1.0.0
+phase: 4
+lesson: 11
+tags: [computer-vision, stable-diffusion, lora, fine-tuning]
+category: skill-lora-training-setup
+audience: user
 ---
 
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | AI/ML mühendisi |
-| **Nerede?** | AI_ML/ |
-| **Ne Zaman?** | AI/ML görevi gerektiğinde |
-| **Neden?** | standardize etmek için |
-| **Nasıl?** | Skill adımlarını takip ederek |
-
-rank, batch size, and learning rate
 # LoRA Training Setup
 
 Turn a description of the fine-tune intent into a concrete training config that is ready to pass to `diffusers` or `kohya_ss`.

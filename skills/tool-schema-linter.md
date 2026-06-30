@@ -8,40 +8,7 @@ lesson: 05
 tags: [tool-design, linter, selection-accuracy, naming]
 category: tool-schema-linter
 audience: user
-
-
 ---
-
-| 5N1K | Açıklama |
-|:----:|:---------|
-| **Kim** | AI gelistiricisi |
-| **Ne** | Audit a tool registry against production design rules for names, descriptions, parameters, and shape. Can run in CI on every tool-registry change. |
-| **Nerede** | `software-development\tool-schema-linter.md` |
-| **Ne Zaman** | Ilgili gorev gerektiginde |
-| **Neden** | Tool Schema Linter islemini standartlastirmak icin |
-| **Nasıl** | Skill dosyasindaki adimlari takip ederek |
-
-
-## 📋 5N1K
-
-| Soru | Cevap |
-|:-----|:------|
-| **Kim?** | Tüm ajanlar |
-| **Ne?** | Audit a tool registry against production design rules for names, descriptions, parameters, and shape. Can run in CI on every tool-registry change. |
-| **Nerede?** | software-development/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
-| **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
-
----
-
-Kim: Yazilim gelistirici
-Ne: Audit a tool registry against production design rules for names, descriptions, parameters, and shape. Can run in CI on every tool-registry change.
-Nerede: `software-development\tool-schema-linter.md`
-Ne Zaman: Ilgili gorev gerektiginde
-Neden: Tool Schema Linter islemini standartlastirmak ve tekrarlanabilir kilmak icin
-Nasil: Skill dosyasindaki adimlari takip ederek
-
 
 Given a tool registry (JSON or Python list), run a static audit against the design rules from Phase 13 · 05 and produce a fix list with severities.
 
