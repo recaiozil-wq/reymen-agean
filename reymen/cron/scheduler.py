@@ -1129,7 +1129,7 @@ def _build_job_prompt(job: dict, prerun_script: Optional[tuple] = None) -> str:
     # Inject output from referenced cron jobs as context.
     context_from = job.get("context_from")
     if context_from:
-        from cron.jobs import OUTPUT_DIR
+        from reymen.cron.jobs import OUTPUT_DIR
         if isinstance(context_from, str):
             context_from = [context_from]
         for source_job_id in context_from:

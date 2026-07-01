@@ -539,7 +539,7 @@ def cronjob(
 
             # Validate context_from references existing jobs
             if context_from:
-                from cron.jobs import get_job as _get_job
+                from reymen.cron.jobs import get_job as _get_job
                 refs = [context_from] if isinstance(context_from, str) else context_from
                 for ref_id in refs:
                     if not _get_job(ref_id):
@@ -687,7 +687,7 @@ def cronjob(
                 else:
                     refs = [str(j).strip() for j in context_from if str(j).strip()]
                 if refs:
-                    from cron.jobs import get_job as _get_job
+                    from reymen.cron.jobs import get_job as _get_job
                     for ref_id in refs:
                         if not _get_job(ref_id):
                             return tool_error(
