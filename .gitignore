@@ -221,14 +221,7 @@ _*.cmd
 *.db-shm
 *.db-wal
 
-# SQLite databases (runtime, regenerated)
-*.db
-*.sqlite3
-
-# Vector binary data (runtime, regenerated)
-*.bin
-vektor_hafizasi/
-*.pid
+# PID files
 
 # Browser/MCP state (screenshots, pages)
 .playwright-mcp/
