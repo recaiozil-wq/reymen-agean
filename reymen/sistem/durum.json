@@ -67,7 +67,7 @@
     },
     "cron_scheduler": {
       "durum": "tamam",
-      "detay": "cron_manager.py \u2014 zamanlanmis gorev calistirma"
+      "detay": "bagimsiz — reymen/cron/ (jobs.py, scheduler.py, cronjob_tool.py)"
     },
     "mcp_client": {
       "durum": "kismen",
