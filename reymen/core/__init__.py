@@ -52,3 +52,16 @@ from .gateway_manager import (
     GatewayYoneticisi,
     get_gateway_yoneticisi,
 )
+
+# Observability / Tracing (P1)
+from .observability import (
+    setup_observability,
+    trace_llm_call,
+    trace_tool_call,
+    trace_skill_load,
+    trace_session_start,
+    span_olustur,
+    get_tracer,
+    observability_aktif_mi,
+    observability_durum,
+)

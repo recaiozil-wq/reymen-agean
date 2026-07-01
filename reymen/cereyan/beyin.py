@@ -27,6 +27,18 @@ from typing import Any, Callable, Generator, List, Optional, Tuple
 
 import requests
 
+# ── Observability / Tracing (opsiyonel) ─────────────────────────────────────
+try:
+    from reymen.core.observability import trace_llm_call
+    _TRACE_LLM_AKTIF = True
+except ImportError:
+    # Observability modülü yoksa no-op dekoratör
+    def trace_llm_call(span_adi=None, attributes=None):
+        def decorator(func):
+            return func
+        return decorator
+    _TRACE_LLM_AKTIF = False
+
 # ── Modül düzeyinde logger ───────────────────────────────────────────────────
 logger = logging.getLogger(__name__)
 
@@ -424,6 +436,7 @@ class Beyin:
     # Genel yüksek-seviye arayüz
     # ────────────────────────────────────────────────────────────────────────
 
+    @trace_llm_call()
     def dusun(
         self,
         sistem_prompt: str,
@@ -657,6 +670,7 @@ class Beyin:
         _key = f"{self.base_url}:{self.model}"
         return _key not in self._fc_desteklenmeyen
 
+    @trace_llm_call()
     def uret_v2(
         self,
         sistem_prompt: str,
@@ -899,6 +913,7 @@ class Beyin:
     # Genel provider çağrı metodu (harici kullanım)
     # ────────────────────────────────────────────────────────────────────────
 
+    @trace_llm_call()
     def provider_cagir(
         self,
         provider: str,

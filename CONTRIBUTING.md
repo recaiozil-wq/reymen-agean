@@ -1,70 +1,84 @@
-# Katkıda Bulunma Rehberi
+# Contributing to ReYMeN Agent
 
-ReYMeN projesine katkıda bulunmayı düşündüğünüz için teşekkürler!
+First off, thank you for considering contributing! ReYMeN is a solo project that's growing, and every contribution helps.
 
-## 🐛 Hata Bildirme
+## Code of Conduct
 
-Hata bildirimleri için [GitHub Issues](https://github.com/recaiozil-wq/reymen-agean/issues/new/choose) sayfasını kullanın.
+- Be respectful and constructive
+- No harassment, trolling, or personal attacks
+- Focus on what's best for the project
 
-Bildiriminizde şu bilgileri ekleyin:
-- Python sürümü (`python --version`)
-- İşletim sistemi
-- Hatanın tam metni
-- Nasıl tekrarlanacağı
+## How to Contribute
 
-## 💡 Özellik Talebi
+### 1. Reporting Bugs
 
-Yeni bir özellik önermek için [GitHub Issues](https://github.com/recaiozil-wq/reymen-agean/issues/new/choose) sayfasını kullanın. Talebinizin:
-- Ne yapmak istediğinizi
-- Neden gerekli olduğunu
-- Nasıl çalışması gerektiğini
+Open an issue with:
+- **Description** — what happened vs what should happen
+- **Steps to reproduce** — be specific
+- **Environment** — OS, Python version, provider
+- **Logs** — relevant log output
 
-açıklayın.
+### 2. Suggesting Features
 
-## 🔧 Geliştirme Ortamı
+Open an issue with:
+- **Problem** — what's missing or painful
+- **Solution** — how you'd like it to work
+- **Alternative** — other approaches considered
+
+### 3. Pull Requests
+
+1. Fork the repo
+2. Create a branch: `git checkout -b feature/my-feature`
+3. Make your changes
+4. Run tests: `python -m pytest reymen/tests/`
+5. Commit: `git commit -m "feat: add my feature"`
+6. Push: `git push origin feature/my-feature`
+7. Open a PR against `main`
+
+### Development Setup
 
 ```bash
-# Depoyu klonla
 git clone https://github.com/recaiozil-wq/reymen-agean.git
 cd reymen-agean
-
-# Sanal ortam oluştur
-python -m venv venv
-source venv/bin/activate  # Linux
-venv\Scripts\activate     # Windows
-
-# Geliştirme bağımlılıkları
-pip install -e ".[dev]"
+uv venv
+uv pip install -e ".[dev]"
 ```
 
-## 📝 Kod Stili
+### Code Standards
 
-- **Dil:** Türkçe (yorumlar ve değişken isimleri)
-- **Formatter:** `ruff format`
-- **Linter:** `ruff check`
-- **Test:** `pytest`
+- **Python 3.11+** — f-strings, type hints, dataclasses
+- **Turkish + English** — variable names in English, comments/docstrings in Turkish
+- **Error handling** — always try/except with graceful degradation
+- **No external dependencies** unless absolutely necessary — prefer stdlib
+- **Module flag pattern** — use `_MODUL_AKTIF = True/False` for optional features
+- **Lint** — `ruff check .` before committing
 
-Commit mesajları:
+### Commit Convention
+
 ```
-kategori: kısa açıklama
-
-- Detay 1
-- Detay 2
-```
-
-Kategoriler: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`
-
-## 🧪 Test
-
-```bash
-pytest reymen/test/
+feat: new feature
+fix: bug fix
+refactor: code change without feature/fix
+docs: documentation only
+chore: maintenance, deps, cleanup
 ```
 
-## 🔄 Pull Request Süreci
+## Project Structure
 
-1. Branch oluşturun: `git checkout -b feat/ozellik-adi`
-2. Değişiklikleri yapın
-3. Testleri çalıştırın: `pytest`
-4. Commit: `git commit -m "feat: kisaca aciklama"`
-5. Push: `git push origin feat/ozellik-adi`
-6. GitHub'da PR açın
+```
+reymen/
+├── ag/            # Gateways (platform connections)
+├── arac/          # Tools (registered capabilities)
+├── cereyan/       # Core (motor, conversation loop)
+├── core/          # Subsystems
+├── guvenlik/      # Security
+├── hafiza/        # Memory systems
+├── plugin/        # Plugin framework
+├── plugins/       # User plugins
+├── scripts/       # Automation scripts
+└── sistem/        # System utilities
+```
+
+## Questions?
+
+Open a discussion or reach out to @Pasa_38_bot on Telegram.

@@ -254,6 +254,17 @@ try:
 except ImportError:
     _LITELLM_MEVCUT = False
 
+# Observability / Tracing (opsiyonel)
+try:
+    from reymen.core.observability import trace_tool_call
+    _TRACE_TOOL_AKTIF = True
+except ImportError:
+    def trace_tool_call(span_adi=None, attributes=None):
+        def decorator(func):
+            return func
+        return decorator
+    _TRACE_TOOL_AKTIF = False
+
 class Motor:
     def __init__(self, backend_mode: str = "local", hafiza_collection: Any = None, config: Optional[dict] = None) -> None:
         self.terminal = TerminalBackendDispatcher(mode=backend_mode) if TerminalBackendDispatcher else None
@@ -1352,6 +1363,7 @@ class Motor:
         "CUA_EKRAN_KULLAN",
     })
 
+    @trace_tool_call()
     def calistir(self, arac: str, ham_param: str) -> str:
         params = self._parametreleri_coz(ham_param)
 

@@ -28,6 +28,7 @@ __all__ = [
     "SendResult",
     "QQAdapter",
     "YuanbaoAdapter",
+    "WhatsAppAdapter",
 ]
 
 
@@ -38,6 +39,9 @@ def __getattr__(name):
     if name == "YuanbaoAdapter":
         from .yuanbao import YuanbaoAdapter  # noqa: F401
         return YuanbaoAdapter
+    if name == "WhatsAppAdapter":
+        from .whatsapp import WhatsAppAdapter  # noqa: F401
+        return WhatsAppAdapter
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 

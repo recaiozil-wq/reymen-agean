@@ -22,6 +22,11 @@ python-telegram-bot>=20.0
 fastapi>=0.110.0
 uvicorn[standard]>=0.29.0
 
+# Observability / Tracing
+opentelemetry-api>=1.25.0
+opentelemetry-sdk>=1.25.0
+opentelemetry-exporter-otlp>=1.25.0
+
 # Full (project.optional-dependencies.full)
 anthropic>=0.30.0
 chromadb>=1.5.0

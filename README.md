@@ -1,119 +1,91 @@
 # ReYMeN Agent
 
-Bağımsız, çok botlu, yapay zeka ajan platformu.  
-Hermes Agent'ten bağımsız — kendi Telegram bot altyapısı ile çalışır.
+> Autonomous AI agent with built-in learning loop, multi-platform messaging, plugin system, and reasoning core.
 
----
+ReYMeN is a self-contained, open-source AI agent framework. It runs on its own infrastructure — no external agent libraries required. Built around a **closed learning loop**: it creates skills from experience, persists memory across sessions, and autonomously maintains its own health via proactive maintenance scripts.
 
-## 📋 Gereksinimler
+## Features
 
-| Gereksinim | Minimum |
-|------------|---------|
-| Python | 3.12+ |
-| RAM | 4 GB (önerilen: 8 GB) |
-| Disk | 500 MB boş alan |
-| İşletim Sistemi | Windows 10/11, Linux, macOS |
+### Core
+- 🧠 **Beyin** — LLM provider abstraction with fallback chain (DeepSeek, xAI, OpenAI, Anthropic, Groq, local)
+- 🔁 **Conversation Loop** — ReAct-style: plan → tool call → evaluate → repeat
+- 🧩 **Plugin System** — 7 lifecycle hooks: `on_load`, `on_message`, `pre_llm_call`, `post_llm_call`, `on_session_start/end`, `on_unload`
+- 🧪 **Reasoning Core** — Ornith-1.0 integrated for autonomous error analysis + solution logging
+- 💾 **Persistent Memory** — OnceHafiza (MEMORY.md + USER.md), FTS5 session search, shared_memories symlink
+- 🛠️ **Skills** — Autonomous skill creation after complex tasks, SKILL.md format
 
-## 🚀 Hızlı Başlangıç
+### Multi-Agent
+- 👥 **3 Bot Single Center** — pasa_38, ReYMeN, kiral38 sharing one config + memory + session via `durum.json` (single source of truth)
+- 🔀 **Multi-Profile** — Isolated profiles (default, reymen, kiral38) with shared session history
+- 🔄 **Ortak Komut** — Unified 26-command system across all bots
+
+### Gateway & Platforms
+- 💬 **Telegram** — Full gateway with /commands, session management, SOUL.md personality
+- 💬 **Discord** — py-cord based gateway, same architecture as Telegram
+- 💬 **WhatsApp** — REST API gateway
+- 🌐 **API Server** — OpenAI-compatible `/v1/chat/completions` endpoint
+- 🔊 **Voice Mode** — Real-time voice conversations
+
+### Tools & Extensions
+- 🌍 **Web Search** — Firecrawl + DuckDuckGo + Bing fallback
+- 🖼️ **Image Generation** — FAL.ai (FLUX 2 Klein 9B)
+- 🎤 **TTS/STT** — Edge TTS + faster-whisper
+- 🌐 **Browser Automation** — Playwright MCP
+- 🔗 **MCP Support** — Both client (native MCP) and server (expose sessions via MCP)
+- 📎 **@file/@url References** — Inline file/URL reading in conversations
+- 🐳 **Container Sandbox** — Docker isolation (kapali/kismi/tam modes)
+- 🔑 **Credential Pool** — Automatic API key rotation
+
+### Automation & Maintenance
+- ⏰ **Cron Scheduler** — Built-in cron with no_agent watchdog mode
+- 🩺 **Proactive Bakim** — 8-point health check every 30min (config drift, gateway watchdog, SOUL sync, state.db prune, memory sync, weekly report, config validation, gateway health)
+- 🛡️ **Startup VBS** — Reboot-proof auto-start for all bots
+
+## Quick Start
 
 ```bash
-# 1. Depoyu klonla
+# Install
 git clone https://github.com/recaiozil-wq/reymen-agean.git
 cd reymen-agean
+uv venv
+uv pip install -e ".[all]"
 
-# 2. Bağımlılıkları yükle
-pip install -r requirements.txt
-
-# 3. Ortam değişkenlerini ayarla
+# Configure
 cp .env.example .env
-# .env dosyasını düzenle:
-#   - TELEGRAM_BOT_TOKEN_PASA_38=<token>
-#   - DEEPSEEK_API_KEY=<key>
-#   (diğer botlar ve API'ler opsiyonel)
+# Edit .env with your API keys
 
-# 4. Bot'u başlat (Hermes Gateway'siz)
-python reymen_bot.py --bot pasa_38
+# Run
+python reymen_launcher.py
+
+# One-shot
+python reymen_launcher.py -z "your question"
+
+# Start gateway (Telegram)
+hermes gateway --profile reymen
 ```
 
-## 🤖 Bot Yönetimi
-
-```bash
-# Botları listele
-python reymen_gateway.py --list
-
-# Tek bot başlat
-python reymen_bot.py --bot pasa_38
-python reymen_bot.py --bot kiral38
-python reymen_bot.py --bot reymen
-
-# Gateway ile tüm botları yönet
-python reymen_gateway.py --all
-```
-
-## ⏰ Cron Job Yönetimi
-
-Cron job'ları ReYMeN motoru üzerinden oluşturup yönetebilirsiniz:
-
-```python
-from reymen.cron.cronjob_tool import cronjob
-
-# Job oluştur
-cronjob(action='create', name='gunluk_ozet', schedule='0 9 * * *',
-        prompt='Günlük özet hazırla')
-
-# Job listele
-cronjob(action='list')
-
-# Job durdur
-cronjob(action='pause', job_id='abc123')
-```
-
-## 🧩 Özellikler
-
-| Özellik | Açıklama | Durum |
-|---------|----------|:-----:|
-| 🤖 **3 Telegram Bot** | Pasa_38, Kiral38, ReYMeN_ReYMeNbot | ✅ |
-| 🧠 **Gelişmiş Hafıza** | OnceHafiza, vektör bellek, FTS5 session arama | ✅ |
-| 🔧 **Tool Desteği** | Web arama, terminal, dosya, browser | ✅ |
-| 🗄️ **Merkezi Veritabanı** | Tüm DB'ler `reymen/merkez_db/` altında | ✅ |
-| ⏰ **Cron Job'lar** | Zamanlanmış görev yönetimi | ✅ |
-| 🌐 **Bağımsız Gateway** | Hermes'siz Telegram bot altyapısı | ✅ |
-| 🪄 **Hermes Stub'lar** | Hermes fonksiyonlarının ReYMeN uyarlaması | ✅ |
-| 🖥️ **Web UI** | Tarayıcıdan yönetim arayüzü | ❌ (planlandı) |
-| 🧩 **Plugin Sistemi** | Harici eklenti desteği | ❌ (planlandı) |
-| 🖼️ **Görsel Üretim** | FAL.ai ile görsel oluşturma | ❌ (planlandı) |
-| 🎤 **Ses İşleme** | TTS/STT sesli konuşma | ❌ (planlandı) |
-
-## 📁 Dizin Yapısı
+## Architecture
 
 ```
-ReYMeN-Ajan/
-├── reymen/
-│   ├── ag/            → Telegram bot, bot süpervizörü
-│   ├── arac/          → Araç motoru ve tool'lar
-│   ├── cereyan/       → Beyin, motor, konuşma döngüsü
-│   ├── cron/          → ⏰ Bağımsız cron sistemi
-│   ├── gateway/       → 🌐 Telegram platform adaptörü
-│   ├── hafiza/        → Hafıza sistemleri
-│   ├── sistem/        → CLI, tool registry, config
-│   ├── core/          → Session search, vektör bellek
-│   ├── guvenlik/      → Güvenlik kontrolleri
-│   └── merkez_db/     → Tüm veritabanları (21 DB)
-├── durum.json         → Bot durumu ve yapılandırma
-├── reymen_bot.py      → Bağımsız bot başlatıcı
-├── reymen_gateway.py  → 🌐 Gateway başlatıcı
-├── requirements.txt   → Python bağımlılıkları
-├── .env.example       → Örnek ortam değişkenleri
-├── pyproject.toml     → Proje yapılandırması
-└── LICENSE            → MIT Lisansı
+reymen/
+├── ag/            # Gateways (Telegram, Discord, MCP Server)
+├── arac/          # Tools (tool registry, executor)
+├── cereyan/       # Core loop (motor, conversation_loop, broker)
+├── core/          # Subsystems (orchestrator, cron, credential pool)
+├── guvenlik/      # Security (file safety, container sandbox)
+├── hafiza/        # Memory (session DB, OnceHafiza, vector)
+├── plugin/        # Plugin system (PluginBase, PluginManager)
+├── plugins/       # Installed plugins
+├── scripts/       # Proactive bakim, watchdog
+└── sistem/        # System (db_config, credential_persistence)
 ```
 
-## 🔗 Bağlantılar
+## Project Stats
 
-- [GitHub](https://github.com/recaiozil-wq/reymen-agean)
-- [Hata Bildir](https://github.com/recaiozil-wq/reymen-agean/issues/new/choose)
+- **694 Python files**, 231K lines of code
+- **154 commits**, single developer
+- **MIT License**
 
-## 📜 Lisans
+## License
 
-MIT License.  
-Hermes Agent (Nous Research) kaynak kodundan uyarlanan dosyalar (`model_tools.py`, `motor.py`, `cron/`, `gateway/`) Apache 2.0 lisansıyla uyumludur.
+MIT License — see [LICENSE](LICENSE) for details.
