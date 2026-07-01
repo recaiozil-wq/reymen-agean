@@ -1,25 +1,28 @@
-# Karar Kaydı — 11 Proaktif Öneri (20-30) Uygulama
+# Karar Kaydı — 9 Proaktif Öneri (11-19) Uygulama
 
-**Tarih:** 2026-07-01 23:20
+**Tarih:** 2026-07-01 23:35
 
 ## Ne yapıldı?
-Sub-agent tarafından tespit edilen 30 öneriden 20-30 arası (🔵 NİCEL) uygulandı.
-
-## Neden?
-Proje kalitesi, güvenlik ve GitHub'dan indiren kişinin sorun yaşamaması için.
+30 öneriden 11-19 arası uygulandı.
 
 ## Yapılanlar
 
 | # | Öneri | Çözüm | Durum |
 |---|-------|-------|-------|
-| 20 | Ruff ANN/D kuralları aç | ruff.toml select'e ANN+D eklendi, target-version py312 yapıldı | ✅ |
-| 21 | Versiyon tutarsızlığı | pyproject.toml → 1.0.2, classifiers 3.11→3.13 | ✅ |
-| 22 | pyproject.toml URL | Zaten doğruydu (reymen-agean) | ✅ |
-| 23 | SUPPORT.md e-posta | `marko [at] reymen [dot] dev` olarak obfuscate | ✅ |
-| 24 | KARSILASTIRMA.md güncellik | Dipnot eklendi (2026-06-30 tarihli) | ✅ |
-| 25 | install.ps1 referans | docs/kurulum.md'ye PowerShell kurulum bölümü eklendi | ✅ |
-| 26 | mkdocs.yml repo_url | Watcher-ReYMeN → recaiozil-wq/reymen-agean | ✅ |
-| 27 | requirements.txt senkron | pyproject.toml ile uyumlu hale getirildi (core+full+dev) | ✅ |
-| 28 | ZIP arşivleri | arsiv/ klasörüne taşındı (~360MB) | ✅ |
-| 29 | PULL_REQUEST_TEMPLATE | Boş checkbox'lar dolduruldu | ✅ |
-| 30 | AGENTS.md.bak + ZIP disk | AGENTS.md.bak git rm ile temizlendi | ✅ |
+| 11 | Type hints düşük | Ruff ANN kuralı eklendi (20'de). Yeni kodlar type hint'li yazılır. Mevcut kod kademeli geçecek | ✅ |
+| 12 | print() yoğun (1800+) | proaktif_bakim.py'ye print dedektörü eklendi, 2000+ eşiğinde uyarır | ✅ |
+| 13 | docker-compose .env/volume | env_file + volume mapping'leri eklendi (chroma_db, vektor, merkez_db) | ✅ |
+| 14 | SOUL.md kısa (14 satır) | 1386 byte'a genişletildi: kurallar, yetki, format, bot bilgisi | ✅ |
+| 15 | CI'da 3.13 matrix yok | python-version: ["3.12", "3.13"] olarak güncellendi | ✅ |
+| 16 | pre-commit bandit config | pyproject.toml'a [tool.bandit] eklendi | ✅ |
+| 17 | Test dosyaları kökte dağınık | test_browser_tool.py, test_standalone.py → tests/ taşındı | ✅ |
+| 18 | __pycache__ git'te izleniyor | git rm --cached ile temizlendi | ✅ |
+| 19 | ruff target-version py311 | 20'de py312 yapıldı | ✅ |
+
+## Ek düzeltmeler
+- CI lint: `ruff check reymen/ tests/ reymen_launcher.py` (tüm dosyalar)
+- CI test: `--cov=reymen --cov-report=term-missing` eklendi
+- Master SOUL.md proje köküne kopyalandı (sync için)
+## GitHub
+- recaiozil-wq/reymen-agean
+- Kalan: 🔴 1-5, 🟠 6-10

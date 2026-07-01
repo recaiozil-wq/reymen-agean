@@ -20,7 +20,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install ruff bandit
       - name: Ruff check
-        run: ruff check reymen/ --exit-zero
+        run: ruff check reymen/ tests/ reymen_launcher.py --exit-zero
       - name: Bandit security
         run: bandit -r reymen/ -ll --skip B101,B603,B602
         continue-on-error: true
@@ -33,7 +33,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
-        python-version: ["3.11", "3.12"]
+        python-version: ["3.12", "3.13"]
     steps:
       - uses: actions/checkout@v4
 
@@ -56,7 +56,7 @@ jobs:
             --tb=short `
             -q `
             --timeout=120 `
-            -x
+            --cov=reymen --cov-report=term-missing
         shell: bash
         continue-on-error: true
 

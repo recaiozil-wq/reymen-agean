@@ -2,14 +2,22 @@ services:
   reymen:
     build: .
     container_name: reymen
+    env_file: .env
     volumes:
       - .ReYMeN:/app/.ReYMeN
       - logs:/app/logs
+      - chroma_db:/app/chroma_db
+      - vektor_hafizasi:/app/reymen/hafiza/vektor
+      - merkez_db:/app/reymen/merkez_db
     environment:
       - REYMEN_MODEL=${REYMEN_MODEL:-auto}
       - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
     command: ["--gorev", ".ReYMeN/gorev_cozucu_sistemi.md"]
 
 volumes:
   logs:
+  chroma_db:
+  vektor_hafizasi:
+  merkez_db:

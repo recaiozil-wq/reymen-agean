@@ -116,3 +116,7 @@ py-modules = ["reymen_launcher"]
 
 [tool.setuptools.package-data]
 reymen = ["**/*.yaml", "**/*.json", "**/*.md", "**/*.txt"]
+
+[tool.bandit]
+exclude_dirs = ["tests", "venv", ".venv", "arsiv"]
+skips = ["B101", "B603", "B602"]
