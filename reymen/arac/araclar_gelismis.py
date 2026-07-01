@@ -62,34 +62,77 @@ class BrowserTool:
             self._playwright_var = False
         return self._playwright_var
 
+    @staticmethod
+    def _chrome_path():
+        """Windows'ta Playwright headless shell yolunu bul."""
+        import os
+        base = os.path.expanduser("~/AppData/Local/ms-playwright")
+        if not os.path.isdir(base):
+            return ""
+        dirs = sorted(
+            [d for d in os.listdir(base) if "headless_shell" in d],
+            reverse=True
+        )
+        if not dirs:
+            return ""
+        shell_dir = os.path.join(base, dirs[0])
+        # Olası konumlar
+        for cand in (
+            os.path.join(shell_dir, "chrome-headless-shell-win64", "chrome-headless-shell.exe"),
+            os.path.join(shell_dir, dirs[0].replace("_", "-"), "chrome-headless-shell.exe"),
+            os.path.join(shell_dir, "chrome-headless-shell.exe"),
+        ):
+            if os.path.isfile(cand):
+                return cand
+        return ""
+
     def _sayfa_al(self):
-        """Mevcut sayfayı döndür, kapalıysa yenisini aç."""
+        """Mevcut sayfayı döndür, kapalıysa yenisini aç.
+
+        Birlesik versiyon — 3 katmanli fallback:
+        1. Mevcut page saglikliysa -> aynisini don
+        2. Context varsa -> yeni tab
+        3. Hic yoksa -> yeni browser baslat
+        """
+        # 1. Mevcut sayfa saglik kontrolu
         if self._page:
             try:
-                self._page.evaluate("1")  # canlılık testi
+                self._page.evaluate("1")
                 return self._page
             except Exception:
                 self._page = None
-        # Yeni tarayıcı başlat
-        from playwright.sync_api import sync_playwright
-        self._pw = sync_playwright().start()
-        self._browser = self._pw.chromium.launch(headless=self._headless, args=["--no-sandbox"])
-        self._context = self._browser.new_context(
-            user_agent="Mozilla/5.0 ReYMeNAgent/1.0"
-        )
-        self._page = self._context.new_page()
-        # Kapanma olayını dinle
-        def _sayfa_kapandi(sayfa):
-            import logging
-            logging.getLogger("BrowserTool").warning(
-                "[Browser] Sayfa kapatildi: %s", sayfa.url
+
+        # 2. Context canliysa yeni TAB
+        if self._context:
+            self._page = self._context.new_page()
+            self._page.on("close", self._sayfa_kapandi)
+            return self._page
+
+        # 3. Hic yoksa — SADECE burada browser baslat
+        if not self._pw:
+            from playwright.sync_api import sync_playwright
+            self._pw = sync_playwright().start()
+            chrome_path = self._chrome_path()
+            launch_args = {"headless": self._headless, "args": ["--no-sandbox"]}
+            if chrome_path:
+                launch_args["executable_path"] = chrome_path
+            self._browser = self._pw.chromium.launch(**launch_args)
+            self._context = self._browser.new_context(
+                user_agent="Mozilla/5.0 ReYMeNAgent/1.0"
             )
-            if self._page is sayfa:
-                self._page = None
-        self._page.on("close", _sayfa_kapandi)
-        self._tabs = [self._page]
-        self._tab_index = 0
+
+        self._page = self._context.new_page()
+        self._page.on("close", self._sayfa_kapandi)
         return self._page
+
+    def _sayfa_kapandi(self, sayfa):
+        """Sayfa kapandiginda referansi temizle."""
+        import logging
+        logging.getLogger("BrowserTool").warning(
+            "[Browser] Sayfa kapatildi: %s", sayfa.url
+        )
+        if self._page is sayfa:
+            self._page = None
 
     # ── Yardımcı: güvenli hata yönetimi ─────────────────────────────
     _MAX_RETRY = 3
