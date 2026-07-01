@@ -1,80 +1,70 @@
-# Katkı Rehberi / Contributing Guide
+# Katkıda Bulunma Rehberi
 
-ReYMeN'e katkıda bulunduğun için teşekkürler! 🎉
+ReYMeN projesine katkıda bulunmayı düşündüğünüz için teşekkürler!
 
-## 🚀 Hızlı Başlangıç
+## 🐛 Hata Bildirme
+
+Hata bildirimleri için [GitHub Issues](https://github.com/recaiozil-wq/reymen-agean/issues/new/choose) sayfasını kullanın.
+
+Bildiriminizde şu bilgileri ekleyin:
+- Python sürümü (`python --version`)
+- İşletim sistemi
+- Hatanın tam metni
+- Nasıl tekrarlanacağı
+
+## 💡 Özellik Talebi
+
+Yeni bir özellik önermek için [GitHub Issues](https://github.com/recaiozil-wq/reymen-agean/issues/new/choose) sayfasını kullanın. Talebinizin:
+- Ne yapmak istediğinizi
+- Neden gerekli olduğunu
+- Nasıl çalışması gerektiğini
+
+açıklayın.
+
+## 🔧 Geliştirme Ortamı
 
 ```bash
-# 1. Fork'la ve clone'la
-git clone https://github.com/KULLANICI_ADIN/ReYMeN-Ajan.git
-cd ReYMeN-Ajan
+# Depoyu klonla
+git clone https://github.com/recaiozil-wq/reymen-agean.git
+cd reymen-agean
 
-# 2. Sanal ortam oluştur
+# Sanal ortam oluştur
 python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# venv\Scripts\activate   # Windows
+source venv/bin/activate  # Linux
+venv\Scripts\activate     # Windows
 
-# 3. Geliştirme bağımlılıklarını yükle
-pip install -e ".[dev,full]"
-
-# 4. Pre-commit hook'larını kur
-pre-commit install
-bash scripts/install-hooks.sh
-
-# 5. Test et
-pytest tests/ -v
+# Geliştirme bağımlılıkları
+pip install -e ".[dev]"
 ```
 
-## 📝 Katkı Süreci
+## 📝 Kod Stili
 
-1. **Issue aç** — Ne yapmak istediğini önce tartışalım
-2. **Branch aç** — `feature/` veya `fix/` önekiyle
-3. **Kodla** — Mevcut stile uygun yaz
-4. **Test ekle** — Yeni kod %70+ coverage
-5. **Lint kontrolü** — `ruff check .`
-6. **PR aç** — Template'i doldur
+- **Dil:** Türkçe (yorumlar ve değişken isimleri)
+- **Formatter:** `ruff format`
+- **Linter:** `ruff check`
+- **Test:** `pytest`
 
-## ✅ Kod Standartları
+Commit mesajları:
+```
+kategori: kısa açıklama
 
-| Kural | Açıklama |
-|:------|:---------|
-| Türkçe docstring | Tüm fonksiyonlar Türkçe açıklama |
-| Ruff uyumu | `ruff check . --fix` ile düzelt |
-| Except pass yok | `except: pass` kullanma, en az `logging.warning` |
-| Tip ipuçları | Mümkünse type hint ekle |
-| Testler | `tests/` dizininde, ilgili modülün testi |
+- Detay 1
+- Detay 2
+```
+
+Kategoriler: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`
 
 ## 🧪 Test
 
 ```bash
-# Tüm testler
-pytest tests/ -v
-
-# Coverage ile
-pytest --cov=reymen tests/
-
-# Belirli modül
-pytest tests/test_beyin.py -v
-
-# Hızlı (timeout hassas testler atlanır)
-pytest tests/ -v --ignore=tests/hermes_legacy
+pytest reymen/test/
 ```
 
-## 🐛 Hata Bildirimi
+## 🔄 Pull Request Süreci
 
-Issue template'ini kullan:
-- Hangi ortam (OS, Python versiyonu)
-- Hata mesajı/log
-- Tekrarlama adımları
-- Beklenen davranış
-
-## 💬 İletişim
-
-- Telegram: @Pasa_38
-- GitHub Issues: Tercih edilen yöntem
-
-## 📌 Çoklu Kopya Uyarısı
-
-Bu repo birden fazla local kopyada çalışılıyor (ör. repo-kontrol + ReYMeN-Ajan).
-Klonladıktan sonra `bash scripts/install-hooks.sh` çalıştırıp commit-öncesi pull uyarısını aktif edin.
-Her commit öncesi `git fetch && git status` ile remote'un gerisinde olmadığınızı manuel de kontrol edebilirsiniz.
+1. Branch oluşturun: `git checkout -b feat/ozellik-adi`
+2. Değişiklikleri yapın
+3. Testleri çalıştırın: `pytest`
+4. Commit: `git commit -m "feat: kisaca aciklama"`
+5. Push: `git push origin feat/ozellik-adi`
+6. GitHub'da PR açın

@@ -1,25 +1,54 @@
-# Changelog
+# Değişiklik Günlüğü
 
-## [2.1.0] - 2026-06-28
-### Added
-- Öğrenme döngüsü (reymen/core/ogrenme.py) — SQLite hafıza, TTL, soyut imza
-- Model Adapter (reymen/core/model_adapter.py) — 7 provider, auto-detect
-- Orchestrator (reymen/core/orchestrator.py) — solve_step, coz_hata
-- MCP Server Host (reymen/core/mcp_server.py)
-- Session Search FTS5 (reymen/core/session_search.py)
-- Dockerfile + docker-compose.yml
-- Skill import script (reymen/scripts/skill_import.py)
-- .github/workflows/ci.yml
-- .pre-commit-config.yaml (ruff + bandit + pytest)
-- Adım script'leri (step_01_merhaba.py, step_02_hata.py)
-- Test coverage: tests/test_core/ (ogrenme, model_adapter, mcp_server, session_search)
+## [1.0.2] — 2026-07-01
 
-### Fixed
-- shell=True 37→0 nokta temizlendi
-- cli_mixin_commands.py'de args_list tanımsız bug'ı düzeltildi (shlex.split eklendi)
-- 12 sessiz except düzeltildi
-- Cron dağınıklığı tek noktada toplandı
-- 13 yeni __init__.py
+### ✨ Yeni Özellikler
+- 📦 **Bağımsız Cron Sistemi** — `reymen/cron/` Hermes'ten bağımsız
+  - jobs.py — Cron job depolama ve yönetim
+  - scheduler.py — Zamanlanmış görev çalıştırıcı
+  - cronjob_tool.py — Agent arayüzü (motor üzerinden cron yönetimi)
+- 🌐 **Bağımsız Gateway** — `reymen/gateway/` Telegram platform adaptörü
+  - Telegram bot altyapısı Hermes'siz çalışır
+  - Python-telegram-bot desteği
+  - Session yönetimi, mesaj iletimi
+- 🧩 **Hermes Stub'lar** — `hermes_stubs.py` Hermes fonksiyonlarının ReYMeN uyarlaması
+  - 40+ Hermes fonksiyonu taklit edildi
+  - Gateway + cron + temel sistem için yeterli
 
-## [2.0.0] - 2026-06-27
-- İlk sürüm
+### 🔧 İyileştirmeler
+- `model_tools.py` + `motor.py` → Hermes import'ları try/except ile korundu
+- `pyproject.toml` → cron ve gateway paketleri eklendi
+- `.gitignore` → cron_data eklendi
+- `README.md` → Kapsamlı kurulum ve kullanım rehberi
+- `requirements.txt` → Tüm bağımlılıklar listelendi
+
+### 🐛 Düzeltmeler
+- cron `jobs.py` → Veri dizini Python paketi ile çakışmıyor (cron_data)
+- cron `cronjob_tool.py` → Hermes import'ları düzgün yönlendirildi
+
+## [1.0.1] — 2026-06-30
+
+### ✨ Yeni Özellikler
+- 🔌 **Hermes Bağımsızlığı** — 0 Hermes import bağımlılığı
+- 🗄️ **Merkezi Veritabanı** — 21 DB tek merkezde (`reymen/merkez_db/`)
+  - Session DB birleştirme (14,146 kayıt)
+  - WAL mode + busy_timeout
+  - Haftalık WAL checkpoint cron
+
+### 🔧 İyileştirmeler
+- `hermes_uyum.py` — Hermes CLI bağımsızlık katmanı
+- `.env.example` — Tüm bot token'ları ve API anahtarları
+- MIT lisans dosyası
+- GitHub Actions CI (Python 3.12)
+- Git LFS ile binary dosya yönetimi
+
+## [1.0.0] — 2026-06-20
+
+### ✨ İlk Sürüm
+- 🤖 3 Telegram Bot (Pasa_38, Kiral38, ReYMeN_ReYMeNbot)
+- 🧠 OnceHafiza + vektör bellek + FTS5 session arama
+- 🔧 675+ araç desteği (web, terminal, dosya, browser)
+- 📅 Cron job yönetimi
+- 🖥️ CLI arayüzü
+- 🔒 Güvenlik katmanı
+- 📚 Türkçe dokümantasyon
