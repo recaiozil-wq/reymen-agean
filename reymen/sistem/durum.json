@@ -110,8 +110,8 @@
       "detay": "Hermes'te Firecrawl var, ReYMeN DDGS kullaniyor"
     },
     "image_gen": {
-      "durum": "yok",
-      "detay": "Hermes'te FAL.ai FLUX var, ReYMeN'de yok"
+      "durum": "var",
+      "detay": "ReYMeN kendi image_gen_engine.py (FAL/OpenAI/xAI/Stub) — bagimsiz"
     },
     "tts_stt": {
       "durum": "yok",

@@ -52,6 +52,7 @@ _TOOLS_MODULES = {
     "tools.xai_http",
     "tools.vision_tools",
     "tools.voice_mode",
+    "tools.image_generation_tool",
 }
 
 
