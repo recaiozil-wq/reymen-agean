@@ -48,7 +48,8 @@ cua_log.txt
 restart_gateways.vbs
 cli-config.yaml
 apps/
-plugins/
+plugins/*
+!plugins/web/
 optional-mcps/
 site/assets/images/
 nul
