@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 telegram_bot.py — ReYMeN Birlesik Telegram Botu.
+
+Bu dosya Hermes Agent Gateway yapisindan esinlenilmistir.
+Apache 2.0 Lisansi — github.com/NousResearch/hermes-agent
 ================================================
 
 3 farkli bot dosyasinin TEK dosyada birlestirilmis hali:

@@ -4,7 +4,8 @@ hermes_uyum.py — Hermes CLI uyumluluk katmani.
 
 ReYMeN, Hermes CLI olmadan da calisabilir. Bu modul,
 hermes_cli'den gelen fonksiyonlari ReYMeN'in kendi
-modullerine yonlendirir.
+modullerine yonlendirir. Hermes Agent referans alinmistir.
+Apache 2.0 Lisansi — github.com/NousResearch/hermes-agent
 """
 import logging
 logger = logging.getLogger(__name__)

@@ -2498,7 +2498,7 @@ async def api_kalite_ogrenme():
         tipler = {}
     try:
         import sqlite3
-        db2 = os.path.join(ROOT, "cereyan/.ReYMeN/skills_index.db")
+        db2 = os.path.join(ROOT, "merkez_db/skills_index.db")  # cereyan/.ReYMeN yerine merkez_db
         if os.path.exists(db2):
             con = sqlite3.connect(db2)
             skill_sayisi = con.execute("SELECT COUNT(*) FROM beceriler_meta").fetchone()[0]

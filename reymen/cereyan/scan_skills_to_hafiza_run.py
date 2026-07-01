@@ -29,8 +29,8 @@ logger = logging.getLogger("scan_skills")
 # ── Yollar ──────────────────────────────────────────────────────────────────
 ROOT = Path(__file__).parent.parent.resolve()  # reymen/
 SKILLS_DIR = ROOT / "cereyan" / "skills"       # taranacak klasör
-SKILLS_DB = ROOT / "cereyan" / ".ReYMeN" / "skills_index.db"
-OGRENME_DB = ROOT / "cereyan" / ".ReYMeN" / "ogrenmeler.db"
+SKILLS_DB = ROOT / "merkez_db" / "skills_index.db"
+OGRENME_DB = ROOT / "merkez_db" / "ogrenmeler.db"
 
 
 def dosya_hash(dosya_yolu: str) -> str:

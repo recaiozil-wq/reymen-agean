@@ -5,7 +5,7 @@ Her senaryo: tespit → düzeltme → doğrulama → kaydetme
 from once_hafiza import kaydet, ara, isle
 import sqlite3, json, time
 
-db = 'reymen/cereyan/.ReYMeN/ogrenmeler.db'
+db = 'reymen/merkez_db/ogrenmeler.db'
 
 def log(msg):
     print(f"  {msg}")

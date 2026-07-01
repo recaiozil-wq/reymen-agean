@@ -29,11 +29,11 @@ ROOT = Path(__file__).parent.parent.resolve()
 logger = logging.getLogger(__name__)
 
 # Varsayılan yollar
-SKILLS_DB = ROOT / "cereyan" / ".ReYMeN" / "skills_index.db"
+SKILLS_DB = ROOT.parent / "merkez_db" / "skills_index.db"
 SKILLS_DIR = ROOT / "cereyan" / "skills"
-OGRENME_DB = ROOT / "hafiza" / "ogrenme.db"
-HATA_DB = ROOT / "hafiza" / "hatalar.db"
-HATA_DB.parent.mkdir(parents=True, exist_ok=True)
+OGRENME_DB = ROOT.parent / "merkez_db" / "ogrenme.db"
+HATA_DB = ROOT.parent / "merkez_db" / "hatalar.db"
+Path("reymen/merkez_db").mkdir(parents=True, exist_ok=True)
 
 # ── Import 4 fonksiyon (cereyan/once_hafiza.py — TEK KAYNAK) ────────────────
 from reymen.cereyan.once_hafiza import (

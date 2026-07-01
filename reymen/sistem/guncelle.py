@@ -34,11 +34,11 @@ GITHUB_REPO = "KULLANICI_ADI/ReYMeN"   # örn: "markopasa/ReYMeN"
 # Güncelleme sırasında ASLA dokunulmayacak kişisel dosyalar
 KORUNACAK = {
     ".env",
-    ".ReYMeN/session.db",
+    ".ReYMeN/session.db",  # -> merkez_db/session_reymen.db
     ".ReYMeN/memories",
     ".ReYMeN/self_improvement.json",
     ".ReYMeN/cron/jobs.json",
-    ".ReYMeN/session.db",
+    ".ReYMeN/session.db",  # -> merkez_db/session_reymen.db
     ".ReYMeN/memories",
 }
 

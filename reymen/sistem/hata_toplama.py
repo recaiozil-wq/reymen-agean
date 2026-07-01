@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 # ── Varsayilan yollar ──────────────────────────────────────────────────────
 PROJE_KOK = Path(__file__).parent.parent
-DEFAULT_DB_PATH = PROJE_KOK / "sistem" / "hata_toplama.db"
+DEFAULT_DB_PATH = PROJE_KOK / "merkez_db" / "hata_toplama.db"
 DEFAULT_CONFIG_PATH = PROJE_KOK / ".ReYMeN" / "hata_toplama.json"
 
 

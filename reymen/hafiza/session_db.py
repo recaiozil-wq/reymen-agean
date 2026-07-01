@@ -25,13 +25,13 @@ class AdvancedSessionStorage:
     """SQLite tabanli session ve ajan günlüğü deposu.
 
     Kullanim:
-        storage = AdvancedSessionStorage(".ReYMeN/session.db")
+        storage = AdvancedSessionStorage("merkez_db/session.db")
         sid = storage.session_baslat(source="cli", model="deepseek")
         storage.token_guncelle(sid, input_tokens=450, output_tokens=120)
         storage.session_bitir(sid, end_reason="completed")
     """
 
-    def __init__(self, db_yolu=".ReYMeN/session.db"):
+    def __init__(self, db_yolu="merkez_db/session.db"):
         self.db_yolu = db_yolu
         os.makedirs(os.path.dirname(db_yolu) or ".", exist_ok=True)
         self._lock = threading.Lock()
@@ -1079,7 +1079,7 @@ _storage_singleton: Optional["AdvancedSessionStorage"] = None
 _storage_lock = threading.Lock()
 
 
-def get_storage(db_yolu: str = ".ReYMeN/session.db") -> "AdvancedSessionStorage":
+def get_storage(db_yolu: str = "merkez_db/session.db") -> "AdvancedSessionStorage":
     """Process boyunca paylasilan tek AdvancedSessionStorage ornegini dondur.
 
     tools.session_search_tool gibi diger modullerin her cagrida yeni

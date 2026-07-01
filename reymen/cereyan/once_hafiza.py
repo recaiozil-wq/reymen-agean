@@ -32,7 +32,7 @@ T = TypeVar("T")
 
 # ── Varsayılan yol ────────────────────────────────────────────────────────
 ROOT = Path(__file__).parent.resolve()
-DB_YOLU = ROOT / ".ReYMeN" / "ogrenmeler.db"
+DB_YOLU = ROOT.parent / "merkez_db" / "ogrenmeler.db"
 
 # 6 ay = ~180 gün
 GECERLILIK_GUN = 180

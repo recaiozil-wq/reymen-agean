@@ -2,6 +2,9 @@
 """motor.py — Eylem çözümleyici. tools/ klasöründeki araçları kullanır.
 LLM çıktısından 'Eylem: ARAÇ(...)' yakalar, ToolRegistry üzerinden
 yönlendirir. Dosya işlemlerinde file_safety + path_security kullanır.
+
+Bu dosya Hermes Agent'ten esinlenilmistir.
+Apache 2.0 Lisansi — github.com/NousResearch/hermes-agent
 """
 
 from typing import Any, Optional, Dict, List, Tuple, Union

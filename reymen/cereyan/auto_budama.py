@@ -128,7 +128,7 @@ def buda(hafiza_yol: str = "", max_gun: int = _VARSAYILAN_TTL_GUN,
     try:
         from reymen.hafiza.session_db import AdvancedSessionStorage
         ROOT = Path(__file__).parent.resolve()
-        db_path = str(ROOT / ".ReYMeN" / "session.db")
+        db_path = str(ROOT.parent / "merkez_db" / "session_cereyan.db")
         storage = AdvancedSessionStorage(db_path)
         s = storage.konsolide_et(max_gun=max_gun, max_session=1000, max_toplam_karakter=500000)
         sonuc["session_budanan"] = s.get("silinen_session", 0)

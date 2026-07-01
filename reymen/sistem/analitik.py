@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 # ── Sabitler ────────────────────────────────────────────────────────────────
 
 PROJE_KOK: Path = Path(__file__).resolve().parent.parent.parent
-DB_DIZINI: Path = PROJE_KOK / ".ReYMeN"
+DB_DIZINI: Path = PROJE_KOK / "reymen" / "merkez_db"
 DB_DIZINI.mkdir(parents=True, exist_ok=True)
 VERITABANI: str = str(DB_DIZINI / "analitik.db")
 

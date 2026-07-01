@@ -85,7 +85,7 @@ class SecurityAudit:
         """Kritik dosyalarin izinlerini kontrol et."""
         kritik_dosyalar = [
             ".env", ".ReYMeN/memories/MEMORY.md",
-            ".ReYMeN/memories/USER.md", ".ReYMeN/session.db",
+            ".ReYMeN/memories/USER.md", "merkez_db/session_reymen.db",
         ]
         for dosya in kritik_dosyalar:
             yol = PROJE_KOK / dosya

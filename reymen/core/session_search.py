@@ -20,7 +20,7 @@ from typing import Any, Dict, List, Optional
 logger = logging.getLogger(__name__)
 
 # Session DB yolu
-DB_PATH = Path(__file__).parent.parent.parent / ".ReYMeN" / "session.db"
+DB_PATH = Path(__file__).parent.parent.parent / "reymen" / "merkez_db" / "session.db"
 
 
 @contextmanager

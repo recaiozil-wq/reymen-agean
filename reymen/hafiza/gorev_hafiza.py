@@ -33,7 +33,7 @@ ROOT = Path(__file__).parent.resolve()
 REYMEN_MEMORIES = ROOT / ".ReYMeN" / "memories"
 REYMEN_SKILLS = ROOT / ".ReYMeN" / "skills"
 SOUL_PATH = ROOT / ".ReYMeN" / "SOUL.md"
-HAFIZA_DB = ROOT / ".reymen_hafiza" / "hafiza.db"
+HAFIZA_DB = ROOT / "merkez_db" / "hafiza.db"
 
 # Dedup: daha önce kaydedilmiş içerik hash'leri (session boyunca)
 _dedup_hash_set: set = set()

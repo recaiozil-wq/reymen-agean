@@ -33,7 +33,7 @@ class OzGelistirmeMotoru:
         """SQLite oturum gunlugundan hatalari analiz et."""
         try:
             import sqlite3
-            db = ROOT / ".ReYMeN" / "session.db"
+            db = ROOT.parent / "merkez_db" / "session_cereyan.db"
             if not db.exists():
                 return {"hata_sayisi": 0, "en_sik_hatalar": [], "basarisiz_araclar": []}
             con = sqlite3.connect(str(db))
@@ -68,7 +68,7 @@ class OzGelistirmeMotoru:
         """Tamamlanan gorevleri analiz et, eksik beceri alanlari bul."""
         try:
             import sqlite3
-            db = ROOT / ".ReYMeN" / "session.db"
+            db = ROOT.parent / "merkez_db" / "session_cereyan.db"
             if not db.exists():
                 return []
             con = sqlite3.connect(str(db))

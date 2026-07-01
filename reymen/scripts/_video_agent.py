@@ -143,7 +143,7 @@ CROSS-REF: kali/network/nmap (ID=12) ile ayni bilgiyi Python API ile sarmalar'''
 )
 
 # Son durum
-con = sqlite3.connect('reymen/cereyan/.ReYMeN/ogrenmeler.db')
+con = sqlite3.connect('reymen/merkez_db/ogrenmeler.db')
 print('=== YENI KATEGORILER ===')
 for r in con.execute("SELECT kategori, COUNT(*) FROM ogrenmeler WHERE kategori LIKE 'video/%' GROUP BY kategori").fetchall():
     print(f'  {r[0]}: {r[1]} kayit')

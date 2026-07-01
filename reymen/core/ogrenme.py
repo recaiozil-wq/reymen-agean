@@ -12,7 +12,7 @@ from contextlib import contextmanager
 
 logger = logging.getLogger(__name__)
 
-DB_PATH = Path("reymen/memory/hafiza.db")
+DB_PATH = Path("reymen/merkez_db/memory.db")
 TTL_GUN = 30
 TTL_MUAF_BASARI = 3
 

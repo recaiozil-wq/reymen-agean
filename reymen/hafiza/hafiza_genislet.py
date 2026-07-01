@@ -39,7 +39,7 @@ logger = logging.getLogger(__name__)
 # ── Sabitler ──────────────────────────────────────────────────────────────
 
 ROOT = Path(__file__).parent.resolve()
-_DB_DIR = ROOT / ".reymen_hafiza"
+_DB_DIR = ROOT / "merkez_db"
 _DB_DIR.mkdir(parents=True, exist_ok=True)
 _DB_PATH = str(_DB_DIR / "hafiza.db")
 
@@ -1099,7 +1099,7 @@ def _auto_consolidation_loop() -> None:
             try:
                 from reymen.hafiza.session_db import AdvancedSessionStorage
                 ROOT = Path(__file__).parent.resolve()
-                db_path = str(ROOT / ".ReYMeN" / "session.db")
+                db_path = str(ROOT / "merkez_db" / "session.db")
                 storage = AdvancedSessionStorage(db_path)
                 sonuc = storage.konsolide_et(max_gun=30, max_session=1000, max_toplam_karakter=500000)
                 if sonuc.get("silinen_session", 0) > 0 or sonuc.get("silinen_mesaj", 0) > 0:

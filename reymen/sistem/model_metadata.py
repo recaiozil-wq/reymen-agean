@@ -157,6 +157,16 @@ def maliyet_hesapla(model_adi: str, token: int) -> float:
     return bilgi.get("fiyat", 0) * (token / 1_000_000)
 
 
+# Apache 2.0 — Hermes Agent'ten esinlenmistir
+MINIMUM_CONTEXT_LENGTH = 4096
+
+
+def get_model_context_length(model_id: str) -> int | None:
+    """Model ID'sine gore context uzunlugunu dondur."""
+    bilgi = _MODEL_KATALOGU.get(model_id, {})
+    return bilgi.get("context") or None
+
+
 if __name__ == "__main__":
     print("Tum modeller:")
     for m in model_listele():

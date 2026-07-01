@@ -39,7 +39,7 @@ __all__ = [
 ]
 
 # ── SQLite yolu ─────────────────────────────────────────────────────────
-_DB_DIR = Path(__file__).parent / "sistem"
+_DB_DIR = Path(__file__).parent / "merkez_db"
 _DB_PATH = _DB_DIR / "self_improve.db"
 
 
