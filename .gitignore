@@ -35,6 +35,7 @@ reymen_*.zip
 
 # Veritabanlari (calisma zamani, kaynak degil)
 reymen/merkez_db/
+reymen/cron_data/
 
 # Buyuk binary / CLI kopyalari
 ReYMeN_cli/
