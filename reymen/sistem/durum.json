@@ -75,7 +75,7 @@
     },
     "telegram_gateway": {
       "durum": "tamam",
-      "detay": "3 bot aktif (@ReYMeN_ReYMeNbot, @Kiral38bot, @Pasa_38_bot)"
+      "detay": "bagimsiz — reymen/gateway/ (platforms/telegram.py dahil)"
     },
     "cli": {
       "durum": "tamam",

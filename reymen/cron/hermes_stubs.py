@@ -170,3 +170,118 @@ def windows_hide_flags() -> int:
 def _expand_env_vars(cfg: Any) -> Any:
     """Stub — oldugu gibi dondur."""
     return cfg
+
+
+def get_default_hermes_root() -> Path:
+    return get_hermes_home()
+
+
+# ... gateway stubs ...
+
+def is_truthy_value(value: Any, default: bool = False) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return value.lower() in ("1", "true", "yes", "on")
+    return bool(value)
+
+
+def normalize_proxy_url(url: Optional[str]) -> Optional[str]:
+    return url
+
+
+def is_safe_url(url: str) -> bool:
+    """Stub — guvenli kabul et."""
+    return True
+
+
+def to_agent_visible_cache_path(path: str) -> str:
+    return path
+
+
+def get_tool_emoji(tool_name: str) -> str:
+    return "🛠️"
+
+
+def get_label(provider: str, model: str) -> str:
+    return f"{provider}/{model}"
+
+
+def group_providers() -> dict:
+    return {}
+
+
+def expensive_model_warning(model: str, provider: str) -> Optional[str]:
+    return None
+
+
+def should_bypass_active_session(ctx: Any) -> bool:
+    return False
+
+
+def telegram_menu_commands() -> list:
+    return []
+
+
+def resolve_gateway_approval(ctx: Any, msg: str) -> bool:
+    return True
+
+
+def resolve_gateway_clarify(ctx: Any) -> Optional[str]:
+    return None
+
+
+def mark_awaiting_text(ctx: Any) -> None:
+    pass
+
+
+def discover_plugins() -> list:
+    return []
+
+
+def has_usable_secret(provider: str) -> bool:
+    return False
+
+
+def text_to_speech_tool(text: str, **kw) -> str:
+    return ""
+
+
+def check_tts_requirements() -> bool:
+    return False
+
+
+def vision_analyze_tool(image: str, **kw) -> str:
+    return ""
+
+
+def ensure(pkg: str) -> bool:
+    """Lazy dep ensure — stub, hep basarili say."""
+    return True
+
+
+def managed_scope(scope: str) -> Any:
+    """Stub — oldugu gibi gec."""
+    return None
+
+
+def set_session_cwd(path: str) -> None:
+    pass
+
+
+def clear_session_cwd() -> None:
+    pass
+
+
+def _ensure_stubs() -> None:
+    """Tum stub'lari dogrula (cagri yapmaz, sadece import kontrolu)."""
+    _stubs = [
+        is_truthy_value, normalize_proxy_url, is_safe_url,
+        to_agent_visible_cache_path, get_tool_emoji, get_label,
+        group_providers, expensive_model_warning, should_bypass_active_session,
+        telegram_menu_commands, resolve_gateway_approval, resolve_gateway_clarify,
+        mark_awaiting_text, discover_plugins, has_usable_secret,
+        text_to_speech_tool, check_tts_requirements, vision_analyze_tool,
+        ensure, managed_scope, set_session_cwd, clear_session_cwd,
+    ]
+    _ = _stubs  # noqa
