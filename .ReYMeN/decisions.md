@@ -1,35 +1,26 @@
-# Karar Kaydı — Proaktif Bakım Sistemi
+# Karar Kaydı — ReYMeN Bot Önerileri Uygulama
 
-**Tarih:** 2026-07-01 22:45
+**Tarih:** 2026-07-01 23:00
 
 ## Ne yapıldı?
-8 maddeli proaktif bakım sistemi kuruldu — ReYMeN Agent'a kalıcı entegre.
+ReYMeN bot'unun sunduğu 6 proaktif öneri uygulandı.
 
 ## Neden?
-3 bot'un aynı soruya farklı cevap vermesi, config drift, gateway çökmeleri, memory farklılıkları gibi sorunların tekrarlanmasını engellemek için.
+3 bot arasındaki farklılıkların kökten çözülmesi ve GitHub'dan indiren kişinin aynı sorunları yaşamaması için.
 
 ## Yapılanlar
 
-| # | Önlem | Dosya | Durum |
+| # | Öneri | Çözüm | Durum |
 |---|-------|-------|-------|
-| 1 | **Config drift dedektörü** | proaktif_bakim.py | ✅ |
-| 2 | **Gateway watchdog (3 profil)** | proaktif_bakim.py | ✅ |
-| 3 | **SOUL.md master sync** | proaktif_bakim.py → 3 profil güncellendi | ✅ |
-| 4 | **state.db prune (30 gün)** | proaktif_bakim.py | ✅ |
-| 5 | **MEMORY.md sync** | proaktif_bakim.py | ✅ |
-| 6 | **Haftalık rapor (Pazar)** | proaktif_bakim.py | ✅ |
-| 7 | **Config template doğrulama** | proaktif_bakim.py | ✅ |
-| 8 | **Gateway health kontrol** | proaktif_bakim.py | ✅ |
+| 1 | shared_memories symlink — default'ta yok | Junction oluşturuldu (→ shared_memories) | ✅ |
+| 2 | Config yedek temizliği (reymen) | SOUL.md.yedek temizlendi | ✅ |
+| 3 | Boot testi — Startup VBS | VBS/BAT `venv/Scripts/hermes.exe` yoluna güncellendi (AppLocker fix), projeye kopyalandı | ✅ |
+| 4 | durum.json güncelle | `ortak_komut.guncelle()` çalıştırıldı, 3 bot eşit görünüyor | ✅ |
+| 5 | kiral38 state.db kopyalama | Gerek yok — memory_sync zaten hafızayı eşitliyor, state.db session geçmişidir | ⏸️ |
+| 6 | default gateway eksik dosyalar | auth.json/channel_directory.json/gateway_state.json — gateway ilk çalıştığında otomatik oluşur | ⏸️ Normal |
 
-## Cron job'lar
-- `proaktif-bakim` — her 30dk (no_agent=True, sessiz)
-- `kiral38-watchdog` — her 5dk (no_agent=True, sessiz)
-
-## Test bulguları
-- default: gateway.pid YOK → restart gönderildi ✅
-- reymen/kiral38: state güncel değil (beklenen, gateway 409 döngüsünde)
-- SOUL.md: 3 profil de güncellendi ✅
-
-## Alternatifler
-- Ayrı ayrı 8 cron job (red — tek script daha verimli)
-- Manuel bakım (red — otonom olmalı)
+## GitHub push
+- Proje: recaiozil-wq/R-eYMeN-
+- Proaktif bakım script'i: `reymen/scripts/proaktif_bakim.py`
+- Startup script'leri: `reymen/scripts/start_botlar.bat` + `.vbs`
+- Cron: proaktif-bakim (30dk) + kiral38-watchdog (5dk)
