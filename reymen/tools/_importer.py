@@ -1,0 +1,86 @@
+"""ReYMeN tools import hook — `from tools.xxx import yyy` → `from reymen.tools.xxx import yyy`.
+
+Bu modül, Hermes Agent'in `tools/` paketi yerine ReYMeN'in `reymen/tools/`
+shim'lerinin kullanılmasını sağlar.
+
+Kullanım (herhangi bir entry point'te bir kere):
+    import reymen.tools._importer  # otomatik hook kurar
+"""
+from __future__ import annotations
+
+import importlib
+import logging
+import sys
+from typing import Optional
+
+logger = logging.getLogger(__name__)
+
+# ReYMeN tools modüllerinin listesi (import hook ile yönlendirilecek)
+_TOOLS_MODULES = {
+    "tools.tts_tool",
+    "tools.browser_tool",
+    "tools.clarify_tool",
+    "tools.execute_code_tool",
+    "tools.send_message_tool",
+    "tools.interrupt",
+    "tools.schema_sanitizer",
+    "tools.file_tools",
+    "tools.macro",
+    "tools.approval",
+    "tools.tirith_security",
+    "tools.computer_use_tool",
+    "tools.terminal_tool",
+    "tools.process_registry",
+    "tools.todo_tool",
+    "tools.achievements",
+    "tools.skills_tool",
+    "tools.skill_usage",
+    "tools.checkpoint_manager",
+    "tools.kanban_tools",
+    "tools.delegate_tool",
+    "tools.mcp_tool",
+    "tools.cronjob_tools",
+    "tools.environments.docker",
+    "tools.environments.local",
+    "tools.environments.modal",
+    "tools.environments.wsl",
+    "tools.web_tools",
+    "tools.url_safety",
+    "tools.website_policy",
+    "tools.debug_helpers",
+    "tools.lazy_deps",
+    "tools.xai_http",
+}
+
+
+class _ToolsRedirectFinder:
+    """Import hook: tools.xxx → reymen.tools.xxx yönlendirmesi."""
+
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname in _TOOLS_MODULES:
+            reymen_name = fullname.replace("tools.", "reymen.tools.", 1)
+            try:
+                return importlib.util.find_spec(reymen_name)
+            except (ImportError, ValueError, AttributeError):
+                return None
+        return None
+
+
+# Otomatik hook kurulumu
+_installed = False
+
+
+def install() -> None:
+    """Import hook'unu sys.meta_path'e ekler."""
+    global _installed
+    if _installed:
+        return
+
+    finder = _ToolsRedirectFinder()
+    sys.meta_path.insert(0, finder)
+    _installed = True
+    logger.debug("ReYMeN tools import hook installed (%d modules)", len(_TOOLS_MODULES))
+
+
+# Modül yüklendiğinde otomatik kur
+install()

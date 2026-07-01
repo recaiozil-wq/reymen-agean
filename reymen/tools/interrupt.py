@@ -1,10 +1,14 @@
-"""ReYMeN tools.interrupt stub — her zaman False döner (Hermes bağımsız)."""
+"""ReYMeN tools.interrupt shim (override) — Hermes interrupt yönetimini ReYMeN'e yönlendirir."""
+from __future__ import annotations
 
+import logging
 import os
+import threading
 
+logger = logging.getLogger(__name__)
+
+_thread_local = threading.local()
 _DEBUG_INTERRUPT = bool(os.getenv("HERMES_DEBUG_INTERRUPT"))
-
-_thread_local = None  # type: ignore
 
 
 def is_interrupted() -> bool:
@@ -13,8 +17,8 @@ def is_interrupted() -> bool:
 
 
 def set_interrupt(thread_id: int) -> None:
-    pass
+    logger.debug("set_interrupt(%d) — ReYMeN stub", thread_id)
 
 
 def clear_interrupt() -> None:
-    pass
+    logger.debug("clear_interrupt — ReYMeN stub")

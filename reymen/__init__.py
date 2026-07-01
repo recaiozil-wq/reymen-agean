@@ -20,6 +20,12 @@ from __future__ import annotations
 
 __version__ = "0.9.0"
 
+# tools.xxx → reymen.tools.xxx import hook'u (Hermes bağımsızlık)
+try:
+    from reymen.tools import _importer  # noqa: F401 — otomatik hook kurar
+except Exception:
+    pass
+
 __all__ = [
     "__version__",
     "cost_tracker",

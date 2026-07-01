@@ -1,1 +1,2 @@
-"""ReYMeN tools package — web, URL safety, debug helpers."""
+"""ReYMeN tools package — Hermes tool shim'leri."""
+
