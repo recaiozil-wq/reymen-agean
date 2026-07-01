@@ -678,6 +678,44 @@ def main():
     session_id = _uid.uuid4().hex[:8]
     cur_m, cur_p = _mevcut_model()
 
+    # Yeni moduller: --voice, --api-server, --credential-pool
+    if "--voice" in sys.argv:
+        try:
+            from reymen.cereyan.voice_mode import VoiceMode
+            vm = VoiceMode()
+            print("🎤 Voice Mode baslatiliyor...")
+            vm.baslat()
+            return 0
+        except Exception as e:
+            print(f"❌ Voice Mode hatasi: {e}")
+            return 1
+
+    if "--api-server" in sys.argv:
+        try:
+            port = 8000
+            for i, a in enumerate(sys.argv):
+                if a == "--port" and i + 1 < len(sys.argv):
+                    port = int(sys.argv[i + 1])
+            from reymen.api_server import APIServer
+            import uvicorn
+            print(f"🌐 API Server baslatiliyor (port {port})...")
+            uvicorn.run("reymen.api_server:app", host="0.0.0.0", port=port)
+            return 0
+        except Exception as e:
+            print(f"❌ API Server hatasi: {e}")
+            return 1
+
+    if "--credential-pool" in sys.argv:
+        try:
+            from reymen.core.credential_pool import get_credential_pool
+            pool = get_credential_pool()
+            print("🔑 Credential Pool durumu:")
+            print(pool.durum())
+            return 0
+        except Exception as e:
+            print(f"❌ Credential Pool hatasi: {e}")
+            return 1
+
     # fix #4: background API kontrol — bekleme yok
     _api_sonuc = _api_kontrol_bekle(timeout=3)
     durum = _api_sonuc.get(cur_p)

@@ -1,18 +1,20 @@
-# Karar Kaydı — 3 Yeni Modül (Credential Pool, Voice Mode, API Server)
+# Karar Kaydı — 3 Modül Entegrasyon
 
-**Tarih:** 2026-07-02 00:15
+**Tarih:** 2026-07-02 00:30
 
 ## Ne yapıldı?
-3 yeni modül oluşturuldu: Credential Pool, Voice Mode, API Server
+Credential Pool, Voice Mode, API Server modülleri reymen_launcher.py'ye entegre edildi.
 
-## Yapılanlar
+## Entegrasyon
 
-| # | Modül | Dosya | Satır | Açıklama |
-|---|-------|-------|:----:|----------|
-| 3 | 🔑 Credential Pool | `reymen/core/credential_pool.py` | 526 | Çoklu API key rotasyonu, WCM+.env+os.environ, thread-safe, JSON kalıcılık |
-| 4 | 🎤 Voice Mode | `reymen/cereyan/voice_mode.py` | ~500 | Push-to-talk: sounddevice→STT→Beyin→TTS→oynat, VAD, REPL |
-| 5 | 🌐 API Server | `reymen/api_server.py` | 640 | OpenAI-uyumlu FastAPI, /v1/chat/completions+streaming, /v1/models, /health |
+| Modül | Çağrı | Açıklama |
+|-------|-------|----------|
+| 🔑 Credential Pool | `reymen --credential-pool` | API key havuz durumu gösterir |
+| 🎤 Voice Mode | `reymen --voice` | Push-to-talk sesli arayüz başlatır |
+| 🌐 API Server | `reymen --api-server --port 8000` | OpenAI-uyumlu REST API başlatır |
 
-## GitHub
-- recaiozil-wq/reymen-agean
-- Sıradaki: Plugin sistemi (öneri #1)
+## Motor.py import
+- `_CREDENTIAL_POOL` — credential pool singleton
+- `_VOICE_MODE_KLASS` — VoiceMode sınıfı
+- `_API_SERVER_KLASS` — APIServer sınıfı
+- Tümü try/except ile güvenli import

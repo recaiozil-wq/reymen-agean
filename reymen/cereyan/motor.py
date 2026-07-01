@@ -59,6 +59,27 @@ try:
 except ImportError:
     _pii_temizle = lambda m: m
 
+# Credential Pool
+try:
+    from reymen.core.credential_pool import get_credential_pool
+    _CREDENTIAL_POOL = get_credential_pool()
+except ImportError:
+    _CREDENTIAL_POOL = None
+
+# Voice Mode
+try:
+    from reymen.cereyan.voice_mode import VoiceMode
+    _VOICE_MODE_KLASS = VoiceMode
+except ImportError:
+    _VOICE_MODE_KLASS = None
+
+# API Server
+try:
+    from reymen.api_server import APIServer
+    _API_SERVER_KLASS = APIServer
+except ImportError:
+    _API_SERVER_KLASS = None
+
 # Otonom görev çözücü (orchestrator)
 try:
     from reymen.core.orchestrator import coz_hata as _coz_hata
