@@ -86,6 +86,21 @@ class _ToolsRedirectFinder:
             except (ImportError, ValueError, AttributeError):
                 return None
 
+        # hermes_cli → ReYMeN_cli (Hermes bagimsizligi)
+        if fullname == "hermes_cli" or fullname.startswith("hermes_cli."):
+            if fullname in sys.modules:
+                return None
+            # hermes_cli → ReYMeN_cli, hermes_cli.xxx → ReYMeN_cli.xxx
+            alt_name = fullname.replace("hermes_cli", "ReYMeN_cli", 1)
+            try:
+                spec = importlib.util.find_spec(alt_name)
+                if spec is not None:
+                    actual = importlib.import_module(alt_name)
+                    sys.modules[fullname] = actual
+                return spec
+            except (ImportError, ValueError, AttributeError):
+                return None
+
         return None
 
 

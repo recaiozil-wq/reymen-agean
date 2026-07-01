@@ -113,6 +113,10 @@
       "durum": "var",
       "detay": "ReYMeN kendi image_gen_engine.py (FAL/OpenAI/xAI/Stub) — bagimsiz"
     },
+    "config": {
+      "durum": "var",
+      "detay": "ReYMeN_cli/config.py + import hook (hermes_cli.config → ReYMeN_cli.config) — bagimsiz"
+    },
     "tts_stt": {
       "durum": "yok",
       "detay": "Hermes'te OpenAI TTS+Whisper var, ReYMeN'de yok"
