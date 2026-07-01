@@ -11,6 +11,11 @@ from pathlib import Path
 CRED_DOSYASI = Path(__file__).parent / ".ReYMeN" / "credentials.enc"
 
 
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 class CredentialPersistence:
     """Kimlik kalicilik yoneticisi.
 
@@ -20,6 +25,7 @@ class CredentialPersistence:
 
     def __init__(self):
         self._wcm_available = False
+        self._wcm = None
         try:
             import win32cred
             self._wcm = win32cred
@@ -79,7 +85,8 @@ class CredentialPersistence:
             target = f"ReYMeN_{anahtar}"
             cred = self._wcm.CredRead(target, self._wcm.CRED_TYPE_GENERIC, 0)
             return cred["CredentialBlob"].decode("utf-16").strip()
-        except Exception:
+        except Exception as e:
+            logger.debug("WCM'de %s bulunamadi (kod: %s)", anahtar, e)
             return ""
 
     def wcm_sil(self, anahtar: str) -> bool:
