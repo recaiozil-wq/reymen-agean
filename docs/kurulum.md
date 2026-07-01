@@ -9,8 +9,8 @@
 ## 1. Depoyu Klonla
 
 ```bash
-git clone https://github.com/Watcher-ReYMeN/ReYMeN-Ajan-v2.git
-cd ReYMeN-Ajan-v2
+git clone https://github.com/recaiozil-wq/reymen-agean.git
+cd reymen-agean
 ```
 
 ## 2. Sanal Ortam Kur
@@ -79,3 +79,11 @@ reymen chat -q "Merhaba, nasıl çalışıyorsun?"
 - [📖 Kullanım Kılavuzu](kullanim.md) — Detaylı kullanım senaryoları
 - [🛠️ CLI Referansı](cli.md) — Tüm komutlar
 - [🤝 Katkıda Bulunma](katki.md) — Geliştirici rehberi
+
+## Alternatif: PowerShell Kurulumu
+
+Windows PowerShell icin hazir betik:
+
+```powershell
+.\install.ps1
+```

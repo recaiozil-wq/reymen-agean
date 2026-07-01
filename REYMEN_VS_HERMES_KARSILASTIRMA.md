@@ -275,3 +275,7 @@
 
 *Rapor, ReYMeN-Ajan projesinin 400+ .py dosyasının taranması ve ReYMeN Agent dokümantasyonunun incelenmesiyle hazırlanmıştır.*
 **Tarih:** 2026-06-29
+
+---
+
+_Bu karsilastirma 2026-06-30 tarihlidir. Guncel durum icin [CHANGELOG.md](CHANGELOG.md)'ye bakin._

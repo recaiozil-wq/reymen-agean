@@ -1,26 +1,25 @@
-# Karar Kaydı — ReYMeN Bot Önerileri Uygulama
+# Karar Kaydı — 11 Proaktif Öneri (20-30) Uygulama
 
-**Tarih:** 2026-07-01 23:00
+**Tarih:** 2026-07-01 23:20
 
 ## Ne yapıldı?
-ReYMeN bot'unun sunduğu 6 proaktif öneri uygulandı.
+Sub-agent tarafından tespit edilen 30 öneriden 20-30 arası (🔵 NİCEL) uygulandı.
 
 ## Neden?
-3 bot arasındaki farklılıkların kökten çözülmesi ve GitHub'dan indiren kişinin aynı sorunları yaşamaması için.
+Proje kalitesi, güvenlik ve GitHub'dan indiren kişinin sorun yaşamaması için.
 
 ## Yapılanlar
 
 | # | Öneri | Çözüm | Durum |
 |---|-------|-------|-------|
-| 1 | shared_memories symlink — default'ta yok | Junction oluşturuldu (→ shared_memories) | ✅ |
-| 2 | Config yedek temizliği (reymen) | SOUL.md.yedek temizlendi | ✅ |
-| 3 | Boot testi — Startup VBS | VBS/BAT `venv/Scripts/hermes.exe` yoluna güncellendi (AppLocker fix), projeye kopyalandı | ✅ |
-| 4 | durum.json güncelle | `ortak_komut.guncelle()` çalıştırıldı, 3 bot eşit görünüyor | ✅ |
-| 5 | kiral38 state.db kopyalama | Gerek yok — memory_sync zaten hafızayı eşitliyor, state.db session geçmişidir | ⏸️ |
-| 6 | default gateway eksik dosyalar | auth.json/channel_directory.json/gateway_state.json — gateway ilk çalıştığında otomatik oluşur | ⏸️ Normal |
-
-## GitHub push
-- Proje: recaiozil-wq/R-eYMeN-
-- Proaktif bakım script'i: `reymen/scripts/proaktif_bakim.py`
-- Startup script'leri: `reymen/scripts/start_botlar.bat` + `.vbs`
-- Cron: proaktif-bakim (30dk) + kiral38-watchdog (5dk)
+| 20 | Ruff ANN/D kuralları aç | ruff.toml select'e ANN+D eklendi, target-version py312 yapıldı | ✅ |
+| 21 | Versiyon tutarsızlığı | pyproject.toml → 1.0.2, classifiers 3.11→3.13 | ✅ |
+| 22 | pyproject.toml URL | Zaten doğruydu (reymen-agean) | ✅ |
+| 23 | SUPPORT.md e-posta | `marko [at] reymen [dot] dev` olarak obfuscate | ✅ |
+| 24 | KARSILASTIRMA.md güncellik | Dipnot eklendi (2026-06-30 tarihli) | ✅ |
+| 25 | install.ps1 referans | docs/kurulum.md'ye PowerShell kurulum bölümü eklendi | ✅ |
+| 26 | mkdocs.yml repo_url | Watcher-ReYMeN → recaiozil-wq/reymen-agean | ✅ |
+| 27 | requirements.txt senkron | pyproject.toml ile uyumlu hale getirildi (core+full+dev) | ✅ |
+| 28 | ZIP arşivleri | arsiv/ klasörüne taşındı (~360MB) | ✅ |
+| 29 | PULL_REQUEST_TEMPLATE | Boş checkbox'lar dolduruldu | ✅ |
+| 30 | AGENTS.md.bak + ZIP disk | AGENTS.md.bak git rm ile temizlendi | ✅ |

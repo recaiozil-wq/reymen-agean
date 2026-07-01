@@ -1,4 +1,4 @@
-target-version = "py311"
+target-version = "py312"
 line-length = 100
 
 [lint]
@@ -14,6 +14,8 @@ select = [
     "ARG", # flake8-unused-arguments
     "PT",  # flake8-pytest-style
     "RUF", # ruff-specific
+    "ANN", # type annotations
+    "D",   # pydocstyle/docstring
 ]
 ignore = [
     "E501",   # line too long (handled by formatter)

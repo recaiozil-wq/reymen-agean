@@ -11,7 +11,7 @@
 |-------|----------|
 | GitHub Issues | Hata ve özellik talepleri |
 | Telegram | @Pasa_38 bot üzerinden canlı destek |
-| E-posta | marko@reymen.dev |
+| E-posta | marko [at] reymen [dot] dev |
 
 ## 🐛 Hata Bildirimi
 [Issue açın](https://github.com/recaiozil-wq/reymen-agean/issues/new/choose)

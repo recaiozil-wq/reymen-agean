@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "reymen-agent"
-version = "1.0.1"
+version = "1.0.2"
 description = "ReYMeN — Türkçe otonom AI asistanı. Çoklu-provider LLM, araç çağrı motoru, kapalı öğrenme döngüsü."
 readme = "README.md"
 requires-python = ">=3.12"
@@ -17,8 +17,8 @@ classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Natural Language :: Turkish",
 ]
