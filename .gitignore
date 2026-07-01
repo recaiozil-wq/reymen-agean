@@ -218,8 +218,16 @@ _*.bat
 _*.cmd
 
 # SQLite WAL/SHM (run-time)
+*.db-shm
+*.db-wal
 
-# PID files
+# SQLite databases (runtime, regenerated)
+*.db
+*.sqlite3
+
+# Vector binary data (runtime, regenerated)
+*.bin
+vektor_hafizasi/
 *.pid
 
 # Browser/MCP state (screenshots, pages)
