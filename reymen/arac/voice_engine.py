@@ -26,6 +26,8 @@ import uuid
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Optional
+import logging
+logger = logging.getLogger(__name__)
 
 log = logging.getLogger(__name__)
 

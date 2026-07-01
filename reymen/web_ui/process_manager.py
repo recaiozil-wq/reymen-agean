@@ -104,7 +104,7 @@ class ProcessManager:
                             )
             except (OSError, subprocess.TimeoutExpired):
                 # Zaten ölmüş
-                pass
+                logger.warning("[fix_01_sessiz_except] Exception")
         except (ValueError, OSError) as e:
             logger.warning("PID okunamadi: %s", e)
 

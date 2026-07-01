@@ -95,7 +95,7 @@ class ContinuousLearning:
             self._closed_loop = ClosedLearningLoop()
             logger.info("[CL] ClosedLearningLoop yuklendi")
         except ImportError:
-            pass
+            logger.warning("[fix_01_sessiz_except] ImportError")
 
     def _onceki_sessionlari_yukle(self, limit: int = _MAX_GECMIS_SESSION):
         try:

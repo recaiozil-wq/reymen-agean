@@ -811,7 +811,7 @@ class BotProcess:
         try:
             _api("deleteWebhook", {"drop_pending_updates": True}, timeout=5)
         except Exception:
-            pass
+            logger.warning("[fix_01_sessiz_except] Exception")
 
         offset = self.ayarlar.get("offset", 0)
         logger.info("[%s] Polling basliyor, offset=%s", self.bot_ad, offset)
@@ -1596,7 +1596,7 @@ if PTB_AVAILABLE:
             try:
                 await bekleme.delete()
             except Exception:
-                pass
+                logger.warning("[fix_01_sessiz_except] Exception")
             await update.message.reply_text(_cevap[:2000])
 
         async def _ptb_foto_handler(self, update: Update, context: ContextTypes.DEFAULT_TYPE):

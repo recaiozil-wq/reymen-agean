@@ -131,7 +131,7 @@ class CLIGateway(GatewayBase):
                 if satir:
                     await self._girdi_kuyrugu.put(satir)
         except asyncio.CancelledError:
-            pass
+            logger.warning("[fix_01_sessiz_except] CancelledError")
         except Exception as e:
             logger.error(f"[CLIGateway] stdin okuyucu hatasi: {e}")
             self._son_hata = str(e)

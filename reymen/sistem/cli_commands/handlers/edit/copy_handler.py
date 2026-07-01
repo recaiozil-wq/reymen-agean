@@ -2,6 +2,8 @@
 
 from reymen.sistem.cli_display import _cprint
 from reymen.sistem.cli_helpers import _assistant_copy_text
+import logging
+logger = logging.getLogger(__name__)
 
 
 def _handle_copy_command(cli, cmd_original: str) -> None:

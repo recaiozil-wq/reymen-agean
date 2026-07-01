@@ -227,7 +227,7 @@ class SelfHeal:
             from reymen.core.ogrenme import ttl_temizle
             ttl_temizle()
         except Exception:
-            pass
+            logger.warning("[fix_01_sessiz_except] Exception")
 
     # ── LLM ──────────────────────────────────────────────────────
 
@@ -348,7 +348,7 @@ class SelfHeal:
                 try:
                     os.unlink(tmp_path)
                 except Exception:
-                    pass
+                    logger.warning("[fix_01_sessiz_except] Exception")
 
     @staticmethod
     def _exec_dene(kod: str) -> tuple:

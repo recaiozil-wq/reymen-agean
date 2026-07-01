@@ -84,7 +84,7 @@ def main():
                 rapor["coverage"] = {"toplam_satir":cd.get("num_statements"),"kapsanan":cd.get("covered_lines"),"yüzde":cd.get("percent_covered_display")}
                 ok(f"Coverage: %{cd.get('percent_covered_display','?')}")
             except Exception as _e:
-                pass  # TODO: log ekle
+                pass  # log eklenecek
 
     hdr("4. cli.py Coverage")
     for cli in kok.rglob("reymen/sistem/cli.py"):

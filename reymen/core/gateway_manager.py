@@ -438,7 +438,7 @@ class CLIAdapter(GatewayAdapter):
                 try:
                     await self._okuyucu_gorev
                 except asyncio.CancelledError:
-                    pass
+                    logger.warning("[fix_01_sessiz_except] CancelledError")
                 self._okuyucu_gorev = None
             self._calisiyor = False
             self._bagli = False
@@ -488,7 +488,7 @@ class CLIAdapter(GatewayAdapter):
                 if satir:
                     await self._girdi_kuyrugu.put(satir)
         except asyncio.CancelledError:
-            pass
+            logger.warning("[fix_01_sessiz_except] CancelledError")
         except Exception as e:
             logger.error("[CLIAdapter] stdin okuyucu hatasi: %s", e)
             self._son_hata = str(e)

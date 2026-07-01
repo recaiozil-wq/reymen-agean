@@ -25,6 +25,8 @@ import logging
 import os
 from abc import ABC, abstractmethod
 from typing import Optional
+import logging
+logger = logging.getLogger(__name__)
 
 log = logging.getLogger(__name__)
 

@@ -126,7 +126,7 @@ class SessionDB:
             try:
                 conn.close()
             except sqlite3.Error:
-                pass
+                logger.warning("[fix_01_sessiz_except] Error")
 
     def get_session(self, session_id: str) -> dict[str, Any]:
         """Tek bir oturumu getirir.
@@ -161,4 +161,4 @@ class SessionDB:
             try:
                 conn.close()
             except sqlite3.Error:
-                pass
+                logger.warning("[fix_01_sessiz_except] Error")

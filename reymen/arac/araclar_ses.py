@@ -142,7 +142,7 @@ def ses_tanima(dosya_yolu: str, dil: str = "tr") -> str:
         metin = " ".join(s.text.strip() for s in segments).strip()
         return f"[SES_TANIMA] (faster-whisper)\n{metin or '(boş)'}"
     except ImportError:
-        pass
+        logger.warning("[fix_01_sessiz_except] ImportError")
     except Exception as e:
         logger.warning("[SES_TANIMA] faster-whisper hatası, openai-whisper deneniyor: %s", e)
 
@@ -179,7 +179,7 @@ def seslendir(metin: str, ses: str = "tr-TR-AhmetNeural", dosya_yolu: str = "") 
         asyncio.run(_uret())
         return _media("audio", dosya_yolu, f"Seslendirme (edge-tts, ses={ses})")
     except ImportError:
-        pass
+        logger.warning("[fix_01_sessiz_except] ImportError")
     except Exception as e:
         logger.warning("[SESLENDIR] edge-tts hatası, pyttsx3'e düşülüyor: %s", e)
 

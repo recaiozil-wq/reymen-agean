@@ -2,6 +2,8 @@
 """subcommand_fix3.py — run_xxx fonksiyon govdesini bastan yaz."""
 import re
 from pathlib import Path
+import logging
+logger = logging.getLogger(__name__)
 
 SUBCMD_DIR = Path(__file__).parent.parent / "reymen_cli" / "subcommands"
 

@@ -22,6 +22,8 @@ import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
+import logging
+logger = logging.getLogger(__name__)
 
 logging.basicConfig(level=logging.INFO, format="[SI_CRON] %(message)s")
 log = logging.getLogger(__name__)

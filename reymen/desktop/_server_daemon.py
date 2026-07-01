@@ -1,6 +1,8 @@
 """ReYMeN Web UI sunucu daemon'i — arka planda calisir."""
 import os
 import sys
+import logging
+logger = logging.getLogger(__name__)
 
 # Proje kokunu sys.path'e ekle
 _PROJE_KOK = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -17,7 +19,7 @@ def main():
         from reymen.web_ui import app
         uvicorn.run(app, host=host, port=port, log_level="warning")
     except KeyboardInterrupt:
-        pass
+        logger.warning("[fix_01_sessiz_except] KeyboardInterrupt")
     except Exception as e:
         import traceback
         log_path = __file__ + ".log"

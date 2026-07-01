@@ -11,6 +11,8 @@ import os
 import sys
 import time
 from pathlib import Path
+import logging
+logger = logging.getLogger(__name__)
 
 # ── Proje kokunu bul ─────────────────────────────────────────────
 _PROJE_KOK = Path(__file__).parent.parent.parent.resolve()  # reymen/ag/../../ = proje koku
@@ -30,7 +32,7 @@ def _durum_json_oku() -> dict:
                 with open(y, encoding="utf-8") as f:
                     return json.load(f)
             except Exception:
-                pass
+                logger.warning("[fix_01_sessiz_except] Exception")
     return {}
 
 
@@ -349,7 +351,7 @@ def cmd_doctor(gonder, cid, arg=""):
         toplam = sum(1 for _ in _os.walk(_PROJE_KOK) for _ in _[2] if _.endswith('.py') and '__pycache__' not in _[0])
         satirlar.append(f"Python dosyasi: ~{toplam}")
     except:
-        pass
+        logger.warning("[fix_01_sessiz_except] Exception")
     gonder(cid, "\n".join(satirlar))
 
 

@@ -65,7 +65,7 @@ def _whisper_transcribe(dosya_yolu: str, dil: str = "tr") -> str:
         segments, _bilgi = model.transcribe(dosya_yolu, language=dil_param)
         return " ".join(s.text.strip() for s in segments).strip()
     except ImportError:
-        pass
+        logger.warning("[fix_01_sessiz_except] ImportError")
     except Exception as e:
         logger.warning("[VIDEO_ANALIZ] faster-whisper hatası, openai-whisper deneniyor: %s", e)
     try:

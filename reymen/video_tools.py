@@ -7,6 +7,8 @@ ile varlık kontrolü yapılabilir.
 Örnek::
 
     from ReYMeN.video_tools import download, convert, probe
+import logging
+logger = logging.getLogger(__name__)
 
     info = download("https://youtube.com/watch?v=...", output="%(title)s.%(ext)s")
     convert("input.mp4", "output.mp3", format="mp3")

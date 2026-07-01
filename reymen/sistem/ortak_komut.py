@@ -7,9 +7,11 @@ Her degisiklikte otomatik guncellenir. Tum botlar burayi okur.
 import json
 import os
 from pathlib import Path
+import logging
+logger = logging.getLogger(__name__)
 
 PROJE_KOK = Path(__file__).resolve().parent.parent.parent
-HERMES_HOME = Path.home() / "AppData" / "Local" / "hermes"
+HERMES_HOME = Path.home() / ".hermes"
 
 # ── Bot Profil Yapilari ────────────────────────────────────────────────
 
@@ -94,8 +96,12 @@ def tara_profil(profil: str) -> dict:
     config_yol = CONFIG_DOSYALARI.get(profil)
     if config_yol and config_yol.exists():
         icerik = config_yol.read_text(encoding="utf-8")
-        if "disabled_toolsets" in icerik and "browser" in icerik:
-            sonuc["browser"] = "kapali"
+        # Browser durumu: disabled_toolsets listesinde "browser" var mi?
+        import re as _re
+        dt_match = _re.search(r'disabled_toolsets\s*:\s*\[(.*?)\]', icerik, _re.DOTALL)
+        if dt_match:
+            tools = [t.strip().strip("'\"") for t in dt_match.group(1).split(",") if t.strip()]
+            sonuc["browser"] = "kapali" if "browser" in tools else "acik"
         else:
             sonuc["browser"] = "acik"
         # Terminal cwd
@@ -156,10 +162,11 @@ def guncelle() -> dict:
 
 def _butun_botlar_esit_mi() -> dict:
     """Tum botlarin (hardcoded + dinamik) ayni yetkide olup olmadigini kontrol et.
-    Sadece permission/settings alanlarini karsilastir (profil/bot_adi haric)."""
+    Sadece permission/settings alanlarini karsilastir (profil/bot_adi haric).
+    soul_boyut: 50 byte'dan az fark esit sayilir (bot ismi uzunlugu)."""
     karsilastirilacak_alanlar = [
         "gateway", "yetki", "browser", "terminal",
-        "web", "soul_boyut", "tools",
+        "web", "tools",
     ]
     # Mevcut durum.json'daki tum botlari al (hardcoded + dinamik)
     butun_botlar = dict(BOTLAR)
@@ -170,7 +177,7 @@ def _butun_botlar_esit_mi() -> dict:
                 if anahtar not in butun_botlar:
                     butun_botlar[anahtar] = deger
         except Exception:
-            pass
+            logger.warning("[fix_01_sessiz_except] Exception")
     yetkiler = [
         [b.get(alan, "") for alan in karsilastirilacak_alanlar]
         for b in butun_botlar.values()
@@ -179,9 +186,16 @@ def _butun_botlar_esit_mi() -> dict:
         return {"esit": True, "aciklama": "Henuz bot yok"}
     ilk = yetkiler[0]
     esit = all(y == ilk for y in yetkiler)
+    # Ayrica soul_boyut farki 50 bayti gecmemeli
+    boyutlar = [b.get("soul_boyut", 0) for b in butun_botlar.values()]
+    if esit and boyutlar:
+        min_boyut = min(boyutlar)
+        max_boyut = max(boyutlar)
+        if max_boyut - min_boyut > 50:
+            esit = False
     return {
         "esit": esit,
-        "aciklama": "Tum botlar esit" if esit else "Fark var!",
+        "aciklama": "Tum botlar esit" if esit else "Fark var! (soul_boyut farki > 50 bayt veya yetki farki)",
     }
 
 

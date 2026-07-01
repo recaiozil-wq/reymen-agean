@@ -15,6 +15,8 @@ import logging
 import os
 import sys
 from pathlib import Path
+import logging
+logger = logging.getLogger(__name__)
 
 _PROJE_KOK = Path(__file__).resolve().parent.parent.parent
 if str(_PROJE_KOK) not in sys.path:

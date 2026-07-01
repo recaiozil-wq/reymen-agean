@@ -37,6 +37,8 @@ from html.parser import HTMLParser
 from typing import Optional
 
 import yaml
+import logging
+logger = logging.getLogger(__name__)
 
 log = logging.getLogger(__name__)
 

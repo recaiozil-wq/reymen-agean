@@ -8,6 +8,8 @@ import json
 import sys
 import time
 import traceback
+import logging
+logger = logging.getLogger(__name__)
 
 
 def run(goal: str, context: str = "") -> dict:

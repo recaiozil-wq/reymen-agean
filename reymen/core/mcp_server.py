@@ -703,7 +703,7 @@ def http_baslat(host: str = "0.0.0.0", port: int = 9000):
                         except asyncio.TimeoutError:
                             yield f"event: heartbeat\ndata: {json.dumps({})}\n\n"
                 except asyncio.CancelledError:
-                    pass
+                    logger.warning("[fix_01_sessiz_except] CancelledError")
                 finally:
                     _sse_clients.pop(session.id, None)
                     _session_kapat(session.id)

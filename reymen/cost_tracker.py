@@ -7,6 +7,8 @@ oluşturulur. Fiyat tablosu config üzerinden geçersiz kılınabilir.
 Örnek::
 
     from ReYMeN.cost_tracker import record_usage, summary
+import logging
+logger = logging.getLogger(__name__)
 
     record_usage(model="gpt-4o", prompt_tokens=1200, completion_tokens=300)
     print(summary())

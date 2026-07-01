@@ -779,7 +779,7 @@ class ConversationLoop:
                         log.info("[%s] Fallback provider: %s", task_id, yeni_provider)
                         api_yanit = self._direct_api_call(messages, tools_bos=False)
                 except Exception:
-                    pass
+                    logger.warning("[fix_01_sessiz_except] Exception")
 
             if api_yanit is None:
                 sonuc["hata"] = f"API cagrisi basarisiz (tur {api_call_count})"

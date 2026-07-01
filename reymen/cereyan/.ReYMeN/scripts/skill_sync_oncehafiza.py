@@ -19,6 +19,8 @@ import sqlite3
 import sys
 from datetime import datetime, date, timedelta
 from pathlib import Path
+import logging
+logger = logging.getLogger(__name__)
 
 # ── Yollar ────────────────────────────────────────────────────────────────
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -42,7 +44,7 @@ def log(msg: str):
         with open(LOG_PATH, "a", encoding="utf-8") as f:
             f.write(line + "\n")
     except Exception:
-        pass
+        logger.warning("[fix_01_sessiz_except] Exception")
 
 
 def hash_file(path: Path) -> str:
@@ -256,7 +258,7 @@ def main():
         try:
             tum_rel_paths.add(str(fp.relative_to(SKILLS_ROOT).as_posix()))
         except Exception:
-            pass
+            logger.warning("[fix_01_sessiz_except] Exception")
 
     silinen_kayitlar = 0
     for row in conn.execute("SELECT dosya_yolu FROM skill_hashes"):
@@ -288,7 +290,7 @@ def main():
             f.write(f"## {simdi[:10]} {simdi[11:16]} — Skill -> OnceHafiza Sync\n")
             f.write(f"- Yeni: {yeni}, Guncellenen: {guncellenen}, Atanan: {atlanan}, Hata: {hata}\n")
     except Exception:
-        pass
+        logger.warning("[fix_01_sessiz_except] Exception")
 
     return 0
 

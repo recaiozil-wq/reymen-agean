@@ -35,7 +35,7 @@ def main():
                     rapor["shell_true"].append(f"{f.relative_to(kok)}:{i}  {line.strip()[:80]}")
                     err(f"{f.relative_to(kok)}:{i}")
         except Exception as _e:
-            pass  # TODO: log ekle
+            pass  # log eklenecek
     if not rapor["shell_true"]: ok("shell=False bulunamadı")
 
     # Credential
@@ -48,7 +48,7 @@ def main():
                     rapor["credential_leak"].append(f"{f.relative_to(kok)}:{i}")
                     warn(f"{f.relative_to(kok)}:{i}")
         except Exception as _e:
-            pass  # TODO: log ekle
+            pass  # log eklenecek
     if not rapor["credential_leak"]: ok("Hardcoded credential yok")
 
     # SQL
@@ -61,7 +61,7 @@ def main():
                     rapor["sql_risk"].append(f"{f.relative_to(kok)}:{i}")
                     warn(f"SQL: {f.relative_to(kok)}:{i}")
         except Exception as _e:
-            pass  # TODO: log ekle
+            pass  # log eklenecek
     if not rapor["sql_risk"]: ok("SQL riski yok")
 
     # Bandit

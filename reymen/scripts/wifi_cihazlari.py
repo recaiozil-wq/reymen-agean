@@ -10,6 +10,8 @@ SelfHeal test örneği:
 
 import subprocess, re, sys, json
 from datetime import datetime
+import logging
+logger = logging.getLogger(__name__)
 
 # ── 1. Ağ arayüzünü bul ──────────────────────────────────────
 
