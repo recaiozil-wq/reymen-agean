@@ -887,6 +887,7 @@ class Motor:
 
     # ── Native Function Calling desteği ──────────────────────────────────────
 
+    @trace_tool_call()
     def calistir_fc(self, arac: str, args: dict) -> str:
         """FC API'den gelen dict args → mevcut calistir() köprüsü.
 
