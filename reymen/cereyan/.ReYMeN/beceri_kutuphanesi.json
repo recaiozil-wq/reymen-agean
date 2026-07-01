@@ -1127,5 +1127,30 @@
     "basari_orani": 1.0,
     "olusturma": "2026-06-30",
     "son_basari": "2026-06-30"
+  },
+  "yeni_bir_konu__hermes_ajan_bir_bağlantı_ona_bağıml": {
+    "ad": "Yeni bir konu\n\nHermes ajan bir bağlantı ona bağıml",
+    "aciklama": "Yeni bir konu\n\nHermes ajan bir bağlantı ona bağıml",
+    "tetikleyiciler": [
+      "hermes",
+      "bir",
+      "yeni",
+      "ajan",
+      "konu"
+    ],
+    "adimlar": [
+      "FC/MCPCLIENT_FILESYSTEM_SEARCH_FILES",
+      "FC/MCPCLIENT_FILESYSTEM_DIRECTORY_TREE",
+      "FC/MCPCLIENT_FILESYSTEM_SEARCH_FILES",
+      "FC/MCP_TOOL_CAGIR",
+      "FC/MCPCLIENT_FILESYSTEM_LIST_ALLOWED_DIRECTORIES",
+      "FC/BROWSER_AGENT",
+      "FC/MCP_TOOL_LISTELE"
+    ],
+    "basari_kriteri": "Hayır, Hermes ajanının bağımlı olduğu bir dosya bulunmamaktadır.",
+    "kullanim_sayisi": 1,
+    "basari_orani": 1.0,
+    "olusturma": "2026-07-01",
+    "son_basari": "2026-07-01"
   }
 }

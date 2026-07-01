@@ -1,4 +1,4 @@
-"""ai_bot_launcher.py — Proje kökü .env'den okuyup ai_bot baslatir.
+"""ai_bot_launcher.py — Proje kökü .env'den okuyup reymen/ag/telegram_bot baslatir.
 
 TEK KAYNAK: Bu dosya SADECE proje kökündeki .env dosyasini okur.
 telegram_bot/.env veya reymen/sistem/.env OKUNMAZ.
@@ -37,5 +37,6 @@ if not token or token == "API_KEYINIZI_GIRIN":
     print("  .env dosyasina gecerli bir token girin.")
     sys.exit(1)
 
-ai_bot_py = PROJE_KOK / "telegram_bot" / "ai_bot.py"
-subprocess.run([sys.executable or "python", str(ai_bot_py)], env=full_env)
+# DOGRUDAN reymen/ag/telegram_bot.py'yi calistir (redirect atla)
+telegram_bot_py = PROJE_KOK / "reymen" / "ag" / "telegram_bot.py"
+subprocess.run([sys.executable or "python", str(telegram_bot_py)], env=full_env)
