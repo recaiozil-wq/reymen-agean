@@ -85,3 +85,19 @@ merkez_db/
 _baslat_*.py
 baslat_*.bat
 kill_bots.py
+
+# Batch/scripts - launcher
+._baslat_*.py
+pasa38_baslat.*
+baslat_botlar.*
+kill_bots.py
+force_restart_bots.py
+start_bots.py
+bot_supervisor.py
+
+# ChromaDB / vector memory binary files
+vektor_hafizasi/*.db
+vektor_hafizasi/*.db-shm
+vektor_hafizasi/*.db-wal
+vektor_hafizasi/*.bin
+vektor_hafizasi/*.pb
