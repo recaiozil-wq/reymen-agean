@@ -18,3 +18,8 @@ def add_cost_parser(sub):
 def add_doctor_parser(sub):return sub.add_parser("doctor",help="Sistem saglik kontrolu")
 def add_skills_parser(sub):return sub.add_parser("skills",help="Skill yonetimi (list/view)")
 def add_plugins_parser(sub):return sub.add_parser("plugins",help="Plugin yonetimi (list/info/enable/disable)")
+def add_langgraph_export_parser(sub):
+    """--langgraph-export flag'i icin parser."""
+    p=sub.add_parser("langgraph-export",help="LangGraph StateGraph export (graph.json + graph.md)")
+    p.add_argument("--output-dir",default=None,help="Cikti dizini (default: proje koku)")
+    return p

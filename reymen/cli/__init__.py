@@ -18,7 +18,7 @@ from .subcommands.parser_backup import add_backup_parser
 from .subcommands.parser_desktop import add_desktop_parser
 from .subcommands.parser_misc import (
     add_status_parser, add_model_parser, add_cost_parser, add_doctor_parser,
-    add_skills_parser, add_plugins_parser,
+    add_skills_parser, add_plugins_parser, add_langgraph_export_parser,
 )
 
 # ── Handler proxy'leri ────────────────────────────────────────────────────────
@@ -89,6 +89,11 @@ def _cmd_plugins(args):
     print(f"  [OK] plugins {alt} (Henuz implementasyon asamasinda)")
     return 0
 
+def _cmd_langgraph_export(args):
+    """LangGraph StateGraph export."""
+    from reymen.core.langgraph_export import cmd_export
+    return cmd_export(args)
+
 # ── Parser kurucusu ───────────────────────────────────────────────────────────
 def build_parser():
     p = argparse.ArgumentParser(prog="reymen",
@@ -117,9 +122,10 @@ def build_parser():
     add_desktop_parser(sub).set_defaults(func=_cmd_desktop)
     add_cron_parser(sub).set_defaults(func=lambda a: _cmd_cron(a))
 
-    # Hermes-parity: skills, plugins + tools, setup, profile, logs, mcp
+    # Hermes-parity: skills, plugins, langgraph-export + tools, setup, profile, logs, mcp
     add_skills_parser(sub).set_defaults(func=lambda a: _cmd_skills(a))
     add_plugins_parser(sub).set_defaults(func=lambda a: _cmd_plugins(a))
+    add_langgraph_export_parser(sub).set_defaults(func=lambda a: _cmd_langgraph_export(a))
     for _ad in ["tools", "setup", "profile", "logs", "mcp"]:
         _p = sub.add_parser(_ad, help=f"{_ad} yonetimi")
         _p.set_defaults(func=lambda a, n=_ad: print(f"  [OK] reymen {n}") or 0)
