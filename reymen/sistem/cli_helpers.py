@@ -178,7 +178,7 @@ from reymen.sistem.utils import base_url_host_matches
 
 _ReYMeN_home = get_reymen_home()
 _project_env = Path(__file__).parent / '.env'
-load_reymen_dotenv(ReYMeN_home=_ReYMeN_home, project_env=_project_env)
+load_reymen_dotenv(reymen_home=_ReYMeN_home, project_env=_project_env)
 
 
 _REASONING_TAGS = (

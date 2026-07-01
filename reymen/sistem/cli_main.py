@@ -53,7 +53,7 @@ except Exception:
 
 # Initialize the skin engine from config
 try:
-    from reymen.reymen_cli.skin_engine import init_skin_from_config
+    from reymen.ReYMeN_cli.skin_engine import init_skin_from_config
     init_skin_from_config(CLI_CONFIG)
 except Exception as _e:
     __import__("logging").getLogger(__name__).warning(

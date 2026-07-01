@@ -50,19 +50,41 @@ _TOOLS_MODULES = {
     "tools.debug_helpers",
     "tools.lazy_deps",
     "tools.xai_http",
+    "tools.vision_tools",
+    "tools.voice_mode",
 }
 
 
 class _ToolsRedirectFinder:
-    """Import hook: tools.xxx → reymen.tools.xxx yönlendirmesi."""
+    """Import hook: tools.xxx → reymen.tools.xxx ve reymen_cli → ReYMeN_cli."""
 
     def find_spec(self, fullname, path=None, target=None):
+        # tools.xxx → reymen.tools.xxx
         if fullname in _TOOLS_MODULES:
             reymen_name = fullname.replace("tools.", "reymen.tools.", 1)
             try:
                 return importlib.util.find_spec(reymen_name)
             except (ImportError, ValueError, AttributeError):
                 return None
+
+        # reymen_cli → ReYMeN_cli (editable finder bypass)
+        if fullname == "reymen_cli" or fullname.startswith("reymen_cli."):
+            # Önce sys.modules'te var mı kontrol et
+            if fullname in sys.modules:
+                return None  # Zaten yüklü, normal akışa devam et
+
+            # reymen_cli → ReYMeN_cli, reymen_cli.xxx → ReYMeN_cli.xxx
+            alt_name = fullname.replace("reymen_cli", "ReYMeN_cli", 1)
+            try:
+                spec = importlib.util.find_spec(alt_name)
+                if spec is not None:
+                    # Alt modülleri sys.modules'e kaydet (cycle önleme)
+                    actual = importlib.import_module(alt_name)
+                    sys.modules[fullname] = actual
+                return spec
+            except (ImportError, ValueError, AttributeError):
+                return None
+
         return None
 
 

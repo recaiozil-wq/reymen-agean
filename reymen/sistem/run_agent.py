@@ -70,12 +70,55 @@ from reymen.sistem.ReYMeN_constants import get_reymen_home
 # `mock.patch("run_agent.<X>")`, `from run_agent import <X>` in production
 # siblings, or the `_ra().<X>` indirection in agent/system_prompt.py — none
 # of which ruff's in-module usage scan can see.
-from agent.process_bootstrap import (
-    OpenAI,  # noqa: F401  # re-exported for tests that mock.patch("run_agent.OpenAI")
-    _SafeWriter,  # noqa: F401  # re-exported for tests that `from run_agent import _SafeWriter`
-    _get_proxy_for_base_url,
-)
-from agent.iteration_budget import IterationBudget
+try:
+    from agent.process_bootstrap import (
+        OpenAI,  # noqa: F401
+        _SafeWriter,  # noqa: F401
+        _get_proxy_for_base_url,
+    )
+except ImportError:
+    # ReYMeN self-contained stubs — no Hermes dependency
+    from openai import OpenAI  # noqa: F401
+
+    class _SafeWriter:  # noqa: F401
+        """Crash-resistant stdout wrapper (Hermes-compatible stub)."""
+        __slots__ = ("_inner",)
+
+        def __init__(self, inner):
+            object.__setattr__(self, "_inner", inner)
+
+        def write(self, data):
+            try:
+                return self._inner.write(data)
+            except (OSError, ValueError):
+                return len(data) if isinstance(data, str) else 0
+
+        def flush(self):
+            try:
+                self._inner.flush()
+            except (OSError, ValueError):
+                pass
+
+        def fileno(self):
+            return self._inner.fileno()
+
+        def isatty(self):
+            try:
+                return self._inner.isatty()
+            except (OSError, ValueError):
+                return False
+
+        def __getattr__(self, name):
+            return getattr(self._inner, name)
+
+    def _get_proxy_for_base_url(base_url=None):  # noqa: F811
+        """Stub: no proxy configured in standalone mode."""
+        return None
+
+try:
+    from agent.iteration_budget import IterationBudget
+except ImportError:
+    from reymen.cereyan.iteration_budget import IterationBudget  # type: ignore
 
 
 from ReYMeN_cli.env_loader import load_reymen_dotenv
@@ -86,7 +129,7 @@ from ReYMeN_cli.timeouts import (
 
 _ReYMeN_home = get_reymen_home()
 _project_env = Path(__file__).parent / '.env'
-_loaded_env_paths = load_reymen_dotenv(ReYMeN_home=_ReYMeN_home, project_env=_project_env)
+_loaded_env_paths = load_reymen_dotenv(reymen_home=_ReYMeN_home, project_env=_project_env)
 if _loaded_env_paths:
     for _env_path in _loaded_env_paths:
         logger.info("Loaded environment variables from %s", _env_path)
