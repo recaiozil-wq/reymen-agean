@@ -41,7 +41,8 @@ class BrowserTool:
     - Dialog yönetimi
     """
 
-    def __init__(self):
+    def __init__(self, headless: bool = True):
+        self._headless = headless
         self._pw = None
         self._browser = None
         self._page = None
@@ -49,6 +50,7 @@ class BrowserTool:
         self._playwright_var = None
         self._tabs: list = []
         self._tab_index = 0
+        self._recorder = None  # type: ignore  # WorkflowRecorder atanir
 
     def _playwright_yukle(self) -> bool:
         if self._playwright_var is not None:
@@ -61,33 +63,93 @@ class BrowserTool:
         return self._playwright_var
 
     def _sayfa_al(self):
-        """Mevcut veya yeni sayfa döndür."""
+        """Mevcut sayfayı döndür, kapalıysa yenisini aç."""
         if self._page:
-            return self._page
+            try:
+                self._page.evaluate("1")  # canlılık testi
+                return self._page
+            except Exception:
+                self._page = None
+        # Yeni tarayıcı başlat
         from playwright.sync_api import sync_playwright
         self._pw = sync_playwright().start()
-        self._browser = self._pw.chromium.launch(headless=True, args=["--no-sandbox"])
+        self._browser = self._pw.chromium.launch(headless=self._headless, args=["--no-sandbox"])
         self._context = self._browser.new_context(
             user_agent="Mozilla/5.0 ReYMeNAgent/1.0"
         )
         self._page = self._context.new_page()
+        # Kapanma olayını dinle
+        def _sayfa_kapandi(sayfa):
+            import logging
+            logging.getLogger("BrowserTool").warning(
+                "[Browser] Sayfa kapatildi: %s", sayfa.url
+            )
+            if self._page is sayfa:
+                self._page = None
+        self._page.on("close", _sayfa_kapandi)
         self._tabs = [self._page]
         self._tab_index = 0
         return self._page
+
+    # ── Yardımcı: güvenli hata yönetimi ─────────────────────────────
+    _MAX_RETRY = 3
+    _retry_counter = 0
+
+    def _hata_kontrol(self, selector: str = "") -> str:
+        """Hata anında screenshot al + log."""
+        import time, logging
+        log = logging.getLogger("BrowserTool")
+        ts = int(time.time())
+        ss_path = f"_browser_hata_{ts}.png"
+        try:
+            if self._page:
+                self._page.screenshot(path=ss_path, full_page=True)
+        except Exception:
+            ss_path = ""
+        log.warning("[Browser] Hata: selector=%s screenshot=%s", selector, ss_path)
+        return ss_path
+
+    def _sayfa_saglik_kontrol(self) -> bool:
+        """Sayfa hala açık mı, kapandıysa sıfırla."""
+        try:
+            self._sayfa_al()  # canlılık testi + otomatik yeniden açma
+            self._retry_counter = 0
+            return True
+        except Exception:
+            self._retry_counter += 1
+            if self._retry_counter >= self._MAX_RETRY:
+                self._retry_counter = 0
+                return False
+            return self._sayfa_al() is not None
 
     # ── Temel ──────────────────────────────────────────────────────
 
     def ac(self, url: str) -> str:
         if not self._playwright_yukle():
             return self._urllib_fallback(url)
-        try:
-            p = self._sayfa_al()
-            p.goto(url, timeout=20000, wait_until="domcontentloaded")
-            baslik = p.title()
-            metin = p.inner_text("body")[:2000]
-            return f"[Browser] {baslik}\nURL: {url}\n\n{metin}"
-        except Exception as e:
-            return self._urllib_fallback(url)
+        import time
+        from playwright.sync_api import TimeoutError as PWTimeout
+        son_hata = ""
+        for deneme in range(3):
+            try:
+                p = self._sayfa_al()
+                sure = 15000 + (deneme * 10000)  # 15s, 25s, 35s
+                p.goto(url, timeout=sure, wait_until="domcontentloaded")
+                baslik = p.title()
+                metin = p.inner_text("body")[:2000]
+                if self._recorder:
+                    self._recorder.kaydet("ac", url=url)
+                return f"[Browser] {baslik}\nURL: {url}\n\n{metin}"
+            except PWTimeout:
+                son_hata = f"Zaman asimi ({sure/1000}s), deneme {deneme+1}/3"
+                self._hata_kontrol(url)
+                time.sleep(1 * (deneme + 1))
+                continue
+            except Exception as e:
+                son_hata = str(e)[:100]
+                self._hata_kontrol(url)
+                break
+        return f"[Browser:Hata] {url} yuklenemedi: {son_hata}"
 
     def screenshot(self, url: str = "", cikti: str = "screenshot.png") -> str:
         if not self._playwright_yukle():
@@ -97,6 +159,8 @@ class BrowserTool:
             if url and self._page:
                 p.goto(url, timeout=20000, wait_until="networkidle")
             p.screenshot(path=cikti, full_page=True)
+            if self._recorder:
+                self._recorder.kaydet("screenshot", url=url, cikti=cikti)
             return f"[Browser] Screenshot alindi: {cikti}"
         except Exception as e:
             return f"[Browser] Screenshot hatasi: {e}"
@@ -104,24 +168,53 @@ class BrowserTool:
     def js_calistir(self, url: str = "", js: str = "document.title") -> str:
         if not self._playwright_yukle():
             return "[Browser] Playwright yuklu degil."
-        try:
-            p = self._sayfa_al()
-            if url:
-                p.goto(url, timeout=20000)
-            sonuc = p.evaluate(js)
-            return f"[Browser] JS sonucu: {sonuc}"
-        except Exception as e:
-            return f"[Browser] JS hatasi: {e}"
+        for deneme in range(2):
+            try:
+                p = self._sayfa_al()
+                if url:
+                    p.goto(url, timeout=20000)
+                sonuc = p.evaluate(js)
+                return f"[Browser] JS sonucu: {sonuc}"
+            except Exception as e:
+                if deneme == 0:
+                    import time
+                    time.sleep(1)
+                    continue
+                # Fallback: DOM ile oku
+                try:
+                    p = self._sayfa_al()
+                    metin = p.inner_text("body")[:2000]
+                    return f"[Browser] JS hatasi: {e}\nDOM fallback: {metin[:200]}"
+                except Exception:
+                    return f"[Browser:Hata] JS: {e}"
 
     def tikla(self, secici: str) -> str:
         if not self._page:
             return "[Browser] Once ac() cagir."
-        try:
-            self._page.click(secici, timeout=5000)
-            time.sleep(0.5)
-            return f"[Browser] Tiklandi: {secici}"
-        except Exception as e:
-            return f"[Browser] Tikla hatasi: {e}"
+        from playwright.sync_api import TimeoutError as PWTimeout
+        for deneme in range(2):
+            try:
+                self._page.click(secici, timeout=5000)
+                time.sleep(0.5)
+                if self._recorder:
+                    self._recorder.kaydet("tikla", secici=secici)
+                return f"[Browser] Tiklandi: {secici}"
+            except PWTimeout:
+                try:
+                    self._page.wait_for_selector(secici, state="visible", timeout=10000)
+                    self._page.click(secici, timeout=5000)
+                    if self._recorder:
+                        self._recorder.kaydet("tikla", secici=secici)
+                    return f"[Browser] Tiklandi (bekleme sonrasi): {secici}"
+                except PWTimeout:
+                    self._hata_kontrol(secici)
+                    if deneme == 0:
+                        time.sleep(2)
+                        continue
+                    return f"[Browser:Hata] Element 15s icinde bulunamadi: {secici}"
+            except Exception as e:
+                self._hata_kontrol(secici)
+                return f"[Browser:Hata] Tiklama: {e}"
 
     def kapat(self):
         try:
@@ -144,9 +237,21 @@ class BrowserTool:
             return "[Browser] Once ac() cagir."
         try:
             self._page.fill(secici, deger, timeout=5000)
+            if self._recorder:
+                self._recorder.kaydet("fill", secici=secici, deger=deger)
             return f"[Browser] Dolduruldu: {secici} = {deger[:50]}"
         except Exception as e:
-            return f"[Browser] Fill hatasi: {e}"
+            try:
+                disabled = self._page.is_disabled(secici)
+                if disabled:
+                    return f"[Browser:Hata] Input pasif (disabled): {secici}"
+                self._page.type(secici, deger, delay=50)
+                if self._recorder:
+                    self._recorder.kaydet("type", secici=secici, deger=deger)
+                return f"[Browser] Yazildi (type fallback): {secici} = {deger[:50]}"
+            except Exception as e2:
+                self._hata_kontrol(secici)
+                return f"[Browser:Hata] Doldurma: {e}"
 
     def type_text(self, secici: str, deger: str) -> str:
         """Karakter karakter yaz (keyboard event tetikler)."""
@@ -154,6 +259,8 @@ class BrowserTool:
             return "[Browser] Once ac() cagir."
         try:
             self._page.type(secici, deger, timeout=5000)
+            if self._recorder:
+                self._recorder.kaydet("type", secici=secici, deger=deger)
             return f"[Browser] Yazildi: {secici} = {deger[:50]}"
         except Exception as e:
             return f"[Browser] Type hatasi: {e}"
@@ -164,9 +271,20 @@ class BrowserTool:
             return "[Browser] Once ac() cagir."
         try:
             self._page.select_option(secici, deger, timeout=5000)
+            if self._recorder:
+                self._recorder.kaydet("sec", secici=secici, deger=deger)
             return f"[Browser] Secildi: {secici} = {deger}"
         except Exception as e:
-            return f"[Browser] Select hatasi: {e}"
+            try:
+                secenekler = self._page.eval_on_selector_all(
+                    f"{secici} option",
+                    "els => els.map(e => e.value)"
+                )
+                return (f"[Browser:Hata] '{deger}' bulunamadi: {e}\n"
+                        f"Mevcut secenekler ({len(secenekler)}): {secenekler[:20]}")
+            except Exception:
+                self._hata_kontrol(secici)
+                return f"[Browser:Hata] Select: {e}"
 
     def wait_for(self, secici: str, timeout: int = 10) -> str:
         """Element sayfada görünene kadar bekle."""
@@ -195,11 +313,25 @@ class BrowserTool:
         """Elementin üzerine gel."""
         if not self._page:
             return "[Browser] Once ac() cagir."
+        from playwright.sync_api import TimeoutError as PWTimeout
         try:
             self._page.hover(secici, timeout=5000)
+            if self._recorder:
+                self._recorder.kaydet("hover", secici=secici)
             return f"[Browser] Hover: {secici}"
+        except PWTimeout:
+            try:
+                self._page.wait_for_selector(secici, state="visible", timeout=10000)
+                self._page.hover(secici, timeout=5000)
+                if self._recorder:
+                    self._recorder.kaydet("hover", secici=secici)
+                return f"[Browser] Hover (bekleme sonrasi): {secici}"
+            except Exception:
+                self._hata_kontrol(secici)
+                return f"[Browser:Hata] Hover: element bulunamadi: {secici}"
         except Exception as e:
-            return f"[Browser] Hover hatasi: {e}"
+            self._hata_kontrol(secici)
+            return f"[Browser:Hata] Hover: {e}"
 
     def scroll(self, dx: int = 0, dy: int = 300) -> str:
         """Sayfayı kaydır."""
@@ -207,6 +339,8 @@ class BrowserTool:
             return "[Browser] Once ac() cagir."
         try:
             self._page.evaluate(f"window.scrollBy({dx}, {dy})")
+            if self._recorder:
+                self._recorder.kaydet("scroll", dx=dx, dy=dy)
             return f"[Browser] Scroll: dx={dx} dy={dy}"
         except Exception as e:
             return f"[Browser] Scroll hatasi: {e}"
@@ -228,6 +362,8 @@ class BrowserTool:
             return "[Browser] Once ac() cagir."
         try:
             self._page.go_back()
+            if self._recorder:
+                self._recorder.kaydet("back")
             return f"[Browser] Geri: {self._page.title()}"
         except Exception as e:
             return f"[Browser] Geri hatasi: {e}"
@@ -238,6 +374,8 @@ class BrowserTool:
             return "[Browser] Once ac() cagir."
         try:
             self._page.go_forward()
+            if self._recorder:
+                self._recorder.kaydet("forward")
             return f"[Browser] Ileri: {self._page.title()}"
         except Exception as e:
             return f"[Browser] Ileri hatasi: {e}"
@@ -257,30 +395,60 @@ class BrowserTool:
         if not self._playwright_yukle():
             return "[Browser] Playwright yuklu degil."
         try:
-            p = self._sayfa_al()
-            yeni = self._context.new_page() if self._context else p
+            if not self._context:
+                self._sayfa_al()
+            yeni = self._context.new_page() if self._context else self._page
             if url:
                 yeni.goto(url, timeout=20000)
+            # Kapanma olayını dinle
+            def _tab_kapandi(sayfa):
+                import logging
+                idx = self._tabs.index(sayfa) if sayfa in self._tabs else -1
+                logging.getLogger("BrowserTool").warning(
+                    "[Browser] Sekme kapatildi: #%d %s", idx, sayfa.url
+                )
+                if idx >= 0 and idx < len(self._tabs):
+                    self._tabs[idx] = None  # işaretle
+            yeni.on("close", _tab_kapandi)
             self._tabs.append(yeni)
             self._page = yeni
             self._tab_index = len(self._tabs) - 1
+            # Boş referansları temizle
+            self._tabs = [t for t in self._tabs if t is not None]
             return f"[Browser] Yeni sekme #{self._tab_index}: {yeni.title()}"
         except Exception as e:
-            return f"[Browser] Yeni sekme hatasi: {e}"
+            return f"[Browser:Hata] Yeni sekme: {e}"
 
     def switch_tab(self, index: int) -> str:
         """Sekmeye geç."""
-        if not self._tabs or index < 0 or index >= len(self._tabs):
+        # Önce boş referansları temizle
+        self._tabs = [t for t in self._tabs if t is not None]
+        if not self._tabs:
+            return "[Browser] Acik sekme yok."
+        if index < 0 or index >= len(self._tabs):
             return f"[Browser] Gecersiz sekme: {index} (0-{len(self._tabs)-1})"
         try:
-            self._page = self._tabs[index]
+            # Sayfanın hala açık olduğunu kontrol et
+            sayfa = self._tabs[index]
+            try:
+                sayfa.evaluate("1")
+            except Exception:
+                self._tabs.pop(index)
+                self._tabs = [t for t in self._tabs if t is not None]
+                if not self._tabs:
+                    self._page = None
+                    return "[Browser] Sekme kapanmis, acik sekme yok."
+                index = min(index, len(self._tabs) - 1)
+                sayfa = self._tabs[index]
+            self._page = sayfa
             self._tab_index = index
             return f"[Browser] Sekme #{index}: {self._page.title()}"
         except Exception as e:
-            return f"[Browser] Sekme hatasi: {e}"
+            return f"[Browser:Hata] Sekme gecis: {e}"
 
     def close_tab(self, index: int = -1) -> str:
         """Sekmeyi kapat (varsayilan: aktif)."""
+        self._tabs = [t for t in self._tabs if t is not None]
         if not self._tabs:
             return "[Browser] Acik sekme yok."
         i = index if index >= 0 else self._tab_index
@@ -289,13 +457,17 @@ class BrowserTool:
         try:
             self._tabs[i].close()
             self._tabs.pop(i)
-            if i >= len(self._tabs):
-                i = len(self._tabs) - 1
-            self._page = self._tabs[i] if self._tabs else None
-            self._tab_index = i if self._page else 0
+            self._tabs = [t for t in self._tabs if t is not None]
+            if not self._tabs:
+                self._page = None
+                self._tab_index = 0
+                return "[Browser] Son sekme kapatildi."
+            i = min(i, len(self._tabs) - 1)
+            self._page = self._tabs[i]
+            self._tab_index = i
             return f"[Browser] Sekme #{i} kapatildi."
         except Exception as e:
-            return f"[Browser] Sekme kapatma hatasi: {e}"
+            return f"[Browser:Hata] Sekme kapatma: {e}"
 
     def tabs_list(self) -> str:
         """Açık sekmeleri listele."""
@@ -646,10 +818,7 @@ _supervisor.izlemeyi_baslat()
 
 def motor_kaydet(motor, onay_tool: ApprovalTool = None):
     """motor.py'ye gelismis araclari kaydet."""
-    try:
-        from plugins.kanban import _plugin_arac_kaydet
-    except Exception:
-        return
+    k = lambda ad, fonk, aciklama="": motor._plugin_arac_kaydet(ad, fonk, aciklama)
     def browser_ac(ham: str) -> str:
         params = re.findall(r'"((?:[^"\\]|\\.)*)"', ham)
         return _browser.ac(params[0] if params else ham.strip('"'))
@@ -693,6 +862,13 @@ def motor_kaydet(motor, onay_tool: ApprovalTool = None):
 
     def browser_html(ham: str) -> str:
         return _browser.html()
+
+    def browser_type_text(ham: str) -> str:
+        """BROWSER_TYPE_TEXT "secici" "metin": karakter karakter yaz"""
+        params = re.findall(r'"((?:[^"\\]|\\.)*)"', ham)
+        if len(params) < 2:
+            return '[Browser] Kullanim: BROWSER_TYPE_TEXT "secici" "metin"'
+        return _browser.type_text(params[0], params[1])
 
     def browser_tabs(ham: str) -> str:
         """BROWSER_TABS: sekmeleri listele"""
@@ -741,6 +917,49 @@ def motor_kaydet(motor, onay_tool: ApprovalTool = None):
             return f"[Browser] Acik: {_browser.title()}\n{_browser.url()}"
         return "[Browser] Kapali."
 
+    # ── Workflow Recorder araclari ──────────────────────────────────
+    _recorder = None
+    def _recorder_al():
+        nonlocal _recorder
+        if _recorder is None:
+            from reymen.arac.workflow_recorder import WorkflowRecorder
+            _recorder = WorkflowRecorder()
+        return _recorder
+
+    def workflow_basla(ham: str) -> str:
+        rec = _recorder_al()
+        ad = ham.strip('"') or f"workflow_{int(time.time())}"
+        _browser._recorder = rec
+        return rec.basla(ad)
+
+    def workflow_bitir(ham: str) -> str:
+        rec = _recorder_al()
+        sonuc = rec.bitir()
+        _browser._recorder = None
+        return sonuc
+
+    def workflow_tekrarla(ham: str) -> str:
+        rec = _recorder_al()
+        ad = ham.strip('"')
+        return rec.tekrarla(ad, _browser)
+
+    def workflow_listele(ham: str) -> str:
+        return _recorder_al().listele()
+
+    def workflow_sil(ham: str) -> str:
+        ad = ham.strip('"')
+        return _recorder_al().sil(ad)
+
+    def browser_vision(ham: str) -> str:
+        """BROWSER_VISION \"soru\": sayfanin screenshot'ini al, path doner"""
+        import time
+        ss_dosya = f"_browser_vision_{int(time.time())}.png"
+        sonuc = _browser.screenshot(cikti=ss_dosya)
+        if "hata" in sonuc.lower():
+            return sonuc
+        soru = ham.strip('"') or "Bu sayfada ne goruyorsun?"
+        return f"[Browser Vision] Screenshot: {ss_dosya}\nSoru: {soru}\nDosyayi GORUNTU_ANALIZ veya baska bir arac ile analiz edebilirsin."
+
     def supervisor_rapor(ham: str) -> str:
         return _supervisor.rapor()
 
@@ -751,31 +970,37 @@ def motor_kaydet(motor, onay_tool: ApprovalTool = None):
         sonuc = tool.onay_iste("ReYMeN Onay", mesaj)
         return f"[Onay] {'ONAYLANDI' if sonuc else 'REDDEDILDI'}"
 
-    # Temel
-    _plugin_arac_kaydet(motor, "BROWSER_HEADLESS", browser_ac)
-    _plugin_arac_kaydet(motor, "BROWSER_SCREENSHOT", browser_screenshot)
-    _plugin_arac_kaydet(motor, "BROWSER_JS", browser_js)
-    _plugin_arac_kaydet(motor, "SUPERVISOR_RAPOR", supervisor_rapor)
-    _plugin_arac_kaydet(motor, "ONAY_ISTE", onay_iste_arac)
+    k("BROWSER_HEADLESS", browser_ac)
+    k("BROWSER_SCREENSHOT", browser_screenshot)
+    k("BROWSER_JS", browser_js)
+    k("SUPERVISOR_RAPOR", supervisor_rapor)
+    k("ONAY_ISTE", onay_iste_arac)
 
     # Gelişmiş browser
-    _plugin_arac_kaydet(motor, "BROWSER_FILL", browser_fill)
-    _plugin_arac_kaydet(motor, "BROWSER_CLICK", browser_click)
-    _plugin_arac_kaydet(motor, "BROWSER_WAIT", browser_wait)
-    _plugin_arac_kaydet(motor, "BROWSER_SELECT", browser_select)
-    _plugin_arac_kaydet(motor, "BROWSER_SNAPSHOT", browser_snapshot)
-    _plugin_arac_kaydet(motor, "BROWSER_HTML", browser_html)
-    _plugin_arac_kaydet(motor, "BROWSER_TABS", browser_tabs)
-    _plugin_arac_kaydet(motor, "BROWSER_NEW_TAB", browser_new_tab)
-    _plugin_arac_kaydet(motor, "BROWSER_SWITCH_TAB", browser_switch_tab)
-    _plugin_arac_kaydet(motor, "BROWSER_BACK", browser_back)
-    _plugin_arac_kaydet(motor, "BROWSER_FORWARD", browser_forward)
-    _plugin_arac_kaydet(motor, "BROWSER_RELOAD", browser_reload)
-    _plugin_arac_kaydet(motor, "BROWSER_SCROLL", browser_scroll)
-    _plugin_arac_kaydet(motor, "BROWSER_HOVER", browser_hover)
-    _plugin_arac_kaydet(motor, "BROWSER_CLOSE", browser_close)
-    _plugin_arac_kaydet(motor, "BROWSER_STATUS", browser_status)
-    print("[GelismisTools] 21 arac kayit edildi.")
+    k("BROWSER_FILL", browser_fill)
+    k("BROWSER_CLICK", browser_click)
+    k("BROWSER_WAIT", browser_wait)
+    k("BROWSER_SELECT", browser_select)
+    k("BROWSER_SNAPSHOT", browser_snapshot)
+    k("BROWSER_HTML", browser_html)
+    k("BROWSER_TYPE_TEXT", browser_type_text)
+    k("BROWSER_VISION", browser_vision)
+    k("BROWSER_TABS", browser_tabs)
+    k("BROWSER_NEW_TAB", browser_new_tab)
+    k("BROWSER_SWITCH_TAB", browser_switch_tab)
+    k("BROWSER_BACK", browser_back)
+    k("BROWSER_FORWARD", browser_forward)
+    k("BROWSER_RELOAD", browser_reload)
+    k("BROWSER_SCROLL", browser_scroll)
+    k("BROWSER_HOVER", browser_hover)
+    k("BROWSER_CLOSE", browser_close)
+    k("BROWSER_STATUS", browser_status)
+    k("WORKFLOW_BASLA", workflow_basla, "Is akisi kaydi baslat. Parametre: workflow_adi (bos olursa otomatik)")
+    k("WORKFLOW_BITIR", workflow_bitir, "Aktif kaydi bitir ve JSON dosyasina kaydet")
+    k("WORKFLOW_TEKRARLA", workflow_tekrarla, "Kayitli workflow'u tekrarla. Parametre: workflow_adi")
+    k("WORKFLOW_LISTELE", workflow_listele, "Kayitli workflow'lari listele")
+    k("WORKFLOW_SIL", workflow_sil, "Bir workflow'u sil. Parametre: workflow_adi")
+    print("[GelismisTools] 28 arac kayit edildi.")
 
 
 # ═══════════════════════════════════════════════════════════════
