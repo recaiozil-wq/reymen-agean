@@ -674,6 +674,24 @@ def main():
         parser.print_help()
         return 1
 
+    # ── TUI modu ──────────────────────────────────────────────────────────
+    if "--tui" in sys.argv or getattr(args, "tui", False):
+        from reymen.cli.tui import tui_baslat
+        cur_m, cur_p = _mevcut_model()
+        session_id = _uid.uuid4().hex[:8]
+
+        def _tui_soru(soru: str) -> str:
+            """TUI callback: soruyu ReYMeN'e ilet ve cevabi don."""
+            cevap, _ = _sor(soru)
+            return cevap
+
+        return tui_baslat(
+            soru_callback=_tui_soru,
+            model=cur_m,
+            provider=cur_p,
+            session_id=session_id,
+        )
+
     # Varsayılan: REPL başlat
     session_id = _uid.uuid4().hex[:8]
     cur_m, cur_p = _mevcut_model()

@@ -27,6 +27,22 @@ from typing import Any, Callable, Generator, List, Optional, Tuple
 
 import requests
 
+# ── Provider Abstraction (config.yaml model.provider okur) ──────────────────
+try:
+    from reymen.cereyan.provider_abstraction import (
+        ProviderBase,
+        get_provider,
+        saglayiciyi_yapilandir,
+        ProviderYanit,
+        _VARSAYILAN_MODELLER as _PA_VARSAYILAN_MODELLER,
+    )
+    _PA_AKTIF = True
+except ImportError:
+    _PA_AKTIF = False
+    ProviderBase = None  # type: ignore[assignment, misc]
+    get_provider = None  # type: ignore[assignment]
+    saglayiciyi_yapilandir = None  # type: ignore[assignment]
+
 # ── Observability / Tracing (opsiyonel) ─────────────────────────────────────
 try:
     from reymen.core.observability import trace_llm_call
@@ -191,17 +207,32 @@ class Beyin:
 
     def __init__(self, config: dict[str, Any]) -> None:
         self.config = config
+        # model.provider oku (config.yaml model: provider: deepseek)
+        model_blok = config.get("model", {})
+        if isinstance(model_blok, dict):
+            model_provider = model_blok.get("provider", "")
+            model_model = model_blok.get("model") or model_blok.get("default", "")
+        else:
+            model_provider = ""
+            model_model = ""
+
         # Önce üst düzey anahtarları, yoksa "general" altındakileri oku
-        self.provider: str = config.get(
-            "default_provider",
-            config.get("general", {}).get("default_provider", "lmstudio"),
+        self.provider: str = (
+            model_provider
+            or config.get(
+                "default_provider",
+                config.get("general", {}).get("default_provider", "lmstudio"),
+            )
         )
-        self.model: str = config.get(
-            "default_model",
-            config.get("general", {}).get(
+        self.model: str = (
+            model_model
+            or config.get(
                 "default_model",
-                "cognitivecomputations.dolphin3.0-llama3.1-8b",
-            ),
+                config.get("general", {}).get(
+                    "default_model",
+                    "cognitivecomputations.dolphin3.0-llama3.1-8b",
+                ),
+            )
         )
 
         self.base_url, self.api_key = self._saglayici_baglantisi_kur(self.provider)
@@ -890,10 +921,29 @@ class Beyin:
             "perplexity":         lambda: self._cagir_openai_uyumlu(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
         }
 
-        fn = dispatch.get(
-            adim.provider,
-            lambda: self._cagir_openai_uyumlu(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
-        )
+        # Provider Abstraction entegrasyonu — deepseek, openai, xai
+        if _PA_AKTIF and adim.provider in ("deepseek", "openai", "xai"):
+            pa_provider = get_provider(
+                adim.provider,
+                model=adim.model,
+                api_key=adim.api_key,
+                base_url=adim.base_url,
+                config=self.config,
+            )
+            if pa_provider and pa_provider.hazir_mi():
+                fn = lambda p=pa_provider, s=sistem_prompt, m=mesajlar: (  # noqa: E731
+                    p.chat(m, s).metin
+                )
+            else:
+                fn = dispatch.get(
+                    adim.provider,
+                    lambda: self._cagir_openai_uyumlu(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
+                )
+        else:
+            fn = dispatch.get(
+                adim.provider,
+                lambda: self._cagir_openai_uyumlu(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
+            )
         metin = fn()
 
         tahmini_token = (
@@ -967,12 +1017,33 @@ class Beyin:
                 "perplexity":         lambda: self._cagir_openai_uyumlu(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
             }
 
-            fn = dispatch.get(
-                adim.provider,
-                lambda: self._cagir_openai_uyumlu(
-                    adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar,
-                ),
-            )
+            # Provider Abstraction entegrasyonu — deepseek, openai, xai
+            if _PA_AKTIF and adim.provider in ("deepseek", "openai", "xai"):
+                pa_provider = get_provider(
+                    adim.provider,
+                    model=adim.model,
+                    api_key=adim.api_key,
+                    base_url=adim.base_url,
+                    config=self.config,
+                )
+                if pa_provider and pa_provider.hazir_mi():
+                    fn = lambda p=pa_provider, s=sistem_prompt, m=mesajlar: (  # noqa: E731
+                        p.chat(m, s).metin
+                    )
+                else:
+                    fn = dispatch.get(
+                        adim.provider,
+                        lambda: self._cagir_openai_uyumlu(
+                            adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar,
+                        ),
+                    )
+            else:
+                fn = dispatch.get(
+                    adim.provider,
+                    lambda: self._cagir_openai_uyumlu(
+                        adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar,
+                    ),
+                )
             metin = fn()
             sure = time.monotonic() - t0
             logger.info(

@@ -156,6 +156,21 @@ logging.level: INFO
 logging.file: .ReYMeN/logs/reymen.log
 logging.max_size_mb: 10
 logging.backup_count: 5
+
+# ── OpenTelemetry Observability ────────────────────────────────────────────
+# Her LLM çağrısını trace eder; token/maliyet/latency takibi.
+# Modlar:
+#   enabled: false  → Kapalı (no-op tracer, hiçbir şey göndermez)
+#   enabled: true   → Açık:
+#     exporter: console → Span'leri stdout'a yazdırır (geliştirme)
+#     exporter: otlp    → OTLP endpoint'ine gönderir (Langfuse/Jaeger)
+#       endpoint: ''    → OTLP endpoint URL'si (boşsa Langfuse varsayılanı)
+#   Not: LANGFUSE_PUBLIC_KEY / LANGFUSE_SECRET_KEY env var'ları varsa
+#   otomatik Langfuse OTLP kullanılır (geriye uyumlu).
+observability:
+  enabled: false
+  exporter: console  # console|otlp
+  endpoint: ''  # OTLP exporter için endpoint URL
 mcp_server.enabled: false
 skills.dir: .ReYMeN/skills
 checkpoint.dir: .ReYMeN/checkpoints
@@ -173,6 +188,8 @@ ref_processor: true
 
 # ── Plugin Sistemi (lifecycle hooks) ─────────────────────────────────────
 # pre_llm_call, post_llm_call, on_session_start, on_session_end, on_message
+pydantic_validation: true
+
 plugins:
   enabled: true
   directory: reymen/plugins

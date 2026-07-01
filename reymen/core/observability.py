@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-observability.py — OpenTelemetry + Langfuse ile gözlemlenebilirlik katmanı.
+observability.py — OpenTelemetry LLM observability katmanı.
 
 LLM çağrıları, araç çalıştırmaları, skill yüklemeleri ve oturum başlatmaları
-için span'ler oluşturur. LANGFUSE_PUBLIC_KEY ve LANGFUSE_SECRET_KEY ortam
-değişkenleri varsa Langfuse OTLP exporter'a veri gönderir, yoksa sessizce
-devre dışı kalır (no-op tracer).
+için span'ler oluşturur. config.yaml'deki ``observability`` bölümüyle
+açılıp kapanabilir.
+
+Desteklenen exporter'lar:
+    - console  (standart çıktıya yazdırır, geliştirme için)
+    - otlp     (Langfuse/Jaeger gibi OTLP alıcılara gönderir)
 
 Kullanım:
     from reymen.core.observability import (
@@ -13,10 +16,11 @@ Kullanım:
         trace_llm_call,
         trace_tool_call,
         tracer,
+        observability_durum,
     )
 
-    # Uygulama başlangıcında bir kez çağır
-    setup_observability()
+    # Uygulama başlangıcında bir kez çağır (config dict ile veya env vars)
+    setup_observability(config={"observability": {"enabled": True, "exporter": "console"}})
 
     # Dekoratör olarak
     @trace_llm_call()
@@ -35,31 +39,42 @@ import logging
 import os
 import time
 import traceback
+from contextlib import nullcontext
 from typing import Any, Callable, Optional
 
 logger = logging.getLogger(__name__)
 
-# ── Langfuse ortam değişkenleri ──────────────────────────────────────────────
+# ── Global durum ─────────────────────────────────────────────────────────────
+_TRACER = None
+_TRACER_PROVIDER = None
+_OBSERVABILITY_AKTIF = False
+
+
+# ── Config okuyucu ───────────────────────────────────────────────────────────
+def _config_oku(config: Optional[dict]) -> dict:
+    """config.yaml'deki observability bölümünü okur; yoksa varsayılan döndürür."""
+    if config is None:
+        config = {}
+    obs = config.get("observability", {}) if isinstance(config, dict) else {}
+    return {
+        "enabled": bool(obs.get("enabled", False)),
+        "exporter": str(obs.get("exporter", "console")),
+        "endpoint": str(obs.get("endpoint", "")),
+        "service_name": str(config.get("agent", {}).get("name", "reymen-agent"))
+        if isinstance(config, dict)
+        else "reymen-agent",
+        "service_version": "1.0.0",
+    }
+
+
+# ── Langfuse env vars (geriye uyumluluk) ─────────────────────────────────────
 LANGFUSE_PUBLIC_KEY = os.environ.get("LANGFUSE_PUBLIC_KEY", "")
 LANGFUSE_SECRET_KEY = os.environ.get("LANGFUSE_SECRET_KEY", "")
 
-# Langfuse OTLP endpoint'leri
 LANGFUSE_OTLP_TRACES_ENDPOINT = os.environ.get(
     "LANGFUSE_OTLP_TRACES_ENDPOINT",
     "https://cloud.langfuse.com/api/public/otlp/v1/traces",
 )
-LANGFUSE_OTLP_METRICS_ENDPOINT = os.environ.get(
-    "LANGFUSE_OTLP_METRICS_ENDPOINT",
-    "https://cloud.langfuse.com/api/public/otlp/v1/metrics",
-)
-
-# Langfuse'un istediği özel enjektör başlıkları için
-# service.name = langfuse olarak set edildiğinde Langfuse OTLP alıcısı
-# Authorization başlığını Basic (public_key:secret_key) olarak oluşturur.
-
-_TRACER = None  # type: ignore[assignment]
-_TRACER_PROVIDER = None  # type: ignore[assignment]
-_OBSERVABILITY_AKTIF = False
 
 
 def _langfuse_kimlik_bilgisi_var() -> bool:
@@ -67,18 +82,24 @@ def _langfuse_kimlik_bilgisi_var() -> bool:
     return bool(LANGFUSE_PUBLIC_KEY) and bool(LANGFUSE_SECRET_KEY)
 
 
+# ── Public API ───────────────────────────────────────────────────────────────
+
+
 def setup_observability(
+    config: Optional[dict] = None,
     service_name: str = "reymen-agent",
     service_version: str = "1.0.0",
 ) -> bool:
-    """OpenTelemetry tracer'ı başlat.
+    """OpenTelemetry tracer'ı başlat veya kapat.
 
-    LANGFUSE_PUBLIC_KEY ve LANGFUSE_SECRET_KEY ortam değişkenleri
-    tanımlıysa Langfuse OTLP exporter kullanılır. Aksi halde no-op
-    tracer döner (hiçbir span gönderilmez).
+    Öncelik sırası:
+        1. ``config`` dict içindeki ``observability`` bölümü (birincil)
+        2. LANGFUSE_PUBLIC_KEY / LANGFUSE_SECRET_KEY env var'ları (geriye uyumlu)
+        3. Hiçbiri yoksa → no-op tracer (hiçbir span gönderilmez)
 
     Args:
-        service_name:    OpenTelemetry servis adı.
+        config:         config.yaml dict (observability.enabled/exporter/endpoint).
+        service_name:   OpenTelemetry servis adı (config yoksa kullanılır).
         service_version: OpenTelemetry servis versiyonu.
 
     Returns:
@@ -89,29 +110,67 @@ def setup_observability(
     if _TRACER is not None:
         return _OBSERVABILITY_AKTIF  # Zaten başlatılmış
 
-    if not _langfuse_kimlik_bilgisi_var():
-        logger.info(
-            "[Observability] LANGFUSE_PUBLIC_KEY / LANGFUSE_SECRET_KEY "
-            "tanımlı değil — observability devre dışı (no-op tracer)."
-        )
-        _OBSERVABILITY_AKTIF = False
-        _setup_noop_tracer(service_name, service_version)
-        return False
+    # 1. Config'den oku
+    obs_conf = _config_oku(config)
 
-    try:
-        _OBSERVABILITY_AKTIF = _setup_langfuse_tracer(
-            service_name, service_version
-        )
-    except Exception as exc:
-        logger.warning(
-            "[Observability] Langfuse tracer başlatılamadı: %s — "
-            "no-op tracer kullanılıyor.",
-            exc,
-        )
-        _OBSERVABILITY_AKTIF = False
-        _setup_noop_tracer(service_name, service_version)
+    if obs_conf["enabled"]:
+        exporter = obs_conf["exporter"]
+        if exporter == "otlp":
+            # OTLP exporter — endpoint gerekli
+            endpoint = obs_conf["endpoint"] or LANGFUSE_OTLP_TRACES_ENDPOINT
+            if _langfuse_kimlik_bilgisi_var():
+                success = _setup_langfuse_tracer(
+                    obs_conf["service_name"],
+                    obs_conf["service_version"],
+                )
+            else:
+                success = _setup_otlp_tracer(
+                    obs_conf["service_name"],
+                    obs_conf["service_version"],
+                    endpoint,
+                )
+            if success:
+                _OBSERVABILITY_AKTIF = True
+                return True
 
-    return _OBSERVABILITY_AKTIF
+        # 2. Console exporter (varsayılan)
+        try:
+            _setup_console_tracer(
+                obs_conf["service_name"],
+                obs_conf["service_version"],
+            )
+            _OBSERVABILITY_AKTIF = True
+            logger.info(
+                "[Observability] Console exporter başlatıldı — tracer aktif."
+            )
+            return True
+        except Exception as exc:
+            logger.warning(
+                "[Observability] Console tracer başlatılamadı: %s — no-op.",
+                exc,
+            )
+
+    # 3. Geriye uyumlu: env var ile Langfuse
+    if _langfuse_kimlik_bilgisi_var():
+        try:
+            _OBSERVABILITY_AKTIF = _setup_langfuse_tracer(service_name, service_version)
+            return _OBSERVABILITY_AKTIF
+        except Exception as exc:
+            logger.warning(
+                "[Observability] Langfuse tracer başlatılamadı: %s — no-op.",
+                exc,
+            )
+
+    # 4. No-op (devre dışı)
+    _setup_noop_tracer(service_name, service_version)
+    _OBSERVABILITY_AKTIF = False
+    logger.info(
+        "[Observability] Observability devre dışı — no-op tracer kullanılıyor."
+    )
+    return False
+
+
+# ── Tracer kurulumları ───────────────────────────────────────────────────────
 
 
 def _setup_noop_tracer(service_name: str, service_version: str) -> None:
@@ -133,16 +192,40 @@ def _setup_noop_tracer(service_name: str, service_version: str) -> None:
         otel_trace.set_tracer_provider(_TRACER_PROVIDER)
         _TRACER = otel_trace.get_tracer(service_name, service_version)
     except ImportError:
-        # OpenTelemetry SDK kurulu değil — tamamen no-op
         _TRACER = None
         _TRACER_PROVIDER = None
 
 
-def _setup_langfuse_tracer(
-    service_name: str,
-    service_version: str,
+def _setup_console_tracer(service_name: str, service_version: str) -> None:
+    """Console exporter ile tracer başlat."""
+    global _TRACER, _TRACER_PROVIDER
+
+    from opentelemetry import trace as otel_trace
+    from opentelemetry.sdk.resources import Resource
+    from opentelemetry.sdk.trace import TracerProvider
+    from opentelemetry.sdk.trace.export import SimpleSpanProcessor
+    from opentelemetry.sdk.trace.export import ConsoleSpanExporter
+
+    resource = Resource.create(
+        {
+            "service.name": service_name,
+            "service.version": service_version,
+        }
+    )
+    _TRACER_PROVIDER = TracerProvider(resource=resource)
+
+    exporter = ConsoleSpanExporter()
+    span_processor = SimpleSpanProcessor(exporter)
+    _TRACER_PROVIDER.add_span_processor(span_processor)
+    otel_trace.set_tracer_provider(_TRACER_PROVIDER)
+
+    _TRACER = otel_trace.get_tracer(service_name, service_version)
+
+
+def _setup_otlp_tracer(
+    service_name: str, service_version: str, endpoint: str
 ) -> bool:
-    """Langfuse OTLP exporter ile tracer başlat."""
+    """OTLP HTTP exporter ile tracer başlat."""
     global _TRACER, _TRACER_PROVIDER
 
     from opentelemetry import trace as otel_trace
@@ -153,8 +236,45 @@ def _setup_langfuse_tracer(
     from opentelemetry.sdk.trace import TracerProvider
     from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
-    # Langfuse Basic Auth: public_key:secret_key → Base64
+    resource = Resource.create(
+        {
+            "service.name": service_name,
+            "service.version": service_version,
+        }
+    )
+    _TRACER_PROVIDER = TracerProvider(resource=resource)
+
+    exporter = OTLPSpanExporter(
+        endpoint=endpoint,
+        timeout=10,
+    )
+
+    span_processor = BatchSpanProcessor(exporter)
+    _TRACER_PROVIDER.add_span_processor(span_processor)
+    otel_trace.set_tracer_provider(_TRACER_PROVIDER)
+
+    _TRACER = otel_trace.get_tracer(service_name, service_version)
+
+    logger.info(
+        "[Observability] OTLP exporter başlatıldı — endpoint: %s",
+        endpoint,
+    )
+    return True
+
+
+def _setup_langfuse_tracer(service_name: str, service_version: str) -> bool:
+    """Langfuse OTLP exporter ile tracer başlat (Basic Auth)."""
+    global _TRACER, _TRACER_PROVIDER
+
     import base64
+
+    from opentelemetry import trace as otel_trace
+    from opentelemetry.exporter.otlp.proto.http.trace_exporter import (
+        OTLPSpanExporter,
+    )
+    from opentelemetry.sdk.resources import Resource
+    from opentelemetry.sdk.trace import TracerProvider
+    from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
     kimlik_b64 = base64.b64encode(
         f"{LANGFUSE_PUBLIC_KEY}:{LANGFUSE_SECRET_KEY}".encode()
@@ -168,7 +288,6 @@ def _setup_langfuse_tracer(
     )
     _TRACER_PROVIDER = TracerProvider(resource=resource)
 
-    # Langfuse OTLP HTTP exporter
     exporter = OTLPSpanExporter(
         endpoint=LANGFUSE_OTLP_TRACES_ENDPOINT,
         headers={
@@ -185,10 +304,12 @@ def _setup_langfuse_tracer(
     _TRACER = otel_trace.get_tracer(service_name, service_version)
 
     logger.info(
-        "[Observability] Langfuse OTLP exporter başlatıldı — "
-        "tracer aktif."
+        "[Observability] Langfuse OTLP exporter başlatıldı — tracer aktif."
     )
     return True
+
+
+# ── Tracer erişimi ───────────────────────────────────────────────────────────
 
 
 def get_tracer():
@@ -198,13 +319,11 @@ def get_tracer():
     if _TRACER is not None:
         return _TRACER
 
-    # İlk çağrıda otomatik setup
     setup_observability()
     return _TRACER
 
 
-# Modül seviyesinde tracer erişimi: get_tracer() ile aynı
-tracer = get_tracer  # fonksiyon referansı — çağrı: tracer()
+tracer = get_tracer  # fonksiyon referansı
 
 
 def observability_aktif_mi() -> bool:
@@ -228,9 +347,6 @@ def span_olustur(
     """
     _tracer = get_tracer()
     if _tracer is None:
-        # No-op context manager
-        from contextlib import nullcontext
-
         return nullcontext()
 
     return _tracer.start_as_current_span(
@@ -254,7 +370,196 @@ def _span_kind(span_tipi: str):
         }
         return mapping.get(span_tipi, SpanKind.INTERNAL)
     except ImportError:
-        return None  # type: ignore[return-value]
+        return None
+
+
+# ── Token ve maliyet hesaplama yardımcıları ──────────────────────────────────
+
+# Basit token başına maliyet (USD/1K token) — en sık kullanılan modeller
+_TAHMINI_MALIYET: dict[str, dict[str, float]] = {
+    "deepseek": {"giris": 0.0005, "cikis": 0.0020},       # deepseek-chat
+    "openai": {"giris": 0.00015, "cikis": 0.0006},        # gpt-4o-mini
+    "anthropic": {"giris": 0.003, "cikis": 0.015},         # claude-haiku
+    "gemini": {"giris": 0.000075, "cikis": 0.0003},        # gemini-1.5-flash
+    "groq": {"giris": 0.0001, "cikis": 0.0004},            # llama-3.1-8b
+    "xai": {"giris": 0.00015, "cikis": 0.0006},            # grok-2
+    "openrouter": {"giris": 0.0005, "cikis": 0.0020},
+    "lmstudio": {"giris": 0.0, "cikis": 0.0},              # local
+    "ollama": {"giris": 0.0, "cikis": 0.0},                # local
+}
+
+_VARSAYILAN_MALIYET = {"giris": 0.001, "cikis": 0.002}
+
+
+def _token_maliyeti_hesapla(
+    provider: str,
+    giris_token: int,
+    cikis_token: int,
+) -> float:
+    """Tahmini token maliyetini USD cinsinden hesaplar."""
+    fiyat = _TAHMINI_MALIYET.get(provider, _VARSAYILAN_MALIYET)
+    giris_maliyet = (giris_token / 1000) * fiyat["giris"]
+    cikis_maliyet = (cikis_token / 1000) * fiyat["cikis"]
+    return round(giris_maliyet + cikis_maliyet, 6)
+
+
+def _token_sayisi_tahmin(text: str) -> int:
+    """Karakter bazında kaba token tahmini (4 karakter ≈ 1 token)."""
+    return len(text) // 4 if text else 0
+
+
+# ── LLM span attribute helper ────────────────────────────────────────────────
+
+
+def _llm_span_attr(
+    provider: str,
+    model: str,
+    sistem_prompt: str,
+    mesajlar: list,
+    yanit: str,
+    latency_ms: float,
+    success: bool = True,
+    hata: Optional[str] = None,
+) -> dict[str, Any]:
+    """LLM çağrısı için zengin span attribute'ları oluşturur."""
+    giris_token = _token_sayisi_tahmin(sistem_prompt) + sum(
+        _token_sayisi_tahmin(str(m)) for m in (mesajlar or [])
+    )
+    cikis_token = _token_sayisi_tahmin(yanit)
+    toplam_token = giris_token + cikis_token
+    maliyet = _token_maliyeti_hesapla(provider, giris_token, cikis_token)
+
+    attrs: dict[str, Any] = {
+        "span.type": "llm.call",
+        "llm.provider": provider,
+        "llm.model": model,
+        "llm.prompt_tokens": giris_token,
+        "llm.completion_tokens": cikis_token,
+        "llm.total_tokens": toplam_token,
+        "llm.cost_usd": maliyet,
+        "llm.latency_ms": round(latency_ms, 2),
+        "llm.success": success,
+    }
+
+    if hata:
+        attrs["error.type"] = type(hata).__name__ if isinstance(hata, Exception) else "Exception"
+        attrs["error.message"] = str(hata)
+
+    return attrs
+
+
+# ── LLM çağrısı için manuel span başlatma/bitirme API'si ─────────────────────
+
+
+class LLMSpan:
+    """LLM çağrısı için span yöneticisi.
+
+    ``with`` bloğu veya manuel start/end ile kullanılabilir.
+
+    Örnek (manuel):
+        span = LLMSpan("dusun", provider="deepseek", model="deepseek-chat")
+        span.start(sistem_prompt, mesajlar)
+        try:
+            yanit = model_cagir(...)
+            span.end(yanit)
+        except Exception as e:
+            span.end_error(e)
+    """
+
+    def __init__(
+        self,
+        name: str = "llm.call",
+        provider: str = "",
+        model: str = "",
+    ):
+        self.name = name
+        self.provider = provider
+        self.model = model
+        self._span = None
+        self._t0: float = 0.0
+        self._sistem_prompt: str = ""
+        self._mesajlar: list = []
+
+    def start(self, sistem_prompt: str = "", mesajlar: Optional[list] = None):
+        """Span'i başlat ve zamanı kaydet."""
+        self._t0 = time.monotonic()
+        self._sistem_prompt = sistem_prompt
+        self._mesajlar = mesajlar or []
+
+        _tracer = get_tracer()
+        if _tracer is None:
+            return
+
+        self._span = _tracer.start_span(
+            self.name,
+            attributes={
+                "span.type": "llm.call",
+                "llm.provider": self.provider,
+                "llm.model": self.model,
+            },
+        )
+
+    def end(self, yanit: str = ""):
+        """Span'i başarıyla bitir — token/maliyet/latency attribute'larını ekle."""
+        if self._span is None:
+            return
+
+        latency_ms = (time.monotonic() - self._t0) * 1000
+        attrs = _llm_span_attr(
+            provider=self.provider,
+            model=self.model,
+            sistem_prompt=self._sistem_prompt,
+            mesajlar=self._mesajlar,
+            yanit=yanit,
+            latency_ms=latency_ms,
+            success=True,
+        )
+
+        for k, v in attrs.items():
+            self._span.set_attribute(k, v)
+
+        self._span.end()
+        self._span = None
+
+    def end_error(self, hata: Exception):
+        """Span'i hata ile bitir."""
+        if self._span is None:
+            return
+
+        latency_ms = (time.monotonic() - self._t0) * 1000
+        attrs = _llm_span_attr(
+            provider=self.provider,
+            model=self.model,
+            sistem_prompt=self._sistem_prompt,
+            mesajlar=self._mesajlar,
+            yanit="",
+            latency_ms=latency_ms,
+            success=False,
+            hata=str(hata),
+        )
+
+        for k, v in attrs.items():
+            self._span.set_attribute(k, v)
+
+        self._span.record_exception(hata)
+        _span_set_status(self._span, str(hata))
+        self._span.end()
+        self._span = None
+
+
+def _status_error(description: str):
+    try:
+        from opentelemetry.trace import Status, StatusCode
+        return Status(StatusCode.ERROR, description)
+    except ImportError:
+        return None
+
+
+def _span_set_status(span, description: str):
+    """Span'e hata durumu ata; opentelemetry yoksa sessizce geç."""
+    status = _status_error(description)
+    if status is not None:
+        span.set_status(status)
 
 
 # ── Dekoratörler ─────────────────────────────────────────────────────────────
@@ -266,24 +571,19 @@ def trace_llm_call(
 ) -> Callable:
     """LLM çağrılarını izlemek için dekoratör.
 
-    ``llm.call`` span tipinde bir span oluşturur. Span'e şu attribute'lar
-    eklenir:
-        - model
-        - provider
-        - prompt_tokens (tahmini)
-        - completion_tokens (tahmini)
-        - latency_ms
+    ``llm.call`` span tipinde bir span oluşturur. Span'i fonksiyonun
+    etrafına sarar (start_as_current_span ile) ve şu attribute'ları ekler:
 
-    Hata durumunda span'e hata bilgisi ve stack trace eklenir.
+        - llm.provider
+        - llm.model
+        - llm.prompt_tokens (tahmini)
+        - llm.completion_tokens (tahmini)
+        - llm.total_tokens
+        - llm.cost_usd (tahmini)
+        - llm.latency_ms
+        - llm.success
 
-    Örnek:
-        @trace_llm_call()
-        def dusun(self, sistem_prompt, mesajlar):
-            ...
-
-        @trace_llm_call(span_adi="custom.llm.call")
-        def ozel_cagri(self, ...):
-            ...
+    Hata durumunda span'e hata bilgisi, stack trace ve exception kaydı eklenir.
     """
 
     def decorator(func: Callable) -> Callable:
@@ -292,83 +592,81 @@ def trace_llm_call(
             _tracer = get_tracer()
             _span_name = span_adi or f"llm.call.{func.__name__}"
 
-            # Sonucu al
-            t0 = time.monotonic()
-            try:
-                result = func(*args, **kwargs)
-                latency_ms = (time.monotonic() - t0) * 1000
+            # Provider/model bilgisini self'den al
+            provider = ""
+            model = ""
+            if args and hasattr(args[0], "provider"):
+                provider = getattr(args[0], "provider", "")
+            if args and hasattr(args[0], "model"):
+                model = getattr(args[0], "model", "")
 
-                # Span attribute'larını belirle
-                span_attrs = dict(attributes or {})
+            span_attrs = dict(attributes or {})
+            span_attrs.setdefault("span.type", "llm.call")
+            span_attrs.setdefault("llm.provider", provider)
+            span_attrs.setdefault("llm.model", model)
 
-                # args[0] = self (Beyin instance)
-                if args and hasattr(args[0], "provider"):
-                    span_attrs.setdefault("provider", getattr(args[0], "provider", ""))
-                if args and hasattr(args[0], "model"):
-                    span_attrs.setdefault("model", getattr(args[0], "model", ""))
+            if _tracer is not None:
+                with _tracer.start_as_current_span(
+                    _span_name,
+                    attributes=span_attrs,
+                    kind=_span_kind("client"),
+                ) as span:
+                    t0 = time.monotonic()
+                    try:
+                        result = func(*args, **kwargs)
+                        latency_ms = (time.monotonic() - t0) * 1000
 
-                # Token tahmini (LLMYanitMeta veya string)
-                if hasattr(result, "tahmini_token") and hasattr(result, "metin"):
-                    # LLMYanitMeta dönüşü
-                    span_attrs.setdefault(
-                        "prompt_tokens", getattr(result, "tahmini_token", 0)
-                    )
-                    span_attrs.setdefault(
-                        "completion_tokens", len(getattr(result, "metin", "")) // 4
-                    )
-                elif isinstance(result, str):
-                    # String yanıt: prompt'u kwargs/mesajlardan al
-                    mesajlar = kwargs.get("mesajlar", [])
-                    sistem_prompt = kwargs.get("sistem_prompt", "")
-                    prompt_tokens = (
-                        len(sistem_prompt)
-                        + sum(len(str(m)) for m in mesajlar)
-                    ) // 4
-                    completion_tokens = len(result) // 4
-                    span_attrs.setdefault("prompt_tokens", prompt_tokens)
-                    span_attrs.setdefault(
-                        "completion_tokens", completion_tokens
-                    )
+                        # Token ve maliyet hesaplama — positional ve keyword arg'lari destekle
+                        if "sistem_prompt" in kwargs:
+                            _sistem_prompt = kwargs["sistem_prompt"]
+                        elif len(args) > 1:
+                            _sistem_prompt = args[1] if isinstance(args[1], str) else ""
+                        else:
+                            _sistem_prompt = ""
 
-                span_attrs.setdefault("latency_ms", round(latency_ms, 2))
-                span_attrs.setdefault("span.type", "llm.call")
+                        if "mesajlar" in kwargs:
+                            _mesajlar = kwargs["mesajlar"]
+                        elif len(args) > 2:
+                            _mesajlar = args[2] if isinstance(args[2], (list, tuple)) else []
+                        else:
+                            _mesajlar = []
 
-                if _tracer is not None:
-                    _tracer.start_span(
-                        _span_name,
-                        attributes=span_attrs,
-                    ).end()
+                        if hasattr(result, "metin"):
+                            yanit = result.metin
+                        elif isinstance(result, dict):
+                            yanit = result.get("content", str(result))
+                        else:
+                            yanit = str(result)
 
-                return result
+                        giris_token = _token_sayisi_tahmin(_sistem_prompt) + sum(
+                            _token_sayisi_tahmin(str(m)) for m in (_mesajlar or [])
+                        )
+                        cikis_token = _token_sayisi_tahmin(yanit)
+                        toplam_token = giris_token + cikis_token
+                        maliyet = _token_maliyeti_hesapla(provider, giris_token, cikis_token)
 
-            except Exception as exc:
-                latency_ms = (time.monotonic() - t0) * 1000
+                        span.set_attribute("llm.prompt_tokens", giris_token)
+                        span.set_attribute("llm.completion_tokens", cikis_token)
+                        span.set_attribute("llm.total_tokens", toplam_token)
+                        span.set_attribute("llm.cost_usd", maliyet)
+                        span.set_attribute("llm.latency_ms", round(latency_ms, 2))
+                        span.set_attribute("llm.success", True)
 
-                error_attrs = dict(attributes or {})
-                error_attrs.setdefault("latency_ms", round(latency_ms, 2))
-                error_attrs.setdefault("span.type", "llm.call")
-                error_attrs.setdefault("error.type", type(exc).__name__)
-                error_attrs.setdefault("error.message", str(exc))
-                error_attrs.setdefault(
-                    "error.stacktrace", traceback.format_exc()
-                )
+                        return result
 
-                if args and hasattr(args[0], "provider"):
-                    error_attrs.setdefault(
-                        "provider", getattr(args[0], "provider", "")
-                    )
-                if args and hasattr(args[0], "model"):
-                    error_attrs.setdefault(
-                        "model", getattr(args[0], "model", "")
-                    )
-
-                if _tracer is not None:
-                    _tracer.start_span(
-                        f"error.{_span_name}",
-                        attributes=error_attrs,
-                    ).end()
-
-                raise
+                    except Exception as exc:
+                        latency_ms = (time.monotonic() - t0) * 1000
+                        span.set_attribute("llm.latency_ms", round(latency_ms, 2))
+                        span.set_attribute("llm.success", False)
+                        span.set_attribute("error.type", type(exc).__name__)
+                        span.set_attribute("error.message", str(exc))
+                        span.set_attribute("error.stacktrace", traceback.format_exc())
+                        span.record_exception(exc)
+                        _span_set_status(span, str(exc))
+                        raise
+            else:
+                # No-op: tracer yoksa direkt çağır
+                return func(*args, **kwargs)
 
         return wrapper
 
@@ -383,16 +681,13 @@ def trace_tool_call(
 
     ``tool.execution`` span tipinde bir span oluşturur. Span'e şu
     attribute'lar eklenir:
+
         - tool.name
         - tool.args
-        - latency_ms
+        - tool.duration_ms
+        - tool.result_length
 
     Hata durumunda span'e hata bilgisi ve stack trace eklenir.
-
-    Örnek:
-        @trace_tool_call()
-        def calistir(self, arac, ham_param):
-            ...
     """
 
     def decorator(func: Callable) -> Callable:
@@ -401,63 +696,42 @@ def trace_tool_call(
             _tracer = get_tracer()
             _span_name = span_adi or f"tool.execution.{func.__name__}"
 
-            t0 = time.monotonic()
-            try:
-                result = func(*args, **kwargs)
-                latency_ms = (time.monotonic() - t0) * 1000
+            span_attrs = dict(attributes or {})
+            span_attrs.setdefault("span.type", "tool.execution")
 
-                span_attrs = dict(attributes or {})
-                span_attrs.setdefault("span.type", "tool.execution")
+            # Tool adı ve parametreler (args: self, arac, ham_param, ...)
+            if len(args) > 1:
+                span_attrs.setdefault("tool.name", str(args[1]))
+            if len(args) > 2:
+                span_attrs.setdefault("tool.args", str(args[2])[:500])
 
-                # Tool adı ve parametreler
-                if len(args) > 1:
-                    span_attrs.setdefault("tool.name", str(args[1]))
-                if len(args) > 2:
-                    span_attrs.setdefault(
-                        "tool.args", str(args[2])[:500]
-                    )  # args çok uzun olabilir
+            if _tracer is not None:
+                with _tracer.start_as_current_span(
+                    _span_name,
+                    attributes=span_attrs,
+                ) as span:
+                    t0 = time.monotonic()
+                    try:
+                        result = func(*args, **kwargs)
+                        duration_ms = (time.monotonic() - t0) * 1000
+                        span.set_attribute("tool.duration_ms", round(duration_ms, 2))
+                        if result is not None:
+                            span.set_attribute("tool.result_length", len(str(result)))
+                        span.set_attribute("tool.success", True)
+                        return result
 
-                span_attrs.setdefault("latency_ms", round(latency_ms, 2))
-
-                if result is not None:
-                    span_attrs.setdefault(
-                        "tool.result_length", len(str(result))
-                    )
-
-                if _tracer is not None:
-                    _tracer.start_span(
-                        _span_name,
-                        attributes=span_attrs,
-                    ).end()
-
-                return result
-
-            except Exception as exc:
-                latency_ms = (time.monotonic() - t0) * 1000
-
-                error_attrs = dict(attributes or {})
-                error_attrs.setdefault("span.type", "tool.execution")
-                error_attrs.setdefault("error.type", type(exc).__name__)
-                error_attrs.setdefault("error.message", str(exc))
-                error_attrs.setdefault(
-                    "error.stacktrace", traceback.format_exc()
-                )
-                error_attrs.setdefault("latency_ms", round(latency_ms, 2))
-
-                if len(args) > 1:
-                    error_attrs.setdefault("tool.name", str(args[1]))
-                if len(args) > 2:
-                    error_attrs.setdefault(
-                        "tool.args", str(args[2])[:500]
-                    )
-
-                if _tracer is not None:
-                    _tracer.start_span(
-                        f"error.{_span_name}",
-                        attributes=error_attrs,
-                    ).end()
-
-                raise
+                    except Exception as exc:
+                        duration_ms = (time.monotonic() - t0) * 1000
+                        span.set_attribute("tool.duration_ms", round(duration_ms, 2))
+                        span.set_attribute("tool.success", False)
+                        span.set_attribute("error.type", type(exc).__name__)
+                        span.set_attribute("error.message", str(exc))
+                        span.set_attribute("error.stacktrace", traceback.format_exc())
+                        span.record_exception(exc)
+                        _span_set_status(span, str(exc))
+                        raise
+            else:
+                return func(*args, **kwargs)
 
         return wrapper
 
@@ -490,7 +764,7 @@ def trace_session_start(oturum_id: str, **extra_attrs: Any):
     ``session.start`` span tipi.
 
     Örnek:
-        with trace_session_start("abc-123", kullanci="marko"):
+        with trace_session_start("abc-123", kullanici="marko"):
             oturum_baslat(...)
     """
     attrs = {
@@ -501,6 +775,26 @@ def trace_session_start(oturum_id: str, **extra_attrs: Any):
     return span_olustur(f"session.start.{oturum_id}", attributes=attrs)
 
 
+def trace_session_end(oturum_id: str, **extra_attrs: Any):
+    """Oturum bitiş span'i için bağlam yöneticisi.
+
+    ``session.end`` span tipi.
+
+    Örnek:
+        with trace_session_end("abc-123", message_count=5, total_tokens=1500):
+            oturum_kapat(...)
+    """
+    attrs = {
+        "span.type": "session.end",
+        "session.id": oturum_id,
+        **extra_attrs,
+    }
+    return span_olustur(f"session.end.{oturum_id}", attributes=attrs)
+
+
+# ── Durum sorgulama ──────────────────────────────────────────────────────────
+
+
 def observability_durum() -> dict[str, Any]:
     """Observability sisteminin mevcut durumunu döndürür."""
     return {
@@ -509,5 +803,4 @@ def observability_durum() -> dict[str, Any]:
         "langfuse_secret_key_var": bool(LANGFUSE_SECRET_KEY),
         "tracer_yuklu": _TRACER is not None,
         "provider_yuklu": _TRACER_PROVIDER is not None,
-        "endpoint": LANGFUSE_OTLP_TRACES_ENDPOINT,
     }

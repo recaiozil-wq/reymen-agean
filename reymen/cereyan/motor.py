@@ -885,6 +885,18 @@ class Motor:
                 return
             _REGISTRY.kaydet(ad, fonk)
 
+    # ── Pydantic Entegrasyonu (opsiyonel, graceful degrade) ─────────────────
+    _PYDANTIK_ENTEGRE = False
+    try:
+        from reymen.cereyan.pydantic_entegrasyonu import (
+            validate_tool_call as _pydantic_validate,
+            pydantic_aktif as _pydantic_aktif,
+        )
+        if _pydantic_aktif:
+            _PYDANTIK_ENTEGRE = True
+    except ImportError:
+        pass
+
     # ── Native Function Calling desteği ──────────────────────────────────────
 
     @trace_tool_call()
@@ -893,11 +905,33 @@ class Motor:
 
         OpenAI tool_calls'taki {key: value} dict'ini, mevcut calistir()
         altyapısının beklediği quoted-string ham_param formatına dönüştürür.
-        Böylece mevcut if/else fallback zinciri değişmeden FC desteği sağlanır.
+        Pydantic aktifse çağrı öncesi args doğrulaması yapar.
 
         Dönüşüm:
             {"dosya": "test.py", "icerik": "..."} → '"test.py" "..."'
+
+        Pydantic validasyon:
+            - args doğrulanır, hatalı tipler düzeltilir
+            - Hata varsa LLM'ye geri bildirim gönderilir
+            - Graceful degrade: hatalı args olduğu gibi iletilir
         """
+        # Pydantic validasyon (varsa)
+        if self._PYDANTIK_ENTEGRE and args:
+            try:
+                validated = _pydantic_validate(arac, args)
+                if validated.get("hata"):
+                    logger.warning(
+                        "[Pydantic] %s validasyon uyarısı: %s",
+                        arac, validated["hata"],
+                    )
+                # Doğrulanmış args'i kullan
+                args = validated.get("args", args)
+            except Exception as e:
+                logger.warning(
+                    "[Pydantic] %s validasyon hatası (ignore): %s",
+                    arac, e,
+                )
+
         if not args:
             return self.calistir(arac, "")
         parts = []
