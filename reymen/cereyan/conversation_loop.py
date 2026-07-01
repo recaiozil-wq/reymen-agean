@@ -182,6 +182,21 @@ except ImportError:
     _delegasyon_hook_bul = None
     _DELEGASYON_AKTIF = False
 
+# ── Plugin Sistemi (lifecycle hooks) ──────────────────────────────────
+try:
+    from reymen.plugin.manager import (
+        PluginManager as _PluginManager,
+        plugin_manager_al as _plugin_manager_al,
+    )
+    _PLUGIN_SISTEMI = _plugin_manager_al()  # singleton, config + auto_load
+    _PLUGIN_AKTIF = _PLUGIN_SISTEMI.aktif
+    log.info("[Plugin] Plugin sistemi aktif=%s (%d plugin yuklu)",
+             _PLUGIN_AKTIF, _PLUGIN_SISTEMI.sayi)
+except ImportError as _pie:
+    _PLUGIN_SISTEMI = None
+    _PLUGIN_AKTIF = False
+    log.debug("[Plugin] Plugin sistemi yuklenemedi: %s", _pie)
+
 # ── Hata sınıflandırıcı ve mesaj tamirci ─────────────────────────
 try:
     from reymen.cereyan.hata_siniflandirici import (
@@ -677,6 +692,16 @@ class ConversationLoop:
                         _oturum_baslat_tetikle(session_id=session_id, task_id=task_id, agent_adi="reymen")
                     except Exception:
                         logger.warning("[hook] sessiz_except")
+                # Plugin: on_session_start
+                if _PLUGIN_AKTIF and _PLUGIN_SISTEMI is not None:
+                    try:
+                        _PLUGIN_SISTEMI.hook_cagir(
+                            "on_session_start",
+                            session_id=session_id or task_id,
+                            user_id=baglam.get("user_id", "unknown") if baglam else "unknown",
+                        )
+                    except Exception:
+                        logger.warning("[plugin] on_session_start sessiz_except")
             except Exception as _se:
                 log.warning("[%s] Session baslatma hatasi: %s", task_id, _se)
 
@@ -762,6 +787,16 @@ class ConversationLoop:
                 log.warning("[%s] RefProcessor hatasi: %s", task_id, _ref_e)
 
         # Kullanici mesaji (en son)
+        # Plugin: on_message — mesaji değiştirme şansı
+        if _PLUGIN_AKTIF and _PLUGIN_SISTEMI is not None:
+            try:
+                plugin_context = {"task_id": task_id, "baglam": baglam or {}}
+                hedef = _PLUGIN_SISTEMI.hook_cagir_mesaj(
+                    "on_message", message=hedef, context=plugin_context,
+                )
+            except Exception:
+                logger.warning("[plugin] on_message sessiz_except")
+
         user_msg = hedef
         if baglam:
             import json as _json
@@ -807,6 +842,13 @@ class ConversationLoop:
 
             # API cagrisi (ReYMeN pattern: retry + fallback ile)
             api_yanit = None
+            # Plugin: pre_llm_call — mesajları değiştirme şansı
+            try:
+                if _PLUGIN_AKTIF and _PLUGIN_SISTEMI is not None:
+                    plugin_ctx = {"task_id": task_id, "tur": api_call_count}
+                    messages, _ = _PLUGIN_SISTEMI.hook_cagir_pre_llm(messages, plugin_ctx)
+            except Exception:
+                logger.warning("[plugin] pre_llm_call sessiz_except")
             try:
                 api_yanit = self._direct_api_call(messages, tools_bos=False)
             except Exception as _ae:
@@ -820,6 +862,14 @@ class ConversationLoop:
                         api_yanit = self._direct_api_call(messages, tools_bos=False)
                 except Exception:
                     logger.warning("[fix_01_sessiz_except] Exception")
+
+            # Plugin: post_llm_call — yanıtı işleme şansı
+            try:
+                if _PLUGIN_AKTIF and _PLUGIN_SISTEMI is not None and api_yanit is not None:
+                    plugin_ctx = {"task_id": task_id, "tur": api_call_count}
+                    api_yanit = _PLUGIN_SISTEMI.hook_cagir_post_llm(api_yanit, plugin_ctx)
+            except Exception:
+                logger.warning("[plugin] post_llm_call sessiz_except")
 
             if api_yanit is None:
                 sonuc["hata"] = f"API cagrisi basarisiz (tur {api_call_count})"
@@ -968,6 +1018,16 @@ class ConversationLoop:
                 )
                 _storage.session_bitir(session_id, end_reason=end_reason)
                 log.info("[%s] Session kapatildi: %s (%s)", task_id, session_id, end_reason)
+                # Plugin: on_session_end
+                if _PLUGIN_AKTIF and _PLUGIN_SISTEMI is not None:
+                    try:
+                        _PLUGIN_SISTEMI.hook_cagir(
+                            "on_session_end",
+                            session_id=session_id or task_id,
+                            reason=end_reason,
+                        )
+                    except Exception:
+                        logger.warning("[plugin] on_session_end sessiz_except")
                 if _HOOK_AKTIF and _oturum_bitir_tetikle is not None:
                     try:
                         _oturum_bitir_tetikle(

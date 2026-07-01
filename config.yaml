@@ -118,6 +118,10 @@ telegram:
   allowed_chats: ''
   channel_prompts: {}
   reactions: false
+discord:
+  enabled: false
+  token_env: DISCORD_BOT_TOKEN
+  prefix: '/'
 terminal:
   backend: local
   cwd: .
@@ -165,3 +169,13 @@ memory.max_records: 2000
 web.backend: auto
 approvals.mode: smart
 spotify.enabled: true
+ref_processor: true
+
+# ── Plugin Sistemi (lifecycle hooks) ─────────────────────────────────────
+# pre_llm_call, post_llm_call, on_session_start, on_session_end, on_message
+plugins:
+  enabled: true
+  directory: reymen/plugins
+  auto_load: true
+  # Sadece belirli plugin'leri yüklemek için liste (boş = tümünü yükle)
+  list: []

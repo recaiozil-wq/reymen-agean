@@ -257,21 +257,25 @@ class WebGateway(GatewayBase):
 
 
 # ═══════════════════════════════════════════════════════════════════════
-#  Discord Gateway (Hazirlik — Stub)
+#  Discord Gateway (REST API + discord.py destegi)
 # ═══════════════════════════════════════════════════════════════════════
 
 class DiscordGateway(GatewayBase):
     """
     Discord platform gateway'i — REST API uzerinden mesaj gonderimi.
 
-    discord.py ile bagimsiz calisir.
-    Mesaj gondermek icin REST API kullanir (bot process'inden bagimsiz).
+    discord.py bot process'inden bagimsiz REST API ile mesaj gonderimi.
+    Ayrica discord_bot.py (DiscordBotProcess) ile birlikte calisir:
+    - DiscordBotProcess mesajlari on_message ile alir
+    - DiscordGateway REST API ile gonderim yapar
+    - mesaj_ekle() ile DiscordBotProcess'ten gelen mesajlari kuyruga ekler
     """
 
     def __init__(self, config: Optional[Dict[str, Any]] = None):
         super().__init__("discord", config)
         self._token: Optional[str] = None
         self._gelen_kuyruk: asyncio.Queue = asyncio.Queue()
+        self._discord_bot_process = None  # discord_bot.py referansi
 
     async def connect(self) -> bool:
         """Discord API'sine baglan (token dogrulama)."""
@@ -297,6 +301,7 @@ class DiscordGateway(GatewayBase):
         """Discord baglantisini kes."""
         try:
             self._token = None
+            self._discord_bot_process = None
             self._bagli = False
             logger.info("[DiscordGateway] Discord baglantisi kesildi.")
             return True
@@ -306,7 +311,7 @@ class DiscordGateway(GatewayBase):
 
     async def send(self, mesaj: str, hedef: Optional[str] = None,
                    meta: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-        """Discord kanalina mesaj gonder (REST API)."""
+        """Discord kanalina mesaj gonder (REST API veya discord.py)."""
         try:
             if not self._bagli or not self._token:
                 return {"basarili": False, "hata": "Baglanti yok"}
@@ -315,7 +320,18 @@ class DiscordGateway(GatewayBase):
             if not kanal_id:
                 return {"basarili": False, "hata": "kanal_id gerekli (hedef veya config'de)"}
 
-            # REST API ile gonder
+            # 1. DiscordBotProcess varsa onu kullan (daha stabil)
+            if self._discord_bot_process is not None:
+                try:
+                    kanal = self._discord_bot_process._bot.get_channel(int(kanal_id))
+                    if kanal:
+                        await kanal.send(mesaj[:2000])
+                        self._mesaj_sayaci += 1
+                        return {"basarili": True, "platform": "discord", "hedef": kanal_id, "yontem": "discord.py"}
+                except Exception as e:
+                    logger.warning(f"[DiscordGateway] discord.py gonderim hatasi (REST fallback): {e}")
+
+            # 2. REST API fallback
             import urllib.request
             import urllib.error
 
@@ -336,6 +352,7 @@ class DiscordGateway(GatewayBase):
                     "platform": "discord",
                     "hedef": kanal_id,
                     "mesaj_id": resp_data.get("id", "?"),
+                    "yontem": "rest",
                 }
 
         except urllib.error.HTTPError as e:
@@ -354,15 +371,21 @@ class DiscordGateway(GatewayBase):
 
     async def health_check(self) -> Dict[str, Any]:
         """Discord baglanti sagligi."""
+        bot_process_aktif = self._discord_bot_process is not None
         return {
             "durum": "saglikli" if self._bagli and self._token else "kopuk",
             "platform": "discord",
             "token_var": bool(self._token),
+            "bot_process_aktif": bot_process_aktif,
         }
 
     def mesaj_ekle(self, mesaj: Dict[str, Any]) -> None:
         """Discord'dan gelen mesaji kuyruga ekle (bot tarafindan cagrilir)."""
         self._gelen_kuyruk.put_nowait(mesaj)
+
+    def bot_process_bagla(self, bot_process) -> None:
+        """DiscordBotProcess referansini bagla (opsiyonel)."""
+        self._discord_bot_process = bot_process
 
 
 def motor_kaydet(motor) -> None:
@@ -389,6 +412,12 @@ def motor_kaydet(motor) -> None:
     )
     motor._plugin_arac_kaydet(
         "GATEWAY_DISCORD_OLUSTUR",
-        lambda config="{}": f"DiscordGateway(config={config}) — Discord gateway (stub) ornegi olusturur",
+        lambda config="{}": f"DiscordGateway(config={config}) — Discord gateway (REST + discord.py) ornegi olusturur",
         "DiscordGateway olusturma yardimcisi",
+    )
+
+    motor._plugin_arac_kaydet(
+        "GATEWAY_DISCORD_GONDER",
+        lambda mesaj="", kanal_id="": f"DiscordGateway.send({mesaj}, hedef={kanal_id}) — Discord mesaj gonderim araci",
+        "Discord mesaj gonderim araci",
     )

@@ -13,6 +13,7 @@ from reymen.ag.salted_gateway import (
     TelegramGateway,
 )
 from reymen.ag.platform_gateways import CLIGateway, WebGateway, DiscordGateway
+from reymen.ag.discord_bot import DiscordBotProcess
 from reymen.ag.gateway_yonetici import GatewayManager
 from reymen.ag.delegasyon import (
     DelegasyonSistemi,

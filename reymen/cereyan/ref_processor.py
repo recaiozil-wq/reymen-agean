@@ -35,6 +35,36 @@ _VARSAYILAN_MAX_KARAKTER = 10000
 _REF_PROCESSOR_AKTIF = True
 
 
+def _config_oku() -> bool:
+    """config.yaml'dan ref_processor ayarini oku.
+
+    Returns:
+        True (acik) / False (kapali)
+    """
+    try:
+        import yaml
+        for y in [
+            Path.cwd() / "config.yaml",
+            Path(__file__).resolve().parent.parent.parent / "config.yaml",
+        ]:
+            if y.exists():
+                with open(y, "r", encoding="utf-8") as f:
+                    cfg = yaml.safe_load(f) or {}
+                val = cfg.get("ref_processor")
+                if isinstance(val, bool):
+                    return val
+                val = cfg.get("ref_processor.enabled")
+                if isinstance(val, bool):
+                    return val
+                break
+    except Exception:
+        pass
+    return True  # varsayilan: acik
+
+
+_REF_PROCESSOR_AKTIF = _config_oku()
+
+
 def _dosya_oku(dosya_yolu: str, max_karakter: int = _VARSAYILAN_MAX_KARAKTER) -> Tuple[bool, str, str]:
     """@file: ile belirtilen dosyayi guvenlik kontrolunden gecirerek oku.
 

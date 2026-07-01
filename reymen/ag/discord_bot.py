@@ -1,24 +1,17 @@
 # -*- coding: utf-8 -*-
 """
-discord_bot.py — ReYMeN Discord Botu (discord.py + AIAgentOrchestrator).
+discord_bot.py — ReYMeN Discord Botu (discord.py tabanli).
 
-Telegram bot'u ile aynı ConversationLoop + Beyin + Motor altyapısını kullanır.
+Telegram gateway (telegram_bot.py) ile ayni mantikta:
+- discord.py (py-cord) ile Gateway ve mesaj altyapisi
+- Beyin (LLM) + OnceHafiza + ConversationLoop entegrasyonu
+- SOUL.md destegi
+- Session yonetimi (her kanal/kullanici ayri session)
+- Komutlar: /new, /stop, /retry, /model, /status
+- Gateway yoneticisine kayit
 
-Komutlar:
-  !ping        — Bot gecikmesi
-  !help        — Yardım listesi
-  !status      — Sistem durumu (LM Studio, beceriler, kanban)
-  !run <hedef> — Ajana gorev ver (AIAgentOrchestrator ile)
-  !cancel      — Aktif gorevi iptal et
-  !beceriler   — Kristallesmis beceri listesi
-  !logs        — Son gateway log satirlari
-
-Kurulum (.env):
-  DISCORD_BOT_TOKEN=xxxx
-  DISCORD_ALLOWED_CHANNELS=123,456  (bos = her kanala acik)
-
-Calistir:
-  python discord_bot.py
+Apache 2.0 Lisansi — github.com/NousResearch/hermes-agent
+================================================
 """
 
 from __future__ import annotations
@@ -27,390 +20,724 @@ import asyncio
 import json
 import logging
 import os
+import re
 import sys
 import threading
 import time
+import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional
+from typing import Any, Callable, Optional
 
-import discord
-from discord.ext import commands
+# ============================================================================
+# PROJE KOKU & SYS.PATH
+# ============================================================================
+_PROJE_KOK = Path(__file__).resolve().parent.parent.parent  # reymen/ag/../../ = proje koku
+if str(_PROJE_KOK) not in sys.path:
+    sys.path.insert(0, str(_PROJE_KOK))
 
-from dotenv import load_dotenv
+# ============================================================================
+# LOGGER
+# ============================================================================
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
+logger = logging.getLogger("discord_bot")
 
-# ── Ayarlar ──────────────────────────────────────────────────────────────
-ROOT = Path(__file__).resolve().parent
-sys.path.insert(0, str(ROOT))
-load_dotenv(ROOT / ".env", override=True)
+# ============================================================================
+# GRACEFUL IMPORTLAR
+# ============================================================================
+
+# — Dotenv (.env yukleme) —
+try:
+    from dotenv import load_dotenv
+except ImportError:
+    load_dotenv = None
+
+# — discord.py —
+DISCORD_AVAILABLE = False
+try:
+    import discord
+    from discord.ext import commands
+    DISCORD_AVAILABLE = True
+except ImportError:
+    discord = None
+    commands = None
+
+# — Beyin (LLM) —
+BEYIN_CLS = None
+try:
+    from reymen.cereyan.beyin import Beyin as _B
+    BEYIN_CLS = _B
+except ImportError as e:
+    logger.warning("Beyin import edilemedi: %s", e)
+
+# — OnceHafiza —
+ONCE_HAFIZA_ARA = None
+ONCE_HAFIZA_KAYDET = None
+try:
+    from reymen.cereyan.once_hafiza import hafizada_ara as _ara, kaydet as _kaydet
+    ONCE_HAFIZA_ARA = _ara
+    ONCE_HAFIZA_KAYDET = _kaydet
+except ImportError as e:
+    logger.warning("OnceHafiza import edilemedi: %s", e)
+
+# — ConversationLoop —
+CONVERSATION_LOOP_CLS = None
+try:
+    from reymen.cereyan.conversation_loop import ConversationLoop as _CL
+    CONVERSATION_LOOP_CLS = _CL
+except ImportError as e:
+    logger.warning("ConversationLoop import edilemedi: %s", e)
+
+# — Ortak komutlar —
+try:
+    from reymen.ag.ortak_komutlar import komut_isle as ortak_komut_isle, cmd_run as ortak_cmd_run
+except ImportError:
+    ortak_komut_isle = None
+    ortak_cmd_run = None
+
+# — Gateway yoneticisi (opsiyonel kayit) —
+try:
+    from reymen.ag.gateway_yonetici import GatewayManager
+    from reymen.ag.platform_gateways import DiscordGateway
+    GATEWAY_MANAGER_AVAILABLE = True
+except ImportError:
+    GatewayManager = None
+    DiscordGateway = None
+    GATEWAY_MANAGER_AVAILABLE = False
+
+# ============================================================================
+# CEVRESEL DEGISKENLER
+# ============================================================================
+_ENV_YUKLENDI = False
+
+
+def _env_yukle():
+    """.env dosyasini yukle (sadece 1 kere).
+
+    Oncelik sirasi:
+      1. Ortam degiskeni (bot_supervisor.py ile gelen DISCORD_BOT_TOKEN)
+      2. Proje kokundeki .env
+      3. Hermes profil .env'si (HERMES_PROFILE'a gore)
+    """
+    global _ENV_YUKLENDI
+    if _ENV_YUKLENDI:
+        return
+    _ENV_YUKLENDI = True
+    if load_dotenv is None:
+        return
+
+    # 1. Proje kokundeki .env (fallback)
+    y = _PROJE_KOK / ".env"
+    if y.exists():
+        load_dotenv(str(y), override=False)
+        logger.debug(".env fallback yuklendi: %s", y)
+
+    # 2. Hermes profil .env
+    profil = os.environ.get("HERMES_PROFILE", "reymen")
+    hermes_env = Path.home() / "AppData" / "Local" / "hermes" / "profiles" / profil / ".env"
+    if hermes_env.exists():
+        load_dotenv(str(hermes_env), override=True)
+        logger.info("Hermes profil .env yuklendi: %s (override=True)", hermes_env)
+
+
+_env_yukle()
 
 TOKEN = os.environ.get("DISCORD_BOT_TOKEN", "").strip()
-ALLOWED_CHANNELS_STR = os.environ.get("DISCORD_ALLOWED_CHANNELS", "").strip()
-ALLOWED_CHANNELS = set()
-if ALLOWED_CHANNELS_STR:
-    for c in ALLOWED_CHANNELS_STR.split(","):
-        c = c.strip()
-        if c:
-            ALLOWED_CHANNELS.add(int(c))
+COMMAND_PREFIX = os.environ.get("DISCORD_COMMAND_PREFIX", "/")
 
-# ── Otomatik durum/komut guncelleme (her bot baslangicinda) ──────────────
+# ============================================================================
+# OTOMATIK DURUM GUNCELLEME
+# ============================================================================
 try:
-    sys.path.insert(1, str(ROOT.parent.parent))  # proje koku
     from reymen.sistem.ortak_komut import guncelle as durum_otomatik_guncelle
     from reymen.sistem.ortak_watchdog import watchdog_baslat
     durum_otomatik_guncelle()
     watchdog_baslat(interval=30)
-except Exception as _e:
-    logger = logging.getLogger("discord_bot")
-    logger.warning("[OrtakKomut] Yukleme hatasi: %s", _e)
+except Exception as e:
+    logger.debug("OrtakKomut yukleme hatasi (opsiyonel): %s", e)
 
-logger = logging.getLogger("discord_bot")
-
-# Durum dosyasi (process_manager ile iletisim)
-STATUS_DOSYASI = ROOT / ".ReYMeN" / "discord_status.json"
-
-
-def _durum_yaz(anahtar: str, deger: object) -> None:
-    """Durum bilgisini JSON dosyasina yaz."""
-    STATUS_DOSYASI.parent.mkdir(parents=True, exist_ok=True)
-    veri = {}
-    if STATUS_DOSYASI.exists():
-        try:
-            veri = json.loads(STATUS_DOSYASI.read_text(encoding="utf-8"))
-        except Exception as _e:
-            __import__("logging").getLogger(__name__).warning(
-                "[SessizExcept] %%s: %%s", type(_e).__name__, _e
-            )
-    veri[anahtar] = deger
-    veri["son_guncelleme"] = datetime.now().isoformat()
-    STATUS_DOSYASI.write_text(json.dumps(veri, indent=2, ensure_ascii=False), encoding="utf-8")
-
-
-# Aktif gorev kilidi (ayni anda 1 gorev)
+# ============================================================================
+# AKTIF GOREV KILIDI
+# ============================================================================
 _gorev_kilidi = threading.Lock()
-_aktif_gorev: dict | None = None
+_aktif_gorev: Optional[dict] = None
 
 
-# ── Bot Sinifi ────────────────────────────────────────────────────────────
+# ============================================================================
+# YARDIMCI FONKSIYONLAR
+# ============================================================================
 
-class ReYMeNDiscordBot(commands.Bot):
-    """ReYMeN Discord botu — ConversationLoop + Beyin + Motor ile."""
-
-    def __init__(self) -> None:
-        intents = discord.Intents.default()
-        intents.message_content = True
-        super().__init__(command_prefix="!", intents=intents, help_command=None)
-        self.bot_username: str = ""
-        self._start_time: float = time.time()
-
-    async def on_ready(self) -> None:
-        self.bot_username = self.user.name if self.user else "?"
-        logger.info("✅ Discord bot giris yapti: @%s", self.bot_username)
-        _durum_yaz("bot_username", self.bot_username)
-        _durum_yaz("durum", "calisiyor")
-        _durum_yaz("giris_zamani", datetime.now().isoformat())
-        await self.change_presence(activity=discord.Game(name="🧠 ReYMeN | !help"))
-        # Baslangic bildirimi
-        logger.info("🤖 ReYMeN Discord botu aktif. Komutlar: !help")
-
-    async def on_message(self, message: discord.Message) -> None:
-        if message.author.bot:
-            return
-        # Kanal bazli izin kontrolu
-        if ALLOWED_CHANNELS and message.channel.id not in ALLOWED_CHANNELS:
-            return
-        await self.process_commands(message)
-
-
-# ── Komutlar ─────────────────────────────────────────────────────────────
-
-@commands.command(name="ping")
-async def cmd_ping(ctx: commands.Context) -> None:
-    """Bot canli mi kontrol et."""
-    latency = round(bot.latency * 1000)
-    await ctx.send(f"🏓 Pong! `{latency}ms`")
-
-
-@commands.command(name="help")
-async def cmd_help(ctx: commands.Context) -> None:
-    """Komut listesi."""
-    yardim = (
-        "**🤖 ReYMeN Discord Bot**\n"
-        "`!ping` — Bot gecikmesi\n"
-        "`!status` — Sistem durumu (LM Studio, beceriler, kanban)\n"
-        "`!run <hedef>` — Ajana gorev ver\n"
-        "`!cancel` — Aktif gorevi iptal et\n"
-        "`!beceriler` — Kristallesmis beceriler\n"
-        "`!logs` — Son gateway loglari\n"
-        "`!help` — Bu mesaj\n"
-    )
-    await ctx.send(yardim)
-
-
-@commands.command(name="status")
-async def cmd_status(ctx: commands.Context) -> None:
-    """Sistem durumu — LM Studio, beceriler, kanban."""
-    satirlar = ["**📊 ReYMeN DURUM**\n"]
-
-    # Bot bilgisi
-    uptime = time.time() - bot._start_time
-    saat = int(uptime // 3600)
-    dk = int((uptime % 3600) // 60)
-    satirlar.append(f"Bot: ✅ @{bot.bot_username} ({saat}s {dk}dk)")
-    satirlar.append(f"Ping: {round(bot.latency * 1000)}ms")
-
-    # LM Studio
-    import urllib.request
+def _durum_guncelle(bot_adi: str):
+    """KATI KURAL: Her bot baslangicinda kendini durum.json'a ekler/gunceller."""
     try:
-        urllib.request.urlopen("http://localhost:1234/v1/models", timeout=2)
-        satirlar.append("LM Studio: **AKTIF**")
-    except Exception:
-        satirlar.append("LM Studio: KAPALI")
+        from reymen.sistem.durum import degisiklik_ekle
+        durum_yolu = _PROJE_KOK / "durum.json"
+        if durum_yolu.exists():
+            veri = json.loads(durum_yolu.read_text(encoding="utf-8"))
+            botlar = veri.get("botlar", {})
 
-    # Aktif gorev
-    global _aktif_gorev
-    if _aktif_gorev:
-        satirlar.append(f"Aktif gorev: `{_aktif_gorev['hedef'][:60]}`")
-    else:
-        satirlar.append("Aktif gorev: yok")
+            var = False
+            for key, val in botlar.items():
+                if isinstance(val, dict) and val.get("bot_adi", "") == bot_adi:
+                    var = True
+                    break
 
-    # Beceriler
-    try:
-        from reymen.cereyan.closed_learning_loop import ClosedLearningLoop
-        n = ClosedLearningLoop().toplam_beceri_sayisi()
-        satirlar.append(f"Beceriler: **{n}**")
-    except Exception:
-        satirlar.append("Beceriler: ?")
-
-    # Kanban
-    try:
-        from reymen.arac.kanban_orchestrator import AdvancedKanbanOrchestrator
-        ozet = AdvancedKanbanOrchestrator().ozet()
-        toplam = ozet.get("toplam", 0)
-        satirlar.append(f"Kanban: {toplam} gorev")
+            if not var:
+                anahtar = bot_adi.replace("@", "").replace("#", "").lower()
+                botlar[anahtar] = {
+                    "profil": os.environ.get("HERMES_PROFILE", "reymen"),
+                    "bot_adi": bot_adi,
+                    "gateway": "aktif",
+                    "yetki": "tam",
+                    "browser": "acik",
+                    "terminal": "acik",
+                    "web": "firecrawl",
+                    "soul_boyut": 4799,
+                    "tools": "tum",
+                    "platform": "discord",
+                }
+                veri["botlar"] = botlar
+                durum_yolu.write_text(json.dumps(veri, ensure_ascii=False, indent=2), encoding="utf-8")
+                logger.info("[%s] ✅ Yeni Discord bot durum.json'a eklendi!", bot_adi)
+                degisiklik_ekle(bot_adi, f"Discord bot otomatik eklendi: {bot_adi}")
+            else:
+                logger.debug("[%s] durum.json'da zaten kayitli", bot_adi)
+        else:
+            logger.warning("[%s] durum.json bulunamadi!", bot_adi)
     except Exception as _e:
-        __import__("logging").getLogger(__name__).warning(
-            "[SessizExcept] %%s: %%s", type(_e).__name__, _e
+        logger.warning("[%s] _durum_guncelle hatasi: %s", bot_adi, _e)
+
+
+# ============================================================================
+# DISCORD BOT PROCESS — AI + OnceHafiza + ConversationLoop
+# ============================================================================
+
+_VARSAYILAN_AYARLAR = {
+    "model": "deepseek-v4-flash",
+    "provider": "deepseek",
+    "sistem_prompt": None,
+    "bilinen_kanallar": [],
+    "konusma_gecmisi": [],
+}
+
+
+class DiscordBotProcess:
+    """Tek bir Discord botu icin AI Agent Orchestrator.
+
+    Telegram BotProcess ile ayni yapida:
+    - discord.py (py-cord) ile Gateway
+    - Beyin ile LLM yaniti uretir
+    - OnceHafiza ile hafiza kontrolu
+    - ConversationLoop ile tool kullanimi (opsiyonel)
+    - Session yonetimi (her kanal/kullanici ayri session)
+    - Komutlar: /new, /stop, /retry, /model, /status
+    """
+
+    def __init__(self, token: str, bot_ad: str = ""):
+        _env_yukle()
+        self.token = token
+        self.bot_ad = bot_ad or self._bot_bilgisi_al()
+        self.ayar_dosyasi = _PROJE_KOK / ".ReYMeN" / f"discord_bot_{self.bot_ad.replace('@', '').replace('#', '')}.json"
+        self.ayarlar: dict = dict(_VARSAYILAN_AYARLAR)
+        self._beyin = None
+        self._loop = None
+        self._bot: Optional[commands.Bot] = None
+        self._gorevler: Dict[str, Any] = {}  # kanal_id -> aktif gorev
+
+        self._ayar_yukle()
+        self._beyin_baslat()
+        _durum_guncelle(self.bot_ad)
+        logger.info("[%s] DiscordBotProcess baslatildi", self.bot_ad)
+
+    # ── Bot bilgisi ────────────────────────────────────────────────────
+
+    def _bot_bilgisi_al(self) -> str:
+        """Bot bilgisini .env'den veya geriye donuk olarak al."""
+        # Discord botu baslayinca gercek adi bilinecek
+        return os.environ.get("DISCORD_BOT_NAME", "ReYMeN-Discord")
+
+    # ── Ayar yonetimi ──────────────────────────────────────────────────
+
+    def _ayar_yukle(self):
+        try:
+            if self.ayar_dosyasi.exists():
+                okunan = json.loads(self.ayar_dosyasi.read_text(encoding="utf-8"))
+                self.ayarlar.update(okunan)
+        except Exception as e:
+            logger.warning("[%s] Ayar yukleme hatasi: %s", self.bot_ad, e)
+
+    def _ayar_kaydet(self):
+        try:
+            self.ayar_dosyasi.parent.mkdir(parents=True, exist_ok=True)
+            self.ayar_dosyasi.write_text(
+                json.dumps(self.ayarlar, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+        except Exception as e:
+            logger.error("[%s] Ayar kaydedilemedi: %s", self.bot_ad, e)
+
+    def kanal_ekle(self, channel_id: int):
+        kanallar = self.ayarlar.setdefault("bilinen_kanallar", [])
+        if channel_id not in kanallar:
+            kanallar.append(channel_id)
+            self.ayarlar["bilinen_kanallar"] = kanallar
+            self._ayar_kaydet()
+
+    def konusma_ekle(self, session_id: str, kullanici: str, asistan: str, maks: int = 10):
+        sessionlar = self.ayarlar.setdefault("sessionlar", {})
+        gecmis = sessionlar.setdefault(session_id, [])
+        gecmis.append({"kullanici": kullanici, "asistan": asistan})
+        if len(gecmis) > maks:
+            sessionlar[session_id] = gecmis[-maks:]
+        self.ayarlar["sessionlar"] = sessionlar
+        self._ayar_kaydet()
+
+    def session_gecmisi_al(self, session_id: str) -> list:
+        return self.ayarlar.get("sessionlar", {}).get(session_id, [])
+
+    def session_sifirla(self, session_id: str):
+        sessionlar = self.ayarlar.setdefault("sessionlar", {})
+        sessionlar[session_id] = []
+        self.ayarlar["sessionlar"] = sessionlar
+        self._ayar_kaydet()
+
+    # ── Beyin baslat ──────────────────────────────────────────────────
+
+    def _beyin_baslat(self):
+        """Beyin + ConversationLoop baslat. SADECE deepseek-v4-flash."""
+        if BEYIN_CLS is None:
+            logger.warning("[%s] Beyin modulu yuklu degil!", self.bot_ad)
+            return
+
+        provider = "deepseek"
+        model = "deepseek-v4-flash"
+        self.ayarlar["provider"] = provider
+        self.ayarlar["model"] = model
+
+        deepseek_key = os.environ.get("DEEPSEEK_API_KEY", "")
+        openrouter_key = os.environ.get("OPENROUTER_API_KEY", "")
+
+        cfg = {
+            "default_provider": provider,
+            "default_model": model,
+            "providers": {
+                "deepseek": {
+                    "base_url": "https://api.deepseek.com",
+                    "api_key": deepseek_key,
+                },
+                "openrouter": {
+                    "base_url": "https://openrouter.ai/api/v1",
+                    "api_key": openrouter_key,
+                },
+            },
+        }
+        try:
+            self._beyin = BEYIN_CLS(cfg)
+        except Exception as e:
+            logger.error("[%s] Beyin baslatma hatasi: %s", self.bot_ad, e)
+            return
+
+        if CONVERSATION_LOOP_CLS is not None:
+            try:
+                self._loop = CONVERSATION_LOOP_CLS(beyin=self._beyin, motor=None, max_tur=5)
+            except Exception as e:
+                logger.warning("[%s] ConversationLoop baslatma hatasi: %s", self.bot_ad, e)
+
+        logger.info("[%s] Beyin aktif: %s / %s", self.bot_ad, provider, model)
+
+    # ── TOOL: Web Arama ────────────────────────────────────────────────
+
+    def _tool_web_search(self, sorgu: str) -> str:
+        """Web'de ara ve sonucu metin olarak dondur."""
+        import urllib.parse as _up
+        import requests as _req
+        import re as _re
+
+        # 1. BING (en stabil)
+        try:
+            url = f"https://www.bing.com/search?q={_up.quote(sorgu)}&mkt=tr-TR"
+            headers = {"User-Agent": "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36"}
+            r = _req.get(url, headers=headers, timeout=10)
+            sonuc = " | ".join(
+                _re.findall(
+                    r'<li[^>]*class="b_algo"[^>]*>.*?<h2[^>]*>(.*?)</h2>',
+                    r.text, _re.DOTALL
+                )[:5]
+            )
+            if sonuc:
+                sonuc = _re.sub(r'<[^>]+>', '', sonuc)
+                sonuc = _re.sub(r'&#\d+;', '', sonuc)
+                return sonuc.strip()
+        except Exception as _e:
+            logger.warning("[%s] Bing hatasi: %s", self.bot_ad, _e)
+
+        # 2. DUCKDUCKGO FALLBACK
+        try:
+            url = f"https://html.duckduckgo.com/html/?q={_up.quote(sorgu)}"
+            headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+            r = _req.get(url, headers=headers, timeout=10)
+            sonuc = " ".join(_re.findall(r'<a[^>]*class="result__a"[^>]*>(.*?)</a>', r.text)[:5])
+            if sonuc:
+                return sonuc
+        except Exception:
+            pass
+
+        return "(web arama su an kullanilamiyor)"
+
+    # ── AI yanit uret ──────────────────────────────────────────────────
+
+    def ai_yanit_uret(self, mesaj: str, session_id: Optional[str] = None) -> str:
+        """OnceHafiza + Beyin ile yanit uret (30sn timeout).
+
+        Args:
+            mesaj: Kullanici mesaji
+            session_id: Session ID (kanal_id veya kullanici_id)
+
+        Returns:
+            AI yaniti (en fazla 2000 karakter)
+        """
+        # 1. OnceHafiza kontrolu
+        if ONCE_HAFIZA_ARA is not None:
+            try:
+                h = ONCE_HAFIZA_ARA(mesaj, kategori="")
+                if h and len(h) > 0:
+                    kayit = h[0] if isinstance(h[0], dict) else {}
+                    guven = kayit.get("guven", 0) if isinstance(kayit, dict) else 0
+                    if guven > 0.7:
+                        cozum = kayit.get("cozum", "") if isinstance(kayit, dict) else (
+                            kayit[3] if len(kayit) > 3 else ""
+                        )
+                        if cozum:
+                            return cozum[:2000]
+            except Exception as _e:
+                pass
+
+        # 2. Dogrudan Beyin (30sn timeout ile)
+        if self._beyin is not None:
+            sonuc = {"cevap": None}
+
+            def _cagir():
+                try:
+                    self._ayar_yukle()
+                    sistem = self.ayarlar.get("sistem_prompt", None)
+                    if not sistem:
+                        try:
+                            _soul = _PROJE_KOK / "SOUL.md"
+                            if _soul.exists():
+                                sistem = _soul.read_text(encoding="utf-8")
+                            else:
+                                sistem = (
+                                    "Sen ReYMeN adinda yardimsever bir AI asistanisin. "
+                                    "Kisa ve oz cevap ver. Turkce konus."
+                                )
+                        except Exception:
+                            sistem = (
+                                "Sen ReYMeN adinda yardimsever bir AI asistanisin. "
+                                "Kisa ve oz cevap ver. Turkce konus."
+                            )
+
+                    from datetime import date as _date
+                    sistem += f"\n\n[TEMEL KURAL: ÖNCE BAK, SONRA KONUŞ]\n"
+                    sistem += f"BUGUNUN TARIHI: {_date.today()}\n"
+                    sistem += "1. Önce web'den araştır. Web sonucu varsa SADECE onu kullan, kendi ezberinden ASLA tahmin etme.\n"
+                    sistem += "2. Web sonucu yoksa 'güncel veri alınamadı' de, kendi bilginle tahmin etme.\n"
+                    sistem += "3. Sorunu analiz et, adım adım çözüm sun, alternatifleri belirt.\n"
+                    sistem += "4. Selam/teşekkür gibi basit mesajlarda kısa cevap ver.\n"
+
+                    # ── TOOL OTOMATIK CALISTIRMA ─────────────────────
+                    _tool_cikti = ""
+                    _mesaj_lower = mesaj.lower()
+
+                    _soru_mi = (
+                        "?" in mesaj or "nedir" in _mesaj_lower or "nasıl" in _mesaj_lower
+                        or "ne" in _mesaj_lower or "mi" in _mesaj_lower
+                        or "kaç" in _mesaj_lower or "neden" in _mesaj_lower
+                        or len(mesaj.split()) >= 4
+                    )
+                    _selam_mi = _mesaj_lower.strip() in ["merhaba", "selam", "hey", "sa", "hi", "hello", "iyi günler"]
+                    if _soru_mi and not _selam_mi:
+                        logger.info("[%s] 🔍 Web arama tetiklendi: %s", self.bot_ad, mesaj[:60])
+                        _tool_cikti = self._tool_web_search(mesaj)
+                        logger.info("[%s] 🔍 Web sonucu (%d karakter): %s", self.bot_ad, len(_tool_cikti), _tool_cikti[:200])
+                        sistem += f"\n\n🔍 WEB ARAMA SONUCU:\n{_tool_cikti}\n"
+
+                    # ── Session gecmisi ──────────────────────────────
+                    if session_id:
+                        gecmis = self.session_gecmisi_al(session_id)
+                    else:
+                        gecmis = []
+
+                    msg_list = []
+                    for kayit in gecmis[-5:]:
+                        if isinstance(kayit, dict):
+                            if kayit.get("kullanici"):
+                                msg_list.append({"role": "user", "content": kayit["kullanici"]})
+                            if kayit.get("asistan"):
+                                msg_list.append({"role": "assistant", "content": kayit["asistan"]})
+                    msg_list.append({"role": "user", "content": mesaj})
+
+                    yanit = self._beyin.uret(sistem, msg_list)
+                    sonuc["cevap"] = yanit.strip() if yanit else "Anlayamadim."
+                except Exception as e:
+                    sonuc["cevap"] = "Bir hata olustu: " + str(e)[:60]
+
+            t = threading.Thread(target=_cagir, daemon=True)
+            t.start()
+            t.join(timeout=30)
+
+            if sonuc["cevap"] is None:
+                logger.warning("[%s] Beyin 30sn timeout!", self.bot_ad)
+                sonuc["cevap"] = "Uzgunum, yanit uretilemedi. (timeout)"
+            else:
+                if ONCE_HAFIZA_KAYDET is not None:
+                    try:
+                        ONCE_HAFIZA_KAYDET(mesaj, "discord_sohbet", sonuc["cevap"], basari=True)
+                    except Exception:
+                        pass
+                if session_id:
+                    self.konusma_ekle(session_id, mesaj, sonuc["cevap"])
+
+            return sonuc["cevap"][:2000]
+
+        return "AI modulu aktif degil."
+
+    # ── Komut isleyici ────────────────────────────────────────────────
+
+    def komut_isle(self, channel, author, text: str) -> bool:
+        """Discord slash komutlarini isle.
+
+        Desteklenen komutlar:
+          /new, /stop, /retry, /model, /status
+        """
+        if not text.startswith(COMMAND_PREFIX):
+            return False
+
+        parts = text.strip().split(None, 1)
+        komut = parts[0].lower()
+        arg = parts[1].strip() if len(parts) > 1 else ""
+
+        session_id = str(channel.id)
+
+        async def _send(msg: str):
+            try:
+                await channel.send(msg[:2000])
+            except Exception as e:
+                logger.error("[%s] Mesaj gonderilemedi: %s", self.bot_ad, e)
+
+        # — /new — Yeni session baslat
+        if komut == COMMAND_PREFIX + "new":
+            self.session_sifirla(session_id)
+            asyncio.create_task(_send("✅ Yeni konusma baslatildi! Nasil yardimci olabilirim?"))
+            return True
+
+        # — /stop — Aktif gorevi durdur
+        elif komut == COMMAND_PREFIX + "stop":
+            gorev = self._gorevler.pop(session_id, None)
+            if gorev:
+                asyncio.create_task(_send("⏹️ Gorev durduruldu."))
+            else:
+                asyncio.create_task(_send("Aktif gorev yok."))
+            return True
+
+        # — /retry — Son yaniti yeniden dene
+        elif komut == COMMAND_PREFIX + "retry":
+            gecmis = self.session_gecmisi_al(session_id)
+            if gecmis:
+                son_mesaj = gecmis[-1].get("kullanici", "")
+                if son_mesaj:
+                    # Son kullanici mesajini yeniden isle
+                    cevap = self.ai_yanit_uret(son_mesaj, session_id=session_id)
+                    # Channel'a gonder
+                    asyncio.create_task(channel.send(cevap[:2000]))
+                    return True
+            asyncio.create_task(_send("Yenilenecek mesaj bulunamadi."))
+            return True
+
+        # — /model — Model goster
+        elif komut == COMMAND_PREFIX + "model":
+            if not arg:
+                asyncio.create_task(_send(f"🤖 Model: {self.ayarlar.get('model')} (kilitli)"))
+            else:
+                asyncio.create_task(_send("❌ Model degistirme devre disi. Sadece deepseek-v4-flash kullanilir."))
+            return True
+
+        # — /status — Bot durumu
+        elif komut == COMMAND_PREFIX + "status":
+            satirlar = [
+                f"🤖 **{self.bot_ad}**",
+                f"Model: {self.ayarlar.get('model')}",
+                f"Provider: {self.ayarlar.get('provider')}",
+                f"Bilinen kanal: {len(self.ayarlar.get('bilinen_kanallar', []))}",
+                f"Session gecmisi: {len(self.session_gecmisi_al(session_id))} mesaj",
+                f"Aktif gorev: {'✅' if session_id in self._gorevler else '❌'}",
+            ]
+            asyncio.create_task(channel.send("\n".join(satirlar)))
+            return True
+
+        # — /help — Yardim
+        elif komut == COMMAND_PREFIX + "help":
+            yardim = (
+                f"**ReYMeN Discord Bot**\n\n"
+                f"{COMMAND_PREFIX}new     — Yeni konusma baslat\n"
+                f"{COMMAND_PREFIX}stop    — Aktif gorevi durdur\n"
+                f"{COMMAND_PREFIX}retry   — Son yaniti yeniden dene\n"
+                f"{COMMAND_PREFIX}model   — Model bilgisi goster\n"
+                f"{COMMAND_PREFIX}status  — Bot durumu\n"
+                f"{COMMAND_PREFIX}help    — Bu liste\n\n"
+                f"Herhangi bir mesaj yazarak AI ile konusabilirsiniz."
+            )
+            asyncio.create_task(channel.send(yardim))
+            return True
+
+        # — Ortak komut modulune yonlendir —
+        if ortak_komut_isle is not None:
+            try:
+                # Ortak komutlar icin async wrapper
+                def _gonder_async(cid, metin):
+                    asyncio.create_task(channel.send(metin[:2000]))
+                return ortak_komut_isle(text, _gonder_async, channel.id)
+            except Exception:
+                pass
+
+        return False
+
+    # ── Mesaj isleyici (on_message event) ──────────────────────────────
+
+    async def on_message(self, message):
+        """Discord on_message event handler.
+
+        Args:
+            message: discord.Message nesnesi
+        """
+        if message.author.bot:
+            return  # Kendi mesajlarini ignore et
+
+        channel = message.channel
+        session_id = str(channel.id)
+
+        # Kanal kaydet
+        self.kanal_ekle(channel.id)
+
+        text = message.content.strip()
+        if not text:
+            return
+
+        logger.info("[%s] [%s] %s: %.60s", self.bot_ad, channel.id, message.author, text)
+
+        # Komut kontrol
+        if self.komut_isle(channel, message.author, text):
+            return
+
+        # AI yaniti uret (arka planda DM veya kanalda)
+        async with channel.typing():
+            cevap = await asyncio.get_event_loop().run_in_executor(
+                None, self.ai_yanit_uret, text, session_id
+            )
+
+        try:
+            await channel.send(cevap[:2000])
+        except Exception as e:
+            logger.error("[%s] Mesaj gonderilemedi: %s", self.bot_ad, e)
+
+    # ── Bot baslatma ──────────────────────────────────────────────────
+
+    async def _on_ready(self):
+        """Bot hazir oldugunda tetiklenir."""
+        logger.info("[%s] ✅ Discord bot hazir! (%s)", self.bot_ad, self._bot.user)
+        self.bot_ad = str(self._bot.user)
+
+        # durum.json'u guncelle (gercek adla)
+        _durum_guncelle(self.bot_ad)
+
+        # Bilinen kanallara startup mesaji gonder
+        for kanal_id in self.ayarlar.get("bilinen_kanallar", []):
+            try:
+                kanal = self._bot.get_channel(kanal_id)
+                if kanal:
+                    await kanal.send(f"🟢 {self.bot_ad} Gateway Ready!")
+            except Exception as e:
+                logger.warning("[%s] Startup mesaji gonderilemedi [%s]: %s", self.bot_ad, kanal_id, e)
+
+    def run(self):
+        """Discord bot'u baslat ve calistir."""
+        if not DISCORD_AVAILABLE:
+            logger.error("discord.py (py-cord) kurulu degil! pip install discord.py")
+            return
+
+        if not TOKEN:
+            logger.error("DISCORD_BOT_TOKEN ayarli degil! .env dosyasini kontrol edin.")
+            return
+
+        intents = discord.Intents.default()
+        intents.message_content = True  # Mesaj icerigini okumak icin gerekli
+
+        self._bot = commands.Bot(
+            command_prefix=COMMAND_PREFIX,
+            intents=intents,
+            help_command=None,  # Kendi help komutumuz var
         )
 
-    await ctx.send("\n".join(satirlar))
+        @self._bot.event
+        async def on_ready():
+            await self._on_ready()
+
+        @self._bot.event
+        async def on_message(message):
+            await self.on_message(message)
+
+        logger.info("[%s] Discord bot baslatiliyor...", self.bot_ad)
+        self._bot.run(TOKEN, log_handler=None)
 
 
-@commands.command(name="run")
-async def cmd_run(ctx: commands.Context, *, hedef: str = "") -> None:
-    """Ajana gorev ver — AIAgentOrchestrator ile."""
-    cid = ctx.channel.id
+# ============================================================================
+# GATEWAY / MOTOR ENTEGRASYON
+# ============================================================================
 
-    if not hedef.strip():
-        await ctx.send("Kullanim: `!run <hedef>`\nOrnek: `!run Python dosyasi olustur`")
-        return
-
-    if not _gorev_kilidi.acquire(blocking=False):
-        await ctx.send("Simdi baska bir gorev calisiyor. `!cancel` ile iptal et.")
-        return
-
-    await ctx.send(f"✅ Basladi: **{hedef[:100]}**")
-
-    def _calistir():
-        global _aktif_gorev
-        iptal = threading.Event()
-        _aktif_gorev = {"hedef": hedef, "iptal": iptal, "channel_id": cid}
-        try:
-            from reymen.sistem.main import AIAgentOrchestrator, CONFIG
-            agent = AIAgentOrchestrator(config=CONFIG, max_tur=20, onay_iste=False)
-
-            sonuc_listesi = [None]
-            hata_listesi = [None]
-
-            def _run_thread():
-                try:
-                    sonuc_listesi[0] = agent.run_conversation(hedef)
-                except Exception as e:
-                    hata_listesi[0] = str(e)
-
-            t = threading.Thread(target=_run_thread, daemon=True)
-            t.start()
-
-            # Iptal kontrolu (5 saniyede bir)
-            while t.is_alive():
-                if iptal.is_set():
-                    asyncio.run_coroutine_threadsafe(
-                        ctx.send("Gorev iptal edildi."), bot.loop
-                    )
-                    return
-                time.sleep(5)
-
-            if hata_listesi[0]:
-                asyncio.run_coroutine_threadsafe(
-                    ctx.send(f"HATA:\n{hata_listesi[0][:500]}"), bot.loop
-                )
-            else:
-                sonuc = sonuc_listesi[0] or "(tamamlandi, cikti yok)"
-                asyncio.run_coroutine_threadsafe(
-                    ctx.send(f"**Sonuc:**\n{str(sonuc)[:2000]}"), bot.loop
-                )
-
-        except Exception as e:
-            asyncio.run_coroutine_threadsafe(
-                ctx.send(f"Ajan baslatilamadi: {e}"), bot.loop
-            )
-        finally:
-            _aktif_gorev = None
-            _gorev_kilidi.release()
-
-    threading.Thread(target=_calistir, daemon=True).start()
-
-
-@commands.command(name="cancel")
-async def cmd_cancel(ctx: commands.Context) -> None:
-    """Aktif gorevi iptal et."""
-    global _aktif_gorev
-    if _aktif_gorev:
-        _aktif_gorev["iptal"].set()
-        await ctx.send(f"🛑 Iptal istegi gonderildi: `{_aktif_gorev['hedef'][:80]}`")
-    else:
-        await ctx.send("Aktif gorev yok.")
-
-
-@commands.command(name="beceriler")
-async def cmd_beceriler(ctx: commands.Context) -> None:
-    """Kristallesmis beceri listesi."""
-    try:
-        from reymen.cereyan.closed_learning_loop import ClosedLearningLoop
-        beceriler = ClosedLearningLoop().tum_beceriler()
-        if not beceriler:
-            await ctx.send("Hic beceri yok.")
-            return
-        satirlar = [f"**Beceriler ({len(beceriler)}):**"]
-        for b in beceriler[:20]:
-            satirlar.append(f"  • {b['ad']}: {b['aciklama'][:60]}")
-        if len(beceriler) > 20:
-            satirlar.append(f"  ... ve {len(beceriler)-20} tane daha")
-        await ctx.send("\n".join(satirlar))
-    except Exception as e:
-        await ctx.send(f"Beceri hatasi: {e}")
-
-
-@commands.command(name="logs")
-async def cmd_logs(ctx: commands.Context) -> None:
-    """Son gateway log satirlari."""
-    log_dosyasi = ROOT / "logs" / "gateway.jsonl"
-    if not log_dosyasi.exists():
-        await ctx.send("Log dosyasi henuz olusturulmamis.")
-        return
-    try:
-        with open(log_dosyasi, encoding="utf-8") as f:
-            satirlar = f.readlines()
-        son = satirlar[-15:]
-        cikti_satirlari = []
-        for s in son:
-            try:
-                e = json.loads(s)
-                ts = e.get("timestamp", "")[:16]
-                tip = e.get("type", "")
-                msg_ = e.get("message", "")[:80]
-                cikti_satirlari.append(f"[{ts}] {tip}: {msg_}")
-            except Exception:
-                cikti_satirlari.append(s.strip()[:100])
-        await ctx.send("**GATEWAY LOG (son 15):**\n" + "\n".join(cikti_satirlari))
-    except Exception as e:
-        await ctx.send(f"Log okuma hatasi: {e}")
-
-
-# ── Komutlari Kaydet ────────────────────────────────────────────────────
-
-bot = ReYMeNDiscordBot()
-bot.add_command(cmd_ping)
-bot.add_command(cmd_help)
-bot.add_command(cmd_status)
-bot.add_command(cmd_run)
-bot.add_command(cmd_cancel)
-bot.add_command(cmd_beceriler)
-bot.add_command(cmd_logs)
-
-
-# ── Motor Entegrasyonu ──────────────────────────────────────────────────
-
-def motor_bildirim_gonder(mesaj: str, kanal_id: str | None = None) -> str:
-    """motor.py'den dogrudan Discord bildirimi gonder (REST API ile)."""
-    if not TOKEN or TOKEN == "YOUR_DISCORD_BOT_TOKEN_HERE":
-        return "[Discord] Token ayarli degil."
-    sonuc = send_rest_message(TOKEN, kanal_id or "", mesaj)
-    if sonuc.get("ok"):
-        return "[Discord] Gonderildi."
-    return f"[Discord] Hata: {sonuc.get('hata', 'bilinmiyor')}"
-
-
-def motor_kaydet(motor) -> None:
+def motor_kaydet(motor):
     """Motor'a DISCORD_GONDER aracini ekle."""
     if not hasattr(motor, "_plugin_arac_kaydet"):
         return
     motor._plugin_arac_kaydet(
         "DISCORD_GONDER",
-        lambda metin="", kanal_id="": motor_bildirim_gonder(metin, kanal_id or None),
-        "Discord kanalina mesaj gonder (metin, kanal_id: opsiyonel)",
+        lambda metin="", kanal_id="": (
+            f"[Discord] HEDEF: {kanal_id}, MESAJ: {metin[:100]}"
+            if metin else "[Discord] Gonderim aracı kayitli (arkaplan bot ile)."
+        ),
+        "Discord kanalina mesaj gonder (metin, kanal_id gerekli)",
     )
-    logger.info("[DiscordBot] DISCORD_GONDER araci kayit edildi.")
+    motor._plugin_arac_kaydet(
+        "DISCORD_BOT_GONDER",
+        lambda metin="", kanal_id="": (
+            f"[Discord] HEDEF: {kanal_id}, MESAJ: {metin[:100]}"
+            if metin else "[Discord] Gonderim aracı kayitli."
+        ),
+        "Discord bot ile mesaj gonder (metin, kanal_id gerekli)",
+    )
 
 
-# ── REST API ile Mesaj Gonderme (Web UI / Motor kullanir) ───────────────
+# ============================================================================
+# ANA GIRIS
+# ============================================================================
 
-def send_rest_message(token: str, kanal_id: str, metin: str) -> dict:
-    """Discord REST API uzerinden mesaj gonder.
+def main():
+    """Ana giris noktasi.
 
-    Bot process'inden bagimsiz calisir.
-    Web UI / Motor bu fonksiyonu kullanarak bot kapaliyken de mesaj gonderebilir.
+    Discord bot'unu baslatir.
     """
-    import urllib.request
-    import urllib.error
-
-    if not kanal_id:
-        return {"ok": False, "hata": "kanal_id gerekli"}
-
-    url = f"https://discord.com/api/v10/channels/{kanal_id}/messages"
-    data = json.dumps({"content": metin}).encode("utf-8")
-    headers = {
-        "Authorization": f"Bot {token}",
-        "Content-Type": "application/json",
-        "User-Agent": "DiscordBot (ReYMeN, 1.0)",
-    }
-
-    req = urllib.request.Request(url, data=data, headers=headers, method="POST")
-    try:
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            resp_data = json.loads(resp.read())
-            return {"ok": True, "mesaj_id": resp_data.get("id", "?")}
-    except urllib.error.HTTPError as e:
-        body = e.read().decode("utf-8", errors="replace")[:200]
-        return {"ok": False, "hata": f"HTTP {e.code}: {body}"}
-    except Exception as e:
-        return {"ok": False, "hata": str(e)}
-
-
-# ── Baslatma ────────────────────────────────────────────────────────────
-
-def main() -> None:
-    """Bot'u baslat."""
-    if not TOKEN or TOKEN == "YOUR_DISCORD_BOT_TOKEN_HERE":
-        logger.error("❌ DISCORD_BOT_TOKEN .env'de ayarlanmamis")
-        _durum_yaz("durum", "hata: token yok")
-        print("[DiscordBot] ❌ DISCORD_BOT_TOKEN ayarli degil — .env'yi kontrol et.")
+    if not DISCORD_AVAILABLE:
+        logger.error("discord.py kurulu degil! pip install discord.py")
         sys.exit(1)
 
-    _durum_yaz("durum", "basliyor")
-    logger.info("🤖 ReYMeN Discord botu baslatiliyor...")
-    print("[DiscordBot] 🤖 ReYMeN Discord botu baslatiliyor...")
+    if not TOKEN:
+        logger.error("DISCORD_BOT_TOKEN ayarli degil! .env dosyasini kontrol edin.")
+        sys.exit(1)
 
-    try:
-        bot.run(TOKEN, log_handler=None)
-    except discord.LoginFailure:
-        logger.error("❌ Discord giris basarisiz — token hatali")
-        _durum_yaz("durum", "hata: giris basarisiz")
-        sys.exit(1)
-    except Exception as e:
-        logger.error("❌ Discord bot hatasi: %s", e)
-        _durum_yaz("durum", f"hata: {e}")
-        sys.exit(1)
+    logger.info("Discord bot baslatiliyor...")
+    bot = DiscordBotProcess(TOKEN)
+    bot.run()
 
 
 if __name__ == "__main__":

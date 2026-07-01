@@ -33,6 +33,9 @@ from .config_manager import (
 # Session DB — SessionDB sinifi
 from .session_db import SessionDB
 
+# Kimlik Havuzu (P0)
+from .credential_pool import CredentialPool, get_credential_pool
+
 # Cron/Scheduler (P1)
 from .cron_manager import (
     CronManager,

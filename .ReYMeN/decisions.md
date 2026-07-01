@@ -1,20 +1,18 @@
-# Karar Kaydı — Son 3 Kritik Öneri (2,4,5) Uygulama
+# Karar Kaydı — 3 Yeni Modül (Credential Pool, Voice Mode, API Server)
 
-**Tarih:** 2026-07-01 23:45
+**Tarih:** 2026-07-02 00:15
 
 ## Ne yapıldı?
-Kalan 🔴 KRİTİK 3 öneri uygulandı. 30 önerinin tamamı tamamlandı.
+3 yeni modül oluşturuldu: Credential Pool, Voice Mode, API Server
 
 ## Yapılanlar
 
-| # | Öneri | Çözüm | Durum |
-|---|-------|-------|-------|
-| 2 | Python versiyon çelişkisi | Dockerfile: 3.11→3.12-slim, kurulum.bat: 3.11→3.12 winget, py312 kontrol | ✅ |
-| 4 | Dockerfile pyproject.toml'siz | COPY requirements.txt pyproject.toml . eklendi | ✅ |
-| 5 | CI continue-on-error:true | test aşaması → false (başarısız test pipeline'ı durdurur) | ✅ |
+| # | Modül | Dosya | Satır | Açıklama |
+|---|-------|-------|:----:|----------|
+| 3 | 🔑 Credential Pool | `reymen/core/credential_pool.py` | 526 | Çoklu API key rotasyonu, WCM+.env+os.environ, thread-safe, JSON kalıcılık |
+| 4 | 🎤 Voice Mode | `reymen/cereyan/voice_mode.py` | ~500 | Push-to-talk: sounddevice→STT→Beyin→TTS→oynat, VAD, REPL |
+| 5 | 🌐 API Server | `reymen/api_server.py` | 640 | OpenAI-uyumlu FastAPI, /v1/chat/completions+streaming, /v1/models, /health |
 
-## Toplam: 30/30 öneri tamamlandı
-- 🔴 1-5: ✅ (1 ve 3 önceki adımlarda düzeltilmişti)
-- 🟠 6-10: ✅
-- 🟡 11-19: ✅
-- 🔵 20-30: ✅
+## GitHub
+- recaiozil-wq/reymen-agean
+- Sıradaki: Plugin sistemi (öneri #1)
