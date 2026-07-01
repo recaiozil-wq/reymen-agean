@@ -124,6 +124,25 @@ terminal:
   timeout: 180
 web:
   backend: firecrawl
+# ── Container Sandbox (Docker) ────────────────────────────────────────────────
+# Terminal komutlarini Docker container icinde izole calistir.
+# Modlar:
+#   kapali: Container kullanma, dogrudan calistir
+#   kismi:  Container'da calistir, volume mount ile dosya paylasimi acik
+#   tam:    Container'da calistir, dosya paylasimi yok, network kapali
+container:
+  sandbox_mode: kapali
+  image: python:3.11-slim
+  timeout: 60
+  memory_limit: 512m
+  cpu_limit: 1.0
+  max_output_chars: 50000
+  workdir: /workspace
+  network_enabled: false
+  volume_mounts: []
+  env_vars: {}
+  container_name_prefix: reymen-sandbox
+
 general.agent_name: ReYMeN
 general.default_model: deepseek-v4-flash
 general.default_provider: deepseek

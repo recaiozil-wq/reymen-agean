@@ -120,3 +120,12 @@ reymen = ["**/*.yaml", "**/*.json", "**/*.md", "**/*.txt"]
 [tool.bandit]
 exclude_dirs = ["tests", "venv", ".venv", "arsiv"]
 skips = ["B101", "B603", "B602"]
+
+[tool.coverage.run]
+source = ["reymen"]
+omit = ["*/tests/*", "*/venv/*", "*/.venv/*"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+fail_under = 30

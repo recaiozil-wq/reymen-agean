@@ -1,28 +1,20 @@
-# Karar Kaydı — 9 Proaktif Öneri (11-19) Uygulama
+# Karar Kaydı — 5 Proaktif Öneri (6-10) Uygulama
 
-**Tarih:** 2026-07-01 23:35
+**Tarih:** 2026-07-01 23:40
 
 ## Ne yapıldı?
-30 öneriden 11-19 arası uygulandı.
+30 öneriden 6-10 arası uygulandı.
 
 ## Yapılanlar
 
 | # | Öneri | Çözüm | Durum |
 |---|-------|-------|-------|
-| 11 | Type hints düşük | Ruff ANN kuralı eklendi (20'de). Yeni kodlar type hint'li yazılır. Mevcut kod kademeli geçecek | ✅ |
-| 12 | print() yoğun (1800+) | proaktif_bakim.py'ye print dedektörü eklendi, 2000+ eşiğinde uyarır | ✅ |
-| 13 | docker-compose .env/volume | env_file + volume mapping'leri eklendi (chroma_db, vektor, merkez_db) | ✅ |
-| 14 | SOUL.md kısa (14 satır) | 1386 byte'a genişletildi: kurallar, yetki, format, bot bilgisi | ✅ |
-| 15 | CI'da 3.13 matrix yok | python-version: ["3.12", "3.13"] olarak güncellendi | ✅ |
-| 16 | pre-commit bandit config | pyproject.toml'a [tool.bandit] eklendi | ✅ |
-| 17 | Test dosyaları kökte dağınık | test_browser_tool.py, test_standalone.py → tests/ taşındı | ✅ |
-| 18 | __pycache__ git'te izleniyor | git rm --cached ile temizlendi | ✅ |
-| 19 | ruff target-version py311 | 20'de py312 yapıldı | ✅ |
+| 6 | Makefile eksik | `make install/test/lint/format/clean/security` hedefli Makefile oluşturuldu | ✅ |
+| 7 | .editorconfig eksik | indent_style=space, indent_size=4, utf-8, lf | ✅ |
+| 8 | Coverage config yok | pyproject.toml'a `[tool.coverage.run]` + `[tool.coverage.report]` eklendi (fail_under=30) | ✅ |
+| 9 | CI lint kapsamı | Önceki adımda `reymen/ tests/ reymen_launcher.py` yapıldı | ✅ |
+| 10 | ruff target-version | Önceki adımda py312 yapıldı | ✅ |
 
-## Ek düzeltmeler
-- CI lint: `ruff check reymen/ tests/ reymen_launcher.py` (tüm dosyalar)
-- CI test: `--cov=reymen --cov-report=term-missing` eklendi
-- Master SOUL.md proje köküne kopyalandı (sync için)
-## GitHub
-- recaiozil-wq/reymen-agean
-- Kalan: 🔴 1-5, 🟠 6-10
+## Toplam durum
+- 30 öneriden 25'i uygulandı (20-30 ✅, 11-19 ✅, 6-10 ✅)
+- Kalan: 🔴 1-5 (KRİTİK)
