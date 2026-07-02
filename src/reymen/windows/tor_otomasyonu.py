@@ -79,8 +79,7 @@ class TorBrowserKontrol:
         """Windows'ta Tor Browser'in standart konumlarini ara."""
         kullanici = os.environ.get("USERNAME", "")
         yollar = [
-            Path(f"C:\\Users\\{kullanici}\\Desktop\\Tor Browser\\Browser\\firefox.exe"),
-            Path(f"C:\\Users\\{kullanici}\\Masaüstü\\Tor Browser\\Browser\\firefox.exe"),
+            Path(os.path.expanduser(f"~\\Desktop\\Tor Browser\\Browser\\firefox.exe")),
             Path("C:\\Tor Browser\\Browser\\firefox.exe"),
             Path("C:\\Program Files\\Tor Browser\\Browser\\firefox.exe"),
         ]

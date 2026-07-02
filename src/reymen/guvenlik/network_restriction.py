@@ -48,8 +48,8 @@ VARSAYILAN_ENGEL = frozenset({
 })
 
 # Windows hosts dosyasi yolu
-HOSTS_DOSYASI = r"C:\Windows\System32\drivers\etc\hosts"
-HOSTS_DOSYASI_ALT = r"C:\Windows\SysWOW64\drivers\etc\hosts"
+HOSTS_DOSYASI = os.environ.get("SystemRoot", "C:\\Windows") + r"\System32\drivers\etc\hosts"
+HOSTS_DOSYASI_ALT = os.environ.get("SystemRoot", "C:\\Windows") + r"\SysWOW64\drivers\etc\hosts"
 
 # ReYMeN network restriction etiketi
 REYMEN_ETIKETI = "# REYMEN_NETWORK_RESTRICTION"

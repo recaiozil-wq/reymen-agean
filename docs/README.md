@@ -28,7 +28,8 @@
 ## 📋 Table of Contents
 
 - [🔥 ReYMeN vs The World](#-reymen-vs-the-world)
-- [🚀 Quickstart (1 Minute)](#-quickstart-1-minute)
+- [🚀 Quickstart](#-quickstart-1-minute)
+- [🚀 Kurulum ve Çalıştırma (Detaylı)](#-kurulum-ve-çalıştırma-detaylı)
 - [✨ Key Features](#-key-features)
 - [📊 Hermes → ReYMeN Feature Parity](#-hermes--reymen-feature-parity)
 - [📂 Directory Structure](#-directory-structure)
@@ -69,27 +70,227 @@
 
 ```bash
 # 1. Clone
-git clone https://github.com/recaiozil-wq/reymen-agent.git
-cd reymen-agent
+git clone https://github.com/recaiozil-wq/reymen-agean.git
+cd reymen-agean
 
 # 2. Virtual environment
-uv venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
-uv pip install -e .
+python -m venv .venv
+source .venv/bin/activate  # Linux/macOS
+# .venv\Scripts\activate   # Windows
 
-# 3. Add your API key
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. Add your API key
 cp config/.env.example .env
-# Set DEEPSEEK_API_KEY or OPENAI_API_KEY in .env
+# Edit .env — set at least DEEPSEEK_API_KEY
 
-# 4. Run
-python -c "from src.reymen.cereyan.beyin import Beyin; b = Beyin({'model':{'provider':'deepseek','model':'deepseek-v4-flash'}}); print(b.dusun('Merhaba!'))"
+# 5. Run
+python reymen_launcher.py
 ```
 
 Or with Docker:
 
 ```bash
-cd docker && docker compose up
+docker compose up
 ```
+
+---
+
+## 🚀 Kurulum ve Çalıştırma (Detaylı)
+
+### Gereksinimler
+
+| Gereksinim | Versiyon | Zorunlu mu? |
+|------------|----------|:-----------:|
+| **Python** | 3.11+ | ✅ Evet |
+| **Git** | 2.x | ✅ Evet |
+| **pip** | 23+ | ✅ Evet |
+| **FFmpeg** | 4.x | ⚠️ Opsiyonel (video/audio) |
+| **Playwright** | latest | ⚠️ Opsiyonel (HyperFrames) |
+| **Docker** | 20+ | ⚠️ Opsiyonel (Container Sandbox) |
+
+### Adım Adım Kurulum
+
+#### 1. Repoyu Klonla
+
+```bash
+git clone https://github.com/recaiozil-wq/reymen-agean.git
+cd reymen-agean
+```
+
+#### 2. Sanal Ortam Oluştur
+
+```bash
+# Python 3.11+ sanal ortam
+python -m venv .venv
+
+# Aktifleştir
+# Linux/macOS:
+source .venv/bin/activate
+
+# Windows (CMD):
+.venv\Scripts\activate
+
+# Windows (PowerShell):
+.venv\Scripts\Activate.ps1
+
+# Windows (Git Bash):
+source .venv/Scripts/activate
+```
+
+#### 3. Bağımlılıkları Yükle
+
+```bash
+# Temel bağımlılıklar
+pip install -r requirements.txt
+
+# Alternatif: Editable install (geliştirme modu)
+pip install -e .
+
+# Tüm opsiyonel bağımlılıklar dahil (önerilir)
+pip install -e ".[full]"
+
+# Geliştirme araçları dahil
+pip install -e ".[dev]"
+
+# Tümü
+pip install -e ".[full,dev]"
+```
+
+#### 4. API Anahtarlarını Ayarla
+
+```bash
+# Örnek .env dosyasını kopyala
+cp config/.env.example .env
+
+# .env dosyasını düzenle — en az bir LLM API key'i girmelisin
+# Önerilen: DEEPSEEK_API_KEY (en ucuz ve hızlı)
+nano .env   # veya notepad .env (Windows)
+```
+
+`.env` dosyasında ayarlanması gereken temel değişkenler:
+
+```bash
+DEEPSEEK_API_KEY=sk-your-key-here        # Zorunlu (veya başka bir LLM)
+PASA38_BOT_TOKEN=your-bot-token          # Telegram bot 1
+REYMEN_BOT_TOKEN=your-reymen-bot-token   # Telegram bot 2
+KIRAL38_BOT_TOKEN=your-kiral38-bot-token # Telegram bot 3
+REYMEN_JWT_SECRET=your-secret-32chars    # Web UI için JWT gizli anahtarı
+```
+
+#### 5. (Opsiyonel) FFmpeg Kurulumu
+
+```bash
+# Windows (winget)
+winget install ffmpeg
+
+# Windows (Chocolatey)
+choco install ffmpeg
+
+# Linux (Debian/Ubuntu)
+sudo apt install ffmpeg
+
+# macOS (Homebrew)
+brew install ffmpeg
+
+# Doğrulama
+ffmpeg -version
+```
+
+#### 6. (Opsiyonel) Playwright Kurulumu
+
+```bash
+# Playwright'ı yükle
+pip install playwright
+
+# Chromium tarayıcısını indir
+playwright install chromium
+```
+
+#### 7. (Opsiyonel) Docker Kurulumu
+
+Container Sandbox özelliği için Docker gereklidir:
+
+```bash
+# Docker'ı kur (https://docs.docker.com/get-docker/)
+docker --version
+
+# Docker Compose'u doğrula
+docker compose version
+```
+
+#### 8. Çalıştır
+
+```bash
+# Doğrudan çalıştır (interaktif REPL)
+python reymen_launcher.py
+
+# Tek seferlik soru
+python reymen_launcher.py -z "Merhaba, nasılsın?"
+
+# Versiyon bilgisi
+python reymen_launcher.py --version
+
+# Yardım
+python reymen_launcher.py --help
+```
+
+### Docker ile Kurulum
+
+```bash
+# Docker ile çalıştır (proje kökünde)
+docker compose up
+
+# Arka planda çalıştır
+docker compose up -d
+
+# Logları izle
+docker compose logs -f
+```
+
+### ReYMeN'i Tanı
+
+ReYMeN framework'ünü tanımak için örnek script'leri çalıştırabilirsin:
+
+```bash
+# Merhaba ReYMeN — temel kullanım
+python examples/00_merhaba_reymen.py
+
+# Plugin kullanımı
+python examples/01_plugin_kullanimi.py
+
+# Container Sandbox
+python examples/03_container_sandbox.py
+
+# MCP Server başlat
+python -c "from src.gateways.mcp_server import main; main()"
+```
+
+### Sık Karşılaşılan Hatalar
+
+| Hata | Olası Sebep | Çözüm |
+|------|-------------|-------|
+| `ModuleNotFoundError: No module named 'src'` | Sanal ortam aktif değil | Sanal ortamı aktifleştir: `source .venv/bin/activate` |
+| `openai.AuthenticationError` | API key yanlış/eksik | `.env` dosyasında `DEEPSEEK_API_KEY` değerini kontrol et |
+| `python-telegram-bot` hatası | Telegram bot token'ı geçersiz | `@BotFather`'dan token'ı yenile |
+| `FFmpeg not found` | FFmpeg kurulu değil | Yukarıdaki FFmpeg kurulum adımlarını uygula |
+| `Playwright` hatası | Tarayıcı binary'si eksik | `playwright install chromium` çalıştır |
+| `docker: command not found` | Docker kurulu değil | Docker Desktop'ı kur (Windows/macOS) veya `apt install docker.io` (Linux) |
+| `Permission denied` | Dosya izinleri | `.env` ve `config/config.yaml` dosyalarının okunabilir olduğunu kontrol et |
+| `sqlite3.OperationalError` | Veritabanı kilitli | `.ReYMeN/` dizinindeki `.db` dosyalarını sil ve yeniden başlat |
+
+### Platform Farklılıkları
+
+| İşlem | Linux/macOS | Windows |
+|-------|-------------|---------|
+| **Sanal ortam aktifleştirme** | `source .venv/bin/activate` | `.venv\Scripts\activate` |
+| **.env kopyalama** | `cp config/.env.example .env` | `copy config\.env.example .env` |
+| **FFmpeg kurulumu** | `apt install ffmpeg` / `brew install ffmpeg` | `winget install ffmpeg` |
+| **Yol ayracı** | `/` | `\` (veya `/` Git Bash'te) |
+| **Ortam değişkeni** | `export VAR=value` | `set VAR=value` (CMD) / `$env:VAR='value'` (PowerShell) |
+
+> 💡 **İpucu:** Windows'ta **Git Bash** kullanmanız önerilir — Linux benzeri komutlar ve yol formatı sağlar.
 
 ---
 

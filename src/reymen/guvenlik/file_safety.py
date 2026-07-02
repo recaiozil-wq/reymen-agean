@@ -16,7 +16,7 @@ IZINLI_DIZINLER = [
 # Kesinlikle yasak dizinler
 YASAK_DIZINLER = [
     "C:\\Windows",
-    "C:\\Windows\\System32",
+    os.environ.get("SystemRoot", "C:\\Windows") + "\\System32",
     "C:\\Windows\\System",
     "C:\\Program Files",
     "C:\\Program Files (x86)",
