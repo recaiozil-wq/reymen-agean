@@ -1,22 +1,23 @@
 ---
-name: Ozellik Talebi / Feature Request
-about: Yeni bir ozellik oner
+name: Özellik Talebi
+about: ReYMeN için bir özellik önerisi.
 title: '[FEATURE] '
 labels: enhancement
 assignees: ''
+
 ---
-**Ilgili Sorun**
-Bu ozellik hangi problemi cozecek?
 
-**Onerilen Cozum**
-Ne yapilmasini istiyorsunuz?
+**Özellik Açıklaması**
+Ne eklenmesini istediğini net bir şekilde açıkla.
 
-**Alternatifler**
-Baska hangi yaklasimlar dusunuldu?
+**Neden Gerekli?**
+Bu özellik hangi problemi çözecek veya hangi kullanım senaryosuna hitap edecek?
 
-**Kullanim Senaryosu**
-```python
-# Nasil kullanilacagina dair ornek
-```
+**Mevcut Alternatifler**
+Şu anda bu ihtiyacı nasıl karşılıyorsun? (varsa)
 
-**Ek Bilgi**
+**Önerilen Çözüm**
+Nasıl implemente edilebileceğine dair fikrin varsa paylaş.
+
+**Ek Bağlam**
+Ekran görüntüleri, örnek kod, referans linkler vs.

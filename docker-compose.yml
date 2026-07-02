@@ -1,23 +1,41 @@
 services:
   reymen:
     build: .
-    container_name: reymen
-    env_file: .env
-    volumes:
-      - .ReYMeN:/app/.ReYMeN
-      - logs:/app/logs
-      - chroma_db:/app/chroma_db
-      - vektor_hafizasi:/app/reymen/hafiza/vektor
-      - merkez_db:/app/reymen/merkez_db
+    container_name: reymen-agent
     environment:
-      - REYMEN_MODEL=${REYMEN_MODEL:-auto}
-      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-}
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
-      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
-    command: ["--gorev", ".ReYMeN/gorev_cozucu_sistemi.md"]
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    volumes:
+      - ./config.yaml:/app/config.yaml
+      - ./src:/app/src
+      - ./examples:/app/examples
+    command: python -c "from src.reymen.cereyan.beyin import Beyin; b = Beyin({'model':{'provider':'deepseek','model':'deepseek-v4-flash'}}); print(b.dusun('Merhaba ReYMeN!'))"
+    profiles:
+      - cli
 
-volumes:
-  logs:
-  chroma_db:
-  vektor_hafizasi:
-  merkez_db:
+  reymen-gateway:
+    build: .
+    container_name: reymen-gateway
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
+    volumes:
+      - ./config.yaml:/app/config.yaml
+      - ./src:/app/src
+    command: python -m src.gateways.gateway_runner
+    profiles:
+      - gateway
+
+  reymen-mcp:
+    build: .
+    container_name: reymen-mcp
+    environment:
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
+    volumes:
+      - ./config.yaml:/app/config.yaml
+      - ./src:/app/src
+    command: python -c "from src.gateways.mcp_server import main; main()"
+    profiles:
+      - mcp

@@ -1,141 +1,126 @@
-# ReYMeN Agent
+# ReYMeN
 
-> Autonomous AI agent with built-in learning loop, multi-platform messaging, plugin system, and reasoning core.
+> **A Self-Healing, Multi-Bot Agent Framework with Native Reasoning Core**
 
-ReYMeN is a self-contained, open-source AI agent framework. It runs on its own infrastructure — no external agent libraries required. Built around a **closed learning loop**: it creates skills from experience, persists memory across sessions, and autonomously maintains its own health via proactive maintenance scripts.
+LangGraph'ın karmaşıklığına veya CrewAI'nin kısıtlamalarına takılmadan; tek bir merkezden (`durum.json`) 3 farklı botu asenkron yöneten, kendi hatalarından öğrenen ve MCP destekli otonom bir altyapı.
 
-## Features
+**694 Python dosyası, 231K satır kod, tek geliştirici. MIT lisansı.**
 
-### Core
-- 🧠 **Beyin** — LLM provider abstraction with fallback chain (DeepSeek, xAI, OpenAI, Anthropic, Groq, local)
-- 🔁 **Conversation Loop** — ReAct-style: plan → tool call → evaluate → repeat
-- 🧩 **Plugin System** — 7 lifecycle hooks: `on_load`, `on_message`, `pre_llm_call`, `post_llm_call`, `on_session_start/end`, `on_unload`
-- 🧪 **Reasoning Core** — Ornith-1.0 integrated for autonomous error analysis + solution logging
-- 💾 **Persistent Memory** — OnceHafiza (MEMORY.md + USER.md), FTS5 session search, shared_memories symlink
-- 🛠️ **Skills** — Autonomous skill creation after complex tasks, SKILL.md format
+---
 
-### Multi-Agent
-- 👥 **3 Bot Single Center** — pasa_38, ReYMeN, kiral38 sharing one config + memory + session via `durum.json` (single source of truth)
-- 🔀 **Multi-Profile** — Isolated profiles (default, reymen, kiral38) with shared session history
-- 🔄 **Ortak Komut** — Unified 26-command system across all bots
+## 🔥 ReYMeN vs Dünya
 
-### Gateway & Platforms
-- 💬 **Telegram** — Full gateway with /commands, session management, SOUL.md personality
-- 💬 **Discord** — py-cord based gateway, same architecture as Telegram
-- 💬 **WhatsApp** — REST API gateway
-- 🌐 **API Server** — OpenAI-compatible `/v1/chat/completions` endpoint
-- 🔊 **Voice Mode** — Real-time voice conversations
+| Özellik | ReYMeN | LangGraph | CrewAI | OpenAI SDK |
+|---------|:------:|:---------:|:------:|:----------:|
+| Kendi Reasoning Core | ✅ **Ornith-1.0** | ❌ | ❌ | ❌ |
+| Multi-Bot Tek Merkez | ✅ **3 bot ortak** | ❌ | ❌ | ❌ |
+| Plugin Sistemi (7 hook) | ✅ | ❌ | ❌ | ❌ |
+| MCP Server (kendisi sunar) | ✅ | ❌ | ❌ | ❌ |
+| Discord + Telegram Gateway | ✅ | ❌ | ❌ | ❌ |
+| Container Sandbox | ✅ | ❌ | ❌ | ❌ |
+| Proaktif Bakım (8 önlem) | ✅ **ÖZGÜN** | ❌ | ❌ | ❌ |
+| Provider Abstraction | ✅ 5 provider | ✅ | ✅ | ✅ |
+| Platform Sayısı | 3 (TG/Discord/WA) | ❌ | ❌ | ❌ |
 
-### Tools & Extensions
-- 🌍 **Web Search** — Firecrawl + DuckDuckGo + Bing fallback
-- 🖼️ **Image Generation** — FAL.ai (FLUX 2 Klein 9B)
-- 🎤 **TTS/STT** — Edge TTS + faster-whisper
-- 🌐 **Browser Automation** — Playwright MCP
-- 🔗 **MCP Support** — Both client (native MCP) and server (expose sessions via MCP)
-- 📎 **@file/@url References** — Inline file/URL reading in conversations
-- 🐳 **Container Sandbox** — Docker isolation (kapali/kismi/tam modes)
-- 🔑 **Credential Pool** — Automatic API key rotation
+---
 
-### Automation & Maintenance
-- ⏰ **Cron Scheduler** — Built-in cron with no_agent watchdog mode
-- 🩺 **Proactive Bakim** — 8-point health check every 30min (config drift, gateway watchdog, SOUL sync, state.db prune, memory sync, weekly report, config validation, gateway health)
-| 🛡️ **Startup VBS** — Reboot-proof auto-start for all bots
-
-## Architecture
-
-### 3 Bot — Single Center
-
-```mermaid
-flowchart TD
-    subgraph Central["☝️ Tek Merkez"]
-        D[durum.json<br/>Tek Kaynak]
-        C[config.yaml<br/>Ortak Ayar]
-        S[SOUL.md<br/>Aynı Kişilik]
-        M[(shared_memories<br/>Aynı Hafıza)]
-    end
-
-    subgraph Bots["👥 3 Bot"]
-        P1[🐦 @Pasa_38_bot<br/>default profil]
-        P2[🤖 @ReYMeN_ReYMeNbot<br/>reymen profil]
-        P3[🔑 @Kiral38bot<br/>kiral38 profil]
-    end
-
-    subgraph Output["📤 Çıktı"]
-        R[✅ Aynı cevap<br/>Aynı yetki<br/>Aynı kişilik]
-    end
-
-    D --> P1 & P2 & P3
-    C --> P1 & P2 & P3
-    S --> P1 & P2 & P3
-    M --> P1 & P2 & P3
-    
-    P1 & P2 & P3 --> Output
-```
-
-### Reasoning Core — Closed Learning Loop
-
-```mermaid
-flowchart LR
-    Start[⚡ Hata oluştu] --> Hash[🔍 Soyut imza çıkar<br/>path + satır + değer → SHA256]
-    Hash --> Check{💾 Hafızada var mı?}
-    Check -->|Evet| Load[📂 Cozumu yükle<br/>basari_sayisi + cozum]
-    Load --> Apply[⚙️ Uygula]
-    Apply --> Success{✅ Başarılı?}
-    Check -->|Hayır| LLM[🧠 LLM'e sor<br/>DeepSeek / Ornith-1.0]
-    LLM --> Generate[✏️ Çözüm üret]
-    Generate --> Apply
-    Success -->|Evet| Save[💿 Cozumu kaydet<br/>SQLite + TTL=30gün]
-    Success -->|Hayır| Retry{🔄 3 deneme?}
-    Retry -->|Hayır| LLM
-    Retry -->|Evet| Report[📝 Raporla<br/>insan mudahalesi]
-    Save --> End[✅ Bir daha aynı hata olmaz]
-```
-
-## Quick Start
+## 🚀 Quickstart (1 Dakika)
 
 ```bash
-# Install
-git clone https://github.com/recaiozil-wq/reymen-agean.git
-cd reymen-agean
+# 1. Klonla
+git clone https://github.com/recaiozil-wq/reymen-agent.git
+cd reymen-agent
+
+# 2. Sanal ortam
 uv venv
-uv pip install -e ".[all]"
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+uv pip install -e .
 
-# Configure
+# 3. API key'ini ekle
 cp .env.example .env
-# Edit .env with your API keys
+# .env'ye DEEPSEEK_API_KEY veya OPENAI_API_KEY yaz
 
-# Run
-python reymen_launcher.py
-
-# One-shot
-python reymen_launcher.py -z "your question"
-
-# Start gateway (Telegram)
-hermes gateway --profile reymen
+# 4. Çalıştır
+python -c "from src.reymen.cereyan.beyin import Beyin; b = Beyin({'model':{'provider':'deepseek','model':'deepseek-v4-flash'}}); print(b.dusun('Merhaba!'))"
 ```
 
-## Architecture
-
-```
-reymen/
-├── ag/            # Gateways (Telegram, Discord, MCP Server)
-├── arac/          # Tools (tool registry, executor)
-├── cereyan/       # Core loop (motor, conversation_loop, broker)
-├── core/          # Subsystems (orchestrator, cron, credential pool)
-├── guvenlik/      # Security (file safety, container sandbox)
-├── hafiza/        # Memory (session DB, OnceHafiza, vector)
-├── plugin/        # Plugin system (PluginBase, PluginManager)
-├── plugins/       # Installed plugins
-├── scripts/       # Proactive bakim, watchdog
-└── sistem/        # System (db_config, credential_persistence)
+Veya Docker ile:
+```bash
+docker compose up
 ```
 
-## Project Stats
+---
 
-- **694 Python files**, 231K lines of code
-- **154 commits**, single developer
-- **MIT License**
+## 📂 Dizin Yapısı
 
-## License
+```
+src/
+├── reymen/          # Framework çekirdeği
+│   ├── cereyan/     # Beyin, Motor, Conversation Loop
+│   ├── arac/        # Tools (50+ araç)
+│   ├── plugin/      # PluginBase + PluginManager
+│   ├── plugins/     # Kullanıcı eklentileri
+│   ├── hafiza/      # Session DB, OnceHafiza, Vector Memory
+│   ├── guvenlik/    # Container Sandbox, File Safety
+│   └── sistem/      # Credential Persistence, DB Config
+├── gateways/        # Platform entegrasyonları
+│   ├── discord_bot.py
+│   ├── telegram_bot.py
+│   ├── mcp_server.py
+│   └── platforms/   # WhatsApp, Telegram network
+├── core/            # Reasoning Core, Credential Pool
+│   ├── observability.py
+│   ├── credential_pool.py
+│   └── provider_abstraction.py
+examples/            # 4 kullanım senaryosu
+tests/               # 112 test dosyası
+```
 
-MIT License — see [LICENSE](LICENSE) for details.
+---
+
+## ✨ Öne Çıkan Özellikler
+
+| Özellik | Açıklama |
+|---------|----------|
+| 🧠 **Reasoning Core** | Ornith-1.0 ile hata → DURUM_OKU() → çözüm → analitik.db. Kapalı öğrenme döngüsü |
+| 👥 **3 Bot Tek Merkez** | pasa_38, ReYMeN, kiral38 aynı config/hafıza/session. `durum.json` TEK KAYNAK |
+| 🧩 **Plugin Sistemi** | 7 lifecycle hook: on_load, on_message, pre_llm_call, post_llm_call, on_session_start/end, on_unload |
+| 🔗 **MCP Server** | Kendisi MCP sunar: 6 araç (list_sessions, send_message, search_sessions...) |
+| 🔑 **Provider Abstraction** | 5 provider: DeepSeek, OpenAI, Anthropic, xAI, OpenRouter. Tek satırda değiştir |
+| ✅ **Pydantic Validation** | Tool çağrılarında type-safe validation, JSON auto-fix |
+| 📊 **OpenTelemetry** | LLM/tool/session span'leri, token/maliyet/latency takibi |
+| 🐳 **Container Sandbox** | Docker izolasyon (kapali/kismi/tam). Güvenli kod çalıştırma |
+| 📎 **@file/@url Referans** | `@file:config.yaml` veya `@url:https://...` ile inline okuma |
+| 🔊 **Voice Mode** | Gerçek zamanlı sesli konuşma (TTS + STT) |
+| 🩺 **Proaktif Bakım** | 8 önlem: config drift, watchdog, SOUL sync, state.db prune, haftalık rapor |
+| 🔄 **Otomatik Startup** | Reboot'ta 3 bot penceresiz başlar (VBS) |
+
+---
+
+## 🎯 Kullanım Senaryoları
+
+```bash
+# Örnek 1: Merhaba ReYMeN
+python examples/00_merhaba_reymen.py
+
+# Örnek 2: Plugin yazma
+python examples/01_plugin_kullanimi.py
+
+# Örnek 3: MCP Server başlatma
+python -c "from src.gateways.mcp_server import main; main()"
+
+# Örnek 4: Container Sandbox
+python examples/03_container_sandbox.py
+```
+
+---
+
+## 🛠 Geliştirici
+
+Tek geliştirici: **Marko (Pasa_38)** — [@Pasa_38_bot](https://t.me/Pasa_38_bot)
+
+---
+
+## 📜 Lisans
+
+MIT License — dilediğiniz gibi kullanın, değiştirin, dağıtın.
