@@ -102,4 +102,8 @@ baslat_botlar.bat
 cli-config.yaml
 cua_log.txt
 AGENTS.md.bak
+git-helper*.sh
+github_push.py
+src/reymen/
+jobs/
 terminal-bench-benchmark/

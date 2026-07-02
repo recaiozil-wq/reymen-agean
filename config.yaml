@@ -200,3 +200,9 @@ plugins:
   auto_load: true
   # Sadece belirli plugin'leri yüklemek için liste (boş = tümünü yükle)
   list: []
+
+# ── Platform Gateway'leri ────────────────────────────────────────────────
+platforms:
+  googlechat:
+    enabled: false
+    webhook_url: "${GOOGLE_CHAT_WEBHOOK_URL}"
