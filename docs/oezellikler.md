@@ -1,59 +1,59 @@
-# Ozellikler
+# Features
 
-## Agent Ozellikleri
+## Agent Features
 
-| Ozellik | Durum | Detay |
-|---------|:-----:|-------|
-| Coklu LLM Provider | ✅ | 12+ provider, auto-failover |
-| Arac Cagri (Tool Calling) | ✅ | 100+ arac |
-| A2A Mesajlasma | ✅ | Agentlar arasi iletisim |
-| Kanban Board | ✅ | Kart/kolon/WIP/oncelik |
-| Swarm Orchestration | ✅ | Coklu-worker gorev dagitimi |
-| Plugin Sistemi | ✅ | Hot-reload, provider plugin |
-| MCP Sunucu | ✅ | Stdio + HTTP/SSE |
-| ACP Sunucu | ✅ | JSON-RPC 2.0, Claude Code |
-| Open WebUI Uyumlu | ✅ | OpenAI API formati |
-| Self-Improvement | ✅ | Otomatik kalite iyilestirme |
-| Cron Zamanlayici | ✅ | Job scheduling |
-| Context Compression | ✅ | Otomatik token yonetimi |
+| Feature | Status | Detail |
+|---------|:-----:|--------|
+| Multi-LLM Provider | ✅ | 12+ providers, auto-failover |
+| Tool Calling | ✅ | 100+ tools |
+| A2A Messaging | ✅ | Inter-agent communication |
+| Kanban Board | ✅ | Card/column/WIP/priority |
+| Swarm Orchestration | ✅ | Multi-worker task distribution |
+| Plugin System | ✅ | Hot-reload, provider plugin |
+| MCP Server | ✅ | Stdio + HTTP/SSE |
+| ACP Server | ✅ | JSON-RPC 2.0, Claude Code |
+| Open WebUI Compatible | ✅ | OpenAI API format |
+| Self-Improvement | ✅ | Automatic quality improvement |
+| Cron Scheduler | ✅ | Job scheduling |
+| Context Compression | ✅ | Automatic token management |
 
-## Guvenlik
+## Security
 
-| Ozellik | Durum | Detay |
-|---------|:-----:|-------|
-| Guardrails | ✅ | Halusinasyon filtresi |
-| Sandbox | ✅ | Docker izole calistirma |
-| PII Redaction | ✅ | API key/email/tel masking |
+| Feature | Status | Detail |
+|---------|:-----:|--------|
+| Guardrails | ✅ | Hallucination filter |
+| Sandbox | ✅ | Docker isolated execution |
+| PII Redaction | ✅ | API key/email/phone masking |
 | OAuth 2.0 | ✅ | Google, Discord |
-| Approvals | ✅ | Destructive komut onayi |
-| Path Security | ✅ | Path traversal korumasi |
+| Approvals | ✅ | Destructive command confirmation |
+| Path Security | ✅ | Path traversal protection |
 
-## Kullanici Arayuzu
+## User Interface
 
-| Ozellik | Durum | Detay |
-|---------|:-----:|-------|
-| CLI | ✅ | 20+ komut |
+| Feature | Status | Detail |
+|---------|:-----:|--------|
+| CLI | ✅ | 20+ commands |
 | Web UI | ✅ | FastAPI + HTMX panel |
-| Desktop | ✅ | Sistem tepsisi + bildirim |
+| Desktop | ✅ | System tray + notifications |
 | TUI | ✅ | Rich terminal UI |
 | Telegram Bot | ✅ | @Pasa_38 |
 
-## Hafiza & Ogrenme
+## Memory & Learning
 
-| Ozellik | Durum | Detay |
-|---------|:-----:|-------|
-| Vektor Hafiza | ✅ | ChromaDB + TF-IDF |
-| FTS5 Arama | ✅ | Full-text search |
-| Context Compression | ✅ | Otomatik |
-| Ogrenme Dongusu | ✅ | Hata cozum hafizasi |
-| Semantic Cache | ✅ | Benzer sorgu onbellegi |
+| Feature | Status | Detail |
+|---------|:-----:|--------|
+| Vector Memory | ✅ | ChromaDB + TF-IDF |
+| FTS5 Search | ✅ | Full-text search |
+| Context Compression | ✅ | Automatic |
+| Learning Loop | ✅ | Error solution memory |
+| Semantic Cache | ✅ | Similar query cache |
 
 ## Developer
 
-| Ozellik | Durum | Detay |
-|---------|:-----:|-------|
+| Feature | Status | Detail |
+|---------|:-----:|--------|
 | Plugin API | ✅ | plugin.yaml + init.py |
-| MCP Protokol | ✅ | tools/list, tools/call |
-| ACP Protokol | ✅ | JSON-RPC 2.0 |
+| MCP Protocol | ✅ | tools/list, tools/call |
+| ACP Protocol | ✅ | JSON-RPC 2.0 |
 | REST API | ✅ | FastAPI endpoints |
-| WebSocket | ✅ | Canli log/bildirim |
+| WebSocket | ✅ | Live log/notification |

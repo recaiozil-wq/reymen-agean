@@ -47,7 +47,7 @@ uv pip install -e ".[dev]"
 ### Code Standards
 
 - **Python 3.11+** — f-strings, type hints, dataclasses
-- **Turkish + English** — variable names in English, comments/docstrings in Turkish
+- **English** — variable names, comments, and docstrings in English
 - **Error handling** — always try/except with graceful degradation
 - **No external dependencies** unless absolutely necessary — prefer stdlib
 - **Module flag pattern** — use `_MODUL_AKTIF = True/False` for optional features

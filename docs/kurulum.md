@@ -1,19 +1,19 @@
 # 🚀 Quickstart
 
-## Gereksinimler
+## Requirements
 
 - **Python 3.11+**
 - **Windows 10/11** (native), **Linux/macOS** (WSL/general)
 - **Git**
 
-## 1. Depoyu Klonla
+## 1. Clone the Repository
 
 ```bash
 git clone https://github.com/recaiozil-wq/reymen-agean.git
 cd reymen-agean
 ```
 
-## 2. Sanal Ortam Kur
+## 2. Set Up Virtual Environment
 
 ```bash
 python -m venv venv
@@ -34,55 +34,55 @@ python -m venv venv
     source venv/bin/activate
     ```
 
-## 3. Bağımlılıkları Yükle
+## 3. Install Dependencies
 
 ```bash
 pip install -e .
 ```
 
-Geliştirme araçları için:
+For development tools:
 
 ```bash
 pip install -e ".[dev]"
 pre-commit install
 ```
 
-## 4. Çevre Değişkenlerini Ayarla
+## 4. Set Environment Variables
 
-`.env` dosyası oluşturun:
+Create `.env` file:
 
 ```bash
-# Ana API key'iniz (DeepSeek önerilen)
+# Your primary API key (DeepSeek recommended)
 DEEPSEEK_API_KEY=your-key-here
 
-# İsteğe bağlı provider'lar
+# Optional providers
 OPENAI_API_KEY=sk-...
 ANTHROPIC_API_KEY=sk-ant-...
 TELEGRAM_BOT_TOKEN=...
 ```
 
-## 5. Çalıştır
+## 5. Run
 
 ```bash
-# Etkileşimli CLI
+# Interactive CLI
 reymen chat
 
 # Web UI (http://localhost:5000)
 reymen web
 
-# Tek sorgu
-reymen chat -q "Merhaba, nasıl çalışıyorsun?"
+# Single query
+reymen chat -q "Hello, how do you work?"
 ```
 
-## 🎯 Sonraki Adımlar
+## 🎯 Next Steps
 
-- [📖 Kullanım Kılavuzu](kullanim.md) — Detaylı kullanım senaryoları
-- [🛠️ CLI Referansı](cli.md) — Tüm komutlar
-- [🤝 Katkıda Bulunma](katki.md) — Geliştirici rehberi
+- [📖 Usage Guide](kullanim.md) — Detailed usage scenarios
+- [🛠️ CLI Reference](cli.md) — All commands
+- [🤝 Contributing](katki.md) — Developer guide
 
-## Alternatif: PowerShell Kurulumu
+## Alternative: PowerShell Setup
 
-Windows PowerShell icin hazir betik:
+Ready-to-use script for Windows PowerShell:
 
 ```powershell
 .\install.ps1

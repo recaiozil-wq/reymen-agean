@@ -1,12 +1,12 @@
-# Katkida Bulunma
+# Contributing
 
-ReYMeN acik kaynak bir projedir. Katkida bulunmak icin:
+ReYMeN is an open source project. To contribute:
 
-1. Fork et
+1. Fork
 2. pip install -e .[dev]
 3. pre-commit install
-4. Branch ac: feature/ozellik-adi
-5. Kodla + test ekle
-6. PR ac
+4. Create branch: feature/feature-name
+5. Code + add tests
+6. Open PR
 
-Detayli rehber: [CONTRIBUTING.md](https://github.com/Watcher-ReYMeN/ReYMeN-Ajan-v2/blob/main/CONTRIBUTING.md)
+Detailed guide: [CONTRIBUTING.md](https://github.com/Watcher-ReYMeN/ReYMeN-Ajan-v2/blob/main/CONTRIBUTING.md)

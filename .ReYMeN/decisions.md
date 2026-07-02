@@ -1,96 +1,96 @@
-1|# Karar Kaydı — 3 Modül Entegrasyon
-2|
-3|**Tarih:** 2026-07-02 00:30
-4|
-5|## Ne yapıldı?
-6|Credential Pool, Voice Mode, API Server modülleri reymen_launcher.py'ye entegre edildi.
-7|
-8|## Entegrasyon
-9|
-10|| Modül | Çağrı | Açıklama |
-11||-------|-------|----------|
-12|| 🔑 Credential Pool | `reymen --credential-pool` | API key havuz durumu gösterir |
-13|| 🎤 Voice Mode | `reymen --voice` | Push-to-talk sesli arayüz başlatır |
-14|| 🌐 API Server | `reymen --api-server --port 8000` | OpenAI-uyumlu REST API başlatır |
-15|
-16|## Motor.py import
-17|- `_CREDENTIAL_POOL` — credential pool singleton
-18|- `_VOICE_MODE_KLASS` — VoiceMode sınıfı
-19|- `_API_SERVER_KLASS` — APIServer sınıfı
-20|- Tümü try/except ile güvenli import
-21|
-22|---
-23|
-24|# Karar Kaydı — Skills → OnceHafiza DB Cron Sync
-25|
-26|**Tarih:** 2026-07-02 06:06
-27|
-28|## Ne yapıldı?
-29|`scan_skills_to_hafiza_cron.py` script'i düzeltildi ve çalıştırıldı:
-30|1. **PATH**: `src/reymen/cereyan/skills/` → root `skills/` (gerçek .md dosyalarının olduğu yer)
-31|2. **DB**: `src/reymen/merkez_db/` → root `merkez_db/` (mevcut DB'lerin olduğu yer)
-32|3. **SCHEMA**: `skills_index.db`'ye `beceriler` + `beceriler_meta` tabloları eklendi
-33|4. **COLUMN**: `ogrenme.db`'de `icerik` → `cozum` (mevcut schema ile uyum)
-34|
-35|## Neden?
-36|- Cron job kayıtlıydı ama yanlış klasörü tarıyordu (0 .md dosyası)
-37|- Gerçek .md skill dosyaları root `skills/` klasöründeydi (~523 dosya)
-38|- DB schema'ları oluşturulmamış veya uyumsuzdu
-39|
-40|## Sonuç
-41|- İlk çalıştırma: **523 yeni** eklendi (+ skills_index.db'ye, + ogrenme.db'ye)
-42|- İkinci çalıştırma: **0 yeni, 0 güncel** — hash'ler eşleşiyor, stabil
-43|
-44|## Alternatifler
-45|- Mevcut script'i tamamen yeniden yazmak yerine path/schema fix'i tercih edildi
-46|- Mevcut cron job kaydı (`skill-sync-to-hafiza`, her 6 saat) korundu, durumu "completed" olarak güncellendi
-47|
+# Decision Log — 3 Module Integration
+
+**Date:** 2026-07-02 00:30
+
+## What was done?
+Credential Pool, Voice Mode, and API Server modules were integrated into reymen_launcher.py.
+
+## Integration
+
+| Module | Command | Description |
+|-------|-------|----------|
+| 🔑 Credential Pool | `reymen --credential-pool` | Shows API key pool status |
+| 🎤 Voice Mode | `reymen --voice` | Starts push-to-talk voice interface |
+| 🌐 API Server | `reymen --api-server --port 8000` | Starts OpenAI-compatible REST API |
+
+## Motor.py imports
+- `_CREDENTIAL_POOL` — credential pool singleton
+- `_VOICE_MODE_KLASS` — VoiceMode class
+- `_API_SERVER_KLASS` — APIServer class
+- All imports use try/except for safe loading
 
 ---
 
-# Karar Kaydı — 15 Hermes→ReYMeN Eksik Kapatma
+# Decision Log — Skills → OnceHafiza DB Cron Sync
 
-**Tarih:** 2026-07-02
+**Date:** 2026-07-02 06:06
 
-## Ne yapıldı?
-15 maddede Hermes'te olup ReYMeN'de eksik/kısmi olan özellikler kapatıldı.
+## What was done?
+Fixed and executed `scan_skills_to_hafiza_cron.py`:
+1. **PATH**: `src/reymen/cereyan/skills/` → root `skills/` (where actual .md files are)
+2. **DB**: `src/reymen/merkez_db/` → root `merkez_db/` (where existing DBs are)
+3. **SCHEMA**: Added `beceriler` + `beceriler_meta` tables to `skills_index.db`
+4. **COLUMN**: Changed `icerik` → `cozum` in `ogrenme.db` (schema compatibility)
 
-## Neden?
-Kullanıcı Hermes seviyesinde %100 eşleşme istedi.
+## Why?
+- Cron job was registered but scanning the wrong folder (0 .md files)
+- Actual .md skill files were in root `skills/` folder (~523 files)
+- DB schemas were not created or incompatible
 
-## Alternatif?
-Tek tek elle yapmak yerine paralel sub-agent + bizzat doğrulama yapıldı.
+## Result
+- First run: **523 new** added (+ to skills_index.db, + to ogrenme.db)
+- Second run: **0 new, 0 updated** — hashes match, stable
 
-## Detay
+## Alternatives
+- Preferred path/schema fix over completely rewriting the existing script
+- Existing cron job record (`skill-sync-to-hafiza`, every 6 hours) was preserved, status updated to "completed"
 
-| # | Madde | Durum | Açıklama |
-|---|-------|:-----:|----------|
-| 1 | Skills sayısı (523→531) | ✅ | 8 Hermes skill'i kopyalandı |
-| 2 | Session search FTS5 | ✅ | `session_search.py` — FTS5 MATCH arama |
+
+---
+
+# Decision Log — 15 Hermes→ReYMeN Gap Closure
+
+**Date:** 2026-07-02
+
+## What was done?
+Closed 15 feature gaps where features existed in Hermes but were missing/partial in ReYMeN.
+
+## Why?
+User requested 100% parity with Hermes feature level.
+
+## Alternative?
+Used parallel sub-agent + manual verification instead of individual manual work.
+
+## Details
+
+| # | Item | Status | Description |
+|---|------|:-----:|-----------|
+| 1 | Skill count (523→531) | ✅ | 8 Hermes skills copied |
+| 2 | Session search FTS5 | ✅ | `session_search.py` — FTS5 MATCH search |
 | 3 | delegate_task (sub-agent) | ✅ | `delegate_task_tool.py` — ThreadPoolExecutor |
-| 4 | Self-update | ✅ | `self_update.py` — GitHub release takip |
+| 4 | Self-update | ✅ | `self_update.py` — GitHub release tracking |
 | 5 | HyperFrames video | ✅ | `hyperframes_tool.py` — HTML→Playwright→FFmpeg |
-| 6 | Memory compaction | ✅ | `memory_compaction.py` — 50K limit, arşiv |
-| 7 | Skill shrink | ✅ | `skill_shrink.py` — 10KB+ tespit |
-| 8 | Obsidian entegrasyonu | ✅ | `obsidian_tool.py` — 6 tool |
-| 9 | Setup wizard | ✅ | `setup_wizard.py` — 8 aşamalı |
-| 10 | Nightly improvement | ✅ | `nightly_improvement.py` — 6 aşamalı, 03:00 |
-| 11 | Auth sistemi | ✅ | `reymen_auth.py` — JWT + multi-user |
+| 6 | Memory compaction | ✅ | `memory_compaction.py` — 50K limit, archive |
+| 7 | Skill shrink | ✅ | `skill_shrink.py` — 10KB+ detection |
+| 8 | Obsidian integration | ✅ | `obsidian_tool.py` — 6 tools |
+| 9 | Setup wizard | ✅ | `setup_wizard.py` — 8 steps |
+| 10 | Nightly improvement | ✅ | `nightly_improvement.py` — 6 stages, 03:00 |
+| 11 | Auth system | ✅ | `reymen_auth.py` — JWT + multi-user |
 | 12 | Web UI image gen | ✅ | `image_gen_route.py` — GET/POST /image-gen |
-| 13 | Framework adaptörleri | ✅ | `framework_adaptor.py` — LangGraph/CrewAI/AutoGen |
+| 13 | Framework adapters | ✅ | `framework_adaptor.py` — LangGraph/CrewAI/AutoGen |
 | 14 | A2A/ACP | ✅ | `a2a_acp.py` — Agent Card + Skill Transfer |
-| 15 | Rules/Config | ✅ | `kurallar.py` — 5 kategori, 6 kural |
+| 15 | Rules/Config | ✅ | `kurallar.py` — 5 categories, 6 rules |
 
-## Doğrulama
-- 11/15 modül import testi ✅
-- 4/15 sub-agent timeout → yeniden başlatıldı ✅
+## Verification
+- 11/15 module import test ✅
+- 4/15 sub-agent timeout → restarted ✅
 - Web UI image gen: GET/POST 200 OK ✅
-- Framework adaptörleri: 3 framework gracefull degrade ✅
-- A2A/ACP: JSON-RPC 9 metod testi ✅
+- Framework adapters: 3 frameworks graceful degradation ✅
+- A2A/ACP: JSON-RPC 9 method test ✅
 - Rules: 7/7 test ✅
-- Nightly: 6/6 aşama başarılı ✅
+- Nightly: 6/6 stages successful ✅
 
-## Kanıt
+## Evidence
 - GitHub commit: `2d41f034`
-- 23 dosya, 4,996 satır eklendi
-- 0 mevcut özellik bozuldu
+- 23 files, 4,996 lines added
+- 0 existing features broken

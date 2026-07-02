@@ -1,69 +1,83 @@
-# 📖 Kullanim Kilavuzu
+# 📖 Usage Guide
 
-## Temel Kullanim
+## Basic Usage
 
-### Sohbet Modu
+### Chat Mode
 
+```
 reymen chat
+```
 
-ReYMeN ile dogal dilde konusabilirsiniz. Dosya islemleri, terminal komutlari,
-web aramasi gibi islemleri otomatik olarak yapar.
+You can talk to ReYMeN in natural language. It automatically handles file operations, terminal commands, web search, and more.
 
-### Web Arayuzu
+### Web Interface
 
+```
 reymen web
+```
 
-Tarayicida http://localhost:5000 adresini acin. JWT kimlik dogrulama ile
-(admin/reymen) paneli kullanabilirsiniz.
+Open http://localhost:5000 in your browser. Use JWT authentication (admin/reymen) to access the panel.
 
-## Gelismis Kullanim
+## Advanced Usage
 
-### Model Degistirme
+### Changing Models
 
+```
 reymen model
 reymen model deepseek
 reymen model openai/gpt-4
+```
 
 ### Kanban Board
 
-reymen kanban board create "Proje X"
-reymen kanban add "Backend gelistirme" --column backlog --priority high
-reymen kanban claim KART_ID
-reymen kanban done KART_ID
-reymen kanban swarm baslat GOREV_TANIMI
+```
+reymen kanban board create "Project X"
+reymen kanban add "Backend development" --column backlog --priority high
+reymen kanban claim CARD_ID
+reymen kanban done CARD_ID
+reymen kanban swarm start TASK_DESCRIPTION
+```
 
-### Cron Gorevleri
+### Cron Tasks
 
-reymen cron add "30m" "Sistem kontrolu"
-reymen cron add "0 9 * * *" "Gunluk rapor"
+```
+reymen cron add "30m" "System check"
+reymen cron add "0 9 * * *" "Daily report"
+```
 
-### Plugin Kullanimi
+### Plugin Usage
 
+```
 reymen plugin list
 reymen plugin enable web_search_provider
 reymen plugin enable image_gen_provider
+```
 
-### MCP Sunucu
+### MCP Server
 
+```
 python -m reymen.core.mcp_server --transport http --port 9000
 python -m reymen.core.mcp_server --transport stdio
+```
 
-### Open WebUI Entegrasyonu
+### Open WebUI Integration
 
-Open WebUI'de Custom OpenAI API ekleyin:
+In Open WebUI, add a Custom OpenAI API:
 URL: http://localhost:5000/v1
 API Key: reymen
 
-## Guvenlik
+## Security
 
-### Approvals Sistemi
-Varsayilan olarak destructive komutlar icin onay istenir.
---yolo bayragi ile atlanabilir.
+### Approvals System
+By default, confirmation is required for destructive commands.
+Can be bypassed with the --yolo flag.
 
 ### Secrets Redaction
-Tool ciktilari API key, token, email gibi hassas bilgileri otomatik maskeler.
+Tool outputs automatically mask sensitive information like API keys, tokens, and emails.
 
 ## Self-Improvement
 
+```
 reymen quality
 reymen quality --trend
+```

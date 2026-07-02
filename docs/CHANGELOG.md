@@ -51,4 +51,4 @@
 - 📅 Cron job management
 - 🖥️ CLI interface
 - 🔒 Security layer
-- 📚 Turkish documentation
+- 📚 English documentation

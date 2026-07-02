@@ -1,27 +1,27 @@
-# 🛠️ CLI Referansı
+# 🛠️ CLI Reference
 
-`reymen` komut satırı arayüzü.
+`reymen` command line interface.
 
-## Genel Kullanım
+## General Usage
 
 ```
-reymen [komut] [parametreler]
+reymen [command] [parameters]
 ```
 
-## Komutlar
+## Commands
 
 ### `reymen chat`
 
-Etkileşimli veya tek sorguluk sohbet.
+Interactive or single-query chat.
 
 ```
-# Etkileşimli
+# Interactive
 reymen chat
 
-# Tek sorgu
-reymen chat -q "Türkiyenin başkenti neresi?"
+# Single query
+reymen chat -q "What is the capital of Turkey?"
 
-# Model seçerek
+# Select model
 reymen chat -m deepseek
 ```
 
@@ -36,38 +36,38 @@ reymen web --port 8080
 
 ### `reymen kanban`
 
-Kanban board yönetimi.
+Kanban board management.
 
 ```
 reymen kanban boards
-reymen kanban add "Yeni görev" --column backlog
+reymen kanban add "New task" --column backlog
 reymen kanban move KART_ID in_progress
 reymen kanban done KART_ID
 ```
 
 ### `reymen cron`
 
-Zamanlanmış görevler.
+Scheduled tasks.
 
 ```
 reymen cron list
-reymen cron add "30m" "Her 30 dakikada kontrol"
+reymen cron add "30m" "Check every 30 minutes"
 reymen cron pause JOB_ID
 ```
 
 ### `reymen plugin`
 
-Plugin yönetimi.
+Plugin management.
 
 ```
 reymen plugin list
-reymen plugin install PLUGIN_ADI
-reymen plugin remove PLUGIN_ADI
+reymen plugin install PLUGIN_NAME
+reymen plugin remove PLUGIN_NAME
 ```
 
 ### `reymen model`
 
-Model/provider yönetimi.
+Model/provider management.
 
 ```
 reymen model
@@ -77,27 +77,27 @@ reymen model providers
 
 ### `reymen session`
 
-Oturum yönetimi.
+Session management.
 
 ```
 reymen session list
-reymen session search "kelime"
+reymen session search "keyword"
 reymen session delete SESSION_ID
 ```
 
 ### `reymen backup`
 
-Yedekleme.
+Backup.
 
 ```
 reymen backup create
-reymen backup restore DOSYA.zip
+reymen backup restore FILE.zip
 reymen backup list
 ```
 
 ### `reymen gateway`
 
-Gateway yönetimi.
+Gateway management.
 
 ```
 reymen gateway start
@@ -107,30 +107,30 @@ reymen gateway status
 
 ### `reymen skill`
 
-Skill yönetimi.
+Skill management.
 
 ```
 reymen skill list
-reymen skill search "kelime"
-reymen skill install SKILL_ADI
+reymen skill search "keyword"
+reymen skill install SKILL_NAME
 ```
 
 ### `reymen config`
 
-Yapılandırma.
+Configuration.
 
 ```
 reymen config show
-reymen config set anahtar.deger
+reymen config set key.value
 reymen config edit
 ```
 
-## Çıkış Kodları
+## Exit Codes
 
-| Kod | Anlamı |
-|:---:|--------|
-| 0 | Başarılı |
-| 1 | Genel hata |
-| 2 | Parametre hatası |
-| 3 | Yetki hatası |
-| 4 | Bağlantı hatası |
+| Code | Meaning |
+|:----:|---------|
+| 0 | Success |
+| 1 | General error |
+| 2 | Parameter error |
+| 3 | Authorization error |
+| 4 | Connection error |

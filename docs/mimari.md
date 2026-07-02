@@ -1,59 +1,59 @@
-# Mimari
+# Architecture
 
-## Genel Yapi
+## Overall Structure
 
 ```
 reymen/
-+-- cereyan/           # Core motor ve ogrenme
-|   +-- motor.py       # Ana arac motoru
-|   +-- conversation_loop.py  # Konusma dongusu
-|   +-- continuous_learning.py # Surekli ogrenme
-+-- ag/                # Provider ve iletisim
-|   +-- model_provider_router.py  # Model yonlendirme
-|   +-- failover_chain.py        # Hata yedekleme
-|   +-- gateway_*                  # Gateway bilesenleri
-|   +-- delegasyon.py             # Goev devretme
-+-- sistem/            # Sistem bilesenleri
-|   +-- plugins/       # Plugin dizini
++-- cereyan/           # Core motor and learning
+|   +-- motor.py       # Main tool engine
+|   +-- conversation_loop.py  # Conversation loop
+|   +-- continuous_learning.py # Continuous learning
++-- ag/                # Provider and communication
+|   +-- model_provider_router.py  # Model routing
+|   +-- failover_chain.py        # Error failover
+|   +-- gateway_*                  # Gateway components
+|   +-- delegasyon.py             # Task delegation
++-- sistem/            # System components
+|   +-- plugins/       # Plugin directory
 |   +-- hot_reload.py  # Runtime reload
-|   +-- tts_tool_text.py  # Metin seslendirme
-|   +-- stt_tool.py    # Ses tanima
-+-- guvenlik/          # Guevenlik
+|   +-- tts_tool_text.py  # Text-to-speech
+|   +-- stt_tool.py    # Speech recognition
++-- guvenlik/          # Security
 |   +-- oauth_sistemi.py
 |   +-- guardrails.py
 |   +-- docker_sandbox.py
-+-- hafiza/            # Bellek
++-- hafiza/            # Memory
 |   +-- vektor_bellek.py  # Vector memory
 |   +-- bellek_yonetici.py
-+-- arac/              # Arac motorlari
++-- arac/              # Tool engines
 |   +-- browser_engine.py
 |   +-- image_gen_engine.py
 |   +-- video_gen_engine.py
 |   +-- web_search_engine.py
-+-- web_ui/            # Web arayuecue
-+-- core/              # Core servisler
-+-- reymen_cli/        # CLI komutlari
++-- web_ui/            # Web interface
++-- core/              # Core services
++-- reymen_cli/        # CLI commands
 ```
 
-## Veri Akisi
+## Data Flow
 
-1. Kullanici mesaji -> conversation_loop.py
-2. Skill aktivasyonu -> active_skill_tracker.py
-3. Provider secimi -> model_provider_router.py
-4. LLM yaniti + arac cagrilari -> motor.py
-5. Arac sonuclari -> kullaniciya iletilir
-6. Ogrenme -> continuous_learning.py / self_improve.py
+1. User message -> conversation_loop.py
+2. Skill activation -> active_skill_tracker.py
+3. Provider selection -> model_provider_router.py
+4. LLM response + tool calls -> motor.py
+5. Tool results -> delivered to user
+6. Learning -> continuous_learning.py / self_improve.py
 
-## Teknoloji Yigini
+## Technology Stack
 
-- **Dil:** Python 3.11+
+- **Language:** Python 3.11+
 - **LLM:** DeepSeek, OpenAI, Anthropic, Gemini, Groq, Ollama, LM Studio
-- **Veritabani:** SQLite (FTS5 + trigram)
+- **Database:** SQLite (FTS5 + trigram)
 - **Vector DB:** ChromaDB + TF-IDF
 - **Web UI:** FastAPI + HTMX
 - **TUI:** Rich + prompt_toolkit
 - **TTS:** edge-tts
 - **STT:** faster-whisper
 - **Browser:** Playwright MCP
-- **Göruntu:** FAL.ai, OpenAI, xAI
+- **Image:** FAL.ai, OpenAI, xAI
 - **Video:** moviepy, FAL.ai

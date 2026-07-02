@@ -38,17 +38,17 @@
 38|uv pip install -e .
 39|
 40|# 3. Add your API key
-41|cp .env.example .env
+41|cp config/.env.example .env
 42|# Set DEEPSEEK_API_KEY or OPENAI_API_KEY in .env
 43|
 44|# 4. Run
 45|python -c "from src.reymen.cereyan.beyin import Beyin; b = Beyin({'model':{'provider':'deepseek','model':'deepseek-v4-flash'}}); print(b.dusun('Merhaba!'))"
 46|```
 47|
-48|Or with Docker:
-49|```bash
-50|docker compose up
-51|```
+Or with Docker:
+```bash
+cd docker && docker compose up
+```
 52|
 53|---
 54|
@@ -56,25 +56,25 @@
 
 ---
 
-## 🏆 Hermes→ReYMeN — %100 Özellik Uyumu (2026-07-02)
+## 🏆 Hermes→ReYMeN — 100% Feature Parity (2026-07-02)
 
-| # | Özellik | Durum |
+| # | Feature | Status |
 |---|---------|:-----:|
 | 1 | **Self-update** — `reymen update --check/--auto` | ✅ |
-| 2 | **Session Search** — FTS5 tam metin arama + otomatik kayıt | ✅ |
-| 3 | **Sub-agent Delegasyonu** — ThreadPoolExecutor ile paralel görev | ✅ |
+| 2 | **Session Search** — FTS5 full-text search + auto-logging | ✅ |
+| 3 | **Sub-agent Delegation** — ThreadPoolExecutor parallel task execution | ✅ |
 | 4 | **HyperFrames Video** — HTML→Playwright→FFmpeg pipeline | ✅ |
-| 5 | **Memory Compaction** — 50K limit, otomatik arşiv, LRU cache temizleme | ✅ |
-| 6 | **Skill Shrink** — 10KB+ skill tespit + references/ yönlendirme | ✅ |
-| 7 | **Obsidian Entegrasyonu** — 6 tool (liste/oku/yaz/güncelle/ara/bilgi) | ✅ |
-| 8 | **Setup Wizard** — `reymen setup --check/--fix/--auto` (8 aşamalı) | ✅ |
-| 9 | **Nightly Self-Improvement** — 6 aşamalı, her gece 03:00 | ✅ |
-| 10 | **Auth Sistemi** — JWT token + multi-user + API key doğrulama | ✅ |
-| 11 | **Web UI Image Gen** — GET/POST /image-gen, 5 provider | ✅ |
-| 12 | **Framework Adaptörleri** — LangGraph/CrewAI/AutoGen (opsiyonel) | ✅ |
-| 13 | **A2A/ACP Protokolleri** — Agent Card + Skill Transfer + Task Delegation | ✅ |
-| 14 | **Rules Engine** — 5 kategori, 6 built-in kural, her aksiyon kontrolü | ✅ |
-| 15 | **Hermes Skills** — 8 yeni Hermes skill'i aktarıldı (531 toplam) | ✅ |
+| 5 | **Memory Compaction** — 50K limit, auto-archive, LRU cache cleanup | ✅ |
+| 6 | **Skill Shrink** — 10KB+ skill detection + references/ redirection | ✅ |
+| 7 | **Obsidian Integration** — 6 tools (list/read/write/update/search/info) | ✅ |
+| 8 | **Setup Wizard** — `reymen setup --check/--fix/--auto` (8 steps) | ✅ |
+| 9 | **Nightly Self-Improvement** — 6 stages, every night at 03:00 | ✅ |
+| 10 | **Auth System** — JWT token + multi-user + API key validation | ✅ |
+| 11 | **Web UI Image Gen** — GET/POST /image-gen, 5 providers | ✅ |
+| 12 | **Framework Adapters** — LangGraph/CrewAI/AutoGen (optional) | ✅ |
+| 13 | **A2A/ACP Protocols** — Agent Card + Skill Transfer + Task Delegation | ✅ |
+| 14 | **Rules Engine** — 5 categories, 6 built-in rules, every action checked | ✅ |
+| 15 | **Hermes Skills** — 8 new Hermes skills transferred (531 total) | ✅ |
 
 
 ## 📂 Directory Structure
@@ -116,7 +116,7 @@
 91|| ✅ **Pydantic Validation** | Type-safe tool calls, auto JSON fix |
 92|| 📊 **OpenTelemetry** | LLM/tool/session spans, token/cost/latency tracking |
 93|| 🐳 **Container Sandbox** | Docker isolation (off/partial/full). Secure code execution |
-94|| 📎 **@file/@url Reference** | Inline reading via `@file:config.yaml` or `@url:https://...` |
+94|| 📎 **@file/@url Reference** | Inline reading via `@file:config/config.yaml` or `@url:https://...` |
 95|| 🔊 **Voice Mode** | Real-time voice conversation (TTS + STT) |
 96|| 🩺 **Proactive Maintenance** | 8 checks: config drift, watchdog, SOUL sync, state.db prune, weekly report |
 97|| 🔄 **Auto Startup** | 3 bots start headlessly on reboot (VBS) |

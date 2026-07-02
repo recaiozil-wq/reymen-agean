@@ -107,12 +107,9 @@ site/
 vektor_hafizasi/
 tests/hermes_legacy/
 tests/ReYMeN_cli/
-kill_bots.py
-restart_gateways.vbs
-baslat_botlar.bat
-cli-config.yaml
-cua_log.txt
-AGENTS.md.bak
+# Legacy/backup — git'e eklenmez
+legacy/
+scripts/legacy/
 git-helper*.sh
 github_push.py
 # src/reymen/ is TRACKED (518 dosya commitlendi)

@@ -1,12 +1,12 @@
-# 📖 ReYMeN API Referansı
+# 📖 ReYMeN API Reference
 
-> Sürüm: 0.9.0 · Python 3.11+
+> Version: 0.9.0 · Python 3.11+
 
 ---
 
-## 📦 Ana Modüller
+## 📦 Main Modules
 
-### reymen (kök paket)
+### reymen (root package)
 
 `reymen/__init__.py`
 
@@ -14,225 +14,225 @@
 __version__ = "0.9.0"
 ```
 
-**Alt modüller:** `cost_tracker`, `platform_adapter`, `tui`, `self_improve`, `kanban`, `video_tools`, `a2a`
+**Submodules:** `cost_tracker`, `platform_adapter`, `tui`, `self_improve`, `kanban`, `video_tools`, `a2a`
 
 ---
 
-## 🤝 A2A Mesajlaşma — `reymen.a2a`
+## 🤝 A2A Messaging — `reymen.a2a`
 
-Agent'lar arası thread-safe kuyruk tabanlı mesajlaşma protokolü.
+Thread-safe queue-based inter-agent messaging protocol.
 
-### Sınıflar
+### Classes
 
 #### `MessageType(str, Enum)`
-Mesaj tipleri: `TEXT`, `TASK`, `RESULT`, `QUERY`, `RESPONSE`, `ERROR`, `BROADCAST`, `HEARTBEAT`
+Message types: `TEXT`, `TASK`, `RESULT`, `QUERY`, `RESPONSE`, `ERROR`, `BROADCAST`, `HEARTBEAT`
 
 #### `Message(sender, receiver, content, type=TEXT, id=uuid, reply_to=None, timestamp, metadata={})`
-A2A mesaj veri yapısı.
+A2A message data structure.
 
-| Metod | Dönüş | Açıklama |
-|-------|-------|----------|
-| `as_dict()` | `dict` | Mesajı sözlüğe çevir |
-| `reply(content, msg_type=None)` | `Message` | Yanıt mesajı oluştur (sender↔receiver ters çevrilir) |
+| Method | Returns | Description |
+|-------|---------|----------|
+| `as_dict()` | `dict` | Convert message to dictionary |
+| `reply(content, msg_type=None)` | `Message` | Create reply message (sender↔receiver swapped) |
 
 #### `Broker()`
-Merkezi mesaj broker'ı. Thread-safe.
+Central message broker. Thread-safe.
 
-| Metod | Dönüş | Açıklama |
-|-------|-------|----------|
-| `register(agent_id)` | `None` | Agent kaydet |
-| `unregister(agent_id)` | `None` | Agent kaydını sil |
-| `is_registered(agent_id)` | `bool` | Kayıtlı mı? |
-| `send(message)` | `None` | Mesaj gönder (hedef kayıtlı değilse `A2AError`) |
-| `broadcast(sender, content, exclude=None)` | `list[str]` | Tüm agent'lara yayın |
-| `receive(agent_id, timeout=None, block=True)` | `Message\|None` | Mesaj al |
-| `peek(agent_id)` | `Message\|None` | Silmeden oku |
-| `inbox_size(agent_id)` | `int` | Bekleyen mesaj sayısı |
-| `set_handler(agent_id, handler)` | `None` | Mesaj handler'ı ayarla |
-| `clear_handler(agent_id)` | `None` | Handler'ı temizle |
-| `message_log()` | `list[Message]` | Tüm iletilen mesajlar |
-| `stats()` | `dict` | Broker istatistikleri |
-| `reset()` | `None` | Tüm inbox'ları ve log'u temizle |
+| Method | Returns | Description |
+|-------|---------|----------|
+| `register(agent_id)` | `None` | Register agent |
+| `unregister(agent_id)` | `None` | Remove agent registration |
+| `is_registered(agent_id)` | `bool` | Check if registered |
+| `send(message)` | `None` | Send message (throws `A2AError` if target not registered) |
+| `broadcast(sender, content, exclude=None)` | `list[str]` | Broadcast to all agents |
+| `receive(agent_id, timeout=None, block=True)` | `Message\|None` | Receive message |
+| `peek(agent_id)` | `Message\|None` | Peek without consuming |
+| `inbox_size(agent_id)` | `int` | Number of pending messages |
+| `set_handler(agent_id, handler)` | `None` | Set message handler |
+| `clear_handler(agent_id)` | `None` | Clear handler |
+| `message_log()` | `list[Message]` | All delivered messages |
+| `stats()` | `dict` | Broker statistics |
+| `reset()` | `None` | Clear all inboxes and log |
 
 #### `Agent(agent_id, broker, on_message=None)`
-A2A agent'ı. Oluşturulurken otomatik broker'a kaydolur.
+A2A agent. Auto-registers with broker on creation.
 
-| Metod | Dönüş | Açıklama |
-|-------|-------|----------|
-| `send(receiver, content, msg_type=TEXT, reply_to=None, metadata=None)` | `Message` | Mesaj gönder |
-| `broadcast(content, exclude=None)` | `list[str]` | Tüm agent'lara yayın |
-| `reply(original, content)` | `Message` | Yanıt ver |
-| `receive(timeout=None, block=True)` | `Message\|None` | Mesaj al |
-| `peek()` | `Message\|None` | Silmeden oku |
-| `inbox_size` | `int` (property) | Bekleyen mesaj sayısı |
-| `set_handler(handler)` | `None` | Mesaj handler'ı ayarla |
-| `clear_handler()` | `None` | Handler'ı temizle |
-| `close()` | `None` | Broker'dan kaydı sil |
+| Method | Returns | Description |
+|-------|---------|----------|
+| `send(receiver, content, msg_type=TEXT, reply_to=None, metadata=None)` | `Message` | Send message |
+| `broadcast(content, exclude=None)` | `list[str]` | Broadcast to all agents |
+| `reply(original, content)` | `Message` | Reply to message |
+| `receive(timeout=None, block=True)` | `Message\|None` | Receive message |
+| `peek()` | `Message\|None` | Peek without consuming |
+| `inbox_size` | `int` (property) | Number of pending messages |
+| `set_handler(handler)` | `None` | Set message handler |
+| `clear_handler()` | `None` | Clear handler |
+| `close()` | `None` | Unregister from broker |
 
-### Hata Sınıfı
+### Error Class
 
-**`A2AError(RuntimeError)`** — A2A mesajlaşma hatası (örn. hedef agent kayıtlı değil)
+**`A2AError(RuntimeError)`** — A2A messaging error (e.g. target agent not registered)
 
 ---
 
-## 🛠️ Araç Katmanı — `reymen.arac`
+## 🛠️ Tool Layer — `reymen.arac`
 
 ### BrowserTool — `araclar_gelismis.py`
 
 Headless Chromium (Playwright) + urllib fallback.
 
-| Metod | Açıklama |
+| Method | Description |
 |-------|----------|
-| `ac(url)` | Sayfa aç, metin oku |
-| `screenshot(url="", cikti="screenshot.png")` | Ekran görüntüsü al |
-| `js_calistir(url="", js="document.title")` | JavaScript çalıştır |
-| `tikla(secici)` | Elemente tıkla |
-| `fill(secici, deger)` | Form alanı doldur |
-| `type_text(secici, deger)` | Karakter karakter yaz |
-| `select_option(secici, deger)` | Dropdown seç |
-| `wait_for(secici, timeout=10)` | Element bekle |
-| `wait_for_text(metin, timeout=10)` | Metin bekle |
-| `hover(secici)` | Üzerine gel |
-| `scroll(dx=0, dy=300)` | Sayfayı kaydır |
-| `scroll_to(secici)` | Elemente kaydır |
-| `back()` / `forward()` / `reload()` | Geçmiş yönetimi |
-| `new_tab(url="")` | Yeni sekme aç |
-| `switch_tab(index)` | Sekmeye geç |
-| `close_tab(index=-1)` | Sekme kapat |
-| `tabs_list()` | Açık sekmeleri listele |
-| `snapshot(maks=3000)` | Sayfa metnini döndür |
-| `html(maks=3000)` | Sayfa HTML'ini döndür |
-| `title()` / `url()` | Başlık / URL |
-| `dialog_accept()` / `dialog_dismiss()` | Dialog yönetimi |
-| `network_requests(limit=10)` | Network isteklerini izle |
-| `cookies()` / `clear_state()` | Cookie/state yönetimi |
-| `kapat()` | Tarayıcıyı kapat |
+| `ac(url)` | Open page, read text |
+| `screenshot(url="", output="screenshot.png")` | Take screenshot |
+| `js_calistir(url="", js="document.title")` | Execute JavaScript |
+| `tikla(selector)` | Click element |
+| `fill(selector, value)` | Fill form field |
+| `type_text(selector, value)` | Type character by character |
+| `select_option(selector, value)` | Select dropdown option |
+| `wait_for(selector, timeout=10)` | Wait for element |
+| `wait_for_text(text, timeout=10)` | Wait for text |
+| `hover(selector)` | Hover over element |
+| `scroll(dx=0, dy=300)` | Scroll page |
+| `scroll_to(selector)` | Scroll to element |
+| `back()` / `forward()` / `reload()` | History management |
+| `new_tab(url="")` | Open new tab |
+| `switch_tab(index)` | Switch to tab |
+| `close_tab(index=-1)` | Close tab |
+| `tabs_list()` | List open tabs |
+| `snapshot(max=3000)` | Return page text |
+| `html(max=3000)` | Return page HTML |
+| `title()` / `url()` | Title / URL |
+| `dialog_accept()` / `dialog_dismiss()` | Dialog management |
+| `network_requests(limit=10)` | Monitor network requests |
+| `cookies()` / `clear_state()` | Cookie/state management |
+| `kapat()` | Close browser |
 
 ### TarayiciKontrol — `araclar_tarayici.py`
 
-Basit, her işlemde yeni tarayıcı açar/kapatır.
+Simple browser that opens/closes on each operation.
 
-| Metod | Açıklama |
+| Method | Description |
 |-------|----------|
-| `sayfa_ac_ve_oku(url, secici=None)` | URL aç, metin döndür |
-| `tikla_ve_yaz(url, tiklanacak_secici, yazi_secici, yazi)` | Tıkla + yaz |
+| `sayfa_ac_ve_oku(url, selector=None)` | Open URL, return text |
+| `tikla_ve_yaz(url, click_selector, input_selector, text)` | Click + type |
 
 ---
 
-## 🧠 LLM Katmanı — `reymen.cereyan.beyin`
+## 🧠 LLM Layer — `reymen.cereyan.beyin`
 
-**`Beyin`** — Çok-sağlayıcılı LLM bağlantı katmanı. 12+ provider, otomatik failover.
+**`Beyin`** — Multi-provider LLM connection layer. 12+ providers, automatic failover.
 
-| Metod | Açıklama |
+| Method | Description |
 |-------|----------|
-| `dusun(mesajlar, tools=None, stream=False)` | LLM sorgula |
-| `iptal_et()` | Mevcut isteği iptal et |
-| `sifirla()` | Rate-limit state'ini sıfırla |
-| `dusun_stream(mesajlar, tools=None)` | Streaming sorgu |
+| `dusun(messages, tools=None, stream=False)` | Query LLM |
+| `iptal_et()` | Cancel current request |
+| `sifirla()` | Reset rate-limit state |
+| `dusun_stream(messages, tools=None)` | Streaming query |
 
-**Desteklenen Provider'lar:** LM Studio, DeepSeek, OpenAI, Anthropic, Groq, Azure, Bedrock, Gemini, Moonshot, Ollama, OpenRouter, xAI
+**Supported Providers:** LM Studio, DeepSeek, OpenAI, Anthropic, Groq, Azure, Bedrock, Gemini, Moonshot, Ollama, OpenRouter, xAI
 
 ---
 
-## 🔄 Konuşma Döngüsü — `reymen.cereyan.conversation_loop`
+## 🔄 Conversation Loop — `reymen.cereyan.conversation_loop`
 
-### `GorevCozucu(motor=None, beyin=None, max_tur=30)`
+### `GorevCozucu(motor=None, beyin=None, max_turns=30)`
 
-7 kaynaklı ensemble karşılaştırma ile akıllı görev çözümü.
+Intelligent task solving with 7-source ensemble comparison.
 
-| Metod | Açıklama |
+| Method | Description |
 |-------|----------|
-| `coz(hedef, baglam=None)` | Basit API (eski) |
-| `run_conversation(hedef, baglam=None, provider=None)` | Gelişmiş API (ReYMeN pipeline) |
+| `coz(goal, context=None)` | Simple API (legacy) |
+| `run_conversation(goal, context=None, provider=None)` | Advanced API (ReYMeN pipeline) |
 
-**Akış:** SORGU → OnceHafıza → Session search → Skill tarama → Ensemble (7 kaynak) → Kaydet → Cevap
+**Flow:** QUERY → OnceHafiza → Session search → Skill scan → Ensemble (7 sources) → Save → Response
 
 ---
 
-## 🎯 Eylem Motoru — `reymen.cereyan.motor`
+## 🎯 Action Engine — `reymen.cereyan.motor`
 
 ### `Motor(backend_mode="local", hafiza_collection=None, config=None)`
 
-LLM çıktısından eylem yakalar, ToolRegistry + plugin'ler üzerinden yönlendirir.
+Captures actions from LLM output, routes through ToolRegistry + plugins.
 
-| Metod | Açıklama |
+| Method | Description |
 |-------|----------|
-| `hook_kaydet(olay, fn)` | Motor hook'u kaydet |
-| `calistir(arac, ham_param)` | Araç çalıştır |
-| `calistir_fc(arac, args)` | Function-calling formatında çalıştır |
-| `tools_schema_al(maks=64)` | OpenAI-uyumlu tool schema üret |
-| `tum_arac_tanimini_al()` | Tüm araç tanımlarını döndür |
-| `gorev_coz(gorev_yolu)` | Görev dosyasını çöz |
-| `eylemi_ayristir(llm_cikti)` | LLM çıktısından eylem adı+param ayıkla |
-| `musait_araclar(toolset=None)` | Kullanılabilir araçları listele |
+| `hook_kaydet(event, fn)` | Register motor hook |
+| `calistir(tool, raw_param)` | Execute tool |
+| `calistir_fc(tool, args)` | Execute in function-calling format |
+| `tools_schema_al(max=64)` | Generate OpenAI-compatible tool schema |
+| `tum_arac_tanimini_al()` | Return all tool definitions |
+| `gorev_coz(task_path)` | Resolve task file |
+| `eylemi_ayristir(llm_output)` | Extract action name+param from LLM output |
+| `musait_araclar(toolset=None)` | List available tools |
 
 ---
 
-## 🧩 Hook Sistemi — `reymen.cereyan.hook_dispatcher`
+## 🧩 Hook System — `reymen.cereyan.hook_dispatcher`
 
-8 olay tipi için fonksiyon tabanlı hook sistemi.
+Function-based hook system for 8 event types.
 
-### Olay Tipleri
+### Event Types
 
-| Olay | Tetikleyici | Ne Zaman |
-|------|-------------|----------|
-| `on_session_start` | `oturum_baslat_tetikle()` | Oturum başlarken |
-| `on_session_end` | `oturum_bitir_tetikle()` | Oturum biterken |
-| `on_turn_start` | `tur_baslat_tetikle()` | Her tur başında |
-| `on_turn_end` | `tur_bitir_tetikle()` | Her tur sonunda |
-| `on_tool_call` | `arac_cagri_tetikle()` | Araç çağrılmadan önce |
-| `on_tool_result` | `arac_sonuc_tetikle()` | Araç sonucu alındıktan sonra |
-| `on_error` | `hata_tetikle()` | Hata oluştuğunda |
-| `on_context_compress` | `context_sikistirma_tetikle()` | Context sıkıştırılmadan önce |
+| Event | Trigger | When |
+|------|---------|------|
+| `on_session_start` | `oturum_baslat_tetikle()` | Session starts |
+| `on_session_end` | `oturum_bitir_tetikle()` | Session ends |
+| `on_turn_start` | `tur_baslat_tetikle()` | Each turn starts |
+| `on_turn_end` | `tur_bitir_tetikle()` | Each turn ends |
+| `on_tool_call` | `arac_cagri_tetikle()` | Before tool is called |
+| `on_tool_result` | `arac_sonuc_tetikle()` | After tool result is received |
+| `on_error` | `hata_tetikle()` | When error occurs |
+| `on_context_compress` | `context_sikistirma_tetikle()` | Before context compression |
 
-### Fonksiyonlar
+### Functions
 
-| Fonksiyon | Açıklama |
-|-----------|----------|
-| `hook_kaydet(olay, callback)` | Hook callback kaydet |
-| `hook_kaldir(olay, callback)` | Hook kaldır (bool döner) |
-| `hook_cagir(olay, **kwargs)` | Tüm callback'leri ateşle |
-| `hook(olay)` | Decorator: `@hook("on_session_start")` |
-| `kayitli_hooklar()` | Kayıtlı hook'ların özeti |
-| `tum_hooklari_temizle()` | Tümünü temizle (test izolasyonu) |
+| Function | Description |
+|---------|----------|
+| `hook_kaydet(event, callback)` | Register hook callback |
+| `hook_kaldir(event, callback)` | Remove hook (returns bool) |
+| `hook_cagir(event, **kwargs)` | Fire all callbacks |
+| `hook(event)` | Decorator: `@hook("on_session_start")` |
+| `kayitli_hooklar()` | Summary of registered hooks |
+| `tum_hooklari_temizle()` | Clear all hooks (test isolation) |
 
 ---
 
-## 💬 Mesaj Broker — `reymen.cereyan.broker`
+## 💬 Message Broker — `reymen.cereyan.broker`
 
 ### `MessageBroker`
-queue.Queue tabanlı, thread-safe, 18 mesaj tipi.
+queue.Queue-based, thread-safe, 18 message types.
 
-| Metod | Açıklama |
+| Method | Description |
 |-------|----------|
-| `abone_ol(consumer_id, mesaj_tipleri, callback)` | Mesaj tipine abone ol |
-| `abone_ol_liste(consumer_id, mesaj_tipleri, callback)` | Liste ile abone ol |
-| `yayinla(mesaj)` | Mesaj yayınla |
-| `yayinla_basit(tip, veri, kaynak="")` | Basit yayın |
-| `baslat()` | Broker'ı başlat |
-| `durdur()` | Broker'ı durdur |
-| `durum()` | Durum raporu |
+| `abone_ol(consumer_id, message_types, callback)` | Subscribe to message type |
+| `abone_ol_liste(consumer_id, message_types, callback)` | Subscribe with list |
+| `yayinla(message)` | Publish message |
+| `yayinla_basit(type, data, source="")` | Simple publish |
+| `baslat()` | Start broker |
+| `durdur()` | Stop broker |
+| `durum()` | Status report |
 
-**18 Mesaj Tipi:** HATA, COZUM_ARA, COZUM_BULUNDU, GOREV_VER, GOREV_ALINDI, GOREV_TAMAM, GOREV_IPTAL, TOOL_CALL, TOOL_SONUC, BILGI, UYARI, DURDUR, DEVRAL, YAYIN, SES, GORUNTU, LOG, KONTROL
+**18 Message Types:** ERROR, SOLVE_SEARCH, SOLVE_FOUND, TASK_ASSIGN, TASK_RECEIVED, TASK_COMPLETE, TASK_CANCEL, TOOL_CALL, TOOL_RESULT, INFO, WARNING, STOP, TAKEOVER, BROADCAST, AUDIO, VIDEO, LOG, CONTROL
 
 ---
 
 ## 💰 Cost Tracking — `reymen.cost_tracker`
 
-SQLite tabanlı API harcama takibi.
+SQLite-based API spending tracker.
 
 ### `CostTracker`
 
-| Metod | Açıklama |
+| Method | Description |
 |-------|----------|
-| `compute_cost(model, input_tokens, output_tokens)` | Maliyet hesapla |
-| `record(model, input_tokens, output_tokens, cost, provider="", metadata=None)` | Kayıt ekle |
-| `summary()` | Özet rapor |
-| `dump_log(limit=50)` | Son kayıtlar |
-| `reset()` | Tüm kayıtları sil |
-| `iter_records()` | Tüm kayıtlar üzerinde iterasyon |
+| `compute_cost(model, input_tokens, output_tokens)` | Calculate cost |
+| `record(model, input_tokens, output_tokens, cost, provider="", metadata=None)` | Add record |
+| `summary()` | Summary report |
+| `dump_log(limit=50)` | Recent records |
+| `reset()` | Delete all records |
+| `iter_records()` | Iterate over all records |
 
-### Modül Fonksiyonları
+### Module Functions
 
 `record_usage()`, `summary()`, `dump_log()`, `reset()`, `set_db_path()`, `set_price_table()`
 
@@ -242,19 +242,19 @@ SQLite tabanlı API harcama takibi.
 
 ### `Board`
 
-WIP limitli, öncelik sıralamalı, deadline destekli kanban panosu.
+WIP-limited, priority-sorted, deadline-supported kanban board.
 
-| Metod | Açıklama |
+| Method | Description |
 |-------|----------|
-| `add(kart, kolon="backlog")` | Kart ekle |
-| `move(kart_id, hedef_kolon)` | Kart taşı |
-| `set_status(kart_id, durum)` | Durum güncelle |
-| `prioritize(kart_id, oncelik)` | Öncelik değiştir |
-| `find(kart_id)` | Kart bul |
-| `complete(kart_id)` | Tamamlandı olarak işaretle |
-| `summary()` | Pano özeti |
-| `save()` / `load()` | Kalıcı depolama |
-| `to_json()` / `from_dict()` | Serileştirme |
+| `add(card, column="backlog")` | Add card |
+| `move(card_id, target_column)` | Move card |
+| `set_status(card_id, status)` | Update status |
+| `prioritize(card_id, priority)` | Change priority |
+| `find(card_id)` | Find card |
+| `complete(card_id)` | Mark as completed |
+| `summary()` | Board summary |
+| `save()` / `load()` | Persistent storage |
+| `to_json()` / `from_dict()` | Serialization |
 
 ### Worker API
 
@@ -264,19 +264,19 @@ WIP limitli, öncelik sıralamalı, deadline destekli kanban panosu.
 
 ## 🌍 Platform Adapter — `reymen.platform_adapter`
 
-### `PlatformAdapter` (temel sınıf)
+### `PlatformAdapter` (base class)
 
-| Metod | Açıklama |
+| Method | Description |
 |-------|----------|
-| `info()` | Platform bilgisi |
-| `translate_path(yol)` | Yol çevir (örn. C:\ → /mnt/c/) |
-| `run(komut)` | Komut çalıştır |
+| `info()` | Platform info |
+| `translate_path(path)` | Translate path (e.g. C:\ → /mnt/c/) |
+| `run(command)` | Run command |
 
-**Alt sınıflar:** `NativeAdapter`, `WSLAdapter`, `KaliAdapter`
+**Subclasses:** `NativeAdapter`, `WSLAdapter`, `KaliAdapter`
 
-### Modül Fonksiyonları
+### Module Functions
 
-`detect()` — Platform algıla, `translate_path()`, `run()`, `is_wsl_available()`, `list_wsl_distros()`
+`detect()` — Detect platform, `translate_path()`, `run()`, `is_wsl_available()`, `list_wsl_distros()`
 
 ---
 
@@ -284,18 +284,18 @@ WIP limitli, öncelik sıralamalı, deadline destekli kanban panosu.
 
 ### `SelfImprover`
 
-Kalite metrikleri, trend analizi ve otomatik iyileştirme.
+Quality metrics, trend analysis, and automatic improvement.
 
-| Metod | Açıklama |
+| Method | Description |
 |-------|----------|
-| `record(metric)` | Metrik kaydet |
-| `history()` | Geçmiş metrikler |
-| `trend()` | Trend analizi |
-| `low_quality_steps(threshold=0.5)` | Düşük kaliteli adımlar |
-| `auto_improve()` | Otomatik iyileştirme önerisi |
-| `reset()` | Sıfırla |
+| `record(metric)` | Record metric |
+| `history()` | History metrics |
+| `trend()` | Trend analysis |
+| `low_quality_steps(threshold=0.5)` | Low quality steps |
+| `auto_improve()` | Auto-improvement suggestion |
+| `reset()` | Reset |
 
-### Modül Fonksiyonları
+### Module Functions
 
 `evaluate()`, `suggest_fix()`, `record_step()`, `record_step_with_cost()`, `report()`, `reset_history()`
 
@@ -303,189 +303,189 @@ Kalite metrikleri, trend analizi ve otomatik iyileştirme.
 
 ## 🪟 TUI — `reymen.tui`
 
-Rich tabanlı terminal arayüzü.
+Rich-based terminal interface.
 
-| Fonksiyon | Açıklama |
-|-----------|----------|
-| `with_spinner(metin)` | Spinner context manager |
-| `progress_bar(iterable, aciklama="")` | Progress bar |
-| `info()` / `success()` / `warning()` / `error()` | Renkli mesajlar |
-| `panel(icerik, baslik="")` | Rich panel |
-| `table(sutunlar, satirlar)` | Rich tablo |
+| Function | Description |
+|---------|----------|
+| `with_spinner(text)` | Spinner context manager |
+| `progress_bar(iterable, description="")` | Progress bar |
+| `info()` / `success()` / `warning()` / `error()` | Colored messages |
+| `panel(content, title="")` | Rich panel |
+| `table(columns, rows)` | Rich table |
 
 ### `StatusBar`
-Tek satırlık durum çubuğu.
+Single-line status bar.
 
 ---
 
-## 🎬 Video Araçları — `reymen.video_tools`
+## 🎬 Video Tools — `reymen.video_tools`
 
 yt-dlp + ffmpeg wrapper.
 
-| Fonksiyon | Açıklama |
-|-----------|----------|
-| `download(url, format="best")` | Video indir |
-| `probe(path)` | Video bilgisi |
-| `convert(kaynak, hedef)` | Format dönüştür |
-| `extract_audio(kaynak, hedef)` | Ses çıkar |
-| `cut(kaynak, baslangic, bitis, hedef)` | Video kes |
+| Function | Description |
+|---------|----------|
+| `download(url, format="best")` | Download video |
+| `probe(path)` | Video info |
+| `convert(source, target)` | Format conversion |
+| `extract_audio(source, target)` | Extract audio |
+| `cut(source, start, end, target)` | Cut video |
 
-### Sınıflar
+### Classes
 
-`VideoInfo` — İndirilen video bilgisi (dataclass)
-`FFmpegResult` — ffmpeg sonucu (dataclass)
+`VideoInfo` — Downloaded video info (dataclass)
+`FFmpegResult` — ffmpeg result (dataclass)
 
 ---
 
 ## 🌐 Web UI — `reymen.web_ui`
 
-FastAPI + HTMX yönetim paneli.
+FastAPI + HTMX management panel.
 
-| Route | Açıklama |
+| Route | Description |
 |-------|----------|
-| `/` | Ana sayfa |
-| `/api/durum` | Sistem durumu |
-| `/api/gateway/restart` | Gateway yeniden başlat |
-| `/api/loglar` | Sistem logları |
+| `/` | Home page |
+| `/api/durum` | System status |
+| `/api/gateway/restart` | Restart gateway |
+| `/api/loglar` | System logs |
 | `/api/bot/test` | Bot test |
 
 ---
 
-## 🧠 Core Modüller
+## 🧠 Core Modules
 
 ### Model Adapter — `reymen.core.model_adapter`
 
-| Sınıf | Açıklama |
+| Class | Description |
 |-------|----------|
 | `ModelAdapter` (protocol) | `complete(prompt) -> str` |
 | `OllamaAdapter` | localhost:11434 |
 | `OpenAICompatAdapter` | LM Studio / DeepSeek / OpenAI |
 | `AnthropicAdapter` | Claude API |
 
-`get_active_adapter()` — REYMEN_MODEL env ile adapter seçimi.
+`get_active_adapter()` — Select adapter via REYMEN_MODEL env.
 
 ### Orchestrator — `reymen.core.orchestrator`
 
-| Fonksiyon | Açıklama |
-|-----------|----------|
-| `run_script(path)` | Python script çalıştır |
-| `solve_step(step_name, script_path)` | Tek adım çöz (max 3 retry) |
-| `solve_all(steps)` | Tüm adımları sırayla çöz |
-| `coz_hata(hata, kod, ad)` | Hata LLM'e sor |
+| Function | Description |
+|---------|----------|
+| `run_script(path)` | Run Python script |
+| `solve_step(step_name, script_path)` | Solve single step (max 3 retries) |
+| `solve_all(steps)` | Solve all steps sequentially |
+| `coz_hata(error, code, name)` | Ask LLM about error |
 
-### Öğrenme — `reymen.core.ogrenme`
+### Learning — `reymen.core.ogrenme`
 
-Hata→çözüm hafızası (SQLite, TTL=30 gün).
+Error→solution memory (SQLite, TTL=30 days).
 
-| Fonksiyon | Açıklama |
-|-----------|----------|
-| `imza_uret(hata)` | Hata imzası oluştur |
-| `cozum_bul(imza)` | Kayıtlı çözüm ara |
-| `cozum_kaydet(imza, hata_tipi, hata_ozet, cozum_kodu)` | Çözüm kaydet |
-| `tablo_olustur()` | DB tablolarını oluştur |
-| `istatistik()` | Öğrenme istatistikleri |
-| `ttl_temizle()` | Eski kayıtları temizle |
+| Function | Description |
+|---------|----------|
+| `imza_uret(error)` | Generate error signature |
+| `cozum_bul(signature)` | Search for saved solution |
+| `cozum_kaydet(signature, error_type, error_summary, solution_code)` | Save solution |
+| `tablo_olustur()` | Create DB tables |
+| `istatistik()` | Learning statistics |
+| `ttl_temizle()` | Clean old records |
 
 ### Session Search — `reymen.core.session_search`
 
-FTS5 tabanlı geçmiş konuşma arama.
+FTS5-based conversation history search.
 
-| Fonksiyon | Açıklama |
-|-----------|----------|
-| `session_ara(sorgu, limit=5)` | FTS5 arama |
-| `session_listele(limit=10)` | Son session'lar |
-| `session_mesajlari(session_id)` | Session mesajları |
-| `session_istatistik()` | İstatistikler |
+| Function | Description |
+|---------|----------|
+| `session_ara(query, limit=5)` | FTS5 search |
+| `session_listele(limit=10)` | Recent sessions |
+| `session_mesajlari(session_id)` | Session messages |
+| `session_istatistik()` | Statistics |
 
 ### MCP Server — `reymen.core.mcp_server`
 
-Model Context Protocol sunucusu.
+Model Context Protocol server.
 
-| Fonksiyon | Açıklama |
-|-----------|----------|
-| `tool_kaydet(ad, fonk, aciklama, schema)` | Tool kaydet |
-| `tool_sil(ad)` | Tool sil |
-| `get_tools()` | Tüm tool'lar |
-| `resource_kaydet(uri, okuyucu)` | Resource kaydet |
-| `prompt_kaydet(ad, olusturucu)` | Prompt kaydet |
+| Function | Description |
+|---------|----------|
+| `tool_kaydet(name, func, description, schema)` | Register tool |
+| `tool_sil(name)` | Remove tool |
+| `get_tools()` | All tools |
+| `resource_kaydet(uri, reader)` | Register resource |
+| `prompt_kaydet(name, generator)` | Register prompt |
 
-**Varsayılan Tool'lar:** ReYMeN_status, memory_search, session_search, file_read, file_write, shell
-
----
-
-## 🔐 Güvenlik — `reymen.guvenlik`
-
-| Modül | Açıklama |
-|-------|----------|
-| `file_safety.py` | `guvenli_mi(yol)` — dosya güvenlik kontrolü |
-| `path_security.py` | `yol_dogrula(yol)` — path doğrulama |
-| `redact.py` | `tam_temizle(mesaj)` — PII redaction |
-| `guardrails.py` | Çıktı guardrail'leri |
-| `guvenli_sandbox.py` | `guvenli_calistir(kod)` — izole Python çalıştırma |
-| `security_engine.py` | Tehdit algılama motoru |
-| `anayasa_denetci.py` | Anayasal AI denetimi |
+**Default Tools:** ReYMeN_status, memory_search, session_search, file_read, file_write, shell
 
 ---
 
-## 🧠 Hafıza — `reymen.hafiza`
+## 🔐 Security — `reymen.guvenlik`
 
-| Modül | Açıklama |
+| Module | Description |
 |-------|----------|
-| `once_hafiza.py` | Vektör tabanlı öncelikli hafıza |
-| `session_db.py` | FTS5 session veritabanı |
-| `context_compressor.py` | Bağlam sıkıştırma |
-| `memory_manager.py` | Hafıza yöneticisi |
-| `bounded_memory.py` | Sınırlandırılmış bellek |
-| `gorev_hafiza.py` | Görev geçmişi |
-| `vektorel_hafiza.py` | Vektör hafıza (ChromaDB) |
+| `file_safety.py` | `guvenli_mi(path)` — file security check |
+| `path_security.py` | `yol_dogrula(path)` — path validation |
+| `redact.py` | `tam_temizle(message)` — PII redaction |
+| `guardrails.py` | Output guardrails |
+| `guvenli_sandbox.py` | `guvenli_calistir(code)` — isolated Python execution |
+| `security_engine.py` | Threat detection engine |
+| `anayasa_denetci.py` | Constitutional AI audit |
+
+---
+
+## 🧠 Memory — `reymen.hafiza`
+
+| Module | Description |
+|-------|----------|
+| `once_hafiza.py` | Vector-based priority memory |
+| `session_db.py` | FTS5 session database |
+| `context_compressor.py` | Context compression |
+| `memory_manager.py` | Memory manager |
+| `bounded_memory.py` | Bounded memory |
+| `gorev_hafiza.py` | Task history |
+| `vektorel_hafiza.py` | Vector memory (ChromaDB) |
 
 ---
 
 ## 🪟 Windows — `reymen.windows`
 
-| Modül | Açıklama |
+| Module | Description |
 |-------|----------|
-| `windows_entegrasyon.py` | Windows sistem entegrasyonu |
-| `trajectory.py` | Windows olay takibi |
-| `trajectory_compressor.py` | Trajectory sıkıştırma |
-| `tor_otomasyonu.py` | Tor tarayıcı otomasyonu |
-| `browser_camofox.py` | Firefox tabanlı browser |
-| `otonom_nisan_olusturucu.py` | Otonom hedef oluşturucu |
-| `screenshot_bot.py` | Ekran görüntüsü botu |
-| `nisan_yakala.py` | Hedef yakalama aracı |
+| `windows_entegrasyon.py` | Windows system integration |
+| `trajectory.py` | Windows event tracking |
+| `trajectory_compressor.py` | Trajectory compression |
+| `tor_otomasyonu.py` | Tor browser automation |
+| `browser_camofox.py` | Firefox-based browser |
+| `otonom_nisan_olusturucu.py` | Autonomous target creator |
+| `screenshot_bot.py` | Screenshot bot |
+| `nisan_yakala.py` | Target capture tool |
 
 ---
 
 ## ⚙️ CLI — `reymen.sistem`
 
-| Modül | Açıklama |
+| Module | Description |
 |-------|----------|
-| `cli_main.py` | Ana CLI (4.857 satır) |
-| `cli_agent.py` | Agent lifecycle (2.618 satır) |
-| `cli_session.py` | Session yönetimi |
-| `cli_display.py` | Görüntüleme mixin |
+| `cli_main.py` | Main CLI (4,857 lines) |
+| `cli_agent.py` | Agent lifecycle (2,618 lines) |
+| `cli_session.py` | Session management |
+| `cli_display.py` | Display mixin |
 | `cli_stream.py` | Streaming mixin |
-| `cli_commands.py` | Komut yönetimi |
-| `run_agent.py` | Agent çalıştırıcı (4.858 satır) |
-| `main.py` | AIAgentOrchestrator (1.582 satır) |
-| `motor.py` | Eylem motoru (1.950 satır) |
+| `cli_commands.py` | Command management |
+| `run_agent.py` | Agent runner (4,858 lines) |
+| `main.py` | AIAgentOrchestrator (1,582 lines) |
+| `motor.py` | Action engine (1,950 lines) |
 
 ---
 
-## 🧩 Alt CLI'lar
+## 🧩 Sub-CLI Commands
 
-| Komut | Açıklama |
+| Command | Description |
 |-------|----------|
-| `reymen status` | Sistem durumu |
-| `reymen cost` | Maliyet görüntüle |
-| `reymen platform` | Platform bilgisi |
-| `reymen quality` | Kalite raporu |
-| `reymen kanban` | Kanban yönetimi |
-| `reymen video` | Video işlemleri |
+| `reymen status` | System status |
+| `reymen cost` | View costs |
+| `reymen platform` | Platform info |
+| `reymen quality` | Quality report |
+| `reymen kanban` | Kanban management |
+| `reymen video` | Video operations |
 | `reymen a2a` | A2A test |
-| `reymen web` | Web UI başlat |
-| `reymen backup` | Yedekleme |
-| `reymen cron` | Cron job yönetimi |
-| `reymen config` | Yapılandırma |
-| `reymen debug` | Debug araçları |
-| `reymen doctor` | Sistem tanılama |
+| `reymen web` | Start Web UI |
+| `reymen backup` | Backup |
+| `reymen cron` | Cron job management |
+| `reymen config` | Configuration |
+| `reymen debug` | Debug tools |
+| `reymen doctor` | System diagnostics |

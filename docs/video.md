@@ -1,14 +1,14 @@
-# 🎬 Video Anlatim
+# 🎬 Video Guide
 
-## Kurulum Videosu
+## Setup Video
 
-Bilgi: ReYMeN kurulum ve kullanim videolari hazirlanma asamasindadir.
+Info: ReYMeN setup and usage videos are in preparation.
 
-## Planlanan Videolar
+## Planned Videos
 
-- [ ] Kurulum ve Ilk Calistirma - 5 dakikada ReYMeN
-- [ ] CLI Kullanimi - Tum komutlar ve parametreler
-- [ ] Web UI Tanitimi - Yonetim paneli ozellikleri
-- [ ] Plugin Gelistirme - Kendi plugininizi yazma
-- [ ] Kanban Kullanimi - Gorev yonetimi ve worker orchestration
-- [ ] Self-Improvement - Otomatik iyilestirme dongusu
+- [ ] Setup and First Run — ReYMeN in 5 minutes
+- [ ] CLI Usage — All commands and parameters
+- [ ] Web UI Overview — Management panel features
+- [ ] Plugin Development — Writing your own plugin
+- [ ] Kanban Usage — Task management and worker orchestration
+- [ ] Self-Improvement — Automatic improvement loop

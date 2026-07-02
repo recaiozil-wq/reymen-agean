@@ -37,7 +37,7 @@ ReYMeN Agent **runs with zero (0) Hermes dependencies**. All infrastructure is i
 | CLI / Parser | `reymen/cli/__init__.py` (build_parser) | NO |
 | CLI Commands | `reymen/arac/cli_commands.py` | NO |
 | Launcher | `reymen_launcher.py` | NO |
-| Config | `config.yaml` | NO |
+| Config | `config/config.yaml` | NO |
 
 ---
 
@@ -74,9 +74,9 @@ python reymen_launcher.py --version
 
 | Data | Location |
 |------|----------|
-| Config | `ReYMeN-Ajan\config.yaml` |
+| Config | `ReYMeN-Ajan\config\config.yaml` |
 | API keys | `ReYMeN-Ajan\.env` |
-| Personality/SOUL.md | `ReYMeN-Ajan\SOUL.md` |
+| Personality/SOUL.md | `ReYMeN-Ajan\docs\SOUL.md` |
 | Motor | `reymen\cereyan\conversation_loop.py` |
 | Launcher | `reymen_launcher.py` |
 | Main entry point | `reymen\bin\reymen.cmd` |

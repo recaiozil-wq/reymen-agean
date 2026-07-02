@@ -1,0 +1,10 @@
+display:
+  busy_input_mode: steer
+  skin: mono
+agent:
+  max_turns: 50
+auxiliary:
+  compression:
+    model: google/gemini-3-flash-preview
+model:
+  default: deepseek-v4-flash

@@ -1,50 +1,51 @@
 # ReYMeN
 
-Otonom Gorev Cozucu AI Asistani
+Autonomous Task Solver AI Assistant
 
-ReYMeN, coklu-provider LLM katmani, 100+ arac cagri motoru, kapali ogrenme
-dongusu ve A2A mesajlasma ile kendi kendini gelistiren otonom bir sistemdir.
+ReYMeN is a self-improving autonomous system with a multi-provider LLM layer, 100+ tool calling engine, closed learning loop, and A2A messaging.
 
-## Hizli Baslangic
+## Quick Start
 
-5 dakikada kurulum ve calistirma. [Basla](kurulum.md)
+Setup and run in 5 minutes. [Start](kurulum.md)
 
-## CLI Referansi
+## CLI Reference
 
-Tum reymen komutlari ve parametreleri. [Incele](cli.md)
+All reymen commands and parameters. [Browse](cli.md)
 
-## API Dokumantasyonu
+## API Documentation
 
-REST API, MCP, ACP ve Open WebUI uyumlulugu. [API](API.md)
+REST API, MCP, ACP, and Open WebUI compatibility. [API](API.md)
 
 ---
 
-## One Cikan Ozellikler
+## Highlights
 
-| Ozellik | Aciklama |
-|---------|----------|
-| Coklu LLM | 12+ provider (DeepSeek, OpenAI, Anthropic, Gemini...) |
-| Arac Cagri Sistemi | 100+ arac: dosya, terminal, web, tarayici, gorsel, video, ses |
-| A2A Mesajlasma | Agentlar arasi thread-safe kuyruk tabanli iletisim |
-| Plugin Sistemi | Hot-reload, provider pluginleri, ozel arac ekleme |
-| Kanban | Kart/kolon/oncelik/deadline yonetimi, WIP limit, swarm |
-| Guvenlik | Guardrails, sandbox, PII redaction, OAuth 2.0, approvals |
-| Hafiza | Vektor hafiza, FTS5 session search, context compression |
-| Self-Improvement | Kalite metrikleri, trend analizi, otomatik iyilestirme |
-| Web UI | FastAPI + HTMX yonetim paneli, log stream, sandbox |
-| Desktop Uygulama | Sistem tepsisi, otomatik baslatma, bildirimler |
+| Feature | Description |
+|---------|-------------|
+| Multi-LLM | 12+ providers (DeepSeek, OpenAI, Anthropic, Gemini...) |
+| Tool Calling System | 100+ tools: file, terminal, web, browser, visual, video, audio |
+| A2A Messaging | Thread-safe queue-based inter-agent communication |
+| Plugin System | Hot-reload, provider plugins, custom tool addition |
+| Kanban | Card/column/priority/deadline management, WIP limit, swarm |
+| Security | Guardrails, sandbox, PII redaction, OAuth 2.0, approvals |
+| Memory | Vector memory, FTS5 session search, context compression |
+| Self-Improvement | Quality metrics, trend analysis, automatic improvement |
+| Web UI | FastAPI + HTMX management panel, log stream, sandbox |
+| Desktop App | System tray, auto-start, notifications |
 
-## Hizli Bakis
+## Quick Overview
 
+```
 git clone https://github.com/Watcher-ReYMeN/ReYMeN-Ajan-v2.git
 cd ReYMeN-Ajan-v2
 pip install -e .
 reymen chat
+```
 
-## Destek
+## Support
 
-| Kanal | Detay |
-|-------|-------|
-| GitHub Issues | Hata ve ozellik talepleri |
-| Telegram | @Pasa_38 ile iletisim |
-| Lisans | MIT |
+| Channel | Detail |
+|---------|--------|
+| GitHub Issues | Bugs and feature requests |
+| Telegram | Contact @Pasa_38 |
+| License | MIT |
