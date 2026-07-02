@@ -75,8 +75,22 @@ audio_cache/
 trajectories/
 *.jsonl
 
-# Backup
+# Backup & temporary
 backup/
+.ReYMeN/db/
+.ReYMeN/fix_yedekleri/
+.ReYMeN/memories/
+.ReYMeN/semantic_cache/
+.ReYMeN/stats/
+.ReYMeN/yedekler/
+.ReYMeN/_fix_*.py
+.ReYMeN/_write_*.py
+.ReYMeN/analitik*
+.ReYMeN/*.old
+.ReYMeN/*.log
+.ReYMeN/watchdog_*
+.ReYMeN/*_bot_*.json
+.ReYMeN/write_key.py
 nul
 bot_venv/
 ._yedek/
@@ -102,4 +116,6 @@ AGENTS.md.bak
 git-helper*.sh
 github_push.py
 src/reymen/
+src/.ReYMeN/
+reports/
 jobs/
