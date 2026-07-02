@@ -1,281 +1,281 @@
-# ReYMeN Agent vs Hermes Agent — Kapsamlı Özellik Karşılaştırması
+# ReYMeN Agent vs Hermes Agent — Comprehensive Feature Comparison
 
-**Tarih:** 2026-06-29
-**Kapsam:** Kod taraması (reymen/ altındaki 400+ .py dosyası) + ReYMeN Agent dokümantasyonu
-**Yöntem:** Tüm ana modüller okundu, import zincirleri takip edildi, her özellik için kod kanıtı toplandı
+**Date:** 2026-06-29
+**Scope:** Code scan (400+ .py files under reymen/) + ReYMeN Agent documentation
+**Method:** All main modules read, import chains traced, code evidence collected for each feature
 
 ---
 
-## 1. ÖZET İSTATİSTİK
+## 1. SUMMARY STATISTICS
 
-| Metrik | Değer |
+| Metric | Value |
 |--------|-------|
-| Toplam ReYMeN .py dosyası | **400+** |
-| Toplam özellik alanı | **48** |
-| ✅ Ortak özellikler | **30** (%62.5) |
-| 🔵 ReYMeN'de fazla (ReYMeN'te yok) | **12** (%25) |
-| 🔴 ReYMeN'te var (ReYMeN'de eksik) | **6** (%12.5) |
+| Total ReYMeN .py files | **400+** |
+| Total feature areas | **48** |
+| ✅ Common features | **30** (%62.5) |
+| 🔵 Extra in ReYMeN (missing in ReYMeN) | **12** (%25) |
+| 🔴 Present in ReYMeN (missing in ReYMeN) | **6** (%12.5) |
 
 ---
 
-## 2. KATEGORİ BAZLI DETAYLI KARŞILAŞTIRMA
+## 2. CATEGORY-BASED DETAILED COMPARISON
 
-### 2.1. 🧠 LLM / Provider Sistemi
+### 2.1. 🧠 LLM / Provider System
 
-| # | Özellik | ReYMeN | ReYMeN | Detay |
-|---|---------|--------|--------|-------|
-| 1 | Çoklu Provider Desteği | ✅ TAM (12+ provider) | ✅ TAM | DeepSeek, OpenAI, Anthropic, Gemini, Groq, LM Studio, Ollama, OpenRouter, Azure, Bedrock, Moonshot, Codex |
-| 2 | Provider Failover Zinciri | ✅ TAM (4 grup) | ✅ TAM | 4 öncelik grubu, her grupta 2-4 provider, toplam 8+ provider zinciri |
-| 3 | Model → Provider Routing | ✅ TAM (33+ mapping) | ✅ TAM | config.yaml'de 33+ model→provider eşlemesi |
-| 4 | Fallback Model | ✅ TAM | ✅ TAM | Ana model başarısız olursa ikinci model |
-| 5 | ProviderChain | ✅ TAM | ✅ TAM | ProviderChain sınıfı, varsayilan_zincir() |
-| 6 | Circuit Breaker | ✅ TAM | ✅ TAM | 5 hata → OPEN (30sn) → HALF_OPEN → CLOSED |
-| 7 | Rate Limiting | ✅ TAM | ✅ TAM | Exponential backoff + rate_guard |
-| 8 | Credential Pool | ✅ TAM | ❌ Yok | API anahtarı havuzu, otomatik döndürme |
-| 9 | Account Usage Tracking | ✅ TAM | ✅ TAM | Kullanım takibi, API harcama |
-| 10 | Akıllı Yönlendirici | ✅ TAM | ❌ Yok | Görev tipine göre model/provider seçimi |
-| 11 | Prompt Caching | ✅ TAM | ✅ TAM | cache_control marker'ları, provider bazlı |
-| 12 | Prompt Builder | ✅ TAM | ✅ TAM | Yapısal prompt oluşturma |
-| 13 | Multi-region Routing | ❌ Yok | ✅ TAM | Coğrafi/latency-based routing |
+| # | Feature | ReYMeN | ReYMeN | Details |
+|---|---------|--------|--------|---------|
+| 1 | Multi-Provider Support | ✅ FULL (12+ providers) | ✅ FULL | DeepSeek, OpenAI, Anthropic, Gemini, Groq, LM Studio, Ollama, OpenRouter, Azure, Bedrock, Moonshot, Codex |
+| 2 | Provider Failover Chain | ✅ FULL (4 groups) | ✅ FULL | 4 priority groups, 2-4 providers per group, 8+ provider chains total |
+| 3 | Model → Provider Routing | ✅ FULL (33+ mappings) | ✅ FULL | 33+ model→provider mappings in config.yaml |
+| 4 | Fallback Model | ✅ FULL | ✅ FULL | Secondary model if primary fails |
+| 5 | ProviderChain | ✅ FULL | ✅ FULL | ProviderChain class, default_chain() |
+| 6 | Circuit Breaker | ✅ FULL | ✅ FULL | 5 errors → OPEN (30s) → HALF_OPEN → CLOSED |
+| 7 | Rate Limiting | ✅ FULL | ✅ FULL | Exponential backoff + rate_guard |
+| 8 | Credential Pool | ✅ FULL | ❌ Missing | API key pool, auto-rotation |
+| 9 | Account Usage Tracking | ✅ FULL | ✅ FULL | Usage tracking, API spending |
+| 10 | Smart Router | ✅ FULL | ❌ Missing | Task-type based model/provider selection |
+| 11 | Prompt Caching | ✅ FULL | ✅ FULL | cache_control markers, provider-based |
+| 12 | Prompt Builder | ✅ FULL | ✅ FULL | Structured prompt creation |
+| 13 | Multi-region Routing | ❌ Missing | ✅ FULL | Geographic/latency-based routing |
 
-### 2.2. 💾 Hafıza / Bellek Sistemi
+### 2.2. 💾 Memory System
 
-| # | Özellik | ReYMeN | ReYMeN |
+| # | Feature | ReYMeN | ReYMeN |
 |---|---------|--------|--------|
-| 14 | Persistent Memory | ✅ TAM | ✅ TAM |
-| 15 | Vector Memory (ChromaDB) | ✅ TAM | ✅ TAM |
-| 16 | **OnceHafıza** (Confidence-based)** | ✅ **TAM** | ❌ **Yok** |
-| 17 | FTS5 Session Search | ✅ TAM | ✅ TAM |
-| 18 | Context Compression | ✅ TAM (4096 token) | ✅ TAM |
-| 19 | Context Manager | ✅ TAM | ✅ TAM |
-| 20 | Bounded Memory | ✅ TAM | ✅ TAM |
-| 21 | **Semantic Cache** | ✅ **TAM** | ❌ **Yok** |
-| 22 | **Task Memory** | ✅ **TAM** | ❌ **Yok** |
-| 23 | Session DB | ✅ TAM (SQLite+FTS5) | ✅ TAM |
+| 14 | Persistent Memory | ✅ FULL | ✅ FULL |
+| 15 | Vector Memory (ChromaDB) | ✅ FULL | ✅ FULL |
+| 16 | **OnceHafiza** (Confidence-based)** | ✅ **FULL** | ❌ **Missing** |
+| 17 | FTS5 Session Search | ✅ FULL | ✅ FULL |
+| 18 | Context Compression | ✅ FULL (4096 tokens) | ✅ FULL |
+| 19 | Context Manager | ✅ FULL | ✅ FULL |
+| 20 | Bounded Memory | ✅ FULL | ✅ FULL |
+| 21 | **Semantic Cache** | ✅ **FULL** | ❌ **Missing** |
+| 22 | **Task Memory** | ✅ **FULL** | ❌ **Missing** |
+| 23 | Session DB | ✅ FULL (SQLite+FTS5) | ✅ FULL |
 
-### 2.3. 🛠️ Araç / Tool Sistemi
+### 2.3. 🛠️ Tool System
 
-| # | Özellik | ReYMeN | ReYMeN |
+| # | Feature | ReYMeN | ReYMeN |
 |---|---------|--------|--------|
-| 24 | Araç Çağrı Motoru | ✅ TAM (Motor, 2390 satır) | ✅ TAM |
-| 25 | ToolRegistry (Auto-discovery) | ✅ TAM (TTL cache, 30sn) | ✅ TAM |
-| 26 | ToolsetManager | ✅ TAM | ✅ TAM |
-| 27 | Web Search (7 engine) | ✅ TAM | ✅ TAM |
-| 28 | Browser Automation | ✅ TAM | ✅ TAM |
-| 29 | Image Generation | ⚠️ KISMİ (FAL/OpenAI/Stub) | ✅ TAM |
-| 30 | Video Generation | ❌ Yok | ✅ TAM |
-| 31 | Voice/TTS/STT | ❌ Eksik (sadece Edge TTS) | ✅ TAM |
-| 32 | Terminal Backends | ✅ TAM | ✅ TAM |
-| 33 | MCP Client/Server | ✅ TAM | ✅ TAM |
-| 34 | **CUA (Computer Use Agent)** | ✅ **TAM** | ❌ **Yok** |
-| 35 | Home Assistant | ✅ TAM | ✅ TAM |
-| 36 | **Kanban Board** | ✅ **TAM** | ❌ **Yok** |
-| 37 | **Spotify** | ✅ **TAM** | ❌ **Yok** |
-| 38 | HITL (Human-in-the-Loop) | ❌ Yok | ✅ TAM |
-| 39 | Telephony (Twilio) | ❌ Yok | ✅ TAM |
-| 40 | Claude Code Delegation | ❌ Yok | ✅ TAM |
+| 24 | Tool Calling Engine | ✅ FULL (Motor, 2390 lines) | ✅ FULL |
+| 25 | ToolRegistry (Auto-discovery) | ✅ FULL (TTL cache, 30s) | ✅ FULL |
+| 26 | ToolsetManager | ✅ FULL | ✅ FULL |
+| 27 | Web Search (7 engines) | ✅ FULL | ✅ FULL |
+| 28 | Browser Automation | ✅ FULL | ✅ FULL |
+| 29 | Image Generation | ⚠️ PARTIAL (FAL/OpenAI/Stub) | ✅ FULL |
+| 30 | Video Generation | ❌ Missing | ✅ FULL |
+| 31 | Voice/TTS/STT | ❌ Incomplete (Edge TTS only) | ✅ FULL |
+| 32 | Terminal Backends | ✅ FULL | ✅ FULL |
+| 33 | MCP Client/Server | ✅ FULL | ✅ FULL |
+| 34 | **CUA (Computer Use Agent)** | ✅ **FULL** | ❌ **Missing** |
+| 35 | Home Assistant | ✅ FULL | ✅ FULL |
+| 36 | **Kanban Board** | ✅ **FULL** | ❌ **Missing** |
+| 37 | **Spotify** | ✅ **FULL** | ❌ **Missing** |
+| 38 | HITL (Human-in-the-Loop) | ❌ Missing | ✅ FULL |
+| 39 | Telephony (Twilio) | ❌ Missing | ✅ FULL |
+| 40 | Claude Code Delegation | ❌ Missing | ✅ FULL |
 
-### 2.4. 🎓 Öğrenme Döngüsü
+### 2.4. 🎓 Learning Loop
 
-| # | Özellik | ReYMeN | ReYMeN |
+| # | Feature | ReYMeN | ReYMeN |
 |---|---------|--------|--------|
-| 41 | Self-Improvement Loop | ✅ TAM (792 satır) | ✅ TAM |
-| 42 | Continuous Learning | ✅ TAM (259 satır) | ✅ TAM |
-| 43 | Closed Learning Loop | ✅ TAM (1002 satır) | ✅ TAM |
-| 44 | Skill Auto-activation | ✅ TAM (590 satır) | ✅ TAM |
-| 45 | Skill Library (FTS5) | ✅ TAM | ✅ TAM |
-| 46 | **Skill Cron Sync** | ✅ **TAM** | ❌ **Yok** |
-| 47 | Skills Marketplace | ❌ Yok | ✅ TAM |
-| 48 | **Kod Kalite Analizi** | ✅ **TAM** | ❌ **Yok** |
+| 41 | Self-Improvement Loop | ✅ FULL (792 lines) | ✅ FULL |
+| 42 | Continuous Learning | ✅ FULL (259 lines) | ✅ FULL |
+| 43 | Closed Learning Loop | ✅ FULL (1002 lines) | ✅ FULL |
+| 44 | Skill Auto-activation | ✅ FULL (590 lines) | ✅ FULL |
+| 45 | Skill Library (FTS5) | ✅ FULL | ✅ FULL |
+| 46 | **Skill Cron Sync** | ✅ **FULL** | ❌ **Missing** |
+| 47 | Skills Marketplace | ❌ Missing | ✅ FULL |
+| 48 | **Code Quality Analysis** | ✅ **FULL** | ❌ **Missing** |
 
-### 2.5. 🖥️ Kullanıcı Arayüzü
+### 2.5. 🖥️ User Interface
 
-| # | Özellik | ReYMeN | ReYMeN |
+| # | Feature | ReYMeN | ReYMeN |
 |---|---------|--------|--------|
-| 49 | Web UI (FastAPI) | ✅ TAM | ✅ TAM |
-| 50 | JWT Auth (Access+Refresh) | ✅ TAM | ✅ TAM |
-| 51 | OAuth2 (Google/GitHub/Discord) | ✅ TAM | ✅ TAM |
-| 52 | Role-based Authorization | ✅ TAM | ✅ TAM |
-| 53 | Audit Logging | ✅ TAM | ✅ TAM |
-| 54 | CLI (TUI) | ✅ TAM | ✅ TAM |
-| 55 | Telegram Bot | ✅ TAM | ✅ TAM |
-| 56 | Discord Bot | ✅ TAM | ✅ TAM |
-| 57 | **Desktop App (Tray)** | ✅ **TAM** | ❌ **Yok** |
-| 58 | API Server (Standalone) | ❌ Yok | ✅ TAM |
+| 49 | Web UI (FastAPI) | ✅ FULL | ✅ FULL |
+| 50 | JWT Auth (Access+Refresh) | ✅ FULL | ✅ FULL |
+| 51 | OAuth2 (Google/GitHub/Discord) | ✅ FULL | ✅ FULL |
+| 52 | Role-based Authorization | ✅ FULL | ✅ FULL |
+| 53 | Audit Logging | ✅ FULL | ✅ FULL |
+| 54 | CLI (TUI) | ✅ FULL | ✅ FULL |
+| 55 | Telegram Bot | ✅ FULL | ✅ FULL |
+| 56 | Discord Bot | ✅ FULL | ✅ FULL |
+| 57 | **Desktop App (Tray)** | ✅ **FULL** | ❌ **Missing** |
+| 58 | API Server (Standalone) | ❌ Missing | ✅ FULL |
 
-### 2.6. 🔐 Güvenlik
+### 2.6. 🔐 Security
 
-| # | Özellik | ReYMeN | ReYMeN |
+| # | Feature | ReYMeN | ReYMeN |
 |---|---------|--------|--------|
-| 59 | Guardrails | ✅ TAM | ✅ TAM |
-| 60 | Docker Sandbox | ✅ TAM | ✅ TAM |
-| 61 | Subprocess Sandbox | ✅ TAM | ✅ TAM |
-| 62 | PII Redaction | ✅ TAM | ✅ TAM |
-| 63 | URL/Path/File Safety | ✅ TAM | ✅ TAM |
-| 64 | Tool Guardrails | ✅ TAM | ✅ TAM |
-| 65 | **Security Audit** | ✅ **TAM** | ❌ **Yok** |
-| 66 | **Constitutional AI** | ✅ **TAM** | ❌ **Yok** |
-| 67 | **Network Restriction** | ✅ **TAM** | ❌ **Yok** |
+| 59 | Guardrails | ✅ FULL | ✅ FULL |
+| 60 | Docker Sandbox | ✅ FULL | ✅ FULL |
+| 61 | Subprocess Sandbox | ✅ FULL | ✅ FULL |
+| 62 | PII Redaction | ✅ FULL | ✅ FULL |
+| 63 | URL/Path/File Safety | ✅ FULL | ✅ FULL |
+| 64 | Tool Guardrails | ✅ FULL | ✅ FULL |
+| 65 | **Security Audit** | ✅ **FULL** | ❌ **Missing** |
+| 66 | **Constitutional AI** | ✅ **FULL** | ❌ **Missing** |
+| 67 | **Network Restriction** | ✅ **FULL** | ❌ **Missing** |
 
-### 2.7. 🔄 İletişim
+### 2.7. 🔄 Communication
 
-| # | Özellik | ReYMeN | ReYMeN |
+| # | Feature | ReYMeN | ReYMeN |
 |---|---------|--------|--------|
-| 68 | **A2A Mesajlaşma** | ✅ **TAM** | ❌ **Yok** |
-| 69 | ACP Protokolü | ❌ Yok | ✅ TAM |
-| 70 | **Hook Dispatcher** (8 event) | ✅ **TAM** | ✅ TAM |
-| 71 | **MessageBroker** | ✅ **TAM** | ❌ **Yok** |
-| 72 | Gateway Sistemi | ✅ TAM | ✅ TAM |
-| 73 | **Service Bridge** | ✅ **TAM** | ❌ **Yok** |
-| 74 | **A2A Distributed** | ✅ **TAM** | ❌ **Yok** |
-| 75 | **Webhook** | ✅ **TAM** | ❌ **Yok** |
+| 68 | **A2A Messaging** | ✅ **FULL** | ❌ **Missing** |
+| 69 | ACP Protocol | ❌ Missing | ✅ FULL |
+| 70 | **Hook Dispatcher** (8 events) | ✅ **FULL** | ✅ FULL |
+| 71 | **MessageBroker** | ✅ **FULL** | ❌ **Missing** |
+| 72 | Gateway System | ✅ FULL | ✅ FULL |
+| 73 | **Service Bridge** | ✅ **FULL** | ❌ **Missing** |
+| 74 | **A2A Distributed** | ✅ **FULL** | ❌ **Missing** |
+| 75 | **Webhook** | ✅ **FULL** | ❌ **Missing** |
 
-### 2.8. 🗓️ Zamanlama / Sistem
+### 2.8. 🗓️ Scheduling / System
 
-| # | Özellik | ReYMeN | ReYMeN |
+| # | Feature | ReYMeN | ReYMeN |
 |---|---------|--------|--------|
-| 76 | Cron/Scheduler | ✅ TAM | ✅ TAM |
-| 77 | **Auto Recovery** | ✅ **TAM** | ❌ **Yok** |
-| 78 | **State Machine** | ✅ **TAM** | ❌ **Yok** |
-| 79 | **Checkpoint Manager** | ✅ **TAM** | ❌ **Yok** |
-| 80 | **Batch Engine** | ✅ **TAM** | ❌ **Yok** |
-| 81 | Iteration Budget | ✅ TAM | ✅ TAM |
-| 82 | Multi-Profile | ✅ TAM | ✅ TAM |
-| 83 | Plugin Sistemi | ⚠️ KISMİ (hot-reload yok) | ✅ TAM |
-| 84 | Backup Sistemi | ✅ TAM | ✅ TAM |
-| 85 | **Platform Adapter** | ✅ **TAM** | ❌ **Yok** |
-| 86 | Health Check | ✅ TAM | ✅ TAM |
-| 87 | Hot Reload | ❌ Yok | ✅ TAM |
-| 88 | Docker Deployment | ⚠️ KISMİ (sandbox var) | ✅ TAM |
-| 89 | **durum.json** | ✅ **TAM** | ❌ **Yok** |
-| 90 | **Module Discovery** | ✅ **TAM** | ❌ **Yok** |
-| 91 | **Credential Pool** | ✅ **TAM** | ❌ **Yok** |
+| 76 | Cron/Scheduler | ✅ FULL | ✅ FULL |
+| 77 | **Auto Recovery** | ✅ **FULL** | ❌ **Missing** |
+| 78 | **State Machine** | ✅ **FULL** | ❌ **Missing** |
+| 79 | **Checkpoint Manager** | ✅ **FULL** | ❌ **Missing** |
+| 80 | **Batch Engine** | ✅ **FULL** | ❌ **Missing** |
+| 81 | Iteration Budget | ✅ FULL | ✅ FULL |
+| 82 | Multi-Profile | ✅ FULL | ✅ FULL |
+| 83 | Plugin System | ⚠️ PARTIAL (no hot-reload) | ✅ FULL |
+| 84 | Backup System | ✅ FULL | ✅ FULL |
+| 85 | **Platform Adapter** | ✅ **FULL** | ❌ **Missing** |
+| 86 | Health Check | ✅ FULL | ✅ FULL |
+| 87 | Hot Reload | ❌ Missing | ✅ FULL |
+| 88 | Docker Deployment | ⚠️ PARTIAL (sandbox exists) | ✅ FULL |
+| 89 | **durum.json** | ✅ **FULL** | ❌ **Missing** |
+| 90 | **Module Discovery** | ✅ **FULL** | ❌ **Missing** |
+| 91 | **Credential Pool** | ✅ **FULL** | ❌ **Missing** |
 
-### 2.9. 🧩 Hata Yönetimi
+### 2.9. 🧩 Error Management
 
-| # | Özellik | ReYMeN | ReYMeN |
+| # | Feature | ReYMeN | ReYMeN |
 |---|---------|--------|--------|
-| 92 | **Hata Sınıflandırıcı** (18+ kategori) | ✅ **TAM** | ✅ TAM |
-| 93 | **Mesaj Tamirci** | ✅ **TAM** | ❌ **Yok** |
-| 94 | Streaming Diagnostics | ✅ TAM | ✅ TAM |
-| 95 | **Robust Execution** | ✅ **TAM** | ❌ **Yok** |
-| 96 | **Error Collector** | ✅ **TAM** | ❌ **Yok** |
+| 92 | **Error Classifier** (18+ categories) | ✅ **FULL** | ✅ FULL |
+| 93 | **Message Repairer** | ✅ **FULL** | ❌ **Missing** |
+| 94 | Streaming Diagnostics | ✅ FULL | ✅ FULL |
+| 95 | **Robust Execution** | ✅ **FULL** | ❌ **Missing** |
+| 96 | **Error Collector** | ✅ **FULL** | ❌ **Missing** |
 
 ---
 
-## 3. 🔵 REYMeN'DE FAZLA OLANLAR (ReYMeN'te Yok)
+## 3. 🔵 EXTRAS IN REYMeN (Missing in ReYMeN)
 
-| # | Özellik | Önem |
-|---|---------|------|
-| 1 | **CUA (Computer Use Agent)** - Bilgisayar kullanımı motor aracı | ⭐ Yüksek |
-| 2 | **Kanban Board** - Kart/kolon/öncelik/deadline yönetimi | ⭐ Yüksek |
-| 3 | **Platform Adapter** - Windows/WSL/Kali yol çevirisi | ⭐ Yüksek |
-| 4 | **A2A Mesajlaşma** - Broker+Agent thread-safe kuyruk | ⭐ Yüksek |
-| 5 | **MessageBroker** - queue.Queue tabanlı pipeline | ⭐ Yüksek |
-| 6 | **Hook Dispatcher** - 8 olay tipi event system | ⭐ Yüksek |
-| 7 | **Hata Sınıflandırıcı** - 18+ kategori, FailoverReason enum (708 satır) | ⭐ Yüksek |
-| 8 | **OnceHafıza** - Sigmoid confidence-based öğrenme (639 satır) | ⭐ Yüksek |
-| 9 | **Türkçe Dil Desteği** - Tamamen Türkçe kod/dokümantasyon | ⭐ Yüksek |
-| 10 | **Desktop App (Tray)** - Windows sistem tepsisi | ⭐ Orta |
-| 11 | **Auto Recovery** - Sağlık kontrolü + otomatik restart | ⭐ Yüksek |
-| 12 | **Anayasa Denetçisi** - Constitutional AI | ⭐ Orta |
-| 13 | **State Machine** - Heartbeat + stale timeout | ⭐ Orta |
-| 14 | **Service Bridge** - Servisler arası köprü | ⭐ Orta |
-| 15 | **durum.json** - Paylaşımlı durum dosyası | ⭐ Orta |
-| 16 | **Semantic Cache** - Anlamsal önbellek | ⭐ Orta |
-| 17 | **Credential Pool** - API anahtarı döndürme havuzu | ⭐ Yüksek |
-| 18 | **Akıllı Yönlendirici** - Görev bazlı model seçimi | ⭐ Orta |
-| 19 | **Checkpoint Manager** - Görev durumu kaydetme | ⭐ Orta |
-| 20 | **Batch Engine** - Toplu işlem motoru | ⭐ Orta |
-| 21 | **Task Memory** - Görev bazlı hafıza | ⭐ Orta |
-| 22 | **Skill Cron Sync** - Periyodik beceri senkronizasyonu | ⭐ Orta |
-| 23 | **Security Audit** - Otomatik güvenlik denetimi | ⭐ Yüksek |
-| 24 | **Network Restriction** - Ağ kısıtlama motoru | ⭐ Orta |
-
----
-
-## 4. 🔴 ReYMeN'TE VAR, REYMeN'DE EKSİK OLANLAR
-
-| # | Özellik | Önem | Tahmini Süre |
-|---|---------|------|-------------|
-| 1 | **Voice/TTS/STT** (OpenAI TTS + Whisper) | 🔴 Yüksek | 2-3 saat |
-| 2 | **Image Generation** (FAL/OpenAI/xAI tam) | 🔴 Yüksek | 1-2 saat |
-| 3 | **Video Generation** | 🟡 Orta | 3-4 saat |
-| 4 | **Plugin Hot-reload** (watchdog) | 🟡 Orta | 1-2 saat |
-| 5 | **Skills Marketplace** (merkezi repo) | 🟡 Orta | 3-4 saat |
-| 6 | **HITL** (Human-in-the-Loop) | 🟡 Orta | 1-2 saat |
-| 7 | **Claude Code Delegation** | 🟡 Orta | 0.5-1 saat |
-| 8 | **ACP Protokolü** | 🟢 Düşük | 1-2 saat |
-| 9 | **Docker Tam Destek** (deployment) | 🟢 Düşük | 1-2 saat |
-| 10 | **Multi-region Routing** | 🟢 Düşük | 2-3 saat |
-| 11 | **Telephony (Twilio)** | 🟢 Düşük | 2-3 saat |
-| 12 | **API Server (Standalone)** | 🟢 Düşük | 0.5 saat |
+| # | Feature | Importance |
+|---|---------|-----------|
+| 1 | **CUA (Computer Use Agent)** — Computer usage engine | ⭐ High |
+| 2 | **Kanban Board** — Card/column/priority/deadline management | ⭐ High |
+| 3 | **Platform Adapter** — Windows/WSL/Kali path translation | ⭐ High |
+| 4 | **A2A Messaging** — Broker+Agent thread-safe queue | ⭐ High |
+| 5 | **MessageBroker** — queue.Queue-based pipeline | ⭐ High |
+| 6 | **Hook Dispatcher** — 8 event type event system | ⭐ High |
+| 7 | **Error Classifier** — 18+ categories, FailoverReason enum (708 lines) | ⭐ High |
+| 8 | **OnceHafiza** — Sigmoid confidence-based learning (639 lines) | ⭐ High |
+| 9 | **Turkish Language Support** — Fully Turkish code/documentation | ⭐ High |
+| 10 | **Desktop App (Tray)** — Windows system tray | ⭐ Medium |
+| 11 | **Auto Recovery** — Health check + auto-restart | ⭐ High |
+| 12 | **Constitutional Auditor** — Constitutional AI | ⭐ Medium |
+| 13 | **State Machine** — Heartbeat + stale timeout | ⭐ Medium |
+| 14 | **Service Bridge** — Inter-service bridge | ⭐ Medium |
+| 15 | **durum.json** — Shared state file | ⭐ Medium |
+| 16 | **Semantic Cache** — Semantic cache | ⭐ Medium |
+| 17 | **Credential Pool** — API key rotation pool | ⭐ High |
+| 18 | **Smart Router** — Task-based model selection | ⭐ Medium |
+| 19 | **Checkpoint Manager** — Task state saving | ⭐ Medium |
+| 20 | **Batch Engine** — Batch processing engine | ⭐ Medium |
+| 21 | **Task Memory** — Task-based memory | ⭐ Medium |
+| 22 | **Skill Cron Sync** — Periodic skill synchronization | ⭐ Medium |
+| 23 | **Security Audit** — Automated security audit | ⭐ High |
+| 24 | **Network Restriction** — Network restriction engine | ⭐ Medium |
 
 ---
 
-## 5. ÖNEMLİ MİMARİ FARKLAR
+## 4. 🔴 PRESENT IN ReYMeN, MISSING IN REYMeN
 
-| Alan | ReYMeN Yaklaşımı | ReYMeN Yaklaşımı |
-|------|--------------------|-------------------|
-| **Dil** | Türkçe (değişken, fonksiyon, dokümantasyon) | İngilizce |
-| **Dosya Sayısı** | 400+ .py (çok büyük, kapsamlı) | Daha derli toplu |
-| **Tekrar** | Çok duplicate modül (hook_dispatcher 2x, context_compressor 2x, once_hafiza 2x, skill_activator 2x) | Daha az tekrar |
-| **Import** | Her yerde try/except graceful degrade | Daha temiz import hiyerarşisi |
-| **Hata Yönetimi** | 18 kategorili hata sınıflandırıcı + mesaj tamirci | Dahili error handling |
-| **Plugin** | PluginLoader + Manager (hot-reload yok) | Hot-reload var |
-| **Öğrenme** | OnceHafıza (confidence) + closed_learning_loop | Dahili learning loop |
-| **İletişim** | A2A Broker+Agent kuyruk tabanlı | ACP protokolü |
-| **Kanban** | Dahili Kanban Board | Yok |
-| **Desktop** | Windows tray uygulaması | Yok |
-| **Platform** | Windows/WSL/Kali adaptasyonu | Linux odaklı |
+| # | Feature | Importance | Estimated Time |
+|---|---------|-----------|---------------|
+| 1 | **Voice/TTS/STT** (OpenAI TTS + Whisper) | 🔴 High | 2-3 hours |
+| 2 | **Image Generation** (FAL/OpenAI/xAI full) | 🔴 High | 1-2 hours |
+| 3 | **Video Generation** | 🟡 Medium | 3-4 hours |
+| 4 | **Plugin Hot-reload** (watchdog) | 🟡 Medium | 1-2 hours |
+| 5 | **Skills Marketplace** (central repo) | 🟡 Medium | 3-4 hours |
+| 6 | **HITL** (Human-in-the-Loop) | 🟡 Medium | 1-2 hours |
+| 7 | **Claude Code Delegation** | 🟡 Medium | 0.5-1 hour |
+| 8 | **ACP Protocol** | 🟢 Low | 1-2 hours |
+| 9 | **Docker Full Support** (deployment) | 🟢 Low | 1-2 hours |
+| 10 | **Multi-region Routing** | 🟢 Low | 2-3 hours |
+| 11 | **Telephony (Twilio)** | 🟢 Low | 2-3 hours |
+| 12 | **API Server (Standalone)** | 🟢 Low | 0.5 hour |
 
 ---
 
-## 6. ÖNCELİKLİ EYLEMLER
+## 5. IMPORTANT ARCHITECTURAL DIFFERENCES
 
-### Acil (P1):
-1. **Image Generation** — image_gen_engine.py tam çalışır hale getirilmeli
-2. **Voice/TTS/STT** — OpenAI TTS + Whisper STT entegrasyonu
+| Area | ReYMeN Approach | ReYMeN Approach |
+|------|-----------------|-----------------|
+| **Language** | Turkish (variables, functions, documentation) | English |
+| **File Count** | 400+ .py (very large, comprehensive) | More compact |
+| **Duplication** | Many duplicate modules (hook_dispatcher 2x, context_compressor 2x, once_hafiza 2x, skill_activator 2x) | Less duplication |
+| **Import** | try/except graceful degradation everywhere | Cleaner import hierarchy |
+| **Error Handling** | 18-category error classifier + message repairer | Built-in error handling |
+| **Plugins** | PluginLoader + Manager (no hot-reload) | Hot-reload available |
+| **Learning** | OnceHafiza (confidence) + closed_learning_loop | Built-in learning loop |
+| **Communication** | A2A Broker+Agent queue-based | ACP protocol |
+| **Kanban** | Built-in Kanban Board | Not available |
+| **Desktop** | Windows tray application | Not available |
+| **Platform** | Windows/WSL/Kali adaptation | Linux-focused |
 
-### Orta (P2):
-3. **Plugin Hot-reload** — Watchdog tabanlı dinamik plugin yükleme
+---
+
+## 6. PRIORITY ACTIONS
+
+### Urgent (P1):
+1. **Image Generation** — Make image_gen_engine.py fully functional
+2. **Voice/TTS/STT** — OpenAI TTS + Whisper STT integration
+
+### Medium (P2):
+3. **Plugin Hot-reload** — Watchdog-based dynamic plugin loading
 4. **HITL** — Human-in-the-loop pipeline
-5. **Claude Code Delegation** — Subagent runner entegrasyonu
+5. **Claude Code Delegation** — Subagent runner integration
 
-### Gelecek (P3):
-6. **Skills Marketplace** — Merkezi skill repo
-7. **ACP Protokolü** — A2A→ACP adapter
-8. **Docker Deployment** — Tam container desteği
+### Future (P3):
+6. **Skills Marketplace** — Central skill repo
+7. **ACP Protocol** — A2A→ACP adapter
+8. **Docker Deployment** — Full container support
 
-### Teknik Borç:
-- Duplicate modüller birleştirilmeli (hook_dispatcher, context_compressor, once_hafiza, skill_activator)
-- Kırık import'lar temizlenmeli (agent., turn_context.)
-- try/except yoğunluğu azaltılmalı
-
----
-
-## 7. İSTATİSTİK (Özet)
-
-| Kategori | ReYMeN | ReYMeN | Ortak |
-|----------|--------|--------|-------|
-| LLM/Provider | 12 özellik | 12 özellik | 10 |
-| Hafıza | 10 özellik | 8 özellik | 7 |
-| Araçlar | 17 özellik | 15 özellik | 12 |
-| Öğrenme | 8 özellik | 6 özellik | 5 |
-| UI | 10 özellik | 9 özellik | 8 |
-| Güvenlik | 9 özellik | 6 özellik | 6 |
-| İletişim | 8 özellik | 3 özellik | 2 |
-| Sistem | 16 özellik | 11 özellik | 9 |
-| Hata Yönetimi | 5 özellik | 3 özellik | 2 |
-| **TOPLAM** | **95 özellik** | **73 özellik** | **61 ortak** |
-
-*Not: Bir özellik birden fazla kategoride sayılabilir. Özellik alanı = 48 benzersiz yetenek alanı.*
+### Technical Debt:
+- Duplicate modules should be consolidated (hook_dispatcher, context_compressor, once_hafiza, skill_activator)
+- Broken imports should be cleaned (agent., turn_context.)
+- try/except density should be reduced
 
 ---
 
-*Rapor, ReYMeN-Ajan projesinin 400+ .py dosyasının taranması ve ReYMeN Agent dokümantasyonunun incelenmesiyle hazırlanmıştır.*
-**Tarih:** 2026-06-29
+## 7. STATISTICS (Summary)
+
+| Category | ReYMeN | ReYMeN | Common |
+|----------|--------|--------|--------|
+| LLM/Provider | 12 features | 12 features | 10 |
+| Memory | 10 features | 8 features | 7 |
+| Tools | 17 features | 15 features | 12 |
+| Learning | 8 features | 6 features | 5 |
+| UI | 10 features | 9 features | 8 |
+| Security | 9 features | 6 features | 6 |
+| Communication | 8 features | 3 features | 2 |
+| System | 16 features | 11 features | 9 |
+| Error Management | 5 features | 3 features | 2 |
+| **TOTAL** | **95 features** | **73 features** | **61 common** |
+
+*Note: A feature may appear in multiple categories. Feature area = 48 unique capability areas.*
 
 ---
 
-_Bu karsilastirma 2026-06-30 tarihlidir. Guncel durum icin [CHANGELOG.md](CHANGELOG.md)'ye bakin._
+*This report was prepared by scanning 400+ .py files in the ReYMeN-Ajan project and reviewing ReYMeN Agent documentation.*
+**Date:** 2026-06-29
+
+---
+
+_This comparison is dated 2026-06-30. For current status, see [CHANGELOG.md](CHANGELOG.md)._

@@ -1,42 +1,42 @@
-# Güvenlik Politikası / Security Policy
+# Security Policy
 
-## 🛡️ Desteklenen Sürümler
+## 🛡️ Supported Versions
 
-| Sürüm | Destek |
-|:------|:-------|
-| 0.9.x (beta) | ✅ Güvenlik yamaları |
-| < 0.9 | ❌ Desteklenmiyor |
+| Version | Support |
+|:--------|:--------|
+| 0.9.x (beta) | ✅ Security patches |
+| < 0.9 | ❌ Not supported |
 
-## 🔐 Güvenlik Açığı Bildirimi
+## 🔐 Reporting a Vulnerability
 
-ReYMeN'de bir güvenlik açığı bulursan:
+If you find a security vulnerability in ReYMeN:
 
-1. **Herkese açık issue AÇMA**
-2. **Telegram'dan iletişime geç:** @Pasa_38
-3. Veya e-posta: (yakında)
+1. **DO NOT open a public issue**
+2. **Contact via Telegram:** @Pasa_38
+3. Or email: (coming soon)
 
-### Beklenen yanıt süresi
+### Expected response time
 
-- İlk dönüş: 48 saat içinde
-- Düzeltme: 7 gün içinde
+- First response: within 48 hours
+- Fix: within 7 days
 
-## ⚠️ Bilinen Güvenlik Uyarıları
+## ⚠️ Known Security Warnings
 
-### API Anahtarları
+### API Keys
 
-- `.env` dosyasını **asla** git'e gönderme
-- `.env.example` dosyasını düzenleyip `.env` olarak kullan
-- Linux'ta: `chmod 600 .env`
-- API anahtarları log'a yazılmaz (filtre ile korunur)
+- **Never** commit `.env` file to git
+- Edit `.env.example` and use as `.env`
+- On Linux: `chmod 600 .env`
+- API keys are not written to logs (protected by filter)
 
-### Token Güvenliği
+### Token Security
 
-- Telegram bot token'ları `.env`'de saklanır
-- Her bot için ayrı token kullan
-- Token sızdırılırsa: BotFather'da `/revoke` ile iptal et
+- Telegram bot tokens are stored in `.env`
+- Use a separate token for each bot
+- If a token is leaked: revoke via BotFather with `/revoke`
 
-### Çalıştırma Güvenliği
+### Execution Security
 
-- `approvals.mode: smart` — tehlikeli işlemler için onay ister
-- Sandbox modu: Dosya erişimi proje diziniyle sınırlanabilir
-- PII redaction: Hassas veri otomatik temizlenir
+- `approvals.mode: smart` — asks for approval on dangerous operations
+- Sandbox mode: File access can be limited to project directory
+- PII redaction: Sensitive data is automatically sanitized

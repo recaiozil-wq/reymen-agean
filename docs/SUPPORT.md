@@ -1,17 +1,17 @@
-# Destek / Support
+# Support
 
-## 📚 Dokümantasyon
-- [README.md](README.md) — Kurulum ve kullanım
-- [CONTRIBUTING.md](CONTRIBUTING.md) — Katkı rehberi
-- [CHANGELOG.md](CHANGELOG.md) — Sürüm notları
+## 📚 Documentation
+- [README.md](README.md) — Setup and usage
+- [CONTRIBUTING.md](CONTRIBUTING.md) — Contribution guide
+- [CHANGELOG.md](CHANGELOG.md) — Release notes
 
-## 🆘 Yardım Alma
+## 🆘 Getting Help
 
-| Kanal | Açıklama |
-|-------|----------|
-| GitHub Issues | Hata ve özellik talepleri |
-| Telegram | @Pasa_38 bot üzerinden canlı destek |
-| E-posta | marko [at] reymen [dot] dev |
+| Channel | Description |
+|---------|------------|
+| GitHub Issues | Bug reports and feature requests |
+| Telegram | Live support via @Pasa_38 bot |
+| Email | marko [at] reymen [dot] dev |
 
-## 🐛 Hata Bildirimi
-[Issue açın](https://github.com/recaiozil-wq/reymen-agean/issues/new/choose)
+## 🐛 Bug Reports
+[Open an issue](https://github.com/recaiozil-wq/reymen-agean/issues/new/choose)
