@@ -1,5 +1,12 @@
 ---
 name: prompt-notebook-helper
+description: prompt-notebook-helper skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-notebook-helper
 description: Debug Jupyter notebook issues including kernel crashes, memory problems, and display failures
 title: "PRompt Notebook Helper"
 phase: 0

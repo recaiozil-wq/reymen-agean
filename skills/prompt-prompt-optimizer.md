@@ -1,5 +1,12 @@
 ---
 name: prompt-prompt-optimizer
+description: prompt-prompt-optimizer skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-prompt-optimizer
 description: Takes a draft prompt and rewrites it using proven prompt engineering patterns for maximum effectiveness across models
 title: "PRompt PRompt Optimizer"
 tags: [general]

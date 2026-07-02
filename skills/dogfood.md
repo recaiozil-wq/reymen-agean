@@ -10,6 +10,7 @@ metadata:
     tags: [qa, testing, browser, web, dogfood]
 audience: contributor
 related_skills: []
+category: genel
 ---
 
 # Dogfood: Systematic Web Application QA Testing

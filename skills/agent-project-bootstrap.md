@@ -5,6 +5,7 @@ description: "Kod tamam ama config/install/run eksik olan multi-service AI ajan 
 tags: [bootstrap, setup, deployment, windows, multi-service, agent, integration]
 audience: contributor
 category: software-development
+version: 1.0.0
 ---
 
 # Agent Projesi Bootstrap

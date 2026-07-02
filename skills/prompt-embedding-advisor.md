@@ -1,5 +1,12 @@
 ---
 name: prompt-embedding-advisor
+description: prompt-embedding-advisor skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-embedding-advisor
 description: Choose embedding models, dimensions, and strategies for specific use cases
 title: "PRompt Embedding Advisor"
 tags: [general]

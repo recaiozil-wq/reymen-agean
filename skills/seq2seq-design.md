@@ -1,5 +1,12 @@
 ---
 name: seq2seq-design
+description: seq2seq-design skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: seq2seq-design
 description: Design a sequence-to-sequence pipeline for a given task.
 title: "Seq2Seq Design"
 tags: [general]

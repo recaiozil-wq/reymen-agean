@@ -1,5 +1,12 @@
 ---
 name: prompt-network-architect
+description: prompt-network-architect skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-network-architect
 description: Guides the user through designing neural network architectures by choosing layer counts, neuron counts, and activation functions for a given problem
 title: "PRompt Network Architect"
 tags: [network]

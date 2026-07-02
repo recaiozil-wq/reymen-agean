@@ -1,5 +1,12 @@
 ---
 name: prompt-vlm-selector
+description: prompt-vlm-selector skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-vlm-selector
 description: Pick Qwen3-VL / InternVL3.5 / LLaVA-Next / API given accuracy, latency, context length, and budget
 title: "PRompt Vlm Selector"
 phase: 4

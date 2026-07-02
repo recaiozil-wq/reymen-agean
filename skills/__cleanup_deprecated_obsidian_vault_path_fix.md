@@ -1,4 +1,11 @@
 ---
+name: __cleanup_deprecated_obsidian_vault_path_fix
+description: __cleanup_deprecated_obsidian_vault_path_fix skill'i
+category: genel
+version: 1.0.0
+---
+
+---
 name: obsidian-vault-path-fix
 description: "Use whenever reading, writing, or syncing anything to Obsidian. Contains correct vault path and sync rules so cached wrong paths are never used again."
 title: "Obsidian Vault Path Fix"

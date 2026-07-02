@@ -1,5 +1,12 @@
 ---
 name: skill-graph-analysis
+description: skill-graph-analysis skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: skill-graph-analysis
 description: Analyze graph-structured data and choose the right graph algorithm for ML tasks
 title: "Skill Graph Analysis"
 tags: [general]

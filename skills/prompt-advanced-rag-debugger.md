@@ -1,5 +1,12 @@
 ---
 name: prompt-advanced-rag-debugger
+description: prompt-advanced-rag-debugger skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-advanced-rag-debugger
 description: Diagnose and fix RAG quality issues across retrieval, generation, and evaluation
 title: "PRompt Advanced RAG Debugger"
 tags: [general]

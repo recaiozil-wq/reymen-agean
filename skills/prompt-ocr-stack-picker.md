@@ -1,5 +1,12 @@
 ---
 name: prompt-ocr-stack-picker
+description: prompt-ocr-stack-picker skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-ocr-stack-picker
 description: Pick Tesseract / PaddleOCR / Donut / VLM-OCR given document type, language, and structure
 title: "PRompt Ocr Stack Picker"
 tags: [general]

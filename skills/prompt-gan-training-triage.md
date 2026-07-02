@@ -1,5 +1,12 @@
 ---
 name: prompt-gan-training-triage
+description: prompt-gan-training-triage skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-gan-training-triage
 description: Read a description of GAN training curves and pick the failure mode plus the single recommended fix
 title: "PRompt Gan Training Triage"
 phase: 4

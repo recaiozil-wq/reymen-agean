@@ -1,5 +1,12 @@
 ---
 name: prompt-3dgs-capture-planner
+description: prompt-3dgs-capture-planner skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-3dgs-capture-planner
 description: Plan a photo capture session for 3DGS reconstruction given scene type and hardware
 title: "PRompt 3Dgs Capture Planner"
 tags: [general]

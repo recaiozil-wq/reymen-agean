@@ -1,5 +1,12 @@
 ---
 name: prompt-linear-solver
+description: prompt-linear-solver skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-linear-solver
 description: Recommend the right algorithm for solving a linear system Ax=b based on matrix properties
 title: "PRompt Linear Solver"
 tags: [general]

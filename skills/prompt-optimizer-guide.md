@@ -1,5 +1,12 @@
 ---
 name: prompt-optimizer-guide
+description: prompt-optimizer-guide skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-optimizer-guide
 description: Guides the user through choosing the right optimizer for their specific machine learning problem
 title: "PRompt Optimizer GUIde"
 tags: [general]

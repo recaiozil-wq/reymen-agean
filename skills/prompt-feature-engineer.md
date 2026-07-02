@@ -1,5 +1,12 @@
 ---
 name: prompt-feature-engineer
+description: prompt-feature-engineer skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-feature-engineer
 description: Systematic prompt for engineering features from raw tabular data
 title: "PRompt Feature Engineer"
 tags: [general]

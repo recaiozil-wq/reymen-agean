@@ -1,5 +1,12 @@
 ---
 name: prompt-tuning-strategy
+description: prompt-tuning-strategy skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-tuning-strategy
 description: Recommend a hyperparameter tuning strategy based on model type, data size, and compute budget
 title: "PRompt Tuning Strategy"
 tags: [general]

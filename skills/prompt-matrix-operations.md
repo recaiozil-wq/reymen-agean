@@ -1,5 +1,12 @@
 ---
 name: prompt-matrix-operations
+description: prompt-matrix-operations skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-matrix-operations
 description: Teaches matrix operations through geometric intuition, connecting abstract math to neural network mechanics
 title: "PRompt Matrix Operations"
 tags: [general]

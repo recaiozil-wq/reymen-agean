@@ -5,6 +5,7 @@ description: ReYMeN proje mimarisi, ReYMeN Agent ile karsilastirma, parallel bat
 tags: [hermes, ReYMeN, react, architecture, gap-analysis, porting]
 audience: maintainer
 version: 3.3.0
+category: genel
 ---
 
 # ReYMeN Proje Mimarisi

@@ -1,5 +1,12 @@
 ---
 name: prompt-edge-deployment-planner
+description: prompt-edge-deployment-planner skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-edge-deployment-planner
 description: Pick backbone, quantisation strategy, and runtime given target device and latency SLA
 title: "PRompt Edge Deployment Planner"
 phase: 4

@@ -1,5 +1,12 @@
 ---
 name: prompt-video-model-picker
+description: prompt-video-model-picker skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-video-model-picker
 description: Pick Sora 2 / Runway Gen-5 / Wan-Video / HunyuanVideo / Cosmos for a given task, license, and latency target
 title: "PRompt Video Model Picker"
 phase: 4

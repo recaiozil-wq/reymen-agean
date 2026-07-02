@@ -1,5 +1,12 @@
 ---
 name: prompt-debug-ai-code
+description: prompt-debug-ai-code skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-debug-ai-code
 description: Diagnose AI-specific bugs including NaN loss, shape errors, training failures, and OOM
 title: "PRompt Debug AI Code"
 tags: [ai]

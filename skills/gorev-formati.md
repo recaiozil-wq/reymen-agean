@@ -1,6 +1,8 @@
 ---
 name: gorev-formati
 description: "Kullanıcının istediği 7 maddeli görev formatı — her görevde zorunlu yapı"
+category: genel
+version: 1.0.0
 ---
 
 # Görev Formatı (Standart Şablon)

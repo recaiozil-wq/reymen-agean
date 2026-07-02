@@ -1,5 +1,12 @@
 ---
 name: prompt-jax-optimizer
+description: prompt-jax-optimizer skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-jax-optimizer
 description: Choose and configure the right JAX/Optax optimizer for a given training scenario
 title: "PRompt JAX Optimizer"
 tags: [general]

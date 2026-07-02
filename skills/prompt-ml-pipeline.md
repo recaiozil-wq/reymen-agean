@@ -1,5 +1,12 @@
 ---
 name: prompt-ml-pipeline
+description: prompt-ml-pipeline skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-ml-pipeline
 description: Build, debug, and deploy reproducible ML pipelines
 title: "PRompt ML Pipeline"
 tags: [ml]

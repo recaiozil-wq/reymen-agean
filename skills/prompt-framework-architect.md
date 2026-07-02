@@ -1,5 +1,12 @@
 ---
 name: prompt-framework-architect
+description: prompt-framework-architect skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-framework-architect
 description: Design neural network architectures using framework abstractions -- modules, containers, losses, and optimizers
 title: "PRompt Framework Architect"
 tags: [general]

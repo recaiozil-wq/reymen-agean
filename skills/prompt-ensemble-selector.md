@@ -1,5 +1,12 @@
 ---
 name: prompt-ensemble-selector
+description: prompt-ensemble-selector skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-ensemble-selector
 description: Pick the right ensemble method for a given dataset and problem
 title: "PRompt Ensemble Selector"
 phase: 02

@@ -1,5 +1,12 @@
 ---
 name: prompt-depth-model-picker
+description: prompt-depth-model-picker skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-depth-model-picker
 description: Pick Depth Anything V3 / Marigold / UniDepth / MiDaS given latency, metric-vs-relative need, and scene type
 title: "PRompt Depth Model Picker"
 phase: 4

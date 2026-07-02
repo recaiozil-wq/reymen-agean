@@ -1,5 +1,12 @@
 ---
 name: prompt-init-strategy
+description: prompt-init-strategy skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-init-strategy
 description: Diagnose weight initialization problems and recommend the right strategy for any neural network architecture
 title: "PRompt Init Strategy"
 tags: [general]

@@ -1,5 +1,12 @@
 ---
 name: prompt-linear-algebra-tutor
+description: prompt-linear-algebra-tutor skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-linear-algebra-tutor
 description: Teach linear algebra through geometric intuition and AI applications
 title: "PRompt Linear Algebra Tutor"
 phase: 1

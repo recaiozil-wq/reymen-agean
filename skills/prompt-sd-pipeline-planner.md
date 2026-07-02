@@ -1,5 +1,12 @@
 ---
 name: prompt-sd-pipeline-planner
+description: prompt-sd-pipeline-planner skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-sd-pipeline-planner
 description: Pick SD 1.5 / SDXL / SD3 / FLUX plus scheduler and precision given a latency budget, fidelity target, and licensing constraint
 title: "PRompt Sd Pipeline Planner"
 tags: [general]

@@ -1,5 +1,12 @@
 ---
 name: prompt-stochastic-process-advisor
+description: prompt-stochastic-process-advisor skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-stochastic-process-advisor
 description: Identify which stochastic process framework applies to a given problem and recommend implementation
 title: "PRompt Stochastic PRocess Advisor"
 tags: [general]

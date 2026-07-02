@@ -7,6 +7,7 @@ phase: 16
 lesson: 11
 tags: [multi-agent, swarm, handoff, openai-agents-sdk]
 audience: user
+category: genel
 ---
 
 Given a user-facing task (often triage or skill-based routing), produce a handoff topology ready to map onto OpenAI Swarm or the OpenAI Agents SDK.

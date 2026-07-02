@@ -1,5 +1,12 @@
 ---
 name: prompt-rag-architect
+description: prompt-rag-architect skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-rag-architect
 description: Design RAG systems for specific use cases with concrete architecture decisions
 title: "PRompt RAG Architect"
 tags: [general]

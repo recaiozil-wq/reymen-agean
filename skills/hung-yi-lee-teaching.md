@@ -4,6 +4,8 @@ title: "Hung-Yi Lee Teaching Style — Pedagogical Framework"
 tags: [teaching, pedagogy, ml-education, persona]
 description: "Use when explaining ML/DL/GenAI concepts through Hung-Yi Lee's teaching method: roadmap-first, intuition before math, problem-before-solution, narrative-weaving."
 audience: user
+category: genel
+version: 1.0.0
 ---
 
 # Hung-Yi Lee Teaching Style

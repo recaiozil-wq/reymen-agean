@@ -1,5 +1,12 @@
 ---
 name: preprocessing-advisor
+description: preprocessing-advisor skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: preprocessing-advisor
 description: Recommends a tokenization, stemming, and lemmatization setup for an NLP task.
 title: "PReprocessing Advisor"
 tags: [general]

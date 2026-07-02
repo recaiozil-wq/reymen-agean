@@ -1,5 +1,12 @@
 ---
 name: prompt-lr-schedule-advisor
+description: prompt-lr-schedule-advisor skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-lr-schedule-advisor
 description: Recommend the right learning rate schedule and hyperparameters for any training setup
 title: "PRompt Lr Schedule Advisor"
 tags: [general]

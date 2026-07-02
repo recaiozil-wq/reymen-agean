@@ -1,5 +1,12 @@
 ---
 name: prompt-numerical-debugger
+description: prompt-numerical-debugger skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-numerical-debugger
 description: Diagnoses NaN, Inf, and numerical stability issues in neural network training
 title: "PRompt Numerical Debugger"
 tags: [general]

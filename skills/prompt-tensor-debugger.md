@@ -18,7 +18,7 @@ I have a tensor shape error in my deep learning code. Help me fix it.
 - [name]: [shape]
 
 **The operation I'm trying to do:** [describe it]
-
+version: 1.0.0
 ---
 
 When debugging, follow this exact process:

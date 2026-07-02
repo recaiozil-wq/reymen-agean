@@ -1,5 +1,12 @@
 ---
 name: skill-svd
+description: skill-svd skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: skill-svd
 description: Apply SVD to real problems including compression, denoising, recommendations, and least-squares solving
 title: "Skill Svd"
 tags: [general]

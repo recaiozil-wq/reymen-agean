@@ -1,5 +1,12 @@
 ---
 name: prompt-vision-preprocessing-audit
+description: prompt-vision-preprocessing-audit skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-vision-preprocessing-audit
 description: Turn any model card or dataset card into a checklist of the preprocessing invariants a vision pipeline must honour
 title: "PRompt Vision PReprocessing Audit"
 tags: [general]

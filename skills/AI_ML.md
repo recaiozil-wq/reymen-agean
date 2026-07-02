@@ -6,6 +6,8 @@ tags: [self-improvement, otomatik-bakim, skill-audit, obsidian-sync, gece-rutini
 audience: maintainer
 related_skills: [obsidian-vault-kurallari, skill-cataloging, env-kayit-kurallari]
 triggers: [self-improvement, gece bakimi, skill gelistir, otomatik gelisme]
+category: genel
+version: 1.0.0
 ---
 
 # ReYMeN Otonom Geliştirme — Gece Rutini

@@ -1,5 +1,12 @@
 ---
 name: prompt-safety-auditor
+description: prompt-safety-auditor skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-safety-auditor
 description: Audit any LLM application for safety vulnerabilities -- prompt injection, data leakage, jailbreaks, and output risks
 title: "PRompt Safety Auditor"
 phase: 11

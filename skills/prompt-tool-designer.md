@@ -1,5 +1,12 @@
 ---
 name: prompt-tool-designer
+description: prompt-tool-designer skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-tool-designer
 description: Design complete tool definitions (JSON Schema) for function calling from a natural language description
 title: "PRompt Tool Designer"
 tags: [general]

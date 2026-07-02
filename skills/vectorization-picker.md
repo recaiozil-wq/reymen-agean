@@ -1,5 +1,12 @@
 ---
 name: vectorization-picker
+description: vectorization-picker skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: vectorization-picker
 description: Given a text-classification task, recommend BoW, TF-IDF, embeddings, or a hybrid.
 title: "Vectorization Picker"
 phase: 5

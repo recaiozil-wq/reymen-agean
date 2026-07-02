@@ -1,5 +1,12 @@
 ---
 name: prompt-data-helper
+description: prompt-data-helper skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-data-helper
 description: Find and load the right dataset for an AI/ML task
 title: "PRompt Data Helper"
 tags: [general]

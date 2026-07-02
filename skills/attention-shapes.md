@@ -1,5 +1,12 @@
 ---
 name: attention-shapes
+description: attention-shapes skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: attention-shapes
 description: Debug shape bugs in attention implementations.
 title: "Attention Shapes"
 tags: [general]

@@ -1,5 +1,12 @@
 ---
 name: prompt-ml-problem-framer
+description: prompt-ml-problem-framer skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-ml-problem-framer
 description: Frame a real-world business problem as a machine learning task
 title: "PRompt ML PRoblem Framer"
 tags: [ml]

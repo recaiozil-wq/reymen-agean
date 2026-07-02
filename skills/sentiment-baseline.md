@@ -1,5 +1,12 @@
 ---
 name: sentiment-baseline
+description: sentiment-baseline skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: sentiment-baseline
 description: Design a sentiment analysis baseline for a new dataset.
 title: "Sentiment Baseline"
 tags: [general]

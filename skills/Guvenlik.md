@@ -5,6 +5,8 @@ title: "Guvenlik"
 user-invocable: true
 audience: contributor
 tags: [development, testing, security]
+category: genel
+version: 1.0.0
 ---
 
 # Guvenlik

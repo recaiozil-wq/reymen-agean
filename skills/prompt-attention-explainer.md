@@ -1,5 +1,12 @@
 ---
 name: prompt-attention-explainer
+description: prompt-attention-explainer skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-attention-explainer
 description: Explain the attention mechanism through the database lookup analogy
 title: "PRompt Attention Explainer"
 tags: [ai]

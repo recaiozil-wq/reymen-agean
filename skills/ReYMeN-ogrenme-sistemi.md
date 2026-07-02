@@ -4,6 +4,8 @@ usage_count: 4
 last_used: 2026-06-16
 name: ReYMeN-ogrenme-sistemi
 description: ReYMeN ajanı için kapalı öğrenme döngüsü — YAML frontmatter, FTS5 çakışma kontrolü, güvenli bağlam enjeksiyonu
+category: genel
+version: 1.0.0
 ---
 # ReYMeN Öğrenme Sistemi
 

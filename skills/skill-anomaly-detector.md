@@ -1,5 +1,12 @@
 ---
 name: skill-anomaly-detector
+description: skill-anomaly-detector skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: skill-anomaly-detector
 description: Choose the right anomaly detection approach for your problem
 title: "Skill Anomaly Detector"
 phase: 2

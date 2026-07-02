@@ -1,5 +1,12 @@
 ---
 name: prompt-lora-advisor
+description: prompt-lora-advisor skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-lora-advisor
 description: Decide LoRA rank, target modules, and hyperparameters for a specific fine-tuning task
 title: "PRompt Lora Advisor"
 tags: [general]

@@ -1,5 +1,12 @@
 ---
 name: prompt-classifier-pipeline-auditor
+description: prompt-classifier-pipeline-auditor skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-classifier-pipeline-auditor
 description: Audit a PyTorch image classification training script for the five invariants that cover most silent bugs
 title: "PRompt Classifier Pipeline Auditor"
 phase: 4

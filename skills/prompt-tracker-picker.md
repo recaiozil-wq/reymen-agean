@@ -1,5 +1,12 @@
 ---
 name: prompt-tracker-picker
+description: prompt-tracker-picker skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-tracker-picker
 description: Pick SORT / ByteTrack / BoT-SORT / SAM 2 / SAM 3.1 given scene type, occlusion patterns, and latency budget
 title: "PRompt Tracker Picker"
 tags: [general]

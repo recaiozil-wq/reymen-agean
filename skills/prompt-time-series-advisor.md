@@ -1,5 +1,12 @@
 ---
 name: prompt-time-series-advisor
+description: prompt-time-series-advisor skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-time-series-advisor
 description: Frame time series problems and recommend approaches
 title: "PRompt Time Series Advisor"
 tags: [general]

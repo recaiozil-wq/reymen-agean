@@ -1,5 +1,12 @@
 ---
 name: prompt-multi-agent-decision
+description: prompt-multi-agent-decision skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-multi-agent-decision
 description: Decide whether a task needs a multi-agent system or a single agent
 title: "PRompt Multi Agent Decision"
 tags: [general]

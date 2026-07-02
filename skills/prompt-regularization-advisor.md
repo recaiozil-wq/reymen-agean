@@ -1,5 +1,12 @@
 ---
 name: prompt-regularization-advisor
+description: prompt-regularization-advisor skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-regularization-advisor
 description: A diagnostic prompt for choosing regularization strategies based on overfitting symptoms
 title: "PRompt Regularization Advisor"
 tags: [general]

@@ -1,5 +1,12 @@
 ---
 name: prompt-vision-service-shape-reviewer
+description: prompt-vision-service-shape-reviewer skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-vision-service-shape-reviewer
 description: Review a vision service's code for contract/response shape violations and name the first breaking bug
 title: "PRompt Vision Service Shape Reviewer"
 tags: [general]

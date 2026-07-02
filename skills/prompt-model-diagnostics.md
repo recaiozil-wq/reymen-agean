@@ -1,5 +1,12 @@
 ---
 name: prompt-model-diagnostics
+description: prompt-model-diagnostics skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-model-diagnostics
 description: Diagnose model performance issues using train/test metrics and learning curves
 title: "PRompt Model Diagnostics"
 phase: 2

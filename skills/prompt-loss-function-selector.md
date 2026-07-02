@@ -1,5 +1,12 @@
 ---
 name: prompt-loss-function-selector
+description: prompt-loss-function-selector skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-loss-function-selector
 description: A decision prompt for choosing the right loss function for any ML task
 title: "PRompt Loss Function Selector"
 phase: 03

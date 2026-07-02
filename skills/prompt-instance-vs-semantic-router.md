@@ -1,5 +1,12 @@
 ---
 name: prompt-instance-vs-semantic-router
+description: prompt-instance-vs-semantic-router skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-instance-vs-semantic-router
 description: Ask three questions and pick instance vs semantic vs panoptic segmentation plus the first model
 title: "PRompt Instance Vs Semantic Router"
 tags: [general]

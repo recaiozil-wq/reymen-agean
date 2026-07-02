@@ -1,5 +1,12 @@
 ---
 name: check-understanding
+description: check-understanding skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: check-understanding
 version: 1.0.0
 description: Phase quiz for AI Engineering from Scratch. Trigger with "quiz me", "test phase", "check my understanding", "do I know phase 3", or `/check-understanding <phase>`.
 title: "Check Understanding"

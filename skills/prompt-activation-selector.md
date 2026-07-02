@@ -1,5 +1,12 @@
 ---
 name: prompt-activation-selector
+description: prompt-activation-selector skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-activation-selector
 description: A decision prompt for choosing the right activation function for any neural network architecture
 title: "PRompt Activation Selector"
 phase: 03

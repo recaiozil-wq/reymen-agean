@@ -1,5 +1,12 @@
 ---
 name: skill-naive-bayes-chooser
+description: skill-naive-bayes-chooser skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: skill-naive-bayes-chooser
 description: Choose the right Naive Bayes variant for your classification task
 title: "Skill Naive Bayes Chooser"
 tags: [ai]

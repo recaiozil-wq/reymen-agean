@@ -1,5 +1,12 @@
 ---
 name: text-encoder-picker
+description: text-encoder-picker skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: text-encoder-picker
 description: Pick a text encoder architecture for a given constraint set.
 title: "Text Encoder Picker"
 tags: [general]

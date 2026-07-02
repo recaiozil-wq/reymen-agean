@@ -1,5 +1,12 @@
 ---
 name: skill-autodiff
+description: skill-autodiff skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: skill-autodiff
 description: Build, debug, and reason about automatic differentiation systems
 title: "Skill Autodiff"
 tags: [general]

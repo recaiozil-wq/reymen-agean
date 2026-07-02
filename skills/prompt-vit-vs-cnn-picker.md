@@ -1,5 +1,12 @@
 ---
 name: prompt-vit-vs-cnn-picker
+description: prompt-vit-vs-cnn-picker skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-vit-vs-cnn-picker
 description: Pick between ViT, ConvNeXt, or Swin based on dataset size, compute, and inference stack
 title: "PRompt ViT Vs CNN Picker"
 tags: [general]

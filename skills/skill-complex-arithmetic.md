@@ -1,5 +1,12 @@
 ---
 name: skill-complex-arithmetic
+description: skill-complex-arithmetic skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: skill-complex-arithmetic
 description: Quick reference for complex number operations in ML and signal processing contexts
 title: "Skill Complex Arithmetic"
 tags: [general]

@@ -1,5 +1,12 @@
 ---
 name: prompt-tokenizer-analyzer
+description: prompt-tokenizer-analyzer skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-tokenizer-analyzer
 description: Analyze tokenization efficiency for a given text across different models and tokenizer types
 title: "PRompt Tokenizer Analyzer"
 tags: [general]

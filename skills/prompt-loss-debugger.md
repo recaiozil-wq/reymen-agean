@@ -1,5 +1,12 @@
 ---
 name: prompt-loss-debugger
+description: prompt-loss-debugger skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-loss-debugger
 description: A diagnostic prompt for debugging loss curves and training failures
 title: "PRompt Loss Debugger"
 tags: [general]

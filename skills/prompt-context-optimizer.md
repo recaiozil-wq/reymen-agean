@@ -1,5 +1,12 @@
 ---
 name: prompt-context-optimizer
+description: prompt-context-optimizer skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-context-optimizer
 description: Audit a context assembly strategy and recommend optimizations to reduce token waste and improve response quality
 title: "PRompt Context Optimizer"
 tags: [general]

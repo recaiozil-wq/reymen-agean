@@ -1,5 +1,12 @@
 ---
 name: prompt-bayesian-reasoning
+description: prompt-bayesian-reasoning skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-bayesian-reasoning
 description: Walk through Bayesian reasoning step by step for any scenario
 title: "PRompt Bayesian Reasoning"
 tags: [general]

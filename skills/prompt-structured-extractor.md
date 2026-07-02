@@ -1,5 +1,12 @@
 ---
 name: prompt-structured-extractor
+description: prompt-structured-extractor skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-structured-extractor
 description: Extract structured data from unstructured text given a JSON Schema definition
 title: "PRompt Structured Extractor"
 phase: 11

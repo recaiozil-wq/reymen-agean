@@ -1,5 +1,12 @@
 ---
 name: prompt-dit-model-picker
+description: prompt-dit-model-picker skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-dit-model-picker
 description: Pick between SD3, SD3.5, FLUX.1-dev, FLUX.1-schnell, Z-Image, SD4 Turbo given quality, latency, and license
 title: "PRompt Dit Model Picker"
 phase: 4

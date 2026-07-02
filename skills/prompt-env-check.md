@@ -1,5 +1,12 @@
 ---
 name: prompt-env-check
+description: prompt-env-check skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-env-check
 description: Diagnose and fix AI engineering environment setup issues
 title: "PRompt Env Check"
 tags: [general]

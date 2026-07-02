@@ -1,5 +1,12 @@
 ---
 name: prompt-retrieval-loss-picker
+description: prompt-retrieval-loss-picker skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-retrieval-loss-picker
 description: Pick triplet / InfoNCE / ProxyNCA for a given retrieval problem
 title: "PRompt Retrieval Loss Picker"
 tags: [general]

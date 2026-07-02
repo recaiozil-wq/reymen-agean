@@ -1,5 +1,12 @@
 ---
 name: prompt-eval-designer
+description: prompt-eval-designer skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-eval-designer
 description: Design a custom evaluation suite for any LLM task, including test cases, scoring functions, and pass/fail thresholds
 title: "PRompt Eval Designer"
 tags: [general]

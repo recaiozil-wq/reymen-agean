@@ -1,5 +1,12 @@
 ---
 name: prompt-api-troubleshooter
+description: prompt-api-troubleshooter skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-api-troubleshooter
 description: Diagnose and fix common AI API errors (auth, rate limits, timeouts)
 title: "PRompt API Troubleshooter"
 phase: 0

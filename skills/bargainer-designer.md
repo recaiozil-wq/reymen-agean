@@ -7,6 +7,7 @@ phase: 16
 lesson: 16
 tags: [multi-agent, negotiation, bargaining, contract-net, OG-Narrator]
 audience: user
+category: genel
 ---
 
 Given a negotiation or task-market scenario (two-party bargain, N-party auction, contract-net task allocation), design the protocol.

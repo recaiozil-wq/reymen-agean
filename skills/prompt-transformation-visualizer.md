@@ -1,5 +1,12 @@
 ---
 name: prompt-transformation-visualizer
+description: prompt-transformation-visualizer skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-transformation-visualizer
 description: Explain what a matrix transformation does geometrically given its entries
 title: "PRompt Transformation Visualizer"
 tags: [general]

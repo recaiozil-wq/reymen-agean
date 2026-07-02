@@ -1,5 +1,12 @@
 ---
 name: prompt-tree-interpreter
+description: prompt-tree-interpreter skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-tree-interpreter
 description: Interpret decision tree results and diagnose potential issues
 title: "PRompt Tree Interpreter"
 tags: [general]

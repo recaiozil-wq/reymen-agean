@@ -1,5 +1,12 @@
 ---
 name: prompt-pytorch-debugger
+description: prompt-pytorch-debugger skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-pytorch-debugger
 description: Diagnose and fix common PyTorch training failures from symptoms
 title: "PRompt PyTorch Debugger"
 phase: 03

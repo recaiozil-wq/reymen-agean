@@ -1,5 +1,12 @@
 ---
 name: prompt-pose-stack-picker
+description: prompt-pose-stack-picker skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-pose-stack-picker
 description: Pick MediaPipe / YOLOv8-pose / HRNet / ViTPose given latency, crowd size, and 2D vs 3D need
 title: "PRompt Pose Stack Picker"
 tags: [general]

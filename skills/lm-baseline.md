@@ -1,5 +1,12 @@
 ---
 name: lm-baseline
+description: lm-baseline skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: lm-baseline
 description: Build a reproducible n-gram language model baseline before training a neural LM.
 title: "Lm Baseline"
 tags: [general]

@@ -1,5 +1,12 @@
 ---
 name: prompt-diffusion-sampler-picker
+description: prompt-diffusion-sampler-picker skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-diffusion-sampler-picker
 description: Pick DDPM, DDIM, DPM-Solver++, or Euler ancestral based on quality target, latency budget, and conditioning type
 title: "PRompt Diffusion SAMpler Picker"
 tags: [general]

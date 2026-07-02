@@ -4,6 +4,8 @@ title: ReYMeN Proje Benchmark
 description: ReYMeN projesinin guncel metrikleri - 755 .py, 215K satir, 29/32 ozellik tamam, Hermes karsilastirma gap analizi
 tags: [benchmark, metrics, quality, gap-analysis, comparison]
 audience: maintainer
+category: genel
+version: 1.0.0
 ---
 
 # ReYMeN Proje Benchmark

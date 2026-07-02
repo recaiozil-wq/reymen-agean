@@ -1,5 +1,12 @@
 ---
 name: prompt-spectral-analyzer
+description: prompt-spectral-analyzer skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-spectral-analyzer
 description: Guides analysis of frequency content in signals using Fourier transform techniques
 title: "PRompt Spectral Analyzer"
 tags: [general]

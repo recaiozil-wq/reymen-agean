@@ -1,5 +1,12 @@
 ---
 name: prompt-tensor-shapes
+description: prompt-tensor-shapes skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-tensor-shapes
 description: Debug tensor shape mismatches and recommend fixes for common deep learning operations
 title: "PRompt Tensor Shapes"
 tags: [general]

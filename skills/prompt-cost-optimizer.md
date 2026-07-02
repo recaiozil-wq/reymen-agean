@@ -1,5 +1,12 @@
 ---
 name: prompt-cost-optimizer
+description: prompt-cost-optimizer skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-cost-optimizer
 description: Analyze an LLM application and recommend specific cost optimizations with projected savings
 title: "PRompt Cost Optimizer"
 tags: [general]

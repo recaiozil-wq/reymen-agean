@@ -1,5 +1,12 @@
 ---
 name: prompt-protocol-selector
+description: prompt-protocol-selector skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-protocol-selector
 description: Helps choose the right agent communication protocol (MCP, A2A, ACP, ANP) based on system requirements
 title: "PRompt PRotocol Selector"
 phase: 16

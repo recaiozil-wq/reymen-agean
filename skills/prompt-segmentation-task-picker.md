@@ -1,5 +1,12 @@
 ---
 name: prompt-segmentation-task-picker
+description: prompt-segmentation-task-picker skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-segmentation-task-picker
 description: Pick semantic vs instance vs panoptic segmentation and name the architecture for a given task
 title: "PRompt Segmentation Task Picker"
 tags: [general]

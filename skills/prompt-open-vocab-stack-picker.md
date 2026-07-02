@@ -1,5 +1,12 @@
 ---
 name: prompt-open-vocab-stack-picker
+description: prompt-open-vocab-stack-picker skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-open-vocab-stack-picker
 description: Pick SAM 3 / Grounded SAM 2 / YOLO-World / SAM-MI based on latency, concept complexity, and licensing
 title: "PRompt Open Vocab Stack Picker"
 tags: [general]

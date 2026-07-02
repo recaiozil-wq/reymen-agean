@@ -8,6 +8,7 @@ title: "Find Your Level"
   "which phase", "assess my knowledge", "placement test", "skip ahead"
 tags: [assessment, onboarding, curriculum, ai-engineering]
 audience: user
+category: genel
 ---Interactive quiz that maps your AI/ML knowledge to a starting point in the
 
 

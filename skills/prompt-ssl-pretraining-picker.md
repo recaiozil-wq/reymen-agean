@@ -1,5 +1,12 @@
 ---
 name: prompt-ssl-pretraining-picker
+description: prompt-ssl-pretraining-picker skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-ssl-pretraining-picker
 description: Pick SimCLR / MAE / DINOv2 given dataset size, compute, and downstream task
 title: "PRompt SSL PRetraining Picker"
 phase: 4

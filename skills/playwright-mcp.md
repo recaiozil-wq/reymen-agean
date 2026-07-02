@@ -12,6 +12,7 @@ metadata:
     tags: [Browser, MCP, Web, Otomasyon]
 audience: user
 related_skills: [native-mcp]
+category: genel
 ---
 
 # Playwright MCP — Tarayıcı Otomasyonu

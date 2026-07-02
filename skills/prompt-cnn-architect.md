@@ -1,5 +1,12 @@
 ---
 name: prompt-cnn-architect
+description: prompt-cnn-architect skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-cnn-architect
 description: Design a stack of Conv2d layers from input size, parameter budget, and target receptive field
 title: "PRompt CNN Architect"
 tags: [general]

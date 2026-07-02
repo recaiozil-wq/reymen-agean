@@ -10,6 +10,7 @@ metadata:
     tags: [yuanbao, mention, at, group, members, 元宝, 派, 艾特]
 audience: user
 related_skills: []
+category: genel
 ---
 
 # Yuanbao Group Interaction

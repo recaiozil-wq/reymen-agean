@@ -1,5 +1,12 @@
 ---
 name: prompt-reasoning-chain
+description: prompt-reasoning-chain skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-reasoning-chain
 description: Production-ready few-shot CoT prompt with self-consistency support for multi-step reasoning tasks
 title: "PRompt Reasoning Chain"
 tags: [ai]

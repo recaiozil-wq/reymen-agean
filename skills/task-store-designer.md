@@ -7,6 +7,7 @@ phase: 13
 lesson: 13
 tags: [mcp, tasks, durable-store, long-running, sep-1686]
 audience: user
+category: genel
 ---
 
 Given a long-running tool (research, build, export, report generation), design the task store that backs SEP-1686 task augmentation.

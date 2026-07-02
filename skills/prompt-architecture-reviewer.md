@@ -1,5 +1,12 @@
 ---
 name: prompt-architecture-reviewer
+description: prompt-architecture-reviewer skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-architecture-reviewer
 description: Review the architecture of any LLM application against a production readiness checklist -- identifies gaps, risks, and missing components
 title: "PRompt Architecture Reviewer"
 tags: [general]

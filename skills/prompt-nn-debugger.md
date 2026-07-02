@@ -1,5 +1,12 @@
 ---
 name: prompt-nn-debugger
+description: prompt-nn-debugger skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-nn-debugger
 description: Diagnose neural network training failures from symptoms -- loss curves, gradient stats, and activation patterns
 title: "PRompt Nn Debugger"
 tags: [general]

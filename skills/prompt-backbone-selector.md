@@ -1,5 +1,12 @@
 ---
 name: prompt-backbone-selector
+description: prompt-backbone-selector skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: prompt-backbone-selector
 description: Pick the right vision backbone (LeNet, VGG, ResNet, MobileNet, EfficientNet-Lite, ConvNeXt, ViT) for a given task, dataset size, and compute budget
 title: "PRompt Backbone Selector"
 phase: 4

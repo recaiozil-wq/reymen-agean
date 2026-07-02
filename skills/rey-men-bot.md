@@ -5,6 +5,7 @@ version: 2.2.0
 author: Watcher-Hermes
 tags: [rey-men, telegram, bot, python, hermes-fork, durum-oku, ortak-modul, kesilme, polling]
 audience: user
+category: genel
 ---
 
 # ReYMeN Telegram Bot — 3 Bot Entegre Sistem
