@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 """
-nudge_model.py — Gizli Kullanıcı Modelleme Sistemi (Hermes Honcho benzeri)
+nudge_model.py — Stealth User Modelling System (Hermes Honcho-like)
 
-Kullanıcı tercihlerini, yanıt stilini, teknik seviyeyi, dil tercihini
-ve araç kullanım sıklığını sessizce gözlemleyerek bir "kullanıcı modeli"
-inşa eder. Tüm gözlemler SQLite ile .ReYMeN/nudge_model.db altında saklanır.
+Silently observes user preferences, response style, technical level,
+language preference, and tool usage frequency to build a "user model".
+All observations are stored in SQLite under .ReYMeN/nudge_model.db.
 
-Temel akış:
-    1. gozlemle(mesaj, yanit) → her etkileşimi işler, modeli günceller
-    2. kullanici_modeli_al() → mevcut kullanıcı modelini döndürür
-    3. sistem_prompu_ekle() → sistem prompt'una eklenecek metin bloğu
-    4. nudge() → bağlama uygun bir hatırlatma/öneri döndürür
-    5. rapor_uret() → kullanıcıya özet rapor sunar
+Basic flow:
+    1. gozlemle(message, response) → processes each interaction, updates model
+    2. kullanici_modeli_al() → returns current user model
+    3. sistem_prompu_ekle() → text block to append to system prompt
+    4. nudge() → returns a context-appropriate reminder/suggestion
+    5. rapor_uret() → generates a summary report for the user
 
-Kullanım:
+Usage:
     from nudge_model import NudgeModel
     nm = NudgeModel()
     nm.gozlemle("merhaba, nasılsın?", "iyiyim teşekkürler!")

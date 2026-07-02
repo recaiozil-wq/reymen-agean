@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-??? ReYMeN Auth Middleware ? Web UI i?in JWT tabanl? yetkilendirme.
+🔐 ReYMeN Auth Middleware — JWT-based authorization for Web UI.
 
-Bu mod?l, ReYMeN'e ba?lanacak web aray?zleri i?in auth middleware
-sa?lar. Hem FastAPI hem de Flask ile uyumlu ?ekilde tasarlanm??t?r.
+This module provides auth middleware for web interfaces connecting to ReYMeN.
+Designed to be compatible with both FastAPI and Flask.
 
-Desteklenen Framework'ler:
-    - FastAPI (tercih edilen)
-    - Flask (uyumluluk modu)
+Supported Frameworks:
+    - FastAPI (preferred)
+    - Flask (compatibility mode)
 
-Kullan?m (FastAPI):
+Usage (FastAPI):
     from reymen.guvenlik.auth_middleware import require_role, get_current_user
     from fastapi import FastAPI, Depends, HTTPException
 
@@ -17,13 +17,13 @@ Kullan?m (FastAPI):
 
     @app.get("/api/admin")
     async def admin_endpoint(user=Depends(require_role("admin"))):
-        return {"message": "Yetkili eri?im", "user": user}
+        return {"message": "Authorized access", "user": user}
 
     @app.get("/api/me")
     async def me_endpoint(user=Depends(get_current_user)):
         return user
 
-Kullan?m (Flask):
+Usage (Flask):
     from flask import Flask, jsonify, request
     from reymen.guvenlik.auth_middleware import flask_auth_middleware, FlaskAuth
 
@@ -34,7 +34,7 @@ Kullan?m (Flask):
     def me():
         auth = FlaskAuth(request)
         if not auth.authenticated:
-            return jsonify({"error": "Yetkisiz"}), 401
+            return jsonify({"error": "Unauthorized"}), 401
         return jsonify(auth.user_info)
 """
 
@@ -52,10 +52,10 @@ logger = logging.getLogger(__name__)
 # ═══════════════════════════════════════════════════════════════════════════════
 
 def extract_token(headers: dict[str, str]) -> Optional[str]:
-    """HTTP header'lardan Bearer token ??kar.
+    """Extract Bearer token from HTTP headers.
 
-    S?ras?yla:
-        1. Authorization: Bearer <token>
+    Priority:
+        1. Authorization: Bearer ***
         2. X-API-Key: <token>
         3. X-Auth-Token: <token>
     """
@@ -75,7 +75,7 @@ def extract_token(headers: dict[str, str]) -> Optional[str]:
 
 
 def extract_token_from_cookies(cookies: dict[str, str]) -> Optional[str]:
-    """Cookie'lerden access_token ??kar."""
+    """Extract access_token from cookies."""
     return cookies.get("access_token") or cookies.get("token")
 
 
@@ -87,11 +87,11 @@ def get_user_from_token(
     token: str,
     auth_manager_override: Any = None,
 ) -> Optional[dict[str, Any]]:
-    """JWT token'dan kullanıcı bilgisini çıkar.
+    """Extract user info from JWT token.
 
     Args:
         token: JWT token string
-        auth_manager_override: İsteğe bağlı özel AuthManager (None = singleton)
+        auth_manager_override: Optional custom AuthManager (None = singleton)
 
     Returns:
         {
@@ -100,7 +100,7 @@ def get_user_from_token(
             "user_id": str,
             "is_authenticated": bool,
         }
-        veya None (geçersiz token)
+        or None (invalid token)
     """
     auth = auth_manager_override
     if auth is None:
@@ -119,7 +119,7 @@ def get_user_from_token(
 
 
 def check_role_for_token(token: str, required_role: str) -> bool:
-    """Token'daki kullan?c?n?n belirli bir role sahip olup olmad???n? kontrol et."""
+    """Check if the JWT token's user has the required role."""
     from reymen.guvenlik.reymen_auth import auth_manager
     return auth_manager.require_role(token, required_role)
 
@@ -129,12 +129,12 @@ def check_role_for_token(token: str, required_role: str) -> bool:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 class Authorization:
-    """HTTP istekleri i?in yetkilendirme helper'?.
+    """Authorization helper for HTTP requests.
 
-    ?zellikler:
-        - Bearer token, API key ve cookie ile ?al???r
-        - Rol bazl? eri?im kontrol?
-        - Hata mesajlar? (HTTP yan?tlar? i?in)
+    Features:
+        - Works with Bearer token, API key and cookies
+        - Role-based access control
+        - Error messages (for HTTP responses)
     """
 
     def __init__(self, headers: dict[str, str],
@@ -179,8 +179,8 @@ class Authorization:
         return (self._user or {}).get("user_id", "")
 
     def require_role(self, required_role: str) -> bool:
-        """Belirli bir rol?n yeterli olup olmad???n? kontrol et.
-        Yetki hiyerar?isi: guest < user < admin
+        """Check if the user's role is sufficient.
+        Permission hierarchy: guest < user < admin
         """
         hierarchy = {"guest": 0, "user": 1, "admin": 2}
         user_level = hierarchy.get(self.role, -1)
@@ -190,7 +190,7 @@ class Authorization:
     def error_response(
         self, status_code: int = 401
     ) -> tuple[dict[str, Any], int]:
-        """HTTP yan?t? olarak d?nd?r?lecek hata mesaj?."""
+        """Error message to return as HTTP response."""
         messages = {
             401: "Yetkilendirme gerekli",
             403: "Bu i?lem i?in yetkiniz yok",
@@ -217,7 +217,7 @@ try:
         credentials: Optional[HTTPAuthorizationCredentials] = Depends(_security),
     ) -> dict[str, Any]:
         # pylint: disable=unused-argument
-        """FastAPI dependency: ge?erli kullan?c?y? d?nd?r?r."""
+        """FastAPI dependency: returns current user."""
         headers = dict(request.headers)
         cookies = dict(request.cookies)
 
@@ -234,7 +234,7 @@ try:
         return auth.user_info or {}
 
     def require_role(required_role: str):
-        """FastAPI dependency: belirli bir rol gerektiren endpoint'ler i?in."""
+        """FastAPI dependency: for endpoints requiring a specific role."""
         async def _dependency(
             user: dict[str, Any] = Depends(get_current_user),
         ) -> dict[str, Any]:
@@ -265,7 +265,7 @@ except ImportError:
     _FASTAPI_AVAILABLE = False
 
     async def get_current_user():
-        """FastAPI kullan?lam?yor ? placeholder."""
+        """FastAPI not available — placeholder."""
         raise RuntimeError("FastAPI y?kl? de?il. Kurulum: pip install fastapi")
 
     def require_role(required_role: str):
@@ -279,7 +279,7 @@ except ImportError:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 class FlaskAuth:
-    """Flask istekleri i?in auth helper."""
+    """Auth helper for Flask requests."""
 
     def __init__(self, flask_request):
         headers = dict(flask_request.headers)
@@ -313,8 +313,8 @@ class FlaskAuth:
 def flask_auth_middleware():
     """Flask before_request middleware.
 
-    Flask g nesnesine kullan?c? bilgisini ekler:
-        g.current_user  -> dict veya None
+    Adds user info to Flask g object:
+        g.current_user  -> dict or None
         g.auth          -> FlaskAuth instance
     """
     try:
@@ -334,7 +334,7 @@ from functools import wraps
 
 
 def auth_required(func):
-    """Genel auth dekorat?r? ? HTTP isteklerinde token zorunlulu?u."""
+    """Generic auth decorator — requires token for HTTP requests."""
     @wraps(func)
     def wrapper(*args, **kwargs):
         try:
@@ -354,7 +354,7 @@ def auth_required(func):
 
 
 def role_required(required_role: str):
-    """Rol bazl? eri?im dekorat?r?."""
+    """Role-based access decorator."""
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):

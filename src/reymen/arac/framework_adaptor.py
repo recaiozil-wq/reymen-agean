@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-framework_adaptor.py — Harici AI Framework Adaptörleri.
+framework_adaptor.py — External AI Framework Adapters.
 
-LangGraph, CrewAI ve AutoGen (AG2) framework'lerini ReYMeN'e entegre eder.
-Her framework opsiyoneldir (try/except ile yüklenir, bağımlılık yoksa sessiz geç).
+Integrates LangGraph, CrewAI and AutoGen (AG2) frameworks into ReYMeN.
+Each framework is optional (loaded via try/except, silently skipped if missing).
 
-Kullanim:
+Usage:
     from reymen.arac.framework_adaptor import framework_adaptor
     sonuc = framework_adaptor.langgraph_calistir(graph, inputs)
     sonuc = framework_adaptor.crewai_calistir(crew)
@@ -38,13 +38,13 @@ except ImportError:
 
 
 class LangGraphAdaptor:
-    """LangGraph StateGraph calistirma adaptoru.
+    """LangGraph StateGraph execution adapter.
 
-    Kullanim:
+    Usage:
         adaptor = LangGraphAdaptor()
-        # Var olan bir StateGraph'i calistir
+        # Run an existing StateGraph
         sonuc = adaptor.calistir(graph, inputs={"messages": []})
-        # Basit bir graph olustur + calistir
+        # Create and run a simple graph
         sonuc = adaptor.basit_is_akisi(
             nodes=[islev1, islev2],
             inputs={"messages": []}

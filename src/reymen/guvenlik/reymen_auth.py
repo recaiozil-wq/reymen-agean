@@ -1,36 +1,35 @@
 # -*- coding: utf-8 -*-
 """
-🔐 ReYMeN Auth Sistemi — Nous Portal alternatifi.
+🔐 ReYMeN Auth System — Nous Portal alternative.
 
-API key doğrulama, JWT token yönetimi, yetki seviyeleri ve
-multi-user desteği sağlar. Mevcut OAuth2 sistemiyle birlikte
-çalışacak şekilde tasarlanmıştır.
+API key validation, JWT token management, permission levels and
+multi-user support. Designed to work alongside the existing OAuth2 system.
 
-Kullanım:
+Usage:
     from reymen.guvenlik.reymen_auth import auth_manager
 
-    # API key doğrulama
+    # API key validation
     key = "sk-xxxxxxxx..."
     provider = auth_manager.validate_api_key(key)
     if provider:
-        print(f"Geçerli {provider} anahtarı")
+        print(f"Valid {provider} key")
 
-    # Token oluşturma
+    # Token creation
     token = auth_manager.create_token("kullanici_adi", role="admin")
     print(token.access_token)
 
-    # Token doğrulama
+    # Token verification
     payload = auth_manager.verify_token(token.access_token)
     if payload:
-        print(f"Hoş geldin {payload['sub']}")
+        print(f"Welcome {payload['sub']}")
 
-    # Token yenileme
+    # Token refresh
     new_token = auth_manager.refresh_token(token.refresh_token)
 
-Yetki Seviyeleri:
-    admin → Tüm işlemlere erişim
-    user  → Standart kullanıcı işlemleri
-    guest → Sadece okuma işlemleri
+Permission Levels:
+    admin → Full access to all operations
+    user  → Standard user operations
+    guest → Read-only operations
 """
 
 from __future__ import annotations
@@ -86,7 +85,7 @@ class AccessToken:
 
 @dataclass
 class User:
-    """Kullanıcı bilgisi."""
+    """User information."""
     user_id: str
     username: str
     role: str = "user"          # admin / user / guest
@@ -146,7 +145,7 @@ API_KEY_PROVIDERS: dict[str, dict[str, Any]] = {
 
 
 def detect_api_key_provider(api_key: str) -> Optional[str]:
-    """Bir API key'in hangi provider'a ait olduğunu tespit eder."""
+    """Detect which provider an API key belongs to."""
     if not api_key or api_key == "buraya_yaz":
         return None
     for provider, config in API_KEY_PROVIDERS.items():
@@ -157,10 +156,10 @@ def detect_api_key_provider(api_key: str) -> Optional[str]:
 
 
 def validate_api_key_format(api_key: str) -> tuple[bool, Optional[str], str]:
-    """API key formatını doğrula.
+    """Validate API key format.
 
     Returns:
-        (geçerli_mi, provider_adı, mesaj)
+        (valid, provider_name, message)
     """
     if not api_key or api_key == "buraya_yaz":
         return False, None, "API anahtarı boş"
@@ -172,10 +171,10 @@ def validate_api_key_format(api_key: str) -> tuple[bool, Optional[str], str]:
 
 
 def validate_api_key_live(api_key: str, provider: str, timeout: int = 10) -> bool:
-    """API key'i canlı olarak provider'a istek yaparak doğrula.
+    """Validate API key live by making a request to the provider.
 
-    Not: Bu işlem network erişimi gerektirir ve zaman alabilir.
-    Varsayılan davranış sadece format kontrolüdür.
+    Note: This requires network access and may take time.
+    Default behavior is format-only validation.
     """
     config = API_KEY_PROVIDERS.get(provider)
     if not config:
@@ -202,9 +201,9 @@ def validate_api_key_live(api_key: str, provider: str, timeout: int = 10) -> boo
 # ═══════════════════════════════════════════════════════════════════════════════
 
 class JWTManager:
-    """HMAC-SHA256 JWT token yönetimi — harici bağımlılık yok.
+    """HMAC-SHA256 JWT token management — no external dependencies.
 
-    Token yapısı:
+    Token structure:
         header:  {"alg": "HS256", "typ": "JWT"}
         payload: {"sub": username, "role": role, "iat": ts, "exp": ts, "jti": id}
         signature: HMAC-SHA256(base64(header).base64(payload), secret)
@@ -217,7 +216,7 @@ class JWTManager:
 
     @staticmethod
     def _generate_secret() -> str:
-        """32 byte rastgele secret üret."""
+        """Generate 32-byte random secret."""
         return base64.urlsafe_b64encode(secrets.token_bytes(32)).decode("utf-8")
 
     def _base64_url_encode(self, data: bytes) -> str:
@@ -230,7 +229,7 @@ class JWTManager:
         return base64.urlsafe_b64decode(data)
 
     def encode(self, payload: dict[str, Any], expires_in: int = 3600) -> str:
-        """JWT token oluştur."""
+        """Create JWT token."""
         header = {"alg": "HS256", "typ": "JWT"}
         now = int(time.time())
 
@@ -253,7 +252,7 @@ class JWTManager:
         return f"{header_b64}.{payload_b64}.{signature_b64}"
 
     def decode(self, token: str, verify: bool = True) -> Optional[dict[str, Any]]:
-        """JWT token çöz ve doğrula."""
+        """Decode and verify JWT token."""
         try:
             parts = token.split(".")
             if len(parts) != 3:
@@ -287,7 +286,7 @@ class JWTManager:
             return None
 
     def refresh_token(self, token: str, expires_in: int = 3600) -> Optional[str]:
-        """Mevcut bir token'ı yenile (refresh_token kullanarak değil, JWT decode ederek)."""
+        """Refresh an existing token (by decoding JWT, not using refresh_token)."""
         payload = self.decode(token, verify=True)
         if payload is None:
             return None
@@ -301,9 +300,9 @@ class JWTManager:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 class AuthStorage:
-    """Kullanıcı ve token bilgilerini SQLite'da saklar.
+    """Stores user and token information in SQLite.
 
-    Tablolar:
+    Tables:
         users:      user_id, username, role, email, password_hash, api_keys,
                     is_active, created_at, last_login, metadata
         tokens:     token_id, user_id, token_type, access_token, refresh_token,
@@ -619,7 +618,7 @@ class AuthStorage:
         )
 
     def cleanup_expired_tokens(self) -> int:
-        """Süresi dolmuş token'ları temizle."""
+        """Clean up expired tokens."""
         conn = self._get_conn()
         try:
             cur = conn.execute(
@@ -637,12 +636,12 @@ class AuthStorage:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 class AuthManager:
-    """ReYMeN Auth Sistemi — Ana yönetici sınıfı.
+    """ReYMeN Auth System — Main manager class.
 
-    API key doğrulama, JWT token yönetimi, kullanıcı yönetimi
-    ve yetkilendirme işlemlerini tek bir arayüzde toplar.
+    Combines API key validation, JWT token management, user management
+    and authorization operations in a single interface.
 
-    Kullanım:
+    Usage:
         manager = AuthManager()
         token = manager.create_token("kullanici", role="admin")
         payload = manager.verify_token(token.access_token)
@@ -660,7 +659,7 @@ class AuthManager:
         self._ensure_default_admin()
 
     def _ensure_default_admin(self) -> None:
-        """İlk çalıştırmada varsayılan admin kullanıcısını oluştur."""
+        """Create default admin user on first run."""
         admin = self.storage.get_user_by_username("admin")
         if admin is None:
             user = self.storage.create_user("admin", role="admin", email="admin@reymen.local")
@@ -669,7 +668,7 @@ class AuthManager:
     # ── API Key Doğrulama ────────────────────────────────────────────────────
 
     def validate_api_key(self, api_key: str) -> Optional[str]:
-        """API key formatını doğrula ve provider adını döndür."""
+        """Validate API key format and return provider name."""
         valid, provider, _ = validate_api_key_format(api_key)
         return provider if valid else None
 
@@ -685,15 +684,15 @@ class AuthManager:
         expires_in: int = 3600,
         scope: str = "",
     ) -> Optional[AccessToken]:
-        """Kullanıcı için access + refresh token oluştur.
+        """Create access + refresh tokens for a user.
 
         Args:
-            username: Kullanıcı adı (otomatik oluşturulur)
-            role:     Yetki seviyesi (admin/user/guest)
-            expires_in: Token geçerlilik süresi (saniye)
+            username: Username (auto-created)
+            role:     Permission level (admin/user/guest)
+            expires_in: Token validity duration (seconds)
 
         Returns:
-            AccessToken objesi veya None (hata durumunda)
+            AccessToken object or None (on error)
         """
         if role not in ("admin", "user", "guest"):
             logger.error("[Auth] Geçersiz rol: %s", role)
@@ -747,9 +746,9 @@ class AuthManager:
         )
 
     def verify_token(self, token: str) -> Optional[dict[str, Any]]:
-        """JWT token doğrula ve payload'ı döndür.
+        """Verify JWT token and return payload.
 
-        Önce JWT imza/süre kontrolü, sonra veritabanında sorgulama.
+        First checks JWT signature/expiry, then queries the database.
         """
         payload = self.jwt.decode(token, verify=True)
         if payload is None:
@@ -764,7 +763,7 @@ class AuthManager:
         return payload
 
     def refresh_token(self, refresh_token: str) -> Optional[AccessToken]:
-        """Refresh token ile yeni access token oluştur."""
+        """Create new access token using a refresh token."""
         # Refresh token'ı doğrula
         payload = self.jwt.decode(refresh_token, verify=True)
         if payload is None:
@@ -788,11 +787,11 @@ class AuthManager:
         return self.create_token(username, role=role)
 
     def revoke_token(self, access_token: str) -> bool:
-        """Access token'ı iptal et."""
+        """Revoke an access token."""
         return self.storage.revoke_token(access_token)
 
     def revoke_user_tokens(self, username: str) -> int:
-        """Kullanıcının tüm token'larını iptal et."""
+        """Revoke all tokens for a user."""
         user = self.storage.get_user_by_username(username)
         if user is None:
             return 0
@@ -802,29 +801,29 @@ class AuthManager:
 
     def create_user(self, username: str, role: str = "user",
                     email: str = "") -> Optional[User]:
-        """Yeni kullanıcı oluştur."""
+        """Create a new user."""
         if role not in ("admin", "user", "guest"):
             logger.error("[Auth] Geçersiz rol: %s", role)
             return None
         return self.storage.create_user(username, role=role, email=email)
 
     def list_users(self) -> list[User]:
-        """Tüm kullanıcıları listele."""
+        """List all users."""
         return self.storage.list_users()
 
     def get_user(self, username: str) -> Optional[User]:
-        """Kullanıcı adı ile kullanıcı bul."""
+        """Find user by username."""
         return self.storage.get_user_by_username(username)
 
     def delete_user(self, username: str) -> bool:
-        """Kullanıcı sil (token'larıyla birlikte)."""
+        """Delete user (along with their tokens)."""
         user = self.storage.get_user_by_username(username)
         if user is None:
             return False
         return self.storage.delete_user(user.user_id)
 
     def update_user_role(self, username: str, role: str) -> bool:
-        """Kullanıcı yetki seviyesini değiştir."""
+        """Change user permission level."""
         if role not in ("admin", "user", "guest"):
             return False
         user = self.storage.get_user_by_username(username)
@@ -835,9 +834,9 @@ class AuthManager:
     # ── Yetkilendirme ────────────────────────────────────────────────────────
 
     def check_permission(self, user_role: str, required_role: str) -> bool:
-        """Kullanıcı yetkisinin yeterli olup olmadığını kontrol et.
+        """Check if the user's permission level is sufficient.
 
-        Yetki hiyerarşisi: guest < user < admin
+        Permission hierarchy: guest < user < admin
         """
         hierarchy = {"guest": 0, "user": 1, "admin": 2}
         user_level = hierarchy.get(user_role, -1)
@@ -845,7 +844,7 @@ class AuthManager:
         return user_level >= required_level
 
     def require_role(self, token: str, required_role: str) -> bool:
-        """JWT token'dan kullanıcının belirli bir role sahip olup olmadığını kontrol et."""
+        """Check if the JWT token has the required role."""
         payload = self.verify_token(token)
         if payload is None:
             return False
@@ -855,7 +854,7 @@ class AuthManager:
     # ── Token Bilgisi ve Liste ───────────────────────────────────────────────
 
     def list_tokens(self, username: Optional[str] = None) -> list[dict[str, Any]]:
-        """Token'ları listele."""
+        """List tokens."""
         if username:
             user = self.storage.get_user_by_username(username)
             if user is None:
@@ -864,7 +863,7 @@ class AuthManager:
         return self.storage.list_tokens()
 
     def list_api_keys(self, username: Optional[str] = None) -> list[dict[str, Any]]:
-        """API key'leri listele."""
+        """List API keys."""
         if username:
             user = self.storage.get_user_by_username(username)
             if user is None:
@@ -875,11 +874,11 @@ class AuthManager:
     # ── Bakım ────────────────────────────────────────────────────────────────
 
     def cleanup(self) -> int:
-        """Süresi dolmuş token'ları temizle."""
+        """Clean up expired tokens."""
         return self.storage.cleanup_expired_tokens()
 
     def status(self) -> dict[str, Any]:
-        """Auth sistemi durum bilgisi."""
+        """Auth system status information."""
         users = self.list_users()
         tokens = self.list_tokens()
         active_tokens = [t for t in tokens if not t.get("revoked")]
@@ -903,23 +902,23 @@ auth_manager = AuthManager()
 
 # Kullanım kolaylığı için doğrudan fonksiyonlar
 def validate_key(key: str) -> Optional[str]:
-    """API key doğrula, provider adı döndür."""
+    """Validate API key, return provider name."""
     return auth_manager.validate_api_key(key)
 
 
 def create_token(username: str, role: str = "user", expires_in: int = 3600) -> Optional[str]:
-    """Kullanıcı için token oluştur, access_token string'ini döndür."""
+    """Create token for user, return access_token string."""
     token = auth_manager.create_token(username, role=role, expires_in=expires_in)
     return token.access_token if token else None
 
 
 def verify_token(token: str) -> Optional[dict[str, Any]]:
-    """Token doğrula, payload döndür."""
+    """Verify token, return payload."""
     return auth_manager.verify_token(token)
 
 
 def check_role(token: str, required_role: str = "user") -> bool:
-    """Token'daki rolün yeterli olup olmadığını kontrol et."""
+    """Check if the token's role is sufficient."""
     return auth_manager.require_role(token, required_role)
 
 

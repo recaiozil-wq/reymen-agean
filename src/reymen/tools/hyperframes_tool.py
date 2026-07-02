@@ -2,15 +2,15 @@
 """
 hyperframes_tool.py — HyperFrames Video Generation.
 
-HTML + CSS + JS animasyonlarını, Playwright ile frame-frame render edip
-FFmpeg ile video'ya birleştiren sistem.
+Renders HTML + CSS + JS animations frame-by-frame with Playwright
+and assembles into video with FFmpeg.
 
-3 temel template:
-  - METIN_ANIMASYONU:  metin yazma / fade-in / scale efekti
-  - GECIS_EFFEKTI:     slide / fade / zoom geçişleri
-  - GRAFIK_ANIMASYONU: bar / çizgi grafiği animasyonu
+3 base templates:
+  - METIN_ANIMASYONU:  text writing / fade-in / scale effect
+  - GECIS_EFFEKTI:     slide / fade / zoom transitions
+  - GRAFIK_ANIMASYONU: bar / line chart animation
 
-Kullanım:
+Usage:
     from reymen.tools.hyperframes_tool import hyperframes_olustur
     sonuc = hyperframes_olustur(
         template="METIN_ANIMASYONU",
@@ -20,10 +20,10 @@ Kullanım:
         sure=5,
     )
 
-Bağımlılıklar:
+Dependencies:
     pip install playwright pillow numpy
     playwright install chromium
-    ffmpeg sistemde kurulu olmalı
+    ffmpeg must be installed on the system
 """
 
 import base64
@@ -52,15 +52,15 @@ os.makedirs(COKLU_VIDEO_KLASORU, exist_ok=True)
 
 def _template_metin_animasyonu(params: dict) -> str:
     """
-    Metin animasyonu template.
-    Parametreler:
-      - metin (str): gösterilecek metin
-      - alt_metin (str, ops.): alt başlık
-      - yazi_rengi (str, ops.): metin rengi (varsayılan: #ffffff)
-      - arkaplan (str, ops.): arkaplan rengi/gradient (varsayılan: #1a1a2e)
-      - font_boyut (int, ops.): ana font boyutu (varsayılan: 48)
-      - efekt (str, ops.): fade | typewriter | scale | slide-up (varsayılan: fade)
-      - arkaplan_resim (str, ops.): base64 veya URL arkaplan resmi
+    Text animation template.
+    Parameters:
+      - metin (str): text to display
+      - alt_metin (str, opt.): subtitle
+      - yazi_rengi (str, opt.): text color (default: #ffffff)
+      - arkaplan (str, opt.): background color/gradient (default: #1a1a2e)
+      - font_boyut (int, opt.): main font size (default: 48)
+      - efekt (str, opt.): fade | typewriter | scale | slide-up (default: fade)
+      - arkaplan_resim (str, opt.): base64 or URL background image
     """
     metin = params.get("metin", "HyperFrame")
     alt_metin = params.get("alt_metin", "")

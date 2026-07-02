@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-"""tool_registry.py — Gelismis ToolRegistry + check_fn TTL cache + ToolsetManager.
+"""tool_registry.py — Advanced ToolRegistry + check_fn TTL cache + ToolsetManager.
 
-tools/ klasorundeki tum araclari otomatik bulur, kaydeder.
-Motor ve sistem_talimati tarafindan kullanilir.
+Auto-discovers and registers all tools from the tools/ folder.
+Used by Motor and sistem_talimati.
 
-Ozellikler (ReYMeN Agent seviyesi):
-  - tools/ otomatik discovery
-  - check_fn: TTL cache (30sn), env check
-  - ToolsetManager: toolset gruplari yonetimi
+Features (ReYMeN Agent level):
+  - tools/ auto-discovery
+  - check_fn: TTL cache (30s), env check
+  - ToolsetManager: toolset group management
   - Dynamic schema overrides
-  - Alias sistemi (eski -> yeni ad)
+  - Alias system (old -> new name)
 """
 
 import functools
@@ -28,7 +28,7 @@ _CHECK_FN_TTL = 30.0  # saniye
 
 
 def _ttl_cache(ttl: float = _CHECK_FN_TTL) -> Callable:
-    """Basit TTL cache dekoratoru — check_fn sonucunu 30sn cache'ler."""
+    """Simple TTL cache decorator — caches check_fn result for 30s."""
     def decorator(fn):
         _cache = {"sonuc": None, "zaman": 0.0}
         @functools.wraps(fn)
@@ -49,9 +49,9 @@ def _ttl_cache(ttl: float = _CHECK_FN_TTL) -> Callable:
 
 # ── ToolsetManager ────────────────────────────────────────────────────
 class ToolsetManager:
-    """Toolset gruplari yonetimi — bir arac birden cok toolset'te olabilir.
+    """Toolset group management — a tool can belong to multiple toolsets.
 
-    Kullanim:
+    Usage:
         tm = ToolsetManager()
         tm.toolset_olustur("web", {"WEB_ARA", "TARAYICI_AC"})
         tm.toolset_ekle("web", "URL_FETCHER")

@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-"""session_search.py — FTS5 tabanli session mesaji arama motoru.
+"""session_search.py — FTS5-based session message search engine.
 
-Her mesaji SQLite FTS5'e kaydeder, tam metin aramasi yapar.
-Bagimsiz calisir (session_db.py'den ayri, hizli arama icin).
+Saves each message to SQLite FTS5, performs full-text search.
+Runs independently (separate from session_db.py, for fast searching).
 
-Kullanim:
+Usage:
     searcher = SessionSearch()
-    searcher.save("session-001", "merhaba dunya", "user")
-    sonuclar = searcher.search("merhaba")
+    searcher.save("session-001", "hello world", "user")
+    sonuclar = searcher.search("hello")
 """
 
 import logging
@@ -26,11 +26,11 @@ _DEFAULT_DB_PATH = str(_DEFAULT_DB_DIR / "session_search.db")
 
 
 class SessionSearch:
-    """FTS5 tabanli session mesaji arama motoru.
+    """FTS5-based session message search engine.
 
     Attributes:
-        db_yolu: SQLite dosya yolu.
-        _lock: Thread guvenligi icin lock.
+        db_yolu: SQLite file path.
+        _lock: Thread safety lock.
     """
 
     def __init__(self, db_yolo: Optional[str] = None):
@@ -50,7 +50,7 @@ class SessionSearch:
     # ── Sema Kurulumu ─────────────────────────────────────────────────
 
     def _kur(self):
-        """FTS5 tablosunu olustur (idempotent)."""
+        """Create the FTS5 table (idempotent)."""
         with self._lock:
             conn = self._baglan()
             try:
@@ -74,15 +74,15 @@ class SessionSearch:
     # ── Kaydet (Save) ─────────────────────────────────────────────────
 
     def save(self, session_id: str, message: str, role: str = "user") -> bool:
-        """Bir mesaji FTS5 tablosuna kaydet.
+        """Save a message to the FTS5 table.
 
         Args:
-            session_id: Oturum ID.
-            message: Mesaj icerigi.
-            role: Mesaj rolu (user/assistant/tool/system).
+            session_id: Session ID.
+            message: Message content.
+            role: Message role (user/assistant/tool/system).
 
         Returns:
-            Basarili ise True.
+            True on success.
         """
         if not message or not message.strip():
             return False
@@ -109,14 +109,14 @@ class SessionSearch:
     # ── Ara (Search) ──────────────────────────────────────────────────
 
     def search(self, query: str, limit: int = 10, session_id: Optional[str] = None) -> List[Dict]:
-        """FTS5 ile tam metin aramasi yap.
+        """Perform full-text search with FTS5.
 
         Args:
-            query: Aranacak kelime/ifade. FTS5 sorgu syntax'i desteklenir:
-                   "kelime1 kelime2" -> AND, "kelime1 OR kelime2" -> OR,
-                   "kelime*" -> prefix, "\"tam ifade\"" -> exact.
-            limit: Maks sonuc sayisi.
-            session_id: Opsiyonel — sadece belirli bir oturumda ara.
+            query: Search word/phrase. Supports FTS5 query syntax:
+                   "word1 word2" -> AND, "word1 OR word2" -> OR,
+                   "word*" -> prefix, "\"exact phrase\"" -> exact.
+            limit: Max result count.
+            session_id: Optional — search only within a specific session.
 
         Returns:
             [{"session_id", "message", "role", "timestamp", "rank"}, ...]
@@ -169,11 +169,11 @@ class SessionSearch:
     # ── Session Mesajlarini Listele ───────────────────────────────────
 
     def session_mesajlari(self, session_id: str, limit: int = 50) -> List[Dict]:
-        """Belirli bir session'in tum mesajlarini getir.
+        """Get all messages for a specific session.
 
         Args:
-            session_id: Oturum ID.
-            limit: Maks sonuc sayisi.
+            session_id: Session ID.
+            limit: Max result count.
 
         Returns:
             [{"session_id", "message", "role", "timestamp"}, ...]
@@ -199,7 +199,7 @@ class SessionSearch:
     # ── Istatistik ────────────────────────────────────────────────────
 
     def istatistik(self) -> Dict:
-        """Toplam kayit sayisi ve diger istatistikler."""
+        """Total record count and other statistics."""
         with self._lock:
             conn = self._baglan()
             try:
@@ -224,7 +224,7 @@ class SessionSearch:
 
     @staticmethod
     def _sorgu_temizle(sorgu: str) -> str:
-        """FTS5 sorgusunu temizle: tehlikeli karakterleri kaldir."""
+        """Sanitize FTS5 query: remove dangerous characters."""
         # FTS5 ozel karakterleri: ^ * " ( ) ~ + - AND OR NEAR NOT
         # Basit guvenlik: cift tirnak icinde olmayan ozel karakterleri kaldir
         import re as _re
@@ -243,7 +243,7 @@ _session_search_lock = threading.Lock()
 
 
 def session_search_al(db_yolu: Optional[str] = None) -> SessionSearch:
-    """Singleton SessionSearch instance'i al (thread-safe)."""
+    """Get singleton SessionSearch instance (thread-safe)."""
     global _session_search_instance
     if _session_search_instance is None:
         with _session_search_lock:
@@ -255,10 +255,10 @@ def session_search_al(db_yolu: Optional[str] = None) -> SessionSearch:
 # ── Kolay Kullanim Fonksiyonlari (dogrudan import icin) ─────────────
 
 def save(session_id: str, message: str, role: str = "user") -> bool:
-    """Kolay kaydet — singleton uzerinden."""
+    """Easy save — via singleton."""
     return session_search_al().save(session_id, message, role)
 
 
 def search(query: str, limit: int = 10, session_id: Optional[str] = None) -> List[Dict]:
-    """Kolay ara — singleton uzerinden."""
+    """Easy search — via singleton."""
     return session_search_al().search(query, limit=limit, session_id=session_id)

@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-delegate_task_tool.py — ThreadPoolExecutor tabanlı paralel sub-agent delegasyonu.
+delegate_task_tool.py — ThreadPoolExecutor-based parallel sub-agent delegation.
 
-Hermes Agent'teki paralel task delegasyon sisteminden esinlenilmiştir.
-Alt ajanları ThreadPoolExecutor ile paralel çalıştırır, her birine ayrı
-Beyin instance'ı verir, sonuçları toplayıp özetler.
+Inspired by the parallel task delegation system in Hermes Agent.
+Runs sub-agents in parallel using ThreadPoolExecutor, gives each a separate
+Beyin instance, collects results and summarizes.
 
-Kullanım:
+Usage:
     DELEGATE_TASK(
         "görev_tanımları_json",
         "bağlam",
@@ -19,8 +19,8 @@ Kullanım:
         {"gorev": "Web'de ara", "baglam": "konu: yapay zeka"},
     ]
 
-Bağımlılıklar:
-    - concurrent.futures.ThreadPoolExecutor (standart kütüphane)
+Dependencies:
+    - concurrent.futures.ThreadPoolExecutor (standard library)
     - reymen.cereyan.beyin.Beyin
 """
 
@@ -50,7 +50,7 @@ _CONFIG_YOLU = _PROJE_KOK / "config.yaml"
 
 
 def _config_yukle() -> dict:
-    """Proje config.yaml'ini yükle, yoksa boş dict döndür."""
+    """Load project config.yaml, return empty dict if missing."""
     try:
         import yaml
         if _CONFIG_YOLU.exists():
@@ -66,7 +66,7 @@ _DELEGATE_CONFIG = _config_yukle()
 
 @dataclass
 class AltGorevSonuc:
-    """Tek bir alt görevin sonucunu tutar."""
+    """Holds the result of a single sub-task."""
     gorev: str
     task_id: str
     basarili: bool

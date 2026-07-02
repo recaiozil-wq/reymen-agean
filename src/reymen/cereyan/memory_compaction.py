@@ -1,26 +1,26 @@
 # -*- coding: utf-8 -*-
 """
-memory_compaction.py — MEMORY.md / USER.md 50K Compaction Sistemi.
+memory_compaction.py — MEMORY.md / USER.md 50K Compaction System.
 
-ReYMeN'de Hermes'teki MEMORY.md/USER.md 50K compaction'inin benzerini uygular.
-Hafiza budama (hafiza_budama.py) TTL bazli calisirken bu modul KARAKTER LIMITI
-bazli compaction yapar — dosya 50.000 karaktere yaklasinca otomatik budar.
+Implements the equivalent of Hermes' MEMORY.md/USER.md 50K compaction in ReYMeN.
+While memory pruning (hafiza_budama.py) works on a TTL basis, this module performs
+CHARACTER-LIMIT-based compaction — it automatically prunes files approaching 50,000 characters.
 
-Ne yapar:
-  1. MEMORY.md ve USER.md'yi tara (reymen/hafiza/ altinda)
-  2. 50.000 karakter limitine yaklasinca (>%80 = 40K) otomatik compaction
-  3. En eski/dusuk oncelikli entry'leri arsivle (reymen/hafiza/arsiv/)
-  4. Onem sirasina gore budama: dusuk oncelikli entry'leri sil
-  5. @lru_cache temizleme (cache_tazele())
-  6. Hafif kontrol (konusma sonrasi hizli check)
+What it does:
+  1. Scans MEMORY.md and USER.md (under reymen/hafiza/)
+  2. Auto-compacts when approaching 50K character limit (>80% = 40K)
+  3. Archives oldest/lowest-priority entries (reymen/hafiza/arsiv/)
+  4. Prunes by priority: removes low-priority entries
+  5. Clears @lru_cache (cache_tazele())
+  6. Lightweight check (fast post-conversation check)
 
-Kullanim:
+Usage:
     from reymen.cereyan.memory_compaction import memory_compaction_check
-    rapor = memory_compaction_check()           # Hafif kontrol
-    rapor = memory_compaction_check(zorla=True) # Zorla compaction
+    rapor = memory_compaction_check()           # Lightweight check
+    rapor = memory_compaction_check(zorla=True) # Force compaction
 
     from reymen.cereyan.memory_compaction import cache_tazele
-    cache_tazele()  # prompt_assembly lru_cache'lerini temizle
+    cache_tazele()  # Clears prompt_assembly lru_cache entries
 """
 
 import functools

@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-skill_shrink.py — Skill küçültme aracı.
+skill_shrink.py — Skill shrinking tool.
 
-10KB+ veya 300+ satır skill'leri tespit eder, şişkin içerikleri kısaltır,
-referans/alt klasörüne taşınabilecek bölümleri ayırır.
+Detects 10KB+ or 300+ line skills, shrinks bloated content,
+splits sections that can be moved to references/ subfolder.
 
-Kullanım (CLI üzerinden):
-    reymen skill shrink --dry-run     # sadece tespit
-    reymen skill shrink --apply       # uygula
-    reymen skill shrink --stats       # istatistik
+Usage (via CLI):
+    reymen skill shrink --dry-run     # detect only
+    reymen skill shrink --apply       # apply
+    reymen skill shrink --stats       # statistics
 """
 
 from __future__ import annotations

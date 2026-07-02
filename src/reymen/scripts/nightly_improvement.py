@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 """
-nightly_improvement.py — ReYMeN Gece Kendini Geliştirme Döngüsü.
+nightly_improvement.py — ReYMeN Nightly Self-Improvement Loop.
 
-Her gece 03:00'te çalışır. 6 aşamalı sessiz döngü:
+Runs every night at 03:00. 6-stage silent loop:
 
-  a) once_hafiza analizi (zayıf noktalar)
-  b) Skill iyileştirme (düşük başarılı skill'ler)
-  c) Memory compaction kontrolü
-  d) Kod kalitesi (ruff/bandit hataları)
-  e) Cron job'ların durumu
-  f) 7 günlük trend raporu
+  a) once_hafiza analysis (weak points)
+  b) Skill improvement (low-success skills)
+  c) Memory compaction check
+  d) Code quality (ruff/bandit errors)
+  e) Cron job status
+  f) 7-day trend report
 
-Raporu durum.json'a yazar. Sessiz çalışır, sadece sorun varsa raporlar.
+Writes report to durum.json. Runs silently, only reports if issues found.
 
-Kullanım:
+Usage:
     python -m reymen.scripts.nightly_improvement
 """
 
@@ -49,7 +49,7 @@ RAPOR_DIZINI.mkdir(parents=True, exist_ok=True)
 
 @dataclass
 class AsamaSonucu:
-    """Tek bir aşamanın sonucu."""
+    """Result of a single stage."""
     ad: str
     basarili: bool
     sure_sn: float = 0.0

@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 """
-self_improve_scheduler.py — ReYMeN Otonom Kendini Geliştirme Zamanlayıcısı.
+self_improve_scheduler.py — ReYMeN Autonomous Self-Improvement Scheduler.
 
-Tüm periyodik kendini geliştirme görevlerini TEK noktadan yönetir:
+Manages ALL periodic self-improvement tasks from a SINGLE point:
 
-  1. self_improve_cron  → Her 6 saatte bir: metrik topla, analiz et, raporla
-  2. hafiza_budama      → Her 24 saatte bir: eski/kullanılmayan hafızayı temizle
-  3. auto_budama        → Her 12 saatte bir: otomatik kod budaması
-  4. skill_iyilestirme  → Her 24 saatte bir: skill kullanım analizi + iyileştirme
-  5. nudge_model        → Her 48 saatte bir: kullanıcı modeli özeti + rapor
-  6. konusmadan_skill   → Her 6 saatte bir: konuşmalardan otomatik skill çıkarma
+  1. self_improve_cron  → Every 6 hours: collect metrics, analyze, report
+  2. hafiza_budama      → Every 24 hours: clean old/unused memory
+  3. auto_budama        → Every 12 hours: automatic code pruning
+  4. skill_iyilestirme  → Every 24 hours: skill usage analysis + improvement
+  5. nudge_model        → Every 48 hours: user model summary + report
+  6. konusmadan_skill   → Every 6 hours: auto-extract skills from conversations
 
-Kullanım:
-    python -m reymen.scripts.self_improve_scheduler --run-all   # Tümünü çalıştır
-    python -m reymen.scripts.self_improve_scheduler --status    # Durum göster
+Usage:
+    python -m reymen.scripts.self_improve_scheduler --run-all   # Run all
+    python -m reymen.scripts.self_improve_scheduler --status    # Show status
 """
 
 import json
@@ -34,13 +34,13 @@ DURUM_DOSYASI = ROOT / ".ReYMeN" / "self_improve_scheduler.json"
 
 
 class KendiniGelistirScheduler:
-    """Tüm self-improvement görevlerini yönetir."""
+    """Manages all self-improvement tasks."""
 
     def __init__(self):
         self.sonuc: dict[str, dict] = {}
 
     def gorev_calistir(self, ad: str, fonk, *args, **kwargs) -> dict:
-        """Tek bir self-improvement görevini çalıştır ve sonucu kaydet."""
+        """Run a single self-improvement task and record the result."""
         baslama = time.time()
         basarili = False
         mesaj = ""

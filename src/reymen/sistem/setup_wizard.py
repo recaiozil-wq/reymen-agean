@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
-"""setup_wizard.py — ReYMeN ilk kurulum sihirbazi (reymen setup).
+"""setup_wizard.py — ReYMeN first setup wizard (reymen setup).
 
-Hermes'teki 'hermes setup' komutunun ReYMeN karsiligi.
-reymen setup veya eksik kurulumda otomatik baslar.
+ReYMeN counterpart of Hermes' 'hermes setup' command.
+Automatically starts on missing setup or via reymen setup.
 
-Kontrol listesi:
-  a) Hosgeldin mesaji + logo
-  b) Python versiyon kontrolu (3.11+ gerekli)
-  c) Git kontrolu
-  d) FFmpeg kontrolu
-  e) Playwright kontrolu (gerekirse kur)
-  f) API key yapilandirmasi (DeepSeek oncelikli)
-  g) config.yaml olusturma/kontrol
-  h) SOUL.md kontrolu
-  i) skills/ dizini kontrolu
+Checklist:
+  a) Welcome message + logo
+  b) Python version check (3.11+ required)
+  c) Git check
+  d) FFmpeg check
+  e) Playwright check (install if needed)
+  f) API key configuration (DeepSeek priority)
+  g) config.yaml creation/check
+  h) SOUL.md check
+  i) skills/ directory check
 """
 
 import os

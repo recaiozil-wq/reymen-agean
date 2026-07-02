@@ -36,7 +36,7 @@ templates = Jinja2Templates(directory=str(_TEMPLATE_DIR))
 
 @router.get("/image-gen", response_class=HTMLResponse)
 async def image_gen_form(request: Request):
-    """GET — Görsel üretme formu."""
+    """GET — Image generation form."""
     return templates.TemplateResponse(
         request, "image_gen.html", {}
     )
@@ -49,10 +49,10 @@ async def image_gen_generate(
     provider: str = Form("auto"),
     aspect_ratio: str = Form("square"),
 ):
-    """POST — Görsel üret.
+    """POST — Generate image.
 
     Form fields:
-        prompt (str): Görsel prompt'u.
+        prompt (str): Image prompt.
         provider (str): Backend (auto/fal/openai/xai/stub).
         aspect_ratio (str): landscape / square / portrait.
 

@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-once_hafiza.py — Hafıza-öncelikli çalışma motoru.
+once_hafiza.py — Memory-first execution engine.
 
-Her görev önce hafızaya bakar, bilgi varsa direkt uygular,
-yoksa dener, sonucu kaydeder.
+Every task first checks memory, directly applies known information,
+or tries it and saves the result if not found.
 
-Kullanım:
+Usage:
     sonuc = once_hafiza.isle(
         hedef="nmap ile port tara",
         kategori="kali/network",
@@ -44,16 +44,16 @@ _yazma_kilit = threading.Lock()
 
 def _kademeli_guven(basari: int, hata: int) -> float:
     """
-    Sigmoid benzeri kademeli güven hesaplama.
+    Sigmoid-like gradual confidence calculation.
 
-    İlk başarıda 0.5, 3 başarıda ~0.75, 10 başarıda ~0.95.
-    Hata oranı arttıkça güven düşer.
+    First success: 0.5, 3 successes: ~0.75, 10 successes: ~0.95.
+    Confidence decreases as error rate increases.
 
-    Formül: 1 / (1 + e^(-0.5 * (basari - hata - 1)))
-    - İlk kayıt (1 basari, 0 hata): 0.5
-    - 3 basari, 0 hata: ~0.73
-    - 10 basari, 0 hata: ~0.99
-    - 1 basari, 3 hata: ~0.12
+    Formula: 1 / (1 + e^(-0.5 * (basari - hata - 1)))
+    - First record (1 success, 0 errors): 0.5
+    - 3 successes, 0 errors: ~0.73
+    - 10 successes, 0 errors: ~0.99
+    - 1 success, 3 errors: ~0.12
     """
     import math
     net = basari - hata - 1  # -1 offset: ilk kayıtta 0.5
@@ -63,7 +63,7 @@ def _kademeli_guven(basari: int, hata: int) -> float:
 # ── Veritabanı ────────────────────────────────────────────────────────────
 
 def _kur(con: sqlite3.Connection) -> None:
-    """ogrenmeler tablosunu oluştur."""
+    """Create the ogrenmeler table."""
     con.executescript("""
         CREATE TABLE IF NOT EXISTS ogrenmeler (
             id              INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -128,18 +128,18 @@ def kaydet(
     kaynak_url: str | None = None,
 ) -> int:
     """
-    Yeni öğrenme kaydı oluştur veya varsa güncelle.
+    Create a new learning record or update if it already exists.
 
     Args:
-        hedef: Görev tanımı (örn. "nmap ile port tara")
-        kategori: "kali", "dron", "cad", "kali/network" vb.
-        icerik: Öğrenilen bilgi / çözüm
-        basari: Başarılı mı?
-        gecerlilik_gun: Kaç gün geçerli? (default: 180)
-        kaynak_url: Bilginin kaynağı (web URL'si) (default: None)
+        hedef: Task description (e.g. "scan ports with nmap")
+        kategori: "kali", "dron", "cad", "kali/network" etc.
+        icerik: Learned information / solution
+        basari: Was it successful?
+        gecerlilik_gun: Validity duration in days (default: 180)
+        kaynak_url: Source of the information (web URL) (default: None)
 
     Returns:
-        Kayıt ID'si
+        Record ID
     """
     _db_kur()
     bugun = date.today().isoformat()
@@ -206,17 +206,17 @@ def ara(
     gecerli_mi: bool = True,
 ) -> list[dict[str, Any]]:
     """
-    Hafızada benzer görev/çözüm ara.
+    Search memory for similar tasks/solutions.
 
-    Her sonuç için `durum` alanı:
+    Each result has a `durum` field:
       - "guvenilir" → guven_skoru >= 0.5
       - "belirsiz"  → guven_skoru < 0.5
 
     Args:
-        hedef: Aranan görev
-        kategori: Sınırla (None = tümü)
-        min_guven: Minimum güven skoru (0.0-1.0)
-        gecerli_mi: Sadece geçerlilik tarihi geçmemiş olanlar?
+        hedef: Task to search for
+        kategori: Filter by category (None = all)
+        min_guven: Minimum confidence score (0.0-1.0)
+        gecerli_mi: Only return records that haven't expired?
 
     Returns:
         [{"id", "hedef", "kategori", "icerik", "guven_skoru", "durum",
@@ -283,16 +283,16 @@ def hafizada_ara(
     min_guven: float = 0.3,
     gecerli_mi: bool = True,
 ) -> list[dict[str, Any]]:
-    """Alias: ara() ile aynı. Kullanıcı 'hafizada_ara()' dediğinde çalışır."""
+    """Alias: same as ara(). Works when user calls 'hafizada_ara()'."""
     return ara(hedef, kategori, min_guven, gecerli_mi)
 
 
 def guven_guncelle(kayit_id: int, basari: bool) -> float:
     """
-    Bir kaydın güven skorunu güncelle (başarı/hata sayısına göre).
+    Update a record's confidence score based on success/failure count.
 
     Returns:
-        Yeni güven skoru
+        New confidence score
     """
     with _yazma_kilit:
         with _baglanti() as con:
@@ -329,11 +329,11 @@ def guven_guncelle(kayit_id: int, basari: bool) -> float:
 
 def eski_kayitlari_temizle(gun_limiti: int = 200) -> int:
     """
-    Geçerlilik tarihi geçmiş kayıtları temizle.
-    Ama yüksek güvenli (>=0.8) olanları koru.
+    Remove expired records whose validity date has passed.
+    But keep high-confidence ones (>=0.8).
 
     Returns:
-        Silinen kayıt sayısı
+        Number of deleted records
     """
     _db_kur()
     with _yazma_kilit:
@@ -357,27 +357,27 @@ def isle(
     zorla: bool = False,
 ) -> tuple[T | dict | None, str]:
     """
-    *** ANA API — Hafıza-öncelikli görev çalıştırma ***
+    *** MAIN API — Memory-first task execution ***
 
-    Akış:
-        1. Hafızada benzer görev ara
-        2a. Bulundu + güven >= min_guven + geçerli → önbellekten döndür
-        2b. Bulunamadı veya güven düşük → calistir() fonksiyonunu çalıştır
-        3. Sonucu hafızaya kaydet
-        4. Sonucu döndür
+    Flow:
+        1. Search memory for similar task
+        2a. Found + confidence >= min_guven + valid → return from cache
+        2b. Not found or low confidence → run calistir() function
+        3. Save result to memory
+        4. Return result
 
     Args:
-        hedef: Görev tanımı
-        kategori: Kategori
-        calistir: Çalıştırılacak fonksiyon (None = sadece hafıza sorgula)
-        min_guven: Önbellek için minimum güven
-        gecerli_mi: Geçerlilik kontrolü yap?
-        zorla: True = hafızaya bakma, direkt çalıştır
+        hedef: Task description
+        kategori: Category
+        calistir: Function to execute (None = query memory only)
+        min_guven: Minimum confidence for cache
+        gecerli_mi: Check validity?
+        zorla: True = skip memory, execute directly
 
     Returns:
-        (sonuc, kaynak)
-        sonuc: calistir()'ın döndürdüğü değer veya hafızadaki kayıt
-        kaynak: "cache" (hafızadan) / "exec" (çalıştırıldı) / "not_found"
+        (result, source)
+        result: Value from calistir() or memory record
+        source: "cache" (from memory) / "exec" (executed) / "not_found"
     """
     _db_kur()
 
@@ -413,7 +413,7 @@ def isle(
 
 
 def istatistik() -> dict[str, Any]:
-    """Hafıza istatistikleri."""
+    """Memory statistics."""
     _db_kur()
     with _baglanti() as con:
         toplam = con.execute("SELECT COUNT(*) FROM ogrenmeler").fetchone()[0]
@@ -447,28 +447,28 @@ def belirsiz_gorev_cozumle(
     max_kategori: int = 3,
 ) -> dict[str, Any]:
     """
-    Belirsiz bir görev geldiğinde hafızadaki en alakalı kategorileri bulur
-    ve kullanıcıya tek bir tahmin önerisi hazırlar.
+    When an ambiguous task comes in, finds the most relevant category in memory
+    and prepares a single guess suggestion for the user.
 
-    Akış:
-        1. Görevi anahtar kelimelere ayır
-        2. Her kategori altındaki kayıtları tara
-        3. En alakalı kategoriyi + ilgili kaydı bul
-        4. Kullanıcıya soru formatında döndür
+    Flow:
+        1. Split the task into keywords
+        2. Scan records under each category
+        3. Find the most relevant category + matching record
+        4. Return in question format to the user
 
     Args:
-        hedef: Kullanıcının verdiği belirsiz görev (örn. "sistemi güvenli yap")
-        esik: Minimum benzerlik eşiği (0.0-1.0)
-        max_kategori: Önerilecek maksimum alternatif kategori sayısı
+        hedef: The user's ambiguous task (e.g. "make the system secure")
+        esik: Minimum similarity threshold (0.0-1.0)
+        max_kategori: Maximum number of alternative categories to suggest
 
     Returns:
         {
-            "tahmin_kategori": "kali/network" veya None,
-            "tahmin_kayit": {...} veya None,
+            "tahmin_kategori": "kali/network" or None,
+            "tahmin_kayit": {...} or None,
             "guven": 0.75,
             "alternatifler": [...],
-            "soru": "Sanırım port taraması yapmak istiyorsun, doğru mu?",
-            "ham_hedef": "sistemi güvenli yap"
+            "soru": "I think you want to do a port scan, is that correct?",
+            "ham_hedef": "make the system secure"
         }
     """
     _db_kur()
@@ -589,7 +589,7 @@ def belirsiz_gorev_cozumle(
 
 
 def _anahtar_kelimeler(metin: str) -> list[str]:
-    """Metni temizle ve anlamlı anahtar kelimelere ayır."""
+    """Clean text and split into meaningful keywords."""
     # Türkçe karakterleri normalize et
     temiz = metin.lower().strip()
     # Noktalama işaretlerini kaldır
@@ -606,12 +606,12 @@ def _benzerlik_skoru(
     kayit: dict[str, Any],
 ) -> float:
     """
-    İki metin arasındaki benzerlik skorunu hesapla.
+    Calculate similarity score between two texts.
 
-    3 faktör:
-    - Anahtar kelime eşleşmesi (hedef kayit.hedef)
-    - Kategori eşleşmesi (kelimeler kayit.kategori)
-    - Güven skoru bonusu
+    3 factors:
+    - Keyword match (target vs record.target)
+    - Category match (keywords vs record.category)
+    - Confidence score bonus
     """
     kayit_kelimeler = _anahtar_kelimeler(kayit["hedef"] + " " + kayit["kategori"])
     if not kayit_kelimeler:

@@ -1,23 +1,23 @@
 # -*- coding: utf-8 -*-
 """
-self_update.py — ReYMeN Otonom Self-Update Sistemi.
+self_update.py — ReYMeN Autonomous Self-Update System.
 
-GitHub'dan son release tag'ini kontrol eder, mevcut versiyonla karsilastirir,
-yeni versiyon varsa otomatik indirir ve kurar.
+Checks the latest release tag from GitHub, compares with current version,
+auto-downloads and installs if a new version is available.
 
-Kullanim:
+Usage:
     from reymen.sistem.self_update import (
         check_for_updates,
         perform_update,
         auto_update_check,
     )
 
-    # Tek seferlik kontrol
+    # One-time check
     sonuc = check_for_updates()
     if sonuc["guncel_var"]:
         perform_update()
 
-    # Otomatik (haftada 1 kontrol)
+    # Automatic (weekly check)
     auto_update_check()
 """
 
@@ -54,10 +54,10 @@ GUNLUK_KONTROL_ARALIGI = 24 * 3600
 
 
 def _git_remote_parse() -> tuple[str, str]:
-    """Git remote origin'den owner/repo bilgisini cikar.
+    """Extract owner/repo info from git remote origin.
 
     Returns:
-        (owner, repo) tuple'i. Bulunamazsa ("recaiozil-wq", "reymen-agean") fallback.
+        (owner, repo) tuple. Falls back to ("recaiozil-wq", "reymen-agean") if not found.
     """
     try:
         r = subprocess.run(
@@ -83,10 +83,10 @@ def _git_remote_parse() -> tuple[str, str]:
 
 
 def _mevcut_versiyon() -> str:
-    """pyproject.toml'dan mevcut versiyonu oku.
+    """Read current version from pyproject.toml.
 
     Returns:
-        Versiyon stringi (ornek: "2026.07.01") veya "0.0.0" bulunamazsa.
+        Version string (e.g. "2026.07.01") or "0.0.0" if not found.
     """
     if not PYPROJECT_TOML.exists():
         logger.warning("[SelfUpdate] pyproject.toml bulunamadi: %s", PYPROJECT_TOML)
@@ -105,19 +105,19 @@ def _mevcut_versiyon() -> str:
 
 
 def _versiyon_karsilastir(v1: str, v2: str) -> int:
-    """Iki versiyonu karsilastir.
+    """Compare two versions.
 
     Args:
-        v1: Mevcut versiyon
-        v2: Yeni versiyon
+        v1: Current version
+        v2: New version
 
     Returns:
-        -1: v1 < v2 (guncelleme gerekli)
+        -1: v1 < v2 (update needed)
          0: v1 == v2
-         1: v1 > v2 veya karsilastirilamaz
+         1: v1 > v2 or incomparable
     """
     def _parcala(v: str) -> list:
-        """Versiyon stringini rakam parcalarina ayir."""
+        """Split version string into numeric parts."""
         parcaciklar = []
         for p in v.replace("-", ".").split("."):
             try:
@@ -144,14 +144,14 @@ def _versiyon_karsilastir(v1: str, v2: str) -> int:
 
 
 def _github_latest_release(owner: str, repo: str) -> Optional[dict]:
-    """GitHub API'den en son release tag'ini al.
+    """Fetch the latest release tag from GitHub API.
 
     Args:
-        owner: GitHub owner/kullanici adi
-        repo: GitHub repo adi
+        owner: GitHub owner/username
+        repo: GitHub repo name
 
     Returns:
-        {"tag_name": ..., "html_url": ..., "body": ...} veya None
+        {"tag_name": ..., "html_url": ..., "body": ...} or None
     """
     import urllib.request as _ur
     import urllib.error as _ue
@@ -187,7 +187,7 @@ def _github_latest_release(owner: str, repo: str) -> Optional[dict]:
 
 
 def _git_pull() -> dict:
-    """git pull — ana branch'ten son degisiklikleri cek.
+    """git pull — fetch latest changes from main branch."""
 
     Returns:
         {"basarili": bool, "cikti": str, "hata": str}
@@ -207,7 +207,7 @@ def _git_pull() -> dict:
 
 
 def _pip_install_editable() -> dict:
-    """pip install -e . — bagimliliklari guncelle.
+    """pip install -e . — update dependencies."""
 
     Returns:
         {"basarili": bool, "cikti": str, "hata": str}
@@ -228,7 +228,7 @@ def _pip_install_editable() -> dict:
 
 
 def _pip_install_requirements() -> dict:
-    """requirements.txt varsa pip install -r requirements.txt.
+    """pip install -r requirements.txt if requirements.txt exists."""
 
     Returns:
         {"basarili": bool, "cikti": str, "hata": str}
@@ -252,7 +252,7 @@ def _pip_install_requirements() -> dict:
 
 
 def _son_kontrol_zamani() -> Optional[float]:
-    """Son kontrol zamanini oku.
+    """Read last check timestamp."""
 
     Returns:
         Unix timestamp (float) veya None
@@ -267,7 +267,7 @@ def _son_kontrol_zamani() -> Optional[float]:
 
 
 def _son_kontrol_kaydet() -> None:
-    """Su anki zamani son kontrol olarak kaydet."""
+    """Save current time as last check."""
     UPDATE_MARKER_DIR.mkdir(parents=True, exist_ok=True)
     UPDATE_MARKER_FILE.write_text(
         json.dumps({
@@ -282,7 +282,7 @@ def _son_kontrol_kaydet() -> None:
 
 
 def check_for_updates() -> dict:
-    """GitHub'dan son release'i kontrol et, mevcut versiyonla karsilastir.
+    """Check latest release from GitHub, compare with current version.
 
     Returns:
         {
@@ -291,7 +291,7 @@ def check_for_updates() -> dict:
             "son_versiyon": str | None,
             "son_tag": str | None,
             "release_url": str | None,
-            "guncel_var": bool,  # True = yeni versiyon mevcut
+            "guncel_var": bool,  # True = new version available
             "aciklama": str,
             "hata": str | None,
             "release_body": str | None,
@@ -354,7 +354,7 @@ def check_for_updates() -> dict:
 
 
 def perform_update() -> dict:
-    """Guncellemeyi gerceklestir: git pull + pip install.
+    """Perform the update: git pull + pip install.
 
     Returns:
         {
@@ -418,16 +418,16 @@ def perform_update() -> dict:
 
 
 def auto_update_check(force: bool = False) -> dict:
-    """Otomatik guncelleme kontrolu — haftada 1 kere calisir.
+    """Automatic update check — runs once a week.
 
-    Startup'ta cagrilir. Eger son kontrolden bu yana 7 gunden fazla
-    gecmisse kontrol eder ve guncelleme varsa otomatik kurar.
+    Called at startup. If more than 7 days have passed since last check,
+    checks and auto-installs if an update is available.
 
     Args:
-        force: True ise beklemeden kontrol et
+        force: If True, check immediately without waiting
 
     Returns:
-        check_for_updates() sonucu veya atlama durumu
+        check_for_updates() result or skip status
     """
     if not force:
         son_kontrol = _son_kontrol_zamani()
@@ -461,7 +461,7 @@ def auto_update_check(force: bool = False) -> dict:
 
 
 def auto_update_thread(interval: int = HAFTALIK_KONTROL_ARALIGI) -> None:
-    """Background thread'te periyodik guncelleme kontrolu.
+    """Periodic update checker running in a background thread."""
 
     Args:
         interval: Kac saniyede bir kontrol (varsayilan: 1 hafta)
@@ -478,7 +478,7 @@ _auto_update_thread: Optional[threading.Thread] = None
 
 
 def auto_update_baslat(interval: int = HAFTALIK_KONTROL_ARALIGI) -> None:
-    """Arkaplan otomatik guncelleme thread'ini baslat.
+    """Start background auto-update thread."""
 
     Args:
         interval: Kac saniyede bir kontrol (varsayilan: 1 hafta)

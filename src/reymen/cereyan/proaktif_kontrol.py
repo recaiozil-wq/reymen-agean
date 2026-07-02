@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
 """
-proaktif_kontrol.py — Her soru/cevap sonrası eksik kalan yönleri analiz eder.
+proaktif_kontrol.py — Analyzes missing aspects after each question/answer.
 
-Ne yapar:
-  1. Verilen cevabı analiz eder: hangi açılardan eksik?
-  2. Kullanıcı sorusuyla karşılaştırır: istenen her şey verilmiş mi?
-  3. Eksik kategorileri tespit eder (kaynak, tablo, örnek, edge case, nicel veri)
-  4. Öğrenir: hangi tip sorularda hangi eksikler tekrarlanıyor?
-  5. Bir sonraki benzer soruda proaktif olarak eksikleri kapatır
+What it does:
+  1. Analyzes the given answer: which angles are missing?
+  2. Compares with the user question: has everything requested been provided?
+  3. Identifies missing categories (source, table, example, edge case, quantitative data)
+  4. Learns: which types of questions tend to have which repeated missing parts?
+  5. Proactively fills gaps in the next similar question
 
-Kullanım:
+Usage:
     denetci = ProaktifDenetci()
     analiz = denetci.soru_cevap_analiz(soru, cevap)
     eksikler = denetci.eksik_bul(analiz)
-    denetci.ders_al(analiz)  # Gelecek için öğren
+    denetci.ders_al(analiz)  # Learn for the future
 
-Entegrasyon:
-    conversation_loop.coz() sonunda otomatik çağrılır.
+Integration:
+    Called automatically at the end of conversation_loop.coz().
 """
 
 import json
@@ -55,7 +55,7 @@ CEVAP_KALITE_KONTROL = [
 
 
 class ProaktifDenetci:
-    """Her soru/cevap sonrası eksikleri analiz eder ve öğrenir."""
+    """Analyzes missing aspects after each question/answer and learns from them."""
 
     def __init__(self, db_yol: Optional[Path] = None):
         ROOT = Path(__file__).resolve().parent.parent.parent.parent
@@ -98,7 +98,7 @@ class ProaktifDenetci:
             """)
 
     def soru_cevap_analiz(self, soru: str, cevap: str) -> dict:
-        """Bir soru/cevap çiftini analiz eder ve eksikleri döndürür."""
+        """Analyzes a question/answer pair and returns missing aspects."""
         baslama = time.time()
 
         # Soruda hangi kategoriler talep edilmiş?
@@ -149,12 +149,12 @@ class ProaktifDenetci:
         return self._son_analiz
 
     def eksik_bul(self, analiz: Optional[dict] = None) -> list[str]:
-        """Mevcut analizdeki eksikleri döndürür."""
+        """Returns missing items from the current analysis."""
         a = analiz or self._son_analiz or {}
         return a.get("eksikler", [])
 
     def ders_al(self, analiz: Optional[dict] = None):
-        """Analizden ders çıkarır, tekrarlanan eksikleri takip eder."""
+        """Extracts lessons from the analysis, tracks repeated missing items."""
         a = analiz or self._son_analiz
         if not a:
             return
@@ -186,7 +186,7 @@ class ProaktifDenetci:
                 ))
 
     def en_sik_eksikler(self, limit: int = 5) -> list[tuple]:
-        """En sık tekrarlanan eksik kategorilerini döndürür."""
+        """Returns the most frequently repeated missing categories."""
         with sqlite3.connect(self._db) as vt:
             cur = vt.execute(
                 "SELECT kategori, toplam_eksik FROM eksik_takip ORDER BY toplam_eksik DESC LIMIT ?",
@@ -195,7 +195,7 @@ class ProaktifDenetci:
             return cur.fetchall()
 
     def proaktif_uyari(self, soru: str) -> Optional[str]:
-        """Benzer sorular için geçmiş eksiklerden uyarı üretir."""
+        """Generates a warning from past missing items for similar questions."""
         en_sik = self.en_sik_eksikler(3)
         if not en_sik:
             return None
@@ -210,7 +210,7 @@ class ProaktifDenetci:
         return None
 
     def durum_raporu(self) -> str:
-        """Kısa durum raporu üretir."""
+        """Produces a short status report."""
         en_sik = self.en_sik_eksikler(5)
         with sqlite3.connect(self._db) as vt:
             cur = vt.execute("SELECT COUNT(*) FROM analiz_gecmisi")
@@ -227,7 +227,7 @@ _proaktif_ornegi: Optional[ProaktifDenetci] = None
 
 
 def proaktif_baslat() -> ProaktifDenetci:
-    """Singleton ProaktifDenetci başlatır."""
+    """Starts a singleton ProaktifDenetci."""
     global _proaktif_ornegi
     if _proaktif_ornegi is None:
         _proaktif_ornegi = ProaktifDenetci()
@@ -235,7 +235,7 @@ def proaktif_baslat() -> ProaktifDenetci:
 
 
 def soru_sonrasi_kontrol(soru: str, cevap: str) -> dict:
-    """Her soru/cevap sonrası çağrılacak ana fonksiyon."""
+    """Main function to be called after each question/answer."""
     denetci = proaktif_baslat()
     analiz = denetci.soru_cevap_analiz(soru, cevap)
 

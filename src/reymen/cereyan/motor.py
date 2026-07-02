@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-"""motor.py — Eylem çözümleyici. tools/ klasöründeki araçları kullanır.
-LLM çıktısından 'Eylem: ARAÇ(...)' yakalar, ToolRegistry üzerinden
-yönlendirir. Dosya işlemlerinde file_safety + path_security kullanır.
+"""motor.py — Action resolver. Uses tools from the tools/ folder.
+Catches 'Action: TOOL(...)' from LLM output, routes via ToolRegistry.
+Uses file_safety + path_security for file operations.
 
-Bu dosya Hermes Agent'ten esinlenilmistir.
-Apache 2.0 Lisansi — github.com/NousResearch/hermes-agent
+This file is inspired by Hermes Agent.
+Apache 2.0 License — github.com/NousResearch/hermes-agent
 """
 
 from typing import Any, Optional, Dict, List, Tuple, Union

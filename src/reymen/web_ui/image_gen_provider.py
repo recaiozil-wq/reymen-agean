@@ -1,8 +1,8 @@
 """
-🎨 ReYMeN Image Gen Provider — Görsel üretme katmanı.
+🎨 ReYMeN Image Gen Provider — Image generation layer.
 
-API key gerektirmeyen, konfigürasyondan beslenen,
-plugins/image_gen/ altındaki provider'ları otomatik keşfeder.
+No API key required, fed from configuration,
+auto-discovers providers under plugins/image_gen/.
 """
 
 from __future__ import annotations
@@ -63,7 +63,7 @@ def error_response(
 
 
 def save_url_image(url: str, provider: str, prompt: str) -> Tuple[str, str]:
-    """URL'den görsel indir ve cache'e kaydet. (url, local_path) döndür."""
+    """Download image from URL and save to cache. Returns (url, local_path)."""
     import requests
     import hashlib
 
@@ -84,7 +84,7 @@ def save_url_image(url: str, provider: str, prompt: str) -> Tuple[str, str]:
 
 
 def save_b64_image(b64_data: str, provider: str, prompt: str) -> Tuple[str, str]:
-    """Base64'ten görsel kaydet. (data_uri, local_path) döndür."""
+    """Save image from base64. Returns (data_uri, local_path)."""
     import base64
     import hashlib
 
@@ -113,9 +113,9 @@ def save_b64_image(b64_data: str, provider: str, prompt: str) -> Tuple[str, str]
 
 
 def discover_providers() -> List[Dict[str, str]]:
-    """plugins/image_gen/ altındaki provider'ları keşfet.
+    """Discover providers under plugins/image_gen/.
 
-    Her bir __init__.py dosyası olan klasör bir provider'dır.
+    Each directory with an __init__.py is a provider.
     """
     plugins_dir = PROJE_KOK / "plugins" / "image_gen"
     providers = []
@@ -163,11 +163,11 @@ def generate_image_simple(
     aspect_ratio: str = DEFAULT_ASPECT_RATIO,
     model: str = "",
 ) -> Dict[str, Any]:
-    """API key gerektirmeyen, basit görsel üretme.
+    """Simple image generation without API key.
 
-    1. Önce plugins/image_gen/{provider_id} import'ını dene
-    2. Olmazsa gerçek API'leri dene (ortam değişkenlerinden key al)
-    3. Hiçbiri çalışmazsa simüle edilmiş görsel döndür
+    1. Try importing plugins/image_gen/{provider_id}
+    2. If not available, try real APIs (from env vars)
+    3. If nothing works, return a simulated image
     """
     # Önce eklenti üzerinden dene
     result = _try_plugin_provider(prompt, provider_id, aspect_ratio, model)
@@ -186,7 +186,7 @@ def generate_image_simple(
 def _try_plugin_provider(
     prompt: str, provider_id: str, aspect_ratio: str, model: str
 ) -> Dict[str, Any]:
-    """plugins/image_gen/ altındaki provider'ı import etmeyi dene."""
+    """Try to import the provider from plugins/image_gen/."""
     try:
         import importlib
 
@@ -233,7 +233,7 @@ def _try_plugin_provider(
 def _try_direct_api(
     prompt: str, provider_id: str, aspect_ratio: str, model: str
 ) -> Dict[str, Any]:
-    """Gerçek API'leri dene — ortam değişkenlerinden key oku."""
+    """Try real APIs — read keys from environment variables."""
     import requests
 
     # Aspect ratio'yu API parametresine çevir
@@ -310,7 +310,7 @@ def _try_direct_api(
 
 
 def _generate_placeholder(prompt: str, provider_id: str, model: str) -> Dict[str, Any]:
-    """API key yoksa placeholder/SVG görsel oluştur."""
+    """Generate placeholder/SVG image when no API key is available."""
     IMAGE_CACHE.mkdir(parents=True, exist_ok=True)
 
     import hashlib
@@ -346,7 +346,7 @@ def _generate_placeholder(prompt: str, provider_id: str, model: str) -> Dict[str
 
 
 def _escape_svg(text: str) -> str:
-    """SVG içinde kullanılmak üzere metni kaçır."""
+    """Escape text for use in SVG."""
     return (text
             .replace("&", "&amp;")
             .replace("<", "&lt;")
@@ -360,7 +360,7 @@ def _escape_svg(text: str) -> str:
 
 
 def get_history(limit: int = 50) -> List[Dict[str, Any]]:
-    """JSON geçmiş dosyasından son kayıtları oku."""
+    """Read recent records from JSON history file."""
     if not HISTORY_FILE.exists():
         return []
     try:
@@ -375,7 +375,7 @@ def get_history(limit: int = 50) -> List[Dict[str, Any]]:
 
 
 def add_history(entry: Dict[str, Any]) -> None:
-    """JSON geçmiş dosyasına kayıt ekle."""
+    """Add record to JSON history file."""
     history = get_history(limit=500)
     history.insert(0, entry)
     try:
@@ -389,6 +389,6 @@ def add_history(entry: Dict[str, Any]) -> None:
 
 
 def clear_history() -> None:
-    """Geçmişi temizle."""
+    """Clear history."""
     if HISTORY_FILE.exists():
         HISTORY_FILE.unlink()

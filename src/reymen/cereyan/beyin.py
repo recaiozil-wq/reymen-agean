@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-beyin.py — Çok-sağlayıcılı LLM bağlantı katmanı.
+beyin.py — Multi-provider LLM connection layer.
 
-Desteklenen sağlayıcılar:
+Supported providers:
     LM Studio · DeepSeek · OpenAI · Anthropic · Groq · Azure OpenAI
     AWS Bedrock · Google Gemini / Vertex AI · Moonshot · Ollama
 
-Entegre modüller (opsiyonel):
-    credential_pool   — API anahtarı havuzu
-    prompt_caching    — İstem önbellekleme
-    nous_rate_guard   — Hız sınırlayıcı
-    providers         — Sağlayıcı kayıt defteri
-    account_usage     — Kullanım takibi
-    akilli_yonlendirici — Görev bazlı model yönlendirme
+Integrated modules (optional):
+    credential_pool   — API key pool
+    prompt_caching    — Prompt caching
+    nous_rate_guard   — Rate limiter
+    providers         — Provider registry
+    account_usage     — Usage tracking
+    akilli_yonlendirici — Task-based model routing
 """
 
 from __future__ import annotations

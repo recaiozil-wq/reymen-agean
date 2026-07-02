@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
 """
-adaptif_ogrenme.py — Adaptif öğrenme ve self-correction modülü.
+adaptif_ogrenme.py — Adaptive learning and self-correction module.
 
-İki işlev:
-  1. Kullanıcı tercihleri: "hayır, böyle yap" gibi düzeltmeleri kaydeder.
-     Kaydedilen tercihler sonraki oturumlarda sistem promptuna enjekte edilir.
+Two functions:
+  1. User preferences: saves corrections like "no, do it this way".
+     Saved preferences are injected into the system prompt in subsequent sessions.
 
-  2. Self-correction: Bir sonraki modül tarafından kullanılmak üzere
-     Python kodu test sonucu + otomatik düzeltme döngüsü API'si.
+  2. Self-correction: Python code test result + automatic correction loop API
+     for use by the next module.
 
-Kullanim::
+Usage::
 
     ao = AdaptifOgrenme()
 
-    # Tercih tespiti (main.py'deki ReAct döngüsünde kullanılır)
-    ao.kullanici_mesaji_isle("hayır, dosyaları UTF-8 ile yaz her zaman")
+    # Preference detection (used in main.py's ReAct loop)
+    ao.kullanici_mesaji_isle("no, always write files with UTF-8")
 
-    # Sistem prompt enjeksiyonu
+    # System prompt injection
     tercihler = ao.tercih_blogu_al()
 
     # Python self-correction
@@ -57,7 +57,7 @@ _DUZELTME_RE = re.compile("|".join(_DUZELTME_SINYALLERI), re.IGNORECASE)
 
 
 class AdaptifOgrenme:
-    """Kullanıcı tercihlerini kaydeden ve self-correction sağlayan sınıf."""
+    """Class that saves user preferences and provides self-correction."""
 
     def __init__(self, tercih_dosyasi: str = None):
         self._dosya = Path(tercih_dosyasi) if tercih_dosyasi else TERCIH_DOSYASI
@@ -85,10 +85,10 @@ class AdaptifOgrenme:
             print(f"[Adaptif]: Tercih kaydetme hatası: {e}")
 
     def tercih_ekle(self, metin: str, kaynak: str = "kullanici") -> bool:
-        """Yeni tercih ekle. Aynı metin zaten varsa eklemez.
+        """Add a new preference. Does not add if the same text already exists.
 
         Returns:
-            True: eklendi, False: zaten mevcut
+            True: added, False: already exists
         """
         metin = metin.strip()[:300]
         if not metin:
@@ -109,17 +109,17 @@ class AdaptifOgrenme:
         return True
 
     def kullanici_mesaji_isle(self, mesaj: str) -> bool:
-        """Kullanıcı mesajında düzeltme sinyali varsa tercihe çevir.
+        """Convert a user message to a preference if it contains a correction signal.
 
         Returns:
-            True: düzeltme sinyali bulundu ve kaydedildi
+            True: correction signal found and saved
         """
         if _DUZELTME_RE.search(mesaj):
             return self.tercih_ekle(mesaj, kaynak="kullanici_duzeltme")
         return False
 
     def tercih_blogu_al(self, limit: int = 10) -> str:
-        """Son N tercihi sistem promptuna enjekte edilecek format olarak döndürür."""
+        """Return the last N preferences in a format suitable for system prompt injection."""
         if not self._tercihler:
             return ""
         son = self._tercihler[-limit:]
@@ -153,16 +153,16 @@ class AdaptifOgrenme:
         provider=None,
         max_deneme: int = 2,
     ) -> str:
-        """Python kodu çalıştır, hata varsa LLM ile düzelt ve yeniden dene.
+        """Run Python code, fix errors with LLM and retry.
 
         Args:
-            kod:        Çalıştırılacak Python kodu.
-            motor:      Motor örneği (PYTHON_CALISTIR için).
-            provider:   LLM provider (Beyin örneği). None ise sadece hata döner.
-            max_deneme: Kaç kere düzeltme denemesi yapılacak.
+            kod:        Python code to execute.
+            motor:      Motor instance (for PYTHON_CALISTIR).
+            provider:   LLM provider (Beyin instance). None returns just the error.
+            max_deneme: Maximum number of correction attempts.
 
         Returns:
-            Çalışan kodun çıktısı veya son hata mesajı.
+            Output of the running code or the final error message.
         """
         mevcut_kod = kod
         son_hata = ""
@@ -207,7 +207,7 @@ class AdaptifOgrenme:
 # ── Motor entegrasyon yardımcısı ──────────────────────────────────────────────
 
 def adaptif_ogrenme_sistemi_kur() -> AdaptifOgrenme:
-    """Global AdaptifOgrenme örneği oluştur."""
+    """Create a global AdaptifOgrenme instance."""
     return AdaptifOgrenme()
 
 

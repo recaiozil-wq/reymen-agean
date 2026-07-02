@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-tool_executor.py — Arac yurutucu modulu.
+tool_executor.py — Tool executor module.
 
-Arac cagrilarini guvenli sekilde yurutur,
-timeout yonetimi ve gecmis kaydi yapar.
+Safely executes tool calls,
+manages timeout and logs history.
 """
 
 import time
@@ -19,18 +19,18 @@ logger = logging.getLogger(__name__)
 
 class ToolExecutor:
     """
-    Arac yurutucu.
+    Tool executor.
 
-    Tool cagrilarini guvenli sekilde calistirir,
-    timeout yonetir ve islem gecmisini tutar.
+    Safely executes tool calls,
+    manages timeouts and maintains operation history.
     """
 
     def __init__(self, varsayilan_timeout: float = 30.0):
         """
-        ToolExecutor baslatici.
+        ToolExecutor initializer.
 
         Args:
-            varsayilan_timeout: Varsayilan timeout (saniye)
+            varsayilan_timeout: Default timeout (seconds)
         """
         self._varsayilan_timeout = varsayilan_timeout
         self._aktif_islemler: Dict[str, Dict[str, Any]] = {}
@@ -44,14 +44,14 @@ class ToolExecutor:
         **params
     ) -> Dict[str, Any]:
         """
-        Bir araci parametrelerle calistirir.
+        Executes a tool with given parameters.
 
         Args:
-            arac: Calistirilacak fonksiyon
-            **params: Arac parametreleri
+            arac: Function to execute
+            **params: Tool parameters
 
         Returns:
-            dict: Islemin sonucu
+            dict: Result of the operation
         """
         islem_id = f"islem_{int(time.time() * 1000)}"
         baslangic = time.time()

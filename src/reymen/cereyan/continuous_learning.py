@@ -1,24 +1,24 @@
 # -*- coding: utf-8 -*-
 """
-continuous_learning.py — Session'lar Arası Sürekli Öğrenme Sistemi.
+continuous_learning.py — Cross-Session Continuous Learning System.
 
-ReYMeN'teki "Session'lar arasi ogrenme" ozelliginin ReYMeN implementasyonu.
+ReYMeN's implementation of the "inter-session learning" feature.
 
-Ne yapar:
-- Her session sonunda ogrenilenleri kaydeder (beceri, hata, cozum)
-- Yeni session basinda gecmis ogrenmeleri yukler
-- LLM context'ine "gecmiste ogrendiklerim" olarak enjekte eder
-- closed_learning_loop + self_improvement + ogrenme modullerini tek cati
+What it does:
+- Saves learnings at the end of each session (skills, errors, solutions)
+- Loads past learnings at the start of a new session
+- Injects them into the LLM context as "previously learned"
+- Combines closed_learning_loop + self_improvement + learning modules under one roof
 
-Entegrasyon:
+Integration:
     from reymen.cereyan.continuous_learning import (
         session_baslat, ogrenmeyi_kaydet,
         session_bitir, ogrenme_baglani_al
     )
-    session_baslat(session_id)       # conversation_loop basinda
-    ogrenmeyi_kaydet("beceri", ...)   # gorev sonrasi
-    session_bitir(session_id)         # conversation_loop sonunda
-    baglam = ogrenme_baglani_al()     # system prompt'a eklenecek
+    session_baslat(session_id)       # at conversation_loop start
+    ogrenmeyi_kaydet("beceri", ...)   # after task completion
+    session_bitir(session_id)         # at conversation_loop end
+    baglam = ogrenme_baglani_al()     # to be added to system prompt
 """
 
 from __future__ import annotations

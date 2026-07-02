@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
 """
-obsidian_tool.py — ReYMeN Obsidian Vault Entegrasyonu.
+obsidian_tool.py — ReYMeN Obsidian Vault Integration.
 
-Obsidian vault (.md) içinde:
-  - Dosya listeleme
-  - Dosya okuma
-  - Yeni not oluşturma
-  - Not güncelleme
-  - Anahtar kelime / grep araması
-  - Vault yapısını keşfetme
+Inside Obsidian vault (.md):
+  - List files
+  - Read files
+  - Create new notes
+  - Update notes
+  - Keyword / grep search
+  - Explore vault structure
 
-Vault yolu:
+Vault path:
   1. Config: config.yaml > obsidian.vault_path
-  2. Parametre: kullanıcı araca vault yolunu parametre olarak verebilir
-  3. Varsayılan: proje kökünde .obsidian/ klasörü aranır
+  2. Parameter: user can pass vault path directly to the tool
+  3. Default: searches for .obsidian/ folder in project root
 
-Bağımlılıklar: yok (sadece Python stdlib)
+Dependencies: none (Python stdlib only)
 """
 
 import logging
@@ -39,13 +39,13 @@ MAKS_ARAMA_SONUC = 50
 
 
 def _vault_yolu_bul(istenen_yol: str = "") -> Tuple[bool, str]:
-    """Obsidian vault yolunu bul.
+    """Find the Obsidian vault path.
 
-    Sırasıyla:
-      1. İstenen parametre yolu (kullanıcı tarafından verilmişse)
+    Priority:
+      1. Requested parameter path (if provided by user)
       2. config.yaml > obsidian.vault_path
-      3. Proje kökünde .obsidian/ klasörü ara
-      4. Kullanıcı ana dizininde Obsidian vault'ları tara
+      3. Search for .obsidian/ folder in project root
+      4. Scan Obsidian vaults in user home directory
 
     Returns:
         (basarili_mi, vault_yolu | hata_mesaji)
@@ -98,7 +98,7 @@ def _vault_yolu_bul(istenen_yol: str = "") -> Tuple[bool, str]:
 
 
 def _yol_guvenli_mi(vault_kok: str, hedef: str) -> Tuple[bool, str]:
-    """Hedef yolun vault içinde kaldığını doğrula (directory traversal koruması)."""
+    """Verify target path stays within vault (directory traversal protection)."""
     try:
         kok = Path(vault_kok).resolve()
         hedef_abs = (kok / hedef).resolve()
@@ -110,10 +110,10 @@ def _yol_guvenli_mi(vault_kok: str, hedef: str) -> Tuple[bool, str]:
 
 
 def _md_dosyalari_listele(vault_kok: str, alt_dizin: str = "", uzanti: str = ".md") -> List[dict]:
-    """Vault içindeki .md dosyalarını listele.
+    """List .md files in the vault.
 
     Returns:
-        [{"yol": "goreceli/yol/not.md", "ad": "not", "boyut": 1234, "degisti": "2024-01-01"}, ...]
+        [{"yol": "relative/path/note.md", "ad": "note", "boyut": 1234, "degisti": "2024-01-01"}, ...]
     """
     baslangic = Path(vault_kok)
     if alt_dizin:
@@ -150,7 +150,7 @@ def _md_dosyalari_listele(vault_kok: str, alt_dizin: str = "", uzanti: str = ".m
 
 
 def _md_oku(vault_kok: str, dosya_yolu: str) -> Tuple[bool, str]:
-    """Bir .md dosyasının içeriğini oku.
+    """Read the contents of a .md file.
 
     Returns:
         (basarili_mi, icerik | hata_mesaji)
@@ -175,12 +175,12 @@ def _md_oku(vault_kok: str, dosya_yolu: str) -> Tuple[bool, str]:
 
 
 def _not_olustur(vault_kok: str, dosya_yolu: str, icerik: str) -> Tuple[bool, str]:
-    """Yeni bir .md notu oluştur.
+    """Create a new .md note.
 
     Args:
-        vault_kok: Vault kök dizini
-        dosya_yolu: Vault'a göre hedef yol (örn: "günlük/2024-01-01.md")
-        icerik: Markdown içeriği
+        vault_kok: Vault root directory
+        dosya_yolu: Target path relative to vault (e.g. "gunluk/2024-01-01.md")
+        icerik: Markdown content
 
     Returns:
         (basarili_mi, sonuc_mesaji | hata_mesaji)
@@ -208,13 +208,13 @@ def _not_olustur(vault_kok: str, dosya_yolu: str, icerik: str) -> Tuple[bool, st
 
 
 def _not_guncelle(vault_kok: str, dosya_yolu: str, icerik: str, mod: str = "overwrite") -> Tuple[bool, str]:
-    """Mevcut bir .md notunu güncelle.
+    """Update an existing .md note.
 
     Args:
-        vault_kok: Vault kök dizini
-        dosya_yolu: Vault'a göre dosya yolu
-        icerik: Yeni içerik veya eklenecek içerik
-        mod: "overwrite" (tamamen değiştir) | "append" (sonuna ekle) | "prepend" (başına ekle)
+        vault_kok: Vault root directory
+        dosya_yolu: File path relative to vault
+        icerik: New content or content to add
+        mod: "overwrite" (replace entirely) | "append" (append to end) | "prepend" (prepend to start)
 
     Returns:
         (basarili_mi, sonuc_mesaji | hata_mesaji)
@@ -246,13 +246,13 @@ def _not_guncelle(vault_kok: str, dosya_yolu: str, icerik: str, mod: str = "over
 
 def _vault_ara(vault_kok: str, sorgu: str, dosya_adi_filtre: str = "", 
                harf_duyarlilik: bool = False) -> Tuple[bool, str]:
-    """Vault içinde anahtar kelime / grep araması yap.
+    """Search vault by keyword / grep.
 
     Args:
-        vault_kok: Vault kök dizini
-        sorgu: Aranacak metin (regex destekler)
-        dosya_adi_filtre: Sadece belirli dosya adlarında ara (örn: "gunluk/*")
-        harf_duyarlilik: Büyük/küçük harf duyarlılığı
+        vault_kok: Vault root directory
+        sorgu: Text to search (supports regex)
+        dosya_adi_filtre: Search only specific filenames (e.g. "gunluk/*")
+        harf_duyarlilik: Case sensitivity
 
     Returns:
         (basarili_mi, sonuclar | hata_mesaji)
@@ -309,7 +309,7 @@ def _vault_ara(vault_kok: str, sorgu: str, dosya_adi_filtre: str = "",
 
 
 def _vault_bilgisi(vault_kok: str) -> Tuple[bool, str]:
-    """Vault hakkında özet bilgi döndür."""
+    """Return summary info about the vault."""
     try:
         kok = Path(vault_kok)
         md_dosyalar = list(kok.rglob("*.md"))
@@ -340,15 +340,15 @@ def _vault_bilgisi(vault_kok: str) -> Tuple[bool, str]:
 
 
 def _obsidian_liste_araci(ham: str) -> str:
-    """OBSIDIAN_LISTE: Vault'taki .md dosyalarını listele.
+    """OBSIDIAN_LISTE: List .md files in the vault.
 
-    Parametreler (virgülle ayrılmış):
-      - vault_yolu (ops): Vault dizini (boşsa config/varsayılan kullanılır)
-      - alt_dizin (ops): Sadece belirli alt dizindekiler
-      - uzanti (ops): Dosya uzantısı (varsayılan: .md)
+    Parameters (pipe-separated):
+      - vault_yolu (opt): Vault directory (empty = use config/default)
+      - alt_dizin (opt): Only show files in specific subdirectory
+      - uzanti (opt): File extension (default: .md)
 
-    Örnek: OBSIDIAN_LISTE(vault_yolu|alt_dizin)
-    Örnek: OBSIDIAN_LISTE(C:/Users/marko/Obsidian Main|gunluk)
+    Example: OBSIDIAN_LISTE(vault_yolu|alt_dizin)
+    Example: OBSIDIAN_LISTE(C:/Users/marko/Obsidian Main|gunluk)
     """
     try:
         params = [p.strip() for p in ham.split("|", 2)] if ham.strip() else [""]
@@ -378,14 +378,14 @@ def _obsidian_liste_araci(ham: str) -> str:
 
 
 def _obsidian_oku_araci(ham: str) -> str:
-    """OBSIDIAN_OKU: Bir .md dosyasının içeriğini oku.
+    """OBSIDIAN_OKU: Read the contents of a .md file.
 
-    Parametreler (virgülle ayrılmış):
-      - dosya_yolu: Vault'a göre dosya yolu (örn: "gunluk/not.md")
-      - vault_yolu (ops): Vault dizini
+    Parameters (pipe-separated):
+      - dosya_yolu: File path relative to vault (e.g. "gunluk/not.md")
+      - vault_yolu (opt): Vault directory
 
-    Örnek: OBSIDIAN_OKU(gunluk/2024-01-01.md)
-    Örnek: OBSIDIAN_OKU(projeler/not.md|C:/Users/marko/Obsidian Main)
+    Example: OBSIDIAN_OKU(gunluk/2024-01-01.md)
+    Example: OBSIDIAN_OKU(projeler/not.md|C:/Users/marko/Obsidian Main)
     """
     try:
         params = [p.strip() for p in ham.split("|", 1)] if ham.strip() else [""]
@@ -413,15 +413,15 @@ def _obsidian_oku_araci(ham: str) -> str:
 
 
 def _obsidian_yaz_araci(ham: str) -> str:
-    """OBSIDIAN_YAZ: Yeni bir .md notu oluştur.
+    """OBSIDIAN_YAZ: Create a new .md note.
 
-    Parametreler (|| ile ayrılmış — içerikte virgül/pipe olabilir):
-      - dosya_yolu: Vault'a göre hedef yol
-      - icerik: Markdown içeriği
-      - vault_yolu (ops): Vault dizini
+    Parameters (|| separated — content may contain pipes/commas):
+      - dosya_yolu: Target path relative to vault
+      - icerik: Markdown content
+      - vault_yolu (opt): Vault directory
 
-    Örnek: OBSIDIAN_YAZ(gunluk/not.md||# Başlık\n\nİçerik burada.)
-    Örnek: OBSIDIAN_YAZ(projeler/not.md||# Proje\\nPlan|C:/Users/marko/Obsidian)
+    Example: OBSIDIAN_YAZ(gunluk/not.md||# Title\n\nContent here.)
+    Example: OBSIDIAN_YAZ(projeler/not.md||# Project\\nPlan|C:/Users/marko/Obsidian)
     """
     try:
         # İlk parametre: dosya_yolu
@@ -461,15 +461,15 @@ def _obsidian_yaz_araci(ham: str) -> str:
 
 
 def _obsidian_guncelle_araci(ham: str) -> str:
-    """OBSIDIAN_GUNCELLE: Mevcut bir .md notunu güncelle.
+    """OBSIDIAN_GUNCELLE: Update an existing .md note.
 
-    Parametreler (|| ile ayrılmış):
-      - dosya_yolu: Vault'a göre dosya yolu
-      - icerik: Yeni içerik
-      - mod (ops): overwrite | append | prepend (varsayılan: overwrite)
+    Parameters (|| separated):
+      - dosya_yolu: File path relative to vault
+      - icerik: New content
+      - mod (opt): overwrite | append | prepend (default: overwrite)
 
-    Örnek: OBSIDIAN_GUNCELLE(gunluk/not.md||# Güncellendi||append)
-    Örnek: OBSIDIAN_GUNCELLE(projeler/not.md||# Yeni başlık||overwrite)
+    Example: OBSIDIAN_GUNCELLE(gunluk/not.md||# Updated||append)
+    Example: OBSIDIAN_GUNCELLE(projeler/not.md||# New title||overwrite)
     """
     try:
         parts = ham.split("||")
@@ -500,16 +500,16 @@ def _obsidian_guncelle_araci(ham: str) -> str:
 
 
 def _obsidian_ara_araci(ham: str) -> str:
-    """OBSIDIAN_ARA: Vault içinde metin araması yap.
+    """OBSIDIAN_ARA: Search vault text.
 
-    Parametreler (| ile ayrılmış):
-      - sorgu: Aranacak metin (regex destekler)
-      - vault_yolu (ops): Vault dizini
-      - harf_duyarli (ops): true|false (varsayılan: false)
+    Parameters (| separated):
+      - sorgu: Text to search (supports regex)
+      - vault_yolu (opt): Vault directory
+      - harf_duyarli (opt): true|false (default: false)
 
-    Örnek: OBSIDIAN_ARA(merhaba dünya)
-    Örnek: OBSIDIAN_ARA(görev|C:/Users/marko/Obsidian)
-    Örnek: OBSIDIAN_ARA(Regex.*ornek||true)
+    Example: OBSIDIAN_ARA(hello world)
+    Example: OBSIDIAN_ARA(task|C:/Users/marko/Obsidian)
+    Example: OBSIDIAN_ARA(Regex.*example||true)
     """
     try:
         params = [p.strip() for p in ham.split("|", 2)] if ham.strip() else [""]
@@ -536,13 +536,13 @@ def _obsidian_ara_araci(ham: str) -> str:
 
 
 def _obsidian_bilgi_araci(ham: str) -> str:
-    """OBSIDIAN_BILGI: Vault hakkında özet bilgi göster.
+    """OBSIDIAN_BILGI: Show summary info about the vault.
 
-    Parametreler:
-      - vault_yolu (ops): Vault dizini
+    Parameters:
+      - vault_yolu (opt): Vault directory
 
-    Örnek: OBSIDIAN_BILGI
-    Örnek: OBSIDIAN_BILGI(C:/Users/marko/Obsidian Main)
+    Example: OBSIDIAN_BILGI
+    Example: OBSIDIAN_BILGI(C:/Users/marko/Obsidian Main)
     """
     try:
         istenen_vault = ham.strip() if ham.strip() else ""
@@ -563,10 +563,10 @@ def _obsidian_bilgi_araci(ham: str) -> str:
 
 
 def motor_kaydet(motor) -> None:
-    """Motor'a Obsidian araçlarını kaydet.
+    """Register Obsidian tools with the Motor.
 
-    Motor._plugin_moduller_yukle() içindeki modül listesinden
-    otomatik çağrılır.
+    Automatically called from the module list in
+    Motor._plugin_moduller_yukle().
     """
     if not hasattr(motor, "_plugin_arac_kaydet"):
         return
