@@ -30,6 +30,7 @@ __pycache__/
 logs/
 
 # Database files
+# NOTE: Large .db files (>100MB) should use Git LFS: git lfs track "*.db"
 *.db
 *.db-shm
 *.db-wal
@@ -120,3 +121,6 @@ hyperframes_output/
 .ReYMeN/nightly/
 .ReYMeN/pasa38_log.txt
 .ReYMeN/update_check.json
+
+# Vector database — ChromaDB persistence
+chroma_db/
