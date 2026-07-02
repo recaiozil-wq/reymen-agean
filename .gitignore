@@ -115,7 +115,7 @@ cua_log.txt
 AGENTS.md.bak
 git-helper*.sh
 github_push.py
-src/reymen/
+# src/reymen/ — ReYMeN çekirdek modülleri (aktif geliştirme, takip edilir)
 src/.ReYMeN/
 reports/
 jobs/
