@@ -115,7 +115,11 @@ cua_log.txt
 AGENTS.md.bak
 git-helper*.sh
 github_push.py
-# src/reymen/ — ReYMeN çekirdek modülleri (aktif geliştirme, takip edilir)
+# src/reymen/ is TRACKED (518 dosya commitlendi)
 src/.ReYMeN/
 reports/
 jobs/
+hyperframes_output/
+.ReYMeN/nightly/
+.ReYMeN/pasa38_log.txt
+.ReYMeN/update_check.json
