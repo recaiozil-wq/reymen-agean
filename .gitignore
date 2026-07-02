@@ -1,7 +1,6 @@
-# Dependency directories (core code)
-reymen/*
-!reymen/ag/
-!reymen/ag/*
+# Dependency directories (core code) — Python files in reymen/ ARE tracked
+reymen/__pycache__/
+reymen/*.pyc
 .venv/
 venv/
 env/
@@ -78,7 +77,6 @@ trajectories/
 
 # Backup
 backup/
-.ReYMeN/
 nul
 bot_venv/
 ._yedek/
@@ -90,7 +88,6 @@ ReYMeN_cli/
 apps/
 arsiv/
 plugins/
-reports/
 scripts/legacy/
 site/
 vektor_hafizasi/
@@ -106,4 +103,3 @@ git-helper*.sh
 github_push.py
 src/reymen/
 jobs/
-terminal-bench-benchmark/
