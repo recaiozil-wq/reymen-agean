@@ -88,6 +88,14 @@ except ImportError:
     AdaptifOgrenme = None
     _ADAPTIF_AKTIF = False
 
+# ── Proaktif kontrol (her cevap sonrası eksik analizi) ────────────────
+try:
+    from reymen.cereyan.proaktif_kontrol import soru_sonrasi_kontrol as _proaktif_kontrol
+    _PROAKTIF_AKTIF = True
+except ImportError:
+    _proaktif_kontrol = None
+    _PROAKTIF_AKTIF = False
+
 # ── Yeni import'lar: circuit breaker, streaming, error classify ─────
 try:
     from reymen.cereyan.iteration_budget import IterationBudget
@@ -1118,6 +1126,13 @@ class ConversationLoop:
             __import__("logging").getLogger(__name__).warning(
                 "[SessizExcept] %%s: %%s", type(_e).__name__, _e
             )
+
+        # ── Proaktif kontrol: her cevap sonrası eksik analizi ─────────
+        if _PROAKTIF_AKTIF and hedef and sonuc and sonuc.get("yanit"):
+            try:
+                _proaktif_kontrol(hedef, str(sonuc.get("yanit", "")))
+            except Exception:
+                pass
 
         return sonuc
 

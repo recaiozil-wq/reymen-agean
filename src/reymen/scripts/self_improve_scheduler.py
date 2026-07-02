@@ -80,7 +80,10 @@ class KendiniGelistirScheduler:
         # 3. Skill iyileştirme
         self.gorev_calistir("skill_iyilestirme", self._skill_iyilestir_cagir)
 
-        # 4. Auto budama (kod budaması)
+        # 4. Proaktif kontrol durumu
+        self.gorev_calistir("proaktif_kontrol", self._proaktif_durum_cagir)
+
+        # 5. Auto budama (kod budaması)
         self.gorev_calistir("auto_budama", self._auto_budama_cagir)
 
         # 5. Nudge model raporu
@@ -159,6 +162,15 @@ class KendiniGelistirScheduler:
             return rapor[:200]
         except ImportError:
             return "[ATLANDI] nudge_model modulu yok"
+
+    def _proaktif_durum_cagir(self) -> str:
+        """Proaktif kontrol durum raporunu alır."""
+        try:
+            from reymen.cereyan.proaktif_kontrol import proaktif_baslat
+            denetci = proaktif_baslat()
+            return denetci.durum_raporu()
+        except ImportError:
+            return "[ATLANDI] proaktif_kontrol modulu yok"
 
     def _durum_kaydet(self):
         """Son durumu JSON'a kaydet."""
