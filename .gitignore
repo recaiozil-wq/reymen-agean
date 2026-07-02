@@ -101,3 +101,5 @@ vektor_hafizasi/*.db-shm
 vektor_hafizasi/*.db-wal
 vektor_hafizasi/*.bin
 vektor_hafizasi/*.pb
+reymen/
+src/config.yaml

@@ -1,1 +1,0 @@
-"""Config command handlers."""

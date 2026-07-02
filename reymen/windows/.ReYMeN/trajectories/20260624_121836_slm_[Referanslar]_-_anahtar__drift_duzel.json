@@ -1,8 +1,0 @@
-{
-  "hedef": "slm\n\n[Referanslar]\n  - anahtar: drift_duzeltme_onayi_son, deger: ReYMeN hafıza drift düzeltmesi kullanıcı tarafından onaylandı. Planın tüm adımları (sorun tespiti, çözüm uygulama, veri kaydı, izleme mekanizması) başarıyla tamamlanmış ve onaylanmıştır., etiketler: [onay, drift_duzeltme, tamam, kullanici_onayi]: \n  - anahtar: drift_duzeltme_onay_2026, deger: ReYMeN hafiza drift duzeltmesi basariyla tamamlandi ve kullanici tarafindan tekrar onaylandi. Drift duzeltme raporlari (20260621, 20260623) mevcut, cozumler uygulanmis, izleme mekanizmasi aktif. Son onay tarihi: 2026., etiketler: [onay, drift_duzeltme, basarili, tamam, nihai_onay]: \n  - anahtar: drift_duzeltme_onay_2026, deger: ReYMeN drift duzeltme sureci kullanici tarafindan onaylandi. Tespit edilen ve cozulen sorunlar: 1) TEKRAR_EDEN_GRS - silindi, 2) ASIRI_TEKRAR - birlestirildi, 3) TAMAMLANMAMIS_GOREV - temizlendi. Izleme mekanizmasi aktif (24 saat). Tum adimlar basariyla tamamlandi ve onaylandi., etiketler: [onay, drift_duzeltme, tamam, basarili]: ",
-  "model": "local",
-  "tamamlandi": true,
-  "adim_sayisi": 0,
-  "adimlar": [],
-  "tool_istatistik": {}
-}

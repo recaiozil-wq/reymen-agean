@@ -1,8 +1,0 @@
-{
-  "hedef": "Selam nasilsin?\n\n[Referanslar]\n  - {\\\"anahtar\\\": \\\"alternatif_web_scraping_plani\\\", \\\"deger\\\": \\\"Alternatif web scraping araci olarak WEB_ICERIK (urllib) kullanilmistir. Orijinal yontem bilinmiyor ancak ayni sonuc alinmistir. Geri donus plani: Eger asil scraping araci basarisiz olursa, WEB_ICERIK aracina otomatik yonlendir. Yedek veri kaynagi olarak REFERANS_ARA ile example_com_verisi referansindan onceden kaydedilmis veri kullanilabilir. Karşılaştırma sonucu: Iki veri kaynagi da tutarlidir - ayni baslik, ayni paragraflar, ayni baglantilar. Tarih: 2026-06-23.\\\", \\\"etiketler\\\": [\\\"alternatif_arac\\\", \\\"web_scraping\\\", \\\"geri_donus_plani\\\", \\\"yedek\\\"]}: \n  - {\\\"anahtar\\\": \\\"drift_duzeltme_onayi_v2\\\", \\\"deger\\\": \\\"ReYMeN hafiza drift duzeltmesi ve alternatif web scraping dogrulamasi basariyla tamamlandi. WEB_ICERIK araci ile example.com verisi tekrar cekildi ve referanstaki eski veriyle karsilastirildi - TUTARLI. Geri donus plani olusturuldu ve alternatif_web_scraping_plani anahtari ile kaydedildi. İzleme mekanizmasi aktif (24 saat).\\\", \\\"etiketler\\\": [\\\"onay\\\", \\\"drift_duzeltme\\\", \\\"basarili\\\", \\\"alternatif_arac\\\", \\\"dogrulama\\\"]}: \n  - anahtar: drift_duzeltme_onayi_son, deger: Kullanici \\\"onay\\\" diyerek drift duzeltmesini onayladi. Tum islemler basariyla tamamlandi, izleme mekanizmasi aktif., etiketler: onay, drift_duzeltme, basarili: ",
-  "model": "local",
-  "tamamlandi": true,
-  "adim_sayisi": 0,
-  "adimlar": [],
-  "tool_istatistik": {}
-}

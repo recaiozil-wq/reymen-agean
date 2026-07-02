@@ -1,8 +1,0 @@
-{
-  "hedef": "Selam nasilsin?\n\n[Referanslar]\n  - {\\\"anahtar\\\": \\\"drift_duzeltme_onayi_20260623\\\", \\\"deger\\\": \\\"ReYMeN hafiza drift duzeltmesi basariyla tamamlandi ve onaylandi. Sorunlar (TEKRAR_EDEN_GRS, ASIRI_TEKRAR, TAMAMLANMAMIS_GOREV) giderildi. Cozumler uygulandi (TEKRAR_SIL, BIRLESTIR, TEMIZLE). 24 saatlik izleme aktif.\\\", \\\"etiketler\\\": [\\\"onay\\\", \\\"drift_duzeltme\\\", \\\"basarili\\\"]}: \n  - {\\\"anahtar\\\": \\\"drift_dogrulama_yedek_20260623\\\", \\\"deger\\\": \\\"Yedek hashler: example=5e29f4d31a20a3871d277415b55dcfc7a2acdb2f4d8d09bea418ea6d7b1e575b, drift=3b6c0c32dceddf6e326bacb14bfc441aaf948af60718228bdcd8f5689e8dda5e, wikipedia=fd549316c825d2fc5c5aea2d5c277692be578327d304836d51ea2b50e78e703a. Alternatif kaynak: Wikipedia. Hash dogrulama basarili.\\\", \\\"etiketler\\\": [\\\"yedek\\\", \\\"hash\\\", \\\"drift_dogrulama\\\", \\\"basarili\\\"]}: \n  - {\\\"anahtar\\\": \\\"drift_duzeltme_onayi_20260623\\\", \\\"deger\\\": \\\"ReYMeN hafiza drift duzeltmesi basariyla tamamlandi ve dogrulandi. Plan uygulandi: 1) Alternatif kaynak (Wikipedia) kullanilarak veri toplandi, 2) Drift duzeltme raporundaki temizlik adimlari uygulandi (TEKRAR_SIL, BIRLESTIR, TEMIZLE), 3) Hash kontrolu ile yedek alindi, 4) Tum dogrulamalar basarili. Izleme mekanizmasi aktif (24 saat).\\\", \\\"etiketler\\\": [\\\"onay\\\", \\\"drift_duzeltme\\\", \\\"basarili\\\", \\\"dogrulama\\\"]}: ",
-  "model": "local",
-  "tamamlandi": true,
-  "adim_sayisi": 0,
-  "adimlar": [],
-  "tool_istatistik": {}
-}
