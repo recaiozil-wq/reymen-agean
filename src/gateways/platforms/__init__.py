@@ -27,6 +27,7 @@ __all__ = [
     "MessageEvent",
     "SendResult",
     "SlackAdapter",
+    "SMSAdapter",
     "GoogleChatAdapter",
     "HomeAssistantAdapter",
     "MattermostAdapter",
@@ -40,6 +41,7 @@ __all__ = [
     "TeamsAdapter",
     "YuanbaoAdapter",
     "WhatsAppAdapter",
+    "EmailAdapter",
 ]
 
 
@@ -47,6 +49,9 @@ def __getattr__(name):
     if name == "SlackAdapter":
         from .slack import SlackAdapter  # noqa: F401
         return SlackAdapter
+    if name == "SMSAdapter":
+        from .sms import SMSAdapter  # noqa: F401
+        return SMSAdapter
     if name == "GoogleChatAdapter":
         from .google_chat import GoogleChatAdapter  # noqa: F401
         return GoogleChatAdapter
@@ -86,6 +91,9 @@ def __getattr__(name):
     if name == "WhatsAppAdapter":
         from .whatsapp import WhatsAppAdapter  # noqa: F401
         return WhatsAppAdapter
+    if name == "EmailAdapter":
+        from .email import EmailAdapter  # noqa: F401
+        return EmailAdapter
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 

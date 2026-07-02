@@ -164,11 +164,13 @@ class LocalEnvironment:
             }
         """
         loop = asyncio.get_running_loop()
-        return await loop.run_in_executor(
-            None,
+        fn = functools.partial(
             self.sync_run,
             komut,
-        ) | {"timeout": timeout, "workdir": workdir}
+            timeout=timeout,
+            workdir=workdir,
+        )
+        return await loop.run_in_executor(None, fn)
 
     # ── Bilgi Metodlari ──────────────────────────────────────────────
 
