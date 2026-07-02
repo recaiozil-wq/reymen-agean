@@ -36,7 +36,7 @@ def run(cmd, cwd=None):
         return subprocess.CompletedProcess(args=cmd, returncode=-1, stdout="", stderr=str(e))
 
 # ── PROJE YOLU ────────────────────────────────────────────────
-PROJE = Path(r"C:\Users\marko\Desktop\Reymen Proje\ReYMeN-Ajan")
+PROJE = Path(__file__).resolve().parent.parent.parent
 
 # Eğer script proje içinden çalışıyorsa otomatik algıla
 if not PROJE.exists():

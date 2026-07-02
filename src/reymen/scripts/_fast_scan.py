@@ -2,7 +2,7 @@
 """Fast import scan of tests/"""
 import os, sys
 
-os.chdir(r'C:\Users\marko\Desktop\Reymen Proje\hermes_projesi')
+os.chdir(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 sys.path.insert(0, os.getcwd())
 
 imports = set()

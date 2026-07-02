@@ -3,8 +3,8 @@
 import docker
 import os, io, tarfile, json, time
 
-BASE = r"C:\Users\marko\Desktop\Reymen Proje\ReYMeN-Ajan\terminal-bench-benchmark\original-tasks"
-RESULTS = r"C:\Users\marko\Desktop\Reymen Proje\ReYMeN-Ajan\.ReYMeN\reports\tbench-hard-sdk-results.json"
+BASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "terminal-bench-benchmark", "original-tasks")
+RESULTS = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".ReYMeN", "reports", "tbench-hard-sdk-results.json")
 
 tasks = [
     ("chem-rf", "tbench-chemrf"),

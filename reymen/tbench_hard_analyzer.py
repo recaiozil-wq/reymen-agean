@@ -2,7 +2,7 @@
 """ReYMeN HARD Task - Sadece Analiz (build yok)"""
 import os, json, time, re
 
-BASE = r"C:\Users\marko\Desktop\Reymen Proje\ReYMeN-Ajan\terminal-bench-benchmark\original-tasks"
+BASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "terminal-bench-benchmark", "original-tasks")
 
 HARD_TASKS = [
     "3d-model-format-legacy", "bn-fit-modify", "cancel-async-tasks",

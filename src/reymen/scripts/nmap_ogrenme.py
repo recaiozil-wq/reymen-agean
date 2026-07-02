@@ -3,7 +3,7 @@
 
 import json
 import sys
-sys.path.insert(0, r"C:\Users\marko\Desktop\Reymen Proje\hermes_projesi")
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from src.reymen.hafiza.gorev_once_kontrol import hafizada_ara, kaydet_isle, isle
 

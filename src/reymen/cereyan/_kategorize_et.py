@@ -2,9 +2,10 @@
 """Tüm skilleri 27 kategori altında topla - 5N1K sistemine göre"""
 import os, shutil, sys
 
-SKILLER = r"C:\Users\marko\Desktop\Reymen Proje\hermes_projesi\reymen\cereyan\skills\Skiller"
-ReYMeN = r"C:\Users\marko\.ReYMeN\skills"
-PROFIL = r"C:\Users\marko\AppData\Local\hermes\profiles\kiral38\skills"
+_KOK = Path(__file__).resolve().parent.parent.parent  # reymen/
+SKILLER = str(_KOK / "cereyan" / "skills" / "Skiller")
+ReYMeN = str(Path.home() / ".ReYMeN" / "skills")
+PROFIL = str(Path.home() / "AppData" / "Local" / "hermes" / "profiles" / "kiral38" / "skills")
 
 # Kategori eşleştirme - her skill klasör adı hangi kategoriye gider?
 KATEGORI = {

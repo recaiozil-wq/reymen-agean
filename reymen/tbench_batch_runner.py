@@ -2,8 +2,8 @@
 """Batch hard task runner — build + solution + test for all feasible tasks"""
 import os, subprocess, json, time, re
 
-BASE = r"C:\Users\marko\Desktop\Reymen Proje\ReYMeN-Ajan\terminal-bench-benchmark\original-tasks"
-RESULTS = r"C:\Users\marko\Desktop\Reymen Proje\ReYMeN-Ajan\.ReYMeN\reports"
+BASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "terminal-bench-benchmark", "original-tasks")
+RESULTS = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".ReYMeN", "reports")
 
 # Feasible hard tasks (no torch, no specialized env)
 TASKS = [

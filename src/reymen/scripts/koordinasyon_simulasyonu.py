@@ -5,7 +5,7 @@ Kali ajanı tespit eder, Windows ajanı engeller.
 """
 
 import json, sys, time
-sys.path.insert(0, r"C:\Users\marko\Desktop\Reymen Proje\hermes_projesi")
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from src.reymen.cereyan.once_hafiza import kaydet, ara, belirsiz_gorev_cozumle, istatistik
 
 basla = time.time()

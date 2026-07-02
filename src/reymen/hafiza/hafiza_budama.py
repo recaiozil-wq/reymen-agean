@@ -41,8 +41,8 @@ MIN_BOSLUK = 500              # Budama sonrası en az 500 karakter boşluk bıra
 
 # Yollar
 PROJE = Path(__file__).parent.resolve()
-REYMEN_MEMORIES = Path("C:\\Users\\marko\\AppData\\Local\\hermes\\profiles\\reymen\\memories")
-REYMEN_CONFIG = Path("C:\\Users\\marko\\AppData\\Local\\hermes\\config.yaml")
+REYMEN_MEMORIES = Path.home() / "AppData" / "Local" / "hermes" / "profiles" / "reymen" / "memories"
+REYMEN_CONFIG = Path.home() / "AppData" / "Local" / "hermes" / "config.yaml"
 REYMEN_DB = Path(str(PROJE) + "\\.reymen_hafiza\\hafiza.db")
 
 logger = logging.getLogger(__name__)

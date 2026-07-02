@@ -4,15 +4,16 @@ import sqlite3, os
 import logging
 logger = logging.getLogger(__name__)
 
+_KOK = Path(__file__).resolve().parent.parent.parent  # ReYMeN-Ajan
 DBS = {
-    'kanban.db': r'C:\Users\marko\Desktop\Reymen Proje\hermes_projesi\.ReYMeN\kanban.db',
-    'memory_fts.db': r'C:\Users\marko\Desktop\Reymen Proje\hermes_projesi\.ReYMeN\memory_fts.db',
-    'session.db': r'C:\Users\marko\Desktop\Reymen Proje\hermes_projesi\.ReYMeN\session.db',
-    'skill_index.db': r'C:\Users\marko\Desktop\Reymen Proje\hermes_projesi\.ReYMeN\skill_index.db',
-    'steering.db': r'C:\Users\marko\Desktop\Reymen Proje\hermes_projesi\reymen\cereyan\.reymen_hafiza\steering.db',
-    'hatalar.db': r'C:\Users\marko\Desktop\Reymen Proje\hermes_projesi\reymen\hafiza\hatalar.db',
-    'ogrenme.db': r'C:\Users\marko\Desktop\Reymen Proje\hermes_projesi\reymen\hafiza\ogrenme.db',
-    'state.db': r'C:\Users\marko\AppData\Local\hermes\profiles\reymen\state.db',
+    'kanban.db': str(_KOK / '.ReYMeN' / 'kanban.db'),
+    'memory_fts.db': str(_KOK / '.ReYMeN' / 'memory_fts.db'),
+    'session.db': str(_KOK / '.ReYMeN' / 'session.db'),
+    'skill_index.db': str(_KOK / '.ReYMeN' / 'skill_index.db'),
+    'steering.db': str(_KOK / 'reymen' / 'cereyan' / '.reymen_hafiza' / 'steering.db'),
+    'hatalar.db': str(_KOK / 'reymen' / 'hafiza' / 'hatalar.db'),
+    'ogrenme.db': str(_KOK / 'reymen' / 'hafiza' / 'ogrenme.db'),
+    'state.db': str(Path.home() / 'AppData' / 'Local' / 'hermes' / 'profiles' / 'reymen' / 'state.db'),
 }
 
 for name, path in DBS.items():

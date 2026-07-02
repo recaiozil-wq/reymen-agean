@@ -1,5 +1,5 @@
 import sys, os
-sys.path.insert(0, r"C:\Users\marko\Desktop\Reymen Proje\ReYMeN-Ajan")
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 print("Path:", sys.path[0])
 print("ReYMeN var:", os.path.isdir(os.path.join(sys.path[0], "ReYMeN")))
 print("init var:", os.path.isfile(os.path.join(sys.path[0], "ReYMeN", "__init__.py")))

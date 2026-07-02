@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 
 # ── Yollar ──────────────────────────────────────────────────────────────
 HERMES_DB = Path.home() / "AppData/Local/hermes/state.db"
-PROJE = Path(r"C:\Users\marko\Desktop\Reymen Proje\hermes_projesi")
+PROJE = Path(__file__).resolve().parent.parent.parent
 REYMEN_DB = PROJE / ".reymen_hafiza" / "hafiza.db"
 NOTES_DIR = PROJE / ".ReYMeN" / "notes" / "sessions"
 MEMORIES_DIR = PROJE / ".ReYMeN" / "memories"

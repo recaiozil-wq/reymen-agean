@@ -2,7 +2,7 @@
 """ReYMeN Stress Test — bagimsiz script"""
 import sys, os, json, time, concurrent.futures
 
-PROJE = r"C:\Users\marko\Desktop\Reymen Proje\ReYMeN-Ajan"
+PROJE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, PROJE)
 os.chdir(PROJE)
 

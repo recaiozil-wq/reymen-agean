@@ -5,9 +5,9 @@ ReYMeN Terminal-Bench HARD Task Runner
 """
 import os, subprocess, json, sys, time, re
 
-BASE = r"C:\Users\marko\Desktop\Reymen Proje\ReYMeN-Ajan\terminal-bench-benchmark\original-tasks"
-RESULTS_FILE = r"C:\Users\marko\Desktop\Reymen Proje\ReYMeN-Ajan\.ReYMeN\reports\tbench-hard-results.json"
-REPORT_FILE = r"C:\Users\marko\Desktop\Reymen Proje\ReYMeN-Ajan\.ReYMeN\reports\tbench-hard-report.md"
+BASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "terminal-bench-benchmark", "original-tasks")
+RESULTS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".ReYMeN", "reports", "tbench-hard-results.json")
+REPORT_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".ReYMeN", "reports", "tbench-hard-report.md")
 
 # Tüm 57 hard task
 HARD_TASKS = [

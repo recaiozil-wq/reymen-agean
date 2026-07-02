@@ -1,0 +1,154 @@
+# =============================================================================
+# ReYMeN Agent — Örnek Konfigürasyon
+# =============================================================================
+# Bu dosyayı config.yaml olarak kopyalayıp kendi ayarlarınızı girin.
+# API anahtarları .env dosyasında tutulur, buraya YAZILMAZ.
+
+agent:
+  api_max_retries: 1
+  api_timeout: 60
+  disabled_toolsets:
+    - browser
+    - computer_use
+  environment_probe: true
+  gateway_timeout: 1800
+  max_turns: 90
+  parallel_tool_call_guidance: true
+  task_completion_guidance: true
+  tool_use_enforcement: auto
+
+approvals:
+  mode: false
+
+compression:
+  enabled: true
+  target_ratio: 0.2
+  threshold: 0.5
+
+display:
+  compact: false
+  final_response_markdown: raw
+  interface: gateway
+  language: tr
+  skin: reymen
+  streaming: false
+
+# ── LLM Sağlayıcıları ─────────────────────────────────────────────────────
+# Ana model ve fallback provider'lar.
+# API anahtarları .env dosyasından okunur, buraya yazılmaz.
+fallback_providers:
+  - api_mode: chat_completions
+    base_url: https://api.deepseek.com
+    model: deepseek-v4-pro
+    provider: deepseek
+  - api_mode: chat_completions
+    base_url: https://api.deepseek.com
+    model: deepseek-v4-flash
+    provider: deepseek
+  - api_mode: chat_completions
+    base_url: https://openrouter.ai/api/v1
+    model: deepseek/deepseek-v4-flash
+    provider: openrouter
+  # Diğer provider'lar (API anahtarı .env'de olmalı):
+  # - anthropic (ANTHROPIC_API_KEY)
+  # - openai-api (OPENAI_API_KEY)
+  # - xai (XAI_API_KEY)
+
+gateway:
+  strict: false
+
+# ── MCP Sunucuları ────────────────────────────────────────────────────────
+mcp_servers:
+  filesystem:
+    args: [.]
+    command: mcp-server-filesystem
+  playwright:
+    args: [-y, '@playwright/mcp@latest', --headless]
+    command: npx
+
+memory:
+  max_chars: 10000
+  memory_enabled: true
+  user_profile_enabled: true
+  write_approval: false
+
+model:
+  api_mode: chat_completions
+  base_url: ''
+  default: deepseek-v4-flash
+  provider: deepseek
+
+telegram:
+  allowed_chats: ''
+  reactions: false
+
+discord:
+  enabled: false
+  token_env: DISCORD_BOT_TOKEN
+  prefix: '/'
+
+terminal:
+  backend: local
+  cwd: .
+  timeout: 180
+
+# ── Container Sandbox (Docker) ────────────────────────────────────────────
+container:
+  sandbox_mode: kismi
+  image: python:3.11-slim
+  timeout: 600
+  memory_limit: 1024m
+  cpu_limit: 2.0
+  workdir: /workspace
+  network_enabled: true
+
+pydantic_validation: true
+
+# ── Plugin Sistemi ────────────────────────────────────────────────────────
+plugins:
+  enabled: true
+  directory: reymen/plugins
+  auto_load: true
+  list: []
+
+# ── Platform Gateway'leri ────────────────────────────────────────────────
+platforms:
+  googlechat:
+    enabled: false
+    webhook_url: "${GOOGLE_CHAT_WEBHOOK_URL}"
+
+# ── Auth Sistemi ──────────────────────────────────────────────────────────
+auth:
+  enabled: true
+  jwt_secret_env: REYMEN_JWT_SECRET
+  token_expiry: 3600
+  refresh_expiry: 86400
+  storage_path: .ReYMeN/auth/auth.db
+  default_role: user
+  multi_user: true
+
+# ── Rules Engine ──────────────────────────────────────────────────────────
+rules:
+  enabled: true
+  strict_mode: false
+  log_level: info
+
+# ── Observability ─────────────────────────────────────────────────────────
+observability:
+  enabled: false
+  exporter: console
+  endpoint: ''
+
+# ── Diğer ─────────────────────────────────────────────────────────────────
+general.agent_name: ReYMeN
+general.default_model: deepseek-v4-flash
+general.default_provider: deepseek
+general.max_turns: 15
+general.secure_binding: true
+
+logging.level: INFO
+logging.file: .ReYMeN/logs/reymen.log
+logging.max_size_mb: 10
+logging.backup_count: 5
+
+kurulum_tamamlandi: false

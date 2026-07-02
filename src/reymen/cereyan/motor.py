@@ -1845,7 +1845,7 @@ class Motor:
                         logger.warning("[Motor] JSON parse hatasi (L1043): %s", _json.JSONDecodeError)
                         pass
                 # Bot ölü — restart dene
-                _py = r"C:\Users\marko\AppData\Local\Python\PythonCore-3.14-64\python.exe"
+                _py = sys.executable
                 _bot = ROOT / "bot.py"
                 subprocess.Popen(
                     [_py, str(_bot)], cwd=str(ROOT),
@@ -2083,7 +2083,7 @@ class Motor:
             return self._ekran.ekran_metnini_oku()
         if arac == "EKRAN_FOTOGRAF_CEK":
             import subprocess, os
-            py3 = r"C:\Users\marko\AppData\Local\Python\PythonCore-3.14-64\python.exe"
+            py3 = sys.executable
             script = os.path.join(os.path.dirname(__file__), "screenshot_bot.py")
             if os.path.exists(script):
                 r = subprocess.run([py3, script], capture_output=True, text=True, timeout=30)

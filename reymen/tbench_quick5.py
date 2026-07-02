@@ -2,7 +2,7 @@
 """Quick test 5 new hard tasks"""
 import docker, os, io, tarfile, json
 
-BASE = r"C:\Users\marko\Desktop\Reymen Proje\ReYMeN-Ajan\terminal-bench-benchmark\original-tasks"
+BASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "terminal-bench-benchmark", "original-tasks")
 
 tasks = [
     ("cancel-async-tasks", "tbench-cancel-async"),

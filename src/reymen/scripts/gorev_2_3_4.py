@@ -3,7 +3,7 @@ import sys
 import os
 
 # Proje yolunu ekle
-proje_yolu = r"C:\Users\marko\Desktop\Reymen Proje\hermes_projesi"
+proje_yolu = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.join(proje_yolu, "reymen", "cereyan"))
 
 from once_hafiza import kaydet

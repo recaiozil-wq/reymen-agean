@@ -1,8 +1,9 @@
 """force_restart_bots.py — T\u00fcm python process'lerini oldur, botlari temiz baslat."""
 import os, subprocess, time, json, urllib.request
 
-PROJE = "C:/Users/marko/Desktop/Reymen Proje/ReYMeN-Ajan"
-HERMES_BASE = "C:/Users/marko/AppData/Local/hermes/profiles"
+import pathlib as _pl
+PROJE = str(_pl.Path(__file__).resolve().parent.parent.parent)  # ReYMeN-Ajan
+HERMES_BASE = str(_pl.Path.home() / "AppData" / "Local" / "hermes" / "profiles")
 
 print("=" * 50)
 print("ADIM 1: TUM PYTHON PROCESS'LERI OLDURULUYOR")

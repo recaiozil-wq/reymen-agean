@@ -4,8 +4,9 @@ import sqlite3, os, shutil
 import logging
 logger = logging.getLogger(__name__)
 
-BROKEN = r'C:\Users\marko\Desktop\Reymen Proje\hermes_projesi\.ReYMeN\skill_index.db'
-GOOD = r'C:\Users\marko\Desktop\Reymen Proje\hermes_projesi\.ReYMeN\skills_index.db'
+_KOK = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+BROKEN = os.path.join(_KOK, '.ReYMeN', 'skill_index.db')
+GOOD = os.path.join(_KOK, '.ReYMeN', 'skills_index.db')
 
 size = os.path.getsize(BROKEN)
 print(f"BOZUK DB: skill_index.db ({size//1024}KB)")

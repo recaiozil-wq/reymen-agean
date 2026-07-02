@@ -9,7 +9,7 @@ import os
 import re
 import shutil
 
-ROOT = r"C:\Users\marko\Desktop\Reymen Proje\ReYMeN-Ajan"
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 MAIN_PATH = os.path.join(ROOT, "reymen", "sistem", "cli_main.py")
 MIXIN_DIR = os.path.join(ROOT, "reymen", "sistem")
 
