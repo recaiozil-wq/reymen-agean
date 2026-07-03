@@ -114,7 +114,14 @@ class CozumHafizasi:
     # ── SORGU ────────────────────────────────────────────────────────────
 
     def bul(self, metin: str, limit: int = 5) -> list[dict[str, Any]]:
-        """Sorun metnine gore en uygun cozumu bul (FTS5 + confidence sirali).
+        """Sorun metnine gore en uygun cozumu bul (FTS5 + 3-katmanli confidence).
+
+        Katmanlar:
+          - 0.6+  : yuksek guven → normal goster, siralamada onde
+          - 0.3-0.6: dusuk guven → "dusuk guvenilirlik" etiketiyle goster
+          - 0.0-0.3: guvensiz → tamamen gizle
+
+        Hic 0.3+ sonuc yoksa bos liste don (cagiran 'guvenilir cozum yok' mesaji verir).
 
         Args:
             metin: Sorun tanimi (hata mesaji, hata kodu, arama kelimesi)
@@ -122,17 +129,17 @@ class CozumHafizasi:
 
         Returns:
             [{"id", "problem", "root_cause", "cozum", "kategori",
-              "confidence", "success", "fail", "created_at"}, ...]
+              "confidence", "success", "fail", "guven_etiketi", ...}]
+            guven_etiketi: "yuksek" | "dusuk"
         """
         if not metin or len(metin.strip()) < 3:
             return []
 
         conn = self._baglan()
         try:
-            # 1. Oncelik: FTS5 tam metin arama
-            sonuc = []
+            # TUM eslesmeleri getir (confidence filtrelemesi Python'da yapilacak)
+            ham_sonuc = []
             try:
-                # FTS5 ile ara
                 fts_sorgu = ' OR '.join(
                     f'"{k}"' for k in metin.split() if len(k) > 2
                 )
@@ -142,22 +149,42 @@ class CozumHafizasi:
                            JOIN cozumler c ON f.rowid = c.id
                            WHERE cozumler_fts MATCH ?
                            ORDER BY c.confidence DESC LIMIT ?""",
-                        (fts_sorgu, limit),
+                        (fts_sorgu, limit * 3),
                     ).fetchall()
-                    sonuc = [dict(r) for r in rows]
+                    ham_sonuc = [dict(r) for r in rows]
             except sqlite3.OperationalError:
-                pass  # FTS5 yoksa asagidaki LIKE sorgusuna dus
+                pass
 
-            # 2. Fallback: LIKE ile arama
-            if not sonuc:
+            if not ham_sonuc:
                 like_sorgu = f'%{metin}%'
                 rows = conn.execute(
                     """SELECT * FROM cozumler
                        WHERE problem LIKE ? OR cozum LIKE ? OR root_cause LIKE ?
                        ORDER BY confidence DESC LIMIT ?""",
-                    (like_sorgu, like_sorgu, like_sorgu, limit),
+                    (like_sorgu, like_sorgu, like_sorgu, limit * 3),
                 ).fetchall()
-                sonuc = [dict(r) for r in rows]
+                ham_sonuc = [dict(r) for r in rows]
+
+            # 3-katmanli confidence filtrele
+            sonuc = []
+            for kayit in ham_sonuc:
+                c = kayit.get("confidence", 0.0)
+                if c >= 0.6:
+                    kayit["guven_etiketi"] = "yuksek"
+                    sonuc.append(kayit)
+                elif c >= 0.3:
+                    kayit["guven_etiketi"] = "dusuk"
+                    sonuc.append(kayit)
+                # < 0.3 tamamen gizle, ekleme
+
+            # Sirala: yuksek onde, sonra dusuk
+            sonuc.sort(key=lambda x: (
+                0 if x.get("guven_etiketi") == "yuksek" else 1,
+                -x.get("confidence", 0)
+            ))
+
+            # Limiti uygula
+            sonuc = sonuc[:limit]
 
             # Son kullanim tarihini guncelle
             for kayit in sonuc:
@@ -423,7 +450,7 @@ def _tool_cozum_bul(**kw) -> str:
         return "[CozumHafizasi] 'metin' parametresi gerekli."
     sonuc = _singleton.bul(metin)
     if not sonuc:
-        return "[CozumHafizasi] Eslesen cozum bulunamadi."
+        return "[CozumHafizasi] Bu sorun icin guvenilir bir gecmis cozum yok."
     return json.dumps(sonuc, indent=2, ensure_ascii=False)
 
 
@@ -472,7 +499,8 @@ def motor_kaydet(motor) -> None:
     """Cozum Hafizasi araclarini motor'a kaydet."""
     motor._plugin_arac_kaydet(
         "COZUM_BUL", _tool_cozum_bul,
-        "Cozum hafizasinda sorun ara. Parametreler: metin/sorun (str)"
+        "Cozum hafizasinda sorun ara. Parametreler: metin/sorun (str). "
+        "Donus: confidence>=0.6 yuksek, 0.3-0.6 dusuk etiketli, <0.3 gizlenir."
     )
     motor._plugin_arac_kaydet(
         "COZUM_KAYDET", _tool_cozum_kaydet,
