@@ -388,13 +388,25 @@ class SelfImprover:
 
         if hedef:
             with _db_connection() as db:
-                db.execute(
-                    """INSERT INTO improvement_goals
-                       (created_at, metric_name, current_val, target_val, status, strategy, notes)
-                       VALUES (?, ?, ?, ?, 'active', ?, ?)""",
-                    (hedef.created_at, hedef.metric_name, hedef.current_val,
-                     hedef.target_val, hedef.strategy, hedef.notes),
-                )
+                # Aynı metrik için aktif hedef var mı kontrol et
+                mevcut = db.execute(
+                    "SELECT id FROM improvement_goals WHERE metric_name=? AND status='active' LIMIT 1",
+                    (hedef.metric_name,),
+                ).fetchone()
+                if mevcut:
+                    # Varolan hedefi güncelle
+                    db.execute(
+                        "UPDATE improvement_goals SET current_val=?, target_val=? WHERE id=?",
+                        (hedef.current_val, hedef.target_val, mevcut["id"]),
+                    )
+                else:
+                    db.execute(
+                        """INSERT INTO improvement_goals
+                           (created_at, metric_name, current_val, target_val, status, strategy, notes)
+                           VALUES (?, ?, ?, ?, 'active', ?, ?)""",
+                        (hedef.created_at, hedef.metric_name, hedef.current_val,
+                         hedef.target_val, hedef.strategy, hedef.notes),
+                    )
         return hedef
 
     def aktif_hedefler(self) -> list[dict]:
@@ -503,7 +515,14 @@ def kod_kalite_analizi(proje_yolu: str | None = None) -> dict[str, Any]:
         Kalite metrikleri sözlüğü.
     """
     if proje_yolu is None:
-        proje_yolu = str(Path(__file__).parent.parent)
+        # Varsayılan: src/reymen'in parentı (src/), ama proje kökünde durum.json varsa onu kullan
+        default = Path(__file__).parent.parent  # src/
+        if (default / "durum.json").exists() or (default / ".git").exists():
+            proje_yolu = str(default)
+        elif (default.parent / "durum.json").exists() or (default.parent / ".git").exists():
+            proje_yolu = str(default.parent)
+        else:
+            proje_yolu = str(default)
 
     kok = Path(proje_yolu)
     py_dosyalari = list(kok.rglob("*.py"))
@@ -513,7 +532,8 @@ def kod_kalite_analizi(proje_yolu: str | None = None) -> dict[str, Any]:
                "node_modules", ".ReYMeN", ".cron_logs", ".alt_ajan_gozlem",
                "bot_venv", "reymen_venv", "ReYMeN_cli",
                "hermes-memory-backup", "ReYMeN-memory-backup",
-               "_claude_multi_output", ".yedek", "Lib", "site-packages"}
+               "_claude_multi_output", ".yedek", "Lib", "site-packages",
+               ".tbench-testing"}
     py_dosyalari = [
         p for p in py_dosyalari
         if not any(part.startswith(".") or part in EXCLUDE

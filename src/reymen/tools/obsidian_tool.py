@@ -73,7 +73,7 @@ def _vault_yolu_bul(istenen_yol: str = "") -> Tuple[bool, str]:
     except ImportError:
         pass  # yaml yoksa sessiz geç
     except Exception:
-        pass
+        logger.warning("[fix_01_sessiz_except] Exception")
 
     # 3. Proje kökünde .obsidian/ klasörü ara
     proje_kok = Path(__file__).resolve().parent.parent.parent.parent  # ReYMeN-Ajan/
@@ -134,7 +134,7 @@ def _md_dosyalari_listele(vault_kok: str, alt_dizin: str = "", uzanti: str = ".m
                     import datetime
                     degisti = datetime.datetime.fromtimestamp(mtime).strftime("%Y-%m-%d %H:%M")
                 except Exception:
-                    pass
+                    logger.warning("[fix_01_sessiz_except] Exception")
                 sonuclar.append({
                     "yol": goreceli.replace("\\", "/"),
                     "ad": f.stem,
@@ -280,7 +280,7 @@ def _vault_ara(vault_kok: str, sorgu: str, dosya_adi_filtre: str = "",
                                                 regex_module.IGNORECASE):
                         continue
                 except regex_module.error:
-                    pass
+                    logger.warning("[fix_01_sessiz_except] error")
 
             dosya_sayisi += 1
             try:

@@ -677,7 +677,7 @@ class ConversationLoop:
                     try:
                         self._nudge.gozlemle(hedef, "")
                     except Exception:
-                        pass
+                        logger.warning("[fix_01_sessiz_except] Exception")
 
                 if self.beyin:
                     eylem = self._beyin_eylem_sec(hedef, baglam)
@@ -1212,7 +1212,7 @@ class ConversationLoop:
             try:
                 _proaktif_kontrol(hedef, str(sonuc.get("yanit", "")))
             except Exception:
-                pass
+                logger.warning("[fix_01_sessiz_except] Exception")
 
         # ── Hafif compaction kontrolu: her konusma sonrasi ───────────
         # MEMORY.md/USER.md %80 doluluk esigini gecerse otomatik compaction
@@ -3161,7 +3161,7 @@ class ConversationLoop:
             if _FRAMEWORK_ADAPTOR_AKTIF and _framework_adaptor:
                 return _framework_adaptor.aktif_frameworkler
         except Exception:
-            pass
+            logger.warning("[fix_01_sessiz_except] Exception")
         return {"langgraph": False, "crewai": False, "autogen": False}
 
 

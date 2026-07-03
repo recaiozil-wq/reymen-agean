@@ -903,7 +903,7 @@ class Motor:
         if _pydantic_aktif:
             _PYDANTIK_ENTEGRE = True
     except ImportError:
-        pass
+        logger.warning("[fix_01_sessiz_except] ImportError")
 
     # ── Native Function Calling desteği ──────────────────────────────────────
 

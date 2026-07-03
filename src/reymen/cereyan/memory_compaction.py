@@ -417,7 +417,7 @@ def cache_tazele() -> Dict[str, Any]:
                 temizlenen += 1
                 moduller.append(f"prompt_assembly.{attr_name}")
     except (ImportError, NameError):
-        pass
+        logger.warning("[fix_01_sessiz_except] Exception")
 
     # 3. Kendi cache'lerimiz (ileride eklenirse)
     # (placeholder)

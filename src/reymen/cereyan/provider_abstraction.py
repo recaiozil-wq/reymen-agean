@@ -138,7 +138,7 @@ def _anahtar_bul(provider: str, config: dict[str, Any]) -> str:
             if deger:
                 return deger
     except Exception:
-        pass
+        logger.warning("[fix_01_sessiz_except] Exception")
 
     try:
         from reymen.sistem.credential_pool import credential_pool  # type: ignore[import]
@@ -147,7 +147,7 @@ def _anahtar_bul(provider: str, config: dict[str, Any]) -> str:
             if deger:
                 return deger
     except Exception:
-        pass
+        logger.warning("[fix_01_sessiz_except] Exception")
 
     # 4. WCM / profil .env'si — zaten os.environ'a yüklenmiş olmalı
     # (profil .env'si Hermes tarafından os.environ'a eklenir)
@@ -264,7 +264,7 @@ class ProviderBase(abc.ABC):
                 elif kod == 429:
                     return ProviderRateLimit(f"Hız sınırı (429): {hata}")
         except Exception:
-            pass
+            logger.warning("[fix_01_sessiz_except] Exception")
         if "401" in mesaj or "unauthorized" in mesaj:
             return ProviderGecersizKey(str(hata))
         elif "402" in mesaj or "payment required" in mesaj:

@@ -1,5 +1,7 @@
 """Tüm merkez_db'deki SQLite dosyalarına WAL + busy_timeout uygula."""
 import sqlite3, os
+import logging
+logger = logging.getLogger(__name__)
 
 DB_DIR = os.path.dirname(os.path.abspath(__file__))
 dbs = [f for f in os.listdir(DB_DIR) if f.endswith(".db")]

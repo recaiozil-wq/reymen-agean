@@ -19,6 +19,8 @@ import sys
 import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+import logging
+logger = logging.getLogger(__name__)
 
 # ── Sabitler ───────────────────────────────────────────────────
 HERMES = Path.home() / "AppData" / "Local" / "hermes"
@@ -105,7 +107,7 @@ def gateway_watchdog():
                         lock.unlink(missing_ok=True)
                         pid.unlink(missing_ok=True)
             except (ValueError, subprocess.TimeoutExpired):
-                pass
+                logger.warning("[fix_01_sessiz_except] Exception")
 
     # Debug log'da 409 kontrolü
     debug_log = PROJE_KOK / "bot_debug.log"
@@ -302,7 +304,7 @@ def gateway_health():
                     if str(pid_int) not in r.stdout:
                         ekle("UYARI", f"[8] {ad} PID {pid_int} calismiyor")
             except (ValueError, subprocess.TimeoutExpired):
-                pass
+                logger.warning("[fix_01_sessiz_except] Exception")
 
         # Gateway state kontrol
         if state.exists():

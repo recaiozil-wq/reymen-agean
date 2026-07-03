@@ -24,6 +24,8 @@ import json
 import time
 from pathlib import Path
 from typing import Optional
+import logging
+logger = logging.getLogger(__name__)
 
 # ── Renkler (reymen_launcher.py ile uyumlu) ──────────────────────────────────
 _R   = "\033[0m"
@@ -398,7 +400,7 @@ def kurulum_durumu_guncelle(proje_kok: Path, tamamlandi: bool = True) -> bool:
                 durum_yol.write_text(json.dumps(durum, indent=2, ensure_ascii=False),
                                       encoding="utf-8")
             except Exception:
-                pass
+                logger.warning("[fix_01_sessiz_except] Exception")
 
         return True
     except Exception:
@@ -418,7 +420,7 @@ def kurulum_tamamlandi_mi(proje_kok: Path) -> bool:
         if eslesme:
             return eslesme.group(1) == "true"
     except Exception:
-        pass
+        logger.warning("[fix_01_sessiz_except] Exception")
 
     return False
 

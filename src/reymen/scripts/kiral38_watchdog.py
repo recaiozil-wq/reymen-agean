@@ -9,6 +9,8 @@ import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+import logging
+logger = logging.getLogger(__name__)
 
 HERMES = Path.home() / "AppData" / "Local" / "hermes"
 KIRAL38 = HERMES / "profiles" / "kiral38"
@@ -43,7 +45,7 @@ def kontrol():
                 lock.unlink(missing_ok=True)
                 pidf.unlink(missing_ok=True)
         except:
-            pass
+            logger.warning("[fix_01_sessiz_except] Exception")
 
     # 3. state.db boyut izle
     db = KIRAL38 / "state.db"

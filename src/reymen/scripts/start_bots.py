@@ -5,6 +5,8 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+import logging
+logger = logging.getLogger(__name__)
 
 PROJE_KOK = Path(__file__).resolve().parent.parent.parent
 HERMES_BASE = Path.home() / "AppData" / "Local" / "hermes" / "profiles"

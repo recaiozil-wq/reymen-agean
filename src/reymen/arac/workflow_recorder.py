@@ -17,6 +17,8 @@ import json
 import time
 import os
 from pathlib import Path
+import logging
+logger = logging.getLogger(__name__)
 
 WORKFLOW_DIR = Path(__file__).parent / "workflows"
 WORKFLOW_DIR.mkdir(exist_ok=True)

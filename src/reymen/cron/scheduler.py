@@ -2176,7 +2176,7 @@ def tick(verbose: bool = True, adapters=None, loop=None, sync: bool = True) -> i
                 if _cfg_par is not None:
                     _max_workers = int(_cfg_par) or None
             except Exception:
-                pass
+                logger.warning("[fix_01_sessiz_except] Exception")
 
         if verbose:
             logger.info(

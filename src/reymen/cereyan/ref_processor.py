@@ -7,6 +7,8 @@ context'e ekler.
 
 Kullanim:
     from reymen.cereyan.ref_processor import ref_isle
+import logging
+logger = logging.getLogger(__name__)
 
     zengin_metin, ref_liste = ref_isle("su dosyaya bak: @file:config.yaml")
 """
@@ -58,7 +60,7 @@ def _config_oku() -> bool:
                     return val
                 break
     except Exception:
-        pass
+        logger.warning("[fix_01_sessiz_except] Exception")
     return True  # varsayilan: acik
 
 
@@ -140,7 +142,7 @@ def _url_oku(url: str, max_karakter: int = _VARSAYILAN_MAX_KARAKTER) -> Tuple[bo
             if not guvenli:
                 return False, "", f"URL guvenlik engeli: {hata}"
         except ImportError:
-            pass
+            logger.warning("[fix_01_sessiz_except] ImportError")
 
         # HTTP istegi
         headers = {

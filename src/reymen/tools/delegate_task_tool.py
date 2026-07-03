@@ -57,7 +57,7 @@ def _config_yukle() -> dict:
             with open(_CONFIG_YOLU, encoding="utf-8") as f:
                 return yaml.safe_load(f) or {}
     except Exception:
-        pass
+        logger.warning("[fix_01_sessiz_except] Exception")
     return {"default_provider": "lmstudio", "default_model": "cognitivecomputations.dolphin3.0-llama3.1-8b"}
 
 

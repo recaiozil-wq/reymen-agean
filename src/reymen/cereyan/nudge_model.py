@@ -830,7 +830,7 @@ class NudgeModel:
                         "guven": 0.5,
                     })
             except (ValueError, TypeError):
-                pass
+                logger.warning("[fix_01_sessiz_except] Exception")
 
         if toplam_konusma >= 10:
             cursor = self._calistir(

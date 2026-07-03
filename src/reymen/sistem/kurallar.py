@@ -202,7 +202,7 @@ class RulesEngine:
                 if isinstance(rules_cfg, dict):
                     self._aktif = rules_cfg.get("enabled", True)
         except Exception:
-            pass
+            logger.warning("[fix_01_sessiz_except] Exception")
         return len(self._rules)
     
     @property

@@ -209,7 +209,7 @@ def _asama_skill_iyilestirme() -> AsamaSonucu:
                     elif sonuc_iyi:
                         iyilestirilen += 1
                 except Exception:
-                    pass
+                    logger.warning("[fix_01_sessiz_except] Exception")
 
             # Rapor
             tur_dagilimi = {}
@@ -444,7 +444,7 @@ def _asama_cron_durumu() -> AsamaSonucu:
                                 "son_hata": job.get("son_hata"),
                             })
             except Exception:
-                pass
+                logger.warning("[fix_01_sessiz_except] Exception")
 
         # Hermes-style cron (jobs.py)
         try:
@@ -460,7 +460,7 @@ def _asama_cron_durumu() -> AsamaSonucu:
                     "last_error": j.get("last_error"),
                 })
         except Exception:
-            pass
+            logger.warning("[fix_01_sessiz_except] Exception")
 
         # Sorunlu job'ları tespit et
         sorunlu = []
@@ -539,7 +539,7 @@ def _asama_trend_raporu() -> AsamaSonucu:
                 trend["once_hafiza"]["yeni_kayit"] = row[0] if row else 0
                 con.close()
         except Exception:
-            pass
+            logger.warning("[fix_01_sessiz_except] Exception")
 
         # Skill iyileştirme trendi
         try:
@@ -570,7 +570,7 @@ def _asama_trend_raporu() -> AsamaSonucu:
                 trend["skill"]["yeni_oneri"] = oneriler[0] if oneriler else 0
                 con.close()
         except Exception:
-            pass
+            logger.warning("[fix_01_sessiz_except] Exception")
 
         # Önceki gece raporlarını topla
         if RAPOR_DIZINI.exists():

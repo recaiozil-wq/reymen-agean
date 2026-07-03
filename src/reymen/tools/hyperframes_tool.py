@@ -860,7 +860,7 @@ def hyperframes_olustur(
         try:
             shutil.rmtree(frame_dir, ignore_errors=True)
         except Exception:
-            pass
+            logger.warning("[fix_01_sessiz_except] Exception")
 
         logger.info(f"[HyperFrames] Video basariyla olusturuldu: {cikti}")
         return {
@@ -1041,7 +1041,7 @@ def motor_kaydet(motor) -> None:
                 import json
                 veri = json.loads(parts[2])
             except json.JSONDecodeError:
-                pass
+                logger.warning("[fix_01_sessiz_except] JSONDecodeError")
 
         sonuc = hyperframes_hizli_grafik(
             baslik=baslik, veri=veri, grafik_tipi=grafik_tipi

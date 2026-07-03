@@ -158,7 +158,7 @@ class BrowserAgentLoop:
             ss = engine.ekran_goruntusu()
             logger.warning("[BrowserAgent] Tik basarisiz, screenshot alindi: %s", ss[:100])
         except Exception:
-            pass
+            logger.warning("[fix_01_sessiz_except] Exception")
 
         return False, f"[HATA] Tik basarisiz ({_DENEME_SAYISI} deneme): {selector}"
 

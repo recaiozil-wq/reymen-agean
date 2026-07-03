@@ -302,7 +302,7 @@ class AgentCardRegistry:
             try:
                 handler(card)
             except Exception:
-                pass
+                logger.warning("[fix_01_sessiz_except] Exception")
 
     def unregister(self, agent_id: str) -> bool:
         """Agent Card kaydını siler."""
@@ -547,7 +547,7 @@ class TaskDelegationProtocol:
                 if sonuc:
                     self.update_status(task.task_id, "in_progress")
             except Exception:
-                pass
+                logger.warning("[fix_01_sessiz_except] Exception")
 
         return task
 
@@ -862,7 +862,7 @@ class ACPServer:
                     })
                 return tools
             except Exception:
-                pass
+                logger.warning("[fix_01_sessiz_except] Exception")
         return []
 
     def _method_tools_list(self, **kw) -> dict:
@@ -1098,7 +1098,7 @@ class ACPServer:
                     sys.stdout.write(response + "\n")
                     sys.stdout.flush()
         except (EOFError, KeyboardInterrupt):
-            pass
+            logger.warning("[fix_01_sessiz_except] Exception")
         finally:
             self.running = False
             logger.info("[ACP] Sunucu durduruldu (stdio)")
@@ -1146,7 +1146,7 @@ class ACPServer:
                     if response:
                         conn.sendall((response + "\n").encode("utf-8"))
         except (socket.timeout, ConnectionResetError, OSError):
-            pass
+            logger.warning("[fix_01_sessiz_except] Exception")
         finally:
             conn.close()
 
@@ -1339,7 +1339,7 @@ class ACPClient:
             try:
                 self._session.close()
             except Exception:
-                pass
+                logger.warning("[fix_01_sessiz_except] Exception")
             self._session = None
 
     def __enter__(self):

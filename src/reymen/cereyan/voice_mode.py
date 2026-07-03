@@ -95,7 +95,7 @@ for _exe in ("ffplay", "ffplay.exe"):
             _FFPLAY_BULUNDU = _r.stdout.strip().splitlines()[0]
             break
     except Exception:
-        pass
+        logger.warning("[fix_01_sessiz_except] Exception")
 
 
 # ── Beyin import (opsiyonel) ───────────────────────────────────────────────
@@ -468,7 +468,7 @@ class VoiceMode:
             kayit.dosya_yolu = yol
             return yol
         except ImportError:
-            pass
+            logger.warning("[fix_01_sessiz_except] ImportError")
 
         try:
             # scipy.io.wavfile ile yaz
@@ -479,7 +479,7 @@ class VoiceMode:
             kayit.dosya_yolu = yol
             return yol
         except ImportError:
-            pass
+            logger.warning("[fix_01_sessiz_except] ImportError")
 
         logger.error("[VoiceMode] WAV yazmak için soundfile veya scipy gerekli.")
         return None
@@ -1065,14 +1065,14 @@ class VoiceMode:
             try:
                 pygame.mixer.music.stop()
             except Exception:
-                pass
+                logger.warning("[fix_01_sessiz_except] Exception")
 
         # sounddevice oynatma varsa durdur
         if SD_MEVCUT:
             try:
                 sd.stop()
             except Exception:
-                pass
+                logger.warning("[fix_01_sessiz_except] Exception")
 
         self.durum = VoiceModeDurum.DURDU
         logger.info("[VoiceMode] Durduruldu.")
@@ -1086,7 +1086,7 @@ class VoiceMode:
             try:
                 del self._whisper_model
             except Exception:
-                pass
+                logger.warning("[fix_01_sessiz_except] Exception")
             self._whisper_model = None
 
         # OpenAI client
@@ -1097,7 +1097,7 @@ class VoiceMode:
             try:
                 pygame.mixer.quit()
             except Exception:
-                pass
+                logger.warning("[fix_01_sessiz_except] Exception")
             self._pygame_ilk = False
 
     @staticmethod

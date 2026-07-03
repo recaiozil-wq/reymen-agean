@@ -348,7 +348,7 @@ def auth_required(func):
             g.auth = auth  # type: ignore
             g.current_user = auth.user_info  # type: ignore
         except ImportError:
-            pass
+            logger.warning("[fix_01_sessiz_except] ImportError")
         return func(*args, **kwargs)
     return wrapper
 
@@ -378,7 +378,7 @@ def role_required(required_role: str):
                 g.auth = auth  # type: ignore
                 g.current_user = auth.user_info  # type: ignore
             except ImportError:
-                pass
+                logger.warning("[fix_01_sessiz_except] ImportError")
             return func(*args, **kwargs)
         return wrapper
     return decorator

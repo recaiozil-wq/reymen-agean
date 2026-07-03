@@ -17,6 +17,8 @@ import time
 import threading
 from pathlib import Path
 from typing import Optional, Callable
+import logging
+logger = logging.getLogger(__name__)
 
 # ── Renk sabitleri (ANSI fallback) ────────────────────────────────────────
 _R = "\033[0m"
@@ -294,7 +296,7 @@ class ReYMeNTUI:
                 import colorama
                 colorama.init()
             except ImportError:
-                pass
+                logger.warning("[fix_01_sessiz_except] ImportError")
 
         from rich.console import Console
         from rich.live import Live
@@ -319,9 +321,9 @@ class ReYMeNTUI:
             try:
                 self._girdi_dongusu(live)
             except KeyboardInterrupt:
-                pass
+                logger.warning("[fix_01_sessiz_except] KeyboardInterrupt")
             except EOFError:
-                pass
+                logger.warning("[fix_01_sessiz_except] EOFError")
             finally:
                 self._live = None
 
@@ -331,7 +333,7 @@ class ReYMeNTUI:
                 import colorama
                 colorama.deinit()
             except ImportError:
-                pass
+                logger.warning("[fix_01_sessiz_except] ImportError")
 
     def _girdi_dongusu(self, live):
         """prompt_toolkit ile girdi al ve isle."""

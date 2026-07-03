@@ -17,6 +17,8 @@ graceful fallback yapar.
 """
 
 from __future__ import annotations
+import logging
+logger = logging.getLogger(__name__)
 
 __version__ = "0.9.0"
 
@@ -24,7 +26,7 @@ __version__ = "0.9.0"
 try:
     from reymen.tools import _importer  # noqa: F401 — otomatik hook kurar
 except Exception:
-    pass
+    logger.warning("[fix_01_sessiz_except] Exception")
 
 __all__ = [
     "__version__",

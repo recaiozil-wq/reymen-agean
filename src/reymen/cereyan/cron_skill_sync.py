@@ -141,7 +141,7 @@ def main() -> dict:
 
     if not dosyalar:
         logger.warning("Hic .md dosyasi bulunamadi!")
-        return {"yeni": 0, "guncellenen": 0, "hata": 0, "toplam": 0}
+        return {"yeni": 0, "guncellenen": 0, "hata": 0, "toplam": 0, "sure": round(time.time() - basla, 1)}
 
     con = db_baglan()
     meta = existing_meta(con)
