@@ -1,6 +1,6 @@
 {
   "proje": "ReYMeN Agent",
-  "surum": "2026-06-30",
+  "surum": "2026-07-03",
   "botlar": {
     "pasa_38": {
       "profil": "default",
@@ -59,5 +59,25 @@
   "esit_mi": {
     "esit": true,
     "aciklama": "Tum botlar esit"
+  },
+  "ozellik_durumu": {
+    "context_compression": {"durum": "aktif", "not": "_COMPRESS_AKTIF=True, ContextCompressor import edilebiliyor"},
+    "checkpoints": {"durum": "aktif", "not": "CheckpointManager import edilebiliyor"},
+    "kanban": {"durum": "aktif", "not": "Board/Card/Column sistemi var, motor'a 11 arac kayitli"},
+    "curator": {"durum": "aktif", "not": "reymen/sistem/curator.py olusturuldu, motor'a kayitli"},
+    "prompt_caching": {"durum": "aktif", "not": "_cache_dosya_oku() ile SOUL/MEMORY/USER/AGENTS mtime bazli cache"},
+    "self_improve": {"durum": "aktif", "not": "proje koku otomatik algilama, hedef duplicate fix"},
+    "test_coverage": {"durum": "kismen", "not": "src/reymen 617 dosya, tests/ 1995 dosya (Hermes referanslari dahil)"},
+    "gateway_multi_platform": {"durum": "stub", "not": "19 adapter tanimli, sadece Telegram aktif"}
+  },
+  "guncel_metrikler": {
+    "tarih": "2026-07-03",
+    "src_py_dosya": 617,
+    "src_toplam_satir": 237083,
+    "test_dosyasi": 1995,
+    "except_pass_kalan": 76,
+    "todo": 14,
+    "fixme": 2,
+    "pycache_boyut_mb": 162.8
   }
 }

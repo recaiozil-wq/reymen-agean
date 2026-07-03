@@ -486,6 +486,8 @@ class Motor:
             "closed_learning_loop",
             # Self-Improvement (kalite metrikleri + otomatik iyilestirme)
             "reymen.self_improve",
+            # Curator (otomatik bakim: skill/hafiza/pycache kontrolu)
+            "reymen.sistem.curator",
             # SQLite FTS5 hafiza + session_search
             "hafiza_genislet",
             # MCP Server Host (Streamable HTTP + Stdio)
