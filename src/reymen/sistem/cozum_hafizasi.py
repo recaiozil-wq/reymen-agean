@@ -40,6 +40,7 @@ __all__ = [
 # ── Varsayilan yapilandirma ──────────────────────────────────────────────
 
 _VARSAYILAN_DB = Path(__file__).resolve().parent.parent.parent / "reymen" / "merkez_db" / "cozum_hafizasi.db"
+_VARSAYILAN_CONFIDENCE = 0.0  # Yeni kayit: test edilmemis, gizli
 
 
 # ── Veritabani ───────────────────────────────────────────────────────────
@@ -229,13 +230,13 @@ class CozumHafizasi:
                    (problem, root_cause, cozum, kategori,
                     success, fail, confidence, created_at, last_used,
                     tags, metadata)
-                   VALUES (?, ?, ?, ?, 0, 0, 0.5, ?, ?, ?, ?)""",
+                   VALUES (?, ?, ?, ?, 0, 0, ?, ?, ?, ?, ?)""",
                 (
                     problem.strip(),
                     root_cause.strip(),
                     cozum.strip(),
                     kategori.strip(),
-                    now, now,
+                    _VARSAYILAN_CONFIDENCE, now, now,
                     json.dumps(tags or [], ensure_ascii=False),
                     json.dumps(metadata or {}, ensure_ascii=False),
                 ),
