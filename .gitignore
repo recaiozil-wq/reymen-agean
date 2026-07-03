@@ -125,3 +125,4 @@ hyperframes_output/
 
 # Vector database — ChromaDB persistence
 chroma_db/
+terminal-bench-benchmark/
