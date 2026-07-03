@@ -47,6 +47,31 @@ logging.getLogger('conversation_loop').setLevel(logging.ERROR)
 for _l in ['CUA', 'Motor', 'motor', 'ReYMeN', 'beyin', 'plugin', 'cron', 'skill']:
     logging.getLogger(_l).setLevel(logging.ERROR)
 
+# ── Prompt Dosya Cache (token tasarrufu) ─────────────────
+# SOUL.md, MEMORY.md, USER.md, AGENTS.md her turda okunmasin
+# mtime ile cache gecersiz kilma: dosya degismediyse cache'den don
+_prompt_dosya_cache: dict[str, tuple[float, str]] = {}
+
+def _cache_dosya_oku(dosya_yolu: str | Path, max_len: int = 0) -> str | None:
+    """Dosyayi mtime kontroluyle cache'le. Degismemisse cache'den don."""
+    p = Path(dosya_yolu) if not isinstance(dosya_yolu, Path) else dosya_yolu
+    if not p.exists():
+        return None
+    try:
+        mtime = p.stat().st_mtime
+        cache_key = f"{str(p.resolve())}_max{max_len}"
+        if cache_key in _prompt_dosya_cache:
+            cached_mtime, cached_content = _prompt_dosya_cache[cache_key]
+            if cached_mtime == mtime:
+                return cached_content
+        icerik = p.read_text(encoding='utf-8', errors='replace')
+        if max_len and len(icerik) > max_len:
+            icerik = icerik[:max_len]
+        _prompt_dosya_cache[cache_key] = (mtime, icerik)
+        return icerik
+    except (OSError, PermissionError):
+        return None
+
 # ── Konusmadan Skill Cikarma ────────────────────────────
 try:
     from reymen.arac.konusmadan_skill import konusmadan_skill_cikar as _skill_cikar
@@ -2064,8 +2089,9 @@ class ConversationLoop:
                         continue
                     yol = aday / dosya_adi
                     if yol.exists():
-                        icerik = yol.read_text(encoding="utf-8", errors="replace")[:2000]
-                        parcalar.append(f"[{etiket}]\n{icerik}")
+                        icerik = _cache_dosya_oku(yol, max_len=2000)
+                        if icerik:
+                            parcalar.append(f"[{etiket}]\n{icerik}")
                         break
 
             if parcalar:
@@ -3003,11 +3029,9 @@ class ConversationLoop:
                     continue
                 yol = aday if isinstance(aday, Path) else Path(aday)
                 if yol.exists():
-                    icerik = yol.read_text(encoding="utf-8", errors="replace")
-                    # Cok uzunsa kisalt (ilk 4000 karakter yeterli)
-                    if len(icerik) > 4000:
-                        icerik = icerik[:4000] + "\n... [SOUL.md kesildi]"
-                    return f"\n[SOUL.md — Kimlik & Kurallar]\n{icerik}\n"
+                    icerik = _cache_dosya_oku(yol, max_len=4000)
+                    if icerik:
+                        return f"\n[SOUL.md — Kimlik & Kurallar]\n{icerik}\n"
             return ""
         except Exception as _e:
             __import__("logging").getLogger(__name__).warning(
@@ -3035,10 +3059,9 @@ class ConversationLoop:
                     continue
                 yol = aday if isinstance(aday, Path) else Path(aday)
                 if yol.exists():
-                    icerik = yol.read_text(encoding="utf-8", errors="replace")
-                    if len(icerik) > 2000:
-                        icerik = icerik[:2000] + "\n... [AGENTS.md kesildi]"
-                    return f"\n[AGENTS.md — Entry Points & Mimari]\n{icerik}\n"
+                    icerik = _cache_dosya_oku(yol, max_len=2000)
+                    if icerik:
+                        return f"\n[AGENTS.md — Entry Points & Mimari]\n{icerik}\n"
             return ""
         except Exception as _e:
             __import__("logging").getLogger(__name__).warning(
