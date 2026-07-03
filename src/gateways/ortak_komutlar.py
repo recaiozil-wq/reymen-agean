@@ -18,6 +18,9 @@ logger = logging.getLogger(__name__)
 _PROJE_KOK = Path(__file__).parent.parent.parent.resolve()  # reymen/ag/../../ = proje koku
 if str(_PROJE_KOK) not in sys.path:
     sys.path.insert(0, str(_PROJE_KOK))
+_SRC = _PROJE_KOK / "src"
+if str(_SRC) not in sys.path:
+    sys.path.insert(0, str(_SRC))
 
 
 def _durum_json_oku() -> dict:

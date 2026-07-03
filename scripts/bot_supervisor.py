@@ -1,5 +1,5 @@
 """bot_supervisor.py — ReYMeN Bot Supervisor.
-3 bot'u 3 farkli token ile baslatir, crash'te restart eder.
+3 bot'u 3 farkli profil ile Gateway uzerinden baslatir.
 
 Kullanim:
     python bot_supervisor.py              # 3 botu baslat (supervisor)
@@ -23,68 +23,42 @@ logging.basicConfig(
 )
 log = logging.getLogger("supervisor")
 
-PROJE_KOK = Path(__file__).resolve().parent
+PROJE_KOK = Path(__file__).resolve().parent.parent  # ReYMeN-Ajan/
 HERMES_BASE = Path.home() / "AppData" / "Local" / "hermes" / "profiles"
 
-# Proje .venv Python'unu kullan (uv yonetimli, tum bagimliliklari var)
-_venv_py = str(PROJE_KOK / ".venv" / "Scripts" / "python.exe")
-if Path(_venv_py).exists():
-    PYTHON = _venv_py
-else:
-    # Fallback: su anki yorumlayici
-    PYTHON = getattr(sys, "_base_executable", sys.executable)
+# Hermes CLI yolu
+_HERMES_CLI = str(Path.home() / "AppData" / "Local" / "hermes" / "hermes-agent" / "venv" / "Scripts" / "hermes.exe")
 
 BOTLAR = [
-    {"ad": "Pasa_38",  "profil": "default", "env_anahtar": "TELEGRAM_BOT_TOKEN"},
-    {"ad": "Kiral38",  "profil": "kiral38", "env_anahtar": "TELEGRAM_BOT_TOKEN"},
-    {"ad": "ReYMeN_Bot", "profil": "reymen", "env_anahtar": "TELEGRAM_BOT_TOKEN"},
+    {"ad": "Pasa_38",  "profil": "default"},
+    {"ad": "Kiral38",  "profil": "kiral38"},
+    # ReYMeN_Bot ayri bir Gateway ile calisir — bu supervisor onu yonetmez
 ]
 
 
-def token_oku(profil: str) -> str:
-    """Profil .env'sinden TELEGRAM_BOT_TOKEN oku."""
-    env_yolu = HERMES_BASE / profil / ".env"
-    if not env_yolu.exists():
-        log.warning("[%s] .env bulunamadi: %s", profil, env_yolu)
-        return ""
-    try:
-        for satir in env_yolu.read_text(encoding="utf-8").splitlines():
-            satir = satir.strip().replace("\r", "")
-            if satir.startswith("TELEGRAM_BOT_TOKEN="):
-                return satir.split("=", 1)[1]
-    except Exception as e:
-        log.error("[%s] Token okuma hatasi: %s", profil, e)
-    return ""
-
-
 class BotYonetici:
-    """Tek bir bot process'ini yonetir + crash'te restart."""
+    """Tek bir bot process'ini Gateway uzerinden yonetir + crash'te restart."""
 
     def __init__(self, bot_bilgi: dict):
         self.ad = bot_bilgi["ad"]
         self.profil = bot_bilgi["profil"]
-        self.env_anahtar = bot_bilgi["env_anahtar"]
         self.process = None
         self.durduruldu = False
 
     def baslat(self):
-        """Bot process'ini baslat."""
-        token = token_oku(self.profil)
-        if not token:
-            log.error("[%s] Token bulunamadi! Baslatilamiyor.", self.ad)
-            return False
+        """Bot'u Gateway uzerinden baslat (bypass yok)."""
+        if self.process and self.process.poll() is None:
+            log.info("[%s] Zaten calisiyor (PID %d)", self.ad, self.process.pid)
+            return True
 
-        env = os.environ.copy()
-        env["TELEGRAM_BOT_TOKEN"] = token
-        env["HERMES_PROFILE"] = self.profil
-        env["HERMES_GATEWAY"] = "ai"
+        hermes = _HERMES_CLI
+        if not Path(hermes).exists():
+            hermes = "hermes"  # PATH'te ara
 
-        script = str(PROJE_KOK / "reymen" / "ag" / "telegram_bot.py")
-
-        log.info("[%s] Baslatiliyor... (python: %s, token: ...%s)", self.ad, PYTHON, token[-6:])
+        log.info("[%s] Baslatiliyor... (hermes -p %s gateway run --replace)", self.ad, self.profil)
         self.process = subprocess.Popen(
-            [PYTHON, script],
-            env=env,
+            [hermes, "-p", self.profil, "gateway", "run", "--replace"],
+            env=os.environ.copy(),
             cwd=str(PROJE_KOK),
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
@@ -121,7 +95,7 @@ class BotYonetici:
 
 
 def supervisor():
-    """Ana supervisor dongusu — 3 bot, crash'te restart."""
+    """Ana supervisor dongusu — botlari Gateway uzerinden yonetir."""
     yoneticiler = [BotYonetici(b) for b in BOTLAR]
 
     def _sinyal_handler(sig, frame):
@@ -139,7 +113,7 @@ def supervisor():
         time.sleep(1)
 
     log.info("=" * 50)
-    log.info("3 bot baslatildi. Supervisor aktif.")
+    log.info("2 bot Gateway uzerinden baslatildi. Supervisor aktif.")
     log.info("Durdurmak icin: Ctrl+C")
     log.info("=" * 50)
 
@@ -159,44 +133,40 @@ def supervisor():
 def main():
     if "--stop" in sys.argv:
         import subprocess as sp
+        # Gateway process'lerini bul ve oldur
         result = sp.run(
-            ["wmic", "process", "where", 'name="python.exe"',
-             "get", "ProcessId,CommandLine", "/format:csv"],
+            ["tasklist", "/fi", "imagename eq hermes.exe", "/v", "/fo", "csv"],
             capture_output=True, text=True, timeout=10
         )
         killed = 0
         for line in result.stdout.split("\n"):
-            if "telegram_bot.py" in line or "bot_supervisor" in line:
+            if "gateway" in line.lower() or "hermes.exe" in line:
                 parts = line.split(",")
                 if len(parts) >= 2:
-                    pid = parts[1].strip()
+                    pid = parts[1].strip().strip('"')
                     if pid.isdigit():
                         sp.run(["taskkill", "/f", "/pid", pid],
                                capture_output=True, timeout=5)
                         killed += 1
                         print(f"  PID {pid} olduruldu")
-        print(f"Toplam {killed} bot process'i durduruldu.")
+        print(f"Toplam {killed} Gateway process'i durduruldu.")
         return
 
     if "--once" in sys.argv:
         for bot in BOTLAR:
-            token = token_oku(bot["profil"])
-            if not token:
-                print(f"[{bot['ad']}] Token yok, atlaniyor.")
-                continue
-            env = os.environ.copy()
-            env["TELEGRAM_BOT_TOKEN"] = token
-            env["HERMES_PROFILE"] = bot["profil"]
-            env["HERMES_GATEWAY"] = "ai"
-            script = str(PROJE_KOK / "reymen" / "ag" / "telegram_bot.py")
+            hermes = _HERMES_CLI
+            if not Path(hermes).exists():
+                hermes = "hermes"
+            log.info("[%s] Baslatiliyor... (hermes -p %s gateway run --replace)", bot["ad"], bot["profil"])
             subprocess.Popen(
-                [PYTHON, script],
-                env=env, cwd=str(PROJE_KOK),
+                [hermes, "-p", bot["profil"], "gateway", "run", "--replace"],
+                env=os.environ.copy(),
+                cwd=str(PROJE_KOK),
                 stdout=open(PROJE_KOK / ".ReYMeN" / f"{bot['ad'].lower()}_bot.log", "w"),
                 stderr=subprocess.STDOUT,
                 creationflags=subprocess.DETACHED_PROCESS | subprocess.CREATE_NO_WINDOW,
             )
-            print(f"[{bot['ad']}] Baslatildi (arka planda). python: {PYTHON}")
+            print(f"[{bot['ad']}] Baslatildi (arka planda).")
             time.sleep(2)
         return
 

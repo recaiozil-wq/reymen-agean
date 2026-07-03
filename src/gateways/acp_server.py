@@ -30,6 +30,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
 
+# ── Proje kokunu sys.path'e ekle (src/ altindaki moduller icin) ──
+_PROJE_KOK = Path(__file__).resolve().parent.parent.parent
+_SRC = _PROJE_KOK / "src"
+if str(_SRC) not in sys.path:
+    sys.path.insert(0, str(_SRC))
+
 # Windows'ta stdout encoding sorunu
 if sys.platform == "win32" and hasattr(sys.stdout, "reconfigure"):
     try:

@@ -43,6 +43,12 @@ Kullanım:
 
 from __future__ import annotations
 
+# ── Proje kokunu sys.path'e ekle (src/ altindaki moduller icin) ──
+import os as _os
+_SRC = _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))), "src")
+if _SRC not in sys.path:
+    sys.path.insert(0, _SRC)
+
 import json
 import logging
 import os

@@ -26,6 +26,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Optional
 
+# ── Proje kokunu sys.path'e ekle (src/ altindaki moduller icin) ──
+_PROJE_KOK = Path(__file__).resolve().parent.parent.parent
+_SRC = _PROJE_KOK / "src"
+if str(_SRC) not in sys.path:
+    sys.path.insert(0, str(_SRC))
+
 # gateway/platforms entegrasyonu
 try:
     from gateway.platforms import platform_listele, platform_baslat, mesaj_gonder as platform_mesaj

@@ -40,11 +40,7 @@ BOTLAR = [
         "profil": "kiral38",
         "env": HERMES_PROFILES / "kiral38" / ".env",
     },
-    {
-        "adisyon": "reymen",
-        "profil": "reymen",
-        "env": HERMES_PROFILES / "reymen" / ".env",
-    },
+    # reymen AYRI BIR GATEWAY ile calisir (bot_supervisor KARIŞMAZ)
 ]
 
 

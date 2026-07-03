@@ -126,3 +126,13 @@ hyperframes_output/
 # Vector database — ChromaDB persistence
 chroma_db/
 terminal-bench-benchmark/
+
+# Project debris (not code)
+cua_log.txt
+echo
+shared_state/
+terminal-bench-benchmark/
+.ReYMeN/_check_*.ps1
+.ReYMeN/sohbet_bot_arkiv/
+reymen/scripts/token_yaz.py
+reymen/scripts/cevap_test.py

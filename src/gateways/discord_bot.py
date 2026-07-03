@@ -35,6 +35,9 @@ from typing import Any, Callable, Optional
 _PROJE_KOK = Path(__file__).resolve().parent.parent.parent  # reymen/ag/../../ = proje koku
 if str(_PROJE_KOK) not in sys.path:
     sys.path.insert(0, str(_PROJE_KOK))
+_SRC = _PROJE_KOK / "src"
+if str(_SRC) not in sys.path:
+    sys.path.insert(0, str(_SRC))
 
 # ============================================================================
 # LOGGER
