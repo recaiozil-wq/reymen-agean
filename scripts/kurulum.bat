@@ -257,6 +257,16 @@ if not exist ".env" (
 
 echo.
 echo ============================================
+echo    HERMES PROFIL AYARLARI UYGULANIYOR...
+echo ============================================
+python scripts/hermes_profil_ayarlari.py
+if %ERRORLEVEL% neq 0 (
+    echo [!!] Hermes profil ayarlari uygulanamadi
+    echo     (Hermes kurulu degil veya profil bulunamadi)
+)
+echo.
+
+echo ============================================
 echo    KURULUM TAMAMLANDI!
 echo ============================================
 echo.
