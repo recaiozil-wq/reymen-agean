@@ -488,6 +488,8 @@ class Motor:
             "reymen.self_improve",
             # Curator (otomatik bakim: skill/hafiza/pycache kontrolu)
             "reymen.sistem.curator",
+            # Cozum Hafizasi (ogrenilen cozumler + geri bildirim)
+            "reymen.sistem.cozum_hafizasi",
             # SQLite FTS5 hafiza + session_search
             "hafiza_genislet",
             # MCP Server Host (Streamable HTTP + Stdio)
