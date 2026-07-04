@@ -20,6 +20,7 @@ from typing import Any, Dict, List, Optional
 @dataclass
 class TurnKarari:
     """A single turn decision record."""
+
     adim: int = 0
     eylem: str = ""
     arac: Optional[str] = None
@@ -47,6 +48,7 @@ class TurnContext:
         ctx.karar_ekle("DOSYA_OKU", arac="DOSYA_OKU")
         ctx.karar_bitir(basarili=True, sonuc="Basarili")
     """
+
     # test_cozum.py API
     tur_id: int = 0
     kararlar: List[TurnKarari] = field(default_factory=list)

@@ -77,7 +77,10 @@ class TestContentLengthForBudget:
         """Anthropic native shape: {type: image, source: {...}}."""
         content = [
             {"type": "text", "text": "hi"},
-            {"type": "image", "source": {"type": "base64", "media_type": "image/png", "data": "XX"}},
+            {
+                "type": "image",
+                "source": {"type": "base64", "media_type": "image/png", "data": "XX"},
+            },
         ]
         assert _content_length_for_budget(content) == 2 + _IMAGE_CHAR_EQUIVALENT
 
@@ -116,17 +119,24 @@ class TestTokenBudgetWithImages:
         # so the tail should be trimmed.
         messages = [{"role": "system", "content": "sys"}]
         for i in range(5):
-            messages.append({
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": f"turn {i}"},
-                    {"type": "image_url", "image_url": {"url": "data:image/png;base64,AAA"}},
-                ],
-            })
-            messages.append({
-                "role": "assistant",
-                "content": f"response {i}",
-            })
+            messages.append(
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": f"turn {i}"},
+                        {
+                            "type": "image_url",
+                            "image_url": {"url": "data:image/png;base64,AAA"},
+                        },
+                    ],
+                }
+            )
+            messages.append(
+                {
+                    "role": "assistant",
+                    "content": f"response {i}",
+                }
+            )
 
         cut = cc._find_tail_cut_by_tokens(messages, head_end=0, token_budget=5000)
 

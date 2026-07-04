@@ -39,7 +39,7 @@ TIP_VARSAYILAN = {
     "None": "None",
     "Any": "None",
     "optional": "None",  # Optional[X]
-    "Path": '""',         # str olarak ver
+    "Path": '""',  # str olarak ver
     "bytes": 'b""',
 }
 
@@ -78,15 +78,31 @@ def _stub_mu(fonksiyon: ast.FunctionDef) -> tuple:
     # 2) 'return ""' veya 'return None' veya 'return 0'
     if len(body) == 1 and isinstance(body[0], ast.Return):
         val = body[0].value
-        if isinstance(val, ast.Constant) and val.value in ("", None, 0, 0.0, [], {}, b""):
+        if isinstance(val, ast.Constant) and val.value in (
+            "",
+            None,
+            0,
+            0.0,
+            [],
+            {},
+            b"",
+        ):
             return ("return literal", fonksiyon.lineno)
         if isinstance(val, ast.List) and len(val.elts) == 0:
             return ("return []", fonksiyon.lineno)
     # 3) docstring + pass
-    if len(body) == 2 and isinstance(body[0], ast.Expr) and isinstance(body[1], ast.Pass):
+    if (
+        len(body) == 2
+        and isinstance(body[0], ast.Expr)
+        and isinstance(body[1], ast.Pass)
+    ):
         return ("docstring + pass", fonksiyon.lineno)
     # 4) docstring + return literal
-    if len(body) == 2 and isinstance(body[0], ast.Expr) and isinstance(body[1], ast.Return):
+    if (
+        len(body) == 2
+        and isinstance(body[0], ast.Expr)
+        and isinstance(body[1], ast.Return)
+    ):
         return ("docstring + return", fonksiyon.lineno)
     return (None, None)
 
@@ -127,9 +143,9 @@ def _tip_coz(annotation) -> str:
         return str(annotation.value)
     if isinstance(annotation, ast.Subscript):
         # Optional[X], List[X], Dict[K,V]
-        if hasattr(annotation.value, 'id'):
+        if hasattr(annotation.value, "id"):
             ust = annotation.value.id
-            alt = _tip_coz(annotation.slice) if hasattr(annotation, 'slice') else "Any"
+            alt = _tip_coz(annotation.slice) if hasattr(annotation, "slice") else "Any"
             if ust in ("Optional",):
                 return "optional"
             if ust in ("list", "List"):
@@ -158,7 +174,9 @@ def _varsayilan_deger_bul(annotation, default_ast) -> str:
             return "{}"
         if isinstance(default_ast, ast.Name) and default_ast.id == "None":
             return "None"
-        if isinstance(default_ast, ast.UnaryOp) and isinstance(default_ast.op, ast.USub):
+        if isinstance(default_ast, ast.UnaryOp) and isinstance(
+            default_ast.op, ast.USub
+        ):
             if isinstance(default_ast.operand, ast.Constant):
                 return repr(-default_ast.operand.value)
         return "None"  # bilinmeyen varsayilan -> None
@@ -195,8 +213,9 @@ def gorev_3_xfailed_coz() -> list:
 
                 # xfail iceriyor mu?
                 xfail_var = any(
-                    isinstance(n, ast.Call) and
-                    hasattr(n.func, 'attr') and n.func.attr == 'xfail'
+                    isinstance(n, ast.Call)
+                    and hasattr(n.func, "attr")
+                    and n.func.attr == "xfail"
                     for n in ast.walk(node)
                 )
                 if not xfail_var:
@@ -214,7 +233,7 @@ def _arguman_uret(imza: str) -> str:
         cikti: 'ad=\"test\", yas=0'
     """
     # Parametre listesini ayikla
-    parantez_ici = imza[imza.index("(")+1:imza.rindex(")")].strip()
+    parantez_ici = imza[imza.index("(") + 1 : imza.rindex(")")].strip()
     if not parantez_ici:
         return ""
 
@@ -291,7 +310,9 @@ def main():
 
         f.write(f"\n## GOREV C: Script Sonrasi Coverage\n\n")
         f.write("1. `pip install pytest-cov` (kurulu)\n")
-        f.write("2. `python -m pytest reymen/test/ --cov=reymen --cov-config=.coveragerc --cov-report=term-missing --tb=no -q`\n")
+        f.write(
+            "2. `python -m pytest reymen/test/ --cov=reymen --cov-config=.coveragerc --cov-report=term-missing --tb=no -q`\n"
+        )
 
     print(f"  {YAPILACAKLAR_YOL}")
 

@@ -25,9 +25,9 @@ from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
 
+
 class MixinSkillsTools:
     """ReYMeNCLI Skills/Tools/Bundles/Cron operations."""
-
 
     def _handle_tools_command(self, cmd: str):
         """Handle /tools [list|disable|enable] slash commands.
@@ -104,10 +104,10 @@ class MixinSkillsTools:
         # Reset session so the new tool config is picked up from a clean state
         from reymen.reymen_cli.tools_config import _get_platform_tools
         from reymen.reymen_cli.config import load_config
+
         self.enabled_toolsets = _get_platform_tools(load_config(), "cli")
         self.new_session()
         _cprint(f"{_DIM}Session reset. New tool configuration is active.{_RST}")
-
 
     def _handle_cron_command(self, cmd: str):
         """Handle the /cron command to manage scheduled tasks."""
@@ -191,7 +191,9 @@ class MixinSkillsTools:
             print()
             print("  Commands:")
             print("    /cron list")
-            print('    /cron add "every 2h" "Check server status" [--skill blogwatcher]')
+            print(
+                '    /cron add "every 2h" "Check server status" [--skill blogwatcher]'
+            )
             print('    /cron edit <job_id> --schedule "every 4h" --prompt "New task"')
             print("    /cron edit <job_id> --skill blogwatcher --skill maps")
             print("    /cron edit <job_id> --remove-skill blogwatcher")
@@ -208,7 +210,9 @@ class MixinSkillsTools:
                 print("  " + "-" * 63)
                 for job in jobs:
                     repeat_str = job.get("repeat", "?")
-                    print(f"    {job['job_id'][:12]:<12} | {job['schedule']:<15} | {repeat_str:<8}")
+                    print(
+                        f"    {job['job_id'][:12]:<12} | {job['schedule']:<15} | {repeat_str:<8}"
+                    )
                     if job.get("skills"):
                         print(f"      Skills: {', '.join(job['skills'])}")
                     print(f"      {job.get('prompt_preview', '')}")
@@ -245,7 +249,9 @@ class MixinSkillsTools:
                     print(f"  Skills: {', '.join(job['skills'])}")
                 print(f"  Prompt: {job.get('prompt_preview', '')}")
                 if job.get("last_run_at"):
-                    print(f"  Last run: {job['last_run_at']} ({job.get('last_status', '?')})")
+                    print(
+                        f"  Last run: {job['last_run_at']} ({job.get('last_status', '?')})"
+                    )
                 print()
             return
 
@@ -282,7 +288,9 @@ class MixinSkillsTools:
         if subcommand == "edit":
             positionals = opts["positionals"]
             if not positionals:
-                print("(._.) Usage: /cron edit <job_id> [--schedule ...] [--prompt ...] [--skill ...]")
+                print(
+                    "(._.) Usage: /cron edit <job_id> [--schedule ...] [--prompt ...] [--skill ...]"
+                )
                 return
             job_id = positionals[0]
             existing = get_job(job_id)
@@ -294,13 +302,18 @@ class MixinSkillsTools:
             replacement_skills = _normalize_skills(opts["skills"])
             add_skills = _normalize_skills(opts["add_skills"])
             remove_skills = set(_normalize_skills(opts["remove_skills"]))
-            existing_skills = list(existing.get("skills") or ([] if not existing.get("skill") else [existing.get("skill")]))
+            existing_skills = list(
+                existing.get("skills")
+                or ([] if not existing.get("skill") else [existing.get("skill")])
+            )
             if opts["clear_skills"]:
                 final_skills = []
             elif replacement_skills:
                 final_skills = replacement_skills
             elif add_skills or remove_skills:
-                final_skills = [skill for skill in existing_skills if skill not in remove_skills]
+                final_skills = [
+                    skill for skill in existing_skills if skill not in remove_skills
+                ]
                 for skill in add_skills:
                     if skill not in final_skills:
                         final_skills.append(skill)
@@ -333,8 +346,14 @@ class MixinSkillsTools:
                 print(f"(._.) Usage: /cron {subcommand} <job_id>")
                 return
             job_id = positionals[0]
-            action = "remove" if subcommand in {"remove", "rm", "delete"} else subcommand
-            result = _cron_api(action=action, job_id=job_id, reason="paused from /cron" if action == "pause" else None)
+            action = (
+                "remove" if subcommand in {"remove", "rm", "delete"} else subcommand
+            )
+            result = _cron_api(
+                action=action,
+                job_id=job_id,
+                reason="paused from /cron" if action == "pause" else None,
+            )
             if not result.get("success"):
                 print(f"(x_x) Failed to {action} job: {result.get('error')}")
                 return
@@ -354,7 +373,6 @@ class MixinSkillsTools:
         print(f"(._.) Unknown cron command: {subcommand}")
         print("  Available: list, add, edit, pause, resume, run, remove")
 
-
     def _handle_curator_command(self, cmd: str):
         """Handle /curator slash command.
 
@@ -369,6 +387,7 @@ class MixinSkillsTools:
 
         try:
             from reymen.reymen_cli.curator import cli_main
+
             cli_main(tokens)
         except SystemExit:
             # argparse calls sys.exit() on --help or errors; swallow so we
@@ -377,12 +396,11 @@ class MixinSkillsTools:
         except Exception as exc:
             print(f"(._.) curator: {exc}")
 
-
     def _handle_skills_command(self, cmd: str):
         """Handle /skills slash command — delegates to cli_commands.tool_commands version."""
         from reymen.sistem.cli_commands.tool_commands import MixinCommands
-        MixinCommands._handle_skills_command(self, cmd)
 
+        MixinCommands._handle_skills_command(self, cmd)
 
     def _handle_background_command(self, cmd: str):
         """Handle /background <prompt> — run a prompt in a separate background session.
@@ -395,7 +413,9 @@ class MixinSkillsTools:
         if len(parts) < 2 or not parts[1].strip():
             _cprint("  Usage: /background <prompt>")
             _cprint("  Example: /background Summarize the top HN stories today")
-            _cprint("  The task runs in a separate session and results display here when done.")
+            _cprint(
+                "  The task runs in a separate session and results display here when done."
+            )
             return
 
         prompt = parts[1].strip()
@@ -408,7 +428,9 @@ class MixinSkillsTools:
             _cprint("  (>_<) Cannot start background task: no valid credentials.")
             return
 
-        _cprint(f"  🔄 Background task #{task_num} started: \"{prompt[:60]}{'...' if len(prompt) > 60 else ''}\"")
+        _cprint(
+            f"  🔄 Background task #{task_num} started: \"{prompt[:60]}{'...' if len(prompt) > 60 else ''}\""
+        )
         _cprint(f"  Task ID: {task_id}")
         _cprint("  You can continue chatting — results will appear when done.\n")
 
@@ -479,31 +501,42 @@ class MixinSkillsTools:
                 print()
                 ChatConsole().print(f"[{_accent_hex()}]{'─' * 40}[/]")
                 _cprint(f"  ✅ Background task #{task_num} complete")
-                _cprint(f"  Prompt: \"{prompt[:60]}{'...' if len(prompt) > 60 else ''}\"")
+                _cprint(
+                    f"  Prompt: \"{prompt[:60]}{'...' if len(prompt) > 60 else ''}\""
+                )
                 ChatConsole().print(f"[{_accent_hex()}]{'─' * 40}[/]")
                 if response:
                     try:
                         from reymen.reymen_cli.skin_engine import get_active_skin
+
                         _skin = get_active_skin()
                         label = _skin.get_branding("response_label", "⚕ ReYMeN")
-                        _resp_color = _maybe_remap_for_light_mode(_skin.get_color("response_border", "#CD7F32"))
-                        _resp_text = _maybe_remap_for_light_mode(_skin.get_color("banner_text", "#FFF8DC"))
+                        _resp_color = _maybe_remap_for_light_mode(
+                            _skin.get_color("response_border", "#CD7F32")
+                        )
+                        _resp_text = _maybe_remap_for_light_mode(
+                            _skin.get_color("banner_text", "#FFF8DC")
+                        )
                     except Exception:
                         label = "⚕ ReYMeN"
                         _resp_color = "#CD7F32"
                         _resp_text = "#FFF8DC"
 
                     _chat_console = ChatConsole()
-                    _chat_console.print(Panel(
-                        _render_final_assistant_content(response, mode=self.final_response_markdown),
-                        title=f"[{_resp_color} bold]{label} (background #{task_num})[/]",
-                        title_align="left",
-                        border_style=_resp_color,
-                        style=_resp_text,
-                        box=rich_box.HORIZONTALS,
-                        padding=(1, 4),
-                        width=self._scrollback_box_width(),
-                    ))
+                    _chat_console.print(
+                        Panel(
+                            _render_final_assistant_content(
+                                response, mode=self.final_response_markdown
+                            ),
+                            title=f"[{_resp_color} bold]{label} (background #{task_num})[/]",
+                            title_align="left",
+                            border_style=_resp_color,
+                            style=_resp_text,
+                            box=rich_box.HORIZONTALS,
+                            padding=(1, 4),
+                            width=self._scrollback_box_width(),
+                        )
+                    )
                 else:
                     _cprint("  (No response generated)")
 
@@ -533,10 +566,11 @@ class MixinSkillsTools:
                 if self._app:
                     self._invalidate(min_interval=0)
 
-        thread = threading.Thread(target=run_background, daemon=True, name=f"bg-task-{task_id}")
+        thread = threading.Thread(
+            target=run_background, daemon=True, name=f"bg-task-{task_id}"
+        )
         self._background_tasks[task_id] = thread
         thread.start()
-
 
     def _handle_bundles_command(self, cmd: str) -> None:
         """In-session ``/bundles`` — show installed skill bundles.
@@ -577,4 +611,4 @@ class MixinSkillsTools:
         )
 
 
-__all__ = ['MixinSkillsTools']
+__all__ = ["MixinSkillsTools"]

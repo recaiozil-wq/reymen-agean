@@ -14,12 +14,14 @@ rate_limiter.py — Provider basına rate limiting ve token bütçe yönetimi.
   TOKEN_BUDGET_DAILY=500000  # günlük token sınırı (0 = sınırsız)
   RATE_LIMIT_RETRY=true      # limit aşılınca bekle
 """
+
 import os
 import threading
 import time
 from collections import deque
 from pathlib import Path
 import logging
+
 logger = logging.getLogger(__name__)
 
 ROOT = Path(__file__).parent
@@ -39,6 +41,7 @@ def _env_bool(key: str, varsayilan: bool = False) -> bool:
 
 # ── Sliding-window Rate Limiter ───────────────────────────────────────────────
 
+
 class RateLimiter:
     """
     Sliding-window rate limiter.
@@ -46,11 +49,11 @@ class RateLimiter:
     """
 
     def __init__(self, rpm: int = None, pencere: int = 60):
-        self.rpm     = rpm or _env_int("RATE_LIMIT_RPM", 60)
-        self.pencere = pencere         # saniye
-        self._retry  = _env_bool("RATE_LIMIT_RETRY", True)
-        self._penc: dict[str, deque] = {}   # provider -> timestamp deque
-        self._kilit  = threading.Lock()
+        self.rpm = rpm or _env_int("RATE_LIMIT_RPM", 60)
+        self.pencere = pencere  # saniye
+        self._retry = _env_bool("RATE_LIMIT_RETRY", True)
+        self._penc: dict[str, deque] = {}  # provider -> timestamp deque
+        self._kilit = threading.Lock()
         self._bekleme_toplam = 0.0
 
     def _pencere_al(self, provider: str) -> deque:
@@ -80,7 +83,9 @@ class RateLimiter:
                 )
             bekleme = 2.0
             self._bekleme_toplam += bekleme
-            print(f"[RateLimiter] {provider}: rate limit — {bekleme:.1f}s bekleniyor...")
+            print(
+                f"[RateLimiter] {provider}: rate limit — {bekleme:.1f}s bekleniyor..."
+            )
             time.sleep(bekleme)
         self.kaydet(provider)
 
@@ -91,10 +96,10 @@ class RateLimiter:
             while p and simdi - p[0] >= self.pencere:
                 p.popleft()
             return {
-                "provider":       provider,
-                "kullanilan":     len(p),
-                "sinir":          self.rpm,
-                "bos":            self.rpm - len(p),
+                "provider": provider,
+                "kullanilan": len(p),
+                "sinir": self.rpm,
+                "bos": self.rpm - len(p),
                 "toplam_bekleme": round(self._bekleme_toplam, 1),
             }
 
@@ -104,6 +109,7 @@ class RateLimiter:
 
 # ── Token Sayacı ──────────────────────────────────────────────────────────────
 
+
 class TokenBudget:
     """
     Günlük token bütçesi. Tahmini sayım: kelime * 1.3.
@@ -111,15 +117,16 @@ class TokenBudget:
     """
 
     def __init__(self, gunluk_sinir: int = None):
-        self.sinir    = gunluk_sinir or _env_int("TOKEN_BUDGET_DAILY", 0)
-        self._harcanan: dict[str, int] = {}   # provider -> token
-        self._gun     = self._bugun()
-        self._kilit   = threading.Lock()
+        self.sinir = gunluk_sinir or _env_int("TOKEN_BUDGET_DAILY", 0)
+        self._harcanan: dict[str, int] = {}  # provider -> token
+        self._gun = self._bugun()
+        self._kilit = threading.Lock()
         self._oturum_baslangic = time.monotonic()
 
     @staticmethod
     def _bugun() -> str:
         from datetime import date
+
         return date.today().isoformat()
 
     def _gun_kontrol(self):
@@ -146,7 +153,7 @@ class TokenBudget:
 
     def kalan(self) -> int:
         if not self.sinir:
-            return -1    # sinirsiz
+            return -1  # sinirsiz
         return max(0, self.sinir - self.toplam())
 
     def sinir_asildimi(self) -> bool:
@@ -159,12 +166,12 @@ class TokenBudget:
             self._gun_kontrol()
             sure = round(time.monotonic() - self._oturum_baslangic, 0)
             return {
-                "gun":            self._gun,
-                "harcanan":       self.toplam(),
-                "sinir":          self.sinir or "sinirsiz",
-                "kalan":          self.kalan() if self.sinir else "sinirsiz",
-                "oturum_sure_s":  sure,
-                "providerlar":    dict(self._harcanan),
+                "gun": self._gun,
+                "harcanan": self.toplam(),
+                "sinir": self.sinir or "sinirsiz",
+                "kalan": self.kalan() if self.sinir else "sinirsiz",
+                "oturum_sure_s": sure,
+                "providerlar": dict(self._harcanan),
             }
 
     def rapor(self) -> str:
@@ -182,6 +189,7 @@ class TokenBudget:
 
 # ── Sarmalayici: provider_transport ile entegre ───────────────────────────────
 
+
 class RateLimitedProvider:
     """
     Var olan provider'i sarmalar — her uret() cagrisi oncesinde
@@ -193,9 +201,9 @@ class RateLimitedProvider:
     """
 
     def __init__(self, provider, rpm: int = None, gunluk_token: int = None):
-        self._provider     = provider
-        self.rate_limiter  = RateLimiter(rpm)
-        self.token_budget  = TokenBudget(gunluk_token)
+        self._provider = provider
+        self.rate_limiter = RateLimiter(rpm)
+        self.token_budget = TokenBudget(gunluk_token)
 
     def uret(self, sistem: str, mesajlar: list, **kwargs) -> str:
         provider_adi = getattr(self._provider, "_aktif_provider", "default")
@@ -215,9 +223,7 @@ class RateLimitedProvider:
         cevap = self._provider.uret(sistem, mesajlar, **kwargs)
 
         # Token say: istek + cevap
-        istek_metni = sistem + " ".join(
-            m.get("content", "") for m in mesajlar
-        )
+        istek_metni = sistem + " ".join(m.get("content", "") for m in mesajlar)
         self.token_budget.kaydet(istek_metni, provider_adi)
         if cevap:
             self.token_budget.kaydet(cevap, provider_adi)
@@ -226,7 +232,7 @@ class RateLimitedProvider:
 
     def durum(self) -> dict:
         return {
-            "rate":  self.rate_limiter.tum_durum(),
+            "rate": self.rate_limiter.tum_durum(),
             "token": self.token_budget.durum(),
         }
 
@@ -246,6 +252,7 @@ class RateLimitedProvider:
 
 
 # ── Motor araci ───────────────────────────────────────────────────────────────
+
 
 def motor_kaydet(motor, rate_limited_provider=None) -> None:
     """Motor'a TOKEN_RAPOR araci ekle."""

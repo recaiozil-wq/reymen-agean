@@ -15,10 +15,20 @@ logger = logging.getLogger(__name__)
 
 # Cereyan hook API'sini import et — aynı arayüz, class+fonksiyon
 from src.reymen.cereyan.hook_dispatcher import (  # noqa: F401
-    hook_kaydet, hook_kaldir, hook_cagir, tum_hooklari_temizle,
-    kayitli_hooklar, hook, oturum_baslat_tetikle, oturum_bitir_tetikle,
-    tur_baslat_tetikle, tur_bitir_tetikle, arac_cagri_tetikle,
-    arac_sonuc_tetikle, hata_tetikle, context_sikistirma_tetikle,
+    hook_kaydet,
+    hook_kaldir,
+    hook_cagir,
+    tum_hooklari_temizle,
+    kayitli_hooklar,
+    hook,
+    oturum_baslat_tetikle,
+    oturum_bitir_tetikle,
+    tur_baslat_tetikle,
+    tur_bitir_tetikle,
+    arac_cagri_tetikle,
+    arac_sonuc_tetikle,
+    hata_tetikle,
+    context_sikistirma_tetikle,
 )
 
 
@@ -59,6 +69,7 @@ class HookDispatcher:
             # Cereyan API'sina da kaydet (konusma dongusu ile uyum)
             try:
                 from reymen.cereyan.hook_dispatcher import hook_kaydet as _hk
+
                 _hk(olay, fn)
             except Exception as _e:
                 __import__("logging").getLogger(__name__).warning(
@@ -121,7 +132,9 @@ class HookDispatcher:
             futures = {}
             for fn in fonsiyonlar:
                 try:
-                    future = self._executor.submit(self._guvenli_calistir, fn, olay, data)
+                    future = self._executor.submit(
+                        self._guvenli_calistir, fn, olay, data
+                    )
                     futures[future] = fn
                 except Exception as e:
                     logger.error(f"{fn.__name__} baslatilamadi: {e}")
@@ -164,9 +177,7 @@ class HookDispatcher:
             fn(olay=olay, **data)
             return True
         except Exception as e:
-            logger.error(
-                f"Hook hatasi [{olay}/{fn.__name__}]: {e}"
-            )
+            logger.error(f"Hook hatasi [{olay}/{fn.__name__}]: {e}")
             return False
 
     def listele(self, olay=None):
@@ -282,6 +293,7 @@ def run(**kwargs):
 
 
 if __name__ == "__main__":
+
     def ornek_hook(olay=None, **data):
         print(f"Hook calisti: {olay}, data={data}")
 

@@ -1,4 +1,5 @@
 """ReYMeN tools.voice_mode shim — Hermes voice mode fonksiyonlarını yönlendirir."""
+
 from __future__ import annotations
 
 import json
@@ -18,18 +19,21 @@ def check_voice_requirements() -> Dict[str, Any]:
     }
     try:
         import speech_recognition  # noqa: F401
+
         result["microphone"] = True
     except ImportError as _e:
         logger.warning("[VoiceMode] Modul yuklenemedi (L22): %s", ImportError)
         pass
     try:
         from reymen.arac.voice_engine import VoiceRegistry
+
         registry = VoiceRegistry()
         result["tts_available"] = True
         result["stt_available"] = True
     except ImportError:
         try:
             import edge_tts  # noqa: F401
+
             result["tts_available"] = True
         except ImportError as _e:
             logger.warning("[VoiceMode] Modul yuklenemedi (L33): %s", ImportError)

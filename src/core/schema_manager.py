@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class Migration:
     """Tek bir schema migration'i."""
+
     version: int
     ad: str
     sql: str = ""
@@ -74,10 +75,13 @@ class SchemaManager:
 
     # -- Ana API ------------------------------------------------------------
 
-    def kaydet(self, db_yol: str | Path,
-               tablolar: list[str],
-               version: int = 1,
-               migrations: list[Migration] | None = None) -> dict:
+    def kaydet(
+        self,
+        db_yol: str | Path,
+        tablolar: list[str],
+        version: int = 1,
+        migrations: list[Migration] | None = None,
+    ) -> dict:
         """Bir DB dosyasinin schema'sini kaydet/guncelle.
 
         Args:
@@ -110,8 +114,7 @@ class SchemaManager:
 
             # Mevcut versiyon
             cur = con.execute(
-                "SELECT version FROM schema_version WHERE ad=?",
-                ("main",)
+                "SELECT version FROM schema_version WHERE ad=?", ("main",)
             )
             row = cur.fetchone()
             mevcut_ver = row[0] if row else 0
@@ -123,8 +126,13 @@ class SchemaManager:
                         if m.version > mevcut_ver and m.version <= version:
                             deg = m.uygula(con)
                             uygulanan.append(f"v{m.version}:{m.ad}({deg})")
-                            logger.info("[Schema] %s -> v%d: %s (%s)",
-                                       yol.name, m.version, m.ad, deg)
+                            logger.info(
+                                "[Schema] %s -> v%d: %s (%s)",
+                                yol.name,
+                                m.version,
+                                m.ad,
+                                deg,
+                            )
 
                 # Tablolari olustur
                 for sql in tablolar:
@@ -135,19 +143,20 @@ class SchemaManager:
                 if mevcut_ver == 0:
                     con.execute(
                         "INSERT INTO schema_version (ad, version, applied_at) VALUES (?, ?, ?)",
-                        ("main", version, time.time())
+                        ("main", version, time.time()),
                     )
                 else:
                     con.execute(
                         "UPDATE schema_version SET version=?, applied_at=? WHERE ad=?",
-                        (version, time.time(), "main")
+                        (version, time.time(), "main"),
                     )
 
                 con.commit()
                 durum = "olusturuldu" if mevcut_ver == 0 else "guncellendi"
                 self._kayitli_dblar[str(yol)] = version
-                logger.info("[Schema] %s: v%d -> v%d (%s)",
-                           yol.name, mevcut_ver, version, durum)
+                logger.info(
+                    "[Schema] %s: v%d -> v%d (%s)", yol.name, mevcut_ver, version, durum
+                )
                 return {
                     "durum": durum,
                     "version": version,
@@ -175,7 +184,7 @@ class SchemaManager:
             con = sqlite3.connect(str(yol))
             cur = con.execute(
                 "SELECT version, applied_at, metadata FROM schema_version WHERE ad=?",
-                ("main",)
+                ("main",),
             )
             row = cur.fetchone()
             con.close()
@@ -184,7 +193,7 @@ class SchemaManager:
                     "db": yol.name,
                     "version": row[0],
                     "applied_at": row[1],
-                    "metadata": json.loads(row[2]) if row[2] != '{}' else {},
+                    "metadata": json.loads(row[2]) if row[2] != "{}" else {},
                 }
             return {"db": yol.name, "version": 0, "applied_at": 0}
         except Exception as e:
@@ -193,8 +202,7 @@ class SchemaManager:
     def tum_durum(self) -> list[dict]:
         """Kayitli tum DB'lerin durumu."""
         return [
-            {"yol": yol, "version": ver}
-            for yol, ver in self._kayitli_dblar.items()
+            {"yol": yol, "version": ver} for yol, ver in self._kayitli_dblar.items()
         ]
 
 
@@ -224,9 +232,7 @@ def tablolari_listele(db_yol: str | Path) -> list[str]:
     if not yol.exists():
         return []
     con = sqlite3.connect(str(yol))
-    cur = con.execute(
-        "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name"
-    )
+    cur = con.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
     tablolar = [r[0] for r in cur.fetchall()]
     con.close()
     return tablolar
@@ -253,16 +259,19 @@ def db_boyut(db_yol: str | Path) -> str:
 def motor_kaydet(motor) -> None:
     """Motor'a Schema Manager araclarini kaydet."""
     motor._plugin_arac_kaydet(
-        "SCHEMA_DURUM", _schema_durum,
-        "SQLite schema versiyonlarini goster. Tum kayitli DB'lerin durumu."
+        "SCHEMA_DURUM",
+        _schema_durum,
+        "SQLite schema versiyonlarini goster. Tum kayitli DB'lerin durumu.",
     )
     motor._plugin_arac_kaydet(
-        "SCHEMA_TABLOLAR", _schema_tablolar,
-        "Bir DB'deki tablolari listele. Kullanim: SCHEMA_TABLOLAR <db_yolu>"
+        "SCHEMA_TABLOLAR",
+        _schema_tablolar,
+        "Bir DB'deki tablolari listele. Kullanim: SCHEMA_TABLOLAR <db_yolu>",
     )
     motor._plugin_arac_kaydet(
-        "SCHEMA_TARA", _schema_tara,
-        "Projedeki tum SQLite DB'leri tara ve schema durumlarini goster."
+        "SCHEMA_TARA",
+        _schema_tara,
+        "Projedeki tum SQLite DB'leri tara ve schema durumlarini goster.",
     )
     logger.info("[SCHEMA] Motor'a 3 arac kaydedildi")
 
@@ -287,17 +296,19 @@ def _schema_tablolar(**kw) -> str:
     tablolar = tablolari_listele(db)
     if not tablolar:
         return f"[SCHEMA] DB bulunamadi veya tablo yok: {db}"
-    return (f"[SCHEMA] {Path(db).name}: {len(tablolari_listele(db))} tablo\n"
-            + "\n".join(f"    - {t}" for t in tablolari_listele(db)))
+    return (
+        f"[SCHEMA] {Path(db).name}: {len(tablolari_listele(db))} tablo\n"
+        + "\n".join(f"    - {t}" for t in tablolari_listele(db))
+    )
 
 
 def _schema_tara(**kw) -> str:
     """Projedeki tum SQLite DB'leri tara."""
     import glob
+
     satirlar = ["[SCHEMA] Proje DB taramasi:"]
     for db in glob.glob("**/*.db", recursive=True):
-        if ("__pycache__" in db or "node_modules" in db
-                or ".venv" in db):
+        if "__pycache__" in db or "node_modules" in db or ".venv" in db:
             continue
         durum = schema_manager().durum(db)
         if durum:

@@ -26,6 +26,7 @@ import os
 from abc import ABC, abstractmethod
 from typing import Optional
 import logging
+
 logger = logging.getLogger(__name__)
 
 log = logging.getLogger(__name__)
@@ -48,6 +49,7 @@ _USER_AGENT = "ReYMeN-Ajan/1.0"
 # ═══════════════════════════════════════════════════════════════════════════════
 # Soyut Taban Sınıfı
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class ImageGenEngine(ABC):
     """Tüm görsel üretim engine'leri için soyut taban sınıfı."""
@@ -79,12 +81,20 @@ class ImageGenEngine(ABC):
         blok += "\n[/MEDIA]"
         return blok
 
-    def _http_post_json(self, url: str, payload: dict, headers: dict = None, timeout: int = 90) -> dict:
+    def _http_post_json(
+        self, url: str, payload: dict, headers: dict = None, timeout: int = 90
+    ) -> dict:
         import urllib.request as _req
+
         data = json.dumps(payload).encode()
         req = _req.Request(
-            url, data=data,
-            headers={"Content-Type": "application/json", "User-Agent": _USER_AGENT, **(headers or {})},
+            url,
+            data=data,
+            headers={
+                "Content-Type": "application/json",
+                "User-Agent": _USER_AGENT,
+                **(headers or {}),
+            },
         )
         with _req.urlopen(req, timeout=timeout) as r:
             return json.loads(r.read().decode())
@@ -93,6 +103,7 @@ class ImageGenEngine(ABC):
 # ═══════════════════════════════════════════════════════════════════════════════
 # FAL Engine (fal.ai FLUX)
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class FALEngine(ImageGenEngine):
     """FAL.ai FLUX modeli ile görsel üretir. FAL_KEY ortam değişkeni gerekli."""
@@ -144,7 +155,10 @@ class FALEngine(ImageGenEngine):
         try:
             sonuc = self._http_post_json(
                 model_url,
-                {"prompt": prompt.strip(), "image_size": {"width": en_i, "height": boy_i}},
+                {
+                    "prompt": prompt.strip(),
+                    "image_size": {"width": en_i, "height": boy_i},
+                },
                 headers={"Authorization": f"Key {api_key}"},
                 timeout=90,
             )
@@ -163,12 +177,15 @@ class FALEngine(ImageGenEngine):
 
             if not url:
                 return f"[RESIM_OLUSTUR/FAL] Hata: beklenmeyen cevap: {json.dumps(sonuc)[:300]}"
-            return self._media("image", url, f"Prompt: {prompt.strip()} [FAL: {model_name}]")
+            return self._media(
+                "image", url, f"Prompt: {prompt.strip()} [FAL: {model_name}]"
+            )
 
         except Exception as e:
             log.exception("[FALEngine] FAL API hatasi:")
             # urllib.error.HTTPError durumunda body'yi oku
             import urllib.error as _ue
+
             if hasattr(e, "read"):
                 try:
                     govde = e.read().decode(errors="replace")[:300]
@@ -183,6 +200,7 @@ class FALEngine(ImageGenEngine):
 # ═══════════════════════════════════════════════════════════════════════════════
 # OpenAI Engine (DALL-E)
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class OpenAIEngine(ImageGenEngine):
     """OpenAI DALL-E ile görsel üretir. OPENAI_API_KEY ortam değişkeni gerekli."""
@@ -223,11 +241,14 @@ class OpenAIEngine(ImageGenEngine):
             url = data[0].get("url", "")
             if not url:
                 return "[RESIM_OLUSTUR/OpenAI] Hata: URL bulunamadi."
-            return self._media("image", url, f"Prompt: {prompt.strip()} [OpenAI DALL-E]")
+            return self._media(
+                "image", url, f"Prompt: {prompt.strip()} [OpenAI DALL-E]"
+            )
 
         except Exception as e:
             log.exception("[OpenAIEngine] OpenAI API hatasi:")
             import urllib.error as _ue
+
             if hasattr(e, "read"):
                 try:
                     govde = e.read().decode(errors="replace")[:300]
@@ -242,6 +263,7 @@ class OpenAIEngine(ImageGenEngine):
 # ═══════════════════════════════════════════════════════════════════════════════
 # xAI Engine (Stub / dummy)
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class xAIEngine(ImageGenEngine):
     """xAI / Grok görsel üretim engine'i. XAI_API_KEY ortam değişkeni gerekli.
@@ -278,7 +300,11 @@ class xAIEngine(ImageGenEngine):
             if not model:
                 model = "grok-imagine-image"
 
-            valid_models = {"grok-imagine-image", "grok-imagine-image-quality", "grok-2-image"}
+            valid_models = {
+                "grok-imagine-image",
+                "grok-imagine-image-quality",
+                "grok-2-image",
+            }
             if model not in valid_models:
                 model = "grok-imagine-image"
 
@@ -305,7 +331,8 @@ class xAIEngine(ImageGenEngine):
                 b64 = data[0].get("b64_json", "")
                 if b64:
                     return self._media(
-                        "image_b64", b64,
+                        "image_b64",
+                        b64,
                         f"Prompt: {prompt.strip()} [xAI Grok]",
                     )
                 return "[RESIM_OLUSTUR/xAI] Hata: URL bulunamadi."
@@ -314,6 +341,7 @@ class xAIEngine(ImageGenEngine):
         except Exception as e:
             log.exception("[xAIEngine] xAI API hatasi:")
             import urllib.error as _ue
+
             if hasattr(e, "read"):
                 try:
                     govde = e.read().decode(errors="replace")[:300]
@@ -328,6 +356,7 @@ class xAIEngine(ImageGenEngine):
 # ═══════════════════════════════════════════════════════════════════════════════
 # Stub Engine (local dummy / simüle)
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class StubEngine(ImageGenEngine):
     """Local dummy engine. API key gerekmez. Görsel üretmez, simüle eder."""
@@ -349,6 +378,7 @@ class StubEngine(ImageGenEngine):
 # Image Gen Registry
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class ImageGenRegistry:
     """Görsel üretim engine'lerini kaydet, seç ve çalıştır."""
 
@@ -366,14 +396,24 @@ class ImageGenRegistry:
             self._varsayilan = adi
         elif adi == "openai" and engine.hazir and self._varsayilan != "fal":
             self._varsayilan = adi
-        elif adi == "xai" and engine.hazir and self._varsayilan not in ("fal", "openai"):
+        elif (
+            adi == "xai" and engine.hazir and self._varsayilan not in ("fal", "openai")
+        ):
             self._varsayilan = adi
-        log.info("[ImageGenRegistry] Engine kaydedildi: %s (varsayilan: %s)", adi, self._varsayilan)
+        log.info(
+            "[ImageGenRegistry] Engine kaydedildi: %s (varsayilan: %s)",
+            adi,
+            self._varsayilan,
+        )
 
     def sec(self, ad: str) -> Optional[ImageGenEngine]:
         eng = self._engines.get(ad)
         if eng is None and self._varsayilan:
-            log.warning("[ImageGenRegistry] '%s' bulunamadi, varsayilana dusuluyor: %s", ad, self._varsayilan)
+            log.warning(
+                "[ImageGenRegistry] '%s' bulunamadi, varsayilana dusuluyor: %s",
+                ad,
+                self._varsayilan,
+            )
             return self._engines.get(self._varsayilan)
         return eng
 
@@ -381,7 +421,9 @@ class ImageGenRegistry:
     def varsayilan(self) -> Optional[ImageGenEngine]:
         return self._engines.get(self._varsayilan) if self._varsayilan else None
 
-    def calistir(self, engine_adi: str, prompt: str, en: str = "1024", boy: str = "1024") -> str:
+    def calistir(
+        self, engine_adi: str, prompt: str, en: str = "1024", boy: str = "1024"
+    ) -> str:
         if not prompt or not prompt.strip():
             return "[RESIM_OLUSTUR] Hata: 'prompt' bos olamaz."
         eng = self.sec(engine_adi)
@@ -429,7 +471,10 @@ def _get_registry() -> ImageGenRegistry:
 # Tool Fonksiyonu
 # ═══════════════════════════════════════════════════════════════════════════════
 
-def resim_olustur(prompt: str, en: str = "1024", boy: str = "1024", backend: str = "") -> str:
+
+def resim_olustur(
+    prompt: str, en: str = "1024", boy: str = "1024", backend: str = ""
+) -> str:
     """RESIM_OLUSTUR tool'u — backend parametresi ile çoklu görsel üretim.
 
     Args:
@@ -468,6 +513,7 @@ def image_gen_engine_listele() -> str:
 # Motor Kayit
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 def motor_kaydet(motor) -> None:
     """Motor tarafindan otomatik cagrilir. RESIM_OLUSTUR tool'unu kaydeder."""
     if not hasattr(motor, "_plugin_arac_kaydet"):
@@ -477,7 +523,7 @@ def motor_kaydet(motor) -> None:
             "RESIM_OLUSTUR",
             lambda ham="": _resim_olustur_ayristir_ve_calistir(ham),
             "Prompt'tan gorsel uretir (coklu back-end)."
-            " Kullanim: RESIM_OLUSTUR(prompt=\"...\", en=\"1024\", boy=\"1024\", backend=\"fal|openai|xai|stub\")\n"
+            ' Kullanim: RESIM_OLUSTUR(prompt="...", en="1024", boy="1024", backend="fal|openai|xai|stub")\n'
             "Varsayilan: FAL (FAL_KEY) > OpenAI (OPENAI_API_KEY) > xAI (XAI_API_KEY) > stub\n"
             "FAL: FAL_KEY ortam degiskeni gerekli.\n"
             "OpenAI: OPENAI_API_KEY gerekli.\n"
@@ -496,6 +542,7 @@ def motor_kaydet(motor) -> None:
 def _resim_olustur_ayristir_ve_calistir(ham: str) -> str:
     """RESIM_OLUSTUR(ham) -> parametre ayristir."""
     import re as _re
+
     prompt = ""
     en = "1024"
     boy = "1024"

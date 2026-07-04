@@ -85,10 +85,12 @@ def test_bridge_refreshes_expired_token(bridge_module, tmp_path):
     _write_token(token_path, token="ya29.old", expiry=past)
 
     mock_resp = MagicMock()
-    mock_resp.read.return_value = json.dumps({
-        "access_token": "ya29.refreshed",
-        "expires_in": 3600,
-    }).encode()
+    mock_resp.read.return_value = json.dumps(
+        {
+            "access_token": "ya29.refreshed",
+            "expires_in": 3600,
+        }
+    ).encode()
     mock_resp.__enter__ = lambda s: s
     mock_resp.__exit__ = MagicMock(return_value=False)
 
@@ -111,10 +113,12 @@ def test_bridge_refresh_passes_timeout_to_urlopen(bridge_module):
     _write_token(token_path, token="ya29.old", expiry=past)
 
     mock_resp = MagicMock()
-    mock_resp.read.return_value = json.dumps({
-        "access_token": "ya29.refreshed",
-        "expires_in": 3600,
-    }).encode()
+    mock_resp.read.return_value = json.dumps(
+        {
+            "access_token": "ya29.refreshed",
+            "expires_in": 3600,
+        }
+    ).encode()
     mock_resp.__enter__ = lambda s: s
     mock_resp.__exit__ = MagicMock(return_value=False)
 
@@ -123,9 +127,9 @@ def test_bridge_refresh_passes_timeout_to_urlopen(bridge_module):
 
     assert mocked.call_count == 1
     _, kwargs = mocked.call_args
-    assert kwargs.get("timeout") is not None, (
-        "urlopen call must pass timeout= to avoid hanging on unreachable upstream"
-    )
+    assert (
+        kwargs.get("timeout") is not None
+    ), "urlopen call must pass timeout= to avoid hanging on unreachable upstream"
 
 
 def test_bridge_refresh_exits_cleanly_on_network_error(bridge_module):
@@ -184,7 +188,11 @@ def test_api_calendar_list_uses_events_list(api_module):
         return MagicMock(returncode=0, stdout="{}", stderr="")
 
     args = api_module.argparse.Namespace(
-        start="", end="", max=25, calendar="primary", func=api_module.calendar_list,
+        start="",
+        end="",
+        max=25,
+        calendar="primary",
+        func=api_module.calendar_list,
     )
 
     with patch.object(api_module.subprocess, "run", side_effect=capture_run):
@@ -236,7 +244,9 @@ def test_api_calendar_list_respects_date_range(api_module):
         ("From", "To", "Subject", "Date"),
     ],
 )
-def test_api_gmail_get_reads_headers_case_insensitively(api_module, capsys, header_names):
+def test_api_gmail_get_reads_headers_case_insensitively(
+    api_module, capsys, header_names
+):
     from_name, to_name, subject_name, date_name = header_names
 
     def fake_run_gws(parts, *, params=None, body=None):
@@ -435,7 +445,9 @@ def test_api_gmail_reply_reads_headers_case_insensitively_and_uses_conventional_
     assert "\nreferences: " not in raw_text
 
 
-def test_api_get_credentials_refresh_persists_authorized_user_type(api_module, monkeypatch):
+def test_api_get_credentials_refresh_persists_authorized_user_type(
+    api_module, monkeypatch
+):
     token_path = api_module.TOKEN_PATH
     _write_token(token_path, token="ya29.old")
 
@@ -449,13 +461,15 @@ def test_api_get_credentials_refresh_persists_authorized_user_type(api_module, m
             self.expired = False
 
         def to_json(self):
-            return json.dumps({
-                "token": "ya29.refreshed",
-                "refresh_token": "1//refresh",
-                "client_id": "123.apps.googleusercontent.com",
-                "client_secret": "secret",
-                "token_uri": "https://oauth2.googleapis.com/token",
-            })
+            return json.dumps(
+                {
+                    "token": "ya29.refreshed",
+                    "refresh_token": "1//refresh",
+                    "client_id": "123.apps.googleusercontent.com",
+                    "client_secret": "secret",
+                    "token_uri": "https://oauth2.googleapis.com/token",
+                }
+            )
 
     class FakeCredentialsModule:
         @staticmethod

@@ -19,16 +19,27 @@ from datetime import datetime
 from pathlib import Path
 
 # ── ANSI ─────────────────────────────────────────────────────────────────────
-_G   = "\033[92m"   # Parlak yesil
-_KG  = "\033[32m"   # Koyu yesil
-_B   = "\033[1m"    # Kalin
-_D   = "\033[2m"    # Dim/soluk
-_S   = "\033[0m"    # Sifirla
+_G = "\033[92m"  # Parlak yesil
+_KG = "\033[32m"  # Koyu yesil
+_B = "\033[1m"  # Kalin
+_D = "\033[2m"  # Dim/soluk
+_S = "\033[0m"  # Sifirla
 
-def _g(t):  return f"{_G}{t}{_S}"
-def _kg(t): return f"{_KG}{_B}{t}{_S}"
-def _d(t):  return f"{_D}{t}{_S}"
-def _gb(t): return f"{_G}{_B}{t}{_S}"
+
+def _g(t):
+    return f"{_G}{t}{_S}"
+
+
+def _kg(t):
+    return f"{_KG}{_B}{t}{_S}"
+
+
+def _d(t):
+    return f"{_D}{t}{_S}"
+
+
+def _gb(t):
+    return f"{_G}{_B}{t}{_S}"
 
 
 # ── Logo ──────────────────────────────────────────────────────────────────────
@@ -44,6 +55,7 @@ _LOGO_GEN = len(_LOGO[0])  # 56 karakter
 
 
 # ── Skill Tarayici ────────────────────────────────────────────────────────────
+
 
 def skill_tara(proje_kok: Path | None = None) -> dict[str, list[str]]:
     """
@@ -68,7 +80,7 @@ def skill_tara(proje_kok: Path | None = None) -> dict[str, list[str]]:
         if not skill_md.exists():
             continue
 
-        adi     = item.name
+        adi = item.name
         kategori = _skill_kategorisi_bul(skill_md, adi)
         kategoriler.setdefault(kategori, []).append(adi)
 
@@ -119,63 +131,132 @@ def _skill_kategorisi_bul(skill_md: Path, adi: str) -> str:
 # Spesifik tag → genis kategori haritasi
 _TAG_HARITASI: dict[str, str] = {
     # Agents / AI
-    "agent": "autonomous-ai-agents", "agents": "autonomous-ai-agents",
-    "multi-agent": "autonomous-ai-agents", "a2a": "autonomous-ai-agents",
-    "autonomous": "autonomous-ai-agents", "claude": "autonomous-ai-agents",
-    "claude-code": "autonomous-ai-agents", "anthropic": "autonomous-ai-agents",
-    "openai": "autonomous-ai-agents", "ReYMeN": "ReYMeN-agent",
-    "ReYMeN-agent": "ReYMeN-agent", "reymen": "ReYMeN-agent",
+    "agent": "autonomous-ai-agents",
+    "agents": "autonomous-ai-agents",
+    "multi-agent": "autonomous-ai-agents",
+    "a2a": "autonomous-ai-agents",
+    "autonomous": "autonomous-ai-agents",
+    "claude": "autonomous-ai-agents",
+    "claude-code": "autonomous-ai-agents",
+    "anthropic": "autonomous-ai-agents",
+    "openai": "autonomous-ai-agents",
+    "ReYMeN": "ReYMeN-agent",
+    "ReYMeN-agent": "ReYMeN-agent",
+    "reymen": "ReYMeN-agent",
     # Software Development
-    "python": "software-development", "code": "software-development",
-    "coding": "software-development", "testing": "software-development",
-    "debug": "software-development", "refactor": "software-development",
-    "api": "software-development", "sdk": "software-development",
-    "architecture": "software-development", "design-patterns": "software-development",
+    "python": "software-development",
+    "code": "software-development",
+    "coding": "software-development",
+    "testing": "software-development",
+    "debug": "software-development",
+    "refactor": "software-development",
+    "api": "software-development",
+    "sdk": "software-development",
+    "architecture": "software-development",
+    "design-patterns": "software-development",
     # DevOps
-    "devops": "devops", "docker": "devops", "kubernetes": "devops",
-    "k8s": "devops", "helm": "devops", "ci": "devops", "cd": "devops",
-    "deployment": "devops", "infrastructure": "devops", "terraform": "devops",
+    "devops": "devops",
+    "docker": "devops",
+    "kubernetes": "devops",
+    "k8s": "devops",
+    "helm": "devops",
+    "ci": "devops",
+    "cd": "devops",
+    "deployment": "devops",
+    "infrastructure": "devops",
+    "terraform": "devops",
     # GitHub / Git
-    "github": "github", "git": "github", "pr": "github",
-    "code-review": "github", "codebase": "github",
+    "github": "github",
+    "git": "github",
+    "pr": "github",
+    "code-review": "github",
+    "codebase": "github",
     # Data Science
-    "data": "data-science", "dataset": "data-science", "sql": "data-science",
-    "database": "data-science", "etl": "data-science", "pandas": "data-science",
-    "jupyter": "data-science", "statistics": "data-science", "analytics": "data-science",
+    "data": "data-science",
+    "dataset": "data-science",
+    "sql": "data-science",
+    "database": "data-science",
+    "etl": "data-science",
+    "pandas": "data-science",
+    "jupyter": "data-science",
+    "statistics": "data-science",
+    "analytics": "data-science",
     # MLOps
-    "ml": "mlops", "llm": "mlops", "mlops": "mlops", "training": "mlops",
-    "finetune": "mlops", "rl": "mlops", "model": "mlops",
-    "huggingface": "mlops", "pytorch": "mlops", "tensorflow": "mlops",
-    "inference": "mlops", "benchmark": "mlops",
+    "ml": "mlops",
+    "llm": "mlops",
+    "mlops": "mlops",
+    "training": "mlops",
+    "finetune": "mlops",
+    "rl": "mlops",
+    "model": "mlops",
+    "huggingface": "mlops",
+    "pytorch": "mlops",
+    "tensorflow": "mlops",
+    "inference": "mlops",
+    "benchmark": "mlops",
     # Research
-    "research": "research", "arxiv": "research", "paper": "research",
-    "blog": "research", "survey": "research", "llm-wiki": "research",
+    "research": "research",
+    "arxiv": "research",
+    "paper": "research",
+    "blog": "research",
+    "survey": "research",
+    "llm-wiki": "research",
     # Web
-    "web": "web", "scraping": "web", "crawl": "web", "http": "web",
-    "browser": "web", "playwright": "web", "selenium": "web",
-    "frontend": "web", "react": "web", "vue": "web",
+    "web": "web",
+    "scraping": "web",
+    "crawl": "web",
+    "http": "web",
+    "browser": "web",
+    "playwright": "web",
+    "selenium": "web",
+    "frontend": "web",
+    "react": "web",
+    "vue": "web",
     # Media / Creative
-    "image": "media", "video": "media", "audio": "media", "gif": "media",
-    "art": "creative", "ascii": "creative", "diagram": "creative",
-    "3d": "creative", "creative": "creative", "design": "creative",
+    "image": "media",
+    "video": "media",
+    "audio": "media",
+    "gif": "media",
+    "art": "creative",
+    "ascii": "creative",
+    "diagram": "creative",
+    "3d": "creative",
+    "creative": "creative",
+    "design": "creative",
     # Messaging / Comms
-    "telegram": "messaging", "discord": "messaging", "slack": "messaging",
-    "whatsapp": "messaging", "signal": "messaging", "messaging": "messaging",
+    "telegram": "messaging",
+    "discord": "messaging",
+    "slack": "messaging",
+    "whatsapp": "messaging",
+    "signal": "messaging",
+    "messaging": "messaging",
     # Note-taking / Productivity
-    "obsidian": "note-taking", "notion": "note-taking",
-    "note": "note-taking", "wiki": "note-taking",
-    "google": "productivity", "airtable": "productivity",
-    "calendar": "productivity", "spreadsheet": "productivity",
+    "obsidian": "note-taking",
+    "notion": "note-taking",
+    "note": "note-taking",
+    "wiki": "note-taking",
+    "google": "productivity",
+    "airtable": "productivity",
+    "calendar": "productivity",
+    "spreadsheet": "productivity",
     # Security
-    "security": "security", "auth": "security", "cve": "security",
-    "pentest": "security", "vulnerability": "security",
+    "security": "security",
+    "auth": "security",
+    "cve": "security",
+    "pentest": "security",
+    "vulnerability": "security",
     # Smart Home / IoT
-    "smart-home": "smart-home", "hue": "smart-home",
-    "mqtt": "smart-home", "iot": "smart-home",
+    "smart-home": "smart-home",
+    "hue": "smart-home",
+    "mqtt": "smart-home",
+    "iot": "smart-home",
     # Email
-    "email": "email", "mail": "email",
+    "email": "email",
+    "mail": "email",
     # UI/UX
-    "ui": "ui", "ux": "ui", "ui-ux": "ui",
+    "ui": "ui",
+    "ux": "ui",
+    "ui-ux": "ui",
 }
 
 
@@ -183,26 +264,36 @@ def _isimden_kategori(adi: str) -> str:
     """Skill adindaki anahtar kelimelere gore kategori tahmin et."""
     adi_l = adi.lower()
     _ISIM_ESLESME = [
-        (["claude", "openai", "anthropic", "gpt", "autonomous", "agent", "llm-"],
-            "autonomous-ai-agents"),
+        (
+            ["claude", "openai", "anthropic", "gpt", "autonomous", "agent", "llm-"],
+            "autonomous-ai-agents",
+        ),
         (["ReYMeN", "reymen"], "ReYMeN-agent"),
         (["github", "git-", "codebase", "pr-"], "github"),
         (["telegram", "discord", "slack", "whatsapp"], "messaging"),
-        (["docker", "kubernetes", "k8s", "helm", "terraform", "deploy", "devops"],
-            "devops"),
-        (["python", "code-", "coding", "debug", "test", "refactor", "sdk", "api-"],
-            "software-development"),
-        (["data", "sql", "database", "etl", "pandas", "jupyter", "analytics"],
-            "data-science"),
-        (["ml-", "llm-", "train", "finetune", "rl-", "reward", "mlops", "hugging"],
-            "mlops"),
-        (["image", "video", "audio", "media", "gif", "art", "3d-", "ascii"],
-            "creative"),
+        (
+            ["docker", "kubernetes", "k8s", "helm", "terraform", "deploy", "devops"],
+            "devops",
+        ),
+        (
+            ["python", "code-", "coding", "debug", "test", "refactor", "sdk", "api-"],
+            "software-development",
+        ),
+        (
+            ["data", "sql", "database", "etl", "pandas", "jupyter", "analytics"],
+            "data-science",
+        ),
+        (
+            ["ml-", "llm-", "train", "finetune", "rl-", "reward", "mlops", "hugging"],
+            "mlops",
+        ),
+        (
+            ["image", "video", "audio", "media", "gif", "art", "3d-", "ascii"],
+            "creative",
+        ),
         (["obsidian", "notion", "note", "wiki"], "note-taking"),
-        (["google", "airtable", "calendar", "spreadsheet", "drive"],
-            "productivity"),
-        (["web-", "scrape", "crawl", "browser", "http", "playwright", "react"],
-            "web"),
+        (["google", "airtable", "calendar", "spreadsheet", "drive"], "productivity"),
+        (["web-", "scrape", "crawl", "browser", "http", "playwright", "react"], "web"),
         (["arxiv", "research", "paper", "blog", "survey"], "research"),
         (["ui-", "ux-", "design", "figma", "interface"], "ui"),
         (["security", "auth", "cve", "pentest", "vuln"], "security"),
@@ -217,8 +308,10 @@ def _isimden_kategori(adi: str) -> str:
 
 # ── Model Secimi (Kredi Kontrollu) ──────────────────────────────────────────
 
+
 def _lmstudio_modeller() -> list[str]:
     import urllib.request, json
+
     try:
         req = urllib.request.Request(
             "http://localhost:1234/v1/models",
@@ -232,6 +325,7 @@ def _lmstudio_modeller() -> list[str]:
 
 def _ollama_modeller() -> list[str]:
     import urllib.request, json
+
     try:
         with urllib.request.urlopen("http://localhost:11434/api/tags", timeout=2) as r:
             return [m["name"] for m in json.loads(r.read()).get("models", [])]
@@ -241,7 +335,7 @@ def _ollama_modeller() -> list[str]:
 
 def _provider_kontrol_et(provider: str, model: str, cfg: dict) -> tuple[bool, str]:
     """Secilen provider'in calisip calismadigini kontrol et.
-    
+
     Returns:
         (True, "") veya (False, "hata_mesaji")
     """
@@ -254,7 +348,10 @@ def _provider_kontrol_et(provider: str, model: str, cfg: dict) -> tuple[bool, st
         if not modeller:
             return False, "LM Studio calismiyor (localhost:1234 ulasilamadi)"
         if model not in modeller:
-            return False, f"Model {model} LM Studio'da bulunamadi. Mevcut: {', '.join(modeller[:3])}..."
+            return (
+                False,
+                f"Model {model} LM Studio'da bulunamadi. Mevcut: {', '.join(modeller[:3])}...",
+            )
         return True, ""
 
     if provider == "ollama":
@@ -271,12 +368,15 @@ def _provider_kontrol_et(provider: str, model: str, cfg: dict) -> tuple[bool, st
     api_key = prov_conf.get("api_key", "") or ""
     if not api_key:
         env_key_name = {
-            "deepseek": "DEEPSEEK_API_KEY", "openai": "OPENAI_API_KEY",
-            "anthropic": "ANTHROPIC_API_KEY", "groq": "GROQ_API_KEY",
+            "deepseek": "DEEPSEEK_API_KEY",
+            "openai": "OPENAI_API_KEY",
+            "anthropic": "ANTHROPIC_API_KEY",
+            "groq": "GROQ_API_KEY",
             "openrouter": "OPENROUTER_API_KEY",
         }.get(provider, "")
         if env_key_name:
             import os
+
             api_key = os.environ.get(env_key_name, "")
 
     if not api_key:
@@ -287,7 +387,7 @@ def _provider_kontrol_et(provider: str, model: str, cfg: dict) -> tuple[bool, st
         url = f"{base_url.rstrip('/')}/v1/models" if base_url else ""
         if not url:
             return False, f"Base URL tanimli degil ({provider})"
-        
+
         headers = {
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
@@ -304,7 +404,10 @@ def _provider_kontrol_et(provider: str, model: str, cfg: dict) -> tuple[bool, st
         code = e.code
         body = e.read().decode("utf-8", errors="replace")[:200]
         if code == 402:
-            return False, f"KREDI YOK (HTTP 402): {provider} hesabinda yeterli kredi bulunamadi"
+            return (
+                False,
+                f"KREDI YOK (HTTP 402): {provider} hesabinda yeterli kredi bulunamadi",
+            )
         elif code == 401:
             return False, f"API anahtari gecersiz (HTTP 401): {provider}"
         elif code == 403:
@@ -326,20 +429,23 @@ def model_sec(agent=None) -> bool:
     Returns True if model changed, False otherwise.
     """
     import os as _os
-    mevcut_model    = ""
+
+    mevcut_model = ""
     mevcut_provider = ""
 
     if agent:
         cfg = getattr(agent, "config", {}) or {}
-        mevcut_model    = cfg.get("default_model", "")
+        mevcut_model = cfg.get("default_model", "")
         mevcut_provider = cfg.get("default_provider", "")
 
     # Mevcut modeli goster
-    print(f"\n  {_kg('Aktif Model')} : {_g(mevcut_model) if mevcut_model else _d('Taninmadi')}"
-          f"  {_d('(' + mevcut_provider + ')') if mevcut_provider else ''}")
+    print(
+        f"\n  {_kg('Aktif Model')} : {_g(mevcut_model) if mevcut_model else _d('Taninmadi')}"
+        f"  {_d('(' + mevcut_provider + ')') if mevcut_provider else ''}"
+    )
 
     # Mevcut modeli taranmis modeller listesiyle karsilastir
-    ls_mods  = _lmstudio_modeller()
+    ls_mods = _lmstudio_modeller()
     oll_mods = _ollama_modeller()
     tum_modeller: list[tuple[str, str, str]] = []  # (provider, model, goruntuleme_adi)
 
@@ -350,11 +456,11 @@ def model_sec(agent=None) -> bool:
 
     # Bulut providerlar — env_degiskeni, gercek_model_adi, goster_adi
     _BULUT_ENV = {
-        "deepseek":    ("DEEPSEEK_API_KEY",    "deepseek-chat",              "DeepSeek"),
-        "openai":      ("OPENAI_API_KEY",       "gpt-4o-mini",                "OpenAI"),
-        "anthropic":   ("ANTHROPIC_API_KEY",    "claude-3-5-haiku-latest",    "Anthropic"),
-        "groq":        ("GROQ_API_KEY",         "llama-3.1-8b-instant",       "Groq"),
-        "openrouter":  ("OPENROUTER_API_KEY",   "deepseek/deepseek-chat",     "OpenRouter"),
+        "deepseek": ("DEEPSEEK_API_KEY", "deepseek-chat", "DeepSeek"),
+        "openai": ("OPENAI_API_KEY", "gpt-4o-mini", "OpenAI"),
+        "anthropic": ("ANTHROPIC_API_KEY", "claude-3-5-haiku-latest", "Anthropic"),
+        "groq": ("GROQ_API_KEY", "llama-3.1-8b-instant", "Groq"),
+        "openrouter": ("OPENROUTER_API_KEY", "deepseek/deepseek-chat", "OpenRouter"),
     }
     for prov_key, (env_adi, model_adi, goster_adi) in _BULUT_ENV.items():
         if _os.environ.get(env_adi, "").strip():
@@ -368,17 +474,23 @@ def model_sec(agent=None) -> bool:
 
         # Birden fazla secen varsa listele
         if not tum_modeller:
-            print(f"  {_d('Kullanilabilir model bulunamadi. /model ile degistirebilirsiniz.')}")
+            print(
+                f"  {_d('Kullanilabilir model bulunamadi. /model ile degistirebilirsiniz.')}"
+            )
             return False
 
         print()
         for i, (prov, mod, goster) in enumerate(tum_modeller, 1):
-            isaret = _g("->") if (mod == mevcut_model and prov == mevcut_provider) else "  "
+            isaret = (
+                _g("->") if (mod == mevcut_model and prov == mevcut_provider) else "  "
+            )
             print(f"  {isaret} [{i}] {_d(goster)}  {mod}")
 
         print()
         try:
-            yanit = input(f"  Model secin [{_d('ENTER: mevcut modeli koru')}]: ").strip()
+            yanit = input(
+                f"  Model secin [{_d('ENTER: mevcut modeli koru')}]: "
+            ).strip()
         except (EOFError, KeyboardInterrupt):
             print()
             return False
@@ -392,7 +504,7 @@ def model_sec(agent=None) -> bool:
                 yeni_prov, yeni_mod, goster = tum_modeller[idx]
                 if agent:
                     cfg = getattr(agent, "config", {})
-                    cfg["default_model"]    = yeni_mod
+                    cfg["default_model"] = yeni_mod
                     cfg["default_provider"] = yeni_prov
 
                 # Secilen provider'i kontrol et
@@ -404,7 +516,9 @@ def model_sec(agent=None) -> bool:
                 basarili, hata = _provider_kontrol_et(yeni_prov, yeni_mod, cfg)
                 if not basarili:
                     print(f"  {_kg('HATA:')} {hata}")
-                    print(f"  {_d('Lutfen baska bir model secin veya ENTER ile gecin.')}")
+                    print(
+                        f"  {_d('Lutfen baska bir model secin veya ENTER ile gecin.')}"
+                    )
                     print()
                     continue  # Menuyu tekrar goster
 
@@ -412,12 +526,15 @@ def model_sec(agent=None) -> bool:
                 if agent:
                     try:
                         from beyin import Beyin
+
                         agent.provider = Beyin(cfg)
                     except Exception:
                         logger.warning("[fix_01_sessiz_except] Exception")
                 # Tercihi kalici kaydet
                 _model_tercihini_kaydet(yeni_prov, yeni_mod)
-                print(f"  {_g('OK')} Model degistirildi: {yeni_mod}  {_d('(' + yeni_prov + ')')}")
+                print(
+                    f"  {_g('OK')} Model degistirildi: {yeni_mod}  {_d('(' + yeni_prov + ')')}"
+                )
                 return True
 
         print(f"  {_d('Gecersiz secim — mevcut model korunuyor.')}")
@@ -427,13 +544,14 @@ def model_sec(agent=None) -> bool:
 def _model_tercihini_kaydet(provider: str, model: str) -> None:
     """Secilen modeli .ReYMeN/setup.json'a kaydet — sonraki acilista kullanilir."""
     import json
+
     try:
         setup_dosya = Path(__file__).parent / ".ReYMeN" / "setup.json"
         data: dict = {}
         if setup_dosya.exists():
             data = json.loads(setup_dosya.read_text(encoding="utf-8"))
         data["tercih_provider"] = provider
-        data["tercih_model"]    = model
+        data["tercih_model"] = model
         setup_dosya.write_text(
             json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8"
         )
@@ -442,6 +560,7 @@ def _model_tercihini_kaydet(provider: str, model: str) -> None:
 
 
 # ── Gorkem Ekrani ─────────────────────────────────────────────────────────────
+
 
 def gorkem_ekranu(
     agent=None,
@@ -461,26 +580,28 @@ def gorkem_ekranu(
     # ── Veri topla ──────────────────────────────────────────────────────────
     model_adi, provider = _model_bilgi(agent, config)
     provider_goster = {
-        "lmstudio":  "LM Studio (Yerel)",
-        "ollama":    "Ollama (Yerel)",
-        "openai":    "OpenAI",
+        "lmstudio": "LM Studio (Yerel)",
+        "ollama": "Ollama (Yerel)",
+        "openai": "OpenAI",
         "anthropic": "Anthropic",
-        "deepseek":  "DeepSeek",
-        "xai":       "xAI / Grok",
-        "openrouter":"OpenRouter",
+        "deepseek": "DeepSeek",
+        "xai": "xAI / Grok",
+        "openrouter": "OpenRouter",
     }.get(provider, provider or "Yerel")
 
-    oturum    = _oturum(agent)
-    simdi     = datetime.now().strftime("%Y-%m-%d %H:%M")
-    versiyon  = "v1.0"
+    oturum = _oturum(agent)
+    simdi = datetime.now().strftime("%Y-%m-%d %H:%M")
+    versiyon = "v1.0"
     pluginler = _plugin_listesi(agent)
-    p_toplam  = len(pluginler) if pluginler else 24
-    arac_say  = max(_arac_sayisi(agent), 21)
+    p_toplam = len(pluginler) if pluginler else 24
+    arac_say = max(_arac_sayisi(agent), 21)
 
     # Skill kategorileri
     if skill_veri is None:
         skill_veri = {}
-    skill_toplam = sum(len(v) for v in skill_veri.values()) or _yetenek_sayisi(agent) or 1045
+    skill_toplam = (
+        sum(len(v) for v in skill_veri.values()) or _yetenek_sayisi(agent) or 1045
+    )
 
     # ── Logo ────────────────────────────────────────────────────────────────
     print()
@@ -490,14 +611,14 @@ def gorkem_ekranu(
 
     # Alt baslik
     baslik = f"Otonom ReAct Ajan  ·  {versiyon}  ·  {provider_goster}"
-    bos    = (_LOGO_GEN - len(baslik)) // 2
+    bos = (_LOGO_GEN - len(baslik)) // 2
     print(f"{girinti}{' ' * bos}{_d(baslik)}")
     print()
 
     # ── Bilgi Kutusu ─────────────────────────────────────────────────────────
     # Genislik: iki sutun (sol: skill/tool, sag: model/oturum)
-    KUTU  = 78   # ic genislik
-    SOL_W = 44   # sol sutun genisligi (skill listesi)
+    KUTU = 78  # ic genislik
+    SOL_W = 44  # sol sutun genisligi (skill listesi)
 
     def ust_kenar(etiket: str = "") -> str:
         if etiket:
@@ -516,13 +637,14 @@ def gorkem_ekranu(
         return f"{_G}│{_S}{' ' * KUTU}{_G}│{_S}"
 
     def _saf(t: str) -> str:
-        return re.sub(r'\033\[[0-9;]*m', '', t)
+        return re.sub(r"\033\[[0-9;]*m", "", t)
 
     def sat(txt: str) -> str:
         """Tek sutun satiri."""
         saf_len = len(_saf(txt))
-        doldur  = KUTU - saf_len - 2
-        if doldur < 0: doldur = 0
+        doldur = KUTU - saf_len - 2
+        if doldur < 0:
+            doldur = 0
         return f"{_G}│{_S} {txt}{' ' * doldur} {_G}│{_S}"
 
     def iki(sol: str, sag: str) -> str:
@@ -531,10 +653,14 @@ def gorkem_ekranu(
         saf_sag = len(_saf(sag))
         sol_doldur = SOL_W - saf_sol - 2
         sag_doldur = KUTU - SOL_W - saf_sag - 3
-        if sol_doldur < 0: sol_doldur = 0
-        if sag_doldur < 0: sag_doldur = 0
-        return (f"{_G}│{_S} {sol}{' ' * sol_doldur} "
-                f"{_G}│{_S} {sag}{' ' * sag_doldur} {_G}│{_S}")
+        if sol_doldur < 0:
+            sol_doldur = 0
+        if sag_doldur < 0:
+            sag_doldur = 0
+        return (
+            f"{_G}│{_S} {sol}{' ' * sol_doldur} "
+            f"{_G}│{_S} {sag}{' ' * sag_doldur} {_G}│{_S}"
+        )
 
     # ── Baslik ───────────────────────────────────────────────────────────────
     baslik_metin = f"R>eYMeN  ·  {provider_goster}  ·  {simdi}"
@@ -559,13 +685,22 @@ def gorkem_ekranu(
             isim_metin = _d(isimler)
             max_isim = SOL_W - len(kat) - 4
             if len(isimler) > max_isim:
-                isimler = isimler[:max_isim - 3] + "..."
+                isimler = isimler[: max_isim - 3] + "..."
                 isim_metin = _d(isimler)
             sol_txt = f"  {kat_txt} {isim_metin}"
             print(sat(sol_txt))
     else:
-        for kat in ["agents", "creative", "devops", "github", "media",
-                    "mlops", "research", "software-development", "web"]:
+        for kat in [
+            "agents",
+            "creative",
+            "devops",
+            "github",
+            "media",
+            "mlops",
+            "research",
+            "software-development",
+            "web",
+        ]:
             print(sat(f"  {_kg(kat + ':')} {_d('...')}"))
 
     print(bos_satir())
@@ -576,9 +711,11 @@ def gorkem_ekranu(
     print(iki(_kg("Oturum"), _kg("Komutlar")))
     print(iki(f"  {_d(oturum)}", f"  {_d('/model  /hafiza  /yansima  /cikis')}"))
 
-    ozet = (f"{_g(str(p_toplam))} plugin  ·  "
-            f"{_g(str(arac_say))} arac  ·  "
-            f"{_g(str(skill_toplam))} yetenek")
+    ozet = (
+        f"{_g(str(p_toplam))} plugin  ·  "
+        f"{_g(str(arac_say))} arac  ·  "
+        f"{_g(str(skill_toplam))} yetenek"
+    )
     print(bos_satir())
     print(sat(f"  {ozet}  ·  {_d('/help ile tum komutlar')}"))
     print(bos_satir())
@@ -591,6 +728,7 @@ def gorkem_ekranu(
 
 
 # ── Yardimcilar ───────────────────────────────────────────────────────────────
+
 
 def _model_bilgi(agent, config) -> tuple[str, str]:
     if config:

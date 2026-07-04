@@ -116,7 +116,9 @@ def modele_gore_sec(istek: str, provider: str = "") -> list[str]:
     Returns:
         Uygun model adlari listesi
     """
-    vision_gerek = any(k in istek.lower() for k in ["gor", "resim", "foto", "gorsel", "screenshot"])
+    vision_gerek = any(
+        k in istek.lower() for k in ["gor", "resim", "foto", "gorsel", "screenshot"]
+    )
     turkce = any(k in istek.lower() for k in ["turkce", "turk"])
     uygun = []
 
@@ -170,6 +172,8 @@ def get_model_context_length(model_id: str) -> int | None:
 if __name__ == "__main__":
     print("Tum modeller:")
     for m in model_listele():
-        print(f"  {m['ad']}: {m['provider']}, {m['context']}ctx, ${m['fiyat']}/M, vision={m['vision']}")
+        print(
+            f"  {m['ad']}: {m['provider']}, {m['context']}ctx, ${m['fiyat']}/M, vision={m['vision']}"
+        )
     print(f"\nVision model onerisi: {modele_gore_sec('resim analiz et')}")
     print(f"Turkee model onerisi: {modele_gore_sec('turkce cevap ver')}")

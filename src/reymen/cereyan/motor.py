@@ -21,6 +21,7 @@ ROOT = Path(__file__).parent
 # CUA Motor Aracı
 try:
     from reymen.arac.cua_motor_araci import CUA_EKRAN_KULLAN, CUA_ARACLARI_TARA
+
     _CUA_MEVCUT = True
 except ImportError:
     _CUA_MEVCUT = False
@@ -38,6 +39,7 @@ except ImportError:
 # Context compression (dead code canlandirma)
 try:
     from reymen.hafiza.context_compressor import ContextCompressor
+
     _COMPRESSOR = ContextCompressor(max_token=4096)
 except ImportError:
     _COMPRESSOR = None
@@ -45,6 +47,7 @@ except ImportError:
 # Prompt caching (dead code canlandirma)
 try:
     from reymen.arac.prompt_caching import PromptCache
+
     _CACHE = PromptCache(max_boyut=100, ttl_saniye=3600)
 except ImportError:
     _CACHE = None
@@ -62,6 +65,7 @@ except ImportError:
 # Credential Pool
 try:
     from reymen.core.credential_pool import get_credential_pool
+
     _CREDENTIAL_POOL = get_credential_pool()
 except ImportError:
     _CREDENTIAL_POOL = None
@@ -69,6 +73,7 @@ except ImportError:
 # Voice Mode
 try:
     from reymen.cereyan.voice_mode import VoiceMode
+
     _VOICE_MODE_KLASS = VoiceMode
 except ImportError:
     _VOICE_MODE_KLASS = None
@@ -76,6 +81,7 @@ except ImportError:
 # API Server
 try:
     from reymen.api_server import APIServer
+
     _API_SERVER_KLASS = APIServer
 except ImportError:
     _API_SERVER_KLASS = None
@@ -83,6 +89,7 @@ except ImportError:
 # Otonom görev çözücü (orchestrator)
 try:
     from reymen.core.orchestrator import coz_hata as _coz_hata
+
     _ORCHESTRATOR_MEVCUT = True
 except ImportError:
     _ORCHESTRATOR_MEVCUT = False
@@ -91,6 +98,7 @@ except ImportError:
 # Öğrenme döngüsü
 try:
     from reymen.core.ogrenme import OgrenmeDongusu, CozumHafizasi
+
     _OGRENME_MEVCUT = True
 except ImportError:
     _OGRENME_MEVCUT = False
@@ -99,9 +107,12 @@ except ImportError:
 try:
     from reymen.cereyan.broker import MessageBroker, MesajTipi, Mesaj, get_broker
     from reymen.cereyan.workflow_pipeline import (
-        hata_handler, cozum_ara_handler, cozum_kaydet_handler,
-        gorev_coz_pipeline
+        hata_handler,
+        cozum_ara_handler,
+        cozum_kaydet_handler,
+        gorev_coz_pipeline,
     )
+
     _BROKER_MEVCUT = True
 except ImportError:
     _BROKER_MEVCUT = False
@@ -109,6 +120,7 @@ except ImportError:
 # Tool Registry (birincil arac kaynagi)
 try:
     from reymen.arac.tool_registry import ToolRegistry as _ToolRegistry
+
     _REGISTRY = _ToolRegistry()
 except ImportError:
     _REGISTRY = None
@@ -116,6 +128,7 @@ except ImportError:
 # Plugin Manager (ikincil arac kaynagi)
 try:
     from reymen.sistem.plugin_manager import PluginManager as _PluginManager
+
     _PLUGIN_MGR = _PluginManager(str(ROOT.parent / "sistem" / "plugins"))
 except ImportError:
     _PLUGIN_MGR = None
@@ -123,6 +136,7 @@ except ImportError:
 # Profil Yoneticisi (multi-profile sistemi)
 try:
     from reymen.sistem.profile_manager import ProfileManager as _ProfileManager
+
     _PROFILE_MGR = _ProfileManager(str(ROOT.parent.parent / "config.yaml"))
 except ImportError:
     _PROFILE_MGR = None
@@ -130,6 +144,7 @@ except ImportError:
 # Plugin Yukleyici (ReYMeN seviyesi — plugin.yaml destegi)
 try:
     from reymen.sistem.plugin_loader import PluginYukleyici as _PluginYukleyici
+
     _PLUGIN_YUKLEYICI = _PluginYukleyici(dizin=ROOT.parent / "sistem" / "plugins")
 except ImportError:
     _PLUGIN_YUKLEYICI = None
@@ -147,8 +162,12 @@ except ImportError:
 
 # ── Vektor bellek yardimci araci (VEKTOR_BELLEK icin) ────────────────────────
 def _vektor_bellek_arac(
-    vb, islem: str, metin: str = "", sorgu: str = "",
-    kayit_id: str = "", k: int = 5,
+    vb,
+    islem: str,
+    metin: str = "",
+    sorgu: str = "",
+    kayit_id: str = "",
+    k: int = 5,
 ) -> str:
     """VEKTOR_BELLEK aracinin arkaplan fonksiyonu.
 
@@ -200,6 +219,7 @@ def _vektor_bellek_arac(
 
     elif islem == "bilgi":
         import json
+
         return json.dumps(vb.bilgi(), ensure_ascii=False, indent=2)
 
     else:
@@ -245,11 +265,11 @@ def _gateway_durum_yaz(state: str = "running", hata: str = "") -> None:
         pass
 
 
-
 # LiteLLM provider (100+ provider destegi)
 try:
     from reymen.ag.litellm_provider import litellm_calisitir as _litellm_calisitir
     from reymen.ag.litellm_provider import litellm_durum as _litellm_durum
+
     _LITELLM_MEVCUT = True
 except ImportError:
     _LITELLM_MEVCUT = False
@@ -257,17 +277,31 @@ except ImportError:
 # Observability / Tracing (opsiyonel)
 try:
     from reymen.core.observability import trace_tool_call
+
     _TRACE_TOOL_AKTIF = True
 except ImportError:
+
     def trace_tool_call(span_adi=None, attributes=None):
         def decorator(func):
             return func
+
         return decorator
+
     _TRACE_TOOL_AKTIF = False
 
+
 class Motor:
-    def __init__(self, backend_mode: str = "local", hafiza_collection: Any = None, config: Optional[dict] = None) -> None:
-        self.terminal = TerminalBackendDispatcher(mode=backend_mode) if TerminalBackendDispatcher else None
+    def __init__(
+        self,
+        backend_mode: str = "local",
+        hafiza_collection: Any = None,
+        config: Optional[dict] = None,
+    ) -> None:
+        self.terminal = (
+            TerminalBackendDispatcher(mode=backend_mode)
+            if TerminalBackendDispatcher
+            else None
+        )
         self.hafiza = hafiza_collection
         self.config = config or {}
         self._ekran = None
@@ -277,10 +311,12 @@ class Motor:
         # Async hook sistemi
         try:
             from reymen.sistem.hook_dispatcher import AsynchronousHookDispatcher
+
             self._hooks = AsynchronousHookDispatcher()
             # Varsayilan hook callback'lerini kaydet
             try:
                 from reymen.cereyan.hook_handlers import varsayilan_hooklari_kaydet
+
                 varsayilan_hooklari_kaydet(self._hooks)
                 logger.info("[Motor] Varsayilan hook callback'ler kaydedildi")
             except Exception as _he:
@@ -292,32 +328,43 @@ class Motor:
         self._plugin_moduller_yukle()
         # FAZ 6: Onceki oturumdan kalan dinamik araclari yukle
         try:
-            from reymen.cereyan.dinamik_arac_uretici import mevcut_dinamik_araclari_yukle
+            from reymen.cereyan.dinamik_arac_uretici import (
+                mevcut_dinamik_araclari_yukle,
+            )
+
             mevcut_dinamik_araclari_yukle(self)
         except ImportError as _e:
             logger.warning("[Motor] Modul yuklenemedi (L143): %s", ImportError)
             pass
-        
+
         # MessageBroker başlat
         self._broker = None
         if _BROKER_MEVCUT:
             try:
                 self._broker = get_broker(max_workers=4)
-                self._broker.abone_ol_liste([
-                    (MesajTipi.HATA, hata_handler),
-                    (MesajTipi.COZUM_ARA, cozum_ara_handler),
-                    (MesajTipi.COZUM_KAYDET, cozum_kaydet_handler),
-                ])
+                self._broker.abone_ol_liste(
+                    [
+                        (MesajTipi.HATA, hata_handler),
+                        (MesajTipi.COZUM_ARA, cozum_ara_handler),
+                        (MesajTipi.COZUM_KAYDET, cozum_kaydet_handler),
+                    ]
+                )
                 self._broker.baslat()
                 logger.info("[Motor] MessageBroker başlatıldı (4 consumer thread)")
-                
+
                 # Broker araçlarını kaydet
-                self._plugin_arac_kaydet("BROKER_DURUM", self.broker_durum,
-                    "MessageBroker durum raporu: çalışan thread'ler, kuyruk boyutları, abone sayıları")
-                self._plugin_arac_kaydet("GOREV_COZ_PIPELINE", self.gorev_coz_pipeline,
+                self._plugin_arac_kaydet(
+                    "BROKER_DURUM",
+                    self.broker_durum,
+                    "MessageBroker durum raporu: çalışan thread'ler, kuyruk boyutları, abone sayıları",
+                )
+                self._plugin_arac_kaydet(
+                    "GOREV_COZ_PIPELINE",
+                    self.gorev_coz_pipeline,
                     "Pipeline ile görev çözümü: GÖREV -> PLANLA -> ÖN DOĞRULA -> KOD -> TEST -> İNCELE -> KAYDET. "
                     "Parametreler: gorev_tanimi (str), script_path (str, opsiyonel). "
-                    "Döner: başarılıysa .py dosya yolu, başarısızsa hata mesajı.")
+                    "Döner: başarılıysa .py dosya yolu, başarısızsa hata mesajı.",
+                )
             except Exception as e:
                 logger.warning("[Motor] Broker başlatma hatası: %s", e)
                 self._broker = None
@@ -332,7 +379,7 @@ class Motor:
     @property
     def broker(self):
         """MessageBroker instance'ı."""
-        return getattr(self, '_broker', None)
+        return getattr(self, "_broker", None)
 
     def broker_durum(self) -> dict:
         """Broker durum raporu."""
@@ -342,11 +389,11 @@ class Motor:
 
     def gorev_coz_pipeline(self, gorev_tanimi: str, script_path: str = "") -> str:
         """Pipeline ile görev çözümü: GÖREV -> PLAN -> DOĞRULA -> KOD -> TEST -> İNCELE -> KAYDET
-        
+
         Args:
             gorev_tanimi: Görev açıklaması
             script_path: Opsiyonel mevcut script yolu
-        
+
         Returns:
             Başarılı: kaydedilen .py dosya yolu
             Başarısız: hata mesajı
@@ -358,37 +405,69 @@ class Motor:
     def _plugin_moduller_yukle(self) -> None:
         """Bilinen tüm plugin modüllerinin araçlarını otomatik kaydet."""
         import importlib
+
         moduller = [
-            "persistence", "message_sanitization",
-            "x_search_tool", "homeassistant_tool", "feishu_doc_tool",
-            "yuanbao_tools", "model_tools", "mcp_tool",
-            "rate_limiter", "araclar_web", "araclar_gelismis",
-            "tools.discord_tool", "tools.browser_camofox",
+            "persistence",
+            "message_sanitization",
+            "x_search_tool",
+            "homeassistant_tool",
+            "feishu_doc_tool",
+            "yuanbao_tools",
+            "model_tools",
+            "mcp_tool",
+            "rate_limiter",
+            "araclar_web",
+            "araclar_gelismis",
+            "tools.discord_tool",
+            "tools.browser_camofox",
             "tools.threat_patterns",
             # Batch 8 - Yeni araclar
-            "tools.delegate_tool", "tools.kanban_tools", "tools.voice_mode",
-            "tools.clarify_tool", "tools.blueprints",
+            "tools.delegate_tool",
+            "tools.kanban_tools",
+            "tools.voice_mode",
+            "tools.clarify_tool",
+            "tools.blueprints",
             "tools.mixture_of_agents_tool",
-            "tools.code_execution_tool", "tools.osv_check", "tools.todo_tool",
-            "tools.skills_hub", "tools.skills_sync",
-            "tools.feishu_doc_tool", "tools.feishu_drive_tool",
-            "tools.homeassistant_tool", "tools.session_search_tool",
-            "tools.approval", "tools.write_approval",
+            "tools.code_execution_tool",
+            "tools.osv_check",
+            "tools.todo_tool",
+            "tools.skills_hub",
+            "tools.skills_sync",
+            "tools.feishu_doc_tool",
+            "tools.feishu_drive_tool",
+            "tools.homeassistant_tool",
+            "tools.session_search_tool",
+            "tools.approval",
+            "tools.write_approval",
             # Memory plugin
             "plugins.memory",
             # Batch 9 - Yeni 25 araç
-            "tools.env_passthrough", "tools.env_probe",
-            "tools.file_operations", "tools.file_state", "tools.file_tools",
-            "tools.fuzzy_match", "tools.interrupt",
-            "tools.process_registry", "tools.registry",
-            "tools.thread_context", "tools.credential_files",
-            "tools.schema_sanitizer", "tools.skill_provenance",
-            "tools.skill_usage", "tools.tool_backend_helpers",
-            "tools.browser_dialog_tool", "tools.browser_supervisor",
-            "tools.web_tools", "tools.cronjob_tools", "tools.cronjob_tool",
-            "tools.debug_helpers", "tools.mcp_oauth",
-            "tools.microsoft_graph_auth", "tools.microsoft_graph_client",
-            "tools.tool_output_limits", "tools.tool_result_storage",
+            "tools.env_passthrough",
+            "tools.env_probe",
+            "tools.file_operations",
+            "tools.file_state",
+            "tools.file_tools",
+            "tools.fuzzy_match",
+            "tools.interrupt",
+            "tools.process_registry",
+            "tools.registry",
+            "tools.thread_context",
+            "tools.credential_files",
+            "tools.schema_sanitizer",
+            "tools.skill_provenance",
+            "tools.skill_usage",
+            "tools.tool_backend_helpers",
+            "tools.browser_dialog_tool",
+            "tools.browser_supervisor",
+            "tools.web_tools",
+            "tools.cronjob_tools",
+            "tools.cronjob_tool",
+            "tools.debug_helpers",
+            "tools.mcp_oauth",
+            "tools.microsoft_graph_auth",
+            "tools.microsoft_graph_client",
+            "tools.tool_output_limits",
+            "tools.tool_result_storage",
             # tools.memory_tool
             "tools.memory_tool",
             # tools.skill_tool
@@ -408,33 +487,52 @@ class Motor:
             # tools.memory_providers
             "tools.memory_providers",
             # tools.clarify_tool ve tools.todo_tool
-            "tools.clarify_tool", "tools.todo_tool",
+            "tools.clarify_tool",
+            "tools.todo_tool",
             # Batch 10 - Son 15 eksik arac
-            "tools.ansi_strip", "tools.binary_extensions",
-            "tools.browser_camofox_state", "tools.browser_tool",
-            "tools.clarify_gateway", "tools.fal_common",
-            "tools.lazy_deps", "tools.openrouter_client",
-            "tools.patch_parser", "tools.read_extract",
-            "tools.read_terminal_tool", "tools.skills_tool",
-            "tools.tool_search", "tools.website_policy",
+            "tools.ansi_strip",
+            "tools.binary_extensions",
+            "tools.browser_camofox_state",
+            "tools.browser_tool",
+            "tools.clarify_gateway",
+            "tools.fal_common",
+            "tools.lazy_deps",
+            "tools.openrouter_client",
+            "tools.patch_parser",
+            "tools.read_extract",
+            "tools.read_terminal_tool",
+            "tools.skills_tool",
+            "tools.tool_search",
+            "tools.website_policy",
             "tools.xai_http",
             # Entegrasyon 4 — kök modüller
-            "kanban_orchestrator", "context_references",
-            "araclar_makro", "araclar_ses", "araclar_telegram",
-            "mcp_oauth", "batch_engine", "security_engine",
-            "yetenek_fabrikasi", "sistem_sinyalleri",
+            "kanban_orchestrator",
+            "context_references",
+            "araclar_makro",
+            "araclar_ses",
+            "araclar_telegram",
+            "mcp_oauth",
+            "batch_engine",
+            "security_engine",
+            "yetenek_fabrikasi",
+            "sistem_sinyalleri",
             # Gorsel analiz (FAL/OpenRouter/Ollama)
             "araclar_goruntu",
             # Gorsel analiz v2 (DeepSeek V4 Flash + OpenRouter Qwen-VL) — araclar_goruntu'dan SONRA
             # yuklenir ki GORUNTU_ANALIZ tool'unu overwrite edip kazansin
             "reymen.cereyan.tools.vision_tools",
             # Entegrasyon 5 — ek modüller
-            "mcp_oauth_manager", "reymen_batch_runner", "models_dev",
+            "mcp_oauth_manager",
+            "reymen_batch_runner",
+            "models_dev",
             # Entegrasyon 6 — reyment CLI araçları
             "reyment",
             # Entegrasyon 7 — ekran/tarayıcı/skill/telegram
-            "araclar_ekran", "araclar_tarayici",
-            "skill_bundles", "skill_commands", "telegram_bot",
+            "araclar_ekran",
+            "araclar_tarayici",
+            "skill_bundles",
+            "skill_commands",
+            "telegram_bot",
             # Entegrasyon 8 — Claude Code işbirliği
             "tools.claude_code_tool",
             # Kanban Board + Worker
@@ -543,12 +641,10 @@ class Motor:
             "reymen.sistem.stt_tool",
             # Video Generation Engine (P3) — moviepy + FAL + HyperFrames
             "reymen.arac.video_gen_engine",
-
-
             # Plugin Marketplacesi — katalog + uzaktan yukleme
             "reymen.sistem.marketplace",
             # TTS/STT araclari — metin->ses, ses->metin
-                        "reymen.ag.acp_server",
+            "reymen.ag.acp_server",
             "reymen.ag.delegation",
             "reymen.ag.mcp_oauth",
             "reymen.ag.telegram_bot",
@@ -636,10 +732,13 @@ class Motor:
         # Provider sistem araçları (Model Router + Failover)
         try:
             from reymen.ag.model_provider_router import router_al as _router_al
+
             _router = _router_al()
             self._plugin_arac_kaydet(
                 "PROVIDER_DURUM",
-                lambda provider="": str(_router.provider_durum(provider if provider else None)),
+                lambda provider="": str(
+                    _router.provider_durum(provider if provider else None)
+                ),
                 "Provider durum raporu: tüm provider'ların sağlık, hata, kara liste durumu. "
                 "Parametre: provider (str, opsiyonel) — belirli bir provider adı verilirse "
                 "sadece onun durumunu gösterir. Boş bırakılırsa tümünü listeler.",
@@ -649,7 +748,9 @@ class Motor:
                 lambda model="", provider_override="": str(
                     _router.model_route(
                         model,
-                        provider_override=provider_override if provider_override else None,
+                        provider_override=provider_override
+                        if provider_override
+                        else None,
                     )
                 ),
                 "Model→Provider yönlendirme kararı. Parametreler: model (str, zorunlu) — "
@@ -673,12 +774,15 @@ class Motor:
                 "Tüm bilinen modelleri listeler. Parametre: provider (str, opsiyonel) — "
                 "sadece belirli bir provider'daki modelleri filtrelemek için.",
             )
-            logger.info("[Motor] Provider sistem araçları kaydedildi: PROVIDER_DURUM, MODEL_ROUTE, PROVIDER_SAGLIK, MODELLERI_LISTELE")
+            logger.info(
+                "[Motor] Provider sistem araçları kaydedildi: PROVIDER_DURUM, MODEL_ROUTE, PROVIDER_SAGLIK, MODELLERI_LISTELE"
+            )
         except Exception as _e:
             logger.warning("[Motor] Provider araç kaydı başarısız: %s", _e)
         # OAuth araçları (P2) — Google/GitHub/Discord giriş ve durum
         try:
             from reymen.guvenlik.oauth_servis import OAuthServis
+
             _oauth_servis = OAuthServis()
 
             def _oauth_login(provider: str = "google") -> str:
@@ -734,6 +838,7 @@ class Motor:
         # PluginYukleyici (ReYMeN seviyesi — plugin.yaml destegi)
         try:
             from reymen.sistem.plugin_loader import PluginYukleyici
+
             _py = PluginYukleyici(dizin=ROOT.parent / "sistem" / "plugins")
             _py.hepsini_yukle()
             _py.tool_pluginlerini_yukle()  # kind: tool pluginleri de yukle
@@ -750,7 +855,10 @@ class Motor:
         # reymen.mcp modülü yukarıda yüklendiğinden mcp_reconnect zaten import edilebilir
         try:
             import asyncio
-            from reymen.mcp.mcp_reconnect import mcp_reconnect_baslat, mcp_reconnect_durumu
+            from reymen.mcp.mcp_reconnect import (
+                mcp_reconnect_baslat,
+                mcp_reconnect_durumu,
+            )
 
             # Mevcut event loop varsa onu kullan, yoksa yeni bir loop'ta başlat
             try:
@@ -762,6 +870,7 @@ class Motor:
             except RuntimeError:
                 # Hiç event loop yok — arkaplan thread'de yeni loop başlat
                 import threading
+
                 def _reconnect_thread():
                     _loop = asyncio.new_event_loop()
                     asyncio.set_event_loop(_loop)
@@ -773,19 +882,30 @@ class Motor:
                         )
                     _loop.run_forever()
 
-                t = threading.Thread(target=_reconnect_thread, daemon=True, name="mcp-reconnect")
+                t = threading.Thread(
+                    target=_reconnect_thread, daemon=True, name="mcp-reconnect"
+                )
                 t.start()
-                __import__("logging").getLogger(__name__).debug("[Motor] MCP Reconnect: arkaplan thread başlatıldı")
+                __import__("logging").getLogger(__name__).debug(
+                    "[Motor] MCP Reconnect: arkaplan thread başlatıldı"
+                )
         except ImportError as _e:
             logger.warning("[Motor] Modul yuklenemedi (L727): %s", ImportError)
             pass
         except Exception as e:
-            __import__("logging").getLogger(__name__).debug("[Motor] MCP Reconnect başlatma hatası (önemsiz): %s", e)
+            __import__("logging").getLogger(__name__).debug(
+                "[Motor] MCP Reconnect başlatma hatası (önemsiz): %s", e
+            )
 
     def _skill_araclari_kaydet(self) -> None:
         """skill_utils modülünden SKILL_ araçlarını kaydet (v1 — geriye uyumluluk)."""
         try:
-            from reymen.arac.skill_utils import skill_ara, kategorileri_listele, skill_oku
+            from reymen.arac.skill_utils import (
+                skill_ara,
+                kategorileri_listele,
+                skill_oku,
+            )
+
             self._plugin_arac_kaydet(
                 "SKILL_ARA",
                 lambda sorgu="": str(skill_ara(sorgu)),
@@ -809,15 +929,22 @@ class Motor:
         """skill_utils v2/v3 araclari: aktivasyon, kategori, script, olustur, dogrula."""
         try:
             from reymen.arac.skill_utils import (
-                skill_aktivat, kategori_skill_listele,
-                skill_script_calistir, skill_script_yardim,
-                skill_sayisi, skill_olustur, skill_dogrula,
-                skill_index_yenile, skill_izin_verilen_araclar,
-                skill_eval_ekle, skill_eval_listele,
+                skill_aktivat,
+                kategori_skill_listele,
+                skill_script_calistir,
+                skill_script_yardim,
+                skill_sayisi,
+                skill_olustur,
+                skill_dogrula,
+                skill_index_yenile,
+                skill_izin_verilen_araclar,
+                skill_eval_ekle,
+                skill_eval_listele,
             )
 
             def _aktivat_ve_izin_guncelle(ad: str = "") -> str:
                 from reymen.cereyan.active_skill_tracker import aktif_skill_ayarla
+
                 sonuc = skill_aktivat(ad)
                 # allowed-tools: skill'in bildirdigi araclari gecici whitelist'e ekle
                 try:
@@ -848,12 +975,16 @@ class Motor:
             )
             self._plugin_arac_kaydet(
                 "SKILL_SCRIPT",
-                lambda skill="", script="", arglar="": skill_script_calistir(skill, script, arglar),
+                lambda skill="", script="", arglar="": skill_script_calistir(
+                    skill, script, arglar
+                ),
                 "Skill icindeki scripts/ dizinindeki bir dosyayi calistir",
             )
             self._plugin_arac_kaydet(
                 "SKILL_OLUSTUR",
-                lambda ad="", aciklama="", talimatlar="", kategori="": skill_olustur(ad, aciklama, talimatlar, kategori),
+                lambda ad="", aciklama="", talimatlar="", kategori="": skill_olustur(
+                    ad, aciklama, talimatlar, kategori
+                ),
                 "Spec uyumlu yeni skill olustur .ReYMeN/skills/ altinda",
             )
             self._plugin_arac_kaydet(
@@ -874,8 +1005,12 @@ class Motor:
             self._plugin_arac_kaydet(
                 "SKILL_EVAL_EKLE",
                 lambda ad="", prompt="", expected="", assertions="": skill_eval_ekle(
-                    ad, prompt, expected,
-                    assertions=[a.strip() for a in assertions.split("|") if a.strip()] if assertions else [],
+                    ad,
+                    prompt,
+                    expected,
+                    assertions=[a.strip() for a in assertions.split("|") if a.strip()]
+                    if assertions
+                    else [],
                 ),
                 "Skill icin eval test case ekle (evals/evals.json)",
             )
@@ -884,13 +1019,17 @@ class Motor:
                 lambda ad="": skill_eval_listele(ad),
                 "Skill'in eval test case'lerini listele",
             )
-            __import__("logging").getLogger(__name__).debug("[Skill v4] %d skill yuklu.", skill_sayisi())
+            __import__("logging").getLogger(__name__).debug(
+                "[Skill v4] %d skill yuklu.", skill_sayisi()
+            )
         except ImportError as _e:
             logger.warning("[Motor] Modul yuklenemedi (L374): %s", ImportError)
             pass
 
     # ── Plugin API ────────────────────────────────────────────────────
-    def _plugin_arac_kaydet(self, ad: str, fonk: Any, aciklama: str = "", only_if_missing: bool = False) -> None:
+    def _plugin_arac_kaydet(
+        self, ad: str, fonk: Any, aciklama: str = "", only_if_missing: bool = False
+    ) -> None:
         """Plugin modüllerinin araç kaydetmesi için ortak API."""
         if _REGISTRY:
             if only_if_missing and ad in _REGISTRY._tools:
@@ -904,6 +1043,7 @@ class Motor:
             validate_tool_call as _pydantic_validate,
             pydantic_aktif as _pydantic_aktif,
         )
+
         if _pydantic_aktif:
             _PYDANTIK_ENTEGRE = True
     except ImportError:
@@ -934,14 +1074,16 @@ class Motor:
                 if validated.get("hata"):
                     logger.warning(
                         "[Pydantic] %s validasyon uyarısı: %s",
-                        arac, validated["hata"],
+                        arac,
+                        validated["hata"],
                     )
                 # Doğrulanmış args'i kullan
                 args = validated.get("args", args)
             except Exception as e:
                 logger.warning(
                     "[Pydantic] %s validasyon hatası (ignore): %s",
-                    arac, e,
+                    arac,
+                    e,
                 )
 
         if not args:
@@ -976,12 +1118,12 @@ class Motor:
                         "properties": {
                             "ozet": {
                                 "type": "string",
-                                "description": "Yapılanların özeti (2–5 cümle)"
+                                "description": "Yapılanların özeti (2–5 cümle)",
                             }
                         },
-                        "required": ["ozet"]
-                    }
-                }
+                        "required": ["ozet"],
+                    },
+                },
             }
         ]
 
@@ -1005,91 +1147,92 @@ class Motor:
                     "properties": {
                         "sorgu": {
                             "type": "string",
-                            "description": "Aranacak kelime veya cümle"
+                            "description": "Aranacak kelime veya cümle",
                         }
                     },
-                    "required": ["sorgu"]
+                    "required": ["sorgu"],
                 },
                 "DOSYA_OKU": {
                     "type": "object",
                     "properties": {
                         "dosya_yolu": {
                             "type": "string",
-                            "description": "Okunacak dosyanın tam yolu"
+                            "description": "Okunacak dosyanın tam yolu",
                         }
                     },
-                    "required": ["dosya_yolu"]
+                    "required": ["dosya_yolu"],
                 },
                 "DOSYA_YAZ": {
                     "type": "object",
                     "properties": {
                         "dosya_yolu": {
                             "type": "string",
-                            "description": "Yazılacak dosyanın tam yolu"
+                            "description": "Yazılacak dosyanın tam yolu",
                         },
                         "icerik": {
                             "type": "string",
-                            "description": "Dosyaya yazılacak içerik"
-                        }
+                            "description": "Dosyaya yazılacak içerik",
+                        },
                     },
-                    "required": ["dosya_yolu", "icerik"]
+                    "required": ["dosya_yolu", "icerik"],
                 },
                 "PYTHON_CALISTIR": {
                     "type": "object",
                     "properties": {
                         "kod": {
                             "type": "string",
-                            "description": "Çalıştırılacak Python kodu"
+                            "description": "Çalıştırılacak Python kodu",
                         }
                     },
-                    "required": ["kod"]
+                    "required": ["kod"],
                 },
                 "KOMUT_CALISTIR": {
                     "type": "object",
                     "properties": {
                         "komut": {
                             "type": "string",
-                            "description": "Çalıştırılacak shell komutu"
+                            "description": "Çalıştırılacak shell komutu",
                         }
                     },
-                    "required": ["komut"]
+                    "required": ["komut"],
                 },
                 "PROFIL_DEGISTIR": {
                     "type": "object",
                     "properties": {
                         "profil_adi": {
                             "type": "string",
-                            "description": "Geçilecek profil adı: reyment, dev, test, prod"
+                            "description": "Geçilecek profil adı: reyment, dev, test, prod",
                         }
                     },
-                    "required": ["profil_adi"]
+                    "required": ["profil_adi"],
                 },
-                "PROFIL_LISTELE": {
-                    "type": "object",
-                    "properties": {},
-                    "required": []
-                },
+                "PROFIL_LISTELE": {"type": "object", "properties": {}, "required": []},
             }
 
-            params = _OZEL_SCHEMALAR.get(ad, {
-                "type": "object",
-                "properties": {
-                    "param": {
-                        "type": "string",
-                        "description": f"{ad} için parametre"
-                    }
+            params = _OZEL_SCHEMALAR.get(
+                ad,
+                {
+                    "type": "object",
+                    "properties": {
+                        "param": {
+                            "type": "string",
+                            "description": f"{ad} için parametre",
+                        }
+                    },
+                    "required": [],
                 },
-                "required": []
-            })
+            )
 
-            schema.append({
-                "type": "function",
-                "function": {
-                    "name": ad,
-                    "description": aciklama[:200],
-                    "parameters": params,
+            schema.append(
+                {
+                    "type": "function",
+                    "function": {
+                        "name": ad,
+                        "description": aciklama[:200],
+                        "parameters": params,
+                    },
                 }
-            })
+            )
         return schema
 
     @property
@@ -1100,36 +1243,63 @@ class Motor:
     def eylemi_ayristir(self, llm_cikti: str) -> Tuple[Optional[str], Optional[str]]:
         """Eylem: ARAC(...) veya EYLEM:\\nARAC(...) satırını yakalar."""
         # 1. Standart: "Eylem: ARAC(...)" veya "EYLEM:\\nARAC(...)"
-        m = re.search(r'Eylem:\s*([A-Z_]+)\s*\((.*)\)', llm_cikti, re.DOTALL | re.IGNORECASE)
+        m = re.search(
+            r"Eylem:\s*([A-Z_]+)\s*\((.*)\)", llm_cikti, re.DOTALL | re.IGNORECASE
+        )
         if m:
             return m.group(1).strip().upper(), m.group(2).strip()
 
         # 2. Fallback: bilinen ARAC_ADI(...) dogrudan herhangi bir satırda
         _BILINEN = {
-            "GOREV_BITTI", "DOSYA_OKU", "DOSYA_YAZ", "KOMUT_CALISTIR",
-            "PYTHON_CALISTIR", "WEB_ARA", "TARAYICI_AC", "IC_GOZLEM",
-            "HAFIZA_ARA", "PARALLEL_CALISTIR", "SKILL_ARA", "SKILL_AKTIVAT",
-            "SKILL_KATEGORILER", "SKILL_SCRIPT", "ARAC_URET", "GUVENLI_CALISTIR",
-            "PROFIL_DEGISTIR", "PROFIL_LISTELE", "DURUM_OKU", "DURUM_RAPOR",
-            "ANALITIK_KAYDET", "ANALITIK_RAPOR", "ANALITIK_PANEL",
+            "GOREV_BITTI",
+            "DOSYA_OKU",
+            "DOSYA_YAZ",
+            "KOMUT_CALISTIR",
+            "PYTHON_CALISTIR",
+            "WEB_ARA",
+            "TARAYICI_AC",
+            "IC_GOZLEM",
+            "HAFIZA_ARA",
+            "PARALLEL_CALISTIR",
+            "SKILL_ARA",
+            "SKILL_AKTIVAT",
+            "SKILL_KATEGORILER",
+            "SKILL_SCRIPT",
+            "ARAC_URET",
+            "GUVENLI_CALISTIR",
+            "PROFIL_DEGISTIR",
+            "PROFIL_LISTELE",
+            "DURUM_OKU",
+            "DURUM_RAPOR",
+            "ANALITIK_KAYDET",
+            "ANALITIK_RAPOR",
+            "ANALITIK_PANEL",
             "PROVIDER_KESFET",
-            "HOT_RELOAD_BASLAT", "HOT_RELOAD_DURDUR", "HOT_RELOAD_DURUM",
-            "PLUGIN_MARKET_LISTE", "PLUGIN_MARKET_ARAMA",
-            "PLUGIN_MARKET_YUKLE", "PLUGIN_MARKET_BILGI",
-            "TTS_KONUS", "TTS_SES_LISTE", "STT_DINLE",
+            "HOT_RELOAD_BASLAT",
+            "HOT_RELOAD_DURDUR",
+            "HOT_RELOAD_DURUM",
+            "PLUGIN_MARKET_LISTE",
+            "PLUGIN_MARKET_ARAMA",
+            "PLUGIN_MARKET_YUKLE",
+            "PLUGIN_MARKET_BILGI",
+            "TTS_KONUS",
+            "TTS_SES_LISTE",
+            "STT_DINLE",
             "GORUNTU_ANALIZ",
             "SESSION_ARA",
         }
         for satir in llm_cikti.splitlines():
             satir_s = satir.strip()
-            m2 = re.match(r'([A-Z][A-Z_0-9]+)\s*\((.*)\)\s*$', satir_s)
+            m2 = re.match(r"([A-Z][A-Z_0-9]+)\s*\((.*)\)\s*$", satir_s)
             if m2 and m2.group(1) in _BILINEN:
                 return m2.group(1), m2.group(2).strip()
             # Cok satirli: ARAC_ADI( ile baslayan satir — devamı alt satirlarda
-            m3 = re.match(r'([A-Z][A-Z_0-9]+)\s*\(', satir_s)
+            m3 = re.match(r"([A-Z][A-Z_0-9]+)\s*\(", satir_s)
             if m3 and m3.group(1) in _BILINEN:
                 idx = llm_cikti.find(satir_s)
-                m4 = re.search(r'([A-Z][A-Z_0-9]+)\s*\((.*?)\)', llm_cikti[idx:], re.DOTALL)
+                m4 = re.search(
+                    r"([A-Z][A-Z_0-9]+)\s*\((.*?)\)", llm_cikti[idx:], re.DOTALL
+                )
                 if m4:
                     return m4.group(1), m4.group(2).strip()
 
@@ -1143,15 +1313,22 @@ class Motor:
     def _hafiza_araclari_kaydet(self) -> None:
         try:
             from reymen.hafiza.memory_agent import hafiza_kur, hafiza_sifirla
-            self._plugin_arac_kaydet("HAFIZA_DURUMU",
+
+            self._plugin_arac_kaydet(
+                "HAFIZA_DURUMU",
                 lambda: str(hafiza_kur().info()),
-                "Konusma hafiza durumunu goster")
-            self._plugin_arac_kaydet("HAFIZA_TEMIZLE",
+                "Konusma hafiza durumunu goster",
+            )
+            self._plugin_arac_kaydet(
+                "HAFIZA_TEMIZLE",
                 lambda: (hafiza_sifirla(), "Hafiza temizlendi.")[1],
-                "Konusma hafizasini temizle")
-            self._plugin_arac_kaydet("HAFIZA_KAYDET",
+                "Konusma hafizasini temizle",
+            )
+            self._plugin_arac_kaydet(
+                "HAFIZA_KAYDET",
                 lambda: (hafiza_kur().save_memory(), "Hafiza kaydedildi.")[1],
-                "Hafizayi JSON dosyasina kaydet")
+                "Hafizayi JSON dosyasina kaydet",
+            )
         except ImportError as _e:
             logger.warning("[Motor] Modul yuklenemedi (L518): %s", ImportError)
             pass
@@ -1167,7 +1344,8 @@ class Motor:
                 "VECTOR_EKLE",
                 lambda metin="", kategori="": _vb_global.ekle(
                     metin, {"kategori": kategori} if kategori else None
-                ) or "[Hata]: Metin bos olamaz",
+                )
+                or "[Hata]: Metin bos olamaz",
                 "Vektor bellege anlamsal kayit ekle. Parametreler: metin (str, zorunlu) — "
                 "eklenecek metin; kategori (str, opsiyonel) — kayit kategorisi. "
                 "Doner: kayit ID'si veya hata mesaji.",
@@ -1183,8 +1361,17 @@ class Motor:
             )
             self._plugin_arac_kaydet(
                 "VEKTOR_BELLEK",
-                lambda islem="", metin="", sorgu="", kayit_id="", k=5: _vektor_bellek_arac(
-                    _vb_global, islem, metin, sorgu, kayit_id, int(k) if str(k).isdigit() else 5
+                lambda islem="",
+                metin="",
+                sorgu="",
+                kayit_id="",
+                k=5: _vektor_bellek_arac(
+                    _vb_global,
+                    islem,
+                    metin,
+                    sorgu,
+                    kayit_id,
+                    int(k) if str(k).isdigit() else 5,
                 ),
                 "Vektor bellek yonetim araci. Parametreler:\n"
                 "  - islem (str, zorunlu): 'ekle' | 'ara' | 'sil' | 'listele' | 'bilgi'\n"
@@ -1194,7 +1381,9 @@ class Motor:
                 "  - k (int, opsiyonel, default=5): sonuc sayisi (islem=ara icin)\n"
                 "Doner: isleme gore metin sonuc.",
             )
-            logger.info("[Motor] Vektor bellek araclari kaydedildi: VECTOR_EKLE, VECTOR_ARA, VEKTOR_BELLEK")
+            logger.info(
+                "[Motor] Vektor bellek araclari kaydedildi: VECTOR_EKLE, VECTOR_ARA, VEKTOR_BELLEK"
+            )
         except ImportError as _e:
             logger.warning("[Motor] Vektor bellek araclari yuklenemedi: %s", _e)
             pass
@@ -1216,12 +1405,16 @@ class Motor:
         # ── Session Search FTS5 Aracı ─────────────────────────────────────────
         try:
             from reymen.cereyan.session_search import session_search_al as _ss_al
+
             _ss = _ss_al()
             self._plugin_arac_kaydet(
                 "SESSION_ARA",
                 lambda sorgu="", limit=10, session_id="": str(
-                    _ss.search(sorgu, limit=int(limit) if str(limit).isdigit() else 10,
-                               session_id=session_id if session_id else None)
+                    _ss.search(
+                        sorgu,
+                        limit=int(limit) if str(limit).isdigit() else 10,
+                        session_id=session_id if session_id else None,
+                    )
                 ),
                 "Session mesajlarinda FTS5 tam metin aramasi yap. "
                 "Parametreler: sorgu (str, zorunlu) — aranacak kelime/ifade; "
@@ -1247,33 +1440,98 @@ class Motor:
         #   ~/.local/bin/reymen.exe     →  .exe direkt (pip console_scripts)
         #   pyproject.toml              →  [project.scripts] reymen = "reymen_launcher:main"
         #
-        "temel":    {"KOMUT_CALISTIR", "PYTHON_CALISTIR", "DOSYA_YAZ", "DOSYA_OKU",
-                     "HAFIZA_ARA", "IC_GOZLEM", "PARALLEL_CALISTIR", "GOREV_BITTI",
-                     "PROFIL_DEGISTIR", "PROFIL_LISTELE"},
-        "web":      {"WEB_ARA", "TARAYICI_AC"},
-        "iletisim": {"TELEGRAM_GONDER", "TELEGRAM_RESIM_GONDER",
-                     "TELEGRAM_STREAM_GONDER", "TELEGRAM_REACTION_EKLE",
-                     "TELEGRAM_PING"},
-        "ekran":    {"EKRAN_OKU", "EKRAN_NISAN", "EKRAN_TIKLA", "MAKRO_OYNAT",
-                     "UYG_ISLEM_CAGIR", "EKRAN_FOTOGRAF_CEK"},
-        "dosya":    {"PDF_OKU", "EXCEL_OKU", "CSV_OKU", "GORUNTU_ANALIZ", "DOSYA_ANALIZ",
-                     "PROJE_TARA"},
-        "skill":    {"SKILL_ARA", "SKILL_AKTIVAT", "SKILL_KATEGORILER", "SKILL_KATEGORI",
-                     "SKILL_SCRIPT", "SKILL_OLUSTUR", "SKILL_DOGRULA", "SKILL_INDEX_YENILE",
-                     "SKILL_SCRIPT_YARDIM", "SKILL_EVAL_EKLE", "SKILL_EVAL_LISTELE",
-                     "ACHIEVEMENTS_LISTE"},
-        "faz6":     {"ARAC_URET", "GUVENLI_CALISTIR"},
-        "container": {"CONTAINER_DURUM", "CONTAINER_CALISTIR", "CONTAINER_IMAGE_HAZIRLA", "CONTAINER_MOD"},
-        "claude":   {"CLAUDE_YARDIM", "CLAUDE_ANALIZ", "CLAUDE_KOD_YAZ",
-                     "CLAUDE_HATA_AYIKLA", "CLAUDE_PLAN", "CLAUDE_REVIZE", "CLAUDE_DURUM"},
-        "gorev":    {"TODO", "CLARIFY", "EXECUTE_CODE", "TUI_BASLAT", "KANBAN_GUNCELLE", "KANBAN_OZET"},
-        "hata":     {"HATA_WATCH_BASLAT", "HATA_WATCH_DURDUR", "HATA_KOD_AL",
-                     "TERMINAL_HATA_PARSE", "COZUM_UYGULA"},
-        "vektor":   {"VECTOR_EKLE", "VECTOR_ARA", "VEKTOR_BELLEK"},
-        "session":  {"SESSION_ARA"},
-        "tor":      {"TOR_AC", "TOR_KAPAT", "TOR_FORM_DOLDUR",
-                     "TOR_LOGIN", "TOR_KAYIT", "TOR_SIPARIS"},
-        "kopru":    {"KOPRU_BASLAT", "KOPRU_DURDUR", "KOPRU_DURUM"},
+        "temel": {
+            "KOMUT_CALISTIR",
+            "PYTHON_CALISTIR",
+            "DOSYA_YAZ",
+            "DOSYA_OKU",
+            "HAFIZA_ARA",
+            "IC_GOZLEM",
+            "PARALLEL_CALISTIR",
+            "GOREV_BITTI",
+            "PROFIL_DEGISTIR",
+            "PROFIL_LISTELE",
+        },
+        "web": {"WEB_ARA", "TARAYICI_AC"},
+        "iletisim": {
+            "TELEGRAM_GONDER",
+            "TELEGRAM_RESIM_GONDER",
+            "TELEGRAM_STREAM_GONDER",
+            "TELEGRAM_REACTION_EKLE",
+            "TELEGRAM_PING",
+        },
+        "ekran": {
+            "EKRAN_OKU",
+            "EKRAN_NISAN",
+            "EKRAN_TIKLA",
+            "MAKRO_OYNAT",
+            "UYG_ISLEM_CAGIR",
+            "EKRAN_FOTOGRAF_CEK",
+        },
+        "dosya": {
+            "PDF_OKU",
+            "EXCEL_OKU",
+            "CSV_OKU",
+            "GORUNTU_ANALIZ",
+            "DOSYA_ANALIZ",
+            "PROJE_TARA",
+        },
+        "skill": {
+            "SKILL_ARA",
+            "SKILL_AKTIVAT",
+            "SKILL_KATEGORILER",
+            "SKILL_KATEGORI",
+            "SKILL_SCRIPT",
+            "SKILL_OLUSTUR",
+            "SKILL_DOGRULA",
+            "SKILL_INDEX_YENILE",
+            "SKILL_SCRIPT_YARDIM",
+            "SKILL_EVAL_EKLE",
+            "SKILL_EVAL_LISTELE",
+            "ACHIEVEMENTS_LISTE",
+        },
+        "faz6": {"ARAC_URET", "GUVENLI_CALISTIR"},
+        "container": {
+            "CONTAINER_DURUM",
+            "CONTAINER_CALISTIR",
+            "CONTAINER_IMAGE_HAZIRLA",
+            "CONTAINER_MOD",
+        },
+        "claude": {
+            "CLAUDE_YARDIM",
+            "CLAUDE_ANALIZ",
+            "CLAUDE_KOD_YAZ",
+            "CLAUDE_HATA_AYIKLA",
+            "CLAUDE_PLAN",
+            "CLAUDE_REVIZE",
+            "CLAUDE_DURUM",
+        },
+        "gorev": {
+            "TODO",
+            "CLARIFY",
+            "EXECUTE_CODE",
+            "TUI_BASLAT",
+            "KANBAN_GUNCELLE",
+            "KANBAN_OZET",
+        },
+        "hata": {
+            "HATA_WATCH_BASLAT",
+            "HATA_WATCH_DURDUR",
+            "HATA_KOD_AL",
+            "TERMINAL_HATA_PARSE",
+            "COZUM_UYGULA",
+        },
+        "vektor": {"VECTOR_EKLE", "VECTOR_ARA", "VEKTOR_BELLEK"},
+        "session": {"SESSION_ARA"},
+        "tor": {
+            "TOR_AC",
+            "TOR_KAPAT",
+            "TOR_FORM_DOLDUR",
+            "TOR_LOGIN",
+            "TOR_KAYIT",
+            "TOR_SIPARIS",
+        },
+        "kopru": {"KOPRU_BASLAT", "KOPRU_DURDUR", "KOPRU_DURUM"},
         "watchdog": {"WATCHDOG_KONTROL"},
     }
 
@@ -1314,6 +1572,7 @@ class Motor:
             # 2. tool_registry'deki check_fn'i kontrol et
             try:
                 from reymen.arac.tool_registry import tool_registry as _reg
+
                 if not _reg.check_fn_kontrol_et(ad):
                     continue  # Registry blokladi
             except (ImportError, AttributeError) as _e:
@@ -1350,7 +1609,7 @@ class Motor:
         """
         tanim = self.toolset_tanimi_al()
         # Registry'de olup toolset'te olmayan araclari ekle
-        if _REGISTRY and hasattr(_REGISTRY, '_tools'):
+        if _REGISTRY and hasattr(_REGISTRY, "_tools"):
             toolset_araclari = {a for g in self.TOOLSET_GRUPLARI.values() for a in g}
             ek = set(_REGISTRY._tools.keys()) - toolset_araclari
             if ek:
@@ -1361,69 +1620,69 @@ class Motor:
 
     # Araç → kullanıcıya gösterilen durum mesajı
     _DURUM_MESAJLARI = {
-        "WEB_ARA":           "İnternette aranıyor...",
-        "TARAYICI_AC":       "Sayfa açılıyor...",
-        "DOSYA_OKU":         "Dosya okunuyor...",
-        "DOSYA_YAZ":         "Dosya yazılıyor...",
-        "KOMUT_CALISTIR":    "Komut çalıştırılıyor...",
-        "PYTHON_CALISTIR":   "Python kodu çalıştırılıyor...",
-        "HAFIZA_ARA":        "Hafızada aranıyor...",
-        "EKRAN_OKU":         "Ekran okunuyor (OCR)...",
-        "EKRAN_TIKLA":       "Ekran öğesine tıklanıyor...",
-        "TELEGRAM_GONDER":   "Mesaj gönderiliyor...",
-        "TELEGRAM_PING":          "Telegram baglantisi test ediliyor...",
+        "WEB_ARA": "İnternette aranıyor...",
+        "TARAYICI_AC": "Sayfa açılıyor...",
+        "DOSYA_OKU": "Dosya okunuyor...",
+        "DOSYA_YAZ": "Dosya yazılıyor...",
+        "KOMUT_CALISTIR": "Komut çalıştırılıyor...",
+        "PYTHON_CALISTIR": "Python kodu çalıştırılıyor...",
+        "HAFIZA_ARA": "Hafızada aranıyor...",
+        "EKRAN_OKU": "Ekran okunuyor (OCR)...",
+        "EKRAN_TIKLA": "Ekran öğesine tıklanıyor...",
+        "TELEGRAM_GONDER": "Mesaj gönderiliyor...",
+        "TELEGRAM_PING": "Telegram baglantisi test ediliyor...",
         "TELEGRAM_STREAM_GONDER": "Stream mesaj gonderiliyor...",
         "TELEGRAM_REACTION_EKLE": "Reaction ekleniyor...",
         "TELEGRAM_RESIM_GONDER": "Resim gönderiliyor...",
         "EKRAN_FOTOGRAF_CEK": "Ekran fotoğrafı çekiliyor...",
         "PARALLEL_CALISTIR": "Araçlar paralel çalıştırılıyor...",
-        "PDF_OKU":           "PDF okunuyor...",
-        "EXCEL_OKU":         "Excel dosyası okunuyor...",
-        "CSV_OKU":           "CSV dosyası okunuyor...",
-        "GORUNTU_ANALIZ":    "Görüntü analiz ediliyor (LLaVA)...",
-        "DOSYA_ANALIZ":      "Dosya analiz ediliyor...",
-        "PROJE_TARA":        "Proje dosyalari taranıyor...",
-        "SKILL_AKTIVAT":       "Skill yukleniyor...",
-        "SKILL_KATEGORI":      "Skill kategorisi listeleniyor...",
-        "SKILL_SCRIPT":        "Skill scripti calistiriliyor...",
-        "SKILL_OLUSTUR":        "Yeni skill olusturuluyor...",
-        "SKILL_DOGRULA":        "Skill dogrulanıyor (spec kontrol)...",
-        "SKILL_INDEX_YENILE":   "Skill FTS5 indexi yenileniyor...",
-        "SKILL_SCRIPT_YARDIM":  "Script arayuzu ogreniyor (--help)...",
-        "SKILL_EVAL_EKLE":      "Skill eval test case ekleniyor...",
-        "SKILL_EVAL_LISTELE":   "Skill eval listesi getiriliyor...",
-        "ARAC_URET":           "Yeni arac uretiliyor (Code-As-A-Tool)...",
-        "GUVENLI_CALISTIR":    "Guvenli sandbox'ta kod calistiriliyor...",
-        "CONTAINER_DURUM":     "Container sandbox durumu sorgulaniyor...",
-        "CONTAINER_CALISTIR":   "Container'da komut calistiriliyor...",
+        "PDF_OKU": "PDF okunuyor...",
+        "EXCEL_OKU": "Excel dosyası okunuyor...",
+        "CSV_OKU": "CSV dosyası okunuyor...",
+        "GORUNTU_ANALIZ": "Görüntü analiz ediliyor (LLaVA)...",
+        "DOSYA_ANALIZ": "Dosya analiz ediliyor...",
+        "PROJE_TARA": "Proje dosyalari taranıyor...",
+        "SKILL_AKTIVAT": "Skill yukleniyor...",
+        "SKILL_KATEGORI": "Skill kategorisi listeleniyor...",
+        "SKILL_SCRIPT": "Skill scripti calistiriliyor...",
+        "SKILL_OLUSTUR": "Yeni skill olusturuluyor...",
+        "SKILL_DOGRULA": "Skill dogrulanıyor (spec kontrol)...",
+        "SKILL_INDEX_YENILE": "Skill FTS5 indexi yenileniyor...",
+        "SKILL_SCRIPT_YARDIM": "Script arayuzu ogreniyor (--help)...",
+        "SKILL_EVAL_EKLE": "Skill eval test case ekleniyor...",
+        "SKILL_EVAL_LISTELE": "Skill eval listesi getiriliyor...",
+        "ARAC_URET": "Yeni arac uretiliyor (Code-As-A-Tool)...",
+        "GUVENLI_CALISTIR": "Guvenli sandbox'ta kod calistiriliyor...",
+        "CONTAINER_DURUM": "Container sandbox durumu sorgulaniyor...",
+        "CONTAINER_CALISTIR": "Container'da komut calistiriliyor...",
         "CONTAINER_IMAGE_HAZIRLA": "Container image hazirlaniyor...",
-        "CONTAINER_MOD":       "Container sandbox modu degistiriliyor...",
-        "HATA_WATCH_BASLAT":  "Hata watchdog baslatiliyor (ekran izleme)...",
-        "HATA_WATCH_DURDUR":  "Hata watchdog durduruluyor...",
-        "HATA_KOD_AL":        "Hata kodu aliniyor...",
-        "TERMINAL_HATA_PARSE":"Terminal ciktisi hata icin taranıyor...",
-        "COZUM_UYGULA":       "Cozum uygulaniyor (patch)...",
-        "TOR_AC":             "Tor Browser baslatiliyor...",
-        "TOR_KAPAT":          "Tor Browser kapatiliyor...",
-        "TOR_FORM_DOLDUR":    "Form dolduruluyor...",
-        "TOR_LOGIN":          "Siteye giris yapiliyor...",
-        "TOR_KAYIT":          "Yeni kayit olusturuluyor...",
-        "TOR_SIPARIS":        "Siparis veriliyor...",
-        "CUA_EKRAN_KULLAN":   "CUA: Ekran vizyon+koordinat+eylem...",
-        "CUA_ARACLARI_TARA":  "CUA bilesenleri taranıyor...",
+        "CONTAINER_MOD": "Container sandbox modu degistiriliyor...",
+        "HATA_WATCH_BASLAT": "Hata watchdog baslatiliyor (ekran izleme)...",
+        "HATA_WATCH_DURDUR": "Hata watchdog durduruluyor...",
+        "HATA_KOD_AL": "Hata kodu aliniyor...",
+        "TERMINAL_HATA_PARSE": "Terminal ciktisi hata icin taranıyor...",
+        "COZUM_UYGULA": "Cozum uygulaniyor (patch)...",
+        "TOR_AC": "Tor Browser baslatiliyor...",
+        "TOR_KAPAT": "Tor Browser kapatiliyor...",
+        "TOR_FORM_DOLDUR": "Form dolduruluyor...",
+        "TOR_LOGIN": "Siteye giris yapiliyor...",
+        "TOR_KAYIT": "Yeni kayit olusturuluyor...",
+        "TOR_SIPARIS": "Siparis veriliyor...",
+        "CUA_EKRAN_KULLAN": "CUA: Ekran vizyon+koordinat+eylem...",
+        "CUA_ARACLARI_TARA": "CUA bilesenleri taranıyor...",
         "ACHIEVEMENTS_LISTE": "Rozetler listeleniyor...",
-        "PROXY_AYARLA":       "Proxy yapilandiriliyor...",
-        "CLARIFY":            "Talep netleştiriliyor...",
-        "EXECUTE_CODE":       "Python kodu çalıştırılıyor...",
-        "TUI_BASLAT":         "Terminal UI baslatiliyor...",
-        "TELEGRAM_STREAM":    "Telegram'a stream mesaj gonderiliyor...",
-        "TELEGRAM_REACT":     "Telegram reaction ekleniyor...",
-        "KOPRU_BASLAT":       "Telegram Bridge baslatiliyor (Bot1/Bot2)...",
-        "KOPRU_DURDUR":       "Telegram Bridge durduruluyor...",
-        "KOPRU_DURUM":        "Telegram Bridge durumu sorgulaniyor...",
-        "PROFIL_DEGISTIR":    "Profil degistiriliyor...",
-        "PROFIL_LISTELE":     "Profiller listeleniyor...",
-        "SESSION_ARA":        "Session mesajlarinda araniyor...",
+        "PROXY_AYARLA": "Proxy yapilandiriliyor...",
+        "CLARIFY": "Talep netleştiriliyor...",
+        "EXECUTE_CODE": "Python kodu çalıştırılıyor...",
+        "TUI_BASLAT": "Terminal UI baslatiliyor...",
+        "TELEGRAM_STREAM": "Telegram'a stream mesaj gonderiliyor...",
+        "TELEGRAM_REACT": "Telegram reaction ekleniyor...",
+        "KOPRU_BASLAT": "Telegram Bridge baslatiliyor (Bot1/Bot2)...",
+        "KOPRU_DURDUR": "Telegram Bridge durduruluyor...",
+        "KOPRU_DURUM": "Telegram Bridge durumu sorgulaniyor...",
+        "PROFIL_DEGISTIR": "Profil degistiriliyor...",
+        "PROFIL_LISTELE": "Profiller listeleniyor...",
+        "SESSION_ARA": "Session mesajlarinda araniyor...",
     }
 
     def _durum_goster(self, arac: str, params: List[str]) -> None:
@@ -1433,11 +1692,17 @@ class Motor:
             ozet = (params[0] if params else "")[:60]
             print(f"  [*] {mesaj}" + (f" [{ozet}]" if ozet else ""), flush=True)
 
-    _RISKLI_ARACLAR: frozenset = frozenset({
-        "KOMUT_CALISTIR", "PYTHON_CALISTIR", "TARAYICI_AC",
-        "EKRAN_TIKLA", "MAKRO_OYNAT", "ARAC_URET",
-        "CUA_EKRAN_KULLAN",
-    })
+    _RISKLI_ARACLAR: frozenset = frozenset(
+        {
+            "KOMUT_CALISTIR",
+            "PYTHON_CALISTIR",
+            "TARAYICI_AC",
+            "EKRAN_TIKLA",
+            "MAKRO_OYNAT",
+            "ARAC_URET",
+            "CUA_EKRAN_KULLAN",
+        }
+    )
 
     @trace_tool_call()
     def calistir(self, arac: str, ham_param: str) -> str:
@@ -1449,6 +1714,7 @@ class Motor:
         # Sayaç: kullanılan araçları kaydet (achievement için)
         try:
             from tools.achievements import _listeye_ekle
+
             _listeye_ekle("tools_used.json", arac)
         except Exception as _e:
             logger.warning("[Motor] except Exception (L713): %s", Exception)
@@ -1461,16 +1727,31 @@ class Motor:
 
         # HITL: riskli araclarda onay
         _izinli = arac in getattr(self, "ekstra_izin_araclar", set())
-        if arac in self._RISKLI_ARACLAR and not _izinli and getattr(self, "onay_fonksiyonu", None):
+        if (
+            arac in self._RISKLI_ARACLAR
+            and not _izinli
+            and getattr(self, "onay_fonksiyonu", None)
+        ):
             ozet = (params[0] if params else "")[:120]
             if not self.onay_fonksiyonu(arac, ozet):
                 return f"[İptal]: Kullanıcı '{arac}' eylemini reddetti."
 
         # HATA_COZUCU araçları — Registry/Plugin öncesi erken kontrol
-        if arac in ("HATA_WATCH_BASLAT", "HATA_WATCH_DURDUR", "HATA_KOD_AL",
-                     "TERMINAL_HATA_PARSE", "COZUM_UYGULA"):
+        if arac in (
+            "HATA_WATCH_BASLAT",
+            "HATA_WATCH_DURDUR",
+            "HATA_KOD_AL",
+            "TERMINAL_HATA_PARSE",
+            "COZUM_UYGULA",
+        ):
             try:
-                from reymen.cereyan.hata_cozucu import HataWatchdog, HataKoduUretici, TerminalHataParser, CozumUygulayici
+                from reymen.cereyan.hata_cozucu import (
+                    HataWatchdog,
+                    HataKoduUretici,
+                    TerminalHataParser,
+                    CozumUygulayici,
+                )
+
                 if not hasattr(self, "_hata_watchdog"):
                     self._hata_watchdog = HataWatchdog()
                     self._hata_kod = HataKoduUretici()
@@ -1483,9 +1764,13 @@ class Motor:
                     self._hata_watchdog.durdur()
                     return "[HataWatchdog] Durduruldu."
                 if arac == "HATA_KOD_AL":
-                    kayit = self._hata_kod.kaydet(params[0] if params else "Bilinmeyen hata")
-                    return (f"[HataKod] {kayit.kod}: [{kayit.kategori}] {kayit.ozet}\n"
-                            f"Claude'a yapistir: {kayit.kod}")
+                    kayit = self._hata_kod.kaydet(
+                        params[0] if params else "Bilinmeyen hata"
+                    )
+                    return (
+                        f"[HataKod] {kayit.kod}: [{kayit.kategori}] {kayit.ozet}\n"
+                        f"Claude'a yapistir: {kayit.kod}"
+                    )
                 if arac == "TERMINAL_HATA_PARSE":
                     sonuc = self._hata_terminal.parse(params[0] if params else "")
                     if sonuc["hata_var"]:
@@ -1503,6 +1788,7 @@ class Motor:
         if arac == "SELF_HEAL":
             try:
                 from reymen.core.self_heal import SelfHeal
+
                 parts = [p.strip() for p in ham_param.split("|", 2)]
                 hedef = parts[0] if len(parts) > 0 else "bilinmeyen"
                 hata = parts[1] if len(parts) > 1 else ""
@@ -1512,25 +1798,39 @@ class Motor:
                 heal = SelfHeal()
                 sonuc = heal.coz(hedef, hata, kod)
                 if sonuc["basarili"]:
-                    return (f"[SelfHeal] ✅ Çözüldü (kaynak: {sonuc['kaynak']}, "
-                            f"deneme: {sonuc['deneme_sayisi']})\n"
-                            f"Çözüm:\n{sonuc['cozum']}")
+                    return (
+                        f"[SelfHeal] ✅ Çözüldü (kaynak: {sonuc['kaynak']}, "
+                        f"deneme: {sonuc['deneme_sayisi']})\n"
+                        f"Çözüm:\n{sonuc['cozum']}"
+                    )
                 else:
-                    return (f"[SelfHeal] ❌ Çözülemedi "
-                            f"({sonuc['deneme_sayisi']} deneme)\n"
-                            f"Hata: {sonuc['hata']}")
+                    return (
+                        f"[SelfHeal] ❌ Çözülemedi "
+                        f"({sonuc['deneme_sayisi']} deneme)\n"
+                        f"Hata: {sonuc['hata']}"
+                    )
             except Exception as e:
                 logger.exception("[Motor] SelfHeal hatası")
                 return f"[SelfHeal] ❌ İç hata: {e}"
 
         # TOR_OTOMASYONU araçları
-        if arac in ("TOR_AC", "TOR_KAPAT", "TOR_FORM_DOLDUR",
-                     "TOR_LOGIN", "TOR_KAYIT", "TOR_SIPARIS"):
+        if arac in (
+            "TOR_AC",
+            "TOR_KAPAT",
+            "TOR_FORM_DOLDUR",
+            "TOR_LOGIN",
+            "TOR_KAYIT",
+            "TOR_SIPARIS",
+        ):
             try:
                 from reymen.windows.tor_otomasyonu import (
-                    TorBrowserKontrol, FormDoldurucu, OtomasyonAkislari,
-                    tor_baslat, tor_kapat
+                    TorBrowserKontrol,
+                    FormDoldurucu,
+                    OtomasyonAkislari,
+                    tor_baslat,
+                    tor_kapat,
                 )
+
                 if not hasattr(self, "_tor_browser"):
                     self._tor_browser = None
                     self._tor_akislar = None
@@ -1538,7 +1838,11 @@ class Motor:
                 if arac == "TOR_AC":
                     sonuc = tor_baslat(ham_param.strip() or None)
                     if "[Tor] Browser baslatildi" in sonuc:
-                        from reymen.windows.tor_otomasyonu import _aktif_tor, _aktif_akislar
+                        from reymen.windows.tor_otomasyonu import (
+                            _aktif_tor,
+                            _aktif_akislar,
+                        )
+
                         self._tor_browser = _aktif_tor
                         self._tor_akislar = _aktif_akislar
                     return sonuc
@@ -1553,6 +1857,7 @@ class Motor:
 
                 if arac == "TOR_FORM_DOLDUR":
                     import json
+
                     alanlar = json.loads(ham_param) if ham_param.startswith("{") else {}
                     if alanlar and self._tor_browser.driver:
                         sonuc = FormDoldurucu.doldur(self._tor_browser.driver, alanlar)
@@ -1560,19 +1865,33 @@ class Motor:
                             # 3 asamali NisanBulucu fallback
                             try:
                                 from reymen.arac.araclar_nisan import NisanBulucu
+
                                 nisan = NisanBulucu()
                                 for alan in sonuc["basarisiz"]:
                                     deger = alanlar.get(alan, "")
                                     if deger:
                                         # Asama 1: DOM ile alani bul
-                                        if self._tor_browser and self._tor_browser.driver:
-                                            nisan_bul = nisan.bul(alan, driver=self._tor_browser.driver, metin_alternatif=deger)
+                                        if (
+                                            self._tor_browser
+                                            and self._tor_browser.driver
+                                        ):
+                                            nisan_bul = nisan.bul(
+                                                alan,
+                                                driver=self._tor_browser.driver,
+                                                metin_alternatif=deger,
+                                            )
                                         else:
-                                            nisan_bul = nisan.bul(alan, metin_alternatif=deger)
+                                            nisan_bul = nisan.bul(
+                                                alan, metin_alternatif=deger
+                                            )
                                         if nisan_bul.get("asama", 0) > 0:
-                                            logger.info("[Tor] Nisan asama %d ile '%s' bulundu (%d,%d)",
-                                                       nisan_bul["asama"], alan,
-                                                       nisan_bul.get("x", 0), nisan_bul.get("y", 0))
+                                            logger.info(
+                                                "[Tor] Nisan asama %d ile '%s' bulundu (%d,%d)",
+                                                nisan_bul["asama"],
+                                                alan,
+                                                nisan_bul.get("x", 0),
+                                                nisan_bul.get("y", 0),
+                                            )
                             except Exception as ocr_e:
                                 logger.warning("[Tor] Nisan fallback hatasi: %s", ocr_e)
                             return f"[Form] Basarili: {sonuc['basarili']}, Basarisiz: {sonuc['basarisiz']}"
@@ -1580,41 +1899,75 @@ class Motor:
                     return "[Tor]: JSON formatinda alanlar gonderin."
                 if arac == "TOR_LOGIN":
                     import json
+
                     data = json.loads(ham_param) if ham_param.startswith("{") else {}
                     if data:
-                        s = self._tor_akislar.login(data.get("url",""), data.get("kullanici",""), data.get("sifre",""))
-                        return "[Login] Basarili." if s["basarili"] else f"[Login] Basarisiz: {s['hata']}"
-                    return "[Tor]: {\\\"url\\\":\\\"...\\\", \\\"kullanici\\\":\\\"...\\\", \\\"sifre\\\":\\\"...\\\"}"
+                        s = self._tor_akislar.login(
+                            data.get("url", ""),
+                            data.get("kullanici", ""),
+                            data.get("sifre", ""),
+                        )
+                        return (
+                            "[Login] Basarili."
+                            if s["basarili"]
+                            else f"[Login] Basarisiz: {s['hata']}"
+                        )
+                    return '[Tor]: {\\"url\\":\\"...\\", \\"kullanici\\":\\"...\\", \\"sifre\\":\\"...\\"}'
                 if arac == "TOR_KAYIT":
                     # HITL: insan onayi zorunlu
                     try:
                         from reymen.cereyan.insan_arayuzu import HumanInterface
-                        izin = HumanInterface().onay_iste("TOR_KAYIT", "Yeni uyelik olusturma talebi. Onayliyor musun?")
+
+                        izin = HumanInterface().onay_iste(
+                            "TOR_KAYIT",
+                            "Yeni uyelik olusturma talebi. Onayliyor musun?",
+                        )
                         if not izin:
                             return "[Kayit] REDDEDILDI: Kullanici onay vermedi."
                     except Exception:
-                        logger.warning("[Tor] insan_arayuzu HITL calismadi, onay atlandi.")
+                        logger.warning(
+                            "[Tor] insan_arayuzu HITL calismadi, onay atlandi."
+                        )
                     import json
+
                     data = json.loads(ham_param) if ham_param.startswith("{") else {}
                     if data:
-                        s = self._tor_akislar.kayit_ol(data.get("url",""), data.get("bilgiler",{}))
-                        return "[Kayit] Basarili." if s["basarili"] else f"[Kayit] Basarisiz: {s['hata']}"
-                    return "[Tor]: {\\\"url\\\":\\\"...\\\", \\\"bilgiler\\\":{...}}"
+                        s = self._tor_akislar.kayit_ol(
+                            data.get("url", ""), data.get("bilgiler", {})
+                        )
+                        return (
+                            "[Kayit] Basarili."
+                            if s["basarili"]
+                            else f"[Kayit] Basarisiz: {s['hata']}"
+                        )
+                    return '[Tor]: {\\"url\\":\\"...\\", \\"bilgiler\\":{...}}'
                 if arac == "TOR_SIPARIS":
                     # HITL: insan onayi zorunlu
                     try:
                         from reymen.cereyan.insan_arayuzu import HumanInterface
-                        izin = HumanInterface().onay_iste("TOR_SIPARIS", "Siparis verme talebi. Onayliyor musun?")
+
+                        izin = HumanInterface().onay_iste(
+                            "TOR_SIPARIS", "Siparis verme talebi. Onayliyor musun?"
+                        )
                         if not izin:
                             return "[Siparis] REDDEDILDI: Kullanici onay vermedi."
                     except Exception:
                         logger.warning("[Tor] insan_arayuzu bulunamadi, onay atlandi.")
                     import json
+
                     data = json.loads(ham_param) if ham_param.startswith("{") else {}
                     if data:
-                        s = self._tor_akislar.siparis_ver(data.get("url",""), data.get("urun",""), data.get("adres",{}))
-                        return "[Siparis] Basarili." if s["basarili"] else f"[Siparis] Basarisiz: {s['hata']}"
-                    return "[Tor]: {\\\"url\\\":\\\"...\\\", \\\"urun\\\":\\\"...\\\", \\\"adres\\\":{...}}"
+                        s = self._tor_akislar.siparis_ver(
+                            data.get("url", ""),
+                            data.get("urun", ""),
+                            data.get("adres", {}),
+                        )
+                        return (
+                            "[Siparis] Basarili."
+                            if s["basarili"]
+                            else f"[Siparis] Basarisiz: {s['hata']}"
+                        )
+                    return '[Tor]: {\\"url\\":\\"...\\", \\"urun\\":\\"...\\", \\"adres\\":{...}}'
             except Exception as e:
                 return f"[Hata]: tor_otomasyonu: {e}"
 
@@ -1652,13 +2005,13 @@ class Motor:
         """
         # Pipe ile bölme — iç tırnak içindeki | karakterlerine dikkat et
         # Basit regex: ARAC_ADI(...) formunu yakala
-        cagrilar = re.findall(r'([A-Z_]+)\s*\(((?:[^()]*|\((?:[^()]*)\))*)\)', tanim)
+        cagrilar = re.findall(r"([A-Z_]+)\s*\(((?:[^()]*|\((?:[^()]*)\))*)\)", tanim)
         if not cagrilar:
             # Pipe ile bölüp her parçayı eylemi_ayristir ile çözmeyi dene
             parcalar = [p.strip() for p in tanim.split("|") if p.strip()]
             cagrilar = []
             for parca in parcalar:
-                m = re.match(r'([A-Z_]+)\s*\((.*)\)', parca.strip(), re.DOTALL)
+                m = re.match(r"([A-Z_]+)\s*\((.*)\)", parca.strip(), re.DOTALL)
                 if m:
                     cagrilar.append((m.group(1).strip(), m.group(2).strip()))
 
@@ -1681,12 +2034,18 @@ class Motor:
                     executor.submit(_cagri_yap, i, a, h): (i, a)
                     for i, (a, h) in enumerate(cagrilar)
                 }
-                for gelecek in as_completed(gelecekler, timeout=_ARAC_TIMEOUT * len(cagrilar)):
+                for gelecek in as_completed(
+                    gelecekler, timeout=_ARAC_TIMEOUT * len(cagrilar)
+                ):
                     i_ref, arac_ref = gelecekler[gelecek]
                     try:
                         idx, arac_adi, sonuc = gelecek.result(timeout=_ARAC_TIMEOUT)
                     except TimeoutError:
-                        idx, arac_adi, sonuc = i_ref, arac_ref, f"[Hata]: {arac_ref} zaman asimi ({_ARAC_TIMEOUT}s)."
+                        idx, arac_adi, sonuc = (
+                            i_ref,
+                            arac_ref,
+                            f"[Hata]: {arac_ref} zaman asimi ({_ARAC_TIMEOUT}s).",
+                        )
                     except Exception as _e:
                         idx, arac_adi, sonuc = i_ref, arac_ref, f"[Hata]: {_e}"
                     sonuclar[idx] = (arac_adi, sonuc)
@@ -1712,7 +2071,9 @@ class Motor:
         olay = "TOOL_ERROR" if hata else "TOOL_CALLED"
 
         if self._hooks:
-            self._hooks.tetikle(olay, arac=arac, params=params, sonuc=sonuc[:200] if sonuc else "")
+            self._hooks.tetikle(
+                olay, arac=arac, params=params, sonuc=sonuc[:200] if sonuc else ""
+            )
 
         # conversation_loop hook'larını da tetikle (entegrasyon)
         try:
@@ -1720,8 +2081,11 @@ class Motor:
                 arac_cagri_tetikle as _ac_tetikle,
                 arac_sonuc_tetikle as _as_tetikle,
             )
+
             _ac_tetikle(arac_adi=arac, argumanlar={"params": params})
-            _as_tetikle(arac_adi=arac, sonuc=str(sonuc)[:200] if sonuc else "", sure_sn=0.0)
+            _as_tetikle(
+                arac_adi=arac, sonuc=str(sonuc)[:200] if sonuc else "", sure_sn=0.0
+            )
         except Exception as _e:
             __import__("logging").getLogger(__name__).warning(
                 "[SessizExcept] %%s: %%s", type(_e).__name__, _e
@@ -1735,11 +2099,15 @@ class Motor:
                 return "[Hata]: Komut gerekli"
             # Container sandbox aktifse container'da calistir
             try:
-                from reymen.guvenlik.container_sandbox import komut_calistir as _container_komut
+                from reymen.guvenlik.container_sandbox import (
+                    komut_calistir as _container_komut,
+                )
+
                 # Motor config'inden container ayarlarini gecir
                 _container_cfg = None
                 if hasattr(self, "config") and self.config:
                     from reymen.guvenlik.container_sandbox import ContainerConfig
+
                     _container_cfg = ContainerConfig.from_dict(self.config)
                 _cikti = _container_komut(komut, config=_container_cfg)
                 # Sandbox aktifse ve Docker varsa direkt container ciktisini dondur
@@ -1748,17 +2116,27 @@ class Motor:
                 if not _cikti.startswith("[ContainerSandbox]"):
                     return _cikti
                 # Container hatasi — normal terminale dus
-                logger.warning("[Motor] Container sandbox hatasi, normal terminale dusuluyor: %.100s", _cikti)
+                logger.warning(
+                    "[Motor] Container sandbox hatasi, normal terminale dusuluyor: %.100s",
+                    _cikti,
+                )
             except ImportError:
                 pass  # container_sandbox yoksa normal terminal
             except Exception as _ce:
-                logger.warning("[Motor] Container sandbox hatasi (fallback terminal): %s", _ce)
+                logger.warning(
+                    "[Motor] Container sandbox hatasi (fallback terminal): %s", _ce
+                )
             # Fallback: normal terminal
-            return self.terminal.calistir(komut) if self.terminal else "[Hata]: Terminal yok"
+            return (
+                self.terminal.calistir(komut)
+                if self.terminal
+                else "[Hata]: Terminal yok"
+            )
         if arac == "PYTHON_CALISTIR":
             # FAZ 6: once guvenli sandbox dene
             try:
                 from reymen.guvenlik.guvenli_sandbox import guvenli_calistir
+
                 return guvenli_calistir(params[0] if params else "", timeout=30)
             except ImportError as _e:
                 logger.warning("[Motor] Modul yuklenemedi (L960): %s", ImportError)
@@ -1769,19 +2147,26 @@ class Motor:
         if arac == "GUVENLI_CALISTIR":
             try:
                 from reymen.guvenlik.guvenli_sandbox import guvenli_calistir
+
                 mod = params[1] if len(params) >= 2 else "oto"
-                return guvenli_calistir(params[0] if params else "", mod=mod, timeout=30)
+                return guvenli_calistir(
+                    params[0] if params else "", mod=mod, timeout=30
+                )
             except ImportError:
                 return "[Hata]: guvenli_sandbox modulu yuklu degil."
         if arac == "ARAC_URET":
             try:
                 from reymen.cereyan.dinamik_arac_uretici import arac_uret_ve_calistir
+
                 problem = params[0] if params else ""
                 test_girdisi = params[1] if len(params) >= 2 else ""
                 provider = getattr(self, "_provider_ref", None)
                 return arac_uret_ve_calistir(
-                    problem, motor=self, provider=provider,
-                    test_girdisi=test_girdisi, max_deneme=2,
+                    problem,
+                    motor=self,
+                    provider=provider,
+                    test_girdisi=test_girdisi,
+                    max_deneme=2,
                 )
             except ImportError:
                 return "[Hata]: dinamik_arac_uretici modulu yuklu degil."
@@ -1789,9 +2174,12 @@ class Motor:
             # Achievement kontrolü
             try:
                 from tools.achievements import check_achievements
+
                 yeni = check_achievements(gorev_tamamlandi=True)
                 if yeni:
-                    return "__GOREV_BITTI__\n" + "\n".join(f"{r['emoji']} {r['name']} kazanıldı! 🎉" for r in yeni)
+                    return "__GOREV_BITTI__\n" + "\n".join(
+                        f"{r['emoji']} {r['name']} kazanıldı! 🎉" for r in yeni
+                    )
             except Exception as _e:
                 logger.warning("[Motor] except Exception (L991): %s", Exception)
                 pass
@@ -1806,6 +2194,7 @@ class Motor:
         if arac == "DURUM_RAPOR":
             try:
                 import time as _t
+
                 satirlar = [
                     "[Durum Raporu]",
                     f"  Zaman: {_t.strftime('%Y-%m-%d %H:%M:%S')}",
@@ -1813,7 +2202,7 @@ class Motor:
                     f"  Kayitli arac: {len(dir(self))}",
                 ]
                 # Provider referansi varsa durumunu ekle
-                if getattr(self, '_provider_ref', None):
+                if getattr(self, "_provider_ref", None):
                     satirlar.append(f"  Provider: bagli")
                 else:
                     satirlar.append(f"  Provider: bagli degil")
@@ -1829,12 +2218,19 @@ class Motor:
             """Bot process canlılık kontrolü. Ölüyse restart dener."""
             import subprocess
             import json as _json
+
             try:
                 sonuc = subprocess.run(
-                    ["powershell.exe", "-NoProfile", "-Command",
-                     "Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -match 'bot\\.py' } | "
-                     "Select-Object ProcessId | ConvertTo-Json -Compress"],
-                    capture_output=True, text=True, timeout=15
+                    [
+                        "powershell.exe",
+                        "-NoProfile",
+                        "-Command",
+                        "Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -match 'bot\\.py' } | "
+                        "Select-Object ProcessId | ConvertTo-Json -Compress",
+                    ],
+                    capture_output=True,
+                    text=True,
+                    timeout=15,
                 )
                 cikti = sonuc.stdout.strip()
                 if cikti and cikti != "null":
@@ -1842,19 +2238,28 @@ class Motor:
                         data = _json.loads(cikti)
                         if isinstance(data, dict):
                             data = [data]
-                        pidler = [str(p.get("ProcessId")) for p in data if p.get("ProcessId")]
+                        pidler = [
+                            str(p.get("ProcessId")) for p in data if p.get("ProcessId")
+                        ]
                         if pidler:
-                            return f"__WATCHDOG__ Bot calisiyor. PID: {', '.join(pidler)}"
+                            return (
+                                f"__WATCHDOG__ Bot calisiyor. PID: {', '.join(pidler)}"
+                            )
                     except _json.JSONDecodeError as _e:
-                        logger.warning("[Motor] JSON parse hatasi (L1043): %s", _json.JSONDecodeError)
+                        logger.warning(
+                            "[Motor] JSON parse hatasi (L1043): %s",
+                            _json.JSONDecodeError,
+                        )
                         pass
                 # Bot ölü — restart dene
                 _py = sys.executable
                 _bot = ROOT / "bot.py"
                 subprocess.Popen(
-                    [_py, str(_bot)], cwd=str(ROOT),
-                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                    creationflags=subprocess.CREATE_NO_WINDOW
+                    [_py, str(_bot)],
+                    cwd=str(ROOT),
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                    creationflags=subprocess.CREATE_NO_WINDOW,
                 )
                 return "__WATCHDOG__ Bot calismiyordu, yeniden baslatildi."
             except Exception as e:
@@ -1869,21 +2274,27 @@ class Motor:
             """TELEGRAM_BOT_TOKEN'in geçerliliğini test et."""
             import urllib.request as _ur
             import json as _js
+
             token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
             if not token:
                 return "[TOKEN] TELEGRAM_BOT_TOKEN .env'de bulunamadi"
             try:
-                resp = _ur.urlopen(f"https://api.telegram.org/bot{token}/getMe", timeout=10)
+                resp = _ur.urlopen(
+                    f"https://api.telegram.org/bot{token}/getMe", timeout=10
+                )
                 data = _js.loads(resp.read().decode())
                 if data.get("ok"):
                     bot = data["result"]
-                    return f"[TOKEN] ✅ {bot['first_name']} (@{bot['username']}) — gecerli"
+                    return (
+                        f"[TOKEN] ✅ {bot['first_name']} (@{bot['username']}) — gecerli"
+                    )
                 return f"[TOKEN] ❌ {data.get('description', 'bilinmeyen hata')}"
             except Exception as e:
                 return f"[TOKEN] ❌ Baglanti hatasi: {e}"
         if arac == "PROXY_AYARLA":
             try:
                 from proxy import ProxyEngine, ProxyConfig
+
                 _proxy_engine = ProxyEngine(ProxyConfig())
                 komut = (params[0] if params else "status").lower()
                 if komut == "start":
@@ -1899,6 +2310,7 @@ class Motor:
                 return f"[Proxy] Hata: {e}"
         if arac == "ACHIEVEMENTS_LISTE":
             from tools.achievements import rozet_listele
+
             return rozet_listele()
         if arac == "DOSYA_YAZ":
             if len(params) < 2:
@@ -1917,6 +2329,7 @@ class Motor:
                     lsp_diagnostics_after_write,
                     format_diagnostics,
                 )
+
                 lsp_diagnostics_before_write(ad)
             except ImportError as _e:
                 logger.warning("[Motor] Modul yuklenemedi (L1115): %s", ImportError)
@@ -1947,14 +2360,17 @@ class Motor:
             if self.hafiza is None:
                 return "[Hafiza]: Bagli degil."
             from reymen.hafiza.vektorel_hafiza import anlamsal_hafiza_ara
+
             return anlamsal_hafiza_ara(self.hafiza, params[0] if params else "")
         if arac == "WEB_ARA":
             from reymen.arac.araclar_web import web_ara
+
             return web_ara(params[0] if params else "")
         if arac == "TELEGRAM_GONDER":
             # ReYMeN Iletisim katmani uzerinden gonder (varsa)
             try:
                 from reymen_iletisim import iletisim_hazir, iletisim_al
+
                 if iletisim_hazir():
                     ileti = iletisim_al()
                     ileti.gonder(params[0] if params else "", kanal="telegram")
@@ -1964,13 +2380,25 @@ class Motor:
                 pass
             # Fallback: tools.send_message_tool
             from tools.send_message_tool import telegram_gonder
+
             tg = self.config.get("telegram", {})
-            return telegram_gonder(params[0] if params else "", tg.get("token", ""), tg.get("chat_id", "6328823909"))
+            return telegram_gonder(
+                params[0] if params else "",
+                tg.get("token", ""),
+                tg.get("chat_id", "6328823909"),
+            )
         if arac == "TELEGRAM_STREAM_GONDER":
             try:
                 from gateway.platforms.telegram import send_stream as _send_stream
-                chat_id = params[1] if len(params) > 1 else os.environ.get("TELEGRAM_CHAT_ID", "6328823909")
-                sonuc = _send_stream(chat_id, params[0] if params else "", parse_mode="HTML")
+
+                chat_id = (
+                    params[1]
+                    if len(params) > 1
+                    else os.environ.get("TELEGRAM_CHAT_ID", "6328823909")
+                )
+                sonuc = _send_stream(
+                    chat_id, params[0] if params else "", parse_mode="HTML"
+                )
                 if sonuc.get("durum") == "basarili":
                     return f"[TELEGRAM_STREAM_GONDER]: Stream mesaj gonderildi ({sonuc.get('chunk_sayisi',1)} chunk)"
                 return f"[TELEGRAM_STREAM_GONDER]: Hata — {sonuc.get('hata', 'bilinmiyor')}"
@@ -1979,7 +2407,12 @@ class Motor:
         if arac == "TELEGRAM_REACTION_EKLE":
             try:
                 from gateway.platforms.telegram import set_reaction as _set_reaction
-                chat_id = params[1] if len(params) > 1 else os.environ.get("TELEGRAM_CHAT_ID", "6328823909")
+
+                chat_id = (
+                    params[1]
+                    if len(params) > 1
+                    else os.environ.get("TELEGRAM_CHAT_ID", "6328823909")
+                )
                 mesaj_id = int(params[0]) if params else 0
                 emoji = params[2] if len(params) > 2 else "\U0001f44d"
                 sonuc = _set_reaction(chat_id, mesaj_id, emoji)
@@ -1991,18 +2424,23 @@ class Motor:
         if arac == "TELEGRAM_PING":
             try:
                 from gateway.platforms.telegram import ping as _ping
+
                 canli = _ping()
                 return f"[TELEGRAM_PING]: {'Baglanti basarili' if canli else 'Baglanti basarisiz (token yok veya API erisilemez)'}"
             except Exception as e:
                 return f"[TELEGRAM_PING]: Hata — {e}"
         if arac == "TELEGRAM_RESIM_GONDER":
             from tools.send_message_tool import telegram_resim_gonder
+
             tg = self.config.get("telegram", {})
             dosya_yolu = params[0] if params else ""
-            return telegram_resim_gonder(dosya_yolu, tg.get("token", ""), tg.get("chat_id", "6328823909"))
+            return telegram_resim_gonder(
+                dosya_yolu, tg.get("token", ""), tg.get("chat_id", "6328823909")
+            )
         if arac == "ILETISIM_BASLAT":
             try:
                 from reymen_iletisim import iletisim_kur, iletisim_hazir
+
                 iletisim_kur()
                 if iletisim_hazir():
                     return "[ILETISIM] ReYMeN Iletisim Katmani baslatildi."
@@ -2012,6 +2450,7 @@ class Motor:
         if arac == "ILETISIM_DURDUR":
             try:
                 from reymen_iletisim import iletisim_durdur
+
                 iletisim_durdur()
                 return "[ILETISIM] ReYMeN Iletisim Katmani durduruldu."
             except Exception as e:
@@ -2019,6 +2458,7 @@ class Motor:
         if arac == "ILETISIM_DURUM":
             try:
                 from reymen_iletisim import iletisim_hazir, iletisim_al
+
                 if not iletisim_hazir():
                     return "[ILETISIM] Calismiyor."
                 ileti = iletisim_al()
@@ -2029,28 +2469,34 @@ class Motor:
             baslik = params[0] if len(params) > 0 else ""
             aciklama = params[1] if len(params) > 1 else ""
             from ReYMeN_cli.kanban import kanban_add
+
             return kanban_add(baslik, aciklama)
         if arac == "KANBAN_LISTE":
             from ReYMeN_cli.kanban import kanban_list
+
             return kanban_list()
         if arac == "KANBAN_CLAIM":
             gorev_id = params[0] if len(params) > 0 else ""
             atanan = params[1] if len(params) > 1 else "ajan"
             from ReYMeN_cli.kanban import kanban_claim
+
             return kanban_claim(gorev_id, atanan)
         if arac == "KANBAN_COMPLETE":
             gorev_id = params[0] if len(params) > 0 else ""
             sonuc = params[1] if len(params) > 1 else ""
             from ReYMeN_cli.kanban import kanban_complete
+
             return kanban_complete(gorev_id, sonuc)
         if arac == "KANBAN_HEARTBEAT":
             gorev_id = params[0] if len(params) > 0 else ""
             from ReYMeN_cli.kanban import kanban_heartbeat
+
             return kanban_heartbeat(gorev_id)
         if arac == "KANBAN_FAIL":
             gorev_id = params[0] if len(params) > 0 else ""
             neden = params[1] if len(params) > 1 else "belirtilmedi"
             from ReYMeN_cli.kanban import kanban_fail
+
             return kanban_fail(gorev_id, neden)
         if arac == "KANBAN_GUNCELLE":
             gorev_id = params[0] if len(params) > 0 else ""
@@ -2061,45 +2507,60 @@ class Motor:
                 baslik = params[1]
                 aciklama = params[2]
                 from ReYMeN_cli.kanban import kanban_update
+
                 return kanban_update(gorev_id, baslik, aciklama)
             else:
                 # 2 parametre: id, yeni_durum
                 yeni_durum = params[1]
                 from ReYMeN_cli.kanban import kanban_move
+
                 return kanban_move(gorev_id, yeni_durum)
         if arac == "KANBAN_OZET":
             from ReYMeN_cli.kanban import kanban_stats
+
             return kanban_stats()
         if arac == "TARAYICI_AC":
             from reymen.arac.araclar_tarayici import TarayiciKontrol
+
             return TarayiciKontrol().sayfa_ac_ve_oku(params[0] if params else "")
         if arac == "EKRAN_TIKLA":
             if not self._ekran:
                 from reymen.arac.araclar_ekran import EkranOCRTikla
+
                 self._ekran = EkranOCRTikla()
             yazi = params[0] if params else ""
-            hangi = int(params[1]) if len(params) >= 2 and params[1].lstrip("-").isdigit() else 0
+            hangi = (
+                int(params[1])
+                if len(params) >= 2 and params[1].lstrip("-").isdigit()
+                else 0
+            )
             return self._ekran.yaziyi_bul_ve_tikla(yazi, hangi=hangi)
         if arac == "EKRAN_OKU":
             if not self._ekran:
                 from reymen.arac.araclar_ekran import EkranOCRTikla
+
                 self._ekran = EkranOCRTikla()
             return self._ekran.ekran_metnini_oku()
         if arac == "EKRAN_FOTOGRAF_CEK":
             import subprocess, os
+
             py3 = sys.executable
             script = os.path.join(os.path.dirname(__file__), "screenshot_bot.py")
             if os.path.exists(script):
-                r = subprocess.run([py3, script], capture_output=True, text=True, timeout=30)
+                r = subprocess.run(
+                    [py3, script], capture_output=True, text=True, timeout=30
+                )
                 if r.returncode == 0:
                     return "[EKRAN_FOTOGRAF_CEK]: " + r.stdout.strip()
                 return f"[EKRAN_FOTOGRAF_CEK]: Hata: {r.stderr[:300]}"
             return "[EKRAN_FOTOGRAF_CEK]: screenshot_bot.py bulunamadi."
         if arac == "MAKRO_OYNAT":
             from tools.macro import oynat
+
             return oynat(params[0] if params else "")
         if arac == "UYG_ISLEM_CAGIR":
             from reymen.hafiza.uygulama_hafizasi import UygulamaHafizasi
+
             uh = UygulamaHafizasi()
             if len(params) < 2:
                 return "[Hata]: UYG_ISLEM_CAGIR iki parametre ister."
@@ -2110,33 +2571,43 @@ class Motor:
         # FAZ 4 H7 — Dosya analiz araçları
         if arac == "PDF_OKU":
             from reymen.arac.araclar_dosya_analiz import pdf_oku
+
             return pdf_oku(params[0] if params else "")
         if arac == "EXCEL_OKU":
             from reymen.arac.araclar_dosya_analiz import excel_oku
+
             sayfa = params[1] if len(params) >= 2 else ""
             return excel_oku(params[0] if params else "", sayfa=sayfa)
         if arac == "CSV_OKU":
             from reymen.arac.araclar_dosya_analiz import csv_oku
+
             ayirici = params[1] if len(params) >= 2 else ","
             return csv_oku(params[0] if params else "", ayirici=ayirici)
         if arac == "GORUNTU_ANALIZ":
             from reymen.arac.araclar_dosya_analiz import goruntu_analiz
+
             soru = params[1] if len(params) >= 2 else ""
             return goruntu_analiz(params[0] if params else "", soru=soru)
         if arac == "DOSYA_ANALIZ":
             from reymen.arac.araclar_dosya_analiz import dosya_analiz
+
             ek = params[1] if len(params) >= 2 else ""
             return dosya_analiz(params[0] if params else "", ek_parametre=ek)
         if arac == "PROJE_TARA":
             import os, json
+
             kok = os.path.dirname(os.path.abspath(__file__))
             py_dosyalar = []
             toplam_boyut = 0
             for kokdizini, altklasorler, dosyalar in os.walk(kok):
                 # .ReYMeN, __pycache__, .git gibi gizli klasörleri atla
-                altklasorler[:] = [d for d in altklasorler if not d.startswith('.') and d != '__pycache__']
+                altklasorler[:] = [
+                    d
+                    for d in altklasorler
+                    if not d.startswith(".") and d != "__pycache__"
+                ]
                 for f in dosyalar:
-                    if f.endswith('.py'):
+                    if f.endswith(".py"):
                         tam = os.path.join(kokdizini, f)
                         boyut = os.path.getsize(tam)
                         py_dosyalar.append((os.path.relpath(tam, kok), boyut))
@@ -2145,7 +2616,7 @@ class Motor:
             ozet = {
                 "toplam_py": len(py_dosyalar),
                 "toplam_boyut_kb": round(toplam_boyut / 1024, 1),
-                "dosyalar": py_dosyalar[:100]  # ilk 100
+                "dosyalar": py_dosyalar[:100],  # ilk 100
             }
             return f"[PROJE_TARA]: {json.dumps(ozet, ensure_ascii=False, indent=2)}"
         # ── CUA (Computer Use Agent) ────────────────────────────────────
@@ -2164,6 +2635,7 @@ class Motor:
             try:
                 import subprocess
                 import sys
+
                 reymentui_path = Path(__file__).parent / "reymentui"
                 if not reymentui_path.exists():
                     return "[TUI] reymentui/ dizini bulunamadi."
@@ -2186,9 +2658,11 @@ class Motor:
         if arac == "GATEWAY_BASLAT":
             try:
                 from gateway.run import GatewayRunner
+
                 filtre = params[0].split(",") if params and params[0] else None
                 # Thread'de çalıştır (ana döngü bloke etmesin)
                 import threading as _gt
+
                 self._gateway_runner = GatewayRunner(polling_interval=5.0)
                 _gt.Thread(
                     target=self._gateway_runner.calistir,
@@ -2197,10 +2671,13 @@ class Motor:
                     name="gateway-thread",
                 ).start()
                 import time as _gt_time
+
                 _gt_time.sleep(1.5)  # başlangıç için bekle
                 ozet = self._gateway_runner.durum_ozeti()
-                return (f"[GATEWAY_BASLAT] Gateway baslatildi. "
-                        f"Platform: {ozet['aktif_platform']}/{ozet['platform_sayisi']} aktif")
+                return (
+                    f"[GATEWAY_BASLAT] Gateway baslatildi. "
+                    f"Platform: {ozet['aktif_platform']}/{ozet['platform_sayisi']} aktif"
+                )
             except Exception as e:
                 return f"[GATEWAY_BASLAT] Hata: {e}"
         if arac == "GATEWAY_DURDUR":
@@ -2216,8 +2693,10 @@ class Motor:
         if arac == "GATEWAY_RESTART":
             try:
                 from gateway.restart import platform_kaydet, restart_all
+
                 # Mevcut platformları restart.py'ye kaydet
                 from gateway.platforms import platform_listele, platform_al
+
                 for ad in platform_listele():
                     bilgi = platform_al(ad)
                     if bilgi:
@@ -2226,7 +2705,11 @@ class Motor:
                             bilgi.get("baslat", lambda: None),
                             bilgi.get("durdur", lambda: None),
                         )
-                bekleme = float(params[0]) if params and params[0].replace(".", "").isdigit() else 1.0
+                bekleme = (
+                    float(params[0])
+                    if params and params[0].replace(".", "").isdigit()
+                    else 1.0
+                )
                 sonuclar = restart_all(bekleme=bekleme)
                 basarili = sum(1 for v in sonuclar.values() if v)
                 toplam = len(sonuclar)
@@ -2236,6 +2719,7 @@ class Motor:
         if arac == "GATEWAY_DURUM":
             try:
                 from gateway.status import read_runtime_status
+
                 durum = read_runtime_status()
                 if not durum:
                     return "[GATEWAY_DURUM] Gateway calismiyor (durum dosyasi yok)."
@@ -2254,7 +2738,9 @@ class Motor:
                 # GatewayRunner'dan ek bilgi
                 if hasattr(self, "_gateway_runner") and self._gateway_runner:
                     runner_ozet = self._gateway_runner.durum_ozeti()
-                    satirlar.append(f"  Aktif: {runner_ozet['aktif_platform']}/{runner_ozet['platform_sayisi']}")
+                    satirlar.append(
+                        f"  Aktif: {runner_ozet['aktif_platform']}/{runner_ozet['platform_sayisi']}"
+                    )
                     satirlar.append(f"  Hata: {runner_ozet['hata_sayisi']}")
                 return "\n".join(satirlar)
             except Exception as e:
@@ -2264,12 +2750,19 @@ class Motor:
         if arac in ("ALT_AJAN_GOREVLENDIR", "ALT_AJAN_DURUM", "ALT_AJAN_IPTAL"):
             try:
                 from reymen.cereyan.alt_ajan import AltAjanKoordinatörü
+
                 if not hasattr(self, "_alt_ajan"):
                     self._alt_ajan = AltAjanKoordinatörü()
                 if arac == "ALT_AJAN_GOREVLENDIR":
                     import json
+
                     try:
-                        gorev_data = json.loads(ham_param) if isinstance(ham_param, str) and ham_param.strip().startswith("{") else {"hedef": ham_param}
+                        gorev_data = (
+                            json.loads(ham_param)
+                            if isinstance(ham_param, str)
+                            and ham_param.strip().startswith("{")
+                            else {"hedef": ham_param}
+                        )
                     except json.JSONDecodeError:
                         gorev_data = {"hedef": ham_param}
                     hedef = gorev_data.get("hedef", ham_param)
@@ -2277,7 +2770,11 @@ class Motor:
                     sonuc = self._alt_ajan.gorevlendir(hedef, tip=tip)
                     return f"[ALT_AJAN] Gorev baslatildi: {sonuc}"
                 if arac == "ALT_AJAN_DURUM":
-                    durum = self._alt_ajan.durum_raporu() if hasattr(self._alt_ajan, "durum_raporu") else "Durum bilgisi alinamadi"
+                    durum = (
+                        self._alt_ajan.durum_raporu()
+                        if hasattr(self._alt_ajan, "durum_raporu")
+                        else "Durum bilgisi alinamadi"
+                    )
                     return f"[ALT_AJAN] {durum}"
                 if arac == "ALT_AJAN_IPTAL":
                     self._alt_ajan.iptal_et()
@@ -2289,11 +2786,18 @@ class Motor:
         if arac == "CLARIFY":
             try:
                 from tools.clarify_tool import run as clarify_run
+
                 soru = params[0] if len(params) > 0 else ""
                 sec_str = params[1] if len(params) > 1 and params[1] else ""
                 varsayilan = params[2] if len(params) > 2 else ""
-                secenekler = [s.strip() for s in sec_str.split("|") if s.strip()] if sec_str else None
-                return clarify_run(soru=soru, secenekler=secenekler, varsayilan=varsayilan)
+                secenekler = (
+                    [s.strip() for s in sec_str.split("|") if s.strip()]
+                    if sec_str
+                    else None
+                )
+                return clarify_run(
+                    soru=soru, secenekler=secenekler, varsayilan=varsayilan
+                )
             except Exception as e:
                 return f"[CLARIFY HATASI] {e}"
 
@@ -2301,8 +2805,13 @@ class Motor:
         if arac == "EXECUTE_CODE":
             try:
                 from tools.execute_code_tool import run as exec_run
+
                 kod = params[0] if len(params) > 0 else ""
-                timeout = int(params[1]) if len(params) > 1 and params[1].strip().isdigit() else 30
+                timeout = (
+                    int(params[1])
+                    if len(params) > 1 and params[1].strip().isdigit()
+                    else 30
+                )
                 calisma_dizini = params[2] if len(params) > 2 else ""
                 return exec_run(kod=kod, timeout=timeout, calisma_dizini=calisma_dizini)
             except Exception as e:
@@ -2314,7 +2823,7 @@ class Motor:
                 return "[Profil] HATA: Profil yoneticisi yuklu degil."
             profil_adi = params[0] if params else ""
             if not profil_adi:
-                return "[Profil] HATA: Profil adi gerekli. Kullanim: PROFIL_DEGISTIR(\"profil_adi\")"
+                return '[Profil] HATA: Profil adi gerekli. Kullanim: PROFIL_DEGISTIR("profil_adi")'
             return _PROFILE_MGR.profil_degistir(profil_adi)
 
         # PROFIL_LISTELE — tüm profilleri listele
@@ -2356,28 +2865,29 @@ class Motor:
 
     def _llm_fix_iste(self, hata_msg: str, kod: str, dosya_adi: str = "") -> str:
         """LLM'e hatayı gönder, düzeltilmiş kodu al.
-        
+
         İyileştirmeler:
         - Dosya adı context'e eklenir
         - Hata tipi çıkarılır ve eklenir
         - Token limiti (4000 char kod, 2000 char hata)
         """
         from reymen.core.model_adapter import get_active_adapter
+
         a = get_active_adapter()
-        
+
         # Hata tipini çıkar (ilk satırdan)
         hata_tipi = ""
         if hata_msg:
             ilk_satir = hata_msg.strip().split("\n")[0]
             if ":" in ilk_satir:
                 hata_tipi = ilk_satir.split(":")[0].strip()
-        
+
         # Kod ve hatayı kısalt (token limiti)
         kod_kisa = kod[:4000] if len(kod) > 4000 else kod
         hata_kisa = hata_msg[:2000] if len(hata_msg) > 2000 else hata_msg
-        
+
         dosya_bilgisi = f"Dosya: {dosya_adi}\n" if dosya_adi else ""
-        
+
         return a.complete(
             f"Bu Python kodu şu hatayı verdi:\n\n"
             f"{dosya_bilgisi}"
@@ -2393,16 +2903,16 @@ class Motor:
     @staticmethod
     def _fix_dogrula(fix_path: Path) -> tuple:
         """Fix'i doğrula. Döner: (başarılı_mı, stderr).
-        
+
         İyileştirmeler:
         - sys.executable kullan (doğru Python)
         - stderr döndür (hata ayıklama için)
         """
         import subprocess
         import sys
+
         r = subprocess.run(
-            [sys.executable, str(fix_path)],
-            capture_output=True, text=True, timeout=120
+            [sys.executable, str(fix_path)], capture_output=True, text=True, timeout=120
         )
         return r.returncode == 0, r.stderr
 
@@ -2425,36 +2935,44 @@ class Motor:
 
         for deneme in range(1, 4):
             r = subprocess.run(
-                [sys.executable, str(path)],
-                capture_output=True, text=True, timeout=120
+                [sys.executable, str(path)], capture_output=True, text=True, timeout=120
             )
             if r.returncode == 0:
                 return True
 
             stderr = r.stderr
-            logger.info("[script_calistir] ❌ Hata (deneme %d/3): %.80s",
-                        deneme, stderr[:80])
+            logger.info(
+                "[script_calistir] ❌ Hata (deneme %d/3): %.80s", deneme, stderr[:80]
+            )
 
             # SelfHeal ile çöz
             try:
                 from reymen.core.self_heal import SelfHeal
+
                 heal = SelfHeal(max_deneme=1)  # her denemede 1 LLM çağrısı
                 sonuc = heal.script_coz(script_path, stderr)
 
                 if sonuc["basarili"]:
                     # Fix başarılı — fix dosyasını kullan
                     path = Path(sonuc["fix_path"])
-                    logger.info("[script_calistir] ✅ SelfHeal çözdü (deneme %d, kaynak: %s)",
-                                deneme, sonuc["kaynak"])
+                    logger.info(
+                        "[script_calistir] ✅ SelfHeal çözdü (deneme %d, kaynak: %s)",
+                        deneme,
+                        sonuc["kaynak"],
+                    )
                 else:
-                    logger.warning("[script_calistir] ❌ SelfHeal çözemedi (deneme %d): %.80s",
-                                   deneme, sonuc.get("hata", "bilinmeyen")[:80])
+                    logger.warning(
+                        "[script_calistir] ❌ SelfHeal çözemedi (deneme %d): %.80s",
+                        deneme,
+                        sonuc.get("hata", "bilinmeyen")[:80],
+                    )
             except Exception as e:
                 logger.exception("[script_calistir] SelfHeal hatası: %s", e)
 
             # Backoff (2. ve 3. denemede)
             if deneme < 3:
                 import time
+
                 bekleme = 1.0 * (2.0 ** (deneme - 1))
                 time.sleep(bekleme)
 
@@ -2469,6 +2987,7 @@ class Motor:
         # SelfHeal ile dene
         try:
             from reymen.core.self_heal import SelfHeal
+
             heal = SelfHeal(max_deneme=1)
             # script_kodu = kod, hata_mesaji = hata
             sonuc = heal.coz(hedef=ad, hata=hata_mesaji, kod=script_kodu)
@@ -2486,6 +3005,7 @@ class Motor:
         self_heal = {}
         try:
             from reymen.core.ogrenme import istatistik
+
             ogrenme = istatistik()
         except ImportError:
             ogrenme = {"hata": "ogrenme modulu yok"}
@@ -2494,6 +3014,7 @@ class Motor:
             pass
         try:
             from reymen.core.self_heal import istatistik_al
+
             self_heal = istatistik_al()
         except Exception:
             self_heal = {"hata": "SelfHeal henüz çalışmadı"}
@@ -2513,6 +3034,7 @@ class Motor:
             return {"hata": "Orchestrator yuklu degil. pip install reymen-core"}
         try:
             from reymen.core.orchestrator import solve_all, solve_step
+
             steps = self._gorev_adimlari_oku(gorev_yolu)
             return {"sonuclar": solve_all(steps), "durum": "tamam"}
         except Exception as e:
@@ -2520,7 +3042,7 @@ class Motor:
 
     def hatadan_kurtul(self, kod: str, hata: str, dosya_adi: str = "") -> str:
         """Bir Python kodundaki hatayı çöz, düzeltilmiş halini al.
-        
+
         İyileştirmeler (v2):
         - Önce öğrenme hafızasında ara (hızlı çözüm)
         - Hafızada yoksa OgrenmeDongusu kullan (LLM + backoff)
@@ -2530,16 +3052,19 @@ class Motor:
         # 1. Önce öğrenme hafızasında ara
         try:
             from reymen.core.ogrenme import imza_uret, cozum_bul, tablo_olustur
+
             tablo_olustur()
             hata_objesi = RuntimeError(hata)
             imza = imza_uret(hata_objesi)
             onceki = cozum_bul(imza)
             if onceki:
-                logger.info("[hatadan_kurtul] Hafızadan çözüm bulundu (imza: %s)", imza[:16])
+                logger.info(
+                    "[hatadan_kurtul] Hafızadan çözüm bulundu (imza: %s)", imza[:16]
+                )
                 return onceki
         except Exception as e:
             logger.warning("[hatadan_kurtul] Hafıza arama hatası: %s", e)
-        
+
         # 2. OgrenmeDongusu dene (LLM + backoff + kaydetme)
         try:
             cozum = self.ogren(hata, kod, dosya_adi or "motor_kurtarma")
@@ -2547,15 +3072,16 @@ class Motor:
                 return cozum
         except Exception as e:
             logger.warning("[hatadan_kurtul] OgrenmeDongusu hatası: %s", e)
-        
+
         # 3. Son çare: orchestrator
         if _ORCHESTRATOR_MEVCUT:
             try:
                 from reymen.core.orchestrator import coz_hata
+
                 return coz_hata(hata, kod, dosya_adi or "motor_kurtarma")
             except Exception as e:
                 return f"Hata cozulemedi: {e}"
-        
+
         return f"Çözüm bulunamadı. Hata: {hata[:200]}"
 
     def _self_heal_calistir(self, hedef_hata_kod: str) -> str:
@@ -2565,6 +3091,7 @@ class Motor:
         """
         try:
             from reymen.core.self_heal import SelfHeal
+
             parts = [p.strip() for p in hedef_hata_kod.split("|", 2)]
             hedef = parts[0] if len(parts) > 0 else "bilinmeyen"
             hata = parts[1] if len(parts) > 1 else ""
@@ -2574,13 +3101,17 @@ class Motor:
             heal = SelfHeal()
             sonuc = heal.coz(hedef, hata, kod)
             if sonuc["basarili"]:
-                return (f"[SelfHeal] ✅ Çözüldü (kaynak: {sonuc['kaynak']}, "
-                        f"deneme: {sonuc['deneme_sayisi']})\n"
-                        f"Çözüm:\n{sonuc['cozum']}")
+                return (
+                    f"[SelfHeal] ✅ Çözüldü (kaynak: {sonuc['kaynak']}, "
+                    f"deneme: {sonuc['deneme_sayisi']})\n"
+                    f"Çözüm:\n{sonuc['cozum']}"
+                )
             else:
-                return (f"[SelfHeal] ❌ Çözülemedi "
-                        f"({sonuc['deneme_sayisi']} deneme)\n"
-                        f"Hata: {sonuc['hata']}")
+                return (
+                    f"[SelfHeal] ❌ Çözülemedi "
+                    f"({sonuc['deneme_sayisi']} deneme)\n"
+                    f"Hata: {sonuc['hata']}"
+                )
         except Exception as e:
             return f"[SelfHeal] ❌ İç hata: {e}"
 
@@ -2591,13 +3122,14 @@ class Motor:
         ADIM_2 | reymen/scripts/step_02.py
         """
         import re
+
         path = Path(gorev_yolu)
         if not path.exists():
             return [("HATA", gorev_yolu)]
         text = path.read_text("utf-8")
         steps = []
         for line in text.splitlines():
-            m = re.match(r'^\s*(ADIM_\d+)\s*\|\s*(.+\.py)\s*$', line)
+            m = re.match(r"^\s*(ADIM_\d+)\s*\|\s*(.+\.py)\s*$", line)
             if m:
                 steps.append((m.group(1), m.group(2).strip()))
         return steps if steps else [("TEK_ADIM", gorev_yolu)]
@@ -2605,5 +3137,5 @@ class Motor:
 
 if __name__ == "__main__":
     m = Motor(backend_mode="local")
-    arac, ham = m.eylemi_ayristir("Eylem: DOSYA_OKU(\"test.txt\")")
+    arac, ham = m.eylemi_ayristir('Eylem: DOSYA_OKU("test.txt")')
     print(f"{arac} -> {m.calistir(arac, ham)[:60]}")

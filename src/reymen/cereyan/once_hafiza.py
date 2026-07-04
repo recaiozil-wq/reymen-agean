@@ -42,6 +42,7 @@ _yazma_kilit = threading.Lock()
 
 # ── Kademeli Güven Fonksiyonu ─────────────────────────────────────────────
 
+
 def _kademeli_guven(basari: int, hata: int) -> float:
     """
     Sigmoid-like gradual confidence calculation.
@@ -56,11 +57,13 @@ def _kademeli_guven(basari: int, hata: int) -> float:
     - 1 success, 3 errors: ~0.12
     """
     import math
+
     net = basari - hata - 1  # -1 offset: ilk kayıtta 0.5
     return 1.0 / (1.0 + math.exp(-0.5 * net))
 
 
 # ── Veritabanı ────────────────────────────────────────────────────────────
+
 
 def _kur(con: sqlite3.Connection) -> None:
     """Create the ogrenmeler table."""
@@ -119,6 +122,7 @@ def _db_kur():
 
 # ── Ana API ───────────────────────────────────────────────────────────────
 
+
 def kaydet(
     hedef: str,
     kategori: str = "genel",
@@ -173,11 +177,25 @@ def kaydet(
                         kaynak_url = COALESCE(?, kaynak_url),
                         guncelleme = datetime('now')
                     WHERE id = ?""",
-                    (icerik, guven, yeni_basari, yeni_hata,
-                     bugun, gecerlilik, kaynak_url, kayit_id),
+                    (
+                        icerik,
+                        guven,
+                        yeni_basari,
+                        yeni_hata,
+                        bugun,
+                        gecerlilik,
+                        kaynak_url,
+                        kayit_id,
+                    ),
                 )
-                logger.info("[Hafiza] Guncellendi: %s/%s (guven=%.2f, %d basari, %d hata)",
-                           kategori, hedef[:40], guven, yeni_basari, yeni_hata)
+                logger.info(
+                    "[Hafiza] Guncellendi: %s/%s (guven=%.2f, %d basari, %d hata)",
+                    kategori,
+                    hedef[:40],
+                    guven,
+                    yeni_basari,
+                    yeni_hata,
+                )
                 return kayit_id
             else:
                 # İlk kayıt: guven=0.5 başlangıç, kademeli artar
@@ -187,15 +205,26 @@ def kaydet(
                        (hedef, kategori, icerik, guven_skoru, basari_sayisi, hata_sayisi,
                         son_kullanim, gecerlilik_tarihi, kaynak_url)
                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                    (hedef, kategori, icerik,
-                     baslangic_guven,
-                     1 if basari else 0,
-                     0 if basari else 1,
-                     bugun, gecerlilik, kaynak_url),
+                    (
+                        hedef,
+                        kategori,
+                        icerik,
+                        baslangic_guven,
+                        1 if basari else 0,
+                        0 if basari else 1,
+                        bugun,
+                        gecerlilik,
+                        kaynak_url,
+                    ),
                 )
                 kayit_id = con.execute("SELECT last_insert_rowid()").fetchone()[0]
-                logger.info("[Hafiza] Yeni kayit: %s/%s (id=%d, guven=%.2f)",
-                           kategori, hedef[:40], kayit_id, baslangic_guven)
+                logger.info(
+                    "[Hafiza] Yeni kayit: %s/%s (id=%d, guven=%.2f)",
+                    kategori,
+                    hedef[:40],
+                    kayit_id,
+                    baslangic_guven,
+                )
                 return kayit_id
 
 
@@ -260,19 +289,21 @@ def ara(
         if row[0] not in gorulen:
             gorulen.add(row[0])
             guven = row[4]
-            sonuc.append({
-                "id": row[0],
-                "hedef": row[1],
-                "kategori": row[2],
-                "icerik": row[3],
-                "guven_skoru": guven,
-                "durum": "guvenilir" if guven >= 0.5 else "belirsiz",
-                "basari_sayisi": row[5],
-                "hata_sayisi": row[6],
-                "son_kullanim": row[7],
-                "gecerlilik_tarihi": row[8],
-                "kaynak_url": row[9] if len(row) > 9 else None,
-            })
+            sonuc.append(
+                {
+                    "id": row[0],
+                    "hedef": row[1],
+                    "kategori": row[2],
+                    "icerik": row[3],
+                    "guven_skoru": guven,
+                    "durum": "guvenilir" if guven >= 0.5 else "belirsiz",
+                    "basari_sayisi": row[5],
+                    "hata_sayisi": row[6],
+                    "son_kullanim": row[7],
+                    "gecerlilik_tarihi": row[8],
+                    "kaynak_url": row[9] if len(row) > 9 else None,
+                }
+            )
 
     return sonuc
 
@@ -385,8 +416,12 @@ def isle(
         kayitlar = ara(hedef, kategori, min_guven=min_guven, gecerli_mi=gecerli_mi)
         if kayitlar:
             en_iyi = kayitlar[0]
-            logger.info("[Hafiza] ONBELLEK: %s/%s (guven=%.2f)",
-                       en_iyi["kategori"], en_iyi["hedef"][:40], en_iyi["guven_skoru"])
+            logger.info(
+                "[Hafiza] ONBELLEK: %s/%s (guven=%.2f)",
+                en_iyi["kategori"],
+                en_iyi["hedef"][:40],
+                en_iyi["guven_skoru"],
+            )
             # Kullanım güncelle
             guven_guncelle(en_iyi["id"], basari=True)
 
@@ -407,7 +442,9 @@ def isle(
         return sonuc, "exec"
     except Exception as e:
         hata_mesaji = "[HATA] {}: {}".format(type(e).__name__, e)
-        logger.warning("[Hafiza] Basarisiz: %s/%s — %s", kategori, hedef[:40], hata_mesaji)
+        logger.warning(
+            "[Hafiza] Basarisiz: %s/%s — %s", kategori, hedef[:40], hata_mesaji
+        )
         kaydet(hedef, kategori, hata_mesaji, basari=False)
         raise
 
@@ -426,9 +463,12 @@ def istatistik() -> dict[str, Any]:
         kategori_say = con.execute(
             "SELECT kategori, COUNT(*) FROM ogrenmeler GROUP BY kategori ORDER BY COUNT(*) DESC"
         ).fetchall()
-        ortalama_guven = con.execute(
-            "SELECT ROUND(AVG(guven_skoru), 4) FROM ogrenmeler"
-        ).fetchone()[0] or 0.0
+        ortalama_guven = (
+            con.execute("SELECT ROUND(AVG(guven_skoru), 4) FROM ogrenmeler").fetchone()[
+                0
+            ]
+            or 0.0
+        )
 
     return {
         "toplam": toplam,
@@ -440,6 +480,7 @@ def istatistik() -> dict[str, Any]:
 
 
 # ── Belirsiz Görev Çözümleme ──────────────────────────────────────────────
+
 
 def belirsiz_gorev_cozumle(
     hedef: str,
@@ -538,9 +579,16 @@ def belirsiz_gorev_cozumle(
             }
             kategori = kayit["kategori"]
             kayit_hedef = kayit["hedef"]
-            soru = ("Hiçbir kayıt tam eşleşmedi ama en güvenilir bildiğim "
-                    + kategori + " kategorisindeki _" + kayit_hedef + "_.\n\n"
-                    + "Sanırım **" + kayit_hedef + "** demek istiyorsun, doğru mu?")
+            soru = (
+                "Hiçbir kayıt tam eşleşmedi ama en güvenilir bildiğim "
+                + kategori
+                + " kategorisindeki _"
+                + kayit_hedef
+                + "_.\n\n"
+                + "Sanırım **"
+                + kayit_hedef
+                + "** demek istiyorsun, doğru mu?"
+            )
             return {
                 "tahmin_kategori": kategori,
                 "tahmin_kayit": kayit,
@@ -566,7 +614,10 @@ def belirsiz_gorev_cozumle(
     gorulen_kategori: set[str] = set()
     alternatifler = []
     for skor, kayit in skorlu:
-        if kayit["kategori"] not in gorulen_kategori and len(alternatifler) < max_kategori:
+        if (
+            kayit["kategori"] not in gorulen_kategori
+            and len(alternatifler) < max_kategori
+        ):
             gorulen_kategori.add(kayit["kategori"])
             alternatifler.append({"skor": round(skor, 2), **kayit})
             if len(alternatifler) >= max_kategori:
@@ -575,7 +626,13 @@ def belirsiz_gorev_cozumle(
     # 6) Soruyu oluştur
     kategori = en_iyi_kayit["kategori"]
     kayit_hedef = en_iyi_kayit["hedef"]
-    satir1 = "Hafızamda **" + kategori + "** kategorisinde _" + kayit_hedef + "_ bilgisi var."
+    satir1 = (
+        "Hafızamda **"
+        + kategori
+        + "** kategorisinde _"
+        + kayit_hedef
+        + "_ bilgisi var."
+    )
     soru = satir1 + "\n\nSanırım **" + kayit_hedef + "** demek istiyorsun, doğru mu?"
 
     return {

@@ -13,6 +13,7 @@ Yapilandirma (ortam degiskenleri):
   - SLACK_SIGNING_SECRET     — Slack imza dogrulama anahtari
   - SLACK_HOME_CHANNEL       — Varsayilan kanal/chat_id
 """
+
 import asyncio
 import json
 import logging
@@ -23,6 +24,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
 
 from pathlib import Path as _Path
+
 sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
 from src.gateways.config import Platform, PlatformConfig
@@ -49,6 +51,7 @@ logger = logging.getLogger(__name__)
 try:
     from slack_sdk import WebClient
     from slack_sdk.errors import SlackApiError
+
     SLACK_AVAILABLE = True
 except ImportError:
     SLACK_AVAILABLE = False
@@ -63,12 +66,14 @@ def check_slack_requirements() -> bool:
         return True
     try:
         from reymen.cron.hermes_stubs import ensure as _lazy_ensure
+
         _lazy_ensure("platform.slack", prompt=False)
     except Exception:
         return False
     try:
         from slack_sdk import WebClient as _WC
         from slack_sdk.errors import SlackApiError as _SAE
+
         WebClient = _WC
         SlackApiError = _SAE
         SLACK_AVAILABLE = True
@@ -151,14 +156,17 @@ class SlackAdapter(BasePlatformAdapter):
 
             logger.info(
                 "[Slack] Baglanti basarili: %s (%s)",
-                self._bot_name, self._bot_user_id,
+                self._bot_name,
+                self._bot_user_id,
             )
 
             # Socket Mode baslat (app_token gerektirir)
             if self._app_token:
                 await self._start_socket_mode()
             else:
-                logger.warning("[Slack] SLACK_APP_TOKEN eksik — polling modunda calisamiyor.")
+                logger.warning(
+                    "[Slack] SLACK_APP_TOKEN eksik — polling modunda calisamiyor."
+                )
 
             return True
         except SlackApiError as e:
@@ -189,9 +197,7 @@ class SlackAdapter(BasePlatformAdapter):
                     if event_type in ("message", "app_mention"):
                         await self._process_slack_event(event, payload)
 
-            self._socket_mode_handler.socket_mode_request_listeners.append(
-                _on_message
-            )
+            self._socket_mode_handler.socket_mode_request_listeners.append(_on_message)
 
             # Baglanti baslangici (thread'de calisir)
             await asyncio.to_thread(self._socket_mode_handler.connect)
@@ -259,6 +265,7 @@ class SlackAdapter(BasePlatformAdapter):
 
         # Session kaynagi olustur
         from src.gateways.session import SessionSource, build_session_key
+
         source = SessionSource(
             platform=Platform.SLACK,
             chat_id=channel,
@@ -320,9 +327,7 @@ class SlackAdapter(BasePlatformAdapter):
             # Markdown destegi
             kwargs["mrkdwn"] = True
 
-            result = await asyncio.to_thread(
-                self._client.chat_postMessage, **kwargs
-            )
+            result = await asyncio.to_thread(self._client.chat_postMessage, **kwargs)
 
             return SendResult(
                 success=True,
@@ -333,15 +338,15 @@ class SlackAdapter(BasePlatformAdapter):
         except SlackApiError as e:
             error_msg = str(e)
             logger.error("[Slack] Gonderim hatasi: %s", error_msg)
-            return SendResult(False, error=error_msg, retryable="ratelimited" in error_msg.lower())
+            return SendResult(
+                False, error=error_msg, retryable="ratelimited" in error_msg.lower()
+            )
 
         except Exception as e:
             logger.error("[Slack] Beklenmeyen gonderim hatasi: %s", e)
             return SendResult(False, error=str(e))
 
-    async def send_typing(
-        self, chat_id: str, metadata: Optional[dict] = None
-    ) -> None:
+    async def send_typing(self, chat_id: str, metadata: Optional[dict] = None) -> None:
         """Slack'te yaziyor gostergesi gonder."""
         try:
             # Slack, typing indicator icin chat.postMessage degil,
@@ -401,7 +406,10 @@ class SlackAdapter(BasePlatformAdapter):
     ) -> SendResult:
         """Slack kanalina dosya gonder."""
         return await self.send_image(
-            chat_id, file_path, caption=caption, metadata=metadata,
+            chat_id,
+            file_path,
+            caption=caption,
+            metadata=metadata,
         )
 
     # ── Channel/User Bilgileri ───────────────────────────────────────
@@ -423,9 +431,7 @@ class SlackAdapter(BasePlatformAdapter):
         if not self._client:
             return None
         try:
-            result = await asyncio.to_thread(
-                self._client.users_info, user=user_id
-            )
+            result = await asyncio.to_thread(self._client.users_info, user=user_id)
             return result.get("user", {})
         except SlackApiError:
             return None

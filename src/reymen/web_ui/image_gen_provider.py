@@ -68,7 +68,9 @@ def save_url_image(url: str, provider: str, prompt: str) -> Tuple[str, str]:
     import hashlib
 
     IMAGE_CACHE.mkdir(parents=True, exist_ok=True)
-    hash_str = hashlib.md5(f"{provider}_{prompt}_{time.time()}".encode()).hexdigest()[:12]
+    hash_str = hashlib.md5(f"{provider}_{prompt}_{time.time()}".encode()).hexdigest()[
+        :12
+    ]
     ext = ".png"
     local_name = f"{provider}_{hash_str}{ext}"
     local_path = IMAGE_CACHE / local_name
@@ -89,7 +91,9 @@ def save_b64_image(b64_data: str, provider: str, prompt: str) -> Tuple[str, str]
     import hashlib
 
     IMAGE_CACHE.mkdir(parents=True, exist_ok=True)
-    hash_str = hashlib.md5(f"{provider}_{prompt}_{time.time()}".encode()).hexdigest()[:12]
+    hash_str = hashlib.md5(f"{provider}_{prompt}_{time.time()}".encode()).hexdigest()[
+        :12
+    ]
     ext = ".png"
     local_name = f"{provider}_{hash_str}{ext}"
     local_path = IMAGE_CACHE / local_name
@@ -133,11 +137,13 @@ def discover_providers() -> List[Dict[str, str]]:
                 display = "xAI (Grok)"
             elif provider_id == "fal":
                 display = "FAL.ai"
-            providers.append({
-                "id": provider_id,
-                "name": display,
-                "path": str(entry),
-            })
+            providers.append(
+                {
+                    "id": provider_id,
+                    "name": display,
+                    "path": str(entry),
+                }
+            )
 
     # Fallback: provider bulunamazsa varsayılan listeyi döndür
     if not providers:
@@ -200,7 +206,10 @@ def _try_plugin_provider(
             for name in dir(mod):
                 obj = getattr(mod, name)
                 if isinstance(obj, type) and name != "ImageGenProvider":
-                    from agent.image_gen_provider import ImageGenProvider as BaseProvider
+                    from agent.image_gen_provider import (
+                        ImageGenProvider as BaseProvider,
+                    )
+
                     if issubclass(obj, BaseProvider):
                         provider_cls = obj
                         break
@@ -254,7 +263,10 @@ def _try_direct_api(
         try:
             resp = requests.post(
                 "https://api.openai.com/v1/images/generations",
-                headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json",
+                },
                 json={
                     "model": model or "dall-e-3",
                     "prompt": prompt,
@@ -284,7 +296,10 @@ def _try_direct_api(
         try:
             resp = requests.post(
                 "https://api.x.ai/v1/images/generations",
-                headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json",
+                },
                 json={
                     "model": model or "grok-image-2",
                     "prompt": prompt,
@@ -306,7 +321,9 @@ def _try_direct_api(
         except Exception as e:
             return error_response(f"xAI hatası: {e}", provider_id)
 
-    return error_response(f"Bilinen provider değil veya API key yok: {provider_id}", provider_id)
+    return error_response(
+        f"Bilinen provider değil veya API key yok: {provider_id}", provider_id
+    )
 
 
 def _generate_placeholder(prompt: str, provider_id: str, model: str) -> Dict[str, Any]:
@@ -314,6 +331,7 @@ def _generate_placeholder(prompt: str, provider_id: str, model: str) -> Dict[str
     IMAGE_CACHE.mkdir(parents=True, exist_ok=True)
 
     import hashlib
+
     hash_str = hashlib.md5(prompt.encode()).hexdigest()[:8]
     local_name = f"{provider_id}_placeholder_{hash_str}.html"
     local_path = IMAGE_CACHE / local_name
@@ -330,6 +348,7 @@ def _generate_placeholder(prompt: str, provider_id: str, model: str) -> Dict[str
 
     # SVG'yi data URI olarak kullan
     import base64
+
     b64 = base64.b64encode(svg.encode()).decode()
     data_uri = f"data:image/svg+xml;base64,{b64}"
 
@@ -347,11 +366,12 @@ def _generate_placeholder(prompt: str, provider_id: str, model: str) -> Dict[str
 
 def _escape_svg(text: str) -> str:
     """Escape text for use in SVG."""
-    return (text
-            .replace("&", "&amp;")
-            .replace("<", "&lt;")
-            .replace(">", "&gt;")
-            .replace('"', "&quot;"))
+    return (
+        text.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace('"', "&quot;")
+    )
 
 
 # ---------------------------------------------------------------------------

@@ -7,13 +7,13 @@ SQLite WAL modu + busy_timeout ile eszamanli yazma guvenligi.
 
 Kullanim:
     from reymen.sistem.findings_board import ekle_bulgu, bulgu_listele, bulgu_guncelle
-    
+
     # Yeni bulgu ekle
     ekle_bulgu(bulan="reymen", konu="DB cogalmasi", onem="kritik")
-    
+
     # Bulgulari listele
     bulgu_listele(durum="beklemede")
-    
+
     # Bulgu guncelle
     bulgu_guncelle(bulgu_id=1, durum="duzeltildi", duzelten="kiral38")
 
@@ -59,6 +59,7 @@ CREATE INDEX IF NOT EXISTS idx_findings_bulan ON findings(bulan_profil);
 
 # ── Veritabani baglantisi ────────────────────────────────────────────
 
+
 def _baglan() -> sqlite3.Connection:
     """SQLite baglantisi olustur (WAL modu + busy_timeout)."""
     _BOARD_DB.parent.mkdir(parents=True, exist_ok=True)
@@ -83,6 +84,7 @@ def _kurulum():
 
 # ── Temel Islemler ───────────────────────────────────────────────────
 
+
 def ekle_bulgu(
     bulan: str,
     konu: str,
@@ -92,7 +94,7 @@ def ekle_bulgu(
     durum: str = "yeni",
 ) -> dict:
     """Yeni bir bulgu ekle.
-    
+
     Args:
         bulan: Profil adi (reymen, pasa_38, kiral38)
         konu: Bulgu konusu (benzersiz olmali)
@@ -100,7 +102,7 @@ def ekle_bulgu(
         dosya_yolu: Ilgili dosya/konum
         aciklama: Detayli aciklama
         durum: yeni / inceleniyor / duzeltildi / reddedildi / beklemede
-    
+
     Returns:
         Eklenen bulgu (id dahil)
     """
@@ -115,7 +117,7 @@ def ekle_bulgu(
             (bulan, bugun, konu, dosya_yolu, onem, durum, aciklama, bugun),
         )
         conn.commit()
-        
+
         # Eklenen kaydi geri oku
         cursor = conn.execute(
             "SELECT * FROM findings WHERE konu = ? AND bulan_profil = ? ORDER BY id DESC LIMIT 1",
@@ -135,14 +137,14 @@ def bulgu_guncelle(
     aciklama: str = "",
 ) -> bool:
     """Bir bulgunun durumunu guncelle.
-    
+
     Args:
         bulgu_id: Bulgu ID'si
         durum: yeni / inceleniyor / duzeltildi / reddedildi / beklemede
         duzelten: Duzelten profil adi
         dogrulayan: Dogrulayan profil adi
         aciklama: Eklenecek aciklama
-    
+
     Returns:
         Basarili mi
     """
@@ -151,7 +153,7 @@ def bulgu_guncelle(
     try:
         set_ifadeleri = []
         parametreler = []
-        
+
         if durum:
             set_ifadeleri.append("durum = ?")
             parametreler.append(durum)
@@ -164,14 +166,14 @@ def bulgu_guncelle(
         if aciklama:
             set_ifadeleri.append("aciklama = ?")
             parametreler.append(aciklama)
-        
+
         if not set_ifadeleri:
             return False
-        
+
         set_ifadeleri.append("guncelleme_tarihi = ?")
         parametreler.append(datetime.now().strftime("%Y-%m-%d %H:%M"))
         parametreler.append(bulgu_id)
-        
+
         conn.execute(
             f"UPDATE findings SET {', '.join(set_ifadeleri)} WHERE id = ?",
             parametreler,
@@ -190,14 +192,14 @@ def bulgu_listele(
     offset: int = 0,
 ) -> list[dict]:
     """Bulgulari filtreleyerek listele.
-    
+
     Args:
         durum: Filtre (yeni/inceleniyor/duzeltildi/reddedildi/beklemede)
         onem: Filtre (kritik/orta/dusuk)
         bulan: Filtre (profil adi)
         limit: Maks sonuc
         offset: Sayfa baslangici
-    
+
     Returns:
         Filtrelenmis bulgu listesi
     """
@@ -206,7 +208,7 @@ def bulgu_listele(
     try:
         kosullar = []
         parametreler = []
-        
+
         if durum:
             kosullar.append("durum = ?")
             parametreler.append(durum)
@@ -216,9 +218,9 @@ def bulgu_listele(
         if bulan:
             kosullar.append("bulan_profil = ?")
             parametreler.append(bulan)
-        
+
         where = f"WHERE {' AND '.join(kosullar)}" if kosullar else ""
-        
+
         cursor = conn.execute(
             f"SELECT * FROM findings {where} ORDER BY id DESC LIMIT ? OFFSET ?",
             parametreler + [limit, offset],
@@ -239,16 +241,16 @@ def bulgu_sayilari() -> dict:
             "SELECT durum, COUNT(*) as cnt FROM findings GROUP BY durum"
         ).fetchall():
             durumlar[satir["durum"]] = satir["cnt"]
-        
+
         # Onem dagilimi
         onemler = {}
         for satir in conn.execute(
             "SELECT onem_derecesi, COUNT(*) as cnt FROM findings GROUP BY onem_derecesi"
         ).fetchall():
             onemler[satir["onem_derecesi"]] = satir["cnt"]
-        
+
         toplam = conn.execute("SELECT COUNT(*) as cnt FROM findings").fetchone()["cnt"]
-        
+
         return {
             "toplam": toplam,
             "durum": durumlar,
@@ -264,7 +266,7 @@ def bulgu_ozet() -> str:
     toplam = sayilar["toplam"]
     durumlar = sayilar["durum"]
     onemler = sayilar["onem"]
-    
+
     satirlar = [
         "=== ORTAK BULGU PANOSU (SQLite WAL) ===",
         f"Toplam: {toplam} bulgu",
@@ -274,30 +276,36 @@ def bulgu_ozet() -> str:
         "",
         "Son 5 bulgu:",
     ]
-    
+
     son_bulgu = bulgu_listele(limit=5)
     for b in son_bulgu:
         durum_simge = {
-            "yeni": "🆕", "inceleniyor": "🔍",
-            "duzeltildi": "✅", "reddedildi": "❌", "beklemede": "⏳"
+            "yeni": "🆕",
+            "inceleniyor": "🔍",
+            "duzeltildi": "✅",
+            "reddedildi": "❌",
+            "beklemede": "⏳",
         }.get(b.get("durum", ""), "❓")
-        onem_simge = {"kritik": "🔴", "orta": "🟠", "dusuk": "🟢"}.get(b.get("onem_derecesi", ""), "⚪")
+        onem_simge = {"kritik": "🔴", "orta": "🟠", "dusuk": "🟢"}.get(
+            b.get("onem_derecesi", ""), "⚪"
+        )
         satirlar.append(
             f"  {durum_simge}{onem_simge} #{b['id']} [{b['bulan_profil']}] "
             f"{b['konu'][:60]}"
         )
-    
+
     return "\n".join(satirlar)
 
 
 # ── Audit Toplu Bulgu Ekleme (K1-K4 guvenlik) ────────────────────────
 
+
 def audit_tamamla(bulan: str, bulgular_listesi: list[dict]) -> list[dict]:
     """Bir denetim/tarama gorevi sonucunda bulunan tum bulgulari ayri ayri kaydet.
-    
+
     Bu fonksiyon bulgulari asla OZETLEMEZ, birlestirmez. Her bulgu
     ayri bir satir olarak DB'ye yazilir.
-    
+
     Args:
         bulan: Profil adi (reymen, pasa_38, kiral38)
         bulgular_listesi: Her biri su anahtarlari iceren dict listesi:
@@ -306,10 +314,10 @@ def audit_tamamla(bulan: str, bulgular_listesi: list[dict]) -> list[dict]:
             - dosya_yolu (str, opsiyonel)
             - aciklama (str, opsiyonel)
             - durum (str, opsiyonel, varsayilan: yeni)
-    
+
     Returns:
         Eklenen bulgularin listesi (her biri id dahil)
-    
+
     Ornek:
         audit_tamamla("kiral38", [
             {"konu": "XYZ hatasi", "onem": "kritik", "aciklama": "..."},
@@ -334,13 +342,13 @@ def audit_tamamla(bulan: str, bulgular_listesi: list[dict]) -> list[dict]:
 
 def check_findings_board_health() -> dict:
     """Bulgu panosunun saglik kontrolu.
-    
+
     Kontroller:
     1. "yeni" durumunda 7 gunden eski bulgu var mi? (ilgilenilmemis)
     2. "inceleniyor" durumunda 14 gunden eski bulgu var mi? (tikanmis)
     3. Toplam bulgu sayisi 500'u gecti mi? (asiri sisisme uyarisi)
     4. Ayni konuda 3+ farkli profil bulgusu var mi? (cakisma)
-    
+
     Returns:
         {
             "saglikli": True/False,
@@ -352,7 +360,7 @@ def check_findings_board_health() -> dict:
     conn = _baglan()
     try:
         sonuc = {"saglikli": True, "kontroller": [], "uyarilar": []}
-        
+
         # Kontrol 1: "yeni" durumunda 7 gunden eski bulgular
         eski_yeni = conn.execute("""
             SELECT id, konu, bulan_profil, tarih FROM findings
@@ -361,15 +369,19 @@ def check_findings_board_health() -> dict:
         """).fetchall()
         if eski_yeni:
             sonuc["saglikli"] = False
-            sonuc["kontroller"].append({
-                "kontrol": "yeni_bulgu_bekliyor",
-                "sayi": len(eski_yeni),
-                "en_eskisi": dict(eski_yeni[0]),
-                "aciiklama": f"{len(eski_yeni)} bulgu 7+ gundur 'yeni' durumunda, hic ilgilenilmemis"
-            })
+            sonuc["kontroller"].append(
+                {
+                    "kontrol": "yeni_bulgu_bekliyor",
+                    "sayi": len(eski_yeni),
+                    "en_eskisi": dict(eski_yeni[0]),
+                    "aciiklama": f"{len(eski_yeni)} bulgu 7+ gundur 'yeni' durumunda, hic ilgilenilmemis",
+                }
+            )
         else:
-            sonuc["kontroller"].append({"kontrol": "yeni_bulgu_bekliyor", "durum": "temiz"})
-        
+            sonuc["kontroller"].append(
+                {"kontrol": "yeni_bulgu_bekliyor", "durum": "temiz"}
+            )
+
         # Kontrol 2: "inceleniyor" durumunda 14 gunden eski bulgular
         tikanmis = conn.execute("""
             SELECT id, konu, bulan_profil, tarih FROM findings
@@ -378,27 +390,35 @@ def check_findings_board_health() -> dict:
         """).fetchall()
         if tikanmis:
             sonuc["saglikli"] = False
-            sonuc["kontroller"].append({
-                "kontrol": "tikanmis_inceleme",
-                "sayi": len(tikanmis),
-                "en_eskisi": dict(tikanmis[0]),
-                "aciiklama": f"{len(tikanmis)} bulgu 14+ gundur 'inceleniyor', cozulmemis"
-            })
+            sonuc["kontroller"].append(
+                {
+                    "kontrol": "tikanmis_inceleme",
+                    "sayi": len(tikanmis),
+                    "en_eskisi": dict(tikanmis[0]),
+                    "aciiklama": f"{len(tikanmis)} bulgu 14+ gundur 'inceleniyor', cozulmemis",
+                }
+            )
         else:
-            sonuc["kontroller"].append({"kontrol": "tikanmis_inceleme", "durum": "temiz"})
-        
+            sonuc["kontroller"].append(
+                {"kontrol": "tikanmis_inceleme", "durum": "temiz"}
+            )
+
         # Kontrol 3: Toplam bulgu sayisi siniri
         toplam = conn.execute("SELECT COUNT(*) as cnt FROM findings").fetchone()["cnt"]
         if toplam > 500:
             sonuc["saglikli"] = False
-            sonuc["kontroller"].append({
-                "kontrol": "asiri_sisme",
-                "sayi": toplam,
-                "aciiklama": f"{toplam} bulgu (esik: 500). improvements.db senaryosu tekrarlaniyor olabilir"
-            })
+            sonuc["kontroller"].append(
+                {
+                    "kontrol": "asiri_sisme",
+                    "sayi": toplam,
+                    "aciiklama": f"{toplam} bulgu (esik: 500). improvements.db senaryosu tekrarlaniyor olabilir",
+                }
+            )
         else:
-            sonuc["kontroller"].append({"kontrol": "asiri_sisme", "durum": f"temiz ({toplam} bulgu)"})
-        
+            sonuc["kontroller"].append(
+                {"kontrol": "asiri_sisme", "durum": f"temiz ({toplam} bulgu)"}
+            )
+
         # Kontrol 4: Ayni konuda cakisan bulgular
         cakisan = conn.execute("""
             SELECT konu, COUNT(DISTINCT bulan_profil) as profil_sayisi, GROUP_CONCAT(DISTINCT bulan_profil) as profiller
@@ -410,15 +430,17 @@ def check_findings_board_health() -> dict:
         """).fetchall()
         if cakisan:
             sonuc["saglikli"] = False
-            sonuc["kontroller"].append({
-                "kontrol": "cakisan_bulgu",
-                "sayi": len(cakisan),
-                "ornek": dict(cakisan[0]),
-                "aciiklama": f"{len(cakisan)} konuda 3+ profil ayni bulguyu ayri ayri girmis"
-            })
+            sonuc["kontroller"].append(
+                {
+                    "kontrol": "cakisan_bulgu",
+                    "sayi": len(cakisan),
+                    "ornek": dict(cakisan[0]),
+                    "aciiklama": f"{len(cakisan)} konuda 3+ profil ayni bulguyu ayri ayri girmis",
+                }
+            )
         else:
             sonuc["kontroller"].append({"kontrol": "cakisan_bulgu", "durum": "temiz"})
-        
+
         sonuc["ozet"] = "✅ Saglikli" if sonuc["saglikli"] else "⚠️ Sorun var"
         return sonuc
     finally:
@@ -427,6 +449,7 @@ def check_findings_board_health() -> dict:
 
 # ── Veritabani dogrudan erisim (acil durumlar icin) ──────────────────
 
+
 def baglanti_al() -> sqlite3.Connection:
     """Dis baglanti al (ozel sorgular icin)."""
     return _baglan()
@@ -434,46 +457,66 @@ def baglanti_al() -> sqlite3.Connection:
 
 # ── CLI ──────────────────────────────────────────────────────────────
 
+
 def _cli():
     import argparse
+
     parser = argparse.ArgumentParser(description="Ortak Bulgu Panosu (SQLite WAL)")
-    parser.add_argument("--ekle", nargs=3, metavar=("BULAN", "KONU", "ONEM"),
-                        help="Yeni bulgu ekle")
-    parser.add_argument("--guncelle", nargs=2, metavar=("ID", "DURUM"),
-                        help="Bulgu durumu guncelle")
+    parser.add_argument(
+        "--ekle", nargs=3, metavar=("BULAN", "KONU", "ONEM"), help="Yeni bulgu ekle"
+    )
+    parser.add_argument(
+        "--guncelle", nargs=2, metavar=("ID", "DURUM"), help="Bulgu durumu guncelle"
+    )
     parser.add_argument("--liste", action="store_true", help="Bulgulari listele")
     parser.add_argument("--ozet", action="store_true", help="Ozet rapor")
     parser.add_argument("--durum", default="", help="Filtre: durum")
     parser.add_argument("--onem", default="", help="Filtre: onem")
     parser.add_argument("--bulan", default="", help="Filtre: profil")
     parser.add_argument("--limit", type=int, default=20, help="Maks sonuc")
-    parser.add_argument("--audit-tamamla", nargs="+", metavar=("BULAN", "KONU_ONEM..."),
-                        help="Toplu audit bulgusu ekle. Format: --audit-tamamla reymen 'konu1:kritik' 'konu2:orta'")
-    parser.add_argument("--audit-from-file", type=str, metavar="JSON_DOSYASI",
-                        help="JSON dosyasindan audit bulgularini oku. Dosya formati: [{\"konu\":\"...\",\"onem\":\"kritik\"}]")
-    
+    parser.add_argument(
+        "--audit-tamamla",
+        nargs="+",
+        metavar=("BULAN", "KONU_ONEM..."),
+        help="Toplu audit bulgusu ekle. Format: --audit-tamamla reymen 'konu1:kritik' 'konu2:orta'",
+    )
+    parser.add_argument(
+        "--audit-from-file",
+        type=str,
+        metavar="JSON_DOSYASI",
+        help='JSON dosyasindan audit bulgularini oku. Dosya formati: [{"konu":"...","onem":"kritik"}]',
+    )
+
     args = parser.parse_args()
-    
+
     _kurulum()
-    
+
     if args.ekle:
         b = ekle_bulgu(bulan=args.ekle[0], konu=args.ekle[1], onem=args.ekle[2])
         print(f"✅ #{b['id']} eklendi: {b['konu']}")
     elif args.guncelle:
-        basarili = bulgu_guncelle(bulgu_id=int(args.guncelle[0]), durum=args.guncelle[1])
+        basarili = bulgu_guncelle(
+            bulgu_id=int(args.guncelle[0]), durum=args.guncelle[1]
+        )
         print(f"{'✅' if basarili else '❌'} #{args.guncelle[0]} -> {args.guncelle[1]}")
     elif args.ozet:
         print(bulgu_ozet())
     elif args.liste:
-        bulgular = bulgu_listele(durum=args.durum, onem=args.onem, bulan=args.bulan, limit=args.limit)
+        bulgular = bulgu_listele(
+            durum=args.durum, onem=args.onem, bulan=args.bulan, limit=args.limit
+        )
         if not bulgular:
             print("Bulgu yok.")
         else:
             for b in bulgular:
                 print(f"#{b['id']} [{b['bulan_profil']}] {b['konu'][:60]}")
-                print(f"    Onem: {b['onem_derecesi']} | Durum: {b['durum']} | Tarih: {b['tarih']}")
-                if b.get('duzelten_profil'):
-                    print(f"    Duzelten: {b['duzelten_profil']} | Dogrulayan: {b.get('dogrulayan_profil','')}")
+                print(
+                    f"    Onem: {b['onem_derecesi']} | Durum: {b['durum']} | Tarih: {b['tarih']}"
+                )
+                if b.get("duzelten_profil"):
+                    print(
+                        f"    Duzelten: {b['duzelten_profil']} | Dogrulayan: {b.get('dogrulayan_profil','')}"
+                    )
                 print()
     elif args.audit_tamamla:
         bulan = args.audit_tamamla[0]
@@ -489,16 +532,21 @@ def _cli():
                 print(f"  #{b['id']}: {b['konu'][:60]}")
     elif args.audit_from_file:
         import json as _json
+
         try:
             with open(args.audit_from_file, "r", encoding="utf-8") as _f:
                 _data = _json.load(_f)
             if isinstance(_data, list):
                 eklenen = audit_tamamla("reymen", _data)
-                print(f"✅ {len(eklenen)} bulgu kaydedildi (dosya: {args.audit_from_file})")
+                print(
+                    f"✅ {len(eklenen)} bulgu kaydedildi (dosya: {args.audit_from_file})"
+                )
             elif isinstance(_data, dict) and "bulgular" in _data:
                 bulan = _data.get("bulan", "reymen")
                 eklenen = audit_tamamla(bulan, _data["bulgular"])
-                print(f"✅ {len(eklenen)} bulgu kaydedildi ({bulan}, dosya: {args.audit_from_file})")
+                print(
+                    f"✅ {len(eklenen)} bulgu kaydedildi ({bulan}, dosya: {args.audit_from_file})"
+                )
         except Exception as _e:
             print(f"❌ Dosya okunamadi: {_e}")
     else:

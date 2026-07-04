@@ -15,6 +15,7 @@ import os
 from pathlib import Path
 from typing import List, Dict, Any
 import logging
+
 logger = logging.getLogger(__name__)
 
 TOOL_META = {
@@ -39,9 +40,7 @@ TOOL_META = {
             "zorunlu": False,
         },
     },
-    "ornek": (
-        'SESSION_SEARCH(sorgu="python AND hata", limit=3)'
-    ),
+    "ornek": ('SESSION_SEARCH(sorgu="python AND hata", limit=3)'),
 }
 
 
@@ -49,6 +48,7 @@ def _get_hafiza():
     """GelismisHafiza örneğini al."""
     try:
         from reymen.hafiza.hafiza_genislet import GelismisHafiza
+
         hf = GelismisHafiza()
         if hf._hazir:
             return hf
@@ -113,6 +113,7 @@ def _fallback_ara(sorgu: str, limit: int = 5, koleksiyon: str = "") -> str:
     """GelismisHafiza yoksa SQLite fallback arama."""
     try:
         import sqlite3
+
         # session.db veya hafiza.db'yi bul
         db_yollari = [
             Path(".ReYMeN") / "session.db",
@@ -136,7 +137,9 @@ def _fallback_ara(sorgu: str, limit: int = 5, koleksiyon: str = "") -> str:
                     rows = c.fetchall()
                     if rows:
                         for i, (sid, icerik) in enumerate(rows, 1):
-                            satirlar.append(f"  {i}. S:{str(sid)[:20]} → {str(icerik)[:150]}")
+                            satirlar.append(
+                                f"  {i}. S:{str(sid)[:20]} → {str(icerik)[:150]}"
+                            )
                     else:
                         satirlar.append("  Sonuç yok.")
                 except Exception:

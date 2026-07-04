@@ -18,6 +18,7 @@ PROJE_KOK = Path(__file__).parent.resolve()
 def _platform_env_yolu() -> Path:
     """Platform-bagimsiz .env yolu. Windows: APPDATA/Local/ReYMeN; Linux: ~/.config/reymen"""
     import platform
+
     ev = Path.home()
     if platform.system() == "Windows":
         return ev / "AppData" / "Local" / "reymen" / ".env"
@@ -69,7 +70,10 @@ class CredentialPool:
         """Windows Credential Manager'dan anahtar oku."""
         try:
             import win32cred
-            cred = win32cred.CredRead(f"ReYMeN_{anahtar}", win32cred.CRED_TYPE_GENERIC, 0)
+
+            cred = win32cred.CredRead(
+                f"ReYMeN_{anahtar}", win32cred.CRED_TYPE_GENERIC, 0
+            )
             return cred["CredentialBlob"].decode("utf-16").strip()
         except Exception:
             return ""
@@ -90,6 +94,7 @@ class CredentialPool:
         # WCM (Windows Credential Manager) once dene
         try:
             from reymen.sistem.credential_persistence import CredentialPersistence
+
             wcm = CredentialPersistence()
             wcm_val = wcm.wcm_oku(anahtar)
             if wcm_val:

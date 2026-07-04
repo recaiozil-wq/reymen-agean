@@ -56,9 +56,7 @@ def _patch_oauth_flow(
     # it never launches a console browser (w3m/lynx) inside the terminal. Tests
     # run headless, so force the GUI path to True — the URL capture relies on
     # webbrowser.open() being invoked.
-    monkeypatch.setattr(
-        "ReYMeN_cli.auth._can_open_graphical_browser", lambda: True
-    )
+    monkeypatch.setattr("ReYMeN_cli.auth._can_open_graphical_browser", lambda: True)
     monkeypatch.setattr("builtins.input", lambda *_a, **_kw: callback_code)
 
     class _FakeResponse:
@@ -143,9 +141,9 @@ def test_authorization_url_state_is_not_pkce_verifier(monkeypatch, tmp_path):
     )
 
     # And the verifier MUST NOT appear anywhere in the URL.
-    assert verifier_sent not in url, (
-        "PKCE verifier leaked into authorization URL — regression of #10693"
-    )
+    assert (
+        verifier_sent not in url
+    ), "PKCE verifier leaked into authorization URL — regression of #10693"
 
 
 def test_callback_state_mismatch_aborts(monkeypatch, tmp_path, caplog):
@@ -171,6 +169,6 @@ def test_callback_state_mismatch_aborts(monkeypatch, tmp_path, caplog):
     result = run_ReYMeN_oauth_login_pure()
 
     assert result is None, "mismatched state must abort the flow"
-    assert "url" not in captured_token, (
-        "token exchange must NOT happen when state mismatches"
-    )
+    assert (
+        "url" not in captured_token
+    ), "token exchange must NOT happen when state mismatches"

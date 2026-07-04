@@ -58,6 +58,7 @@ __all__ = [
 # Modül seviyesinde otomatik keşif (motor._plugin_moduller_yukle() sırasında)
 # ═══════════════════════════════════════════════════════════════════════════
 
+
 def otomatik_kesif_yap() -> int:
     """Modül import edildiğinde MCP sunucularını otomatik keşfeder.
 
@@ -72,7 +73,9 @@ def otomatik_kesif_yap() -> int:
     try:
         yeni = mcp_kesfet(geri_bildirim=True)
         if yeni > 0:
-            logger.info("[MCP] Otomatik keşif: %d yeni sunucu bulundu (modül import)", yeni)
+            logger.info(
+                "[MCP] Otomatik keşif: %d yeni sunucu bulundu (modül import)", yeni
+            )
         return yeni
     except Exception as e:
         logger.debug("[MCP] Otomatik keşif hatası (modül import): %s", e)

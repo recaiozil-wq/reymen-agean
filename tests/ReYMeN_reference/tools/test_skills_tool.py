@@ -666,6 +666,7 @@ class TestSkillViewSecureSetupOnLoad:
         assert result["setup_skipped"] is True
         assert result["content"].startswith("---")
 
+
 # ---------------------------------------------------------------------------
 # skill_matches_platform
 # ---------------------------------------------------------------------------

@@ -23,6 +23,7 @@ def fresh_constants(monkeypatch, tmp_path):
     """Import ReYMeN_constants fresh and reset the one-shot warn flag."""
     import importlib
     import ReYMeN_constants
+
     importlib.reload(ReYMeN_constants)
     monkeypatch.setattr(Path, "home", lambda: tmp_path)
     monkeypatch.delenv("ReYMeN_HOME", raising=False)
@@ -38,9 +39,7 @@ class TestGetReYMeNHomeProfileWarning:
         assert result == tmp_path / ".ReYMeN"
         assert "ReYMeN_HOME fallback" not in capsys.readouterr().err
 
-    def test_default_active_profile_no_warning(
-        self, fresh_constants, tmp_path, capsys
-    ):
+    def test_default_active_profile_no_warning(self, fresh_constants, tmp_path, capsys):
         """active_profile=default → still no warning, returns ~/.ReYMeN."""
         ReYMeN_dir = tmp_path / ".ReYMeN"
         ReYMeN_dir.mkdir()
@@ -102,9 +101,7 @@ class TestGetReYMeNHomeProfileWarning:
         # Shouldn't crash; shouldn't warn either (can't tell what profile was intended)
         assert "ReYMeN_HOME fallback" not in capsys.readouterr().err
 
-    def test_empty_active_profile_no_warning(
-        self, fresh_constants, tmp_path, capsys
-    ):
+    def test_empty_active_profile_no_warning(self, fresh_constants, tmp_path, capsys):
         """Empty active_profile file → treated as default, no warning."""
         ReYMeN_dir = tmp_path / ".ReYMeN"
         ReYMeN_dir.mkdir()

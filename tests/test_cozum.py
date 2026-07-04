@@ -51,6 +51,7 @@ class TestConversationLoop:
 
 class MockProvider:
     """Mock provider for testing."""
+
     def uret(self, prompt, mesajlar):
         return "1. Ilk adim\n2. Ikinci adim\n3. Ucuncu adim"
 
@@ -73,9 +74,11 @@ class TestPlanlayici:
 
     def test_plani_uret_provider_hata(self):
         """Provider hatasinda tek adima dusme."""
+
         class HataProvider:
             def uret(self, prompt, mesajlar):
                 raise Exception("Provider hatasi")
+
         p = Planlayici(HataProvider())
         plan = p.plani_uret("test")
         assert plan == ["test"]
@@ -107,7 +110,9 @@ class TestClosedLearningLoop:
             skills_dir = os.path.join(tmp, "skills")
             # auto_index=False: proje skills dizinini FTS5'e yukleme,
             # aksi halde gercek becerilerle eslesen merge yapilir
-            loop = ClosedLearningLoop(db_yolu=db_yolu, skills_dir=skills_dir, auto_index=False)
+            loop = ClosedLearningLoop(
+                db_yolu=db_yolu, skills_dir=skills_dir, auto_index=False
+            )
             loop.beceri_kristallestir("Test Beceri", "Aciklama", "1. Adim\n2. Adim")
             skills_path = Path(skills_dir)
             md_files = list(skills_path.glob("*.md"))
@@ -130,6 +135,7 @@ class TestClosedLearningLoop:
             skills_dir = os.path.join(tmp, "skills")
             loop = ClosedLearningLoop(db_yolu=db_yolu, skills_dir=skills_dir)
             import sqlite3
+
             con = sqlite3.connect(db_yolu)
             tablo = con.execute(
                 "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='beceriler'"

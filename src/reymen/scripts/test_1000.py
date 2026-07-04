@@ -1,8 +1,10 @@
 """ReYMeN 1000 soru toplu test — otomatik soru uret (background'da calisir)"""
+
 import os, sys, json, time, random, itertools, string
 from dotenv import load_dotenv
+
 load_dotenv(".env", override=True)
-BASLANGIC_ZAMAN = time.strftime('%Y-%m-%d %H:%M:%S')
+BASLANGIC_ZAMAN = time.strftime("%Y-%m-%d %H:%M:%S")
 
 sys.path.insert(0, os.path.abspath("."))
 from src.reymen.cereyan.conversation_loop import ConversationLoop
@@ -10,16 +12,115 @@ from src.reymen.cereyan.conversation_loop import ConversationLoop
 cl = ConversationLoop(motor=None, beyin=None, max_tur=3)
 
 # ── Soru uretici ────────────────────────────────────────────────────
-selam = ["slm", "merhaba", "selam", "hey", "naber", "selamun aleykum", "iyi misin", "nasilsin", "merhaba nasilsin", "slm naber"]
-tesekkur = ["tesekkur", "tesekkurler", "sagol", "sagolasin", "eyvallah", "thanks", "mukkemmel", "harika", "iyi", "tamamdir"]
-veda = ["bye", "gorusuruz", "hadi", "hadi bakalim", "görüşürüz", "kapan", "cikis", "sonlandir", "tmm", "tamamdir"]
-onay = ["ok", "tamam", "olur", "peki", "anlasildi", "anladim", "kabul", "yap", "basla", "hadi yap"]
+selam = [
+    "slm",
+    "merhaba",
+    "selam",
+    "hey",
+    "naber",
+    "selamun aleykum",
+    "iyi misin",
+    "nasilsin",
+    "merhaba nasilsin",
+    "slm naber",
+]
+tesekkur = [
+    "tesekkur",
+    "tesekkurler",
+    "sagol",
+    "sagolasin",
+    "eyvallah",
+    "thanks",
+    "mukkemmel",
+    "harika",
+    "iyi",
+    "tamamdir",
+]
+veda = [
+    "bye",
+    "gorusuruz",
+    "hadi",
+    "hadi bakalim",
+    "görüşürüz",
+    "kapan",
+    "cikis",
+    "sonlandir",
+    "tmm",
+    "tamamdir",
+]
+onay = [
+    "ok",
+    "tamam",
+    "olur",
+    "peki",
+    "anlasildi",
+    "anladim",
+    "kabul",
+    "yap",
+    "basla",
+    "hadi yap",
+]
 
-ulkeler = ["turkiye", "almanya", "fransa", "ispanya", "italya", "japonya", "cin", "hindistan", "brezilya", "rusya"]
-teknoloji = ["python", "javascript", "rust", "go", "java", "linux", "windows", "docker", "kubernetes", "git"]
-konular = ["ekonomi", "savas", "deprem", "secim", "uzay", "iklim", "saglik", "egitim", "spor", "sanat"]
-sifat = ["2026", "guncel", "son", "yeni", "en iyi", "en kotu", "populer", "onemli", "buyuk", "kucuk"]
-fiil = ["nedir", "nasil yapilir", "ne zaman", "nerede", "kim", "fiyati", "haberleri", "tarihi", "ozellikleri", "neden"]
+ulkeler = [
+    "turkiye",
+    "almanya",
+    "fransa",
+    "ispanya",
+    "italya",
+    "japonya",
+    "cin",
+    "hindistan",
+    "brezilya",
+    "rusya",
+]
+teknoloji = [
+    "python",
+    "javascript",
+    "rust",
+    "go",
+    "java",
+    "linux",
+    "windows",
+    "docker",
+    "kubernetes",
+    "git",
+]
+konular = [
+    "ekonomi",
+    "savas",
+    "deprem",
+    "secim",
+    "uzay",
+    "iklim",
+    "saglik",
+    "egitim",
+    "spor",
+    "sanat",
+]
+sifat = [
+    "2026",
+    "guncel",
+    "son",
+    "yeni",
+    "en iyi",
+    "en kotu",
+    "populer",
+    "onemli",
+    "buyuk",
+    "kucuk",
+]
+fiil = [
+    "nedir",
+    "nasil yapilir",
+    "ne zaman",
+    "nerede",
+    "kim",
+    "fiyati",
+    "haberleri",
+    "tarihi",
+    "ozellikleri",
+    "neden",
+]
 
 # 3000 soru uret
 random.seed(42)
@@ -48,9 +149,22 @@ for _ in range(600):
     sorular.append(f"{t} {f}")
 
 # 4. Anlamsiz girdi (600)
-anlamsiz_kok = ["asdf", "qwerty", "zxcv", "123", "test", "xyz", "abc", "foo", "bar", "baz"]
+anlamsiz_kok = [
+    "asdf",
+    "qwerty",
+    "zxcv",
+    "123",
+    "test",
+    "xyz",
+    "abc",
+    "foo",
+    "bar",
+    "baz",
+]
 for _ in range(600):
-    sorular.append(random.choice(anlamsiz_kok) + random.choice(string.ascii_lowercase[:5]))
+    sorular.append(
+        random.choice(anlamsiz_kok) + random.choice(string.ascii_lowercase[:5])
+    )
 
 # 5. Karisik (600)
 for _ in range(600):
@@ -60,7 +174,9 @@ for _ in range(600):
     elif tip == 2:
         sorular.append(f"{random.choice(teknoloji)} {random.choice(sifat)}")
     elif tip == 3:
-        sorular.append(f"{random.choice(konular)} {random.choice(sifat)} {random.choice(fiil)}")
+        sorular.append(
+            f"{random.choice(konular)} {random.choice(sifat)} {random.choice(fiil)}"
+        )
     else:
         sorular.append(f"{random.choice(sifat)} {random.choice(konular)}")
 
@@ -99,14 +215,26 @@ for i, soru in enumerate(sorular, 1):
             sorun = "BOS"
             hata_say += 1
 
-        sonuclar.append({"no": i, "soru": soru[:60], "kaynak": kaynak, "sure": sure, "sorun": sorun})
+        sonuclar.append(
+            {"no": i, "soru": soru[:60], "kaynak": kaynak, "sure": sure, "sorun": sorun}
+        )
 
         if i % 50 == 0:
-            print(f"[{i}/{len(sorular)}] hata={hata_say} cache={sum(1 for s in sonuclar if s.get('kaynak')=='oncelik_cache')} web={sum(1 for s in sonuclar if s.get('kaynak')=='web_arama')} llm={sum(1 for s in sonuclar if s.get('kaynak')=='llm')}")
+            print(
+                f"[{i}/{len(sorular)}] hata={hata_say} cache={sum(1 for s in sonuclar if s.get('kaynak')=='oncelik_cache')} web={sum(1 for s in sonuclar if s.get('kaynak')=='web_arama')} llm={sum(1 for s in sonuclar if s.get('kaynak')=='llm')}"
+            )
             sys.stdout.flush()
     except Exception as e:
         hata_say += 1
-        sonuclar.append({"no": i, "soru": str(soru)[:60], "kaynak": "EXCEPTION", "sure": 0, "sorun": str(e)[:50]})
+        sonuclar.append(
+            {
+                "no": i,
+                "soru": str(soru)[:60],
+                "kaynak": "EXCEPTION",
+                "sure": 0,
+                "sorun": str(e)[:50],
+            }
+        )
 
 # ── Rapor ────────────────────────────────────────────────────────────
 bitis = time.time()
@@ -117,7 +245,9 @@ llm_say = sum(1 for s in sonuclar if s.get("kaynak") == "llm")
 oneri_say = sum(1 for s in sonuclar if s.get("kaynak") == "oneri_uret")
 once_say = sum(1 for s in sonuclar if s.get("kaynak") == "once_hafiza")
 exc_say = sum(1 for s in sonuclar if s.get("kaynak") == "EXCEPTION")
-hatali_sorun = [s for s in sonuclar if s.get("sorun") and s.get("kaynak") != "EXCEPTION"]
+hatali_sorun = [
+    s for s in sonuclar if s.get("sorun") and s.get("kaynak") != "EXCEPTION"
+]
 
 RAPOR = f"""
 ========================================

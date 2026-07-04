@@ -17,6 +17,7 @@ Kullanim:
     sonuc = await env.calistir("ls -la")
     print(sonuc["cikti"])
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -233,7 +234,9 @@ class SSHEnvironment:
             }
 
         except asyncssh.PermissionDeniedError:
-            logger.error("[SSH] Kimlik dogrulama hatasi (%s@%s)", self._user, self._host)
+            logger.error(
+                "[SSH] Kimlik dogrulama hatasi (%s@%s)", self._user, self._host
+            )
             return {
                 "basarili": False,
                 "cikti": "",

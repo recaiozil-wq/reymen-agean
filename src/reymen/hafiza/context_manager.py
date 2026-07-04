@@ -12,6 +12,7 @@ Ozellikler:
 
 ReYMeN context_compressor'dan ilham alindi, ReYMeN icin yeniden yazildi.
 """
+
 import re
 from typing import Optional
 
@@ -54,13 +55,18 @@ OZET_SISTEM_TALIMATI = (
 class TrajectoryCompressor:
     """LLM destekli konusma gecmisi sikistirici."""
 
-    def __init__(self, provider=None, esik_oran: float = 0.75,
-                 korunan_son: int = 8, max_arac_cikti: int = 300):
-        self.provider = provider          # RuntimeProviderEngine veya None
-        self.esik_oran = esik_oran        # Bu orandan fazla dolunca sikistir
-        self.korunan_son = korunan_son    # Son N mesaj korunur
+    def __init__(
+        self,
+        provider=None,
+        esik_oran: float = 0.75,
+        korunan_son: int = 8,
+        max_arac_cikti: int = 300,
+    ):
+        self.provider = provider  # RuntimeProviderEngine veya None
+        self.esik_oran = esik_oran  # Bu orandan fazla dolunca sikistir
+        self.korunan_son = korunan_son  # Son N mesaj korunur
         self.max_arac_cikti = max_arac_cikti  # Gozlem satirlari max uzunlugu
-        self._onceki_ozet: str = ""       # Iteratif guncelleme icin
+        self._onceki_ozet: str = ""  # Iteratif guncelleme icin
 
     # ── Token tahmini ─────────────────────────────────────────────────
 
@@ -77,7 +83,7 @@ class TrajectoryCompressor:
             if m.get("role") == "user" and len(icerik) > self.max_arac_cikti:
                 # [Gozlem] ile baslayan uzun mesajlari kisalt
                 if icerik.startswith("Gozlem:") or icerik.startswith("["):
-                    icerik = icerik[:self.max_arac_cikti] + "\n... [budandi]"
+                    icerik = icerik[: self.max_arac_cikti] + "\n... [budandi]"
             budanmis.append({**m, "content": icerik})
         return budanmis
 
@@ -102,8 +108,7 @@ class TrajectoryCompressor:
         # Onceki ozet varsa birlestir
         if self._onceki_ozet:
             gecmis = (
-                f"[ONCEKI OZET]\n{self._onceki_ozet}\n\n"
-                f"[YENI MESAJLAR]\n{gecmis}"
+                f"[ONCEKI OZET]\n{self._onceki_ozet}\n\n" f"[YENI MESAJLAR]\n{gecmis}"
             )
 
         try:
@@ -162,12 +167,15 @@ class TrajectoryCompressor:
         if self._token_tahmin(mesajlar) < context_length * self.esik_oran:
             return mesajlar
 
-        eski = mesajlar[:-self.korunan_son]
-        son = mesajlar[-self.korunan_son:]
+        eski = mesajlar[: -self.korunan_son]
+        son = mesajlar[-self.korunan_son :]
 
         # Eski ozet mesajini kaldır (tekrar ozetleme)
-        eski = [m for m in eski
-                if not m.get("content", "").startswith("[BAGLAM SIKISTIRMASI")]
+        eski = [
+            m
+            for m in eski
+            if not m.get("content", "").startswith("[BAGLAM SIKISTIRMASI")
+        ]
 
         if not eski:
             return mesajlar
@@ -187,6 +195,7 @@ class TrajectoryCompressor:
 # Geriye donuk uyumluluk takma adlari
 class AdvancedContextCompressor(TrajectoryCompressor):
     """Eski isim — TrajectoryCompressor'in takma adi."""
+
     pass
 
 
@@ -198,7 +207,12 @@ if __name__ == "__main__":
     msgs = []
     for i in range(50):
         msgs.append({"role": "user", "content": f"Gozlem: Adim {i} tamamlandi."})
-        msgs.append({"role": "assistant", "content": f"Eylem: DOSYA_YAZ(\"dosya{i}.txt\", \"icerik\")"})
+        msgs.append(
+            {
+                "role": "assistant",
+                "content": f'Eylem: DOSYA_YAZ("dosya{i}.txt", "icerik")',
+            }
+        )
 
     sonuc = comp.compress(msgs, context_length=8192)
     print(f"Onceki: {len(msgs)} mesaj → Sonraki: {len(sonuc)} mesaj")

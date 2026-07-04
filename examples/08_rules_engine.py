@@ -63,6 +63,7 @@ try:
 
     # Temizlik
     import shutil
+
     shutil.rmtree(gecici_dizin, ignore_errors=True)
 
 except ImportError as e:

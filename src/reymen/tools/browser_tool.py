@@ -1,5 +1,5 @@
-"""ReYMeN tools.browser_tool shim — Hermes browser fonksiyonlarını ReYMeN browser_engine'e yönlendirir.
-"""
+"""ReYMeN tools.browser_tool shim — Hermes browser fonksiyonlarını ReYMeN browser_engine'e yönlendirir."""
+
 from __future__ import annotations
 
 import logging
@@ -59,6 +59,7 @@ def _get_cloud_provider() -> Optional[str]:
 # ---------------------------------------------------------------------------
 # Ana browser tool fonksiyonları
 # ---------------------------------------------------------------------------
+
 
 def browser_navigate(url: str) -> str:
     """Hermes browser_navigate — ReYMeN browser_engine'e yönlendirir."""

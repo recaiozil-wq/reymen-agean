@@ -88,17 +88,17 @@ import winreg
 def _tor_bul():
     # 1. Kayıt defterinden dene
     try:
-        with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, 
+        with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
                             r"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\firefox.exe") as key:
             return Path(winreg.QueryValue(key, None)).parent
     except:
         pass
-    
+
     # 2. Varsayılan konumlar (dinamik home ile)
     home = Path.home()
     local = Path(os.environ.get('LOCALAPPDATA', home / 'AppData' / 'Local'))
     prog_files = Path(os.environ.get('ProgramFiles', 'C:\\Program Files'))
-    
+
     adaylar = [
         home / 'Desktop' / 'Tor Browser' / 'Browser' / 'firefox.exe',
         home / 'Masaüstü' / 'Tor Browser' / 'Browser' / 'firefox.exe',

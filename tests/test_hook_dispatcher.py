@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Testler: reymen.cereyan.hook_dispatcher"""
+
 import pytest
 from reymen.cereyan.hook_dispatcher import (
     hook_kaydet,
@@ -109,7 +110,13 @@ class TestHookCagir:
             alindi.update(kw)
 
         hook_kaydet("on_tool_result", alici)
-        hook_cagir("on_tool_result", arac_adi="yazdir", sonuc="tamam", sure_sn=0.5, ekstra="veri")
+        hook_cagir(
+            "on_tool_result",
+            arac_adi="yazdir",
+            sonuc="tamam",
+            sure_sn=0.5,
+            ekstra="veri",
+        )
         assert alindi["arac_adi"] == "yazdir"
         assert alindi["sonuc"] == "tamam"
         assert alindi["sure_sn"] == 0.5
@@ -135,6 +142,7 @@ class TestDecorator:
 
     def test_hook_decorator_bilinmeyen_olay(self):
         with pytest.raises(ValueError):
+
             @hook("bilinmeyen_olay")
             def fn(**kw):
                 pass
@@ -143,10 +151,14 @@ class TestDecorator:
 class TestGecerliOlaylar:
     def test_tum_olay_adlari(self):
         beklenen = {
-            "on_session_start", "on_session_end",
-            "on_turn_start", "on_turn_end",
-            "on_tool_call", "on_tool_result",
-            "on_error", "on_context_compress",
+            "on_session_start",
+            "on_session_end",
+            "on_turn_start",
+            "on_turn_end",
+            "on_tool_call",
+            "on_tool_result",
+            "on_error",
+            "on_context_compress",
         }
         assert GECERLI_OLAYLAR == beklenen
 
@@ -156,7 +168,9 @@ class TestKayitliHooklar:
         assert kayitli_hooklar() == {}
 
     def test_kayitli_olanlar_listelenir(self):
-        def oturum_fn(**kw): pass
+        def oturum_fn(**kw):
+            pass
+
         hook_kaydet("on_session_start", oturum_fn)
         ozet = kayitli_hooklar()
         assert "on_session_start" in ozet

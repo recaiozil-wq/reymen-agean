@@ -10,10 +10,12 @@ across mixin modules in reymen/sistem/cli_mixin_*.py.
 import logging
 import sys
 from typing import Optional, Any, List, Dict, Tuple
+
 logger = logging.getLogger(__name__)
 
 # Import the actual implementation
 from src.reymen.sistem.cli_main import ReYMeNCLI
+
 
 def main(
     query: str = None,
@@ -43,7 +45,7 @@ def main(
 ):
     """
     ReYMeN Agent CLI - Interactive AI Assistant
-    
+
     Args:
         query: Single query to execute (then exit). Alias: -q
         q: Shorthand for --query
@@ -63,7 +65,7 @@ def main(
         resume: Resume a previous session by its ID (e.g., 20260225_143052_a1b2c3)
         worktree: Run in an isolated git worktree (for parallel agents). Alias: -w
         w: Shorthand for --worktree
-    
+
     Examples:
         python cli.py                            # Start interactive mode
         python cli.py --toolsets web,terminal    # Use specific toolsets
@@ -82,6 +84,7 @@ def main(
     # UnicodeEncodeError on cp1252.  No-op on Linux/macOS.
     try:
         from ReYMeN_cli.stdio import configure_windows_stdio
+
         configure_windows_stdio()
     except Exception:
         logger.warning("[fix_01_sessiz_except] Exception")
@@ -93,11 +96,12 @@ def main(
     # --yolo flag: tum tehlikeli komut onaylarini atla
     if yolo:
         os.environ["REYMEN_YOLO_MODE"] = "1"
-    
+
     # approvals.mode = off → YOLO modu (config)
     if not os.environ.get("REYMEN_YOLO_MODE"):
         try:
             from ReYMeN_cli.config import load_config as _load_reymen_config
+
             _cfg = _load_reymen_config()
             if isinstance(_cfg, dict):
                 _approvals = _cfg.get("approvals", {}) or {}
@@ -105,11 +109,12 @@ def main(
                     os.environ["REYMEN_YOLO_MODE"] = "1"
         except Exception:
             logger.warning("[fix_01_sessiz_except] Exception")
-    
+
     # Handle gateway mode (messaging + cron)
     if gateway:
         import asyncio
         from gateway.run import start_gateway
+
         print("Starting ReYMeN Gateway (messaging platforms)...")
         asyncio.run(start_gateway())
         return
@@ -137,10 +142,10 @@ def main(
                 return
     else:
         wt_info = None
-    
+
     # Handle query shorthand
     query = query or q
-    
+
     # Parse toolsets - handle both string and tuple/list inputs
     # Default to ReYMeN-cli toolset which includes cronjob management tools
     toolsets_list = None
@@ -158,8 +163,9 @@ def main(
     else:
         # Use the shared resolver so MCP servers are included at runtime
         from ReYMeN_cli.tools_config import _get_platform_tools
+
         toolsets_list = sorted(_get_platform_tools(CLI_CONFIG, "cli"))
-    
+
     parsed_skills = _parse_skills_argument(skills)
 
     # Create CLI instance
@@ -202,18 +208,18 @@ def main(
             f"The original repo is at {wt_info['repo_root']}.]"
         )
         cli.system_prompt = (cli.system_prompt or "") + wt_note
-    
+
     # Handle list commands (don't init agent for these)
     if list_tools:
         cli.show_banner()
         cli.show_tools()
         sys.exit(0)
-    
+
     if list_toolsets:
         cli.show_banner()
         cli.show_toolsets()
         sys.exit(0)
-    
+
     # Register cleanup for single-query mode (interactive mode registers in run())
     atexit.register(_run_cleanup)
 
@@ -263,6 +269,7 @@ def main(
         if os.environ.get("ReYMeN_KANBAN_TASK"):
             try:
                 import signal as _sig_mod
+
                 if hasattr(_sig_mod, "SIGALRM"):
                     # Cancel any pre-existing alarm to avoid colliding with
                     # caller-installed timers.
@@ -272,6 +279,7 @@ def main(
                 logger.warning("[fix_01_sessiz_except] Exception")
             try:
                 import logging as _lg
+
                 _lg.shutdown()
             except Exception:
                 logger.warning("[fix_01_sessiz_except] Exception")
@@ -282,8 +290,10 @@ def main(
                     logger.warning("[fix_01_sessiz_except] Exception")
             os._exit(0)
         raise KeyboardInterrupt()
+
     try:
         import signal as _signal
+
         _signal.signal(_signal.SIGTERM, _signal_handler_q)
         if hasattr(_signal, "SIGHUP"):
             _signal.signal(_signal.SIGHUP, _signal_handler_q)
@@ -291,7 +301,7 @@ def main(
         __import__("logging").getLogger(__name__).warning(
             "[SessizExcept] %%s: %%s", type(_e).__name__, _e
         )  # signal handler may fail in restricted environments
-    
+
     # Handle single query mode
     if query or image:
         query, single_query_images = _collect_query_images(query, image)
@@ -378,13 +388,19 @@ def main(
                                 # so keep the original query text intact when
                                 # only URLs were supplied.
                                 if single_query_images:
-                                    effective_query = cli._preprocess_images_with_vision(
-                                        query, single_query_images, announce=False,
+                                    effective_query = (
+                                        cli._preprocess_images_with_vision(
+                                            query,
+                                            single_query_images,
+                                            announce=False,
+                                        )
                                     )
                         except Exception:
                             if single_query_images:
                                 effective_query = cli._preprocess_images_with_vision(
-                                    query, single_query_images, announce=False,
+                                    query,
+                                    single_query_images,
+                                    announce=False,
                                 )
                     elif single_query_images:
                         effective_query = cli._preprocess_images_with_vision(
@@ -420,7 +436,11 @@ def main(
                         and cli.agent.session_id != cli.session_id
                     ):
                         cli.session_id = cli.agent.session_id
-                    response = result.get("final_response", "") if isinstance(result, dict) else str(result)
+                    response = (
+                        result.get("final_response", "")
+                        if isinstance(result, dict)
+                        else str(result)
+                    )
                     # Surface backend errors that produced no visible output
                     # (e.g. invalid model slug → provider 4xx). Mirrors the
                     # interactive CLI path. Write to stderr so piped stdout
@@ -450,10 +470,12 @@ def main(
 
                     # Session ID goes to stderr so piped stdout is clean.
                     print(f"\nsession_id: {cli.session_id}", file=sys.stderr)
-                    
+
                     # Ensure proper exit code for automation wrappers
-                    sys.exit(1 if isinstance(result, dict) and result.get("failed") else 0)
-            
+                    sys.exit(
+                        1 if isinstance(result, dict) and result.get("failed") else 0
+                    )
+
             # Exit with error code if credentials or agent init fails
             sys.exit(1)
         else:
@@ -479,9 +501,10 @@ def main(
             cli.chat(query, images=single_query_images or None)
             cli._print_exit_summary()
         return
-    
+
     # Run interactive mode
     cli.run()
+
 
 if __name__ == "__main__":
     import fire

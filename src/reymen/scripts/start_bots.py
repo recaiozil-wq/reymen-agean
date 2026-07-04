@@ -1,4 +1,5 @@
 """start_bots.py — Tüm Telegram botlarini temiz baslat."""
+
 import json
 import os
 import subprocess
@@ -6,6 +7,7 @@ import sys
 import time
 from pathlib import Path
 import logging
+
 logger = logging.getLogger(__name__)
 
 PROJE_KOK = Path(__file__).resolve().parent.parent.parent
@@ -17,6 +19,7 @@ BOTLAR = [
     {"ad": "ReYMeN_Bot", "profil": "reymen"},
 ]
 
+
 def token_oku(profil):
     env_yolu = HERMES_BASE / profil / ".env"
     if not env_yolu.exists():
@@ -26,6 +29,7 @@ def token_oku(profil):
         if satir.startswith("TELEGRAM_BOT_TOKEN="):
             return satir.split("=", 1)[1]
     return ""
+
 
 def bot_baslat(bot_info):
     """Tek bot baslat (DETACHED_PROCESS, no window)."""
@@ -53,7 +57,9 @@ def bot_baslat(bot_info):
     log_yolu.parent.mkdir(parents=True, exist_ok=True)
 
     with open(log_yolu, "w") as lf:
-        lf.write(f"[{time.strftime('%H:%M:%S')}] {ad} baslatiliyor... (profil={profil})\n")
+        lf.write(
+            f"[{time.strftime('%H:%M:%S')}] {ad} baslatiliyor... (profil={profil})\n"
+        )
 
     proc = subprocess.Popen(
         [str(venv_python), str(script)],
@@ -67,6 +73,7 @@ def bot_baslat(bot_info):
     print(f"[{ad}] ✅ Baslatildi (PID: {proc.pid}) — token: ...{token[-6:]}")
     return True
 
+
 def main():
     # Once tum eski botlari oldur
     print("=" * 50)
@@ -79,9 +86,12 @@ def main():
         token = token_oku(bot["profil"])
         if token:
             import urllib.request
+
             url = f"https://api.telegram.org/bot{token}/deleteWebhook"
             data = json.dumps({"drop_pending_updates": True}).encode()
-            req = urllib.request.Request(url, data=data, headers={"Content-Type": "application/json"})
+            req = urllib.request.Request(
+                url, data=data, headers={"Content-Type": "application/json"}
+            )
             try:
                 with urllib.request.urlopen(req, timeout=10) as r:
                     sonuc = json.loads(r.read())
@@ -116,9 +126,11 @@ def main():
     print("Durdurmak icin: python start_bots.py --stop")
     print("=" * 50)
 
+
 if __name__ == "__main__":
     if "--stop" in sys.argv:
         import wmi  # type: ignore
+
         c = wmi.WMI()
         killed = 0
         for proc in c.Win32_Process(name="python.exe"):

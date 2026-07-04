@@ -17,6 +17,7 @@ import logging
 import threading
 import time
 import logging
+
 logger = logging.getLogger(__name__)
 
 log = logging.getLogger(__name__)
@@ -25,14 +26,15 @@ log = logging.getLogger(__name__)
 try:
     import sqlite3
     from pathlib import Path
+
     _SQLITE = True
 except ImportError:
     _SQLITE = False
 
 # ── Sabitler ──────────────────────────────────────────────────────────
-_VARSAYILAN_TTL_GUN = 90          # 90 gun sonra otomatik sil
-_MAX_KAYIT_PER_KOL = 1000         # Koleksiyon basina max kayit
-_BUDAMA_ARALIK_SN = 1800          # 30 dakika
+_VARSAYILAN_TTL_GUN = 90  # 90 gun sonra otomatik sil
+_MAX_KAYIT_PER_KOL = 1000  # Koleksiyon basina max kayit
+_BUDAMA_ARALIK_SN = 1800  # 30 dakika
 _auto_thread = None
 _auto_stop = threading.Event()
 
@@ -46,8 +48,11 @@ def _db_yollari():
     return hafiza_yol
 
 
-def buda(hafiza_yol: str = "", max_gun: int = _VARSAYILAN_TTL_GUN,
-         max_kayit: int = _MAX_KAYIT_PER_KOL) -> dict:
+def buda(
+    hafiza_yol: str = "",
+    max_gun: int = _VARSAYILAN_TTL_GUN,
+    max_kayit: int = _MAX_KAYIT_PER_KOL,
+) -> dict:
     """Hafizayi buda: eski + asiri kayitlari temizle.
 
     Uc asama:
@@ -64,8 +69,13 @@ def buda(hafiza_yol: str = "", max_gun: int = _VARSAYILAN_TTL_GUN,
         {"silinen_ttl": N, "silinen_eski": N, "silinen_asiri": N,
          "session_budanan": N, "toplam_session": N}
     """
-    sonuc = {"silinen_ttl": 0, "silinen_eski": 0, "silinen_asiri": 0,
-             "session_budanan": 0, "toplam_session": 0}
+    sonuc = {
+        "silinen_ttl": 0,
+        "silinen_eski": 0,
+        "silinen_asiri": 0,
+        "session_budanan": 0,
+        "toplam_session": 0,
+    }
 
     if not _SQLITE:
         return sonuc
@@ -127,10 +137,13 @@ def buda(hafiza_yol: str = "", max_gun: int = _VARSAYILAN_TTL_GUN,
     # --- 2. Session.db budama ---
     try:
         from reymen.hafiza.session_db import AdvancedSessionStorage
+
         ROOT = Path(__file__).parent.resolve()
         db_path = str(ROOT.parent / "merkez_db" / "session_cereyan.db")
         storage = AdvancedSessionStorage(db_path)
-        s = storage.konsolide_et(max_gun=max_gun, max_session=1000, max_toplam_karakter=500000)
+        s = storage.konsolide_et(
+            max_gun=max_gun, max_session=1000, max_toplam_karakter=500000
+        )
         sonuc["session_budanan"] = s.get("silinen_session", 0)
         sonuc["toplam_session"] = s.get("toplam_session", 0)
     except Exception as _auto_bud_e133:
@@ -143,27 +156,36 @@ def _session_budama(max_gun: int):
     """Session DB'de eski kayitlari temizle (alternatif)."""
     try:
         from reymen.hafiza.session_db import AdvancedSessionStorage
+
         ROOT = Path(__file__).parent.resolve()
         db_path = str(ROOT / ".ReYMeN" / "session.db")
         storage = AdvancedSessionStorage(db_path)
-        storage.konsolide_et(max_gun=max_gun, max_session=1000, max_toplam_karakter=500000)
+        storage.konsolide_et(
+            max_gun=max_gun, max_session=1000, max_toplam_karakter=500000
+        )
     except Exception as _auto_bud_e147:
         print(f"[UYARI] auto_budama.py:148 - {_auto_bud_e147}")
 
 
 # ── Otomatik Budama Thread ──────────────────────────────────────────
 
+
 def _budama_dongusu():
     """Arka planda periyodik budama yap."""
     while not _auto_stop.is_set():
         try:
             sonuc = buda()
-            toplam = sonuc["silinen_ttl"] + sonuc["silinen_eski"] + sonuc["silinen_asiri"]
+            toplam = (
+                sonuc["silinen_ttl"] + sonuc["silinen_eski"] + sonuc["silinen_asiri"]
+            )
             if toplam > 0:
                 log.info(
                     "[AutoBudama] %d kayit silindi (ttl=%d, eski=%d, asiri=%d, session=%d)",
-                    toplam, sonuc["silinen_ttl"], sonuc["silinen_eski"],
-                    sonuc["silinen_asiri"], sonuc["session_budanan"],
+                    toplam,
+                    sonuc["silinen_ttl"],
+                    sonuc["silinen_eski"],
+                    sonuc["silinen_asiri"],
+                    sonuc["session_budanan"],
                 )
         except Exception as _auto_bud_e165:
             print(f"[UYARI] auto_budama.py:166 - {_auto_bud_e165}")

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """reymen_stub_tara.py — ReYMeN'deki eksik/stub fonksiyonlari tara."""
+
 import ast
 import os
 import sys
@@ -17,6 +18,7 @@ HARIC = {"__pycache__", "test", "tests", ".git", "venv", "node_modules", "__init
 
 stubs = []
 
+
 def _stub_mu(node) -> tuple:
     """(tur, sebep) veya (None, None)"""
     body = node.body
@@ -24,7 +26,11 @@ def _stub_mu(node) -> tuple:
     if len(body) == 1 and isinstance(body[0], ast.Pass):
         return ("pass", "")
     # docstring + pass
-    if len(body) == 2 and isinstance(body[0], ast.Expr) and isinstance(body[1], ast.Pass):
+    if (
+        len(body) == 2
+        and isinstance(body[0], ast.Expr)
+        and isinstance(body[1], ast.Pass)
+    ):
         return ("pass", "docstring+pass")
     # return "" / None / 0 / [] / {}
     if len(body) == 1 and isinstance(body[0], ast.Return):
@@ -41,6 +47,7 @@ def _stub_mu(node) -> tuple:
             return ("return", "None")
     return (None, None)
 
+
 for tara in TARA_DIZINLER:
     if not tara.exists():
         print(f"  [YOK] {tara}")
@@ -56,11 +63,15 @@ for tara in TARA_DIZINLER:
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 tur, sebep = _stub_mu(node)
                 if tur:
-                    stubs.append((tur, sebep, py.relative_to(ROOT), node.name, node.lineno))
+                    stubs.append(
+                        (tur, sebep, py.relative_to(ROOT), node.name, node.lineno)
+                    )
             elif isinstance(node, ast.ClassDef):
                 tur, sebep = _stub_mu(node)
                 if tur:
-                    stubs.append((tur, sebep, py.relative_to(ROOT), node.name, node.lineno))
+                    stubs.append(
+                        (tur, sebep, py.relative_to(ROOT), node.name, node.lineno)
+                    )
 
 # TODO/FIXME tara
 todolar = []
@@ -72,7 +83,12 @@ for tara in TARA_DIZINLER:
             continue
         for i, line in enumerate(py.read_text(encoding="utf-8").splitlines(), 1):
             stripped = line.strip()
-            if stripped.startswith("#") and ("TODO" in stripped.upper() or "FIXME" in stripped.upper() or "HACK" in stripped.upper() or "XXX" in stripped.upper()):
+            if stripped.startswith("#") and (
+                "TODO" in stripped.upper()
+                or "FIXME" in stripped.upper()
+                or "HACK" in stripped.upper()
+                or "XXX" in stripped.upper()
+            ):
                 rel = py.relative_to(ROOT)
                 todolar.append((rel, i, stripped))
                 if len(todolar) >= 50:
@@ -122,6 +138,7 @@ print(f"\n--- 1. STUB FONKSIYONLAR ({len(stubs)} adet) ---")
 if stubs:
     # Grupla
     from collections import Counter
+
     tur_say = Counter(s[0] for s in stubs)
     print(f"  pass govdeli:      {tur_say.get('pass', 0)}")
     print(f"  return literal:    {tur_say.get('return', 0)}")
@@ -153,5 +170,7 @@ else:
     print("  HIC YOK!")
 
 print(f"\n{'=' * 70}")
-print(f"  OZET: {len(stubs)} stub + {len(todolar)} TODO + {len(not_implemented)} NI + {len(import_fallback)} ImportError")
+print(
+    f"  OZET: {len(stubs)} stub + {len(todolar)} TODO + {len(not_implemented)} NI + {len(import_fallback)} ImportError"
+)
 print(f"{'=' * 70}")

@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 # --- YAML yükleyici ---
 try:
     import yaml
+
     _YAML_MEVCUT = True
 except ImportError:
     _YAML_MEVCUT = False
@@ -69,8 +70,12 @@ class ProfileManager:
             self._profiller = {
                 "reyment": {
                     "aciklama": "Ana ReYMeN profili",
-                    "default_provider": data.get("general", {}).get("default_provider", "deepseek"),
-                    "default_model": data.get("general", {}).get("default_model", "deepseek-v4-flash"),
+                    "default_provider": data.get("general", {}).get(
+                        "default_provider", "deepseek"
+                    ),
+                    "default_model": data.get("general", {}).get(
+                        "default_model", "deepseek-v4-flash"
+                    ),
                 }
             }
             return
@@ -89,12 +94,16 @@ class ProfileManager:
         else:
             self._aktif_profil = "reyment"
 
-        logger.info(f"{len(self._profiller)} profil yuklendi. Aktif: {self._aktif_profil}")
+        logger.info(
+            f"{len(self._profiller)} profil yuklendi. Aktif: {self._aktif_profil}"
+        )
         self._profil_override_yukle()
 
     def _profil_override_yukle(self) -> None:
         """Profil-specific config dosyasini yukle (config.reymen.yaml, config.dev.yaml vb.)"""
-        override_dosyasi = self._config_yolu.parent / f"config.{self._aktif_profil}.yaml"
+        override_dosyasi = (
+            self._config_yolu.parent / f"config.{self._aktif_profil}.yaml"
+        )
         if not override_dosyasi.exists():
             return
         if not _YAML_MEVCUT:
@@ -102,7 +111,10 @@ class ProfileManager:
         try:
             with open(override_dosyasi, "r", encoding="utf-8") as f:
                 override_data = yaml.safe_load(f)
-            if isinstance(override_data, dict) and self._aktif_profil in self._profiller:
+            if (
+                isinstance(override_data, dict)
+                and self._aktif_profil in self._profiller
+            ):
                 for anahtar, deger in override_data.items():
                     if isinstance(deger, dict) and isinstance(
                         self._profiller[self._aktif_profil].get(anahtar), dict
@@ -112,7 +124,9 @@ class ProfileManager:
                         self._profiller[self._aktif_profil][anahtar] = deger
                 logger.info(f"Profil override yuklendi: {override_dosyasi.name}")
         except Exception as e:
-            logger.warning(f"Profil override yuklenemedi ({override_dosyasi.name}): {e}")
+            logger.warning(
+                f"Profil override yuklenemedi ({override_dosyasi.name}): {e}"
+            )
 
     def profil_degistir(self, ad: str) -> str:
         """Aktif profili değiştir.
@@ -126,7 +140,9 @@ class ProfileManager:
         ad = ad.strip().lower()
         if ad not in self._profiller:
             mevcut = ", ".join(self._profiller.keys())
-            return f"[Profil] HATA: '{ad}' profili bulunamadi. Mevcut profiller: {mevcut}"
+            return (
+                f"[Profil] HATA: '{ad}' profili bulunamadi. Mevcut profiller: {mevcut}"
+            )
 
         eski_profil = self._aktif_profil
         self._aktif_profil = ad
@@ -179,10 +195,14 @@ class ProfileManager:
     def tum_profiller(self) -> Dict[str, Dict[str, Any]]:
         return dict(self._profiller)
 
-    def profil_ekle(self, ad: str, aciklama: str = "",
-                    default_provider: str = "",
-                    default_model: str = "",
-                    overrides: Optional[Dict[str, Any]] = None) -> str:
+    def profil_ekle(
+        self,
+        ad: str,
+        aciklama: str = "",
+        default_provider: str = "",
+        default_model: str = "",
+        overrides: Optional[Dict[str, Any]] = None,
+    ) -> str:
         ad = ad.strip().lower()
         if not ad:
             return "[Profil] HATA: Profil adi bos olamaz."
@@ -230,8 +250,15 @@ class ProfileManager:
                 else:
                     yeni_config["providers"][pname] = pcfg
 
-        for anahtar in ("max_turns", "memory_char_limit", "secure_binding",
-                        "telegram", "voice", "web", "logging"):
+        for anahtar in (
+            "max_turns",
+            "memory_char_limit",
+            "secure_binding",
+            "telegram",
+            "voice",
+            "web",
+            "logging",
+        ):
             if anahtar in profil:
                 yeni_config[anahtar] = profil[anahtar]
         return yeni_config

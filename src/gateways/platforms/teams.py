@@ -14,6 +14,7 @@ Yapilandirma (ortam degiskenleri):
   - TEAMS_CLIENT_SECRET   — Uygulama client secret (zorunlu)
   - TEAMS_HOME_CHANNEL    — Varsayilan kanal (teamId:channelId, opsiyonel)
 """
+
 import asyncio
 import logging
 import os
@@ -23,6 +24,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 from pathlib import Path as _Path
+
 sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
 from src.gateways.config import Platform, PlatformConfig
@@ -46,6 +48,7 @@ logger = logging.getLogger(__name__)
 
 try:
     import httpx
+
     HTTPX_AVAILABLE = True
 except ImportError:
     HTTPX_AVAILABLE = False
@@ -142,9 +145,7 @@ class TeamsAdapter(BasePlatformAdapter):
 
         self._access_token = token_data["access_token"]
         expires_in = token_data.get("expires_in", 3600)
-        self._token_expires_at = now.replace(
-            second=(now.second + int(expires_in)) % 60
-        )
+        self._token_expires_at = now.replace(second=(now.second + int(expires_in)) % 60)
 
         logger.debug("[Teams] Yeni access_token alindi, sure: %s sn", expires_in)
         assert self._access_token is not None
@@ -213,8 +214,7 @@ class TeamsAdapter(BasePlatformAdapter):
             client = await self._get_client()
 
             url = (
-                f"{self._GRAPH_BASE}/teams/{team_id}"
-                f"/channels/{channel_id}/messages"
+                f"{self._GRAPH_BASE}/teams/{team_id}" f"/channels/{channel_id}/messages"
             )
 
             headers = {
@@ -260,10 +260,7 @@ class TeamsAdapter(BasePlatformAdapter):
             token = await self._get_access_token()
             client = await self._get_client()
 
-            url = (
-                f"{self._GRAPH_BASE}/teams/{team_id}"
-                f"/channels/{channel_id}"
-            )
+            url = f"{self._GRAPH_BASE}/teams/{team_id}" f"/channels/{channel_id}"
 
             headers = {
                 "Authorization": f"Bearer {token}",
@@ -308,9 +305,7 @@ class TeamsAdapter(BasePlatformAdapter):
             metadata=metadata,
         )
 
-    async def send_typing(
-        self, chat_id: str, metadata: Optional[dict] = None
-    ) -> None:
+    async def send_typing(self, chat_id: str, metadata: Optional[dict] = None) -> None:
         """Teams typing indicator (Graph API desteklemez, no-op)."""
         pass
 
@@ -324,9 +319,9 @@ class TeamsAdapter(BasePlatformAdapter):
     ) -> SendResult:
         """Teams'e resim gonder (URL olarak)."""
         if caption:
-            text = f"{caption}<br><img src=\"{image_url}\" alt=\"image\">"
+            text = f'{caption}<br><img src="{image_url}" alt="image">'
         else:
-            text = f"<img src=\"{image_url}\" alt=\"image\">"
+            text = f'<img src="{image_url}" alt="image">'
         return await self.send_message(
             chat_id,
             text,
@@ -416,6 +411,7 @@ class TeamsAdapter(BasePlatformAdapter):
 
             # Session source
             from src.gateways.session import SessionSource, build_session_key
+
             source = SessionSource(
                 platform=Platform.TEAMS,
                 chat_id=chat_id_val,

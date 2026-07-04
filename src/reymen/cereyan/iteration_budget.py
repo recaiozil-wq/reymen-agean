@@ -86,8 +86,9 @@ class IterationBudget:
         """Eski API: consume ile ayni."""
         self.consume()
 
-    def tur_bitir(self, basarili: bool = True, sonuc: str = "",
-                  hata_tipi: str = "") -> bool:
+    def tur_bitir(
+        self, basarili: bool = True, sonuc: str = "", hata_tipi: str = ""
+    ) -> bool:
         """Eski API: tur sonu kontrolu. True = devam et, False = dur."""
         return self.remaining > 0
 
@@ -127,49 +128,137 @@ class IterationBudget:
         hedef = gorev.lower().strip()
 
         # ── 0. Selamlasma/sosyal/basit soru → direkt 1 ──────────────
-        _selam = any(k in hedef for k in [
-            "merhaba", "selam", "naber", "nasılsın", "nasilsin",
-            "iyi misin", "teşekkür", "tesekkur", "sağol", "sagol",
-            "günaydın", "gunaydin", "iyi günler", "iyi gunler",
-            "iyi akşamlar", "iyi aksamlar", "iyi geceler",
-            "ne yapıyorsun", "ne yapiyorsun", "napıyorsun", "napiyorsun",
-            "kolay gelsin", "hayırlı", "hayirli",
-        ])
+        _selam = any(
+            k in hedef
+            for k in [
+                "merhaba",
+                "selam",
+                "naber",
+                "nasılsın",
+                "nasilsin",
+                "iyi misin",
+                "teşekkür",
+                "tesekkur",
+                "sağol",
+                "sagol",
+                "günaydın",
+                "gunaydin",
+                "iyi günler",
+                "iyi gunler",
+                "iyi akşamlar",
+                "iyi aksamlar",
+                "iyi geceler",
+                "ne yapıyorsun",
+                "ne yapiyorsun",
+                "napıyorsun",
+                "napiyorsun",
+                "kolay gelsin",
+                "hayırlı",
+                "hayirli",
+            ]
+        )
         # Eger sadece selam kelimeleri varsa (ek istek yoksa)
         if _selam:
             # Icinde ek islem kelimesi yoksa direkt 1
-            _ek_islem = any(k in hedef for k in [
-                "yap", "ara", "oku", "yaz", "sil", "bul",
-                "calistir", "çalıştır", "indir", "yukle", "yükle",
-                "kur", "gönder", "gonder", "tara", "kontrol",
-                "düzelt", "duzelt", "temizle", "düzenle", "duzenle",
-                "raporla", "analiz", "incele", "güncelle", "guncelle",
-                "aç", "ac", "kapat", "kes", "koştur", "kostur",
-            ])
+            _ek_islem = any(
+                k in hedef
+                for k in [
+                    "yap",
+                    "ara",
+                    "oku",
+                    "yaz",
+                    "sil",
+                    "bul",
+                    "calistir",
+                    "çalıştır",
+                    "indir",
+                    "yukle",
+                    "yükle",
+                    "kur",
+                    "gönder",
+                    "gonder",
+                    "tara",
+                    "kontrol",
+                    "düzelt",
+                    "duzelt",
+                    "temizle",
+                    "düzenle",
+                    "duzenle",
+                    "raporla",
+                    "analiz",
+                    "incele",
+                    "güncelle",
+                    "guncelle",
+                    "aç",
+                    "ac",
+                    "kapat",
+                    "kes",
+                    "koştur",
+                    "kostur",
+                ]
+            )
             if not _ek_islem:
                 return {"karmasiklik": 1}
 
         # ── 1. Toplu gorev tespiti ─────────────────────────────────
-        _toplu = any(k in hedef for k in [
-            "hepsini", "hepsin", "hepsi",
-            "tümünü", "tümü", "tüm", "tumu", "tumunu",
-            "bütün", "butun", "toplu",
-        ])
-        _islem = any(k in hedef for k in [
-            "kontrol", "gider", "düzelt", "duzelt", "onar", "temizle",
-            "tara", "düzenle", "duzenle", "yap", "calistir", "çalıştır",
-            "incele", "dönüştür", "donustur", "güncelle", "guncelle",
-        ])
+        _toplu = any(
+            k in hedef
+            for k in [
+                "hepsini",
+                "hepsin",
+                "hepsi",
+                "tümünü",
+                "tümü",
+                "tüm",
+                "tumu",
+                "tumunu",
+                "bütün",
+                "butun",
+                "toplu",
+            ]
+        )
+        _islem = any(
+            k in hedef
+            for k in [
+                "kontrol",
+                "gider",
+                "düzelt",
+                "duzelt",
+                "onar",
+                "temizle",
+                "tara",
+                "düzenle",
+                "duzenle",
+                "yap",
+                "calistir",
+                "çalıştır",
+                "incele",
+                "dönüştür",
+                "donustur",
+                "güncelle",
+                "guncelle",
+            ]
+        )
         if _toplu and _islem:
             return {"karmasiklik": 5}
         if _toplu:
             return {"karmasiklik": 4}
 
         # ── 2. Cok adimli gorev tespiti (baglac + virgul) ──────────
-        _cok_adim_baglac = any(k in hedef for k in [
-            "ve", "sonra", "ardindan", "ardından", "daha sonra",
-            "once", "önce", "daha önce", "daha once",
-        ])
+        _cok_adim_baglac = any(
+            k in hedef
+            for k in [
+                "ve",
+                "sonra",
+                "ardindan",
+                "ardından",
+                "daha sonra",
+                "once",
+                "önce",
+                "daha önce",
+                "daha once",
+            ]
+        )
         _cok_adim_virgul = hedef.count(",") >= 2
         _cok_adim = _cok_adim_baglac or _cok_adim_virgul
 
@@ -178,27 +267,108 @@ class IterationBudget:
         # birden fazla keyword extra puan vermez
         kategoriler = {
             "dosya_islem": ["dosya", "klasör", "klasor", "dizin", "belge", "uzanti"],
-            "web_islem":   ["web", "internet", "url", "site", "sayfa", "link",
-                           "indir", "yukle", "yükle", "gönder", "gonder"],
-            "kod_islem":   ["kod", "python", "script", "calistir", "çalıştır",
-                           "analiz", "derle", "debug", "test"],
-            "sistem_islem":["sistem", "komut", "terminal", "powershell", "servis",
-                           "port", "ağ", "ag", "islem", "işlem", "proses", "durdur"],
-            "arama_islem": ["ara", "bul", "tara", "sorgula", "keşfet", "kesfet",
-                           "listele", "getir"],
-            "yazma_islem": ["yaz", "oluştur", "olustur", "kaydet", "ekle",
-                           "güncelle", "guncelle", "sil", "düzenle", "duzenle",
-                           "temizle", "dönüştür", "donustur", "düzelt", "duzelt",
-                           "onar"],
-            "guvenlik":    ["güvenlik", "guvenlik", "şifre", "sifre", "izin",
-                           "yetki", "erişim", "erisim"],
-            "github_islem":["git", "github", "repo", "commit", "push", "pull",
-                           "clone", "branch", "merge"],
+            "web_islem": [
+                "web",
+                "internet",
+                "url",
+                "site",
+                "sayfa",
+                "link",
+                "indir",
+                "yukle",
+                "yükle",
+                "gönder",
+                "gonder",
+            ],
+            "kod_islem": [
+                "kod",
+                "python",
+                "script",
+                "calistir",
+                "çalıştır",
+                "analiz",
+                "derle",
+                "debug",
+                "test",
+            ],
+            "sistem_islem": [
+                "sistem",
+                "komut",
+                "terminal",
+                "powershell",
+                "servis",
+                "port",
+                "ağ",
+                "ag",
+                "islem",
+                "işlem",
+                "proses",
+                "durdur",
+            ],
+            "arama_islem": [
+                "ara",
+                "bul",
+                "tara",
+                "sorgula",
+                "keşfet",
+                "kesfet",
+                "listele",
+                "getir",
+            ],
+            "yazma_islem": [
+                "yaz",
+                "oluştur",
+                "olustur",
+                "kaydet",
+                "ekle",
+                "güncelle",
+                "guncelle",
+                "sil",
+                "düzenle",
+                "duzenle",
+                "temizle",
+                "dönüştür",
+                "donustur",
+                "düzelt",
+                "duzelt",
+                "onar",
+            ],
+            "guvenlik": [
+                "güvenlik",
+                "guvenlik",
+                "şifre",
+                "sifre",
+                "izin",
+                "yetki",
+                "erişim",
+                "erisim",
+            ],
+            "github_islem": [
+                "git",
+                "github",
+                "repo",
+                "commit",
+                "push",
+                "pull",
+                "clone",
+                "branch",
+                "merge",
+            ],
         }
 
         # Ekstra puan veren kelimeler (kategori disi kapsam artirici)
-        _ekstra_kelimeler = ["raporla", "özet", "ozet", "karşılaştır", "karsilastir",
-                            "birleştir", "birlestir", "görsel", "gorsel", "grafik"]
+        _ekstra_kelimeler = [
+            "raporla",
+            "özet",
+            "ozet",
+            "karşılaştır",
+            "karsilastir",
+            "birleştir",
+            "birlestir",
+            "görsel",
+            "gorsel",
+            "grafik",
+        ]
 
         # Kac farkli kategori bulundu
         _bulunan_kategori = 0
@@ -212,8 +382,17 @@ class IterationBudget:
             skor += 1
 
         # Ek keyword sayisi (kategori disi ekstra)
-        _ek_kelimeler = ["raporla", "özet", "ozet", "karşılaştır", "karsilastir",
-                        "donüştür", "donustur", "birleştir", "birlestir"]
+        _ek_kelimeler = [
+            "raporla",
+            "özet",
+            "ozet",
+            "karşılaştır",
+            "karsilastir",
+            "donüştür",
+            "donustur",
+            "birleştir",
+            "birlestir",
+        ]
         for k in _ek_kelimeler:
             if k in hedef:
                 # Sadece yeni kategori eklemediysek bonus

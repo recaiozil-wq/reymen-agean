@@ -16,6 +16,7 @@ Kullanim (CLI):
     python kanban_orchestrator.py guncelle 3 --durum done
     python kanban_orchestrator.py ozet
 """
+
 import argparse
 import json
 import sqlite3
@@ -32,17 +33,18 @@ DB_YOLU = ROOT / ".ReYMeN" / "kanban.db"
 
 DURUMLAR = ("todo", "ready", "running", "done", "blocked", "archived")
 DURUM_SIMGELERI = {
-    "todo":     "◻",
-    "ready":    "▶",
-    "running":  "●",
-    "done":     "✓",
-    "blocked":  "⊘",
+    "todo": "◻",
+    "ready": "▶",
+    "running": "●",
+    "done": "✓",
+    "blocked": "⊘",
     "archived": "—",
 }
 ONCELIK_SIMGELERI = {1: "!!!", 2: "!! ", 3: "!  "}
 
 
 # ── Veri Modeli ──────────────────────────────────────────────────────────────
+
 
 @dataclass
 class Gorev:
@@ -53,8 +55,12 @@ class Gorev:
     oncelik: int = 2
     atanan: str = ""
     etiketler: str = ""
-    olusturma: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
-    guncelleme: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    olusturma: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
+    guncelleme: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
     baslangic: str = ""
     bitis: str = ""
     hedef_id: str = ""
@@ -71,6 +77,7 @@ class Gorev:
 
 
 # ── Veritabani ───────────────────────────────────────────────────────────────
+
 
 class KanbanDB:
     _kilit = threading.Lock()
@@ -143,8 +150,15 @@ class KanbanDB:
             hedef_id=row["hedef_id"] or "",
         )
 
-    def ekle(self, baslik: str, govde: str = "", oncelik: int = 2,
-             atanan: str = "", etiketler: str = "", hedef_id: str = "") -> Gorev:
+    def ekle(
+        self,
+        baslik: str,
+        govde: str = "",
+        oncelik: int = 2,
+        atanan: str = "",
+        etiketler: str = "",
+        hedef_id: str = "",
+    ) -> Gorev:
         simdi = datetime.now(timezone.utc).isoformat()
         with self._kilit:
             con = self._baglanti()
@@ -153,18 +167,41 @@ class KanbanDB:
                     "INSERT INTO gorevler (baslik, govde, durum, oncelik, atanan, "
                     "etiketler, olusturma, guncelleme, hedef_id) "
                     "VALUES (?,?,?,?,?,?,?,?,?)",
-                    (baslik, govde, "todo", oncelik, atanan, etiketler, simdi, simdi, hedef_id),
+                    (
+                        baslik,
+                        govde,
+                        "todo",
+                        oncelik,
+                        atanan,
+                        etiketler,
+                        simdi,
+                        simdi,
+                        hedef_id,
+                    ),
                 )
                 con.commit()
-                row = con.execute("SELECT * FROM gorevler WHERE id=?", (cur.lastrowid,)).fetchone()
+                row = con.execute(
+                    "SELECT * FROM gorevler WHERE id=?", (cur.lastrowid,)
+                ).fetchone()
                 return self._satir_cevir(row)
             finally:
                 con.close()
 
     def guncelle(self, gorev_id: int, **alanlar) -> Optional[Gorev]:
-        IZINLI_KOLONLAR = {"baslik", "govde", "durum", "oncelik", "atanan", "etiketler",
-                           "baslangic", "bitis", "hedef_id"}
-        alanlar = {k: v for k, v in alanlar.items() if k in IZINLI_KOLONLAR and v is not None}
+        IZINLI_KOLONLAR = {
+            "baslik",
+            "govde",
+            "durum",
+            "oncelik",
+            "atanan",
+            "etiketler",
+            "baslangic",
+            "bitis",
+            "hedef_id",
+        }
+        alanlar = {
+            k: v for k, v in alanlar.items() if k in IZINLI_KOLONLAR and v is not None
+        }
         if not alanlar:
             return self.bul(gorev_id)
 
@@ -184,7 +221,9 @@ class KanbanDB:
             try:
                 con.execute(f"UPDATE gorevler SET {set_clause} WHERE id=?", degerler)  # nosec B608 — IZINLI_KOLONLAR whitelist'i ile filtreli (satir 165-167)
                 con.commit()
-                row = con.execute("SELECT * FROM gorevler WHERE id=?", (gorev_id,)).fetchone()
+                row = con.execute(
+                    "SELECT * FROM gorevler WHERE id=?", (gorev_id,)
+                ).fetchone()
                 return self._satir_cevir(row) if row else None
             finally:
                 con.close()
@@ -202,13 +241,16 @@ class KanbanDB:
     def bul(self, gorev_id: int) -> Optional[Gorev]:
         con = self._baglanti()
         try:
-            row = con.execute("SELECT * FROM gorevler WHERE id=?", (gorev_id,)).fetchone()
+            row = con.execute(
+                "SELECT * FROM gorevler WHERE id=?", (gorev_id,)
+            ).fetchone()
             return self._satir_cevir(row) if row else None
         finally:
             con.close()
 
-    def listele(self, durum: str = "", oncelik: int = 0,
-                atanan: str = "", limit: int = 100) -> list[Gorev]:
+    def listele(
+        self, durum: str = "", oncelik: int = 0, atanan: str = "", limit: int = 100
+    ) -> list[Gorev]:
         filtreler = []
         degerler: list = []
         if durum:
@@ -266,11 +308,14 @@ class KanbanDB:
 
     def engelle(self, gorev_id: int, neden: str = "") -> Optional[Gorev]:
         govde = self.bul(gorev_id)
-        govde_metni = (govde.govde if govde else "") + (f"\n[ENGEL]: {neden}" if neden else "")
+        govde_metni = (govde.govde if govde else "") + (
+            f"\n[ENGEL]: {neden}" if neden else ""
+        )
         return self.guncelle(gorev_id, durum="blocked", govde=govde_metni)
 
 
 # ── Orkestrator ──────────────────────────────────────────────────────────────
+
 
 class AdvancedKanbanOrchestrator:
     """ReYMeN ana arayuzu — ajan araclariyla dogrudan kullanilir."""
@@ -279,8 +324,15 @@ class AdvancedKanbanOrchestrator:
         self.db = KanbanDB(db_yolu)
 
     # Ajan araclari
-    def ekle(self, baslik: str, govde: str = "", oncelik: int = 2,
-             atanan: str = "", etiketler: str = "", hedef_id: str = "") -> dict:
+    def ekle(
+        self,
+        baslik: str,
+        govde: str = "",
+        oncelik: int = 2,
+        atanan: str = "",
+        etiketler: str = "",
+        hedef_id: str = "",
+    ) -> dict:
         g = self.db.ekle(baslik, govde, oncelik, atanan, etiketler, hedef_id)
         return g.to_dict()
 
@@ -289,7 +341,10 @@ class AdvancedKanbanOrchestrator:
         return g.to_dict() if g else {}
 
     def liste(self, durum: str = "", oncelik: int = 0, limit: int = 50) -> list[dict]:
-        return [g.to_dict() for g in self.db.listele(durum=durum, oncelik=oncelik, limit=limit)]
+        return [
+            g.to_dict()
+            for g in self.db.listele(durum=durum, oncelik=oncelik, limit=limit)
+        ]
 
     def ara(self, sorgu: str) -> list[dict]:
         return [g.to_dict() for g in self.db.ara(sorgu)]
@@ -326,6 +381,7 @@ class AdvancedKanbanOrchestrator:
 
 
 # ── CLI ──────────────────────────────────────────────────────────────────────
+
 
 def _cli():
     parser = argparse.ArgumentParser(description="ReYMeN Kanban CLI")
@@ -386,8 +442,11 @@ def _cli():
                 print(gorv.satir())
 
     elif args.komut == "guncelle":
-        alanlar = {k: v for k, v in vars(args).items()
-                   if k not in ("komut", "id") and v is not None}
+        alanlar = {
+            k: v
+            for k, v in vars(args).items()
+            if k not in ("komut", "id") and v is not None
+        }
         g = k.guncelle(args.id, **alanlar)
         if g:
             print(f"[Kanban] Guncellendi: #{g['id']} → {g['durum']}")
@@ -411,7 +470,11 @@ def _cli():
             print(f"  {simge} {durum:10s}: {sayi}")
 
     elif args.komut == "tahta":
-        print(k.gorsel_tahta().encode(sys.stdout.encoding or "utf-8", errors="replace").decode(sys.stdout.encoding or "utf-8", errors="replace"))
+        print(
+            k.gorsel_tahta()
+            .encode(sys.stdout.encoding or "utf-8", errors="replace")
+            .decode(sys.stdout.encoding or "utf-8", errors="replace")
+        )
 
     else:
         parser.print_help()
@@ -425,21 +488,26 @@ def motor_kaydet(motor):
     motor._plugin_arac_kaydet(
         "KANBAN_EKLE",
         lambda baslik="", govde="", oncelik="2": str(
-            _kb.ekle(baslik, govde, int(oncelik) if str(oncelik).isdigit() else 2).satir()
+            _kb.ekle(
+                baslik, govde, int(oncelik) if str(oncelik).isdigit() else 2
+            ).satir()
         ),
         "Kanban tahtasına görev ekle (baslik, govde, oncelik:1-3)",
     )
     motor._plugin_arac_kaydet(
         "KANBAN_LISTE",
         lambda durum="": (
-            "\n".join(g.satir() for g in _kb.listele(durum=durum)) or "[Kanban]: Görev yok"
+            "\n".join(g.satir() for g in _kb.listele(durum=durum))
+            or "[Kanban]: Görev yok"
         ),
         "Kanban görevlerini listele (durum: todo/running/done/boş=hepsi)",
     )
     motor._plugin_arac_kaydet(
         "KANBAN_GUNCELLE",
         lambda id="0", durum="done": (
-            str(_kb.guncelle(int(id), durum=durum).satir()) if str(id).isdigit() else "[Kanban]: Geçersiz id"
+            str(_kb.guncelle(int(id), durum=durum).satir())
+            if str(id).isdigit()
+            else "[Kanban]: Geçersiz id"
         ),
         "Kanban görevi güncelle (id, durum: todo/ready/running/done/blocked)",
     )

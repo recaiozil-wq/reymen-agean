@@ -63,21 +63,25 @@ def tum_skills_dosyalari() -> list[dict]:
             content = p.read_text(encoding="utf-8", errors="replace")
         except Exception:
             content = ""
-        dosyalar.append({
-            "ad": rel_path,
-            "aciklama": rel_path,
-            "icerik": content,
-            "kaynak": str(p),
-            "dosya_hash": dosya_hash(content),
-        })
+        dosyalar.append(
+            {
+                "ad": rel_path,
+                "aciklama": rel_path,
+                "icerik": content,
+                "kaynak": str(p),
+                "dosya_hash": dosya_hash(content),
+            }
+        )
     return dosyalar
 
 
 def existing_meta(con: sqlite3.Connection) -> dict[str, dict]:
     try:
         cur = con.execute("SELECT ad, dosya_hash, guncelleme FROM beceriler_meta")
-        return {r[0]: {"ad": r[0], "dosya_hash": r[1] or "", "guncelleme": r[2] or ""}
-                for r in cur.fetchall()}
+        return {
+            r[0]: {"ad": r[0], "dosya_hash": r[1] or "", "guncelleme": r[2] or ""}
+            for r in cur.fetchall()
+        }
     except Exception:
         return {}
 
@@ -182,8 +186,13 @@ def main() -> dict:
     )
     log_kaydet(yeni_say, guncel_say, hata_say, ozet)
 
-    logger.info("=== Tamamlandı: +%d yeni, ~%d güncel, %d hata (%.1fs) ===",
-                yeni_say, guncel_say, hata_say, sure)
+    logger.info(
+        "=== Tamamlandı: +%d yeni, ~%d güncel, %d hata (%.1fs) ===",
+        yeni_say,
+        guncel_say,
+        hata_say,
+        sure,
+    )
 
     return {
         "yeni": yeni_say,
@@ -196,5 +205,7 @@ def main() -> dict:
 
 if __name__ == "__main__":
     sonuc = main()
-    print(f"\n📊 RAPOR: {sonuc['yeni']} yeni + {sonuc['guncellenen']} güncellendi "
-          f"({sonuc['hata']} hata) — {sonuc['sure']}s")
+    print(
+        f"\n📊 RAPOR: {sonuc['yeni']} yeni + {sonuc['guncellenen']} güncellendi "
+        f"({sonuc['hata']} hata) — {sonuc['sure']}s"
+    )

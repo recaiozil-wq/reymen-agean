@@ -20,6 +20,7 @@ def _handle_paste_command(cli):
         return
 
     from reymen.reymen_cli.clipboard import has_clipboard_image
+
     if has_clipboard_image():
         if cli._try_attach_clipboard_image():
             n = len(cli._attached_images)

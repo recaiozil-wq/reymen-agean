@@ -20,8 +20,8 @@ from typing import Optional
 
 
 class CircuitBreakerState:
-    CLOSED = "closed"        # Normal calisma
-    OPEN = "open"            # Hata limiti asildi, bekleniyor
+    CLOSED = "closed"  # Normal calisma
+    OPEN = "open"  # Hata limiti asildi, bekleniyor
     HALF_OPEN = "half_open"  # Deneme suresi, sonraki basarili cagri kapatir
 
 

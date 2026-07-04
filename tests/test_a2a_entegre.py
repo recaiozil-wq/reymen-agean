@@ -1,4 +1,5 @@
 """Test: reymen/a2a.py ve a2a_integration.py entegre"""
+
 from __future__ import annotations
 import os, sys, threading
 from pathlib import Path
@@ -11,14 +12,17 @@ sys.path.insert(0, str(PROJE_KOK))
 class TestA2AEntegre:
     def test_a2a_import(self):
         import reymen.a2a as m
+
         assert m is not None
 
     def test_a2a_integration_import(self):
         import reymen.a2a_integration as m
+
         assert m is not None
 
     def test_mesaj_kuyrugu(self):
         from reymen.a2a import A2A
+
         a2a = A2A()
         a2a.mesaj_yolla("test_hedef", "test_icerik")
         mesajlar = a2a.mesajlari_al("test_hedef")
@@ -27,6 +31,7 @@ class TestA2AEntegre:
 
     def test_mesaj_sil(self):
         from reymen.a2a import A2A
+
         a2a = A2A()
         a2a.mesaj_yolla("test_hedef2", "silinecek")
         a2a.mesajlari_temizle("test_hedef2")
@@ -35,6 +40,7 @@ class TestA2AEntegre:
 
     def test_birden_fazla_mesaj(self):
         from reymen.a2a import A2A
+
         a2a = A2A()
         a2a.mesaj_yolla("h", "m1")
         a2a.mesaj_yolla("h", "m2")

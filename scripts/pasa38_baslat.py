@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """Pasa_38 bot baslatici - token'i dosyadan okuyarak, profile override olmadan."""
+
 import os, sys, subprocess
 from pathlib import Path
 

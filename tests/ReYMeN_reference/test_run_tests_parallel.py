@@ -150,9 +150,9 @@ def test_grandchild_leak_is_killed_by_runner(tmp_path: Path) -> None:
         timeout=60,
     )
 
-    assert handoff.exists(), (
-        f"probe never wrote handoff file; runner output:\n{proc.stdout}"
-    )
+    assert (
+        handoff.exists()
+    ), f"probe never wrote handoff file; runner output:\n{proc.stdout}"
     handoff_data = json.loads(handoff.read_text())
     grandchild_pid = handoff_data["pid"]
     diag = handoff_data.get("diag", "(no diag)")
@@ -161,9 +161,9 @@ def test_grandchild_leak_is_killed_by_runner(tmp_path: Path) -> None:
     handoff.unlink()
 
     # The runner must have exited cleanly (probe test passes).
-    assert proc.returncode == 0, (
-        f"runner exited {proc.returncode}; output:\n{proc.stdout}"
-    )
+    assert (
+        proc.returncode == 0
+    ), f"runner exited {proc.returncode}; output:\n{proc.stdout}"
 
     # The grandchild must be gone. Poll for a bit because process-group
     # SIGKILL + reaping isn't synchronous; on a loaded box it can take

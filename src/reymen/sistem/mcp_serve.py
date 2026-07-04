@@ -26,6 +26,7 @@ Sunulan araclar:
   - ReYMeN_skills_list()      — Kristal becerileri listele
   - ReYMeN_providers_list()   — Kullanilabilir LLM providerlari
 """
+
 import json
 import os
 import sys
@@ -53,7 +54,10 @@ TOOLS = [
         "inputSchema": {
             "type": "object",
             "properties": {
-                "hedef": {"type": "string", "description": "Ajanin gerceklestirecegi gorev"}
+                "hedef": {
+                    "type": "string",
+                    "description": "Ajanin gerceklestirecegi gorev",
+                }
             },
             "required": ["hedef"],
         },
@@ -68,9 +72,7 @@ TOOLS = [
         "description": "ReYMeN anlamsal hafizasinda arama yap.",
         "inputSchema": {
             "type": "object",
-            "properties": {
-                "sorgu": {"type": "string", "description": "Arama sorgusu"}
-            },
+            "properties": {"sorgu": {"type": "string", "description": "Arama sorgusu"}},
             "required": ["sorgu"],
         },
     },
@@ -80,7 +82,10 @@ TOOLS = [
         "inputSchema": {
             "type": "object",
             "properties": {
-                "dosya": {"type": "string", "description": "Dosya yolu (mutlak veya goreceli)"}
+                "dosya": {
+                    "type": "string",
+                    "description": "Dosya yolu (mutlak veya goreceli)",
+                }
             },
             "required": ["dosya"],
         },
@@ -102,9 +107,7 @@ TOOLS = [
         "description": "Proje dizininde kabuk komutu calistir.",
         "inputSchema": {
             "type": "object",
-            "properties": {
-                "komut": {"type": "string", "description": "Shell komutu"}
-            },
+            "properties": {"komut": {"type": "string", "description": "Shell komutu"}},
             "required": ["komut"],
         },
     },
@@ -122,6 +125,7 @@ TOOLS = [
 
 
 # ── Araç Uygulayicilari ──────────────────────────────────────────────
+
 
 def _arac_calistir(name: str, args: dict) -> str:
     try:
@@ -156,6 +160,7 @@ def _run_ajan(hedef: str) -> str:
     def _worker():
         try:
             from reymen.sistem.main import AIAgentOrchestrator, CONFIG
+
             agent = AIAgentOrchestrator(config=CONFIG, max_tur=15)
             sonuc = agent.run_conversation(hedef)
             with _durum_kilit:
@@ -174,16 +179,23 @@ def _run_ajan(hedef: str) -> str:
 def _get_durum() -> str:
     with _durum_kilit:
         d = dict(_durum)
-    return json.dumps({
-        "calisiyor": d["calisiyor"],
-        "son_hedef": d["son_hedef"],
-        "son_sonuc": d["son_sonuc"],
-    }, ensure_ascii=False)
+    return json.dumps(
+        {
+            "calisiyor": d["calisiyor"],
+            "son_hedef": d["son_hedef"],
+            "son_sonuc": d["son_sonuc"],
+        },
+        ensure_ascii=False,
+    )
 
 
 def _hafiza_ara(sorgu: str) -> str:
     try:
-        from reymen.hafiza.vektorel_hafiza import vektorel_hafiza_sistemini_kur, anlamsal_hafiza_ara
+        from reymen.hafiza.vektorel_hafiza import (
+            vektorel_hafiza_sistemini_kur,
+            anlamsal_hafiza_ara,
+        )
+
         hafiza = vektorel_hafiza_sistemini_kur()
         return anlamsal_hafiza_ara(hafiza, sorgu)
     except Exception as e:
@@ -208,13 +220,18 @@ def _shell_calistir(komut: str) -> str:
     """MCP uzerinden calistirilan shell komutu. shlex.split ile güvenli."""
     import subprocess
     import shlex
+
     try:
         args_list = shlex.split(komut, posix=(sys.platform != "win32"))
         if not args_list:
             return "Geçersiz komut"
         r = subprocess.run(  # nosec B603
-            args_list, shell=False, capture_output=True, text=True,
-            cwd=str(ROOT), timeout=60
+            args_list,
+            shell=False,
+            capture_output=True,
+            text=True,
+            cwd=str(ROOT),
+            timeout=60,
         )
         return (r.stdout + r.stderr)[:4000]
     except subprocess.TimeoutExpired:
@@ -236,25 +253,33 @@ def _beceri_listele() -> str:
 def _provider_listele() -> str:
     try:
         from providers import list_providers, mevcut_providerlar
-        return json.dumps({
-            "tum": list_providers(),
-            "mevcut": mevcut_providerlar(),
-        }, ensure_ascii=False)
+
+        return json.dumps(
+            {
+                "tum": list_providers(),
+                "mevcut": mevcut_providerlar(),
+            },
+            ensure_ascii=False,
+        )
     except Exception:
         return '{"tum":[],"mevcut":[]}'
 
 
 # ── JSON-RPC Isleyici ────────────────────────────────────────────────
 
+
 def _yanit(req_id, sonuc):
     return json.dumps({"jsonrpc": "2.0", "id": req_id, "result": sonuc})
 
 
 def _hata_yaniti(req_id, code, mesaj):
-    return json.dumps({
-        "jsonrpc": "2.0", "id": req_id,
-        "error": {"code": code, "message": mesaj},
-    })
+    return json.dumps(
+        {
+            "jsonrpc": "2.0",
+            "id": req_id,
+            "error": {"code": code, "message": mesaj},
+        }
+    )
 
 
 def _istek_isle(istek: dict) -> str:
@@ -263,11 +288,14 @@ def _istek_isle(istek: dict) -> str:
     params = istek.get("params", {})
 
     if method == "initialize":
-        return _yanit(req_id, {
-            "protocolVersion": PROTOCOL_VERSION,
-            "serverInfo": SERVER_INFO,
-            "capabilities": {"tools": {}},
-        })
+        return _yanit(
+            req_id,
+            {
+                "protocolVersion": PROTOCOL_VERSION,
+                "serverInfo": SERVER_INFO,
+                "capabilities": {"tools": {}},
+            },
+        )
 
     if method == "tools/list":
         return _yanit(req_id, {"tools": TOOLS})
@@ -276,9 +304,7 @@ def _istek_isle(istek: dict) -> str:
         name = params.get("name", "")
         args = params.get("arguments", {})
         sonuc = _arac_calistir(name, args)
-        return _yanit(req_id, {
-            "content": [{"type": "text", "text": sonuc}]
-        })
+        return _yanit(req_id, {"content": [{"type": "text", "text": sonuc}]})
 
     if method == "ping":
         return _yanit(req_id, {})
@@ -291,6 +317,7 @@ def _istek_isle(istek: dict) -> str:
 
 
 # ── Stdio Dongusu ────────────────────────────────────────────────────
+
 
 def stdio_dongu():
     """MCP stdio protokolu: her satir bir JSON-RPC istegi."""

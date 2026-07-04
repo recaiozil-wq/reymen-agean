@@ -32,7 +32,9 @@ logger = logging.getLogger(__name__)
 # Handler delegates — extracted to handlers/config/
 from .handlers.config.profile import _handle_profile_command as _delegate_profile
 from .handlers.config.gquota import _handle_gquota_command as _delegate_gquota
-from .handlers.config.personality import _handle_personality_command as _delegate_personality
+from .handlers.config.personality import (
+    _handle_personality_command as _delegate_personality,
+)
 from .handlers.config.skin import _handle_skin_command as _delegate_skin
 from .handlers.config.footer import _handle_footer_command as _delegate_footer
 from .handlers.config.reasoning import _handle_reasoning_command as _delegate_reasoning
@@ -47,10 +49,19 @@ class MixinCommands:
         """Display active profile name and home directory."""
         return _delegate_profile(self)
 
-    def _open_model_picker(self, providers: list, current_model: str, current_provider: str, user_provs=None, custom_provs=None) -> None:
+    def _open_model_picker(
+        self,
+        providers: list,
+        current_model: str,
+        current_provider: str,
+        user_provs=None,
+        custom_provs=None,
+    ) -> None:
         """Open prompt_toolkit-native /model picker modal."""
         self._capture_modal_input_snapshot()
-        default_idx = next((i for i, p in enumerate(providers) if p.get("is_current")), 0)
+        default_idx = next(
+            (i for i, p in enumerate(providers) if p.get("is_current")), 0
+        )
         self._model_picker_state = {
             "stage": "provider",
             "providers": providers,
@@ -125,7 +136,9 @@ class MixinCommands:
                     api_mode=result.api_mode,
                 )
             except Exception as exc:
-                _cprint(f"  ⚠ Agent swap failed ({exc}); change applied to next session.")
+                _cprint(
+                    f"  ⚠ Agent swap failed ({exc}); change applied to next session."
+                )
 
         self._pending_model_switch_note = (
             f"[Note: model was just switched from {old_model} to {result.new_model} "
@@ -143,13 +156,18 @@ class MixinCommands:
         mi = result.model_info
         try:
             from reymen.reymen_cli.model_switch import resolve_display_context_length
+
             ctx = resolve_display_context_length(
                 result.new_model,
                 result.target_provider,
                 base_url=result.base_url or self.base_url or "",
                 api_key=result.api_key or self.api_key or "",
                 model_info=mi,
-                config_context_length=getattr(self.agent, "_config_context_length", None) if self.agent else None,
+                config_context_length=getattr(
+                    self.agent, "_config_context_length", None
+                )
+                if self.agent
+                else None,
             )
             if ctx:
                 _cprint(f"    Context: {ctx:,} tokens")
@@ -163,9 +181,9 @@ class MixinCommands:
             _cprint(f"    Capabilities: {mi.format_capabilities()}")
 
         cache_enabled = (
-            (base_url_host_matches(result.base_url or "", "openrouter.ai") and "claude" in result.new_model.lower())
-            or result.api_mode == "anthropic_messages"
-        )
+            base_url_host_matches(result.base_url or "", "openrouter.ai")
+            and "claude" in result.new_model.lower()
+        ) or result.api_mode == "anthropic_messages"
         if cache_enabled:
             _cprint("    Prompt caching: enabled")
         if result.warning_message:
@@ -198,6 +216,7 @@ class MixinCommands:
             if not model_list:
                 try:
                     from reymen.reymen_cli.models import provider_model_ids
+
                     live = provider_model_ids(provider_data["slug"])
                     if live:
                         model_list = live
@@ -216,7 +235,14 @@ class MixinCommands:
             cancel_idx = len(model_list) + 1
             if selected == back_idx:
                 state["stage"] = "provider"
-                state["selected"] = next((i for i, p in enumerate(state.get("providers") or []) if p.get("slug") == provider_data.get("slug")), 0)
+                state["selected"] = next(
+                    (
+                        i
+                        for i, p in enumerate(state.get("providers") or [])
+                        if p.get("slug") == provider_data.get("slug")
+                    ),
+                    0,
+                )
                 self._invalidate(min_interval=0.0)
                 return
             if selected >= cancel_idx:
@@ -224,6 +250,7 @@ class MixinCommands:
                 return
             if selected < len(model_list):
                 from reymen.reymen_cli.model_switch import switch_model
+
                 chosen_model = model_list[selected]
                 result = switch_model(
                     raw_input=chosen_model,
@@ -259,7 +286,9 @@ class MixinCommands:
         raw_args = parts[1].strip() if len(parts) > 1 else ""
 
         # Parse --provider, --global, and --refresh flags
-        model_input, explicit_provider, persist_global, force_refresh = parse_model_flags(raw_args)
+        model_input, explicit_provider, persist_global, force_refresh = (
+            parse_model_flags(raw_args)
+        )
 
         # --refresh: wipe the on-disk picker cache before building the
         # provider list. Forces a live re-fetch of every authed provider's
@@ -267,6 +296,7 @@ class MixinCommands:
         if force_refresh:
             try:
                 from reymen.reymen_cli.models import clear_provider_models_cache
+
                 clear_provider_models_cache()
                 _cprint("  Cleared model picker cache. Refreshing...")
             except Exception:
@@ -276,7 +306,10 @@ class MixinCommands:
         # dashboard / TUI used to duplicate. Overlay live session state
         # via with_overrides (truthy-only) so empty self.* attrs don't
         # clobber disk config.
-        from reymen.reymen_cli.inventory import build_models_payload, load_picker_context
+        from reymen.reymen_cli.inventory import (
+            build_models_payload,
+            load_picker_context,
+        )
 
         try:
             ctx = load_picker_context().with_overrides(
@@ -309,7 +342,9 @@ class MixinCommands:
                 _cprint("")
                 _cprint("  /model <name>                        switch model")
                 _cprint("  /model --provider <slug>             switch provider")
-                _cprint("  /model --refresh                     re-fetch live model lists")
+                _cprint(
+                    "  /model --refresh                     re-fetch live model lists"
+                )
                 return
 
             self._open_model_picker(
@@ -368,7 +403,9 @@ class MixinCommands:
                     api_mode=result.api_mode,
                 )
             except Exception as exc:
-                _cprint(f"  ⚠ Agent swap failed ({exc}); change applied to next session.")
+                _cprint(
+                    f"  ⚠ Agent swap failed ({exc}); change applied to next session."
+                )
 
         # Store a note to prepend to the next user message so the model
         # knows a switch occurred (avoids injecting system messages mid-history
@@ -389,13 +426,16 @@ class MixinCommands:
         # (e.g. gpt-5.5 is 1.05M on openai but 272K on Codex OAuth).
         mi = result.model_info
         from reymen.reymen_cli.model_switch import resolve_display_context_length
+
         ctx = resolve_display_context_length(
             result.new_model,
             result.target_provider,
             base_url=result.base_url or self.base_url or "",
             api_key=result.api_key or self.api_key or "",
             model_info=mi,
-            config_context_length=getattr(self.agent, "_config_context_length", None) if self.agent else None,
+            config_context_length=getattr(self.agent, "_config_context_length", None)
+            if self.agent
+            else None,
         )
         if ctx:
             _cprint(f"    Context: {ctx:,} tokens")
@@ -408,9 +448,9 @@ class MixinCommands:
 
         # Cache notice
         cache_enabled = (
-            (base_url_host_matches(result.base_url or "", "openrouter.ai") and "claude" in result.new_model.lower())
-            or result.api_mode == "anthropic_messages"
-        )
+            base_url_host_matches(result.base_url or "", "openrouter.ai")
+            and "claude" in result.new_model.lower()
+        ) or result.api_mode == "anthropic_messages"
         if cache_enabled:
             _cprint("    Prompt caching: enabled")
 
@@ -427,19 +467,24 @@ class MixinCommands:
         else:
             _cprint("    (session only — add --global to persist)")
 
-    def _should_handle_model_command_inline(self, text: str, has_images: bool = False) -> bool:
+    def _should_handle_model_command_inline(
+        self, text: str, has_images: bool = False
+    ) -> bool:
         """Return True when /model should be handled immediately on the UI thread."""
         if not text or has_images or not _looks_like_slash_command(text):
             return False
         try:
             from reymen.reymen_cli.commands import resolve_command
-            base = text.split(None, 1)[0].lower().lstrip('/')
+
+            base = text.split(None, 1)[0].lower().lstrip("/")
             cmd = resolve_command(base)
             return bool(cmd and cmd.name == "model")
         except Exception:
             return False
 
-    def _should_handle_steer_command_inline(self, text: str, has_images: bool = False) -> bool:
+    def _should_handle_steer_command_inline(
+        self, text: str, has_images: bool = False
+    ) -> bool:
         """Return True when /steer should be dispatched immediately while the agent is running.
 
         /steer MUST bypass the normal _pending_input → process_loop path when
@@ -457,7 +502,8 @@ class MixinCommands:
             return False
         try:
             from reymen.reymen_cli.commands import resolve_command
-            base = text.split(None, 1)[0].lower().lstrip('/')
+
+            base = text.split(None, 1)[0].lower().lstrip("/")
             cmd = resolve_command(base)
             return bool(cmd and cmd.name == "steer")
         except Exception:
@@ -468,9 +514,9 @@ class MixinCommands:
         if isinstance(value, dict):
             parts = [value.get("system_prompt", "")]
             if value.get("tone"):
-                parts.append(f'Tone: {value["tone"]}' )
+                parts.append(f'Tone: {value["tone"]}')
             if value.get("style"):
-                parts.append(f'Style: {value["style"]}' )
+                parts.append(f'Style: {value["style"]}')
             return "\n".join(p for p in parts if p)
         return str(value)
 
@@ -521,6 +567,7 @@ class MixinCommands:
         # writes directly to stdout which patch_stdout's StdoutProxy mangles
         # into garbled sequences like '?[33mTool progress: NEW?[0m' (#2262).
         from reymen.reymen_cli.colors import Colors as _Colors
+
         labels = {
             "off": f"{_Colors.DIM}Tool progress: OFF{_Colors.RESET} — silent mode, just the final response.",
             "new": f"{_Colors.YELLOW}Tool progress: NEW{_Colors.RESET} — show each new tool (skip repeats).",
@@ -575,7 +622,9 @@ class MixinCommands:
           the automatic token-budget heuristic.
         """
         if not self.conversation_history or len(self.conversation_history) < 4:
-            print("(._.) Not enough conversation to compress (need at least 4 messages).")
+            print(
+                "(._.) Not enough conversation to compress (need at least 4 messages)."
+            )
             return
 
         if not self.agent:
@@ -606,7 +655,10 @@ class MixinCommands:
         with self._busy_command("Compressing context..."):
             try:
                 from agent.model_metadata import estimate_request_tokens_rough
-                from agent.manual_compression_feedback import summarize_manual_compression
+                from agent.manual_compression_feedback import (
+                    summarize_manual_compression,
+                )
+
                 original_history = list(self.conversation_history)
 
                 # Boundary-aware split: only the head is summarized; the
@@ -636,14 +688,20 @@ class MixinCommands:
                     tools=_tools,
                 )
                 if partial:
-                    print(f"🗜️  Summarizing up to here: compressing {len(head)} of "
-                          f"{original_count} messages (~{approx_tokens:,} tokens), "
-                          f"keeping last {keep_last} exchange(s) verbatim...")
+                    print(
+                        f"🗜️  Summarizing up to here: compressing {len(head)} of "
+                        f"{original_count} messages (~{approx_tokens:,} tokens), "
+                        f"keeping last {keep_last} exchange(s) verbatim..."
+                    )
                 elif focus_topic:
-                    print(f"🗜️  Compressing {original_count} messages (~{approx_tokens:,} tokens), "
-                          f"focus: \"{focus_topic}\"...")
+                    print(
+                        f"🗜️  Compressing {original_count} messages (~{approx_tokens:,} tokens), "
+                        f'focus: "{focus_topic}"...'
+                    )
                 else:
-                    print(f"🗜️  Compressing {original_count} messages (~{approx_tokens:,} tokens)...")
+                    print(
+                        f"🗜️  Compressing {original_count} messages (~{approx_tokens:,} tokens)..."
+                    )
 
                 # Pass None as system_message so _compress_context rebuilds
                 # the system prompt from scratch via _build_system_prompt(None).
@@ -683,7 +741,9 @@ class MixinCommands:
                     # Manual /compress replaces conversation_history with a new
                     # compressed handoff for the child session. Persist it from
                     # offset 0 so resume can recover the continuation after exit.
-                    self.agent._flush_messages_to_session_db(self.conversation_history, None)
+                    self.agent._flush_messages_to_session_db(
+                        self.conversation_history, None
+                    )
                 new_tokens = estimate_request_tokens_rough(
                     self.conversation_history,
                     system_prompt=_sys_prompt,
@@ -722,6 +782,7 @@ class MixinCommands:
         self._last_config_check = now
 
         from reymen.reymen_cli.config import get_config_path as _get_config_path
+
         cfg_path = _get_config_path()
         if not cfg_path.exists():
             return
@@ -752,13 +813,13 @@ class MixinCommands:
         # indefinitely (which would freeze the entire TUI).
         print()
         print("🔄 MCP server config changed — reloading connections...")
-        _reload_thread = threading.Thread(
-            target=self._reload_mcp, daemon=True
-        )
+        _reload_thread = threading.Thread(target=self._reload_mcp, daemon=True)
         _reload_thread.start()
         _reload_thread.join(timeout=30)
         if _reload_thread.is_alive():
-            print("  ⚠️  MCP reload timed out (30s). Some servers may not have reconnected.")
+            print(
+                "  ⚠️  MCP reload timed out (30s). Some servers may not have reconnected."
+            )
 
     def _confirm_and_reload_mcp(self, cmd_original: str = "") -> None:
         """Interactive /reload-mcp — confirm with the user, then reload.
@@ -792,7 +853,11 @@ class MixinCommands:
         # modal as destructive slash confirmations so choices stay visible.
         choices = [
             ("once", "Approve Once", "reload now"),
-            ("always", "Always Approve", "reload now and silence this prompt permanently"),
+            (
+                "always",
+                "Always Approve",
+                "reload now and silence this prompt permanently",
+            ),
             ("cancel", "Cancel", "leave MCP tools unchanged"),
         ]
         raw = self._prompt_text_input_modal(
@@ -820,7 +885,9 @@ class MixinCommands:
         if choice == "always":
             if save_config_value("approvals.mcp_reload_confirm", False):
                 print("🔒 Future /reload-mcp calls will run without confirmation.")
-                print("   Re-enable via `approvals.mcp_reload_confirm: true` in config.yaml.")
+                print(
+                    "   Re-enable via `approvals.mcp_reload_confirm: true` in config.yaml."
+                )
             else:
                 print("⚠️  Couldn't persist opt-out — reloading once.")
 
@@ -834,7 +901,12 @@ class MixinCommands:
         sees the updated tools on the next turn.
         """
         try:
-            from tools.mcp_tool import shutdown_mcp_servers, discover_mcp_tools, _servers, _lock
+            from tools.mcp_tool import (
+                shutdown_mcp_servers,
+                discover_mcp_tools,
+                _servers,
+                _lock,
+            )
 
             # Capture old server names
             with _lock:
@@ -866,18 +938,23 @@ class MixinCommands:
             if not connected_servers:
                 print("  No MCP servers connected.")
             else:
-                print(f"  🔧 {len(new_tools)} tool(s) available from {len(connected_servers)} server(s)")
+                print(
+                    f"  🔧 {len(new_tools)} tool(s) available from {len(connected_servers)} server(s)"
+                )
 
             # Refresh the agent's tool list so the model can call new tools
             if self.agent is not None:
                 self.agent.tools = get_tool_definitions(
                     enabled_toolsets=self.agent.enabled_toolsets
-                    if hasattr(self.agent, "enabled_toolsets") else None,
+                    if hasattr(self.agent, "enabled_toolsets")
+                    else None,
                     quiet_mode=True,
                 )
-                self.agent.valid_tool_names = {
-                    tool["function"]["name"] for tool in self.agent.tools
-                } if self.agent.tools else set()
+                self.agent.valid_tool_names = (
+                    {tool["function"]["name"] for tool in self.agent.tools}
+                    if self.agent.tools
+                    else set()
+                )
 
             # Inject a message at the END of conversation history so the
             # model knows tools changed.  Appended after all existing
@@ -888,13 +965,21 @@ class MixinCommands:
             if removed:
                 change_parts.append(f"Removed servers: {', '.join(sorted(removed))}")
             if reconnected:
-                change_parts.append(f"Reconnected servers: {', '.join(sorted(reconnected))}")
-            tool_summary = f"{len(new_tools)} MCP tool(s) now available" if new_tools else "No MCP tools available"
+                change_parts.append(
+                    f"Reconnected servers: {', '.join(sorted(reconnected))}"
+                )
+            tool_summary = (
+                f"{len(new_tools)} MCP tool(s) now available"
+                if new_tools
+                else "No MCP tools available"
+            )
             change_detail = ". ".join(change_parts) + ". " if change_parts else ""
-            self.conversation_history.append({
-                "role": "user",
-                "content": f"[IMPORTANT: MCP servers have been reloaded. {change_detail}{tool_summary}. The tool list for this conversation has been updated accordingly.]",
-            })
+            self.conversation_history.append(
+                {
+                    "role": "user",
+                    "content": f"[IMPORTANT: MCP servers have been reloaded. {change_detail}{tool_summary}. The tool list for this conversation has been updated accordingly.]",
+                }
+            )
 
             # Persist session immediately so the session log reflects the
             # updated tools list (self.agent.tools was refreshed above).
@@ -909,7 +994,9 @@ class MixinCommands:
                         "[SessizExcept] %%s: %%s", type(_e).__name__, _e
                     )  # Best-effort
 
-            print(f"  ✅ Agent updated — {len(self.agent.tools if self.agent else [])} tool(s) available")
+            print(
+                f"  ✅ Agent updated — {len(self.agent.tools if self.agent else [])} tool(s) available"
+            )
 
         except Exception as e:
             print(f"  ❌ MCP reload failed: {e}")
@@ -940,7 +1027,7 @@ class MixinCommands:
             # updated dict without needing to restart the session.
             global _skill_commands
             _skill_commands = get_skill_commands()
-            added = result.get("added", [])      # [{"name", "description"}, ...]
+            added = result.get("added", [])  # [{"name", "description"}, ...]
             removed = result.get("removed", [])  # [{"name", "description"}, ...]
             total = result.get("total", 0)
 
@@ -991,4 +1078,3 @@ class MixinCommands:
 
         except Exception as e:
             print(f"  ❌ Skills reload failed: {e}")
-

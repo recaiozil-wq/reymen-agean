@@ -62,6 +62,7 @@ class TestRegisterTTSProvider:
         from ReYMeN_cli.plugins import PluginManager
 
         from agent import tts_registry
+
         tts_registry._reset_for_tests()
 
         ReYMeN_home = Path(os.environ["ReYMeN_HOME"])
@@ -83,9 +84,9 @@ class TestRegisterTTSProvider:
         mgr = PluginManager()
         mgr.discover_and_load()
 
-        assert mgr._plugins["my-tts-plugin"].enabled is True, (
-            f"Plugin failed to load: {mgr._plugins['my-tts-plugin'].error}"
-        )
+        assert (
+            mgr._plugins["my-tts-plugin"].enabled is True
+        ), f"Plugin failed to load: {mgr._plugins['my-tts-plugin'].error}"
         assert tts_registry.get_provider("fake-tts") is not None
 
         tts_registry._reset_for_tests()
@@ -95,6 +96,7 @@ class TestRegisterTTSProvider:
         from ReYMeN_cli.plugins import PluginManager
 
         from agent import tts_registry
+
         tts_registry._reset_for_tests()
 
         ReYMeN_home = Path(os.environ["ReYMeN_HOME"])
@@ -125,6 +127,7 @@ class TestRegisterTTSProvider:
         from ReYMeN_cli.plugins import PluginManager
 
         from agent import tts_registry
+
         tts_registry._reset_for_tests()
 
         ReYMeN_home = Path(os.environ["ReYMeN_HOME"])

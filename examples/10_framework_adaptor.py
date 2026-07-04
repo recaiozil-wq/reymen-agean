@@ -51,7 +51,10 @@ try:
                 {"rol": "Yazar", "gorev": "Rapor yaz", "model": "gpt-4"},
             ],
             tasks=[
-                {"aciklama": "Kullanici girdisini analiz et", "beklenen_cikti": "Analiz sonucu"},
+                {
+                    "aciklama": "Kullanici girdisini analiz et",
+                    "beklenen_cikti": "Analiz sonucu",
+                },
             ],
             isim="ReYMeN Ekibi",
         )

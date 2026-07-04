@@ -32,12 +32,16 @@ TEST_HEDEF = "test hedef mesaji"
 # ====================================================================
 import pytest
 
+
 @pytest.fixture(autouse=True)
 def _hafiza_mock():
     """Her testten önce OnceHafiza'yı mock'la (DB bağımlılığını kaldır)."""
-    with patch("reymen.cereyan.conversation_loop._hafizada_ara",
-               return_value={"guven": 0.0, "yanit": ""}):
+    with patch(
+        "reymen.cereyan.conversation_loop._hafizada_ara",
+        return_value={"guven": 0.0, "yanit": ""},
+    ):
         yield
+
 
 # ====================================================================
 # YARDIMCI: budget mock factory
@@ -45,7 +49,7 @@ def _hafiza_mock():
 def _mock_budget(devam=True, tur_sayisi=0):
     """Standart budget mock'u olustur"""
     _bitti = [not devam]  # mutable closure
-    
+
     class _MockBudget:
         def __init__(self):
             self.tur = tur_sayisi
@@ -54,25 +58,25 @@ def _mock_budget(devam=True, tur_sayisi=0):
             self._kalan_butce = 25
             self.kalan_eylem = 20
             self.kaldi = 25
-        
+
         def devam_etmeli_mi(self):
             return not _bitti[0]
-        
+
         def gorev_tamamla(self):
             _bitti[0] = True
-        
+
         def tur_basla(self):
             self.tur += 1
-        
+
         def tur_bitir(self, basarili=True, **kw):
             pass
-        
+
         def eylem_kaydet(self, _):
             pass
-        
+
         def ozet_dict(self):
             return {"tur": self.tur, "max_tur": self.max_tur}
-    
+
     return _MockBudget()
 
 
@@ -99,18 +103,25 @@ def test_adim2_session_baslatma():
     """ADIM 2: SessionStorage.session_baslat() cagrilmali"""
     with patch("reymen.cereyan.conversation_loop._SESSION_AKTIF", True):
         with patch("reymen.cereyan.conversation_loop._HOOK_AKTIF", False):
-            with patch("reymen.cereyan.conversation_loop._SessionStorage") as mock_storage:
+            with patch(
+                "reymen.cereyan.conversation_loop._SessionStorage"
+            ) as mock_storage:
                 mock_instance = MagicMock()
                 session_id = "test-session-42"
                 mock_instance.session_baslat.return_value = session_id
                 mock_storage.return_value = mock_instance
 
                 from reymen.cereyan.conversation_loop import ConversationLoop
-                loop = ConversationLoop(motor=MagicMock(), beyin=MagicMock(provider="deepseek"))
+
+                loop = ConversationLoop(
+                    motor=MagicMock(), beyin=MagicMock(provider="deepseek")
+                )
                 loop._budget_olustur = MagicMock(return_value=_mock_budget(devam=False))
 
                 sonuc = loop.run_conversation(hedef=TEST_HEDEF)
-                assert mock_instance.session_baslat.called, "session_baslat() cagrilmadi"
+                assert (
+                    mock_instance.session_baslat.called
+                ), "session_baslat() cagrilmadi"
                 assert sonuc.get("session_id") == session_id, f"session_id eslesmiyor"
                 print(f"  ✅ Session baslatildi: {session_id}")
 
@@ -125,9 +136,9 @@ def test_adim3_hafiza_atlama():
     loop = ConversationLoop(motor=MagicMock(), beyin=MagicMock())
     loop._budget_olustur = MagicMock(return_value=_mock_budget(devam=True))
     loop._sistem_promptu_olustur = MagicMock(return_value="test prompt")
-    loop._direct_api_call = MagicMock(return_value={
-        "role": "assistant", "content": "API yaniti", "tool_calls": []
-    })
+    loop._direct_api_call = MagicMock(
+        return_value={"role": "assistant", "content": "API yaniti", "tool_calls": []}
+    )
     loop._tool_calls_al = MagicMock(return_value=[])
     loop._yanit_icerigi_al = MagicMock(return_value="API yaniti")
 
@@ -148,11 +159,17 @@ def test_adim4_belirsiz_gorev_oneri():
     loop = ConversationLoop(motor=MagicMock(), beyin=MagicMock())
     loop._budget_olustur = MagicMock(return_value=_mock_budget(devam=True))
     loop._sistem_promptu_olustur = MagicMock(return_value="test prompt")
-    loop._direct_api_call = MagicMock(return_value={
-        "role": "assistant", "content": "Ne demek istediginizi anlamadim, aciklar misiniz?", "tool_calls": []
-    })
+    loop._direct_api_call = MagicMock(
+        return_value={
+            "role": "assistant",
+            "content": "Ne demek istediginizi anlamadim, aciklar misiniz?",
+            "tool_calls": [],
+        }
+    )
     loop._tool_calls_al = MagicMock(return_value=[])
-    loop._yanit_icerigi_al = MagicMock(return_value="Ne demek istediginizi anlamadim, aciklar misiniz?")
+    loop._yanit_icerigi_al = MagicMock(
+        return_value="Ne demek istediginizi anlamadim, aciklar misiniz?"
+    )
 
     sonuc = loop.run_conversation(hedef="belirsiz")
     # ReYMeN-style: model direkt yanit verir, oneri_uret katmani yok
@@ -171,9 +188,9 @@ def test_adim5_konusma_gecmisi():
     loop = ConversationLoop(motor=MagicMock(), beyin=MagicMock())
     loop._budget_olustur = MagicMock(return_value=_mock_budget(devam=True))
     loop._sistem_promptu_olustur = MagicMock(return_value="test prompt")
-    loop._direct_api_call = MagicMock(return_value={
-        "role": "assistant", "content": "cevap", "tool_calls": []
-    })
+    loop._direct_api_call = MagicMock(
+        return_value={"role": "assistant", "content": "cevap", "tool_calls": []}
+    )
     loop._tool_calls_al = MagicMock(return_value=[])
     loop._yanit_icerigi_al = MagicMock(return_value="cevap")
 
@@ -199,11 +216,17 @@ def test_adim6_cache_kontrol():
     loop = ConversationLoop(motor=MagicMock(), beyin=MagicMock())
     loop._budget_olustur = MagicMock(return_value=_mock_budget(devam=True))
     loop._sistem_promptu_olustur = MagicMock(return_value="test prompt")
-    loop._direct_api_call = MagicMock(return_value={
-        "role": "assistant", "content": "Merhaba! Size nasil yardimci olabilirim?", "tool_calls": []
-    })
+    loop._direct_api_call = MagicMock(
+        return_value={
+            "role": "assistant",
+            "content": "Merhaba! Size nasil yardimci olabilirim?",
+            "tool_calls": [],
+        }
+    )
     loop._tool_calls_al = MagicMock(return_value=[])
-    loop._yanit_icerigi_al = MagicMock(return_value="Merhaba! Size nasil yardimci olabilirim?")
+    loop._yanit_icerigi_al = MagicMock(
+        return_value="Merhaba! Size nasil yardimci olabilirim?"
+    )
 
     sonuc = loop.run_conversation(hedef="selam")
     # ReYMeN-style: cache katmani yok, direkt API'ye gider
@@ -233,6 +256,7 @@ def test_adim7_sistem_prompt():
 def test_adim8_context_preflight():
     """ADIM 8: context doluluk kontrolu calismali"""
     from reymen.cereyan.conversation_loop import ConversationLoop
+
     loop = ConversationLoop(motor=MagicMock(), beyin=MagicMock())
 
     # Dusuk doluluk - sikistirma yapilmamali
@@ -256,7 +280,9 @@ def test_adim9_ephemeral_layer():
     budget = MagicMock()
     budget.tur = 5
     budget.max_tur = 30
-    budget.kaldi = 25  # _ephemeral_layerlar_ekle getattr(budget, 'kaldi', None) ile okur
+    budget.kaldi = (
+        25  # _ephemeral_layerlar_ekle getattr(budget, 'kaldi', None) ile okur
+    )
     budget.kalan_butce = 25
     budget._kalan_butce = 25
     budget.kalan_eylem = 20
@@ -277,9 +303,9 @@ def test_adim10_api_call():
     loop = ConversationLoop(motor=MagicMock(), beyin=MagicMock())
     loop._budget_olustur = MagicMock(return_value=_mock_budget(devam=True))
     loop._sistem_promptu_olustur = MagicMock(return_value="test prompt")
-    loop._direct_api_call = MagicMock(return_value={
-        "role": "assistant", "content": "test yanit", "tool_calls": []
-    })
+    loop._direct_api_call = MagicMock(
+        return_value={"role": "assistant", "content": "test yanit", "tool_calls": []}
+    )
     loop._tool_calls_al = MagicMock(return_value=[])
     loop._yanit_icerigi_al = MagicMock(return_value="test yanit")
 
@@ -299,25 +325,31 @@ def test_adim11_tool_loop():
     loop = ConversationLoop(motor=MagicMock(), beyin=MagicMock())
 
     # _tool_calls_al'in tool dondurmesini sagla
-    loop._tool_calls_al = MagicMock(return_value=[{
-        "id": "call_123",
-        "type": "function",
-        "function": {
-            "name": "test_tool",
-            "arguments": json.dumps({"param": "test"}),
-        }
-    }])
+    loop._tool_calls_al = MagicMock(
+        return_value=[
+            {
+                "id": "call_123",
+                "type": "function",
+                "function": {
+                    "name": "test_tool",
+                    "arguments": json.dumps({"param": "test"}),
+                },
+            }
+        ]
+    )
 
-    loop._budget_olustur = MagicMock(return_value=_mock_budget(devam=True, tur_sayisi=1))
+    loop._budget_olustur = MagicMock(
+        return_value=_mock_budget(devam=True, tur_sayisi=1)
+    )
     loop._sistem_promptu_olustur = MagicMock(return_value="test prompt")
     loop._api_mesajlari_olustur = MagicMock(return_value=[])
     loop._ephemeral_layerlar_ekle = MagicMock(return_value=[])
     loop._context_preflight = MagicMock(return_value=[])
     loop._api_call_with_retry = MagicMock(return_value={})  # dummy
     loop._yanit_icerigi_al = MagicMock(return_value="Arac cagiriyorum")
-    loop._arac_calistir = MagicMock(return_value={
-        "basarili": True, "tamamlandi": True, "cikti": "tool sonucu"
-    })
+    loop._arac_calistir = MagicMock(
+        return_value={"basarili": True, "tamamlandi": True, "cikti": "tool sonucu"}
+    )
 
     sonuc = loop.run_conversation(hedef=TEST_HEDEF)
     assert loop._arac_calistir.called, "_arac_calistir cagrilmadi"
@@ -338,9 +370,18 @@ def test_adim12_text_yanit():
     loop._api_mesajlari_olustur = MagicMock(return_value=[])
     loop._ephemeral_layerlar_ekle = MagicMock(return_value=[])
     loop._context_preflight = MagicMock(return_value=[])
-    loop._api_call_with_retry = MagicMock(return_value={
-        "choices": [{"message": {"content": "Merhaba! Bunu yapabilirim.", "role": "assistant"}}]
-    })
+    loop._api_call_with_retry = MagicMock(
+        return_value={
+            "choices": [
+                {
+                    "message": {
+                        "content": "Merhaba! Bunu yapabilirim.",
+                        "role": "assistant",
+                    }
+                }
+            ]
+        }
+    )
     loop._tool_calls_al = MagicMock(return_value=[])
     loop._yanit_icerigi_al = MagicMock(return_value="Merhaba! Bunu yapabilirim.")
 
@@ -355,7 +396,10 @@ def test_adim12_text_yanit():
 # ====================================================================
 def test_adim13_circuit_breaker():
     """ADIM 13: 3 arka arkaya hata → circuit breaker aktif"""
-    from reymen.cereyan.conversation_loop import ConversationLoop, CIRCUIT_BREAKER_MAX_HATA
+    from reymen.cereyan.conversation_loop import (
+        ConversationLoop,
+        CIRCUIT_BREAKER_MAX_HATA,
+    )
 
     loop = ConversationLoop(motor=MagicMock(), beyin=MagicMock())
     # CB acik: 3 hata birikmis
@@ -387,16 +431,32 @@ def test_adim14_takilma_dedektoru():
     loop._budget_olustur = MagicMock(return_value=_mock_budget(devam=True))
     loop._sistem_promptu_olustur = MagicMock(return_value="test prompt")
     # Simule et: surekli tool cagir but hep basarisiz -> budget biter
-    loop._direct_api_call = MagicMock(return_value={
-        "role": "assistant",
-        "content": "",
-        "tool_calls": [{"id": "tc1", "type": "function", "function": {"name": "test_tool", "arguments": "{}"}}]
-    })
-    loop._tool_calls_al = MagicMock(return_value=[
-        {"id": "tc1", "type": "function", "function": {"name": "test_tool", "arguments": "{}"}}
-    ])
+    loop._direct_api_call = MagicMock(
+        return_value={
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+                {
+                    "id": "tc1",
+                    "type": "function",
+                    "function": {"name": "test_tool", "arguments": "{}"},
+                }
+            ],
+        }
+    )
+    loop._tool_calls_al = MagicMock(
+        return_value=[
+            {
+                "id": "tc1",
+                "type": "function",
+                "function": {"name": "test_tool", "arguments": "{}"},
+            }
+        ]
+    )
     loop._yanit_icerigi_al = MagicMock(return_value="")
-    loop._arac_calistir = MagicMock(return_value={"basarili": False, "hata": "simule", "tamamlandi": False})
+    loop._arac_calistir = MagicMock(
+        return_value={"basarili": False, "hata": "simule", "tamamlandi": False}
+    )
 
     sonuc = loop.run_conversation(hedef=TEST_HEDEF)
     # ReYMeN-style: tool loop dener ama basarisiz -> budget biter -> False
@@ -415,12 +475,15 @@ def test_adim15_session_kapat():
         mock_storage.return_value = mock_instance
 
         from reymen.cereyan.conversation_loop import ConversationLoop
+
         loop = ConversationLoop(motor=MagicMock(), beyin=MagicMock(provider="deepseek"))
         loop._budget_olustur = MagicMock(return_value=_mock_budget(devam=False))
 
         sonuc = loop.run_conversation(hedef=TEST_HEDEF)
         # session_bitir en az 1 kez cagrilmis olmali
-        session_bitir_calls = [c for c in mock_instance.method_calls if c[0] == 'session_bitir']
+        session_bitir_calls = [
+            c for c in mock_instance.method_calls if c[0] == "session_bitir"
+        ]
         assert session_bitir_calls, "session_bitir() cagrilmadi"
         print(f"  ✅ Session kapatildi")
 
@@ -430,21 +493,35 @@ def test_adim15_session_kapat():
 # ====================================================================
 def test_adim16_hafiza_genisletme():
     """ADIM 16: _gorev_sonrasi_hafiza() cagrilmali (basarili gorevde)"""
-    with patch("reymen.cereyan.conversation_loop.ConversationLoop._gorev_sonrasi_hafiza") as mock_hafiza_genislet:
+    with patch(
+        "reymen.cereyan.conversation_loop.ConversationLoop._gorev_sonrasi_hafiza"
+    ) as mock_hafiza_genislet:
         mock_hafiza_genislet.return_value = None
 
         from reymen.cereyan.conversation_loop import ConversationLoop
+
         loop = ConversationLoop(motor=MagicMock(), beyin=MagicMock())
         loop._budget_olustur = MagicMock(return_value=_mock_budget(devam=True))
         loop._sistem_promptu_olustur = MagicMock(return_value="test prompt")
         loop._api_mesajlari_olustur = MagicMock(return_value=[])
         loop._ephemeral_layerlar_ekle = MagicMock(return_value=[])
         loop._context_preflight = MagicMock(return_value=[])
-        loop._api_call_with_retry = MagicMock(return_value={
-            "choices": [{"message": {"content": "Bu 20 karakterden uzun bir test yaniti", "role": "assistant"}}]
-        })
+        loop._api_call_with_retry = MagicMock(
+            return_value={
+                "choices": [
+                    {
+                        "message": {
+                            "content": "Bu 20 karakterden uzun bir test yaniti",
+                            "role": "assistant",
+                        }
+                    }
+                ]
+            }
+        )
         loop._tool_calls_al = MagicMock(return_value=[])
-        loop._yanit_icerigi_al = MagicMock(return_value="Bu 20 karakterden uzun bir test yaniti")
+        loop._yanit_icerigi_al = MagicMock(
+            return_value="Bu 20 karakterden uzun bir test yaniti"
+        )
 
         sonuc = loop.run_conversation(hedef=TEST_HEDEF)
         assert mock_hafiza_genislet.called, "_gorev_sonrasi_hafiza cagrilmadi"
@@ -487,9 +564,11 @@ def test_adim18_gecmis_tasima():
     loop._api_mesajlari_olustur = MagicMock(return_value=[])
     loop._ephemeral_layerlar_ekle = MagicMock(return_value=[])
     loop._context_preflight = MagicMock(return_value=[])
-    loop._api_call_with_retry = MagicMock(return_value={
-        "choices": [{"message": {"content": "cevap", "role": "assistant"}}]
-    })
+    loop._api_call_with_retry = MagicMock(
+        return_value={
+            "choices": [{"message": {"content": "cevap", "role": "assistant"}}]
+        }
+    )
     loop._tool_calls_al = MagicMock(return_value=[])
     loop._yanit_icerigi_al = MagicMock(return_value="cevap")
 
@@ -499,9 +578,12 @@ def test_adim18_gecmis_tasima():
     # Sadece user/assistant mesajlari
     for m in loop._gecmis_mesajlar:
         assert m["role"] in ("user", "assistant"), f"gecmiste {m['role']} rolu olmamali"
-    assert len(loop._gecmis_mesajlar) <= loop._max_gecmis_mesaj, \
-        f"max {loop._max_gecmis_mesaj} mesaj: {len(loop._gecmis_mesajlar)}"
-    print(f"  ✅ Gecmis tasindi: {len(loop._gecmis_mesajlar)} mesaj (max={loop._max_gecmis_mesaj})")
+    assert (
+        len(loop._gecmis_mesajlar) <= loop._max_gecmis_mesaj
+    ), f"max {loop._max_gecmis_mesaj} mesaj: {len(loop._gecmis_mesajlar)}"
+    print(
+        f"  ✅ Gecmis tasindi: {len(loop._gecmis_mesajlar)} mesaj (max={loop._max_gecmis_mesaj})"
+    )
 
 
 # ====================================================================
@@ -520,9 +602,13 @@ def test_entegrasyon_tam_akis():
         loop._api_mesajlari_olustur = MagicMock(return_value=[])
         loop._ephemeral_layerlar_ekle = MagicMock(return_value=[])
         loop._context_preflight = MagicMock(return_value=[])
-        loop._api_call_with_retry = MagicMock(return_value={
-            "choices": [{"message": {"content": "Tamam islem tamam.", "role": "assistant"}}]
-        })
+        loop._api_call_with_retry = MagicMock(
+            return_value={
+                "choices": [
+                    {"message": {"content": "Tamam islem tamam.", "role": "assistant"}}
+                ]
+            }
+        )
         loop._tool_calls_al = MagicMock(return_value=[])
         loop._yanit_icerigi_al = MagicMock(return_value="Tamam islem tamam.")
 
@@ -532,8 +618,10 @@ def test_entegrasyon_tam_akis():
         assert sonuc["turlar"] > 0, "en az 1 tur olmali"
         assert "sure" in sonuc, "sure bilgisi eksik"
         assert "task_id" in sonuc, "task_id eksik"
-        print(f"  ✅ Entegrasyon: task_id={sonuc['task_id']}, "
-              f"tur={sonuc['turlar']}, sure={sonuc['sure']}s")
+        print(
+            f"  ✅ Entegrasyon: task_id={sonuc['task_id']}, "
+            f"tur={sonuc['turlar']}, sure={sonuc['sure']}s"
+        )
 
 
 if __name__ == "__main__":

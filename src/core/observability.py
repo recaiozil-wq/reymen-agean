@@ -140,9 +140,7 @@ def setup_observability(
                 obs_conf["service_version"],
             )
             _OBSERVABILITY_AKTIF = True
-            logger.info(
-                "[Observability] Console exporter başlatıldı — tracer aktif."
-            )
+            logger.info("[Observability] Console exporter başlatıldı — tracer aktif.")
             return True
         except Exception as exc:
             logger.warning(
@@ -164,9 +162,7 @@ def setup_observability(
     # 4. No-op (devre dışı)
     _setup_noop_tracer(service_name, service_version)
     _OBSERVABILITY_AKTIF = False
-    logger.info(
-        "[Observability] Observability devre dışı — no-op tracer kullanılıyor."
-    )
+    logger.info("[Observability] Observability devre dışı — no-op tracer kullanılıyor.")
     return False
 
 
@@ -222,9 +218,7 @@ def _setup_console_tracer(service_name: str, service_version: str) -> None:
     _TRACER = otel_trace.get_tracer(service_name, service_version)
 
 
-def _setup_otlp_tracer(
-    service_name: str, service_version: str, endpoint: str
-) -> bool:
+def _setup_otlp_tracer(service_name: str, service_version: str, endpoint: str) -> bool:
     """OTLP HTTP exporter ile tracer başlat."""
     global _TRACER, _TRACER_PROVIDER
 
@@ -303,9 +297,7 @@ def _setup_langfuse_tracer(service_name: str, service_version: str) -> bool:
 
     _TRACER = otel_trace.get_tracer(service_name, service_version)
 
-    logger.info(
-        "[Observability] Langfuse OTLP exporter başlatıldı — tracer aktif."
-    )
+    logger.info("[Observability] Langfuse OTLP exporter başlatıldı — tracer aktif.")
     return True
 
 
@@ -377,15 +369,15 @@ def _span_kind(span_tipi: str):
 
 # Basit token başına maliyet (USD/1K token) — en sık kullanılan modeller
 _TAHMINI_MALIYET: dict[str, dict[str, float]] = {
-    "deepseek": {"giris": 0.0005, "cikis": 0.0020},       # deepseek-chat
-    "openai": {"giris": 0.00015, "cikis": 0.0006},        # gpt-4o-mini
-    "anthropic": {"giris": 0.003, "cikis": 0.015},         # claude-haiku
-    "gemini": {"giris": 0.000075, "cikis": 0.0003},        # gemini-1.5-flash
-    "groq": {"giris": 0.0001, "cikis": 0.0004},            # llama-3.1-8b
-    "xai": {"giris": 0.00015, "cikis": 0.0006},            # grok-2
+    "deepseek": {"giris": 0.0005, "cikis": 0.0020},  # deepseek-chat
+    "openai": {"giris": 0.00015, "cikis": 0.0006},  # gpt-4o-mini
+    "anthropic": {"giris": 0.003, "cikis": 0.015},  # claude-haiku
+    "gemini": {"giris": 0.000075, "cikis": 0.0003},  # gemini-1.5-flash
+    "groq": {"giris": 0.0001, "cikis": 0.0004},  # llama-3.1-8b
+    "xai": {"giris": 0.00015, "cikis": 0.0006},  # grok-2
     "openrouter": {"giris": 0.0005, "cikis": 0.0020},
-    "lmstudio": {"giris": 0.0, "cikis": 0.0},              # local
-    "ollama": {"giris": 0.0, "cikis": 0.0},                # local
+    "lmstudio": {"giris": 0.0, "cikis": 0.0},  # local
+    "ollama": {"giris": 0.0, "cikis": 0.0},  # local
 }
 
 _VARSAYILAN_MALIYET = {"giris": 0.001, "cikis": 0.002}
@@ -442,7 +434,9 @@ def _llm_span_attr(
     }
 
     if hata:
-        attrs["error.type"] = type(hata).__name__ if isinstance(hata, Exception) else "Exception"
+        attrs["error.type"] = (
+            type(hata).__name__ if isinstance(hata, Exception) else "Exception"
+        )
         attrs["error.message"] = str(hata)
 
     return attrs
@@ -550,6 +544,7 @@ class LLMSpan:
 def _status_error(description: str):
     try:
         from opentelemetry.trace import Status, StatusCode
+
         return Status(StatusCode.ERROR, description)
     except ImportError:
         return None
@@ -627,7 +622,9 @@ def trace_llm_call(
                         if "mesajlar" in kwargs:
                             _mesajlar = kwargs["mesajlar"]
                         elif len(args) > 2:
-                            _mesajlar = args[2] if isinstance(args[2], (list, tuple)) else []
+                            _mesajlar = (
+                                args[2] if isinstance(args[2], (list, tuple)) else []
+                            )
                         else:
                             _mesajlar = []
 
@@ -643,7 +640,9 @@ def trace_llm_call(
                         )
                         cikis_token = _token_sayisi_tahmin(yanit)
                         toplam_token = giris_token + cikis_token
-                        maliyet = _token_maliyeti_hesapla(provider, giris_token, cikis_token)
+                        maliyet = _token_maliyeti_hesapla(
+                            provider, giris_token, cikis_token
+                        )
 
                         span.set_attribute("llm.prompt_tokens", giris_token)
                         span.set_attribute("llm.completion_tokens", cikis_token)

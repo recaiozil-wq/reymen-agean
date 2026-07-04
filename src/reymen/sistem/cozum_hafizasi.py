@@ -39,11 +39,17 @@ __all__ = [
 
 # ── Varsayilan yapilandirma ──────────────────────────────────────────────
 
-_VARSAYILAN_DB = Path(__file__).resolve().parent.parent.parent / "reymen" / "merkez_db" / "cozum_hafizasi.db"
+_VARSAYILAN_DB = (
+    Path(__file__).resolve().parent.parent.parent
+    / "reymen"
+    / "merkez_db"
+    / "cozum_hafizasi.db"
+)
 _VARSAYILAN_CONFIDENCE = 0.0  # Yeni kayit: test edilmemis, gizli
 
 
 # ── Veritabani ───────────────────────────────────────────────────────────
+
 
 def _db_baglan(db_yolu: str | Path | None = None) -> sqlite3.Connection:
     if db_yolu is None:
@@ -86,6 +92,7 @@ def _db_olustur(conn: sqlite3.Connection) -> None:
 
 
 # ── CozumHafizasi Sinifi ─────────────────────────────────────────────────
+
 
 class CozumHafizasi:
     """Cozulmus sorunlarin yapilandirilmis hafizasi.
@@ -141,9 +148,7 @@ class CozumHafizasi:
             # TUM eslesmeleri getir (confidence filtrelemesi Python'da yapilacak)
             ham_sonuc = []
             try:
-                fts_sorgu = ' OR '.join(
-                    f'"{k}"' for k in metin.split() if len(k) > 2
-                )
+                fts_sorgu = " OR ".join(f'"{k}"' for k in metin.split() if len(k) > 2)
                 if fts_sorgu:
                     rows = conn.execute(
                         """SELECT c.* FROM cozumler_fts f
@@ -158,7 +163,7 @@ class CozumHafizasi:
                 pass
 
             if not ham_sonuc:
-                like_sorgu = f'%{metin}%'
+                like_sorgu = f"%{metin}%"
                 rows = conn.execute(
                     """SELECT * FROM cozumler
                        WHERE problem LIKE ? OR cozum LIKE ? OR root_cause LIKE ?
@@ -180,10 +185,12 @@ class CozumHafizasi:
                 # < 0.3 tamamen gizle, ekleme
 
             # Sirala: yuksek onde, sonra dusuk
-            sonuc.sort(key=lambda x: (
-                0 if x.get("guven_etiketi") == "yuksek" else 1,
-                -x.get("confidence", 0)
-            ))
+            sonuc.sort(
+                key=lambda x: (
+                    0 if x.get("guven_etiketi") == "yuksek" else 1,
+                    -x.get("confidence", 0),
+                )
+            )
 
             # Limiti uygula
             sonuc = sonuc[:limit]
@@ -237,7 +244,9 @@ class CozumHafizasi:
                     root_cause.strip(),
                     cozum.strip(),
                     kategori.strip(),
-                    _VARSAYILAN_CONFIDENCE, now, now,
+                    _VARSAYILAN_CONFIDENCE,
+                    now,
+                    now,
                     json.dumps(tags or [], ensure_ascii=False),
                     json.dumps(metadata or {}, ensure_ascii=False),
                 ),
@@ -301,12 +310,16 @@ class CozumHafizasi:
             conn.commit()
 
             sonuc = dict(
-                conn.execute("SELECT * FROM cozumler WHERE id=?", (kayit_id,)).fetchone()
+                conn.execute(
+                    "SELECT * FROM cozumler WHERE id=?", (kayit_id,)
+                ).fetchone()
             )
             durum = "✅" if basarili else "❌"
             logger.info(
                 "[CozumHafizasi] Geri bildirim #%d: %s (confidence=%.2f)",
-                kayit_id, durum, sonuc.get("confidence", 0),
+                kayit_id,
+                durum,
+                sonuc.get("confidence", 0),
             )
             return sonuc
         finally:
@@ -391,9 +404,10 @@ class CozumHafizasi:
                 "SELECT COUNT(*) FROM cozumler WHERE success > 0"
             ).fetchone()[0]
 
-            ort_confidence = conn.execute(
-                "SELECT AVG(confidence) FROM cozumler"
-            ).fetchone()[0] or 0.0
+            ort_confidence = (
+                conn.execute("SELECT AVG(confidence) FROM cozumler").fetchone()[0]
+                or 0.0
+            )
 
             son_kullanim = conn.execute(
                 "SELECT COUNT(*) FROM cozumler WHERE last_used > ?",
@@ -436,8 +450,11 @@ def cozum_bul(metin: str, limit: int = 5) -> list[dict[str, Any]]:
 
 
 def cozum_kaydet(
-    problem: str, root_cause: str, cozum: str,
-    kategori: str = "", tags: list[str] | None = None,
+    problem: str,
+    root_cause: str,
+    cozum: str,
+    kategori: str = "",
+    tags: list[str] | None = None,
 ) -> int:
     return _singleton.kaydet(problem, root_cause, cozum, kategori, tags)
 
@@ -447,6 +464,7 @@ def cozum_geri_bildirim(kayit_id: int, basarili: bool) -> dict[str, Any]:
 
 
 # ── Motor kaydi ──────────────────────────────────────────────────────────
+
 
 def _tool_cozum_bul(**kw) -> str:
     metin = kw.get("metin") or kw.get("sorun") or ""
@@ -502,28 +520,31 @@ def _tool_cozum_istatistik(**kw) -> str:
 def motor_kaydet(motor) -> None:
     """Cozum Hafizasi araclarini motor'a kaydet."""
     motor._plugin_arac_kaydet(
-        "COZUM_BUL", _tool_cozum_bul,
+        "COZUM_BUL",
+        _tool_cozum_bul,
         "Cozum hafizasinda sorun ara. Parametreler: metin/sorun (str). "
-        "Donus: confidence>=0.6 yuksek, 0.3-0.6 dusuk etiketli, <0.3 gizlenir."
+        "Donus: confidence>=0.6 yuksek, 0.3-0.6 dusuk etiketli, <0.3 gizlenir.",
     )
     motor._plugin_arac_kaydet(
-        "COZUM_KAYDET", _tool_cozum_kaydet,
+        "COZUM_KAYDET",
+        _tool_cozum_kaydet,
         "Yeni cozum kaydet. Parametreler: problem, root_cause/kok_neden, "
-        "cozum, kategori"
+        "cozum, kategori",
     )
     motor._plugin_arac_kaydet(
-        "COZUM_GERI_BILDIRIM", _tool_cozum_geri_bildirim,
+        "COZUM_GERI_BILDIRIM",
+        _tool_cozum_geri_bildirim,
         "Cozumun ise yarayip yaramadigini bildir. "
-        "Parametreler: id/kayit_id (int), basarili (bool)"
+        "Parametreler: id/kayit_id (int), basarili (bool)",
     )
     motor._plugin_arac_kaydet(
-        "COZUM_EKSPORT", _tool_cozum_export,
+        "COZUM_EKSPORT",
+        _tool_cozum_export,
         "Cozumleri JSON olarak disari aktar. "
-        "Parametreler: kategori (str), min_confidence (float), limit (int)"
+        "Parametreler: kategori (str), min_confidence (float), limit (int)",
     )
     motor._plugin_arac_kaydet(
-        "COZUM_ISTATISTIK", _tool_cozum_istatistik,
-        "Cozum havuzu istatistikleri."
+        "COZUM_ISTATISTIK", _tool_cozum_istatistik, "Cozum havuzu istatistikleri."
     )
     logger.info("[CozumHafizasi] Motor'a 5 arac kaydedildi")
 

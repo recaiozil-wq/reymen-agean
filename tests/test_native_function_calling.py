@@ -48,10 +48,12 @@ TOOLS_SCHEMA = [
 
 # ── beyin.uret_v2 testleri ───────────────────────────────────────────────────
 
+
 class TestUretV2:
     @pytest.fixture
     def beyin(self):
         from beyin import Beyin
+
         b = Beyin({"provider": "deepseek", "model": "deepseek-chat", "api_key": "test"})
         return b
 
@@ -63,11 +65,20 @@ class TestUretV2:
         beklenen_yanit = {
             "role": "assistant",
             "content": "",
-            "tool_calls": [{"id": "tc_1", "type": "function",
-                            "function": {"name": "DOSYA_OKU", "arguments": '{"param": "test.txt"}'}}],
+            "tool_calls": [
+                {
+                    "id": "tc_1",
+                    "type": "function",
+                    "function": {
+                        "name": "DOSYA_OKU",
+                        "arguments": '{"param": "test.txt"}',
+                    },
+                }
+            ],
         }
-        monkeypatch.setattr(beyin, "_cagir_openai_uyumlu_v2",
-                            lambda *a, **kw: beklenen_yanit)
+        monkeypatch.setattr(
+            beyin, "_cagir_openai_uyumlu_v2", lambda *a, **kw: beklenen_yanit
+        )
         sonuc = beyin.uret_v2(SISTEM, MESAJLAR, tools=TOOLS_SCHEMA)
         assert sonuc["tool_calls"]
         assert sonuc["tool_calls"][0]["function"]["name"] == "DOSYA_OKU"
@@ -75,8 +86,7 @@ class TestUretV2:
     def test_uret_v2_metin_yanit(self, beyin, monkeypatch):
         """API metin yanıtı döndürünce tool_calls boş."""
         beklenen = {"role": "assistant", "content": "Merhaba!", "tool_calls": []}
-        monkeypatch.setattr(beyin, "_cagir_openai_uyumlu_v2",
-                            lambda *a, **kw: beklenen)
+        monkeypatch.setattr(beyin, "_cagir_openai_uyumlu_v2", lambda *a, **kw: beklenen)
         sonuc = beyin.uret_v2(SISTEM, MESAJLAR, tools=TOOLS_SCHEMA)
         assert sonuc["content"] == "Merhaba!"
         assert sonuc["tool_calls"] == []
@@ -93,16 +103,22 @@ class TestUretV2:
 
     def test_uret_v2_hata_fallback(self, beyin, monkeypatch):
         """Tüm provider'lar başarısız → metin fallback."""
-        monkeypatch.setattr(beyin, "_cagir_openai_uyumlu_v2",
-                            MagicMock(side_effect=Exception("API hatası")))
+        monkeypatch.setattr(
+            beyin,
+            "_cagir_openai_uyumlu_v2",
+            MagicMock(side_effect=Exception("API hatası")),
+        )
         monkeypatch.setattr(beyin, "dusun", lambda *a, **kw: "fallback yanıt")
         sonuc = beyin.uret_v2(SISTEM, MESAJLAR, tools=TOOLS_SCHEMA)
         assert sonuc["content"] == "fallback yanıt"
         assert sonuc["tool_calls"] == []
 
     def test_uret_v2_dict_donuyor(self, beyin, monkeypatch):
-        monkeypatch.setattr(beyin, "_cagir_openai_uyumlu_v2",
-                            lambda *a, **kw: {"role": "assistant", "content": "ok", "tool_calls": []})
+        monkeypatch.setattr(
+            beyin,
+            "_cagir_openai_uyumlu_v2",
+            lambda *a, **kw: {"role": "assistant", "content": "ok", "tool_calls": []},
+        )
         sonuc = beyin.uret_v2(SISTEM, MESAJLAR, tools=TOOLS_SCHEMA)
         assert isinstance(sonuc, dict)
         assert "role" in sonuc
@@ -110,11 +126,15 @@ class TestUretV2:
 
 # ── _cagir_openai_uyumlu_v2 testleri ────────────────────────────────────────
 
+
 class TestCagirOpenAIUyumluV2:
     @pytest.fixture
     def beyin(self):
         from beyin import Beyin
-        return Beyin({"provider": "deepseek", "model": "deepseek-chat", "api_key": "test"})
+
+        return Beyin(
+            {"provider": "deepseek", "model": "deepseek-chat", "api_key": "test"}
+        )
 
     def test_payload_tools_gonderilir(self, beyin):
         """tools varsa payload'a eklenir, tool_choice='auto' olur."""
@@ -131,8 +151,12 @@ class TestCagirOpenAIUyumluV2:
 
         with patch("requests.post", mock_post):
             beyin._cagir_openai_uyumlu_v2(
-                "https://api.example.com", "key", "model",
-                SISTEM, MESAJLAR, tools=TOOLS_SCHEMA
+                "https://api.example.com",
+                "key",
+                "model",
+                SISTEM,
+                MESAJLAR,
+                tools=TOOLS_SCHEMA,
             )
 
         assert "tools" in gonderilen_payload
@@ -154,8 +178,7 @@ class TestCagirOpenAIUyumluV2:
 
         with patch("requests.post", mock_post):
             beyin._cagir_openai_uyumlu_v2(
-                "https://api.example.com", "key", "model",
-                SISTEM, MESAJLAR, tools=None
+                "https://api.example.com", "key", "model", SISTEM, MESAJLAR, tools=None
             )
 
         assert "tools" not in gonderilen_payload
@@ -163,8 +186,13 @@ class TestCagirOpenAIUyumluV2:
 
     def test_tool_calls_parse(self, beyin):
         """API tool_calls döndürünce doğru parse edilir."""
-        tc = [{"id": "tc_1", "type": "function",
-               "function": {"name": "DOSYA_OKU", "arguments": '{"param": "x.txt"}'}}]
+        tc = [
+            {
+                "id": "tc_1",
+                "type": "function",
+                "function": {"name": "DOSYA_OKU", "arguments": '{"param": "x.txt"}'},
+            }
+        ]
 
         def mock_post(url, headers=None, json=None, timeout=None):
             mock_resp = MagicMock()
@@ -176,8 +204,12 @@ class TestCagirOpenAIUyumluV2:
 
         with patch("requests.post", mock_post):
             sonuc = beyin._cagir_openai_uyumlu_v2(
-                "https://api.example.com", "key", "model",
-                SISTEM, MESAJLAR, tools=TOOLS_SCHEMA
+                "https://api.example.com",
+                "key",
+                "model",
+                SISTEM,
+                MESAJLAR,
+                tools=TOOLS_SCHEMA,
             )
 
         assert sonuc["tool_calls"] == tc
@@ -185,6 +217,7 @@ class TestCagirOpenAIUyumluV2:
 
     def test_yanit_formati_dict(self, beyin):
         """Dönüş her zaman dict: role, content, tool_calls."""
+
         def mock_post(url, headers=None, json=None, timeout=None):
             mock_resp = MagicMock()
             mock_resp.raise_for_status.return_value = None
@@ -195,8 +228,7 @@ class TestCagirOpenAIUyumluV2:
 
         with patch("requests.post", mock_post):
             sonuc = beyin._cagir_openai_uyumlu_v2(
-                "https://api.example.com", "key", "model",
-                SISTEM, MESAJLAR
+                "https://api.example.com", "key", "model", SISTEM, MESAJLAR
             )
         assert sonuc["role"] == "assistant"
         assert sonuc["content"] == "merhaba"
@@ -205,9 +237,11 @@ class TestCagirOpenAIUyumluV2:
 
 # ── _motor_tools_schema_al testleri ─────────────────────────────────────────
 
+
 class TestMotorToolsSchemaAl:
     def test_bos_motor(self):
         from conversation_loop import _motor_tools_schema_al
+
         motor = MagicMock()
         motor._plugin_araclar = {}
         schemas = _motor_tools_schema_al(motor)
@@ -215,6 +249,7 @@ class TestMotorToolsSchemaAl:
 
     def test_araclar_schema_uretilir(self):
         from conversation_loop import _motor_tools_schema_al
+
         motor = MagicMock()
         motor._plugin_araclar = {
             "DOSYA_OKU": lambda p="": p,
@@ -228,6 +263,7 @@ class TestMotorToolsSchemaAl:
 
     def test_schema_format_gecerli(self):
         from conversation_loop import _motor_tools_schema_al
+
         motor = MagicMock()
         motor._plugin_araclar = {"TEST_ARAC": lambda: None}
         schemas = _motor_tools_schema_al(motor)
@@ -240,6 +276,7 @@ class TestMotorToolsSchemaAl:
 
     def test_maks_arac_siniri(self):
         from conversation_loop import _motor_tools_schema_al
+
         motor = MagicMock()
         motor._plugin_araclar = {f"ARAC_{i}": lambda: None for i in range(100)}
         schemas = _motor_tools_schema_al(motor, maks_arac=10)
@@ -247,20 +284,25 @@ class TestMotorToolsSchemaAl:
 
     def test_motor_plugin_araclar_yok(self):
         from conversation_loop import _motor_tools_schema_al
+
         motor = object()  # _plugin_araclar yok
         schemas = _motor_tools_schema_al(motor)
         assert schemas == []
 
     def test_hata_durumunda_bos_liste(self, monkeypatch):
         from conversation_loop import _motor_tools_schema_al
+
         motor = MagicMock()
         # _plugin_araclar property'si exception fırlatsın
-        type(motor)._plugin_araclar = property(lambda self: (_ for _ in ()).throw(RuntimeError("hata")))
+        type(motor)._plugin_araclar = property(
+            lambda self: (_ for _ in ()).throw(RuntimeError("hata"))
+        )
         schemas = _motor_tools_schema_al(motor)
         assert schemas == []
 
 
 # ── _interruptible_api_call uret_v2 önceliği ────────────────────────────────
+
 
 class TestInterruptibleApiCallV2:
     def test_uret_v2_cagrilir_oncelikli(self):

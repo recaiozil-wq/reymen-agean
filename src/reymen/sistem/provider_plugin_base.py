@@ -123,13 +123,15 @@ class ProviderPluginBase(abc.ABC):
             self._active_provider = provider_name
             logger.debug(
                 "[ProviderPluginBase] '%s' aktif provider: %s",
-                self.name, provider_name,
+                self.name,
+                provider_name,
             )
             return True
         logger.warning(
-            "[ProviderPluginBase] '%s' icin gecersiz provider: '%s'. "
-            "Secenekler: %s",
-            self.name, provider_name, self._providers,
+            "[ProviderPluginBase] '%s' icin gecersiz provider: '%s'. " "Secenekler: %s",
+            self.name,
+            provider_name,
+            self._providers,
         )
         return False
 

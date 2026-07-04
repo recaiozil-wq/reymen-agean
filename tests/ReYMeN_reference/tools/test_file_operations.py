@@ -25,6 +25,7 @@ from tools.file_operations import (
 # Write deny list
 # =========================================================================
 
+
 class TestIsWriteDenied:
     def test_ssh_authorized_keys_denied(self):
         path = os.path.join(str(Path.home()), ".ssh", "authorized_keys")
@@ -76,6 +77,7 @@ class TestIsWriteDenied:
     def test_oauth_mcp_tokens_and_pairing_denied(self, path):
         """PKCE creds, mcp-tokens, and pairing entries must be write-denied."""
         from ReYMeN_constants import get_reymen_home
+
         ReYMeN_home = get_reymen_home()
         full_path = str(ReYMeN_home / path)
         assert _is_write_denied(full_path) is True
@@ -98,6 +100,7 @@ class TestIsWriteDenied:
     def test_oauth_traversal_denied(self, path):
         """Path traversal attempts to protected OAuth files must be blocked."""
         from ReYMeN_constants import get_reymen_home
+
         ReYMeN_home = get_reymen_home()
         full_path = str(ReYMeN_home / path)
         assert _is_write_denied(full_path) is True
@@ -129,7 +132,9 @@ class TestIsWriteDenied:
         "name",
         ["auth.json", "config.yaml", "webhook_subscriptions.json"],
     )
-    def test_control_files_requested_writable_in_profile_mode(self, tmp_path, monkeypatch, name):
+    def test_control_files_requested_writable_in_profile_mode(
+        self, tmp_path, monkeypatch, name
+    ):
         root = tmp_path / "ReYMeN"
         profile = root / "profiles" / "coder"
         profile.mkdir(parents=True)
@@ -165,25 +170,32 @@ class TestIsWriteDenied:
         monkeypatch.setenv("ReYMeN_HOME", str(profile))
 
         # Active profile pairing entries
-        assert _is_write_denied(str(profile / "pairing" / "telegram-approved.json")) is True
-        assert _is_write_denied(str(profile / "pairing" / "discord-pending.json")) is True
+        assert (
+            _is_write_denied(str(profile / "pairing" / "telegram-approved.json"))
+            is True
+        )
+        assert (
+            _is_write_denied(str(profile / "pairing" / "discord-pending.json")) is True
+        )
         # The directory itself
         assert _is_write_denied(str(profile / "pairing")) is True
         # Root pairing entries (profile mode — same shape as mcp-tokens gap)
-        assert _is_write_denied(str(root / "pairing" / "telegram-approved.json")) is True
+        assert (
+            _is_write_denied(str(root / "pairing" / "telegram-approved.json")) is True
+        )
         assert _is_write_denied(str(root / "pairing")) is True
-
 
 
 # =========================================================================
 # Result dataclasses
 # =========================================================================
 
+
 class TestReadResult:
     def test_to_dict_omits_defaults(self):
         r = ReadResult()
         d = r.to_dict()
-        assert "error" not in d    # None omitted
+        assert "error" not in d  # None omitted
         assert "similar_files" not in d  # empty list omitted
 
     def test_to_dict_preserves_empty_content(self):
@@ -292,6 +304,7 @@ class TestLintResult:
 # =========================================================================
 # ShellFileOperations helpers
 # =========================================================================
+
 
 @pytest.fixture()
 def mock_env():
@@ -444,12 +457,14 @@ class TestSearchPathValidation:
 
     def test_search_nonexistent_path_returns_error(self, mock_env):
         """search() should return an error when the path doesn't exist."""
+
         def side_effect(command, **kwargs):
             if "test -e" in command:
                 return {"output": "not_found", "returncode": 1}
             if "command -v" in command:
                 return {"output": "yes", "returncode": 0}
             return {"output": "", "returncode": 0}
+
         mock_env.execute.side_effect = side_effect
         ops = ShellFileOperations(mock_env)
         result = ops.search("pattern", path="/nonexistent/path")
@@ -458,12 +473,14 @@ class TestSearchPathValidation:
 
     def test_search_nonexistent_path_files_mode(self, mock_env):
         """search(target='files') should also return error for bad paths."""
+
         def side_effect(command, **kwargs):
             if "test -e" in command:
                 return {"output": "not_found", "returncode": 1}
             if "command -v" in command:
                 return {"output": "yes", "returncode": 0}
             return {"output": "", "returncode": 0}
+
         mock_env.execute.side_effect = side_effect
         ops = ShellFileOperations(mock_env)
         result = ops.search("*.py", path="/nonexistent/path", target="files")
@@ -472,6 +489,7 @@ class TestSearchPathValidation:
 
     def test_search_existing_path_proceeds(self, mock_env):
         """search() should proceed normally when the path exists."""
+
         def side_effect(command, **kwargs):
             if "test -e" in command:
                 return {"output": "exists", "returncode": 0}
@@ -479,6 +497,7 @@ class TestSearchPathValidation:
                 return {"output": "yes", "returncode": 0}
             # rg returns exit 1 (no matches) with empty output
             return {"output": "", "returncode": 1}
+
         mock_env.execute.side_effect = side_effect
         ops = ShellFileOperations(mock_env)
         result = ops.search("pattern", path="/existing/path")
@@ -488,6 +507,7 @@ class TestSearchPathValidation:
     def test_search_rg_error_exit_code(self, mock_env):
         """search() should report error when rg returns exit code 2."""
         call_count = {"n": 0}
+
         def side_effect(command, **kwargs):
             call_count["n"] += 1
             if "test -e" in command:
@@ -496,6 +516,7 @@ class TestSearchPathValidation:
                 return {"output": "yes", "returncode": 0}
             # rg returns exit 2 (error) with empty output
             return {"output": "", "returncode": 2}
+
         mock_env.execute.side_effect = side_effect
         ops = ShellFileOperations(mock_env)
         result = ops.search("pattern", path="/some/path")
@@ -523,7 +544,9 @@ class TestSearchFilesFallbackHiddenPaths:
         env.execute = execute
         return env
 
-    def test_hidden_root_with_hidden_ancestor_includes_files(self, tmp_path, monkeypatch):
+    def test_hidden_root_with_hidden_ancestor_includes_files(
+        self, tmp_path, monkeypatch
+    ):
         """Fallback find should include visible files when path is inside hidden root."""
         root = tmp_path / ".ReYMeN" / "logs"
         root.mkdir(parents=True)
@@ -532,7 +555,12 @@ class TestSearchFilesFallbackHiddenPaths:
         nested_hidden_file = root / "nested" / ".secret.log"
         visible_nested_file = root / "nested" / "visible.log"
 
-        for p in [visible_file, nested_hidden_file, visible_nested_file, hidden_dir_file]:
+        for p in [
+            visible_file,
+            nested_hidden_file,
+            visible_nested_file,
+            hidden_dir_file,
+        ]:
             p.parent.mkdir(parents=True, exist_ok=True)
             p.write_text("x")
 
@@ -590,7 +618,10 @@ class TestShellFileOpsWriteDenied:
         assert "denied" in result.error.lower()
 
     def test_move_file_failure_path(self, mock_env):
-        mock_env.execute.return_value = {"output": "No such file or directory", "returncode": 1}
+        mock_env.execute.return_value = {
+            "output": "No such file or directory",
+            "returncode": 1,
+        }
         ops = ShellFileOperations(mock_env)
         result = ops.move_file("/tmp/nonexistent.txt", "/tmp/dest.txt")
         assert result.error is not None
@@ -625,7 +656,10 @@ class TestPatchReplacePostWriteVerification:
             if command.startswith("wc -c"):
                 for path in file_contents:
                     if path in command:
-                        return {"output": str(len(file_contents[path].encode())), "returncode": 0}
+                        return {
+                            "output": str(len(file_contents[path].encode())),
+                            "returncode": 0,
+                        }
                 return {"output": "0", "returncode": 0}
             # Everything else (including the write itself) pretends to succeed
             # but DOESN'T update file_contents — simulates silent failure
@@ -666,7 +700,9 @@ class TestPatchReplacePostWriteVerification:
         result = ops.patch_replace("/tmp/test/a.py", "hello", "hi")
         assert result.error is None, f"Unexpected error: {result.error}"
         assert result.success is True
-        assert state["content"] == "hi world\n", f"File not actually updated: {state['content']!r}"
+        assert (
+            state["content"] == "hi world\n"
+        ), f"File not actually updated: {state['content']!r}"
 
     def test_patch_replace_fails_when_verify_read_errors(self, mock_env):
         """If the verify-read step itself fails (exit code != 0), return an error."""
@@ -700,6 +736,7 @@ class TestPatchReplacePostWriteVerification:
 # Git baseline check for write_file warning
 # =========================================================================
 
+
 class _DeletedTestGitBaselineCheck:
     """Removed May 2026 — these tests asserted on a ``_check_git_baseline``
     method that doesn't exist on ``ShellFileOperations`` (regression intro
@@ -708,4 +745,5 @@ class _DeletedTestGitBaselineCheck:
     instruction to keep CI green; reinstate them when the underlying
     helper is restored or replaced.
     """
+
     pass

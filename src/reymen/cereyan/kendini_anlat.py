@@ -19,6 +19,7 @@ import os
 import sys
 from pathlib import Path
 import logging
+
 logger = logging.getLogger(__name__)
 
 # ─── Proje Kok ______________________________
@@ -56,8 +57,7 @@ def satir_say(dosya: Path) -> int:
     try:
         with open(dosya, encoding="utf-8") as f:
             return sum(
-                1 for satir in f
-                if satir.strip() and not satir.strip().startswith("#")
+                1 for satir in f if satir.strip() and not satir.strip().startswith("#")
             )
     except Exception:
         return 0
@@ -98,15 +98,39 @@ def import_analizi(dosya: Path) -> list[str]:
         for node in ast.walk(tree):
             if isinstance(node, ast.Import):
                 for alias in node.names:
-                    if not alias.name.startswith(("os", "sys", "json", "re", "time",
-                                                   "datetime", "pathlib", "typing",
-                                                   "threading", "subprocess", "io",
-                                                   "argparse", "ast", "inspect")):
+                    if not alias.name.startswith(
+                        (
+                            "os",
+                            "sys",
+                            "json",
+                            "re",
+                            "time",
+                            "datetime",
+                            "pathlib",
+                            "typing",
+                            "threading",
+                            "subprocess",
+                            "io",
+                            "argparse",
+                            "ast",
+                            "inspect",
+                        )
+                    ):
                         ozel_importlar.add(alias.name.split(".")[0])
             elif isinstance(node, ast.ImportFrom):
-                if node.module and not node.module.startswith(("os", "sys", "json", "re",
-                                                                "time", "datetime", "typing",
-                                                                "subprocess", "argparse")):
+                if node.module and not node.module.startswith(
+                    (
+                        "os",
+                        "sys",
+                        "json",
+                        "re",
+                        "time",
+                        "datetime",
+                        "typing",
+                        "subprocess",
+                        "argparse",
+                    )
+                ):
                     ozel_importlar.add(node.module.split(".")[0])
     except Exception as _kendini__e108:
         print(f"[UYARI] kendini_anlat.py:109 - {_kendini__e108}")
@@ -114,6 +138,7 @@ def import_analizi(dosya: Path) -> list[str]:
 
 
 # ─── Analiz Fonksiyonlari ___________________
+
 
 def cozum_tarzi_analizi() -> dict:
     """
@@ -134,9 +159,13 @@ def cozum_tarzi_analizi() -> dict:
     # Tool analizi
     tools_dir = PROJE_KOK / "tools"
     if tools_dir.exists():
-        tool_dosyalari = list(tools_dir.glob("*_tool.py")) + list(tools_dir.glob("*.py"))
+        tool_dosyalari = list(tools_dir.glob("*_tool.py")) + list(
+            tools_dir.glob("*.py")
+        )
         sonuc["tool_sayisi"] = len(tool_dosyalari)
-        sonuc["tool_listesi"] = [t.name for t in tool_dosyalari if t.name != "__init__.py"]
+        sonuc["tool_listesi"] = [
+            t.name for t in tool_dosyalari if t.name != "__init__.py"
+        ]
 
     # Provider analizi
     provider_dir = PROJE_KOK / "providers"
@@ -169,13 +198,19 @@ def cozum_tarzi_analizi() -> dict:
 
     # Benzersiz ozellikler
     if (PROJE_KOK / "closed_learning_loop.py").exists():
-        sonuc["benzersiz_ozellikler"].append("Kapali ogrenme dongusu (FTS5 beceri kristallestirme)")
+        sonuc["benzersiz_ozellikler"].append(
+            "Kapali ogrenme dongusu (FTS5 beceri kristallestirme)"
+        )
     if (PROJE_KOK / "yetenek_fabrikasi.py").exists():
-        sonuc["benzersiz_ozellikler"].append("Yetenek fabrikasi (beceri otomatik olusturma)")
+        sonuc["benzersiz_ozellikler"].append(
+            "Yetenek fabrikasi (beceri otomatik olusturma)"
+        )
     if (PROJE_KOK / "vektorel_hafiza.py").exists():
         sonuc["benzersiz_ozellikler"].append("Vektorel hafiza (anlamsal bellek)")
     if (PROJE_KOK / "araclar_ekran.py").exists():
-        sonuc["benzersiz_ozellikler"].append("Ekran OCR ve tiklamatik (uygulama otomasyonu)")
+        sonuc["benzersiz_ozellikler"].append(
+            "Ekran OCR ve tiklamatik (uygulama otomasyonu)"
+        )
     if (PROJE_KOK / "araclar_makro.py").exists():
         sonuc["benzersiz_ozellikler"].append("Makro kaydetme/oynatma")
     if (PROJE_KOK / "uygulama_hafizasi.py").exists():
@@ -183,7 +218,9 @@ def cozum_tarzi_analizi() -> dict:
     if (PROJE_KOK / "tirith_security.py").exists():
         sonuc["benzersiz_ozellikler"].append("Tirith guvenlik katmani")
     if (PROJE_KOK / "checkpoint_manager.py").exists():
-        sonuc["benzersiz_ozellikler"].append("Checkpoint yonetimi (duraklat/devam ettir)")
+        sonuc["benzersiz_ozellikler"].append(
+            "Checkpoint yonetimi (duraklat/devam ettir)"
+        )
 
     return sonuc
 
@@ -226,28 +263,36 @@ def eksik_analizi() -> list[dict]:
         for s in siniflar:
             if s in ("Renk", "ServisDurumu", "Servis"):
                 continue
-            eksikler.append({
-                "dosya": py_dosya.name,
-                "turu": "eksik_docstring",
-                "detay": f"Sinif '{s}' docstring kontrol edilmedi",
-            })
+            eksikler.append(
+                {
+                    "dosya": py_dosya.name,
+                    "turu": "eksik_docstring",
+                    "detay": f"Sinif '{s}' docstring kontrol edilmedi",
+                }
+            )
 
         if todo_say > 0 or fixme_say > 0 or ni_say > 0:
-            eksikler.append({
-                "dosya": py_dosya.name,
-                "turu": "yapilacak",
-                "detay": f"{todo_say}x TODO, {fixme_say}x FIXME, {ni_say}x NotImplementedError",
-            })
+            eksikler.append(
+                {
+                    "dosya": py_dosya.name,
+                    "turu": "yapilacak",
+                    "detay": f"{todo_say}x TODO, {fixme_say}x FIXME, {ni_say}x NotImplementedError",
+                }
+            )
 
     # Test sonuclari
     test_raporu = ""
     test_dosyasi = PROJE_KOK / "test_suite.py"
     if test_dosyasi.exists():
         import subprocess
+
         try:
             sonuc = subprocess.run(
                 [sys.executable, str(test_dosyasi)],
-                capture_output=True, text=True, timeout=30, cwd=str(PROJE_KOK),
+                capture_output=True,
+                text=True,
+                timeout=30,
+                cwd=str(PROJE_KOK),
             )
             test_raporu = sonuc.stdout[-500:] if sonuc.stdout else ""
         except Exception as e:
@@ -295,6 +340,7 @@ def genel_istatistik() -> dict:
 
 # ─── Raporlama ______________________________
 
+
 def rapor_yaz(mod: str = "tum"):
     """Insan okunabilir rapor yazdir."""
     istatistik = genel_istatistik()
@@ -308,7 +354,9 @@ def rapor_yaz(mod: str = "tum"):
 ╚══════════════════════════════════════════════════════════╝
 """
     print(baslik)
-    print(f"  Analiz Tarihi: {__import__('datetime').datetime.now().strftime('%Y-%m-%d %H:%M')}")
+    print(
+        f"  Analiz Tarihi: {__import__('datetime').datetime.now().strftime('%Y-%m-%d %H:%M')}"
+    )
     print(f"  Proje Koku: {PROJE_KOK}")
     print()
 
@@ -357,7 +405,9 @@ def rapor_yaz(mod: str = "tum"):
         print(f"  TODO sayisi           : {eksik['istatistik']['toplam_todo']}")
         print(f"  FIXME sayisi          : {eksik['istatistik']['toplam_fixme']}")
         print(f"  Bos pass bloklari     : {eksik['istatistik']['toplam_pass']}")
-        print(f"  NotImplementedError   : {eksik['istatistik']['toplam_not_implemented']}")
+        print(
+            f"  NotImplementedError   : {eksik['istatistik']['toplam_not_implemented']}"
+        )
         print()
 
         yapilacaklar = [e for e in eksik["eksik_listesi"] if e["turu"] == "yapilacak"]
@@ -383,15 +433,23 @@ def rapor_yaz(mod: str = "tum"):
 
         oneriler = []
         if eksik["istatistik"]["toplam_todo"] > 5:
-            oneriler.append(f"{eksik['istatistik']['toplam_todo']} adet TODO tamamlanmali")
+            oneriler.append(
+                f"{eksik['istatistik']['toplam_todo']} adet TODO tamamlanmali"
+            )
 
         if eksik["istatistik"]["toplam_not_implemented"] > 0:
-            oneriler.append(f"{eksik['istatistik']['toplam_not_implemented']} adet NotImplementedError implemente edilmeli")
+            oneriler.append(
+                f"{eksik['istatistik']['toplam_not_implemented']} adet NotImplementedError implemente edilmeli"
+            )
 
         if istatistik["skill_sayisi"] == 0:
-            oneriler.append("Henuz skill kutuphanesi yok — ogrenme dongusu icin skill gerekli")
+            oneriler.append(
+                "Henuz skill kutuphanesi yok — ogrenme dongusu icin skill gerekli"
+            )
 
-        if not (PROJE_KOK / "tests").exists() or not list((PROJE_KOK / "tests").glob("test_*.py")):
+        if not (PROJE_KOK / "tests").exists() or not list(
+            (PROJE_KOK / "tests").glob("test_*.py")
+        ):
             oneriler.append("Test dosyalari eksik veya yetersiz")
 
         for o in oneriler:

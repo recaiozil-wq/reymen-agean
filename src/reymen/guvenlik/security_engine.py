@@ -31,15 +31,22 @@ class SecurityEngine:
         self._aciklar = []
 
         self._pii_desenleri = [
-            (r'\b[\w.+-]+@[\w-]+\.[\w.-]+\b', 'EMAIL'),
-            (r'\b\d{11}\b', 'TCKN'),
-            (r'\b(?:\d[ -]?){13,16}\b', 'KART_NO'),
-            (r'\b(?:0[0-9]{3})?[0-9]{10,11}\b', 'TELEFON'),
+            (r"\b[\w.+-]+@[\w-]+\.[\w.-]+\b", "EMAIL"),
+            (r"\b\d{11}\b", "TCKN"),
+            (r"\b(?:\d[ -]?){13,16}\b", "KART_NO"),
+            (r"\b(?:0[0-9]{3})?[0-9]{10,11}\b", "TELEFON"),
         ]
         self._tehdit_kelimeleri = [
-            'rm -rf', 'drop table', 'shutdown', 'format',
-            'eval(', 'exec(', 'system(', '__import__',
-            'ignore all instructions', 'system prompt',
+            "rm -rf",
+            "drop table",
+            "shutdown",
+            "format",
+            "eval(",
+            "exec(",
+            "system(",
+            "__import__",
+            "ignore all instructions",
+            "system prompt",
         ]
         self._risk_kurallari = {
             "yuksek": ["parola", "sifre", "token", "api_key", "secret"],
@@ -77,7 +84,11 @@ class SecurityEngine:
                         icerik = f.read()
                     kaynak = str(hedef)
                 except OSError as e:
-                    return {"basari": False, "hata": f"Dosya okunamadi: {e}", "seviye": "hata"}
+                    return {
+                        "basari": False,
+                        "hata": f"Dosya okunamadi: {e}",
+                        "seviye": "hata",
+                    }
             else:
                 icerik = str(hedef)
 
@@ -89,32 +100,38 @@ class SecurityEngine:
                     eslesmeler = re.findall(desen, icerik)
                     if eslesmeler:
                         pii_bulunan.append({"tur": etiket, "adet": len(eslesmeler)})
-                        bulunan_aciklar.append({
-                            "tur": "pii",
-                            "etiket": etiket,
-                            "adet": len(eslesmeler),
-                            "seviye": "yuksek",
-                        })
+                        bulunan_aciklar.append(
+                            {
+                                "tur": "pii",
+                                "etiket": etiket,
+                                "adet": len(eslesmeler),
+                                "seviye": "yuksek",
+                            }
+                        )
                 except re.error:
                     continue
 
             for kelime in self._tehdit_kelimeleri:
                 if kelime.lower() in icerik.lower():
-                    bulunan_aciklar.append({
-                        "tur": "tehdit",
-                        "kelime": kelime,
-                        "seviye": "kritik",
-                    })
+                    bulunan_aciklar.append(
+                        {
+                            "tur": "tehdit",
+                            "kelime": kelime,
+                            "seviye": "kritik",
+                        }
+                    )
 
             icerik_kucuk = icerik.lower()
             for seviye, anahtarlar in self._risk_kurallari.items():
                 for anahtar in anahtarlar:
                     if anahtar.lower() in icerik_kucuk:
-                        bulunan_aciklar.append({
-                            "tur": "risk",
-                            "anahtar": anahtar,
-                            "seviye": seviye,
-                        })
+                        bulunan_aciklar.append(
+                            {
+                                "tur": "risk",
+                                "anahtar": anahtar,
+                                "seviye": seviye,
+                            }
+                        )
 
             self._son_tarama = {
                 "zaman": baslangic.isoformat(),
@@ -180,10 +197,18 @@ class SecurityEngine:
                 "risk_puani": self._risk_seviyesi,
                 "risk_seviyesi": seviye_etiket,
                 "acik_sayisi": len(self._aciklar),
-                "kritik_sayisi": sum(1 for a in self._aciklar if a.get("seviye") == "kritik"),
-                "yuksek_sayisi": sum(1 for a in self._aciklar if a.get("seviye") == "yuksek"),
-                "orta_sayisi": sum(1 for a in self._aciklar if a.get("seviye") == "orta"),
-                "dusuk_sayisi": sum(1 for a in self._aciklar if a.get("seviye") == "dusuk"),
+                "kritik_sayisi": sum(
+                    1 for a in self._aciklar if a.get("seviye") == "kritik"
+                ),
+                "yuksek_sayisi": sum(
+                    1 for a in self._aciklar if a.get("seviye") == "yuksek"
+                ),
+                "orta_sayisi": sum(
+                    1 for a in self._aciklar if a.get("seviye") == "orta"
+                ),
+                "dusuk_sayisi": sum(
+                    1 for a in self._aciklar if a.get("seviye") == "dusuk"
+                ),
                 "tavsiye": self._tavsiye_uret(seviye_etiket),
             }
             return analiz
@@ -323,16 +348,16 @@ class AdvancedMemorySecurityEngine:
     """main.py'nin kullandigi PII redaction + injection tespiti motoru."""
 
     _PII = [
-        (re.compile(r'\b[\w.+-]+@[\w-]+\.[\w.-]+\b'), '[EMAIL]'),
-        (re.compile(r'\b\d{11}\b'),                    '[TCKN]'),
-        (re.compile(r'\b(?:\d[ -]?){13,16}\b'),        '[KART_NO]'),
+        (re.compile(r"\b[\w.+-]+@[\w-]+\.[\w.-]+\b"), "[EMAIL]"),
+        (re.compile(r"\b\d{11}\b"), "[TCKN]"),
+        (re.compile(r"\b(?:\d[ -]?){13,16}\b"), "[KART_NO]"),
     ]
     _INJECTION = re.compile(
-        r'ignore (all )?instructions?|'
-        r'forget (all )?previous|'
-        r'system prompt|'
-        r'jailbreak|'
-        r'disregard (all )?',
+        r"ignore (all )?instructions?|"
+        r"forget (all )?previous|"
+        r"system prompt|"
+        r"jailbreak|"
+        r"disregard (all )?",
         re.IGNORECASE,
     )
 
@@ -358,5 +383,7 @@ def login():
     tarama = se.tarama_yap(test_kodu)
     print(f"Acik sayisi: {tarama.get('acik_sayisi', 0)}")
     analiz = se.risk_analizi()
-    print(f"Risk: {analiz.get('risk_puani', '?')}/100 - {analiz.get('risk_seviyesi', '?')}")
+    print(
+        f"Risk: {analiz.get('risk_puani', '?')}/100 - {analiz.get('risk_seviyesi', '?')}"
+    )
     print(se.rapor_uret("ozet"))

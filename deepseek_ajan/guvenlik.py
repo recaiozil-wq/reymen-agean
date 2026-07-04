@@ -1,4 +1,5 @@
 """Guvenlik katmani - approvals, izinler."""
+
 import os, json
 from pathlib import Path
 
@@ -15,6 +16,7 @@ _DEFAULT_CONFIG = {
     "log_all_commands": True,
 }
 
+
 def _load():
     if CONFIG_FILE.exists():
         try:
@@ -24,18 +26,22 @@ def _load():
             pass
     return dict(_DEFAULT_CONFIG)
 
+
 def _save(cfg):
     CONFIG_DIR.mkdir(parents=True, exist_ok=True)
     CONFIG_FILE.write_text(json.dumps(cfg, indent=2, ensure_ascii=False))
 
+
 def get(key):
     return _load().get(key, _DEFAULT_CONFIG.get(key))
+
 
 def set_key(key, value):
     cfg = _load()
     cfg[key] = value
     _save(cfg)
     return True
+
 
 def yetki_kontrol(user_id=None):
     """Kullanim izni kontrolu. user_id=None = yerel kullanici."""
@@ -48,6 +54,7 @@ def yetki_kontrol(user_id=None):
         return True
     return False
 
+
 def onay_gerekli(komut_tipi):
     """Bu komut tipi icin onay gerekli mi?"""
     cfg = _load()
@@ -59,11 +66,13 @@ def onay_gerekli(komut_tipi):
         return False
     return True
 
+
 def durum():
     cfg = _load()
     mode = cfg["approvals_mode"]
     users = "herkes" if cfg["allow_all_users"] else "sadece yerel"
     return f"approvals={mode}, erisim={users}"
+
 
 def reset():
     _save(dict(_DEFAULT_CONFIG))

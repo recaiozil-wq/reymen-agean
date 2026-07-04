@@ -52,6 +52,7 @@ def _create_app(broker):
         Body: {sender, receiver, content, type?, reply_to?, metadata?}
         """
         from reymen.a2a import Message, MessageType
+
         try:
             msg = Message(
                 sender=data["sender"],
@@ -136,6 +137,7 @@ def _create_app(broker):
     @app.websocket("/ws/a2a/{agent_id}")
     async def websocket_endpoint(websocket, agent_id: str):
         from reymen.a2a import MessageType
+
         await websocket.accept()
         try:
             broker.register(agent_id)
@@ -147,6 +149,7 @@ def _create_app(broker):
                     try:
                         data = await websocket.receive_json()
                         from reymen.a2a import Message
+
                         msg = Message(
                             sender=data.get("sender", agent_id),
                             receiver=data["receiver"],
@@ -204,6 +207,7 @@ class A2ANode:
             Durum mesaji.
         """
         import uvicorn
+
         if background:
             self._thread = threading.Thread(
                 target=lambda: uvicorn.run(
@@ -226,6 +230,7 @@ class A2ANode:
         self._calisiyor = False
         if self._thread and self._thread.is_alive():
             import os
+
             os._exit(0)
         return "[A2A] Node durduruldu."
 
@@ -253,6 +258,7 @@ class A2ARemote:
     def _get_session(self):
         if self._session is None:
             import httpx
+
             self._session = httpx.Client(timeout=10.0)
         return self._session
 
@@ -263,32 +269,41 @@ class A2ARemote:
             r = s.get(f"{self.base_url}/api/a2a/health", timeout=5)
             r.raise_for_status()
             # Kendini kaydettir
-            s.post(f"{self.base_url}/api/a2a/register",
-                   json={"agent_id": self.local_agent_id})
+            s.post(
+                f"{self.base_url}/api/a2a/register",
+                json={"agent_id": self.local_agent_id},
+            )
             return f"[A2A] Baglanti basarili: {self.base_url}"
         except Exception as e:
             return f"[A2A] Baglanti hatasi: {e}"
 
-    def send(self, receiver: str, content: str, msg_type: str = "text",
-             reply_to: str | None = None) -> str:
+    def send(
+        self,
+        receiver: str,
+        content: str,
+        msg_type: str = "text",
+        reply_to: str | None = None,
+    ) -> str:
         """Uzak node uzerinden mesaj gonder."""
         try:
             s = self._get_session()
-            r = s.post(f"{self.base_url}/api/a2a/send", json={
-                "sender": self.local_agent_id,
-                "receiver": receiver,
-                "content": content,
-                "type": msg_type,
-                "reply_to": reply_to,
-            })
+            r = s.post(
+                f"{self.base_url}/api/a2a/send",
+                json={
+                    "sender": self.local_agent_id,
+                    "receiver": receiver,
+                    "content": content,
+                    "type": msg_type,
+                    "reply_to": reply_to,
+                },
+            )
             r.raise_for_status()
             data = r.json()
             return f"[A2A] Gonderildi: id={data.get('id', '?')}"
         except Exception as e:
             return f"[A2A] Gonderme hatasi: {e}"
 
-    def receive(self, agent_id: str | None = None,
-                timeout: float = 1.0) -> dict | None:
+    def receive(self, agent_id: str | None = None, timeout: float = 1.0) -> dict | None:
         """Uzak node'dan mesaj al."""
         aid = agent_id or self.local_agent_id
         try:
@@ -323,6 +338,7 @@ class A2ARemote:
 
 # ── NetworkBroker — Hibrit: yerel + uzak ─────────────────────────────────
 
+
 class NetworkBroker:
     """Yerel Broker + uzak node'lara yonlendirme yapabilen hibrit broker.
 
@@ -337,6 +353,7 @@ class NetworkBroker:
 
     def __init__(self, broker=None):
         from reymen.a2a import Broker
+
         self.broker = broker or Broker()
         self._uzaklar: dict[str, A2ARemote] = {}
         self._agent_uzak: dict[str, str] = {}  # agent_id -> node_adi
@@ -349,8 +366,7 @@ class NetworkBroker:
     def uzak_cikar(self, node_adi: str) -> str:
         self._uzaklar.pop(node_adi, None)
         # Bu node'a ait agent kayitlarini temizle
-        self._agent_uzak = {k: v for k, v in self._agent_uzak.items()
-                            if v != node_adi}
+        self._agent_uzak = {k: v for k, v in self._agent_uzak.items() if v != node_adi}
         return f"[A2A] Uzak node cikarildi: {node_adi}"
 
     def register(self, agent_id: str, node_adi: str | None = None) -> None:
@@ -372,15 +388,19 @@ class NetworkBroker:
     def send(self, message) -> None:
         """Mesaj gonder — otomatik yerel/uzak yonlendirme."""
         from reymen.a2a import Message
+
         receiver = message.receiver
 
         # Uzak mi?
         node_adi = self._agent_uzak.get(receiver)
         if node_adi and node_adi in self._uzaklar:
             remote = self._uzaklar[node_adi]
-            remote.send(receiver, message.content,
-                        msg_type=message.type.value,
-                        reply_to=message.reply_to)
+            remote.send(
+                receiver,
+                message.content,
+                msg_type=message.type.value,
+                reply_to=message.reply_to,
+            )
             return
 
         # Yerel
@@ -410,28 +430,26 @@ def motor_kaydet(motor) -> None:
     global _A2A_MOTOR
     _A2A_MOTOR = motor
     motor._plugin_arac_kaydet(
-        "A2A_NODE_BASLAT", _node_baslat,
-        "A2A HTTP/WS sunucusunu baslat. Parametreler: port=9100 host=0.0.0.0"
+        "A2A_NODE_BASLAT",
+        _node_baslat,
+        "A2A HTTP/WS sunucusunu baslat. Parametreler: port=9100 host=0.0.0.0",
     )
     motor._plugin_arac_kaydet(
-        "A2A_NODE_DURUM", _node_durum,
-        "A2A sunucu durumunu goster."
+        "A2A_NODE_DURUM", _node_durum, "A2A sunucu durumunu goster."
+    )
+    motor._plugin_arac_kaydet("A2A_NODE_DURDUR", _node_durdur, "A2A sunucuyu durdur.")
+    motor._plugin_arac_kaydet(
+        "A2A_UZAK_BAGLAN",
+        _uzak_baglan,
+        "Uzak bir A2A node'una baglan. Parametreler: url, agent_id",
     )
     motor._plugin_arac_kaydet(
-        "A2A_NODE_DURDUR", _node_durdur,
-        "A2A sunucuyu durdur."
+        "A2A_UZAK_GONDER",
+        _uzak_gonder,
+        "Uzak node uzerinden mesaj gonder. Parametreler: receiver, content, type?",
     )
     motor._plugin_arac_kaydet(
-        "A2A_UZAK_BAGLAN", _uzak_baglan,
-        "Uzak bir A2A node'una baglan. Parametreler: url, agent_id"
-    )
-    motor._plugin_arac_kaydet(
-        "A2A_UZAK_GONDER", _uzak_gonder,
-        "Uzak node uzerinden mesaj gonder. Parametreler: receiver, content, type?"
-    )
-    motor._plugin_arac_kaydet(
-        "A2A_UZAK_AL", _uzak_al,
-        "Uzak node'dan mesaj al. Parametre: timeout=1.0"
+        "A2A_UZAK_AL", _uzak_al, "Uzak node'dan mesaj al. Parametre: timeout=1.0"
     )
     logger.info("[A2A-TRANSPORT] Motor'a 6 arac kaydedildi")
 
@@ -443,6 +461,7 @@ def _node_baslat(**kw) -> str:
         return _node_durum(**kw) + " (zaten calisiyor)"
 
     from reymen.a2a import Broker
+
     port = int(kw.get("args", [9100])[0]) if kw.get("args") else 9100
     broker = Broker()
     _A2A_NODE = A2ANode(broker, port=port)
@@ -508,5 +527,7 @@ def _uzak_al(**kw) -> str:
     for key, remote in _UZAKLAR.items():
         msg = remote.receive(timeout=timeout)
         if msg:
-            return f"[A2A] {key}'den mesaj:\n  {json.dumps(msg, ensure_ascii=False)[:500]}"
+            return (
+                f"[A2A] {key}'den mesaj:\n  {json.dumps(msg, ensure_ascii=False)[:500]}"
+            )
     return "[A2A] Bekleyen mesaj yok"

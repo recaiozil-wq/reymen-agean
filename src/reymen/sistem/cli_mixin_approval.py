@@ -25,9 +25,9 @@ from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
 
+
 class MixinApproval:
     """ReYMeNCLI Onay/güvenlik metotları."""
-
 
     def _clarify_callback(self, question, choices):
         """
@@ -90,18 +90,18 @@ class MixinApproval:
         self._clarify_freetext = False
         self._clarify_deadline = 0
         self._invalidate()
-        _cprint(f"\n{_DIM}(clarify timed out after {timeout}s — agent will decide){_RST}")
+        _cprint(
+            f"\n{_DIM}(clarify timed out after {timeout}s — agent will decide){_RST}"
+        )
         return (
             "The user did not provide a response within the time limit. "
             "Use your best judgement to make the choice and proceed."
         )
 
-
-
     def _sudo_password_callback(self) -> str:
         """
         Prompt for sudo password through the prompt_toolkit UI.
-        
+
         Called from the agent thread when a sudo command is encountered.
         Uses the same clarify-style mechanism: sets UI state, waits on a
         queue for the user's response via the Enter key binding.
@@ -144,10 +144,9 @@ class MixinApproval:
         _cprint(f"\n{_DIM}  ⏱ Timeout — continuing without sudo{_RST}")
         return ""
 
-
-
-    def _approval_callback(self, command: str, description: str,
-                           *, allow_permanent: bool = True) -> str:
+    def _approval_callback(
+        self, command: str, description: str, *, allow_permanent: bool = True
+    ) -> str:
         """
         Prompt for dangerous command approval through the prompt_toolkit UI.
 
@@ -170,7 +169,9 @@ class MixinApproval:
             self._approval_state = {
                 "command": command,
                 "description": description,
-                "choices": self._approval_choices(command, allow_permanent=allow_permanent),
+                "choices": self._approval_choices(
+                    command, allow_permanent=allow_permanent
+                ),
                 "selected": 0,
                 "response_queue": response_queue,
             }
@@ -201,21 +202,23 @@ class MixinApproval:
             _cprint(f"\n{_DIM}  ⏱ Timeout — denying command{_RST}")
             return "deny"
 
-
-
-    def _approval_choices(self, command: str, *, allow_permanent: bool = True) -> list[str]:
+    def _approval_choices(
+        self, command: str, *, allow_permanent: bool = True
+    ) -> list[str]:
         """Return approval choices for a dangerous command prompt."""
-        choices = ["once", "session", "always", "deny"] if allow_permanent else ["once", "session", "deny"]
+        choices = (
+            ["once", "session", "always", "deny"]
+            if allow_permanent
+            else ["once", "session", "deny"]
+        )
         if len(command) > 70:
             choices.append("view")
         return choices
 
-
-
-    def _secret_capture_callback(self, var_name: str, prompt: str, metadata=None) -> dict:
+    def _secret_capture_callback(
+        self, var_name: str, prompt: str, metadata=None
+    ) -> dict:
         return prompt_for_secret(self, var_name, prompt, metadata)
-
-
 
     def _capture_modal_input_snapshot(self) -> None:
         """Temporarily clear the input buffer and save the user's in-progress draft."""
@@ -231,8 +234,6 @@ class MixinApproval:
         except Exception:
             self._modal_input_snapshot = None
 
-
-
     def _restore_modal_input_snapshot(self) -> None:
         """Restore any draft text that was present before a modal prompt opened."""
         snapshot = self._modal_input_snapshot
@@ -246,8 +247,6 @@ class MixinApproval:
         except Exception:
             logger.warning("[fix_01_sessiz_except] Exception")
 
-
-
     def _submit_secret_response(self, value: str) -> None:
         if not self._secret_state:
             return
@@ -256,12 +255,8 @@ class MixinApproval:
         self._secret_deadline = 0
         self._invalidate()
 
-
-
     def _cancel_secret_capture(self) -> None:
         self._submit_secret_response("")
-
-
 
     def _clear_secret_input_buffer(self) -> None:
         if getattr(self, "_app", None):
@@ -269,4 +264,3 @@ class MixinApproval:
                 self._app.current_buffer.reset()
             except Exception:
                 logger.warning("[fix_01_sessiz_except] Exception")
-

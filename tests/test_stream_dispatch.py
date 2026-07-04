@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 """tests/test_stream_dispatch.py — GatewayEventDispatcher birim testleri."""
+
 import sys
 from pathlib import Path
+
 PROJE_KOK = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJE_KOK))
 import pytest
@@ -9,14 +11,19 @@ from unittest.mock import MagicMock, ANY
 
 from gateway.stream_dispatch import GatewayEventDispatcher
 from gateway.stream_events import (
-    MessageChunk, MessageStop, Commentary,
-    ToolCallChunk, ToolCallFinished,
-    LongToolHint, GatewayNotice,
+    MessageChunk,
+    MessageStop,
+    Commentary,
+    ToolCallChunk,
+    ToolCallFinished,
+    LongToolHint,
+    GatewayNotice,
 )
 
 
 class _FakeAdapter:
     """Minimal adapter stub for testing dispatch routing."""
+
     def render_message_event(self, event, sink):
         sink.append(event)
 
@@ -74,7 +81,9 @@ class TestGatewayEventDispatcher:
     def test_dispatch_tool_call_chunk_off_mode(self):
         lines = []
         adapter = _FakeAdapter()
-        d = GatewayEventDispatcher(adapter, enqueue_tool_line=lines.append, tool_mode="off")
+        d = GatewayEventDispatcher(
+            adapter, enqueue_tool_line=lines.append, tool_mode="off"
+        )
         event = ToolCallChunk(tool_name="search", preview="query", args={})
         d.dispatch(event)
         assert len(lines) == 0
@@ -82,10 +91,16 @@ class TestGatewayEventDispatcher:
     def test_dispatch_tool_call_chunk_new_mode(self):
         lines = []
         adapter = _FakeAdapter()
-        d = GatewayEventDispatcher(adapter, enqueue_tool_line=lines.append, tool_mode="new")
+        d = GatewayEventDispatcher(
+            adapter, enqueue_tool_line=lines.append, tool_mode="new"
+        )
         event1 = ToolCallChunk(tool_name="search", preview="query", args={})
-        event2 = ToolCallChunk(tool_name="search", preview="query", args={})  # same tool, dedup
-        event3 = ToolCallChunk(tool_name="read", preview="file", args={})  # different tool
+        event2 = ToolCallChunk(
+            tool_name="search", preview="query", args={}
+        )  # same tool, dedup
+        event3 = ToolCallChunk(
+            tool_name="read", preview="file", args={}
+        )  # different tool
         d.dispatch(event1)
         d.dispatch(event2)
         d.dispatch(event3)
@@ -127,9 +142,11 @@ class TestGatewayEventDispatcher:
 
     def test_dispatch_never_raises(self):
         """dispatch() catches exceptions internally."""
+
         class CrashAdapter:
             def render_message_event(self, event, sink):
                 raise RuntimeError("crash")
+
             def format_tool_event(self, event, **kwargs):
                 raise RuntimeError("crash")
 
@@ -142,8 +159,10 @@ class TestGatewayEventDispatcher:
         """Unknown event types are silently ignored."""
         adapter = _FakeAdapter()
         d = GatewayEventDispatcher(adapter)
+
         class UnknownEvent:
             pass
+
         event = UnknownEvent()
         d.dispatch(event)  # should not raise
 

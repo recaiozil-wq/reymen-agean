@@ -8,6 +8,7 @@ Yapilandirma (ortam degiskenleri):
   - HASS_TOKEN               — Home Assistant Long-Lived Access Token
   - HASS_HOST                — Home Assistant sunucu adresi (varsayilan: http://homeassistant.local:8123)
 """
+
 import asyncio
 import json
 import logging
@@ -17,6 +18,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
 
 from pathlib import Path as _Path
+
 sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
 from src.gateways.config import Platform, PlatformConfig
@@ -35,6 +37,7 @@ logger = logging.getLogger(__name__)
 
 try:
     import httpx
+
     HTTPX_AVAILABLE = True
 except ImportError:
     HTTPX_AVAILABLE = False
@@ -81,7 +84,9 @@ class HomeAssistantAdapter(BasePlatformAdapter):
     def __init__(self, config: PlatformConfig):
         super().__init__(config, Platform.HOMEASSISTANT)
         self._token: str = _env("HASS_TOKEN", config.token or "")
-        self._host: str = _env("HASS_HOST", config.extra.get("host", _DEFAULT_HASS_HOST))
+        self._host: str = _env(
+            "HASS_HOST", config.extra.get("host", _DEFAULT_HASS_HOST)
+        )
 
         self._client: Optional[httpx.AsyncClient] = None
 
@@ -99,7 +104,9 @@ class HomeAssistantAdapter(BasePlatformAdapter):
             return False
 
         if not self._token:
-            logger.warning("[HomeAssistant] HASS_TOKEN tanimlanmamis; auth basarisiz olabilir.")
+            logger.warning(
+                "[HomeAssistant] HASS_TOKEN tanimlanmamis; auth basarisiz olabilir."
+            )
 
         # Baglanti dogrulamasi yap (opsiyonel health check)
         try:
@@ -110,11 +117,14 @@ class HomeAssistantAdapter(BasePlatformAdapter):
                 headers=headers,
             )
             if resp.status_code == 401:
-                logger.error("[HomeAssistant] API yetkisiz — HASS_TOKEN gecersiz olabilir.")
+                logger.error(
+                    "[HomeAssistant] API yetkisiz — HASS_TOKEN gecersiz olabilir."
+                )
             elif resp.is_error:
                 logger.warning(
                     "[HomeAssistant] API yaniti: %s %s",
-                    resp.status_code, resp.text[:200],
+                    resp.status_code,
+                    resp.text[:200],
                 )
             else:
                 logger.info(
@@ -179,7 +189,11 @@ class HomeAssistantAdapter(BasePlatformAdapter):
             # Yontem 1: conversation/process
             if meta.get("use_conversation", True):
                 result = await self._send_via_conversation(
-                    client, headers, chat_id, text, meta,
+                    client,
+                    headers,
+                    chat_id,
+                    text,
+                    meta,
                 )
                 if result.success:
                     return result
@@ -187,7 +201,11 @@ class HomeAssistantAdapter(BasePlatformAdapter):
 
             # Yontem 2: notify servisi
             return await self._send_via_notify(
-                client, headers, chat_id, text, meta,
+                client,
+                headers,
+                chat_id,
+                text,
+                meta,
             )
 
         except httpx.HTTPStatusError as e:
@@ -242,7 +260,12 @@ class HomeAssistantAdapter(BasePlatformAdapter):
         data = resp.json()
 
         # Basarili conversation yaniti
-        response_text = data.get("response", {}).get("speech", {}).get("plain", {}).get("speech", "")
+        response_text = (
+            data.get("response", {})
+            .get("speech", {})
+            .get("plain", {})
+            .get("speech", "")
+        )
         if response_text:
             logger.debug("[HomeAssistant] Conversation yaniti: %s", response_text[:200])
 
@@ -300,9 +323,7 @@ class HomeAssistantAdapter(BasePlatformAdapter):
             raw_response={"service": service},
         )
 
-    async def send_typing(
-        self, chat_id: str, metadata: Optional[dict] = None
-    ) -> None:
+    async def send_typing(self, chat_id: str, metadata: Optional[dict] = None) -> None:
         """Home Assistant typing indicator (no-op, REST API desteklemez)."""
         pass
 

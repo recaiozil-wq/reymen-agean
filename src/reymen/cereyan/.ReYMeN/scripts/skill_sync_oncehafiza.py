@@ -20,6 +20,7 @@ import sys
 from datetime import datetime, date, timedelta
 from pathlib import Path
 import logging
+
 logger = logging.getLogger(__name__)
 
 # ── Yollar ────────────────────────────────────────────────────────────────
@@ -143,7 +144,7 @@ def main():
             # Hash ayni -> sadece son_gorulme guncelle
             conn.execute(
                 "UPDATE skill_hashes SET son_gorulme = datetime('now') WHERE dosya_yolu = ?",
-                (rel,)
+                (rel,),
             )
             conn.commit()
             atlanan += 1
@@ -167,15 +168,23 @@ def main():
                        (hedef, kategori, icerik, guven_skoru, basari_sayisi, hata_sayisi,
                         son_kullanim, gecerlilik_tarihi, olusturulma, guncelleme)
                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                    (hedef, kategori, icerik,
-                     0.5,  # baslangic guven
-                     1, 0,  # basari=1, hata=0
-                     bugun, gecerlilik, simdi, simdi)
+                    (
+                        hedef,
+                        kategori,
+                        icerik,
+                        0.5,  # baslangic guven
+                        1,
+                        0,  # basari=1, hata=0
+                        bugun,
+                        gecerlilik,
+                        simdi,
+                        simdi,
+                    ),
                 )
                 conn.execute(
                     """INSERT INTO skill_hashes (dosya_yolu, hash_256, son_gorulme, guncelleme)
                        VALUES (?, ?, datetime('now'), datetime('now'))""",
-                    (rel, h)
+                    (rel, h),
                 )
                 conn.commit()
                 yeni += 1
@@ -187,19 +196,19 @@ def main():
                 try:
                     existing = conn.execute(
                         "SELECT id FROM ogrenmeler WHERE hedef = ? AND kategori = ?",
-                        (hedef, kategori)
+                        (hedef, kategori),
                     ).fetchone()
                     if existing:
                         conn.execute(
                             """UPDATE ogrenmeler SET
                                 icerik = ?, guncelleme = ?, son_kullanim = ?
                                WHERE id = ?""",
-                            (icerik, simdi, bugun, existing["id"])
+                            (icerik, simdi, bugun, existing["id"]),
                         )
                         conn.execute(
                             """INSERT OR REPLACE INTO skill_hashes (dosya_yolu, hash_256, son_gorulme, guncelleme)
                                VALUES (?, ?, datetime('now'), datetime('now'))""",
-                            (rel, h)
+                            (rel, h),
                         )
                         conn.commit()
                         guncellenen += 1
@@ -217,14 +226,14 @@ def main():
             try:
                 existing = conn.execute(
                     "SELECT id FROM ogrenmeler WHERE hedef = ? AND kategori = ?",
-                    (hedef, kategori)
+                    (hedef, kategori),
                 ).fetchone()
                 if existing:
                     conn.execute(
                         """UPDATE ogrenmeler SET
                             icerik = ?, guncelleme = ?, son_kullanim = ?
                            WHERE id = ?""",
-                        (icerik, simdi, bugun, existing["id"])
+                        (icerik, simdi, bugun, existing["id"]),
                     )
                 else:
                     # Hedef+kategori yoksa -> INSERT (dosya yeniden tasinmis olabilir)
@@ -233,16 +242,25 @@ def main():
                            (hedef, kategori, icerik, guven_skoru, basari_sayisi, hata_sayisi,
                             son_kullanim, gecerlilik_tarihi, olusturulma, guncelleme)
                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                        (hedef, kategori, icerik,
-                         0.5, 1, 0,
-                         bugun, gecerlilik, simdi, simdi)
+                        (
+                            hedef,
+                            kategori,
+                            icerik,
+                            0.5,
+                            1,
+                            0,
+                            bugun,
+                            gecerlilik,
+                            simdi,
+                            simdi,
+                        ),
                     )
 
                 conn.execute(
                     """UPDATE skill_hashes SET
                         hash_256 = ?, son_gorulme = datetime('now'), guncelleme = datetime('now')
                        WHERE dosya_yolu = ?""",
-                    (h, rel)
+                    (h, rel),
                 )
                 conn.commit()
                 guncellenen += 1
@@ -263,7 +281,9 @@ def main():
     silinen_kayitlar = 0
     for row in conn.execute("SELECT dosya_yolu FROM skill_hashes"):
         if row["dosya_yolu"] not in tum_rel_paths:
-            conn.execute("DELETE FROM skill_hashes WHERE dosya_yolu = ?", (row["dosya_yolu"],))
+            conn.execute(
+                "DELETE FROM skill_hashes WHERE dosya_yolu = ?", (row["dosya_yolu"],)
+            )
             silinen_kayitlar += 1
     if silinen_kayitlar > 0:
         conn.commit()
@@ -281,14 +301,18 @@ def main():
     log(f"  Toplam dosya:    {len(md_files)}")
 
     # Son satir ozet - cron delivery icin
-    print(f"\nOZET: +{yeni} yeni / ~{guncellenen} guncellendi / -{atlanan} ayni / !{hata} hata / Silinen: {silinen_kayitlar}")
+    print(
+        f"\nOZET: +{yeni} yeni / ~{guncellenen} guncellendi / -{atlanan} ayni / !{hata} hata / Silinen: {silinen_kayitlar}"
+    )
 
     # Raporu decisions.md'ye de ekle
     karar_yolu = CEREYAN_DIR / ".ReYMeN" / "decisions.md"
     try:
         with open(karar_yolu, "a", encoding="utf-8") as f:
             f.write(f"## {simdi[:10]} {simdi[11:16]} — Skill -> OnceHafiza Sync\n")
-            f.write(f"- Yeni: {yeni}, Guncellenen: {guncellenen}, Atanan: {atlanan}, Hata: {hata}\n")
+            f.write(
+                f"- Yeni: {yeni}, Guncellenen: {guncellenen}, Atanan: {atlanan}, Hata: {hata}\n"
+            )
     except Exception:
         logger.warning("[fix_01_sessiz_except] Exception")
 

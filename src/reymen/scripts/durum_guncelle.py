@@ -18,9 +18,11 @@ sys.path.insert(0, str(KOK))
 
 # Kilit mekanizmasi icin durum_paylas
 import importlib
+
 _dp = importlib.import_module("reymen.sistem.durum_paylas")
 _kilitle = _dp._kilitle
 _kilidi_ac = _dp._kilidi_ac
+
 
 def _py_dosyalari_tara():
     """Projedeki .py dosyalarini tara, metrikleri topla."""
@@ -33,8 +35,17 @@ def _py_dosyalari_tara():
 
     for root, dirs, files in os.walk(KOK):
         # Gereksiz klasorleri atla
-        if any(skip in root for skip in ["__pycache__", ".git", "venv", "bot_venv", 
-                                          "node_modules", "ReYMeN-memory-backup"]):
+        if any(
+            skip in root
+            for skip in [
+                "__pycache__",
+                ".git",
+                "venv",
+                "bot_venv",
+                "node_modules",
+                "ReYMeN-memory-backup",
+            ]
+        ):
             continue
         for f in files:
             if not f.endswith(".py"):
@@ -48,7 +59,9 @@ def _py_dosyalari_tara():
                 toplam_satir += satir_sayisi
                 if "test" in f.lower() or "test_" in f.lower():
                     test_dosyasi += 1
-                except_pass += icerik.count("except:\n        pass") + icerik.count("except:\n            pass")
+                except_pass += icerik.count("except:\n        pass") + icerik.count(
+                    "except:\n            pass"
+                )
                 sinif += icerik.count("class ")
                 fonksiyon += icerik.count("def ")
             except Exception as _e:
@@ -63,7 +76,9 @@ def _py_dosyalari_tara():
         "sinif": sinif,
         "fonksiyon": fonksiyon,
         "except_pass": except_pass,
-        "ortalama_dosya_boyu": round(toplam_satir / toplam_dosya, 1) if toplam_dosya else 0,
+        "ortalama_dosya_boyu": round(toplam_satir / toplam_dosya, 1)
+        if toplam_dosya
+        else 0,
     }
 
 

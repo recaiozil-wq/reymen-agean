@@ -37,9 +37,10 @@ def web_arama_kaydet(motor) -> None:
         motor._plugin_arac_kaydet("WEB_ARA", web_ara, "Web'de ara")
     """
     motor._plugin_arac_kaydet(
-        "WEB_ARA", web_ara,
+        "WEB_ARA",
+        web_ara,
         "Web aramasi yapar (coklu back-end, auto-detect). "
-        "Kullanim: WEB_ARA(sorgu=\"...\")."
+        'Kullanim: WEB_ARA(sorgu="...").',
     )
 
 
@@ -51,5 +52,6 @@ def motor_kaydet(motor) -> None:
 if __name__ == "__main__":
     # Test
     import sys
+
     sonuc = web_ara(" ".join(sys.argv[1:]) if len(sys.argv) > 1 else "test")
     print(sonuc)

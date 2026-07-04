@@ -6,6 +6,7 @@ Verifies:
   - Each handler's happy path.
   - Error paths (missing required args, bad metadata type, etc).
 """
+
 from __future__ import annotations
 
 import json
@@ -17,6 +18,7 @@ import pytest
 # ---------------------------------------------------------------------------
 # Gating
 # ---------------------------------------------------------------------------
+
 
 def test_kanban_tools_hidden_without_env_var(monkeypatch, tmp_path):
     """Normal `ReYMeN chat` sessions (no ReYMeN_KANBAN_TASK) must have
@@ -34,9 +36,7 @@ def test_kanban_tools_hidden_without_env_var(monkeypatch, tmp_path):
     schema = registry.get_definitions(set(resolve_toolset("ReYMeN-cli")), quiet=True)
     names = {s["function"].get("name") for s in schema if "function" in s}
     kanban = {n for n in names if n and n.startswith("kanban_")}
-    assert kanban == set(), (
-        f"kanban tools leaked into normal chat schema: {kanban}"
-    )
+    assert kanban == set(), f"kanban tools leaked into normal chat schema: {kanban}"
 
 
 def test_kanban_tools_visible_with_env_var(monkeypatch, tmp_path):
@@ -55,8 +55,13 @@ def test_kanban_tools_visible_with_env_var(monkeypatch, tmp_path):
     names = {s["function"].get("name") for s in schema if "function" in s}
     kanban = {n for n in names if n and n.startswith("kanban_")}
     expected = {
-        "kanban_show", "kanban_complete", "kanban_block", "kanban_heartbeat",
-        "kanban_comment", "kanban_create", "kanban_link",
+        "kanban_show",
+        "kanban_complete",
+        "kanban_block",
+        "kanban_heartbeat",
+        "kanban_comment",
+        "kanban_create",
+        "kanban_link",
     }
     assert kanban == expected, f"expected {expected}, got {kanban}"
 
@@ -135,8 +140,13 @@ def test_kanban_tools_visible_with_toolset_config(monkeypatch, tmp_path):
     kanban = {n for n in names if n and n.startswith("kanban_")}
     expected = {
         "kanban_list",
-        "kanban_show", "kanban_complete", "kanban_block", "kanban_heartbeat",
-        "kanban_comment", "kanban_create", "kanban_link",
+        "kanban_show",
+        "kanban_complete",
+        "kanban_block",
+        "kanban_heartbeat",
+        "kanban_comment",
+        "kanban_create",
+        "kanban_link",
         "kanban_unblock",
     }
     assert kanban == expected, f"expected {expected}, got {kanban}"
@@ -145,6 +155,7 @@ def test_kanban_tools_visible_with_toolset_config(monkeypatch, tmp_path):
 # ---------------------------------------------------------------------------
 # Handler happy paths
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def worker_env(monkeypatch, tmp_path):
@@ -156,9 +167,11 @@ def worker_env(monkeypatch, tmp_path):
     monkeypatch.setenv("ReYMeN_PROFILE", "test-worker")
     monkeypatch.delenv("ReYMeN_SESSION_ID", raising=False)
     from pathlib import Path as _Path
+
     monkeypatch.setattr(_Path, "home", lambda: tmp_path)
 
     from ReYMeN_cli import kanban_db as kb
+
     kb._INITIALIZED_PATHS.clear()
     kb.init_db()
     conn = kb.connect()
@@ -173,6 +186,7 @@ def worker_env(monkeypatch, tmp_path):
 
 def test_show_defaults_to_env_task_id(worker_env):
     from tools import kanban_tools as kt
+
     out = kt._handle_show({})
     d = json.loads(out)
     assert "task" in d
@@ -185,12 +199,14 @@ def test_show_defaults_to_env_task_id(worker_env):
 def test_show_explicit_task_id(worker_env):
     """Peek at a different task than the one in env."""
     from ReYMeN_cli import kanban_db as kb
+
     conn = kb.connect()
     try:
         other = kb.create_task(conn, title="other task", assignee="peer")
     finally:
         conn.close()
     from tools import kanban_tools as kt
+
     out = kt._handle_show({"task_id": other})
     d = json.loads(out)
     assert d["task"]["id"] == other
@@ -200,6 +216,7 @@ def test_list_filters_tasks(monkeypatch, worker_env):
     """kanban_list gives orchestrators filtered board discovery."""
     monkeypatch.delenv("ReYMeN_KANBAN_TASK", raising=False)
     from ReYMeN_cli import kanban_db as kb
+
     conn = kb.connect()
     try:
         a = kb.create_task(conn, title="alpha", assignee="factory", priority=5)
@@ -209,6 +226,7 @@ def test_list_filters_tasks(monkeypatch, worker_env):
         conn.close()
 
     from tools import kanban_tools as kt
+
     out = kt._handle_list({"assignee": "factory", "status": "ready", "limit": 10})
     d = json.loads(out)
     ids = [t["id"] for t in d["tasks"]]
@@ -218,11 +236,13 @@ def test_list_filters_tasks(monkeypatch, worker_env):
     assert d["tasks"][0]["parent_count"] == 0
     assert b not in ids
 
-    tenant_out = kt._handle_list({
-        "assignee": "factory",
-        "status": "ready",
-        "tenant": "other",
-    })
+    tenant_out = kt._handle_list(
+        {
+            "assignee": "factory",
+            "status": "ready",
+            "tenant": "other",
+        }
+    )
     tenant_ids = [t["id"] for t in json.loads(tenant_out)["tasks"]]
     assert tenant_ids == [c]
 
@@ -230,6 +250,7 @@ def test_list_filters_tasks(monkeypatch, worker_env):
 def test_list_rejects_invalid_status(monkeypatch, worker_env):
     monkeypatch.delenv("ReYMeN_KANBAN_TASK", raising=False)
     from tools import kanban_tools as kt
+
     out = kt._handle_list({"status": "not-a-state"})
     assert "status must be one of" in json.loads(out).get("error", "")
 
@@ -237,6 +258,7 @@ def test_list_rejects_invalid_status(monkeypatch, worker_env):
 def test_list_rejects_bad_limit(monkeypatch, worker_env):
     monkeypatch.delenv("ReYMeN_KANBAN_TASK", raising=False)
     from tools import kanban_tools as kt
+
     assert json.loads(kt._handle_list({"limit": "nope"})).get("error")
     assert json.loads(kt._handle_list({"limit": 0})).get("error")
 
@@ -244,6 +266,7 @@ def test_list_rejects_bad_limit(monkeypatch, worker_env):
 def test_list_parses_include_archived_string_false(monkeypatch, worker_env):
     monkeypatch.delenv("ReYMeN_KANBAN_TASK", raising=False)
     from ReYMeN_cli import kanban_db as kb
+
     conn = kb.connect()
     try:
         live = kb.create_task(conn, title="live task", assignee="factory")
@@ -253,10 +276,13 @@ def test_list_parses_include_archived_string_false(monkeypatch, worker_env):
         conn.close()
 
     from tools import kanban_tools as kt
-    out = kt._handle_list({
-        "assignee": "factory",
-        "include_archived": "false",
-    })
+
+    out = kt._handle_list(
+        {
+            "assignee": "factory",
+            "include_archived": "false",
+        }
+    )
     ids = [t["id"] for t in json.loads(out)["tasks"]]
     assert live in ids
     assert archived not in ids
@@ -265,6 +291,7 @@ def test_list_parses_include_archived_string_false(monkeypatch, worker_env):
 def test_list_parses_include_archived_string_true(monkeypatch, worker_env):
     monkeypatch.delenv("ReYMeN_KANBAN_TASK", raising=False)
     from ReYMeN_cli import kanban_db as kb
+
     conn = kb.connect()
     try:
         live = kb.create_task(conn, title="live task", assignee="factory")
@@ -274,10 +301,13 @@ def test_list_parses_include_archived_string_true(monkeypatch, worker_env):
         conn.close()
 
     from tools import kanban_tools as kt
-    out = kt._handle_list({
-        "assignee": "factory",
-        "include_archived": "true",
-    })
+
+    out = kt._handle_list(
+        {
+            "assignee": "factory",
+            "include_archived": "true",
+        }
+    )
     ids = [t["id"] for t in json.loads(out)["tasks"]]
     assert live in ids
     assert archived in ids
@@ -286,21 +316,26 @@ def test_list_parses_include_archived_string_true(monkeypatch, worker_env):
 def test_list_rejects_bad_include_archived(monkeypatch, worker_env):
     monkeypatch.delenv("ReYMeN_KANBAN_TASK", raising=False)
     from tools import kanban_tools as kt
+
     out = kt._handle_list({"include_archived": "sometimes"})
     assert "include_archived must be" in json.loads(out).get("error", "")
 
 
 def test_complete_happy_path(worker_env):
     from tools import kanban_tools as kt
-    out = kt._handle_complete({
-        "summary": "got the thing done",
-        "metadata": {"files": 2},
-    })
+
+    out = kt._handle_complete(
+        {
+            "summary": "got the thing done",
+            "metadata": {"files": 2},
+        }
+    )
     d = json.loads(out)
     assert d["ok"] is True
     assert d["task_id"] == worker_env
     # Verify via kernel
     from ReYMeN_cli import kanban_db as kb
+
     conn = kb.connect()
     try:
         run = kb.latest_run(conn, worker_env)
@@ -324,10 +359,12 @@ def test_complete_metadata_round_trips_through_show(worker_env):
         "residual_risk": ["dashboard rendering not exercised"],
     }
 
-    complete_out = kt._handle_complete({
-        "summary": "finished with structured evidence",
-        "metadata": handoff,
-    })
+    complete_out = kt._handle_complete(
+        {
+            "summary": "finished with structured evidence",
+            "metadata": handoff,
+        }
+    )
     assert json.loads(complete_out)["ok"] is True
 
     show_out = kt._handle_show({"task_id": worker_env})
@@ -343,14 +380,17 @@ def test_complete_stamps_worker_session_id_from_env(monkeypatch, worker_env):
     monkeypatch.setenv("ReYMeN_SESSION_ID", "session-trusted")
     metadata = {"files": 2, "worker_session_id": "user-spoof"}
 
-    out = kt._handle_complete({
-        "summary": "done by scoped worker",
-        "metadata": metadata,
-    })
+    out = kt._handle_complete(
+        {
+            "summary": "done by scoped worker",
+            "metadata": metadata,
+        }
+    )
     assert json.loads(out)["ok"] is True
     assert metadata["worker_session_id"] == "user-spoof"
 
     from ReYMeN_cli import kanban_db as kb
+
     conn = kb.connect()
     try:
         run = kb.latest_run(conn, worker_env)
@@ -370,14 +410,17 @@ def test_complete_does_not_stamp_worker_session_id_without_scoped_task(
     monkeypatch.delenv("ReYMeN_KANBAN_TASK", raising=False)
     monkeypatch.setenv("ReYMeN_SESSION_ID", "session-trusted")
 
-    out = kt._handle_complete({
-        "task_id": worker_env,
-        "summary": "done outside worker scope",
-        "metadata": {"files": 2, "worker_session_id": "user-provided"},
-    })
+    out = kt._handle_complete(
+        {
+            "task_id": worker_env,
+            "summary": "done outside worker scope",
+            "metadata": {"files": 2, "worker_session_id": "user-provided"},
+        }
+    )
     assert json.loads(out)["ok"] is True
 
     from ReYMeN_cli import kanban_db as kb
+
     conn = kb.connect()
     try:
         run = kb.latest_run(conn, worker_env)
@@ -392,6 +435,7 @@ def test_complete_does_not_stamp_worker_session_id_without_scoped_task(
 def test_complete_with_result_only(worker_env):
     """`result` alone (without summary) is accepted for legacy compat."""
     from tools import kanban_tools as kt
+
     out = kt._handle_complete({"result": "legacy result"})
     d = json.loads(out)
     assert d["ok"] is True
@@ -404,10 +448,12 @@ def test_complete_with_artifacts_lands_in_event_payload(worker_env):
     from ReYMeN_cli import kanban_db as kb
     from tools import kanban_tools as kt
 
-    out = kt._handle_complete({
-        "summary": "rendered the chart",
-        "artifacts": ["/tmp/q3-revenue.png", "/tmp/q3-report.pdf"],
-    })
+    out = kt._handle_complete(
+        {
+            "summary": "rendered the chart",
+            "artifacts": ["/tmp/q3-revenue.png", "/tmp/q3-report.pdf"],
+        }
+    )
     assert json.loads(out)["ok"] is True
 
     conn = kb.connect()
@@ -436,10 +482,12 @@ def test_complete_artifacts_accepts_single_string(worker_env):
     from ReYMeN_cli import kanban_db as kb
     from tools import kanban_tools as kt
 
-    out = kt._handle_complete({
-        "summary": "one chart",
-        "artifacts": "/tmp/chart.png",
-    })
+    out = kt._handle_complete(
+        {
+            "summary": "one chart",
+            "artifacts": "/tmp/chart.png",
+        }
+    )
     assert json.loads(out)["ok"] is True
 
     conn = kb.connect()
@@ -456,11 +504,13 @@ def test_complete_artifacts_merges_with_explicit_metadata_field(worker_env):
     from ReYMeN_cli import kanban_db as kb
     from tools import kanban_tools as kt
 
-    out = kt._handle_complete({
-        "summary": "merged",
-        "metadata": {"artifacts": ["/tmp/a.png"], "other": "fact"},
-        "artifacts": ["/tmp/b.pdf", "/tmp/a.png"],
-    })
+    out = kt._handle_complete(
+        {
+            "summary": "merged",
+            "metadata": {"artifacts": ["/tmp/a.png"], "other": "fact"},
+            "artifacts": ["/tmp/b.pdf", "/tmp/a.png"],
+        }
+    )
     assert json.loads(out)["ok"] is True
 
     conn = kb.connect()
@@ -476,22 +526,27 @@ def test_complete_artifacts_merges_with_explicit_metadata_field(worker_env):
 def test_complete_rejects_non_list_artifacts(worker_env):
     """Non-list, non-string artifacts should be rejected with a clear error."""
     from tools import kanban_tools as kt
-    out = kt._handle_complete({
-        "summary": "bad shape",
-        "artifacts": {"not": "a list"},
-    })
+
+    out = kt._handle_complete(
+        {
+            "summary": "bad shape",
+            "artifacts": {"not": "a list"},
+        }
+    )
     err = json.loads(out).get("error", "")
     assert "artifacts must be a list" in err
 
 
 def test_complete_rejects_no_handoff(worker_env):
     from tools import kanban_tools as kt
+
     out = kt._handle_complete({})
     assert json.loads(out).get("error"), "should have errored"
 
 
 def test_complete_rejects_non_dict_metadata(worker_env):
     from tools import kanban_tools as kt
+
     out = kt._handle_complete({"summary": "x", "metadata": [1, 2, 3]})
     assert json.loads(out).get("error")
 
@@ -506,10 +561,12 @@ def test_complete_phantom_card_message_advertises_retry(worker_env):
     from ReYMeN_cli import kanban_db as kb
     from tools import kanban_tools as kt
 
-    out = kt._handle_complete({
-        "summary": "oops claimed a phantom",
-        "created_cards": ["t_phantomdeadbeef"],
-    })
+    out = kt._handle_complete(
+        {
+            "summary": "oops claimed a phantom",
+            "created_cards": ["t_phantomdeadbeef"],
+        }
+    )
     err = json.loads(out).get("error", "")
     assert err, f"expected an error, got {out!r}"
     # Phantom id surfaced verbatim.
@@ -539,17 +596,25 @@ def test_complete_retry_with_empty_created_cards_succeeds(worker_env):
     from tools import kanban_tools as kt
 
     # Hit the gate first.
-    rejected = json.loads(kt._handle_complete({
-        "summary": "oops",
-        "created_cards": ["t_phantomdeadbeef"],
-    }))
+    rejected = json.loads(
+        kt._handle_complete(
+            {
+                "summary": "oops",
+                "created_cards": ["t_phantomdeadbeef"],
+            }
+        )
+    )
     assert rejected.get("error")
 
     # Retry with the escape hatch.
-    ok = json.loads(kt._handle_complete({
-        "summary": "retry without claims",
-        "created_cards": [],
-    }))
+    ok = json.loads(
+        kt._handle_complete(
+            {
+                "summary": "retry without claims",
+                "created_cards": [],
+            }
+        )
+    )
     assert ok.get("ok") is True
 
     conn = kb.connect()
@@ -568,25 +633,38 @@ def test_complete_retry_with_corrected_created_cards_succeeds(worker_env):
 
     # Create a real child via the tool so it gets the worker-profile
     # attribution the gate trusts.
-    child = json.loads(kt._handle_create({
-        "title": "real child", "assignee": "peer",
-    }))
+    child = json.loads(
+        kt._handle_create(
+            {
+                "title": "real child",
+                "assignee": "peer",
+            }
+        )
+    )
     assert child["ok"]
     real_id = child["task_id"]
 
     # First attempt mixes real + phantom — gate rejects.
-    rejected = json.loads(kt._handle_complete({
-        "summary": "oops",
-        "created_cards": [real_id, "t_phantomdeadbeef"],
-    }))
+    rejected = json.loads(
+        kt._handle_complete(
+            {
+                "summary": "oops",
+                "created_cards": [real_id, "t_phantomdeadbeef"],
+            }
+        )
+    )
     assert rejected.get("error")
     assert "t_phantomdeadbeef" in rejected["error"]
 
     # Retry with corrected list.
-    ok = json.loads(kt._handle_complete({
-        "summary": "retry with corrected list",
-        "created_cards": [real_id],
-    }))
+    ok = json.loads(
+        kt._handle_complete(
+            {
+                "summary": "retry with corrected list",
+                "created_cards": [real_id],
+            }
+        )
+    )
     assert ok.get("ok") is True
 
     conn = kb.connect()
@@ -598,10 +676,12 @@ def test_complete_retry_with_corrected_created_cards_succeeds(worker_env):
 
 def test_block_happy_path(worker_env):
     from tools import kanban_tools as kt
+
     out = kt._handle_block({"reason": "need clarification"})
     d = json.loads(out)
     assert d["ok"] is True
     from ReYMeN_cli import kanban_db as kb
+
     conn = kb.connect()
     try:
         assert kb.get_task(conn, worker_env).status == "blocked"
@@ -611,6 +691,7 @@ def test_block_happy_path(worker_env):
 
 def test_block_rejects_empty_reason(worker_env):
     from tools import kanban_tools as kt
+
     for bad in ["", "   ", None]:
         out = kt._handle_block({"reason": bad})
         assert json.loads(out).get("error")
@@ -618,6 +699,7 @@ def test_block_rejects_empty_reason(worker_env):
 
 def test_heartbeat_happy_path(worker_env):
     from tools import kanban_tools as kt
+
     out = kt._handle_heartbeat({"note": "progress"})
     d = json.loads(out)
     assert d["ok"] is True
@@ -626,6 +708,7 @@ def test_heartbeat_happy_path(worker_env):
 def test_heartbeat_without_note(worker_env):
     """note is optional."""
     from tools import kanban_tools as kt
+
     out = kt._handle_heartbeat({})
     d = json.loads(out)
     assert d["ok"] is True
@@ -688,14 +771,18 @@ def test_heartbeat_extends_claim_expires(worker_env):
 
 def test_comment_happy_path(worker_env):
     from tools import kanban_tools as kt
-    out = kt._handle_comment({
-        "task_id": worker_env,
-        "body": "hello thread",
-    })
+
+    out = kt._handle_comment(
+        {
+            "task_id": worker_env,
+            "body": "hello thread",
+        }
+    )
     d = json.loads(out)
     assert d["ok"] is True
     assert d["comment_id"]
     from ReYMeN_cli import kanban_db as kb
+
     conn = kb.connect()
     try:
         comments = kb.list_comments(conn, worker_env)
@@ -709,6 +796,7 @@ def test_comment_happy_path(worker_env):
 
 def test_comment_rejects_empty_body(worker_env):
     from tools import kanban_tools as kt
+
     out = kt._handle_comment({"task_id": worker_env, "body": "   "})
     assert json.loads(out).get("error")
 
@@ -722,11 +810,17 @@ def test_comment_ignores_caller_supplied_author(worker_env):
     is removed.
     """
     from tools import kanban_tools as kt
-    out = kt._handle_comment({
-        "task_id": worker_env, "body": "hi", "author": "ReYMeN-system",
-    })
+
+    out = kt._handle_comment(
+        {
+            "task_id": worker_env,
+            "body": "hi",
+            "author": "ReYMeN-system",
+        }
+    )
     assert json.loads(out)["ok"]
     from ReYMeN_cli import kanban_db as kb
+
     conn = kb.connect()
     try:
         comments = kb.list_comments(conn, worker_env)
@@ -743,22 +837,27 @@ def test_comment_schema_omits_author_override():
     handler is hardened against.
     """
     from tools.kanban_tools import KANBAN_COMMENT_SCHEMA
+
     props = KANBAN_COMMENT_SCHEMA["parameters"]["properties"]
     assert "author" not in props
 
 
 def test_create_happy_path(worker_env):
     from tools import kanban_tools as kt
-    out = kt._handle_create({
-        "title": "child task",
-        "assignee": "peer",
-        "parents": [worker_env],
-    })
+
+    out = kt._handle_create(
+        {
+            "title": "child task",
+            "assignee": "peer",
+            "parents": [worker_env],
+        }
+    )
     d = json.loads(out)
     assert d["ok"] is True
     assert d["task_id"]
     assert d["status"] == "todo"  # parent isn't done yet
     from ReYMeN_cli import kanban_db as kb
+
     conn = kb.connect()
     try:
         child = kb.get_task(conn, d["task_id"])
@@ -779,8 +878,11 @@ def test_create_inherits_worker_dir_workspace(monkeypatch, worker_env):
     conn = kb.connect()
     try:
         self_tid = kb.create_task(
-            conn, title="dir worker", assignee="test-worker",
-            workspace_kind="dir", workspace_path=proj,
+            conn,
+            title="dir worker",
+            assignee="test-worker",
+            workspace_kind="dir",
+            workspace_path=proj,
         )
         kb.claim_task(conn, self_tid)
     finally:
@@ -806,18 +908,26 @@ def test_create_explicit_workspace_beats_inheritance(monkeypatch, worker_env):
     conn = kb.connect()
     try:
         self_tid = kb.create_task(
-            conn, title="dir worker", assignee="test-worker",
-            workspace_kind="dir", workspace_path="/home/teknium/proj",
+            conn,
+            title="dir worker",
+            assignee="test-worker",
+            workspace_kind="dir",
+            workspace_path="/home/teknium/proj",
         )
         kb.claim_task(conn, self_tid)
     finally:
         conn.close()
     monkeypatch.setenv("ReYMeN_KANBAN_TASK", self_tid)
 
-    d = json.loads(kt._handle_create({
-        "title": "scratch child", "assignee": "peer",
-        "workspace_kind": "scratch",
-    }))
+    d = json.loads(
+        kt._handle_create(
+            {
+                "title": "scratch child",
+                "assignee": "peer",
+                "workspace_kind": "scratch",
+            }
+        )
+    )
     assert d["ok"] is True
     conn = kb.connect()
     try:
@@ -853,11 +963,14 @@ def test_create_stamps_session_id_from_env(monkeypatch, worker_env):
     monkeypatch.setenv("ReYMeN_SESSION_ID", "acp-sess-abc")
     from tools import kanban_tools as kt
     from ReYMeN_cli import kanban_db as kb
-    out = kt._handle_create({
-        "title": "from chat",
-        "assignee": "peer",
-        "parents": [worker_env],
-    })
+
+    out = kt._handle_create(
+        {
+            "title": "from chat",
+            "assignee": "peer",
+            "parents": [worker_env],
+        }
+    )
     d = json.loads(out)
     assert d["ok"] is True
     conn = kb.connect()
@@ -876,12 +989,15 @@ def test_create_session_id_arg_overrides_env(monkeypatch, worker_env):
     monkeypatch.setenv("ReYMeN_SESSION_ID", "from-env")
     from tools import kanban_tools as kt
     from ReYMeN_cli import kanban_db as kb
-    out = kt._handle_create({
-        "title": "explicit override",
-        "assignee": "peer",
-        "parents": [worker_env],
-        "session_id": "explicit-arg",
-    })
+
+    out = kt._handle_create(
+        {
+            "title": "explicit override",
+            "assignee": "peer",
+            "parents": [worker_env],
+            "session_id": "explicit-arg",
+        }
+    )
     d = json.loads(out)
     assert d["ok"] is True
     conn = kb.connect()
@@ -899,11 +1015,14 @@ def test_create_session_id_absent_when_env_unset(monkeypatch, worker_env):
     monkeypatch.delenv("ReYMeN_SESSION_ID", raising=False)
     from tools import kanban_tools as kt
     from ReYMeN_cli import kanban_db as kb
-    out = kt._handle_create({
-        "title": "no session",
-        "assignee": "peer",
-        "parents": [worker_env],
-    })
+
+    out = kt._handle_create(
+        {
+            "title": "no session",
+            "assignee": "peer",
+            "parents": [worker_env],
+        }
+    )
     d = json.loads(out)
     assert d["ok"] is True
     conn = kb.connect()
@@ -916,17 +1035,20 @@ def test_create_session_id_absent_when_env_unset(monkeypatch, worker_env):
 
 def test_create_rejects_no_title(worker_env):
     from tools import kanban_tools as kt
+
     assert json.loads(kt._handle_create({"assignee": "x"})).get("error")
     assert json.loads(kt._handle_create({"title": "   ", "assignee": "x"})).get("error")
 
 
 def test_create_rejects_no_assignee(worker_env):
     from tools import kanban_tools as kt
+
     assert json.loads(kt._handle_create({"title": "t"})).get("error")
 
 
 def test_create_rejects_non_list_parents(worker_env):
     from tools import kanban_tools as kt
+
     out = kt._handle_create({"title": "t", "assignee": "a", "parents": 42})
     assert json.loads(out).get("error")
 
@@ -934,11 +1056,14 @@ def test_create_rejects_non_list_parents(worker_env):
 def test_create_parses_triage_string_false(worker_env):
     from tools import kanban_tools as kt
     from ReYMeN_cli import kanban_db as kb
-    out = kt._handle_create({
-        "title": "not triage",
-        "assignee": "peer",
-        "triage": "false",
-    })
+
+    out = kt._handle_create(
+        {
+            "title": "not triage",
+            "assignee": "peer",
+            "triage": "false",
+        }
+    )
     d = json.loads(out)
     assert d["ok"] is True
     conn = kb.connect()
@@ -952,11 +1077,14 @@ def test_create_parses_triage_string_false(worker_env):
 def test_create_parses_triage_string_true(worker_env):
     from tools import kanban_tools as kt
     from ReYMeN_cli import kanban_db as kb
-    out = kt._handle_create({
-        "title": "needs triage",
-        "assignee": "peer",
-        "triage": "true",
-    })
+
+    out = kt._handle_create(
+        {
+            "title": "needs triage",
+            "assignee": "peer",
+            "triage": "true",
+        }
+    )
     d = json.loads(out)
     assert d["ok"] is True
     conn = kb.connect()
@@ -969,20 +1097,28 @@ def test_create_parses_triage_string_true(worker_env):
 
 def test_create_rejects_bad_triage(worker_env):
     from tools import kanban_tools as kt
-    out = kt._handle_create({
-        "title": "bad triage",
-        "assignee": "peer",
-        "triage": "sometimes",
-    })
+
+    out = kt._handle_create(
+        {
+            "title": "bad triage",
+            "assignee": "peer",
+            "triage": "sometimes",
+        }
+    )
     assert "triage must be" in json.loads(out).get("error", "")
 
 
 def test_create_accepts_string_parent(worker_env):
     """Convenience: a single parent id as string is coerced to [id]."""
     from tools import kanban_tools as kt
-    out = kt._handle_create({
-        "title": "t", "assignee": "a", "parents": worker_env,
-    })
+
+    out = kt._handle_create(
+        {
+            "title": "t",
+            "assignee": "a",
+            "parents": worker_env,
+        }
+    )
     assert json.loads(out)["ok"]
 
 
@@ -990,11 +1126,14 @@ def test_create_accepts_skills_list(worker_env):
     """Tool writes the per-task skills through to the kernel."""
     from tools import kanban_tools as kt
     from ReYMeN_cli import kanban_db as kb
-    out = kt._handle_create({
-        "title": "skilled",
-        "assignee": "linguist",
-        "skills": ["translation", "github-code-review"],
-    })
+
+    out = kt._handle_create(
+        {
+            "title": "skilled",
+            "assignee": "linguist",
+            "skills": ["translation", "github-code-review"],
+        }
+    )
     d = json.loads(out)
     assert d["ok"] is True
     with kb.connect() as conn:
@@ -1006,11 +1145,14 @@ def test_create_accepts_skills_string(worker_env):
     """Convenience: a single skill name as string is coerced to [name]."""
     from tools import kanban_tools as kt
     from ReYMeN_cli import kanban_db as kb
-    out = kt._handle_create({
-        "title": "one-skill",
-        "assignee": "a",
-        "skills": "translation",
-    })
+
+    out = kt._handle_create(
+        {
+            "title": "one-skill",
+            "assignee": "a",
+            "skills": "translation",
+        }
+    )
     d = json.loads(out)
     assert d["ok"] is True
     with kb.connect() as conn:
@@ -1021,14 +1163,20 @@ def test_create_accepts_skills_string(worker_env):
 def test_create_rejects_non_list_skills(worker_env):
     """skills: 42 must be rejected, not silently dropped."""
     from tools import kanban_tools as kt
-    out = kt._handle_create({
-        "title": "t", "assignee": "a", "skills": 42,
-    })
+
+    out = kt._handle_create(
+        {
+            "title": "t",
+            "assignee": "a",
+            "skills": 42,
+        }
+    )
     assert json.loads(out).get("error")
 
 
 def test_link_happy_path(worker_env):
     from ReYMeN_cli import kanban_db as kb
+
     conn = kb.connect()
     try:
         a = kb.create_task(conn, title="A", assignee="x")
@@ -1036,6 +1184,7 @@ def test_link_happy_path(worker_env):
     finally:
         conn.close()
     from tools import kanban_tools as kt
+
     out = kt._handle_link({"parent_id": a, "child_id": b})
     d = json.loads(out)
     assert d["ok"] is True
@@ -1043,12 +1192,14 @@ def test_link_happy_path(worker_env):
 
 def test_link_rejects_self_reference(worker_env):
     from tools import kanban_tools as kt
+
     out = kt._handle_link({"parent_id": worker_env, "child_id": worker_env})
     assert json.loads(out).get("error")
 
 
 def test_link_rejects_missing_args(worker_env):
     from tools import kanban_tools as kt
+
     assert json.loads(kt._handle_link({"parent_id": "x"})).get("error")
     assert json.loads(kt._handle_link({"child_id": "y"})).get("error")
 
@@ -1056,6 +1207,7 @@ def test_link_rejects_missing_args(worker_env):
 def test_link_rejects_cycle(worker_env):
     """A → B, then try to link B → A."""
     from ReYMeN_cli import kanban_db as kb
+
     conn = kb.connect()
     try:
         a = kb.create_task(conn, title="A", assignee="x")
@@ -1063,6 +1215,7 @@ def test_link_rejects_cycle(worker_env):
     finally:
         conn.close()
     from tools import kanban_tools as kt
+
     out = kt._handle_link({"parent_id": b, "child_id": a})
     assert json.loads(out).get("error")
 
@@ -1070,6 +1223,7 @@ def test_link_rejects_cycle(worker_env):
 def test_unblock_happy_path(monkeypatch, worker_env):
     monkeypatch.delenv("ReYMeN_KANBAN_TASK", raising=False)
     from ReYMeN_cli import kanban_db as kb
+
     conn = kb.connect()
     try:
         tid = kb.create_task(conn, title="blocked", assignee="worker")
@@ -1078,6 +1232,7 @@ def test_unblock_happy_path(monkeypatch, worker_env):
         conn.close()
 
     from tools import kanban_tools as kt
+
     out = kt._handle_unblock({"task_id": tid})
     d = json.loads(out)
     assert d["ok"] is True
@@ -1093,6 +1248,7 @@ def test_unblock_happy_path(monkeypatch, worker_env):
 def test_unblock_rejects_non_blocked_task(monkeypatch, worker_env):
     monkeypatch.delenv("ReYMeN_KANBAN_TASK", raising=False)
     from tools import kanban_tools as kt
+
     out = kt._handle_unblock({"task_id": worker_env})
     assert json.loads(out).get("error")
 
@@ -1111,28 +1267,41 @@ def test_worker_lifecycle_through_tools(worker_env):
     assert json.loads(kt._handle_heartbeat({"note": "warming up"}))["ok"]
 
     # 3. comment for a future peer
-    assert json.loads(kt._handle_comment({
-        "task_id": worker_env,
-        "body": "note: using stdlib sqlite3 bindings",
-    }))["ok"]
+    assert json.loads(
+        kt._handle_comment(
+            {
+                "task_id": worker_env,
+                "body": "note: using stdlib sqlite3 bindings",
+            }
+        )
+    )["ok"]
 
     # 4. spawn a child task for follow-up
-    child_out = json.loads(kt._handle_create({
-        "title": "write integration test",
-        "assignee": "qa",
-        "parents": [worker_env],
-    }))
+    child_out = json.loads(
+        kt._handle_create(
+            {
+                "title": "write integration test",
+                "assignee": "qa",
+                "parents": [worker_env],
+            }
+        )
+    )
     assert child_out["ok"]
 
     # 5. complete with structured handoff
-    comp = json.loads(kt._handle_complete({
-        "summary": "implemented + spawned QA follow-up",
-        "metadata": {"child_task": child_out["task_id"]},
-    }))
+    comp = json.loads(
+        kt._handle_complete(
+            {
+                "summary": "implemented + spawned QA follow-up",
+                "metadata": {"child_task": child_out["task_id"]},
+            }
+        )
+    )
     assert comp["ok"]
 
     # Verify final state
     from ReYMeN_cli import kanban_db as kb
+
     conn = kb.connect()
     try:
         parent = kb.get_task(conn, worker_env)
@@ -1144,9 +1313,9 @@ def test_worker_lifecycle_through_tools(worker_env):
         # Child is todo (parent just finished, but recompute_ready may
         # have promoted it — complete_task runs recompute internally).
         child = kb.get_task(conn, child_out["task_id"])
-        assert child.status == "ready", (
-            f"child should be ready after parent done, got {child.status}"
-        )
+        assert (
+            child.status == "ready"
+        ), f"child should be ready after parent done, got {child.status}"
         # Comment is visible
         assert len(kb.list_comments(conn, worker_env)) == 1
         # Heartbeat event recorded
@@ -1160,6 +1329,7 @@ def test_worker_lifecycle_through_tools(worker_env):
 # System-prompt guidance injection
 # ---------------------------------------------------------------------------
 
+
 def test_kanban_guidance_not_in_normal_prompt(monkeypatch, tmp_path):
     """A normal chat session (no ReYMeN_KANBAN_TASK) must NOT have
     KANBAN_GUIDANCE in its system prompt."""
@@ -1168,14 +1338,17 @@ def test_kanban_guidance_not_in_normal_prompt(monkeypatch, tmp_path):
     home.mkdir()
     monkeypatch.setenv("ReYMeN_HOME", str(home))
     from pathlib import Path as _P
+
     monkeypatch.setattr(_P, "home", lambda: tmp_path)
 
     from tools.registry import invalidate_check_fn_cache
     from model_tools import _clear_tool_defs_cache
+
     invalidate_check_fn_cache()
     _clear_tool_defs_cache()
 
     from run_agent import AIAgent
+
     a = AIAgent(
         api_key="test",
         base_url="https://openrouter.ai/api/v1",
@@ -1196,14 +1369,17 @@ def test_kanban_guidance_in_worker_prompt(monkeypatch, tmp_path):
     home.mkdir()
     monkeypatch.setenv("ReYMeN_HOME", str(home))
     from pathlib import Path as _P
+
     monkeypatch.setattr(_P, "home", lambda: tmp_path)
 
     from tools.registry import invalidate_check_fn_cache
     from model_tools import _clear_tool_defs_cache
+
     invalidate_check_fn_cache()
     _clear_tool_defs_cache()
 
     from run_agent import AIAgent
+
     a = AIAgent(
         api_key="test",
         base_url="https://openrouter.ai/api/v1",
@@ -1231,12 +1407,14 @@ def test_kanban_guidance_prompt_size_bounded(monkeypatch, tmp_path):
     home.mkdir()
     monkeypatch.setenv("ReYMeN_HOME", str(home))
     from pathlib import Path as _P
+
     monkeypatch.setattr(_P, "home", lambda: tmp_path)
 
     from agent.prompt_builder import KANBAN_GUIDANCE
-    assert 1_500 < len(KANBAN_GUIDANCE) < 4_096, (
-        f"KANBAN_GUIDANCE is {len(KANBAN_GUIDANCE)} chars — too short (missing?) or too long"
-    )
+
+    assert (
+        1_500 < len(KANBAN_GUIDANCE) < 4_096
+    ), f"KANBAN_GUIDANCE is {len(KANBAN_GUIDANCE)} chars — too short (missing?) or too long"
 
 
 # ---------------------------------------------------------------------------
@@ -1259,6 +1437,7 @@ def test_kanban_guidance_prompt_size_bounded(monkeypatch, tmp_path):
 def test_worker_complete_rejects_foreign_task_id(worker_env):
     """A worker cannot complete a task that isn't its own (#19534)."""
     from ReYMeN_cli import kanban_db as kb
+
     conn = kb.connect()
     try:
         other = kb.create_task(conn, title="sibling")
@@ -1268,6 +1447,7 @@ def test_worker_complete_rejects_foreign_task_id(worker_env):
         conn.close()
 
     from tools import kanban_tools as kt
+
     out = kt._handle_complete({"task_id": other, "summary": "HIJACK"})
     d = json.loads(out)
     assert d.get("ok") is not True
@@ -1284,6 +1464,7 @@ def test_worker_complete_rejects_foreign_task_id(worker_env):
 def test_worker_block_rejects_foreign_task_id(worker_env):
     """A worker cannot block a task that isn't its own (#19534)."""
     from ReYMeN_cli import kanban_db as kb
+
     conn = kb.connect()
     try:
         other = kb.create_task(conn, title="sibling")
@@ -1293,6 +1474,7 @@ def test_worker_block_rejects_foreign_task_id(worker_env):
         conn.close()
 
     from tools import kanban_tools as kt
+
     out = kt._handle_block({"task_id": other, "reason": "evil"})
     d = json.loads(out)
     assert "refusing to mutate" in d.get("error", "")
@@ -1307,6 +1489,7 @@ def test_worker_block_rejects_foreign_task_id(worker_env):
 def test_worker_heartbeat_rejects_foreign_task_id(worker_env):
     """A worker cannot heartbeat a task that isn't its own (#19534)."""
     from ReYMeN_cli import kanban_db as kb
+
     conn = kb.connect()
     try:
         other = kb.create_task(conn, title="sibling")
@@ -1317,6 +1500,7 @@ def test_worker_heartbeat_rejects_foreign_task_id(worker_env):
         conn.close()
 
     from tools import kanban_tools as kt
+
     out = kt._handle_heartbeat({"task_id": other})
     d = json.loads(out)
     assert "refusing to mutate" in d.get("error", "")
@@ -1332,6 +1516,7 @@ def test_worker_can_comment_on_foreign_task(worker_env):
     to ``_handle_comment`` would fail CI immediately.
     """
     from ReYMeN_cli import kanban_db as kb
+
     conn = kb.connect()
     try:
         other = kb.create_task(conn, title="sibling")
@@ -1339,10 +1524,13 @@ def test_worker_can_comment_on_foreign_task(worker_env):
         conn.close()
 
     from tools import kanban_tools as kt
-    out = kt._handle_comment({
-        "task_id": other,
-        "body": "handoff: see prior findings before starting",
-    })
+
+    out = kt._handle_comment(
+        {
+            "task_id": other,
+            "body": "handoff: see prior findings before starting",
+        }
+    )
     d = json.loads(out)
     assert d.get("ok") is True, f"cross-task comment must succeed: {d}"
 
@@ -1367,6 +1555,7 @@ def test_worker_unblock_rejects_foreign_task_id(worker_env):
     pinning is "worker cannot mutate foreign task via kanban_unblock".
     """
     from ReYMeN_cli import kanban_db as kb
+
     conn = kb.connect()
     try:
         other = kb.create_task(conn, title="blocked sibling", assignee="peer")
@@ -1375,12 +1564,13 @@ def test_worker_unblock_rejects_foreign_task_id(worker_env):
         conn.close()
 
     from tools import kanban_tools as kt
+
     out = kt._handle_unblock({"task_id": other})
     d = json.loads(out)
     err = d.get("error", "")
-    assert "orchestrator-only" in err or "refusing to mutate" in err, (
-        f"expected worker-rejection error, got {err}"
-    )
+    assert (
+        "orchestrator-only" in err or "refusing to mutate" in err
+    ), f"expected worker-rejection error, got {err}"
 
     conn = kb.connect()
     try:
@@ -1392,6 +1582,7 @@ def test_worker_unblock_rejects_foreign_task_id(worker_env):
 def test_worker_complete_own_task_still_works(worker_env):
     """The ownership check doesn't break the normal own-task happy path."""
     from tools import kanban_tools as kt
+
     # Both implicit (no task_id arg) and explicit (matching env) must work.
     out = kt._handle_complete({"task_id": worker_env, "summary": "explicit own"})
     d = json.loads(out)
@@ -1426,6 +1617,7 @@ def test_worker_complete_rejects_stale_run_id(worker_env, monkeypatch):
         conn.close()
 
     from tools import kanban_tools as kt
+
     monkeypatch.setenv("ReYMeN_KANBAN_RUN_ID", str(run1.id))
     out = kt._handle_complete({"summary": "late stale completion"})
     d = json.loads(out)
@@ -1453,9 +1645,11 @@ def test_orchestrator_complete_any_task_allowed(monkeypatch, tmp_path):
     home.mkdir()
     monkeypatch.setenv("ReYMeN_HOME", str(home))
     from pathlib import Path as _P
+
     monkeypatch.setattr(_P, "home", lambda: tmp_path)
 
     from ReYMeN_cli import kanban_db as kb
+
     kb._INITIALIZED_PATHS.clear()
     kb.init_db()
     conn = kb.connect()
@@ -1467,6 +1661,7 @@ def test_orchestrator_complete_any_task_allowed(monkeypatch, tmp_path):
         conn.close()
 
     from tools import kanban_tools as kt
+
     out = kt._handle_complete({"task_id": tid, "summary": "orchestrator close"})
     d = json.loads(out)
     assert d.get("ok") is True and d.get("task_id") == tid
@@ -1503,24 +1698,22 @@ def multi_board_env(monkeypatch, tmp_path):
     monkeypatch.delenv("ReYMeN_KANBAN_TASK", raising=False)
     monkeypatch.setenv("ReYMeN_PROFILE", "test-orchestrator")
     from pathlib import Path as _Path
+
     monkeypatch.setattr(_Path, "home", lambda: tmp_path)
 
     from ReYMeN_cli import kanban_db as kb
+
     kb._INITIALIZED_PATHS.clear()
     # Default board — implicit
     conn = kb.connect()
     try:
-        seed_default = kb.create_task(
-            conn, title="seed-default", assignee="worker-d"
-        )
+        seed_default = kb.create_task(conn, title="seed-default", assignee="worker-d")
     finally:
         conn.close()
     # Alt board — explicit slug routes the connection to a separate DB
     conn = kb.connect(board="alt")
     try:
-        seed_alt = kb.create_task(
-            conn, title="seed-alt", assignee="worker-a"
-        )
+        seed_alt = kb.create_task(conn, title="seed-alt", assignee="worker-a")
     finally:
         conn.close()
     return {
@@ -1537,11 +1730,13 @@ def test_board_param_routes_create_to_alt_board(multi_board_env):
     from ReYMeN_cli import kanban_db as kb
     from tools import kanban_tools as kt
 
-    out = kt._handle_create({
-        "title": "alt-only",
-        "assignee": "worker",
-        "board": "alt",
-    })
+    out = kt._handle_create(
+        {
+            "title": "alt-only",
+            "assignee": "worker",
+            "board": "alt",
+        }
+    )
     d = json.loads(out)
     assert d["ok"] is True, d
     new_tid = d["task_id"]
@@ -1598,11 +1793,13 @@ def test_board_param_routes_assign_via_create_to_alt(multi_board_env):
     from ReYMeN_cli import kanban_db as kb
     from tools import kanban_tools as kt
 
-    out = kt._handle_create({
-        "title": "alt-assigned",
-        "assignee": "linguist",
-        "board": "alt",
-    })
+    out = kt._handle_create(
+        {
+            "title": "alt-assigned",
+            "assignee": "linguist",
+            "board": "alt",
+        }
+    )
     d = json.loads(out)
     assert d["ok"] is True
     with kb.connect(board="alt") as conn:
@@ -1617,11 +1814,13 @@ def test_board_param_routes_comment_to_alt_board(multi_board_env):
     from tools import kanban_tools as kt
 
     alt_seed = multi_board_env["alt_seed"]
-    out = kt._handle_comment({
-        "task_id": alt_seed,
-        "body": "alt comment",
-        "board": "alt",
-    })
+    out = kt._handle_comment(
+        {
+            "task_id": alt_seed,
+            "body": "alt comment",
+            "board": "alt",
+        }
+    )
     d = json.loads(out)
     assert d["ok"] is True
 
@@ -1645,11 +1844,13 @@ def test_board_param_routes_complete_to_alt_board(multi_board_env):
     with kb.connect(board="alt") as conn:
         kb.claim_task(conn, alt_seed)
 
-    out = kt._handle_complete({
-        "task_id": alt_seed,
-        "summary": "alt close",
-        "board": "alt",
-    })
+    out = kt._handle_complete(
+        {
+            "task_id": alt_seed,
+            "summary": "alt close",
+            "board": "alt",
+        }
+    )
     d = json.loads(out)
     assert d["ok"] is True
 
@@ -1670,11 +1871,13 @@ def test_board_param_routes_block_to_alt_board(multi_board_env):
     with kb.connect(board="alt") as conn:
         kb.claim_task(conn, alt_seed)
 
-    out = kt._handle_block({
-        "task_id": alt_seed,
-        "reason": "need input on alt board",
-        "board": "alt",
-    })
+    out = kt._handle_block(
+        {
+            "task_id": alt_seed,
+            "reason": "need input on alt board",
+            "board": "alt",
+        }
+    )
     d = json.loads(out)
     assert d["ok"] is True
 
@@ -1712,9 +1915,11 @@ def test_board_param_routes_heartbeat_to_alt_board(monkeypatch, tmp_path):
     monkeypatch.delenv("ReYMeN_KANBAN_DB", raising=False)
     monkeypatch.delenv("ReYMeN_KANBAN_BOARD", raising=False)
     from pathlib import Path as _Path
+
     monkeypatch.setattr(_Path, "home", lambda: tmp_path)
 
     from ReYMeN_cli import kanban_db as kb
+
     kb._INITIALIZED_PATHS.clear()
     # Seed the alt board with a claimed task.
     with kb.connect(board="alt") as conn:
@@ -1723,6 +1928,7 @@ def test_board_param_routes_heartbeat_to_alt_board(monkeypatch, tmp_path):
     monkeypatch.setenv("ReYMeN_KANBAN_TASK", tid)
 
     from tools import kanban_tools as kt
+
     out = kt._handle_heartbeat({"note": "alive on alt", "board": "alt"})
     d = json.loads(out)
     assert d["ok"] is True
@@ -1742,11 +1948,13 @@ def test_board_param_routes_link_to_alt_board(multi_board_env):
         a = kb.create_task(conn, title="A-alt", assignee="x")
         b = kb.create_task(conn, title="B-alt", assignee="x")
 
-    out = kt._handle_link({
-        "parent_id": a,
-        "child_id": b,
-        "board": "alt",
-    })
+    out = kt._handle_link(
+        {
+            "parent_id": a,
+            "child_id": b,
+            "board": "alt",
+        }
+    )
     d = json.loads(out)
     assert d["ok"] is True
 
@@ -1804,11 +2012,9 @@ def test_board_param_in_all_schemas():
     ]
     for schema in schemas:
         props = schema["parameters"]["properties"]
-        assert "board" in props, (
-            f"{schema['name']} is missing the 'board' property"
-        )
+        assert "board" in props, f"{schema['name']} is missing the 'board' property"
         assert props["board"]["type"] == "string"
         # board is optional everywhere — never in required.
-        assert "board" not in schema["parameters"].get("required", []), (
-            f"{schema['name']} marks board as required; must be optional"
-        )
+        assert "board" not in schema["parameters"].get(
+            "required", []
+        ), f"{schema['name']} marks board as required; must be optional"

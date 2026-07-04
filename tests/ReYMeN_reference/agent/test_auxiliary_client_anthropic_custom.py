@@ -17,8 +17,10 @@ import pytest
 @pytest.fixture(autouse=True)
 def _clean_env(monkeypatch):
     for key in (
-        "OPENAI_API_KEY", "OPENAI_BASE_URL",
-        "ANTHROPIC_API_KEY", "ANTHROPIC_TOKEN",
+        "OPENAI_API_KEY",
+        "OPENAI_BASE_URL",
+        "ANTHROPIC_API_KEY",
+        "ANTHROPIC_TOKEN",
     ):
         monkeypatch.delenv(key, raising=False)
 
@@ -86,6 +88,7 @@ def test_custom_endpoint_anthropic_messages_falls_back_when_sdk_missing():
     assert model == "claude-sonnet-4-6"
     # OpenAI client, not AnthropicAuxiliaryClient.
     from agent.auxiliary_client import AnthropicAuxiliaryClient
+
     assert not isinstance(client, AnthropicAuxiliaryClient)
 
 

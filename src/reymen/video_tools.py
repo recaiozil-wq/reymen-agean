@@ -163,7 +163,8 @@ def download(
         ytdlp,
         "--print-json",
         "--no-playlist",
-        "-o", output_template,
+        "-o",
+        output_template,
     ]
 
     if audio_only:
@@ -225,17 +226,17 @@ def probe(filepath: str | Path) -> dict[str, Any]:
     ffprobe = ensure_tool("ffprobe")
     cmd = [
         ffprobe,
-        "-v", "quiet",
-        "-print_format", "json",
+        "-v",
+        "quiet",
+        "-print_format",
+        "json",
         "-show_format",
         "-show_streams",
         str(filepath),
     ]
     result = subprocess.run(cmd, capture_output=True, text=True, check=False)
     if result.returncode != 0:
-        raise VideoToolError(
-            f"ffprobe başarısız: {result.stderr.strip()}"
-        )
+        raise VideoToolError(f"ffprobe başarısız: {result.stderr.strip()}")
     return json.loads(result.stdout)
 
 

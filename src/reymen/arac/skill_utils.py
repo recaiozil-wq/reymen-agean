@@ -35,9 +35,9 @@ ROOT = Path(__file__).parent.resolve()
 # Tum skill kaynak klasorleri (oncelik sirasinda)
 # NOT: .agents/skills/ resmi agentskills.io standart dizini (VS Code, Copilot, vb. burada arar)
 SKILLS_KLASORLERI = [
-    ROOT / "skills",              # Ana ReYMeN skill deposu (1041+)
-    ROOT / ".ReYMeN" / "skills", # Kullanici kristallestirilen skilllar
-    ROOT / ".agents" / "skills", # Resmi agentskills.io standart dizini
+    ROOT / "skills",  # Ana ReYMeN skill deposu (1041+)
+    ROOT / ".ReYMeN" / "skills",  # Kullanici kristallestirilen skilllar
+    ROOT / ".agents" / "skills",  # Resmi agentskills.io standart dizini
 ]
 
 # Geriye donuk uyumluluk
@@ -55,6 +55,7 @@ _ONERI_MAKS_TOKEN = 5000
 
 
 # ── YAML frontmatter parser (PyYAML gerekmez) ────────────────────────────────
+
 
 def _frontmatter_parse(icerik: str) -> dict:
     """SKILL.md'nin YAML frontmatter'ini sozluge cevir.
@@ -74,10 +75,10 @@ def _frontmatter_parse(icerik: str) -> dict:
             continue
         anahtar, deger = satir.split(":", 1)
         anahtar = anahtar.strip()
-        deger = deger.strip().strip('"\'')
+        deger = deger.strip().strip("\"'")
         if deger.startswith("[") and deger.endswith("]"):
             ic = deger[1:-1]
-            deger = [x.strip().strip('"\'') for x in ic.split(",") if x.strip()]
+            deger = [x.strip().strip("\"'") for x in ic.split(",") if x.strip()]
         meta[anahtar] = deger
     return meta
 
@@ -96,6 +97,7 @@ def _tum_skill_dosyalari():
 
 
 # ── FTS5 SQLite Index ─────────────────────────────────────────────────────────
+
 
 def _index_db_ac() -> sqlite3.Connection:
     """FTS5 index veritabanini ac (yoksa olustur)."""
@@ -154,8 +156,10 @@ def skill_index_yenile(zorla: bool = False) -> int:
                 if ust != klas:
                     kat = ust.name
                     break
-            baslik = str(meta.get("title") or meta.get("name") or ad).strip('"\'')
-            aciklama = str(meta.get("description", "")).strip('"\'')[:_MAKS_ACIKLAMA_UZUNLUGU]
+            baslik = str(meta.get("title") or meta.get("name") or ad).strip("\"'")
+            aciklama = str(meta.get("description", "")).strip("\"'")[
+                :_MAKS_ACIKLAMA_UZUNLUGU
+            ]
             etiketler_ham = meta.get("tags", [])
             if isinstance(etiketler_ham, list):
                 etiketler = " ".join(etiketler_ham)
@@ -164,7 +168,11 @@ def skill_index_yenile(zorla: bool = False) -> int:
             uyumluluk = str(meta.get("compatibility", "")).strip()
             izin_araclar = str(meta.get("allowed-tools", "")).strip()
             # Govde: frontmatter sonrasi markdown icerigi (token tasarrufu icin kisalt)
-            govde = icerik[icerik.find("\n---\n", 3) + 5:] if "\n---\n" in icerik else icerik
+            govde = (
+                icerik[icerik.find("\n---\n", 3) + 5 :]
+                if "\n---\n" in icerik
+                else icerik
+            )
             govde = govde[:3000]
             satir_sayisi = icerik.count("\n")
             # Var olani sil, yenisini ekle
@@ -207,7 +215,7 @@ def skill_fts_ara(sorgu: str, limit: int = 10) -> list:
         return []
 
     # FTS5 sorgusu: tirmnak isaretleri ve ozel karakterleri temizle
-    fts_sorgu = re.sub(r'[^a-z0-9 _-]', '', sorgu_kucuk).strip()
+    fts_sorgu = re.sub(r"[^a-z0-9 _-]", "", sorgu_kucuk).strip()
     if not fts_sorgu:
         fts_sorgu = sorgu_kucuk
 
@@ -244,11 +252,15 @@ def skill_fts_ara(sorgu: str, limit: int = 10) -> list:
                 "SELECT yol FROM skill_meta WHERE ad=?", (ad,)
             ).fetchone()
             yol = row2[0] if row2 else ""
-            sonuclar.append({
-                "ad": ad, "kategori": kat,
-                "aciklama": (aciklama or "")[:120],
-                "yol": yol, "puan": puan,
-            })
+            sonuclar.append(
+                {
+                    "ad": ad,
+                    "kategori": kat,
+                    "aciklama": (aciklama or "")[:120],
+                    "yol": yol,
+                    "puan": puan,
+                }
+            )
         # Puanla sirala (yuksek puan = daha iyi)
         sonuclar.sort(key=lambda x: x["puan"], reverse=True)
         return sonuclar[:limit]
@@ -257,6 +269,7 @@ def skill_fts_ara(sorgu: str, limit: int = 10) -> list:
 
 
 # ── Temel okuma / bulma ───────────────────────────────────────────────────────
+
 
 def skill_bul(ad: str) -> Optional[Path]:
     """Skill adina gore SKILL.md yolunu bul (her iki klasorde arar)."""
@@ -293,13 +306,13 @@ def skill_meta(ad: str) -> dict:
 def skill_baslik_al(ad: str) -> str:
     """Skill basligini dondur (title -> name -> klasor adi)."""
     meta = skill_meta(ad)
-    return (meta.get("title") or meta.get("name") or ad).strip('"\'')
+    return (meta.get("title") or meta.get("name") or ad).strip("\"'")
 
 
 def skill_aciklama_al(ad: str) -> str:
     """Skill'in description alanini dondur."""
     meta = skill_meta(ad)
-    return str(meta.get("description", "")).strip('"\'')
+    return str(meta.get("description", "")).strip("\"'")
 
 
 def skill_etiketleri_al(ad: str) -> list:
@@ -355,6 +368,7 @@ def skill_guncelle(ad: str, yeni_icerik: str) -> bool:
 
 # ── Sayim ve listeleme ────────────────────────────────────────────────────────
 
+
 def skill_sayisi() -> int:
     """Tum klasorlerdeki toplam benzersiz SKILL.md sayisi."""
     return sum(1 for _ in _tum_skill_dosyalari())
@@ -389,17 +403,22 @@ def kategori_skill_listele(kategori: str, limit: int = 20) -> list:
                 try:
                     icerik = skill_md.read_text(encoding="utf-8", errors="replace")
                     meta = _frontmatter_parse(icerik)
-                    sonuclar.append({
-                        "ad": skill_klas.name,
-                        "aciklama": str(meta.get("description", ""))[:120],
-                        "yol": str(skill_md),
-                    })
+                    sonuclar.append(
+                        {
+                            "ad": skill_klas.name,
+                            "aciklama": str(meta.get("description", ""))[:120],
+                            "yol": str(skill_md),
+                        }
+                    )
                 except Exception as _e:
-                    logger.warning("[Skill liste] %s: %s", skill_md.name if skill_md else "?", _e)
+                    logger.warning(
+                        "[Skill liste] %s: %s", skill_md.name if skill_md else "?", _e
+                    )
     return sonuclar
 
 
 # ── Arama ────────────────────────────────────────────────────────────────────
+
 
 def skill_ara(sorgu: str, limit: int = 10) -> list:
     """Skill ara — FTS5 ile hizli, yoksa dosya taramasi.
@@ -439,17 +458,25 @@ def skill_ara(sorgu: str, limit: int = 10) -> list:
             if sorgu_kucuk in ad.lower():
                 puan += 2.0
             puan += 1.0  # govde match
-            eslesen.append({
-                "ad": ad, "kategori": kat,
-                "aciklama": aciklama, "yol": str(dosya), "puan": puan,
-            })
+            eslesen.append(
+                {
+                    "ad": ad,
+                    "kategori": kat,
+                    "aciklama": aciklama,
+                    "yol": str(dosya),
+                    "puan": puan,
+                }
+            )
         except Exception as _e:
-            logger.warning("[Skill dosya tara] %s: %s", dosya.name if dosya else "?", _e)
+            logger.warning(
+                "[Skill dosya tara] %s: %s", dosya.name if dosya else "?", _e
+            )
     eslesen.sort(key=lambda x: x.get("puan", 0), reverse=True)
     return eslesen
 
 
 # ── Progressive Disclosure: Aktivasyon ───────────────────────────────────────
+
 
 def skill_aktivat(ad: str) -> str:
     """Skill'i aktive et — tam SKILL.md + scripts/references listesi + uyumluluk uyarisi.
@@ -472,7 +499,7 @@ def skill_aktivat(ad: str) -> str:
         return f"[Skill Hata]: {e}"
 
     meta = _frontmatter_parse(icerik)
-    baslik = str(meta.get("title") or meta.get("name") or ad).strip('"\'')
+    baslik = str(meta.get("title") or meta.get("name") or ad).strip("\"'")
 
     # Uyumluluk uyarisi
     uyumluluk = str(meta.get("compatibility", "")).strip()
@@ -526,7 +553,11 @@ def skill_aktivat(ad: str) -> str:
     return (
         f"=== SKILL: {baslik} ==={uyum_blogu}{arac_blogu}\n"
         f"{icerik[:4000]}"
-        + (f"\n...[{len(icerik)} karakter, ilk 4000 gosterildi]" if len(icerik) > 4000 else "")
+        + (
+            f"\n...[{len(icerik)} karakter, ilk 4000 gosterildi]"
+            if len(icerik) > 4000
+            else ""
+        )
         + scripts_listesi
         + ref_listesi
         + eval_bilgisi
@@ -535,6 +566,7 @@ def skill_aktivat(ad: str) -> str:
 
 
 # ── Skill Dogrulama (agentskills.io spec) ────────────────────────────────────
+
 
 def skill_dogrula(ad: str) -> str:
     """Skill'i agentskills.io spec kurallarina gore dogrula.
@@ -563,31 +595,48 @@ def skill_dogrula(ad: str) -> str:
     klasor_adi = dosya.parent.name
 
     # name kurallari
-    name_val = str(meta.get("name", "")).strip('"\'')
+    name_val = str(meta.get("name", "")).strip("\"'")
     if not name_val:
         hatalar.append("'name' alani eksik.")
     else:
         if len(name_val) > _MAKS_AD_UZUNLUGU:
-            hatalar.append(f"'name' {len(name_val)} karakter (max {_MAKS_AD_UZUNLUGU}).")
-        if not re.fullmatch(r'[a-z0-9][a-z0-9-]*[a-z0-9]|[a-z0-9]', name_val):
-            hatalar.append(f"'name' gecersiz karakter iceriyor: '{name_val}'. Sadece a-z, 0-9, - izinli.")
+            hatalar.append(
+                f"'name' {len(name_val)} karakter (max {_MAKS_AD_UZUNLUGU})."
+            )
+        if not re.fullmatch(r"[a-z0-9][a-z0-9-]*[a-z0-9]|[a-z0-9]", name_val):
+            hatalar.append(
+                f"'name' gecersiz karakter iceriyor: '{name_val}'. Sadece a-z, 0-9, - izinli."
+            )
         if "--" in name_val:
             hatalar.append("'name' ardisik tire iceriyor (--).")
         if name_val != klasor_adi:
-            uyarilar.append(f"'name' ({name_val}) klasor adiyla ({klasor_adi}) uyusmuyor.")
+            uyarilar.append(
+                f"'name' ({name_val}) klasor adiyla ({klasor_adi}) uyusmuyor."
+            )
 
     # description kurallari
-    desc_val = str(meta.get("description", "")).strip('"\'')
+    desc_val = str(meta.get("description", "")).strip("\"'")
     if not desc_val:
         hatalar.append("'description' alani eksik veya bos.")
     else:
         if len(desc_val) > _MAKS_ACIKLAMA_UZUNLUGU:
-            hatalar.append(f"'description' {len(desc_val)} karakter (max {_MAKS_ACIKLAMA_UZUNLUGU}).")
+            hatalar.append(
+                f"'description' {len(desc_val)} karakter (max {_MAKS_ACIKLAMA_UZUNLUGU})."
+            )
         # "Ne zaman kullanilacagi" kontrol — imperatif yapı (Use when / ne zaman / kullan)
         zaman_ipuclari = [
-            "use when", "use this when", "when ", "ne zaman", "kullan",
-            "icin kullan", "uygulanir", "gerektiginde", "durumunda",
-            "use for", "kullanici", "istendiginde",
+            "use when",
+            "use this when",
+            "when ",
+            "ne zaman",
+            "kullan",
+            "icin kullan",
+            "uygulanir",
+            "gerektiginde",
+            "durumunda",
+            "use for",
+            "kullanici",
+            "istendiginde",
         ]
         if not any(ipucu in desc_val.lower() for ipucu in zaman_ipuclari):
             uyarilar.append(
@@ -603,8 +652,11 @@ def skill_dogrula(ad: str) -> str:
             )
         # Generik/anlamsiz aciklama tespiti
         generik_kaliplar = [
-            r"^helps? with\b", r"^a skill (that|for)\b", r"^this skill\b",
-            r"^provides?\b", r"^handles?\b",
+            r"^helps? with\b",
+            r"^a skill (that|for)\b",
+            r"^this skill\b",
+            r"^provides?\b",
+            r"^handles?\b",
         ]
         if any(re.match(p, desc_val.lower().strip()) for p in generik_kaliplar):
             uyarilar.append(
@@ -615,7 +667,9 @@ def skill_dogrula(ad: str) -> str:
     # compatibility kontrol
     uyum = str(meta.get("compatibility", "")).strip()
     if uyum and len(uyum) > _MAKS_UYUMLULUK_UZUNLUGU:
-        hatalar.append(f"'compatibility' {len(uyum)} karakter (max {_MAKS_UYUMLULUK_UZUNLUGU}).")
+        hatalar.append(
+            f"'compatibility' {len(uyum)} karakter (max {_MAKS_UYUMLULUK_UZUNLUGU})."
+        )
 
     # Dosya boyutu
     satir_sayisi = icerik.count("\n")
@@ -645,6 +699,7 @@ def skill_dogrula(ad: str) -> str:
 
 # ── Skill Olusturma (spec uyumlu) ─────────────────────────────────────────────
 
+
 def _ad_dogrula(ad: str) -> tuple:
     """Skill adinin spec kurallarina uyup uymadigini kontrol et.
 
@@ -655,7 +710,7 @@ def _ad_dogrula(ad: str) -> tuple:
         return False, "Ad bos olamaz."
     if len(ad) > _MAKS_AD_UZUNLUGU:
         return False, f"Ad max {_MAKS_AD_UZUNLUGU} karakter olabilir."
-    if not re.fullmatch(r'[a-z0-9][a-z0-9-]*[a-z0-9]|[a-z0-9]', ad):
+    if not re.fullmatch(r"[a-z0-9][a-z0-9-]*[a-z0-9]|[a-z0-9]", ad):
         return False, "Sadece kucuk harf (a-z), rakam (0-9) ve tire (-) kullanilabilir."
     if "--" in ad:
         return False, "Ardisik tire (--) kullanilamaz."
@@ -743,6 +798,7 @@ def skill_olustur(
 
 # ── Skill scripts calistirma ─────────────────────────────────────────────────
 
+
 def _uv_mevcut() -> bool:
     """uv paket yoneticisinin kurulu olup olmadigini kontrol et."""
     try:
@@ -777,7 +833,11 @@ def skill_script_calistir(skill_adi: str, script_adi: str, arglar: str = "") -> 
 
     script_yol = dosya.parent / "scripts" / script_adi
     if not script_yol.exists():
-        mevcut = [f.name for f in (dosya.parent / "scripts").iterdir()] if (dosya.parent / "scripts").exists() else []
+        mevcut = (
+            [f.name for f in (dosya.parent / "scripts").iterdir()]
+            if (dosya.parent / "scripts").exists()
+            else []
+        )
         return f"[Skill Script]: '{script_adi}' bulunamadi. Mevcut: {mevcut}"
 
     uzanti = script_yol.suffix.lower()
@@ -811,7 +871,10 @@ def skill_script_calistir(skill_adi: str, script_adi: str, arglar: str = "") -> 
 
     try:
         sonuc = subprocess.run(
-            cmd, capture_output=True, text=True, timeout=60,
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=60,
             cwd=str(dosya.parent),
         )
         cikti = sonuc.stdout[:2000] + (sonuc.stderr[:500] if sonuc.stderr else "")
@@ -843,6 +906,7 @@ def skill_script_yardim(skill_adi: str, script_adi: str) -> str:
 
 # ── Skill Eval Sistemi (agentskills.io evals/ standardı) ─────────────────────
 
+
 def skill_eval_al(ad: str) -> dict:
     """Skill'in evals/evals.json dosyasini oku.
 
@@ -865,7 +929,11 @@ def skill_eval_al(ad: str) -> dict:
         return {"hata": f"'{ad}' bulunamadi."}
     eval_dosya = dosya.parent / "evals" / "evals.json"
     if not eval_dosya.exists():
-        return {"skill_name": ad, "evals": [], "bilgi": "Henuz eval yok. SKILL_EVAL_EKLE ile ekle."}
+        return {
+            "skill_name": ad,
+            "evals": [],
+            "bilgi": "Henuz eval yok. SKILL_EVAL_EKLE ile ekle.",
+        }
     try:
         return json.loads(eval_dosya.read_text(encoding="utf-8"))
     except Exception as e:
@@ -922,14 +990,18 @@ def skill_eval_ekle(
         "expected_output": expected_output,
     }
     if assertions:
-        yeni_case["assertions"] = assertions if isinstance(assertions, list) else [assertions]
+        yeni_case["assertions"] = (
+            assertions if isinstance(assertions, list) else [assertions]
+        )
     if files:
         yeni_case["files"] = files if isinstance(files, list) else [files]
 
     mevcut_evals.append(yeni_case)
     mevcut["evals"] = mevcut_evals
 
-    eval_dosya.write_text(json.dumps(mevcut, ensure_ascii=False, indent=2), encoding="utf-8")
+    eval_dosya.write_text(
+        json.dumps(mevcut, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
     return (
         f"[Eval Eklendi]: #{yeni_id} — '{ad}'\n"
         f"  Prompt: {prompt[:80]}\n"
@@ -958,6 +1030,7 @@ def skill_eval_listele(ad: str) -> str:
 
 
 # ── Startup ozeti (progressive disclosure) ───────────────────────────────────
+
 
 def skill_ozet_listesi(limit: int = 50) -> str:
     """Startup icin kisa name+description ozeti dondur (dusuk token)."""

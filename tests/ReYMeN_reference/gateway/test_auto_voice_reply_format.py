@@ -27,12 +27,14 @@ class TestAutoVoiceReplyFormat:
             assert output_path.endswith(".ogg")
             Path(output_path).parent.mkdir(parents=True, exist_ok=True)
             Path(output_path).write_bytes(b"fake ogg opus")
-            return json.dumps({
-                "success": True,
-                "file_path": output_path,
-                "provider": "gemini",
-                "voice_compatible": True,
-            })
+            return json.dumps(
+                {
+                    "success": True,
+                    "file_path": output_path,
+                    "provider": "gemini",
+                    "voice_compatible": True,
+                }
+            )
 
         with patch("tools.tts_tool.text_to_speech_tool", side_effect=fake_tts):
             await runner._send_voice_reply(event, "hello from auto tts")
@@ -56,12 +58,14 @@ class TestAutoVoiceReplyFormat:
             assert output_path.endswith(".mp3")
             Path(output_path).parent.mkdir(parents=True, exist_ok=True)
             Path(output_path).write_bytes(b"fake mp3")
-            return json.dumps({
-                "success": True,
-                "file_path": output_path,
-                "provider": "gemini",
-                "voice_compatible": False,
-            })
+            return json.dumps(
+                {
+                    "success": True,
+                    "file_path": output_path,
+                    "provider": "gemini",
+                    "voice_compatible": False,
+                }
+            )
 
         with patch("tools.tts_tool.text_to_speech_tool", side_effect=fake_tts):
             await runner._send_voice_reply(event, "hello from auto tts")

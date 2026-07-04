@@ -42,7 +42,9 @@ def test_run_listele_with_files(mock_urlopen):
     mock_resp_token = MagicMock()
     mock_resp_token.read.return_value = _TOKEN_RESPONSE
     mock_resp_files = MagicMock()
-    mock_resp_files.read.return_value = b'{"data": {"files": [{"token": "t1", "name": "doc1", "type": "doc"}]}}'
+    mock_resp_files.read.return_value = (
+        b'{"data": {"files": [{"token": "t1", "name": "doc1", "type": "doc"}]}}'
+    )
     mock_urlopen.return_value.__enter__.side_effect = [mock_resp_token, mock_resp_files]
 
     with patch("tools.feishu_doc_tool.FEISHU_APP_ID", "test_id"):

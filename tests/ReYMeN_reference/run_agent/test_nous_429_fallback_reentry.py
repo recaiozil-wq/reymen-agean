@@ -14,6 +14,7 @@ exactly once more: the guard sees the breaker state recorded by
 ``record_nous_rate_limit()`` moments earlier and either activates a fallback
 provider (resetting retry_count) or returns the explicit rate-limit failure.
 """
+
 from __future__ import annotations
 
 import inspect
@@ -32,9 +33,9 @@ class TestGenuineNous429ReentersLoop:
     def test_fixed_assignment_reenters_for_typical_max_retries(self):
         for max_retries in (1, 2, 3, 5, 10):
             retry_count = max(0, max_retries - 1)
-            assert _loop_reenters(retry_count, max_retries), (
-                f"max_retries={max_retries}: guard would never run"
-            )
+            assert _loop_reenters(
+                retry_count, max_retries
+            ), f"max_retries={max_retries}: guard would never run"
 
     def test_buggy_assignment_never_reenters(self):
         """Documents the bug shape: retry_count = max_retries exits the

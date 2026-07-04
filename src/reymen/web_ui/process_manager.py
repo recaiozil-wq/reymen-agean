@@ -21,6 +21,7 @@ PROJE_KOK = Path(__file__).resolve().parent.parent.parent
 # Process Manager
 # ---------------------------------------------------------------------------
 
+
 class ProcessManager:
     """PID-based process yönetimi. taskkill kullanmaz, sinyal gönderir."""
 
@@ -100,7 +101,8 @@ class ProcessManager:
                         else:
                             subprocess.run(
                                 ["taskkill", "/F", "/PID", str(pid)],
-                                capture_output=True, timeout=5
+                                capture_output=True,
+                                timeout=5,
                             )
             except (OSError, subprocess.TimeoutExpired):
                 # Zaten ölmüş
@@ -131,7 +133,9 @@ class ProcessManager:
                     komut,
                     stdout=log_f,
                     stderr=subprocess.STDOUT,
-                    creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if sys.platform == "win32" else 0,
+                    creationflags=subprocess.CREATE_NEW_PROCESS_GROUP
+                    if sys.platform == "win32"
+                    else 0,
                 )
             self.kaydet(ad, proc.pid, {"port": port})
             logger.info("Process baslatildi: %s (PID=%d)", ad, proc.pid)
@@ -155,7 +159,9 @@ class ProcessManager:
             try:
                 result = subprocess.run(
                     ["tasklist", "/FI", f"PID eq {pid}"],
-                    capture_output=True, text=True, timeout=5
+                    capture_output=True,
+                    text=True,
+                    timeout=5,
                 )
                 return str(pid) in result.stdout
             except Exception:

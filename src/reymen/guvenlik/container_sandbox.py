@@ -53,7 +53,9 @@ _DOCKER_CHECK_OK = False
 try:
     r = subprocess.run(
         ["docker", "version", "--format", "{{.Server.Version}}"],
-        capture_output=True, text=True, timeout=10,
+        capture_output=True,
+        text=True,
+        timeout=10,
     )
     DOCKER_MEVCUT = r.returncode == 0 and bool(r.stdout.strip())
     if DOCKER_MEVCUT:
@@ -70,7 +72,9 @@ if DOCKER_MEVCUT:
     try:
         r = subprocess.run(
             ["docker", "images", "-q", VARSAYILAN_IMAGE],
-            capture_output=True, text=True, timeout=10,
+            capture_output=True,
+            text=True,
+            timeout=10,
         )
         IMAGE_MEVCUT = bool(r.stdout.strip())
         if IMAGE_MEVCUT:
@@ -80,6 +84,7 @@ if DOCKER_MEVCUT:
 
 
 # ── Hata Siniflari ─────────────────────────────────────────────────────────
+
 
 class ContainerSandboxError(RuntimeError):
     """Container sandbox calistirma hatasi."""
@@ -99,9 +104,11 @@ class DockerNotAvailableError(ContainerSandboxError):
 
 # ── Config Model ───────────────────────────────────────────────────────────
 
+
 @dataclass
 class ContainerConfig:
     """Container sandbox konfigurasyonu."""
+
     sandbox_mode: str = KAPALI
     image: str = VARSAYILAN_IMAGE
     timeout: int = VARSAYILAN_TIMEOUT
@@ -135,7 +142,9 @@ class ContainerConfig:
             timeout=int(container.get("timeout", VARSAYILAN_TIMEOUT)),
             memory_limit=container.get("memory_limit", VARSAYILAN_MEMORY_LIMIT),
             cpu_limit=float(container.get("cpu_limit", VARSAYILAN_CPU_LIMIT)),
-            max_output_chars=int(container.get("max_output_chars", VARSAYILAN_MAX_OUTPUT_CHARS)),
+            max_output_chars=int(
+                container.get("max_output_chars", VARSAYILAN_MAX_OUTPUT_CHARS)
+            ),
             workdir=container.get("workdir", VARSAYILAN_WORKDIR),
             network_enabled=container.get("network_enabled", mode != TAM),
             volume_mounts=container.get("volume_mounts", []),
@@ -165,6 +174,7 @@ class ContainerConfig:
 
 
 # ── Container Sandbox ──────────────────────────────────────────────────────
+
 
 class ContainerSandbox:
     """Docker container'da shell komutlarini izole calistir.
@@ -207,9 +217,7 @@ class ContainerSandbox:
     def aktif(self) -> bool:
         """Container sandbox aktif mi?"""
         return (
-            self.config.sandbox_mode in (KISMI, TAM)
-            and DOCKER_MEVCUT
-            and IMAGE_MEVCUT
+            self.config.sandbox_mode in (KISMI, TAM) and DOCKER_MEVCUT and IMAGE_MEVCUT
         )
 
     def calistir(
@@ -262,7 +270,7 @@ class ContainerSandbox:
             cikti = r.stdout + r.stderr
             if len(cikti) > self.config.max_output_chars:
                 cikti = (
-                    cikti[:self.config.max_output_chars]
+                    cikti[: self.config.max_output_chars]
                     + f"\n... [cikti {len(cikti)} karakter, "
                     f"sinir {self.config.max_output_chars}]"
                 )
@@ -289,11 +297,17 @@ class ContainerSandbox:
 
         # Docker run argumanlari
         docker_args = [
-            "docker", "run", "--rm",
-            "--name", container_name,
-            "--memory", self.config.memory_limit,
-            "--cpus", str(self.config.cpu_limit),
-            "--label", "reymen=container-sandbox",
+            "docker",
+            "run",
+            "--rm",
+            "--name",
+            container_name,
+            "--memory",
+            self.config.memory_limit,
+            "--cpus",
+            str(self.config.cpu_limit),
+            "--label",
+            "reymen=container-sandbox",
         ]
 
         # Sandbox moduna gore network
@@ -320,7 +334,8 @@ class ContainerSandbox:
                 else:
                     logger.warning(
                         "[ContainerSandbox] Eksik mount: host=%s, container=%s",
-                        host_path, container_path,
+                        host_path,
+                        container_path,
                     )
 
         # Ortam degiskenleri
@@ -362,7 +377,7 @@ class ContainerSandbox:
             # Cikti boyut siniri
             if len(cikti) > self.config.max_output_chars:
                 cikti = (
-                    cikti[:self.config.max_output_chars]
+                    cikti[: self.config.max_output_chars]
                     + f"\n... [cikti {len(cikti)} karakter, "
                     f"sinir {self.config.max_output_chars}]"
                 )
@@ -390,12 +405,12 @@ class ContainerSandbox:
         try:
             subprocess.run(
                 ["docker", "rm", "-f", container_name],
-                capture_output=True, text=True, timeout=5,
+                capture_output=True,
+                text=True,
+                timeout=5,
             )
         except Exception as e:
-            logger.warning(
-                "[ContainerSandbox] Container temizleme hatasi: %s", e
-            )
+            logger.warning("[ContainerSandbox] Container temizleme hatasi: %s", e)
 
     def _windows_yol_duzelt(self, yol: str) -> str:
         """Windows yolunu Docker mount icin uygun hale getir.
@@ -437,21 +452,17 @@ class ContainerSandbox:
             return True, f"[ContainerSandbox] Image zaten mevcut: {self.config.image}"
 
         try:
-            logger.info(
-                "[ContainerSandbox] Image cekiliyor: %s", self.config.image
-            )
+            logger.info("[ContainerSandbox] Image cekiliyor: %s", self.config.image)
             r = subprocess.run(
                 ["docker", "pull", self.config.image],
-                capture_output=True, text=True, timeout=300,
+                capture_output=True,
+                text=True,
+                timeout=300,
             )
             if r.returncode == 0:
                 IMAGE_MEVCUT = True
-                return True, (
-                    f"[ContainerSandbox] Image hazir: {self.config.image}"
-                )
-            return False, (
-                f"[ContainerSandbox] Image cekilemedi: {r.stderr[:500]}"
-            )
+                return True, (f"[ContainerSandbox] Image hazir: {self.config.image}")
+            return False, (f"[ContainerSandbox] Image cekilemedi: {r.stderr[:500]}")
         except subprocess.TimeoutExpired:
             return False, "[ContainerSandbox] Image cekme zamani asimi (300s)"
         except Exception as e:
@@ -494,6 +505,7 @@ class ContainerSandbox:
 
 # ── Config Yukleyici ───────────────────────────────────────────────────────
 
+
 def config_yukle(config_path: Optional[str] = None) -> ContainerConfig:
     """Config.yaml'dan container ayarlarini oku.
 
@@ -518,6 +530,7 @@ def config_yukle(config_path: Optional[str] = None) -> ContainerConfig:
 
     try:
         import yaml
+
         with open(yaml_path, "r", encoding="utf-8") as f:
             data = yaml.safe_load(f) or {}
         return ContainerConfig.from_dict(data)
@@ -599,6 +612,7 @@ def durum_text(config: Optional[ContainerConfig] = None) -> str:
 
 # ── motor_kaydet: Motor entegrasyonu ───────────────────────────────────────
 
+
 def motor_kaydet(motor: Any) -> None:
     """Container sandbox'i Motor'a kaydet.
 
@@ -639,15 +653,18 @@ def motor_kaydet(motor: Any) -> None:
             sb.calistir(
                 komut,
                 timeout=int(timeout) if timeout.isdigit() else None,
-                volume_mounts=json.loads(volume_mounts) if volume_mounts and volume_mounts != "{}" else None,
+                volume_mounts=json.loads(volume_mounts)
+                if volume_mounts and volume_mounts != "{}"
+                else None,
             )
-            if komut else "[Hata]: CONTAINER_CALISTIR(komut) gerekli"
+            if komut
+            else "[Hata]: CONTAINER_CALISTIR(komut) gerekli"
         ),
         "Docker container'da shell komutu calistir. Parametreler: "
         "komut (str, zorunlu) — calistirilacak shell komutu; "
         "timeout (int, opsiyonel, default=60) — zaman asimi saniye; "
         "volume_mounts (JSON str, opsiyonel) — volume mount listesi. "
-        "Ornek volume_mounts: '[{\"host_path\": \"/c/proje\", \"container_path\": \"/workspace\"}]'. "
+        'Ornek volume_mounts: \'[{"host_path": "/c/proje", "container_path": "/workspace"}]\'. '
         "Doner: komut ciktisi.",
     )
 

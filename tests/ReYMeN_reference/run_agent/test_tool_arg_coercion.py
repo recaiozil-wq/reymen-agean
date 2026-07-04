@@ -239,10 +239,12 @@ class TestCoerceToolArgs:
 
     def test_preserves_non_string_values(self):
         """Lists, dicts, and other non-string values are never touched."""
-        schema = self._mock_schema({
-            "items": {"type": "array"},
-            "config": {"type": "object"},
-        })
+        schema = self._mock_schema(
+            {
+                "items": {"type": "array"},
+                "config": {"type": "object"},
+            }
+        )
         with patch("model_tools.registry.get_schema", return_value=schema):
             args = {"items": [1, 2, 3], "config": {"key": "val"}}
             result = coerce_tool_args("test_tool", args)
@@ -251,9 +253,11 @@ class TestCoerceToolArgs:
 
     def test_coerces_stringified_array_arg(self):
         """Regression for #3947 — MCP servers using z.array() expect lists, not strings."""
-        schema = self._mock_schema({
-            "messageIds": {"type": "array", "items": {"type": "string"}},
-        })
+        schema = self._mock_schema(
+            {
+                "messageIds": {"type": "array", "items": {"type": "string"}},
+            }
+        )
         with patch("model_tools.registry.get_schema", return_value=schema):
             args = {"messageIds": '["abc", "def"]'}
             result = coerce_tool_args("test_tool", args)
@@ -269,28 +273,32 @@ class TestCoerceToolArgs:
 
     def test_coerces_string_null_for_nullable_object_arg(self):
         """Models often emit literal "null" for optional MCP object args."""
-        schema = self._mock_schema({
-            "setting": {
-                "type": "object",
-                "additionalProperties": True,
-                "nullable": True,
-                "default": None,
-            },
-        })
+        schema = self._mock_schema(
+            {
+                "setting": {
+                    "type": "object",
+                    "additionalProperties": True,
+                    "nullable": True,
+                    "default": None,
+                },
+            }
+        )
         with patch("model_tools.registry.get_schema", return_value=schema):
             args = {"setting": "null"}
             result = coerce_tool_args("test_tool", args)
             assert result["setting"] is None
 
     def test_coerces_string_null_for_nullable_array_arg(self):
-        schema = self._mock_schema({
-            "stages": {
-                "type": "array",
-                "items": {"type": "object"},
-                "nullable": True,
-                "default": None,
-            },
-        })
+        schema = self._mock_schema(
+            {
+                "stages": {
+                    "type": "array",
+                    "items": {"type": "object"},
+                    "nullable": True,
+                    "default": None,
+                },
+            }
+        )
         with patch("model_tools.registry.get_schema", return_value=schema):
             args = {"stages": "null"}
             result = coerce_tool_args("test_tool", args)
@@ -314,7 +322,9 @@ class TestCoerceToolArgs:
 
     def test_bare_string_wrapped_as_array(self):
         """Bare string on array field → single-element list."""
-        schema = self._mock_schema({"urls": {"type": "array", "items": {"type": "string"}}})
+        schema = self._mock_schema(
+            {"urls": {"type": "array", "items": {"type": "string"}}}
+        )
         with patch("model_tools.registry.get_schema", return_value=schema):
             args = {"urls": "https://a.com"}
             result = coerce_tool_args("test_tool", args)
@@ -322,7 +332,9 @@ class TestCoerceToolArgs:
 
     def test_bare_int_wrapped_as_array(self):
         """Bare non-string scalars (int, bool, float) also get wrapped."""
-        schema = self._mock_schema({"ids": {"type": "array", "items": {"type": "integer"}}})
+        schema = self._mock_schema(
+            {"ids": {"type": "array", "items": {"type": "integer"}}}
+        )
         with patch("model_tools.registry.get_schema", return_value=schema):
             args = {"ids": 5}
             result = coerce_tool_args("test_tool", args)
@@ -371,12 +383,14 @@ class TestCoerceToolArgs:
 
     def test_mixed_coercion(self):
         """Multiple args coerced in the same call."""
-        schema = self._mock_schema({
-            "offset": {"type": "integer"},
-            "limit": {"type": "integer"},
-            "full": {"type": "boolean"},
-            "path": {"type": "string"},
-        })
+        schema = self._mock_schema(
+            {
+                "offset": {"type": "integer"},
+                "limit": {"type": "integer"},
+                "full": {"type": "boolean"},
+                "path": {"type": "string"},
+            }
+        )
         with patch("model_tools.registry.get_schema", return_value=schema):
             args = {
                 "offset": "1",

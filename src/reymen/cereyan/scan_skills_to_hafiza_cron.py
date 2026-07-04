@@ -27,7 +27,7 @@ logger = logging.getLogger("scan_skills_cron")
 
 # ── Yollar ──────────────────────────────────────────────────────────────────
 ROOT = Path(__file__).parent.parent.parent.parent.resolve()  # proje kökü
-SKILLS_DIR = ROOT / "skills"                         # taranacak klasör
+SKILLS_DIR = ROOT / "skills"  # taranacak klasör
 SKILLS_DB = ROOT / "merkez_db" / "skills_index.db"
 OGRENME_DB = ROOT / "merkez_db" / "ogrenme.db"
 
@@ -134,7 +134,9 @@ def scan_and_sync() -> tuple[int, int]:
     skills_db_kur(con_skills)
     meta_map = {}
     try:
-        for row in con_skills.execute("SELECT ad, dosya_hash FROM beceriler_meta").fetchall():
+        for row in con_skills.execute(
+            "SELECT ad, dosya_hash FROM beceriler_meta"
+        ).fetchall():
             meta_map[row[0]] = row[1]  # ad -> full_hash (64 chars)
     except sqlite3.OperationalError:
         logger.warning("[fix_01_sessiz_except] OperationalError")
@@ -155,8 +157,8 @@ def scan_and_sync() -> tuple[int, int]:
     logger.info("📚 OnceHafiza DB: %d kayıt", len(ogrenme_set))
 
     # 4) Her dosyayı tara, yeni/değişenleri belirle
-    yeni_liste = []       # skills_index.db'de olmayan (yepyeni)
-    guncel_liste = []     # skills_index.db'de var ama hash değişmiş
+    yeni_liste = []  # skills_index.db'de olmayan (yepyeni)
+    guncel_liste = []  # skills_index.db'de var ama hash değişmiş
     oncehafiza_ekle = []  # skills_index.db'de var ama OnceHafiza'da yok
     atlanan = 0
 
@@ -176,17 +178,26 @@ def scan_and_sync() -> tuple[int, int]:
             yeni_liste.append((meta_adi, str(dosya), guncel_hash, kategori, dosya_adi))
         elif eski_hash != guncel_hash:
             # Hash değişmiş → güncelle
-            guncel_liste.append((meta_adi, str(dosya), guncel_hash, kategori, dosya_adi))
+            guncel_liste.append(
+                (meta_adi, str(dosya), guncel_hash, kategori, dosya_adi)
+            )
         else:
             atlanan += 1
 
         # OnceHafiza'da var mı kontrol et (hedef = dosya_adi .md'siz)
         hedef = dosya_adi.replace(".md", "")
         if hedef not in ogrenme_set:
-            oncehafiza_ekle.append((meta_adi, str(dosya), guncel_hash, kategori, dosya_adi))
+            oncehafiza_ekle.append(
+                (meta_adi, str(dosya), guncel_hash, kategori, dosya_adi)
+            )
 
-    logger.info("📊 Analiz: yeni=%d, guncel=%d, atlanan=%d, OnceHafiza'ya_ek=%d",
-                len(yeni_liste), len(guncel_liste), atlanan, len(oncehafiza_ekle))
+    logger.info(
+        "📊 Analiz: yeni=%d, guncel=%d, atlanan=%d, OnceHafiza'ya_ek=%d",
+        len(yeni_liste),
+        len(guncel_liste),
+        atlanan,
+        len(oncehafiza_ekle),
+    )
 
     # 5) skills_index.db'yi güncelle (yeni + güncellenen)
     con_s = _baglan(SKILLS_DB)
@@ -200,12 +211,23 @@ def scan_and_sync() -> tuple[int, int]:
                     icerik = f.read()
             except Exception:
                 continue
-            baslik = next((l.strip()[2:] for l in icerik.split("\n") if l.strip().startswith("# ")), icerik[:200].strip())
+            baslik = next(
+                (
+                    l.strip()[2:]
+                    for l in icerik.split("\n")
+                    if l.strip().startswith("# ")
+                ),
+                icerik[:200].strip(),
+            )
             su_an = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            con_s.execute("INSERT OR IGNORE INTO beceriler (ad, aciklama, icerik, kaynak) VALUES (?, ?, ?, ?)",
-                          (meta_adi, baslik[:500], icerik[:10000], dosya_yolu))
-            con_s.execute("INSERT OR IGNORE INTO beceriler_meta (ad, dosya_hash, guncelleme) VALUES (?, ?, ?)",
-                          (meta_adi, guncel_hash, su_an))
+            con_s.execute(
+                "INSERT OR IGNORE INTO beceriler (ad, aciklama, icerik, kaynak) VALUES (?, ?, ?, ?)",
+                (meta_adi, baslik[:500], icerik[:10000], dosya_yolu),
+            )
+            con_s.execute(
+                "INSERT OR IGNORE INTO beceriler_meta (ad, dosya_hash, guncelleme) VALUES (?, ?, ?)",
+                (meta_adi, guncel_hash, su_an),
+            )
             skills_eklenen += 1
 
         for meta_adi, dosya_yolu, guncel_hash, kategori, dosya_adi in guncel_liste:
@@ -214,19 +236,32 @@ def scan_and_sync() -> tuple[int, int]:
                     icerik = f.read()
             except Exception:
                 continue
-            baslik = next((l.strip()[2:] for l in icerik.split("\n") if l.strip().startswith("# ")), icerik[:200].strip())
+            baslik = next(
+                (
+                    l.strip()[2:]
+                    for l in icerik.split("\n")
+                    if l.strip().startswith("# ")
+                ),
+                icerik[:200].strip(),
+            )
             su_an = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            con_s.execute("UPDATE beceriler SET aciklama=?, icerik=?, kaynak=? WHERE ad=?",
-                          (baslik[:500], icerik[:10000], dosya_yolu, meta_adi))
-            con_s.execute("UPDATE beceriler_meta SET dosya_hash=?, guncelleme=? WHERE ad=?",
-                          (guncel_hash, su_an, meta_adi))
+            con_s.execute(
+                "UPDATE beceriler SET aciklama=?, icerik=?, kaynak=? WHERE ad=?",
+                (baslik[:500], icerik[:10000], dosya_yolu, meta_adi),
+            )
+            con_s.execute(
+                "UPDATE beceriler_meta SET dosya_hash=?, guncelleme=? WHERE ad=?",
+                (guncel_hash, su_an, meta_adi),
+            )
             skills_guncellenen += 1
 
         con_s.commit()
     finally:
         con_s.close()
 
-    logger.info("✅ Skills DB: %d yeni + %d güncellendi", skills_eklenen, skills_guncellenen)
+    logger.info(
+        "✅ Skills DB: %d yeni + %d güncellendi", skills_eklenen, skills_guncellenen
+    )
 
     # 6) OnceHafiza DB'sini güncelle (ogrenmeler.db)
     # Kullanılacak kaynak: birleştir (yeni + güncel + OnceHafiza'da olmayan)
@@ -293,11 +328,19 @@ def scan_and_sync() -> tuple[int, int]:
     finally:
         con_o.close()
 
-    logger.info("✅ OnceHafiza DB: %d yeni eklendi + %d güncellendi", ogrenme_eklenen, ogrenme_guncellenen)
+    logger.info(
+        "✅ OnceHafiza DB: %d yeni eklendi + %d güncellendi",
+        ogrenme_eklenen,
+        ogrenme_guncellenen,
+    )
     logger.info("=" * 60)
     logger.info("📊 CRON RAPORU:")
-    logger.info("   Skills DB  → yeni: %d, güncel: %d", skills_eklenen, skills_guncellenen)
-    logger.info("   OnceHafiza → yeni: %d, güncel: %d", ogrenme_eklenen, ogrenme_guncellenen)
+    logger.info(
+        "   Skills DB  → yeni: %d, güncel: %d", skills_eklenen, skills_guncellenen
+    )
+    logger.info(
+        "   OnceHafiza → yeni: %d, güncel: %d", ogrenme_eklenen, ogrenme_guncellenen
+    )
     logger.info("=" * 60)
 
     return ogrenme_eklenen, ogrenme_guncellenen

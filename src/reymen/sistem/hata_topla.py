@@ -59,18 +59,21 @@ def bildirim_kanal_ekle(
         esik: Minimum seviye (DEBUG/INFO/WARNING/ERROR/CRITICAL)
         token: Telegram bot token (telegram için)
     """
-    _bildirim_kanallari.append({
-        "tur": tur,
-        "hedef": hedef,
-        "esik": esik,
-        "token": token,
-        "aktif": True,
-    })
+    _bildirim_kanallari.append(
+        {
+            "tur": tur,
+            "hedef": hedef,
+            "esik": esik,
+            "token": token,
+            "aktif": True,
+        }
+    )
 
 
 # ═══════════════════════════════════════════════════════════════════
 # Hata Deposu
 # ═══════════════════════════════════════════════════════════════════
+
 
 class HataDeposu:
     """JSONL dosyasına hata kayıtlarını yaz/oku."""
@@ -112,13 +115,19 @@ class HataDeposu:
         # Filtrele
         if seviye:
             min_sev = SEVIYE_SIRASI.get(seviye, 0)
-            kayitlar = [k for k in kayitlar if SEVIYE_SIRASI.get(k.get("seviye", "INFO"), 0) >= min_sev]
+            kayitlar = [
+                k
+                for k in kayitlar
+                if SEVIYE_SIRASI.get(k.get("seviye", "INFO"), 0) >= min_sev
+            ]
         if kaynak:
-            kayitlar = [k for k in kayitlar if kaynak.lower() in k.get("kaynak", "").lower()]
+            kayitlar = [
+                k for k in kayitlar if kaynak.lower() in k.get("kaynak", "").lower()
+            ]
 
         # Ters sırala (en yeni ilk)
         kayitlar.reverse()
-        return kayitlar[offset:offset + limit]
+        return kayitlar[offset : offset + limit]
 
     def temizle(self) -> int:
         """Tüm kayıtları sil."""
@@ -167,6 +176,7 @@ class HataDeposu:
 # ═══════════════════════════════════════════════════════════════════
 # Log Handler (logging modülü için)
 # ═══════════════════════════════════════════════════════════════════
+
 
 class HataLogHandler(logging.Handler):
     """Log kayıtlarını HataDeposu'na yönlendirir."""
@@ -231,6 +241,7 @@ def _excepthook(tip, deger, tb):
 # Bildirim Gönderme
 # ═══════════════════════════════════════════════════════════════════
 
+
 def _bildirim_gonder(kayit: dict) -> None:
     """Kayıtlı kanallara bildirim gönder."""
     seviye = kayit.get("seviye", "INFO")
@@ -273,11 +284,13 @@ def _bildirim_telegram(token: str, chat_id: str, kayit: dict) -> None:
     )
 
     url = f"https://api.telegram.org/bot{token}/sendMessage"
-    data = urllib.parse.urlencode({
-        "chat_id": chat_id,
-        "text": mesaj,
-        "parse_mode": "Markdown",
-    }).encode()
+    data = urllib.parse.urlencode(
+        {
+            "chat_id": chat_id,
+            "text": mesaj,
+            "parse_mode": "Markdown",
+        }
+    ).encode()
 
     req = urllib.request.Request(url, data=data, method="POST")
     urllib.request.urlopen(req, timeout=10)
@@ -301,6 +314,7 @@ def _bildirim_webhook(url: str, kayit: dict) -> None:
 # ═══════════════════════════════════════════════════════════════════
 # Ana Sınıf (Singleton)
 # ═══════════════════════════════════════════════════════════════════
+
 
 class HataToplayici:
     """Merkezi hata toplama sistemi.

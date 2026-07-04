@@ -1,4 +1,5 @@
 """Session gecmisi yonetimi."""
+
 import json, os
 from datetime import datetime
 from pathlib import Path
@@ -6,12 +7,15 @@ from pathlib import Path
 SESSIONS_DIR = Path.home() / ".deepseek_ajan" / "sessions"
 MAX_MESSAGES = 100
 
+
 def _ensure():
     SESSIONS_DIR.mkdir(parents=True, exist_ok=True)
+
 
 def path(name):
     _ensure()
     return SESSIONS_DIR / f"{name}.jsonl"
+
 
 def listele():
     _ensure()
@@ -23,6 +27,7 @@ def listele():
         result.append({"id": i, "name": s.stem, "mesaj": size, "tarih": mt})
     return result
 
+
 def kaydet(ad, messages):
     if not ad:
         ad = "sohbet_" + datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -31,6 +36,7 @@ def kaydet(ad, messages):
         for m in messages[-MAX_MESSAGES:]:
             f.write(json.dumps(m, ensure_ascii=False) + "\n")
     return p
+
 
 def yukle(ad):
     p = path(ad)
@@ -51,6 +57,7 @@ def yukle(ad):
             if line:
                 msgs.append(json.loads(line))
     return msgs
+
 
 def sil(ad):
     p = path(ad)

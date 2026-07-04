@@ -58,19 +58,26 @@ class TelegramTools:
             RuntimeError: Token ayarli degilse
         """
         if not self._token or "BURAYA" in self._token:
-            raise RuntimeError("[TelegramTools] Token ayarli degil. TELEGRAM_BOT_TOKEN env'ini kontrol et.")
+            raise RuntimeError(
+                "[TelegramTools] Token ayarli degil. TELEGRAM_BOT_TOKEN env'ini kontrol et."
+            )
 
         try:
             import requests
+
             url = f"{self._base_url}/{method}"
             r = requests.post(url, data=data, timeout=self._timeout)
             r.raise_for_status()
             yanit = r.json()
             if not yanit.get("ok"):
-                raise RuntimeError(f"Telegram API hatasi: {yanit.get('description', 'bilinmiyor')}")
+                raise RuntimeError(
+                    f"Telegram API hatasi: {yanit.get('description', 'bilinmiyor')}"
+                )
             return yanit
         except ImportError:
-            raise RuntimeError("[TelegramTools] requests kutuphanesi gerekli. pip install requests")
+            raise RuntimeError(
+                "[TelegramTools] requests kutuphanesi gerekli. pip install requests"
+            )
         except Exception as _e:
             _en = type(_e).__name__
             if "Timeout" in _en:
@@ -92,11 +99,14 @@ class TelegramTools:
         try:
             if not mesaj:
                 return "[TelegramTools] Mesaj bos, gonderilmedi."
-            yanit = self._api_istek("sendMessage", {
-                "chat_id": chat_id,
-                "text": mesaj,
-                "parse_mode": "HTML",
-            })
+            yanit = self._api_istek(
+                "sendMessage",
+                {
+                    "chat_id": chat_id,
+                    "text": mesaj,
+                    "parse_mode": "HTML",
+                },
+            )
             mesaj_id = yanit.get("result", {}).get("message_id", 0)
             return f"[TelegramTools] Mesaj gonderildi (ID: {mesaj_id})"
         except RuntimeError as e:
@@ -120,11 +130,14 @@ class TelegramTools:
             if limit > 100:
                 limit = 100
 
-            yanit = self._api_istek("getUpdates", {
-                "offset": self._son_mesaj_id,
-                "limit": limit,
-                "timeout": 10,
-            })
+            yanit = self._api_istek(
+                "getUpdates",
+                {
+                    "offset": self._son_mesaj_id,
+                    "limit": limit,
+                    "timeout": 10,
+                },
+            )
             sonuclar = yanit.get("result", [])
             mesajlar = []
 
@@ -135,11 +148,15 @@ class TelegramTools:
 
                 mesaj_verisi = guncelleme.get("message", {})
                 if mesaj_verisi:
-                    mesajlar.append({
-                        "kimden": mesaj_verisi.get("from", {}).get("first_name", "Bilinmiyor"),
-                        "metin": mesaj_verisi.get("text", ""),
-                        "tarih": mesaj_verisi.get("date", 0),
-                    })
+                    mesajlar.append(
+                        {
+                            "kimden": mesaj_verisi.get("from", {}).get(
+                                "first_name", "Bilinmiyor"
+                            ),
+                            "metin": mesaj_verisi.get("text", ""),
+                            "tarih": mesaj_verisi.get("date", 0),
+                        }
+                    )
 
             return mesajlar
         except RuntimeError as e:
@@ -164,6 +181,7 @@ class TelegramTools:
                 return f"[TelegramTools] Dosya bulunamadi: {dosya_yolu}"
 
             import requests
+
             dosya_adi = os.path.basename(dosya_yolu)
 
             with open(dosya_yolu, "rb") as f:
@@ -176,7 +194,9 @@ class TelegramTools:
                 r.raise_for_status()
                 yanit = r.json()
                 if yanit.get("ok"):
-                    doc_id = yanit.get("result", {}).get("document", {}).get("file_id", "")
+                    doc_id = (
+                        yanit.get("result", {}).get("document", {}).get("file_id", "")
+                    )
                     return f"[TelegramTools] Dosya gonderildi (file_id: {doc_id})"
                 return f"[TelegramTools] Dosya gonderilemedi: {yanit.get('description', '')}"
         except ImportError:
@@ -195,6 +215,7 @@ class TelegramTools:
         """
         try:
             import requests
+
             baslangic = time.time()
             r = requests.get(f"{self._base_url}/getMe", timeout=10)
             gecen_sure = round((time.time() - baslangic) * 1000, 1)
@@ -204,8 +225,10 @@ class TelegramTools:
                 bot_info = yanit.get("result", {})
                 bot_ad = bot_info.get("first_name", "Bilinmiyor")
                 kullanici_adi = bot_info.get("username", "")
-                return (f"[TelegramTools] Baglanti basarili | Bot: {bot_ad} "
-                        f"(@{kullanici_adi}) | Gecikme: {gecen_sure}ms")
+                return (
+                    f"[TelegramTools] Baglanti basarili | Bot: {bot_ad} "
+                    f"(@{kullanici_adi}) | Gecikme: {gecen_sure}ms"
+                )
             return f"[TelegramTools] Baglanti basarisiz: {yanit.get('description', '')}"
         except ImportError:
             return "[TelegramTools] requests kutuphanesi gerekli."
@@ -239,7 +262,9 @@ class TelegramTools:
         except Exception as e:
             return {"hata": str(e)}
 
-    def stream_mesaj_gonder(self, chat_id: str, mesaj: str, chunk_boyut: int = 4096) -> str:
+    def stream_mesaj_gonder(
+        self, chat_id: str, mesaj: str, chunk_boyut: int = 4096
+    ) -> str:
         """Uzun mesajlari chunk'lara bolerek gonder.
 
         Args:
@@ -257,12 +282,15 @@ class TelegramTools:
             # Gateway import'u dene (basarili olursa gateway send_stream kullanilir)
             try:
                 from gateway.platforms.telegram import send_stream
+
                 stream_sonuc = send_stream(self._token, chat_id, mesaj)
                 if isinstance(stream_sonuc, dict):
                     return f"Stream mesaj gonderildi ({stream_sonuc.get('chunk_sayisi', '?')} chunk)"
                 return str(stream_sonuc)
             except ImportError as _e:
-                logger.warning("[AraclarTelegram] Modul yuklenemedi (L263): %s", ImportError)
+                logger.warning(
+                    "[AraclarTelegram] Modul yuklenemedi (L263): %s", ImportError
+                )
                 pass
 
             # Kisa mesaj -> normal mesaj_gonder'e yonlendir
@@ -271,11 +299,14 @@ class TelegramTools:
 
             # Uzun mesaj -> chunk'lara bol
             import requests
+
             chunk_sayisi = 0
             for i in range(0, len(mesaj), chunk_boyut):
-                chunk = mesaj[i:i + chunk_boyut]
+                chunk = mesaj[i : i + chunk_boyut]
                 data = {"chat_id": chat_id, "text": chunk}
-                r = requests.post(f"{self._base_url}/sendMessage", data=data, timeout=self._timeout)
+                r = requests.post(
+                    f"{self._base_url}/sendMessage", data=data, timeout=self._timeout
+                )
                 r.raise_for_status()
                 chunk_sayisi += 1
 
@@ -301,22 +332,28 @@ class TelegramTools:
             # Gateway import'u dene
             try:
                 from gateway.platforms.telegram import set_reaction
+
                 reac_sonuc = set_reaction(self._token, chat_id, mesaj_id, emoji)
                 if isinstance(reac_sonuc, dict):
                     return f"Reaction eklendi: {emoji}"
                 return str(reac_sonuc)
             except ImportError as _e:
-                logger.warning("[AraclarTelegram] Modul yuklenemedi (L306): %s", ImportError)
+                logger.warning(
+                    "[AraclarTelegram] Modul yuklenemedi (L306): %s", ImportError
+                )
                 pass
 
             # Fallback: Telegram API setMessageReaction
             import requests
+
             data = {
                 "chat_id": chat_id,
                 "message_id": mesaj_id,
                 "reaction": [{"type": "emoji", "emoji": emoji}],
             }
-            r = requests.post(f"{self._base_url}/setMessageReaction", data=data, timeout=self._timeout)
+            r = requests.post(
+                f"{self._base_url}/setMessageReaction", data=data, timeout=self._timeout
+            )
             r.raise_for_status()
             return f"[TelegramTools] Reaction eklendi: {emoji}"
         except RuntimeError as e:
@@ -336,10 +373,13 @@ class TelegramTools:
             Islem sonucu
         """
         try:
-            self._api_istek("deleteMessage", {
-                "chat_id": chat_id,
-                "message_id": mesaj_id,
-            })
+            self._api_istek(
+                "deleteMessage",
+                {
+                    "chat_id": chat_id,
+                    "message_id": mesaj_id,
+                },
+            )
             return f"[TelegramTools] Mesaj {mesaj_id} silindi."
         except RuntimeError as e:
             return f"[TelegramTools] Silme hatasi: {e}"

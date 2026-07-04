@@ -8,7 +8,11 @@ from src.reymen.sistem.cli_display import _ACCENT
 def _handle_skin_command(cli, cmd: str):
     """Handle /skin [name] — show or change the display skin."""
     try:
-        from reymen.reymen_cli.skin_engine import list_skins, set_active_skin, get_active_skin_name
+        from reymen.reymen_cli.skin_engine import (
+            list_skins,
+            set_active_skin,
+            get_active_skin_name,
+        )
     except ImportError:
         print("Skin engine not available.")
         return

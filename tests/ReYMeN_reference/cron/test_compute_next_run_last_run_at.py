@@ -3,6 +3,7 @@
 Regression test for: cron jobs computing next_run_at from _ReYMeN_now()
 instead of from last_run_at, making them inconsistent with interval jobs.
 """
+
 import pytest
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -40,9 +41,9 @@ class TestCronComputeNextRunUsesLastRunAt:
         # With now as base (Apr 10 22:00), next is Apr 11 00:00.
         # The fix should use last_run_at, returning Apr 6 18:00
         # (stale detection in get_due_jobs() fast-forwards from there).
-        assert next_dt.date().isoformat() == "2026-04-06", (
-            f"Expected next run on Apr 6 (from last_run_at), got {next_dt}"
-        )
+        assert (
+            next_dt.date().isoformat() == "2026-04-06"
+        ), f"Expected next run on Apr 6 (from last_run_at), got {next_dt}"
         assert next_dt.hour == 18
 
     def test_cron_without_last_run_at_uses_now(self, monkeypatch):
@@ -60,9 +61,9 @@ class TestCronComputeNextRunUsesLastRunAt:
         next_dt = datetime.fromisoformat(result)
 
         # Without last_run_at, should compute from now -> Apr 11 00:00
-        assert next_dt.date().isoformat() == "2026-04-11", (
-            f"Expected next run on Apr 11 (from now), got {next_dt}"
-        )
+        assert (
+            next_dt.date().isoformat() == "2026-04-11"
+        ), f"Expected next run on Apr 11 (from now), got {next_dt}"
         assert next_dt.hour == 0
 
     def test_cron_weekly_consistent_with_interval(self, monkeypatch):
@@ -78,10 +79,16 @@ class TestCronComputeNextRunUsesLastRunAt:
         interval_schedule = {"kind": "interval", "minutes": 7 * 24 * 60}
 
         cron_result = compute_next_run(cron_schedule, last_run_at=last_run.isoformat())
-        interval_result = compute_next_run(interval_schedule, last_run_at=last_run.isoformat())
+        interval_result = compute_next_run(
+            interval_schedule, last_run_at=last_run.isoformat()
+        )
 
         # Both should be after last_run_at
         cron_dt = datetime.fromisoformat(cron_result)
         interval_dt = datetime.fromisoformat(interval_result)
-        assert cron_dt > last_run, f"Cron next {cron_dt} should be after last_run {last_run}"
-        assert interval_dt > last_run, f"Interval next {interval_dt} should be after last_run {last_run}"
+        assert (
+            cron_dt > last_run
+        ), f"Cron next {cron_dt} should be after last_run {last_run}"
+        assert (
+            interval_dt > last_run
+        ), f"Interval next {interval_dt} should be after last_run {last_run}"

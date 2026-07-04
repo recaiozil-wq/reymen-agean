@@ -71,9 +71,9 @@ def test_load_env_invalidates_on_mtime_bump():
             os.utime(env_path, (future, future))
 
             second = load_env()
-            assert second.get("OPENAI_API_KEY") == "sk-new", (
-                "load_env() returned stale value after file change"
-            )
+            assert (
+                second.get("OPENAI_API_KEY") == "sk-new"
+            ), "load_env() returned stale value after file change"
     finally:
         env_path.unlink(missing_ok=True)
         invalidate_env_cache()

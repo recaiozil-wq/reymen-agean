@@ -10,6 +10,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 import logging
+
 logger = logging.getLogger(__name__)
 
 HERMES = Path.home() / "AppData" / "Local" / "hermes"
@@ -27,7 +28,9 @@ def kontrol():
         icerik = debug_log.read_text(encoding="utf-8", errors="ignore")
         conflict_say = icerik.count("409 Conflict")
         if conflict_say > 3:
-            rapor.append(f"[WATCHDOG] kiral38: {conflict_say} kez 409 Conflict (log temizlendi)")
+            rapor.append(
+                f"[WATCHDOG] kiral38: {conflict_say} kez 409 Conflict (log temizlendi)"
+            )
             debug_log.write_text("")
 
     # 2. gateway.lock temiz mi?
@@ -38,7 +41,9 @@ def kontrol():
             pid = int(pidf.read_text().strip())
             r = subprocess.run(
                 ["tasklist", "/FI", f"PID eq {pid}", "/NH"],
-                capture_output=True, text=True, timeout=10
+                capture_output=True,
+                text=True,
+                timeout=10,
             )
             if str(pid) not in r.stdout:
                 rapor.append(f"[WATCHDOG] kiral38 PID {pid} olmus, lock temizleniyor")

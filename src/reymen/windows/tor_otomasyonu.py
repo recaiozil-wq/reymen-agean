@@ -42,6 +42,7 @@ try:
     from selenium.webdriver.support import expected_conditions as _EC
     from selenium.common.exceptions import TimeoutException as _TimeoutException
     from selenium.common.exceptions import WebDriverException as _WebDriverException
+
     _SELENIUM_VAR = True
 except ImportError:
     _SELENIUM_VAR = False
@@ -49,6 +50,7 @@ except ImportError:
 # OCR entegrasyonu (opsiyonel)
 try:
     from reymen.cereyan.hata_cozucu import HataKoduUretici
+
     _HATA_COZUCU_VAR = True
 except ImportError:
     _HATA_COZUCU_VAR = False
@@ -65,11 +67,13 @@ _FORM_BEKLEME = 30
 
 # ── Tor Browser kontrol ─────────────────────────────────────────────────────
 
+
 class TorBrowserKontrol:
     """Tor Browser'i bul, baslat, Selenium WebDriver ile yonet."""
 
-    def __init__(self, tor_yolu: Optional[str] = None,
-                 geckodriver_yolu: str = "geckodriver") -> None:
+    def __init__(
+        self, tor_yolu: Optional[str] = None, geckodriver_yolu: str = "geckodriver"
+    ) -> None:
         self.tor_yolu = tor_yolu or self._varsayilan_yol()
         self.geckodriver_yolu = geckodriver_yolu
         self.driver: Optional[Any] = None
@@ -168,6 +172,7 @@ class TorBrowserKontrol:
 
 # ── Form doldurma ───────────────────────────────────────────────────────────
 
+
 class FormDoldurucu:
     """DOM'da alanlari bulup deger girer. Birden fazla secici stratejisi dener."""
 
@@ -197,8 +202,9 @@ class FormDoldurucu:
     }
 
     @classmethod
-    def doldur(cls, driver: Any, alanlar: Dict[str, str],
-               bekle: int = _FORM_BEKLEME) -> Dict[str, str]:
+    def doldur(
+        cls, driver: Any, alanlar: Dict[str, str], bekle: int = _FORM_BEKLEME
+    ) -> Dict[str, str]:
         """Form alanlarini doldur.
 
         Args:
@@ -226,7 +232,9 @@ class FormDoldurucu:
                         element.send_keys(deger)
                         sonuc["basarili"].append(alan_adi)
                         bulundu = True
-                        logger.debug("[Form] %s = %s (%s)", alan_adi, deger[:10], aranan)
+                        logger.debug(
+                            "[Form] %s = %s (%s)", alan_adi, deger[:10], aranan
+                        )
                         break
                     except Exception:
                         continue
@@ -235,13 +243,17 @@ class FormDoldurucu:
 
             if not bulundu:
                 sonuc["basarisiz"].append(alan_adi)
-                logger.warning("[Form] Alan bulunamadi: '%s' (aranan: %s)",
-                              alan_adi, aranacaklar[:3])
+                logger.warning(
+                    "[Form] Alan bulunamadi: '%s' (aranan: %s)",
+                    alan_adi,
+                    aranacaklar[:3],
+                )
 
         return sonuc
 
 
 # ─── Is akislari (Login, Kayit, Siparis) ────────────────────────────────────
+
 
 class OtomasyonAkislari:
     """Tor Browser uzerinden login, kayit, siparis akislari."""
@@ -290,10 +302,13 @@ class OtomasyonAkislari:
             if not self.tor.sayfaya_git(url):
                 return {"basarili": False, "sayfa": "", "hata": "Sayfa yuklenemedi"}
 
-            FormDoldurucu.doldur(self.tor.driver, {
-                "kullanici_adi": kullanici,
-                "sifre": sifre,
-            })
+            FormDoldurucu.doldur(
+                self.tor.driver,
+                {
+                    "kullanici_adi": kullanici,
+                    "sifre": sifre,
+                },
+            )
 
             self._submit()
             time.sleep(2)
@@ -328,8 +343,7 @@ class OtomasyonAkislari:
             logger.error("[Akis] Kayit hatasi: %s", e)
             return {"basarili": False, "sonuc": "", "hata": str(e)}
 
-    def siparis_ver(self, url: str, urun: str,
-                    adres: Dict[str, str]) -> Dict[str, Any]:
+    def siparis_ver(self, url: str, urun: str, adres: Dict[str, str]) -> Dict[str, Any]:
         """Urun detay sayfasina git, sepete ekle, adres gir, siparis ver.
 
         Args:
@@ -342,7 +356,11 @@ class OtomasyonAkislari:
         try:
             urun_url = f"{url.rstrip('/')}/{urun.lstrip('/')}"
             if not self.tor.sayfaya_git(urun_url):
-                return {"basarili": False, "sonuc": "", "hata": "Urun sayfasi yuklenemedi"}
+                return {
+                    "basarili": False,
+                    "sonuc": "",
+                    "hata": "Urun sayfasi yuklenemedi",
+                }
 
             # Sepete ekle butonunu bul ve tikla
             self._submit()
@@ -392,6 +410,7 @@ def tor_kapat() -> str:
 
 # ── motor.py kayit fonksiyonu ───────────────────────────────────────────────
 
+
 def motor_kaydet(motor) -> None:
     """motor.py'ye TOR_ araclarini kaydet."""
     if not hasattr(motor, "_orijinal_calistir"):
@@ -411,17 +430,21 @@ def motor_kaydet(motor) -> None:
 
         if arac == "TOR_FORM_DOLDUR":
             import json
+
             try:
                 alanlar = json.loads(ham_param)
                 if isinstance(alanlar, dict):
                     sonuc = FormDoldurucu.doldur(_aktif_tor.driver, alanlar)
-                    return (f"[Form] Basarili: {sonuc['basarili']}, "
-                            f"Basarisiz: {sonuc['basarisiz']}")
+                    return (
+                        f"[Form] Basarili: {sonuc['basarili']}, "
+                        f"Basarisiz: {sonuc['basarisiz']}"
+                    )
             except json.JSONDecodeError:
-                return "[Tor]: JSON formatinda alanlar gonderin: {\"ad\": \"...\", ...}"
+                return '[Tor]: JSON formatinda alanlar gonderin: {"ad": "...", ...}'
 
         if arac == "TOR_LOGIN":
             import json
+
             try:
                 data = json.loads(ham_param)
                 sonuc = _aktif_akislar.login(
@@ -433,10 +456,11 @@ def motor_kaydet(motor) -> None:
                     return "[Login] Basarili."
                 return f"[Login] Basarisiz: {sonuc['hata']}"
             except json.JSONDecodeError:
-                return "[Tor]: JSON gonderin: {\"url\": \"...\", \"kullanici\": \"...\", \"sifre\": \"...\"}"
+                return '[Tor]: JSON gonderin: {"url": "...", "kullanici": "...", "sifre": "..."}'
 
         if arac == "TOR_KAYIT":
             import json
+
             try:
                 data = json.loads(ham_param)
                 sonuc = _aktif_akislar.kayit_ol(
@@ -447,10 +471,11 @@ def motor_kaydet(motor) -> None:
                     return "[Kayit] Basarili."
                 return f"[Kayit] Basarisiz: {sonuc['hata']}"
             except json.JSONDecodeError:
-                return "[Tor]: JSON gonderin: {\"url\": \"...\", \"bilgiler\": {...}}"
+                return '[Tor]: JSON gonderin: {"url": "...", "bilgiler": {...}}'
 
         if arac == "TOR_SIPARIS":
             import json
+
             try:
                 data = json.loads(ham_param)
                 sonuc = _aktif_akislar.siparis_ver(
@@ -462,18 +487,21 @@ def motor_kaydet(motor) -> None:
                     return "[Siparis] Basarili."
                 return f"[Siparis] Basarisiz: {sonuc['hata']}"
             except json.JSONDecodeError:
-                return "[Tor]: JSON gonderin: {\"url\": \"...\", \"urun\": \"...\", \"adres\": {...}}"
+                return '[Tor]: JSON gonderin: {"url": "...", "urun": "...", "adres": {...}}'
 
         return motor._orijinal_calistir(arac, ham_param)
 
     motor.calistir = yamali_calistir
-    logger.info("[Tor] 6 arac kaydedildi: TOR_AC, TOR_KAPAT, TOR_FORM_DOLDUR, TOR_LOGIN, TOR_KAYIT, TOR_SIPARIS")
+    logger.info(
+        "[Tor] 6 arac kaydedildi: TOR_AC, TOR_KAPAT, TOR_FORM_DOLDUR, TOR_LOGIN, TOR_KAYIT, TOR_SIPARIS"
+    )
 
 
 # ── Hizli test ─────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
     import logging as _logging
+
     _logging.basicConfig(level=_logging.INFO, format="%(levelname)s %(message)s")
 
     print("=== Tor Otomasyon Testi ===")
@@ -487,10 +515,13 @@ if __name__ == "__main__":
     print("\n=== Motor Kayit Testi ===")
     try:
         from reymen.cereyan.motor import Motor
+
         m = Motor(backend_mode="local")
+
         # Motor'a TOR_ araçlarını ekle (motor_kaydet ile)
         class MockMotor:
             calistir = m.calistir
+
         mock = MockMotor()
         motor_kaydet(mock)
         print("  [OK] Motor kaydi yapildi")

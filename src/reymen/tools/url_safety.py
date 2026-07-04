@@ -54,29 +54,35 @@ def normalize_url_for_request(url: str) -> str:
     return urlunsplit((parsed.scheme, netloc, path, query, fragment))
 
 
-_BLOCKED_HOSTNAMES = frozenset({
-    "metadata.google.internal",
-    "metadata.goog",
-})
+_BLOCKED_HOSTNAMES = frozenset(
+    {
+        "metadata.google.internal",
+        "metadata.goog",
+    }
+)
 
-_ALWAYS_BLOCKED_IPS = frozenset({
-    ipaddress.ip_address("169.254.169.254"),
-    ipaddress.ip_address("169.254.170.2"),
-    ipaddress.ip_address("169.254.169.253"),
-    ipaddress.ip_address("fd00:ec2::254"),
-    ipaddress.ip_address("100.100.100.200"),
-    ipaddress.ip_address("::ffff:169.254.169.254"),
-    ipaddress.ip_address("::ffff:169.254.170.2"),
-    ipaddress.ip_address("::ffff:169.254.169.253"),
-    ipaddress.ip_address("::ffff:100.100.100.200"),
-})
+_ALWAYS_BLOCKED_IPS = frozenset(
+    {
+        ipaddress.ip_address("169.254.169.254"),
+        ipaddress.ip_address("169.254.170.2"),
+        ipaddress.ip_address("169.254.169.253"),
+        ipaddress.ip_address("fd00:ec2::254"),
+        ipaddress.ip_address("100.100.100.200"),
+        ipaddress.ip_address("::ffff:169.254.169.254"),
+        ipaddress.ip_address("::ffff:169.254.170.2"),
+        ipaddress.ip_address("::ffff:169.254.169.253"),
+        ipaddress.ip_address("::ffff:100.100.100.200"),
+    }
+)
 _ALWAYS_BLOCKED_NETWORKS = (
     ipaddress.ip_network("169.254.0.0/16"),
     ipaddress.ip_network("::ffff:169.254.0.0/112"),
 )
-_TRUSTED_PRIVATE_IP_HOSTS = frozenset({
-    "multimedia.nt.qq.com.cn",
-})
+_TRUSTED_PRIVATE_IP_HOSTS = frozenset(
+    {
+        "multimedia.nt.qq.com.cn",
+    }
+)
 _CGNAT_NETWORK = ipaddress.ip_network("100.64.0.0/10")
 
 _allow_private_resolved = False
@@ -104,10 +110,15 @@ def _reset_allow_private_cache() -> None:
 def _is_blocked_ip(ip):
     if isinstance(ip, ipaddress.IPv6Address) and ip.ipv4_mapped is not None:
         embedded_ip = ip.ipv4_mapped
-        return (embedded_ip.is_private or embedded_ip.is_loopback or
-                embedded_ip.is_link_local or embedded_ip.is_reserved or
-                embedded_ip.is_multicast or embedded_ip.is_unspecified or
-                embedded_ip in _CGNAT_NETWORK)
+        return (
+            embedded_ip.is_private
+            or embedded_ip.is_loopback
+            or embedded_ip.is_link_local
+            or embedded_ip.is_reserved
+            or embedded_ip.is_multicast
+            or embedded_ip.is_unspecified
+            or embedded_ip in _CGNAT_NETWORK
+        )
     if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved:
         return True
     if ip.is_multicast or ip.is_unspecified:
@@ -131,11 +142,15 @@ def is_always_blocked_url(url: str) -> bool:
         except ValueError:
             ip = None
         if ip is not None:
-            if ip in _ALWAYS_BLOCKED_IPS or any(ip in net for net in _ALWAYS_BLOCKED_NETWORKS):
+            if ip in _ALWAYS_BLOCKED_IPS or any(
+                ip in net for net in _ALWAYS_BLOCKED_NETWORKS
+            ):
                 return True
             return False
         try:
-            addr_info = socket.getaddrinfo(hostname, None, socket.AF_UNSPEC, socket.SOCK_STREAM)
+            addr_info = socket.getaddrinfo(
+                hostname, None, socket.AF_UNSPEC, socket.SOCK_STREAM
+            )
         except socket.gaierror:
             return False
         for _family, _, _, _, sockaddr in addr_info:
@@ -144,7 +159,9 @@ def is_always_blocked_url(url: str) -> bool:
                 resolved = ipaddress.ip_address(ip_str)
             except ValueError:
                 continue
-            if resolved in _ALWAYS_BLOCKED_IPS or any(resolved in net for net in _ALWAYS_BLOCKED_NETWORKS):
+            if resolved in _ALWAYS_BLOCKED_IPS or any(
+                resolved in net for net in _ALWAYS_BLOCKED_NETWORKS
+            ):
                 return True
         return False
     except Exception as exc:
@@ -162,7 +179,9 @@ def is_safe_url(url: str) -> bool:
         hostname = (parsed.hostname or "").strip().lower().rstrip(".")
         scheme = (parsed.scheme or "").strip().lower()
         if scheme not in {"http", "https"}:
-            logger.warning("Blocked request — unsupported URL scheme: %s", scheme or "<empty>")
+            logger.warning(
+                "Blocked request — unsupported URL scheme: %s", scheme or "<empty>"
+            )
             return False
         if not hostname:
             return False
@@ -172,7 +191,9 @@ def is_safe_url(url: str) -> bool:
         allow_all_private = _global_allow_private_urls()
         allow_private_ip = _allows_private_ip_resolution(hostname, scheme)
         try:
-            addr_info = socket.getaddrinfo(hostname, None, socket.AF_UNSPEC, socket.SOCK_STREAM)
+            addr_info = socket.getaddrinfo(
+                hostname, None, socket.AF_UNSPEC, socket.SOCK_STREAM
+            )
         except socket.gaierror:
             logger.warning("Blocked request — DNS resolution failed for: %s", hostname)
             return False
@@ -182,11 +203,17 @@ def is_safe_url(url: str) -> bool:
                 ip = ipaddress.ip_address(ip_str)
             except ValueError:
                 continue
-            if ip in _ALWAYS_BLOCKED_IPS or any(ip in net for net in _ALWAYS_BLOCKED_NETWORKS):
-                logger.warning("Blocked request to metadata address: %s -> %s", hostname, ip_str)
+            if ip in _ALWAYS_BLOCKED_IPS or any(
+                ip in net for net in _ALWAYS_BLOCKED_NETWORKS
+            ):
+                logger.warning(
+                    "Blocked request to metadata address: %s -> %s", hostname, ip_str
+                )
                 return False
             if not allow_all_private and not allow_private_ip and _is_blocked_ip(ip):
-                logger.warning("Blocked request to private address: %s -> %s", hostname, ip_str)
+                logger.warning(
+                    "Blocked request to private address: %s -> %s", hostname, ip_str
+                )
                 return False
         return True
     except Exception as exc:

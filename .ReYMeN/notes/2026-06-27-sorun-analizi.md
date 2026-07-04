@@ -27,12 +27,12 @@ build_welcome_banner(
 ```
 
 **Beklenen:** Rich Console ile bir welcome banner basmalı.
-**Örnek:** 
+**Örnek:**
 ```python
 from rich.panel import Panel
 from rich.text import Text
 
-def build_welcome_banner(console=None, model=None, cwd=None, tools=None, 
+def build_welcome_banner(console=None, model=None, cwd=None, tools=None,
                          enabled_toolsets=None, session_id=None, context_length=None):
     if console is None:
         return ""
@@ -60,10 +60,10 @@ _completer = SlashCommandCompleter(
 
 **Bağlam:** prompt_toolkit `WordCompleter` benzeri. `skill_commands_provider` fonksiyonu çağrıldığında komut listesi döndürüyor. `command_filter` hangi komutların geçerli olduğunu kontrol ediyor.
 
-**Beklenen:** 
+**Beklenen:**
 ```python
 class SlashCommandCompleter:
-    def __init__(self, skill_commands_provider=None, command_filter=None, 
+    def __init__(self, skill_commands_provider=None, command_filter=None,
                  skill_bundles_provider=None):
         self.skill_commands_provider = skill_commands_provider
         self.command_filter = command_filter

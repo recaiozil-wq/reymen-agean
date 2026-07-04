@@ -1,10 +1,12 @@
 from collections import deque
+
 # ============================================================================
 # ASCII Art & Branding
 # ============================================================================
 from contextlib import contextmanager
 import os, re, shutil, sys, time, math
 import logging
+
 logger = logging.getLogger(__name__)
 _RichText = str
 
@@ -19,7 +21,9 @@ _RichText = str
 _ACCENT_ANSI_DEFAULT = "\033[1;38;2;255;215;0m"  # True-color #FFD700 bold — fallback
 _BOLD = "\033[1m"
 _RST = "\033[0m"
-_STREAM_PAD = "    "  # 4-space indent for streamed response text (matches Panel padding)
+_STREAM_PAD = (
+    "    "  # 4-space indent for streamed response text (matches Panel padding)
+)
 
 
 def _hex_to_ansi(hex_color: str, *, bold: bool = False) -> str:
@@ -60,7 +64,9 @@ def _hex_to_ansi(hex_color: str, *, bold: bool = False) -> str:
 _LIGHT_MODE_CACHE: bool | None = None
 _TRUE_RE = re.compile(r"^(1|true|on|yes|y)$")
 _FALSE_RE = re.compile(r"^(0|false|off|no|n)$")
-_LIGHT_DEFAULT_TERM_PROGRAMS = frozenset()  # Apple_Terminal doesn't reliably indicate; require explicit
+_LIGHT_DEFAULT_TERM_PROGRAMS = (
+    frozenset()
+)  # Apple_Terminal doesn't reliably indicate; require explicit
 
 
 def _luminance_from_hex(hex_str: str) -> float | None:
@@ -97,6 +103,7 @@ def _query_osc11_background() -> str | None:
     try:
         import termios
         import tty
+
         fd = sys.stdin.fileno()
         old = termios.tcgetattr(fd)
     except Exception:
@@ -113,6 +120,7 @@ def _query_osc11_background() -> str | None:
             return None
         # Read up to ~50ms for the response
         import select
+
         deadline = time.monotonic() + 0.1
         buf = b""
         while time.monotonic() < deadline:
@@ -132,12 +140,14 @@ def _query_osc11_background() -> str | None:
         m = re.search(rb"rgb:([0-9a-fA-F]+)/([0-9a-fA-F]+)/([0-9a-fA-F]+)", buf)
         if not m:
             return None
+
         # Each component is 1-4 hex digits — normalize to 8-bit
         def norm(h: bytes) -> int:
             v = int(h, 16)
             # Scale to 0-255 based on hex length
             bits = len(h) * 4
             return (v * 255) // ((1 << bits) - 1) if bits else 0
+
         r, g, b = norm(m.group(1)), norm(m.group(2)), norm(m.group(3))
         return f"#{r:02X}{g:02X}{b:02X}"
     finally:
@@ -223,17 +233,17 @@ def _detect_light_mode() -> bool:
 # become invisible the OTHER direction (dark gray on dark navy).
 _LIGHT_MODE_REMAP: dict[str, str] = {
     # Original (dark-mode) -> Light-mode replacement (darker, readable)
-    "#FFF8DC": "#1A1A1A",   # cornsilk -> near-black
-    "#FFD700": "#9A6B00",   # gold -> dark goldenrod (readable on cream)
-    "#FFBF00": "#8A5A00",   # amber -> dark amber
-    "#B8860B": "#5C4500",   # dark goldenrod -> deeper brown (more contrast)
-    "#DAA520": "#6B4F00",   # goldenrod -> dark olive
-    "#F1E6CF": "#1A1A1A",   # cream -> near-black
-    "#c9d1d9": "#24292F",   # github-light fg
-    "#EAF7FF": "#0F1B26",   # ice
+    "#FFF8DC": "#1A1A1A",  # cornsilk -> near-black
+    "#FFD700": "#9A6B00",  # gold -> dark goldenrod (readable on cream)
+    "#FFBF00": "#8A5A00",  # amber -> dark amber
+    "#B8860B": "#5C4500",  # dark goldenrod -> deeper brown (more contrast)
+    "#DAA520": "#6B4F00",  # goldenrod -> dark olive
+    "#F1E6CF": "#1A1A1A",  # cream -> near-black
+    "#c9d1d9": "#24292F",  # github-light fg
+    "#EAF7FF": "#0F1B26",  # ice
     "#F5F5F5": "#1A1A1A",
     "#FFF0D4": "#1A1A1A",
-    "#CD7F32": "#8A4F1A",   # bronze -> darker bronze
+    "#CD7F32": "#8A4F1A",  # bronze -> darker bronze
     "#FFEFB5": "#3A2A00",
     # NOTE: skipping #C0C0C0/#888888/#555555/#8B8682 — those are
     # status-bar foregrounds paired with dark navy bg, where dark
@@ -294,7 +304,6 @@ except Exception:
     logger.warning("[fix_01_sessiz_except] Exception")
 
 
-
 class _SkinAwareAnsi:
     """Lazy ANSI escape that resolves from the skin engine on first use.
 
@@ -302,7 +311,9 @@ class _SkinAwareAnsi:
     force re-resolution after a ``/skin`` switch.
     """
 
-    def __init__(self, skin_key: str, fallback_hex: str = "#FFD700", *, bold: bool = False):
+    def __init__(
+        self, skin_key: str, fallback_hex: str = "#FFD700", *, bold: bool = False
+    ):
         self._skin_key = skin_key
         self._fallback_hex = fallback_hex
         self._bold = bold
@@ -312,6 +323,7 @@ class _SkinAwareAnsi:
         if self._cached is None:
             try:
                 from ReYMeN_cli.skin_engine import get_active_skin
+
                 self._cached = _hex_to_ansi(
                     get_active_skin().get_color(self._skin_key, self._fallback_hex),
                     bold=self._bold,
@@ -344,6 +356,7 @@ def _accent_hex() -> str:
     """Return the active skin accent color for legacy CLI output lines."""
     try:
         from ReYMeN_cli.skin_engine import get_active_skin
+
         return get_active_skin().get_color("ui_accent", "#FFBF00")
     except Exception:
         return "#FFBF00"
@@ -504,13 +517,21 @@ def _suspend_output_history():
 
 
 def _record_output_history_entry(entry) -> None:
-    if not _OUTPUT_HISTORY_ENABLED or _OUTPUT_HISTORY_REPLAYING or _OUTPUT_HISTORY_SUPPRESSED:
+    if (
+        not _OUTPUT_HISTORY_ENABLED
+        or _OUTPUT_HISTORY_REPLAYING
+        or _OUTPUT_HISTORY_SUPPRESSED
+    ):
         return
     _OUTPUT_HISTORY.append(entry)
 
 
 def _record_output_history(text: str) -> None:
-    if not _OUTPUT_HISTORY_ENABLED or _OUTPUT_HISTORY_REPLAYING or _OUTPUT_HISTORY_SUPPRESSED:
+    if (
+        not _OUTPUT_HISTORY_ENABLED
+        or _OUTPUT_HISTORY_REPLAYING
+        or _OUTPUT_HISTORY_SUPPRESSED
+    ):
         return
     normalized = str(text).replace("\r", "").rstrip("\n")
     if not normalized:
@@ -607,6 +628,7 @@ def _cprint(text: str):
         return
 
     import asyncio as _asyncio
+
     try:
         # Use get_running_loop() instead of get_event_loop() to avoid the
         # DeprecationWarning / RuntimeWarning emitted by Python 3.10+ when
@@ -640,8 +662,11 @@ def _cprint(text: str):
         try:
             import asyncio as _aio
             import inspect as _inspect
+
             coro = run_in_terminal(lambda: _pt_print(_PT_ANSI(text)))
-            if coro is not None and (_inspect.isawaitable(coro) or _inspect.iscoroutine(coro)):
+            if coro is not None and (
+                _inspect.isawaitable(coro) or _inspect.iscoroutine(coro)
+            ):
                 _aio.ensure_future(coro)
             # else: run_in_terminal ran the lambda synchronously; nothing more
             # to do (double-scheduling would print twice).
@@ -663,14 +688,23 @@ def _cprint(text: str):
 # File-drop / local attachment detection — extracted as pure helpers for tests.
 # ---------------------------------------------------------------------------
 
-_IMAGE_EXTENSIONS = frozenset({
-    '.png', '.jpg', '.jpeg', '.gif', '.webp',
-    '.bmp', '.tiff', '.tif', '.svg', '.ico',
-})
+_IMAGE_EXTENSIONS = frozenset(
+    {
+        ".png",
+        ".jpg",
+        ".jpeg",
+        ".gif",
+        ".webp",
+        ".bmp",
+        ".tiff",
+        ".tif",
+        ".svg",
+        ".ico",
+    }
+)
 
 
 from src.reymen.sistem.ReYMeN_constants import is_termux as _is_termux_environment
 import re
 import sys
 import shutil
-

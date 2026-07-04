@@ -9,6 +9,7 @@ Kullanım:
     from reymen.core.session_search import session_ara
     sonuclar = session_ara("hata düzeltme", limit=10)
 """
+
 from __future__ import annotations
 
 import logging
@@ -108,13 +109,15 @@ def session_ara(
 
             sonuclar = []
             for row in cursor.fetchall():
-                sonuclar.append({
-                    "session_id": row["session_id"],
-                    "rol": row["rol"],
-                    "icerik": row["icerik"][:500],  # İlk 500 karakter
-                    "skor": round(row["skor"], 4) if row["skor"] else 0,
-                    "created_at": row["created_at"],
-                })
+                sonuclar.append(
+                    {
+                        "session_id": row["session_id"],
+                        "rol": row["rol"],
+                        "icerik": row["icerik"][:500],  # İlk 500 karakter
+                        "skor": round(row["skor"], 4) if row["skor"] else 0,
+                        "created_at": row["created_at"],
+                    }
+                )
 
             return sonuclar
 
@@ -159,13 +162,15 @@ def _trigram_ara(
 
             sonuclar = []
             for row in cursor.fetchall():
-                sonuclar.append({
-                    "session_id": row["session_id"],
-                    "rol": row["rol"],
-                    "icerik": row["icerik"][:500],
-                    "skor": 0,
-                    "created_at": row["created_at"],
-                })
+                sonuclar.append(
+                    {
+                        "session_id": row["session_id"],
+                        "rol": row["rol"],
+                        "icerik": row["icerik"][:500],
+                        "skor": 0,
+                        "created_at": row["created_at"],
+                    }
+                )
             return sonuclar
     except Exception as e:
         logger.error("Trigram arama hatası: %s", e)
@@ -217,17 +222,19 @@ def session_listele(limit: int = 20) -> List[Dict[str, Any]]:
 
             sonuclar = []
             for row in cursor.fetchall():
-                sonuclar.append({
-                    "id": row["id"],
-                    "source": row["source"],
-                    "user_id": row["user_id"],
-                    "model": row["model"],
-                    "started_at": row["started_at"],
-                    "ended_at": row["ended_at"],
-                    "message_count": row["message_count"],
-                    "tool_call_count": row["tool_call_count"],
-                    "title": row["title"],
-                })
+                sonuclar.append(
+                    {
+                        "id": row["id"],
+                        "source": row["source"],
+                        "user_id": row["user_id"],
+                        "model": row["model"],
+                        "started_at": row["started_at"],
+                        "ended_at": row["ended_at"],
+                        "message_count": row["message_count"],
+                        "tool_call_count": row["tool_call_count"],
+                        "title": row["title"],
+                    }
+                )
             return sonuclar
     except Exception as e:
         logger.error("Session listeleme hatası: %s", e)
@@ -259,13 +266,15 @@ def session_mesajlari(session_id: str, limit: int = 50) -> List[Dict[str, Any]]:
 
             sonuclar = []
             for row in cursor.fetchall():
-                sonuclar.append({
-                    "id": row["id"],
-                    "session_id": row["session_id"],
-                    "rol": row["rol"],
-                    "icerik": row["icerik"],
-                    "created_at": row["created_at"],
-                })
+                sonuclar.append(
+                    {
+                        "id": row["id"],
+                        "session_id": row["session_id"],
+                        "rol": row["rol"],
+                        "icerik": row["icerik"],
+                        "created_at": row["created_at"],
+                    }
+                )
             return sonuclar
     except Exception as e:
         logger.error("Session mesaj getirme hatası: %s", e)
@@ -277,8 +286,12 @@ def session_istatistik() -> Dict[str, Any]:
     try:
         with _db() as con:
             session_sayisi = con.execute("SELECT COUNT(*) FROM sessions").fetchone()[0]
-            mesaj_sayisi = con.execute("SELECT COUNT(*) FROM session_messages").fetchone()[0]
-            tool_cagri_sayisi = con.execute("SELECT COUNT(*) FROM session_tool_calls").fetchone()[0]
+            mesaj_sayisi = con.execute(
+                "SELECT COUNT(*) FROM session_messages"
+            ).fetchone()[0]
+            tool_cagri_sayisi = con.execute(
+                "SELECT COUNT(*) FROM session_tool_calls"
+            ).fetchone()[0]
 
             # FTS5 tablo var mı
             fts_var = _fts5_mevcut_mu()
@@ -309,7 +322,9 @@ if __name__ == "__main__":
 
     if sys.argv[1] == "--list":
         for s in session_listele():
-            print(f"  [{s['id'][:8]}] {s.get('title', 'Başlıksız')} — {s['message_count']} mesaj")
+            print(
+                f"  [{s['id'][:8]}] {s.get('title', 'Başlıksız')} — {s['message_count']} mesaj"
+            )
     elif sys.argv[1] == "--stats":
         print(json.dumps(session_istatistik(), indent=2, ensure_ascii=False))
     else:

@@ -14,20 +14,34 @@ logger = logging.getLogger(__name__)
 _KOK = Path(__file__).parent.parent.parent.resolve()
 
 # ── Renkler ────────────────────────────────────────────────────────────────────
-_R   = "\033[0m"
-_C   = "\033[96m"
-_G   = "\033[92m"
-_Y   = "\033[93m"
-_B   = "\033[94m"
-_M   = "\033[95m"
-_D   = "\033[2m"
+_R = "\033[0m"
+_C = "\033[96m"
+_G = "\033[92m"
+_Y = "\033[93m"
+_B = "\033[94m"
+_M = "\033[95m"
+_D = "\033[2m"
 _RED = "\033[91m"
 
-def _c(t):   return f"{_C}{t}{_R}"
-def _g(t):   return f"{_G}{t}{_R}"
-def _y(t):   return f"{_Y}{t}{_R}"
-def _d(t):   return f"{_D}{t}{_R}"
-def _r(t):   return f"{_RED}{t}{_R}"
+
+def _c(t):
+    return f"{_C}{t}{_R}"
+
+
+def _g(t):
+    return f"{_G}{t}{_R}"
+
+
+def _y(t):
+    return f"{_Y}{t}{_R}"
+
+
+def _d(t):
+    return f"{_D}{t}{_R}"
+
+
+def _r(t):
+    return f"{_RED}{t}{_R}"
 
 
 # ── GATEWAY (ReYMeN bagimsiz) ─────────────────────────────────────────────────
@@ -64,7 +78,9 @@ def _gateway_durum(profil: str) -> int:
         # Telegram bot process'i var mi?
         r = subprocess.run(
             ["tasklist", "/FI", "IMAGENAME eq python.exe", "/FO", "CSV", "/NH"],
-            capture_output=True, text=True, timeout=5,
+            capture_output=True,
+            text=True,
+            timeout=5,
         )
         # reymen ile ilgili python process'lerini bul
         reymen_pids = []
@@ -76,7 +92,9 @@ def _gateway_durum(profil: str) -> int:
                     reymen_pids.append(pid)
 
         if reymen_pids:
-            print(f"  {_c('⊡')} {_g(profil):<10} {_g('calisiyor')} PID: {', '.join(reymen_pids[:3])}")
+            print(
+                f"  {_c('⊡')} {_g(profil):<10} {_g('calisiyor')} PID: {', '.join(reymen_pids[:3])}"
+            )
         else:
             print(f"  {_c('⊡')} {_y(profil):<10} {_d('kapali')}")
         return 0
@@ -105,15 +123,18 @@ def _gateway_durdur(profil: str) -> int:
         # reymen ile ilgili python process'lerini bul ve oldur
         r = subprocess.run(
             ["tasklist", "/FI", "IMAGENAME eq python.exe", "/FO", "CSV", "/NH"],
-            capture_output=True, text=True, timeout=5,
+            capture_output=True,
+            text=True,
+            timeout=5,
         )
         for line in r.stdout.splitlines():
             if "reymen" in line.lower() or "telegram" in line.lower():
                 parts = line.split(",")
                 if len(parts) >= 2:
                     pid = parts[1].strip('"')
-                    subprocess.run(["taskkill", "/F", "/PID", pid],
-                                   capture_output=True, timeout=3)
+                    subprocess.run(
+                        ["taskkill", "/F", "/PID", pid], capture_output=True, timeout=3
+                    )
         print(f"  {_g('✓')} Gateway process'leri durduruldu.")
         return 0
     except Exception as e:
@@ -146,8 +167,13 @@ def _config_goster() -> int:
     icerik = yaml_yol.read_text(encoding="utf-8", errors="replace")
     # Hassas bilgileri temizle
     import re
-    icerik = re.sub(r'(api_key|token|password|secret):\s*["\']?[^"\'\n]+["\']?',
-                    r'\1: ***', icerik, flags=re.IGNORECASE)
+
+    icerik = re.sub(
+        r'(api_key|token|password|secret):\s*["\']?[^"\'\n]+["\']?',
+        r"\1: ***",
+        icerik,
+        flags=re.IGNORECASE,
+    )
     print(icerik)
     return 0
 
@@ -155,6 +181,7 @@ def _config_goster() -> int:
 def _config_env_goster() -> int:
     """Aktif .evn degiskenlerini goster (sifreleri gizle)."""
     import re
+
     env_yol = _KOK / ".env"
     if not env_yol.exists():
         print(f"  {_y('!')} .env bulunamadi")
@@ -165,7 +192,9 @@ def _config_env_goster() -> int:
             continue
         if "=" in satir:
             key, val = satir.split("=", 1)
-            if any(k in key.upper() for k in ["API_KEY", "TOKEN", "SECRET", "PASSWORD"]):
+            if any(
+                k in key.upper() for k in ["API_KEY", "TOKEN", "SECRET", "PASSWORD"]
+            ):
                 val = "***" if val else ""
             print(f"  {key}={val}")
     return 0
@@ -188,9 +217,16 @@ def cmd_session(args) -> int:
 def _session_listele(limit: int = 10) -> int:
     """~/.hermes/reymen/state.db'den son session'lari listele."""
     import sqlite3
+
     db_yollari = [
         _KOK / ".ReYMeN" / "state.db",
-        Path.home() / "AppData" / "Local" / "reymen" / "profiles" / "reymen" / "state.db",
+        Path.home()
+        / "AppData"
+        / "Local"
+        / "reymen"
+        / "profiles"
+        / "reymen"
+        / "state.db",
         Path.home() / "AppData" / "Local" / "reymen" / "state.db",
     ]
     for db in db_yollari:
@@ -200,14 +236,17 @@ def _session_listele(limit: int = 10) -> int:
                 cur = conn.cursor()
                 cur.execute(
                     "SELECT session_id, created_at, message_count FROM sessions "
-                    "ORDER BY created_at DESC LIMIT ?", (limit,)
+                    "ORDER BY created_at DESC LIMIT ?",
+                    (limit,),
                 )
                 rows = cur.fetchall()
                 conn.close()
                 if rows:
                     for sid, ts, cnt in rows:
-                        print(f"  {_c('◈')} {_g(sid[:12]):<14} "
-                              f"{_d(str(ts)[:19]):<22} {cnt} mesaj")
+                        print(
+                            f"  {_c('◈')} {_g(sid[:12]):<14} "
+                            f"{_d(str(ts)[:19]):<22} {cnt} mesaj"
+                        )
                     return 0
             except Exception as e:
                 logger.warning("[CliCommands] except Exception (L209): %s", Exception)
@@ -237,23 +276,32 @@ def cmd_doctor(args) -> int:
 
     # 2. .env
     env = _KOK / ".env"
-    print(f"  {_g('✓') if env.exists() else _r('✗')} .env: {'var' if env.exists() else 'YOK'}")
+    print(
+        f"  {_g('✓') if env.exists() else _r('✗')} .env: {'var' if env.exists() else 'YOK'}"
+    )
 
     # 3. config.yaml
     yaml = _KOK / "config.yaml"
-    print(f"  {_g('✓') if yaml.exists() else _y('?')} config.yaml: {'var' if yaml.exists() else 'yok'}")
+    print(
+        f"  {_g('✓') if yaml.exists() else _y('?')} config.yaml: {'var' if yaml.exists() else 'yok'}"
+    )
 
     # 4. API key test
     import http.client as _hc
+
     deepseek_key = os.environ.get("DEEPSEEK_API_KEY", "")
     if deepseek_key:
         try:
             conn = _hc.HTTPSConnection("api.deepseek.com", timeout=3)
-            conn.request("GET", "/v1/models", headers={"Authorization": f"Bearer {deepseek_key}"})
+            conn.request(
+                "GET", "/v1/models", headers={"Authorization": f"Bearer {deepseek_key}"}
+            )
             resp = conn.getresponse()
             ok = resp.status == 200
             conn.close()
-            print(f"  {_g('✓') if ok else _r('✗')} DeepSeek API: {'calisiyor' if ok else f'hata {resp.status}'}")
+            print(
+                f"  {_g('✓') if ok else _r('✗')} DeepSeek API: {'calisiyor' if ok else f'hata {resp.status}'}"
+            )
         except Exception as e:
             print(f"  {_r('✗')} DeepSeek API: {_d(str(e)[:40])}")
             sorun += 1
@@ -272,6 +320,7 @@ def cmd_doctor(args) -> int:
     # 6. ConversationLoop
     try:
         from reymen.cereyan.conversation_loop import ConversationLoop
+
         print(f"  {_g('✓')} ConversationLoop: hazir")
     except Exception as e:
         print(f"  {_r('✗')} ConversationLoop: {e}")
@@ -279,7 +328,9 @@ def cmd_doctor(args) -> int:
 
     # 7. ReYMeN binary
     reymen = str(_KOK / "reymen_launcher.py")
-    print(f"  {_g('✓') if os.path.exists(reymen) else _y('?')} Launcher: {'reymen_launcher.py' if os.path.exists(reymen) else 'bulunamadi'}")
+    print(
+        f"  {_g('✓') if os.path.exists(reymen) else _y('?')} Launcher: {'reymen_launcher.py' if os.path.exists(reymen) else 'bulunamadi'}"
+    )
 
     print(f"  {_d('─'*50)}")
     if sorun:
@@ -309,9 +360,13 @@ def cmd_backup(args) -> int:
 def _backup_durum() -> int:
     try:
         import subprocess
+
         r = subprocess.run(
             ["git", "status", "--short"],
-            cwd=str(_KOK), capture_output=True, text=True, timeout=10
+            cwd=str(_KOK),
+            capture_output=True,
+            text=True,
+            timeout=10,
         )
         cikti = r.stdout.strip()
         if cikti:
@@ -332,15 +387,20 @@ def _backup_push() -> int:
     try:
         r = subprocess.run(
             ["git", "add", "-A"],
-            cwd=str(_KOK), capture_output=True, text=True, timeout=30
+            cwd=str(_KOK),
+            capture_output=True,
+            text=True,
+            timeout=30,
         )
         r = subprocess.run(
             ["git", "commit", "-m", f"otomatik yedek [$(date +%Y-%m-%d_%H:%M)]"],
-            cwd=str(_KOK), capture_output=True, text=True, timeout=30
+            cwd=str(_KOK),
+            capture_output=True,
+            text=True,
+            timeout=30,
         )
         r = subprocess.run(
-            ["git", "push"],
-            cwd=str(_KOK), capture_output=True, text=True, timeout=60
+            ["git", "push"], cwd=str(_KOK), capture_output=True, text=True, timeout=60
         )
         out = (r.stdout + r.stderr).strip()
         if "Everything up-to-date" in out or r.returncode == 0:
@@ -357,7 +417,10 @@ def _backup_log() -> int:
     try:
         r = subprocess.run(
             ["git", "log", "--oneline", "-10"],
-            cwd=str(_KOK), capture_output=True, text=True, timeout=10
+            cwd=str(_KOK),
+            capture_output=True,
+            text=True,
+            timeout=10,
         )
         print(r.stdout.strip() or "Kayit yok")
         return 0

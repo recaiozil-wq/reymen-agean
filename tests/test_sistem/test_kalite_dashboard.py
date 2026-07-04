@@ -23,9 +23,16 @@ class TestKaliteDashboard:
     def test_kalite_api_routes_var(self):
         """Kalite API route'lari tanimli mi?"""
         from reymen.web_ui import app
+
         kalite_routes = [r.path for r in app.routes if "kalite" in r.path.lower()]
-        assert len(kalite_routes) >= 7, f"Sadece {len(kalite_routes)} kalite route bulundu"
-        required = ["/api/kalite/metrikler", "/api/kalite/coverage", "/api/kalite/hatalar"]
+        assert (
+            len(kalite_routes) >= 7
+        ), f"Sadece {len(kalite_routes)} kalite route bulundu"
+        required = [
+            "/api/kalite/metrikler",
+            "/api/kalite/coverage",
+            "/api/kalite/hatalar",
+        ]
         for r in required:
             assert r in kalite_routes, f"{r} route eksik"
 
@@ -34,14 +41,16 @@ class TestKaliteDashboard:
         from reymen.web_ui import app
         from httpx import AsyncClient, ASGITransport
         import asyncio
-        
+
         async def test():
             transport = ASGITransport(app=app)
-            async with AsyncClient(transport=transport, base_url="http://test") as client:
+            async with AsyncClient(
+                transport=transport, base_url="http://test"
+            ) as client:
                 resp = await client.get("/api/kalite/metrikler")
                 assert resp.status_code == 200
                 assert "Test Coverage" in resp.text
-        
+
         asyncio.run(test())
 
     def test_kalite_sayfasi(self):
@@ -49,19 +58,25 @@ class TestKaliteDashboard:
         from reymen.web_ui import app
         from httpx import AsyncClient, ASGITransport
         import asyncio
-        
+
         async def test():
             transport = ASGITransport(app=app)
-            async with AsyncClient(transport=transport, base_url="http://test") as client:
+            async with AsyncClient(
+                transport=transport, base_url="http://test"
+            ) as client:
                 resp = await client.get("/kalite")
                 assert resp.status_code == 200
                 assert "Kalite" in resp.text or "kalite" in resp.text.lower()
-        
+
         asyncio.run(test())
 
     def test_dashboard_cli(self):
         """CLI dashboard komutu calisiyor mu?"""
-        from reymen.reymen_cli.subcommands.dashboard import build_dashboard_parser, run_dashboard
+        from reymen.reymen_cli.subcommands.dashboard import (
+            build_dashboard_parser,
+            run_dashboard,
+        )
+
         parser = build_dashboard_parser()
         assert parser is not None
         # --durum ile calis

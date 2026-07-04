@@ -34,7 +34,12 @@ except ImportError as e:
     StubEngine = None  # type: ignore
     xAIEngine = None  # type: ignore
     ImageGenRegistry = None  # type: ignore
-    resim_olustur = lambda prompt, en="1024", boy="1024", backend="": f"[ImageGen] Motor yuklenemedi: {prompt}"
+    resim_olustur = (
+        lambda prompt,
+        en="1024",
+        boy="1024",
+        backend="": f"[ImageGen] Motor yuklenemedi: {prompt}"
+    )
     image_gen_engine_listele = lambda: "[ImageGen] Motor yuklenemedi."
 
 

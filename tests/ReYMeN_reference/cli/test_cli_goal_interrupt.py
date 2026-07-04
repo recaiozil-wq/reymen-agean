@@ -34,6 +34,7 @@ def ReYMeN_home(tmp_path, monkeypatch):
 
     # Bust the goal module's DB cache so it re-resolves ReYMeN_HOME each test.
     from ReYMeN_cli import goals
+
     goals._DB_CACHE.clear()
     yield home
     goals._DB_CACHE.clear()
@@ -87,9 +88,9 @@ class TestInterruptAutoPause:
             cli._maybe_continue_goal_after_turn()
 
         # Pending input must NOT contain a continuation prompt.
-        assert cli._pending_input.empty(), (
-            "Interrupted turn should not enqueue a continuation prompt"
-        )
+        assert (
+            cli._pending_input.empty()
+        ), "Interrupted turn should not enqueue a continuation prompt"
 
         # Goal should be paused, not active.
         state = mgr.state
@@ -155,7 +156,8 @@ class TestEmptyResponseSkip:
 
 class TestHealthyTurnStillRuns:
     def test_clean_response_enqueues_continuation_when_judge_says_continue(
-        self, ReYMeN_home,
+        self,
+        ReYMeN_home,
     ):
         """Sanity check: the hook still works in the happy path."""
         sid = f"sid-healthy-{uuid.uuid4().hex}"

@@ -1,4 +1,5 @@
 """Unit tests for ReYMeN_cli.session_recap."""
+
 from __future__ import annotations
 
 import json

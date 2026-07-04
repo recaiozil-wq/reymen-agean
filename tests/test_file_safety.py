@@ -57,7 +57,7 @@ class TestFileSafetyConstants:
         assert len(YASAK_DOSYALAR) >= 5
 
     def test_yasak_dosyalar_hosts_var(self):
-        """"hosts" yasak dosyalarda olmalı."""
+        """ "hosts" yasak dosyalarda olmalı."""
         assert "hosts" in YASAK_DOSYALAR
 
     def test_yasak_dosyalar_env_var(self):
@@ -65,7 +65,7 @@ class TestFileSafetyConstants:
         assert ".env" in YASAK_DOSYALAR
 
     def test_yasak_dosyalar_passwd_var(self):
-        """"passwd" yasak dosyalarda olmalı."""
+        """ "passwd" yasak dosyalarda olmalı."""
         assert "passwd" in YASAK_DOSYALAR
 
 

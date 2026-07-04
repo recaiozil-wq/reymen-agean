@@ -31,14 +31,15 @@ def _mock_agent():
 # ReYMeN_state.SessionDB.update_session_meta — unit tests
 # ---------------------------------------------------------------------------
 
+
 class TestUpdateSessionMeta:
     """Direct unit tests for the new public method."""
 
     def test_method_exists(self, tmp_path):
         db = _tmp_db(tmp_path)
-        assert hasattr(db, "update_session_meta"), (
-            "SessionDB must have update_session_meta() public method"
-        )
+        assert hasattr(
+            db, "update_session_meta"
+        ), "SessionDB must have update_session_meta() public method"
         assert callable(db.update_session_meta)
 
     def test_updates_model_config(self, tmp_path):
@@ -87,9 +88,9 @@ class TestUpdateSessionMeta:
         db._execute_write = patched
         db.update_session_meta("s4", json.dumps({"cwd": "."}), model="m")
 
-        assert call_count[0] >= 1, (
-            "update_session_meta must call _execute_write at least once"
-        )
+        assert (
+            call_count[0] >= 1
+        ), "update_session_meta must call _execute_write at least once"
 
     def test_noop_on_nonexistent_session(self, tmp_path):
         """Updating a non-existent session must not raise."""
@@ -100,6 +101,7 @@ class TestUpdateSessionMeta:
 # ---------------------------------------------------------------------------
 # AST check: session.py must not access db._lock or db._conn
 # ---------------------------------------------------------------------------
+
 
 class TestNoPrviateDBAccess:
     """_persist() in session.py must not access db._lock or db._conn."""
@@ -116,9 +118,7 @@ class TestNoPrviateDBAccess:
             if isinstance(node, ast.Attribute):
                 if isinstance(node.value, ast.Name) and node.value.id == "db":
                     if node.attr in ("_lock", "_conn"):
-                        violations.append(
-                            f"db.{node.attr} at line {node.lineno}"
-                        )
+                        violations.append(f"db.{node.attr} at line {node.lineno}")
 
         assert violations == [], (
             "session.py accesses private SessionDB internals: "
@@ -152,6 +152,7 @@ class TestNoPrviateDBAccess:
 # ---------------------------------------------------------------------------
 # Integration: _persist round-trip via SessionManager
 # ---------------------------------------------------------------------------
+
 
 class TestPersistRoundTrip:
     """End-to-end: save a session and verify DB state is correct."""
@@ -189,13 +190,15 @@ class TestPersistRoundTrip:
 
         state = manager.create_session()
         # Manually set a model in DB
-        db.update_session_meta(state.session_id, json.dumps({"cwd": "."}), model="stored-model")
+        db.update_session_meta(
+            state.session_id, json.dumps({"cwd": "."}), model="stored-model"
+        )
 
         # Now save with empty model
         state.model = ""
         manager.save_session(state.session_id)
 
         row = db.get_session(state.session_id)
-        assert row["model"] == "stored-model", (
-            "COALESCE must preserve the existing model when new value is NULL"
-        )
+        assert (
+            row["model"] == "stored-model"
+        ), "COALESCE must preserve the existing model when new value is NULL"

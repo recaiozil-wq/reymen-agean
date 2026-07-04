@@ -23,7 +23,9 @@ def test_resolve_managed_tool_gateway_derives_vendor_origin_from_shared_domain()
             "TOOL_GATEWAY_DOMAIN": "nousresearch.com",
         },
         clear=False,
-    ), patch.object(managed_tool_gateway, "managed_nous_tools_enabled", return_value=True):
+    ), patch.object(
+        managed_tool_gateway, "managed_nous_tools_enabled", return_value=True
+    ):
         result = resolve_managed_tool_gateway(
             "firecrawl",
             token_reader=lambda: "nous-token",
@@ -42,7 +44,9 @@ def test_resolve_managed_tool_gateway_uses_vendor_specific_override():
             "BROWSER_USE_GATEWAY_URL": "http://browser-use-gateway.localhost:3009/",
         },
         clear=False,
-    ), patch.object(managed_tool_gateway, "managed_nous_tools_enabled", return_value=True):
+    ), patch.object(
+        managed_tool_gateway, "managed_nous_tools_enabled", return_value=True
+    ):
         result = resolve_managed_tool_gateway(
             "browser-use",
             token_reader=lambda: "nous-token",
@@ -59,7 +63,9 @@ def test_resolve_managed_tool_gateway_is_inactive_without_nous_token():
             "TOOL_GATEWAY_DOMAIN": "nousresearch.com",
         },
         clear=False,
-    ), patch.object(managed_tool_gateway, "managed_nous_tools_enabled", return_value=True):
+    ), patch.object(
+        managed_tool_gateway, "managed_nous_tools_enabled", return_value=True
+    ):
         result = resolve_managed_tool_gateway(
             "firecrawl",
             token_reader=lambda: None,
@@ -69,8 +75,11 @@ def test_resolve_managed_tool_gateway_is_inactive_without_nous_token():
 
 
 def test_resolve_managed_tool_gateway_is_disabled_without_subscription():
-    with patch.dict(os.environ, {"TOOL_GATEWAY_DOMAIN": "nousresearch.com"}, clear=False), \
-         patch.object(managed_tool_gateway, "managed_nous_tools_enabled", return_value=False):
+    with patch.dict(
+        os.environ, {"TOOL_GATEWAY_DOMAIN": "nousresearch.com"}, clear=False
+    ), patch.object(
+        managed_tool_gateway, "managed_nous_tools_enabled", return_value=False
+    ):
         result = resolve_managed_tool_gateway(
             "firecrawl",
             token_reader=lambda: "nous-token",
@@ -83,15 +92,19 @@ def test_read_nous_access_token_refreshes_expiring_cached_token(tmp_path, monkey
     monkeypatch.delenv("TOOL_GATEWAY_USER_TOKEN", raising=False)
     monkeypatch.setenv("ReYMeN_HOME", str(tmp_path))
     expires_at = (datetime.now(timezone.utc) + timedelta(seconds=30)).isoformat()
-    (tmp_path / "auth.json").write_text(json.dumps({
-        "providers": {
-            "nous": {
-                "access_token": "stale-token",
-                "refresh_token": "refresh-token",
-                "expires_at": expires_at,
+    (tmp_path / "auth.json").write_text(
+        json.dumps(
+            {
+                "providers": {
+                    "nous": {
+                        "access_token": "stale-token",
+                        "refresh_token": "refresh-token",
+                        "expires_at": expires_at,
+                    }
+                }
             }
-        }
-    }))
+        )
+    )
     monkeypatch.setattr(
         "ReYMeN_cli.auth.resolve_nous_access_token",
         lambda refresh_skew_seconds=120: "fresh-token",
@@ -100,19 +113,25 @@ def test_read_nous_access_token_refreshes_expiring_cached_token(tmp_path, monkey
     assert managed_tool_gateway.read_nous_access_token() == "fresh-token"
 
 
-def test_is_managed_tool_gateway_ready_skips_refresh_for_expired_cached_token(tmp_path, monkeypatch):
+def test_is_managed_tool_gateway_ready_skips_refresh_for_expired_cached_token(
+    tmp_path, monkeypatch
+):
     monkeypatch.delenv("TOOL_GATEWAY_USER_TOKEN", raising=False)
     monkeypatch.setenv("ReYMeN_HOME", str(tmp_path))
     expired_at = (datetime.now(timezone.utc) - timedelta(seconds=30)).isoformat()
-    (tmp_path / "auth.json").write_text(json.dumps({
-        "providers": {
-            "nous": {
-                "access_token": "expired-token",
-                "refresh_token": "refresh-token",
-                "expires_at": expired_at,
+    (tmp_path / "auth.json").write_text(
+        json.dumps(
+            {
+                "providers": {
+                    "nous": {
+                        "access_token": "expired-token",
+                        "refresh_token": "refresh-token",
+                        "expires_at": expired_at,
+                    }
+                }
             }
-        }
-    }))
+        )
+    )
     refresh_calls = []
 
     def _record_refresh(*, refresh_skew_seconds=120, **_kwargs):
@@ -128,7 +147,9 @@ def test_is_managed_tool_gateway_ready_skips_refresh_for_expired_cached_token(tm
         os.environ,
         {"TOOL_GATEWAY_DOMAIN": "nousresearch.com"},
         clear=False,
-    ), patch.object(managed_tool_gateway, "managed_nous_tools_enabled", return_value=True):
+    ), patch.object(
+        managed_tool_gateway, "managed_nous_tools_enabled", return_value=True
+    ):
         assert is_managed_tool_gateway_ready("modal") is True
 
     assert refresh_calls == []

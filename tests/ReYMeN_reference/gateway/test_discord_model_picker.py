@@ -33,12 +33,14 @@ async def test_model_picker_clears_controls_before_running_switch_callback():
         )
 
     async def edit_original_response(**kwargs):
-        events.append((
-            "final-edit",
-            kwargs["embed"].title,
-            kwargs["embed"].description,
-            kwargs["view"],
-        ))
+        events.append(
+            (
+                "final-edit",
+                kwargs["embed"].title,
+                kwargs["embed"].description,
+                kwargs["view"],
+            )
+        )
 
     view = ModelPickerView(
         providers=[
@@ -101,12 +103,14 @@ async def test_expensive_model_requires_confirmation(monkeypatch):
         )
 
     async def edit_original_response(**kwargs):
-        events.append((
-            "final-edit",
-            kwargs["embed"].title,
-            kwargs["embed"].description,
-            kwargs["view"],
-        ))
+        events.append(
+            (
+                "final-edit",
+                kwargs["embed"].title,
+                kwargs["embed"].description,
+                kwargs["view"],
+            )
+        )
 
     monkeypatch.setattr(
         "ReYMeN_cli.model_cost_guard.expensive_model_warning",

@@ -21,6 +21,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import List, Optional
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -76,8 +77,11 @@ class MemoryAgent:
         """ChromaDB persistent client baslat."""
         try:
             import chromadb
+
             self._chroma_client = chromadb.PersistentClient(path=self.chroma_path)
-            self.vector_store = self._chroma_client.get_or_create_collection("konusma_hafizasi")
+            self.vector_store = self._chroma_client.get_or_create_collection(
+                "konusma_hafizasi"
+            )
         except ImportError:
             raise RuntimeError("chromadb kurulu degil: pip install chromadb")
 
@@ -102,11 +106,11 @@ class MemoryAgent:
         """En eski mesajlari ozetle ve window'dan cikar."""
         if self.llm_client is None:
             # LLM yoksa direkt kes (en eski mesajlari at)
-            self.history = self.history[-self.context_length:]
+            self.history = self.history[-self.context_length :]
             return
 
-        to_summarize = self.history[:self.summarize_after]
-        remaining = self.history[self.summarize_after:]
+        to_summarize = self.history[: self.summarize_after]
+        remaining = self.history[self.summarize_after :]
 
         text_block = "\n".join(f"{m.role}: {m.content}" for m in to_summarize)
         prompt = (
@@ -172,10 +176,12 @@ class MemoryAgent:
 
         # Ozeti system mesaji olarak ekle
         if self.long_term_summary:
-            messages.append({
-                "role": "system",
-                "content": f"[Onceki konusma ozeti]\n{self.long_term_summary}"
-            })
+            messages.append(
+                {
+                    "role": "system",
+                    "content": f"[Onceki konusma ozeti]\n{self.long_term_summary}",
+                }
+            )
 
         # Son mesajlari ekle
         for m in self.history:
@@ -206,7 +212,9 @@ class MemoryAgent:
                 data = json.load(f)
             self.long_term_summary = data.get("summary", "")
             raw_history = data.get("history", [])
-            self.history = [Message(**m) for m in raw_history if "role" in m and "content" in m]
+            self.history = [
+                Message(**m) for m in raw_history if "role" in m and "content" in m
+            ]
             self.context_length = data.get("context_length", self.context_length)
             self.summarize_after = data.get("summarize_after", self.summarize_after)
         except Exception:

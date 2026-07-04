@@ -42,7 +42,9 @@ def test_run_api_cagir_success():
         mock_resp.text = '{"status": "ok"}'
         mock_post.return_value = mock_resp
         with patch("tools.fal_common._FAL_TOKEN", "test_key"):
-            sonuc = fal_common.run(islem="api_cagir", endpoint="/test", parametreler={"key": "val"})
+            sonuc = fal_common.run(
+                islem="api_cagir", endpoint="/test", parametreler={"key": "val"}
+            )
             assert "200" in sonuc
 
 
@@ -54,7 +56,9 @@ def test_run_queue_bekle_no_request_id():
 def test_run_queue_bekle():
     with patch("tools.fal_common.time.sleep", return_value=None):
         with patch("tools.fal_common.time.time", side_effect=[100.0, 102.0, 0.0]):
-            sonuc = fal_common.run(islem="queue_bekle", request_id="abc123", max_bekle=1, aralik=1)
+            sonuc = fal_common.run(
+                islem="queue_bekle", request_id="abc123", max_bekle=1, aralik=1
+            )
     assert "zaman aşımı" in sonuc
 
 

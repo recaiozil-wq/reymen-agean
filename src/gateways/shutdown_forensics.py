@@ -56,7 +56,9 @@ def _read_proc_field(pid: int, key: str) -> Optional[str]:
                 if line.startswith(key + ":"):
                     return line.split(":", 1)[1].strip()
     except (FileNotFoundError, PermissionError, OSError) as _e:
-        logger.warning("[ShutdownForensics] Dosya/klasor hatasi (L55): %s", FileNotFoundError)
+        logger.warning(
+            "[ShutdownForensics] Dosya/klasor hatasi (L55): %s", FileNotFoundError
+        )
         pass
     return None
 
@@ -183,11 +185,12 @@ def snapshot_shutdown_context(received_signal: Any = None) -> Dict[str, Any]:
                     raw = takeover_path.read_text(encoding="utf-8")
                     ctx["takeover_marker"] = raw[:300]
                     ctx["takeover_marker_for_self"] = (
-                        f'"target_pid": {pid}' in raw
-                        or f"'target_pid': {pid}" in raw
+                        f'"target_pid": {pid}' in raw or f"'target_pid': {pid}" in raw
                     )
                 except OSError as _e:
-                    logger.warning("[ShutdownForensics] Dosya/klasor hatasi (L182): %s", OSError)
+                    logger.warning(
+                        "[ShutdownForensics] Dosya/klasor hatasi (L182): %s", OSError
+                    )
                     pass
             planned_stop_path = Path(hermes_home_str) / ".gateway-planned-stop.json"
             if planned_stop_path.exists():
@@ -195,7 +198,9 @@ def snapshot_shutdown_context(received_signal: Any = None) -> Dict[str, Any]:
                     raw = planned_stop_path.read_text(encoding="utf-8")
                     ctx["planned_stop_marker"] = raw[:300]
                 except OSError as _e:
-                    logger.warning("[ShutdownForensics] Dosya/klasor hatasi (L189): %s", OSError)
+                    logger.warning(
+                        "[ShutdownForensics] Dosya/klasor hatasi (L189): %s", OSError
+                    )
                     pass
     except Exception:  # noqa as _e:
         logger.warning("[ShutdownForensics] except Exception (L191): %s", Exception)
@@ -276,7 +281,9 @@ def spawn_async_diagnostic(
         try:
             os.close(fd)
         except OSError as _e:
-            logger.warning("[ShutdownForensics] Dosya/klasor hatasi (L268): %s", OSError)
+            logger.warning(
+                "[ShutdownForensics] Dosya/klasor hatasi (L268): %s", OSError
+            )
             pass
         return None
     finally:
@@ -284,7 +291,9 @@ def spawn_async_diagnostic(
         try:
             os.close(fd)
         except OSError as _e:
-            logger.warning("[ShutdownForensics] Dosya/klasor hatasi (L275): %s", OSError)
+            logger.warning(
+                "[ShutdownForensics] Dosya/klasor hatasi (L275): %s", OSError
+            )
             pass
 
     return proc.pid
@@ -303,9 +312,7 @@ def format_context_for_log(ctx: Dict[str, Any]) -> str:
     extras: List[str] = []
     if ctx.get("takeover_marker") is not None:
         for_self = ctx.get("takeover_marker_for_self")
-        extras.append(
-            f"takeover_marker_present={'self' if for_self else 'other'}"
-        )
+        extras.append(f"takeover_marker_present={'self' if for_self else 'other'}")
     if ctx.get("planned_stop_marker") is not None:
         extras.append("planned_stop_marker_present=yes")
     if ctx.get("tracer_pid"):
@@ -381,7 +388,9 @@ def check_systemd_timing_alignment(drain_timeout: float) -> Optional[Dict[str, A
         try:
             result = subprocess.run(
                 ["systemctl", *flag, "show", unit_name, "--property=TimeoutStopUSec"],
-                capture_output=True, text=True, timeout=2.0,
+                capture_output=True,
+                text=True,
+                timeout=2.0,
             )
         except (FileNotFoundError, subprocess.TimeoutExpired, OSError):
             continue

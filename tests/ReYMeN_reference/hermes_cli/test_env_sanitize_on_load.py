@@ -27,9 +27,9 @@ def test_load_env_sanitizes_concatenated_lines():
     try:
         with patch("ReYMeN_cli.config.get_env_path", return_value=env_path):
             result = load_env()
-        assert result.get("TELEGRAM_BOT_TOKEN") == token, (
-            f"Token should be exactly '{token}', got '{result.get('TELEGRAM_BOT_TOKEN')}'"
-        )
+        assert (
+            result.get("TELEGRAM_BOT_TOKEN") == token
+        ), f"Token should be exactly '{token}', got '{result.get('TELEGRAM_BOT_TOKEN')}'"
         assert result.get("ANTHROPIC_API_KEY") == "sk-ant-test123"
     finally:
         env_path.unlink(missing_ok=True)

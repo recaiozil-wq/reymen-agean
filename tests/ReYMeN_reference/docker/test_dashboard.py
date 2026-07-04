@@ -10,6 +10,7 @@ Every ``docker exec`` here runs as the unprivileged ``ReYMeN`` user
 (via :func:`docker_exec`/:func:`docker_exec_sh` in conftest), matching
 the realistic runtime context. See the conftest module docstring.
 """
+
 from __future__ import annotations
 
 import json
@@ -19,8 +20,9 @@ import time
 from tests.docker.conftest import docker_exec, docker_exec_sh
 
 
-def _poll(container: str, probe: str, *, deadline_s: float = 30.0,
-          interval_s: float = 0.5) -> tuple[bool, str]:
+def _poll(
+    container: str, probe: str, *, deadline_s: float = 30.0, interval_s: float = 0.5
+) -> tuple[bool, str]:
     """Repeatedly run ``probe`` inside the container until it exits 0 or
     ``deadline_s`` elapses. Returns (success, last stdout)."""
     end = time.monotonic() + deadline_s
@@ -35,26 +37,27 @@ def _poll(container: str, probe: str, *, deadline_s: float = 30.0,
 
 
 def test_dashboard_not_running_by_default(
-    built_image: str, container_name: str,
+    built_image: str,
+    container_name: str,
 ) -> None:
     """Without ReYMeN_DASHBOARD, no dashboard process should be running."""
     subprocess.run(
-        ["docker", "run", "-d", "--name", container_name, built_image,
-         "sleep", "60"],
-        check=True, capture_output=True, timeout=30,
+        ["docker", "run", "-d", "--name", container_name, built_image, "sleep", "60"],
+        check=True,
+        capture_output=True,
+        timeout=30,
     )
     # Give the entrypoint enough time to finish bootstrap; if a dashboard
     # were going to start it'd be visible by now.
     time.sleep(5)
     r = docker_exec(container_name, "pgrep", "-f", "ReYMeN dashboard")
     # pgrep exits non-zero when no match found
-    assert r.returncode != 0, (
-        "Dashboard should not be running without ReYMeN_DASHBOARD"
-    )
+    assert r.returncode != 0, "Dashboard should not be running without ReYMeN_DASHBOARD"
 
 
 def test_dashboard_slot_reports_down_when_disabled(
-    built_image: str, container_name: str,
+    built_image: str,
+    container_name: str,
 ) -> None:
     """Without ReYMeN_DASHBOARD, s6-svstat should report the dashboard
     slot as DOWN (not up-with-sleep-infinity, which would
@@ -65,15 +68,18 @@ def test_dashboard_slot_reports_down_when_disabled(
     ReYMeN_DASHBOARD is unset, so the slot reflects reality.
     """
     subprocess.run(
-        ["docker", "run", "-d", "--name", container_name, built_image,
-         "sleep", "60"],
-        check=True, capture_output=True, timeout=30,
+        ["docker", "run", "-d", "--name", container_name, built_image, "sleep", "60"],
+        check=True,
+        capture_output=True,
+        timeout=30,
     )
     time.sleep(5)
     # /command/ isn't on PATH for docker-exec sessions, so call by
     # absolute path.
     r = docker_exec(
-        container_name, "/command/s6-svstat", "/run/service/dashboard",
+        container_name,
+        "/command/s6-svstat",
+        "/run/service/dashboard",
     )
     assert r.returncode == 0, f"s6-svstat failed: {r.stderr!r} / {r.stdout!r}"
     assert "down" in r.stdout, (
@@ -83,28 +89,43 @@ def test_dashboard_slot_reports_down_when_disabled(
 
 
 def test_dashboard_slot_reports_up_when_enabled(
-    built_image: str, container_name: str,
+    built_image: str,
+    container_name: str,
 ) -> None:
     """Symmetry: with ReYMeN_DASHBOARD=1, s6-svstat reports the slot as up."""
     subprocess.run(
-        ["docker", "run", "-d", "--name", container_name,
-         "-e", "ReYMeN_DASHBOARD=1",
-         # The default dashboard host is 0.0.0.0, which now engages the
-         # OAuth auth gate. Without a provider registered (no
-         # ReYMeN_DASHBOARD_OAUTH_CLIENT_ID in this test env), start_server
-         # would fail closed and the slot would never come up. Pin the
-         # explicit insecure opt-in to keep this test focused on the s6
-         # supervision contract, not the auth gate.
-         "-e", "ReYMeN_DASHBOARD_INSECURE=1",
-         built_image, "sleep", "120"],
-        check=True, capture_output=True, timeout=30,
+        [
+            "docker",
+            "run",
+            "-d",
+            "--name",
+            container_name,
+            "-e",
+            "ReYMeN_DASHBOARD=1",
+            # The default dashboard host is 0.0.0.0, which now engages the
+            # OAuth auth gate. Without a provider registered (no
+            # ReYMeN_DASHBOARD_OAUTH_CLIENT_ID in this test env), start_server
+            # would fail closed and the slot would never come up. Pin the
+            # explicit insecure opt-in to keep this test focused on the s6
+            # supervision contract, not the auth gate.
+            "-e",
+            "ReYMeN_DASHBOARD_INSECURE=1",
+            built_image,
+            "sleep",
+            "120",
+        ],
+        check=True,
+        capture_output=True,
+        timeout=30,
     )
     # uvicorn takes a moment to bind; poll svstat.
     deadline = time.monotonic() + 30.0
     last = ""
     while time.monotonic() < deadline:
         r = docker_exec(
-            container_name, "/command/s6-svstat", "/run/service/dashboard",
+            container_name,
+            "/command/s6-svstat",
+            "/run/service/dashboard",
         )
         last = r.stdout
         if r.returncode == 0 and "up " in r.stdout:
@@ -116,41 +137,71 @@ def test_dashboard_slot_reports_up_when_enabled(
 
 
 def test_dashboard_opt_in_starts(
-    built_image: str, container_name: str,
+    built_image: str,
+    container_name: str,
 ) -> None:
     """With ReYMeN_DASHBOARD=1, a dashboard process should be visible."""
     subprocess.run(
-        ["docker", "run", "-d", "--name", container_name,
-         "-e", "ReYMeN_DASHBOARD=1",
-         # Default bind is 0.0.0.0; pin insecure opt-in so the auth gate
-         # doesn't fail-closed before the process can come up. See
-         # test_dashboard_slot_reports_up_when_enabled for the full rationale.
-         "-e", "ReYMeN_DASHBOARD_INSECURE=1",
-         built_image, "sleep", "120"],
-        check=True, capture_output=True, timeout=30,
+        [
+            "docker",
+            "run",
+            "-d",
+            "--name",
+            container_name,
+            "-e",
+            "ReYMeN_DASHBOARD=1",
+            # Default bind is 0.0.0.0; pin insecure opt-in so the auth gate
+            # doesn't fail-closed before the process can come up. See
+            # test_dashboard_slot_reports_up_when_enabled for the full rationale.
+            "-e",
+            "ReYMeN_DASHBOARD_INSECURE=1",
+            built_image,
+            "sleep",
+            "120",
+        ],
+        check=True,
+        capture_output=True,
+        timeout=30,
     )
     # Poll for the dashboard subprocess to appear — the entrypoint
     # backgrounds it and bootstrap (skills sync etc.) can take a few
     # seconds before the python process actually launches.
     ok, _ = _poll(
-        container_name, "pgrep -f 'ReYMeN dashboard'", deadline_s=30.0,
+        container_name,
+        "pgrep -f 'ReYMeN dashboard'",
+        deadline_s=30.0,
     )
     assert ok, "Dashboard should be running with ReYMeN_DASHBOARD=1"
 
 
 def test_dashboard_port_override(
-    built_image: str, container_name: str,
+    built_image: str,
+    container_name: str,
 ) -> None:
     """ReYMeN_DASHBOARD_PORT changes the dashboard's listen port."""
     subprocess.run(
-        ["docker", "run", "-d", "--name", container_name,
-         "-e", "ReYMeN_DASHBOARD=1", "-e", "ReYMeN_DASHBOARD_PORT=9120",
-         # Default bind is 0.0.0.0; pin insecure opt-in so the auth gate
-         # doesn't fail-closed before the port is bound. See
-         # test_dashboard_slot_reports_up_when_enabled for the full rationale.
-         "-e", "ReYMeN_DASHBOARD_INSECURE=1",
-         built_image, "sleep", "120"],
-        check=True, capture_output=True, timeout=30,
+        [
+            "docker",
+            "run",
+            "-d",
+            "--name",
+            container_name,
+            "-e",
+            "ReYMeN_DASHBOARD=1",
+            "-e",
+            "ReYMeN_DASHBOARD_PORT=9120",
+            # Default bind is 0.0.0.0; pin insecure opt-in so the auth gate
+            # doesn't fail-closed before the port is bound. See
+            # test_dashboard_slot_reports_up_when_enabled for the full rationale.
+            "-e",
+            "ReYMeN_DASHBOARD_INSECURE=1",
+            built_image,
+            "sleep",
+            "120",
+        ],
+        check=True,
+        capture_output=True,
+        timeout=30,
     )
     # The dashboard process appearing in pgrep doesn't mean it's bound
     # to the port yet — uvicorn takes another second or two to come up.
@@ -158,15 +209,15 @@ def test_dashboard_port_override(
     # port 9120 = 0x23A0, state 0A = LISTEN.
     ok, stdout = _poll(
         container_name,
-        "grep -E ' 0+:23A0 .* 0A ' /proc/net/tcp /proc/net/tcp6 "
-        "2>/dev/null",
+        "grep -E ' 0+:23A0 .* 0A ' /proc/net/tcp /proc/net/tcp6 " "2>/dev/null",
         deadline_s=60.0,
     )
     assert ok, f"Dashboard not listening on port 9120: stdout={stdout!r}"
 
 
 def test_dashboard_restarts_after_crash(
-    built_image: str, container_name: str,
+    built_image: str,
+    container_name: str,
 ) -> None:
     """Phase 2 invariant: under s6 supervision, killing the dashboard
     process should be recovered automatically.
@@ -177,19 +228,33 @@ def test_dashboard_restarts_after_crash(
     it after a ~1s backoff (the default).
     """
     subprocess.run(
-        ["docker", "run", "-d", "--name", container_name,
-         "-e", "ReYMeN_DASHBOARD=1",
-         # Default bind is 0.0.0.0; pin insecure opt-in so the auth gate
-         # doesn't fail-closed before the supervised dashboard can come up.
-         # See test_dashboard_slot_reports_up_when_enabled for the full
-         # rationale.
-         "-e", "ReYMeN_DASHBOARD_INSECURE=1",
-         built_image, "sleep", "120"],
-        check=True, capture_output=True, timeout=30,
+        [
+            "docker",
+            "run",
+            "-d",
+            "--name",
+            container_name,
+            "-e",
+            "ReYMeN_DASHBOARD=1",
+            # Default bind is 0.0.0.0; pin insecure opt-in so the auth gate
+            # doesn't fail-closed before the supervised dashboard can come up.
+            # See test_dashboard_slot_reports_up_when_enabled for the full
+            # rationale.
+            "-e",
+            "ReYMeN_DASHBOARD_INSECURE=1",
+            built_image,
+            "sleep",
+            "120",
+        ],
+        check=True,
+        capture_output=True,
+        timeout=30,
     )
     # Wait for the first dashboard to come up.
     ok, _ = _poll(
-        container_name, "pgrep -f 'ReYMeN dashboard'", deadline_s=30.0,
+        container_name,
+        "pgrep -f 'ReYMeN dashboard'",
+        deadline_s=30.0,
     )
     assert ok, "Dashboard never started initially"
 
@@ -199,7 +264,10 @@ def test_dashboard_restarts_after_crash(
     first_pid: str | None = None
     for _attempt in range(10):
         first_pid_result = docker_exec(
-            container_name, "pgrep", "-f", "ReYMeN dashboard",
+            container_name,
+            "pgrep",
+            "-f",
+            "ReYMeN dashboard",
         )
         first_pids = first_pid_result.stdout.strip().split()
         if first_pids:
@@ -222,9 +290,7 @@ def test_dashboard_restarts_after_crash(
             return  # success
         time.sleep(0.5)
 
-    raise AssertionError(
-        f"Dashboard not restarted after kill (first_pid={first_pid})"
-    )
+    raise AssertionError(f"Dashboard not restarted after kill (first_pid={first_pid})")
 
 
 # ---------------------------------------------------------------------------
@@ -276,11 +342,7 @@ except urllib.error.HTTPError as h:
     # Feed the program over stdin via a heredoc so docker_exec_sh's
     # single bash string stays clean. The 'PY' delimiter is quoted to
     # disable shell expansion inside the heredoc body.
-    probe = (
-        "/opt/ReYMeN/.venv/bin/python - <<'PY'\n"
-        f"{py_program}"
-        "PY"
-    )
+    probe = "/opt/ReYMeN/.venv/bin/python - <<'PY'\n" f"{py_program}" "PY"
     end = time.monotonic() + deadline_s
     last_err = ""
     while time.monotonic() < end:
@@ -303,7 +365,8 @@ except urllib.error.HTTPError as h:
 
 
 def test_dashboard_oauth_gate_engages_on_non_loopback_bind(
-    built_image: str, container_name: str,
+    built_image: str,
+    container_name: str,
 ) -> None:
     """The s6 dashboard run script must NOT auto-add ``--insecure`` when the
     dashboard binds to ``0.0.0.0``. The OAuth auth gate engages on its own
@@ -334,12 +397,25 @@ def test_dashboard_oauth_gate_engages_on_non_loopback_bind(
        distinguish "gate on" from "gate off".
     """
     subprocess.run(
-        ["docker", "run", "-d", "--name", container_name,
-         "-e", "ReYMeN_DASHBOARD=1",
-         "-e", "ReYMeN_DASHBOARD_HOST=0.0.0.0",
-         "-e", "ReYMeN_DASHBOARD_OAUTH_CLIENT_ID=agent:test-instance",
-         built_image, "sleep", "120"],
-        check=True, capture_output=True, timeout=30,
+        [
+            "docker",
+            "run",
+            "-d",
+            "--name",
+            container_name,
+            "-e",
+            "ReYMeN_DASHBOARD=1",
+            "-e",
+            "ReYMeN_DASHBOARD_HOST=0.0.0.0",
+            "-e",
+            "ReYMeN_DASHBOARD_OAUTH_CLIENT_ID=agent:test-instance",
+            built_image,
+            "sleep",
+            "120",
+        ],
+        check=True,
+        capture_output=True,
+        timeout=30,
     )
 
     # (1) Provider registry visible via the public bootstrap endpoint.
@@ -384,7 +460,8 @@ def test_dashboard_oauth_gate_engages_on_non_loopback_bind(
 
 
 def test_dashboard_insecure_env_var_opts_out_of_gate(
-    built_image: str, container_name: str,
+    built_image: str,
+    container_name: str,
 ) -> None:
     """``ReYMeN_DASHBOARD_INSECURE=1`` re-enables the legacy no-gate mode
     for operators running on trusted LANs behind a reverse proxy without
@@ -396,12 +473,25 @@ def test_dashboard_insecure_env_var_opts_out_of_gate(
     ``auth_required: false`` body — proves the gate is bypassed.
     """
     subprocess.run(
-        ["docker", "run", "-d", "--name", container_name,
-         "-e", "ReYMeN_DASHBOARD=1",
-         "-e", "ReYMeN_DASHBOARD_HOST=0.0.0.0",
-         "-e", "ReYMeN_DASHBOARD_INSECURE=1",
-         built_image, "sleep", "120"],
-        check=True, capture_output=True, timeout=30,
+        [
+            "docker",
+            "run",
+            "-d",
+            "--name",
+            container_name,
+            "-e",
+            "ReYMeN_DASHBOARD=1",
+            "-e",
+            "ReYMeN_DASHBOARD_HOST=0.0.0.0",
+            "-e",
+            "ReYMeN_DASHBOARD_INSECURE=1",
+            built_image,
+            "sleep",
+            "120",
+        ],
+        check=True,
+        capture_output=True,
+        timeout=30,
     )
     status_code, body = _http_probe(container_name, "/api/status")
     assert status_code == 200, (

@@ -47,10 +47,12 @@ from typing import Any, FrozenSet, Iterable, Optional, Tuple
 # their own ``user_allowed_commands`` (this set is only the implicit
 # fallback floor — anything in ``user_allowed_commands`` overrides it
 # additively, never restrictively).
-_ALWAYS_ALLOWED_FOR_USERS: FrozenSet[str] = frozenset({
-    "help",
-    "whoami",
-})
+_ALWAYS_ALLOWED_FOR_USERS: FrozenSet[str] = frozenset(
+    {
+        "help",
+        "whoami",
+    }
+)
 
 
 @dataclass(frozen=True)
@@ -62,7 +64,7 @@ class SlashAccessPolicy:
     SessionSource.chat_type → scope happens in ``policy_for_source``.
     """
 
-    enabled: bool                      # gating active for this scope?
+    enabled: bool  # gating active for this scope?
     admin_user_ids: FrozenSet[str]
     user_allowed_commands: FrozenSet[str]
 

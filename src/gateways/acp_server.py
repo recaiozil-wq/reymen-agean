@@ -60,6 +60,7 @@ try:
     from reymen.cereyan.closed_learning_loop import (
         _get_loop as _cl_get_loop,
     )
+
     _CLOSED_LOOP = _cl_get_loop()
 except ImportError:
     logger.debug("[ACP] closed_learning_loop yuklenemedi.")
@@ -71,6 +72,7 @@ _ACP_SERVER_INSTANCE = None
 
 
 # ── Yardimci fonksiyonlar ─────────────────────────────────────────────────
+
 
 def _json_safe(deger: Any) -> Any:
     """JSON serialize edilemeyen degerleri str()'e cevir."""
@@ -96,8 +98,10 @@ def _zaman_damgasi() -> str:
 
 # ── JSON-RPC Hata Kodlari ─────────────────────────────────────────────────
 
+
 class ACPHataKodlari:
     """JSON-RPC standart hata kodlari + ACP ozel kodlari."""
+
     PARSE_ERROR = -32700
     INVALID_REQUEST = -32600
     METHOD_NOT_FOUND = -32601
@@ -113,6 +117,7 @@ class ACPHataKodlari:
 
 # ── Ana Sinif ──────────────────────────────────────────────────────────────
 
+
 class ACPServer:
     """Agent Communication Protocol sunucusu.
 
@@ -124,7 +129,9 @@ class ACPServer:
         initialized: initialize() basariyla cagrildi mi?
     """
 
-    def __init__(self, tool_registry: Optional[Any] = None, transport: str = "stdio") -> None:
+    def __init__(
+        self, tool_registry: Optional[Any] = None, transport: str = "stdio"
+    ) -> None:
         """ACP sunucusu baslat.
 
         Args:
@@ -143,8 +150,9 @@ class ACPServer:
 
     # ── JSON-RPC Cekirdek ─────────────────────────────────────────────────
 
-    def _jsonrpc_hata(self, kod: int, mesaj: str, veri: Any = None,
-                      id_degeri: Any = None) -> str:
+    def _jsonrpc_hata(
+        self, kod: int, mesaj: str, veri: Any = None, id_degeri: Any = None
+    ) -> str:
         """JSON-RPC hata yaniti olustur."""
         yanit = {
             "jsonrpc": "2.0",
@@ -259,8 +267,12 @@ class ACPServer:
             "transport": self.transport,
             "timestamp": _zaman_damgasi(),
             "uptime_seconds": (
-                (datetime.now(tz=timezone.utc) - datetime.fromisoformat(str(self._start_time))).total_seconds()
-                if getattr(self, "_start_time", None) else 0
+                (
+                    datetime.now(tz=timezone.utc)
+                    - datetime.fromisoformat(str(self._start_time))
+                ).total_seconds()
+                if getattr(self, "_start_time", None)
+                else 0
             ),
             "tools_count": len(self._list_tools_raw()),
             "skills_count": len(self._list_skills_raw()),
@@ -273,6 +285,7 @@ class ACPServer:
         # Bellek kullanimi (psutil varsa)
         try:
             import psutil
+
             proc = psutil.Process(os.getpid())
             sonuc["memory"]["rss_mb"] = round(proc.memory_info().rss / 1024 / 1024, 1)
         except ImportError:
@@ -290,6 +303,7 @@ class ACPServer:
             {"notifications": [...]}
         """
         import time
+
         basla = time.time()
         bekleyen = []
 
@@ -302,8 +316,9 @@ class ACPServer:
 
         return {"notifications": bekleyen}
 
-    def _method_tools_call_stream(self, name: str = None, arguments: dict = None,
-                                   chunk_size: int = 1000, **kwargs) -> dict:
+    def _method_tools_call_stream(
+        self, name: str = None, arguments: dict = None, chunk_size: int = 1000, **kwargs
+    ) -> dict:
         """Stream destekli arac cagirisi.
 
         Args:
@@ -315,7 +330,11 @@ class ACPServer:
             {"chunks": [...], "total_length": int, "isError": bool}
         """
         if not name:
-            return {"chunks": ["[Hata]: Arac adi gerekli"], "total_length": 0, "isError": True}
+            return {
+                "chunks": ["[Hata]: Arac adi gerekli"],
+                "total_length": 0,
+                "isError": True,
+            }
 
         args = arguments or {}
         sonuc = self._call_tool(name, args)
@@ -325,7 +344,7 @@ class ACPServer:
         # Yaniti chunk'lara bol
         chunklar = []
         for i in range(0, len(metin), chunk_size):
-            chunklar.append(metin[i:i + chunk_size])
+            chunklar.append(metin[i : i + chunk_size])
 
         return {
             "chunks": chunklar,
@@ -334,8 +353,9 @@ class ACPServer:
             "isError": not basarili,
         }
 
-    def _method_initialize(self, protocol_version: str = None,
-                           client_info: dict = None, **kwargs) -> dict:
+    def _method_initialize(
+        self, protocol_version: str = None, client_info: dict = None, **kwargs
+    ) -> dict:
         """ACP baglantisini baslat.
 
         Args:
@@ -373,8 +393,9 @@ class ACPServer:
         tools = self._list_tools_raw()
         return {"tools": tools}
 
-    def _method_tools_call(self, name: str = None, arguments: dict = None,
-                           **kwargs) -> dict:
+    def _method_tools_call(
+        self, name: str = None, arguments: dict = None, **kwargs
+    ) -> dict:
         """Bir araci cagir.
 
         Args:
@@ -501,7 +522,9 @@ class ACPServer:
                             p_ad = p.get("ad", p.get("name", "param"))
                             tool["inputSchema"]["properties"][p_ad] = {
                                 "type": p.get("tip", p.get("type", "string")),
-                                "description": p.get("aciklama", p.get("description", "")),
+                                "description": p.get(
+                                    "aciklama", p.get("description", "")
+                                ),
                             }
                     tool["inputSchema"]["required"] = [
                         p.get("ad", p.get("name"))
@@ -525,23 +548,26 @@ class ACPServer:
                 meta = self._registry._meta.get(alias, {})
                 musait = self._registry.check_fn_kontrol_et(alias)
 
-                tools.append({
-                    "name": alias,
-                    "description": meta.get("aciklama", "") or f"{alias} -> {hedef}",
-                    "inputSchema": {
-                        "type": "object",
-                        "properties": {
-                            "args": {
-                                "type": "array",
-                                "description": f"{alias} icin parametreler",
-                                "items": {"type": "string"},
+                tools.append(
+                    {
+                        "name": alias,
+                        "description": meta.get("aciklama", "")
+                        or f"{alias} -> {hedef}",
+                        "inputSchema": {
+                            "type": "object",
+                            "properties": {
+                                "args": {
+                                    "type": "array",
+                                    "description": f"{alias} icin parametreler",
+                                    "items": {"type": "string"},
+                                },
                             },
                         },
-                    },
-                    "available": musait,
-                    "alias_for": hedef,
-                    "kategori": meta.get("kategori", ""),
-                })
+                        "available": musait,
+                        "alias_for": hedef,
+                        "kategori": meta.get("kategori", ""),
+                    }
+                )
 
         except Exception as e:
             logger.exception("[ACP] Tool listeleme hatasi")
@@ -584,11 +610,13 @@ class ACPServer:
                                             ad = v.strip().strip("\"'")
                                         elif k == "description" and v.strip():
                                             aciklama = v.strip().strip("\"'")[:200]
-                        skills.append({
-                            "ad": ad,
-                            "aciklama": aciklama or dosya.stem,
-                            "kaynak": str(dosya),
-                        })
+                        skills.append(
+                            {
+                                "ad": ad,
+                                "aciklama": aciklama or dosya.stem,
+                                "kaynak": str(dosya),
+                            }
+                        )
                     except Exception as _acp_serv_e581:
                         print(f"[UYARI] acp_server.py:582 - {_acp_serv_e581}")
         except Exception as _acp_serv_e583:
@@ -629,7 +657,10 @@ class ACPServer:
                     try:
                         icerik = dosya.read_text(encoding="utf-8", errors="replace")
                         dosya_adi = dosya.stem
-                        if ad.lower() in (dosya_adi.lower(), icerik.split("\n")[0].lstrip("# ").strip().lower()):
+                        if ad.lower() in (
+                            dosya_adi.lower(),
+                            icerik.split("\n")[0].lstrip("# ").strip().lower(),
+                        ):
                             return {
                                 "ad": dosya_adi,
                                 "aciklama": icerik[:200],
@@ -843,7 +874,9 @@ if __name__ == "__main__":
     data = json.loads(yanit)
     assert "error" in data, f"Hata donmeliydi: {data}"
     assert data["error"]["code"] == -32601
-    print(f"[Test 6] Bilinmeyen metot: {data['error']['code']} - {data['error']['message']}")
+    print(
+        f"[Test 6] Bilinmeyen metot: {data['error']['code']} - {data['error']['message']}"
+    )
 
     # 7. shutdown test
     yanit = server._handle_request('{"jsonrpc":"2.0","method":"shutdown","id":7}')
@@ -856,12 +889,15 @@ if __name__ == "__main__":
     data = json.loads(yanit)
     assert "error" in data, f"Hata donmeliydi: {data}"
     assert data["error"]["code"] == -32700
-    print(f"[Test 8] Gecersiz JSON: {data['error']['code']} - {data['error']['message']}")
+    print(
+        f"[Test 8] Gecersiz JSON: {data['error']['code']} - {data['error']['message']}"
+    )
 
     # 9. motor_kaydet test
     class MockMotor:
         def __init__(self):
             self._araclar = {}
+
         def _plugin_arac_kaydet(self, ad, fonk, aciklama=""):
             self._araclar[ad] = (fonk, aciklama)
 

@@ -36,6 +36,7 @@ from src.reymen.sistem.cli_session import SessionMixin
 # This ensures CLI sessions produce a log trail even before AIAgent is instantiated.
 try:
     from reymen.sistem.ReYMeN_logging import setup_logging
+
     setup_logging(mode="cli")
 except Exception as _e:
     __import__("logging").getLogger(__name__).warning(
@@ -45,15 +46,18 @@ except Exception as _e:
 # Validate config structure early — print warnings before user hits cryptic errors
 try:
     from reymen.reymen_cli.config import print_config_warnings
+
     print_config_warnings(sys.argv[1:] if len(sys.argv) > 1 else [])
 except Exception:
     import logging
+
     logger = logging.getLogger(__name__)
     logger.warning("[fix_01_sessiz_except] Exception")
 
 # Initialize the skin engine from config
 try:
     from reymen.ReYMeN_cli.skin_engine import init_skin_from_config
+
     init_skin_from_config(CLI_CONFIG)
 except Exception as _e:
     __import__("logging").getLogger(__name__).warning(
@@ -63,6 +67,7 @@ except Exception as _e:
 # Initialize tool preview length from config
 try:
     from agent.display import set_tool_preview_max_len
+
     _tpl = CLI_CONFIG.get("display", {}).get("tool_preview_length", 0)
     set_tool_preview_max_len(int(_tpl) if _tpl else 0)
 except Exception:
@@ -134,6 +139,7 @@ from rich.markup import escape as _escape
 from rich.panel import Panel
 from rich.text import Text as _RichText
 
+
 # Import agent and tool systems lazily. Bare interactive startup only needs the
 # prompt; the full agent/tool registry is initialized on first use.
 def AIAgent(*args, **kwargs):
@@ -154,6 +160,7 @@ def get_toolset_for_tool(*args, **kwargs):
     from reymen.sistem.model_tools import get_toolset_for_tool as _get_toolset_for_tool
 
     return _get_toolset_for_tool(*args, **kwargs)
+
 
 # Extracted CLI modules (Phase 3)
 from src.reymen.cli.banner import build_welcome_banner
@@ -183,7 +190,6 @@ def validate_toolset(*args, **kwargs):
     from reymen.sistem.toolsets import validate_toolset as _validate_toolset
 
     return _validate_toolset(*args, **kwargs)
-
 
 
 def _prepare_deferred_agent_startup() -> None:
@@ -232,6 +238,7 @@ def _prepare_deferred_agent_startup() -> None:
             exc_info=True,
         )
 
+
 def _run_cleanup():
     """Run resource cleanup exactly once."""
     global _cleanup_done
@@ -249,6 +256,7 @@ def _run_cleanup():
         logger.warning("[fix_01_sessiz_except] Exception")
     try:
         from tools.mcp_tool import shutdown_mcp_servers
+
         shutdown_mcp_servers()
     except Exception:
         logger.warning("[fix_01_sessiz_except] Exception")
@@ -257,6 +265,7 @@ def _run_cleanup():
     # and trigger prompt_toolkit's "Press ENTER to continue..." handler.
     try:
         from agent.auxiliary_client import shutdown_cached_clients
+
         shutdown_cached_clients()
     except Exception:
         logger.warning("[fix_01_sessiz_except] Exception")
@@ -264,18 +273,23 @@ def _run_cleanup():
     # session boundary — NOT per-turn inside run_conversation().
     try:
         from reymen.reymen_cli.plugins import invoke_hook as _invoke_hook
-        _invoke_hook("on_session_finalize", session_id=_active_agent_ref.session_id if _active_agent_ref else None, platform="cli")
+
+        _invoke_hook(
+            "on_session_finalize",
+            session_id=_active_agent_ref.session_id if _active_agent_ref else None,
+            platform="cli",
+        )
     except Exception:
         logger.warning("[fix_01_sessiz_except] Exception")
     try:
-        if _active_agent_ref and hasattr(_active_agent_ref, 'shutdown_memory_provider'):
+        if _active_agent_ref and hasattr(_active_agent_ref, "shutdown_memory_provider"):
             # Forward the agent's own transcript so memory providers'
             # ``on_session_end`` hooks see the real conversation instead of
             # an empty list (#15165). ``_session_messages`` is set on
             # ``AIAgent.__init__`` and refreshed every turn via
             # ``_persist_session``. Fall back to no-arg on test stubs /
             # partially-initialised agents where the attribute is missing.
-            _session_msgs = getattr(_active_agent_ref, '_session_messages', None)
+            _session_msgs = getattr(_active_agent_ref, "_session_messages", None)
             if isinstance(_session_msgs, list):
                 _active_agent_ref.shutdown_memory_provider(_session_msgs)
             else:
@@ -292,15 +306,31 @@ def _run_cleanup():
 _active_worktree: Optional[Dict[str, str]] = None
 
 
-
-class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, MixinVoice, MixinApproval, MixinCommands, MixinCore, MixinFileOps, MixinMedia, MixinAgentSettings, MixinBrowser, MixinGoals, MixinSkillsTools, MixinUI):
+class ReYMeNCLI(
+    TUIMixin,
+    AgentMixin,
+    SessionMixin,
+    MixinDisplay,
+    MixinStream,
+    MixinVoice,
+    MixinApproval,
+    MixinCommands,
+    MixinCore,
+    MixinFileOps,
+    MixinMedia,
+    MixinAgentSettings,
+    MixinBrowser,
+    MixinGoals,
+    MixinSkillsTools,
+    MixinUI,
+):
     """
     Interactive CLI for the ReYMeN Agent.
-    
+
     Provides a REPL interface with rich formatting, command history,
     and tool execution capabilities.
     """
-    
+
     def __init__(
         self,
         model: str = None,
@@ -334,7 +364,11 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
         # Initialize Rich console
         self.console = Console()
         self.config = CLI_CONFIG
-        self.compact = compact if compact is not None else CLI_CONFIG["display"].get("compact", False)
+        self.compact = (
+            compact
+            if compact is not None
+            else CLI_CONFIG["display"].get("compact", False)
+        )
         # tool_progress: "off", "new", "all", "verbose" (from config.yaml display section)
         # YAML 1.1 parses bare `off` as boolean False — normalise to string.
         _raw_tp = CLI_CONFIG["display"].get("tool_progress", "all")
@@ -352,7 +386,11 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
         # busy_input_mode: "interrupt" (Enter interrupts current run),
         # "queue" (Enter queues for next turn), or "steer" (Enter injects
         # mid-run via /steer, arriving after the next tool call).
-        _bim = str(CLI_CONFIG["display"].get("busy_input_mode", "interrupt")).strip().lower()
+        _bim = (
+            str(CLI_CONFIG["display"].get("busy_input_mode", "interrupt"))
+            .strip()
+            .lower()
+        )
         if _bim == "queue":
             self.busy_input_mode = "queue"
         elif _bim == "steer":
@@ -366,14 +404,17 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
         # Coupling the two (PR #6a1aa420e) caused all module DEBUG logs to spew
         # to console whenever a user set tool_progress: verbose in config.
         self.verbose = bool(verbose) if verbose is not None else False
-        
+
         # streaming: stream tokens to the terminal as they arrive (display.streaming in config.yaml)
         self.streaming_enabled = CLI_CONFIG["display"].get("streaming", False)
         # show_timestamps: prefix user and assistant labels with [HH:MM]
         self.show_timestamps = CLI_CONFIG["display"].get("timestamps", False)
-        self.final_response_markdown = str(
-            CLI_CONFIG["display"].get("final_response_markdown", "strip")
-        ).strip().lower() or "strip"
+        self.final_response_markdown = (
+            str(CLI_CONFIG["display"].get("final_response_markdown", "strip"))
+            .strip()
+            .lower()
+            or "strip"
+        )
         if self.final_response_markdown not in {"render", "strip", "raw"}:
             self.final_response_markdown = "strip"
 
@@ -396,10 +437,12 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
         self.user_message_preview_last_lines = max(0, _ump_last_lines)
 
         # Streaming display state
-        self._stream_buf = ""        # Partial line buffer for line-buffered rendering
+        self._stream_buf = ""  # Partial line buffer for line-buffered rendering
         self._stream_started = False  # True once first delta arrives
         self._stream_box_opened = False  # True once the response box header is printed
-        self._reasoning_preview_buf = ""  # Coalesce tiny reasoning chunks for [thinking] output
+        self._reasoning_preview_buf = (
+            ""  # Coalesce tiny reasoning chunks for [thinking] output
+        )
         # Table-row buffer.  When a streamed line looks like it could be
         # part of a markdown table, hold it here until the block ends so
         # we can re-pad with wcwidth-aware widths.  Empty by default;
@@ -409,21 +452,30 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
         self._pending_edit_snapshots = {}
         self._last_input_mode_recovery = 0.0
         self._input_mode_recovery_notice_shown = False
-        
+
         # Configuration - priority: CLI args > env vars > config file
         # Model comes from: CLI arg or config.yaml (single source of truth).
         # LLM_MODEL/OPENAI_MODEL env vars are NOT checked — config.yaml is
         # authoritative.  This avoids conflicts in multi-agent setups where
         # env vars would stomp each other.
         _model_config = CLI_CONFIG.get("model", {})
-        _config_model = (_model_config.get("default") or _model_config.get("model") or "") if isinstance(_model_config, dict) else (_model_config or "")
+        _config_model = (
+            (_model_config.get("default") or _model_config.get("model") or "")
+            if isinstance(_model_config, dict)
+            else (_model_config or "")
+        )
         _DEFAULT_CONFIG_MODEL = ""
         self.model = model or _config_model or _DEFAULT_CONFIG_MODEL
         # Auto-detect model from local server if still on default
         if self.model == _DEFAULT_CONFIG_MODEL:
-            _base_url = (_model_config.get("base_url") or "") if isinstance(_model_config, dict) else ""
+            _base_url = (
+                (_model_config.get("base_url") or "")
+                if isinstance(_model_config, dict)
+                else ""
+            )
             if "localhost" in _base_url or "127.0.0.1" in _base_url:
                 from reymen.reymen_cli.runtime_provider import _auto_detect_local_model
+
                 _detected = _auto_detect_local_model(_base_url)
                 if _detected:
                     self.model = _detected
@@ -461,9 +513,17 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
         # custom endpoint → prefer OPENAI_API_KEY (issue #560).
         # Note: _ensure_runtime_credentials() re-resolves this before first use.
         if self.base_url and base_url_host_matches(self.base_url, "openrouter.ai"):
-            self.api_key = api_key or os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY")
+            self.api_key = (
+                api_key
+                or os.getenv("OPENROUTER_API_KEY")
+                or os.getenv("OPENAI_API_KEY")
+            )
         else:
-            self.api_key = api_key or os.getenv("OPENAI_API_KEY") or os.getenv("OPENROUTER_API_KEY")
+            self.api_key = (
+                api_key
+                or os.getenv("OPENAI_API_KEY")
+                or os.getenv("OPENROUTER_API_KEY")
+            )
         # Max turns priority: CLI arg > config file > env var > default
         if max_turns is not None:  # CLI arg was explicitly set
             self.max_turns = max_turns
@@ -478,7 +538,7 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
                 self.max_turns = 90
         else:
             self.max_turns = 90
-        
+
         # Parse and validate toolsets
         self.enabled_toolsets = toolsets
         self.disabled_toolsets = CLI_CONFIG["agent"].get("disabled_toolsets") or []
@@ -488,10 +548,14 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
             # live registry aliases (registered during discover_mcp_tools),
             # but discovery hasn't run yet at this point, so exclude them.
             mcp_names = set((CLI_CONFIG.get("mcp_servers") or {}).keys())
-            invalid = [t for t in toolsets if not validate_toolset(t) and t not in mcp_names]
+            invalid = [
+                t for t in toolsets if not validate_toolset(t) and t not in mcp_names
+            ]
             if invalid:
-                self._console_print(f"[bold red]Warning: Unknown toolsets: {', '.join(invalid)}[/]")
-        
+                self._console_print(
+                    f"[bold red]Warning: Unknown toolsets: {', '.join(invalid)}[/]"
+                )
+
         # Filesystem checkpoints: CLI flag > config
         cp_cfg = CLI_CONFIG.get("checkpoints", {})
         if isinstance(cp_cfg, bool):
@@ -506,19 +570,18 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
         # pass skip_context_files=True and skip_memory=True to AIAgent so
         # AGENTS.md/SOUL.md/.cursorrules and persistent memory are not loaded.
         self.ignore_rules = ignore_rules or os.environ.get("ReYMeN_IGNORE_RULES") == "1"
-        
+
         # Ephemeral system prompt: env var takes precedence, then config
-        self.system_prompt = (
-            os.getenv("ReYMeN_EPHEMERAL_SYSTEM_PROMPT", "")
-            or CLI_CONFIG["agent"].get("system_prompt", "")
-        )
+        self.system_prompt = os.getenv(
+            "ReYMeN_EPHEMERAL_SYSTEM_PROMPT", ""
+        ) or CLI_CONFIG["agent"].get("system_prompt", "")
         self.personalities = CLI_CONFIG["agent"].get("personalities", {})
-        
+
         # Ephemeral prefill messages (few-shot priming, never persisted)
         self.prefill_messages = _load_prefill_messages(
             CLI_CONFIG["agent"].get("prefill_messages_file", "")
         )
-        
+
         # Reasoning config (OpenRouter reasoning effort level)
         self.reasoning_config = _parse_reasoning_config(
             CLI_CONFIG["agent"].get("reasoning_effort", "")
@@ -526,7 +589,7 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
         self.service_tier = _parse_service_tier_config(
             CLI_CONFIG["agent"].get("service_tier", "")
         )
-        
+
         # OpenRouter provider routing preferences
         pr = CLI_CONFIG.get("provider_routing", {}) or {}
         self._provider_sort = pr.get("sort")
@@ -549,7 +612,7 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
                     self._openrouter_min_coding_score = _f
             except (TypeError, ValueError):
                 logger.warning("[fix_01_sessiz_except] Exception")
-        
+
         # Fallback provider chain — tried in order when primary fails after retries.
         # Merge new ``fallback_providers`` entries with any legacy
         # ``fallback_model`` entries so old configs still participate.
@@ -565,7 +628,7 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
         self._tool_callbacks_installed = False
         self._tirith_security_checked = False
         self._app = None  # prompt_toolkit Application (set in run())
-        
+
         # Conversation state
         self.conversation_history: List[Dict[str, Any]] = []
         self.session_start = datetime.now()
@@ -578,9 +641,13 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
         self._session_db = None
         try:
             from reymen.sistem.ReYMeN_state import SessionDB
+
             self._session_db = SessionDB()
         except Exception as e:
-            logger.warning("Failed to initialize SessionDB — session will NOT be indexed for search: %s", e)
+            logger.warning(
+                "Failed to initialize SessionDB — session will NOT be indexed for search: %s",
+                e,
+            )
 
         # Opportunistic state.db maintenance — runs at most once per
         # min_interval_hours, tracked via state_meta in state.db itself so
@@ -595,7 +662,7 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
 
         # Deferred title: stored in memory until the session is created in the DB
         self._pending_title: Optional[str] = None
-        
+
         # Session ID: reuse existing one when resuming, otherwise generate fresh
         if resume:
             self.session_id = resume
@@ -604,7 +671,7 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
             timestamp_str = self.session_start.strftime("%Y%m%d_%H%M%S")
             short_uuid = uuid.uuid4().hex[:6]
             self.session_id = f"{timestamp_str}_{short_uuid}"
-        
+
         # History file for persistent input recall across sessions
         self._history_file = _ReYMeN_home / ".ReYMeN_history"
         self._last_invalidate: float = 0.0  # throttle UI repaints
@@ -654,9 +721,13 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
         self._secret_state = None
         self._secret_deadline = 0
         self._spinner_text: str = ""  # thinking spinner text for TUI
-        self._tool_start_time: float = 0.0  # monotonic timestamp when current tool started (for live elapsed)
+        self._tool_start_time: float = (
+            0.0  # monotonic timestamp when current tool started (for live elapsed)
+        )
         self._pending_tool_info: dict = {}  # function_name -> list of (preview, args) for stacked scrollback
-        self._last_scrollback_tool: str = ""  # last tool name printed to scrollback (for "new" dedup)
+        self._last_scrollback_tool: str = (
+            ""  # last tool name printed to scrollback (for "new" dedup)
+        )
         self._command_running = False
         self._command_status = ""
         self._attached_images: list[Path] = []
@@ -695,24 +766,30 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
         """Display the welcome banner in Claude Code style."""
         self.console.clear()
         ctx_len = None
-        if hasattr(self, 'agent') and self.agent and hasattr(self.agent, 'context_compressor'):
+        if (
+            hasattr(self, "agent")
+            and self.agent
+            and hasattr(self.agent, "context_compressor")
+        ):
             ctx_len = self.agent.context_compressor.context_length
-        
+
         # Auto-compact for narrow terminals — the full banner with caduceus
         # + tool list needs ~80 columns minimum to render without wrapping.
         term_width = shutil.get_terminal_size().columns
         use_compact = self.compact or term_width < 80
-        
+
         if use_compact:
             self._console_print(_build_compact_banner())
             self._show_status()
         else:
             # Get tools for display
-            tools = get_tool_definitions(enabled_toolsets=self.enabled_toolsets, quiet_mode=True)
-            
+            tools = get_tool_definitions(
+                enabled_toolsets=self.enabled_toolsets, quiet_mode=True
+            )
+
             # Get terminal working directory (where commands will execute)
             cwd = os.getenv("TERMINAL_CWD", os.getcwd())
-            
+
             # Build and display the banner
             build_welcome_banner(
                 console=self.console,
@@ -723,7 +800,7 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
                 session_id=self.session_id,
                 context_length=ctx_len,
             )
-        
+
         # Tool discovery is intentionally deferred on the Termux bare prompt
         # path; availability warnings are shown once tools are initialized.
         if os.environ.get("ReYMeN_DEFER_AGENT_STARTUP") != "1":
@@ -732,6 +809,7 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
         # Warn about low context lengths (common with local servers). Keep
         # this tied to the runtime guard so guidance cannot drift again.
         from agent.model_metadata import MINIMUM_CONTEXT_LENGTH
+
         if ctx_len and ctx_len < MINIMUM_CONTEXT_LENGTH:
             self._console_print()
             self._console_print(
@@ -800,8 +878,8 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
 
         # Collect displayable entries (skip system, tool-result messages)
         entries = []  # list of (role, display_text)
-        _last_asst_idx = None       # index of last assistant entry
-        _last_asst_full = None      # un-truncated display text for last assistant
+        _last_asst_idx = None  # index of last assistant entry
+        _last_asst_full = None  # un-truncated display text for last assistant
         for msg in self.conversation_history:
             role = msg.get("role", "")
             content = msg.get("content")
@@ -846,7 +924,11 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
                     names = []
                     for tc in tool_calls:
                         fn = tc.get("function", {})
-                        name = fn.get("name", "unknown") if isinstance(fn, dict) else "unknown"
+                        name = (
+                            fn.get("name", "unknown")
+                            if isinstance(fn, dict)
+                            else "unknown"
+                        )
                         if name not in names:
                             names.append(name)
                     names_str = ", ".join(names[:4])
@@ -889,6 +971,7 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
 
         try:
             from reymen.reymen_cli.skin_engine import get_active_skin
+
             _skin = get_active_skin()
             _history_text_c = _skin.get_color("banner_text", "#FFF8DC")
             _session_label_c = _skin.get_color("session_label", "#DAA520")
@@ -938,7 +1021,9 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
             padding=(0, 1),
             style=_history_text_c,
         )
-        _record_output_history_entry(lambda: self._render_resume_history_panel_lines(panel))
+        _record_output_history_entry(
+            lambda: self._render_resume_history_panel_lines(panel)
+        )
         with _suspend_output_history():
             self._console_print(panel)
 
@@ -963,7 +1048,6 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
 
     # Moved to cli_mixin_fileops.py (MixinFileOps._handle_rollback_command)
 
-
     def _resolve_checkpoint_ref(self, ref: str, checkpoints: list) -> str | None:
         """Resolve a checkpoint number or hash to a full commit hash."""
         try:
@@ -979,15 +1063,11 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
 
     # Moved to cli_mixin_fileops.py (MixinFileOps._handle_snapshot_command)
 
-
     # Moved to cli_mixin_fileops.py (MixinFileOps._handle_stop_command)
-
 
     # Moved to cli_mixin_ui.py (MixinUI._handle_agents_command)
 
-
     # Moved to cli_mixin_media.py (MixinMedia._handle_paste_command)
-
 
     def _write_osc52_clipboard(self, text: str) -> None:
         """Copy *text* to terminal clipboard via OSC 52."""
@@ -1039,10 +1119,11 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
 
     # Moved to cli_mixin_media.py (MixinMedia._handle_copy_command)
 
-
     # Moved to cli_mixin_media.py (MixinMedia._handle_image_command)
 
-    def _preprocess_images_with_vision(self, text: str, images: list, *, announce: bool = True) -> str:
+    def _preprocess_images_with_vision(
+        self, text: str, images: list, *, announce: bool = True
+    ) -> str:
         """Analyze attached images via the vision tool and return enriched text.
 
         Instead of embedding raw base64 ``image_url`` content parts in the
@@ -1072,7 +1153,9 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
                 _cprint(f"  {_DIM}👁️  analyzing {img_path.name} ({size_kb}KB)...{_RST}")
             try:
                 result_json = _asyncio.run(
-                    vision_analyze_tool(image_url=str(img_path), user_prompt=analysis_prompt)
+                    vision_analyze_tool(
+                        image_url=str(img_path), user_prompt=analysis_prompt
+                    )
                 )
                 result = json.loads(result_json)
                 if result.get("success"):
@@ -1091,7 +1174,9 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
                         f"image_url: {img_path}]"
                     )
                     if announce:
-                        _cprint(f"  {_DIM}⚠ vision analysis failed — path included for retry{_RST}")
+                        _cprint(
+                            f"  {_DIM}⚠ vision analysis failed — path included for retry{_RST}"
+                        )
             except Exception as e:
                 enriched_parts.append(
                     f"[The user attached an image but analysis failed ({e}). "
@@ -1099,7 +1184,9 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
                     f"image_url: {img_path}]"
                 )
                 if announce:
-                    _cprint(f"  {_DIM}⚠ vision analysis error — path included for retry{_RST}")
+                    _cprint(
+                        f"  {_DIM}⚠ vision analysis error — path included for retry{_RST}"
+                    )
 
         # Combine: vision descriptions first, then the user's original text
         user_text = text if isinstance(text, str) and text else ""
@@ -1114,6 +1201,7 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
 
         try:
             from reymen.reymen_cli.skin_engine import get_active_help_header
+
             header = get_active_help_header("(^_^)? Available Commands")
         except Exception:
             header = "(^_^)? Available Commands"
@@ -1130,11 +1218,15 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
             for cmd, desc in commands.items():
                 if not self._command_available(cmd):
                     continue
-                ChatConsole().print(f"    [bold {_accent_hex()}]{cmd:<15}[/] [dim]-[/] {_escape(desc)}")
+                ChatConsole().print(
+                    f"    [bold {_accent_hex()}]{cmd:<15}[/] [dim]-[/] {_escape(desc)}"
+                )
 
         skill_commands = _ensure_skill_commands()
         if skill_commands:
-            _cprint(f"\n  ⚡ {_BOLD}Skill Commands{_RST} ({len(skill_commands)} installed):")
+            _cprint(
+                f"\n  ⚡ {_BOLD}Skill Commands{_RST} ({len(skill_commands)} installed):"
+            )
             for cmd, info in sorted(skill_commands.items()):
                 ChatConsole().print(
                     f"    [bold {_accent_hex()}]{cmd:<22}[/] [dim]-[/] {_escape(info['description'])}"
@@ -1142,7 +1234,9 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
 
         _bundles_now = get_skill_bundles()
         if _bundles_now:
-            _cprint(f"\n  ▣ {_BOLD}Skill Bundles{_RST} ({len(_bundles_now)} installed):")
+            _cprint(
+                f"\n  ▣ {_BOLD}Skill Bundles{_RST} ({len(_bundles_now)} installed):"
+            )
             for cmd, info in sorted(_bundles_now.items()):
                 skill_count = len(info.get("skills", []))
                 desc = info.get("description") or f"Load {skill_count} skills"
@@ -1155,18 +1249,22 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
         _cprint(f"  {_DIM}Multi-line: Alt+Enter for a new line{_RST}")
         _cprint(f"  {_DIM}Draft editor: Ctrl+G (Alt+G in VSCode/Cursor){_RST}")
         if _is_termux_environment():
-            _cprint(f"  {_DIM}Attach image: /image {_termux_example_image_path()} or start your prompt with a local image path{_RST}\n")
+            _cprint(
+                f"  {_DIM}Attach image: /image {_termux_example_image_path()} or start your prompt with a local image path{_RST}\n"
+            )
         else:
             _cprint(f"  {_DIM}Paste image: Alt+V (or /paste){_RST}\n")
-    
+
     def show_tools(self):
         """Display available tools with kawaii ASCII art."""
-        tools = get_tool_definitions(enabled_toolsets=self.enabled_toolsets, quiet_mode=True)
-        
+        tools = get_tool_definitions(
+            enabled_toolsets=self.enabled_toolsets, quiet_mode=True
+        )
+
         if not tools:
             print("(;_;) No tools available")
             return
-        
+
         # Header
         print()
         title = "(^_^)/ Available Tools"
@@ -1176,7 +1274,7 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
         print("|" + " " * (pad // 2) + title + " " * (pad - pad // 2) + "|")
         print("+" + "-" * width + "+")
         print()
-        
+
         # Group tools by toolset
         toolsets = {}
         for tool in sorted(tools, key=lambda t: t["function"]["name"]):
@@ -1188,16 +1286,16 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
             # First sentence: split on ". " (period+space) to avoid breaking on "e.g." or "v2.0"
             desc = desc.split("\n")[0]
             if ". " in desc:
-                desc = desc[:desc.index(". ") + 1]
+                desc = desc[: desc.index(". ") + 1]
             toolsets[toolset].append((name, desc))
-        
+
         # Display by toolset
         for toolset in sorted(toolsets.keys()):
             print(f"  [{toolset}]")
             for name, desc in toolsets[toolset]:
                 print(f"    * {name:<20} - {desc}")
             print()
-        
+
         print(f"  Total: {len(tools)} tools  ヽ(^o^)ノ")
         print()
 
@@ -1206,7 +1304,7 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
     def show_toolsets(self):
         """Display available toolsets with kawaii ASCII art."""
         all_toolsets = get_all_toolsets()
-        
+
         # Header
         print()
         title = "(^_^)b Available Toolsets"
@@ -1216,26 +1314,29 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
         print("|" + " " * (pad // 2) + title + " " * (pad - pad // 2) + "|")
         print("+" + "-" * width + "+")
         print()
-        
+
         for name in sorted(all_toolsets.keys()):
             info = get_toolset_info(name)
             if info:
                 tool_count = info["tool_count"]
                 desc = info["description"]
-                
+
                 # Mark if currently enabled
-                marker = "(*)" if self.enabled_toolsets and name in self.enabled_toolsets else "   "
+                marker = (
+                    "(*)"
+                    if self.enabled_toolsets and name in self.enabled_toolsets
+                    else "   "
+                )
                 print(f"  {marker} {name:<18} [{tool_count:>2} tools] - {desc}")
-        
+
         print()
         print("  (*) = currently enabled")
         print()
         print("  Tip: Use 'all' or '*' to enable all toolsets")
         print("  Example: python cli.py --toolsets web,terminal")
         print()
-    
-    # Moved to cli_mixin_agentsettings.py (MixinAgentSettings._handle_profile_command)
 
+    # Moved to cli_mixin_agentsettings.py (MixinAgentSettings._handle_profile_command)
 
     def show_config(self):
         """Display current configuration with kawaii ASCII art."""
@@ -1243,25 +1344,26 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
         terminal_env = os.getenv("TERMINAL_ENV", "local")
         terminal_cwd = os.getenv("TERMINAL_CWD", os.getcwd())
         terminal_timeout = os.getenv("TERMINAL_TIMEOUT", "60")
-        
-        user_config_path = _ReYMeN_home / 'config.yaml'
-        project_config_path = Path(__file__).parent / 'cli-config.yaml'
+
+        user_config_path = _ReYMeN_home / "config.yaml"
+        project_config_path = Path(__file__).parent / "cli-config.yaml"
         if user_config_path.exists():
             config_path = user_config_path
         else:
             config_path = project_config_path
         config_status = "(loaded)" if config_path.exists() else "(not found)"
-        
+
         # ``self.api_key`` may be a callable (Azure Foundry Entra ID bearer
         # provider). Never invoke it; just identify the auth surface.
         from agent.azure_identity_adapter import is_token_provider
+
         if is_token_provider(self.api_key):
             api_key_display = "Microsoft Entra ID"
         elif isinstance(self.api_key, str) and len(self.api_key) > 12:
             api_key_display = f"{self.api_key[:8]}...{self.api_key[-4:]}"
         else:
             api_key_display = "Not set!"
-        
+
         print()
         title = "(^_^) Configuration"
         width = 50
@@ -1287,14 +1389,16 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
         print()
         print("  -- Agent --")
         print(f"  Max Turns:  {self.max_turns}")
-        print(f"  Toolsets:   {', '.join(self.enabled_toolsets) if self.enabled_toolsets else 'all'}")
+        print(
+            f"  Toolsets:   {', '.join(self.enabled_toolsets) if self.enabled_toolsets else 'all'}"
+        )
         print(f"  Verbose:    {self.verbose}")
         print()
         print("  -- Session --")
         print(f"  Started:     {self.session_start.strftime('%Y-%m-%d %H:%M:%S')}")
         print(f"  Config File: {config_path} {config_status}")
         print()
-    
+
     def _prefill_input_buffer(self, text: str) -> None:
         """Place ``text`` in the active prompt_toolkit buffer, editable."""
         app = getattr(self, "_app", None)
@@ -1308,8 +1412,10 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
             app.invalidate()
         except Exception as e:
             logger.debug("undo: prefill buffer failed: %s", e)
-    
-    def _run_curses_picker(self, title: str, items: list[str], default_index: int = 0) -> int | None:
+
+    def _run_curses_picker(
+        self, title: str, items: list[str], default_index: int = 0
+    ) -> int | None:
         """Run curses_single_select via run_in_terminal so prompt_toolkit handles terminal ownership cleanly."""
         import threading
         from reymen.reymen_cli.curses_ui import curses_single_select
@@ -1326,6 +1432,7 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
 
         if self._app and in_main_thread:
             from prompt_toolkit.application import run_in_terminal
+
             was_visible = self._status_bar_visible
             self._status_bar_visible = False
             self._app.invalidate()
@@ -1351,6 +1458,7 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
         ``input()`` when we're off the main thread.
         """
         import threading
+
         result = [None]
 
         def _ask():
@@ -1363,6 +1471,7 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
 
         if self._app and in_main_thread:
             from prompt_toolkit.application import run_in_terminal
+
             was_visible = self._status_bar_visible
             self._status_bar_visible = False
             self._app.invalidate()
@@ -1546,8 +1655,11 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
 
         prefix = "✓" if result.success else "✗"
         for line in result.message.splitlines():
-            _cprint(f"  {prefix} {line}" if line.startswith("openai_runtime")
-                    else f"    {line}")
+            _cprint(
+                f"  {prefix} {line}"
+                if line.startswith("openai_runtime")
+                else f"    {line}"
+            )
         if result.success and result.requires_new_session:
             _cprint("    Tip: `/reset` starts a new session immediately.")
 
@@ -1559,24 +1671,17 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
 
     # Moved to cli_mixin_agentsettings.py (MixinAgentSettings._handle_gquota_command)
 
-
     # Moved to cli_mixin_agentsettings.py (MixinAgentSettings._handle_personality_command)
-
 
     # Moved to cli_mixin_skillstools.py (MixinSkillsTools._handle_cron_command)
 
-
     # Moved to cli_mixin_skillstools.py (MixinSkillsTools._handle_curator_command)
-
 
     # Moved to cli_mixin_ui.py (MixinUI._handle_kanban_command)
 
-
     # Moved to cli_mixin_skillstools.py (MixinSkillsTools._handle_skills_command)
 
-
     # Moved to cli_mixin_skillstools.py (MixinSkillsTools._handle_background_command)
-
 
     def _try_launch_chrome_debug(port: int, system: str) -> bool:
         """Try to launch a Chromium-family browser with remote debugging enabled.
@@ -1590,9 +1695,7 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
 
     # Moved to cli_mixin_skillstools.py (MixinSkillsTools._handle_bundles_command)
 
-
     # Moved to cli_mixin_browser.py (MixinBrowser._handle_browser_command)
-
 
     def _get_goal_manager(self):
         """Return the GoalManager bound to the current session_id.
@@ -1716,7 +1819,8 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
                         parts = [
                             p.get("text", "")
                             for p in content
-                            if isinstance(p, dict) and p.get("type") in {"text", "output_text"}
+                            if isinstance(p, dict)
+                            and p.get("type") in {"text", "output_text"}
                         ]
                         last_response = "\n".join(t for t in parts if t)
                     else:
@@ -1772,6 +1876,7 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
         # writes directly to stdout which patch_stdout's StdoutProxy mangles
         # into garbled sequences like '?[33mTool progress: NEW?[0m' (#2262).
         from reymen.reymen_cli.colors import Colors as _Colors
+
         labels = {
             "off": f"{_Colors.DIM}Tool progress: OFF{_Colors.RESET} — silent mode, just the final response.",
             "new": f"{_Colors.YELLOW}Tool progress: NEW{_Colors.RESET} — show each new tool (skip repeats).",
@@ -1878,7 +1983,9 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
         """Callback for intermediate reasoning display during tool-call loops."""
         if not reasoning_text:
             return
-        self._reasoning_preview_buf = getattr(self, "_reasoning_preview_buf", "") + reasoning_text
+        self._reasoning_preview_buf = (
+            getattr(self, "_reasoning_preview_buf", "") + reasoning_text
+        )
         self._flush_reasoning_preview(force=False)
 
     def _manual_compress(self, cmd_original: str = ""):
@@ -1900,7 +2007,9 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
           the automatic token-budget heuristic.
         """
         if not self.conversation_history or len(self.conversation_history) < 4:
-            print("(._.) Not enough conversation to compress (need at least 4 messages).")
+            print(
+                "(._.) Not enough conversation to compress (need at least 4 messages)."
+            )
             return
 
         if not self.agent:
@@ -1931,7 +2040,10 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
         with self._busy_command("Compressing context..."):
             try:
                 from agent.model_metadata import estimate_request_tokens_rough
-                from agent.manual_compression_feedback import summarize_manual_compression
+                from agent.manual_compression_feedback import (
+                    summarize_manual_compression,
+                )
+
                 original_history = list(self.conversation_history)
 
                 # Boundary-aware split: only the head is summarized; the
@@ -1961,14 +2073,20 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
                     tools=_tools,
                 )
                 if partial:
-                    print(f"🗜️  Summarizing up to here: compressing {len(head)} of "
-                          f"{original_count} messages (~{approx_tokens:,} tokens), "
-                          f"keeping last {keep_last} exchange(s) verbatim...")
+                    print(
+                        f"🗜️  Summarizing up to here: compressing {len(head)} of "
+                        f"{original_count} messages (~{approx_tokens:,} tokens), "
+                        f"keeping last {keep_last} exchange(s) verbatim..."
+                    )
                 elif focus_topic:
-                    print(f"🗜️  Compressing {original_count} messages (~{approx_tokens:,} tokens), "
-                          f"focus: \"{focus_topic}\"...")
+                    print(
+                        f"🗜️  Compressing {original_count} messages (~{approx_tokens:,} tokens), "
+                        f'focus: "{focus_topic}"...'
+                    )
                 else:
-                    print(f"🗜️  Compressing {original_count} messages (~{approx_tokens:,} tokens)...")
+                    print(
+                        f"🗜️  Compressing {original_count} messages (~{approx_tokens:,} tokens)..."
+                    )
 
                 # Pass None as system_message so _compress_context rebuilds
                 # the system prompt from scratch via _build_system_prompt(None).
@@ -2008,7 +2126,9 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
                     # Manual /compress replaces conversation_history with a new
                     # compressed handoff for the child session. Persist it from
                     # offset 0 so resume can recover the continuation after exit.
-                    self.agent._flush_messages_to_session_db(self.conversation_history, None)
+                    self.agent._flush_messages_to_session_db(
+                        self.conversation_history, None
+                    )
                 new_tokens = estimate_request_tokens_rough(
                     self.conversation_history,
                     system_prompt=_sys_prompt,
@@ -2049,6 +2169,7 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
         self._last_config_check = now
 
         from reymen.reymen_cli.config import get_config_path as _get_config_path
+
         cfg_path = _get_config_path()
         if not cfg_path.exists():
             return
@@ -2079,13 +2200,13 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
         # indefinitely (which would freeze the entire TUI).
         print()
         print("🔄 MCP server config changed — reloading connections...")
-        _reload_thread = threading.Thread(
-            target=self._reload_mcp, daemon=True
-        )
+        _reload_thread = threading.Thread(target=self._reload_mcp, daemon=True)
         _reload_thread.start()
         _reload_thread.join(timeout=30)
         if _reload_thread.is_alive():
-            print("  ⚠️  MCP reload timed out (30s). Some servers may not have reconnected.")
+            print(
+                "  ⚠️  MCP reload timed out (30s). Some servers may not have reconnected."
+            )
 
     # Inline-skip tokens that bypass the destructive-slash confirmation modal.
     # Matches the escape-hatch pattern users on broken modal platforms
@@ -2169,7 +2290,9 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
             approvals = cfg.get("approvals") if isinstance(cfg, dict) else None
             confirm_required = True
             if isinstance(approvals, dict):
-                confirm_required = bool(approvals.get("destructive_slash_confirm", True))
+                confirm_required = bool(
+                    approvals.get("destructive_slash_confirm", True)
+                )
         except Exception:
             confirm_required = True
 
@@ -2203,8 +2326,12 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
 
         if choice == "always":
             if save_config_value("approvals.destructive_slash_confirm", False):
-                print("🔒 Future /clear, /new, /reset, and /undo will run without confirmation.")
-                print("   Re-enable via `approvals.destructive_slash_confirm: true` in config.yaml.")
+                print(
+                    "🔒 Future /clear, /new, /reset, and /undo will run without confirmation."
+                )
+                print(
+                    "   Re-enable via `approvals.destructive_slash_confirm: true` in config.yaml."
+                )
             else:
                 print("⚠️  Couldn't persist opt-out — proceeding once.")
 
@@ -2242,7 +2369,11 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
         # modal as destructive slash confirmations so choices stay visible.
         choices = [
             ("once", "Approve Once", "reload now"),
-            ("always", "Always Approve", "reload now and silence this prompt permanently"),
+            (
+                "always",
+                "Always Approve",
+                "reload now and silence this prompt permanently",
+            ),
             ("cancel", "Cancel", "leave MCP tools unchanged"),
         ]
         raw = self._prompt_text_input_modal(
@@ -2270,7 +2401,9 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
         if choice == "always":
             if save_config_value("approvals.mcp_reload_confirm", False):
                 print("🔒 Future /reload-mcp calls will run without confirmation.")
-                print("   Re-enable via `approvals.mcp_reload_confirm: true` in config.yaml.")
+                print(
+                    "   Re-enable via `approvals.mcp_reload_confirm: true` in config.yaml."
+                )
             else:
                 print("⚠️  Couldn't persist opt-out — reloading once.")
 
@@ -2284,7 +2417,12 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
         sees the updated tools on the next turn.
         """
         try:
-            from tools.mcp_tool import shutdown_mcp_servers, discover_mcp_tools, _servers, _lock
+            from tools.mcp_tool import (
+                shutdown_mcp_servers,
+                discover_mcp_tools,
+                _servers,
+                _lock,
+            )
 
             # Capture old server names
             with _lock:
@@ -2316,18 +2454,23 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
             if not connected_servers:
                 print("  No MCP servers connected.")
             else:
-                print(f"  🔧 {len(new_tools)} tool(s) available from {len(connected_servers)} server(s)")
+                print(
+                    f"  🔧 {len(new_tools)} tool(s) available from {len(connected_servers)} server(s)"
+                )
 
             # Refresh the agent's tool list so the model can call new tools
             if self.agent is not None:
                 self.agent.tools = get_tool_definitions(
                     enabled_toolsets=self.agent.enabled_toolsets
-                    if hasattr(self.agent, "enabled_toolsets") else None,
+                    if hasattr(self.agent, "enabled_toolsets")
+                    else None,
                     quiet_mode=True,
                 )
-                self.agent.valid_tool_names = {
-                    tool["function"]["name"] for tool in self.agent.tools
-                } if self.agent.tools else set()
+                self.agent.valid_tool_names = (
+                    {tool["function"]["name"] for tool in self.agent.tools}
+                    if self.agent.tools
+                    else set()
+                )
 
             # Inject a message at the END of conversation history so the
             # model knows tools changed.  Appended after all existing
@@ -2338,13 +2481,21 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
             if removed:
                 change_parts.append(f"Removed servers: {', '.join(sorted(removed))}")
             if reconnected:
-                change_parts.append(f"Reconnected servers: {', '.join(sorted(reconnected))}")
-            tool_summary = f"{len(new_tools)} MCP tool(s) now available" if new_tools else "No MCP tools available"
+                change_parts.append(
+                    f"Reconnected servers: {', '.join(sorted(reconnected))}"
+                )
+            tool_summary = (
+                f"{len(new_tools)} MCP tool(s) now available"
+                if new_tools
+                else "No MCP tools available"
+            )
             change_detail = ". ".join(change_parts) + ". " if change_parts else ""
-            self.conversation_history.append({
-                "role": "user",
-                "content": f"[IMPORTANT: MCP servers have been reloaded. {change_detail}{tool_summary}. The tool list for this conversation has been updated accordingly.]",
-            })
+            self.conversation_history.append(
+                {
+                    "role": "user",
+                    "content": f"[IMPORTANT: MCP servers have been reloaded. {change_detail}{tool_summary}. The tool list for this conversation has been updated accordingly.]",
+                }
+            )
 
             # Persist session immediately so the session log reflects the
             # updated tools list (self.agent.tools was refreshed above).
@@ -2359,7 +2510,9 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
                         "[SessizExcept] %%s: %%s", type(_e).__name__, _e
                     )  # Best-effort
 
-            print(f"  ✅ Agent updated — {len(self.agent.tools if self.agent else [])} tool(s) available")
+            print(
+                f"  ✅ Agent updated — {len(self.agent.tools if self.agent else [])} tool(s) available"
+            )
 
         except Exception as e:
             print(f"  ❌ MCP reload failed: {e}")
@@ -2390,7 +2543,7 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
             # updated dict without needing to restart the session.
             global _skill_commands
             _skill_commands = get_skill_commands()
-            added = result.get("added", [])      # [{"name", "description"}, ...]
+            added = result.get("added", [])  # [{"name", "description"}, ...]
             removed = result.get("removed", [])  # [{"name", "description"}, ...]
             total = result.get("total", 0)
 
@@ -2459,6 +2612,7 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
         self._close_reasoning_box()
 
         from agent.display import get_tool_emoji
+
         emoji = get_tool_emoji(tool_name, default="⚡")
         _cprint(f"  ┊ {emoji} preparing {tool_name}…")
 
@@ -2466,7 +2620,14 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
     # Tool progress callback (audio cues for voice mode)
     # ====================================================================
 
-    def _on_tool_progress(self, event_type: str, function_name: str = None, preview: str = None, function_args: dict = None, **kwargs):
+    def _on_tool_progress(
+        self,
+        event_type: str,
+        function_name: str = None,
+        preview: str = None,
+        function_args: dict = None,
+        **kwargs,
+    ):
         """Called on tool lifecycle events (tool.started, tool.completed, reasoning.available, etc.).
 
         Updates the TUI spinner widget so the user can see what the agent
@@ -2493,13 +2654,22 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
                 if stored is not None and not stored:
                     del self._pending_tool_info[function_name]
                 # "new" mode: skip consecutive repeats of the same tool
-                if self.tool_progress_mode == "new" and function_name == self._last_scrollback_tool:
+                if (
+                    self.tool_progress_mode == "new"
+                    and function_name == self._last_scrollback_tool
+                ):
                     self._invalidate()
                     return
                 self._last_scrollback_tool = function_name
                 try:
                     from agent.display import get_cute_tool_message
-                    line = get_cute_tool_message(function_name, stored_args, duration, result=kwargs.get("result"))
+
+                    line = get_cute_tool_message(
+                        function_name,
+                        stored_args,
+                        duration,
+                        result=kwargs.get("result"),
+                    )
                     _cprint(f"  {line}")
                 except Exception:
                     logger.warning("[fix_01_sessiz_except] Exception")
@@ -2521,11 +2691,14 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
                             mark_seen,
                             tool_progress_hint_cli,
                         )
+
                         if not is_seen(CLI_CONFIG, TOOL_PROGRESS_FLAG):
                             self._long_tool_hint_fired = True
                             _cprint(f"  {_DIM}{tool_progress_hint_cli()}{_RST}")
                             mark_seen(_ReYMeN_home / "config.yaml", TOOL_PROGRESS_FLAG)
-                            CLI_CONFIG.setdefault("onboarding", {}).setdefault("seen", {})[TOOL_PROGRESS_FLAG] = True
+                            CLI_CONFIG.setdefault("onboarding", {}).setdefault(
+                                "seen", {}
+                            )[TOOL_PROGRESS_FLAG] = True
                 except Exception:
                     logger.warning("[fix_01_sessiz_except] Exception")
             self._invalidate()
@@ -2534,12 +2707,14 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
             return
         if function_name and not function_name.startswith("_"):
             from agent.display import get_tool_emoji
+
             emoji = get_tool_emoji(function_name)
             label = preview or function_name
             from agent.display import get_tool_preview_max_len
+
             _pl = get_tool_preview_max_len()
             if _pl > 0 and len(label) > _pl:
-                label = label[:_pl - 3] + "..."
+                label = label[: _pl - 3] + "..."
             self._spinner_text = f"{emoji} {label}"
             self._tool_start_time = time.monotonic()
             # Store args for stacked scrollback line on completion
@@ -2548,7 +2723,9 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
             )
             self._invalidate()
 
-    def _on_tool_start(self, tool_call_id: str, function_name: str, function_args: dict):
+    def _on_tool_start(
+        self, tool_call_id: str, function_name: str, function_args: dict
+    ):
         """Capture local before-state for write-capable tools."""
         try:
             from agent.display import capture_local_edit_snapshot
@@ -2557,9 +2734,17 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
             if snapshot is not None:
                 self._pending_edit_snapshots[tool_call_id] = snapshot
         except Exception:
-            logger.debug("Edit snapshot capture failed for %s", function_name, exc_info=True)
+            logger.debug(
+                "Edit snapshot capture failed for %s", function_name, exc_info=True
+            )
 
-    def _on_tool_complete(self, tool_call_id: str, function_name: str, function_args: dict, function_result: str):
+    def _on_tool_complete(
+        self,
+        tool_call_id: str,
+        function_name: str,
+        function_args: dict,
+        function_result: str,
+    ):
         """Render file edits with inline diff after write-capable tools complete."""
         snapshot = self._pending_edit_snapshots.pop(tool_call_id, None)
         try:
@@ -2573,7 +2758,9 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
                 print_fn=_cprint,
             )
         except Exception:
-            logger.debug("Edit diff preview failed for %s", function_name, exc_info=True)
+            logger.debug(
+                "Edit diff preview failed for %s", function_name, exc_info=True
+            )
 
     # ====================================================================
     # Voice mode methods
@@ -2592,8 +2779,11 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
 
         if self._voice_tts:
             from tools.tts_tool import check_tts_requirements
+
             if not check_tts_requirements():
-                _cprint(f"{_DIM}Warning: No TTS provider available. Install edge-tts or set API keys.{_RST}")
+                _cprint(
+                    f"{_DIM}Warning: No TTS provider available. Install edge-tts or set API keys.{_RST}"
+                )
 
         _cprint(f"{_ACCENT}Voice TTS {status}.{_RST}")
 
@@ -2658,20 +2848,30 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
         self._clarify_freetext = False
         self._clarify_deadline = 0
         self._invalidate()
-        _cprint(f"\n{_DIM}(clarify timed out after {timeout}s — agent will decide){_RST}")
+        _cprint(
+            f"\n{_DIM}(clarify timed out after {timeout}s — agent will decide){_RST}"
+        )
         return (
             "The user did not provide a response within the time limit. "
             "Use your best judgement to make the choice and proceed."
         )
 
-    def _approval_choices(self, command: str, *, allow_permanent: bool = True) -> list[str]:
+    def _approval_choices(
+        self, command: str, *, allow_permanent: bool = True
+    ) -> list[str]:
         """Return approval choices for a dangerous command prompt."""
-        choices = ["once", "session", "always", "deny"] if allow_permanent else ["once", "session", "deny"]
+        choices = (
+            ["once", "session", "always", "deny"]
+            if allow_permanent
+            else ["once", "session", "deny"]
+        )
         if len(command) > 70:
             choices.append("view")
         return choices
 
-    def _computer_use_approval_callback(self, action: str, args: dict, summary: str) -> str:
+    def _computer_use_approval_callback(
+        self, action: str, args: dict, summary: str
+    ) -> str:
         """Adapt the generic approval UI for the computer_use tool.
 
         The computer_use handler expects verdicts of the form
@@ -2725,6 +2925,7 @@ class ReYMeNCLI(TUIMixin, AgentMixin, SessionMixin, MixinDisplay, MixinStream, M
             except Exception:
                 logger.warning("[fix_01_sessiz_except] Exception")
 
+
 def _run_kanban_goal_loop_q(cli: "ReYMeNCLI", first_response: str) -> None:
     """Drive a kanban goal_mode worker through the Ralph-style goal loop.
 
@@ -2742,7 +2943,10 @@ def _run_kanban_goal_loop_q(cli: "ReYMeNCLI", first_response: str) -> None:
         return
 
     from ReYMeN_cli import kanban_db as _kb
-    from reymen.reymen_cli.goals import run_kanban_goal_loop as _run_loop, DEFAULT_MAX_TURNS as _DEF_TURNS
+    from reymen.reymen_cli.goals import (
+        run_kanban_goal_loop as _run_loop,
+        DEFAULT_MAX_TURNS as _DEF_TURNS,
+    )
 
     # Resolve goal text from the card (title + body = the acceptance
     # criteria the judge evaluates against).
@@ -2777,7 +2981,11 @@ def _run_kanban_goal_loop_q(cli: "ReYMeNCLI", first_response: str) -> None:
             and cli.agent.session_id != cli.session_id
         ):
             cli.session_id = cli.agent.session_id
-        resp = result.get("final_response", "") if isinstance(result, dict) else str(result)
+        resp = (
+            result.get("final_response", "")
+            if isinstance(result, dict)
+            else str(result)
+        )
         if resp:
             print(resp)
         return resp or ""
@@ -2843,7 +3051,7 @@ def main(
 ):
     """
     ReYMeN Agent CLI - Interactive AI Assistant
-    
+
     Args:
         query: Single query to execute (then exit). Alias: -q
         q: Shorthand for --query
@@ -2863,7 +3071,7 @@ def main(
         resume: Resume a previous session by its ID (e.g., 20260225_143052_a1b2c3)
         worktree: Run in an isolated git worktree (for parallel agents). Alias: -w
         w: Shorthand for --worktree
-    
+
     Examples:
         python cli.py                            # Start interactive mode
         python cli.py --toolsets web,terminal    # Use specific toolsets
@@ -2882,6 +3090,7 @@ def main(
     # UnicodeEncodeError on cp1252.  No-op on Linux/macOS.
     try:
         from reymen.reymen_cli.stdio import configure_windows_stdio
+
         configure_windows_stdio()
     except Exception:
         logger.warning("[fix_01_sessiz_except] Exception")
@@ -2893,11 +3102,12 @@ def main(
     # --yolo flag: tum tehlikeli komut onaylarini atla
     if yolo:
         os.environ["REYMEN_YOLO_MODE"] = "1"
-    
+
     # approvals.mode = off → YOLO modu (config)
     if not os.environ.get("REYMEN_YOLO_MODE"):
         try:
             from reymen.reymen_cli.config import load_config as _load_reymen_config
+
             _cfg = _load_reymen_config()
             if isinstance(_cfg, dict):
                 _approvals = _cfg.get("approvals", {}) or {}
@@ -2905,11 +3115,12 @@ def main(
                     os.environ["REYMEN_YOLO_MODE"] = "1"
         except Exception:
             logger.warning("[fix_01_sessiz_except] Exception")
-    
+
     # Handle gateway mode (messaging + cron)
     if gateway:
         import asyncio
         from gateway.run import start_gateway
+
         print("Starting ReYMeN Gateway (messaging platforms)...")
         asyncio.run(start_gateway())
         return
@@ -2937,10 +3148,10 @@ def main(
                 return
     else:
         wt_info = None
-    
+
     # Handle query shorthand
     query = query or q
-    
+
     # Parse toolsets - handle both string and tuple/list inputs
     # Default to ReYMeN-cli toolset which includes cronjob management tools
     toolsets_list = None
@@ -2958,8 +3169,9 @@ def main(
     else:
         # Use the shared resolver so MCP servers are included at runtime
         from reymen.reymen_cli.tools_config import _get_platform_tools
+
         toolsets_list = sorted(_get_platform_tools(CLI_CONFIG, "cli"))
-    
+
     parsed_skills = _parse_skills_argument(skills)
 
     # Create CLI instance
@@ -3002,18 +3214,18 @@ def main(
             f"The original repo is at {wt_info['repo_root']}.]"
         )
         cli.system_prompt = (cli.system_prompt or "") + wt_note
-    
+
     # Handle list commands (don't init agent for these)
     if list_tools:
         cli.show_banner()
         cli.show_tools()
         sys.exit(0)
-    
+
     if list_toolsets:
         cli.show_banner()
         cli.show_toolsets()
         sys.exit(0)
-    
+
     # Register cleanup for single-query mode (interactive mode registers in run())
     atexit.register(_run_cleanup)
 
@@ -3063,6 +3275,7 @@ def main(
         if os.environ.get("ReYMeN_KANBAN_TASK"):
             try:
                 import signal as _sig_mod
+
                 if hasattr(_sig_mod, "SIGALRM"):
                     # Cancel any pre-existing alarm to avoid colliding with
                     # caller-installed timers.
@@ -3072,6 +3285,7 @@ def main(
                 logger.warning("[fix_01_sessiz_except] Exception")
             try:
                 import logging as _lg
+
                 _lg.shutdown()
             except Exception:
                 logger.warning("[fix_01_sessiz_except] Exception")
@@ -3082,8 +3296,10 @@ def main(
                     logger.warning("[fix_01_sessiz_except] Exception")
             os._exit(0)
         raise KeyboardInterrupt()
+
     try:
         import signal as _signal
+
         _signal.signal(_signal.SIGTERM, _signal_handler_q)
         if hasattr(_signal, "SIGHUP"):
             _signal.signal(_signal.SIGHUP, _signal_handler_q)
@@ -3091,7 +3307,7 @@ def main(
         __import__("logging").getLogger(__name__).warning(
             "[SessizExcept] %%s: %%s", type(_e).__name__, _e
         )  # signal handler may fail in restricted environments
-    
+
     # Handle single query mode
     if query or image:
         query, single_query_images = _collect_query_images(query, image)
@@ -3178,13 +3394,19 @@ def main(
                                 # so keep the original query text intact when
                                 # only URLs were supplied.
                                 if single_query_images:
-                                    effective_query = cli._preprocess_images_with_vision(
-                                        query, single_query_images, announce=False,
+                                    effective_query = (
+                                        cli._preprocess_images_with_vision(
+                                            query,
+                                            single_query_images,
+                                            announce=False,
+                                        )
                                     )
                         except Exception:
                             if single_query_images:
                                 effective_query = cli._preprocess_images_with_vision(
-                                    query, single_query_images, announce=False,
+                                    query,
+                                    single_query_images,
+                                    announce=False,
                                 )
                     elif single_query_images:
                         effective_query = cli._preprocess_images_with_vision(
@@ -3220,7 +3442,11 @@ def main(
                         and cli.agent.session_id != cli.session_id
                     ):
                         cli.session_id = cli.agent.session_id
-                    response = result.get("final_response", "") if isinstance(result, dict) else str(result)
+                    response = (
+                        result.get("final_response", "")
+                        if isinstance(result, dict)
+                        else str(result)
+                    )
                     # Surface backend errors that produced no visible output
                     # (e.g. invalid model slug → provider 4xx). Mirrors the
                     # interactive CLI path. Write to stderr so piped stdout
@@ -3250,10 +3476,12 @@ def main(
 
                     # Session ID goes to stderr so piped stdout is clean.
                     print(f"\nsession_id: {cli.session_id}", file=sys.stderr)
-                    
+
                     # Ensure proper exit code for automation wrappers
-                    sys.exit(1 if isinstance(result, dict) and result.get("failed") else 0)
-            
+                    sys.exit(
+                        1 if isinstance(result, dict) and result.get("failed") else 0
+                    )
+
             # Exit with error code if credentials or agent init fails
             sys.exit(1)
         else:
@@ -3279,7 +3507,7 @@ def main(
             cli.chat(query, images=single_query_images or None)
             cli._print_exit_summary()
         return
-    
+
     # Run interactive mode
     cli.run()
 

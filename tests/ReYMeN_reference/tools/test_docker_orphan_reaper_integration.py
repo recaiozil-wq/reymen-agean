@@ -39,9 +39,9 @@ def test_maybe_reap_runs_once_per_process(monkeypatch):
         terminal_tool._maybe_reap_docker_orphans(config)
         terminal_tool._maybe_reap_docker_orphans(config)
 
-    assert call_count["reap"] == 1, (
-        f"reaper must run exactly once per process; got {call_count['reap']} calls"
-    )
+    assert (
+        call_count["reap"] == 1
+    ), f"reaper must run exactly once per process; got {call_count['reap']} calls"
 
 
 def test_maybe_reap_respects_disable_flag(monkeypatch):
@@ -80,9 +80,9 @@ def test_maybe_reap_doubles_lifetime_for_max_age(monkeypatch):
     with patch("tools.environments.docker.reap_orphan_containers", _fake_reap):
         terminal_tool._maybe_reap_docker_orphans({"docker_orphan_reaper": True})
 
-    assert captured_args.get("max_age_seconds") == 600, (
-        f"expected 2 × 300 = 600, got {captured_args.get('max_age_seconds')}"
-    )
+    assert (
+        captured_args.get("max_age_seconds") == 600
+    ), f"expected 2 × 300 = 600, got {captured_args.get('max_age_seconds')}"
 
 
 def test_maybe_reap_floors_at_60_seconds(monkeypatch):
@@ -100,9 +100,9 @@ def test_maybe_reap_floors_at_60_seconds(monkeypatch):
     with patch("tools.environments.docker.reap_orphan_containers", _fake_reap):
         terminal_tool._maybe_reap_docker_orphans({"docker_orphan_reaper": True})
 
-    assert captured_args.get("max_age_seconds") == 120, (
-        f"expected floored 60 × 2 = 120, got {captured_args.get('max_age_seconds')}"
-    )
+    assert (
+        captured_args.get("max_age_seconds") == 120
+    ), f"expected floored 60 × 2 = 120, got {captured_args.get('max_age_seconds')}"
 
 
 def test_maybe_reap_passes_current_profile_as_filter(monkeypatch):
@@ -116,13 +116,15 @@ def test_maybe_reap_passes_current_profile_as_filter(monkeypatch):
         captured_args.update(kwargs)
         return 0
 
-    with patch("tools.environments.docker.reap_orphan_containers", _fake_reap), \
-         patch("tools.environments.docker._get_active_profile_name", return_value="research-bot"):
+    with patch("tools.environments.docker.reap_orphan_containers", _fake_reap), patch(
+        "tools.environments.docker._get_active_profile_name",
+        return_value="research-bot",
+    ):
         terminal_tool._maybe_reap_docker_orphans({"docker_orphan_reaper": True})
 
-    assert captured_args.get("profile_filter") == "research-bot", (
-        f"expected profile_filter='research-bot', got {captured_args.get('profile_filter')!r}"
-    )
+    assert (
+        captured_args.get("profile_filter") == "research-bot"
+    ), f"expected profile_filter='research-bot', got {captured_args.get('profile_filter')!r}"
 
 
 def test_maybe_reap_swallows_exceptions(monkeypatch):

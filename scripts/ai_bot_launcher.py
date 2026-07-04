@@ -3,6 +3,7 @@
 TEK KAYNAK: Bu dosya SADECE proje kökündeki .env dosyasini okur.
 telegram_bot/.env veya reymen/sistem/.env OKUNMAZ.
 """
+
 import os
 import subprocess
 import sys

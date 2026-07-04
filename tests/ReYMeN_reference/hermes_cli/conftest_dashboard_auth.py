@@ -13,6 +13,7 @@ can complete the OAuth round trip in-process without external network.
 Tokens are HMAC-signed JSON blobs (not real JWTs) — just enough structure
 for ``verify_session`` to detect tampering and expiry.
 """
+
 from __future__ import annotations
 
 import base64
@@ -98,12 +99,15 @@ class StubAuthProvider(DashboardAuthProvider):
         )
 
     def complete_login(
-        self, *, code: str, state: str, code_verifier: str, redirect_uri: str,
+        self,
+        *,
+        code: str,
+        state: str,
+        code_verifier: str,
+        redirect_uri: str,
     ) -> Session:
         if code != "stub_code":
-            raise InvalidCodeError(
-                f"stub expects code='stub_code', got {code!r}"
-            )
+            raise InvalidCodeError(f"stub expects code='stub_code', got {code!r}")
         expected_verifier = self._state_to_verifier.get(state)
         if expected_verifier is None or expected_verifier != code_verifier:
             raise InvalidCodeError("stub state/verifier mismatch")
@@ -118,18 +122,22 @@ class StubAuthProvider(DashboardAuthProvider):
             org_id="stub-org-1",
             provider=self.name,
             expires_at=exp,
-            access_token=_sign({
-                "sub": "stub-user-1",
-                "email": "stub@example.test",
-                "name": "Stub User",
-                "org_id": "stub-org-1",
-                "exp": exp,
-            }),
-            refresh_token=_sign({
-                "sub": "stub-user-1",
-                "kind": "refresh",
-                "exp": now + 30 * 86400,
-            }),
+            access_token=_sign(
+                {
+                    "sub": "stub-user-1",
+                    "email": "stub@example.test",
+                    "name": "Stub User",
+                    "org_id": "stub-org-1",
+                    "exp": exp,
+                }
+            ),
+            refresh_token=_sign(
+                {
+                    "sub": "stub-user-1",
+                    "kind": "refresh",
+                    "exp": now + 30 * 86400,
+                }
+            ),
         )
 
     def verify_session(self, *, access_token: str):
@@ -165,18 +173,22 @@ class StubAuthProvider(DashboardAuthProvider):
             org_id="stub-org-1",
             provider=self.name,
             expires_at=exp,
-            access_token=_sign({
-                "sub": payload["sub"],
-                "email": "stub@example.test",
-                "name": "Stub User",
-                "org_id": "stub-org-1",
-                "exp": exp,
-            }),
-            refresh_token=_sign({
-                "sub": payload["sub"],
-                "kind": "refresh",
-                "exp": now + 30 * 86400,
-            }),
+            access_token=_sign(
+                {
+                    "sub": payload["sub"],
+                    "email": "stub@example.test",
+                    "name": "Stub User",
+                    "org_id": "stub-org-1",
+                    "exp": exp,
+                }
+            ),
+            refresh_token=_sign(
+                {
+                    "sub": payload["sub"],
+                    "kind": "refresh",
+                    "exp": now + 30 * 86400,
+                }
+            ),
         )
 
     def revoke_session(self, *, refresh_token: str) -> None:

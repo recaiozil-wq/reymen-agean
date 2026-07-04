@@ -45,19 +45,13 @@ def main() -> None:
     if secim == "1":
         print("\n[+] OTONOM mod secildi.")
         print("[i] Tor Browser acilacak, elementler taranacak...\n")
-        subprocess.run([
-            sys.executable,
-            str(PROJE_KOKU / "otonom_nisan_olusturucu.py")
-        ])
+        subprocess.run([sys.executable, str(PROJE_KOKU / "otonom_nisan_olusturucu.py")])
 
     elif secim == "2":
         print("\n[+] MANUEL mod secildi.")
         print("[i] Fareyi hedef uzerine getirip ENTER'a bas.")
         print("[i] Cikis icin ESC.\n")
-        subprocess.run([
-            sys.executable,
-            str(PROJE_KOKU / "nisan_yakala.py")
-        ])
+        subprocess.run([sys.executable, str(PROJE_KOKU / "nisan_yakala.py")])
 
     elif secim == "3":
         print("\n[-] Iptal edildi.")

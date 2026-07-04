@@ -5,13 +5,20 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from acp_adapter.server import ACPServer, ReYMeNACPAgent, ReYMeN_VERSION, PROTOCOL_VERSION, SERVER_INFO
+from acp_adapter.server import (
+    ACPServer,
+    ReYMeNACPAgent,
+    ReYMeN_VERSION,
+    PROTOCOL_VERSION,
+    SERVER_INFO,
+)
 from acp_adapter.session import SessionYoneticisi, SessionManager
 
 
 # ============================================================
 # ACPServer Tests
 # ============================================================
+
 
 class TestACPServerInit:
     """ACPServer başlatma testleri."""
@@ -64,7 +71,8 @@ class TestACPServerYanitHata:
         server = ACPServer()
         result = json.loads(server._hata(1, -32601, "Not found"))
         assert result == {
-            "jsonrpc": "2.0", "id": 1,
+            "jsonrpc": "2.0",
+            "id": 1,
             "error": {"code": -32601, "message": "Not found"},
         }
 
@@ -96,40 +104,62 @@ class TestACPServerIstekIsle:
     def test_tools_call(self):
         server = ACPServer()
         server.tool_kaydet("ping", lambda args: "pong")
-        result = json.loads(server._istek_isle({
-            "id": 1, "method": "tools/call",
-            "params": {"name": "ping", "arguments": {}},
-        }))
+        result = json.loads(
+            server._istek_isle(
+                {
+                    "id": 1,
+                    "method": "tools/call",
+                    "params": {"name": "ping", "arguments": {}},
+                }
+            )
+        )
         assert result["result"]["content"] == "pong"
 
     def test_tools_call_with_args(self):
         server = ACPServer()
         server.tool_kaydet("echo", lambda args: args.get("msg", ""))
-        result = json.loads(server._istek_isle({
-            "id": 1, "method": "tools/call",
-            "params": {"name": "echo", "arguments": {"msg": "merhaba"}},
-        }))
+        result = json.loads(
+            server._istek_isle(
+                {
+                    "id": 1,
+                    "method": "tools/call",
+                    "params": {"name": "echo", "arguments": {"msg": "merhaba"}},
+                }
+            )
+        )
         assert result["result"]["content"] == "merhaba"
 
     def test_tools_call_tool_not_found(self):
         server = ACPServer()
-        result = json.loads(server._istek_isle({
-            "id": 1, "method": "tools/call",
-            "params": {"name": "yok", "arguments": {}},
-        }))
+        result = json.loads(
+            server._istek_isle(
+                {
+                    "id": 1,
+                    "method": "tools/call",
+                    "params": {"name": "yok", "arguments": {}},
+                }
+            )
+        )
         assert "error" in result
         assert result["error"]["code"] == -32601
         assert "yok" in result["error"]["message"]
 
     def test_tools_call_exception(self):
         server = ACPServer()
+
         def _boom(args):
             raise ValueError("patladi")
+
         server.tool_kaydet("patla", _boom)
-        result = json.loads(server._istek_isle({
-            "id": 1, "method": "tools/call",
-            "params": {"name": "patla", "arguments": {}},
-        }))
+        result = json.loads(
+            server._istek_isle(
+                {
+                    "id": 1,
+                    "method": "tools/call",
+                    "params": {"name": "patla", "arguments": {}},
+                }
+            )
+        )
         assert "error" in result
         assert result["error"]["code"] == -32603
 
@@ -198,6 +228,7 @@ class TestACPServerLifecycle:
 # ReYMeNACPAgent Tests
 # ============================================================
 
+
 class TestReYMeNACPAgent:
     """ReYMeNACPAgent testleri."""
 
@@ -238,6 +269,7 @@ class TestReYMeNACPAgent:
 # ============================================================
 # SessionYoneticisi Tests
 # ============================================================
+
 
 class TestSessionYoneticisi:
     """SessionYoneticisi testleri."""
@@ -311,15 +343,18 @@ class TestSessionYoneticisi:
 # auth.py Export Tests
 # ============================================================
 
+
 class TestAuthExports:
     """acp_adapter.auth export testleri."""
 
     def test_TERMINAL_SETUP_AUTH_METHOD_ID(self):
         from acp_adapter.auth import TERMINAL_SETUP_AUTH_METHOD_ID
+
         assert TERMINAL_SETUP_AUTH_METHOD_ID == "terminal_setup"
 
     def test_build_auth_methods(self):
         from acp_adapter.auth import build_auth_methods, ACPAuth
+
         methods = build_auth_methods("test-token")
         assert len(methods) == 1
         assert isinstance(methods[0], ACPAuth)
@@ -327,6 +362,7 @@ class TestAuthExports:
 
     def test_has_provider(self):
         from acp_adapter.auth import has_provider
+
         assert has_provider("hmac") is True
         assert has_provider("terminal_setup") is True
         assert has_provider("unknown") is False
@@ -334,12 +370,14 @@ class TestAuthExports:
     def test_detect_provider_hmac(self):
         from acp_adapter.auth import detect_provider
         from types import SimpleNamespace
+
         req = SimpleNamespace(headers={"x-hmac-signature": "abc"})
         assert detect_provider(req) == "hmac"
 
     def test_detect_provider_terminal(self):
         from acp_adapter.auth import detect_provider
         from types import SimpleNamespace
+
         req = SimpleNamespace(headers={})
         assert detect_provider(req) == "terminal_setup"
 
@@ -348,11 +386,13 @@ class TestAuthExports:
 # acp.schema Export Tests
 # ============================================================
 
+
 class TestSchemaExports:
     """acp.schema dataclass testleri."""
 
     def test_UsageUpdate_defaults(self):
         from acp.schema import UsageUpdate
+
         u = UsageUpdate()
         assert u.input_tokens == 0
         assert u.output_tokens == 0
@@ -360,12 +400,14 @@ class TestSchemaExports:
 
     def test_UsageUpdate_with_values(self):
         from acp.schema import UsageUpdate
+
         u = UsageUpdate(input_tokens=10, output_tokens=20, total_tokens=30, cost=0.5)
         assert u.total_tokens == 30
         assert u.cost == 0.5
 
     def test_UserMessageChunk(self):
         from acp.schema import UserMessageChunk
+
         m = UserMessageChunk(content="test", chunk_type="user_message")
         assert m.content == "test"
         assert m.chunk_type == "user_message"
@@ -375,20 +417,25 @@ class TestSchemaExports:
 # acp.agent.router Tests
 # ============================================================
 
+
 class TestAgentRouter:
     """acp.agent.router testleri."""
 
     def test_build_agent_router(self):
         from acp.agent.router import build_agent_router, AgentRouter
+
         router = build_agent_router()
         assert isinstance(router, AgentRouter)
 
     @pytest.mark.asyncio
     async def test_router_register_dispatch(self):
         from acp.agent.router import build_agent_router
+
         router = build_agent_router()
+
         async def handler(msg):
             return "handled"
+
         router.register("test", handler)
         result = await router.dispatch("bu bir test mesaji")
         assert result == "handled"
@@ -396,6 +443,7 @@ class TestAgentRouter:
     @pytest.mark.asyncio
     async def test_router_no_match(self):
         from acp.agent.router import build_agent_router
+
         router = build_agent_router()
         result = await router.dispatch("bilinmeyen mesaj")
         assert result is None

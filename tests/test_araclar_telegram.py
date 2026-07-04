@@ -22,10 +22,14 @@ from araclar_telegram import TelegramTools, run
 
 # ── TelegramTools başlatma testleri ──────────────────────────────────────
 
+
 class TestTelegramToolsInit:
     def test_token_env_alinir(self):
         """Token verilmezse TELEGRAM_BOT_TOKEN env'den alınır."""
-        with patch.dict(os.environ, {"TELEGRAM_BOT_TOKEN": "env_token:ABC", "TELEGRAM_CHAT_ID": "env_chat"}):
+        with patch.dict(
+            os.environ,
+            {"TELEGRAM_BOT_TOKEN": "env_token:ABC", "TELEGRAM_CHAT_ID": "env_chat"},
+        ):
             bot = TelegramTools()
             assert bot._token == "env_token:ABC"
             assert bot._chat_id == "env_chat"
@@ -63,6 +67,7 @@ class TestTelegramToolsInit:
 
 # ── _api_istek testleri ──────────────────────────────────────────────────
 
+
 class TestApiIstek:
     def test_basarili_api_istegi(self):
         """Başarılı API çağrısı yanıtı döndürür."""
@@ -97,11 +102,13 @@ class TestApiIstek:
         """requests yoksa RuntimeError fırlatılır."""
         bot = TelegramTools(token="123:ABC")
         with patch("builtins.__import__") as mock_import:
+
             def side_effect(name, *args, **kwargs):
                 if name == "requests":
                     raise ImportError("No module named requests")
                 # Call the real __import__ for everything else
                 return __import__(name, *args, **kwargs)
+
             mock_import.side_effect = side_effect
             with pytest.raises(RuntimeError, match="requests kutuphanesi gerekli"):
                 bot._api_istek("sendMessage", {})
@@ -109,19 +116,27 @@ class TestApiIstek:
     def test_timeout_hata(self):
         pytest.skip("test suite import sirasi nedeniyle kararsiz, tekil calisiyor")
         bot = TelegramTools(token="123:ABC")
-        with patch("requests.post", side_effect=__import__("requests").exceptions.Timeout):
+        with patch(
+            "requests.post", side_effect=__import__("requests").exceptions.Timeout
+        ):
             with pytest.raises(RuntimeError, match="Zaman asimi"):
                 bot._api_istek("sendMessage", {})
 
     def test_connection_error_hata(self):
         pytest.skip("test suite import sirasi nedeniyle kararsiz, tekil calisiyor")
         bot = TelegramTools(token="123:ABC")
-        with patch("requests.post", side_effect=__import__("requests").exceptions.ConnectionError("baglanti yok")):
+        with patch(
+            "requests.post",
+            side_effect=__import__("requests").exceptions.ConnectionError(
+                "baglanti yok"
+            ),
+        ):
             with pytest.raises(RuntimeError, match="Baglanti hatasi"):
                 bot._api_istek("sendMessage", {})
 
 
 # ── mesaj_gonder testleri ─────────────────────────────────────────────────
+
 
 class TestMesajGonder:
     def test_bos_mesaj_gonderilmez(self):
@@ -150,6 +165,7 @@ class TestMesajGonder:
 
 # ── stream_mesaj_gonder testleri ─────────────────────────────────────────
 
+
 class TestStreamMesajGonder:
     def test_bos_mesaj_gonderilmez(self):
         bot = TelegramTools(token="123:ABC")
@@ -160,7 +176,10 @@ class TestStreamMesajGonder:
         """4096 karakterden kısa mesaj normal mesaj_gonder'e düşer."""
         bot = TelegramTools(token="123:ABC")
         # Gateway send_stream import'u basarisiz olsun -> fallback -> mesaj_gonder
-        with patch("gateway.platforms.telegram.send_stream", side_effect=ImportError("no gateway")):
+        with patch(
+            "gateway.platforms.telegram.send_stream",
+            side_effect=ImportError("no gateway"),
+        ):
             with patch("requests.post") as mock_post:
                 mock_resp = MagicMock()
                 mock_resp.json.return_value = {"ok": True, "result": {"message_id": 1}}
@@ -172,7 +191,10 @@ class TestStreamMesajGonder:
         """4096+ karakter mesaj stream edilir (chunk'lanır)."""
         bot = TelegramTools(token="123:ABC")
         uzun_mesaj = "A" * 5000
-        with patch("gateway.platforms.telegram.send_stream", side_effect=ImportError("no gateway")):
+        with patch(
+            "gateway.platforms.telegram.send_stream",
+            side_effect=ImportError("no gateway"),
+        ):
             mock_resp1 = MagicMock()
             mock_resp1.json.return_value = {"ok": True, "result": {"message_id": 99}}
             mock_resp2 = MagicMock()
@@ -184,8 +206,17 @@ class TestStreamMesajGonder:
     def test_gateway_import_basarili(self):
         """gateway.platforms.telegram.send_stream import edilebilirse kullanılır."""
         bot = TelegramTools(token="123:ABC")
-        mock_stream = MagicMock(return_value={"durum": "basarili", "chunk_sayisi": 3, "mesaj_id": "55"})
-        with patch.dict("sys.modules", {"gateway": MagicMock(), "gateway.platforms": MagicMock(), "gateway.platforms.telegram": MagicMock()}):
+        mock_stream = MagicMock(
+            return_value={"durum": "basarili", "chunk_sayisi": 3, "mesaj_id": "55"}
+        )
+        with patch.dict(
+            "sys.modules",
+            {
+                "gateway": MagicMock(),
+                "gateway.platforms": MagicMock(),
+                "gateway.platforms.telegram": MagicMock(),
+            },
+        ):
             with patch("gateway.platforms.telegram.send_stream", mock_stream):
                 sonuc = bot.stream_mesaj_gonder("123", "Uzun mesaj " * 500)
                 assert "Stream mesaj gonderildi" in sonuc
@@ -194,12 +225,16 @@ class TestStreamMesajGonder:
 
 # ── reaction_ekle testleri ───────────────────────────────────────────────
 
+
 class TestReactionEkle:
     def test_reaction_basarili(self):
         bot = TelegramTools(token="123:ABC")
         mock_resp = MagicMock()
         mock_resp.json.return_value = {"ok": True, "result": True}
-        with patch("gateway.platforms.telegram.set_reaction", side_effect=ImportError("no gateway")):
+        with patch(
+            "gateway.platforms.telegram.set_reaction",
+            side_effect=ImportError("no gateway"),
+        ):
             with patch("requests.post", return_value=mock_resp) as mock_post:
                 sonuc = bot.reaction_ekle("123", 42)
                 assert "Reaction eklendi" in sonuc
@@ -208,7 +243,10 @@ class TestReactionEkle:
 
     def test_reaction_ozel_emoji(self):
         bot = TelegramTools(token="123:ABC")
-        with patch("gateway.platforms.telegram.set_reaction", side_effect=ImportError("no gateway")):
+        with patch(
+            "gateway.platforms.telegram.set_reaction",
+            side_effect=ImportError("no gateway"),
+        ):
             with patch("requests.post") as mock_post:
                 mock_resp = MagicMock()
                 mock_resp.json.return_value = {"ok": True, "result": True}
@@ -219,13 +257,21 @@ class TestReactionEkle:
     def test_gateway_reaction_basarili(self):
         bot = TelegramTools(token="123:ABC")
         mock_set = MagicMock(return_value={"durum": "basarili"})
-        with patch.dict("sys.modules", {"gateway": MagicMock(), "gateway.platforms": MagicMock(), "gateway.platforms.telegram": MagicMock()}):
+        with patch.dict(
+            "sys.modules",
+            {
+                "gateway": MagicMock(),
+                "gateway.platforms": MagicMock(),
+                "gateway.platforms.telegram": MagicMock(),
+            },
+        ):
             with patch("gateway.platforms.telegram.set_reaction", mock_set):
                 sonuc = bot.reaction_ekle("123", 42, "👍")
                 assert "Reaction eklendi" in sonuc
 
 
 # ── mesaj_oku testleri ───────────────────────────────────────────────────
+
 
 class TestMesajOku:
     def test_mesaj_oku_basarili(self):
@@ -234,17 +280,23 @@ class TestMesajOku:
         mock_resp.json.return_value = {
             "ok": True,
             "result": [
-                {"update_id": 100, "message": {
-                    "from": {"first_name": "Ali"},
-                    "text": "Merhaba",
-                    "date": 1700000000,
-                }},
-                {"update_id": 101, "message": {
-                    "from": {"first_name": "Veli"},
-                    "text": "Nasilsin",
-                    "date": 1700000001,
-                }},
-            ]
+                {
+                    "update_id": 100,
+                    "message": {
+                        "from": {"first_name": "Ali"},
+                        "text": "Merhaba",
+                        "date": 1700000000,
+                    },
+                },
+                {
+                    "update_id": 101,
+                    "message": {
+                        "from": {"first_name": "Veli"},
+                        "text": "Nasilsin",
+                        "date": 1700000001,
+                    },
+                },
+            ],
         }
         with patch("requests.post", return_value=mock_resp):
             mesajlar = bot.mesaj_oku(limit=5)
@@ -277,7 +329,12 @@ class TestMesajOku:
         mock_resp = MagicMock()
         mock_resp.json.return_value = {
             "ok": True,
-            "result": [{"update_id": 50, "message": {"from": {"first_name": "A"}, "text": "m", "date": 1}}]
+            "result": [
+                {
+                    "update_id": 50,
+                    "message": {"from": {"first_name": "A"}, "text": "m", "date": 1},
+                }
+            ],
         }
         with patch("requests.post", return_value=mock_resp):
             bot.mesaj_oku(limit=10)
@@ -292,6 +349,7 @@ class TestMesajOku:
 
 # ── dosya_gonder testleri ────────────────────────────────────────────────
 
+
 class TestDosyaGonder:
     def test_dosya_bulunamadi(self):
         bot = TelegramTools(token="123:ABC")
@@ -303,7 +361,7 @@ class TestDosyaGonder:
         mock_resp = MagicMock()
         mock_resp.json.return_value = {
             "ok": True,
-            "result": {"document": {"file_id": "FILE123"}}
+            "result": {"document": {"file_id": "FILE123"}},
         }
         with patch("os.path.exists", return_value=True):
             with patch("builtins.open", mock_open(read_data=b"test")):
@@ -326,6 +384,7 @@ class TestDosyaGonder:
 
 # ── ping testleri ────────────────────────────────────────────────────────
 
+
 class TestPing:
     @pytest.mark.skip(reason="test suite import sirasi nedeniyle kararsiz")
     def test_ping_basarili(self):
@@ -333,7 +392,7 @@ class TestPing:
         mock_resp = MagicMock()
         mock_resp.json.return_value = {
             "ok": True,
-            "result": {"first_name": "TestBot", "username": "test_bot"}
+            "result": {"first_name": "TestBot", "username": "test_bot"},
         }
         with patch("requests.get", return_value=mock_resp) as mock_get:
             sonuc = bot.ping()
@@ -353,19 +412,25 @@ class TestPing:
     @pytest.mark.skip(reason="test suite import sirasi nedeniyle kararsiz")
     def test_ping_timeout(self):
         bot = TelegramTools(token="123:ABC")
-        with patch("requests.get", side_effect=__import__("requests").exceptions.Timeout):
+        with patch(
+            "requests.get", side_effect=__import__("requests").exceptions.Timeout
+        ):
             sonuc = bot.ping()
             assert "zamani asimi" in sonuc.lower()
 
     @pytest.mark.skip(reason="test suite import sirasi nedeniyle kararsiz")
     def test_ping_connection_error(self):
         bot = TelegramTools(token="123:ABC")
-        with patch("requests.get", side_effect=__import__("requests").exceptions.ConnectionError):
+        with patch(
+            "requests.get",
+            side_effect=__import__("requests").exceptions.ConnectionError,
+        ):
             sonuc = bot.ping()
             assert "Baglanti kurulamadi" in sonuc
 
 
 # ── sohbet_bilgisi testleri ──────────────────────────────────────────────
+
 
 class TestSohbetBilgisi:
     def test_sohbet_bilgisi_basarili(self):
@@ -373,7 +438,12 @@ class TestSohbetBilgisi:
         mock_resp = MagicMock()
         mock_resp.json.return_value = {
             "ok": True,
-            "result": {"id": 123, "type": "private", "title": "", "username": "test_user"}
+            "result": {
+                "id": 123,
+                "type": "private",
+                "title": "",
+                "username": "test_user",
+            },
         }
         with patch("requests.post", return_value=mock_resp):
             bilgi = bot.sohbet_bilgisi("123")
@@ -389,6 +459,7 @@ class TestSohbetBilgisi:
 
 
 # ── mesaj_sil testleri ───────────────────────────────────────────────────
+
 
 class TestMesajSil:
     def test_mesaj_sil_basarili(self):
@@ -408,48 +479,71 @@ class TestMesajSil:
 
 # ── run() fonksiyon testleri ─────────────────────────────────────────────
 
+
 class TestRunFonksiyonu:
     def test_run_ping(self):
         """run() fonksiyonu ping işlemini çalıştırır."""
-        with patch("araclar_telegram.TelegramTools.ping", return_value="[TelegramTools] Baglanti basarili"):
+        with patch(
+            "araclar_telegram.TelegramTools.ping",
+            return_value="[TelegramTools] Baglanti basarili",
+        ):
             sonuc = run(islem="ping")
             assert "Baglanti basarili" in sonuc
 
     def test_run_gonder(self):
-        with patch("araclar_telegram.TelegramTools.mesaj_gonder", return_value="[TelegramTools] Mesaj gonderildi (ID: 1)"):
+        with patch(
+            "araclar_telegram.TelegramTools.mesaj_gonder",
+            return_value="[TelegramTools] Mesaj gonderildi (ID: 1)",
+        ):
             sonuc = run(islem="gonder", mesaj="test", chat_id="123")
             assert "Mesaj gonderildi" in sonuc
 
     def test_run_stream(self):
-        with patch("araclar_telegram.TelegramTools.stream_mesaj_gonder", return_value="[TelegramTools] Stream mesaj gonderildi (2 chunk)"):
+        with patch(
+            "araclar_telegram.TelegramTools.stream_mesaj_gonder",
+            return_value="[TelegramTools] Stream mesaj gonderildi (2 chunk)",
+        ):
             sonuc = run(islem="stream", mesaj="test", baslik="Baslik")
             assert "Stream mesaj" in sonuc
 
     def test_run_reaction(self):
-        with patch("araclar_telegram.TelegramTools.reaction_ekle", return_value="[TelegramTools] Reaction eklendi: 👍"):
+        with patch(
+            "araclar_telegram.TelegramTools.reaction_ekle",
+            return_value="[TelegramTools] Reaction eklendi: 👍",
+        ):
             sonuc = run(islem="reaction", mesaj_id=42, emoji="👍")
             assert "Reaction eklendi" in sonuc
 
     def test_run_oku(self):
         mock_mesajlar = [{"kimden": "Ali", "metin": "test", "tarih": 100}]
-        with patch("araclar_telegram.TelegramTools.mesaj_oku", return_value=mock_mesajlar):
+        with patch(
+            "araclar_telegram.TelegramTools.mesaj_oku", return_value=mock_mesajlar
+        ):
             sonuc = run(islem="oku", limit=5)
             assert "Ali" in sonuc
             assert "test" in sonuc
 
     def test_run_dosya_gonder(self):
-        with patch("araclar_telegram.TelegramTools.dosya_gonder", return_value="[TelegramTools] Dosya gonderildi (file_id: F123)"):
+        with patch(
+            "araclar_telegram.TelegramTools.dosya_gonder",
+            return_value="[TelegramTools] Dosya gonderildi (file_id: F123)",
+        ):
             sonuc = run(islem="dosya_gonder", dosya_yolu="test.txt")
             assert "Dosya gonderildi" in sonuc
 
     def test_run_bilgi(self):
         mock_bilgi = {"id": 123, "tip": "group", "baslik": "Test", "kullanici_adi": ""}
-        with patch("araclar_telegram.TelegramTools.sohbet_bilgisi", return_value=mock_bilgi):
+        with patch(
+            "araclar_telegram.TelegramTools.sohbet_bilgisi", return_value=mock_bilgi
+        ):
             sonuc = run(islem="bilgi", chat_id="123")
             assert "Test" in sonuc
 
     def test_run_varsayilan_ping(self):
         """islem belirtilmezse ping çalışır."""
-        with patch("araclar_telegram.TelegramTools.ping", return_value="[TelegramTools] Baglanti basarili"):
+        with patch(
+            "araclar_telegram.TelegramTools.ping",
+            return_value="[TelegramTools] Baglanti basarili",
+        ):
             sonuc = run()
             assert "Baglanti basarili" in sonuc

@@ -44,7 +44,16 @@ def _has_env(name: str) -> bool:
 def _get_backend() -> str:
     """Backend seçimi: REYMEN_WEB_BACKEND env var veya env var'dan otomatik."""
     configured = (os.getenv("REYMEN_WEB_BACKEND") or "").lower().strip()
-    if configured in ("parallel", "firecrawl", "tavily", "exa", "searxng", "brave-free", "ddgs", "xai"):
+    if configured in (
+        "parallel",
+        "firecrawl",
+        "tavily",
+        "exa",
+        "searxng",
+        "brave-free",
+        "ddgs",
+        "xai",
+    ):
         return configured
 
     backends = (
@@ -94,6 +103,7 @@ def _is_backend_available(backend: str) -> bool:
     if backend == "ddgs":
         try:
             import ddgs  # noqa: F401
+
             return True
         except ImportError:
             return False
@@ -104,8 +114,13 @@ def _is_backend_available(backend: str) -> bool:
 # LLM summarization — opsiyonel (auxiliary client yoksa atlanır)
 # ---------------------------------------------------------------------------
 
-async def _try_summarize(content: str, url: str = "", title: str = "",
-                          min_length: int = DEFAULT_MIN_LENGTH_FOR_SUMMARIZATION) -> Optional[str]:
+
+async def _try_summarize(
+    content: str,
+    url: str = "",
+    title: str = "",
+    min_length: int = DEFAULT_MIN_LENGTH_FOR_SUMMARIZATION,
+) -> Optional[str]:
     """LLM ile özetleme dene. auxiliary client yoksa None döner."""
     if len(content) < min_length:
         return None
@@ -115,6 +130,7 @@ async def _try_summarize(content: str, url: str = "", title: str = "",
     try:
         # Opsiyonel: auxiliary LLM client varsa kullan
         from reymen.auxiliary import async_web_extract_summarize
+
         return await async_web_extract_summarize(content, url, title)
     except ImportError:
         logger.debug("reymen.auxiliary mevcut değil, LLM özetleme atlanıyor")
@@ -123,13 +139,16 @@ async def _try_summarize(content: str, url: str = "", title: str = "",
         logger.warning("LLM summarization failed: %s", exc)
         truncated = content[:5000]
         if len(content) > 5000:
-            truncated += f"\n\n[Content truncated — first 5,000 of {len(content):,} chars]"
+            truncated += (
+                f"\n\n[Content truncated — first 5,000 of {len(content):,} chars]"
+            )
         return truncated
 
 
 # ---------------------------------------------------------------------------
 # Basit tool_error / tool_result yardımcıları
 # ---------------------------------------------------------------------------
+
 
 def tool_error(message: str, **extra) -> str:
     result = {"error": str(message)}
@@ -148,6 +167,7 @@ _debug = DebugSession("web_tools", env_var="WEB_TOOLS_DEBUG")
 # ---------------------------------------------------------------------------
 # Provider'ları yükle (ensure_web_plugins_loaded)
 # ---------------------------------------------------------------------------
+
 
 def _ensure_web_plugins_loaded() -> None:
     """Plugin'leri yükle — providers register olur. Idempotent."""
@@ -193,6 +213,7 @@ def _import_all_providers() -> None:
 # web_search_tool
 # ---------------------------------------------------------------------------
 
+
 def web_search_tool(query: str, limit: int = 5) -> str:
     """Web'de arama yap. Provider registry üzerinden dispatch eder.
 
@@ -213,7 +234,10 @@ def web_search_tool(query: str, limit: int = 5) -> str:
 
     try:
         _ensure_web_plugins_loaded()
-        from reymen.web_search_registry import get_active_search_provider, get_provider as _get_provider
+        from reymen.web_search_registry import (
+            get_active_search_provider,
+            get_provider as _get_provider,
+        )
 
         backend = _get_search_backend()
         provider = _get_provider(backend) if backend else None
@@ -224,10 +248,12 @@ def web_search_tool(query: str, limit: int = 5) -> str:
             response_data = {
                 "success": False,
                 "error": "No web search provider configured. Set FIRECRAWL_API_KEY "
-                         "or another search API key in .env",
+                "or another search API key in .env",
             }
         else:
-            logger.info("Web search via %s: '%s' (limit: %d)", provider.name, query, limit)
+            logger.info(
+                "Web search via %s: '%s' (limit: %d)", provider.name, query, limit
+            )
             response_data = provider.search(query, limit)
 
         debug_data["results_count"] = len(response_data.get("data", {}).get("web", []))
@@ -248,6 +274,7 @@ def web_search_tool(query: str, limit: int = 5) -> str:
 # ---------------------------------------------------------------------------
 # web_extract_tool
 # ---------------------------------------------------------------------------
+
 
 async def web_extract_tool(
     urls: List[str],
@@ -282,18 +309,23 @@ async def web_extract_tool(
             r"AIza[0-9A-Za-z_-]{35}|xox[bpras]-[0-9a-zA-Z-]{10,})"
         )
         from urllib.parse import unquote
+
         decoded = unquote(_url)
         if _secret_pattern.search(_url) or _secret_pattern.search(decoded):
-            return json.dumps({
-                "success": False,
-                "error": "Blocked: URL contains what appears to be an API key or token.",
-            })
+            return json.dumps(
+                {
+                    "success": False,
+                    "error": "Blocked: URL contains what appears to be an API key or token.",
+                }
+            )
         normalized_urls.append(normalize_url_for_request(_url))
 
     debug_data = {
-        "urls": normalized_urls, "format": format,
+        "urls": normalized_urls,
+        "format": format,
         "use_llm_processing": use_llm_processing,
-        "error": None, "pages_extracted": 0,
+        "error": None,
+        "pages_extracted": 0,
     }
 
     try:
@@ -304,42 +336,56 @@ async def web_extract_tool(
         ssrf_blocked: List[Dict[str, Any]] = []
         for url in normalized_urls:
             if not await async_is_safe_url(url):
-                ssrf_blocked.append({
-                    "url": url, "title": "", "content": "",
-                    "error": "Blocked: URL targets a private or internal network address",
-                })
+                ssrf_blocked.append(
+                    {
+                        "url": url,
+                        "title": "",
+                        "content": "",
+                        "error": "Blocked: URL targets a private or internal network address",
+                    }
+                )
             else:
                 safe_urls.append(url)
 
         results = []
         if safe_urls:
             _ensure_web_plugins_loaded()
-            from reymen.web_search_registry import get_active_extract_provider, get_provider as _get_provider
+            from reymen.web_search_registry import (
+                get_active_extract_provider,
+                get_provider as _get_provider,
+            )
 
             backend = _get_extract_backend()
             provider = _get_provider(backend) if backend else None
             if provider is None or not provider.supports_extract():
                 if provider is not None and not provider.supports_extract():
-                    return json.dumps({
-                        "success": False,
-                        "error": f"{provider.display_name} is search-only. "
-                                 f"Set extract to firecrawl, tavily, exa, or parallel.",
-                    })
+                    return json.dumps(
+                        {
+                            "success": False,
+                            "error": f"{provider.display_name} is search-only. "
+                            f"Set extract to firecrawl, tavily, exa, or parallel.",
+                        }
+                    )
                 provider = get_active_extract_provider()
                 if provider is None:
-                    return json.dumps({
-                        "success": False,
-                        "error": "No web extract provider configured. "
-                                 "Set FIRECRAWL_API_KEY or another extract API key.",
-                    })
+                    return json.dumps(
+                        {
+                            "success": False,
+                            "error": "No web extract provider configured. "
+                            "Set FIRECRAWL_API_KEY or another extract API key.",
+                        }
+                    )
 
             logger.info("Web extract via %s: %d URL(s)", provider.name, len(safe_urls))
 
             import inspect
+
             if inspect.iscoroutinefunction(provider.extract):
                 results = await provider.extract(safe_urls, format=format)
             else:
-                results = await asyncio.to_thread(provider.extract, safe_urls, format=format)
+                results = await asyncio.to_thread(
+                    provider.extract, safe_urls, format=format
+                )
 
         if ssrf_blocked:
             results = ssrf_blocked + results

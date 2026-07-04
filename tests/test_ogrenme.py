@@ -22,6 +22,7 @@ from src.core.ogrenme import (
 
 # ── Test Fixtures ─────────────────────────────────────────────
 
+
 @pytest.fixture(autouse=True)
 def _test_db(monkeypatch, tmp_path):
     """Her test ayri gecici DB kullansin."""
@@ -35,6 +36,7 @@ def _test_db(monkeypatch, tmp_path):
 
 
 # ── Imza Testleri ─────────────────────────────────────────────
+
 
 class TestImza:
     """imza_uret — exception'dan soyut imza olusturma."""
@@ -61,22 +63,28 @@ class TestImza:
 
 # ── Cozum Islemi Testleri ─────────────────────────────────────
 
+
 class TestCozumKaydetVeBul:
     """cozum_kaydet + cozum_bul entegrasyonu."""
 
     def test_kaydet_ve_bul(self):
         """Happy path: cozum kaydet, sonra bul."""
         imza = "test_imza_001"
-        cozum_kaydet(imza, "ValueError", "test hatasi",
-                     "cozum_kodu_ornek", "test.py", basarili=True)
+        cozum_kaydet(
+            imza,
+            "ValueError",
+            "test hatasi",
+            "cozum_kodu_ornek",
+            "test.py",
+            basarili=True,
+        )
         bulunan = cozum_bul(imza)
         assert bulunan == "cozum_kodu_ornek"
 
     def test_kaydet_basarisiz_bulunamaz(self):
         """Happy path: basarisiz kayit cozum_bul'da donmez."""
         imza = "test_imza_basarisiz"
-        cozum_kaydet(imza, "TypeError", "tip hatasi",
-                     "", "test.py", basarili=False)
+        cozum_kaydet(imza, "TypeError", "tip hatasi", "", "test.py", basarili=False)
         assert cozum_bul(imza) is None
 
     def test_gecersiz_imza_bul(self):
@@ -85,6 +93,7 @@ class TestCozumKaydetVeBul:
 
 
 # ── Yardimci Fonksiyon Testleri ───────────────────────────────
+
 
 class TestYardimcilar:
     """ttl_temizle, istatistik, backoff_bekle."""
@@ -112,6 +121,7 @@ class TestYardimcilar:
 
 
 # ── Ogrenme Dongusu Testleri ──────────────────────────────────
+
 
 class TestOgrenmeDongusu:
     """OgrenmeDongusu — ogren metodu."""

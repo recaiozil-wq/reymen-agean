@@ -160,11 +160,13 @@ class MemoryAgent:
             content: Mesaj metni
         """
         with self._lock:
-            self.messages.append({
-                "role": role,
-                "content": content,
-                "timestamp": datetime.now().isoformat(),
-            })
+            self.messages.append(
+                {
+                    "role": role,
+                    "content": content,
+                    "timestamp": datetime.now().isoformat(),
+                }
+            )
             self._maybe_summarize()
             self._trim_context()
 
@@ -190,8 +192,7 @@ class MemoryAgent:
                     relevant = self._vector_store.similarity_search(query, k=3)
                     if relevant:
                         contexts = "\n".join(
-                            f"- {doc.page_content[:200]}"
-                            for doc in relevant
+                            f"- {doc.page_content[:200]}" for doc in relevant
                         )
                         parts.append(f"[ILGILI HAFIZA:\n{contexts}\n]")
                 except Exception as e:
@@ -199,10 +200,9 @@ class MemoryAgent:
 
             # Son mesajlar
             if self.messages:
-                history = self.messages[-(self.context_length):]
+                history = self.messages[-(self.context_length) :]
                 history_text = "\n".join(
-                    f"{m['role']}: {m['content']}"
-                    for m in history
+                    f"{m['role']}: {m['content']}" for m in history
                 )
                 parts.append(f"[KONUSMA GECMISI:\n{history_text}\n]")
 
@@ -220,10 +220,7 @@ class MemoryAgent:
         if not to_summarize:
             return
 
-        text = "\n".join(
-            f"{m['role']}: {m['content'][:500]}"
-            for m in to_summarize
-        )
+        text = "\n".join(f"{m['role']}: {m['content'][:500]}" for m in to_summarize)
 
         try:
             summary_prompt = (
@@ -232,7 +229,7 @@ class MemoryAgent:
             summary = self.complete(summary_prompt)
             self.summary = summary[:500]
             # Ozetlenen mesajlari temizle
-            self.messages = self.messages[len(to_summarize):]
+            self.messages = self.messages[len(to_summarize) :]
             logger.info(f"Hafiza ozetlendi: {len(to_summarize)} mesaj -> 1 ozet")
         except Exception as e:
             logger.warning(f"Ozetleme basarisiz: {e}")
@@ -240,7 +237,7 @@ class MemoryAgent:
     def _trim_context(self):
         """Context penceresini context_length ile sinirla."""
         if len(self.messages) > self.context_length * 2:
-            self.messages = self.messages[-(self.context_length):]
+            self.messages = self.messages[-(self.context_length) :]
 
     # ── Kaydet/Yukle ─────────────────────────
 
@@ -265,9 +262,7 @@ class MemoryAgent:
         with self._lock:
             try:
                 if self._memory_file.exists():
-                    data = json.loads(
-                        self._memory_file.read_text(encoding="utf-8")
-                    )
+                    data = json.loads(self._memory_file.read_text(encoding="utf-8"))
                     self.messages = data.get("messages", [])
                     self.summary = data.get("summary", "")
                     logger.info(

@@ -49,7 +49,7 @@ Her degisiklik sonrasi:
 5. Cron job her saat basi kontrol eder
 
 Otonom zincir:
-    Kod degisikligi → watchdog algilar (30sn) → ortak_komut.guncelle() 
+    Kod degisikligi → watchdog algilar (30sn) → ortak_komut.guncelle()
     → durum.json yazilir → tum botlar ayni veriyi okur
 
 Önceliklendir: kullanıcının seni düzeltmesini veya hatırlatmasını engelleyecek bilgiler. Kullanıcı tercihleri ve tekrarlayan düzeltmeler, prosedürel görev detaylarından daha değerlidir.

@@ -107,8 +107,10 @@ def load_website_blocklist(config_path: Optional[Path] = None) -> Dict[str, Any]
     now = time.monotonic()
     if config_path is None:
         with _cache_lock:
-            if (_cached_policy is not None
-                    and (now - _cached_policy_time) < _CACHE_TTL_SECONDS):
+            if (
+                _cached_policy is not None
+                and (now - _cached_policy_time) < _CACHE_TTL_SECONDS
+            ):
                 return _cached_policy
     config_path = config_path or _get_default_config_path()
     policy = _load_policy_config(config_path)
@@ -169,7 +171,9 @@ def _extract_host_from_urlish(url: str) -> str:
     return ""
 
 
-def check_website_access(url: str, config_path: Optional[Path] = None) -> Optional[Dict[str, str]]:
+def check_website_access(
+    url: str, config_path: Optional[Path] = None
+) -> Optional[Dict[str, str]]:
     if config_path is None:
         with _cache_lock:
             if _cached_policy is not None and not _cached_policy.get("enabled"):

@@ -84,9 +84,9 @@ def test_install_sh_clears_unmerged_index_then_stashes(tmp_path: Path) -> None:
     _make_unmerged_repo(repo)
 
     # Sanity: this is exactly the state that breaks `git stash` / `git checkout`.
-    assert _git(repo, "ls-files", "--unmerged").stdout.strip(), (
-        "test setup failed to produce an unmerged index"
-    )
+    assert _git(
+        repo, "ls-files", "--unmerged"
+    ).stdout.strip(), "test setup failed to produce an unmerged index"
 
     block = _extract_autostash_block()
     script = (
@@ -109,28 +109,28 @@ def test_install_sh_clears_unmerged_index_then_stashes(tmp_path: Path) -> None:
     assert "Clearing unmerged index entries" in res.stdout
 
     # The conflict state is gone ...
-    assert _git(repo, "ls-files", "--unmerged").stdout.strip() == "", (
-        "unmerged entries should have been cleared"
-    )
+    assert (
+        _git(repo, "ls-files", "--unmerged").stdout.strip() == ""
+    ), "unmerged entries should have been cleared"
     # ... and the local changes were preserved in a stash, not discarded.
-    assert _git(repo, "stash", "list").stdout.strip(), (
-        "local changes should be preserved in a stash"
-    )
+    assert _git(
+        repo, "stash", "list"
+    ).stdout.strip(), "local changes should be preserved in a stash"
 
 
 def test_install_ps1_clears_unmerged_index_before_stash() -> None:
     """install.ps1 must clear an unmerged index before stash/checkout, and do
     so *before* the stash push (order matters — the fix is a no-op otherwise)."""
     text = INSTALL_PS1.read_text()
-    assert "ls-files --unmerged" in text, (
-        "install.ps1 must detect an unmerged index before updating"
-    )
+    assert (
+        "ls-files --unmerged" in text
+    ), "install.ps1 must detect an unmerged index before updating"
     idx_unmerged = text.index("ls-files --unmerged")
     idx_reset = text.index("reset -q", idx_unmerged)
     idx_stash = text.index("stash push --include-untracked")
-    assert idx_unmerged < idx_stash, (
-        "the unmerged-index clear must run before `git stash push`"
-    )
+    assert (
+        idx_unmerged < idx_stash
+    ), "the unmerged-index clear must run before `git stash push`"
     assert idx_reset < idx_stash, "`git reset` must run before `git stash push`"
 
 

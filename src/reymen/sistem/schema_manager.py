@@ -86,6 +86,7 @@ def durum_text() -> str:
         if db_yol.exists():
             try:
                 import sqlite3
+
                 con = sqlite3.connect(str(db_yol))
                 versiyon = con.execute("PRAGMA user_version").fetchone()[0]
                 con.close()

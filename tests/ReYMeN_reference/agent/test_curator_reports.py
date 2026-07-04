@@ -25,10 +25,13 @@ def curator_env(tmp_path, monkeypatch):
 
     import importlib
     import ReYMeN_constants
+
     importlib.reload(ReYMeN_constants)
     from agent import curator
+
     importlib.reload(curator)
     from tools import skill_usage
+
     importlib.reload(skill_usage)
     yield {"home": home, "curator": curator, "skill_usage": skill_usage}
 
@@ -117,10 +120,20 @@ def test_run_json_has_expected_shape(curator_env):
 
     # top-level shape
     for k in (
-        "started_at", "duration_seconds", "model", "provider",
-        "auto_transitions", "counts", "tool_call_counts",
-        "archived", "added", "state_transitions",
-        "llm_final", "llm_summary", "llm_error", "tool_calls",
+        "started_at",
+        "duration_seconds",
+        "model",
+        "provider",
+        "auto_transitions",
+        "counts",
+        "tool_call_counts",
+        "archived",
+        "added",
+        "state_transitions",
+        "llm_final",
+        "llm_summary",
+        "llm_error",
+        "tool_calls",
     ):
         assert k in payload, f"missing key: {k}"
 
@@ -161,12 +174,14 @@ def test_report_md_is_human_readable(curator_env):
                 # write_file under foo-umbrella referencing foo.
                 {
                     "name": "skill_manage",
-                    "arguments": json.dumps({
-                        "action": "write_file",
-                        "name": "foo-umbrella",
-                        "file_path": "references/foo.md",
-                        "file_content": "# foo\nContent absorbed from the old foo skill.\n",
-                    }),
+                    "arguments": json.dumps(
+                        {
+                            "action": "write_file",
+                            "name": "foo-umbrella",
+                            "file_path": "references/foo.md",
+                            "file_content": "# foo\nContent absorbed from the old foo skill.\n",
+                        }
+                    ),
                 },
             ],
         ),
@@ -293,6 +308,7 @@ def curator_env_with_cron(curator_env, monkeypatch):
 
     import importlib
     import cron.jobs as jobs_mod
+
     importlib.reload(jobs_mod)
     monkeypatch.setattr(jobs_mod, "ReYMeN_DIR", home)
     monkeypatch.setattr(jobs_mod, "CRON_DIR", home / "cron")
@@ -334,12 +350,14 @@ def test_curator_rewrites_cron_skills_when_skill_consolidated(curator_env_with_c
             tool_calls=[
                 {
                     "name": "skill_manage",
-                    "arguments": json.dumps({
-                        "action": "write_file",
-                        "name": "foo-umbrella",
-                        "file_path": "references/foo.md",
-                        "file_content": "from foo",
-                    }),
+                    "arguments": json.dumps(
+                        {
+                            "action": "write_file",
+                            "name": "foo-umbrella",
+                            "file_path": "references/foo.md",
+                            "file_content": "from foo",
+                        }
+                    ),
                 },
             ],
         ),

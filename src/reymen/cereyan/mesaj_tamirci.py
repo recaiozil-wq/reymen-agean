@@ -19,7 +19,9 @@ from typing import Any, Dict, List, Optional
 log = logging.getLogger("conversation_loop")
 
 # Corrupted tool call arguments için eklenen işaret
-_BOZUK_ARGUMAN_ISARETI = "[Uyarı: orijinal araç çağrısı argümanları bozuktu — boş {} kullanıldı]"
+_BOZUK_ARGUMAN_ISARETI = (
+    "[Uyarı: orijinal araç çağrısı argümanları bozuktu — boş {} kullanıldı]"
+)
 
 
 def arac_cagri_argumanlarini_temizle(
@@ -171,7 +173,7 @@ def mesaj_siralamasi_tamir_et(mesajlar: List[Dict]) -> int:
         rol = msg.get("role")
         if rol == "assistant":
             bilinen_arac_idleri = set()
-            for tc in (msg.get("tool_calls") or []):
+            for tc in msg.get("tool_calls") or []:
                 tc_id = tc.get("id") if isinstance(tc, dict) else None
                 if tc_id:
                     bilinen_arac_idleri.add(tc_id)
@@ -253,6 +255,8 @@ def surrogate_karakterleri_temizle(metin: str) -> str:
     if not isinstance(metin, str):
         return metin
     try:
-        return metin.encode("utf-8", errors="surrogatepass").decode("utf-8", errors="replace")
+        return metin.encode("utf-8", errors="surrogatepass").decode(
+            "utf-8", errors="replace"
+        )
     except (UnicodeEncodeError, UnicodeDecodeError):
         return metin.encode("ascii", errors="replace").decode("ascii")

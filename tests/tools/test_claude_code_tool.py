@@ -80,7 +80,9 @@ def test_claude_calistir_nonzero(mock_run):
             assert "Hata" in sonuc or "hata" in sonuc
 
 
-@patch("tools.claude_code_tool.subprocess.run", side_effect=Exception("Beklenmeyen hata"))
+@patch(
+    "tools.claude_code_tool.subprocess.run", side_effect=Exception("Beklenmeyen hata")
+)
 def test_claude_calistir_exception(mock_run):
     with patch("tools.claude_code_tool._CLAUDE_EXE", "/usr/bin/claude"):
         with patch("pathlib.Path.exists", return_value=True):

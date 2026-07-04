@@ -29,6 +29,7 @@ def cron_env(tmp_path, monkeypatch):
     monkeypatch.setenv("ReYMeN_HOME", str(ReYMeN_home))
 
     import cron.jobs as jobs_mod
+
     monkeypatch.setattr(jobs_mod, "ReYMeN_DIR", ReYMeN_home)
     monkeypatch.setattr(jobs_mod, "CRON_DIR", ReYMeN_home / "cron")
     monkeypatch.setattr(jobs_mod, "JOBS_FILE", ReYMeN_home / "cron" / "jobs.json")

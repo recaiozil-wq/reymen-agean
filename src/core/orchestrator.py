@@ -6,22 +6,26 @@ from src.core.model_adapter import get_active_adapter
 MAX_RETRIES = 3
 adapter = None  # lazy init
 
+
 def _get_adapter():
     global adapter
     if adapter is None:
         adapter = get_active_adapter()
     return adapter
 
+
 def run_script(path: str) -> tuple[bool, str]:
     """Python script çalıştır. Döner: (başarılı_mı, çıktı/hata)"""
     try:
-        r = subprocess.run([sys.executable, path],
-                           capture_output=True, text=True, timeout=120)
+        r = subprocess.run(
+            [sys.executable, path], capture_output=True, text=True, timeout=120
+        )
         return r.returncode == 0, r.stdout if r.returncode == 0 else r.stderr
     except subprocess.TimeoutExpired:
         return False, "TIMEOUT: 120s aşıldı"
     except Exception as e:
         return False, str(e)
+
 
 def ask_model_to_fix(code: str, error: str) -> str:
     """LLM'e hata mesajını gönder, düzeltilmiş kod al"""
@@ -39,6 +43,7 @@ Görevi:
 3. Sadece çalışan Python kodunu döndür — açıklama yok, markdown yok
 """
     return _get_adapter().complete(prompt)
+
 
 def solve_step(step_name: str, script_path: str) -> bool:
     """Tek adımı çöz. Hata varsa max 3 kere dene."""
@@ -70,6 +75,7 @@ def solve_step(step_name: str, script_path: str) -> bool:
     _log("logs/fail_log.jsonl", step_name, MAX_RETRIES, False, output[:400])
     return False
 
+
 def solve_all(steps: list[tuple[str, str]]) -> dict:
     """Tüm adımları sırayla çöz. Döner: {step_name: success_bool}"""
     results = {}
@@ -77,14 +83,22 @@ def solve_all(steps: list[tuple[str, str]]) -> dict:
         results[name] = solve_step(name, path)
     return results
 
+
 def _log(file: str, step, attempt, success, output):
     Path(file).parent.mkdir(exist_ok=True)
-    entry = {"ts": datetime.now().isoformat(), "step": step,
-             "attempt": attempt, "ok": success, "tail": output}
+    entry = {
+        "ts": datetime.now().isoformat(),
+        "step": step,
+        "attempt": attempt,
+        "ok": success,
+        "tail": output,
+    }
     with open(file, "a", encoding="utf-8") as f:
         f.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
+
 # ── Doğrudan hata çözümü (motor.py'den çağrılacak) ──────────
+
 
 def coz_hata(hata: str, kod: str = "", ad: str = "acil_fix") -> str:
     """Herhangi bir hatayı LLM'e sor, düzeltilmiş kod al.

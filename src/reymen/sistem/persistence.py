@@ -18,68 +18,71 @@ import time
 from pathlib import Path
 from typing import Optional
 import logging
+
 logger = logging.getLogger(__name__)
 
-DEPO_KOKU   = Path(__file__).parent / ".ReYMeN" / "security"
+DEPO_KOKU = Path(__file__).parent / ".ReYMeN" / "security"
 OLAY_DOSYASI = DEPO_KOKU / "events.jsonl"
 DENETIM_YOLU = DEPO_KOKU / "audit_trail.jsonl"
-PROFIL_YOLU  = DEPO_KOKU / "risk_profiles.json"
+PROFIL_YOLU = DEPO_KOKU / "risk_profiles.json"
 
 DEPO_KOKU.mkdir(parents=True, exist_ok=True)
 
 
 # ── Veri Modelleri ────────────────────────────────────────────────────
 
+
 class GuvenlikOlayi:
     """Tek bir güvenlik olayı kaydı."""
 
-    SEVIYE_BILGI   = "INFO"
-    SEVIYE_UYARI   = "WARN"
-    SEVIYE_TEHDIT  = "THREAT"
-    SEVIYE_KRITIK  = "CRITICAL"
+    SEVIYE_BILGI = "INFO"
+    SEVIYE_UYARI = "WARN"
+    SEVIYE_TEHDIT = "THREAT"
+    SEVIYE_KRITIK = "CRITICAL"
 
     def __init__(
         self,
         kategori: str,
         aciklama: str,
-        seviye: str         = "INFO",
-        kaynak: str         = "",
-        detay: dict         = None,
+        seviye: str = "INFO",
+        kaynak: str = "",
+        detay: dict = None,
     ):
-        self.id         = f"{int(time.time() * 1000)}"
-        self.zaman      = time.strftime("%Y-%m-%dT%H:%M:%S")
-        self.kategori   = kategori
-        self.aciklama   = aciklama
-        self.seviye     = seviye
-        self.kaynak     = kaynak
-        self.detay      = detay or {}
+        self.id = f"{int(time.time() * 1000)}"
+        self.zaman = time.strftime("%Y-%m-%dT%H:%M:%S")
+        self.kategori = kategori
+        self.aciklama = aciklama
+        self.seviye = seviye
+        self.kaynak = kaynak
+        self.detay = detay or {}
 
     def to_dict(self) -> dict:
         return {
-            "id":        self.id,
-            "zaman":     self.zaman,
-            "kategori":  self.kategori,
-            "aciklama":  self.aciklama,
-            "seviye":    self.seviye,
-            "kaynak":    self.kaynak,
-            "detay":     self.detay,
+            "id": self.id,
+            "zaman": self.zaman,
+            "kategori": self.kategori,
+            "aciklama": self.aciklama,
+            "seviye": self.seviye,
+            "kaynak": self.kaynak,
+            "detay": self.detay,
         }
 
     @classmethod
     def from_dict(cls, veri: dict) -> "GuvenlikOlayi":
         o = cls(
-            kategori  = veri.get("kategori", ""),
-            aciklama  = veri.get("aciklama", ""),
-            seviye    = veri.get("seviye", "INFO"),
-            kaynak    = veri.get("kaynak", ""),
-            detay     = veri.get("detay", {}),
+            kategori=veri.get("kategori", ""),
+            aciklama=veri.get("aciklama", ""),
+            seviye=veri.get("seviye", "INFO"),
+            kaynak=veri.get("kaynak", ""),
+            detay=veri.get("detay", {}),
         )
-        o.id    = veri.get("id", o.id)
+        o.id = veri.get("id", o.id)
         o.zaman = veri.get("zaman", o.zaman)
         return o
 
 
 # ── Olay Deposu ───────────────────────────────────────────────────────
+
 
 class KalicilikDeposu:
     """JSONL tabanlı güvenlik olayı deposu."""
@@ -94,18 +97,16 @@ class KalicilikDeposu:
 
     def oku(
         self,
-        son_n: int          = 100,
-        kategori: str       = "",
-        min_seviye: str     = "",
-        kaynak: str         = "",
+        son_n: int = 100,
+        kategori: str = "",
+        min_seviye: str = "",
+        kaynak: str = "",
     ) -> list[GuvenlikOlayi]:
         """Olayları filtreli oku."""
         if not self._dosya.exists():
             return []
 
-        seviye_siralama = {
-            "INFO": 0, "WARN": 1, "THREAT": 2, "CRITICAL": 3
-        }
+        seviye_siralama = {"INFO": 0, "WARN": 1, "THREAT": 2, "CRITICAL": 3}
         min_s = seviye_siralama.get(min_seviye, 0)
 
         olaylar = []
@@ -162,12 +163,13 @@ class KalicilikDeposu:
         for o in olaylar:
             sayilar[o.seviye] = sayilar.get(o.seviye, 0) + 1
         return {
-            "toplam":   len(olaylar),
+            "toplam": len(olaylar),
             "seviyeler": sayilar,
         }
 
 
 # ── Risk Profili ──────────────────────────────────────────────────────
+
 
 class RiskProfili:
     """Kaynak başına risk skoru takibi."""
@@ -196,13 +198,15 @@ class RiskProfili:
 
         if kaynak not in self._profiller:
             self._profiller[kaynak] = {
-                "skor": 0, "olay_sayisi": 0,
-                "son_olay": "", "tehdit_sayisi": 0,
+                "skor": 0,
+                "olay_sayisi": 0,
+                "son_olay": "",
+                "tehdit_sayisi": 0,
             }
         p = self._profiller[kaynak]
-        p["skor"]        = min(p["skor"] + puan, 1000)
+        p["skor"] = min(p["skor"] + puan, 1000)
         p["olay_sayisi"] += 1
-        p["son_olay"]    = time.strftime("%Y-%m-%dT%H:%M:%S")
+        p["son_olay"] = time.strftime("%Y-%m-%dT%H:%M:%S")
         if olay_seviyesi in ("THREAT", "CRITICAL"):
             p["tehdit_sayisi"] += 1
         self._kaydet()
@@ -223,12 +227,15 @@ class RiskProfili:
 
     def rapor(self) -> str:
         satirlar = ["Risk Profilleri:"]
-        for k, v in sorted(self._profiller.items(), key=lambda x: -x[1].get("skor", 0))[:20]:
+        for k, v in sorted(self._profiller.items(), key=lambda x: -x[1].get("skor", 0))[
+            :20
+        ]:
             satirlar.append(f"  {k:<30} skor={v['skor']:>4}  olay={v['olay_sayisi']}")
         return "\n".join(satirlar)
 
 
 # ── Denetim İzi ───────────────────────────────────────────────────────
+
 
 class AuditTrail:
     """Değişmez denetim izi — sadece ekleme yapılabilir."""
@@ -239,18 +246,18 @@ class AuditTrail:
     def yaz(
         self,
         islem: str,
-        kaynak: str  = "",
-        hedef: str   = "",
-        sonuc: str   = "OK",
-        detay: dict  = None,
+        kaynak: str = "",
+        hedef: str = "",
+        sonuc: str = "OK",
+        detay: dict = None,
     ):
         kayit = {
-            "ts":     time.strftime("%Y-%m-%dT%H:%M:%S"),
-            "islem":  islem,
+            "ts": time.strftime("%Y-%m-%dT%H:%M:%S"),
+            "islem": islem,
             "kaynak": kaynak,
-            "hedef":  hedef,
-            "sonuc":  sonuc,
-            "detay":  detay or {},
+            "hedef": hedef,
+            "sonuc": sonuc,
+            "detay": detay or {},
         }
         with open(self._dosya, "a", encoding="utf-8") as f:
             f.write(json.dumps(kayit, ensure_ascii=False) + "\n")
@@ -275,11 +282,12 @@ class AuditTrail:
 
 # ── Birleşik Arayüz ───────────────────────────────────────────────────
 
+
 class GuvenlikKalicilik:
     """Tüm kalıcılık bileşenlerini yöneten tek sınıf."""
 
     def __init__(self):
-        self.depo   = KalicilikDeposu()
+        self.depo = KalicilikDeposu()
         self.profil = RiskProfili()
         self.denetim = AuditTrail()
 
@@ -287,9 +295,9 @@ class GuvenlikKalicilik:
         self,
         kategori: str,
         aciklama: str,
-        seviye: str   = "INFO",
-        kaynak: str   = "",
-        detay: dict   = None,
+        seviye: str = "INFO",
+        kaynak: str = "",
+        detay: dict = None,
     ) -> GuvenlikOlayi:
         """Güvenlik olayı kaydet, risk profilini güncelle, denetim izine yaz."""
         olay = GuvenlikOlayi(kategori, aciklama, seviye, kaynak, detay)
@@ -297,17 +305,21 @@ class GuvenlikKalicilik:
         if kaynak:
             self.profil.guncelle(kaynak, seviye)
         self.denetim.yaz(
-            islem  = f"GUVENLIK_{kategori.upper()}",
-            kaynak = kaynak,
-            sonuc  = seviye,
-            detay  = {"aciklama": aciklama[:200]},
+            islem=f"GUVENLIK_{kategori.upper()}",
+            kaynak=kaynak,
+            sonuc=seviye,
+            detay={"aciklama": aciklama[:200]},
         )
         return olay
 
-    def tehdit_kaydet(self, kategori: str, aciklama: str, kaynak: str = "", detay: dict = None):
+    def tehdit_kaydet(
+        self, kategori: str, aciklama: str, kaynak: str = "", detay: dict = None
+    ):
         return self.olay_kaydet(kategori, aciklama, "THREAT", kaynak, detay)
 
-    def kritik_kaydet(self, kategori: str, aciklama: str, kaynak: str = "", detay: dict = None):
+    def kritik_kaydet(
+        self, kategori: str, aciklama: str, kaynak: str = "", detay: dict = None
+    ):
         return self.olay_kaydet(kategori, aciklama, "CRITICAL", kaynak, detay)
 
     def ozet(self) -> str:
@@ -356,7 +368,9 @@ def motor_kaydet(motor):
 if __name__ == "__main__":
     gk = GuvenlikKalicilik()
     gk.olay_kaydet("test", "Başlatma testi", "INFO", kaynak="persistence.py")
-    gk.tehdit_kaydet("prompt_injection", "Şüpheli girdi tespit edildi", kaynak="kullanici_1")
+    gk.tehdit_kaydet(
+        "prompt_injection", "Şüpheli girdi tespit edildi", kaynak="kullanici_1"
+    )
     print(gk.ozet())
     print("\nDenetim İzi (son 5):")
     for k in gk.denetim.son(5):

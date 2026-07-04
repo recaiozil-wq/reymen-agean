@@ -78,7 +78,9 @@ class PluginManager:
 
             logger.info(
                 "[Plugin] Config: aktif=%s, dizin=%s, oto_yukle=%s",
-                self._aktif, self._dizin, self._oto_yukle,
+                self._aktif,
+                self._dizin,
+                self._oto_yukle,
             )
 
             # Aktif plugin listesini de oku (opsiyonel)
@@ -143,9 +145,7 @@ class PluginManager:
             try:
                 instance.on_load()
             except Exception as _e:
-                logger.warning(
-                    "[Plugin] '%s'.on_load() hatasi: %s", ad, _e
-                )
+                logger.warning("[Plugin] '%s'.on_load() hatasi: %s", ad, _e)
 
             self._pluginler[ad] = instance
             self._context[ad] = {}
@@ -155,7 +155,9 @@ class PluginManager:
         except Exception as e:
             logger.error(
                 "[Plugin] '%s' yukleme hatasi: %s\n%s",
-                ad, e, traceback.format_exc(),
+                ad,
+                e,
+                traceback.format_exc(),
             )
             sys.modules.pop(ad, None)
             return None
@@ -241,17 +243,15 @@ class PluginManager:
             metod = getattr(plugin, hook_name, None)
             if metod is not None and callable(metod):
                 # PluginBase'in no-op implementasyonunu atla
-                if getattr(type(plugin).__dict__.get(hook_name), "__func__", None) is getattr(
-                    PluginBase.__dict__.get(hook_name), "__func__", None
-                ):
+                if getattr(
+                    type(plugin).__dict__.get(hook_name), "__func__", None
+                ) is getattr(PluginBase.__dict__.get(hook_name), "__func__", None):
                     # Metod override edilmemiş (PluginBase'deki no-op)
                     continue
                 callables.append(metod)
         return callables
 
-    def hook_cagir(
-        self, hook_name: str, **kwargs: Any
-    ) -> None:
+    def hook_cagir(self, hook_name: str, **kwargs: Any) -> None:
         """Belirtilen hook'u tüm plugin'lerde çağır.
 
         Her plugin try/except ile izole çalıştırılır. Bir plugin'deki
@@ -273,7 +273,9 @@ class PluginManager:
             base_metod = getattr(PluginBase, hook_name, None)
             if base_metod is not None:
                 # Aynı fonksiyon referansı mı? (override edilmemiş)
-                if getattr(metod, "__func__", None) is getattr(base_metod, "__func__", None):
+                if getattr(metod, "__func__", None) is getattr(
+                    base_metod, "__func__", None
+                ):
                     continue
 
             try:
@@ -281,12 +283,12 @@ class PluginManager:
             except Exception as e:
                 logger.warning(
                     "[Plugin] '%s'.%s() hatasi: %s",
-                    ad, hook_name, e,
+                    ad,
+                    hook_name,
+                    e,
                 )
 
-    def hook_cagir_mesaj(
-        self, hook_name: str, message: str, context: dict
-    ) -> str:
+    def hook_cagir_mesaj(self, hook_name: str, message: str, context: dict) -> str:
         """on_message türü hook'lar: mesaj döndürebilir."""
         if not self._aktif:
             return message
@@ -298,7 +300,9 @@ class PluginManager:
                 continue
             base_metod = getattr(PluginBase, hook_name, None)
             if base_metod is not None:
-                if getattr(metod, "__func__", None) is getattr(base_metod, "__func__", None):
+                if getattr(metod, "__func__", None) is getattr(
+                    base_metod, "__func__", None
+                ):
                     continue
             try:
                 sonuc = metod(guncel, context)
@@ -306,13 +310,14 @@ class PluginManager:
                     guncel = sonuc
             except Exception as e:
                 logger.warning(
-                    "[Plugin] '%s'.%s() hatasi: %s", ad, hook_name, e,
+                    "[Plugin] '%s'.%s() hatasi: %s",
+                    ad,
+                    hook_name,
+                    e,
                 )
         return guncel
 
-    def hook_cagir_pre_llm(
-        self, messages: list, context: dict
-    ) -> Tuple[list, dict]:
+    def hook_cagir_pre_llm(self, messages: list, context: dict) -> Tuple[list, dict]:
         """pre_llm_call hook'larını zincirleme çağır."""
         if not self._aktif:
             return messages, context
@@ -325,7 +330,9 @@ class PluginManager:
                 continue
             base_metod = getattr(PluginBase, "pre_llm_call", None)
             if base_metod is not None:
-                if getattr(metod, "__func__", None) is getattr(base_metod, "__func__", None):
+                if getattr(metod, "__func__", None) is getattr(
+                    base_metod, "__func__", None
+                ):
                     continue
             try:
                 yeni_msgs, yeni_ctx = metod(guncel_msgs, guncel_ctx)
@@ -335,13 +342,13 @@ class PluginManager:
                     guncel_ctx = yeni_ctx
             except Exception as e:
                 logger.warning(
-                    "[Plugin] '%s'.pre_llm_call() hatasi: %s", ad, e,
+                    "[Plugin] '%s'.pre_llm_call() hatasi: %s",
+                    ad,
+                    e,
                 )
         return guncel_msgs, guncel_ctx
 
-    def hook_cagir_post_llm(
-        self, response: dict, context: dict
-    ) -> dict:
+    def hook_cagir_post_llm(self, response: dict, context: dict) -> dict:
         """post_llm_call hook'larını zincirleme çağır."""
         if not self._aktif:
             return response
@@ -353,7 +360,9 @@ class PluginManager:
                 continue
             base_metod = getattr(PluginBase, "post_llm_call", None)
             if base_metod is not None:
-                if getattr(metod, "__func__", None) is getattr(base_metod, "__func__", None):
+                if getattr(metod, "__func__", None) is getattr(
+                    base_metod, "__func__", None
+                ):
                     continue
             try:
                 sonuc = metod(guncel_resp, context)
@@ -361,7 +370,9 @@ class PluginManager:
                     guncel_resp = sonuc
             except Exception as e:
                 logger.warning(
-                    "[Plugin] '%s'.post_llm_call() hatasi: %s", ad, e,
+                    "[Plugin] '%s'.post_llm_call() hatasi: %s",
+                    ad,
+                    e,
                 )
         return guncel_resp
 
@@ -407,6 +418,7 @@ def plugin_manager_al() -> PluginManager:
 
 
 # ── Kısayol fonksiyonları ─────────────────────────────────────────────
+
 
 def plugin_yukle(ad: str, path: str) -> Optional[PluginBase]:
     """Kısayol: singleton üzerinden plugin yükle."""

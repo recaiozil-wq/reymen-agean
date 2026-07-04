@@ -18,6 +18,7 @@ The s6-overlay rework moved bootstrap from docker/entrypoint.sh (now a shim) to
 docker/stage2-hook.sh, installed as /etc/cont-init.d/01-ReYMeN-setup. This test
 targets that location.
 """
+
 from __future__ import annotations
 
 import os
@@ -48,9 +49,9 @@ def _toplevel_chown_loop(text: str) -> str:
     )
     assert m, "stage2-hook.sh must contain the top-level-file chown for-loop (#35098)"
     block = m.group(1)
-    assert 'chown ReYMeN:ReYMeN "$ReYMeN_HOME/$f"' in block, (
-        "the top-level-file loop must chown each allowlisted file to ReYMeN"
-    )
+    assert (
+        'chown ReYMeN:ReYMeN "$ReYMeN_HOME/$f"' in block
+    ), "the top-level-file loop must chown each allowlisted file to ReYMeN"
     return block
 
 
@@ -58,16 +59,18 @@ def test_toplevel_chown_loop_present(stage2_text: str) -> None:
     block = _toplevel_chown_loop(stage2_text)
     # The reported-broken files must be covered.
     for required in ("auth.json", "state.db", "gateway.lock", "gateway_state.json"):
-        assert required in block, (
-            f"top-level chown allowlist must include {required!r} (#35098)"
-        )
+        assert (
+            required in block
+        ), f"top-level chown allowlist must include {required!r} (#35098)"
 
 
 def test_no_blanket_find_user_root_sweep(stage2_text: str) -> None:
     """The fix must NOT reintroduce a blanket `find … -user root` chown of
     $ReYMeN_HOME contents — that would clobber host-owned files in a bind mount
     (#19788 / PR #19795)."""
-    assert not re.search(r"find\s+\"?\$\{?ReYMeN_HOME\}?\"?[^\n]*-user\s+root", stage2_text), (
+    assert not re.search(
+        r"find\s+\"?\$\{?ReYMeN_HOME\}?\"?[^\n]*-user\s+root", stage2_text
+    ), (
         "stage2-hook.sh must not blanket-chown root-owned files under "
         "$ReYMeN_HOME via `find -user root`; use the targeted allowlist instead "
         "so host-owned bind-mounted files are preserved (#19788, #19795)."
@@ -126,9 +129,9 @@ def test_loop_skips_nonallowlisted_host_file(stage2_text: str) -> None:
     """A file NOT on the allowlist (e.g. a host-owned file in a bind mount) must
     never be chowned, even if present."""
     touched = _run_loop(stage2_text, ["auth.json"])
-    assert "host_secret.json" not in touched, (
-        "the allowlist loop must not touch non-allowlisted files (#19788)"
-    )
+    assert (
+        "host_secret.json" not in touched
+    ), "the allowlist loop must not touch non-allowlisted files (#19788)"
 
 
 def test_loop_skips_absent_files(stage2_text: str) -> None:

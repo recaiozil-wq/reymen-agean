@@ -82,7 +82,10 @@ class PromptCache:
 # Anthropic Prompt Caching — cache_control marker fonksiyonlari
 # ══════════════════════════════════════════════════════════════════════
 
-def _apply_cache_marker(msg: dict, cache_marker: dict, native_anthropic: bool = False) -> None:
+
+def _apply_cache_marker(
+    msg: dict, cache_marker: dict, native_anthropic: bool = False
+) -> None:
     """Add cache_control to a single message, handling all format variations."""
     role = msg.get("role", "")
     content = msg.get("content")
@@ -162,9 +165,21 @@ def caching_aktif_mi(provider: Optional[str] = None) -> bool:
         return True  # varsayilan: aktif
     provider = provider.lower()
     # Anthropic, OpenAI, DeepSeek, OpenRouter destekliyor
-    caching_providers = {"anthropic", "claude", "sonnet", "openai", "gpt4",
-                         "gpt4o", "deepseek", "openrouter", "gemini", "codex"}
-    return provider in caching_providers or any(p in provider for p in caching_providers)
+    caching_providers = {
+        "anthropic",
+        "claude",
+        "sonnet",
+        "openai",
+        "gpt4",
+        "gpt4o",
+        "deepseek",
+        "openrouter",
+        "gemini",
+        "codex",
+    }
+    return provider in caching_providers or any(
+        p in provider for p in caching_providers
+    )
 
 
 def _prompt_caching_ekle(loop_instance: Any, mesajlar: List[dict]) -> List[dict]:
@@ -186,7 +201,9 @@ def _prompt_caching_ekle(loop_instance: Any, mesajlar: List[dict]) -> List[dict]
         provider = str(provider).lower()
 
     # Default: apply Anthropic-style caching
-    return apply_anthropic_cache_control(mesajlar, cache_ttl="5m", native_anthropic=False)
+    return apply_anthropic_cache_control(
+        mesajlar, cache_ttl="5m", native_anthropic=False
+    )
 
 
 # Global cache instance

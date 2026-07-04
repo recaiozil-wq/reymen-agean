@@ -8,7 +8,7 @@ buradan erisilir (bagimliliklari soyutlar).
 
 Kullanim (bot icinde):
     from reymen.scripts.motor_tool import motor_erisimi_al, motor_calistir
-    
+
     motor = motor_erisimi_al()
     sonuc = motor_calistir("bir dosya olustur")
 
@@ -36,10 +36,10 @@ _MOTOR_INSTANCE = None
 
 def motor_erisimi_al() -> Any:
     """Motor singleton'ina erisir.
-    
+
     Motor, tool registry, plugin manager ve diger alt bilesenleri
     yukler. Her cagrıda yeniden yukleme yapmaz (singleton).
-    
+
     Returns:
         Motor instance'i veya None (yuklenemezse)
     """
@@ -59,6 +59,7 @@ def motor_erisimi_al() -> Any:
         # Scripts tool'larini kaydet (varsa)
         try:
             from reymen.scripts.ReYMeN_tools import motor_kaydet as _scripts_kaydet
+
             _scripts_kaydet(_MOTOR_INSTANCE)
             logger.info("[MotorTool] ReYMeN_tools scriptleri kaydedildi")
         except ImportError:
@@ -69,6 +70,7 @@ def motor_erisimi_al() -> Any:
         # Delegasyon araclarini kaydet (varsa)
         try:
             from reymen.ag.delegasyon import motor_kaydet as _delegasyon_kaydet
+
             _delegasyon_kaydet(_MOTOR_INSTANCE)
             logger.info("[MotorTool] Delegasyon araclari kaydedildi")
         except ImportError:
@@ -89,12 +91,12 @@ def motor_calistir(
     timeout: int = 120,
 ) -> Dict[str, Any]:
     """Motor uzerinden bir hedefi calistirir.
-    
+
     Args:
         hedef: Kullanici hedefi / komut
         baglam: Ek baglam bilgisi (opsiyonel)
         timeout: Zaman asimi saniye
-        
+
     Returns:
         {
             "basarili": bool,
@@ -122,7 +124,9 @@ def motor_calistir(
 
         return {
             "basarili": basarili,
-            "sonuc": str(sonuc) if not isinstance(sonuc, dict) else str(sonuc.get("sonuc", sonuc.get("cikti", sonuc))),
+            "sonuc": str(sonuc)
+            if not isinstance(sonuc, dict)
+            else str(sonuc.get("sonuc", sonuc.get("cikti", sonuc))),
             "sure": sure,
             "ham_sonuc": sonuc,
         }
@@ -140,7 +144,7 @@ def motor_calistir(
 
 def motor_araclari_listele() -> List[Dict[str, str]]:
     """Motor'a kayitli tum araclari listeler.
-    
+
     Returns:
         [{"ad": "arac_adi", "aciklama": "..."}, ...]
     """
@@ -156,7 +160,11 @@ def motor_araclari_listele() -> List[Dict[str, str]]:
                 if isinstance(deger, tuple) and len(deger) >= 2:
                     aciklama = str(deger[1]) if deger[1] else ad
                 else:
-                    aciklama = str(deger) if hasattr(deger, "__doc__") and deger.__doc__ else ad
+                    aciklama = (
+                        str(deger)
+                        if hasattr(deger, "__doc__") and deger.__doc__
+                        else ad
+                    )
                 araclar.append({"ad": ad, "aciklama": aciklama[:200]})
 
         if hasattr(motor, "araclar") and motor.araclar:
@@ -172,7 +180,7 @@ def motor_araclari_listele() -> List[Dict[str, str]]:
 
 def motor_durum() -> Dict[str, Any]:
     """Motor durum bilgisini dondurur.
-    
+
     Returns:
         Motor durumu (arac sayisi, plugin sayisi, vs.)
     """
@@ -198,10 +206,10 @@ def motor_durum() -> Dict[str, Any]:
 
 def motor_kaydet(motor) -> None:
     """Motor'a bu modulun tool'larini kaydeder.
-    
+
     Bu fonksiyon, motor._plugin_arac_kaydet API'sine uygun olarak
     scripts tool'larini motora ekler.
-    
+
     Kaydettigi araclar:
         - MOTOR_CALISTIR: Motor uzerinden hedef calistir
         - MOTOR_ARAC_LISTELE: Motor arac listesi
@@ -232,7 +240,9 @@ def motor_kaydet(motor) -> None:
             "Ornek: MOTOR_DURUM()",
         )
 
-        logger.info("[MotorTool] 3 arac kaydedildi: MOTOR_CALISTIR, MOTOR_ARAC_LISTELE, MOTOR_DURUM")
+        logger.info(
+            "[MotorTool] 3 arac kaydedildi: MOTOR_CALISTIR, MOTOR_ARAC_LISTELE, MOTOR_DURUM"
+        )
 
     except Exception as e:
         logger.warning("[MotorTool] Arac kayit hatasi: %s", e)
@@ -250,7 +260,9 @@ def _motor_calistir_araci(**kw) -> str:
     baglam = {}
     if baglam_str:
         try:
-            baglam = json.loads(baglam_str) if isinstance(baglam_str, str) else baglam_str
+            baglam = (
+                json.loads(baglam_str) if isinstance(baglam_str, str) else baglam_str
+            )
         except json.JSONDecodeError:
             baglam = {"raw": baglam_str}
 
@@ -299,6 +311,7 @@ def _motor_durum_araci(**kw) -> str:
 
 
 # ── CLI Kullanimi ────────────────────────────────────────────────────────
+
 
 def main():
     """CLI'den dogrudan calistirma: python motor_tool.py <hedef>"""

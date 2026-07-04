@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """gateway/platforms/yuanbao_media.py testleri."""
+
 from __future__ import annotations
 
 import sys
@@ -14,6 +15,7 @@ import pytest
 class TestGuessMimeType:
     def test_image_types(self):
         from gateway.platforms.yuanbao_media import guess_mime_type
+
         assert guess_mime_type("foto.jpg") == "image/jpeg"
         assert guess_mime_type("foto.jpeg") == "image/jpeg"
         assert guess_mime_type("foto.png") == "image/png"
@@ -23,28 +25,36 @@ class TestGuessMimeType:
 
     def test_document_types(self):
         from gateway.platforms.yuanbao_media import guess_mime_type
+
         assert guess_mime_type("belge.pdf") == "application/pdf"
-        assert guess_mime_type("belge.docx") == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        assert (
+            guess_mime_type("belge.docx")
+            == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        )
         assert guess_mime_type("belge.txt") == "text/plain"
 
     def test_audio_video(self):
         from gateway.platforms.yuanbao_media import guess_mime_type
+
         assert guess_mime_type("ses.mp3") == "audio/mpeg"
         assert guess_mime_type("video.mp4") == "video/mp4"
 
     def test_unknown(self):
         from gateway.platforms.yuanbao_media import guess_mime_type
+
         assert guess_mime_type("dosya.xyz") == "application/octet-stream"
 
 
 class TestIsImage:
     def test_image_by_mime(self):
         from gateway.platforms.yuanbao_media import is_image
+
         assert is_image("test.jpg", "image/jpeg") is True
         assert is_image("test.xyz", "image/png") is True
 
     def test_image_by_ext(self):
         from gateway.platforms.yuanbao_media import is_image
+
         assert is_image("test.jpg") is True
         assert is_image("test.png") is True
         assert is_image("test.gif") is True
@@ -55,6 +65,7 @@ class TestIsImage:
 class TestGetImageFormat:
     def test_get_image_format_known(self):
         from gateway.platforms.yuanbao_media import get_image_format
+
         assert get_image_format("image/jpeg") == 1
         assert get_image_format("image/png") == 3
         assert get_image_format("image/gif") == 2
@@ -62,6 +73,7 @@ class TestGetImageFormat:
 
     def test_get_image_format_unknown(self):
         from gateway.platforms.yuanbao_media import get_image_format
+
         assert get_image_format("application/pdf") == 255
         assert get_image_format("") == 255
 
@@ -69,6 +81,7 @@ class TestGetImageFormat:
 class TestBuildImageMsgBody:
     def test_build_image_msg_body(self):
         from gateway.platforms.yuanbao_media import build_image_msg_body
+
         result = build_image_msg_body(
             url="https://cdn.example.com/img.jpg",
             uuid="abc123",
@@ -83,10 +96,14 @@ class TestBuildImageMsgBody:
         assert result[0]["msg_content"]["image_format"] == 1
         assert result[0]["msg_content"]["image_info_array"][0]["width"] == 800
         assert result[0]["msg_content"]["image_info_array"][0]["height"] == 600
-        assert result[0]["msg_content"]["image_info_array"][0]["url"] == "https://cdn.example.com/img.jpg"
+        assert (
+            result[0]["msg_content"]["image_info_array"][0]["url"]
+            == "https://cdn.example.com/img.jpg"
+        )
 
     def test_build_image_msg_body_default_uuid(self):
         from gateway.platforms.yuanbao_media import build_image_msg_body
+
         result = build_image_msg_body(
             url="https://cdn.example.com/path/foto.jpg",
             filename="foto.jpg",
@@ -98,6 +115,7 @@ class TestBuildImageMsgBody:
 class TestBuildFileMsgBody:
     def test_build_file_msg_body(self):
         from gateway.platforms.yuanbao_media import build_file_msg_body
+
         result = build_file_msg_body(
             url="https://cdn.example.com/doc.pdf",
             filename="rapor.pdf",
@@ -113,6 +131,7 @@ class TestBuildFileMsgBody:
 
     def test_build_file_msg_body_default_uuid(self):
         from gateway.platforms.yuanbao_media import build_file_msg_body
+
         result = build_file_msg_body("https://example.com/f.txt", "f.txt")
         assert result[0]["msg_content"]["uuid"] == "f.txt"
 
@@ -120,6 +139,7 @@ class TestBuildFileMsgBody:
 class TestMD5Hex:
     def test_md5_hex(self):
         from gateway.platforms.yuanbao_media import md5_hex
+
         result = md5_hex(b"test data")
         assert isinstance(result, str)
         assert len(result) == 32
@@ -134,6 +154,7 @@ class TestConstants:
             DEFAULT_MAX_SIZE_MB,
             COS_USE_ACCELERATE,
         )
+
         assert UPLOAD_INFO_PATH == "/api/resource/genUploadInfo"
         assert DEFAULT_API_DOMAIN == "yuanbao.tencent.com"
         assert DEFAULT_MAX_SIZE_MB == 50
@@ -143,6 +164,7 @@ class TestConstants:
 class TestBasenameFromUrl:
     def test_basename(self):
         from gateway.platforms.yuanbao_media import _basename_from_url
+
         assert _basename_from_url("http://example.com/path/foto.jpg") == "foto.jpg"
         assert _basename_from_url("http://example.com/") == ""
         assert _basename_from_url("") == ""

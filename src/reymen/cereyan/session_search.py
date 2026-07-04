@@ -97,8 +97,12 @@ class SessionSearch:
                     (session_id, message.strip(), role, timestamp),
                 )
                 conn.commit()
-                logger.debug("SessionSearch kaydedildi: session=%s role=%s msg=%.40s",
-                             session_id, role, message)
+                logger.debug(
+                    "SessionSearch kaydedildi: session=%s role=%s msg=%.40s",
+                    session_id,
+                    role,
+                    message,
+                )
                 return True
             except Exception as e:
                 logger.error("SessionSearch save hatasi: %s", e)
@@ -108,7 +112,9 @@ class SessionSearch:
 
     # ── Ara (Search) ──────────────────────────────────────────────────
 
-    def search(self, query: str, limit: int = 10, session_id: Optional[str] = None) -> List[Dict]:
+    def search(
+        self, query: str, limit: int = 10, session_id: Optional[str] = None
+    ) -> List[Dict]:
         """Perform full-text search with FTS5.
 
         Args:
@@ -151,13 +157,15 @@ class SessionSearch:
 
                 sonuclar = []
                 for r in rows:
-                    sonuclar.append({
-                        "session_id": r["session_id"],
-                        "message": r["message"],
-                        "role": r["role"],
-                        "timestamp": r["timestamp"],
-                        "rank": r["rank"],
-                    })
+                    sonuclar.append(
+                        {
+                            "session_id": r["session_id"],
+                            "message": r["message"],
+                            "role": r["role"],
+                            "timestamp": r["timestamp"],
+                            "rank": r["rank"],
+                        }
+                    )
                 logger.debug("SessionSearch: '%s' -> %d sonuc", query, len(sonuclar))
                 return sonuclar
             except Exception as e:
@@ -228,11 +236,12 @@ class SessionSearch:
         # FTS5 ozel karakterleri: ^ * " ( ) ~ + - AND OR NEAR NOT
         # Basit guvenlik: cift tirnak icinde olmayan ozel karakterleri kaldir
         import re as _re
+
         # Cift tirnak icindeki ifadeleri koru
         # Geri kalan ozel karakterleri temizle
-        temiz = _re.sub(r'[^\w\s"*()~+\-]', ' ', sorgu)
+        temiz = _re.sub(r'[^\w\s"*()~+\-]', " ", sorgu)
         # Birden fazla boslugu tek bosluk yap
-        temiz = _re.sub(r'\s+', ' ', temiz).strip()
+        temiz = _re.sub(r"\s+", " ", temiz).strip()
         return temiz if temiz else sorgu
 
 
@@ -253,6 +262,7 @@ def session_search_al(db_yolu: Optional[str] = None) -> SessionSearch:
 
 
 # ── Kolay Kullanim Fonksiyonlari (dogrudan import icin) ─────────────
+
 
 def save(session_id: str, message: str, role: str = "user") -> bool:
     """Easy save — via singleton."""

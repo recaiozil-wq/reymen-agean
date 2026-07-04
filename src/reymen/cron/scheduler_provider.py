@@ -17,6 +17,7 @@ ticker. Alternative providers (e.g. Chronos, a NAS-mediated managed-cron
 provider for scale-to-zero deployments) live under plugins/cron/<name>/ and are
 selected via the `cron.provider` config key (empty = built-in).
 """
+
 from __future__ import annotations
 
 import threading
@@ -126,6 +127,7 @@ def resolve_cron_scheduler() -> "CronScheduler":
     name = ""
     try:
         from hermes_cli.config import cfg_get, load_config
+
         name = (cfg_get(load_config(), "cron", "provider", default="") or "").strip()
     except Exception as _e:
         logger.warning("[SchedulerProvider] except Exception (L130): %s", Exception)
@@ -136,12 +138,15 @@ def resolve_cron_scheduler() -> "CronScheduler":
 
     try:
         from plugins.cron import load_cron_scheduler
+
         provider = load_cron_scheduler(name)
         if provider is None:
             logger.warning("cron.provider '%s' not found; using built-in ticker", name)
             return InProcessCronScheduler()
         if not provider.is_available():
-            logger.warning("cron.provider '%s' not available; using built-in ticker", name)
+            logger.warning(
+                "cron.provider '%s' not available; using built-in ticker", name
+            )
             return InProcessCronScheduler()
         logger.info("Using cron scheduler provider: %s", provider.name)
         return provider

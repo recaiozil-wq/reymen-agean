@@ -48,9 +48,7 @@ def _create_app(adapter: WebhookAdapter) -> web.Application:
 
 def _github_signature(body: bytes, secret: str) -> str:
     """Compute X-Hub-Signature-256 for *body* using *secret*."""
-    return "sha256=" + hmac.new(
-        secret.encode(), body, hashlib.sha256
-    ).hexdigest()
+    return "sha256=" + hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
 
 
 SIMPLE_PAYLOAD = {"event": "test", "data": "hello"}
@@ -107,9 +105,9 @@ class TestSignatureBeforeRateLimit:
                     },
                 )
                 # Each invalid signature should be rejected with 401
-                assert resp.status == 401, (
-                    f"Expected 401 for invalid signature, got {resp.status}"
-                )
+                assert (
+                    resp.status == 401
+                ), f"Expected 401 for invalid signature, got {resp.status}"
 
             # Now send a valid-signed request — it MUST succeed (202)
             # BEFORE FIX: This would return 429 because the 5 bad requests

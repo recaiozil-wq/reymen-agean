@@ -9,6 +9,7 @@ import importlib
 import os
 from pathlib import Path
 import logging
+
 logger = logging.getLogger(__name__)
 
 PROJE_KOK = Path(__file__).parent.resolve()
@@ -21,12 +22,14 @@ class SecurityAudit:
         self._bulgular: list[dict] = []
 
     def _bulgu_ekle(self, seviye: str, kategori: str, mesaj: str, cozum: str = ""):
-        self._bulgular.append({
-            "seviye": seviye,
-            "kategori": kategori,
-            "mesaj": mesaj,
-            "cozum": cozum,
-        })
+        self._bulgular.append(
+            {
+                "seviye": seviye,
+                "kategori": kategori,
+                "mesaj": mesaj,
+                "cozum": cozum,
+            }
+        )
 
     def tarama_yap(self) -> list[dict]:
         """Tam guvenlik taramasi yap.
@@ -46,7 +49,8 @@ class SecurityAudit:
         env_yolu = PROJE_KOK / ".env"
         if not env_yolu.exists():
             self._bulgu_ekle(
-                "YUKSEK", "env",
+                "YUKSEK",
+                "env",
                 ".env dosyasi bulunamadi.",
                 ".env.example dosyasini .env olarak kopyala ve API anahtarlarini gir.",
             )
@@ -60,7 +64,8 @@ class SecurityAudit:
                 if "API_KEY" in anahtar or "TOKEN" in anahtar:
                     if "***" in deger or not deger.strip():
                         self._bulgu_ekle(
-                            "ORTA", "env",
+                            "ORTA",
+                            "env",
                             f"{anahtar} maskeli veya bos.",
                             f"Gecerli bir API anahtari gir: {anahtar}=<deger>",
                         )
@@ -68,15 +73,19 @@ class SecurityAudit:
     def _guvenlik_modulu_kontrol(self):
         """Guvenlik modullerinin varligini kontrol et."""
         gerekli = [
-            "file_safety", "path_security", "url_safety",
-            "redact", "threat_patterns",
+            "file_safety",
+            "path_security",
+            "url_safety",
+            "redact",
+            "threat_patterns",
         ]
         for mod in gerekli:
             try:
                 importlib.import_module(mod)
             except ImportError:
                 self._bulgu_ekle(
-                    "YUKSEK", "guvenlik_modulu",
+                    "YUKSEK",
+                    "guvenlik_modulu",
                     f"{mod}.py bulunamadi.",
                     f"Guvenlik modulu eksik. Ekle: {mod}.py",
                 )
@@ -84,8 +93,10 @@ class SecurityAudit:
     def _dosya_izni_kontrol(self):
         """Kritik dosyalarin izinlerini kontrol et."""
         kritik_dosyalar = [
-            ".env", ".ReYMeN/memories/MEMORY.md",
-            ".ReYMeN/memories/USER.md", "merkez_db/session_reymen.db",
+            ".env",
+            ".ReYMeN/memories/MEMORY.md",
+            ".ReYMeN/memories/USER.md",
+            "merkez_db/session_reymen.db",
         ]
         for dosya in kritik_dosyalar:
             yol = PROJE_KOK / dosya
@@ -93,10 +104,12 @@ class SecurityAudit:
                 # Windows'ta herkes okuyabilir mi?
                 try:
                     import stat
+
                     izin = os.stat(yol).st_mode
                     if izin & stat.S_IROTH:
                         self._bulgu_ekle(
-                            "DUSUK", "dosya_izni",
+                            "DUSUK",
+                            "dosya_izni",
                             f"{dosya} herkes tarafindan okunabilir.",
                             f"Dosya izinlerini kisitla: icacls {dosya} /inheritance:r",
                         )
@@ -117,7 +130,8 @@ class SecurityAudit:
         for dosya, aciklama in bilesenler:
             if not (PROJE_KOK / dosya).exists():
                 self._bulgu_ekle(
-                    "YUKSEK", "bilesen",
+                    "YUKSEK",
+                    "bilesen",
                     f"{aciklama} ({dosya}) bulunamadi.",
                     f"Eksik bilesen: {dosya}",
                 )

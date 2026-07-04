@@ -29,7 +29,10 @@ from ReYMeN_cli.config import (
 # depend on its routes opt in via the `_install_example_plugin` fixture
 # below.
 _EXAMPLE_PLUGIN_FIXTURE = (
-    Path(__file__).resolve().parent.parent / "fixtures" / "plugins" / "example-dashboard"
+    Path(__file__).resolve().parent.parent
+    / "fixtures"
+    / "plugins"
+    / "example-dashboard"
 )
 
 
@@ -233,7 +236,9 @@ class TestWebServerEndpoints:
         from ReYMeN_constants import get_reymen_home
         from ReYMeN_cli.web_server import app, _SESSION_HEADER_NAME, _SESSION_TOKEN
 
-        monkeypatch.setattr(ReYMeN_state, "DEFAULT_DB_PATH", get_reymen_home() / "state.db")
+        monkeypatch.setattr(
+            ReYMeN_state, "DEFAULT_DB_PATH", get_reymen_home() / "state.db"
+        )
 
         self.client = TestClient(app)
         self.client.headers[_SESSION_HEADER_NAME] = _SESSION_TOKEN
@@ -331,9 +336,7 @@ class TestWebServerEndpoints:
     def test_set_dashboard_font_rejects_unknown_id(self):
         """An id not in the curated catalog coerces to the theme sentinel,
         so a stale/hostile client can't inject an arbitrary font id."""
-        resp = self.client.put(
-            "/api/dashboard/font", json={"font": "../../etc/passwd"}
-        )
+        resp = self.client.put("/api/dashboard/font", json={"font": "../../etc/passwd"})
         assert resp.status_code == 200
         assert resp.json() == {"ok": True, "font": "theme"}
 
@@ -358,7 +361,6 @@ class TestWebServerEndpoints:
         config = load_config()
         assert config["dashboard"]["theme"] == "ember"
         assert config["dashboard"]["font"] == "jetbrains-mono"
-
 
     def test_get_sessions_uses_only_persisted_cwd(self, monkeypatch):
         """Session rows without persisted cwd must not inherit TERMINAL_CWD.
@@ -559,7 +561,9 @@ class TestWebServerEndpoints:
         assert stats["total"] == 1
         assert stats["messages"] == 1
 
-        messages = self.client.get("/api/sessions/worker-only/messages?profile=worker").json()
+        messages = self.client.get(
+            "/api/sessions/worker-only/messages?profile=worker"
+        ).json()
         assert [m["content"] for m in messages["messages"]] == ["worker"]
 
     def test_analytics_endpoints_read_requested_profile(self):
@@ -571,14 +575,20 @@ class TestWebServerEndpoints:
 
         default_db = SessionDB()
         try:
-            default_db.create_session(session_id="default-usage", source="cli", model="default/model")
-            default_db.update_token_counts("default-usage", input_tokens=10, output_tokens=5)
+            default_db.create_session(
+                session_id="default-usage", source="cli", model="default/model"
+            )
+            default_db.update_token_counts(
+                "default-usage", input_tokens=10, output_tokens=5
+            )
         finally:
             default_db.close()
 
         worker_db = SessionDB(db_path=worker_home / "state.db")
         try:
-            worker_db.create_session(session_id="worker-usage", source="cli", model="worker/model")
+            worker_db.create_session(
+                session_id="worker-usage", source="cli", model="worker/model"
+            )
             worker_db.update_token_counts(
                 "worker-usage",
                 input_tokens=123,
@@ -631,12 +641,21 @@ class TestWebServerEndpoints:
                 "UPDATE sessions SET started_at = ?, ended_at = ? WHERE id = ?",
                 (old, old + 10, "root-old"),
             )
-            db.create_session(session_id="tip-new", source="cli", parent_session_id="root-old")
-            db._conn.execute("UPDATE sessions SET started_at = ? WHERE id = ?", (old + 10, "tip-new"))
-            db.append_message(session_id="tip-new", role="user", content="continued just now")
+            db.create_session(
+                session_id="tip-new", source="cli", parent_session_id="root-old"
+            )
+            db._conn.execute(
+                "UPDATE sessions SET started_at = ? WHERE id = ?", (old + 10, "tip-new")
+            )
+            db.append_message(
+                session_id="tip-new", role="user", content="continued just now"
+            )
             # A brand-new unrelated session started after the root but before now.
             db.create_session(session_id="mid", source="cli")
-            db._conn.execute("UPDATE sessions SET started_at = ? WHERE id = ?", (_time.time() - 3600, "mid"))
+            db._conn.execute(
+                "UPDATE sessions SET started_at = ? WHERE id = ?",
+                (_time.time() - 3600, "mid"),
+            )
             db.append_message(session_id="mid", role="user", content="hello")
             db._conn.commit()
         finally:
@@ -662,16 +681,29 @@ class TestWebServerEndpoints:
         db = SessionDB()
         try:
             db.create_session(session_id="search-root", source="cli")
-            db.append_message(session_id="search-root", role="user", content="distinctneedle in the root")
+            db.append_message(
+                session_id="search-root",
+                role="user",
+                content="distinctneedle in the root",
+            )
             db.end_session("search-root", "compression")
             now = _time.time()
             db._conn.execute(
                 "UPDATE sessions SET started_at = ?, ended_at = ? WHERE id = ?",
                 (now - 100, now - 90, "search-root"),
             )
-            db.create_session(session_id="search-tip", source="cli", parent_session_id="search-root")
-            db._conn.execute("UPDATE sessions SET started_at = ? WHERE id = ?", (now - 90, "search-tip"))
-            db.append_message(session_id="search-tip", role="user", content="distinctneedle again in the tip")
+            db.create_session(
+                session_id="search-tip", source="cli", parent_session_id="search-root"
+            )
+            db._conn.execute(
+                "UPDATE sessions SET started_at = ? WHERE id = ?",
+                (now - 90, "search-tip"),
+            )
+            db.append_message(
+                session_id="search-tip",
+                role="user",
+                content="distinctneedle again in the tip",
+            )
             db._conn.commit()
         finally:
             db.close()
@@ -700,15 +732,28 @@ class TestWebServerEndpoints:
         try:
             now = _time.time()
             db.create_session(session_id="branch-parent", source="cli")
-            db.append_message(session_id="branch-parent", role="user", content="ancestor context")
+            db.append_message(
+                session_id="branch-parent", role="user", content="ancestor context"
+            )
             db.end_session("branch-parent", "branched")
             db._conn.execute(
                 "UPDATE sessions SET started_at = ?, ended_at = ? WHERE id = ?",
                 (now - 100, now - 90, "branch-parent"),
             )
-            db.create_session(session_id="branch-child", source="cli", parent_session_id="branch-parent")
-            db._conn.execute("UPDATE sessions SET started_at = ? WHERE id = ?", (now - 80, "branch-child"))
-            db.append_message(session_id="branch-child", role="user", content="branchspecificneedle only here")
+            db.create_session(
+                session_id="branch-child",
+                source="cli",
+                parent_session_id="branch-parent",
+            )
+            db._conn.execute(
+                "UPDATE sessions SET started_at = ? WHERE id = ?",
+                (now - 80, "branch-child"),
+            )
+            db.append_message(
+                session_id="branch-child",
+                role="user",
+                content="branchspecificneedle only here",
+            )
             db._conn.commit()
         finally:
             db.close()
@@ -718,7 +763,8 @@ class TestWebServerEndpoints:
         results = resp.json()["results"]
 
         assert any(
-            r["session_id"] == "branch-child" and r.get("lineage_root") == "branch-child"
+            r["session_id"] == "branch-child"
+            and r.get("lineage_root") == "branch-child"
             for r in results
         )
 
@@ -732,17 +778,26 @@ class TestWebServerEndpoints:
         db = SessionDB()
         try:
             db.create_session(session_id="desktop-root", source="cli")
-            db.append_message(session_id="desktop-root", role="user", content="before compression")
+            db.append_message(
+                session_id="desktop-root", role="user", content="before compression"
+            )
             db.end_session("desktop-root", "compression")
             now = _time.time()
             db._conn.execute(
                 "UPDATE sessions SET started_at = ?, ended_at = ? WHERE id = ?",
                 (now - 10, now - 5, "desktop-root"),
             )
-            db.create_session(session_id="desktop-tip", source="cli", parent_session_id="desktop-root")
-            db._conn.execute("UPDATE sessions SET started_at = ? WHERE id = ?", (now - 4, "desktop-tip"))
+            db.create_session(
+                session_id="desktop-tip", source="cli", parent_session_id="desktop-root"
+            )
+            db._conn.execute(
+                "UPDATE sessions SET started_at = ? WHERE id = ?",
+                (now - 4, "desktop-tip"),
+            )
             db.replace_messages("desktop-root", [])
-            db.append_message(session_id="desktop-tip", role="user", content="after compression")
+            db.append_message(
+                session_id="desktop-tip", role="user", content="after compression"
+            )
             db._conn.commit()
         finally:
             db.close()
@@ -763,7 +818,11 @@ class TestWebServerEndpoints:
         finally:
             db.close()
 
-        row = next(s for s in self.client.get("/api/sessions").json()["sessions"] if s["id"] == "bool-arch")
+        row = next(
+            s
+            for s in self.client.get("/api/sessions").json()["sessions"]
+            if s["id"] == "bool-arch"
+        )
         assert row["archived"] is False
 
     def test_rename_response_omits_archived_when_not_set(self):
@@ -793,7 +852,9 @@ class TestWebServerEndpoints:
                 "provider": "test",
             }
 
-        monkeypatch.setattr(transcription_tools, "transcribe_audio", fake_transcribe_audio)
+        monkeypatch.setattr(
+            transcription_tools, "transcribe_audio", fake_transcribe_audio
+        )
 
         resp = self.client.post(
             "/api/audio/transcribe",
@@ -856,11 +917,13 @@ class TestWebServerEndpoints:
         audio_file.write_bytes(b"ID3fake-audio-bytes")
 
         def fake_tts(text):
-            return json.dumps({
-                "success": True,
-                "file_path": str(audio_file),
-                "provider": "test",
-            })
+            return json.dumps(
+                {
+                    "success": True,
+                    "file_path": str(audio_file),
+                    "provider": "test",
+                }
+            )
 
         monkeypatch.setattr(tts_tool, "text_to_speech_tool", fake_tts)
 
@@ -910,7 +973,10 @@ class TestWebServerEndpoints:
         assert status_data["running"] is False
         assert status_data["exit_code"] == 1
         assert status_data["pid"] is None
-        assert any("docker pull nousresearch/ReYMeN-agent:latest" in line for line in status_data["lines"])
+        assert any(
+            "docker pull nousresearch/ReYMeN-agent:latest" in line
+            for line in status_data["lines"]
+        )
 
     def test_update_ReYMeN_spawns_on_non_docker_install(self, monkeypatch):
         import ReYMeN_cli.web_server as web_server
@@ -1000,7 +1066,6 @@ class TestWebServerEndpoints:
             "pid": 99,
         }
 
-
     def test_get_status_filters_unconfigured_gateway_platforms(self, monkeypatch):
         import gateway.config as gateway_config
         import ReYMeN_cli.web_server as web_server
@@ -1021,23 +1086,39 @@ class TestWebServerEndpoints:
                 "gateway_state": "running",
                 "updated_at": "2026-04-12T00:00:00+00:00",
                 "platforms": {
-                    "telegram": {"state": "connected", "updated_at": "2026-04-12T00:00:00+00:00"},
-                    "whatsapp": {"state": "retrying", "updated_at": "2026-04-12T00:00:00+00:00"},
-                    "feishu": {"state": "connected", "updated_at": "2026-04-12T00:00:00+00:00"},
+                    "telegram": {
+                        "state": "connected",
+                        "updated_at": "2026-04-12T00:00:00+00:00",
+                    },
+                    "whatsapp": {
+                        "state": "retrying",
+                        "updated_at": "2026-04-12T00:00:00+00:00",
+                    },
+                    "feishu": {
+                        "state": "connected",
+                        "updated_at": "2026-04-12T00:00:00+00:00",
+                    },
                 },
             },
         )
         monkeypatch.setattr(web_server, "check_config_version", lambda: (1, 1))
-        monkeypatch.setattr(gateway_config, "load_gateway_config", lambda: _GatewayConfig())
+        monkeypatch.setattr(
+            gateway_config, "load_gateway_config", lambda: _GatewayConfig()
+        )
 
         resp = self.client.get("/api/status")
 
         assert resp.status_code == 200
         assert resp.json()["gateway_platforms"] == {
-            "telegram": {"state": "connected", "updated_at": "2026-04-12T00:00:00+00:00"},
+            "telegram": {
+                "state": "connected",
+                "updated_at": "2026-04-12T00:00:00+00:00",
+            },
         }
 
-    def test_get_status_hides_stale_platforms_when_gateway_not_running(self, monkeypatch):
+    def test_get_status_hides_stale_platforms_when_gateway_not_running(
+        self, monkeypatch
+    ):
         import gateway.config as gateway_config
         import ReYMeN_cli.web_server as web_server
 
@@ -1053,13 +1134,21 @@ class TestWebServerEndpoints:
                 "gateway_state": "startup_failed",
                 "updated_at": "2026-04-12T00:00:00+00:00",
                 "platforms": {
-                    "whatsapp": {"state": "retrying", "updated_at": "2026-04-12T00:00:00+00:00"},
-                    "feishu": {"state": "connected", "updated_at": "2026-04-12T00:00:00+00:00"},
+                    "whatsapp": {
+                        "state": "retrying",
+                        "updated_at": "2026-04-12T00:00:00+00:00",
+                    },
+                    "feishu": {
+                        "state": "connected",
+                        "updated_at": "2026-04-12T00:00:00+00:00",
+                    },
                 },
             },
         )
         monkeypatch.setattr(web_server, "check_config_version", lambda: (1, 1))
-        monkeypatch.setattr(gateway_config, "load_gateway_config", lambda: _GatewayConfig())
+        monkeypatch.setattr(
+            gateway_config, "load_gateway_config", lambda: _GatewayConfig()
+        )
 
         resp = self.client.get("/api/status")
 
@@ -1156,7 +1245,9 @@ class TestWebServerEndpoints:
     def test_model_set_requires_confirmation_for_expensive_model(self, monkeypatch):
         monkeypatch.setattr(
             "ReYMeN_cli.model_cost_guard.expensive_model_warning",
-            lambda *_args, **_kwargs: SimpleNamespace(message="EXPENSIVE MODEL WARNING"),
+            lambda *_args, **_kwargs: SimpleNamespace(
+                message="EXPENSIVE MODEL WARNING"
+            ),
         )
 
         resp = self.client.post(
@@ -1211,6 +1302,7 @@ class TestWebServerEndpoints:
         assert data["model"] == "claude-opus-4-6"
 
         from ReYMeN_cli.config import load_config
+
         cfg = load_config()
         assert cfg["model"]["provider"] == "anthropic"
         assert cfg["model"]["default"] == "claude-opus-4-6"
@@ -1224,6 +1316,7 @@ class TestWebServerEndpoints:
             lambda *_args, **_kwargs: None,
         )
         from ReYMeN_cli.config import load_config, save_config
+
         cfg = load_config()
         cfg["model"] = {"provider": "openrouter", "default": "openai/gpt-5.5"}
         save_config(cfg)
@@ -1269,6 +1362,7 @@ class TestWebServerEndpoints:
 
         archive = tmp_path / "backup.zip"
         import zipfile
+
         with zipfile.ZipFile(archive, "w") as zf:
             zf.writestr("config.yaml", "model: {}\n")
 
@@ -1278,27 +1372,30 @@ class TestWebServerEndpoints:
             captured["args"] = subcommand
             captured["name"] = name
             from types import SimpleNamespace as NS
+
             return NS(pid=12345)
 
         monkeypatch.setattr(ws, "_spawn_ReYMeN_action", fake_spawn)
 
         resp = self.client.post(
-            "/api/ops/import", json={"archive": str(archive), "force": True},
+            "/api/ops/import",
+            json={"archive": str(archive), "force": True},
         )
         assert resp.status_code == 200
         assert captured["args"] == ["import", str(archive), "--force"]
 
         resp = self.client.post(
-            "/api/ops/import", json={"archive": str(archive)},
+            "/api/ops/import",
+            json={"archive": str(archive)},
         )
         assert resp.status_code == 200
         assert captured["args"] == ["import", str(archive)]
-
 
     def test_reveal_env_var(self, tmp_path):
         """POST /api/env/reveal should return the real unredacted value."""
         from ReYMeN_cli.config import save_env_value
         from ReYMeN_cli.web_server import _SESSION_HEADER_NAME, _SESSION_TOKEN
+
         save_env_value("TEST_REVEAL_KEY", "super-secret-value-12345")
         resp = self.client.post(
             "/api/env/reveal",
@@ -1313,6 +1410,7 @@ class TestWebServerEndpoints:
     def test_reveal_env_var_not_found(self):
         """POST /api/env/reveal should 404 for unknown keys."""
         from ReYMeN_cli.web_server import _SESSION_HEADER_NAME, _SESSION_TOKEN
+
         resp = self.client.post(
             "/api/env/reveal",
             json={"key": "NONEXISTENT_KEY_XYZ"},
@@ -1325,6 +1423,7 @@ class TestWebServerEndpoints:
         from starlette.testclient import TestClient
         from ReYMeN_cli.web_server import app
         from ReYMeN_cli.config import save_env_value
+
         save_env_value("TEST_REVEAL_NOAUTH", "secret-value")
         # Use a fresh client WITHOUT the dashboard session header
         unauth_client = TestClient(app)
@@ -1338,6 +1437,7 @@ class TestWebServerEndpoints:
         """POST /api/env/reveal with wrong token should return 401."""
         from ReYMeN_cli.config import save_env_value
         from ReYMeN_cli.web_server import _SESSION_HEADER_NAME
+
         save_env_value("TEST_REVEAL_BADAUTH", "secret-value")
         resp = self.client.post(
             "/api/env/reveal",
@@ -1346,7 +1446,9 @@ class TestWebServerEndpoints:
         )
         assert resp.status_code == 401
 
-    def test_reveal_env_var_custom_session_header_ignores_proxy_authorization(self, tmp_path):
+    def test_reveal_env_var_custom_session_header_ignores_proxy_authorization(
+        self, tmp_path
+    ):
         """A valid dashboard session header should coexist with proxy auth."""
         from ReYMeN_cli.config import save_env_value
         from ReYMeN_cli.web_server import _SESSION_HEADER_NAME, _SESSION_TOKEN
@@ -1383,10 +1485,15 @@ class TestWebServerEndpoints:
 
         assert resp.status_code == 200
         platforms = resp.json()["platforms"]
-        telegram = next(platform for platform in platforms if platform["id"] == "telegram")
+        telegram = next(
+            platform for platform in platforms if platform["id"] == "telegram"
+        )
         assert telegram["name"] == "Telegram"
         assert telegram["enabled"] is False
-        assert any(field["key"] == "TELEGRAM_BOT_TOKEN" and field["required"] for field in telegram["env_vars"])
+        assert any(
+            field["key"] == "TELEGRAM_BOT_TOKEN" and field["required"]
+            for field in telegram["env_vars"]
+        )
 
     def test_weixin_messaging_metadata_describes_personal_ilink_setup(self):
         resp = self.client.get("/api/messaging/platforms")
@@ -1420,7 +1527,9 @@ class TestWebServerEndpoints:
         for member in Platform.__members__.values():
             if member.value == "local":
                 continue
-            assert member.value in platforms, f"Missing gateway platform {member.value} from /api/messaging/platforms"
+            assert (
+                member.value in platforms
+            ), f"Missing gateway platform {member.value} from /api/messaging/platforms"
 
     def test_messaging_catalog_includes_plugin_platforms(self, monkeypatch):
         """Plugin-registered adapters appear in the catalog without per-platform code."""
@@ -1441,7 +1550,10 @@ class TestWebServerEndpoints:
             ids = {row["id"]: row for row in resp.json()["platforms"]}
             assert "ircfake" in ids
             assert ids["ircfake"]["name"] == "IRC (test)"
-            assert any(field["key"] == "IRC_SERVER" and field["required"] for field in ids["ircfake"]["env_vars"])
+            assert any(
+                field["key"] == "IRC_SERVER" and field["required"]
+                for field in ids["ircfake"]["env_vars"]
+            )
         finally:
             platform_registry.unregister("ircfake")
 
@@ -1465,7 +1577,9 @@ class TestWebServerEndpoints:
         assert telegram["enabled"] is False
 
     def test_messaging_platform_test_reports_missing_required_setup(self):
-        resp = self.client.put("/api/messaging/platforms/discord", json={"enabled": True})
+        resp = self.client.put(
+            "/api/messaging/platforms/discord", json={"enabled": True}
+        )
         assert resp.status_code == 200
 
         resp = self.client.post("/api/messaging/platforms/discord/test")
@@ -1583,7 +1697,9 @@ class TestWebServerEndpoints:
             )
         ]
 
-    def test_telegram_onboarding_ready_and_apply_never_returns_bot_token(self, monkeypatch):
+    def test_telegram_onboarding_ready_and_apply_never_returns_bot_token(
+        self, monkeypatch
+    ):
         import ReYMeN_cli.web_server as ws
         from ReYMeN_cli.config import load_config, load_env
 
@@ -1848,6 +1964,7 @@ class TestWebServerEndpoints:
         """API requests without the session token should be rejected."""
         from starlette.testclient import TestClient
         from ReYMeN_cli.web_server import app
+
         # Create a client WITHOUT the dashboard session header
         unauth_client = TestClient(app)
         resp = unauth_client.get("/api/env")
@@ -1891,7 +2008,9 @@ class TestWebServerEndpoints:
         assets.mkdir(parents=True)
         index_path = dist / "index.html"
         css_path = assets / "app.css"
-        index_path.write_text("<html><head></head><body>cafe cafe</body></html>", encoding="utf-8")
+        index_path.write_text(
+            "<html><head></head><body>cafe cafe</body></html>", encoding="utf-8"
+        )
         css_path.write_text("body::before { content: 'cafe'; }", encoding="utf-8")
 
         original_read_text = Path.read_text
@@ -1914,7 +2033,9 @@ class TestWebServerEndpoints:
         assert index_resp.status_code == 200
         assert "cafe cafe" in index_resp.text
 
-        css_resp = spa_client.get("/assets/app.css", headers={"x-forwarded-prefix": "/ReYMeN"})
+        css_resp = spa_client.get(
+            "/assets/app.css", headers={"x-forwarded-prefix": "/ReYMeN"}
+        )
         assert css_resp.status_code == 200
         assert "content: 'cafe';" in css_resp.text
 
@@ -1954,13 +2075,19 @@ class TestWebServerEndpoints:
         import ReYMeN_cli.nous_subscription as ns
 
         def boom(*args, **kwargs):  # pragma: no cover - must not be called
-            raise AssertionError("apply_nous_managed_defaults called for non-nous provider")
+            raise AssertionError(
+                "apply_nous_managed_defaults called for non-nous provider"
+            )
 
         monkeypatch.setattr(ns, "apply_nous_managed_defaults", boom)
 
         resp = self.client.post(
             "/api/model/set",
-            json={"scope": "main", "provider": "openrouter", "model": "anthropic/claude-opus-4.8"},
+            json={
+                "scope": "main",
+                "provider": "openrouter",
+                "model": "anthropic/claude-opus-4.8",
+            },
         )
         assert resp.status_code == 200
         data = resp.json()
@@ -1977,7 +2104,10 @@ class TestWebServerEndpoints:
 
         # Custom + base_url → persisted; stale context_length dropped.
         out = _apply_main_model_assignment(
-            {"context_length": 8192}, "custom", "llama-3.1-8b", "http://127.0.0.1:8000/v1"
+            {"context_length": 8192},
+            "custom",
+            "llama-3.1-8b",
+            "http://127.0.0.1:8000/v1",
         )
         assert out["provider"] == "custom"
         assert out["default"] == "llama-3.1-8b"
@@ -1997,7 +2127,10 @@ class TestWebServerEndpoints:
         # Regression: picking a different MiMo model under xiaomi must NOT wipe a
         # Token Plan base_url (https://token-plan-*.xiaomimimo.com/v1).
         out = _apply_main_model_assignment(
-            {"provider": "xiaomi", "base_url": "https://token-plan-ams.xiaomimimo.com/v1"},
+            {
+                "provider": "xiaomi",
+                "base_url": "https://token-plan-ams.xiaomimimo.com/v1",
+            },
             "xiaomi",
             "mimo-v2.5-pro",
         )
@@ -2156,7 +2289,11 @@ class TestWebServerEndpoints:
 
         resp = self.client.post(
             "/api/model/set",
-            json={"scope": "main", "provider": "openrouter", "model": "anthropic/claude-opus-4.8"},
+            json={
+                "scope": "main",
+                "provider": "openrouter",
+                "model": "anthropic/claude-opus-4.8",
+            },
         )
         assert resp.status_code == 200
         assert resp.json()["base_url"] == ""
@@ -2209,7 +2346,11 @@ class TestWebServerEndpoints:
 
         resp = self.client.post(
             "/api/model/set",
-            json={"scope": "main", "provider": "openrouter", "model": "anthropic/claude-opus-4.8"},
+            json={
+                "scope": "main",
+                "provider": "openrouter",
+                "model": "anthropic/claude-opus-4.8",
+            },
         )
         assert resp.status_code == 200
         stale = resp.json()["stale_aux"]
@@ -2229,14 +2370,21 @@ class TestWebServerEndpoints:
         cfg = load_config()
         cfg["model"] = {"provider": "nous", "default": "ReYMeN-4"}
         cfg["auxiliary"] = {
-            "compression": {"provider": "openrouter", "model": "google/gemini-2.5-flash"},
+            "compression": {
+                "provider": "openrouter",
+                "model": "google/gemini-2.5-flash",
+            },
             "vision": {"provider": "auto", "model": ""},
         }
         save_config(cfg)
 
         resp = self.client.post(
             "/api/model/set",
-            json={"scope": "main", "provider": "openrouter", "model": "anthropic/claude-opus-4.8"},
+            json={
+                "scope": "main",
+                "provider": "openrouter",
+                "model": "anthropic/claude-opus-4.8",
+            },
         )
         assert resp.status_code == 200
         assert resp.json()["stale_aux"] == []
@@ -2268,19 +2416,31 @@ class TestWebServerEndpoints:
         model (mirroring `ReYMeN model`), not the first curated paid entry."""
         import ReYMeN_cli.models as models_mod
 
-        monkeypatch.setattr(models_mod, "get_curated_nous_model_ids", lambda: ["paid/expensive", "free/cheap"])
         monkeypatch.setattr(
-            models_mod, "get_pricing_for_provider",
-            lambda provider: {"paid/expensive": {"input": "1"}, "free/cheap": {"input": "0"}},
+            models_mod,
+            "get_curated_nous_model_ids",
+            lambda: ["paid/expensive", "free/cheap"],
         )
-        monkeypatch.setattr(models_mod, "check_nous_free_tier", lambda *, force_fresh=False: True)
         monkeypatch.setattr(
-            models_mod, "union_with_portal_free_recommendations",
+            models_mod,
+            "get_pricing_for_provider",
+            lambda provider: {
+                "paid/expensive": {"input": "1"},
+                "free/cheap": {"input": "0"},
+            },
+        )
+        monkeypatch.setattr(
+            models_mod, "check_nous_free_tier", lambda *, force_fresh=False: True
+        )
+        monkeypatch.setattr(
+            models_mod,
+            "union_with_portal_free_recommendations",
             lambda ids, pricing, url: (ids, pricing),
         )
         # Free partition keeps only the free model selectable.
         monkeypatch.setattr(
-            models_mod, "partition_nous_models_by_tier",
+            models_mod,
+            "partition_nous_models_by_tier",
             lambda ids, pricing, free_tier: (["free/cheap"], ["paid/expensive"]),
         )
 
@@ -2295,11 +2455,18 @@ class TestWebServerEndpoints:
         """A paid Nous user gets the first curated/paid-augmented model."""
         import ReYMeN_cli.models as models_mod
 
-        monkeypatch.setattr(models_mod, "get_curated_nous_model_ids", lambda: ["top/model", "other/model"])
-        monkeypatch.setattr(models_mod, "get_pricing_for_provider", lambda provider: {})
-        monkeypatch.setattr(models_mod, "check_nous_free_tier", lambda *, force_fresh=False: False)
         monkeypatch.setattr(
-            models_mod, "union_with_portal_paid_recommendations",
+            models_mod,
+            "get_curated_nous_model_ids",
+            lambda: ["top/model", "other/model"],
+        )
+        monkeypatch.setattr(models_mod, "get_pricing_for_provider", lambda provider: {})
+        monkeypatch.setattr(
+            models_mod, "check_nous_free_tier", lambda *, force_fresh=False: False
+        )
+        monkeypatch.setattr(
+            models_mod,
+            "union_with_portal_paid_recommendations",
             lambda ids, pricing, url: (ids, pricing),
         )
 
@@ -2334,17 +2501,20 @@ class TestWebServerEndpoints:
 class TestBuildSchemaFromConfig:
     def test_produces_expected_field_count(self):
         from ReYMeN_cli.web_server import CONFIG_SCHEMA
+
         # DEFAULT_CONFIG has ~150+ leaf fields
         assert len(CONFIG_SCHEMA) > 100
 
     def test_schema_entries_have_required_fields(self):
         from ReYMeN_cli.web_server import CONFIG_SCHEMA
+
         for key, entry in list(CONFIG_SCHEMA.items())[:10]:
             assert "type" in entry, f"Missing type for {key}"
             assert "category" in entry, f"Missing category for {key}"
 
     def test_overrides_applied(self):
         from ReYMeN_cli.web_server import CONFIG_SCHEMA
+
         # terminal.backend should be a select with options
         if "terminal.backend" in CONFIG_SCHEMA:
             entry = CONFIG_SCHEMA["terminal.backend"]
@@ -2354,6 +2524,7 @@ class TestBuildSchemaFromConfig:
 
     def test_empty_prefix_produces_correct_keys(self):
         from ReYMeN_cli.web_server import _build_schema_from_config
+
         test_config = {"model": "test", "nested": {"key": "val"}}
         schema = _build_schema_from_config(test_config)
         assert "model" in schema
@@ -2362,17 +2533,20 @@ class TestBuildSchemaFromConfig:
     def test_top_level_scalars_get_general_category(self):
         """Top-level scalar fields should be in 'general' category."""
         from ReYMeN_cli.web_server import CONFIG_SCHEMA
+
         assert CONFIG_SCHEMA["model"]["category"] == "general"
 
     def test_nested_keys_get_parent_category(self):
         """Nested fields should use the top-level parent as their category."""
         from ReYMeN_cli.web_server import CONFIG_SCHEMA
+
         if "agent.max_turns" in CONFIG_SCHEMA:
             assert CONFIG_SCHEMA["agent.max_turns"]["category"] == "agent"
 
     def test_category_merge_applied(self):
         """Small categories should be merged into larger ones."""
         from ReYMeN_cli.web_server import CONFIG_SCHEMA
+
         categories = {e["category"] for e in CONFIG_SCHEMA.values()}
         # These should be merged away
         assert "privacy" not in categories  # merged into security
@@ -2382,9 +2556,12 @@ class TestBuildSchemaFromConfig:
         """After merging, no category should have just 1 field."""
         from ReYMeN_cli.web_server import CONFIG_SCHEMA
         from collections import Counter
+
         cats = Counter(e["category"] for e in CONFIG_SCHEMA.values())
         for cat, count in cats.items():
-            assert count >= 2, f"Category '{cat}' has only {count} field(s) — should be merged"
+            assert (
+                count >= 2
+            ), f"Category '{cat}' has only {count} field(s) — should be merged"
 
 
 # ---------------------------------------------------------------------------
@@ -2402,6 +2579,7 @@ class TestConfigRoundTrip:
         except ImportError:
             pytest.skip("fastapi/starlette not installed")
         from ReYMeN_cli.web_server import app, _SESSION_HEADER_NAME, _SESSION_TOKEN
+
         self.client = TestClient(app)
         self.client.headers[_SESSION_HEADER_NAME] = _SESSION_TOKEN
 
@@ -2414,22 +2592,25 @@ class TestConfigRoundTrip:
     def test_get_config_model_is_string(self):
         """GET /api/config should normalize model dict to a string."""
         config = self.client.get("/api/config").json()
-        assert isinstance(config.get("model"), str), \
-            f"model should be string, got {type(config.get('model'))}"
+        assert isinstance(
+            config.get("model"), str
+        ), f"model should be string, got {type(config.get('model'))}"
 
     def test_round_trip_preserves_model_subkeys(self):
         """Save and reload should not lose model.provider, model.base_url, etc."""
         from ReYMeN_cli.config import load_config, save_config
 
         # Set up a config with model as a dict (the common user config form)
-        save_config({
-            "model": {
-                "default": "anthropic/claude-sonnet-4",
-                "provider": "openrouter",
-                "base_url": "https://openrouter.ai/api/v1",
-                "api_mode": "openai",
+        save_config(
+            {
+                "model": {
+                    "default": "anthropic/claude-sonnet-4",
+                    "provider": "openrouter",
+                    "base_url": "https://openrouter.ai/api/v1",
+                    "api_mode": "openai",
+                }
             }
-        })
+        )
 
         before = load_config()
         assert isinstance(before.get("model"), dict)
@@ -2437,14 +2618,19 @@ class TestConfigRoundTrip:
 
         # GET → PUT unchanged
         web_config = self.client.get("/api/config").json()
-        assert isinstance(web_config.get("model"), str), "GET should normalize model to string"
+        assert isinstance(
+            web_config.get("model"), str
+        ), "GET should normalize model to string"
 
         self.client.put("/api/config", json={"config": web_config})
 
         after = load_config()
-        assert isinstance(after.get("model"), dict), "model should still be a dict after save"
-        assert set(after["model"].keys()) >= original_keys, \
-            f"Lost model subkeys: {original_keys - set(after['model'].keys())}"
+        assert isinstance(
+            after.get("model"), dict
+        ), "model should still be a dict after save"
+        assert (
+            set(after["model"].keys()) >= original_keys
+        ), f"Lost model subkeys: {original_keys - set(after['model'].keys())}"
 
     def test_edit_model_name_preserved(self):
         """Changing the model string should update model.default on disk."""
@@ -2539,7 +2725,9 @@ class TestNewEndpoints:
         from ReYMeN_constants import get_reymen_home
         from ReYMeN_cli.web_server import app, _SESSION_HEADER_NAME, _SESSION_TOKEN
 
-        monkeypatch.setattr(ReYMeN_state, "DEFAULT_DB_PATH", get_reymen_home() / "state.db")
+        monkeypatch.setattr(
+            ReYMeN_state, "DEFAULT_DB_PATH", get_reymen_home() / "state.db"
+        )
 
         self.client = TestClient(app)
         self.client.headers[_SESSION_HEADER_NAME] = _SESSION_TOKEN
@@ -2580,12 +2768,16 @@ class TestNewEndpoints:
     def test_blueprint_instantiate_creates_job(self):
         resp = self.client.post(
             "/api/cron/blueprints/instantiate",
-            json={"blueprint": "morning-brief", "values": {"time": "07:30", "deliver": "local"}},
+            json={
+                "blueprint": "morning-brief",
+                "values": {"time": "07:30", "deliver": "local"},
+            },
         )
         assert resp.status_code == 200
         job = resp.json()
-        assert (job.get("schedule_display") or "").strip() == "30 7 * * *" or \
-            (job.get("schedule", {}) or {}).get("expr") == "30 7 * * *"
+        assert (job.get("schedule_display") or "").strip() == "30 7 * * *" or (
+            job.get("schedule", {}) or {}
+        ).get("expr") == "30 7 * * *"
 
     def test_blueprint_instantiate_unknown_404(self):
         resp = self.client.post(
@@ -2605,6 +2797,7 @@ class TestNewEndpoints:
 
     def test_profiles_list_includes_default(self):
         from ReYMeN_constants import get_reymen_home
+
         get_reymen_home().mkdir(parents=True, exist_ok=True)
 
         resp = self.client.get("/api/profiles")
@@ -2626,7 +2819,9 @@ class TestNewEndpoints:
         named.mkdir(parents=True)
         (named / ".env").write_text("EXAMPLE=1\n", encoding="utf-8")
         (named / "skills" / "demo").mkdir(parents=True)
-        (named / "skills" / "demo" / "SKILL.md").write_text("---\nname: demo\n---\n", encoding="utf-8")
+        (named / "skills" / "demo" / "SKILL.md").write_text(
+            "---\nname: demo\n---\n", encoding="utf-8"
+        )
 
         monkeypatch.setattr(
             profiles_mod,
@@ -2647,7 +2842,10 @@ class TestNewEndpoints:
         # Stub gateway service teardown so the test doesn't shell out to
         # launchctl/systemctl on the host.
         import ReYMeN_cli.profiles as profiles_mod
-        monkeypatch.setattr(profiles_mod, "_cleanup_gateway_service", lambda *a, **kw: None)
+
+        monkeypatch.setattr(
+            profiles_mod, "_cleanup_gateway_service", lambda *a, **kw: None
+        )
 
         created = self.client.post("/api/profiles", json={"name": "test-prof"})
         assert created.status_code == 200
@@ -2687,13 +2885,17 @@ class TestNewEndpoints:
         assert resp.status_code == 200
         assert resp.json()["command"] == "ReYMeN setup"
 
-    def test_profiles_create_creates_wrapper_alias_when_safe(self, monkeypatch, tmp_path):
+    def test_profiles_create_creates_wrapper_alias_when_safe(
+        self, monkeypatch, tmp_path
+    ):
         import ReYMeN_cli.profiles as profiles_mod
 
         wrapper_dir = tmp_path / "bin"
         wrapper_dir.mkdir()
         monkeypatch.setattr(profiles_mod, "_get_wrapper_dir", lambda: wrapper_dir)
-        monkeypatch.setattr(profiles_mod.shutil, "which", lambda name: "/opt/ReYMeN/bin/ReYMeN")
+        monkeypatch.setattr(
+            profiles_mod.shutil, "which", lambda name: "/opt/ReYMeN/bin/ReYMeN"
+        )
 
         resp = self.client.post(
             "/api/profiles",
@@ -2703,7 +2905,10 @@ class TestNewEndpoints:
         assert resp.status_code == 200
         wrapper_path = wrapper_dir / "writer"
         assert wrapper_path.exists()
-        assert wrapper_path.read_text() == '#!/bin/sh\nexec /opt/ReYMeN/bin/ReYMeN -p writer "$@"\n'
+        assert (
+            wrapper_path.read_text()
+            == '#!/bin/sh\nexec /opt/ReYMeN/bin/ReYMeN -p writer "$@"\n'
+        )
 
     def test_profiles_create_with_clone_from_copies_source_skills(self, monkeypatch):
         from ReYMeN_constants import get_reymen_home
@@ -2716,7 +2921,9 @@ class TestNewEndpoints:
         )
         default_skill = get_reymen_home() / "skills" / "custom" / "new-skill"
         default_skill.mkdir(parents=True)
-        (default_skill / "SKILL.md").write_text("---\nname: new-skill\n---\n", encoding="utf-8")
+        (default_skill / "SKILL.md").write_text(
+            "---\nname: new-skill\n---\n", encoding="utf-8"
+        )
 
         resp = self.client.post(
             "/api/profiles",
@@ -2727,9 +2934,13 @@ class TestNewEndpoints:
         cloned_root = get_reymen_home() / "profiles" / "cloned"
         cloned_skill = cloned_root / "skills" / "custom" / "new-skill" / "SKILL.md"
         assert cloned_skill.exists()
-        cloned_config = yaml.safe_load((cloned_root / "config.yaml").read_text(encoding="utf-8"))
+        cloned_config = yaml.safe_load(
+            (cloned_root / "config.yaml").read_text(encoding="utf-8")
+        )
         assert cloned_config["_config_version"] == DEFAULT_CONFIG["_config_version"]
-        profiles = {p["name"]: p for p in self.client.get("/api/profiles").json()["profiles"]}
+        profiles = {
+            p["name"]: p for p in self.client.get("/api/profiles").json()["profiles"]
+        }
         assert profiles["cloned"]["skill_count"] == 1
 
     def test_profiles_create_with_clone_from_duplicates_source(self, monkeypatch):
@@ -2739,10 +2950,22 @@ class TestNewEndpoints:
         monkeypatch.setattr(profiles_mod, "create_wrapper_script", lambda name: None)
 
         # Create a source profile and give it a distinctive skill.
-        assert self.client.post("/api/profiles", json={"name": "source-prof"}).status_code == 200
-        source_skill = get_reymen_home() / "profiles" / "source-prof" / "skills" / "custom" / "src-skill"
+        assert (
+            self.client.post("/api/profiles", json={"name": "source-prof"}).status_code
+            == 200
+        )
+        source_skill = (
+            get_reymen_home()
+            / "profiles"
+            / "source-prof"
+            / "skills"
+            / "custom"
+            / "src-skill"
+        )
         source_skill.mkdir(parents=True)
-        (source_skill / "SKILL.md").write_text("---\nname: src-skill\n---\n", encoding="utf-8")
+        (source_skill / "SKILL.md").write_text(
+            "---\nname: src-skill\n---\n", encoding="utf-8"
+        )
 
         # Duplicate it via an explicit clone_from source (not "default").
         resp = self.client.post(
@@ -2752,7 +2975,13 @@ class TestNewEndpoints:
 
         assert resp.status_code == 200
         cloned_skill = (
-            get_reymen_home() / "profiles" / "source-prof-copy" / "skills" / "custom" / "src-skill" / "SKILL.md"
+            get_reymen_home()
+            / "profiles"
+            / "source-prof-copy"
+            / "skills"
+            / "custom"
+            / "src-skill"
+            / "SKILL.md"
         )
         assert cloned_skill.exists()
 
@@ -2762,11 +2991,20 @@ class TestNewEndpoints:
 
         monkeypatch.setattr(profiles_mod, "create_wrapper_script", lambda name: None)
 
-        assert self.client.post("/api/profiles", json={"name": "full-src"}).status_code == 200
+        assert (
+            self.client.post("/api/profiles", json={"name": "full-src"}).status_code
+            == 200
+        )
         source_dir = get_reymen_home() / "profiles" / "full-src"
-        (source_dir / "config.yaml").write_text("model:\n  provider: source-only\n", encoding="utf-8")
-        (source_dir / "workspace" / "artifact.txt").parent.mkdir(parents=True, exist_ok=True)
-        (source_dir / "workspace" / "artifact.txt").write_text("copied", encoding="utf-8")
+        (source_dir / "config.yaml").write_text(
+            "model:\n  provider: source-only\n", encoding="utf-8"
+        )
+        (source_dir / "workspace" / "artifact.txt").parent.mkdir(
+            parents=True, exist_ok=True
+        )
+        (source_dir / "workspace" / "artifact.txt").write_text(
+            "copied", encoding="utf-8"
+        )
 
         resp = self.client.post(
             "/api/profiles",
@@ -2775,8 +3013,12 @@ class TestNewEndpoints:
 
         assert resp.status_code == 200
         target_dir = get_reymen_home() / "profiles" / "full-copy"
-        assert (target_dir / "config.yaml").read_text(encoding="utf-8") == "model:\n  provider: source-only\n"
-        assert (target_dir / "workspace" / "artifact.txt").read_text(encoding="utf-8") == "copied"
+        assert (target_dir / "config.yaml").read_text(
+            encoding="utf-8"
+        ) == "model:\n  provider: source-only\n"
+        assert (target_dir / "workspace" / "artifact.txt").read_text(
+            encoding="utf-8"
+        ) == "copied"
 
     def test_profiles_create_without_clone_seeds_bundled_skills(self, monkeypatch):
         from ReYMeN_constants import get_reymen_home
@@ -2787,7 +3029,9 @@ class TestNewEndpoints:
         def fake_seed(profile_dir, quiet=False):
             skill_dir = profile_dir / "skills" / "software-development" / "plan"
             skill_dir.mkdir(parents=True)
-            (skill_dir / "SKILL.md").write_text("---\nname: plan\n---\n", encoding="utf-8")
+            (skill_dir / "SKILL.md").write_text(
+                "---\nname: plan\n---\n", encoding="utf-8"
+            )
             return {"copied": ["plan"]}
 
         monkeypatch.setattr(profiles_mod, "seed_profile_skills", fake_seed)
@@ -2798,12 +3042,24 @@ class TestNewEndpoints:
         )
 
         assert resp.status_code == 200
-        seeded_skill = get_reymen_home() / "profiles" / "fresh" / "skills" / "software-development" / "plan" / "SKILL.md"
+        seeded_skill = (
+            get_reymen_home()
+            / "profiles"
+            / "fresh"
+            / "skills"
+            / "software-development"
+            / "plan"
+            / "SKILL.md"
+        )
         assert seeded_skill.exists()
-        profiles = {p["name"]: p for p in self.client.get("/api/profiles").json()["profiles"]}
+        profiles = {
+            p["name"]: p for p in self.client.get("/api/profiles").json()["profiles"]
+        }
         assert profiles["fresh"]["skill_count"] == 1
 
-    def test_profiles_create_builder_fields_model_mcp_and_keep_skills(self, monkeypatch):
+    def test_profiles_create_builder_fields_model_mcp_and_keep_skills(
+        self, monkeypatch
+    ):
         """Profile-builder create: model + MCP servers + keep-skills selection
         all land in the NEW profile's config, and hub installs are spawned
         scoped to that profile via ``-p <name>``."""
@@ -2824,7 +3080,9 @@ class TestNewEndpoints:
             for skill in ("keep-me", "drop-me"):
                 d = profile_dir / "skills" / "custom" / skill
                 d.mkdir(parents=True)
-                (d / "SKILL.md").write_text(f"---\nname: {skill}\n---\n", encoding="utf-8")
+                (d / "SKILL.md").write_text(
+                    f"---\nname: {skill}\n---\n", encoding="utf-8"
+                )
             return {"copied": ["keep-me", "drop-me"]}
 
         monkeypatch.setattr(profiles_mod, "seed_profile_skills", fake_seed)
@@ -2861,7 +3119,9 @@ class TestNewEndpoints:
         assert data["model_set"] is True
         assert data["mcp_written"] == 1  # bogus skipped
         assert data["skills_disabled"] == 1  # drop-me disabled, keep-me kept
-        assert data["hub_installs"] == [{"identifier": "someuser/some-skill", "pid": 4321}]
+        assert data["hub_installs"] == [
+            {"identifier": "someuser/some-skill", "pid": 4321}
+        ]
 
         # Hub install was scoped to the new profile.
         assert spawned == [
@@ -2892,7 +3152,9 @@ class TestNewEndpoints:
         (get_reymen_home() / "profiles" / "coder").mkdir(parents=True)
         calls = []
         monkeypatch.setattr(web_server.sys, "platform", "darwin")
-        monkeypatch.setattr(web_server.subprocess, "Popen", lambda args, **kwargs: calls.append(args))
+        monkeypatch.setattr(
+            web_server.subprocess, "Popen", lambda args, **kwargs: calls.append(args)
+        )
 
         resp = self.client.post("/api/profiles/coder/open-terminal")
 
@@ -2908,7 +3170,9 @@ class TestNewEndpoints:
         (get_reymen_home() / "profiles" / "coder").mkdir(parents=True)
         calls = []
         monkeypatch.setattr(web_server.sys, "platform", "win32")
-        monkeypatch.setattr(web_server.subprocess, "Popen", lambda args, **kwargs: calls.append(args))
+        monkeypatch.setattr(
+            web_server.subprocess, "Popen", lambda args, **kwargs: calls.append(args)
+        )
 
         resp = self.client.post("/api/profiles/coder/open-terminal")
 
@@ -2931,7 +3195,10 @@ class TestNewEndpoints:
 
     def test_profile_soul_round_trip(self, monkeypatch):
         import ReYMeN_cli.profiles as profiles_mod
-        monkeypatch.setattr(profiles_mod, "_cleanup_gateway_service", lambda *a, **kw: None)
+
+        monkeypatch.setattr(
+            profiles_mod, "_cleanup_gateway_service", lambda *a, **kw: None
+        )
 
         self.client.post("/api/profiles", json={"name": "soul-prof"})
         get1 = self.client.get("/api/profiles/soul-prof/soul")
@@ -2957,6 +3224,7 @@ class TestNewEndpoints:
 
     def test_profiles_active_defaults(self):
         from ReYMeN_constants import get_reymen_home
+
         get_reymen_home().mkdir(parents=True, exist_ok=True)
 
         resp = self.client.get("/api/profiles/active")
@@ -2967,6 +3235,7 @@ class TestNewEndpoints:
 
     def test_profiles_set_active_round_trip(self, monkeypatch):
         import ReYMeN_cli.profiles as profiles_mod
+
         monkeypatch.setattr(profiles_mod, "create_wrapper_script", lambda name: None)
 
         self.client.post("/api/profiles", json={"name": "router"})
@@ -2982,6 +3251,7 @@ class TestNewEndpoints:
 
     def test_profile_description_round_trip(self, monkeypatch):
         import ReYMeN_cli.profiles as profiles_mod
+
         monkeypatch.setattr(profiles_mod, "create_wrapper_script", lambda name: None)
 
         self.client.post("/api/profiles", json={"name": "desc-prof"})
@@ -2995,7 +3265,9 @@ class TestNewEndpoints:
         assert body["description"] == "Handles code review"
         assert body["description_auto"] is False
 
-        profiles = {p["name"]: p for p in self.client.get("/api/profiles").json()["profiles"]}
+        profiles = {
+            p["name"]: p for p in self.client.get("/api/profiles").json()["profiles"]
+        }
         assert profiles["desc-prof"]["description"] == "Handles code review"
         assert profiles["desc-prof"]["description_auto"] is False
 
@@ -3008,6 +3280,7 @@ class TestNewEndpoints:
     def test_profile_model_round_trip(self, monkeypatch):
         from ReYMeN_constants import get_reymen_home
         import ReYMeN_cli.profiles as profiles_mod
+
         monkeypatch.setattr(profiles_mod, "create_wrapper_script", lambda name: None)
 
         self.client.post("/api/profiles", json={"name": "model-prof"})
@@ -3020,6 +3293,7 @@ class TestNewEndpoints:
         assert resp.json()["provider"] == "openrouter"
 
         import yaml
+
         cfg_path = get_reymen_home() / "profiles" / "model-prof" / "config.yaml"
         cfg = yaml.safe_load(cfg_path.read_text(encoding="utf-8"))
         assert cfg["model"]["provider"] == "openrouter"
@@ -3027,6 +3301,7 @@ class TestNewEndpoints:
 
     def test_profile_model_requires_provider_and_model(self, monkeypatch):
         import ReYMeN_cli.profiles as profiles_mod
+
         monkeypatch.setattr(profiles_mod, "create_wrapper_script", lambda name: None)
 
         self.client.post("/api/profiles", json={"name": "model-prof2"})
@@ -3038,11 +3313,13 @@ class TestNewEndpoints:
 
     def test_profile_describe_auto_success(self, monkeypatch):
         import ReYMeN_cli.profiles as profiles_mod
+
         monkeypatch.setattr(profiles_mod, "create_wrapper_script", lambda name: None)
 
         self.client.post("/api/profiles", json={"name": "auto-prof"})
 
         from ReYMeN_cli import profile_describer
+
         monkeypatch.setattr(
             profile_describer,
             "describe_profile",
@@ -3060,11 +3337,13 @@ class TestNewEndpoints:
 
     def test_profile_describe_auto_failure_is_not_auto(self, monkeypatch):
         import ReYMeN_cli.profiles as profiles_mod
+
         monkeypatch.setattr(profiles_mod, "create_wrapper_script", lambda name: None)
 
         self.client.post("/api/profiles", json={"name": "auto-fail"})
 
         from ReYMeN_cli import profile_describer
+
         monkeypatch.setattr(
             profile_describer,
             "describe_profile",
@@ -3096,16 +3375,30 @@ class TestNewEndpoints:
         def _fake_find_all_skills(*, skip_disabled=False):
             if skip_disabled:
                 return [
-                    {"name": "active-skill", "description": "active", "category": "demo"},
-                    {"name": "disabled-skill", "description": "disabled", "category": "demo"},
+                    {
+                        "name": "active-skill",
+                        "description": "active",
+                        "category": "demo",
+                    },
+                    {
+                        "name": "disabled-skill",
+                        "description": "disabled",
+                        "category": "demo",
+                    },
                 ]
             return [
                 {"name": "active-skill", "description": "active", "category": "demo"},
             ]
 
         monkeypatch.setattr(skills_tool, "_find_all_skills", _fake_find_all_skills)
-        monkeypatch.setattr(skills_config, "get_disabled_skills", lambda config: {"disabled-skill"})
-        monkeypatch.setattr(web_server, "load_config", lambda: {"skills": {"disabled": ["disabled-skill"]}})
+        monkeypatch.setattr(
+            skills_config, "get_disabled_skills", lambda config: {"disabled-skill"}
+        )
+        monkeypatch.setattr(
+            web_server,
+            "load_config",
+            lambda: {"skills": {"disabled": ["disabled-skill"]}},
+        )
 
         resp = self.client.get("/api/skills")
 
@@ -3152,7 +3445,10 @@ class TestNewEndpoints:
         monkeypatch.setattr(
             tools_config,
             "_get_platform_tools",
-            lambda config, platform, include_default_mcp_servers=False: {"web", "skills"},
+            lambda config, platform, include_default_mcp_servers=False: {
+                "web",
+                "skills",
+            },
         )
         monkeypatch.setattr(
             tools_config,
@@ -3168,7 +3464,11 @@ class TestNewEndpoints:
                 "memory": ["memory_read"],
             }[name],
         )
-        monkeypatch.setattr(web_server, "load_config", lambda: {"platform_toolsets": {"cli": ["web", "skills"]}})
+        monkeypatch.setattr(
+            web_server,
+            "load_config",
+            lambda: {"platform_toolsets": {"cli": ["web", "skills"]}},
+        )
 
         resp = self.client.get("/api/tools/toolsets")
 
@@ -3312,6 +3612,7 @@ class TestNewEndpoints:
         assert body["provider"] == "Firecrawl Self-Hosted"
 
         from ReYMeN_cli.config import load_config
+
         cfg = load_config()
         assert cfg["web"]["backend"] == "firecrawl"
 
@@ -3370,7 +3671,9 @@ class TestNewEndpoints:
             "top_skills": [],
         }
 
-    def test_models_analytics_merges_session_only_duplicate_into_accounted_provider(self):
+    def test_models_analytics_merges_session_only_duplicate_into_accounted_provider(
+        self,
+    ):
         """Session-only model rows should not render as duplicate zero-token cards.
 
         Direct-provider-on-OpenRouter sessions can leave one row with only
@@ -3407,8 +3710,7 @@ class TestNewEndpoints:
 
         models = resp.json()["models"]
         deepseek_rows = [
-            row for row in models
-            if row["model"] == "deepseek/deepseek-v4-flash"
+            row for row in models if row["model"] == "deepseek/deepseek-v4-flash"
         ]
 
         assert len(deepseek_rows) == 1
@@ -3541,14 +3843,21 @@ class TestModelContextLength:
         from ReYMeN_cli.config import save_config
 
         # Set up disk config with model as a dict
-        save_config({
-            "model": {"default": "anthropic/claude-opus-4.6", "provider": "openrouter"}
-        })
+        save_config(
+            {
+                "model": {
+                    "default": "anthropic/claude-opus-4.6",
+                    "provider": "openrouter",
+                }
+            }
+        )
 
-        result = _denormalize_config_from_web({
-            "model": "anthropic/claude-opus-4.6",
-            "model_context_length": 100000,
-        })
+        result = _denormalize_config_from_web(
+            {
+                "model": "anthropic/claude-opus-4.6",
+                "model_context_length": 100000,
+            }
+        )
         assert isinstance(result["model"], dict)
         assert result["model"]["context_length"] == 100000
         assert "model_context_length" not in result  # virtual field removed
@@ -3558,18 +3867,22 @@ class TestModelContextLength:
         from ReYMeN_cli.web_server import _denormalize_config_from_web
         from ReYMeN_cli.config import save_config
 
-        save_config({
-            "model": {
-                "default": "anthropic/claude-opus-4.6",
-                "provider": "openrouter",
-                "context_length": 50000,
+        save_config(
+            {
+                "model": {
+                    "default": "anthropic/claude-opus-4.6",
+                    "provider": "openrouter",
+                    "context_length": 50000,
+                }
             }
-        })
+        )
 
-        result = _denormalize_config_from_web({
-            "model": "anthropic/claude-opus-4.6",
-            "model_context_length": 0,
-        })
+        result = _denormalize_config_from_web(
+            {
+                "model": "anthropic/claude-opus-4.6",
+                "model_context_length": 0,
+            }
+        )
         assert isinstance(result["model"], dict)
         assert "context_length" not in result["model"]
 
@@ -3581,10 +3894,12 @@ class TestModelContextLength:
         # Disk has model as bare string
         save_config({"model": "anthropic/claude-sonnet-4"})
 
-        result = _denormalize_config_from_web({
-            "model": "anthropic/claude-sonnet-4",
-            "model_context_length": 65000,
-        })
+        result = _denormalize_config_from_web(
+            {
+                "model": "anthropic/claude-sonnet-4",
+                "model_context_length": 65000,
+            }
+        )
         assert isinstance(result["model"], dict)
         assert result["model"]["default"] == "anthropic/claude-sonnet-4"
         assert result["model"]["context_length"] == 65000
@@ -3596,10 +3911,12 @@ class TestModelContextLength:
 
         save_config({"model": "anthropic/claude-sonnet-4"})
 
-        result = _denormalize_config_from_web({
-            "model": "anthropic/claude-sonnet-4",
-            "model_context_length": 0,
-        })
+        result = _denormalize_config_from_web(
+            {
+                "model": "anthropic/claude-sonnet-4",
+                "model_context_length": 0,
+            }
+        )
         assert result["model"] == "anthropic/claude-sonnet-4"
 
     def test_denormalize_coerces_string_context_length(self):
@@ -3607,14 +3924,14 @@ class TestModelContextLength:
         from ReYMeN_cli.web_server import _denormalize_config_from_web
         from ReYMeN_cli.config import save_config
 
-        save_config({
-            "model": {"default": "test/model", "provider": "openrouter"}
-        })
+        save_config({"model": {"default": "test/model", "provider": "openrouter"}})
 
-        result = _denormalize_config_from_web({
-            "model": "test/model",
-            "model_context_length": "32000",
-        })
+        result = _denormalize_config_from_web(
+            {
+                "model": "test/model",
+                "model_context_length": "32000",
+            }
+        )
         assert isinstance(result["model"], dict)
         assert result["model"]["context_length"] == 32000
 
@@ -3624,17 +3941,20 @@ class TestModelContextLengthSchema:
 
     def test_schema_has_model_context_length(self):
         from ReYMeN_cli.web_server import CONFIG_SCHEMA
+
         assert "model_context_length" in CONFIG_SCHEMA
 
     def test_schema_model_context_length_after_model(self):
         """model_context_length should appear immediately after model in schema."""
         from ReYMeN_cli.web_server import CONFIG_SCHEMA
+
         keys = list(CONFIG_SCHEMA.keys())
         model_idx = keys.index("model")
         assert keys[model_idx + 1] == "model_context_length"
 
     def test_schema_model_context_length_is_number(self):
         from ReYMeN_cli.web_server import CONFIG_SCHEMA
+
         entry = CONFIG_SCHEMA["model_context_length"]
         assert entry["type"] == "number"
         assert "category" in entry
@@ -3650,6 +3970,7 @@ class TestModelInfoEndpoint:
         except ImportError:
             pytest.skip("fastapi/starlette not installed")
         from ReYMeN_cli.web_server import app
+
         self.client = TestClient(app)
 
     def test_model_info_returns_200(self):
@@ -3666,15 +3987,21 @@ class TestModelInfoEndpoint:
     def test_model_info_with_dict_config(self, monkeypatch):
         import ReYMeN_cli.web_server as ws
 
-        monkeypatch.setattr(ws, "load_config", lambda: {
-            "model": {
-                "default": "anthropic/claude-opus-4.6",
-                "provider": "openrouter",
-                "context_length": 100000,
-            }
-        })
+        monkeypatch.setattr(
+            ws,
+            "load_config",
+            lambda: {
+                "model": {
+                    "default": "anthropic/claude-opus-4.6",
+                    "provider": "openrouter",
+                    "context_length": 100000,
+                }
+            },
+        )
 
-        with patch("agent.model_metadata.get_model_context_length", return_value=200000):
+        with patch(
+            "agent.model_metadata.get_model_context_length", return_value=200000
+        ):
             resp = self.client.get("/api/model/info")
 
         data = resp.json()
@@ -3687,11 +4014,20 @@ class TestModelInfoEndpoint:
     def test_model_info_auto_detect_when_no_override(self, monkeypatch):
         import ReYMeN_cli.web_server as ws
 
-        monkeypatch.setattr(ws, "load_config", lambda: {
-            "model": {"default": "anthropic/claude-opus-4.6", "provider": "openrouter"}
-        })
+        monkeypatch.setattr(
+            ws,
+            "load_config",
+            lambda: {
+                "model": {
+                    "default": "anthropic/claude-opus-4.6",
+                    "provider": "openrouter",
+                }
+            },
+        )
 
-        with patch("agent.model_metadata.get_model_context_length", return_value=200000):
+        with patch(
+            "agent.model_metadata.get_model_context_length", return_value=200000
+        ):
             resp = self.client.get("/api/model/info")
 
         data = resp.json()
@@ -3712,11 +4048,13 @@ class TestModelInfoEndpoint:
     def test_model_info_bare_string_model(self, monkeypatch):
         import ReYMeN_cli.web_server as ws
 
-        monkeypatch.setattr(ws, "load_config", lambda: {
-            "model": "anthropic/claude-sonnet-4"
-        })
+        monkeypatch.setattr(
+            ws, "load_config", lambda: {"model": "anthropic/claude-sonnet-4"}
+        )
 
-        with patch("agent.model_metadata.get_model_context_length", return_value=200000):
+        with patch(
+            "agent.model_metadata.get_model_context_length", return_value=200000
+        ):
             resp = self.client.get("/api/model/info")
 
         data = resp.json()
@@ -3728,9 +4066,16 @@ class TestModelInfoEndpoint:
     def test_model_info_capabilities(self, monkeypatch):
         import ReYMeN_cli.web_server as ws
 
-        monkeypatch.setattr(ws, "load_config", lambda: {
-            "model": {"default": "anthropic/claude-opus-4.6", "provider": "openrouter"}
-        })
+        monkeypatch.setattr(
+            ws,
+            "load_config",
+            lambda: {
+                "model": {
+                    "default": "anthropic/claude-opus-4.6",
+                    "provider": "openrouter",
+                }
+            },
+        )
 
         mock_caps = MagicMock()
         mock_caps.supports_tools = True
@@ -3740,8 +4085,9 @@ class TestModelInfoEndpoint:
         mock_caps.max_output_tokens = 32000
         mock_caps.model_family = "claude-opus"
 
-        with patch("agent.model_metadata.get_model_context_length", return_value=200000), \
-             patch("agent.models_dev.get_model_capabilities", return_value=mock_caps):
+        with patch(
+            "agent.model_metadata.get_model_context_length", return_value=200000
+        ), patch("agent.models_dev.get_model_capabilities", return_value=mock_caps):
             resp = self.client.get("/api/model/info")
 
         caps = resp.json()["capabilities"]
@@ -3755,11 +4101,12 @@ class TestModelInfoEndpoint:
         """Endpoint should return zeros on import/resolution errors, not 500."""
         import ReYMeN_cli.web_server as ws
 
-        monkeypatch.setattr(ws, "load_config", lambda: {
-            "model": "some/obscure-model"
-        })
+        monkeypatch.setattr(ws, "load_config", lambda: {"model": "some/obscure-model"})
 
-        with patch("agent.model_metadata.get_model_context_length", side_effect=Exception("boom")):
+        with patch(
+            "agent.model_metadata.get_model_context_length",
+            side_effect=Exception("boom"),
+        ):
             resp = self.client.get("/api/model/info")
 
         assert resp.status_code == 200
@@ -3778,6 +4125,7 @@ class TestProbeGatewayHealth:
     def test_returns_false_when_no_url_configured(self, monkeypatch):
         """When GATEWAY_HEALTH_URL is unset, the probe returns (False, None)."""
         import ReYMeN_cli.web_server as ws
+
         monkeypatch.setattr(ws, "_GATEWAY_HEALTH_URL", None)
         alive, body = ws._probe_gateway_health()
         assert alive is False
@@ -3786,6 +4134,7 @@ class TestProbeGatewayHealth:
     def test_normalizes_url_with_health_suffix(self, monkeypatch):
         """If the user sets the URL to include /health, it's stripped to base."""
         import ReYMeN_cli.web_server as ws
+
         monkeypatch.setattr(ws, "_GATEWAY_HEALTH_URL", "http://gw:8642/health")
         monkeypatch.setattr(ws, "_GATEWAY_HEALTH_TIMEOUT", 1)
         # Both paths should fail (no server), but we verify they were constructed
@@ -3806,6 +4155,7 @@ class TestProbeGatewayHealth:
     def test_normalizes_url_with_health_detailed_suffix(self, monkeypatch):
         """If the user sets the URL to include /health/detailed, it's stripped to base."""
         import ReYMeN_cli.web_server as ws
+
         monkeypatch.setattr(ws, "_GATEWAY_HEALTH_URL", "http://gw:8642/health/detailed")
         monkeypatch.setattr(ws, "_GATEWAY_HEALTH_TIMEOUT", 1)
         calls = []
@@ -3822,14 +4172,17 @@ class TestProbeGatewayHealth:
     def test_successful_detailed_probe(self, monkeypatch):
         """Successful /health/detailed probe returns (True, body_dict)."""
         import ReYMeN_cli.web_server as ws
+
         monkeypatch.setattr(ws, "_GATEWAY_HEALTH_URL", "http://gw:8642")
         monkeypatch.setattr(ws, "_GATEWAY_HEALTH_TIMEOUT", 1)
 
-        response_body = json.dumps({
-            "status": "ok",
-            "gateway_state": "running",
-            "pid": 42,
-        })
+        response_body = json.dumps(
+            {
+                "status": "ok",
+                "gateway_state": "running",
+                "pid": 42,
+            }
+        )
 
         mock_resp = MagicMock()
         mock_resp.status = 200
@@ -3846,6 +4199,7 @@ class TestProbeGatewayHealth:
     def test_detailed_fails_falls_back_to_simple_health(self, monkeypatch):
         """If /health/detailed fails, falls back to /health."""
         import ReYMeN_cli.web_server as ws
+
         monkeypatch.setattr(ws, "_GATEWAY_HEALTH_URL", "http://gw:8642")
         monkeypatch.setattr(ws, "_GATEWAY_HEALTH_TIMEOUT", 1)
 
@@ -3880,6 +4234,7 @@ class TestStatusRemoteGateway:
             pytest.skip("fastapi/starlette not installed")
 
         from ReYMeN_cli.web_server import app, _SESSION_HEADER_NAME, _SESSION_TOKEN
+
         self.client = TestClient(app)
         self.client.headers[_SESSION_HEADER_NAME] = _SESSION_TOKEN
 
@@ -3890,12 +4245,19 @@ class TestStatusRemoteGateway:
         monkeypatch.setattr(ws, "get_running_pid", lambda: None)
         monkeypatch.setattr(ws, "read_runtime_status", lambda: None)
         monkeypatch.setattr(ws, "_GATEWAY_HEALTH_URL", "http://gw:8642")
-        monkeypatch.setattr(ws, "_probe_gateway_health", lambda: (True, {
-            "status": "ok",
-            "gateway_state": "running",
-            "platforms": {"telegram": {"state": "connected"}},
-            "pid": 999,
-        }))
+        monkeypatch.setattr(
+            ws,
+            "_probe_gateway_health",
+            lambda: (
+                True,
+                {
+                    "status": "ok",
+                    "gateway_state": "running",
+                    "platforms": {"telegram": {"state": "connected"}},
+                    "pid": 999,
+                },
+            ),
+        )
 
         resp = self.client.get("/api/status")
         assert resp.status_code == 200
@@ -3910,10 +4272,14 @@ class TestStatusRemoteGateway:
         import ReYMeN_cli.web_server as ws
 
         monkeypatch.setattr(ws, "get_running_pid", lambda: 1234)
-        monkeypatch.setattr(ws, "read_runtime_status", lambda: {
-            "gateway_state": "running",
-            "platforms": {},
-        })
+        monkeypatch.setattr(
+            ws,
+            "read_runtime_status",
+            lambda: {
+                "gateway_state": "running",
+                "platforms": {},
+            },
+        )
         monkeypatch.setattr(ws, "_GATEWAY_HEALTH_URL", "http://gw:8642")
         probe_called = [False]
         original = ws._probe_gateway_health
@@ -3949,9 +4315,16 @@ class TestStatusRemoteGateway:
         monkeypatch.setattr(ws, "get_running_pid", lambda: None)
         monkeypatch.setattr(ws, "read_runtime_status", lambda: None)
         monkeypatch.setattr(ws, "_GATEWAY_HEALTH_URL", "http://gw:8642")
-        monkeypatch.setattr(ws, "_probe_gateway_health", lambda: (True, {
-            "status": "ok",
-        }))
+        monkeypatch.setattr(
+            ws,
+            "_probe_gateway_health",
+            lambda: (
+                True,
+                {
+                    "status": "ok",
+                },
+            ),
+        )
 
         resp = self.client.get("/api/status")
         assert resp.status_code == 200
@@ -3971,12 +4344,14 @@ class TestNormaliseThemeDefinition:
 
     def test_rejects_missing_name(self):
         from ReYMeN_cli.web_server import _normalise_theme_definition
+
         assert _normalise_theme_definition({}) is None
         assert _normalise_theme_definition({"name": ""}) is None
         assert _normalise_theme_definition({"name": "   "}) is None
 
     def test_rejects_non_dict(self):
         from ReYMeN_cli.web_server import _normalise_theme_definition
+
         assert _normalise_theme_definition("string") is None
         assert _normalise_theme_definition(None) is None
         assert _normalise_theme_definition([1, 2, 3]) is None
@@ -3984,10 +4359,13 @@ class TestNormaliseThemeDefinition:
     def test_loose_colors_shorthand(self):
         """Bare hex strings under `colors` parse as {hex, alpha=1.0}."""
         from ReYMeN_cli.web_server import _normalise_theme_definition
-        result = _normalise_theme_definition({
-            "name": "loose",
-            "colors": {"background": "#000000", "midground": "#ffffff"},
-        })
+
+        result = _normalise_theme_definition(
+            {
+                "name": "loose",
+                "colors": {"background": "#000000", "midground": "#ffffff"},
+            }
+        )
         assert result is not None
         assert result["palette"]["background"] == {"hex": "#000000", "alpha": 1.0}
         assert result["palette"]["midground"] == {"hex": "#ffffff", "alpha": 1.0}
@@ -3997,15 +4375,18 @@ class TestNormaliseThemeDefinition:
 
     def test_full_palette_form(self):
         from ReYMeN_cli.web_server import _normalise_theme_definition
-        result = _normalise_theme_definition({
-            "name": "full",
-            "palette": {
-                "background": {"hex": "#0a1628", "alpha": 1.0},
-                "midground": {"hex": "#a8d0ff", "alpha": 0.9},
-                "warmGlow": "rgba(255, 0, 0, 0.5)",
-                "noiseOpacity": 0.5,
-            },
-        })
+
+        result = _normalise_theme_definition(
+            {
+                "name": "full",
+                "palette": {
+                    "background": {"hex": "#0a1628", "alpha": 1.0},
+                    "midground": {"hex": "#a8d0ff", "alpha": 0.9},
+                    "warmGlow": "rgba(255, 0, 0, 0.5)",
+                    "noiseOpacity": 0.5,
+                },
+            }
+        )
         assert result["palette"]["background"]["hex"] == "#0a1628"
         assert result["palette"]["midground"]["alpha"] == 0.9
         assert result["palette"]["warmGlow"] == "rgba(255, 0, 0, 0.5)"
@@ -4013,6 +4394,7 @@ class TestNormaliseThemeDefinition:
 
     def test_default_typography_applied_when_missing(self):
         from ReYMeN_cli.web_server import _normalise_theme_definition
+
         result = _normalise_theme_definition({"name": "minimal"})
         typo = result["typography"]
         assert "fontSans" in typo
@@ -4023,13 +4405,16 @@ class TestNormaliseThemeDefinition:
 
     def test_partial_typography_merges_with_defaults(self):
         from ReYMeN_cli.web_server import _normalise_theme_definition
-        result = _normalise_theme_definition({
-            "name": "partial",
-            "typography": {
-                "fontSans": "MyFont, sans-serif",
-                "baseSize": "12px",
-            },
-        })
+
+        result = _normalise_theme_definition(
+            {
+                "name": "partial",
+                "typography": {
+                    "fontSans": "MyFont, sans-serif",
+                    "baseSize": "12px",
+                },
+            }
+        )
         assert result["typography"]["fontSans"] == "MyFont, sans-serif"
         assert result["typography"]["baseSize"] == "12px"
         # fontMono defaulted
@@ -4037,35 +4422,43 @@ class TestNormaliseThemeDefinition:
 
     def test_layout_defaults(self):
         from ReYMeN_cli.web_server import _normalise_theme_definition
+
         result = _normalise_theme_definition({"name": "minimal"})
         assert result["layout"]["radius"] == "0.5rem"
         assert result["layout"]["density"] == "comfortable"
 
     def test_invalid_density_falls_back(self):
         from ReYMeN_cli.web_server import _normalise_theme_definition
-        result = _normalise_theme_definition({
-            "name": "bad",
-            "layout": {"density": "ultra-spacious"},
-        })
+
+        result = _normalise_theme_definition(
+            {
+                "name": "bad",
+                "layout": {"density": "ultra-spacious"},
+            }
+        )
         assert result["layout"]["density"] == "comfortable"
 
     def test_valid_densities_accepted(self):
         from ReYMeN_cli.web_server import _normalise_theme_definition
+
         for d in ("compact", "comfortable", "spacious"):
             r = _normalise_theme_definition({"name": "x", "layout": {"density": d}})
             assert r["layout"]["density"] == d
 
     def test_color_overrides_filter_unknown_keys(self):
         from ReYMeN_cli.web_server import _normalise_theme_definition
-        result = _normalise_theme_definition({
-            "name": "o",
-            "colorOverrides": {
-                "card": "#123456",
-                "fakeToken": "#abcdef",
-                "primary": 42,  # non-string rejected
-                "destructive": "#ff0000",
-            },
-        })
+
+        result = _normalise_theme_definition(
+            {
+                "name": "o",
+                "colorOverrides": {
+                    "card": "#123456",
+                    "fakeToken": "#abcdef",
+                    "primary": 42,  # non-string rejected
+                    "destructive": "#ff0000",
+                },
+            }
+        )
         assert result["colorOverrides"] == {
             "card": "#123456",
             "destructive": "#ff0000",
@@ -4073,28 +4466,37 @@ class TestNormaliseThemeDefinition:
 
     def test_color_overrides_omitted_when_empty(self):
         from ReYMeN_cli.web_server import _normalise_theme_definition
+
         result = _normalise_theme_definition({"name": "x"})
         assert "colorOverrides" not in result
 
     def test_alpha_clamped_to_unit_range(self):
         from ReYMeN_cli.web_server import _normalise_theme_definition
-        r = _normalise_theme_definition({
-            "name": "c",
-            "palette": {"background": {"hex": "#000", "alpha": 99.5}},
-        })
+
+        r = _normalise_theme_definition(
+            {
+                "name": "c",
+                "palette": {"background": {"hex": "#000", "alpha": 99.5}},
+            }
+        )
         assert r["palette"]["background"]["alpha"] == 1.0
-        r2 = _normalise_theme_definition({
-            "name": "c",
-            "palette": {"background": {"hex": "#000", "alpha": -5}},
-        })
+        r2 = _normalise_theme_definition(
+            {
+                "name": "c",
+                "palette": {"background": {"hex": "#000", "alpha": -5}},
+            }
+        )
         assert r2["palette"]["background"]["alpha"] == 0.0
 
     def test_invalid_alpha_uses_default(self):
         from ReYMeN_cli.web_server import _normalise_theme_definition
-        r = _normalise_theme_definition({
-            "name": "c",
-            "palette": {"background": {"hex": "#000", "alpha": "not a number"}},
-        })
+
+        r = _normalise_theme_definition(
+            {
+                "name": "c",
+                "palette": {"background": {"hex": "#000", "alpha": "not a number"}},
+            }
+        )
         assert r["palette"]["background"]["alpha"] == 1.0
 
 
@@ -4104,6 +4506,7 @@ class TestDiscoverUserThemes:
     def test_returns_empty_when_dir_missing(self, tmp_path, monkeypatch):
         monkeypatch.setenv("ReYMeN_HOME", str(tmp_path))
         from ReYMeN_cli import web_server
+
         assert web_server._discover_user_themes() == []
 
     def test_loads_and_normalises_yaml(self, tmp_path, monkeypatch):
@@ -4115,12 +4518,13 @@ class TestDiscoverUserThemes:
             "label: Ocean\n"
             "palette:\n"
             "  background:\n"
-            "    hex: \"#0a1628\"\n"
+            '    hex: "#0a1628"\n'
             "    alpha: 1.0\n"
             "layout:\n"
             "  density: spacious\n"
         )
         from ReYMeN_cli import web_server
+
         results = web_server._discover_user_themes()
         assert len(results) == 1
         assert results[0]["name"] == "ocean"
@@ -4138,6 +4542,7 @@ class TestDiscoverUserThemes:
         (themes_dir / "nameless.yaml").write_text("label: No Name Here\n")
         (themes_dir / "ok.yaml").write_text("name: ok\n")
         from ReYMeN_cli import web_server
+
         results = web_server._discover_user_themes()
         names = [r["name"] for r in results]
         assert "ok" in names
@@ -4152,17 +4557,20 @@ class TestNormaliseThemeExtensions:
 
     def test_layout_variant_defaults_to_standard(self):
         from ReYMeN_cli.web_server import _normalise_theme_definition
+
         result = _normalise_theme_definition({"name": "t"})
         assert result["layoutVariant"] == "standard"
 
     def test_layout_variant_accepts_known_values(self):
         from ReYMeN_cli.web_server import _normalise_theme_definition
+
         for variant in ("standard", "cockpit", "tiled"):
             r = _normalise_theme_definition({"name": "t", "layoutVariant": variant})
             assert r["layoutVariant"] == variant
 
     def test_layout_variant_rejects_unknown(self):
         from ReYMeN_cli.web_server import _normalise_theme_definition
+
         r = _normalise_theme_definition({"name": "t", "layoutVariant": "warship"})
         assert r["layoutVariant"] == "standard"
         r2 = _normalise_theme_definition({"name": "t", "layoutVariant": 12})
@@ -4170,16 +4578,19 @@ class TestNormaliseThemeExtensions:
 
     def test_assets_named_slots_passthrough(self):
         from ReYMeN_cli.web_server import _normalise_theme_definition
-        r = _normalise_theme_definition({
-            "name": "t",
-            "assets": {
-                "bg": "https://example.com/bg.jpg",
-                "hero": "linear-gradient(180deg, red, blue)",
-                "crest": "/ds-assets/crest.svg",
-                "logo": "  ",  # whitespace-only — dropped
-                "notAKnownKey": "ignored",
-            },
-        })
+
+        r = _normalise_theme_definition(
+            {
+                "name": "t",
+                "assets": {
+                    "bg": "https://example.com/bg.jpg",
+                    "hero": "linear-gradient(180deg, red, blue)",
+                    "crest": "/ds-assets/crest.svg",
+                    "logo": "  ",  # whitespace-only — dropped
+                    "notAKnownKey": "ignored",
+                },
+            }
+        )
         assert r["assets"]["bg"] == "https://example.com/bg.jpg"
         assert r["assets"]["hero"].startswith("linear-gradient")
         assert r["assets"]["crest"] == "/ds-assets/crest.svg"
@@ -4188,17 +4599,20 @@ class TestNormaliseThemeExtensions:
 
     def test_assets_custom_block(self):
         from ReYMeN_cli.web_server import _normalise_theme_definition
-        r = _normalise_theme_definition({
-            "name": "t",
-            "assets": {
-                "custom": {
-                    "scan-lines": "/img/scan.png",
-                    "my_overlay": "/img/ov.png",
-                    "bad key!": "x",  # non-alnum key — rejected
-                    "empty": "",        # empty value — rejected
+
+        r = _normalise_theme_definition(
+            {
+                "name": "t",
+                "assets": {
+                    "custom": {
+                        "scan-lines": "/img/scan.png",
+                        "my_overlay": "/img/ov.png",
+                        "bad key!": "x",  # non-alnum key — rejected
+                        "empty": "",  # empty value — rejected
+                    },
                 },
-            },
-        })
+            }
+        )
         assert r["assets"]["custom"] == {
             "scan-lines": "/img/scan.png",
             "my_overlay": "/img/ov.png",
@@ -4206,16 +4620,20 @@ class TestNormaliseThemeExtensions:
 
     def test_assets_absent_means_no_field(self):
         from ReYMeN_cli.web_server import _normalise_theme_definition
+
         r = _normalise_theme_definition({"name": "t"})
         assert "assets" not in r
 
     def test_custom_css_passthrough_and_capped(self):
         from ReYMeN_cli.web_server import _normalise_theme_definition
+
         # Small CSS passes through verbatim.
-        r = _normalise_theme_definition({
-            "name": "t",
-            "customCSS": "body { color: red; }",
-        })
+        r = _normalise_theme_definition(
+            {
+                "name": "t",
+                "customCSS": "body { color: red; }",
+            }
+        )
         assert r["customCSS"] == "body { color: red; }"
 
         # 40 KiB of CSS gets clipped to the 32 KiB cap.
@@ -4225,41 +4643,52 @@ class TestNormaliseThemeExtensions:
 
     def test_custom_css_empty_dropped(self):
         from ReYMeN_cli.web_server import _normalise_theme_definition
+
         for val in ("", "   \n\t", None):
             r = _normalise_theme_definition({"name": "t", "customCSS": val})
             assert "customCSS" not in r
 
     def test_component_styles_per_bucket(self):
         from ReYMeN_cli.web_server import _normalise_theme_definition
-        r = _normalise_theme_definition({
-            "name": "t",
-            "componentStyles": {
-                "card": {
-                    "clipPath": "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
-                    "boxShadow": "inset 0 0 0 1px red",
-                    "bad prop!": "ignored",  # non-alnum prop rejected
+
+        r = _normalise_theme_definition(
+            {
+                "name": "t",
+                "componentStyles": {
+                    "card": {
+                        "clipPath": "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
+                        "boxShadow": "inset 0 0 0 1px red",
+                        "bad prop!": "ignored",  # non-alnum prop rejected
+                    },
+                    "header": {"background": "linear-gradient(red, blue)"},
+                    "rogueBucket": {"foo": "bar"},  # not a known bucket — rejected
                 },
-                "header": {"background": "linear-gradient(red, blue)"},
-                "rogueBucket": {"foo": "bar"},  # not a known bucket — rejected
-            },
-        })
+            }
+        )
         assert r["componentStyles"]["card"] == {
             "clipPath": "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
             "boxShadow": "inset 0 0 0 1px red",
         }
-        assert r["componentStyles"]["header"]["background"].startswith("linear-gradient")
+        assert r["componentStyles"]["header"]["background"].startswith(
+            "linear-gradient"
+        )
         assert "rogueBucket" not in r["componentStyles"]
 
     def test_component_styles_empty_buckets_dropped(self):
         from ReYMeN_cli.web_server import _normalise_theme_definition
-        r = _normalise_theme_definition({
-            "name": "t",
-            "componentStyles": {
-                "card": {},        # empty — dropped entirely
-                "header": {"bad prop!": "ignored"},  # all props rejected — bucket dropped
-                "footer": {"background": "black"},
-            },
-        })
+
+        r = _normalise_theme_definition(
+            {
+                "name": "t",
+                "componentStyles": {
+                    "card": {},  # empty — dropped entirely
+                    "header": {
+                        "bad prop!": "ignored"
+                    },  # all props rejected — bucket dropped
+                    "footer": {"background": "black"},
+                },
+            }
+        )
         assert "card" not in r.get("componentStyles", {})
         assert "header" not in r.get("componentStyles", {})
         assert r["componentStyles"]["footer"]["background"] == "black"
@@ -4267,10 +4696,13 @@ class TestNormaliseThemeExtensions:
     def test_component_styles_accepts_numeric_values(self):
         """Numeric values (e.g. opacity: 0.8) are coerced to strings."""
         from ReYMeN_cli.web_server import _normalise_theme_definition
-        r = _normalise_theme_definition({
-            "name": "t",
-            "componentStyles": {"card": {"opacity": 0.8, "zIndex": 5}},
-        })
+
+        r = _normalise_theme_definition(
+            {
+                "name": "t",
+                "componentStyles": {"card": {"opacity": 0.8, "zIndex": 5}},
+            }
+        )
         assert r["componentStyles"]["card"] == {"opacity": "0.8", "zIndex": "5"}
 
 
@@ -4356,9 +4788,7 @@ class TestBulkDeleteSessionsEndpoint:
     def test_empty_list_is_noop(self):
         """``ids: []`` returns ``deleted: 0`` (200, not 400) — the UI
         treats an empty selection as a no-op rather than an error."""
-        resp = self.auth_client.post(
-            "/api/sessions/bulk-delete", json={"ids": []}
-        )
+        resp = self.auth_client.post("/api/sessions/bulk-delete", json={"ids": []})
         assert resp.status_code == 200
         assert resp.json() == {"ok": True, "deleted": 0}
 
@@ -4383,9 +4813,7 @@ class TestBulkDeleteSessionsEndpoint:
         must hit the bulk handler, not be re-interpreted via the
         templated ``/api/sessions/{session_id}`` family. Concretely the
         response carries our ``ok`` + ``deleted`` keys."""
-        resp = self.auth_client.post(
-            "/api/sessions/bulk-delete", json={"ids": []}
-        )
+        resp = self.auth_client.post("/api/sessions/bulk-delete", json={"ids": []})
         assert resp.status_code == 200
         body = resp.json()
         assert body.get("ok") is True
@@ -4544,7 +4972,9 @@ class TestPluginAPIAuth:
     """Tests that plugin API routes require the session token (issue #19533)."""
 
     @pytest.fixture(autouse=True)
-    def _setup_test_client(self, monkeypatch, _isolate_ReYMeN_home, _install_example_plugin):
+    def _setup_test_client(
+        self, monkeypatch, _isolate_ReYMeN_home, _install_example_plugin
+    ):
         """Create a TestClient without the session token header.
 
         Pulls in ``_install_example_plugin`` so ``test_plugin_route_allows_auth``
@@ -4561,7 +4991,9 @@ class TestPluginAPIAuth:
         from ReYMeN_constants import get_reymen_home
         from ReYMeN_cli.web_server import app, _SESSION_HEADER_NAME, _SESSION_TOKEN
 
-        monkeypatch.setattr(ReYMeN_state, "DEFAULT_DB_PATH", get_reymen_home() / "state.db")
+        monkeypatch.setattr(
+            ReYMeN_state, "DEFAULT_DB_PATH", get_reymen_home() / "state.db"
+        )
 
         self.client = TestClient(app)
         self.auth_client = TestClient(app)
@@ -4644,9 +5076,7 @@ class TestPluginAPIAuth:
         # Without a token the WS endpoint must close the upgrade itself
         # (its own _check_ws_token), NOT 401 from the HTTP middleware.
         try:
-            with self.client.websocket_connect(
-                "/api/plugins/kanban/events"
-            ):
+            with self.client.websocket_connect("/api/plugins/kanban/events"):
                 pass  # if we got here without disconnect, the WS accepted us
         except WebSocketDisconnect:
             pass  # expected — WS endpoint rejected via its own check
@@ -4664,6 +5094,7 @@ class TestDashboardPluginManifestExtensions:
 
     def _write_plugin(self, tmp_path, name, manifest):
         import json
+
         plug_dir = tmp_path / "plugins" / name / "dashboard"
         plug_dir.mkdir(parents=True)
         (plug_dir / "manifest.json").write_text(json.dumps(manifest))
@@ -4671,14 +5102,19 @@ class TestDashboardPluginManifestExtensions:
 
     def test_override_and_hidden_carried_through(self, tmp_path, monkeypatch):
         monkeypatch.setenv("ReYMeN_HOME", str(tmp_path))
-        self._write_plugin(tmp_path, "skin-home", {
-            "name": "skin-home",
-            "label": "Skin Home",
-            "tab": {"path": "/skin-home", "override": "/", "hidden": True},
-            "slots": ["sidebar", "header-left"],
-            "entry": "dist/index.js",
-        })
+        self._write_plugin(
+            tmp_path,
+            "skin-home",
+            {
+                "name": "skin-home",
+                "label": "Skin Home",
+                "tab": {"path": "/skin-home", "override": "/", "hidden": True},
+                "slots": ["sidebar", "header-left"],
+                "entry": "dist/index.js",
+            },
+        )
         from ReYMeN_cli import web_server
+
         # Bust the process-level cache so the test plugin is picked up.
         web_server._dashboard_plugins_cache = None
         plugins = web_server._get_dashboard_plugins(force_rescan=True)
@@ -4689,13 +5125,18 @@ class TestDashboardPluginManifestExtensions:
 
     def test_override_requires_leading_slash(self, tmp_path, monkeypatch):
         monkeypatch.setenv("ReYMeN_HOME", str(tmp_path))
-        self._write_plugin(tmp_path, "bad-override", {
-            "name": "bad-override",
-            "label": "Bad",
-            "tab": {"path": "/bad", "override": "no-leading-slash"},
-            "entry": "dist/index.js",
-        })
+        self._write_plugin(
+            tmp_path,
+            "bad-override",
+            {
+                "name": "bad-override",
+                "label": "Bad",
+                "tab": {"path": "/bad", "override": "no-leading-slash"},
+                "entry": "dist/index.js",
+            },
+        )
         from ReYMeN_cli import web_server
+
         web_server._dashboard_plugins_cache = None
         plugins = web_server._get_dashboard_plugins(force_rescan=True)
         entry = next(p for p in plugins if p["name"] == "bad-override")
@@ -4703,13 +5144,18 @@ class TestDashboardPluginManifestExtensions:
 
     def test_slots_default_empty(self, tmp_path, monkeypatch):
         monkeypatch.setenv("ReYMeN_HOME", str(tmp_path))
-        self._write_plugin(tmp_path, "no-slots", {
-            "name": "no-slots",
-            "label": "No Slots",
-            "tab": {"path": "/no-slots"},
-            "entry": "dist/index.js",
-        })
+        self._write_plugin(
+            tmp_path,
+            "no-slots",
+            {
+                "name": "no-slots",
+                "label": "No Slots",
+                "tab": {"path": "/no-slots"},
+                "entry": "dist/index.js",
+            },
+        )
         from ReYMeN_cli import web_server
+
         web_server._dashboard_plugins_cache = None
         plugins = web_server._get_dashboard_plugins(force_rescan=True)
         entry = next(p for p in plugins if p["name"] == "no-slots")
@@ -4719,14 +5165,19 @@ class TestDashboardPluginManifestExtensions:
 
     def test_slots_filters_non_string_entries(self, tmp_path, monkeypatch):
         monkeypatch.setenv("ReYMeN_HOME", str(tmp_path))
-        self._write_plugin(tmp_path, "mixed-slots", {
-            "name": "mixed-slots",
-            "label": "Mixed",
-            "tab": {"path": "/mixed-slots"},
-            "slots": ["sidebar", "", 42, None, "header-right"],
-            "entry": "dist/index.js",
-        })
+        self._write_plugin(
+            tmp_path,
+            "mixed-slots",
+            {
+                "name": "mixed-slots",
+                "label": "Mixed",
+                "tab": {"path": "/mixed-slots"},
+                "slots": ["sidebar", "", 42, None, "header-right"],
+                "entry": "dist/index.js",
+            },
+        )
         from ReYMeN_cli import web_server
+
         web_server._dashboard_plugins_cache = None
         plugins = web_server._get_dashboard_plugins(force_rescan=True)
         entry = next(p for p in plugins if p["name"] == "mixed-slots")
@@ -4738,24 +5189,29 @@ class TestDashboardPluginManifestExtensions:
         frontend ``<PluginSlot name="...">`` placements decide what actually
         renders — but the loader must not mangle colons in slot names."""
         monkeypatch.setenv("ReYMeN_HOME", str(tmp_path))
-        self._write_plugin(tmp_path, "page-slots", {
-            "name": "page-slots",
-            "label": "Page Slots",
-            "tab": {"path": "/page-slots", "hidden": True},
-            "slots": [
-                "sessions:top",
-                "analytics:bottom",
-                "logs:top",
-                "skills:bottom",
-                "config:top",
-                "env:bottom",
-                "docs:top",
-                "cron:bottom",
-                "chat:top",
-            ],
-            "entry": "dist/index.js",
-        })
+        self._write_plugin(
+            tmp_path,
+            "page-slots",
+            {
+                "name": "page-slots",
+                "label": "Page Slots",
+                "tab": {"path": "/page-slots", "hidden": True},
+                "slots": [
+                    "sessions:top",
+                    "analytics:bottom",
+                    "logs:top",
+                    "skills:bottom",
+                    "config:top",
+                    "env:bottom",
+                    "docs:top",
+                    "cron:bottom",
+                    "chat:top",
+                ],
+                "entry": "dist/index.js",
+            },
+        )
         from ReYMeN_cli import web_server
+
         web_server._dashboard_plugins_cache = None
         plugins = web_server._get_dashboard_plugins(force_rescan=True)
         entry = next(p for p in plugins if p["name"] == "page-slots")
@@ -4820,7 +5276,10 @@ class TestPtyWebSocket:
         monkeypatch.setattr(
             main_mod,
             "_make_tui_argv",
-            lambda project_root, tui_dev=False: (["node", "dist/entry.js"], "/tmp/ui-tui"),
+            lambda project_root, tui_dev=False: (
+                ["node", "dist/entry.js"],
+                "/tmp/ui-tui",
+            ),
         )
 
         _argv, _cwd, env = self.ws_module._resolve_chat_argv()
@@ -4852,7 +5311,10 @@ class TestPtyWebSocket:
         monkeypatch.setattr(
             main_mod,
             "_make_tui_argv",
-            lambda project_root, tui_dev=False: (["node", "dist/entry.js"], "/tmp/ui-tui"),
+            lambda project_root, tui_dev=False: (
+                ["node", "dist/entry.js"],
+                "/tmp/ui-tui",
+            ),
         )
 
         _argv, _cwd, env = self.ws_module._resolve_chat_argv()
@@ -4874,7 +5336,11 @@ class TestPtyWebSocket:
         monkeypatch.setattr(
             self.ws_module,
             "_resolve_chat_argv",
-            lambda resume=None, sidecar_url=None, profile=None: (["/bin/cat"], None, None),
+            lambda resume=None, sidecar_url=None, profile=None: (
+                ["/bin/cat"],
+                None,
+                None,
+            ),
         )
         from starlette.websockets import WebSocketDisconnect
 
@@ -4887,7 +5353,11 @@ class TestPtyWebSocket:
         monkeypatch.setattr(
             self.ws_module,
             "_resolve_chat_argv",
-            lambda resume=None, sidecar_url=None, profile=None: (["/bin/cat"], None, None),
+            lambda resume=None, sidecar_url=None, profile=None: (
+                ["/bin/cat"],
+                None,
+                None,
+            ),
         )
         from starlette.websockets import WebSocketDisconnect
 
@@ -4930,7 +5400,11 @@ class TestPtyWebSocket:
         monkeypatch.setattr(
             self.ws_module,
             "_resolve_chat_argv",
-            lambda resume=None, sidecar_url=None, profile=None: (["/bin/cat"], None, None),
+            lambda resume=None, sidecar_url=None, profile=None: (
+                ["/bin/cat"],
+                None,
+                None,
+            ),
         )
         with self.client.websocket_connect(self._url()) as conn:
             conn.send_bytes(b"round-trip-payload\n")
@@ -4999,17 +5473,27 @@ class TestPtyWebSocket:
         monkeypatch.setattr(
             self.ws_module,
             "_resolve_chat_argv",
-            lambda resume=None, sidecar_url=None, profile=None: (["/bin/cat"], None, None),
+            lambda resume=None, sidecar_url=None, profile=None: (
+                ["/bin/cat"],
+                None,
+                None,
+            ),
         )
         # Patch PtyBridge.spawn at the web_server module's binding.
         import ReYMeN_cli.web_server as ws_mod
 
-        monkeypatch.setattr(ws_mod.PtyBridge, "spawn", classmethod(lambda cls, *a, **k: _raise(*a, **k)))
+        monkeypatch.setattr(
+            ws_mod.PtyBridge, "spawn", classmethod(lambda cls, *a, **k: _raise(*a, **k))
+        )
 
         with self.client.websocket_connect(self._url()) as conn:
             # Expect a final text frame with the error message, then close.
             msg = conn.receive_text()
-            assert "pty missing" in msg or "unavailable" in msg.lower() or "pty" in msg.lower()
+            assert (
+                "pty missing" in msg
+                or "unavailable" in msg.lower()
+                or "pty" in msg.lower()
+            )
 
     def test_resume_parameter_is_forwarded_to_argv(self, monkeypatch):
         captured: dict = {}
@@ -5042,9 +5526,7 @@ class TestPtyWebSocket:
         monkeypatch.setattr(
             self.ws_module.app.state, "bound_host", "127.0.0.1", raising=False
         )
-        monkeypatch.setattr(
-            self.ws_module.app.state, "bound_port", 9119, raising=False
-        )
+        monkeypatch.setattr(self.ws_module.app.state, "bound_port", 9119, raising=False)
 
         headers = {"host": "127.0.0.1:9119", "origin": "http://127.0.0.1:9119"}
         with self.client.websocket_connect(
@@ -5121,9 +5603,7 @@ class TestPtyWebSocket:
         from starlette.websockets import WebSocketDisconnect
 
         with pytest.raises(WebSocketDisconnect) as exc:
-            with self.client.websocket_connect(
-                f"/api/events?token={self.token}"
-            ):
+            with self.client.websocket_connect(f"/api/events?token={self.token}"):
                 pass
         assert exc.value.code == 4400
 
@@ -5162,7 +5642,9 @@ class TestDashboardPluginStaticAssetAllowlist:
     """
 
     @pytest.fixture(autouse=True)
-    def _setup_test_client(self, monkeypatch, _isolate_ReYMeN_home, _install_example_plugin):
+    def _setup_test_client(
+        self, monkeypatch, _isolate_ReYMeN_home, _install_example_plugin
+    ):
         """Create a TestClient and install the example-dashboard fixture.
 
         The static-asset allowlist tests need a plugin to point at —
@@ -5223,9 +5705,7 @@ class TestDashboardPluginStaticAssetAllowlist:
         """The allowlist is on top of the existing ``.resolve()`` /
         ``is_relative_to()`` check — a ``.js`` named file at an
         out-of-base path is still rejected as traversal, not served."""
-        resp = self.client.get(
-            "/dashboard-plugins/example/..%2Fplugin_api.py"
-        )
+        resp = self.client.get("/dashboard-plugins/example/..%2Fplugin_api.py")
         # 403 traversal-blocked OR 404 (depending on URL decode order)
         # — never 200.
         assert resp.status_code in (403, 404)
@@ -5235,6 +5715,7 @@ def _fake_httpx_client(*, status: int | None = None, raise_exc: bool = False):
     """Build a drop-in for httpx.Client whose .get() returns a canned status
     (or raises a transport error). Patched in for the credential-validate probe
     so tests never touch the network."""
+
     class _Resp:
         def __init__(self, code):
             self.status_code = code
@@ -5277,7 +5758,9 @@ class TestValidateProviderCredential:
         self.client.headers[_SESSION_HEADER_NAME] = _SESSION_TOKEN
 
     def _post(self, key, value):
-        return self.client.post("/api/providers/validate", json={"key": key, "value": value})
+        return self.client.post(
+            "/api/providers/validate", json={"key": key, "value": value}
+        )
 
     def test_rejected_key_blocks(self, monkeypatch):
         monkeypatch.setattr("httpx.Client", _fake_httpx_client(status=401))

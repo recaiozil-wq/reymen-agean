@@ -60,8 +60,10 @@ class TelegramRateLimiter:
             except Exception as e:
                 error_str = str(e)
                 if "429" in error_str or "Too Many Requests" in error_str:
-                    wait = min(30, 2 ** attempt * 2)
-                    print(f"[RateLimit] 429 aldi, {wait}s bekliyor (deneme {attempt+1}/{max_retries})")
+                    wait = min(30, 2**attempt * 2)
+                    print(
+                        f"[RateLimit] 429 aldi, {wait}s bekliyor (deneme {attempt+1}/{max_retries})"
+                    )
                     await asyncio.sleep(wait)
                     continue
                 elif "Conflict" in error_str or "409" in error_str:
@@ -94,20 +96,26 @@ class AutoReconnector:
                 while self._running:
                     await asyncio.sleep(self._health_interval)
                     if not await self._health_check():
-                        print("[Reconnect] Health check basarisiz, yeniden baglaniyor...")
+                        print(
+                            "[Reconnect] Health check basarisiz, yeniden baglaniyor..."
+                        )
                         break
             except (ConnectionError, TimeoutError, OSError) as e:
                 retry_count += 1
                 delay = min(30, self.base_delay * (2 ** (retry_count - 1)))
                 print(f"[Reconnect] Baglanti koptu: {e}")
-                print(f"[Reconnect] {delay}s sonra yeniden deneniyor (deneme {retry_count}/{self.max_retries})")
+                print(
+                    f"[Reconnect] {delay}s sonra yeniden deneniyor (deneme {retry_count}/{self.max_retries})"
+                )
                 await asyncio.sleep(delay)
             except Exception as e:
                 print(f"[Reconnect] Beklenmeyen hata: {e}")
                 break
 
         if retry_count >= self.max_retries:
-            print(f"[Reconnect] {self.max_retries} deneme basarisiz, gateway durduruluyor")
+            print(
+                f"[Reconnect] {self.max_retries} deneme basarisiz, gateway durduruluyor"
+            )
 
     async def _health_check(self):
         try:
@@ -144,7 +152,7 @@ class SessionManager:
             "created_at": now,
             "last_active": now,
             "message_count": 0,
-            "context": []
+            "context": [],
         }
         self._sessions[chat_id] = session
         print(f"[Session] Yeni session: {chat_id}")
@@ -153,7 +161,8 @@ class SessionManager:
     async def cleanup_stale(self):
         now = time.time()
         stale = [
-            cid for cid, s in self._sessions.items()
+            cid
+            for cid, s in self._sessions.items()
             if now - s["last_active"] > self._session_timeout
         ]
         for cid in stale:
@@ -171,7 +180,7 @@ class SessionManager:
         return {
             "active_sessions": len(self._sessions),
             "total_messages": sum(s["message_count"] for s in self._sessions.values()),
-            "oldest_session": min(s["created_at"] for s in self._sessions.values())
+            "oldest_session": min(s["created_at"] for s in self._sessions.values()),
         }
 
 
@@ -197,8 +206,12 @@ class CrashRecovery:
                 print(f"[CrashRecovery] Gateway coktu: {type(e).__name__}: {e}")
 
                 if len(recent) >= self.max_restarts:
-                    print(f"[CrashRecovery] {self.window_seconds}s icinde {self.max_restarts} cokme — durduruluyor")
-                    await self._notify_admin(f"Gateway {self.max_restarts} kez coktu, durduruldu")
+                    print(
+                        f"[CrashRecovery] {self.window_seconds}s icinde {self.max_restarts} cokme — durduruluyor"
+                    )
+                    await self._notify_admin(
+                        f"Gateway {self.max_restarts} kez coktu, durduruldu"
+                    )
                     break
 
                 delay = min(30, 2 ** (len(recent) - 1))
@@ -226,8 +239,12 @@ class SaltedGateway:
         dogrulama = gateway.dogrula(token=imzali["token"])
     """
 
-    def __init__(self, salt: Optional[str] = None, rate_limit: int = 100,
-                 rate_penceresi: int = 60):
+    def __init__(
+        self,
+        salt: Optional[str] = None,
+        rate_limit: int = 100,
+        rate_penceresi: int = 60,
+    ):
         """
         SaltedGateway baslatici.
 
@@ -261,9 +278,7 @@ class SaltedGateway:
             Hex imza.
         """
         return hmac.new(
-            self._salt.encode("utf-8"),
-            veri.encode("utf-8"),
-            hashlib.sha256
+            self._salt.encode("utf-8"), veri.encode("utf-8"), hashlib.sha256
         ).hexdigest()
 
     def _token_olustur(self, hedef: str, mesaj: str) -> str:
@@ -283,7 +298,9 @@ class SaltedGateway:
         imza = self._imzala(ham)
         return f"{zaman}.{rastgele}.{imza}"
 
-    def gonder(self, hedef: str, mesaj: str, meta: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def gonder(
+        self, hedef: str, mesaj: str, meta: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
         """
         Hedefe imzali mesaj gonderir (sanal).
 
@@ -344,8 +361,9 @@ class SaltedGateway:
         except Exception as e:
             return {"basarili": False, "hata": f"Gonderim hatasi: {e}"}
 
-    def dogrula(self, token: str, hedef: Optional[str] = None,
-                mesaj: Optional[str] = None) -> Dict[str, Any]:
+    def dogrula(
+        self, token: str, hedef: Optional[str] = None, mesaj: Optional[str] = None
+    ) -> Dict[str, Any]:
         """
         Token dogrulaması yapar.
 
@@ -465,7 +483,7 @@ class SaltedGateway:
                     for h, d in sorted(
                         self._hedefler.items(),
                         key=lambda x: x[1]["gonderi_sayisi"],
-                        reverse=True
+                        reverse=True,
                     )
                 },
                 "rate_limit_yapisi": {
@@ -548,6 +566,7 @@ class SaltedGateway:
 #  TelegramGateway — GatewayBase Implementasyonu
 # ═══════════════════════════════════════════════════════════════════════
 
+
 class TelegramGateway(GatewayBase):
     """
     Telegram platform gateway'i — GatewayBase implementasyonu.
@@ -585,18 +604,19 @@ class TelegramGateway(GatewayBase):
             )
 
             # SaltedGateway imzalayici
-            self._imzalayici = SaltedGateway(
-                salt=self._config.get("salt")
-            )
+            self._imzalayici = SaltedGateway(salt=self._config.get("salt"))
 
             # python-telegram-bot
             try:
                 from telegram.ext import Application
+
                 self._bot = Application.builder().token(token).build()
                 await self._bot.initialize()
                 logger.info("[TelegramGateway] Application baslatildi.")
             except ImportError:
-                logger.warning("[TelegramGateway] python-telegram-bot yuklu degil, stub modda.")
+                logger.warning(
+                    "[TelegramGateway] python-telegram-bot yuklu degil, stub modda."
+                )
                 self._bot = None
 
             # AutoReconnector
@@ -638,8 +658,12 @@ class TelegramGateway(GatewayBase):
             logger.error(f"[TelegramGateway] Baglanti kesme hatasi: {e}")
             return False
 
-    async def send(self, mesaj: str, hedef: Optional[str] = None,
-                   meta: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    async def send(
+        self,
+        mesaj: str,
+        hedef: Optional[str] = None,
+        meta: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
         """Telegram'a mesaj gonder."""
         try:
             if not self._bagli:
@@ -716,21 +740,26 @@ class TelegramGateway(GatewayBase):
 
 # ── Motor Kayit ─────────────────────────────────────────────────────
 
+
 def motor_kaydet(motor) -> None:
     """Motor'a salted gateway araçlarını kaydeder."""
     motor._plugin_arac_kaydet(
         "SALTED_GATEWAY_OLUSTUR",
-        lambda salt="", rate_limit="100": f"SaltedGateway(salt='{salt}', rate_limit={rate_limit})",
+        lambda salt="",
+        rate_limit="100": f"SaltedGateway(salt='{salt}', rate_limit={rate_limit})",
         "Guvenli SaltedGateway ornegi olusturur",
     )
     motor._plugin_arac_kaydet(
         "SALTED_GATEWAY_GONDER",
-        lambda hedef="", mesaj="": f"SaltedGateway().gonder(hedef='{hedef}', mesaj='{mesaj}')",
+        lambda hedef="",
+        mesaj="": f"SaltedGateway().gonder(hedef='{hedef}', mesaj='{mesaj}')",
         "SaltedGateway ile imzali mesaj gonderir",
     )
     motor._plugin_arac_kaydet(
         "SALTED_GATEWAY_DOGRULA",
-        lambda token="", hedef="", mesaj="": f"SaltedGateway().dogrula(token='{token}', ...)",
+        lambda token="",
+        hedef="",
+        mesaj="": f"SaltedGateway().dogrula(token='{token}', ...)",
         "SaltedGateway token dogrulamasi yapar",
     )
     motor._plugin_arac_kaydet(
@@ -751,9 +780,7 @@ if __name__ == "__main__":
     # Test dogrula
     if gonderi.get("basarili"):
         dogrula = gw.dogrula(
-            token=gonderi["token"],
-            hedef=gonderi["hedef"],
-            mesaj=gonderi["mesaj"]
+            token=gonderi["token"], hedef=gonderi["hedef"], mesaj=gonderi["mesaj"]
         )
         print("Dogrulama:", json.dumps(dogrula, ensure_ascii=False, indent=2))
 

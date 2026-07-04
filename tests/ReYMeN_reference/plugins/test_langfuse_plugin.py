@@ -1,4 +1,5 @@
 """Tests for the bundled observability/langfuse plugin."""
+
 from __future__ import annotations
 
 import importlib
@@ -19,6 +20,7 @@ PLUGIN_DIR = REPO_ROOT / "plugins" / "observability" / "langfuse"
 # Manifest + layout
 # ---------------------------------------------------------------------------
 
+
 class TestManifest:
     def test_plugin_directory_exists(self):
         assert PLUGIN_DIR.is_dir()
@@ -31,9 +33,12 @@ class TestManifest:
         assert data["version"]
         # All six hooks the plugin implements.
         assert set(data["hooks"]) == {
-            "pre_api_request", "post_api_request",
-            "pre_llm_call", "post_llm_call",
-            "pre_tool_call", "post_tool_call",
+            "pre_api_request",
+            "post_api_request",
+            "pre_llm_call",
+            "post_llm_call",
+            "pre_tool_call",
+            "post_tool_call",
         }
         # Required env vars are the user-facing ReYMeN_ prefixed keys.
         assert "ReYMeN_LANGFUSE_PUBLIC_KEY" in data["requires_env"]
@@ -45,6 +50,7 @@ class TestManifest:
 # This guards against someone accidentally re-introducing a per-hook
 # load_config() gate or making the plugin auto-load.
 # ---------------------------------------------------------------------------
+
 
 class TestDiscovery:
     def test_plugin_is_discovered_as_standalone_opt_in(self, tmp_path, monkeypatch):
@@ -74,6 +80,7 @@ class TestDiscovery:
 # per-hook load_config() design.
 # ---------------------------------------------------------------------------
 
+
 class TestRuntimeGate:
     def _fresh_plugin(self):
         """Import the plugin module fresh (clears any cached client)."""
@@ -83,8 +90,10 @@ class TestRuntimeGate:
 
     def test_get_langfuse_returns_none_without_credentials(self, monkeypatch):
         for k in (
-            "ReYMeN_LANGFUSE_PUBLIC_KEY", "ReYMeN_LANGFUSE_SECRET_KEY",
-            "LANGFUSE_PUBLIC_KEY", "LANGFUSE_SECRET_KEY",
+            "ReYMeN_LANGFUSE_PUBLIC_KEY",
+            "ReYMeN_LANGFUSE_SECRET_KEY",
+            "LANGFUSE_PUBLIC_KEY",
+            "LANGFUSE_SECRET_KEY",
         ):
             monkeypatch.delenv(k, raising=False)
 
@@ -94,8 +103,10 @@ class TestRuntimeGate:
     def test_get_langfuse_caches_failure_no_config_load(self, monkeypatch):
         """A miss must be cached — no per-hook config.yaml reads, no env re-reads."""
         for k in (
-            "ReYMeN_LANGFUSE_PUBLIC_KEY", "ReYMeN_LANGFUSE_SECRET_KEY",
-            "LANGFUSE_PUBLIC_KEY", "LANGFUSE_SECRET_KEY",
+            "ReYMeN_LANGFUSE_PUBLIC_KEY",
+            "ReYMeN_LANGFUSE_SECRET_KEY",
+            "LANGFUSE_PUBLIC_KEY",
+            "LANGFUSE_SECRET_KEY",
         ):
             monkeypatch.delenv(k, raising=False)
 
@@ -107,6 +118,7 @@ class TestRuntimeGate:
         # Now block os.environ.get — a correctly-cached plugin must not
         # touch env again.
         import os
+
         called = {"n": 0}
         real_get = os.environ.get
 
@@ -128,8 +140,10 @@ class TestRuntimeGate:
     def test_get_langfuse_does_not_import_ReYMeN_config(self, monkeypatch):
         """The plugin must not re-read config.yaml per hook."""
         for k in (
-            "ReYMeN_LANGFUSE_PUBLIC_KEY", "ReYMeN_LANGFUSE_SECRET_KEY",
-            "LANGFUSE_PUBLIC_KEY", "LANGFUSE_SECRET_KEY",
+            "ReYMeN_LANGFUSE_PUBLIC_KEY",
+            "ReYMeN_LANGFUSE_SECRET_KEY",
+            "LANGFUSE_PUBLIC_KEY",
+            "LANGFUSE_SECRET_KEY",
         ):
             monkeypatch.delenv(k, raising=False)
 
@@ -150,31 +164,44 @@ class TestRuntimeGate:
 # Hooks are inert when the client is unavailable.
 # ---------------------------------------------------------------------------
 
+
 class TestHooksInert:
     def test_hooks_noop_without_client(self, monkeypatch):
         """All 6 hooks must return without raising when _get_langfuse() is None."""
         for k in (
-            "ReYMeN_LANGFUSE_PUBLIC_KEY", "ReYMeN_LANGFUSE_SECRET_KEY",
-            "LANGFUSE_PUBLIC_KEY", "LANGFUSE_SECRET_KEY",
+            "ReYMeN_LANGFUSE_PUBLIC_KEY",
+            "ReYMeN_LANGFUSE_SECRET_KEY",
+            "LANGFUSE_PUBLIC_KEY",
+            "LANGFUSE_SECRET_KEY",
         ):
             monkeypatch.delenv(k, raising=False)
 
         sys.modules.pop("plugins.observability.langfuse", None)
         import importlib
+
         mod = importlib.import_module("plugins.observability.langfuse")
 
         # Each hook should just return; no exceptions.
-        mod.on_pre_llm_call(task_id="t", session_id="s", messages=[{"role": "user", "content": "hi"}])
-        mod.on_pre_llm_request(task_id="t", session_id="s", api_call_count=1, request_messages=[])
+        mod.on_pre_llm_call(
+            task_id="t", session_id="s", messages=[{"role": "user", "content": "hi"}]
+        )
+        mod.on_pre_llm_request(
+            task_id="t", session_id="s", api_call_count=1, request_messages=[]
+        )
         mod.on_post_llm_call(task_id="t", session_id="s", api_call_count=1)
-        mod.on_pre_tool_call(tool_name="read_file", args={}, task_id="t", session_id="s")
-        mod.on_post_tool_call(tool_name="read_file", args={}, result="ok", task_id="t", session_id="s")
+        mod.on_pre_tool_call(
+            tool_name="read_file", args={}, task_id="t", session_id="s"
+        )
+        mod.on_post_tool_call(
+            tool_name="read_file", args={}, result="ok", task_id="t", session_id="s"
+        )
 
 
 class TestPayloadSanitization:
     def test_safe_value_redacts_base64_data_uri_instead_of_truncating(self):
         sys.modules.pop("plugins.observability.langfuse", None)
         import importlib
+
         mod = importlib.import_module("plugins.observability.langfuse")
 
         payload = "data:image/png;base64," + ("a" * 20000)
@@ -190,12 +217,18 @@ class TestPayloadSanitization:
     def test_serialize_messages_redacts_data_uri_parts(self):
         sys.modules.pop("plugins.observability.langfuse", None)
         import importlib
+
         mod = importlib.import_module("plugins.observability.langfuse")
 
         payload = "data:image/jpeg;base64," + ("b" * 20000)
-        serialized = mod._serialize_messages([
-            {"role": "user", "content": [{"type": "image_url", "image_url": {"url": payload}}]}
-        ])
+        serialized = mod._serialize_messages(
+            [
+                {
+                    "role": "user",
+                    "content": [{"type": "image_url", "image_url": {"url": payload}}],
+                }
+            ]
+        )
 
         assert serialized[0]["content"][0]["image_url"]["url"] == {
             "type": "data_uri",
@@ -255,8 +288,10 @@ class TestPlaceholderKeyDetection:
     @staticmethod
     def _clear_env(monkeypatch):
         for k in (
-            "ReYMeN_LANGFUSE_PUBLIC_KEY", "ReYMeN_LANGFUSE_SECRET_KEY",
-            "LANGFUSE_PUBLIC_KEY", "LANGFUSE_SECRET_KEY",
+            "ReYMeN_LANGFUSE_PUBLIC_KEY",
+            "ReYMeN_LANGFUSE_SECRET_KEY",
+            "LANGFUSE_PUBLIC_KEY",
+            "LANGFUSE_SECRET_KEY",
         ):
             monkeypatch.delenv(k, raising=False)
 
@@ -289,19 +324,23 @@ class TestPlaceholderKeyDetection:
     def test_validate_langfuse_key_accepts_documented_prefix(self, monkeypatch):
         self._clear_env(monkeypatch)
         plugin = self._fresh_plugin()
-        assert plugin._validate_langfuse_key(
-            "ReYMeN_LANGFUSE_PUBLIC_KEY", "pk-lf-real-public-xyz"
-        ) is None
-        assert plugin._validate_langfuse_key(
-            "ReYMeN_LANGFUSE_SECRET_KEY", "sk-lf-real-secret-xyz"
-        ) is None
+        assert (
+            plugin._validate_langfuse_key(
+                "ReYMeN_LANGFUSE_PUBLIC_KEY", "pk-lf-real-public-xyz"
+            )
+            is None
+        )
+        assert (
+            plugin._validate_langfuse_key(
+                "ReYMeN_LANGFUSE_SECRET_KEY", "sk-lf-real-secret-xyz"
+            )
+            is None
+        )
 
     def test_validate_langfuse_key_rejects_wrong_prefix(self, monkeypatch):
         self._clear_env(monkeypatch)
         plugin = self._fresh_plugin()
-        msg = plugin._validate_langfuse_key(
-            "ReYMeN_LANGFUSE_PUBLIC_KEY", "placeholder"
-        )
+        msg = plugin._validate_langfuse_key("ReYMeN_LANGFUSE_PUBLIC_KEY", "placeholder")
         assert msg is not None
         assert "ReYMeN_LANGFUSE_PUBLIC_KEY" in msg
         assert "pk-lf-" in msg
@@ -310,7 +349,10 @@ class TestPlaceholderKeyDetection:
         """Defensive: an env var with no registered prefix is trusted."""
         self._clear_env(monkeypatch)
         plugin = self._fresh_plugin()
-        assert plugin._validate_langfuse_key("ReYMeN_LANGFUSE_BASE_URL", "anything") is None
+        assert (
+            plugin._validate_langfuse_key("ReYMeN_LANGFUSE_BASE_URL", "anything")
+            is None
+        )
 
     # -- end-to-end _get_langfuse() behaviour --------------------------------
     # These tests pass `monkeypatch` to _fresh_plugin() so the helper can
@@ -357,8 +399,11 @@ class TestPlaceholderKeyDetection:
         plugin = self._fresh_plugin(monkeypatch)
         with caplog.at_level(logging.WARNING, logger=self.LOGGER_NAME):
             assert plugin._get_langfuse() is None
-        warnings = [r for r in caplog.records if r.levelname == "WARNING"
-                    and r.name == self.LOGGER_NAME]
+        warnings = [
+            r
+            for r in caplog.records
+            if r.levelname == "WARNING" and r.name == self.LOGGER_NAME
+        ]
         assert len(warnings) == 1, (
             f"Expected a single combined warning; got {len(warnings)}:\n"
             + "\n".join(r.getMessage() for r in warnings)
@@ -379,23 +424,29 @@ class TestPlaceholderKeyDetection:
         with caplog.at_level(logging.WARNING, logger=self.LOGGER_NAME):
             for _ in range(15):
                 assert plugin._get_langfuse() is None
-        warnings = [r for r in caplog.records if r.levelname == "WARNING"
-                    and r.name == self.LOGGER_NAME]
+        warnings = [
+            r
+            for r in caplog.records
+            if r.levelname == "WARNING" and r.name == self.LOGGER_NAME
+        ]
         assert len(warnings) == 1, (
             f"Warning fired {len(warnings)} times across 15 calls; "
             "expected 1 (cached via _INIT_FAILED)"
         )
 
-    @pytest.mark.parametrize("placeholder", [
+    @pytest.mark.parametrize(
         "placeholder",
-        "test-key",
-        "your-langfuse-key",
-        "change-me",
-        "xxx",
-        "dummy-key-here",
-        "<your-key>",
-        "REPLACE_ME",
-    ])
+        [
+            "placeholder",
+            "test-key",
+            "your-langfuse-key",
+            "change-me",
+            "xxx",
+            "dummy-key-here",
+            "<your-key>",
+            "REPLACE_ME",
+        ],
+    )
     def test_common_placeholders_detected(self, monkeypatch, caplog, placeholder):
         """A grab-bag of values that real-world ``.env.example`` templates
         use as stand-ins.  Any of them in either key must trip the guard."""
@@ -433,8 +484,11 @@ class TestPlaceholderKeyDetection:
         plugin = self._fresh_plugin(monkeypatch)
         with caplog.at_level(logging.WARNING, logger=self.LOGGER_NAME):
             assert plugin._get_langfuse() is None
-        warnings = [r for r in caplog.records if r.levelname == "WARNING"
-                    and r.name == self.LOGGER_NAME]
+        warnings = [
+            r
+            for r in caplog.records
+            if r.levelname == "WARNING" and r.name == self.LOGGER_NAME
+        ]
         assert warnings == []
 
     def test_sdk_not_installed_still_skips_silently(self, monkeypatch, caplog):
@@ -454,11 +508,16 @@ class TestPlaceholderKeyDetection:
         monkeypatch.setattr(plugin, "Langfuse", None, raising=False)
         with caplog.at_level(logging.WARNING, logger=self.LOGGER_NAME):
             assert plugin._get_langfuse() is None
-        warnings = [r for r in caplog.records if r.levelname == "WARNING"
-                    and r.name == self.LOGGER_NAME]
+        warnings = [
+            r
+            for r in caplog.records
+            if r.levelname == "WARNING" and r.name == self.LOGGER_NAME
+        ]
         assert warnings == []
 
-    def test_valid_prefixes_do_not_trigger_placeholder_warning(self, monkeypatch, caplog):
+    def test_valid_prefixes_do_not_trigger_placeholder_warning(
+        self, monkeypatch, caplog
+    ):
         """Real Langfuse keys (``pk-lf-…`` / ``sk-lf-…``) must pass the
         guard and proceed to SDK init.  We stub the SDK constructor with
         a recording fake so the assertion can confirm BOTH that the
@@ -474,13 +533,15 @@ class TestPlaceholderKeyDetection:
         assert isinstance(client, _FakeLangfuse)
         assert client.kwargs["public_key"] == "pk-lf-real-public-xyz"
         assert client.kwargs["secret_key"] == "sk-lf-real-secret-xyz"
-        assert "placeholders" not in caplog.text.lower(), (
-            f"Valid Langfuse keys tripped the placeholder guard: {caplog.text!r}"
-        )
+        assert (
+            "placeholders" not in caplog.text.lower()
+        ), f"Valid Langfuse keys tripped the placeholder guard: {caplog.text!r}"
 
 
 class TestRequestMessageCoercion:
-    def test_prefers_request_messages_then_messages_then_history_then_user_message(self):
+    def test_prefers_request_messages_then_messages_then_history_then_user_message(
+        self,
+    ):
         sys.modules.pop("plugins.observability.langfuse", None)
         mod = importlib.import_module("plugins.observability.langfuse")
 
@@ -499,7 +560,9 @@ class TestRequestMessageCoercion:
             conversation_history=[{"role": "user", "content": "h"}],
             user_message="u",
         ) == [{"role": "user", "content": "h"}]
-        assert mod._coerce_request_messages(user_message="u") == [{"role": "user", "content": "u"}]
+        assert mod._coerce_request_messages(user_message="u") == [
+            {"role": "user", "content": "u"}
+        ]
 
 
 class TestToolCallOutputBackfill:
@@ -510,23 +573,27 @@ class TestToolCallOutputBackfill:
         observation = object()
         state = mod.TraceState(trace_id="trace-1", root_ctx=None, root_span=None)
         state.tools["call-1"] = observation
-        state.turn_tool_calls.append({
-            "id": "call-1",
-            "type": "function",
-            "name": "web_extract",
-            "arguments": '{"urls": ["https://example.com"]}',
-            "function": {
+        state.turn_tool_calls.append(
+            {
+                "id": "call-1",
+                "type": "function",
                 "name": "web_extract",
                 "arguments": '{"urls": ["https://example.com"]}',
-            },
-        })
+                "function": {
+                    "name": "web_extract",
+                    "arguments": '{"urls": ["https://example.com"]}',
+                },
+            }
+        )
 
         task_key = mod._trace_key("task-1", "session-1")
         monkeypatch.setitem(mod._TRACE_STATE, task_key, state)
 
         ended = {}
 
-        def fake_end_observation(obs, *, output=None, metadata=None, usage_details=None, cost_details=None):
+        def fake_end_observation(
+            obs, *, output=None, metadata=None, usage_details=None, cost_details=None
+        ):
             ended["observation"] = obs
             ended["output"] = output
             ended["metadata"] = metadata
@@ -553,19 +620,23 @@ class TestToolCallOutputBackfill:
         sys.modules.pop("plugins.observability.langfuse", None)
         mod = importlib.import_module("plugins.observability.langfuse")
 
-        messages = [{
-            "role": "tool",
-            "name": "web_extract",
-            "tool_call_id": "call-1",
-            "content": '{"ok": true}',
-        }]
+        messages = [
+            {
+                "role": "tool",
+                "name": "web_extract",
+                "tool_call_id": "call-1",
+                "content": '{"ok": true}',
+            }
+        ]
 
-        assert mod._serialize_messages(messages) == [{
-            "role": "tool",
-            "name": "web_extract",
-            "tool_call_id": "call-1",
-            "content": {"ok": True},
-        }]
+        assert mod._serialize_messages(messages) == [
+            {
+                "role": "tool",
+                "name": "web_extract",
+                "tool_call_id": "call-1",
+                "content": {"ok": True},
+            }
+        ]
 
     def test_serialize_tool_calls_emits_openai_style_function_shape(self):
         sys.modules.pop("plugins.observability.langfuse", None)
@@ -580,16 +651,18 @@ class TestToolCallOutputBackfill:
             type = "function"
             function = _Fn()
 
-        assert mod._serialize_tool_calls([_ToolCall()]) == [{
-            "id": "call-1",
-            "type": "function",
-            "name": "web_extract",
-            "arguments": '{"urls": ["https://example.com"]}',
-            "function": {
+        assert mod._serialize_tool_calls([_ToolCall()]) == [
+            {
+                "id": "call-1",
+                "type": "function",
                 "name": "web_extract",
                 "arguments": '{"urls": ["https://example.com"]}',
-            },
-        }]
+                "function": {
+                    "name": "web_extract",
+                    "arguments": '{"urls": ["https://example.com"]}',
+                },
+            }
+        ]
 
 
 class TestToolObservationKeying:
@@ -629,7 +702,9 @@ class TestToolObservationKeying:
         assert ended["output"] == {"ok": True}
         assert state.pending_tools_by_name.get("my_tool") is None
 
-    def test_empty_tool_call_id_observations_are_fifo_within_tool_name(self, monkeypatch):
+    def test_empty_tool_call_id_observations_are_fifo_within_tool_name(
+        self, monkeypatch
+    ):
         """Two queued observations are consumed in FIFO order so the first
         post hook gets the first observation's output, not the second.
 
@@ -654,12 +729,20 @@ class TestToolObservationKeying:
         monkeypatch.setattr(mod, "_end_observation", fake_end)
 
         mod.on_post_tool_call(
-            tool_name="web_extract", args={}, result='{"val": "a"}',
-            task_id="task-1", session_id="sess-1", tool_call_id="",
+            tool_name="web_extract",
+            args={},
+            result='{"val": "a"}',
+            task_id="task-1",
+            session_id="sess-1",
+            tool_call_id="",
         )
         mod.on_post_tool_call(
-            tool_name="web_extract", args={}, result='{"val": "b"}',
-            task_id="task-1", session_id="sess-1", tool_call_id="",
+            tool_name="web_extract",
+            args={},
+            result='{"val": "b"}',
+            task_id="task-1",
+            session_id="sess-1",
+            tool_call_id="",
         )
 
         assert calls[0] == (obs_a, {"val": "a"})
@@ -696,8 +779,12 @@ class TestToolObservationKeying:
         def worker():
             barrier.wait()
             mod.on_post_tool_call(
-                tool_name="web_extract", args={}, result='{"ok": true}',
-                task_id="task-thr", session_id="sess-thr", tool_call_id="",
+                tool_name="web_extract",
+                args={},
+                result='{"ok": true}',
+                task_id="task-thr",
+                session_id="sess-thr",
+                tool_call_id="",
             )
 
         threads = [threading.Thread(target=worker) for _ in range(n)]
@@ -730,8 +817,12 @@ class TestToolObservationKeying:
         monkeypatch.setattr(mod, "_end_observation", fake_end)
 
         mod.on_post_tool_call(
-            tool_name="my_tool", args={}, result='{"status": "done"}',
-            task_id="task-1", session_id="sess-1", tool_call_id="call-99",
+            tool_name="my_tool",
+            args={},
+            result='{"status": "done"}',
+            task_id="task-1",
+            session_id="sess-1",
+            tool_call_id="call-99",
         )
 
         assert ended["obs"] is obs
@@ -751,10 +842,14 @@ class TestUsageFromSanitizedResponse:
         observation = object()
         state = mod.TraceState(trace_id="trace-1", root_ctx=None, root_span=None)
         state.generations[mod._request_key(1)] = observation
-        monkeypatch.setitem(mod._TRACE_STATE, mod._trace_key("task-1", "session-1"), state)
+        monkeypatch.setitem(
+            mod._TRACE_STATE, mod._trace_key("task-1", "session-1"), state
+        )
         captured = {}
 
-        def fake_end_observation(obs, *, output=None, metadata=None, usage_details=None, cost_details=None):
+        def fake_end_observation(
+            obs, *, output=None, metadata=None, usage_details=None, cost_details=None
+        ):
             captured["usage_details"] = usage_details
 
         monkeypatch.setattr(mod, "_end_observation", fake_end_observation)
@@ -771,7 +866,10 @@ class TestUsageFromSanitizedResponse:
             session_id="session-1",
             api_call_count=1,
             model="gemini-3-flash-preview",
-            response={"model": "gemini-3-flash-preview", "usage": {"input_tokens": 100, "output_tokens": 20}},
+            response={
+                "model": "gemini-3-flash-preview",
+                "usage": {"input_tokens": 100, "output_tokens": 20},
+            },
             usage={"input_tokens": 100, "output_tokens": 20},
             assistant_content_chars=42,
         )

@@ -59,6 +59,7 @@ CONFIG_YOLLARI = [
 # aiohttp opsiyonel
 try:
     import aiohttp
+
     AIOHTTP_OK = True
 except ImportError:
     AIOHTTP_OK = False
@@ -66,6 +67,7 @@ except ImportError:
 # pyyaml opsiyonel
 try:
     import yaml
+
     YAML_OK = True
 except ImportError:
     YAML_OK = False
@@ -74,14 +76,15 @@ except ImportError:
 @dataclass
 class MCPSunucuConfig:
     """Tek bir MCP sunucusu konfigurasyonu."""
+
     ad: str
-    komut: Optional[str] = None        # stdio: calistirilacak program
-    args: list[str] = field(default_factory=list)      # stdio: argumanlar
+    komut: Optional[str] = None  # stdio: calistirilacak program
+    args: list[str] = field(default_factory=list)  # stdio: argumanlar
     env: dict[str, str] = field(default_factory=dict)  # stdio: ek ortam degiskenleri
-    url: Optional[str] = None          # HTTP: sunucu URL
+    url: Optional[str] = None  # HTTP: sunucu URL
     headers: dict[str, str] = field(default_factory=dict)  # HTTP: basliklar
-    timeout: int = 120                 # arac timeout
-    connect_timeout: int = 60          # baglanti timeout
+    timeout: int = 120  # arac timeout
+    connect_timeout: int = 60  # baglanti timeout
 
     @property
     def transport(self) -> str:
@@ -184,9 +187,13 @@ class MCPBaglanti:
             try:
                 # Yeniden baglanma araligi (exponential backoff)
                 if deneme > 0:
-                    bekle = min(2 ** deneme, 60)  # max 60s
-                    logger.info("[MCP] %s yeniden baglaniyor (deneme %d, bekle %ds)...",
-                                self.config.ad, deneme + 1, bekle)
+                    bekle = min(2**deneme, 60)  # max 60s
+                    logger.info(
+                        "[MCP] %s yeniden baglaniyor (deneme %d, bekle %ds)...",
+                        self.config.ad,
+                        deneme + 1,
+                        bekle,
+                    )
                     await asyncio.sleep(bekle)
 
                 async with aiohttp.ClientSession(
@@ -195,11 +202,14 @@ class MCPBaglanti:
                 ) as session:
                     self._session = session
                     # Initialize
-                    init_yanit = await self._json_rpc_http("initialize", {
-                        "protocolVersion": "0.1.0",
-                        "capabilities": {},
-                        "clientInfo": {"name": "ReYMeN", "version": "1.0"},
-                    })
+                    init_yanit = await self._json_rpc_http(
+                        "initialize",
+                        {
+                            "protocolVersion": "0.1.0",
+                            "capabilities": {},
+                            "clientInfo": {"name": "ReYMeN", "version": "1.0"},
+                        },
+                    )
                     if "result" not in init_yanit:
                         raise ConnectionError("Initialize basarisiz")
 
@@ -208,8 +218,11 @@ class MCPBaglanti:
                     self._araclar = yanit.get("result", {}).get("tools", [])
                     self._bagli = True
                     deneme = 0
-                    logger.info("[MCP] %s (HTTP): %d tool kesfedildi",
-                                self.config.ad, len(self._araclar))
+                    logger.info(
+                        "[MCP] %s (HTTP): %d tool kesfedildi",
+                        self.config.ad,
+                        len(self._araclar),
+                    )
 
                     # Baglantiyi canli tut — sunucu kapatana kadar bekle
                     while not self._durduruldu:
@@ -221,11 +234,16 @@ class MCPBaglanti:
                 self._bagli = False
                 deneme += 1
                 if deneme > 5:
-                    logger.error("[MCP] %s 5 kez denendi, vazgeciliyor: %s",
-                                 self.config.ad, e)
+                    logger.error(
+                        "[MCP] %s 5 kez denendi, vazgeciliyor: %s", self.config.ad, e
+                    )
                     break
-                logger.warning("[MCP] %s baglanti koptu (deneme %d/5): %s",
-                               self.config.ad, deneme, e)
+                logger.warning(
+                    "[MCP] %s baglanti koptu (deneme %d/5): %s",
+                    self.config.ad,
+                    deneme,
+                    e,
+                )
 
     async def _json_rpc_http(self, method: str, params: dict) -> dict:
         """HTTP JSON-RPC istegi."""
@@ -266,10 +284,13 @@ class MCPBaglanti:
 
     async def _http_arac_cagir_async(self, arac_adi: str, parametreler: dict) -> str:
         """HTTP tool cagrisi (async)."""
-        yanit = await self._json_rpc_http("tools/call", {
-            "name": arac_adi,
-            "arguments": parametreler,
-        })
+        yanit = await self._json_rpc_http(
+            "tools/call",
+            {
+                "name": arac_adi,
+                "arguments": parametreler,
+            },
+        )
         sonuc = yanit.get("result", {})
         icerik = sonuc.get("content", [])
         if icerik and isinstance(icerik, list):
@@ -290,6 +311,7 @@ class MCPBaglanti:
             # shutil.which ile .cmd/.exe yolunu coz.
             if os.name == "nt":
                 import shutil
+
                 ilk = komut[0]
                 tam_yol = shutil.which(ilk)
                 if tam_yol and tam_yol != ilk:
@@ -304,11 +326,14 @@ class MCPBaglanti:
                 env=env,
             )
             # Initialize
-            self._stdio_json_rpc("initialize", {
-                "protocolVersion": "0.1.0",
-                "capabilities": {},
-                "clientInfo": {"name": "ReYMeN", "version": "1.0"},
-            })
+            self._stdio_json_rpc(
+                "initialize",
+                {
+                    "protocolVersion": "0.1.0",
+                    "capabilities": {},
+                    "clientInfo": {"name": "ReYMeN", "version": "1.0"},
+                },
+            )
             # Tools/list
             yanit = self._stdio_json_rpc("tools/list", {})
             self._araclar = yanit.get("result", {}).get("tools", [])
@@ -320,8 +345,11 @@ class MCPBaglanti:
                 name=f"mcp-{self.config.ad}-watchdog",
             )
             self._thread.start()
-            logger.info("[MCP] %s (stdio): %d tool kesfedildi",
-                        self.config.ad, len(self._araclar))
+            logger.info(
+                "[MCP] %s (stdio): %d tool kesfedildi",
+                self.config.ad,
+                len(self._araclar),
+            )
             return True
         except Exception as e:
             logger.error("[MCP] %s (stdio) baglanti hatasi: %s", self.config.ad, e)
@@ -338,12 +366,17 @@ class MCPBaglanti:
                 self._bagli = False
                 deneme += 1
                 if deneme > 5:
-                    logger.error("[MCP] %s stdio 5 kez denendi, vazgeciliyor",
-                                 self.config.ad)
+                    logger.error(
+                        "[MCP] %s stdio 5 kez denendi, vazgeciliyor", self.config.ad
+                    )
                     break
-                bekle = min(2 ** deneme, 60)
-                logger.info("[MCP] %s stdio yeniden basliyor (deneme %d, bekle %ds)...",
-                            self.config.ad, deneme, bekle)
+                bekle = min(2**deneme, 60)
+                logger.info(
+                    "[MCP] %s stdio yeniden basliyor (deneme %d, bekle %ds)...",
+                    self.config.ad,
+                    deneme,
+                    bekle,
+                )
                 time.sleep(bekle)
                 if self._stdio_baglan():
                     deneme = 0
@@ -352,30 +385,37 @@ class MCPBaglanti:
         """Stdio JSON-RPC istegi."""
         with self._kilit:
             self._istek_id += 1
-            istek = json.dumps({
-                "jsonrpc": "2.0",
-                "id": self._istek_id,
-                "method": method,
-                "params": params,
-            }) + "\n"
+            istek = (
+                json.dumps(
+                    {
+                        "jsonrpc": "2.0",
+                        "id": self._istek_id,
+                        "method": method,
+                        "params": params,
+                    }
+                )
+                + "\n"
+            )
             try:
                 self._proses.stdin.write(istek)
                 self._proses.stdin.flush()
                 satir = self._proses.stdout.readline()
                 return json.loads(satir) if satir else {}
             except Exception as e:
-                logger.error("[MCP] Stdio JSON-RPC hatasi (%s): %s",
-                             self.config.ad, e)
+                logger.error("[MCP] Stdio JSON-RPC hatasi (%s): %s", self.config.ad, e)
                 return {}
 
     def _stdio_arac_cagir(self, arac_adi: str, parametreler: dict) -> str:
         """Stdio tool cagrisi."""
         if not self._bagli:
             return "[MCP] Baglanti aktif degil"
-        yanit = self._stdio_json_rpc("tools/call", {
-            "name": arac_adi,
-            "arguments": parametreler,
-        })
+        yanit = self._stdio_json_rpc(
+            "tools/call",
+            {
+                "name": arac_adi,
+                "arguments": parametreler,
+            },
+        )
         sonuc = yanit.get("result", {})
         icerik = sonuc.get("content", [])
         if icerik and isinstance(icerik, list):
@@ -427,8 +467,7 @@ class NativeMCPClient:
                 else:
                     sunucular = self._json_oku(yol)
                 if sunucular:
-                    logger.info("[MCP] %d sunucu %s'den yuklendi",
-                                len(sunucular), yol)
+                    logger.info("[MCP] %d sunucu %s'den yuklendi", len(sunucular), yol)
                     return sunucular
             except Exception as e:
                 logger.warning("[MCP] %s okuma hatasi: %s", yol, e)
@@ -462,16 +501,18 @@ class NativeMCPClient:
         for ad, ayar in servers.items():
             if not isinstance(ayar, dict):
                 continue
-            sonuc.append(MCPSunucuConfig(
-                ad=ad,
-                komut=ayar.get("command"),
-                args=ayar.get("args", []),
-                env=ayar.get("env", {}),
-                url=ayar.get("url"),
-                headers=ayar.get("headers", {}),
-                timeout=ayar.get("timeout", 120),
-                connect_timeout=ayar.get("connect_timeout", 60),
-            ))
+            sonuc.append(
+                MCPSunucuConfig(
+                    ad=ad,
+                    komut=ayar.get("command"),
+                    args=ayar.get("args", []),
+                    env=ayar.get("env", {}),
+                    url=ayar.get("url"),
+                    headers=ayar.get("headers", {}),
+                    timeout=ayar.get("timeout", 120),
+                    connect_timeout=ayar.get("connect_timeout", 60),
+                )
+            )
         return sonuc
 
     def _json_oku(self, yol: Path) -> list[MCPSunucuConfig]:
@@ -496,13 +537,15 @@ class NativeMCPClient:
                 continue
             transport = ayar.get("transport", "stdio")
             if transport == "http":
-                sonuc.append(MCPSunucuConfig(
-                    ad=ad,
-                    url=ayar.get("url"),
-                    headers=ayar.get("headers", {}),
-                    timeout=ayar.get("timeout", 120),
-                    connect_timeout=ayar.get("connect_timeout", 60),
-                ))
+                sonuc.append(
+                    MCPSunucuConfig(
+                        ad=ad,
+                        url=ayar.get("url"),
+                        headers=ayar.get("headers", {}),
+                        timeout=ayar.get("timeout", 120),
+                        connect_timeout=ayar.get("connect_timeout", 60),
+                    )
+                )
             else:
                 komut = ayar.get("command", "")
                 if isinstance(komut, str):
@@ -510,14 +553,16 @@ class NativeMCPClient:
                 else:
                     komut_list = komut
                 args = ayar.get("args", [])
-                sonuc.append(MCPSunucuConfig(
-                    ad=ad,
-                    komut=komut_list[0] if komut_list else None,
-                    args=komut_list[1:] + args if len(komut_list) > 1 else args,
-                    env=ayar.get("env", {}),
-                    timeout=ayar.get("timeout", 120),
-                    connect_timeout=ayar.get("connect_timeout", 60),
-                ))
+                sonuc.append(
+                    MCPSunucuConfig(
+                        ad=ad,
+                        komut=komut_list[0] if komut_list else None,
+                        args=komut_list[1:] + args if len(komut_list) > 1 else args,
+                        env=ayar.get("env", {}),
+                        timeout=ayar.get("timeout", 120),
+                        connect_timeout=ayar.get("connect_timeout", 60),
+                    )
+                )
         return sonuc
 
     # ── Baglanti Yonetimi ─────────────────────────────────────────────────
@@ -584,8 +629,11 @@ class NativeMCPClient:
             self.motor_kaydet()
 
         self._kesfedildi = True
-        logger.info("[MCP] discover_mcp_tools: %d yeni sunucu, toplam %d",
-                    yeni_sayisi, len(self._baglantilar))
+        logger.info(
+            "[MCP] discover_mcp_tools: %d yeni sunucu, toplam %d",
+            yeni_sayisi,
+            len(self._baglantilar),
+        )
 
     def motor_kaydet(self):
         """Tum MCP tool'larini motora kaydet.
@@ -695,8 +743,9 @@ def motor_kaydet(motor):
 if __name__ == "__main__":
     import sys
 
-    logging.basicConfig(level=logging.INFO,
-                        format="%(asctime)s [%(levelname)s] %(message)s")
+    logging.basicConfig(
+        level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
+    )
 
     istemci = native_mcp()
     istemci.discover_mcp_tools()

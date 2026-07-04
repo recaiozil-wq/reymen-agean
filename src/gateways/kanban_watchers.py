@@ -46,7 +46,9 @@ def _acquire_singleton_lock(lock_path) -> "tuple[Optional[object], str]":
     back to config-only control.
     """
     try:
-        from reymen.gateway.status import _try_acquire_file_lock  # deferred; same package
+        from reymen.gateway.status import (
+            _try_acquire_file_lock,
+        )  # deferred; same package
     except ImportError:
         return None, "unavailable"
     try:
@@ -66,6 +68,7 @@ def _release_singleton_lock(handle) -> None:
         return
     try:
         from reymen.gateway.status import _release_file_lock
+
         _release_file_lock(handle)
     except Exception as _e:
         logger.warning("[KanbanWatchers] except Exception (L70): %s", Exception)
@@ -108,9 +111,13 @@ class GatewayKanbanWatchersMixin:
         except Exception:
             logger.warning("kanban notifier: config loader unavailable; disabled")
             return
-        env_override = os.environ.get("HERMES_KANBAN_DISPATCH_IN_GATEWAY", "").strip().lower()
+        env_override = (
+            os.environ.get("HERMES_KANBAN_DISPATCH_IN_GATEWAY", "").strip().lower()
+        )
         if env_override in {"0", "false", "no", "off"}:
-            logger.info("kanban notifier: disabled via HERMES_KANBAN_DISPATCH_IN_GATEWAY env")
+            logger.info(
+                "kanban notifier: disabled via HERMES_KANBAN_DISPATCH_IN_GATEWAY env"
+            )
             return
         try:
             cfg = _load_config()
@@ -124,10 +131,13 @@ class GatewayKanbanWatchersMixin:
             )
             return
         from reymen.gateway.config import Platform as _Platform
+
         try:
             from reymen.cron.hermes_stubs import kanban_db as _kb
         except Exception:
-            logger.warning("kanban notifier: kanban_db not importable; notifier disabled")
+            logger.warning(
+                "kanban notifier: kanban_db not importable; notifier disabled"
+            )
             return
 
         TERMINAL_KINDS = ("completed", "blocked", "gave_up", "crashed", "timed_out")
@@ -148,9 +158,7 @@ class GatewayKanbanWatchersMixin:
         # consecutive send failures the sub is dropped so we don't spin
         # against a dead chat every 5 seconds forever.
         MAX_SEND_FAILURES = 3
-        sub_fail_counts: dict[tuple, int] = getattr(
-            self, "_kanban_sub_fail_counts", {}
-        )
+        sub_fail_counts: dict[tuple, int] = getattr(self, "_kanban_sub_fail_counts", {})
         self._kanban_sub_fail_counts = sub_fail_counts
         notifier_profile = getattr(self, "_kanban_notifier_profile", None)
         if not notifier_profile:
@@ -162,6 +170,7 @@ class GatewayKanbanWatchersMixin:
 
         while self._running:
             try:
+
                 def _collect():
                     deliveries: list[dict] = []
                     active_platforms = {
@@ -169,7 +178,9 @@ class GatewayKanbanWatchersMixin:
                         for platform in self.adapters.keys()
                     }
                     if not active_platforms:
-                        logger.debug("kanban notifier: no connected adapters; skipping tick")
+                        logger.debug(
+                            "kanban notifier: no connected adapters; skipping tick"
+                        )
                         return deliveries
 
                     # Enumerate every board on disk, but poll each resolved DB
@@ -186,20 +197,27 @@ class GatewayKanbanWatchersMixin:
                         slug = board_meta.get("slug") or _kb.DEFAULT_BOARD
                         db_path = board_meta.get("db_path")
                         try:
-                            resolved_db_path = str(Path(db_path).expanduser().resolve()) if db_path else str(_kb.kanban_db_path(slug).resolve())
+                            resolved_db_path = (
+                                str(Path(db_path).expanduser().resolve())
+                                if db_path
+                                else str(_kb.kanban_db_path(slug).resolve())
+                            )
                         except Exception:
                             resolved_db_path = f"slug:{slug}"
                         if resolved_db_path in seen_db_paths:
                             logger.debug(
                                 "kanban notifier: skipping duplicate board slug %s for DB %s",
-                                slug, resolved_db_path,
+                                slug,
+                                resolved_db_path,
                             )
                             continue
                         seen_db_paths.add(resolved_db_path)
                         try:
                             conn = _kb.connect(board=slug)
                         except Exception as exc:
-                            logger.debug("kanban notifier: cannot open board %s: %s", slug, exc)
+                            logger.debug(
+                                "kanban notifier: cannot open board %s: %s", slug, exc
+                            )
                             continue
                         try:
                             # `connect()` runs the schema + idempotent migration
@@ -216,45 +234,59 @@ class GatewayKanbanWatchersMixin:
                             # redundant call to avoid the wasted work.
                             subs = _kb.list_notify_subs(conn)
                             if not subs:
-                                logger.debug("kanban notifier: board %s has no subscriptions", slug)
+                                logger.debug(
+                                    "kanban notifier: board %s has no subscriptions",
+                                    slug,
+                                )
                             for sub in subs:
                                 owner_profile = sub.get("notifier_profile") or None
                                 if owner_profile and owner_profile != notifier_profile:
                                     logger.debug(
                                         "kanban notifier: subscription for %s owned by profile %s; current profile %s skipping",
-                                        sub.get("task_id"), owner_profile, notifier_profile,
+                                        sub.get("task_id"),
+                                        owner_profile,
+                                        notifier_profile,
                                     )
                                     continue
                                 platform = (sub.get("platform") or "").lower()
                                 if platform not in active_platforms:
                                     logger.debug(
                                         "kanban notifier: subscription for %s on %s skipped; adapter not connected",
-                                        sub.get("task_id"), platform or "<missing>",
+                                        sub.get("task_id"),
+                                        platform or "<missing>",
                                     )
                                     continue
-                                old_cursor, cursor, events = _kb.claim_unseen_events_for_sub(
-                                    conn,
-                                    task_id=sub["task_id"],
-                                    platform=sub["platform"],
-                                    chat_id=sub["chat_id"],
-                                    thread_id=sub.get("thread_id") or "",
-                                    kinds=TERMINAL_KINDS,
+                                old_cursor, cursor, events = (
+                                    _kb.claim_unseen_events_for_sub(
+                                        conn,
+                                        task_id=sub["task_id"],
+                                        platform=sub["platform"],
+                                        chat_id=sub["chat_id"],
+                                        thread_id=sub.get("thread_id") or "",
+                                        kinds=TERMINAL_KINDS,
+                                    )
                                 )
                                 if not events:
                                     continue
                                 task = _kb.get_task(conn, sub["task_id"])
                                 logger.debug(
                                     "kanban notifier: claimed %d event(s) for %s on board %s cursor %s→%s",
-                                    len(events), sub["task_id"], slug, old_cursor, cursor,
+                                    len(events),
+                                    sub["task_id"],
+                                    slug,
+                                    old_cursor,
+                                    cursor,
                                 )
-                                deliveries.append({
-                                    "sub": sub,
-                                    "old_cursor": old_cursor,
-                                    "cursor": cursor,
-                                    "events": events,
-                                    "task": task,
-                                    "board": slug,
-                                })
+                                deliveries.append(
+                                    {
+                                        "sub": sub,
+                                        "old_cursor": old_cursor,
+                                        "cursor": cursor,
+                                        "events": events,
+                                        "task": task,
+                                        "board": slug,
+                                    }
+                                )
                         finally:
                             conn.close()
                     return deliveries
@@ -271,14 +303,18 @@ class GatewayKanbanWatchersMixin:
                         # Unknown platform string; skip and advance cursor so
                         # we don't replay forever.
                         await asyncio.to_thread(
-                            self._kanban_advance, sub, d["cursor"], board_slug,
+                            self._kanban_advance,
+                            sub,
+                            d["cursor"],
+                            board_slug,
                         )
                         continue
                     adapter = self.adapters.get(plat)
                     if adapter is None:
                         logger.debug(
                             "kanban notifier: adapter %s disconnected before delivery for %s; rewinding claim",
-                            platform_str, sub["task_id"],
+                            platform_str,
+                            sub["task_id"],
                         )
                         await asyncio.to_thread(
                             self._kanban_rewind,
@@ -294,7 +330,7 @@ class GatewayKanbanWatchersMixin:
                         # Identity prefix: attribute terminal pings to the
                         # worker that did the work. Makes fleets (where one
                         # chat subscribes to many tasks) legible at a glance.
-                        who = (task.assignee if task and task.assignee else None)
+                        who = task.assignee if task and task.assignee else None
                         tag = f"@{who} " if who else ""
                         if kind == "completed":
                             # Prefer the run's summary (the worker's
@@ -350,16 +386,24 @@ class GatewayKanbanWatchersMixin:
                         if sub.get("thread_id"):
                             metadata["thread_id"] = sub["thread_id"]
                         sub_key = (
-                            sub["task_id"], sub["platform"],
-                            sub["chat_id"], sub.get("thread_id") or "",
+                            sub["task_id"],
+                            sub["platform"],
+                            sub["chat_id"],
+                            sub.get("thread_id") or "",
                         )
                         try:
                             await adapter.send(
-                                sub["chat_id"], msg, metadata=metadata,
+                                sub["chat_id"],
+                                msg,
+                                metadata=metadata,
                             )
                             logger.debug(
                                 "kanban notifier: delivered %s event for %s to %s/%s on board %s",
-                                kind, sub["task_id"], platform_str, sub["chat_id"], board_slug,
+                                kind,
+                                sub["task_id"],
+                                platform_str,
+                                sub["chat_id"],
+                                board_slug,
                             )
                             # After delivering the text notification, surface
                             # any artifact paths the worker referenced in
@@ -382,7 +426,8 @@ class GatewayKanbanWatchersMixin:
                                 except Exception as art_exc:
                                     logger.debug(
                                         "kanban notifier: artifact delivery for %s failed: %s",
-                                        sub["task_id"], art_exc,
+                                        sub["task_id"],
+                                        art_exc,
                                     )
                             # Reset the failure counter on success.
                             sub_fail_counts.pop(sub_key, None)
@@ -392,16 +437,23 @@ class GatewayKanbanWatchersMixin:
                             logger.warning(
                                 "kanban notifier: send failed for %s on %s "
                                 "(attempt %d/%d): %s",
-                                sub["task_id"], platform_str, fails,
-                                MAX_SEND_FAILURES, exc,
+                                sub["task_id"],
+                                platform_str,
+                                fails,
+                                MAX_SEND_FAILURES,
+                                exc,
                             )
                             if fails >= MAX_SEND_FAILURES:
                                 logger.warning(
                                     "kanban notifier: dropping subscription "
                                     "%s on %s after %d consecutive send failures",
-                                    sub["task_id"], platform_str, fails,
+                                    sub["task_id"],
+                                    platform_str,
+                                    fails,
                                 )
-                                await asyncio.to_thread(self._kanban_unsub, sub, board_slug)
+                                await asyncio.to_thread(
+                                    self._kanban_unsub, sub, board_slug
+                                )
                                 sub_fail_counts.pop(sub_key, None)
                             else:
                                 await asyncio.to_thread(
@@ -420,7 +472,10 @@ class GatewayKanbanWatchersMixin:
                         # is the dedup mechanism — it prevents re-delivery
                         # of the same event on subsequent ticks.
                         await asyncio.to_thread(
-                            self._kanban_advance, sub, d["cursor"], board_slug,
+                            self._kanban_advance,
+                            sub,
+                            d["cursor"],
+                            board_slug,
                         )
                         # Unsubscribe only when the task has reached a truly
                         # final status (done / archived). For blocked /
@@ -432,7 +487,9 @@ class GatewayKanbanWatchersMixin:
                         task_terminal = task and task.status in {"done", "archived"}
                         if task_terminal:
                             await asyncio.to_thread(
-                                self._kanban_unsub, sub, board_slug,
+                                self._kanban_unsub,
+                                sub,
+                                board_slug,
                             )
             except Exception as exc:
                 logger.warning("kanban notifier tick failed: %s", exc)
@@ -443,7 +500,10 @@ class GatewayKanbanWatchersMixin:
                 await asyncio.sleep(1)
 
     def _kanban_advance(
-        self, sub: dict, cursor: int, board: Optional[str] = None,
+        self,
+        sub: dict,
+        cursor: int,
+        board: Optional[str] = None,
     ) -> None:
         """Sync helper: advance a subscription's cursor. Runs in to_thread.
 
@@ -451,6 +511,7 @@ class GatewayKanbanWatchersMixin:
         subscription. Unsub cursors in one board can't touch another's.
         """
         from reymen.cron.hermes_stubs import kanban_db as _kb
+
         conn = _kb.connect(board=board)
         try:
             _kb.advance_notify_cursor(
@@ -466,6 +527,7 @@ class GatewayKanbanWatchersMixin:
 
     def _kanban_unsub(self, sub: dict, board: Optional[str] = None) -> None:
         from reymen.cron.hermes_stubs import kanban_db as _kb
+
         conn = _kb.connect(board=board)
         try:
             _kb.remove_notify_sub(
@@ -487,6 +549,7 @@ class GatewayKanbanWatchersMixin:
     ) -> None:
         """Sync helper: undo a claimed notification cursor after send failure."""
         from reymen.cron.hermes_stubs import kanban_db as _kb
+
         conn = _kb.connect(board=board)
         try:
             _kb.rewind_notify_cursor(
@@ -568,6 +631,7 @@ class GatewayKanbanWatchersMixin:
             return
 
         from reymen.gateway.platforms.base import BasePlatformAdapter
+
         candidates = BasePlatformAdapter.filter_local_delivery_paths(candidates)
         if not candidates:
             return
@@ -580,17 +644,22 @@ class GatewayKanbanWatchersMixin:
         # Partition images so they ride a single send_multiple_images call
         # on platforms that support batch image uploads (Signal/Slack RPCs).
         image_paths = [p for p in candidates if _Path(p).suffix.lower() in _IMAGE_EXTS]
-        other_paths = [p for p in candidates if _Path(p).suffix.lower() not in _IMAGE_EXTS]
+        other_paths = [
+            p for p in candidates if _Path(p).suffix.lower() not in _IMAGE_EXTS
+        ]
 
         if image_paths:
             try:
                 batch = [(f"file://{_quote(p)}", "") for p in image_paths]
                 await adapter.send_multiple_images(
-                    chat_id=chat_id, images=batch, metadata=metadata,
+                    chat_id=chat_id,
+                    images=batch,
+                    metadata=metadata,
                 )
             except Exception as exc:
                 logger.warning(
-                    "kanban notifier: image batch upload failed: %s", exc,
+                    "kanban notifier: image batch upload failed: %s",
+                    exc,
                 )
 
         for path in other_paths:
@@ -598,16 +667,21 @@ class GatewayKanbanWatchersMixin:
             try:
                 if ext in _VIDEO_EXTS:
                     await adapter.send_video(
-                        chat_id=chat_id, video_path=path, metadata=metadata,
+                        chat_id=chat_id,
+                        video_path=path,
+                        metadata=metadata,
                     )
                 else:
                     await adapter.send_document(
-                        chat_id=chat_id, file_path=path, metadata=metadata,
+                        chat_id=chat_id,
+                        file_path=path,
+                        metadata=metadata,
                     )
             except Exception as exc:
                 logger.warning(
                     "kanban notifier: artifact upload (%s) failed: %s",
-                    path, exc,
+                    path,
+                    exc,
                 )
 
     async def _kanban_dispatcher_watcher(self) -> None:
@@ -637,9 +711,13 @@ class GatewayKanbanWatchersMixin:
         except Exception:
             logger.warning("kanban dispatcher: config loader unavailable; disabled")
             return
-        env_override = os.environ.get("HERMES_KANBAN_DISPATCH_IN_GATEWAY", "").strip().lower()
+        env_override = (
+            os.environ.get("HERMES_KANBAN_DISPATCH_IN_GATEWAY", "").strip().lower()
+        )
         if env_override in {"0", "false", "no", "off"}:
-            logger.info("kanban dispatcher: disabled via HERMES_KANBAN_DISPATCH_IN_GATEWAY env")
+            logger.info(
+                "kanban dispatcher: disabled via HERMES_KANBAN_DISPATCH_IN_GATEWAY env"
+            )
             return
 
         try:
@@ -657,7 +735,9 @@ class GatewayKanbanWatchersMixin:
         try:
             from reymen.cron.hermes_stubs import kanban_db as _kb
         except Exception:
-            logger.warning("kanban dispatcher: kanban_db not importable; dispatcher disabled")
+            logger.warning(
+                "kanban dispatcher: kanban_db not importable; dispatcher disabled"
+            )
             return
 
         # Single-dispatcher backstop. dispatch_in_gateway defaults to true, so a
@@ -673,16 +753,22 @@ class GatewayKanbanWatchersMixin:
         if _lock_state == "contended":
             logger.info(
                 "kanban dispatcher: another gateway already holds the dispatcher "
-                "lock (%s); this gateway will NOT dispatch.", _lock_path,
+                "lock (%s); this gateway will NOT dispatch.",
+                _lock_path,
             )
             return
         if _lock_state == "held":
-            self._kanban_dispatcher_lock_handle = _lock_handle  # hold for process lifetime
-            logger.info("kanban dispatcher: holding singleton dispatcher lock (%s)", _lock_path)
+            self._kanban_dispatcher_lock_handle = (
+                _lock_handle  # hold for process lifetime
+            )
+            logger.info(
+                "kanban dispatcher: holding singleton dispatcher lock (%s)", _lock_path
+            )
         else:
             logger.warning(
                 "kanban dispatcher: advisory lock unavailable at %s; proceeding "
-                "on config control alone.", _lock_path,
+                "on config control alone.",
+                _lock_path,
             )
 
         try:
@@ -927,7 +1013,9 @@ class GatewayKanbanWatchersMixin:
                     try:
                         conn.close()
                     except Exception as _e:
-                        logger.warning("[KanbanWatchers] except Exception (L927): %s", Exception)
+                        logger.warning(
+                            "[KanbanWatchers] except Exception (L927): %s", Exception
+                        )
                         pass
 
         def _tick_once() -> "list[tuple[str, Optional[object]]]":
@@ -979,7 +1067,10 @@ class GatewayKanbanWatchersMixin:
                         try:
                             conn.close()
                         except Exception as _e:
-                            logger.warning("[KanbanWatchers] except Exception (L978): %s", Exception)
+                            logger.warning(
+                                "[KanbanWatchers] except Exception (L978): %s",
+                                Exception,
+                            )
                             pass
             return False
 
@@ -1008,7 +1099,8 @@ class GatewayKanbanWatchersMixin:
                 from reymen.cron.hermes_stubs import kanban_decompose as _decomp
             except Exception as exc:  # pragma: no cover
                 logger.warning(
-                    "kanban auto-decompose: import failed (%s); skipping", exc,
+                    "kanban auto-decompose: import failed (%s); skipping",
+                    exc,
                 )
                 return 0
             try:
@@ -1033,7 +1125,8 @@ class GatewayKanbanWatchersMixin:
                     except Exception as exc:
                         logger.debug(
                             "kanban auto-decompose: list_triage_ids failed on board %s (%s)",
-                            slug, exc,
+                            slug,
+                            exc,
                         )
                         triage_ids = []
                     for tid in triage_ids:
@@ -1042,7 +1135,8 @@ class GatewayKanbanWatchersMixin:
                         attempted += 1
                         try:
                             outcome = _decomp.decompose_task(
-                                tid, author="auto-decomposer",
+                                tid,
+                                author="auto-decomposer",
                             )
                         except Exception:
                             logger.exception(
@@ -1055,19 +1149,24 @@ class GatewayKanbanWatchersMixin:
                             if outcome.fanout and outcome.child_ids:
                                 logger.info(
                                     "kanban auto-decompose [%s]: %s → %d children",
-                                    slug, tid, len(outcome.child_ids),
+                                    slug,
+                                    tid,
+                                    len(outcome.child_ids),
                                 )
                             else:
                                 logger.info(
                                     "kanban auto-decompose [%s]: %s → single task (no fanout)",
-                                    slug, tid,
+                                    slug,
+                                    tid,
                                 )
                         else:
                             # Common no-op reasons (no aux client configured) shouldn't
                             # spam logs every tick. Log at debug.
                             logger.debug(
                                 "kanban auto-decompose [%s]: %s skipped: %s",
-                                slug, tid, outcome.reason,
+                                slug,
+                                tid,
+                                outcome.reason,
                             )
                 finally:
                     if prev_env is None:
@@ -1076,9 +1175,7 @@ class GatewayKanbanWatchersMixin:
                         os.environ["HERMES_KANBAN_BOARD"] = prev_env
             return successes
 
-        logger.info(
-            "kanban dispatcher: embedded in gateway (interval=%.1fs)", interval
-        )
+        logger.info("kanban dispatcher: embedded in gateway (interval=%.1fs)", interval)
         while self._running:
             try:
                 # Reap zombie children before per-board work so a board DB
@@ -1098,7 +1195,7 @@ class GatewayKanbanWatchersMixin:
                     await asyncio.to_thread(_auto_decompose_tick)
                 results = await asyncio.to_thread(_tick_once)
                 any_spawned = False
-                for slug, res in (results or []):
+                for slug, res in results or []:
                     if res is not None and getattr(res, "spawned", None):
                         any_spawned = True
                         # Quiet by default — only log when something actually
@@ -1110,9 +1207,13 @@ class GatewayKanbanWatchersMixin:
                             len(res.spawned),
                             res.reclaimed,
                             len(res.crashed) if hasattr(res.crashed, "__len__") else 0,
-                            len(res.timed_out) if hasattr(res.timed_out, "__len__") else 0,
+                            len(res.timed_out)
+                            if hasattr(res.timed_out, "__len__")
+                            else 0,
                             res.promoted,
-                            len(res.auto_blocked) if hasattr(res.auto_blocked, "__len__") else 0,
+                            len(res.auto_blocked)
+                            if hasattr(res.auto_blocked, "__len__")
+                            else 0,
                         )
                 # Health telemetry (aggregate across boards)
                 ready_pending = await asyncio.to_thread(_ready_nonempty)

@@ -21,7 +21,9 @@ def ensure(package_spec: str, reason: str = "", optional: bool = False) -> bool:
         bool: Paket import edilebiliyorsa True
     """
     # Paket adını çıkar (versiyon spesifikasyonundan temizle)
-    pkg_name = package_spec.split(">=")[0].split("<")[0].split("=")[0].split("[")[0].strip()
+    pkg_name = (
+        package_spec.split(">=")[0].split("<")[0].split("=")[0].split("[")[0].strip()
+    )
     try:
         __import__(pkg_name.replace("-", "_"))
         return True

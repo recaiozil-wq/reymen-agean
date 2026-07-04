@@ -32,6 +32,7 @@ logger = logging.getLogger(__name__)
 CHROMA_MEVCUT = None
 SENTENCE_TRANSFORMERS_MEVCUT = None
 
+
 def _chromada_kontrol_et() -> bool:
     """ChromaDB kullanilabilir mi? (Lazy check, ilk cagrida bir kez dener.)"""
     global CHROMA_MEVCUT, chromadb, _ChromaSettings
@@ -39,10 +40,12 @@ def _chromada_kontrol_et() -> bool:
         try:
             import chromadb  # noqa: F401
             from chromadb.config import Settings as _ChromaSettings  # noqa: F401
+
             CHROMA_MEVCUT = True
         except ImportError:
             CHROMA_MEVCUT = False
     return CHROMA_MEVCUT
+
 
 def _sentence_transformers_kontrol_et() -> bool:
     """sentence-transformers kullanilabilir mi? (Lazy check)"""
@@ -50,22 +53,25 @@ def _sentence_transformers_kontrol_et() -> bool:
     if SENTENCE_TRANSFORMERS_MEVCUT is None:
         try:
             import sentence_transformers  # noqa: F401
+
             SENTENCE_TRANSFORMERS_MEVCUT = True
         except ImportError:
             SENTENCE_TRANSFORMERS_MEVCUT = False
     return SENTENCE_TRANSFORMERS_MEVCUT
 
+
 # ── Varsayilan sabitler ───────────────────────────────────────────────────────
 VARSAYILAN_DIZIN = str(Path(__file__).parent.parent.parent / "vektor_hafizasi")
 VARSAYILAN_MODEL = "all-MiniLM-L6-v2"
-MAKS_KAYIT = 8000          # Baslangic 5000'di, 8000'e yukseltildi
-ESIK_BENZERLIK = 0.15       # Arama esigi (altindaki sonuclar filtrelenir)
-ESIK_DEDUP = 0.85           # Dedup esigi (ustundeki kayit tekrar eklenmez)
+MAKS_KAYIT = 8000  # Baslangic 5000'di, 8000'e yukseltildi
+ESIK_BENZERLIK = 0.15  # Arama esigi (altindaki sonuclar filtrelenir)
+ESIK_DEDUP = 0.85  # Dedup esigi (ustundeki kayit tekrar eklenmez)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
 #  SQLite Fallback
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class _SQLiteVektorBellek:
     """ChromaDB yoksa kullanilacak SQLite tabanli basit vektor benzeri bellek.
@@ -77,7 +83,9 @@ class _SQLiteVektorBellek:
         import sqlite3
 
         self._db_path = db_path or str(
-            Path(__file__).parent.parent.parent / "vektor_hafizasi" / "vektor_fallback.db"
+            Path(__file__).parent.parent.parent
+            / "vektor_hafizasi"
+            / "vektor_fallback.db"
         )
         Path(self._db_path).parent.mkdir(parents=True, exist_ok=True)
         self._conn = sqlite3.connect(self._db_path, check_same_thread=False)
@@ -154,7 +162,9 @@ class _SQLiteVektorBellek:
                 meta = json.loads(row[2])
             except (json.JSONDecodeError, TypeError):
                 meta = {}
-            sonuc.append({"id": row[0], "metin": row[1], "metadata": meta, "zaman": row[3]})
+            sonuc.append(
+                {"id": row[0], "metin": row[1], "metadata": meta, "zaman": row[3]}
+            )
         return sonuc
 
     def __len__(self) -> int:
@@ -176,6 +186,7 @@ class _SQLiteVektorBellek:
 # ═══════════════════════════════════════════════════════════════════════════════
 #  VektorBellek Ana Sinif
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class VektorBellek:
     """Embedding tabanli anlamsal bellek.
@@ -208,7 +219,9 @@ class VektorBellek:
         if CHROMA_MEVCUT:
             self._chroma_kur()
         else:
-            logger.info("[VektorBellek] ChromaDB mevcut degil, SQLite fallback kullanilacak")
+            logger.info(
+                "[VektorBellek] ChromaDB mevcut degil, SQLite fallback kullanilacak"
+            )
             self._fallback = _SQLiteVektorBellek()
 
     def _chroma_kur(self):
@@ -229,7 +242,9 @@ class VektorBellek:
                 self._koleksiyon.count(),
             )
         except Exception as e:
-            logger.warning("[VektorBellek] ChromaDB kurulum hatasi: %s — SQLite fallback", e)
+            logger.warning(
+                "[VektorBellek] ChromaDB kurulum hatasi: %s — SQLite fallback", e
+            )
             self._koleksiyon = None
             self._fallback = _SQLiteVektorBellek()
 
@@ -267,7 +282,10 @@ class VektorBellek:
             if mevcut_doclar and mesafeler:
                 benzerlik = 1 - mesafeler[0]
                 if benzerlik >= ESIK_DEDUP:
-                    logger.debug("[VektorBellek] Tekrar eden kayit atlandi: %.2f benzerlik", benzerlik)
+                    logger.debug(
+                        "[VektorBellek] Tekrar eden kayit atlandi: %.2f benzerlik",
+                        benzerlik,
+                    )
                     return kayit_id
         except Exception as e:
             logger.debug("[VektorBellek] Dedup sorgu hatasi (goz ardi edildi): %s", e)
@@ -372,12 +390,14 @@ class VektorBellek:
                 meta = {}
                 if i < len(metadatalar) and metadatalar[i]:
                     meta = {k: v for k, v in metadatalar[i].items()}
-                sonuc.append({
-                    "id": doc_id,
-                    "metin": dokumanlar[i] if i < len(dokumanlar) else "",
-                    "metadata": meta,
-                    "zaman": meta.get("zaman", ""),
-                })
+                sonuc.append(
+                    {
+                        "id": doc_id,
+                        "metin": dokumanlar[i] if i < len(dokumanlar) else "",
+                        "metadata": meta,
+                        "zaman": meta.get("zaman", ""),
+                    }
+                )
             return sonuc
         except Exception as e:
             logger.warning("[VektorBellek] Listeleme hatasi: %s", e)
@@ -422,7 +442,9 @@ class VektorBellek:
     def bilgi(self) -> Dict:
         """Vektor bellek hakkinda bilgi dondur."""
         return {
-            "backend": "chromadb" if self._koleksiyon else ("sqlite_fallback" if self._fallback else "yok"),
+            "backend": "chromadb"
+            if self._koleksiyon
+            else ("sqlite_fallback" if self._fallback else "yok"),
             "koleksiyon": self._koleksiyon_adi,
             "kayit_sayisi": len(self),
             "dizin": self._kalici_dizin,

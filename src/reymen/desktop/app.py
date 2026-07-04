@@ -1,8 +1,10 @@
 """ReYMeN Desktop uygulamasi (ust seviye API)."""
+
 from __future__ import annotations
 from src.reymen.desktop.server import WebServerManager, web_server
 from src.reymen.desktop.autostart import AutoStartManager
 from src.reymen.desktop.tray import run_tray
+
 
 class DesktopApp:
     def __init__(self):

@@ -132,7 +132,9 @@ class TestMigration:
         assert "CREATE TABLE" in result
 
         # Tablo gerçekten oluştu
-        cur = con.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='test'")
+        cur = con.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='test'"
+        )
         assert cur.fetchone() is not None
 
     def test_migration_uygula_fn_dallanmasi(self):
@@ -149,7 +151,9 @@ class TestMigration:
         result = m.uygula(con)
         assert "callable:fn_migration" in result
 
-        cur = con.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='foo'")
+        cur = con.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='foo'"
+        )
         assert cur.fetchone() is not None
 
     def test_migration_uygula_bos(self):
@@ -252,6 +256,7 @@ class TestMigrationApply:
 
         # Tablolar gerçekten oluştu mu?
         from reymen.core.schema_manager import tablolari_listele
+
         tablolar = tablolari_listele(db_yol)
         assert "ana_tablo" in tablolar
         assert "v1_bar" in tablolar
@@ -279,7 +284,11 @@ class TestUpdateSchema:
         # Güncelle: v3, yeni migration + yeni tablo
         migrations = [
             Migration(version=2, ad="ek_tablo", sql="CREATE TABLE v2_ek (x INT)"),
-            Migration(version=3, ad="ek_index", sql="CREATE INDEX IF NOT EXISTS idx_x ON v2_ek(x)"),
+            Migration(
+                version=3,
+                ad="ek_index",
+                sql="CREATE INDEX IF NOT EXISTS idx_x ON v2_ek(x)",
+            ),
         ]
 
         sonuc = sm.kaydet(
@@ -298,6 +307,7 @@ class TestUpdateSchema:
         assert len(sonuc["degisiklik"]) == 2  # v2 ve v3 migration
 
         from reymen.core.schema_manager import tablolari_listele
+
         tablolar = tablolari_listele(db_yol)
         assert "yeni_tablo" in tablolar
         assert "v2_ek" in tablolar
@@ -460,6 +470,7 @@ class TestMotorEntegrasyonu:
         sm.kaydet(db_yol, ["CREATE TABLE t (id INT)"], version=2)
 
         import reymen.core.schema_manager as sm_module
+
         sm_module._SCHEMA_MANAGER = sm
 
         result = _schema_durum()
@@ -521,11 +532,13 @@ class TestSchemaTaraDetayli:
 
         # _schema_tara çağır (glob'da **/*.db ile bulur)
         import os
+
         old_cwd = os.getcwd()
         os.chdir(tempfile.mkdtemp())
 
         # DB'yi cwd'ye kopyala ki glob bulabilsin
         import shutil
+
         shutil.copy2(str(db_yol), "test_tara.db")
 
         result = _schema_tara()
@@ -542,7 +555,9 @@ class TestDurumBostaDb:
         """DB'de schema_version tablosu var ama 'main' kaydı yok → version 0 döner (line 189)."""
         db_yol = Path(tempfile.mkdtemp()) / "test_no_ver.db"
         con = sqlite3.connect(str(db_yol))
-        con.execute("CREATE TABLE schema_version (ad TEXT PRIMARY KEY, version INTEGER, applied_at REAL, metadata TEXT)")
+        con.execute(
+            "CREATE TABLE schema_version (ad TEXT PRIMARY KEY, version INTEGER, applied_at REAL, metadata TEXT)"
+        )
         # 'main' kaydı ekleme — boş tablo
         con.close()
 

@@ -100,12 +100,14 @@ class TestLoadConfigParseFailure:
         # Reset the dedup cache so this test isn't affected by other tests
         # that may have warned about a different broken config.
         from ReYMeN_cli import config as cfg_mod
+
         cfg_mod._CONFIG_PARSE_WARNED.clear()
 
         with patch.dict(os.environ, {"ReYMeN_HOME": str(tmp_path)}):
             (tmp_path / "config.yaml").write_text("\tbroken tab indent:\n")
 
             import logging
+
             with caplog.at_level(logging.WARNING, logger="ReYMeN_cli.config"):
                 config = load_config()
 
@@ -127,6 +129,7 @@ class TestLoadConfigParseFailure:
 
     def test_dedup_on_repeated_load_same_file(self, tmp_path, capsys):
         from ReYMeN_cli import config as cfg_mod
+
         cfg_mod._CONFIG_PARSE_WARNED.clear()
 
         with patch.dict(os.environ, {"ReYMeN_HOME": str(tmp_path)}):
@@ -138,11 +141,14 @@ class TestLoadConfigParseFailure:
 
             load_config()
             second = capsys.readouterr().err
-            assert second == "", "second load should NOT re-warn (same file, same mtime)"
+            assert (
+                second == ""
+            ), "second load should NOT re-warn (same file, same mtime)"
 
     def test_rewarns_after_file_edit(self, tmp_path, capsys):
         import time
         from ReYMeN_cli import config as cfg_mod
+
         cfg_mod._CONFIG_PARSE_WARNED.clear()
 
         with patch.dict(os.environ, {"ReYMeN_HOME": str(tmp_path)}):
@@ -165,6 +171,7 @@ class TestLoadConfigParseFailure:
         adapted: we back up but deliberately do NOT reset config.yaml.
         """
         from ReYMeN_cli import config as cfg_mod
+
         cfg_mod._CONFIG_PARSE_WARNED.clear()
 
         with patch.dict(os.environ, {"ReYMeN_HOME": str(tmp_path)}):
@@ -187,6 +194,7 @@ class TestLoadConfigParseFailure:
         """Don't churn backups: if a corrupt backup of the same size already
         exists (same corruption already preserved), skip making another."""
         from ReYMeN_cli import config as cfg_mod
+
         cfg_mod._CONFIG_PARSE_WARNED.clear()
 
         with patch.dict(os.environ, {"ReYMeN_HOME": str(tmp_path)}):
@@ -200,15 +208,19 @@ class TestLoadConfigParseFailure:
             load_config()
 
             baks = list(tmp_path.glob("config.yaml.corrupt.*.bak"))
-            assert len(baks) == 1, f"should not add a second same-size backup, got {baks}"
+            assert (
+                len(baks) == 1
+            ), f"should not add a second same-size backup, got {baks}"
 
     def test_corrupt_symlink_config_not_backed_up(self, tmp_path):
         """Symlinked config.yaml is not copied (mirrors Gemini #21541 lstat
         guard) — avoids clobbering whatever the symlink points at."""
         import sys as _sys
+
         if _sys.platform == "win32":
             pytest.skip("symlink creation requires privileges on Windows")
         from ReYMeN_cli import config as cfg_mod
+
         cfg_mod._CONFIG_PARSE_WARNED.clear()
 
         with patch.dict(os.environ, {"ReYMeN_HOME": str(tmp_path)}):
@@ -327,7 +339,9 @@ class TestRemoveEnvValue:
     def test_clears_os_environ(self, tmp_path):
         env_path = tmp_path / ".env"
         env_path.write_text("MY_KEY=my_value\n")
-        with patch.dict(os.environ, {"ReYMeN_HOME": str(tmp_path), "MY_KEY": "my_value"}):
+        with patch.dict(
+            os.environ, {"ReYMeN_HOME": str(tmp_path), "MY_KEY": "my_value"}
+        ):
             remove_env_value("MY_KEY")
             assert "MY_KEY" not in os.environ
 
@@ -341,7 +355,9 @@ class TestRemoveEnvValue:
             assert env_path.read_text() == "OTHER_KEY=value\n"
 
     def test_handles_missing_env_file(self, tmp_path):
-        with patch.dict(os.environ, {"ReYMeN_HOME": str(tmp_path), "GHOST_KEY": "ghost"}):
+        with patch.dict(
+            os.environ, {"ReYMeN_HOME": str(tmp_path), "GHOST_KEY": "ghost"}
+        ):
             result = remove_env_value("GHOST_KEY")
             assert result is False
             # os.environ should still be cleared
@@ -350,7 +366,9 @@ class TestRemoveEnvValue:
     def test_clears_os_environ_even_when_not_in_file(self, tmp_path):
         env_path = tmp_path / ".env"
         env_path.write_text("OTHER=stuff\n")
-        with patch.dict(os.environ, {"ReYMeN_HOME": str(tmp_path), "ORPHAN_KEY": "orphan"}):
+        with patch.dict(
+            os.environ, {"ReYMeN_HOME": str(tmp_path), "ORPHAN_KEY": "orphan"}
+        ):
             remove_env_value("ORPHAN_KEY")
             assert "ORPHAN_KEY" not in os.environ
 
@@ -441,7 +459,9 @@ class TestSanitizeEnvLines:
 
     def test_splits_concatenated_keys(self):
         """Two KEY=VALUE pairs jammed on one line get split."""
-        lines = ["ANTHROPIC_API_KEY=sk-ant-xxxOPENAI_BASE_URL=https://api.openai.com/v1\n"]
+        lines = [
+            "ANTHROPIC_API_KEY=sk-ant-xxxOPENAI_BASE_URL=https://api.openai.com/v1\n"
+        ]
         result = _sanitize_env_lines(lines)
         assert result == [
             "ANTHROPIC_API_KEY=sk-ant-xxx\n",
@@ -495,7 +515,9 @@ class TestSanitizeEnvLines:
 
     def test_value_ending_with_digits_still_splits(self):
         """Concatenation is detected even when value ends with digits."""
-        lines = ["OPENROUTER_API_KEY=sk-or-v1-abc123OPENAI_BASE_URL=https://api.openai.com/v1\n"]
+        lines = [
+            "OPENROUTER_API_KEY=sk-or-v1-abc123OPENAI_BASE_URL=https://api.openai.com/v1\n"
+        ]
         result = _sanitize_env_lines(lines)
         assert len(result) == 2
         assert result[0].startswith("OPENROUTER_API_KEY=")
@@ -508,7 +530,9 @@ class TestSanitizeEnvLines:
             "GLM_BASE_URL=https://api.z.ai/api/paas/v4\n",
         ]
         result = _sanitize_env_lines(lines)
-        assert result == lines, f"GLM_* lines were corrupted by suffix collision: {result}"
+        assert (
+            result == lines
+        ), f"GLM_* lines were corrupted by suffix collision: {result}"
 
     def test_suffix_collision_does_not_break_real_concatenation(self):
         """A genuine concatenation that happens to start with a suffix-superset key still splits."""
@@ -540,8 +564,7 @@ class TestSanitizeEnvLines:
         """sanitize_env_file reports how many entries were fixed."""
         env_file = tmp_path / ".env"
         env_file.write_text(
-            "FAL_KEY=good\n"
-            "OPENROUTER_API_KEY=valFIRECRAWL_API_KEY=val2\n"
+            "FAL_KEY=good\n" "OPENROUTER_API_KEY=valFIRECRAWL_API_KEY=val2\n"
         )
         with patch.dict(os.environ, {"ReYMeN_HOME": str(tmp_path)}):
             fixes = sanitize_env_file()
@@ -567,26 +590,33 @@ class TestOptionalEnvVarsRegistry:
     def test_tavily_api_key_registered(self):
         """TAVILY_API_KEY is listed in OPTIONAL_ENV_VARS."""
         from ReYMeN_cli.config import OPTIONAL_ENV_VARS
+
         assert "TAVILY_API_KEY" in OPTIONAL_ENV_VARS
 
     def test_tavily_api_key_is_tool_category(self):
         """TAVILY_API_KEY is in the 'tool' category."""
         from ReYMeN_cli.config import OPTIONAL_ENV_VARS
+
         assert OPTIONAL_ENV_VARS["TAVILY_API_KEY"]["category"] == "tool"
 
     def test_tavily_api_key_is_password(self):
         """TAVILY_API_KEY is marked as password."""
         from ReYMeN_cli.config import OPTIONAL_ENV_VARS
+
         assert OPTIONAL_ENV_VARS["TAVILY_API_KEY"]["password"] is True
 
     def test_tavily_api_key_has_url(self):
         """TAVILY_API_KEY has a URL."""
         from ReYMeN_cli.config import OPTIONAL_ENV_VARS
-        assert OPTIONAL_ENV_VARS["TAVILY_API_KEY"]["url"] == "https://app.tavily.com/home"
+
+        assert (
+            OPTIONAL_ENV_VARS["TAVILY_API_KEY"]["url"] == "https://app.tavily.com/home"
+        )
 
     def test_tavily_in_env_vars_by_version(self):
         """TAVILY_API_KEY is listed in ENV_VARS_BY_VERSION."""
         from ReYMeN_cli.config import ENV_VARS_BY_VERSION
+
         all_vars = []
         for vars_list in ENV_VARS_BY_VERSION.values():
             all_vars.extend(vars_list)
@@ -602,6 +632,7 @@ class TestOptionalEnvVarsRegistry:
         fallback in the gateway/CLI, never a promoted write target.
         """
         from ReYMeN_cli.config import OPTIONAL_ENV_VARS
+
         assert "ReYMeN_MAX_ITERATIONS" not in OPTIONAL_ENV_VARS
 
 
@@ -629,6 +660,7 @@ class TestConfigMigrationSecretPrompts:
             if required_only
             else [],
         )
+
         def fake_masked_secret_prompt(prompt):
             saved["prompt"] = prompt
             return "secret"
@@ -663,7 +695,9 @@ class TestConfigVersionDetection:
             assert check_config_version() == (latest, latest)
 
     def test_check_config_version_does_not_migrate_invalid_yaml(self, tmp_path):
-        (tmp_path / "config.yaml").write_text("model: [unterminated\n", encoding="utf-8")
+        (tmp_path / "config.yaml").write_text(
+            "model: [unterminated\n", encoding="utf-8"
+        )
 
         with patch.dict(os.environ, {"ReYMeN_HOME": str(tmp_path)}):
             latest = DEFAULT_CONFIG["_config_version"]
@@ -676,16 +710,20 @@ class TestAnthropicTokenMigration:
     def _write_config_version(self, tmp_path, version):
         config_path = tmp_path / "config.yaml"
         import yaml
+
         config_path.write_text(yaml.safe_dump({"_config_version": version}))
 
     def test_clears_token_on_upgrade_to_v9(self, tmp_path):
         """ANTHROPIC_TOKEN is cleared unconditionally when upgrading to v9."""
         self._write_config_version(tmp_path, 8)
         (tmp_path / ".env").write_text("ANTHROPIC_TOKEN=old-token\n")
-        with patch.dict(os.environ, {
-            "ReYMeN_HOME": str(tmp_path),
-            "ANTHROPIC_TOKEN": "old-token",
-        }):
+        with patch.dict(
+            os.environ,
+            {
+                "ReYMeN_HOME": str(tmp_path),
+                "ANTHROPIC_TOKEN": "old-token",
+            },
+        ):
             migrate_config(interactive=False, quiet=True)
             assert load_env().get("ANTHROPIC_TOKEN") == ""
 
@@ -693,10 +731,13 @@ class TestAnthropicTokenMigration:
         """Already at v9 — ANTHROPIC_TOKEN is not touched."""
         self._write_config_version(tmp_path, 9)
         (tmp_path / ".env").write_text("ANTHROPIC_TOKEN=current-token\n")
-        with patch.dict(os.environ, {
-            "ReYMeN_HOME": str(tmp_path),
-            "ANTHROPIC_TOKEN": "current-token",
-        }):
+        with patch.dict(
+            os.environ,
+            {
+                "ReYMeN_HOME": str(tmp_path),
+                "ANTHROPIC_TOKEN": "current-token",
+            },
+        ):
             migrate_config(interactive=False, quiet=True)
             assert load_env().get("ANTHROPIC_TOKEN") == "current-token"
 
@@ -736,6 +777,7 @@ class TestCustomProviderCompatibility:
             raw = yaml.safe_load(config_path.read_text(encoding="utf-8"))
 
         from ReYMeN_cli.config import DEFAULT_CONFIG
+
         assert raw["_config_version"] == DEFAULT_CONFIG["_config_version"]
         assert raw["providers"]["openai-direct"] == {
             "api": "https://api.openai.com/v1",
@@ -843,7 +885,9 @@ class TestCustomProviderCompatibility:
         assert compatible[0]["provider_key"] == "openai-direct"
         assert compatible[0]["api_mode"] == "codex_responses"
 
-    def test_compatible_custom_providers_prefers_base_url_then_url_then_api(self, tmp_path):
+    def test_compatible_custom_providers_prefers_base_url_then_url_then_api(
+        self, tmp_path
+    ):
         """URL field precedence is base_url > url > api (PR #9332)."""
         config_path = tmp_path / "config.yaml"
         config_path.write_text(
@@ -915,9 +959,21 @@ class TestCustomProviderCompatibility:
                 {
                     "_config_version": 17,
                     "custom_providers": [
-                        {"name": "Ollama Cloud", "base_url": "https://ollama.com/v1", "model": "qwen3-coder"},
-                        {"name": "Ollama Cloud", "base_url": "https://ollama.com/v1", "model": "glm-5.1"},
-                        {"name": "Ollama Cloud", "base_url": "https://ollama.com/v1", "model": "kimi-k2.5"},
+                        {
+                            "name": "Ollama Cloud",
+                            "base_url": "https://ollama.com/v1",
+                            "model": "qwen3-coder",
+                        },
+                        {
+                            "name": "Ollama Cloud",
+                            "base_url": "https://ollama.com/v1",
+                            "model": "glm-5.1",
+                        },
+                        {
+                            "name": "Ollama Cloud",
+                            "base_url": "https://ollama.com/v1",
+                            "model": "kimi-k2.5",
+                        },
                     ],
                 }
             ),
@@ -941,7 +997,9 @@ class TestInterimAssistantMessageConfig:
     def test_migrate_to_v15_adds_interim_assistant_message_gate(self, tmp_path):
         config_path = tmp_path / "config.yaml"
         config_path.write_text(
-            yaml.safe_dump({"_config_version": 14, "display": {"tool_progress": "off"}}),
+            yaml.safe_dump(
+                {"_config_version": 14, "display": {"tool_progress": "off"}}
+            ),
             encoding="utf-8",
         )
 
@@ -950,6 +1008,7 @@ class TestInterimAssistantMessageConfig:
             raw = yaml.safe_load(config_path.read_text(encoding="utf-8"))
 
         from ReYMeN_cli.config import DEFAULT_CONFIG
+
         assert raw["_config_version"] == DEFAULT_CONFIG["_config_version"]
         assert raw["display"]["tool_progress"] == "off"
         assert raw["display"]["interim_assistant_messages"] is True
@@ -971,6 +1030,7 @@ class TestDiscordChannelPromptsConfig:
             raw = yaml.safe_load(config_path.read_text(encoding="utf-8"))
 
         from ReYMeN_cli.config import DEFAULT_CONFIG
+
         assert raw["_config_version"] == DEFAULT_CONFIG["_config_version"]
         assert raw["discord"]["auto_thread"] is True
         assert raw["discord"]["channel_prompts"] == {}
@@ -1112,9 +1172,11 @@ class TestWriteApprovalMigration:
 
     def test_approve_maps_to_true(self, tmp_path):
         with patch.dict(os.environ, {"ReYMeN_HOME": str(tmp_path)}):
-            self._write(tmp_path,
-                        "_config_version: 28\nmemory:\n  write_mode: approve\n"
-                        "skills:\n  write_mode: approve\n")
+            self._write(
+                tmp_path,
+                "_config_version: 28\nmemory:\n  write_mode: approve\n"
+                "skills:\n  write_mode: approve\n",
+            )
             migrate_config(interactive=False, quiet=True)
             raw = yaml.safe_load((tmp_path / "config.yaml").read_text())
             assert raw["memory"]["write_approval"] is True
@@ -1126,9 +1188,11 @@ class TestWriteApprovalMigration:
         with patch.dict(os.environ, {"ReYMeN_HOME": str(tmp_path)}):
             # YAML 1.1 parses bare on/off as bools — write_mode could be either
             # the string or the bool; both legacy "not gating" values → False.
-            self._write(tmp_path,
-                        "_config_version: 28\nmemory:\n  write_mode: 'on'\n"
-                        "skills:\n  write_mode: 'off'\n")
+            self._write(
+                tmp_path,
+                "_config_version: 28\nmemory:\n  write_mode: 'on'\n"
+                "skills:\n  write_mode: 'off'\n",
+            )
             migrate_config(interactive=False, quiet=True)
             raw = yaml.safe_load((tmp_path / "config.yaml").read_text())
             assert raw["memory"]["write_approval"] is False
@@ -1136,7 +1200,9 @@ class TestWriteApprovalMigration:
 
     def test_unset_key_defaults_to_false(self, tmp_path):
         with patch.dict(os.environ, {"ReYMeN_HOME": str(tmp_path)}):
-            self._write(tmp_path, "_config_version: 28\nmemory:\n  memory_enabled: true\n")
+            self._write(
+                tmp_path, "_config_version: 28\nmemory:\n  memory_enabled: true\n"
+            )
             migrate_config(interactive=False, quiet=True)
             raw = yaml.safe_load((tmp_path / "config.yaml").read_text())
             # No write_mode was persisted, so the rename is a no-op; the missing-

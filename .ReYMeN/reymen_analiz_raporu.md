@@ -1,6 +1,6 @@
 # 🔬 ReYMeN Proje Analiz Raporu (reymen_analiz.py)
-**Tarih:** 2026-06-27  
-**Script:** reymen_analiz.py (6 aşama)  
+**Tarih:** 2026-06-27
+**Script:** reymen_analiz.py (6 aşama)
 **Durum:** Aşama 1-3 tam, 4 kısmi, 5-6 timeout → manuel tamamlandı
 
 ---

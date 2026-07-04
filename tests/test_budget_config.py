@@ -11,6 +11,7 @@ from unittest.mock import patch
 
 # Import from the real module (not shim)
 import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from reymen.sistem.budget_config import BudgetConfig, run
 
@@ -39,7 +40,10 @@ class TestBudgetConfigInit:
     def test_env_invalid_uses_default(self):
         with patch.dict(os.environ, {"ReYMeN_BUDGET_GUNLUK_API": "not_a_number"}):
             bc = BudgetConfig()
-            assert bc._limitler["gunluk_api"] == BudgetConfig.VARSAYILAN_LIMITLER["gunluk_api"]
+            assert (
+                bc._limitler["gunluk_api"]
+                == BudgetConfig.VARSAYILAN_LIMITLER["gunluk_api"]
+            )
 
 
 class TestButceAyarlama:

@@ -6,6 +6,7 @@ from typing import Dict
 from typing import Any
 from pathlib import Path
 import logging
+
 logger = logging.getLogger(__name__)
 _ReYMeN_home = Path.home() / ".ReYMeN"
 
@@ -14,12 +15,13 @@ _ReYMeN_home = Path.home() / ".ReYMeN"
 # Configuration Loading
 # =============================================================================
 
+
 def _load_prefill_messages(file_path: str) -> List[Dict[str, Any]]:
     """Load ephemeral prefill messages from a JSON file.
-    
+
     The file should contain a JSON array of {role, content} dicts, e.g.:
         [{"role": "user", "content": "Hi"}, {"role": "assistant", "content": "Hello!"}]
-    
+
     Relative paths are resolved from ~/.ReYMeN/.
     Returns an empty list if the path is empty or the file doesn't exist.
     """
@@ -46,6 +48,7 @@ def _load_prefill_messages(file_path: str) -> List[Dict[str, Any]]:
 def _parse_reasoning_config(effort: str) -> dict | None:
     """Parse a reasoning effort level into an OpenRouter reasoning config dict."""
     from reymen.sistem.ReYMeN_constants import parse_reasoning_effort
+
     result = parse_reasoning_effort(effort)
     if effort and effort.strip() and result is None:
         logger.warning("Unknown reasoning_effort '%s', using default (medium)", effort)
@@ -62,14 +65,15 @@ def _parse_service_tier_config(raw: str) -> str | None:
     logger.warning("Unknown service_tier '%s', ignoring", raw)
     return None
 
+
 def load_cli_config() -> Dict[str, Any]:
     """
     Load CLI configuration from config files.
-    
+
     Config lookup order:
     1. ~/.ReYMeN/config.yaml (user config - preferred)
     2. ./cli-config.yaml (project config - fallback)
-    
+
     Environment variables take precedence over config file values.
     Returns default values if no config file exists.
 
@@ -80,8 +84,8 @@ def load_cli_config() -> Dict[str, Any]:
     behavioral/config settings.
     """
     # Check user config first ({ReYMeN_HOME}/config.yaml)
-    user_config_path = _ReYMeN_home / 'config.yaml'
-    project_config_path = Path(__file__).parent / 'cli-config.yaml'
+    user_config_path = _ReYMeN_home / "config.yaml"
+    project_config_path = Path(__file__).parent / "cli-config.yaml"
 
     # --ignore-user-config: force-skip the user config.yaml (still honor project
     # config as a fallback so defaults stay sensible).
@@ -123,8 +127,8 @@ def load_cli_config() -> Dict[str, Any]:
             },
         },
         "compression": {
-            "enabled": True,      # Auto-compress when approaching context limit
-            "threshold": 0.50,    # Compress at 50% of model's context limit
+            "enabled": True,  # Auto-compress when approaching context limit
+            "threshold": 0.50,  # Compress at 50% of model's context limit
         },
         "agent": {
             "max_turns": 90,  # Default max tool-calling iterations (shared with subagents)
@@ -150,7 +154,6 @@ def load_cli_config() -> Dict[str, Any]:
                 "hype": "YOOO LET'S GOOOO!!! I am SO PUMPED to help you today! Every question is AMAZING and we're gonna CRUSH IT together! This is gonna be LEGENDARY! ARE YOU READY?! LET'S DO THIS!",
             },
         },
-
         "display": {
             "compact": False,
             "resume_display": "full",
@@ -165,14 +168,13 @@ def load_cli_config() -> Dict[str, Any]:
             "busy_input_mode": "interrupt",
             "persistent_output": True,
             "persistent_output_max_lines": 200,
-
             "skin": "default",
         },
         "clarify": {
             "timeout": 120,  # Seconds to wait for a clarify answer before auto-proceeding
         },
         "code_execution": {
-            "timeout": 300,    # Max seconds a sandbox script can run before being killed (5 min)
+            "timeout": 300,  # Max seconds a sandbox script can run before being killed (5 min)
             "max_tool_calls": 50,  # Max RPC tool calls per execution
         },
         "auxiliary": {
@@ -191,10 +193,10 @@ def load_cli_config() -> Dict[str, Any]:
         },
         "delegation": {
             "max_iterations": 45,  # Max tool-calling turns per child agent
-            "model": "",       # Subagent model override (empty = inherit parent model)
-            "provider": "",    # Subagent provider override (empty = inherit parent provider)
-            "base_url": "",    # Direct OpenAI-compatible endpoint for subagents
-            "api_key": "",     # API key for delegation.base_url (falls back to OPENAI_API_KEY)
+            "model": "",  # Subagent model override (empty = inherit parent model)
+            "provider": "",  # Subagent provider override (empty = inherit parent provider)
+            "base_url": "",  # Direct OpenAI-compatible endpoint for subagents
+            "api_key": "",  # API key for delegation.base_url (falls back to OPENAI_API_KEY)
         },
         "onboarding": {
             # First-touch hint flags (see agent/onboarding.py).  Each hint is
@@ -202,7 +204,7 @@ def load_cli_config() -> Dict[str, Any]:
             "seen": {},
         },
     }
-    
+
     # Track whether the config file explicitly set terminal config.
     # When using defaults (no config file / no terminal section), we should NOT
     # overwrite env vars that were already set by .env -- only a user's config
@@ -216,7 +218,7 @@ def load_cli_config() -> Dict[str, Any]:
                 from ReYMeN_cli.config import _normalize_root_model_keys
 
                 file_config = _normalize_root_model_keys(yaml.safe_load(f) or {})
-            
+
             _file_has_terminal_config = "terminal" in file_config
 
             # Handle model config - can be string (new format) or dict (old format)
@@ -233,7 +235,10 @@ def load_cli_config() -> Dict[str, Any]:
                     # profile configs that only set "model:" (not "default:") silently
                     # fall back to claude-opus because the merge preserves the
                     # hardcoded default and ReYMeNCLI.__init__ checks "default" first.
-                    if "model" in file_config["model"] and "default" not in file_config["model"]:
+                    if (
+                        "model" in file_config["model"]
+                        and "default" not in file_config["model"]
+                    ):
                         defaults["model"]["default"] = file_config["model"]["model"]
 
             # Deep merge file_config into defaults.
@@ -242,17 +247,19 @@ def load_cli_config() -> Dict[str, Any]:
                 if key == "model":
                     continue  # Already handled above
                 if key in file_config:
-                    if isinstance(defaults[key], dict) and isinstance(file_config[key], dict):
+                    if isinstance(defaults[key], dict) and isinstance(
+                        file_config[key], dict
+                    ):
                         defaults[key].update(file_config[key])
                     else:
                         defaults[key] = file_config[key]
-            
+
             # Second: carry over keys from file_config that aren't in defaults
             # (e.g. platform_toolsets, provider_routing, memory, honcho, etc.)
             for key in file_config:
                 if key not in defaults and key != "model":
                     defaults[key] = file_config[key]
-            
+
             # Handle legacy root-level max_turns (backwards compat) - copy to
             # agent.max_turns whenever the nested key is missing.
             agent_file_config = file_config.get("agent")
@@ -266,17 +273,18 @@ def load_cli_config() -> Dict[str, Any]:
 
     # Expand ${ENV_VAR} references in config values before bridging to env vars.
     from ReYMeN_cli.config import _expand_env_vars
+
     defaults = _expand_env_vars(defaults)
 
     # Apply terminal config to environment variables (so terminal_tool picks them up)
     terminal_config = defaults.get("terminal", {})
-    
+
     # Normalize config key: the new config system (ReYMeN_cli/config.py) and all
     # documentation use "backend", the legacy cli-config.yaml uses "env_type".
     # Accept both, with "backend" taking precedence (it's the documented key).
     if "backend" in terminal_config:
         terminal_config["env_type"] = terminal_config["backend"]
-    
+
     # CWD resolution for CLI/TUI. The gateway has its own config bridge in
     # gateway/run.py but may lazily import cli.py (triggering this code).
     # Local backend: always os.getcwd(). Use `cd /dir && ReYMeN` to control it.
@@ -290,7 +298,7 @@ def load_cli_config() -> Dict[str, Any]:
         defaults["terminal"]["cwd"] = terminal_config["cwd"]
     elif terminal_config.get("cwd") in _CWD_PLACEHOLDERS:
         terminal_config.pop("cwd", None)
-    
+
     env_mappings = {
         "env_type": "TERMINAL_ENV",
         "cwd": "TERMINAL_CWD",
@@ -323,7 +331,7 @@ def load_cli_config() -> Dict[str, Any]:
         # Sudo support (works with all backends)
         "sudo_password": "SUDO_PASSWORD",
     }
-    
+
     # Bridge config → env vars for terminal_tool. TERMINAL_CWD is force-exported
     # UNLESS we're inside a gateway process (detected by _ReYMeN_GATEWAY marker)
     # where it was already set correctly by gateway/run.py's config bridge.
@@ -342,17 +350,17 @@ def load_cli_config() -> Dict[str, Any]:
                     os.environ[env_var] = json.dumps(val)
                 else:
                     os.environ[env_var] = str(val)
-    
+
     # Apply browser config to environment variables
     browser_config = defaults.get("browser", {})
     browser_env_mappings = {
         "inactivity_timeout": "BROWSER_INACTIVITY_TIMEOUT",
     }
-    
+
     for config_key, env_var in browser_env_mappings.items():
         if config_key in browser_config:
             os.environ[env_var] = str(browser_config[config_key])
-    
+
     # Apply auxiliary model/direct-endpoint overrides to environment variables.
     # Vision and web_extract each have their own provider/model/base_url/api_key tuple.
     # Compression config is read directly from config.yaml by run_agent.py and
@@ -381,7 +389,7 @@ def load_cli_config() -> Dict[str, Any]:
             "api_key": "AUXILIARY_APPROVAL_API_KEY",
         },
     }
-    
+
     for task_key, env_map in auxiliary_task_env.items():
         task_cfg = auxiliary_config.get(task_key, {})
         if not isinstance(task_cfg, dict):
@@ -398,7 +406,7 @@ def load_cli_config() -> Dict[str, Any]:
             os.environ[env_map["base_url"]] = base_url
         if api_key:
             os.environ[env_map["api_key"]] = api_key
-    
+
     # Security settings
     security_config = defaults.get("security", {})
     if isinstance(security_config, dict):
@@ -407,6 +415,7 @@ def load_cli_config() -> Dict[str, Any]:
             os.environ["ReYMeN_REDACT_SECRETS"] = str(redact).lower()
 
     return defaults
+
 
 # Load configuration at module startup
 CLI_CONFIG = load_cli_config()

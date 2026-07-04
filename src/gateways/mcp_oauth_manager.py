@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 
 try:
     from reymen.ag.mcp_oauth import MCPOAuth
+
     _MCP_OAUTH_MEVCUT = True
 except ImportError:
     _MCP_OAUTH_MEVCUT = False
@@ -71,12 +72,18 @@ class MCPOAuthManager:
             self._oauth = MCPOAuth()
         else:
             self._oauth = None
-        logger.info("MCPOAuthManager baslatildi. MCPOAuth: %s",
-                     "mevcut" if self._oauth else "yok (fallback)")
+        logger.info(
+            "MCPOAuthManager baslatildi. MCPOAuth: %s",
+            "mevcut" if self._oauth else "yok (fallback)",
+        )
 
-    def token_al(self, saglayici: str = "local",
-                 client_id: str = "", client_secret: str = "",
-                 scope: str = "read") -> dict:
+    def token_al(
+        self,
+        saglayici: str = "local",
+        client_id: str = "",
+        client_secret: str = "",
+        scope: str = "read",
+    ) -> dict:
         """Belirtilen saglayicidan token al.
 
         Args:
@@ -137,7 +144,9 @@ class MCPOAuthManager:
             Token string
         """
         random_part = secrets.token_hex(16)
-        hash_part = hashlib.sha256(f"{saglayici}:{random_part}:{time.time()}".encode()).hexdigest()[:16]
+        hash_part = hashlib.sha256(
+            f"{saglayici}:{random_part}:{time.time()}".encode()
+        ).hexdigest()[:16]
         return f"mcp_{saglayici}_{random_part}_{hash_part}"
 
     def token_yenile(self) -> dict:
@@ -285,11 +294,16 @@ class MCPOAuthManager:
             return
         try:
             with open(self._kayit_yolu, "w", encoding="utf-8") as f:
-                json.dump({
-                    "tokens": self._tokens,
-                    "aktif": self._aktif_saglayici,
-                    "istatistik": self._istatistik,
-                }, f, ensure_ascii=False, indent=2)
+                json.dump(
+                    {
+                        "tokens": self._tokens,
+                        "aktif": self._aktif_saglayici,
+                        "istatistik": self._istatistik,
+                    },
+                    f,
+                    ensure_ascii=False,
+                    indent=2,
+                )
         except Exception as e:
             logger.warning("Kayit hatasi: %s", e)
 
@@ -356,7 +370,9 @@ def run(**kwargs) -> str:
 if __name__ == "__main__":
     print("=== MCPOAuthManager Test ===")
     mgr = MCPOAuthManager()
-    print(json.dumps(mgr.token_al("github", scope="repo"), ensure_ascii=False, indent=2))
+    print(
+        json.dumps(mgr.token_al("github", scope="repo"), ensure_ascii=False, indent=2)
+    )
     print(json.dumps(mgr.token_kontrol("github"), ensure_ascii=False, indent=2))
     print(json.dumps(mgr.token_yenile(), ensure_ascii=False, indent=2))
     print(json.dumps(mgr.token_kontrol("github"), ensure_ascii=False, indent=2))

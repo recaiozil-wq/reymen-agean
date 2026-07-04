@@ -88,9 +88,9 @@ class TestOpenCodeGoV1Strip:
 
         assert result.success, f"switch_model failed: {result.error_message}"
         assert result.api_mode == "anthropic_messages"
-        assert result.base_url == "https://opencode.ai/zen/go", (
-            f"Expected /v1 stripped for anthropic_messages; got {result.base_url}"
-        )
+        assert (
+            result.base_url == "https://opencode.ai/zen/go"
+        ), f"Expected /v1 stripped for anthropic_messages; got {result.base_url}"
 
     def test_switch_to_minimax_m25_strips_v1(self):
         """Same behavior for M2.5."""
@@ -117,9 +117,9 @@ class TestOpenCodeGoV1Strip:
 
         assert result.success
         assert result.api_mode == "chat_completions"
-        assert result.base_url == "https://opencode.ai/zen/go/v1", (
-            f"chat_completions must keep /v1; got {result.base_url}"
-        )
+        assert (
+            result.base_url == "https://opencode.ai/zen/go/v1"
+        ), f"chat_completions must keep /v1; got {result.base_url}"
 
     def test_switch_to_kimi_leaves_v1_intact(self):
         result = _run_opencode_switch(
@@ -234,9 +234,9 @@ class TestAgentSwitchModelDefenseInDepth:
         with patch(
             "agent.anthropic_adapter.build_anthropic_client",
             side_effect=_raise_after_capture,
-        ), patch("agent.anthropic_adapter.resolve_anthropic_token", return_value=""), patch(
-            "agent.anthropic_adapter._is_oauth_token", return_value=False
-        ):
+        ), patch(
+            "agent.anthropic_adapter.resolve_anthropic_token", return_value=""
+        ), patch("agent.anthropic_adapter._is_oauth_token", return_value=False):
             with pytest.raises(_Sentinel):
                 agent.switch_model(
                     new_model="minimax-m2.7",
@@ -250,7 +250,6 @@ class TestAgentSwitchModelDefenseInDepth:
             f"agent.switch_model did not strip /v1; passed {captured.get('base_url')} "
             "to build_anthropic_client"
         )
-
 
 
 class TestStaleConfigDefaultDoesNotWedgeResolver:
@@ -270,22 +269,34 @@ class TestStaleConfigDefaultDoesNotWedgeResolver:
     regression in the target_model plumbing surfaces immediately.
     """
 
-    def test_kimi_switch_keeps_v1_despite_claude_config_default(self, tmp_path, monkeypatch):
+    def test_kimi_switch_keeps_v1_despite_claude_config_default(
+        self, tmp_path, monkeypatch
+    ):
         import yaml
         import importlib
 
         monkeypatch.setenv("ReYMeN_HOME", str(tmp_path))
         monkeypatch.setenv("OPENCODE_ZEN_API_KEY", "test-key")
-        (tmp_path / "config.yaml").write_text(yaml.safe_dump({
-            "model": {"provider": "opencode-zen", "default": "claude-sonnet-4-6"},
-        }))
+        (tmp_path / "config.yaml").write_text(
+            yaml.safe_dump(
+                {
+                    "model": {
+                        "provider": "opencode-zen",
+                        "default": "claude-sonnet-4-6",
+                    },
+                }
+            )
+        )
 
         # Re-import with the new ReYMeN_HOME so config cache is fresh.
         import ReYMeN_cli.config as _cfg_mod
+
         importlib.reload(_cfg_mod)
         import ReYMeN_cli.runtime_provider as _rp_mod
+
         importlib.reload(_rp_mod)
         import ReYMeN_cli.model_switch as _ms_mod
+
         importlib.reload(_ms_mod)
 
         result = _ms_mod.switch_model(
@@ -306,22 +317,31 @@ class TestStaleConfigDefaultDoesNotWedgeResolver:
         )
         assert result.api_mode == "chat_completions"
 
-    def test_go_glm_switch_keeps_v1_despite_minimax_config_default(self, tmp_path, monkeypatch):
+    def test_go_glm_switch_keeps_v1_despite_minimax_config_default(
+        self, tmp_path, monkeypatch
+    ):
         import yaml
         import importlib
 
         monkeypatch.setenv("ReYMeN_HOME", str(tmp_path))
         monkeypatch.setenv("OPENCODE_GO_API_KEY", "test-key")
         monkeypatch.delenv("OPENCODE_ZEN_API_KEY", raising=False)
-        (tmp_path / "config.yaml").write_text(yaml.safe_dump({
-            "model": {"provider": "opencode-go", "default": "minimax-m2.7"},
-        }))
+        (tmp_path / "config.yaml").write_text(
+            yaml.safe_dump(
+                {
+                    "model": {"provider": "opencode-go", "default": "minimax-m2.7"},
+                }
+            )
+        )
 
         import ReYMeN_cli.config as _cfg_mod
+
         importlib.reload(_cfg_mod)
         import ReYMeN_cli.runtime_provider as _rp_mod
+
         importlib.reload(_rp_mod)
         import ReYMeN_cli.model_switch as _ms_mod
+
         importlib.reload(_ms_mod)
 
         result = _ms_mod.switch_model(
@@ -338,7 +358,9 @@ class TestStaleConfigDefaultDoesNotWedgeResolver:
         assert result.base_url == "https://opencode.ai/zen/go/v1"
         assert result.api_mode == "chat_completions"
 
-    def test_claude_switch_still_strips_v1_with_kimi_config_default(self, tmp_path, monkeypatch):
+    def test_claude_switch_still_strips_v1_with_kimi_config_default(
+        self, tmp_path, monkeypatch
+    ):
         """Inverse case: config default is chat_completions, switch TO anthropic_messages.
 
         Guards that the target_model plumbing does not break the original
@@ -349,15 +371,22 @@ class TestStaleConfigDefaultDoesNotWedgeResolver:
 
         monkeypatch.setenv("ReYMeN_HOME", str(tmp_path))
         monkeypatch.setenv("OPENCODE_ZEN_API_KEY", "test-key")
-        (tmp_path / "config.yaml").write_text(yaml.safe_dump({
-            "model": {"provider": "opencode-zen", "default": "kimi-k2.6"},
-        }))
+        (tmp_path / "config.yaml").write_text(
+            yaml.safe_dump(
+                {
+                    "model": {"provider": "opencode-zen", "default": "kimi-k2.6"},
+                }
+            )
+        )
 
         import ReYMeN_cli.config as _cfg_mod
+
         importlib.reload(_cfg_mod)
         import ReYMeN_cli.runtime_provider as _rp_mod
+
         importlib.reload(_rp_mod)
         import ReYMeN_cli.model_switch as _ms_mod
+
         importlib.reload(_ms_mod)
 
         result = _ms_mod.switch_model(

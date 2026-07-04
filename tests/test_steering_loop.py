@@ -27,6 +27,7 @@ from steering_loop import (
 
 # ── Fixtures ─────────────────────────────────────────────────────────────────
 
+
 @pytest.fixture
 def k1(tmp_path):
     return Katman1Hafiza(db_path=str(tmp_path / "k1.db"))
@@ -53,8 +54,8 @@ def sl(tmp_path):
 # KATMAN 1 — HAFIZA
 # ══════════════════════════════════════════════════════════════════════════════
 
-class TestKatman1Hafiza:
 
+class TestKatman1Hafiza:
     def test_kaydet_basarili(self, k1):
         assert k1.kaydet("task_01", "adim", "Python decorator nasil calisir?") is True
 
@@ -66,8 +67,15 @@ class TestKatman1Hafiza:
         assert any("decorator" in s["icerik"].lower() for s in sonuclar)
 
     def test_kaydet_metadata(self, k1):
-        assert k1.kaydet("task_01", "adim", "Meta icerik",
-                          metadata={"kaynak": "api", "adim_no": 1}) is True
+        assert (
+            k1.kaydet(
+                "task_01",
+                "adim",
+                "Meta icerik",
+                metadata={"kaynak": "api", "adim_no": 1},
+            )
+            is True
+        )
 
     def test_ara_bos_sorgu_bos_doner(self, k1):
         k1.kaydet("task_01", "adim", "Icerik var")
@@ -119,8 +127,8 @@ class TestKatman1Hafiza:
 # KATMAN 4 — KANCA
 # ══════════════════════════════════════════════════════════════════════════════
 
-class TestKatman4Kanca:
 
+class TestKatman4Kanca:
     def test_normal_eylem_gecerli(self, k4):
         hata = k4.denetle("task_01", "DOSYA_OKU")
         assert hata is None
@@ -190,18 +198,36 @@ class TestKatman4Kanca:
 # KATMAN 5 — GOZLEM
 # ══════════════════════════════════════════════════════════════════════════════
 
-class TestKatman5Gozlem:
 
+class TestKatman5Gozlem:
     def test_kaydet_basarili(self, k5):
         # kaydet donüs degeri yok (None), hata vermemesi yeterli
-        k5.kaydet("task_01", sure_sn=2.5, cevap="Merhaba", basarili=True,
-                   girdi_token=50, cikti_token=100)
+        k5.kaydet(
+            "task_01",
+            sure_sn=2.5,
+            cevap="Merhaba",
+            basarili=True,
+            girdi_token=50,
+            cikti_token=100,
+        )
 
     def test_task_ozet(self, k5):
-        k5.kaydet("task_ozet", sure_sn=1.0, cevap="Cevap 1", basarili=True,
-                   girdi_token=10, cikti_token=20)
-        k5.kaydet("task_ozet", sure_sn=2.0, cevap="Cevap 2", basarili=True,
-                   girdi_token=15, cikti_token=30)
+        k5.kaydet(
+            "task_ozet",
+            sure_sn=1.0,
+            cevap="Cevap 1",
+            basarili=True,
+            girdi_token=10,
+            cikti_token=20,
+        )
+        k5.kaydet(
+            "task_ozet",
+            sure_sn=2.0,
+            cevap="Cevap 2",
+            basarili=True,
+            girdi_token=15,
+            cikti_token=30,
+        )
         ozet = k5.task_ozet("task_ozet")
         assert ozet["cagri_sayisi"] == 2
         assert ozet["toplam_sure_sn"] == pytest.approx(3.0, abs=0.01)
@@ -252,8 +278,8 @@ class TestKatman5Gozlem:
 # STEERING LOOP — BIRLESIK API
 # ══════════════════════════════════════════════════════════════════════════════
 
-class TestSteeringLoop:
 
+class TestSteeringLoop:
     def test_hafiza_kaydet_ve_ara(self, sl):
         sl.hafiza_kaydet("task_01", "adim", "SteeringLoop FTS5 testi")
         sonuclar = sl.hafiza_ara("SteeringLoop")
@@ -272,8 +298,14 @@ class TestSteeringLoop:
         assert sl.kanca_denetle("task_bloke", "DOSYA_YAZ") is None
 
     def test_gozlem_kaydet_ve_ozet(self, sl):
-        sl.gozlem_kaydet("task_01", 1.5, cevap="Cevap", basarili=True,
-                          girdi_token=50, cikti_token=100)
+        sl.gozlem_kaydet(
+            "task_01",
+            1.5,
+            cevap="Cevap",
+            basarili=True,
+            girdi_token=50,
+            cikti_token=100,
+        )
         ozet = sl.gozlem_ozet("task_01")
         assert ozet["cagri_sayisi"] == 1
 
@@ -318,6 +350,7 @@ class TestSteeringLoop:
 # KATMAN 4 — CIRCUIT BREAKER ENTEGRASYONU
 # ══════════════════════════════════════════════════════════════════════════════
 
+
 class TestKatman4CircuitBreaker:
     """Katman4Kanca.denetle() circuit breaker entegrasyon testleri."""
 
@@ -339,6 +372,7 @@ class TestKatman4CircuitBreaker:
         for _ in range(5):
             k4.hata_bildir("task_01")
         from circuit_breaker import CircuitBreakerState
+
         assert k4._cb.durum == CircuitBreakerState.OPEN
 
     def test_denetle_circuit_open_bloke_eder(self, k4):
@@ -370,6 +404,7 @@ class TestKatman4CircuitBreaker:
 
     def test_30sn_sonra_half_open_tekrar_calisir(self, k4):
         import time
+
         for _ in range(5):
             k4.hata_bildir("task_01")
         # Zamanı 31sn ileri kaydır

@@ -33,29 +33,31 @@ logger = logging.getLogger(__name__)
 
 # ── Mesaj Tipleri ──────────────────────────────────────────────────────────────
 
+
 class MesajTipi(Enum):
     """Sistemdeki tüm mesaj tipleri. Her tip bir consumer queue'suna karşılık gelir."""
+
     # Çözüm döngüsü
-    HATA       = auto()  # hata_cozucu'ya: hata yakalandı, çözüm üret
-    COZUM_ARA  = auto()  # ogrenme'ye: çözüm hafızasında ara
+    HATA = auto()  # hata_cozucu'ya: hata yakalandı, çözüm üret
+    COZUM_ARA = auto()  # ogrenme'ye: çözüm hafızasında ara
     COZUM_BULUNDU = auto()  # orchestrator'a: çözüm bulundu, uygula
     COZUM_KAYDET = auto()  # ogrenme'ye: başarılı çözümü kaydet
     BECERI_KRISTAL = auto()  # closed_learning_loop'a: skill kartı oluştur
 
     # Workflow pipeline
-    GOREV_BASLAT   = auto()  # motor'a: yeni görev başlat
-    GOREV_PLANLA   = auto()  # planlayıcıya: görevi alt adımlara böl
-    GOREV_DOGRULA  = auto()  # doğrulayıcıya: ön koşulları kontrol et
-    GOREV_KOD      = auto()  # kodlayıcıya: Python script'i üret
-    GOREV_TEST     = auto()  # testçiye: script'i çalıştır/doğrula
-    GOREV_INCELE   = auto()  # inceleyiciye: kodu gözden geçir
-    GOREV_KAYDET   = auto()  # kaydediciye: .py dosyasına yaz
+    GOREV_BASLAT = auto()  # motor'a: yeni görev başlat
+    GOREV_PLANLA = auto()  # planlayıcıya: görevi alt adımlara böl
+    GOREV_DOGRULA = auto()  # doğrulayıcıya: ön koşulları kontrol et
+    GOREV_KOD = auto()  # kodlayıcıya: Python script'i üret
+    GOREV_TEST = auto()  # testçiye: script'i çalıştır/doğrula
+    GOREV_INCELE = auto()  # inceleyiciye: kodu gözden geçir
+    GOREV_KAYDET = auto()  # kaydediciye: .py dosyasına yaz
     GOREV_BASARILI = auto()  # orchestrator'a: görev tamam
-    GOREV_HATA     = auto()  # orchestrator'a: görev başarısız
+    GOREV_HATA = auto()  # orchestrator'a: görev başarısız
 
     # Tool çağrıları
-    TOOL_CALL      = auto()  # conversation_loop'a: tool çağrısı hazır
-    TOOL_SONUC     = auto()  # conversation_loop'a: tool sonucu döndü
+    TOOL_CALL = auto()  # conversation_loop'a: tool çağrısı hazır
+    TOOL_SONUC = auto()  # conversation_loop'a: tool sonucu döndü
 
     # Kontrol
     DURDUR = auto()  # broker'ı kapat
@@ -64,6 +66,7 @@ class MesajTipi(Enum):
 @dataclass
 class Mesaj:
     """Thread-safe mesaj veri yapısı."""
+
     tip: MesajTipi
     veri: dict = field(default_factory=dict)
     kaynak: str = ""
@@ -75,6 +78,7 @@ class Mesaj:
 
 
 # ── Mesaj Kuyruğu (thread-safe) ───────────────────────────────────────────────
+
 
 class MesajKuyrugu:
     """Her consumer için ayrı queue + abone yönetimi."""
@@ -102,10 +106,11 @@ class MesajKuyrugu:
 
 # ── Message Broker ─────────────────────────────────────────────────────────────
 
+
 class MessageBroker:
     """
     Merkezi mesajlaşma katmanı.
-    
+
     - Her MesajTipi için ayrı queue
     - ThreadPoolExecutor consumer pool
     - Abonelik bazlı routing
@@ -159,7 +164,9 @@ class MessageBroker:
     def _consumer_loop(self, kuyruk: MesajKuyrugu) -> None:
         """Tek bir queue için consumer thread döngüsü."""
         thread_name = threading.current_thread().name
-        logger.debug("[Broker] Consumer başladı: %s <- %s", thread_name, kuyruk.tip.name)
+        logger.debug(
+            "[Broker] Consumer başladı: %s <- %s", thread_name, kuyruk.tip.name
+        )
 
         while self._running:
             mesaj = kuyruk.mesaj_al(timeout=0.5)
@@ -229,7 +236,10 @@ class MessageBroker:
 
 # ── Yardımcı Fonksiyonlar ─────────────────────────────────────────────────────
 
-def mesaj_gonder(broker: Optional[MessageBroker], tip: MesajTipi, veri: dict, kaynak: str = "") -> None:
+
+def mesaj_gonder(
+    broker: Optional[MessageBroker], tip: MesajTipi, veri: dict, kaynak: str = ""
+) -> None:
     """Broker varsa mesaj gönder, yoksa sessiz geç."""
     if broker:
         broker.yayinla(Mesaj(tip=tip, veri=veri, kaynak=kaynak or __name__))

@@ -5,6 +5,7 @@ import subprocess
 from pathlib import Path
 from typing import Dict, Optional
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -24,6 +25,7 @@ def _normalize_git_bash_path(p: Optional[str]) -> Optional[str]:
     if sys.platform != "win32":
         return p
     import re as _re
+
     # /c/Users/... or /C/Users/...
     m = _re.match(r"^/([a-zA-Z])/(.*)$", p)
     if m:
@@ -46,10 +48,13 @@ def _git_repo_root() -> Optional[str]:
     mistakes.
     """
     import subprocess
+
     try:
         result = subprocess.run(
             ["git", "rev-parse", "--show-toplevel"],
-            capture_output=True, text=True, timeout=5,
+            capture_output=True,
+            text=True,
+            timeout=5,
         )
         if result.returncode == 0:
             return _normalize_git_bash_path(result.stdout.strip())
@@ -107,10 +112,15 @@ def _setup_worktree(repo_root: str = None) -> Optional[Dict[str, str]]:
     try:
         result = subprocess.run(
             ["git", "worktree", "add", str(wt_path), "-b", branch_name, "HEAD"],
-            capture_output=True, text=True, timeout=30, cwd=repo_root,
+            capture_output=True,
+            text=True,
+            timeout=30,
+            cwd=repo_root,
         )
         if result.returncode != 0:
-            print(f"\033[31m✗ Failed to create worktree: {result.stderr.strip()}\033[0m")
+            print(
+                f"\033[31m✗ Failed to create worktree: {result.stderr.strip()}\033[0m"
+            )
             return None
     except Exception as e:
         print(f"\033[31m✗ Failed to create worktree: {e}\033[0m")
@@ -138,10 +148,15 @@ def _setup_worktree(repo_root: str = None) -> Optional[Dict[str, str]]:
                     logger.debug("Skipping invalid .worktreeinclude entry: %s", entry)
                     continue
                 if not _path_is_within_root(src_resolved, repo_root_resolved):
-                    logger.warning("Skipping .worktreeinclude entry outside repo root: %s", entry)
+                    logger.warning(
+                        "Skipping .worktreeinclude entry outside repo root: %s", entry
+                    )
                     continue
                 if not _path_is_within_root(dst_resolved, wt_path_resolved):
-                    logger.warning("Skipping .worktreeinclude entry that escapes worktree: %s", entry)
+                    logger.warning(
+                        "Skipping .worktreeinclude entry that escapes worktree: %s",
+                        entry,
+                    )
                     continue
                 if src.is_file():
                     dst.parent.mkdir(parents=True, exist_ok=True)
@@ -176,7 +191,9 @@ def _setup_worktree(repo_root: str = None) -> Optional[Dict[str, str]]:
                                     logger.warning(
                                         ".worktreeinclude: copy fallback "
                                         "also failed for %s -> %s: %s",
-                                        src, dst, _copy_err,
+                                        src,
+                                        dst,
+                                        _copy_err,
                                     )
                             else:
                                 raise
@@ -208,7 +225,10 @@ def _worktree_has_unpushed_commits(worktree_path: str, timeout: int = 10) -> boo
     try:
         remote_refs = subprocess.run(
             ["git", "for-each-ref", "--format=%(refname)", "refs/remotes"],
-            capture_output=True, text=True, timeout=timeout, cwd=worktree_path,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+            cwd=worktree_path,
         )
         if remote_refs.returncode != 0:
             return True
@@ -217,7 +237,10 @@ def _worktree_has_unpushed_commits(worktree_path: str, timeout: int = 10) -> boo
 
         result = subprocess.run(
             ["git", "log", "--oneline", "HEAD", "--not", "--remotes"],
-            capture_output=True, text=True, timeout=timeout, cwd=worktree_path,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+            cwd=worktree_path,
         )
         if result.returncode != 0:
             return True
@@ -261,7 +284,10 @@ def _cleanup_worktree(info: Dict[str, str] = None) -> None:
     try:
         subprocess.run(
             ["git", "worktree", "remove", wt_path, "--force"],
-            capture_output=True, text=True, timeout=15, cwd=repo_root,
+            capture_output=True,
+            text=True,
+            timeout=15,
+            cwd=repo_root,
         )
     except Exception as e:
         logger.debug("Failed to remove worktree: %s", e)
@@ -270,7 +296,10 @@ def _cleanup_worktree(info: Dict[str, str] = None) -> None:
     try:
         subprocess.run(
             ["git", "branch", "-D", branch],
-            capture_output=True, text=True, timeout=10, cwd=repo_root,
+            capture_output=True,
+            text=True,
+            timeout=10,
+            cwd=repo_root,
         )
     except Exception as e:
         logger.debug("Failed to delete branch %s: %s", branch, e)
@@ -294,6 +323,7 @@ def _run_state_db_auto_maintenance(session_db) -> None:
     try:
         from ReYMeN_cli.config import load_config as _load_full_config
         from reymen.sistem.ReYMeN_constants import get_reymen_home as _get_reymen_home
+
         _ReYMeN_home_maint = _get_reymen_home()
 
         # One-time prune of empty TUI ghost sessions.
@@ -314,13 +344,11 @@ def _run_state_db_auto_maintenance(session_db) -> None:
                 finalized = session_db.finalize_orphaned_compression_sessions()
                 session_db.set_meta("orphaned_compression_finalize_v1", "1")
                 if finalized:
-                    logger.info(
-                        "Finalized %d orphaned compression sessions", finalized
-                    )
+                    logger.info("Finalized %d orphaned compression sessions", finalized)
         except Exception as _finalize_exc:
             logger.debug("Orphan compression finalize skipped: %s", _finalize_exc)
 
-        cfg = (_load_full_config().get("sessions") or {})
+        cfg = _load_full_config().get("sessions") or {}
         if not cfg.get("auto_prune", False):
             return
         session_db.maybe_auto_prune_and_vacuum(
@@ -343,10 +371,12 @@ def _run_checkpoint_auto_maintenance() -> None:
     """
     try:
         from ReYMeN_cli.config import load_config as _load_full_config
-        cfg = (_load_full_config().get("checkpoints") or {})
+
+        cfg = _load_full_config().get("checkpoints") or {}
         if not cfg.get("auto_prune", False):
             return
         from tools.checkpoint_manager import maybe_auto_prune_checkpoints
+
         maybe_auto_prune_checkpoints(
             retention_days=int(cfg.get("retention_days", 7)),
             min_interval_hours=int(cfg.get("min_interval_hours", 24)),
@@ -377,8 +407,8 @@ def _prune_stale_worktrees(repo_root: str, max_age_hours: int = 24) -> None:
         return
 
     now = time.time()
-    soft_cutoff = now - (max_age_hours * 3600)       # 24h default
-    hard_cutoff = now - (max_age_hours * 3 * 3600)   # 72h default
+    soft_cutoff = now - (max_age_hours * 3600)  # 24h default
+    hard_cutoff = now - (max_age_hours * 3 * 3600)  # 72h default
 
     for entry in worktrees_dir.iterdir():
         if not entry.is_dir() or not entry.name.startswith("ReYMeN-"):
@@ -403,18 +433,27 @@ def _prune_stale_worktrees(repo_root: str, max_age_hours: int = 24) -> None:
         try:
             branch_result = subprocess.run(
                 ["git", "branch", "--show-current"],
-                capture_output=True, text=True, timeout=5, cwd=str(entry),
+                capture_output=True,
+                text=True,
+                timeout=5,
+                cwd=str(entry),
             )
             branch = branch_result.stdout.strip()
 
             subprocess.run(
                 ["git", "worktree", "remove", str(entry), "--force"],
-                capture_output=True, text=True, timeout=15, cwd=repo_root,
+                capture_output=True,
+                text=True,
+                timeout=15,
+                cwd=repo_root,
             )
             if branch:
                 subprocess.run(
                     ["git", "branch", "-D", branch],
-                    capture_output=True, text=True, timeout=10, cwd=repo_root,
+                    capture_output=True,
+                    text=True,
+                    timeout=10,
+                    cwd=repo_root,
                 )
             logger.debug("Pruned stale worktree: %s (force=%s)", entry.name, force)
         except Exception as e:
@@ -435,11 +474,16 @@ def _prune_orphaned_branches(repo_root: str) -> None:
     try:
         result = subprocess.run(
             ["git", "branch", "--format=%(refname:short)"],
-            capture_output=True, text=True, timeout=10, cwd=repo_root,
+            capture_output=True,
+            text=True,
+            timeout=10,
+            cwd=repo_root,
         )
         if result.returncode != 0:
             return
-        all_branches = [b.strip() for b in result.stdout.strip().split("\n") if b.strip()]
+        all_branches = [
+            b.strip() for b in result.stdout.strip().split("\n") if b.strip()
+        ]
     except Exception:
         return
 
@@ -448,7 +492,10 @@ def _prune_orphaned_branches(repo_root: str) -> None:
     try:
         wt_result = subprocess.run(
             ["git", "worktree", "list", "--porcelain"],
-            capture_output=True, text=True, timeout=10, cwd=repo_root,
+            capture_output=True,
+            text=True,
+            timeout=10,
+            cwd=repo_root,
         )
         for line in wt_result.stdout.split("\n"):
             if line.startswith("branch refs/heads/"):
@@ -460,7 +507,10 @@ def _prune_orphaned_branches(repo_root: str) -> None:
     try:
         head_result = subprocess.run(
             ["git", "branch", "--show-current"],
-            capture_output=True, text=True, timeout=5, cwd=repo_root,
+            capture_output=True,
+            text=True,
+            timeout=5,
+            cwd=repo_root,
         )
         current = head_result.stdout.strip()
         if current:
@@ -470,7 +520,8 @@ def _prune_orphaned_branches(repo_root: str) -> None:
     active_branches.add("main")
 
     orphaned = [
-        b for b in all_branches
+        b
+        for b in all_branches
         if b not in active_branches
         and (b.startswith("ReYMeN/ReYMeN-") or b.startswith("pr-"))
     ]
@@ -480,11 +531,14 @@ def _prune_orphaned_branches(repo_root: str) -> None:
 
     # Delete in batches
     for i in range(0, len(orphaned), 50):
-        batch = orphaned[i:i + 50]
+        batch = orphaned[i : i + 50]
         try:
             subprocess.run(
                 ["git", "branch", "-D"] + batch,
-                capture_output=True, text=True, timeout=30, cwd=repo_root,
+                capture_output=True,
+                text=True,
+                timeout=30,
+                cwd=repo_root,
             )
         except Exception as e:
             logger.debug("Failed to prune orphaned branches: %s", e)

@@ -17,7 +17,12 @@ def _handle_background_command(cli, cmd: str):
     When it completes, prints the result to the CLI without modifying
     the active session's conversation history.
     """
-    from reymen.sistem.cli_display import _cprint, _accent_hex, _maybe_remap_for_light_mode, _render_final_assistant_content
+    from reymen.sistem.cli_display import (
+        _cprint,
+        _accent_hex,
+        _maybe_remap_for_light_mode,
+        _render_final_assistant_content,
+    )
     from reymen.sistem.cli_stream import ChatConsole
     from reymen.sistem.run_agent import AIAgent
     from rich.markup import escape as _escape
@@ -33,7 +38,9 @@ def _handle_background_command(cli, cmd: str):
     if len(parts) < 2 or not parts[1].strip():
         _cprint("  Usage: /background <prompt>")
         _cprint("  Example: /background Summarize the top HN stories today")
-        _cprint("  The task runs in a separate session and results display here when done.")
+        _cprint(
+            "  The task runs in a separate session and results display here when done."
+        )
         return
 
     prompt = parts[1].strip()
@@ -46,7 +53,9 @@ def _handle_background_command(cli, cmd: str):
         _cprint("  (>_<) Cannot start background task: no valid credentials.")
         return
 
-    _cprint(f"  🔄 Background task #{task_num} started: \"{prompt[:60]}{'...' if len(prompt) > 60 else ''}\"")
+    _cprint(
+        f"  🔄 Background task #{task_num} started: \"{prompt[:60]}{'...' if len(prompt) > 60 else ''}\""
+    )
     _cprint(f"  Task ID: {task_id}")
     _cprint("  You can continue chatting — results will appear when done.\n")
 
@@ -122,10 +131,15 @@ def _handle_background_command(cli, cmd: str):
             if response:
                 try:
                     from reymen.reymen_cli.skin_engine import get_active_skin
+
                     _skin = get_active_skin()
                     label = _skin.get_branding("response_label", "⚕ ReYMeN")
-                    _resp_color = _maybe_remap_for_light_mode(_skin.get_color("response_border", "#CD7F32"))
-                    _resp_text = _maybe_remap_for_light_mode(_skin.get_color("banner_text", "#FFF8DC"))
+                    _resp_color = _maybe_remap_for_light_mode(
+                        _skin.get_color("response_border", "#CD7F32")
+                    )
+                    _resp_text = _maybe_remap_for_light_mode(
+                        _skin.get_color("banner_text", "#FFF8DC")
+                    )
                 except Exception:
                     label = "⚕ ReYMeN"
                     _resp_color = "#CD7F32"
@@ -133,16 +147,20 @@ def _handle_background_command(cli, cmd: str):
 
                 _chat_console = ChatConsole()
                 _scroll_width = cli._scrollback_box_width()
-                _chat_console.print(Panel(
-                    _render_final_assistant_content(response, mode=cli.final_response_markdown),
-                    title=f"[{_resp_color} bold]{label} (background #{task_num})[/]",
-                    title_align="left",
-                    border_style=_resp_color,
-                    style=_resp_text,
-                    box=rich_box.HORIZONTALS,
-                    padding=(1, 4),
-                    width=_scroll_width,
-                ))
+                _chat_console.print(
+                    Panel(
+                        _render_final_assistant_content(
+                            response, mode=cli.final_response_markdown
+                        ),
+                        title=f"[{_resp_color} bold]{label} (background #{task_num})[/]",
+                        title_align="left",
+                        border_style=_resp_color,
+                        style=_resp_text,
+                        box=rich_box.HORIZONTALS,
+                        padding=(1, 4),
+                        width=_scroll_width,
+                    )
+                )
             else:
                 _cprint("  (No response generated)")
 
@@ -172,6 +190,8 @@ def _handle_background_command(cli, cmd: str):
             if cli._app:
                 cli._invalidate(min_interval=0)
 
-    thread = threading.Thread(target=run_background, daemon=True, name=f"bg-task-{task_id}")
+    thread = threading.Thread(
+        target=run_background, daemon=True, name=f"bg-task-{task_id}"
+    )
     cli._background_tasks[task_id] = thread
     thread.start()

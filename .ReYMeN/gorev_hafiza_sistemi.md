@@ -61,19 +61,19 @@ Her oturum başında hafızayı yükler, sonunda kaydeder.
 class MemoryManager:
     def __init__(self, memory_path: str = None, user_path: str = None):
         """Hafıza yöneticisini başlat."""
-    
+
     def yukle(self) -> dict:
         """MEMORY.md ve USER.md'yi oku, içeriğini döndür."""
-    
+
     def kaydet(self, memory_icerik: str, user_icerik: str):
         """Güncellenmiş hafızayı dosyaya yaz."""
-    
+
     def guncelle(self, hedef: str, anahtar: str, deger: str):
         """Hafızada bir anahtarı güncelle (ör: yeni öğrenilen bilgi)."""
-    
+
     def ekle(self, hedef: str, metin: str):
         """Hafızaya yeni bilgi ekle (sona append)."""
-    
+
     def ozet(self) -> str:
         """Hafıza özeti: karakter sayısı, doluluk oranı."""
 ```

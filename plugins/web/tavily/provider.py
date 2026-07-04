@@ -181,9 +181,7 @@ class TavilyWebSearchProvider(WebSearchProvider):
             from reymen.tools.interrupt import is_interrupted
 
             if is_interrupted():
-                return [
-                    {"url": u, "error": "Interrupted", "title": ""} for u in urls
-                ]
+                return [{"url": u, "error": "Interrupted", "title": ""} for u in urls]
 
             logger.info("Tavily extract: %d URL(s)", len(urls))
             raw = _tavily_request(
@@ -197,11 +195,18 @@ class TavilyWebSearchProvider(WebSearchProvider):
                 raw, fallback_url=urls[0] if urls else ""
             )
         except ValueError as exc:
-            return [{"url": u, "title": "", "content": "", "error": str(exc)} for u in urls]
+            return [
+                {"url": u, "title": "", "content": "", "error": str(exc)} for u in urls
+            ]
         except Exception as exc:  # noqa: BLE001
             logger.warning("Tavily extract error: %s", exc)
             return [
-                {"url": u, "title": "", "content": "", "error": f"Tavily extract failed: {exc}"}
+                {
+                    "url": u,
+                    "title": "",
+                    "content": "",
+                    "error": f"Tavily extract failed: {exc}",
+                }
                 for u in urls
             ]
 

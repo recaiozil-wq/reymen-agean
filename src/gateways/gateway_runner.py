@@ -34,19 +34,26 @@ if str(_SRC) not in sys.path:
 
 # gateway/platforms entegrasyonu
 try:
-    from gateway.platforms import platform_listele, platform_baslat, mesaj_gonder as platform_mesaj
+    from gateway.platforms import (
+        platform_listele,
+        platform_baslat,
+        mesaj_gonder as platform_mesaj,
+    )
+
     _PLATFORMLAR_AKTIF = True
 except ImportError:
     _PLATFORMLAR_AKTIF = False
 
 try:
     from gateway.session import yonetici as session_yonetici
+
     _SESSION_AKTIF = True
 except ImportError:
     _SESSION_AKTIF = False
 
 try:
     from gateway.mirror import aynalayici
+
     _MIRROR_AKTIF = True
 except ImportError:
     _MIRROR_AKTIF = False
@@ -63,6 +70,7 @@ GATEWAY_PID_DOSYASI = PROJE_KOK / ".ReYMeN" / "gateway.pid"
 
 
 # ── PID Yönetimi ─────────────────────────────────────────────────────
+
 
 def _pid_kaydet():
     """Mevcut PID'i dosyaya yaz."""
@@ -93,7 +101,8 @@ def _eski_pid_oldur():
         if sys.platform == "win32":
             subprocess.run(
                 ["taskkill", "/F", "/PID", str(eski_pid)],
-                capture_output=True, timeout=5,
+                capture_output=True,
+                timeout=5,
             )
         else:
             os.kill(eski_pid, signal.SIGTERM)
@@ -235,6 +244,7 @@ class TelegramChannel(ChannelHandler):
             env_path = PROJE_KOK / ".env"
             if env_path.exists():
                 from dotenv import load_dotenv
+
                 load_dotenv(env_path)
                 token = os.getenv("TELEGRAM_BOT_TOKEN", "")
 
@@ -284,7 +294,9 @@ class TelegramChannel(ChannelHandler):
             return
         # Telegram bot'una mesaj göndermek için python-telegram-bot API'si kullanılabilir
         # Şimdilik log ile yetiniyoruz, bot.py kendi mesajlarını yönetir
-        logger.info(f"[telegram] Gönderilecek mesaj (bot.py yönetir): {message[:60]}...")
+        logger.info(
+            f"[telegram] Gönderilecek mesaj (bot.py yönetir): {message[:60]}..."
+        )
 
     def _monitor_process(self) -> None:
         """Bot sürecini izle, çökerse durumu güncelle."""
@@ -297,7 +309,9 @@ class TelegramChannel(ChannelHandler):
                     f"  stderr: {stderr[-200:] if stderr else ''}"
                 )
                 self._status = "error"
-                self._error = f"Process exited: {stderr[-200:] if stderr else 'unknown'}"
+                self._error = (
+                    f"Process exited: {stderr[-200:] if stderr else 'unknown'}"
+                )
         except Exception as e:
             logger.error(f"[telegram] Monitör hatası: {e}")
 
@@ -316,6 +330,7 @@ class DashboardChannel(ChannelHandler):
     def start(self) -> None:
         try:
             import importlib.util
+
             spec = importlib.util.spec_from_file_location(
                 "dashboard_app",
                 Path(__file__).parent / "dashboard" / "app.py",
@@ -328,7 +343,9 @@ class DashboardChannel(ChannelHandler):
         except Exception as e:
             self._status = "error"
             self._error = str(e)
-            logger.warning(f"[dashboard] Kanal baslatılamadi (dashboard calismiyor): {e}")
+            logger.warning(
+                f"[dashboard] Kanal baslatılamadi (dashboard calismiyor): {e}"
+            )
 
     def send(self, message: str) -> None:
         if not self._running or not self._log_fn:
@@ -362,6 +379,7 @@ class DiscordChannel(ChannelHandler):
             env_path = PROJE_KOK / ".env"
             if env_path.exists():
                 from dotenv import load_dotenv
+
                 load_dotenv(env_path)
                 token = os.getenv("DISCORD_BOT_TOKEN", "")
 
@@ -422,10 +440,11 @@ class DiscordChannel(ChannelHandler):
                     f"  stderr: {stderr[-200:] if stderr else ''}"
                 )
                 self._status = "error"
-                self._error = f"Process exited: {stderr[-200:] if stderr else 'unknown'}"
+                self._error = (
+                    f"Process exited: {stderr[-200:] if stderr else 'unknown'}"
+                )
         except Exception as e:
             logger.error(f"[discord] Monitor hatasi: {e}")
-
 
 
 class WebSocketChannel(ChannelHandler):
@@ -475,7 +494,9 @@ class WebSocketChannel(ChannelHandler):
         with self._lock:
             if client in self._clients:
                 self._clients.remove(client)
-                logger.debug(f"[websocket] İstemci çıkarıldı (toplam: {len(self._clients)})")
+                logger.debug(
+                    f"[websocket] İstemci çıkarıldı (toplam: {len(self._clients)})"
+                )
 
     @property
     def client_count(self) -> int:
@@ -534,9 +555,13 @@ class GatewayRunner:
         """
         with self._lock:
             if name in self._channels:
-                logger.warning(f"[gateway] '{name}' kanalı zaten kayıtlı, değiştiriliyor")
+                logger.warning(
+                    f"[gateway] '{name}' kanalı zaten kayıtlı, değiştiriliyor"
+                )
             self._channels[name] = handler
-            logger.info(f"[gateway] Kanal kaydedildi: '{name}' ({handler.__class__.__name__})")
+            logger.info(
+                f"[gateway] Kanal kaydedildi: '{name}' ({handler.__class__.__name__})"
+            )
 
     def unregister_channel(self, name: str) -> Optional[ChannelHandler]:
         """Bir kanalı kaldır ve durdur."""
@@ -568,6 +593,7 @@ class GatewayRunner:
 
         # Cikista PID sil
         import atexit
+
         atexit.register(_pid_sil)
 
         # SIGTERM/SIGINT yakalayici
@@ -576,6 +602,7 @@ class GatewayRunner:
             _pid_sil()
             self.stop()
             sys.exit(0)
+
         try:
             signal.signal(signal.SIGTERM, _sinyal_isle)
             signal.signal(signal.SIGINT, _sinyal_isle)
@@ -621,17 +648,19 @@ class GatewayRunner:
                 try:
                     self._mcp_proc = subprocess.Popen(
                         [sys.executable, str(_mcp_path)],
-                        stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                        stdin=subprocess.PIPE,
+                        stdout=subprocess.PIPE,
                         stderr=subprocess.PIPE,
                     )
-                    logger.info(f"[gateway] MCP sunucu başlatıldı (pid={self._mcp_proc.pid})")
+                    logger.info(
+                        f"[gateway] MCP sunucu başlatıldı (pid={self._mcp_proc.pid})"
+                    )
                     self._log_entry("system", f"mcp_serve pid={self._mcp_proc.pid}")
                 except Exception as e:
                     logger.warning(f"[gateway] MCP sunucu başlatılamadı: {e}")
 
         logger.info(
-            f"[gateway] GatewayRunner başlatıldı — "
-            f"{len(channel_list)} kanal aktif"
+            f"[gateway] GatewayRunner başlatıldı — " f"{len(channel_list)} kanal aktif"
         )
         self._log_entry("system", "GatewayRunner başlatıldı")
 
@@ -685,7 +714,9 @@ class GatewayRunner:
                     except Exception as e:
                         logger.error(f"[gateway] '{channel}' gönderme hatası: {e}")
                 else:
-                    logger.warning(f"[gateway] '{channel}' kanalı çalışmıyor veya bulunamadı")
+                    logger.warning(
+                        f"[gateway] '{channel}' kanalı çalışmıyor veya bulunamadı"
+                    )
             else:
                 for cname, handler in self._channels.items():
                     if handler.running:
@@ -737,6 +768,7 @@ class GatewayRunner:
         """Her 60 saniyede CronSchedulerCore.execute_tick_cycle() çalıştır."""
         try:
             from reymen.sistem.cron_scheduler import CronScheduler
+
             cron = CronScheduler()
         except ImportError:
             return
@@ -754,8 +786,12 @@ class GatewayRunner:
                     cpu = _psutil.cpu_percent(interval=0.1)
                     ram = _psutil.virtual_memory().percent
                     if cpu > 85 or ram > 90:
-                        logger.warning(f"[kaynak] Yüksek kullanım — CPU:{cpu:.1f}% RAM:{ram:.1f}%")
-                        self._log_entry("system", f"yüksek kaynak: cpu={cpu:.1f} ram={ram:.1f}")
+                        logger.warning(
+                            f"[kaynak] Yüksek kullanım — CPU:{cpu:.1f}% RAM:{ram:.1f}%"
+                        )
+                        self._log_entry(
+                            "system", f"yüksek kaynak: cpu={cpu:.1f} ram={ram:.1f}"
+                        )
                 except Exception as _gateway__e663:
                     print(f"[UYARI] gateway_runner.py:664 - {_gateway__e663}")
             try:
@@ -773,14 +809,18 @@ class GatewayRunner:
             if not self._running:
                 break
             if self._queue_processor and not self._queue_processor.is_alive():
-                logger.warning("[gateway] Watchdog: kuyruk isleyici oldu, yeniden baslatiliyor")
+                logger.warning(
+                    "[gateway] Watchdog: kuyruk isleyici oldu, yeniden baslatiliyor"
+                )
                 self._queue_processor = threading.Thread(
                     target=self._process_message_queue,
                     daemon=True,
                     name="queue-processor",
                 )
                 self._queue_processor.start()
-                self._log_entry("system", "Watchdog: kuyruk isleyici yeniden baslatildi")
+                self._log_entry(
+                    "system", "Watchdog: kuyruk isleyici yeniden baslatildi"
+                )
 
     def _handle_message(self, entry: dict) -> None:
         """Kuyruktan gelen bir mesajı işle (tüm kanallara yönlendir)."""
@@ -794,7 +834,9 @@ class GatewayRunner:
                     try:
                         handler.send(f"[{source} → {cname}] {message}")
                     except Exception as e:
-                        logger.error(f"[gateway] Yönlendirme hatası {source}→{cname}: {e}")
+                        logger.error(
+                            f"[gateway] Yönlendirme hatası {source}→{cname}: {e}"
+                        )
 
     # ── Durum Sorgulama ─────────────────────────────────────────────
 
@@ -814,7 +856,10 @@ class GatewayRunner:
     def status_text(self) -> str:
         """İnsan tarafından okunabilir durum metni."""
         s = self.status()
-        lines = ["📡 GatewayRunner Durumu", f"   Çalışıyor: {'✅' if s['running'] else '❌'}"]
+        lines = [
+            "📡 GatewayRunner Durumu",
+            f"   Çalışıyor: {'✅' if s['running'] else '❌'}",
+        ]
         lines.append(f"   Kuyruk: {s['queue_size']} mesaj")
         lines.append("")
         for cname, info in s["channels"].items():
@@ -832,11 +877,13 @@ class GatewayRunner:
 
     def _log_entry(self, event_type: str, message: str) -> None:
         """Sistemsel bir olayı JSON log'a yaz."""
-        self._log_entry_raw({
-            "type": event_type,
-            "message": message,
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-        })
+        self._log_entry_raw(
+            {
+                "type": event_type,
+                "message": message,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+        )
 
     def _log_entry_raw(self, entry: dict) -> None:
         """Ham bir entry'yi JSON log dosyasına ekle."""

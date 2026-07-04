@@ -4,7 +4,7 @@ agent:
   api_timeout: 60
   max_turns: 90
   tool_use_enforcement: auto
-  
+
 display:
   language: tr
   skin: reymen

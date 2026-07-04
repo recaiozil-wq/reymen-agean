@@ -32,7 +32,7 @@ from typing import Optional
 ROOT = Path(__file__).parent.resolve()
 LOG_DOSYASI = ROOT / ".ReYMeN" / "oz_yansima_log.md"
 MINIMUM_ARALIK_SN = 300  # Ayni oturumda en erken tekrar ne zaman
-MAKS_LLM_TOKEN = 800     # Yansima prompt ciktisi siniri
+MAKS_LLM_TOKEN = 800  # Yansima prompt ciktisi siniri
 
 
 class OzYansima:
@@ -124,7 +124,9 @@ class OzYansima:
         hata_orani = hata_verisi.get("hata_orani", 0.0)
         oneriler = []
 
-        if self._provider and (hata_orani > 0.1 or sistem_metrigi.get("bellek_yuzde", 0) > 80):
+        if self._provider and (
+            hata_orani > 0.1 or sistem_metrigi.get("bellek_yuzde", 0) > 80
+        ):
             oneriler = self._llm_analiz_et(hata_verisi, sistem_metrigi)
 
         # Hata orani yuksekse kural tabanli oneri ekle (LLM olmasa bile)
@@ -134,8 +136,8 @@ class OzYansima:
                 f"'{en_cok}' araci en cok hataya sebep oluyor "
                 f"(oran: {hata_orani:.0%}). "
                 f"Parametre dogrulamasi veya fallback eklenmesi onerilir."
-                if en_cok else
-                f"Genel hata orani yuksek: {hata_orani:.0%}. "
+                if en_cok
+                else f"Genel hata orani yuksek: {hata_orani:.0%}. "
                 f"Circuit breaker esigi dusurulmesi onerilir."
             )
             oneriler.insert(0, kural_oneri)
@@ -166,8 +168,10 @@ class OzYansima:
             "Maksimum 3 madde, her biri tek cumle."
         )
         mesajlar = [
-            {"role": "user",
-             "content": f"Ajan performans ozeti:\n{ozet}\n\nNe onerilirsin?"}
+            {
+                "role": "user",
+                "content": f"Ajan performans ozeti:\n{ozet}\n\nNe onerilirsin?",
+            }
         ]
         try:
             yanit = self._provider.uret(sistem_prompt, mesajlar)
@@ -209,10 +213,12 @@ class OzYansima:
 
 # ── Sistem metrigi ────────────────────────────────────────────────────────────
 
+
 def _sistem_metrigi_al() -> dict:
     """psutil varsa CPU/RAM, yoksa bos dict don."""
     try:
         import psutil
+
         return {
             "cpu_yuzde": round(psutil.cpu_percent(interval=0.5), 1),
             "bellek_yuzde": round(psutil.virtual_memory().percent, 1),
@@ -232,6 +238,7 @@ if __name__ == "__main__":
     # Gecici log dosyasi
     with tempfile.TemporaryDirectory() as tmpdir:
         import oz_yansima as ozy
+
         ozy.LOG_DOSYASI = Path(tmpdir) / "test_log.md"
         ozy.MINIMUM_ARALIK_SN = 0  # Test icin aralik siniri kaldir
 

@@ -10,6 +10,7 @@ on every retry. That PR has since been reverted, but the underlying issue
 tweak inside this function is likely. This test pins the contract that the
 function must treat its input dict as read-only.
 """
+
 from unittest.mock import MagicMock, patch
 
 from run_agent import AIAgent
@@ -32,6 +33,6 @@ def test_create_openai_client_does_not_mutate_input_kwargs(mock_openai):
 
     agent._create_openai_client(kwargs, reason="test", shared=False)
 
-    assert kwargs == snapshot, (
-        f"_create_openai_client mutated input kwargs; expected {snapshot}, got {kwargs}"
-    )
+    assert (
+        kwargs == snapshot
+    ), f"_create_openai_client mutated input kwargs; expected {snapshot}, got {kwargs}"

@@ -29,6 +29,7 @@ from src.reymen.mcp import baslangicta_baslat, _cift_mcp_uyar
 
 # ── Yardimci ────────────────────────────────────────────────────────
 
+
 @pytest.fixture(autouse=True)
 async def _her_test_oncesi_temizlik():
     """Her testten once reconnect'i durdurup sifirla."""
@@ -40,6 +41,7 @@ async def _her_test_oncesi_temizlik():
 
 
 # ── Test 1: Bos durum ───────────────────────────────────────────────
+
 
 @pytest.mark.asyncio
 async def test_bos_durum_dondurur():
@@ -54,6 +56,7 @@ async def test_bos_durum_dondurur():
 
 
 # ── Test 2: Baslat / Durdur ─────────────────────────────────────────
+
 
 @pytest.mark.asyncio
 async def test_baslat_durdur():
@@ -76,6 +79,7 @@ async def test_baslat_durdur():
 
 # ── Test 3: Idempotent start ────────────────────────────────────────
 
+
 @pytest.mark.asyncio
 async def test_iki_kere_baslatma_idempotent():
     """Ikinci baslatma cagrisi False donmeli (zaten calisiyor)."""
@@ -92,6 +96,7 @@ async def test_iki_kere_baslatma_idempotent():
 
 
 # ── Test 4: Durum raporu sekli ──────────────────────────────────────
+
 
 @pytest.mark.asyncio
 async def test_durum_raporu_metin_dondurur():
@@ -114,6 +119,7 @@ async def test_durum_raporu_metin_dondurur():
 
 # ── Test 5: Coklu baslat/durdur cevrimi ─────────────────────────────
 
+
 @pytest.mark.asyncio
 async def test_coklu_cevrim():
     """Ard arda baslat/durdur yapilabilmeli (3 cevrim)."""
@@ -129,6 +135,7 @@ async def test_coklu_cevrim():
 
 
 # ── Test 6: Sunucu yokken heartbeat sayisi sifir ────────────────────
+
 
 @pytest.mark.asyncio
 async def test_sunucu_yokken_heartbeat_sifir():
@@ -146,6 +153,7 @@ async def test_sunucu_yokken_heartbeat_sifir():
 
 
 # ── Test 7: Auto-start (baslangicta_baslat) ──────────────────────────
+
 
 @pytest.mark.asyncio
 async def test_baslangicta_baslat():
@@ -175,6 +183,7 @@ async def test_baslangicta_baslat():
 
 # ── Test 8: Çift MCP client uyarısı ─────────────────────────────────
 
+
 def test_cift_mcp_uyar_sessiz():
     """_cift_mcp_uyar() crash yapmadan çalışmali."""
     # native_mcp_client henüz import edilmemişken — sessiz çalışmalı
@@ -183,6 +192,7 @@ def test_cift_mcp_uyar_sessiz():
     # native_mcp_client import et
     try:
         import reymen.arac.native_mcp_client  # noqa: F401
+
         # Şimdi uyarı log'lanmalı ama crash olmamalı
         _cift_mcp_uyar()  # Exception fırlatmamalı
     except ImportError:

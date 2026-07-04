@@ -28,6 +28,7 @@ try:
     from langgraph.checkpoint import MemorySaver
     from typing import TypedDict, Annotated
     import langgraph as _lg
+
     _LANGGRAPH_MEVCUT = True
     logger.debug("[Framework] LangGraph %s yuklu", getattr(_lg, "__version__", "?"))
 except ImportError:
@@ -122,8 +123,7 @@ class LangGraphAdaptor:
 
             # Kenarlari bagla (zincir)
             node_names = [
-                getattr(fn, "__name__", f"node_{i}")
-                for i, fn in enumerate(nodes)
+                getattr(fn, "__name__", f"node_{i}") for i, fn in enumerate(nodes)
             ]
             for i in range(len(node_names) - 1):
                 graph.add_edge(node_names[i], node_names[i + 1])
@@ -152,6 +152,7 @@ class LangGraphAdaptor:
 try:
     from crewai import Crew, Agent, Task, Process
     import crewai as _ca
+
     _CREWAI_MEVCUT = True
     logger.debug("[Framework] CrewAI %s yuklu", getattr(_ca, "__version__", "?"))
 except ImportError:
@@ -281,6 +282,7 @@ class CrewAIAdaptor:
 
 try:
     import autogen as _ag
+
     _AUTOGEN_MEVCUT = True
     logger.debug("[Framework] AutoGen %s yuklu", getattr(_ag, "__version__", "?"))
 except ImportError:
@@ -404,8 +406,11 @@ class AutoGenAdaptor:
                 """ReYMeN fonksiyonunu AutoGen reply handler olarak sar."""
                 if not messages:
                     return False, None
-                son_mesaj = messages[-1].get("content", "") if isinstance(
-                    messages[-1], dict) else str(messages[-1])
+                son_mesaj = (
+                    messages[-1].get("content", "")
+                    if isinstance(messages[-1], dict)
+                    else str(messages[-1])
+                )
                 try:
                     yanit = fonksiyon(son_mesaj)
                     return True, {"content": str(yanit), "role": "assistant"}
@@ -465,6 +470,7 @@ class AutoGenAdaptor:
 # ══════════════════════════════════════════════════════════════════════
 # Framework Yoneticisi (Ana Adaptor)
 # ══════════════════════════════════════════════════════════════════════
+
 
 class FrameworkYonetici:
     """Tum framework adaptörlerini birlesik arayuzde yonetir.

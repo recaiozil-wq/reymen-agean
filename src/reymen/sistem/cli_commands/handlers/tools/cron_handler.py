@@ -103,7 +103,9 @@ def _handle_cron_command(cli, cmd: str):
             print("  " + "-" * 63)
             for job in jobs:
                 repeat_str = job.get("repeat", "?")
-                print(f"    {job['job_id'][:12]:<12} | {job['schedule']:<15} | {repeat_str:<8}")
+                print(
+                    f"    {job['job_id'][:12]:<12} | {job['schedule']:<15} | {repeat_str:<8}"
+                )
                 if job.get("skills"):
                     print(f"      Skills: {', '.join(job['skills'])}")
                 print(f"      {job.get('prompt_preview', '')}")
@@ -140,7 +142,9 @@ def _handle_cron_command(cli, cmd: str):
                 print(f"  Skills: {', '.join(job['skills'])}")
             print(f"  Prompt: {job.get('prompt_preview', '')}")
             if job.get("last_run_at"):
-                print(f"  Last run: {job['last_run_at']} ({job.get('last_status', '?')})")
+                print(
+                    f"  Last run: {job['last_run_at']} ({job.get('last_status', '?')})"
+                )
             print()
         return
 
@@ -177,7 +181,9 @@ def _handle_cron_command(cli, cmd: str):
     if subcommand == "edit":
         positionals = opts["positionals"]
         if not positionals:
-            print("(._.) Usage: /cron edit <job_id> [--schedule ...] [--prompt ...] [--skill ...]")
+            print(
+                "(._.) Usage: /cron edit <job_id> [--schedule ...] [--prompt ...] [--skill ...]"
+            )
             return
         job_id = positionals[0]
         existing = get_job(job_id)
@@ -189,13 +195,18 @@ def _handle_cron_command(cli, cmd: str):
         replacement_skills = _normalize_skills(opts["skills"])
         add_skills = _normalize_skills(opts["add_skills"])
         remove_skills = set(_normalize_skills(opts["remove_skills"]))
-        existing_skills = list(existing.get("skills") or ([] if not existing.get("skill") else [existing.get("skill")]))
+        existing_skills = list(
+            existing.get("skills")
+            or ([] if not existing.get("skill") else [existing.get("skill")])
+        )
         if opts["clear_skills"]:
             final_skills = []
         elif replacement_skills:
             final_skills = replacement_skills
         elif add_skills or remove_skills:
-            final_skills = [skill for skill in existing_skills if skill not in remove_skills]
+            final_skills = [
+                skill for skill in existing_skills if skill not in remove_skills
+            ]
             for skill in add_skills:
                 if skill not in final_skills:
                     final_skills.append(skill)
@@ -229,7 +240,11 @@ def _handle_cron_command(cli, cmd: str):
             return
         job_id = positionals[0]
         action = "remove" if subcommand in {"remove", "rm", "delete"} else subcommand
-        result = _cron_api(action=action, job_id=job_id, reason="paused from /cron" if action == "pause" else None)
+        result = _cron_api(
+            action=action,
+            job_id=job_id,
+            reason="paused from /cron" if action == "pause" else None,
+        )
         if not result.get("success"):
             print(f"(x_x) Failed to {action} job: {result.get('error')}")
             return

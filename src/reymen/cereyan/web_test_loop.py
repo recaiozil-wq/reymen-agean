@@ -26,15 +26,17 @@ logger = logging.getLogger(__name__)
 
 # ── Veri Yapıları ─────────────────────────────────────────────────────────
 
+
 @dataclass
 class TestSonucu:
     """Bir yöntemin test sonucu."""
+
     yontem_adi: str
-    hiz_sn: float        # Kaç saniye sürdü? (düşük iyi)
-    basari: bool          # Hata verdi mi? (True=başarılı)
-    cikti_dogru: bool     # Çıktı doğru mu?
-    guvenlik: float       # 0.0-1.0 (1.0=güvenli)
-    kaynak_guven: float   # Kaynağın güvenilirliği (web veya hafıza)
+    hiz_sn: float  # Kaç saniye sürdü? (düşük iyi)
+    basari: bool  # Hata verdi mi? (True=başarılı)
+    cikti_dogru: bool  # Çıktı doğru mu?
+    guvenlik: float  # 0.0-1.0 (1.0=güvenli)
+    kaynak_guven: float  # Kaynağın güvenilirliği (web veya hafıza)
 
     def puan(self) -> float:
         """Toplam puan [0.0, 1.0]"""
@@ -183,6 +185,7 @@ def puanla(
 
 # ── Karar ─────────────────────────────────────────────────────────────────
 
+
 @dataclass
 class KararSonucu:
     kazanan: str
@@ -314,19 +317,22 @@ def tetikleyici_simulasyonu() -> list[dict]:
         beklenen = senaryo["beklenen_tetik"]
         durum = "✅" if tid == beklenen else "❌"
 
-        sonuclar.append({
-            "senaryo": senaryo["ad"],
-            "durum": durum,
-            "ateslenen_tetik": tid,
-            "beklenen_tetik": beklenen,
-            "tetikleyici_adi": bilgi.get("ad", "YOK"),
-            "kosul": bilgi.get("kosul", ""),
-        })
+        sonuclar.append(
+            {
+                "senaryo": senaryo["ad"],
+                "durum": durum,
+                "ateslenen_tetik": tid,
+                "beklenen_tetik": beklenen,
+                "tetikleyici_adi": bilgi.get("ad", "YOK"),
+                "kosul": bilgi.get("kosul", ""),
+            }
+        )
 
     return sonuclar
 
 
 # ── Tam Döngü ─────────────────────────────────────────────────────────────
+
 
 def web_test_loop(
     konu: str,
@@ -409,21 +415,21 @@ if __name__ == "__main__":
     # Eski yöntem: nmap -sU -p 1-1000 (tam UDP tarama, yavaş)
     eski_yontem = lambda: TestSonucu(
         yontem_adi="nmap -sU tam UDP tarama",
-        hiz_sn=45.0,        # yavaş
+        hiz_sn=45.0,  # yavaş
         basari=True,
         cikti_dogru=True,
-        guvenlik=1.0,       # nmap güvenli
-        kaynak_guven=0.9,   # resmi doc
+        guvenlik=1.0,  # nmap güvenli
+        kaynak_guven=0.9,  # resmi doc
     )
 
     # Yeni yöntem (web'den bulunan): nmap -sU --top-ports 100 (hızlı)
     yeni_yontem = lambda: TestSonucu(
         yontem_adi="nmap -sU --top-ports 100",
-        hiz_sn=5.0,          # çok hızlı
+        hiz_sn=5.0,  # çok hızlı
         basari=True,
-        cikti_dogru=True,    # ilk 100 port yeterli
+        cikti_dogru=True,  # ilk 100 port yeterli
         guvenlik=1.0,
-        kaynak_guven=0.7,    # stackoverflow
+        kaynak_guven=0.7,  # stackoverflow
     )
 
     sonuc = web_test_loop(
@@ -437,8 +443,8 @@ if __name__ == "__main__":
     print(f"{'Kriter':<12} {'Eski':<8} {'Yeni':<8}")
     print("-" * 30)
     for kriter in PUAN_KRITERLERI:
-        eski_val = sonuc['puan_tablosu']['eski_kriter'][kriter]
-        yeni_val = sonuc['puan_tablosu']['yeni_kriter'][kriter]
+        eski_val = sonuc["puan_tablosu"]["eski_kriter"][kriter]
+        yeni_val = sonuc["puan_tablosu"]["yeni_kriter"][kriter]
         print(f"{kriter:<12} {str(eski_val):<8} {str(yeni_val):<8}")
 
     print(f"\nEski puan: {sonuc['eski']['puan']:.4f}")

@@ -22,13 +22,14 @@ import sys
 import threading
 from pathlib import Path
 import logging
+
 logger = logging.getLogger(__name__)
 
-PROJE_KOKU    = Path(__file__).parent.resolve()
+PROJE_KOKU = Path(__file__).parent.resolve()
 GITHUB_BRANCH = "main"
 
 # ── Buraya kendi GitHub kullanıcı adını ve repo adını yaz ──────────────────
-GITHUB_REPO = "KULLANICI_ADI/ReYMeN"   # örn: "markopasa/ReYMeN"
+GITHUB_REPO = "KULLANICI_ADI/ReYMeN"  # örn: "markopasa/ReYMeN"
 # ───────────────────────────────────────────────────────────────────────────
 
 # Güncelleme sırasında ASLA dokunulmayacak kişisel dosyalar
@@ -49,11 +50,15 @@ _ARKA_PLAN_SONUC: dict = {}
 
 # ── Ayar yönetimi ─────────────────────────────────────────────────────────
 
+
 def ayar_oku() -> dict:
     varsayilan = {"otomatik_kontrol": True, "gosterilen_sha": ""}
     try:
         if AYAR_DOSYASI.exists():
-            return {**varsayilan, **json.loads(AYAR_DOSYASI.read_text(encoding="utf-8"))}
+            return {
+                **varsayilan,
+                **json.loads(AYAR_DOSYASI.read_text(encoding="utf-8")),
+            }
     except Exception as _guncelle_e54:
         print(f"[UYARI] guncelle.py:55 - {_guncelle_e54}")
     return varsayilan
@@ -61,10 +66,13 @@ def ayar_oku() -> dict:
 
 def ayar_kaydet(ayar: dict):
     AYAR_DOSYASI.parent.mkdir(parents=True, exist_ok=True)
-    AYAR_DOSYASI.write_text(json.dumps(ayar, ensure_ascii=False, indent=2), encoding="utf-8")
+    AYAR_DOSYASI.write_text(
+        json.dumps(ayar, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
 
 
 # ── Commit kontrol ────────────────────────────────────────────────────────
+
 
 def _yerel_commit() -> str | None:
     try:
@@ -86,6 +94,7 @@ def _uzak_commit() -> str | None:
         return None
     try:
         import urllib.request
+
         url = f"https://api.github.com/repos/{GITHUB_REPO}/commits/{GITHUB_BRANCH}"
         istek = urllib.request.Request(url, headers={"User-Agent": "ReYMeN-updater"})
         with urllib.request.urlopen(istek, timeout=6) as r:
@@ -96,13 +105,14 @@ def _uzak_commit() -> str | None:
 
 def guncelleme_var_mi() -> tuple[bool, str | None, str | None]:
     yerel = _yerel_commit()
-    uzak  = _uzak_commit()
+    uzak = _uzak_commit()
     if yerel and uzak:
         return yerel != uzak, uzak, yerel
     return False, uzak, yerel
 
 
 # ── Değişen dosyaları listele ─────────────────────────────────────────────
+
 
 def _degisen_dosyalar() -> dict:
     """git diff ile güncelleme öncesi nelerin değişeceğini göster."""
@@ -111,11 +121,16 @@ def _degisen_dosyalar() -> dict:
         # Uzak repo'dan fetch et
         subprocess.run(
             ["git", "fetch", "origin", GITHUB_BRANCH],
-            capture_output=True, cwd=str(PROJE_KOKU), timeout=15,
+            capture_output=True,
+            cwd=str(PROJE_KOKU),
+            timeout=15,
         )
         r = subprocess.run(
             ["git", "diff", f"HEAD..origin/{GITHUB_BRANCH}", "--name-only"],
-            capture_output=True, text=True, cwd=str(PROJE_KOKU), timeout=10,
+            capture_output=True,
+            text=True,
+            cwd=str(PROJE_KOKU),
+            timeout=10,
         )
         for dosya in r.stdout.strip().splitlines():
             dosya = dosya.strip()
@@ -141,12 +156,15 @@ def _degisen_dosyalar() -> dict:
 
 # ── Güncelleme ────────────────────────────────────────────────────────────
 
+
 def _git_pull() -> tuple[bool, str]:
     try:
         sonuc = subprocess.run(
             ["git", "pull", "origin", GITHUB_BRANCH],
-            capture_output=True, text=True,
-            cwd=str(PROJE_KOKU), timeout=60,
+            capture_output=True,
+            text=True,
+            cwd=str(PROJE_KOKU),
+            timeout=60,
         )
         cikti = (sonuc.stdout + sonuc.stderr).strip()
         return sonuc.returncode == 0, cikti
@@ -179,21 +197,27 @@ def _zip_ile_guncelle() -> tuple[bool, str]:
             for uye in zf.namelist():
                 if not uye.startswith(f"{repo_adi}/"):
                     continue
-                hedef_yol = uye[len(repo_adi) + 1:]
+                hedef_yol = uye[len(repo_adi) + 1 :]
                 if not hedef_yol:
                     continue
 
                 # Korunacak dosyaları atla
                 koruma = any(
-                    hedef_yol == k or hedef_yol.startswith(k + "/") or hedef_yol.startswith(k)
+                    hedef_yol == k
+                    or hedef_yol.startswith(k + "/")
+                    or hedef_yol.startswith(k)
                     for k in KORUNACAK
                 )
                 if koruma:
                     continue
 
                 # Sadece .py ve skill dosyaları
-                if not (hedef_yol.endswith(".py") or "skills" in hedef_yol
-                        or hedef_yol.endswith(".md") or hedef_yol.endswith(".json")):
+                if not (
+                    hedef_yol.endswith(".py")
+                    or "skills" in hedef_yol
+                    or hedef_yol.endswith(".md")
+                    or hedef_yol.endswith(".json")
+                ):
                     if hedef_yol.endswith(".txt") or hedef_yol.endswith(".yaml"):
                         pass
                     else:
@@ -241,7 +265,9 @@ def guncelle(onaysiz: bool = False) -> bool:
         if degisen["diger"]:
             print(f"  Diğer          : {len(degisen['diger'])} dosya")
         if degisen["korunan"]:
-            print(f"  Korunacak      : {len(degisen['korunan'])} kişisel dosya (.env, hafıza vb.)")
+            print(
+                f"  Korunacak      : {len(degisen['korunan'])} kişisel dosya (.env, hafıza vb.)"
+            )
 
     print()
 
@@ -276,11 +302,12 @@ def guncelle(onaysiz: bool = False) -> bool:
 
 # ── Açma / Kapatma ────────────────────────────────────────────────────────
 
+
 def otomatik_ac():
     """Otomatik güncelleme bildirimini aç."""
     ayar = ayar_oku()
     ayar["otomatik_kontrol"] = True
-    ayar["gosterilen_sha"] = ""   # Bildirimi sıfırla
+    ayar["gosterilen_sha"] = ""  # Bildirimi sıfırla
     ayar_kaydet(ayar)
     print("  ✓ Otomatik güncelleme kontrolü açıldı.")
 
@@ -306,15 +333,16 @@ def durum_goster():
 
 # ── Arka plan kontrolü ────────────────────────────────────────────────────
 
+
 def _arka_plan_kontrol():
     try:
         ayar = ayar_oku()
         if not ayar.get("otomatik_kontrol", True):
             return
         var_mi, uzak, yerel = guncelleme_var_mi()
-        _ARKA_PLAN_SONUC["var_mi"]  = var_mi
-        _ARKA_PLAN_SONUC["uzak"]    = uzak
-        _ARKA_PLAN_SONUC["yerel"]   = yerel
+        _ARKA_PLAN_SONUC["var_mi"] = var_mi
+        _ARKA_PLAN_SONUC["uzak"] = uzak
+        _ARKA_PLAN_SONUC["yerel"] = yerel
         _ARKA_PLAN_SONUC["gosterilen"] = ayar.get("gosterilen_sha", "")
     except Exception:
         _ARKA_PLAN_SONUC["var_mi"] = False
@@ -335,8 +363,8 @@ def guncelleme_bildirimi() -> str | None:
     """
     if not _ARKA_PLAN_SONUC.get("var_mi"):
         return None
-    uzak      = _ARKA_PLAN_SONUC.get("uzak", "?")
-    yerel     = _ARKA_PLAN_SONUC.get("yerel", "?")
+    uzak = _ARKA_PLAN_SONUC.get("uzak", "?")
+    yerel = _ARKA_PLAN_SONUC.get("yerel", "?")
     gosterilen = _ARKA_PLAN_SONUC.get("gosterilen", "")
 
     # Aynı sürüm için tekrar gösterme
@@ -354,6 +382,7 @@ def guncelleme_bildirimi() -> str | None:
 
 
 # ── /guncelle komut yönlendirici ──────────────────────────────────────────
+
 
 def komut_isle(args: str = "") -> bool:
     """
@@ -406,7 +435,7 @@ if __name__ == "__main__":
 
     if "KULLANICI_ADI" in GITHUB_REPO:
         print("\n[!] guncelle.py içindeki GITHUB_REPO değişkenini ayarla.")
-        print("    Örnek: GITHUB_REPO = \"markopasa/ReYMeN\"")
+        print('    Örnek: GITHUB_REPO = "markopasa/ReYMeN"')
         sys.exit(1)
 
     guncelle(onaysiz=False)

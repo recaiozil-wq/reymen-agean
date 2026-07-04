@@ -76,7 +76,9 @@ def test_detect_concurrent_finds_other_ReYMeN_process(_winp, tmp_path):
     other_pid = os.getpid() + 1
     procs = [
         _make_proc(other_pid, str(shim), "ReYMeN.exe"),
-        _make_proc(os.getpid() + 2, r"C:\\Windows\\System32\\notepad.exe", "notepad.exe"),
+        _make_proc(
+            os.getpid() + 2, r"C:\\Windows\\System32\\notepad.exe", "notepad.exe"
+        ),
     ]
     fake_psutil = types.SimpleNamespace(process_iter=lambda attrs: iter(procs))
     with patch.dict(sys.modules, {"psutil": fake_psutil}):
@@ -565,13 +567,9 @@ def test_cmd_update_aborts_on_concurrent_instance(_winp, tmp_path, capsys):
         cli_main,
         "_detect_concurrent_ReYMeN_instances",
         return_value=[(4242, "ReYMeN.exe")],
-    ), patch.object(
-        cli_main, "_run_pre_update_backup"
-    ) as mock_backup, patch.object(
+    ), patch.object(cli_main, "_run_pre_update_backup") as mock_backup, patch.object(
         cli_main, "_install_hangup_protection", return_value={}
-    ), patch.object(
-        cli_main, "_finalize_update_output"
-    ):
+    ), patch.object(cli_main, "_finalize_update_output"):
         with pytest.raises(SystemExit) as excinfo:
             cli_main.cmd_update(args)
 
@@ -614,9 +612,7 @@ def test_cmd_update_force_bypasses_concurrent_check(_winp, tmp_path):
         cli_main, "_run_pre_update_backup", side_effect=sentinel
     ), patch.object(
         cli_main, "_install_hangup_protection", return_value={}
-    ), patch.object(
-        cli_main, "_finalize_update_output"
-    ):
+    ), patch.object(cli_main, "_finalize_update_output"):
         with pytest.raises(RuntimeError, match="reached post-gate body"):
             cli_main.cmd_update(args)
 

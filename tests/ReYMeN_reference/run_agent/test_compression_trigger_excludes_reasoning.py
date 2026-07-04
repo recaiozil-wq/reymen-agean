@@ -33,9 +33,9 @@ class TestCompressionTriggerExcludesReasoning:
             threshold_tokens=100_000,
         )
         assert real_tokens == 40_000
-        assert real_tokens < comp.threshold_tokens, (
-            "Should NOT trigger compression — only prompt tokens matter"
-        )
+        assert (
+            real_tokens < comp.threshold_tokens
+        ), "Should NOT trigger compression — only prompt tokens matter"
 
     def test_high_prompt_tokens_should_trigger_compression(self):
         """When prompt tokens genuinely exceed the threshold, compress."""
@@ -45,9 +45,9 @@ class TestCompressionTriggerExcludesReasoning:
             threshold_tokens=100_000,
         )
         assert real_tokens == 110_000
-        assert real_tokens >= comp.threshold_tokens, (
-            "Should trigger compression — prompt tokens exceed threshold"
-        )
+        assert (
+            real_tokens >= comp.threshold_tokens
+        ), "Should trigger compression — prompt tokens exceed threshold"
 
     def test_zero_prompt_tokens_falls_back(self):
         """When provider returns 0 prompt tokens, real_tokens is 0 (fallback path)."""

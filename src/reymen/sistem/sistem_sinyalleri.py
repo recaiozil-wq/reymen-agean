@@ -15,6 +15,7 @@ import threading
 import traceback
 from typing import Optional, Dict, Any, Callable
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -112,7 +113,7 @@ class SignalHandler:
                 self.graceful_shutdown()
 
             # Yeniden baslatma sinyali (Windows'ta SIGHUP yok)
-            sighup = getattr(signal, 'SIGHUP', None)
+            sighup = getattr(signal, "SIGHUP", None)
             if sighup is not None and signum == sighup:
                 self._yeniden_baslatma_istegi.set()
                 print("[Signal] Yeniden baslatma baslatiliyor...")
@@ -151,7 +152,10 @@ class SignalHandler:
                 self._kapatma_istegi.wait(timeout)
             else:
                 # Sonsuz bekle, sinyaller keser
-                while not self._kapatma_istegi.is_set() and not self._yeniden_baslatma_istegi.is_set():
+                while (
+                    not self._kapatma_istegi.is_set()
+                    and not self._yeniden_baslatma_istegi.is_set()
+                ):
                     self._kapatma_istegi.wait(1.0)
 
             self._aktif = False
@@ -332,6 +336,7 @@ class SignalHandler:
             JSON formatinda sonuc.
         """
         import json as json_mod
+
         try:
             action = kwargs.pop("action", "durum")
             if action == "kaydet":
@@ -354,11 +359,18 @@ class SignalHandler:
                 return json_mod.dumps({"basarili": sonuc}, ensure_ascii=False)
             elif action == "kapatma_ekle":
                 # run icinden fonk eklenemez
-                return json_mod.dumps({"basarili": False, "hata": "Run uzerinden eklenemez"}, ensure_ascii=False)
+                return json_mod.dumps(
+                    {"basarili": False, "hata": "Run uzerinden eklenemez"},
+                    ensure_ascii=False,
+                )
             elif action == "durum":
-                return json_mod.dumps(self.durum(), ensure_ascii=False, indent=2, default=str)
+                return json_mod.dumps(
+                    self.durum(), ensure_ascii=False, indent=2, default=str
+                )
             else:
-                return json_mod.dumps({"hata": f"Bilinmeyen action: {action}"}, ensure_ascii=False)
+                return json_mod.dumps(
+                    {"hata": f"Bilinmeyen action: {action}"}, ensure_ascii=False
+                )
         except Exception as e:
             return json_mod.dumps({"hata": str(e)}, ensure_ascii=False)
 
@@ -370,6 +382,7 @@ def motor_kaydet(motor):
     def _sistem_kaynak():
         try:
             import psutil
+
             cpu = psutil.cpu_percent(interval=0.3)
             ram = psutil.virtual_memory().percent
             return f"CPU: {cpu:.1f}%  RAM: {ram:.1f}%"

@@ -3,9 +3,9 @@ import sqlite3
 
 # GOREV 1: Video ajani mimarisi
 kaydet(
-    hedef='video_ogrenme_ajani_mimari',
-    kategori='video/learning',
-    icerik='''VIDEO OGRENME AJANI MIMARISI
+    hedef="video_ogrenme_ajani_mimari",
+    kategori="video/learning",
+    icerik="""VIDEO OGRENME AJANI MIMARISI
 
 Akis:
 1. YouTube URL al
@@ -27,15 +27,15 @@ Bolumleme:
 Skill Cikarma:
 - Her teknik adim -> ayri kayit
 - Kod blogu -> calistir + dogrula
-- Hata varsa -> duzeltilmis halini kaydet''',
-    basari=True
+- Hata varsa -> duzeltilmis halini kaydet""",
+    basari=True,
 )
 
 # GOREV 2: Video simule + karsilastir
 kaydet(
-    hedef='python_nmap_video_ogrenme',
-    kategori='video/python/nmap',
-    icerik='''VIDEO: "Python ile nmap kullanimi" (simule)
+    hedef="python_nmap_video_ogrenme",
+    kategori="video/python/nmap",
+    icerik="""VIDEO: "Python ile nmap kullanimi" (simule)
 
 KAYNAK: Simule edilmis video, yt-dlp + Whisper ile transcript alindi.
 
@@ -57,15 +57,15 @@ VIDEODA EKSIK OLANLAR (hafizada var):
 - UDP scan (video sadece TCP)
 - open|filtered sorunu ve cozumu
 
-BIRLESIK SKILL = video/python/nmap + kali/network/nmap''',
-    basari=True
+BIRLESIK SKILL = video/python/nmap + kali/network/nmap""",
+    basari=True,
 )
 
 # GOREV 3: Hata tespiti
 kaydet(
-    hedef='python_nmap_hata_tespiti',
-    kategori='video/python/nmap',
-    icerik='''HATA TESPITI: python-nmap kullanimi
+    hedef="python_nmap_hata_tespiti",
+    kategori="video/python/nmap",
+    icerik="""HATA TESPITI: python-nmap kullanimi
 
 KAYNAK: Video + PyPI dokumantasyonu + hafiza
 
@@ -87,15 +87,15 @@ DEGERLENDIRME:
 NASIL TESPIT ETTI?
 - Hafiza: kali/network/nmap bilgisi
 - Web: PyPI dokumantasyonu ile API dogrulandi
-- Mantik: scan() dict dondurur, islenmezse anlamsiz''',
-    basari=True
+- Mantik: scan() dict dondurur, islenmezse anlamsiz""",
+    basari=True,
 )
 
 # GOREV 4: Duzeltilmis kod
 kaydet(
-    hedef='python_nmap_duzeltilmis_kod',
-    kategori='video/python/nmap',
-    icerik='''DUZELTILMIS KOD: Python ile nmap port taramasi
+    hedef="python_nmap_duzeltilmis_kod",
+    kategori="video/python/nmap",
+    icerik="""DUZELTILMIS KOD: Python ile nmap port taramasi
 
 Hatalar duzeltildi, eksikler eklendi:
 
@@ -138,17 +138,21 @@ EKLENENLER:
 5. timeout parametresi
 6. Host bulunamadi kontrolu
 
-CROSS-REF: kali/network/nmap (ID=12) ile ayni bilgiyi Python API ile sarmalar''',
-    basari=True
+CROSS-REF: kali/network/nmap (ID=12) ile ayni bilgiyi Python API ile sarmalar""",
+    basari=True,
 )
 
 # Son durum
-con = sqlite3.connect('reymen/merkez_db/ogrenmeler.db')
-print('=== YENI KATEGORILER ===')
-for r in con.execute("SELECT kategori, COUNT(*) FROM ogrenmeler WHERE kategori LIKE 'video/%' GROUP BY kategori").fetchall():
-    print(f'  {r[0]}: {r[1]} kayit')
+con = sqlite3.connect("reymen/merkez_db/ogrenmeler.db")
+print("=== YENI KATEGORILER ===")
+for r in con.execute(
+    "SELECT kategori, COUNT(*) FROM ogrenmeler WHERE kategori LIKE 'video/%' GROUP BY kategori"
+).fetchall():
+    print(f"  {r[0]}: {r[1]} kayit")
 print()
-print('=== TUM KATEGORILER ===')
-for r in con.execute('SELECT kategori, COUNT(*) FROM ogrenmeler GROUP BY kategori ORDER BY kategori').fetchall():
-    print(f'  {r[0]:40s} {r[1]}')
+print("=== TUM KATEGORILER ===")
+for r in con.execute(
+    "SELECT kategori, COUNT(*) FROM ogrenmeler GROUP BY kategori ORDER BY kategori"
+).fetchall():
+    print(f"  {r[0]:40s} {r[1]}")
 con.close()

@@ -35,18 +35,18 @@ class State(enum.Enum):
     IDLE = "idle"
 
     # Aktif çalışma
-    THINKING = "thinking"       # LLM çağrısı bekleniyor
-    TOOL_CALL = "tool_call"     # Araç çalıştırılıyor
-    WAITING = "waiting"         # Dış girdi bekleniyor (HITL / kullanıcı)
+    THINKING = "thinking"  # LLM çağrısı bekleniyor
+    TOOL_CALL = "tool_call"  # Araç çalıştırılıyor
+    WAITING = "waiting"  # Dış girdi bekleniyor (HITL / kullanıcı)
 
     # Hata / kurtarma
-    ERROR = "error"             # Geçici hata
-    RECOVERING = "recovering"   # Otomatik kurtarma devam ediyor
-    DEGRADED = "degraded"       # Çalışıyor ama kısıtlı kapasite
+    ERROR = "error"  # Geçici hata
+    RECOVERING = "recovering"  # Otomatik kurtarma devam ediyor
+    DEGRADED = "degraded"  # Çalışıyor ama kısıtlı kapasite
 
     # Terminal
     SHUTDOWN = "shutdown"
-    CRASHED = "crashed"         # Kurtarılamaz hata
+    CRASHED = "crashed"  # Kurtarılamaz hata
 
 
 # --- Geçerli durum geçişleri ---
@@ -54,12 +54,38 @@ class State(enum.Enum):
 _TRANSITIONS: Dict[State, Set[State]] = {
     State.UNINITIALIZED: {State.INITIALIZING},
     State.INITIALIZING: {State.IDLE, State.ERROR, State.SHUTDOWN},
-    State.IDLE: {State.THINKING, State.INITIALIZING, State.ERROR, State.SHUTDOWN, State.DEGRADED},
-    State.THINKING: {State.TOOL_CALL, State.IDLE, State.ERROR, State.RECOVERING, State.SHUTDOWN},
-    State.TOOL_CALL: {State.THINKING, State.IDLE, State.ERROR, State.RECOVERING, State.WAITING, State.DEGRADED, State.SHUTDOWN},
+    State.IDLE: {
+        State.THINKING,
+        State.INITIALIZING,
+        State.ERROR,
+        State.SHUTDOWN,
+        State.DEGRADED,
+    },
+    State.THINKING: {
+        State.TOOL_CALL,
+        State.IDLE,
+        State.ERROR,
+        State.RECOVERING,
+        State.SHUTDOWN,
+    },
+    State.TOOL_CALL: {
+        State.THINKING,
+        State.IDLE,
+        State.ERROR,
+        State.RECOVERING,
+        State.WAITING,
+        State.DEGRADED,
+        State.SHUTDOWN,
+    },
     State.WAITING: {State.THINKING, State.IDLE, State.ERROR, State.SHUTDOWN},
     State.ERROR: {State.RECOVERING, State.IDLE, State.SHUTDOWN, State.CRASHED},
-    State.RECOVERING: {State.IDLE, State.DEGRADED, State.ERROR, State.CRASHED, State.SHUTDOWN},
+    State.RECOVERING: {
+        State.IDLE,
+        State.DEGRADED,
+        State.ERROR,
+        State.CRASHED,
+        State.SHUTDOWN,
+    },
     State.DEGRADED: {State.IDLE, State.ERROR, State.SHUTDOWN, State.RECOVERING},
     State.SHUTDOWN: set(),
     State.CRASHED: {State.INITIALIZING},
@@ -69,7 +95,13 @@ _TRANSITIONS: Dict[State, Set[State]] = {
 _ERROR_STATES = {State.ERROR, State.RECOVERING, State.DEGRADED, State.CRASHED}
 
 # Aktif çalışma durumları (IDLE + meşgul)
-_ACTIVE_STATES = {State.IDLE, State.THINKING, State.TOOL_CALL, State.WAITING, State.DEGRADED}
+_ACTIVE_STATES = {
+    State.IDLE,
+    State.THINKING,
+    State.TOOL_CALL,
+    State.WAITING,
+    State.DEGRADED,
+}
 
 # Ölü/kilitli durumlar
 _STUCK_STATES = {State.UNINITIALIZED, State.ERROR, State.SHUTDOWN, State.CRASHED}
@@ -77,6 +109,7 @@ _STUCK_STATES = {State.UNINITIALIZED, State.ERROR, State.SHUTDOWN, State.CRASHED
 
 class StateTransitionError(ValueError):
     """Geçersiz durum geçişi."""
+
     pass
 
 
@@ -213,7 +246,7 @@ class StateMachine:
 
     def tick(self) -> Optional[State]:
         """Periyodik kontrol — stuck durumdaysa belirle.
-        
+
         Returns:
             Stuck ise mevcut state, değilse None.
         """

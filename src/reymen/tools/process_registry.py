@@ -1,4 +1,5 @@
 """ReYMeN tools.process_registry shim — Hermes process registry'sini yönlendirir."""
+
 from __future__ import annotations
 
 import logging

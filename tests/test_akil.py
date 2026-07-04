@@ -54,10 +54,12 @@ class TestContextEngine:
     def test_onemli_anahtarlar(self):
         """Onemli anahtar kelimelerin dogru tespiti."""
         ce = ContextEngine()
-        onemli = ce._onemli_bilgileri_ayikla([
-            {"icerik": "API anahtari ve URL ayarlandi"},
-            {"icerik": "Dosya yolu belirlendi"},
-        ])
+        onemli = ce._onemli_bilgileri_ayikla(
+            [
+                {"icerik": "API anahtari ve URL ayarlandi"},
+                {"icerik": "Dosya yolu belirlendi"},
+            ]
+        )
         assert len(onemli) >= 1
 
     def test_ozetle_kisa_gecmis(self):
@@ -93,7 +95,11 @@ class TestContextCompressor:
         gecmis = [{"rol": "user", "icerik": "merhaba"}]
         sikistirilmis = cc.sikistir(gecmis)
         assert len(sikistirilmis) > 0
-        assert any("[OZET]" in m.get("icerik", "") for m in sikistirilmis if isinstance(m, dict))
+        assert any(
+            "[OZET]" in m.get("icerik", "")
+            for m in sikistirilmis
+            if isinstance(m, dict)
+        )
 
     def test_onemli_bilgileri_sakla(self):
         """Onemli bilgi saklama."""

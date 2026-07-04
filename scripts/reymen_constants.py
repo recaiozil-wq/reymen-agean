@@ -1,4 +1,5 @@
 """ReYMeN constants — ReYMeN evrensel sabitleri ve yardımcıları."""
+
 from __future__ import annotations
 
 import os

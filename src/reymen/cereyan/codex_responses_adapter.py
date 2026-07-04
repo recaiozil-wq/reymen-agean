@@ -12,8 +12,8 @@ import os
 import urllib.request
 from typing import Optional
 
-OPENAI_API_KEY  = os.environ.get("OPENAI_API_KEY", "")
-OPENAI_BASE     = "https://api.openai.com/v1"
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
+OPENAI_BASE = "https://api.openai.com/v1"
 VARSAYILAN_MODEL = os.environ.get("CODEX_MODEL", "gpt-4o")
 
 
@@ -26,7 +26,7 @@ def _openai_istek(yol: str, veri: dict) -> dict:
             data=json.dumps(veri).encode("utf-8"),
             headers={
                 "Authorization": f"Bearer {OPENAI_API_KEY}",
-                "Content-Type":  "application/json",
+                "Content-Type": "application/json",
             },
         )
         with urllib.request.urlopen(req, timeout=90) as r:
@@ -48,13 +48,13 @@ class CodexResponsesAdapter:
         model: str = VARSAYILAN_MODEL,
         api_key: str = OPENAI_API_KEY,
     ):
-        self.model   = model
+        self.model = model
         self.api_key = api_key
 
     def _baslik(self) -> dict:
         return {
             "Authorization": f"Bearer {self.api_key}",
-            "Content-Type":  "application/json",
+            "Content-Type": "application/json",
         }
 
     def tamamla(
@@ -78,10 +78,10 @@ class CodexResponsesAdapter:
             API yanıtı dict
         """
         govde: dict = {
-            "model":             self.model,
-            "input":             mesajlar,
+            "model": self.model,
+            "input": mesajlar,
             "max_output_tokens": max_output_tokens,
-            "temperature":       sicaklik,
+            "temperature": sicaklik,
         }
         if araclar:
             govde["tools"] = araclar
@@ -118,7 +118,9 @@ class CodexResponsesAdapter:
         Returns:
             Yanıt metni
         """
-        giris = [{"role": "system", "content": sistem}] + mesajlar if sistem else mesajlar
+        giris = (
+            [{"role": "system", "content": sistem}] + mesajlar if sistem else mesajlar
+        )
 
         araclar = []
         if web_arama:
@@ -162,7 +164,12 @@ class CodexResponsesAdapter:
         """
         return self.uret(
             sistem="Sen bir kod çalıştırma asistanısın.",
-            mesajlar=[{"role": "user", "content": f"Bu {dil} kodunu çalıştır:\n```{dil}\n{kod}\n```"}],
+            mesajlar=[
+                {
+                    "role": "user",
+                    "content": f"Bu {dil} kodunu çalıştır:\n```{dil}\n{kod}\n```",
+                }
+            ],
             kod_yorumlayici=True,
         )
 
@@ -194,12 +201,17 @@ class OpenAIChatAdapter:
         self.model = model
 
     def uret(self, sistem: str, mesajlar: list[dict], max_tokens: int = 4096) -> str:
-        msgs = [{"role": "system", "content": sistem}] + mesajlar if sistem else mesajlar
-        yanit = _openai_istek("/chat/completions", {
-            "model":      self.model,
-            "messages":   msgs,
-            "max_tokens": max_tokens,
-        })
+        msgs = (
+            [{"role": "system", "content": sistem}] + mesajlar if sistem else mesajlar
+        )
+        yanit = _openai_istek(
+            "/chat/completions",
+            {
+                "model": self.model,
+                "messages": msgs,
+                "max_tokens": max_tokens,
+            },
+        )
         if "error" in yanit:
             return f"[OpenAI]: {yanit['error']}"
         secimler = yanit.get("choices", [])

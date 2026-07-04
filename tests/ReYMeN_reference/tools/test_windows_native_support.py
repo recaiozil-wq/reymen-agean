@@ -45,6 +45,7 @@ class TestConfigureWindowsStdio:
         # Fresh import now; tests import from ReYMeN_cli.stdio themselves,
         # but this guarantees the module they get is a brand-new copy.
         import ReYMeN_cli.stdio as _s
+
         _s._CONFIGURED = False
         yield
         sys.modules.pop("ReYMeN_cli.stdio", None)
@@ -300,9 +301,9 @@ class TestSigkillFallback:
         rel = module_path.replace(".", "/") + ".py"
         root = Path(__file__).resolve().parents[2]
         source = (root / rel).read_text(encoding="utf-8")
-        assert line_pattern in source, (
-            f"{rel} must use the getattr fallback pattern on its SIGKILL site"
-        )
+        assert (
+            line_pattern in source
+        ), f"{rel} must use the getattr fallback pattern on its SIGKILL site"
 
 
 # ---------------------------------------------------------------------------
@@ -378,8 +379,17 @@ class TestPidExistsOSErrorWidening:
 
         # Force the psutil-first branch to miss so we exercise the fallback.
         monkeypatch.setitem(
-            __import__("sys").modules, "psutil",
-            type("P", (), {"pid_exists": staticmethod(lambda pid: (_ for _ in ()).throw(ImportError()))})()
+            __import__("sys").modules,
+            "psutil",
+            type(
+                "P",
+                (),
+                {
+                    "pid_exists": staticmethod(
+                        lambda pid: (_ for _ in ()).throw(ImportError())
+                    )
+                },
+            )(),
         )
         monkeypatch.setattr(status, "_IS_WINDOWS", False)
 
@@ -394,8 +404,17 @@ class TestPidExistsOSErrorWidening:
         from gateway import status
 
         monkeypatch.setitem(
-            __import__("sys").modules, "psutil",
-            type("P", (), {"pid_exists": staticmethod(lambda pid: (_ for _ in ()).throw(ImportError()))})()
+            __import__("sys").modules,
+            "psutil",
+            type(
+                "P",
+                (),
+                {
+                    "pid_exists": staticmethod(
+                        lambda pid: (_ for _ in ()).throw(ImportError())
+                    )
+                },
+            )(),
         )
         monkeypatch.setattr(status, "_IS_WINDOWS", False)
 
@@ -423,12 +442,11 @@ class TestTzdataDependencyDeclared:
         # — only that tzdata is declared with a win32 marker. This is an
         # invariant check, not a snapshot test.
         import re
+
         # Match `"tzdata` … `; sys_platform == 'win32'"` allowing any version
         # specifier in between (==X.Y.Z, >=X.Y.Z,<W, etc.) and either quote
         # style on the marker.
-        pattern = re.compile(
-            r'"tzdata[^"]*;\s*sys_platform\s*==\s*[\'"]win32[\'"]\s*"'
-        )
+        pattern = re.compile(r'"tzdata[^"]*;\s*sys_platform\s*==\s*[\'"]win32[\'"]\s*"')
         assert pattern.search(source), (
             "tzdata must be a Windows-only dep in pyproject.toml dependencies "
             "(declared with a `; sys_platform == 'win32'` marker)"
@@ -455,9 +473,9 @@ class TestReadmeNoLongerSaysWindowsUnsupported:
     def test_readme_mentions_powershell_installer(self):
         root = Path(__file__).resolve().parents[2]
         source = (root / "README.md").read_text(encoding="utf-8")
-        assert "install.ps1" in source, (
-            "README.md must point at scripts/install.ps1 for Windows users"
-        )
+        assert (
+            "install.ps1" in source
+        ), "README.md must point at scripts/install.ps1 for Windows users"
 
 
 # ---------------------------------------------------------------------------
@@ -472,17 +490,17 @@ class TestWebServerPtyBridgeGuard:
         root = Path(__file__).resolve().parents[2]
         source = (root / "ReYMeN_cli" / "web_server.py").read_text(encoding="utf-8")
         assert "_PTY_BRIDGE_AVAILABLE" in source
-        assert "except ImportError" in source, (
-            "web_server.py must wrap the pty_bridge import in try/except ImportError"
-        )
+        assert (
+            "except ImportError" in source
+        ), "web_server.py must wrap the pty_bridge import in try/except ImportError"
 
     def test_pty_handler_checks_availability_flag(self):
         """The /api/pty handler must short-circuit when the bridge is unavailable."""
         root = Path(__file__).resolve().parents[2]
         source = (root / "ReYMeN_cli" / "web_server.py").read_text(encoding="utf-8")
-        assert "if not _PTY_BRIDGE_AVAILABLE" in source, (
-            "/api/pty handler must return a friendly error when PTY is unavailable"
-        )
+        assert (
+            "if not _PTY_BRIDGE_AVAILABLE" in source
+        ), "/api/pty handler must return a friendly error when PTY is unavailable"
 
 
 # ---------------------------------------------------------------------------
@@ -516,11 +534,13 @@ class TestSubprocessCompatHelpers:
 
     def test_is_windows_matches_sys_platform(self):
         from ReYMeN_cli import _subprocess_compat as sc
+
         assert sc.IS_WINDOWS == (sys.platform == "win32")
 
     def test_resolve_node_command_returns_absolute_on_posix(self):
         """On Linux, resolve_node_command('sh', ['-c','echo hi']) picks up /bin/sh."""
         from ReYMeN_cli._subprocess_compat import resolve_node_command
+
         # We can't assert "npm is on PATH" portably; use `sh` which is
         # guaranteed on POSIX.  On Windows the test only confirms the
         # no-crash fallback path.
@@ -531,9 +551,8 @@ class TestSubprocessCompatHelpers:
 
     def test_resolve_node_command_fallback_when_absent(self):
         from ReYMeN_cli._subprocess_compat import resolve_node_command
-        argv = resolve_node_command(
-            "zzz-definitely-not-on-path-xyzzy", ["--help"]
-        )
+
+        argv = resolve_node_command("zzz-definitely-not-on-path-xyzzy", ["--help"])
         # Must fall back to the bare name — NOT return None, NOT crash.
         assert argv[0] == "zzz-definitely-not-on-path-xyzzy"
         assert argv[1:] == ["--help"]
@@ -544,6 +563,7 @@ class TestSubprocessCompatHelpers:
             windows_detach_flags_without_breakaway,
             windows_hide_flags,
         )
+
         if sys.platform != "win32":
             assert windows_detach_flags() == 0
             assert windows_detach_flags_without_breakaway() == 0
@@ -551,6 +571,7 @@ class TestSubprocessCompatHelpers:
 
     def test_windows_detach_popen_kwargs_is_posix_equivalent_on_posix(self):
         from ReYMeN_cli._subprocess_compat import windows_detach_popen_kwargs
+
         kwargs = windows_detach_popen_kwargs()
         if sys.platform != "win32":
             # POSIX path MUST produce start_new_session=True, which maps to
@@ -569,6 +590,7 @@ class TestSubprocessCompatHelpers:
     def test_windows_detach_flags_has_expected_win32_bits(self, monkeypatch):
         """Simulate Windows to verify flag bundle."""
         from ReYMeN_cli import _subprocess_compat as sc
+
         monkeypatch.setattr(sc, "IS_WINDOWS", True)
         flags = sc.windows_detach_flags()
         # CREATE_NEW_PROCESS_GROUP | DETACHED_PROCESS | CREATE_NO_WINDOW |
@@ -593,6 +615,7 @@ class TestSubprocessCompatHelpers:
         stay in the default bundle going forward.
         """
         from ReYMeN_cli import _subprocess_compat as sc
+
         monkeypatch.setattr(sc, "IS_WINDOWS", True)
         assert sc.windows_detach_flags() & 0x01000000, (
             "CREATE_BREAKAWAY_FROM_JOB (0x01000000) must remain in the "
@@ -613,6 +636,7 @@ class TestSubprocessCompatHelpers:
         are still required for the child to survive the parent's exit.
         """
         from ReYMeN_cli import _subprocess_compat as sc
+
         monkeypatch.setattr(sc, "IS_WINDOWS", True)
         full = sc.windows_detach_flags()
         fallback = sc.windows_detach_flags_without_breakaway()
@@ -679,7 +703,7 @@ class TestKanbanWaitpidWindowsGuard:
         #   `if os.name == "nt": return []` (early-return guard).
         # Both correctly keep the waitpid loop off Windows; the early-return
         # form is stronger because the rest of the function never runs.
-        preamble = source[max(0, idx - 400):idx]
+        preamble = source[max(0, idx - 400) : idx]
         guard_patterns = (
             'os.name != "nt"',
             "os.name != 'nt'",
@@ -709,12 +733,12 @@ class TestCodeExecutionTransportTcpFallback:
         root = Path(__file__).resolve().parents[2]
         source = (root / "tools" / "code_execution_tool.py").read_text(encoding="utf-8")
         # _UDS_TRANSPORT_HEADER body must parse both transports.
-        assert 'endpoint.startswith("tcp://")' in source, (
-            "generated sandbox client must accept tcp:// endpoints for Windows"
-        )
-        assert "socket.AF_INET" in source, (
-            "generated sandbox client must be able to open AF_INET sockets"
-        )
+        assert (
+            'endpoint.startswith("tcp://")' in source
+        ), "generated sandbox client must accept tcp:// endpoints for Windows"
+        assert (
+            "socket.AF_INET" in source
+        ), "generated sandbox client must be able to open AF_INET sockets"
 
     def test_server_side_branches_on_use_tcp_rpc(self):
         root = Path(__file__).resolve().parents[2]
@@ -738,9 +762,9 @@ class TestCronSchedulerBashResolution:
         # The old hardcoded path should be gone as the sole bash source.
         # It may still appear as a POSIX fallback after shutil.which(), so
         # we check for the shutil.which call near the .sh/.bash branch.
-        assert 'shutil.which("bash")' in source, (
-            "cron.scheduler must resolve bash dynamically via shutil.which"
-        )
+        assert (
+            'shutil.which("bash")' in source
+        ), "cron.scheduler must resolve bash dynamically via shutil.which"
 
     def test_error_message_when_bash_missing(self):
         root = Path(__file__).resolve().parents[2]
@@ -799,7 +823,7 @@ class TestNpmBareSpawnsResolved:
                     break
                 # Look at the preceding 120 chars — if "shutil.which" appears
                 # there, or the pattern is inside a comment/string, it's fine.
-                context = source[max(0, idx - 120):idx]
+                context = source[max(0, idx - 120) : idx]
                 if "#" in context.split("\n")[-1]:
                     idx += len(pat)
                     continue
@@ -828,13 +852,15 @@ class TestLocalEnvironmentWindowsTempDir:
         env = LocalEnvironment(cwd="/tmp", timeout=10, env={})
         tmp_dir = env.get_temp_dir()
         if sys.platform != "win32":
-            assert tmp_dir.startswith("/"), (
-                f"POSIX temp dir must start with '/'; got {tmp_dir!r}"
-            )
+            assert tmp_dir.startswith(
+                "/"
+            ), f"POSIX temp dir must start with '/'; got {tmp_dir!r}"
 
     def test_source_has_windows_branch_using_ReYMeN_home(self):
         root = Path(__file__).resolve().parents[2]
-        source = (root / "tools" / "environments" / "local.py").read_text(encoding="utf-8")
+        source = (root / "tools" / "environments" / "local.py").read_text(
+            encoding="utf-8"
+        )
         assert "if _IS_WINDOWS:" in source
         assert "get_reymen_home" in source
         assert 'cache_dir = get_reymen_home() / "cache" / "terminal"' in source
@@ -864,6 +890,7 @@ class TestGitBashPathNormalization:
     def test_posix_noop(self):
         """Must NOT mutate paths on Linux/macOS."""
         from cli import _normalize_git_bash_path
+
         if sys.platform != "win32":
             assert _normalize_git_bash_path("/home/teknium/foo") == "/home/teknium/foo"
             assert _normalize_git_bash_path("/c/Users/foo") == "/c/Users/foo"
@@ -872,11 +899,13 @@ class TestGitBashPathNormalization:
 
     def test_empty_string_preserved(self):
         from cli import _normalize_git_bash_path
+
         assert _normalize_git_bash_path("") == ""
 
     def test_windows_translation(self, monkeypatch):
         """Simulate Windows and verify /c/Users/... becomes C:\\Users\\..."""
         import cli as cli_mod
+
         monkeypatch.setattr(cli_mod.sys, "platform", "win32")
         assert cli_mod._normalize_git_bash_path("/c/Users/foo") == r"C:\Users\foo"
         assert cli_mod._normalize_git_bash_path("/C/Users/foo") == r"C:\Users\foo"
@@ -918,9 +947,9 @@ class TestGatewayDetachedWatcherWindowsFlags:
     def test_ReYMeN_cli_gateway_uses_compat_kwargs(self):
         root = Path(__file__).resolve().parents[2]
         source = (root / "ReYMeN_cli" / "gateway.py").read_text(encoding="utf-8")
-        assert "windows_detach_popen_kwargs" in source, (
-            "ReYMeN_cli/gateway.py must use the platform-aware detach helper"
-        )
+        assert (
+            "windows_detach_popen_kwargs" in source
+        ), "ReYMeN_cli/gateway.py must use the platform-aware detach helper"
         # The legacy start_new_session=True on the outer Popen should be
         # replaced by **windows_detach_popen_kwargs(). Inside the watcher
         # STRING the old pattern is replaced by explicit creationflags.
@@ -934,7 +963,9 @@ class TestGatewayDetachedWatcherWindowsFlags:
         # Windows branch uses windows_detach_popen_kwargs
         assert "windows_detach_popen_kwargs" in source
 
-    def test_launch_detached_profile_gateway_restart_inlined_watcher_uses_breakaway(self):
+    def test_launch_detached_profile_gateway_restart_inlined_watcher_uses_breakaway(
+        self,
+    ):
         """The inlined respawn script (stringified Python passed to ``python -c``)
         must include CREATE_BREAKAWAY_FROM_JOB so the *respawned gateway* also
         breaks away from any job-object the watcher itself inherits.

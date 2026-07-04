@@ -41,7 +41,9 @@ class Sandbox:
         self.exit_code: Optional[int] = None
         self._proc: Optional[subprocess.Popen] = None
 
-    def calistir(self, komut: list[str], timeout: int = AZAMI_SURE, env: Optional[dict] = None) -> dict:
+    def calistir(
+        self, komut: list[str], timeout: int = AZAMI_SURE, env: Optional[dict] = None
+    ) -> dict:
         """Sandbox'da komut çalıştır."""
         self.durum = "calisiyor"
         self.baslama = time.time()
@@ -61,7 +63,9 @@ class Sandbox:
                 cwd=str(self.dizin),
                 env=sandbox_env,
                 text=True,
-                creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0,
+                creationflags=subprocess.CREATE_NO_WINDOW
+                if sys.platform == "win32"
+                else 0,
             )
 
             try:

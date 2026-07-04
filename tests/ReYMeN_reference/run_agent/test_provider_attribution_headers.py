@@ -1,4 +1,5 @@
 """Attribution default_headers applied per provider via base-URL detection."""
+
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
@@ -55,7 +56,10 @@ def test_nvidia_cloud_base_url_applies_billing_origin_header(mock_openai):
         skip_memory=True,
     )
 
-    assert agent._client_kwargs["default_headers"]["X-BILLING-INVOKE-ORIGIN"] == "ReYMeNAgent"
+    assert (
+        agent._client_kwargs["default_headers"]["X-BILLING-INVOKE-ORIGIN"]
+        == "ReYMeNAgent"
+    )
 
     agent._apply_client_headers_for_base_url("https://integrate.api.nvidia.com/v1")
 
@@ -93,10 +97,13 @@ def test_routed_client_preserves_openai_sdk_custom_headers(mock_openai):
         _custom_headers={"X-BILLING-INVOKE-ORIGIN": "ReYMeNAgent"},
     )
 
-    with patch("agent.auxiliary_client.resolve_provider_client", return_value=(
-        routed_client,
-        "nvidia/test-model",
-    )):
+    with patch(
+        "agent.auxiliary_client.resolve_provider_client",
+        return_value=(
+            routed_client,
+            "nvidia/test-model",
+        ),
+    ):
         agent = AIAgent(
             provider="nvidia",
             model="nvidia/test-model",
@@ -165,9 +172,12 @@ def test_openrouter_headers_include_response_cache_when_enabled(mock_openai):
         skip_memory=True,
     )
 
-    with patch("ReYMeN_cli.config.load_config", return_value={
-        "openrouter": {"response_cache": True, "response_cache_ttl": 600},
-    }):
+    with patch(
+        "ReYMeN_cli.config.load_config",
+        return_value={
+            "openrouter": {"response_cache": True, "response_cache_ttl": 600},
+        },
+    ):
         agent._apply_client_headers_for_base_url("https://openrouter.ai/api/v1")
 
     headers = agent._client_kwargs["default_headers"]
@@ -196,9 +206,12 @@ def test_user_default_headers_override_sdk_user_agent(mock_openai):
         skip_memory=True,
     )
 
-    with patch("ReYMeN_cli.config.load_config", return_value={
-        "model": {"default_headers": {"User-Agent": "curl/8.7.1", "X-Extra": "1"}},
-    }):
+    with patch(
+        "ReYMeN_cli.config.load_config",
+        return_value={
+            "model": {"default_headers": {"User-Agent": "curl/8.7.1", "X-Extra": "1"}},
+        },
+    ):
         agent._apply_client_headers_for_base_url("http://localhost:8080/v1")
 
     headers = agent._client_kwargs["default_headers"]
@@ -219,14 +232,19 @@ def test_user_default_headers_win_over_provider_defaults(mock_openai):
         skip_memory=True,
     )
 
-    with patch("ReYMeN_cli.config.load_config", return_value={
-        "model": {"default_headers": {"X-Title": "MyApp"}},
-    }):
+    with patch(
+        "ReYMeN_cli.config.load_config",
+        return_value={
+            "model": {"default_headers": {"X-Title": "MyApp"}},
+        },
+    ):
         agent._apply_client_headers_for_base_url("https://openrouter.ai/api/v1")
 
     headers = agent._client_kwargs["default_headers"]
     assert headers["X-Title"] == "MyApp"  # user override wins
-    assert headers["HTTP-Referer"] == "https://ReYMeN-agent.nousresearch.com"  # default preserved
+    assert (
+        headers["HTTP-Referer"] == "https://ReYMeN-agent.nousresearch.com"
+    )  # default preserved
 
 
 @patch("run_agent.OpenAI")
@@ -265,9 +283,12 @@ def test_user_default_headers_skipped_for_anthropic_mode(mock_openai):
     agent.api_mode = "anthropic_messages"
     agent._client_kwargs = {}
 
-    with patch("ReYMeN_cli.config.load_config", return_value={
-        "model": {"default_headers": {"User-Agent": "curl/8.7.1"}},
-    }):
+    with patch(
+        "ReYMeN_cli.config.load_config",
+        return_value={
+            "model": {"default_headers": {"User-Agent": "curl/8.7.1"}},
+        },
+    ):
         agent._apply_user_default_headers()
 
     assert "default_headers" not in agent._client_kwargs
@@ -286,9 +307,12 @@ def test_openrouter_headers_no_cache_when_disabled(mock_openai):
         skip_memory=True,
     )
 
-    with patch("ReYMeN_cli.config.load_config", return_value={
-        "openrouter": {"response_cache": False},
-    }):
+    with patch(
+        "ReYMeN_cli.config.load_config",
+        return_value={
+            "openrouter": {"response_cache": False},
+        },
+    ):
         agent._apply_client_headers_for_base_url("https://openrouter.ai/api/v1")
 
     headers = agent._client_kwargs["default_headers"]

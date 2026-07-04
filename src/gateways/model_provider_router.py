@@ -34,47 +34,47 @@ logger = logging.getLogger(__name__)
 # config.yaml'da model_providers: yoksa kullanılır
 VARSAYILAN_MODEL_PROVIDER_MAP: dict[str, str] = {
     # DeepSeek
-    "deepseek-v4-flash":          "deepseek",
-    "deepseek-v3":                "deepseek",
-    "deepseek-chat":              "deepseek",
-    "deepseek-reasoner":          "deepseek",
-    "deepseek-r1":                "deepseek",
+    "deepseek-v4-flash": "deepseek",
+    "deepseek-v3": "deepseek",
+    "deepseek-chat": "deepseek",
+    "deepseek-reasoner": "deepseek",
+    "deepseek-r1": "deepseek",
     # OpenAI
-    "gpt-4o":                     "openai",
-    "gpt-4o-mini":                "openai",
-    "gpt-4-turbo":                "openai",
-    "gpt-3.5-turbo":              "openai",
-    "o1":                         "openai",
-    "o3-mini":                    "openai",
+    "gpt-4o": "openai",
+    "gpt-4o-mini": "openai",
+    "gpt-4-turbo": "openai",
+    "gpt-3.5-turbo": "openai",
+    "o1": "openai",
+    "o3-mini": "openai",
     # Anthropic
-    "claude-sonnet-4":            "anthropic",
-    "claude-sonnet-4-20250514":   "anthropic",
-    "claude-3-5-sonnet":          "anthropic",
-    "claude-3-opus":              "anthropic",
-    "claude-3-haiku":             "anthropic",
+    "claude-sonnet-4": "anthropic",
+    "claude-sonnet-4-20250514": "anthropic",
+    "claude-3-5-sonnet": "anthropic",
+    "claude-3-opus": "anthropic",
+    "claude-3-haiku": "anthropic",
     # OpenRouter
-    "openrouter/auto":            "openrouter",
-    "openrouter/deepseek":        "openrouter",
-    "openrouter/llama":           "openrouter",
-    "openrouter/mistral":         "openrouter",
+    "openrouter/auto": "openrouter",
+    "openrouter/deepseek": "openrouter",
+    "openrouter/llama": "openrouter",
+    "openrouter/mistral": "openrouter",
     # Groq
-    "groq/llama3":                "groq",
-    "groq/mixtral":               "groq",
-    "groq/deepseek":              "groq",
-    "groq/gemma":                 "groq",
+    "groq/llama3": "groq",
+    "groq/mixtral": "groq",
+    "groq/deepseek": "groq",
+    "groq/gemma": "groq",
     # Azure OpenAI
-    "azure/gpt-4o":               "azure",
-    "azure/gpt-4":                "azure",
+    "azure/gpt-4o": "azure",
+    "azure/gpt-4": "azure",
     # Gemini
-    "gemini-pro":                 "gemini",
-    "gemini-1.5-pro":             "gemini",
-    "gemini-1.5-flash":           "gemini",
+    "gemini-pro": "gemini",
+    "gemini-1.5-pro": "gemini",
+    "gemini-1.5-flash": "gemini",
     # LM Studio (yerel)
-    "lm-studio/default":          "lmstudio",
-    "local-model":                "lmstudio",
+    "lm-studio/default": "lmstudio",
+    "local-model": "lmstudio",
     # Amazon Bedrock
-    "bedrock/claude":             "bedrock",
-    "bedrock/llama":              "bedrock",
+    "bedrock/claude": "bedrock",
+    "bedrock/llama": "bedrock",
 }
 
 # Provider→failover sırası (varsayılan)
@@ -91,43 +91,45 @@ VARSAYILAN_FAILOVER_ZINCIRI: list[list[str]] = [
 
 # Provider tipi → API uyumluluğu
 PROVIDER_API_TIPI: dict[str, str] = {
-    "openrouter":   "openai",
-    "openai":       "openai",
-    "deepseek":     "openai",
-    "groq":         "openai",
-    "azure":        "openai",
-    "gemini":       "openai",
-    "anthropic":    "anthropic",
-    "bedrock":      "bedrock",
-    "lmstudio":     "openai",
+    "openrouter": "openai",
+    "openai": "openai",
+    "deepseek": "openai",
+    "groq": "openai",
+    "azure": "openai",
+    "gemini": "openai",
+    "anthropic": "anthropic",
+    "bedrock": "bedrock",
+    "lmstudio": "openai",
 }
 
 # Provider → varsayılan model
 PROVIDER_VARSAYILAN_MODEL: dict[str, str] = {
-    "deepseek":     "deepseek-v4-flash",
-    "openai":       "gpt-4o",
-    "anthropic":    "claude-sonnet-4-20250514",
-    "openrouter":   "openrouter/auto",
-    "groq":         "groq/llama3",
-    "azure":        "azure/gpt-4o",
-    "gemini":       "gemini-1.5-pro",
-    "bedrock":      "bedrock/claude",
-    "lmstudio":     "lm-studio/default",
+    "deepseek": "deepseek-v4-flash",
+    "openai": "gpt-4o",
+    "anthropic": "claude-sonnet-4-20250514",
+    "openrouter": "openrouter/auto",
+    "groq": "groq/llama3",
+    "azure": "azure/gpt-4o",
+    "gemini": "gemini-1.5-pro",
+    "bedrock": "bedrock/claude",
+    "lmstudio": "lm-studio/default",
 }
 
 
 # ── Veri Yapıları ───────────────────────────────────────────────────────────
 
+
 @dataclass
 class ModelYonlendirmeKarari:
     """Model yönlendirme kararı — hangi provider'a, hangi model adıyla gidilecek."""
-    model: str                          # LLM'e gönderilecek model adı
-    provider: str                       # Provider adı (deepseek, openai vb.)
-    api_tipi: str                       # API uyumluluk tipi (openai/anthropic/bedrock)
-    base_url: str                       # Provider base URL
-    api_key: str                        # API anahtarı
+
+    model: str  # LLM'e gönderilecek model adı
+    provider: str  # Provider adı (deepseek, openai vb.)
+    api_tipi: str  # API uyumluluk tipi (openai/anthropic/bedrock)
+    base_url: str  # Provider base URL
+    api_key: str  # API anahtarı
     failover_zinciri: list[str] = field(default_factory=list)  # Yedek provider listesi
-    orijinal_model: str = ""            # İstenen orijinal model adı
+    orijinal_model: str = ""  # İstenen orijinal model adı
 
     def __post_init__(self):
         if not self.orijinal_model:
@@ -135,6 +137,7 @@ class ModelYonlendirmeKarari:
 
 
 # ── Ana Sınıf ───────────────────────────────────────────────────────────────
+
 
 class ModelProviderRouter:
     """Model→Provider yönlendirme + failover zinciri yönetimi.
@@ -187,10 +190,12 @@ class ModelProviderRouter:
         yollar = []
         if config_yolu:
             yollar.append(Path(config_yolu))
-        yollar.extend([
-            Path.cwd() / "config.yaml",
-            Path(__file__).resolve().parent.parent.parent / "config.yaml",
-        ])
+        yollar.extend(
+            [
+                Path.cwd() / "config.yaml",
+                Path(__file__).resolve().parent.parent.parent / "config.yaml",
+            ]
+        )
 
         for y in yollar:
             if y.exists():
@@ -228,7 +233,9 @@ class ModelProviderRouter:
 
     # ── Model Yönlendirme ────────────────────────────────────────────────
 
-    def model_route(self, model: str, provider_override: Optional[str] = None) -> ModelYonlendirmeKarari:
+    def model_route(
+        self, model: str, provider_override: Optional[str] = None
+    ) -> ModelYonlendirmeKarari:
         """Bir model adını çözümle: hangi provider, hangi API tipi, hangi URL.
 
         Args:
@@ -243,7 +250,7 @@ class ModelProviderRouter:
         with self._lock:
             # Provider override varsa onu kullan
             if provider_override:
-                    provider = provider_override
+                provider = provider_override
             else:
                 # Model→Provider haritasında ara
                 provider = self._model_provider_map.get(model_adi)
@@ -261,7 +268,9 @@ class ModelProviderRouter:
                     provider = "deepseek"
                     logger.warning(
                         "[ModelRouter] '%s' modeli için provider bulunamadı, "
-                        "varsayılan: %s", model_adi, provider,
+                        "varsayılan: %s",
+                        model_adi,
+                        provider,
                     )
 
             # Provider yapılandırmasını al
@@ -271,6 +280,7 @@ class ModelProviderRouter:
             api_key_env = prov_yapi.get("api_key_env", "")
             if not api_key and api_key_env:
                 import os
+
                 api_key = os.environ.get(api_key_env, "")
 
             # API tipini belirle
@@ -332,6 +342,7 @@ class ModelProviderRouter:
             api_key_env = yapi.get("api_key_env", "")
             if not api_key and api_key_env:
                 import os
+
                 api_key = os.environ.get(api_key_env, "")
             if base_url:
                 provider_list.append((ad, base_url, api_key))
@@ -392,18 +403,18 @@ class ModelProviderRouter:
             if provider_filtre and provider_adi != provider_filtre:
                 continue
             api_tipi = PROVIDER_API_TIPI.get(provider_adi, "openai")
-            sonuc.append({
-                "model": model_adi,
-                "provider": provider_adi,
-                "api_tipi": api_tipi,
-            })
+            sonuc.append(
+                {
+                    "model": model_adi,
+                    "provider": provider_adi,
+                    "api_tipi": api_tipi,
+                }
+            )
         return sonuc
 
     def provider_modelleri(self, provider: str) -> list[str]:
         """Bir provider'daki tüm modelleri listele."""
-        return [
-            m for m, p in self._model_provider_map.items() if p == provider
-        ]
+        return [m for m, p in self._model_provider_map.items() if p == provider]
 
 
 # ── Singleton ────────────────────────────────────────────────────────────────
@@ -429,5 +440,7 @@ def router_al(
                 )
     elif config_yolu or model_provider_map or failover_zinciri:
         # İlk kurulumdan sonra parametre değişikliği — log uyar
-        logger.warning("[ModelRouter] router_al() parametreleri singleton sonrası yok sayıldı")
+        logger.warning(
+            "[ModelRouter] router_al() parametreleri singleton sonrası yok sayıldı"
+        )
     return _router

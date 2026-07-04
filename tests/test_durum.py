@@ -1,4 +1,5 @@
 """Test: reymen.sistem.durum — merkezi durum.json okuyucu."""
+
 import sys, os, json, tempfile
 from pathlib import Path
 from unittest.mock import patch, MagicMock
@@ -6,9 +7,7 @@ from unittest.mock import patch, MagicMock
 # Proje kokunu path'e ekle
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
-from src.reymen.sistem.durum import (
-    _yukle, _ozet, _detayli, durum_oku, motor_kaydet
-)
+from src.reymen.sistem.durum import _yukle, _ozet, _detayli, durum_oku, motor_kaydet
 
 
 class TestYukle:
@@ -16,7 +15,9 @@ class TestYukle:
 
     def test_dosya_yoksa_hata_dict_dondurur(self):
         """Dosya yoksa {'hata': ...} dondurur."""
-        with patch("reymen.sistem.durum.DURUM_DOSYASI", Path("/nonexistent/durum.json")):
+        with patch(
+            "reymen.sistem.durum.DURUM_DOSYASI", Path("/nonexistent/durum.json")
+        ):
             sonuc = _yukle()
             assert "hata" in sonuc
             assert "bulunamadi" in sonuc["hata"]
@@ -51,33 +52,37 @@ class TestOzet:
         "tamam": 5,
         "isleniyor": 3,
         "cozulen_8_onceki": {
-            "tamam": 4, "toplam": 8,
-            "maddeler": {"test_madde": {"detay": "test detay"}}
+            "tamam": 4,
+            "toplam": 8,
+            "maddeler": {"test_madde": {"detay": "test detay"}},
         },
         "cozulen_10_ikinci_dalga": {
-            "tamam": 6, "toplam": 10,
-            "maddeler": {"test_madde2": {"detay": "detay2", "oncelik": "YUKSEK"}}
+            "tamam": 6,
+            "toplam": 10,
+            "maddeler": {"test_madde2": {"detay": "detay2", "oncelik": "YUKSEK"}},
         },
         "cozulen_4_kismen": {
-            "tamam": 2, "toplam": 4,
-            "maddeler": {"kismen_madde": {"detay": "kismen", "oncelik": "ORTA"}}
+            "tamam": 2,
+            "toplam": 4,
+            "maddeler": {"kismen_madde": {"detay": "kismen", "oncelik": "ORTA"}},
         },
         "mevcut_eksikler": {
-            "tamam": 3, "toplam": 15,
+            "tamam": 3,
+            "toplam": 15,
             "maddeler": {
                 "eksik1": {"durum": "tamam", "oncelik": "YUKSEK"},
                 "eksik2": {"durum": "kismen", "oncelik": "ORTA"},
                 "eksik3": {"durum": "stub", "oncelik": "DUSUK"},
                 "eksik4": {"durum": "eksik", "oncelik": "ACIL", "cozuluyor": True},
-            }
+            },
         },
         "pasa_38_karsilastirmasi": {
             "aciklama": "karsilastirma test",
             "maddeler": [
                 {"eksik": "test1", "cozuldu_mu": "evet", "ReYMeN": "var"},
                 {"eksik": "test2", "cozuldu_mu": "hayir", "ReYMeN": "yok"},
-            ]
-        }
+            ],
+        },
     }
 
     def test_ozet_metin_dondurur(self):

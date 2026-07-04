@@ -23,10 +23,13 @@ logger = logging.getLogger(__name__)
 # --- YAML yükleyici (try/except ile) ---
 try:
     import yaml
+
     _YAML_AVAILABLE = True
 except ImportError:
     _YAML_AVAILABLE = False
-    logger.warning("PyYAML kurulu degil. JSON fallback kullanilacak. pip install pyyaml")
+    logger.warning(
+        "PyYAML kurulu degil. JSON fallback kullanilacak. pip install pyyaml"
+    )
 
 
 def load_yaml_safe(path: Path) -> Optional[Dict[str, Any]]:
@@ -80,7 +83,7 @@ def load_config(config_path: Optional[str] = None) -> Dict[str, Any]:
     if config_path is None:
         # Proje kökünü bul (config_loader.py'nin bulunduğu dizin)
         config_path = str(Path(__file__).parent / "config.yaml")
-    
+
     yaml_path = Path(config_path)
     yaml_cfg = load_yaml_safe(yaml_path) or {}
 
@@ -97,17 +100,21 @@ def load_config(config_path: Optional[str] = None) -> Dict[str, Any]:
             "REYMEN_DEFAULT_PROVIDER",
             "lmstudio",
         ),
-        "max_turns": int(_env_or(
-            str(general.get("max_turns", 15)),
-            "REYMEN_MAX_TURNS",
-            "15",
-        )),
+        "max_turns": int(
+            _env_or(
+                str(general.get("max_turns", 15)),
+                "REYMEN_MAX_TURNS",
+                "15",
+            )
+        ),
         "secure_binding": general.get("secure_binding", True),
-        "memory_char_limit": int(_env_or(
-            str(general.get("memory_char_limit", 50000)),
-            "REYMEN_MEMORY_CHAR_LIMIT",
-            "50000",
-        )),
+        "memory_char_limit": int(
+            _env_or(
+                str(general.get("memory_char_limit", 50000)),
+                "REYMEN_MEMORY_CHAR_LIMIT",
+                "50000",
+            )
+        ),
     }
 
     # ── Sağlayıcılar ───────────────────────────────────────────────
@@ -195,6 +202,7 @@ def load_config(config_path: Optional[str] = None) -> Dict[str, Any]:
     # ── Profil yukleme (multi-profile sistemi) ─────────────────────
     try:
         from reymen.sistem.profile_manager import get_profile_manager
+
         pm = get_profile_manager(str(yaml_path))
         aktif_profil = pm.aktif_profil_al()
         profil_bilgi = pm.aktif_profil_bilgisi()
@@ -222,7 +230,9 @@ def load_config(config_path: Optional[str] = None) -> Dict[str, Any]:
         logger.info(f"Aktif profil: {aktif_profil}")
     except ImportError:
         result["active_profile"] = "reyment"
-        logger.debug("profile_manager modulu bulunamadi, varsayilan profil kullaniliyor")
+        logger.debug(
+            "profile_manager modulu bulunamadi, varsayilan profil kullaniliyor"
+        )
     except Exception as e:
         result["active_profile"] = "reyment"
         logger.warning(f"Profil yukleme hatasi: {e}")
@@ -230,18 +240,24 @@ def load_config(config_path: Optional[str] = None) -> Dict[str, Any]:
     return result
 
 
-def merge_with_existing(yaml_config: Dict[str, Any],
-                        existing_config: Dict[str, Any]) -> Dict[str, Any]:
+def merge_with_existing(
+    yaml_config: Dict[str, Any], existing_config: Dict[str, Any]
+) -> Dict[str, Any]:
     """YAML config'i mevcut CONFIG dict ile birleştir.
-    
+
     Mevcut dict'te olup YAML'da olmayan alanlar korunur.
     YAML değerleri sadece mevcut dict boşsa veya override edilecekse yazılır.
     """
     merged = dict(existing_config)
 
     # Genel
-    for key in ("default_model", "default_provider", "secure_binding", "memory_char_limit",
-                "skills_dir"):
+    for key in (
+        "default_model",
+        "default_provider",
+        "secure_binding",
+        "memory_char_limit",
+        "skills_dir",
+    ):
         if key in yaml_config:
             merged[key] = yaml_config[key]
 
@@ -275,8 +291,13 @@ def merge_with_existing(yaml_config: Dict[str, Any],
                     tg[key] = yaml_config["telegram"].get(key, "")
 
     # Yeni config anahtarlari (main.py CONFIG'inde olmayanlar)
-    for key in ("state_machine", "service_bridge", "auto_recovery",
-                "auto_recovery_components", "logging"):
+    for key in (
+        "state_machine",
+        "service_bridge",
+        "auto_recovery",
+        "auto_recovery_components",
+        "logging",
+    ):
         if key in yaml_config:
             merged[key] = yaml_config[key]
 
@@ -300,12 +321,13 @@ if __name__ == "__main__":
 def config_guncelle(anahtar: str, deger: str) -> str:
     """config.yaml'da bir anahtari guncelle. Basit metin degistirme."""
     import re
+
     yaml_path = Path(__file__).parent / "config.yaml"
     if not yaml_path.exists():
         return f"HATA: config.yaml bulunamadi: {yaml_path}"
-    
+
     icerik = yaml_path.read_text(encoding="utf-8")
-    
+
     if anahtar in ("model", "provider"):
         # model: xxx veya provider: xxx satirini bul (basta bosluk olabilir)
         yeni, sayi = re.subn(
@@ -313,12 +335,12 @@ def config_guncelle(anahtar: str, deger: str) -> str:
             rf"\g<1>{anahtar}: {deger}",
             icerik,
             count=1,
-            flags=re.MULTILINE
+            flags=re.MULTILINE,
         )
         if sayi == 0:
             # Bulunamadiysa en basa ekle
             yeni = f"{anahtar}: {deger}\n" + icerik
         yaml_path.write_text(yeni, encoding="utf-8")
         return f"config.yaml -> {anahtar}: {deger}"
-    
+
     return f"Bilinmeyen anahtar: {anahtar} (model/provider desteklenir)"

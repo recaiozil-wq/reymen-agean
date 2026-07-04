@@ -21,6 +21,7 @@ def delegate_task(*args, **kwargs) -> Any:
     """
     try:
         from reymen.tools.delegate_task_tool import delegate_task as _real_delegate
+
         return _real_delegate(*args, **kwargs)
     except ImportError as _e:
         logger.warning("delegate_task_tool yüklenemedi, stub kullanılıyor: %s", _e)
@@ -35,6 +36,7 @@ def motor_kaydet(motor) -> None:
     """
     try:
         from reymen.tools.delegate_task_tool import motor_kaydet as _real_kaydet
+
         _real_kaydet(motor)
     except ImportError as _e:
         logger.warning("delegate_task_tool yüklenemedi, tool kaydedilemedi: %s", _e)

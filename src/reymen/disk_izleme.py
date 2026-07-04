@@ -1,4 +1,5 @@
 """disk_izleme.py — Günlük disk + DB boyut kontrolü."""
+
 import shutil, json
 from pathlib import Path
 
@@ -26,8 +27,10 @@ if si_db.exists():
 
 # .old yaş kontrolü
 for f in sorted(PROJE.rglob("*.old")):
-    yas = (__import__('datetime').datetime.now() - 
-           __import__('datetime').datetime.fromtimestamp(f.stat().st_mtime)).days
+    yas = (
+        __import__("datetime").datetime.now()
+        - __import__("datetime").datetime.fromtimestamp(f.stat().st_mtime)
+    ).days
     if yas > 7:
         rapor.append(f"⚠️ {f.name}: {yas} günlük .old — silinebilir")
 

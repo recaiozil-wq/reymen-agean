@@ -96,6 +96,7 @@ class Display:
         """Terminal genisligini dondurur."""
         try:
             import shutil
+
             return shutil.get_terminal_size().columns
         except Exception:
             return 80
@@ -215,10 +216,7 @@ class Display:
             return ""
 
     def _renkli_tablo_yaz(
-        self,
-        tablo_metni: str,
-        baslik_renk: str,
-        satir_renk: str
+        self, tablo_metni: str, baslik_renk: str, satir_renk: str
     ) -> None:
         """Renkli tablo yazdirir."""
         try:
@@ -232,11 +230,7 @@ class Display:
             print(tablo_metni)
 
     def progress_bar(
-        self,
-        ilerleme: int,
-        toplam: int,
-        genislik: int = 40,
-        baslik: str = ""
+        self, ilerleme: int, toplam: int, genislik: int = 40, baslik: str = ""
     ) -> str:
         """
         Progress bar gosterir.

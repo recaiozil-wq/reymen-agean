@@ -25,9 +25,9 @@ from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
 
+
 class MixinVoice:
     """ReYMeNCLI Ses/voice metotları."""
-
 
     def _voice_record_key_label(self) -> str:
         """Return the configured voice push-to-talk key formatted for UI.
@@ -52,8 +52,6 @@ class MixinVoice:
         """
         return getattr(self, "_voice_record_key_display_cache", None) or "Ctrl+B"
 
-
-
     def set_voice_record_key_cache(self, raw_key: object) -> None:
         """Populate the voice label cache from a raw ``voice.record_key``.
 
@@ -62,15 +60,16 @@ class MixinVoice:
         """
         try:
             from reymen.reymen_cli.voice import format_voice_record_key_for_status
-            self._voice_record_key_display_cache = format_voice_record_key_for_status(raw_key)
+
+            self._voice_record_key_display_cache = format_voice_record_key_for_status(
+                raw_key
+            )
         except Exception:
             self._voice_record_key_display_cache = "Ctrl+B"
 
-
-
     def _voice_start_recording(self):
         """Start capturing audio from the microphone."""
-        if getattr(self, '_should_exit', False):
+        if getattr(self, "_should_exit", False):
             return
         from tools.voice_mode import create_audio_recorder, check_voice_requirements
 
@@ -116,6 +115,7 @@ class MixinVoice:
         voice_cfg: dict = {}
         try:
             from reymen.reymen_cli.config import load_config
+
             _cfg = load_config().get("voice")
             voice_cfg = _cfg if isinstance(_cfg, dict) else {}
         except Exception:
@@ -135,10 +135,14 @@ class MixinVoice:
         _threshold = voice_cfg.get("silence_threshold")
         _duration = voice_cfg.get("silence_duration")
         self._voice_recorder._silence_threshold = (
-            _threshold if isinstance(_threshold, (int, float)) and not isinstance(_threshold, bool) else 200
+            _threshold
+            if isinstance(_threshold, (int, float)) and not isinstance(_threshold, bool)
+            else 200
         )
         self._voice_recorder._silence_duration = (
-            _duration if isinstance(_duration, (int, float)) and not isinstance(_duration, bool) else 3.0
+            _duration
+            if isinstance(_duration, (int, float)) and not isinstance(_duration, bool)
+            else 3.0
         )
 
         def _on_silence():
@@ -147,7 +151,7 @@ class MixinVoice:
                 if not self._voice_recording:
                     return
             _cprint(f"\n{_DIM}Silence detected, auto-stopping...{_RST}")
-            if hasattr(self, '_app') and self._app:
+            if hasattr(self, "_app") and self._app:
                 self._app.invalidate()
             self._voice_stop_and_transcribe()
 
@@ -155,6 +159,7 @@ class MixinVoice:
         if self._voice_beeps_enabled():
             try:
                 from tools.voice_mode import play_beep
+
                 play_beep(frequency=880, count=1)
             except Exception:
                 logger.warning("[fix_01_sessiz_except] Exception")
@@ -167,7 +172,9 @@ class MixinVoice:
             raise
         _label = self._voice_record_key_label()
         if getattr(self._voice_recorder, "supports_silence_autostop", True):
-            _recording_hint = f"auto-stops on silence | {_label} to stop & exit continuous"
+            _recording_hint = (
+                f"auto-stops on silence | {_label} to stop & exit continuous"
+            )
         elif _is_termux_environment():
             _recording_hint = f"Termux:API capture | {_label} to stop"
         else:
@@ -181,12 +188,11 @@ class MixinVoice:
                     still_recording = self._voice_recording
                 if not still_recording:
                     break
-                if hasattr(self, '_app') and self._app:
+                if hasattr(self, "_app") and self._app:
                     self._app.invalidate()
                 time.sleep(0.15)
+
         threading.Thread(target=_refresh_level, daemon=True).start()
-
-
 
     def _voice_stop_and_transcribe(self):
         """Stop recording, transcribe via STT, and queue the transcript as input."""
@@ -212,6 +218,7 @@ class MixinVoice:
             if self._voice_beeps_enabled():
                 try:
                     from tools.voice_mode import play_beep
+
                     play_beep(frequency=660, count=2)
                 except Exception:
                     logger.warning("[fix_01_sessiz_except] Exception")
@@ -221,7 +228,7 @@ class MixinVoice:
                 return
 
             # _voice_processing is already True (set atomically above)
-            if hasattr(self, '_app') and self._app:
+            if hasattr(self, "_app") and self._app:
                 self._app.invalidate()
             _cprint(f"{_DIM}Transcribing...{_RST}")
 
@@ -229,18 +236,20 @@ class MixinVoice:
             stt_model = None
             try:
                 from reymen.reymen_cli.config import load_config
+
                 stt_config = load_config().get("stt", {})
                 stt_model = stt_config.get("model")
             except Exception:
                 logger.warning("[fix_01_sessiz_except] Exception")
 
             from tools.voice_mode import transcribe_recording
+
             result = transcribe_recording(wav_path, model=stt_model)
 
             if result.get("success") and result.get("transcript", "").strip():
                 transcript = result["transcript"].strip()
                 self._attached_images.clear()
-                if hasattr(self, '_app') and self._app:
+                if hasattr(self, "_app") and self._app:
                     self._app.invalidate()
                 self._pending_input.put(transcript)
                 submitted = True
@@ -257,7 +266,7 @@ class MixinVoice:
         finally:
             with self._voice_lock:
                 self._voice_processing = False
-            if hasattr(self, '_app') and self._app:
+            if hasattr(self, "_app") and self._app:
                 self._app.invalidate()
             # Clean up temp file unless transcription failed. On failure, keep
             # the source recording so long dictation is not lost.
@@ -272,11 +281,13 @@ class MixinVoice:
 
             # Track consecutive no-speech cycles to avoid infinite restart loops.
             if not submitted:
-                self._no_speech_count = getattr(self, '_no_speech_count', 0) + 1
+                self._no_speech_count = getattr(self, "_no_speech_count", 0) + 1
                 if self._no_speech_count >= 3:
                     self._voice_continuous = False
                     self._no_speech_count = 0
-                    _cprint(f"{_DIM}No speech detected 3 times, continuous mode stopped.{_RST}")
+                    _cprint(
+                        f"{_DIM}No speech detected 3 times, continuous mode stopped.{_RST}"
+                    )
                     return
             else:
                 self._no_speech_count = 0
@@ -286,16 +297,16 @@ class MixinVoice:
             # (When transcript IS submitted, process_loop handles restart
             # after chat() completes.)
             if self._voice_continuous and not submitted and not self._voice_recording:
+
                 def _restart_recording():
                     try:
                         self._voice_start_recording()
-                        if hasattr(self, '_app') and self._app:
+                        if hasattr(self, "_app") and self._app:
                             self._app.invalidate()
                     except Exception as e:
                         _cprint(f"{_DIM}Voice auto-restart failed: {e}{_RST}")
+
                 threading.Thread(target=_restart_recording, daemon=True).start()
-
-
 
     def _voice_speak_response_async(self, text: str) -> None:
         """Schedule TTS and mark it pending before continuous recording can restart."""
@@ -308,8 +319,6 @@ class MixinVoice:
             daemon=True,
         ).start()
 
-
-
     def _voice_speak_response(self, text: str):
         """Speak the agent's response aloud using TTS (runs in background thread)."""
         if not self._voice_tts:
@@ -321,25 +330,32 @@ class MixinVoice:
 
             # Strip markdown and non-speech content for cleaner TTS
             tts_text = text[:4000] if len(text) > 4000 else text
-            tts_text = re.sub(r'```[\s\S]*?```', ' ', tts_text)   # fenced code blocks
-            tts_text = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', tts_text)  # [text](url) -> text
-            tts_text = re.sub(r'https?://\S+', '', tts_text)      # URLs
-            tts_text = re.sub(r'\*\*(.+?)\*\*', r'\1', tts_text)  # bold
-            tts_text = re.sub(r'\*(.+?)\*', r'\1', tts_text)      # italic
-            tts_text = re.sub(r'`(.+?)`', r'\1', tts_text)        # inline code
-            tts_text = re.sub(r'^#+\s*', '', tts_text, flags=re.MULTILINE)  # headers
-            tts_text = re.sub(r'^\s*[-*]\s+', '', tts_text, flags=re.MULTILINE)  # list items
-            tts_text = re.sub(r'---+', '', tts_text)              # horizontal rules
-            tts_text = re.sub(r'\n{3,}', '\n\n', tts_text)        # excessive newlines
+            tts_text = re.sub(r"```[\s\S]*?```", " ", tts_text)  # fenced code blocks
+            tts_text = re.sub(
+                r"\[([^\]]+)\]\([^)]+\)", r"\1", tts_text
+            )  # [text](url) -> text
+            tts_text = re.sub(r"https?://\S+", "", tts_text)  # URLs
+            tts_text = re.sub(r"\*\*(.+?)\*\*", r"\1", tts_text)  # bold
+            tts_text = re.sub(r"\*(.+?)\*", r"\1", tts_text)  # italic
+            tts_text = re.sub(r"`(.+?)`", r"\1", tts_text)  # inline code
+            tts_text = re.sub(r"^#+\s*", "", tts_text, flags=re.MULTILINE)  # headers
+            tts_text = re.sub(
+                r"^\s*[-*]\s+", "", tts_text, flags=re.MULTILINE
+            )  # list items
+            tts_text = re.sub(r"---+", "", tts_text)  # horizontal rules
+            tts_text = re.sub(r"\n{3,}", "\n\n", tts_text)  # excessive newlines
             tts_text = tts_text.strip()
             if not tts_text:
                 return
 
             # Use MP3 output for CLI playback (afplay doesn't handle OGG well).
             # The TTS tool may auto-convert MP3->OGG, but the original MP3 remains.
-            os.makedirs(os.path.join(tempfile.gettempdir(), "ReYMeN_voice"), exist_ok=True)
+            os.makedirs(
+                os.path.join(tempfile.gettempdir(), "ReYMeN_voice"), exist_ok=True
+            )
             mp3_path = os.path.join(
-                tempfile.gettempdir(), "ReYMeN_voice",
+                tempfile.gettempdir(),
+                "ReYMeN_voice",
                 f"tts_{time.strftime('%Y%m%d_%H%M%S')}.mp3",
             )
 
@@ -362,16 +378,14 @@ class MixinVoice:
         finally:
             self._voice_tts_done.set()
 
-
-
     def _voice_beeps_enabled(self) -> bool:
         """Return whether CLI voice mode should play record start/stop beeps."""
         try:
             from reymen.reymen_cli.config import load_config
+
             voice_cfg = load_config().get("voice", {})
             if isinstance(voice_cfg, dict):
                 return bool(voice_cfg.get("beep_enabled", True))
         except Exception:
             logger.warning("[fix_01_sessiz_except] Exception")
         return True
-

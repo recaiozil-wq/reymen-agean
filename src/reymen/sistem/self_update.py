@@ -63,7 +63,9 @@ def _git_remote_parse() -> tuple[str, str]:
         r = subprocess.run(
             ["git", "remote", "get-url", "origin"],
             cwd=PROJE_KOK,
-            capture_output=True, text=True, timeout=10,
+            capture_output=True,
+            text=True,
+            timeout=10,
         )
         if r.returncode == 0:
             url = r.stdout.strip()
@@ -71,7 +73,7 @@ def _git_remote_parse() -> tuple[str, str]:
             # git@github.com:owner/repo.git
             for prefix in ("https://github.com/", "git@github.com:"):
                 if url.startswith(prefix):
-                    path = url[len(prefix):]
+                    path = url[len(prefix) :]
                     if path.endswith(".git"):
                         path = path[:-4]
                     parts = path.split("/", 1)
@@ -117,6 +119,7 @@ def _versiyon_karsilastir(v1: str, v2: str) -> int:
          0: v1 == v2
          1: v1 > v2 or incomparable
     """
+
     def _parcala(v: str) -> list:
         """Split version string into numeric parts."""
         parcaciklar = []
@@ -161,10 +164,13 @@ def _github_latest_release(owner: str, repo: str) -> Optional[dict]:
     logger.info("[SelfUpdate] GitHub API cagrisi: %s", url)
 
     try:
-        req = _ur.Request(url, headers={
-            "Accept": "application/vnd.github.v3+json",
-            "User-Agent": "ReYMeN-Agent/1.0",
-        })
+        req = _ur.Request(
+            url,
+            headers={
+                "Accept": "application/vnd.github.v3+json",
+                "User-Agent": "ReYMeN-Agent/1.0",
+            },
+        )
         with _ur.urlopen(req, timeout=15) as resp:
             if resp.status == 200:
                 veri = json.loads(resp.read().decode("utf-8"))
@@ -196,12 +202,18 @@ def _git_pull() -> dict:
         r = subprocess.run(
             ["git", "pull"],
             cwd=PROJE_KOK,
-            capture_output=True, text=True, timeout=120,
+            capture_output=True,
+            text=True,
+            timeout=120,
         )
         if r.returncode == 0:
             return {"basarili": True, "cikti": r.stdout.strip(), "hata": ""}
         else:
-            return {"basarili": False, "cikti": r.stdout.strip(), "hata": r.stderr.strip()[:500]}
+            return {
+                "basarili": False,
+                "cikti": r.stdout.strip(),
+                "hata": r.stderr.strip()[:500],
+            }
     except Exception as e:
         return {"basarili": False, "cikti": "", "hata": str(e)}
 
@@ -214,7 +226,9 @@ def _pip_install_editable() -> dict:
     try:
         r = subprocess.run(
             [sys.executable, "-m", "pip", "install", "-e", str(PROJE_KOK), "--quiet"],
-            capture_output=True, text=True, timeout=180,
+            capture_output=True,
+            text=True,
+            timeout=180,
         )
         basarili = r.returncode == 0
         return {
@@ -237,7 +251,9 @@ def _pip_install_requirements() -> dict:
     try:
         r = subprocess.run(
             [sys.executable, "-m", "pip", "install", "-r", str(req_file), "--quiet"],
-            capture_output=True, text=True, timeout=180,
+            capture_output=True,
+            text=True,
+            timeout=180,
         )
         basarili = r.returncode == 0
         return {
@@ -268,10 +284,13 @@ def _son_kontrol_kaydet() -> None:
     """Save current time as last check."""
     UPDATE_MARKER_DIR.mkdir(parents=True, exist_ok=True)
     UPDATE_MARKER_FILE.write_text(
-        json.dumps({
-            "son_kontrol": time.time(),
-            "zaman": datetime.now(timezone.utc).isoformat(),
-        }, indent=2),
+        json.dumps(
+            {
+                "son_kontrol": time.time(),
+                "zaman": datetime.now(timezone.utc).isoformat(),
+            },
+            indent=2,
+        ),
         encoding="utf-8",
     )
 
@@ -335,16 +354,20 @@ def check_for_updates() -> dict:
         sonuc["aciklama"] = f"Yeni surum mevcut: {son_tag} (mevcut: v{mevcut})"
         logger.info(
             "[SelfUpdate] Yeni surum: %s (mevcut: v%s)",
-            son_tag, mevcut,
+            son_tag,
+            mevcut,
         )
     elif karsilastirma == 0:
         sonuc["aciklama"] = f"En son surum kullaniliyor: v{mevcut}"
         logger.info("[SelfUpdate] En son surum: v%s", mevcut)
     else:
-        sonuc["aciklama"] = f"Mevcut surum (v{mevcut}) release'den ({son_tag}) daha yeni"
+        sonuc["aciklama"] = (
+            f"Mevcut surum (v{mevcut}) release'den ({son_tag}) daha yeni"
+        )
         logger.info(
             "[SelfUpdate] Mevcut surum daha yeni: v%s > %s",
-            mevcut, son_tag,
+            mevcut,
+            son_tag,
         )
 
     sonuc["basarili"] = True
@@ -436,13 +459,14 @@ def auto_update_check(force: bool = False) -> dict:
                 logger.info(
                     "[SelfUpdate] Haftalik kontrol atlandi "
                     "(son: %ds once, kalan: %ds)",
-                    int(gecen), int(kalan),
+                    int(gecen),
+                    int(kalan),
                 )
                 return {
                     "basarili": True,
                     "atlandi": True,
                     "aciklama": f"Haftalik kontrol atlandi "
-                                f"(son kontrol: {int(gecen // 3600)}s once)",
+                    f"(son kontrol: {int(gecen // 3600)}s once)",
                 }
 
     # Kontrol yap
@@ -501,10 +525,18 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description="ReYMeN Self-Update Sistemi")
-    parser.add_argument("--check", action="store_true", help="GitHub'dan son release'i kontrol et")
-    parser.add_argument("--auto", action="store_true", help="Otomatik guncelleme kontrolu (haftada 1)")
-    parser.add_argument("--force", action="store_true", help="Auto kontrolu zorla (bekleme yapma)")
-    parser.add_argument("--update", action="store_true", help="Guncellemeyi gerceklestir")
+    parser.add_argument(
+        "--check", action="store_true", help="GitHub'dan son release'i kontrol et"
+    )
+    parser.add_argument(
+        "--auto", action="store_true", help="Otomatik guncelleme kontrolu (haftada 1)"
+    )
+    parser.add_argument(
+        "--force", action="store_true", help="Auto kontrolu zorla (bekleme yapma)"
+    )
+    parser.add_argument(
+        "--update", action="store_true", help="Guncellemeyi gerceklestir"
+    )
     args = parser.parse_args()
 
     if args.check:

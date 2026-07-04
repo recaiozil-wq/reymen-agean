@@ -47,7 +47,9 @@ class TestParseJudgeResponse:
     def test_clean_json_continue(self):
         from ReYMeN_cli.goals import _parse_judge_response
 
-        done, reason, _ = _parse_judge_response('{"done": false, "reason": "more work needed"}')
+        done, reason, _ = _parse_judge_response(
+            '{"done": false, "reason": "more work needed"}'
+        )
         assert done is False
         assert reason == "more work needed"
 
@@ -276,7 +278,9 @@ class TestGoalManager:
         mgr = GoalManager(session_id="eval-sid-2", default_max_turns=5)
         mgr.set("a long goal")
 
-        with patch.object(goals, "judge_goal", return_value=("continue", "more work", False)):
+        with patch.object(
+            goals, "judge_goal", return_value=("continue", "more work", False)
+        ):
             decision = mgr.evaluate_after_turn("made some progress")
 
         assert decision["verdict"] == "continue"
@@ -294,7 +298,9 @@ class TestGoalManager:
         mgr = GoalManager(session_id="eval-sid-3", default_max_turns=2)
         mgr.set("hard goal")
 
-        with patch.object(goals, "judge_goal", return_value=("continue", "not yet", False)):
+        with patch.object(
+            goals, "judge_goal", return_value=("continue", "not yet", False)
+        ):
             d1 = mgr.evaluate_after_turn("step 1")
             assert d1["should_continue"] is True
             assert mgr.state.turns_used == 1
@@ -400,7 +406,9 @@ class TestJudgeParseFailureAutoPause:
         from ReYMeN_cli import goals
 
         fake_client = MagicMock()
-        fake_client.chat.completions.create.side_effect = RuntimeError("connection reset")
+        fake_client.chat.completions.create.side_effect = RuntimeError(
+            "connection reset"
+        )
         with patch(
             "agent.auxiliary_client.get_text_auxiliary_client",
             return_value=(fake_client, "judge-model"),
@@ -435,7 +443,9 @@ class TestJudgeParseFailureAutoPause:
         mgr.set("do a thing")
 
         with patch.object(
-            goals, "judge_goal", return_value=("continue", "judge returned empty response", True)
+            goals,
+            "judge_goal",
+            return_value=("continue", "judge returned empty response", True),
         ):
             d1 = mgr.evaluate_after_turn("step 1")
             assert d1["should_continue"] is True
@@ -487,7 +497,9 @@ class TestJudgeParseFailureAutoPause:
         mgr.set("goal")
 
         with patch.object(
-            goals, "judge_goal", return_value=("continue", "judge error: RuntimeError", False)
+            goals,
+            "judge_goal",
+            return_value=("continue", "judge error: RuntimeError", False),
         ):
             for _ in range(5):
                 d = mgr.evaluate_after_turn("still going")
@@ -527,21 +539,24 @@ class TestGoalStateSubgoalsBackcompat:
         round-trip with an empty list, not crash."""
         from ReYMeN_cli.goals import GoalState
 
-        legacy = json.dumps({
-            "goal": "do a thing",
-            "status": "active",
-            "turns_used": 2,
-            "max_turns": 20,
-            "created_at": 1.0,
-            "last_turn_at": 2.0,
-            "consecutive_parse_failures": 0,
-        })
+        legacy = json.dumps(
+            {
+                "goal": "do a thing",
+                "status": "active",
+                "turns_used": 2,
+                "max_turns": 20,
+                "created_at": 1.0,
+                "last_turn_at": 2.0,
+                "consecutive_parse_failures": 0,
+            }
+        )
         state = GoalState.from_json(legacy)
         assert state.goal == "do a thing"
         assert state.subgoals == []
 
     def test_subgoals_round_trip(self):
         from ReYMeN_cli.goals import GoalState
+
         state = GoalState(goal="g", subgoals=["a", "b", "c"])
         rt = GoalState.from_json(state.to_json())
         assert rt.subgoals == ["a", "b", "c"]
@@ -550,6 +565,7 @@ class TestGoalStateSubgoalsBackcompat:
 class TestGoalManagerSubgoals:
     def test_add_subgoal(self, ReYMeN_home):
         from ReYMeN_cli.goals import GoalManager
+
         mgr = GoalManager(session_id="sub-add")
         mgr.set("main goal")
         text = mgr.add_subgoal("  use bullet points  ")
@@ -559,6 +575,7 @@ class TestGoalManagerSubgoals:
     def test_add_subgoal_requires_active_goal(self, ReYMeN_home):
         import pytest
         from ReYMeN_cli.goals import GoalManager
+
         mgr = GoalManager(session_id="sub-noactive")
         with pytest.raises(RuntimeError):
             mgr.add_subgoal("oops")
@@ -566,6 +583,7 @@ class TestGoalManagerSubgoals:
     def test_add_empty_subgoal_rejected(self, ReYMeN_home):
         import pytest
         from ReYMeN_cli.goals import GoalManager
+
         mgr = GoalManager(session_id="sub-empty")
         mgr.set("g")
         with pytest.raises(ValueError):
@@ -573,6 +591,7 @@ class TestGoalManagerSubgoals:
 
     def test_remove_subgoal(self, ReYMeN_home):
         from ReYMeN_cli.goals import GoalManager
+
         mgr = GoalManager(session_id="sub-remove")
         mgr.set("g")
         mgr.add_subgoal("first")
@@ -585,6 +604,7 @@ class TestGoalManagerSubgoals:
     def test_remove_subgoal_out_of_range(self, ReYMeN_home):
         import pytest
         from ReYMeN_cli.goals import GoalManager
+
         mgr = GoalManager(session_id="sub-oob")
         mgr.set("g")
         mgr.add_subgoal("only")
@@ -595,6 +615,7 @@ class TestGoalManagerSubgoals:
 
     def test_clear_subgoals(self, ReYMeN_home):
         from ReYMeN_cli.goals import GoalManager
+
         mgr = GoalManager(session_id="sub-clear")
         mgr.set("g")
         mgr.add_subgoal("a")
@@ -606,6 +627,7 @@ class TestGoalManagerSubgoals:
     def test_subgoals_persist_across_reloads(self, ReYMeN_home):
         """Subgoals stored in SessionDB survive a fresh GoalManager."""
         from ReYMeN_cli.goals import GoalManager
+
         mgr = GoalManager(session_id="sub-persist")
         mgr.set("g")
         mgr.add_subgoal("first")
@@ -618,6 +640,7 @@ class TestGoalManagerSubgoals:
 class TestContinuationPromptWithSubgoals:
     def test_empty_subgoals_uses_original_template(self, ReYMeN_home):
         from ReYMeN_cli.goals import GoalManager
+
         mgr = GoalManager(session_id="cp-empty")
         mgr.set("ship the feature")
         prompt = mgr.next_continuation_prompt()
@@ -627,6 +650,7 @@ class TestContinuationPromptWithSubgoals:
 
     def test_with_subgoals_includes_them(self, ReYMeN_home):
         from ReYMeN_cli.goals import GoalManager
+
         mgr = GoalManager(session_id="cp-with")
         mgr.set("ship the feature")
         mgr.add_subgoal("write tests")
@@ -653,10 +677,13 @@ class TestJudgeGoalWithSubgoals:
 
         class _FakeMsg:
             content = '{"done": true, "reason": "all done"}'
+
         class _FakeChoice:
             message = _FakeMsg()
+
         class _FakeResp:
             choices = [_FakeChoice()]
+
         class _FakeClient:
             class chat:
                 class completions:
@@ -665,14 +692,17 @@ class TestJudgeGoalWithSubgoals:
                         captured.update(kwargs)
                         return _FakeResp()
 
-        with patch.object(goals, "get_text_auxiliary_client",
-                          return_value=(_FakeClient, "fake-model"), create=True), \
-             patch.object(goals, "get_auxiliary_extra_body",
-                          return_value=None, create=True), \
-             patch("agent.auxiliary_client.get_text_auxiliary_client",
-                   return_value=(_FakeClient, "fake-model")), \
-             patch("agent.auxiliary_client.get_auxiliary_extra_body",
-                   return_value=None):
+        with patch.object(
+            goals,
+            "get_text_auxiliary_client",
+            return_value=(_FakeClient, "fake-model"),
+            create=True,
+        ), patch.object(
+            goals, "get_auxiliary_extra_body", return_value=None, create=True
+        ), patch(
+            "agent.auxiliary_client.get_text_auxiliary_client",
+            return_value=(_FakeClient, "fake-model"),
+        ), patch("agent.auxiliary_client.get_auxiliary_extra_body", return_value=None):
             verdict, reason, parse_failed = goals.judge_goal(
                 "ship the feature",
                 "ok shipped",
@@ -681,7 +711,9 @@ class TestJudgeGoalWithSubgoals:
 
         # The aux client was called with a prompt that includes the subgoals.
         sent_messages = captured.get("messages") or []
-        user_msg = next((m["content"] for m in sent_messages if m["role"] == "user"), "")
+        user_msg = next(
+            (m["content"] for m in sent_messages if m["role"] == "user"), ""
+        )
         assert "Additional criteria" in user_msg
         assert "1. write tests" in user_msg
         assert "2. update docs" in user_msg
@@ -696,10 +728,13 @@ class TestJudgeGoalWithSubgoals:
 
         class _FakeMsg:
             content = '{"done": true, "reason": "ok"}'
+
         class _FakeChoice:
             message = _FakeMsg()
+
         class _FakeResp:
             choices = [_FakeChoice()]
+
         class _FakeClient:
             class chat:
                 class completions:
@@ -708,14 +743,16 @@ class TestJudgeGoalWithSubgoals:
                         captured.update(kwargs)
                         return _FakeResp()
 
-        with patch("agent.auxiliary_client.get_text_auxiliary_client",
-                   return_value=(_FakeClient, "fake-model")), \
-             patch("agent.auxiliary_client.get_auxiliary_extra_body",
-                   return_value=None):
+        with patch(
+            "agent.auxiliary_client.get_text_auxiliary_client",
+            return_value=(_FakeClient, "fake-model"),
+        ), patch("agent.auxiliary_client.get_auxiliary_extra_body", return_value=None):
             goals.judge_goal("ship it", "done", subgoals=None)
 
         sent_messages = captured.get("messages") or []
-        user_msg = next((m["content"] for m in sent_messages if m["role"] == "user"), "")
+        user_msg = next(
+            (m["content"] for m in sent_messages if m["role"] == "user"), ""
+        )
         assert "Additional criteria" not in user_msg
         assert "ship it" in user_msg
 
@@ -723,6 +760,7 @@ class TestJudgeGoalWithSubgoals:
 class TestStatusLineSubgoalCount:
     def test_status_line_no_subgoals(self, ReYMeN_home):
         from ReYMeN_cli.goals import GoalManager
+
         mgr = GoalManager(session_id="sl-empty")
         mgr.set("ship it")
         line = mgr.status_line()
@@ -731,6 +769,7 @@ class TestStatusLineSubgoalCount:
 
     def test_status_line_with_subgoals(self, ReYMeN_home):
         from ReYMeN_cli.goals import GoalManager
+
         mgr = GoalManager(session_id="sl-with")
         mgr.set("ship it")
         mgr.add_subgoal("a")

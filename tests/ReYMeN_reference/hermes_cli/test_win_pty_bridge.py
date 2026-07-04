@@ -95,7 +95,9 @@ class TestWinPtyBridgeSpawn:
     def test_spawn_raises_on_missing_argv0(self, tmp_path):
         # pywinpty wraps CreateProcessW failures; surface as OSError / RuntimeError.
         bogus = str(tmp_path / "definitely-not-a-real-binary.exe")
-        with pytest.raises((FileNotFoundError, OSError, RuntimeError, PtyUnavailableError)):
+        with pytest.raises(
+            (FileNotFoundError, OSError, RuntimeError, PtyUnavailableError)
+        ):
             WinPtyBridge.spawn([bogus])
 
 
@@ -181,7 +183,7 @@ class TestWinPtyBridgeResize:
         )
         try:
             bridge.resize(cols=131072, rows=1)  # must not raise
-            bridge.resize(cols=0, rows=-5)      # nor this
+            bridge.resize(cols=0, rows=-5)  # nor this
             assert bridge.is_alive()
         finally:
             bridge.close()
@@ -251,9 +253,9 @@ class TestWinPtyBridgeClose:
         deadline = time.monotonic() + 5.0
         while bridge.is_alive() and time.monotonic() < deadline:
             time.sleep(0.1)
-        assert not bridge.is_alive(), (
-            f"WinPtyBridge.is_alive() still True after close(); pid {pid}"
-        )
+        assert (
+            not bridge.is_alive()
+        ), f"WinPtyBridge.is_alive() still True after close(); pid {pid}"
 
 
 @windows_only
@@ -275,9 +277,9 @@ class TestWinPtyBridgeEnv:
                 buf.extend(chunk)
                 if needle_resolved in bytes(buf).lower():
                     break
-            assert needle_resolved in bytes(buf).lower(), (
-                f"cwd {tmp_path!s} not echoed by child; got {bytes(buf)!r}"
-            )
+            assert (
+                needle_resolved in bytes(buf).lower()
+            ), f"cwd {tmp_path!s} not echoed by child; got {bytes(buf)!r}"
         finally:
             bridge.close()
 

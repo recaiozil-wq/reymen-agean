@@ -3,6 +3,7 @@
 Bu modül, a2a.py'deki altyapıyı kullanarak ReYMeN motoruna
 A2A mesajlaşma araçlarını ekler.
 """
+
 from __future__ import annotations
 
 import logging
@@ -15,11 +16,13 @@ logger = logging.getLogger(__name__)
 _A2A_BROKER = None
 _A2A_AGENT = None
 
+
 def _get_broker():
     """Global A2A Broker singleton'ını döndür."""
     global _A2A_BROKER
     if _A2A_BROKER is None:
         from reymen.a2a import Broker
+
         _A2A_BROKER = Broker()
     return _A2A_BROKER
 
@@ -29,11 +32,13 @@ def _get_agent():
     global _A2A_AGENT
     if _A2A_AGENT is None:
         from reymen.a2a import Agent
+
         _A2A_AGENT = Agent("reymen", _get_broker())
     return _A2A_AGENT
 
 
 # ── Tool fonksiyonları (motor._plugin_arac_kaydet ile kaydedilir) ──────────
+
 
 def a2a_gonder(receiver: str, content: str, msg_type: str = "text") -> str:
     """A2A mesajı gönder.
@@ -47,6 +52,7 @@ def a2a_gonder(receiver: str, content: str, msg_type: str = "text") -> str:
         Gönderilen mesaj ID'si.
     """
     from reymen.a2a import MessageType
+
     try:
         tip = MessageType(msg_type)
     except ValueError:
@@ -118,15 +124,16 @@ def a2a_agent_listele() -> str:
     """
     broker = _get_broker()
     stats = broker.stats()
-    if stats['agents'] == 0:
+    if stats["agents"] == 0:
         return "[A2A] Kayitli agent yok"
     liste = [f"[A2A] Kayitli agent'lar ({stats['agents']}):"]
-    for aid, pending in stats['pending'].items():
+    for aid, pending in stats["pending"].items():
         liste.append(f"  - {aid} ({pending} bekleyen)")
     return "\n".join(liste)
 
 
 # ── Motor kayıt ────────────────────────────────────────────────────────────
+
 
 def motor_kaydet(motor: Any) -> None:
     """Motor'a A2A araçlarını kaydet.
@@ -135,34 +142,41 @@ def motor_kaydet(motor: Any) -> None:
         motor: Motor instance'ı (self).
     """
     import json as _json
+
     # _a2a_durum içinde json kullanılıyor — global'e yaz
     global json
     json = _json
 
     motor._plugin_arac_kaydet(
-        "A2A_GONDER", a2a_gonder,
+        "A2A_GONDER",
+        a2a_gonder,
         "A2A mesaji gonder. Parametreler: receiver (str), content (str), msg_type (str: text/task/query/result)",
     )
     motor._plugin_arac_kaydet(
-        "A2A_AL", a2a_al,
+        "A2A_AL",
+        a2a_al,
         "A2A mesaji al. Parametre: timeout (float, varsayilan 1.0)",
     )
     motor._plugin_arac_kaydet(
-        "A2A_AGENT_KAYDET", a2a_agent_kaydet,
+        "A2A_AGENT_KAYDET",
+        a2a_agent_kaydet,
         "A2A agent'i kaydet. Parametre: agent_id (str)",
     )
     motor._plugin_arac_kaydet(
-        "A2A_DURUM", a2a_durum,
+        "A2A_DURUM",
+        a2a_durum,
         "A2A broker durumunu goster",
     )
     motor._plugin_arac_kaydet(
-        "A2A_AGENT_LISTELE", a2a_agent_listele,
+        "A2A_AGENT_LISTELE",
+        a2a_agent_listele,
         "Kayitli A2A agent'larini listele",
     )
     logger.info("[A2A] Motor'a 5 arac kaydedildi")
 
 
 # ── Conversation loop entegrasyonu ─────────────────────────────────────────
+
 
 class A2ABridge:
     """conversation_loop içinde A2A mesajlaşma köprüsü.
@@ -176,6 +190,7 @@ class A2ABridge:
 
     def __init__(self, broker=None):
         from reymen.a2a import Agent
+
         self.broker = broker or _get_broker()
         self.agent = Agent("reymen_loop", self.broker)
 
@@ -187,6 +202,7 @@ class A2ABridge:
     def mesaj_gonder(self, receiver: str, content: str, msg_type: str = "text") -> str:
         """Agent'a mesaj gönder."""
         from reymen.a2a import MessageType
+
         try:
             tip = MessageType(msg_type)
         except ValueError:

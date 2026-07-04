@@ -36,6 +36,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 
 # Proje kokunu sys.path'e ekle
 from pathlib import Path as _Path
+
 sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
 from src.gateways.config import Platform, PlatformConfig
@@ -72,21 +73,37 @@ _DEFAULT_API_VERSION = "v22.0"
 WHATSAPP_MAX_MESSAGE_LENGTH = 4096
 
 # Desteklenen medya tipleri (WhatsApp Cloud API)
-WHATSAPP_IMAGE_TYPES = frozenset({
-    "image/jpeg", "image/png", "image/webp",
-})
-WHATSAPP_AUDIO_TYPES = frozenset({
-    "audio/ogg", "audio/mp3", "audio/mpeg", "audio/aac", "audio/mp4",
-})
-WHATSAPP_VIDEO_TYPES = frozenset({
-    "video/mp4", "video/3gp",
-})
-WHATSAPP_DOCUMENT_TYPES = frozenset({
-    "application/pdf",
-    "text/plain", "text/csv",
-    "application/vnd.ms-excel",
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-})
+WHATSAPP_IMAGE_TYPES = frozenset(
+    {
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+    }
+)
+WHATSAPP_AUDIO_TYPES = frozenset(
+    {
+        "audio/ogg",
+        "audio/mp3",
+        "audio/mpeg",
+        "audio/aac",
+        "audio/mp4",
+    }
+)
+WHATSAPP_VIDEO_TYPES = frozenset(
+    {
+        "video/mp4",
+        "video/3gp",
+    }
+)
+WHATSAPP_DOCUMENT_TYPES = frozenset(
+    {
+        "application/pdf",
+        "text/plain",
+        "text/csv",
+        "application/vnd.ms-excel",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    }
+)
 
 # Graph API temel URL'si
 _GRAPH_API_BASE = "https://graph.facebook.com"
@@ -106,8 +123,7 @@ def _env_required(key: str) -> str:
     value = _env(key)
     if not value:
         raise EnvironmentError(
-            f"[WhatsApp] Eksik yapilandirma: {key} "
-            f"ortam degiskeni ayarlanmamis."
+            f"[WhatsApp] Eksik yapilandirma: {key} " f"ortam degiskeni ayarlanmamis."
         )
     return value
 
@@ -115,10 +131,7 @@ def _env_required(key: str) -> str:
 def _api_url(phone_number_id: str, action: str = "messages") -> str:
     """Graph API URL'sini olusturur."""
     version = _env("WHATSAPP_API_VERSION", _DEFAULT_API_VERSION)
-    return (
-        f"{_GRAPH_API_BASE}/{version}"
-        f"/{phone_number_id}/{action}"
-    )
+    return f"{_GRAPH_API_BASE}/{version}" f"/{phone_number_id}/{action}"
 
 
 def _media_url(media_id: str) -> str:
@@ -482,7 +495,8 @@ class WhatsAppClient:
         except Exception as exc:
             logger.error(
                 "[WhatsApp] Medya yukleme hatasi (%s): %s",
-                file_path, exc,
+                file_path,
+                exc,
             )
             return None
 
@@ -508,9 +522,7 @@ class WhatsAppClient:
             mime_type = media_info.get("mime_type", "")
 
             if not download_url:
-                logger.warning(
-                    "[WhatsApp] Medya URL'si bulunamadi: %s", media_id
-                )
+                logger.warning("[WhatsApp] Medya URL'si bulunamadi: %s", media_id)
                 return None
 
             # Medyayi indir
@@ -519,7 +531,9 @@ class WhatsAppClient:
             return dl_resp.content
         except Exception as exc:
             logger.error(
-                "[WhatsApp] Medya indirme hatasi (%s): %s", media_id, exc,
+                "[WhatsApp] Medya indirme hatasi (%s): %s",
+                media_id,
+                exc,
             )
             return None
 
@@ -619,7 +633,9 @@ class WhatsAppWebhookParser:
                 for raw_msg in raw_messages:
                     try:
                         msg = WhatsAppWebhookParser._parse_single(
-                            raw_msg, display_phone, phone_number_id,
+                            raw_msg,
+                            display_phone,
+                            phone_number_id,
                         )
                         if msg:
                             messages.append(msg)
@@ -738,7 +754,9 @@ class WhatsAppWebhookParser:
 
         # Bilinmeyen mesaj türü
         if msg_type == "unknown":
-            logger.debug("[WhatsApp] Atlanan bilinmeyen mesaj turu: %s", raw.get("type"))
+            logger.debug(
+                "[WhatsApp] Atlanan bilinmeyen mesaj turu: %s", raw.get("type")
+            )
             return None
 
         return WhatsAppMessage(
@@ -788,7 +806,7 @@ def verify_webhook_signature(
     expected_prefix = "sha256="
     if not signature_header.startswith(expected_prefix):
         return False
-    received_sig = signature_header[len(expected_prefix):]
+    received_sig = signature_header[len(expected_prefix) :]
 
     try:
         expected_sig = hmac.new(
@@ -951,9 +969,7 @@ class WhatsAppAdapter(BasePlatformAdapter):
 
         # Uygulama secret (imza dogrulama icin)
         self._app_secret = (
-            config.extra.get("app_secret")
-            or _env("WHATSAPP_APP_SECRET")
-            or ""
+            config.extra.get("app_secret") or _env("WHATSAPP_APP_SECRET") or ""
         )
 
         # HTTPX istemcisi
@@ -1095,9 +1111,7 @@ class WhatsAppAdapter(BasePlatformAdapter):
             )
 
         try:
-            preview_url = bool(
-                (metadata or {}).get("preview_url", False)
-            )
+            preview_url = bool((metadata or {}).get("preview_url", False))
 
             result = await self._client.send_text(
                 to_number=chat_id,
@@ -1260,7 +1274,9 @@ class WhatsAppAdapter(BasePlatformAdapter):
             return "ERROR: Parse failed"
 
         if not messages:
-            logger.debug("[WhatsApp] Islenecek mesaj yok (status guncellemesi olabilir)")
+            logger.debug(
+                "[WhatsApp] Islenecek mesaj yok (status guncellemesi olabilir)"
+            )
             return "OK"
 
         for wa_msg in messages:
@@ -1324,11 +1340,13 @@ class WhatsAppAdapter(BasePlatformAdapter):
             timestamp=datetime.fromtimestamp(
                 int(wa_msg.timestamp) if wa_msg.timestamp.isdigit() else 0,
                 tz=timezone.utc,
-            ) if wa_msg.timestamp else datetime.now(timezone.utc),
+            )
+            if wa_msg.timestamp
+            else datetime.now(timezone.utc),
         )
 
         logger.info(
-            "[WhatsApp] Mesaj alindi: %s -> \"%s\"%s",
+            '[WhatsApp] Mesaj alindi: %s -> "%s"%s',
             _redact_phone(wa_msg.from_number),
             (wa_msg.text or "")[:80],
             f" [+{len(media_urls)} medya]" if media_urls else "",
@@ -1434,11 +1452,15 @@ class WhatsAppAdapter(BasePlatformAdapter):
             sig_header = ""
             if hasattr(request, "headers"):
                 sig_header = request.headers.get("X-Hub-Signature-256", "")
-            elif hasattr(request, "headers") and callable(getattr(request, "headers", None)):
+            elif hasattr(request, "headers") and callable(
+                getattr(request, "headers", None)
+            ):
                 sig_header = request.headers.get("X-Hub-Signature-256", "")
 
             if sig_header and not verify_webhook_signature(
-                body, sig_header, self._app_secret,
+                body,
+                sig_header,
+                self._app_secret,
             ):
                 logger.warning("[WhatsApp] Webhook imza dogrulama basarisiz")
                 return _http_response(body="Invalid signature", status=403)

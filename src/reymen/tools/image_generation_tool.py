@@ -34,9 +34,9 @@ VALID_ASPECT_RATIOS = ("landscape", "square", "portrait")
 
 # ReYMeN coords: landscape=16:9→genis, square=1:1→kare, portrait=9:16→dar
 _ASPECT_TO_SIZE = {
-    "landscape": ("1792", "1024"),    # 16:9
-    "square": ("1024", "1024"),        # 1:1
-    "portrait": ("1024", "1792"),      # 9:16
+    "landscape": ("1792", "1024"),  # 16:9
+    "square": ("1024", "1024"),  # 1:1
+    "portrait": ("1024", "1792"),  # 9:16
 }
 
 # ---------------------------------------------------------------------------
@@ -136,13 +136,15 @@ def image_generate_tool(
     """
     try:
         if not prompt or not isinstance(prompt, str) or not prompt.strip():
-            return json.dumps({
-                "success": False,
-                "image": None,
-                "modality": "text",
-                "error": "Prompt bos olamaz.",
-                "error_type": "validation",
-            })
+            return json.dumps(
+                {
+                    "success": False,
+                    "image": None,
+                    "modality": "text",
+                    "error": "Prompt bos olamaz.",
+                    "error_type": "validation",
+                }
+            )
 
         # aspect_ratio dogrula
         ar = (aspect_ratio or DEFAULT_ASPECT_RATIO).lower().strip()
@@ -153,7 +155,9 @@ def image_generate_tool(
 
         # Edit modu: image_url varsa uyari ver (ReYMeN engine su an edit desteklemez)
         if image_url or reference_image_urls:
-            logger.info("image_url/reference_image_urls alindi ancak ReYMeN engine edit modu icin basit FAL'e yonlendiriyor")
+            logger.info(
+                "image_url/reference_image_urls alindi ancak ReYMeN engine edit modu icin basit FAL'e yonlendiriyor"
+            )
             # Basit FAL backend denemesi — FAL engine edit destekler
             sonuc = _reymen_resim_olustur(prompt.strip(), en, boy, backend="fal")
         else:
@@ -162,36 +166,43 @@ def image_generate_tool(
 
         # ReYMeN engine [MEDIA] formatinda doner
         if "[RESIM_OLUSTUR" in sonuc and "Hata" in sonuc:
-            return json.dumps({
-                "success": False,
-                "image": None,
-                "modality": "text",
-                "error": sonuc,
-                "error_type": "generation",
-            })
+            return json.dumps(
+                {
+                    "success": False,
+                    "image": None,
+                    "modality": "text",
+                    "error": sonuc,
+                    "error_type": "generation",
+                }
+            )
 
         # MEDIA etiketinden URL'yi cikar
         import re
+
         url_match = re.search(r'src="([^"]+)"', sonuc)
         image_url_result = url_match.group(1) if url_match else None
 
-        return json.dumps({
-            "success": True,
-            "image": image_url_result,
-            "modality": "image" if image_url_result else "text",
-            "error": None,
-            "error_type": None,
-        })
+        return json.dumps(
+            {
+                "success": True,
+                "image": image_url_result,
+                "modality": "image" if image_url_result else "text",
+                "error": None,
+                "error_type": None,
+            }
+        )
 
     except Exception as e:
         logger.exception("[image_generation_tool] Hata:")
-        return json.dumps({
-            "success": False,
-            "image": None,
-            "modality": "text",
-            "error": str(e),
-            "error_type": "exception",
-        })
+        return json.dumps(
+            {
+                "success": False,
+                "image": None,
+                "modality": "text",
+                "error": str(e),
+                "error_type": "exception",
+            }
+        )
 
 
 def _handle_image_generate(**kwargs: Any) -> str:

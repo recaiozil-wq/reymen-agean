@@ -45,12 +45,15 @@ class TestDynamicRouteLoading:
         (tmp_path / _DYNAMIC_ROUTES_FILENAME).write_text(
             json.dumps({"conflict": {"secret": "dynamic", "prompt": "dyn"}})
         )
-        adapter = _make_adapter(routes={"conflict": {"secret": "static", "prompt": "stat"}})
+        adapter = _make_adapter(
+            routes={"conflict": {"secret": "static", "prompt": "stat"}}
+        )
         adapter._reload_dynamic_routes()
         assert adapter._routes["conflict"]["secret"] == "static"
 
     def test_mtime_gated(self, tmp_path):
         import time
+
         path = tmp_path / _DYNAMIC_ROUTES_FILENAME
         path.write_text(json.dumps({"v1": {"secret": "s"}}))
 
@@ -152,6 +155,7 @@ class TestDynamicRouteSecretValidation:
 
     def test_warning_logged_on_skip(self, tmp_path, caplog):
         import logging
+
         (tmp_path / _DYNAMIC_ROUTES_FILENAME).write_text(
             json.dumps({"silent": {"secret": "", "prompt": "x"}})
         )
@@ -163,10 +167,12 @@ class TestDynamicRouteSecretValidation:
     def test_partial_skip(self, tmp_path):
         # One route bad, one route good — only the bad one is dropped.
         (tmp_path / _DYNAMIC_ROUTES_FILENAME).write_text(
-            json.dumps({
-                "bad":  {"secret": "", "prompt": "x"},
-                "good": {"secret": "valid-secret", "prompt": "y"},
-            })
+            json.dumps(
+                {
+                    "bad": {"secret": "", "prompt": "x"},
+                    "good": {"secret": "valid-secret", "prompt": "y"},
+                }
+            )
         )
         adapter = _make_adapter()
         adapter._reload_dynamic_routes()

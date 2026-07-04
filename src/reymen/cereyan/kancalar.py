@@ -30,21 +30,26 @@ from typing import Optional
 
 # ── Sabitler ──────────────────────────────────────────────────────────────────
 
-VARSAYILAN_MAKS_ART_ARDA = 4        # Aynı eylem kaç kez üst üste?
-VARSAYILAN_MAKS_EYLEM = 30          # Task başına toplam eylem limiti
-VARSAYILAN_MIN_ARALIK = 0.5         # İki eylem arası minimum saniye
-DANGLING_DERINLIK_UYARISI = 3       # Derinlik > 3 ise 3'ten sonraki her adım uyarır
-ENGELLENEN_ARACLAR = frozenset({
-    "ALT_AJAN_GOREVLENDIR",         # Zincir koruması
-    "SIL_DOSYA", "BICAKLA",          # Tehlikeli araçlar
-})
+VARSAYILAN_MAKS_ART_ARDA = 4  # Aynı eylem kaç kez üst üste?
+VARSAYILAN_MAKS_EYLEM = 30  # Task başına toplam eylem limiti
+VARSAYILAN_MIN_ARALIK = 0.5  # İki eylem arası minimum saniye
+DANGLING_DERINLIK_UYARISI = 3  # Derinlik > 3 ise 3'ten sonraki her adım uyarır
+ENGELLENEN_ARACLAR = frozenset(
+    {
+        "ALT_AJAN_GOREVLENDIR",  # Zincir koruması
+        "SIL_DOSYA",
+        "BICAKLA",  # Tehlikeli araçlar
+    }
+)
 
 
 # ── Veri Yapıları ─────────────────────────────────────────────────────────────
 
+
 @dataclass
 class TaskKancaDurumu:
     """Bir task'ın kanca durumu."""
+
     son_eylem: Optional[str] = None
     art_arda_sayac: int = 0
     toplam_eylem: int = 0
@@ -55,7 +60,7 @@ class TaskKancaDurumu:
 
 class KancaMotoru:
     """Eylem öncesi kural denetimi yapar.
-    
+
     Thread-safe: defaultdict + lock ile farklı task'lar birbirini etkilemez.
     """
 
@@ -73,7 +78,7 @@ class KancaMotoru:
         min_aralik: float = VARSAYILAN_MIN_ARALIK,
     ) -> Optional[str]:
         """Bir eylemi kural denetiminden geçirir.
-        
+
         Args:
             task_id: Alt ajan task ID'si
             arac: Çalıştırılacak araç adı (örn. "KOMUT_CALISTIR")
@@ -81,7 +86,7 @@ class KancaMotoru:
             maks_art_arda: Üst üste aynı eylem limiti
             maks_eylem: Task başına toplam eylem limiti
             min_aralik: İki eylem arası minimum süre (saniye)
-        
+
         Returns:
             None = kural ihlali yok (eylem çalıştırılabilir)
             str = kural ihlali mesajı (eylem çalıştırılmaz)
@@ -133,7 +138,9 @@ class KancaMotoru:
             # Hızlı döngü kontrolü
             simdi = time.time()
             if durum.son_ts > 0 and (simdi - durum.son_ts) < min_aralik:
-                return f"[KANCA] Çok hızlı: {(simdi - durum.son_ts):.2f}s < {min_aralik}s"
+                return (
+                    f"[KANCA] Çok hızlı: {(simdi - durum.son_ts):.2f}s < {min_aralik}s"
+                )
             durum.son_ts = simdi
 
         return None  # İhlal yok

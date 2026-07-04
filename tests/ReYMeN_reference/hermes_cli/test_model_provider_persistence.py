@@ -45,16 +45,18 @@ class TestSaveModelChoiceAlwaysDict:
         _save_model_choice("kimi-k2.5")
 
         import yaml
+
         config = yaml.safe_load((config_home / "config.yaml").read_text()) or {}
         model = config.get("model")
-        assert isinstance(model, dict), (
-            f"Expected model to be a dict after save, got {type(model)}: {model}"
-        )
+        assert isinstance(
+            model, dict
+        ), f"Expected model to be a dict after save, got {type(model)}: {model}"
         assert model["default"] == "kimi-k2.5"
 
     def test_dict_model_stays_dict(self, config_home):
         """When config.model is already a dict, _save_model_choice preserves it."""
         import yaml
+
         (config_home / "config.yaml").write_text(
             "model:\n  default: old-model\n  provider: openrouter\n"
         )
@@ -85,7 +87,9 @@ class TestProviderPersistsAfterModelSave:
             assert kwargs["sort_keys"] is False
             raise OSError("simulated atomic write failure")
 
-        with patch("ReYMeN_cli.auth.atomic_yaml_write", side_effect=_boom) as mock_write:
+        with patch(
+            "ReYMeN_cli.auth.atomic_yaml_write", side_effect=_boom
+        ) as mock_write:
             with pytest.raises(OSError, match="simulated atomic write failure"):
                 _update_config_for_provider(
                     "nous",
@@ -96,7 +100,9 @@ class TestProviderPersistsAfterModelSave:
         assert mock_write.call_count == 1
         assert config_path.read_text(encoding="utf-8") == original_text
 
-    def test_api_key_provider_saved_when_model_was_string(self, config_home, monkeypatch):
+    def test_api_key_provider_saved_when_model_was_string(
+        self, config_home, monkeypatch
+    ):
         """_model_flow_api_key_provider must persist the provider even when
         config.model started as a plain string."""
         from ReYMeN_cli.auth import PROVIDER_REGISTRY
@@ -113,18 +119,21 @@ class TestProviderPersistsAfterModelSave:
 
         # Mock the model selection prompt to return "kimi-k2.5"
         # Also mock input() for the base URL prompt and builtins.input
-        with patch("ReYMeN_cli.auth._prompt_model_selection", return_value="kimi-k2.5"), \
-             patch("ReYMeN_cli.auth.deactivate_provider"), \
-             patch("builtins.input", return_value=""):
+        with patch(
+            "ReYMeN_cli.auth._prompt_model_selection", return_value="kimi-k2.5"
+        ), patch("ReYMeN_cli.auth.deactivate_provider"), patch(
+            "builtins.input", return_value=""
+        ):
             _model_flow_api_key_provider(load_config(), "kimi-coding", "old-model")
 
         import yaml
+
         config = yaml.safe_load((config_home / "config.yaml").read_text()) or {}
         model = config.get("model")
         assert isinstance(model, dict), f"model should be dict, got {type(model)}"
-        assert model.get("provider") == "kimi-coding", (
-            f"provider should be 'kimi-coding', got {model.get('provider')}"
-        )
+        assert (
+            model.get("provider") == "kimi-coding"
+        ), f"provider should be 'kimi-coding', got {model.get('provider')}"
         assert model.get("default") == "kimi-k2.5"
 
     def test_copilot_provider_saved_when_selected(self, config_home):
@@ -150,7 +159,10 @@ class TestProviderPersistsAfterModelSave:
                 },
                 {
                     "id": "gpt-5.4",
-                    "capabilities": {"type": "chat", "supports": {"reasoning_effort": ["low", "medium", "high"]}},
+                    "capabilities": {
+                        "type": "chat",
+                        "supports": {"reasoning_effort": ["low", "medium", "high"]},
+                    },
                     "supported_endpoints": ["/responses"],
                 },
             ],
@@ -193,11 +205,12 @@ class TestProviderPersistsAfterModelSave:
         # Patch fetch_api_models so the named custom flow returns one model;
         # force the curses menu to error so the input() fallback runs; patch
         # input to auto-select the first model from the fallback prompt.
-        with patch("ReYMeN_cli.auth._save_model_choice"), \
-             patch("ReYMeN_cli.auth.deactivate_provider"), \
-             patch("ReYMeN_cli.models.fetch_api_models", return_value=["gpt-5.4"]), \
-             patch("ReYMeN_cli.curses_ui.curses_radiolist", side_effect=OSError("no tty in test")), \
-             patch("builtins.input", return_value="1"):
+        with patch("ReYMeN_cli.auth._save_model_choice"), patch(
+            "ReYMeN_cli.auth.deactivate_provider"
+        ), patch("ReYMeN_cli.models.fetch_api_models", return_value=["gpt-5.4"]), patch(
+            "ReYMeN_cli.curses_ui.curses_radiolist",
+            side_effect=OSError("no tty in test"),
+        ), patch("builtins.input", return_value="1"):
             _model_flow_named_custom({}, provider_info)
 
         config = yaml.safe_load((config_home / "config.yaml").read_text()) or {}
@@ -247,7 +260,10 @@ class TestProviderPersistsAfterModelSave:
                 },
                 {
                     "id": "gpt-5.4",
-                    "capabilities": {"type": "chat", "supports": {"reasoning_effort": ["low", "medium", "high"]}},
+                    "capabilities": {
+                        "type": "chat",
+                        "supports": {"reasoning_effort": ["low", "medium", "high"]},
+                    },
                     "supported_endpoints": ["/responses"],
                 },
             ],
@@ -269,19 +285,28 @@ class TestProviderPersistsAfterModelSave:
         assert model.get("default") == "gpt-5.4"
         assert model.get("api_mode") == "chat_completions"
 
-    def test_opencode_go_models_are_selectable_and_persist_normalized(self, config_home, monkeypatch):
+    def test_opencode_go_models_are_selectable_and_persist_normalized(
+        self, config_home, monkeypatch
+    ):
         from ReYMeN_cli.main import _model_flow_api_key_provider
         from ReYMeN_cli.config import load_config
 
         monkeypatch.setenv("OPENCODE_GO_API_KEY", "test-key")
 
-        with patch("ReYMeN_cli.models.fetch_api_models", return_value=["opencode-go/kimi-k2.5", "opencode-go/minimax-m2.7"]), \
-             patch("ReYMeN_cli.auth._prompt_model_selection", return_value="kimi-k2.5"), \
-             patch("ReYMeN_cli.auth.deactivate_provider"), \
-             patch("builtins.input", return_value=""):
-            _model_flow_api_key_provider(load_config(), "opencode-go", "opencode-go/kimi-k2.5")
+        with patch(
+            "ReYMeN_cli.models.fetch_api_models",
+            return_value=["opencode-go/kimi-k2.5", "opencode-go/minimax-m2.7"],
+        ), patch(
+            "ReYMeN_cli.auth._prompt_model_selection", return_value="kimi-k2.5"
+        ), patch("ReYMeN_cli.auth.deactivate_provider"), patch(
+            "builtins.input", return_value=""
+        ):
+            _model_flow_api_key_provider(
+                load_config(), "opencode-go", "opencode-go/kimi-k2.5"
+            )
 
         import yaml
+
         config = yaml.safe_load((config_home / "config.yaml").read_text()) or {}
         model = config.get("model")
         assert isinstance(model, dict)
@@ -289,7 +314,9 @@ class TestProviderPersistsAfterModelSave:
         assert model.get("default") == "kimi-k2.5"
         assert model.get("api_mode") == "chat_completions"
 
-    def test_opencode_go_same_provider_switch_recomputes_api_mode(self, config_home, monkeypatch):
+    def test_opencode_go_same_provider_switch_recomputes_api_mode(
+        self, config_home, monkeypatch
+    ):
         from ReYMeN_cli.main import _model_flow_api_key_provider
         from ReYMeN_cli.config import load_config
 
@@ -302,20 +329,24 @@ class TestProviderPersistsAfterModelSave:
             "  api_mode: chat_completions\n"
         )
 
-        with patch("ReYMeN_cli.models.fetch_api_models", return_value=["opencode-go/kimi-k2.5", "opencode-go/minimax-m2.5"]), \
-             patch("ReYMeN_cli.auth._prompt_model_selection", return_value="minimax-m2.5"), \
-             patch("ReYMeN_cli.auth.deactivate_provider"), \
-             patch("builtins.input", return_value=""):
+        with patch(
+            "ReYMeN_cli.models.fetch_api_models",
+            return_value=["opencode-go/kimi-k2.5", "opencode-go/minimax-m2.5"],
+        ), patch(
+            "ReYMeN_cli.auth._prompt_model_selection", return_value="minimax-m2.5"
+        ), patch("ReYMeN_cli.auth.deactivate_provider"), patch(
+            "builtins.input", return_value=""
+        ):
             _model_flow_api_key_provider(load_config(), "opencode-go", "kimi-k2.5")
 
         import yaml
+
         config = yaml.safe_load((config_home / "config.yaml").read_text()) or {}
         model = config.get("model")
         assert isinstance(model, dict)
         assert model.get("provider") == "opencode-go"
         assert model.get("default") == "minimax-m2.5"
         assert model.get("api_mode") == "anthropic_messages"
-
 
 
 class TestBaseUrlValidation:
@@ -335,15 +366,18 @@ class TestBaseUrlValidation:
         from ReYMeN_cli.config import load_config, get_env_value
 
         # User types a shell command instead of a URL at the base URL prompt
-        with patch("ReYMeN_cli.auth._prompt_model_selection", return_value="glm-5"), \
-             patch("ReYMeN_cli.auth.deactivate_provider"), \
-             patch("builtins.input", return_value="nano ~/.ReYMeN/.env"):
+        with patch(
+            "ReYMeN_cli.auth._prompt_model_selection", return_value="glm-5"
+        ), patch("ReYMeN_cli.auth.deactivate_provider"), patch(
+            "builtins.input", return_value="nano ~/.ReYMeN/.env"
+        ):
             _model_flow_api_key_provider(load_config(), "zai", "old-model")
 
         # The garbage value should NOT have been saved
         saved = get_env_value("GLM_BASE_URL") or ""
-        assert not saved or saved.startswith(("http://", "https://")), \
-            f"Non-URL value was saved as GLM_BASE_URL: {saved}"
+        assert not saved or saved.startswith(
+            ("http://", "https://")
+        ), f"Non-URL value was saved as GLM_BASE_URL: {saved}"
         captured = capsys.readouterr()
         assert "Invalid URL" in captured.out
 
@@ -360,9 +394,11 @@ class TestBaseUrlValidation:
         from ReYMeN_cli.main import _model_flow_api_key_provider
         from ReYMeN_cli.config import load_config, get_env_value
 
-        with patch("ReYMeN_cli.auth._prompt_model_selection", return_value="glm-5"), \
-             patch("ReYMeN_cli.auth.deactivate_provider"), \
-             patch("builtins.input", return_value="https://custom.z.ai/api/paas/v4"):
+        with patch(
+            "ReYMeN_cli.auth._prompt_model_selection", return_value="glm-5"
+        ), patch("ReYMeN_cli.auth.deactivate_provider"), patch(
+            "builtins.input", return_value="https://custom.z.ai/api/paas/v4"
+        ):
             _model_flow_api_key_provider(load_config(), "zai", "old-model")
 
         saved = get_env_value("GLM_BASE_URL") or ""
@@ -382,11 +418,12 @@ class TestBaseUrlValidation:
         from ReYMeN_cli.main import _model_flow_api_key_provider
         from ReYMeN_cli.config import load_config, get_env_value
 
-        with patch("ReYMeN_cli.auth._prompt_model_selection", return_value="glm-5"), \
-             patch("ReYMeN_cli.auth.deactivate_provider"), \
-             patch("builtins.input", return_value=""):
+        with patch(
+            "ReYMeN_cli.auth._prompt_model_selection", return_value="glm-5"
+        ), patch("ReYMeN_cli.auth.deactivate_provider"), patch(
+            "builtins.input", return_value=""
+        ):
             _model_flow_api_key_provider(load_config(), "zai", "old-model")
 
         saved = get_env_value("GLM_BASE_URL") or ""
         assert saved == "", "Empty input should not save a base URL"
-

@@ -14,9 +14,15 @@ BACKUP_DIR = Path(__file__).parent / ".ReYMeN" / "backups"
 BACKUP_DIR.mkdir(parents=True, exist_ok=True)
 
 HARIC_TUT = {
-    "venv", ".git", "__pycache__", ".ReYMeN/backups",
-    ".ReYMeN/trajectories", ".ReYMeN/checkpoints",
-    "logs", "output", "node_modules",
+    "venv",
+    ".git",
+    "__pycache__",
+    ".ReYMeN/backups",
+    ".ReYMeN/trajectories",
+    ".ReYMeN/checkpoints",
+    "logs",
+    "output",
+    "node_modules",
 }
 
 
@@ -53,11 +59,17 @@ def yedek_listele() -> list[dict]:
     sonuc = []
     for f in sorted(BACKUP_DIR.glob("*.zip"), reverse=True):
         boyut = f.stat().st_size
-        sonuc.append({
-            "dosya": f.name,
-            "boyut": f"{boyut / 1024:.1f}KB" if boyut < 1024 * 1024 else f"{boyut / 1024 / 1024:.1f}MB",
-            "tarih": datetime.fromtimestamp(f.stat().st_mtime).strftime("%Y-%m-%d %H:%M"),
-        })
+        sonuc.append(
+            {
+                "dosya": f.name,
+                "boyut": f"{boyut / 1024:.1f}KB"
+                if boyut < 1024 * 1024
+                else f"{boyut / 1024 / 1024:.1f}MB",
+                "tarih": datetime.fromtimestamp(f.stat().st_mtime).strftime(
+                    "%Y-%m-%d %H:%M"
+                ),
+            }
+        )
     return sonuc
 
 

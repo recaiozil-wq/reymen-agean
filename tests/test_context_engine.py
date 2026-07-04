@@ -2,6 +2,7 @@
 """
 test_context_engine.py — context_engine.py testleri (~30 test)
 """
+
 import pytest
 import sys
 from unittest.mock import MagicMock, patch
@@ -11,10 +12,12 @@ from unittest.mock import MagicMock, patch
 # Import helpers
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture
 def engine():
     """Varsayılan ContextEngine örneği."""
     from context_engine import ContextEngine
+
     return ContextEngine(max_token=8000)
 
 
@@ -22,6 +25,7 @@ def engine():
 def engine_small():
     """Küçük token limitli ContextEngine."""
     from context_engine import ContextEngine
+
     return ContextEngine(max_token=50)
 
 
@@ -29,24 +33,29 @@ def engine_small():
 # __init__
 # ---------------------------------------------------------------------------
 
+
 class TestInit:
     def test_default_max_token(self):
         from context_engine import ContextEngine
+
         ce = ContextEngine()
         assert ce.max_token == 8000
 
     def test_custom_max_token(self):
         from context_engine import ContextEngine
+
         ce = ContextEngine(max_token=4096)
         assert ce.max_token == 4096
 
     def test_zero_max_token(self):
         from context_engine import ContextEngine
+
         ce = ContextEngine(max_token=0)
         assert ce.max_token == 0
 
     def test_negative_max_token(self):
         from context_engine import ContextEngine
+
         ce = ContextEngine(max_token=-100)
         assert ce.max_token == -100
 
@@ -54,6 +63,7 @@ class TestInit:
 # ---------------------------------------------------------------------------
 # _token_hesapla
 # ---------------------------------------------------------------------------
+
 
 class TestTokenHesapla:
     def test_bos_gecmis(self, engine):
@@ -101,6 +111,7 @@ class TestTokenHesapla:
 # ---------------------------------------------------------------------------
 # _ozetle
 # ---------------------------------------------------------------------------
+
 
 class TestOzetle:
     def test_bos_gecmis_icin_bos_ozet(self, engine):
@@ -181,6 +192,7 @@ class TestOzetle:
 # _onemli_bilgileri_ayikla
 # ---------------------------------------------------------------------------
 
+
 class TestOnemliBilgileriAyikla:
     def test_bos_gecmis_icin_bos(self, engine):
         assert engine._onemli_bilgileri_ayikla([]) == ""
@@ -211,6 +223,7 @@ class TestOnemliBilgileriAyikla:
     def test_anahtar_kelime_listesi_kapsamli(self, engine):
         """Tum onemli anahtar kelimeler test edilir."""
         from context_engine import _ONEMLI_ANAHTAR
+
         assert "hedef" in _ONEMLI_ANAHTAR
         assert "hata" in _ONEMLI_ANAHTAR
         assert "api" in _ONEMLI_ANAHTAR
@@ -243,6 +256,7 @@ class TestOnemliBilgileriAyikla:
 # ---------------------------------------------------------------------------
 # baglam_hazirla
 # ---------------------------------------------------------------------------
+
 
 class TestBaglamHazirla:
     def test_return_type(self, engine):
@@ -281,6 +295,7 @@ class TestBaglamHazirla:
 # token_limit_asti_mi
 # ---------------------------------------------------------------------------
 
+
 class TestTokenLimitAstiMi:
     def test_limit_alti(self, engine):
         gecmis = [{"icerik": "kisa"}]
@@ -307,20 +322,24 @@ class TestTokenLimitAstiMi:
 # modul sabitleri
 # ---------------------------------------------------------------------------
 
+
 class TestModulSabitleri:
     def test_onemli_anahtar_listesi(self):
         from context_engine import _ONEMLI_ANAHTAR
+
         assert isinstance(_ONEMLI_ANAHTAR, list)
         assert len(_ONEMLI_ANAHTAR) >= 15
 
     def test_anahtar_kelimeler_unique(self):
         from context_engine import _ONEMLI_ANAHTAR
+
         assert len(_ONEMLI_ANAHTAR) == len(set(_ONEMLI_ANAHTAR))
 
     def test_import_hatasiz(self):
         """context_engine.py import edilirken hata firlatmamali."""
         try:
             import context_engine
+
             assert hasattr(context_engine, "ContextEngine")
         except Exception as e:
             pytest.fail(f"Import hatasi: {e}")
@@ -330,10 +349,12 @@ class TestModulSabitleri:
 # __main__ test
 # ---------------------------------------------------------------------------
 
+
 class TestMainOrnek:
     def test_main_ornek_calisir(self):
         """__main__ blogundaki ornek calismali."""
         from context_engine import ContextEngine
+
         ce = ContextEngine(max_token=8000)
         gecmis = [{"icerik": "Hedefimiz Python yazilimi gelistirmek"}]
         sonuc = ce.baglam_hazirla(gecmis, "devam edelim")

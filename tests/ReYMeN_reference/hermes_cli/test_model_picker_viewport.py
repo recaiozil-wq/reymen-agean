@@ -6,6 +6,7 @@ clipping the bottom border and any items past the terminal's last row.
 The viewport helper now caps visible items and slides the offset to keep
 the cursor on screen.
 """
+
 from cli import ReYMeNCLI
 
 
@@ -57,6 +58,6 @@ class TestPickerViewport:
         offset = 0
         for cursor in list(range(36)) + list(range(35, -1, -1)):
             offset, visible = _compute(cursor, offset, n=36, term_rows=30)
-            assert cursor in range(offset, offset + visible), (
-                f"cursor={cursor} out of view: offset={offset} visible={visible}"
-            )
+            assert cursor in range(
+                offset, offset + visible
+            ), f"cursor={cursor} out of view: offset={offset} visible={visible}"

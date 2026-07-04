@@ -175,9 +175,7 @@ class ParallelWebSearchProvider(WebSearchProvider):
                 return {"success": False, "error": "Interrupted"}
 
             mode = _resolve_search_mode()
-            logger.info(
-                "Parallel search: '%s' (mode=%s, limit=%d)", query, mode, limit
-            )
+            logger.info("Parallel search: '%s' (mode=%s, limit=%d)", query, mode, limit)
             response = _get_sync_client().beta.search(
                 search_queries=[query],
                 objective=query,
@@ -209,9 +207,7 @@ class ParallelWebSearchProvider(WebSearchProvider):
             logger.warning("Parallel search error: %s", exc)
             return {"success": False, "error": f"Parallel search failed: {exc}"}
 
-    async def extract(
-        self, urls: List[str], **kwargs: Any
-    ) -> List[Dict[str, Any]]:
+    async def extract(self, urls: List[str], **kwargs: Any) -> List[Dict[str, Any]]:
         """Extract content from one or more URLs via the async SDK.
 
         Returns the legacy list-of-results shape that
@@ -223,9 +219,7 @@ class ParallelWebSearchProvider(WebSearchProvider):
             from reymen.tools.interrupt import is_interrupted
 
             if is_interrupted():
-                return [
-                    {"url": u, "error": "Interrupted", "title": ""} for u in urls
-                ]
+                return [{"url": u, "error": "Interrupted", "title": ""} for u in urls]
 
             logger.info("Parallel extract: %d URL(s)", len(urls))
             response = await _get_async_client().beta.extract(
@@ -256,23 +250,37 @@ class ParallelWebSearchProvider(WebSearchProvider):
                         "url": error.url or "",
                         "title": "",
                         "content": "",
-                        "error": error.content or error.error_type or "extraction failed",
+                        "error": error.content
+                        or error.error_type
+                        or "extraction failed",
                         "metadata": {"sourceURL": error.url or ""},
                     }
                 )
 
             return results
         except ValueError as exc:
-            return [{"url": u, "title": "", "content": "", "error": str(exc)} for u in urls]
+            return [
+                {"url": u, "title": "", "content": "", "error": str(exc)} for u in urls
+            ]
         except ImportError as exc:
             return [
-                {"url": u, "title": "", "content": "", "error": f"Parallel SDK not installed: {exc}"}
+                {
+                    "url": u,
+                    "title": "",
+                    "content": "",
+                    "error": f"Parallel SDK not installed: {exc}",
+                }
                 for u in urls
             ]
         except Exception as exc:  # noqa: BLE001
             logger.warning("Parallel extract error: %s", exc)
             return [
-                {"url": u, "title": "", "content": "", "error": f"Parallel extract failed: {exc}"}
+                {
+                    "url": u,
+                    "title": "",
+                    "content": "",
+                    "error": f"Parallel extract failed: {exc}",
+                }
                 for u in urls
             ]
 

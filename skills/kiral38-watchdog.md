@@ -298,7 +298,7 @@ Sub-agent tüm projeyi tarar, 20-30 öneri çıkarır. Her öneriye öncelik sev
 ### Aşama 2: Listele ve Sun
 Önerileri öncelik sırasına göre numaralı tablo olarak sun. Kullanıcı hangi numaraları istediğini söyler (örn. "20,21,22,23,24,25,26,27,28,29,30").
 
-**FORMA**: 
+**FORMA**:
 ```
 | # | Öneri | Ne / Nerede / Neden | Çözüm |
 ```

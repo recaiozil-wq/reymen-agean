@@ -4,4 +4,6 @@
 Orijinal dosya bulunamadi; testler icin stub.
 """
 
-def test_stub(): pass
+
+def test_stub():
+    pass

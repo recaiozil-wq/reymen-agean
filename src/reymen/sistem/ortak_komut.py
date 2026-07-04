@@ -16,6 +16,7 @@ from pathlib import Path
 import requests
 
 import sys as _sys
+
 # Proje kokunu sys.path'e ekle (src/ degil, ReYMeN-Ajan/)
 # __file__ = .../reymen/sistem/ortak_komut.py -> 4x parent = proje koku
 _sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent.parent))
@@ -102,6 +103,7 @@ DURUM_JSON = PROJE_KOK / "durum.json"
 
 # ── Tarama Fonksiyonu ──────────────────────────────────────────────────
 
+
 def tara_profil(profil: str) -> dict:
     """Bir profilin guncel durumunu tara."""
     sonuc = {"soul_boyut": 0, "browser": "?", "terminal_cwd": "?"}
@@ -116,9 +118,13 @@ def tara_profil(profil: str) -> dict:
     if config_yol and config_yol.exists():
         icerik = config_yol.read_text(encoding="utf-8")
         # Browser durumu: disabled_toolsets listesinde "browser" var mi?
-        dt_match = re.search(r'disabled_toolsets\s*:\s*\[(.*?)\]', icerik, re.DOTALL)
+        dt_match = re.search(r"disabled_toolsets\s*:\s*\[(.*?)\]", icerik, re.DOTALL)
         if dt_match:
-            tools = [t.strip().strip("'\"") for t in dt_match.group(1).split(",") if t.strip()]
+            tools = [
+                t.strip().strip("'\"")
+                for t in dt_match.group(1).split(",")
+                if t.strip()
+            ]
             sonuc["browser"] = "kapali" if "browser" in tools else "acik"
         else:
             sonuc["browser"] = "acik"
@@ -180,8 +186,7 @@ def guncelle() -> dict:
     }
 
     DURUM_JSON.write_text(
-        json.dumps(yeni_durum, indent=2, ensure_ascii=False),
-        encoding="utf-8"
+        json.dumps(yeni_durum, indent=2, ensure_ascii=False), encoding="utf-8"
     )
 
     return yeni_durum
@@ -192,8 +197,12 @@ def _butun_botlar_esit_mi() -> dict:
     Sadece permission/settings alanlarini karsilastir (profil/bot_adi haric).
     soul_boyut: 50 byte'dan az fark esit sayilir (bot ismi uzunlugu)."""
     karsilastirilacak_alanlar = [
-        "gateway", "yetki", "browser", "terminal",
-        "web", "tools",
+        "gateway",
+        "yetki",
+        "browser",
+        "terminal",
+        "web",
+        "tools",
     ]
     # Mevcut durum.json'daki tum botlari al (hardcoded + dinamik)
     butun_botlar = dict(BOTLAR)
@@ -222,11 +231,14 @@ def _butun_botlar_esit_mi() -> dict:
             esit = False
     return {
         "esit": esit,
-        "aciklama": "Tum botlar esit" if esit else "Fark var! (soul_boyut farki > 50 bayt veya yetki farki)",
+        "aciklama": "Tum botlar esit"
+        if esit
+        else "Fark var! (soul_boyut farki > 50 bayt veya yetki farki)",
     }
 
 
 # ── Reasoning-Core Fonksiyonlari ───────────────────────────────────────
+
 
 def _analitik_db_hazirla() -> None:
     """analitik.db'de reasoning_log tablosu yoksa oluşturur (idempotent)."""
@@ -249,7 +261,9 @@ def _analitik_db_hazirla() -> None:
         conn.commit()
 
 
-def _reasoning_core_cagir(prompt: str, fallback_providers: list[dict], timeout: int = 60) -> dict:
+def _reasoning_core_cagir(
+    prompt: str, fallback_providers: list[dict], timeout: int = 60
+) -> dict:
     """config.yaml > fallback_providers içindeki 'reasoning-core' girdisini
     bulup OpenAI-uyumlu chat/completions isteği atar.
 
@@ -259,7 +273,11 @@ def _reasoning_core_cagir(prompt: str, fallback_providers: list[dict], timeout: 
     her iki durumu da (ayrı alan / metin içi <think>) destekler.
     """
     provider_cfg = next(
-        (p for p in fallback_providers if p.get("provider", "").startswith(_REASONING_PROVIDER_ADI)),
+        (
+            p
+            for p in fallback_providers
+            if p.get("provider", "").startswith(_REASONING_PROVIDER_ADI)
+        ),
         None,
     )
     if provider_cfg is None:
@@ -275,7 +293,10 @@ def _reasoning_core_cagir(prompt: str, fallback_providers: list[dict], timeout: 
     t0 = time.time()
     resp = requests.post(
         f"{base_url}/chat/completions",
-        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        },
         json={
             "model": model,
             "messages": [{"role": "user", "content": prompt}],
@@ -299,7 +320,12 @@ def _reasoning_core_cagir(prompt: str, fallback_providers: list[dict], timeout: 
         except IndexError:
             dusunce = None
 
-    return {"cozum": icerik, "dusunce_zinciri": dusunce, "model": model, "sure_sn": round(sure, 2)}
+    return {
+        "cozum": icerik,
+        "dusunce_zinciri": dusunce,
+        "model": model,
+        "sure_sn": round(sure, 2),
+    }
 
 
 def reasoning_loop(
@@ -369,7 +395,8 @@ def reasoning_loop(
 
     logger.info(
         "reasoning_loop: %s botunda hata çözümü %ss içinde analitik.db'ye kaydedildi.",
-        bot_adi, kayit["sure_sn"],
+        bot_adi,
+        kayit["sure_sn"],
     )
     return {"basarili": True, **kayit}
 
@@ -378,6 +405,7 @@ def reasoning_loop(
 
 if __name__ == "__main__":
     import sys
+
     # CLI'da sys.path'e proje kökünü ekle (reymen paketini bulmak için)
     # __file__ = .../reymen/sistem/ortak_komut.py -> 4x parent = proje koku
     _cli_kok = Path(__file__).resolve().parent.parent.parent.parent
@@ -386,7 +414,9 @@ if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "tara":
         for ad in BOTLAR:
             d = tara_profil(BOTLAR[ad]["profil"])
-            print(f"{ad}: SOUL={d['soul_boyut']}b, Browser={d['browser']}, CWD={d['terminal_cwd']}")
+            print(
+                f"{ad}: SOUL={d['soul_boyut']}b, Browser={d['browser']}, CWD={d['terminal_cwd']}"
+            )
     elif len(sys.argv) > 1 and sys.argv[1] == "guncelle":
         sonuc = guncelle()
         print(f"✅ durum.json guncellendi. Botlar esit mi: {sonuc['esit_mi']['esit']}")

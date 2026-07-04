@@ -16,6 +16,7 @@ Run from the PR worktree:
     cd ~/.ReYMeN/ReYMeN-agent/.worktrees/browser-providers-plugin
     python tests/plugins/browser/check_parity_vs_main.py
 """
+
 from __future__ import annotations
 
 import json
@@ -32,12 +33,12 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 # checkout lives two levels up at ``~/.ReYMeN/ReYMeN-agent``.
 MAIN_DIR = REPO_ROOT.parent.parent  # ~/.ReYMeN/ReYMeN-agent
 PR_DIR = REPO_ROOT  # the worktree we're in
-assert (MAIN_DIR / "tools" / "browser_tool.py").exists(), (
-    f"MAIN_DIR={MAIN_DIR} doesn't look like a ReYMeN-agent checkout"
-)
-assert (PR_DIR / "tools" / "browser_tool.py").exists(), (
-    f"PR_DIR={PR_DIR} doesn't look like a ReYMeN-agent checkout"
-)
+assert (
+    MAIN_DIR / "tools" / "browser_tool.py"
+).exists(), f"MAIN_DIR={MAIN_DIR} doesn't look like a ReYMeN-agent checkout"
+assert (
+    PR_DIR / "tools" / "browser_tool.py"
+).exists(), f"PR_DIR={PR_DIR} doesn't look like a ReYMeN-agent checkout"
 
 
 # Reduced shape comparison — exact instance addresses obviously differ

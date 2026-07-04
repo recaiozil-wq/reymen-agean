@@ -33,18 +33,21 @@ HATA_KLASORU = ROOT / ".ReYMeN" / "hata_kodlari"
 # OCR modulu (opsiyonel)
 try:
     import pytesseract as _pytesseract
+
     _OCR_VAR = True
 except ImportError:
     _OCR_VAR = False
 
 try:
     from PIL import Image as _PIL_Image
+
     _PIL_VAR = True
 except ImportError:
     _PIL_VAR = False
 
 try:
     import mss as _mss
+
     _MSS_VAR = True
 except ImportError:
     _MSS_VAR = False
@@ -53,6 +56,7 @@ except ImportError:
 try:
     import ctypes
     from ctypes import wintypes
+
     _WIN_API_VAR = True
 except ImportError:
     _WIN_API_VAR = False
@@ -80,9 +84,11 @@ def _sonraki_hata_kodu() -> str:
 
 # ── Veri yapilari ──────────────────────────────────────────────────────────
 
+
 @dataclass
 class HataKaydi:
     """Bir hata kaydinin tum bilgileri."""
+
     kod: str
     zaman: str
     kategori: str
@@ -97,6 +103,7 @@ class HataKaydi:
 
 # ── 1. HataWatchdog ────────────────────────────────────────────────────────
 
+
 class HataWatchdog:
     """Ekrani periyodik tara, hata dialog'u tespit et, callback tetikle.
 
@@ -105,12 +112,28 @@ class HataWatchdog:
         Permission denied, SyntaxError, TypeError, ValueError
     """
 
-    _VARSAYILAN_KELIMELER = frozenset({
-        "hata", "error", "exception", "access denied", "file not found",
-        "permission denied", "syntaxerror", "typeerror", "valueerror",
-        "modulenotfounderror", "importerror", "keyerror", "indexerror",
-        "runtimeerror", "stop", "critical", "failed", "basarisiz",
-    })
+    _VARSAYILAN_KELIMELER = frozenset(
+        {
+            "hata",
+            "error",
+            "exception",
+            "access denied",
+            "file not found",
+            "permission denied",
+            "syntaxerror",
+            "typeerror",
+            "valueerror",
+            "modulenotfounderror",
+            "importerror",
+            "keyerror",
+            "indexerror",
+            "runtimeerror",
+            "stop",
+            "critical",
+            "failed",
+            "basarisiz",
+        }
+    )
 
     def __init__(
         self,
@@ -131,7 +154,9 @@ class HataWatchdog:
             logger.debug("[HataWatchdog] Zaten calisiyor.")
             return
         if not _MSS_VAR or not _OCR_VAR:
-            logger.warning("[HataWatchdog] mss veya pytesseract yok, watchdog sinirli calisir.")
+            logger.warning(
+                "[HataWatchdog] mss veya pytesseract yok, watchdog sinirli calisir."
+            )
         self._durdurma.clear()
         self._aktif = True
         self._thread = threading.Thread(target=self._dongu, daemon=True)
@@ -181,15 +206,22 @@ class HataWatchdog:
 
 # ── 2. HataKoduUretici ────────────────────────────────────────────────────
 
+
 class HataKoduUretici:
     """Hata metninden HATA-XXXX formatli kayit olusturur."""
 
     KATEGORILER = {
         "import": re.compile(r"import|modulenotfound|importerror", re.IGNORECASE),
         "syntax": re.compile(r"syntax|indentation|invalid syntax", re.IGNORECASE),
-        "tip": re.compile(r"typeerror|valueerror|cannot unpack|unhashable", re.IGNORECASE),
-        "dosya": re.compile(r"filenotfound|permission|file exists|no such file", re.IGNORECASE),
-        "baglanti": re.compile(r"timeout|connection|network|socket|cannot connect", re.IGNORECASE),
+        "tip": re.compile(
+            r"typeerror|valueerror|cannot unpack|unhashable", re.IGNORECASE
+        ),
+        "dosya": re.compile(
+            r"filenotfound|permission|file exists|no such file", re.IGNORECASE
+        ),
+        "baglanti": re.compile(
+            r"timeout|connection|network|socket|cannot connect", re.IGNORECASE
+        ),
         "bellek": re.compile(r"memory|outofmemory|alloc", re.IGNORECASE),
         "ekran": re.compile(r"screen|display|monitor|opencv|camera", re.IGNORECASE),
     }
@@ -242,7 +274,7 @@ class HataKoduUretici:
         for s in satirlar:
             if any(k in s.lower() for k in ("error", "hata", "exception", "failed")):
                 return s[:120]
-        return (satirlar[0][:120] if satirlar else "Bilinmeyen hata")
+        return satirlar[0][:120] if satirlar else "Bilinmeyen hata"
 
     def _md_yaz(self, kayit: HataKaydi) -> Path:
         """Hata kaydini .md dosyasi olarak kaydet."""
@@ -320,6 +352,7 @@ class HataKoduUretici:
 
 # ── 3. TerminalHataParser ──────────────────────────────────────────────────
 
+
 class TerminalHataParser:
     """Windows PowerShell/cmd ciktisindan hata mesajlarini ayiklar."""
 
@@ -377,13 +410,15 @@ class TerminalHataParser:
         sonuc["hata_var"] = len(sonuc["hata_mesajlari"]) > 0
         sonuc["hata_sayisi"] = len(sonuc["hata_mesajlari"])
         sonuc["ozet"] = (
-            sonuc["hata_mesajlari"][0][:150] if sonuc["hata_mesajlari"]
+            sonuc["hata_mesajlari"][0][:150]
+            if sonuc["hata_mesajlari"]
             else "Hata bulunamadi"
         )
         return sonuc
 
 
 # ── 4. CozumUygulayici ─────────────────────────────────────────────────────
+
 
 class CozumUygulayici:
     """Kullanicinin verdigi cozum metnini otomatik uygula.
@@ -427,14 +462,24 @@ class CozumUygulayici:
         yeni = yeni_m.group(1).strip() if yeni_m else ""
 
         if not dosya_yolu or not yeni:
-            return {"basarili": False, "kod": kod, "mesaj": "Eksik cozum: dosya veya yeni kod bulunamadi.", "patch_sonuc": ""}
+            return {
+                "basarili": False,
+                "kod": kod,
+                "mesaj": "Eksik cozum: dosya veya yeni kod bulunamadi.",
+                "patch_sonuc": "",
+            }
 
         # Tam yol
         tam_yol = ROOT / dosya_yolu
         if not tam_yol.exists():
             tam_yol = ROOT.parent / dosya_yolu
         if not tam_yol.exists():
-            return {"basarili": False, "kod": kod, "mesaj": f"Dosya bulunamadi: {dosya_yolu}", "patch_sonuc": ""}
+            return {
+                "basarili": False,
+                "kod": kod,
+                "mesaj": f"Dosya bulunamadi: {dosya_yolu}",
+                "patch_sonuc": "",
+            }
 
         # Patch uygula
         try:
@@ -450,16 +495,31 @@ class CozumUygulayici:
                     tam_yol.write_text("\n".join(satirlar), encoding="utf-8")
                     patch_sonuc = f"Satir {satir} degistirildi"
                 else:
-                    return {"basarili": False, "kod": kod, "mesaj": f"Satir {satir} dosyada yok.", "patch_sonuc": ""}
+                    return {
+                        "basarili": False,
+                        "kod": kod,
+                        "mesaj": f"Satir {satir} dosyada yok.",
+                        "patch_sonuc": "",
+                    }
             else:
-                return {"basarili": False, "kod": kod, "mesaj": "Ne eski kod ne satir belirtilmemis.", "patch_sonuc": ""}
+                return {
+                    "basarili": False,
+                    "kod": kod,
+                    "mesaj": "Ne eski kod ne satir belirtilmemis.",
+                    "patch_sonuc": "",
+                }
 
             # Hata kaydini guncelle
             if kod:
                 self.hata_uretici.cozum_ekle(kod, cozum_metni)
 
             logger.info("[Cozum] %s uygulandi: %s", kod or "Cozum", patch_sonuc[:100])
-            return {"basarili": True, "kod": kod, "mesaj": "Cozum uygulandi.", "patch_sonuc": patch_sonuc}
+            return {
+                "basarili": True,
+                "kod": kod,
+                "mesaj": "Cozum uygulandi.",
+                "patch_sonuc": patch_sonuc,
+            }
 
         except Exception as e:
             logger.error("[Cozum] Uygulama hatasi: %s", e)
@@ -467,6 +527,7 @@ class CozumUygulayici:
 
 
 # ── motor.py tool kayit fonksiyonu ─────────────────────────────────────────
+
 
 def motor_kaydet(motor) -> None:
     """motor.py icin HATA_ ve COZUM_ araclarini kaydet."""
@@ -492,15 +553,19 @@ def motor_kaydet(motor) -> None:
 
         if arac == "HATA_KOD_AL":
             kayit = hata_kod.kaydet(ham_param)
-            return (f"[HataKod] {kayit.kod}: [{kayit.kategori}] {kayit.ozet}\n"
-                    f"Dosya: .ReYMeN/hata_kodlari/{kayit.kod}.md\n"
-                    f"Claude'a su kodu yapistir: {kayit.kod}")
+            return (
+                f"[HataKod] {kayit.kod}: [{kayit.kategori}] {kayit.ozet}\n"
+                f"Dosya: .ReYMeN/hata_kodlari/{kayit.kod}.md\n"
+                f"Claude'a su kodu yapistir: {kayit.kod}"
+            )
 
         if arac == "TERMINAL_HATA_PARSE":
             sonuc = terminal_parser.parse(ham_param)
             if sonuc["hata_var"]:
-                return (f"[Terminal] {sonuc['hata_sayisi']} hata bulundu.\n"
-                        f"Ilki: {sonuc['ozet']}")
+                return (
+                    f"[Terminal] {sonuc['hata_sayisi']} hata bulundu.\n"
+                    f"Ilki: {sonuc['ozet']}"
+                )
             return "[Terminal] Hata bulunamadi."
 
         if arac == "COZUM_UYGULA":
@@ -512,7 +577,9 @@ def motor_kaydet(motor) -> None:
         return motor._orijinal_calistir(arac, ham_param)
 
     motor.calistir = yamali_calistir
-    logger.info("[HataCozucu] 5 arac kaydedildi: HATA_WATCH_BASLAT, HATA_WATCH_DURDUR, HATA_KOD_AL, TERMINAL_HATA_PARSE, COZUM_UYGULA")
+    logger.info(
+        "[HataCozucu] 5 arac kaydedildi: HATA_WATCH_BASLAT, HATA_WATCH_DURDUR, HATA_KOD_AL, TERMINAL_HATA_PARSE, COZUM_UYGULA"
+    )
 
 
 # ── Hizli test ─────────────────────────────────────────────────────────────
@@ -530,7 +597,7 @@ ModuleNotFoundError: No module named 'missing_module'
 """
     sonuc = parser.parse(ornek_cikti)
     print(f"Hata var: {sonuc['hata_var']}, Sayi: {sonuc['hata_sayisi']}")
-    for m in sonuc['hata_mesajlari'][:2]:
+    for m in sonuc["hata_mesajlari"][:2]:
         print(f"  -> {m[:80]}")
 
     print("\n=== 2. HataKoduUretici Test ===")

@@ -12,10 +12,11 @@ PROJE_KOK = Path(__file__).resolve().parent
 VENV_PYTHON = PROJE_KOK / "venv" / "Scripts" / "python.exe"
 
 BOTLAR = [
-    {"adi": "Kral_38",      "token_env": "BOT_TOKEN_KRAL"},
-    {"adi": "Pasa_38",      "token_env": "BOT_TOKEN_PASA"},
-    {"adi": "ReYMeN_¥_♤",  "token_env": "BOT_TOKEN_REYMEN"},
+    {"adi": "Kral_38", "token_env": "BOT_TOKEN_KRAL"},
+    {"adi": "Pasa_38", "token_env": "BOT_TOKEN_PASA"},
+    {"adi": "ReYMeN_¥_♤", "token_env": "BOT_TOKEN_REYMEN"},
 ]
+
 
 def _env_yukle():
     """.env dosyasini oku, ortam degiskenlerine ekle."""
@@ -27,6 +28,7 @@ def _env_yukle():
                 if line and not line.startswith("#") and "=" in line:
                     key, val = line.split("=", 1)
                     os.environ.setdefault(key.strip(), val.strip())
+
 
 def bot_baslat(bot_adi: str, token_env: str):
     """Bir botu ayri process'te baslat."""
@@ -50,6 +52,7 @@ def bot_baslat(bot_adi: str, token_env: str):
     )
     print(f"[{bot_adi}] ✅ Baslatildi (PID: {proc.pid})", flush=True)
     return proc
+
 
 def main():
     print("╔══════════════════════════════════════╗")
@@ -81,6 +84,7 @@ def main():
         for p in processler:
             p.terminate()
         print("Tum botlar durduruldu.")
+
 
 if __name__ == "__main__":
     main()

@@ -77,9 +77,9 @@ class TestCreateOpenAIClientCallable:
         forwarded = captured["kwargs"]["api_key"]
         assert callable(forwarded)
         assert not isinstance(forwarded, str)
-        assert forwarded is token_provider, (
-            "_create_openai_client must not wrap or coerce the callable"
-        )
+        assert (
+            forwarded is token_provider
+        ), "_create_openai_client must not wrap or coerce the callable"
         assert client is not None
 
 
@@ -99,23 +99,28 @@ class TestNormalizeMainRuntimePreservesCallable:
         def provider():
             return "jwt"
 
-        normalized = _normalize_main_runtime({
-            "provider": "azure-foundry",
-            "model": "gpt-4o",
-            "base_url": "https://r.openai.azure.com/openai/v1",
-            "api_key": provider,
-            "api_mode": "chat_completions",
-            "auth_mode": "entra_id",
-        })
+        normalized = _normalize_main_runtime(
+            {
+                "provider": "azure-foundry",
+                "model": "gpt-4o",
+                "base_url": "https://r.openai.azure.com/openai/v1",
+                "api_key": provider,
+                "api_mode": "chat_completions",
+                "auth_mode": "entra_id",
+            }
+        )
         assert normalized["api_key"] is provider
         assert normalized["auth_mode"] == "entra_id"
 
     def test_string_api_key_still_works(self):
         from agent.auxiliary_client import _normalize_main_runtime
-        normalized = _normalize_main_runtime({
-            "provider": "azure-foundry",
-            "api_key": "sk-static",
-        })
+
+        normalized = _normalize_main_runtime(
+            {
+                "provider": "azure-foundry",
+                "api_key": "sk-static",
+            }
+        )
         assert normalized["api_key"] == "sk-static"
 
     def test_normalization_drops_empty_string_but_preserves_callable(self):
@@ -127,21 +132,26 @@ class TestNormalizeMainRuntimePreservesCallable:
         # Empty string fields are dropped, but a callable is preserved
         # even if it would mint an empty token (we don't invoke during
         # normalization).
-        normalized = _normalize_main_runtime({
-            "provider": "azure-foundry",
-            "api_key": provider,
-            "model": "",
-        })
+        normalized = _normalize_main_runtime(
+            {
+                "provider": "azure-foundry",
+                "api_key": provider,
+                "model": "",
+            }
+        )
         assert normalized["api_key"] is provider
         assert "model" not in normalized
 
     def test_unknown_field_dropped(self):
         from agent.auxiliary_client import _normalize_main_runtime, _MAIN_RUNTIME_FIELDS
-        normalized = _normalize_main_runtime({
-            "provider": "azure-foundry",
-            "api_key": "k",
-            "secret_field_we_dont_want": "leak",
-        })
+
+        normalized = _normalize_main_runtime(
+            {
+                "provider": "azure-foundry",
+                "api_key": "k",
+                "secret_field_we_dont_want": "leak",
+            }
+        )
         assert "secret_field_we_dont_want" not in normalized
         # auth_mode IS in the field allowlist (rubber-duck blocker fix).
         assert "auth_mode" in _MAIN_RUNTIME_FIELDS
@@ -171,12 +181,14 @@ class TestTruncateTokenCallable:
 
     def test_string_jwt_still_truncated_to_signature_tail(self):
         from ReYMeN_cli.web_server import _truncate_token
+
         # JWT shape: header.payload.signature → only signature tail shown.
         out = _truncate_token("aaaa.bbbb.cccccccsig", visible=4)
         assert out == "…csig"
 
     def test_empty_returns_empty(self):
         from ReYMeN_cli.web_server import _truncate_token
+
         assert _truncate_token(None) == ""
         assert _truncate_token("") == ""
 
@@ -216,7 +228,9 @@ class TestRuntimeDictSerializationGuard:
 
 
 class TestBatchRunnerCallableHandling:
-    def test_callable_api_key_stripped_from_worker_config(self, capsys, monkeypatch, tmp_path):
+    def test_callable_api_key_stripped_from_worker_config(
+        self, capsys, monkeypatch, tmp_path
+    ):
         """``BatchRunner._run_batches`` (or the equivalent code path)
         must replace a callable api_key with None before pickling the
         worker config dict — otherwise multiprocessing.Pool fails."""
@@ -230,7 +244,9 @@ class TestBatchRunnerCallableHandling:
             return "jwt"
 
         api_key = provider
-        worker_api_key = None if (callable(api_key) and not isinstance(api_key, str)) else api_key
+        worker_api_key = (
+            None if (callable(api_key) and not isinstance(api_key, str)) else api_key
+        )
         assert worker_api_key is None, (
             "BatchRunner must replace callable api_key with None so "
             "multiprocessing.Pool can pickle the worker config"
@@ -238,7 +254,11 @@ class TestBatchRunnerCallableHandling:
 
         # And a string passes through unchanged.
         api_key_str = "sk-static"
-        worker_api_key_str = None if (callable(api_key_str) and not isinstance(api_key_str, str)) else api_key_str
+        worker_api_key_str = (
+            None
+            if (callable(api_key_str) and not isinstance(api_key_str, str))
+            else api_key_str
+        )
         assert worker_api_key_str == "sk-static"
 
     def test_batch_runner_source_uses_the_correct_predicate(self):
@@ -246,8 +266,10 @@ class TestBatchRunnerCallableHandling:
         change it are caught here. Reading the source rather than
         importing avoids spinning up the full BatchRunner."""
         from pathlib import Path
-        src = (Path(__file__).resolve().parent.parent.parent
-               / "batch_runner.py").read_text()
+
+        src = (
+            Path(__file__).resolve().parent.parent.parent / "batch_runner.py"
+        ).read_text()
         assert "callable(self.api_key) and not isinstance(self.api_key, str)" in src, (
             "BatchRunner.api_key callable check changed — update test or "
             "verify the new predicate still routes Entra token providers "
@@ -275,11 +297,15 @@ class TestCliEnsureRuntimeCredentialsCallable:
 
     def test_callable_predicate_present_in_cli_runtime_validation(self):
         from pathlib import Path
+
         # ``_ensure_runtime_credentials`` was extracted from cli.py into the
         # ``CLIAgentSetupMixin`` (god-file decomposition Phase 4). Read the
         # module the method actually lives in now.
-        src = (Path(__file__).resolve().parent.parent.parent
-               / "ReYMeN_cli" / "cli_agent_setup_mixin.py").read_text()
+        src = (
+            Path(__file__).resolve().parent.parent.parent
+            / "ReYMeN_cli"
+            / "cli_agent_setup_mixin.py"
+        ).read_text()
         # The fix introduces ``_is_callable_provider`` which gates the
         # string-only check so callable token providers survive.
         assert "_is_callable_provider = callable(api_key)" in src, (
@@ -306,8 +332,10 @@ class TestInlinedDisplayMasks:
         ``is_token_provider`` so a callable Entra ID provider doesn't
         crash ``len(api_key)``."""
         from pathlib import Path
-        src = (Path(__file__).resolve().parent.parent.parent
-               / "agent" / "agent_init.py").read_text()
+
+        src = (
+            Path(__file__).resolve().parent.parent.parent / "agent" / "agent_init.py"
+        ).read_text()
         assert src.count("is_token_provider(") >= 2, (
             "agent/agent_init.py must guard BOTH masked-banner paths "
             "(chat_completions and anthropic_messages) with "
@@ -326,8 +354,8 @@ class TestInlinedDisplayMasks:
         ``is_token_provider`` and prints the same static label as the
         run_agent banners."""
         from pathlib import Path
-        src = (Path(__file__).resolve().parent.parent.parent
-               / "cli.py").read_text()
+
+        src = (Path(__file__).resolve().parent.parent.parent / "cli.py").read_text()
         assert "is_token_provider(self.api_key)" in src, (
             "cli.ReYMeNCLI.show_config must guard self.api_key via "
             "is_token_provider so callable Entra ID providers don't "
@@ -347,8 +375,10 @@ class TestInlinedDisplayMasks:
         and return the placeholder rather than crashing on
         ``len(callable)``."""
         from pathlib import Path
-        src = (Path(__file__).resolve().parent.parent.parent
-               / "run_agent.py").read_text()
+
+        src = (
+            Path(__file__).resolve().parent.parent.parent / "run_agent.py"
+        ).read_text()
         # The function now starts with a callable check.
         assert (
             "if callable(key) and not isinstance(key, str):" in src
@@ -366,8 +396,12 @@ class TestInlinedDisplayMasks:
         to do ``key[:12]`` on ``self._anthropic_api_key``. For Entra ID +
         Anthropic-style mode that's a callable; slicing crashes."""
         from pathlib import Path
-        src = (Path(__file__).resolve().parent.parent.parent
-               / "agent" / "conversation_loop.py").read_text()
+
+        src = (
+            Path(__file__).resolve().parent.parent.parent
+            / "agent"
+            / "conversation_loop.py"
+        ).read_text()
         # The Anthropic 401 block now branches on is_token_provider
         # before slicing the key.
         assert "Microsoft Entra ID (httpx event hook)" in src, (

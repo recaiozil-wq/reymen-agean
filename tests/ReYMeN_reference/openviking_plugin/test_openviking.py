@@ -20,10 +20,27 @@ class FakeVikingClient:
 
 class TestOpenVikingSummaryUriNormalization:
     def test_normalize_summary_uri_maps_pseudo_files_to_parent_directory(self):
-        assert OpenVikingMemoryProvider._normalize_summary_uri("viking://user/ReYMeN/.overview.md") == "viking://user/ReYMeN"
-        assert OpenVikingMemoryProvider._normalize_summary_uri("viking://resources/.abstract.md") == "viking://resources"
-        assert OpenVikingMemoryProvider._normalize_summary_uri("viking://") == "viking://"
-        assert OpenVikingMemoryProvider._normalize_summary_uri("viking://user/ReYMeN/memories/profile.md") == "viking://user/ReYMeN/memories/profile.md"
+        assert (
+            OpenVikingMemoryProvider._normalize_summary_uri(
+                "viking://user/ReYMeN/.overview.md"
+            )
+            == "viking://user/ReYMeN"
+        )
+        assert (
+            OpenVikingMemoryProvider._normalize_summary_uri(
+                "viking://resources/.abstract.md"
+            )
+            == "viking://resources"
+        )
+        assert (
+            OpenVikingMemoryProvider._normalize_summary_uri("viking://") == "viking://"
+        )
+        assert (
+            OpenVikingMemoryProvider._normalize_summary_uri(
+                "viking://user/ReYMeN/memories/profile.md"
+            )
+            == "viking://user/ReYMeN/memories/profile.md"
+        )
 
 
 class TestOpenVikingRead:
@@ -38,16 +55,22 @@ class TestOpenVikingRead:
             }
         )
 
-        result = json.loads(provider._tool_read({"uri": "viking://user/ReYMeN/.overview.md", "level": "overview"}))
+        result = json.loads(
+            provider._tool_read(
+                {"uri": "viking://user/ReYMeN/.overview.md", "level": "overview"}
+            )
+        )
 
         assert result["uri"] == "viking://user/ReYMeN/.overview.md"
         assert result["resolved_uri"] == "viking://user/ReYMeN"
         assert result["level"] == "overview"
         assert result["content"] == "overview text"
-        assert provider._client.calls == [(
-            "/api/v1/content/overview",
-            {"uri": "viking://user/ReYMeN"},
-        )]
+        assert provider._client.calls == [
+            (
+                "/api/v1/content/overview",
+                {"uri": "viking://user/ReYMeN"},
+            )
+        ]
 
     def test_full_read_keeps_original_uri(self):
         provider = OpenVikingMemoryProvider()
@@ -60,16 +83,22 @@ class TestOpenVikingRead:
             }
         )
 
-        result = json.loads(provider._tool_read({"uri": "viking://user/ReYMeN/memories/profile.md", "level": "full"}))
+        result = json.loads(
+            provider._tool_read(
+                {"uri": "viking://user/ReYMeN/memories/profile.md", "level": "full"}
+            )
+        )
 
         assert result["uri"] == "viking://user/ReYMeN/memories/profile.md"
         assert result["resolved_uri"] == "viking://user/ReYMeN/memories/profile.md"
         assert result["level"] == "full"
         assert result["content"] == "full text"
-        assert provider._client.calls == [(
-            "/api/v1/content/read",
-            {"uri": "viking://user/ReYMeN/memories/profile.md"},
-        )]
+        assert provider._client.calls == [
+            (
+                "/api/v1/content/read",
+                {"uri": "viking://user/ReYMeN/memories/profile.md"},
+            )
+        ]
 
     def test_overview_file_uri_routes_straight_to_content_read_via_stat_probe(self):
         """Pre-check via fs/stat: file URIs skip the directory-only endpoint entirely."""
@@ -112,7 +141,11 @@ class TestOpenVikingRead:
             }
         )
 
-        result = json.loads(provider._tool_read({"uri": "viking://user/ReYMeN/.overview.md", "level": "overview"}))
+        result = json.loads(
+            provider._tool_read(
+                {"uri": "viking://user/ReYMeN/.overview.md", "level": "overview"}
+            )
+        )
 
         assert result["content"] == "overview"
         # No fs/stat call — normalization already determined it's a directory.
@@ -191,7 +224,9 @@ class TestOpenVikingRead:
         )
 
         try:
-            provider._tool_read({"uri": "viking://user/ReYMeN/.overview.md", "level": "overview"})
+            provider._tool_read(
+                {"uri": "viking://user/ReYMeN/.overview.md", "level": "overview"}
+            )
             assert False, "Expected summary endpoint error to be raised"
         except RuntimeError:
             pass
@@ -212,25 +247,48 @@ class TestOpenVikingBrowse:
                 ): {
                     "result": {
                         "entries": [
-                            {"name": "memories", "uri": "viking://user/ReYMeN/memories", "type": "dir"},
-                            {"rel_path": "profile.md", "uri": "viking://user/ReYMeN/memories/profile.md", "isDir": False, "abstract": "Profile"},
+                            {
+                                "name": "memories",
+                                "uri": "viking://user/ReYMeN/memories",
+                                "type": "dir",
+                            },
+                            {
+                                "rel_path": "profile.md",
+                                "uri": "viking://user/ReYMeN/memories/profile.md",
+                                "isDir": False,
+                                "abstract": "Profile",
+                            },
                         ]
                     }
                 },
             }
         )
 
-        result = json.loads(provider._tool_browse({"action": "list", "path": "viking://user/ReYMeN"}))
+        result = json.loads(
+            provider._tool_browse({"action": "list", "path": "viking://user/ReYMeN"})
+        )
 
         assert result["path"] == "viking://user/ReYMeN"
         assert result["entries"] == [
-            {"name": "memories", "uri": "viking://user/ReYMeN/memories", "type": "dir", "abstract": ""},
-            {"name": "profile.md", "uri": "viking://user/ReYMeN/memories/profile.md", "type": "file", "abstract": "Profile"},
+            {
+                "name": "memories",
+                "uri": "viking://user/ReYMeN/memories",
+                "type": "dir",
+                "abstract": "",
+            },
+            {
+                "name": "profile.md",
+                "uri": "viking://user/ReYMeN/memories/profile.md",
+                "type": "file",
+                "abstract": "Profile",
+            },
         ]
-        assert provider._client.calls == [(
-            "/api/v1/fs/ls",
-            {"uri": "viking://user/ReYMeN"},
-        )]
+        assert provider._client.calls == [
+            (
+                "/api/v1/fs/ls",
+                {"uri": "viking://user/ReYMeN"},
+            )
+        ]
 
 
 class TestOpenVikingMemoryUriBuilder:
@@ -250,7 +308,9 @@ class TestOpenVikingMemoryUriBuilder:
         """URI must contain /agent/{agent}/ between user and memories."""
         p = self._make_provider(user="alice", agent="coder")
         uri = p._build_memory_uri("preferences")
-        assert uri.startswith("viking://user/alice/agent/coder/memories/preferences/mem_")
+        assert uri.startswith(
+            "viking://user/alice/agent/coder/memories/preferences/mem_"
+        )
         assert uri.endswith(".md")
 
     def test_uri_uses_configured_agent_not_default(self):
@@ -263,6 +323,7 @@ class TestOpenVikingMemoryUriBuilder:
     def test_uri_slug_is_twelve_hex_chars_and_unique(self):
         """Slug must be 12 hex chars and differ between calls."""
         import re
+
         p = self._make_provider()
         uri1 = p._build_memory_uri("preferences")
         uri2 = p._build_memory_uri("preferences")
@@ -278,6 +339,6 @@ class TestOpenVikingMemoryUriBuilder:
         subdirs = ["preferences", "entities", "events", "cases", "patterns"]
         for subdir in subdirs:
             uri = p._build_memory_uri(subdir)
-            assert f"/memories/{subdir}/mem_" in uri, (
-                f"subdir '{subdir}' not placed correctly in URI: {uri}"
-            )
+            assert (
+                f"/memories/{subdir}/mem_" in uri
+            ), f"subdir '{subdir}' not placed correctly in URI: {uri}"

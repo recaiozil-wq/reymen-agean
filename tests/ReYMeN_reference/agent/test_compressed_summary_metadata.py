@@ -12,6 +12,7 @@ Two invariants:
    opencode-go) reject unknown message keys with "Extra inputs are not
    permitted", poisoning the session.
 """
+
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -23,9 +24,7 @@ from agent.context_compressor import (
 
 
 def _make_compressor():
-    with patch(
-        "agent.context_compressor.get_model_context_length", return_value=8000
-    ):
+    with patch("agent.context_compressor.get_model_context_length", return_value=8000):
         return ContextCompressor(
             model="test-model", quiet_mode=True, config_context_length=8000
         )
@@ -51,7 +50,8 @@ class TestMetadataFlagSet:
         cc = _make_compressor()
         out = _compress(cc, _make_messages())
         flagged = [
-            m for m in out
+            m
+            for m in out
             if isinstance(m, dict) and m.get(COMPRESSED_SUMMARY_METADATA_KEY)
         ]
         assert len(flagged) == 1
@@ -83,11 +83,9 @@ class TestMetadataFlagNeverReachesWire:
         out = _compress(cc, _make_messages())
         wire = ChatCompletionsTransport().convert_messages(out, model="some-model")
         assert not any(
-            isinstance(m, dict) and COMPRESSED_SUMMARY_METADATA_KEY in m
-            for m in wire
+            isinstance(m, dict) and COMPRESSED_SUMMARY_METADATA_KEY in m for m in wire
         )
         # Sanitization must not destroy the in-process flag on the originals.
         assert any(
-            isinstance(m, dict) and m.get(COMPRESSED_SUMMARY_METADATA_KEY)
-            for m in out
+            isinstance(m, dict) and m.get(COMPRESSED_SUMMARY_METADATA_KEY) for m in out
         )

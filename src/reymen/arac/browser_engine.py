@@ -29,6 +29,7 @@ logger = logging.getLogger(__name__)
 
 # ── Sekme State Yönetimi ────────────────────────────────────────────
 
+
 def log_sekme_durumu(browser, baglam: str = "", olay: str = ""):
     """Teşhis: açık sekmeleri ve çağrı yığınını logla.
 
@@ -36,9 +37,8 @@ def log_sekme_durumu(browser, baglam: str = "", olay: str = ""):
         log_sekme_durumu(browser, "gorev_baslat", "new_page öncesi")
     """
     try:
-        sekmeler = browser.pages if hasattr(browser, 'pages') else []
-        logger.info("[Sekme:%s:%s] Acik sekme: %d",
-                     baglam, olay, len(sekmeler))
+        sekmeler = browser.pages if hasattr(browser, "pages") else []
+        logger.info("[Sekme:%s:%s] Acik sekme: %d", baglam, olay, len(sekmeler))
         for i, s in enumerate(sekmeler):
             try:
                 url = s.url
@@ -117,6 +117,7 @@ class SekmeYoneticisi:
         finally:
             self._aktif_sekme = None
 
+
 # Playwright MCP: npx ile calistir
 _NPX = shutil.which("npx") or "npx"
 PLAYWRIGHT_MCP_CMD = [_NPX, "-y", "@playwright/mcp"]
@@ -124,6 +125,7 @@ PLAYWRIGHT_MCP_CMD = [_NPX, "-y", "@playwright/mcp"]
 # Browser Use
 try:
     from browser_use import Agent as BrowserUseAgent
+
     BROWSER_USE_OK = True
 except ImportError:
     BROWSER_USE_OK = False
@@ -147,11 +149,14 @@ class PlaywrightMCPEngine:
                 text=True,
             )
             # Initialize
-            self._json_rpc("initialize", {
-                "protocolVersion": "0.1.0",
-                "capabilities": {},
-                "clientInfo": {"name": "ReYMeN", "version": "1.0"},
-            })
+            self._json_rpc(
+                "initialize",
+                {
+                    "protocolVersion": "0.1.0",
+                    "capabilities": {},
+                    "clientInfo": {"name": "ReYMeN", "version": "1.0"},
+                },
+            )
             return True
         except Exception as e:
             logger.error("[Playwright] Baslatma hatasi: %s", e)
@@ -159,10 +164,17 @@ class PlaywrightMCPEngine:
 
     def _json_rpc(self, method: str, params: dict) -> dict:
         self._istek_id += 1
-        istek = json.dumps({
-            "jsonrpc": "2.0", "id": self._istek_id,
-            "method": method, "params": params,
-        }) + "\n"
+        istek = (
+            json.dumps(
+                {
+                    "jsonrpc": "2.0",
+                    "id": self._istek_id,
+                    "method": method,
+                    "params": params,
+                }
+            )
+            + "\n"
+        )
         try:
             self._proc.stdin.write(istek)
             self._proc.stdin.flush()
@@ -173,42 +185,57 @@ class PlaywrightMCPEngine:
 
     def sayfa_ac(self, url: str) -> str:
         """Sayfa ac."""
-        yanit = self._json_rpc("tools/call", {
-            "name": "browser_navigate",
-            "arguments": {"url": url},
-        })
+        yanit = self._json_rpc(
+            "tools/call",
+            {
+                "name": "browser_navigate",
+                "arguments": {"url": url},
+            },
+        )
         return str(yanit.get("result", {}))
 
     def tikla(self, selector: str) -> str:
         """Elemente tikla."""
-        yanit = self._json_rpc("tools/call", {
-            "name": "browser_click",
-            "arguments": {"selector": selector},
-        })
+        yanit = self._json_rpc(
+            "tools/call",
+            {
+                "name": "browser_click",
+                "arguments": {"selector": selector},
+            },
+        )
         return str(yanit.get("result", {}))
 
     def yazi_yaz(self, selector: str, text: str) -> str:
         """Input alanina yazi yaz."""
-        yanit = self._json_rpc("tools/call", {
-            "name": "browser_type",
-            "arguments": {"selector": selector, "text": text},
-        })
+        yanit = self._json_rpc(
+            "tools/call",
+            {
+                "name": "browser_type",
+                "arguments": {"selector": selector, "text": text},
+            },
+        )
         return str(yanit.get("result", {}))
 
     def ekran_goruntusu(self) -> str:
         """Ekran goruntusu al."""
-        yanit = self._json_rpc("tools/call", {
-            "name": "browser_screenshot",
-            "arguments": {},
-        })
+        yanit = self._json_rpc(
+            "tools/call",
+            {
+                "name": "browser_screenshot",
+                "arguments": {},
+            },
+        )
         return str(yanit.get("result", {}))
 
     def sayfa_basligi(self) -> str:
         """Sayfa basligini al (browser_snapshot ile)."""
-        yanit = self._json_rpc("tools/call", {
-            "name": "browser_snapshot",
-            "arguments": {},
-        })
+        yanit = self._json_rpc(
+            "tools/call",
+            {
+                "name": "browser_snapshot",
+                "arguments": {},
+            },
+        )
         return str(yanit.get("result", {}))
 
     def kapat(self):

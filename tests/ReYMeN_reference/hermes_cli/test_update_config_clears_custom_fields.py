@@ -61,9 +61,9 @@ class TestUpdateConfigForProviderClearsStaleCustomFields:
         model_cfg = _read_model_cfg()
         assert model_cfg.get("provider") == "openrouter"
         assert model_cfg.get("base_url") == "https://openrouter.ai/api/v1"
-        assert "api_key" not in model_cfg, (
-            "Stale custom api_key would leak into OpenRouter requests — must be cleared"
-        )
+        assert (
+            "api_key" not in model_cfg
+        ), "Stale custom api_key would leak into OpenRouter requests — must be cleared"
         assert "api_mode" not in model_cfg, (
             "Stale api_mode=anthropic_messages from MiniMax would mis-route "
             "OpenRouter requests to the Anthropic SDK — must be cleared"

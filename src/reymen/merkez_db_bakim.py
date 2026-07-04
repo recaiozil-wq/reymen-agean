@@ -1,7 +1,9 @@
 """merkez_db_bakim.py — Haftalık WAL checkpoint + boyut raporu."""
+
 import sqlite3, os, json
 from pathlib import Path
 import logging
+
 logger = logging.getLogger(__name__)
 
 DB_DIR = Path(__file__).parent / "merkez_db"

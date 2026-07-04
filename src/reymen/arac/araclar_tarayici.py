@@ -9,8 +9,10 @@ KURULUM (bir kerelik):
 
 Playwright yoksa import hata vermez; araç "kurulu değil" der.
 """
+
 try:
     from playwright.sync_api import sync_playwright
+
     PLAYWRIGHT_OK = True
 except Exception:
     PLAYWRIGHT_OK = False
@@ -63,12 +65,17 @@ def motor_kaydet(motor):
         return
     motor._plugin_arac_kaydet(
         "TARAYICI_AC",
-        lambda url="", secici="": TarayiciKontrol().sayfa_ac_ve_oku(url, secici or None),
+        lambda url="", secici="": TarayiciKontrol().sayfa_ac_ve_oku(
+            url, secici or None
+        ),
         "URL'yi tarayıcıda aç ve metin döndür (url, secici: CSS seçici opsiyonel)",
     )
     motor._plugin_arac_kaydet(
         "TARAYICI_TIKLA",
-        lambda url="", tikla_secici="", yazi_secici="", yazi="": TarayiciKontrol().tikla_ve_yaz(
+        lambda url="",
+        tikla_secici="",
+        yazi_secici="",
+        yazi="": TarayiciKontrol().tikla_ve_yaz(
             url, tikla_secici or None, yazi_secici or None, yazi or None
         ),
         "Sayfayı aç, elemente tıkla/yaz (url, tikla_secici, yazi_secici, yazi)",

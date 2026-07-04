@@ -141,9 +141,7 @@ class Broker:
         """Mesajı hedef agent'ın inbox'ına bırakır."""
         with self._global_lock:
             if message.receiver not in self._inboxes:
-                raise A2AError(
-                    f"Alıcı '{message.receiver}' kayıtlı değil"
-                )
+                raise A2AError(f"Alıcı '{message.receiver}' kayıtlı değil")
             inbox = self._inboxes[message.receiver]
             condition = self._conditions[message.receiver]
 
@@ -163,7 +161,9 @@ class Broker:
                     "[SessizExcept] %%s: %%s", type(_e).__name__, _e
                 )  # Handler hatası mesaj akışını bozmamalı
 
-    def broadcast(self, sender: str, content: Any, *, exclude: set[str] | None = None) -> list[str]:
+    def broadcast(
+        self, sender: str, content: Any, *, exclude: set[str] | None = None
+    ) -> list[str]:
         """Tüm kayıtlı agent'lara broadcast mesaj gönderir.
 
         Returns:
@@ -173,10 +173,7 @@ class Broker:
         exclude.add(sender)
         sent_to: list[str] = []
         with self._global_lock:
-            targets = [
-                aid for aid in self._inboxes
-                if aid not in exclude
-            ]
+            targets = [aid for aid in self._inboxes if aid not in exclude]
         for aid in targets:
             msg = Message(
                 sender=sender,
@@ -261,9 +258,7 @@ class Broker:
             return {
                 "agents": len(self._inboxes),
                 "total_messages": len(self._log),
-                "pending": {
-                    aid: len(inbox) for aid, inbox in self._inboxes.items()
-                },
+                "pending": {aid: len(inbox) for aid, inbox in self._inboxes.items()},
             }
 
     def reset(self) -> None:

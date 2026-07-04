@@ -7,6 +7,7 @@ Sayfa icerik cekme: Playwright > urllib fallback.
 
 API anahtari gerekmez (DuckDuckGo fallback her zaman calisir).
 """
+
 import html
 import logging
 import os
@@ -29,8 +30,9 @@ def _temizle(s: str) -> str:
     return html.unescape(re.sub(r"<[^>]+>", "", s)).strip()
 
 
-def _http_get(url: str, params: dict = None, headers: dict = None,
-              timeout: int = 15) -> str:
+def _http_get(
+    url: str, params: dict = None, headers: dict = None, timeout: int = 15
+) -> str:
     if params:
         url = url + "?" + urllib.parse.urlencode(params)
     req = urllib.request.Request(url, headers={**_HEADERS, **(headers or {})})
@@ -41,6 +43,7 @@ def _http_get(url: str, params: dict = None, headers: dict = None,
 
 # ── Ana arama fonksiyonu (SearchDispatcher'a yönlendirir) ─────────────────
 
+
 def web_ara(sorgu: str, adet: int = 5) -> str:
     """Internette arar. SearchDispatcher'a yönlendirir (auto-detect)."""
     dispatcher = _get_dispatcher()
@@ -49,11 +52,13 @@ def web_ara(sorgu: str, adet: int = 5) -> str:
 
 # ── Sayfa icerik cekme ────────────────────────────────────────────────────
 
+
 def web_icerik_al(url: str, max_karakter: int = 3000) -> str:
     """Bir URL'nin metin icerigini cekin. Playwright > urllib fallback."""
     # Playwright dene
     try:
         from playwright.sync_api import sync_playwright
+
         with sync_playwright() as pw:
             b = pw.chromium.launch(headless=True, args=["--no-sandbox"])
             p = b.new_page()
@@ -77,12 +82,15 @@ def web_icerik_al(url: str, max_karakter: int = 3000) -> str:
                 super().__init__()
                 self._t = []
                 self._atla = False
+
             def handle_starttag(self, t, _):
                 if t in ("script", "style", "nav", "footer"):
                     self._atla = True
+
             def handle_endtag(self, t):
                 if t in ("script", "style", "nav", "footer"):
                     self._atla = False
+
             def handle_data(self, d):
                 if not self._atla and d.strip():
                     self._t.append(d.strip())
@@ -97,6 +105,7 @@ def web_icerik_al(url: str, max_karakter: int = 3000) -> str:
 
 # ── Motor kayit ───────────────────────────────────────────────────────────
 
+
 def motor_kaydet(motor) -> None:
     if not hasattr(motor, "_plugin_arac_kaydet"):
         return
@@ -105,16 +114,18 @@ def motor_kaydet(motor) -> None:
             "WEB_ARA",
             lambda ham="": web_ara(
                 re.findall(r'"((?:[^"\\]|\\.)*)"', ham)[0]
-                if re.findall(r'"((?:[^"\\]|\\.)*)"', ham) else ham.strip('"')
+                if re.findall(r'"((?:[^"\\]|\\.)*)"', ham)
+                else ham.strip('"')
             ),
             "Web aramasi yapar (coklu back-end, auto-detect). "
-            "Kullanim: WEB_ARA(\"sorgu\")",
+            'Kullanim: WEB_ARA("sorgu")',
         )
         motor._plugin_arac_kaydet(
             "WEB_ICERIK",
             lambda ham="": web_icerik_al(
                 re.findall(r'"((?:[^"\\]|\\.)*)"', ham)[0]
-                if re.findall(r'"((?:[^"\\]|\\.)*)"', ham) else ham.strip('"')
+                if re.findall(r'"((?:[^"\\]|\\.)*)"', ham)
+                else ham.strip('"')
             ),
             "Bir URL'nin metin icerigini al",
         )
@@ -124,5 +135,6 @@ def motor_kaydet(motor) -> None:
 
 if __name__ == "__main__":
     import sys
+
     sorgu = sys.argv[1] if len(sys.argv) > 1 else "python asyncio nedir"
     print(web_ara(sorgu, adet=3))

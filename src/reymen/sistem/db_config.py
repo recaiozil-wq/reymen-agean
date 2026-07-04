@@ -26,12 +26,12 @@ DB_KOK.mkdir(parents=True, exist_ok=True)
 # ── ortak kullandığı tekil DB yolları ─────────────────────────────────
 DB = {
     "session": DB_KOK / "session.db",
-    "ogrenmeler": DB_KOK / "ogrenmeler.db",          # OnceHafiza
+    "ogrenmeler": DB_KOK / "ogrenmeler.db",  # OnceHafiza
     "skills_index": DB_KOK / "skills_index.db",
     "hafiza": DB_KOK / "hafiza.db",
     "self_improve": DB_KOK / "self_improve.db",
     "continuous_learning": DB_KOK / "continuous_learning.db",
-    "analitik": DB_KOK / "analitik.db",              # reasoning_loop kayıtları burada
+    "analitik": DB_KOK / "analitik.db",  # reasoning_loop kayıtları burada
     "karar": DB_KOK / "karar.db",
 }
 

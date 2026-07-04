@@ -1,6 +1,8 @@
 """ReYMeN toplu test — 30 soru, cevap kalitesi raporu"""
+
 import os, sys, json, time
 from dotenv import load_dotenv
+
 load_dotenv(".env", override=True)
 
 from src.reymen.cereyan.conversation_loop import ConversationLoop
@@ -52,7 +54,11 @@ for i, soru in enumerate(sorular, 1):
     sonuc = cl.run_conversation(hedef=soru, provider="deepseek")
     sure = round(time.time() - t0, 2)
     kaynak = sonuc.get("kaynak", "llm")
-    yanit = sonuc.get("yanit") or sonuc.get("sonuc", "") or "[HATA: " + str(sonuc.get("hata", "")) + "]"
+    yanit = (
+        sonuc.get("yanit")
+        or sonuc.get("sonuc", "")
+        or "[HATA: " + str(sonuc.get("hata", "")) + "]"
+    )
     basarili = sonuc.get("basarili", False)
     yanit_kisa = yanit[:100].replace("\n", " ")
 
@@ -69,10 +75,16 @@ for i, soru in enumerate(sorular, 1):
     elif not yanit or len(yanit.strip()) < 3:
         sorun = "BOS YANIT"
 
-    sonuclar.append({
-        "no": i, "soru": soru[:40], "kaynak": kaynak,
-        "sure": sure, "yanit": yanit_kisa, "sorun": sorun
-    })
+    sonuclar.append(
+        {
+            "no": i,
+            "soru": soru[:40],
+            "kaynak": kaynak,
+            "sure": sure,
+            "yanit": yanit_kisa,
+            "sorun": sorun,
+        }
+    )
     print(f"[{i:2d}] {kaynak:15s} {sure:5.2f}s {sorun or 'OK':15s} | {yanit_kisa}")
 
 # Rapor

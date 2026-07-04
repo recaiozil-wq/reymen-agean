@@ -21,32 +21,54 @@ logger = logging.getLogger(__name__)
 
 # ── Yapılandırma ──────────────────────────────────────────────────────────────
 
-_BREAKER_HATA_LIMITI: int = 2        # Kaç hata sonra kara listeye alınsın?
-_BREAKER_BEKLEME_SN: int = 120       # Kara listede kaç saniye kalsın?
-_PING_TIMEOUT_SN: int = 5            # Ping zaman aşımı
-_LOCAL_PROVIDERS: frozenset = frozenset({
-    "lmstudio", "lmstudio_reasoning", "ollama",
-})
+_BREAKER_HATA_LIMITI: int = 2  # Kaç hata sonra kara listeye alınsın?
+_BREAKER_BEKLEME_SN: int = 120  # Kara listede kaç saniye kalsın?
+_PING_TIMEOUT_SN: int = 5  # Ping zaman aşımı
+_LOCAL_PROVIDERS: frozenset = frozenset(
+    {
+        "lmstudio",
+        "lmstudio_reasoning",
+        "ollama",
+    }
+)
 # LiteLLM destegi — tum litellm provider'lari remote kabul et
-_LITELLM_PROVIDERLER: frozenset = frozenset({
-    "openai", "anthropic", "gemini", "deepseek", "groq",
-    "together", "fireworks", "replicate", "perplexity",
-    "cohere", "mistral", "xai", "bedrock", "azure",
-})
-_KARMA_PROVIDERS: frozenset = frozenset({
-    "groq", "moonshot", "gemini",
-})
+_LITELLM_PROVIDERLER: frozenset = frozenset(
+    {
+        "openai",
+        "anthropic",
+        "gemini",
+        "deepseek",
+        "groq",
+        "together",
+        "fireworks",
+        "replicate",
+        "perplexity",
+        "cohere",
+        "mistral",
+        "xai",
+        "bedrock",
+        "azure",
+    }
+)
+_KARMA_PROVIDERS: frozenset = frozenset(
+    {
+        "groq",
+        "moonshot",
+        "gemini",
+    }
+)
 
 
 # ── Veri yapıları ─────────────────────────────────────────────────────────────
+
 
 @dataclass
 class SaglayiciDurum:
     ad: str
     hata_sayisi: int = 0
-    kara_liste_saati: float = 0.0     # time.monotonic()
+    kara_liste_saati: float = 0.0  # time.monotonic()
     ping_canli: Optional[bool] = None  # None = henüz pinglenmedi
-    ping_suresi_sn: float = 0.0        # 0 = hiç pinglenmedi / başarısız
+    ping_suresi_sn: float = 0.0  # 0 = hiç pinglenmedi / başarısız
 
     @property
     def aktif(self) -> bool:
@@ -61,7 +83,9 @@ class SaglayiciDurum:
             self.kara_liste_saati = time.monotonic()
             logger.warning(
                 "[Router] ⛔ %s kara listeye alındı (%d hata, %ds bekleme)",
-                self.ad, self.hata_sayisi, _BREAKER_BEKLEME_SN,
+                self.ad,
+                self.hata_sayisi,
+                _BREAKER_BEKLEME_SN,
             )
 
     def basari_kaydet(self):
@@ -71,6 +95,7 @@ class SaglayiciDurum:
 
 
 # ── Ana sınıf ─────────────────────────────────────────────────────────────────
+
 
 class SaglayiciYonlendirici:
     """Provider'ları yönetir, sıralar, kara listeye alır."""
@@ -118,7 +143,11 @@ class SaglayiciYonlendirici:
             satirlar = []
             for ad, d in sorted(self._durumlar.items()):
                 ikon = "✅" if d.aktif else "⛔"
-                canli = f"ping:{'✅' if d.ping_canli else '❌'}" if d.ping_canli is not None else ""
+                canli = (
+                    f"ping:{'✅' if d.ping_canli else '❌'}"
+                    if d.ping_canli is not None
+                    else ""
+                )
                 kara = f" kara:{d.kara_liste_saati>0}" if d.kara_liste_saati > 0 else ""
                 hata = f" hata:{d.hata_sayisi}" if d.hata_sayisi > 0 else ""
                 sure = f" {d.ping_suresi_sn:.1f}s" if d.ping_suresi_sn > 0 else ""
@@ -157,7 +186,11 @@ class SaglayiciYonlendirici:
                     url = f"{base_url.rstrip('/')}/v1/models"
                     headers = {"Authorization": f"Bearer {api_key}"}
                     resp = requests.get(url, timeout=_PING_TIMEOUT_SN, headers=headers)
-                    canli = resp.status_code in (200, 401, 403)  # 401/403 = API canlı ama yetki yok
+                    canli = resp.status_code in (
+                        200,
+                        401,
+                        403,
+                    )  # 401/403 = API canlı ama yetki yok
                 else:
                     canli = False
                 sure = time.monotonic() - t0
@@ -204,8 +237,13 @@ class SaglayiciYonlendirici:
         3. Ping canlı olanlar önce
         4. Hızlı ping süresine göre
         """
+
         def skor(adim) -> float:
-            ad = ad_al(adim) if ad_al else (adim.provider if hasattr(adim, "provider") else adim)
+            ad = (
+                ad_al(adim)
+                if ad_al
+                else (adim.provider if hasattr(adim, "provider") else adim)
+            )
             with self._lock:
                 durum = self._durumlar.get(ad)
 

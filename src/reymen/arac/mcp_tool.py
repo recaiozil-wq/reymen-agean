@@ -13,6 +13,7 @@ import time
 from pathlib import Path
 from typing import Any, Callable, Optional
 import logging
+
 logger = logging.getLogger(__name__)
 
 MCP_KONFIG_YOLU = Path(__file__).parent / ".ReYMeN" / "mcp_servers.json"
@@ -22,12 +23,12 @@ class MCPSunucusu:
     """Tek bir MCP sunucusu bağlantısı (stdio tabanlı)."""
 
     def __init__(self, ad: str, komut: list[str], calisma_dizini: str = ""):
-        self.ad             = ad
-        self.komut          = komut
+        self.ad = ad
+        self.komut = komut
         self.calisma_dizini = calisma_dizini
         self._proses: Optional[subprocess.Popen] = None
-        self._istek_id      = 0
-        self._kilit         = threading.Lock()
+        self._istek_id = 0
+        self._kilit = threading.Lock()
         self._araclar: list[dict] = []
 
     def baslat(self) -> bool:
@@ -41,11 +42,14 @@ class MCPSunucusu:
                 cwd=self.calisma_dizini or None,
             )
             # İlk initialize mesajı
-            self._json_rpc("initialize", {
-                "protocolVersion": "0.1.0",
-                "capabilities":    {},
-                "clientInfo":      {"name": "ReYMeN", "version": "1.0"},
-            })
+            self._json_rpc(
+                "initialize",
+                {
+                    "protocolVersion": "0.1.0",
+                    "capabilities": {},
+                    "clientInfo": {"name": "ReYMeN", "version": "1.0"},
+                },
+            )
             # Araç listesini al
             yanit = self._json_rpc("tools/list", {})
             self._araclar = yanit.get("result", {}).get("tools", [])
@@ -56,12 +60,17 @@ class MCPSunucusu:
     def _json_rpc(self, metod: str, params: dict) -> dict:
         with self._kilit:
             self._istek_id += 1
-            istek = json.dumps({
-                "jsonrpc": "2.0",
-                "id":      self._istek_id,
-                "method":  metod,
-                "params":  params,
-            }) + "\n"
+            istek = (
+                json.dumps(
+                    {
+                        "jsonrpc": "2.0",
+                        "id": self._istek_id,
+                        "method": metod,
+                        "params": params,
+                    }
+                )
+                + "\n"
+            )
             try:
                 self._proses.stdin.write(istek)
                 self._proses.stdin.flush()
@@ -71,14 +80,19 @@ class MCPSunucusu:
                 return {}
 
     def arac_cagir(self, arac_adi: str, parametreler: dict) -> Any:
-        yanit = self._json_rpc("tools/call", {
-            "name":      arac_adi,
-            "arguments": parametreler,
-        })
+        yanit = self._json_rpc(
+            "tools/call",
+            {
+                "name": arac_adi,
+                "arguments": parametreler,
+            },
+        )
         sonuc = yanit.get("result", {})
         icerik = sonuc.get("content", [])
         if icerik and isinstance(icerik, list):
-            return " ".join(c.get("text", "") for c in icerik if c.get("type") == "text")
+            return " ".join(
+                c.get("text", "") for c in icerik if c.get("type") == "text"
+            )
         return str(sonuc)
 
     def araclar(self) -> list[dict]:
@@ -134,14 +148,15 @@ class MCPIstemci:
         for sunucu_ad, araclar in self.tum_araclar().items():
             for arac in araclar:
                 arac_adi = f"MCP_{sunucu_ad.upper()}_{arac['name'].upper()}"
-                params   = arac.get("inputSchema", {}).get("properties", {})
+                params = arac.get("inputSchema", {}).get("properties", {})
 
                 def _fn(sun=sunucu_ad, ar=arac["name"], **kw):
                     return self.arac_cagir(sun, ar, kw)
 
                 if hasattr(motor, "_plugin_arac_kaydet"):
                     motor._plugin_arac_kaydet(
-                        arac_adi, _fn,
+                        arac_adi,
+                        _fn,
                         arac.get("description", f"MCP: {sunucu_ad}/{arac['name']}"),
                     )
 
@@ -149,7 +164,7 @@ class MCPIstemci:
         return {
             ad: {
                 "arac_sayisi": len(s.araclar()),
-                "aktif":       s._proses is not None and s._proses.poll() is None,
+                "aktif": s._proses is not None and s._proses.poll() is None,
             }
             for ad, s in self._sunucular.items()
         }

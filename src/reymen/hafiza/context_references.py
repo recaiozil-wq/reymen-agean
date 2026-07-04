@@ -36,12 +36,14 @@ class ReferansYoneticisi:
 
     def ekle(self, etiket: str, icerik: str, kaynak: str = ""):
         """Yeni referans ekle (en fazla 100)."""
-        self._referanslar.append({
-            "etiket": etiket,
-            "icerik": icerik[:500],
-            "kaynak": kaynak,
-            "tarih": datetime.now().isoformat()[:10],
-        })
+        self._referanslar.append(
+            {
+                "etiket": etiket,
+                "icerik": icerik[:500],
+                "kaynak": kaynak,
+                "tarih": datetime.now().isoformat()[:10],
+            }
+        )
         self._kaydet()
 
     def ara(self, sorgu: str) -> list[dict]:
@@ -76,7 +78,8 @@ def motor_kaydet(motor):
     motor._plugin_arac_kaydet(
         "REFERANS_EKLE",
         lambda etiket="", icerik="", kaynak="": (
-            _ry.ekle(str(etiket), str(icerik), str(kaynak)), "[Referans]: Eklendi"
+            _ry.ekle(str(etiket), str(icerik), str(kaynak)),
+            "[Referans]: Eklendi",
         )[1],
         "Önemli bir bilgiyi referans olarak kaydet (etiket, icerik, kaynak)",
     )

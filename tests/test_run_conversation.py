@@ -22,6 +22,7 @@ from conversation_loop import ConversationLoop, GOREV_BITTI_TETIK
 
 # ── Sabit mock cevaplar ────────────────────────────────────────────────
 
+
 def _mock_beyin(cevap: str):
     """Verilen cevabi donduren sahte beyin nesnesi."""
     b = MagicMock()
@@ -34,7 +35,9 @@ def _mock_motor(sonuc: dict = None):
     """Sahte motor nesnesi."""
     m = MagicMock()
     m.arac_calistir.return_value = sonuc or {
-        "basarili": True, "cikti": "tamam", "tamamlandi": False
+        "basarili": True,
+        "cikti": "tamam",
+        "tamamlandi": False,
     }
     return m
 
@@ -42,6 +45,7 @@ def _mock_motor(sonuc: dict = None):
 # ══════════════════════════════════════════════════════════════════════
 # 1. SINIF VE BAŞLATMA TESTLERİ (1-6)
 # ══════════════════════════════════════════════════════════════════════
+
 
 class TestBaslatma:
     def test_varsayilan_baslatma(self):
@@ -85,6 +89,7 @@ class TestBaslatma:
 # 2. PROVIDER TESPİTİ (7-11)
 # ══════════════════════════════════════════════════════════════════════
 
+
 class TestProviderTespiti:
     def test_anthropic_provider(self):
         cl = ConversationLoop()
@@ -105,9 +110,9 @@ class TestProviderTespiti:
     def test_varsayilan_chat_completions(self):
         cl = ConversationLoop()
         for p in ("deepseek", "openai", "lmstudio", "groq", ""):
-            assert cl._provider_tipi_belirle(p) == "chat_completions", (
-                f"{p} chat_completions olmali"
-            )
+            assert (
+                cl._provider_tipi_belirle(p) == "chat_completions"
+            ), f"{p} chat_completions olmali"
 
     def test_beyin_provider_devralma(self):
         """Provider belirtilmezse beyin.provider kullanilmali."""
@@ -120,6 +125,7 @@ class TestProviderTespiti:
 # ══════════════════════════════════════════════════════════════════════
 # 3. API MESAJ FORMATI (12-16)
 # ══════════════════════════════════════════════════════════════════════
+
 
 class TestApiMesajFormati:
     def test_chat_completions_sistem_eklenir(self):
@@ -168,6 +174,7 @@ class TestApiMesajFormati:
 # ══════════════════════════════════════════════════════════════════════
 # 4. TOOL CALLS PARSE (17-22)
 # ══════════════════════════════════════════════════════════════════════
+
 
 class TestToolCallsParse:
     def test_openai_format_tool_calls(self):
@@ -223,6 +230,7 @@ class TestToolCallsParse:
 # 5. CONTEXT PREFLIGHT ve SIKISTIRMA (23-25)
 # ══════════════════════════════════════════════════════════════════════
 
+
 class TestContextPreflight:
     def test_dusuk_dolulukta_sikistirma_yok(self):
         """Context dolulugu dusukse mesajlar degismeden donmeli."""
@@ -250,6 +258,7 @@ class TestContextPreflight:
 # 6. EPHEMERAL LAYERLAR (26-27)
 # ══════════════════════════════════════════════════════════════════════
 
+
 class TestEphemeralLayerlar:
     def test_yeterli_tur_kaldiysa_layer_yok(self):
         """Yeterli tur kaldiysa ephemeral layer eklenmemeli."""
@@ -276,6 +285,7 @@ class TestEphemeralLayerlar:
 # 7. BUDGET YONETIMI (28-29)
 # ══════════════════════════════════════════════════════════════════════
 
+
 class TestBudgetYonetimi:
     def test_budget_olusturma(self):
         """Budget nesnesi olusturulmali ve gerekli metodlara sahip olmali."""
@@ -295,6 +305,7 @@ class TestBudgetYonetimi:
 # ══════════════════════════════════════════════════════════════════════
 # 8. RUN_CONVERSATION AKİŞ (30-33)
 # ══════════════════════════════════════════════════════════════════════
+
 
 class TestRunConversationAkis:
     def test_donuc_yapisi(self):
@@ -330,6 +341,7 @@ class TestRunConversationAkis:
 # ══════════════════════════════════════════════════════════════════════
 # 9. GERİYE UYUMLULUK (34-35)
 # ══════════════════════════════════════════════════════════════════════
+
 
 class TestGeriyeUyumluluk:
     def test_coz_api_calisir(self):

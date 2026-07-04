@@ -17,6 +17,7 @@ class TestSecurityEngine:
     @pytest.fixture(autouse=True)
     def _modulu_yukle(self):
         from security_engine import SecurityEngine
+
         self.SecurityEngine = SecurityEngine
 
     # ── Kurulum ───────────────────────────────────────────────────────────
@@ -103,8 +104,7 @@ class TestSecurityEngine:
         sonuc = se.tarama_yap("parola = 'admin123'")
         assert sonuc["acik_sayisi"] >= 1
         yuksek_var = any(
-            a.get("seviye") in ("yuksek", "kritik")
-            for a in sonuc.get("aciklar", [])
+            a.get("seviye") in ("yuksek", "kritik") for a in sonuc.get("aciklar", [])
         )
         assert yuksek_var
 
@@ -186,9 +186,7 @@ class TestSecurityEngine:
     def test_risk_analizi_yuksek_tehdit(self):
         """Çok tehdit içeren içerik için yüksek risk dönmeli."""
         se = self.SecurityEngine()
-        se.tarama_yap(
-            "parola='x' sifre='y' token='z' api_key='k' rm -rf / eval('x')"
-        )
+        se.tarama_yap("parola='x' sifre='y' token='z' api_key='k' rm -rf / eval('x')")
         analiz = se.risk_analizi()
         assert analiz.get("risk_puani", 0) >= 15
 

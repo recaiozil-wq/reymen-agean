@@ -40,6 +40,7 @@ except ImportError:
 #  BellekYonetici
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class BellekYonetici:
     """Vektor + SQLite hibrit hafiza yoneticisi.
 
@@ -155,25 +156,29 @@ class BellekYonetici:
         vektor_sonuc = self._vektor.ara(sorgu, k=k_gercek)
         vektor_liste = []
         for vid, metin, skor, meta in vektor_sonuc:
-            vektor_liste.append({
-                "kaynak": "vektor",
-                "id": vid,
-                "icerik": metin,
-                "skor": skor,
-                "metadata": meta,
-            })
+            vektor_liste.append(
+                {
+                    "kaynak": "vektor",
+                    "id": vid,
+                    "icerik": metin,
+                    "skor": skor,
+                    "metadata": meta,
+                }
+            )
 
         # SQLite arama
         sqlite_sonuc = self.sqlite_ara(sorgu, limit=k_gercek)
         sqlite_liste = []
         for s in sqlite_sonuc:
-            sqlite_liste.append({
-                "kaynak": "sqlite",
-                "id": s.get("task_id", ""),
-                "icerik": f"Task: {s.get('task_id', '')} - {s.get('son_tur', '')}",
-                "skor": 0.5,  # SQLite icin sabit skor
-                "metadata": s,
-            })
+            sqlite_liste.append(
+                {
+                    "kaynak": "sqlite",
+                    "id": s.get("task_id", ""),
+                    "icerik": f"Task: {s.get('task_id', '')} - {s.get('son_tur', '')}",
+                    "skor": 0.5,  # SQLite icin sabit skor
+                    "metadata": s,
+                }
+            )
 
         # Hibrit birlesim: once vektor (yuksek skor), sonra SQLite
         hibrit = list(vektor_liste)

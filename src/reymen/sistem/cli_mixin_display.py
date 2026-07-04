@@ -25,20 +25,22 @@ from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
 
+
 class MixinDisplay:
     """ReYMeNCLI UI/ekran/çıktı formatlama metotları."""
-
 
     def _invalidate(self, min_interval: float = 0.25) -> None:
         """Throttled UI repaint — prevents terminal blinking on slow/SSH connections."""
         if getattr(self, "_resize_recovery_pending", False):
             return
         now = time.monotonic()
-        if hasattr(self, "_app") and self._app and (now - self._last_invalidate) >= min_interval:
+        if (
+            hasattr(self, "_app")
+            and self._app
+            and (now - self._last_invalidate) >= min_interval
+        ):
             self._last_invalidate = now
             self._app.invalidate()
-
-
 
     def _force_full_redraw(self) -> None:
         """Force a clean full-screen repaint of the prompt_toolkit UI.
@@ -65,9 +67,9 @@ class MixinDisplay:
         except Exception:
             logger.warning("[fix_01_sessiz_except] Exception")
 
-
-
-    def _clear_prompt_toolkit_screen(self, app, *, rebuild_scrollback: bool = False) -> None:
+    def _clear_prompt_toolkit_screen(
+        self, app, *, rebuild_scrollback: bool = False
+    ) -> None:
         """Clear the terminal and reset prompt_toolkit renderer state."""
         try:
             renderer = app.renderer
@@ -87,8 +89,6 @@ class MixinDisplay:
             renderer.reset(leave_alternate_screen=False)
         except Exception:
             logger.warning("[fix_01_sessiz_except] Exception")
-
-
 
     def _recover_after_resize(self, app, original_on_resize) -> None:
         """Recover a resized classic CLI without desynchronizing cursor state.
@@ -123,9 +123,9 @@ class MixinDisplay:
             logger.warning("[fix_01_sessiz_except] Exception")
         original_on_resize()
 
-
-
-    def _schedule_resize_recovery(self, app, original_on_resize, delay: float = 0.12) -> None:
+    def _schedule_resize_recovery(
+        self, app, original_on_resize, delay: float = 0.12
+    ) -> None:
         """Debounce resize redraws so footer chrome is not stamped into scrollback."""
         try:
             old_timer = getattr(self, "_resize_recovery_timer", None)
@@ -137,7 +137,10 @@ class MixinDisplay:
             def _timer_fired(timer_ref):
                 def _run_recovery():
                     with lock:
-                        if getattr(self, "_resize_recovery_timer", None) is not timer_ref:
+                        if (
+                            getattr(self, "_resize_recovery_timer", None)
+                            is not timer_ref
+                        ):
                             return
                         self._resize_recovery_timer = None
                         self._resize_recovery_pending = False
@@ -170,8 +173,6 @@ class MixinDisplay:
             self._resize_recovery_pending = False
             self._recover_after_resize(app, original_on_resize)
 
-
-
     def _status_bar_context_style(self, percent_used: Optional[int]) -> str:
         if percent_used is None:
             return "class:status-bar-dim"
@@ -183,17 +184,15 @@ class MixinDisplay:
             return "class:status-bar-warn"
         return "class:status-bar-good"
 
-
-
     def _build_context_bar(self, percent_used: Optional[int], width: int = 10) -> str:
         safe_percent = max(0, min(100, percent_used or 0))
         filled = round((safe_percent / 100) * width)
         return f"[{('█' * filled) + ('░' * max(0, width - filled))}]"
 
-
-
     @staticmethod
-    def _format_prompt_elapsed(prompt_start_time: Optional[float], prompt_duration: float, live: bool = False) -> str:
+    def _format_prompt_elapsed(
+        prompt_start_time: Optional[float], prompt_duration: float, live: bool = False
+    ) -> str:
         """Format per-prompt elapsed time for the status bar.
 
         Always returns a string — shows 0s on fresh start before first turn.
@@ -208,7 +207,11 @@ class MixinDisplay:
         """
         if prompt_start_time is None and prompt_duration == 0.0:
             return "⏲ 0s"
-        elapsed = time.time() - prompt_start_time if prompt_start_time is not None else prompt_duration
+        elapsed = (
+            time.time() - prompt_start_time
+            if prompt_start_time is not None
+            else prompt_duration
+        )
         elapsed = max(0.0, elapsed)
 
         days = int(elapsed // 86400)
@@ -221,7 +224,9 @@ class MixinDisplay:
         if days > 0:
             time_str = f"{days}d {hours}h {minutes}m"
         elif hours > 0:
-            time_str = f"{hours}h {minutes}m {seconds}s" if seconds else f"{hours}h {minutes}m"
+            time_str = (
+                f"{hours}h {minutes}m {seconds}s" if seconds else f"{hours}h {minutes}m"
+            )
         elif minutes > 0:
             time_str = f"{minutes}m {seconds}s" if seconds else f"{minutes}m"
         else:
@@ -230,22 +235,22 @@ class MixinDisplay:
         emoji = "⏱" if live else "⏲"
         return f"{emoji} {time_str}"
 
-
-
     def _get_status_bar_snapshot(self) -> Dict[str, Any]:
         # Prefer the agent's model name — it updates on fallback.
         # self.model reflects the originally configured model and never
         # changes mid-session, so the TUI would show a stale name after
         # _try_activate_fallback() switches provider/model.
         agent = getattr(self, "agent", None)
-        model_name = (getattr(agent, "model", None) or self.model or "unknown")
+        model_name = getattr(agent, "model", None) or self.model or "unknown"
         model_short = model_name.split("/")[-1] if "/" in model_name else model_name
         if model_short.endswith(".gguf"):
             model_short = model_short[:-5]
         if len(model_short) > 26:
             model_short = f"{model_short[:23]}..."
 
-        elapsed_seconds = max(0.0, (datetime.now() - self.session_start).total_seconds())
+        elapsed_seconds = max(
+            0.0, (datetime.now() - self.session_start).total_seconds()
+        )
         snapshot = {
             "model_name": model_name,
             "model_short": model_short,
@@ -285,21 +290,35 @@ class MixinDisplay:
         # sessions tracked by tools.process_registry). Cheap O(1) read.
         try:
             from tools.process_registry import process_registry
+
             snapshot["active_background_processes"] = process_registry.count_running()
         except Exception:
             logger.warning("[fix_01_sessiz_except] Exception")
 
-
         if not agent:
             return snapshot
 
-        snapshot["session_input_tokens"] = getattr(agent, "session_input_tokens", 0) or 0
-        snapshot["session_output_tokens"] = getattr(agent, "session_output_tokens", 0) or 0
-        snapshot["session_cache_read_tokens"] = getattr(agent, "session_cache_read_tokens", 0) or 0
-        snapshot["session_cache_write_tokens"] = getattr(agent, "session_cache_write_tokens", 0) or 0
-        snapshot["session_prompt_tokens"] = getattr(agent, "session_prompt_tokens", 0) or 0
-        snapshot["session_completion_tokens"] = getattr(agent, "session_completion_tokens", 0) or 0
-        snapshot["session_total_tokens"] = getattr(agent, "session_total_tokens", 0) or 0
+        snapshot["session_input_tokens"] = (
+            getattr(agent, "session_input_tokens", 0) or 0
+        )
+        snapshot["session_output_tokens"] = (
+            getattr(agent, "session_output_tokens", 0) or 0
+        )
+        snapshot["session_cache_read_tokens"] = (
+            getattr(agent, "session_cache_read_tokens", 0) or 0
+        )
+        snapshot["session_cache_write_tokens"] = (
+            getattr(agent, "session_cache_write_tokens", 0) or 0
+        )
+        snapshot["session_prompt_tokens"] = (
+            getattr(agent, "session_prompt_tokens", 0) or 0
+        )
+        snapshot["session_completion_tokens"] = (
+            getattr(agent, "session_completion_tokens", 0) or 0
+        )
+        snapshot["session_total_tokens"] = (
+            getattr(agent, "session_total_tokens", 0) or 0
+        )
         snapshot["session_api_calls"] = getattr(agent, "session_api_calls", 0) or 0
 
         compressor = getattr(agent, "context_compressor", None)
@@ -319,11 +338,11 @@ class MixinDisplay:
             snapshot["context_length"] = context_length or None
             snapshot["compressions"] = getattr(compressor, "compression_count", 0) or 0
             if context_length:
-                snapshot["context_percent"] = max(0, min(100, round((context_tokens / context_length) * 100)))
+                snapshot["context_percent"] = max(
+                    0, min(100, round((context_tokens / context_length) * 100))
+                )
 
         return snapshot
-
-
 
     @staticmethod
     def _status_bar_display_width(text: str) -> int:
@@ -336,11 +355,10 @@ class MixinDisplay:
         """
         try:
             from prompt_toolkit.utils import get_cwidth
+
             return get_cwidth(text or "")
         except Exception:
             return len(text or "")
-
-
 
     @classmethod
     def _trim_status_bar_text(cls, text: str, max_width: int) -> str:
@@ -370,8 +388,6 @@ class MixinDisplay:
             width += ch_width
         return "".join(out).rstrip() + ellipsis
 
-
-
     @staticmethod
     def _get_tui_terminal_width(default: tuple[int, int] = (80, 24)) -> int:
         """Return the live prompt_toolkit width, falling back to ``shutil``.
@@ -382,11 +398,10 @@ class MixinDisplay:
         """
         try:
             from prompt_toolkit.application import get_app
+
             return get_app().output.get_size().columns
         except Exception:
             return shutil.get_terminal_size(default).columns
-
-
 
     @staticmethod
     def _scrollback_box_width(width: Optional[int] = None) -> int:
@@ -412,8 +427,6 @@ class MixinDisplay:
                 width = 80
         return max(32, int(width or 80))
 
-
-
     def _tui_input_rule_height(self, position: str, width: Optional[int] = None) -> int:
         """Return the visible height for the top/bottom input separator rules."""
         if position not in {"top", "bottom"}:
@@ -423,8 +436,6 @@ class MixinDisplay:
         if position == "top":
             return 1
         return 0 if self._use_minimal_tui_chrome(width=width) else 1
-
-
 
     def _spinner_widget_height(self, width: Optional[int] = None) -> int:
         """Return the visible height for the spinner/status text line above the status bar."""
@@ -436,11 +447,10 @@ class MixinDisplay:
         width = width or self._get_tui_terminal_width()
         if width and width > 10:
             import math
+
             text_width = self._status_bar_display_width(spinner_line)
             return max(1, math.ceil(text_width / width))
         return 1
-
-
 
     def _render_spinner_text(self) -> str:
         """Return the live spinner/status text exactly as rendered in the TUI."""
@@ -460,8 +470,6 @@ class MixinDisplay:
                 elapsed_str = f"{elapsed:5.1f}s"
             return f"  {txt}  ({elapsed_str})"
         return f"  {txt}"
-
-
 
     def _build_status_bar_text(self, width: Optional[int] = None) -> str:
         """Return a compact one-line session status string for the TUI footer."""
@@ -522,10 +530,8 @@ class MixinDisplay:
         except Exception:
             return f"⚕ {self.model if getattr(self, 'model', None) else 'ReYMeN'}"
 
-
-
     def _get_status_bar_fragments(self):
-        if not self._status_bar_visible or getattr(self, '_model_picker_state', None):
+        if not self._status_bar_visible or getattr(self, "_model_picker_state", None):
             return []
         try:
             snapshot = self._get_status_bar_snapshot()
@@ -564,17 +570,24 @@ class MixinDisplay:
                     ]
                     if compressions:
                         frags.append(("class:status-bar-dim", " · "))
-                        frags.append((self._compression_count_style(compressions), f"🗜️ {compressions}"))
+                        frags.append(
+                            (
+                                self._compression_count_style(compressions),
+                                f"🗜️ {compressions}",
+                            )
+                        )
                     if bg_count:
                         frags.append(("class:status-bar-dim", " · "))
                         frags.append(("class:status-bar-strong", f"▶ {bg_count}"))
                     if bg_proc_count:
                         frags.append(("class:status-bar-dim", " · "))
                         frags.append(("class:status-bar-strong", f"⚙ {bg_proc_count}"))
-                    frags.extend([
-                        ("class:status-bar-dim", " · "),
-                        ("class:status-bar-dim", duration_label),
-                    ])
+                    frags.extend(
+                        [
+                            ("class:status-bar-dim", " · "),
+                            ("class:status-bar-dim", duration_label),
+                        ]
+                    )
                     if yolo_active:
                         frags.append(("class:status-bar-dim", " · "))
                         frags.append(("class:status-bar-yolo", "⚠ YOLO"))
@@ -582,7 +595,9 @@ class MixinDisplay:
                 else:
                     if snapshot["context_length"]:
                         ctx_total = _format_context_length(snapshot["context_length"])
-                        ctx_used = format_token_count_compact(snapshot["context_tokens"])
+                        ctx_used = format_token_count_compact(
+                            snapshot["context_tokens"]
+                        )
                         context_label = f"{ctx_used}/{ctx_total}"
                     else:
                         context_label = "ctx --"
@@ -603,17 +618,24 @@ class MixinDisplay:
                     ]
                     if compressions:
                         frags.append(("class:status-bar-dim", " │ "))
-                        frags.append((self._compression_count_style(compressions), f"🗜️ {compressions}"))
+                        frags.append(
+                            (
+                                self._compression_count_style(compressions),
+                                f"🗜️ {compressions}",
+                            )
+                        )
                     if bg_count:
                         frags.append(("class:status-bar-dim", " │ "))
                         frags.append(("class:status-bar-strong", f"▶ {bg_count}"))
                     if bg_proc_count:
                         frags.append(("class:status-bar-dim", " │ "))
                         frags.append(("class:status-bar-strong", f"⚙ {bg_proc_count}"))
-                    frags.extend([
-                        ("class:status-bar-dim", " │ "),
-                        ("class:status-bar-dim", duration_label),
-                    ])
+                    frags.extend(
+                        [
+                            ("class:status-bar-dim", " │ "),
+                            ("class:status-bar-dim", duration_label),
+                        ]
+                    )
                     # Position 7: per-prompt elapsed timer (live or frozen)
                     prompt_elapsed = snapshot.get("prompt_elapsed")
                     if prompt_elapsed:
@@ -633,17 +655,18 @@ class MixinDisplay:
         except Exception:
             return [("class:status-bar", f" {self._build_status_bar_text()} ")]
 
-
-
     def _format_submitted_user_message_preview(self, user_input: str) -> str:
         """Format the submitted user-message scrollback preview."""
         ts_suffix = (
             f" [dim]{datetime.now().strftime('%H:%M')}[/]"
-            if getattr(self, "show_timestamps", False) else ""
+            if getattr(self, "show_timestamps", False)
+            else ""
         )
         lines = user_input.split("\n")
         if len(lines) <= 1:
-            return f"[bold {_accent_hex()}]●[/] [bold]{_escape(user_input)}[/]{ts_suffix}"
+            return (
+                f"[bold {_accent_hex()}]●[/] [bold]{_escape(user_input)}[/]{ts_suffix}"
+            )
 
         first_lines = int(getattr(self, "user_message_preview_first_lines", 2))
         last_lines = int(getattr(self, "user_message_preview_last_lines", 2))
@@ -671,13 +694,11 @@ class MixinDisplay:
         preview_lines.extend(f"[bold]{_escape(line)}[/]" for line in tail)
         return "\n".join(preview_lines)
 
-
-
     def _expand_paste_references(self, text: str | None) -> str:
         """Expand [Pasted text #N -> file] placeholders into file contents."""
         if not isinstance(text, str) or "[Pasted text #" not in text:
             return text or ""
-        paste_ref_re = re.compile(r'\[Pasted text #\d+: \d+ lines \u2192 (.+?)\]')
+        paste_ref_re = re.compile(r"\[Pasted text #\d+: \d+ lines \u2192 (.+?)\]")
 
         def _expand_ref(match):
             path = Path(match.group(1))
@@ -687,12 +708,12 @@ class MixinDisplay:
             try:
                 return path.read_text(encoding="utf-8")
             except (OSError, IOError):
-                logger.warning("Paste file gone or unreadable, returning placeholder: %s", path)
+                logger.warning(
+                    "Paste file gone or unreadable, returning placeholder: %s", path
+                )
                 return match.group(0)
 
         return paste_ref_re.sub(_expand_ref, text)
-
-
 
     def _print_user_message_preview(self, user_input: str) -> None:
         """Render a user message using the normal chat scrollback style."""
@@ -703,8 +724,6 @@ class MixinDisplay:
         else:
             ChatConsole().print(f"[bold {_accent_hex()}]●[/] [bold]{_escape(text)}[/]")
 
-
-    
     def _show_security_advisories(self):
         """Show a startup banner if any unacked security advisories match.
 
@@ -719,6 +738,7 @@ class MixinDisplay:
                 detect_compromised,
                 startup_banner,
             )
+
             hits = detect_compromised()
             banner = startup_banner(hits)
             if banner:
@@ -729,8 +749,6 @@ class MixinDisplay:
             # Never let the security banner block startup. Failures are
             # logged at DEBUG by the advisory module.
             logger.warning("[fix_01_sessiz_except] Exception")
-
-
 
     def _render_resume_history_panel_lines(self, panel) -> list[str]:
         """Render the resume panel at the current terminal width for resize replay."""
@@ -749,41 +767,43 @@ class MixinDisplay:
             console.print(panel)
         return buf.getvalue().rstrip("\n").splitlines()
 
-
-
     def _show_tool_availability_warnings(self):
         """Show warnings about disabled tools due to missing API keys."""
         try:
             from reymen.sistem.model_tools import check_tool_availability
-            
+
             available, unavailable = check_tool_availability()
-            
+
             # Filter to only those missing API keys (not system deps)
             api_key_missing = [u for u in unavailable if u["missing_vars"]]
-            
+
             if api_key_missing:
                 self._console_print()
-                self._console_print("[yellow]⚠️  Some tools disabled (missing API keys):[/]")
+                self._console_print(
+                    "[yellow]⚠️  Some tools disabled (missing API keys):[/]"
+                )
                 for item in api_key_missing:
                     tools_str = ", ".join(item["tools"][:2])  # Show first 2 tools
                     if len(item["tools"]) > 2:
                         tools_str += f", +{len(item['tools'])-2} more"
-                    self._console_print(f"   [dim]• {item['name']}[/] [dim italic]({', '.join(item['missing_vars'])})[/]")
+                    self._console_print(
+                        f"   [dim]• {item['name']}[/] [dim italic]({', '.join(item['missing_vars'])})[/]"
+                    )
                 self._console_print("[dim]   Run 'ReYMeN setup' to configure[/]")
         except Exception as _e:
             __import__("logging").getLogger(__name__).warning(
                 "[SessizExcept] %%s: %%s", type(_e).__name__, _e
             )  # Don't crash on import errors
 
-
-    
     def _show_status(self):
         """Show compact startup status line."""
         # Avoid pulling the full tool registry into the bare Termux prompt path.
         if os.environ.get("ReYMeN_DEFER_AGENT_STARTUP") == "1":
             tool_status = "tools deferred"
         else:
-            tools = get_tool_definitions(enabled_toolsets=self.enabled_toolsets, quiet_mode=True)
+            tools = get_tool_definitions(
+                enabled_toolsets=self.enabled_toolsets, quiet_mode=True
+            )
             tool_count = len(tools) if tools else 0
             tool_status = f"{tool_count} tools"
 
@@ -801,6 +821,7 @@ class MixinDisplay:
         # Build status line with proper markup — skin-aware colors
         try:
             from reymen.reymen_cli.skin_engine import get_active_skin
+
             skin = get_active_skin()
             separator_color = skin.get_color("banner_dim", "#B8860B")
             accent_color = skin.get_color("ui_accent", "#FFBF00")
@@ -811,17 +832,19 @@ class MixinDisplay:
         if self.enabled_toolsets and "all" not in self.enabled_toolsets:
             toolsets_info = f" [dim {separator_color}]·[/] [{label_color}]toolsets: {', '.join(self.enabled_toolsets)}[/]"
 
-        provider_info = f" [dim {separator_color}]·[/] [dim]provider: {self.provider}[/]"
+        provider_info = (
+            f" [dim {separator_color}]·[/] [dim]provider: {self.provider}[/]"
+        )
         if self._provider_source:
-            provider_info += f" [dim {separator_color}]·[/] [dim]auth: {self._provider_source}[/]"
+            provider_info += (
+                f" [dim {separator_color}]·[/] [dim]auth: {self._provider_source}[/]"
+            )
 
         self._console_print(
             f"  {api_indicator} [{accent_color}]{model_short}[/] "
             f"[dim {separator_color}]·[/] [bold {label_color}]{tool_status}[/]"
             f"{toolsets_info}{provider_info}"
         )
-
-
 
     def _show_session_status(self):
         """Show gateway-style status for the current CLI session."""
@@ -867,18 +890,20 @@ class MixinDisplay:
         ]
         if title:
             lines.append(f"Title: {title}")
-        lines.extend([
-            f"Model: {model} ({provider})",
-            f"Created: {created_at.strftime('%Y-%m-%d %H:%M')}",
-            f"Last Activity: {updated_at.strftime('%Y-%m-%d %H:%M')}",
-            f"Tokens: {total_tokens:,}",
-            f"Agent Running: {'Yes' if is_running else 'No'}",
-        ])
+        lines.extend(
+            [
+                f"Model: {model} ({provider})",
+                f"Created: {created_at.strftime('%Y-%m-%d %H:%M')}",
+                f"Last Activity: {updated_at.strftime('%Y-%m-%d %H:%M')}",
+                f"Tokens: {total_tokens:,}",
+                f"Agent Running: {'Yes' if is_running else 'No'}",
+            ]
+        )
         self._console_print("\n".join(lines), highlight=False, markup=False)
 
-
-
-    def _show_recent_sessions(self, *, reason: str = "history", limit: int = 10) -> bool:
+    def _show_recent_sessions(
+        self, *, reason: str = "history", limit: int = 10
+    ) -> bool:
         """Render recent sessions inline from the active chat TUI.
 
         Returns True when something was shown, False if no session list was available.
@@ -891,7 +916,9 @@ class MixinDisplay:
 
         print()
         if reason == "history":
-            print("(._.) No messages in the current chat yet — here are recent sessions you can resume:")
+            print(
+                "(._.) No messages in the current chat yet — here are recent sessions you can resume:"
+            )
         else:
             print("  Recent sessions:")
         print()
@@ -901,14 +928,16 @@ class MixinDisplay:
             title = session.get("title") or "—"
             preview = (session.get("preview") or "")[:38]
             last_active = _relative_time(session.get("last_active"))
-            print(f"  {idx:<3} {title:<32} {preview:<40} {last_active:<13} {session['id']}")
+            print(
+                f"  {idx:<3} {title:<32} {preview:<40} {last_active:<13} {session['id']}"
+            )
         print()
-        print("  Use /resume <number>, /resume <session id>, or /resume <session title> to continue.")
+        print(
+            "  Use /resume <number>, /resume <session id>, or /resume <session title> to continue."
+        )
         print("  Example: /resume 2")
         print()
         return True
-
-
 
     def _prefill_input_buffer(self, text: str) -> None:
         """Place ``text`` in the active prompt_toolkit buffer, editable."""
@@ -924,37 +953,33 @@ class MixinDisplay:
         except Exception as e:
             logger.debug("undo: prefill buffer failed: %s", e)
 
-
-
     def _console_print(self, *args, **kwargs):
         """Print through the active command-safe console."""
         self._output_console().print(*args, **kwargs)
 
-
-
     def _show_gateway_status(self):
         """Show status of the gateway and connected messaging platforms."""
         from gateway.config import load_gateway_config, Platform
-        
+
         print()
         print("+" + "-" * 60 + "+")
         print("|" + " " * 15 + "(✿◠‿◠) Gateway Status" + " " * 17 + "|")
         print("+" + "-" * 60 + "+")
         print()
-        
+
         try:
             config = load_gateway_config()
-            
+
             print("  Messaging Platform Configuration:")
             print("  " + "-" * 55)
-            
+
             platform_status = {
                 Platform.TELEGRAM: ("Telegram", "TELEGRAM_BOT_TOKEN"),
                 Platform.DISCORD: ("Discord", "DISCORD_BOT_TOKEN"),
                 Platform.SLACK: ("Slack", "SLACK_BOT_TOKEN"),
                 Platform.WHATSAPP: ("WhatsApp", "WHATSAPP_ENABLED"),
             }
-            
+
             for platform, (name, env_var) in platform_status.items():
                 pconfig = config.platforms.get(platform)
                 if pconfig and pconfig.enabled:
@@ -963,7 +988,7 @@ class MixinDisplay:
                     print(f"    ✓ {name:<12} Enabled{home_str}")
                 else:
                     print(f"    ○ {name:<12} Not configured ({env_var})")
-            
+
             print()
             print("  Session Reset Policy:")
             print("  " + "-" * 55)
@@ -971,14 +996,14 @@ class MixinDisplay:
             print(f"    Mode: {policy.mode}")
             print(f"    Daily reset at: {policy.at_hour}:00")
             print(f"    Idle timeout: {policy.idle_minutes} minutes")
-            
+
             print()
             print("  To start the gateway:")
             print("    python cli.py --gateway")
             print()
             print(f"  Configuration file: {display_reymen_home()}/config.yaml")
             print()
-            
+
         except Exception as e:
             print(f"  Error loading gateway config: {e}")
             print()
@@ -986,10 +1011,10 @@ class MixinDisplay:
             print("    1. Set environment variables:")
             print("       TELEGRAM_BOT_TOKEN=your_token")
             print("       DISCORD_BOT_TOKEN=your_token")
-            print(f"    2. Or configure settings in {display_reymen_home()}/config.yaml")
+            print(
+                f"    2. Or configure settings in {display_reymen_home()}/config.yaml"
+            )
             print()
-
-
 
     def _show_usage(self):
         """Show rate limits (if available) and session token usage."""
@@ -1008,6 +1033,7 @@ class MixinDisplay:
         rl_state = agent.get_rate_limit_state()
         if rl_state and rl_state.has_data:
             from agent.rate_limit_tracker import format_rate_limit_display
+
             print()
             print(format_rate_limit_display(rl_state))
             print()
@@ -1040,7 +1066,9 @@ class MixinDisplay:
             provider=getattr(agent, "provider", None),
             base_url=getattr(agent, "base_url", None),
         )
-        elapsed = format_duration_compact((datetime.now() - self.session_start).total_seconds())
+        elapsed = format_duration_compact(
+            (datetime.now() - self.session_start).total_seconds()
+        )
 
         print("  📊 Session Token Usage")
         print(f"  {'─' * 40}")
@@ -1060,7 +1088,9 @@ class MixinDisplay:
         print(f"  Cost source:              {cost_result.source:>10}")
         if cost_result.amount_usd is not None:
             prefix = "~" if cost_result.status == "estimated" else ""
-            print(f"  Total cost:              {prefix}${float(cost_result.amount_usd):>10.4f}")
+            print(
+                f"  Total cost:              {prefix}${float(cost_result.amount_usd):>10.4f}"
+            )
         elif cost_result.status == "included":
             print(f"  Total cost:              {'included':>10}")
         else:
@@ -1079,17 +1109,22 @@ class MixinDisplay:
         api_key = getattr(agent, "api_key", None) or getattr(self, "api_key", None)
         # Lazy import — pulls the OpenAI SDK chain, only needed here.
         from agent.account_usage import fetch_account_usage, render_account_usage_lines
+
         account_snapshot = None
         if provider:
             with concurrent.futures.ThreadPoolExecutor(max_workers=1) as _pool:
                 try:
                     account_snapshot = _pool.submit(
-                        fetch_account_usage, provider,
-                        base_url=base_url, api_key=api_key,
+                        fetch_account_usage,
+                        provider,
+                        base_url=base_url,
+                        api_key=api_key,
                     ).result(timeout=10.0)
                 except (concurrent.futures.TimeoutError, Exception):
                     account_snapshot = None
-        account_lines = [f"  {line}" for line in render_account_usage_lines(account_snapshot)]
+        account_lines = [
+            f"  {line}" for line in render_account_usage_lines(account_snapshot)
+        ]
         if account_lines:
             print()
             for line in account_lines:
@@ -1097,12 +1132,19 @@ class MixinDisplay:
 
         if self.verbose:
             logging.getLogger().setLevel(logging.DEBUG)
-            for noisy in ('openai', 'openai._base_client', 'httpx', 'httpcore', 'asyncio', 'hpack', 'grpc', 'modal'):
+            for noisy in (
+                "openai",
+                "openai._base_client",
+                "httpx",
+                "httpcore",
+                "asyncio",
+                "hpack",
+                "grpc",
+                "modal",
+            ):
                 logging.getLogger(noisy).setLevel(logging.WARNING)
         else:
             logging.getLogger().setLevel(logging.INFO)
-
-
 
     def _show_insights(self, command: str = "/insights"):
         """Show usage insights and analytics from session history."""
@@ -1140,8 +1182,6 @@ class MixinDisplay:
         except Exception as e:
             print(f"  Error generating insights: {e}")
 
-
-
     def _show_voice_status(self):
         """Show current voice mode status."""
         from tools.voice_mode import check_voice_requirements
@@ -1161,15 +1201,21 @@ class MixinDisplay:
         for line in reqs["details"].split("\n"):
             _cprint(f"    {line}")
 
-
-    
     def _print_exit_summary(self):
         """Print session resume info on exit, similar to Claude Code."""
         print()
         msg_count = len(self.conversation_history)
         if msg_count > 0:
-            user_msgs = len([m for m in self.conversation_history if m.get("role") == "user"])
-            tool_calls = len([m for m in self.conversation_history if m.get("role") == "tool" or m.get("tool_calls")])
+            user_msgs = len(
+                [m for m in self.conversation_history if m.get("role") == "user"]
+            )
+            tool_calls = len(
+                [
+                    m
+                    for m in self.conversation_history
+                    if m.get("role") == "tool" or m.get("tool_calls")
+                ]
+            )
             elapsed = datetime.now() - self.session_start
             hours, remainder = divmod(int(elapsed.total_seconds()), 3600)
             minutes, seconds = divmod(remainder, 60)
@@ -1179,7 +1225,7 @@ class MixinDisplay:
                 duration_str = f"{minutes}m {seconds}s"
             else:
                 duration_str = f"{seconds}s"
-            
+
             # Look up session title for resume-by-name hint
             session_title = None
             if self._session_db:
@@ -1196,30 +1242,34 @@ class MixinDisplay:
             # profile names use the standard ReYMeN_HOME, so no -p needed.
             try:
                 from reymen.reymen_cli.profiles import get_active_profile_name
+
                 _active_profile = get_active_profile_name()
             except Exception:
                 _active_profile = "default"
             profile_flag = (
-                "" if _active_profile in ("default", "custom") else f" -p {_active_profile}"
+                ""
+                if _active_profile in ("default", "custom")
+                else f" -p {_active_profile}"
             )
             print(f"  ReYMeN --resume {self.session_id}{profile_flag}")
             if session_title:
-                print(f"  ReYMeN -c \"{session_title}\"{profile_flag}")
+                print(f'  ReYMeN -c "{session_title}"{profile_flag}')
             print()
             print(f"Session:        {self.session_id}")
             if session_title:
                 print(f"Title:          {session_title}")
             print(f"Duration:       {duration_str}")
-            print(f"Messages:       {msg_count} ({user_msgs} user, {tool_calls} tool calls)")
+            print(
+                f"Messages:       {msg_count} ({user_msgs} user, {tool_calls} tool calls)"
+            )
         else:
             try:
                 from reymen.reymen_cli.skin_engine import get_active_goodbye
+
                 goodbye = get_active_goodbye("Goodbye! ⚕")
             except Exception:
                 goodbye = "Goodbye! ⚕"
             print(goodbye)
-
-
 
     def _get_tui_prompt_symbols(self) -> tuple[str, str]:
         """Return ``(normal_prompt, state_suffix)`` for the active skin.
@@ -1233,6 +1283,7 @@ class MixinDisplay:
         """
         try:
             from reymen.reymen_cli.skin_engine import get_active_prompt_symbol
+
             symbol = get_active_prompt_symbol("❯ ")
         except Exception:
             symbol = "❯ "
@@ -1242,6 +1293,7 @@ class MixinDisplay:
         # Prepend profile name when not default
         try:
             from reymen.reymen_cli.profiles import get_active_profile_name
+
             profile = get_active_profile_name()
             if profile not in {"default", "custom"}:
                 symbol = f"{profile} {symbol}"
@@ -1260,8 +1312,6 @@ class MixinDisplay:
         # Icon-only custom prompts should still remain visible in special states.
         return symbol, symbol
 
-
-
     def _audio_level_bar(self) -> str:
         """Return a visual audio level indicator based on current RMS."""
         _LEVEL_BARS = " ▁▂▃▄▅▆▇"
@@ -1273,8 +1323,6 @@ class MixinDisplay:
         # Typical speech RMS is 500-5000, we cap display at ~8000
         level = min(rms, 8000) * 7 // 8000
         return _LEVEL_BARS[level]
-
-
 
     def _get_tui_prompt_fragments(self):
         """Return the prompt_toolkit fragments for the current interactive state."""
@@ -1309,20 +1357,18 @@ class MixinDisplay:
         if self._clarify_state:
             return _state_fragment("class:prompt-working", "?")
         if self._command_running:
-            return _state_fragment("class:prompt-working", self._command_spinner_frame())
+            return _state_fragment(
+                "class:prompt-working", self._command_spinner_frame()
+            )
         if self._agent_running:
             return _state_fragment("class:prompt-working", "⚕")
         if self._voice_mode:
             return _state_fragment("class:voice-prompt", "🎤")
         return [("class:prompt", symbol)]
 
-
-
     def _get_tui_prompt_text(self) -> str:
         """Return the visible prompt text for width calculations."""
         return "".join(text for _, text in self._get_tui_prompt_fragments())
-
-
 
     def _build_tui_style_dict(self) -> dict[str, str]:
         """Layer the active skin's prompt_toolkit colors over the base TUI style.
@@ -1335,6 +1381,7 @@ class MixinDisplay:
         style_dict = dict(getattr(self, "_tui_style_base", {}) or {})
         try:
             from reymen.reymen_cli.skin_engine import get_prompt_toolkit_style_overrides
+
             style_dict.update(get_prompt_toolkit_style_overrides())
         except Exception:
             logger.warning("[fix_01_sessiz_except] Exception")
@@ -1352,6 +1399,7 @@ class MixinDisplay:
         # paints.
         try:
             if _detect_light_mode():
+
                 def _remap_value(v: str) -> str:
                     if not v:
                         return v
@@ -1364,22 +1412,21 @@ class MixinDisplay:
                         _maybe_remap_for_light_mode(t) if t.startswith("#") else t
                         for t in tokens
                     )
+
                 style_dict = {k: _remap_value(v or "") for k, v in style_dict.items()}
         except Exception:
             logger.warning("[fix_01_sessiz_except] Exception")
         return style_dict
 
-
-
     def _apply_tui_skin_style(self) -> bool:
         """Refresh prompt_toolkit styling for a running interactive TUI."""
-        if not getattr(self, "_app", None) or not getattr(self, "_tui_style_base", None):
+        if not getattr(self, "_app", None) or not getattr(
+            self, "_tui_style_base", None
+        ):
             return False
         self._app.style = PTStyle.from_dict(self._build_tui_style_dict())
         self._invalidate(min_interval=0.0)
         return True
-
-
 
     def _get_extra_tui_widgets(self) -> list:
         """Return extra prompt_toolkit widgets to insert into the TUI layout.
@@ -1389,8 +1436,6 @@ class MixinDisplay:
         are inserted between the spacer and the status bar.
         """
         return []
-
-
 
     def _register_extra_tui_keybindings(self, kb, *, input_area) -> None:
         """Register extra keybindings on the TUI ``KeyBindings`` object.
@@ -1406,8 +1451,6 @@ class MixinDisplay:
             The main input widget, for wrappers that need to inspect or
             manipulate user input from a keybinding handler.
         """
-
-
 
     def _build_tui_layout_children(
         self,
@@ -1435,7 +1478,8 @@ class MixinDisplay:
         ordering.
         """
         return [
-            item for item in [
+            item
+            for item in [
                 Window(height=0),
                 sudo_widget,
                 secret_widget,
@@ -1453,6 +1497,6 @@ class MixinDisplay:
                 input_rule_bot,
                 voice_status_bar,
                 completions_menu,
-            ] if item is not None
+            ]
+            if item is not None
         ]
-

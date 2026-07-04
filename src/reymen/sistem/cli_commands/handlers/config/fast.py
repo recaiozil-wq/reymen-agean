@@ -7,15 +7,22 @@ from src.reymen.sistem.cli_display import _cprint, _ACCENT, _RST, _DIM
 def _handle_fast_command(cli, cmd: str):
     """Handle /fast — toggle fast mode (OpenAI Priority Processing / Anthropic Fast Mode)."""
     if not cli._fast_command_available():
-        _cprint("  (._.) /fast is only available for models that support fast mode (OpenAI Priority Processing or Anthropic Fast Mode).")
+        _cprint(
+            "  (._.) /fast is only available for models that support fast mode (OpenAI Priority Processing or Anthropic Fast Mode)."
+        )
         return
 
     # Determine the branding for the current model
     try:
         from reymen.reymen_cli.models import _is_anthropic_fast_model
+
         agent = getattr(cli, "agent", None)
         model = getattr(agent, "model", None) or getattr(cli, "model", None)
-        feature_name = "Anthropic Fast Mode" if _is_anthropic_fast_model(model) else "Priority Processing"
+        feature_name = (
+            "Anthropic Fast Mode"
+            if _is_anthropic_fast_model(model)
+            else "Priority Processing"
+        )
     except Exception:
         feature_name = "Fast mode"
 

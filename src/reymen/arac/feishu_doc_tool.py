@@ -13,9 +13,9 @@ import urllib.parse
 import urllib.request
 from typing import Optional
 
-FEISHU_APP_ID     = os.environ.get("FEISHU_APP_ID", "")
+FEISHU_APP_ID = os.environ.get("FEISHU_APP_ID", "")
 FEISHU_APP_SECRET = os.environ.get("FEISHU_APP_SECRET", "")
-FEISHU_BASE       = "https://open.feishu.cn/open-apis"
+FEISHU_BASE = "https://open.feishu.cn/open-apis"
 
 _TOKEN_CACHE: dict = {"token": "", "bitis": 0.0}
 
@@ -27,10 +27,12 @@ def _feishu_token() -> str:
     if not FEISHU_APP_ID or not FEISHU_APP_SECRET:
         return ""
     try:
-        govde = json.dumps({
-            "app_id":     FEISHU_APP_ID,
-            "app_secret": FEISHU_APP_SECRET,
-        }).encode("utf-8")
+        govde = json.dumps(
+            {
+                "app_id": FEISHU_APP_ID,
+                "app_secret": FEISHU_APP_SECRET,
+            }
+        ).encode("utf-8")
         req = urllib.request.Request(
             f"{FEISHU_BASE}/auth/v3/tenant_access_token/internal",
             data=govde,
@@ -57,7 +59,7 @@ def _fs_get(yol: str, params: dict = None) -> dict:
             url,
             headers={
                 "Authorization": f"Bearer {token}",
-                "Content-Type":  "application/json",
+                "Content-Type": "application/json",
             },
         )
         with urllib.request.urlopen(req, timeout=15) as r:
@@ -76,7 +78,7 @@ def _fs_post(yol: str, veri: dict) -> dict:
             data=json.dumps(veri).encode("utf-8"),
             headers={
                 "Authorization": f"Bearer {token}",
-                "Content-Type":  "application/json",
+                "Content-Type": "application/json",
             },
         )
         with urllib.request.urlopen(req, timeout=15) as r:
@@ -96,7 +98,7 @@ def _fs_patch(yol: str, veri: dict) -> dict:
             data=govde,
             headers={
                 "Authorization": f"Bearer {token}",
-                "Content-Type":  "application/json",
+                "Content-Type": "application/json",
             },
             method="PATCH",
         )
@@ -107,6 +109,7 @@ def _fs_patch(yol: str, veri: dict) -> dict:
 
 
 # ── Döküman İşlemleri ─────────────────────────────────────────────────
+
 
 def dokuman_olustur(baslik: str, klasor_token: str = "") -> str:
     """Yeni Feishu dokümanı oluştur.
@@ -127,7 +130,7 @@ def dokuman_olustur(baslik: str, klasor_token: str = "") -> str:
         return f"[Feishu Döküman]: {yanit['error']}"
 
     doc_id = yanit.get("data", {}).get("document", {}).get("document_id", "")
-    url    = f"https://docs.larksuite.com/docx/{doc_id}" if doc_id else ""
+    url = f"https://docs.larksuite.com/docx/{doc_id}" if doc_id else ""
     return f"Döküman oluşturuldu: {doc_id}\nURL: {url}"
 
 
@@ -160,22 +163,22 @@ def dokuman_blok_ekle(document_id: str, metin: str, blok_tipi: str = "text") -> 
         Sonuç metni
     """
     tip_map = {
-        "text":     2,
+        "text": 2,
         "heading1": 3,
         "heading2": 4,
         "heading3": 5,
-        "bullet":   12,
-        "ordered":  13,
+        "bullet": 12,
+        "ordered": 13,
     }
     tip_kodu = tip_map.get(blok_tipi, 2)
 
     veri = {
-        "children": [{
-            "block_type": tip_kodu,
-            "text": {
-                "elements": [{"text_run": {"content": metin}}]
-            },
-        }]
+        "children": [
+            {
+                "block_type": tip_kodu,
+                "text": {"elements": [{"text_run": {"content": metin}}]},
+            }
+        ]
     }
     yanit = _fs_post(f"/docx/v1/documents/{document_id}/blocks/batch_update", veri)
     if "error" in yanit:
@@ -193,11 +196,14 @@ def dokuman_ara(arama_terimi: str, max_sonuc: int = 10) -> str:
     Returns:
         Sonuçlar metin olarak
     """
-    yanit = _fs_post("/suite/docs-api/search/object", {
-        "search_key": arama_terimi,
-        "count":      min(max_sonuc, 50),
-        "docs_types": ["docx", "doc", "sheet"],
-    })
+    yanit = _fs_post(
+        "/suite/docs-api/search/object",
+        {
+            "search_key": arama_terimi,
+            "count": min(max_sonuc, 50),
+            "docs_types": ["docx", "doc", "sheet"],
+        },
+    )
     if "error" in yanit:
         return f"[Feishu Arama]: {yanit['error']}"
 
@@ -231,7 +237,9 @@ def motor_kaydet(motor):
     )
     motor._plugin_arac_kaydet(
         "FEISHU_DOC_BLOK_EKLE",
-        lambda document_id, metin, blok_tipi="text": dokuman_blok_ekle(document_id, metin, blok_tipi),
+        lambda document_id, metin, blok_tipi="text": dokuman_blok_ekle(
+            document_id, metin, blok_tipi
+        ),
         "Feishu dökümanına içerik ekle",
     )
     motor._plugin_arac_kaydet(

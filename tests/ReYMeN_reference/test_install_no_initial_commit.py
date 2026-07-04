@@ -56,7 +56,7 @@ def _extract_no_commit_guard() -> str:
 def _run_guard(install_dir: Path) -> None:
     block = _extract_no_commit_guard()
     script = (
-        "log_warn() { echo \"WARN: $*\"; }\n"
+        'log_warn() { echo "WARN: $*"; }\n'
         f"INSTALL_DIR={shlex.quote(str(install_dir))}\n"
         f"{block}\n"
     )
@@ -97,9 +97,9 @@ def test_install_sh_guard_keeps_repo_with_commits(tmp_path: Path) -> None:
     _run_guard(install_dir)
     assert install_dir.exists()
     assert (install_dir / "f.txt").exists(), "a real checkout must be left intact"
-    assert not list(install_dir.parent.glob(install_dir.name + ".broken-*")), (
-        "a healthy checkout must not be moved aside"
-    )
+    assert not list(
+        install_dir.parent.glob(install_dir.name + ".broken-*")
+    ), "a healthy checkout must not be moved aside"
 
 
 def test_install_sh_guard_ignores_non_repo_dir(tmp_path: Path) -> None:
@@ -117,9 +117,9 @@ def test_install_sh_guard_ignores_non_repo_dir(tmp_path: Path) -> None:
 def test_install_ps1_validity_requires_initial_commit() -> None:
     """The PowerShell repo-validity gate must also require a resolvable HEAD."""
     text = INSTALL_PS1.read_text()
-    assert "rev-parse --verify HEAD" in text, (
-        "install.ps1 must probe for an initial commit (#40998)"
-    )
+    assert (
+        "rev-parse --verify HEAD" in text
+    ), "install.ps1 must probe for an initial commit (#40998)"
     # Contract: $repoValid is only set when the HEAD probe succeeded too.
     assert re.search(
         r"if \(\$revParseOk -and \$statusOk -and \$hasCommit\) \{",
@@ -127,9 +127,9 @@ def test_install_ps1_validity_requires_initial_commit() -> None:
     ), "repo validity must be gated on $hasCommit, not just rev-parse + status"
     # Cleanup must be non-destructive: move the broken checkout aside, never
     # `Remove-Item -Recurse -Force` it (review feedback on #40998).
-    assert "Move-Item -LiteralPath $InstallDir" in text, (
-        "install.ps1 must move an invalid checkout aside, not delete it"
-    )
+    assert (
+        "Move-Item -LiteralPath $InstallDir" in text
+    ), "install.ps1 must move an invalid checkout aside, not delete it"
     assert "Remove-Item -Recurse -Force $InstallDir -ErrorAction Stop" not in text, (
         "the destructive wipe of an existing install dir must be gone "
         "(transient cleanup of a just-failed clone is fine)"

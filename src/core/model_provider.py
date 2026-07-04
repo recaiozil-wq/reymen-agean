@@ -36,6 +36,7 @@ _HTTP_TIMEOUT = 120.0
 # ModelProvider — Soyut temel sinif
 # ═══════════════════════════════════════════════════════════════
 
+
 class ModelProvider(abc.ABC):
     """Tüm provider'ların uyması gereken soyut ara yüz.
 
@@ -120,6 +121,7 @@ class ModelProvider(abc.ABC):
 # ═══════════════════════════════════════════════════════════════
 # OpenAI uyumlu provider (DeepSeek, OpenRouter, xAI, Groq, ...)
 # ═══════════════════════════════════════════════════════════════
+
 
 class OpenAICompatibleProvider(ModelProvider):
     """OpenAI uyumlu /chat/completions endpoint'i icin provider.
@@ -207,6 +209,7 @@ class OpenAICompatibleProvider(ModelProvider):
 # MiniMax (xiaomi) provider — farkli API formatı
 # ═══════════════════════════════════════════════════════════════
 
+
 class MiniMaxProvider(ModelProvider):
     """MiniMax (xiaomi) API — /v1/text/chatcompletion_v2."""
 
@@ -266,6 +269,7 @@ class MiniMaxProvider(ModelProvider):
 # LiteLLM Provider — 100+ provider tek API ile
 # ═══════════════════════════════════════════════════════════════
 
+
 class LiteLLMProvider(ModelProvider):
     """LiteLLM ile 100+ provider'a erisim. OpenAI uyumlu API.
 
@@ -278,15 +282,19 @@ class LiteLLMProvider(ModelProvider):
     api_key_env = ""
     base_url = ""
 
-    def __init__(self, model: Optional[str] = None,
-                 api_key: Optional[str] = None,
-                 base_url: Optional[str] = None,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        model: Optional[str] = None,
+        api_key: Optional[str] = None,
+        base_url: Optional[str] = None,
+        **kwargs: Any,
+    ):
         self._model = model or self.model
         self._api_key = api_key
         self._base_url = base_url
         try:
             import litellm
+
             self._litellm = litellm
             self._mevcut = True
         except ImportError:
@@ -295,9 +303,9 @@ class LiteLLMProvider(ModelProvider):
     def hazir_mi(self) -> bool:
         return self._mevcut
 
-    def calistir(self, messages: list[dict],
-                 system_content: str = "",
-                 **kwargs: Any) -> tuple[str, Optional[str]]:
+    def calistir(
+        self, messages: list[dict], system_content: str = "", **kwargs: Any
+    ) -> tuple[str, Optional[str]]:
         if not self._mevcut:
             return "", "LiteLLM kurulu degil (pip install litellm)"
 
@@ -308,6 +316,7 @@ class LiteLLMProvider(ModelProvider):
             full_messages.extend(messages)
 
             import litellm as lm
+
             response = lm.completion(
                 model=self._model,
                 messages=full_messages,
@@ -325,6 +334,7 @@ class LiteLLMProvider(ModelProvider):
 # ═══════════════════════════════════════════════════════════════
 # Provider Fabrikası
 # ═══════════════════════════════════════════════════════════════
+
 
 def _provider_fabrikasi(
     ad: str,
@@ -400,7 +410,9 @@ def _provider_fabrikasi(
 
     info = _providers.get(ad)
     if not info:
-        raise ValueError(f"Bilinmeyen provider: {ad}. Secenekler: {list(_providers.keys())}")
+        raise ValueError(
+            f"Bilinmeyen provider: {ad}. Secenekler: {list(_providers.keys())}"
+        )
 
     cls = info["cls"]
     if "kwargs" in info:
@@ -417,9 +429,11 @@ def _provider_fabrikasi(
 # ProviderChain — Failover zinciri
 # ═══════════════════════════════════════════════════════════════
 
+
 @dataclass
 class ProviderKayit:
     """Zincirdeki bir provider'in kaydi."""
+
     ad: str
     model: Optional[str] = None
     api_key: Optional[str] = None
@@ -429,6 +443,7 @@ class ProviderKayit:
 @dataclass
 class CalistirSonuc:
     """ProviderChain.calistir sonucu."""
+
     yanit: str = ""
     provider_adi: str = ""
     basarili: bool = False
@@ -464,8 +479,13 @@ class ProviderChain:
     def provider_list(self) -> list[ProviderKayit]:
         return list(self._provider_list)
 
-    def ekle(self, ad: str, model: Optional[str] = None,
-             api_key: Optional[str] = None, base_url: Optional[str] = None) -> None:
+    def ekle(
+        self,
+        ad: str,
+        model: Optional[str] = None,
+        api_key: Optional[str] = None,
+        base_url: Optional[str] = None,
+    ) -> None:
         """Zincirin sonuna provider ekle."""
         self._provider_list.append(
             ProviderKayit(ad=ad, model=model, api_key=api_key, base_url=base_url)
@@ -488,7 +508,9 @@ class ProviderChain:
             self._instances[kayit.ad] = provider
             return provider
         except ValueError as e:
-            logger.warning("[ProviderChain] Provider olusturulamadi (%s): %s", kayit.ad, e)
+            logger.warning(
+                "[ProviderChain] Provider olusturulamadi (%s): %s", kayit.ad, e
+            )
             return None
 
     def calistir(
@@ -513,21 +535,25 @@ class ProviderChain:
         for kayit in self._provider_list:
             provider = self._get_provider(kayit)
             if provider is None:
-                sonuc.denenen_providerlar.append({
-                    "ad": kayit.ad,
-                    "durum": "atlandi",
-                    "sebep": "olusturulamadi",
-                    "sure_ms": 0,
-                })
+                sonuc.denenen_providerlar.append(
+                    {
+                        "ad": kayit.ad,
+                        "durum": "atlandi",
+                        "sebep": "olusturulamadi",
+                        "sure_ms": 0,
+                    }
+                )
                 continue
 
             if not provider.hazir_mi():
-                sonuc.denenen_providerlar.append({
-                    "ad": kayit.ad,
-                    "durum": "atlandi",
-                    "sebep": "api_anahtari_yok",
-                    "sure_ms": 0,
-                })
+                sonuc.denenen_providerlar.append(
+                    {
+                        "ad": kayit.ad,
+                        "durum": "atlandi",
+                        "sebep": "api_anahtari_yok",
+                        "sure_ms": 0,
+                    }
+                )
                 logger.debug("[ProviderChain] %s atlandi (API anahtari yok)", kayit.ad)
                 continue
 
@@ -543,38 +569,56 @@ class ProviderChain:
                 sonuc.provider_adi = kayit.ad
                 sonuc.basarili = True
                 sonuc.sure_ms = sure
-                sonuc.denenen_providerlar.append({
-                    "ad": kayit.ad,
-                    "durum": "basarili",
-                    "sure_ms": round(prov_sure, 1),
-                })
+                sonuc.denenen_providerlar.append(
+                    {
+                        "ad": kayit.ad,
+                        "durum": "basarili",
+                        "sure_ms": round(prov_sure, 1),
+                    }
+                )
                 logger.info(
                     "[ProviderChain] ✅ %s basarili (%.0f ms)",
-                    kayit.ad, prov_sure,
+                    kayit.ad,
+                    prov_sure,
                 )
                 return sonuc
             else:
                 # Basarisiz — failover
-                failover_kodlari = ("401", "402", "429", "500", "HTTP 401",
-                                    "HTTP 402", "HTTP 429", "HTTP 500")
+                failover_kodlari = (
+                    "401",
+                    "402",
+                    "429",
+                    "500",
+                    "HTTP 401",
+                    "HTTP 402",
+                    "HTTP 429",
+                    "HTTP 500",
+                )
                 failover = any(k in hata for k in failover_kodlari)
                 durum = "failover" if failover else "hata"
-                sonuc.denenen_providerlar.append({
-                    "ad": kayit.ad,
-                    "durum": durum,
-                    "sebep": hata[:120],
-                    "sure_ms": round(prov_sure, 1),
-                })
+                sonuc.denenen_providerlar.append(
+                    {
+                        "ad": kayit.ad,
+                        "durum": durum,
+                        "sebep": hata[:120],
+                        "sure_ms": round(prov_sure, 1),
+                    }
+                )
                 logger.warning(
                     "[ProviderChain] ✗ %s basarisiz (%s) — %s (%.0f ms)",
-                    kayit.ad, durum, hata[:80], prov_sure,
+                    kayit.ad,
+                    durum,
+                    hata[:80],
+                    prov_sure,
                 )
 
         # Tum provider'lar basarisiz
         toplam_sure = (time.time() - baslangic) * 1000
         sonuc.sure_ms = toplam_sure
         sonuc.hata = "Tum provider'lar basarisiz oldu"
-        logger.error("[ProviderChain] Tum provider'lar basarisiz (%.0f ms)", toplam_sure)
+        logger.error(
+            "[ProviderChain] Tum provider'lar basarisiz (%.0f ms)", toplam_sure
+        )
         return sonuc
 
     def durum_raporu(self) -> dict:
@@ -584,14 +628,16 @@ class ProviderChain:
             provider = self._instances.get(kayit.ad)
             hazir = provider is not None and provider.hazir_mi()
             api_var = bool(provider and provider.api_key) if provider else False
-            providers.append({
-                "ad": kayit.ad,
-                "model": kayit.model or "(varsayilan)",
-                "hazir": hazir,
-                "api_anahtari_var": api_var,
-                "base_url": kayit.base_url or "(varsayilan)",
-                "instance_var": provider is not None,
-            })
+            providers.append(
+                {
+                    "ad": kayit.ad,
+                    "model": kayit.model or "(varsayilan)",
+                    "hazir": hazir,
+                    "api_anahtari_var": api_var,
+                    "base_url": kayit.base_url or "(varsayilan)",
+                    "instance_var": provider is not None,
+                }
+            )
         return {
             "provider_sayisi": len(self._provider_list),
             "providerlar": providers,
@@ -615,6 +661,7 @@ _varsayilan_zincir: Optional[ProviderChain] = None
 # Provider Kesif — OpenRouter uzerinden model listesi
 # ═══════════════════════════════════════════════════════════════
 
+
 def provider_kesfet(api_key: Optional[str] = None) -> str:
     """OpenRouter /v1/models uzerinden kullanilabilir provider/model listesi.
 
@@ -622,6 +669,7 @@ def provider_kesfet(api_key: Optional[str] = None) -> str:
     Her provider icin model adedi gosterilir.
     """
     import httpx
+
     key = api_key or os.environ.get("OPENROUTER_API_KEY", "")
     if not key:
         return "❌ OpenRouter API key bulunamadi (OPENROUTER_API_KEY)"
@@ -637,6 +685,7 @@ def provider_kesfet(api_key: Optional[str] = None) -> str:
 
         modeller = resp.json().get("data", [])
         from collections import Counter
+
         provider_sayaci: Counter = Counter()
         for m in modeller:
             pid = m.get("id", "")
@@ -644,7 +693,11 @@ def provider_kesfet(api_key: Optional[str] = None) -> str:
                 prov = pid.split("/")[0]
                 provider_sayaci[prov] += 1
 
-        satirlar = ["📡 **OpenRouter ile Kullanilabilir Provider'lar**", f"  Toplam model: {len(modeller)}", ""]
+        satirlar = [
+            "📡 **OpenRouter ile Kullanilabilir Provider'lar**",
+            f"  Toplam model: {len(modeller)}",
+            "",
+        ]
         for prov, adet in sorted(provider_sayaci.items(), key=lambda x: -x[1]):
             satirlar.append(f"  {prov:20s} → {adet:4d} model")
         satirlar.append("")
@@ -652,10 +705,23 @@ def provider_kesfet(api_key: Optional[str] = None) -> str:
         satirlar.append(f"  (OpenRouter API key ile erisilebilir)")
 
         # En populer provider'lari ayrica goster
-        populer = [p for p in provider_sayaci if p in (
-            "openai", "anthropic", "google", "meta-llama", "mistral",
-            "cohere", "deepseek", "microsoft", "amazon", "xai"
-        )]
+        populer = [
+            p
+            for p in provider_sayaci
+            if p
+            in (
+                "openai",
+                "anthropic",
+                "google",
+                "meta-llama",
+                "mistral",
+                "cohere",
+                "deepseek",
+                "microsoft",
+                "amazon",
+                "xai",
+            )
+        ]
         if populer:
             satirlar.append("")
             satirlar.append("**Populer:**")
@@ -692,6 +758,7 @@ def zinciri_sifirla() -> None:
 # Motor tool kayit (motor.py otomatik import eder)
 # ═══════════════════════════════════════════════════════════════
 
+
 def motor_kaydet(motor: Any) -> None:
     """Provider araçlarını Motor'a kaydeder.
 
@@ -724,14 +791,18 @@ def motor_kaydet(motor: Any) -> None:
             kwargs["model"] = model
 
         sonuc = chain.calistir(messages_list, system, **kwargs)
-        return _json.dumps({
-            "yanit": sonuc.yanit,
-            "provider": sonuc.provider_adi,
-            "basarili": sonuc.basarili,
-            "sure_ms": round(sonuc.sure_ms, 1),
-            "denenenler": sonuc.denenen_providerlar,
-            "hata": sonuc.hata,
-        }, ensure_ascii=False, indent=2)
+        return _json.dumps(
+            {
+                "yanit": sonuc.yanit,
+                "provider": sonuc.provider_adi,
+                "basarili": sonuc.basarili,
+                "sure_ms": round(sonuc.sure_ms, 1),
+                "denenenler": sonuc.denenen_providerlar,
+                "hata": sonuc.hata,
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
 
     def _provider_zincir_durum() -> str:
         """PROVIDER_ZINCIR_DURUM: Provider zincirinin durum raporu.
@@ -757,4 +828,6 @@ def motor_kaydet(motor: Any) -> None:
         provider_kesif_motor,
         "OpenRouter uzerinden kullanilabilir provider/model listesi. API gerekmez.",
     )
-    logger.info("[ModelProvider] Motor araclari kaydedildi: PROVIDER_CALISTIR, PROVIDER_ZINCIR_DURUM, PROVIDER_KESFET")
+    logger.info(
+        "[ModelProvider] Motor araclari kaydedildi: PROVIDER_CALISTIR, PROVIDER_ZINCIR_DURUM, PROVIDER_KESFET"
+    )

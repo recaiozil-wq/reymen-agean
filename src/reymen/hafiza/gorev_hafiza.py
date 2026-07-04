@@ -43,7 +43,8 @@ _dedup_kilit = threading.Lock()
 # Hafıza genişletme modülü (opsiyonel)
 try:
     from reymen.hafiza.hafiza_genislet import hafiza as _hafiza
-    _HAFIZA_AKTIF = _hafiza._hazir if hasattr(_hafiza, '_hazir') else True
+
+    _HAFIZA_AKTIF = _hafiza._hazir if hasattr(_hafiza, "_hazir") else True
 except ImportError:
     _hafiza = None
     _HAFIZA_AKTIF = False
@@ -51,6 +52,7 @@ except ImportError:
 # Session DB (ReYMeN'ten import için opsiyonel)
 try:
     from reymen.hafiza.session_db import AdvancedSessionStorage as _SessionStorage
+
     _SESSION_IMPORT_AKTIF = True
 except ImportError:
     _SessionStorage = None
@@ -60,6 +62,7 @@ except ImportError:
 # ══════════════════════════════════════════════════════════════════════════
 # DEDUP YARDIMCI
 # ══════════════════════════════════════════════════════════════════════════
+
 
 def _dedup_kontrol(kayit: dict, tur: str = "icerik") -> bool:
     """Aynı içerik daha önce kaydedilmiş mi kontrol et.
@@ -99,6 +102,7 @@ def _dedup_kontrol(kayit: dict, tur: str = "icerik") -> bool:
 # ══════════════════════════════════════════════════════════════════════════
 # GÖREV SONRASI HAFIZA GENİŞLETME
 # ══════════════════════════════════════════════════════════════════════════
+
 
 def gorev_sonrasi_hafiza(
     task_id: str,
@@ -213,6 +217,7 @@ def _guven_skoru_hesapla(basarili_sayisi: int, hata_sayisi: int) -> float:
 def _varsayilan_gecerlilik(baslangic_str: str = "") -> str:
     """6 aylık varsayılan geçerlilik tarihi döndür."""
     from datetime import timedelta
+
     baslangic = datetime.now()
     if baslangic_str:
         try:
@@ -224,8 +229,7 @@ def _varsayilan_gecerlilik(baslangic_str: str = "") -> str:
     return bitis.strftime("%Y-%m-%d")
 
 
-def guncelle_son_kullanim(kayit_id: int, kategori: str = "",
-                          basarili_mi: bool = True):
+def guncelle_son_kullanim(kayit_id: int, kategori: str = "", basarili_mi: bool = True):
     """Kaydın son_kullanim ve guven_skoru metadata'sını güncelle.
 
     Args:
@@ -456,6 +460,7 @@ def _soul_guncelle(kayit: dict) -> dict:
 # BECERİ KRISTALLEŞTİRME (SKILL.md)
 # ══════════════════════════════════════════════════════════════════════════
 
+
 def beceri_kristallestir(
     gorev_adi: str,
     ozet: str,
@@ -523,7 +528,9 @@ def beceri_kristallestir(
                 baslik = anahtar.replace("_", " ").title()
                 satirlar.append(f"| {baslik} | {deger} |")
             if satirlar:
-                ek_tablo = "| **Özellik** | **Değer** |\n|---|---|\n" + "\n".join(satirlar)
+                ek_tablo = "| **Özellik** | **Değer** |\n|---|---|\n" + "\n".join(
+                    satirlar
+                )
 
         # Oturum içi dedup: aynı gorev_adi + ozet daha önce işlendiyse atla
         icerik_imza = f"{gorev_adi}|{ozet[:100]}"
@@ -623,42 +630,63 @@ def gorev_ozeti_markdown(kayit: dict) -> str:
         ]
 
         if hata:
-            satirlar.extend([
-                "",
-                "## ❌ Hata Detayı",
-                "```",
-                hata[:500],
-                "```",
-            ])
+            satirlar.extend(
+                [
+                    "",
+                    "## ❌ Hata Detayı",
+                    "```",
+                    hata[:500],
+                    "```",
+                ]
+            )
 
         if yanit_ozeti:
-            satirlar.extend([
-                "",
-                "## 💬 Yanıt Özeti",
-                "```text",
-                yanit_ozeti[:500],
-                "```",
-            ])
+            satirlar.extend(
+                [
+                    "",
+                    "## 💬 Yanıt Özeti",
+                    "```text",
+                    yanit_ozeti[:500],
+                    "```",
+                ]
+            )
 
         if ozet:
-            satirlar.extend([
-                "",
-                "## 📝 Özet",
-                ozet,
-            ])
+            satirlar.extend(
+                [
+                    "",
+                    "## 📝 Özet",
+                    ozet,
+                ]
+            )
 
         # Ek JSON detaylar
-        ek_detay = {k: v for k, v in kayit.items()
-                    if k not in ("task_id", "zaman", "hedef", "basarili",
-                                 "sure_sn", "tur_sayisi", "hata", "yanit_ozeti", "ozet")}
+        ek_detay = {
+            k: v
+            for k, v in kayit.items()
+            if k
+            not in (
+                "task_id",
+                "zaman",
+                "hedef",
+                "basarili",
+                "sure_sn",
+                "tur_sayisi",
+                "hata",
+                "yanit_ozeti",
+                "ozet",
+            )
+        }
         if ek_detay:
-            satirlar.extend([
-                "",
-                "## 🔍 Ek Detaylar",
-                "```json",
-                json.dumps(ek_detay, ensure_ascii=False, indent=2),
-                "```",
-            ])
+            satirlar.extend(
+                [
+                    "",
+                    "## 🔍 Ek Detaylar",
+                    "```json",
+                    json.dumps(ek_detay, ensure_ascii=False, indent=2),
+                    "```",
+                ]
+            )
 
         return "\n".join(satirlar)
 
@@ -670,6 +698,7 @@ def gorev_ozeti_markdown(kayit: dict) -> str:
 # ══════════════════════════════════════════════════════════════════════════
 # GEÇMİŞ KONUŞMALARI İMPORT ET
 # ══════════════════════════════════════════════════════════════════════════
+
 
 def gecmis_konusmalari_import_et(
     kaynak: str = "memory",
@@ -759,7 +788,11 @@ def _session_db_import_et(istatistik: dict, limit: int) -> None:
                     mesajlar = storage.session_mesajlari(session_id)
 
                 ozet = s.get("ozet", "") if isinstance(s, dict) else ""
-                kaynak = s.get("source", "session_db") if isinstance(s, dict) else "session_db"
+                kaynak = (
+                    s.get("source", "session_db")
+                    if isinstance(s, dict)
+                    else "session_db"
+                )
 
                 icerik = f"""
 ## Session: {session_id}
@@ -795,6 +828,7 @@ def _session_db_import_et(istatistik: dict, limit: int) -> None:
 # ══════════════════════════════════════════════════════════════════════════
 # TOPLU GEÇMİŞ İMPORT
 # ══════════════════════════════════════════════════════════════════════════
+
 
 def tum_gecmisi_isle() -> dict:
     """Tüm geçmiş konuşmaları tek seferde işle.
@@ -849,6 +883,7 @@ def tum_gecmisi_isle() -> dict:
 # ══════════════════════════════════════════════════════════════════════════
 # NESNe TABANLI ARAYÜZ
 # ══════════════════════════════════════════════════════════════════════════
+
 
 class GorevHafiza:
     """Görev hafıza sistemi için nesne tabanlı arayüz.

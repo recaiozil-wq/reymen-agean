@@ -1,4 +1,5 @@
 """Test: reymen/sistem/hot_reload.py — HotReloader, motor tool kaydi"""
+
 from __future__ import annotations
 
 import sys
@@ -28,15 +29,18 @@ def fake_motor():
 @pytest.fixture
 def reloader(fake_motor):
     from reymen.sistem.hot_reload import HotReloader
+
     hr = HotReloader(fake_motor, aralik=30)
     yield hr
 
 
 # ── Initialization ───────────────────────────────────────────────────────
 
+
 class TestInit:
     def test_default_values(self, fake_motor):
         from reymen.sistem.hot_reload import HotReloader
+
         hr = HotReloader(fake_motor, aralik=30)
         assert hr._aralik == 30
         assert hr._motor is fake_motor
@@ -47,6 +51,7 @@ class TestInit:
 
     def test_initial_klasorler(self, fake_motor):
         from reymen.sistem.hot_reload import HotReloader
+
         hr = HotReloader(fake_motor, aralik=30)
         assert len(hr._klasorler) == 2  # arac/ ve plugins/
         for k in hr._klasorler:
@@ -62,11 +67,13 @@ class TestInit:
 
     def test_aralik_default(self, fake_motor):
         from reymen.sistem.hot_reload import HotReloader
+
         hr = HotReloader(fake_motor)  # varsayilan aralik=10
         assert hr._aralik == 10
 
 
 # ── Baslat / Durdur ──────────────────────────────────────────────────────
+
 
 class TestBaslatDurdur:
     def test_baslat_message(self, reloader):
@@ -102,6 +109,7 @@ class TestBaslatDurdur:
 
 # ── Klasor Ekle ──────────────────────────────────────────────────────────
 
+
 class TestKlasorEkle:
     def test_klasor_ekle_valid(self, reloader, tmp_path):
         yeni = tmp_path / "test_plugins"
@@ -129,6 +137,7 @@ class TestKlasorEkle:
 
 # ── Durum ────────────────────────────────────────────────────────────────
 
+
 class TestDurum:
     def test_durum_keys(self, reloader):
         durum = reloader.durum()
@@ -150,9 +159,11 @@ class TestDurum:
 
 # ── Motor tool kaydi ─────────────────────────────────────────────────────
 
+
 class TestMotorKaydet:
     def test_motor_kaydet_registers_tools(self, fake_motor):
         from reymen.sistem.hot_reload import motor_kaydet
+
         motor_kaydet(fake_motor)
         assert len(fake_motor.kayitlar) == 3
         adlar = [k[0] for k in fake_motor.kayitlar]
@@ -162,15 +173,18 @@ class TestMotorKaydet:
 
     def test_motor_hot_reload_baslat_func(self, fake_motor):
         from reymen.sistem.hot_reload import motor_kaydet, motor_hot_reload_baslat
+
         motor_kaydet(fake_motor)
         sonuc = motor_hot_reload_baslat("aralik=30")
         assert "Baslatildi" in sonuc
         # cleanup
         from reymen.sistem.hot_reload import motor_hot_reload_durdur
+
         motor_hot_reload_durdur()
 
     def test_motor_hot_reload_durum_func(self, fake_motor):
         from reymen.sistem.hot_reload import motor_kaydet, motor_hot_reload_durum
+
         motor_kaydet(fake_motor)
         durum_json = motor_hot_reload_durum()
         durum = json.loads(durum_json)
@@ -179,6 +193,7 @@ class TestMotorKaydet:
 
     def test_motor_hot_reload_durdur_func(self, fake_motor):
         from reymen.sistem.hot_reload import motor_kaydet, motor_hot_reload_durdur
+
         motor_kaydet(fake_motor)
         # Once stop without starting -> "Zaten kapali" cunku _HOT_RELOADER var ama thread calismiyor
         sonuc = motor_hot_reload_durdur()
@@ -186,6 +201,7 @@ class TestMotorKaydet:
 
 
 # ── _reload_modul Testleri ──────────────────────────────────────────────
+
 
 class TestReloadModul:
     """_reload_modul fonksiyonunun cesitli senaryolari."""
@@ -214,6 +230,7 @@ class TestReloadModul:
 
         modul_adi = "reymen.test._test_hr_temp_module"
         import reymen.test._test_hr_temp_module as test_mod
+
         assert hasattr(test_mod, "motor_kaydet")
         assert test_mod.TEST_VAR == "initial_value"
         assert modul_adi in sys.modules
@@ -232,7 +249,11 @@ class TestReloadModul:
 
         monkeypatch.setattr(Path, "relative_to", fake_relative_to)
         # Store original for non-test paths
-        Path.original_relative_to = Path.__dict__["relative_to"].__func__ if hasattr(Path.__dict__["relative_to"], '__func__') else Path.__dict__["relative_to"]
+        Path.original_relative_to = (
+            Path.__dict__["relative_to"].__func__
+            if hasattr(Path.__dict__["relative_to"], "__func__")
+            else Path.__dict__["relative_to"]
+        )
 
         before_count = reloader._istatistik["yenilenen"]
         result = reloader._reload_modul(mod_dosyasi)
@@ -240,7 +261,9 @@ class TestReloadModul:
         assert reloader._istatistik["yenilenen"] == before_count + 1
 
         # Verify motor_kaydet was called on the motor
-        before_motor_count = len(reloader._motor.kayitlar) if hasattr(reloader._motor, 'kayitlar') else 0
+        before_motor_count = (
+            len(reloader._motor.kayitlar) if hasattr(reloader._motor, "kayitlar") else 0
+        )
 
     def test_reload_module_without_motor_kaydet(self, reloader, monkeypatch):
         """Modulde motor_kaydet yoksa reload yapilir ancak motor_kaydet cagrilmaz."""
@@ -333,6 +356,7 @@ class TestReloadModul:
         sys.path.insert(0, str(tmp_path))
 
         import importlib.util
+
         spec = importlib.util.spec_from_file_location(modul_adi, str(mod_yolu))
         if spec:
             mod = importlib.util.module_from_spec(spec)
@@ -370,6 +394,7 @@ class TestReloadModul:
 
 # ── _dongu ve _tarama Testleri ──────────────────────────────────────────
 
+
 class TestDonguVeTarama:
     """_dongu ve _tarama icin cesitli senaryolar."""
 
@@ -377,7 +402,9 @@ class TestDonguVeTarama:
         """Var olmayan klasor _tarama'da hata firlatmaz, skip eder."""
         reloader._klasorler = [Path("/nonexistent_dir_12345_test")]
         reloader._tarama()  # hata firlatmamali
-        assert reloader._istatistik["tarama"] == 0  # _tarama direkt cagrildi, istatistik guncellenmez
+        assert (
+            reloader._istatistik["tarama"] == 0
+        )  # _tarama direkt cagrildi, istatistik guncellenmez
 
     def test_tarama_new_file_detection(self, reloader, tmp_path):
         """Ilk taramada yeni dosyalar _izlenen'e eklenir."""
@@ -432,6 +459,7 @@ class TestDonguVeTarama:
 
     def test_dongu_exception_handler(self, reloader):
         """_dongu icindeki exception handler hata sayacini artirir."""
+
         # _tarama'yi hata firlatacak sekilde degistir
         def hatali_tarama():
             raise RuntimeError("Test hatasi")
@@ -449,13 +477,16 @@ class TestDonguVeTarama:
 
 # ── Motor Tool Fonksiyon Testleri (no motor) ─────────────────────────────
 
+
 class TestMotorToolsNoMotor:
     """_HOT_RELOADER yokken motor tool fonksiyonlari."""
 
     def test_motor_hot_reload_baslat_no_motor(self):
         from reymen.sistem.hot_reload import motor_hot_reload_baslat
+
         # _HOT_RELOADER globalini sifirla
         import reymen.sistem.hot_reload as hr_mod
+
         hr_mod._HOT_RELOADER = None
 
         sonuc = motor_hot_reload_baslat()
@@ -464,6 +495,7 @@ class TestMotorToolsNoMotor:
     def test_motor_hot_reload_durdur_no_reloader(self):
         from reymen.sistem.hot_reload import motor_hot_reload_durdur
         import reymen.sistem.hot_reload as hr_mod
+
         hr_mod._HOT_RELOADER = None
 
         sonuc = motor_hot_reload_durdur()
@@ -472,6 +504,7 @@ class TestMotorToolsNoMotor:
     def test_motor_hot_reload_durum_no_reloader(self):
         from reymen.sistem.hot_reload import motor_hot_reload_durum
         import reymen.sistem.hot_reload as hr_mod
+
         hr_mod._HOT_RELOADER = None
 
         sonuc = motor_hot_reload_durum()
@@ -481,18 +514,29 @@ class TestMotorToolsNoMotor:
 
 # ── Motor_hot_reload_baslat Parametre Testleri ──────────────────────────
 
+
 class TestBaslatParametre:
     """motor_hot_reload_baslat parametre ayristirma."""
 
     def test_baslat_no_params(self, fake_motor):
-        from reymen.sistem.hot_reload import motor_kaydet, motor_hot_reload_baslat, motor_hot_reload_durdur
+        from reymen.sistem.hot_reload import (
+            motor_kaydet,
+            motor_hot_reload_baslat,
+            motor_hot_reload_durdur,
+        )
+
         motor_kaydet(fake_motor)
         sonuc = motor_hot_reload_baslat("")
         assert "Baslatildi" in sonuc
         motor_hot_reload_durdur()
 
     def test_baslat_params_invalid(self, fake_motor):
-        from reymen.sistem.hot_reload import motor_kaydet, motor_hot_reload_baslat, motor_hot_reload_durdur
+        from reymen.sistem.hot_reload import (
+            motor_kaydet,
+            motor_hot_reload_baslat,
+            motor_hot_reload_durdur,
+        )
+
         motor_kaydet(fake_motor)
         # Gecersiz parametre, varsayilan deger kullanilmali
         sonuc = motor_hot_reload_baslat("xyz=abc")
@@ -500,7 +544,12 @@ class TestBaslatParametre:
         motor_hot_reload_durdur()
 
     def test_baslat_with_parantez(self, fake_motor):
-        from reymen.sistem.hot_reload import motor_kaydet, motor_hot_reload_baslat, motor_hot_reload_durdur
+        from reymen.sistem.hot_reload import (
+            motor_kaydet,
+            motor_hot_reload_baslat,
+            motor_hot_reload_durdur,
+        )
+
         motor_kaydet(fake_motor)
         # Parantez icinde parametre
         sonuc = motor_hot_reload_baslat("aralik=5)")
@@ -510,12 +559,14 @@ class TestBaslatParametre:
 
 # ── Singleton Pattern Testi ─────────────────────────────────────────────
 
+
 class TestSingleton:
     """motor_kaydet singleton pattern testi."""
 
     def test_motor_kaydet_sets_global(self, fake_motor):
         from reymen.sistem.hot_reload import motor_kaydet
         import reymen.sistem.hot_reload as hr_mod
+
         hr_mod._HOT_RELOADER = None
 
         motor_kaydet(fake_motor)

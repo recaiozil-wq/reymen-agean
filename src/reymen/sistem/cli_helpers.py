@@ -1,4 +1,5 @@
 from typing import Any
+
 #!/usr/bin/env python3
 """
 ReYMeN Agent CLI - Interactive Terminal Interface
@@ -59,8 +60,19 @@ from prompt_toolkit.history import FileHistory
 from prompt_toolkit.styles import Style as PTStyle
 from prompt_toolkit.patch_stdout import patch_stdout
 from prompt_toolkit.application import Application
-from prompt_toolkit.layout import Layout, HSplit, Window, FormattedTextControl, ConditionalContainer
-from prompt_toolkit.layout.processors import Processor, Transformation, PasswordProcessor, ConditionalProcessor
+from prompt_toolkit.layout import (
+    Layout,
+    HSplit,
+    Window,
+    FormattedTextControl,
+    ConditionalContainer,
+)
+from prompt_toolkit.layout.processors import (
+    Processor,
+    Transformation,
+    PasswordProcessor,
+    ConditionalProcessor,
+)
 from prompt_toolkit.filters import Condition
 from prompt_toolkit.layout.dimension import Dimension
 from prompt_toolkit.layout.menus import CompletionsMenu
@@ -68,8 +80,10 @@ from prompt_toolkit.widgets import TextArea
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit import print_formatted_text as _pt_print
 from prompt_toolkit.formatted_text import ANSI as _PT_ANSI
+
 try:
     from prompt_toolkit.cursor_shapes import CursorShape
+
     _STEADY_CURSOR = CursorShape.BLOCK  # Non-blinking block cursor
 except (ImportError, AttributeError):
     _STEADY_CURSOR = None
@@ -80,14 +94,20 @@ try:
         install_ignored_terminal_sequences,
         install_shift_enter_alias,
     )
+
     install_shift_enter_alias()
     install_ctrl_enter_alias()
     install_ignored_terminal_sequences()
-    del install_shift_enter_alias, install_ctrl_enter_alias, install_ignored_terminal_sequences
+    del (
+        install_shift_enter_alias,
+        install_ctrl_enter_alias,
+        install_ignored_terminal_sequences,
+    )
 except Exception:
     logger.warning("[fix_01_sessiz_except] Exception")
 import threading
 import queue
+
 
 def CanonicalUsage(*args, **kwargs):
     from agent.usage_pricing import CanonicalUsage as _CanonicalUsage
@@ -153,9 +173,13 @@ def looks_like_table_row(*args, **kwargs):
 
 
 def realign_markdown_tables(*args, **kwargs):
-    from agent.markdown_tables import realign_markdown_tables as _realign_markdown_tables
+    from agent.markdown_tables import (
+        realign_markdown_tables as _realign_markdown_tables,
+    )
 
     return _realign_markdown_tables(*args, **kwargs)
+
+
 # NOTE: `from agent.account_usage import ...` is deliberately NOT at module
 # top — it transitively pulls the OpenAI SDK chain (~230 ms cold) and is only
 # needed when the user runs `/limits`. Lazy-imported inside the handler below.
@@ -177,7 +201,7 @@ from ReYMeN_cli.env_loader import load_reymen_dotenv
 from src.reymen.sistem.utils import base_url_host_matches
 
 _ReYMeN_home = get_reymen_home()
-_project_env = Path(__file__).parent / '.env'
+_project_env = Path(__file__).parent / ".env"
 load_reymen_dotenv(reymen_home=_ReYMeN_home, project_env=_project_env)
 
 
@@ -235,8 +259,13 @@ def _strip_reasoning_tags(text: str) -> str:
             flags=re.IGNORECASE,
         )
     # Tool-call XML blocks (openclaw/openclaw#67318).
-    for tc_tag in ("tool_call", "tool_calls", "tool_result",
-                   "function_call", "function_calls"):
+    for tc_tag in (
+        "tool_call",
+        "tool_calls",
+        "tool_result",
+        "function_call",
+        "function_calls",
+    ):
         cleaned = re.sub(
             rf"<{tc_tag}\b[^>]*>.*?</{tc_tag}>\s*",
             "",
@@ -245,17 +274,17 @@ def _strip_reasoning_tags(text: str) -> str:
         )
     # <function name="..."> — boundary + attribute gated to avoid prose FPs.
     cleaned = re.sub(
-        r'(?:(?<=^)|(?<=[\n\r.!?:]))[ \t]*'
-        r'<function\b[^>]*\bname\s*=[^>]*>'
-        r'(?:(?:(?!</function>).)*)</function>\s*',
-        '',
+        r"(?:(?<=^)|(?<=[\n\r.!?:]))[ \t]*"
+        r"<function\b[^>]*\bname\s*=[^>]*>"
+        r"(?:(?:(?!</function>).)*)</function>\s*",
+        "",
         cleaned,
         flags=re.DOTALL | re.IGNORECASE,
     )
     # Stray tool-call close tags.
     cleaned = re.sub(
-        r'</(?:tool_call|tool_calls|tool_result|function_call|function_calls|function)>\s*',
-        '',
+        r"</(?:tool_call|tool_calls|tool_result|function_call|function_calls|function)>\s*",
+        "",
         cleaned,
         flags=re.IGNORECASE,
     )

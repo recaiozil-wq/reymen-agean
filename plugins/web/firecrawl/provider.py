@@ -154,9 +154,12 @@ def _is_tool_gateway_ready() -> bool:
     """
     import tools.web_tools as _wt
 
-    return _wt.resolve_managed_tool_gateway(
-        "firecrawl", token_reader=_wt._peek_nous_access_token
-    ) is not None
+    return (
+        _wt.resolve_managed_tool_gateway(
+            "firecrawl", token_reader=_wt._peek_nous_access_token
+        )
+        is not None
+    )
 
 
 def _has_direct_firecrawl_config() -> bool:

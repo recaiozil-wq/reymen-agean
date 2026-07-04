@@ -30,9 +30,9 @@ def test_all_tui_subprocess_calls_have_stdin():
         text=True,
         timeout=30,
     )
-    assert result.returncode == 0, (
-        f"subprocess stdin= check failed:\n{result.stdout}\n{result.stderr}"
-    )
+    assert (
+        result.returncode == 0
+    ), f"subprocess stdin= check failed:\n{result.stdout}\n{result.stderr}"
 
 
 def test_oauth_setup_token_keeps_inherited_stdin():
@@ -67,4 +67,3 @@ def test_inline_noqa_marker_exempts_a_call():
         "x.py",
     )
     assert exempt == [], "inline marker should exempt the call"
-

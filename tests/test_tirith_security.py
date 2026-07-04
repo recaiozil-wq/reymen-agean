@@ -15,6 +15,7 @@ class TestTirithSecurity:
     @pytest.fixture(autouse=True)
     def _modulu_yukle(self):
         from tirith_security import TirithSecurity, guvenlik_kontrol
+
         self.TirithSecurity = TirithSecurity
         self.guvenlik_kontrol = guvenlik_kontrol
 

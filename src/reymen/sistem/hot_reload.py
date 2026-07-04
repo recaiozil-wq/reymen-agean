@@ -139,9 +139,13 @@ class HotReloader:
                 if hasattr(mod, "motor_kaydet") and self._motor:
                     try:
                         mod.motor_kaydet(self._motor)
-                        logger.info("[HotReload] Motor'a yeniden kaydedildi: %s", modul_adi)
+                        logger.info(
+                            "[HotReload] Motor'a yeniden kaydedildi: %s", modul_adi
+                        )
                     except Exception as e:
-                        logger.warning("[HotReload] motor_kaydet hatasi (%s): %s", modul_adi, e)
+                        logger.warning(
+                            "[HotReload] motor_kaydet hatasi (%s): %s", modul_adi, e
+                        )
 
                 self._istatistik["yenilenen"] += 1
                 return True
@@ -193,6 +197,7 @@ def motor_hot_reload_durum(params: str = "") -> str:
     global _HOT_RELOADER
     if _HOT_RELOADER:
         import json
+
         return json.dumps(_HOT_RELOADER.durum(), indent=2, ensure_ascii=False)
     return '{"calisiyor": false}'
 

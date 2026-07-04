@@ -14,6 +14,7 @@ import uuid
 from datetime import datetime
 from pathlib import Path
 import logging
+
 logger = logging.getLogger(__name__)
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -35,11 +36,13 @@ sys.path.insert(0, str(PROJE))
 try:
     from hafiza_genislet import hafiza as _hafiza
     from gorev_hafiza import gorev_sonrasi_hafiza
+
     HAZIR = True
 except ImportError:
     try:
         from reymen.hafiza.hafiza_genislet import hafiza as _hafiza
         from reymen.hafiza.gorev_hafiza import gorev_sonrasi_hafiza
+
         HAZIR = True
     except ImportError as e:
         log.error("Import hatasi: %s", e)
@@ -79,7 +82,9 @@ def session_notu_al(session, messages) -> str:
     cost = session.get("estimated_cost_usd") or 0
 
     # Kullanıcı mesajlarını özetle
-    user_msgs = [m["content"][:200] for m in messages if m["role"] == "user" and m.get("content")]
+    user_msgs = [
+        m["content"][:200] for m in messages if m["role"] == "user" and m.get("content")
+    ]
 
     satirlar = [
         f"# Session Kazanımı",
@@ -115,7 +120,9 @@ def main():
         return
 
     # ── 1. ReYMeN DB'den session'lari oku ────────────────────────────
-    log.info("ReYMeN DB okunuyor: %s (%.0f MB)", HERMES_DB, HERMES_DB.stat().st_size / 1e6)
+    log.info(
+        "ReYMeN DB okunuyor: %s (%.0f MB)", HERMES_DB, HERMES_DB.stat().st_size / 1e6
+    )
 
     conn = sqlite3.connect(str(HERMES_DB))
     conn.row_factory = sqlite3.Row
@@ -133,7 +140,9 @@ def main():
     try:
         conn2 = sqlite3.connect(str(REYMEN_DB))
         c2 = conn2.cursor()
-        c2.execute("SELECT DISTINCT session_id FROM kayitlar WHERE session_id LIKE 'hermes_%'")
+        c2.execute(
+            "SELECT DISTINCT session_id FROM kayitlar WHERE session_id LIKE 'hermes_%'"
+        )
         islenmis = {row[0] for row in c2.fetchall()}
         conn2.close()
     except Exception:
@@ -148,7 +157,7 @@ def main():
 
     for idx, session in enumerate(sessions):
         session_id = session.get("id", "")
-        
+
         # Zaten islenmis mi?
         hermes_key = f"hermes_{session_id[:16]}"
         if hermes_key in islenmis:
@@ -184,14 +193,14 @@ def main():
 
         # Kazanim notu
         kazanim = session_notu_al(session, messages)
-        
+
         # Tum konusma
         konusma = ""
         for m in messages:
             role = m["role"]
             content = (m.get("content") or "")[:500]
             tool_name = m.get("tool_name") or ""
-            
+
             if role == "user":
                 konusma += f"\n### user\n{content}\n"
             elif role == "assistant":
@@ -242,7 +251,8 @@ def main():
                         "guven_skoru": 0.5,
                         "son_kullanim": datetime.now().strftime("%Y-%m-%d %H:%M"),
                         "gecerlilik_tarihi": (
-                            datetime.now().replace(year=datetime.now().year + 1)
+                            datetime.now()
+                            .replace(year=datetime.now().year + 1)
                             .strftime("%Y-%m-%d")
                         ),
                         "kullanim_sayisi": 0,
@@ -274,7 +284,8 @@ def main():
                     "guven_skoru": 0.7,
                     "son_kullanim": datetime.now().strftime("%Y-%m-%d %H:%M"),
                     "gecerlilik_tarihi": (
-                        datetime.now().replace(year=datetime.now().year + 1)
+                        datetime.now()
+                        .replace(year=datetime.now().year + 1)
                         .strftime("%Y-%m-%d")
                     ),
                     "kullanim_sayisi": 0,

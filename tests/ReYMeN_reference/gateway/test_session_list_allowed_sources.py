@@ -32,11 +32,13 @@ def _call(limit: int | None = None):
     params: dict = {}
     if limit is not None:
         params["limit"] = limit
-    return server.handle_request({
-        "id": "1",
-        "method": "session.list",
-        "params": params,
-    })
+    return server.handle_request(
+        {
+            "id": "1",
+            "method": "session.list",
+            "params": params,
+        }
+    )
 
 
 def test_session_list_surfaces_all_user_facing_sources(monkeypatch):
@@ -62,7 +64,9 @@ def test_session_list_surfaces_all_user_facing_sources(monkeypatch):
     assert "tui-1" in ids
     assert "cli-1" in ids
     assert "acp-1" in ids, "acp sessions were being hidden by the old allow-list"
-    assert "webhook-1" in ids, "webhook sessions were being hidden by the old allow-list"
+    assert (
+        "webhook-1" in ids
+    ), "webhook sessions were being hidden by the old allow-list"
     assert "custom-1" in ids, "custom ReYMeN_SESSION_SOURCE values were being hidden"
 
     # Only internal sub-agent runs stay hidden.

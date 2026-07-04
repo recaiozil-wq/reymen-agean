@@ -11,8 +11,10 @@ def _handle_snapshot_command(cli, command: str):
         /snapshot prune [N]        — prune to N snapshots (default 20)
     """
     from reymen.reymen_cli.backup import (
-        create_quick_snapshot, list_quick_snapshots,
-        restore_quick_snapshot, prune_quick_snapshots,
+        create_quick_snapshot,
+        list_quick_snapshots,
+        restore_quick_snapshot,
+        prune_quick_snapshots,
     )
     from reymen.sistem.ReYMeN_constants import display_reymen_home
 
@@ -37,7 +39,9 @@ def _handle_snapshot_command(cli, command: str):
             else:
                 size_str = f"{size / 1024 / 1024:.1f} MB"
             label = s.get("label") or ""
-            print(f"  {i:3}  {s['id']:<35} {s.get('file_count', 0):>5} {size_str:>10} {label}")
+            print(
+                f"  {i:3}  {s['id']:<35} {s.get('file_count', 0):>5} {size_str:>10} {label}"
+            )
 
     elif subcmd == "create":
         label = " ".join(parts[2:]) if len(parts) > 2 else None
@@ -67,6 +71,7 @@ def _handle_snapshot_command(cli, command: str):
                 return
         except ValueError:
             import logging
+
             logging.getLogger(__name__).warning("[fix_01_sessiz_except] ValueError")
         if restore_quick_snapshot(snap_id):
             print(f"  Restored state from: {snap_id}")

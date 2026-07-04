@@ -14,13 +14,25 @@ def test_tool_search_sorts_by_raw_score_across_buckets():
     provider._client.post.return_value = {
         "result": {
             "memories": [
-                {"uri": "viking://memories/1", "score": 0.9003, "abstract": "memory result"},
+                {
+                    "uri": "viking://memories/1",
+                    "score": 0.9003,
+                    "abstract": "memory result",
+                },
             ],
             "resources": [
-                {"uri": "viking://resources/1", "score": 0.9004, "abstract": "resource result"},
+                {
+                    "uri": "viking://resources/1",
+                    "score": 0.9004,
+                    "abstract": "resource result",
+                },
             ],
             "skills": [
-                {"uri": "viking://skills/1", "score": 0.8999, "abstract": "skill result"},
+                {
+                    "uri": "viking://skills/1",
+                    "score": 0.8999,
+                    "abstract": "skill result",
+                },
             ],
             "total": 3,
         }
@@ -46,10 +58,18 @@ def test_tool_search_sorts_missing_raw_score_after_negative_scores():
                 {"uri": "viking://memories/missing", "abstract": "missing score"},
             ],
             "resources": [
-                {"uri": "viking://resources/negative", "score": -0.25, "abstract": "negative score"},
+                {
+                    "uri": "viking://resources/negative",
+                    "score": -0.25,
+                    "abstract": "negative score",
+                },
             ],
             "skills": [
-                {"uri": "viking://skills/positive", "score": 0.1, "abstract": "positive score"},
+                {
+                    "uri": "viking://skills/positive",
+                    "score": 0.1,
+                    "abstract": "positive score",
+                },
             ],
             "total": 3,
         }
@@ -77,19 +97,26 @@ def test_tool_add_resource_uploads_existing_local_file(tmp_path):
         "result": {"root_uri": "viking://resources/sample"},
     }
 
-    result = json.loads(provider._tool_add_resource({
-        "url": str(sample),
-        "reason": "local test",
-        "wait": True,
-    }))
+    result = json.loads(
+        provider._tool_add_resource(
+            {
+                "url": str(sample),
+                "reason": "local test",
+                "wait": True,
+            }
+        )
+    )
 
     provider._client.upload_temp_file.assert_called_once_with(sample)
-    provider._client.post.assert_called_once_with("/api/v1/resources", {
-        "reason": "local test",
-        "wait": True,
-        "source_name": "sample.md",
-        "temp_file_id": "upload_sample.md",
-    })
+    provider._client.post.assert_called_once_with(
+        "/api/v1/resources",
+        {
+            "reason": "local test",
+            "wait": True,
+            "source_name": "sample.md",
+            "temp_file_id": "upload_sample.md",
+        },
+    )
     assert result["status"] == "added"
     assert result["root_uri"] == "viking://resources/sample"
 
@@ -105,17 +132,24 @@ def test_tool_add_resource_uploads_file_uri(tmp_path):
         "result": {"root_uri": "viking://resources/sample"},
     }
 
-    result = json.loads(provider._tool_add_resource({
-        "url": sample.as_uri(),
-        "reason": "file uri test",
-    }))
+    result = json.loads(
+        provider._tool_add_resource(
+            {
+                "url": sample.as_uri(),
+                "reason": "file uri test",
+            }
+        )
+    )
 
     provider._client.upload_temp_file.assert_called_once_with(sample)
-    provider._client.post.assert_called_once_with("/api/v1/resources", {
-        "reason": "file uri test",
-        "source_name": "sample.md",
-        "temp_file_id": "upload_sample.md",
-    })
+    provider._client.post.assert_called_once_with(
+        "/api/v1/resources",
+        {
+            "reason": "file uri test",
+            "source_name": "sample.md",
+            "temp_file_id": "upload_sample.md",
+        },
+    )
     assert result["status"] == "added"
     assert result["root_uri"] == "viking://resources/sample"
 
@@ -138,21 +172,28 @@ def test_tool_add_resource_uploads_existing_local_directory_and_cleans_zip(tmp_p
         "result": {"root_uri": "viking://resources/docs"},
     }
 
-    result = json.loads(provider._tool_add_resource({
-        "url": str(docs),
-        "reason": "directory test",
-        "wait": True,
-    }))
+    result = json.loads(
+        provider._tool_add_resource(
+            {
+                "url": str(docs),
+                "reason": "directory test",
+                "wait": True,
+            }
+        )
+    )
 
     assert uploaded_paths
     assert uploaded_paths[0].suffix == ".zip"
     assert not uploaded_paths[0].exists()
-    provider._client.post.assert_called_once_with("/api/v1/resources", {
-        "reason": "directory test",
-        "wait": True,
-        "source_name": "docs",
-        "temp_file_id": "upload_docs.zip",
-    })
+    provider._client.post.assert_called_once_with(
+        "/api/v1/resources",
+        {
+            "reason": "directory test",
+            "wait": True,
+            "source_name": "docs",
+            "temp_file_id": "upload_docs.zip",
+        },
+    )
     assert result["status"] == "added"
     assert result["root_uri"] == "viking://resources/docs"
 
@@ -177,8 +218,7 @@ def test_tool_add_resource_directory_zip_skips_symlink_escape(tmp_path):
         with zipfile.ZipFile(path) as archive:
             archive_entries["names"] = archive.namelist()
             archive_entries["payloads"] = {
-                name: archive.read(name)
-                for name in archive.namelist()
+                name: archive.read(name) for name in archive.namelist()
             }
         return "upload_docs.zip"
 
@@ -258,17 +298,23 @@ def test_tool_add_resource_sends_remote_url_as_path():
     provider._tool_add_resource({"url": "https://example.com/doc.md"})
 
     provider._client.upload_temp_file.assert_not_called()
-    provider._client.post.assert_called_once_with("/api/v1/resources", {
-        "path": "https://example.com/doc.md",
-    })
+    provider._client.post.assert_called_once_with(
+        "/api/v1/resources",
+        {
+            "path": "https://example.com/doc.md",
+        },
+    )
 
 
-@pytest.mark.parametrize("url", [
-    "git@github.com:org/repo.git",
-    "git@ssh.dev.azure.com:v3/org/project/repo",
-    "ssh://git@github.com/org/repo.git",
-    "git://github.com/org/repo.git",
-])
+@pytest.mark.parametrize(
+    "url",
+    [
+        "git@github.com:org/repo.git",
+        "git@ssh.dev.azure.com:v3/org/project/repo",
+        "ssh://git@github.com/org/repo.git",
+        "git://github.com/org/repo.git",
+    ],
+)
 def test_tool_add_resource_sends_git_remote_sources_as_path(url):
     provider = OpenVikingMemoryProvider()
     provider._client = MagicMock()
@@ -280,12 +326,17 @@ def test_tool_add_resource_sends_git_remote_sources_as_path(url):
     provider._tool_add_resource({"url": url})
 
     provider._client.upload_temp_file.assert_not_called()
-    provider._client.post.assert_called_once_with("/api/v1/resources", {
-        "path": url,
-    })
+    provider._client.post.assert_called_once_with(
+        "/api/v1/resources",
+        {
+            "path": url,
+        },
+    )
 
 
-def test_viking_client_upload_temp_file_uses_multipart_identity_headers(tmp_path, monkeypatch):
+def test_viking_client_upload_temp_file_uses_multipart_identity_headers(
+    tmp_path, monkeypatch
+):
     sample = tmp_path / "sample.md"
     sample.write_text("# Local resource\n", encoding="utf-8")
     client = _VikingClient(
@@ -302,7 +353,10 @@ def test_viking_client_upload_temp_file_uses_multipart_identity_headers(tmp_path
         return SimpleNamespace(
             status_code=200,
             text="",
-            json=lambda: {"status": "ok", "result": {"temp_file_id": "upload_sample.md"}},
+            json=lambda: {
+                "status": "ok",
+                "result": {"temp_file_id": "upload_sample.md"},
+            },
             raise_for_status=lambda: None,
         )
 

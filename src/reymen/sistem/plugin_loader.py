@@ -31,6 +31,7 @@ Kullanim:
   yukleyici.tool_pluginlerini_yukle() # kind: tool olanlari manuel yukle
   yukleyici.motora_kaydet(motor)
 """
+
 from __future__ import annotations
 
 import importlib
@@ -105,7 +106,9 @@ class PluginYukleyici:
             return []
         yuklenenler = []
         for klasor in self._butun_plugin_klasorleri():
-            yaml_veri = self._yaml_bilgisi.get(klasor.name) or self._yaml_yukle(klasor) or {}
+            yaml_veri = (
+                self._yaml_bilgisi.get(klasor.name) or self._yaml_yukle(klasor) or {}
+            )
             self._yaml_bilgisi[klasor.name] = yaml_veri
             kind = yaml_veri.get("kind", "backend")
             if kind == "tool" and (klasor / "__init__.py").exists():
@@ -127,6 +130,7 @@ class PluginYukleyici:
             return None
         try:
             import yaml
+
             with open(yaml_dosya, "r", encoding="utf-8") as f:
                 veri = yaml.safe_load(f)
             return veri if isinstance(veri, dict) else {}
@@ -233,7 +237,9 @@ class PluginYukleyici:
             return {}
         return {
             "adi": yaml_bilgi.get("name", plugin_adi),
-            "aciklama": yaml_bilgi.get("description", getattr(modul, "plugin_aciklamasi", "") if modul else ""),
+            "aciklama": yaml_bilgi.get(
+                "description", getattr(modul, "plugin_aciklamasi", "") if modul else ""
+            ),
             "versiyon": yaml_bilgi.get("version", ""),
             "kind": yaml_bilgi.get("kind", "unknown"),
             "yazar": yaml_bilgi.get("author", ""),
@@ -250,14 +256,16 @@ class PluginYukleyici:
         sonuc = []
         for klasor in self._butun_plugin_klasorleri():
             yaml_veri = self._yaml_bilgisi.get(klasor.name) or {}
-            sonuc.append({
-                "adi": yaml_veri.get("name", klasor.name),
-                "klasor": klasor.name,
-                "kind": yaml_veri.get("kind", "unknown"),
-                "versiyon": yaml_veri.get("version", ""),
-                "aciklama": yaml_veri.get("description", ""),
-                "yuklu": klasor.name in self._yuklu,
-            })
+            sonuc.append(
+                {
+                    "adi": yaml_veri.get("name", klasor.name),
+                    "klasor": klasor.name,
+                    "kind": yaml_veri.get("kind", "unknown"),
+                    "versiyon": yaml_veri.get("version", ""),
+                    "aciklama": yaml_veri.get("description", ""),
+                    "yuklu": klasor.name in self._yuklu,
+                }
+            )
         return sonuc
 
     def plugin_kaldir(self, plugin_adi: str) -> bool:
@@ -348,7 +356,9 @@ if __name__ == "__main__":
     print(f"Yuklenen backend plugin sayisi: {len(yuklenenler)}")
     for p in yuklenenler:
         bilgi = yukleyici.plugin_bilgisi(p)
-        print(f"  - {p}: v{bilgi['versiyon']} | {bilgi['kind']} | {bilgi['aciklama'][:60]}")
+        print(
+            f"  - {p}: v{bilgi['versiyon']} | {bilgi['kind']} | {bilgi['aciklama'][:60]}"
+        )
 
     tool_plugins = yukleyici.tool_pluginlerini_yukle()
     print(f"\nYuklenen tool plugin sayisi: {len(tool_plugins)}")

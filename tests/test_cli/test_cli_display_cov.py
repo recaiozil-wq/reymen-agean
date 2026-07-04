@@ -1,13 +1,24 @@
 """Coverage tests for reymen.sistem.cli_display - actually calls every function."""
+
 import pytest
 from src.reymen.sistem.cli_display import (
-    _detect_light_mode, _maybe_remap_for_light_mode, _accent_hex,
-    _rich_text_from_ansi, _strip_markdown_syntax,
-    _terminal_width_for_streaming, _render_final_assistant_content,
-    _configure_output_history, _clear_output_history, _suspend_output_history,
-    _record_output_history, _replay_output_history, _cprint,
-    _hex_to_ansi, _luminance_from_hex,
+    _detect_light_mode,
+    _maybe_remap_for_light_mode,
+    _accent_hex,
+    _rich_text_from_ansi,
+    _strip_markdown_syntax,
+    _terminal_width_for_streaming,
+    _render_final_assistant_content,
+    _configure_output_history,
+    _clear_output_history,
+    _suspend_output_history,
+    _record_output_history,
+    _replay_output_history,
+    _cprint,
+    _hex_to_ansi,
+    _luminance_from_hex,
 )
+
 
 class TestCliDisplayCoverage:
     def test_hex_to_ansi(self):

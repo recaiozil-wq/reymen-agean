@@ -258,12 +258,12 @@ def test_session_key_no_race_condition_with_contextvars(monkeypatch):
     asyncio.run(run())
 
     # Both tasks must read back their own session key
-    assert results["session-A"] == "session-A", (
-        f"Session A got '{results['session-A']}' instead of 'session-A' — race condition!"
-    )
-    assert results["session-B"] == "session-B", (
-        f"Session B got '{results['session-B']}' instead of 'session-B' — race condition!"
-    )
+    assert (
+        results["session-A"] == "session-A"
+    ), f"Session A got '{results['session-A']}' instead of 'session-A' — race condition!"
+    assert (
+        results["session-B"] == "session-B"
+    ), f"Session B got '{results['session-B']}' instead of 'session-B' — race condition!"
 
 
 @pytest.mark.asyncio

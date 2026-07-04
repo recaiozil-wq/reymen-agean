@@ -73,13 +73,15 @@ def tum_skills_dosyalari() -> list[dict]:
             content = p.read_text(encoding="utf-8", errors="replace")
         except Exception:
             content = ""
-        dosyalar.append({
-            "ad": rel_path,
-            "aciklama": rel_path,
-            "icerik": content,
-            "kaynak": str(p),
-            "dosya_hash": dosya_hash(content),
-        })
+        dosyalar.append(
+            {
+                "ad": rel_path,
+                "aciklama": rel_path,
+                "icerik": content,
+                "kaynak": str(p),
+                "dosya_hash": dosya_hash(content),
+            }
+        )
     return dosyalar
 
 
@@ -141,7 +143,13 @@ def main() -> dict:
 
     if not dosyalar:
         logger.warning("Hic .md dosyasi bulunamadi!")
-        return {"yeni": 0, "guncellenen": 0, "hata": 0, "toplam": 0, "sure": round(time.time() - basla, 1)}
+        return {
+            "yeni": 0,
+            "guncellenen": 0,
+            "hata": 0,
+            "toplam": 0,
+            "sure": round(time.time() - basla, 1),
+        }
 
     con = db_baglan()
     meta = existing_meta(con)
@@ -199,8 +207,13 @@ def main() -> dict:
     )
     log_kaydet(yeni_say, guncel_say, hata_say, ozet)
 
-    logger.info("=== Tamamlandi: +%d yeni, ~%d guncel, %d hata (%.1fs) ===",
-                yeni_say, guncel_say, hata_say, sure)
+    logger.info(
+        "=== Tamamlandi: +%d yeni, ~%d guncel, %d hata (%.1fs) ===",
+        yeni_say,
+        guncel_say,
+        hata_say,
+        sure,
+    )
 
     return {
         "yeni": yeni_say,
@@ -213,15 +226,19 @@ def main() -> dict:
 
 if __name__ == "__main__":
     sonuc = main()
-    print(f"\nRAPOR: {sonuc['yeni']} yeni + {sonuc['guncellenen']} guncellendi "
-          f"({sonuc['hata']} hata) - {sonuc['sure']}s")
+    print(
+        f"\nRAPOR: {sonuc['yeni']} yeni + {sonuc['guncellenen']} guncellendi "
+        f"({sonuc['hata']} hata) - {sonuc['sure']}s"
+    )
 
 
 # ── Motor / Cron sistemine kayit ──────────────────────────────────────
 
+
 def cron_job_kaydet() -> str:
     """Skill sync cron job'unu jobs.json'a kaydet."""
     import json
+
     sync_script = str(Path(__file__).resolve())
     komut = f"{sys.executable} {sync_script}"
 
@@ -251,7 +268,7 @@ def cron_job_kaydet() -> str:
 
 def motor_kaydet(motor) -> bool:
     """Motor / plugin sistemi icin kayit fonksiyonu.
-    
+
     Motor._plugin_moduller_yukle() tarafindan otomatik cagrilir.
     Skill sync cron job'unu kaydeder ve cron_skill_sync_register
     tool'unu motora ekler.

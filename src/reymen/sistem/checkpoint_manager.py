@@ -11,6 +11,7 @@ import time
 from pathlib import Path
 from typing import Optional
 import logging
+
 logger = logging.getLogger(__name__)
 
 CHECKPOINT_DIR = Path(__file__).parent / ".ReYMeN" / "checkpoints"
@@ -43,7 +44,9 @@ class CheckpointManager:
             "durum": durum,
         }
 
-        dosya.write_text(json.dumps(veri, ensure_ascii=False, indent=2), encoding="utf-8")
+        dosya.write_text(
+            json.dumps(veri, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
         self._son_kayit = checkpoint_id
         return checkpoint_id
 
@@ -82,12 +85,16 @@ class CheckpointManager:
         for d in sorted(CHECKPOINT_DIR.glob("ckpt_*.json")):
             try:
                 veri = json.loads(d.read_text(encoding="utf-8"))
-                sonuc.append({
-                    "id": veri["id"],
-                    "hedef": veri["hedef"][:50],
-                    "tur": veri["tur"],
-                    "zaman": time.strftime("%H:%M:%S", time.localtime(veri["zaman"])),
-                })
+                sonuc.append(
+                    {
+                        "id": veri["id"],
+                        "hedef": veri["hedef"][:50],
+                        "tur": veri["tur"],
+                        "zaman": time.strftime(
+                            "%H:%M:%S", time.localtime(veri["zaman"])
+                        ),
+                    }
+                )
             except Exception as _checkpoi_e88:
                 print(f"[UYARI] checkpoint_manager.py:89 - {_checkpoi_e88}")
         return sonuc

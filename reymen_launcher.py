@@ -10,9 +10,22 @@ from pathlib import Path
 import re as _re
 
 import logging
+
 logging.basicConfig(level=logging.ERROR, force=True)
-for _l in ['CUA', 'Motor', 'motor', 'ReYMeN', 'reymen', 'conversation_loop',
-           'beyin', 'plugin', 'cron', 'skill', 'root', '__main__']:
+for _l in [
+    "CUA",
+    "Motor",
+    "motor",
+    "ReYMeN",
+    "reymen",
+    "conversation_loop",
+    "beyin",
+    "plugin",
+    "cron",
+    "skill",
+    "root",
+    "__main__",
+]:
     logging.getLogger(_l).setLevel(logging.ERROR)
 logger = logging.getLogger("reymen_launcher")
 
@@ -34,6 +47,7 @@ if _src.exists():
 
 try:
     from dotenv import load_dotenv
+
     load_dotenv(_KOK / ".env", override=True)
 except Exception:
     pass
@@ -43,6 +57,7 @@ try:
     sys.path.insert(0, str(_KOK))
     from reymen.sistem.ortak_komut import guncelle as durum_otomatik_guncelle
     from reymen.sistem.ortak_watchdog import watchdog_baslat
+
     durum_otomatik_guncelle()
     watchdog_baslat(interval=30)
 except Exception:
@@ -51,30 +66,55 @@ except Exception:
 # ── Otomatik self-update kontrolu (haftada 1 kez) ──────────────────────
 try:
     from reymen.sistem.self_update import auto_update_check, auto_update_baslat
-    auto_update_check()        # Startup'ta bir kere kontrol et
-    auto_update_baslat()       # Arkaplanda periyodik kontrol baslat
+
+    auto_update_check()  # Startup'ta bir kere kontrol et
+    auto_update_baslat()  # Arkaplanda periyodik kontrol baslat
 except Exception:
     pass
 
 # ── Renkler ────────────────────────────────────────────────────────────────────
-_R   = "\033[0m"
-_C   = "\033[96m"   # cyan
-_G   = "\033[92m"   # green
-_Y   = "\033[93m"   # yellow
-_B   = "\033[94m"   # blue
-_M   = "\033[95m"   # magenta
-_W   = "\033[97m"   # white
-_D   = "\033[2m"    # dim
-_RED = "\033[91m"   # kirmizi
+_R = "\033[0m"
+_C = "\033[96m"  # cyan
+_G = "\033[92m"  # green
+_Y = "\033[93m"  # yellow
+_B = "\033[94m"  # blue
+_M = "\033[95m"  # magenta
+_W = "\033[97m"  # white
+_D = "\033[2m"  # dim
+_RED = "\033[91m"  # kirmizi
 
-def _c(t):   return f"{_C}{t}{_R}"
-def _g(t):   return f"{_G}{t}{_R}"
-def _y(t):   return f"{_Y}{t}{_R}"
-def _mavi(t): return f"{_B}{t}{_R}"  # fix #6: _b -> _mavi
-def _d(t):   return f"{_D}{t}{_R}"
-def _r(t):   return f"{_RED}{t}{_R}"
-def _gb(t):  return f"{_G}{_B}{t}{_R}"
-def _cb(t):  return f"{_C}{_B}{t}{_R}"
+
+def _c(t):
+    return f"{_C}{t}{_R}"
+
+
+def _g(t):
+    return f"{_G}{t}{_R}"
+
+
+def _y(t):
+    return f"{_Y}{t}{_R}"
+
+
+def _mavi(t):
+    return f"{_B}{t}{_R}"  # fix #6: _b -> _mavi
+
+
+def _d(t):
+    return f"{_D}{t}{_R}"
+
+
+def _r(t):
+    return f"{_RED}{t}{_R}"
+
+
+def _gb(t):
+    return f"{_G}{_B}{t}{_R}"
+
+
+def _cb(t):
+    return f"{_C}{_B}{t}{_R}"
+
 
 # ── API Cache ──────────────────────────────────────────────────────────────────
 _API_CACHE: dict = {}
@@ -122,10 +162,12 @@ _MODEL_DB = {
     },
 }
 
+
 def _mevcut_model():
     m = os.environ.get("REYMEN_MODEL", "deepseek-v4-flash")
     p = os.environ.get("REYMEN_PROVIDER", "deepseek")
     return m, p
+
 
 def _env_replace(key, value):
     """.env'deki bir satiri replace et (fix #3: append yerine in-place)."""
@@ -138,7 +180,9 @@ def _env_replace(key, value):
     found = False
     with open(env_path, "r", encoding="utf-8") as f:
         for line in f:
-            if line.strip().startswith(f"{key}=") or line.strip().startswith(f"#{key}="):
+            if line.strip().startswith(f"{key}=") or line.strip().startswith(
+                f"#{key}="
+            ):
                 lines.append(f"{key}={value}\n")
                 found = True
             else:
@@ -147,6 +191,7 @@ def _env_replace(key, value):
         lines.append(f"\n{key}={value}\n")
     with open(env_path, "w", encoding="utf-8") as f:
         f.writelines(lines)
+
 
 def _model_guncelle(provider, model):
     """Provider+model'i .env'ye yaz (fix #3: in-place replace)."""
@@ -160,10 +205,12 @@ def _model_guncelle(provider, model):
     except Exception:
         pass
 
+
 # ── API kontrol (fix #4: background + timeout) ─────────────────────────────────
 _API_KONTROL_SONUC = {}
 _API_KONTROL_KILIT = threading.Lock()
 _API_KONTROL_BITTI = threading.Event()
+
 
 def _api_kontrol_arkaplan():
     """Provider API key'lerini background thread'te test et."""
@@ -200,7 +247,9 @@ def _api_kontrol_arkaplan():
 
     threads = []
     for p, info in _MODEL_DB.items():
-        t = threading.Thread(target=_tek, args=(p, info["url"], info["env"]), daemon=True)
+        t = threading.Thread(
+            target=_tek, args=(p, info["url"], info["env"]), daemon=True
+        )
         t.start()
         threads.append(t)
     for t in threads:
@@ -213,11 +262,13 @@ def _api_kontrol_arkaplan():
         _API_KONTROL_SONUC = sonuclar
     _API_KONTROL_BITTI.set()
 
+
 def _api_kontrol_bekle(timeout=4):
     """Background API kontrol sonucunu bekle (en fazla timeout saniye)."""
     _API_KONTROL_BITTI.wait(timeout=timeout)
     with _API_KONTROL_KILIT:
         return dict(_API_KONTROL_SONUC)
+
 
 # Arka planda baslat
 _API_KONTROL_BITTI.clear()
@@ -230,6 +281,7 @@ _REYMEN_AGENT_LOGO = """[bold #FFD700]██████╗ ██████�
 [#FFBF00]██╔══██╗██╔══╝    ╚██╔╝  ██║╚██╔╝██║██╔══╝  ██║╚██╗██║    ██╔══██║██║   ██║██╔══╝  ██║╚██╗██║   ██║[/]
 [#CD7F32]██║  ██║███████╗   ██║   ██║ ╚═╝ ██║███████╗██║ ╚████║    ██║  ██║╚██████╔╝███████╗██║ ╚████║   ██║[/]
 [#CD7F32]╚═╝  ╚═╝╚══════╝   ╚═╝   ╚═╝     ╚═╝╚══════╝╚═╝  ╚═══╝    ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═══╝   ╚═╝[/]"""
+
 
 # ── ReYMeN-style welcome banner (bağımsız, ReYMeN bağımlılığı yok) ────────────
 def _hermes_welcome(model: str, session_id: str = ""):
@@ -271,7 +323,9 @@ def _hermes_welcome(model: str, session_id: str = ""):
         ep_table.add_row("reymen/bin/reymen.cmd", ".cmd -> python reymen_launcher.py")
         ep_table.add_row("venv/Scripts/reymen.cmd", ".cmd -> python reymen_launcher.py")
         ep_table.add_row("venv/Scripts/reymen.exe", ".exe direkt (PyInstaller)")
-        ep_table.add_row("~/.local/bin/reymen.exe", ".exe -> python reymen_launcher.py (zipapp)")
+        ep_table.add_row(
+            "~/.local/bin/reymen.exe", ".exe -> python reymen_launcher.py (zipapp)"
+        )
         console.print(f"\n  [dim]ReYMeN'de 4 tane:[/]")
         console.print(Panel(ep_table, border_style="dim"))
 
@@ -288,6 +342,7 @@ def _hermes_welcome(model: str, session_id: str = ""):
         print(f"  {_d('─'*50)}\n")
         print(f"  R>eYMeN Ajan'a hoş geldiniz!\n")
 
+
 # ── Model secim ekrani ─────────────────────────────────────────────────────────
 def _model_sec(api_sonuc=None):
     cur_m, cur_p = _mevcut_model()
@@ -295,11 +350,14 @@ def _model_sec(api_sonuc=None):
     print(f"  {_d('─'*50)}")
     if api_sonuc:
         for ad, durum in api_sonuc.items():
-            ikon = _g("✓") if durum is True else (_r("✗") if durum == "401" else _y("?"))
+            ikon = (
+                _g("✓") if durum is True else (_r("✗") if durum == "401" else _y("?"))
+            )
             print(f"  {ikon} {_mavi(ad):<16} {_d(str(durum))}")
     print(f"  {_d('─'*50)}")
     print(f"  {_d('Aktif:')} {_g(cur_m)}")
     print()
+
 
 # ── Spinner ───────────────────────────────────────────────────────────────────
 def _spinner(stop_evt):
@@ -311,8 +369,10 @@ def _spinner(stop_evt):
         time.sleep(0.12)
     print(f"\r{' '*30}\r", end="", flush=True)
 
+
 # ── ReYMeN cagrisi ────────────────────────────────────────────────────────────
 _ilk_tur = True
+
 
 def _sistem_prompu_al() -> str:
     """SOUL.md + DURUM_OKU talimati ile sistem promptu olustur."""
@@ -334,6 +394,7 @@ def _sistem_prompu_al() -> str:
         "Karsilastirma/eksik/liste/sayi sorularinda ONCE DURUM_OKU().\\n"
         + (f"\\n## SOUL.md\\n{soul[:2000]}\\n" if soul else "")
     )
+
 
 def _sor(soru: str) -> tuple[str, str]:
     """ReYMeN'e soru sor — Telegram bot ile AYNI full pipeline."""
@@ -388,6 +449,7 @@ def _sor_direkt_api(soru: str) -> tuple[str, str]:
     """Fallback: direkt API cagrisi (Beyin.uret ile)."""
     try:
         from reymen.cereyan.beyin import Beyin as _BeyinMod
+
         _beyin_inst = _BeyinMod(config=_REYMEN_CONFIG)
         _s = _sistem_prompu_al()
         _c = _beyin_inst.uret(_s, [{"role": "user", "content": soru}])
@@ -406,6 +468,7 @@ _YARDIM = f"""
 
   {_d('Herhangi bir metin yaz → ReYMeN cevaplar.')}
 """
+
 
 # ── Ana REPL ──────────────────────────────────────────────────────────────────
 def _repl(session_id=""):
@@ -443,6 +506,7 @@ def _repl(session_id=""):
         # Ortak komut modulune yonlendir
         try:
             from reymen.ag.ortak_komutlar import komut_isle
+
             if komut_isle(girdi, _repl_gonder, 0):
                 continue  # Komut islendi, normal akisa gecme
         except ImportError:
@@ -458,11 +522,16 @@ def _repl(session_id=""):
         print(f"  {'─'*50}")
         t_in = len(girdi.split())
         t_out = len(cevap.split())
-        print(f"  {_y(cur_m)} {_d('|')} {_c(f'{t_in*2}K/1M')} {_d('|')} [{_g('█'*int(min(20, t_in*2//5000)))}{_d('▒'*max(0,20-int(min(20, t_in*2//5000))))}] {_g(f'{min(99, t_in*2//10000)}%')} {_d('|')} {_y(f'{dt:.0f}s')}", flush=True)
+        print(
+            f"  {_y(cur_m)} {_d('|')} {_c(f'{t_in*2}K/1M')} {_d('|')} [{_g('█'*int(min(20, t_in*2//5000)))}{_d('▒'*max(0,20-int(min(20, t_in*2//5000))))}] {_g(f'{min(99, t_in*2//10000)}%')} {_d('|')} {_y(f'{dt:.0f}s')}",
+            flush=True,
+        )
+
 
 # ── Versiyon ─────────────────────────────────────────────────────────────────
 _REYMEN_VERSION = "0.1.0"
 _REYMEN_BUILD = "2026.6.29"
+
 
 def _show_version():
     print(f"ReYMeN Agent v{_REYMEN_VERSION} ({_REYMEN_BUILD})")
@@ -481,14 +550,14 @@ def _build_parser():
 
     # required=True'i kaldır — command olmadan da -z/-V/m/provider çalışabilmeli
     for action in p._actions:
-        if hasattr(action, 'required') and hasattr(action, 'choices'):
+        if hasattr(action, "required") and hasattr(action, "choices"):
             action.required = False
 
     # Launcher'a özel: model komutu handler'ı
     for action in p._actions:
-        if hasattr(action, 'choices') and action.choices is not None:
-            if 'status' in action.choices or 'cost' in action.choices:
-                if 'model' not in action.choices:
+        if hasattr(action, "choices") and action.choices is not None:
+            if "status" in action.choices or "cost" in action.choices:
+                if "model" not in action.choices:
                     p_model = action.add_parser("model", help="Model seçimi")
                     p_model.set_defaults(func=lambda a: _model_sec_interactive())
                 break
@@ -496,55 +565,68 @@ def _build_parser():
     # start komutu (eski .bat/.vbs dosyalarinin yerine)
     _sub = None
     for action in p._actions:
-        if hasattr(action, 'choices') and action.choices is not None:
+        if hasattr(action, "choices") and action.choices is not None:
             _sub = action
             break
 
     if _sub is not None:
         p_start = _sub.add_parser("start", help="ReYMeN bileşenlerini başlat")
-        p_start.add_argument("--mode", choices=["bot", "gateway", "tray", "web", "doctor"],
-                             default="bot", help="Başlatılacak modül")
-        p_start.add_argument("--bot-name", default="all",
-                             help="Bot adı (pasa, reymen, kiral38, all)")
+        p_start.add_argument(
+            "--mode",
+            choices=["bot", "gateway", "tray", "web", "doctor"],
+            default="bot",
+            help="Başlatılacak modül",
+        )
+        p_start.add_argument(
+            "--bot-name", default="all", help="Bot adı (pasa, reymen, kiral38, all)"
+        )
         p_start.set_defaults(func=_cmd_start)
 
     # Update komutu
     if _sub is not None:
-        p_update = _sub.add_parser("update", help="ReYMeN'i güncelle (git pull + pip install)")
-        p_update.add_argument("--check", action="store_true",
-                              help="Sadece kontrol et, güncelleme yapma")
-        p_update.add_argument("--auto", action="store_true",
-                              help="Otomatik kontrol (haftada 1 kez)")
-        p_update.add_argument("--force", action="store_true",
-                              help="Auto kontrolü zorla (bekleme süresini yoksay)")
+        p_update = _sub.add_parser(
+            "update", help="ReYMeN'i güncelle (git pull + pip install)"
+        )
+        p_update.add_argument(
+            "--check", action="store_true", help="Sadece kontrol et, güncelleme yapma"
+        )
+        p_update.add_argument(
+            "--auto", action="store_true", help="Otomatik kontrol (haftada 1 kez)"
+        )
+        p_update.add_argument(
+            "--force",
+            action="store_true",
+            help="Auto kontrolü zorla (bekleme süresini yoksay)",
+        )
         p_update.set_defaults(func=_cmd_update)
 
     # Setup komutu (kurulum sihirbazi)
     if _sub is not None:
-        p_setup = _sub.add_parser("setup", help="ReYMeN kurulum sihirbazi (ilk kurulum)")
-        p_setup.add_argument("--fix", action="store_true",
-                             help="Eksikleri otomatik düzelt")
-        p_setup.add_argument("--check", action="store_true",
-                             help="Sadece kontrol et, değişiklik yapma")
-        p_setup.add_argument("--auto", action="store_true",
-                             help="Otomatik mod (sorunsuz çaliştir)")
+        p_setup = _sub.add_parser(
+            "setup", help="ReYMeN kurulum sihirbazi (ilk kurulum)"
+        )
+        p_setup.add_argument(
+            "--fix", action="store_true", help="Eksikleri otomatik düzelt"
+        )
+        p_setup.add_argument(
+            "--check", action="store_true", help="Sadece kontrol et, değişiklik yapma"
+        )
+        p_setup.add_argument(
+            "--auto", action="store_true", help="Otomatik mod (sorunsuz çaliştir)"
+        )
         p_setup.set_defaults(func=_cmd_setup)
 
     # Cost handler override (launcher'daki _cmd_cost_alt console.py'ye yönlendirir)
     for action in p._actions:
-        if hasattr(action, 'choices') and action.choices:
-            if 'cost' in action.choices:
-                action.choices['cost'].set_defaults(
-                    func=lambda a: _cmd_cost_alt(a)
-                )
+        if hasattr(action, "choices") and action.choices:
+            if "cost" in action.choices:
+                action.choices["cost"].set_defaults(func=lambda a: _cmd_cost_alt(a))
 
     # Status handler override
     for action in p._actions:
-        if hasattr(action, 'choices') and action.choices:
-            if 'status' in action.choices:
-                action.choices['status'].set_defaults(
-                    func=lambda a: _cmd_status()
-                )
+        if hasattr(action, "choices") and action.choices:
+            if "status" in action.choices:
+                action.choices["status"].set_defaults(func=lambda a: _cmd_status())
 
     return p
 
@@ -557,6 +639,7 @@ from reymen.arac.cli_commands import (
     cmd_doctor as _cmd_doctor,
     cmd_backup as _cmd_backup,
 )
+
 
 # ── start komutu (eski .bat/.vbs dosyalari yerine) ──────────────────────────
 def _cmd_start(args):
@@ -574,17 +657,21 @@ def _cmd_start(args):
     if mode == "tray":
         print(f"  Sistem tepsisi başlatılıyor...")
         import subprocess as _sp
+
         _pyw = sys.executable.replace("python.exe", "pythonw.exe")
         if not os.path.isfile(_pyw):
             _pyw = sys.executable
-        _sp.Popen([_pyw, str(_KOK / "reymen" / "desktop" / "tray.py")],
-                  creationflags=_sp.CREATE_NO_WINDOW if os.name == "nt" else 0)
+        _sp.Popen(
+            [_pyw, str(_KOK / "reymen" / "desktop" / "tray.py")],
+            creationflags=_sp.CREATE_NO_WINDOW if os.name == "nt" else 0,
+        )
         print(f"  {_g('✓')} Tray arkaplanda başlatıldı")
         return 0
 
     if mode == "web":
         print(f"  Web UI başlatılıyor...")
         from reymen.arac.cli_commands import cmd_web as _cmd_web
+
         return _cmd_web(args)
 
     # mode == "bot" (varsayilan)
@@ -594,6 +681,7 @@ def _cmd_start(args):
         _bat = _KOK / "baslat_reymen_bot.bat"
         if _bat.exists():
             import subprocess as _sp
+
             _sp.Popen(["cmd", "/c", "start", str(_bat)], shell=True)
     else:
         _token_map = {
@@ -605,15 +693,19 @@ def _cmd_start(args):
         token = os.environ.get(token_var, "")
         if token:
             from reymen.ag.telegram_bot import BotProcess
+
             bot = BotProcess(token)
             bot.poll()
         else:
             print(f"  {_r('✗')} {bot_name} için token bulunamadi (.env kontrol et)")
     return 0
+
+
 # ── Cron komutu — reymen.cli._cmd_cron kullanılır (build_parser üzerinden)
 # ── Cost komutu proxy (console.py'ye) ──────────────────────────────────────
 def _cmd_cost_alt(args):
     from reymen.console import cmd_cost as _cc
+
     return _cc(args)
 
 
@@ -622,6 +714,7 @@ def _cmd_status():
     """Genel durum bilgisi."""
     from reymen.console import cmd_status as _cs
     import argparse as _ap
+
     return _cs(_ap.Namespace())
 
 
@@ -634,20 +727,26 @@ def _cmd_update(args=None):
 
     # ── Self-Update modulu ──────────────────────────────────────────
     try:
-        from reymen.sistem.self_update import check_for_updates, perform_update, auto_update_check
+        from reymen.sistem.self_update import (
+            check_for_updates,
+            perform_update,
+            auto_update_check,
+        )
     except ImportError:
         print(f"  {_r('✗')} self_update modulu yuklenemedi!")
         return 1
 
     # ── --check: sadece kontrol ─────────────────────────────────────
-    if args is not None and getattr(args, 'check', False):
+    if args is not None and getattr(args, "check", False):
         print(f"\n  {_c('╔══════════════════════════════════════╗')}")
         print(f"  {_c('║')}   ReYMeN Versiyon Kontrolü         {_c('║')}")
         print(f"  {_c('╚══════════════════════════════════════╝')}\n")
 
         sonuc = check_for_updates()
         if not sonuc.get("basarili"):
-            print(f"  {_r('✗')} Kontrol basarisiz: {sonuc.get('hata', 'Bilinmeyen hata')}")
+            print(
+                f"  {_r('✗')} Kontrol basarisiz: {sonuc.get('hata', 'Bilinmeyen hata')}"
+            )
             return 1
 
         print(f"  {_d('Mevcut:')}  {_g('v' + sonuc['mevcut_versiyon'])}")
@@ -665,8 +764,8 @@ def _cmd_update(args=None):
         return 0
 
     # ── --auto: otomatik kontrol ───────────────────────────────────
-    if args is not None and getattr(args, 'auto', False):
-        force = getattr(args, 'force', False)
+    if args is not None and getattr(args, "auto", False):
+        force = getattr(args, "force", False)
         print(f"\n  {_c('╔══════════════════════════════════════╗')}")
         print(f"  {_c('║')}   Otomatik Güncelleme Kontrolü     {_c('║')}")
         print(f"  {_c('╚══════════════════════════════════════╝')}\n")
@@ -679,7 +778,9 @@ def _cmd_update(args=None):
             return 0
 
         if not sonuc.get("basarili"):
-            print(f"  {_r('✗')} Kontrol basarisiz: {sonuc.get('hata', 'Bilinmeyen hata')}")
+            print(
+                f"  {_r('✗')} Kontrol basarisiz: {sonuc.get('hata', 'Bilinmeyen hata')}"
+            )
             return 1
 
         if sonuc.get("guncel_var"):
@@ -705,6 +806,7 @@ def _cmd_update(args=None):
 
     # 1. Mevcut versiyon — versiyon bilgisini yakalamak için stdout'u yönlendir
     import io as _io
+
     _buf = _io.StringIO()
     _old_stdout = sys.stdout
     sys.stdout = _buf
@@ -745,11 +847,11 @@ def _cmd_setup(args=None):
     sadece_kontrol = False
 
     if args is not None:
-        if getattr(args, 'auto', False):
+        if getattr(args, "auto", False):
             oto_kur = True
-        elif getattr(args, 'fix', False):
+        elif getattr(args, "fix", False):
             oto_kur = True
-        if getattr(args, 'check', False):
+        if getattr(args, "check", False):
             sadece_kontrol = True
 
     print(f"\n  {_c('╔══════════════════════════════════════╗')}")
@@ -817,37 +919,53 @@ def main():
 
     # CLI komutlarini tanı: reymen/cli.py build_parser + launcher özel komutlar
     # Tek kaynak: reymen.cli.build_parser + launcher ekleri (model)
-    _LAUNCHER_CMD = {"model", "status", "cost", "gateway", "config",
-                         "session", "doctor", "backup", "cron", "skills",
-                         "skill", "plugins", "tools", "setup", "profile", "logs",
-                         "mcp", "update"}
+    _LAUNCHER_CMD = {
+        "model",
+        "status",
+        "cost",
+        "gateway",
+        "config",
+        "session",
+        "doctor",
+        "backup",
+        "cron",
+        "skills",
+        "skill",
+        "plugins",
+        "tools",
+        "setup",
+        "profile",
+        "logs",
+        "mcp",
+        "update",
+    }
 
     # Argümanları parse et
     parser = _build_parser()
     args = parser.parse_args()
 
     # -V / --version
-    if getattr(args, 'version', False):
+    if getattr(args, "version", False):
         return _show_version()
 
     # -m / --model override
-    if getattr(args, 'model', False):
+    if getattr(args, "model", False):
         _model_guncelle(
             args.provider or os.environ.get("REYMEN_PROVIDER", "deepseek"),
             args.model,
         )
 
     # --provider override (model yoksa da çalışır)
-    if getattr(args, 'provider', None) and not getattr(args, 'model', None):
+    if getattr(args, "provider", None) and not getattr(args, "model", None):
         cur_m = os.environ.get("REYMEN_MODEL", "deepseek-v4-flash")
         _model_guncelle(args.provider, cur_m)
 
     # -z / --oneshot: banner yok, direkt cevap
-    if getattr(args, 'oneshot', None):
+    if getattr(args, "oneshot", None):
         return _oneshot(args.oneshot)
 
     # Alt komutlar
-    if getattr(args, 'command', None):
+    if getattr(args, "command", None):
         if args.command == "model":
             return _model_sec_interactive()
         if args.command == "status":
@@ -860,6 +978,7 @@ def main():
     # ── TUI modu ──────────────────────────────────────────────────────────
     if "--tui" in sys.argv or getattr(args, "tui", False):
         from reymen.cli.tui import tui_baslat
+
         cur_m, cur_p = _mevcut_model()
         session_id = _uid.uuid4().hex[:8]
 
@@ -886,6 +1005,7 @@ def main():
     if "--voice" in sys.argv:
         try:
             from reymen.cereyan.voice_mode import VoiceMode
+
             vm = VoiceMode()
             print("🎤 Voice Mode baslatiliyor...")
             vm.baslat()
@@ -902,6 +1022,7 @@ def main():
                     port = int(sys.argv[i + 1])
             from reymen.api_server import APIServer
             import uvicorn
+
             print(f"🌐 API Server baslatiliyor (port {port})...")
             uvicorn.run("reymen.api_server:app", host="0.0.0.0", port=port)
             return 0
@@ -912,6 +1033,7 @@ def main():
     if "--credential-pool" in sys.argv:
         try:
             from reymen.core.credential_pool import get_credential_pool
+
             pool = get_credential_pool()
             print("🔑 Credential Pool durumu:")
             print(pool.durum())
@@ -930,6 +1052,7 @@ def main():
     _hermes_welcome(cur_m, session_id)
     _repl(session_id)
     return 0
+
 
 if __name__ == "__main__":
     raise SystemExit(main())

@@ -396,7 +396,9 @@ class TestWebUrlsNotRedacted:
         assert redact_sensitive_text(text) == text
 
     def test_presigned_signature_passes_through(self):
-        text = "https://s3.amazonaws.com/bucket/k?signature=LONG_PRESIGNED_SIG&id=public"
+        text = (
+            "https://s3.amazonaws.com/bucket/k?signature=LONG_PRESIGNED_SIG&id=public"
+        )
         assert redact_sensitive_text(text) == text
 
     def test_https_userinfo_passes_through(self):
@@ -410,7 +412,7 @@ class TestWebUrlsNotRedacted:
     def test_http_access_log_request_target_passes_through(self):
         text = (
             'INFO aiohttp.access: 127.0.0.1 "POST '
-            '/bluebubbles-webhook?password=webhookSecret123&event=new-message '
+            "/bluebubbles-webhook?password=webhookSecret123&event=new-message "
             'HTTP/1.1" 200 173 "-" "test-client"'
         )
         assert redact_sensitive_text(text) == text

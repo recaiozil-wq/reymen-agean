@@ -31,6 +31,7 @@ PROJE_KOK = Path(__file__).parent.parent  # reymen/
 #  Telegram Gateway (salted_gateway'den extend)
 # ═══════════════════════════════════════════════════════════════════════
 
+
 class TelegramGateway(_TelegramGatewayBase):
     """
     Telegram platform gateway'i — salted_gateway modulunden extend edilmistir.
@@ -47,6 +48,7 @@ class TelegramGateway(_TelegramGatewayBase):
 #  CLI Gateway
 # ═══════════════════════════════════════════════════════════════════════
 
+
 class CLIGateway(GatewayBase):
     """
     Komut satiri (stdin/stdout) gateway'i.
@@ -55,8 +57,11 @@ class CLIGateway(GatewayBase):
     Bot2 / arkaplan CLI senaryolari icin uygundur.
     """
 
-    def __init__(self, config: Optional[Dict[str, Any]] = None,
-                 girdi_okuyucu: Optional[asyncio.Queue] = None):
+    def __init__(
+        self,
+        config: Optional[Dict[str, Any]] = None,
+        girdi_okuyucu: Optional[asyncio.Queue] = None,
+    ):
         super().__init__("cli", config)
         self._girdi_kuyrugu = girdi_okuyucu or asyncio.Queue()
         self._okuyucu_gorev: Optional[asyncio.Task] = None
@@ -87,8 +92,12 @@ class CLIGateway(GatewayBase):
             self._son_hata = str(e)
             return False
 
-    async def send(self, mesaj: str, hedef: Optional[str] = None,
-                   meta: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    async def send(
+        self,
+        mesaj: str,
+        hedef: Optional[str] = None,
+        meta: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
         """CLI'ya mesaj bas (stdout)."""
         try:
             if meta and meta.get("raw"):
@@ -145,6 +154,7 @@ class CLIGateway(GatewayBase):
 #  Web Gateway (FastAPI WS/SSE)
 # ═══════════════════════════════════════════════════════════════════════
 
+
 class WebGateway(GatewayBase):
     """
     Web platform gateway'i — FastAPI WebSocket ve SSE destegi.
@@ -184,8 +194,12 @@ class WebGateway(GatewayBase):
             self._son_hata = str(e)
             return False
 
-    async def send(self, mesaj: str, hedef: Optional[str] = None,
-                   meta: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    async def send(
+        self,
+        mesaj: str,
+        hedef: Optional[str] = None,
+        meta: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
         """Tum WebSocket ve SSE istemcilerine mesaj gonder."""
         try:
             if not self._bagli:
@@ -215,7 +229,11 @@ class WebGateway(GatewayBase):
                     logger.warning(f"[WebGateway] SSE gonderim hatasi: {sse_err}")
 
             self._mesaj_sayaci += 1
-            return {"basarili": True, "platform": "web", "hedef_sayisi": len(self._ws_baglantilari)}
+            return {
+                "basarili": True,
+                "platform": "web",
+                "hedef_sayisi": len(self._ws_baglantilari),
+            }
 
         except Exception as e:
             return {"basarili": False, "hata": str(e)}
@@ -240,7 +258,9 @@ class WebGateway(GatewayBase):
     def ws_ekle(self, ws_baglantisi: Any) -> None:
         """WebSocket istemcisi ekle."""
         self._ws_baglantilari.append(ws_baglantisi)
-        logger.debug(f"[WebGateway] WS istemci eklendi (toplam: {len(self._ws_baglantilari)})")
+        logger.debug(
+            f"[WebGateway] WS istemci eklendi (toplam: {len(self._ws_baglantilari)})"
+        )
 
     def ws_cikar(self, ws_baglantisi: Any) -> None:
         """WebSocket istemcisi cikar."""
@@ -259,6 +279,7 @@ class WebGateway(GatewayBase):
 # ═══════════════════════════════════════════════════════════════════════
 #  Discord Gateway (REST API + discord.py destegi)
 # ═══════════════════════════════════════════════════════════════════════
+
 
 class DiscordGateway(GatewayBase):
     """
@@ -309,8 +330,12 @@ class DiscordGateway(GatewayBase):
             self._son_hata = str(e)
             return False
 
-    async def send(self, mesaj: str, hedef: Optional[str] = None,
-                   meta: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    async def send(
+        self,
+        mesaj: str,
+        hedef: Optional[str] = None,
+        meta: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
         """Discord kanalina mesaj gonder (REST API veya discord.py)."""
         try:
             if not self._bagli or not self._token:
@@ -318,7 +343,10 @@ class DiscordGateway(GatewayBase):
 
             kanal_id = hedef or self._config.get("varsayilan_kanal_id")
             if not kanal_id:
-                return {"basarili": False, "hata": "kanal_id gerekli (hedef veya config'de)"}
+                return {
+                    "basarili": False,
+                    "hata": "kanal_id gerekli (hedef veya config'de)",
+                }
 
             # 1. DiscordBotProcess varsa onu kullan (daha stabil)
             if self._discord_bot_process is not None:
@@ -327,9 +355,16 @@ class DiscordGateway(GatewayBase):
                     if kanal:
                         await kanal.send(mesaj[:2000])
                         self._mesaj_sayaci += 1
-                        return {"basarili": True, "platform": "discord", "hedef": kanal_id, "yontem": "discord.py"}
+                        return {
+                            "basarili": True,
+                            "platform": "discord",
+                            "hedef": kanal_id,
+                            "yontem": "discord.py",
+                        }
                 except Exception as e:
-                    logger.warning(f"[DiscordGateway] discord.py gonderim hatasi (REST fallback): {e}")
+                    logger.warning(
+                        f"[DiscordGateway] discord.py gonderim hatasi (REST fallback): {e}"
+                    )
 
             # 2. REST API fallback
             import urllib.request
@@ -418,6 +453,7 @@ def motor_kaydet(motor) -> None:
 
     motor._plugin_arac_kaydet(
         "GATEWAY_DISCORD_GONDER",
-        lambda mesaj="", kanal_id="": f"DiscordGateway.send({mesaj}, hedef={kanal_id}) — Discord mesaj gonderim araci",
+        lambda mesaj="",
+        kanal_id="": f"DiscordGateway.send({mesaj}, hedef={kanal_id}) — Discord mesaj gonderim araci",
         "Discord mesaj gonderim araci",
     )

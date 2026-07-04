@@ -1,4 +1,5 @@
 """``python -m reymen`` için giriş noktası."""
+
 import sys
 from pathlib import Path
 

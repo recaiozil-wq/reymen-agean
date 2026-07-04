@@ -22,11 +22,13 @@ DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 # ── Veri yonetimi (bot.py'dekiyle ayni pattern) ──
 
+
 def _sohbetleri_yukle() -> dict:
     path = DATA_DIR / "sohbetler.json"
     if path.exists():
         return json.loads(path.read_text(encoding="utf-8"))
     return {}
+
 
 def _sohbetleri_kaydet(sohbetler: dict):
     (DATA_DIR / "sohbetler.json").write_text(
@@ -34,15 +36,19 @@ def _sohbetleri_kaydet(sohbetler: dict):
         encoding="utf-8",
     )
 
+
 def _sohbet_gecmisi_al(chat_id: str) -> list:
     return _sohbetleri_yukle().get(str(chat_id), [])
+
 
 def _sohbet_gecmisi_guncelle(chat_id: str, mesajlar: list):
     sohbetler = _sohbetleri_yukle()
     sohbetler[str(chat_id)] = mesajlar
     _sohbetleri_kaydet(sohbetler)
 
+
 # ── Handler'lar ──
+
 
 async def gecmis(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Sohbet gecmisini goster (/gecmis)."""
@@ -92,10 +98,12 @@ async def kaydet(update: Update, context: ContextTypes.DEFAULT_TYPE):
     export_dir.mkdir(parents=True, exist_ok=True)
     fname = f"sohbet_{chat_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
     path = export_dir / fname
-    path.write_text(json.dumps(mesajlar, indent=2, ensure_ascii=False, default=str), encoding="utf-8")
+    path.write_text(
+        json.dumps(mesajlar, indent=2, ensure_ascii=False, default=str),
+        encoding="utf-8",
+    )
     await update.message.reply_text(
-        f"💾 *Sohbet Kaydedildi*\\n\\n"
-        f"{len(mesajlar)} mesaj -> `{fname}`",
+        f"💾 *Sohbet Kaydedildi*\\n\\n" f"{len(mesajlar)} mesaj -> `{fname}`",
         parse_mode="Markdown",
     )
 

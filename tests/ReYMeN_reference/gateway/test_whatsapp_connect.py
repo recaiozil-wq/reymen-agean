@@ -25,6 +25,7 @@ from gateway.config import Platform
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 class _AsyncCM:
     """Minimal async context manager returning a fixed value."""
 
@@ -89,7 +90,9 @@ def _connect_patches(mock_proc, mock_fh, mock_client_cls=None):
         "gateway.platforms.whatsapp.asyncio.create_task": MagicMock(),
     }
     base = [
-        patch("gateway.platforms.whatsapp.check_whatsapp_requirements", return_value=True),
+        patch(
+            "gateway.platforms.whatsapp.check_whatsapp_requirements", return_value=True
+        ),
         patch.object(Path, "exists", return_value=True),
         patch.object(Path, "mkdir", return_value=None),
         patch("subprocess.run", return_value=MagicMock(returncode=0)),
@@ -107,12 +110,14 @@ def _connect_patches(mock_proc, mock_fh, mock_client_cls=None):
 # _close_bridge_log() unit tests
 # ---------------------------------------------------------------------------
 
+
 class TestCloseBridgeLog:
     """Direct tests for the _close_bridge_log() helper method."""
 
     @staticmethod
     def _bare_adapter():
         from gateway.platforms.whatsapp import WhatsAppAdapter
+
         a = WhatsAppAdapter.__new__(WhatsAppAdapter)
         a._bridge_log_fh = None
         return a
@@ -149,6 +154,7 @@ class TestCloseBridgeLog:
 # data variable initialization
 # ---------------------------------------------------------------------------
 
+
 class TestDataInitialized:
     """Verify ``data = {}`` prevents NameError when resp.json() fails."""
 
@@ -166,15 +172,18 @@ class TestDataInitialized:
         mock_proc.poll.return_value = None  # bridge stays alive
 
         mock_client_cls = _mock_aiohttp(
-            status=200, json_side_effect=ValueError("bad json"),
+            status=200,
+            json_side_effect=ValueError("bad json"),
         )
         mock_fh = MagicMock()
 
         patches = _connect_patches(mock_proc, mock_fh, mock_client_cls)
 
-        with patches[0], patches[1], patches[2], patches[3], patches[4], \
-             patches[5], patches[6], patches[7], patches[8], \
-             patch.object(type(adapter), "_poll_messages", return_value=MagicMock()):
+        with patches[0], patches[1], patches[2], patches[3], patches[4], patches[
+            5
+        ], patches[6], patches[7], patches[8], patch.object(
+            type(adapter), "_poll_messages", return_value=MagicMock()
+        ):
             # Must NOT raise NameError
             result = await adapter.connect()
 
@@ -186,6 +195,7 @@ class TestDataInitialized:
 # ---------------------------------------------------------------------------
 # File handle cleanup on error paths
 # ---------------------------------------------------------------------------
+
 
 class TestFileHandleClosedOnError:
     """Verify the bridge log file handle is closed on every failure path."""
@@ -202,8 +212,9 @@ class TestFileHandleClosedOnError:
         mock_fh = MagicMock()
         patches = _connect_patches(mock_proc, mock_fh)
 
-        with patches[0], patches[1], patches[2], patches[3], patches[4], \
-             patches[5], patches[6], patches[7]:
+        with patches[0], patches[1], patches[2], patches[3], patches[4], patches[
+            5
+        ], patches[6], patches[7]:
             result = await adapter.connect()
 
         assert result is False
@@ -223,15 +234,19 @@ class TestConnectCleanup:
 
         install_result = MagicMock(returncode=1, stderr="install failed")
 
-        with patch("gateway.platforms.whatsapp.check_whatsapp_requirements", return_value=True), \
-             patch.object(Path, "exists", autospec=True, side_effect=_path_exists), \
-             patch("subprocess.run", return_value=install_result), \
-             patch("gateway.status.acquire_scoped_lock", return_value=(True, None)), \
-             patch("gateway.status.release_scoped_lock") as mock_release:
+        with patch(
+            "gateway.platforms.whatsapp.check_whatsapp_requirements", return_value=True
+        ), patch.object(Path, "exists", autospec=True, side_effect=_path_exists), patch(
+            "subprocess.run", return_value=install_result
+        ), patch(
+            "gateway.status.acquire_scoped_lock", return_value=(True, None)
+        ), patch("gateway.status.release_scoped_lock") as mock_release:
             result = await adapter.connect()
 
         assert result is False
-        mock_release.assert_called_once_with("whatsapp-session", str(adapter._session_path))
+        mock_release.assert_called_once_with(
+            "whatsapp-session", str(adapter._session_path)
+        )
         assert adapter._platform_lock_identity is None
 
 
@@ -356,8 +371,9 @@ class TestBridgeRuntimeFailure:
         mock_fh = MagicMock()
         patches = _connect_patches(mock_proc, mock_fh, mock_client_cls)
 
-        with patches[0], patches[1], patches[2], patches[3], patches[4], \
-             patches[5], patches[6], patches[7], patches[8]:
+        with patches[0], patches[1], patches[2], patches[3], patches[4], patches[
+            5
+        ], patches[6], patches[7], patches[8]:
             result = await adapter.connect()
 
         assert result is False
@@ -382,13 +398,15 @@ class TestBridgeRuntimeFailure:
 
         # Health returns 200 with status != "connected" -> triggers Phase 2
         mock_client_cls = _mock_aiohttp(
-            status=200, json_data={"status": "disconnected"},
+            status=200,
+            json_data={"status": "disconnected"},
         )
         mock_fh = MagicMock()
         patches = _connect_patches(mock_proc, mock_fh, mock_client_cls)
 
-        with patches[0], patches[1], patches[2], patches[3], patches[4], \
-             patches[5], patches[6], patches[7], patches[8]:
+        with patches[0], patches[1], patches[2], patches[3], patches[4], patches[
+            5
+        ], patches[6], patches[7], patches[8]:
             result = await adapter.connect()
 
         assert result is False
@@ -402,12 +420,13 @@ class TestBridgeRuntimeFailure:
 
         mock_fh = MagicMock()
 
-        with patch("gateway.platforms.whatsapp.check_whatsapp_requirements", return_value=True), \
-             patch.object(Path, "exists", return_value=True), \
-             patch.object(Path, "mkdir", return_value=None), \
-             patch("subprocess.run", return_value=MagicMock(returncode=0)), \
-             patch("subprocess.Popen", side_effect=OSError("spawn failed")), \
-             patch("builtins.open", return_value=mock_fh):
+        with patch(
+            "gateway.platforms.whatsapp.check_whatsapp_requirements", return_value=True
+        ), patch.object(Path, "exists", return_value=True), patch.object(
+            Path, "mkdir", return_value=None
+        ), patch("subprocess.run", return_value=MagicMock(returncode=0)), patch(
+            "subprocess.Popen", side_effect=OSError("spawn failed")
+        ), patch("builtins.open", return_value=mock_fh):
             result = await adapter.connect()
 
         assert result is False
@@ -418,6 +437,7 @@ class TestBridgeRuntimeFailure:
 # ---------------------------------------------------------------------------
 # _kill_port_process() cross-platform tests
 # ---------------------------------------------------------------------------
+
 
 class TestKillPortProcess:
     """Verify _kill_port_process uses platform-appropriate commands."""
@@ -440,14 +460,13 @@ class TestKillPortProcess:
                 return mock_taskkill
             return MagicMock()
 
-        with patch("gateway.platforms.whatsapp._IS_WINDOWS", True), \
-             patch("gateway.platforms.whatsapp.subprocess.run", side_effect=run_side_effect) as mock_run:
+        with patch("gateway.platforms.whatsapp._IS_WINDOWS", True), patch(
+            "gateway.platforms.whatsapp.subprocess.run", side_effect=run_side_effect
+        ) as mock_run:
             _kill_port_process(3000)
 
         # netstat called
-        assert any(
-            call.args[0][0] == "netstat" for call in mock_run.call_args_list
-        )
+        assert any(call.args[0][0] == "netstat" for call in mock_run.call_args_list)
         # taskkill called with correct PID
         assert any(
             call.args[0] == ["taskkill", "/PID", "12345", "/F"]
@@ -457,19 +476,17 @@ class TestKillPortProcess:
     def test_does_not_kill_wrong_port_on_windows(self):
         from gateway.platforms.whatsapp import _kill_port_process
 
-        netstat_output = (
-            "  TCP    0.0.0.0:30000          0.0.0.0:0              LISTENING       55555\n"
-        )
+        netstat_output = "  TCP    0.0.0.0:30000          0.0.0.0:0              LISTENING       55555\n"
         mock_netstat = MagicMock(stdout=netstat_output)
 
-        with patch("gateway.platforms.whatsapp._IS_WINDOWS", True), \
-             patch("gateway.platforms.whatsapp.subprocess.run", return_value=mock_netstat) as mock_run:
+        with patch("gateway.platforms.whatsapp._IS_WINDOWS", True), patch(
+            "gateway.platforms.whatsapp.subprocess.run", return_value=mock_netstat
+        ) as mock_run:
             _kill_port_process(3000)
 
         # Should NOT call taskkill because port 30000 != 3000
         assert not any(
-            call.args[0][0] == "taskkill"
-            for call in mock_run.call_args_list
+            call.args[0][0] == "taskkill" for call in mock_run.call_args_list
         )
 
     def test_uses_fuser_on_linux(self):
@@ -477,8 +494,9 @@ class TestKillPortProcess:
 
         mock_check = MagicMock(returncode=0)
 
-        with patch("gateway.platforms.whatsapp._IS_WINDOWS", False), \
-             patch("gateway.platforms.whatsapp.subprocess.run", return_value=mock_check) as mock_run:
+        with patch("gateway.platforms.whatsapp._IS_WINDOWS", False), patch(
+            "gateway.platforms.whatsapp.subprocess.run", return_value=mock_check
+        ) as mock_run:
             _kill_port_process(3000)
 
         calls = [c.args[0] for c in mock_run.call_args_list]
@@ -490,8 +508,9 @@ class TestKillPortProcess:
 
         mock_check = MagicMock(returncode=1)  # port not in use
 
-        with patch("gateway.platforms.whatsapp._IS_WINDOWS", False), \
-             patch("gateway.platforms.whatsapp.subprocess.run", return_value=mock_check) as mock_run:
+        with patch("gateway.platforms.whatsapp._IS_WINDOWS", False), patch(
+            "gateway.platforms.whatsapp.subprocess.run", return_value=mock_check
+        ) as mock_run:
             _kill_port_process(3000)
 
         calls = [c.args[0] for c in mock_run.call_args_list]
@@ -501,14 +520,17 @@ class TestKillPortProcess:
     def test_suppresses_exceptions(self):
         from gateway.platforms.whatsapp import _kill_port_process
 
-        with patch("gateway.platforms.whatsapp._IS_WINDOWS", True), \
-             patch("gateway.platforms.whatsapp.subprocess.run", side_effect=OSError("no netstat")):
+        with patch("gateway.platforms.whatsapp._IS_WINDOWS", True), patch(
+            "gateway.platforms.whatsapp.subprocess.run",
+            side_effect=OSError("no netstat"),
+        ):
             _kill_port_process(3000)  # must not raise
 
 
 # ---------------------------------------------------------------------------
 # Persistent HTTP session lifecycle
 # ---------------------------------------------------------------------------
+
 
 class TestHttpSessionLifecycle:
     """Verify persistent aiohttp.ClientSession is created and cleaned up."""
@@ -526,9 +548,12 @@ class TestHttpSessionLifecycle:
         adapter._running = True
         adapter._session_lock_identity = None
 
-        with patch("gateway.platforms.whatsapp._IS_WINDOWS", True), \
-             patch("gateway.platforms.whatsapp.subprocess.run", return_value=MagicMock(returncode=0)) as mock_run, \
-             patch("gateway.platforms.whatsapp.asyncio.sleep", new_callable=AsyncMock):
+        with patch("gateway.platforms.whatsapp._IS_WINDOWS", True), patch(
+            "gateway.platforms.whatsapp.subprocess.run",
+            return_value=MagicMock(returncode=0),
+        ) as mock_run, patch(
+            "gateway.platforms.whatsapp.asyncio.sleep", new_callable=AsyncMock
+        ):
             await adapter.disconnect()
 
         mock_run.assert_called_once_with(

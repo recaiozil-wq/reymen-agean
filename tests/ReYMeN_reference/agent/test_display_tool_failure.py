@@ -32,7 +32,9 @@ class TestTrimError:
         assert trimmed.endswith("...")
 
     def test_file_not_found_path_collapsed_to_filename(self):
-        long_path = "File not found: /home/teknium/.ReYMeN/ReYMeN-agent/very/deep/path/foo.py"
+        long_path = (
+            "File not found: /home/teknium/.ReYMeN/ReYMeN-agent/very/deep/path/foo.py"
+        )
         assert _trim_error(long_path) == "File not found: foo.py"
 
     def test_file_not_found_already_short_unchanged(self):
@@ -57,11 +59,13 @@ class TestDetectToolFailureTerminal:
         assert suffix == " [exit 1]"
 
     def test_nonzero_exit_with_error_shows_message(self):
-        result = json.dumps({
-            "output": "",
-            "exit_code": 127,
-            "error": "ls: cannot access 'foo': No such file or directory",
-        })
+        result = json.dumps(
+            {
+                "output": "",
+                "exit_code": 127,
+                "error": "ls: cannot access 'foo': No such file or directory",
+            }
+        )
         is_failure, suffix = _detect_tool_failure("terminal", result)
         assert is_failure is True
         assert "cannot access" in suffix
@@ -98,11 +102,13 @@ class TestDetectToolFailureStructured:
     """Generic path: any tool that returns {"error": ...} JSON."""
 
     def test_read_file_error_surfaced(self):
-        result = json.dumps({
-            "path": "/nope/missing.py",
-            "success": False,
-            "error": "File not found: /nope/missing.py",
-        })
+        result = json.dumps(
+            {
+                "path": "/nope/missing.py",
+                "success": False,
+                "error": "File not found: /nope/missing.py",
+            }
+        )
         is_failure, suffix = _detect_tool_failure("read_file", result)
         assert is_failure is True
         # _trim_error reduces the path to the basename.
@@ -138,12 +144,16 @@ class TestGetCuteToolMessageFailureSuffix:
     """End-to-end: failure suffix is appended by get_cute_tool_message."""
 
     def test_read_file_failure_suffix_appended(self):
-        fail = json.dumps({
-            "path": "/etc/missing",
-            "success": False,
-            "error": "File not found: /etc/missing",
-        })
-        line = get_cute_tool_message("read_file", {"path": "/etc/missing"}, 0.1, result=fail)
+        fail = json.dumps(
+            {
+                "path": "/etc/missing",
+                "success": False,
+                "error": "File not found: /etc/missing",
+            }
+        )
+        line = get_cute_tool_message(
+            "read_file", {"path": "/etc/missing"}, 0.1, result=fail
+        )
         assert "[File not found: missing]" in line
 
     def test_terminal_exit_only_suffix(self):
@@ -152,12 +162,16 @@ class TestGetCuteToolMessageFailureSuffix:
         assert "[exit 2]" in line
 
     def test_terminal_with_stderr_uses_message(self):
-        fail = json.dumps({
-            "output": "",
-            "exit_code": 127,
-            "error": "command not found: notathing",
-        })
-        line = get_cute_tool_message("terminal", {"command": "notathing"}, 0.1, result=fail)
+        fail = json.dumps(
+            {
+                "output": "",
+                "exit_code": 127,
+                "error": "command not found: notathing",
+            }
+        )
+        line = get_cute_tool_message(
+            "terminal", {"command": "notathing"}, 0.1, result=fail
+        )
         assert "command not found" in line
         # No '[exit 127]' tag when we have a specific message
         assert "exit 127" not in line

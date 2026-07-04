@@ -15,8 +15,6 @@ from unittest.mock import MagicMock, patch
 class TestBedrockContext1MBeta:
     """``context-1m-2025-08-07`` must reach Bedrock Claude requests."""
 
-
-
     def test_common_betas_strips_1m_for_minimax(self):
         """MiniMax bearer-auth endpoints host their own models — strip 1M beta."""
         from agent.anthropic_adapter import (
@@ -29,9 +27,9 @@ class TestBedrockContext1MBeta:
             "https://api.minimaxi.com/anthropic",
         ):
             betas = _common_betas_for_base_url(url)
-            assert _CONTEXT_1M_BETA not in betas, (
-                f"1M beta must be stripped for MiniMax bearer endpoint {url}"
-            )
+            assert (
+                _CONTEXT_1M_BETA not in betas
+            ), f"1M beta must be stripped for MiniMax bearer endpoint {url}"
             # Other betas still present
             assert "interleaved-thinking-2025-05-14" in betas
 

@@ -38,12 +38,12 @@ from harbor.models.trajectories import (
 class ReYMeNAgent(BaseInstalledAgent):
     """
     ReYMeN AI agent adapted for Harbor/Terminal-Bench.
-    
+
     Setup:
       - Python 3 + pip kurar
       - requests, pyyaml bağımlılıklarını yükler
       - tbench_plan_recovery.py'yi container'a kopyalar
-    
+
     Run:
       - Görev talimatını alır
       - tbench_plan_recovery.py'yi çalıştırır
@@ -75,18 +75,18 @@ class ReYMeNAgent(BaseInstalledAgent):
             ),
             timeout_sec=120,
         )
-        
+
         # Python bağımlılıkları
         await self.exec_as_agent(
             environment,
             command="python3 -m pip install requests pyyaml 2>&1 | tail -3",
             timeout_sec=60,
         )
-        
+
         # tbench_plan_recovery.py'yi kopyala
         script_dir = Path(__file__).parent.parent
         script_path = script_dir / "tbench_plan_recovery.py"
-        
+
         if script_path.exists():
             script_content = script_path.read_text()
             escaped = script_content.replace("'", "'\\''")
@@ -125,12 +125,12 @@ class ReYMeNAgent(BaseInstalledAgent):
         deepseek_key = os.environ.get("DEEPSEEK_API_KEY")
         if deepseek_key:
             env["DEEPSEEK_API_KEY"] = deepseek_key
-        
+
         model = self.model_name or "deepseek/deepseek-v4-flash"
         env["REYMEN_MODEL"] = model
-        
+
         env["HARBOR_INSTRUCTION"] = instruction
-        
+
         # tbench_plan_recovery.py'yi çalıştır
         run_cmd = (
             "cd /home/user && "
@@ -139,7 +139,7 @@ class ReYMeNAgent(BaseInstalledAgent):
             f"--model {shlex.quote(model)} "
             f"2>&1 | tee {shlex.quote(str(self.logs_dir / 'reymen-output.txt'))}"
         )
-        
+
         try:
             await self.exec_as_agent(
                 environment,

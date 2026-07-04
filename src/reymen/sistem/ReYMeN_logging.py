@@ -30,12 +30,17 @@ def kur(seviye=logging.INFO, dosya_yolu=None):
     # Dosyaya yaz (rotating, max 5MB, 3 yedek)
     dosya = dosya_yolu or LOG_FILE
     handler = RotatingFileHandler(
-        dosya, maxBytes=5 * 1024 * 1024, backupCount=3, encoding="utf-8",
+        dosya,
+        maxBytes=5 * 1024 * 1024,
+        backupCount=3,
+        encoding="utf-8",
     )
-    handler.setFormatter(logging.Formatter(
-        "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-    ))
+    handler.setFormatter(
+        logging.Formatter(
+            "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S",
+        )
+    )
     logger.addHandler(handler)
 
     # Konsola yaz
@@ -65,11 +70,13 @@ def get_logger(ad: str) -> logging.Logger:
 # ReYMeN uyumluluk fonksiyonlari
 _session_context = {}
 
+
 def set_session_context(session_id: str, **kwargs):
     """ReYMeN uyumluluk: session baglamini ayarla."""
     _session_context.clear()
     _session_context["session_id"] = session_id
     _session_context.update(kwargs)
+
 
 def get_session_context() -> dict:
     """ReYMeN uyumluluk: session baglamini getir."""

@@ -51,11 +51,11 @@ def nisan_yakalayiciyi_baslat():
         monitor = sct.monitors[1]  # Ana ekran
 
         while True:
-            if keyboard.is_pressed('esc'):
+            if keyboard.is_pressed("esc"):
                 print("\n[!] Cikis saglandi.")
                 break
 
-            if keyboard.is_pressed('enter'):
+            if keyboard.is_pressed("enter"):
                 time.sleep(0.2)  # Cift tetiklenmeyi onle
 
                 x, y = fare_konumunu_oku()
@@ -66,7 +66,12 @@ def nisan_yakalayiciyi_baslat():
                 sag = min(monitor["width"], x + 40)
                 alt = min(monitor["height"], y + 40)
 
-                bbox = {"top": ust, "left": sol, "width": sag - sol, "height": alt - ust}
+                bbox = {
+                    "top": ust,
+                    "left": sol,
+                    "width": sag - sol,
+                    "height": alt - ust,
+                }
 
                 # Yakala ve BGR'a cevir
                 sct_img = sct.grab(bbox)
@@ -89,7 +94,9 @@ def nisan_yakalayiciyi_baslat():
                 else:
                     print("[-] Iptal edildi.\n")
 
-                print("[*] Yeni nisan icin fareyi konumlandirip ENTER'a bas (Cikis: ESC)...")
+                print(
+                    "[*] Yeni nisan icin fareyi konumlandirip ENTER'a bas (Cikis: ESC)..."
+                )
 
 
 if __name__ == "__main__":

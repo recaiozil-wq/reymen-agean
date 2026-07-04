@@ -3,6 +3,7 @@
 Not: ReYMeN kendi code_execution mantığını kullanır.
 Bu shim, Hermes import'larının kırılmaması için basit implementasyon sağlar.
 """
+
 from __future__ import annotations
 
 import logging

@@ -28,13 +28,16 @@ class TestHostHeaderValidator:
 
         for bound in ("127.0.0.1", "localhost", "::1"):
             for host_header in (
-                "127.0.0.1", "127.0.0.1:9119",
-                "localhost", "localhost:9119",
-                "[::1]", "[::1]:9119",
+                "127.0.0.1",
+                "127.0.0.1:9119",
+                "localhost",
+                "localhost:9119",
+                "[::1]",
+                "[::1]:9119",
             ):
-                assert _is_accepted_host(host_header, bound), (
-                    f"bound={bound} must accept host={host_header}"
-                )
+                assert _is_accepted_host(
+                    host_header, bound
+                ), f"bound={bound} must accept host={host_header}"
 
     def test_loopback_bind_rejects_attacker_hostnames(self):
         """The core rebinding defence: attacker-controlled hosts that
@@ -50,9 +53,9 @@ class TestHostHeaderValidator:
                 "127.0.0.1.evil.test",  # lookalike IP prefix
                 "",  # missing Host
             ):
-                assert not _is_accepted_host(attacker, bound), (
-                    f"bound={bound} must reject attacker host={attacker!r}"
-                )
+                assert not _is_accepted_host(
+                    attacker, bound
+                ), f"bound={bound} must reject attacker host={attacker!r}"
 
     def test_zero_zero_bind_accepts_anything(self):
         """0.0.0.0 means operator explicitly opted into all-interfaces

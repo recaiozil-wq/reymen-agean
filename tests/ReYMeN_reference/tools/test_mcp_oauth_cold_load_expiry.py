@@ -31,6 +31,7 @@ These tests pin the contract for Fix A:
 Reference: Claude Code solves this via an ``OAuthTokens.expiresAt`` absolute
 timestamp persisted alongside the access_token (``auth.ts:~180``).
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -70,9 +71,7 @@ class TestSetTokensAbsoluteExpiry:
         )
         after = time.time()
 
-        on_disk = json.loads(
-            (tmp_path / "mcp-tokens" / "srv.json").read_text()
-        )
+        on_disk = json.loads((tmp_path / "mcp-tokens" / "srv.json").read_text())
         assert "expires_at" in on_disk, (
             "Fix A: set_tokens must record an absolute expires_at wall-clock "
             "timestamp alongside the SDK's serialized token so cold-loads "
@@ -100,16 +99,12 @@ class TestSetTokensAbsoluteExpiry:
             )
         )
 
-        on_disk = json.loads(
-            (tmp_path / "mcp-tokens" / "srv.json").read_text()
-        )
+        on_disk = json.loads((tmp_path / "mcp-tokens" / "srv.json").read_text())
         assert "expires_at" not in on_disk
 
 
 class TestGetTokensReconstructsExpiresIn:
-    def test_get_tokens_uses_expires_at_for_remaining_ttl(
-        self, tmp_path, monkeypatch
-    ):
+    def test_get_tokens_uses_expires_at_for_remaining_ttl(self, tmp_path, monkeypatch):
         """Round-trip: expires_in on read must reflect time remaining."""
         monkeypatch.setenv("ReYMeN_HOME", str(tmp_path))
         from mcp.shared.auth import OAuthToken
@@ -137,9 +132,7 @@ class TestGetTokensReconstructsExpiresIn:
         # Should be slightly less than 3600 after the 50ms sleep.
         assert 3500 < reloaded.expires_in <= 3600
 
-    def test_get_tokens_returns_zero_ttl_for_expired_token(
-        self, tmp_path, monkeypatch
-    ):
+    def test_get_tokens_returns_zero_ttl_for_expired_token(self, tmp_path, monkeypatch):
         """An already-expired token reloaded from disk must report expires_in=0."""
         monkeypatch.setenv("ReYMeN_HOME", str(tmp_path))
         from tools.mcp_oauth import ReYMeNTokenStorage, _get_token_dir
@@ -366,9 +359,7 @@ async def _noop_callback() -> tuple[str, str | None]:
 
 
 @pytest.mark.asyncio
-async def test_initialize_prefetches_oauth_metadata_when_missing(
-    tmp_path, monkeypatch
-):
+async def test_initialize_prefetches_oauth_metadata_when_missing(tmp_path, monkeypatch):
     """Cold-load must pre-flight PRM + ASM discovery so ``_refresh_token``
     has the correct ``token_endpoint`` before the first refresh attempt.
 
@@ -477,9 +468,9 @@ async def test_initialize_prefetches_oauth_metadata_when_missing(
 
     await provider._initialize()
 
-    assert provider.context.protected_resource_metadata is not None, (
-        "Pre-flight must cache PRM for the SDK to reference later."
-    )
+    assert (
+        provider.context.protected_resource_metadata is not None
+    ), "Pre-flight must cache PRM for the SDK to reference later."
     assert provider.context.oauth_metadata is not None, (
         "Pre-flight must cache ASM so _refresh_token builds the correct "
         "token_endpoint URL."
@@ -541,6 +532,6 @@ async def test_initialize_skips_prefetch_when_no_tokens(tmp_path, monkeypatch):
 
     await provider._initialize()
 
-    assert calls == [], (
-        f"Pre-flight must not fire when no tokens are stored, but got {calls}"
-    )
+    assert (
+        calls == []
+    ), f"Pre-flight must not fire when no tokens are stored, but got {calls}"

@@ -21,7 +21,9 @@ import pytest
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
-def _run_gateway_import(ReYMeN_home: Path, initial_env: dict[str, str]) -> dict[str, str]:
+def _run_gateway_import(
+    ReYMeN_home: Path, initial_env: dict[str, str]
+) -> dict[str, str]:
     """Import gateway.run in a clean subprocess and return the post-import env.
 
     The bridge runs at module-import time, so simply importing is enough
@@ -80,9 +82,14 @@ def _run_gateway_import(ReYMeN_home: Path, initial_env: dict[str, str]) -> dict[
     return out
 
 
-def _write_config(home: Path, agent_cfg: dict | None = None, display_cfg: dict | None = None,
-                  timezone: str | None = None) -> None:
+def _write_config(
+    home: Path,
+    agent_cfg: dict | None = None,
+    display_cfg: dict | None = None,
+    timezone: str | None = None,
+) -> None:
     import yaml
+
     cfg: dict = {}
     if agent_cfg:
         cfg["agent"] = agent_cfg
@@ -120,14 +127,20 @@ def test_config_max_turns_wins_over_stale_env(ReYMeN_home: Path) -> None:
 
 def test_config_gateway_timeout_wins_over_stale_env(ReYMeN_home: Path) -> None:
     """Every agent.* bridge key must be config-authoritative, not .env-authoritative."""
-    _write_config(ReYMeN_home, agent_cfg={
-        "gateway_timeout": 1800,
-        "gateway_timeout_warning": 900,
-    })
-    _write_env(ReYMeN_home, {
-        "ReYMeN_AGENT_TIMEOUT": "60",
-        "ReYMeN_AGENT_TIMEOUT_WARNING": "30",
-    })
+    _write_config(
+        ReYMeN_home,
+        agent_cfg={
+            "gateway_timeout": 1800,
+            "gateway_timeout_warning": 900,
+        },
+    )
+    _write_env(
+        ReYMeN_home,
+        {
+            "ReYMeN_AGENT_TIMEOUT": "60",
+            "ReYMeN_AGENT_TIMEOUT_WARNING": "30",
+        },
+    )
 
     env = _run_gateway_import(ReYMeN_home, initial_env={})
 

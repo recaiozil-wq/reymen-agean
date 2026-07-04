@@ -52,8 +52,7 @@ def _katalog_yukle() -> list[dict]:
     # 2. Uzaktan indir
     try:
         req = urllib.request.Request(
-            KATALOG_URL,
-            headers={"User-Agent": "ReYMeN-Marketplace/1.0"}
+            KATALOG_URL, headers={"User-Agent": "ReYMeN-Marketplace/1.0"}
         )
         with urllib.request.urlopen(req, timeout=10) as r:
             veri = json.loads(r.read().decode("utf-8"))
@@ -104,12 +103,14 @@ def ara(sorgu: str) -> str:
             sonuc.append(p)
 
     if not sonuc:
-        return f"🔍 \"{sorgu}\" icin sonuc bulunamadi."
+        return f'🔍 "{sorgu}" icin sonuc bulunamadi.'
 
-    satirlar = [f"🔍 \"{sorgu}\" icin {len(sonuc)} sonuc:", ""]
+    satirlar = [f'🔍 "{sorgu}" icin {len(sonuc)} sonuc:', ""]
     for p in sonuc:
         yuklu = "✅" if _yuklu_mi(p.get("ad", "")) else "⬇️"
-        satirlar.append(f"  {yuklu} {p['ad']} v{p.get('versiyon', '?')} — {p.get('aciklama', '')[:70]}")
+        satirlar.append(
+            f"  {yuklu} {p['ad']} v{p.get('versiyon', '?')} — {p.get('aciklama', '')[:70]}"
+        )
     return "\n".join(satirlar)
 
 
@@ -122,7 +123,7 @@ def bilgi(ad: str) -> str:
             p = x
             break
     if not p:
-        return f"❌ \"{ad}\" katalogda bulunamadi."
+        return f'❌ "{ad}" katalogda bulunamadi.'
 
     yuklu = "✅ Evet" if _yuklu_mi(ad) else "❌ Hayir"
     satirlar = [
@@ -151,14 +152,14 @@ def yukle(ad: str) -> str:
             p = x
             break
     if not p:
-        return f"❌ \"{ad}\" katalogda bulunamadi."
+        return f'❌ "{ad}" katalogda bulunamadi.'
 
     if _yuklu_mi(ad):
-        return f"ℹ️ \"{ad}\" zaten yuklu."
+        return f'ℹ️ "{ad}" zaten yuklu.'
 
     kaynak = p.get("kaynak", "")
     if not kaynak:
-        return f"❌ \"{ad}\" icin kaynak URL belirtilmemis."
+        return f'❌ "{ad}" icin kaynak URL belirtilmemis.'
 
     hedef = PLUGIN_DIZINI / ad
     try:
@@ -176,7 +177,9 @@ def yukle(ad: str) -> str:
             git_url = kaynak[4:]
             subprocess.run(
                 ["git", "clone", git_url, str(hedef)],
-                check=True, capture_output=True, timeout=60
+                check=True,
+                capture_output=True,
+                timeout=60,
             )
         elif kaynak.startswith("file:"):
             # Yerel dosyadan kopyala
@@ -196,7 +199,7 @@ def yukle(ad: str) -> str:
         # Motor'a yeniden yukle
         _motora_kaydet(ad)
 
-        return f"✅ \"{ad}\" basariyla yuklendi ve aktif."
+        return f'✅ "{ad}" basariyla yuklendi ve aktif.'
     except Exception as e:
         logger.error("Plugin yukleme hatasi: %s", e)
         # Temizlik
@@ -212,12 +215,12 @@ def paylas(ad: str, kaynak: str, aciklama: str = "", yazar: str = "") -> str:
     """
     plugin_yolu = PLUGIN_DIZINI / ad
     if not plugin_yolu.exists():
-        return f"❌ \"{ad}\" plugin dizini bulunamadi."
+        return f'❌ "{ad}" plugin dizini bulunamadi.'
 
     plugins = _katalog_yukle()
     for p in plugins:
         if p.get("ad", "").lower() == ad.lower():
-            return f"ℹ️ \"{ad}\" zaten katalogda."
+            return f'ℹ️ "{ad}" zaten katalogda.'
 
     # plugin.yaml'dan bilgi al
     yaml_yol = plugin_yolu / "plugin.yaml"
@@ -225,6 +228,7 @@ def paylas(ad: str, kaynak: str, aciklama: str = "", yazar: str = "") -> str:
     if yaml_yol.exists():
         try:
             import yaml
+
             with open(yaml_yol, "r", encoding="utf-8") as f:
                 yaml_veri = yaml.safe_load(f)
             versiyon = yaml_veri.get("version", "1.0.0")
@@ -246,17 +250,18 @@ def paylas(ad: str, kaynak: str, aciklama: str = "", yazar: str = "") -> str:
         "lisans": "MIT",
         "etiketler": ["plugin"],
         "bagimliliklar": [],
-        "dokuman": ""
+        "dokuman": "",
     }
     plugins.append(yeni)
 
     with open(KATALOG_DOSYASI, "w", encoding="utf-8") as f:
         json.dump(plugins, f, indent=2, ensure_ascii=False)
 
-    return f"✅ \"{ad}\" katalog'a eklendi. Katalog JSON: {KATALOG_DOSYASI}"
+    return f'✅ "{ad}" katalog\'a eklendi. Katalog JSON: {KATALOG_DOSYASI}'
 
 
 # ── Yardimci fonksiyonlar ──────────────────────────────────────────────
+
 
 def _yuklu_mi(ad: str) -> bool:
     """Plugin yerel dizinde var mi kontrol et."""
@@ -285,14 +290,18 @@ def _motora_kaydet(ad: str) -> None:
     """
     try:
         from reymen.sistem.hot_reload import HotReloader
+
         # HotReloader sinifi import edilebiliyorsa, bir sonraki
         # turda algilanacak. Simdilik sadece log.
         logger.info("[Marketplace] Plugin '%s' yuklendi, hot-reload bekliyor.", ad)
     except ImportError:
-        logger.warning("[Marketplace] HotReloader yok, elle yeniden baslatma gerekebilir.")
+        logger.warning(
+            "[Marketplace] HotReloader yok, elle yeniden baslatma gerekebilir."
+        )
 
 
 # ── Motor tool'lari ────────────────────────────────────────────────────
+
 
 def motor_kaydet(motor) -> None:
     """Motor tarafindan otomatik cagrilir."""
@@ -302,22 +311,22 @@ def motor_kaydet(motor) -> None:
         motor._plugin_arac_kaydet(
             "PLUGIN_MARKET_LISTE",
             lambda: liste(),
-            "ReYMeN Plugin Katalogu: tum mevcut pluginleri listeler."
+            "ReYMeN Plugin Katalogu: tum mevcut pluginleri listeler.",
         )
         motor._plugin_arac_kaydet(
             "PLUGIN_MARKET_ARAMA",
             lambda sorgu="": ara(sorgu),
-            "Katalogda plugin ara. Kullanim: PLUGIN_MARKET_ARAMA(sorgu)"
+            "Katalogda plugin ara. Kullanim: PLUGIN_MARKET_ARAMA(sorgu)",
         )
         motor._plugin_arac_kaydet(
             "PLUGIN_MARKET_YUKLE",
             lambda ad="": yukle(ad),
-            "Plugin'i katalogdan indir ve yukle. Kullanim: PLUGIN_MARKET_YUKLE(ad)"
+            "Plugin'i katalogdan indir ve yukle. Kullanim: PLUGIN_MARKET_YUKLE(ad)",
         )
         motor._plugin_arac_kaydet(
             "PLUGIN_MARKET_BILGI",
             lambda ad="": bilgi(ad),
-            "Plugin detayini goster. Kullanim: PLUGIN_MARKET_BILGI(ad)"
+            "Plugin detayini goster. Kullanim: PLUGIN_MARKET_BILGI(ad)",
         )
         logger.info("[Marketplace] 4 tool kaydedildi.")
     except Exception as e:
@@ -328,6 +337,7 @@ def motor_kaydet(motor) -> None:
 
 if __name__ == "__main__":
     import sys
+
     if len(sys.argv) < 2:
         print("Kullanim: marketplace.py [liste|ara|yukle|bilgi|paylas] [args]")
         sys.exit(1)

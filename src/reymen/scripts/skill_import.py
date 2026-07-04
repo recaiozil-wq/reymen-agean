@@ -4,6 +4,7 @@ Kullanım: python reymen/scripts/skill_import.py [--kategori AI_ML,DevOps]
 Hermes: ~/AppData/Local/hermes/skills/<kategori>/<skill>/SKILL.md
 ReYMeN: reymen/cereyan/skills/Skiller/<kategori>/<skill>_SKILL.md (düz dosya)
 """
+
 import os, re, shutil
 from pathlib import Path
 
@@ -38,6 +39,7 @@ KATEGORI_MAP = {
     "user-preferences/hersona/skills": "Kullanici",
 }
 
+
 def skill_aktar(hedef_klasor: str = "", limit: int = 0):
     """ReYMeN skill'lerini ReYMeN formatına çevir."""
     hedef = REYMEN_SKILLS
@@ -65,7 +67,9 @@ def skill_aktar(hedef_klasor: str = "", limit: int = 0):
             icerik = skill_md.read_text("utf-8", errors="replace")
 
             # Frontmatter'ı temizle (ReYMeN formatına uygun)
-            icerik = re.sub(r'^---\n.*?\n---\n', '', icerik, flags=re.DOTALL | re.MULTILINE)
+            icerik = re.sub(
+                r"^---\n.*?\n---\n", "", icerik, flags=re.DOTALL | re.MULTILINE
+            )
             icerik = icerik.strip()
 
             # Dosya adı: "skill_adi_SKILL.md"
@@ -80,15 +84,23 @@ def skill_aktar(hedef_klasor: str = "", limit: int = 0):
 
     return aktarilan
 
+
 def skill_say():
     """ReYMeN ve ReYMeN'deki skill sayılarını göster."""
-    ReYMeN = sum(1 for k in HERMES_SKILLS.iterdir() if k.is_dir()
-                 for s in k.iterdir() if (s / "SKILL.md").exists())
+    ReYMeN = sum(
+        1
+        for k in HERMES_SKILLS.iterdir()
+        if k.is_dir()
+        for s in k.iterdir()
+        if (s / "SKILL.md").exists()
+    )
     reymen = sum(1 for f in REYMEN_SKILLS.rglob("*_SKILL.md"))
     return {"ReYMeN": ReYMeN, "reymen": reymen, "eksik": ReYMeN - reymen}
 
+
 if __name__ == "__main__":
     import sys
+
     hedef = sys.argv[1] if len(sys.argv) > 1 else ""
     lim = int(sys.argv[2]) if len(sys.argv) > 2 else 0
 

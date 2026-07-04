@@ -10,7 +10,7 @@ category: genel
 
 # ReYMeN Telegram Bot — 3 Bot Entegre Sistem
 
-3 bot: **Kral_38** (`telegram_bot/bot.py`), **Pasa_38** (`reymen/ag/telegram_bot.py`), **ReYMeN** (`telegram_bot/ai_bot.py`).  
+3 bot: **Kral_38** (`telegram_bot/bot.py`), **Pasa_38** (`reymen/ag/telegram_bot.py`), **ReYMeN** (`telegram_bot/ai_bot.py`).
 Hepsi ayni **15 ortak komutu** kullanir (`reymen/ag/ortak_komutlar.py`).
 
 ## Bot Dosyalari
@@ -23,7 +23,7 @@ Hepsi ayni **15 ortak komutu** kullanir (`reymen/ag/ortak_komutlar.py`).
 
 ## Komut Seti (15 Ortak Komut)
 
-Tum komutlar `reymen/ag/ortak_komutlar.py`'de tanimlidir.  
+Tum komutlar `reymen/ag/ortak_komutlar.py`'de tanimlidir.
 Her bot `komut_isle()` fonksiyonu ile bu modulu cagirir.
 
 | Komut | Aciklama | Kimde |
@@ -54,7 +54,7 @@ reymen/ag/ortak_komutlar.py  ← TEK KAYNAK (15 komut)
                                  + ortak modul           + ortak modul
 ```
 
-**Komut ekleme:** Sadece `ortak_komutlar.py`'ye fonksiyon ekle + `KOMUTLAR` sozlugune kaydet.  
+**Komut ekleme:** Sadece `ortak_komutlar.py`'ye fonksiyon ekle + `KOMUTLAR` sozlugune kaydet.
 **Bot ozel komut:** Bot'un kendi `komut_isle()` metoduna elif ekle, ortak modul cagrisindan ONCE kontrol et.
 
 ## .env Yapilandirmasi
@@ -181,7 +181,7 @@ Bot üç şekilde eski veri gösteriyordu:
 ==================================================
 ```
 
-**Katman 3 — Ham JSON (insan okunabilir ozet YOK):**  
+**Katman 3 — Ham JSON (insan okunabilir ozet YOK):**
 `conversation_loop.py` (1341-1366): `from reymen.sistem.durum import _yukle` ile ham JSON okunur, dogrudan prompt'a eklenir. **İnsan okunabilir özet kaldırıldı.** Model JSON'u tabloya çevirmek zorunda kalır, kendi ezberini kullanamaz.
 
 ```python
@@ -204,7 +204,7 @@ Katman 3 → Ham JSON vs ozet (model hala training data'sini kullaniyorsa)
 
 ## durum.json Yapisi
 
-Dosya: `ReYMeN-Ajan/durum.json`  
+Dosya: `ReYMeN-Ajan/durum.json`
 Guncelleyen: ReYMeN_Agent (elle) veya self-improve cron (otomatik)
 
 ### Bolumler
@@ -235,7 +235,7 @@ Guncelleyen: ReYMeN_Agent (elle) veya self-improve cron (otomatik)
 
 ## Bot Yetki Sistemi
 
-3 Telegram botu da `yetki: tam` olarak isaretlenmistir.  
+3 Telegram botu da `yetki: tam` olarak isaretlenmistir.
 Diger ajanlar (DiscordBot, AIAgentOrchestrator, ACPServer) `yetki: standart`.
 
 ### Yetki Seviyeleri

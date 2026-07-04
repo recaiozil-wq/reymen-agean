@@ -162,10 +162,10 @@ class TestApplyUpdate:
             def read_file_raw(self, path):
                 return SimpleNamespace(
                     content=(
-                        'def run():\n'
+                        "def run():\n"
                         '    cmd = "echo a | sed s/a/b/"\n'
-                        '    result = 1\n'
-                        '    return result'
+                        "    result = 1\n"
+                        "    return result"
                     ),
                     error=None,
                 )
@@ -180,10 +180,10 @@ class TestApplyUpdate:
 
         assert result.success is True
         assert file_ops.written == (
-            'def run():\n'
+            "def run():\n"
             '    cmd = "echo a | sed s/a/b/"\n'
-            '    result = 1\n'
-            '    return result + 1'
+            "    result = 1\n"
+            "    return result + 1"
         )
 
 
@@ -206,16 +206,18 @@ class TestAdditionOnlyHunks:
 
         hunk = ops[0].hunks[0]
         # All lines should be additions
-        assert all(l.prefix == '+' for l in hunk.lines)
+        assert all(l.prefix == "+" for l in hunk.lines)
 
         # Apply to a file that contains the context hint
         class FakeFileOps:
             written = None
+
             def read_file_raw(self, path):
                 return SimpleNamespace(
                     content="def main():\n    pass\n",
                     error=None,
                 )
+
             def write_file(self, path, content):
                 self.written = content
                 return SimpleNamespace(error=None)
@@ -239,11 +241,13 @@ class TestAdditionOnlyHunks:
 
         class FakeFileOps:
             written = None
+
             def read_file_raw(self, path):
                 return SimpleNamespace(
                     content="existing = True\n",
                     error=None,
                 )
+
             def write_file(self, path, content):
                 self.written = content
                 return SimpleNamespace(error=None)
@@ -273,14 +277,16 @@ class TestReadFileRaw:
 
         # Build a 2500-line file; the hunk targets a region at line 2200
         lines = [f"line_{i}" for i in range(1, 2501)]
-        lines[2199] = "line_2200"   # index 2199 = line 2200
+        lines[2199] = "line_2200"  # index 2199 = line 2200
         lines[2200] = "old_value"
         file_content = "\n".join(lines)
 
         class FakeFileOps:
             written = None
+
             def read_file_raw(self, path):
                 return SimpleNamespace(content=file_content, error=None)
+
             def write_file(self, path, content):
                 self.written = content
                 return SimpleNamespace(error=None)
@@ -289,9 +295,9 @@ class TestReadFileRaw:
         result = apply_v4a_operations(ops, file_ops)
         assert result.success is True
         written_lines = file_ops.written.split("\n")
-        assert len(written_lines) == 2500, (
-            f"Expected 2500 lines, got {len(written_lines)}"
-        )
+        assert (
+            len(written_lines) == 2500
+        ), f"Expected 2500 lines, got {len(written_lines)}"
         assert "new_value" in file_ops.written
         assert "old_value" not in file_ops.written
 
@@ -313,8 +319,10 @@ class TestReadFileRaw:
 
         class FakeFileOps:
             written = None
+
             def read_file_raw(self, path):
                 return SimpleNamespace(content=file_content, error=None)
+
             def write_file(self, path, content):
                 self.written = content
                 return SimpleNamespace(error=None)
@@ -355,7 +363,9 @@ class TestValidationPhase:
                 }
                 content = files.get(path)
                 if content is None:
-                    return SimpleNamespace(content=None, error=f"File not found: {path}")
+                    return SimpleNamespace(
+                        content=None, error=f"File not found: {path}"
+                    )
                 return SimpleNamespace(content=content, error=None)
 
             def write_file(self, path, content):
@@ -364,7 +374,9 @@ class TestValidationPhase:
 
         result = apply_v4a_operations(ops, FakeFileOps())
         assert result.success is False
-        assert written == {}, f"No files should have been written, got: {list(written.keys())}"
+        assert (
+            written == {}
+        ), f"No files should have been written, got: {list(written.keys())}"
         assert "validation failed" in result.error.lower()
 
     def test_all_valid_operations_applied(self):
@@ -462,6 +474,7 @@ class TestApplyDelete:
 class TestCountOccurrences:
     def test_basic(self):
         from tools.patch_parser import _count_occurrences
+
         assert _count_occurrences("aaa", "a") == 3
         assert _count_occurrences("aaa", "aa") == 2
         assert _count_occurrences("hello world", "xyz") == 0
@@ -493,9 +506,9 @@ class TestParseErrorSignalling:
         # Either parse sees zero ops (fine) or returns an error (also fine).
         # What is NOT acceptable is ops=[MOVE op with empty new_path] + err=None.
         if ops:
-            assert err is not None, (
-                "MOVE with missing destination must either produce empty ops or an error"
-            )
+            assert (
+                err is not None
+            ), "MOVE with missing destination must either produce empty ops or an error"
 
     def test_valid_patch_returns_no_error(self):
         """A well-formed patch must still return err=None."""
@@ -529,10 +542,7 @@ class TestV4ALspDiagnosticsPropagation:
         # / Hunk / Line objects by hand.
         lines = "\n".join(f"+{line}" for line in content.splitlines())
         patch_text = (
-            "*** Begin Patch\n"
-            f"*** Add File: {path}\n"
-            f"{lines}\n"
-            "*** End Patch"
+            "*** Begin Patch\n" f"*** Add File: {path}\n" f"{lines}\n" "*** End Patch"
         )
         ops, err = parse_v4a_patch(patch_text)
         assert err is None, err
@@ -544,7 +554,7 @@ class TestV4ALspDiagnosticsPropagation:
         ops = self._build_ops_writing("foo.ts", "const x: number = 1\n")
 
         diag_block = (
-            "<diagnostics file=\"foo.ts\">\n"
+            '<diagnostics file="foo.ts">\n'
             "ERROR [1:7] some diagnostic\n"
             "</diagnostics>"
         )
@@ -575,9 +585,7 @@ class TestV4ALspDiagnosticsPropagation:
         assert err is None
 
         diag_block = (
-            "<diagnostics file=\"bar.ts\">\n"
-            "ERROR [3:1] something\n"
-            "</diagnostics>"
+            '<diagnostics file="bar.ts">\n' "ERROR [3:1] something\n" "</diagnostics>"
         )
 
         class FakeFileOps:
@@ -630,8 +638,8 @@ class TestV4ALspDiagnosticsPropagation:
         assert err is None
 
         per_file = {
-            "a.ts": "<diagnostics file=\"a.ts\">\nERR a\n</diagnostics>",
-            "b.ts": "<diagnostics file=\"b.ts\">\nERR b\n</diagnostics>",
+            "a.ts": '<diagnostics file="a.ts">\nERR a\n</diagnostics>',
+            "b.ts": '<diagnostics file="b.ts">\nERR b\n</diagnostics>',
         }
 
         class FakeFileOps:

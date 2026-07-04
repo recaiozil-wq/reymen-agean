@@ -54,58 +54,160 @@ def _baglanti():
 # ── Yardımcı: Anahtar Kelime Çıkarma ───────────────────────────────────────
 
 TURKCE_KARAKTER_MAP = {
-    "ı": "i", "İ": "i", "ğ": "g", "Ğ": "g",
-    "ü": "u", "Ü": "u", "ş": "s", "Ş": "s",
-    "ö": "o", "Ö": "o", "ç": "c", "Ç": "c",
+    "ı": "i",
+    "İ": "i",
+    "ğ": "g",
+    "Ğ": "g",
+    "ü": "u",
+    "Ü": "u",
+    "ş": "s",
+    "Ş": "s",
+    "ö": "o",
+    "Ö": "o",
+    "ç": "c",
+    "Ç": "c",
 }
 
 STOP_KELIMELER: set[str] = {
-    "bir", "bu", "ve", "veya", "ile", "için", "ile",
-    "ama", "fakat", "lakin", "veya", "ya", "da", "de",
-    "mi", "mu", "mı", "mu", "nı", "ni", "nu", "nü",
-    "en", "çok", "daha", "biraz", "hiç", "tüm", "her",
-    "olan", "olduğu", "olacak", "yap", "yapma",
-    "nasıl", "ne", "nerede", "neden", "hangi", "kim",
-    "ben", "sen", "o", "biz", "siz", "onlar",
-    "beni", "seni", "bizi", "sizi", "onları",
-    "benim", "senin", "bizim", "sizin", "onun",
-    "şu", "şunu", "şuna", "bunu", "buna",
+    "bir",
+    "bu",
+    "ve",
+    "veya",
+    "ile",
+    "için",
+    "ile",
+    "ama",
+    "fakat",
+    "lakin",
+    "veya",
+    "ya",
+    "da",
+    "de",
+    "mi",
+    "mu",
+    "mı",
+    "mu",
+    "nı",
+    "ni",
+    "nu",
+    "nü",
+    "en",
+    "çok",
+    "daha",
+    "biraz",
+    "hiç",
+    "tüm",
+    "her",
+    "olan",
+    "olduğu",
+    "olacak",
+    "yap",
+    "yapma",
+    "nasıl",
+    "ne",
+    "nerede",
+    "neden",
+    "hangi",
+    "kim",
+    "ben",
+    "sen",
+    "o",
+    "biz",
+    "siz",
+    "onlar",
+    "beni",
+    "seni",
+    "bizi",
+    "sizi",
+    "onları",
+    "benim",
+    "senin",
+    "bizim",
+    "sizin",
+    "onun",
+    "şu",
+    "şunu",
+    "şuna",
+    "bunu",
+    "buna",
 }
 
 TURKCE_KOK_MAP = {
     # Fiil kökleri
-    "izleme": "izle", "izler": "izle", "izledi": "izle",
-    "tarama": "tara", "tarar": "tara", "taradı": "tara",
-    "yönetme": "yonet", "yönetir": "yonet", "yönetimi": "yonet",
-    "kontrol": "kontrol", "kontrolü": "kontrol", "kontrol et": "kontrol",
-    "güvenlik": "guvenlik", "güvenli": "guvenlik",
-    "bağlantı": "baglanti", "bağlan": "baglan", "bağlantıları": "baglanti",
-    "analiz": "analiz", "analizi": "analiz", "analiz et": "analiz",
-    "rapor": "rapor", "raporlama": "rapor",
-    "log": "log", "loglama": "log", "logları": "log",
-    "kayıt": "kayit", "kaydet": "kayit", "kayıtları": "kayit",
-    "dosya": "dosya", "dosyaları": "dosya",
-    "veri": "veri", "verileri": "veri",
-    "sistem": "sistem", "sistemi": "sistem",
-    "ağ": "ag", "ağı": "ag",
-    "port": "port", "portları": "port",
-    "servis": "servis", "servisleri": "servis",
-    "bildirim": "bildirim", "bildirimi": "bildirim",
-    "uyarı": "uyari", "uyar": "uyari", "uyarıları": "uyari",
-    "otomatik": "otomatik", "oto": "otomatik",
-    "zaman": "zaman", "zamanlı": "zaman",
-    "görev": "gorev", "görevi": "gorev",
-    "plan": "plan", "planlama": "plan",
-    "yedek": "yedek", "yedekleme": "yedek",
-    "şifre": "sifre", "şifreleme": "sifre", "şifreli": "sifre",
-    "kimlik": "kimlik", "kimlik doğrulama": "kimlik",
-    "yetki": "yetki", "yetkilendirme": "yetki",
-    "izin": "izin", "izinler": "izin",
-    "erişim": "erisim", "erişimi": "erisim",
-    "proxy": "proxy", "proxy ayarları": "proxy",
-    "dns": "dns", "dns sorgu": "dns",
-    "cache": "cache", "önbellek": "cache",
-    "monitör": "monitor", "monitörü": "monitor",
+    "izleme": "izle",
+    "izler": "izle",
+    "izledi": "izle",
+    "tarama": "tara",
+    "tarar": "tara",
+    "taradı": "tara",
+    "yönetme": "yonet",
+    "yönetir": "yonet",
+    "yönetimi": "yonet",
+    "kontrol": "kontrol",
+    "kontrolü": "kontrol",
+    "kontrol et": "kontrol",
+    "güvenlik": "guvenlik",
+    "güvenli": "guvenlik",
+    "bağlantı": "baglanti",
+    "bağlan": "baglan",
+    "bağlantıları": "baglanti",
+    "analiz": "analiz",
+    "analizi": "analiz",
+    "analiz et": "analiz",
+    "rapor": "rapor",
+    "raporlama": "rapor",
+    "log": "log",
+    "loglama": "log",
+    "logları": "log",
+    "kayıt": "kayit",
+    "kaydet": "kayit",
+    "kayıtları": "kayit",
+    "dosya": "dosya",
+    "dosyaları": "dosya",
+    "veri": "veri",
+    "verileri": "veri",
+    "sistem": "sistem",
+    "sistemi": "sistem",
+    "ağ": "ag",
+    "ağı": "ag",
+    "port": "port",
+    "portları": "port",
+    "servis": "servis",
+    "servisleri": "servis",
+    "bildirim": "bildirim",
+    "bildirimi": "bildirim",
+    "uyarı": "uyari",
+    "uyar": "uyari",
+    "uyarıları": "uyari",
+    "otomatik": "otomatik",
+    "oto": "otomatik",
+    "zaman": "zaman",
+    "zamanlı": "zaman",
+    "görev": "gorev",
+    "görevi": "gorev",
+    "plan": "plan",
+    "planlama": "plan",
+    "yedek": "yedek",
+    "yedekleme": "yedek",
+    "şifre": "sifre",
+    "şifreleme": "sifre",
+    "şifreli": "sifre",
+    "kimlik": "kimlik",
+    "kimlik doğrulama": "kimlik",
+    "yetki": "yetki",
+    "yetkilendirme": "yetki",
+    "izin": "izin",
+    "izinler": "izin",
+    "erişim": "erisim",
+    "erişimi": "erisim",
+    "proxy": "proxy",
+    "proxy ayarları": "proxy",
+    "dns": "dns",
+    "dns sorgu": "dns",
+    "cache": "cache",
+    "önbellek": "cache",
+    "monitör": "monitor",
+    "monitörü": "monitor",
     "performans": "performans",
     "optimizasyon": "optimizasyon",
 }
@@ -130,7 +232,7 @@ def _anahtar_kelimeler(metin: str) -> list[str]:
         temiz = temiz.replace(tr, ascii_karsilik)
 
     # Noktalama işaretlerini kaldır
-    for ch in ".,!?;:()[]{}\"'\"`”“‘’…––/\\|@#$%^&*+=<>~":
+    for ch in '.,!?;:()[]{}"\'"`”“‘’…––/\\|@#$%^&*+=<>~':
         temiz = temiz.replace(ch, " ")
 
     # Kelimelere ayır, kısa ve stop kelimeleri çıkar
@@ -158,8 +260,9 @@ def _anahtar_kelimeler(metin: str) -> list[str]:
     return sonuc
 
 
-def _eslesme_skoru(sorgu_kelimeleri: list[str], skill_etiketleri: list[str],
-                   skill_baslik: str) -> float:
+def _eslesme_skoru(
+    sorgu_kelimeleri: list[str], skill_etiketleri: list[str], skill_baslik: str
+) -> float:
     """
     Sorgu kelimeleri ile skill etiketleri arasındaki eşleşme skorunu hesapla.
 
@@ -238,6 +341,7 @@ def _eslesme_skoru(sorgu_kelimeleri: list[str], skill_etiketleri: list[str],
 
 # ── SkillActivator Sınıfı ──────────────────────────────────────────────────
 
+
 class SkillActivator:
     """
     Otomatik skill aktivasyon motoru.
@@ -306,7 +410,9 @@ class SkillActivator:
                 )
                 con.commit()
                 self._temizle_cache()
-                logger.info("[Activator] Aktif edildi: %s (%s)", skill_id, skill["baslik"][:40])
+                logger.info(
+                    "[Activator] Aktif edildi: %s (%s)", skill_id, skill["baslik"][:40]
+                )
                 return True
             except Exception as e:
                 con.rollback()
@@ -351,7 +457,9 @@ class SkillActivator:
                 )
                 con.commit()
                 self._temizle_cache()
-                logger.info("[Activator] Devre disi: %s (%s)", skill_id, skill["baslik"][:40])
+                logger.info(
+                    "[Activator] Devre disi: %s (%s)", skill_id, skill["baslik"][:40]
+                )
                 return True
             except Exception as e:
                 con.rollback()
@@ -362,8 +470,9 @@ class SkillActivator:
 
     # ── Sorgudan Otomatik Aktif Et ──────────────────────────────────────
 
-    def sorgudan_aktif_et(self, sorgu: str, max_aktif: int = 3,
-                          min_skor: float = 0.15) -> list[str]:
+    def sorgudan_aktif_et(
+        self, sorgu: str, max_aktif: int = 3, min_skor: float = 0.15
+    ) -> list[str]:
         """
         Gelen sorguya göre ilgili skill'leri otomatik bul ve aktif et.
 
@@ -410,13 +519,15 @@ class SkillActivator:
         skorlu.sort(key=lambda x: x[0], reverse=True)
 
         if not skorlu:
-            logger.debug("[Activator] Eslesen skill bulunamadi (min_skor=%.2f).", min_skor)
+            logger.debug(
+                "[Activator] Eslesen skill bulunamadi (min_skor=%.2f).", min_skor
+            )
             return []
 
         # En iyi sonuçları logla
         logger.info(
             "[Activator] En iyi eslesmeler: %s",
-            ", ".join(f"{s['id']}({skor:.2f})" for skor, s in skorlu[:5])
+            ", ".join(f"{s['id']}({skor:.2f})" for skor, s in skorlu[:5]),
         )
 
         # En çok eşleşenleri aktif et (zaten aktif olanları atla)
@@ -427,10 +538,14 @@ class SkillActivator:
                     aktif_edilen.append(skill["id"])
                     logger.info(
                         "[Activator] Sorgudan aktif: %s (skor=%.2f, etiket=%s)",
-                        skill["id"], skor, skill["etiketler"]
+                        skill["id"],
+                        skor,
+                        skill["etiketler"],
                     )
             else:
-                logger.debug("[Activator] Zaten aktif, atla: %s (skor=%.2f)", skill["id"], skor)
+                logger.debug(
+                    "[Activator] Zaten aktif, atla: %s (skor=%.2f)", skill["id"], skor
+                )
 
         return aktif_edilen
 
@@ -520,7 +635,9 @@ class SkillActivator:
             for et in s["etiketler"]:
                 etiket_sayaci[et] = etiket_sayaci.get(et, 0) + 1
 
-        en_cok_etiket = sorted(etiket_sayaci.items(), key=lambda x: x[1], reverse=True)[:10]
+        en_cok_etiket = sorted(etiket_sayaci.items(), key=lambda x: x[1], reverse=True)[
+            :10
+        ]
 
         return {
             "toplam_skill": lib_stat["toplam"],
@@ -544,6 +661,7 @@ def get_activator(db_yolu: str | Path | None = None) -> SkillActivator:
 
 # ── Kolay kullanım fonksiyonları ────────────────────────────────────────────
 
+
 def aktif_et(skill_id: str) -> bool:
     """Skill aktif et (kolay kullanım)."""
     return get_activator().aktif_et(skill_id)
@@ -554,8 +672,9 @@ def devre_disina_al(skill_id: str) -> bool:
     return get_activator().devre_disina_al(skill_id)
 
 
-def sorgudan_aktif_et(sorgu: str, max_aktif: int = 3,
-                      min_skor: float = 0.15) -> list[str]:
+def sorgudan_aktif_et(
+    sorgu: str, max_aktif: int = 3, min_skor: float = 0.15
+) -> list[str]:
     """Sorgudan otomatik aktif et (kolay kullanım)."""
     return get_activator().sorgudan_aktif_et(sorgu, max_aktif, min_skor)
 

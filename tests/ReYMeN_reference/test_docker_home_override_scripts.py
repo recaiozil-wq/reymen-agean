@@ -17,12 +17,12 @@ def test_main_wrapper_preserves_docker_workdir() -> None:
     text = MAIN_WRAPPER.read_text(encoding="utf-8")
 
     # Must save original cwd before cd /opt/data.
-    assert "_ReYMeN_orig_cwd" in text, (
-        "main-wrapper.sh must save the original cwd before cd /opt/data"
-    )
-    assert 'ReYMeN_ORIG_CWD:-$PWD' in text, (
-        "main-wrapper.sh must capture PWD as the fallback original cwd"
-    )
+    assert (
+        "_ReYMeN_orig_cwd" in text
+    ), "main-wrapper.sh must save the original cwd before cd /opt/data"
+    assert (
+        "ReYMeN_ORIG_CWD:-$PWD" in text
+    ), "main-wrapper.sh must capture PWD as the fallback original cwd"
 
     # Must cd to /opt/data for init (existing behaviour preserved).
     assert "cd /opt/data" in text
@@ -60,24 +60,24 @@ def test_dashboard_run_does_not_derive_insecure_from_bind_host() -> None:
     text = DASHBOARD_RUN.read_text(encoding="utf-8")
 
     # No legacy host-derived flip.
-    assert '127.0.0.1|localhost' not in text, (
+    assert "127.0.0.1|localhost" not in text, (
         "Run script still derives --insecure from the bind host. The gate "
         "is the authority now — opt in via ReYMeN_DASHBOARD_INSECURE instead."
     )
-    assert 'case "$dash_host" in' not in text, (
-        "Legacy host-derived --insecure case-statement is back."
-    )
+    assert (
+        'case "$dash_host" in' not in text
+    ), "Legacy host-derived --insecure case-statement is back."
 
     # New opt-in env var present.
-    assert "ReYMeN_DASHBOARD_INSECURE" in text, (
-        "Explicit ReYMeN_DASHBOARD_INSECURE opt-in is missing."
-    )
+    assert (
+        "ReYMeN_DASHBOARD_INSECURE" in text
+    ), "Explicit ReYMeN_DASHBOARD_INSECURE opt-in is missing."
     # Truthy values aligned with the rest of the s6 scripts
     # (e.g. ReYMeN_DASHBOARD).
     for truthy in ("1", "true", "TRUE", "True", "yes", "YES", "Yes"):
-        assert truthy in text, (
-            f"ReYMeN_DASHBOARD_INSECURE should accept truthy value {truthy!r}"
-        )
+        assert (
+            truthy in text
+        ), f"ReYMeN_DASHBOARD_INSECURE should accept truthy value {truthy!r}"
 
 
 def test_stage2_hook_repairs_profiles_and_cron_ownership_on_every_boot() -> None:

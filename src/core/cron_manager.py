@@ -49,26 +49,28 @@ WATCHDOG_LOG = CRON_DIZINI / "watchdog.log"
 #  Veri Modelleri
 # ═══════════════════════════════════════════════════════════════════════
 
+
 @dataclass
 class CronJob:
     """Bir cron isinin tum ozellikleri."""
+
     id: str = ""
     ad: str = ""
-    komut: str = ""           # Shell komutu
-    script: str = ""          # .py script yolu (komut yerine)
-    prompt: str = ""          # LLM prompt (agent modunda)
-    cron_ifade: str = ""      # Cron expression (ornek: "0 */6 * * *")
+    komut: str = ""  # Shell komutu
+    script: str = ""  # .py script yolu (komut yerine)
+    prompt: str = ""  # LLM prompt (agent modunda)
+    cron_ifade: str = ""  # Cron expression (ornek: "0 */6 * * *")
     zaman_aciklama: str = ""  # Insan okunabilir zaman ("every 6 hours")
     aktif: bool = True
-    durum: str = "idle"       # idle, running, success, failed, timeout
-    timeout_saniye: int = 300 # Varsayilan 5 dk
+    durum: str = "idle"  # idle, running, success, failed, timeout
+    timeout_saniye: int = 300  # Varsayilan 5 dk
     max_retry: int = 3
     retry_sayisi: int = 0
-    model: Optional[str] = None       # Model override
-    provider: Optional[str] = None    # Provider override
-    base_url: Optional[str] = None    # Base URL override
+    model: Optional[str] = None  # Model override
+    provider: Optional[str] = None  # Provider override
+    base_url: Optional[str] = None  # Base URL override
     skills: list[str] = field(default_factory=list)
-    deliver: str = "origin"           # "origin", "telegram", "discord", "cli", "none"
+    deliver: str = "origin"  # "origin", "telegram", "discord", "cli", "none"
     deliver_hedef: Optional[str] = None
     aciklama: str = ""
     kaynak: str = ""
@@ -145,6 +147,7 @@ class CronJob:
 #  JSON Depolama
 # ═══════════════════════════════════════════════════════════════════════
 
+
 def _json_oku() -> dict[str, Any]:
     """jobs.json'u oku."""
     if not JOBS_JSON_YOLU.exists():
@@ -182,6 +185,7 @@ def _watchdog_log(mesaj: str) -> None:
 #  Cron Scheduler
 # ═══════════════════════════════════════════════════════════════════════
 
+
 class CronManager:
     """Merkezi Cron/Scheduler yoneticisi.
 
@@ -194,7 +198,9 @@ class CronManager:
 
     def __init__(self):
         self._isler: dict[str, CronJob] = {}
-        self._calisan_isler: dict[str, dict] = {}  # id -> {"process": ..., "start": ..., "timer": ...}
+        self._calisan_isler: dict[
+            str, dict
+        ] = {}  # id -> {"process": ..., "start": ..., "timer": ...}
         self._scheduler_task: Optional[asyncio.Task] = None
         self._watchdog_task: Optional[asyncio.Task] = None
         self._calisiyor = False
@@ -211,7 +217,10 @@ class CronManager:
             threading.Thread(target=self._watchdog_dongusu, daemon=True).start()
 
             self._calisiyor = True
-            logger.info("[CronManager] Scheduler + Watchdog baslatildi (%d is yuklu).", len(self._isler))
+            logger.info(
+                "[CronManager] Scheduler + Watchdog baslatildi (%d is yuklu).",
+                len(self._isler),
+            )
             return True
         except Exception as e:
             logger.error("[CronManager] Baslatma hatasi: %s", e)
@@ -394,7 +403,12 @@ class CronManager:
     def _json_kaydet(self) -> None:
         """Tum isleri jobs.json'a kaydet."""
         isler_listesi = [job.to_dict() for job in self._isler.values()]
-        _json_yaz({"jobs": isler_listesi, "updated_at": datetime.now(timezone.utc).isoformat()})
+        _json_yaz(
+            {
+                "jobs": isler_listesi,
+                "updated_at": datetime.now(timezone.utc).isoformat(),
+            }
+        )
 
     def _scheduler_dongusu(self) -> None:
         """Arkaplan scheduler dongusu — her 30 saniyede bir kontrol."""
@@ -434,7 +448,9 @@ class CronManager:
                         )
                         logger.warning(
                             "[Cron] Watchdog: %s timeout (%ds > %ds)",
-                            job.ad, calisma_suresi, job.timeout_saniye,
+                            job.ad,
+                            calisma_suresi,
+                            job.timeout_saniye,
                         )
                         self._is_durdur(job_id)
 
@@ -477,7 +493,10 @@ class CronManager:
             dakika_eslesir = (
                 dakika_ifade == "*"
                 or str(now.minute) == dakika_ifade
-                or (dakika_ifade.startswith("*/") and now.minute % int(dakika_ifade[2:]) == 0)
+                or (
+                    dakika_ifade.startswith("*/")
+                    and now.minute % int(dakika_ifade[2:]) == 0
+                )
             )
             saat_eslesir = (
                 saat_ifade == "*"
@@ -539,8 +558,15 @@ class CronManager:
                 daemon=True,
             ).start()
 
-            _watchdog_log(f"BASLATILDI: {job.ad} (pid={process.pid}, timeout={job.timeout_saniye}s)")
-            logger.info("[Cron] Is baslatildi: %s (pid=%d, timeout=%ds)", job.ad, process.pid, job.timeout_saniye)
+            _watchdog_log(
+                f"BASLATILDI: {job.ad} (pid={process.pid}, timeout={job.timeout_saniye}s)"
+            )
+            logger.info(
+                "[Cron] Is baslatildi: %s (pid=%d, timeout=%ds)",
+                job.ad,
+                process.pid,
+                job.timeout_saniye,
+            )
             self._json_kaydet()
 
         except Exception as e:
@@ -573,9 +599,13 @@ class CronManager:
                 _watchdog_log(f"HATA: {job.ad} — exit={returncode}")
                 logger.error("[Cron] Is basarisiz: %s (exit=%d)", job.ad, returncode)
 
-            logger.info("[Cron] Is tamamlandi: %s (exit=%d, %.1fs)", job.ad, returncode, time.time() - (
-                self._calisan_isler.get(job_id, {}).get("start", time.time())
-            ))
+            logger.info(
+                "[Cron] Is tamamlandi: %s (exit=%d, %.1fs)",
+                job.ad,
+                returncode,
+                time.time()
+                - (self._calisan_isler.get(job_id, {}).get("start", time.time())),
+            )
 
         except subprocess.TimeoutExpired:
             job.durum = "timeout"
@@ -624,6 +654,7 @@ def get_cron_manager() -> CronManager:
 # ═══════════════════════════════════════════════════════════════════════
 #  Motor Tool'lari
 # ═══════════════════════════════════════════════════════════════════════
+
 
 def _cron_liste(aktif_mi: str = "") -> str:
     """Motor tool: Kayitli cron islerini listele.
@@ -724,6 +755,7 @@ def _cron_sil(job_id: str = "") -> str:
 
 # ── Motor Kayit ─────────────────────────────────────────────────────
 
+
 def motor_kaydet(motor) -> None:
     """Motor'a cron/scheduler araçlarını kaydeder."""
     motor._plugin_arac_kaydet(
@@ -744,7 +776,8 @@ def motor_kaydet(motor) -> None:
     motor._plugin_arac_kaydet(
         "CRON_SIL",
         _cron_sil,
-        "Cron isini sil. "
-        "Parametre: job_id (str, zorunlu).",
+        "Cron isini sil. " "Parametre: job_id (str, zorunlu).",
     )
-    logger.info("[CronManager] Motor araclari kaydedildi: CRON_LISTE, CRON_EKLE, CRON_SIL")
+    logger.info(
+        "[CronManager] Motor araclari kaydedildi: CRON_LISTE, CRON_EKLE, CRON_SIL"
+    )

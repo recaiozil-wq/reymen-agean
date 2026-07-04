@@ -25,10 +25,10 @@ for bot_dosya in REYDIR.glob("ai_bot_*.json"):
     try:
         with open(bot_dosya, "r", encoding="utf-8") as f:
             data = json.load(f)
-        
+
         eski_prompt = data.get("sistem_prompt", "")
         print(f"ESKI prompt sonu: ...{eski_prompt[-100:]}")
-        
+
         if "ORTAK DURUM DOSYASI" not in eski_prompt:
             data["sistem_prompt"] = eski_prompt + ORTAK_YONLENDIRME
             with open(bot_dosya, "w", encoding="utf-8") as f:

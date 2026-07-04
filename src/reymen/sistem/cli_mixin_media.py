@@ -25,9 +25,9 @@ from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
 
+
 class MixinMedia:
     """ReYMeNCLI Media/Clipboard operations — paste, copy, image, voice."""
-
 
     def _handle_paste_command(self):
         """Handle /paste — explicitly check clipboard for an image.
@@ -45,22 +45,26 @@ class MixinMedia:
             return
 
         from reymen.reymen_cli.clipboard import has_clipboard_image
+
         if has_clipboard_image():
             if self._try_attach_clipboard_image():
                 n = len(self._attached_images)
                 _cprint(f"  📎 Image #{n} attached from clipboard")
             else:
-                _cprint(f"  {_DIM}(>_<) Clipboard has an image but extraction failed{_RST}")
+                _cprint(
+                    f"  {_DIM}(>_<) Clipboard has an image but extraction failed{_RST}"
+                )
         else:
             _cprint(f"  {_DIM}(._.) No image found in clipboard{_RST}")
-
 
     def _handle_copy_command(self, cmd_original: str) -> None:
         """Handle /copy [number] — copy assistant output to clipboard."""
         parts = cmd_original.split(maxsplit=1)
         arg = parts[1].strip() if len(parts) > 1 else ""
 
-        assistant = [m for m in self.conversation_history if m.get("role") == "assistant"]
+        assistant = [
+            m for m in self.conversation_history if m.get("role") == "assistant"
+        ]
         if not assistant:
             _cprint("  Nothing to copy yet.")
             return
@@ -93,12 +97,15 @@ class MixinMedia:
         except Exception as e:
             _cprint(f"  Clipboard copy failed: {e}")
 
-
     def _handle_image_command(self, cmd_original: str):
         """Handle /image <path> — attach a local image file for the next prompt."""
-        raw_args = (cmd_original.split(None, 1)[1].strip() if " " in cmd_original else "")
+        raw_args = cmd_original.split(None, 1)[1].strip() if " " in cmd_original else ""
         if not raw_args:
-            hint = _termux_example_image_path() if _is_termux_environment() else "/path/to/image.png"
+            hint = (
+                _termux_example_image_path()
+                if _is_termux_environment()
+                else "/path/to/image.png"
+            )
             _cprint(f"  {_DIM}Usage: /image <path>  e.g. /image {hint}{_RST}")
             return
 
@@ -108,16 +115,21 @@ class MixinMedia:
             _cprint(f"  {_DIM}(>_<) File not found: {path_token}{_RST}")
             return
         if image_path.suffix.lower() not in _IMAGE_EXTENSIONS:
-            _cprint(f"  {_DIM}(._.) Not a supported image file: {image_path.name}{_RST}")
+            _cprint(
+                f"  {_DIM}(._.) Not a supported image file: {image_path.name}{_RST}"
+            )
             return
 
         self._attached_images.append(image_path)
         _cprint(f"  📎 Attached image: {image_path.name}")
         if _remainder:
-            _cprint(f"  {_DIM}Now type your prompt (or use --image in single-query mode): {_remainder}{_RST}")
+            _cprint(
+                f"  {_DIM}Now type your prompt (or use --image in single-query mode): {_remainder}{_RST}"
+            )
         elif _is_termux_environment():
-            _cprint(f"  {_DIM}Tip: type your next message, or run ReYMeN chat -q --image {_termux_example_image_path(image_path.name)} \"What do you see?\"{_RST}")
-
+            _cprint(
+                f'  {_DIM}Tip: type your next message, or run ReYMeN chat -q --image {_termux_example_image_path(image_path.name)} "What do you see?"{_RST}'
+            )
 
     def _handle_voice_command(self, command: str):
         """Handle /voice [on|off|tts|status] command."""
@@ -143,4 +155,4 @@ class MixinMedia:
             _cprint("Usage: /voice [on|off|tts|status]")
 
 
-__all__ = ['MixinMedia']
+__all__ = ["MixinMedia"]

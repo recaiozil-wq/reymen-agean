@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 # VisionAdapter conversation_loop'dan (opsiyonel — loop baglantisiz da calisir)
 try:
     from reymen.cereyan.conversation_loop import VisionAdapter
+
     VISION_HAZIR = True
 except ImportError:
     VisionAdapter = None
@@ -45,8 +46,8 @@ def motor_kaydet(motor) -> None:
     global _GLOBAL_LOOP_REF
     try:
         # Motor uzerinden conversation_loop'a ulasmaya calis
-        if hasattr(motor, '_provider_ref'):
-            _GLOBAL_LOOP_REF = getattr(motor, '_provider_ref', None)
+        if hasattr(motor, "_provider_ref"):
+            _GLOBAL_LOOP_REF = getattr(motor, "_provider_ref", None)
 
         motor._plugin_arac_kaydet(
             "GORUNTU_ANALIZ",
@@ -85,7 +86,10 @@ def goruntu_analiz_tool(gorsel_yolu: str = "", soru: str = "") -> str:
                 sorgu = f"{gorsel_yolu} {soru}" if gorsel_yolu else soru
                 return adapter._vision_analiz(sorgu)
         except Exception as e:
-            logger.debug("[VisionTools] VisionAdapter baglantisi basarisiz: %s (standalone mod)", e)
+            logger.debug(
+                "[VisionTools] VisionAdapter baglantisi basarisiz: %s (standalone mod)",
+                e,
+            )
 
     # 2. Dosya yolunu/sorguyu hazirla
     if not gorsel_yolu:
@@ -107,8 +111,14 @@ def goruntu_analiz_tool(gorsel_yolu: str = "", soru: str = "") -> str:
                     img_b64 = base64.b64encode(f.read()).decode()
                 # Format belirle
                 ext = os.path.splitext(gorsel_yolu)[1].lower().lstrip(".")
-                mime_map = {"jpg": "jpeg", "jpeg": "jpeg", "png": "png",
-                           "gif": "gif", "webp": "webp", "bmp": "bmp"}
+                mime_map = {
+                    "jpg": "jpeg",
+                    "jpeg": "jpeg",
+                    "png": "png",
+                    "gif": "gif",
+                    "webp": "webp",
+                    "bmp": "bmp",
+                }
                 mime = mime_map.get(ext, "jpeg")
                 resim_url = f"data:image/{mime};base64,{img_b64}"
             else:
@@ -121,19 +131,28 @@ def goruntu_analiz_tool(gorsel_yolu: str = "", soru: str = "") -> str:
                 client = OpenAI(api_key=ds_key, base_url="https://api.deepseek.com")
                 r = client.chat.completions.create(
                     model="deepseek-v4-flash",
-                    messages=[{
-                        "role": "user",
-                        "content": [
-                            {"type": "text", "text": soru_metin},
-                            {"type": "image_url", "image_url": {"url": resim_url}},
-                        ],
-                    }],
+                    messages=[
+                        {
+                            "role": "user",
+                            "content": [
+                                {"type": "text", "text": soru_metin},
+                                {"type": "image_url", "image_url": {"url": resim_url}},
+                            ],
+                        }
+                    ],
                     max_tokens=1024,
                 )
                 content = r.choices[0].message.content
-                return content.strip() if content else "[GORUNTU_ANALIZ] Bos yanit (DeepSeek)"
+                return (
+                    content.strip()
+                    if content
+                    else "[GORUNTU_ANALIZ] Bos yanit (DeepSeek)"
+                )
             except Exception as e:
-                logger.debug("[VisionTools] DeepSeek vision basarisiz: %s (OpenRouter fallback)", e)
+                logger.debug(
+                    "[VisionTools] DeepSeek vision basarisiz: %s (OpenRouter fallback)",
+                    e,
+                )
 
         # 4. Fallback: OpenRouter (Qwen-VL)
         or_key = os.environ.get("OPENROUTER_API_KEY", "")
@@ -145,13 +164,15 @@ def goruntu_analiz_tool(gorsel_yolu: str = "", soru: str = "") -> str:
         client = OpenAI(api_key=or_key, base_url="https://openrouter.ai/api/v1")
         r = client.chat.completions.create(
             model="qwen/qwen-vl-plus:free",
-            messages=[{
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": soru_metin},
-                    {"type": "image_url", "image_url": {"url": resim_url}},
-                ],
-            }],
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": soru_metin},
+                        {"type": "image_url", "image_url": {"url": resim_url}},
+                    ],
+                }
+            ],
             max_tokens=1024,
         )
         content = r.choices[0].message.content
@@ -162,7 +183,9 @@ def goruntu_analiz_tool(gorsel_yolu: str = "", soru: str = "") -> str:
         return f"[GORUNTU_ANALIZ] Hata: {e}"
 
 
-def vision_analiz(gorsel_yolu: str = "", soru: str = "Bu gorseli analiz et.") -> Optional[str]:
+def vision_analiz(
+    gorsel_yolu: str = "", soru: str = "Bu gorseli analiz et."
+) -> Optional[str]:
     """Geriye uyumlu: dogrudan cagrilabilir vision fonksiyonu.
 
     Args:

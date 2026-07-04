@@ -57,20 +57,20 @@ def mcp_tool_listele(sunucu_ad: str = "") -> list[dict]:
     tum = []
     for ad, araclar in yonetici.tum_araclar().items():
         for arac in araclar:
-            tum.append({
-                "sunucu": ad,
-                "name": arac.get("name", "?"),
-                "description": arac.get("description", ""),
-                "inputSchema": arac.get("inputSchema", {}),
-            })
+            tum.append(
+                {
+                    "sunucu": ad,
+                    "name": arac.get("name", "?"),
+                    "description": arac.get("description", ""),
+                    "inputSchema": arac.get("inputSchema", {}),
+                }
+            )
     if sunucu_ad:
         tum = [a for a in tum if a["sunucu"] == sunucu_ad]
     return tum
 
 
-def mcp_tool_cagir(
-    sunucu: str, arac: str, args: Optional[dict] = None
-) -> str:
+def mcp_tool_cagir(sunucu: str, arac: str, args: Optional[dict] = None) -> str:
     """MCP sunucusunda bir aracı çağır.
 
     Args:

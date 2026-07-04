@@ -4,6 +4,7 @@ Verifies the production helper in cli.py monkey-patches prompt_toolkit's
 Vt100Parser.feed() so the parser auto-escapes from bracketed-paste mode when
 the ESC[201~ end mark is never received.
 """
+
 import ast
 import importlib
 import logging
@@ -37,9 +38,9 @@ def _load_production_patch_helper():
         ),
         None,
     )
-    assert helper_node is not None, (
-        "cli.py must define _apply_bracketed_paste_timeout_patch()"
-    )
+    assert (
+        helper_node is not None
+    ), "cli.py must define _apply_bracketed_paste_timeout_patch()"
     helper_source = ast.get_source_segment(source, helper_node)
     namespace = {"time": time, "logger": logging.getLogger("test.cli")}
     exec(helper_source, namespace)

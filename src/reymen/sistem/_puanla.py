@@ -17,13 +17,13 @@ from datetime import datetime, date
 
 # Kaynak güvenilirlik puanları
 KAYNAK_PUAN = {
-    "resmi_dokuman": 1.0,      # PyPI, GitHub resmi, Microsoft docs
-    "stackoverflow": 0.8,      # StackOverflow / GitHub Issues
-    "blog": 0.6,               # Teknik blog
-    "forum": 0.5,              # Forum tartışması
-    "video": 0.7,              # YouTube (doğrulama gerektirir)
-    "llm": 0.4,                # Başka bir LLM'in cevabı
-    "bilinmiyor": 0.3,         # Kaynağı belirsiz
+    "resmi_dokuman": 1.0,  # PyPI, GitHub resmi, Microsoft docs
+    "stackoverflow": 0.8,  # StackOverflow / GitHub Issues
+    "blog": 0.6,  # Teknik blog
+    "forum": 0.5,  # Forum tartışması
+    "video": 0.7,  # YouTube (doğrulama gerektirir)
+    "llm": 0.4,  # Başka bir LLM'in cevabı
+    "bilinmiyor": 0.3,  # Kaynağı belirsiz
 }
 
 # Alan adı → kaynak tipi eşleme
@@ -76,12 +76,12 @@ def guncellik_puan(tarih_str: str = None) -> float:
     """
     if not tarih_str:
         return 0.5  # Tarih yoksa ortalama
-    
+
     try:
         tarih = datetime.strptime(tarih_str[:10], "%Y-%m-%d").date()
         bugun = date.today()
         fark = (bugun - tarih).days
-        
+
         if fark <= 30:
             return 1.0
         elif fark <= 180:  # 6 ay
@@ -132,14 +132,14 @@ def hesapla(
 ) -> dict:
     """
     Ana puanlama fonksiyonu.
-    
+
     Parametreler:
         url: Bilginin kaynak URL'si
         tarih: Bilginin yayın tarihi (YYYY-MM-DD)
         kaynak_sayisi: Kaç farklı kaynak doğruluyor
         oncehafiza_guven: DB'deki mevcut güven (0-1)
         web_icerik_uyum: İçerik uyumu (0-1)
-    
+
     Dönen:
         {
             "puan": float (0-1),
@@ -150,19 +150,19 @@ def hesapla(
     p_guncellik = guncellik_puan(tarih)
     p_kaynak = kaynak_guvenirlik_puan(url)
     p_dogrulama = dogrulama_puan(kaynak_sayisi)
-    
+
     if oncehafiza_guven is not None and web_icerik_uyum is not None:
         p_celiski = celiski_puan(oncehafiza_guven, web_icerik_uyum)
     else:
         p_celiski = 0.5  # Karşılaştırma yoksa nötr
-    
+
     puan = (
-        p_guncellik * agirlik_guncellik +
-        p_kaynak * agirlik_kaynak +
-        p_dogrulama * agirlik_dogrulama +
-        p_celiski * agirlik_celiski
+        p_guncellik * agirlik_guncellik
+        + p_kaynak * agirlik_kaynak
+        + p_dogrulama * agirlik_dogrulama
+        + p_celiski * agirlik_celiski
     )
-    
+
     # Karar
     if puan >= 0.7:
         karar = "kaydet"
@@ -170,7 +170,7 @@ def hesapla(
         karar = "danis"
     else:
         karar = "reddet"
-    
+
     return {
         "puan": round(puan, 3),
         "karar": karar,
@@ -180,7 +180,7 @@ def hesapla(
             "dogrulama": round(p_dogrulama, 3),
             "celiski": round(p_celiski, 3),
             "url": url,
-        }
+        },
     }
 
 
@@ -189,16 +189,22 @@ def karar_aciklamasi(sonuc: dict) -> str:
     puan = sonuc["puan"]
     karar = sonuc["karar"]
     detay = sonuc["detay"]
-    
+
     if karar == "kaydet":
-        return (f"✅ PUAN={puan} → KAYDET (güncellik={detay['guncellik']}, "
-                f"kaynak={detay['kaynak_guven']}, doğrulama={detay['dogrulama']})")
+        return (
+            f"✅ PUAN={puan} → KAYDET (güncellik={detay['guncellik']}, "
+            f"kaynak={detay['kaynak_guven']}, doğrulama={detay['dogrulama']})"
+        )
     elif karar == "danis":
-        return (f"⚠️ PUAN={puan} → DANIŞ (güncellik={detay['guncellik']}, "
-                f"kaynak={detay['kaynak_guven']}, çelişki={detay['celiski']})")
+        return (
+            f"⚠️ PUAN={puan} → DANIŞ (güncellik={detay['guncellik']}, "
+            f"kaynak={detay['kaynak_guven']}, çelişki={detay['celiski']})"
+        )
     else:
-        return (f"❌ PUAN={puan} → REDDET (kaynak={detay['kaynak_guven']}, "
-                f"doğrulama={detay['dogrulama']}, güncellik={detay['guncellik']})")
+        return (
+            f"❌ PUAN={puan} → REDDET (kaynak={detay['kaynak_guven']}, "
+            f"doğrulama={detay['dogrulama']}, güncellik={detay['guncellik']})"
+        )
 
 
 # === TEST ===
@@ -210,8 +216,13 @@ if __name__ == "__main__":
         ("https://random-forum.com/thread", "2023-01-01", 1, None, None),  # Reddet
         ("https://github.com/user/repo", "2026-05-15", 2, 0.5, 0.3),  # Danış (çelişki)
     ]
-    
+
     for url, tarih, ks, og, wu in testler:
-        s = hesapla(url=url, tarih=tarih, kaynak_sayisi=ks, 
-                    oncehafiza_guven=og, web_icerik_uyum=wu)
+        s = hesapla(
+            url=url,
+            tarih=tarih,
+            kaynak_sayisi=ks,
+            oncehafiza_guven=og,
+            web_icerik_uyum=wu,
+        )
         print(karar_aciklamasi(s))

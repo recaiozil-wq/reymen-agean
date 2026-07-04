@@ -21,7 +21,9 @@ def has_xai_credentials() -> bool:
         try:
             store = json.loads(auth_path.read_text())
             providers = store.get("providers", {}) if isinstance(store, dict) else {}
-            xai_state = providers.get("xai-oauth", {}) if isinstance(providers, dict) else {}
+            xai_state = (
+                providers.get("xai-oauth", {}) if isinstance(providers, dict) else {}
+            )
             tokens = xai_state.get("tokens", {}) if isinstance(xai_state, dict) else {}
             access = tokens.get("access_token", "") if isinstance(tokens, dict) else ""
             return bool(str(access or "").strip())

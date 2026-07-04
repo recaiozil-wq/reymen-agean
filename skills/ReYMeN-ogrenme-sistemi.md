@@ -404,7 +404,7 @@ ADIM 2: Mevcut skill ile karsilastir
   Farklari tablo ile goster
 
 ADIM 3: Catisma cozumu — NE YAPILIR?
-  
+
   | Eski bilgi | Yeni bilgi | Karar |
   |:-----------|:-----------|:------|
   | Dogru ama eksik | Detayli | ✅ UPDATE (append) — eskiyi koru, yeni ekle |

@@ -70,10 +70,14 @@ def worker_loop(worker_id: int, ReYMeN_home: str, result_file: str) -> None:
             tid = row["id"]
             try:
                 claimed = kb.claim_task(
-                    conn, tid, claimer=f"worker-{worker_id}",
+                    conn,
+                    tid,
+                    claimer=f"worker-{worker_id}",
                 )
             except sqlite3.OperationalError as e:
-                events.append({"kind": "sqlite_err_on_claim", "task": tid, "err": str(e)})
+                events.append(
+                    {"kind": "sqlite_err_on_claim", "task": tid, "err": str(e)}
+                )
                 continue
             if claimed is None:
                 # Someone else beat us — expected contention, not an error.
@@ -81,34 +85,41 @@ def worker_loop(worker_id: int, ReYMeN_home: str, result_file: str) -> None:
                 continue
 
             run = kb.latest_run(conn, tid)
-            events.append({
-                "kind": "claimed",
-                "task": tid,
-                "worker": worker_id,
-                "run_id": run.id,
-                "t": time.monotonic() - start,
-            })
+            events.append(
+                {
+                    "kind": "claimed",
+                    "task": tid,
+                    "worker": worker_id,
+                    "run_id": run.id,
+                    "t": time.monotonic() - start,
+                }
+            )
 
             # Simulate short, variable work
             time.sleep(random.uniform(0.001, 0.05))
 
             try:
                 kb.complete_task(
-                    conn, tid,
+                    conn,
+                    tid,
                     result=f"done by worker-{worker_id}",
                     summary=f"worker-{worker_id} finished task {tid}",
                     metadata={"worker_id": worker_id, "run_id": run.id},
                 )
             except sqlite3.OperationalError as e:
-                events.append({"kind": "sqlite_err_on_complete", "task": tid, "err": str(e)})
+                events.append(
+                    {"kind": "sqlite_err_on_complete", "task": tid, "err": str(e)}
+                )
                 continue
-            events.append({
-                "kind": "completed",
-                "task": tid,
-                "worker": worker_id,
-                "run_id": run.id,
-                "t": time.monotonic() - start,
-            })
+            events.append(
+                {
+                    "kind": "completed",
+                    "task": tid,
+                    "worker": worker_id,
+                    "run_id": run.id,
+                    "t": time.monotonic() - start,
+                }
+            )
         finally:
             conn.close()
 
@@ -131,7 +142,9 @@ def main():
     tids = []
     for i in range(NUM_TASKS):
         tid = kb.create_task(
-            conn, title=f"task #{i}", assignee="shared",
+            conn,
+            title=f"task #{i}",
+            assignee="shared",
             tenant="concurrency-test",
         )
         tids.append(tid)
@@ -252,9 +265,7 @@ def main():
             )
 
         # Check 6: count SQLite errors that escaped retry
-        sqlite_errs = sum(
-            1 for e in all_events if e["kind"].startswith("sqlite_err")
-        )
+        sqlite_errs = sum(1 for e in all_events if e["kind"].startswith("sqlite_err"))
         if sqlite_errs > 0:
             failures.append(f"UNRETRIED SQLITE ERRORS: {sqlite_errs}")
 

@@ -107,7 +107,10 @@ async def test_reload_mcp_refreshes_cached_agent_tools():
 
     with (
         patch("tools.mcp_tool.shutdown_mcp_servers"),
-        patch("tools.mcp_tool.discover_mcp_tools", return_value=["HassTurnOn", "HassTurnOff"]),
+        patch(
+            "tools.mcp_tool.discover_mcp_tools",
+            return_value=["HassTurnOn", "HassTurnOff"],
+        ),
         patch.dict("tools.mcp_tool._servers", {"homeassistant": object()}, clear=True),
         patch("model_tools.get_tool_definitions", return_value=fresh_tool_defs),
     ):
@@ -119,12 +122,12 @@ async def test_reload_mcp_refreshes_cached_agent_tools():
     # Every cached agent has fresh tools and the matching valid_tool_names.
     expected_names = {"HassTurnOn", "HassTurnOff"}
     for key, (agent, _sig) in runner._agent_cache.items():
-        assert agent.tools == fresh_tool_defs, (
-            f"Agent {key} kept stale tools: {agent.tools} != {fresh_tool_defs}"
-        )
-        assert agent.valid_tool_names == expected_names, (
-            f"Agent {key} kept stale valid_tool_names: {agent.valid_tool_names}"
-        )
+        assert (
+            agent.tools == fresh_tool_defs
+        ), f"Agent {key} kept stale tools: {agent.tools} != {fresh_tool_defs}"
+        assert (
+            agent.valid_tool_names == expected_names
+        ), f"Agent {key} kept stale valid_tool_names: {agent.valid_tool_names}"
         # Sanity check that the swap actually changed something.
         assert agent.tools != pre_reload_tools[key]
 
@@ -167,7 +170,10 @@ async def test_reload_mcp_preserves_per_agent_toolset_overrides():
         patch("tools.mcp_tool.shutdown_mcp_servers"),
         patch("tools.mcp_tool.discover_mcp_tools", return_value=["refreshed"]),
         patch.dict("tools.mcp_tool._servers", {"homeassistant": object()}, clear=True),
-        patch("model_tools.get_tool_definitions", side_effect=_capture_get_tool_definitions),
+        patch(
+            "model_tools.get_tool_definitions",
+            side_effect=_capture_get_tool_definitions,
+        ),
     ):
         await runner._execute_mcp_reload(_make_event())
 

@@ -60,6 +60,7 @@ _FTS_TEMIZLE = re.compile(r"[^\w\s]", re.UNICODE)
 # Module-level yardimci fonksiyonlar (harici import gerektirmez)
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 def _guvenli_ad(ad: str) -> str:
     """Dosya sistemi icin guvenli, unicode-safe isim uret."""
     try:
@@ -80,8 +81,7 @@ def _fts5_token(metin: str) -> str:
     """
     temiz = _FTS_TEMIZLE.sub(" ", metin).strip()
     tokenlar = [
-        t for t in temiz.split()
-        if t.lower() not in ("and", "or", "not", "near")
+        t for t in temiz.split() if t.lower() not in ("and", "or", "not", "near")
     ]
     if not tokenlar:
         return ""
@@ -132,6 +132,7 @@ def _frontmatter_deger_guncelle(metin: str, anahtar: str, deger: str | int) -> s
 # ─────────────────────────────────────────────────────────────────────────────
 # Ana sinif
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 class ClosedLearningLoop:
     """
@@ -195,7 +196,9 @@ class ClosedLearningLoop:
                     con.execute("SELECT kaynak FROM beceriler LIMIT 1")
                 except sqlite3.OperationalError:
                     con.execute("DROP TABLE IF EXISTS beceriler")
-                    logger.warning("[Beceri] Eski tablo yeniden olusturuluyor (kaynak kolonu eksikti).")
+                    logger.warning(
+                        "[Beceri] Eski tablo yeniden olusturuluyor (kaynak kolonu eksikti)."
+                    )
 
             con.executescript(
                 "CREATE VIRTUAL TABLE IF NOT EXISTS beceriler USING fts5("
@@ -221,7 +224,9 @@ class ClosedLearningLoop:
                 for dosya in sorted(dizin.rglob("*.md")):
                     ad, aciklama, icerik = self._md_ayristir(dosya)
                     try:
-                        anahtar = str(dosya.relative_to(dizin).with_suffix("")).replace("\\", "/")
+                        anahtar = str(dosya.relative_to(dizin).with_suffix("")).replace(
+                            "\\", "/"
+                        )
                     except ValueError:
                         anahtar = f"{dizin.name}/{ad}"
 
@@ -286,7 +291,7 @@ class ClosedLearningLoop:
             if norm.startswith("---"):
                 idx = norm.find("\n---", 3)
                 if idx != -1:
-                    govde = norm[idx + 4:]
+                    govde = norm[idx + 4 :]
             m2 = re.search(r"^#\s+(.+)$", govde, re.MULTILINE)
             if m2:
                 ad = m2.group(1).strip()
@@ -303,7 +308,7 @@ class ClosedLearningLoop:
             if norm.startswith("---"):
                 idx = norm.find("\n---", 3)
                 if idx != -1:
-                    govde = norm[idx + 4:]
+                    govde = norm[idx + 4 :]
             for s in govde.splitlines():
                 s = s.strip()
                 if s and not s.startswith("#"):
@@ -367,7 +372,9 @@ class ClosedLearningLoop:
                     (fts_sorgu, adet),
                 ).fetchall()
             except sqlite3.OperationalError as e:
-                logger.debug("[Beceri] FTS5 hatasi (%s), LIKE fallback: %s", fts_sorgu, e)
+                logger.debug(
+                    "[Beceri] FTS5 hatasi (%s), LIKE fallback: %s", fts_sorgu, e
+                )
 
             like = f"%{_FTS_TEMIZLE.sub(' ', sorgu).strip()}%"
             try:
@@ -483,11 +490,15 @@ class ClosedLearningLoop:
 
         # usage_count guncelle
         try:
-            yeni_sayi = int(_frontmatter_deger_al(mevcut_icerik, "usage_count") or "1") + 1
+            yeni_sayi = (
+                int(_frontmatter_deger_al(mevcut_icerik, "usage_count") or "1") + 1
+            )
         except ValueError:
             yeni_sayi = 2
 
-        yeni_icerik = _frontmatter_deger_guncelle(mevcut_icerik, "usage_count", yeni_sayi)
+        yeni_icerik = _frontmatter_deger_guncelle(
+            mevcut_icerik, "usage_count", yeni_sayi
+        )
         yeni_icerik = _frontmatter_deger_guncelle(
             yeni_icerik, "last_used", datetime.now().strftime("%Y-%m-%d")
         )
@@ -511,7 +522,12 @@ class ClosedLearningLoop:
             except sqlite3.Error as e:
                 logger.error("[Beceri] FTS5 guncelleme hatasi: %s", e)
 
-        logger.info("[Beceri] Merge edildi: %s -> %s (usage_count=%d)", beceri_adi, yol, yeni_sayi)
+        logger.info(
+            "[Beceri] Merge edildi: %s -> %s (usage_count=%d)",
+            beceri_adi,
+            yol,
+            yeni_sayi,
+        )
         return str(yol)
 
     def _yeni_beceri_olustur(
@@ -523,7 +539,9 @@ class ClosedLearningLoop:
         """Self-contained yeni beceri dosyasi olustur (harici import yok)."""
         yol = Path(self.skills_dir) / f"{_guvenli_ad(beceri_adi)}.md"
         try:
-            yol.write_text(_beceri_md_olustur(beceri_adi, aciklama, adimlar), encoding="utf-8")
+            yol.write_text(
+                _beceri_md_olustur(beceri_adi, aciklama, adimlar), encoding="utf-8"
+            )
         except OSError as e:
             logger.error("[Beceri] Dosya yazma hatasi (%s): %s", yol, e)
             return ""
@@ -651,7 +669,9 @@ class ClosedLearningLoop:
 
         # Web'de ara (DuckDuckGo üzerinden)
         try:
-            query = urllib.parse.quote(f"best practice {focus} coding tutorial 2025 2026")
+            query = urllib.parse.quote(
+                f"best practice {focus} coding tutorial 2025 2026"
+            )
             url = f"https://html.duckduckgo.com/html/?q={query}"
             req = urllib.request.Request(
                 url,
@@ -672,12 +692,14 @@ class ClosedLearningLoop:
                     if baslik and not any(
                         x in link for x in (".js", ".css", "pixel", "analytics")
                     ):
-                        sonuclar.append({
-                            "name": baslik[:80],
-                            "code": "",
-                            "source_url": link,
-                            "summary": f"Web'de bulundu: {baslik[:100]}",
-                        })
+                        sonuclar.append(
+                            {
+                                "name": baslik[:80],
+                                "code": "",
+                                "source_url": link,
+                                "summary": f"Web'de bulundu: {baslik[:100]}",
+                            }
+                        )
                     if len(sonuclar) >= 5:
                         break
         except Exception as e:
@@ -685,12 +707,14 @@ class ClosedLearningLoop:
 
         # Fallback: temel yöntem
         if not sonuclar:
-            sonuclar.append({
-                "name": f"varsayilan_{focus}",
-                "code": f"# {focus} icin temel cozum\npass",
-                "source_url": "",
-                "summary": f"Varsayilan {focus} yontemi",
-            })
+            sonuclar.append(
+                {
+                    "name": f"varsayilan_{focus}",
+                    "code": f"# {focus} icin temel cozum\npass",
+                    "source_url": "",
+                    "summary": f"Varsayilan {focus} yontemi",
+                }
+            )
 
         logger.info("[SelfImprove] %d yontem bulundu", len(sonuclar))
         return sonuclar
@@ -750,8 +774,8 @@ class ClosedLearningLoop:
         try:
             compile(code, "<sandbox>", "exec")
             # Skor: yöntemin adı ne kadar açıklayıcıysa o kadar yüksek
-            name = (new_method.get("name", "") or "")
-            kaynak = (new_method.get("source_url", "") or "")
+            name = new_method.get("name", "") or ""
+            kaynak = new_method.get("source_url", "") or ""
             skor = 5.0
             if name:
                 skor += 2.0
@@ -773,9 +797,9 @@ class ClosedLearningLoop:
             Oluşturulan dosya yolu.
         """
         name = (method.get("name", "self_improved") or "self_improved")[:60]
-        summary = (method.get("summary", "") or "")
-        source = (method.get("source_url", "") or "")
-        kod = (method.get("code", "") or "")
+        summary = method.get("summary", "") or ""
+        source = method.get("source_url", "") or ""
+        kod = method.get("code", "") or ""
 
         aciklama = (
             f"[SelfImprove] Skor: {score}/10"
@@ -797,7 +821,9 @@ class ClosedLearningLoop:
         logger.info("[SelfImprove] Skill kaydedildi: %s (skor=%s)", yol, score)
         return yol
 
-    def run_forever(self, cycle_hours: int = 24, test_mode: bool = False, max_test_iter: int = 672) -> None:
+    def run_forever(
+        self, cycle_hours: int = 24, test_mode: bool = False, max_test_iter: int = 672
+    ) -> None:
         """Ana kendini geliştirme döngüsü.
 
         1. Kendini gözlemle
@@ -812,14 +838,21 @@ class ClosedLearningLoop:
             test_mode: True ise hiç beklemez, iterasyonları hızlıca tamamlar.
             max_test_iter: Test modunda maksimum iterasyon (varsayılan 672 = 7 gün).
         """
-        logger.info("[SelfImprove] Meta-dongu basladi (cycle=%dh, test_mode=%s, max_iter=%d)", cycle_hours, test_mode, max_test_iter)
+        logger.info(
+            "[SelfImprove] Meta-dongu basladi (cycle=%dh, test_mode=%s, max_iter=%d)",
+            cycle_hours,
+            test_mode,
+            max_test_iter,
+        )
         max_iter = max_test_iter if test_mode else 0
 
         iter_sayisi = 0
         while True:
             iter_sayisi += 1
             if test_mode and iter_sayisi > max_iter:
-                logger.info("[SelfImprove] Test modu tamamlandi: %d iterasyon", max_iter)
+                logger.info(
+                    "[SelfImprove] Test modu tamamlandi: %d iterasyon", max_iter
+                )
                 break
             # 1. Kendini gözlemle
             state = self.observe_self()
@@ -856,14 +889,18 @@ class ClosedLearningLoop:
                     logger.info("[SelfImprove] ✅ Yeni skill eklendi: %s", focus)
 
             elif decision == "DAHA_FAZLA_ARAŞTIR":
-                logger.info("[SelfImprove] ⏳ Eklendi: bekleme listesine alindi: %s", focus)
+                logger.info(
+                    "[SelfImprove] ⏳ Eklendi: bekleme listesine alindi: %s", focus
+                )
 
             elif decision == "REDDET":
                 logger.info("[SelfImprove] ⏭ Reddedildi: %s", focus)
 
             # 6. 24 saat bekle (test_mode'de atla)
             if test_mode:
-                logger.info("[SelfImprove] ✅ Test iterasyon %d/%d tamam", iter_sayisi, max_iter)
+                logger.info(
+                    "[SelfImprove] ✅ Test iterasyon %d/%d tamam", iter_sayisi, max_iter
+                )
                 continue  # hiç beklemeden sonraki iterasyon
             logger.info("[SelfImprove] Bekleniyor (%d saat)...", cycle_hours)
             time.sleep(cycle_hours * 3600)
@@ -889,20 +926,22 @@ if __name__ == "__main__":
 
         # Test 1: Yeni beceri
         yol1 = loop.beceri_kristallestir(
-            "web_scraping", "Web sayfasi icerik cekme",
-            "1. requests.get(url)\n2. BeautifulSoup parse\n3. Veri ayristir"
+            "web_scraping",
+            "Web sayfasi icerik cekme",
+            "1. requests.get(url)\n2. BeautifulSoup parse\n3. Veri ayristir",
         )
         assert yol1, "Test 1 FAIL"
         print(f"[Test 1] Yeni: {yol1} | Toplam: {loop.toplam_beceri_sayisi()}")
 
         # Test 2: Merge (ayni isim, farkli token)
         yol2 = loop.beceri_kristallestir(
-            "web scraping", "Web scraping varyasyon",
-            "4. async await\n5. rate limit"
+            "web scraping", "Web scraping varyasyon", "4. async await\n5. rate limit"
         )
         assert yol2, "Test 2 FAIL"
         assert yol1 == yol2, f"Test 2 FAIL: merge olmadi ({yol1} != {yol2})"
-        print(f"[Test 2] Merge: OK | Toplam: {loop.toplam_beceri_sayisi()} (degismemeli)")
+        print(
+            f"[Test 2] Merge: OK | Toplam: {loop.toplam_beceri_sayisi()} (degismemeli)"
+        )
 
         # Test 3: Baglam sorgusu
         baglam = loop.beceri_baglamini_al("web scraping")
@@ -911,20 +950,28 @@ if __name__ == "__main__":
 
         # Test 4: Karakter siniri
         for i in range(8):
-            loop.beceri_kristallestir(f"beceri_{i}", "x" * 500, "\n".join(f"{j}." for j in range(50)))
+            loop.beceri_kristallestir(
+                f"beceri_{i}", "x" * 500, "\n".join(f"{j}." for j in range(50))
+            )
         b2 = loop.beceri_baglamini_al("beceri", adet=6)
-        assert len(b2) <= MAKS_BAGLAM_KARAKTER, f"Test 4 FAIL: {len(b2)} > {MAKS_BAGLAM_KARAKTER}"
+        assert (
+            len(b2) <= MAKS_BAGLAM_KARAKTER
+        ), f"Test 4 FAIL: {len(b2)} > {MAKS_BAGLAM_KARAKTER}"
         print(f"[Test 4] Sinir: {len(b2)} char — OK")
 
         # Test 5: Yapisal cikti (LLM agent)
         sonuclar = loop.beceri_baglamini_al_yapisal("web scraping", adet=2)
-        assert isinstance(sonuclar, list) and all("ad" in s for s in sonuclar), "Test 5 FAIL"
+        assert isinstance(sonuclar, list) and all(
+            "ad" in s for s in sonuclar
+        ), "Test 5 FAIL"
         print(f"[Test 5] Yapisal: {sonuclar}")
 
         # Test 6: SQL injection safety
         loop.beceri_baglamini_al("'; DROP TABLE beceriler; --")
         assert loop.toplam_beceri_sayisi() > 0, "Test 6 FAIL: injection!"
-        print(f"[Test 6] Injection safety: OK ({loop.toplam_beceri_sayisi()} beceri hala var)")
+        print(
+            f"[Test 6] Injection safety: OK ({loop.toplam_beceri_sayisi()} beceri hala var)"
+        )
 
         loop.kapat()
         print(f"\n✓ Tum testler gecti. Son: {loop.toplam_beceri_sayisi()} beceri")
@@ -987,7 +1034,9 @@ def motor_kaydet(motor: object):
     if hasattr(motor, "_plugin_arac_kaydet"):
         motor._plugin_arac_kaydet(
             "BECERI_KRISTALLESTIR",
-            lambda ad="", aciklama="", adimlar="": _beceri_kristallestir(ad, aciklama, adimlar),
+            lambda ad="", aciklama="", adimlar="": _beceri_kristallestir(
+                ad, aciklama, adimlar
+            ),
             "Gorev sonrasi kazanimi beceri karti olarak kristallestirir. Beceri adi, aciklama ve adimlar gerekli.",
         )
         motor._plugin_arac_kaydet(

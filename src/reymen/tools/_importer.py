@@ -6,6 +6,7 @@ shim'lerinin kullanılmasını sağlar.
 Kullanım (herhangi bir entry point'te bir kere):
     import reymen.tools._importer  # otomatik hook kurar
 """
+
 from __future__ import annotations
 
 import importlib

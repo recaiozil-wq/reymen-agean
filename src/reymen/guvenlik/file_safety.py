@@ -33,14 +33,28 @@ YASAK_DIZINLER = [
 
 # Yasal dosya uzantilari (sistem dosyalari)
 YASAK_UZANTILAR = [
-    ".exe", ".dll", ".sys", ".bin", ".msi", ".bat",
-    ".cmd", ".ps1", ".vbs", ".scr", ".com",
+    ".exe",
+    ".dll",
+    ".sys",
+    ".bin",
+    ".msi",
+    ".bat",
+    ".cmd",
+    ".ps1",
+    ".vbs",
+    ".scr",
+    ".com",
 ]
 
 # Kritik dosya adlari
 YASAK_DOSYALAR = [
-    "boot.ini", "ntldr", "ntdetect.com", "pagefile.sys",
-    "hiberfil.sys", "swapfile.sys", "config.db",
+    "boot.ini",
+    "ntldr",
+    "ntdetect.com",
+    "pagefile.sys",
+    "hiberfil.sys",
+    "swapfile.sys",
+    "config.db",
 ]
 
 

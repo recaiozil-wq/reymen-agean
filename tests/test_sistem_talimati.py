@@ -27,6 +27,7 @@ from sistem_talimati import (
 # TEMEL TESTLER
 # ============================================================
 
+
 class TestTemel:
     """En temel davranis testleri."""
 
@@ -236,6 +237,7 @@ class TestTumParametreler:
 # KAPSAYICI TESTLER
 # ============================================================
 
+
 class TestKapsayici:
     """Prompt icerigi ve yapisi testleri."""
 
@@ -377,6 +379,7 @@ class TestPromptYapisi:
 # ============================================================
 # GERILEME TESTLERI
 # ============================================================
+
 
 class TestGerileme:
     """Daha once calisan davranislarin korundugunu dogrular."""

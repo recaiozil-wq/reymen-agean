@@ -29,13 +29,20 @@ from typing import Any
 logger = logging.getLogger(__name__)
 
 __all__ = [
-    "QualityMetric", "QualityReport",
-    "evaluate", "suggest_fix",
-    "SelfImprover", "ImprovementGoal",
-    "record_step", "record_step_with_cost",
-    "report", "reset_history",
-    "auto_improve_cycle", "kod_kalite_analizi",
-    "kod_kalite_gecmisi", "conversation_loop_hook",
+    "QualityMetric",
+    "QualityReport",
+    "evaluate",
+    "suggest_fix",
+    "SelfImprover",
+    "ImprovementGoal",
+    "record_step",
+    "record_step_with_cost",
+    "report",
+    "reset_history",
+    "auto_improve_cycle",
+    "kod_kalite_analizi",
+    "kod_kalite_gecmisi",
+    "conversation_loop_hook",
 ]
 
 # ── SQLite yolu ─────────────────────────────────────────────────────────
@@ -104,9 +111,11 @@ def _db_init() -> None:
 
 # ── Data Classes ────────────────────────────────────────────────────────
 
+
 @dataclass
 class QualityMetric:
     """Tek bir çözüm adımının kalite metrikleri."""
+
     success: bool
     errors: int = 0
     retries: int = 0
@@ -123,6 +132,7 @@ class QualityMetric:
 @dataclass
 class QualityReport:
     """Kalite değerlendirme raporu."""
+
     score: float
     grade: str
     issues: list[str] = field(default_factory=list)
@@ -145,6 +155,7 @@ class QualityReport:
 @dataclass
 class ImprovementGoal:
     """İyileştirme hedefi."""
+
     metric_name: str
     current_val: float = 0.0
     target_val: float = 0.0
@@ -158,6 +169,7 @@ class ImprovementGoal:
 
 
 # ── Değerlendirme ──────────────────────────────────────────────────────
+
 
 def _grade_for(score: float) -> str:
     if score >= 0.9:
@@ -221,11 +233,17 @@ def suggest_fix(metric: QualityMetric) -> list[str]:
     if not metric.success:
         suggestions.append("Adım başarısız — hata loglarını inceleyip kök nedeni bul.")
     if metric.errors >= 3:
-        suggestions.append("Çok hata var — input validasyonu ve hata yakalama (try/except) ekle.")
+        suggestions.append(
+            "Çok hata var — input validasyonu ve hata yakalama (try/except) ekle."
+        )
     if metric.retries >= 3:
-        suggestions.append("Çok yeniden deneme — backoff stratejisi veya farklı yaklaşım dene.")
+        suggestions.append(
+            "Çok yeniden deneme — backoff stratejisi veya farklı yaklaşım dene."
+        )
     if metric.duration > 30.0:
-        suggestions.append("Yavaş adım — paralelleştirme, önbellekleme veya batch işlem düşün.")
+        suggestions.append(
+            "Yavaş adım — paralelleştirme, önbellekleme veya batch işlem düşün."
+        )
     if metric.tokens_used > 10_000:
         suggestions.append("Yüksek token kullanımı — prompt'u kısalt veya özetle.")
     if not suggestions:
@@ -234,6 +252,7 @@ def suggest_fix(metric: QualityMetric) -> list[str]:
 
 
 # ── SelfImprover (SQLite destekli) ──────────────────────────────────────
+
 
 class SelfImprover:
     """Adım geçmişini SQLite'da tutar, trend analizi yapar, hedef belirler."""
@@ -334,7 +353,9 @@ class SelfImprover:
                     "SELECT score FROM metrics WHERE timestamp >= ? AND timestamp < ?",
                     (bas, bit),
                 ).fetchall()
-            ortalama = round(sum(r["score"] for r in rows) / len(rows), 3) if rows else 0.0
+            ortalama = (
+                round(sum(r["score"] for r in rows) / len(rows), 3) if rows else 0.0
+            )
             hafta_adi = datetime.fromtimestamp(bas).strftime("%d.%m")
             sonuc.append({"hafta": hafta_adi, "ortalama": ortalama, "adim": len(rows)})
         return list(reversed(sonuc))
@@ -361,7 +382,8 @@ class SelfImprover:
         if len(error_adimlari) >= 3:
             hedef = ImprovementGoal(
                 metric_name="hata_sayisi",
-                current_val=sum(r["errors"] for r in error_adimlari) / len(error_adimlari),
+                current_val=sum(r["errors"] for r in error_adimlari)
+                / len(error_adimlari),
                 target_val=1.0,
                 strategy="try/except ekle, input dogrulamasi yap",
                 notes=f"Son 7 günde {len(error_adimlari)} adım yüksek hatalı",
@@ -370,7 +392,8 @@ class SelfImprover:
         elif len(retry_adimlari) >= 3:
             hedef = ImprovementGoal(
                 metric_name="retry_sayisi",
-                current_val=sum(r["retries"] for r in retry_adimlari) / len(retry_adimlari),
+                current_val=sum(r["retries"] for r in retry_adimlari)
+                / len(retry_adimlari),
                 target_val=1.0,
                 strategy="backoff stratejisi ekle, alternatif cozum dene",
                 notes=f"Son 7 günde {len(retry_adimlari)} adım yüksek retry'li",
@@ -379,7 +402,8 @@ class SelfImprover:
         elif len(sure_adimlari) >= 2:
             hedef = ImprovementGoal(
                 metric_name="sure",
-                current_val=sum(r["duration"] for r in sure_adimlari) / len(sure_adimlari),
+                current_val=sum(r["duration"] for r in sure_adimlari)
+                / len(sure_adimlari),
                 target_val=15.0,
                 strategy="paralellestir, cache ekle",
                 notes=f"Son 7 günde {len(sure_adimlari)} adım yavaş",
@@ -404,8 +428,14 @@ class SelfImprover:
                         """INSERT INTO improvement_goals
                            (created_at, metric_name, current_val, target_val, status, strategy, notes)
                            VALUES (?, ?, ?, ?, 'active', ?, ?)""",
-                        (hedef.created_at, hedef.metric_name, hedef.current_val,
-                         hedef.target_val, hedef.strategy, hedef.notes),
+                        (
+                            hedef.created_at,
+                            hedef.metric_name,
+                            hedef.current_val,
+                            hedef.target_val,
+                            hedef.strategy,
+                            hedef.notes,
+                        ),
                     )
         return hedef
 
@@ -505,6 +535,7 @@ if __name__ == "__main__":
 
 # ── Kod Kalite Analizi ──────────────────────────────────────────────────
 
+
 def kod_kalite_analizi(proje_yolu: str | None = None) -> dict[str, Any]:
     """Proje kod tabanını tarar, kalite metriklerini çıkarır.
 
@@ -519,7 +550,9 @@ def kod_kalite_analizi(proje_yolu: str | None = None) -> dict[str, Any]:
         default = Path(__file__).parent.parent  # src/
         if (default / "durum.json").exists() or (default / ".git").exists():
             proje_yolu = str(default)
-        elif (default.parent / "durum.json").exists() or (default.parent / ".git").exists():
+        elif (default.parent / "durum.json").exists() or (
+            default.parent / ".git"
+        ).exists():
             proje_yolu = str(default.parent)
         else:
             proje_yolu = str(default)
@@ -528,16 +561,33 @@ def kod_kalite_analizi(proje_yolu: str | None = None) -> dict[str, Any]:
     py_dosyalari = list(kok.rglob("*.py"))
 
     # Gizli, __pycache__, venv klasörlerini atla
-    EXCLUDE = {".git", "__pycache__", ".venv", "venv", ".env",
-               "node_modules", ".ReYMeN", ".cron_logs", ".alt_ajan_gozlem",
-               "bot_venv", "reymen_venv", "ReYMeN_cli",
-               "hermes-memory-backup", "ReYMeN-memory-backup",
-               "_claude_multi_output", ".yedek", "Lib", "site-packages",
-               ".tbench-testing"}
+    EXCLUDE = {
+        ".git",
+        "__pycache__",
+        ".venv",
+        "venv",
+        ".env",
+        "node_modules",
+        ".ReYMeN",
+        ".cron_logs",
+        ".alt_ajan_gozlem",
+        "bot_venv",
+        "reymen_venv",
+        "ReYMeN_cli",
+        "hermes-memory-backup",
+        "ReYMeN-memory-backup",
+        "_claude_multi_output",
+        ".yedek",
+        "Lib",
+        "site-packages",
+        ".tbench-testing",
+    }
     py_dosyalari = [
-        p for p in py_dosyalari
-        if not any(part.startswith(".") or part in EXCLUDE
-                   for part in p.relative_to(kok).parts)
+        p
+        for p in py_dosyalari
+        if not any(
+            part.startswith(".") or part in EXCLUDE for part in p.relative_to(kok).parts
+        )
     ]
 
     toplam_satir = 0
@@ -555,7 +605,9 @@ def kod_kalite_analizi(proje_yolu: str | None = None) -> dict[str, Any]:
             toplam_satir += len(satirlar)
 
             # except:pass
-            except_pass_sayisi += len(re.findall(r"except\s*.*:\s*\n\s*pass", icerik, re.MULTILINE))
+            except_pass_sayisi += len(
+                re.findall(r"except\s*.*:\s*\n\s*pass", icerik, re.MULTILINE)
+            )
 
             # TODO / FIXME
             todo_sayisi += len(re.findall(r"#\s*TODO", icerik, re.IGNORECASE))
@@ -563,7 +615,9 @@ def kod_kalite_analizi(proje_yolu: str | None = None) -> dict[str, Any]:
 
             # class / def
             sinif_sayisi += len(re.findall(r"^\s*class\s+\w+", icerik, re.MULTILINE))
-            fonk_sayisi += len(re.findall(r"^\s*(?:async\s+)?def\s+\w+", icerik, re.MULTILINE))
+            fonk_sayisi += len(
+                re.findall(r"^\s*(?:async\s+)?def\s+\w+", icerik, re.MULTILINE)
+            )
 
         except Exception:
             import_hatalari += 1
@@ -588,7 +642,9 @@ def kod_kalite_analizi(proje_yolu: str | None = None) -> dict[str, Any]:
         "except_pass": except_pass_sayisi,
         "todo": todo_sayisi,
         "fixme": fixme_sayisi,
-        "ortalama_dosya_boyut": round(toplam_satir / len(py_dosyalari), 1) if py_dosyalari else 0,
+        "ortalama_dosya_boyut": round(toplam_satir / len(py_dosyalari), 1)
+        if py_dosyalari
+        else 0,
         "import_hatali": import_hatalari,
     }
 
@@ -631,6 +687,7 @@ def kod_kalite_gecmisi(limit: int = 10) -> list[dict]:
 
 
 # ── Aktif iyileştirme döngüsü ─────────────────────────────────────────
+
 
 def auto_improve_cycle(proje_yolu: str | None = None) -> dict[str, Any]:
     """Tam iyileştirme döngüsü: kod tara → metrik çıkar → hedef belirle → öneri üret.
@@ -675,6 +732,7 @@ def auto_improve_cycle(proje_yolu: str | None = None) -> dict[str, Any]:
 
 
 # ── conversation_loop entegrasyonu ─────────────────────────────────────
+
 
 def conversation_loop_hook(**kwargs) -> None:
     """conversation_loop'dan çağrılacak hook.
@@ -727,6 +785,7 @@ def record_step_with_cost(
     step_name: str = "",
 ) -> QualityReport:
     from . import cost_tracker
+
     cost_tracker.record_usage(
         model=model,
         prompt_tokens=prompt_tokens,
@@ -746,22 +805,40 @@ def record_step_with_cost(
 
 # ── Motor Kaydı ────────────────────────────────────────────────────────
 
+
 def motor_kaydet(motor) -> None:
     """Motor'a self-improvement araçlarını kaydet."""
-    motor._plugin_arac_kaydet("SELF_IMPROVE_REPORT", _tool_report,
-                              "Self-improvement trend raporu (SQLite kalici).")
-    motor._plugin_arac_kaydet("SELF_IMPROVE_SUGGEST", _tool_suggest,
-                              "Dusuk kaliteli adimlar icin iyilestirme onerileri + hedef.")
-    motor._plugin_arac_kaydet("SELF_IMPROVE_RECORD", _tool_record,
-                              "Kalite metriklerini kaydet: success, step_name, errors, retries, duration, tokens_used")
-    motor._plugin_arac_kaydet("SELF_IMPROVE_RESET", _tool_reset,
-                              "Self-improvement gecmisini temizle.")
-    motor._plugin_arac_kaydet("SELF_IMPROVE_CYCLE", _tool_cycle,
-                              "Tam iyilestirme dongusu: kod tara + metrik + hedef + oneri.")
-    motor._plugin_arac_kaydet("SELF_IMPROVE_GOALS", _tool_goals,
-                              "Aktif iyilestirme hedeflerini listele.")
-    motor._plugin_arac_kaydet("KOD_KALITE_ANALIZI", _tool_kalite,
-                              "Proje kod tabanini tara, kalite metriklerini cikar.")
+    motor._plugin_arac_kaydet(
+        "SELF_IMPROVE_REPORT",
+        _tool_report,
+        "Self-improvement trend raporu (SQLite kalici).",
+    )
+    motor._plugin_arac_kaydet(
+        "SELF_IMPROVE_SUGGEST",
+        _tool_suggest,
+        "Dusuk kaliteli adimlar icin iyilestirme onerileri + hedef.",
+    )
+    motor._plugin_arac_kaydet(
+        "SELF_IMPROVE_RECORD",
+        _tool_record,
+        "Kalite metriklerini kaydet: success, step_name, errors, retries, duration, tokens_used",
+    )
+    motor._plugin_arac_kaydet(
+        "SELF_IMPROVE_RESET", _tool_reset, "Self-improvement gecmisini temizle."
+    )
+    motor._plugin_arac_kaydet(
+        "SELF_IMPROVE_CYCLE",
+        _tool_cycle,
+        "Tam iyilestirme dongusu: kod tara + metrik + hedef + oneri.",
+    )
+    motor._plugin_arac_kaydet(
+        "SELF_IMPROVE_GOALS", _tool_goals, "Aktif iyilestirme hedeflerini listele."
+    )
+    motor._plugin_arac_kaydet(
+        "KOD_KALITE_ANALIZI",
+        _tool_kalite,
+        "Proje kod tabanini tara, kalite metriklerini cikar.",
+    )
     logger.info("[SELF_IMPROVE] Motor'a 7 arac kaydedildi")
 
 
@@ -779,18 +856,28 @@ def _tool_suggest(**kw) -> str:
     return "[SELF_IMPROVE] Oneriler:\n" + "\n".join(f"  - {s}" for s in oneriler)
 
 
-def _tool_record(success: bool = True, step_name: str = "",
-                 errors: int = 0, retries: int = 0,
-                 duration: float = 0.0, tokens_used: int = 0) -> str:
+def _tool_record(
+    success: bool = True,
+    step_name: str = "",
+    errors: int = 0,
+    retries: int = 0,
+    duration: float = 0.0,
+    tokens_used: int = 0,
+) -> str:
     metric = QualityMetric(
-        success=success, step_name=step_name,
-        errors=errors, retries=retries,
-        duration=duration, tokens_used=tokens_used,
+        success=success,
+        step_name=step_name,
+        errors=errors,
+        retries=retries,
+        duration=duration,
+        tokens_used=tokens_used,
     )
     rapor = _singleton.record(metric)
-    return (f"[SELF_IMPROVE] Kaydedildi: adim={step_name} "
-            f"skor={rapor.score:.2f} not={rapor.grade} "
-            f"{'✅' if rapor.passed else '⚠️'}")
+    return (
+        f"[SELF_IMPROVE] Kaydedildi: adim={step_name} "
+        f"skor={rapor.score:.2f} not={rapor.grade} "
+        f"{'✅' if rapor.passed else '⚠️'}"
+    )
 
 
 def _tool_reset(**kw) -> str:

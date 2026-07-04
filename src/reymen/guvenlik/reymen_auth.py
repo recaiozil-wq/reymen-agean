@@ -61,12 +61,14 @@ DEFAULT_DB_DIR = PROJE_KOK / ".ReYMeN" / "auth"
 # Veri Yapıları
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 @dataclass
 class AccessToken:
     """JWT access token."""
+
     access_token: str
     token_type: str = "Bearer"
-    expires_in: int = 3600          # 1 saat
+    expires_in: int = 3600  # 1 saat
     refresh_token: str = ""
     scope: str = ""
     role: str = "user"
@@ -86,9 +88,10 @@ class AccessToken:
 @dataclass
 class User:
     """User information."""
+
     user_id: str
     username: str
-    role: str = "user"          # admin / user / guest
+    role: str = "user"  # admin / user / guest
     email: str = ""
     api_keys: list = field(default_factory=list)
     is_active: bool = True
@@ -184,6 +187,7 @@ def validate_api_key_live(api_key: str, provider: str, timeout: int = 10) -> boo
         return False
     try:
         import urllib.request
+
         req = urllib.request.Request(
             base_url,
             headers={"Authorization": f"Bearer {api_key}"},
@@ -199,6 +203,7 @@ def validate_api_key_live(api_key: str, provider: str, timeout: int = 10) -> boo
 # ═══════════════════════════════════════════════════════════════════════════════
 # JWT Token Yönetimi (standart kütüphane ile HMAC-SHA256)
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class JWTManager:
     """HMAC-SHA256 JWT token management — no external dependencies.
@@ -240,8 +245,12 @@ class JWTManager:
             "jti": secrets.token_hex(16),
         }
 
-        header_b64 = self._base64_url_encode(json.dumps(header, separators=(",", ":")).encode("utf-8"))
-        payload_b64 = self._base64_url_encode(json.dumps(full_payload, separators=(",", ":")).encode("utf-8"))
+        header_b64 = self._base64_url_encode(
+            json.dumps(header, separators=(",", ":")).encode("utf-8")
+        )
+        payload_b64 = self._base64_url_encode(
+            json.dumps(full_payload, separators=(",", ":")).encode("utf-8")
+        )
 
         signing_input = f"{header_b64}.{payload_b64}".encode("utf-8")
         signature = hmac.new(
@@ -271,7 +280,9 @@ class JWTManager:
                     logger.warning("[JWT] İmza doğrulama başarısız")
                     return None
 
-            payload_data = json.loads(self._base64_url_decode(payload_b64).decode("utf-8"))
+            payload_data = json.loads(
+                self._base64_url_decode(payload_b64).decode("utf-8")
+            )
 
             # Expiry kontrolü
             now = int(time.time())
@@ -291,13 +302,16 @@ class JWTManager:
         if payload is None:
             return None
         # Yeni token oluştur (süreyi uzat)
-        new_payload = {k: v for k, v in payload.items() if k not in ("iat", "exp", "jti")}
+        new_payload = {
+            k: v for k, v in payload.items() if k not in ("iat", "exp", "jti")
+        }
         return self.encode(new_payload, expires_in=expires_in)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # Kullanıcı ve Token Deposu (SQLite)
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class AuthStorage:
     """Stores user and token information in SQLite.
@@ -380,8 +394,13 @@ class AuthStorage:
 
     # ── Kullanıcı İşlemleri ──────────────────────────────────────────────────
 
-    def create_user(self, username: str, role: str = "user",
-                    email: str = "", password_hash: str = "") -> User:
+    def create_user(
+        self,
+        username: str,
+        role: str = "user",
+        email: str = "",
+        password_hash: str = "",
+    ) -> User:
         conn = self._get_conn()
         try:
             user_id = str(uuid.uuid4())
@@ -394,9 +413,12 @@ class AuthStorage:
             )
             conn.commit()
             return User(
-                user_id=user_id, username=username,
-                role=role, email=email,
-                created_at=now, is_active=True,
+                user_id=user_id,
+                username=username,
+                role=role,
+                email=email,
+                created_at=now,
+                is_active=True,
             )
         except sqlite3.IntegrityError:
             logger.warning("[AuthStorage] Kullanıcı zaten var: %s", username)
@@ -437,7 +459,14 @@ class AuthStorage:
             conn.close()
 
     def update_user(self, user_id: str, **kwargs) -> bool:
-        allowed = {"role", "email", "is_active", "last_login", "password_hash", "metadata"}
+        allowed = {
+            "role",
+            "email",
+            "is_active",
+            "last_login",
+            "password_hash",
+            "metadata",
+        }
         updates = {k: v for k, v in kwargs.items() if k in allowed}
         if not updates:
             return False
@@ -445,9 +474,7 @@ class AuthStorage:
         values = list(updates.values()) + [user_id]
         conn = self._get_conn()
         try:
-            conn.execute(
-                f"UPDATE users SET {set_clause} WHERE user_id = ?", values
-            )
+            conn.execute(f"UPDATE users SET {set_clause} WHERE user_id = ?", values)
             conn.commit()
             return conn.total_changes > 0
         finally:
@@ -466,8 +493,15 @@ class AuthStorage:
 
     # ── Token İşlemleri ──────────────────────────────────────────────────────
 
-    def save_token(self, user_id: str, access_token: str, refresh_token: str,
-                   expires_in: int, role: str = "user", scope: str = "") -> str:
+    def save_token(
+        self,
+        user_id: str,
+        access_token: str,
+        refresh_token: str,
+        expires_in: int,
+        role: str = "user",
+        scope: str = "",
+    ) -> str:
         conn = self._get_conn()
         try:
             token_id = str(uuid.uuid4())
@@ -477,8 +511,16 @@ class AuthStorage:
                 """INSERT INTO tokens (token_id, user_id, access_token,
                    refresh_token, expires_at, role, scope, created_at)
                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
-                (token_id, user_id, access_token, refresh_token,
-                 expires_at, role, scope, now),
+                (
+                    token_id,
+                    user_id,
+                    access_token,
+                    refresh_token,
+                    expires_at,
+                    role,
+                    scope,
+                    now,
+                ),
             )
             conn.commit()
             return token_id
@@ -556,8 +598,9 @@ class AuthStorage:
 
     # ── API Key İşlemleri ────────────────────────────────────────────────────
 
-    def save_api_key(self, user_id: str, key_hash: str,
-                     provider: str = "", label: str = "") -> str:
+    def save_api_key(
+        self, user_id: str, key_hash: str, provider: str = "", label: str = ""
+    ) -> str:
         conn = self._get_conn()
         try:
             key_id = str(uuid.uuid4())
@@ -635,6 +678,7 @@ class AuthStorage:
 # Ana Auth Yöneticisi
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class AuthManager:
     """ReYMeN Auth System — Main manager class.
 
@@ -662,8 +706,12 @@ class AuthManager:
         """Create default admin user on first run."""
         admin = self.storage.get_user_by_username("admin")
         if admin is None:
-            user = self.storage.create_user("admin", role="admin", email="admin@reymen.local")
-            logger.info("[Auth] Varsayılan admin kullanıcısı oluşturuldu: %s", user.user_id)
+            user = self.storage.create_user(
+                "admin", role="admin", email="admin@reymen.local"
+            )
+            logger.info(
+                "[Auth] Varsayılan admin kullanıcısı oluşturuldu: %s", user.user_id
+            )
 
     # ── API Key Doğrulama ────────────────────────────────────────────────────
 
@@ -799,8 +847,9 @@ class AuthManager:
 
     # ── Kullanıcı Yönetimi ───────────────────────────────────────────────────
 
-    def create_user(self, username: str, role: str = "user",
-                    email: str = "") -> Optional[User]:
+    def create_user(
+        self, username: str, role: str = "user", email: str = ""
+    ) -> Optional[User]:
         """Create a new user."""
         if role not in ("admin", "user", "guest"):
             logger.error("[Auth] Geçersiz rol: %s", role)
@@ -900,13 +949,16 @@ class AuthManager:
 
 auth_manager = AuthManager()
 
+
 # Kullanım kolaylığı için doğrudan fonksiyonlar
 def validate_key(key: str) -> Optional[str]:
     """Validate API key, return provider name."""
     return auth_manager.validate_api_key(key)
 
 
-def create_token(username: str, role: str = "user", expires_in: int = 3600) -> Optional[str]:
+def create_token(
+    username: str, role: str = "user", expires_in: int = 3600
+) -> Optional[str]:
     """Create token for user, return access_token string."""
     token = auth_manager.create_token(username, role=role, expires_in=expires_in)
     return token.access_token if token else None

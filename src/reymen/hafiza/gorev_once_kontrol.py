@@ -29,13 +29,14 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 import logging
+
 logger = logging.getLogger(__name__)
 
 log = logging.getLogger(__name__)
 
 # ── Sabitler ──────────────────────────────────────────────────────────────
 ROOT = Path(__file__).parent.resolve()  # reymen/hafiza/
-PROJE = ROOT.parent.parent              # hermes_projesi/
+PROJE = ROOT.parent.parent  # hermes_projesi/
 
 SOUL_PATH = PROJE / ".ReYMeN" / "SOUL.md"
 MEMORIES_DIR = PROJE / ".ReYMeN" / "memories"
@@ -48,6 +49,7 @@ _CROSS_AGENT_DIRS: list = []
 # Python session_search fonksiyonu (varsa)
 try:
     from reymen.hafiza.session_db import AdvancedSessionStorage as _SessionStorage
+
     _SESSION_DB_AKTIF = True
 except ImportError:
     _SessionStorage = None
@@ -56,7 +58,8 @@ except ImportError:
 # FTS5 tabanlı hafıza modülü (varsa)
 try:
     from reymen.hafiza.hafiza_genislet import hafiza as _hafiza
-    _HAFIZA_AKTIF = hasattr(_hafiza, '_hazir') and _hafiza._hazir
+
+    _HAFIZA_AKTIF = hasattr(_hafiza, "_hazir") and _hafiza._hazir
 except ImportError:
     _hafiza = None
     _HAFIZA_AKTIF = False
@@ -64,6 +67,7 @@ except ImportError:
 # Gorev hafiza modülü (kaydetme + guven_skoru için)
 try:
     from reymen.hafiza.gorev_hafiza import gorev_sonrasi_hafiza, guncelle_son_kullanim
+
     _GOREV_HAFIZA_AKTIF = True
 except ImportError:
     gorev_sonrasi_hafiza = None
@@ -74,6 +78,7 @@ except ImportError:
 # ══════════════════════════════════════════════════════════════════════════
 # GÜVEN SKORU + GEÇERLİLİK YARDIMCILARI
 # ══════════════════════════════════════════════════════════════════════════
+
 
 def _guven_skoru(basari: int, hata: int) -> float:
     """Güven skoru: basari/(basari+hata), ikisi de 0 ise 0.5."""
@@ -103,6 +108,7 @@ def _gecerlilik_kontrol(gecerlilik_tarihi: str) -> str:
 # KATEGORİ YARDIMCILARI
 # ══════════════════════════════════════════════════════════════════════════
 
+
 def _kategori_eslesme(hedef: str) -> str:
     """Hedef metnine göre kategori tahmini yap.
 
@@ -114,29 +120,80 @@ def _kategori_eslesme(hedef: str) -> str:
     h = hedef.lower()
 
     # Kali
-    if any(k in h for k in ["nmap", "metasploit", "burp", "sqlmap", "hydra",
-                             "kali", "sızma", "penetration", "exploit",
-                             "wireshark", "aircrack", "john", "hashcat"]):
-        if any(n in h for n in ["network", "port", "scan", "tarama", "ip",
-                                 "ağ", "ag"]):
+    if any(
+        k in h
+        for k in [
+            "nmap",
+            "metasploit",
+            "burp",
+            "sqlmap",
+            "hydra",
+            "kali",
+            "sızma",
+            "penetration",
+            "exploit",
+            "wireshark",
+            "aircrack",
+            "john",
+            "hashcat",
+        ]
+    ):
+        if any(n in h for n in ["network", "port", "scan", "tarama", "ip", "ağ", "ag"]):
             return "kali/network"
         if any(w in h for w in ["web", "http", "site", "sql", "xss"]):
             return "kali/web"
         return "kali/genel"
 
     # Dron
-    if any(k in h for k in ["dron", "drone", "uav", "uçur", "ucur", "px4",
-                             "ardupilot", "mission planner", "mavlink"]):
+    if any(
+        k in h
+        for k in [
+            "dron",
+            "drone",
+            "uav",
+            "uçur",
+            "ucur",
+            "px4",
+            "ardupilot",
+            "mission planner",
+            "mavlink",
+        ]
+    ):
         return "dron"
 
     # CAD
-    if any(k in h for k in ["cad", "solidworks", "autocad", "fusion",
-                             "catia", "3d", "stl", "step", "iges"]):
+    if any(
+        k in h
+        for k in [
+            "cad",
+            "solidworks",
+            "autocad",
+            "fusion",
+            "catia",
+            "3d",
+            "stl",
+            "step",
+            "iges",
+        ]
+    ):
         return "cad"
 
     # Windows
-    if any(k in h for k in ["windows", "win10", "win11", "regedit", "powershell",
-                             "cmd", "ekran", "screenshot", "mouse", "klavye"]):
+    if any(
+        k in h
+        for k in [
+            "windows",
+            "win10",
+            "win11",
+            "regedit",
+            "powershell",
+            "cmd",
+            "ekran",
+            "screenshot",
+            "mouse",
+            "klavye",
+        ]
+    ):
         return "windows"
 
     return "genel"
@@ -145,6 +202,7 @@ def _kategori_eslesme(hedef: str) -> str:
 # ══════════════════════════════════════════════════════════════════════════
 # 1. HAFIZADA_ARA — kategori filtreli + güven skorlu ana fonksiyon
 # ══════════════════════════════════════════════════════════════════════════
+
 
 def hafizada_ara(hedef: str, kategori: str = "") -> dict:
     """Hafızada benzer görev ara, kategori + güven skoru filtresiyle.
@@ -220,6 +278,7 @@ def hafizada_ara(hedef: str, kategori: str = "") -> dict:
 # 2. ISLE — HAFIZAYA BAK → VARSA KULLAN → YOKSA DENE → KAYDET
 # ══════════════════════════════════════════════════════════════════════════
 
+
 def isle(
     hedef: str,
     islev: Callable[[], Any],
@@ -269,7 +328,9 @@ def isle(
             try:
                 guncelle_son_kullanim(kayit_id, kategori=kategori, basarili_mi=True)
             except Exception as _e:
-                logger.warning("[GorevOnceKontrol] except Exception (L269): %s", Exception)
+                logger.warning(
+                    "[GorevOnceKontrol] except Exception (L269): %s", Exception
+                )
                 pass
 
         return {
@@ -300,6 +361,7 @@ def isle(
     if _GOREV_HAFIZA_AKTIF and gorev_sonrasi_hafiza:
         try:
             import uuid
+
             task_id = str(uuid.uuid4())[:8]
             sonuc_dict = {
                 "basarili": basarili,
@@ -330,6 +392,7 @@ def isle(
 # 3. ONERI_URET — belirsiz gorev icin hafiza tabanli oneri
 # ══════════════════════════════════════════════════════════════════════════
 
+
 def oneri_uret(hedef: str) -> dict:
     """Belirsiz bir görev için hafızaya dayalı en iyi tahmini üret.
 
@@ -357,9 +420,24 @@ def oneri_uret(hedef: str) -> dict:
     hedef_lower = hedef.strip().lower()
 
     # Selamlasma / anlamsiz girdi kontrolu
-    selam_kelimeler = {"merhaba", "selam", "hey", "hi", "hello", "naber",
-                       "nasılsın", "nasilsin", "iyi", "teşekkür", "tesekkur",
-                       "sağol", "sagol", "bye", "görüşürüz", "gorusuruz"}
+    selam_kelimeler = {
+        "merhaba",
+        "selam",
+        "hey",
+        "hi",
+        "hello",
+        "naber",
+        "nasılsın",
+        "nasilsin",
+        "iyi",
+        "teşekkür",
+        "tesekkur",
+        "sağol",
+        "sagol",
+        "bye",
+        "görüşürüz",
+        "gorusuruz",
+    }
     kelimeler = set(hedef_lower.split())
     if len(kelimeler - selam_kelimeler) == 0 and len(kelimeler) <= 2:
         return {
@@ -375,41 +453,85 @@ def oneri_uret(hedef: str) -> dict:
         {
             "kategori": "kali/network/nmap",
             "tetikleyiciler": [
-                "güvenli", "guvenli", "port", "tarama", "scan", "nmap",
-                "ağ", "ag", "network", "ip", "servis", "açık", "acik",
-                "sızma", "sizma", "pentest", "güvenlik", "guvenlik",
+                "güvenli",
+                "guvenli",
+                "port",
+                "tarama",
+                "scan",
+                "nmap",
+                "ağ",
+                "ag",
+                "network",
+                "ip",
+                "servis",
+                "açık",
+                "acik",
+                "sızma",
+                "sizma",
+                "pentest",
+                "güvenlik",
+                "guvenlik",
             ],
             "aciklama": "port taraması / servis tespiti",
         },
         {
             "kategori": "kali/web",
             "tetikleyiciler": [
-                "web", "site", "http", "sql", "xss", "csrf", "burp",
-                "güvenli", "guvenli", "güvenlik", "guvenlik",
+                "web",
+                "site",
+                "http",
+                "sql",
+                "xss",
+                "csrf",
+                "burp",
+                "güvenli",
+                "guvenli",
+                "güvenlik",
+                "guvenlik",
             ],
             "aciklama": "web güvenlik testi",
         },
         {
             "kategori": "dron",
             "tetikleyiciler": [
-                "dron", "drone", "uçur", "ucur", "px4", "uav",
-                "uçuş", "ucus", "iha",
+                "dron",
+                "drone",
+                "uçur",
+                "ucur",
+                "px4",
+                "uav",
+                "uçuş",
+                "ucus",
+                "iha",
             ],
             "aciklama": "drone / IHA uçuşu",
         },
         {
             "kategori": "cad",
             "tetikleyiciler": [
-                "cad", "solidworks", "çizim", "cizim", "3d", "model",
-                "tasarım", "tasarim", "mekanik",
+                "cad",
+                "solidworks",
+                "çizim",
+                "cizim",
+                "3d",
+                "model",
+                "tasarım",
+                "tasarim",
+                "mekanik",
             ],
             "aciklama": "CAD tasarım / 3D modelleme",
         },
         {
             "kategori": "windows",
             "tetikleyiciler": [
-                "windows", "masaüstü", "masaustu", "ekran", "mouse",
-                "klavye", "otomasyon", "script",
+                "windows",
+                "masaüstü",
+                "masaustu",
+                "ekran",
+                "mouse",
+                "klavye",
+                "otomasyon",
+                "script",
             ],
             "aciklama": "Windows otomasyonu",
         },
@@ -477,13 +599,16 @@ def oneri_uret(hedef: str) -> dict:
         "aciklama": kat["aciklama"],
         "icerik": hafiza_sonuc.get("icerik", "") if hafiza_sonuc else "",
         "guven_skoru": round(min(guven, 0.95), 2),
-        "kaynak": hafiza_sonuc.get("kaynak", "kategori_tahmini") if hafiza_sonuc else "kategori_tahmini",
+        "kaynak": hafiza_sonuc.get("kaynak", "kategori_tahmini")
+        if hafiza_sonuc
+        else "kategori_tahmini",
     }
 
 
 # ══════════════════════════════════════════════════════════════════════════
 # 4. GOREV_ONCE_HAFIZA_KONTROL (güncellendi — yeni alanlar eklendi)
 # ══════════════════════════════════════════════════════════════════════════
+
 
 def gorev_once_hafiza_kontrol(hedef: str, kategori: str = "") -> Optional[dict]:
     """Görev başlamadan önce hafızada benzer çözüm ara (5 katman).
@@ -560,6 +685,7 @@ def _kategori_uygun(sonuc: dict, kategori: str) -> bool:
 # 4. KAYDET_ISLE — otomatik guven_skoru hesaplamalı kaydetme
 # ══════════════════════════════════════════════════════════════════════════
 
+
 def kaydet_isle(
     hedef: str,
     kategori: str,
@@ -582,6 +708,7 @@ def kaydet_isle(
 
     try:
         import uuid
+
         task_id = str(uuid.uuid4())[:8]
         sonuc_dict = {
             "basarili": basarili,
@@ -605,6 +732,7 @@ def kaydet_isle(
 # ══════════════════════════════════════════════════════════════════════════
 # KONTROL STRATEJİLERİ (5 katman)
 # ══════════════════════════════════════════════════════════════════════════
+
 
 def _soul_kontrol(hedef: str) -> Optional[dict]:
     """1. SOUL.md → Öğrenilenler bölümünden eşleşme ara."""
@@ -653,7 +781,7 @@ def _soul_kontrol(hedef: str) -> Optional[dict]:
 
 def _memory_db_kontrol(hedef: str, kategori: str = "") -> Optional[dict]:
     """2. SQLite hafıza DB'sinden FTS5 ile eşleşme ara.
-    
+
     Gelişmiş: metadata'dan guven_skoru, kategori, gecerlilik_tarihi çeker.
     """
     if not _HAFIZA_AKTIF or not _hafiza:
@@ -674,7 +802,11 @@ def _memory_db_kontrol(hedef: str, kategori: str = "") -> Optional[dict]:
             doc_kategori = (doc.get("kategori") or "").lower()
 
             # Kategori filtresi
-            if kategori and kategori.lower() not in doc_kategori and doc_kategori not in kategori.lower():
+            if (
+                kategori
+                and kategori.lower() not in doc_kategori
+                and doc_kategori not in kategori.lower()
+            ):
                 continue
 
             # gecerlilik kontrolü
@@ -870,6 +1002,7 @@ def _skills_kontrol(hedef: str) -> Optional[dict]:
 # CROSS-AGENT DESTEĞİ
 # ══════════════════════════════════════════════════════════════════════════
 
+
 def cross_agent_ekle(ajan_adi: str, proje_koku: str = ""):
     """Başka bir ajanın hafıza klasörünü taramaya ekle.
 
@@ -904,12 +1037,14 @@ def cross_agent_tara(hedef: str) -> List[dict]:
                 icerik = dosya.read_text(encoding="utf-8", errors="replace")
                 eslesme = sum(1 for k in kelimeler if k in icerik.lower())
                 if eslesme >= len(kelimeler) // 3:
-                    sonuclar.append({
-                        "ajan": ajan_adi,
-                        "kaynak": f"{ajan_adi}/{dosya.name}",
-                        "icerik": icerik[:300],
-                        "eslesme": eslesme,
-                    })
+                    sonuclar.append(
+                        {
+                            "ajan": ajan_adi,
+                            "kaynak": f"{ajan_adi}/{dosya.name}",
+                            "icerik": icerik[:300],
+                            "eslesme": eslesme,
+                        }
+                    )
         except Exception:
             continue
 
@@ -919,6 +1054,7 @@ def cross_agent_tara(hedef: str) -> List[dict]:
 # ══════════════════════════════════════════════════════════════════════════
 # DURUM ÖZETİ
 # ══════════════════════════════════════════════════════════════════════════
+
 
 def hafiza_durum_ozet() -> dict:
     """Hafıza durum özeti."""

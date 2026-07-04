@@ -107,7 +107,9 @@ class AnayasaDenetci:
         if not elestiri.get("ihlal_var"):
             return True, cevap
 
-        print(f"[AnayasaDenetci] Ihlal: {elestiri.get('ihlal_edilen', 'belirsiz')[:80]}")
+        print(
+            f"[AnayasaDenetci] Ihlal: {elestiri.get('ihlal_edilen', 'belirsiz')[:80]}"
+        )
 
         if revize_et:
             revizyon = self._revize_et(hedef, cevap, elestiri)
@@ -115,7 +117,10 @@ class AnayasaDenetci:
                 self._revizyon_sayisi += 1
                 return False, revizyon
 
-        return False, f"[Anayasa Uyarisi]: {elestiri.get('kisa_elestiri', '')}\nOrijinal: {cevap}"
+        return (
+            False,
+            f"[Anayasa Uyarisi]: {elestiri.get('kisa_elestiri', '')}\nOrijinal: {cevap}",
+        )
 
     def hizli_kontrol(self, cevap: str) -> tuple[bool, str]:
         """LLM olmadan kural tabanli hizli guvenlik kontrolu.
@@ -145,7 +150,8 @@ class AnayasaDenetci:
             "revizyon_sayisi": self._revizyon_sayisi,
             "revizyon_orani": (
                 round(self._revizyon_sayisi / self._elestiri_sayisi, 3)
-                if self._elestiri_sayisi else 0.0
+                if self._elestiri_sayisi
+                else 0.0
             ),
         }
 
@@ -153,10 +159,16 @@ class AnayasaDenetci:
 
     def _elestir(self, hedef: str, cevap: str, adimlar: list) -> dict:
         """LLM ile anayasal elestiri yap."""
-        ilkeler_str = "\n".join(f"{i+1}. {ilke}" for i, ilke in enumerate(self._ilkeler))
+        ilkeler_str = "\n".join(
+            f"{i+1}. {ilke}" for i, ilke in enumerate(self._ilkeler)
+        )
         sistem = _ELESTIRI_SISTEM.format(ilkeler=ilkeler_str)
 
-        adim_str = ("\nYapilan adimlar:\n" + "\n".join(f"- {a}" for a in adimlar[-5:])) if adimlar else ""
+        adim_str = (
+            ("\nYapilan adimlar:\n" + "\n".join(f"- {a}" for a in adimlar[-5:]))
+            if adimlar
+            else ""
+        )
         kullanici = (
             f"Kullanici Hedefi: {hedef}\n\n"
             f"Uretilen Sonuc/Cevap:\n{cevap[:600]}"
@@ -164,7 +176,9 @@ class AnayasaDenetci:
         )
 
         try:
-            yanit = self._provider.uret(sistem, [{"role": "user", "content": kullanici}])
+            yanit = self._provider.uret(
+                sistem, [{"role": "user", "content": kullanici}]
+            )
             return self._yanit_ayristir(yanit)
         except Exception as e:
             print(f"[AnayasaDenetci] LLM hatasi: {e}")
@@ -180,7 +194,9 @@ class AnayasaDenetci:
             "Anayasal ilkelere uygun sekilde revize et:"
         )
         try:
-            return self._provider.uret(_REVIZYON_SISTEM, [{"role": "user", "content": kullanici}])
+            return self._provider.uret(
+                _REVIZYON_SISTEM, [{"role": "user", "content": kullanici}]
+            )
         except Exception:
             return ""
 

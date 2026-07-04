@@ -1,4 +1,5 @@
 """Tests for reymen.sistem.cli_auth."""
+
 import pytest
 from src.reymen.sistem.cli_auth import (
     set_sudo_password_callback,
@@ -15,4 +16,5 @@ class TestCallbacks:
 
     def test_module_imports(self):
         import reymen.sistem.cli_auth
+
         assert True

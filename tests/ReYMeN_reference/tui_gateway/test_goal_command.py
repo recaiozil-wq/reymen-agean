@@ -105,7 +105,9 @@ def test_goal_status_alias_shows_status(server, session):
 
 def test_goal_set_returns_send_with_notice(server, session):
     sid, session_key, _ = session
-    r = _call(server, "command.dispatch", name="goal", arg="build a rocket", session_id=sid)
+    r = _call(
+        server, "command.dispatch", name="goal", arg="build a rocket", session_id=sid
+    )
     result = r["result"]
     assert result["type"] == "send"
     assert result["message"] == "build a rocket"

@@ -20,8 +20,7 @@ import time
 from pathlib import Path
 
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
 )
 logger = logging.getLogger("reymen_gateway")
 
@@ -32,6 +31,7 @@ sys.path.insert(0, str(PROJE))
 # .env yukle
 try:
     from dotenv import load_dotenv
+
     load_dotenv()
 except ImportError:
     pass
@@ -80,6 +80,7 @@ def botu_baslat(bot_adi: str, profil: str):
 
     try:
         from reymen.gateway.platforms.telegram import TelegramAdapter
+
         logger.info("✅ %s hazir (TelegramAdapter sinifi mevcut)", bot_adi)
     except Exception as e:
         logger.error("%s baslatilamadi: %s", bot_adi, e)
@@ -87,6 +88,7 @@ def botu_baslat(bot_adi: str, profil: str):
 
 def main():
     import argparse
+
     parser = argparse.ArgumentParser(description="ReYMeN Gateway (Hermes'siz)")
     parser.add_argument("--bot", help="Bot adi (pasa_38, kiral38, reymen)")
     parser.add_argument("--list", action="store_true", help="Botlari listele")

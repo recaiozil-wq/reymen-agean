@@ -30,9 +30,16 @@ class TestToolRegistry:
 
     def test_tool_kaydet_ve_listele(self):
         """Happy path: tool kaydet, listede gorunsun."""
+
         def handler(args: dict) -> str:
             return "ok"
-        tool_kaydet("test_tool", "Test aciklamasi", {"type": "object", "properties": {}}, handler)
+
+        tool_kaydet(
+            "test_tool",
+            "Test aciklamasi",
+            {"type": "object", "properties": {}},
+            handler,
+        )
         tools = get_tools()
         isimler = [t["name"] for t in tools]
         assert "test_tool" in isimler
@@ -41,8 +48,10 @@ class TestToolRegistry:
 
     def test_tool_sil(self):
         """Happy path: tool silindikten sonra listede olmamali."""
+
         def handler(args: dict) -> str:
             return "ok"
+
         tool_kaydet("silinecek_tool", "", {"type": "object", "properties": {}}, handler)
         assert tool_sil("silinecek_tool") is True
         assert tool_sil("silinecek_tool") is False  # zaten silindi
@@ -80,8 +89,12 @@ class TestMCPServerHata:
 
     def test_tool_call_bulunamadi(self):
         """Error case: olmayan tool cagrisi ->32601."""
-        istek = {"jsonrpc": "2.0", "method": "tools/call", "id": 1,
-                 "params": {"name": "yok_tool", "arguments": {}}}
+        istek = {
+            "jsonrpc": "2.0",
+            "method": "tools/call",
+            "id": 1,
+            "params": {"name": "yok_tool", "arguments": {}},
+        }
         yanit = _istek_isle(istek)
         data = json.loads(yanit)
         assert "error" in data

@@ -16,6 +16,7 @@ REYMEN_PAKET = "reymen"
 # Modül bilgisi
 # ---------------------------------------------------------------------------
 
+
 class ModulBilgisi:
     """Bir modülün adı, yolu, yüklenme durumu ve açıklaması."""
 
@@ -50,9 +51,11 @@ class ModulBilgisi:
             "kategori": self.kategori,
         }
 
+
 # ---------------------------------------------------------------------------
 # Modül tarayıcı
 # ---------------------------------------------------------------------------
+
 
 class ModulTarayici:
     """reymen/ paketini tarar, tüm alt modülleri keşfeder."""
@@ -68,6 +71,7 @@ class ModulTarayici:
         # 1. pkgutil ile paket taraması
         try:
             import reymen
+
             for importer, mod_adi, is_pkg in pkgutil.walk_packages(
                 reymen.__path__, prefix=f"{REYMEN_PAKET}."
             ):
@@ -97,7 +101,9 @@ class ModulTarayici:
             try:
                 yolu = getattr(mod, "__file__", "") or ""
                 if yolu and Path(yolu).exists():
-                    satir_sayisi = sum(1 for _ in open(yolu, encoding="utf-8", errors="ignore"))
+                    satir_sayisi = sum(
+                        1 for _ in open(yolu, encoding="utf-8", errors="ignore")
+                    )
                 doc = getattr(mod, "__doc__", "") or ""
                 if doc:
                     # İlk satırı al
@@ -109,7 +115,7 @@ class ModulTarayici:
 
         # Kategori: reymen.xxx.yyy -> xxx
         kategori = ""
-        bas = mod_adi[len(REYMEN_PAKET) + 1:]
+        bas = mod_adi[len(REYMEN_PAKET) + 1 :]
         if "." in bas:
             kategori = bas.split(".")[0]
 

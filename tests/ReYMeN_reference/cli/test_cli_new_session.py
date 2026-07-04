@@ -115,16 +115,18 @@ def _make_cli(env_overrides=None, config_overrides=None, **kwargs):
         import cli as _cli_mod
 
         _cli_mod = importlib.reload(_cli_mod)
-        with patch.object(_cli_mod, "get_tool_definitions", return_value=[]), patch.dict(
-            _cli_mod.__dict__, {"CLI_CONFIG": _clean_config}
-        ):
+        with patch.object(
+            _cli_mod, "get_tool_definitions", return_value=[]
+        ), patch.dict(_cli_mod.__dict__, {"CLI_CONFIG": _clean_config}):
             return _cli_mod.ReYMeNCLI(**kwargs)
 
 
 def _prepare_cli_with_active_session(tmp_path):
     cli = _make_cli()
     cli._session_db = SessionDB(db_path=tmp_path / "state.db")
-    cli._session_db.create_session(session_id=cli.session_id, source="cli", model=cli.model)
+    cli._session_db.create_session(
+        session_id=cli.session_id, source="cli", model=cli.model
+    )
 
     cli.agent = _FakeAgent(cli.session_id, cli.session_start)
     cli.conversation_history = [{"role": "user", "content": "hello"}]

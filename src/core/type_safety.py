@@ -216,7 +216,9 @@ class ValidatedTool:
 
         # Fonksiyon tip ipuçlarını oto-çıkar
         if schema is None:
-            self._auto_schema: Optional[type[BaseModel]] = self._tip_ipuclarindan_schema_olustur()
+            self._auto_schema: Optional[type[BaseModel]] = (
+                self._tip_ipuclarindan_schema_olustur()
+            )
         else:
             self._auto_schema = None
 
@@ -329,9 +331,7 @@ class ValidatedTool:
                 # kwargs içinden schema alanlarını filtrele
                 # (sadece modelde tanımlı alanları geç)
                 model_alanlari = set(aktif_schema.model_fields.keys())
-                uygun_kwargs = {
-                    k: v for k, v in kwargs.items() if k in model_alanlari
-                }
+                uygun_kwargs = {k: v for k, v in kwargs.items() if k in model_alanlari}
 
                 # Eğer hiç uygun kwargs yoksa ve tek bir pozisyonel
                 # argüman varsa, onu doğrudan model girdisi olarak al
@@ -346,7 +346,8 @@ class ValidatedTool:
             except ValidationError as exc:
                 logger.warning(
                     "[ValidatedTool:%s] Giriş validasyonu başarısız: %s",
-                    self._arac_adi, exc,
+                    self._arac_adi,
+                    exc,
                 )
                 return ToolResult(
                     basarili=False,
@@ -360,7 +361,9 @@ class ValidatedTool:
         except Exception as exc:
             logger.error(
                 "[ValidatedTool:%s] Çalışma hatası: %s",
-                self._arac_adi, exc, exc_info=True,
+                self._arac_adi,
+                exc,
+                exc_info=True,
             )
             return ToolResult(
                 basarili=False,
@@ -379,7 +382,8 @@ class ValidatedTool:
             except ValidationError as exc:
                 logger.warning(
                     "[ValidatedTool:%s] Çıkış validasyonu başarısız: %s",
-                    self._arac_adi, exc,
+                    self._arac_adi,
+                    exc,
                 )
                 return ToolResult(
                     basarili=False,

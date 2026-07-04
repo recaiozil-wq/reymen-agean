@@ -4,6 +4,7 @@
 Her fonksiyon ``hook_dispatcher.hook_kaydet()`` ile kaydedilir.
 Ortak imza: fn(olay: str, **data) -> None
 """
+
 from __future__ import annotations
 
 import logging
@@ -36,13 +37,17 @@ def _session_izleme_cb(olay: str, **data: Any) -> None:
     """Session başlangıç/bitiş olaylarını logla."""
     if olay == "on_session_start":
         session_id = data.get("session_id", "?")
-        logger.info("[HOOK] Session başladı: %s (task=%s)", session_id, data.get("task_id", "?"))
+        logger.info(
+            "[HOOK] Session başladı: %s (task=%s)", session_id, data.get("task_id", "?")
+        )
     elif olay == "on_session_end":
         session_id = data.get("session_id", "?")
         basarili = data.get("basarili", False)
         logger.info(
             "[HOOK] Session bitti: %s | basarili=%s | tur=%s",
-            session_id, basarili, data.get("tur_sayisi", "?"),
+            session_id,
+            basarili,
+            data.get("tur_sayisi", "?"),
         )
 
 
@@ -52,7 +57,12 @@ def _hata_izleme_cb(olay: str, **data: Any) -> None:
         hata = data.get("hata", "?")
         baglam = data.get("olay_baglami", "")
         task_id = data.get("task_id", "?")
-        logger.warning("[HOOK] HATA task=%s | baglam=%s | hata=%s", task_id, baglam, str(hata)[:150])
+        logger.warning(
+            "[HOOK] HATA task=%s | baglam=%s | hata=%s",
+            task_id,
+            baglam,
+            str(hata)[:150],
+        )
 
 
 def _tool_izleme_cb(olay: str, **data: Any) -> None:
@@ -76,6 +86,7 @@ def _context_izleme_cb(olay: str, **data: Any) -> None:
 
 
 # ── Tüm varsayılan callback'leri kaydet ─────────────────────────────────────
+
 
 def varsayilan_hooklari_kaydet(hook_sistemi: Any = None) -> None:
     """Tüm varsayılan hook callback'lerini kaydet.
@@ -114,6 +125,7 @@ def varsayilan_hooklari_kaydet(hook_sistemi: Any = None) -> None:
 
 
 # ── Metrik görüntüleme ──────────────────────────────────────────────────────
+
 
 def metrik_raporu() -> dict:
     """Hook metriklerini döndür: olay bazlı sayı ve süre."""

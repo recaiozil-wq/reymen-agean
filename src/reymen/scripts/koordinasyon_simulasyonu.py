@@ -5,15 +5,25 @@ Kali ajanı tespit eder, Windows ajanı engeller.
 """
 
 import json, sys, time
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from src.reymen.cereyan.once_hafiza import kaydet, ara, belirsiz_gorev_cozumle, istatistik
+
+sys.path.insert(
+    0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+)
+from src.reymen.cereyan.once_hafiza import (
+    kaydet,
+    ara,
+    belirsiz_gorev_cozumle,
+    istatistik,
+)
 
 basla = time.time()
 llm_calls = 0
 
+
 def log(msg):
     t = time.time() - basla
     print(f"[{t:5.2f}s] {msg}")
+
 
 # ══════════════════════════════════════════
 # ADIM 1: KALI AJANI — Port Tara
@@ -26,7 +36,9 @@ log("=" * 55)
 log("[KALI] Hafizada kali/network bilgisi araniyor...")
 nmap_bilgi = ara("nmap ile port tara", kategori="kali/network", min_guven=0.5)
 if nmap_bilgi:
-    log(f"[KALI] ✅ HAFIZA ATLAMASI — ID={nmap_bilgi[0]['id']}, guven={nmap_bilgi[0]['guven_skoru']}")
+    log(
+        f"[KALI] ✅ HAFIZA ATLAMASI — ID={nmap_bilgi[0]['id']}, guven={nmap_bilgi[0]['guven_skoru']}"
+    )
     log(f"[KALI] Bilgi: {nmap_bilgi[0]['icerik'][:100]}")
 else:
     log("[KALI] ❌ Hafizada yok — LLM cagrilirdi")
@@ -36,7 +48,9 @@ else:
 log("[KALI] 'localhost port tara' icin belirsiz gorev cozumleme...")
 belirsiz = belirsiz_gorev_cozumle("localhost port tara")
 if belirsiz["tahmin_kategori"]:
-    log(f"[KALI] ✅ Tahmin: {belirsiz['tahmin_kategori']} -> {belirsiz['tahmin_kayit']['hedef']}")
+    log(
+        f"[KALI] ✅ Tahmin: {belirsiz['tahmin_kategori']} -> {belirsiz['tahmin_kayit']['hedef']}"
+    )
 else:
     log("[KALI] ❌ Tahmin yok")
 
@@ -84,9 +98,13 @@ log(f"[WIN] PORT_BLOCK komutu: {mesaj}")
 log("[WIN] Port 1234 netstat ile dogrulaniyor...")
 
 # 2b) Hafızada netstat bilgisi var mı?
-netstat_bilgi = ara("netstat_komutu", kategori="windows/terminal/network", min_guven=0.5)
+netstat_bilgi = ara(
+    "netstat_komutu", kategori="windows/terminal/network", min_guven=0.5
+)
 if netstat_bilgi:
-    log(f"[WIN] ✅ HAFIZA ATLAMASI — ID={netstat_bilgi[0]['id']}, guven={netstat_bilgi[0]['guven_skoru']}")
+    log(
+        f"[WIN] ✅ HAFIZA ATLAMASI — ID={netstat_bilgi[0]['id']}, guven={netstat_bilgi[0]['guven_skoru']}"
+    )
 else:
     log("[WIN] ❌ Hafizada yok — LLM cagrilirdi")
     llm_calls += 1
@@ -98,10 +116,10 @@ log("[WIN] ✅ Port 1234 dogrulandi: TCP 127.0.0.1:1234 LISTENING")
 # 2d) Firewall kuralı
 log("[WIN] Windows Firewall kurali olusturuluyor...")
 kural = (
-    'netsh advfirewall firewall add rule '
+    "netsh advfirewall firewall add rule "
     'name="BLOCK_SUSPICIOUS_PORT_1234" '
-    'dir=in action=block '
-    'protocol=TCP localport=1234'
+    "dir=in action=block "
+    "protocol=TCP localport=1234"
 )
 log(f"[WIN] Uygulanan: {kural}")
 log("[WIN] ✅ Kural basariyla eklendi (simulasyon)")
@@ -153,16 +171,25 @@ log("=" * 55)
 kaydet(
     hedef="kali_windows_koordinasyon_port_engelleme",
     kategori="cross-platform/security",
-    icerik=json.dumps({
-        "senaryo": "Kali nmap ile port tarar, Windows netstat ile dogrular ve firewall kurali ekler",
-        "port": "1234",
-        "kali_kategori": "kali/network/nmap",
-        "windows_kategori": "windows/terminal/network",
-        "firewall_komutu": 'netsh advfirewall firewall add rule name="BLOCK_<PORT>" dir=in action=block protocol=TCP localport=<PORT>',
-        "mesaj_formati": {"kaynak": "[kali|windows]", "hedef": "[kali|windows]", "komut": "[PORT_BLOCK|PORT_BLOCKED|SCAN_RESULT|ERROR]", "port": "<PORT>", "durum": "[LISTENING|BLOCKED|FAILED]"},
-        "orkestrator": "conversation_loop",
-        "hata_durumu": "Windows calisamiyorsa Kali tekrar dener (max 3 retry). Kali calisamiyorsa Windows OnceHafiza'ya sorar.",
-    }, ensure_ascii=False),
+    icerik=json.dumps(
+        {
+            "senaryo": "Kali nmap ile port tarar, Windows netstat ile dogrular ve firewall kurali ekler",
+            "port": "1234",
+            "kali_kategori": "kali/network/nmap",
+            "windows_kategori": "windows/terminal/network",
+            "firewall_komutu": 'netsh advfirewall firewall add rule name="BLOCK_<PORT>" dir=in action=block protocol=TCP localport=<PORT>',
+            "mesaj_formati": {
+                "kaynak": "[kali|windows]",
+                "hedef": "[kali|windows]",
+                "komut": "[PORT_BLOCK|PORT_BLOCKED|SCAN_RESULT|ERROR]",
+                "port": "<PORT>",
+                "durum": "[LISTENING|BLOCKED|FAILED]",
+            },
+            "orkestrator": "conversation_loop",
+            "hata_durumu": "Windows calisamiyorsa Kali tekrar dener (max 3 retry). Kali calisamiyorsa Windows OnceHafiza'ya sorar.",
+        },
+        ensure_ascii=False,
+    ),
     basari=True,
 )
 log("[HAFIZA] ✅ cross-platform/security kategorisine kaydedildi")

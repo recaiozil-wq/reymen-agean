@@ -90,7 +90,9 @@ class BackupManager:
                     logger.info("[BackupManager] Yedeklenecek yeni dosya yok.")
                     # Yine de son commit hash'ini don
                     return self._son_commit_hash()
-                logger.error("[BackupManager] git commit basarisiz: %s", r.stderr.strip())
+                logger.error(
+                    "[BackupManager] git commit basarisiz: %s", r.stderr.strip()
+                )
                 return None
 
             # commit hash'ini al
@@ -119,6 +121,7 @@ class BackupManager:
     @staticmethod
     def _timestamp() -> str:
         from datetime import datetime
+
         return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     # ------------------------------------------------------------------
@@ -152,10 +155,12 @@ class BackupManager:
                     continue
                 # hash + message
                 parts = line.split(" ", 1)
-                commits.append({
-                    "hash": parts[0],
-                    "message": parts[1] if len(parts) > 1 else "",
-                })
+                commits.append(
+                    {
+                        "hash": parts[0],
+                        "message": parts[1] if len(parts) > 1 else "",
+                    }
+                )
             return commits
 
         except (FileNotFoundError, subprocess.TimeoutExpired, OSError) as e:
@@ -178,7 +183,10 @@ class BackupManager:
         try:
             r = subprocess.run(
                 [
-                    "git", "log", "--all", "--max-count=50",
+                    "git",
+                    "log",
+                    "--all",
+                    "--max-count=50",
                     "--format=%H|%h|%an|%ai|%s",
                 ],
                 cwd=str(self._repo_path),
@@ -196,13 +204,15 @@ class BackupManager:
                     continue
                 parts = line.split("|", 4)
                 if len(parts) >= 5:
-                    commits.append({
-                        "hash": parts[0],
-                        "kisa_hash": parts[1],
-                        "author": parts[2],
-                        "tarih": parts[3],
-                        "message": parts[4],
-                    })
+                    commits.append(
+                        {
+                            "hash": parts[0],
+                            "kisa_hash": parts[1],
+                            "author": parts[2],
+                            "tarih": parts[3],
+                            "message": parts[4],
+                        }
+                    )
                 elif len(parts) >= 1:
                     commits.append({"hash": parts[0]})
             return commits
@@ -255,7 +265,9 @@ class BackupManager:
                 logger.info("[BackupManager] Geri yukleme basarili: %s", ref)
                 return True
             else:
-                logger.error("[BackupManager] checkout basarisiz (%s): %s", ref, r.stderr.strip())
+                logger.error(
+                    "[BackupManager] checkout basarisiz (%s): %s", ref, r.stderr.strip()
+                )
                 return False
 
         except (FileNotFoundError, subprocess.TimeoutExpired, OSError) as e:

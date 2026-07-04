@@ -10,6 +10,7 @@ used to load zero rows and show a blank chat.
 and redirects to the first descendant that actually has messages. These
 tests pin that behaviour.
 """
+
 import time
 
 import pytest
@@ -36,14 +37,17 @@ def _make_chain(db: SessionDB, ids_with_parent):
 
 def test_redirects_from_empty_head_to_descendant_with_messages(db):
     # Reproducer shape from #15000: 6 sessions, only the 5th holds messages.
-    _make_chain(db, [
-        ("head",   None),
-        ("mid1",   "head"),
-        ("mid2",   "mid1"),
-        ("mid3",   "mid2"),
-        ("bulk",   "mid3"),    # has messages
-        ("tail",   "bulk"),    # empty tail after another compression
-    ])
+    _make_chain(
+        db,
+        [
+            ("head", None),
+            ("mid1", "head"),
+            ("mid2", "mid1"),
+            ("mid3", "mid2"),
+            ("bulk", "mid3"),  # has messages
+            ("tail", "bulk"),  # empty tail after another compression
+        ],
+    )
     for i in range(5):
         db.append_message("bulk", role="user", content=f"msg {i}")
 
@@ -87,10 +91,13 @@ def test_prefers_most_recent_child_when_fork_exists(db):
     # If a session was somehow forked (two children), pick the latest one.
     # In practice, compression only produces single-chain shape, but the helper
     # should degrade gracefully.
-    _make_chain(db, [
-        ("parent", None),
-        ("older_fork", "parent"),
-        ("newer_fork", "parent"),
-    ])
+    _make_chain(
+        db,
+        [
+            ("parent", None),
+            ("older_fork", "parent"),
+            ("newer_fork", "parent"),
+        ],
+    )
     db.append_message("newer_fork", role="user", content="x")
     assert db.resolve_resume_session_id("parent") == "newer_fork"

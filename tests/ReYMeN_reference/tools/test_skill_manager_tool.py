@@ -27,8 +27,9 @@ from tools.skill_manager_tool import (
 def _skill_dir(tmp_path):
     """Patch both SKILLS_DIR and get_all_skills_dirs so _find_skill searches
     only the temp directory — not the real ~/.ReYMeN/skills/."""
-    with patch("tools.skill_manager_tool.SKILLS_DIR", tmp_path), \
-         patch("agent.skill_utils.get_all_skills_dirs", return_value=[tmp_path]):
+    with patch("tools.skill_manager_tool.SKILLS_DIR", tmp_path), patch(
+        "agent.skill_utils.get_all_skills_dirs", return_value=[tmp_path]
+    ):
         yield
 
 
@@ -122,23 +123,37 @@ class TestValidateFrontmatter:
 
     def test_no_frontmatter(self):
         err = _validate_frontmatter("# Just a heading\nSome content.\n")
-        assert err == "SKILL.md must start with YAML frontmatter (---). See existing skills for format."
+        assert (
+            err
+            == "SKILL.md must start with YAML frontmatter (---). See existing skills for format."
+        )
 
     def test_unclosed_frontmatter(self):
         content = "---\nname: test\ndescription: desc\nBody content.\n"
-        assert _validate_frontmatter(content) == "SKILL.md frontmatter is not closed. Ensure you have a closing '---' line."
+        assert (
+            _validate_frontmatter(content)
+            == "SKILL.md frontmatter is not closed. Ensure you have a closing '---' line."
+        )
 
     def test_missing_name_field(self):
         content = "---\ndescription: desc\n---\n\nBody.\n"
-        assert _validate_frontmatter(content) == "Frontmatter must include 'name' field."
+        assert (
+            _validate_frontmatter(content) == "Frontmatter must include 'name' field."
+        )
 
     def test_missing_description_field(self):
         content = "---\nname: test\n---\n\nBody.\n"
-        assert _validate_frontmatter(content) == "Frontmatter must include 'description' field."
+        assert (
+            _validate_frontmatter(content)
+            == "Frontmatter must include 'description' field."
+        )
 
     def test_no_body_after_frontmatter(self):
         content = "---\nname: test\ndescription: desc\n---\n"
-        assert _validate_frontmatter(content) == "SKILL.md must have content after the frontmatter (instructions, procedures, etc.)."
+        assert (
+            _validate_frontmatter(content)
+            == "SKILL.md must have content after the frontmatter (instructions, procedures, etc.)."
+        )
 
     def test_invalid_yaml(self):
         content = "---\n: invalid: yaml: {{{\n---\n\nBody.\n"
@@ -238,9 +253,12 @@ class TestCreateSkill:
         skills_dir = tmp_path / "skills"
         skills_dir.mkdir()
 
-        with patch("tools.skill_manager_tool.SKILLS_DIR", skills_dir), \
-             patch("agent.skill_utils.get_all_skills_dirs", return_value=[skills_dir]):
-            result = _create_skill("my-skill", VALID_SKILL_CONTENT, category="../escape")
+        with patch("tools.skill_manager_tool.SKILLS_DIR", skills_dir), patch(
+            "agent.skill_utils.get_all_skills_dirs", return_value=[skills_dir]
+        ):
+            result = _create_skill(
+                "my-skill", VALID_SKILL_CONTENT, category="../escape"
+            )
 
         assert result["success"] is False
         assert "Invalid category '../escape'" in result["error"]
@@ -251,9 +269,12 @@ class TestCreateSkill:
         skills_dir.mkdir()
         outside = tmp_path / "outside"
 
-        with patch("tools.skill_manager_tool.SKILLS_DIR", skills_dir), \
-             patch("agent.skill_utils.get_all_skills_dirs", return_value=[skills_dir]):
-            result = _create_skill("my-skill", VALID_SKILL_CONTENT, category=str(outside))
+        with patch("tools.skill_manager_tool.SKILLS_DIR", skills_dir), patch(
+            "agent.skill_utils.get_all_skills_dirs", return_value=[skills_dir]
+        ):
+            result = _create_skill(
+                "my-skill", VALID_SKILL_CONTENT, category=str(outside)
+            )
 
         assert result["success"] is False
         assert f"Invalid category '{outside}'" in result["error"]
@@ -299,7 +320,10 @@ class TestPatchSkill:
             _create_skill("my-skill", VALID_SKILL_CONTENT)
             result = _patch_skill("my-skill", "this text does not exist", "replacement")
         assert result["success"] is False
-        assert "not found" in result["error"].lower() or "could not find" in result["error"].lower()
+        assert (
+            "not found" in result["error"].lower()
+            or "could not find" in result["error"].lower()
+        )
 
     def test_patch_ambiguous_match_rejected(self, tmp_path):
         content = """\
@@ -338,7 +362,9 @@ word word
         with _skill_dir(tmp_path):
             _create_skill("my-skill", VALID_SKILL_CONTENT)
             _write_file("my-skill", "references/api.md", "old text here")
-            result = _patch_skill("my-skill", "old text", "new text", file_path="references/api.md")
+            result = _patch_skill(
+                "my-skill", "old text", "new text", file_path="references/api.md"
+            )
         assert result["success"] is True
 
     def test_patch_skill_not_found(self, tmp_path):
@@ -359,7 +385,9 @@ word word
             except OSError:
                 pytest.skip("Symlinks not supported")
 
-            result = _patch_skill("my-skill", "old text", "new text", file_path="references/evil.md")
+            result = _patch_skill(
+                "my-skill", "old text", "new text", file_path="references/evil.md"
+            )
 
         assert result["success"] is False
         assert "escapes" in result["error"].lower()
@@ -446,7 +474,9 @@ class TestWriteFile:
     def test_write_reference_file(self, tmp_path):
         with _skill_dir(tmp_path):
             _create_skill("my-skill", VALID_SKILL_CONTENT)
-            result = _write_file("my-skill", "references/api.md", "# API\nEndpoint docs.")
+            result = _write_file(
+                "my-skill", "references/api.md", "# API\nEndpoint docs."
+            )
         assert result["success"] is True
         assert (tmp_path / "my-skill" / "references" / "api.md").exists()
 
@@ -553,8 +583,11 @@ class TestSkillManageDispatcher:
         or prune it).
         """
         with _skill_dir(tmp_path):
-            raw = skill_manage(action="create", name="test-skill", content=VALID_SKILL_CONTENT)
+            raw = skill_manage(
+                action="create", name="test-skill", content=VALID_SKILL_CONTENT
+            )
             from tools.skill_usage import load_usage
+
             usage = load_usage()
         result = json.loads(raw)
         assert result["success"] is True
@@ -566,6 +599,7 @@ class TestSkillManageDispatcher:
     def test_create_from_background_review_marks_agent_created(self, tmp_path):
         """Background-review fork creates ARE marked as agent-created."""
         from tools.skill_provenance import set_current_write_origin, BACKGROUND_REVIEW
+
         token = set_current_write_origin(BACKGROUND_REVIEW)
         try:
             with _skill_dir(tmp_path):
@@ -573,9 +607,11 @@ class TestSkillManageDispatcher:
                     action="create", name="review-sediment", content=VALID_SKILL_CONTENT
                 )
                 from tools.skill_usage import load_usage
+
                 usage = load_usage()
         finally:
             from tools.skill_provenance import reset_current_write_origin
+
             reset_current_write_origin(token)
         result = json.loads(raw)
         assert result["success"] is True
@@ -608,8 +644,9 @@ class TestSecurityScanGate:
         """Default config (flag off) short-circuits before running scan_skill."""
         from tools.skill_manager_tool import _security_scan_skill
 
-        with patch("tools.skill_manager_tool._guard_agent_created_enabled", return_value=False), \
-             patch("tools.skill_manager_tool.scan_skill") as mock_scan:
+        with patch(
+            "tools.skill_manager_tool._guard_agent_created_enabled", return_value=False
+        ), patch("tools.skill_manager_tool.scan_skill") as mock_scan:
             result = _security_scan_skill(tmp_path)
 
         assert result is None
@@ -629,8 +666,11 @@ class TestSecurityScanGate:
             findings=[],
             summary="ok",
         )
-        with patch("tools.skill_manager_tool._guard_agent_created_enabled", return_value=True), \
-             patch("tools.skill_manager_tool.scan_skill", return_value=fake_result) as mock_scan:
+        with patch(
+            "tools.skill_manager_tool._guard_agent_created_enabled", return_value=True
+        ), patch(
+            "tools.skill_manager_tool.scan_skill", return_value=fake_result
+        ) as mock_scan:
             result = _security_scan_skill(tmp_path)
 
         assert result is None
@@ -642,8 +682,13 @@ class TestSecurityScanGate:
         from tools.skills_guard import ScanResult, Finding
 
         finding = Finding(
-            pattern_id="test", severity="critical", category="exfiltration",
-            file="SKILL.md", line=1, match="curl $TOKEN", description="test",
+            pattern_id="test",
+            severity="critical",
+            category="exfiltration",
+            file="SKILL.md",
+            line=1,
+            match="curl $TOKEN",
+            description="test",
         )
         fake_result = ScanResult(
             skill_name="test",
@@ -653,8 +698,9 @@ class TestSecurityScanGate:
             findings=[finding],
             summary="dangerous",
         )
-        with patch("tools.skill_manager_tool._guard_agent_created_enabled", return_value=True), \
-             patch("tools.skill_manager_tool.scan_skill", return_value=fake_result):
+        with patch(
+            "tools.skill_manager_tool._guard_agent_created_enabled", return_value=True
+        ), patch("tools.skill_manager_tool.scan_skill", return_value=fake_result):
             result = _security_scan_skill(tmp_path)
 
         assert result is not None
@@ -671,8 +717,10 @@ class TestSecurityScanGate:
         """_guard_agent_created_enabled returns True when user explicitly enables."""
         from tools.skill_manager_tool import _guard_agent_created_enabled
 
-        with patch("ReYMeN_cli.config.load_config",
-                   return_value={"skills": {"guard_agent_created": True}}):
+        with patch(
+            "ReYMeN_cli.config.load_config",
+            return_value={"skills": {"guard_agent_created": True}},
+        ):
             assert _guard_agent_created_enabled() is True
 
     def test_guard_flag_handles_config_error(self):
@@ -687,20 +735,26 @@ class TestSecurityScanGate:
         from tools.skill_manager_tool import _guard_agent_created_enabled
 
         for quoted in ("false", "False", "0", "no", "off"):
-            with patch("ReYMeN_cli.config.load_config",
-                       return_value={"skills": {"guard_agent_created": quoted}}):
-                assert _guard_agent_created_enabled() is False, \
-                    f"guard_agent_created={quoted!r} must coerce to False"
+            with patch(
+                "ReYMeN_cli.config.load_config",
+                return_value={"skills": {"guard_agent_created": quoted}},
+            ):
+                assert (
+                    _guard_agent_created_enabled() is False
+                ), f"guard_agent_created={quoted!r} must coerce to False"
 
     def test_guard_flag_quoted_true_enables(self):
         """Quoted truthy strings must enable the guard."""
         from tools.skill_manager_tool import _guard_agent_created_enabled
 
         for quoted in ("true", "True", "1", "yes", "on"):
-            with patch("ReYMeN_cli.config.load_config",
-                       return_value={"skills": {"guard_agent_created": quoted}}):
-                assert _guard_agent_created_enabled() is True, \
-                    f"guard_agent_created={quoted!r} must coerce to True"
+            with patch(
+                "ReYMeN_cli.config.load_config",
+                return_value={"skills": {"guard_agent_created": quoted}},
+            ):
+                assert (
+                    _guard_agent_created_enabled() is True
+                ), f"guard_agent_created={quoted!r} must coerce to True"
 
 
 # ---------------------------------------------------------------------------
@@ -712,9 +766,9 @@ class TestSecurityScanGate:
 def _two_roots(local_dir: Path, external_dir: Path):
     """Patch the skill manager so local SKILLS_DIR = local_dir and
     get_all_skills_dirs() returns [local_dir, external_dir] in order."""
-    with patch("tools.skill_manager_tool.SKILLS_DIR", local_dir), \
-         patch("agent.skill_utils.get_all_skills_dirs",
-               return_value=[local_dir, external_dir]):
+    with patch("tools.skill_manager_tool.SKILLS_DIR", local_dir), patch(
+        "agent.skill_utils.get_all_skills_dirs", return_value=[local_dir, external_dir]
+    ):
         yield
 
 
@@ -741,7 +795,8 @@ class TestExternalSkillMutations:
     def test_patch_external_skill_writes_in_place(self, tmp_path):
         local = tmp_path / "local"
         external = tmp_path / "vault"
-        local.mkdir(); external.mkdir()
+        local.mkdir()
+        external.mkdir()
         skill_dir = _write_external_skill(external)
 
         with _two_roots(local, external):
@@ -755,7 +810,8 @@ class TestExternalSkillMutations:
     def test_edit_external_skill_writes_in_place(self, tmp_path):
         local = tmp_path / "local"
         external = tmp_path / "vault"
-        local.mkdir(); external.mkdir()
+        local.mkdir()
+        external.mkdir()
         skill_dir = _write_external_skill(external)
 
         new_content = (
@@ -772,7 +828,8 @@ class TestExternalSkillMutations:
     def test_write_file_on_external_skill(self, tmp_path):
         local = tmp_path / "local"
         external = tmp_path / "vault"
-        local.mkdir(); external.mkdir()
+        local.mkdir()
+        external.mkdir()
         skill_dir = _write_external_skill(external)
 
         with _two_roots(local, external):
@@ -785,7 +842,8 @@ class TestExternalSkillMutations:
     def test_remove_file_on_external_skill(self, tmp_path):
         local = tmp_path / "local"
         external = tmp_path / "vault"
-        local.mkdir(); external.mkdir()
+        local.mkdir()
+        external.mkdir()
         skill_dir = _write_external_skill(external)
         (skill_dir / "references").mkdir()
         (skill_dir / "references" / "notes.md").write_text("# Notes\n")
@@ -799,7 +857,8 @@ class TestExternalSkillMutations:
     def test_delete_external_skill_removes_skill_not_root(self, tmp_path):
         local = tmp_path / "local"
         external = tmp_path / "vault"
-        local.mkdir(); external.mkdir()
+        local.mkdir()
+        external.mkdir()
         skill_dir = _write_external_skill(external)
 
         with _two_roots(local, external):
@@ -816,7 +875,8 @@ class TestExternalSkillMutations:
         stop at the external root."""
         local = tmp_path / "local"
         external = tmp_path / "vault"
-        local.mkdir(); external.mkdir()
+        local.mkdir()
+        external.mkdir()
         cat_dir = external / "team"
         cat_dir.mkdir()
         skill_dir = cat_dir / "ext-skill"
@@ -832,23 +892,25 @@ class TestExternalSkillMutations:
         assert result["success"] is True, result
         assert not skill_dir.exists()
         assert not cat_dir.exists()  # empty category cleaned up
-        assert external.exists()     # but never the external root
+        assert external.exists()  # but never the external root
 
     def test_create_still_writes_to_local_root(self, tmp_path):
         """Creating a new skill always lands in local SKILLS_DIR, never
         external_dirs — create is unchanged by this PR."""
         local = tmp_path / "local"
         external = tmp_path / "vault"
-        local.mkdir(); external.mkdir()
+        local.mkdir()
+        external.mkdir()
 
         with _two_roots(local, external):
-            result = _create_skill("fresh-skill", VALID_SKILL_CONTENT.replace(
-                "name: test-skill", "name: fresh-skill"))
+            result = _create_skill(
+                "fresh-skill",
+                VALID_SKILL_CONTENT.replace("name: test-skill", "name: fresh-skill"),
+            )
 
         assert result["success"] is True, result
         assert (local / "fresh-skill" / "SKILL.md").exists()
         assert not (external / "fresh-skill").exists()
-
 
 
 # ---------------------------------------------------------------------------
@@ -857,14 +919,17 @@ class TestExternalSkillMutations:
 # come up. The user unpins via `ReYMeN curator unpin <name>` to delete.
 # ---------------------------------------------------------------------------
 
+
 class TestPinnedGuard:
     """Delete is refused on pinned skills; patch/edit/write_file/remove_file are allowed."""
 
     @staticmethod
     def _pin(name: str):
         """Return a patch context that marks *name* as pinned in skill_usage."""
+
         def _fake_get_record(skill_name, _name=name):
             return {"pinned": True} if skill_name == _name else {"pinned": False}
+
         return patch("tools.skill_usage.get_record", side_effect=_fake_get_record)
 
     def test_edit_allowed_when_pinned(self, tmp_path):
@@ -894,11 +959,15 @@ class TestPinnedGuard:
             _write_file("my-skill", "references/api.md", "original")
             with self._pin("my-skill"):
                 result = _patch_skill(
-                    "my-skill", "original", "modified",
+                    "my-skill",
+                    "original",
+                    "modified",
                     file_path="references/api.md",
                 )
         assert result["success"] is True, result
-        assert (tmp_path / "my-skill" / "references" / "api.md").read_text() == "modified"
+        assert (
+            tmp_path / "my-skill" / "references" / "api.md"
+        ).read_text() == "modified"
 
     def test_delete_refuses_pinned(self, tmp_path):
         """Delete is the one action pin still blocks — it's the irrecoverable one."""
@@ -919,7 +988,9 @@ class TestPinnedGuard:
             with self._pin("my-skill"):
                 result = _write_file("my-skill", "references/api.md", "content")
         assert result["success"] is True, result
-        assert (tmp_path / "my-skill" / "references" / "api.md").read_text() == "content"
+        assert (
+            tmp_path / "my-skill" / "references" / "api.md"
+        ).read_text() == "content"
 
     def test_remove_file_allowed_when_pinned(self, tmp_path):
         with _skill_dir(tmp_path):
@@ -953,7 +1024,9 @@ class TestPinnedGuard:
         """
         with _skill_dir(tmp_path):
             _create_skill("my-skill", VALID_SKILL_CONTENT)
-            with patch("tools.skill_usage.get_record",
-                       side_effect=RuntimeError("sidecar broken")):
+            with patch(
+                "tools.skill_usage.get_record",
+                side_effect=RuntimeError("sidecar broken"),
+            ):
                 result = _delete_skill("my-skill")
         assert result["success"] is True

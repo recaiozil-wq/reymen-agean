@@ -79,6 +79,7 @@ def _handle_tools_command(cli, cmd: str):
     # Reset session so the new tool config is picked up from a clean state
     from reymen.reymen_cli.tools_config import _get_platform_tools
     from reymen.reymen_cli.config import load_config
+
     cli.enabled_toolsets = _get_platform_tools(load_config(), "cli")
     cli.new_session()
     _cprint(f"{_DIM}Session reset. New tool configuration is active.{_RST}")

@@ -10,6 +10,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 import logging
+
 logger = logging.getLogger(__name__)
 
 PROJE_KOK = Path(__file__).resolve().parent.parent.parent
@@ -46,15 +47,20 @@ def kaydet(alt_parser):
 
     Alt komutlar: list, add, remove, test, log
     """
-    alt_parser.add_argument("islem", type=str, nargs="?",
-                            choices=["list", "add", "remove", "test", "log"],
-                            help="Yapilacak islem (list|add|remove|test|log)")
-    alt_parser.add_argument("--name", type=str, default=None,
-                            help="Webhook adi")
-    alt_parser.add_argument("--url", type=str, default=None,
-                            help="Webhook URL (add icin)")
-    alt_parser.add_argument("--event", type=str, default=None,
-                            help="Tetiklenecek olay (add icin)")
+    alt_parser.add_argument(
+        "islem",
+        type=str,
+        nargs="?",
+        choices=["list", "add", "remove", "test", "log"],
+        help="Yapilacak islem (list|add|remove|test|log)",
+    )
+    alt_parser.add_argument("--name", type=str, default=None, help="Webhook adi")
+    alt_parser.add_argument(
+        "--url", type=str, default=None, help="Webhook URL (add icin)"
+    )
+    alt_parser.add_argument(
+        "--event", type=str, default=None, help="Tetiklenecek olay (add icin)"
+    )
 
 
 def calistir(args):
@@ -116,9 +122,15 @@ def calistir(args):
             print(f"[Webhook] Test ediliyor: {name} -> {bilgi.get('url')}")
             try:
                 import urllib.request
-                veri = json.dumps({"test": True, "zaman": datetime.now().isoformat()}).encode()
-                req = urllib.request.Request(bilgi["url"], data=veri,
-                                             headers={"Content-Type": "application/json"})
+
+                veri = json.dumps(
+                    {"test": True, "zaman": datetime.now().isoformat()}
+                ).encode()
+                req = urllib.request.Request(
+                    bilgi["url"],
+                    data=veri,
+                    headers={"Content-Type": "application/json"},
+                )
                 urllib.request.urlopen(req, timeout=5)
                 print(f"[Webhook] Test basarili.")
             except Exception as ex:

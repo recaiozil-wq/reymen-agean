@@ -8,7 +8,7 @@ ReYMeN'te olup ReYMeN'de eksik kalan düşük öncelikli 7 özellik.
 ## ADIM 1: Cost Tracking (Harcama Takibi)
 
 **Yer:** `reymen/sistem/budget_config.py` (mevcut, geliştir)
-**Ne yap:** 
+**Ne yap:**
 - `budget_config.py`'ye provider-based cost hesaplama ekle
 - Her API çağrısında token sayısını + maliyeti logla
 - `cost_log.json` dosyasına günlük/aylık harcama kaydet

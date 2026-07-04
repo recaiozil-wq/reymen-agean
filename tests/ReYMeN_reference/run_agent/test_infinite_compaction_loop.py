@@ -23,6 +23,7 @@ from agent.context_compressor import ContextCompressor, _CHARS_PER_TOKEN
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _make_compressor(**kwargs) -> ContextCompressor:
     defaults = dict(
         model="test-model",
@@ -42,13 +43,16 @@ def _build_session(n_turns: int, words_per_turn: int = 20) -> list:
     messages = [{"role": "system", "content": "You are a helpful agent."}]
     for i in range(n_turns):
         messages.append({"role": "user", "content": f"{base_text} (user turn {i})"})
-        messages.append({"role": "assistant", "content": f"{base_text} (assistant turn {i})"})
+        messages.append(
+            {"role": "assistant", "content": f"{base_text} (assistant turn {i})"}
+        )
     return messages
 
 
 # ---------------------------------------------------------------------------
 # Test: compress_start >= compress_end registers as ineffective
 # ---------------------------------------------------------------------------
+
 
 class TestCompressNoOpRegistersIneffective:
     """When compress_start >= compress_end, the fix records this as
@@ -75,9 +79,9 @@ class TestCompressNoOpRegistersIneffective:
 
         result = comp.compress(messages, current_tokens=65_000)
 
-        assert comp._ineffective_compression_count >= 1, (
-            f"Expected ineffective_compression_count >= 1, got {comp._ineffective_compression_count}"
-        )
+        assert (
+            comp._ineffective_compression_count >= 1
+        ), f"Expected ineffective_compression_count >= 1, got {comp._ineffective_compression_count}"
 
     def test_no_op_sets_savings_to_zero(self):
         """compress_start >= compress_end -> _last_compression_savings_pct = 0"""
@@ -107,9 +111,9 @@ class TestCompressNoOpRegistersIneffective:
         comp.compress(messages, current_tokens=65_000)
 
         assert comp._ineffective_compression_count >= 2
-        assert not comp.should_compress(65_000), (
-            "should_compress should return False after 2+ ineffective compressions"
-        )
+        assert not comp.should_compress(
+            65_000
+        ), "should_compress should return False after 2+ ineffective compressions"
 
     def test_no_op_returns_unchanged_messages(self):
         """compress_start >= compress_end -> messages returned unchanged"""
@@ -124,15 +128,16 @@ class TestCompressNoOpRegistersIneffective:
 
         result = comp.compress(messages, current_tokens=65_000)
 
-        assert len(result) == len(messages), (
-            f"Expected unchanged message count {len(messages)}, got {len(result)}"
-        )
+        assert len(result) == len(
+            messages
+        ), f"Expected unchanged message count {len(messages)}, got {len(result)}"
         comp._find_tail_cut_by_tokens = original_cut
 
 
 # ---------------------------------------------------------------------------
 # Test: _find_tail_cut_by_tokens raw-budget fallback
 # ---------------------------------------------------------------------------
+
 
 class TestTailCutRawBudgetFallback:
     """When the entire transcript fits within soft_ceiling, the fix
@@ -171,9 +176,9 @@ class TestTailCutRawBudgetFallback:
         cut = comp._find_tail_cut_by_tokens(messages, head_end)
 
         n = len(messages)
-        assert head_end < cut < n, (
-            f"Expected head_end ({head_end}) < cut ({cut}) < n ({n})"
-        )
+        assert (
+            head_end < cut < n
+        ), f"Expected head_end ({head_end}) < cut ({cut}) < n ({n})"
 
     def test_proactive_fix_prevents_no_op_window(self):
         """The raw-budget fallback in _find_tail_cut_by_tokens should prevent
@@ -201,6 +206,7 @@ class TestTailCutRawBudgetFallback:
 # Test: Effective compression resets counter
 # ---------------------------------------------------------------------------
 
+
 class TestEffectiveCompressionResetsCounter:
     """When compression actually saves tokens, the ineffective counter resets."""
 
@@ -211,7 +217,9 @@ class TestEffectiveCompressionResetsCounter:
             config_context_length=96000,
         )
         messages = _build_session(30, words_per_turn=100)
-        comp._generate_summary = MagicMock(return_value="Compacted summary of earlier turns.")
+        comp._generate_summary = MagicMock(
+            return_value="Compacted summary of earlier turns."
+        )
         comp.last_prompt_tokens = 65_000
 
         comp.compress(messages, current_tokens=65_000)
@@ -225,6 +233,7 @@ class TestEffectiveCompressionResetsCounter:
 # ---------------------------------------------------------------------------
 # Test: anti-thrashing in should_compress
 # ---------------------------------------------------------------------------
+
 
 class TestAntiThrashing:
     """Directly test the should_compress anti-thrashing guard."""

@@ -24,6 +24,7 @@ from hafiza_genislet import GelismisHafiza
 
 # ── Fixtures ─────────────────────────────────────────────────────────────────
 
+
 @pytest.fixture
 def hg(tmp_path):
     """Her test icin izole gecici DB."""
@@ -44,8 +45,8 @@ def hg_bos(tmp_path):
 # 1. INITIALIZE
 # ══════════════════════════════════════════════════════════════════════════════
 
-class TestInitialize:
 
+class TestInitialize:
     def test_yeni_session_olustur(self, tmp_path):
         db = str(tmp_path / "init.db")
         h = GelismisHafiza(db_yolu=db)
@@ -73,8 +74,8 @@ class TestInitialize:
 # 2. KAYDET
 # ══════════════════════════════════════════════════════════════════════════════
 
-class TestKaydet:
 
+class TestKaydet:
     def test_konusma_kaydet_basarili(self, hg):
         assert hg.kaydet("Python decorator nasil calisir?") is True
 
@@ -85,12 +86,15 @@ class TestKaydet:
         assert hg.tercih_kaydet("dil", "Turkce") is True
 
     def test_metadata_ile_kaydet(self, hg):
-        assert hg.kaydet(
-            "Metadata testi",
-            koleksiyon="konusmalar",
-            anahtar="meta_test",
-            metadata={"kaynak": "test", "puan": 5},
-        ) is True
+        assert (
+            hg.kaydet(
+                "Metadata testi",
+                koleksiyon="konusmalar",
+                anahtar="meta_test",
+                metadata={"kaynak": "test", "puan": 5},
+            )
+            is True
+        )
 
     def test_uzun_icerik_10k(self, hg):
         assert hg.kaydet("A" * 10_000) is True
@@ -124,8 +128,8 @@ class TestKaydet:
 # 3. ARA (FTS5)
 # ══════════════════════════════════════════════════════════════════════════════
 
-class TestAra:
 
+class TestAra:
     def test_fts5_tam_kelime_bulur(self, hg):
         hg.kaydet("Python decorator fonksiyon sarici", anahtar="decorator")
         sonuclar = hg.ara("decorator")
@@ -189,8 +193,8 @@ class TestAra:
 # 4. SESSION_ARA
 # ══════════════════════════════════════════════════════════════════════════════
 
-class TestSessionAra:
 
+class TestSessionAra:
     def test_konusmalar_koleksiyonunda_bulur(self, hg):
         # session_ara sadece "konusmalar" ve "session_ozetleri" koleksiyonlarinda arar
         hg.kaydet("ReYMeN_agent_benzersiz testi", koleksiyon="konusmalar")
@@ -219,8 +223,8 @@ class TestSessionAra:
 # 5. SESSION YONETIMI
 # ══════════════════════════════════════════════════════════════════════════════
 
-class TestSessionYonetimi:
 
+class TestSessionYonetimi:
     def test_session_listele(self, hg):
         sessions = hg.session_listele()
         assert isinstance(sessions, list)
@@ -272,8 +276,8 @@ class TestSessionYonetimi:
 # 6. KULLANICI TERCIHLERİ
 # ══════════════════════════════════════════════════════════════════════════════
 
-class TestTercihler:
 
+class TestTercihler:
     def test_kaydet_al(self, hg):
         hg.tercih_kaydet("dil", "Turkce")
         assert hg.tercih_al("dil") == "Turkce"
@@ -308,8 +312,8 @@ class TestTercihler:
 # 7. DAYANIKLILIK
 # ══════════════════════════════════════════════════════════════════════════════
 
-class TestDayaniklilik:
 
+class TestDayaniklilik:
     def test_buyuk_veri_200_kayit(self, hg):
         for i in range(200):
             hg.kaydet(f"Test kaydi numarasi {i} bilgi ogrenme")

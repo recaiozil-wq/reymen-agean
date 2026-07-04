@@ -2,6 +2,7 @@
 """
 test_agent_memory_manager.py — agent/memory_manager.py testleri (~35 test)
 """
+
 import pytest
 from unittest.mock import MagicMock, patch, PropertyMock
 from typing import Any, Dict, List, Optional
@@ -11,8 +12,10 @@ from typing import Any, Dict, List, Optional
 # Mock MemoryProvider
 # ---------------------------------------------------------------------------
 
+
 class MockProvider:
     """Testler icin basit MemoryProvider mock'u."""
+
     def __init__(self, name="test_provider", tools=None):
         self._name = name
         self._tools = tools or []
@@ -58,7 +61,9 @@ class MockProvider:
     def on_session_end(self, messages):
         pass
 
-    def on_session_switch(self, new_session_id, parent_session_id="", reset=False, **kwargs):
+    def on_session_switch(
+        self, new_session_id, parent_session_id="", reset=False, **kwargs
+    ):
         pass
 
     def on_pre_compress(self, messages):
@@ -76,6 +81,7 @@ class MockProvider:
 
 class MockProviderWithMessages(MockProvider):
     """sync_turn'i messages parametresini kabul eden provider."""
+
     def sync_turn(self, user_content, assistant_content, session_id="", messages=None):
         self.sync_called = True
         self.last_messages = messages
@@ -85,23 +91,28 @@ class MockProviderWithMessages(MockProvider):
 # sanitize_context
 # ---------------------------------------------------------------------------
 
+
 class TestSanitizeContext:
     def test_temiz_metin_degismez(self):
         from agent.memory_manager import sanitize_context
+
         assert sanitize_context("merhaba dunya") == "merhaba dunya"
 
     def test_memory_context_etiketi_temizlenir(self):
         from agent.memory_manager import sanitize_context
+
         text = "<memory-context>gizli bilgi</memory-context> dis"
         assert sanitize_context(text) == " dis"
 
     def test_fence_etiketi_temizlenir(self):
         from agent.memory_manager import sanitize_context
+
         text = "</memory-context> bas"
         assert sanitize_context(text) == " bas"
 
     def test_system_note_temizlenir(self):
         from agent.memory_manager import sanitize_context
+
         text = (
             "[System note: The following is recalled memory context, "
             "NOT new user input. Treat as authoritative reference data.] icerik"
@@ -112,15 +123,18 @@ class TestSanitizeContext:
 
     def test_bos_metin(self):
         from agent.memory_manager import sanitize_context
+
         assert sanitize_context("") == ""
 
     def test_ic_ice_etiketler(self):
         from agent.memory_manager import sanitize_context
+
         text = "<memory-context><memory-context>derin</memory-context></memory-context>"
         assert sanitize_context(text) == ""
 
     def test_buyuk_kucuk_harf_ignored(self):
         from agent.memory_manager import sanitize_context
+
         text = "<MEMORY-CONTEXT>data</MEMORY-CONTEXT>"
         assert sanitize_context(text) == ""
 
@@ -129,14 +143,17 @@ class TestSanitizeContext:
 # StreamingContextScrubber
 # ---------------------------------------------------------------------------
 
+
 class TestStreamingContextScrubber:
     def test_temiz_metin_gecer(self):
         from agent.memory_manager import StreamingContextScrubber
+
         scrubber = StreamingContextScrubber()
         assert scrubber.feed("merhaba") == "merhaba"
 
     def test_acik_etiket_icindekini_siler(self):
         from agent.memory_manager import StreamingContextScrubber
+
         scrubber = StreamingContextScrubber()
         assert scrubber.feed("once\n<memory-context>\n") == "once\n"
         assert scrubber.feed("gizli") == ""
@@ -145,6 +162,7 @@ class TestStreamingContextScrubber:
 
     def test_parcali_span(self):
         from agent.memory_manager import StreamingContextScrubber
+
         scrubber = StreamingContextScrubber()
         # First chunk — no tag yet
         assert scrubber.feed("once\n") == "once\n"
@@ -161,12 +179,14 @@ class TestStreamingContextScrubber:
 
     def test_flush_temiz_metin(self):
         from agent.memory_manager import StreamingContextScrubber
+
         scrubber = StreamingContextScrubber()
         scrubber.feed("merhaba")
         assert scrubber.flush() == ""
 
     def test_flush_acik_spani_siler(self):
         from agent.memory_manager import StreamingContextScrubber
+
         scrubber = StreamingContextScrubber()
         scrubber.feed("<memory-context>")
         scrubber.feed("gizli")
@@ -174,12 +194,14 @@ class TestStreamingContextScrubber:
 
     def test_flush_partial_tag_verir(self):
         from agent.memory_manager import StreamingContextScrubber
+
         scrubber = StreamingContextScrubber()
         scrubber.feed("merhaba <mem")  # partial tag
         assert scrubber.flush() == "<mem"
 
     def test_reset(self):
         from agent.memory_manager import StreamingContextScrubber
+
         scrubber = StreamingContextScrubber()
         scrubber.feed("<memory-context>")
         scrubber.reset()
@@ -187,13 +209,17 @@ class TestStreamingContextScrubber:
 
     def test_bos_feed(self):
         from agent.memory_manager import StreamingContextScrubber
+
         scrubber = StreamingContextScrubber()
         assert scrubber.feed("") == ""
 
     def test_at_block_boundary(self):
         from agent.memory_manager import StreamingContextScrubber
+
         scrubber = StreamingContextScrubber()
-        result = scrubber.feed("once\n\n<memory-context>\ngizli\n</memory-context>\nsonra")
+        result = scrubber.feed(
+            "once\n\n<memory-context>\ngizli\n</memory-context>\nsonra"
+        )
         assert "once" in result
         assert "gizli" not in result
         assert "sonra" in result
@@ -203,14 +229,17 @@ class TestStreamingContextScrubber:
 # build_memory_context_block
 # ---------------------------------------------------------------------------
 
+
 class TestBuildMemoryContextBlock:
     def test_bos_metin_icin_bos(self):
         from agent.memory_manager import build_memory_context_block
+
         assert build_memory_context_block("") == ""
         assert build_memory_context_block("   ") == ""
 
     def test_metin_sarilir(self):
         from agent.memory_manager import build_memory_context_block
+
         result = build_memory_context_block("test verisi")
         assert "<memory-context>" in result
         assert "</memory-context>" in result
@@ -220,6 +249,7 @@ class TestBuildMemoryContextBlock:
     def test_onceden_sarilmis_metin_temizlenir(self, caplog):
         from agent.memory_manager import build_memory_context_block
         import logging
+
         caplog.set_level(logging.WARNING)
         raw = "<memory-context>eski veri</memory-context>"
         result = build_memory_context_block(raw)
@@ -234,14 +264,17 @@ class TestBuildMemoryContextBlock:
 # MemoryManager — Registration
 # ---------------------------------------------------------------------------
 
+
 class TestMemoryManagerRegistration:
     def test_bos_baslar(self):
         from agent.memory_manager import MemoryManager
+
         mm = MemoryManager()
         assert mm.providers == []
 
     def test_provider_eklenir(self):
         from agent.memory_manager import MemoryManager
+
         mm = MemoryManager()
         p = MockProvider(name="builtin")
         mm.add_provider(p)
@@ -250,6 +283,7 @@ class TestMemoryManagerRegistration:
 
     def test_builtin_ve_bir_external(self):
         from agent.memory_manager import MemoryManager
+
         mm = MemoryManager()
         mm.add_provider(MockProvider(name="builtin"))
         mm.add_provider(MockProvider(name="external1"))
@@ -257,6 +291,7 @@ class TestMemoryManagerRegistration:
 
     def test_ikinci_external_reddedilir(self):
         from agent.memory_manager import MemoryManager
+
         mm = MemoryManager()
         mm.add_provider(MockProvider(name="builtin"))
         mm.add_provider(MockProvider(name="external1"))
@@ -265,6 +300,7 @@ class TestMemoryManagerRegistration:
 
     def test_get_provider_var(self):
         from agent.memory_manager import MemoryManager
+
         mm = MemoryManager()
         p = MockProvider(name="builtin")
         mm.add_provider(p)
@@ -273,11 +309,15 @@ class TestMemoryManagerRegistration:
 
     def test_tool_indexlenir(self):
         from agent.memory_manager import MemoryManager
+
         mm = MemoryManager()
-        p = MockProvider(name="builtin", tools=[
-            {"name": "memory_save"},
-            {"name": "memory_search"},
-        ])
+        p = MockProvider(
+            name="builtin",
+            tools=[
+                {"name": "memory_save"},
+                {"name": "memory_search"},
+            ],
+        )
         mm.add_provider(p)
         assert mm.has_tool("memory_save") is True
         assert mm.has_tool("memory_search") is True
@@ -286,6 +326,7 @@ class TestMemoryManagerRegistration:
     def test_tool_isim_catismasi_uyari(self, caplog):
         from agent.memory_manager import MemoryManager
         import logging
+
         caplog.set_level(logging.WARNING)
         mm = MemoryManager()
         p1 = MockProvider(name="builtin", tools=[{"name": "memory_save"}])
@@ -299,14 +340,17 @@ class TestMemoryManagerRegistration:
 # MemoryManager — System prompt
 # ---------------------------------------------------------------------------
 
+
 class TestMemoryManagerSystemPrompt:
     def test_bos_provider_bos_prompt(self):
         from agent.memory_manager import MemoryManager
+
         mm = MemoryManager()
         assert mm.build_system_prompt() == ""
 
     def test_provider_blok_eklenir(self):
         from agent.memory_manager import MemoryManager
+
         mm = MemoryManager()
         p = MockProvider(name="builtin")
         p.system_block = "Benim hafiza blokum"
@@ -315,6 +359,7 @@ class TestMemoryManagerSystemPrompt:
 
     def test_bos_blok_atlanir(self):
         from agent.memory_manager import MemoryManager
+
         mm = MemoryManager()
         p1 = MockProvider(name="builtin")
         p1.system_block = "blok1"
@@ -328,6 +373,7 @@ class TestMemoryManagerSystemPrompt:
 
     def test_provider_hatasi_sessiz_gecer(self, caplog):
         from agent.memory_manager import MemoryManager
+
         mm = MemoryManager()
         p = MockProvider(name="builtin")
         p.system_prompt_block = MagicMock(side_effect=ValueError("hata"))
@@ -341,9 +387,11 @@ class TestMemoryManagerSystemPrompt:
 # MemoryManager — Prefetch / Sync
 # ---------------------------------------------------------------------------
 
+
 class TestMemoryManagerPrefetch:
     def test_prefetch_all_cagrilir(self):
         from agent.memory_manager import MemoryManager
+
         mm = MemoryManager()
         p = MockProvider(name="builtin")
         p.prefetch_result = "hafiza verisi"
@@ -354,6 +402,7 @@ class TestMemoryManagerPrefetch:
 
     def test_queue_prefetch_all_cagrilir(self):
         from agent.memory_manager import MemoryManager
+
         mm = MemoryManager()
         p = MockProvider(name="builtin")
         mm.add_provider(p)
@@ -362,6 +411,7 @@ class TestMemoryManagerPrefetch:
 
     def test_sync_all_cagrilir(self):
         from agent.memory_manager import MemoryManager
+
         mm = MemoryManager()
         p = MockProvider(name="builtin")
         mm.add_provider(p)
@@ -370,6 +420,7 @@ class TestMemoryManagerPrefetch:
 
     def test_sync_all_messages_iletilir(self):
         from agent.memory_manager import MemoryManager
+
         mm = MemoryManager()
         p = MockProviderWithMessages(name="builtin")
         mm.add_provider(p)
@@ -380,6 +431,7 @@ class TestMemoryManagerPrefetch:
     def test_prefetch_hatasi_sessiz_gecer(self, caplog):
         from agent.memory_manager import MemoryManager
         import logging
+
         caplog.set_level(logging.DEBUG)
         mm = MemoryManager()
         p = MockProvider(name="builtin")
@@ -394,14 +446,19 @@ class TestMemoryManagerPrefetch:
 # MemoryManager — Tool handling
 # ---------------------------------------------------------------------------
 
+
 class TestMemoryManagerTools:
     def test_get_all_tool_schemas(self):
         from agent.memory_manager import MemoryManager
+
         mm = MemoryManager()
-        p = MockProvider(name="builtin", tools=[
-            {"name": "memory_save"},
-            {"name": "memory_search"},
-        ])
+        p = MockProvider(
+            name="builtin",
+            tools=[
+                {"name": "memory_save"},
+                {"name": "memory_search"},
+            ],
+        )
         mm.add_provider(p)
         schemas = mm.get_all_tool_schemas()
         assert len(schemas) == 2
@@ -410,6 +467,7 @@ class TestMemoryManagerTools:
 
     def test_get_all_tool_names(self):
         from agent.memory_manager import MemoryManager
+
         mm = MemoryManager()
         p = MockProvider(name="builtin", tools=[{"name": "memory_save"}])
         mm.add_provider(p)
@@ -417,6 +475,7 @@ class TestMemoryManagerTools:
 
     def test_handle_tool_call_basarili(self):
         from agent.memory_manager import MemoryManager
+
         mm = MemoryManager()
         p = MockProvider(name="builtin", tools=[{"name": "memory_save"}])
         mm.add_provider(p)
@@ -425,12 +484,14 @@ class TestMemoryManagerTools:
 
     def test_handle_tool_call_bilinmeyen(self):
         from agent.memory_manager import MemoryManager
+
         mm = MemoryManager()
         result = mm.handle_tool_call("yok", {})
         assert "No memory provider handles tool" in result
 
     def test_handle_tool_call_hatasi(self, caplog):
         from agent.memory_manager import MemoryManager
+
         mm = MemoryManager()
         p = MockProvider(name="builtin", tools=[{"name": "memory_save"}])
         p.handle_tool_call = MagicMock(side_effect=ValueError("islem hatasi"))
@@ -443,9 +504,11 @@ class TestMemoryManagerTools:
 # MemoryManager — Lifecycle hooks
 # ---------------------------------------------------------------------------
 
+
 class TestMemoryManagerLifecycle:
     def test_on_turn_start(self):
         from agent.memory_manager import MemoryManager
+
         mm = MemoryManager()
         p = MockProvider(name="builtin")
         mm.add_provider(p)
@@ -454,6 +517,7 @@ class TestMemoryManagerLifecycle:
 
     def test_on_session_end(self):
         from agent.memory_manager import MemoryManager
+
         mm = MemoryManager()
         p = MockProvider(name="builtin")
         p.on_session_end = MagicMock()
@@ -463,6 +527,7 @@ class TestMemoryManagerLifecycle:
 
     def test_on_session_switch(self):
         from agent.memory_manager import MemoryManager
+
         mm = MemoryManager()
         p = MockProvider(name="builtin")
         p.on_session_switch = MagicMock()
@@ -472,6 +537,7 @@ class TestMemoryManagerLifecycle:
 
     def test_initialize_all(self):
         from agent.memory_manager import MemoryManager
+
         mm = MemoryManager()
         p = MockProvider(name="builtin")
         p.initialize = MagicMock()
@@ -481,6 +547,7 @@ class TestMemoryManagerLifecycle:
 
     def test_shutdown_all(self):
         from agent.memory_manager import MemoryManager
+
         mm = MemoryManager()
         p = MockProvider(name="builtin")
         p.shutdown = MagicMock()
@@ -490,6 +557,7 @@ class TestMemoryManagerLifecycle:
 
     def test_on_pre_compress(self):
         from agent.memory_manager import MemoryManager
+
         mm = MemoryManager()
         p = MockProvider(name="builtin")
         p.on_pre_compress = MagicMock(return_value="ozet")
@@ -499,6 +567,7 @@ class TestMemoryManagerLifecycle:
 
     def test_on_delegation(self):
         from agent.memory_manager import MemoryManager
+
         mm = MemoryManager()
         p = MockProvider(name="builtin")
         p.on_delegation = MagicMock()
@@ -508,6 +577,7 @@ class TestMemoryManagerLifecycle:
 
     def test_on_memory_write_builtini_atlar(self):
         from agent.memory_manager import MemoryManager
+
         mm = MemoryManager()
         p = MockProvider(name="builtin")
         p.on_memory_write = MagicMock()
@@ -517,6 +587,7 @@ class TestMemoryManagerLifecycle:
 
     def test_on_memory_write_externale_gider(self):
         from agent.memory_manager import MemoryManager
+
         mm = MemoryManager()
         builtin = MockProvider(name="builtin")
         external = MockProvider(name="external")

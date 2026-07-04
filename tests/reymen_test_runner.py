@@ -190,10 +190,7 @@ def run_core_testler(dosyalar):
             m = re.search(r"Sonuc:\s*(\d+)/(\d+)", sonuc["stdout"])
             gecen = m.group(1) if m else "?"
             toplam = m.group(2) if m else "?"
-            print(
-                renkli(f"OK", "yesil")
-                + f" ({gecen}/{toplam}, {sonuc['sure']}s)"
-            )
+            print(renkli(f"OK", "yesil") + f" ({gecen}/{toplam}, {sonuc['sure']}s)")
         else:
             print(renkli(f"FAIL", "kirmizi") + f" ({sonuc['sure']}s)")
             if sonuc["timeout"]:
@@ -292,7 +289,9 @@ def run_reference_testler(dizin, max_files=50):
         toplam_kalan += int(kalan) if kalan != "?" else 0
         toplam_sure += sonuc["sure"]
 
-        durum = renkli("OK", "yesil") if sonuc["basarili"] else renkli("FAIL", "kirmizi")
+        durum = (
+            renkli("OK", "yesil") if sonuc["basarili"] else renkli("FAIL", "kirmizi")
+        )
         print(f"{durum} (g:{gecen} k:{kalan} {sonuc['sure']}s)")
 
         sonuclar.append(
@@ -458,7 +457,9 @@ def rapor_ozetle(sonuc):
     if toplam > 0:
         print(f"  Test dosyasi: {sonuc.get('dosya_sayisi', 0)}")
         print(f"  Gecen: {renkli(str(gecen), 'yesil')}")
-        print(f"  Kalan: {renkli(str(kalan), 'kirmizi') if kalan > 0 else renkli('0', 'yesil')}")
+        print(
+            f"  Kalan: {renkli(str(kalan), 'kirmizi') if kalan > 0 else renkli('0', 'yesil')}"
+        )
         print(f"  Basari: {renkli(f'%{oran}', 'yesil' if oran >= 90 else 'sari')}")
 
         # Progress bar
@@ -505,7 +506,9 @@ def rapor_ozetle(sonuc):
 # ──────────────────────────────────────────────
 
 
-def ana_calistir(kategori="all", html_rapor=False, json_yol=None, cron_mod=False, marker_filtre=None):
+def ana_calistir(
+    kategori="all", html_rapor=False, json_yol=None, cron_mod=False, marker_filtre=None
+):
     """Ana test orkestratoru."""
     basla = time.time()
 
@@ -531,7 +534,7 @@ def ana_calistir(kategori="all", html_rapor=False, json_yol=None, cron_mod=False
 
     # ── CORE TESTLER ──
     if kategori in ("all", "core", "quick"):
-        print(renkli('▸ CORE TESTLER', 'kalın', 'cyan'))
+        print(renkli("▸ CORE TESTLER", "kalın", "cyan"))
         core_dosyalar = test_dosyalarini_bul(
             KATEGORILER["core"]["dizin"],
             KATEGORILER["core"]["desen"],
@@ -543,15 +546,17 @@ def ana_calistir(kategori="all", html_rapor=False, json_yol=None, cron_mod=False
         core_kalan = sum(1 for s in core_sonuc if not s["basari"])
         core_sure = round(sum(s["sure"] for s in core_sonuc), 2)
 
-        sonuc["kategoriler"].append({
-            "ad": "core",
-            "basari": core_kalan == 0,
-            "toplam": len(core_sonuc),
-            "gecen": core_gecen,
-            "kalan": core_kalan,
-            "sure": core_sure,
-            "dosyalar": core_sonuc,
-        })
+        sonuc["kategoriler"].append(
+            {
+                "ad": "core",
+                "basari": core_kalan == 0,
+                "toplam": len(core_sonuc),
+                "gecen": core_gecen,
+                "kalan": core_kalan,
+                "sure": core_sure,
+                "dosyalar": core_sonuc,
+            }
+        )
         sonuc["dosya_sayisi"] += len(core_sonuc)
         sonuc["gecen_test"] += core_gecen
         sonuc["kalan_test"] += core_kalan
@@ -559,10 +564,12 @@ def ana_calistir(kategori="all", html_rapor=False, json_yol=None, cron_mod=False
 
         for s in core_sonuc:
             if not s["basari"]:
-                sonuc["hatalar"].append({
-                    "dosya": s["ad"],
-                    "hata": s.get("hata", "")[:300],
-                })
+                sonuc["hatalar"].append(
+                    {
+                        "dosya": s["ad"],
+                        "hata": s.get("hata", "")[:300],
+                    }
+                )
 
         print()
 
@@ -570,14 +577,14 @@ def ana_calistir(kategori="all", html_rapor=False, json_yol=None, cron_mod=False
     if kategori in ("all", "pytest", "quick"):
         if kategori == "quick":
             # Quick mod: sadece tests/test_*.py (reference haric)
-            print(renkli('▸ PYTEST TESTLER (hizli)', 'kalın', 'cyan'))
+            print(renkli("▸ PYTEST TESTLER (hizli)", "kalın", "cyan"))
             pytest_dosyalar = test_dosyalarini_bul(
                 KATEGORILER["pytest"]["dizin"],
                 KATEGORILER["pytest"]["desen"],
                 KATEGORILER["pytest"]["hariç"],
             )
         else:
-            print(renkli('▸ PYTEST TESTLER', 'kalın', 'cyan'))
+            print(renkli("▸ PYTEST TESTLER", "kalın", "cyan"))
             pytest_dosyalar = test_dosyalarini_bul(
                 KATEGORILER["pytest"]["dizin"],
                 KATEGORILER["pytest"]["desen"],
@@ -587,31 +594,37 @@ def ana_calistir(kategori="all", html_rapor=False, json_yol=None, cron_mod=False
 
         if pytest_dosyalar:
             print("  Testler calistiriliyor... ", end="", flush=True)
-            p_sonuc = run_pytest_testler(pytest_dosyalar, ["-x", "--tb=short"], marker=marker_filtre)
+            p_sonuc = run_pytest_testler(
+                pytest_dosyalar, ["-x", "--tb=short"], marker=marker_filtre
+            )
             gecen = int(p_sonuc["gecen"]) if p_sonuc["gecen"] != "?" else 0
             kalan = int(p_sonuc["kalan"]) if p_sonuc["kalan"] != "?" else 0
 
             durum_renk = "yesil" if p_sonuc["basari"] else "kirmizi"
             print(renkli("OK" if p_sonuc["basari"] else "FAIL", durum_renk))
 
-            sonuc["kategoriler"].append({
-                "ad": "pytest",
-                "basari": p_sonuc["basari"],
-                "toplam": len(pytest_dosyalar),
-                "gecen": gecen,
-                "kalan": kalan,
-                "sure": p_sonuc["sure"],
-            })
+            sonuc["kategoriler"].append(
+                {
+                    "ad": "pytest",
+                    "basari": p_sonuc["basari"],
+                    "toplam": len(pytest_dosyalar),
+                    "gecen": gecen,
+                    "kalan": kalan,
+                    "sure": p_sonuc["sure"],
+                }
+            )
             sonuc["dosya_sayisi"] += len(pytest_dosyalar)
             sonuc["gecen_test"] += gecen
             sonuc["kalan_test"] += kalan
             sonuc["genel_durum"] = sonuc["genel_durum"] and p_sonuc["basari"]
 
             if not p_sonuc["basari"]:
-                sonuc["hatalar"].append({
-                    "dosya": "pytest (toplu)",
-                    "hata": p_sonuc["cikti"][:500],
-                })
+                sonuc["hatalar"].append(
+                    {
+                        "dosya": "pytest (toplu)",
+                        "hata": p_sonuc["cikti"][:500],
+                    }
+                )
         else:
             print(f"  {renkli('(test dosyasi yok)', 'koyu')}")
 
@@ -619,7 +632,7 @@ def ana_calistir(kategori="all", html_rapor=False, json_yol=None, cron_mod=False
 
     # ── REFERENCE TESTLER ──
     if kategori in ("all", "reference"):
-        print(renkli('▸ REFERENCE TESTLER (ReYMeN)', 'kalın', 'cyan'))
+        print(renkli("▸ REFERENCE TESTLER (ReYMeN)", "kalın", "cyan"))
         ref_dizin = ROOT / "tests" / "ReYMeN_reference"
         if ref_dizin.exists():
             ref_dosyalar = sorted(ref_dizin.rglob("test_*.py"))
@@ -635,15 +648,17 @@ def ana_calistir(kategori="all", html_rapor=False, json_yol=None, cron_mod=False
             gecen = ref_sonuc.get("gecen", 0)
             kalan = ref_sonuc.get("kalan", 0)
 
-            sonuc["kategoriler"].append({
-                "ad": "reference",
-                "basari": kalan == 0,
-                "toplam": ref_sonuc.get("toplam", 0),
-                "gecen": gecen,
-                "kalan": kalan,
-                "sure": ref_sonuc.get("sure", 0),
-                "batch": ref_sonuc.get("batch", []),
-            })
+            sonuc["kategoriler"].append(
+                {
+                    "ad": "reference",
+                    "basari": kalan == 0,
+                    "toplam": ref_sonuc.get("toplam", 0),
+                    "gecen": gecen,
+                    "kalan": kalan,
+                    "sure": ref_sonuc.get("sure", 0),
+                    "batch": ref_sonuc.get("batch", []),
+                }
+            )
             sonuc["dosya_sayisi"] += ref_sonuc.get("toplam", 0)
             sonuc["gecen_test"] += gecen
             sonuc["kalan_test"] += kalan
@@ -655,13 +670,11 @@ def ana_calistir(kategori="all", html_rapor=False, json_yol=None, cron_mod=False
 
     # ── HESAPLAMA ──
     toplam = sonuc["gecen_test"] + sonuc["kalan_test"]
-    sonuc["oran"] = round(
-        (sonuc["gecen_test"] / toplam * 100) if toplam > 0 else 0, 1
-    )
+    sonuc["oran"] = round((sonuc["gecen_test"] / toplam * 100) if toplam > 0 else 0, 1)
     sonuc["sure"] = round(time.time() - basla, 2)
 
     # ── RAPOR ──
-    print(renkli('─' * 55, 'koyu'))
+    print(renkli("─" * 55, "koyu"))
     rapor_ozetle(sonuc)
 
     # JSON cikti
@@ -707,24 +720,16 @@ Ornekler:
         """,
     )
 
-    parser.add_argument(
-        "--core", action="store_true", help="Sadece core testler"
-    )
-    parser.add_argument(
-        "--pytest", action="store_true", help="Sadece pytest testler"
-    )
+    parser.add_argument("--core", action="store_true", help="Sadece core testler")
+    parser.add_argument("--pytest", action="store_true", help="Sadece pytest testler")
     parser.add_argument(
         "--reference", action="store_true", help="Sadece reference testler"
     )
     parser.add_argument(
         "--quick", action="store_true", help="Hizli mod (core + pytest)"
     )
-    parser.add_argument(
-        "--html", action="store_true", help="HTML rapor uret"
-    )
-    parser.add_argument(
-        "--json", type=str, metavar="DOSYA", help="JSON cikti dosyasi"
-    )
+    parser.add_argument("--html", action="store_true", help="HTML rapor uret")
+    parser.add_argument("--json", type=str, metavar="DOSYA", help="JSON cikti dosyasi")
     parser.add_argument(
         "--cron",
         action="store_true",
@@ -788,9 +793,7 @@ Ornekler:
         kategori = "marker"
 
     if marker_filtre:
-        print(
-            f"  {renkli(f'Marker filtresi: {marker_filtre}', 'mavi')}"
-        )
+        print(f"  {renkli(f'Marker filtresi: {marker_filtre}', 'mavi')}")
 
     if args.watch:
         print(f"{renkli('Watch modu aktif...', 'sari')}")
@@ -818,9 +821,7 @@ Ornekler:
                 observer.stop()
             observer.join()
         except ImportError:
-            print(
-                f"{renkli('watchdog modulu gerekli: pip install watchdog', 'sari')}"
-            )
+            print(f"{renkli('watchdog modulu gerekli: pip install watchdog', 'sari')}")
             return 1
     else:
         sonuc = ana_calistir(kategori, args.html, args.json, args.cron, marker_filtre)

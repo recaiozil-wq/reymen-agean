@@ -47,6 +47,7 @@ try:
 
     # Zaman asimi kisa tut, hata durumunda sorunsuz gec
     import socket
+
     socket.setdefaulttimeout(5)
 
     try:
@@ -77,11 +78,15 @@ try:
             if otomatik.get("guncel_var"):
                 print(f"   ✅ Guncelleme bulundu ve uygulandi")
                 guncel = otomatik.get("guncelleme", {})
-                print(f"   Once: v{guncel.get('once', '?')} -> Sonra: v{guncel.get('sonra', '?')}")
+                print(
+                    f"   Once: v{guncel.get('once', '?')} -> Sonra: v{guncel.get('sonra', '?')}"
+                )
             else:
                 print(f"   ✅ Guncel: {otomatik.get('aciklama', '')}")
         else:
-            print(f"   ℹ️  {'Atlandi: ' + otomatik.get('aciklama', '') if otomatik.get('aciklama') else 'Kontrol yapilamadi'}")
+            print(
+                f"   ℹ️  {'Atlandi: ' + otomatik.get('aciklama', '') if otomatik.get('aciklama') else 'Kontrol yapilamadi'}"
+            )
     except Exception as e:
         print(f"   ℹ️  Otomatik guncelleme kontrolu: {e}")
 

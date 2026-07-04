@@ -3,7 +3,9 @@
 from ReYMeN_cli.config import load_env
 
 
-def test_save_anthropic_oauth_token_uses_token_slot_and_clears_api_key(tmp_path, monkeypatch):
+def test_save_anthropic_oauth_token_uses_token_slot_and_clears_api_key(
+    tmp_path, monkeypatch
+):
     home = tmp_path / "ReYMeN"
     home.mkdir()
     monkeypatch.setenv("ReYMeN_HOME", str(home))
@@ -22,7 +24,10 @@ def test_use_anthropic_claude_code_credentials_clears_env_slots(tmp_path, monkey
     home.mkdir()
     monkeypatch.setenv("ReYMeN_HOME", str(home))
 
-    from ReYMeN_cli.config import save_anthropic_oauth_token, use_anthropic_claude_code_credentials
+    from ReYMeN_cli.config import (
+        save_anthropic_oauth_token,
+        use_anthropic_claude_code_credentials,
+    )
 
     save_anthropic_oauth_token("sk-ant-oat01-token")
     use_anthropic_claude_code_credentials()
@@ -32,7 +37,9 @@ def test_use_anthropic_claude_code_credentials_clears_env_slots(tmp_path, monkey
     assert env_vars["ANTHROPIC_API_KEY"] == ""
 
 
-def test_save_anthropic_api_key_uses_api_key_slot_and_clears_token(tmp_path, monkeypatch):
+def test_save_anthropic_api_key_uses_api_key_slot_and_clears_token(
+    tmp_path, monkeypatch
+):
     home = tmp_path / "ReYMeN"
     home.mkdir()
     monkeypatch.setenv("ReYMeN_HOME", str(home))

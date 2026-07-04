@@ -30,7 +30,7 @@ class ConversationCompressor:
         self.provider = provider
         self.pencere_boyutu = max(pencere_boyutu, 2)
         self.esik_token = esik_token
-        self._diyalog_ozeti = ""      # Iteratif ozet: her sikistirmada guncellenir
+        self._diyalog_ozeti = ""  # Iteratif ozet: her sikistirmada guncellenir
         self._sikistirma_sayisi = 0
 
     # ── Token tahmini ──────────────────────────────────────────────────
@@ -64,8 +64,7 @@ class ConversationCompressor:
         )
         try:
             return self.provider.uret(
-                prompt,
-                [{"role": "user", "content": "Ozeti yaz."}]
+                prompt, [{"role": "user", "content": "Ozeti yaz."}]
             )
         except Exception:
             return self._basit_ozetle(mesajlar)
@@ -73,7 +72,7 @@ class ConversationCompressor:
     def _basit_ozetle(self, mesajlar: list) -> str:
         """LLM olmadan kural-tabanli ozet."""
         eylemler = []
-        hatalar  = []
+        hatalar = []
         for m in mesajlar:
             icerik = m.get("content", "")
             # Eylem satırlarını yakala
@@ -129,9 +128,7 @@ class ConversationCompressor:
         self._diyalog_ozeti = ozet
         self._sikistirma_sayisi += 1
 
-        return [
-            {"role": "system", "content": self._OZET_BASLIGI + ozet}
-        ] + yeni
+        return [{"role": "system", "content": self._OZET_BASLIGI + ozet}] + yeni
 
     # ── Yardimci ──────────────────────────────────────────────────────
 
@@ -153,9 +150,9 @@ if __name__ == "__main__":
     c = ConversationCompressor()
     mesajlar = [
         {"role": "user", "content": "bir dosya olustur"},
-        {"role": "assistant", "content": "DOSYA_YAZ(\"test.txt\", \"merhaba\")"},
+        {"role": "assistant", "content": 'DOSYA_YAZ("test.txt", "merhaba")'},
         {"role": "user", "content": "simdi oku"},
-        {"role": "assistant", "content": "DOSYA_OKU(\"test.txt\")"},
+        {"role": "assistant", "content": 'DOSYA_OKU("test.txt")'},
     ]
     sonuc = c.sikistir(mesajlar, esik_token=5)
     print(f"{len(mesajlar)} -> {len(sonuc)} mesaj")

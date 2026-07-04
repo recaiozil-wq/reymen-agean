@@ -54,7 +54,9 @@ class TestMem0FiltersV2:
         client = FakeClientV2()
         provider = self._make_provider(monkeypatch, client)
 
-        provider.handle_tool_call("mem0_search", {"query": "hello", "top_k": 3, "rerank": False})
+        provider.handle_tool_call(
+            "mem0_search", {"query": "hello", "top_k": 3, "rerank": False}
+        )
 
         assert client.captured_search["query"] == "hello"
         assert client.captured_search["top_k"] == 3
@@ -99,7 +101,9 @@ class TestMem0FiltersV2:
         client = FakeClientV2()
         provider = self._make_provider(monkeypatch, client)
 
-        provider.handle_tool_call("mem0_conclude", {"conclusion": "user likes dark mode"})
+        provider.handle_tool_call(
+            "mem0_conclude", {"conclusion": "user likes dark mode"}
+        )
 
         assert len(client.captured_add) == 1
         call = client.captured_add[0]
@@ -137,7 +141,9 @@ class TestMem0ResponseUnwrapping:
         return provider
 
     def test_profile_dict_response(self, monkeypatch):
-        client = FakeClientV2(all_results={"results": [{"memory": "alpha"}, {"memory": "beta"}]})
+        client = FakeClientV2(
+            all_results={"results": [{"memory": "alpha"}, {"memory": "beta"}]}
+        )
         provider = self._make_provider(monkeypatch, client)
 
         result = json.loads(provider.handle_tool_call("mem0_profile", {}))
@@ -156,14 +162,19 @@ class TestMem0ResponseUnwrapping:
         assert "gamma" in result["result"]
 
     def test_search_dict_response(self, monkeypatch):
-        client = FakeClientV2(search_results={
-            "results": [{"memory": "foo", "score": 0.9}, {"memory": "bar", "score": 0.7}]
-        })
+        client = FakeClientV2(
+            search_results={
+                "results": [
+                    {"memory": "foo", "score": 0.9},
+                    {"memory": "bar", "score": 0.7},
+                ]
+            }
+        )
         provider = self._make_provider(monkeypatch, client)
 
-        result = json.loads(provider.handle_tool_call(
-            "mem0_search", {"query": "test", "top_k": 5}
-        ))
+        result = json.loads(
+            provider.handle_tool_call("mem0_search", {"query": "test", "top_k": 5})
+        )
 
         assert result["count"] == 2
         assert result["results"][0]["memory"] == "foo"
@@ -173,9 +184,7 @@ class TestMem0ResponseUnwrapping:
         client = FakeClientV2(search_results=[{"memory": "baz", "score": 0.8}])
         provider = self._make_provider(monkeypatch, client)
 
-        result = json.loads(provider.handle_tool_call(
-            "mem0_search", {"query": "test"}
-        ))
+        result = json.loads(provider.handle_tool_call("mem0_search", {"query": "test"}))
         assert result["count"] == 1
 
     def test_unwrap_results_edge_cases(self):
@@ -187,9 +196,9 @@ class TestMem0ResponseUnwrapping:
         assert Mem0MemoryProvider._unwrap_results("unexpected") == []
 
     def test_prefetch_dict_response(self, monkeypatch):
-        client = FakeClientV2(search_results={
-            "results": [{"memory": "user prefers dark mode"}]
-        })
+        client = FakeClientV2(
+            search_results={"results": [{"memory": "user prefers dark mode"}]}
+        )
         provider = Mem0MemoryProvider()
         provider.initialize("test-session")
         monkeypatch.setattr(provider, "_get_client", lambda: client)

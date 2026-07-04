@@ -27,10 +27,12 @@ VIDEO_CACHE.mkdir(parents=True, exist_ok=True)
 
 # ── Engine Secimi ────────────────────────────────────────────────────────────
 
+
 def _fal_mevcut() -> bool:
     """FAL.ai API key ve kutuphanesi var mi?"""
     try:
         import fal_client
+
         api_key = os.environ.get("FAL_KEY") or os.environ.get("FAL_API_KEY") or ""
         return bool(api_key)
     except ImportError:
@@ -41,12 +43,14 @@ def _hyperframes_mevcut() -> bool:
     """HyperFrames kurulu mu?"""
     try:
         import hyperframes
+
         return True
     except ImportError:
         return False
 
 
 # ── moviepy ile Slayt Gosterisi Videosu ──────────────────────────────────────
+
 
 def _moviepy_slayt(
     resimler: list[str],
@@ -68,11 +72,21 @@ def _moviepy_slayt(
         Video dosyasi yolu.
     """
     try:
-        from moviepy import ImageClip, AudioFileClip, CompositeVideoClip, concatenate_videoclips
+        from moviepy import (
+            ImageClip,
+            AudioFileClip,
+            CompositeVideoClip,
+            concatenate_videoclips,
+        )
     except ImportError:
         # moviepy v1 fallback
         try:
-            from moviepy.editor import ImageClip, AudioFileClip, CompositeVideoClip, concatenate_videoclips
+            from moviepy.editor import (
+                ImageClip,
+                AudioFileClip,
+                CompositeVideoClip,
+                concatenate_videoclips,
+            )
         except ImportError:
             return "[HATA] moviepy kurulu degil."
 
@@ -125,8 +139,11 @@ def _moviepy_slayt(
             c.close()
 
         if os.path.exists(cikti) and os.path.getsize(cikti) > 0:
-            logger.info("[VideoGen] Slayt videosu olusturuldu: %s (%d bytes)",
-                         cikti, os.path.getsize(cikti))
+            logger.info(
+                "[VideoGen] Slayt videosu olusturuldu: %s (%d bytes)",
+                cikti,
+                os.path.getsize(cikti),
+            )
             return cikti
         return "[HATA] Video dosyasi olusturulamadi."
 
@@ -136,6 +153,7 @@ def _moviepy_slayt(
 
 
 # ── FAL.ai ile AI Video Uretimi ─────────────────────────────────────────────
+
 
 def _fal_video(
     prompt: str,
@@ -166,6 +184,7 @@ def _fal_video(
         if resim_yolu and os.path.exists(resim_yolu):
             # Image-to-video
             import base64
+
             with open(resim_yolu, "rb") as f:
                 img_b64 = base64.b64encode(f.read()).decode()
             args["image_url"] = f"data:image/jpeg;base64,{img_b64}"
@@ -176,7 +195,9 @@ def _fal_video(
         elif "image-to-video" in model:
             args["duration"] = sure
 
-        logger.info("[VideoGen] FAL video istegi: model=%s, prompt=%s", model, prompt[:50])
+        logger.info(
+            "[VideoGen] FAL video istegi: model=%s, prompt=%s", model, prompt[:50]
+        )
 
         # Async gonder
         sonuc = fal_client.subscribe(
@@ -186,7 +207,9 @@ def _fal_video(
 
         video_url = ""
         if isinstance(sonuc, dict):
-            video_url = sonuc.get("video", {}).get("url", "") or sonuc.get("output", {}).get("video_url", "")
+            video_url = sonuc.get("video", {}).get("url", "") or sonuc.get(
+                "output", {}
+            ).get("video_url", "")
 
         if video_url:
             logger.info("[VideoGen] FAL video uretildi: %s", video_url[:80])
@@ -201,6 +224,7 @@ def _fal_video(
 
 
 # ── HyperFrames ile Video ────────────────────────────────────────────────────
+
 
 def _hyperframes_video(html_kodu: str, cikti: str = "") -> str:
     """HyperFrames ile HTML'den video olustur.
@@ -232,6 +256,7 @@ def _hyperframes_video(html_kodu: str, cikti: str = "") -> str:
 
 
 # ── Ana API ──────────────────────────────────────────────────────────────────
+
 
 def video_uret(
     prompt: str = "",
@@ -287,12 +312,14 @@ def video_durum() -> str:
 def _moviepy_mevcut() -> bool:
     try:
         import moviepy
+
         return True
     except ImportError:
         return False
 
 
 # ── Motor Kayit ──────────────────────────────────────────────────────────────
+
 
 def motor_kaydet(motor: Any) -> None:
     """Motor'a video gen araclaini kaydet."""
@@ -315,7 +342,9 @@ def motor_kaydet(motor: Any) -> None:
 
         Doner: Video dosyasi yolu veya URL.
         """
-        resim_list = [r.strip() for r in resimler.split(",") if r.strip()] if resimler else []
+        resim_list = (
+            [r.strip() for r in resimler.split(",") if r.strip()] if resimler else []
+        )
         return video_uret(prompt, resim_list, ses_yolu, sure, model)
 
     def _video_durum() -> str:
@@ -347,18 +376,29 @@ def motor_kaydet(motor: Any) -> None:
         return f"❌ Video test basarisiz: {sonuc}"
 
     if hasattr(motor, "_plugin_arac_kaydet"):
-        motor._plugin_arac_kaydet("VIDEO_OLUSTUR", _video_uret,
+        motor._plugin_arac_kaydet(
+            "VIDEO_OLUSTUR",
+            _video_uret,
             "Video uretir. Parametreler: prompt=str (AI prompt), "
             "resimler=str (virgulle ayrilmis resim yollari), "
             "ses_yolu=str (opsiyonel), sure=int (saniye), "
             "model=str (moviepy/fal/hyperframes). "
-            "Doner: video dosyasi yolu veya URL.")
-        motor._plugin_arac_kaydet("VIDEO_DURUM", _video_durum,
-            "Video gen sistem durumu: moviepy/FAL/HyperFrames durumu.")
-        motor._plugin_arac_kaydet("VIDEO_TEST", _video_test,
-            "Video gen sistemini test eder. Basit bir slayt videosu olusturur.")
+            "Doner: video dosyasi yolu veya URL.",
+        )
+        motor._plugin_arac_kaydet(
+            "VIDEO_DURUM",
+            _video_durum,
+            "Video gen sistem durumu: moviepy/FAL/HyperFrames durumu.",
+        )
+        motor._plugin_arac_kaydet(
+            "VIDEO_TEST",
+            _video_test,
+            "Video gen sistemini test eder. Basit bir slayt videosu olusturur.",
+        )
 
-        logger.info("[VideoGen] Motor araclari kaydedildi: VIDEO_OLUSTUR, VIDEO_DURUM, VIDEO_TEST")
+        logger.info(
+            "[VideoGen] Motor araclari kaydedildi: VIDEO_OLUSTUR, VIDEO_DURUM, VIDEO_TEST"
+        )
 
 
 if __name__ == "__main__":

@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 from pathlib import Path as _Path
+
 sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
 from src.gateways.config import Platform, PlatformConfig
@@ -42,6 +43,7 @@ logger = logging.getLogger(__name__)
 
 try:
     import httpx
+
     HTTPX_AVAILABLE = True
 except ImportError:
     HTTPX_AVAILABLE = False
@@ -55,11 +57,13 @@ def check_matrix_requirements() -> bool:
         return True
     try:
         from src.reymen.cron.hermes_stubs import ensure as _lazy_ensure
+
         _lazy_ensure("platform.matrix", prompt=False)
     except Exception:
         return False
     try:
         import httpx as _httpx
+
         httpx = _httpx
         HTTPX_AVAILABLE = True
         return True
@@ -98,9 +102,8 @@ class MatrixAdapter(BasePlatformAdapter):
         super().__init__(config, Platform.MATRIX)
 
         # Ortam degiskenlerinden yapilandirma
-        self._homeserver_url: str = (
-            config.extra.get("homeserver_url")
-            or _env("MATRIX_HOMESERVER_URL", "")
+        self._homeserver_url: str = config.extra.get("homeserver_url") or _env(
+            "MATRIX_HOMESERVER_URL", ""
         )
         self._homeserver_url = self._homeserver_url.rstrip("/")
 
@@ -110,9 +113,8 @@ class MatrixAdapter(BasePlatformAdapter):
             or _env("MATRIX_ACCESS_TOKEN", "")
         )
 
-        self._home_room: str = (
-            config.extra.get("home_room")
-            or _env("MATRIX_HOME_ROOM", "")
+        self._home_room: str = config.extra.get("home_room") or _env(
+            "MATRIX_HOME_ROOM", ""
         )
 
         # API temel URL
@@ -321,6 +323,7 @@ class MatrixAdapter(BasePlatformAdapter):
 
             # Session kaynagi olustur
             from src.gateways.session import SessionSource, build_session_key
+
             source = SessionSource(
                 platform=Platform.MATRIX,
                 chat_id=room_id,
@@ -521,7 +524,9 @@ class MatrixAdapter(BasePlatformAdapter):
             )
 
             if resp.status_code == 404:
-                return SendResult(False, error="Mesaj bulunamadi veya duzenleme desteklenmiyor")
+                return SendResult(
+                    False, error="Mesaj bulunamadi veya duzenleme desteklenmiyor"
+                )
 
             resp.raise_for_status()
             data = resp.json()

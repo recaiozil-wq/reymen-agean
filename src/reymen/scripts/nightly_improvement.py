@@ -47,9 +47,11 @@ RAPOR_DIZINI.mkdir(parents=True, exist_ok=True)
 
 # ── Veri Yapıları ───────────────────────────────────────────────────
 
+
 @dataclass
 class AsamaSonucu:
     """Result of a single stage."""
+
     ad: str
     basarili: bool
     sure_sn: float = 0.0
@@ -61,6 +63,7 @@ class AsamaSonucu:
 @dataclass
 class NightlyRapor:
     """6 aşamalı gece raporunun tamamı."""
+
     timestamp: str = ""
     asamalar: list[dict[str, Any]] = field(default_factory=list)
     toplam_sure_sn: float = 0.0
@@ -75,6 +78,7 @@ class NightlyRapor:
 #  Aşama 1: once_hafiza Analizi (Zayıf Noktalar)
 # ═══════════════════════════════════════════════════════════════════════
 
+
 def _asama_once_hafiza() -> AsamaSonucu:
     """once_hafiza'daki zayıf noktaları tespit et.
 
@@ -87,6 +91,7 @@ def _asama_once_hafiza() -> AsamaSonucu:
 
     try:
         from reymen.sistem.once_hafiza import OnceHafiza
+
         oh = OnceHafiza()
 
         import sqlite3
@@ -136,13 +141,21 @@ def _asama_once_hafiza() -> AsamaSonucu:
 
                 zayif_noktalar = {
                     "dusuk_guven": [
-                        {"hedef": row["hedef"], "guven": row["guven_skoru"],
-                         "basarili": row["basari_sayisi"], "hata": row["hata_sayisi"]}
+                        {
+                            "hedef": row["hedef"],
+                            "guven": row["guven_skoru"],
+                            "basarili": row["basari_sayisi"],
+                            "hata": row["hata_sayisi"],
+                        }
                         for row in dusuk_guven
                     ],
                     "cok_hata": [
-                        {"hedef": row["hedef"], "hata_sayisi": row["hata_sayisi"],
-                         "basarili": row["basari_sayisi"], "guven": row["guven_skoru"]}
+                        {
+                            "hedef": row["hedef"],
+                            "hata_sayisi": row["hata_sayisi"],
+                            "basarili": row["basari_sayisi"],
+                            "guven": row["guven_skoru"],
+                        }
                         for row in cok_hata
                     ],
                     "sifir_basari": [
@@ -185,6 +198,7 @@ def _asama_once_hafiza() -> AsamaSonucu:
 # ═══════════════════════════════════════════════════════════════════════
 #  Aşama 2: Skill İyileştirme (Düşük Başarılı Skill'ler)
 # ═══════════════════════════════════════════════════════════════════════
+
 
 def _asama_skill_iyilestirme() -> AsamaSonucu:
     """Düşük başarılı skill'leri tespit et ve iyileştir."""
@@ -229,8 +243,11 @@ def _asama_skill_iyilestirme() -> AsamaSonucu:
                 "iyilestirilen": iyilestirilen,
                 "tur_dagilimi": tur_dagilimi,
                 "aday_detay": [
-                    {"skill": a.get("skill_adi"), "tur": a.get("tur"),
-                     "oncelik": a.get("oncelik")}
+                    {
+                        "skill": a.get("skill_adi"),
+                        "tur": a.get("tur"),
+                        "oncelik": a.get("oncelik"),
+                    }
                     for a in adaylar[:20]
                 ],
             }
@@ -256,15 +273,14 @@ def _asama_skill_iyilestirme() -> AsamaSonucu:
 #  Aşama 3: Memory Compaction Kontrolü
 # ═══════════════════════════════════════════════════════════════════════
 
+
 def _asama_memory_compaction() -> AsamaSonucu:
     """Hafıza compaction kontrolü yap."""
     basla = time.time()
     sonuc = AsamaSonucu(ad="memory_compaction", basarili=True)
 
     try:
-        from reymen.cereyan.memory_compaction import (
-            memory_compaction_check
-        )
+        from reymen.cereyan.memory_compaction import memory_compaction_check
 
         rapor = memory_compaction_check(zorla=False)
 
@@ -313,6 +329,7 @@ def _asama_memory_compaction() -> AsamaSonucu:
 #  Aşama 4: Kod Kalitesi (ruff/bandit)
 # ═══════════════════════════════════════════════════════════════════════
 
+
 def _asama_kod_kalitesi() -> AsamaSonucu:
     """ruff ve bandit ile kod kalitesi taraması."""
     basla = time.time()
@@ -325,9 +342,18 @@ def _asama_kod_kalitesi() -> AsamaSonucu:
         # ── ruff kontrolü ──
         try:
             r = subprocess.run(
-                [sys.executable, "-m", "ruff", "check", "--select=E,F,W", "--statistics",
-                 str(SRC / "reymen")],
-                capture_output=True, text=True, timeout=60,
+                [
+                    sys.executable,
+                    "-m",
+                    "ruff",
+                    "check",
+                    "--select=E,F,W",
+                    "--statistics",
+                    str(SRC / "reymen"),
+                ],
+                capture_output=True,
+                text=True,
+                timeout=60,
             )
             if r.returncode != 0:
                 for satir in r.stdout.strip().split("\n"):
@@ -336,6 +362,7 @@ def _asama_kod_kalitesi() -> AsamaSonucu:
                         hata_sayisi += 1
                 # Sayıyı standart çıktıdan al
                 import re as _re
+
                 sayi_match = _re.search(r"Found (\d+) error", r.stdout)
                 if sayi_match:
                     hata_sayisi = int(sayi_match.group(1))
@@ -346,7 +373,9 @@ def _asama_kod_kalitesi() -> AsamaSonucu:
         try:
             r = subprocess.run(
                 [sys.executable, "-m", "bandit", "-r", "-q", str(SRC / "reymen")],
-                capture_output=True, text=True, timeout=60,
+                capture_output=True,
+                text=True,
+                timeout=60,
             )
             if r.returncode != 0:
                 for satir in r.stdout.strip().split("\n"):
@@ -419,6 +448,7 @@ def _asama_kod_kalitesi() -> AsamaSonucu:
 #  Aşama 5: Cron Job'ların Durumu
 # ═══════════════════════════════════════════════════════════════════════
 
+
 def _asama_cron_durumu() -> AsamaSonucu:
     """Kayıtlı cron job'larının durumunu kontrol et."""
     basla = time.time()
@@ -435,37 +465,41 @@ def _asama_cron_durumu() -> AsamaSonucu:
                 if isinstance(veri, dict):
                     for job_id, job in veri.items():
                         if isinstance(job, dict):
-                            yerel_isler.append({
-                                "id": job_id,
-                                "ad": job.get("ad", ""),
-                                "cron": job.get("cron", ""),
-                                "aktif": job.get("aktif", True),
-                                "son_durum": job.get("son_durum", "?"),
-                                "son_hata": job.get("son_hata"),
-                            })
+                            yerel_isler.append(
+                                {
+                                    "id": job_id,
+                                    "ad": job.get("ad", ""),
+                                    "cron": job.get("cron", ""),
+                                    "aktif": job.get("aktif", True),
+                                    "son_durum": job.get("son_durum", "?"),
+                                    "son_hata": job.get("son_hata"),
+                                }
+                            )
             except Exception:
                 logger.warning("[fix_01_sessiz_except] Exception")
 
         # Hermes-style cron (jobs.py)
         try:
             from reymen.cron.jobs import list_jobs
+
             h_jobs = list_jobs(include_disabled=True)
             for j in h_jobs:
-                hermes_isler.append({
-                    "id": j.get("id", "?"),
-                    "name": j.get("name", ""),
-                    "schedule": j.get("schedule_display", ""),
-                    "enabled": j.get("enabled", True),
-                    "last_status": j.get("last_status"),
-                    "last_error": j.get("last_error"),
-                })
+                hermes_isler.append(
+                    {
+                        "id": j.get("id", "?"),
+                        "name": j.get("name", ""),
+                        "schedule": j.get("schedule_display", ""),
+                        "enabled": j.get("enabled", True),
+                        "last_status": j.get("last_status"),
+                        "last_error": j.get("last_error"),
+                    }
+                )
         except Exception:
             logger.warning("[fix_01_sessiz_except] Exception")
 
         # Sorunlu job'ları tespit et
         sorunlu = []
-        for isler, kaynak in [(yerel_isler, "yerel"),
-                               (hermes_isler, "hermes")]:
+        for isler, kaynak in [(yerel_isler, "yerel"), (hermes_isler, "hermes")]:
             for j in isler:
                 if not j.get("aktif", j.get("enabled", True)):
                     continue
@@ -475,9 +509,7 @@ def _asama_cron_durumu() -> AsamaSonucu:
                     sorunlu.append({**j, "kaynak": kaynak})
 
         toplam_is = len(yerel_isler) + len(hermes_isler)
-        mesaj = (
-            f"{toplam_is} is, {len(sorunlu)} sorunlu"
-        )
+        mesaj = f"{toplam_is} is, {len(sorunlu)} sorunlu"
 
         sonuc.uyari = len(sorunlu) > 0
         sonuc.veri = {
@@ -501,6 +533,7 @@ def _asama_cron_durumu() -> AsamaSonucu:
 #  Aşama 6: 7 Günlük Trend Raporu
 # ═══════════════════════════════════════════════════════════════════════
 
+
 def _asama_trend_raporu() -> AsamaSonucu:
     """Son 7 günlük performans trendini hesapla."""
     basla = time.time()
@@ -520,15 +553,15 @@ def _asama_trend_raporu() -> AsamaSonucu:
         # once_hafiza trendi
         try:
             from reymen.sistem.once_hafiza import OnceHafiza
+
             oh = OnceHafiza()
             ogrenme_db = oh.ogrenme_db
 
             if Path(ogrenme_db).exists():
                 import sqlite3
+
                 con = sqlite3.connect(ogrenme_db)
-                row = con.execute(
-                    "SELECT COUNT(*) FROM ogrenmeler"
-                ).fetchone()
+                row = con.execute("SELECT COUNT(*) FROM ogrenmeler").fetchone()
                 trend["once_hafiza"]["toplam_kayit"] = row[0] if row else 0
 
                 # Son 7 günde eklenen
@@ -544,9 +577,11 @@ def _asama_trend_raporu() -> AsamaSonucu:
         # Skill iyileştirme trendi
         try:
             from reymen.scripts.skill_iyilestirici import SkillIyilestirici
+
             si = SkillIyilestirici()
 
             import sqlite3
+
             db_yol = ROOT / "skills" / "improvements.db"
             if db_yol.exists():
                 con = sqlite3.connect(str(db_yol))
@@ -574,17 +609,20 @@ def _asama_trend_raporu() -> AsamaSonucu:
 
         # Önceki gece raporlarını topla
         if RAPOR_DIZINI.exists():
-            rapor_dosyalari = sorted(RAPOR_DIZINI.glob("nightly_*.json"),
-                                     reverse=True)[:7]
+            rapor_dosyalari = sorted(RAPOR_DIZINI.glob("nightly_*.json"), reverse=True)[
+                :7
+            ]
             for rp in rapor_dosyalari:
                 try:
                     veri = json.loads(rp.read_text(encoding="utf-8"))
-                    trend["gece_raporlari"].append({
-                        "tarih": veri.get("timestamp", "")[:10],
-                        "basarili_asama": veri.get("basarili_asama", 0),
-                        "toplam_asama": veri.get("toplam_asama", 6),
-                        "uyari_var": veri.get("uyari_var", False),
-                    })
+                    trend["gece_raporlari"].append(
+                        {
+                            "tarih": veri.get("timestamp", "")[:10],
+                            "basarili_asama": veri.get("basarili_asama", 0),
+                            "toplam_asama": veri.get("toplam_asama", 6),
+                            "uyari_var": veri.get("uyari_var", False),
+                        }
+                    )
                 except Exception:
                     continue
 
@@ -602,16 +640,13 @@ def _asama_trend_raporu() -> AsamaSonucu:
 
         oh = trend["once_hafiza"]
         trend_ozeti.append(
-            f"once_hafiza: {oh['toplam_kayit']} kayit "
-            f"(+{oh['yeni_kayit']} yeni)"
+            f"once_hafiza: {oh['toplam_kayit']} kayit " f"(+{oh['yeni_kayit']} yeni)"
         )
 
         gecmis = trend["gece_raporlari"]
         if gecmis:
             uyarili_gun = sum(1 for g in gecmis if g.get("uyari_var"))
-            trend_ozeti.append(
-                f"Son {len(gecmis)} gecede {uyarili_gun} gun uyari var"
-            )
+            trend_ozeti.append(f"Son {len(gecmis)} gecede {uyarili_gun} gun uyari var")
 
         mesaj = " | ".join(trend_ozeti) if trend_ozeti else "Yetersiz veri"
         sonuc.uyari = "UYARI" in mesaj
@@ -630,6 +665,7 @@ def _asama_trend_raporu() -> AsamaSonucu:
 # ═══════════════════════════════════════════════════════════════════════
 #  Rapor Yazma
 # ═══════════════════════════════════════════════════════════════════════
+
 
 def _rapor_kaydet(rapor: NightlyRapor) -> None:
     """Raporu durum.json ve .ReYMeN/nightly/ altına yaz."""
@@ -694,13 +730,15 @@ def _rapor_kaydet(rapor: NightlyRapor) -> None:
 
     logger.info(
         "[Nightly] Rapor kaydedildi: %s (durum.json + nightly_%s.json)",
-        son_dosya, tarih,
+        son_dosya,
+        tarih,
     )
 
 
 # ═══════════════════════════════════════════════════════════════════════
 #  Ana Döngü
 # ═══════════════════════════════════════════════════════════════════════
+
 
 def main() -> str:
     """6 aşamalı gece kendini geliştirme döngüsünü çalıştır.
@@ -745,28 +783,19 @@ def main() -> str:
     toplam_sure = round(time.time() - baslama, 2)
 
     # Özet mesajı
-    sorunlu_asamalar = [
-        s["ad"] for s in sonuclar if s.get("uyari")
-    ]
-    basarisiz_asamalar = [
-        s["ad"] for s in sonuclar if not s["basarili"]
-    ]
+    sorunlu_asamalar = [s["ad"] for s in sonuclar if s.get("uyari")]
+    basarisiz_asamalar = [s["ad"] for s in sonuclar if not s["basarili"]]
 
     ozet_parcalari = []
     if sorunlu_asamalar:
-        ozet_parcalari.append(
-            f"⚠️ Uyari: {', '.join(sorunlu_asamalar)}"
-        )
+        ozet_parcalari.append(f"⚠️ Uyari: {', '.join(sorunlu_asamalar)}")
     if basarisiz_asamalar:
-        ozet_parcalari.append(
-            f"❌ Basarisiz: {', '.join(basarisiz_asamalar)}"
-        )
+        ozet_parcalari.append(f"❌ Basarisiz: {', '.join(basarisiz_asamalar)}")
     if not sorunlu_asamalar and not basarisiz_asamalar:
         ozet_parcalari.append("✅ Tum asamalar basarili, sorun yok")
 
     ozet_parcalari.append(
-        f"({basarili_asama}/{len(asama_fonksiyonlari)} basarili, "
-        f"{toplam_sure}s)"
+        f"({basarili_asama}/{len(asama_fonksiyonlari)} basarili, " f"{toplam_sure}s)"
     )
     ozet = " | ".join(ozet_parcalari)
 

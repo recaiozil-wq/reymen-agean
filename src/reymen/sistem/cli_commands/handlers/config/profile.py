@@ -8,6 +8,7 @@ def _handle_profile_command(cli) -> None:
     display = display_reymen_home()
     try:
         from reymen.reymen_cli.profiles import get_active_profile_name
+
         profile_name = get_active_profile_name()
     except ImportError:
         profile_name = "default"

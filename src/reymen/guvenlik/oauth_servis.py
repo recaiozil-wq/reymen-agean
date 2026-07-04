@@ -32,6 +32,7 @@ logger = logging.getLogger(__name__)
 try:
     from fastapi import APIRouter, Query, HTTPException  # type: ignore[import-untyped]
     from fastapi.responses import RedirectResponse  # type: ignore[import-untyped]
+
     _FASTAPI_MEVCUT = True
 except ImportError:
     _FASTAPI_MEVCUT = False
@@ -77,11 +78,13 @@ class OAuthServis:
                     f"[{provider.upper()}] OAuth yapılandırması eksik. "
                     f"Lütfen .env dosyasına {provider.upper()}_CLIENT_ID ve "
                     f"{provider.upper()}_CLIENT_SECRET ekleyin.",
-                    provider=provider, code="oauth_config_eksik",
+                    provider=provider,
+                    code="oauth_config_eksik",
                 )
             raise OAuthError(
                 f"[{provider.upper()}] Auth URL oluşturulamadı.",
-                provider=provider, code="oauth_url_hatasi",
+                provider=provider,
+                code="oauth_url_hatasi",
             )
         return url
 
@@ -103,12 +106,15 @@ class OAuthServis:
             raise OAuthError(
                 f"[{provider.upper()}] Authorization code ile token alınamadı. "
                 f"Code geçersiz olabilir veya süresi dolmuş olabilir.",
-                provider=provider, code="oauth_token_alma_hatasi",
+                provider=provider,
+                code="oauth_token_alma_hatasi",
             )
         return {
             "basarili": True,
             "provider": provider,
-            "access_token": token.access_token[:20] + "..." if len(token.access_token) > 20 else token.access_token,
+            "access_token": token.access_token[:20] + "..."
+            if len(token.access_token) > 20
+            else token.access_token,
             "refresh_token_var": bool(token.refresh_token),
             "email": token.email,
             "display_name": token.display_name,
@@ -142,7 +148,8 @@ class OAuthServis:
             raise OAuthError(
                 "[GITHUB] GitHub token'ları süresizdir, refresh_token desteği yoktur. "
                 "Token silinip yeniden giriş yapılabilir.",
-                provider="github", code="github_no_refresh",
+                provider="github",
+                code="github_no_refresh",
             )
 
         yeni_token = self._sistem.token_yenile(provider)
@@ -151,12 +158,15 @@ class OAuthServis:
                 f"[{provider.upper()}] Token yenilenemedi. "
                 f"Refresh token geçersiz veya süresi dolmuş olabilir. "
                 f"Tekrar giriş yapmayı deneyin.",
-                provider=provider, code="oauth_refresh_hatasi",
+                provider=provider,
+                code="oauth_refresh_hatasi",
             )
         return {
             "basarili": True,
             "provider": provider,
-            "access_token": yeni_token.access_token[:20] + "..." if len(yeni_token.access_token) > 20 else yeni_token.access_token,
+            "access_token": yeni_token.access_token[:20] + "..."
+            if len(yeni_token.access_token) > 20
+            else yeni_token.access_token,
             "refresh_token_var": bool(yeni_token.refresh_token),
             "email": yeni_token.email,
             "display_name": yeni_token.display_name,
@@ -176,8 +186,9 @@ class OAuthServis:
         return {
             "basarili": basarili,
             "provider": provider,
-            "mesaj": "Çıkış yapıldı, token silindi." if basarili
-                     else f"[{provider.upper()}] Zaten giriş yapılmamış.",
+            "mesaj": "Çıkış yapıldı, token silindi."
+            if basarili
+            else f"[{provider.upper()}] Zaten giriş yapılmamış.",
         }
 
     def durum(self, provider: str) -> dict[str, Any]:
@@ -246,6 +257,7 @@ class OAuthServis:
 # ---------------------------------------------------------------------------
 # FastAPI Callback Route'ları (isteğe bağlı)
 # ---------------------------------------------------------------------------
+
 
 def fastapi_callback_router(servis: Optional[OAuthServis] = None) -> Any:
     """FastAPI router oluştur — OAuth callback'leri için.

@@ -41,7 +41,9 @@ class TestNormalizeProfile:
 
         assert _normalize_profile("Default") == "default"
 
-    def test_named_profile_must_exist_and_is_normalized(self, isolated_cron_profile_home):
+    def test_named_profile_must_exist_and_is_normalized(
+        self, isolated_cron_profile_home
+    ):
         from cron.jobs import _normalize_profile
 
         assert _normalize_profile("Support") == "support"
@@ -69,7 +71,9 @@ class TestCreateAndUpdateJobProfile:
         assert stored is not None
         assert stored["profile"] == "support"
 
-    def test_create_without_profile_preserves_old_behaviour(self, isolated_cron_profile_home):
+    def test_create_without_profile_preserves_old_behaviour(
+        self, isolated_cron_profile_home
+    ):
         from cron.jobs import create_job, get_job
 
         job = create_job(prompt="hello", schedule="every 1h")
@@ -215,10 +219,14 @@ class TestRunJobProfileContext:
             },
         )
 
-        monkeypatch.setattr(sched, "_build_job_prompt", lambda job, prerun_script=None: "hi")
+        monkeypatch.setattr(
+            sched, "_build_job_prompt", lambda job, prerun_script=None: "hi"
+        )
         monkeypatch.setattr(sched, "_resolve_origin", lambda job: None)
         monkeypatch.setattr(sched, "_resolve_delivery_target", lambda job: None)
-        monkeypatch.setattr(sched, "_resolve_cron_enabled_toolsets", lambda job, cfg: None)
+        monkeypatch.setattr(
+            sched, "_resolve_cron_enabled_toolsets", lambda job, cfg: None
+        )
         monkeypatch.setattr(sched, "_ReYMeN_home", None)
         monkeypatch.setenv("ReYMeN_CRON_TIMEOUT", "0")
 
@@ -379,7 +387,9 @@ class TestRunJobProfileContext:
 
 
 class TestTickProfilePartition:
-    def test_profile_and_workdir_combined(self, isolated_cron_profile_home, monkeypatch):
+    def test_profile_and_workdir_combined(
+        self, isolated_cron_profile_home, monkeypatch
+    ):
         """Both profile and workdir set — verify both are applied and restored."""
         import cron.scheduler as sched
 
@@ -401,12 +411,15 @@ class TestTickProfilePartition:
 
         assert success is True, error
         assert observed["ReYMeN_home_during_init"] == str(profile_home.resolve())
-        assert os.environ.get("TERMINAL_CWD", "") != fake_workdir, \
-            "TERMINAL_CWD should be restored after job"
+        assert (
+            os.environ.get("TERMINAL_CWD", "") != fake_workdir
+        ), "TERMINAL_CWD should be restored after job"
         assert os.environ["ReYMeN_HOME"] == str(root)
         assert sched._get_reymen_home() == root
 
-    def test_profile_jobs_run_sequentially(self, isolated_cron_profile_home, monkeypatch):
+    def test_profile_jobs_run_sequentially(
+        self, isolated_cron_profile_home, monkeypatch
+    ):
         import threading
         import cron.scheduler as sched
 

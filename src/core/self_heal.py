@@ -35,7 +35,7 @@ logger = logging.getLogger(__name__)
 
 # ── Deneme Ayarları ──────────────────────────────────────────────
 MAX_DENEME = 3
-BACKOFF_TABAN = 1.0   # saniye
+BACKOFF_TABAN = 1.0  # saniye
 BACKOFF_CARPAN = 2.0
 
 # ── Çalıştırma Modu ─────────────────────────────────────────────
@@ -65,8 +65,7 @@ class SelfHeal:
 
     # ── Ana Metod ────────────────────────────────────────────────
 
-    def coz(self, hedef: str, hata: str, kod: str = "",
-            dosya_yolu: str = "") -> dict:
+    def coz(self, hedef: str, hata: str, kod: str = "", dosya_yolu: str = "") -> dict:
         """Bir hatayı otonom çöz.
 
         Args:
@@ -104,15 +103,19 @@ class SelfHeal:
                 "cozum": hafiza_cozum,
                 "kaynak": "hafiza",
                 "deneme_sayisi": 0,
-                "hata": ""
+                "hata": "",
             }
 
         # 2. LLM ile çöz
         for deneme in range(1, self.max_deneme + 1):
             if deneme > 1:
                 bekleme = BACKOFF_TABAN * (BACKOFF_CARPAN ** (deneme - 2))
-                logger.info("[SelfHeal] ⏳ Bekleme: %.1fs (deneme %d/%d)",
-                            bekleme, deneme, self.max_deneme)
+                logger.info(
+                    "[SelfHeal] ⏳ Bekleme: %.1fs (deneme %d/%d)",
+                    bekleme,
+                    deneme,
+                    self.max_deneme,
+                )
                 time.sleep(bekleme)
 
             cozum_kodu = self._llm_coz(hedef, hata, kod, deneme)
@@ -131,14 +134,13 @@ class SelfHeal:
                     "cozum": cozum_kodu,
                     "kaynak": "llm",
                     "deneme_sayisi": deneme,
-                    "hata": ""
+                    "hata": "",
                 }
 
             # Düzelmedi — hatayı LLM'e geri bildir
-            logger.info("[SelfHeal] ❌ Deneme %d başarısız: %s",
-                        deneme, cikti[:120])
-            hata = cikti        # yeni hata = çalıştırma hatası
-            kod = cozum_kodu    # mevcut kodu düzeltmesi için gönder
+            logger.info("[SelfHeal] ❌ Deneme %d başarısız: %s", deneme, cikti[:120])
+            hata = cikti  # yeni hata = çalıştırma hatası
+            kod = cozum_kodu  # mevcut kodu düzeltmesi için gönder
 
         # 3 deneme de başarısız
         self._hafizaya_kaydet(hata_imza, hata, "", basarili=False)
@@ -148,7 +150,7 @@ class SelfHeal:
             "cozum": "",
             "kaynak": "basarisiz",
             "deneme_sayisi": self.max_deneme,
-            "hata": f"{self.max_deneme} denemede çözülemedi: {hata[:200]}"
+            "hata": f"{self.max_deneme} denemede çözülemedi: {hata[:200]}",
         }
 
     # ── Motor Entegrasyonu ───────────────────────────────────────
@@ -189,8 +191,8 @@ class SelfHeal:
     def _imza_uret(hata: str, dosya: str = "") -> str:
         """Hata mesajı + dosya adından SHA256 imza üret."""
         # Hata mesajını normalize et (sayıları, adresleri soyutla)
-        temiz = re.sub(r'0x[0-9a-fA-F]+', '0x...', hata)
-        temiz = re.sub(r'\b\d+\b', 'N', temiz)
+        temiz = re.sub(r"0x[0-9a-fA-F]+", "0x...", hata)
+        temiz = re.sub(r"\b\d+\b", "N", temiz)
         temiz = re.sub(r'File ".*?"', 'File "..."', temiz)
         kaynak = f"{dosya}|{temiz[:200]}"
         return hashlib.sha256(kaynak.encode()).hexdigest()
@@ -202,6 +204,7 @@ class SelfHeal:
         """OnceHafiza/ogrenme'de çözüm ara."""
         try:
             from reymen.core.ogrenme import cozum_bul, tablo_olustur
+
             tablo_olustur()
             return cozum_bul(imza)
         except Exception as e:
@@ -209,14 +212,15 @@ class SelfHeal:
             return None
 
     @staticmethod
-    def _hafizaya_kaydet(imza: str, hata: str, cozum: str,
-                         basarili: bool):
+    def _hafizaya_kaydet(imza: str, hata: str, cozum: str, basarili: bool):
         """Çözümü hafızaya kaydet."""
         try:
             from reymen.core.ogrenme import cozum_kaydet
+
             hata_tipi = hata.split(":")[0].split("\n")[0][:50]
-            cozum_kaydet(imza, hata_tipi, hata[:500], cozum,
-                         "self_heal", basarili=basarili)
+            cozum_kaydet(
+                imza, hata_tipi, hata[:500], cozum, "self_heal", basarili=basarili
+            )
         except Exception as e:
             logger.debug("[SelfHeal] Hafıza kayıt hatası: %s", e)
 
@@ -225,14 +229,14 @@ class SelfHeal:
         """TTL süresi dolmuş çözümleri temizle."""
         try:
             from reymen.core.ogrenme import ttl_temizle
+
             ttl_temizle()
         except Exception:
             logger.warning("[fix_01_sessiz_except] Exception")
 
     # ── LLM ──────────────────────────────────────────────────────
 
-    def _llm_coz(self, hedef: str, hata: str, kod: str,
-                 deneme: int) -> Optional[str]:
+    def _llm_coz(self, hedef: str, hata: str, kod: str, deneme: int) -> Optional[str]:
         """LLM'e sor ve düzeltilmiş kod al."""
         adapter = self._adapter_al()
         if not adapter:
@@ -278,16 +282,29 @@ class SelfHeal:
     def _kod_ayikla(cevap: str) -> Optional[str]:
         """LLM cevabından Python kodunu ayıkla."""
         # ```python ... ``` bloklarını ayıkla
-        blok = re.search(r'```(?:python)?\n(.*?)```', cevap, re.DOTALL)
+        blok = re.search(r"```(?:python)?\n(.*?)```", cevap, re.DOTALL)
         if blok:
             return blok.group(1).strip()
         # Hiçbir blok yoksa kod satırlarını dene
         satirlar = []
         kod_bolgesi = False
         for satir in cevap.splitlines():
-            if satir.strip().startswith(("import ", "from ", "def ", "class ",
-                                          "print(", "return ", "if ", "for ",
-                                          "while ", "try:", "with ", "async ")):
+            if satir.strip().startswith(
+                (
+                    "import ",
+                    "from ",
+                    "def ",
+                    "class ",
+                    "print(",
+                    "return ",
+                    "if ",
+                    "for ",
+                    "while ",
+                    "try:",
+                    "with ",
+                    "async ",
+                )
+            ):
                 kod_bolgesi = True
             if kod_bolgesi:
                 satirlar.append(satir)
@@ -324,14 +341,13 @@ class SelfHeal:
         tmp_path = None
         try:
             with tempfile.NamedTemporaryFile(
-                mode='w', suffix='.py', delete=False, encoding='utf-8'
+                mode="w", suffix=".py", delete=False, encoding="utf-8"
             ) as f:
                 f.write(kod)
                 tmp_path = f.name
 
             r = subprocess.run(
-                [sys.executable, tmp_path],
-                capture_output=True, text=True, timeout=30
+                [sys.executable, tmp_path], capture_output=True, text=True, timeout=30
             )
 
             if r.returncode == 0:
@@ -369,6 +385,7 @@ class SelfHeal:
         if self._adapter is None:
             try:
                 from reymen.core.model_adapter import get_active_adapter
+
                 self._adapter = get_active_adapter()
             except Exception as e:
                 logger.error("[SelfHeal] Model adapter hatası: %s", e)
@@ -397,20 +414,25 @@ class SelfHeal:
             sonuc = heal.coz(hedef, hata, kod)
 
             if sonuc["basarili"]:
-                return (f"[SelfHeal] ✅ Çözüldü (kaynak: {sonuc['kaynak']}, "
-                        f"deneme: {sonuc['deneme_sayisi']})\n"
-                        f"Çözüm:\n{sonuc['cozum']}")
+                return (
+                    f"[SelfHeal] ✅ Çözüldü (kaynak: {sonuc['kaynak']}, "
+                    f"deneme: {sonuc['deneme_sayisi']})\n"
+                    f"Çözüm:\n{sonuc['cozum']}"
+                )
             else:
-                return (f"[SelfHeal] ❌ Çözülemedi "
-                        f"({sonuc['deneme_sayisi']} deneme)\n"
-                        f"Hata: {sonuc['hata']}")
+                return (
+                    f"[SelfHeal] ❌ Çözülemedi "
+                    f"({sonuc['deneme_sayisi']} deneme)\n"
+                    f"Hata: {sonuc['hata']}"
+                )
         except Exception as e:
             logger.exception("[SelfHeal] motor_calistir_icinde hatası")
             return f"[SelfHeal] ❌ İç hata: {e}"
 
     @staticmethod
-    def motor_hatadan_kurtul(motor_self, kod: str, hata: str,
-                              dosya_adi: str = "") -> str:
+    def motor_hatadan_kurtul(
+        motor_self, kod: str, hata: str, dosya_adi: str = ""
+    ) -> str:
         """Motor.hatadan_kurtul() metoduna self_heal entegrasyonu.
 
         Mevcut hatadan_kurtul()'u geliştirir:
@@ -420,7 +442,8 @@ class SelfHeal:
         try:
             eski_cozum = motor_self.hatadan_kurtul(kod, hata, dosya_adi)
             if eski_cozum and not eski_cozum.startswith(
-                ("Çözüm bulunamadı", "Hata cozulemedi")):
+                ("Çözüm bulunamadı", "Hata cozulemedi")
+            ):
                 return eski_cozum
         except Exception as e:
             logger.debug("[SelfHeal] Motor.hatadan_kurtul hatası: %s", e)
@@ -445,17 +468,16 @@ class SelfHeal:
             "basarili_cozum": self._basarili,
             "hafiza_isabet": self._hafiza_isabet,
             "basari_orani": round(
-                (self._basarili / self._toplam * 100)
-                if self._toplam > 0 else 0, 1
+                (self._basarili / self._toplam * 100) if self._toplam > 0 else 0, 1
             ),
             "hafiza_orani": round(
-                (self._hafiza_isabet / self._toplam * 100)
-                if self._toplam > 0 else 0, 1
+                (self._hafiza_isabet / self._toplam * 100) if self._toplam > 0 else 0, 1
             ),
         }
 
 
 # ── Doğrudan Kullanım ──────────────────────────────────────────
+
 
 def coz(hedef: str, hata: str, kod: str = "", dosya_yolu: str = "") -> dict:
     """Tek çağrılık self-heal."""

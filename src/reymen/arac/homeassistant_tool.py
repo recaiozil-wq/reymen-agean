@@ -11,7 +11,7 @@ import os
 import urllib.request
 from typing import Optional
 
-HA_URL   = os.environ.get("HA_URL",   "http://homeassistant.local:8123")
+HA_URL = os.environ.get("HA_URL", "http://homeassistant.local:8123")
 HA_TOKEN = os.environ.get("HA_TOKEN", "")
 
 
@@ -23,7 +23,7 @@ def _ha_get(yol: str) -> dict | list:
             f"{HA_URL.rstrip('/')}{yol}",
             headers={
                 "Authorization": f"Bearer {HA_TOKEN}",
-                "Content-Type":  "application/json",
+                "Content-Type": "application/json",
             },
         )
         with urllib.request.urlopen(req, timeout=10) as r:
@@ -41,7 +41,7 @@ def _ha_post(yol: str, veri: dict) -> dict:
             data=json.dumps(veri).encode("utf-8"),
             headers={
                 "Authorization": f"Bearer {HA_TOKEN}",
-                "Content-Type":  "application/json",
+                "Content-Type": "application/json",
             },
         )
         with urllib.request.urlopen(req, timeout=10) as r:
@@ -64,7 +64,7 @@ def durum_oku(entity_id: str) -> str:
         return f"[HA]: {yanit['error']}"
     if isinstance(yanit, dict):
         durum = yanit.get("state", "bilinmiyor")
-        nit   = yanit.get("attributes", {})
+        nit = yanit.get("attributes", {})
         return f"{entity_id}: {durum} | {json.dumps(nit, ensure_ascii=False)}"
     return str(yanit)
 
@@ -84,10 +84,16 @@ def tum_durumlar(domain: str = "") -> str:
 
     entitiler = yanit if isinstance(yanit, list) else []
     if domain:
-        entitiler = [e for e in entitiler if e.get("entity_id", "").startswith(domain + ".")]
+        entitiler = [
+            e for e in entitiler if e.get("entity_id", "").startswith(domain + ".")
+        ]
 
     if not entitiler:
-        return f"Domain '{domain}' için entity bulunamadı." if domain else "Hiç entity yok."
+        return (
+            f"Domain '{domain}' için entity bulunamadı."
+            if domain
+            else "Hiç entity yok."
+        )
 
     satirlar = [f"Home Assistant Entity'leri ({len(entitiler)}):"]
     for e in entitiler[:50]:
@@ -162,7 +168,9 @@ def motor_kaydet(motor):
     )
     motor._plugin_arac_kaydet(
         "HA_ISIK_AC",
-        lambda entity_id, parlaklik="": isik_ac(entity_id, int(parlaklik) if parlaklik else None),
+        lambda entity_id, parlaklik="": isik_ac(
+            entity_id, int(parlaklik) if parlaklik else None
+        ),
         "Işık aç",
     )
     motor._plugin_arac_kaydet(

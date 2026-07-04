@@ -13,9 +13,13 @@ from src.reymen.sistem.ReYMeN_constants import is_termux as _is_termux_environme
 
 def _handle_image_command(cli, cmd_original: str):
     """Handle /image <path> — attach a local image file for the next prompt."""
-    raw_args = (cmd_original.split(None, 1)[1].strip() if " " in cmd_original else "")
+    raw_args = cmd_original.split(None, 1)[1].strip() if " " in cmd_original else ""
     if not raw_args:
-        hint = _termux_example_image_path() if _is_termux_environment() else "/path/to/image.png"
+        hint = (
+            _termux_example_image_path()
+            if _is_termux_environment()
+            else "/path/to/image.png"
+        )
         _cprint(f"  {_DIM}Usage: /image <path>  e.g. /image {hint}{_RST}")
         return
 
@@ -31,6 +35,10 @@ def _handle_image_command(cli, cmd_original: str):
     cli._attached_images.append(image_path)
     _cprint(f"  📎 Attached image: {image_path.name}")
     if _remainder:
-        _cprint(f"  {_DIM}Now type your prompt (or use --image in single-query mode): {_remainder}{_RST}")
+        _cprint(
+            f"  {_DIM}Now type your prompt (or use --image in single-query mode): {_remainder}{_RST}"
+        )
     elif _is_termux_environment():
-        _cprint(f"  {_DIM}Tip: type your next message, or run ReYMeN chat -q --image {_termux_example_image_path(image_path.name)} \"What do you see?\"{_RST}")
+        _cprint(
+            f'  {_DIM}Tip: type your next message, or run ReYMeN chat -q --image {_termux_example_image_path(image_path.name)} "What do you see?"{_RST}'
+        )

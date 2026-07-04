@@ -36,6 +36,7 @@ class _FakeResponse:
 # default resolver path.
 # ---------------------------------------------------------------------------
 
+
 def test_x_search_posts_responses_request(monkeypatch):
     from tools.x_search_tool import x_search_tool
     from ReYMeN_cli import __version__
@@ -50,7 +51,9 @@ def test_x_search_posts_responses_request(monkeypatch):
         return _FakeResponse(
             {
                 "output_text": "People on X are discussing xAI's latest launch.",
-                "citations": [{"url": "https://x.com/example/status/1", "title": "Example post"}],
+                "citations": [
+                    {"url": "https://x.com/example/status/1", "title": "Example post"}
+                ],
             }
         )
 
@@ -94,7 +97,10 @@ def test_x_search_rejects_conflicting_handle_filters(monkeypatch):
         )
     )
 
-    assert result["error"] == "allowed_x_handles and excluded_x_handles cannot be used together"
+    assert (
+        result["error"]
+        == "allowed_x_handles and excluded_x_handles cannot be used together"
+    )
 
 
 def test_x_search_extracts_inline_url_citations(monkeypatch):
@@ -228,6 +234,7 @@ def test_x_search_retries_5xx_then_succeeds(monkeypatch):
 # ---------------------------------------------------------------------------
 # Credential-resolution coverage — the OAuth-or-API-key gating contract.
 # ---------------------------------------------------------------------------
+
 
 def _no_xai_env(monkeypatch):
     """Strip any XAI_* env vars so the resolver doesn't see a leaked dev key."""
@@ -388,9 +395,7 @@ def test_x_search_check_fn_false_when_resolver_raises(monkeypatch):
     def _boom():
         raise RuntimeError("token revoked and refresh failed")
 
-    monkeypatch.setattr(
-        "tools.x_search_tool.resolve_xai_http_credentials", _boom
-    )
+    monkeypatch.setattr("tools.x_search_tool.resolve_xai_http_credentials", _boom)
     invalidate_check_fn_cache()
 
     assert check_x_search_requirements() is False
@@ -445,10 +450,14 @@ def test_x_search_registered_in_registry_with_check_fn():
 # callers to distinguish from a real result.
 # ---------------------------------------------------------------------------
 
+
 def _no_post_allowed(monkeypatch):
     """Guard: any test that should fail before HTTP can hit this fence."""
+
     def _fail(*_, **__):
-        raise AssertionError("requests.post must not be called — validation should reject first")
+        raise AssertionError(
+            "requests.post must not be called — validation should reject first"
+        )
 
     monkeypatch.setattr("requests.post", _fail)
 
@@ -489,7 +498,10 @@ def test_x_search_rejects_inverted_date_range(monkeypatch):
         )
     )
 
-    assert "from_date (2026-05-10) must be on or before to_date (2026-05-01)" in result["error"]
+    assert (
+        "from_date (2026-05-10) must be on or before to_date (2026-05-01)"
+        in result["error"]
+    )
 
 
 def test_x_search_rejects_future_from_date(monkeypatch):
@@ -576,6 +588,7 @@ def test_x_search_accepts_today_as_from_date(monkeypatch):
 # unsourced fluff when narrowing filters returned nothing.
 # ---------------------------------------------------------------------------
 
+
 def test_x_search_marks_degraded_when_handle_filter_returns_no_citations(monkeypatch):
     """allowed_x_handles set + zero citations → degraded=True."""
     from tools.x_search_tool import x_search_tool
@@ -584,12 +597,17 @@ def test_x_search_marks_degraded_when_handle_filter_returns_no_citations(monkeyp
     monkeypatch.setattr(
         "requests.post",
         lambda *a, **k: _FakeResponse(
-            {"output_text": "Generic encyclopedic answer with no citations.", "citations": []}
+            {
+                "output_text": "Generic encyclopedic answer with no citations.",
+                "citations": [],
+            }
         ),
     )
 
     result = json.loads(
-        x_search_tool(query="what has @ghostuser posted", allowed_x_handles=["ghostuser"])
+        x_search_tool(
+            query="what has @ghostuser posted", allowed_x_handles=["ghostuser"]
+        )
     )
 
     assert result["success"] is True
@@ -689,14 +707,14 @@ def test_x_search_not_degraded_when_filter_returns_top_level_citations(monkeypat
         lambda *a, **k: _FakeResponse(
             {
                 "output_text": "Found discussion.",
-                "citations": [{"url": "https://x.com/example/status/1", "title": "Example"}],
+                "citations": [
+                    {"url": "https://x.com/example/status/1", "title": "Example"}
+                ],
             }
         ),
     )
 
-    result = json.loads(
-        x_search_tool(query="anything", allowed_x_handles=["xai"])
-    )
+    result = json.loads(x_search_tool(query="anything", allowed_x_handles=["xai"]))
 
     assert result["degraded"] is False
     assert result["degraded_reason"] is None
@@ -722,4 +740,3 @@ def test_x_search_not_degraded_when_no_filters_active(monkeypatch):
     assert result["success"] is True
     assert result["degraded"] is False
     assert result["degraded_reason"] is None
-

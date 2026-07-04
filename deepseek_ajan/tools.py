@@ -1,6 +1,8 @@
 """Arac/Tool sistemi - /py, /sys, web, dosya."""
+
 import io, os, subprocess, sys, json
 from contextlib import redirect_stdout, redirect_stderr
+
 
 class ToolResult:
     def __init__(self, output="", error="", exit_code=0):
@@ -8,17 +10,18 @@ class ToolResult:
         self.error = error
         self.exit_code = exit_code
 
+
 def cmd_py(code, timeout=30):
     try:
         f_out, f_err = io.StringIO(), io.StringIO()
         with redirect_stdout(f_out), redirect_stderr(f_err):
             exec(code)
         return ToolResult(
-            output=f_out.getvalue().strip(),
-            error=f_err.getvalue().strip()
+            output=f_out.getvalue().strip(), error=f_err.getvalue().strip()
         )
     except Exception as e:
         return ToolResult(error=str(e), exit_code=1)
+
 
 def cmd_sys(command, timeout=30):
     try:
@@ -26,14 +29,13 @@ def cmd_sys(command, timeout=30):
             command, shell=True, capture_output=True, text=True, timeout=timeout
         )
         return ToolResult(
-            output=r.stdout.strip(),
-            error=r.stderr.strip(),
-            exit_code=r.returncode
+            output=r.stdout.strip(), error=r.stderr.strip(), exit_code=r.returncode
         )
     except subprocess.TimeoutExpired:
         return ToolResult(error="Zaman asimi", exit_code=124)
     except Exception as e:
         return ToolResult(error=str(e), exit_code=1)
+
 
 def cmd_read(path):
     if not os.path.exists(path):
@@ -45,6 +47,7 @@ def cmd_read(path):
     except Exception as e:
         return ToolResult(error=str(e), exit_code=1)
 
+
 def cmd_write(path, content):
     try:
         with open(path, "w", encoding="utf-8") as f:
@@ -53,6 +56,7 @@ def cmd_write(path, content):
     except Exception as e:
         return ToolResult(error=str(e), exit_code=1)
 
+
 def cmd_ls(path="."):
     try:
         files = os.listdir(path)
@@ -60,6 +64,7 @@ def cmd_ls(path="."):
         return ToolResult(output=f"{len(files)} dosya:\n{result}")
     except Exception as e:
         return ToolResult(error=str(e), exit_code=1)
+
 
 TOOL_REGISTRY = {
     "py": cmd_py,

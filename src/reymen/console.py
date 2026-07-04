@@ -13,6 +13,7 @@ Kullanım::
     reymen model
     reymen cost summary
 """
+
 from __future__ import annotations
 
 import argparse
@@ -26,6 +27,7 @@ from typing import Any
 try:
     from reymen.sistem.kurallar import cmd_kural
 except ImportError:
+
     def cmd_kural(args) -> int:
         print("[HATA] Rules Engine modulu yuklenemedi (reymen.sistem.kurallar)")
         return 1
@@ -98,6 +100,7 @@ def cmd_skill_shrink(args: argparse.Namespace) -> int:
     """Skill küçültme CLI komutu."""
     try:
         from reymen.scripts.skill_shrink import cmd_skill_shrink as _shrink_impl
+
         return _shrink_impl(args)
     except ImportError as e:
         print(f"[HATA] skill_shrink modülü bulunamadı: {e}")
@@ -144,9 +147,9 @@ def cmd_auth(args: argparse.Namespace) -> int:
         for t in tokens:
             user = t.get("user_id", "")[:12]
             role = t.get("role", "?")
-            created = datetime.fromtimestamp(
-                t.get("created_at", 0)
-            ).strftime("%Y-%m-%d %H:%M:%S")
+            created = datetime.fromtimestamp(t.get("created_at", 0)).strftime(
+                "%Y-%m-%d %H:%M:%S"
+            )
             durum_str = "✓ AKTİF" if not t.get("revoked") else "✗ İPTAL"
             print(f"{user:<20} {role:<10} {created:<25} {durum_str:<10}")
         return 0
@@ -237,6 +240,7 @@ def cmd_auth(args: argparse.Namespace) -> int:
             print("❌ API anahtarı gerekli")
             return 1
         from reymen.guvenlik.reymen_auth import validate_api_key_format
+
         valid, provider, msg = validate_api_key_format(key_value)
         if valid:
             print(f"✅ {msg}")
@@ -288,8 +292,11 @@ def cmd_a2a(args: argparse.Namespace) -> int:
     # Önce ACP modülünü yükle
     try:
         from reymen.a2a_acp import (
-            ACPServer, AgentCard, _ACP_SERVER_INSTANCE,
+            ACPServer,
+            AgentCard,
+            _ACP_SERVER_INSTANCE,
         )
+
         _acp_loaded = True
     except ImportError as e:
         print(f"[HATA] A2A/ACP modulu yuklenemedi: {e}")
@@ -395,7 +402,9 @@ def cmd_a2a(args: argparse.Namespace) -> int:
                 print("  ❌ target ve title gerekli")
                 return 1
             task = _ACP_SERVER_INSTANCE._delegation.delegate(
-                source=source, target=target, title=title,
+                source=source,
+                target=target,
+                title=title,
                 description=getattr(args, "description", ""),
             )
             print(f"  ✅ Gorev devredildi: {task.task_id}")
@@ -458,13 +467,27 @@ def build_parser() -> argparse.ArgumentParser:
     # skill
     p_skill = sub.add_parser("skill", help="Skill yönetimi")
     p_skill_sub = p_skill.add_subparsers(dest="skill_sub")
-    p_shrink = p_skill_sub.add_parser("shrink", help="Şişkin skill'leri tespit et/küçült")
-    p_shrink.add_argument("--dry-run", action="store_true", default=True,
-                          help="Sadece tespit et, değişiklik yapma (varsayılan)")
-    p_shrink.add_argument("--apply", action="store_true", default=False,
-                          help="Bulunan şişkinlikleri uygula")
-    p_shrink.add_argument("--stats", action="store_true", default=False,
-                          help="Skill deposu istatistikleri")
+    p_shrink = p_skill_sub.add_parser(
+        "shrink", help="Şişkin skill'leri tespit et/küçült"
+    )
+    p_shrink.add_argument(
+        "--dry-run",
+        action="store_true",
+        default=True,
+        help="Sadece tespit et, değişiklik yapma (varsayılan)",
+    )
+    p_shrink.add_argument(
+        "--apply",
+        action="store_true",
+        default=False,
+        help="Bulunan şişkinlikleri uygula",
+    )
+    p_shrink.add_argument(
+        "--stats",
+        action="store_true",
+        default=False,
+        help="Skill deposu istatistikleri",
+    )
     p_shrink.set_defaults(func=cmd_skill_shrink)
 
     # auth 🔐
@@ -475,10 +498,14 @@ def build_parser() -> argparse.ArgumentParser:
     p_auth_sub.add_parser("users", help="Kullanıcıları listele")
     p_auth_create = p_auth_sub.add_parser("create", help="Kullanıcı + token oluştur")
     p_auth_create.add_argument("username", nargs="?", default="kullanici")
-    p_auth_create.add_argument("--role", "-r", default="user", choices=["admin", "user", "guest"])
+    p_auth_create.add_argument(
+        "--role", "-r", default="user", choices=["admin", "user", "guest"]
+    )
     p_auth_token = p_auth_sub.add_parser("token", help="Token oluştur")
     p_auth_token.add_argument("username", nargs="?", default="kullanici")
-    p_auth_token.add_argument("--role", "-r", default="user", choices=["admin", "user", "guest"])
+    p_auth_token.add_argument(
+        "--role", "-r", default="user", choices=["admin", "user", "guest"]
+    )
     p_auth_revoke = p_auth_sub.add_parser("revoke", help="Token iptal et")
     p_auth_revoke.add_argument("token_value", help="İptal edilecek token")
     p_auth_delete = p_auth_sub.add_parser("delete", help="Kullanıcı sil")
@@ -492,37 +519,69 @@ def build_parser() -> argparse.ArgumentParser:
     p_auth.set_defaults(func=cmd_auth)
 
     # a2a/ACP
-    p_a2a = sub.add_parser("a2a", help="📡 A2A/ACP protokol yönetimi (Agent Card, görev devretme, beceri aktarımı)")
+    p_a2a = sub.add_parser(
+        "a2a",
+        help="📡 A2A/ACP protokol yönetimi (Agent Card, görev devretme, beceri aktarımı)",
+    )
 
     # kural (Rules Engine)
     p_kural = sub.add_parser("kural", help="📋 Kural/izin yönetimi (Rules Engine)")
     p_kural_sub = p_kural.add_subparsers(dest="kural_sub")
     p_kural_list = p_kural_sub.add_parser("list", help="Kuralları listele")
-    p_kural_list.add_argument("--kategori", choices=["dosya_erisim", "ag", "komut", "api_cagrisi", "guvenlik"],
-                               help="Kategori filtresi")
-    p_kural_list.add_argument("--tip", choices=["izin", "engel", "uyari"], help="Kural tipi filtresi")
-    p_kural_list.add_argument("--aktif", action="store_true", help="Sadece aktif kurallar")
+    p_kural_list.add_argument(
+        "--kategori",
+        choices=["dosya_erisim", "ag", "komut", "api_cagrisi", "guvenlik"],
+        help="Kategori filtresi",
+    )
+    p_kural_list.add_argument(
+        "--tip", choices=["izin", "engel", "uyari"], help="Kural tipi filtresi"
+    )
+    p_kural_list.add_argument(
+        "--aktif", action="store_true", help="Sadece aktif kurallar"
+    )
     p_kural_ekle = p_kural_sub.add_parser("ekle", help="Yeni kural ekle")
-    p_kural_ekle.add_argument("kategori", choices=["dosya_erisim", "ag", "komut", "api_cagrisi", "guvenlik"],
-                               help="Kural kategorisi")
-    p_kural_ekle.add_argument("tip", choices=["izin", "engel", "uyari"], help="Kural tipi")
-    p_kural_ekle.add_argument("desen", help="Eşleşme deseni (wildcard veya re: ile regex)")
+    p_kural_ekle.add_argument(
+        "kategori",
+        choices=["dosya_erisim", "ag", "komut", "api_cagrisi", "guvenlik"],
+        help="Kural kategorisi",
+    )
+    p_kural_ekle.add_argument(
+        "tip", choices=["izin", "engel", "uyari"], help="Kural tipi"
+    )
+    p_kural_ekle.add_argument(
+        "desen", help="Eşleşme deseni (wildcard veya re: ile regex)"
+    )
     p_kural_ekle.add_argument("--sebep", "-s", default="", help="Kural açıklaması")
     p_kural_ekle.add_argument("--id", default=None, help="Kural ID'si (opsiyonel)")
     p_kural_sil = p_kural_sub.add_parser("sil", help="Kural sil")
     p_kural_sil.add_argument("kural_id", help="Silinecek kural ID'si")
-    p_kural_kontrol = p_kural_sub.add_parser("kontrol", help="Bir hedefi kurallara göre kontrol et")
-    p_kural_kontrol.add_argument("kategori", choices=["dosya_erisim", "ag", "komut", "api_cagrisi", "guvenlik"],
-                                  help="Kontrol kategorisi")
-    p_kural_kontrol.add_argument("hedef", help="Kontrol edilecek hedef (dosya yolu, komut, URL vb.)")
+    p_kural_kontrol = p_kural_sub.add_parser(
+        "kontrol", help="Bir hedefi kurallara göre kontrol et"
+    )
+    p_kural_kontrol.add_argument(
+        "kategori",
+        choices=["dosya_erisim", "ag", "komut", "api_cagrisi", "guvenlik"],
+        help="Kontrol kategorisi",
+    )
+    p_kural_kontrol.add_argument(
+        "hedef", help="Kontrol edilecek hedef (dosya yolu, komut, URL vb.)"
+    )
     p_kural.set_defaults(func=cmd_kural)
     p_a2a_sub = p_a2a.add_subparsers(dest="a2a_sub")
     p_a2a_sub.add_parser("status", help="A2A/ACP durumu")
     p_a2a_start = p_a2a_sub.add_parser("start", help="ACP sunucusunu başlat")
-    p_a2a_start.add_argument("--transport", default="stdio", choices=["stdio", "socket"],
-                             help="Taşıma protokolü (varsayılan: stdio)")
-    p_a2a_start.add_argument("--port", type=int, default=9200,
-                             help="Socket port (transport=socket ise, varsayılan: 9200)")
+    p_a2a_start.add_argument(
+        "--transport",
+        default="stdio",
+        choices=["stdio", "socket"],
+        help="Taşıma protokolü (varsayılan: stdio)",
+    )
+    p_a2a_start.add_argument(
+        "--port",
+        type=int,
+        default=9200,
+        help="Socket port (transport=socket ise, varsayılan: 9200)",
+    )
     p_a2a_sub.add_parser("stop", help="ACP sunucusunu durdur")
 
     # card alt komutları
@@ -532,9 +591,14 @@ def build_parser() -> argparse.ArgumentParser:
     p_card_reg = p_card_sub.add_parser("register", help="Agent Card kaydet")
     p_card_reg.add_argument("agent_id", help="Benzersiz agent ID")
     p_card_reg.add_argument("--name", default="", help="Gösterim adı")
-    p_card_reg.add_argument("--capabilities", default="messaging",
-                            help="Yetenek listesi (virgülle ayrılmış)")
-    p_card_reg.add_argument("--skills", default="", help="Beceri listesi (virgülle ayrılmış)")
+    p_card_reg.add_argument(
+        "--capabilities",
+        default="messaging",
+        help="Yetenek listesi (virgülle ayrılmış)",
+    )
+    p_card_reg.add_argument(
+        "--skills", default="", help="Beceri listesi (virgülle ayrılmış)"
+    )
     p_card.set_defaults(card_sub="list")
 
     # task alt komutları
@@ -542,12 +606,17 @@ def build_parser() -> argparse.ArgumentParser:
     p_task_sub = p_task.add_subparsers(dest="task_sub")
     p_task_list = p_task_sub.add_parser("list", help="Devredilen görevleri listele")
     p_task_list.add_argument("--agent-id", help="Agent ID filtresi")
-    p_task_list.add_argument("--status", dest="task_status",
-                              help="Durum filtresi (pending/accepted/completed/failed)")
+    p_task_list.add_argument(
+        "--status",
+        dest="task_status",
+        help="Durum filtresi (pending/accepted/completed/failed)",
+    )
     p_task_del = p_task_sub.add_parser("delegate", help="Yeni görev devret")
     p_task_del.add_argument("target", help="Hedef agent ID")
     p_task_del.add_argument("title", help="Görev başlığı")
-    p_task_del.add_argument("--source", default="reymen", help="Kaynak agent ID (varsayılan: reymen)")
+    p_task_del.add_argument(
+        "--source", default="reymen", help="Kaynak agent ID (varsayılan: reymen)"
+    )
     p_task_del.add_argument("--description", default="", help="Görev açıklaması")
     p_task.set_defaults(task_sub="list")
 

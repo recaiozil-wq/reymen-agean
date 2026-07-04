@@ -18,6 +18,7 @@ The fix probes the build trees directly (stat .venv) rather than $ReYMeN_HOME.
 The extraction + stubbed-shell-run approach mirrors
 tests/tools/test_stage2_hook_toplevel_chown.py.
 """
+
 from __future__ import annotations
 
 import re
@@ -58,13 +59,15 @@ def test_build_tree_chown_not_gated_on_ReYMeN_home(stage2_text: str) -> None:
     assert "venv_owner" in block
     assert "$INSTALL_DIR/.venv" in block
     # All three build trees are covered.
-    for tree in ("$INSTALL_DIR/.venv", "$INSTALL_DIR/ui-tui", "$INSTALL_DIR/node_modules"):
+    for tree in (
+        "$INSTALL_DIR/.venv",
+        "$INSTALL_DIR/ui-tui",
+        "$INSTALL_DIR/node_modules",
+    ):
         assert tree in block, f"build-tree chown must cover {tree}"
 
 
-def _run_build_tree_block(
-    text: str, *, venv_owner: int, ReYMeN_uid: int
-) -> bool:
+def _run_build_tree_block(text: str, *, venv_owner: int, ReYMeN_uid: int) -> bool:
     """Run the extracted build-tree block with `stat`, `id`, and `chown`
     stubbed. Returns True iff the block attempted the recursive chown."""
     bash = shutil.which("bash")
@@ -82,10 +85,9 @@ def _run_build_tree_block(
         script = (
             "set -eu\n"
             f'INSTALL_DIR="/opt/ReYMeN"\n'
-            f'actual_ReYMeN_uid={ReYMeN_uid}\n'
-            f'stat() {{ echo {venv_owner}; }}\n'
-            f'chown() {{ echo fired >> "{log}"; }}\n'
-            + block
+            f"actual_ReYMeN_uid={ReYMeN_uid}\n"
+            f"stat() {{ echo {venv_owner}; }}\n"
+            f'chown() {{ echo fired >> "{log}"; }}\n' + block
         )
         script_path = dpath / "harness.sh"
         script_path.write_text(script)

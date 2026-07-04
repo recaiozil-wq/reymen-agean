@@ -89,13 +89,7 @@ def test_iter_skill_index_files_prunes_dependency_dirs(tmp_path):
     (nested / "SKILL.md").write_text("---\nname: typer\n---\n", encoding="utf-8")
 
     node_module = (
-        tmp_path
-        / "web-skill"
-        / "node_modules"
-        / "dep"
-        / ".agents"
-        / "skills"
-        / "dep"
+        tmp_path / "web-skill" / "node_modules" / "dep" / ".agents" / "skills" / "dep"
     )
     node_module.mkdir(parents=True)
     (node_module / "SKILL.md").write_text("---\nname: dep\n---\n", encoding="utf-8")
@@ -142,9 +136,9 @@ skills:
 
     assert get_disabled_skill_names() == {"hidden-skill"}
     assert get_external_skills_dirs() == [external.resolve()]
-    assert resolve_skill_config_values([
-        {"key": "wiki.path", "description": "Wiki path"}
-    ])["wiki.path"].endswith("/wiki")
+    assert resolve_skill_config_values(
+        [{"key": "wiki.path", "description": "Wiki path"}]
+    )["wiki.path"].endswith("/wiki")
     assert parse_count == 1
 
 
@@ -163,6 +157,7 @@ def test_skill_config_raw_cache_invalidates_on_config_edit(tmp_path, monkeypatch
 
     config_path.write_text("skills:\n  disabled: [new-skill]\n", encoding="utf-8")
     import os
+
     os.utime(config_path, None)
 
     assert get_disabled_skill_names() == {"new-skill"}

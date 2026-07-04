@@ -104,6 +104,7 @@ KOSUL_ACIKLAMA: Dict[str, str] = {
 
 # ── Graph Tanımı ───────────────────────────────────────────────────────────────
 
+
 def _graph_json_insa() -> dict:
     """LangGraph StateGraph formatında JSON graph yapısı oluştur.
 
@@ -116,29 +117,51 @@ def _graph_json_insa() -> dict:
     """
     nodes: List[Dict[str, Any]] = []
     for adim in AKIS_ADIMLARI:
-        nodes.append({
-            "id": adim,
-            "type": "node",
-            "label": adim.replace("_", " ").title(),
-            "description": DUGUM_ACIKLAMA.get(adim, ""),
-            "entry": adim == "basla",
-            "exit": adim == "bitis",
-            "config": {
-                "max_retry": 3 if adim == "llm_cagir" else 0,
-                "timeout_ms": 30000 if adim == "llm_cagir" else 5000,
-            },
-        })
+        nodes.append(
+            {
+                "id": adim,
+                "type": "node",
+                "label": adim.replace("_", " ").title(),
+                "description": DUGUM_ACIKLAMA.get(adim, ""),
+                "entry": adim == "basla",
+                "exit": adim == "bitis",
+                "config": {
+                    "max_retry": 3 if adim == "llm_cagir" else 0,
+                    "timeout_ms": 30000 if adim == "llm_cagir" else 5000,
+                },
+            }
+        )
 
     # Kenarlar (sabit akış)
     edges: List[Dict[str, Any]] = [
-        {"source": "basla",         "target": "hafiza_kontrol", "type": "direct",  "label": ""},
-        {"source": "hafiza_kontrol","target": "web_ara",        "type": "direct",  "label": ""},
-        {"source": "web_ara",       "target": "skill_ara",      "type": "direct",  "label": ""},
-        {"source": "skill_ara",     "target": "llm_cagir",      "type": "direct",  "label": ""},
-        {"source": "llm_cagir",     "target": "tool_calistir",  "type": "direct",  "label": ""},
-        {"source": "tool_calistir", "target": "llm_cagir",      "type": "direct",  "label": ""},
-        {"source": "tool_calistir", "target": "yanit_ver",      "type": "direct",  "label": ""},
-        {"source": "yanit_ver",     "target": "bitis",          "type": "direct",  "label": ""},
+        {"source": "basla", "target": "hafiza_kontrol", "type": "direct", "label": ""},
+        {
+            "source": "hafiza_kontrol",
+            "target": "web_ara",
+            "type": "direct",
+            "label": "",
+        },
+        {"source": "web_ara", "target": "skill_ara", "type": "direct", "label": ""},
+        {"source": "skill_ara", "target": "llm_cagir", "type": "direct", "label": ""},
+        {
+            "source": "llm_cagir",
+            "target": "tool_calistir",
+            "type": "direct",
+            "label": "",
+        },
+        {
+            "source": "tool_calistir",
+            "target": "llm_cagir",
+            "type": "direct",
+            "label": "",
+        },
+        {
+            "source": "tool_calistir",
+            "target": "yanit_ver",
+            "type": "direct",
+            "label": "",
+        },
+        {"source": "yanit_ver", "target": "bitis", "type": "direct", "label": ""},
     ]
 
     # Koşullu dallanmalar (conditional edges)
@@ -147,8 +170,16 @@ def _graph_json_insa() -> dict:
             "id": "hafiza_var_mi",
             "source": "hafiza_kontrol",
             "branches": [
-                {"condition": True,  "target": "web_ara",       "label": "Hafiza yok → normal akis"},
-                {"condition": False, "target": "yanit_ver",     "label": "Hafiza var → onbellekten yanit"},
+                {
+                    "condition": True,
+                    "target": "web_ara",
+                    "label": "Hafiza yok → normal akis",
+                },
+                {
+                    "condition": False,
+                    "target": "yanit_ver",
+                    "label": "Hafiza var → onbellekten yanit",
+                },
             ],
             "default": "web_ara",
         },
@@ -156,8 +187,16 @@ def _graph_json_insa() -> dict:
             "id": "web_gerekli_mi",
             "source": "web_ara",
             "branches": [
-                {"condition": True,  "target": "skill_ara",     "label": "Web sonucu eklendi → devam"},
-                {"condition": False, "target": "skill_ara",     "label": "Web gerekmez → atla"},
+                {
+                    "condition": True,
+                    "target": "skill_ara",
+                    "label": "Web sonucu eklendi → devam",
+                },
+                {
+                    "condition": False,
+                    "target": "skill_ara",
+                    "label": "Web gerekmez → atla",
+                },
             ],
             "default": "skill_ara",
         },
@@ -165,8 +204,16 @@ def _graph_json_insa() -> dict:
             "id": "skill_var_mi",
             "source": "skill_ara",
             "branches": [
-                {"condition": True,  "target": "llm_cagir",     "label": "Skill bulundu → context'e ekle"},
-                {"condition": False, "target": "llm_cagir",     "label": "Skill yok → dogrudan LLM"},
+                {
+                    "condition": True,
+                    "target": "llm_cagir",
+                    "label": "Skill bulundu → context'e ekle",
+                },
+                {
+                    "condition": False,
+                    "target": "llm_cagir",
+                    "label": "Skill yok → dogrudan LLM",
+                },
             ],
             "default": "llm_cagir",
         },
@@ -174,8 +221,16 @@ def _graph_json_insa() -> dict:
             "id": "tool_gerekli_mi",
             "source": "tool_calistir",
             "branches": [
-                {"condition": True,  "target": "llm_cagir",     "label": "Tool sonucu var → tekrar LLM (ReAct)"},
-                {"condition": False, "target": "yanit_ver",     "label": "Tool yok → yanit ver"},
+                {
+                    "condition": True,
+                    "target": "llm_cagir",
+                    "label": "Tool sonucu var → tekrar LLM (ReAct)",
+                },
+                {
+                    "condition": False,
+                    "target": "yanit_ver",
+                    "label": "Tool yok → yanit ver",
+                },
             ],
             "default": "yanit_ver",
         },
@@ -183,8 +238,16 @@ def _graph_json_insa() -> dict:
             "id": "hata_var_mi",
             "source": "llm_cagir",
             "branches": [
-                {"condition": True,  "target": "bitis",         "label": "Hata var → hata yonetimi + bitis"},
-                {"condition": False, "target": "tool_calistir", "label": "Basarili → tool/yanti kontrolu"},
+                {
+                    "condition": True,
+                    "target": "bitis",
+                    "label": "Hata var → hata yonetimi + bitis",
+                },
+                {
+                    "condition": False,
+                    "target": "tool_calistir",
+                    "label": "Basarili → tool/yanti kontrolu",
+                },
             ],
             "default": "tool_calistir",
         },
@@ -195,7 +258,7 @@ def _graph_json_insa() -> dict:
             "name": "ReYMeN Conversation StateGraph",
             "version": "1.0.0",
             "description": "ReYMeN Agent konusma dongusu LangGraph StateGraph exportu. "
-                           "conversation_loop.py:ConversationLoop.run_conversation() akisi.",
+            "conversation_loop.py:ConversationLoop.run_conversation() akisi.",
             "framework": "langgraph",
             "generated_at": datetime.now().isoformat(),
             "source_file": "reymen/cereyan/conversation_loop.py",
@@ -223,10 +286,18 @@ def _mermaid_insa(graph_data: dict) -> str:
 
     # Stil tanımları
     lines.append("    %% Stiller")
-    lines.append("    classDef entry fill:#1a1a2e,stroke:#e94560,stroke-width:2px,color:#fff")
-    lines.append("    classDef node fill:#16213e,stroke:#0f3460,stroke-width:1px,color:#a8d8ea")
-    lines.append("    classDef exit fill:#1a1a2e,stroke:#00ff88,stroke-width:2px,color:#fff")
-    lines.append("    classDef condition fill:#2d1b2e,stroke:#e94560,stroke-width:1px,color:#ff9a9e")
+    lines.append(
+        "    classDef entry fill:#1a1a2e,stroke:#e94560,stroke-width:2px,color:#fff"
+    )
+    lines.append(
+        "    classDef node fill:#16213e,stroke:#0f3460,stroke-width:1px,color:#a8d8ea"
+    )
+    lines.append(
+        "    classDef exit fill:#1a1a2e,stroke:#00ff88,stroke-width:2px,color:#fff"
+    )
+    lines.append(
+        "    classDef condition fill:#2d1b2e,stroke:#e94560,stroke-width:1px,color:#ff9a9e"
+    )
     lines.append("")
 
     # Düğümler
@@ -243,11 +314,11 @@ def _mermaid_insa(graph_data: dict) -> str:
 
         # Sınıf ata
         if node.get("entry"):
-            lines.append(f'    class {node_id} entry;')
+            lines.append(f"    class {node_id} entry;")
         elif node.get("exit"):
-            lines.append(f'    class {node_id} exit;')
+            lines.append(f"    class {node_id} exit;")
         else:
-            lines.append(f'    class {node_id} node;')
+            lines.append(f"    class {node_id} node;")
     lines.append("")
 
     # Koşul düğümleri (diamond)
@@ -258,7 +329,7 @@ def _mermaid_insa(graph_data: dict) -> str:
         # Koşul etiketini formatla
         label = cid.replace("_", " ").title()
         lines.append(f'    {cid}{{"{label}"}}')
-        lines.append(f'    class {cid} condition;')
+        lines.append(f"    class {cid} condition;")
 
         # Kaynak düğüm -> koşul
         lines.append(f'    {cond["source"]} -->|"kosul"| {cid}')
@@ -287,7 +358,7 @@ def _mermaid_insa(graph_data: dict) -> str:
             if lbl:
                 lines.append(f'    {src} -->|"{lbl}"| {tgt}')
             else:
-                lines.append(f'    {src} --> {tgt}')
+                lines.append(f"    {src} --> {tgt}")
     lines.append("")
 
     # Alt-graph: ReAct Loop
@@ -339,11 +410,13 @@ def _mermaid_readme_md_insa(graph_data: dict) -> str:
     lines.append("| Düğüm | Tür | Açıklama |")
     lines.append("|-------|-----|----------|")
     for node in graph_data["nodes"]:
-            node_type = "Giriş" if node.get("entry") else ("Çıkış" if node.get("exit") else "İşlem")
-            desc = node.get("description", "").replace("\n", " ").strip()
-            if len(desc) > 100:
-                desc = desc[:97] + "..."
-            lines.append(f"| `{node['id']}` | {node_type} | {desc} |")
+        node_type = (
+            "Giriş" if node.get("entry") else ("Çıkış" if node.get("exit") else "İşlem")
+        )
+        desc = node.get("description", "").replace("\n", " ").strip()
+        if len(desc) > 100:
+            desc = desc[:97] + "..."
+        lines.append(f"| `{node['id']}` | {node_type} | {desc} |")
     lines.append("")
     lines.append("---")
     lines.append("")
@@ -355,9 +428,13 @@ def _mermaid_readme_md_insa(graph_data: dict) -> str:
     lines.append("|-------|--------|----------|")
     for cond in graph_data["conditions"]:
         desc = KOSUL_ACIKLAMA.get(cond["id"], "")
-        branch_strs = [f"`{b['condition']}` → `{b['target']}`" for b in cond["branches"]]
+        branch_strs = [
+            f"`{b['condition']}` → `{b['target']}`" for b in cond["branches"]
+        ]
         branches = " | ".join(branch_strs)
-        lines.append(f"| `{cond['id']}` | `{cond['source']}` | {desc}<br/>({branches}) |")
+        lines.append(
+            f"| `{cond['id']}` | `{cond['source']}` | {desc}<br/>({branches}) |"
+        )
     lines.append("")
     lines.append("---")
     lines.append("")
@@ -375,10 +452,12 @@ def _mermaid_readme_md_insa(graph_data: dict) -> str:
     lines.append("         yanit_ver")
     lines.append("```")
     lines.append("")
-    lines.append("Bu döngü max_iterations ({}) kadar tekrar eder. "
-                 "Her turda LLM tool_calls döndürürse araç çalıştırılır "
-                 "ve sonuç tekrar LLM'e gönderilir. Tool_calls yoksa "
-                 "doğrudan yanıt verilir.".format(meta["max_iterations"]))
+    lines.append(
+        "Bu döngü max_iterations ({}) kadar tekrar eder. "
+        "Her turda LLM tool_calls döndürürse araç çalıştırılır "
+        "ve sonuç tekrar LLM'e gönderilir. Tool_calls yoksa "
+        "doğrudan yanıt verilir.".format(meta["max_iterations"])
+    )
     lines.append("")
     lines.append("---")
     lines.append("")
@@ -386,9 +465,15 @@ def _mermaid_readme_md_insa(graph_data: dict) -> str:
     # Hata Yönetimi
     lines.append("## Hata Yönetimi")
     lines.append("")
-    lines.append("- **Retry:** LLM çağrısı başarısız olursa 3 kez dene (exponential backoff)")
-    lines.append("- **Fallback:** Provider çökerse, `_provider_rotate` ile alternatif provider'a geç")
-    lines.append("- **Circuit Breaker:** 3 ardışık hata → circuit breaker açılır, kalıcı kilit")
+    lines.append(
+        "- **Retry:** LLM çağrısı başarısız olursa 3 kez dene (exponential backoff)"
+    )
+    lines.append(
+        "- **Fallback:** Provider çökerse, `_provider_rotate` ile alternatif provider'a geç"
+    )
+    lines.append(
+        "- **Circuit Breaker:** 3 ardışık hata → circuit breaker açılır, kalıcı kilit"
+    )
     lines.append("- **Takılma Dedektörü:** Aynı eylem 3x tekrar ederse loop sonlanır")
     lines.append("- **Budget:** IterationBudget aşılırsa loop sonlanır")
     lines.append("- **Interrupt:** Ctrl+C ile kullanıcı iptali desteklenir")
@@ -398,6 +483,7 @@ def _mermaid_readme_md_insa(graph_data: dict) -> str:
 
 
 # ── Ana Export Fonksiyonu ─────────────────────────────────────────────────────
+
 
 def langgraph_export(
     output_dir: Optional[str] = None,
@@ -463,6 +549,7 @@ def langgraph_export(
 
 # ── CLI Entegrasyonu ──────────────────────────────────────────────────────────
 
+
 def cmd_export(args) -> str:
     """CLI handler: ``reymen --langgraph-export`` çağrısı.
 
@@ -489,7 +576,9 @@ def cmd_export(args) -> str:
     node_sayisi = len(sonuc["graph"].get("nodes", []))
     edge_sayisi = len(sonuc["graph"].get("edges", []))
     cond_sayisi = len(sonuc["graph"].get("conditions", []))
-    lines.append(f"         Dugum: {node_sayisi}, Kenar: {edge_sayisi}, Kosul: {cond_sayisi}")
+    lines.append(
+        f"         Dugum: {node_sayisi}, Kenar: {edge_sayisi}, Kosul: {cond_sayisi}"
+    )
 
     # Mermaid önizleme
     lines.append("")
@@ -509,7 +598,9 @@ if __name__ == "__main__":
     """Doğrudan çalıştırma: python -m reymen.core.langgraph_export"""
     sonuc = langgraph_export(output_dir=os.getcwd())
     if sonuc["basarili"]:
-        print(f"[OK] LangGraph export:\n  JSON: {sonuc.get('graph_json_path')}\n  MD:   {sonuc.get('graph_md_path')}")
+        print(
+            f"[OK] LangGraph export:\n  JSON: {sonuc.get('graph_json_path')}\n  MD:   {sonuc.get('graph_md_path')}"
+        )
     else:
         print(f"[HATA] {sonuc}")
         sys.exit(1)

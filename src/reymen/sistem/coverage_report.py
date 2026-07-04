@@ -92,20 +92,40 @@ def calistir(hizli: bool = False) -> dict:
         basla = time.time()
 
         subprocess.run(
-            [sys.executable, "-m", "coverage", "run",
-             f"--source={kaynak}",
-             "--omit=*/venv/*,*/bot_venv/*,*/node_modules/*,*/__pycache__/*,*/tests/*",
-             "-m", "pytest"] + test_hedef.split(),
-            cwd=str(PROJE_KOK), capture_output=True, text=True,
-            timeout=120, env=env,
+            [
+                sys.executable,
+                "-m",
+                "coverage",
+                "run",
+                f"--source={kaynak}",
+                "--omit=*/venv/*,*/bot_venv/*,*/node_modules/*,*/__pycache__/*,*/tests/*",
+                "-m",
+                "pytest",
+            ]
+            + test_hedef.split(),
+            cwd=str(PROJE_KOK),
+            capture_output=True,
+            text=True,
+            timeout=120,
+            env=env,
         )
 
         # JSON rapor
         rc = subprocess.run(
-            [sys.executable, "-m", "coverage", "json", "-o", "-",
-             "--omit=*/venv/*,*/bot_venv/*,*/node_modules/*,*/__pycache__/*,*/tests/*"],
-            cwd=str(PROJE_KOK), capture_output=True, text=True,
-            timeout=30, env=env,
+            [
+                sys.executable,
+                "-m",
+                "coverage",
+                "json",
+                "-o",
+                "-",
+                "--omit=*/venv/*,*/bot_venv/*,*/node_modules/*,*/__pycache__/*,*/tests/*",
+            ],
+            cwd=str(PROJE_KOK),
+            capture_output=True,
+            text=True,
+            timeout=30,
+            env=env,
         )
 
         sure = round(time.time() - basla, 2)
@@ -141,8 +161,9 @@ def statik_analiz() -> dict:
                 mod_path = os.path.join(root, f)
                 mod_name = (
                     "reymen."
-                    + os.path.relpath(mod_path, str(PROJE_KOK))
-                    .replace(os.sep, ".")[:-3]
+                    + os.path.relpath(mod_path, str(PROJE_KOK)).replace(os.sep, ".")[
+                        :-3
+                    ]
                 )
                 try:
                     __import__(mod_name)
@@ -150,9 +171,11 @@ def statik_analiz() -> dict:
                 except Exception:
                     import_edilemeyen += 1
 
-    yuzde = round(
-        import_edilebilen / (import_edilebilen + import_edilemeyen) * 100, 1
-    ) if (import_edilebilen + import_edilemeyen) > 0 else 0
+    yuzde = (
+        round(import_edilebilen / (import_edilebilen + import_edilemeyen) * 100, 1)
+        if (import_edilebilen + import_edilemeyen) > 0
+        else 0
+    )
 
     sonuc = {
         "basari": True,
@@ -175,14 +198,16 @@ def _gecmis_ekle(sonuc: dict) -> None:
             with open(HISTORY_FILE) as f:
                 history = json.load(f)
 
-        history.append({
-            "tarih": datetime.now().isoformat(),
-            "yuzde": sonuc.get("yuzde", 0),
-            "toplam_satir": sonuc.get("toplam_satir", 0),
-            "kapsanan_satir": sonuc.get("kapsanan_satir", 0),
-            "sure": sonuc.get("sure", 0),
-            "tur": sonuc.get("tur", "coverage"),
-        })
+        history.append(
+            {
+                "tarih": datetime.now().isoformat(),
+                "yuzde": sonuc.get("yuzde", 0),
+                "toplam_satir": sonuc.get("toplam_satir", 0),
+                "kapsanan_satir": sonuc.get("kapsanan_satir", 0),
+                "sure": sonuc.get("sure", 0),
+                "tur": sonuc.get("tur", "coverage"),
+            }
+        )
 
         # Son 100 kayıt
         history = history[-100:]

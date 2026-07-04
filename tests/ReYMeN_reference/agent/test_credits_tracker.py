@@ -390,7 +390,9 @@ class TestVersionValidation:
         assert state is None
 
     def test_version_absent_returns_none(self):
-        headers = {k: v for k, v in _base_headers().items() if k != "x-nous-credits-version"}
+        headers = {
+            k: v for k, v in _base_headers().items() if k != "x-nous-credits-version"
+        }
         state = parse_credits_headers(headers)
         assert state is None
 
@@ -409,10 +411,14 @@ class TestVersionValidation:
                 parse_credits_headers(headers)
                 parse_credits_headers(headers)
 
-            warning_records = [r for r in caplog.records if "unsupported" in r.message.lower() or "version" in r.message.lower()]
-            assert len(warning_records) == 1, (
-                f"Expected exactly 1 version warning, got {len(warning_records)}: {[r.message for r in warning_records]}"
-            )
+            warning_records = [
+                r
+                for r in caplog.records
+                if "unsupported" in r.message.lower() or "version" in r.message.lower()
+            ]
+            assert (
+                len(warning_records) == 1
+            ), f"Expected exactly 1 version warning, got {len(warning_records)}: {[r.message for r in warning_records]}"
         finally:
             ct._version_warning_emitted = original
 
@@ -604,8 +610,12 @@ class TestNegativeValues:
 
     def test_negative_subscription_accepted(self):
         """subscription_micros is the ONLY field allowed to be negative."""
-        headers = _base_headers(**{"x-nous-credits-subscription-micros": "-5000000",
-                                   "x-nous-credits-subscription-usd": "-5.00"})
+        headers = _base_headers(
+            **{
+                "x-nous-credits-subscription-micros": "-5000000",
+                "x-nous-credits-subscription-usd": "-5.00",
+            }
+        )
         state = parse_credits_headers(headers)
         assert state is not None
         assert state.subscription_micros == -5_000_000
@@ -831,17 +841,23 @@ class TestCreditsStateDefaults:
 class TestDepletedProperty:
     def test_depleted_equals_not_paid_access(self):
         """depleted must be exactly `not paid_access`, never `remaining==0`."""
-        state = CreditsState(paid_access=False, remaining_micros=0, captured_at=time.time())
+        state = CreditsState(
+            paid_access=False, remaining_micros=0, captured_at=time.time()
+        )
         assert state.depleted is True
 
     def test_not_depleted_when_paid_access_true(self):
-        state = CreditsState(paid_access=True, remaining_micros=0, captured_at=time.time())
+        state = CreditsState(
+            paid_access=True, remaining_micros=0, captured_at=time.time()
+        )
         # remaining==0 but paid_access is True → NOT depleted
         assert state.depleted is False
 
     def test_depleted_independent_of_remaining(self):
         """Even with remaining > 0, if paid_access is False, depleted is True."""
-        state = CreditsState(paid_access=False, remaining_micros=1_000_000, captured_at=time.time())
+        state = CreditsState(
+            paid_access=False, remaining_micros=1_000_000, captured_at=time.time()
+        )
         assert state.depleted is True
 
 

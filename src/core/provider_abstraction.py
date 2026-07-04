@@ -49,6 +49,7 @@ _BEKLEME_CARPAN: float = 2.0
 
 # ── Veri Yapıları ──────────────────────────────────────────────────────────
 
+
 @dataclass
 class ProviderYanit:
     """Sağlayıcıdan dönen yanıtı temsil eder.
@@ -62,6 +63,7 @@ class ProviderYanit:
         hata:          Hata mesajı (varsa).
         tahmini_token: Tahmini token sayısı.
     """
+
     metin: str = ""
     provider: str = ""
     model: str = ""
@@ -77,6 +79,7 @@ class ProviderYapilandirma:
 
     config.yaml -> fallback_providers listesindeki her girdi bu yapıya dönüşür.
     """
+
     provider: str
     model: str
     base_url: str = ""
@@ -86,32 +89,39 @@ class ProviderYapilandirma:
 
 # ── Hata Sınıfları ─────────────────────────────────────────────────────────
 
+
 class ProviderHatasi(Exception):
     """Sağlayıcı çağrıları sırasında oluşan genel hata."""
+
     pass
 
 
 class ProviderGecersizKey(ProviderHatasi):
     """API anahtarı geçersiz (401/403)."""
+
     pass
 
 
 class ProviderKrediBitti(ProviderHatasi):
     """Sağlayıcı kredisi bitti (402 Payment Required)."""
+
     pass
 
 
 class ProviderRateLimit(ProviderHatasi):
     """Hız sınırı aşıldı (429)."""
+
     pass
 
 
 class ProviderZamanAsimi(ProviderHatasi):
     """İstek zaman aşımına uğradı."""
+
     pass
 
 
 # ── Temel Sınıf ────────────────────────────────────────────────────────────
+
 
 class ProviderBase(abc.ABC):
     """Tüm sağlayıcıların türemesi gereken soyut temel sınıf.
@@ -212,7 +222,9 @@ class ProviderBase(abc.ABC):
         if not self.hazir_mi():
             logger.warning(
                 "[%s] API anahtari eksik — sağlayıcı kullanilamaz. "
-                "Ortam değişkeni: %s", self.ad, self.api_key_env,
+                "Ortam değişkeni: %s",
+                self.ad,
+                self.api_key_env,
             )
             return False
         return True
@@ -382,28 +394,40 @@ class ProviderBase(abc.ABC):
                 if isinstance(siniflandirilmis, ProviderGecersizKey):
                     logger.warning(
                         "[%s] Yetki hatasi — retry edilmiyor: %s",
-                        self.ad, siniflandirilmis,
+                        self.ad,
+                        siniflandirilmis,
                     )
                     raise siniflandirilmis
 
                 if isinstance(siniflandirilmis, ProviderKrediBitti):
                     logger.warning(
                         "[%s] Kredi bitti — retry edilmiyor: %s",
-                        self.ad, siniflandirilmis,
+                        self.ad,
+                        siniflandirilmis,
                     )
                     raise siniflandirilmis
 
-                if isinstance(siniflandirilmis, ProviderRateLimit) and deneme < _MAKS_DENEME:
+                if (
+                    isinstance(siniflandirilmis, ProviderRateLimit)
+                    and deneme < _MAKS_DENEME
+                ):
                     logger.warning(
                         "[%s] Rate limit — %.1fs bekleniyor (%d/%d)…",
-                        self.ad, bekleme, deneme, _MAKS_DENEME,
+                        self.ad,
+                        bekleme,
+                        deneme,
+                        _MAKS_DENEME,
                     )
                     time.sleep(bekleme)
                     bekleme *= _BEKLEME_CARPAN
                 elif deneme < _MAKS_DENEME:
                     logger.warning(
                         "[%s] Hata — %.1fs sonra yeniden deneniyor (%d/%d): %s",
-                        self.ad, bekleme, deneme, _MAKS_DENEME, hata,
+                        self.ad,
+                        bekleme,
+                        deneme,
+                        _MAKS_DENEME,
+                        hata,
                     )
                     time.sleep(bekleme)
                     bekleme *= _BEKLEME_CARPAN
@@ -559,7 +583,10 @@ class ProviderBase(abc.ABC):
         """
         simdi = time.time()
         with self._lock:
-            if self._model_cache is not None and (simdi - self._model_cache_zamani) < self._model_cache_omru:
+            if (
+                self._model_cache is not None
+                and (simdi - self._model_cache_zamani) < self._model_cache_omru
+            ):
                 return self._model_cache
 
             try:
@@ -596,6 +623,7 @@ class ProviderBase(abc.ABC):
 # ═══════════════════════════════════════════════════════════════════════════
 # OpenAI Uyumlu Sağlayıcılar (DeepSeek, OpenAI, Groq, xAI, OpenRouter, LM Studio)
 # ═══════════════════════════════════════════════════════════════════════════
+
 
 class OpenAIUyumluProvider(ProviderBase):
     """OpenAI-uyumlu /v1/chat/completions API'sine sahip sağlayıcılar için temel sınıf.
@@ -649,7 +677,9 @@ class OpenAIUyumluProvider(ProviderBase):
         model = kwargs.get("model") or self._model
         payload = {
             "model": model,
-            "messages": [{"role": "system", "content": sistem_prompt}] + mesajlar if sistem_prompt else mesajlar,
+            "messages": [{"role": "system", "content": sistem_prompt}] + mesajlar
+            if sistem_prompt
+            else mesajlar,
             "stream": False,
             "temperature": kwargs.get("temperature", _VARSAYILAN_SICAKLIK),
             "max_tokens": kwargs.get("max_tokens", _VARSAYILAN_MAX_TOKEN),
@@ -657,7 +687,9 @@ class OpenAIUyumluProvider(ProviderBase):
 
         t0 = time.monotonic()
         try:
-            r = requests.post(url, headers=headers, json=payload, timeout=_TIMEOUT_SANIYE)
+            r = requests.post(
+                url, headers=headers, json=payload, timeout=_TIMEOUT_SANIYE
+            )
             r.raise_for_status()
             veri = r.json()
             metin = veri["choices"][0]["message"]["content"] or ""
@@ -710,7 +742,9 @@ class OpenAIUyumluProvider(ProviderBase):
         model = kwargs.get("model") or self._model
         payload = {
             "model": model,
-            "messages": [{"role": "system", "content": sistem_prompt}] + mesajlar if sistem_prompt else mesajlar,
+            "messages": [{"role": "system", "content": sistem_prompt}] + mesajlar
+            if sistem_prompt
+            else mesajlar,
             "stream": True,
             "temperature": kwargs.get("temperature", _VARSAYILAN_SICAKLIK),
             "max_tokens": kwargs.get("max_tokens", _VARSAYILAN_MAX_TOKEN),
@@ -804,6 +838,7 @@ class OpenAIUyumluProvider(ProviderBase):
 # Sağlayıcı Alt Sınıfları
 # ═══════════════════════════════════════════════════════════════════════════
 
+
 class DeepSeekProvider(OpenAIUyumluProvider):
     """DeepSeek API sağlayıcısı.
 
@@ -811,6 +846,7 @@ class DeepSeekProvider(OpenAIUyumluProvider):
     Ortam değişkeni: DEEPSEEK_API_KEY
     Varsayılan model: deepseek-chat
     """
+
     ad: str = "deepseek"
     varsayilan_model: str = "deepseek-chat"
     varsayilan_base_url: str = "https://api.deepseek.com"
@@ -824,6 +860,7 @@ class OpenAIProvider(OpenAIUyumluProvider):
     Ortam değişkeni: OPENAI_API_KEY
     Varsayılan model: gpt-4o-mini
     """
+
     ad: str = "openai"
     varsayilan_model: str = "gpt-4o-mini"
     varsayilan_base_url: str = "https://api.openai.com"
@@ -837,6 +874,7 @@ class GroqProvider(OpenAIUyumluProvider):
     Ortam değişkeni: GROQ_API_KEY
     Varsayılan model: llama-3.1-8b-instant
     """
+
     ad: str = "groq"
     varsayilan_model: str = "llama-3.1-8b-instant"
     varsayilan_base_url: str = "https://api.groq.com/openai/v1"
@@ -850,6 +888,7 @@ class XAIProvider(OpenAIUyumluProvider):
     Ortam değişkeni: XAI_API_KEY
     Varsayılan model: grok-2-latest
     """
+
     ad: str = "xai"
     varsayilan_model: str = "grok-2-latest"
     varsayilan_base_url: str = "https://api.x.ai"
@@ -863,6 +902,7 @@ class OpenRouterProvider(OpenAIUyumluProvider):
     Ortam değişkeni: OPENROUTER_API_KEY
     Varsayılan model: deepseek/deepseek-chat
     """
+
     ad: str = "openrouter"
     varsayilan_model: str = "deepseek/deepseek-chat"
     varsayilan_base_url: str = "https://openrouter.ai/api"
@@ -876,6 +916,7 @@ class LMStudioProvider(OpenAIUyumluProvider):
     API: http://localhost:1234/v1/chat/completions
     Varsayılan model: local-model
     """
+
     ad: str = "lmstudio"
     varsayilan_model: str = "local-model"
     varsayilan_base_url: str = "http://localhost:1234"
@@ -897,10 +938,14 @@ class LMStudioProvider(OpenAIUyumluProvider):
         donusturulmus: list[dict] = []
 
         if sistem_prompt:
-            donusturulmus.append({"role": "user", "content": f"[SISTEM]: {sistem_prompt}"})
+            donusturulmus.append(
+                {"role": "user", "content": f"[SISTEM]: {sistem_prompt}"}
+            )
         for m in mesajlar:
             if m.get("role") == "system":
-                donusturulmus.append({"role": "user", "content": f"[SISTEM]: {m['content']}"})
+                donusturulmus.append(
+                    {"role": "user", "content": f"[SISTEM]: {m['content']}"}
+                )
             else:
                 donusturulmus.append(m)
 
@@ -937,6 +982,7 @@ class LMStudioProvider(OpenAIUyumluProvider):
 # Anthropic Sağlayıcısı (farklı API formatı)
 # ═══════════════════════════════════════════════════════════════════════════
 
+
 class AnthropicProvider(ProviderBase):
     """Anthropic (Claude) API sağlayıcısı.
 
@@ -947,6 +993,7 @@ class AnthropicProvider(ProviderBase):
     Ortam değişkeni: ANTHROPIC_API_KEY
     Varsayılan model: claude-haiku-4-5-20251001
     """
+
     ad: str = "anthropic"
     varsayilan_model: str = "claude-haiku-4-5-20251001"
     varsayilan_base_url: str = "https://api.anthropic.com"
@@ -990,7 +1037,9 @@ class AnthropicProvider(ProviderBase):
 
         t0 = time.monotonic()
         try:
-            r = requests.post(url, headers=headers, json=payload, timeout=_TIMEOUT_SANIYE)
+            r = requests.post(
+                url, headers=headers, json=payload, timeout=_TIMEOUT_SANIYE
+            )
             r.raise_for_status()
             veri = r.json()
             # Anthropic yanit formati: content[{type: "text", text: "..."}]
@@ -1108,7 +1157,11 @@ class AnthropicProvider(ProviderBase):
                     "anthropic-version": "2023-06-01",
                     "Content-Type": "application/json",
                 },
-                json={"model": self._model, "messages": [{"role": "user", "content": "ping"}], "max_tokens": 1},
+                json={
+                    "model": self._model,
+                    "messages": [{"role": "user", "content": "ping"}],
+                    "max_tokens": 1,
+                },
                 timeout=5,
             )
             return r.status_code < 500
@@ -1120,6 +1173,7 @@ class AnthropicProvider(ProviderBase):
 # Xiaomi (MiniMax) Sağlayıcısı
 # ═══════════════════════════════════════════════════════════════════════════
 
+
 class XiaomiProvider(ProviderBase):
     """Xiaomi (MiniMax) API sağlayıcısı.
 
@@ -1129,6 +1183,7 @@ class XiaomiProvider(ProviderBase):
     Ortam değişkeni: XIAOMI_API_KEY
     Varsayılan model: MiniMax-Text-01
     """
+
     ad: str = "xiaomi"
     varsayilan_model: str = "mimo-v2.5-pro"
     varsayilan_base_url: str = "https://api.xiaomimimo.com/v1"
@@ -1160,7 +1215,9 @@ class XiaomiProvider(ProviderBase):
         model = kwargs.get("model") or self._model
         payload = {
             "model": model,
-            "messages": [{"role": "system", "content": sistem_prompt}] + mesajlar if sistem_prompt else mesajlar,
+            "messages": [{"role": "system", "content": sistem_prompt}] + mesajlar
+            if sistem_prompt
+            else mesajlar,
             "stream": False,
             "temperature": kwargs.get("temperature", _VARSAYILAN_SICAKLIK),
             "max_tokens": kwargs.get("max_tokens", _VARSAYILAN_MAX_TOKEN),
@@ -1168,7 +1225,9 @@ class XiaomiProvider(ProviderBase):
 
         t0 = time.monotonic()
         try:
-            r = requests.post(url, headers=headers, json=payload, timeout=_TIMEOUT_SANIYE)
+            r = requests.post(
+                url, headers=headers, json=payload, timeout=_TIMEOUT_SANIYE
+            )
             r.raise_for_status()
             veri = r.json()
             metin = veri["choices"][0]["message"]["content"] or ""
@@ -1203,7 +1262,9 @@ class XiaomiProvider(ProviderBase):
         model = kwargs.get("model") or self._model
         payload = {
             "model": model,
-            "messages": [{"role": "system", "content": sistem_prompt}] + mesajlar if sistem_prompt else mesajlar,
+            "messages": [{"role": "system", "content": sistem_prompt}] + mesajlar
+            if sistem_prompt
+            else mesajlar,
             "stream": True,
             "temperature": kwargs.get("temperature", _VARSAYILAN_SICAKLIK),
             "max_tokens": kwargs.get("max_tokens", _VARSAYILAN_MAX_TOKEN),
@@ -1272,8 +1333,15 @@ class XiaomiProvider(ProviderBase):
             url = self._api_url()
             r = requests.post(
                 url,
-                headers={"Authorization": f"Bearer {self._api_key}", "Content-Type": "application/json"},
-                json={"model": self._model, "messages": [{"role": "user", "content": "ping"}], "max_tokens": 1},
+                headers={
+                    "Authorization": f"Bearer {self._api_key}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "model": self._model,
+                    "messages": [{"role": "user", "content": "ping"}],
+                    "max_tokens": 1,
+                },
                 timeout=5,
             )
             return r.status_code < 500
@@ -1286,15 +1354,15 @@ class XiaomiProvider(ProviderBase):
 # ═══════════════════════════════════════════════════════════════════════════
 
 _PROVIDER_SINIFLARI: dict[str, type[ProviderBase]] = {
-    "deepseek":   DeepSeekProvider,
-    "openai":     OpenAIProvider,
+    "deepseek": DeepSeekProvider,
+    "openai": OpenAIProvider,
     "openai-api": OpenAIProvider,  # config.yaml'daki "openai-api" icin alias
-    "anthropic":  AnthropicProvider,
-    "groq":       GroqProvider,
-    "xiaomi":     XiaomiProvider,
-    "xai":        XAIProvider,
+    "anthropic": AnthropicProvider,
+    "groq": GroqProvider,
+    "xiaomi": XiaomiProvider,
+    "xai": XAIProvider,
     "openrouter": OpenRouterProvider,
-    "lmstudio":   LMStudioProvider,
+    "lmstudio": LMStudioProvider,
 }
 
 # Global instance cache (thread-safe)
@@ -1363,9 +1431,13 @@ def get_provider(
             _global_config = config
 
     # Config'de fallback_providers varsa, oradan yapilandirma oku
-    if config and _provider_adi_duzelt(ad) in [p.get("provider", "") for p in config.get("fallback_providers", [])]:
+    if config and _provider_adi_duzelt(ad) in [
+        p.get("provider", "") for p in config.get("fallback_providers", [])
+    ]:
         for pconf in config.get("fallback_providers", []):
-            if _provider_adi_duzelt(pconf.get("provider", "")) == _provider_adi_duzelt(ad):
+            if _provider_adi_duzelt(pconf.get("provider", "")) == _provider_adi_duzelt(
+                ad
+            ):
                 model = model or pconf.get("model")
                 base_url = base_url or pconf.get("base_url")
                 break
@@ -1389,7 +1461,11 @@ def get_provider(
 
         instance = sinif(model=model, base_url=base_url, api_key=api_key)
         _provider_cache[cache_key] = instance
-        logger.debug("[ProviderFabrikasi] %s olusturuldu (cache anahtari: %s)", duzeltilmis_ad, cache_key)
+        logger.debug(
+            "[ProviderFabrikasi] %s olusturuldu (cache anahtari: %s)",
+            duzeltilmis_ad,
+            cache_key,
+        )
         return instance
 
 
@@ -1455,13 +1531,15 @@ def provideri_temizle(ad: Optional[str] = None) -> None:
                 del _provider_cache[k]
             logger.info(
                 "[ProviderFabrikasi] %s cache'i temizlendi (%d girdi).",
-                duzeltilmis_ad, len(silinecek),
+                duzeltilmis_ad,
+                len(silinecek),
             )
 
 
 # ═══════════════════════════════════════════════════════════════════════════
 # Beyin.py ile uyumluluk
 # ═══════════════════════════════════════════════════════════════════════════
+
 
 def beyin_icin_provider_olustur(
     beyin_config: dict[str, Any],
@@ -1521,7 +1599,16 @@ if __name__ == "__main__":
 
     # 1. Temel provider olusturma
     print("\n--- 1. Provider olusturma ---")
-    for ad in ("deepseek", "openai", "anthropic", "groq", "xiaomi", "xai", "openrouter", "lmstudio"):
+    for ad in (
+        "deepseek",
+        "openai",
+        "anthropic",
+        "groq",
+        "xiaomi",
+        "xai",
+        "openrouter",
+        "lmstudio",
+    ):
         try:
             p = get_provider(ad)
             print(f"  ✅ {p}")
@@ -1561,8 +1648,16 @@ if __name__ == "__main__":
     print("\n--- 5. Config'den yukleme (ornek) ---")
     ornek_config = {
         "fallback_providers": [
-            {"provider": "deepseek", "model": "deepseek-v4-flash", "base_url": "https://api.deepseek.com"},
-            {"provider": "lmstudio", "model": "local-model", "base_url": "http://localhost:1234"},
+            {
+                "provider": "deepseek",
+                "model": "deepseek-v4-flash",
+                "base_url": "https://api.deepseek.com",
+            },
+            {
+                "provider": "lmstudio",
+                "model": "local-model",
+                "base_url": "http://localhost:1234",
+            },
         ]
     }
     tumu = get_all_providers(ornek_config)

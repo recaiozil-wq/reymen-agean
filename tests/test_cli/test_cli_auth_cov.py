@@ -1,4 +1,5 @@
 """Coverage tests for reymen.sistem.cli_auth - actually calls every function."""
+
 import pytest
 from src.reymen.sistem.cli_auth import *
 

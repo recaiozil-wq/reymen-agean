@@ -13,6 +13,7 @@ Yapilandirma (ortam degiskenleri):
   - GOOGLE_CHAT_SPACE_ID      — Varsayilan alan/chat_id
   - GOOGLE_CHAT_WEBHOOK_URL   — Gelen webhook URL'si
 """
+
 import asyncio
 import hashlib
 import hmac
@@ -25,6 +26,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
 
 from pathlib import Path as _Path
+
 sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
 from src.gateways.config import Platform, PlatformConfig
@@ -50,6 +52,7 @@ logger = logging.getLogger(__name__)
 
 try:
     import httpx
+
     HTTPX_AVAILABLE = True
 except ImportError:
     HTTPX_AVAILABLE = False
@@ -149,6 +152,7 @@ class GoogleChatAdapter(BasePlatformAdapter):
 
             # Session source
             from src.gateways.session import SessionSource, build_session_key
+
             source = SessionSource(
                 platform=Platform.GOOGLE_CHAT,
                 chat_id=space_name,
@@ -241,9 +245,7 @@ class GoogleChatAdapter(BasePlatformAdapter):
             logger.error("[GoogleChat] Gonderim hatasi: %s", e)
             return SendResult(False, error=str(e))
 
-    async def send_typing(
-        self, chat_id: str, metadata: Optional[dict] = None
-    ) -> None:
+    async def send_typing(self, chat_id: str, metadata: Optional[dict] = None) -> None:
         """Google Chat typing indicator (no-op, API desteklemez)."""
         pass
 

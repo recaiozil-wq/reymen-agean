@@ -35,6 +35,7 @@ logger = logging.getLogger(__name__)
 
 class EventType(enum.Enum):
     """Sistem event tipleri."""
+
     STATE_CHANGED = "state_changed"
     TOOL_CALL_START = "tool_call_start"
     TOOL_CALL_END = "tool_call_end"
@@ -53,6 +54,7 @@ class EventType(enum.Enum):
 @dataclass
 class Event:
     """Event mesajı."""
+
     type: str  # EventType.value veya özel isim
     source: str  # Hangi bileşenden geldiği
     data: Dict[str, Any] = field(default_factory=dict)
@@ -108,8 +110,13 @@ class ServiceBridge:
 
     # ── Yayınlama ──────────────────────────────────────────────────────
 
-    def publish(self, event_type: str, data: Optional[Dict[str, Any]] = None,
-                source: str = "unknown", event_id: Optional[str] = None) -> Event:
+    def publish(
+        self,
+        event_type: str,
+        data: Optional[Dict[str, Any]] = None,
+        source: str = "unknown",
+        event_id: Optional[str] = None,
+    ) -> Event:
         """Event yayınla — tüm abonelere ilet.
 
         Args:
@@ -174,7 +181,9 @@ class ServiceBridge:
                 return False
             return (time.time() - last) < max_age_sec
 
-    def all_components_healthy(self, components: List[str], max_age_sec: float = 30.0) -> bool:
+    def all_components_healthy(
+        self, components: List[str], max_age_sec: float = 30.0
+    ) -> bool:
         """Tüm belirtilen bileşenler sağlıklı mı?"""
         return all(self.component_healthy(c, max_age_sec) for c in components)
 
@@ -188,12 +197,12 @@ class ServiceBridge:
                 "uptime_sec": round(time.time() - self._started_at, 1),
                 "event_count": self._event_count,
                 "subscriber_count": {
-                    et: len(hs)
-                    for et, hs in self._subscribers.items()
+                    et: len(hs) for et, hs in self._subscribers.items()
                 },
                 "known_components": list(self._component_health.keys()),
                 "healthy_components": [
-                    c for c in self._component_health
+                    c
+                    for c in self._component_health
                     if (time.time() - self._component_health[c]) < 30
                 ],
             }
@@ -224,8 +233,14 @@ if __name__ == "__main__":
     bridge.subscribe(EventType.ERROR.value, on_error)
     bridge.subscribe_all(lambda e: results.append(f"ALL: {e.type}"))
 
-    bridge.publish(EventType.STATE_CHANGED.value, {"to": "thinking"}, source="state_machine")
-    bridge.publish(EventType.ERROR.value, {"component": "provider", "msg": "API timeout"}, source="auto_recovery")
+    bridge.publish(
+        EventType.STATE_CHANGED.value, {"to": "thinking"}, source="state_machine"
+    )
+    bridge.publish(
+        EventType.ERROR.value,
+        {"component": "provider", "msg": "API timeout"},
+        source="auto_recovery",
+    )
 
     status = bridge.status()
     print(f"Event count: {status['event_count']}")

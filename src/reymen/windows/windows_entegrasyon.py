@@ -25,8 +25,15 @@ def windows_entegrasyonu_baslat():
         cokus_raporlayici.py ──cokus──→ kullanici (bildirim)
     """
     try:
-        from reymen.windows.windows_events import event_bus_al, OLAY_HATA, OLAY_NISAN, \
-            OLAY_TOR_HATA, OLAY_COKUS, OLAY_TOR_BASARILI, OLAY_COZUM_UYGULANDI
+        from reymen.windows.windows_events import (
+            event_bus_al,
+            OLAY_HATA,
+            OLAY_NISAN,
+            OLAY_TOR_HATA,
+            OLAY_COKUS,
+            OLAY_TOR_BASARILI,
+            OLAY_COZUM_UYGULANDI,
+        )
 
         bus = event_bus_al()
         baglanti_sayisi = 0
@@ -34,39 +41,51 @@ def windows_entegrasyonu_baslat():
         # 1. tor_otomasyonu hata → hata_cozucu
         try:
             from reymen.cereyan.hata_cozucu import CozumUygulayici
+
             cozum = CozumUygulayici()
             bus.dinle(OLAY_TOR_HATA, lambda v: _tor_hatasini_coz(v, cozum))
             baglanti_sayisi += 1
         except ImportError as _e:
-            logger.warning("[WindowsEntegrasyon] Modul yuklenemedi (L40): %s", ImportError)
+            logger.warning(
+                "[WindowsEntegrasyon] Modul yuklenemedi (L40): %s", ImportError
+            )
             pass
 
         # 2. nisan bulundu → tor_otomasyonu
         try:
             from reymen.windows.tor_otomasyonu import TorNavigator
+
             tor = TorNavigator()
             bus.dinle(OLAY_NISAN, lambda v: _nisana_git(v, tor))
             baglanti_sayisi += 1
         except ImportError as _e:
-            logger.warning("[WindowsEntegrasyon] Modul yuklenemedi (L49): %s", ImportError)
+            logger.warning(
+                "[WindowsEntegrasyon] Modul yuklenemedi (L49): %s", ImportError
+            )
             pass
 
         # 3. hata → cokus raporu (son cares)
         try:
             from reymen.cereyan.cokus_raporlayici import cokus_raporu_uret
+
             bus.dinle(OLAY_HATA, lambda v: _cokus_kontrol(v, cokus_raporu_uret))
             baglanti_sayisi += 1
         except ImportError as _e:
-            logger.warning("[WindowsEntegrasyon] Modul yuklenemedi (L57): %s", ImportError)
+            logger.warning(
+                "[WindowsEntegrasyon] Modul yuklenemedi (L57): %s", ImportError
+            )
             pass
 
         # 4. tor basarili → akilli_yonlendirici (istenirse sec)
         try:
             from reymen.cereyan.akilli_yonlendirici import gorev_icin_model_sec
+
             bus.dinle(OLAY_TOR_BASARILI, lambda v: _basarili_log(v))
             baglanti_sayisi += 1
         except ImportError as _e:
-            logger.warning("[WindowsEntegrasyon] Modul yuklenemedi (L65): %s", ImportError)
+            logger.warning(
+                "[WindowsEntegrasyon] Modul yuklenemedi (L65): %s", ImportError
+            )
             pass
 
         # 5. Cozum uygulandi log

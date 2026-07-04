@@ -86,9 +86,9 @@ def test_cancel_secret_capture_marks_setup_skipped():
 def test_secret_capture_uses_masked_prompt_without_tui():
     cli = _make_cli_stub()
 
-    with patch("ReYMeN_cli.callbacks.masked_secret_prompt", return_value="secret-value"), patch(
-        "ReYMeN_cli.callbacks.save_env_value_secure"
-    ) as save_secret:
+    with patch(
+        "ReYMeN_cli.callbacks.masked_secret_prompt", return_value="secret-value"
+    ), patch("ReYMeN_cli.callbacks.save_env_value_secure") as save_secret:
         save_secret.return_value = {
             "success": True,
             "stored_as": "TENOR_API_KEY",
@@ -142,6 +142,9 @@ def test_cli_chat_registers_secret_capture_callback():
             cli_obj.chat("hello")
 
     try:
-        assert skills_tool_module._secret_capture_callback == cli_obj._secret_capture_callback
+        assert (
+            skills_tool_module._secret_capture_callback
+            == cli_obj._secret_capture_callback
+        )
     finally:
         set_secret_capture_callback(None)

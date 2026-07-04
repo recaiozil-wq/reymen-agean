@@ -1,4 +1,5 @@
 """Test: reymen/core/backup_manager.py - mock ile hata senaryolari"""
+
 from __future__ import annotations
 import os, sys, tempfile, json, zipfile
 from pathlib import Path
@@ -12,6 +13,7 @@ sys.path.insert(0, str(PROJE_KOK))
 class TestBackupKismiYedekHata:
     def test_kismi_yedek_basarili(self):
         from reymen.core.backup_manager import BackupManager
+
         with tempfile.TemporaryDirectory() as td:
             src = Path(td) / "skills"
             src.mkdir(parents=True)
@@ -23,6 +25,7 @@ class TestBackupKismiYedekHata:
 
     def test_kismi_yedek_kaynak_yok(self):
         from reymen.core.backup_manager import BackupManager
+
         with tempfile.TemporaryDirectory() as td:
             with patch("reymen.core.backup_manager.PROJE_KOK", Path(td)):
                 bm = BackupManager(yedek_dizini=Path(td) / "yedekler")
@@ -31,24 +34,31 @@ class TestBackupKismiYedekHata:
 
     def test_kismi_yedek_copytree_hatasi(self):
         from reymen.core.backup_manager import BackupManager
+
         with tempfile.TemporaryDirectory() as td:
             with patch("reymen.core.backup_manager.PROJE_KOK", Path(td)):
-                with patch("shutil.copytree", side_effect=PermissionError("Erisim engellendi")):
+                with patch(
+                    "shutil.copytree", side_effect=PermissionError("Erisim engellendi")
+                ):
                     bm = BackupManager(yedek_dizini=Path(td) / "yedekler")
                     sonuc = bm.yedek_al(tip="kismi")
                     assert sonuc["durum"] == "basarili"
 
     def test_kismi_yedek_metadata_json_dogru(self):
         from reymen.core.backup_manager import BackupManager
+
         with tempfile.TemporaryDirectory() as td:
             with patch("reymen.core.backup_manager.PROJE_KOK", Path(td)):
                 bm = BackupManager(yedek_dizini=Path(td) / "yedekler")
                 bm.yedek_al(tip="kismi")
-                yedekler = list((Path(td) / "yedekler").glob("kismi_*/yedek_metadata.json"))
+                yedekler = list(
+                    (Path(td) / "yedekler").glob("kismi_*/yedek_metadata.json")
+                )
                 assert len(yedekler) >= 0
 
     def test_kismi_yedek_kismi_basarisizlik_metadata_tutarliligi(self):
         from reymen.core.backup_manager import BackupManager
+
         with tempfile.TemporaryDirectory() as td:
             with patch("reymen.core.backup_manager.PROJE_KOK", Path(td)):
                 bm = BackupManager(yedek_dizini=Path(td) / "yedekler")
@@ -59,6 +69,7 @@ class TestBackupKismiYedekHata:
 class TestBackupZipYedekHata:
     def test_zip_yedek_basarili(self):
         from reymen.core.backup_manager import BackupManager
+
         with tempfile.TemporaryDirectory() as td:
             (Path(td) / "test.txt").write_text("hello")
             with patch("reymen.core.backup_manager.PROJE_KOK", Path(td)):
@@ -68,6 +79,7 @@ class TestBackupZipYedekHata:
 
     def test_zip_yedek_zipfile_hatasi(self):
         from reymen.core.backup_manager import BackupManager
+
         with tempfile.TemporaryDirectory() as td:
             with patch("reymen.core.backup_manager.PROJE_KOK", Path(td)):
                 with patch("zipfile.ZipFile", side_effect=OSError("Disk dolu")):
@@ -77,6 +89,7 @@ class TestBackupZipYedekHata:
 
     def test_zip_yedek_gitignore_filtreleme(self):
         from reymen.core.backup_manager import BackupManager
+
         with tempfile.TemporaryDirectory() as td:
             (Path(td) / "main.py").write_text("print('ok')")
             (Path(td) / "secret.log").write_text("hidden")
@@ -88,6 +101,7 @@ class TestBackupZipYedekHata:
 
     def test_zip_yedek_bos_proje(self):
         from reymen.core.backup_manager import BackupManager
+
         with tempfile.TemporaryDirectory() as td:
             with patch("reymen.core.backup_manager.PROJE_KOK", Path(td)):
                 bm = BackupManager(yedek_dizini=Path(td) / "yedekler")
@@ -98,6 +112,7 @@ class TestBackupZipYedekHata:
 class TestYedekListeleme:
     def test_yedek_listele_bos(self):
         from reymen.core.backup_manager import BackupManager
+
         with tempfile.TemporaryDirectory() as td:
             bm = BackupManager(yedek_dizini=Path(td))
             liste = bm.yedek_listele()
@@ -105,6 +120,7 @@ class TestYedekListeleme:
 
     def test_yedek_listele_filtre(self):
         from reymen.core.backup_manager import BackupManager
+
         with tempfile.TemporaryDirectory() as td:
             with patch("reymen.core.backup_manager.PROJE_KOK", Path(td)):
                 bm = BackupManager(yedek_dizini=Path(td) / "yedekler")
@@ -116,6 +132,7 @@ class TestYedekListeleme:
 class TestBackupGeriYukle:
     def test_geri_yukle_kaynak_yok(self):
         from reymen.core.backup_manager import BackupManager
+
         with tempfile.TemporaryDirectory() as td:
             bm = BackupManager(yedek_dizini=Path(td))
             sonuc = bm.geri_yukle("/olmayan/dizin")
@@ -123,6 +140,7 @@ class TestBackupGeriYukle:
 
     def test_geri_yukle_kismi(self):
         from reymen.core.backup_manager import BackupManager
+
         with tempfile.TemporaryDirectory() as td:
             with patch("reymen.core.backup_manager.PROJE_KOK", Path(td)):
                 bm = BackupManager(yedek_dizini=Path(td) / "yedekler")
@@ -134,6 +152,7 @@ class TestBackupGeriYukle:
 
     def test_geri_yukle_zip(self):
         from reymen.core.backup_manager import BackupManager
+
         with tempfile.TemporaryDirectory() as td:
             with patch("reymen.core.backup_manager.PROJE_KOK", Path(td)):
                 bm = BackupManager(yedek_dizini=Path(td) / "yedekler")

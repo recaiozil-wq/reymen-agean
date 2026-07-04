@@ -6,6 +6,7 @@ session_db.py — AdvancedSessionStorage. SQLite WAL + FTS5 ajan günlüğü
 Geriye uyumluluk: FTS5 ajan_gunlugu tablosu korunur.
 Yeni: sessions tablosu, token/maliyet/parent-session takibi.
 """
+
 import json
 import logging
 import os
@@ -16,6 +17,7 @@ import time
 import uuid
 from typing import Any, Dict, List, Optional, Tuple, Union
 import logging
+
 logger = logging.getLogger(__name__)
 
 log = logging.getLogger(__name__)
@@ -215,9 +217,18 @@ class AdvancedSessionStorage:
                     ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
                     """,
                     (
-                        sid, source, user_id, model, mc_json, system_prompt,
-                        parent_session_id, now, title,
-                        billing_provider, billing_base_url, billing_mode,
+                        sid,
+                        source,
+                        user_id,
+                        model,
+                        mc_json,
+                        system_prompt,
+                        parent_session_id,
+                        now,
+                        title,
+                        billing_provider,
+                        billing_base_url,
+                        billing_mode,
                     ),
                 )
                 conn.commit()
@@ -292,7 +303,11 @@ class AdvancedSessionStorage:
         duration_ms: int = 0,
     ):
         """Tool call'u kaydet; tool_call_count + api_call_count artir."""
-        args_json = json.dumps(args, ensure_ascii=False) if isinstance(args, dict) else str(args)
+        args_json = (
+            json.dumps(args, ensure_ascii=False)
+            if isinstance(args, dict)
+            else str(args)
+        )
         with self._lock:
             conn = self._baglan()
             try:
@@ -302,7 +317,14 @@ class AdvancedSessionStorage:
                         (session_id, tool_name, args, result, duration_ms, created_at)
                     VALUES (?,?,?,?,?,?)
                     """,
-                    (session_id, tool_name, args_json, result, duration_ms, time.time()),
+                    (
+                        session_id,
+                        tool_name,
+                        args_json,
+                        result,
+                        duration_ms,
+                        time.time(),
+                    ),
                 )
                 conn.execute(
                     """
@@ -344,15 +366,20 @@ class AdvancedSessionStorage:
                     WHERE id=?
                     """,
                     (
-                        input_tokens, output_tokens,
-                        cache_read_tokens, cache_write_tokens,
-                        reasoning_tokens, session_id,
+                        input_tokens,
+                        output_tokens,
+                        cache_read_tokens,
+                        cache_write_tokens,
+                        reasoning_tokens,
+                        session_id,
                     ),
                 )
                 conn.commit()
                 log.debug(
                     "token_guncelle: session=%s in=%d out=%d",
-                    session_id, input_tokens, output_tokens,
+                    session_id,
+                    input_tokens,
+                    output_tokens,
                 )
             except Exception as e:
                 log.error("token_guncelle hatasi: %s", e)
@@ -383,13 +410,20 @@ class AdvancedSessionStorage:
                     WHERE id=?
                     """,
                     (
-                        estimated_cost, actual_cost,
-                        cost_status, cost_source,
-                        pricing_version, session_id,
+                        estimated_cost,
+                        actual_cost,
+                        cost_status,
+                        cost_source,
+                        pricing_version,
+                        session_id,
                     ),
                 )
                 conn.commit()
-                log.debug("maliyet_guncelle: session=%s est=%.6f", session_id, estimated_cost or 0)
+                log.debug(
+                    "maliyet_guncelle: session=%s est=%.6f",
+                    session_id,
+                    estimated_cost or 0,
+                )
             except Exception as e:
                 log.error("maliyet_guncelle hatasi: %s", e)
             finally:
@@ -543,7 +577,10 @@ class AdvancedSessionStorage:
 
         if s in ("bugun", "today"):
             import datetime as _dt
-            gun_basi = _dt.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+
+            gun_basi = _dt.datetime.now().replace(
+                hour=0, minute=0, second=0, microsecond=0
+            )
             return gun_basi.timestamp(), now
 
         m = re.match(r"^(\d+)\s*([gs])$", s)
@@ -556,8 +593,11 @@ class AdvancedSessionStorage:
             try:
                 bas_s, bit_s = s.split("..", 1)
                 import datetime as _dt
+
                 bas = _dt.datetime.strptime(bas_s.strip(), "%Y-%m-%d").timestamp()
-                bit = _dt.datetime.strptime(bit_s.strip(), "%Y-%m-%d").timestamp() + 86399
+                bit = (
+                    _dt.datetime.strptime(bit_s.strip(), "%Y-%m-%d").timestamp() + 86399
+                )
                 return bas, bit
             except Exception:
                 return None, None
@@ -618,14 +658,16 @@ class AdvancedSessionStorage:
             if not ozet:
                 ilk = gruplar[sid][0]["icerik"] if gruplar[sid] else ""
                 ozet = f"({session.get('model', '?') if session else '?'}) {ilk}"
-            sonuc.append({
-                "session_id": sid,
-                "ozet": ozet,
-                "model": session.get("model") if session else None,
-                "started_at": session.get("started_at") if session else None,
-                "eslesen_mesaj_sayisi": eslesen_sayisi,
-                "ilgili_mesajlar": gruplar[sid],
-            })
+            sonuc.append(
+                {
+                    "session_id": sid,
+                    "ozet": ozet,
+                    "model": session.get("model") if session else None,
+                    "started_at": session.get("started_at") if session else None,
+                    "eslesen_mesaj_sayisi": eslesen_sayisi,
+                    "ilgili_mesajlar": gruplar[sid],
+                }
+            )
         return sonuc
 
     def son_sessionlar(self, source: str = None, limit: int = 10) -> list:
@@ -765,7 +807,9 @@ class AdvancedSessionStorage:
     def _export_markdown(self, session: dict, mesajlar: list) -> str:
         """Session verisini Markdown formatina cevir."""
         try:
-            baslik = session.get("title") or f"Session {session.get('id', 'bilinmiyor')}"
+            baslik = (
+                session.get("title") or f"Session {session.get('id', 'bilinmiyor')}"
+            )
             satirlar = [
                 f"# {baslik}",
                 "",
@@ -781,13 +825,33 @@ class AdvancedSessionStorage:
                 ("Kullanici", session.get("user_id")),
                 ("Model", session.get("model")),
                 ("Sistem Prompt", session.get("system_prompt")),
-                ("Baslangic", time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(session.get("started_at", 0))) if session.get("started_at") else "-"),
-                ("Bitis", time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(session.get("ended_at", 0))) if session.get("ended_at") else "-"),
+                (
+                    "Baslangic",
+                    time.strftime(
+                        "%Y-%m-%d %H:%M:%S",
+                        time.localtime(session.get("started_at", 0)),
+                    )
+                    if session.get("started_at")
+                    else "-",
+                ),
+                (
+                    "Bitis",
+                    time.strftime(
+                        "%Y-%m-%d %H:%M:%S", time.localtime(session.get("ended_at", 0))
+                    )
+                    if session.get("ended_at")
+                    else "-",
+                ),
                 ("Bitis Nedeni", session.get("end_reason")),
                 ("Mesaj Sayisi", str(session.get("message_count", 0))),
                 ("Giris Token", str(session.get("input_tokens", 0))),
                 ("Cikis Token", str(session.get("output_tokens", 0))),
-                ("Tahmini Maliyet ($)", f"{session.get('estimated_cost_usd', 0):.6f}" if session.get("estimated_cost_usd") else "-"),
+                (
+                    "Tahmini Maliyet ($)",
+                    f"{session.get('estimated_cost_usd', 0):.6f}"
+                    if session.get("estimated_cost_usd")
+                    else "-",
+                ),
             ]
 
             for alan, deger in meta:
@@ -799,10 +863,14 @@ class AdvancedSessionStorage:
             for m in mesajlar:
                 rol = m.get("rol", "bilinmiyor")
                 icerik = m.get("icerik", "")
-                zaman = time.strftime(
-                    "%Y-%m-%d %H:%M:%S",
-                    time.localtime(m.get("created_at", 0)),
-                ) if m.get("created_at") else "-"
+                zaman = (
+                    time.strftime(
+                        "%Y-%m-%d %H:%M:%S",
+                        time.localtime(m.get("created_at", 0)),
+                    )
+                    if m.get("created_at")
+                    else "-"
+                )
                 satirlar.append(f"### {rol.upper()} ({zaman})")
                 satirlar.append("")
                 satirlar.append(icerik or "_bos_")
@@ -953,7 +1021,8 @@ class AdvancedSessionStorage:
                         conn.execute(
                             "DELETE FROM session_messages_trigram WHERE rowid IN "
                             "(SELECT id FROM session_messages WHERE session_id IN ("
-                            + ",".join("?" * adet) + "))",
+                            + ",".join("?" * adet)
+                            + "))",
                             ids,
                         )
                     except Exception as _session__e828:
@@ -1036,11 +1105,15 @@ class AdvancedSessionStorage:
 
         if not satirlar:
             return {
-                "toplam": 0, "hata_sayisi": 0, "hata_orani": 0.0,
-                "en_cok_hata_veren_arac": "", "tekrarlayan_hatalar": [],
+                "toplam": 0,
+                "hata_sayisi": 0,
+                "hata_orani": 0.0,
+                "en_cok_hata_veren_arac": "",
+                "tekrarlayan_hatalar": [],
             }
 
         import re
+
         hata_sayaci: dict = {}
         hata_sayisi = 0
 

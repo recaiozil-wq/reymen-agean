@@ -4,6 +4,7 @@ Unraid commonly runs appdata as nobody:users (99:100). The stage2 hook must
 accept those non-root numeric IDs and keep legacy/new pairing stores writable
 after targeted ownership reconciliation.
 """
+
 from __future__ import annotations
 
 import os
@@ -47,10 +48,12 @@ def _validate_uid_gid(text: str, value: str) -> bool:
 
 
 @pytest.mark.parametrize("value", ["1", "99", "100", "1000", "65534"])
-def test_uid_gid_validator_accepts_non_root_nas_ids(stage2_text: str, value: str) -> None:
-    assert _validate_uid_gid(stage2_text, value), (
-        f"stage2 hook must accept NAS UID/GID {value}; Unraid uses 99:100 (#38070)"
-    )
+def test_uid_gid_validator_accepts_non_root_nas_ids(
+    stage2_text: str, value: str
+) -> None:
+    assert _validate_uid_gid(
+        stage2_text, value
+    ), f"stage2 hook must accept NAS UID/GID {value}; Unraid uses 99:100 (#38070)"
 
 
 @pytest.mark.parametrize("value", ["", "0", "abc", "99x", "65535"])
@@ -77,7 +80,9 @@ def test_targeted_chown_covers_legacy_and_new_pairing_dirs(stage2_text: str) -> 
     assert "platforms/pairing" in subdirs
 
 
-def test_seeded_directory_list_covers_legacy_and_new_pairing_dirs(stage2_text: str) -> None:
+def test_seeded_directory_list_covers_legacy_and_new_pairing_dirs(
+    stage2_text: str,
+) -> None:
     seed_block = stage2_text.split("as_ReYMeN mkdir -p \\", 1)[1].split(
         "# --- Install-method stamp",
         1,

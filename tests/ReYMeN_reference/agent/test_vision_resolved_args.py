@@ -15,7 +15,13 @@ def test_vision_call_uses_resolved_provider_args():
 
     with patch(
         "agent.auxiliary_client._resolve_task_provider_model",
-        return_value=("my-resolved-provider", "my-resolved-model", "http://resolved", "resolved-key", "chat_completions"),
+        return_value=(
+            "my-resolved-provider",
+            "my-resolved-model",
+            "http://resolved",
+            "resolved-key",
+            "chat_completions",
+        ),
     ), patch(
         "agent.auxiliary_client.resolve_vision_provider_client",
         return_value=("my-resolved-provider", fake_client, "my-resolved-model"),
@@ -61,4 +67,7 @@ def test_vision_base_url_override_keeps_explicit_provider():
     assert client is fake_client
     assert model == "glm-4v"
     assert mock_resolve.call_args.args[0] == "zai"
-    assert mock_resolve.call_args.kwargs["explicit_base_url"] == "https://open.bigmodel.cn/api/paas/v4"
+    assert (
+        mock_resolve.call_args.kwargs["explicit_base_url"]
+        == "https://open.bigmodel.cn/api/paas/v4"
+    )

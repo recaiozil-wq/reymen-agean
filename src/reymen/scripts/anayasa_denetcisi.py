@@ -15,10 +15,19 @@ import re
 # ---------------------------------------------------------------------------
 # Safe words that are always allowed (kesin geçiş listesi)
 # ---------------------------------------------------------------------------
-_KESIN_GEC: frozenset = frozenset({
-    "merhaba", "selam", "teşekkür", "teşekkürler", "günaydın",
-    "iyi geceler", "lütfen", "rica", "yardım",
-})
+_KESIN_GEC: frozenset = frozenset(
+    {
+        "merhaba",
+        "selam",
+        "teşekkür",
+        "teşekkürler",
+        "günaydın",
+        "iyi geceler",
+        "lütfen",
+        "rica",
+        "yardım",
+    }
+)
 
 # ---------------------------------------------------------------------------
 # Blocked content patterns (engelli desenler)

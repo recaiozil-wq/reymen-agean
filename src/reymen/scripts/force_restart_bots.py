@@ -1,7 +1,9 @@
 """force_restart_bots.py — T\u00fcm python process'lerini oldur, botlari temiz baslat."""
+
 import os, subprocess, time, json, urllib.request
 
 import pathlib as _pl
+
 PROJE = str(_pl.Path(__file__).resolve().parent.parent.parent)  # ReYMeN-Ajan
 HERMES_BASE = str(_pl.Path.home() / "AppData" / "Local" / "hermes" / "profiles")
 
@@ -31,7 +33,9 @@ for profil in ["default", "kiral38", "reymen"]:
     if token:
         url = f"https://api.telegram.org/bot{token}/deleteWebhook"
         data = json.dumps({"drop_pending_updates": True}).encode()
-        req = urllib.request.Request(url, data=data, headers={"Content-Type": "application/json"})
+        req = urllib.request.Request(
+            url, data=data, headers={"Content-Type": "application/json"}
+        )
         with urllib.request.urlopen(req, timeout=10) as r:
             sonuc = json.loads(r.read())
         print(f"  {profil}: {'OK' if sonuc.get('ok') else 'FAIL'} webhook temiz")
@@ -71,7 +75,8 @@ for ad, profil in bots:
 
     subprocess.Popen(
         [venv_python, script],
-        env=env, cwd=PROJE,
+        env=env,
+        cwd=PROJE,
         stdout=open(log_path, "a"),
         stderr=subprocess.STDOUT,
         creationflags=subprocess.DETACHED_PROCESS | subprocess.CREATE_NO_WINDOW,

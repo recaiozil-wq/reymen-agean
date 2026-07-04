@@ -30,6 +30,7 @@ from typing import Any, Dict, List, Optional
 # SQLite (standart kütüphane)
 try:
     import sqlite3
+
     _SQLITE_AVAILABLE = True
 except ImportError:
     _SQLITE_AVAILABLE = False
@@ -44,52 +45,218 @@ _DB_DIR.mkdir(parents=True, exist_ok=True)
 _DB_PATH = str(_DB_DIR / "hafiza.db")
 
 # Koleksiyon (tablo) adlari
-_COLL_KONUSMA = "konusmalar"       # Kullanici-ajan konusmalari
-_COLL_NOTLAR = "notlar"            # Kisa notlar / hatirlatmalar
+_COLL_KONUSMA = "konusmalar"  # Kullanici-ajan konusmalari
+_COLL_NOTLAR = "notlar"  # Kisa notlar / hatirlatmalar
 _COLL_TERCIHLER = "kullanici_tercihleri"  # Kullanici tercihleri (key-value)
-_COLL_SESSIONS = "session_ozetleri"       # Session ozetleri
+_COLL_SESSIONS = "session_ozetleri"  # Session ozetleri
 
-_MAX_KAYIT_PER_SESSION = 500       # Session basina max kayit
+_MAX_KAYIT_PER_SESSION = 500  # Session basina max kayit
 
 # Turkce stop words (konu_cikar() icin)
-_TURKCE_STOP_WORDS = frozenset({
-    "acaba", "alti", "ama", "ancak", "bana", "bazi", "bazı", "belki",
-    "bende", "beni", "benim", "beri", "bile", "bir", "biraz", "biri",
-    "birkaç", "birsey", "birşey", "biz", "bize", "bizi", "bizim",
-    "boyle", "bunca", "bunda", "bundan", "bunlar", "bunlari", "bunları",
-    "bunlardan", "bunlarin", "bunların", "bunu", "bunun", "burada",
-    "böyle", "bu", "buna",
-    "da", "daha", "dahi", "de", "defa", "diye", "diğer", "diger",
-    "dolayi", "dolayı", "dolayisiyla", "dolayısıyla",
-    "eger", "elbette", "en", "evet", "eğer",
-    "fakat", "falan", "filan",
-    "gene", "gibi", "göre", "gore",
-    "halen", "hangi", "hani", "hatta", "hem", "henuz", "henüz",
-    "hep", "hepsi", "her", "herhalde", "herhangi", "herkes",
-    "hic", "hicbir", "hâlâ", "hiç", "hiçbir",
-    "icin", "ile", "ilgili", "ise", "ister",
-    "itibaren", "itibariyle", "için", "içinde", "işte",
-    "kadar", "karsi", "karsin", "karsı", "karşın", "kendine",
-    "kendini", "kendi", "kendisi", "kez", "ki", "kim", "kime",
-    "kimi", "kimin", "kimse",
-    "madem", "mi", "milyon", "mu", "mü", "mı",
-    "nasil", "nasıl", "ne", "neden", "nedenle", "nerde", "nerede",
-    "nereli", "neyse", "nice", "niye", "niçin", "nu", "nun",
-    "o", "olan", "olarak", "oldu", "oldugu", "olduğu", "olmadı",
-    "olmak", "olsa", "olur", "ona", "ondan", "onlar", "onlari",
-    "onlardan", "onlarin", "onları", "onların", "onu", "onun",
-    "orada", "oysa", "oysaki",
-    "pek", "rağmen",
-    "sadece", "sanki", "sen", "siz", "sizin", "soyle", "söyle",
-    "su", "suna", "sunda", "sundan", "sunu", "sunun",
-    "seye", "sey", "şu", "şuna", "şunda", "şundan",
-    "şunları", "şunu", "şey", "şeye", "şeyi",
-    "tarafindan", "tarafından", "tum", "tüm",
-    "uzere", "üzerinde", "üzere",
-    "var", "ve", "veya", "veyahut",
-    "ya", "yani", "yapacak", "yapilan", "yapılan", "yapmak",
-    "yapti", "yaptı", "yeter", "yine", "yo", "yoksa", "zaten",
-})
+_TURKCE_STOP_WORDS = frozenset(
+    {
+        "acaba",
+        "alti",
+        "ama",
+        "ancak",
+        "bana",
+        "bazi",
+        "bazı",
+        "belki",
+        "bende",
+        "beni",
+        "benim",
+        "beri",
+        "bile",
+        "bir",
+        "biraz",
+        "biri",
+        "birkaç",
+        "birsey",
+        "birşey",
+        "biz",
+        "bize",
+        "bizi",
+        "bizim",
+        "boyle",
+        "bunca",
+        "bunda",
+        "bundan",
+        "bunlar",
+        "bunlari",
+        "bunları",
+        "bunlardan",
+        "bunlarin",
+        "bunların",
+        "bunu",
+        "bunun",
+        "burada",
+        "böyle",
+        "bu",
+        "buna",
+        "da",
+        "daha",
+        "dahi",
+        "de",
+        "defa",
+        "diye",
+        "diğer",
+        "diger",
+        "dolayi",
+        "dolayı",
+        "dolayisiyla",
+        "dolayısıyla",
+        "eger",
+        "elbette",
+        "en",
+        "evet",
+        "eğer",
+        "fakat",
+        "falan",
+        "filan",
+        "gene",
+        "gibi",
+        "göre",
+        "gore",
+        "halen",
+        "hangi",
+        "hani",
+        "hatta",
+        "hem",
+        "henuz",
+        "henüz",
+        "hep",
+        "hepsi",
+        "her",
+        "herhalde",
+        "herhangi",
+        "herkes",
+        "hic",
+        "hicbir",
+        "hâlâ",
+        "hiç",
+        "hiçbir",
+        "icin",
+        "ile",
+        "ilgili",
+        "ise",
+        "ister",
+        "itibaren",
+        "itibariyle",
+        "için",
+        "içinde",
+        "işte",
+        "kadar",
+        "karsi",
+        "karsin",
+        "karsı",
+        "karşın",
+        "kendine",
+        "kendini",
+        "kendi",
+        "kendisi",
+        "kez",
+        "ki",
+        "kim",
+        "kime",
+        "kimi",
+        "kimin",
+        "kimse",
+        "madem",
+        "mi",
+        "milyon",
+        "mu",
+        "mü",
+        "mı",
+        "nasil",
+        "nasıl",
+        "ne",
+        "neden",
+        "nedenle",
+        "nerde",
+        "nerede",
+        "nereli",
+        "neyse",
+        "nice",
+        "niye",
+        "niçin",
+        "nu",
+        "nun",
+        "o",
+        "olan",
+        "olarak",
+        "oldu",
+        "oldugu",
+        "olduğu",
+        "olmadı",
+        "olmak",
+        "olsa",
+        "olur",
+        "ona",
+        "ondan",
+        "onlar",
+        "onlari",
+        "onlardan",
+        "onlarin",
+        "onları",
+        "onların",
+        "onu",
+        "onun",
+        "orada",
+        "oysa",
+        "oysaki",
+        "pek",
+        "rağmen",
+        "sadece",
+        "sanki",
+        "sen",
+        "siz",
+        "sizin",
+        "soyle",
+        "söyle",
+        "su",
+        "suna",
+        "sunda",
+        "sundan",
+        "sunu",
+        "sunun",
+        "seye",
+        "sey",
+        "şu",
+        "şuna",
+        "şunda",
+        "şundan",
+        "şunları",
+        "şunu",
+        "şey",
+        "şeye",
+        "şeyi",
+        "tarafindan",
+        "tarafından",
+        "tum",
+        "tüm",
+        "uzere",
+        "üzerinde",
+        "üzere",
+        "var",
+        "ve",
+        "veya",
+        "veyahut",
+        "ya",
+        "yani",
+        "yapacak",
+        "yapilan",
+        "yapılan",
+        "yapmak",
+        "yapti",
+        "yaptı",
+        "yeter",
+        "yine",
+        "yo",
+        "yoksa",
+        "zaten",
+    }
+)
 
 # Thread-safe yazma
 _yazma_kilit = threading.Lock()
@@ -98,6 +265,7 @@ _yazma_kilit = threading.Lock()
 # ══════════════════════════════════════════════════════════════════════════
 # GELISMIS HAFIZA SINIFI (SQLite + FTS5)
 # ══════════════════════════════════════════════════════════════════════════
+
 
 class GelismisHafiza:
     """ReYMeN session_search + memory sisteminin ReYMeN uyarlamasi.
@@ -192,10 +360,16 @@ class GelismisHafiza:
             """)
 
             # Index'ler
-            c.execute("CREATE INDEX IF NOT EXISTS idx_kayit_session ON kayitlar(session_id)")
-            c.execute("CREATE INDEX IF NOT EXISTS idx_kayit_koleksiyon ON kayitlar(koleksiyon)")
+            c.execute(
+                "CREATE INDEX IF NOT EXISTS idx_kayit_session ON kayitlar(session_id)"
+            )
+            c.execute(
+                "CREATE INDEX IF NOT EXISTS idx_kayit_koleksiyon ON kayitlar(koleksiyon)"
+            )
             c.execute("CREATE INDEX IF NOT EXISTS idx_kayit_zaman ON kayitlar(zaman)")
-            c.execute("CREATE INDEX IF NOT EXISTS idx_kayit_expire ON kayitlar(expire_zaman)")
+            c.execute(
+                "CREATE INDEX IF NOT EXISTS idx_kayit_expire ON kayitlar(expire_zaman)"
+            )
 
             # FTS5 content sync trigger'ları
             c.execute("""
@@ -240,7 +414,7 @@ class GelismisHafiza:
             c = self._conn.cursor()
             c.execute(
                 "INSERT OR IGNORE INTO sessions (id, baslik, baslangic) VALUES (?, ?, ?)",
-                (session_id, baslik, time.time())
+                (session_id, baslik, time.time()),
             )
             self._conn.commit()
         except sqlite3.Error as _hafiza_g_e245:
@@ -254,7 +428,7 @@ class GelismisHafiza:
             c = self._conn.cursor()
             c.execute(
                 "UPDATE sessions SET bitis=?, mesaj_sayisi=?, ozet=? WHERE id=?",
-                (time.time(), self._mesaj_sayaci, ozet[:500], self._aktif_session)
+                (time.time(), self._mesaj_sayaci, ozet[:500], self._aktif_session),
             )
             self._conn.commit()
         except sqlite3.Error as _hafiza_g_e259:
@@ -263,9 +437,14 @@ class GelismisHafiza:
 
     # ── Kayit Islemleri ─────────────────────────────────────────────────
 
-    def kaydet(self, icerik: str, koleksiyon: str = _COLL_KONUSMA,
-               anahtar: str = "", metadata: dict = None,
-               ttl_saat: float = 0) -> bool:
+    def kaydet(
+        self,
+        icerik: str,
+        koleksiyon: str = _COLL_KONUSMA,
+        anahtar: str = "",
+        metadata: dict = None,
+        ttl_saat: float = 0,
+    ) -> bool:
         """Hafizaya bir kayit ekle. FTS5 otomatik indexlenir.
 
         Args:
@@ -290,8 +469,15 @@ class GelismisHafiza:
                     """INSERT INTO kayitlar
                        (session_id, koleksiyon, anahtar, icerik, metadata, zaman, expire_zaman)
                        VALUES (?, ?, ?, ?, ?, ?, ?)""",
-                    (self._aktif_session or "genel", koleksiyon,
-                     anahtar[:200], icerik, meta_json, time.time(), expire)
+                    (
+                        self._aktif_session or "genel",
+                        koleksiyon,
+                        anahtar[:200],
+                        icerik,
+                        meta_json,
+                        time.time(),
+                        expire,
+                    ),
                 )
                 self._conn.commit()
                 self._mesaj_sayaci += 1
@@ -304,8 +490,9 @@ class GelismisHafiza:
         except sqlite3.Error:
             return False
 
-    def kayit_guncelle(self, kayit_id: int, yeni_icerik: str = "",
-                       yeni_metadata: dict = None) -> bool:
+    def kayit_guncelle(
+        self, kayit_id: int, yeni_icerik: str = "", yeni_metadata: dict = None
+    ) -> bool:
         """Varolan bir kaydi guncelle (FTS5 trigger ile sync olur)."""
         if not self._hazir or not self._conn:
             return False
@@ -315,12 +502,12 @@ class GelismisHafiza:
                 if yeni_icerik:
                     c.execute(
                         "UPDATE kayitlar SET icerik=?, zaman=? WHERE id=?",
-                        (yeni_icerik, time.time(), kayit_id)
+                        (yeni_icerik, time.time(), kayit_id),
                     )
                 if yeni_metadata is not None:
                     c.execute(
                         "UPDATE kayitlar SET metadata=?, zaman=? WHERE id=?",
-                        (json.dumps(yeni_metadata), time.time(), kayit_id)
+                        (json.dumps(yeni_metadata), time.time(), kayit_id),
                     )
                 self._conn.commit()
             return True
@@ -329,8 +516,9 @@ class GelismisHafiza:
 
     # ── Arama ────────────────────────────────────────────────────────────
 
-    def ara(self, sorgu: str, koleksiyon: str = "",
-            limit: int = 10, session_id: str = "") -> List[Dict[str, Any]]:
+    def ara(
+        self, sorgu: str, koleksiyon: str = "", limit: int = 10, session_id: str = ""
+    ) -> List[Dict[str, Any]]:
         """FTS5 ile tam metin arama yap.
 
         Args:
@@ -404,8 +592,9 @@ class GelismisHafiza:
             # FTS5 hatasi olursa LIKE fallback
             return self._ara_like(sorgu, koleksiyon, limit, session_id)
 
-    def _ara_like(self, sorgu: str, koleksiyon: str = "",
-                  limit: int = 10, session_id: str = "") -> List[Dict[str, Any]]:
+    def _ara_like(
+        self, sorgu: str, koleksiyon: str = "", limit: int = 10, session_id: str = ""
+    ) -> List[Dict[str, Any]]:
         """FTS5 calismazsa LIKE ile yedek arama."""
         if not self._conn:
             return []
@@ -424,7 +613,7 @@ class GelismisHafiza:
 
             c.execute(
                 f"SELECT k.* FROM kayitlar k WHERE {' AND '.join(kosullar)} ORDER BY k.zaman DESC LIMIT ?",
-                params + [limit]
+                params + [limit],
             )
             sonuclar = []
             for row in c.fetchall():
@@ -440,14 +629,16 @@ class GelismisHafiza:
         # FTS5 ozel karakterleri: ^ * " ( ) ~ + -
         # Basit sorgu icin fazla karakterleri temizle
         import re
+
         # Kelimeleri al, FTS5 AND ile birlestir
-        kelimeler = re.findall(r'\w+', sorgu)
+        kelimeler = re.findall(r"\w+", sorgu)
         if not kelimeler:
             return sorgu
         return " AND ".join(kelimeler[:10])  # max 10 kelime
 
-    def arama_sirala(self, sorgu: str, koleksiyon: str = "",
-                     limit: int = 10, session_id: str = "") -> List[Dict[str, Any]]:
+    def arama_sirala(
+        self, sorgu: str, koleksiyon: str = "", limit: int = 10, session_id: str = ""
+    ) -> List[Dict[str, Any]]:
         """FTS5 arama sonuclarini akilli sirala.
 
         Tam eslesme once, kismi eslesme sonra gelir.
@@ -576,7 +767,16 @@ class GelismisHafiza:
                         "zaman": row["zaman"],
                         "skor": round(row["skor"], 2),
                         "bonus_puan": round(toplam_puan, 2),
-                        "toplam_puan": round(tam_eslesme_sayisi * 3.0 + kismi_eslesme_sayisi * 1.0 + (toplam_puan - tam_eslesme_sayisi * 3.0 - kismi_eslesme_sayisi * 1.0), 2),
+                        "toplam_puan": round(
+                            tam_eslesme_sayisi * 3.0
+                            + kismi_eslesme_sayisi * 1.0
+                            + (
+                                toplam_puan
+                                - tam_eslesme_sayisi * 3.0
+                                - kismi_eslesme_sayisi * 1.0
+                            ),
+                            2,
+                        ),
                         "tam_eslesme": tam_eslesme_sayisi,
                         "kismi_eslesme": kismi_eslesme_sayisi,
                     }
@@ -595,7 +795,9 @@ class GelismisHafiza:
 
             # Sonucu limit kadar kes
             sonuclar = [doc for _, doc in puanlanmis[:limit]]
-            logger.info(f"arama_sirala: '{sorgu}' -> {len(sonuclar)} sonuc (ham: {len(ham_sonuclar)})")
+            logger.info(
+                f"arama_sirala: '{sorgu}' -> {len(sonuclar)} sonuc (ham: {len(ham_sonuclar)})"
+            )
             return sonuclar
 
         except sqlite3.Error as e:
@@ -615,7 +817,7 @@ class GelismisHafiza:
             c = self._conn.cursor()
             c.execute(
                 "INSERT OR REPLACE INTO tercihler (anahtar, deger, guncelleme_zamani) VALUES (?, ?, ?)",
-                (anahtar.strip().lower(), deger, time.time())
+                (anahtar.strip().lower(), deger, time.time()),
             )
             self._conn.commit()
             return True
@@ -630,7 +832,7 @@ class GelismisHafiza:
             c = self._conn.cursor()
             c.execute(
                 "SELECT deger FROM tercihler WHERE anahtar = ?",
-                (anahtar.strip().lower(),)
+                (anahtar.strip().lower(),),
             )
             row = c.fetchone()
             return row["deger"] if row else default
@@ -654,7 +856,9 @@ class GelismisHafiza:
             return False
         try:
             c = self._conn.cursor()
-            c.execute("DELETE FROM tercihler WHERE anahtar = ?", (anahtar.strip().lower(),))
+            c.execute(
+                "DELETE FROM tercihler WHERE anahtar = ?", (anahtar.strip().lower(),)
+            )
             self._conn.commit()
             return True
         except sqlite3.Error:
@@ -700,23 +904,29 @@ class GelismisHafiza:
                   fts.rank
                 LIMIT ?
             """
-            c.execute(sql, (
-                fts_sorgu,
-                _COLL_KONUSMA, _COLL_SESSIONS,
-                time.time(),
-                _COLL_KONUSMA,
-                limit,
-            ))
+            c.execute(
+                sql,
+                (
+                    fts_sorgu,
+                    _COLL_KONUSMA,
+                    _COLL_SESSIONS,
+                    time.time(),
+                    _COLL_KONUSMA,
+                    limit,
+                ),
+            )
             sonuclar = []
             for row in c.fetchall():
-                sonuclar.append({
-                    "session_id": row["session_id"],
-                    "koleksiyon": row["koleksiyon"],
-                    "anahtar": row["anahtar"],
-                    "icerik": row["icerik"],
-                    "zaman": row["zaman"],
-                    "skor": round(row["skor"], 2),
-                })
+                sonuclar.append(
+                    {
+                        "session_id": row["session_id"],
+                        "koleksiyon": row["koleksiyon"],
+                        "anahtar": row["anahtar"],
+                        "icerik": row["icerik"],
+                        "zaman": row["zaman"],
+                        "skor": round(row["skor"], 2),
+                    }
+                )
             return sonuclar
 
         except sqlite3.Error as e:
@@ -730,7 +940,8 @@ class GelismisHafiza:
             return []
         try:
             c = self._conn.cursor()
-            c.execute("""
+            c.execute(
+                """
                 SELECT session_id, koleksiyon, anahtar,
                        substr(icerik, 1, 500) as icerik,
                        zaman, 0.0 as skor
@@ -740,7 +951,9 @@ class GelismisHafiza:
                   AND (expire_zaman = 0 OR expire_zaman > ?)
                 ORDER BY zaman DESC
                 LIMIT ?
-            """, (_COLL_KONUSMA, _COLL_SESSIONS, f"%{sorgu}%", time.time(), limit))
+            """,
+                (_COLL_KONUSMA, _COLL_SESSIONS, f"%{sorgu}%", time.time(), limit),
+            )
             return [dict(row) for row in c.fetchall()]
         except sqlite3.Error:
             return []
@@ -752,14 +965,15 @@ class GelismisHafiza:
         try:
             c = self._conn.cursor()
             c.execute(
-                "SELECT * FROM sessions ORDER BY baslangic DESC LIMIT ?",
-                (limit,)
+                "SELECT * FROM sessions ORDER BY baslangic DESC LIMIT ?", (limit,)
             )
             return [dict(row) for row in c.fetchall()]
         except sqlite3.Error:
             return []
 
-    def session_kayitlari(self, session_id: str, limit: int = 50) -> List[Dict[str, Any]]:
+    def session_kayitlari(
+        self, session_id: str, limit: int = 50
+    ) -> List[Dict[str, Any]]:
         """Bir session'daki tum kayitlari getir."""
         if not self._hazir or not self._conn:
             return []
@@ -772,7 +986,7 @@ class GelismisHafiza:
                    WHERE session_id = ?
                    ORDER BY zaman ASC
                    LIMIT ?""",
-                (session_id, limit)
+                (session_id, limit),
             )
             return [dict(row) for row in c.fetchall()]
         except sqlite3.Error:
@@ -801,7 +1015,7 @@ class GelismisHafiza:
                 """SELECT icerik FROM kayitlar
                    WHERE session_id = ? AND koleksiyon = ?
                    AND (expire_zaman = 0 OR expire_zaman > ?)""",
-                (session_id, _COLL_KONUSMA, time.time())
+                (session_id, _COLL_KONUSMA, time.time()),
             )
             satirlar = c.fetchall()
 
@@ -811,17 +1025,19 @@ class GelismisHafiza:
 
             # 1. Tum metinleri birlestir ve tokenize et
             import re
+
             tum_metin = " ".join(row["icerik"] or "" for row in satirlar)
-            kelimeler = re.findall(r'[a-zA-ZğüşıöçĞÜŞİÖÇ0-9]+', tum_metin.lower())
+            kelimeler = re.findall(r"[a-zA-ZğüşıöçĞÜŞİÖÇ0-9]+", tum_metin.lower())
 
             # 2. Stop words + kisa kelimeleri filtrele
             filtrelenmis = [
-                k for k in kelimeler
-                if len(k) > 2 and k not in _TURKCE_STOP_WORDS
+                k for k in kelimeler if len(k) > 2 and k not in _TURKCE_STOP_WORDS
             ]
 
             if not filtrelenmis:
-                logger.info(f"konu_cikar: session '{session_id}' icin anlamli kelime bulunamadi")
+                logger.info(
+                    f"konu_cikar: session '{session_id}' icin anlamli kelime bulunamadi"
+                )
                 return []
 
             # 3. Frekans sayimi
@@ -836,7 +1052,9 @@ class GelismisHafiza:
             #    varsa tum kayitlardaki genel frekans ile normalize et
             toplam_kelime = len(filtrelenmis)
             konular = []
-            for kelime, sayi in sirali[:limit * 3]:  # Once fazla al, sonra TF-IDF ile kes
+            for kelime, sayi in sirali[
+                : limit * 3
+            ]:  # Once fazla al, sonra TF-IDF ile kes
                 # Goreli frekans (TF)
                 tf = sayi / toplam_kelime if toplam_kelime > 0 else 0
 
@@ -845,7 +1063,7 @@ class GelismisHafiza:
                     """SELECT COUNT(DISTINCT id) as n FROM kayitlar
                        WHERE icerik LIKE ? AND koleksiyon = ?
                        AND (expire_zaman = 0 OR expire_zaman > ?)""",
-                    (f"%{kelime}%", _COLL_KONUSMA, time.time())
+                    (f"%{kelime}%", _COLL_KONUSMA, time.time()),
                 )
                 genel_sayi = c.fetchone()["n"] or 1
                 idf_benzeri = max(0.1, 1.0 / genel_sayi)
@@ -895,7 +1113,9 @@ class GelismisHafiza:
             return False
 
         if hedef_session_id == kaynak_session_id:
-            logger.info(f"session_birlestir: ayni session ID ({hedef_session_id}), birlestirme gerekmez")
+            logger.info(
+                f"session_birlestir: ayni session ID ({hedef_session_id}), birlestirme gerekmez"
+            )
             return True
 
         try:
@@ -907,14 +1127,20 @@ class GelismisHafiza:
                 if not c.fetchone():
                     c.execute(
                         "INSERT INTO sessions (id, baslik, baslangic) VALUES (?, ?, ?)",
-                        (hedef_session_id, f"Birlestirilmis: {hedef_session_id}", time.time())
+                        (
+                            hedef_session_id,
+                            f"Birlestirilmis: {hedef_session_id}",
+                            time.time(),
+                        ),
                     )
-                    logger.info(f"session_birlestir: hedef session '{hedef_session_id}' olusturuldu")
+                    logger.info(
+                        f"session_birlestir: hedef session '{hedef_session_id}' olusturuldu"
+                    )
 
                 # 2. Kaynak session'daki kayitlari hedef session'a tasi
                 c.execute(
                     "UPDATE kayitlar SET session_id = ? WHERE session_id = ?",
-                    (hedef_session_id, kaynak_session_id)
+                    (hedef_session_id, kaynak_session_id),
                 )
                 tasinan_kayit = c.rowcount
 
@@ -923,21 +1149,27 @@ class GelismisHafiza:
                 session_silindi = c.rowcount > 0
 
                 # 4. Hedef session ozetini guncelle
-                c.execute("SELECT COUNT(*) as n FROM kayitlar WHERE session_id = ?",
-                          (hedef_session_id,))
+                c.execute(
+                    "SELECT COUNT(*) as n FROM kayitlar WHERE session_id = ?",
+                    (hedef_session_id,),
+                )
                 toplam_kayit = c.fetchone()["n"]
 
                 # Konulari cikar ve baslik olarak ekle
                 try:
                     konular = self.konu_cikar(hedef_session_id, limit=3)
-                    yeni_baslik = ", ".join(konular) if konular else f"Session: {hedef_session_id[:20]}"
+                    yeni_baslik = (
+                        ", ".join(konular)
+                        if konular
+                        else f"Session: {hedef_session_id[:20]}"
+                    )
                 except Exception:
                     yeni_baslik = f"Session: {hedef_session_id[:20]}"
 
                 c.execute(
                     "UPDATE sessions SET mesaj_sayisi=?, baslik=?, "
                     "bitis=COALESCE(NULLIF(bitis, 0), ?) WHERE id=?",
-                    (toplam_kayit, yeni_baslik, time.time(), hedef_session_id)
+                    (toplam_kayit, yeni_baslik, time.time(), hedef_session_id),
                 )
 
                 self._conn.commit()
@@ -961,14 +1193,13 @@ class GelismisHafiza:
 
     # ── Notlar (Kisa Hatirlatmalar) ──────────────────────────────────────
 
-    def not_ekle(self, baslik: str, icerik: str = "",
-                 ttl_saat: float = 0) -> bool:
+    def not_ekle(self, baslik: str, icerik: str = "", ttl_saat: float = 0) -> bool:
         """Kisa bir not/hatirlatma ekle. _COLL_NOTLAR koleksiyonuna kaydeder."""
         return self.kaydet(
             icerik=icerik or baslik,
             koleksiyon=_COLL_NOTLAR,
             anahtar=baslik[:200],
-            ttl_saat=ttl_saat
+            ttl_saat=ttl_saat,
         )
 
     def notlari_listele(self, limit: int = 20) -> List[Dict[str, Any]]:
@@ -982,7 +1213,7 @@ class GelismisHafiza:
                    WHERE koleksiyon = ?
                    AND (expire_zaman = 0 OR expire_zaman > ?)
                    ORDER BY zaman DESC LIMIT ?""",
-                (_COLL_NOTLAR, time.time(), limit)
+                (_COLL_NOTLAR, time.time(), limit),
             )
             return [dict(row) for row in c.fetchall()]
         except sqlite3.Error:
@@ -1008,7 +1239,7 @@ class GelismisHafiza:
             esik = time.time() - yas_saat * 3600
             c.execute(
                 "DELETE FROM kayitlar WHERE expire_zaman > 0 AND expire_zaman < ?",
-                (esik,)
+                (esik,),
             )
             silinen = c.rowcount
             self._conn.commit()
@@ -1055,7 +1286,9 @@ class GelismisHafiza:
                 "session_sayisi": session_sayisi,
                 "koleksiyon_sayisi": koleksiyon_sayisi,
                 "tercih_sayisi": tercih_sayisi,
-                "son_kayit": datetime.fromtimestamp(son_zaman).isoformat() if son_zaman else "yok",
+                "son_kayit": datetime.fromtimestamp(son_zaman).isoformat()
+                if son_zaman
+                else "yok",
                 "db_boyut": f"{fts_boyut / 1024:.1f} KB",
             }
         except sqlite3.Error as e:
@@ -1098,11 +1331,17 @@ def _auto_consolidation_loop() -> None:
             # session_db'de de konsolidasyon yap (varsa)
             try:
                 from reymen.hafiza.session_db import AdvancedSessionStorage
+
                 ROOT = Path(__file__).parent.resolve()
                 db_path = str(ROOT / "merkez_db" / "session.db")
                 storage = AdvancedSessionStorage(db_path)
-                sonuc = storage.konsolide_et(max_gun=30, max_session=1000, max_toplam_karakter=500000)
-                if sonuc.get("silinen_session", 0) > 0 or sonuc.get("silinen_mesaj", 0) > 0:
+                sonuc = storage.konsolide_et(
+                    max_gun=30, max_session=1000, max_toplam_karakter=500000
+                )
+                if (
+                    sonuc.get("silinen_session", 0) > 0
+                    or sonuc.get("silinen_mesaj", 0) > 0
+                ):
                     logger.info(
                         f"[AutoConsolidation] session_db: {sonuc['silinen_session']} session, "
                         f"{sonuc['silinen_mesaj']} mesaj budandi"
@@ -1148,6 +1387,7 @@ def auto_consolidation_durdur() -> None:
 # MOTOR ENTEGRASYONU — araçları motor.py'ye kaydet
 # ══════════════════════════════════════════════════════════════════════════
 
+
 def motor_kaydet(motor: Any) -> None:
     """hafiza_genislet.py araçlarını Motor'a kaydet.
 
@@ -1167,7 +1407,10 @@ def motor_kaydet(motor: Any) -> None:
     motor._plugin_arac_kaydet(
         "HAFIZA_ARA",
         lambda sorgu="", limit="10": json.dumps(
-            hafiza.ara(sorgu, limit=int(limit)), ensure_ascii=False, indent=2, default=str
+            hafiza.ara(sorgu, limit=int(limit)),
+            ensure_ascii=False,
+            indent=2,
+            default=str,
         ),
         "Hafizada FTS5 ile tam metin ara. Kullanim: HAFIZA_ARA(sorgu='decorator', limit='10')",
     )
@@ -1175,15 +1418,18 @@ def motor_kaydet(motor: Any) -> None:
     # HAFIZA_KAYDET — hafızaya kayıt ekle
     motor._plugin_arac_kaydet(
         "HAFIZA_KAYDET",
-        lambda icerik="", koleksiyon="konusmalar", anahtar="", ttl_saat="0": json.dumps({
-            "basarili": hafiza.kaydet(
-                icerik=icerik,
-                koleksiyon=koleksiyon,
-                anahtar=anahtar,
-                ttl_saat=float(ttl_saat) if ttl_saat else 0,
-            ),
-            "koleksiyon": koleksiyon,
-        }, ensure_ascii=False),
+        lambda icerik="", koleksiyon="konusmalar", anahtar="", ttl_saat="0": json.dumps(
+            {
+                "basarili": hafiza.kaydet(
+                    icerik=icerik,
+                    koleksiyon=koleksiyon,
+                    anahtar=anahtar,
+                    ttl_saat=float(ttl_saat) if ttl_saat else 0,
+                ),
+                "koleksiyon": koleksiyon,
+            },
+            ensure_ascii=False,
+        ),
         "Hafizaya kayit ekler. Kullanim: HAFIZA_KAYDET(icerik='...', koleksiyon='konusmalar', anahtar='...', ttl_saat='0')",
     )
 
@@ -1192,7 +1438,9 @@ def motor_kaydet(motor: Any) -> None:
         "HAFIZA_SESSION_ARA",
         lambda sorgu="", limit="5": json.dumps(
             hafiza.session_ara(sorgu, limit=int(limit)),
-            ensure_ascii=False, indent=2, default=str,
+            ensure_ascii=False,
+            indent=2,
+            default=str,
         ),
         "Gecmis oturumlarda FTS5 ile ara. Kullanim: HAFIZA_SESSION_ARA(sorgu='decorator', limit='5')",
     )
@@ -1202,7 +1450,9 @@ def motor_kaydet(motor: Any) -> None:
         "HAFIZA_SESSION_LISTE",
         lambda limit="10": json.dumps(
             hafiza.session_listele(limit=int(limit)),
-            ensure_ascii=False, indent=2, default=str,
+            ensure_ascii=False,
+            indent=2,
+            default=str,
         ),
         "Son oturumlari listeler. Kullanim: HAFIZA_SESSION_LISTE(limit='10')",
     )
@@ -1210,12 +1460,16 @@ def motor_kaydet(motor: Any) -> None:
     # HAFIZA_NOT_EKLE — kısa not ekle
     motor._plugin_arac_kaydet(
         "HAFIZA_NOT_EKLE",
-        lambda baslik="", icerik="", ttl_saat="0": json.dumps({
-            "basarili": hafiza.not_ekle(
-                baslik=baslik, icerik=icerik,
-                ttl_saat=float(ttl_saat) if ttl_saat else 0,
-            ),
-        }, ensure_ascii=False),
+        lambda baslik="", icerik="", ttl_saat="0": json.dumps(
+            {
+                "basarili": hafiza.not_ekle(
+                    baslik=baslik,
+                    icerik=icerik,
+                    ttl_saat=float(ttl_saat) if ttl_saat else 0,
+                ),
+            },
+            ensure_ascii=False,
+        ),
         "Kisa not/hatirlatma ekler. Kullanim: HAFIZA_NOT_EKLE(baslik='ornek', icerik='...', ttl_saat='24')",
     )
 
@@ -1224,7 +1478,9 @@ def motor_kaydet(motor: Any) -> None:
         "HAFIZA_NOT_LISTE",
         lambda limit="20": json.dumps(
             hafiza.notlari_listele(limit=int(limit)),
-            ensure_ascii=False, indent=2, default=str,
+            ensure_ascii=False,
+            indent=2,
+            default=str,
         ),
         "Tum aktif notlari listeler. Kullanim: HAFIZA_NOT_LISTE(limit='20')",
     )
@@ -1232,29 +1488,40 @@ def motor_kaydet(motor: Any) -> None:
     # HAFIZA_TERCIH_KAYDET — kullanıcı tercihi kaydet
     motor._plugin_arac_kaydet(
         "HAFIZA_TERCIH_KAYDET",
-        lambda anahtar="", deger="": json.dumps({
-            "basarili": hafiza.tercih_kaydet(anahtar=anahtar, deger=deger),
-        }, ensure_ascii=False),
+        lambda anahtar="", deger="": json.dumps(
+            {
+                "basarili": hafiza.tercih_kaydet(anahtar=anahtar, deger=deger),
+            },
+            ensure_ascii=False,
+        ),
         "Kullanici tercihi kaydeder. Kullanim: HAFIZA_TERCIH_KAYDET(anahtar='dil', deger='Turkce')",
     )
 
     # HAFIZA_TERCIH_AL — kullanıcı tercihini oku
     motor._plugin_arac_kaydet(
         "HAFIZA_TERCIH_AL",
-        lambda anahtar="", default="": json.dumps({
-            "anahtar": anahtar,
-            "deger": hafiza.tercih_al(anahtar=anahtar, default=default),
-        }, ensure_ascii=False),
+        lambda anahtar="", default="": json.dumps(
+            {
+                "anahtar": anahtar,
+                "deger": hafiza.tercih_al(anahtar=anahtar, default=default),
+            },
+            ensure_ascii=False,
+        ),
         "Kullanici tercihini okur. Kullanim: HAFIZA_TERCIH_AL(anahtar='dil', default='Turkce')",
     )
 
     # HAFIZA_TEMIZLE — eski kayıtları temizle (memory consolidation)
     motor._plugin_arac_kaydet(
         "HAFIZA_TEMIZLE",
-        lambda yas_saat="72": json.dumps({
-            "silinen_kayit": hafiza.temizle(yas_saat=float(yas_saat) if yas_saat else 72.0),
-            "mesaj": f"{yas_saat} saatten eski expire kayitlar temizlendi",
-        }, ensure_ascii=False),
+        lambda yas_saat="72": json.dumps(
+            {
+                "silinen_kayit": hafiza.temizle(
+                    yas_saat=float(yas_saat) if yas_saat else 72.0
+                ),
+                "mesaj": f"{yas_saat} saatten eski expire kayitlar temizlendi",
+            },
+            ensure_ascii=False,
+        ),
         "Eski/expire kayitlari temizler. Kullanim: HAFIZA_TEMIZLE(yas_saat='72')",
     )
 

@@ -103,9 +103,7 @@ def key_kontrol() -> Dict[str, List[str]]:
             else:
                 sonuc["eksik_opsiyonel"].append(env_ad)
         elif regex and not key_format_kontrol(value, regex):
-            sonuc["format_hatali"].append(
-                f"{env_ad} — beklenen format: {regex}"
-            )
+            sonuc["format_hatali"].append(f"{env_ad} — beklenen format: {regex}")
 
     # Bot token'ları
     for env_ad, (zorunlu, aciklama) in BOT_TOKEN_TANIMLARI.items():

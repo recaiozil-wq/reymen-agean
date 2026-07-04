@@ -29,7 +29,10 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional, Union
 
-from src.reymen.cron.hermes_stubs.account_usage import fetch_account_usage, render_account_usage_lines
+from src.reymen.cron.hermes_stubs.account_usage import (
+    fetch_account_usage,
+    render_account_usage_lines,
+)
 from src.reymen.cron.hermes_stubs.i18n import t
 from src.gateways.config import HomeChannel, Platform, PlatformConfig
 from src.gateways.platforms.base import EphemeralReply, MessageEvent, MessageType
@@ -58,13 +61,21 @@ class GatewaySlashCommandsMixin:
         Instruction text built for those platforms must show the prefix
         that actually works when typed.
         """
-        adapter = self.adapters.get(platform) if getattr(self, "adapters", None) else None
-        return getattr(adapter, "typed_command_prefix", "/") if adapter is not None else "/"
+        adapter = (
+            self.adapters.get(platform) if getattr(self, "adapters", None) else None
+        )
+        return (
+            getattr(adapter, "typed_command_prefix", "/")
+            if adapter is not None
+            else "/"
+        )
 
-    async def _handle_reset_command(self, event: MessageEvent) -> Union[str, EphemeralReply]:
+    async def _handle_reset_command(
+        self, event: MessageEvent
+    ) -> Union[str, EphemeralReply]:
         """Handle /new or /reset command."""
         source = event.source
-        
+
         # Get existing session key
         session_key = self._session_key_for_source(source)
         self._invalidate_session_run_generation(session_key, reason="session_reset")
@@ -86,7 +97,13 @@ class GatewaySlashCommandsMixin:
         if _cache_lock is not None:
             with _cache_lock:
                 _cached = self._agent_cache.get(session_key)
-                _old_agent = _cached[0] if isinstance(_cached, tuple) else _cached if _cached else None
+                _old_agent = (
+                    _cached[0]
+                    if isinstance(_cached, tuple)
+                    else _cached
+                    if _cached
+                    else None
+                )
             if _old_agent is not None:
                 self._cleanup_agent_resources(_old_agent)
         self._evict_cached_agent(session_key)
@@ -100,6 +117,7 @@ class GatewaySlashCommandsMixin:
 
         try:
             from reymen.cron.hermes_stubs.env_passthrough import clear_env_passthrough
+
             clear_env_passthrough()
         except Exception as _e:
             logger.warning("[SlashCommands] except Exception (L104): %s", Exception)
@@ -107,6 +125,7 @@ class GatewaySlashCommandsMixin:
 
         try:
             from reymen.cron.hermes_stubs.credential_files import clear_credential_files
+
             clear_credential_files()
         except Exception as _e:
             logger.warning("[SlashCommands] except Exception (L110): %s", Exception)
@@ -132,6 +151,7 @@ class GatewaySlashCommandsMixin:
         # Fire plugin on_session_finalize hook (session boundary)
         try:
             from reymen.cron.hermes_stubs.plugins import invoke_hook as _invoke_hook
+
             _invoke_hook(
                 "on_session_finalize",
                 session_id=_old_sid,
@@ -145,18 +165,24 @@ class GatewaySlashCommandsMixin:
             pass
 
         # Emit session:end hook (session is ending)
-        await self.hooks.emit("session:end", {
-            "platform": source.platform.value if source.platform else "",
-            "user_id": source.user_id,
-            "session_key": session_key,
-        })
+        await self.hooks.emit(
+            "session:end",
+            {
+                "platform": source.platform.value if source.platform else "",
+                "user_id": source.user_id,
+                "session_key": session_key,
+            },
+        )
 
         # Emit session:reset hook
-        await self.hooks.emit("session:reset", {
-            "platform": source.platform.value if source.platform else "",
-            "user_id": source.user_id,
-            "session_key": session_key,
-        })
+        await self.hooks.emit(
+            "session:reset",
+            {
+                "platform": source.platform.value if source.platform else "",
+                "user_id": source.user_id,
+                "session_key": session_key,
+            },
+        )
 
         # Resolve session config info to surface to the user
         try:
@@ -165,17 +191,22 @@ class GatewaySlashCommandsMixin:
             session_info = ""
 
         if new_entry:
-            header = self._telegram_topic_new_header(source) or t("gateway.reset.header_default")
+            header = self._telegram_topic_new_header(source) or t(
+                "gateway.reset.header_default"
+            )
         else:
             # No existing session, just create one
             new_entry = self.session_store.get_or_create_session(source, force_new=True)
-            header = self._telegram_topic_new_header(source) or t("gateway.reset.header_new")
+            header = self._telegram_topic_new_header(source) or t(
+                "gateway.reset.header_new"
+            )
 
         # Set session title if provided with /new <title>
         _title_arg = event.get_command_args().strip()
         _title_note = ""
         if _title_arg and self._session_db and new_entry:
             from reymen.cron.hermes_stubs import SessionDB
+
             try:
                 sanitized = SessionDB.sanitize_title(_title_arg)
             except ValueError as e:
@@ -188,7 +219,9 @@ class GatewaySlashCommandsMixin:
                 except ValueError as e:
                     _title_note = t("gateway.reset.title_error_untitled", error=str(e))
                 except Exception as _e:
-                    logger.warning("[SlashCommands] except Exception (L187): %s", Exception)
+                    logger.warning(
+                        "[SlashCommands] except Exception (L187): %s", Exception
+                    )
                     pass
             elif not _title_note:
                 # sanitize_title returned empty (whitespace-only / unprintable)
@@ -204,11 +237,14 @@ class GatewaySlashCommandsMixin:
             try:
                 self._record_telegram_topic_binding(source, new_entry)
             except Exception:
-                logger.debug("Failed to rebind Telegram topic after /new", exc_info=True)
+                logger.debug(
+                    "Failed to rebind Telegram topic after /new", exc_info=True
+                )
 
         # Fire plugin on_session_reset hook (new session guaranteed to exist)
         try:
             from reymen.cron.hermes_stubs.plugins import invoke_hook as _invoke_hook
+
             _new_sid = new_entry.session_id if new_entry else None
             _invoke_hook(
                 "on_session_reset",
@@ -225,6 +261,7 @@ class GatewaySlashCommandsMixin:
         # Append a random tip to the reset message
         try:
             from reymen.cron.hermes_stubs.tips import get_random_tip
+
             _tip_line = t("gateway.reset.tip", tip=get_random_tip())
         except Exception:
             _tip_line = ""
@@ -262,7 +299,11 @@ class GatewaySlashCommandsMixin:
         policy = _policy_for_source(self.config, source)
         platform = source.platform.value if source and source.platform else "?"
         chat_type = (source.chat_type if source else "") or "dm"
-        scope = "DM" if chat_type.lower() in {"dm", "direct", "private", ""} else "group/channel"
+        scope = (
+            "DM"
+            if chat_type.lower() in {"dm", "direct", "private", ""}
+            else "group/channel"
+        )
         user_id = (source.user_id if source else None) or "?"
 
         if not policy.enabled:
@@ -323,7 +364,7 @@ class GatewaySlashCommandsMixin:
         if text.startswith("/"):
             text = text.lstrip("/")
         if text.startswith("kanban"):
-            text = text[len("kanban"):].lstrip()
+            text = text[len("kanban") :].lstrip()
 
         tokens = shlex.split(text) if text else []
         requested_board = None
@@ -363,25 +404,35 @@ class GatewaySlashCommandsMixin:
                     source = event.source
                     platform = getattr(source, "platform", None)
                     platform_str = (
-                        platform.value if hasattr(platform, "value") else str(platform or "")
+                        platform.value
+                        if hasattr(platform, "value")
+                        else str(platform or "")
                     ).lower()
                     chat_id = str(getattr(source, "chat_id", "") or "")
                     thread_id = str(getattr(source, "thread_id", "") or "")
                     user_id = str(getattr(source, "user_id", "") or "") or None
                     if platform_str and chat_id:
+
                         def _sub():
                             from reymen.cron.hermes_stubs import kanban_db as _kb
+
                             conn = _kb.connect(board=requested_board)
                             try:
                                 _kb.add_notify_sub(
-                                    conn, task_id=task_id,
-                                    platform=platform_str, chat_id=chat_id,
+                                    conn,
+                                    task_id=task_id,
+                                    platform=platform_str,
+                                    chat_id=chat_id,
                                     thread_id=thread_id or None,
                                     user_id=user_id,
-                                    notifier_profile=getattr(self, "_kanban_notifier_profile", None) or self._active_profile_name(),
+                                    notifier_profile=getattr(
+                                        self, "_kanban_notifier_profile", None
+                                    )
+                                    or self._active_profile_name(),
                                 )
                             finally:
                                 conn.close()
+
                         await asyncio.to_thread(_sub)
                         output = (
                             output.rstrip()
@@ -399,7 +450,11 @@ class GatewaySlashCommandsMixin:
 
     async def _handle_status_command(self, event: MessageEvent) -> str:
         """Handle /status command."""
-        from reymen.gateway.run import _AGENT_PENDING_SENTINEL, _load_gateway_config, _resolve_gateway_model
+        from reymen.gateway.run import (
+            _AGENT_PENDING_SENTINEL,
+            _load_gateway_config,
+            _resolve_gateway_model,
+        )
 
         source = event.source
         session_entry = self.session_store.get_or_create_session(source)
@@ -489,7 +544,9 @@ class GatewaySlashCommandsMixin:
         model_name = model_name or _clean_str(session_row.get("model"))
         provider_name = provider_name or _clean_str(session_row.get("billing_provider"))
         base_url = base_url or _clean_str(session_row.get("billing_base_url"))
-        context_used = context_used or _int_value(getattr(session_entry, "last_prompt_tokens", 0))
+        context_used = context_used or _int_value(
+            getattr(session_entry, "last_prompt_tokens", 0)
+        )
 
         user_config: dict[str, Any] = {}
         if not model_name or not provider_name or not context_total:
@@ -500,25 +557,39 @@ class GatewaySlashCommandsMixin:
         if not model_name:
             model_name = _resolve_gateway_model(user_config)
         if not provider_name:
-            model_cfg = user_config.get("model", {}) if isinstance(user_config, dict) else {}
+            model_cfg = (
+                user_config.get("model", {}) if isinstance(user_config, dict) else {}
+            )
             if isinstance(model_cfg, dict):
                 provider_name = _clean_str(model_cfg.get("provider"))
         if not context_total:
-            model_cfg = user_config.get("model", {}) if isinstance(user_config, dict) else {}
-            configured_context = model_cfg.get("context_length") if isinstance(model_cfg, dict) else None
+            model_cfg = (
+                user_config.get("model", {}) if isinstance(user_config, dict) else {}
+            )
+            configured_context = (
+                model_cfg.get("context_length") if isinstance(model_cfg, dict) else None
+            )
             if isinstance(configured_context, int) and configured_context > 0:
                 context_total = configured_context
 
         model_line = ""
         if model_name:
             if provider_name:
-                model_line = t("gateway.status.model_provider", model=model_name, provider=provider_name)
+                model_line = t(
+                    "gateway.status.model_provider",
+                    model=model_name,
+                    provider=provider_name,
+                )
             else:
                 model_line = t("gateway.status.model", model=model_name)
 
         context_line = ""
         if context_total:
-            pct = min(100, round((context_used / context_total) * 100)) if context_total else 0
+            pct = (
+                min(100, round((context_used / context_total) * 100))
+                if context_total
+                else 0
+            )
             context_line = t(
                 "gateway.status.context",
                 used=f"{context_used:,}",
@@ -535,40 +606,66 @@ class GatewaySlashCommandsMixin:
         ]
         if title:
             lines.append(t("gateway.status.title", title=title))
-        lines.extend([
-            t("gateway.status.created", timestamp=session_entry.created_at.strftime('%Y-%m-%d %H:%M')),
-            t("gateway.status.last_activity", timestamp=session_entry.updated_at.strftime('%Y-%m-%d %H:%M')),
-        ])
+        lines.extend(
+            [
+                t(
+                    "gateway.status.created",
+                    timestamp=session_entry.created_at.strftime("%Y-%m-%d %H:%M"),
+                ),
+                t(
+                    "gateway.status.last_activity",
+                    timestamp=session_entry.updated_at.strftime("%Y-%m-%d %H:%M"),
+                ),
+            ]
+        )
         if model_line:
             lines.append(model_line)
         if context_line:
             lines.append(context_line)
-        lines.extend([
-            t("gateway.status.tokens", tokens=f"{db_total_tokens:,}"),
-            t("gateway.status.agent_running", state=t("gateway.status.state_yes") if is_running else t("gateway.status.state_no")),
-        ])
+        lines.extend(
+            [
+                t("gateway.status.tokens", tokens=f"{db_total_tokens:,}"),
+                t(
+                    "gateway.status.agent_running",
+                    state=t("gateway.status.state_yes")
+                    if is_running
+                    else t("gateway.status.state_no"),
+                ),
+            ]
+        )
         if queue_depth:
             lines.append(t("gateway.status.queued", count=queue_depth))
         if source.platform == Platform.MATRIX:
             adapter = self.adapters.get(Platform.MATRIX)
-            scope = getattr(adapter, "_matrix_session_scope", os.getenv("MATRIX_SESSION_SCOPE", "auto"))
+            scope = getattr(
+                adapter,
+                "_matrix_session_scope",
+                os.getenv("MATRIX_SESSION_SCOPE", "auto"),
+            )
             thread = source.thread_id or "none"
-            lines.extend([
+            lines.extend(
+                [
+                    "",
+                    t("gateway.status.matrix_scope_header"),
+                    t(
+                        "gateway.status.matrix_scope_room",
+                        room=source.chat_name or source.chat_id,
+                    ),
+                    t("gateway.status.matrix_scope_room_id", room_id=source.chat_id),
+                    t("gateway.status.matrix_scope_thread", thread_id=thread),
+                    t("gateway.status.matrix_scope_mode", scope=scope),
+                    t(
+                        "gateway.status.matrix_scope_key",
+                        session_key=self._redact_matrix_session_key(session_key),
+                    ),
+                ]
+            )
+        lines.extend(
+            [
                 "",
-                t("gateway.status.matrix_scope_header"),
-                t("gateway.status.matrix_scope_room", room=source.chat_name or source.chat_id),
-                t("gateway.status.matrix_scope_room_id", room_id=source.chat_id),
-                t("gateway.status.matrix_scope_thread", thread_id=thread),
-                t("gateway.status.matrix_scope_mode", scope=scope),
-                t(
-                    "gateway.status.matrix_scope_key",
-                    session_key=self._redact_matrix_session_key(session_key),
-                ),
-            ])
-        lines.extend([
-            "",
-            t("gateway.status.platforms", platforms=', '.join(connected_platforms)),
-        ])
+                t("gateway.status.platforms", platforms=", ".join(connected_platforms)),
+            ]
+        )
 
         return "\n".join(lines)
 
@@ -579,7 +676,9 @@ class GatewaySlashCommandsMixin:
         digest = hashlib.sha256(text.encode("utf-8")).hexdigest()[:12]
         return f"sha256:{digest}"
 
-    def _gateway_session_origin_for_id(self, session_id: str) -> Optional[SessionSource]:
+    def _gateway_session_origin_for_id(
+        self, session_id: str
+    ) -> Optional[SessionSource]:
         """Best-effort origin lookup for gateway session IDs."""
         lookup = getattr(type(self.session_store), "lookup_by_session_id", None)
         if callable(lookup):
@@ -595,7 +694,9 @@ class GatewaySlashCommandsMixin:
         return None
 
     @staticmethod
-    def _same_matrix_room(current: SessionSource, origin: Optional[SessionSource]) -> bool:
+    def _same_matrix_room(
+        current: SessionSource, origin: Optional[SessionSource]
+    ) -> bool:
         return (
             origin is not None
             and origin.platform == Platform.MATRIX
@@ -606,7 +707,10 @@ class GatewaySlashCommandsMixin:
     async def _handle_agents_command(self, event: MessageEvent) -> str:
         """Handle /agents command - list active agents and running tasks."""
         from reymen.gateway.run import _AGENT_PENDING_SENTINEL
-        from reymen.cron.hermes_stubs.process_registry import format_uptime_short, process_registry
+        from reymen.cron.hermes_stubs.process_registry import (
+            format_uptime_short,
+            process_registry,
+        )
 
         now = time.time()
         current_session_key = self._session_key_for_source(event.source)
@@ -623,9 +727,15 @@ class GatewaySlashCommandsMixin:
                 {
                     "session_key": session_key,
                     "elapsed": elapsed,
-                    "state": t("gateway.agents.state_starting") if is_pending else t("gateway.agents.state_running"),
-                    "session_id": "" if is_pending else str(getattr(agent, "session_id", "") or ""),
-                    "model": "" if is_pending else str(getattr(agent, "model", "") or ""),
+                    "state": t("gateway.agents.state_starting")
+                    if is_pending
+                    else t("gateway.agents.state_running"),
+                    "session_id": ""
+                    if is_pending
+                    else str(getattr(agent, "session_id", "") or ""),
+                    "model": ""
+                    if is_pending
+                    else str(getattr(agent, "model", "") or ""),
                 }
             )
 
@@ -634,14 +744,16 @@ class GatewaySlashCommandsMixin:
         running_processes: list[dict] = []
         try:
             running_processes = [
-                p for p in process_registry.list_sessions()
+                p
+                for p in process_registry.list_sessions()
                 if p.get("status") == "running"
             ]
         except Exception:
             running_processes = []
 
         background_tasks = [
-            t for t in (getattr(self, "_background_tasks", set()) or set())
+            t
+            for t in (getattr(self, "_background_tasks", set()) or set())
             if hasattr(t, "done") and not t.done()
         ]
 
@@ -653,7 +765,11 @@ class GatewaySlashCommandsMixin:
 
         if agent_rows:
             for idx, row in enumerate(agent_rows[:12], 1):
-                current = t("gateway.agents.this_chat") if row["session_key"] == current_session_key else ""
+                current = (
+                    t("gateway.agents.this_chat")
+                    if row["session_key"] == current_session_key
+                    else ""
+                )
                 sid = f" · `{row['session_id']}`" if row["session_id"] else ""
                 model = f" · `{row['model']}`" if row["model"] else ""
                 lines.append(
@@ -679,7 +795,9 @@ class GatewaySlashCommandsMixin:
                     f"{format_uptime_short(int(proc.get('uptime_seconds', 0)))} · `{cmd}`"
                 )
             if len(running_processes) > 12:
-                lines.append(t("gateway.agents.more", count=len(running_processes) - 12))
+                lines.append(
+                    t("gateway.agents.more", count=len(running_processes) - 12)
+                )
 
         lines.extend(
             [
@@ -694,7 +812,9 @@ class GatewaySlashCommandsMixin:
 
         return "\n".join(lines)
 
-    async def _handle_stop_command(self, event: MessageEvent) -> Union[str, EphemeralReply]:
+    async def _handle_stop_command(
+        self, event: MessageEvent
+    ) -> Union[str, EphemeralReply]:
         """Handle /stop command - interrupt a running agent.
 
         When an agent is truly hung (blocked thread that never checks
@@ -706,6 +826,7 @@ class GatewaySlashCommandsMixin:
         The session is preserved so the user can continue the conversation.
         """
         from reymen.gateway.run import _AGENT_PENDING_SENTINEL, _INTERRUPT_REASON_STOP
+
         source = event.source
         session_entry = self.session_store.get_or_create_session(source)
         session_key = session_entry.session_key
@@ -801,9 +922,7 @@ class GatewaySlashCommandsMixin:
                         )
                     else:
                         attempts = info.get("attempts", 0)
-                        lines.append(
-                            f"  · {p.value} — retrying (attempt {attempts})"
-                        )
+                        lines.append(f"  · {p.value} — retrying (attempt {attempts})")
             else:
                 lines.append("Failed/paused: (none)")
             return "\n".join(lines)
@@ -823,7 +942,9 @@ class GatewaySlashCommandsMixin:
                     )
                 if failed[platform].get("paused"):
                     return f"{platform.value} is already paused."
-                self._pause_failed_platform(platform, reason="paused via /platform pause")
+                self._pause_failed_platform(
+                    platform, reason="paused via /platform pause"
+                )
                 return (
                     f"✓ {platform.value} paused. "
                     f"Resume with `/platform resume {platform.value}` or "
@@ -836,10 +957,7 @@ class GatewaySlashCommandsMixin:
                     f"nothing to resume."
                 )
             if not failed[platform].get("paused"):
-                return (
-                    f"{platform.value} is already retrying — "
-                    f"no resume needed."
-                )
+                return f"{platform.value} is already retrying — " f"no resume needed."
             self._resume_paused_platform(platform)
             return f"✓ {platform.value} resumed — retrying on next watcher tick."
 
@@ -850,9 +968,12 @@ class GatewaySlashCommandsMixin:
             "  /platform resume <name> — re-queue a paused platform"
         )
 
-    async def _handle_restart_command(self, event: MessageEvent) -> Union[str, EphemeralReply]:
+    async def _handle_restart_command(
+        self, event: MessageEvent
+    ) -> Union[str, EphemeralReply]:
         """Handle /restart command - drain active work, then restart the gateway."""
         from reymen.gateway.run import _hermes_home
+
         # Defensive idempotency check: if the previous gateway process
         # recorded this same /restart (same platform + update_id) and the new
         # process is seeing it *again*, this is a re-delivery caused by PTB's
@@ -868,7 +989,9 @@ class GatewaySlashCommandsMixin:
             logger.info(
                 "Ignoring redelivered /restart (platform=%s, update_id=%s) — "
                 "already processed by a previous gateway instance.",
-                event.source.platform.value if event.source and event.source.platform else "?",
+                event.source.platform.value
+                if event.source and event.source.platform
+                else "?",
                 event.platform_update_id,
             )
             return ""
@@ -883,7 +1006,9 @@ class GatewaySlashCommandsMixin:
         # notify them once it comes back online.
         try:
             notify_data = {
-                "platform": event.source.platform.value if event.source.platform else None,
+                "platform": event.source.platform.value
+                if event.source.platform
+                else None,
                 "chat_id": event.source.chat_id,
                 "chat_type": event.source.chat_type,
             }
@@ -916,7 +1041,9 @@ class GatewaySlashCommandsMixin:
         # /restart redelivery from Telegram.  Overwritten on every /restart.
         try:
             dedup_data = {
-                "platform": event.source.platform.value if event.source.platform else None,
+                "platform": event.source.platform.value
+                if event.source.platform
+                else None,
                 "requested_at": time.time(),
             }
             if event.platform_update_id is not None:
@@ -937,7 +1064,9 @@ class GatewaySlashCommandsMixin:
         # under systemd (KillMode=mixed kills the cgroup) or Docker (tini
         # exits when the gateway dies, taking the detached helper with it).
         _under_service = bool(os.environ.get("INVOCATION_ID"))  # systemd sets this
-        _in_container = os.path.exists("/.dockerenv") or os.path.exists("/run/.containerenv")
+        _in_container = os.path.exists("/.dockerenv") or os.path.exists(
+            "/run/.containerenv"
+        )
         if _under_service or _in_container:
             self.request_restart(detached=False, via_service=True)
         else:
@@ -956,12 +1085,14 @@ class GatewaySlashCommandsMixin:
         """Handle /help command - list available commands."""
         from reymen.gateway.run import _telegramize_command_mentions
         from reymen.cron.hermes_stubs.commands import gateway_help_lines
+
         lines = [
             t("gateway.help.header"),
             *gateway_help_lines(),
         ]
         try:
             from reymen.cron.hermes_stubs.skill_commands import get_skill_commands
+
             skill_cmds = get_skill_commands()
             if skill_cmds:
                 lines.append(t("gateway.help.skill_header", count=len(skill_cmds)))
@@ -970,7 +1101,9 @@ class GatewaySlashCommandsMixin:
                 for cmd in sorted_cmds[:10]:
                     lines.append(f"`{cmd}` — {skill_cmds[cmd]['description']}")
                 if len(sorted_cmds) > 10:
-                    lines.append(t("gateway.help.more_use_commands", count=len(sorted_cmds) - 10))
+                    lines.append(
+                        t("gateway.help.more_use_commands", count=len(sorted_cmds) - 10)
+                    )
         except Exception as _e:
             logger.warning("[SlashCommands] except Exception (L969): %s", Exception)
             pass
@@ -996,12 +1129,15 @@ class GatewaySlashCommandsMixin:
         entries = list(gateway_help_lines())
         try:
             from reymen.cron.hermes_stubs.skill_commands import get_skill_commands
+
             skill_cmds = get_skill_commands()
             if skill_cmds:
                 entries.append("")
                 entries.append(t("gateway.commands.skill_header"))
                 for cmd in sorted(skill_cmds):
-                    desc = skill_cmds[cmd].get("description", "").strip() or t("gateway.commands.default_desc")
+                    desc = skill_cmds[cmd].get("description", "").strip() or t(
+                        "gateway.commands.default_desc"
+                    )
                     entries.append(f"`{cmd}` — {desc}")
         except Exception as _e:
             logger.warning("[SlashCommands] except Exception (L1000): %s", Exception)
@@ -1011,14 +1147,20 @@ class GatewaySlashCommandsMixin:
             return t("gateway.commands.none")
 
         from reymen.gateway.config import Platform
+
         page_size = 15 if event.source.platform == Platform.TELEGRAM else 20
         total_pages = max(1, (len(entries) + page_size - 1) // page_size)
         page = max(1, min(requested_page, total_pages))
         start = (page - 1) * page_size
-        page_entries = entries[start:start + page_size]
+        page_entries = entries[start : start + page_size]
 
         lines = [
-            t("gateway.commands.header", total=len(entries), page=page, total_pages=total_pages),
+            t(
+                "gateway.commands.header",
+                total=len(entries),
+                page=page,
+                total_pages=total_pages,
+            ),
             "",
             *page_entries,
         ]
@@ -1030,7 +1172,9 @@ class GatewaySlashCommandsMixin:
                 nav_parts.append(t("gateway.commands.nav_next", page=page + 1))
             lines.extend(["", " | ".join(nav_parts)])
         if page != requested_page:
-            lines.append(t("gateway.commands.out_of_range", requested=requested_page, page=page))
+            lines.append(
+                t("gateway.commands.out_of_range", requested=requested_page, page=page)
+            )
         return _telegramize_command_mentions(
             "\n".join(lines),
             getattr(getattr(event, "source", None), "platform", None),
@@ -1050,7 +1194,8 @@ class GatewaySlashCommandsMixin:
         from reymen.gateway.run import _hermes_home, _load_gateway_config
         import yaml
         from reymen.cron.hermes_stubs.model_switch import (
-            switch_model as _switch_model, parse_model_flags,
+            switch_model as _switch_model,
+            parse_model_flags,
             resolve_persist_behavior,
             list_authenticated_providers,
             list_picker_providers,
@@ -1073,9 +1218,12 @@ class GatewaySlashCommandsMixin:
         if force_refresh:
             try:
                 from reymen.cron.hermes_stubs.models import clear_provider_models_cache
+
                 clear_provider_models_cache()
             except Exception as _e:
-                logger.warning("[SlashCommands] except Exception (L1070): %s", Exception)
+                logger.warning(
+                    "[SlashCommands] except Exception (L1070): %s", Exception
+                )
                 pass
 
         # Read current model/provider from config
@@ -1096,7 +1244,10 @@ class GatewaySlashCommandsMixin:
                     current_base_url = model_cfg.get("base_url", "")
                 user_provs = cfg.get("providers")
                 try:
-                    from reymen.cron.hermes_stubs.config import get_compatible_custom_providers
+                    from reymen.cron.hermes_stubs.config import (
+                        get_compatible_custom_providers,
+                    )
+
                     custom_provs = get_compatible_custom_providers(cfg)
                 except Exception:
                     custom_provs = cfg.get("custom_providers")
@@ -1167,7 +1318,9 @@ class GatewaySlashCommandsMixin:
                             custom_providers=custom_provs,
                         )
                         if not result.success:
-                            return t("gateway.model.error_prefix", error=result.error_message)
+                            return t(
+                                "gateway.model.error_prefix", error=result.error_message
+                            )
 
                         # Update cached agent in-place
                         cached_entry = None
@@ -1186,7 +1339,10 @@ class GatewaySlashCommandsMixin:
                                     api_mode=result.api_mode,
                                 )
                             except Exception as exc:
-                                logger.warning("Picker model switch failed for cached agent: %s", exc)
+                                logger.warning(
+                                    "Picker model switch failed for cached agent: %s",
+                                    exc,
+                                )
 
                         # Persist the new model to the session DB so the
                         # dashboard shows the updated model (#34850).
@@ -1230,7 +1386,10 @@ class GatewaySlashCommandsMixin:
                         lines = [t("gateway.model.switched", model=result.new_model)]
                         lines.append(t("gateway.model.provider_label", provider=plabel))
                         mi = result.model_info
-                        from reymen.cron.hermes_stubs.model_switch import resolve_display_context_length
+                        from reymen.cron.hermes_stubs.model_switch import (
+                            resolve_display_context_length,
+                        )
+
                         _sw_config_ctx = None
                         try:
                             _sw_cfg = _load_gateway_config()
@@ -1240,7 +1399,10 @@ class GatewaySlashCommandsMixin:
                                 if _sw_raw is not None:
                                     _sw_config_ctx = int(_sw_raw)
                         except Exception as _e:
-                            logger.warning("[SlashCommands] except Exception (L1233): %s", Exception)
+                            logger.warning(
+                                "[SlashCommands] except Exception (L1233): %s",
+                                Exception,
+                            )
                             pass
                         ctx = resolve_display_context_length(
                             result.new_model,
@@ -1252,17 +1414,33 @@ class GatewaySlashCommandsMixin:
                             config_context_length=_sw_config_ctx,
                         )
                         if ctx:
-                            lines.append(t("gateway.model.context_label", tokens=f"{ctx:,}"))
+                            lines.append(
+                                t("gateway.model.context_label", tokens=f"{ctx:,}")
+                            )
                         if mi:
                             if mi.max_output:
-                                lines.append(t("gateway.model.max_output_label", tokens=f"{mi.max_output:,}"))
+                                lines.append(
+                                    t(
+                                        "gateway.model.max_output_label",
+                                        tokens=f"{mi.max_output:,}",
+                                    )
+                                )
                             if mi.has_cost_data():
-                                lines.append(t("gateway.model.cost_label", cost=mi.format_cost()))
-                            lines.append(t("gateway.model.capabilities_label", capabilities=mi.format_capabilities()))
+                                lines.append(
+                                    t("gateway.model.cost_label", cost=mi.format_cost())
+                                )
+                            lines.append(
+                                t(
+                                    "gateway.model.capabilities_label",
+                                    capabilities=mi.format_capabilities(),
+                                )
+                            )
                         lines.append(t("gateway.model.session_only_hint"))
                         return "\n".join(lines)
 
-                    metadata = self._thread_metadata_for_source(source, self._reply_anchor_for_event(event))
+                    metadata = self._thread_metadata_for_source(
+                        source, self._reply_anchor_for_event(event)
+                    )
                     result = await adapter.send_model_picker(
                         chat_id=source.chat_id,
                         providers=providers,
@@ -1277,7 +1455,14 @@ class GatewaySlashCommandsMixin:
 
             # Fallback: text list (for platforms without picker or if picker failed)
             provider_label = get_label(current_provider)
-            lines = [t("gateway.model.current_label", model=current_model or "unknown", provider=provider_label), ""]
+            lines = [
+                t(
+                    "gateway.model.current_label",
+                    model=current_model or "unknown",
+                    provider=provider_label,
+                ),
+                "",
+            ]
 
             try:
                 providers = list_authenticated_providers(
@@ -1293,13 +1478,22 @@ class GatewaySlashCommandsMixin:
                     lines.append(f"**{p['name']}** `--provider {p['slug']}`{tag}:")
                     if p["models"]:
                         model_strs = ", ".join(f"`{m}`" for m in p["models"])
-                        extra = t("gateway.model.more_models_suffix", count=p["total_models"] - len(p["models"])) if p["total_models"] > len(p["models"]) else ""
+                        extra = (
+                            t(
+                                "gateway.model.more_models_suffix",
+                                count=p["total_models"] - len(p["models"]),
+                            )
+                            if p["total_models"] > len(p["models"])
+                            else ""
+                        )
                         lines.append(f"  {model_strs}{extra}")
                     elif p.get("api_url"):
                         lines.append(f"  `{p['api_url']}`")
                     lines.append("")
             except Exception as _e:
-                logger.warning("[SlashCommands] except Exception (L1291): %s", Exception)
+                logger.warning(
+                    "[SlashCommands] except Exception (L1291): %s", Exception
+                )
                 pass
 
             lines.append(t("gateway.model.usage_switch_model"))
@@ -1343,7 +1537,9 @@ class GatewaySlashCommandsMixin:
                         api_mode=result.api_mode,
                     )
                 except Exception as exc:
-                    logger.warning("In-place model switch failed for cached agent: %s", exc)
+                    logger.warning(
+                        "In-place model switch failed for cached agent: %s", exc
+                    )
 
             # Persist the new model to the session DB so the dashboard
             # shows the updated model (#34850).
@@ -1355,9 +1551,7 @@ class GatewaySlashCommandsMixin:
                         _sess_entry.session_id, result.new_model
                     )
                 except Exception as exc:
-                    logger.debug(
-                        "Failed to persist model switch to DB: %s", exc
-                    )
+                    logger.debug("Failed to persist model switch to DB: %s", exc)
 
             # Store a note to prepend to the next user message so the model
             # knows about the switch (avoids system messages mid-history).
@@ -1410,6 +1604,7 @@ class GatewaySlashCommandsMixin:
                     if result.base_url:
                         model_cfg["base_url"] = result.base_url
                     from reymen.cron.hermes_stubs.config import save_config
+
                     save_config(cfg)
                 except Exception as e:
                     logger.warning("Failed to persist model switch: %s", e)
@@ -1422,7 +1617,10 @@ class GatewaySlashCommandsMixin:
             # Context: always resolve via the provider-aware chain so Codex OAuth,
             # Copilot, and Nous-enforced caps win over the raw models.dev entry.
             mi = result.model_info
-            from reymen.cron.hermes_stubs.model_switch import resolve_display_context_length
+            from reymen.cron.hermes_stubs.model_switch import (
+                resolve_display_context_length,
+            )
+
             _sw2_config_ctx = None
             try:
                 _sw2_cfg = _load_gateway_config()
@@ -1432,7 +1630,9 @@ class GatewaySlashCommandsMixin:
                     if _sw2_raw is not None:
                         _sw2_config_ctx = int(_sw2_raw)
             except Exception as _e:
-                logger.warning("[SlashCommands] except Exception (L1423): %s", Exception)
+                logger.warning(
+                    "[SlashCommands] except Exception (L1423): %s", Exception
+                )
                 pass
             ctx = resolve_display_context_length(
                 result.new_model,
@@ -1447,21 +1647,30 @@ class GatewaySlashCommandsMixin:
                 lines.append(t("gateway.model.context_label", tokens=f"{ctx:,}"))
             if mi:
                 if mi.max_output:
-                    lines.append(t("gateway.model.max_output_label", tokens=f"{mi.max_output:,}"))
+                    lines.append(
+                        t("gateway.model.max_output_label", tokens=f"{mi.max_output:,}")
+                    )
                 if mi.has_cost_data():
                     lines.append(t("gateway.model.cost_label", cost=mi.format_cost()))
-                lines.append(t("gateway.model.capabilities_label", capabilities=mi.format_capabilities()))
+                lines.append(
+                    t(
+                        "gateway.model.capabilities_label",
+                        capabilities=mi.format_capabilities(),
+                    )
+                )
 
             # Cache notice
             cache_enabled = (
-                (base_url_host_matches(result.base_url or "", "openrouter.ai") and "claude" in result.new_model.lower())
-                or result.api_mode == "anthropic_messages"
-            )
+                base_url_host_matches(result.base_url or "", "openrouter.ai")
+                and "claude" in result.new_model.lower()
+            ) or result.api_mode == "anthropic_messages"
             if cache_enabled:
                 lines.append(t("gateway.model.prompt_caching_enabled"))
 
             if result.warning_message:
-                lines.append(t("gateway.model.warning_prefix", warning=result.warning_message))
+                lines.append(
+                    t("gateway.model.warning_prefix", warning=result.warning_message)
+                )
 
             if persist_global:
                 lines.append(t("gateway.model.saved_global"))
@@ -1478,7 +1687,9 @@ class GatewaySlashCommandsMixin:
         # on a cache miss, so run it off the event loop.
         _cost_warning = None
         try:
-            from reymen.cron.hermes_stubs.model_cost_guard import expensive_model_warning
+            from reymen.cron.hermes_stubs.model_cost_guard import (
+                expensive_model_warning,
+            )
 
             _cost_warning = await asyncio.to_thread(
                 expensive_model_warning,
@@ -1491,6 +1702,7 @@ class GatewaySlashCommandsMixin:
         except Exception:
             _cost_warning = None
         if _cost_warning is not None:
+
             async def _on_cost_confirm(choice: str) -> str:
                 if choice == "cancel":
                     return (
@@ -1556,8 +1768,10 @@ class GatewaySlashCommandsMixin:
                 session_key = self._session_key_for_source(event.source)
                 self._evict_cached_agent(session_key)
             except Exception:
-                logger.debug("could not evict cached agent after codex-runtime change",
-                             exc_info=True)
+                logger.debug(
+                    "could not evict cached agent after codex-runtime change",
+                    exc_info=True,
+                )
 
         prefix = "✓" if result.success else "✗"
         return f"{prefix} {result.message}"
@@ -1568,7 +1782,7 @@ class GatewaySlashCommandsMixin:
         from reymen.cron.hermes_stubs import display_hermes_home
 
         args = event.get_command_args().strip().lower()
-        config_path = _hermes_home / 'config.yaml'
+        config_path = _hermes_home / "config.yaml"
 
         try:
             config = _load_gateway_config()
@@ -1585,7 +1799,10 @@ class GatewaySlashCommandsMixin:
             lines.append(t("gateway.personality.none_option"))
             for name, prompt in personalities.items():
                 if isinstance(prompt, dict):
-                    preview = prompt.get("description") or prompt.get("system_prompt", "")[:50]
+                    preview = (
+                        prompt.get("description")
+                        or prompt.get("system_prompt", "")[:50]
+                    )
                 else:
                     preview = prompt[:50] + "..." if len(prompt) > 50 else prompt
                 lines.append(t("gateway.personality.item", name=name, preview=preview))
@@ -1637,7 +1854,7 @@ class GatewaySlashCommandsMixin:
         source = event.source
         session_entry = self.session_store.get_or_create_session(source)
         history = self.session_store.load_transcript(session_entry.session_id)
-        
+
         # Find the last user message
         last_user_msg = None
         last_user_idx = None
@@ -1646,16 +1863,16 @@ class GatewaySlashCommandsMixin:
                 last_user_msg = history[i].get("content", "")
                 last_user_idx = i
                 break
-        
+
         if not last_user_msg:
             return t("gateway.retry.no_previous")
-        
+
         # Truncate history to before the last user message and persist
         truncated = history[:last_user_idx]
         self.session_store.rewrite_transcript(session_entry.session_id, truncated)
         # Reset stored token count — transcript was truncated
         session_entry.last_prompt_tokens = 0
-        
+
         # Re-send by creating a fake text event with the old message
         retry_event = MessageEvent(
             text=last_user_msg,
@@ -1664,7 +1881,7 @@ class GatewaySlashCommandsMixin:
             raw_message=event.raw_message,
             channel_prompt=event.channel_prompt,
         )
-        
+
         # Let the normal message handler process it
         return await self._handle_message(retry_event)
 
@@ -1694,8 +1911,12 @@ class GatewaySlashCommandsMixin:
             if state is None:
                 return t("gateway.goal.no_goal_set")
             try:
-                adapter = self.adapters.get(event.source.platform) if event.source else None
-                _quick_key = self._session_key_for_source(event.source) if event.source else None
+                adapter = (
+                    self.adapters.get(event.source.platform) if event.source else None
+                )
+                _quick_key = (
+                    self._session_key_for_source(event.source) if event.source else None
+                )
                 if adapter and _quick_key:
                     self._clear_goal_pending_continuations(_quick_key, adapter)
             except Exception as exc:
@@ -1712,8 +1933,12 @@ class GatewaySlashCommandsMixin:
             had = mgr.has_goal()
             mgr.clear()
             try:
-                adapter = self.adapters.get(event.source.platform) if event.source else None
-                _quick_key = self._session_key_for_source(event.source) if event.source else None
+                adapter = (
+                    self.adapters.get(event.source.platform) if event.source else None
+                )
+                _quick_key = (
+                    self._session_key_for_source(event.source) if event.source else None
+                )
                 if adapter and _quick_key:
                     self._clear_goal_pending_continuations(_quick_key, adapter)
             except Exception as exc:
@@ -1729,7 +1954,9 @@ class GatewaySlashCommandsMixin:
         # Queue the goal text as an immediate first turn so the agent
         # starts making progress. The post-turn hook takes over after.
         adapter = self.adapters.get(event.source.platform) if event.source else None
-        _quick_key = self._session_key_for_source(event.source) if event.source else None
+        _quick_key = (
+            self._session_key_for_source(event.source) if event.source else None
+        )
         if adapter and _quick_key:
             try:
                 kickoff_event = MessageEvent(
@@ -1848,6 +2075,7 @@ class GatewaySlashCommandsMixin:
     async def _handle_set_home_command(self, event: MessageEvent) -> str:
         """Handle /sethome command -- set the current chat as the platform's home channel."""
         from reymen.gateway.run import _home_target_env_var, _home_thread_env_var
+
         source = event.source
         platform_name = source.platform.value if source.platform else "unknown"
         chat_id = source.chat_id
@@ -1860,6 +2088,7 @@ class GatewaySlashCommandsMixin:
         # Save to .env so it persists across restarts
         try:
             from reymen.cron.hermes_stubs.config import save_env_value
+
             save_env_value(env_key, str(chat_id))
             # Keep thread/topic routing explicit and clear stale values when
             # /sethome is run from the parent chat instead of a thread.
@@ -1929,12 +2158,23 @@ class GatewaySlashCommandsMixin:
                 if info:
                     lines = [
                         t("gateway.voice.status_mode", label=labels.get(mode, mode)),
-                        t("gateway.voice.status_channel", channel=info['channel_name']),
-                        t("gateway.voice.status_participants", count=info['member_count']),
+                        t("gateway.voice.status_channel", channel=info["channel_name"]),
+                        t(
+                            "gateway.voice.status_participants",
+                            count=info["member_count"],
+                        ),
                     ]
                     for m in info["members"]:
-                        status = t("gateway.voice.speaking") if m.get("is_speaking") else ""
-                        lines.append(t("gateway.voice.status_member", name=m['display_name'], status=status))
+                        status = (
+                            t("gateway.voice.speaking") if m.get("is_speaking") else ""
+                        )
+                        lines.append(
+                            t(
+                                "gateway.voice.status_member",
+                                name=m["display_name"],
+                                status=status,
+                            )
+                        )
                     return "\n".join(lines)
             return t("gateway.voice.status_mode", label=labels.get(mode, mode))
         else:
@@ -1967,12 +2207,16 @@ class GatewaySlashCommandsMixin:
     async def _handle_rollback_command(self, event: MessageEvent) -> str:
         """Handle /rollback command — list or restore filesystem checkpoints."""
         from reymen.gateway.run import _hermes_home
-        from reymen.cron.hermes_stubs.checkpoint_manager import CheckpointManager, format_checkpoint_list
+        from reymen.cron.hermes_stubs.checkpoint_manager import (
+            CheckpointManager,
+            format_checkpoint_list,
+        )
 
         # Read checkpoint config from config.yaml
         cp_cfg = {}
         try:
             import yaml as _y
+
             _cfg_path = _hermes_home / "config.yaml"
             if _cfg_path.exists():
                 with open(_cfg_path, encoding="utf-8") as _f:
@@ -2124,7 +2368,9 @@ class GatewaySlashCommandsMixin:
                 if self._show_reasoning
                 else t("gateway.reasoning.display_off")
             )
-            has_session_override = session_key in (getattr(self, "_session_reasoning_overrides", {}) or {})
+            has_session_override = session_key in (
+                getattr(self, "_session_reasoning_overrides", {}) or {}
+            )
             scope = (
                 t("gateway.reasoning.scope_session")
                 if has_session_override
@@ -2191,7 +2437,9 @@ class GatewaySlashCommandsMixin:
         new setting takes effect on the next message.
         """
         from reymen.gateway.run import _hermes_home
-        from reymen.cron.hermes_stubs.write_approval_commands import handle_pending_subcommand
+        from reymen.cron.hermes_stubs.write_approval_commands import (
+            handle_pending_subcommand,
+        )
         from reymen.cron.hermes_stubs import write_approval as wa
         from reymen.cron.hermes_stubs.memory_tool import MemoryStore
 
@@ -2202,6 +2450,7 @@ class GatewaySlashCommandsMixin:
 
         def _set_approval(enabled: bool):
             import yaml
+
             user_config = {}
             if config_path.exists():
                 with open(config_path, encoding="utf-8") as f:
@@ -2217,11 +2466,16 @@ class GatewaySlashCommandsMixin:
         store.load_from_disk()
 
         out = handle_pending_subcommand(
-            wa.MEMORY, args, memory_store=store, set_mode_fn=_set_approval,
+            wa.MEMORY,
+            args,
+            memory_store=store,
+            set_mode_fn=_set_approval,
         )
         if out is None:
-            out = ("Unknown /memory subcommand. Use: pending, approve <id>, "
-                   "reject <id>, approval <on|off>.")
+            out = (
+                "Unknown /memory subcommand. Use: pending, approve <id>, "
+                "reject <id>, approval <on|off>."
+            )
         return out
 
     async def _handle_skills_command(self, event: MessageEvent) -> str:
@@ -2241,7 +2495,9 @@ class GatewaySlashCommandsMixin:
         ``hermes skills diff <name>`` that diffs a bundled skill vs stock.)
         """
         from reymen.gateway.run import _hermes_home
-        from reymen.cron.hermes_stubs.write_approval_commands import handle_pending_subcommand
+        from reymen.cron.hermes_stubs.write_approval_commands import (
+            handle_pending_subcommand,
+        )
         from reymen.cron.hermes_stubs import write_approval as wa
 
         raw_args = event.get_command_args().strip()
@@ -2252,12 +2508,15 @@ class GatewaySlashCommandsMixin:
         gate_on = wa.write_approval_enabled(wa.SKILLS)
         wants_toggle = bool(args) and args[0].lower() in {"approval", "mode"}
         if not gate_on and not wants_toggle and wa.pending_count(wa.SKILLS) == 0:
-            return ("Skill write approval is off (skills.write_approval). "
-                    "Enable it with /skills approval on, then review staged "
-                    "writes here with /skills pending.")
+            return (
+                "Skill write approval is off (skills.write_approval). "
+                "Enable it with /skills approval on, then review staged "
+                "writes here with /skills pending."
+            )
 
         def _set_approval(enabled: bool):
             import yaml
+
             user_config = {}
             if config_path.exists():
                 with open(config_path, encoding="utf-8") as f:
@@ -2268,12 +2527,16 @@ class GatewaySlashCommandsMixin:
             self._evict_cached_agent(session_key)
 
         out = handle_pending_subcommand(
-            wa.SKILLS, args, set_mode_fn=_set_approval,
+            wa.SKILLS,
+            args,
+            set_mode_fn=_set_approval,
         )
         if out is None:
-            return ("Unknown /skills subcommand on this platform. Use: pending, "
-                    "approve <id>, reject <id>, diff <id>, approval <on|off>. "
-                    "(Search/install are CLI-only.)")
+            return (
+                "Unknown /skills subcommand on this platform. Use: pending, "
+                "approve <id>, reject <id>, diff <id>, approval <on|off>. "
+                "(Search/install are CLI-only.)"
+            )
 
         # Chat bubbles can't hold a full skill diff — truncate and point at
         # the real review surface. (Note: `hermes skills diff <name>` is a
@@ -2281,14 +2544,19 @@ class GatewaySlashCommandsMixin:
         # version — so we point at the pending JSON file, not that command.)
         if args and args[0].lower() == "diff" and len(out) > 3000:
             pending_id = args[1] if len(args) > 1 else "<id>"
-            out = (out[:3000]
-                   + "\n… (truncated — full diff in "
-                     f"~/.hermes/pending/skills/{pending_id}.json)")
+            out = (
+                out[:3000] + "\n… (truncated — full diff in "
+                f"~/.hermes/pending/skills/{pending_id}.json)"
+            )
         return out
 
     async def _handle_fast_command(self, event: MessageEvent) -> str:
         """Handle /fast — mirror the CLI Priority Processing toggle in gateway chats."""
-        from reymen.gateway.run import _hermes_home, _load_gateway_config, _resolve_gateway_model
+        from reymen.gateway.run import (
+            _hermes_home,
+            _load_gateway_config,
+            _resolve_gateway_model,
+        )
         import yaml
         from reymen.cron.hermes_stubs.models import model_supports_fast_mode
 
@@ -2322,7 +2590,11 @@ class GatewaySlashCommandsMixin:
                 return False
 
         if not args or args == "status":
-            status = t("gateway.fast.status_fast") if self._service_tier == "priority" else t("gateway.fast.status_normal")
+            status = (
+                t("gateway.fast.status_fast")
+                if self._service_tier == "priority"
+                else t("gateway.fast.status_normal")
+            )
             return t("gateway.fast.status", mode=status)
 
         if args in {"fast", "on"}:
@@ -2340,7 +2612,9 @@ class GatewaySlashCommandsMixin:
             return t("gateway.fast.saved", label=label)
         return t("gateway.fast.session_only", label=label)
 
-    async def _handle_yolo_command(self, event: MessageEvent) -> Union[str, EphemeralReply]:
+    async def _handle_yolo_command(
+        self, event: MessageEvent
+    ) -> Union[str, EphemeralReply]:
         """Handle /yolo — toggle dangerous command approval bypass for this session only."""
         from reymen.cron.hermes_stubs.approval import (
             disable_session_yolo,
@@ -2366,7 +2640,11 @@ class GatewaySlashCommandsMixin:
         ``display.platforms.<platform>.tool_progress`` so each channel can
         have its own verbosity level independently.
         """
-        from reymen.gateway.run import _hermes_home, _load_gateway_config, _platform_config_key
+        from reymen.gateway.run import (
+            _hermes_home,
+            _load_gateway_config,
+            _platform_config_key,
+        )
 
         config_path = _hermes_home / "config.yaml"
         platform_key = _platform_config_key(event.source.platform)
@@ -2395,7 +2673,10 @@ class GatewaySlashCommandsMixin:
 
         # Read current effective mode for this platform via the resolver
         from reymen.gateway.display_config import resolve_display_setting
-        current = resolve_display_setting(user_config, platform_key, "tool_progress", "all")
+
+        current = resolve_display_setting(
+            user_config, platform_key, "tool_progress", "all"
+        )
         if current not in cycle:
             current = "all"
         idx = (cycle.index(current) + 1) % len(cycle)
@@ -2403,22 +2684,29 @@ class GatewaySlashCommandsMixin:
 
         # Save to display.platforms.<platform>.tool_progress
         try:
-            if "display" not in user_config or not isinstance(user_config.get("display"), dict):
+            if "display" not in user_config or not isinstance(
+                user_config.get("display"), dict
+            ):
                 user_config["display"] = {}
             display = user_config["display"]
-            if "platforms" not in display or not isinstance(display.get("platforms"), dict):
+            if "platforms" not in display or not isinstance(
+                display.get("platforms"), dict
+            ):
                 display["platforms"] = {}
-            if platform_key not in display["platforms"] or not isinstance(display["platforms"].get(platform_key), dict):
+            if platform_key not in display["platforms"] or not isinstance(
+                display["platforms"].get(platform_key), dict
+            ):
                 display["platforms"][platform_key] = {}
             display["platforms"][platform_key]["tool_progress"] = new_mode
             atomic_yaml_write(config_path, user_config)
-            return (
-                f"{descriptions[new_mode]}\n"
-                + t("gateway.verbose.saved_suffix", platform=platform_key)
+            return f"{descriptions[new_mode]}\n" + t(
+                "gateway.verbose.saved_suffix", platform=platform_key
             )
         except Exception as e:
             logger.warning("Failed to save tool_progress mode: %s", e)
-            return f"{descriptions[new_mode]}\n" + t("gateway.verbose.save_failed", error=e)
+            return f"{descriptions[new_mode]}\n" + t(
+                "gateway.verbose.save_failed", error=e
+            )
 
     async def _handle_footer_command(self, event: MessageEvent) -> str:
         """Handle /footer command — toggle the runtime-metadata footer.
@@ -2434,7 +2722,12 @@ class GatewaySlashCommandsMixin:
         are respected but not modified here — edit config.yaml directly for
         per-platform control.
         """
-        from reymen.gateway.run import _hermes_home, _load_gateway_config, _platform_config_key, _resolve_gateway_model
+        from reymen.gateway.run import (
+            _hermes_home,
+            _load_gateway_config,
+            _platform_config_key,
+            _resolve_gateway_model,
+        )
         from reymen.gateway.runtime_footer import resolve_footer_config
 
         config_path = _hermes_home / "config.yaml"
@@ -2460,7 +2753,11 @@ class GatewaySlashCommandsMixin:
         effective = resolve_footer_config(user_config, platform_key)
 
         if arg in {"status", "?"}:
-            state = t("gateway.footer.state_on") if effective["enabled"] else t("gateway.footer.state_off")
+            state = (
+                t("gateway.footer.state_on")
+                if effective["enabled"]
+                else t("gateway.footer.state_off")
+            )
             fields = ", ".join(effective.get("fields") or [])
             return t(
                 "gateway.footer.status",
@@ -2491,11 +2788,14 @@ class GatewaySlashCommandsMixin:
             logger.warning("Failed to save runtime_footer.enabled: %s", e)
             return t("gateway.config_save_failed", error=e)
 
-        state = t("gateway.footer.state_on") if new_state else t("gateway.footer.state_off")
+        state = (
+            t("gateway.footer.state_on") if new_state else t("gateway.footer.state_off")
+        )
         example = ""
         if new_state:
             # Show a preview using current agent state if available.
             from reymen.gateway.runtime_footer import format_runtime_footer
+
             preview = format_runtime_footer(
                 model=_resolve_gateway_model(user_config) or None,
                 context_tokens=0,
@@ -2533,13 +2833,18 @@ class GatewaySlashCommandsMixin:
             rejoin_compressed_head_and_tail,
             split_history_for_partial_compress,
         )
+
         _raw_args = (event.get_command_args() or "").strip()
         partial, keep_last, focus_topic = parse_partial_compress_args(_raw_args)
 
         try:
             from run_agent import AIAgent
-            from reymen.cron.hermes_stubs.manual_compression_feedback import summarize_manual_compression
-            from reymen.cron.hermes_stubs.model_metadata import estimate_request_tokens_rough
+            from reymen.cron.hermes_stubs.manual_compression_feedback import (
+                summarize_manual_compression,
+            )
+            from reymen.cron.hermes_stubs.model_metadata import (
+                estimate_request_tokens_rough,
+            )
 
             session_key = self._session_key_for_source(source)
             model, runtime_kwargs = self._resolve_session_agent_runtime(
@@ -2597,7 +2902,13 @@ class GatewaySlashCommandsMixin:
                 loop = asyncio.get_running_loop()
                 compressed, _ = await loop.run_in_executor(
                     None,
-                    lambda: tmp_agent._compress_context(head, "", approx_tokens=approx_tokens, focus_topic=focus_topic, force=True)
+                    lambda: tmp_agent._compress_context(
+                        head,
+                        "",
+                        approx_tokens=approx_tokens,
+                        focus_topic=focus_topic,
+                        force=True,
+                    ),
                 )
 
                 # Re-append the verbatim tail after the compressed head,
@@ -2615,7 +2926,9 @@ class GatewaySlashCommandsMixin:
                     session_entry.session_id = new_session_id
                     self.session_store._save()
                     self._sync_telegram_topic_binding(
-                        source, session_entry, reason="compress-command",
+                        source,
+                        session_entry,
+                        reason="compress-command",
                     )
 
                 # Only rewrite the transcript when rotation actually produced a
@@ -2653,13 +2966,19 @@ class GatewaySlashCommandsMixin:
                 # usable summary and the compressor preserved messages
                 # unchanged (no drop, no placeholder).  force=True was
                 # passed above so any active cooldown is bypassed.
-                _summary_aborted = bool(getattr(compressor, "_last_compress_aborted", False))
+                _summary_aborted = bool(
+                    getattr(compressor, "_last_compress_aborted", False)
+                )
                 _summary_err = getattr(compressor, "_last_summary_error", None)
                 # Separately: did the user's CONFIGURED aux model fail
                 # and we recovered via main?  Surface that as an info
                 # note so they can fix their config.
-                _aux_fail_model = getattr(compressor, "_last_aux_model_failure_model", None)
-                _aux_fail_err = getattr(compressor, "_last_aux_model_failure_error", None)
+                _aux_fail_model = getattr(
+                    compressor, "_last_aux_model_failure_model", None
+                )
+                _aux_fail_err = getattr(
+                    compressor, "_last_aux_model_failure_error", None
+                )
             finally:
                 # Evict cached agent so next turn rebuilds system prompt
                 # from current files (SOUL.md, memory, etc.).
@@ -2698,7 +3017,10 @@ class GatewaySlashCommandsMixin:
             return t("gateway.topic.not_telegram_dm")
         if not self._session_db:
             from reymen.cron.hermes_stubs import format_session_db_unavailable
-            return format_session_db_unavailable(prefix=t("gateway.shared.session_db_unavailable_prefix"))
+
+            return format_session_db_unavailable(
+                prefix=t("gateway.shared.session_db_unavailable_prefix")
+            )
 
         # Authorization: /topic activates multi-session mode and mutates
         # SQLite side tables. Unauthorized senders (not in allowlist) must
@@ -2745,7 +3067,9 @@ class GatewaySlashCommandsMixin:
                 chat_id=str(source.chat_id),
                 user_id=str(source.user_id),
                 has_topics_enabled=capabilities.get("has_topics_enabled"),
-                allows_users_to_create_topics=capabilities.get("allows_users_to_create_topics"),
+                allows_users_to_create_topics=capabilities.get(
+                    "allows_users_to_create_topics"
+                ),
             )
         except Exception as exc:
             logger.exception("Failed to enable Telegram topic mode")
@@ -2788,7 +3112,10 @@ class GatewaySlashCommandsMixin:
 
         if not self._session_db:
             from reymen.cron.hermes_stubs import format_session_db_unavailable
-            return format_session_db_unavailable(prefix=t("gateway.shared.session_db_unavailable_prefix"))
+
+            return format_session_db_unavailable(
+                prefix=t("gateway.shared.session_db_unavailable_prefix")
+            )
 
         # Ensure session exists in SQLite DB (it may only exist in session_store
         # if this is the first command in a new session)
@@ -2825,7 +3152,11 @@ class GatewaySlashCommandsMixin:
             # Show the current title and session ID
             title = self._session_db.get_session_title(session_id)
             if title:
-                return t("gateway.title.current_with_title", session_id=session_id, title=title)
+                return t(
+                    "gateway.title.current_with_title",
+                    session_id=session_id,
+                    title=title,
+                )
             else:
                 return t("gateway.title.current_no_title", session_id=session_id)
 
@@ -2833,7 +3164,10 @@ class GatewaySlashCommandsMixin:
         """Handle /resume command — list or switch to a previous session."""
         if not self._session_db:
             from reymen.cron.hermes_stubs import format_session_db_unavailable
-            return format_session_db_unavailable(prefix=t("gateway.shared.session_db_unavailable_prefix"))
+
+            return format_session_db_unavailable(
+                prefix=t("gateway.shared.session_db_unavailable_prefix")
+            )
 
         source = event.source
         session_key = self._session_key_for_source(source)
@@ -2868,7 +3202,9 @@ class GatewaySlashCommandsMixin:
                 if source.platform == Platform.MATRIX and not allow_all:
                     scoped = []
                     for s in titled:
-                        origin = self._gateway_session_origin_for_id(str(s.get("id") or ""))
+                        origin = self._gateway_session_origin_for_id(
+                            str(s.get("id") or "")
+                        )
                         if self._same_matrix_room(source, origin):
                             scoped.append(s)
                     titled = scoped
@@ -2880,12 +3216,25 @@ class GatewaySlashCommandsMixin:
                 for idx, s in enumerate(titled[:10], start=1):
                     title = s["title"]
                     if source.platform == Platform.MATRIX and allow_all:
-                        origin = self._gateway_session_origin_for_id(str(s.get("id") or ""))
+                        origin = self._gateway_session_origin_for_id(
+                            str(s.get("id") or "")
+                        )
                         if origin:
                             title = f"{title} — {origin.chat_name or origin.chat_id}"
                     preview = s.get("preview", "")[:40]
-                    preview_part = t("gateway.resume.list_preview_suffix", preview=preview) if preview else ""
-                    lines.append(t("gateway.resume.list_item_numbered", index=idx, title=title, preview_part=preview_part))
+                    preview_part = (
+                        t("gateway.resume.list_preview_suffix", preview=preview)
+                        if preview
+                        else ""
+                    )
+                    lines.append(
+                        t(
+                            "gateway.resume.list_item_numbered",
+                            index=idx,
+                            title=title,
+                            preview_part=preview_part,
+                        )
+                    )
                 lines.append(t("gateway.resume.list_footer_numbered"))
                 return "\n".join(lines)
             except Exception as e:
@@ -2899,7 +3248,9 @@ class GatewaySlashCommandsMixin:
                 if source.platform == Platform.MATRIX and not allow_all:
                     scoped = []
                     for s in titled:
-                        origin = self._gateway_session_origin_for_id(str(s.get("id") or ""))
+                        origin = self._gateway_session_origin_for_id(
+                            str(s.get("id") or "")
+                        )
                         if self._same_matrix_room(source, origin):
                             scoped.append(s)
                     titled = scoped
@@ -2927,11 +3278,16 @@ class GatewaySlashCommandsMixin:
         try:
             target_id = self._session_db.resolve_resume_session_id(target_id)
         except Exception as e:
-            logger.debug("Failed to resolve resume continuation for %s: %s", target_id, e)
+            logger.debug(
+                "Failed to resolve resume continuation for %s: %s", target_id, e
+            )
 
         if source.platform == Platform.MATRIX:
             target_origin = self._gateway_session_origin_for_id(target_id)
-            if not self._same_matrix_room(source, target_origin) and not allow_cross_room:
+            if (
+                not self._same_matrix_room(source, target_origin)
+                and not allow_cross_room
+            ):
                 if target_origin is None:
                     return t("gateway.resume.matrix_blocked_no_origin", name=name)
                 return t(
@@ -2966,8 +3322,14 @@ class GatewaySlashCommandsMixin:
 
         # Count messages for context
         history = self.session_store.load_transcript(target_id)
-        msg_count = len([m for m in history if m.get("role") == "user"]) if history else 0
-        msg_part = f" ({msg_count} message{'s' if msg_count != 1 else ''})" if msg_count else ""
+        msg_count = (
+            len([m for m in history if m.get("role") == "user"]) if history else 0
+        )
+        msg_part = (
+            f" ({msg_count} message{'s' if msg_count != 1 else ''})"
+            if msg_count
+            else ""
+        )
 
         if source.platform == Platform.MATRIX and allow_cross_room:
             return t(
@@ -2986,7 +3348,10 @@ class GatewaySlashCommandsMixin:
         """Handle /sessions — list previous sessions for gateway chats."""
         if not self._session_db:
             from reymen.cron.hermes_stubs import format_session_db_unavailable
-            return format_session_db_unavailable(prefix=t("gateway.shared.session_db_unavailable_prefix"))
+
+            return format_session_db_unavailable(
+                prefix=t("gateway.shared.session_db_unavailable_prefix")
+            )
 
         from reymen.cron.hermes_stubs.session_listing import (
             format_gateway_session_listing,
@@ -3017,9 +3382,11 @@ class GatewaySlashCommandsMixin:
         )
         if source.platform == Platform.MATRIX and not include_all:
             rows = [
-                row for row in rows
+                row
+                for row in rows
                 if self._same_matrix_room(
-                    source, self._gateway_session_origin_for_id(str(row.get("id") or ""))
+                    source,
+                    self._gateway_session_origin_for_id(str(row.get("id") or "")),
                 )
             ]
         return format_gateway_session_listing(
@@ -3039,7 +3406,10 @@ class GatewaySlashCommandsMixin:
 
         if not self._session_db:
             from reymen.cron.hermes_stubs import format_session_db_unavailable
-            return format_session_db_unavailable(prefix=t("gateway.shared.session_db_unavailable_prefix"))
+
+            return format_session_db_unavailable(
+                prefix=t("gateway.shared.session_db_unavailable_prefix")
+            )
 
         source = event.source
         session_key = self._session_key_for_source(source)
@@ -3054,6 +3424,7 @@ class GatewaySlashCommandsMixin:
 
         # Generate the new session ID
         from datetime import datetime as _dt
+
         now = _dt.now()
         timestamp_str = now.strftime("%Y%m%d_%H%M%S")
         short_uuid = _uuid.uuid4().hex[:6]
@@ -3078,7 +3449,9 @@ class GatewaySlashCommandsMixin:
             self._session_db.create_session(
                 session_id=new_session_id,
                 source=source.platform.value if source.platform else "gateway",
-                model=(self.config.get("model", {}) or {}).get("default") if isinstance(self.config, dict) else None,
+                model=(self.config.get("model", {}) or {}).get("default")
+                if isinstance(self.config, dict)
+                else None,
                 model_config={"_branched_from": parent_session_id},
                 parent_session_id=parent_session_id,
             )
@@ -3123,8 +3496,18 @@ class GatewaySlashCommandsMixin:
         self._evict_cached_agent(session_key)
 
         msg_count = len([m for m in history if m.get("role") == "user"])
-        key = "gateway.branch.branched_one" if msg_count == 1 else "gateway.branch.branched_many"
-        return t(key, title=branch_title, count=msg_count, parent=parent_session_id, new=new_session_id)
+        key = (
+            "gateway.branch.branched_one"
+            if msg_count == 1
+            else "gateway.branch.branched_many"
+        )
+        return t(
+            key,
+            title=branch_title,
+            count=msg_count,
+            parent=parent_session_id,
+            new=new_session_id,
+        )
 
     async def _handle_credits_command(self, event: MessageEvent) -> str:
         """Handle /credits -- show Nous credit balance and the top-up handoff.
@@ -3157,7 +3540,9 @@ class GatewaySlashCommandsMixin:
         if view.topup_url:
             lines.append("")
             lines.append(f"Top up: {view.topup_url}")
-            lines.append("Complete your top-up in the browser — credits will appear in /credits shortly.")
+            lines.append(
+                "Complete your top-up in the browser — credits will appear in /credits shortly."
+            )
         return "\n".join(lines)
 
     async def _handle_usage_command(self, event: MessageEvent) -> str:
@@ -3168,6 +3553,7 @@ class GatewaySlashCommandsMixin:
         available whenever the user asks, not only while the agent is running.
         """
         from reymen.gateway.run import _AGENT_PENDING_SENTINEL
+
         source = event.source
         session_key = self._session_key_for_source(source)
 
@@ -3186,13 +3572,27 @@ class GatewaySlashCommandsMixin:
         # Prefer the live agent; fall back to persisted billing data on the
         # SessionDB row so `/usage` still returns account info between turns
         # when no agent is resident.
-        provider = getattr(agent, "provider", None) if agent and agent is not _AGENT_PENDING_SENTINEL else None
-        base_url = getattr(agent, "base_url", None) if agent and agent is not _AGENT_PENDING_SENTINEL else None
-        api_key = getattr(agent, "api_key", None) if agent and agent is not _AGENT_PENDING_SENTINEL else None
+        provider = (
+            getattr(agent, "provider", None)
+            if agent and agent is not _AGENT_PENDING_SENTINEL
+            else None
+        )
+        base_url = (
+            getattr(agent, "base_url", None)
+            if agent and agent is not _AGENT_PENDING_SENTINEL
+            else None
+        )
+        api_key = (
+            getattr(agent, "api_key", None)
+            if agent and agent is not _AGENT_PENDING_SENTINEL
+            else None
+        )
         if not provider and getattr(self, "_session_db", None) is not None:
             try:
                 _entry_for_billing = self.session_store.get_or_create_session(source)
-                persisted = self._session_db.get_session(_entry_for_billing.session_id) or {}
+                persisted = (
+                    self._session_db.get_session(_entry_for_billing.session_id) or {}
+                )
             except Exception:
                 persisted = {}
             provider = provider or persisted.get("billing_provider")
@@ -3213,7 +3613,9 @@ class GatewaySlashCommandsMixin:
             except Exception:
                 account_snapshot = None
             if account_snapshot:
-                account_lines = render_account_usage_lines(account_snapshot, markdown=True)
+                account_lines = render_account_usage_lines(
+                    account_snapshot, markdown=True
+                )
 
         # ── Nous credits magnitudes + monthly-grant % gauge ─────────────
         # Shared with the CLI / TUI /usage block via nous_credits_lines(): a single
@@ -3230,14 +3632,26 @@ class GatewaySlashCommandsMixin:
         except Exception:
             credits_lines = []  # fail-open: never break /usage
 
-        if agent and hasattr(agent, "session_total_tokens") and agent.session_api_calls > 0:
+        if (
+            agent
+            and hasattr(agent, "session_total_tokens")
+            and agent.session_api_calls > 0
+        ):
             lines = []
 
             # Rate limits (when available from provider headers)
             rl_state = agent.get_rate_limit_state()
             if rl_state and rl_state.has_data:
-                from reymen.cron.hermes_stubs.rate_limit_tracker import format_rate_limit_compact
-                lines.append(t("gateway.usage.rate_limits", state=format_rate_limit_compact(rl_state)))
+                from reymen.cron.hermes_stubs.rate_limit_tracker import (
+                    format_rate_limit_compact,
+                )
+
+                lines.append(
+                    t(
+                        "gateway.usage.rate_limits",
+                        state=format_rate_limit_compact(rl_state),
+                    )
+                )
                 lines.append("")
 
             # Session token usage — detailed breakdown matching CLI
@@ -3248,18 +3662,34 @@ class GatewaySlashCommandsMixin:
 
             lines.append(t("gateway.usage.header_session"))
             lines.append(t("gateway.usage.label_model", model=agent.model))
-            lines.append(t("gateway.usage.label_input_tokens", count=f"{input_tokens:,}"))
+            lines.append(
+                t("gateway.usage.label_input_tokens", count=f"{input_tokens:,}")
+            )
             if cache_read:
-                lines.append(t("gateway.usage.label_cache_read", count=f"{cache_read:,}"))
+                lines.append(
+                    t("gateway.usage.label_cache_read", count=f"{cache_read:,}")
+                )
             if cache_write:
-                lines.append(t("gateway.usage.label_cache_write", count=f"{cache_write:,}"))
-            lines.append(t("gateway.usage.label_output_tokens", count=f"{output_tokens:,}"))
-            lines.append(t("gateway.usage.label_total", count=f"{agent.session_total_tokens:,}"))
-            lines.append(t("gateway.usage.label_api_calls", count=agent.session_api_calls))
+                lines.append(
+                    t("gateway.usage.label_cache_write", count=f"{cache_write:,}")
+                )
+            lines.append(
+                t("gateway.usage.label_output_tokens", count=f"{output_tokens:,}")
+            )
+            lines.append(
+                t("gateway.usage.label_total", count=f"{agent.session_total_tokens:,}")
+            )
+            lines.append(
+                t("gateway.usage.label_api_calls", count=agent.session_api_calls)
+            )
 
             # Cost estimation
             try:
-                from reymen.cron.hermes_stubs.usage_pricing import CanonicalUsage, estimate_usage_cost
+                from reymen.cron.hermes_stubs.usage_pricing import (
+                    CanonicalUsage,
+                    estimate_usage_cost,
+                )
+
                 cost_result = estimate_usage_cost(
                     agent.model,
                     CanonicalUsage(
@@ -3273,20 +3703,41 @@ class GatewaySlashCommandsMixin:
                 )
                 if cost_result.amount_usd is not None:
                     prefix = "~" if cost_result.status == "estimated" else ""
-                    lines.append(t("gateway.usage.label_cost", prefix=prefix, amount=f"{float(cost_result.amount_usd):.4f}"))
+                    lines.append(
+                        t(
+                            "gateway.usage.label_cost",
+                            prefix=prefix,
+                            amount=f"{float(cost_result.amount_usd):.4f}",
+                        )
+                    )
                 elif cost_result.status == "included":
                     lines.append(t("gateway.usage.label_cost_included"))
             except Exception as _e:
-                logger.warning("[SlashCommands] except Exception (L3265): %s", Exception)
+                logger.warning(
+                    "[SlashCommands] except Exception (L3265): %s", Exception
+                )
                 pass
 
             # Context window and compressions
             ctx = agent.context_compressor
             if ctx.last_prompt_tokens:
-                pct = min(100, ctx.last_prompt_tokens / ctx.context_length * 100) if ctx.context_length else 0
-                lines.append(t("gateway.usage.label_context", used=f"{ctx.last_prompt_tokens:,}", total=f"{ctx.context_length:,}", pct=f"{pct:.0f}"))
+                pct = (
+                    min(100, ctx.last_prompt_tokens / ctx.context_length * 100)
+                    if ctx.context_length
+                    else 0
+                )
+                lines.append(
+                    t(
+                        "gateway.usage.label_context",
+                        used=f"{ctx.last_prompt_tokens:,}",
+                        total=f"{ctx.context_length:,}",
+                        pct=f"{pct:.0f}",
+                    )
+                )
             if ctx.compression_count:
-                lines.append(t("gateway.usage.label_compressions", count=ctx.compression_count))
+                lines.append(
+                    t("gateway.usage.label_compressions", count=ctx.compression_count)
+                )
 
             if account_lines:
                 lines.append("")
@@ -3301,8 +3752,15 @@ class GatewaySlashCommandsMixin:
         session_entry = self.session_store.get_or_create_session(source)
         history = self.session_store.load_transcript(session_entry.session_id)
         if history:
-            from reymen.cron.hermes_stubs.model_metadata import estimate_messages_tokens_rough
-            msgs = [m for m in history if m.get("role") in {"user", "assistant"} and m.get("content")]
+            from reymen.cron.hermes_stubs.model_metadata import (
+                estimate_messages_tokens_rough,
+            )
+
+            msgs = [
+                m
+                for m in history
+                if m.get("role") in {"user", "assistant"} and m.get("content")
+            ]
             approx = estimate_messages_tokens_rough(msgs)
             lines = [
                 t("gateway.usage.header_session_info"),
@@ -3332,7 +3790,7 @@ class GatewaySlashCommandsMixin:
         args = event.get_command_args().strip()
 
         # Normalize Unicode dashes (Telegram/iOS auto-converts -- to em/en dash)
-        args = re.sub(r'[\u2012\u2013\u2014\u2015](days|source)', r'--\1', args)
+        args = re.sub(r"[\u2012\u2013\u2014\u2015](days|source)", r"--\1", args)
 
         days = 30
         source = None
@@ -3398,7 +3856,9 @@ class GatewaySlashCommandsMixin:
         # Read the gate fresh from disk so a prior "always" click takes
         # effect on the next invocation without restarting the gateway.
         user_config = self._read_user_config()
-        approvals = user_config.get("approvals") if isinstance(user_config, dict) else None
+        approvals = (
+            user_config.get("approvals") if isinstance(user_config, dict) else None
+        )
         confirm_required = True
         if isinstance(approvals, dict):
             confirm_required = bool(approvals.get("mcp_reload_confirm", True))
@@ -3417,13 +3877,16 @@ class GatewaySlashCommandsMixin:
                 # Persist the opt-out and run the reload.
                 try:
                     from cli import save_config_value
+
                     save_config_value("approvals.mcp_reload_confirm", False)
                     logger.info(
                         "User opted out of /reload-mcp confirmation (session=%s)",
                         session_key,
                     )
                 except Exception as exc:
-                    logger.warning("Failed to persist mcp_reload_confirm=false: %s", exc)
+                    logger.warning(
+                        "Failed to persist mcp_reload_confirm=false: %s", exc
+                    )
             # once / always → run the reload
             result = await self._execute_mcp_reload(event)
             if choice == "always":
@@ -3459,7 +3922,7 @@ class GatewaySlashCommandsMixin:
             from reymen.cron.hermes_stubs.skill_commands import reload_skills
 
             result = await loop.run_in_executor(None, reload_skills)
-            added = result.get("added", [])      # [{"name", "description"}, ...]
+            added = result.get("added", [])  # [{"name", "description"}, ...]
             removed = result.get("removed", [])  # [{"name", "description"}, ...]
             total = result.get("total", 0)
 
@@ -3482,7 +3945,8 @@ class GatewaySlashCommandsMixin:
                 except Exception as exc:
                     logger.warning(
                         "Adapter %s refresh_skill_group raised: %s",
-                        getattr(adapter, "name", adapter), exc,
+                        getattr(adapter, "name", adapter),
+                        exc,
                     )
 
             lines = [t("gateway.reload_skills.header")]
@@ -3547,7 +4011,10 @@ class GatewaySlashCommandsMixin:
         invoking the bundle's own ``/<slug>`` command, not by this one.
         """
         try:
-            from reymen.cron.hermes_stubs.skill_bundles import list_bundles, _bundles_dir
+            from reymen.cron.hermes_stubs.skill_bundles import (
+                list_bundles,
+                _bundles_dir,
+            )
         except Exception as exc:
             logger.warning("Bundles command unavailable: %s", exc)
             return f"Bundles subsystem unavailable: {exc}"
@@ -3565,9 +4032,7 @@ class GatewaySlashCommandsMixin:
         for info in bundles:
             skill_count = len(info.get("skills", []))
             desc = info.get("description") or f"Load {skill_count} skills"
-            lines.append(
-                f"• `/{info['slug']}` — {desc} _({skill_count} skills)_"
-            )
+            lines.append(f"• `/{info['slug']}` — {desc} _({skill_count} skills)_")
             for s in info.get("skills", []):
                 lines.append(f"    · {s}")
         lines.append("")
@@ -3598,7 +4063,8 @@ class GatewaySlashCommandsMixin:
         session_key = self._session_key_for_source(source)
 
         from reymen.cron.hermes_stubs.approval import (
-            resolve_gateway_approval, has_blocking_approval,
+            resolve_gateway_approval,
+            has_blocking_approval,
         )
 
         if not has_blocking_approval(session_key):
@@ -3628,7 +4094,9 @@ class GatewaySlashCommandsMixin:
         if _adapter:
             _adapter.resume_typing_for_chat(source.chat_id)
 
-        logger.info("User approved %d dangerous command(s) via /approve (%s)", count, choice)
+        logger.info(
+            "User approved %d dangerous command(s) via /approve (%s)", count, choice
+        )
         plural = "plural" if count > 1 else "singular"
         return t(f"gateway.approve.{choice}_{plural}", count=count)
 
@@ -3644,7 +4112,8 @@ class GatewaySlashCommandsMixin:
         session_key = self._session_key_for_source(source)
 
         from reymen.cron.hermes_stubs.approval import (
-            resolve_gateway_approval, has_blocking_approval,
+            resolve_gateway_approval,
+            has_blocking_approval,
         )
 
         if not has_blocking_approval(session_key):
@@ -3679,9 +4148,12 @@ class GatewaySlashCommandsMixin:
         """
         import asyncio
         from reymen.cron.hermes_stubs.debug import (
-            _capture_dump, collect_debug_report,
-            upload_to_pastebin, _schedule_auto_delete,
-            _GATEWAY_PRIVACY_NOTICE, _best_effort_sweep_expired_pastes,
+            _capture_dump,
+            collect_debug_report,
+            upload_to_pastebin,
+            _schedule_auto_delete,
+            _GATEWAY_PRIVACY_NOTICE,
+            _best_effort_sweep_expired_pastes,
         )
 
         loop = asyncio.get_running_loop()
@@ -3736,6 +4208,7 @@ class GatewaySlashCommandsMixin:
         if platform not in _allowed:
             try:
                 from reymen.gateway.platform_registry import platform_registry
+
                 entry = platform_registry.get(platform.value)
                 if not entry or not entry.allow_update_command:
                     return t("gateway.update.platform_not_messaging")
@@ -3746,7 +4219,7 @@ class GatewaySlashCommandsMixin:
             return f"✗ {format_managed_message('update Hermes Agent')}"
 
         project_root = Path(__file__).parent.parent.resolve()
-        git_dir = project_root / '.git'
+        git_dir = project_root / ".git"
 
         if not git_dir.exists():
             return t("gateway.update.not_git_repo")
@@ -3803,7 +4276,9 @@ class GatewaySlashCommandsMixin:
         try:
             if sys.platform == "win32":
                 import textwrap
-                from reymen.cron.hermes_stubs._subprocess_compat import windows_detach_popen_kwargs
+                from reymen.cron.hermes_stubs._subprocess_compat import (
+                    windows_detach_popen_kwargs,
+                )
 
                 # hermes_cmd is a list of argv parts we can pass directly
                 # (no shell-quoting needed).
@@ -3824,9 +4299,14 @@ class GatewaySlashCommandsMixin:
                 ).strip()
                 subprocess.Popen(
                     [
-                        sys.executable, "-c", helper,
-                        str(output_path), str(exit_code_path),
-                        *hermes_cmd, "update", "--gateway",
+                        sys.executable,
+                        "-c",
+                        helper,
+                        str(output_path),
+                        str(exit_code_path),
+                        *hermes_cmd,
+                        "update",
+                        "--gateway",
                     ],
                     stdout=subprocess.DEVNULL,
                     stderr=subprocess.DEVNULL,

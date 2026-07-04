@@ -15,7 +15,9 @@ import yaml
 from gateway import run as gateway_run
 
 
-def test_reload_runtime_env_preserves_config_max_turns(tmp_path: Path, monkeypatch) -> None:
+def test_reload_runtime_env_preserves_config_max_turns(
+    tmp_path: Path, monkeypatch
+) -> None:
     ReYMeN_home = tmp_path / ".ReYMeN"
     ReYMeN_home.mkdir()
     (ReYMeN_home / "config.yaml").write_text(
@@ -42,7 +44,9 @@ def test_reload_runtime_env_keeps_env_max_iterations_when_config_omits_key(
 ) -> None:
     ReYMeN_home = tmp_path / ".ReYMeN"
     ReYMeN_home.mkdir()
-    (ReYMeN_home / "config.yaml").write_text(yaml.safe_dump({"agent": {}}), encoding="utf-8")
+    (ReYMeN_home / "config.yaml").write_text(
+        yaml.safe_dump({"agent": {}}), encoding="utf-8"
+    )
     (ReYMeN_home / ".env").write_text("ReYMeN_MAX_ITERATIONS=123\n", encoding="utf-8")
 
     monkeypatch.setattr(gateway_run, "_ReYMeN_home", ReYMeN_home)

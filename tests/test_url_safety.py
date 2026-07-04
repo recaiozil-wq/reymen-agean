@@ -1,7 +1,13 @@
 # -*- coding: utf-8 -*-
 """Tests for url_safety — URL security validation."""
+
 import pytest
-from reymen.guvenlik.url_safety import url_guvenli_mi, url_temizle, YASAKLI_PROTOKOLLER, RISKLI_TLD
+from reymen.guvenlik.url_safety import (
+    url_guvenli_mi,
+    url_temizle,
+    YASAKLI_PROTOKOLLER,
+    RISKLI_TLD,
+)
 
 
 class TestUrlGuvenliMi:
@@ -9,29 +15,35 @@ class TestUrlGuvenliMi:
 
     # ── Safe URLs ──
 
-    @pytest.mark.parametrize("url", [
-        "https://www.google.com",
-        "https://github.com/user/repo",
-        "https://docs.python.org/3/library/",
-        "http://localhost:8080",
-        "http://127.0.0.1:3000/api",
-        "https://example.com/path?q=hello",
-    ])
+    @pytest.mark.parametrize(
+        "url",
+        [
+            "https://www.google.com",
+            "https://github.com/user/repo",
+            "https://docs.python.org/3/library/",
+            "http://localhost:8080",
+            "http://127.0.0.1:3000/api",
+            "https://example.com/path?q=hello",
+        ],
+    )
     def test_safe_urls_pass(self, url):
         guvenli, _ = url_guvenli_mi(url)
         assert guvenli is True
 
     # ── Blocked protocols ──
 
-    @pytest.mark.parametrize("proto", [
-        "file:///etc/passwd",
-        "ftp://evil.com/steal",
-        "smb://network/share",
-        "ldap://dc.example.com",
-        "javascript:alert(1)",
-        "data:text/html,<script>alert(1)</script>",
-        "vbscript:MsgBox(1)",
-    ])
+    @pytest.mark.parametrize(
+        "proto",
+        [
+            "file:///etc/passwd",
+            "ftp://evil.com/steal",
+            "smb://network/share",
+            "ldap://dc.example.com",
+            "javascript:alert(1)",
+            "data:text/html,<script>alert(1)</script>",
+            "vbscript:MsgBox(1)",
+        ],
+    )
     def test_blocked_protocols(self, proto):
         guvenli, mesaj = url_guvenli_mi(proto)
         assert guvenli is False
@@ -39,11 +51,14 @@ class TestUrlGuvenliMi:
 
     # ── Non-HTTP(S) URLs ──
 
-    @pytest.mark.parametrize("url", [
-        "smtp://mail.example.com",
-        "telnet://server",
-        "custom://something",
-    ])
+    @pytest.mark.parametrize(
+        "url",
+        [
+            "smtp://mail.example.com",
+            "telnet://server",
+            "custom://something",
+        ],
+    )
     def test_non_http_blocked(self, url):
         guvenli, mesaj = url_guvenli_mi(url)
         assert guvenli is False
@@ -51,13 +66,16 @@ class TestUrlGuvenliMi:
 
     # ── Risky TLDs ──
 
-    @pytest.mark.parametrize("url", [
-        "https://phish.tk/login",
-        "https://malware.ml/download",
-        "https://scam.ga/get",
-        "https://free.xyz/offer",
-        "https://cheap.top/buy",
-    ])
+    @pytest.mark.parametrize(
+        "url",
+        [
+            "https://phish.tk/login",
+            "https://malware.ml/download",
+            "https://scam.ga/get",
+            "https://free.xyz/offer",
+            "https://cheap.top/buy",
+        ],
+    )
     def test_risky_tld_blocked(self, url):
         guvenli, mesaj = url_guvenli_mi(url)
         assert guvenli is False
@@ -65,12 +83,15 @@ class TestUrlGuvenliMi:
 
     # ── Localhost always allowed ──
 
-    @pytest.mark.parametrize("url", [
-        "http://localhost:8080/admin",
-        "https://localhost/api",
-        "http://127.0.0.1:3000",
-        "http://127.0.0.1:5000/secret",
-    ])
+    @pytest.mark.parametrize(
+        "url",
+        [
+            "http://localhost:8080/admin",
+            "https://localhost/api",
+            "http://127.0.0.1:3000",
+            "http://127.0.0.1:5000/secret",
+        ],
+    )
     def test_localhost_always_safe(self, url):
         guvenli, _ = url_guvenli_mi(url)
         assert guvenli is True

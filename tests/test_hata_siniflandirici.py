@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Testler: reymen.cereyan.hata_siniflandirici"""
+
 import pytest
 from reymen.cereyan.hata_siniflandirici import (
     api_hatasini_siniflandir,
@@ -11,10 +12,13 @@ from reymen.cereyan.hata_siniflandirici import (
 
 # ── Yardımcı hata yaratıcıları ──────────────────────────────────────────────
 
+
 def _http_hata(status: int, mesaj: str = "") -> Exception:
     """Basit HTTP hata simülatörü — status_code attribute'u olan exception."""
+
     class FakeHTTPError(Exception):
         pass
+
     e = FakeHTTPError(mesaj or f"HTTP {status}")
     e.status_code = status  # type: ignore[attr-defined]
     return e
@@ -22,8 +26,10 @@ def _http_hata(status: int, mesaj: str = "") -> Exception:
 
 def _body_hata(status: int, hata_mesaji: str = "", hata_kodu: str = "") -> Exception:
     """body attribute'u olan hata — SDK tarzı."""
+
     class FakeAPIError(Exception):
         pass
+
     e = FakeAPIError(f"HTTP {status}: {hata_mesaji}")
     e.status_code = status  # type: ignore[attr-defined]
     govde: dict = {}
@@ -38,6 +44,7 @@ def _body_hata(status: int, hata_mesaji: str = "", hata_kodu: str = "") -> Excep
 
 
 # ── FailoverReason enum testleri ─────────────────────────────────────────────
+
 
 class TestFailoverReasonEnum:
     def test_tum_degerler_mevcut(self):
@@ -58,6 +65,7 @@ class TestFailoverReasonEnum:
 
 
 # ── SiniflandirilmisHata dataclass testleri ──────────────────────────────────
+
 
 class TestSiniflandirilmisHata:
     def test_varsayilan_degerler(self):
@@ -96,6 +104,7 @@ class TestSiniflandirilmisHata:
 
 # ── Temel durum kodu sınıflandırmaları ───────────────────────────────────────
 
+
 class TestDurumKoduSiniflandirma:
     def test_401_auth(self):
         s = api_hatasini_siniflandir(_http_hata(401))
@@ -110,7 +119,9 @@ class TestDurumKoduSiniflandirma:
         assert s.yeniden_denenebilir is False
 
     def test_402_gecici_kullanim_limiti_rate_limit(self):
-        s = api_hatasini_siniflandir(_body_hata(402, "usage limit exceeded — retry after 60s"))
+        s = api_hatasini_siniflandir(
+            _body_hata(402, "usage limit exceeded — retry after 60s")
+        )
         assert s.neden == FailoverReason.rate_limit
         assert s.yeniden_denenebilir is True
 
@@ -146,6 +157,7 @@ class TestDurumKoduSiniflandirma:
 
 # ── 400 sınıflandırma ayrıntıları ────────────────────────────────────────────
 
+
 class TestDortYuzSiniflandirma:
     def test_400_context_tasma(self):
         s = api_hatasini_siniflandir(_body_hata(400, "context length exceeded"))
@@ -157,7 +169,9 @@ class TestDortYuzSiniflandirma:
         assert s.neden == FailoverReason.image_too_large
 
     def test_400_multimodal_arac(self):
-        s = api_hatasini_siniflandir(_body_hata(400, "tool message content must be a string"))
+        s = api_hatasini_siniflandir(
+            _body_hata(400, "tool message content must be a string")
+        )
         assert s.neden == FailoverReason.multimodal_tool_content_unsupported
 
     def test_400_sifreli_icerik(self):
@@ -172,11 +186,14 @@ class TestDortYuzSiniflandirma:
         assert s.neden == FailoverReason.thinking_signature
 
     def test_400_bilinmeyen_parametre_format_hatasi(self):
-        s = api_hatasini_siniflandir(_body_hata(400, "unknown parameter: stream_options"))
+        s = api_hatasini_siniflandir(
+            _body_hata(400, "unknown parameter: stream_options")
+        )
         assert s.neden == FailoverReason.format_error
 
 
 # ── Mesaj örüntüsü sınıflandırmaları ─────────────────────────────────────────
+
 
 class TestMesajOrnekSiniflandirma:
     def test_faturalama_ornegi(self):
@@ -212,11 +229,14 @@ class TestMesajOrnekSiniflandirma:
         assert s.yeniden_denenebilir is False
 
     def test_provider_politikasi_ornegi(self):
-        s = api_hatasini_siniflandir(Exception("no endpoints available matching your guardrail"))
+        s = api_hatasini_siniflandir(
+            Exception("no endpoints available matching your guardrail")
+        )
         assert s.neden == FailoverReason.provider_policy_blocked
 
 
 # ── Transport / timeout testleri ─────────────────────────────────────────────
+
 
 class TestTransportHatalar:
     def test_timeout_tipi(self):
@@ -241,6 +261,7 @@ class TestTransportHatalar:
 
 # ── Provider parametresi ─────────────────────────────────────────────────────
 
+
 class TestProviderParametresi:
     def test_provider_ve_model_aktarilir(self):
         s = api_hatasini_siniflandir(
@@ -263,6 +284,7 @@ class TestProviderParametresi:
 
 
 # ── Özgün Anthropic özel durumlar ────────────────────────────────────────────
+
 
 class TestAnthropicOzelDurumlar:
     def test_uzun_context_katmani(self):

@@ -1,4 +1,5 @@
 """Auto-generated tests for reymen.sistem.cli_display."""
+
 import pytest
 from src.reymen.sistem.cli_display import (
     _detect_light_mode,

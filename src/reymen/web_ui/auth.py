@@ -13,10 +13,10 @@ Kullanim:
         register_provider, get_provider, list_providers,
         user_manager, token_manager, Session,
     )
-    
+
     # Kullanici yönetimi
     user_manager.kullanici_ekle("operator", "sifre", role="operator")
-    
+
     # Provider registry
     from reymen.web_ui.auth import PasswordAuthProvider
     register_provider(PasswordAuthProvider())
@@ -44,39 +44,56 @@ PROJE_KOK = Path(__file__).resolve().parent.parent.parent
 # Roller
 # ---------------------------------------------------------------------------
 
+
 class Role(str, Enum):
-    ADMIN = "admin"       # Tam yetki
-    OPERATOR = "operator" # Araç kullanabilir, yapılandıramaz
-    VIEWER = "viewer"     # Sadece görüntüleme
+    ADMIN = "admin"  # Tam yetki
+    OPERATOR = "operator"  # Araç kullanabilir, yapılandıramaz
+    VIEWER = "viewer"  # Sadece görüntüleme
+
 
 ROLE_PERMISSIONS = {
     Role.ADMIN: {
-        "gateway.baslat", "gateway.durdur", "gateway.restart", "gateway.ayarlar",
-        "plugin.aktif_et", "plugin.devre_disina_al",
-        "user.ekle", "user.sil", "user.sifre_degistir",
-        "system.yeniden_baslat", "system.guncelle",
-        "log.goruntule", "log.temizle",
-        "a2a.yonet", "a2a.mesaj_gonder",
-        "maliyet.goruntule", "kalite.goruntule",
+        "gateway.baslat",
+        "gateway.durdur",
+        "gateway.restart",
+        "gateway.ayarlar",
+        "plugin.aktif_et",
+        "plugin.devre_disina_al",
+        "user.ekle",
+        "user.sil",
+        "user.sifre_degistir",
+        "system.yeniden_baslat",
+        "system.guncelle",
+        "log.goruntule",
+        "log.temizle",
+        "a2a.yonet",
+        "a2a.mesaj_gonder",
+        "maliyet.goruntule",
+        "kalite.goruntule",
         "kanban.yonet",
     },
     Role.OPERATOR: {
-        "gateway.baslat", "gateway.durdur",
-        "plugin.aktif_et", "plugin.devre_disina_al",
+        "gateway.baslat",
+        "gateway.durdur",
+        "plugin.aktif_et",
+        "plugin.devre_disina_al",
         "log.goruntule",
         "a2a.mesaj_gonder",
-        "maliyet.goruntule", "kalite.goruntule",
+        "maliyet.goruntule",
+        "kalite.goruntule",
         "kanban.yonet",
     },
     Role.VIEWER: {
         "log.goruntule",
-        "maliyet.goruntule", "kalite.goruntule",
+        "maliyet.goruntule",
+        "kalite.goruntule",
     },
 }
 
 # ---------------------------------------------------------------------------
 # Session (ReYMeN'teki Session dataclass'inin birebir karsiligi)
 # ---------------------------------------------------------------------------
+
 
 @dataclass(frozen=True)
 class Session:
@@ -89,6 +106,7 @@ class Session:
     access_token: JWT token
     refresh_token: refresh token (opsiyonel, bos string olabilir)
     """
+
     user_id: str
     display_name: str
     role: str
@@ -97,19 +115,24 @@ class Session:
     access_token: str
     refresh_token: str = ""
 
+
 # ---------------------------------------------------------------------------
 # Hata siniflari (ReYMeN pattern)
 # ---------------------------------------------------------------------------
 
+
 class ProviderError(Exception):
     """Auth provider ulasilamaz / gecici hata -> HTTP 503"""
+
 
 class InvalidCredentialsError(Exception):
     """Kullanici adi/sifre yanlis -> HTTP 401"""
 
+
 # ---------------------------------------------------------------------------
 # AuthProvider ABC (ReYMeN'teki DashboardAuthProvider)
 # ---------------------------------------------------------------------------
+
 
 class AuthProvider(ABC):
     """Auth saglayici arayuzu.
@@ -139,57 +162,77 @@ class AuthProvider(ABC):
     def revoke_session(self, *, refresh_token: str) -> None:
         """Session'i sonlandir (best-effort)."""
 
+
 # ---------------------------------------------------------------------------
 # Provider Registry (ReYMeN pattern)
 # ---------------------------------------------------------------------------
 
 _providers: dict[str, AuthProvider] = {}
 
+
 def register_provider(provider: AuthProvider) -> None:
     """Auth provider kaydet. Ayni isimde provider varsa uzerine yazar."""
     if not provider.name:
         raise ValueError("AuthProvider.name bos olamaz")
     _providers[provider.name] = provider
-    logger.info("Auth provider kaydedildi: %s (%s)", provider.name, provider.display_name)
+    logger.info(
+        "Auth provider kaydedildi: %s (%s)", provider.name, provider.display_name
+    )
+
 
 def get_provider(name: str) -> Optional[AuthProvider]:
     """Isme gore provider getir."""
     return _providers.get(name)
 
+
 def list_providers() -> list[AuthProvider]:
     """Kayitli tum provider'lari listele."""
     return list(_providers.values())
+
 
 def clear_providers() -> None:
     """Test amaciyla tum provider'lari temizle."""
     _providers.clear()
 
+
 # ---------------------------------------------------------------------------
 # Config
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class AuthConfig:
-    secret: str = field(default_factory=lambda: os.getenv(
-        "WEB_UI_SECRET",
-        hashlib.sha256(f"ReYMeN-web-ui-{os.getpid()}-{time.time()}".encode()).hexdigest()[:32]
-    ))
-    token_expiry: int = 86400          # 24 saat (access token)
-    refresh_expiry: int = 604800        # 7 gun (refresh token)
-    cookie_name: str = "reymen_session_at"   # ReYMeN ile uyumlu
+    secret: str = field(
+        default_factory=lambda: os.getenv(
+            "WEB_UI_SECRET",
+            hashlib.sha256(
+                f"ReYMeN-web-ui-{os.getpid()}-{time.time()}".encode()
+            ).hexdigest()[:32],
+        )
+    )
+    token_expiry: int = 86400  # 24 saat (access token)
+    refresh_expiry: int = 604800  # 7 gun (refresh token)
+    cookie_name: str = "reymen_session_at"  # ReYMeN ile uyumlu
     cookie_rt_name: str = "reymen_session_rt"  # refresh token cookie
-    users_file: Path = field(default_factory=lambda: PROJE_KOK / ".ReYMeN" / "web" / "users.json")
-    password_provider: str = field(default_factory=lambda: os.getenv("AUTH_PROVIDER", "password"))
+    users_file: Path = field(
+        default_factory=lambda: PROJE_KOK / ".ReYMeN" / "web" / "users.json"
+    )
+    password_provider: str = field(
+        default_factory=lambda: os.getenv("AUTH_PROVIDER", "password")
+    )
+
 
 # ---------------------------------------------------------------------------
 # Kullanici yonetimi
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class UserData:
     password_hash: str
     role: str = Role.VIEWER.value
     created: float = field(default_factory=time.time)
+
 
 class UserManager:
     """users.json ile kullanici yonetimi + roller."""
@@ -206,7 +249,11 @@ class UserManager:
                 data = json.loads(dosya.read_text(encoding="utf-8"))
                 for k, v in data.items():
                     if isinstance(v, str):
-                        self._users[k] = {"password_hash": v, "role": Role.ADMIN.value, "created": 0}
+                        self._users[k] = {
+                            "password_hash": v,
+                            "role": Role.ADMIN.value,
+                            "created": 0,
+                        }
                     elif isinstance(v, dict):
                         if "role" not in v:
                             v["role"] = Role.ADMIN.value
@@ -243,8 +290,9 @@ class UserManager:
             return False
         return hmac.compare_digest(user["password_hash"], self._hash(password))
 
-    def kullanici_ekle(self, username: str, password: str,
-                       role: str = Role.VIEWER.value) -> tuple[bool, str]:
+    def kullanici_ekle(
+        self, username: str, password: str, role: str = Role.VIEWER.value
+    ) -> tuple[bool, str]:
         if username in self._users:
             return False, "Kullanici zaten var"
         try:
@@ -268,8 +316,9 @@ class UserManager:
         self._save()
         return True, f"Kullanici silindi: {username}"
 
-    def set_password(self, username: str, password: str,
-                     old_password: str | None = None) -> tuple[bool, str]:
+    def set_password(
+        self, username: str, password: str, old_password: str | None = None
+    ) -> tuple[bool, str]:
         if username not in self._users:
             return False, "Kullanici bulunamadi"
         if old_password and not hmac.compare_digest(
@@ -309,17 +358,22 @@ class UserManager:
 
     def list_users(self) -> list[dict]:
         return [
-            {"username": k, "role": v.get("role", Role.VIEWER.value),
-             "created": v.get("created", 0)}
+            {
+                "username": k,
+                "role": v.get("role", Role.VIEWER.value),
+                "created": v.get("created", 0),
+            }
             for k, v in self._users.items()
         ]
 
     def get_user_role(self, username: str) -> str | None:
         return self.get_role(username)
 
+
 # ---------------------------------------------------------------------------
 # JWT Token (HMAC-SHA256, ReYMeN cookie uyumlu)
 # ---------------------------------------------------------------------------
+
 
 class TokenManager:
     """HMAC-SHA256 JWT token + refresh token."""
@@ -327,28 +381,35 @@ class TokenManager:
     def __init__(self, config: AuthConfig) -> None:
         self.config = config
 
-    def create(self, username: str, role: str = Role.VIEWER.value,
-               provider: str = "password") -> str:
+    def create(
+        self, username: str, role: str = Role.VIEWER.value, provider: str = "password"
+    ) -> str:
         """Access token olustur (kisa omurlu, cookie'de saklanir)."""
-        payload = json.dumps({
-            "user": username,
-            "role": role,
-            "provider": provider,
-            "exp": int(time.time()) + self.config.token_expiry,
-            "iat": int(time.time()),
-        }, separators=(",", ":"))
+        payload = json.dumps(
+            {
+                "user": username,
+                "role": role,
+                "provider": provider,
+                "exp": int(time.time()) + self.config.token_expiry,
+                "iat": int(time.time()),
+            },
+            separators=(",", ":"),
+        )
         b64 = self._b64_encode(payload.encode())
         sig = self._sign(b64)
         return f"{b64}.{sig}"
 
     def create_refresh(self, username: str) -> str:
         """Refresh token olustur (uzun omurlu, cookie'de saklanir)."""
-        payload = json.dumps({
-            "user": username,
-            "type": "refresh",
-            "exp": int(time.time()) + self.config.refresh_expiry,
-            "iat": int(time.time()),
-        }, separators=(",", ":"))
+        payload = json.dumps(
+            {
+                "user": username,
+                "type": "refresh",
+                "exp": int(time.time()) + self.config.refresh_expiry,
+                "iat": int(time.time()),
+            },
+            separators=(",", ":"),
+        )
         b64 = self._b64_encode(payload.encode())
         sig = self._sign(b64)
         return f"{b64}.{sig}"
@@ -409,9 +470,11 @@ class TokenManager:
     def _b64_decode(data: str) -> bytes:
         return bytes.fromhex(data)
 
+
 # ---------------------------------------------------------------------------
 # PasswordAuthProvider (ReYMeN'teki DashboardAuthProvider'in ReYMeN implementasyonu)
 # ---------------------------------------------------------------------------
+
 
 class PasswordAuthProvider(AuthProvider):
     """Kullanici adi/sifre ile giris yapan auth provider.
@@ -426,8 +489,11 @@ class PasswordAuthProvider(AuthProvider):
     name = "password"
     display_name = "Şifre ile Giriş"
 
-    def __init__(self, user_manager: UserManager | None = None,
-                 token_manager: TokenManager | None = None) -> None:
+    def __init__(
+        self,
+        user_manager: UserManager | None = None,
+        token_manager: TokenManager | None = None,
+    ) -> None:
         # Lazy import to avoid circular dependency at module level
         self._um: UserManager | None = user_manager
         self._tm: TokenManager | None = token_manager
@@ -436,6 +502,7 @@ class PasswordAuthProvider(AuthProvider):
     def um(self) -> UserManager:
         if self._um is None:
             from reymen.web_ui.auth import user_manager
+
             self._um = user_manager
         return self._um
 
@@ -443,6 +510,7 @@ class PasswordAuthProvider(AuthProvider):
     def tm(self) -> TokenManager:
         if self._tm is None:
             from reymen.web_ui.auth import token_manager
+
             self._tm = token_manager
         return self._tm
 
@@ -511,9 +579,11 @@ class PasswordAuthProvider(AuthProvider):
         """Session sonlandir. Best-effort (stateless JWT'de bir sey yapmaya gerek yok)."""
         pass
 
+
 # ---------------------------------------------------------------------------
 # Audit logging (ReYMeN'teki AuditEvent pattern)
 # ---------------------------------------------------------------------------
+
 
 class AuditEvent:
     LOGIN_SUCCESS = "login.success"
@@ -525,8 +595,16 @@ class AuditEvent:
     USER_CREATED = "user.created"
     USER_DELETED = "user.deleted"
 
-def audit_log(event: str, *, provider: str = "", user_id: str = "",
-              ip: str = "", reason: str = "", **extra) -> None:
+
+def audit_log(
+    event: str,
+    *,
+    provider: str = "",
+    user_id: str = "",
+    ip: str = "",
+    reason: str = "",
+    **extra,
+) -> None:
     """ReYMeN audit_log islevi ile ayni desen."""
     entry = {
         "event": event,
@@ -537,8 +615,15 @@ def audit_log(event: str, *, provider: str = "", user_id: str = "",
         "reason": reason,
     }
     entry.update(extra)
-    logger.info("AUTH: %s — user=%s provider=%s ip=%s reason=%s",
-                event, user_id, provider, ip, reason)
+    logger.info(
+        "AUTH: %s — user=%s provider=%s ip=%s reason=%s",
+        event,
+        user_id,
+        provider,
+        ip,
+        reason,
+    )
+
 
 # ---------------------------------------------------------------------------
 # Singleton

@@ -81,7 +81,11 @@ def test_main_applies_preloaded_skills_to_system_prompt(monkeypatch):
     monkeypatch.setattr(
         cli_mod,
         "build_preloaded_skills_prompt",
-        lambda skills, task_id=None: ("skill prompt", ["ReYMeN-agent-dev", "github-auth"], []),
+        lambda skills, task_id=None: (
+            "skill prompt",
+            ["ReYMeN-agent-dev", "github-auth"],
+            [],
+        ),
     )
 
     with pytest.raises(SystemExit):

@@ -8,6 +8,7 @@ import pytest
 
 # import yolunu ayarla
 import sys, os
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from reymen.sistem.circuit_breaker import CircuitBreaker, CircuitBreakerState

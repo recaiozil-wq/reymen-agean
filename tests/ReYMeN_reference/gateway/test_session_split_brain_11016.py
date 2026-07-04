@@ -64,16 +64,12 @@ def _make_adapter():
 
 
 def _make_event(text="hello", chat_id="12345"):
-    source = SessionSource(
-        platform=Platform.TELEGRAM, chat_id=chat_id, chat_type="dm"
-    )
+    source = SessionSource(platform=Platform.TELEGRAM, chat_id=chat_id, chat_type="dm")
     return MessageEvent(text=text, message_type=MessageType.TEXT, source=source)
 
 
 def _session_key(chat_id="12345"):
-    source = SessionSource(
-        platform=Platform.TELEGRAM, chat_id=chat_id, chat_type="dm"
-    )
+    source = SessionSource(platform=Platform.TELEGRAM, chat_id=chat_id, chat_type="dm")
     return build_session_key(source)
 
 
@@ -142,9 +138,9 @@ class TestAdapterSessionCancellation:
 
         await adapter.handle_message(_make_event(command_text))
 
-        assert processing_cancelled.is_set(), (
-            f"{command_text} did not cancel the active processing task"
-        )
+        assert (
+            processing_cancelled.is_set()
+        ), f"{command_text} did not cancel the active processing task"
         assert sk not in adapter._active_sessions
         assert sk not in adapter._pending_messages
         assert sk not in adapter._session_tasks
@@ -158,9 +154,9 @@ class TestAdapterSessionCancellation:
         await asyncio.sleep(0)
         await asyncio.sleep(0)
 
-        assert any("handled:model" in r for r in adapter.sent_responses), (
-            f"follow-up /model stayed blocked after {command_text}"
-        )
+        assert any(
+            "handled:model" in r for r in adapter.sent_responses
+        ), f"follow-up /model stayed blocked after {command_text}"
         assert sk not in adapter._pending_messages
 
     @pytest.mark.asyncio
@@ -211,10 +207,16 @@ class TestAdapterSessionCancellation:
         await asyncio.sleep(0)
         await asyncio.sleep(0)
 
-        assert sk in adapter._active_sessions, "guard must stay active while /new is still running"
-        assert sk in adapter._pending_messages, "follow-up should stay queued until /new finishes"
+        assert (
+            sk in adapter._active_sessions
+        ), "guard must stay active while /new is still running"
+        assert (
+            sk in adapter._pending_messages
+        ), "follow-up should stay queued until /new finishes"
         assert not follow_up_processed.is_set(), "follow-up ran before /new completed"
-        assert "original:cancelled" not in call_order, "old task was cancelled before runner completed /new"
+        assert (
+            "original:cancelled" not in call_order
+        ), "old task was cancelled before runner completed /new"
 
         allow_command_finish.set()
         await command_task
@@ -222,7 +224,9 @@ class TestAdapterSessionCancellation:
 
         assert any("handled:new" in r for r in adapter.sent_responses)
         assert call_order.index("command:end") < call_order.index("original:cancelled")
-        assert call_order.index("original:cancelled") < call_order.index("followup:processed")
+        assert call_order.index("original:cancelled") < call_order.index(
+            "followup:processed"
+        )
         assert sk not in adapter._pending_messages
 
 
@@ -264,9 +268,9 @@ class TestStaleSessionLockSelfHeal:
         for _ in range(5):
             await asyncio.sleep(0)
 
-        assert any("handled:text" in r for r in adapter.sent_responses), (
-            "stale lock trapped a normal message — split-brain not healed"
-        )
+        assert any(
+            "handled:text" in r for r in adapter.sent_responses
+        ), "stale lock trapped a normal message — split-brain not healed"
 
     def test_no_owner_task_is_not_treated_as_stale(self):
         """If _session_tasks has no entry at all, the guard isn't stale.

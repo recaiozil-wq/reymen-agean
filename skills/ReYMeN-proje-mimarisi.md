@@ -16,7 +16,7 @@ ReYMeN Agent ile neredeyse esitlendi (tools/ ve plugins/ kategorilerinde gecti).
 **Güncel (30 Haziran):** 92 tool, 140 CLI komut. ReYMeN CLI: 61 slash + 16 ana argparse + 25 alt komut + 14 .bat/.cmd. Hermes CLI: 127 modul (hermes_cli/) + plugin/alt komut ≈ 175 toplam.
 
 ## Proje Hedefi
-ReYMeN bir sohbet ajani degil, **uygulama otomasyonu ajani**. 
+ReYMeN bir sohbet ajani degil, **uygulama otomasyonu ajani**.
 Odak: Ekran OCR + tikla, makro kaydetme/oynatma, uygulama adim hafizasi.
 ReYMeN Agent'a alternatif degil, tamamlayici — ReYMeN'te olmayan ozelliklerde guclu.
 

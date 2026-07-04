@@ -37,14 +37,15 @@ __all__ = [
 # ── Varsayilan yapilandirma ──────────────────────────────────────────────
 
 _DEFAULT_CONFIG: dict[str, Any] = {
-    "skill_max_boyut_kb": 100,       # 100KB ustu skill uyarisi
-    "memory_max_char": 50000,        # MEMORY.md max karakter
-    "pycache_temizlik": True,        # __pycache__ temizligi
+    "skill_max_boyut_kb": 100,  # 100KB ustu skill uyarisi
+    "memory_max_char": 50000,  # MEMORY.md max karakter
+    "pycache_temizlik": True,  # __pycache__ temizligi
     "skill_frontmatter_kontrol": True,  # SKILL.md frontmatter kontrol
-    "haftalik_trend_gun": 7,         # Trend raporu kapsami
+    "haftalik_trend_gun": 7,  # Trend raporu kapsami
 }
 
 # ── Yardimcilar ──────────────────────────────────────────────────────────
+
 
 def _proje_kok() -> Path:
     """Proje kok dizinini bul."""
@@ -60,6 +61,7 @@ def _dosya_boyutu_mb(yol: Path) -> float:
 
 
 # ── 1. Skill bakimi ──────────────────────────────────────────────────────
+
 
 def _skill_kontrol(kok: Path) -> list[str]:
     """Skill dosyalarini tara, bozuk/eksik bul."""
@@ -94,6 +96,7 @@ def _skill_kontrol(kok: Path) -> list[str]:
 
 # ── 2. Hafiza budama ─────────────────────────────────────────────────────
 
+
 def _hafiza_kontrol(kok: Path) -> list[str]:
     """MEMORY.md ve USER.md boyutunu kontrol et."""
     sorunlar: list[str] = []
@@ -118,6 +121,7 @@ def _hafiza_kontrol(kok: Path) -> list[str]:
 
 # ── 3. __pycache__ temizligi ──────────────────────────────────────────────
 
+
 def _pycache_temizle(kok: Path, dry_run: bool = True) -> list[str]:
     """__pycache__ klasorlerini temizle (dry_run=True: sadece raporla)."""
     sonuc: list[str] = []
@@ -127,7 +131,9 @@ def _pycache_temizle(kok: Path, dry_run: bool = True) -> list[str]:
     for kok_dizini, alt_dizinler, dosyalar in os.walk(kok):
         kok_yol = Path(kok_dizini)
         # Erisilemeyen/exclude dizinleri atla
-        alt_dizinler[:] = [d for d in alt_dizinler if d not in EXCLUDE_DIRS and not d.startswith(".")]
+        alt_dizinler[:] = [
+            d for d in alt_dizinler if d not in EXCLUDE_DIRS and not d.startswith(".")
+        ]
         if kok_yol.name != "__pycache__":
             continue
         for f in dosyalar:
@@ -138,6 +144,7 @@ def _pycache_temizle(kok: Path, dry_run: bool = True) -> list[str]:
                 continue
         if not dry_run:
             import shutil
+
             try:
                 shutil.rmtree(kok_yol)
                 sonuc.append(f"Temizlendi: {kok_yol.relative_to(kok)}")
@@ -153,6 +160,7 @@ def _pycache_temizle(kok: Path, dry_run: bool = True) -> list[str]:
 
 
 # ── 4. Trend raporu (self-improve DB) ─────────────────────────────────────
+
 
 def _trend_rapor(kok: Path) -> dict[str, Any]:
     """Self-improve DB'sinden trend verisi al."""
@@ -188,6 +196,7 @@ def _trend_rapor(kok: Path) -> dict[str, Any]:
 
 
 # ── Ana fonksiyonlar ─────────────────────────────────────────────────────
+
 
 def curator_calistir(
     kok: str | Path | None = None,
@@ -314,6 +323,7 @@ def curator_rapor(sonuc: dict[str, Any] | None = None) -> str:
 
 # ── Motor kaydi ──────────────────────────────────────────────────────────
 
+
 def _tool_curator_calistir(**kw) -> str:
     """Curator bakimini calistir ve JSON rapor don."""
     sonuc = curator_calistir()
@@ -334,16 +344,19 @@ def _tool_curator_temizlik(**kw) -> str:
 def motor_kaydet(motor) -> None:
     """Curator araclarini motor'a kaydet."""
     motor._plugin_arac_kaydet(
-        "CURATOR_CALISTIR", _tool_curator_calistir,
-        "Curator bakimini calistir. Skill/hafiza/pycache kontrolu + trend raporu."
+        "CURATOR_CALISTIR",
+        _tool_curator_calistir,
+        "Curator bakimini calistir. Skill/hafiza/pycache kontrolu + trend raporu.",
     )
     motor._plugin_arac_kaydet(
-        "CURATOR_RAPOR", _tool_curator_rapor,
-        "Curator raporunu insan-okunur metin olarak goster."
+        "CURATOR_RAPOR",
+        _tool_curator_rapor,
+        "Curator raporunu insan-okunur metin olarak goster.",
     )
     motor._plugin_arac_kaydet(
-        "CURATOR_TEMIZLIK", _tool_curator_temizlik,
-        "Gerçek temizlik yap: __pycache__ sil."
+        "CURATOR_TEMIZLIK",
+        _tool_curator_temizlik,
+        "Gerçek temizlik yap: __pycache__ sil.",
     )
     logger.info("[CURATOR] Motor'a 3 arac kaydedildi")
 
@@ -351,6 +364,7 @@ def motor_kaydet(motor) -> None:
 if __name__ == "__main__":
     # Dogrudan calistirma
     import sys
+
     dry_run = "--temizlik" not in sys.argv
     if dry_run:
         print(curator_rapor())

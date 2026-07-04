@@ -97,7 +97,9 @@ class TestSuggestFix:
         assert any("yavaş" in s.lower() for s in suggestions)
 
     def test_suggestion_for_high_tokens(self):
-        metric = QualityMetric(success=True, errors=0, retries=0, duration=1.0, tokens_used=20_000)
+        metric = QualityMetric(
+            success=True, errors=0, retries=0, duration=1.0, tokens_used=20_000
+        )
         suggestions = suggest_fix(metric)
         assert any("token" in s.lower() for s in suggestions)
 

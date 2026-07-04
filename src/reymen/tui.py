@@ -18,6 +18,7 @@ Kullanim:
     tui = ReYMeNTUI()
     tui.baslat()
 """
+
 from __future__ import annotations
 
 import logging
@@ -34,14 +35,21 @@ try:
     from prompt_toolkit import PromptSession, Application
     from prompt_toolkit.key_binding import KeyBindings
     from prompt_toolkit.layout import (
-        Layout, HSplit, VSplit, Window, WindowAlign,
-        FormattedTextControl, FloatContainer, Float,
+        Layout,
+        HSplit,
+        VSplit,
+        Window,
+        WindowAlign,
+        FormattedTextControl,
+        FloatContainer,
+        Float,
     )
     from prompt_toolkit.styles import Style
     from prompt_toolkit.history import FileHistory
     from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
     from prompt_toolkit.completion import WordCompleter, FuzzyWordCompleter
     from prompt_toolkit.application import get_app
+
     PTK_AVAILABLE = True
 except ImportError:
     PTK_AVAILABLE = False
@@ -55,6 +63,7 @@ try:
     from rich.panel import Panel as _RichPanel
     from rich.live import Live as _RichLive
     from rich.layout import Layout as _RichLayout
+
     RICH_AVAILABLE = True
 except ImportError:
     RICH_AVAILABLE = False
@@ -62,19 +71,22 @@ except ImportError:
 
 # ── Varsayilan Stil ──────────────────────────────────────────────────────
 
-_STIL = Style.from_dict({
-    "status":      "ansigreen bold",
-    "error":       "ansired bold",
-    "warning":     "ansiyellow",
-    "info":        "ansiblue",
-    "prompt":      "ansicyan bold",
-    "title":       "white bold",
-    "konusma":     "",
-    "zaman":       "ansibrightblack",
-})
+_STIL = Style.from_dict(
+    {
+        "status": "ansigreen bold",
+        "error": "ansired bold",
+        "warning": "ansiyellow",
+        "info": "ansiblue",
+        "prompt": "ansicyan bold",
+        "title": "white bold",
+        "konusma": "",
+        "zaman": "ansibrightblack",
+    }
+)
 
 
 # ── Renkli Cikti (Rich yoksa fallback) ───────────────────────────────────
+
 
 def _stil_renk(metin: str, stil: str = "") -> str:
     """ANSI renk kodu ekle (prompt_toolkit stili)."""
@@ -84,6 +96,7 @@ def _stil_renk(metin: str, stil: str = "") -> str:
 
 
 # ── Ana TUI Sinifi ───────────────────────────────────────────────────────
+
 
 class ReYMeNTUI:
     """ReYMeN Terminal UI — prompt_toolkit tabanli etkilesimli arayuz.
@@ -113,17 +126,43 @@ class ReYMeNTUI:
 
         # Otomatik tamamlama kelimeleri
         self._komutlar = [
-            "ac", "aciklama", "ara", "baslat", "bitir", "clear", "cikis",
-            "exit", "gorsel", "gorev", "hafiza", "help", "history",
-            "ilerleme", "iptal", "kaydet", "komut", "ls", "merhaba",
-            "neredesin", "ne yapabilirsin", "oku", "prompt", "resim",
-            "selam", "sil", "sistem", "status", "test", "yardim", "yaz",
+            "ac",
+            "aciklama",
+            "ara",
+            "baslat",
+            "bitir",
+            "clear",
+            "cikis",
+            "exit",
+            "gorsel",
+            "gorev",
+            "hafiza",
+            "help",
+            "history",
+            "ilerleme",
+            "iptal",
+            "kaydet",
+            "komut",
+            "ls",
+            "merhaba",
+            "neredesin",
+            "ne yapabilirsin",
+            "oku",
+            "prompt",
+            "resim",
+            "selam",
+            "sil",
+            "sistem",
+            "status",
+            "test",
+            "yardim",
+            "yaz",
             "?",
         ]
 
         # Motor tool adlarini tamamlama listesine ekle
         if motor:
-            araclar = getattr(motor, '_araclar', {})
+            araclar = getattr(motor, "_araclar", {})
             for arac_adi in araclar:
                 if arac_adi.lower() not in self._komutlar:
                     self._komutlar.append(arac_adi.lower())
@@ -158,10 +197,12 @@ class ReYMeNTUI:
 
         # Ana layout
         self._layout = Layout(
-            HSplit([
-                konusma_pencere,
-                giris_pencere,
-            ])
+            HSplit(
+                [
+                    konusma_pencere,
+                    giris_pencere,
+                ]
+            )
         )
         return self._layout
 
@@ -265,11 +306,12 @@ class ReYMeNTUI:
 
     def _motor_cagir(self, komut: str) -> str:
         """Motor tool'unu cagir. `TOOL_ADI arg1 arg2` formati.
-        
+
         Motorun _araclar sozlugunde tool'u arar. Bulursa
         calistirir, bulamazsa conversation_loop/motor sohbete yonlendirir.
         """
         import shlex
+
         try:
             parcalar = shlex.split(komut)
         except ValueError:
@@ -279,7 +321,7 @@ class ReYMeNTUI:
         args = parcalar[1:] if len(parcalar) > 1 else []
 
         # 1) Motor tool registry'de ara
-        araclar = getattr(self.motor, '_araclar', {})
+        araclar = getattr(self.motor, "_araclar", {})
         if arac_adi in araclar:
             try:
                 tool_fn, aciklama = araclar[arac_adi]
@@ -299,6 +341,7 @@ class ReYMeNTUI:
         # 3) Conversation loop'a gonder (dogrudan import)
         try:
             from reymen.cereyan.conversation_loop import ConversationLoop as _ConvLoop
+
             _cl = _ConvLoop(motor=self.motor)
             sonuc = _cl.coz(komut)
             if sonuc:
@@ -319,6 +362,7 @@ class ReYMeNTUI:
     def _status_goster(self) -> None:
         """Sistem durumu goster."""
         import datetime
+
         calisma = time.time() - self._baslama
         saat = int(calisma // 3600)
         dk = int((calisma % 3600) // 60)
@@ -363,6 +407,7 @@ class ReYMeNTUI:
         # Session
         try:
             import os
+
             history_file = os.path.expanduser("~/.hermes/tui_history")
             self._session = PromptSession(
                 history=FileHistory(history_file),
@@ -409,6 +454,7 @@ class ReYMeNTUI:
 
 
 # ── Kolaylik Fonksiyonlari (Geriye Uyumluluk) ────────────────────────────
+
 
 def info(msg: str) -> None:
     if RICH_AVAILABLE:
@@ -477,17 +523,18 @@ def motor_kaydet(motor, beyin=None) -> None:
     _TUI_MOTOR = motor
     _TUI_BEYIN = beyin
     motor._plugin_arac_kaydet(
-        "TUI_BASLAT", _tui_baslat,
+        "TUI_BASLAT",
+        _tui_baslat,
         "Terminal UI'yi baslat. Parametre yok. "
-        "prompt_toolkit + Rich ile etkilesimli arayuz."
+        "prompt_toolkit + Rich ile etkilesimli arayuz.",
     )
     motor._plugin_arac_kaydet(
-        "TUI_MESAJ", _tui_mesaj,
-        "TUI'ya mesaj gonder. Kullanim: TUI_MESAJ mesaj_metni"
+        "TUI_MESAJ", _tui_mesaj, "TUI'ya mesaj gonder. Kullanim: TUI_MESAJ mesaj_metni"
     )
     motor._plugin_arac_kaydet(
-        "TUI_DURUM", _tui_durum,
-        "TUI durumunu goster: calisma suresi, mesaj sayisi, baglantilar"
+        "TUI_DURUM",
+        _tui_durum,
+        "TUI durumunu goster: calisma suresi, mesaj sayisi, baglantilar",
     )
     logger.info("[TUI] Motor'a 3 arac kaydedildi (BASLAT, MESAJ, DURUM)")
 
@@ -501,6 +548,7 @@ def _konusma_loop_olustur() -> Any:
         return None
     try:
         from reymen.cereyan.conversation_loop import ConversationLoop
+
         if _TUI_BEYIN is not None:
             return ConversationLoop(motor=_TUI_MOTOR, beyin=_TUI_BEYIN)
         return ConversationLoop(motor=_TUI_MOTOR)
@@ -524,10 +572,18 @@ def _tui_mesaj(**kw) -> str:
     """TUI'ya mesaj gonder (TUI calisiyorsa)."""
     global _TUI_ORNEK
     if _TUI_ORNEK is None or not _TUI_ORNEK._calisiyor:
-        mesaj = kw.get("_ham_metin", "") or kw.get("args", [""])[0] if isinstance(kw.get("args"), list) else str(kw.get("args", ""))
+        mesaj = (
+            kw.get("_ham_metin", "") or kw.get("args", [""])[0]
+            if isinstance(kw.get("args"), list)
+            else str(kw.get("args", ""))
+        )
         print(f"[TUI] {mesaj}")
         return f"[TUI] Mesaj yazdirildi: {mesaj[:60]}"
-    mesaj = kw.get("_ham_metin", "") or kw.get("args", [""])[0] if isinstance(kw.get("args"), list) else str(kw.get("args", ""))
+    mesaj = (
+        kw.get("_ham_metin", "") or kw.get("args", [""])[0]
+        if isinstance(kw.get("args"), list)
+        else str(kw.get("args", ""))
+    )
     _TUI_ORNEK.mesaj_ekle(mesaj)
     return f"[TUI] Mesaj TUI'ya gonderildi: {mesaj[:60]}"
 
@@ -549,6 +605,7 @@ def with_spinner(text: str = ""):
     if RICH_AVAILABLE:
         try:
             from rich.console import Console
+
             console = Console()
             with console.status(text, spinner="dots"):
                 yield
@@ -614,6 +671,7 @@ def progress_bar(*args, **kwargs):
 
 # ── Status Bar ──────────────────────────────────────────────────────────
 
+
 class StatusBar:
     """Canli status bar (Rich Live ile alt satirda gostergeler).
 
@@ -637,9 +695,12 @@ class StatusBar:
         from rich.console import Console
         from rich.live import Live
         from rich.text import Text
+
         self._calisiyor = True
         console = Console()
-        self._live = Live(self._metin_uret, console=console, refresh_per_second=4, transient=True)
+        self._live = Live(
+            self._metin_uret, console=console, refresh_per_second=4, transient=True
+        )
         self._live.start()
 
     def guncelle(self, mesaj: str = "", durum: str = "aktif"):
@@ -650,6 +711,7 @@ class StatusBar:
         if not RICH_AVAILABLE:
             return ""
         from rich.text import Text
+
         gecen = time.time() - self._baslama
         saat = int(gecen // 3600)
         dk = int((gecen % 3600) // 60)
@@ -657,7 +719,13 @@ class StatusBar:
         t = Text()
         t.append(f" ReYMeN TUI ", style="bold cyan")
         t.append(f"| {saat:02d}:{dk:02d}:{sn:02d} ", style="green")
-        durum_stil = "green" if self._durum == "aktif" else "yellow" if self._durum == "bekliyor" else "red"
+        durum_stil = (
+            "green"
+            if self._durum == "aktif"
+            else "yellow"
+            if self._durum == "bekliyor"
+            else "red"
+        )
         t.append(f"| {self._durum.upper()} ", style=durum_stil)
         if self._son_mesaj:
             t.append(f"| {self._son_mesaj[:40]} ", style="white")
@@ -676,6 +744,7 @@ class StatusBar:
 
 # ── Konfirmasyon Dialog ────────────────────────────────────────────────
 
+
 def confirm(mesaj: str, varsayilan: bool = False, timeout: int = 0) -> bool:
     """Kullanicidan Evet/Hayir onayi iste.
 
@@ -691,11 +760,14 @@ def confirm(mesaj: str, varsayilan: bool = False, timeout: int = 0) -> bool:
     print(f"  \033[1;33m⚠ ONAY\033[0m")
     print(f"  {mesaj}")
     if timeout > 0:
-        print(f"  [{timeout}sn icinde cevap verilmezse {'evet' if varsayilan else 'hayir'}]")
+        print(
+            f"  [{timeout}sn icinde cevap verilmezse {'evet' if varsayilan else 'hayir'}]"
+        )
     print()
 
     try:
         import threading
+
         cevap = [None]
 
         def _oku():
@@ -719,7 +791,10 @@ def confirm(mesaj: str, varsayilan: bool = False, timeout: int = 0) -> bool:
 
 # ── Progress Bar (iterable wrapper, original API) ────────────────────────
 
-def _progress_bar_iter(iterable, aciklama: str = "Isleniyor", renk: str = "cyan") -> Any:
+
+def _progress_bar_iter(
+    iterable, aciklama: str = "Isleniyor", renk: str = "cyan"
+) -> Any:
     """Rich Progress bar ile iterasyon.
 
     Kullanim:
@@ -731,6 +806,7 @@ def _progress_bar_iter(iterable, aciklama: str = "Isleniyor", renk: str = "cyan"
     if RICH_AVAILABLE:
         from rich.console import Console
         from rich.progress import Progress, BarColumn, TextColumn, TimeElapsedColumn
+
         console = Console()
         with Progress(
             TextColumn(f"[bold {renk}]{aciklama}"),
@@ -740,7 +816,9 @@ def _progress_bar_iter(iterable, aciklama: str = "Isleniyor", renk: str = "cyan"
             console=console,
             transient=True,
         ) as p:
-            task = p.add_task("", total=len(list(iterable)) if hasattr(iterable, "__len__") else None)
+            task = p.add_task(
+                "", total=len(list(iterable)) if hasattr(iterable, "__len__") else None
+            )
             for item in iterable:
                 yield item
                 p.advance(task)
@@ -749,6 +827,7 @@ def _progress_bar_iter(iterable, aciklama: str = "Isleniyor", renk: str = "cyan"
 
 
 # ── Log Viewer ──────────────────────────────────────────────────────────
+
 
 class LogViewer:
     """Son N log satirini canli gosterir.
@@ -767,7 +846,7 @@ class LogViewer:
         """Log ekle (max siniri asinca eskiyi sil)."""
         self._loglar.append(satir)
         if len(self._loglar) > self._max:
-            self._loglar = self._loglar[-self._max:]
+            self._loglar = self._loglar[-self._max :]
 
     def goster(self, son: int = 20, filtre: str | None = None) -> str:
         """Son N log satirini dondur (opsiyonel filtre ile)."""
@@ -798,7 +877,11 @@ def log_ekle(satir: str) -> None:
 def log_goster(son: int = 20, filtre: str | None = None) -> str:
     """Global log viewer'dan son N satiri goster."""
     return _LOG_VIEWER.goster(son, filtre)
-    mesaj = kw.get("_ham_metin", "") or kw.get("args", [""])[0] if isinstance(kw.get("args"), list) else str(kw.get("args", ""))
+    mesaj = (
+        kw.get("_ham_metin", "") or kw.get("args", [""])[0]
+        if isinstance(kw.get("args"), list)
+        else str(kw.get("args", ""))
+    )
     _TUI_ORNEK.mesaj_ekle(f"[SISTEM] {mesaj}")
     return f"[TUI] Mesaj iletildi: {mesaj[:60]}"
 
@@ -815,16 +898,17 @@ def _tui_durum(**kw) -> str:
         satirlar.append("  TUI: PASIF")
     if _TUI_MOTOR:
         satirlar.append(f"  Motor: {'bagli' if _TUI_MOTOR else 'bagli degil'}")
-        tool_sayisi = len(getattr(_TUI_MOTOR, '_araclar', {}))
+        tool_sayisi = len(getattr(_TUI_MOTOR, "_araclar", {}))
         satirlar.append(f"  Tool: {tool_sayisi}")
     return "\n".join(satirlar)
 
 
 # ── CLI Giris ────────────────────────────────────────────────────────────
 
+
 def main(motor: Any = None):
     """CLI'den TUI baslat.
-    
+
     Args:
         motor: Motor instance (opsiyonel). Verilirse tool ve konusma destegi eklenir.
     """

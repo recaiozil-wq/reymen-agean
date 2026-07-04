@@ -86,9 +86,9 @@ def test_executor_submit_with_copy_context_run_propagates():
         ctx = contextvars.copy_context()
         observed = ex.submit(ctx.run, read_in_worker).result(timeout=5)
 
-    assert observed == "set-in-main", (
-        f"copy_context().run(...) failed to propagate: got {observed!r}"
-    )
+    assert (
+        observed == "set-in-main"
+    ), f"copy_context().run(...) failed to propagate: got {observed!r}"
 
 
 def test_run_tool_worker_sees_parent_approval_session_key():
@@ -263,9 +263,9 @@ def test_two_concurrent_tool_batches_keep_session_keys_isolated():
     t_a.join(timeout=10)
     t_b.join(timeout=10)
 
-    assert results.get("A") == "session-A", (
-        f"Session A worker saw {results.get('A')!r}, expected 'session-A'"
-    )
-    assert results.get("B") == "session-B", (
-        f"Session B worker saw {results.get('B')!r}, expected 'session-B'"
-    )
+    assert (
+        results.get("A") == "session-A"
+    ), f"Session A worker saw {results.get('A')!r}, expected 'session-A'"
+    assert (
+        results.get("B") == "session-B"
+    ), f"Session B worker saw {results.get('B')!r}, expected 'session-B'"

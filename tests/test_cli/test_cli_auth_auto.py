@@ -1,4 +1,5 @@
 """Auto-generated tests for reymen.sistem.cli_auth."""
+
 import pytest
 from src.reymen.sistem.cli_auth import (
     get_job,

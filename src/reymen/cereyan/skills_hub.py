@@ -64,6 +64,7 @@ def hub_indir(hub_adi: str, kategori: str = "") -> str:
 
     try:
         import requests
+
         print(f"[Hub] Indiriliyor: {hub_adi}...")
         r = requests.get(hub["url"], timeout=60)
         if r.status_code != 200:

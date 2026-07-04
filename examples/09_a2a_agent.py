@@ -50,7 +50,9 @@ try:
     )
     registry.register(kart2)
     print(f"  Kayitli agent: {registry.count()}")
-    print(f"  Tool execution yetenegi olanlar: {len(registry.list(capability='tool_execution'))}")
+    print(
+        f"  Tool execution yetenegi olanlar: {len(registry.list(capability='tool_execution'))}"
+    )
 
     # ── 3. Skill Transfer ────────────────────────────────────────────────
     print("\n=== 3. Skill Transfer (Beceri Aktarimi) ===")
@@ -60,7 +62,7 @@ try:
 
     paket = stp.package_skill(
         name="web-scraper",
-        content="\"\"\"Web scraping tool using requests + BeautifulSoup.\"\"\"\nimport requests\nfrom bs4 import BeautifulSoup\n\ndef scrape(url):\n    r = requests.get(url)\n    return BeautifulSoup(r.text, 'html.parser').get_text()[:1000]",
+        content='"""Web scraping tool using requests + BeautifulSoup."""\nimport requests\nfrom bs4 import BeautifulSoup\n\ndef scrape(url):\n    r = requests.get(url)\n    return BeautifulSoup(r.text, \'html.parser\').get_text()[:1000]',
         source_agent="reymen-001",
         target_agent="asistan-alpha",
         description="Basit web kazima araci",
@@ -101,6 +103,7 @@ try:
     print(f"  Gorev: '{gorev.title}' -> {durum['status']}")
 
     import shutil
+
     shutil.rmtree(gecici_dizin, ignore_errors=True)
 
 except ImportError as e:

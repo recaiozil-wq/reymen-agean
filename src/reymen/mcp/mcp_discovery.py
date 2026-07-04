@@ -114,7 +114,7 @@ def _parse_env_match(sunucu_raw: str, anahtar_raw: str) -> tuple[str, str]:
         # group1: GITHUB_ENV_GITHUB → sunucu=GITHUB, kalan=ENV_GITHUB
         idx = sunucu_raw.index("_ENV_")
         sunucu_adi = sunucu_raw[:idx].lower()
-        env_key = sunucu_raw[idx + 5:] + "_" + anahtar_raw  # "GITHUB" + "_" + "TOKEN"
+        env_key = sunucu_raw[idx + 5 :] + "_" + anahtar_raw  # "GITHUB" + "_" + "TOKEN"
         if env_key.startswith("_"):
             env_key = env_key[1:]
         return (sunucu_adi, f"env_{env_key}")
@@ -160,18 +160,22 @@ def _env_oku() -> dict[str, dict]:
                 anahtar, _, deger = satir.partition("=")
                 anahtar = anahtar.strip()
                 deger = deger.strip().strip("\"'")
-                if (anahtar.startswith("MCP_")
-                        or anahtar.startswith("MCP_SERVER_")
-                        or anahtar.startswith("MCP_SUNUCU_")):
+                if (
+                    anahtar.startswith("MCP_")
+                    or anahtar.startswith("MCP_SERVER_")
+                    or anahtar.startswith("MCP_SUNUCU_")
+                ):
                     env_vars[anahtar] = deger
         except Exception as e:
             logger.debug(".env okuma hatası %s: %s", yol, e)
 
     # 2. OS environment'dan da oku (öncelikli)
     for anahtar, deger in os.environ.items():
-        if (anahtar.startswith("MCP_")
-                or anahtar.startswith("MCP_SERVER_")
-                or anahtar.startswith("MCP_SUNUCU_")):
+        if (
+            anahtar.startswith("MCP_")
+            or anahtar.startswith("MCP_SERVER_")
+            or anahtar.startswith("MCP_SUNUCU_")
+        ):
             env_vars[anahtar] = deger
 
     if not env_vars:
@@ -195,6 +199,7 @@ def _env_oku() -> dict[str, dict]:
 # config.yaml'dan MCP Sunucu Keşfi
 # ═══════════════════════════════════════════════════════════════════════════
 
+
 def _config_oku() -> dict[str, dict]:
     """config.yaml dosyalarından mcp_servers: bölümünü oku.
 
@@ -205,6 +210,7 @@ def _config_oku() -> dict[str, dict]:
         {sunucu_adi: {anahtar: deger}, ...}
     """
     import yaml
+
     birlesik: dict[str, dict] = {}
 
     for yol in CONFIG_YOLLARI:
@@ -240,6 +246,7 @@ def _config_oku() -> dict[str, dict]:
 # ═══════════════════════════════════════════════════════════════════════════
 # .env → mcp_manager formatına dönüşüm
 # ═══════════════════════════════════════════════════════════════════════════
+
 
 def _env_sunucuyu_cfg_cevir(sunucu_adi: str, env_ayar: dict) -> dict:
     """.env'den okunan MCP sunucu ayarlarını mcp_manager formatına çevir.
@@ -316,6 +323,7 @@ def _env_sunucuyu_cfg_cevir(sunucu_adi: str, env_ayar: dict) -> dict:
 # Ana Keşif Fonksiyonu
 # ═══════════════════════════════════════════════════════════════════════════
 
+
 def mcp_kesfet(geri_bildirim: bool = True) -> int:
     """Tüm kaynaklardan MCP sunucularını keşfet ve mcp_manager'a kaydet.
 
@@ -370,13 +378,16 @@ def mcp_kesfet(geri_bildirim: bool = True) -> int:
         yeni_sayisi += 1
         logger.debug(
             "MCP Keşif: '%s' eklendi (kaynak: %s, transport: %s)",
-            ad, cfg.get("_kaynak", "?"), cfg.get("transport", "stdio"),
+            ad,
+            cfg.get("_kaynak", "?"),
+            cfg.get("transport", "stdio"),
         )
 
     if geri_bildirim and yeni_sayisi > 0:
         logger.info(
             "MCP Keşif: %d yeni sunucu bulundu, toplam %d",
-            yeni_sayisi, len(mgr._sunucular),
+            yeni_sayisi,
+            len(mgr._sunucular),
         )
 
     return yeni_sayisi
@@ -400,13 +411,15 @@ def mcp_kesif_durumu() -> dict[str, Any]:
     sunucular = []
     for ad, baglanti in mgr._sunucular.items():
         cfg = baglanti.cfg
-        sunucular.append({
-            "ad": ad,
-            "transport": cfg.get("transport", "stdio"),
-            "kaynak": cfg.get("_kaynak", "?"),
-            "tool_sayisi": len(baglanti._tools),
-            "bagli": baglanti.baglandi,
-        })
+        sunucular.append(
+            {
+                "ad": ad,
+                "transport": cfg.get("transport", "stdio"),
+                "kaynak": cfg.get("_kaynak", "?"),
+                "tool_sayisi": len(baglanti._tools),
+                "bagli": baglanti.baglandi,
+            }
+        )
 
     return {
         "toplam": len(sunucular),
@@ -502,11 +515,11 @@ def mcp_kesif_raporu() -> str:
         "=" * 55,
     ]
     for s in durum["sunucular"]:
-                    simge = "🟢" if s["bagli"] else "🔴"
-                    satirlar.append(
-                        f"  {s['ad']} ({s['transport']}): {simge} "
-                        f"{s['tool_sayisi']} tool — kaynak: {s['kaynak']}"
-                    )
+        simge = "🟢" if s["bagli"] else "🔴"
+        satirlar.append(
+            f"  {s['ad']} ({s['transport']}): {simge} "
+            f"{s['tool_sayisi']} tool — kaynak: {s['kaynak']}"
+        )
     satirlar.append(f"\nToplam: {durum['toplam']} sunucu")
     return "\n".join(satirlar)
 
@@ -514,6 +527,7 @@ def mcp_kesif_raporu() -> str:
 # ═══════════════════════════════════════════════════════════════════════════
 # Motor Tool Kaydı
 # ═══════════════════════════════════════════════════════════════════════════
+
 
 def motor_kaydet(motor) -> None:
     """MCP_DISCOVERY aracını Motor'a kaydet.
@@ -560,7 +574,9 @@ def motor_kaydet(motor) -> None:
 # ═══════════════════════════════════════════════════════════════════════════
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+    logging.basicConfig(
+        level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
+    )
 
     print("=== MCP Otomatik Keşif Testi ===\n")
 

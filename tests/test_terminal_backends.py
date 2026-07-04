@@ -3,6 +3,7 @@
 """test_terminal_backends.py — TerminalBackend birim testleri."""
 
 import sys
+
 sys.path.insert(0, ".")
 
 import os

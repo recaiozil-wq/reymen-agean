@@ -21,6 +21,7 @@ Every ``docker exec`` here runs as the unprivileged ``ReYMeN`` user
 (via :func:`docker_exec_sh` in conftest); see the conftest module
 docstring.
 """
+
 from __future__ import annotations
 
 import subprocess
@@ -32,7 +33,9 @@ PROFILE = "test-harness-profile"
 
 
 def _sh(
-    container: str, command: str, timeout: int = 30,
+    container: str,
+    command: str,
+    timeout: int = 30,
 ) -> subprocess.CompletedProcess[str]:
     return docker_exec_sh(container, command, timeout=timeout)
 
@@ -67,12 +70,14 @@ def _svstat_wants_up(container: str) -> bool:
 
 
 def test_profile_create_then_gateway_start(
-    built_image: str, container_name: str,
+    built_image: str,
+    container_name: str,
 ) -> None:
     subprocess.run(
-        ["docker", "run", "-d", "--name", container_name, built_image,
-         "sleep", "120"],
-        check=True, capture_output=True, timeout=30,
+        ["docker", "run", "-d", "--name", container_name, built_image, "sleep", "120"],
+        check=True,
+        capture_output=True,
+        timeout=30,
     )
     time.sleep(3)
 
@@ -84,9 +89,9 @@ def test_profile_create_then_gateway_start(
     assert r.returncode == 0, "s6 service slot not created on profile create"
 
     r = _sh(container_name, f"ReYMeN -p {PROFILE} gateway start", timeout=60)
-    assert r.returncode == 0, (
-        f"gateway start failed: stderr={r.stderr!r} stdout={r.stdout!r}"
-    )
+    assert (
+        r.returncode == 0
+    ), f"gateway start failed: stderr={r.stderr!r} stdout={r.stdout!r}"
 
     # After start, s6's intent is "up" — even if the supervised gateway
     # process spin-fails (no model/auth in the test profile), the
@@ -104,20 +109,21 @@ def test_profile_create_then_gateway_start(
 
     time.sleep(2)
     assert not _svstat_wants_up(container_name), (
-        f"slot want-state still up after gateway stop: "
-        f"{_svstat(container_name)!r}"
+        f"slot want-state still up after gateway stop: " f"{_svstat(container_name)!r}"
     )
 
 
 def test_profile_delete_stops_gateway(
-    built_image: str, container_name: str,
+    built_image: str,
+    container_name: str,
 ) -> None:
     """Deleting a profile should stop its gateway and remove the s6
     service slot."""
     subprocess.run(
-        ["docker", "run", "-d", "--name", container_name, built_image,
-         "sleep", "120"],
-        check=True, capture_output=True, timeout=30,
+        ["docker", "run", "-d", "--name", container_name, built_image, "sleep", "120"],
+        check=True,
+        capture_output=True,
+        timeout=30,
     )
     time.sleep(3)
 

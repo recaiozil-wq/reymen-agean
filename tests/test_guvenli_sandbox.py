@@ -23,6 +23,7 @@ class TestGuvenliSandbox:
             _tehlikeli_mi,
             _TEHLIKELI_KALIPLAR,
         )
+
         self.guvenli_calistir = guvenli_calistir
         self.sandbox_modu_raporu = sandbox_modu_raporu
         self._tehlikeli_mi = _tehlikeli_mi
@@ -57,7 +58,9 @@ class TestGuvenliSandbox:
 
     def test_degisken_kullanimi(self):
         """Değişken tanımlama ve kullanma çalışmalı."""
-        sonuc = self.guvenli_calistir("isim = 'Dunya'\nprint(f'Merhaba {isim}')", timeout=10)
+        sonuc = self.guvenli_calistir(
+            "isim = 'Dunya'\nprint(f'Merhaba {isim}')", timeout=10
+        )
         assert "Merhaba Dunya" in sonuc
 
     def test_syntax_hatasi_yakalanir(self):
@@ -67,7 +70,9 @@ class TestGuvenliSandbox:
 
     def test_zaman_asimi_calisir(self):
         """Sonsuz döngü zaman aşımına uğramalı."""
-        sonuc = self.guvenli_calistir("import time\nwhile True: time.sleep(1)", timeout=2)
+        sonuc = self.guvenli_calistir(
+            "import time\nwhile True: time.sleep(1)", timeout=2
+        )
         assert "[Hata]" in sonuc or "zaman" in sonuc.lower()
 
     def test_kisa_timeout_calisir(self):
@@ -84,7 +89,9 @@ class TestGuvenliSandbox:
 
     def test_subprocess_engellenir(self):
         """subprocess çağrısı tehlikeli kalıp olarak engellenmeli."""
-        sonuc = self.guvenli_calistir("import subprocess\nsubprocess.run(['dir'])", timeout=5)
+        sonuc = self.guvenli_calistir(
+            "import subprocess\nsubprocess.run(['dir'])", timeout=5
+        )
         assert "[Guvenlik Reddi]" in sonuc
 
     def test_eval_engellenir(self):
@@ -114,14 +121,15 @@ class TestGuvenliSandbox:
 
     def test_requests_engellenir(self):
         """requests kullanımı engellenmeli."""
-        sonuc = self.guvenli_calistir("import requests\nrequests.get('http://x.com')", timeout=5)
+        sonuc = self.guvenli_calistir(
+            "import requests\nrequests.get('http://x.com')", timeout=5
+        )
         assert "[Guvenlik Reddi]" in sonuc
 
     def test_tehlike_kontrolu_devre_disi(self):
         """tehlike_kontrolu=False ile tehlikeli kod çalışabilmeli (mod=tempdir ile)."""
         sonuc = self.guvenli_calistir(
-            "import os\nprint('test')", timeout=5,
-            mod="tempdir", tehlike_kontrolu=False
+            "import os\nprint('test')", timeout=5, mod="tempdir", tehlike_kontrolu=False
         )
         # os.system değil sadece import os + print, çalışması yeterli
         assert "test" in sonuc or "[CIKTI]" in sonuc
@@ -153,7 +161,9 @@ class TestGuvenliSandbox:
 
     def test_mod_tempdir_her_zaman_calisir(self):
         """mod='tempdir' her zaman çalışmalı (bağımlılık yok)."""
-        sonuc = self.guvenli_calistir("print('tempdir test')", timeout=10, mod="tempdir")
+        sonuc = self.guvenli_calistir(
+            "print('tempdir test')", timeout=10, mod="tempdir"
+        )
         assert "tempdir test" in sonuc
 
     def test_mod_docker_yoksa_hata_doner(self):
@@ -163,7 +173,9 @@ class TestGuvenliSandbox:
 
     def test_mod_restricted_yoksa_hata_doner(self):
         """mod='restricted' seçilip RestrictedPython yoksa hata dönmeli."""
-        sonuc = self.guvenli_calistir("print('restricted test')", timeout=5, mod="restricted")
+        sonuc = self.guvenli_calistir(
+            "print('restricted test')", timeout=5, mod="restricted"
+        )
         assert "RestrictedPython" in sonuc or "[CIKTI]" in sonuc
 
     # ── sandbox_modu_raporu ──────────────────────────────────────────────
@@ -189,24 +201,21 @@ class TestGuvenliSandbox:
     def test_fonksiyon_tanimlama(self):
         """Fonksiyon tanımlayıp çağırma çalışmalı."""
         sonuc = self.guvenli_calistir(
-            "def topla(a, b):\n    return a + b\nprint(topla(3, 5))",
-            timeout=10
+            "def topla(a, b):\n    return a + b\nprint(topla(3, 5))", timeout=10
         )
         assert "8" in sonuc
 
     def test_liste_ve_dongu(self):
         """Liste ve döngü çalışmalı."""
         sonuc = self.guvenli_calistir(
-            "toplam = sum(range(10))\nprint(toplam)",
-            timeout=10
+            "toplam = sum(range(10))\nprint(toplam)", timeout=10
         )
         assert "45" in sonuc
 
     def test_dict_kullanimi(self):
         """Sözlük kullanımı çalışmalı."""
         sonuc = self.guvenli_calistir(
-            "d = {'a': 1, 'b': 2}\nprint(d['a'] + d['b'])",
-            timeout=10
+            "d = {'a': 1, 'b': 2}\nprint(d['a'] + d['b'])", timeout=10
         )
         assert "3" in sonuc
 

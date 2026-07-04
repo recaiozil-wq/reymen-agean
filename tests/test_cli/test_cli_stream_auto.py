@@ -1,4 +1,5 @@
 """Auto-generated tests for reymen.sistem.cli_stream."""
+
 import pytest
 from src.reymen.sistem.cli_stream import (
     _termux_example_image_path,

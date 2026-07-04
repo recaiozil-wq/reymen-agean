@@ -51,7 +51,7 @@ def _gecerlilik_kontrol(gecerlilik_tarihi: str, tool_adi: str = None) -> str:
     - Tool versiyonu degismisse uyar
     """
     bugun = date.today()
-    
+
     # Tarih kontrolu
     if gecerlilik_tarihi:
         try:
@@ -61,28 +61,33 @@ def _gecerlilik_kontrol(gecerlilik_tarihi: str, tool_adi: str = None) -> str:
                 return f"T4: {gun_fark} gun gecikmis - web'de tazele"
         except (ValueError, TypeError, OSError):
             logger.warning("[fix_01_sessiz_except] Exception")
-    
+
     # Versiyon kontrolu
     if tool_adi and tool_adi.lower() in BILINEN_VERSIYONLAR:
         try:
             conn = sqlite3.connect(str(DB_YOLU))
             c = conn.cursor()
-            c.execute("""
-                SELECT icerik FROM ogrenmeler 
+            c.execute(
+                """
+                SELECT icerik FROM ogrenmeler
                 WHERE hedef = ? ORDER BY olusturulma DESC LIMIT 1
-            """, (f"{tool_adi}_versiyon",))
+            """,
+                (f"{tool_adi}_versiyon",),
+            )
             row = c.fetchone()
             conn.close()
-            
+
             if row:
                 kayitli_versiyon = row[0].strip()
                 guncel_versiyon = BILINEN_VERSIYONLAR[tool_adi.lower()]
                 if kayitli_versiyon != guncel_versiyon:
-                    return (f"T4: {tool_adi} versiyon degismis "
-                            f"({kayitli_versiyon} -> {guncel_versiyon})")
+                    return (
+                        f"T4: {tool_adi} versiyon degismis "
+                        f"({kayitli_versiyon} -> {guncel_versiyon})"
+                    )
         except (sqlite3.Error, ValueError, TypeError, OSError):
             logger.warning("[fix_01_sessiz_except] Exception")
-    
+
     return ""
 
 

@@ -39,7 +39,11 @@ async def _sesleri_getir() -> list[dict[str, str]]:
     if _SES_LISTESI is None:
         sesler = await edge_tts.list_voices()
         _SES_LISTESI = [
-            {"ad": s["ShortName"], "dil": s.get("Locale", ""), "isim": s.get("FriendlyName", "")}
+            {
+                "ad": s["ShortName"],
+                "dil": s.get("Locale", ""),
+                "isim": s.get("FriendlyName", ""),
+            }
             for s in sesler
         ]
     return _SES_LISTESI
@@ -75,17 +79,26 @@ async def _metni_sese_cevir_async(
         cikti = SES_ORNEKLEM / f"ses_{zaman}.mp3"
 
     try:
-        ses_noktali = ses.replace("-", "+", 1) if "-" in ses and ses.count("-") > 1 else ses
+        ses_noktali = (
+            ses.replace("-", "+", 1) if "-" in ses and ses.count("-") > 1 else ses
+        )
         iletisim = edge_tts.Communicate(
             text=metin,
             voice=ses,
             rate=hiz,
-            volume=f"+{int(ses_volumu * 100)}%" if ses_volumu > 0 else f"-{int(abs(ses_volumu - 1) * 100)}%",
+            volume=f"+{int(ses_volumu * 100)}%"
+            if ses_volumu > 0
+            else f"-{int(abs(ses_volumu - 1) * 100)}%",
         )
         await iletisim.save(str(cikti))
 
         if cikti.exists() and cikti.stat().st_size > 0:
-            logger.info("[TTS] Ses olusturuldu: %s (%d bytes, ses=%s)", cikti, cikti.stat().st_size, ses)
+            logger.info(
+                "[TTS] Ses olusturuldu: %s (%d bytes, ses=%s)",
+                cikti,
+                cikti.stat().st_size,
+                ses,
+            )
             return str(cikti)
         return "[HATA] Ses dosyasi olusturulamadi."
 
@@ -133,10 +146,13 @@ def ses_listesi(dil_filtre: str = "") -> str:
     satirlar = ["=== Kullanilabilir Sesler ==="]
     for s in sesler:
         satirlar.append(f"  {s['ad']} ({s['dil']})")
-    return "\n".join(satirlar[:30]) + (f"\n  ... +{len(sesler)-30} ses daha" if len(sesler) > 30 else "")
+    return "\n".join(satirlar[:30]) + (
+        f"\n  ... +{len(sesler)-30} ses daha" if len(sesler) > 30 else ""
+    )
 
 
 # ── Motor kayit ──────────────────────────────────────────────────────────────
+
 
 def motor_kaydet(motor: Any) -> None:
     """Motor'a TTS araclarini kaydet."""
@@ -168,16 +184,25 @@ def motor_kaydet(motor: Any) -> None:
         return f"✅ TTS test basarili: {sonuc}"
 
     if hasattr(motor, "_plugin_arac_kaydet"):
-        motor._plugin_arac_kaydet("TTS_KONUS", _tts_konus,
+        motor._plugin_arac_kaydet(
+            "TTS_KONUS",
+            _tts_konus,
             "Metni sese cevirir (edge-tts). "
             "Parametreler: metin (str, zorunlu) — seslendirilecek metin; "
             "ses (str, opsiyonel) — ses adi (varsayilan: tr-TR-EmelNeural). "
-            "Doner: ses dosyasi yolu.")
-        motor._plugin_arac_kaydet("TTS_SESLER", _tts_sesler,
+            "Doner: ses dosyasi yolu.",
+        )
+        motor._plugin_arac_kaydet(
+            "TTS_SESLER",
+            _tts_sesler,
             "Kullanilabilir sesleri listeler. "
-            "Parametre: dil (str, opsiyonel) — dil kodu filtresi (ornek: 'tr', 'en').")
-        motor._plugin_arac_kaydet("TTS_TEST", _tts_test,
-            "TTS sistemini test eder. Kisa bir test sesi olusturur.")
+            "Parametre: dil (str, opsiyonel) — dil kodu filtresi (ornek: 'tr', 'en').",
+        )
+        motor._plugin_arac_kaydet(
+            "TTS_TEST",
+            _tts_test,
+            "TTS sistemini test eder. Kisa bir test sesi olusturur.",
+        )
 
         logger.info("[TTS] Motor araclari kaydedildi: TTS_KONUS, TTS_SESLER, TTS_TEST")
 

@@ -50,6 +50,7 @@ ACIKLAMA: [tek cumle]
 
 # ── Sinif ─────────────────────────────────────────────────────────────────────
 
+
 class OzTutarlilikDenetci:
     """N bagimsiz cevap uretip en iyisini secen Self-Consistency + Judge sinifi."""
 
@@ -144,8 +145,10 @@ class OzTutarlilikDenetci:
         for i, a in enumerate(adaylar):
             tok_a = set(a.lower().split())
             skor = sum(
-                len(tok_a & set(adaylar[j].lower().split())) / max(len(tok_a | set(adaylar[j].lower().split())), 1)
-                for j in range(len(adaylar)) if j != i
+                len(tok_a & set(adaylar[j].lower().split()))
+                / max(len(tok_a | set(adaylar[j].lower().split())), 1)
+                for j in range(len(adaylar))
+                if j != i
             )
             skorlar.append((skor, i))
 
@@ -192,8 +195,7 @@ class OzTutarlilikDenetci:
         self._judge_cagrisi += 1
 
         numarali = "\n\n".join(
-            f"=== CEVAP {i+1} ===\n{a[:400]}"
-            for i, a in enumerate(adaylar)
+            f"=== CEVAP {i+1} ===\n{a[:400]}" for i, a in enumerate(adaylar)
         )
         kullanici = f"Hedef: {hedef}\n\n{numarali}"
 

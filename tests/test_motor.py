@@ -13,6 +13,7 @@ import pytest
 
 # ── Yardimci: Motor ornegi olustur (init'teki plugin yuklemeyi atla) ─────────
 
+
 @pytest.fixture
 def motor_instance():
     """Motor ornegi olustur, _plugin_moduller_yukle'yi devre disi birak.
@@ -22,11 +23,13 @@ def motor_instance():
     """
     with patch("reymen.cereyan.motor.Motor._plugin_moduller_yukle", return_value=None):
         from reymen.cereyan.motor import Motor
+
         motor = Motor()
         return motor
 
 
 # ── _plugin_arac_kaydet Testleri ─────────────────────────────────────────────
+
 
 class TestPluginAracKaydet:
     """Motor._plugin_arac_kaydet() — arac kaydetme mekanizmasi."""
@@ -36,6 +39,7 @@ class TestPluginAracKaydet:
         with patch("reymen.cereyan.motor._REGISTRY", None):
             with patch("reymen.cereyan.motor.Motor._plugin_moduller_yukle"):
                 from reymen.cereyan.motor import Motor
+
                 motor = Motor()
                 motor._plugin_arac_kaydet("TEST_ARAC", lambda: "test", "Test araci")
 
@@ -52,6 +56,7 @@ class TestPluginAracKaydet:
             p.start()
         try:
             from reymen.cereyan.motor import Motor
+
             motor = Motor()
             fonk = lambda: "sonuc"
             motor._plugin_arac_kaydet("TEST", fonk)
@@ -73,6 +78,7 @@ class TestPluginAracKaydet:
             p.start()
         try:
             from reymen.cereyan.motor import Motor
+
             motor = Motor()
             motor._plugin_arac_kaydet("ARAC_A", lambda: "1")
             motor._plugin_arac_kaydet("ARAC_B", lambda: "2")
@@ -84,26 +90,33 @@ class TestPluginAracKaydet:
 
 # ── calistir_fc Testleri ─────────────────────────────────────────────────────
 
+
 class TestCalistirFC:
     """Motor.calistir_fc() — FC args dict'ini calistir()'a kopruler."""
 
     def test_calistir_fc_bos_args(self, motor_instance):
         """calistir_fc() args=None ise calistir'a bos string gitmeli."""
-        with patch.object(motor_instance, "calistir", return_value="OK") as mock_calistir:
+        with patch.object(
+            motor_instance, "calistir", return_value="OK"
+        ) as mock_calistir:
             sonuc = motor_instance.calistir_fc("TEST", {})
             mock_calistir.assert_called_once_with("TEST", "")
             assert sonuc == "OK"
 
     def test_calistir_fc_tek_param(self, motor_instance):
         """Tek parametreli args dogru formata donusuyor mu?"""
-        with patch.object(motor_instance, "calistir", return_value="OK") as mock_calistir:
+        with patch.object(
+            motor_instance, "calistir", return_value="OK"
+        ) as mock_calistir:
             motor_instance.calistir_fc("TEST", {"dosya": "test.py"})
             args_str = mock_calistir.call_args[0][1]
             assert "test.py" in args_str
 
     def test_calistir_fc_coklu_param(self, motor_instance):
         """Coklu parametreli args sıralı string'e donusuyor mu?"""
-        with patch.object(motor_instance, "calistir", return_value="OK") as mock_calistir:
+        with patch.object(
+            motor_instance, "calistir", return_value="OK"
+        ) as mock_calistir:
             motor_instance.calistir_fc("TEST", {"x": "1", "y": "2"})
             args_str = mock_calistir.call_args[0][1]
             assert "1" in args_str
@@ -111,13 +124,16 @@ class TestCalistirFC:
 
     def test_calistir_fc_ozel_karakter_escape(self, motor_instance):
         """Ozel karakterler (tirnak, ters slash) escape ediliyor mu?"""
-        with patch.object(motor_instance, "calistir", return_value="OK") as mock_calistir:
+        with patch.object(
+            motor_instance, "calistir", return_value="OK"
+        ) as mock_calistir:
             motor_instance.calistir_fc("TEST", {"metin": 'deger"icinde"tirnak'})
             args_str = mock_calistir.call_args[0][1]
             assert '\\"' in args_str
 
 
 # ── Motor Baslatma Testleri ──────────────────────────────────────────────────
+
 
 class TestMotorBaslatma:
     """Motor() kurulumu — try/except importlar mock'lanmis."""
@@ -141,6 +157,7 @@ class TestMotorBaslatma:
             p.start()
         try:
             from reymen.cereyan.motor import Motor
+
             motor = Motor()
             assert motor.terminal is None
             assert motor.hafiza is None
@@ -152,12 +169,14 @@ class TestMotorBaslatma:
         """Motor(config) parametresi dogru saklaniyor mu?"""
         with patch("reymen.cereyan.motor.Motor._plugin_moduller_yukle"):
             from reymen.cereyan.motor import Motor
+
             test_config = {"test_key": "test_val"}
             motor = Motor(config=test_config)
             assert motor.config["test_key"] == "test_val"
 
 
 # ── Motor Durum / Yardimci Testleri ─────────────────────────────────────────
+
 
 class TestMotorYardimci:
     """Motor yardimci metodlari ve durum."""

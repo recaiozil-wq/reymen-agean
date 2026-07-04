@@ -23,6 +23,7 @@ import pytest
 # ── Proje kökü ├───────────────────────────────────────────────────────────
 PROJE_KOK = Path(__file__).resolve().parent.parent
 import sys
+
 if str(PROJE_KOK) not in sys.path:
     sys.path.insert(0, str(PROJE_KOK))
 
@@ -30,6 +31,7 @@ if str(PROJE_KOK) not in sys.path:
 # ════════════════════════════════════════════════════════════════════════════
 # BÖLÜM 1 — AdvancedSessionStorage (session_db.py)
 # ════════════════════════════════════════════════════════════════════════════
+
 
 @pytest.fixture
 def in_memory_db():
@@ -41,7 +43,7 @@ def in_memory_db():
       - session_tool_calls
       - ajan_gunlugu (FTS5)
       - session_messages_fts (FTS5 content-sync)
-    
+
     WAL + foreign_keys + row_factory aktif.
     """
     conn = sqlite3.connect(":memory:")
@@ -81,9 +83,7 @@ def in_memory_db():
             FOREIGN KEY (parent_session_id) REFERENCES sessions(id)
         )
     """)
-    conn.execute(
-        "CREATE INDEX IF NOT EXISTS idx_sessions_source ON sessions(source)"
-    )
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_sessions_source ON sessions(source)")
     conn.execute(
         "CREATE INDEX IF NOT EXISTS idx_sessions_parent ON sessions(parent_session_id)"
     )
@@ -171,14 +171,15 @@ def ass_storage(in_memory_db):
         """_baglan override: in-memory DB döndür, close() pas geçer."""
         return no_close
 
-    with patch.object(AdvancedSessionStorage, '_baglan', mock_baglan):
+    with patch.object(AdvancedSessionStorage, "_baglan", mock_baglan):
         # _kur'u bypass et (tablolar zaten fixture'da kurulu)
-        with patch.object(AdvancedSessionStorage, '_kur', lambda self: None):
+        with patch.object(AdvancedSessionStorage, "_kur", lambda self: None):
             storage = AdvancedSessionStorage(":memory:")
             yield storage
 
 
 # ── Testler ────────────────────────────────────────────────────────────────
+
 
 class TestSessionDB:
     """AdvancedSessionStorage: session yönetimi, mesaj kaydı, arama, temizlik."""
@@ -339,7 +340,9 @@ class TestSessionDB:
         """session_search → FTS ile session bulma."""
         sid = ass_storage.session_baslat(source="test", title="Python Eğitimi")
         ass_storage.mesaj_ekle(sid, "user", "Python decorator nedir?")
-        ass_storage.mesaj_ekle(sid, "assistant", "Decorator bir fonksiyon sarmalayıcıdır.")
+        ass_storage.mesaj_ekle(
+            sid, "assistant", "Decorator bir fonksiyon sarmalayıcıdır."
+        )
 
         sonuclar = ass_storage.session_search("decorator")
         assert len(sonuclar) >= 1
@@ -460,6 +463,7 @@ class TestSessionDB:
 # BÖLÜM 2 — GelismisHafiza (hafiza_genislet.py) — SQLite+FTS5
 # ════════════════════════════════════════════════════════════════════════════
 
+
 @pytest.fixture
 def gelismis_hafiza():
     """GelismisHafiza örneği — :memory: DB ile, _baglan + _tablolari_olustur mock'lu."""
@@ -510,9 +514,13 @@ def gelismis_hafiza():
         )
     """)
     conn.execute("CREATE INDEX IF NOT EXISTS idx_kayit_session ON kayitlar(session_id)")
-    conn.execute("CREATE INDEX IF NOT EXISTS idx_kayit_koleksiyon ON kayitlar(koleksiyon)")
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_kayit_koleksiyon ON kayitlar(koleksiyon)"
+    )
     conn.execute("CREATE INDEX IF NOT EXISTS idx_kayit_zaman ON kayitlar(zaman)")
-    conn.execute("CREATE INDEX IF NOT EXISTS idx_kayit_expire ON kayitlar(expire_zaman)")
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_kayit_expire ON kayitlar(expire_zaman)"
+    )
 
     # FTS5 content-sync trigger'ları
     conn.execute("""
@@ -559,7 +567,9 @@ class TestGelismisHafiza:
 
         # Doğrudan sqlite ile doğrula
         c = gh._conn.cursor()
-        row = c.execute("SELECT id, baslik FROM sessions WHERE id=?", ("session_test_1",)).fetchone()
+        row = c.execute(
+            "SELECT id, baslik FROM sessions WHERE id=?", ("session_test_1",)
+        ).fetchone()
         assert row["id"] == "session_test_1"
         assert row["baslik"] == "Test Session"
 
@@ -572,7 +582,9 @@ class TestGelismisHafiza:
         gh.session_bitir(ozet="2 mesajlı test")
 
         c = gh._conn.cursor()
-        row = c.execute("SELECT bitis, mesaj_sayisi, ozet FROM sessions WHERE id='s1'").fetchone()
+        row = c.execute(
+            "SELECT bitis, mesaj_sayisi, ozet FROM sessions WHERE id='s1'"
+        ).fetchone()
         assert row["bitis"] > 0
         assert row["mesaj_sayisi"] == 2
         assert "2 mesaj" in row["ozet"]
@@ -594,7 +606,8 @@ class TestGelismisHafiza:
         gh = gelismis_hafiza
         gh.initialize("s1")
         gh.kaydet(
-            "test içerik", "notlar",
+            "test içerik",
+            "notlar",
             anahtar="test",
             metadata={"onem": "yüksek", "kaynak": "web"},
         )
@@ -691,6 +704,7 @@ class TestGelismisHafiza:
 # BÖLÜM 3 — AltAjanHafiza (hafiza.py) — JSON dosya tabanlı
 # ════════════════════════════════════════════════════════════════════════════
 
+
 @pytest.fixture
 def alt_ajan_hafiza(tmp_path):
     """AltAjanHafiza örneği — temp dizin ile."""
@@ -714,6 +728,7 @@ class TestAltAjanHafiza:
     def test_kaydet_ve_yukle(self, tmp_path):
         """Kayıt ve yükleme."""
         from reymen.hafiza.hafiza import AltAjanHafiza
+
         with patch("reymen.hafiza.hafiza.HAFIZA_DIZINI", tmp_path / ".alt_ajan_hafiza"):
             hafiza = AltAjanHafiza()
 
@@ -729,6 +744,7 @@ class TestAltAjanHafiza:
     def test_son_kayit(self, tmp_path):
         """Son kaydı döndürür."""
         from reymen.hafiza.hafiza import AltAjanHafiza
+
         with patch("reymen.hafiza.hafiza.HAFIZA_DIZINI", tmp_path / ".alt_ajan_hafiza"):
             hafiza = AltAjanHafiza()
             hafiza.kaydet("t1", "adim", {"no": 1})
@@ -742,6 +758,7 @@ class TestAltAjanHafiza:
     def test_task_listele(self, tmp_path):
         """Task'ları listeleme."""
         from reymen.hafiza.hafiza import AltAjanHafiza
+
         with patch("reymen.hafiza.hafiza.HAFIZA_DIZINI", tmp_path / ".alt_ajan_hafiza"):
             hafiza = AltAjanHafiza()
 
@@ -757,6 +774,7 @@ class TestAltAjanHafiza:
     def test_temizle(self, tmp_path):
         """Task silme."""
         from reymen.hafiza.hafiza import AltAjanHafiza
+
         with patch("reymen.hafiza.hafiza.HAFIZA_DIZINI", tmp_path / ".alt_ajan_hafiza"):
             hafiza = AltAjanHafiza()
             hafiza.kaydet("silinecek", "adim", {"x": 1})
@@ -768,6 +786,7 @@ class TestAltAjanHafiza:
     def test_temizle_hepsi(self, tmp_path):
         """Tümünü temizleme."""
         from reymen.hafiza.hafiza import AltAjanHafiza
+
         with patch("reymen.hafiza.hafiza.HAFIZA_DIZINI", tmp_path / ".alt_ajan_hafiza"):
             hafiza = AltAjanHafiza()
             hafiza.kaydet("t1", "adim", {})
@@ -780,6 +799,7 @@ class TestAltAjanHafiza:
     def test_olmayan_task_none(self, tmp_path):
         """Olmayan task → None döner."""
         from reymen.hafiza.hafiza import AltAjanHafiza
+
         with patch("reymen.hafiza.hafiza.HAFIZA_DIZINI", tmp_path / ".alt_ajan_hafiza"):
             hafiza = AltAjanHafiza()
             assert hafiza.yukle("yok") is None
@@ -788,6 +808,7 @@ class TestAltAjanHafiza:
     def test_bos_listele(self, tmp_path):
         """Boş hafıza → boş liste."""
         from reymen.hafiza.hafiza import AltAjanHafiza
+
         with patch("reymen.hafiza.hafiza.HAFIZA_DIZINI", tmp_path / ".alt_ajan_hafiza"):
             hafiza = AltAjanHafiza()
             assert hafiza.task_listele() == []
@@ -797,23 +818,27 @@ class TestAltAjanHafiza:
 # BÖLÜM 4 — Context Compression (arama_sirala + mesaj_ara tarih aralığı)
 # ════════════════════════════════════════════════════════════════════════════
 
+
 class TestTarihAraligi:
     """_tarih_araligi_coz: tarih format çözümleyici."""
 
     def test_none_donar(self):
         """None → (None, None)."""
         from reymen.hafiza.session_db import AdvancedSessionStorage
+
         sonuc = AdvancedSessionStorage._tarih_araligi_coz(None)
         assert sonuc == (None, None)
 
     def test_bos_string(self):
         """Boş string → (None, None)."""
         from reymen.hafiza.session_db import AdvancedSessionStorage
+
         assert AdvancedSessionStorage._tarih_araligi_coz("") == (None, None)
 
     def test_7g(self):
         """'7g' → son 7 gün."""
         from reymen.hafiza.session_db import AdvancedSessionStorage
+
         bas, bit = AdvancedSessionStorage._tarih_araligi_coz("7g")
         assert bas is not None
         assert bit is not None
@@ -823,6 +848,7 @@ class TestTarihAraligi:
     def test_24s(self):
         """'24s' → son 24 saat."""
         from reymen.hafiza.session_db import AdvancedSessionStorage
+
         bas, bit = AdvancedSessionStorage._tarih_araligi_coz("24s")
         assert bas is not None
         fark = bit - bas
@@ -831,16 +857,19 @@ class TestTarihAraligi:
     def test_bugun(self):
         """'bugun' → bugün başından şimdiye."""
         from reymen.hafiza.session_db import AdvancedSessionStorage
+
         bas, bit = AdvancedSessionStorage._tarih_araligi_coz("bugun")
         assert bas is not None
         assert bit is not None
         import datetime as _dt
+
         gun_basi = _dt.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
         assert abs(bas - gun_basi.timestamp()) < 5
 
     def test_yyyy_mm_dd(self):
         """'2026-06-01..2026-06-30' aralığı."""
         from reymen.hafiza.session_db import AdvancedSessionStorage
+
         bas, bit = AdvancedSessionStorage._tarih_araligi_coz("2026-06-01..2026-06-30")
         assert bas is not None
         assert bit is not None
@@ -851,6 +880,7 @@ class TestTarihAraligi:
     def test_tuple_ver(self):
         """Direkt tuple → aynen döner."""
         from reymen.hafiza.session_db import AdvancedSessionStorage
+
         bas, bit = AdvancedSessionStorage._tarih_araligi_coz((100.0, 200.0))
         assert bas == 100.0
         assert bit == 200.0
@@ -860,6 +890,7 @@ class TestTarihAraligi:
 # BÖLÜM 5 — Vektörel Hafıza (vektorel_hafiza.py) — Embedding mock'lu
 # ════════════════════════════════════════════════════════════════════════════
 
+
 class TestVektorelHafizaYedek:
     """_BasitYedek: ChromaDB yokken TF-IDF benzeri yedek bellek."""
 
@@ -867,6 +898,7 @@ class TestVektorelHafizaYedek:
     def _setup(self):
         """Her test için taze yedek."""
         from reymen.hafiza.vektorel_hafiza import _BasitYedek
+
         self.yedek = _BasitYedek()
 
     def test_add_ve_query(self):
@@ -929,6 +961,7 @@ class TestVektorelHafizaYedek:
         """_counter_cosine 0-1 arası döner."""
         from reymen.hafiza.vektorel_hafiza import _BasitYedek
         from collections import Counter
+
         skor = _BasitYedek._counter_cosine(
             Counter("merhaba dünya".split()),
             Counter("merhaba dünya".split()),
@@ -944,6 +977,7 @@ class TestVektorelHafizaYedek:
     def test_chroma_yoksa_yedek_kullan(self, tmp_path):
         """ChromaDB yoksa yedek oluşur."""
         from reymen.hafiza.vektorel_hafiza import vektorel_hafiza_sistemini_kur
+
         with patch("reymen.hafiza.vektorel_hafiza.CHROMA_AVAILABLE", False):
             sistem = vektorel_hafiza_sistemini_kur(str(tmp_path / "vektor"))
             assert sistem is not None
@@ -953,6 +987,7 @@ class TestVektorelHafizaYedek:
 # ════════════════════════════════════════════════════════════════════════════
 # BÖLÜM 6 — GorevHafiza (gorev_hafiza.py) — Görev sonrası kayıt
 # ════════════════════════════════════════════════════════════════════════════
+
 
 class TestGorevHafiza:
     """gorev_sonrasi_hafiza: görev tamamlama → hafızaya kayıt."""
@@ -964,11 +999,18 @@ class TestGorevHafiza:
         # _hafizaya_kaydet'i mock'la (gerçek DB kurulumu olmadan)
         with patch.object(gorev_hafiza, "_HAFIZA_AKTIF", False):
             with patch.object(gorev_hafiza, "_hafiza", None):
-                with patch.object(gorev_hafiza, "REYMEN_MEMORIES", tmp_path / ".ReYMeN" / "memories"):
+                with patch.object(
+                    gorev_hafiza, "REYMEN_MEMORIES", tmp_path / ".ReYMeN" / "memories"
+                ):
                     sonuc = gorev_hafiza.gorev_sonrasi_hafiza(
                         task_id="test_task_1",
                         hedef="Kullanıcıya merhaba de",
-                        sonuc={"basarili": True, "turlar": 2, "sure": 1.5, "yanit": "Merhaba!"},
+                        sonuc={
+                            "basarili": True,
+                            "turlar": 2,
+                            "sure": 1.5,
+                            "yanit": "Merhaba!",
+                        },
                     )
                     assert sonuc["task_id"] == "test_task_1"
                     assert sonuc["hafiza"]["durum"] == "pasif"  # _HAFIZA_AKTIF=False
@@ -980,7 +1022,9 @@ class TestGorevHafiza:
 
         with patch.object(gorev_hafiza, "_HAFIZA_AKTIF", False):
             with patch.object(gorev_hafiza, "_hafiza", None):
-                with patch.object(gorev_hafiza, "REYMEN_MEMORIES", tmp_path / ".ReYMeN" / "memories"):
+                with patch.object(
+                    gorev_hafiza, "REYMEN_MEMORIES", tmp_path / ".ReYMeN" / "memories"
+                ):
                     sonuc = gorev_hafiza.gorev_sonrasi_hafiza(
                         task_id="test_hata",
                         hedef="başarısız görev",
@@ -998,12 +1042,15 @@ class TestGorevHafiza:
     def test_ozet_olustur_basarili(self):
         """Başarılı görev özeti."""
         from reymen.hafiza.gorev_hafiza import _ozet_olustur
-        ozet = _ozet_olustur({
-            "basarili": True,
-            "sure_sn": 2.5,
-            "tur_sayisi": 3,
-            "hedef": "test görev",
-        })
+
+        ozet = _ozet_olustur(
+            {
+                "basarili": True,
+                "sure_sn": 2.5,
+                "tur_sayisi": 3,
+                "hedef": "test görev",
+            }
+        )
         assert "Başarılı" in ozet
         assert "test görev" in ozet
         assert "2.5" in ozet
@@ -1011,19 +1058,23 @@ class TestGorevHafiza:
     def test_ozet_olustur_hata(self):
         """Hatalı görev özeti."""
         from reymen.hafiza.gorev_hafiza import _ozet_olustur
-        ozet = _ozet_olustur({
-            "basarili": False,
-            "sure_sn": 1.0,
-            "tur_sayisi": 1,
-            "hedef": "başarısız",
-            "hata": "Timeout hatası",
-        })
+
+        ozet = _ozet_olustur(
+            {
+                "basarili": False,
+                "sure_sn": 1.0,
+                "tur_sayisi": 1,
+                "hedef": "başarısız",
+                "hata": "Timeout hatası",
+            }
+        )
         assert "Hata" in ozet
         assert "Timeout" in ozet
 
     def test_guven_skoru_hesapla(self):
         """Güven skoru hesaplama."""
         from reymen.hafiza.gorev_hafiza import _guven_skoru_hesapla
+
         assert _guven_skoru_hesapla(3, 1) == 0.75
         assert _guven_skoru_hesapla(0, 0) == 0.5
         assert _guven_skoru_hesapla(10, 0) == 1.0
@@ -1032,6 +1083,7 @@ class TestGorevHafiza:
         """6 aylık varsayılan geçerlilik."""
         from reymen.hafiza.gorev_hafiza import _varsayilan_gecerlilik
         from datetime import datetime, timedelta
+
         tarih = _varsayilan_gecerlilik()
         assert len(tarih) == 10  # YYYY-MM-DD
         # ~180 gün sonrası
@@ -1050,11 +1102,12 @@ class TestGorevHafiza:
         kayit2 = {"ozet": "benzersiz içerik 12345"}  # aynı
 
         assert _dedup_kontrol(kayit1, tur="icerik") is False  # ilk kez
-        assert _dedup_kontrol(kayit2, tur="icerik") is True   # dedup
+        assert _dedup_kontrol(kayit2, tur="icerik") is True  # dedup
 
     def test_guncelle_son_kullanim(self):
         """Son kullanım güncelleme (hafiza pasifken sessiz atlar)."""
         from reymen.hafiza.gorev_hafiza import guncelle_son_kullanim
+
         # _HAFIZA_AKTIF=False → sessizce atlar, hata fırlatmaz
         guncelle_son_kullanim(1, kategori="test", basarili_mi=True)
 
@@ -1062,6 +1115,7 @@ class TestGorevHafiza:
 # ════════════════════════════════════════════════════════════════════════════
 # BÖLÜM 7 — Entegrasyon: Memory katmanı akış testi
 # ════════════════════════════════════════════════════════════════════════════
+
 
 class TestMemoryEntegrasyon:
     """SessionMemory → gorev_hafiza akışı (uçtan uca)."""
@@ -1073,7 +1127,8 @@ class TestMemoryEntegrasyon:
         """
         # 1. Session oluştur
         sid = ass_storage.session_baslat(
-            source="cli", model="deepseek",
+            source="cli",
+            model="deepseek",
             user_id="test_user",
             title="Test Konuşması",
         )

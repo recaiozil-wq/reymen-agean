@@ -25,6 +25,7 @@ def en_cok_kullanilan_araclar(limit: int = 5) -> list[tuple[str, int]]:
         return []
 
     import json
+
     for f in sorted(TRAJ_DIR.glob("*.json"))[-20:]:
         try:
             data = json.loads(f.read_text(encoding="utf-8"))
@@ -46,6 +47,7 @@ def basari_orani() -> float:
         return 0.0
 
     import json
+
     basarili = 0
     toplam = 0
 
@@ -71,6 +73,7 @@ def gunluk_aktivite() -> dict:
         {"tarih": str, "gorev": int, "basari": float}
     """
     import json
+
     gorev_sayisi = 0
     if TRAJ_DIR.exists():
         gorev_sayisi = len(list(TRAJ_DIR.glob("*.json")))

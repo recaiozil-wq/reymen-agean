@@ -6,6 +6,7 @@ ReYMeN kimligi: Turkce docstring, try/except, class-based.
 
 Degisiklik (v2): YAML Frontmatter, beceri_karti_uret(), frontmatter yonetimi.
 """
+
 import os
 import json
 import hashlib
@@ -18,6 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 # ── Yardimci Fonksiyonlar ────────────────────────────────────────────
+
 
 def _guvenli_ad(ad: str) -> str:
     """Yetene adini guvenli dosya adina donustur."""
@@ -101,7 +103,7 @@ def _frontmatter_guncelle(dosya_yolu: Path, alan: str, deger) -> bool:
             if ikinci == -1:
                 return False
             # Eski frontmatter'i cikar, yenisini yaz
-            govde = icerik_norm[ikinci + 5:]  # \n---\n'den sonrasi
+            govde = icerik_norm[ikinci + 5 :]  # \n---\n'den sonrasi
         else:
             govde = icerik_norm
 
@@ -112,13 +114,17 @@ def _frontmatter_guncelle(dosya_yolu: Path, alan: str, deger) -> bool:
         # Eger dogrudan skill_id guncelleniyorsa hash'i yenileme
         if alan == "skill_id":
             from hashlib import md5
-            skill_id = md5(str(deger).encode("utf-8"), usedforsecurity=False).hexdigest()[:12]
+
+            skill_id = md5(
+                str(deger).encode("utf-8"), usedforsecurity=False
+            ).hexdigest()[:12]
         usage_count = meta.get("usage_count", 1)
         if isinstance(usage_count, (int, float)):
             usage_count = int(usage_count)
         else:
             usage_count = 1
         from datetime import datetime
+
         bugun = datetime.now().strftime("%Y-%m-%d")
         last_used = meta.get("last_used", bugun)
         if not isinstance(last_used, str):
@@ -148,8 +154,10 @@ def _frontmatter_guncelle(dosya_yolu: Path, alan: str, deger) -> bool:
 
 # ── Standalone Fonksiyon (closed_learning_loop.py icin) ──────────────
 
-def beceri_karti_uret(beceri_adi: str, aciklama: str,
-                      adimlar: str, skills_dir: str = None) -> str:
+
+def beceri_karti_uret(
+    beceri_adi: str, aciklama: str, adimlar: str, skills_dir: str = None
+) -> str:
     """Basarili gorev adimlarindan .md beceri karti olustur.
 
     YAML frontmatter (skill_id, usage_count, last_used) icerir.
@@ -206,6 +214,7 @@ def beceri_karti_uret(beceri_adi: str, aciklama: str,
 
 
 # ── Sinif ────────────────────────────────────────────────────────────
+
 
 class YetenekFabrikasi:
     """YetenekFabrikasi: Yapay zeka yeteneklerini yonetir.
@@ -361,21 +370,27 @@ class YetenekFabrikasi:
             dosya_yolu.write_text(yeni_icerik, encoding="utf-8")
 
             # usage_count artir
-            _frontmatter_guncelle(dosya_yolu, "usage_count",
-                                  _frontmatter_parse(yeni_icerik).get("usage_count", 0) + 1)
-            _frontmatter_guncelle(dosya_yolu, "last_used",
-                                  datetime.now().strftime("%Y-%m-%d"))
+            _frontmatter_guncelle(
+                dosya_yolu,
+                "usage_count",
+                _frontmatter_parse(yeni_icerik).get("usage_count", 0) + 1,
+            )
+            _frontmatter_guncelle(
+                dosya_yolu, "last_used", datetime.now().strftime("%Y-%m-%d")
+            )
 
             # Tekrar oku (frontmatter guncellenmis olabilir)
             son_icerik = dosya_yolu.read_text(encoding="utf-8")
             k = self._yetenek_ortusu.get(guvenli, {})
-            k.update({
-                "ad": ad,
-                "dosya_yolu": str(dosya_yolu),
-                "boyut": len(son_icerik),
-                "son_ogretme": datetime.now().isoformat(),
-                "frontmatter": _frontmatter_parse(son_icerik),
-            })
+            k.update(
+                {
+                    "ad": ad,
+                    "dosya_yolu": str(dosya_yolu),
+                    "boyut": len(son_icerik),
+                    "son_ogretme": datetime.now().isoformat(),
+                    "frontmatter": _frontmatter_parse(son_icerik),
+                }
+            )
             self._yetenek_ortusu[guvenli] = k
 
             return {
@@ -439,7 +454,7 @@ class YetenekFabrikasi:
             if icerik_norm2.startswith("---\n"):
                 ikinci = icerik_norm2.find("\n---\n", 4)
                 if ikinci != -1:
-                    govde = icerik_norm2[ikinci + 5:]
+                    govde = icerik_norm2[ikinci + 5 :]
 
             if not govde.startswith("#"):
                 uyarilar.append("Gecersiz format: # ile baslamali")
@@ -475,7 +490,11 @@ class YetenekFabrikasi:
             }
 
         except OSError as e:
-            return {"basarili": False, "hata": f"Dosya hatasi: {e}", "test_sonucu": "hata"}
+            return {
+                "basarili": False,
+                "hata": f"Dosya hatasi: {e}",
+                "test_sonucu": "hata",
+            }
         except Exception as hata:
             print(f"[YetenekFabrikasi] Test hatasi: {hata}")
             return {"basarili": False, "hata": str(hata), "test_sonucu": "hata"}
@@ -573,11 +592,11 @@ class YetenekFabrikasi:
         """
         try:
             yetenek_sayisi = len(self._yetenek_ortusu)
-            toplam_boyut = sum(
-                k.get("boyut", 0) for k in self._yetenek_ortusu.values()
-            )
+            toplam_boyut = sum(k.get("boyut", 0) for k in self._yetenek_ortusu.values())
             test_sayisi = len(self._test_sonuclari)
-            basarili_test = sum(1 for t in self._test_sonuclari if t.get("test_basarili"))
+            basarili_test = sum(
+                1 for t in self._test_sonuclari if t.get("test_basarili")
+            )
 
             return {
                 "yetenek_sayisi": yetenek_sayisi,
@@ -593,13 +612,14 @@ class YetenekFabrikasi:
 
 if __name__ == "__main__":
     import tempfile
+
     with tempfile.TemporaryDirectory() as tmpdir:
         yf = YetenekFabrikasi(skills_dir=os.path.join(tmpdir, "skills"))
 
         sonuc = yf.yetenek_olustur(
             "dosya_yaz",
             "with open(dosya_adi, 'w') as f:\n    f.write(icerik)",
-            "Dosyaya metin yazar"
+            "Dosyaya metin yazar",
         )
         print(f"Olustur: {sonuc['mesaj']}")
 
@@ -609,7 +629,9 @@ if __name__ == "__main__":
             meta = _frontmatter_parse(icerik)
             print(f"Frontmatter: {meta}")
 
-        sonuc = yf.yetenek_ogret("dosya_yaz", {"ornek": "test.txt", "icerik": "merhaba"})
+        sonuc = yf.yetenek_ogret(
+            "dosya_yaz", {"ornek": "test.txt", "icerik": "merhaba"}
+        )
         print(f"Ogret: {sonuc['mesaj']}")
 
         test = yf.yetenek_test_et("dosya_yaz")
@@ -625,7 +647,7 @@ if __name__ == "__main__":
             "ornek_beceri",
             "Ornek bir beceri",
             "1. Adim: yap\n2. Adim: bitir",
-            os.path.join(tmpdir, "skills")
+            os.path.join(tmpdir, "skills"),
         )
         print(f"beceri_karti_uret: {yol}")
         print(Path(yol).read_text(encoding="utf-8"))

@@ -14,6 +14,7 @@ Kullanim:
     sonuc = await env.calistir("python script.py")
     print(sonuc["cikti"])
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -47,6 +48,7 @@ def check_daytona_requirements() -> bool:
         return True
     try:
         import subprocess
+
         subprocess.check_call(
             [sys.executable, "-m", "pip", "install", "daytona", "-q"],
             timeout=30,
@@ -215,7 +217,8 @@ class DaytonaEnvironment:
             if workdir and self._sandbox:
                 try:
                     await asyncio.to_thread(
-                        self._sandbox.fs.create_folder, f"/workspace/{workdir.lstrip('/')}"
+                        self._sandbox.fs.create_folder,
+                        f"/workspace/{workdir.lstrip('/')}",
                     )
                     komut = f"cd /workspace/{workdir.lstrip('/')} && {komut}"
                 except Exception:

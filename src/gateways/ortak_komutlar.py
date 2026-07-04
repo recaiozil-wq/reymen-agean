@@ -12,10 +12,13 @@ import sys
 import time
 from pathlib import Path
 import logging
+
 logger = logging.getLogger(__name__)
 
 # ── Proje kokunu bul ─────────────────────────────────────────────
-_PROJE_KOK = Path(__file__).parent.parent.parent.resolve()  # reymen/ag/../../ = proje koku
+_PROJE_KOK = Path(
+    __file__
+).parent.parent.parent.resolve()  # reymen/ag/../../ = proje koku
 if str(_PROJE_KOK) not in sys.path:
     sys.path.insert(0, str(_PROJE_KOK))
 _SRC = _PROJE_KOK / "src"
@@ -42,6 +45,7 @@ def _durum_json_oku() -> dict:
 # ── Komut fonksiyonlari ─────────────────────────────────────────
 # Her fonksiyon: (mesaj_gonder_fonk, chat_id, arg) seklinde cagrilir
 # mesaj_gonder_fonk: bir fonksiyon (chat_id, metin) -> herhangi
+
 
 def cmd_start(gonder, cid, arg=""):
     gonder(cid, "ReYMeN botuna hosgeldin!\n/help ile komutlari gor.")
@@ -77,22 +81,28 @@ def cmd_run(gonder, cid, arg=""):
         return
     import reymen.ag.telegram_bot as _bot_m
     import threading as _th
+
     if not _bot_m._gorev_kilidi.acquire(blocking=False):
         gonder(cid, "Simdi baska bir gorev calisiyor. /cancel ile iptal et.")
         return
     gonder(cid, f"Basladi: {arg[:100]}")
+
     def _calistir():
         iptal = _th.Event()
         _bot_m._aktif_gorev = {"hedef": arg, "iptal": iptal, "chat_id": cid}
         try:
             from reymen.sistem.main import AIAgentOrchestrator, CONFIG
+
             agent = AIAgentOrchestrator(config=CONFIG, max_tur=20, onay_iste=False)
-            sonuc = [None]; hata = [None]
+            sonuc = [None]
+            hata = [None]
+
             def _run():
                 try:
                     sonuc[0] = agent.run_conversation(arg)
                 except Exception as e:
                     hata[0] = str(e)
+
             t = _th.Thread(target=_run, daemon=True)
             t.start()
             while t.is_alive():
@@ -103,12 +113,15 @@ def cmd_run(gonder, cid, arg=""):
             if hata[0]:
                 gonder(cid, f"HATA:\n{hata[0][:500]}")
             else:
-                gonder(cid, f"Sonuc:\n{str(sonuc[0] or '(tamamlandi, cikti yok)')[:2000]}")
+                gonder(
+                    cid, f"Sonuc:\n{str(sonuc[0] or '(tamamlandi, cikti yok)')[:2000]}"
+                )
         except Exception as e:
             gonder(cid, f"Ajan baslatilamadi: {e}")
         finally:
             _bot_m._aktif_gorev = None
             _bot_m._gorev_kilidi.release()
+
     _th.Thread(target=_calistir, daemon=True).start()
 
 
@@ -134,10 +147,14 @@ def cmd_status(gonder, cid, arg=""):
             satirlar.append(f"Self-improve: {trend.get('ortalama_skor', '?')} skor")
         kk = si.get("kod_kalitesi", {}) or {}
         if kk:
-            satirlar.append(f"Kod: {kk.get('toplam_dosya', '?')} dosya, {kk.get('toplam_satir', '?')} satir")
+            satirlar.append(
+                f"Kod: {kk.get('toplam_dosya', '?')} dosya, {kk.get('toplam_satir', '?')} satir"
+            )
         ks = d.get("ReYMeN_karsilastirma", {}) or {}
         if ks:
-            satirlar.append(f"Hermes karsilastirma: {ks.get('tamam', '?')}/{ks.get('toplam_ozellik', '?')} tamam")
+            satirlar.append(
+                f"Hermes karsilastirma: {ks.get('tamam', '?')}/{ks.get('toplam_ozellik', '?')} tamam"
+            )
         satirlar.append(f"Surum: {d.get('surum', '?')}")
     except Exception as e:
         satirlar.append(f"Durum okunamadi: {e}")
@@ -169,6 +186,7 @@ def cmd_logs(gonder, cid, arg=""):
 def cmd_cancel(gonder, cid, arg=""):
     """Aktif gorevi iptal et."""
     from reymen.ag.telegram_bot import _aktif_gorev
+
     if _aktif_gorev:
         _aktif_gorev["iptal"].set()
         gonder(cid, f"Iptal istegi gonderildi: {_aktif_gorev['hedef'][:80]}")
@@ -183,10 +201,17 @@ def cmd_clarify(gonder, cid, arg=""):
         return
     try:
         from tools.clarify_tool import run as clarify_run
+
         parcalar = arg.split("|")
         soru = parcalar[0].strip()
-        secenekler = [s.strip() for s in parcalar[1].split(",")] if len(parcalar) > 1 and parcalar[1].strip() else None
-        varsayilan = parcalar[2].strip() if len(parcalar) > 2 and parcalar[2].strip() else ""
+        secenekler = (
+            [s.strip() for s in parcalar[1].split(",")]
+            if len(parcalar) > 1 and parcalar[1].strip()
+            else None
+        )
+        varsayilan = (
+            parcalar[2].strip() if len(parcalar) > 2 and parcalar[2].strip() else ""
+        )
         sonuc = clarify_run(soru=soru, secenekler=secenekler, varsayilan=varsayilan)
         gonder(cid, sonuc)
     except Exception as e:
@@ -196,10 +221,13 @@ def cmd_clarify(gonder, cid, arg=""):
 def cmd_exec(gonder, cid, arg=""):
     """Python kodu calistir."""
     if not arg.strip():
-        gonder(cid, "Kullanim: /exec <python_kodu>\nOrnek: /exec print(sum(range(100)))")
+        gonder(
+            cid, "Kullanim: /exec <python_kodu>\nOrnek: /exec print(sum(range(100)))"
+        )
         return
     try:
         from tools.execute_code_tool import run as exec_run
+
         sonuc = exec_run(kod=arg)
         gonder(cid, sonuc[:3000])
     except Exception as e:
@@ -210,6 +238,7 @@ def cmd_beceriler(gonder, cid, arg=""):
     """Beceri listesi."""
     try:
         from reymen.cereyan.closed_learning_loop import ClosedLearningLoop
+
         beceriler = ClosedLearningLoop().tum_beceriler()
         if not beceriler:
             gonder(cid, "Hic beceri yok.")
@@ -259,7 +288,9 @@ def cmd_ayarlar(gonder, cid, arg=""):
     ]
     ks = d.get("ReYMeN_karsilastirma", {}) or {}
     if ks:
-        satirlar.append(f"Hermes karsilastirma: {ks.get('tamam', '?')}/{ks.get('toplam_ozellik', '?')} tamam, {ks.get('eksik', '?')} eksik")
+        satirlar.append(
+            f"Hermes karsilastirma: {ks.get('tamam', '?')}/{ks.get('toplam_ozellik', '?')} tamam, {ks.get('eksik', '?')} eksik"
+        )
     gonder(cid, "\n".join(satirlar))
 
 
@@ -284,7 +315,9 @@ def cmd_cron(gonder, cid, arg=""):
     cron = d.get("ozellikler", {}).get("cron", {})
     durum = cron.get("durum", "tamam")
     detay = cron.get("detay", "kendi cron")
-    gonder(cid, f"Cron: {durum}\n{detay}\n\nDetayli liste icin CLI'da: reymen cron list")
+    gonder(
+        cid, f"Cron: {durum}\n{detay}\n\nDetayli liste icin CLI'da: reymen cron list"
+    )
 
 
 def cmd_gateway(gonder, cid, arg=""):
@@ -298,12 +331,18 @@ def cmd_gateway(gonder, cid, arg=""):
 
 def cmd_session(gonder, cid, arg=""):
     """Session listesi."""
-    gonder(cid, "Session yonetimi icin CLI'da: reymen session list\n\nTelegram'da session bilgisi sinirli.")
+    gonder(
+        cid,
+        "Session yonetimi icin CLI'da: reymen session list\n\nTelegram'da session bilgisi sinirli.",
+    )
 
 
 def cmd_backup(gonder, cid, arg=""):
     """Backup durumu."""
-    gonder(cid, "Backup yonetimi icin CLI'da: reymen backup status\n\nTelegram'da backup otomatik (cron ile).")
+    gonder(
+        cid,
+        "Backup yonetimi icin CLI'da: reymen backup status\n\nTelegram'da backup otomatik (cron ile).",
+    )
 
 
 def cmd_plugins(gonder, cid, arg=""):
@@ -318,7 +357,10 @@ def cmd_tools(gonder, cid, arg=""):
 
 def cmd_setup(gonder, cid, arg=""):
     """Kurulum bilgisi."""
-    gonder(cid, "Kurulum icin CLI'da: reymen setup\n\nVeya dogrudan: python reymen_launcher.py")
+    gonder(
+        cid,
+        "Kurulum icin CLI'da: reymen setup\n\nVeya dogrudan: python reymen_launcher.py",
+    )
 
 
 def cmd_profile(gonder, cid, arg=""):
@@ -334,9 +376,11 @@ def cmd_mcp(gonder, cid, arg=""):
 def cmd_doctor(gonder, cid, arg=""):
     """Sistem saglik kontrolu."""
     import subprocess as _sp, json as _js
+
     satirlar = ["ReYMeN DOKTOR RAPORU\n"]
     # Python versiyon
     import sys
+
     satirlar.append(f"Python: {sys.version.split()[0]}")
     # Proje
     satirlar.append(f"Proje: {_PROJE_KOK}")
@@ -350,7 +394,13 @@ def cmd_doctor(gonder, cid, arg=""):
     # Disk
     try:
         import os as _os
-        toplam = sum(1 for _ in _os.walk(_PROJE_KOK) for _ in _[2] if _.endswith('.py') and '__pycache__' not in _[0])
+
+        toplam = sum(
+            1
+            for _ in _os.walk(_PROJE_KOK)
+            for _ in _[2]
+            if _.endswith(".py") and "__pycache__" not in _[0]
+        )
         satirlar.append(f"Python dosyasi: ~{toplam}")
     except Exception:
         logger.warning("[fix_01_sessiz_except] Exception")
@@ -359,11 +409,14 @@ def cmd_doctor(gonder, cid, arg=""):
 
 def cmd_desktop(gonder, cid, arg=""):
     """Desktop uygulama durumu."""
-    gonder(cid, "ReYMeN Desktop:\n"
-                "  Durum: hazir\n"
-                "  Baslat: reymen desktop start\n"
-                "  Durdur: reymen desktop stop\n"
-                "  Detay icin CLI'da: reymen desktop status")
+    gonder(
+        cid,
+        "ReYMeN Desktop:\n"
+        "  Durum: hazir\n"
+        "  Baslat: reymen desktop start\n"
+        "  Durdur: reymen desktop stop\n"
+        "  Detay icin CLI'da: reymen desktop status",
+    )
 
 
 # ── Komut dispatcher ─────────────────────────────────────────────

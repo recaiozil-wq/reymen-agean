@@ -96,6 +96,7 @@ class TestGetAdapter:
 
         # adapter global'ini sıfırla
         import reymen.core.orchestrator as orch
+
         orch.adapter = None
 
         mock_adapter = MagicMock()
@@ -111,6 +112,7 @@ class TestGetAdapter:
         from reymen.core.orchestrator import _get_adapter
 
         import reymen.core.orchestrator as orch
+
         cached = MagicMock()
         orch.adapter = cached
 
@@ -148,6 +150,7 @@ class TestAskModelToFix:
         from reymen.core.orchestrator import ask_model_to_fix
 
         import reymen.core.orchestrator as orch
+
         orch.adapter = None
 
         mock_get_adapter.side_effect = RuntimeError("Adapter bulunamadi")
@@ -255,9 +258,7 @@ class TestCozHata:
 
     @patch("reymen.core.orchestrator._log")
     @patch("reymen.core.orchestrator.ask_model_to_fix", return_value="fixed_kod")
-    def test_coz_hata_with_code(
-        self, mock_ask: MagicMock, mock_log: MagicMock
-    ):
+    def test_coz_hata_with_code(self, mock_ask: MagicMock, mock_log: MagicMock):
         """kod verilmişse → ask_model_to_fix çağrılır, düzeltilmiş kod döner."""
         from reymen.core.orchestrator import coz_hata
 
@@ -268,9 +269,7 @@ class TestCozHata:
 
     @patch("reymen.core.orchestrator._log")
     @patch("reymen.core.orchestrator.ask_model_to_fix")
-    def test_coz_hata_without_code(
-        self, mock_ask: MagicMock, mock_log: MagicMock
-    ):
+    def test_coz_hata_without_code(self, mock_ask: MagicMock, mock_log: MagicMock):
         """kod verilmemişse → sadece log mesajı döner, model çağrılmaz."""
         from reymen.core.orchestrator import coz_hata
 

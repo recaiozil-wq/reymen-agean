@@ -147,7 +147,9 @@ def sistem_talimatini_insa_et(
 
     if araclar:
         if isinstance(araclar, dict):
-            satırlar = "\n".join(f"- {isim}: {aciklama}" for isim, aciklama in araclar.items())
+            satırlar = "\n".join(
+                f"- {isim}: {aciklama}" for isim, aciklama in araclar.items()
+            )
         else:
             satırlar = "\n".join(f"- {a}" for a in araclar)
         bolumler.append(f"## KULLANABILECEN ARACLAR (GUNCELL)\n\n{satırlar}")

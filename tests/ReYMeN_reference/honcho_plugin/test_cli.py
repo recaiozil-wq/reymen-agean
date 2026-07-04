@@ -9,12 +9,14 @@ class TestResolveApiKey:
 
     def test_returns_api_key_from_root(self, monkeypatch):
         import plugins.memory.honcho.cli as honcho_cli
+
         monkeypatch.setattr(honcho_cli, "_host_key", lambda: "ReYMeN")
         monkeypatch.delenv("HONCHO_API_KEY", raising=False)
         assert honcho_cli._resolve_api_key({"apiKey": "root-key"}) == "root-key"
 
     def test_returns_api_key_from_host_block(self, monkeypatch):
         import plugins.memory.honcho.cli as honcho_cli
+
         monkeypatch.setattr(honcho_cli, "_host_key", lambda: "ReYMeN")
         monkeypatch.delenv("HONCHO_API_KEY", raising=False)
         cfg = {"hosts": {"ReYMeN": {"apiKey": "host-key"}}, "apiKey": "root-key"}
@@ -22,6 +24,7 @@ class TestResolveApiKey:
 
     def test_returns_local_for_base_url_without_api_key(self, monkeypatch):
         import plugins.memory.honcho.cli as honcho_cli
+
         monkeypatch.setattr(honcho_cli, "_host_key", lambda: "ReYMeN")
         monkeypatch.delenv("HONCHO_API_KEY", raising=False)
         monkeypatch.delenv("HONCHO_BASE_URL", raising=False)
@@ -30,6 +33,7 @@ class TestResolveApiKey:
 
     def test_returns_local_for_base_url_env_var(self, monkeypatch):
         import plugins.memory.honcho.cli as honcho_cli
+
         monkeypatch.setattr(honcho_cli, "_host_key", lambda: "ReYMeN")
         monkeypatch.delenv("HONCHO_API_KEY", raising=False)
         monkeypatch.setenv("HONCHO_BASE_URL", "http://10.0.0.5:8000")
@@ -37,6 +41,7 @@ class TestResolveApiKey:
 
     def test_returns_empty_when_nothing_configured(self, monkeypatch):
         import plugins.memory.honcho.cli as honcho_cli
+
         monkeypatch.setattr(honcho_cli, "_host_key", lambda: "ReYMeN")
         monkeypatch.delenv("HONCHO_API_KEY", raising=False)
         monkeypatch.delenv("HONCHO_BASE_URL", raising=False)
@@ -45,6 +50,7 @@ class TestResolveApiKey:
     def test_rejects_garbage_base_url_without_scheme(self, monkeypatch):
         """Obvious non-URL literals in baseUrl (typos) must not pass the guard."""
         import plugins.memory.honcho.cli as honcho_cli
+
         monkeypatch.setattr(honcho_cli, "_host_key", lambda: "ReYMeN")
         monkeypatch.delenv("HONCHO_API_KEY", raising=False)
         monkeypatch.delenv("HONCHO_BASE_URL", raising=False)
@@ -52,8 +58,9 @@ class TestResolveApiKey:
         # host-like punctuation are rejected.  Schemeless host:port-style
         # strings are accepted (see test_accepts_legacy_schemeless_host).
         for garbage in ("true", "false", "null", "1", "12345", "localhost"):
-            assert honcho_cli._resolve_api_key({"baseUrl": garbage}) == "", \
-                f"expected empty for garbage {garbage!r}"
+            assert (
+                honcho_cli._resolve_api_key({"baseUrl": garbage}) == ""
+            ), f"expected empty for garbage {garbage!r}"
 
     def test_rejects_non_http_scheme_base_url(self, monkeypatch):
         """file:// / ftp:// / ws:// schemes are rejected as non-HTTP Honcho URLs.
@@ -65,6 +72,7 @@ class TestResolveApiKey:
         parsed scheme explicitly.
         """
         import plugins.memory.honcho.cli as honcho_cli
+
         monkeypatch.setattr(honcho_cli, "_host_key", lambda: "ReYMeN")
         monkeypatch.delenv("HONCHO_API_KEY", raising=False)
         monkeypatch.delenv("HONCHO_BASE_URL", raising=False)
@@ -78,10 +86,14 @@ class TestResolveApiKey:
 
     def test_accepts_https_base_url(self, monkeypatch):
         import plugins.memory.honcho.cli as honcho_cli
+
         monkeypatch.setattr(honcho_cli, "_host_key", lambda: "ReYMeN")
         monkeypatch.delenv("HONCHO_API_KEY", raising=False)
         monkeypatch.delenv("HONCHO_BASE_URL", raising=False)
-        assert honcho_cli._resolve_api_key({"baseUrl": "https://honcho.example.com"}) == "local"
+        assert (
+            honcho_cli._resolve_api_key({"baseUrl": "https://honcho.example.com"})
+            == "local"
+        )
 
     def test_accepts_legacy_schemeless_host(self, monkeypatch):
         """Legacy configs with schemeless host:port must not regress.
@@ -93,12 +105,19 @@ class TestResolveApiKey:
         The SDK itself still rejects malformed URLs at connect time.
         """
         import plugins.memory.honcho.cli as honcho_cli
+
         monkeypatch.setattr(honcho_cli, "_host_key", lambda: "ReYMeN")
         monkeypatch.delenv("HONCHO_API_KEY", raising=False)
         monkeypatch.delenv("HONCHO_BASE_URL", raising=False)
-        for legacy in ("localhost:8000", "10.0.0.5:8000", "honcho.local:8080", "host.example.com"):
-            assert honcho_cli._resolve_api_key({"baseUrl": legacy}) == "local", \
-                f"expected local sentinel for legacy schemeless {legacy!r}"
+        for legacy in (
+            "localhost:8000",
+            "10.0.0.5:8000",
+            "honcho.local:8080",
+            "host.example.com",
+        ):
+            assert (
+                honcho_cli._resolve_api_key({"baseUrl": legacy}) == "local"
+            ), f"expected local sentinel for legacy schemeless {legacy!r}"
 
 
 class TestCmdSetupLocalJwt:
@@ -146,9 +165,9 @@ class TestCmdSetupLocalJwt:
             tmp_path,
             initial_cfg={},
             prompt_answers=[
-                "local",                       # deployment
-                "http://localhost:8000",       # base URL
-                "my-local-jwt-token",          # local JWT
+                "local",  # deployment
+                "http://localhost:8000",  # base URL
+                "my-local-jwt-token",  # local JWT
             ],
         )
         assert cfg is not None
@@ -180,7 +199,9 @@ class TestCmdSetupLocalJwt:
 
 
 class TestCmdStatus:
-    def test_reports_connection_failure_when_session_setup_fails(self, monkeypatch, capsys, tmp_path):
+    def test_reports_connection_failure_when_session_setup_fails(
+        self, monkeypatch, capsys, tmp_path
+    ):
         import plugins.memory.honcho.cli as honcho_cli
 
         cfg_path = tmp_path / "honcho.json"
@@ -246,15 +267,20 @@ class TestCloneHonchoForProfile:
 
     def _setup_clone_env(self, monkeypatch, tmp_path, cfg):
         import plugins.memory.honcho.cli as honcho_cli
+
         cfg_path = tmp_path / "config.json"
         cfg_path.write_text("{}")
         monkeypatch.setattr(honcho_cli, "_read_config", lambda: cfg)
         monkeypatch.setattr(honcho_cli, "_config_path", lambda: cfg_path)
         monkeypatch.setattr(honcho_cli, "_local_config_path", lambda: cfg_path)
-        monkeypatch.setattr(honcho_cli, "_ensure_peer_exists", lambda host_key=None: True)
+        monkeypatch.setattr(
+            honcho_cli, "_ensure_peer_exists", lambda host_key=None: True
+        )
         written = {}
+
         def _write(c, path=None):
             written["cfg"] = c
+
         monkeypatch.setattr(honcho_cli, "_write_config", _write)
         return honcho_cli, written
 
@@ -272,9 +298,14 @@ class TestCloneHonchoForProfile:
         ok = honcho_cli.clone_honcho_for_profile("coder")
         assert ok is True
         new_block = written["cfg"]["hosts"]["ReYMeN_coder"]
-        assert new_block["userPeerAliases"] == {"86701400": "eri", "discord-491827364": "eri"}
+        assert new_block["userPeerAliases"] == {
+            "86701400": "eri",
+            "discord-491827364": "eri",
+        }
 
-    def test_runtime_peer_prefix_carries_into_cloned_profile(self, monkeypatch, tmp_path):
+    def test_runtime_peer_prefix_carries_into_cloned_profile(
+        self, monkeypatch, tmp_path
+    ):
         cfg = {
             "apiKey": "***",
             "hosts": {
@@ -306,7 +337,9 @@ class TestCloneHonchoForProfile:
         new_block = written["cfg"]["hosts"]["ReYMeN_coder"]
         assert new_block["pinPeerName"] is True
 
-    def test_unset_identity_keys_do_not_appear_in_cloned_profile(self, monkeypatch, tmp_path):
+    def test_unset_identity_keys_do_not_appear_in_cloned_profile(
+        self, monkeypatch, tmp_path
+    ):
         cfg = {
             "apiKey": "***",
             "hosts": {"ReYMeN": {"peerName": "eri"}},
@@ -349,15 +382,20 @@ class TestSetupWizardDeploymentShape:
 
         # Bypass config.yaml + connection test side effects.
         monkeypatch.setattr(
-            "ReYMeN_cli.config.load_config", lambda: {"memory": {}}, raising=False,
+            "ReYMeN_cli.config.load_config",
+            lambda: {"memory": {}},
+            raising=False,
         )
         monkeypatch.setattr(
-            "ReYMeN_cli.config.save_config", lambda c: None, raising=False,
+            "ReYMeN_cli.config.save_config",
+            lambda c: None,
+            raising=False,
         )
 
         class _FakeClientCfg:
             def resolve_session_name(self):
                 return "ReYMeN-test"
+
             workspace_id = "ReYMeN"
             peer_name = "eri"
             ai_peer = "hermetika"
@@ -381,47 +419,57 @@ class TestSetupWizardDeploymentShape:
 
         # Scripted _prompt: pop answers in order. Default-return for unconsumed prompts.
         answer_iter = iter(answers)
+
         def _scripted_prompt(label, default=None, secret=False):
             try:
                 return next(answer_iter)
             except StopIteration:
                 return default if default is not None else ""
+
         monkeypatch.setattr(honcho_cli, "_prompt", _scripted_prompt)
 
         honcho_cli.cmd_setup(SimpleNamespace())
         return cfg["hosts"]["ReYMeN"]
 
-    def test_single_shape_sets_pin_peer_name_and_clears_aliases(self, monkeypatch, tmp_path):
+    def test_single_shape_sets_pin_peer_name_and_clears_aliases(
+        self, monkeypatch, tmp_path
+    ):
         answers = [
-            "cloud",           # deployment
-            "",                # api key (keep)
-            "eri",             # peer name
-            "hermetika",       # ai peer
-            "ReYMeN",          # workspace
-            "single",          # deployment shape ← key answer
+            "cloud",  # deployment
+            "",  # api key (keep)
+            "eri",  # peer name
+            "hermetika",  # ai peer
+            "ReYMeN",  # workspace
+            "single",  # deployment shape ← key answer
             # remaining prompts fall through to defaults
         ]
         initial_cfg = {
             "apiKey": "***",
-            "hosts": {"ReYMeN": {
-                "userPeerAliases": {"old": "stale"},
-                "runtimePeerPrefix": "old_",
-            }},
+            "hosts": {
+                "ReYMeN": {
+                    "userPeerAliases": {"old": "stale"},
+                    "runtimePeerPrefix": "old_",
+                }
+            },
         }
-        host = self._run_setup(monkeypatch, tmp_path, answers=answers, initial_cfg=initial_cfg)
+        host = self._run_setup(
+            monkeypatch, tmp_path, answers=answers, initial_cfg=initial_cfg
+        )
         assert host["pinPeerName"] is True
         assert "userPeerAliases" not in host
         assert "runtimePeerPrefix" not in host
 
-    def test_multi_shape_leaves_pin_false_and_accepts_prefix(self, monkeypatch, tmp_path):
+    def test_multi_shape_leaves_pin_false_and_accepts_prefix(
+        self, monkeypatch, tmp_path
+    ):
         answers = [
-            "cloud",           # deployment
-            "",                # api key (keep)
-            "eri",             # peer name
-            "hermetika",       # ai peer
-            "ReYMeN",          # workspace
-            "multi",           # deployment shape
-            "telegram_",       # runtime peer prefix
+            "cloud",  # deployment
+            "",  # api key (keep)
+            "eri",  # peer name
+            "hermetika",  # ai peer
+            "ReYMeN",  # workspace
+            "multi",  # deployment shape
+            "telegram_",  # runtime peer prefix
         ]
         host = self._run_setup(monkeypatch, tmp_path, answers=answers)
         assert host["pinPeerName"] is False
@@ -431,19 +479,21 @@ class TestSetupWizardDeploymentShape:
         assert "userPeerAliases" not in host
         assert host["runtimePeerPrefix"] == "telegram_"
 
-    def test_hybrid_shape_aliases_operator_runtime_ids_to_peer_name(self, monkeypatch, tmp_path):
+    def test_hybrid_shape_aliases_operator_runtime_ids_to_peer_name(
+        self, monkeypatch, tmp_path
+    ):
         answers = [
-            "cloud",           # deployment
-            "",                # api key (keep)
-            "eri",             # peer name
-            "hermetika",       # ai peer
-            "ReYMeN",          # workspace
-            "hybrid",          # deployment shape
-            "86701400",        # telegram uid
-            "491827364",       # discord snowflake
-            "",                # slack (skip)
-            "",                # matrix (skip)
-            "",                # runtime peer prefix (skip)
+            "cloud",  # deployment
+            "",  # api key (keep)
+            "eri",  # peer name
+            "hermetika",  # ai peer
+            "ReYMeN",  # workspace
+            "hybrid",  # deployment shape
+            "86701400",  # telegram uid
+            "491827364",  # discord snowflake
+            "",  # slack (skip)
+            "",  # matrix (skip)
+            "",  # runtime peer prefix (skip)
         ]
         host = self._run_setup(monkeypatch, tmp_path, answers=answers)
         assert host["pinPeerName"] is False
@@ -456,16 +506,25 @@ class TestSetupWizardDeploymentShape:
     def test_skip_shape_preserves_existing_identity_config(self, monkeypatch, tmp_path):
         initial_cfg = {
             "apiKey": "***",
-            "hosts": {"ReYMeN": {
-                "pinPeerName": True,
-                "userPeerAliases": {"keep": "me"},
-                "runtimePeerPrefix": "keep_",
-            }},
+            "hosts": {
+                "ReYMeN": {
+                    "pinPeerName": True,
+                    "userPeerAliases": {"keep": "me"},
+                    "runtimePeerPrefix": "keep_",
+                }
+            },
         }
         answers = [
-            "cloud", "", "eri", "hermetika", "ReYMeN", "skip",
+            "cloud",
+            "",
+            "eri",
+            "hermetika",
+            "ReYMeN",
+            "skip",
         ]
-        host = self._run_setup(monkeypatch, tmp_path, answers=answers, initial_cfg=initial_cfg)
+        host = self._run_setup(
+            monkeypatch, tmp_path, answers=answers, initial_cfg=initial_cfg
+        )
         assert host["pinPeerName"] is True
         assert host["userPeerAliases"] == {"keep": "me"}
         assert host["runtimePeerPrefix"] == "keep_"
@@ -480,20 +539,22 @@ class TestSetupWizardDeploymentShape:
             "hosts": {"ReYMeN": {"pinPeerName": True, "peerName": "eri"}},
         }
         answers = [
-            "cloud",           # deployment
-            "",                # api key (keep)
-            "eri",             # peer name
-            "hermetika",       # ai peer
-            "ReYMeN",          # workspace
-            "multi",           # deployment shape — triggers the guard
-            "hybrid",          # guard response: accept the steer
-            "86701400",        # telegram uid
-            "",                # discord (skip)
-            "",                # slack (skip)
-            "",                # matrix (skip)
-            "",                # runtime prefix (skip)
+            "cloud",  # deployment
+            "",  # api key (keep)
+            "eri",  # peer name
+            "hermetika",  # ai peer
+            "ReYMeN",  # workspace
+            "multi",  # deployment shape — triggers the guard
+            "hybrid",  # guard response: accept the steer
+            "86701400",  # telegram uid
+            "",  # discord (skip)
+            "",  # slack (skip)
+            "",  # matrix (skip)
+            "",  # runtime prefix (skip)
         ]
-        host = self._run_setup(monkeypatch, tmp_path, answers=answers, initial_cfg=initial_cfg)
+        host = self._run_setup(
+            monkeypatch, tmp_path, answers=answers, initial_cfg=initial_cfg
+        )
         assert host["pinPeerName"] is False
         assert host["userPeerAliases"] == {"86701400": "eri"}
 
@@ -506,12 +567,18 @@ class TestSetupWizardDeploymentShape:
             "hosts": {"ReYMeN": {"pinPeerName": True, "peerName": "eri"}},
         }
         answers = [
-            "cloud", "", "eri", "hermetika", "ReYMeN",
-            "multi",           # deployment shape — triggers the guard
-            "yes",             # guard response: confirm multi
-            "telegram_",       # runtime peer prefix
+            "cloud",
+            "",
+            "eri",
+            "hermetika",
+            "ReYMeN",
+            "multi",  # deployment shape — triggers the guard
+            "yes",  # guard response: confirm multi
+            "telegram_",  # runtime peer prefix
         ]
-        host = self._run_setup(monkeypatch, tmp_path, answers=answers, initial_cfg=initial_cfg)
+        host = self._run_setup(
+            monkeypatch, tmp_path, answers=answers, initial_cfg=initial_cfg
+        )
         assert host["pinPeerName"] is False
         # See test_multi_shape_leaves_pin_false_and_accepts_prefix.
         assert "userPeerAliases" not in host
@@ -534,7 +601,9 @@ class TestSetupWizardDeploymentShape:
         # wizard-detected shape).  Scripting an explicit "" would NOT
         # exercise that fallthrough — the mock returns it literally.
         answers = ["cloud", "", "eri", "hermetika", "ReYMeN"]
-        host = self._run_setup(monkeypatch, tmp_path, answers=answers, initial_cfg=initial_cfg)
+        host = self._run_setup(
+            monkeypatch, tmp_path, answers=answers, initial_cfg=initial_cfg
+        )
         # Scrub-then-write normalises onto pinPeerName and drops the alias
         # so resolver precedence can't reintroduce ambiguity.
         assert host["pinPeerName"] is True
@@ -550,14 +619,18 @@ class TestSetupWizardDeploymentShape:
         """
         initial_cfg = {
             "apiKey": "***",
-            "hosts": {"ReYMeN": {
-                "pinUserPeer": False,
-                "pinPeerName": True,
-                "peerName": "eri",
-            }},
+            "hosts": {
+                "ReYMeN": {
+                    "pinUserPeer": False,
+                    "pinPeerName": True,
+                    "peerName": "eri",
+                }
+            },
         }
         answers = ["cloud", "", "eri", "hermetika", "ReYMeN"]
-        host = self._run_setup(monkeypatch, tmp_path, answers=answers, initial_cfg=initial_cfg)
+        host = self._run_setup(
+            monkeypatch, tmp_path, answers=answers, initial_cfg=initial_cfg
+        )
         assert host["pinPeerName"] is False
         assert "pinUserPeer" not in host
 
@@ -571,13 +644,17 @@ class TestSetupWizardDeploymentShape:
             "hosts": {"ReYMeN": {"peerName": "eri"}},
         }
         answers = ["cloud", "", "eri", "hermetika", "ReYMeN"]
-        host = self._run_setup(monkeypatch, tmp_path, answers=answers, initial_cfg=initial_cfg)
+        host = self._run_setup(
+            monkeypatch, tmp_path, answers=answers, initial_cfg=initial_cfg
+        )
         assert host["pinPeerName"] is False
         # Hybrid materialises the root aliases into the host so subsequent
         # operator edits live on the host block they're inspecting.
         assert host["userPeerAliases"] == {"86701400": "eri"}
 
-    def test_multi_does_not_override_root_user_peer_aliases(self, monkeypatch, tmp_path):
+    def test_multi_does_not_override_root_user_peer_aliases(
+        self, monkeypatch, tmp_path
+    ):
         """Explicit ``multi`` must leave the host ``userPeerAliases`` key
         absent, preserving any root-level aliases as a cross-host baseline.
 
@@ -595,10 +672,16 @@ class TestSetupWizardDeploymentShape:
             "hosts": {"ReYMeN": {"peerName": "eri"}},
         }
         answers = [
-            "cloud", "", "eri", "hermetika", "ReYMeN",
-            "multi",           # explicit multi override of detected hybrid
+            "cloud",
+            "",
+            "eri",
+            "hermetika",
+            "ReYMeN",
+            "multi",  # explicit multi override of detected hybrid
         ]
-        host = self._run_setup(monkeypatch, tmp_path, answers=answers, initial_cfg=initial_cfg)
+        host = self._run_setup(
+            monkeypatch, tmp_path, answers=answers, initial_cfg=initial_cfg
+        )
         assert host["pinPeerName"] is False
         assert "userPeerAliases" not in host
 
@@ -610,16 +693,24 @@ class TestSetupWizardDeploymentShape:
         """
         initial_cfg = {
             "apiKey": "***",
-            "hosts": {"ReYMeN": {
-                "pinUserPeer": False,
-                "peerName": "eri",
-            }},
+            "hosts": {
+                "ReYMeN": {
+                    "pinUserPeer": False,
+                    "peerName": "eri",
+                }
+            },
         }
         answers = [
-            "cloud", "", "eri", "hermetika", "ReYMeN",
+            "cloud",
+            "",
+            "eri",
+            "hermetika",
+            "ReYMeN",
             "single",
         ]
-        host = self._run_setup(monkeypatch, tmp_path, answers=answers, initial_cfg=initial_cfg)
+        host = self._run_setup(
+            monkeypatch, tmp_path, answers=answers, initial_cfg=initial_cfg
+        )
         assert host["pinPeerName"] is True
         assert "pinUserPeer" not in host
 
@@ -643,10 +734,14 @@ class TestCloneCarriesPinUserPeer:
         monkeypatch.setattr(honcho_cli, "_read_config", lambda: cfg)
         monkeypatch.setattr(honcho_cli, "_config_path", lambda: cfg_path)
         monkeypatch.setattr(honcho_cli, "_local_config_path", lambda: cfg_path)
-        monkeypatch.setattr(honcho_cli, "_ensure_peer_exists", lambda host_key=None: True)
+        monkeypatch.setattr(
+            honcho_cli, "_ensure_peer_exists", lambda host_key=None: True
+        )
         written = {}
         monkeypatch.setattr(
-            honcho_cli, "_write_config", lambda c, path=None: written.setdefault("cfg", c),
+            honcho_cli,
+            "_write_config",
+            lambda c, path=None: written.setdefault("cfg", c),
         )
 
         ok = honcho_cli.clone_honcho_for_profile("partner")

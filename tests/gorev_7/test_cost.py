@@ -20,27 +20,40 @@ def tracker(tmp_path):
 
 class TestCostComputation:
     def test_known_model_price(self, tracker):
-        cost = tracker.compute_cost("gpt-4o", prompt_tokens=1_000_000, completion_tokens=0)
+        cost = tracker.compute_cost(
+            "gpt-4o", prompt_tokens=1_000_000, completion_tokens=0
+        )
         assert cost == 5.0
 
     def test_completion_price(self, tracker):
-        cost = tracker.compute_cost("gpt-4o", prompt_tokens=0, completion_tokens=1_000_000)
+        cost = tracker.compute_cost(
+            "gpt-4o", prompt_tokens=0, completion_tokens=1_000_000
+        )
         assert cost == 15.0
 
     def test_combined_tokens(self, tracker):
-        cost = tracker.compute_cost("gpt-4o", prompt_tokens=1_000_000, completion_tokens=1_000_000)
+        cost = tracker.compute_cost(
+            "gpt-4o", prompt_tokens=1_000_000, completion_tokens=1_000_000
+        )
         assert cost == 20.0
 
     def test_unknown_model_uses_default(self, tracker):
-        cost = tracker.compute_cost("unknown-model", prompt_tokens=1_000_000, completion_tokens=0)
+        cost = tracker.compute_cost(
+            "unknown-model", prompt_tokens=1_000_000, completion_tokens=0
+        )
         assert cost == 1.0
 
     def test_prefix_matching(self, tracker):
-        cost = tracker.compute_cost("gpt-4o-2024-08-06", prompt_tokens=1_000_000, completion_tokens=0)
+        cost = tracker.compute_cost(
+            "gpt-4o-2024-08-06", prompt_tokens=1_000_000, completion_tokens=0
+        )
         assert cost == 5.0
 
     def test_custom_price_table(self, tmp_path):
-        custom = {"my-model": {"prompt": 2.0, "completion": 6.0}, "default": {"prompt": 1.0, "completion": 3.0}}
+        custom = {
+            "my-model": {"prompt": 2.0, "completion": 6.0},
+            "default": {"prompt": 1.0, "completion": 3.0},
+        }
         t = CostTracker(db_path=tmp_path / "x.db", price_table=custom)
         assert t.compute_cost("my-model", 1_000_000, 0) == 2.0
 
@@ -55,7 +68,9 @@ class TestRecord:
         assert rec.cost_usd > 0
 
     def test_record_with_metadata(self, tracker):
-        rec = tracker.record("gpt-4o", 100, 50, session_id="s1", metadata={"task": "test"})
+        rec = tracker.record(
+            "gpt-4o", 100, 50, session_id="s1", metadata={"task": "test"}
+        )
         assert rec.session_id == "s1"
         assert rec.metadata == {"task": "test"}
 

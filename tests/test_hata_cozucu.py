@@ -66,6 +66,7 @@ class TestHataKoduUretici:
     def test_olusturma(self):
         with tempfile.TemporaryDirectory() as tmp:
             from hata_cozucu import HATA_KLASORU as _orig
+
             uretici = HataKoduUretici()
             assert uretici is not None
 
@@ -106,6 +107,7 @@ class TestHataKoduUretici:
         kayit = uretici.kaydet("TypeError: unsupported operand")
         md_yolu = Path(uretici.__class__.__module__)
         from hata_cozucu import HATA_KLASORU
+
         md_yolu = HATA_KLASORU / f"{kayit.kod}.md"
         assert md_yolu.exists()
 
@@ -238,10 +240,7 @@ class TestCozumUygulayici:
     def test_olmayan_dosya(self):
         cu = CozumUygulayici()
         cozum = (
-            "HATA-0001:\n"
-            "Dosya: var_olmayan_dosya.py\n"
-            "Satir: 1\n"
-            "Yeni: pass\n"
+            "HATA-0001:\n" "Dosya: var_olmayan_dosya.py\n" "Satir: 1\n" "Yeni: pass\n"
         )
         sonuc = cu.uygula(cozum)
         assert sonuc["basarili"] is False
@@ -256,10 +255,7 @@ class TestCozumUygulayici:
         try:
             cu = CozumUygulayici()
             cozum = (
-                f"HATA-9990:\n"
-                f"Dosya: {f_adi}\n"
-                f"Eski: y = 2\n"
-                f"Yeni: y = 99\n"
+                f"HATA-9990:\n" f"Dosya: {f_adi}\n" f"Eski: y = 2\n" f"Yeni: y = 99\n"
             )
             sonuc = cu.uygula(cozum)
             assert sonuc["basarili"] is True

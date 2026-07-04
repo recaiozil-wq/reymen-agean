@@ -9,6 +9,7 @@ Kullanim:
     sonuc = await env.calistir("ls -la")
     print(sonuc["cikti"])
 """
+
 from __future__ import annotations
 
 import asyncio

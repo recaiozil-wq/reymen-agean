@@ -25,9 +25,9 @@ from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
 
+
 class MixinStream:
     """ReYMeNCLI Stream/akış metotları."""
-
 
     def _on_thinking(self, text: str) -> None:
         """Called by agent when thinking starts/stops. Updates TUI spinner."""
@@ -37,8 +37,6 @@ class MixinStream:
         self._tool_start_time = 0.0  # clear tool timer when switching to thinking
         self._invalidate()
 
-
-
     def _current_reasoning_callback(self):
         """Return the active reasoning display callback for the current mode."""
         if self.show_reasoning and self.streaming_enabled:
@@ -46,8 +44,6 @@ class MixinStream:
         if self.verbose and not self.show_reasoning:
             return self._on_reasoning
         return None
-
-
 
     def _emit_reasoning_preview(self, reasoning_text: str) -> None:
         """Render a buffered reasoning preview as a single [thinking] block."""
@@ -65,7 +61,9 @@ class MixinStream:
         paragraphs = []
         raw_paragraphs = re.split(r"\n\s*\n+", preview_text.replace("\r\n", "\n"))
         for paragraph in raw_paragraphs:
-            compact = " ".join(line.strip() for line in paragraph.splitlines() if line.strip())
+            compact = " ".join(
+                line.strip() for line in paragraph.splitlines() if line.strip()
+            )
             if compact:
                 paragraphs.append(textwrap.fill(compact, width=wrap_width))
         preview_text = "\n".join(paragraphs)
@@ -83,8 +81,6 @@ class MixinStream:
         else:
             preview = preview_text
         _cprint(f"  {_DIM}[thinking] {preview}{_RST}")
-
-
 
     def _flush_reasoning_preview(self, *, force: bool = False) -> None:
         """Flush buffered reasoning text at natural boundaries.
@@ -123,7 +119,9 @@ class MixinStream:
                 buf = buf[line_break + 1 :]
             elif len(buf) >= target_width:
                 search_start = max(20, target_width // 2)
-                search_end = min(len(buf), max(target_width + (target_width // 3), target_width + 8))
+                search_end = min(
+                    len(buf), max(target_width + (target_width // 3), target_width + 8)
+                )
                 cut = -1
                 for boundary in (" ", "\t", ".", "!", "?", ",", ";", ":"):
                     cut = max(cut, buf.rfind(boundary, search_start, search_end))
@@ -134,8 +132,6 @@ class MixinStream:
         self._reasoning_preview_buf = buf.lstrip() if flush_text else buf
         if flush_text:
             self._emit_reasoning_preview(flush_text)
-
-
 
     def _stream_reasoning_delta(self, text: str) -> None:
         """Stream reasoning/thinking tokens into a dim box above the response.
@@ -173,8 +169,6 @@ class MixinStream:
             _cprint(f"{_DIM}{self._reasoning_buf}{_RST}")
             self._reasoning_buf = ""
 
-
-
     def _close_reasoning_box(self) -> None:
         """Close the live reasoning box if it's open."""
         if getattr(self, "_reasoning_box_opened", False):
@@ -192,8 +186,6 @@ class MixinStream:
             if deferred:
                 self._deferred_content = ""
                 self._emit_stream_text(deferred)
-
-
 
     def _stream_delta(self, text) -> None:
         """Line-buffered streaming callback for real-time token rendering.
@@ -226,8 +218,22 @@ class MixinStream:
         # suppress them during streaming too — unless show_reasoning is
         # enabled, in which case we route the inner content to the
         # reasoning display box instead of discarding it.
-        _OPEN_TAGS = ("<REASONING_SCRATCHPAD>", "<think>", "<reasoning>", "<THINKING>", "<thinking>", "<thought>")
-        _CLOSE_TAGS = ("</REASONING_SCRATCHPAD>", "</think>", "</reasoning>", "</THINKING>", "</thinking>", "</thought>")
+        _OPEN_TAGS = (
+            "<REASONING_SCRATCHPAD>",
+            "<think>",
+            "<reasoning>",
+            "<THINKING>",
+            "<thinking>",
+            "<thought>",
+        )
+        _CLOSE_TAGS = (
+            "</REASONING_SCRATCHPAD>",
+            "</think>",
+            "</reasoning>",
+            "</THINKING>",
+            "</thinking>",
+            "</thought>",
+        )
 
         # Append to a pre-filter buffer first
         self._stream_prefilt = getattr(self, "_stream_prefilt", "") + text
@@ -258,7 +264,9 @@ class MixinStream:
                         # At buffer start — only a boundary if we're at
                         # a line start (stream start or last emit ended
                         # with newline)
-                        is_block_boundary = getattr(self, "_stream_last_was_newline", True)
+                        is_block_boundary = getattr(
+                            self, "_stream_last_was_newline", True
+                        )
                     else:
                         # Find last newline in the buffer before the tag
                         last_nl = preceding.rfind("\n")
@@ -273,14 +281,14 @@ class MixinStream:
                         else:
                             # Text between last newline and tag must be
                             # whitespace-only
-                            is_block_boundary = preceding[last_nl + 1:].strip() == ""
+                            is_block_boundary = preceding[last_nl + 1 :].strip() == ""
                     if is_block_boundary:
                         # Emit everything before the tag
                         if preceding:
                             self._emit_stream_text(preceding)
                             self._stream_last_was_newline = preceding.endswith("\n")
                         self._in_reasoning_block = True
-                        self._stream_prefilt = self._stream_prefilt[idx + len(tag):]
+                        self._stream_prefilt = self._stream_prefilt[idx + len(tag) :]
                         break
                     # Not a block boundary — keep searching after this occurrence
                     search_start = idx + 1
@@ -299,7 +307,7 @@ class MixinStream:
                 if safe:
                     self._emit_stream_text(safe)
                     self._stream_last_was_newline = safe.endswith("\n")
-                    self._stream_prefilt = self._stream_prefilt[len(safe):]
+                    self._stream_prefilt = self._stream_prefilt[len(safe) :]
                 return
 
         # Inside a reasoning block — look for close tag.
@@ -316,7 +324,7 @@ class MixinStream:
                         inner = self._stream_prefilt[:idx]
                         if inner:
                             self._stream_reasoning_delta(inner)
-                    after = self._stream_prefilt[idx + len(tag):]
+                    after = self._stream_prefilt[idx + len(tag) :]
                     self._stream_prefilt = ""
                     # Process remaining text after close tag through full
                     # filtering (it could contain another open tag)
@@ -334,8 +342,6 @@ class MixinStream:
                     self._stream_reasoning_delta(safe_reasoning)
                 self._stream_prefilt = self._stream_prefilt[-max_tag_len:]
             return
-
-
 
     def _emit_stream_text(self, text: str) -> None:
         """Emit filtered text to the streaming display."""
@@ -361,6 +367,7 @@ class MixinStream:
             self._stream_box_opened = True
             try:
                 from reymen.reymen_cli.skin_engine import get_active_skin
+
                 _skin = get_active_skin()
                 label = _skin.get_branding("response_label", "⚕ ReYMeN")
                 _text_hex = _skin.get_color("banner_text", "#FFF8DC")
@@ -388,7 +395,11 @@ class MixinStream:
         _tc = getattr(self, "_stream_text_ansi", "")
 
         def _emit_one(printed_line: str) -> None:
-            _cprint(f"{_STREAM_PAD}{_tc}{printed_line}{_RST}" if _tc else f"{_STREAM_PAD}{printed_line}")
+            _cprint(
+                f"{_STREAM_PAD}{_tc}{printed_line}{_RST}"
+                if _tc
+                else f"{_STREAM_PAD}{printed_line}"
+            )
 
         def _flush_table_buf() -> None:
             buf = self._stream_table_buf
@@ -432,14 +443,14 @@ class MixinStream:
                 line = _strip_markdown_syntax(line)
             _emit_one(line)
 
-
-
     def _flush_stream(self) -> None:
         """Emit any remaining partial line from the stream buffer and close the box."""
         # If we're still inside a "reasoning block" at end-of-stream, it was
         # a false positive — the model mentioned a tag like <think> in prose
         # but never closed it.  Recover the buffered content as regular text.
-        if getattr(self, "_in_reasoning_block", False) and getattr(self, "_stream_prefilt", ""):
+        if getattr(self, "_in_reasoning_block", False) and getattr(
+            self, "_stream_prefilt", ""
+        ):
             self._in_reasoning_block = False
             self._emit_stream_text(self._stream_prefilt)
             self._stream_prefilt = ""
@@ -457,7 +468,10 @@ class MixinStream:
         if (
             self._stream_buf
             and getattr(self, "_in_stream_table", False)
-            and (looks_like_table_row(self._stream_buf) or is_table_divider(self._stream_buf))
+            and (
+                looks_like_table_row(self._stream_buf)
+                or is_table_divider(self._stream_buf)
+            )
         ):
             self._stream_table_buf.append(self._stream_buf)
             self._stream_buf = ""
@@ -472,19 +486,25 @@ class MixinStream:
                 joined = _strip_markdown_syntax(joined)
             block = realign_markdown_tables(joined, _terminal_width_for_streaming())
             for ln in block.split("\n"):
-                _cprint(f"{_STREAM_PAD}{_tc}{ln}{_RST}" if _tc else f"{_STREAM_PAD}{ln}")
+                _cprint(
+                    f"{_STREAM_PAD}{_tc}{ln}{_RST}" if _tc else f"{_STREAM_PAD}{ln}"
+                )
 
         if self._stream_buf:
-            line = _strip_markdown_syntax(self._stream_buf) if self.final_response_markdown == "strip" else self._stream_buf
-            _cprint(f"{_STREAM_PAD}{_tc}{line}{_RST}" if _tc else f"{_STREAM_PAD}{line}")
+            line = (
+                _strip_markdown_syntax(self._stream_buf)
+                if self.final_response_markdown == "strip"
+                else self._stream_buf
+            )
+            _cprint(
+                f"{_STREAM_PAD}{_tc}{line}{_RST}" if _tc else f"{_STREAM_PAD}{line}"
+            )
             self._stream_buf = ""
 
         # Close the response box
         if self._stream_box_opened:
             w = self._scrollback_box_width()
             _cprint(f"{_ACCENT}╰{'─' * (w - 2)}╯{_RST}")
-
-
 
     def _reset_stream_state(self) -> None:
         """Reset streaming state before each agent invocation."""
@@ -502,12 +522,11 @@ class MixinStream:
         self._stream_table_buf = []
         self._in_stream_table = False
 
-
-
     def _on_reasoning(self, reasoning_text: str):
         """Callback for intermediate reasoning display during tool-call loops."""
         if not reasoning_text:
             return
-        self._reasoning_preview_buf = getattr(self, "_reasoning_preview_buf", "") + reasoning_text
+        self._reasoning_preview_buf = (
+            getattr(self, "_reasoning_preview_buf", "") + reasoning_text
+        )
         self._flush_reasoning_preview(force=False)
-

@@ -19,7 +19,8 @@ def main():
     # Announce via CLI (goes through real argparse + init_db + etc)
     subprocess.run(
         ["ReYMeN", "kanban", "heartbeat", tid, "--note", "started"],
-        check=True, capture_output=True,
+        check=True,
+        capture_output=True,
     )
 
     # Simulate work with periodic heartbeats
@@ -27,21 +28,30 @@ def main():
         time.sleep(0.3)
         subprocess.run(
             ["ReYMeN", "kanban", "heartbeat", tid, "--note", f"progress {i+1}/3"],
-            check=True, capture_output=True,
+            check=True,
+            capture_output=True,
         )
 
     # Complete with structured handoff
     subprocess.run(
         [
-            "ReYMeN", "kanban", "complete", tid,
-            "--summary", f"real-subprocess worker finished {tid}",
-            "--metadata", json.dumps({
-                "workspace": workspace,
-                "worker_pid": os.getpid(),
-                "iterations": 3,
-            }),
+            "ReYMeN",
+            "kanban",
+            "complete",
+            tid,
+            "--summary",
+            f"real-subprocess worker finished {tid}",
+            "--metadata",
+            json.dumps(
+                {
+                    "workspace": workspace,
+                    "worker_pid": os.getpid(),
+                    "iterations": 3,
+                }
+            ),
         ],
-        check=True, capture_output=True,
+        check=True,
+        capture_output=True,
     )
 
 

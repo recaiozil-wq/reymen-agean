@@ -42,14 +42,21 @@ class TestExtractFileMutationTargets:
         assert _extract_file_mutation_targets("terminal", {"command": "ls"}) == []
 
     def test_write_file_returns_single_path(self):
-        out = _extract_file_mutation_targets("write_file", {"path": "/tmp/a.md", "content": "x"})
+        out = _extract_file_mutation_targets(
+            "write_file", {"path": "/tmp/a.md", "content": "x"}
+        )
         assert out == ["/tmp/a.md"]
 
     def test_write_file_missing_path_returns_empty(self):
         assert _extract_file_mutation_targets("write_file", {"content": "x"}) == []
 
     def test_patch_replace_mode_returns_path(self):
-        args = {"mode": "replace", "path": "/tmp/a.md", "old_string": "x", "new_string": "y"}
+        args = {
+            "mode": "replace",
+            "path": "/tmp/a.md",
+            "old_string": "x",
+            "new_string": "y",
+        }
         assert _extract_file_mutation_targets("patch", args) == ["/tmp/a.md"]
 
     def test_patch_default_mode_is_replace(self):
@@ -86,7 +93,10 @@ class TestExtractFileMutationTargets:
 
     def test_patch_v4a_missing_body_returns_empty(self):
         assert _extract_file_mutation_targets("patch", {"mode": "patch"}) == []
-        assert _extract_file_mutation_targets("patch", {"mode": "patch", "patch": ""}) == []
+        assert (
+            _extract_file_mutation_targets("patch", {"mode": "patch", "patch": ""})
+            == []
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -96,11 +106,16 @@ class TestExtractFileMutationTargets:
 
 class TestExtractErrorPreview:
     def test_json_error_field_preferred(self):
-        raw = json.dumps({"success": False, "error": "Could not find old_string in /tmp/x"})
+        raw = json.dumps(
+            {"success": False, "error": "Could not find old_string in /tmp/x"}
+        )
         assert _extract_error_preview(raw) == "Could not find old_string in /tmp/x"
 
     def test_plain_string_falls_through(self):
-        assert _extract_error_preview("Error executing tool: boom") == "Error executing tool: boom"
+        assert (
+            _extract_error_preview("Error executing tool: boom")
+            == "Error executing tool: boom"
+        )
 
     def test_long_preview_truncated(self):
         long = "x" * 500
@@ -135,7 +150,10 @@ class TestRecordFileMutationResult:
     def test_non_mutating_tool_ignored(self):
         agent = _bare_agent()
         agent._record_file_mutation_result(
-            "read_file", {"path": "/tmp/x"}, "{}", is_error=True,
+            "read_file",
+            {"path": "/tmp/x"},
+            "{}",
+            is_error=True,
         )
         assert agent._turn_failed_file_mutations == {}
 
@@ -143,8 +161,15 @@ class TestRecordFileMutationResult:
         agent = _bare_agent()
         result = json.dumps({"success": False, "error": "Could not find old_string"})
         agent._record_file_mutation_result(
-            "patch", {"mode": "replace", "path": "/tmp/a.md", "old_string": "x", "new_string": "y"},
-            result, is_error=True,
+            "patch",
+            {
+                "mode": "replace",
+                "path": "/tmp/a.md",
+                "old_string": "x",
+                "new_string": "y",
+            },
+            result,
+            is_error=True,
         )
         state = agent._turn_failed_file_mutations
         assert "/tmp/a.md" in state
@@ -155,14 +180,28 @@ class TestRecordFileMutationResult:
         agent = _bare_agent()
         # First attempt fails
         agent._record_file_mutation_result(
-            "patch", {"mode": "replace", "path": "/tmp/a.md", "old_string": "x", "new_string": "y"},
-            json.dumps({"error": "not found"}), is_error=True,
+            "patch",
+            {
+                "mode": "replace",
+                "path": "/tmp/a.md",
+                "old_string": "x",
+                "new_string": "y",
+            },
+            json.dumps({"error": "not found"}),
+            is_error=True,
         )
         assert "/tmp/a.md" in agent._turn_failed_file_mutations
         # Second attempt with corrected old_string succeeds
         agent._record_file_mutation_result(
-            "patch", {"mode": "replace", "path": "/tmp/a.md", "old_string": "real", "new_string": "fixed"},
-            json.dumps({"success": True, "diff": "..."}), is_error=False,
+            "patch",
+            {
+                "mode": "replace",
+                "path": "/tmp/a.md",
+                "old_string": "real",
+                "new_string": "fixed",
+            },
+            json.dumps({"success": True, "diff": "..."}),
+            is_error=False,
         )
         assert agent._turn_failed_file_mutations == {}
 
@@ -176,10 +215,12 @@ class TestRecordFileMutationResult:
         )
         assert "/tmp/a.py" in agent._turn_failed_file_mutations
 
-        result = json.dumps({
-            "bytes_written": 24,
-            "lint": {"status": "error", "output": "SyntaxError: invalid syntax"},
-        })
+        result = json.dumps(
+            {
+                "bytes_written": 24,
+                "lint": {"status": "error", "output": "SyntaxError: invalid syntax"},
+            }
+        )
 
         agent._record_file_mutation_result(
             "write_file",
@@ -194,22 +235,34 @@ class TestRecordFileMutationResult:
         agent = _bare_agent()
         agent._record_file_mutation_result(
             "patch",
-            {"mode": "replace", "path": "/tmp/a.py", "old_string": "x", "new_string": "y"},
+            {
+                "mode": "replace",
+                "path": "/tmp/a.py",
+                "old_string": "x",
+                "new_string": "y",
+            },
             json.dumps({"error": "Could not find old_string"}),
             is_error=True,
         )
         assert "/tmp/a.py" in agent._turn_failed_file_mutations
 
-        result = json.dumps({
-            "success": True,
-            "diff": "--- a/tmp.py\n+++ b/tmp.py\n",
-            "files_modified": ["/tmp/a.py"],
-            "lsp_diagnostics": "<diagnostics>ERROR [1:1] type mismatch</diagnostics>",
-        })
+        result = json.dumps(
+            {
+                "success": True,
+                "diff": "--- a/tmp.py\n+++ b/tmp.py\n",
+                "files_modified": ["/tmp/a.py"],
+                "lsp_diagnostics": "<diagnostics>ERROR [1:1] type mismatch</diagnostics>",
+            }
+        )
 
         agent._record_file_mutation_result(
             "patch",
-            {"mode": "replace", "path": "/tmp/a.py", "old_string": "x", "new_string": "y"},
+            {
+                "mode": "replace",
+                "path": "/tmp/a.py",
+                "old_string": "x",
+                "new_string": "y",
+            },
             result,
             is_error=True,
         )
@@ -219,16 +272,33 @@ class TestRecordFileMutationResult:
     def test_repeated_failure_keeps_first_error(self):
         agent = _bare_agent()
         agent._record_file_mutation_result(
-            "patch", {"mode": "replace", "path": "/tmp/a.md", "old_string": "v1", "new_string": "y"},
-            json.dumps({"error": "first error"}), is_error=True,
+            "patch",
+            {
+                "mode": "replace",
+                "path": "/tmp/a.md",
+                "old_string": "v1",
+                "new_string": "y",
+            },
+            json.dumps({"error": "first error"}),
+            is_error=True,
         )
         agent._record_file_mutation_result(
-            "patch", {"mode": "replace", "path": "/tmp/a.md", "old_string": "v2", "new_string": "y"},
-            json.dumps({"error": "second error"}), is_error=True,
+            "patch",
+            {
+                "mode": "replace",
+                "path": "/tmp/a.md",
+                "old_string": "v2",
+                "new_string": "y",
+            },
+            json.dumps({"error": "second error"}),
+            is_error=True,
         )
         # Keep the original error — swapping to the latest would obscure
         # the initial root cause.
-        assert "first error" in agent._turn_failed_file_mutations["/tmp/a.md"]["error_preview"]
+        assert (
+            "first error"
+            in agent._turn_failed_file_mutations["/tmp/a.md"]["error_preview"]
+        )
 
     def test_v4a_multi_file_all_tracked(self):
         agent = _bare_agent()
@@ -239,8 +309,10 @@ class TestRecordFileMutationResult:
             "*** End Patch\n"
         )
         agent._record_file_mutation_result(
-            "patch", {"mode": "patch", "patch": body},
-            json.dumps({"error": "parse failure"}), is_error=True,
+            "patch",
+            {"mode": "patch", "patch": body},
+            json.dumps({"error": "parse failure"}),
+            is_error=True,
         )
         assert set(agent._turn_failed_file_mutations) == {"/tmp/a.md", "/tmp/b.md"}
 
@@ -254,15 +326,19 @@ class TestRecordFileMutationResult:
         agent = object.__new__(AIAgent)  # no state attached
         # Should not raise
         agent._record_file_mutation_result(
-            "patch", {"mode": "replace", "path": "/tmp/a.md"},
-            json.dumps({"error": "x"}), is_error=True,
+            "patch",
+            {"mode": "replace", "path": "/tmp/a.md"},
+            json.dumps({"error": "x"}),
+            is_error=True,
         )
 
     def test_missing_path_arg_recorded_nowhere(self):
         agent = _bare_agent()
         agent._record_file_mutation_result(
-            "patch", {"mode": "replace"},  # no path
-            json.dumps({"error": "path required"}), is_error=True,
+            "patch",
+            {"mode": "replace"},  # no path
+            json.dumps({"error": "path required"}),
+            is_error=True,
         )
         # No path → nothing to key on, state stays empty.  The per-turn
         # state is about file paths, not individual tool-call IDs.
@@ -280,7 +356,12 @@ class TestFormatFooter:
 
     def test_single_failure(self):
         out = AIAgent._format_file_mutation_failure_footer(
-            {"/tmp/a.md": {"tool": "patch", "error_preview": "Could not find old_string"}},
+            {
+                "/tmp/a.md": {
+                    "tool": "patch",
+                    "error_preview": "Could not find old_string",
+                }
+            },
         )
         assert "1 file(s) were NOT modified" in out
         assert "/tmp/a.md" in out
@@ -304,13 +385,15 @@ class TestFormatFooter:
         """Footer paths must be inline-code wrapped so the gateway's bare-path
         media extractor can't auto-attach them (#35584 defense-in-depth)."""
         out = AIAgent._format_file_mutation_failure_footer(
-            {"/home/u/.ReYMeN/config.yaml": {
-                "tool": "patch",
-                "error_preview": (
-                    "Write denied: '/home/u/.ReYMeN/config.yaml' is a "
-                    "protected system/credential file."
-                ),
-            }},
+            {
+                "/home/u/.ReYMeN/config.yaml": {
+                    "tool": "patch",
+                    "error_preview": (
+                        "Write denied: '/home/u/.ReYMeN/config.yaml' is a "
+                        "protected system/credential file."
+                    ),
+                }
+            },
         )
         # Path still human-readable.
         assert "/home/u/.ReYMeN/config.yaml" in out
@@ -336,19 +419,22 @@ class TestFormatFooter:
             with open(cfg, "w") as fh:
                 fh.write("openrouter_api_key: sk-LEAK\n")
             footer = AIAgent._format_file_mutation_failure_footer(
-                {cfg: {
-                    "tool": "patch",
-                    "error_preview": (
-                        f"Write denied: '{cfg}' is a protected "
-                        "system/credential file."
-                    ),
-                }},
+                {
+                    cfg: {
+                        "tool": "patch",
+                        "error_preview": (
+                            f"Write denied: '{cfg}' is a protected "
+                            "system/credential file."
+                        ),
+                    }
+                },
             )
             response = "I updated your config.\n\n" + footer
             paths, _ = BasePlatformAdapter.extract_local_files(response)
             assert paths == [], f"footer leaked deliverable path(s): {paths}"
         finally:
             import shutil
+
             shutil.rmtree(tmp, ignore_errors=True)
 
 
@@ -364,6 +450,7 @@ class TestVerifierEnabled:
         # With no env and no config present, safe default is True.
         # load_config may surface a user config.yaml in some envs — stub it.
         import ReYMeN_cli.config as _cfg_mod
+
         monkeypatch.setattr(_cfg_mod, "load_config", lambda: {})
         assert agent._file_mutation_verifier_enabled() is True
 
@@ -376,8 +463,10 @@ class TestVerifierEnabled:
     def test_env_enables_over_config(self, monkeypatch):
         monkeypatch.setenv("ReYMeN_FILE_MUTATION_VERIFIER", "1")
         import ReYMeN_cli.config as _cfg_mod
+
         monkeypatch.setattr(
-            _cfg_mod, "load_config",
+            _cfg_mod,
+            "load_config",
             lambda: {"display": {"file_mutation_verifier": False}},
         )
         agent = _bare_agent()
@@ -386,8 +475,10 @@ class TestVerifierEnabled:
     def test_config_disables_when_no_env(self, monkeypatch):
         monkeypatch.delenv("ReYMeN_FILE_MUTATION_VERIFIER", raising=False)
         import ReYMeN_cli.config as _cfg_mod
+
         monkeypatch.setattr(
-            _cfg_mod, "load_config",
+            _cfg_mod,
+            "load_config",
             lambda: {"display": {"file_mutation_verifier": False}},
         )
         agent = _bare_agent()

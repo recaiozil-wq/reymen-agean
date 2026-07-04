@@ -26,6 +26,7 @@ def handle_sessions_command(cli, cmd_original: str) -> None:
     if not arg or sub in {"list", "ls", "browse"}:
         if not cli._session_db:
             from reymen.sistem.ReYMeN_state import format_session_db_unavailable
+
             _cprint(f"  {format_session_db_unavailable()}")
             return
         if not cli._show_recent_sessions(reason="sessions"):

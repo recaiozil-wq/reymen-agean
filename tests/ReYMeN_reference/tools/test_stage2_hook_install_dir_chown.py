@@ -8,6 +8,7 @@ tree: Python writes ``__pycache__`` beneath the package on first import, which
 fails with EACCES if the tree still belongs to the build-time UID (10000) after
 a remap (#27221).
 """
+
 from __future__ import annotations
 
 import re
@@ -35,7 +36,9 @@ def _install_dir_chown_block(text: str) -> str:
         text,
         flags=re.DOTALL,
     )
-    assert match, "stage2-hook.sh must repair ownership of runtime-writable install trees"
+    assert (
+        match
+    ), "stage2-hook.sh must repair ownership of runtime-writable install trees"
     return match.group(1)
 
 
@@ -47,7 +50,9 @@ def test_uid_remap_chowns_runtime_writable_gateway_tree(stage2_text: str) -> Non
     )
 
 
-def test_install_dir_chown_keeps_existing_runtime_writable_trees(stage2_text: str) -> None:
+def test_install_dir_chown_keeps_existing_runtime_writable_trees(
+    stage2_text: str,
+) -> None:
     block = _install_dir_chown_block(stage2_text)
     for required in (
         '"$INSTALL_DIR/.venv"',

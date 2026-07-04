@@ -271,4 +271,6 @@ if __name__ == "__main__":
     print(f"   Atlanan (değişmeyen): {atlanan}")
 
     # Makine formatı
-    print(f"\nSONUC|new={len(yeni_liste)}|updated={len(guncel_liste)}|skipped={atlanan}")
+    print(
+        f"\nSONUC|new={len(yeni_liste)}|updated={len(guncel_liste)}|skipped={atlanan}"
+    )

@@ -63,16 +63,12 @@ def _make_adapter():
 
 
 def _make_event(text="/stop", chat_id="12345"):
-    source = SessionSource(
-        platform=Platform.TELEGRAM, chat_id=chat_id, chat_type="dm"
-    )
+    source = SessionSource(platform=Platform.TELEGRAM, chat_id=chat_id, chat_type="dm")
     return MessageEvent(text=text, message_type=MessageType.TEXT, source=source)
 
 
 def _session_key(chat_id="12345"):
-    source = SessionSource(
-        platform=Platform.TELEGRAM, chat_id=chat_id, chat_type="dm"
-    )
+    source = SessionSource(platform=Platform.TELEGRAM, chat_id=chat_id, chat_type="dm")
     return build_session_key(source)
 
 
@@ -93,12 +89,12 @@ class TestCommandBypassActiveSession:
 
         await adapter.handle_message(_make_event("/stop"))
 
-        assert sk not in adapter._pending_messages, (
-            "/stop was queued as a pending message instead of being dispatched"
-        )
-        assert any("handled:stop" in r for r in adapter.sent_responses), (
-            "/stop response was not sent back to the user"
-        )
+        assert (
+            sk not in adapter._pending_messages
+        ), "/stop was queued as a pending message instead of being dispatched"
+        assert any(
+            "handled:stop" in r for r in adapter.sent_responses
+        ), "/stop response was not sent back to the user"
 
     @pytest.mark.asyncio
     async def test_new_bypasses_guard(self):
@@ -193,12 +189,12 @@ class TestCommandBypassActiveSession:
 
         await adapter.handle_message(_make_event("/background summarize HN"))
 
-        assert sk not in adapter._pending_messages, (
-            "/background was queued as a pending message instead of being dispatched"
-        )
-        assert any("handled:background" in r for r in adapter.sent_responses), (
-            "/background response was not sent back to the user"
-        )
+        assert (
+            sk not in adapter._pending_messages
+        ), "/background was queued as a pending message instead of being dispatched"
+        assert any(
+            "handled:background" in r for r in adapter.sent_responses
+        ), "/background response was not sent back to the user"
 
     @pytest.mark.asyncio
     async def test_steer_bypasses_guard(self):
@@ -212,12 +208,12 @@ class TestCommandBypassActiveSession:
 
         await adapter.handle_message(_make_event("/steer also check auth.log"))
 
-        assert sk not in adapter._pending_messages, (
-            "/steer was queued as a pending message instead of being dispatched"
-        )
-        assert any("handled:steer" in r for r in adapter.sent_responses), (
-            "/steer response was not sent back to the user"
-        )
+        assert (
+            sk not in adapter._pending_messages
+        ), "/steer was queued as a pending message instead of being dispatched"
+        assert any(
+            "handled:steer" in r for r in adapter.sent_responses
+        ), "/steer response was not sent back to the user"
 
     @pytest.mark.asyncio
     async def test_help_bypasses_guard(self):
@@ -228,12 +224,12 @@ class TestCommandBypassActiveSession:
 
         await adapter.handle_message(_make_event("/help"))
 
-        assert sk not in adapter._pending_messages, (
-            "/help was queued as a pending message instead of being dispatched"
-        )
-        assert any("handled:help" in r for r in adapter.sent_responses), (
-            "/help response was not sent back to the user"
-        )
+        assert (
+            sk not in adapter._pending_messages
+        ), "/help was queued as a pending message instead of being dispatched"
+        assert any(
+            "handled:help" in r for r in adapter.sent_responses
+        ), "/help response was not sent back to the user"
 
     @pytest.mark.asyncio
     async def test_update_bypasses_guard(self):
@@ -244,12 +240,12 @@ class TestCommandBypassActiveSession:
 
         await adapter.handle_message(_make_event("/update"))
 
-        assert sk not in adapter._pending_messages, (
-            "/update was queued as a pending message instead of being dispatched"
-        )
-        assert any("handled:update" in r for r in adapter.sent_responses), (
-            "/update response was not sent back to the user"
-        )
+        assert (
+            sk not in adapter._pending_messages
+        ), "/update was queued as a pending message instead of being dispatched"
+        assert any(
+            "handled:update" in r for r in adapter.sent_responses
+        ), "/update response was not sent back to the user"
 
     @pytest.mark.asyncio
     async def test_queue_bypasses_guard(self):
@@ -260,12 +256,12 @@ class TestCommandBypassActiveSession:
 
         await adapter.handle_message(_make_event("/queue follow up"))
 
-        assert sk not in adapter._pending_messages, (
-            "/queue was queued as a pending message instead of being dispatched"
-        )
-        assert any("handled:queue" in r for r in adapter.sent_responses), (
-            "/queue response was not sent back to the user"
-        )
+        assert (
+            sk not in adapter._pending_messages
+        ), "/queue was queued as a pending message instead of being dispatched"
+        assert any(
+            "handled:queue" in r for r in adapter.sent_responses
+        ), "/queue response was not sent back to the user"
 
 
 # ---------------------------------------------------------------------------
@@ -311,9 +307,9 @@ class TestAllResolvableCommandsBypassGuard:
 
         await adapter.handle_message(_make_event(command_text))
 
-        assert sk not in adapter._pending_messages, (
-            f"{command_text} was queued as pending — it should bypass the guard"
-        )
+        assert (
+            sk not in adapter._pending_messages
+        ), f"{command_text} was queued as pending — it should bypass the guard"
         assert len(adapter.sent_responses) > 0, (
             f"{command_text} produced no response — it should be dispatched, "
             "not silently discarded"
@@ -324,13 +320,24 @@ class TestAllResolvableCommandsBypassGuard:
         from ReYMeN_cli.commands import should_bypass_active_session
 
         for cmd in (
-            "model", "reasoning", "personality", "voice", "insights", "title",
-            "resume", "retry", "undo", "compress", "usage",
-            "reload-mcp", "sethome", "reset",
+            "model",
+            "reasoning",
+            "personality",
+            "voice",
+            "insights",
+            "title",
+            "resume",
+            "retry",
+            "undo",
+            "compress",
+            "usage",
+            "reload-mcp",
+            "sethome",
+            "reset",
         ):
-            assert should_bypass_active_session(cmd) is True, (
-                f"/{cmd} must bypass the active-session guard"
-            )
+            assert (
+                should_bypass_active_session(cmd) is True
+            ), f"/{cmd} must bypass the active-session guard"
 
     def test_should_bypass_returns_false_for_unknown(self):
         """Unknown words don't bypass — they get queued as user text."""
@@ -360,12 +367,12 @@ class TestNonBypassStillQueued:
 
         await adapter.handle_message(_make_event("hello world"))
 
-        assert sk in adapter._pending_messages, (
-            "Regular text was not queued — it should be pending"
-        )
-        assert len(adapter.sent_responses) == 0, (
-            "Regular text should not produce a direct response"
-        )
+        assert (
+            sk in adapter._pending_messages
+        ), "Regular text was not queued — it should be pending"
+        assert (
+            len(adapter.sent_responses) == 0
+        ), "Regular text should not produce a direct response"
 
     @pytest.mark.asyncio
     async def test_unknown_command_queued(self):
@@ -477,9 +484,9 @@ class TestBypassWithBotnameSuffix:
 
         await adapter.handle_message(_make_event("/stop@MyReYMeNBot"))
 
-        assert sk not in adapter._pending_messages, (
-            "/stop@MyReYMeNBot was queued instead of bypassing"
-        )
+        assert (
+            sk not in adapter._pending_messages
+        ), "/stop@MyReYMeNBot was queued instead of bypassing"
         assert any("handled:stop" in r for r in adapter.sent_responses)
 
     @pytest.mark.asyncio

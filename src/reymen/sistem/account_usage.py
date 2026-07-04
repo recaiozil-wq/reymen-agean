@@ -39,9 +39,18 @@ class AccountUsage:
         }
 
     def _kaydet(self):
-        RAPOR_DOSYASI.write_text(json.dumps(self._veri, ensure_ascii=False, indent=2), encoding="utf-8")
+        RAPOR_DOSYASI.write_text(
+            json.dumps(self._veri, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
 
-    def ekle(self, provider: str, model: str, giris_token: int, cikis_token: int, maliyet: float):
+    def ekle(
+        self,
+        provider: str,
+        model: str,
+        giris_token: int,
+        cikis_token: int,
+        maliyet: float,
+    ):
         """Yeni kullanim kaydi ekle.
 
         Args:
@@ -58,7 +67,12 @@ class AccountUsage:
 
         # Provider bazli
         if provider not in self._veri["providerlar"]:
-            self._veri["providerlar"][provider] = {"istek": 0, "token": 0, "maliyet": 0.0, "model": model}
+            self._veri["providerlar"][provider] = {
+                "istek": 0,
+                "token": 0,
+                "maliyet": 0.0,
+                "model": model,
+            }
         p = self._veri["providerlar"][provider]
         p["istek"] += 1
         p["token"] += giris_token + cikis_token
@@ -119,13 +133,22 @@ class AccountUsage:
         if not a:
             return None
         if a["maliyet"] >= aylik_limit:
-            return f"[Uyari] Aylik butce asildi! ${a['maliyet']:.2f} / ${aylik_limit:.2f}"
+            return (
+                f"[Uyari] Aylik butce asildi! ${a['maliyet']:.2f} / ${aylik_limit:.2f}"
+            )
         if a["maliyet"] >= aylik_limit * 0.8:
             return f"[Uyari] Aylik butcenin %80'i kullanildi (${a['maliyet']:.2f}/${aylik_limit:.2f})"
         return None
 
     def sifirla(self):
-        self._veri = {"olusturma": datetime.now().isoformat(), "toplam_istek": 0, "toplam_token": 0, "toplam_maliyet": 0.0, "providerlar": {}, "aylik_veri": {}}
+        self._veri = {
+            "olusturma": datetime.now().isoformat(),
+            "toplam_istek": 0,
+            "toplam_token": 0,
+            "toplam_maliyet": 0.0,
+            "providerlar": {},
+            "aylik_veri": {},
+        }
         self._kaydet()
 
 
@@ -133,7 +156,9 @@ class AccountUsage:
 _hesap = AccountUsage()
 
 
-def hesap_ekle(provider: str, model: str, giris_token: int, cikis_token: int, maliyet: float):
+def hesap_ekle(
+    provider: str, model: str, giris_token: int, cikis_token: int, maliyet: float
+):
     _hesap.ekle(provider, model, giris_token, cikis_token, maliyet)
 
 

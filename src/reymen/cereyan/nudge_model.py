@@ -41,19 +41,25 @@ ROOT = Path(__file__).parent.resolve()
 VERITABANI_YOLU = ROOT / ".ReYMeN" / "nudge_model.db"
 
 # Gozlem limitleri
-MAKS_SATIR = 5000          # Veritabaninda en fazla satir
-MAKS_GUN = 90              # Kac gunluk veri tutulacak
-MAKS_NUDGE = 20            # nudge() dondrugunde en fazla kac oge
+MAKS_SATIR = 5000  # Veritabaninda en fazla satir
+MAKS_GUN = 90  # Kac gunluk veri tutulacak
+MAKS_NUDGE = 20  # nudge() dondrugunde en fazla kac oge
 
 # Model agirliklandirma
 SON_KONUSMA_AGRILIK = 0.6  # Son konusmalarin agirligi
 ESKI_KONUSMA_AGRILIK = 0.4  # Eski konusmalarin agirligi
-GUVEN_ESIGI = 3             # Guven puani icin minimum gozlem sayisi
+GUVEN_ESIGI = 3  # Guven puani icin minimum gozlem sayisi
 
 # Stil/teknik/dil sabitleri
 STIL_KATEGORILERI = [
-    "resmi", "samimi", "teknik", "kisa", "detayli",
-    "komut", "soru", "hata_bildirimi",
+    "resmi",
+    "samimi",
+    "teknik",
+    "kisa",
+    "detayli",
+    "komut",
+    "soru",
+    "hata_bildirimi",
 ]
 
 TEKNIK_SEVIYE_ETIKETLERI = {
@@ -65,12 +71,18 @@ TEKNIK_SEVIYE_ETIKETLERI = {
 }
 
 ARAC_KATEGORILERI = [
-    "terminal", "dosya_oku", "dosya_yaz", "ara",
-    "web", "kod_calistir", "diger",
+    "terminal",
+    "dosya_oku",
+    "dosya_yaz",
+    "ara",
+    "web",
+    "kod_calistir",
+    "diger",
 ]
 
 
 # ── Yardimci Fonksiyonlar ─────────────────────────────────────────────────────
+
 
 def _simdiki_zaman() -> str:
     """ISO formatinda su anki zamani dondur."""
@@ -83,6 +95,7 @@ def _zaman_damgasi() -> float:
 
 
 # ── NudgeModel Sinifi ─────────────────────────────────────────────────────────
+
 
 class NudgeModel:
     """Gizli kullanici modelleme sistemi.
@@ -222,9 +235,19 @@ class NudgeModel:
                 yanit_uzunluk, stil_tahmini, teknik_seviye, dil_kodu,
                 arac_kullanimi, duygu_tonu)
                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-            (simdi, damga, mesaj[:500], yanit[:500],
-             mesaj_uzunluk, yanit_uzunluk, stil, teknik, dil,
-             arac, duygu),
+            (
+                simdi,
+                damga,
+                mesaj[:500],
+                yanit[:500],
+                mesaj_uzunluk,
+                yanit_uzunluk,
+                stil,
+                teknik,
+                dil,
+                arac,
+                duygu,
+            ),
         )
 
         self._model_guncelle("stil", stil)
@@ -271,41 +294,86 @@ class NudgeModel:
 
         if metin.endswith("?") or "?" in metin:
             teknik_soru = [
-                "kod", "api", "fonksiyon", "hata", "error", "debug",
-                "import", "class", "def ", "neden",
+                "kod",
+                "api",
+                "fonksiyon",
+                "hata",
+                "error",
+                "debug",
+                "import",
+                "class",
+                "def ",
+                "neden",
             ]
             if any(k in metin.lower() for k in teknik_soru):
                 return "teknik"
             return "soru"
 
         komut_ifadeleri = [
-            "yap", "olustur", "yaz", "goster", "sil", "calistir",
-            "getir", "ara", "bul", "kur", "ac", "kapat", "yukle",
+            "yap",
+            "olustur",
+            "yaz",
+            "goster",
+            "sil",
+            "calistir",
+            "getir",
+            "ara",
+            "bul",
+            "kur",
+            "ac",
+            "kapat",
+            "yukle",
         ]
         ilk_kelime = metin.split()[0].lower() if metin.split() else ""
         if ilk_kelime in komut_ifadeleri:
             return "komut"
 
         hata_ifadeleri = [
-            "hata", "error", "calismiyor", "patladi", "olmuyor",
-            "sorun", "bug", "kirik", "beklemiyordum",
+            "hata",
+            "error",
+            "calismiyor",
+            "patladi",
+            "olmuyor",
+            "sorun",
+            "bug",
+            "kirik",
+            "beklemiyordum",
         ]
         if any(h in metin.lower() for h in hata_ifadeleri):
             return "hata_bildirimi"
 
         teknik_ifadeler = [
-            "implement", "refactor", "deploy", "migration", "dependency",
-            "config", "pipeline", "docker", "kubernetes", "postgres",
-            "redis", "nginx", "localhost", "port", "endpoint",
+            "implement",
+            "refactor",
+            "deploy",
+            "migration",
+            "dependency",
+            "config",
+            "pipeline",
+            "docker",
+            "kubernetes",
+            "postgres",
+            "redis",
+            "nginx",
+            "localhost",
+            "port",
+            "endpoint",
         ]
         teknik_sayisi = sum(1 for t in teknik_ifadeler if t in metin.lower())
         if teknik_sayisi >= 2:
             return "teknik"
 
         resmi_ifadeler = [
-            "lutfen", "rica", "sayin", "saygiyla", "tesekkur",
-            "merhaba", "iyi gunler", "yardimci olabilir",
-            "acaba", "mumkun mu",
+            "lutfen",
+            "rica",
+            "sayin",
+            "saygiyla",
+            "tesekkur",
+            "merhaba",
+            "iyi gunler",
+            "yardimci olabilir",
+            "acaba",
+            "mumkun mu",
         ]
         if any(r in metin.lower() for r in resmi_ifadeler) and uzunluk > 50:
             return "resmi"
@@ -327,18 +395,57 @@ class NudgeModel:
         puan = 0.0
 
         ileri_teknik = [
-            "asenkron", "senkronizasyon", "paralel", "thread", "process",
-            "deadlock", "race condition", "memory leak", "buffer overflow",
-            "dependency injection", "ioc", "aop", "orm", "sql injection",
-            "ci/cd", "devops", "microservice", "monolith", "event driven",
-            "message queue", "load balancer", "horizontal scaling",
-            "vertical scaling", "sharding", "replication", "consensus",
-            "distributed system", "restful", "graphql", "grpc", "websocket",
-            "oauth", "jwt", "ssl/tls", "certificate", "asymmetric",
-            "time complexity", "space complexity", "big o", "recursive",
-            "dynamic programming", "machine learning", "deep learning",
-            "neural network", "transformer", "embedding", "vector db",
-            "rag", "fine tuning", "tokenization", "inference",
+            "asenkron",
+            "senkronizasyon",
+            "paralel",
+            "thread",
+            "process",
+            "deadlock",
+            "race condition",
+            "memory leak",
+            "buffer overflow",
+            "dependency injection",
+            "ioc",
+            "aop",
+            "orm",
+            "sql injection",
+            "ci/cd",
+            "devops",
+            "microservice",
+            "monolith",
+            "event driven",
+            "message queue",
+            "load balancer",
+            "horizontal scaling",
+            "vertical scaling",
+            "sharding",
+            "replication",
+            "consensus",
+            "distributed system",
+            "restful",
+            "graphql",
+            "grpc",
+            "websocket",
+            "oauth",
+            "jwt",
+            "ssl/tls",
+            "certificate",
+            "asymmetric",
+            "time complexity",
+            "space complexity",
+            "big o",
+            "recursive",
+            "dynamic programming",
+            "machine learning",
+            "deep learning",
+            "neural network",
+            "transformer",
+            "embedding",
+            "vector db",
+            "rag",
+            "fine tuning",
+            "tokenization",
+            "inference",
         ]
         for terim in ileri_teknik:
             if terim in metin_lower:
@@ -346,18 +453,71 @@ class NudgeModel:
                 break
 
         orta_teknik = [
-            "python", "java", "javascript", "typescript", "rust", "go",
-            "c++", "c#", "ruby", "php", "shell", "bash", "powershell",
-            "sql", "nosql", "mongodb", "redis", "postgresql", "mysql",
-            "docker", "kubernetes", "git", "github", "linux", "unix",
-            "api", "rest", "json", "xml", "yaml", "toml",
-            "framework", "library", "kutuphane", "paket", "modul",
-            "fonksiyon", "degisken", "sinif", "nesne", "interface",
-            "veritabani", "sunucu", "istemci", "backend", "frontend",
-            "debug", "log", "test", "unit test", "integration",
-            "deploy", "build", "compile", "runtime", "dependency",
-            "algoritma", "veri yapisi", "liste", "sozluk", "kume",
-            "dongu", "kosul", "hata yakalama", "try catch",
+            "python",
+            "java",
+            "javascript",
+            "typescript",
+            "rust",
+            "go",
+            "c++",
+            "c#",
+            "ruby",
+            "php",
+            "shell",
+            "bash",
+            "powershell",
+            "sql",
+            "nosql",
+            "mongodb",
+            "redis",
+            "postgresql",
+            "mysql",
+            "docker",
+            "kubernetes",
+            "git",
+            "github",
+            "linux",
+            "unix",
+            "api",
+            "rest",
+            "json",
+            "xml",
+            "yaml",
+            "toml",
+            "framework",
+            "library",
+            "kutuphane",
+            "paket",
+            "modul",
+            "fonksiyon",
+            "degisken",
+            "sinif",
+            "nesne",
+            "interface",
+            "veritabani",
+            "sunucu",
+            "istemci",
+            "backend",
+            "frontend",
+            "debug",
+            "log",
+            "test",
+            "unit test",
+            "integration",
+            "deploy",
+            "build",
+            "compile",
+            "runtime",
+            "dependency",
+            "algoritma",
+            "veri yapisi",
+            "liste",
+            "sozluk",
+            "kume",
+            "dongu",
+            "kosul",
+            "hata yakalama",
+            "try catch",
         ]
         for terim in orta_teknik:
             if terim in metin_lower:
@@ -396,10 +556,30 @@ class NudgeModel:
             return "tr"
 
         tr_kelimeler = [
-            "bir", "ve", "bu", "icin", "ile", "ama", "veya",
-            "gibi", "kadar", "sonra", "once", "ancak", "cunku",
-            "eger", "her", "sey", "yani", "veya", "degil",
-            "ne", "nasil", "neden", "nerede", "hangi",
+            "bir",
+            "ve",
+            "bu",
+            "icin",
+            "ile",
+            "ama",
+            "veya",
+            "gibi",
+            "kadar",
+            "sonra",
+            "once",
+            "ancak",
+            "cunku",
+            "eger",
+            "her",
+            "sey",
+            "yani",
+            "veya",
+            "degil",
+            "ne",
+            "nasil",
+            "neden",
+            "nerede",
+            "hangi",
         ]
         kelimeler = set(metin.lower().split())
         tr_skor = sum(1 for k in tr_kelimeler if k in kelimeler)
@@ -443,18 +623,46 @@ class NudgeModel:
 
         metin_lower = metin.lower()
         pozitif = [
-            "tesekkur", "harika", "mukemmel", "guzel", "super",
-            "cok iyi", "ellerine saglik", "helal", "muhtesem",
-            "tam istedigim", "calisti", "oldu", "basardin",
+            "tesekkur",
+            "harika",
+            "mukemmel",
+            "guzel",
+            "super",
+            "cok iyi",
+            "ellerine saglik",
+            "helal",
+            "muhtesem",
+            "tam istedigim",
+            "calisti",
+            "oldu",
+            "basardin",
         ]
         negatif = [
-            "hata", "kotu", "berbat", "ise yaramaz", "olmuyor",
-            "calismiyor", "patladi", "yapma", "hayir", "degil",
-            "duzel", "tekrar", "bozuk", "yanlis",
+            "hata",
+            "kotu",
+            "berbat",
+            "ise yaramaz",
+            "olmuyor",
+            "calismiyor",
+            "patladi",
+            "yapma",
+            "hayir",
+            "degil",
+            "duzel",
+            "tekrar",
+            "bozuk",
+            "yanlis",
         ]
         acil = [
-            "hemen", "acil", "cabuk", "lutfen yardim", "kritik",
-            "patladi", "durdu", "oldu", "coktu",
+            "hemen",
+            "acil",
+            "cabuk",
+            "lutfen yardim",
+            "kritik",
+            "patladi",
+            "durdu",
+            "oldu",
+            "coktu",
         ]
 
         if any(a in metin_lower for a in acil):
@@ -537,8 +745,7 @@ class NudgeModel:
                    deger = ?, guven_puani = ?,
                    son_guncelleme = ?, gozlem_sayisi = ?
                    WHERE anahtar = ?""",
-                (str(yeni_deger), mevcut["guven_puani"],
-                 simdi, yeni_sayi, anahtar),
+                (str(yeni_deger), mevcut["guven_puani"], simdi, yeni_sayi, anahtar),
             )
         else:
             self._calistir(
@@ -683,9 +890,7 @@ class NudgeModel:
         dil = model.get("dil", {})
         if isinstance(dil, dict) and dil.get("guven", 0) >= 0.3:
             dil_adi = "Turkce" if dil["deger"] == "tr" else "Ingilizce"
-            bolumler.append(
-                f"Dil tercihi: **{dil_adi}**."
-            )
+            bolumler.append(f"Dil tercihi: **{dil_adi}**.")
 
         arac_model = model.get("arac_kullanim", {})
         if arac_model:
@@ -751,45 +956,54 @@ class NudgeModel:
         stil = model.get("stil", {})
         if isinstance(stil, dict) and stil.get("guven", 0) > 0.5:
             if stil["deger"] == "teknik" and toplam_konusma > 5:
-                nudges.append({
-                    "tur": "stil_uyari",
-                    "icerik": "Kullanici teknik detaylari tercih ediyor "
-                              "yanitlarda spesifik ol.",
-                    "guven": stil["guven"],
-                })
+                nudges.append(
+                    {
+                        "tur": "stil_uyari",
+                        "icerik": "Kullanici teknik detaylari tercih ediyor "
+                        "yanitlarda spesifik ol.",
+                        "guven": stil["guven"],
+                    }
+                )
             elif stil["deger"] == "kisa":
-                nudges.append({
-                    "tur": "stil_uyari",
-                    "icerik": "Kullanici kisa yanitlari tercih ediyor "
-                              "ozlu ol.",
-                    "guven": stil["guven"],
-                })
+                nudges.append(
+                    {
+                        "tur": "stil_uyari",
+                        "icerik": "Kullanici kisa yanitlari tercih ediyor " "ozlu ol.",
+                        "guven": stil["guven"],
+                    }
+                )
 
         teknik = model.get("teknik_seviye", {})
         if isinstance(teknik, dict) and teknik.get("guven", 0) > 0.4:
             if teknik["deger"] <= 2:
-                nudges.append({
-                    "tur": "teknik_seviye",
-                    "icerik": "Kullanici dusuk teknik seviyede "
-                              "jargon kullanma basit acikla.",
-                    "guven": teknik["guven"],
-                })
+                nudges.append(
+                    {
+                        "tur": "teknik_seviye",
+                        "icerik": "Kullanici dusuk teknik seviyede "
+                        "jargon kullanma basit acikla.",
+                        "guven": teknik["guven"],
+                    }
+                )
             elif teknik["deger"] >= 4:
-                nudges.append({
-                    "tur": "teknik_seviye",
-                    "icerik": "Kullanici ileri teknik seviyede "
-                              "detayli teknik aciklama yapabilirsin.",
-                    "guven": teknik["guven"],
-                })
+                nudges.append(
+                    {
+                        "tur": "teknik_seviye",
+                        "icerik": "Kullanici ileri teknik seviyede "
+                        "detayli teknik aciklama yapabilirsin.",
+                        "guven": teknik["guven"],
+                    }
+                )
 
         dil = model.get("dil", {})
         if isinstance(dil, dict) and dil.get("guven", 0) > 0.5:
             dil_sembol = "Turkce" if dil["deger"] == "tr" else "Ingilizce"
-            nudges.append({
-                "tur": "dil_tercihi",
-                "icerik": f"Kullanici tercih ettigi dil: {dil_sembol}.",
-                "guven": dil["guven"],
-            })
+            nudges.append(
+                {
+                    "tur": "dil_tercihi",
+                    "icerik": f"Kullanici tercih ettigi dil: {dil_sembol}.",
+                    "guven": dil["guven"],
+                }
+            )
 
         duygu = model.get("duygu_profili", {})
         if duygu:
@@ -797,25 +1011,28 @@ class NudgeModel:
             if toplam_duygu >= 3:
                 negatif_oran = duygu.get("negatif", {}).get("oran", 0)
                 if negatif_oran > 0.4:
-                    nudges.append({
-                        "tur": "duygu_uyari",
-                        "icerik": "Kullanici son zamanlarda sik "
-                                  "olumsuz geribildirim veriyor. Cozum odakli ol.",
-                        "guven": min(0.8, negatif_oran),
-                    })
+                    nudges.append(
+                        {
+                            "tur": "duygu_uyari",
+                            "icerik": "Kullanici son zamanlarda sik "
+                            "olumsuz geribildirim veriyor. Cozum odakli ol.",
+                            "guven": min(0.8, negatif_oran),
+                        }
+                    )
 
         arac_model = model.get("arac_kullanim", {})
         if arac_model and sum(v["sayi"] for v in arac_model.values()) > 10:
-            nadir_araclar = [k for k, v in arac_model.items()
-                             if v["sayi"] == 1]
+            nadir_araclar = [k for k, v in arac_model.items() if v["sayi"] == 1]
             if nadir_araclar:
-                nudges.append({
-                    "tur": "arac_kesfi",
-                    "icerik": f"Kullanici '{nadir_araclar[0]}' aracini "
-                              f"sadece 1 kere kullandi belki tanitmak "
-                              f"faydali olabilir.",
-                    "guven": 0.3,
-                })
+                nudges.append(
+                    {
+                        "tur": "arac_kesfi",
+                        "icerik": f"Kullanici '{nadir_araclar[0]}' aracini "
+                        f"sadece 1 kere kullandi belki tanitmak "
+                        f"faydali olabilir.",
+                        "guven": 0.3,
+                    }
+                )
 
         son_etkilesim = model.get("son_etkilesim")
         if son_etkilesim:
@@ -823,12 +1040,14 @@ class NudgeModel:
                 son = datetime.fromisoformat(son_etkilesim)
                 fark = datetime.now() - son
                 if fark > timedelta(hours=24):
-                    nudges.append({
-                        "tur": "zaman_uyari",
-                        "icerik": f"Kullanici son {int(fark.total_seconds() / 3600)} "
-                                  f"saattir yeni bir konu acmamis.",
-                        "guven": 0.5,
-                    })
+                    nudges.append(
+                        {
+                            "tur": "zaman_uyari",
+                            "icerik": f"Kullanici son {int(fark.total_seconds() / 3600)} "
+                            f"saattir yeni bir konu acmamis.",
+                            "guven": 0.5,
+                        }
+                    )
             except (ValueError, TypeError):
                 logger.warning("[fix_01_sessiz_except] Exception")
 
@@ -843,14 +1062,16 @@ class NudgeModel:
                 en_cok = arac_satirlari[0]["sayi"]
                 en_az = arac_satirlari[-1]["sayi"]
                 if en_cok > en_az * 3 and en_az > 0:
-                    nudges.append({
-                        "tur": "desen_kesfi",
-                        "icerik": f"Kullanici '{arac_satirlari[0]['arac_kullanimi']}' "
-                                  f"aracini '{arac_satirlari[-1]['arac_kullanimi']}' "
-                                  f"aracina kiyasla {en_cok // en_az} kat "
-                                  f"daha fazla kullaniyor.",
-                        "guven": 0.4,
-                    })
+                    nudges.append(
+                        {
+                            "tur": "desen_kesfi",
+                            "icerik": f"Kullanici '{arac_satirlari[0]['arac_kullanimi']}' "
+                            f"aracini '{arac_satirlari[-1]['arac_kullanimi']}' "
+                            f"aracina kiyasla {en_cok // en_az} kat "
+                            f"daha fazla kullaniyor.",
+                            "guven": 0.4,
+                        }
+                    )
 
         nudges.sort(key=lambda x: x["guven"], reverse=True)
 
@@ -912,8 +1133,7 @@ class NudgeModel:
         if isinstance(dil, dict):
             dil_adi = "Turkce" if dil.get("deger") == "tr" else "Ingilizce"
             satirlar.append(
-                f"Dil Tercihi: {dil_adi} "
-                f"(guven: %{int(dil.get('guven', 0) * 100)})"
+                f"Dil Tercihi: {dil_adi} " f"(guven: %{int(dil.get('guven', 0) * 100)})"
             )
 
         satirlar.append("")
@@ -921,8 +1141,9 @@ class NudgeModel:
         arac_model = model.get("arac_kullanim", {})
         if arac_model:
             satirlar.append("Arac Kullanim Dagitimi:")
-            for arac, bilgi in sorted(arac_model.items(),
-                                      key=lambda x: x[1]["sayi"], reverse=True):
+            for arac, bilgi in sorted(
+                arac_model.items(), key=lambda x: x[1]["sayi"], reverse=True
+            ):
                 bar = chr(9608) * min(bilgi["sayi"], 20)
                 satirlar.append(f"  {arac}: {bilgi['sayi']} {bar}")
 
@@ -942,9 +1163,7 @@ class NudgeModel:
         )
         satir = cursor.fetchone()
         if satir and satir["sayi"] > 0:
-            satirlar.append(
-                f"Bekleyen Nudge: {satir['sayi']} adet"
-            )
+            satirlar.append(f"Bekleyen Nudge: {satir['sayi']} adet")
 
         return "\n".join(satirlar)
 
@@ -957,9 +1176,7 @@ class NudgeModel:
             cursor = self._calistir("SELECT COUNT(*) as sayi FROM gozlemler")
             durum["gozlem_sayisi"] = cursor.fetchone()["sayi"]
 
-            cursor = self._calistir(
-                "SELECT COUNT(*) as sayi FROM kullanici_modeli"
-            )
+            cursor = self._calistir("SELECT COUNT(*) as sayi FROM kullanici_modeli")
             durum["model_ozellik_sayisi"] = cursor.fetchone()["sayi"]
 
             cursor = self._calistir("SELECT COUNT(*) as sayi FROM nudge_gecmisi")
@@ -1029,36 +1246,43 @@ if __name__ == "__main__":
     nm = NudgeModel()
 
     test_konusmalar = [
-        ("merhaba chatbot, nasilsin?",
-         "iyiyim tesekkurler, sana nasil yardimci olabilirim?"),
-        ("bir python script'i yaz, dosyalari okuyup JSON'a cevirsin",
-         "```python\nimport json\n...``` terminal ile calistirabilirsin."),
-        ("terminal ciktisini kontrol edelim",
-         "[terminal] cikti: basarili"),
-        ("hata aliyorum, neden calismiyor?",
-         "[hata] dosya bulunamadi..."),
-        ("tesekkurler, harika oldu!",
-         "rica ederim, baska bir sey var mi?"),
-        ("hayir, her zaman UTF-8 kullan",
-         "not edildi, UTF-8 kullanacagim."),
-        ("su API endpoint'ini dene, port 3000'de",
-         "http://localhost:3000/api'ye istek atiyorum..."),
-        ("bu projeyi dockerize et",
-         "Dockerfile olusturuluyor..."),
-        ("lutfen su kodu refactor eder misin?",
-         "tabii, dependency injection ile yeniden yazalim..."),
-        ("cok tesekkur ederim, mukemmel bir cozum oldu!",
-         "ne demek, yardimci olabildiysem ne mutlu!"),
+        (
+            "merhaba chatbot, nasilsin?",
+            "iyiyim tesekkurler, sana nasil yardimci olabilirim?",
+        ),
+        (
+            "bir python script'i yaz, dosyalari okuyup JSON'a cevirsin",
+            "```python\nimport json\n...``` terminal ile calistirabilirsin.",
+        ),
+        ("terminal ciktisini kontrol edelim", "[terminal] cikti: basarili"),
+        ("hata aliyorum, neden calismiyor?", "[hata] dosya bulunamadi..."),
+        ("tesekkurler, harika oldu!", "rica ederim, baska bir sey var mi?"),
+        ("hayir, her zaman UTF-8 kullan", "not edildi, UTF-8 kullanacagim."),
+        (
+            "su API endpoint'ini dene, port 3000'de",
+            "http://localhost:3000/api'ye istek atiyorum...",
+        ),
+        ("bu projeyi dockerize et", "Dockerfile olusturuluyor..."),
+        (
+            "lutfen su kodu refactor eder misin?",
+            "tabii, dependency injection ile yeniden yazalim...",
+        ),
+        (
+            "cok tesekkur ederim, mukemmel bir cozum oldu!",
+            "ne demek, yardimci olabildiysem ne mutlu!",
+        ),
     ]
 
     print(f"\n> {len(test_konusmalar)} test konusmasi isleniyor...\n")
     for i, (mesaj, yanit) in enumerate(test_konusmalar, 1):
         gozlem = nm.gozlemle(mesaj, yanit)
-        print(f"  [{i}] Stil={gozlem['stil']:>10} "
-              f"| Teknik={gozlem['teknik_seviye']} "
-              f"| Dil={gozlem['dil']} "
-              f"| Arac={gozlem['arac']:>12} "
-              f"| Duygu={gozlem['duygu']:>8}")
+        print(
+            f"  [{i}] Stil={gozlem['stil']:>10} "
+            f"| Teknik={gozlem['teknik_seviye']} "
+            f"| Dil={gozlem['dil']} "
+            f"| Arac={gozlem['arac']:>12} "
+            f"| Duygu={gozlem['duygu']:>8}"
+        )
 
     print("\n" + "-" * 60)
     print(nm.rapor_uret())
@@ -1073,8 +1297,7 @@ if __name__ == "__main__":
     hatirlatmalar = nm.nudge()
     if hatirlatmalar:
         for h in hatirlatmalar:
-            print(f"  [{h['tur']}] (guven: %{int(h['guven'] * 100)}) "
-                  f"{h['icerik']}")
+            print(f"  [{h['tur']}] (guven: %{int(h['guven'] * 100)}) " f"{h['icerik']}")
     else:
         print("  (henuz nudge uretilemedi)")
 

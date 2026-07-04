@@ -25,9 +25,9 @@ from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
 
+
 class MixinFileOps:
     """ReYMeNCLI File/DevOps operations — rollback, snapshot, stop, debug, update."""
-
 
     def _handle_rollback_command(self, command: str):
         """Handle /rollback — list, diff, or restore filesystem checkpoints.
@@ -40,7 +40,7 @@ class MixinFileOps:
         """
         from tools.checkpoint_manager import format_checkpoint_list
 
-        if not hasattr(self, 'agent') or not self.agent:
+        if not hasattr(self, "agent") or not self.agent:
             print("  No active agent session.")
             return
 
@@ -87,7 +87,9 @@ class MixinFileOps:
                         diff_lines = diff.splitlines()
                         if len(diff_lines) > 80:
                             print("\n".join(diff_lines[:80]))
-                            print(f"\n  ... ({len(diff_lines) - 80} more lines, showing first 80)")
+                            print(
+                                f"\n  ... ({len(diff_lines) - 80} more lines, showing first 80)"
+                            )
                         else:
                             print(f"\n{diff}")
             else:
@@ -110,9 +112,13 @@ class MixinFileOps:
         result = mgr.restore(cwd, target_hash, file_path=file_path)
         if result["success"]:
             if file_path:
-                print(f"  ✅ Restored {file_path} from checkpoint {result['restored_to']}: {result['reason']}")
+                print(
+                    f"  ✅ Restored {file_path} from checkpoint {result['restored_to']}: {result['reason']}"
+                )
             else:
-                print(f"  ✅ Restored to checkpoint {result['restored_to']}: {result['reason']}")
+                print(
+                    f"  ✅ Restored to checkpoint {result['restored_to']}: {result['reason']}"
+                )
             print("  A pre-rollback snapshot was saved automatically.")
 
             # Also undo the last conversation turn so the agent's context
@@ -122,7 +128,6 @@ class MixinFileOps:
                 print("  Chat turn undone to match restored file state.")
         else:
             print(f"  ❌ {result['error']}")
-
 
     def _handle_snapshot_command(self, command: str):
         """Handle /snapshot — lightweight state snapshots for ReYMeN config/state.
@@ -134,8 +139,10 @@ class MixinFileOps:
             /snapshot prune [N]        — prune to N snapshots (default 20)
         """
         from reymen.reymen_cli.backup import (
-            create_quick_snapshot, list_quick_snapshots,
-            restore_quick_snapshot, prune_quick_snapshots,
+            create_quick_snapshot,
+            list_quick_snapshots,
+            restore_quick_snapshot,
+            prune_quick_snapshots,
         )
         from reymen.sistem.ReYMeN_constants import display_reymen_home
 
@@ -160,7 +167,9 @@ class MixinFileOps:
                 else:
                     size_str = f"{size / 1024 / 1024:.1f} MB"
                 label = s.get("label") or ""
-                print(f"  {i:3}  {s['id']:<35} {s.get('file_count', 0):>5} {size_str:>10} {label}")
+                print(
+                    f"  {i:3}  {s['id']:<35} {s.get('file_count', 0):>5} {size_str:>10} {label}"
+                )
 
         elif subcmd == "create":
             label = " ".join(parts[2:]) if len(parts) > 2 else None
@@ -211,7 +220,6 @@ class MixinFileOps:
             print(f"  Unknown subcommand: {subcmd}")
             print("  Usage: /snapshot [list|create [label]|restore <id>|prune [N]]")
 
-
     def _handle_stop_command(self):
         """Handle /stop — kill all running background processes.
 
@@ -231,7 +239,6 @@ class MixinFileOps:
         killed = process_registry.kill_all()
         print(f"  ✅ Stopped {killed} process(es).")
 
-
     def _handle_debug_command(self):
         """Handle /debug — upload debug report + logs and print paste URLs."""
         from reymen.reymen_cli.debug import run_debug_share
@@ -239,7 +246,6 @@ class MixinFileOps:
 
         args = SimpleNamespace(lines=200, expire=7, local=False)
         run_debug_share(args)
-
 
     def _handle_update_command(self) -> bool:
         """Handle /update — update ReYMeN Agent to the latest version.
@@ -294,4 +300,4 @@ class MixinFileOps:
         return True
 
 
-__all__ = ['MixinFileOps']
+__all__ = ["MixinFileOps"]

@@ -21,16 +21,17 @@ from run_agent import AIAgent
 # _SKILL_REVIEW_PROMPT
 # ---------------------------------------------------------------------------
 
+
 def test_skill_review_prompt_biases_toward_active_updates():
     """Prompt must frame updating as the default stance, not something rare."""
     prompt = AIAgent._SKILL_REVIEW_PROMPT
-    assert "ACTIVE" in prompt or "active" in prompt.lower(), (
-        "must tell the reviewer to be active"
-    )
+    assert (
+        "ACTIVE" in prompt or "active" in prompt.lower()
+    ), "must tell the reviewer to be active"
     # "missed learning opportunity" or equivalent framing for not acting
-    assert "missed" in prompt.lower() or "opportunity" in prompt.lower(), (
-        "must frame inaction as a miss, not a neutral outcome"
-    )
+    assert (
+        "missed" in prompt.lower() or "opportunity" in prompt.lower()
+    ), "must frame inaction as a miss, not a neutral outcome"
 
 
 def test_skill_review_prompt_treats_user_corrections_as_skill_signal():
@@ -38,29 +39,32 @@ def test_skill_review_prompt_treats_user_corrections_as_skill_signal():
     prompt = AIAgent._SKILL_REVIEW_PROMPT
     lower = prompt.lower()
     # Must mention style/format/verbosity-family corrections
-    assert any(k in lower for k in ("style", "format", "verbos", "legib", "tone")), (
-        "must name style/format/verbosity/legibility as signals"
-    )
+    assert any(
+        k in lower for k in ("style", "format", "verbos", "legib", "tone")
+    ), "must name style/format/verbosity/legibility as signals"
     # Must frame these as first-class skill signals (not memory-only)
-    assert "FIRST-CLASS" in prompt or "first-class" in prompt, (
-        "must explicitly label user-preference corrections as first-class skill signals"
-    )
+    assert (
+        "FIRST-CLASS" in prompt or "first-class" in prompt
+    ), "must explicitly label user-preference corrections as first-class skill signals"
     # Must mention the correction-type phrases to tune the model's ear
-    assert "stop doing" in lower or "don't" in lower or "hate" in lower or "frustrat" in lower, (
-        "must give concrete phrasing examples so the model recognizes corrections"
-    )
+    assert (
+        "stop doing" in lower
+        or "don't" in lower
+        or "hate" in lower
+        or "frustrat" in lower
+    ), "must give concrete phrasing examples so the model recognizes corrections"
 
 
 def test_skill_review_prompt_prefers_loaded_skills_first():
     """Currently-loaded skills must be the first patch target."""
     prompt = AIAgent._SKILL_REVIEW_PROMPT
-    assert "LOADED" in prompt or "loaded" in prompt, (
-        "must mention currently-loaded skills"
-    )
+    assert (
+        "LOADED" in prompt or "loaded" in prompt
+    ), "must mention currently-loaded skills"
     # Must name the mechanisms for detecting loaded skills
-    assert "skill_view" in prompt and "/skill" in prompt, (
-        "must name skill_view and /skill-name as loaded-skill signals"
-    )
+    assert (
+        "skill_view" in prompt and "/skill" in prompt
+    ), "must name skill_view and /skill-name as loaded-skill signals"
 
 
 def test_skill_review_prompt_has_four_step_preference_order():
@@ -79,24 +83,30 @@ def test_skill_review_prompt_names_three_support_file_kinds():
     assert "templates/" in prompt, "must name templates/ as a support-file kind"
     assert "scripts/" in prompt, "must name scripts/ as a support-file kind"
     # Purpose hints for each kind
-    assert "knowledge" in prompt.lower() or "research" in prompt.lower() or "API docs" in prompt, (
-        "must mention knowledge-bank / research / API-docs role of references/"
-    )
-    assert "copied" in prompt.lower() or "starter" in prompt.lower() or "reproduce" in prompt.lower(), (
-        "must mention that templates/ are starter files to copy/modify"
-    )
-    assert "re-runnable" in prompt.lower() or "verification" in prompt.lower() or "probe" in prompt.lower(), (
-        "must mention that scripts/ are re-runnable actions"
-    )
+    assert (
+        "knowledge" in prompt.lower()
+        or "research" in prompt.lower()
+        or "API docs" in prompt
+    ), "must mention knowledge-bank / research / API-docs role of references/"
+    assert (
+        "copied" in prompt.lower()
+        or "starter" in prompt.lower()
+        or "reproduce" in prompt.lower()
+    ), "must mention that templates/ are starter files to copy/modify"
+    assert (
+        "re-runnable" in prompt.lower()
+        or "verification" in prompt.lower()
+        or "probe" in prompt.lower()
+    ), "must mention that scripts/ are re-runnable actions"
 
 
 def test_skill_review_prompt_has_name_veto_for_create():
     """Creating a new skill must be gated behind class-level naming."""
     prompt = AIAgent._SKILL_REVIEW_PROMPT
     assert "class level" in prompt.lower() or "CLASS-LEVEL" in prompt
-    assert "MUST NOT" in prompt or "must not" in prompt, (
-        "must have a name-veto clause blocking session-artifact names"
-    )
+    assert (
+        "MUST NOT" in prompt or "must not" in prompt
+    ), "must have a name-veto clause blocking session-artifact names"
 
 
 def test_skill_review_prompt_embeds_user_preferences_in_skills():
@@ -104,9 +114,9 @@ def test_skill_review_prompt_embeds_user_preferences_in_skills():
     prompt = AIAgent._SKILL_REVIEW_PROMPT
     lower = prompt.lower()
     assert "preference" in lower, "must mention user preferences"
-    assert "memory" in lower and "skill" in lower, (
-        "must contrast memory vs skill responsibilities"
-    )
+    assert (
+        "memory" in lower and "skill" in lower
+    ), "must contrast memory vs skill responsibilities"
 
 
 def test_skill_review_prompt_flags_overlap_and_defers_to_curator():
@@ -125,6 +135,7 @@ def test_skill_review_prompt_still_has_opt_out_clause():
 # ---------------------------------------------------------------------------
 # _COMBINED_REVIEW_PROMPT
 # ---------------------------------------------------------------------------
+
 
 def test_combined_review_prompt_has_memory_section():
     """Memory half must still cover user facts and preferences."""
@@ -162,7 +173,11 @@ def test_combined_review_prompt_has_four_step_skill_ladder():
     assert "PATCH" in prompt
     assert "references/" in prompt or "REFERENCE" in prompt
     assert "CREATE" in prompt
-    assert "CLASS-LEVEL" in prompt or "class-level" in prompt or "class level" in prompt.lower()
+    assert (
+        "CLASS-LEVEL" in prompt
+        or "class-level" in prompt
+        or "class level" in prompt.lower()
+    )
 
 
 def test_combined_review_prompt_names_three_support_file_kinds():
@@ -191,25 +206,26 @@ def test_combined_review_prompt_preserves_opt_out_clause():
 def _assert_anti_pattern_guidance(prompt: str, label: str) -> None:
     """Both review prompts must carry the same anti-pattern section."""
     lower = prompt.lower()
-    assert "do not capture" in lower, (
-        f"{label}: must have an explicit 'Do NOT capture' section"
-    )
+    assert (
+        "do not capture" in lower
+    ), f"{label}: must have an explicit 'Do NOT capture' section"
     # Environment-dependent failures (the #6051 root cause)
-    assert any(k in lower for k in ("missing binar", "command not found", "uninstalled", "fresh-install")), (
-        f"{label}: must call out environment/setup failures as not-skill-worthy"
-    )
+    assert any(
+        k in lower
+        for k in ("missing binar", "command not found", "uninstalled", "fresh-install")
+    ), f"{label}: must call out environment/setup failures as not-skill-worthy"
     # Negative-framing avoidance
-    assert any(k in lower for k in ("negative claim", "do not work", "is broken")), (
-        f"{label}: must call out negative-claim phrasings as the failure mode"
-    )
+    assert any(
+        k in lower for k in ("negative claim", "do not work", "is broken")
+    ), f"{label}: must call out negative-claim phrasings as the failure mode"
     # Positive reframing — "capture the fix, not the failure"
-    assert "capture the fix" in lower or "capture the fix " in lower, (
-        f"{label}: must redirect tool-failure capture toward the fix, not the constraint"
-    )
+    assert (
+        "capture the fix" in lower or "capture the fix " in lower
+    ), f"{label}: must redirect tool-failure capture toward the fix, not the constraint"
     # One-off task narratives (#12812 family)
-    assert "one-off" in lower, (
-        f"{label}: must call out one-off task narratives as not-skill-worthy"
-    )
+    assert (
+        "one-off" in lower
+    ), f"{label}: must call out one-off task narratives as not-skill-worthy"
 
 
 def test_skill_review_prompt_has_anti_pattern_guidance():
@@ -219,12 +235,15 @@ def test_skill_review_prompt_has_anti_pattern_guidance():
 
 def test_combined_review_prompt_has_anti_pattern_guidance():
     """_COMBINED_REVIEW_PROMPT must carry the same guidance — same failure mode applies."""
-    _assert_anti_pattern_guidance(AIAgent._COMBINED_REVIEW_PROMPT, "_COMBINED_REVIEW_PROMPT")
+    _assert_anti_pattern_guidance(
+        AIAgent._COMBINED_REVIEW_PROMPT, "_COMBINED_REVIEW_PROMPT"
+    )
 
 
 # ---------------------------------------------------------------------------
 # _MEMORY_REVIEW_PROMPT — unchanged, still memory-focused
 # ---------------------------------------------------------------------------
+
 
 def test_memory_review_prompt_still_focused_on_user_facts():
     """Memory-only review prompt stays focused on user facts — not touched by this change."""

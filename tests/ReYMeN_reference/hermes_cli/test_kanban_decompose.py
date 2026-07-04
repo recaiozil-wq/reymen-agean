@@ -60,17 +60,26 @@ def _patch_list_profiles(names: list[str]):
     profiles_mod.list_profiles() to build the roster + valid-set, and
     profiles_mod.profile_exists() to resolve orchestrator/default."""
     from types import SimpleNamespace
+
     fake_profiles = [
         SimpleNamespace(
-            name=n, is_default=(i == 0), description=f"desc for {n}",
-            description_auto=False, model="m", provider="p", skill_count=1,
+            name=n,
+            is_default=(i == 0),
+            description=f"desc for {n}",
+            description_auto=False,
+            model="m",
+            provider="p",
+            skill_count=1,
         )
         for i, n in enumerate(names)
     ]
     return [
         patch("ReYMeN_cli.profiles.list_profiles", return_value=fake_profiles),
         patch("ReYMeN_cli.profiles.profile_exists", side_effect=lambda x: x in names),
-        patch("ReYMeN_cli.profiles.get_active_profile_name", return_value=names[0] if names else "default"),
+        patch(
+            "ReYMeN_cli.profiles.get_active_profile_name",
+            return_value=names[0] if names else "default",
+        ),
     ]
 
 
@@ -78,14 +87,26 @@ def test_decompose_with_fanout_creates_children(kanban_home):
     with kb.connect() as conn:
         tid = kb.create_task(conn, title="ship a feature", triage=True)
 
-    llm_payload = jsonlib.dumps({
-        "fanout": True,
-        "rationale": "test split",
-        "tasks": [
-            {"title": "research", "body": "look it up", "assignee": "researcher", "parents": []},
-            {"title": "build", "body": "code it", "assignee": "engineer", "parents": [0]},
-        ],
-    })
+    llm_payload = jsonlib.dumps(
+        {
+            "fanout": True,
+            "rationale": "test split",
+            "tasks": [
+                {
+                    "title": "research",
+                    "body": "look it up",
+                    "assignee": "researcher",
+                    "parents": [],
+                },
+                {
+                    "title": "build",
+                    "body": "code it",
+                    "assignee": "engineer",
+                    "parents": [0],
+                },
+            ],
+        }
+    )
 
     patches = _patch_list_profiles(["orchestrator", "researcher", "engineer"])
     for p in patches:
@@ -116,12 +137,14 @@ def test_decompose_fanout_false_assigns_default_when_unassigned(kanban_home):
     with kb.connect() as conn:
         tid = kb.create_task(conn, title="just one thing", triage=True)
 
-    llm_payload = jsonlib.dumps({
-        "fanout": False,
-        "rationale": "single unit",
-        "title": "Tightened title",
-        "body": "**Goal**\nDo the thing.",
-    })
+    llm_payload = jsonlib.dumps(
+        {
+            "fanout": False,
+            "rationale": "single unit",
+            "title": "Tightened title",
+            "body": "**Goal**\nDo the thing.",
+        }
+    )
 
     patches = _patch_list_profiles(["orchestrator", "fallback"])
     for p in patches:
@@ -157,13 +180,15 @@ def test_decompose_fanout_false_preserves_existing_assignee(kanban_home):
             triage=True,
         )
 
-    llm_payload = jsonlib.dumps({
-        "fanout": False,
-        "rationale": "single unit",
-        "title": "Tightened title",
-        "body": "Keep existing lane.",
-        "assignee": "fallback",
-    })
+    llm_payload = jsonlib.dumps(
+        {
+            "fanout": False,
+            "rationale": "single unit",
+            "title": "Tightened title",
+            "body": "Keep existing lane.",
+            "assignee": "fallback",
+        }
+    )
 
     patches = _patch_list_profiles(["orchestrator", "engineer", "fallback"])
     for p in patches:
@@ -190,13 +215,15 @@ def test_decompose_fanout_false_uses_valid_llm_assignee(kanban_home):
     with kb.connect() as conn:
         tid = kb.create_task(conn, title="route me", triage=True)
 
-    llm_payload = jsonlib.dumps({
-        "fanout": False,
-        "rationale": "single unit",
-        "title": "Tightened title",
-        "body": "Route to specialist.",
-        "assignee": "engineer",
-    })
+    llm_payload = jsonlib.dumps(
+        {
+            "fanout": False,
+            "rationale": "single unit",
+            "title": "Tightened title",
+            "body": "Route to specialist.",
+            "assignee": "engineer",
+        }
+    )
 
     patches = _patch_list_profiles(["orchestrator", "engineer", "fallback"])
     for p in patches:
@@ -222,13 +249,15 @@ def test_decompose_fanout_false_invalid_llm_assignee_uses_default(kanban_home):
     with kb.connect() as conn:
         tid = kb.create_task(conn, title="route me safely", triage=True)
 
-    llm_payload = jsonlib.dumps({
-        "fanout": False,
-        "rationale": "single unit",
-        "title": "Tightened title",
-        "body": "Route to fallback.",
-        "assignee": "made_up",
-    })
+    llm_payload = jsonlib.dumps(
+        {
+            "fanout": False,
+            "rationale": "single unit",
+            "title": "Tightened title",
+            "body": "Route to fallback.",
+            "assignee": "made_up",
+        }
+    )
 
     patches = _patch_list_profiles(["orchestrator", "fallback"])
     for p in patches:
@@ -255,30 +284,33 @@ def test_decompose_unknown_assignee_falls_back_to_default(kanban_home):
         tid = kb.create_task(conn, title="x", triage=True)
 
     # Roster only has 'orchestrator' and 'fallback'; LLM picks 'made_up'.
-    llm_payload = jsonlib.dumps({
-        "fanout": True,
-        "rationale": "test",
-        "tasks": [
-            {"title": "do X", "body": "", "assignee": "made_up", "parents": []},
-        ],
-    })
+    llm_payload = jsonlib.dumps(
+        {
+            "fanout": True,
+            "rationale": "test",
+            "tasks": [
+                {"title": "do X", "body": "", "assignee": "made_up", "parents": []},
+            ],
+        }
+    )
 
     patches = _patch_list_profiles(["orchestrator", "fallback"])
     for p in patches:
         p.start()
     try:
         with patch.dict(
-            "os.environ", {}, clear=False,
-        ), _patch_aux_client(llm_payload), _patch_extra_body(), \
-            patch(
-                "ReYMeN_cli.kanban_decompose._load_config",
-                return_value={
-                    "kanban": {
-                        "orchestrator_profile": "orchestrator",
-                        "default_assignee": "fallback",
-                    }
-                },
-            ):
+            "os.environ",
+            {},
+            clear=False,
+        ), _patch_aux_client(llm_payload), _patch_extra_body(), patch(
+            "ReYMeN_cli.kanban_decompose._load_config",
+            return_value={
+                "kanban": {
+                    "orchestrator_profile": "orchestrator",
+                    "default_assignee": "fallback",
+                }
+            },
+        ):
             outcome = decomp.decompose_task(tid, author="me")
     finally:
         for p in patches:

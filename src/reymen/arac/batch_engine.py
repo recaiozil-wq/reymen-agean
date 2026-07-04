@@ -54,7 +54,12 @@ class BatchEngine:
         self._calisiyor = False
         self._max_kuyruk = max_kuyruk
 
-    def ekle(self, gorev: Any, gorev_id: Optional[str] = None, meta: Optional[Dict[str, Any]] = None) -> str:
+    def ekle(
+        self,
+        gorev: Any,
+        gorev_id: Optional[str] = None,
+        meta: Optional[Dict[str, Any]] = None,
+    ) -> str:
         """
         Kuyruga yeni bir gorev ekler.
 
@@ -243,7 +248,10 @@ class BatchEngine:
         with self._kilit:
             if gorev_id:
                 kayit = self._gorevler.get(gorev_id)
-                if kayit and kayit["durum"] in (self.DURUM_BEKLIYOR, self.DURUM_CALISIYOR):
+                if kayit and kayit["durum"] in (
+                    self.DURUM_BEKLIYOR,
+                    self.DURUM_CALISIYOR,
+                ):
                     kayit["durum"] = self.DURUM_IPTAL
                     self._sonuclar[gorev_id] = {
                         "id": gorev_id,
@@ -280,8 +288,7 @@ class BatchEngine:
         with self._kilit:
             if durum_filtre:
                 return [
-                    s for s in self._sonuclar.values()
-                    if s.get("durum") == durum_filtre
+                    s for s in self._sonuclar.values() if s.get("durum") == durum_filtre
                 ]
             return list(self._sonuclar.values())
 
@@ -310,7 +317,8 @@ class BatchEngine:
         with self._kilit:
             tamam_durumlar = {self.DURUM_BASARILI, self.DURUM_HATA, self.DURUM_IPTAL}
             silinecek = [
-                kid for kid, kayit in self._gorevler.items()
+                kid
+                for kid, kayit in self._gorevler.items()
                 if kayit["durum"] in tamam_durumlar
             ]
             for kid in silinecek:
@@ -341,7 +349,11 @@ class BatchEngine:
             elif action == "durum":
                 gorev_id = kwargs.get("gorev_id", "")
                 d = self.durum(gorev_id)
-                return json.dumps(d, ensure_ascii=False, indent=2, default=str) if d else "Gorev bulunamadi"
+                return (
+                    json.dumps(d, ensure_ascii=False, indent=2, default=str)
+                    if d
+                    else "Gorev bulunamadi"
+                )
             elif action == "iptal":
                 gorev_id = kwargs.get("gorev_id")
                 adet = self.iptal(gorev_id)
@@ -355,7 +367,9 @@ class BatchEngine:
                 g = self.listele(durum=durum_filtre)
                 return json.dumps(g, ensure_ascii=False, indent=2, default=str)
             else:
-                return json.dumps({"hata": f"Bilinmeyen action: {action}"}, ensure_ascii=False)
+                return json.dumps(
+                    {"hata": f"Bilinmeyen action: {action}"}, ensure_ascii=False
+                )
         except Exception as e:
             return json.dumps({"hata": str(e)}, ensure_ascii=False)
 
@@ -369,9 +383,7 @@ def motor_kaydet(motor):
         return
     motor._plugin_arac_kaydet(
         "BATCH_EKLE",
-        lambda gorev="": (
-            _GLOBAL_ENGINE.ekle(gorev=str(gorev)),
-        )[0],
+        lambda gorev="": (_GLOBAL_ENGINE.ekle(gorev=str(gorev)),)[0],
         "Batch kuyruğuna görev ekle, gorev_id döndürür (gorev: çalıştırılacak metin/komut)",
     )
     motor._plugin_arac_kaydet(
@@ -404,6 +416,8 @@ if __name__ == "__main__":
     engine.ekle(gorev=lambda: test_gorevi("Gorev-3"), gorev_id="g3")
 
     sonuc = engine.calistir(paralel=2)
-    print(f"Calistirma sonucu: {len(sonuc.get('basarili', []))} basarili, "
-          f"{len(sonuc.get('hatali', []))} hatali")
+    print(
+        f"Calistirma sonucu: {len(sonuc.get('basarili', []))} basarili, "
+        f"{len(sonuc.get('hatali', []))} hatali"
+    )
     print("Durum g1:", engine.durum("g1"))

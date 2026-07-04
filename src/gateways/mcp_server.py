@@ -41,6 +41,7 @@ try:
     from reymen.hafiza.session_db import (
         AdvancedSessionStorage as _SessionStorage,
     )
+
     _SESSION_AKTIF = True
 except ImportError:
     _SessionStorage = None
@@ -54,6 +55,7 @@ RESOURCE_PREFIX = "reymen://"
 
 # ── JSON-RPC / MCP Yardimciları ─────────────────────────────────────────
 
+
 def _rpc_json(request_id: Any, result: Any = None, error: Optional[dict] = None) -> str:
     """JSON-RPC 2.0 yanıtı oluştur."""
     msg: dict[str, Any] = {"jsonrpc": "2.0", "id": request_id}
@@ -63,12 +65,14 @@ def _rpc_json(request_id: Any, result: Any = None, error: Optional[dict] = None)
         msg["result"] = result if result is not None else {}
     return json.dumps(msg, ensure_ascii=False)
 
+
 def _rpc_notification(method: str, params: Optional[dict] = None) -> str:
     """JSON-RPC 2.0 bildirimi (notification, id'siz)."""
     msg: dict[str, Any] = {"jsonrpc": "2.0", "method": method}
     if params:
         msg["params"] = params
     return json.dumps(msg, ensure_ascii=False)
+
 
 def _rpc_error(request_id: Any, code: int, message: str, data: Any = None) -> str:
     """JSON-RPC hata yanıtı."""
@@ -79,6 +83,7 @@ def _rpc_error(request_id: Any, code: int, message: str, data: Any = None) -> st
 
 
 # ── MCP Sunucu Sinifi ────────────────────────────────────────────────────
+
 
 class MCPServer:
     """ReYMeN MCP Sunucusu.
@@ -127,7 +132,9 @@ class MCPServer:
                 sys.stdout.flush()
             except Exception:
                 err = _rpc_error(
-                    None, -32603, "Internal error",
+                    None,
+                    -32603,
+                    "Internal error",
                     traceback.format_exc(),
                 )
                 sys.stdout.write(err + "\n")
@@ -158,7 +165,9 @@ class MCPServer:
             return _rpc_error(req_id, -32602, str(e))
         except Exception as e:
             return _rpc_error(
-                req_id, -32603, str(e),
+                req_id,
+                -32603,
+                str(e),
                 traceback.format_exc() if logger.isEnabledFor(logging.DEBUG) else None,
             )
 
@@ -167,9 +176,7 @@ class MCPServer:
     def _handle_initialize(self, params: dict) -> dict:
         """initialize — MCP el sıkışması."""
         client_version = params.get("protocolVersion", "unknown")
-        logger.info(
-            "[MCPServer] İstemci bağlandı: protocolVersion=%s", client_version
-        )
+        logger.info("[MCPServer] İstemci bağlandı: protocolVersion=%s", client_version)
         self._initialized = True
         return {
             "protocolVersion": MCP_VERSION,
@@ -210,15 +217,17 @@ class MCPServer:
             model = s.get("model", "?")
             created = s.get("started_at", 0)
             msg_count = s.get("message_count", 0)
-            resources.append({
-                "uri": f"{RESOURCE_PREFIX}sessions/{sid}",
-                "name": title,
-                "description": (
-                    f"Model: {model} | Mesaj: {msg_count} | "
-                    f"Oluşturulma: {time.strftime('%Y-%m-%d %H:%M', time.localtime(created)) if created else '?'}"
-                ),
-                "mimeType": "application/json",
-            })
+            resources.append(
+                {
+                    "uri": f"{RESOURCE_PREFIX}sessions/{sid}",
+                    "name": title,
+                    "description": (
+                        f"Model: {model} | Mesaj: {msg_count} | "
+                        f"Oluşturulma: {time.strftime('%Y-%m-%d %H:%M', time.localtime(created)) if created else '?'}"
+                    ),
+                    "mimeType": "application/json",
+                }
+            )
         return {
             "resources": resources,
             "nextCursor": None,
@@ -230,7 +239,7 @@ class MCPServer:
         if not uri.startswith(RESOURCE_PREFIX):
             raise ValueError(f"Geçersiz URI: {uri}")
 
-        path = uri[len(RESOURCE_PREFIX):].strip("/")
+        path = uri[len(RESOURCE_PREFIX) :].strip("/")
         parts = path.split("/")
 
         if len(parts) == 1 and parts[0] == "sessions":
@@ -238,11 +247,13 @@ class MCPServer:
             sessions = self._get_session_list()
             content = json.dumps(sessions, ensure_ascii=False, indent=2, default=str)
             return {
-                "contents": [{
-                    "uri": uri,
-                    "mimeType": "application/json",
-                    "text": content,
-                }]
+                "contents": [
+                    {
+                        "uri": uri,
+                        "mimeType": "application/json",
+                        "text": content,
+                    }
+                ]
             }
 
         if len(parts) >= 2 and parts[0] == "sessions":
@@ -266,13 +277,17 @@ class MCPServer:
                     "messages": messages,
                 }
 
-            content = json.dumps(session_data, ensure_ascii=False, indent=2, default=str)
+            content = json.dumps(
+                session_data, ensure_ascii=False, indent=2, default=str
+            )
             return {
-                "contents": [{
-                    "uri": uri,
-                    "mimeType": "application/json",
-                    "text": content,
-                }]
+                "contents": [
+                    {
+                        "uri": uri,
+                        "mimeType": "application/json",
+                        "text": content,
+                    }
+                ]
             }
 
         raise ValueError(f"Geçersiz resource yolu: {uri}")
@@ -414,7 +429,9 @@ class MCPServer:
             "content": [
                 {
                     "type": "text",
-                    "text": json.dumps(result, ensure_ascii=False, indent=2, default=str),
+                    "text": json.dumps(
+                        result, ensure_ascii=False, indent=2, default=str
+                    ),
                 }
             ],
         }
@@ -457,6 +474,7 @@ class MCPServer:
                 return self._storage._mesajlari_getir(session_id)
             # Fallback: doğrudan SQLite sorgusu
             import sqlite3
+
             conn = sqlite3.connect(str(self._storage.db_yolu))
             conn.row_factory = sqlite3.Row
             try:
@@ -631,6 +649,7 @@ class MCPServer:
 
 
 # ── Entry Points ─────────────────────────────────────────────────────────
+
 
 def main() -> None:
     """MCP sunucusunu başlatır (ana entry point)."""

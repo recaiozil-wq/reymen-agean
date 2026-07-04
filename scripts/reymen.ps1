@@ -39,7 +39,7 @@ switch ($Action) {
         Get-Process -Name "python" -ErrorAction SilentlyContinue | Where-Object {
             $_.CommandLine -match "telegram_bot|bot_supervisor"
         } | Format-Table Id, ProcessName, @{Name="Command";Expression={$_.CommandLine -replace '^.+\\([^\\]+)$','$1'}}
-        
+
         if ((Get-Process -Name "python" -ErrorAction SilentlyContinue | Where-Object { $_.CommandLine -match "telegram_bot" }).Count -eq 0) {
             Write-Host "❌ Hicbir bot process'i calismiyor" -ForegroundColor Red
         }

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """test_gateway_persistence.py — ai_bot.py kalıcı ayar testleri."""
+
 import json
 import sys
 import os
@@ -15,6 +16,7 @@ sys.path.insert(0, str(PROJE_KOK / "telegram_bot"))
 
 # ── Fixture ─────────────────────────────────────────────────────────────────
 
+
 @pytest.fixture
 def ayar_dosyasi(tmp_path):
     return tmp_path / "ai_bot_ayarlari.json"
@@ -23,10 +25,12 @@ def ayar_dosyasi(tmp_path):
 @pytest.fixture
 def yoneticisi(ayar_dosyasi):
     from telegram_bot.ai_bot import AyarYoneticisi, VARSAYILAN_AYARLAR
+
     return AyarYoneticisi(ayar_dosyasi)
 
 
 # ── AyarYoneticisi Testleri ───────────────────────────────────────────────────
+
 
 class TestAyarYoneticisi:
     def test_varsayilan_ayarlar(self, yoneticisi):
@@ -37,6 +41,7 @@ class TestAyarYoneticisi:
 
     def test_dosya_yoksa_varsayilan_kullanir(self, ayar_dosyasi):
         from telegram_bot.ai_bot import AyarYoneticisi
+
         y = AyarYoneticisi(ayar_dosyasi)
         assert y.al("model") == "deepseek-chat"
         assert not ayar_dosyasi.exists()  # okuma yok → dosya oluşmadı
@@ -49,6 +54,7 @@ class TestAyarYoneticisi:
 
     def test_ayarla_kalici_olarak_okunur(self, ayar_dosyasi):
         from telegram_bot.ai_bot import AyarYoneticisi
+
         y1 = AyarYoneticisi(ayar_dosyasi)
         y1.ayarla("provider", "openrouter")
         y2 = AyarYoneticisi(ayar_dosyasi)
@@ -67,6 +73,7 @@ class TestAyarYoneticisi:
 
     def test_offset_restart_sonrasi_korunur(self, ayar_dosyasi):
         from telegram_bot.ai_bot import AyarYoneticisi
+
         y1 = AyarYoneticisi(ayar_dosyasi)
         y1.offset_guncelle(9999)
         y2 = AyarYoneticisi(ayar_dosyasi)
@@ -83,6 +90,7 @@ class TestAyarYoneticisi:
 
     def test_chat_kalici_olarak_okunur(self, ayar_dosyasi):
         from telegram_bot.ai_bot import AyarYoneticisi
+
         y1 = AyarYoneticisi(ayar_dosyasi)
         y1.chat_ekle(111111)
         y2 = AyarYoneticisi(ayar_dosyasi)
@@ -97,6 +105,7 @@ class TestAyarYoneticisi:
 
     def test_sifirla_kalici(self, ayar_dosyasi):
         from telegram_bot.ai_bot import AyarYoneticisi
+
         y1 = AyarYoneticisi(ayar_dosyasi)
         y1.ayarla("provider", "ozel-prov")
         y1.sifirla()
@@ -111,6 +120,7 @@ class TestAyarYoneticisi:
 
     def test_bozuk_dosya_varsayilana_duner(self, ayar_dosyasi):
         from telegram_bot.ai_bot import AyarYoneticisi
+
         ayar_dosyasi.parent.mkdir(parents=True, exist_ok=True)
         ayar_dosyasi.write_text("bu gecersiz json{{{{", encoding="utf-8")
         y = AyarYoneticisi(ayar_dosyasi)
@@ -118,6 +128,7 @@ class TestAyarYoneticisi:
 
 
 # ── Komut İşleyici Testleri ───────────────────────────────────────────────────
+
 
 class TestKomutIsleme:
     def _gonder_mock(self):
@@ -127,6 +138,7 @@ class TestKomutIsleme:
         gonder = self._gonder_mock()
         with patch("telegram_bot.ai_bot.mesaj_gonder", gonder):
             from telegram_bot.ai_bot import komut_isle
+
             komut_isle("TOK", 100, "/model gpt-4o-mini", yoneticisi)
         assert yoneticisi.al("model") == "gpt-4o-mini"
 
@@ -134,6 +146,7 @@ class TestKomutIsleme:
         gonder = self._gonder_mock()
         with patch("telegram_bot.ai_bot.mesaj_gonder", gonder):
             from telegram_bot.ai_bot import komut_isle
+
             komut_isle("TOK", 100, "/provider openrouter", yoneticisi)
         assert yoneticisi.al("provider") == "openrouter"
 
@@ -141,6 +154,7 @@ class TestKomutIsleme:
         gonder = self._gonder_mock()
         with patch("telegram_bot.ai_bot.mesaj_gonder", gonder):
             from telegram_bot.ai_bot import komut_isle
+
             komut_isle("TOK", 100, "/sistem Yeni sistem prompt", yoneticisi)
         assert yoneticisi.al("sistem_prompt") == "Yeni sistem prompt"
 
@@ -149,6 +163,7 @@ class TestKomutIsleme:
         gonder = self._gonder_mock()
         with patch("telegram_bot.ai_bot.mesaj_gonder", gonder):
             from telegram_bot.ai_bot import komut_isle
+
             komut_isle("TOK", 100, "/sifirla", yoneticisi)
         assert yoneticisi.al("model") == "deepseek-chat"
 
@@ -156,6 +171,7 @@ class TestKomutIsleme:
         gonder = self._gonder_mock()
         with patch("telegram_bot.ai_bot.mesaj_gonder", gonder):
             from telegram_bot.ai_bot import komut_isle
+
             komut_isle("TOK", 100, "/ayarlar", yoneticisi)
         gonder.assert_called_once()
 
@@ -163,16 +179,19 @@ class TestKomutIsleme:
         gonder = self._gonder_mock()
         with patch("telegram_bot.ai_bot.mesaj_gonder", gonder):
             from telegram_bot.ai_bot import komut_isle
+
             komut_isle("TOK", 100, "/start", yoneticisi)
         gonder.assert_called_once()
 
     def test_bilinmeyen_komut_false_doner(self, yoneticisi):
         from telegram_bot.ai_bot import komut_isle
+
         sonuc = komut_isle("TOK", 100, "/bilinmeyenkomut", yoneticisi)
         assert sonuc is False
 
     def test_normal_mesaj_false_doner(self, yoneticisi):
         from telegram_bot.ai_bot import komut_isle
+
         sonuc = komut_isle("TOK", 100, "merhaba nasılsın", yoneticisi)
         assert sonuc is False
 
@@ -180,6 +199,7 @@ class TestKomutIsleme:
         gonder = self._gonder_mock()
         with patch("telegram_bot.ai_bot.mesaj_gonder", gonder):
             from telegram_bot.ai_bot import komut_isle
+
             komut_isle("TOK", 100, "/model", yoneticisi)
         gonder.assert_called_once()
         assert "deepseek-chat" in str(gonder.call_args)
@@ -188,5 +208,6 @@ class TestKomutIsleme:
         gonder = self._gonder_mock()
         with patch("telegram_bot.ai_bot.mesaj_gonder", gonder):
             from telegram_bot.ai_bot import komut_isle
+
             sonuc = komut_isle("TOK", 100, "/start", yoneticisi)
         assert sonuc is True

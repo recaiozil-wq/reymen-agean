@@ -55,8 +55,14 @@ class HumanInterface:
         except Exception:
             return 80
 
-    def progress_bar(self, mevcut: int, toplam: int, baslik: str = "",
-                     goster_yuzde: bool = True, goster_sayi: bool = True) -> str:
+    def progress_bar(
+        self,
+        mevcut: int,
+        toplam: int,
+        baslik: str = "",
+        goster_yuzde: bool = True,
+        goster_sayi: bool = True,
+    ) -> str:
         """
         Konsolda ilerleme cubugu gosterir.
 
@@ -104,8 +110,13 @@ class HumanInterface:
         except Exception as e:
             return f"[Progress hatasi: {e}]"
 
-    def input(self, prompt: str, secenekler: Optional[List[str]] = None,
-              varsayilan: str = "", zorunlu: bool = False) -> str:
+    def input(
+        self,
+        prompt: str,
+        secenekler: Optional[List[str]] = None,
+        varsayilan: str = "",
+        zorunlu: bool = False,
+    ) -> str:
         """
         Kullanicidan girdi alir.
 
@@ -151,7 +162,9 @@ class HumanInterface:
                 if secenekler and girdi:
                     eslenen = [s for s in secenekler if s.lower() == girdi.lower()]
                     if not eslenen:
-                        print(f"[Hata] Gecersiz secenek. Gecerli: {', '.join(secenekler)}")
+                        print(
+                            f"[Hata] Gecersiz secenek. Gecerli: {', '.join(secenekler)}"
+                        )
                         continue
                     return eslenen[0].lower()
 
@@ -201,8 +214,12 @@ class HumanInterface:
             print(f"[Onay hatasi: {e}]")
             return varsayilan
 
-    def tablo(self, veri: List[Dict[str, Any]], basliklar: Optional[List[str]] = None,
-              max_sutun: int = 80) -> str:
+    def tablo(
+        self,
+        veri: List[Dict[str, Any]],
+        basliklar: Optional[List[str]] = None,
+        max_sutun: int = 80,
+    ) -> str:
         """
         Veriyi tablo formatinda gosterir.
 
@@ -235,9 +252,13 @@ class HumanInterface:
             toplam_genislik = sum(sutun_genislikleri.values()) + len(basliklar) + 1
             if toplam_genislik > self._konsol_genislik:
                 # Sutunlari kis
-                oran = (self._konsol_genislik - len(basliklar) - 1) / sum(sutun_genislikleri.values())
+                oran = (self._konsol_genislik - len(basliklar) - 1) / sum(
+                    sutun_genislikleri.values()
+                )
                 for baslik in basliklar:
-                    sutun_genislikleri[baslik] = max(5, int(sutun_genislikleri[baslik] * oran))
+                    sutun_genislikleri[baslik] = max(
+                        5, int(sutun_genislikleri[baslik] * oran)
+                    )
 
             # Ayrac satiri
             ayrac = "+" + "+".join("-" * w for w in sutun_genislikleri.values()) + "+"
@@ -257,8 +278,10 @@ class HumanInterface:
                 for baslik in basliklar:
                     deger = str(satir.get(baslik, ""))
                     if len(deger) > sutun_genislikleri[baslik] - 1:
-                        deger = deger[:sutun_genislikleri[baslik] - 4] + "..."
-                    veri_satiri += " " + deger.ljust(sutun_genislikleri[baslik] - 1) + "|"
+                        deger = deger[: sutun_genislikleri[baslik] - 4] + "..."
+                    veri_satiri += (
+                        " " + deger.ljust(sutun_genislikleri[baslik] - 1) + "|"
+                    )
                 satirlar.append(veri_satiri)
 
             satirlar.append(ayrac)
@@ -272,8 +295,9 @@ class HumanInterface:
             print(hata)
             return hata
 
-    def menu(self, baslik: str, secenekler: List[Tuple[str, str]],
-             aciklama: str = "") -> str:
+    def menu(
+        self, baslik: str, secenekler: List[Tuple[str, str]], aciklama: str = ""
+    ) -> str:
         """
         Kullaniciya menu gosterir ve secim yaptirir.
 
@@ -330,6 +354,7 @@ class HumanInterface:
         """
         try:
             import ctypes
+
             # MB_YESNO=4, MB_ICONQUESTION=0x20; IDYES=6
             sonuc = ctypes.windll.user32.MessageBoxW(0, mesaj, baslik, 4 | 0x20)
             return sonuc == 6

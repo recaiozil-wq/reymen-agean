@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Eksik import'ları toplu düzelt — Claude Code'un unuttuklarını ekle."""
+
 import ast, sys
 from pathlib import Path
 
@@ -61,7 +62,12 @@ for py_file in sorted((kok / "reymen" / "sistem").glob("cli_*.py")):
             s = line.strip()
             if s.startswith("import ") or s.startswith("from "):
                 insert_at = i + 1
-            elif s.startswith("#") or s == "" or s.startswith('"""') or s.startswith("'''"):
+            elif (
+                s.startswith("#")
+                or s == ""
+                or s.startswith('"""')
+                or s.startswith("'''")
+            ):
                 continue
             elif insert_at == 0:
                 break

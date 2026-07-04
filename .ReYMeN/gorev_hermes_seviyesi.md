@@ -23,7 +23,7 @@ ReYMeN ajanının çıktı kalitesini, hata yönetimini ve kullanıcı deneyimin
 **Yer:** `reymen/cereyan/beyin.py` (1325. satır civarı)
 
 **Sorun:** `BudgetConfig` objesinde `provider_maliyeti` attribute'u yok.
-**Çözüm:** 
+**Çözüm:**
 ```python
 # HATALI:
 maliyet = self.budget_config.provider_maliyeti

@@ -8,6 +8,7 @@ from context_compressor import ContextCompressor
 
 # ── Fixture ─────────────────────────────────────────────────────────────
 
+
 @pytest.fixture
 def compressor():
     return ContextCompressor(max_token=1024)
@@ -17,15 +18,22 @@ def compressor():
 def ornek_gecmis():
     return [
         {"rol": "kullanici", "icerik": "Merhaba, nasilsin?"},
-        {"rol": "asistan", "icerik": "Iyiyim, tesekkurler. Sana nasil yardimci olabilirim?"},
+        {
+            "rol": "asistan",
+            "icerik": "Iyiyim, tesekkurler. Sana nasil yardimci olabilirim?",
+        },
         {"rol": "kullanici", "icerik": "Python ile dosya islemleri yapmak istiyorum."},
-        {"rol": "asistan", "icerik": "Python'da dosya islemleri icin open() fonksiyonunu kullanabilirsin."},
+        {
+            "rol": "asistan",
+            "icerik": "Python'da dosya islemleri icin open() fonksiyonunu kullanabilirsin.",
+        },
         {"rol": "kullanici", "icerik": "Peki json nasil okunur?"},
         {"rol": "asistan", "icerik": "json.load() ile dosyadan okuyabilirsin."},
     ]
 
 
 # ── Test 1: Baslangic durumu ────────────────────────────────────────────
+
 
 class TestBaslangic:
     def test_baslangic_varsayilan_max_token(self):
@@ -55,6 +63,7 @@ class TestBaslangic:
 
 
 # ── Test 2: sikistir ────────────────────────────────────────────────────
+
 
 class TestSikistir:
     def test_bos_gecmis(self, compressor):
@@ -116,6 +125,7 @@ class TestSikistir:
 
 # ── Test 3: token_hesapla ──────────────────────────────────────────────
 
+
 class TestTokenHesapla:
     def test_token_bos(self, compressor):
         """Bos liste 0 token donmeli."""
@@ -129,7 +139,7 @@ class TestTokenHesapla:
     def test_token_coklu_mesaj(self, compressor):
         """Birden cok mesajin tokenlari toplanmali."""
         mesajlar = [
-            {"rol": "kullanici", "icerik": "abc"},     # 3/4 + 1 = 1
+            {"rol": "kullanici", "icerik": "abc"},  # 3/4 + 1 = 1
             {"rol": "asistan", "icerik": "abcdefgh"},  # 8/4 + 1 = 3
         ]
         assert compressor._token_hesapla(mesajlar) == 4
@@ -141,6 +151,7 @@ class TestTokenHesapla:
 
 
 # ── Test 4: onemli_bilgileri_sakla / getir / temizle ───────────────────
+
 
 class TestOnemliBilgiler:
     def test_anahtar_deger_sakla(self, compressor):
@@ -186,6 +197,7 @@ class TestOnemliBilgiler:
 
 # ── Test 5: ozet_olustur ────────────────────────────────────────────────
 
+
 class TestOzet:
     def test_ozet_bos_gecmis(self, compressor):
         """Bos gecmis icin 'Henuz mesaj yok' donmeli."""
@@ -220,6 +232,7 @@ class TestOzet:
 
 # ── Test 6: anahtar_kelime_cikar ────────────────────────────────────────
 
+
 class TestAnahtarKelime:
     def test_anahtar_kelime_bos(self, compressor):
         """Bos gecmis bos liste donmeli."""
@@ -244,10 +257,12 @@ class TestAnahtarKelime:
 
 # ── Test 7: run fonksiyonu ──────────────────────────────────────────────
 
+
 class TestRun:
     def test_run_varsayilan(self):
         """run() varsayilan parametrelerle calismali."""
         from context_compressor import run
+
         sonuc = run()
         data = json.loads(sonuc)
         assert "orijinal_sayi" in data
@@ -257,8 +272,11 @@ class TestRun:
     def test_run_ozel_gecmis(self):
         """run() ozel gecmis ile calismali."""
         from context_compressor import run
-        sonuc = run(gecmis=[
-            {"rol": "kullanici", "icerik": "Test mesaji"},
-        ])
+
+        sonuc = run(
+            gecmis=[
+                {"rol": "kullanici", "icerik": "Test mesaji"},
+            ]
+        )
         data = json.loads(sonuc)
         assert data["orijinal_sayi"] == 1

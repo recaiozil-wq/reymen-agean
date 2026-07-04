@@ -15,12 +15,14 @@ SILENT_REPLY_TOKEN = "NO_REPLY"
 # Exact whole-response markers that mean "the agent intentionally chose not to
 # reply".  Keep this list small and explicit; arbitrary empty output remains an
 # error/empty-response path, not silence.
-LIVE_GATEWAY_SILENT_MARKERS = frozenset({
-    "[SILENT]",
-    "SILENT",
-    "NO_REPLY",
-    "NO REPLY",
-})
+LIVE_GATEWAY_SILENT_MARKERS = frozenset(
+    {
+        "[SILENT]",
+        "SILENT",
+        "NO_REPLY",
+        "NO REPLY",
+    }
+)
 
 
 def _canonical_silence_candidate(text: str) -> str:
@@ -44,7 +46,9 @@ def is_intentional_silence_response(response: Any) -> bool:
     return _canonical_silence_candidate(stripped) in LIVE_GATEWAY_SILENT_MARKERS
 
 
-def is_intentional_silence_agent_result(agent_result: dict | None, response: Any) -> bool:
+def is_intentional_silence_agent_result(
+    agent_result: dict | None, response: Any
+) -> bool:
     """Silence markers suppress delivery only for successful agent turns."""
     if not isinstance(agent_result, dict):
         return False

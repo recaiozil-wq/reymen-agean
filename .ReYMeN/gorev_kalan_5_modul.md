@@ -28,7 +28,7 @@ ReYMeN'e 5 yeni modül ekle. Kodları yaz, test et.
 ### 3. self_improve.py — Kalite metrikleri
 **Yer:** `reymen/cereyan/self_improve.py`
 **Ne yap:**
-- `QualityMetric` sınıfı: başarı, hata sayısı, yeniden deneme, süre 
+- `QualityMetric` sınıfı: başarı, hata sayısı, yeniden deneme, süre
 - `evaluate()` — projedeki .py dosyalarını tara, metrikleri topla
 - `suggest_fix()` — düşük kaliteli alanlar için LLM'den öneri al
 - Depolama: `.ReYMeN/self_improve_log.json`

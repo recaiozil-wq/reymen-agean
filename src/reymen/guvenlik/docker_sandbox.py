@@ -30,14 +30,16 @@ logger = logging.getLogger(__name__)
 VARSAYILAN_IMAGE = "reymen-sandbox:latest"
 VARSAYILAN_TIMEOUT = 30
 VARSAYILAN_MAX_CHARS = 10000
-VARSAYILAN_MEMORY = "256m"       # Docker memory limit
-VARSAYILAN_CPU = 0.5             # Docker CPU limit (cores)
+VARSAYILAN_MEMORY = "256m"  # Docker memory limit
+VARSAYILAN_CPU = 0.5  # Docker CPU limit (cores)
 VARSAYILAN_TEMP = "/tmp/sandbox"
 
 # Docker mevcut mu?
 DOCKER_MEVCUT = False
 try:
-    r = subprocess.run(["docker", "--version"], capture_output=True, text=True, timeout=5)
+    r = subprocess.run(
+        ["docker", "--version"], capture_output=True, text=True, timeout=5
+    )
     DOCKER_MEVCUT = r.returncode == 0
 except Exception as _e:
     __import__("logging").getLogger(__name__).warning(
@@ -50,7 +52,9 @@ if DOCKER_MEVCUT:
     try:
         r = subprocess.run(
             ["docker", "images", "-q", VARSAYILAN_IMAGE],
-            capture_output=True, text=True, timeout=10
+            capture_output=True,
+            text=True,
+            timeout=10,
         )
         IMAGE_MEVCUT = bool(r.stdout.strip())
     except Exception as _e:
@@ -61,6 +65,7 @@ if DOCKER_MEVCUT:
 # Fallback: subprocess sandbox
 try:
     from reymen.guvenlik.guvenli_sandbox import guvenli_calistir as _subprocess_sandbox
+
     SUBPROCESS_SANDBOX_OK = True
 except ImportError:
     SUBPROCESS_SANDBOX_OK = False
@@ -71,12 +76,14 @@ try:
         NetworkRestriction as _NetworkRestriction,
         DockerNetworkRestriction as _DockerNetworkRestriction,
     )
+
     NETWORK_RESTRICTION_OK = True
 except ImportError:
     NETWORK_RESTRICTION_OK = False
 
 
 # ── Hata Siniflari ─────────────────────────────────────────────────────────
+
 
 class SandboxError(RuntimeError):
     """Sandbox calistirma hatasi."""
@@ -91,6 +98,7 @@ class SandboxBuildError(SandboxError):
 
 
 # ── Docker Sandbox ─────────────────────────────────────────────────────────
+
 
 class DockerSandbox:
     """Docker container'da izole Python kodu calistir.
@@ -160,12 +168,18 @@ class DockerSandbox:
 
         # Container argumanlari
         docker_args = [
-            "docker", "run", "--rm",
-            "--read-only",                                 # root salt-okunur
-            "--tmpfs", "/sandbox:rw,noexec,nosuid,size=64m",  # yazilabilir tmp
-            "--memory", self.memory,
-            "--cpus", str(self.cpu),
-            "--label", "reymen=sandbox",
+            "docker",
+            "run",
+            "--rm",
+            "--read-only",  # root salt-okunur
+            "--tmpfs",
+            "/sandbox:rw,noexec,nosuid,size=64m",  # yazilabilir tmp
+            "--memory",
+            self.memory,
+            "--cpus",
+            str(self.cpu),
+            "--label",
+            "reymen=sandbox",
         ] + network_args
 
         docker_args.extend([self.image, sarmalanmis_kod])
@@ -184,7 +198,7 @@ class DockerSandbox:
 
         cikti = process.stdout + process.stderr
         if len(cikti) > self.max_chars:
-            cikti = cikti[:self.max_chars] + (
+            cikti = cikti[: self.max_chars] + (
                 f"\n... [cikti {len(cikti)} karakter, sinir {self.max_chars}]"
             )
         return cikti
@@ -210,7 +224,8 @@ class DockerSandbox:
             except Exception as e:
                 logger.warning(
                     "[Sandbox] Docker network restriction basarisiz, "
-                    "--network=none kullaniliyor: %s", e
+                    "--network=none kullaniliyor: %s",
+                    e,
                 )
 
         # Varsayilan: ag tamamen kapali
@@ -233,20 +248,21 @@ class DockerSandbox:
         """Docker yoksa subprocess sandbox'a dus."""
         if SUBPROCESS_SANDBOX_OK:
             logger.warning("[Sandbox] Docker yok, subprocess sandbox kullaniliyor")
-            return _subprocess_sandbox(kod, timeout=self.timeout, max_chars=self.max_chars, baglam=baglam)
+            return _subprocess_sandbox(
+                kod, timeout=self.timeout, max_chars=self.max_chars, baglam=baglam
+            )
         return "[Sandbox] Hicbir sandbox yontemi kullanilamiyor."
 
 
 # ── Image Builder ──────────────────────────────────────────────────────────
+
 
 class SandboxImageBuilder:
     """Docker sandbox image'ini olusturur ve yonetir."""
 
     def __init__(self, image: str = VARSAYILAN_IMAGE):
         self.image = image
-        self.dockerfile = str(
-            Path(__file__).parent / "Dockerfile.sandbox"
-        )
+        self.dockerfile = str(Path(__file__).parent / "Dockerfile.sandbox")
 
     def build(self) -> bool:
         """Sandbox Docker image'ini build et."""
@@ -257,9 +273,18 @@ class SandboxImageBuilder:
         dockerfile_dir = str(Path(self.dockerfile).parent)
         try:
             r = subprocess.run(
-                ["docker", "build", "-t", self.image,
-                 "-f", self.dockerfile, dockerfile_dir],
-                capture_output=True, text=True, timeout=120,
+                [
+                    "docker",
+                    "build",
+                    "-t",
+                    self.image,
+                    "-f",
+                    self.dockerfile,
+                    dockerfile_dir,
+                ],
+                capture_output=True,
+                text=True,
+                timeout=120,
             )
             if r.returncode == 0:
                 global IMAGE_MEVCUT
@@ -285,6 +310,7 @@ class SandboxImageBuilder:
 
 
 # ── Guvenlik Denetleyici ───────────────────────────────────────────────────
+
 
 class GuvenlikDenetleyici:
     """Kod guvenlik denetleyicisi: threat pattern + PII + yasakli ifade.
@@ -315,15 +341,13 @@ class GuvenlikDenetleyici:
 
     def __init__(self):
         import re
+
         self.re = re
         self._threat_re = {
             k: self.re.compile(v, self.re.IGNORECASE)
             for k, v in self.THREAT_PATTERNS.items()
         }
-        self._pii_re = {
-            k: self.re.compile(v)
-            for k, v in self.PII_PATTERNS.items()
-        }
+        self._pii_re = {k: self.re.compile(v) for k, v in self.PII_PATTERNS.items()}
 
     def kod_kontrol(self, kod: str) -> list[dict]:
         """Kodu threat pattern'lerle tara.
@@ -334,12 +358,14 @@ class GuvenlikDenetleyici:
         sonuclar = []
         for kategori, regex in self._threat_re.items():
             for m in regex.finditer(kod):
-                sonuclar.append({
-                    "tip": "threat",
-                    "kategori": kategori,
-                    "eslesme": kod[m.start():m.end()][:80],
-                    "konum": (m.start(), m.end()),
-                })
+                sonuclar.append(
+                    {
+                        "tip": "threat",
+                        "kategori": kategori,
+                        "eslesme": kod[m.start() : m.end()][:80],
+                        "konum": (m.start(), m.end()),
+                    }
+                )
         return sonuclar
 
     def pii_kontrol(self, metin: str) -> list[dict]:
@@ -351,12 +377,14 @@ class GuvenlikDenetleyici:
         sonuclar = []
         for kategori, regex in self._pii_re.items():
             for m in regex.finditer(metin):
-                sonuclar.append({
-                    "tip": "pii",
-                    "kategori": kategori,
-                    "eslesme": metin[m.start():m.end()][:20],
-                    "konum": (m.start(), m.end()),
-                })
+                sonuclar.append(
+                    {
+                        "tip": "pii",
+                        "kategori": kategori,
+                        "eslesme": metin[m.start() : m.end()][:20],
+                        "konum": (m.start(), m.end()),
+                    }
+                )
         return sonuclar
 
     def tam_kontrol(self, kod: str) -> dict:
@@ -416,9 +444,7 @@ def guvenli_calistir(
     denetleyici = _VARSAYILAN_DENETLEYICI
     kontrol = denetleyici.tam_kontrol(kod)
     if not kontrol["guvenli"]:
-        threat_list = ", ".join(
-            f"{t['kategori']}" for t in kontrol["threats"]
-        )
+        threat_list = ", ".join(f"{t['kategori']}" for t in kontrol["threats"])
         kodu = kod[:200].replace("\n", " ")
         return (
             f"[GUVENLIK] Kod bloke edildi - threat pattern tespit edildi: {threat_list}\n"
@@ -437,8 +463,11 @@ def guvenli_calistir(
     # Subprocess fallback
     if SUBPROCESS_SANDBOX_OK:
         from reymen.guvenlik.guvenli_sandbox import guvenli_calistir as _sp_calistir
+
         try:
-            return _sp_calistir(kod, timeout=timeout, max_chars=max_chars, baglam=baglam)
+            return _sp_calistir(
+                kod, timeout=timeout, max_chars=max_chars, baglam=baglam
+            )
         except Exception as e:
             return f"[GUVENLIK] {e}"
 
@@ -473,6 +502,7 @@ def sandbox_durum() -> dict:
     if NETWORK_RESTRICTION_OK:
         try:
             from reymen.guvenlik.network_restriction import network_durum
+
             durum["network_restriction"] = network_durum()
         except Exception:
             durum["network_restriction"] = {"aktif": False, "sistem": "bilinmiyor"}
@@ -492,10 +522,7 @@ def sandbox_durum_text() -> str:
     nr_info = d.get("network_restriction", {})
     if nr_info:
         nr_ikon = "🟢" if nr_info.get("aktif") else "🟡"
-        nr_text = (
-            "aktif" if nr_info.get("aktif")
-            else "pasif (mevcut)"
-        )
+        nr_text = "aktif" if nr_info.get("aktif") else "pasif (mevcut)"
 
     return (
         f"[Sandbox] Guvenlik Durumu:\n"
@@ -508,6 +535,7 @@ def sandbox_durum_text() -> str:
 
 
 # ── Motor Plugin API ───────────────────────────────────────────────────────
+
 
 def motor_kaydet(motor):
     """Motor'a guvenlik araclarini kaydet."""
@@ -532,7 +560,10 @@ def motor_kaydet(motor):
     # Network restriction araclari
     if NETWORK_RESTRICTION_OK:
         try:
-            from reymen.guvenlik.network_restriction import motor_kaydet as _nr_motor_kaydet
+            from reymen.guvenlik.network_restriction import (
+                motor_kaydet as _nr_motor_kaydet,
+            )
+
             _nr_motor_kaydet(motor)
         except Exception as e:
             logger.warning("[Sandbox] Network restriction kayit hatasi: %s", e)
@@ -541,8 +572,9 @@ def motor_kaydet(motor):
 # ── CLI Test ───────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO,
-                        format="%(asctime)s [%(levelname)s] %(message)s")
+    logging.basicConfig(
+        level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
+    )
 
     print("=== ReYMeN Docker Sandbox Test ===\n")
 

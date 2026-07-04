@@ -61,7 +61,7 @@
 | **Turkish Language Support** | ✅ **Fully Turkish** | ❌ | ❌ | ❌ | ❌ | ❌ |
 | **GitHub Stars** | ⭐ *Yours!* | 12K+ | 25K+ | 35K+ | — | 5K+ |
 
-> **Legend:** ✅ = Full support | ⚠️ = Partial / In progress | ❌ = Not available  
+> **Legend:** ✅ = Full support | ⚠️ = Partial / In progress | ❌ = Not available
 > *Stats for other frameworks are approximate and sourced from public repositories.*
 
 ---

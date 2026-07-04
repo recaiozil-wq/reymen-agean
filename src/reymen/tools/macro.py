@@ -1,4 +1,5 @@
 """ReYMeN tools.macro shim — Hermes macro fonksiyonlarını yönlendirir."""
+
 from __future__ import annotations
 
 import logging

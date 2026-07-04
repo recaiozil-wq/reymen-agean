@@ -33,6 +33,7 @@ Claude Code (.claude/settings.json):
       }
     }
 """
+
 from __future__ import annotations
 
 import argparse
@@ -54,6 +55,7 @@ PROTOCOL_VERSION = "2024-11-05"
 SERVER_INFO = {"name": "ReYMeN", "version": "2.0.0"}
 
 # ── JSON Schema doğrulama ───────────────────────────────────────────────
+
 
 def _schema_dogrula(schema: dict, data: dict) -> str | None:
     """JSON Schema'ya göre argümanları doğrula. Hata varsa döndür."""
@@ -93,8 +95,10 @@ def _schema_dogrula(schema: dict, data: dict) -> str | None:
 _TOOLS: dict[str, dict] = {}
 _HANDLERS: dict[str, Callable] = {}
 
-def tool_kaydet(name: str, description: str, input_schema: dict,
-                handler: Callable[[dict], str]) -> None:
+
+def tool_kaydet(
+    name: str, description: str, input_schema: dict, handler: Callable[[dict], str]
+) -> None:
     """Bir MCP tool'u kaydet.
 
     Args:
@@ -103,8 +107,11 @@ def tool_kaydet(name: str, description: str, input_schema: dict,
         input_schema: JSON Schema
         handler: Args dict alır, str döndürür
     """
-    _TOOLS[name] = {"name": name, "description": description,
-                     "inputSchema": input_schema}
+    _TOOLS[name] = {
+        "name": name,
+        "description": description,
+        "inputSchema": input_schema,
+    }
     _HANDLERS[name] = handler
     logger.info("MCP tool kaydedildi: %s", name)
 
@@ -126,9 +133,14 @@ def get_tools() -> list[dict]:
 _RESOURCES: dict[str, dict] = {}
 _RESOURCE_HANDLERS: dict[str, Callable] = {}
 
-def resource_kaydet(uri: str, name: str, description: str = "",
-                    mime_type: str = "text/plain",
-                    handler: Callable[[], str] | None = None) -> None:
+
+def resource_kaydet(
+    uri: str,
+    name: str,
+    description: str = "",
+    mime_type: str = "text/plain",
+    handler: Callable[[], str] | None = None,
+) -> None:
     """Bir MCP resource kaydet.
 
     Args:
@@ -139,7 +151,9 @@ def resource_kaydet(uri: str, name: str, description: str = "",
         handler: Resource içeriğini döndüren fonksiyon
     """
     _RESOURCES[uri] = {
-        "uri": uri, "name": name, "description": description,
+        "uri": uri,
+        "name": name,
+        "description": description,
         "mimeType": mime_type,
     }
     if handler:
@@ -167,9 +181,13 @@ def resource_oku(uri: str) -> dict | None:
     handler = _RESOURCE_HANDLERS.get(uri)
     text = handler() if handler else f"[Resource: {meta['name']}]"
     return {
-        "contents": [{
-            "uri": uri, "mimeType": meta["mimeType"], "text": text[:8000],
-        }]
+        "contents": [
+            {
+                "uri": uri,
+                "mimeType": meta["mimeType"],
+                "text": text[:8000],
+            }
+        ]
     }
 
 
@@ -178,9 +196,13 @@ def resource_oku(uri: str) -> dict | None:
 _PROMPTS: dict[str, dict] = {}
 _PROMPT_HANDLERS: dict[str, Callable] = {}
 
-def prompt_kaydet(name: str, description: str = "",
-                  arguments: list[dict] | None = None,
-                  handler: Callable[[dict], str] | None = None) -> None:
+
+def prompt_kaydet(
+    name: str,
+    description: str = "",
+    arguments: list[dict] | None = None,
+    handler: Callable[[dict], str] | None = None,
+) -> None:
     """Bir MCP prompt kaydet.
 
     Args:
@@ -190,7 +212,8 @@ def prompt_kaydet(name: str, description: str = "",
         handler: Args dict alır, prompt mesaj metnini döndürür
     """
     _PROMPTS[name] = {
-        "name": name, "description": description,
+        "name": name,
+        "description": description,
         "arguments": arguments or [],
     }
     if handler:
@@ -217,15 +240,14 @@ def prompt_get(name: str, args: dict | None = None) -> dict | None:
         return None
     handler = _PROMPT_HANDLERS.get(name)
     text = handler(args or {}) if handler else f"[Prompt: {meta['description']}]"
-    return {
-        "messages": [{"role": "user", "content": {"type": "text", "text": text}}]
-    }
+    return {"messages": [{"role": "user", "content": {"type": "text", "text": text}}]}
 
 
 # ── Roots Registry ──────────────────────────────────────────────────────
 
 _ROOTS: list[dict] = []
 _ROOT_WATCHERS: list[str] = []
+
 
 def root_ekle(uri: str, name: str = "") -> None:
     """Root (dosya sistemi kökü) ekle."""
@@ -248,6 +270,7 @@ def get_roots() -> list[dict]:
 
 # ── Session Management ──────────────────────────────────────────────────
 
+
 class ClientSession:
     """Bağlı bir MCP client'ının oturumu."""
 
@@ -269,7 +292,8 @@ class ClientSession:
 
     def as_dict(self) -> dict:
         return {
-            "id": self.id, "transport": self.transport,
+            "id": self.id,
+            "transport": self.transport,
             "connected_at": self.connected_at,
             "last_activity": self.last_activity,
             "initialized": self.initialized,
@@ -282,7 +306,9 @@ _SESSIONS: dict[str, ClientSession] = {}
 _SESSION_LOCK = threading.Lock()
 
 
-def _session_ac(client_id: str | None = None, transport: str = "stdio") -> ClientSession:
+def _session_ac(
+    client_id: str | None = None, transport: str = "stdio"
+) -> ClientSession:
     with _SESSION_LOCK:
         sid = client_id or f"client_{uuid.uuid4().hex[:8]}"
         session = ClientSession(sid, transport)
@@ -316,21 +342,29 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 
 
 def _tool_status(args: dict) -> str:
-    return json.dumps({
-        "calisiyor": False, "version": SERVER_INFO["version"],
-        "tool_sayisi": len(_TOOLS), "resource_sayisi": len(_RESOURCES),
-        "prompt_sayisi": len(_PROMPTS), "session_sayisi": len(get_sessions()),
-        "python": sys.version.split()[0], "platform": sys.platform,
-    }, ensure_ascii=False)
+    return json.dumps(
+        {
+            "calisiyor": False,
+            "version": SERVER_INFO["version"],
+            "tool_sayisi": len(_TOOLS),
+            "resource_sayisi": len(_RESOURCES),
+            "prompt_sayisi": len(_PROMPTS),
+            "session_sayisi": len(get_sessions()),
+            "python": sys.version.split()[0],
+            "platform": sys.platform,
+        },
+        ensure_ascii=False,
+    )
 
 
 def _tool_memory_search(args: dict) -> str:
     sorgu = args.get("sorgu", "")
     try:
         from reymen.core.ogrenme import istatistik
-        return json.dumps({"sorgu": sorgu,
-                            "ogrenme_istatistik": istatistik()},
-                           ensure_ascii=False)
+
+        return json.dumps(
+            {"sorgu": sorgu, "ogrenme_istatistik": istatistik()}, ensure_ascii=False
+        )
     except Exception as e:
         return f"Hafiza arama hatasi: {e}"
 
@@ -340,6 +374,7 @@ def _tool_session_search(args: dict) -> str:
     limit = args.get("limit", 10)
     try:
         from reymen.core.session_search import session_ara
+
         return json.dumps(session_ara(sorgu, limit=limit), ensure_ascii=False)
     except Exception as e:
         return f"Session arama hatasi: {e}"
@@ -348,6 +383,7 @@ def _tool_session_search(args: dict) -> str:
 def _tool_learning_stats(args: dict) -> str:
     try:
         from reymen.core.ogrenme import istatistik, eski_basarisizlari_temizle
+
         eski_basarisizlari_temizle()
         return json.dumps(istatistik(), ensure_ascii=False)
     except Exception as e:
@@ -385,14 +421,19 @@ def _tool_file_write(args: dict) -> str:
 
 def _tool_shell(args: dict) -> str:
     import shlex, subprocess
+
     komut = args.get("komut", "")
     try:
         args_list = shlex.split(komut, posix=(sys.platform != "win32"))
         if not args_list:
             return "Gecersiz komut"
         r = subprocess.run(
-            args_list, shell=False, capture_output=True, text=True,
-            cwd=str(ROOT), timeout=60,
+            args_list,
+            shell=False,
+            capture_output=True,
+            text=True,
+            cwd=str(ROOT),
+            timeout=60,
         )
         return (r.stdout + r.stderr)[:4000]
     except subprocess.TimeoutExpired:
@@ -423,60 +464,116 @@ def _rootlarda_mi(yol: Path) -> bool:
 
 def _varsayilan_toollari_kaydet() -> None:
     """ReYMeN'in temel tool'larını MCP olarak kaydet."""
-    tool_kaydet("ReYMeN_status", "ReYMeN ajan durumu.",
-                {"type": "object", "properties": {}}, _tool_status)
-    tool_kaydet("ReYMeN_memory_search", "Anlamsal hafizada ara.",
-                {"type": "object", "properties": {
-                    "sorgu": {"type": "string", "description": "Arama sorgusu"}},
-                 "required": ["sorgu"]}, _tool_memory_search)
-    tool_kaydet("ReYMeN_session_search", "Gecmis session larda FTS5 ara.",
-                {"type": "object", "properties": {
-                    "sorgu": {"type": "string"},
-                    "limit": {"type": "integer", "default": 10}},
-                 "required": ["sorgu"]}, _tool_session_search)
-    tool_kaydet("ReYMeN_learning_stats", "Ogrenme istatistikleri.",
-                {"type": "object", "properties": {}}, _tool_learning_stats)
-    tool_kaydet("ReYMeN_file_read", "Proje dizininde dosya oku.",
-                {"type": "object", "properties": {
-                    "dosya": {"type": "string", "description": "Dosya yolu"}},
-                 "required": ["dosya"]}, _tool_file_read)
-    tool_kaydet("ReYMeN_file_write", "Proje dizininde dosyaya yaz.",
-                {"type": "object", "properties": {
-                    "dosya": {"type": "string"},
-                    "icerik": {"type": "string"}},
-                 "required": ["dosya", "icerik"]}, _tool_file_write)
-    tool_kaydet("ReYMeN_shell", "Guvenli kabuk komutu.",
-                {"type": "object", "properties": {
-                    "komut": {"type": "string"}},
-                 "required": ["komut"]}, _tool_shell)
+    tool_kaydet(
+        "ReYMeN_status",
+        "ReYMeN ajan durumu.",
+        {"type": "object", "properties": {}},
+        _tool_status,
+    )
+    tool_kaydet(
+        "ReYMeN_memory_search",
+        "Anlamsal hafizada ara.",
+        {
+            "type": "object",
+            "properties": {"sorgu": {"type": "string", "description": "Arama sorgusu"}},
+            "required": ["sorgu"],
+        },
+        _tool_memory_search,
+    )
+    tool_kaydet(
+        "ReYMeN_session_search",
+        "Gecmis session larda FTS5 ara.",
+        {
+            "type": "object",
+            "properties": {
+                "sorgu": {"type": "string"},
+                "limit": {"type": "integer", "default": 10},
+            },
+            "required": ["sorgu"],
+        },
+        _tool_session_search,
+    )
+    tool_kaydet(
+        "ReYMeN_learning_stats",
+        "Ogrenme istatistikleri.",
+        {"type": "object", "properties": {}},
+        _tool_learning_stats,
+    )
+    tool_kaydet(
+        "ReYMeN_file_read",
+        "Proje dizininde dosya oku.",
+        {
+            "type": "object",
+            "properties": {"dosya": {"type": "string", "description": "Dosya yolu"}},
+            "required": ["dosya"],
+        },
+        _tool_file_read,
+    )
+    tool_kaydet(
+        "ReYMeN_file_write",
+        "Proje dizininde dosyaya yaz.",
+        {
+            "type": "object",
+            "properties": {"dosya": {"type": "string"}, "icerik": {"type": "string"}},
+            "required": ["dosya", "icerik"],
+        },
+        _tool_file_write,
+    )
+    tool_kaydet(
+        "ReYMeN_shell",
+        "Guvenli kabuk komutu.",
+        {
+            "type": "object",
+            "properties": {"komut": {"type": "string"}},
+            "required": ["komut"],
+        },
+        _tool_shell,
+    )
 
 
 def _varsayilan_resources_kaydet() -> None:
     """Varsayılan resource'ları kaydet."""
-    resource_kaydet("reymen://status", "ReYMeN Status",
-                     "Ajan durum bilgisi", handler=lambda: _tool_status({}))
-    resource_kaydet("reymen://tools", "ReYMeN Tools",
-                     "Kayitli tool listesi",
-                     handler=lambda: json.dumps(get_tools(), indent=2, ensure_ascii=False))
-    resource_kaydet("reymen://sessions", "Active Sessions",
-                     "Bagli MCP client oturumlari",
-                     handler=lambda: json.dumps(get_sessions(), indent=2, ensure_ascii=False))
-    resource_kaydet("reymen://roots", "Filesystem Roots",
-                     "Dosya sistemi kok dizinleri",
-                     handler=lambda: json.dumps(get_roots(), indent=2, ensure_ascii=False))
+    resource_kaydet(
+        "reymen://status",
+        "ReYMeN Status",
+        "Ajan durum bilgisi",
+        handler=lambda: _tool_status({}),
+    )
+    resource_kaydet(
+        "reymen://tools",
+        "ReYMeN Tools",
+        "Kayitli tool listesi",
+        handler=lambda: json.dumps(get_tools(), indent=2, ensure_ascii=False),
+    )
+    resource_kaydet(
+        "reymen://sessions",
+        "Active Sessions",
+        "Bagli MCP client oturumlari",
+        handler=lambda: json.dumps(get_sessions(), indent=2, ensure_ascii=False),
+    )
+    resource_kaydet(
+        "reymen://roots",
+        "Filesystem Roots",
+        "Dosya sistemi kok dizinleri",
+        handler=lambda: json.dumps(get_roots(), indent=2, ensure_ascii=False),
+    )
 
 
 # ── JSON-RPC İşleyici ───────────────────────────────────────────────────
+
 
 def _yanit(req_id, sonuc):
     return json.dumps({"jsonrpc": "2.0", "id": req_id, "result": sonuc})
 
 
 def _hata_yaniti(req_id, code, mesaj):
-    return json.dumps({
-        "jsonrpc": "2.0", "id": req_id,
-        "error": {"code": code, "message": mesaj},
-    })
+    return json.dumps(
+        {
+            "jsonrpc": "2.0",
+            "id": req_id,
+            "error": {"code": code, "message": mesaj},
+        }
+    )
 
 
 def _istek_isle(istek: dict, session: ClientSession | None = None) -> str | None:
@@ -512,20 +609,23 @@ def _istek_isle(istek: dict, session: ClientSession | None = None) -> str | None
         if not _ROOTS:
             root_ekle(f"file://{ROOT}", "ReYMeN Project Root")
 
-        return _yanit(req_id, {
-            "protocolVersion": PROTOCOL_VERSION,
-            "serverInfo": SERVER_INFO,
-            "capabilities": {
-                "tools": {},
-                "resources": {
-                    "listChanged": True,
-                    "subscribe": True,
+        return _yanit(
+            req_id,
+            {
+                "protocolVersion": PROTOCOL_VERSION,
+                "serverInfo": SERVER_INFO,
+                "capabilities": {
+                    "tools": {},
+                    "resources": {
+                        "listChanged": True,
+                        "subscribe": True,
+                    },
+                    "prompts": {"listChanged": True},
+                    "roots": {"listChanged": True},
+                    "logging": {},
                 },
-                "prompts": {"listChanged": True},
-                "roots": {"listChanged": True},
-                "logging": {},
             },
-        })
+        )
 
     if method == "notifications/initialized":
         # Client initialized bildirimi aldı
@@ -554,9 +654,7 @@ def _istek_isle(istek: dict, session: ClientSession | None = None) -> str | None
 
         try:
             sonuc = _HANDLERS[name](args)
-            return _yanit(req_id, {
-                "content": [{"type": "text", "text": sonuc}]
-            })
+            return _yanit(req_id, {"content": [{"type": "text", "text": sonuc}]})
         except Exception as e:
             logger.exception("Tool hatasi: %s", name)
             return _hata_yaniti(req_id, -32603, str(e))
@@ -569,15 +667,13 @@ def _istek_isle(istek: dict, session: ClientSession | None = None) -> str | None
         uri = params.get("uri", "")
         icerik = resource_oku(uri)
         if icerik is None:
-            return _hata_yaniti(req_id, -32602,
-                                 f"Resource bulunamadi: {uri}")
+            return _hata_yaniti(req_id, -32602, f"Resource bulunamadi: {uri}")
         return _yanit(req_id, icerik)
 
     if method == "resources/subscribe":
         uri = params.get("uri", "")
         if uri not in _RESOURCES:
-            return _hata_yaniti(req_id, -32602,
-                                 f"Resource bulunamadi: {uri}")
+            return _hata_yaniti(req_id, -32602, f"Resource bulunamadi: {uri}")
         return _yanit(req_id, {})
 
     if method == "resources/unsubscribe":
@@ -592,8 +688,7 @@ def _istek_isle(istek: dict, session: ClientSession | None = None) -> str | None
         args = params.get("arguments", {})
         icerik = prompt_get(name, args)
         if icerik is None:
-            return _hata_yaniti(req_id, -32602,
-                                 f"Prompt bulunamadi: {name}")
+            return _hata_yaniti(req_id, -32602, f"Prompt bulunamadi: {name}")
         return _yanit(req_id, icerik)
 
     # ── Roots ──────────────────────────────────────────────────────────
@@ -615,6 +710,7 @@ def _istek_isle(istek: dict, session: ClientSession | None = None) -> str | None
 
 
 # ── Stdio Transport ─────────────────────────────────────────────────────
+
 
 def stdio_dongu():
     """MCP stdio protokolü: her satır bir JSON-RPC isteği."""
@@ -645,6 +741,7 @@ def stdio_dongu():
 
 # ── HTTP Transport (Streamable HTTP / SSE) ──────────────────────────────
 
+
 def http_baslat(host: str = "0.0.0.0", port: int = 9000):
     """HTTP tabanlı MCP sunucusu başlat (FastAPI + SSE)."""
     try:
@@ -661,8 +758,11 @@ def http_baslat(host: str = "0.0.0.0", port: int = 9000):
 
     @app.get("/health")
     async def saglik():
-        return {"status": "ok", "tool_sayisi": len(_TOOLS),
-                "session_sayisi": len(get_sessions())}
+        return {
+            "status": "ok",
+            "tool_sayisi": len(_TOOLS),
+            "session_sayisi": len(get_sessions()),
+        }
 
     @app.get("/mcp/sessions")
     async def session_listele():
@@ -675,9 +775,11 @@ def http_baslat(host: str = "0.0.0.0", port: int = 9000):
         except Exception:
             return JSONResponse(
                 status_code=400,
-                content={"jsonrpc": "2.0",
-                          "error": {"code": -32700, "message": "Gecersiz JSON"},
-                          "id": None},
+                content={
+                    "jsonrpc": "2.0",
+                    "error": {"code": -32700, "message": "Gecersiz JSON"},
+                    "id": None,
+                },
             )
 
         # Session yönetimi (HTTP header'dan client_id)
@@ -708,12 +810,15 @@ def http_baslat(host: str = "0.0.0.0", port: int = 9000):
                     _sse_clients.pop(session.id, None)
                     _session_kapat(session.id)
 
-            return StreamingResponse(event_stream(), media_type="text/event-stream",
-                                       headers={
-                                           "Cache-Control": "no-cache",
-                                           "Connection": "keep-alive",
-                                           "X-Accel-Buffering": "no",
-                                       })
+            return StreamingResponse(
+                event_stream(),
+                media_type="text/event-stream",
+                headers={
+                    "Cache-Control": "no-cache",
+                    "Connection": "keep-alive",
+                    "X-Accel-Buffering": "no",
+                },
+            )
 
         # Normal JSON-RPC
         yanit = _istek_isle(body, session)
@@ -729,10 +834,12 @@ def http_baslat(host: str = "0.0.0.0", port: int = 9000):
 
 # ── CLI Giriş ───────────────────────────────────────────────────────────
 
+
 def main():
     parser = argparse.ArgumentParser(description="ReYMeN MCP Server")
-    parser.add_argument("--transport", choices=["stdio", "http"],
-                        default="stdio", help="Transport tipi")
+    parser.add_argument(
+        "--transport", choices=["stdio", "http"], default="stdio", help="Transport tipi"
+    )
     parser.add_argument("--host", default="0.0.0.0", help="HTTP host")
     parser.add_argument("--port", type=int, default=9000, help="HTTP port")
     args = parser.parse_args()
@@ -740,8 +847,7 @@ def main():
     _varsayilan_toollari_kaydet()
     _varsayilan_resources_kaydet()
 
-    logging.basicConfig(level=logging.INFO,
-                        format="[MCP %(asctime)s] %(message)s")
+    logging.basicConfig(level=logging.INFO, format="[MCP %(asctime)s] %(message)s")
 
     if args.transport == "stdio":
         stdio_dongu()
@@ -751,6 +857,7 @@ def main():
 
 # ── Motor Entegrasyonu ──────────────────────────────────────────────────
 
+
 def motor_kaydet(motor) -> None:
     """Motor'a MCP server başlatma/kontrol araçlarını kaydet.
 
@@ -758,27 +865,32 @@ def motor_kaydet(motor) -> None:
         motor: Motor instance'ı.
     """
     motor._plugin_arac_kaydet(
-        "MCP_SERVER_BASLAT", _mcp_baslat,
+        "MCP_SERVER_BASLAT",
+        _mcp_baslat,
         "MCP sunucusunu baslat. Parametreler: transport (str, stdio/http), "
-        "port (int, varsayilan 9000). Background'ta calisir."
+        "port (int, varsayilan 9000). Background'ta calisir.",
     )
     motor._plugin_arac_kaydet(
-        "MCP_SERVER_DURUM", _mcp_durum,
-        "MCP sunucu durumu: tool/resource/prompt/session sayilari."
+        "MCP_SERVER_DURUM",
+        _mcp_durum,
+        "MCP sunucu durumu: tool/resource/prompt/session sayilari.",
     )
     motor._plugin_arac_kaydet(
-        "MCP_TOOL_EKLE", _mcp_tool_ekle,
+        "MCP_TOOL_EKLE",
+        _mcp_tool_ekle,
         "Calisma zamaninda MCP tool ekle. Parametreler: name (str), "
-        "description (str), input_schema (str: JSON), handler_turu (str: builtin/custom)"
+        "description (str), input_schema (str: JSON), handler_turu (str: builtin/custom)",
     )
     motor._plugin_arac_kaydet(
-        "MCP_RESOURCE_EKLE", _mcp_resource_ekle,
+        "MCP_RESOURCE_EKLE",
+        _mcp_resource_ekle,
         "MCP resource ekle. Parametreler: uri (str), name (str), "
-        "description (str), mime_type (str)"
+        "description (str), mime_type (str)",
     )
     motor._plugin_arac_kaydet(
-        "MCP_ROOT_EKLE", _mcp_root_ekle,
-        "MCP filesystem root ekle. Parametreler: path (str, absolute)"
+        "MCP_ROOT_EKLE",
+        _mcp_root_ekle,
+        "MCP filesystem root ekle. Parametreler: path (str, absolute)",
     )
     logger.info("[MCP] Motor'a 5 arac kaydedildi")
 
@@ -786,36 +898,48 @@ def motor_kaydet(motor) -> None:
 def _mcp_baslat(transport: str = "stdio", port: int = 9000) -> str:
     """MCP sunucusunu background thread'de başlat."""
     import threading as _t
+
     _varsayilan_toollari_kaydet()
     _varsayilan_resources_kaydet()
 
     if transport == "http":
+
         def _run():
             http_baslat(port=port)
+
         t = _t.Thread(target=_run, daemon=True)
         t.start()
         return f"[MCP] HTTP sunucu baslatildi: port={port}"
     else:
-        return ("[MCP] Stdio modu icin: "
-                "python -m reymen.core.mcp_server --transport stdio")
+        return (
+            "[MCP] Stdio modu icin: "
+            "python -m reymen.core.mcp_server --transport stdio"
+        )
 
 
 def _mcp_durum(**kw) -> str:
     """MCP sunucu durum raporu."""
-    return json.dumps({
-        "tools": len(_TOOLS),
-        "resources": len(_RESOURCES),
-        "prompts": len(_PROMPTS),
-        "roots": len(_ROOTS),
-        "sessions": len(get_sessions()),
-        "protocol": PROTOCOL_VERSION,
-        "server": SERVER_INFO,
-    }, indent=2, ensure_ascii=False)
+    return json.dumps(
+        {
+            "tools": len(_TOOLS),
+            "resources": len(_RESOURCES),
+            "prompts": len(_PROMPTS),
+            "roots": len(_ROOTS),
+            "sessions": len(get_sessions()),
+            "protocol": PROTOCOL_VERSION,
+            "server": SERVER_INFO,
+        },
+        indent=2,
+        ensure_ascii=False,
+    )
 
 
-def _mcp_tool_ekle(name: str, description: str = "",
-                    input_schema: str = "{}",
-                    handler_turu: str = "builtin") -> str:
+def _mcp_tool_ekle(
+    name: str,
+    description: str = "",
+    input_schema: str = "{}",
+    handler_turu: str = "builtin",
+) -> str:
     """Çalışma zamanında MCP tool ekle."""
     try:
         schema = json.loads(input_schema)
@@ -835,8 +959,10 @@ def _mcp_tool_ekle(name: str, description: str = "",
         }
         handler = handler_map.get(name.split("_")[-1] if "_" in name else name)
         if handler is None:
-            return (f"[MCP] Bilinmeyen handler: {name}. "
-                    f"Kullanilabilirler: {list(handler_map.keys())}")
+            return (
+                f"[MCP] Bilinmeyen handler: {name}. "
+                f"Kullanilabilirler: {list(handler_map.keys())}"
+            )
     else:
         return "[MCP] Custom handler su an desteklenmiyor"
 
@@ -844,8 +970,9 @@ def _mcp_tool_ekle(name: str, description: str = "",
     return f"[MCP] Tool eklendi: {name}"
 
 
-def _mcp_resource_ekle(uri: str, name: str, description: str = "",
-                        mime_type: str = "text/plain") -> str:
+def _mcp_resource_ekle(
+    uri: str, name: str, description: str = "", mime_type: str = "text/plain"
+) -> str:
     """Çalışma zamanında MCP resource ekle."""
     resource_kaydet(uri, name, description, mime_type)
     return f"[MCP] Resource eklendi: {uri} ({name})"

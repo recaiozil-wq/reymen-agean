@@ -21,6 +21,7 @@ sys.path.insert(0, os.path.join(ROOT, "tools"))
 
 # ── Mock motor ──────────────────────────────────────────────────────────────
 
+
 class MockMotor:
     def __init__(self):
         self._araclar = {}
@@ -31,6 +32,7 @@ class MockMotor:
 
 # ── Mock CheckpointManager ──────────────────────────────────────────────────
 
+
 class MockCheckpointManager:
     def __init__(self):
         self._data = {}
@@ -39,7 +41,13 @@ class MockCheckpointManager:
     def kaydet(self, hedef, tur, durum):
         self._counter += 1
         cid = f"cp_{self._counter}"
-        self._data[cid] = {"id": cid, "hedef": hedef, "tur": tur, "durum": durum, "zaman": "2026-01-01T00:00:00"}
+        self._data[cid] = {
+            "id": cid,
+            "hedef": hedef,
+            "tur": tur,
+            "durum": durum,
+            "zaman": "2026-01-01T00:00:00",
+        }
         return cid
 
     def yukle(self, cid):
@@ -85,7 +93,12 @@ def mock_checkpoint_manager(monkeypatch):
                 checkpointler = c.listele()
                 if not checkpointler:
                     return "Henuz checkpoint bulunmuyor."
-                return "\n".join([f"  [{cp['id']}] {cp['hedef']} - tur {cp['tur']} ({cp['zaman']})" for cp in checkpointler])
+                return "\n".join(
+                    [
+                        f"  [{cp['id']}] {cp['hedef']} - tur {cp['tur']} ({cp['zaman']})"
+                        for cp in checkpointler
+                    ]
+                )
             elif islem == "temizle":
                 saat = int(kwargs.get("saat", 24))
                 c.temizle(saat)
@@ -109,19 +122,25 @@ def mock_checkpoint_manager(monkeypatch):
 
 # ── motor_kaydet testleri ────────────────────────────────────────────────────
 
+
 class TestMotorKaydet:
     def test_araclar_kayitli(self):
         from tools.checkpoint_manager import motor_kaydet
+
         motor = MockMotor()
         motor_kaydet(motor)
         beklenen = {
-            "CHECKPOINT_KAYDET", "CHECKPOINT_YUKLE",
-            "CHECKPOINT_LISTELE", "CHECKPOINT_TEMIZLE", "CHECKPOINT_DEVAM",
+            "CHECKPOINT_KAYDET",
+            "CHECKPOINT_YUKLE",
+            "CHECKPOINT_LISTELE",
+            "CHECKPOINT_TEMIZLE",
+            "CHECKPOINT_DEVAM",
         }
         assert beklenen.issubset(set(motor._araclar.keys()))
 
     def test_listele_bos(self):
         from tools.checkpoint_manager import motor_kaydet
+
         motor = MockMotor()
         motor_kaydet(motor)
         sonuc = motor._araclar["CHECKPOINT_LISTELE"]()
@@ -130,10 +149,12 @@ class TestMotorKaydet:
 
 # ── Checkpoint CRUD testleri ─────────────────────────────────────────────────
 
+
 class TestCheckpointCRUD:
     @pytest.fixture
     def kayitli_motor(self):
         from tools.checkpoint_manager import motor_kaydet
+
         motor = MockMotor()
         motor_kaydet(motor)
         return motor

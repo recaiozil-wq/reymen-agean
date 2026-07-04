@@ -29,6 +29,7 @@ try:
         vektor_bellek_al as _varsayilan_vb_al,
         CHROMA_MEVCUT,
     )
+
     VARSAYILAN_VB_MEVCUT = True
 except ImportError:
     _VektorBellek = None  # type: ignore
@@ -39,6 +40,7 @@ except ImportError:
 # ── DeepSeek embeddings API (opsiyonel) ───────────────────────────────────────
 try:
     from openai import OpenAI
+
     _OPENAI_MEVCUT = True
 except ImportError:
     _OPENAI_MEVCUT = False
@@ -46,6 +48,7 @@ except ImportError:
 # ── numpy (opsiyonel, embedding islemleri icin) ────────────────────────────────
 try:
     import numpy as np
+
     _NUMPY_MEVCUT = True
 except ImportError:
     _NUMPY_MEVCUT = False
@@ -72,7 +75,9 @@ class EmbeddingMotor:
         3. Basit hash tabanli gomme (fallback)
     """
 
-    def __init__(self, api_key: str = "", model: str = VARSAYILAN_MODEL, base_url: str = ""):
+    def __init__(
+        self, api_key: str = "", model: str = VARSAYILAN_MODEL, base_url: str = ""
+    ):
         self._model = model
         self._client = None
         self._fallback_aktif = False
@@ -82,13 +87,21 @@ class EmbeddingMotor:
             try:
                 # DeepSeek base_url veya standart OpenAI
                 actual_base = base_url or "https://api.deepseek.com/v1"
-                actual_key = api_key or self._env_oku("DEEPSEEK_API_KEY") or self._env_oku("OPENAI_API_KEY")
+                actual_key = (
+                    api_key
+                    or self._env_oku("DEEPSEEK_API_KEY")
+                    or self._env_oku("OPENAI_API_KEY")
+                )
                 if actual_key:
                     self._client = OpenAI(api_key=actual_key, base_url=actual_base)
                     self._model = model
-                    logger.info("[EmbeddingMotor] OpenAI uyumlu API hazir: %s", actual_base)
+                    logger.info(
+                        "[EmbeddingMotor] OpenAI uyumlu API hazir: %s", actual_base
+                    )
                 else:
-                    logger.warning("[EmbeddingMotor] API key bulunamadi, fallback kullanilacak")
+                    logger.warning(
+                        "[EmbeddingMotor] API key bulunamadi, fallback kullanilacak"
+                    )
                     self._fallback_aktif = True
             except Exception as e:
                 logger.warning("[EmbeddingMotor] API kurulum hatasi: %s", e)
@@ -99,6 +112,7 @@ class EmbeddingMotor:
 
     def _env_oku(self, key: str) -> str:
         import os
+
         return os.getenv(key, "")
 
     def embed(self, metin: str) -> List[float]:
@@ -114,7 +128,9 @@ class EmbeddingMotor:
                 )
                 return resp.data[0].embedding if resp.data else []
             except Exception as e:
-                logger.warning("[EmbeddingMotor] API embedding hatasi: %s — fallback", e)
+                logger.warning(
+                    "[EmbeddingMotor] API embedding hatasi: %s — fallback", e
+                )
                 self._fallback_aktif = True
 
         # Fallback: hash tabanli gomme
@@ -132,7 +148,9 @@ class EmbeddingMotor:
                 resp = self._client.embeddings.create(model=self._model, input=trimmed)
                 return [d.embedding for d in resp.data] if resp.data else []
             except Exception as e:
-                logger.warning("[EmbeddingMotor] Batch embedding hatasi: %s — fallback", e)
+                logger.warning(
+                    "[EmbeddingMotor] Batch embedding hatasi: %s — fallback", e
+                )
                 self._fallback_aktif = True
 
         return [self._hash_embed(m) for m in metinler]
@@ -196,9 +214,14 @@ class VectorMemory:
                     koleksiyon_adi=koleksiyon_adi,
                     kalici_dizin=self._kalici_dizin,
                 )
-                logger.info("[VectorMemory] VektorBellek baslatildi: %s", koleksiyon_adi)
+                logger.info(
+                    "[VectorMemory] VektorBellek baslatildi: %s", koleksiyon_adi
+                )
             except Exception as e:
-                logger.warning("[VectorMemory] VektorBellek baslatma hatasi: %s — SQLite fallback", e)
+                logger.warning(
+                    "[VectorMemory] VektorBellek baslatma hatasi: %s — SQLite fallback",
+                    e,
+                )
                 self._vb = None
 
         # SQLite fallback (her zaman hazir)
@@ -284,7 +307,9 @@ class VectorMemory:
 
         return self._sqlite.sil(kayit_id) or basarili
 
-    def guncelle(self, kayit_id: str, yeni_metin: str, yeni_metadata: Optional[Dict] = None) -> bool:
+    def guncelle(
+        self, kayit_id: str, yeni_metin: str, yeni_metadata: Optional[Dict] = None
+    ) -> bool:
         """Varolan kaydi guncelle (sil + yeniden ekle).
 
         Args:
@@ -330,7 +355,9 @@ class VectorMemory:
         """VectorMemory hakkinda bilgi."""
         return {
             "koleksiyon": self._koleksiyon_adi,
-            "backend": "chromadb" if (self._vb and hasattr(self._vb, '_koleksiyon') and self._vb._koleksiyon) else "sqlite",
+            "backend": "chromadb"
+            if (self._vb and hasattr(self._vb, "_koleksiyon") and self._vb._koleksiyon)
+            else "sqlite",
             "embedding": {
                 "model": self._embedder._model,
                 "api_hazir": self._embedder.hazir,
@@ -381,7 +408,12 @@ class _SQLiteVectorMemory:
             )
         self._conn.commit()
 
-    def ekle(self, metin: str, metadata: Optional[Dict] = None, embedding: Optional[List[float]] = None) -> str:
+    def ekle(
+        self,
+        metin: str,
+        metadata: Optional[Dict] = None,
+        embedding: Optional[List[float]] = None,
+    ) -> str:
         """Metni kaydet."""
         kayit_id = hashlib.sha256(metin.encode("utf-8")).hexdigest()[:16]
         meta_json = json.dumps(metadata or {}, ensure_ascii=False)
@@ -407,7 +439,9 @@ class _SQLiteVectorMemory:
             logger.warning("[SQLiteVectorMemory] Ekleme hatasi: %s", e)
         return kayit_id
 
-    def ara(self, sorgu_embed: List[float], sorgu_metin: str = "", limit: int = 5) -> List[Dict]:
+    def ara(
+        self, sorgu_embed: List[float], sorgu_metin: str = "", limit: int = 5
+    ) -> List[Dict]:
         """Cosine benzerligi ile ara (embedding varsa) veya FTS5 keyword ara."""
         if not sorgu_embed and not sorgu_metin:
             return []
@@ -433,18 +467,22 @@ class _SQLiteVectorMemory:
                     doc_norm = np.linalg.norm(doc_np)
                     if doc_norm == 0:
                         continue
-                    cos_benzerlik = float(np.dot(sorgu_np, doc_np) / (sorgu_norm * doc_norm))
+                    cos_benzerlik = float(
+                        np.dot(sorgu_np, doc_np) / (sorgu_norm * doc_norm)
+                    )
                     if cos_benzerlik >= ESIK_BENZERLIK:
                         try:
                             meta = json.loads(row[2])
                         except (json.JSONDecodeError, TypeError):
                             meta = {}
-                        sonuclar.append({
-                            "id": row[0],
-                            "metin": row[1],
-                            "skor": round(cos_benzerlik, 4),
-                            "metadata": meta,
-                        })
+                        sonuclar.append(
+                            {
+                                "id": row[0],
+                                "metin": row[1],
+                                "skor": round(cos_benzerlik, 4),
+                                "metadata": meta,
+                            }
+                        )
                 except Exception:
                     continue
 
@@ -468,12 +506,14 @@ class _SQLiteVectorMemory:
                         meta = json.loads(row[2])
                     except (json.JSONDecodeError, TypeError):
                         meta = {}
-                    sonuclar.append({
-                        "id": row[0],
-                        "metin": row[1],
-                        "skor": 0.5,
-                        "metadata": meta,
-                    })
+                    sonuclar.append(
+                        {
+                            "id": row[0],
+                            "metin": row[1],
+                            "skor": 0.5,
+                            "metadata": meta,
+                        }
+                    )
             except Exception as _e:
                 __import__("logging").getLogger(__name__).warning(
                     "[SessizExcept] %%s: %%s", type(_e).__name__, _e
@@ -485,7 +525,9 @@ class _SQLiteVectorMemory:
         try:
             self._conn.execute("DELETE FROM vector_memory WHERE id = ?", (kayit_id,))
             try:
-                self._conn.execute("DELETE FROM vector_memory_fts WHERE id = ?", (kayit_id,))
+                self._conn.execute(
+                    "DELETE FROM vector_memory_fts WHERE id = ?", (kayit_id,)
+                )
             except Exception as _e:
                 __import__("logging").getLogger(__name__).warning(
                     "[SessizExcept] %%s: %%s", type(_e).__name__, _e
@@ -507,7 +549,9 @@ class _SQLiteVectorMemory:
                 meta = json.loads(row[2])
             except (json.JSONDecodeError, TypeError):
                 meta = {}
-            sonuc.append({"id": row[0], "metin": row[1], "metadata": meta, "zaman": row[3]})
+            sonuc.append(
+                {"id": row[0], "metin": row[1], "metadata": meta, "zaman": row[3]}
+            )
         return sonuc
 
     def __len__(self) -> int:
@@ -560,14 +604,14 @@ def motor_kaydet(motor) -> None:
         _vektor_ekle_tool,
         "VEKTOR_EKLE(metin, metadata) — Metni vektor bellege ekle. "
         "Parametreler: metin=eklenecek_metin metadata=opsiyonel_json_dict. "
-        "Ornek: VEKTOR_EKLE(metin='Bugun hava cok guzel', metadata={\"kategori\":\"not\"})"
+        'Ornek: VEKTOR_EKLE(metin=\'Bugun hava cok guzel\', metadata={"kategori":"not"})',
     )
     motor._plugin_arac_kaydet(
         "VEKTOR_ARA",
         _vektor_ara_tool,
         "VEKTOR_ARA(sorgu, limit) — Anlamsal arama yap. "
         "Parametreler: sorgu=arama_sorgusu limit=kac_sonuc (varsayilan 5). "
-        "Ornek: VEKTOR_ARA(sorgu='hava durumu', limit=3)"
+        "Ornek: VEKTOR_ARA(sorgu='hava durumu', limit=3)",
     )
     logger.info("[VectorMemory] Motor'a 2 arac kaydedildi (VEKTOR_EKLE, VEKTOR_ARA)")
 

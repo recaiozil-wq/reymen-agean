@@ -143,7 +143,9 @@ def atomic_replace(tmp_path: Union[str, Path], target: Union[str, Path]) -> str:
     need to re-apply permissions can target it instead of the symlink.
     """
     target_str = str(target)
-    real_path = os.path.realpath(target_str) if os.path.islink(target_str) else target_str
+    real_path = (
+        os.path.realpath(target_str) if os.path.islink(target_str) else target_str
+    )
     os.replace(str(tmp_path), real_path)
     return real_path
 
@@ -251,7 +253,9 @@ def atomic_yaml_write(
     )
     try:
         with os.fdopen(fd, "w", encoding="utf-8") as f:
-            yaml.dump(data, f, default_flow_style=default_flow_style, sort_keys=sort_keys)
+            yaml.dump(
+                data, f, default_flow_style=default_flow_style, sort_keys=sort_keys
+            )
             if extra_content:
                 f.write(extra_content)
             f.flush()
@@ -372,8 +376,12 @@ def env_bool(key: str, default: bool = False) -> bool:
 
 
 _PROXY_ENV_KEYS = (
-    "HTTPS_PROXY", "HTTP_PROXY", "ALL_PROXY",
-    "https_proxy", "http_proxy", "all_proxy",
+    "HTTPS_PROXY",
+    "HTTP_PROXY",
+    "ALL_PROXY",
+    "https_proxy",
+    "http_proxy",
+    "all_proxy",
 )
 
 

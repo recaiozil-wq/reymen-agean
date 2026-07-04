@@ -22,6 +22,7 @@ from reymen.core.config_manager import (
 
 # ── Config Başlatma ──────────────────────────────────────────────────────────
 
+
 class TestConfigBaslatma:
     """Config() kurulumu ve varsayılan değerler."""
 
@@ -62,6 +63,7 @@ class TestConfigBaslatma:
 
 
 # ── Config Get / Set ─────────────────────────────────────────────────────────
+
 
 class TestConfigGetSet:
     """Config.get() / set() / set_and_save()."""
@@ -106,6 +108,7 @@ class TestConfigGetSet:
 
 
 # ── Config Yardımcı Metodları ────────────────────────────────────────────────
+
 
 class TestConfigHelperMetodlari:
     """_dict_merge, _dict_set, _dict_anahtar_say, durum_raporu."""
@@ -181,6 +184,7 @@ class TestConfigHelperMetodlari:
 
 # ── ConfigManager ────────────────────────────────────────────────────────────
 
+
 class TestConfigManager:
     """ConfigManager get/set/list arayüzü."""
 
@@ -215,6 +219,7 @@ class TestConfigManager:
 
 # ── Singleton ────────────────────────────────────────────────────────────────
 
+
 class TestVarsayilanConfig:
     """varsayilan_config() singleton."""
 
@@ -227,12 +232,14 @@ class TestVarsayilanConfig:
     def test_config_yeniden_yukle_yeni_nesne(self):
         """config_yeniden_yukle() yeni Config oluşturuyor mu?"""
         from reymen.core.config_manager import config_yeniden_yukle
+
         c1 = varsayilan_config()
         c2 = config_yeniden_yukle()
         assert c1 is not c2
 
 
 # ── Environment Variable Override ────────────────────────────────────────────
+
 
 class TestEnvOverride:
     """REYMEN_* env variable override."""
@@ -244,7 +251,9 @@ class TestEnvOverride:
         Ornek: REYMEN_GENERAL_DEFAULT_MODEL -> general.default.model (YANLIS)
         Bu nedenle yaprak anahtarinda alt cizgi OLMAYAN key kullaniriz.
         """
-        with patch.dict(os.environ, {"REYMEN_AGENT_NAME": "ReymenOverride"}, clear=False):
+        with patch.dict(
+            os.environ, {"REYMEN_AGENT_NAME": "ReymenOverride"}, clear=False
+        ):
             cfg = Config()
             assert cfg.get("agent.name") == "ReymenOverride"
 
@@ -265,6 +274,7 @@ class TestEnvOverride:
 
 
 # ── Kaydetme (Config yokken) ─────────────────────────────────────────────────
+
 
 class TestKaydetme:
     """kaydet() - config dosyası olmadan hata vermemeli."""

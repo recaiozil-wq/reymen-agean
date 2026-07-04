@@ -49,6 +49,7 @@ _CONFIG_YOLU = Path(__file__).parent.parent / ".ReYMeN" / "mcp_client.json"
 # aiohttp opsiyonel
 try:
     import aiohttp
+
     AIOHTTP_OK = True
 except ImportError:
     AIOHTTP_OK = False
@@ -76,15 +77,20 @@ class MCPClientHTTP:
                 headers=self.headers, timeout=aiohttp.ClientTimeout(total=30)
             )
             # Initialize
-            await self._json_rpc("initialize", {
-                "protocolVersion": "0.1.0",
-                "capabilities": {},
-                "clientInfo": {"name": "ReYMeN", "version": "1.0"},
-            })
+            await self._json_rpc(
+                "initialize",
+                {
+                    "protocolVersion": "0.1.0",
+                    "capabilities": {},
+                    "clientInfo": {"name": "ReYMeN", "version": "1.0"},
+                },
+            )
             # Tools/list
             yanit = await self._json_rpc("tools/list", {})
             self._araclar = yanit.get("result", {}).get("tools", [])
-            logger.info("[MCPClient] %s: %d tool keşfedildi", self.ad, len(self._araclar))
+            logger.info(
+                "[MCPClient] %s: %d tool keşfedildi", self.ad, len(self._araclar)
+            )
             return True
         except Exception as e:
             logger.error("[MCPClient] %s bağlantı hatası: %s", self.ad, e)
@@ -113,10 +119,13 @@ class MCPClientHTTP:
 
     async def arac_cagir(self, arac_adi: str, parametreler: dict) -> Any:
         """Bir MCP tool'u çağır."""
-        yanit = await self._json_rpc("tools/call", {
-            "name": arac_adi,
-            "arguments": parametreler,
-        })
+        yanit = await self._json_rpc(
+            "tools/call",
+            {
+                "name": arac_adi,
+                "arguments": parametreler,
+            },
+        )
         sonuc = yanit.get("result", {})
         icerik = sonuc.get("content", [])
         if icerik and isinstance(icerik, list):
@@ -153,6 +162,7 @@ class MCPClientStdio:
             komut = self.komut[:]
             if os.name == "nt":
                 import shutil
+
                 ilk = komut[0]
                 tam_yol = shutil.which(ilk)
                 if tam_yol and tam_yol != ilk:
@@ -166,14 +176,21 @@ class MCPClientStdio:
                 env=self.env,
                 cwd=self.cwd,
             )
-            self._json_rpc("initialize", {
-                "protocolVersion": "0.1.0",
-                "capabilities": {},
-                "clientInfo": {"name": "ReYMeN", "version": "1.0"},
-            })
+            self._json_rpc(
+                "initialize",
+                {
+                    "protocolVersion": "0.1.0",
+                    "capabilities": {},
+                    "clientInfo": {"name": "ReYMeN", "version": "1.0"},
+                },
+            )
             yanit = self._json_rpc("tools/list", {})
             self._araclar = yanit.get("result", {}).get("tools", [])
-            logger.info("[MCPClient] %s (stdio): %d tool keşfedildi", self.ad, len(self._araclar))
+            logger.info(
+                "[MCPClient] %s (stdio): %d tool keşfedildi",
+                self.ad,
+                len(self._araclar),
+            )
             return True
         except Exception as e:
             logger.error("[MCPClient] %s (stdio) bağlantı hatası: %s", self.ad, e)
@@ -183,12 +200,17 @@ class MCPClientStdio:
     def _json_rpc(self, method: str, params: dict) -> dict:
         with self._kilit:
             self._istek_id += 1
-            istek = json.dumps({
-                "jsonrpc": "2.0",
-                "id": self._istek_id,
-                "method": method,
-                "params": params,
-            }) + "\n"
+            istek = (
+                json.dumps(
+                    {
+                        "jsonrpc": "2.0",
+                        "id": self._istek_id,
+                        "method": method,
+                        "params": params,
+                    }
+                )
+                + "\n"
+            )
             try:
                 self._proses.stdin.write(istek)
                 self._proses.stdin.flush()
@@ -199,10 +221,13 @@ class MCPClientStdio:
                 return {}
 
     def arac_cagir(self, arac_adi: str, parametreler: dict) -> Any:
-        yanit = self._json_rpc("tools/call", {
-            "name": arac_adi,
-            "arguments": parametreler,
-        })
+        yanit = self._json_rpc(
+            "tools/call",
+            {
+                "name": arac_adi,
+                "arguments": parametreler,
+            },
+        )
         sonuc = yanit.get("result", {})
         icerik = sonuc.get("content", [])
         if icerik and isinstance(icerik, list):
@@ -228,7 +253,7 @@ class MCPClientYoneticisi:
 
     def __init__(self):
         self._sunucular: dict[str, Any] = {}  # ad -> MCPClientHTTP | MCPClientStdio
-        self._konfig: dict = {}               # ad -> ayar (ham config)
+        self._konfig: dict = {}  # ad -> ayar (ham config)
         self._konfig_yukle()
 
     def _konfig_yukle(self):
@@ -288,7 +313,9 @@ class MCPClientYoneticisi:
                 return sunucu
             return None
 
-    def sunucu_ekle_http(self, ad: str, url: str, headers: Optional[dict] = None) -> bool:
+    def sunucu_ekle_http(
+        self, ad: str, url: str, headers: Optional[dict] = None
+    ) -> bool:
         """HTTP tabanlı MCP sunucusu ekle ve bağlan."""
         if ad in self._sunucular:
             return False
@@ -386,7 +413,9 @@ class MCPClientYoneticisi:
                     motor._plugin_arac_kaydet(
                         arac_adi,
                         _fn,
-                        arac.get("description", f"MCP Client: {sunucu_ad}/{arac['name']}"),
+                        arac.get(
+                            "description", f"MCP Client: {sunucu_ad}/{arac['name']}"
+                        ),
                     )
                 except Exception as e:
                     logger.error("[MCPClient] Motor kayıt hatası (%s): %s", arac_adi, e)
@@ -411,6 +440,7 @@ def mcp_client() -> MCPClientYoneticisi:
 
 
 # ── Public API ────────────────────────────────────────────────────────────
+
 
 def mcp_client_baglan(sunucu_adi: str) -> str:
     """Belirli bir sunucuya bağlan (config'den veya manuel).
@@ -441,7 +471,9 @@ def mcp_client_listele() -> str:
     for ad, bilgi in durum.items():
         satirlar.append(f"  {ad} ({bilgi['transport']}): {bilgi['arac_sayisi']} tool")
         for arac in yonetici._sunucular[ad].araclar():
-            satirlar.append(f"    - {arac.get('name', '?')}: {arac.get('description', '')[:60]}")
+            satirlar.append(
+                f"    - {arac.get('name', '?')}: {arac.get('description', '')[:60]}"
+            )
     return "\n".join(satirlar)
 
 

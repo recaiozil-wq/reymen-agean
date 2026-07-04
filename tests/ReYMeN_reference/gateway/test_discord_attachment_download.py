@@ -35,9 +35,19 @@ def _ensure_discord_mock():
     discord_mod.DMChannel = type("DMChannel", (), {})
     discord_mod.Thread = type("Thread", (), {})
     discord_mod.ForumChannel = type("ForumChannel", (), {})
-    discord_mod.ui = SimpleNamespace(View=object, button=lambda *a, **k: (lambda fn: fn), Button=object)
-    discord_mod.ButtonStyle = SimpleNamespace(success=1, primary=2, secondary=2, danger=3, green=1, grey=2, blurple=2, red=3)
-    discord_mod.Color = SimpleNamespace(orange=lambda: 1, green=lambda: 2, blue=lambda: 3, red=lambda: 4, purple=lambda: 5)
+    discord_mod.ui = SimpleNamespace(
+        View=object, button=lambda *a, **k: (lambda fn: fn), Button=object
+    )
+    discord_mod.ButtonStyle = SimpleNamespace(
+        success=1, primary=2, secondary=2, danger=3, green=1, grey=2, blurple=2, red=3
+    )
+    discord_mod.Color = SimpleNamespace(
+        orange=lambda: 1,
+        green=lambda: 2,
+        blue=lambda: 3,
+        red=lambda: 4,
+        purple=lambda: 5,
+    )
     discord_mod.Interaction = object
     discord_mod.Embed = MagicMock
     discord_mod.app_commands = SimpleNamespace(
@@ -97,6 +107,7 @@ def _make_attachment_without_read() -> SimpleNamespace:
 # _read_attachment_bytes
 # ---------------------------------------------------------------------------
 
+
 class TestReadAttachmentBytes:
     """Unit tests for the low-level att.read() wrapper."""
 
@@ -137,6 +148,7 @@ class TestReadAttachmentBytes:
 # ---------------------------------------------------------------------------
 # _cache_discord_image
 # ---------------------------------------------------------------------------
+
 
 class TestCacheDiscordImage:
     @pytest.mark.asyncio
@@ -203,6 +215,7 @@ class TestCacheDiscordImage:
 # _cache_discord_audio
 # ---------------------------------------------------------------------------
 
+
 class TestCacheDiscordAudio:
     @pytest.mark.asyncio
     async def test_prefers_att_read_over_url(self):
@@ -241,6 +254,7 @@ class TestCacheDiscordAudio:
 # ---------------------------------------------------------------------------
 # _cache_discord_document
 # ---------------------------------------------------------------------------
+
 
 class TestCacheDiscordDocument:
     @pytest.mark.asyncio
@@ -306,6 +320,7 @@ class TestCacheDiscordDocument:
 # Integration: end-to-end via _handle_message
 # ---------------------------------------------------------------------------
 
+
 class TestHandleMessageUsesAuthenticatedRead:
     """E2E: verify _handle_message routes image/audio downloads through
     att.read() so cdn.discordapp.com 403s (#8242) and SSRF false-positives
@@ -347,7 +362,10 @@ class TestHandleMessageUsesAuthenticatedRead:
             )
             chan = _FakeDMChannel()
             msg = SimpleNamespace(
-                id=1, content="", attachments=[att], mentions=[],
+                id=1,
+                content="",
+                attachments=[att],
+                mentions=[],
                 reference=None,
                 created_at=datetime.now(timezone.utc),
                 channel=chan,
@@ -391,7 +409,10 @@ class TestHandleMessageUsesAuthenticatedRead:
             )
             chan = _FakeDMChannel()
             msg = SimpleNamespace(
-                id=1, content="", attachments=[att], mentions=[],
+                id=1,
+                content="",
+                attachments=[att],
+                mentions=[],
                 reference=None,
                 created_at=datetime.now(timezone.utc),
                 channel=chan,
@@ -435,7 +456,10 @@ class TestHandleMessageUsesAuthenticatedRead:
             )
             chan = _FakeDMChannel()
             msg = SimpleNamespace(
-                id=1, content="", attachments=[att], mentions=[],
+                id=1,
+                content="",
+                attachments=[att],
+                mentions=[],
                 reference=None,
                 created_at=datetime.now(timezone.utc),
                 channel=chan,

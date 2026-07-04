@@ -31,6 +31,7 @@ try:
         prompt_guvenli_mi as _prompt_guvenli_mi,
         cikti_guvenli_mi as _cikti_guvenli_mi,
     )
+
     _THREAT_PATTERNS_MEVCUT = True
 except ImportError:
     _THREAT_PATTERNS_MEVCUT = False
@@ -100,11 +101,12 @@ _KOD_EXEC_DESENLERI = [
 @dataclass
 class GuardrailSonucu:
     """Guardrail kontrol sonucu."""
+
     guvenli: bool
-    tespit: str = ""          # Tespit edilen tehdit turu
-    eslesme: str = ""          # Eslesen desen
-    seviye: str = "dusuk"     # dusuk / orta / yuksek
-    detay: str = ""            # Ek detay
+    tespit: str = ""  # Tespit edilen tehdit turu
+    eslesme: str = ""  # Eslesen desen
+    seviye: str = "dusuk"  # dusuk / orta / yuksek
+    detay: str = ""  # Ek detay
     islem_zamani: float = 0.0
 
     def to_dict(self) -> Dict[str, Any]:
@@ -396,7 +398,7 @@ def motor_kaydet(motor) -> None:
         "GIRDI_KONTROL(prompt) — Kullanici girdisini prompt injection, "
         "zararli komut ve PII'ya karsi kontrol et. "
         "Parametre: prompt=kontrol_edilecek_metin. "
-        "Ornek: GIRDI_KONTROL(prompt='Merhaba, nasilsin?')"
+        "Ornek: GIRDI_KONTROL(prompt='Merhaba, nasilsin?')",
     )
     motor._plugin_arac_kaydet(
         "CIKTI_KONTROL",
@@ -404,15 +406,17 @@ def motor_kaydet(motor) -> None:
         "CIKTI_KONTROL(cikti) — LLM ciktisini yasakli icerik, "
         "kod exec ve PII sizintisina karsi kontrol et. "
         "Parametre: cikti=kontrol_edilecek_metin. "
-        "Ornek: CIKTI_KONTROL(cikti='Islem basarili')"
+        "Ornek: CIKTI_KONTROL(cikti='Islem basarili')",
     )
     motor._plugin_arac_kaydet(
         "GUARDRAIL_DURUM",
         _guardrail_durum_tool,
         "GUARDRAIL_DURUM() — Guardrail sistemi durumunu goster: "
-        "aktif desenler, toplam kontrol sayisi, tespit sayisi"
+        "aktif desenler, toplam kontrol sayisi, tespit sayisi",
     )
-    logger.info("[Guardrails] Motor'a 3 arac kaydedildi (GIRDI_KONTROL, CIKTI_KONTROL, GUARDRAIL_DURUM)")
+    logger.info(
+        "[Guardrails] Motor'a 3 arac kaydedildi (GIRDI_KONTROL, CIKTI_KONTROL, GUARDRAIL_DURUM)"
+    )
 
 
 def _girdi_kontrol_tool(**kw) -> str:

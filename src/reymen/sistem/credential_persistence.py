@@ -28,6 +28,7 @@ class CredentialPersistence:
         self._wcm = None
         try:
             import win32cred
+
             self._wcm = win32cred
             self._wcm_available = True
         except ImportError:
@@ -36,17 +37,11 @@ class CredentialPersistence:
     def _basit_sifrele(self, veri: str) -> bytes:
         """Basit XOR sifreleme (guclu degil, sadece duz metin korumasi)."""
         anahtar = b"ReYMeN_SECRET_KEY_2026"
-        return bytes(
-            ord(c) ^ anahtar[i % len(anahtar)]
-            for i, c in enumerate(veri)
-        )
+        return bytes(ord(c) ^ anahtar[i % len(anahtar)] for i, c in enumerate(veri))
 
     def _basit_coz(self, veri: bytes) -> str:
         anahtar = b"ReYMeN_SECRET_KEY_2026"
-        return "".join(
-            chr(b ^ anahtar[i % len(anahtar)])
-            for i, b in enumerate(veri)
-        )
+        return "".join(chr(b ^ anahtar[i % len(anahtar)]) for i, b in enumerate(veri))
 
     def wcm_kaydet(self, anahtar: str, deger: str) -> bool:
         """Windows Credential Manager'a kaydet.
@@ -62,6 +57,7 @@ class CredentialPersistence:
             return False
         try:
             import pywintypes
+
             cred_type = self._wcm.CRED_TYPE_GENERIC
             target = f"ReYMeN_{anahtar}"
             self._wcm.CredWrite(
@@ -111,6 +107,7 @@ class CredentialPersistence:
         """
         try:
             import json
+
             veri = json.dumps(anahtarlar)
             sifreli = self._basit_sifrele(veri)
             CRED_DOSYASI.parent.mkdir(parents=True, exist_ok=True)
@@ -125,6 +122,7 @@ class CredentialPersistence:
             return {}
         try:
             import json
+
             sifreli = CRED_DOSYASI.read_bytes()
             veri = self._basit_coz(sifreli)
             return json.loads(veri)

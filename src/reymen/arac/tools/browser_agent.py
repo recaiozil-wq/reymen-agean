@@ -38,12 +38,24 @@ TOOL_META = {
     "kategori": "browser",
     "risk": 2,
     "parametreler": [
-        {"ad": "goal", "tip": "string", "zorunlu": True,
-         "aciklama": "Tarayıcıda yapılacak iş (örn: 'Google\'da X ara, ilk sonucu aç')"},
-        {"ad": "url", "tip": "string", "zorunlu": False,
-         "aciklama": "Başlangıç URL'si (opsiyonel)"},
-        {"ad": "max_tur", "tip": "int", "zorunlu": False,
-         "aciklama": "Maksimum döngü turu (varsayılan: 15)"},
+        {
+            "ad": "goal",
+            "tip": "string",
+            "zorunlu": True,
+            "aciklama": "Tarayıcıda yapılacak iş (örn: 'Google'da X ara, ilk sonucu aç')",
+        },
+        {
+            "ad": "url",
+            "tip": "string",
+            "zorunlu": False,
+            "aciklama": "Başlangıç URL'si (opsiyonel)",
+        },
+        {
+            "ad": "max_tur",
+            "tip": "int",
+            "zorunlu": False,
+            "aciklama": "Maksimum döngü turu (varsayılan: 15)",
+        },
     ],
 }
 
@@ -88,8 +100,9 @@ class BrowserAgentLoop:
     - finally: kaynak temizleme
     """
 
-    def __init__(self, goal: str, baslangic_url: Optional[str] = None,
-                 max_tur: int = 15):
+    def __init__(
+        self, goal: str, baslangic_url: Optional[str] = None, max_tur: int = 15
+    ):
         self.goal = goal
         self.baslangic_url = baslangic_url
         self.max_tur = max_tur
@@ -108,6 +121,7 @@ class BrowserAgentLoop:
         if self._beyin is None:
             try:
                 from reymen.cereyan.beyin import Beyin as _Beyin
+
                 cfg = {
                     "default_provider": os.environ.get("BEYIN_PROVIDER", "deepseek"),
                     "default_model": os.environ.get("BEYIN_MODEL", "deepseek-chat"),
@@ -141,11 +155,16 @@ class BrowserAgentLoop:
                 sonuc = engine.tikla(selector)
                 if "hatasi" not in sonuc.lower():
                     return True, sonuc
-                logger.warning("[BrowserAgent] Tik %d/%d basarisiz: %s",
-                               i + 1, _DENEME_SAYISI, sonuc)
+                logger.warning(
+                    "[BrowserAgent] Tik %d/%d basarisiz: %s",
+                    i + 1,
+                    _DENEME_SAYISI,
+                    sonuc,
+                )
             except Exception as e:
-                logger.warning("[BrowserAgent] Tik %d/%d hata: %s",
-                               i + 1, _DENEME_SAYISI, e)
+                logger.warning(
+                    "[BrowserAgent] Tik %d/%d hata: %s", i + 1, _DENEME_SAYISI, e
+                )
 
             # Exponential backoff: 1sn, 2sn, 3sn
             bekle = _BEKLEME_CARPAN * (i + 1)
@@ -156,7 +175,9 @@ class BrowserAgentLoop:
         try:
             engine = self._engine_al()
             ss = engine.ekran_goruntusu()
-            logger.warning("[BrowserAgent] Tik basarisiz, screenshot alindi: %s", ss[:100])
+            logger.warning(
+                "[BrowserAgent] Tik basarisiz, screenshot alindi: %s", ss[:100]
+            )
         except Exception:
             logger.warning("[fix_01_sessiz_except] Exception")
 
@@ -166,7 +187,10 @@ class BrowserAgentLoop:
         """Timeout + retry ile güvenli sayfa açma."""
         # Invisible döngü tespiti
         if self._sekme_acma_sayaci >= _MAX_DENEME:
-            return False, "[HATA] Sekme açma/kapama döngüsü tespit edildi — işlem durduruldu"
+            return (
+                False,
+                "[HATA] Sekme açma/kapama döngüsü tespit edildi — işlem durduruldu",
+            )
 
         for i in range(_DENEME_SAYISI):
             try:
@@ -175,13 +199,15 @@ class BrowserAgentLoop:
                 self._sekme_acma_sayaci += 1
                 return True, sonuc
             except TimeoutError:
-                logger.warning("[BrowserAgent] Sayfa %d/%d timeout: %s",
-                               i + 1, _DENEME_SAYISI, url)
+                logger.warning(
+                    "[BrowserAgent] Sayfa %d/%d timeout: %s", i + 1, _DENEME_SAYISI, url
+                )
                 if i < _DENEME_SAYISI - 1:
                     time.sleep(2.0 * (i + 1))
             except Exception as e:
-                logger.warning("[BrowserAgent] Sayfa %d/%d hata: %s",
-                               i + 1, _DENEME_SAYISI, e)
+                logger.warning(
+                    "[BrowserAgent] Sayfa %d/%d hata: %s", i + 1, _DENEME_SAYISI, e
+                )
                 if i < _DENEME_SAYISI - 1:
                     time.sleep(1.0 * (i + 1))
 
@@ -211,7 +237,7 @@ class BrowserAgentLoop:
                 f"Hedef: {self.goal}\n"
                 f"Tur: {self.tur + 1}/{self.max_tur}\n\n"
                 f"Bir sonraki eylemi belirle (sadece JSON):"
-            )
+            ),
         }
 
         if beyin:
@@ -244,16 +270,20 @@ class BrowserAgentLoop:
             return {
                 "degerlendirme": "JSON ayrıştırılamadı",
                 "hedefe_ulasti": True,
-                "eylem": {"tur": "tamam", "parametreler": {},
-                          "aciklama": "JSON parse hatasi"},
-                "sonuc": f"LLM yaniti parse edilemedi: {yanit[:100]}"
+                "eylem": {
+                    "tur": "tamam",
+                    "parametreler": {},
+                    "aciklama": "JSON parse hatasi",
+                },
+                "sonuc": f"LLM yaniti parse edilemedi: {yanit[:100]}",
             }
 
     def _hata_karar(self, hata: str) -> dict:
         return {
-            "degerlendirme": hata, "hedefe_ulasti": True,
+            "degerlendirme": hata,
+            "hedefe_ulasti": True,
             "eylem": {"tur": "basarisiz", "parametreler": {}, "aciklama": hata},
-            "sonuc": f"Hata: {hata}"
+            "sonuc": f"Hata: {hata}",
         }
 
     def _basit_strateji(self) -> dict:
@@ -261,22 +291,28 @@ class BrowserAgentLoop:
             return {
                 "degerlendirme": "Baslangic sayfasina gidiliyor",
                 "hedefe_ulasti": False,
-                "eylem": {"tur": "navigate",
-                          "parametreler": {"url": self.baslangic_url},
-                          "aciklama": f"{self.baslangic_url}'e git"}
+                "eylem": {
+                    "tur": "navigate",
+                    "parametreler": {"url": self.baslangic_url},
+                    "aciklama": f"{self.baslangic_url}'e git",
+                },
             }
         return {
             "degerlendirme": "Basit strateji, LLM yok",
             "hedefe_ulasti": True,
-            "eylem": {"tur": "tamam", "parametreler": {},
-                      "aciklama": "Basit strateji sonu"},
-            "sonuc": f"LLM bulunamadi. Sayfa: {self.son_snapshot[:200]}"
+            "eylem": {
+                "tur": "tamam",
+                "parametreler": {},
+                "aciklama": "Basit strateji sonu",
+            },
+            "sonuc": f"LLM bulunamadi. Sayfa: {self.son_snapshot[:200]}",
         }
 
     def _engine_al(self):
         """Browser engine al (singleton)."""
         if self._engine is None:
             from reymen.arac.browser_engine import BrowserEngine
+
             self._engine = BrowserEngine()
         return self._engine
 
@@ -355,7 +391,9 @@ class BrowserAgentLoop:
                         )
 
                 elif eylem_tur in ("scrolldown", "scroll"):
-                    logger.info("[BrowserAgent] Scroll: %s", params.get("direction", "down"))
+                    logger.info(
+                        "[BrowserAgent] Scroll: %s", params.get("direction", "down")
+                    )
 
                 elif eylem_tur in ("tamam", "basarisiz"):
                     return (
@@ -379,9 +417,7 @@ class BrowserAgentLoop:
         except Exception as e:
             logger.error("[BrowserAgent] Kritik hata: %s", e)
             return (
-                f"❌ BROWSER AGENT KRITIK HATA\n\n"
-                f"Hedef: {self.goal}\n"
-                f"Hata: {e}"
+                f"❌ BROWSER AGENT KRITIK HATA\n\n" f"Hedef: {self.goal}\n" f"Hata: {e}"
             )
 
         finally:
@@ -395,6 +431,7 @@ class BrowserAgentLoop:
 
 
 # ── Tool Entry Point (tools/ discovery için) ──────────────────────────
+
 
 def run(goal: str = "", url: str = "", max_tur: int = 15) -> str:
     """BROWSER_AGENT tool entry point.
@@ -411,9 +448,7 @@ def run(goal: str = "", url: str = "", max_tur: int = 15) -> str:
         return "[HATA] 'goal' parametresi zorunludur"
 
     agent = BrowserAgentLoop(
-        goal=goal,
-        baslangic_url=url if url else None,
-        max_tur=max_tur
+        goal=goal, baslangic_url=url if url else None, max_tur=max_tur
     )
     return agent.calistir()
 

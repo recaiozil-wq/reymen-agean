@@ -30,7 +30,13 @@ _VARSAYILAN_SOUL_MD = _PROJE_KOKU / "SOUL.md"
 _VARSAYILAN_CONFIG = _PROJE_KOKU / "config.yaml"
 
 # ReYMeN profil SOUL.md (varsa oncelikli)
-_REYMEN_PROFIL = Path(os.environ.get("LOCALAPPDATA", "")) / "reymen" / "profiles" / "reymen" / "SOUL.md"
+_REYMEN_PROFIL = (
+    Path(os.environ.get("LOCALAPPDATA", ""))
+    / "reymen"
+    / "profiles"
+    / "reymen"
+    / "SOUL.md"
+)
 
 
 def _profil_soul_yolu() -> Path:
@@ -64,6 +70,7 @@ def _config_prompt_al() -> str:
     degerini oku. Yoksa bos string doner."""
     try:
         import yaml
+
         yol = _VARSAYILAN_CONFIG
         if yol.exists():
             with open(yol, "r", encoding="utf-8") as f:
@@ -150,8 +157,11 @@ class PromptAssemblyEngine:
     def __init__(self, bounded_memory=None, learning_loop=None):
         self.bounded_memory = bounded_memory
         self.learning_loop = learning_loop
-        log.debug("PromptAssemblyEngine baslatildi (bounded_memory=%s, learning_loop=%s)",
-                  bounded_memory is not None, learning_loop is not None)
+        log.debug(
+            "PromptAssemblyEngine baslatildi (bounded_memory=%s, learning_loop=%s)",
+            bounded_memory is not None,
+            learning_loop is not None,
+        )
 
     def sistem_prompt_al(self, tema: Optional[str] = None, ek_bilgi: str = "") -> str:
         """sistem_prompt_al fonksiyonuna yonlendir."""
@@ -165,9 +175,14 @@ class PromptAssemblyEngine:
         """Debug icin kaynak dosya yollari."""
         return _kaynak_dosyalari()
 
-    def insa_et(self, hedef: str, son_gozlem: str = "",
-                 tur: int = 1, toplam_tur: int = 15,
-                 ic_gozlem_modu: bool = False) -> str:
+    def insa_et(
+        self,
+        hedef: str,
+        son_gozlem: str = "",
+        tur: int = 1,
+        toplam_tur: int = 15,
+        ic_gozlem_modu: bool = False,
+    ) -> str:
         """_sistem_promptu_insa_et fallback'i — prompt_assembly'den sistem prompt'u al.
 
         Bu fonksiyon `AIAgentOrchestrator._sistem_promptu_insa_et()` tarafindan

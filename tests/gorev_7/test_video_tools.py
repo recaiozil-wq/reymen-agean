@@ -36,7 +36,9 @@ class TestCheckAvailable:
 class TestEnsureTool:
     def test_ensure_existing_tool(self):
         # python her zaman var
-        path = ensure_tool("python") if sys.platform == "win32" else ensure_tool("python3")
+        path = (
+            ensure_tool("python") if sys.platform == "win32" else ensure_tool("python3")
+        )
         assert path is not None
 
     def test_ensure_missing_tool(self):

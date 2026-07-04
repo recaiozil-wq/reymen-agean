@@ -45,6 +45,7 @@ logger = logging.getLogger(__name__)
 try:
     import sounddevice as sd
     import numpy as np
+
     SD_MEVCUT = True
 except ImportError:
     sd = None  # type: ignore[assignment]
@@ -54,6 +55,7 @@ except ImportError:
 # faster-whisper — yerel STT motoru
 try:
     from faster_whisper import WhisperModel
+
     _FASTER_WHISPER_MEVCUT = True
 except ImportError:
     WhisperModel = None  # type: ignore[assignment]
@@ -62,6 +64,7 @@ except ImportError:
 # openai — Whisper API (alternatif STT)
 try:
     from openai import OpenAI
+
     _OPENAI_MEVCUT = True
 except ImportError:
     OpenAI = None  # type: ignore[assignment]
@@ -70,6 +73,7 @@ except ImportError:
 # edge-tts — Microsoft Edge TTS motoru
 try:
     import edge_tts
+
     _EDGE_TTS_MEVCUT = True
 except ImportError:
     edge_tts = None  # type: ignore[assignment]
@@ -78,6 +82,7 @@ except ImportError:
 # pygame — alternatif ses oynatıcı
 try:
     import pygame
+
     PYGAME_MEVCUT = True
 except ImportError:
     pygame = None  # type: ignore[assignment]
@@ -89,7 +94,9 @@ for _exe in ("ffplay", "ffplay.exe"):
     try:
         _r = subprocess.run(
             ["where" if os.name == "nt" else "which", _exe],
-            capture_output=True, text=True, timeout=3,
+            capture_output=True,
+            text=True,
+            timeout=3,
         )
         if _r.returncode == 0 and _r.stdout.strip():
             _FFPLAY_BULUNDU = _r.stdout.strip().splitlines()[0]
@@ -100,10 +107,12 @@ for _exe in ("ffplay", "ffplay.exe"):
 
 # ── Beyin import (opsiyonel) ───────────────────────────────────────────────
 
+
 def _beyin_al() -> Any:
     """Beyin sınıfını döndürür; yoksa None."""
     try:
         from reymen.cereyan.beyin import Beyin
+
         return Beyin
     except ImportError:
         return None
@@ -111,36 +120,40 @@ def _beyin_al() -> Any:
 
 # ── Varsayılan sabitler ────────────────────────────────────────────────────
 
-_VARSAYILAN_SES_KAYNAGI: int = 0          # varsayılan mikrofon
+_VARSAYILAN_SES_KAYNAGI: int = 0  # varsayılan mikrofon
 _VARSAYILAN_ORNEKLEME_HIZI: int = 16000  # Whisper için ideal
-_VARSAYILAN_KANAL_SAYISI: int = 1        # mono
-_VARSAYILAN_KAYIT_SURESI: float = 5.0    # saniye (push-to-talk değilse)
+_VARSAYILAN_KANAL_SAYISI: int = 1  # mono
+_VARSAYILAN_KAYIT_SURESI: float = 5.0  # saniye (push-to-talk değilse)
 _VARSAYILAN_DINLEME_ESIĞI: float = 0.02  # ses seviyesi eşiği (VAD basit)
 _VARSAYILAN_SESSIZLIK_SURESI: float = 1.5  # VAD için sessizlik timeout
-_VARSAYILAN_DIL: str = "tr"              # STT dili
+_VARSAYILAN_DIL: str = "tr"  # STT dili
 _VARSAYILAN_TTS_SESI: str = "tr-TR-AhmetNeural"  # edge-tts Türkçe erkek sesi
 
 # VAD (Voice Activity Detection) parametreleri
 _VAD_PENCERE_BOYUTU: int = 1024  # RMS penceresi
-_VAD_SESSIZ_EN_COK: int = 15     # kaç sessiz pencereden sonra dur
+_VAD_SESSIZ_EN_COK: int = 15  # kaç sessiz pencereden sonra dur
 
 
 # ── Ses verisi taşıyıcısı ──────────────────────────────────────────────────
 
+
 @dataclass
 class SesKaydi:
     """Kaydedilmiş ses verisini ve üstverisini taşır."""
-    veri: Optional[Any] = None          # numpy array
+
+    veri: Optional[Any] = None  # numpy array
     ornekleme_hizi: int = _VARSAYILAN_ORNEKLEME_HIZI
     sure_sn: float = 0.0
-    dosya_yolu: Optional[str] = None   # temp wav dosya yolu
-    metin: str = ""                    # STT çıktısı
+    dosya_yolu: Optional[str] = None  # temp wav dosya yolu
+    metin: str = ""  # STT çıktısı
 
 
 # ── Durum kodları ─────────────────────────────────────────────────────────
 
+
 class VoiceModeDurum:
     """VoiceMode çalışma durumları."""
+
     DURDU = "durdu"
     DİNLİYOR = "dinliyor"
     KONUSUYOR = "konusuyor"
@@ -151,6 +164,7 @@ class VoiceModeDurum:
 # ═══════════════════════════════════════════════════════════════════════════
 # VoiceMode Ana Sınıfı
 # ═══════════════════════════════════════════════════════════════════════════
+
 
 class VoiceMode:
     """Sesli arayüz yöneticisi.
@@ -289,12 +303,14 @@ class VoiceMode:
         try:
             cihazlar = []
             for i, c in enumerate(sd.query_devices()):  # type: ignore[arg-type]
-                cihazlar.append({
-                    "id": i,
-                    "adi": c["name"],
-                    "kanal": c["max_input_channels"],
-                    "ornek": int(c["default_samplerate"]),
-                })
+                cihazlar.append(
+                    {
+                        "id": i,
+                        "adi": c["name"],
+                        "kanal": c["max_input_channels"],
+                        "ornek": int(c["default_samplerate"]),
+                    }
+                )
             return cihazlar
         except Exception as e:
             logger.error("[VoiceMode] Cihaz listeleme hatası: %s", e)
@@ -330,7 +346,7 @@ class VoiceMode:
             if status:
                 logger.debug("[VoiceMode] Ses akışı status: %s", status)
             # RMS ses seviyesi
-            rms = np.sqrt(np.mean(indata ** 2))  # type: ignore[operator]
+            rms = np.sqrt(np.mean(indata**2))  # type: ignore[operator]
             buffer.append(indata.copy())
             if rms < self.ses_esiği:
                 sessiz_sayac += 1
@@ -462,6 +478,7 @@ class VoiceMode:
         try:
             # soundfile ile yaz
             import soundfile as sf
+
             fd, yol = tempfile.mkstemp(suffix=".wav", prefix="reymen_voice_")
             os.close(fd)
             sf.write(yol, kayit.veri, kayit.ornekleme_hizi)
@@ -473,6 +490,7 @@ class VoiceMode:
         try:
             # scipy.io.wavfile ile yaz
             from scipy.io import wavfile
+
             fd, yol = tempfile.mkstemp(suffix=".wav", prefix="reymen_voice_")
             os.close(fd)
             wavfile.write(yol, kayit.ornekleme_hizi, kayit.veri)
@@ -503,7 +521,9 @@ class VoiceMode:
             compute_type = self._cfg.get("whisper_compute", "int8")
             logger.info(
                 "[VoiceMode] faster-whisper model yükleniyor: %s (%s, %s)...",
-                model_boyutu, device, compute_type,
+                model_boyutu,
+                device,
+                compute_type,
             )
             self._whisper_model = WhisperModel(
                 model_boyutu,
@@ -685,11 +705,13 @@ class VoiceMode:
             try:
                 import pydub
                 from pydub import AudioSegment
+
                 ses = AudioSegment.from_mp3(io.BytesIO(ses_verisi))
                 wav_buf = io.BytesIO()
                 ses.export(wav_buf, format="wav")
                 wav_buf.seek(0)
                 import soundfile as sf
+
                 data, sr = sf.read(wav_buf)
             except ImportError:
                 # pydub yoksa geçici dosyaya yaz, ffmpeg ile çevir
@@ -702,9 +724,11 @@ class VoiceMode:
                 try:
                     subprocess.run(
                         ["ffmpeg", "-y", "-i", temp_in, temp_wav],
-                        capture_output=True, timeout=30,
+                        capture_output=True,
+                        timeout=30,
                     )
                     import soundfile as sf
+
                     data, sr = sf.read(temp_wav)
                 except Exception:
                     self._temizle(temp_in)
@@ -717,6 +741,7 @@ class VoiceMode:
         else:
             # WAV direkt
             import soundfile as sf
+
             data, sr = sf.read(io.BytesIO(ses_verisi))
             sound_device_data = data
             sample_rate = sr
@@ -806,7 +831,9 @@ class VoiceMode:
                 return True
             except Exception as e:
                 hatalar.append(f"sounddevice: {e}")
-                logger.debug("[VoiceMode] sounddevice oynatma başarısız, pygame deneniyor...")
+                logger.debug(
+                    "[VoiceMode] sounddevice oynatma başarısız, pygame deneniyor..."
+                )
 
         # 2. pygame
         if PYGAME_MEVCUT:
@@ -828,7 +855,9 @@ class VoiceMode:
 
         self.durum = VoiceModeDurum.HATA
         self.istatistik["hata_sayisi"] += 1
-        logger.error("[VoiceMode] Tüm oynatma backend'leri başarısız: %s", "; ".join(hatalar))
+        logger.error(
+            "[VoiceMode] Tüm oynatma backend'leri başarısız: %s", "; ".join(hatalar)
+        )
         return False
 
     # ────────────────────────────────────────────────────────────────────
@@ -1112,6 +1141,7 @@ class VoiceMode:
 
 # ── Asenkron yardımcı ────────────────────────────────────────────────────
 
+
 def asyncio_loop(koroutin: Any) -> None:
     """Async fonksiyonu senkron context'te çalıştırır.
 
@@ -1125,6 +1155,7 @@ def asyncio_loop(koroutin: Any) -> None:
         if loop.is_running():
             # Zaten çalışan bir loop var — yeni loop aç
             import asyncio
+
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             try:
@@ -1135,6 +1166,7 @@ def asyncio_loop(koroutin: Any) -> None:
             loop.run_until_complete(koroutin)
     except RuntimeError:
         import asyncio
+
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         try:

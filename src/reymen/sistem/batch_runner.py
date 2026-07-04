@@ -11,6 +11,7 @@ Calistirma:
     python batch_runner.py --hedefler "hedef1" "hedef2" "hedef3"
     python batch_runner.py --dosya hedefler.jsonl --paralel 3
 """
+
 import argparse
 import json
 import os
@@ -21,6 +22,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from queue import Queue
 import logging
+
 logger = logging.getLogger(__name__)
 
 ROOT = Path(__file__).parent.resolve()
@@ -31,6 +33,7 @@ CIKTI_DIZIN.mkdir(parents=True, exist_ok=True)
 
 
 # ── Sonuc Yoneticisi ─────────────────────────────────────────────────
+
 
 class SonucYoneticisi:
     def __init__(self, cikti_dosyasi: Path):
@@ -48,14 +51,18 @@ class SonucYoneticisi:
             try:
                 data = json.loads(self._checkpoint.read_text(encoding="utf-8"))
                 self._tamamlanan_idler = set(data.get("tamamlanan", []))
-                print(f"[Batch] Checkpoint yuklendi: {len(self._tamamlanan_idler)} tamamlanmis")
+                print(
+                    f"[Batch] Checkpoint yuklendi: {len(self._tamamlanan_idler)} tamamlanmis"
+                )
             except Exception as _batch_ru_e49:
                 print(f"[UYARI] batch_runner.py:50 - {_batch_ru_e49}")
 
     def _checkpoint_kaydet(self):
         try:
             self._checkpoint.write_text(
-                json.dumps({"tamamlanan": list(self._tamamlanan_idler)}, ensure_ascii=False),
+                json.dumps(
+                    {"tamamlanan": list(self._tamamlanan_idler)}, ensure_ascii=False
+                ),
                 encoding="utf-8",
             )
         except Exception as _batch_ru_e58:
@@ -95,8 +102,10 @@ class SonucYoneticisi:
 
 # ── Gorev Isleyici ───────────────────────────────────────────────────
 
-def gorev_isle(gorev_id: str, hedef: str, sonuc_yoneticisi: SonucYoneticisi,
-               verbose: bool = True):
+
+def gorev_isle(
+    gorev_id: str, hedef: str, sonuc_yoneticisi: SonucYoneticisi, verbose: bool = True
+):
     """Tek bir gorevi calistir."""
     if sonuc_yoneticisi.zaten_tamamlandi_mi(gorev_id):
         if verbose:
@@ -110,6 +119,7 @@ def gorev_isle(gorev_id: str, hedef: str, sonuc_yoneticisi: SonucYoneticisi,
     sonuc = None
     try:
         from reymen.sistem.main import AIAgentOrchestrator, CONFIG
+
         agent = AIAgentOrchestrator(config=CONFIG, max_tur=10, onay_iste=False)
         sonuc = agent.run_conversation(hedef)
     except Exception as e:
@@ -135,10 +145,14 @@ def hedefleri_yukle(dosya: Path) -> list[dict]:
             if satir.startswith("{"):
                 try:
                     obj = json.loads(satir)
-                    hedefler.append({
-                        "id": obj.get("id", f"gorev-{i}"),
-                        "hedef": obj.get("hedef") or obj.get("goal") or obj.get("prompt", ""),
-                    })
+                    hedefler.append(
+                        {
+                            "id": obj.get("id", f"gorev-{i}"),
+                            "hedef": obj.get("hedef")
+                            or obj.get("goal")
+                            or obj.get("prompt", ""),
+                        }
+                    )
                 except json.JSONDecodeError as _batch_ru_e139:
                     print(f"[UYARI] batch_runner.py:140 - {_batch_ru_e139}")
             else:
@@ -146,8 +160,12 @@ def hedefleri_yukle(dosya: Path) -> list[dict]:
     return hedefler
 
 
-def paralel_calistir(hedefler: list[dict], max_is: int,
-                      sonuc_yoneticisi: SonucYoneticisi, verbose: bool = True):
+def paralel_calistir(
+    hedefler: list[dict],
+    max_is: int,
+    sonuc_yoneticisi: SonucYoneticisi,
+    verbose: bool = True,
+):
     """Hedefleri thread havuzuyla paralel calistir."""
     kuyruk: Queue = Queue()
     for h in hedefler:
@@ -174,11 +192,16 @@ def paralel_calistir(hedefler: list[dict], max_is: int,
 
 # ── CLI ─────────────────────────────────────────────────────────────
 
+
 def main():
     parser = argparse.ArgumentParser(description="ReYMeN Batch Runner")
     parser.add_argument("--dosya", type=Path, help="Hedef listesi (.txt veya .jsonl)")
-    parser.add_argument("--hedefler", nargs="+", help="Dogrudan hedefler (space-seperated)")
-    parser.add_argument("--paralel", type=int, default=1, help="Paralel is sayisi (default: 1)")
+    parser.add_argument(
+        "--hedefler", nargs="+", help="Dogrudan hedefler (space-seperated)"
+    )
+    parser.add_argument(
+        "--paralel", type=int, default=1, help="Paralel is sayisi (default: 1)"
+    )
     parser.add_argument("--cikti", type=Path, default=None, help="Cikti JSONL dosyasi")
     parser.add_argument("--sessiz", action="store_true", help="Detayli log gizle")
     args = parser.parse_args()
@@ -187,8 +210,9 @@ def main():
     if args.dosya:
         hedefler = hedefleri_yukle(args.dosya)
     elif args.hedefler:
-        hedefler = [{"id": f"gorev-{i}", "hedef": h}
-                    for i, h in enumerate(args.hedefler)]
+        hedefler = [
+            {"id": f"gorev-{i}", "hedef": h} for i, h in enumerate(args.hedefler)
+        ]
     else:
         parser.print_help()
         return
@@ -209,7 +233,9 @@ def main():
 
     ozet = sonuc_yoneticisi.ozet()
     print(f"\n[Batch] Bitti — {time.time()-t0:.1f}s")
-    print(f"  Toplam: {ozet['toplam']} | Basarili: {ozet['basarili']} | Basarisiz: {ozet['basarisiz']}")
+    print(
+        f"  Toplam: {ozet['toplam']} | Basarili: {ozet['basarili']} | Basarisiz: {ozet['basarisiz']}"
+    )
     print(f"  Sonuclar: {cikti}")
 
 
@@ -218,16 +244,19 @@ def motor_kaydet(motor):
     if not hasattr(motor, "_plugin_arac_kaydet"):
         return
     import subprocess, sys as _sys
+
     motor._plugin_arac_kaydet(
         "BATCH_CALISTIR",
         lambda dosya="", paralel="1": subprocess.run(
             [_sys.executable, __file__, "--dosya", dosya, "--paralel", paralel],
-            capture_output=True, text=True, timeout=300
-        ).stdout[:500] or "[Batch]: Çalıştırıldı",
+            capture_output=True,
+            text=True,
+            timeout=300,
+        ).stdout[:500]
+        or "[Batch]: Çalıştırıldı",
         "Toplu görev dosyasını çalıştır (dosya: jsonl yolu, paralel: iş sayısı)",
     )
 
 
 if __name__ == "__main__":
     main()
-

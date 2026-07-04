@@ -8,6 +8,7 @@ Exports:
   VoiceMixer        — audio mixing class
   synth_ambient_pcm — ambient audio generator
 """
+
 import struct
 import math
 
@@ -30,15 +31,19 @@ def synth_ambient_pcm(seconds: float = 0.5, sample_rate: int = 48000) -> bytes:
         )
         val = max(-32768, min(32767, val))
         frames.extend([val, val])  # stereo
-    return struct.pack('<' + 'h' * len(frames), *frames)
+    return struct.pack("<" + "h" * len(frames), *frames)
 
 
 class VoiceMixer:
     """Pure-PCM stereo audio mixer for Discord voice."""
 
-    def __init__(self, ambient_gain: float = 0.0,
-                 duck_gain: float = 0.0, duck_release_ms: int = 500):
-        self._ambient: bytes = b''
+    def __init__(
+        self,
+        ambient_gain: float = 0.0,
+        duck_gain: float = 0.0,
+        duck_release_ms: int = 500,
+    ):
+        self._ambient: bytes = b""
         self._ambient_gain = ambient_gain
         self._duck_gain = duck_gain
         self._duck_release_ms = duck_release_ms

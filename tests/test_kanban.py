@@ -1,4 +1,5 @@
 """Test: reymen/kanban.py — Board, Card, Column, Priority testleri"""
+
 from __future__ import annotations
 
 import sys
@@ -15,30 +16,36 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 @pytest.fixture
 def board():
     from reymen.kanban import Board, Card
+
     b = Board(name="Test Pano")
     yield b
 
 
 # ── Priority ─────────────────────────────────────────────────────────────
 
+
 class TestPriority:
     def test_from_str_name(self):
         from reymen.kanban import Priority
+
         assert Priority.from_str("HIGH") == Priority.HIGH
         assert Priority.from_str("low") == Priority.LOW
         assert Priority.from_str("MEDIUM") == Priority.MEDIUM
 
     def test_from_str_int(self):
         from reymen.kanban import Priority
+
         assert Priority.from_str(0) == Priority.CRITICAL
         assert Priority.from_str(3) == Priority.LOW
 
     def test_from_str_priority_object(self):
         from reymen.kanban import Priority
+
         assert Priority.from_str(Priority.CRITICAL) == Priority.CRITICAL
 
     def test_from_str_aliases(self):
         from reymen.kanban import Priority
+
         assert Priority.from_str("URGENT") == Priority.CRITICAL
         assert Priority.from_str("BLOCKER") == Priority.CRITICAL
         assert Priority.from_str("NORMAL") == Priority.MEDIUM
@@ -46,24 +53,35 @@ class TestPriority:
 
     def test_from_str_invalid_raises(self):
         from reymen.kanban import Priority
+
         with pytest.raises(ValueError, match="Geçersiz"):
             Priority.from_str("INVALID")
 
     def test_str_representation(self):
         from reymen.kanban import Priority
+
         assert str(Priority.HIGH) == "HIGH"
         assert str(Priority.BACKLOG) == "BACKLOG"
 
     def test_enum_ordering(self):
         from reymen.kanban import Priority
-        assert Priority.CRITICAL < Priority.HIGH < Priority.MEDIUM < Priority.LOW < Priority.BACKLOG
+
+        assert (
+            Priority.CRITICAL
+            < Priority.HIGH
+            < Priority.MEDIUM
+            < Priority.LOW
+            < Priority.BACKLOG
+        )
 
 
 # ── CardStatus ───────────────────────────────────────────────────────────
 
+
 class TestCardStatus:
     def test_gecerli_mi_valid_transitions(self):
         from reymen.kanban import CardStatus
+
         assert CardStatus.gecerli_mi("backlog", "todo") is True
         assert CardStatus.gecerli_mi("backlog", "ready") is True
         assert CardStatus.gecerli_mi("todo", "in_progress") is True
@@ -74,6 +92,7 @@ class TestCardStatus:
 
     def test_gecerli_mi_invalid_transitions(self):
         from reymen.kanban import CardStatus
+
         assert CardStatus.gecerli_mi("backlog", "in_progress") is False
         assert CardStatus.gecerli_mi("done", "todo") is False
         assert CardStatus.gecerli_mi("todo", "review") is False
@@ -81,14 +100,17 @@ class TestCardStatus:
 
     def test_gecerli_mi_unknown_source(self):
         from reymen.kanban import CardStatus
+
         assert CardStatus.gecerli_mi("unknown", "todo") is False
 
 
 # ── Card ─────────────────────────────────────────────────────────────────
 
+
 class TestCard:
     def test_card_defaults(self):
         from reymen.kanban import Card
+
         c = Card(title="Test Kart")
         assert c.title == "Test Kart"
         assert c.status == "backlog"
@@ -97,6 +119,7 @@ class TestCard:
 
     def test_card_touch_updates_timestamp(self):
         from reymen.kanban import Card
+
         c = Card(title="Dokunma")
         old = c.updated_at
         c.touch()
@@ -104,21 +127,25 @@ class TestCard:
 
     def test_is_overdue_no_deadline(self):
         from reymen.kanban import Card
+
         c = Card(title="Surek Yok")
         assert c.is_overdue() is False
 
     def test_is_overdue_past_deadline(self):
         from reymen.kanban import Card
+
         c = Card(title="Gecikmis", deadline="2020-01-01T00:00:00+00:00")
         assert c.is_overdue() is True
 
     def test_is_overdue_future_deadline(self):
         from reymen.kanban import Card
+
         c = Card(title="Gelecek", deadline="2099-12-31T23:59:59+00:00")
         assert c.is_overdue() is False
 
     def test_add_comment(self):
         from reymen.kanban import Card
+
         c = Card(title="Yorum")
         entry = c.add_comment("worker1", "deneme yorum")
         assert entry["author"] == "worker1"
@@ -129,6 +156,7 @@ class TestCard:
 
     def test_add_heartbeat(self):
         from reymen.kanban import Card
+
         c = Card(title="HB")
         hb = c.add_heartbeat("calisiyor", "test")
         assert hb["status"] == "calisiyor"
@@ -137,6 +165,7 @@ class TestCard:
 
     def test_start_and_end_run(self):
         from reymen.kanban import Card
+
         c = Card(title="Run")
         run = c.start_run("worker_1")
         assert run.worker == "worker_1"
@@ -148,11 +177,13 @@ class TestCard:
 
     def test_end_run_with_no_runs(self):
         from reymen.kanban import Card
+
         c = Card(title="Bosan")
         c.end_run("completed")  # should not raise
 
     def test_as_dict(self):
         from reymen.kanban import Card, Priority
+
         c = Card(title="Dict", priority=Priority.LOW)
         d = c.as_dict()
         assert d["title"] == "Dict"
@@ -162,6 +193,7 @@ class TestCard:
 
     def test_from_dict_roundtrip(self):
         from reymen.kanban import Card, Priority
+
         original = Card(title="Yuvarlak", priority=Priority.HIGH, description="test")
         d = original.as_dict()
         restored = Card.from_dict(d)
@@ -172,9 +204,11 @@ class TestCard:
 
 # ── Column ───────────────────────────────────────────────────────────────
 
+
 class TestColumn:
     def test_add_card(self):
         from reymen.kanban import Column, Card
+
         col = Column(name="todo")
         c = Card(title="Gorev")
         col.add(c)
@@ -183,6 +217,7 @@ class TestColumn:
 
     def test_wip_limit_exceeded(self):
         from reymen.kanban import Column, Card
+
         col = Column(name="wip", wip_limit=1)
         col.add(Card(title="Ilk"))
         with pytest.raises(ValueError, match="WIP"):
@@ -190,6 +225,7 @@ class TestColumn:
 
     def test_remove_card(self):
         from reymen.kanban import Column, Card
+
         col = Column(name="test")
         c = Card(title="Sil")
         col.add(c)
@@ -200,11 +236,13 @@ class TestColumn:
 
     def test_remove_nonexistent(self):
         from reymen.kanban import Column
+
         col = Column(name="test")
         assert col.remove("yok") is None
 
     def test_get_card(self):
         from reymen.kanban import Column, Card
+
         col = Column(name="test")
         c = Card(title="Bul")
         col.add(c)
@@ -212,11 +250,13 @@ class TestColumn:
 
     def test_get_nonexistent(self):
         from reymen.kanban import Column
+
         col = Column(name="test")
         assert col.get("yok") is None
 
     def test_sort_by_priority(self):
         from reymen.kanban import Column, Card, Priority
+
         col = Column(name="test")
         col.add(Card(title="Dusuk", priority=Priority.LOW))
         col.add(Card(title="Yuksek", priority=Priority.CRITICAL))
@@ -228,6 +268,7 @@ class TestColumn:
 
     def test_as_dict(self):
         from reymen.kanban import Column, Card
+
         col = Column(name="test", wip_limit=5)
         col.add(Card(title="K1"))
         d = col.as_dict()
@@ -238,9 +279,11 @@ class TestColumn:
 
 # ── Board ────────────────────────────────────────────────────────────────
 
+
 class TestBoard:
     def test_init_default_columns(self):
         from reymen.kanban import Board
+
         b = Board()
         assert len(b.columns) == 7
         assert b.columns[0].name == "backlog"
@@ -262,6 +305,7 @@ class TestBoard:
 
     def test_add_card_to_column(self, board):
         from reymen.kanban import Card
+
         c = Card(title="Yeni")
         board.add(c, "backlog")
         assert board.find(c.id) is not None
@@ -269,11 +313,13 @@ class TestBoard:
 
     def test_add_card_to_invalid_column(self, board):
         from reymen.kanban import Card
+
         with pytest.raises(ValueError, match="bulunamad"):
             board.add(Card(title="Hata"), "yok_kolon")
 
     def test_move_card(self, board):
         from reymen.kanban import Card
+
         c = Card(title="Tasima")
         board.add(c, "backlog")
         board.move(c.id, "todo")
@@ -281,6 +327,7 @@ class TestBoard:
 
     def test_move_same_column_idempotent(self, board):
         from reymen.kanban import Card
+
         c = Card(title="Ayni")
         board.add(c, "backlog")
         board.move(c.id, "backlog")
@@ -288,6 +335,7 @@ class TestBoard:
 
     def test_move_invalid_transition_raises(self, board):
         from reymen.kanban import Card
+
         c = Card(title="Gecersiz")
         board.add(c, "backlog")
         with pytest.raises(ValueError, match="Geçersiz durum"):
@@ -299,6 +347,7 @@ class TestBoard:
 
     def test_move_to_nonexistent_column_raises(self, board):
         from reymen.kanban import Card
+
         c = Card(title="Hedefsiz")
         board.add(c, "backlog")
         # Status gecisi gecersiz oldugu icin "Geçersiz durum" hatasi alinir
@@ -307,6 +356,7 @@ class TestBoard:
 
     def test_set_status(self, board):
         from reymen.kanban import Card
+
         c = Card(title="Durum")
         board.add(c, "backlog")
         board.set_status(c.id, "ready")
@@ -314,6 +364,7 @@ class TestBoard:
 
     def test_prioritize_card(self, board):
         from reymen.kanban import Card, Priority
+
         c = Card(title="Oncelik", priority=Priority.LOW)
         board.add(c, "backlog")
         board.prioritize(c.id, Priority.CRITICAL)
@@ -321,11 +372,13 @@ class TestBoard:
 
     def test_prioritize_nonexistent_raises(self, board):
         from reymen.kanban import Priority
+
         with pytest.raises(ValueError):
             board.prioritize("yok", Priority.HIGH)
 
     def test_set_deadline(self, board):
         from reymen.kanban import Card
+
         c = Card(title="Deadline")
         board.add(c, "backlog")
         board.set_deadline(c.id, "2099-12-31")
@@ -336,6 +389,7 @@ class TestBoard:
 
     def test_all_cards(self, board):
         from reymen.kanban import Card
+
         board.add(Card(title="K1"), "backlog")
         board.add(Card(title="K2"), "todo")
         board.add(Card(title="K3"), "done")
@@ -343,6 +397,7 @@ class TestBoard:
 
     def test_overdue_cards(self, board):
         from reymen.kanban import Card
+
         board.add(Card(title="Gec", deadline="2020-01-01T00:00:00+00:00"), "backlog")
         board.add(Card(title="Guncel", deadline="2099-12-31T00:00:00+00:00"), "todo")
         overdue = board.overdue_cards()
@@ -351,6 +406,7 @@ class TestBoard:
 
     def test_cards_by_assignee(self, board):
         from reymen.kanban import Card
+
         board.add(Card(title="Ali'nin", assignee="ali"), "in_progress")
         board.add(Card(title="Veli'nin", assignee="veli"), "todo")
         board.add(Card(title="Ali bitti", assignee="ali", status="done"), "done")
@@ -360,6 +416,7 @@ class TestBoard:
 
     def test_claim_card(self, board):
         from reymen.kanban import Card
+
         c = Card(title="Ustlen")
         board.add(c, "ready")
         board.claim(c.id, "worker_1")
@@ -370,6 +427,7 @@ class TestBoard:
 
     def test_claim_already_assigned_raises(self, board):
         from reymen.kanban import Card
+
         c = Card(title="Atanmis", assignee="ali")
         board.add(c, "ready")
         with pytest.raises(ValueError, match="zaten"):
@@ -377,6 +435,7 @@ class TestBoard:
 
     def test_complete_card(self, board):
         from reymen.kanban import Card
+
         c = Card(title="Bitis")
         board.add(c, "ready")
         board.claim(c.id, "worker_1")  # start_run + in_progress
@@ -388,6 +447,7 @@ class TestBoard:
 
     def test_block_and_unblock(self, board):
         from reymen.kanban import Card
+
         c = Card(title="Blok")
         board.add(c, "in_progress")
         board.block(c.id, "dis bagimli")
@@ -398,6 +458,7 @@ class TestBoard:
 
     def test_unblock_not_blocked_raises(self, board):
         from reymen.kanban import Card
+
         c = Card(title="Bloke Degil")
         board.add(c, "backlog")
         with pytest.raises(ValueError, match="bloke durumunda"):
@@ -405,6 +466,7 @@ class TestBoard:
 
     def test_comment_on_card(self, board):
         from reymen.kanban import Card
+
         c = Card(title="Yorumlu")
         board.add(c, "backlog")
         entry = board.comment(c.id, "user", "test")
@@ -413,6 +475,7 @@ class TestBoard:
 
     def test_heartbeat(self, board):
         from reymen.kanban import Card
+
         c = Card(title="HB")
         board.add(c, "in_progress")
         hb = board.heartbeat(c.id, "worker", "calisiyor")
@@ -420,6 +483,7 @@ class TestBoard:
 
     def test_save_and_load_json(self, board, tmp_path):
         from reymen.kanban import Card, Board
+
         board.add(Card(title="Kayit"), "backlog")
         p = tmp_path / "board.json"
         board.save(p)
@@ -430,6 +494,7 @@ class TestBoard:
 
     def test_to_json(self, board):
         from reymen.kanban import Card
+
         board.add(Card(title="JSON"), "backlog")
         js = board.to_json()
         data = json.loads(js)
@@ -438,6 +503,7 @@ class TestBoard:
 
     def test_board_from_dict(self):
         from reymen.kanban import Board
+
         data = {
             "name": "Yuklenen",
             "columns": [
@@ -451,6 +517,7 @@ class TestBoard:
 
     def test_board_as_dict(self, board):
         from reymen.kanban import Card
+
         board.add(Card(title="Test"), "backlog")
         d = board.as_dict()
         assert d["name"] == "Test Pano"
@@ -458,6 +525,7 @@ class TestBoard:
 
     def test_summary(self, board):
         from reymen.kanban import Card
+
         board.add(Card(title="T1"), "backlog")
         board.add(Card(title="T2"), "done")
         s = board.summary()
@@ -469,14 +537,21 @@ class TestBoard:
 
 # ── RunRecord ────────────────────────────────────────────────────────────
 
+
 class TestRunRecord:
     """RunRecord serilestirme ve deserilestirme."""
 
     def test_as_dict(self):
         from reymen.kanban import RunRecord
-        run = RunRecord(worker="w1", started_at="2024-01-01T00:00:00",
-                        ended_at="2024-01-01T01:00:00", outcome="completed",
-                        summary="bitti", error="")
+
+        run = RunRecord(
+            worker="w1",
+            started_at="2024-01-01T00:00:00",
+            ended_at="2024-01-01T01:00:00",
+            outcome="completed",
+            summary="bitti",
+            error="",
+        )
         d = run.as_dict()
         assert d["worker"] == "w1"
         assert d["outcome"] == "completed"
@@ -485,6 +560,7 @@ class TestRunRecord:
 
     def test_from_dict(self):
         from reymen.kanban import RunRecord
+
         data = {
             "worker": "w2",
             "started_at": "2024-01-01T00:00:00",
@@ -504,6 +580,7 @@ class TestRunRecord:
     def test_card_start_end_run_record(self):
         """Kart uzerinden RunRecord olusturma ve serilestirme."""
         from reymen.kanban import Card
+
         c = Card(title="RR Test")
         run = c.start_run("worker_x")
         assert run.outcome == "running"
@@ -519,18 +596,26 @@ class TestRunRecord:
 
 # ── Card.from_dict ek testler ───────────────────────────────────────────
 
+
 class TestCardFromDict:
     """Card.from_dict cesitli senaryolar."""
 
     def test_from_dict_with_runs(self):
         from reymen.kanban import Card, Priority, RunRecord
+
         data = {
             "title": "Kart",
             "priority": 0,
             "runs": [
-                {"worker": "w1", "started_at": "2024-01-01T00:00:00",
-                 "ended_at": None, "outcome": "running", "summary": "",
-                 "error": "", "heartbeats": []},
+                {
+                    "worker": "w1",
+                    "started_at": "2024-01-01T00:00:00",
+                    "ended_at": None,
+                    "outcome": "running",
+                    "summary": "",
+                    "error": "",
+                    "heartbeats": [],
+                },
             ],
         }
         c = Card.from_dict(data)
@@ -541,6 +626,7 @@ class TestCardFromDict:
 
     def test_from_dict_priority_str(self):
         from reymen.kanban import Card, Priority
+
         data = {"title": "PrioStr", "priority": "HIGH"}
         c = Card.from_dict(data)
         assert c.priority == Priority.HIGH
@@ -548,11 +634,13 @@ class TestCardFromDict:
 
 # ── Board.link ───────────────────────────────────────────────────────────
 
+
 class TestBoardLink:
     """Board.link metodu testleri."""
 
     def test_link_parent_child(self, board):
         from reymen.kanban import Card
+
         parent = Card(title="Parent")
         child = Card(title="Child")
         board.add(parent, "backlog")
@@ -563,6 +651,7 @@ class TestBoardLink:
 
     def test_link_nonexistent_parent(self, board):
         from reymen.kanban import Card
+
         child = Card(title="Child")
         board.add(child, "todo")
         with pytest.raises(ValueError, match="bulunamad"):
@@ -570,6 +659,7 @@ class TestBoardLink:
 
     def test_link_nonexistent_child(self, board):
         from reymen.kanban import Card
+
         parent = Card(title="Parent")
         board.add(parent, "backlog")
         with pytest.raises(ValueError, match="bulunamad"):
@@ -578,6 +668,7 @@ class TestBoardLink:
     def test_link_idempotent(self, board):
         """Aynı bağ iki kez eklenirse sorun olmaz."""
         from reymen.kanban import Card
+
         p = Card(title="P")
         c = Card(title="C")
         board.add(p, "backlog")
@@ -591,11 +682,13 @@ class TestBoardLink:
 
 # ── Board.query ──────────────────────────────────────────────────────────
 
+
 class TestBoardQuery:
     """Board.query metodu testleri."""
 
     def test_query_no_filters(self, board):
         from reymen.kanban import Card
+
         board.add(Card(title="K1"), "backlog")
         board.add(Card(title="K2"), "done")
         results = board.query()
@@ -603,6 +696,7 @@ class TestBoardQuery:
 
     def test_query_by_status(self, board):
         from reymen.kanban import Card
+
         board.add(Card(title="B1"), "backlog")
         board.add(Card(title="B2"), "todo")
         board.add(Card(title="B3"), "todo")
@@ -612,6 +706,7 @@ class TestBoardQuery:
 
     def test_query_by_assignee(self, board):
         from reymen.kanban import Card
+
         board.add(Card(title="Ali1", assignee="ali"), "backlog")
         board.add(Card(title="Ali2", assignee="ali"), "todo")
         board.add(Card(title="Veli1", assignee="veli"), "backlog")
@@ -620,6 +715,7 @@ class TestBoardQuery:
 
     def test_query_by_tag(self, board):
         from reymen.kanban import Card
+
         board.add(Card(title="Bug", tags=["bug", "frontend"]), "backlog")
         board.add(Card(title="Feature", tags=["feature"]), "backlog")
         r = board.query(tag="bug")
@@ -628,6 +724,7 @@ class TestBoardQuery:
 
     def test_query_overdue(self, board):
         from reymen.kanban import Card
+
         board.add(Card(title="Gec", deadline="2020-01-01T00:00:00+00:00"), "backlog")
         board.add(Card(title="Guncel", deadline="2099-12-31T00:00:00+00:00"), "todo")
         r = board.query(overdue=True)
@@ -636,6 +733,7 @@ class TestBoardQuery:
 
     def test_query_limit(self, board):
         from reymen.kanban import Card
+
         for i in range(10):
             board.add(Card(title=f"K{i}"), "backlog")
         r = board.query(limit=3)
@@ -643,6 +741,7 @@ class TestBoardQuery:
 
     def test_query_sort_by_priority(self, board):
         from reymen.kanban import Card, Priority
+
         c1 = Card(title="Low", priority=Priority.LOW)
         c2 = Card(title="High", priority=Priority.HIGH)
         board.add(c1, "backlog")
@@ -654,11 +753,13 @@ class TestBoardQuery:
 
 # ── _auto_promote_children ─────────────────────────────────────────────
 
+
 class TestAutoPromote:
     """_auto_promote_children tam dal coverage."""
 
     def test_auto_promote_done_card_with_children(self, board):
         from reymen.kanban import Card
+
         parent = Card(title="Parent")
         child = Card(title="Child")
         board.add(parent, "todo")
@@ -676,6 +777,7 @@ class TestAutoPromote:
     def test_auto_promote_not_all_parents_done(self, board):
         """Child'in tum parent'lari done degilse ready'e alinmaz."""
         from reymen.kanban import Card
+
         p1 = Card(title="P1")
         p2 = Card(title="P2")
         child = Card(title="Child")
@@ -694,6 +796,7 @@ class TestAutoPromote:
     def test_auto_promote_none_done_card(self, board):
         """Done olmayan kart icin _auto_promote_children hicbir sey yapmaz."""
         from reymen.kanban import Card
+
         c = Card(title="Todo")
         board.add(c, "todo")
         board._auto_promote_children(c.id)  # hata firlatmamali
@@ -706,6 +809,7 @@ class TestAutoPromote:
     def test_auto_promote_child_not_todo(self, board):
         """Child todo degilse ready'e alinmaz."""
         from reymen.kanban import Card
+
         parent = Card(title="P")
         child = Card(title="C")
         board.add(parent, "backlog")
@@ -717,12 +821,14 @@ class TestAutoPromote:
 
 # ── Board move / set_status ek testler ─────────────────────────────────
 
+
 class TestBoardMoveExtended:
     """Board.move ve set_status icin ek testler."""
 
     def test_move_to_target_column_not_found(self, board):
         """move()'de hedef kolon bulunamazsa hata."""
         from reymen.kanban import Card
+
         c = Card(title="Hedefsiz")
         board.add(c, "backlog")
         # Status gecisi gecersiz oldugu icin 'Geçersiz durum' hatasi alinir
@@ -760,11 +866,13 @@ class TestBoardMoveExtended:
 
 # ── WIP limit ────────────────────────────────────────────────────────────
 
+
 class TestWIPLimit:
     """Gecersiz WIP limit degerleri ve sinir durumlari."""
 
     def test_wip_limit_exact(self, board):
         from reymen.kanban import Card, Column
+
         col = Column(name="wip", wip_limit=2)
         col.add(Card(title="K1"))
         col.add(Card(title="K2"))
@@ -772,12 +880,14 @@ class TestWIPLimit:
 
     def test_wip_limit_zero(self, board):
         from reymen.kanban import Card, Column
+
         col = Column(name="zero", wip_limit=0)
         with pytest.raises(ValueError, match="WIP"):
             col.add(Card(title="Ilk"))
 
     def test_column_add_orders(self, board):
         from reymen.kanban import Card, Column
+
         col = Column(name="sirali")
         c1 = Card(title="Ilk")
         c2 = Card(title="Ikinci")
@@ -789,11 +899,13 @@ class TestWIPLimit:
 
 # ── Board serialization ─────────────────────────────────────────────────
 
+
 class TestBoardSerialization:
     """Board serilestirme roundtrip ve hata senaryolari."""
 
     def test_board_save_load_roundtrip(self, board, tmp_path):
         from reymen.kanban import Card, Board, Priority
+
         board.add(Card(title="K1", tags=["test"]), "backlog")
         board.add(Card(title="K2", priority=Priority.CRITICAL), "todo")
         p = tmp_path / "roundtrip.json"
@@ -805,6 +917,7 @@ class TestBoardSerialization:
 
     def test_load_json_error(self, tmp_path):
         from reymen.kanban import Board
+
         p = tmp_path / "bad.json"
         p.write_text("{invalid json}", encoding="utf-8")
         with pytest.raises(json.JSONDecodeError):
@@ -812,11 +925,13 @@ class TestBoardSerialization:
 
     def test_load_file_not_found(self, tmp_path):
         from reymen.kanban import Board
+
         with pytest.raises(FileNotFoundError):
             Board.load(tmp_path / "nonexistent.json")
 
     def test_from_dict_with_cards(self):
         from reymen.kanban import Board
+
         data = {
             "name": "Dolu Pano",
             "columns": [
@@ -838,21 +953,25 @@ class TestBoardSerialization:
 
 # ── cards_by_assignee ────────────────────────────────────────────────────
 
+
 class TestCardsByAssignee:
     def test_no_matches(self, board):
         assert board.cards_by_assignee("yok") == []
 
     def test_done_cards_excluded(self, board):
         from reymen.kanban import Card
+
         board.add(Card(title="Bitti", assignee="ali", status="done"), "done")
         assert board.cards_by_assignee("ali") == []
 
 
 # ── Board summary ────────────────────────────────────────────────────────
 
+
 class TestBoardSummary:
     def test_summary_over_limit(self, board):
         from reymen.kanban import Card
+
         board.add_column("wip_test", wip_limit=1)
         col = board.get_column("wip_test")
         # WIP limit atlamak icin dogrudan cards listesine ekle
@@ -863,6 +982,7 @@ class TestBoardSummary:
 
 
 # ── Worker API ──────────────────────────────────────────────────────────
+
 
 class TestWorkerAPI:
     """Worker API fonksiyonlari (kanban_create, kanban_show, vb.)."""
@@ -875,9 +995,14 @@ class TestWorkerAPI:
         temp_pano = tmp_path / "test_board.json"
         monkeypatch.setattr(kb, "_VARSAYILAN_PANO_YOLU", temp_pano)
 
-        card_id = kanban_create("Test Kart", description="Aciklama",
-                                 assignee="worker1", priority="HIGH",
-                                 tags=["test"], deadline="2099-12-31")
+        card_id = kanban_create(
+            "Test Kart",
+            description="Aciklama",
+            assignee="worker1",
+            priority="HIGH",
+            tags=["test"],
+            deadline="2099-12-31",
+        )
         assert card_id is not None
         assert len(card_id) == 12
         assert temp_pano.exists()
@@ -925,7 +1050,9 @@ class TestWorkerAPI:
         monkeypatch.setattr(kb, "_VARSAYILAN_PANO_YOLU", temp_pano)
 
         card_id = kanban_create("Tamamlanacak")
-        result = kanban_complete(card_id, summary="bitti", metadata='{"files":["x.py"]}')
+        result = kanban_complete(
+            card_id, summary="bitti", metadata='{"files":["x.py"]}'
+        )
         assert "tamamland" in result
 
     def test_kanban_block(self, tmp_path, monkeypatch):
@@ -951,7 +1078,12 @@ class TestWorkerAPI:
         assert "bulunamad" in result
 
     def test_kanban_unblock(self, tmp_path, monkeypatch):
-        from reymen.kanban import kanban_create, kanban_claim, kanban_block, kanban_unblock
+        from reymen.kanban import (
+            kanban_create,
+            kanban_claim,
+            kanban_block,
+            kanban_unblock,
+        )
         import reymen.kanban as kb
 
         temp_pano = tmp_path / "test_board8.json"
@@ -1095,7 +1227,13 @@ class TestWorkerAPI:
 
     def test_kanban_show_with_metadata_comments(self, tmp_path, monkeypatch):
         """kanban_show'un metadata, yorum ve run icerdigi durum."""
-        from reymen.kanban import kanban_create, kanban_show, kanban_comment, kanban_claim, kanban_complete
+        from reymen.kanban import (
+            kanban_create,
+            kanban_show,
+            kanban_comment,
+            kanban_claim,
+            kanban_complete,
+        )
         import reymen.kanban as kb
 
         temp_pano = tmp_path / "test_board21.json"
@@ -1132,21 +1270,25 @@ class TestWorkerAPI:
 
 # ── Motor kaydi ─────────────────────────────────────────────────────────
 
+
 class TestKanbanMotorKaydet:
     """kanban.motor_kaydet fonksiyonu (ikinci versiyon - 6 tool)."""
 
     def test_motor_kaydet_is_callable(self):
         from reymen.kanban import motor_kaydet
+
         assert callable(motor_kaydet)
 
 
 # ── Board save/load extended ────────────────────────────────────────────
+
 
 class TestBoardSaveLoadExtended:
     """Board.save ve Board.load icin ek testler."""
 
     def test_board_save_with_empty_board(self, tmp_path):
         from reymen.kanban import Board
+
         b = Board(name="Bos Pano")
         p = tmp_path / "bos.json"
         b.save(p)
@@ -1156,6 +1298,7 @@ class TestBoardSaveLoadExtended:
 
     def test_board_save_with_priority_cards(self, tmp_path):
         from reymen.kanban import Board, Card, Priority
+
         b = Board(name="Oncelik Pano")
         b.add(Card(title="Yuksek", priority=Priority.HIGH), "backlog")
         b.add(Card(title="Dusuk", priority=Priority.LOW), "backlog")
@@ -1168,9 +1311,11 @@ class TestBoardSaveLoadExtended:
 
 # ── Board with deadline ─────────────────────────────────────────────────
 
+
 class TestBoardDeadlineExtended:
     def test_set_deadline_finds_card(self, board):
         from reymen.kanban import Card
+
         c = Card(title="Sureli")
         board.add(c, "backlog")
         board.set_deadline(c.id, "2099-12-31")
@@ -1179,9 +1324,11 @@ class TestBoardDeadlineExtended:
 
 # ── Card.is_override_with_custom_now ────────────────────────────────────
 
+
 class TestCardIsOverdue:
     def test_is_overdue_custom_now(self):
         from reymen.kanban import Card
+
         # String comparison works for ISO format dates: '2020' < '2099' is True
         c = Card(title="Gecikmis", deadline="2020-01-01T00:00:00+00:00")
         # Deadline 2020, now is 2019 -> not overdue (deadline > now)

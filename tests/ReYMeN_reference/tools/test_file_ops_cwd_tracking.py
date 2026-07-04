@@ -18,7 +18,6 @@ Fix: _exec() now prefers the LIVE ``env.cwd`` over the init-time
 from __future__ import annotations
 
 
-
 from tools.file_operations import ShellFileOperations
 
 
@@ -37,6 +36,7 @@ class _FakeEnv:
 
     def execute(self, command: str, cwd: str = None, **kwargs) -> dict:
         import subprocess
+
         self.calls.append({"command": command, "cwd": cwd})
         # Simulate cd by updating self.cwd (the real env does the same
         # via _extract_cwd_from_output after a successful command)
@@ -107,12 +107,12 @@ class TestShellFileOpsCwdTracking:
         result = ops.patch_replace("t.txt", "shared text\n", "PATCHED\n")
         assert result.success is True
 
-        assert (dir_b / "t.txt").read_text() == "PATCHED\n", (
-            "patch must land in the live-cwd dir (worktree)"
-        )
-        assert (dir_a / "t.txt").read_text() == "shared text\n", (
-            "patch must NOT land in the init-time dir (main)"
-        )
+        assert (
+            dir_b / "t.txt"
+        ).read_text() == "PATCHED\n", "patch must land in the live-cwd dir (worktree)"
+        assert (
+            (dir_a / "t.txt").read_text() == "shared text\n"
+        ), "patch must NOT land in the init-time dir (main)"
 
     def test_explicit_cwd_arg_still_wins(self, tmp_path):
         """An explicit cwd= arg to _exec must override both env.cwd and self.cwd."""
@@ -142,8 +142,10 @@ class TestShellFileOpsCwdTracking:
         class _NoCwdEnv:
             def execute(self, command, cwd=None, **kwargs):
                 import subprocess
-                proc = subprocess.run(["bash", "-c", command], cwd=cwd,
-                                      capture_output=True, text=True)
+
+                proc = subprocess.run(
+                    ["bash", "-c", command], cwd=cwd, capture_output=True, text=True
+                )
                 return {"output": proc.stdout, "returncode": proc.returncode}
 
         env = _NoCwdEnv()
@@ -170,6 +172,6 @@ class TestShellFileOpsCwdTracking:
         result = ops.patch_replace(str(target), "old content\n", "new content\n")
         assert result.success is True
         assert result.error is None
-        assert target.read_text() == "new content\n", (
-            "patch_replace claimed success but file wasn't written correctly"
-        )
+        assert (
+            target.read_text() == "new content\n"
+        ), "patch_replace claimed success but file wasn't written correctly"

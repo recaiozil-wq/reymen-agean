@@ -240,6 +240,6 @@ def test_deepseek_v4_thinking_tool_call_replay_round_trip(live_model: str):
     final_content = second_message.content or ""
     final_reasoning = _raw_reasoning_content(second_message) or ""
     assert second.choices[0].finish_reason == "stop"
-    assert final_content.strip() or final_reasoning.strip(), (
-        "DeepSeek returned neither visible content nor reasoning_content"
-    )
+    assert (
+        final_content.strip() or final_reasoning.strip()
+    ), "DeepSeek returned neither visible content nor reasoning_content"

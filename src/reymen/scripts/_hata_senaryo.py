@@ -2,24 +2,35 @@
 HATA DUZELTME SÜRECI — 3 Senaryo
 Her senaryo: tespit → düzeltme → doğrulama → kaydetme
 """
+
 from once_hafiza import kaydet, ara, isle
 import sqlite3, json, time
 
-db = 'reymen/merkez_db/ogrenmeler.db'
+db = "reymen/merkez_db/ogrenmeler.db"
+
 
 def log(msg):
     print(f"  {msg}")
-    
+
+
 def db_goster(kategori_filter=None):
     con = sqlite3.connect(db)
     con.row_factory = sqlite3.Row
     if kategori_filter:
-        rows = con.execute("SELECT id, hedef, kategori, guven_skoru, basari_sayisi, hata_sayisi, guncelleme FROM ogrenmeler WHERE kategori LIKE ? ORDER BY id", (kategori_filter,)).fetchall()
+        rows = con.execute(
+            "SELECT id, hedef, kategori, guven_skoru, basari_sayisi, hata_sayisi, guncelleme FROM ogrenmeler WHERE kategori LIKE ? ORDER BY id",
+            (kategori_filter,),
+        ).fetchall()
     else:
-        rows = con.execute("SELECT id, hedef, kategori, guven_skoru, basari_sayisi, hata_sayisi, guncelleme FROM ogrenmeler ORDER BY id DESC LIMIT 10").fetchall()
+        rows = con.execute(
+            "SELECT id, hedef, kategori, guven_skoru, basari_sayisi, hata_sayisi, guncelleme FROM ogrenmeler ORDER BY id DESC LIMIT 10"
+        ).fetchall()
     for r in rows:
-        print(f"  ID={r['id']} | {r['hedef'][:40]:40s} | kat={r['kategori']:25s} | guven={r['guven_skoru']} | basari={r['basari_sayisi']} | hata={r['hata_sayisi']}")
+        print(
+            f"  ID={r['id']} | {r['hedef'][:40]:40s} | kat={r['kategori']:25s} | guven={r['guven_skoru']} | basari={r['basari_sayisi']} | hata={r['hata_sayisi']}"
+        )
     con.close()
+
 
 # ════════════════════════════════════════════════════════════════════
 # SENARYO 1 — KOD HATASI
@@ -74,10 +85,10 @@ print("""
 # ADIM 4: Hafızaya kaydet (başarılı)
 print("\n[ADIM 4] Hafizaya kaydet (basarili)")
 kaydet(
-    hedef='python_nmap_duzeltilmis_kod_dogrulandi',
-    kategori='video/python/nmap',
-    icerik='Duzeltilmis kod sandbox\'ta calisti ve dogrulandi. 5 hata duzeltildi.',
-    basari=True
+    hedef="python_nmap_duzeltilmis_kod_dogrulandi",
+    kategori="video/python/nmap",
+    icerik="Duzeltilmis kod sandbox'ta calisti ve dogrulandi. 5 hata duzeltildi.",
+    basari=True,
 )
 
 # ADIM 5: Kayıt göster
@@ -92,7 +103,7 @@ print("SENARYO 2: ÇELİŞKİLİ BİLGİ")
 print("=" * 70)
 
 print("""
-  Durum: 
+  Durum:
   - Hafizada (ID=12): UDP scan yavas -> open|filtered
   - Video: UDP scan hizli -> python-nmap ile -sU
 
@@ -105,7 +116,7 @@ print("""  Kaynaklar:
   1. nmap.org: UDP scan yavas, open|filtered beklenir ✅ HAFIZA
   2. PyPI: python-nmap -sU destekler, yine de yavas ✅ HAFIZA
   3. Security SE: --min-rate ile hizlandirma mumkun ✅ KISMEN
-  
+
   KARAR: HAFIZA DOGRU
   - UDP scan dogal olarak yavas
   - Video yanlis ifade etmis olabilir
@@ -122,19 +133,19 @@ print("""
   web_uyum    1.0 (tum kaynaklar ayni)
   ─────────────────
   TOPLAM      0.95 -> HAFIZA KAZANDI
-  
+
   Video puani: 0.4 (tekil kaynak, dogrulama yok)
 """)
 
 # Eski bilgiyi güncelle (üzerine yazma, not düş)
 print("[ADIM 3] Celiski isaretleme")
 kaydet(
-    hedef='python_nmap_udp_open_filtered_notu',
-    kategori='video/python/nmap',
+    hedef="python_nmap_udp_open_filtered_notu",
+    kategori="video/python/nmap",
     icerik='UYARI: Video UDP scan icin "hizli" ifadesi kullandi. Bu YANLIS.'
-           'UDP scan dogal olarak yavastir (open|filtered).'
-           'python-nmap da ayni nmap motorunu kullanir, hizlanmaz.',
-    basari=True
+    "UDP scan dogal olarak yavastir (open|filtered)."
+    "python-nmap da ayni nmap motorunu kullanir, hizlanmaz.",
+    basari=True,
 )
 print("  Yeni kayit olusturuldu (celiski notu)")
 print("  ESKI KAYIT (ID=12): ✅ KORUNDU, guven degismedi, üzerine yazilmadi")
@@ -158,7 +169,7 @@ print("""
 print("[ADIM 1] Mekanik retry (OnceHafiza isle() kullanimi)")
 print("""
   Deneme 1: arguments'i degistir -> HATA
-  Deneme 2: timeout ekle -> HATA  
+  Deneme 2: timeout ekle -> HATA
   Deneme 3: sudo=True dene -> HATA
   ─────────────────
   Circuit breaker: 3/3 -> KALICI DUR
@@ -171,15 +182,15 @@ print("""
   Ajan -> Kullanici:
   "Beklenmedik bir hatayla karsilastim.
    nm.scan() su hatayi veriyor: PortScannerError: Unexpected error
-   
+
    Hafizamda bu hata icin kayit yok.
    Web'de de benzerini bulamadim.
-   
+
    Su anki kod:
    nm.scan('127.0.0.1', '22-443', arguments='-sT', timeout=120)
-   
+
    Ne yapmami istersin?"
-   
+
   Secenekler:
   [1] Farkli parametre dene (--unprivileged)
   [2] Kodu incelememe izin ver (kodu goster)
@@ -188,25 +199,27 @@ print("""
 
 # Cevap gelince kaydetme
 print("[ADIM 3] Cevap gelince hafizaya kaydet")
-print("""  
+print("""
   Kullanici: "[1] --unprivileged dene"
-  
+
   Yeni deneme:
   nm.scan('127.0.0.1', '22-443', arguments='-sT --unprivileged', timeout=120)
-  
+
   -> BASARILI ✅
-  
+
   Hafizaya kaydet:
 """)
 
 kaydet(
-    hedef='python_nmap_unexpected_error_cozumu',
-    kategori='video/python/nmap',
-    icerik=("PortScannerError: Unexpected error -> --unprivileged flagi ile cozuldu. "
-            "Nedeni: Windows'ta raw socket icin admin yetkisi gerek. "
-            "--unprivileged ile nmap alternatif yontem kullanir. "
-            "Kullanici cozumu ile ogrenildi."),
-    basari=True
+    hedef="python_nmap_unexpected_error_cozumu",
+    kategori="video/python/nmap",
+    icerik=(
+        "PortScannerError: Unexpected error -> --unprivileged flagi ile cozuldu. "
+        "Nedeni: Windows'ta raw socket icin admin yetkisi gerek. "
+        "--unprivileged ile nmap alternatif yontem kullanir. "
+        "Kullanici cozumu ile ogrenildi."
+    ),
+    basari=True,
 )
 
 # Tüm kayıtları göster
@@ -235,7 +248,9 @@ print(f"""
 
 # Toplam maliyet
 con = sqlite3.connect(db)
-top = con.execute("SELECT COUNT(*) FROM ogrenmeler WHERE kategori LIKE 'video/python/nmap%'").fetchone()[0]
+top = con.execute(
+    "SELECT COUNT(*) FROM ogrenmeler WHERE kategori LIKE 'video/python/nmap%'"
+).fetchone()[0]
 print(f"Toplam video/python/nmap kaydi: {top}")
 print("LLM cagrisi: 0 (hepsi OnceHafiza uzerinden)")
 con.close()

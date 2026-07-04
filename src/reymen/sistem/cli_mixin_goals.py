@@ -25,9 +25,9 @@ from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
 
+
 class MixinGoals:
     """ReYMeNCLI Goal management — goal and subgoal commands."""
-
 
     def _handle_goal_command(self, cmd: str) -> None:
         """Dispatch /goal subcommands: set / status / pause / resume / clear."""
@@ -94,7 +94,6 @@ class MixinGoals:
             self._pending_input.put(state.goal)
         except Exception:
             logger.warning("[fix_01_sessiz_except] Exception")
-
 
     def _handle_subgoal_command(self, cmd: str) -> None:
         """Dispatch /subgoal subcommands.
@@ -172,4 +171,4 @@ class MixinGoals:
         _cprint(f"  ✓ Added subgoal {idx}: {text}")
 
 
-__all__ = ['MixinGoals']
+__all__ = ["MixinGoals"]

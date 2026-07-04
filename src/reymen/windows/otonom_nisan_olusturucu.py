@@ -32,6 +32,7 @@ try:
     from selenium.webdriver.common.by import By
     from selenium.webdriver.support.ui import WebDriverWait
     from selenium.webdriver.support import expected_conditions as EC
+
     _SELENIUM_VAR = True
 except ImportError:
     _SELENIUM_VAR = False
@@ -78,14 +79,14 @@ _SABLON_HEDEFLERI: Dict[str, str] = {
         "'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'buy')]"
     ),
     "telefon_alani": (
-        "//input[@type='tel' or @name='phone' "
-        "or @name='telefon' or @name='mobile']"
+        "//input[@type='tel' or @name='phone' " "or @name='telefon' or @name='mobile']"
     ),
 }
 
 
-def otonom_sablon_olustur(hedef_url: str,
-                          hedefler: Optional[Dict[str, str]] = None) -> Dict[str, str]:
+def otonom_sablon_olustur(
+    hedef_url: str, hedefler: Optional[Dict[str, str]] = None
+) -> Dict[str, str]:
     """Tor uzerinden hedef siteye baglan, elementleri bul, screenshot al.
 
     Args:
@@ -98,19 +99,26 @@ def otonom_sablon_olustur(hedef_url: str,
     sonuc: Dict[str, str] = {"basarili": [], "basarisiz": [], "hata": ""}
 
     if not _SELENIUM_VAR:
-        return {"basarili": [], "basarisiz": list((hedefler or _SABLON_HEDEFLERI).keys()),
-                "hata": "Selenium yuklu degil"}
+        return {
+            "basarili": [],
+            "basarisiz": list((hedefler or _SABLON_HEDEFLERI).keys()),
+            "hata": "Selenium yuklu degil",
+        }
 
     hedefler = hedefler or _SABLON_HEDEFLERI
     NISAN_DIZINI.mkdir(parents=True, exist_ok=True)
 
     try:
         from reymen.windows.tor_otomasyonu import TorBrowserKontrol
+
         tor = TorBrowserKontrol()
         tor.baslat()
     except Exception as e:
-        return {"basarili": [], "basarisiz": list(hedefler.keys()),
-                "hata": f"Tor baslatilamadi: {e}"}
+        return {
+            "basarili": [],
+            "basarisiz": list(hedefler.keys()),
+            "hata": f"Tor baslatilamadi: {e}",
+        }
 
     try:
         tor.driver.get(hedef_url)
@@ -168,7 +176,9 @@ if __name__ == "__main__":
     print(f"\n=== RAPOR ===")
     print(f"Basarili: {sonuc['basarili']}")
     print(f"Basarisiz: {sonuc['basarisiz']}")
-    if sonuc['hata']:
+    if sonuc["hata"]:
         print(f"Hata: {sonuc['hata']}")
-    print(f"\nToplam: {len(sonuc['basarili'])} kaydedildi, "
-          f"{len(sonuc['basarisiz'])} bulunamadi")
+    print(
+        f"\nToplam: {len(sonuc['basarili'])} kaydedildi, "
+        f"{len(sonuc['basarisiz'])} bulunamadi"
+    )

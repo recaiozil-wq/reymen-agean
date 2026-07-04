@@ -32,7 +32,9 @@ class TestWSLPathTranslation:
         assert adapter.translate_path(r"\\wsl$\Ubuntu\home\user") == "/home/user"
 
     def test_wsl_localhost_unc(self, adapter):
-        assert adapter.translate_path(r"\\wsl.localhost\Ubuntu\home\user") == "/home/user"
+        assert (
+            adapter.translate_path(r"\\wsl.localhost\Ubuntu\home\user") == "/home/user"
+        )
 
     def test_linux_path_unchanged(self, adapter):
         assert adapter.translate_path("/home/user/file") == "/home/user/file"

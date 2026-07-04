@@ -1,4 +1,5 @@
 """ReYMeN tools.achievements shim — Hermes başarımlarını yönlendirir."""
+
 from __future__ import annotations
 
 import logging

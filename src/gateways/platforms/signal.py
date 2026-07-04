@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 from pathlib import Path as _Path
+
 sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
 from src.gateways.config import Platform, PlatformConfig
@@ -41,6 +42,7 @@ logger = logging.getLogger(__name__)
 
 try:
     import httpx
+
     HTTPX_AVAILABLE = True
 except ImportError:
     HTTPX_AVAILABLE = False
@@ -54,11 +56,13 @@ def check_signal_requirements() -> bool:
         return True
     try:
         from src.reymen.cron.hermes_stubs import ensure as _lazy_ensure
+
         _lazy_ensure("platform.signal", prompt=False)
     except Exception:
         return False
     try:
         import httpx as _httpx
+
         httpx = _httpx
         HTTPX_AVAILABLE = True
         return True
@@ -106,14 +110,12 @@ class SignalAdapter(BasePlatformAdapter):
         )
         self._signal_url = self._signal_url.rstrip("/")
 
-        self._signal_number: str = (
-            config.extra.get("number")
-            or _env("SIGNAL_NUMBER", "")
+        self._signal_number: str = config.extra.get("number") or _env(
+            "SIGNAL_NUMBER", ""
         )
 
-        self._home_channel: str = (
-            config.extra.get("home_channel")
-            or _env("SIGNAL_HOME_CHANNEL", "")
+        self._home_channel: str = config.extra.get("home_channel") or _env(
+            "SIGNAL_HOME_CHANNEL", ""
         )
 
         # HTTP istemcisi

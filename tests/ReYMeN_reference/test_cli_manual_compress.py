@@ -10,7 +10,15 @@ class DummyAgent:
         self.session_id = "new-session"
         self.calls = []
 
-    def _compress_context(self, messages, system_message, *, approx_tokens=None, focus_topic=None, force=False):
+    def _compress_context(
+        self,
+        messages,
+        system_message,
+        *,
+        approx_tokens=None,
+        focus_topic=None,
+        force=False,
+    ):
         self.calls.append(
             {
                 "messages": messages,
@@ -20,7 +28,10 @@ class DummyAgent:
                 "force": force,
             }
         )
-        return ([{"role": "user", "content": "[CONTEXT SUMMARY]: compacted"}], "new system prompt")
+        return (
+            [{"role": "user", "content": "[CONTEXT SUMMARY]: compacted"}],
+            "new system prompt",
+        )
 
 
 def test_manual_compress_does_not_pass_cached_system_prompt(monkeypatch):

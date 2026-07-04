@@ -18,11 +18,13 @@ import os
 
 try:
     import pdfplumber
+
     _PDF_VAR = "pdfplumber"
 except ImportError:
     pdfplumber = None
     try:
         import PyPDF2
+
         _PDF_VAR = "PyPDF2"
     except ImportError:
         PyPDF2 = None
@@ -30,11 +32,13 @@ except ImportError:
 
 try:
     import openpyxl
+
     _EXCEL_VAR = "openpyxl"
 except ImportError:
     openpyxl = None
     try:
         import xlrd
+
         _EXCEL_VAR = "xlrd"
     except ImportError:
         xlrd = None
@@ -42,6 +46,7 @@ except ImportError:
 
 try:
     import ollama as _ollama_lib
+
     _OLLAMA_LIB_VAR = True
 except ImportError:
     _ollama_lib = None
@@ -49,13 +54,14 @@ except ImportError:
 
 # ── Sabitler ──────────────────────────────────────────────────────────────────
 
-OLLAMA_BASE   = "http://localhost:11434"
+OLLAMA_BASE = "http://localhost:11434"
 GORUNTU_MODEL = "llava"
-MAKS_SATIR    = 200   # CSV/Excel'de en fazla bu kadar satir goster
+MAKS_SATIR = 200  # CSV/Excel'de en fazla bu kadar satir goster
 MAKS_KARAKTER = 8000  # PDF'te en fazla bu kadar karakter goster
 
 
 # ── PDF ───────────────────────────────────────────────────────────────────────
+
 
 def pdf_oku(dosya_yolu: str) -> str:
     """PDF dosyasinin metin icerigini cikartir.
@@ -84,7 +90,10 @@ def pdf_oku(dosya_yolu: str) -> str:
                 if not tam_metin.strip():
                     return "[PDF]: Metin çıkarılamadı (taranmış/görsel PDF olabilir)."
                 if len(tam_metin) > MAKS_KARAKTER:
-                    tam_metin = tam_metin[:MAKS_KARAKTER] + f"\n...[{len(tam_metin)} karakter, ilk {MAKS_KARAKTER} gösterildi]"
+                    tam_metin = (
+                        tam_metin[:MAKS_KARAKTER]
+                        + f"\n...[{len(tam_metin)} karakter, ilk {MAKS_KARAKTER} gösterildi]"
+                    )
                 return f"[PDF — {len(pdf.pages)} sayfa]\n{tam_metin}"
         except Exception as e:
             return f"[PDF Hatası]: pdfplumber: {e}"
@@ -111,6 +120,7 @@ def pdf_oku(dosya_yolu: str) -> str:
 
 
 # ── Excel ─────────────────────────────────────────────────────────────────────
+
 
 def excel_oku(dosya_yolu: str, sayfa: str = "") -> str:
     """Excel (.xlsx / .xls) dosyasini okur.
@@ -148,14 +158,22 @@ def excel_oku(dosya_yolu: str, sayfa: str = "") -> str:
                 satirlar = satirlar[:MAKS_SATIR]
             else:
                 ek = ""
-            return f"[Excel — '{ws.title}' sayfası, {len(satirlar)} satır]\n" + "\n".join(satirlar) + ek
+            return (
+                f"[Excel — '{ws.title}' sayfası, {len(satirlar)} satır]\n"
+                + "\n".join(satirlar)
+                + ek
+            )
         except Exception as e:
             return f"[Excel Hatası]: openpyxl: {e}"
 
     if _EXCEL_VAR == "xlrd":
         try:
             wb = xlrd.open_workbook(dosya_yolu)
-            ws = wb.sheet_by_name(sayfa) if sayfa and sayfa in wb.sheet_names() else wb.sheet_by_index(0)
+            ws = (
+                wb.sheet_by_name(sayfa)
+                if sayfa and sayfa in wb.sheet_names()
+                else wb.sheet_by_index(0)
+            )
             satirlar = []
             for r in range(ws.nrows):
                 hucre_metinleri = [str(ws.cell_value(r, c)) for c in range(ws.ncols)]
@@ -169,10 +187,13 @@ def excel_oku(dosya_yolu: str, sayfa: str = "") -> str:
         except Exception as e:
             return f"[Excel Hatası]: xlrd: {e}"
 
-    return "[Excel]: openpyxl veya xlrd kurulu değil. 'pip install openpyxl' çalıştırın."
+    return (
+        "[Excel]: openpyxl veya xlrd kurulu değil. 'pip install openpyxl' çalıştırın."
+    )
 
 
 # ── CSV ───────────────────────────────────────────────────────────────────────
+
 
 def csv_oku(dosya_yolu: str, ayirici: str = ",") -> str:
     """CSV dosyasini okur ve ozet tablo olarak dondurur.
@@ -209,12 +230,15 @@ def csv_oku(dosya_yolu: str, ayirici: str = ",") -> str:
 
         if not satirlar:
             return "[CSV]: Boş dosya."
-        return f"[CSV — {len(satirlar)} satır, ayirici='{ayirici}']\n" + "\n".join(satirlar)
+        return f"[CSV — {len(satirlar)} satır, ayirici='{ayirici}']\n" + "\n".join(
+            satirlar
+        )
     except Exception as e:
         return f"[CSV Hatası]: {e}"
 
 
 # ── LLaVA Görüntü Analizi ─────────────────────────────────────────────────────
+
 
 def goruntu_analiz(goruntu_yolu: str, soru: str = "") -> str:
     """Goruntu analiz eder (OpenRouter vision uzerinden)."""
@@ -222,7 +246,10 @@ def goruntu_analiz(goruntu_yolu: str, soru: str = "") -> str:
         return f"[Görüntü Hatası]: '{goruntu_yolu}' bulunamadı."
     try:
         from reymen.arac.araclar_goruntu import vision_analiz
-        return vision_analiz(kaynak=goruntu_yolu, soru=soru or "Bu görselde ne var, detaylı açıkla.")
+
+        return vision_analiz(
+            kaynak=goruntu_yolu, soru=soru or "Bu görselde ne var, detaylı açıkla."
+        )
     except Exception as e:
         return f"[Görüntü Hatası]: {e}"
 
@@ -233,6 +260,7 @@ def _goruntu_http(goruntu_yolu: str, prompt: str, onceki_hata: str) -> str:
 
 
 # ── Dosya Tipi Tespiti (tek API noktası) ─────────────────────────────────────
+
 
 def dosya_analiz(dosya_yolu: str, ek_parametre: str = "") -> str:
     """Dosya uzantisina gore dogru arac cagrisini yapar.
@@ -268,11 +296,16 @@ if __name__ == "__main__":
     print(f"PDF:   {_PDF_VAR or 'kurulu değil'}")
     print(f"Excel: {_EXCEL_VAR or 'kurulu değil'}")
     print(f"CSV:   stdlib (her zaman mevcut)")
-    print(f"LLaVA: {'ollama kütüphanesi' if _OLLAMA_LIB_VAR else 'HTTP API'} üzerinden\n")
+    print(
+        f"LLaVA: {'ollama kütüphanesi' if _OLLAMA_LIB_VAR else 'HTTP API'} üzerinden\n"
+    )
 
     # CSV testi (stdlib ile her zaman çalışır)
     import tempfile
-    tmp = tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False, encoding="utf-8")
+
+    tmp = tempfile.NamedTemporaryFile(
+        mode="w", suffix=".csv", delete=False, encoding="utf-8"
+    )
     tmp.write("ad,yas,sehir\nAhmet,30,Istanbul\nFatma,25,Ankara\nMehmet,35,Izmir\n")
     tmp.close()
     print(csv_oku(tmp.name))

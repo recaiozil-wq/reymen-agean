@@ -12,6 +12,7 @@ Docker tests need longer timeouts than the suite default (30s), so every
 test under this directory is granted a 180s default via
 ``pytest.mark.timeout`` applied at collection time.
 """
+
 from __future__ import annotations
 
 import os
@@ -30,7 +31,9 @@ def _docker_available() -> bool:
         return False
     try:
         r = subprocess.run(
-            ["docker", "info"], capture_output=True, timeout=5,
+            ["docker", "info"],
+            capture_output=True,
+            timeout=5,
         )
         return r.returncode == 0
     except (subprocess.TimeoutExpired, OSError):
@@ -66,11 +69,11 @@ def built_image() -> str:
     )
     result = subprocess.run(
         ["docker", "build", "-t", IMAGE_TAG, repo_root],
-        capture_output=True, text=True, timeout=1200,
+        capture_output=True,
+        text=True,
+        timeout=1200,
     )
-    assert result.returncode == 0, (
-        f"docker build failed:\n{result.stderr[-2000:]}"
-    )
+    assert result.returncode == 0, f"docker build failed:\n{result.stderr[-2000:]}"
     return IMAGE_TAG
 
 
@@ -82,7 +85,8 @@ def container_name(request) -> Iterator[str]:
     yield name
     subprocess.run(
         ["docker", "rm", "-f", name],
-        capture_output=True, timeout=10,
+        capture_output=True,
+        timeout=10,
     )
 
 
@@ -122,7 +126,10 @@ def docker_exec(
     """
     cmd = ["docker", "exec", "-u", user, *extra_docker_args, container, *args]
     return subprocess.run(
-        cmd, capture_output=True, text=True, timeout=timeout,
+        cmd,
+        capture_output=True,
+        text=True,
+        timeout=timeout,
     )
 
 
@@ -135,5 +142,10 @@ def docker_exec_sh(
 ) -> subprocess.CompletedProcess[str]:
     """Run ``sh -c <command>`` inside the container as ``user``."""
     return docker_exec(
-        container, "sh", "-c", command, user=user, timeout=timeout,
+        container,
+        "sh",
+        "-c",
+        command,
+        user=user,
+        timeout=timeout,
     )

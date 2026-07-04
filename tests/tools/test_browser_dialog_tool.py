@@ -17,7 +17,9 @@ def test_run_bekle_timeout():
 def test_dialog_kaydet_ve_cevapla():
     browser_dialog_tool._bekleyen_dialoglar.clear()
     browser_dialog_tool._dialog_cevaplari.clear()
-    dialog_id = browser_dialog_tool._dialog_kaydet("test_dialog", "alert", "Test mesajı")
+    dialog_id = browser_dialog_tool._dialog_kaydet(
+        "test_dialog", "alert", "Test mesajı"
+    )
     assert dialog_id == "test_dialog"
     assert browser_dialog_tool._dialog_cevapla(dialog_id, "OK") is True
     assert browser_dialog_tool._bekleyen_dialoglar[dialog_id]["cevaplandi"] is True

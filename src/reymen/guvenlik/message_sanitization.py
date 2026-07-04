@@ -19,15 +19,29 @@ TEHLIKELI_DESENLER = [
     (r"(?i)(https?://bit\.ly|https?://tinyurl|https?://shorturl)", "KISALTILMIS_URL"),
 ]
 
-IZINLI_HTML = {"b", "i", "u", "code", "pre", "a", "ul", "ol", "li", "br", "p", "strong", "em"}
+IZINLI_HTML = {
+    "b",
+    "i",
+    "u",
+    "code",
+    "pre",
+    "a",
+    "ul",
+    "ol",
+    "li",
+    "br",
+    "p",
+    "strong",
+    "em",
+}
 
-_HTML_TAG     = re.compile(r"<[^>]+>")
-_ANSI_ESC     = re.compile(r"\x1b\[[0-9;]*[mGKHFJ]")
+_HTML_TAG = re.compile(r"<[^>]+>")
+_ANSI_ESC = re.compile(r"\x1b\[[0-9;]*[mGKHFJ]")
 _COKLU_BOSLUK = re.compile(r" {3,}")
 _BOSLUK_SATIR = re.compile(r"\n{4,}")
-_KONTROL      = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
+_KONTROL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 
-_SISTEM_TAG  = re.compile(
+_SISTEM_TAG = re.compile(
     r"<\s*(system|sys|inst|instruction)\s*>.*?</\s*\1\s*>",
     re.IGNORECASE | re.DOTALL,
 )
@@ -39,11 +53,14 @@ _IGNORE_PREV = re.compile(
 
 # ── Temel temizleyiciler ──────────────────────────────────────────────
 
+
 def html_temizle(metin: str) -> str:
     """Izin verilmeyen HTML etiketlerini kaldir."""
+
     def _filtrele(m):
         etiket = m.group(0)[1:].split()[0].rstrip(">").lower().lstrip("/")
         return m.group(0) if etiket in IZINLI_HTML else ""
+
     return re.sub(r"<[^>]+>", _filtrele, metin)
 
 
@@ -87,14 +104,15 @@ def injection_isaretle(metin: str) -> tuple:
 
 # ── Birlesik temizleyiciler ───────────────────────────────────────────
 
+
 def giris_temizle(
     metin: str,
-    maks_uzunluk: int     = 16000,
-    html: bool            = True,
-    ansi: bool            = True,
-    kontrol: bool         = True,
-    injection_koru: bool  = True,
-    bosluk_norm: bool     = True,
+    maks_uzunluk: int = 16000,
+    html: bool = True,
+    ansi: bool = True,
+    kontrol: bool = True,
+    injection_koru: bool = True,
+    bosluk_norm: bool = True,
 ) -> tuple:
     """Kullanici/dis kaynakli girisi temizle.
 
@@ -145,7 +163,8 @@ def mesaj_listesi_temizle(mesajlar: list, maks_icerik: int = 8000) -> list:
         elif isinstance(icerik, list):
             icerik = [
                 {**p, "text": giris_temizle(p["text"], maks_uzunluk=maks_icerik)[0]}
-                if p.get("type") == "text" else p
+                if p.get("type") == "text"
+                else p
                 for p in icerik
             ]
         temiz.append({**msg, "content": icerik})
@@ -153,6 +172,7 @@ def mesaj_listesi_temizle(mesajlar: list, maks_icerik: int = 8000) -> list:
 
 
 # ── Hizli yardimcilar ─────────────────────────────────────────────────
+
 
 def temiz_mi(metin: str) -> bool:
     """Metnin injection icermedigini hizlica kontrol et."""
@@ -164,6 +184,7 @@ def pii_var_mi(metin: str) -> bool:
     """Basit PII varlik kontrolu."""
     try:
         from reymen.guvenlik.redact import pii_var_mi as _pii
+
         return _pii(metin)
     except ImportError:
         patterns = [
@@ -174,6 +195,7 @@ def pii_var_mi(metin: str) -> bool:
 
 
 # ── Linter'in orijinal stublari (geriye donuk uyumluluk) ─────────────
+
 
 def temizle(metin: str) -> str:
     """LLM cikti metnini temizle (geriye donuk uyumluluk)."""
@@ -204,6 +226,7 @@ def dogrula(metin: str) -> dict:
 
 # ── Motor kaydı ───────────────────────────────────────────────────────
 
+
 def motor_kaydet(motor):
     """Sanitizasyon araclarini motora kaydet."""
     if not hasattr(motor, "_plugin_arac_kaydet"):
@@ -215,7 +238,9 @@ def motor_kaydet(motor):
     )
     motor._plugin_arac_kaydet(
         "INJECTION_KONTROL",
-        lambda metin="": "Temiz" if temiz_mi(str(metin)) else "UYARI: Injection kalıbı tespit edildi",
+        lambda metin="": "Temiz"
+        if temiz_mi(str(metin))
+        else "UYARI: Injection kalıbı tespit edildi",
         "Metinde prompt injection kalibı ara",
     )
 

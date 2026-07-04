@@ -13,6 +13,7 @@ Yapilandirma (ortam degiskenleri):
   - DINGTALK_APP_KEY      — DingTalk uygulama AppKey (opsiyonel, REST API icin)
   - DINGTALK_APP_SECRET   — DingTalk uygulama AppSecret (opsiyonel, REST API icin)
 """
+
 import asyncio
 import hmac
 import hashlib
@@ -27,6 +28,7 @@ from typing import Any, Dict, List, Optional
 from urllib.parse import urlencode, urlparse, urlunparse
 
 from pathlib import Path as _Path
+
 sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
 from src.gateways.config import Platform, PlatformConfig
@@ -45,6 +47,7 @@ logger = logging.getLogger(__name__)
 
 try:
     import httpx
+
     HTTPX_AVAILABLE = True
 except ImportError:
     HTTPX_AVAILABLE = False
@@ -58,11 +61,13 @@ def check_dingtalk_requirements() -> bool:
         return True
     try:
         from reymen.cron.hermes_stubs import ensure as _lazy_ensure
+
         _lazy_ensure("platform.dingtalk", prompt=False)
     except Exception:
         return False
     try:
         import httpx as _httpx
+
         httpx = _httpx
         HTTPX_AVAILABLE = True
         return True
@@ -154,10 +159,14 @@ class DingTalkAdapter(BasePlatformAdapter):
 
     def __init__(self, config: PlatformConfig):
         super().__init__(config, Platform.DINGTALK)
-        self._webhook_url: str = _env("DINGTALK_WEBHOOK_URL", config.extra.get("webhook_url", ""))
+        self._webhook_url: str = _env(
+            "DINGTALK_WEBHOOK_URL", config.extra.get("webhook_url", "")
+        )
         self._secret: str = _env("DINGTALK_SECRET", config.extra.get("secret", ""))
         self._app_key: str = _env("DINGTALK_APP_KEY", config.extra.get("app_key", ""))
-        self._app_secret: str = _env("DINGTALK_APP_SECRET", config.extra.get("app_secret", ""))
+        self._app_secret: str = _env(
+            "DINGTALK_APP_SECRET", config.extra.get("app_secret", "")
+        )
 
         self._client: Optional[httpx.AsyncClient] = None
         self._access_token: Optional[str] = None  # REST API token (future use)
@@ -350,7 +359,8 @@ class DingTalkAdapter(BasePlatformAdapter):
                 return SendResult(
                     False,
                     error=f"DingTalk API hatasi: {errmsg}",
-                    retryable=errcode in (90002, 90006, 90010),  # rate-limit, internal, timeout
+                    retryable=errcode
+                    in (90002, 90006, 90010),  # rate-limit, internal, timeout
                 )
 
             return SendResult(
@@ -401,7 +411,9 @@ class DingTalkAdapter(BasePlatformAdapter):
         DingTalk Robot Webhook uzerinden gonderilen mesajlar
         duzenlenemez.
         """
-        return SendResult(False, error="DingTalk Robot Webhook mesaj duzenleme desteklemez")
+        return SendResult(
+            False, error="DingTalk Robot Webhook mesaj duzenleme desteklemez"
+        )
 
     async def delete_message(
         self,

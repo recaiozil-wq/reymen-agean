@@ -36,9 +36,7 @@ class ContextCompressor:
         self._etiket_puani: Dict[str, float] = {}
 
     def sikistir(
-        self,
-        gecmis: List[Dict[str, Any]],
-        max_token: Optional[int] = None
+        self, gecmis: List[Dict[str, Any]], max_token: Optional[int] = None
     ) -> List[Dict[str, Any]]:
         """
         Konusma gecmisini sikistirir.
@@ -58,16 +56,20 @@ class ContextCompressor:
 
             # Once ozet ekle
             ozet = self.ozet_olustur(gecmis)
-            sikistirilmis = [{"rol": "sistem", "icerik": f"[OZET] {ozet}", "sikistirilmis": True}]
+            sikistirilmis = [
+                {"rol": "sistem", "icerik": f"[OZET] {ozet}", "sikistirilmis": True}
+            ]
 
             # Onemli bilgileri ekle
             if self._onemli_bilgiler:
                 onemli_str = json.dumps(self._onemli_bilgiler, ensure_ascii=False)
-                sikistirilmis.append({
-                    "rol": "sistem",
-                    "icerik": f"[ONEMLI] {onemli_str}",
-                    "sikistirilmis": True,
-                })
+                sikistirilmis.append(
+                    {
+                        "rol": "sistem",
+                        "icerik": f"[ONEMLI] {onemli_str}",
+                        "sikistirilmis": True,
+                    }
+                )
 
             # Son mesajlari ekle (token limitine kadar)
             mevcut_token = self._token_hesapla(sikistirilmis)
@@ -99,10 +101,7 @@ class ContextCompressor:
             return len(mesajlar) * 10
 
     def onemli_bilgileri_sakla(
-        self,
-        anahtar_ya_dict,
-        deger=None,
-        etiket: Optional[str] = None
+        self, anahtar_ya_dict, deger=None, etiket: Optional[str] = None
     ) -> None:
         """
         Onemli bilgileri saklar.
@@ -129,9 +128,7 @@ class ContextCompressor:
             logger.error(f"Bilgi saklama hatasi: {e}")
 
     def ozet_olustur(
-        self,
-        gecmis: List[Dict[str, Any]],
-        max_karakter: int = 500
+        self, gecmis: List[Dict[str, Any]], max_karakter: int = 500
     ) -> str:
         """
         Konusma gecmisinin ozetini olusturur.
@@ -148,9 +145,15 @@ class ContextCompressor:
                 return "Henuz mesaj yok."
 
             # Mesaj turlerini say
-            kullanici_say = sum(1 for m in gecmis if isinstance(m, dict) and m.get("rol") == "kullanici")
-            asistan_say = sum(1 for m in gecmis if isinstance(m, dict) and m.get("rol") == "asistan")
-            sistem_say = sum(1 for m in gecmis if isinstance(m, dict) and m.get("rol") == "sistem")
+            kullanici_say = sum(
+                1 for m in gecmis if isinstance(m, dict) and m.get("rol") == "kullanici"
+            )
+            asistan_say = sum(
+                1 for m in gecmis if isinstance(m, dict) and m.get("rol") == "asistan"
+            )
+            sistem_say = sum(
+                1 for m in gecmis if isinstance(m, dict) and m.get("rol") == "sistem"
+            )
 
             # Ilk ve son mesajlari al
             ilk_mesaj = ""
@@ -176,7 +179,9 @@ class ContextCompressor:
             ]
 
             if anahtar_kelimeler:
-                ozet_parcalari.append(f"Anahtar kelimeler: {', '.join(anahtar_kelimeler[:10])}")
+                ozet_parcalari.append(
+                    f"Anahtar kelimeler: {', '.join(anahtar_kelimeler[:10])}"
+                )
 
             ozet = " | ".join(ozet_parcalari)
 
@@ -184,11 +189,13 @@ class ContextCompressor:
                 ozet = ozet[:max_karakter] + "..."
 
             # Ozet gecmisine ekle
-            self._ozet_gecmisi.append({
-                "ozet": ozet,
-                "mesaj_sayisi": len(gecmis),
-                "zaman": time.time(),
-            })
+            self._ozet_gecmisi.append(
+                {
+                    "ozet": ozet,
+                    "mesaj_sayisi": len(gecmis),
+                    "zaman": time.time(),
+                }
+            )
 
             return ozet
 
@@ -200,19 +207,45 @@ class ContextCompressor:
         """Metinden anahtar kelimeleri cikarir."""
         try:
             tum_metin = " ".join(
-                str(m.get("icerik", "")) for m in gecmis
+                str(m.get("icerik", ""))
+                for m in gecmis
                 if isinstance(m, dict) and m.get("icerik")
             )
 
             # Turkce stop words
             stop_words = {
-                "bir", "bu", "ve", "veya", "ile", "icin", "ama", "ancak",
-                "olarak", "olan", "daha", "en", "cok", "kadar", "gibi",
-                "kendi", "diger", "her", "tum", "bazi", "arasinda",
-                "sonra", "once", "yani", "uzere", "de", "da", "mi", "mu",
+                "bir",
+                "bu",
+                "ve",
+                "veya",
+                "ile",
+                "icin",
+                "ama",
+                "ancak",
+                "olarak",
+                "olan",
+                "daha",
+                "en",
+                "cok",
+                "kadar",
+                "gibi",
+                "kendi",
+                "diger",
+                "her",
+                "tum",
+                "bazi",
+                "arasinda",
+                "sonra",
+                "once",
+                "yani",
+                "uzere",
+                "de",
+                "da",
+                "mi",
+                "mu",
             }
 
-            kelimeler = re.findall(r'\w+', tum_metin.lower())
+            kelimeler = re.findall(r"\w+", tum_metin.lower())
             kelime_say = {}
             for k in kelimeler:
                 if len(k) > 2 and k not in stop_words:
@@ -256,23 +289,39 @@ def run(**kwargs) -> str:
     """
     try:
         compressor = ContextCompressor()
-        gecmis = kwargs.get("gecmis", [
-            {"rol": "kullanici", "icerik": "Merhaba, nasilsin?"},
-            {"rol": "asistan", "icerik": "Iyiyim, tesekkurler. Sana nasil yardimci olabilirim?"},
-            {"rol": "kullanici", "icerik": "Python ile dosya islemleri yapmak istiyorum."},
-            {"rol": "asistan", "icerik": "Python'da dosya islemleri icin open() fonksiyonunu kullanabilirsin."},
-        ])
+        gecmis = kwargs.get(
+            "gecmis",
+            [
+                {"rol": "kullanici", "icerik": "Merhaba, nasilsin?"},
+                {
+                    "rol": "asistan",
+                    "icerik": "Iyiyim, tesekkurler. Sana nasil yardimci olabilirim?",
+                },
+                {
+                    "rol": "kullanici",
+                    "icerik": "Python ile dosya islemleri yapmak istiyorum.",
+                },
+                {
+                    "rol": "asistan",
+                    "icerik": "Python'da dosya islemleri icin open() fonksiyonunu kullanabilirsin.",
+                },
+            ],
+        )
 
         sikistirilmis = compressor.sikistir(gecmis)
         ozet = compressor.ozet_olustur(gecmis)
         compressor.onemli_bilgileri_sakla({"kullanici_adi": "test_user"})
 
-        return json.dumps({
-            "orijinal_sayi": len(gecmis),
-            "sikistirilmis_sayi": len(sikistirilmis),
-            "ozet": ozet,
-            "onemli_bilgiler": compressor.onemli_bilgileri_getir(),
-        }, ensure_ascii=False, indent=2)
+        return json.dumps(
+            {
+                "orijinal_sayi": len(gecmis),
+                "sikistirilmis_sayi": len(sikistirilmis),
+                "ozet": ozet,
+                "onemli_bilgiler": compressor.onemli_bilgileri_getir(),
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
 
     except Exception as e:
         return f"Context compressor hatasi: {e}"

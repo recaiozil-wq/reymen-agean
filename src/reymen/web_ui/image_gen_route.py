@@ -30,6 +30,7 @@ router = APIRouter(tags=["image-gen"])
 
 # Templates — parent dir'deki templates/ klasörü
 from pathlib import Path
+
 _TEMPLATE_DIR = Path(__file__).parent / "templates"
 templates = Jinja2Templates(directory=str(_TEMPLATE_DIR))
 
@@ -37,9 +38,7 @@ templates = Jinja2Templates(directory=str(_TEMPLATE_DIR))
 @router.get("/image-gen", response_class=HTMLResponse)
 async def image_gen_form(request: Request):
     """GET — Image generation form."""
-    return templates.TemplateResponse(
-        request, "image_gen.html", {}
-    )
+    return templates.TemplateResponse(request, "image_gen.html", {})
 
 
 @router.post("/image-gen")
@@ -62,10 +61,12 @@ async def image_gen_generate(
     start = time.time()
 
     if not prompt or not prompt.strip():
-        return JSONResponse({
-            "success": False,
-            "error": "Prompt boş olamaz.",
-        })
+        return JSONResponse(
+            {
+                "success": False,
+                "error": "Prompt boş olamaz.",
+            }
+        )
 
     try:
         # Provider'a göre davran
@@ -83,35 +84,41 @@ async def image_gen_generate(
         duration = time.time() - start
 
         if result.get("success"):
-            return JSONResponse({
-                "success": True,
-                "image": result.get("image"),
-                "provider": result.get("provider", provider),
-                "model": result.get("model", ""),
-                "duration": round(duration, 2),
-                "error": None,
-            })
+            return JSONResponse(
+                {
+                    "success": True,
+                    "image": result.get("image"),
+                    "provider": result.get("provider", provider),
+                    "model": result.get("model", ""),
+                    "duration": round(duration, 2),
+                    "error": None,
+                }
+            )
 
         # Hata durumu
-        return JSONResponse({
-            "success": False,
-            "image": result.get("image"),
-            "provider": provider,
-            "model": result.get("model", ""),
-            "duration": round(duration, 2),
-            "error": result.get("error", "Görsel üretilemedi."),
-        })
+        return JSONResponse(
+            {
+                "success": False,
+                "image": result.get("image"),
+                "provider": provider,
+                "model": result.get("model", ""),
+                "duration": round(duration, 2),
+                "error": result.get("error", "Görsel üretilemedi."),
+            }
+        )
 
     except Exception as e:
         logger.exception("[image_gen_route] Hata:")
         duration = time.time() - start
-        return JSONResponse({
-            "success": False,
-            "image": None,
-            "provider": provider,
-            "error": str(e),
-            "duration": round(duration, 2),
-        })
+        return JSONResponse(
+            {
+                "success": False,
+                "image": None,
+                "provider": provider,
+                "error": str(e),
+                "duration": round(duration, 2),
+            }
+        )
 
 
 def _stub_generate(prompt: str, aspect_ratio: str) -> dict[str, Any]:
@@ -119,7 +126,9 @@ def _stub_generate(prompt: str, aspect_ratio: str) -> dict[str, Any]:
     import hashlib
     import base64
 
-    w, h = {"landscape": (640, 360), "square": (512, 512), "portrait": (360, 640)}.get(aspect_ratio, (512, 512))
+    w, h = {"landscape": (640, 360), "square": (512, 512), "portrait": (360, 640)}.get(
+        aspect_ratio, (512, 512)
+    )
 
     svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}">
   <rect width="{w}" height="{h}" fill="#1a1a2e"/>
@@ -143,4 +152,9 @@ def _stub_generate(prompt: str, aspect_ratio: str) -> dict[str, Any]:
 
 def _esc(text: str) -> str:
     """SVG-escape text."""
-    return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
+    return (
+        text.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace('"', "&quot;")
+    )

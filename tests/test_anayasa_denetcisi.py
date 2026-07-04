@@ -24,6 +24,7 @@ from anayasa_denetcisi import (
 # kural_varmi testleri (1-15)
 # ══════════════════════════════════════════════════════════════════════════
 
+
 class TestKuralVarmi:
     # ── Boş/null girdi ────────────────────────────────────────────────────
     def test_bos_metin_gecer(self):
@@ -131,13 +132,16 @@ class TestKuralVarmi:
 
     def test_kibar_ifade_iceriyorsa_gecer(self):
         """Kibar ifade (lütfen, rica, yardım) içeren mesaj geçmeli."""
-        engelli, gerekce = kural_varmi("Lütfen yardım eder misiniz? Çok teşekkür ederim.")
+        engelli, gerekce = kural_varmi(
+            "Lütfen yardım eder misiniz? Çok teşekkür ederim."
+        )
         assert engelli is False
 
 
 # ══════════════════════════════════════════════════════════════════════════
 # mesaj_guvenli_mi testleri (16-20)
 # ══════════════════════════════════════════════════════════════════════════
+
 
 class TestMesajGuvenliMi:
     def test_guvenli_mesaj_true(self):
@@ -165,6 +169,7 @@ class TestMesajGuvenliMi:
 # Sabitler testleri (21-22)
 # ══════════════════════════════════════════════════════════════════════════
 
+
 class TestSabitler:
     def test_kesin_gec_frozenset(self):
         """_KESIN_GEC bir frozenset olmalı."""
@@ -186,6 +191,7 @@ class TestSabitler:
 # ══════════════════════════════════════════════════════════════════════════
 # Karmaşık/köşe durum testleri (23-25)
 # ══════════════════════════════════════════════════════════════════════════
+
 
 class TestKoseDurumlari:
     def test_engelli_desen_kisa_mesajda_yakalanir(self):

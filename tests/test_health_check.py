@@ -33,7 +33,12 @@ class TestHealthDurum:
         assert HealthDurum.HATA == "hata"
 
     def test_dort_deger(self):
-        values = {HealthDurum.IYI, HealthDurum.UYARI, HealthDurum.KRITIK, HealthDurum.HATA}
+        values = {
+            HealthDurum.IYI,
+            HealthDurum.UYARI,
+            HealthDurum.KRITIK,
+            HealthDurum.HATA,
+        }
         assert len(values) == 4
 
 
@@ -120,7 +125,7 @@ class TestDiskKontrol:
         hc = HealthChecker(base_dir=tmp_path)
         DiskUsage = namedtuple("DiskUsage", ["total", "used", "free"])
         # 0.3GB free → kritik
-        fake = DiskUsage(total=100*1024**3, used=99.7*1024**3, free=0.3*1024**3)
+        fake = DiskUsage(total=100 * 1024**3, used=99.7 * 1024**3, free=0.3 * 1024**3)
         with patch("shutil.disk_usage", return_value=fake):
             result = hc.disk_kontrol()
         assert result["kullanilabilir_gb"] == 0.3
@@ -131,7 +136,7 @@ class TestDiskKontrol:
         hc = HealthChecker(base_dir=tmp_path)
         DiskUsage = namedtuple("DiskUsage", ["total", "used", "free"])
         # 1.5GB free → uyari
-        fake = DiskUsage(total=100*1024**3, used=98.5*1024**3, free=1.5*1024**3)
+        fake = DiskUsage(total=100 * 1024**3, used=98.5 * 1024**3, free=1.5 * 1024**3)
         with patch("shutil.disk_usage", return_value=fake):
             result = hc.disk_kontrol()
         uyari = [s for s in hc.sorunlar if s["seviye"] == HealthDurum.UYARI]
@@ -152,7 +157,9 @@ class TestBellekKontrol:
         mock_psutil.virtual_memory.return_value = mock_mem
 
         import builtins
+
         real_import = builtins.__import__
+
         def fake_import(name, *args, **kwargs):
             if name == "psutil":
                 return mock_psutil
@@ -208,6 +215,7 @@ class TestApiBaglantisi:
     def test_basarisiz_url_error(self):
         hc = HealthChecker()
         import urllib.error
+
         with patch("urllib.request.urlopen", side_effect=urllib.error.URLError("yok")):
             result = hc.api_baglantisi()
         for isim in HealthChecker.API_SAGLIK_URLS:
@@ -244,9 +252,10 @@ class TestTamKontrol:
     def test_tum_kontroller_calisiyor(self):
         hc = HealthChecker()
         DiskUsage = namedtuple("DiskUsage", ["total", "used", "free"])
-        fake = DiskUsage(100*1024**3, 50*1024**3, 50*1024**3)
-        with patch("shutil.disk_usage", return_value=fake), \
-             patch("urllib.request.urlopen", side_effect=Exception("x")):
+        fake = DiskUsage(100 * 1024**3, 50 * 1024**3, 50 * 1024**3)
+        with patch("shutil.disk_usage", return_value=fake), patch(
+            "urllib.request.urlopen", side_effect=Exception("x")
+        ):
             rapor = hc.tam_kontrol()
         assert "disk" in rapor["kontroller"]
         assert "bellek" in rapor["kontroller"]
@@ -259,10 +268,11 @@ class TestTamKontrol:
     def test_sorun_ozeti_sayilari(self):
         hc = HealthChecker()
         DiskUsage = namedtuple("DiskUsage", ["total", "used", "free"])
-        fake = DiskUsage(100*1024**3, 50*1024**3, 50*1024**3)
+        fake = DiskUsage(100 * 1024**3, 50 * 1024**3, 50 * 1024**3)
         # API'ler erişilemez → uyari; moduller gercek import →.isSuccess
-        with patch("shutil.disk_usage", return_value=fake), \
-             patch("urllib.request.urlopen", side_effect=Exception("x")):
+        with patch("shutil.disk_usage", return_value=fake), patch(
+            "urllib.request.urlopen", side_effect=Exception("x")
+        ):
             rapor = hc.tam_kontrol()
         ozet = rapor["sorun_ozeti"]
         assert rapor["toplam_sorun"] > 0
@@ -302,5 +312,12 @@ class TestRaporFormati:
     def test_rapor_keys(self):
         hc = HealthChecker()
         rapor = hc.tam_kontrol()
-        gerekli = {"zaman", "durum", "kontroller", "sorunlar", "toplam_sorun", "sorun_ozeti"}
+        gerekli = {
+            "zaman",
+            "durum",
+            "kontroller",
+            "sorunlar",
+            "toplam_sorun",
+            "sorun_ozeti",
+        }
         assert gerekli.issubset(set(rapor.keys()))

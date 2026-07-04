@@ -118,9 +118,9 @@ class TestHataSenaryolari:
             "while True: pass",
             timeout=2,
         )
-        assert "Sandbox zaman aşımı" in cikti, (
-            f"Zaman asimi mesaji bekleniyor: {cikti!r}"
-        )
+        assert (
+            "Sandbox zaman aşımı" in cikti
+        ), f"Zaman asimi mesaji bekleniyor: {cikti!r}"
 
 
 # ──────────────────────────────────────────────────────────────────────
@@ -148,9 +148,7 @@ class TestLocalRun:
         cikti = lab._local_run(olmayan, timeout=2)
         # subprocess exit kodu 2 (dosya bulunamadi), stderr'de hata mesaji
         assert "[HATA]" in cikti, f"[HATA] etiketi eksik: {cikti!r}"
-        assert len(cikti) > 20, (
-            f"Hata mesaji cok kisa, beklenmeyen: {cikti!r}"
-        )
+        assert len(cikti) > 20, f"Hata mesaji cok kisa, beklenmeyen: {cikti!r}"
 
 
 # ──────────────────────────────────────────────────────────────────────
@@ -170,9 +168,7 @@ class TestNegatif:
         # stdout bos oldugu icin [CIKTI] ile [HATA] arasinda sadece bosluk var
         cikti_duz = cikti.replace("\n", "").replace(" ", "")
         # sadece etiketler ve yeni satirlar kalmali
-        assert len(cikti_duz) >= len("[ÇIKTI][HATA]"), (
-            f"Beklenmedik icerik: {cikti!r}"
-        )
+        assert len(cikti_duz) >= len("[ÇIKTI][HATA]"), f"Beklenmedik icerik: {cikti!r}"
 
     def test_kod_none(self, lab):
         """11. kod = None -> TypeError firlatir (f.write(None) basarisiz).
@@ -212,9 +208,7 @@ class TestKapsayici:
             lab2.izole_python_calistir("raise ValueError('cleanup')", timeout=2)
             # dosya silinmis olmali
             kalanlar = list(tmp_path.glob("_ReYMeN_*.py"))
-            assert len(kalanlar) == 0, (
-                f"Hata senaryosunda silinmemis dosya: {kalanlar}"
-            )
+            assert len(kalanlar) == 0, f"Hata senaryosunda silinmemis dosya: {kalanlar}"
         finally:
             os.chdir(original_cwd)
 
@@ -252,9 +246,9 @@ class TestOutputFormati:
         assert cikti.startswith("[ÇIKTI]"), f"[ÇIKTI] ile baslamiyor: {cikti!r}"
         assert "[HATA]" in cikti, f"[HATA] etiketi yok: {cikti!r}"
         # [HATA] [CIKTI]'den sonra gelmeli
-        assert cikti.index("[HATA]") > cikti.index("[ÇIKTI]"), (
-            f"[HATA] [ÇIKTI]'den once: {cikti!r}"
-        )
+        assert cikti.index("[HATA]") > cikti.index(
+            "[ÇIKTI]"
+        ), f"[HATA] [ÇIKTI]'den once: {cikti!r}"
 
     def test_basari_ciktisi_stderr_bos(self, lab):
         """Basarili calistirmada stderr bos olur, [HATA] satiri bostur."""
@@ -262,19 +256,18 @@ class TestOutputFormati:
         # stdout icerigi var, stderr bos
         # format: [CIKTI]\nok\n\n[HATA]\n  -> strip: [CIKTI]\nok\n\n[HATA]
         hatadan_sonrasi = cikti.split("[HATA]")[-1].strip()
-        assert hatadan_sonrasi in ("", " "), (
-            f"HATA bolumu bos olmali ama su var: {hatadan_sonrasi!r}"
-        )
+        assert hatadan_sonrasi in (
+            "",
+            " ",
+        ), f"HATA bolumu bos olmali ama su var: {hatadan_sonrasi!r}"
 
     def test_hata_ciktisinda_traceback_vardir(self, lab):
         """Hata durumunda [HATA] sonrasi traceback icerir."""
-        cikti = lab.izole_python_calistir(
-            "1/0", timeout=2
-        )
-        assert "ZeroDivisionError" in cikti, (
-            f"ZeroDivisionError tracebacki yok: {cikti!r}"
-        )
+        cikti = lab.izole_python_calistir("1/0", timeout=2)
+        assert (
+            "ZeroDivisionError" in cikti
+        ), f"ZeroDivisionError tracebacki yok: {cikti!r}"
         hatadan_sonrasi = cikti.split("[HATA]")[-1]
-        assert "ZeroDivisionError" in hatadan_sonrasi, (
-            f"Hata bolumunde ZeroDivisionError yok: {hatadan_sonrasi!r}"
-        )
+        assert (
+            "ZeroDivisionError" in hatadan_sonrasi
+        ), f"Hata bolumunde ZeroDivisionError yok: {hatadan_sonrasi!r}"

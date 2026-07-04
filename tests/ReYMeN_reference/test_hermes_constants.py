@@ -69,7 +69,9 @@ class TestGetDefaultReYMeNRoot:
         monkeypatch.setenv("ReYMeN_HOME", str(profile))
         assert get_default_reymen_root() == docker_root
 
-    def test_no_ReYMeN_home_returns_localappdata_root_on_windows(self, tmp_path, monkeypatch):
+    def test_no_ReYMeN_home_returns_localappdata_root_on_windows(
+        self, tmp_path, monkeypatch
+    ):
         """Native Windows falls back to %LOCALAPPDATA%\\ReYMeN, not ~/.ReYMeN."""
         local_appdata = tmp_path / "LocalAppData"
         monkeypatch.delenv("ReYMeN_HOME", raising=False)
@@ -79,7 +81,9 @@ class TestGetDefaultReYMeNRoot:
 
         assert get_default_reymen_root() == local_appdata / "ReYMeN"
 
-    def test_no_ReYMeN_home_uses_windows_path_when_localappdata_missing(self, tmp_path, monkeypatch):
+    def test_no_ReYMeN_home_uses_windows_path_when_localappdata_missing(
+        self, tmp_path, monkeypatch
+    ):
         """Windows fallback still uses AppData/Local/ReYMeN without LOCALAPPDATA."""
         home = tmp_path / "Home"
         monkeypatch.delenv("ReYMeN_HOME", raising=False)
@@ -127,23 +131,35 @@ class TestIsContainer:
     def test_detects_cgroup_docker(self, monkeypatch, tmp_path):
         """/proc/1/cgroup containing 'docker' triggers detection."""
         import builtins
+
         self._reset_cache(monkeypatch)
         monkeypatch.setattr(os.path, "exists", lambda p: False)
         cgroup_file = tmp_path / "cgroup"
         cgroup_file.write_text("12:memory:/docker/abc123\n")
         _real_open = builtins.open
-        monkeypatch.setattr("builtins.open", lambda p, *a, **kw: _real_open(str(cgroup_file), *a, **kw) if p == "/proc/1/cgroup" else _real_open(p, *a, **kw))
+        monkeypatch.setattr(
+            "builtins.open",
+            lambda p, *a, **kw: _real_open(str(cgroup_file), *a, **kw)
+            if p == "/proc/1/cgroup"
+            else _real_open(p, *a, **kw),
+        )
         assert is_container() is True
 
     def test_negative_case(self, monkeypatch, tmp_path):
         """Returns False on a regular Linux host."""
         import builtins
+
         self._reset_cache(monkeypatch)
         monkeypatch.setattr(os.path, "exists", lambda p: False)
         cgroup_file = tmp_path / "cgroup"
         cgroup_file.write_text("12:memory:/\n")
         _real_open = builtins.open
-        monkeypatch.setattr("builtins.open", lambda p, *a, **kw: _real_open(str(cgroup_file), *a, **kw) if p == "/proc/1/cgroup" else _real_open(p, *a, **kw))
+        monkeypatch.setattr(
+            "builtins.open",
+            lambda p, *a, **kw: _real_open(str(cgroup_file), *a, **kw)
+            if p == "/proc/1/cgroup"
+            else _real_open(p, *a, **kw),
+        )
         assert is_container() is False
 
     def test_caches_result(self, monkeypatch):
@@ -254,10 +270,12 @@ class TestSecureParentDir:
 
         # Mock Path.resolve to return a short path regardless of OS quirks
         original_resolve = Path.resolve
+
         def mock_resolve(self):
             if str(self) == "/x/y":
                 return Path("/x")
             return original_resolve(self)
+
         monkeypatch.setattr(Path, "resolve", mock_resolve)
 
         secure_parent_dir(Path("/x/y"))
@@ -297,4 +315,3 @@ class TestSecureParentDir:
         secure_parent_dir(link_target)
         assert len(called_with) == 1
         assert called_with[0] == (str(real_dir), 0o700)
-

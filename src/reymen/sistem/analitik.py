@@ -100,6 +100,7 @@ def _tablolari_olustur():
 
 # ── Kayit Fonksiyonlari ─────────────────────────────────────────────────────
 
+
 def kaydet(
     tur: str,
     kaynak: str = "",
@@ -126,8 +127,14 @@ def kaydet(
             maliyet, basarili, hata_mesaji, detay_json, bot_adi)
            VALUES (?,?,?,?,?,?,?,?,?,?)""",
         (
-            tur, kaynak, sure_ms, token_giris, token_cikis,
-            maliyet, 1 if basarili else 0, hata_mesaji,
+            tur,
+            kaynak,
+            sure_ms,
+            token_giris,
+            token_cikis,
+            maliyet,
+            1 if basarili else 0,
+            hata_mesaji,
             json.dumps(detay or {}, ensure_ascii=False),
             bot_adi,
         ),
@@ -198,6 +205,7 @@ def hata_kaydet(
 
 # ── Rapor Fonksiyonlari ─────────────────────────────────────────────────────
 
+
 def ozet_son_n(gun: int = 7) -> dict[str, Any]:
     """Son N gunun ozet metrikleri."""
     _tablolari_olustur()
@@ -252,11 +260,13 @@ def ozet_son_n(gun: int = 7) -> dict[str, Any]:
            GROUP BY hata_mesaji ORDER BY adet DESC LIMIT 10""",
         (kesim,),
     ):
-        hatalar.append({
-            "kaynak": row["kaynak"],
-            "hata": row["hata_mesaji"][:100],
-            "adet": row["adet"],
-        })
+        hatalar.append(
+            {
+                "kaynak": row["kaynak"],
+                "hata": row["hata_mesaji"][:100],
+                "adet": row["adet"],
+            }
+        )
 
     return {
         "donem_gun": gun,
@@ -294,13 +304,15 @@ def provider_raporu(gun: int = 7) -> list[dict]:
            GROUP BY kaynak ORDER BY cagri DESC""",
         (kesim,),
     ):
-        sonuc.append({
-            "provider": row["provider"],
-            "cagri": row["cagri"],
-            "token": row["token"] or 0,
-            "maliyet": round(row["maliyet"] or 0, 6),
-            "ortalama_sure_ms": round(row["ortalama_sure"] or 0, 1),
-        })
+        sonuc.append(
+            {
+                "provider": row["provider"],
+                "cagri": row["cagri"],
+                "token": row["token"] or 0,
+                "maliyet": round(row["maliyet"] or 0, 6),
+                "ortalama_sure_ms": round(row["ortalama_sure"] or 0, 1),
+            }
+        )
     return sonuc
 
 
@@ -347,6 +359,7 @@ def haftalik_ozet() -> str:
 
 # ── Temizlik ─────────────────────────────────────────────────────────────────
 
+
 def eski_kayitlari_temizle(saklama_gunu: int = 90):
     """90 gunden eski kayitlari temizler."""
     _tablolari_olustur()
@@ -361,6 +374,7 @@ def eski_kayitlari_temizle(saklama_gunu: int = 90):
 
 # ── Motor Tool'lari ─────────────────────────────────────────────────────────
 
+
 def motor_analitik_kaydet(params: str = "") -> str:
     """ANALITIK_KAYDET(tur=\"llm_cagri\", kaynak=\"deepseek\", sure_ms=1500, ...)\n
     Bir analitik olayi kaydeder.\n
@@ -368,6 +382,7 @@ def motor_analitik_kaydet(params: str = "") -> str:
                   maliyet, basarili, hata_mesaji, bot_adi
     """
     import ast
+
     try:
         # Parametreleri ayristir: tur="llm_cagri", sure_ms=1500, ...
         params_dict = {}
@@ -376,7 +391,7 @@ def motor_analitik_kaydet(params: str = "") -> str:
             if "=" in part:
                 k, v = part.split("=", 1)
                 k = k.strip()
-                v = v.strip().strip('"\'')
+                v = v.strip().strip("\"'")
                 # Sayisal donusum
                 if v.replace(".", "", 1).replace("-", "", 1).isdigit():
                     v = float(v) if "." in v else int(v)
@@ -402,7 +417,11 @@ def motor_analitik_rapor(params: str = "") -> str:
         gun = int(params.split("=")[1].strip().rstrip(")")) if "=" in params else 7
     except (ValueError, IndexError):
         gun = 7
-    return ozet_son_n(gun)["_raw"] if False else json.dumps(ozet_son_n(gun), indent=2, ensure_ascii=False)
+    return (
+        ozet_son_n(gun)["_raw"]
+        if False
+        else json.dumps(ozet_son_n(gun), indent=2, ensure_ascii=False)
+    )
 
 
 def motor_analitik_panel(params: str = "") -> str:
@@ -413,6 +432,7 @@ def motor_analitik_panel(params: str = "") -> str:
 
 
 # ── HTML Dashboard ──────────────────────────────────────────────────────────
+
 
 def _dashboard_html() -> str:
     """Kendi kendine yeten HTML dashboard sayfasi."""
@@ -503,6 +523,7 @@ new Chart(document.getElementById('trendChart'), {{
 
 # ── Motor Kaydi ─────────────────────────────────────────────────────────────
 
+
 def motor_kaydet(motor: Any) -> None:
     """Motor tarafindan cagrilir, ANALITIK tool'larini kaydeder."""
     from reymen.sistem.analitik import (
@@ -510,6 +531,7 @@ def motor_kaydet(motor: Any) -> None:
         motor_analitik_rapor,
         motor_analitik_panel,
     )
+
     motor._plugin_arac_kaydet(
         "ANALITIK_KAYDET",
         motor_analitik_kaydet,

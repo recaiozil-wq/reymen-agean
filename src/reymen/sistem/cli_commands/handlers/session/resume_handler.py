@@ -45,6 +45,7 @@ def handle_resume_command(cli, cmd_original: str) -> None:
 
     if not cli._session_db:
         from reymen.sistem.ReYMeN_state import format_session_db_unavailable
+
         _cprint(f"  {format_session_db_unavailable()}")
         return
 
@@ -60,6 +61,7 @@ def handle_resume_command(cli, cmd_original: str) -> None:
         target_id = selected["id"]
     else:
         from reymen.reymen_cli.main import _resolve_session_by_name_or_id
+
         resolved = _resolve_session_by_name_or_id(target)
         target_id = resolved or target
 
@@ -122,6 +124,7 @@ def handle_resume_command(cli, cmd_original: str) -> None:
         if hasattr(cli.agent, "_todo_store"):
             try:
                 from tools.todo_tool import TodoStore
+
                 cli.agent._todo_store = TodoStore()
             except Exception:
                 logger.warning("[fix_01_sessiz_except] Exception")
@@ -154,7 +157,9 @@ def handle_resume_command(cli, cmd_original: str) -> None:
         )
         cli._display_resumed_history()
     else:
-        _cprint(f"  ↻ Resumed session {target_id}{title_part} — no messages, starting fresh.")
+        _cprint(
+            f"  ↻ Resumed session {target_id}{title_part} — no messages, starting fresh."
+        )
 
 
 # Needed by this handler — imported here to keep it accessible

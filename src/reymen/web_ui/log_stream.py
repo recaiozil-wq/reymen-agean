@@ -38,9 +38,11 @@ class LogStreamer:
 
         # Mevcut tail'i yükle
         try:
-            satirlar = self.log_dosyasi.read_text(encoding="utf-8", errors="replace").splitlines()
+            satirlar = self.log_dosyasi.read_text(
+                encoding="utf-8", errors="replace"
+            ).splitlines()
             self._son_boyut = len("".join(satirlar))
-            self._log_tail = satirlar[-self.max_tail:]
+            self._log_tail = satirlar[-self.max_tail :]
         except Exception:
             self._son_boyut = 0
             self._log_tail = []
@@ -54,7 +56,9 @@ class LogStreamer:
             if suanki <= self._son_boyut:
                 return
 
-            with open(str(self.log_dosyasi), "r", encoding="utf-8", errors="replace") as f:
+            with open(
+                str(self.log_dosyasi), "r", encoding="utf-8", errors="replace"
+            ) as f:
                 f.seek(self._son_boyut)
                 yeni_satirlar = f.read()
 
@@ -68,7 +72,7 @@ class LogStreamer:
                 self._log_tail.append(satir)
                 await _log_kuyruk.put(satir)
 
-            self._log_tail = self._log_tail[-self.max_tail:]
+            self._log_tail = self._log_tail[-self.max_tail :]
 
         except Exception as e:
             logger.debug("Log tarama hatasi (normal): %s", e)
@@ -83,6 +87,7 @@ class LogStreamer:
 
 
 # Abone yönetimi
+
 
 def abone_ekle(callback: Callable) -> None:
     _log_aboneler.append(callback)

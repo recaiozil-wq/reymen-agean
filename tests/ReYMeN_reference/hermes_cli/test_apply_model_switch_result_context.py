@@ -11,6 +11,7 @@ particular, ChatGPT Codex OAuth enforces 272K on the same slug. The sibling
 
 Fix: both display paths now go through ``resolve_display_context_length()``.
 """
+
 from __future__ import annotations
 
 from unittest.mock import patch
@@ -31,6 +32,7 @@ class _FakeModelInfo:
 
 class _StubCLI:
     """Minimum attrs ``_apply_model_switch_result`` reads on ``self``."""
+
     agent = None
     model = ""
     provider = ""
@@ -80,12 +82,12 @@ def test_picker_path_uses_provider_aware_context_on_codex(monkeypatch):
         lines = _run_display(monkeypatch, result)
 
     ctx_line = next((l for l in lines if "Context:" in l), "")
-    assert "272,000" in ctx_line, (
-        f"picker-path display must show Codex's 272K cap, got: {ctx_line!r}"
-    )
-    assert "1,050,000" not in ctx_line, (
-        f"picker-path display leaked models.dev's 1.05M for Codex: {ctx_line!r}"
-    )
+    assert (
+        "272,000" in ctx_line
+    ), f"picker-path display must show Codex's 272K cap, got: {ctx_line!r}"
+    assert (
+        "1,050,000" not in ctx_line
+    ), f"picker-path display leaked models.dev's 1.05M for Codex: {ctx_line!r}"
 
 
 def test_picker_path_shows_vendor_value_when_no_provider_cap(monkeypatch):
@@ -115,9 +117,9 @@ def test_picker_path_shows_vendor_value_when_no_provider_cap(monkeypatch):
         lines = _run_display(monkeypatch, result)
 
     ctx_line = next((l for l in lines if "Context:" in l), "")
-    assert "1,050,000" in ctx_line, (
-        f"OpenRouter gpt-5.5 should show 1.05M context, got: {ctx_line!r}"
-    )
+    assert (
+        "1,050,000" in ctx_line
+    ), f"OpenRouter gpt-5.5 should show 1.05M context, got: {ctx_line!r}"
 
 
 def test_picker_path_falls_back_to_model_info_when_resolver_empty(monkeypatch):
@@ -147,6 +149,6 @@ def test_picker_path_falls_back_to_model_info_when_resolver_empty(monkeypatch):
         lines = _run_display(monkeypatch, result)
 
     ctx_line = next((l for l in lines if "Context:" in l), "")
-    assert "1,050,000" in ctx_line, (
-        f"resolver-empty path should fall back to ModelInfo, got: {ctx_line!r}"
-    )
+    assert (
+        "1,050,000" in ctx_line
+    ), f"resolver-empty path should fall back to ModelInfo, got: {ctx_line!r}"

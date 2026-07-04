@@ -274,7 +274,9 @@ class TestComponentWatcherStartRecovery:
 
     def handler_hatasinda_exception_yutulur(self, watcher):
         """Handler hatasinda exception yutulup False donmeli."""
-        watcher.on_recovery(lambda n, e: (_ for _ in ()).throw(Exception("Handler hatasi")))
+        watcher.on_recovery(
+            lambda n, e: (_ for _ in ()).throw(Exception("Handler hatasi"))
+        )
         sonuc = watcher.start_recovery()
         assert sonuc is False
 
@@ -288,7 +290,10 @@ class TestComponentWatcherStartRecovery:
 class TestComponentWatcherOnRecovery:
     def test_handler_eklenir(self, watcher):
         """Handler eklenebilmeli."""
-        def handler(n, e): return True
+
+        def handler(n, e):
+            return True
+
         watcher.on_recovery(handler)
         assert len(watcher._recovery_handlers) == 1
         assert watcher._recovery_handlers[0] is handler
@@ -634,7 +639,9 @@ class TestAutoRecoveryIntegration:
         assert w2.state.status == ComponentStatus.HEALTHY
 
         sonuc = rec.tick()
-        assert "bilesen_b" in sonuc["checked"] or "bilesen_b" in sonuc.get("recovered", [])
+        assert "bilesen_b" in sonuc["checked"] or "bilesen_b" in sonuc.get(
+            "recovered", []
+        )
 
     def test_loop_dongusu_hata_yonetimi(self):
         """_loop icindeki hatalar yutulmali."""

@@ -102,7 +102,13 @@ class TestSonCheckpoint:
     def test_kayit_yoksa_dosyalardan_son(self, tmp_path):
         with patch.object(cm, "CHECKPOINT_DIR", tmp_path):
             # Manuel dosya oluştur (kaydetmeden)
-            veri = {"id": "ckpt_001", "hedef": "test", "tur": 1, "zaman": time.time(), "durum": {}}
+            veri = {
+                "id": "ckpt_001",
+                "hedef": "test",
+                "tur": 1,
+                "zaman": time.time(),
+                "durum": {},
+            }
             (tmp_path / "ckpt_001.json").write_text(json.dumps(veri), encoding="utf-8")
             cp = CheckpointManager()
             son = cp.son_chekpoint()
@@ -131,10 +137,12 @@ class TestListele:
             assert cp.listele() == []
 
     def test_coklu_liste(self, tmp_path):
-        with patch.object(cm, "CHECKPOINT_DIR", tmp_path),              patch("reymen.sistem.checkpoint_manager.time") as mock_time:
+        with patch.object(cm, "CHECKPOINT_DIR", tmp_path), patch(
+            "reymen.sistem.checkpoint_manager.time"
+        ) as mock_time:
             mock_time.time.return_value = 1000.0
             mock_time.strftime.side_effect = lambda fmt, t: "00:00:00"
-            mock_time.localtime.side_effect = lambda t: (2025,1,1,0,0,0,0,0,0)
+            mock_time.localtime.side_effect = lambda t: (2025, 1, 1, 0, 0, 0, 0, 0, 0)
             cp = CheckpointManager()
             cp.kaydet("gorev_A", 1, {})
             mock_time.time.return_value = 1001.0

@@ -21,6 +21,7 @@ ileride video MEDIA'sı eklenmek istenirse aynı sözleşme izlenebilir:
 
     [MEDIA type="video" src="<url-veya-yol>"]
 """
+
 import glob
 import logging
 import os
@@ -38,12 +39,14 @@ _ow_model = None
 
 # ── Whisper (bağımsız kopya — diğer modüllere bağımlı olmamak için) ──
 
+
 def _faster_whisper_model(model_adi: str = "small"):
     global _fw_model
     if _fw_model is None:
         with _whisper_lock:
             if _fw_model is None:
                 from faster_whisper import WhisperModel
+
                 _fw_model = WhisperModel(model_adi, device="cpu", compute_type="int8")
     return _fw_model
 
@@ -54,6 +57,7 @@ def _openai_whisper_model(model_adi: str = "base"):
         with _whisper_lock:
             if _ow_model is None:
                 import whisper
+
                 _ow_model = whisper.load_model(model_adi)
     return _ow_model
 
@@ -67,7 +71,9 @@ def _whisper_transcribe(dosya_yolu: str, dil: str = "tr") -> str:
     except ImportError:
         logger.warning("[fix_01_sessiz_except] ImportError")
     except Exception as e:
-        logger.warning("[VIDEO_ANALIZ] faster-whisper hatası, openai-whisper deneniyor: %s", e)
+        logger.warning(
+            "[VIDEO_ANALIZ] faster-whisper hatası, openai-whisper deneniyor: %s", e
+        )
     try:
         model = _openai_whisper_model()
         sonuc = model.transcribe(dosya_yolu, language=dil_param)
@@ -81,6 +87,7 @@ def _whisper_transcribe(dosya_yolu: str, dil: str = "tr") -> str:
 
 # ── Altyazı dosyası ayrıştırma (vtt/srt → düz metin) ─────────────────
 
+
 def _altyazi_dosya_oku(yol: str) -> str:
     with open(yol, encoding="utf-8", errors="replace") as f:
         ham = f.read()
@@ -89,11 +96,11 @@ def _altyazi_dosya_oku(yol: str) -> str:
         s = satir.strip()
         if not s or s.upper().startswith(("WEBVTT", "NOTE", "KIND:", "LANGUAGE:")):
             continue
-        if re.match(r"^\d+$", s):           # srt sıra numarası
+        if re.match(r"^\d+$", s):  # srt sıra numarası
             continue
-        if "-->" in s:                       # zaman damgası
+        if "-->" in s:  # zaman damgası
             continue
-        s = re.sub(r"<[^>]+>", "", s)        # vtt etiketleri
+        s = re.sub(r"<[^>]+>", "", s)  # vtt etiketleri
         if s:
             satirlar.append(s)
     # otomatik altyazılarda sık görülen ardışık tekrarları sil
@@ -114,20 +121,25 @@ def _basit_ozet(metin: str, n_cumle: int = 3, maks_uzunluk: int = 400) -> str:
 
 # ── Uzak video (YouTube vb.) ──────────────────────────────────────────
 
+
 def _video_bilgi_uzak(url: str) -> str:
     try:
         import yt_dlp
     except ImportError:
         return "[VIDEO_BILGI] Hata: yt-dlp kurulu değil (pip install yt-dlp)."
     try:
-        with yt_dlp.YoutubeDL({"quiet": True, "no_warnings": True, "skip_download": True}) as ydl:
+        with yt_dlp.YoutubeDL(
+            {"quiet": True, "no_warnings": True, "skip_download": True}
+        ) as ydl:
             info = ydl.extract_info(url, download=False)
         baslik = info.get("title", "?")
         sure = info.get("duration", "?")
         genislik, yukseklik = info.get("width", "?"), info.get("height", "?")
         yukleyen = info.get("uploader", "?")
-        return (f"[VIDEO_BILGI]\nBaşlık: {baslik}\nSüre: {sure}s\n"
-                f"Çözünürlük: {genislik}x{yukseklik}\nYükleyen: {yukleyen}\nURL: {url}")
+        return (
+            f"[VIDEO_BILGI]\nBaşlık: {baslik}\nSüre: {sure}s\n"
+            f"Çözünürlük: {genislik}x{yukseklik}\nYükleyen: {yukleyen}\nURL: {url}"
+        )
     except Exception as e:
         return f"[VIDEO_BILGI] Hata: {e}"
 
@@ -139,27 +151,37 @@ def _altyazi_veya_ses_metni_uzak(url: str, dil: str) -> tuple:
     with tempfile.TemporaryDirectory() as tmp:
         # 1) Altyazı dene (manuel + otomatik)
         try:
-            with yt_dlp.YoutubeDL({
-                "quiet": True, "no_warnings": True, "skip_download": True,
-                "writesubtitles": True, "writeautomaticsub": True,
-                "subtitleslangs": [dil or "tr", "en"],
-                "outtmpl": os.path.join(tmp, "%(id)s.%(ext)s"),
-            }) as ydl:
+            with yt_dlp.YoutubeDL(
+                {
+                    "quiet": True,
+                    "no_warnings": True,
+                    "skip_download": True,
+                    "writesubtitles": True,
+                    "writeautomaticsub": True,
+                    "subtitleslangs": [dil or "tr", "en"],
+                    "outtmpl": os.path.join(tmp, "%(id)s.%(ext)s"),
+                }
+            ) as ydl:
                 ydl.download([url])
         except Exception as e:
             logger.warning("[VIDEO_ANALIZ] altyazı indirme hatası: %s", e)
 
-        altyazilar = glob.glob(os.path.join(tmp, "*.vtt")) + glob.glob(os.path.join(tmp, "*.srt"))
+        altyazilar = glob.glob(os.path.join(tmp, "*.vtt")) + glob.glob(
+            os.path.join(tmp, "*.srt")
+        )
         if altyazilar:
             return _altyazi_dosya_oku(altyazilar[0]), "altyazı"
 
         # 2) Ses indir + Whisper
         try:
-            with yt_dlp.YoutubeDL({
-                "quiet": True, "no_warnings": True,
-                "format": "bestaudio/best",
-                "outtmpl": os.path.join(tmp, "ses.%(ext)s"),
-            }) as ydl:
+            with yt_dlp.YoutubeDL(
+                {
+                    "quiet": True,
+                    "no_warnings": True,
+                    "format": "bestaudio/best",
+                    "outtmpl": os.path.join(tmp, "ses.%(ext)s"),
+                }
+            ) as ydl:
                 ydl.download([url])
         except Exception as e:
             return "", f"ses_indirme_hatasi:{e}"
@@ -172,26 +194,44 @@ def _altyazi_veya_ses_metni_uzak(url: str, dil: str) -> tuple:
 
 # ── Yerel video ───────────────────────────────────────────────────────
 
+
 def _video_bilgi_yerel(yol: str) -> str:
     if not os.path.exists(yol):
         return f"[VIDEO_BILGI] Hata: dosya bulunamadı: {yol}"
     try:
         cikti = subprocess.run(
-            ["ffprobe", "-v", "quiet", "-print_format", "json",
-             "-show_format", "-show_streams", yol],
-            capture_output=True, text=True, timeout=20,
+            [
+                "ffprobe",
+                "-v",
+                "quiet",
+                "-print_format",
+                "json",
+                "-show_format",
+                "-show_streams",
+                yol,
+            ],
+            capture_output=True,
+            text=True,
+            timeout=20,
         )
         import json as _json
+
         veri = _json.loads(cikti.stdout)
-        video_akisi = next((s for s in veri.get("streams", []) if s.get("codec_type") == "video"), {})
+        video_akisi = next(
+            (s for s in veri.get("streams", []) if s.get("codec_type") == "video"), {}
+        )
         sure = veri.get("format", {}).get("duration", "?")
-        return (f"[VIDEO_BILGI]\nDosya: {yol}\nSüre: {sure}s\n"
-                f"Çözünürlük: {video_akisi.get('width', '?')}x{video_akisi.get('height', '?')}\n"
-                f"Codec: {video_akisi.get('codec_name', '?')}")
+        return (
+            f"[VIDEO_BILGI]\nDosya: {yol}\nSüre: {sure}s\n"
+            f"Çözünürlük: {video_akisi.get('width', '?')}x{video_akisi.get('height', '?')}\n"
+            f"Codec: {video_akisi.get('codec_name', '?')}"
+        )
     except FileNotFoundError:
         boyut_mb = os.path.getsize(yol) / 1_048_576
-        return (f"[VIDEO_BILGI] (ffprobe kurulu değil, sınırlı bilgi)\n"
-                f"Dosya: {yol}\nBoyut: {boyut_mb:.1f} MB")
+        return (
+            f"[VIDEO_BILGI] (ffprobe kurulu değil, sınırlı bilgi)\n"
+            f"Dosya: {yol}\nBoyut: {boyut_mb:.1f} MB"
+        )
     except Exception as e:
         return f"[VIDEO_BILGI] Hata: {e}"
 
@@ -201,8 +241,21 @@ def _yerel_video_ses_metni(yol: str, dil: str) -> tuple:
         ses_yolu = os.path.join(tmp, "ses.wav")
         try:
             subprocess.run(
-                ["ffmpeg", "-y", "-i", yol, "-vn", "-ac", "1", "-ar", "16000", ses_yolu],
-                capture_output=True, timeout=180, check=True,
+                [
+                    "ffmpeg",
+                    "-y",
+                    "-i",
+                    yol,
+                    "-vn",
+                    "-ac",
+                    "1",
+                    "-ar",
+                    "16000",
+                    ses_yolu,
+                ],
+                capture_output=True,
+                timeout=180,
+                check=True,
             )
         except FileNotFoundError:
             return "", "ffmpeg_kurulu_degil"
@@ -212,6 +265,7 @@ def _yerel_video_ses_metni(yol: str, dil: str) -> tuple:
 
 
 # ── Ana araçlar ───────────────────────────────────────────────────────
+
 
 def video_bilgi(kaynak: str) -> str:
     """Video metadata döner (başlık, süre, çözünürlük). URL veya yerel dosya yolu kabul eder."""
@@ -247,18 +301,23 @@ def video_analiz(kaynak: str, dil: str = "tr", max_karakter: str = "4000") -> st
         return f"[VIDEO_ANALIZ] Hata: {e}"
 
     if not metin or not metin.strip():
-        return (f"[VIDEO_ANALIZ] Hata: metin çıkarılamadı (kaynak_tip={kaynak_tip}). "
-                "Altyazı yok ve Whisper başarısız olmuş olabilir (ffmpeg/yt-dlp/whisper kontrol edin).")
+        return (
+            f"[VIDEO_ANALIZ] Hata: metin çıkarılamadı (kaynak_tip={kaynak_tip}). "
+            "Altyazı yok ve Whisper başarısız olmuş olabilir (ffmpeg/yt-dlp/whisper kontrol edin)."
+        )
 
     metin = metin.strip()
     hizli_ozet = _basit_ozet(metin)
     kisaltilmis = metin[:maks] + ("…" if len(metin) > maks else "")
-    return (f"[VIDEO_ANALIZ] (kaynak: {kaynak_tip})\n"
-            f"Hızlı özet: {hizli_ozet}\n\n"
-            f"Transkript/Altyazı ({len(metin)} karakter, {len(kisaltilmis)} gösteriliyor):\n{kisaltilmis}")
+    return (
+        f"[VIDEO_ANALIZ] (kaynak: {kaynak_tip})\n"
+        f"Hızlı özet: {hizli_ozet}\n\n"
+        f"Transkript/Altyazı ({len(metin)} karakter, {len(kisaltilmis)} gösteriliyor):\n{kisaltilmis}"
+    )
 
 
 # ── Motor kayıt ───────────────────────────────────────────────────────
+
 
 def motor_kaydet(motor) -> None:
     if not hasattr(motor, "_plugin_arac_kaydet"):

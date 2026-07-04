@@ -46,7 +46,9 @@ from typing import Any, Callable, Optional
 # ============================================================================
 # PROJE KOKU & SYS.PATH
 # ============================================================================
-_PROJE_KOK = Path(__file__).resolve().parent.parent.parent  # reymen/ag/../../ = proje koku
+_PROJE_KOK = (
+    Path(__file__).resolve().parent.parent.parent
+)  # reymen/ag/../../ = proje koku
 if str(_PROJE_KOK) not in sys.path:
     sys.path.insert(0, str(_PROJE_KOK))
 _SRC = _PROJE_KOK / "src"
@@ -76,7 +78,14 @@ except ImportError:
 PTB_AVAILABLE = False
 try:
     from telegram import Update
-    from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
+    from telegram.ext import (
+        Application,
+        CommandHandler,
+        ContextTypes,
+        MessageHandler,
+        filters,
+    )
+
     PTB_AVAILABLE = True
 except ImportError:
     Update = None
@@ -90,6 +99,7 @@ except ImportError:
 BEYIN_CLS = None
 try:
     from reymen.cereyan.beyin import Beyin as _B
+
     BEYIN_CLS = _B
 except ImportError as e:
     logger.warning("Beyin import edilemedi: %s", e)
@@ -99,6 +109,7 @@ ONCE_HAFIZA_ARA = None
 ONCE_HAFIZA_KAYDET = None
 try:
     from reymen.cereyan.once_hafiza import hafizada_ara as _ara, kaydet as _kaydet
+
     ONCE_HAFIZA_ARA = _ara
     ONCE_HAFIZA_KAYDET = _kaydet
 except ImportError as e:
@@ -108,13 +119,17 @@ except ImportError as e:
 CONVERSATION_LOOP_CLS = None
 try:
     from reymen.cereyan.conversation_loop import ConversationLoop as _CL
+
     CONVERSATION_LOOP_CLS = _CL
 except ImportError as e:
     logger.warning("ConversationLoop import edilemedi: %s", e)
 
 # — Ortak komutlar —
 try:
-    from reymen.ag.ortak_komutlar import komut_isle as ortak_komut_isle, cmd_run as ortak_cmd_run
+    from reymen.ag.ortak_komutlar import (
+        komut_isle as ortak_komut_isle,
+        cmd_run as ortak_cmd_run,
+    )
 except ImportError:
     ortak_komut_isle = None
     ortak_cmd_run = None
@@ -148,7 +163,9 @@ def _env_yukle():
 
     # 2. Hermes profil .env (kazanan — override=True, profildeki degerler kesin gecerli)
     profil = os.environ.get("HERMES_PROFILE", "reymen")
-    hermes_env = Path.home() / "AppData" / "Local" / "hermes" / "profiles" / profil / ".env"
+    hermes_env = (
+        Path.home() / "AppData" / "Local" / "hermes" / "profiles" / profil / ".env"
+    )
     if hermes_env.exists():
         load_dotenv(str(hermes_env), override=True)
         logger.info("Hermes profil .env yuklendi: %s (override=True)", hermes_env)
@@ -165,7 +182,7 @@ GATEWAY_MOD = os.environ.get("HERMES_GATEWAY", "http").strip().lower()
 
 # ── Reconnection ayarlari ─────────────────────────────────────────────────
 _MAX_BACKOFF = 60  # maksimum bekleme saniyesi (exponential backoff)
-_MAX_RETRY = 10    # maksimum ardışık hata sayisi -> bot restart sinyali
+_MAX_RETRY = 10  # maksimum ardışık hata sayisi -> bot restart sinyali
 
 # ============================================================================
 # OTOMATIK DURUM GUNCELLEME
@@ -173,6 +190,7 @@ _MAX_RETRY = 10    # maksimum ardışık hata sayisi -> bot restart sinyali
 try:
     from reymen.sistem.ortak_komut import guncelle as durum_otomatik_guncelle
     from reymen.sistem.ortak_watchdog import watchdog_baslat
+
     durum_otomatik_guncelle()
     watchdog_baslat(interval=30)
 except Exception as e:
@@ -187,6 +205,7 @@ _aktif_gorev: Optional[dict] = None
 # ============================================================================
 # YARDIMCI FONKSIYONLAR — _api() ve gonder()
 # ============================================================================
+
 
 def _api(yontem: str, veri: dict = None, timeout: int = 30) -> dict:
     """Telegram HTTP API'sine istek gonder.
@@ -205,8 +224,10 @@ def _api(yontem: str, veri: dict = None, timeout: int = 30) -> dict:
     body = json.dumps(veri or {}).encode()
     try:
         import urllib.request
+
         req = urllib.request.Request(
-            url, data=body,
+            url,
+            data=body,
             headers={"Content-Type": "application/json"},
         )
         with urllib.request.urlopen(req, timeout=timeout) as r:
@@ -222,6 +243,7 @@ def _api_requests(yontem: str, veri: dict = None, timeout: int = 30) -> dict:
     """
     try:
         import requests
+
         url = f"{API_BASE}/{yontem}"
         r = requests.post(url, json=veri or {}, timeout=timeout)
         return r.json()
@@ -250,7 +272,7 @@ def gonder(chat_id: int | str, metin: str, parse_mode: str = "") -> dict:
         return _api("sendMessage", veri)
     # Cok uzunsa parcala
     for i in range(0, len(metin), sinir):
-        parca = metin[i:i + sinir]
+        parca = metin[i : i + sinir]
         veri = {"chat_id": chat_id, "text": parca}
         if parse_mode:
             veri["parse_mode"] = parse_mode
@@ -262,6 +284,7 @@ def gonder_requests(chat_id: int | str, metin: str) -> bool:
     """requests ile mesaj gonder (BotProcess icin)."""
     try:
         import requests
+
         r = requests.post(
             f"{API_BASE}/sendMessage",
             json={"chat_id": chat_id, "text": metin[:4096]},
@@ -283,6 +306,7 @@ def _izin_var(chat_id: int | str) -> bool:
 # ============================================================================
 # CRON MANAGER — Tam cron job yoneticisi
 # ============================================================================
+
 
 class CronManager:
     """Cron job yoneticisi — job ekle, sil, calistir, listele.
@@ -467,7 +491,9 @@ class BotProcess:
         _env_yukle()
         self.token = token
         self.bot_ad = bot_ad or self._bot_bilgisi_al()
-        self.ayar_dosyasi = _PROJE_KOK / ".ReYMeN" / f"ai_bot_{self.bot_ad.replace('@', '')}.json"
+        self.ayar_dosyasi = (
+            _PROJE_KOK / ".ReYMeN" / f"ai_bot_{self.bot_ad.replace('@', '')}.json"
+        )
         self.ayarlar: dict = dict(_VARSAYILAN_AYARLAR)
         self._beyin = None
         self._loop = None
@@ -488,6 +514,7 @@ class BotProcess:
             pass
         try:
             import requests
+
             r = requests.get(
                 f"https://api.telegram.org/bot{self.token}/getMe", timeout=5
             )
@@ -521,19 +548,20 @@ class BotProcess:
         Yeni bot veya yeni token geldiginde otomatik kaydedilir."""
         try:
             from reymen.sistem.durum import degisiklik_ekle
+
             durum_yolu = _PROJE_KOK / "durum.json"
             if durum_yolu.exists():
                 veri = json.loads(durum_yolu.read_text(encoding="utf-8"))
                 botlar = veri.get("botlar", {})
                 bot_adi_str = self.bot_ad  # "@ReYMeN_ReYMeNbot"
-                
+
                 # Bot zaten var mi? (bot_adi alanina gore kontrol et)
                 var = False
                 for key, val in botlar.items():
                     if isinstance(val, dict) and val.get("bot_adi", "") == bot_adi_str:
                         var = True
                         break
-                
+
                 if not var:
                     anahtar = bot_adi_str.replace("@", "").lower()
                     botlar[anahtar] = {
@@ -545,10 +573,12 @@ class BotProcess:
                         "terminal": "acik",
                         "web": "firecrawl",
                         "soul_boyut": 4799,
-                        "tools": "tum"
+                        "tools": "tum",
                     }
                     veri["botlar"] = botlar
-                    durum_yolu.write_text(json.dumps(veri, ensure_ascii=False, indent=2), encoding="utf-8")
+                    durum_yolu.write_text(
+                        json.dumps(veri, ensure_ascii=False, indent=2), encoding="utf-8"
+                    )
                     logger.info("[%s] ✅ Yeni bot durum.json'a eklendi!", self.bot_ad)
                     degisiklik_ekle(self.bot_ad, f"Bot otomatik eklendi: {self.bot_ad}")
                 else:
@@ -617,9 +647,13 @@ class BotProcess:
         # ConversationLoop (opsiyonel)
         if CONVERSATION_LOOP_CLS is not None:
             try:
-                self._loop = CONVERSATION_LOOP_CLS(beyin=self._beyin, motor=None, max_tur=5)
+                self._loop = CONVERSATION_LOOP_CLS(
+                    beyin=self._beyin, motor=None, max_tur=5
+                )
             except Exception as e:
-                logger.warning("[%s] ConversationLoop baslatma hatasi: %s", self.bot_ad, e)
+                logger.warning(
+                    "[%s] ConversationLoop baslatma hatasi: %s", self.bot_ad, e
+                )
 
         logger.info("[%s] Beyin aktif: %s / %s", self.bot_ad, provider, model)
 
@@ -634,12 +668,20 @@ class BotProcess:
         # 1. BING (en stabil)
         try:
             url = f"https://www.bing.com/search?q={_up.quote(sorgu)}&mkt=tr-TR"
-            headers = {"User-Agent": "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36"}
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36"
+            }
             r = _req.get(url, headers=headers, timeout=10)
-            sonuc = " | ".join(_re.findall(r'<li[^>]*class="b_algo"[^>]*>.*?<h2[^>]*>(.*?)</h2>', r.text, _re.DOTALL)[:5])
+            sonuc = " | ".join(
+                _re.findall(
+                    r'<li[^>]*class="b_algo"[^>]*>.*?<h2[^>]*>(.*?)</h2>',
+                    r.text,
+                    _re.DOTALL,
+                )[:5]
+            )
             if sonuc:
-                sonuc = _re.sub(r'<[^>]+>', '', sonuc)  # HTML tag temizligi
-                sonuc = _re.sub(r'&#\d+;', '', sonuc)   # HTML entity temizligi
+                sonuc = _re.sub(r"<[^>]+>", "", sonuc)  # HTML tag temizligi
+                sonuc = _re.sub(r"&#\d+;", "", sonuc)  # HTML entity temizligi
                 return sonuc.strip()
         except Exception as _e:
             logger.warning("[%s] Bing hatasi: %s", self.bot_ad, _e)
@@ -647,9 +689,13 @@ class BotProcess:
         # 2. DUCKDUCKGO FALLBACK
         try:
             url = f"https://html.duckduckgo.com/html/?q={_up.quote(sorgu)}"
-            headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+            }
             r = _req.get(url, headers=headers, timeout=10)
-            sonuc = " ".join(_re.findall(r'<a[^>]*class="result__a"[^>]*>(.*?)</a>', r.text)[:5])
+            sonuc = " ".join(
+                _re.findall(r'<a[^>]*class="result__a"[^>]*>(.*?)</a>', r.text)[:5]
+            )
             if sonuc:
                 return sonuc
         except Exception as e:
@@ -664,8 +710,11 @@ class BotProcess:
         """Komutu calistir ve ciktiyi dondur."""
         try:
             import subprocess as _sp
+
             r = _sp.run(komut, shell=True, capture_output=True, text=True, timeout=15)
-            cikti = r.stdout.strip()[:500] if r.stdout.strip() else r.stderr.strip()[:500]
+            cikti = (
+                r.stdout.strip()[:500] if r.stdout.strip() else r.stderr.strip()[:500]
+            )
             return cikti if cikti else "(cikti yok)"
         except Exception as e:
             logger.warning("[%s] Terminal hatasi: %s", self.bot_ad, e)
@@ -690,8 +739,10 @@ class BotProcess:
                     kayit = h[0] if isinstance(h[0], dict) else {}
                     guven = kayit.get("guven", 0) if isinstance(kayit, dict) else 0
                     if guven > 0.7:
-                        cozum = kayit.get("cozum", "") if isinstance(kayit, dict) else (
-                            kayit[3] if len(kayit) > 3 else ""
+                        cozum = (
+                            kayit.get("cozum", "")
+                            if isinstance(kayit, dict)
+                            else (kayit[3] if len(kayit) > 3 else "")
                         )
                         if cozum:
                             return cozum[:2000]
@@ -724,33 +775,59 @@ class BotProcess:
                             )
                     # ── TARIH VE TEMEL KURAL ───────────────────────────
                     from datetime import date as _date
+
                     sistem += f"\n\n[TEMEL KURAL: ÖNCE BAK, SONRA KONUŞ]\n"
                     sistem += f"BUGUNUN TARIHI: {_date.today()}\n"
                     sistem += "1. Önce web'den araştır. Web sonucu varsa SADECE onu kullan, kendi ezberinden ASLA tahmin etme.\n"
                     sistem += "2. Web sonucu yoksa 'güncel veri alınamadı' de, kendi bilginle tahmin etme.\n"
                     sistem += "3. Sorunu analiz et, adım adım çözüm sun, alternatifleri belirt.\n"
-                    sistem += "4. Selam/teşekkür gibi basit mesajlarda kısa cevap ver.\n"
+                    sistem += (
+                        "4. Selam/teşekkür gibi basit mesajlarda kısa cevap ver.\n"
+                    )
 
                     # ── TOOL OTOMATIK CALISTIRMA ─────────────────────
                     _tool_cikti = ""
                     _mesaj_lower = mesaj.lower()
 
                     # Web arama: soru/sikayet iceren her mesajda tetiklenir
-                    _soru_mi = ("?" in mesaj or "nedir" in _mesaj_lower or "nasıl" in _mesaj_lower
-                                or "ne" in _mesaj_lower or "mi" in _mesaj_lower
-                                or "kaç" in _mesaj_lower or "neden" in _mesaj_lower
-                                or len(mesaj.split()) >= 4)
-                    _selam_mi = _mesaj_lower.strip() in ["merhaba", "selam", "hey", "sa", "hi", "hello", "iyi günler"]
+                    _soru_mi = (
+                        "?" in mesaj
+                        or "nedir" in _mesaj_lower
+                        or "nasıl" in _mesaj_lower
+                        or "ne" in _mesaj_lower
+                        or "mi" in _mesaj_lower
+                        or "kaç" in _mesaj_lower
+                        or "neden" in _mesaj_lower
+                        or len(mesaj.split()) >= 4
+                    )
+                    _selam_mi = _mesaj_lower.strip() in [
+                        "merhaba",
+                        "selam",
+                        "hey",
+                        "sa",
+                        "hi",
+                        "hello",
+                        "iyi günler",
+                    ]
                     if _soru_mi and not _selam_mi:
-                        logger.info("[%s] 🔍 Web arama tetiklendi: %s", self.bot_ad, mesaj[:60])
+                        logger.info(
+                            "[%s] 🔍 Web arama tetiklendi: %s", self.bot_ad, mesaj[:60]
+                        )
                         _tool_cikti = self._tool_web_search(mesaj)
-                        logger.info("[%s] 🔍 Web sonucu (%d karakter): %s", self.bot_ad, len(_tool_cikti), _tool_cikti[:200])
+                        logger.info(
+                            "[%s] 🔍 Web sonucu (%d karakter): %s",
+                            self.bot_ad,
+                            len(_tool_cikti),
+                            _tool_cikti[:200],
+                        )
                         sistem += f"\n\n🔍 WEB ARAMA SONUCU:\n{_tool_cikti}\n"
 
                     # Terminal tetikleyicisi ($ ile baslayan komut)
                     if mesaj.strip().startswith("$") and len(mesaj.strip()) > 1:
                         _komut = mesaj.strip()[1:].strip()
-                        logger.info("[%s] 💻 Terminal tetiklendi: %s", self.bot_ad, _komut)
+                        logger.info(
+                            "[%s] 💻 Terminal tetiklendi: %s", self.bot_ad, _komut
+                        )
                         _term_cikti = self._tool_terminal(_komut)
                         sistem += f"\n\n💻 TERMINAL CIKTISI:\n{_term_cikti}\n"
 
@@ -766,9 +843,13 @@ class BotProcess:
                     for kayit in gecmis[-5:]:
                         if isinstance(kayit, dict):
                             if kayit.get("kullanici"):
-                                msg_list.append({"role": "user", "content": kayit["kullanici"]})
+                                msg_list.append(
+                                    {"role": "user", "content": kayit["kullanici"]}
+                                )
                             if kayit.get("asistan"):
-                                msg_list.append({"role": "assistant", "content": kayit["asistan"]})
+                                msg_list.append(
+                                    {"role": "assistant", "content": kayit["asistan"]}
+                                )
                     msg_list.append({"role": "user", "content": mesaj})
                     yanit = self._beyin.uret(sistem, msg_list)
                     sonuc["cevap"] = yanit.strip() if yanit else "Anlayamadim."
@@ -785,9 +866,13 @@ class BotProcess:
             else:
                 if ONCE_HAFIZA_KAYDET is not None:
                     try:
-                        ONCE_HAFIZA_KAYDET(mesaj, "bot_sohbet", sonuc["cevap"], basari=True)
+                        ONCE_HAFIZA_KAYDET(
+                            mesaj, "bot_sohbet", sonuc["cevap"], basari=True
+                        )
                     except Exception as _e:
-                        logger.warning("[TelegramBot] except Exception (L700): %s", Exception)
+                        logger.warning(
+                            "[TelegramBot] except Exception (L700): %s", Exception
+                        )
                         pass
                 self.konusma_ekle(mesaj, sonuc["cevap"])
 
@@ -828,15 +913,25 @@ class BotProcess:
         # — Kendi AI ayar komutlari (SADECE deepseek-v4-flash) —
         if komut == "/model":
             if not arg:
-                self.mesaj_gonder(chat_id, f"Model: {self.ayarlar.get('model')} (kilitli)")
+                self.mesaj_gonder(
+                    chat_id, f"Model: {self.ayarlar.get('model')} (kilitli)"
+                )
             else:
-                self.mesaj_gonder(chat_id, "❌ Model degistirme devre disi. Sadece deepseek-v4-flash kullanilir.")
+                self.mesaj_gonder(
+                    chat_id,
+                    "❌ Model degistirme devre disi. Sadece deepseek-v4-flash kullanilir.",
+                )
             return True
         elif komut == "/provider":
             if not arg:
-                self.mesaj_gonder(chat_id, f"Provider: {self.ayarlar.get('provider')} (kilitli)")
+                self.mesaj_gonder(
+                    chat_id, f"Provider: {self.ayarlar.get('provider')} (kilitli)"
+                )
             else:
-                self.mesaj_gonder(chat_id, "❌ Provider degistirme devre disi. Sadece deepseek kullanilir.")
+                self.mesaj_gonder(
+                    chat_id,
+                    "❌ Provider degistirme devre disi. Sadece deepseek kullanilir.",
+                )
             return True
         elif komut == "/sistem":
             if not arg:
@@ -914,7 +1009,9 @@ class BotProcess:
             )
             if not r.get("ok"):
                 if "409" in str(r.get("error", "")):
-                    logger.warning("[%s] 409 Conflict — offset sifirlaniyor.", self.bot_ad)
+                    logger.warning(
+                        "[%s] 409 Conflict — offset sifirlaniyor.", self.bot_ad
+                    )
                     offset = 0
                 raise RuntimeError(f"[{self.bot_ad}] API hatasi: {r}")
 
@@ -933,7 +1030,9 @@ class BotProcess:
                 if not text:
                     continue
 
-                logger.info("[%s] [%s] %s: %.60s", self.bot_ad, chat_id, from_user, text)
+                logger.info(
+                    "[%s] [%s] %s: %.60s", self.bot_ad, chat_id, from_user, text
+                )
 
                 if self.komut_isle(chat_id, text):
                     continue
@@ -956,10 +1055,10 @@ class BotProcess:
 # KOMUT HANDLERLARI (HTTP API modu icin)
 # ============================================================================
 
+
 def _cmd_start(msg: dict):
     """/start komutu."""
-    gonder(msg["chat"]["id"],
-           "ReYMeN ajan botuna hosgeldin!\n/help ile komutlari gor.")
+    gonder(msg["chat"]["id"], "ReYMeN ajan botuna hosgeldin!\n/help ile komutlari gor.")
 
 
 def _cmd_help(msg: dict):
@@ -1002,6 +1101,7 @@ def _cmd_run(msg: dict, hedef: str):
         _aktif_gorev = {"hedef": hedef, "iptal": iptal, "chat_id": cid}
         try:
             from reymen.sistem.main import AIAgentOrchestrator, CONFIG
+
             agent = AIAgentOrchestrator(config=CONFIG, max_tur=20, onay_iste=False)
 
             sonuc_listesi = [None]
@@ -1025,7 +1125,11 @@ def _cmd_run(msg: dict, hedef: str):
             if hata_listesi[0]:
                 gonder(cid, f"HATA:\n{hata_listesi[0][:500]}")
                 try:
-                    from reymen.sistem.ortak_komut import reasoning_loop as _rl, guncelle as _og
+                    from reymen.sistem.ortak_komut import (
+                        reasoning_loop as _rl,
+                        guncelle as _og,
+                    )
+
                     _rl(hata_listesi[0], str(_og())[:2000], "telegram_bot", [])
                 except Exception as e:
                     log.warning(f"[telegram_bot] Hafiza kaydi hatasi: {e}")
@@ -1071,7 +1175,9 @@ def _cmd_status(msg: dict):
             if ajanlar:
                 satirlar.append(f"Ajanlar ({len(ajanlar)}):")
                 for ad, bilgi in ajanlar.items():
-                    satirlar.append(f"  {ad}: {bilgi.get('durum', '?')} ({bilgi.get('platform', '?')})")
+                    satirlar.append(
+                        f"  {ad}: {bilgi.get('durum', '?')} ({bilgi.get('platform', '?')})"
+                    )
             else:
                 satirlar.append("Ajanlar: (liste bos)")
 
@@ -1081,11 +1187,15 @@ def _cmd_status(msg: dict):
             si = durum.get("tohum_self_improve", {})
             trend = si.get("trend_7gun", {})
             if trend:
-                satirlar.append(f"Self-improve: {trend.get('ortalama_skor', '?')} skor ({trend.get('gecme_orani', '?')} gecme)")
+                satirlar.append(
+                    f"Self-improve: {trend.get('ortalama_skor', '?')} skor ({trend.get('gecme_orani', '?')} gecme)"
+                )
 
             kk = si.get("kod_kalitesi", {})
             if kk:
-                satirlar.append(f"Kod: {kk.get('toplam_dosya', '?')} dosya, {kk.get('toplam_satir', '?')} satir")
+                satirlar.append(
+                    f"Kod: {kk.get('toplam_dosya', '?')} dosya, {kk.get('toplam_satir', '?')} satir"
+                )
 
             # Cron jobs
             cron_jobs = _cron_manager.list_jobs()
@@ -1102,6 +1212,7 @@ def _cmd_status(msg: dict):
         # Fallback: hardcoded kontroller
         try:
             import urllib.request
+
             urllib.request.urlopen("http://localhost:1234/v1/models", timeout=2)
             satirlar.append("LM Studio: AKTIF")
         except Exception:
@@ -1114,6 +1225,7 @@ def _cmd_status(msg: dict):
 
         try:
             from reymen.cereyan.closed_learning_loop import ClosedLearningLoop
+
             n = ClosedLearningLoop().toplam_beceri_sayisi()
             satirlar.append(f"Beceriler: {n}")
         except Exception:
@@ -1121,6 +1233,7 @@ def _cmd_status(msg: dict):
 
         try:
             from reymen.arac.kanban_orchestrator import AdvancedKanbanOrchestrator
+
             ozet = AdvancedKanbanOrchestrator().ozet()
             toplam = ozet.get("toplam", 0)
             satirlar.append(f"Kanban: {toplam} gorev")
@@ -1185,10 +1298,17 @@ def _cmd_clarify(msg: dict, hedef: str):
         return
     try:
         from tools.clarify_tool import run as clarify_run
+
         parcalar = hedef.split("|")
         soru = parcalar[0].strip()
-        secenekler = [s.strip() for s in parcalar[1].split(",")] if len(parcalar) > 1 and parcalar[1].strip() else None
-        varsayilan = parcalar[2].strip() if len(parcalar) > 2 and parcalar[2].strip() else ""
+        secenekler = (
+            [s.strip() for s in parcalar[1].split(",")]
+            if len(parcalar) > 1 and parcalar[1].strip()
+            else None
+        )
+        varsayilan = (
+            parcalar[2].strip() if len(parcalar) > 2 and parcalar[2].strip() else ""
+        )
         sonuc = clarify_run(soru=soru, secenekler=secenekler, varsayilan=varsayilan)
         gonder(cid, sonuc)
     except Exception as e:
@@ -1208,6 +1328,7 @@ def _cmd_exec(msg: dict, kod: str):
         return
     try:
         from tools.execute_code_tool import run as exec_run
+
         sonuc = exec_run(kod=kod)
         cikti = sonuc[:3000]
         gonder(cid, cikti)
@@ -1220,6 +1341,7 @@ def _cmd_beceriler(msg: dict):
     cid = msg["chat"]["id"]
     try:
         from reymen.cereyan.closed_learning_loop import ClosedLearningLoop
+
         beceriler = ClosedLearningLoop().tum_beceriler()
         if not beceriler:
             gonder(cid, "Hic beceri yok.")
@@ -1262,7 +1384,10 @@ def _cmd_cron(msg: dict, args: str):
         name = parts[1] if len(parts) > 1 else "job"
         command = parts[2] if len(parts) > 2 else name
         job_id = _cron_manager.add_job(name, command)
-        gonder(cid, f"Cron job eklendi:\n  Ad: {name}\n  ID: {job_id}\n  Komut: {command[:100]}")
+        gonder(
+            cid,
+            f"Cron job eklendi:\n  Ad: {name}\n  ID: {job_id}\n  Komut: {command[:100]}",
+        )
 
     elif alt_komut == "list":
         jobs = _cron_manager.list_jobs()
@@ -1272,7 +1397,12 @@ def _cmd_cron(msg: dict, args: str):
         lines = ["📊 Cron Jobs:\n"]
         for j in jobs[:10]:
             status = j.get("status", "?")
-            emoji = {"running": "🟢", "success": "✅", "failed": "❌", "pending": "⏳"}.get(status, "⚪")
+            emoji = {
+                "running": "🟢",
+                "success": "✅",
+                "failed": "❌",
+                "pending": "⏳",
+            }.get(status, "⚪")
             lines.append(f"{emoji} {j.get('name')} ({j.get('id', '')}) — {status}")
         gonder(cid, "\n".join(lines))
 
@@ -1300,6 +1430,7 @@ def _cmd_cron(msg: dict, args: str):
 # ============================================================================
 # MESAJ YONLENDIRICI (HTTP API modu)
 # ============================================================================
+
 
 def _isle(msg: dict):
     """Gelen mesaji komutlara yonlendir — once kendi handlerlar, sonra ortak komut modulu."""
@@ -1378,6 +1509,7 @@ def _isle(msg: dict):
 # POLLING (HTTP API modu)
 # ============================================================================
 
+
 def _polling_yonetici(ad: str, poll_fn, durma_events: Optional[list] = None):
     """Polling supervisor — exponential backoff + maksimum deneme + restart.
 
@@ -1403,15 +1535,20 @@ def _polling_yonetici(ad: str, poll_fn, durma_events: Optional[list] = None):
             return
         except Exception as e:
             ardisik_hata += 1
-            backoff = min(2 ** ardisik_hata, _MAX_BACKOFF)
+            backoff = min(2**ardisik_hata, _MAX_BACKOFF)
             logger.error(
                 "[%s] Polling hatasi (%d/%d): %s — %ds bekleniyor...",
-                ad, ardisik_hata, _MAX_RETRY, e, backoff,
+                ad,
+                ardisik_hata,
+                _MAX_RETRY,
+                e,
+                backoff,
             )
             if ardisik_hata >= _MAX_RETRY:
                 logger.critical(
                     "[%s] %d ardısık hata — bot yeniden baslatiliyor...",
-                    ad, _MAX_RETRY,
+                    ad,
+                    _MAX_RETRY,
                 )
                 time.sleep(5)
                 ardisik_hata = 0  # restart dongusu
@@ -1467,7 +1604,9 @@ if PTB_AVAILABLE:
         def __init__(self, token: str):
             _env_yukle()
             self.token = token
-            self.app = Application.builder().token(token).build() if Application else None
+            self.app = (
+                Application.builder().token(token).build() if Application else None
+            )
             self.cron = _cron_manager
             self._register_handlers()
 
@@ -1488,7 +1627,9 @@ if PTB_AVAILABLE:
             self.app.add_handler(CommandHandler("cron", self._ptb_cron))
 
             # Normal mesaj handler (komut disi)
-            self.app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, self._ptb_mesaj_handler))
+            self.app.add_handler(
+                MessageHandler(filters.TEXT & ~filters.COMMAND, self._ptb_mesaj_handler)
+            )
 
             # Fotograf handler
             self.app.add_handler(MessageHandler(filters.PHOTO, self._ptb_foto_handler))
@@ -1498,6 +1639,7 @@ if PTB_AVAILABLE:
 
             # Komut listesini kaydet
             import asyncio
+
             try:
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
@@ -1510,18 +1652,20 @@ if PTB_AVAILABLE:
         async def _bot_komutlarini_ayarla(self):
             """BotFather'a komut listesini kaydet."""
             try:
-                await self.app.bot.set_my_commands([
-                    ("start", "Botu baslat / menu"),
-                    ("run", "Job calistir: /run <hedef>"),
-                    ("status", "Sistem durumu"),
-                    ("logs", "Gateway loglari"),
-                    ("cancel", "Aktif gorevi iptal et"),
-                    ("clarify", "Talebi netlestir"),
-                    ("exec", "Python kodu calistir"),
-                    ("beceriler", "Beceri listesi"),
-                    ("cron", "Cron job yonetimi"),
-                    ("help", "Yardim"),
-                ])
+                await self.app.bot.set_my_commands(
+                    [
+                        ("start", "Botu baslat / menu"),
+                        ("run", "Job calistir: /run <hedef>"),
+                        ("status", "Sistem durumu"),
+                        ("logs", "Gateway loglari"),
+                        ("cancel", "Aktif gorevi iptal et"),
+                        ("clarify", "Talebi netlestir"),
+                        ("exec", "Python kodu calistir"),
+                        ("beceriler", "Beceri listesi"),
+                        ("cron", "Cron job yonetimi"),
+                        ("help", "Yardim"),
+                    ]
+                )
                 logger.info("Komut listesi Telegram'a kaydedildi")
             except Exception as e:
                 logger.warning("Komut listesi kaydedilemedi: %s", e)
@@ -1552,7 +1696,9 @@ if PTB_AVAILABLE:
             cid = update.message.chat_id
             hedef = " ".join(context.args) if context.args else ""
             if not hedef:
-                await update.message.reply_text("Kullanim: /run <hedef>\nOrnek: /run Python dosyasi olustur")
+                await update.message.reply_text(
+                    "Kullanim: /run <hedef>\nOrnek: /run Python dosyasi olustur"
+                )
                 return
 
             await update.message.reply_text(f"Gorev baslatiliyor: {hedef[:100]}...")
@@ -1594,7 +1740,9 @@ if PTB_AVAILABLE:
             mock_msg = {"chat": {"id": cid}}
             _cmd_cancel(mock_msg)
 
-        async def _ptb_clarify(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        async def _ptb_clarify(
+            self, update: Update, context: ContextTypes.DEFAULT_TYPE
+        ):
             cid = update.message.chat_id
             hedef = " ".join(context.args) if context.args else ""
             mock_msg = {"chat": {"id": cid}}
@@ -1606,7 +1754,9 @@ if PTB_AVAILABLE:
             mock_msg = {"chat": {"id": cid}}
             _cmd_exec(mock_msg, kod)
 
-        async def _ptb_beceriler(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        async def _ptb_beceriler(
+            self, update: Update, context: ContextTypes.DEFAULT_TYPE
+        ):
             cid = update.message.chat_id
             mock_msg = {"chat": {"id": cid}}
             _cmd_beceriler(mock_msg)
@@ -1617,7 +1767,9 @@ if PTB_AVAILABLE:
             mock_msg = {"chat": {"id": cid}}
             _cmd_cron(mock_msg, args)
 
-        async def _ptb_mesaj_handler(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        async def _ptb_mesaj_handler(
+            self, update: Update, context: ContextTypes.DEFAULT_TYPE
+        ):
             """Normal mesajlara AI ile yanit ver."""
             if not update.message or not update.message.text:
                 return
@@ -1635,7 +1787,9 @@ if PTB_AVAILABLE:
                             await update.message.reply_text(f"🧠 {_cevap}")
                             return
                 except Exception as _e:
-                    logger.warning("[TelegramBot] except Exception (L1541): %s", Exception)
+                    logger.warning(
+                        "[TelegramBot] except Exception (L1541): %s", Exception
+                    )
                     pass
 
             bekleme = await update.message.reply_text("Dusunuyorum...")
@@ -1645,8 +1799,12 @@ if PTB_AVAILABLE:
                 deepseek_key = os.environ.get("DEEPSEEK_API_KEY", "")
                 openrouter_key = os.environ.get("OPENROUTER_API_KEY", "")
                 cfg = {
-                    "default_provider": os.environ.get("ReYMeN_DEFAULT_PROVIDER", "deepseek"),
-                    "default_model": os.environ.get("ReYMeN_DEFAULT_MODEL", "deepseek-chat"),
+                    "default_provider": os.environ.get(
+                        "ReYMeN_DEFAULT_PROVIDER", "deepseek"
+                    ),
+                    "default_model": os.environ.get(
+                        "ReYMeN_DEFAULT_MODEL", "deepseek-chat"
+                    ),
                     "providers": {
                         "deepseek": {
                             "base_url": "https://api.deepseek.com",
@@ -1663,14 +1821,18 @@ if PTB_AVAILABLE:
                     _beyin = BEYIN_CLS(cfg)
                     _sistem = "Sen ReYMeN adinda yardimsever bir AI asistanisin. Kisa ve oz cevap ver. Turkce konus."
                     _yanit = _beyin.uret(_sistem, [{"role": "user", "content": metin}])
-                    _cevap = _yanit.strip() if _yanit else "Anlayamadim, tekrar dener misin?"
+                    _cevap = (
+                        _yanit.strip() if _yanit else "Anlayamadim, tekrar dener misin?"
+                    )
 
                     # Cevabi hafizaya kaydet
                     if ONCE_HAFIZA_KAYDET is not None:
                         try:
                             ONCE_HAFIZA_KAYDET(metin, "bot_sohbet", _cevap, basari=True)
                         except Exception as _e:
-                            logger.warning("[TelegramBot] except Exception (L1575): %s", Exception)
+                            logger.warning(
+                                "[TelegramBot] except Exception (L1575): %s", Exception
+                            )
                             pass
                 else:
                     _cevap = "AI modulu aktif degil."
@@ -1685,7 +1847,9 @@ if PTB_AVAILABLE:
                 logger.warning("[fix_01_sessiz_except] Exception")
             await update.message.reply_text(_cevap[:2000])
 
-        async def _ptb_foto_handler(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        async def _ptb_foto_handler(
+            self, update: Update, context: ContextTypes.DEFAULT_TYPE
+        ):
             """Telegram'a gonderilen fotografi analiz et."""
             if not update.message or not update.message.photo:
                 return
@@ -1693,12 +1857,14 @@ if PTB_AVAILABLE:
             dosya = await foto.get_file()
 
             import tempfile
+
             tmp = Path(tempfile.gettempdir()) / f"reymen_vision_{foto.file_id[:10]}.jpg"
 
             bekleme = await update.message.reply_text("🖼️ Gorsel analiz ediliyor...")
             try:
                 await dosya.download_to_drive(tmp)
                 from reymen.arac.araclar_goruntu import vision_analiz
+
                 sonuc = vision_analiz(
                     kaynak=str(tmp),
                     soru="Bu gorselde ne var? Detayli Turkce acikla.",
@@ -1713,7 +1879,9 @@ if PTB_AVAILABLE:
                 if tmp.exists():
                     tmp.unlink()
 
-        async def _ptb_error_handler(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        async def _ptb_error_handler(
+            self, update: Update, context: ContextTypes.DEFAULT_TYPE
+        ):
             """Hata handler."""
             logger.error("PTB Hatasi: %s | Update: %s", context.error, update)
 
@@ -1731,6 +1899,7 @@ if PTB_AVAILABLE:
 # ============================================================================
 # MOTOR ENTEGRASYON FONKSIYONLARI
 # ============================================================================
+
 
 def motor_bildirim_gonder(mesaj: str) -> str:
     """motor.py'den dogrudan Telegram bildirimi gonder.
@@ -1769,8 +1938,13 @@ def motor_kaydet(motor):
         return
     motor._plugin_arac_kaydet(
         "TELEGRAM_BOT_GONDER",
-        lambda metin="", chat_id="": motor_bildirim_gonder(metin) if not chat_id
-        else (gonder(chat_id, metin).get("ok") and "[Telegram] Gonderildi." or "[Telegram] Hata."),
+        lambda metin="", chat_id="": motor_bildirim_gonder(metin)
+        if not chat_id
+        else (
+            gonder(chat_id, metin).get("ok")
+            and "[Telegram] Gonderildi."
+            or "[Telegram] Hata."
+        ),
         "Telegram bot ile mesaj gonder (metin, chat_id: opsiyonel — bos=env'den)",
     )
 
@@ -1778,6 +1952,7 @@ def motor_kaydet(motor):
 # ============================================================================
 # ANA GIRIS
 # ============================================================================
+
 
 def main():
     """Ana giris noktasi.

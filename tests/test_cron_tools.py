@@ -24,6 +24,7 @@ sys.path.insert(0, os.path.join(ROOT, "tools"))
 
 # ── Yardımcı mock motor ─────────────────────────────────────────────────────
 
+
 class MockMotor:
     def __init__(self):
         self._araclar = {}
@@ -34,10 +35,12 @@ class MockMotor:
 
 # ── Fixture: geçici JSON dosyası ────────────────────────────────────────────
 
+
 @pytest.fixture(autouse=True)
 def gecici_cron_dosyasi(tmp_path, monkeypatch):
     dosya = str(tmp_path / "cron_jobs.json")
     import tools.cronjob_tools as ct
+
     monkeypatch.setattr(ct, "CRON_DOSYASI", dosya)
     # Scheduler singleton sıfırla
     monkeypatch.setattr(ct, "_scheduler_instance", None)
@@ -46,20 +49,28 @@ def gecici_cron_dosyasi(tmp_path, monkeypatch):
 
 # ── motor_kaydet testleri ────────────────────────────────────────────────────
 
+
 class TestMotorKaydet:
     def test_araclar_kayitli(self):
         from tools.cronjob_tools import motor_kaydet
+
         motor = MockMotor()
         motor_kaydet(motor)
         beklenen = {
-            "CRON_EKLE", "CRON_SIL", "CRON_LISTELE",
-            "CRON_CALISTIR", "CRON_BASLAT", "CRON_DURDUR",
-            "CRON_DURUM", "CRON_ZAMANLA",
+            "CRON_EKLE",
+            "CRON_SIL",
+            "CRON_LISTELE",
+            "CRON_CALISTIR",
+            "CRON_BASLAT",
+            "CRON_DURDUR",
+            "CRON_DURUM",
+            "CRON_ZAMANLA",
         }
         assert beklenen.issubset(set(motor._araclar.keys()))
 
     def test_cron_listele_araci_cagrilebilir(self):
         from tools.cronjob_tools import motor_kaydet
+
         motor = MockMotor()
         motor_kaydet(motor)
         sonuc = motor._araclar["CRON_LISTELE"]()
@@ -70,9 +81,11 @@ class TestMotorKaydet:
 
 # ── JSON tabanlı CRUD ────────────────────────────────────────────────────────
 
+
 class TestCronCRUD:
     def test_ekle_ve_listele(self):
         from tools.cronjob_tools import run
+
         r = run("ekle", "sabah_raporu", "09:00", "python rapor.py")
         assert json.loads(r)["durum"] == "basarili"
 
@@ -82,12 +95,14 @@ class TestCronCRUD:
 
     def test_gecersiz_zaman_formati(self):
         from tools.cronjob_tools import run
+
         r = json.loads(run("ekle", "test", "25:99", "echo x"))
         assert r["durum"] == "hata"
         assert "zaman" in r["mesaj"].lower()
 
     def test_sil(self):
         from tools.cronjob_tools import run
+
         run("ekle", "silinecek", "10:00", "echo x")
         r = json.loads(run("sil", "silinecek"))
         assert r["durum"] == "basarili"
@@ -95,26 +110,31 @@ class TestCronCRUD:
 
     def test_sil_olmayan(self):
         from tools.cronjob_tools import run
+
         r = json.loads(run("sil", "yok_olan"))
         assert r["durum"] == "hata"
 
     def test_ayni_ad_tekrar_eklenemez(self):
         from tools.cronjob_tools import run
+
         run("ekle", "tek", "08:00", "echo a")
         r = json.loads(run("ekle", "tek", "09:00", "echo b"))
         assert r["durum"] == "hata"
 
     def test_bilinmeyen_islem(self):
         from tools.cronjob_tools import run
+
         r = json.loads(run("yoktur"))
         assert r["durum"] == "hata"
 
 
 # ── CronScheduler daemon entegrasyonu ────────────────────────────────────────
 
+
 class TestSchedulerDaemon:
     def test_durum_calismıyor(self):
         from tools.cronjob_tools import _scheduler_durum
+
         r = json.loads(_scheduler_durum())
         # cron_scheduler import edilemezse hata döner (CI'da normal)
         assert r["durum"] in ("basarili", "hata")
@@ -125,7 +145,12 @@ class TestSchedulerDaemon:
         except ImportError:
             pytest.skip("cron_scheduler modülü yok")
 
-        from tools.cronjob_tools import _scheduler_baslat, _scheduler_durdur, _scheduler_durum
+        from tools.cronjob_tools import (
+            _scheduler_baslat,
+            _scheduler_durdur,
+            _scheduler_durum,
+        )
+
         r = json.loads(_scheduler_baslat())
         assert r["durum"] == "basarili"
 
@@ -145,6 +170,7 @@ class TestSchedulerDaemon:
             pytest.skip("cron_scheduler modülü yok")
 
         from tools.cronjob_tools import _scheduler_baslat
+
         _scheduler_baslat()
         r = json.loads(_scheduler_baslat())
         assert r["durum"] == "bilgi"  # zaten çalışıyor
@@ -152,22 +178,28 @@ class TestSchedulerDaemon:
 
 # ── CRON_ZAMANLA ─────────────────────────────────────────────────────────────
 
+
 class TestCronZamanla:
     def test_zamanla_eksik_parametre(self):
         from tools.cronjob_tools import _zamanla
+
         r = json.loads(_zamanla("", "echo x", ""))
         assert r["durum"] == "hata"
 
     def test_zamanla_scheduler_yok(self, monkeypatch):
         import tools.cronjob_tools as ct
+
         monkeypatch.setattr(ct, "_scheduler_instance", None)
         # CronScheduler import'ı başarısız yap
         import builtins
+
         _orijinal_import = builtins.__import__
+
         def _mock_import(name, *args, **kwargs):
             if name == "cron_scheduler":
                 raise ImportError("mock")
             return _orijinal_import(name, *args, **kwargs)
+
         monkeypatch.setattr(builtins, "__import__", _mock_import)
         r = json.loads(ct._zamanla("* * * * *", "echo x", "test"))
         assert r["durum"] == "hata"
@@ -179,6 +211,7 @@ class TestCronZamanla:
             pytest.skip("cron_scheduler modülü yok")
 
         from tools.cronjob_tools import _zamanla
+
         r = json.loads(_zamanla("0 9 * * *", "python rapor.py", "gunluk"))
         assert r["durum"] == "basarili"
         assert r["job_id"] == "gunluk"
@@ -190,6 +223,7 @@ class TestCronZamanla:
             pytest.skip("cron_scheduler modülü yok")
 
         from tools.cronjob_tools import _zamanla
+
         r = json.loads(_zamanla("*/5 * * * *", "echo x", ""))
         assert r["durum"] == "basarili"
         assert r["job_id"].startswith("job_")

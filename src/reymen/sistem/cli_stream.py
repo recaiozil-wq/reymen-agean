@@ -2,7 +2,9 @@ from contextlib import contextmanager
 import re, os, sys, time, shutil
 from pathlib import Path
 import logging
+
 logger = logging.getLogger(__name__)
+
 
 def _termux_example_image_path(filename: str = "cat.png") -> str:
     """Return a realistic example media path for the current Termux setup."""
@@ -36,7 +38,7 @@ def _split_path_input(raw: str) -> tuple[str, str]:
         pos = 1
         while pos < len(raw):
             ch = raw[pos]
-            if ch == '\\' and pos + 1 < len(raw):
+            if ch == "\\" and pos + 1 < len(raw):
                 pos += 2
                 continue
             if ch == quote:
@@ -49,14 +51,14 @@ def _split_path_input(raw: str) -> tuple[str, str]:
     pos = 0
     while pos < len(raw):
         ch = raw[pos]
-        if ch == '\\' and pos + 1 < len(raw) and raw[pos + 1] == ' ':
+        if ch == "\\" and pos + 1 < len(raw) and raw[pos + 1] == " ":
             pos += 2
-        elif ch == ' ':
+        elif ch == " ":
             break
         else:
             pos += 1
 
-    token = raw[:pos].replace('\\ ', ' ')
+    token = raw[:pos].replace("\\ ", " ")
     remainder = raw[pos:].strip()
     return token, remainder
 
@@ -72,9 +74,11 @@ def _resolve_attachment_path(raw_path: str) -> Path | None:
     if not token:
         return None
 
-    if (token.startswith('"') and token.endswith('"')) or (token.startswith("'") and token.endswith("'")):
+    if (token.startswith('"') and token.endswith('"')) or (
+        token.startswith("'") and token.endswith("'")
+    ):
         token = token[1:-1].strip()
-    token = token.replace('\\ ', ' ')
+    token = token.replace("\\ ", " ")
     if not token:
         return None
 
@@ -91,7 +95,12 @@ def _resolve_attachment_path(raw_path: str) -> Path | None:
     expanded = os.path.expandvars(os.path.expanduser(expanded))
     if os.name != "nt":
         normalized = expanded.replace("\\", "/")
-        if len(normalized) >= 3 and normalized[1] == ":" and normalized[2] == "/" and normalized[0].isalpha():
+        if (
+            len(normalized) >= 3
+            and normalized[1] == ":"
+            and normalized[2] == "/"
+            and normalized[0].isalpha()
+        ):
             expanded = f"/mnt/{normalized[0].lower()}/{normalized[3:]}"
     path = Path(expanded)
     if not path.is_absolute():
@@ -120,9 +129,6 @@ def _resolve_attachment_path(raw_path: str) -> Path | None:
     except OSError:
         return None
     return resolved
-
-
-
 
 
 def _detect_file_drop(user_input: str) -> "dict | None":
@@ -154,7 +160,12 @@ def _detect_file_drop(user_input: str) -> "dict | None":
         or stripped.startswith("./")
         or stripped.startswith("../")
         or stripped.startswith("file://")
-        or (len(stripped) >= 3 and stripped[1] == ":" and stripped[2] in {"\\", "/"} and stripped[0].isalpha())
+        or (
+            len(stripped) >= 3
+            and stripped[1] == ":"
+            and stripped[2] in {"\\", "/"}
+            and stripped[0].isalpha()
+        )
         or stripped.startswith('"/')
         or stripped.startswith('"~')
         or stripped.startswith("'/")
@@ -163,7 +174,13 @@ def _detect_file_drop(user_input: str) -> "dict | None":
         or stripped.startswith('"../')
         or stripped.startswith("'./")
         or stripped.startswith("'../")
-        or (len(stripped) >= 4 and stripped[0] in {"'", '"'} and stripped[2] == ":" and stripped[3] in {"\\", "/"} and stripped[1].isalpha())
+        or (
+            len(stripped) >= 4
+            and stripped[0] in {"'", '"'}
+            and stripped[2] == ":"
+            and stripped[3] in {"\\", "/"}
+            and stripped[1].isalpha()
+        )
     )
     if not starts_like_path:
         return None
@@ -197,7 +214,9 @@ def _detect_file_drop(user_input: str) -> "dict | None":
     }
 
 
-def _format_image_attachment_badges(attached_images: list[Path], image_counter: int, width: int | None = None) -> str:
+def _format_image_attachment_badges(
+    attached_images: list[Path], image_counter: int, width: int | None = None
+) -> str:
     """Format the attached-image badge row for the interactive CLI.
 
     Narrow terminals such as Termux should get a compact summary that fits on a
@@ -224,10 +243,7 @@ def _format_image_attachment_badges(attached_images: list[Path], image_counter: 
         return f"[📎 {first}] [+{extra}]"
 
     base = image_counter - len(attached_images) + 1
-    return " ".join(
-        f"[📎 Image #{base + i}]"
-        for i in range(len(attached_images))
-    )
+    return " ".join(f"[📎 Image #{base + i}]" for i in range(len(attached_images)))
 
 
 def _should_auto_attach_clipboard_image_on_paste(pasted_text: str) -> bool:
@@ -299,9 +315,7 @@ def _apply_bracketed_paste_timeout_patch() -> None:
                         _PtKeyPress(_PtKeys.BracketedPaste, paste_content)
                     )
                     self_parser._in_bracketed_paste = False
-                    remaining = self_parser._paste_buffer[
-                        end_index + len(end_mark):
-                    ]
+                    remaining = self_parser._paste_buffer[end_index + len(end_mark) :]
                     self_parser._paste_buffer = ""
                     self_parser._ReYMeN_bp_start = None
                     if remaining:
@@ -367,10 +381,10 @@ _TERMINAL_INPUT_MODE_RESET_SEQ = (
     "\x1b[?1004l"  # disable focus events
     "\x1b[?2004l"  # disable bracketed paste
     "\x1b[?1049l"  # leave alt screen (if stuck there)
-    "\x1b[<u"      # pop kitty keyboard mode
-    "\x1b[>4m"     # reset modifyOtherKeys
-    "\x1b[0m"      # reset text attributes
-    "\x1b[?25h"    # ensure cursor visible
+    "\x1b[<u"  # pop kitty keyboard mode
+    "\x1b[>4m"  # reset modifyOtherKeys
+    "\x1b[0m"  # reset text attributes
+    "\x1b[?25h"  # ensure cursor visible
 )
 
 
@@ -488,7 +502,9 @@ def _strip_leaked_terminal_responses(text: str) -> str:
     return cleaned
 
 
-def _collect_query_images(query: str | None, image_arg: str | None = None) -> tuple[str, list[Path]]:
+def _collect_query_images(
+    query: str | None, image_arg: str | None = None
+) -> tuple[str, list[Path]]:
     """Collect local image attachments for single-query CLI flows."""
     message = query or ""
     images: list[Path] = []
@@ -497,7 +513,9 @@ def _collect_query_images(query: str | None, image_arg: str | None = None) -> tu
         dropped = _detect_file_drop(message)
         if dropped and dropped.get("is_image"):
             images.append(dropped["path"])
-            message = dropped["remainder"] or f"[User attached image: {dropped['path'].name}]"
+            message = (
+                dropped["remainder"] or f"[User attached image: {dropped['path'].name}]"
+            )
 
     if image_arg:
         explicit_path = _resolve_attachment_path(image_arg)
@@ -529,6 +547,7 @@ class ChatConsole:
 
     def __init__(self):
         from io import StringIO
+
         self._buffer = StringIO()
         self._inner = Console(
             file=self._buffer,
@@ -560,6 +579,7 @@ class ChatConsole:
         """
         yield self
 
+
 # ASCII Art - ReYMeN-AGENT logo (full width, single line - requires ~95 char terminal)
 ReYMeN_AGENT_LOGO = """[bold #FFD700]██╗  ██╗███████╗██████╗ ███╗   ███╗███████╗███████╗       █████╗  ██████╗ ███████╗███╗   ██╗████████╗[/]
 [bold #FFD700]██║  ██║██╔════╝██╔══██╗████╗ ████║██╔════╝██╔════╝      ██╔══██╗██╔════╝ ██╔════╝████╗  ██║╚══██╔══╝[/]
@@ -586,11 +606,11 @@ ReYMeN_CADUCEUS = """[#CD7F32]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⡀⠀⣀⣀�
 [#B8860B]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]"""
 
 
-
 def _build_compact_banner() -> str:
     """Build a compact banner that fits the current terminal width."""
     try:
         from ReYMeN_cli.skin_engine import get_active_skin
+
         _skin = get_active_skin()
     except Exception:
         _skin = None
@@ -604,7 +624,11 @@ def _build_compact_banner() -> str:
         line1 = "⚕ NOUS ReYMeN - AI Agent Framework"
         tiny_line = "⚕ NOUS ReYMeN"
     else:
-        agent_name = _skin.get_branding("agent_name", "ReYMeN Agent") if _skin else "ReYMeN Agent"
+        agent_name = (
+            _skin.get_branding("agent_name", "ReYMeN Agent")
+            if _skin
+            else "ReYMeN Agent"
+        )
         line1 = f"{agent_name} - AI Agent Framework"
         tiny_line = agent_name
 
@@ -636,10 +660,10 @@ def _build_compact_banner() -> str:
     )
 
 
-
 # ============================================================================
 # Slash-command detection helper
 # ============================================================================
+
 
 def _looks_like_slash_command(text: str) -> bool:
     """Return True if *text* looks like a slash command, not a file path.
@@ -711,12 +735,15 @@ def _get_plugin_cmd_handler_names() -> set:
     """Return plugin command names (without slash prefix) for dispatch matching."""
     try:
         from ReYMeN_cli.plugins import get_plugin_commands
+
         return set(get_plugin_commands().keys())
     except Exception:
         return set()
 
 
-def _parse_skills_argument(skills: str | list[str] | tuple[str, ...] | None) -> list[str]:
+def _parse_skills_argument(
+    skills: str | list[str] | tuple[str, ...] | None,
+) -> list[str]:
     """Normalize a CLI skills flag into a deduplicated list of skill identifiers."""
     if not skills:
         return []
@@ -743,45 +770,43 @@ def _parse_skills_argument(skills: str | list[str] | tuple[str, ...] | None) -> 
 def save_config_value(key_path: str, value: any) -> bool:
     """
     Save a value to the active config file at the specified key path.
-    
+
     Respects the same lookup order as load_cli_config():
     1. ~/.ReYMeN/config.yaml (user config - preferred, used if it exists)
     2. ./cli-config.yaml (project config - fallback)
-    
+
     Args:
         key_path: Dot-separated path like "agent.system_prompt"
         value: Value to save
-    
+
     Returns:
         True if successful, False otherwise
     """
     # Use the same precedence as load_cli_config: user config first, then project config
-    user_config_path = _ReYMeN_home / 'config.yaml'
-    project_config_path = Path(__file__).parent / 'cli-config.yaml'
+    user_config_path = _ReYMeN_home / "config.yaml"
+    project_config_path = Path(__file__).parent / "cli-config.yaml"
     config_path = user_config_path if user_config_path.exists() else project_config_path
-    
+
     try:
         # Ensure parent directory exists (for ~/.ReYMeN/config.yaml on first use)
         config_path.parent.mkdir(parents=True, exist_ok=True)
-        
+
         # Save back atomically while preserving comments, ordering, quotes, and
         # readable Unicode in user-edited config.yaml.
         from reymen.sistem.utils import atomic_roundtrip_yaml_update
 
         atomic_roundtrip_yaml_update(config_path, key_path, value)
-        
+
         # Enforce owner-only permissions on config files (contain API keys)
         try:
             os.chmod(config_path, 0o600)
         except (OSError, NotImplementedError):
             logger.warning("[fix_01_sessiz_except] Exception")
-        
+
         return True
     except Exception as e:
         logger.error("Failed to save config: %s", e)
         return False
-
-
 
 
 # ============================================================================

@@ -12,7 +12,7 @@ def _handle_rollback_command(cli, command: str):
     """
     from tools.checkpoint_manager import format_checkpoint_list
 
-    if not hasattr(cli, 'agent') or not cli.agent:
+    if not hasattr(cli, "agent") or not cli.agent:
         print("  No active agent session.")
         return
 
@@ -59,7 +59,9 @@ def _handle_rollback_command(cli, command: str):
                     diff_lines = diff.splitlines()
                     if len(diff_lines) > 80:
                         print("\n".join(diff_lines[:80]))
-                        print(f"\n  ... ({len(diff_lines) - 80} more lines, showing first 80)")
+                        print(
+                            f"\n  ... ({len(diff_lines) - 80} more lines, showing first 80)"
+                        )
                     else:
                         print(f"\n{diff}")
         else:
@@ -82,9 +84,13 @@ def _handle_rollback_command(cli, command: str):
     result = mgr.restore(cwd, target_hash, file_path=file_path)
     if result["success"]:
         if file_path:
-            print(f"  ✅ Restored {file_path} from checkpoint {result['restored_to']}: {result['reason']}")
+            print(
+                f"  ✅ Restored {file_path} from checkpoint {result['restored_to']}: {result['reason']}"
+            )
         else:
-            print(f"  ✅ Restored to checkpoint {result['restored_to']}: {result['reason']}")
+            print(
+                f"  ✅ Restored to checkpoint {result['restored_to']}: {result['reason']}"
+            )
         print("  A pre-rollback snapshot was saved automatically.")
 
         # Also undo the last conversation turn so the agent's context

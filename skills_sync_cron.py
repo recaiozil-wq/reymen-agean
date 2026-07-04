@@ -40,14 +40,16 @@ def md_parse_meta(filepath: str, content: str) -> tuple[str, str]:
             for line in frontmatter.strip().split("\n"):
                 line = line.strip()
                 if line.startswith("description:"):
-                    aciklama = line[len("description:"):].strip().strip('"').strip("'")
+                    aciklama = line[len("description:") :].strip().strip('"').strip("'")
                 elif line.startswith("name:"):
                     if not aciklama:
-                        aciklama = line[len("name:"):].strip().strip('"').strip("'")
+                        aciklama = line[len("name:") :].strip().strip('"').strip("'")
                 elif line.startswith("category:"):
-                    kategori = line[len("category:"):].strip().strip('"').strip("'")
+                    kategori = line[len("category:") :].strip().strip('"').strip("'")
                 elif line.startswith("tags:"):
-                    kategori = kategori or line[len("tags:"):].strip().strip('"').strip("'")
+                    kategori = kategori or line[len("tags:") :].strip().strip(
+                        '"'
+                    ).strip("'")
 
     # Fallback: use first non-empty line
     if not aciklama:
@@ -151,9 +153,7 @@ def main() -> tuple[int, int, int]:
 
     existing = {}
     try:
-        rows = con.execute(
-            "SELECT ad, dosya_hash FROM beceriler_meta"
-        ).fetchall()
+        rows = con.execute("SELECT ad, dosya_hash FROM beceriler_meta").fetchall()
         existing = {row[0]: row[1] for row in rows}
     except Exception:
         pass
@@ -183,7 +183,9 @@ def main() -> tuple[int, int, int]:
 
         update_skill_in_db(con, ad, content, aciklama, kaynak, kategori, current_hash)
         con.commit()
-        logger.info("[%s] %s (%d chars, hash=%s)", action, ad, len(content), current_hash[:12])
+        logger.info(
+            "[%s] %s (%d chars, hash=%s)", action, ad, len(content), current_hash[:12]
+        )
 
     # Remove rows for files that no longer exist on disk
     all_file_names = {fp.name for fp in md_files}
@@ -197,7 +199,10 @@ def main() -> tuple[int, int, int]:
 
     logger.info(
         "Sync complete: %d new, %d updated, %d removed (total: %d)",
-        new_count, updated_count, len(orphans), len(md_files)
+        new_count,
+        updated_count,
+        len(orphans),
+        len(md_files),
     )
     return new_count, updated_count, len(orphans)
 

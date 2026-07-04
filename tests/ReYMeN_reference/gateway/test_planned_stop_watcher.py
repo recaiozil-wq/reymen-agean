@@ -86,9 +86,9 @@ def test_watcher_fires_shutdown_when_marker_appears(tmp_path, monkeypatch):
     watcher.join(timeout=2.0)
 
     assert not watcher.is_alive(), "Watcher should exit after firing"
-    assert len(loop._captured) == 1, (
-        f"Expected exactly one shutdown invocation, got {loop._captured}"
-    )
+    assert (
+        len(loop._captured) == 1
+    ), f"Expected exactly one shutdown invocation, got {loop._captured}"
     fn, args = loop._captured[0]
     assert fn is shutdown_handler
     # The handler must be called with signal=None (planned stop sentinel).
@@ -101,6 +101,7 @@ def test_watcher_does_not_fire_when_marker_absent(tmp_path, monkeypatch):
     # Deliberately do NOT create the marker.
 
     from gateway import status as status_mod
+
     monkeypatch.setattr(status_mod, "_get_planned_stop_marker_path", lambda: marker)
 
     runner = _FakeRunner(running=True, draining=False)
@@ -120,9 +121,9 @@ def test_watcher_does_not_fire_when_marker_absent(tmp_path, monkeypatch):
     watcher.join(timeout=2.0)
 
     assert not watcher.is_alive()
-    assert loop._captured == [], (
-        f"No marker present, but watcher fired shutdown: {loop._captured}"
-    )
+    assert (
+        loop._captured == []
+    ), f"No marker present, but watcher fired shutdown: {loop._captured}"
     shutdown_handler.assert_not_called()
 
 
@@ -166,6 +167,7 @@ def test_watcher_skips_when_runner_not_started(tmp_path, monkeypatch):
     marker.write_text('{"target_pid": 9999}', encoding="utf-8")
 
     from gateway import status as status_mod
+
     monkeypatch.setattr(status_mod, "_get_planned_stop_marker_path", lambda: marker)
 
     runner = _FakeRunner(running=False, draining=False)
@@ -191,6 +193,7 @@ def test_watcher_responds_to_stop_event_promptly(tmp_path, monkeypatch):
     """Setting stop_event must exit the watcher within ~poll_interval seconds."""
     marker = tmp_path / ".gateway-planned-stop.json"
     from gateway import status as status_mod
+
     monkeypatch.setattr(status_mod, "_get_planned_stop_marker_path", lambda: marker)
 
     runner = _FakeRunner(running=True, draining=False)
@@ -253,6 +256,7 @@ def test_watcher_tolerates_marker_path_resolution_errors(tmp_path, monkeypatch, 
     from gateway import status as status_mod
 
     call_count = [0]
+
     def explode():
         call_count[0] += 1
         # First call (the one outside the loop, at thread start) is fine —
@@ -329,9 +333,9 @@ def test_watcher_does_not_fire_for_foreign_pid_marker(tmp_path, monkeypatch):
     watcher.join(timeout=2.0)
 
     assert not watcher.is_alive()
-    assert loop._captured == [], (
-        f"Watcher fired on a foreign-PID marker (#34597 regression): {loop._captured}"
-    )
+    assert (
+        loop._captured == []
+    ), f"Watcher fired on a foreign-PID marker (#34597 regression): {loop._captured}"
     shutdown_handler.assert_not_called()
     # Foreign (but live) marker is left in place — it may still belong to
     # the process it names.
@@ -368,7 +372,9 @@ def test_watcher_cleans_up_stale_marker_and_keeps_running(tmp_path, monkeypatch)
     assert not marker.exists(), "Stale marker should have been cleaned up"
 
 
-def test_planned_stop_marker_targets_self_probe_is_non_destructive(tmp_path, monkeypatch):
+def test_planned_stop_marker_targets_self_probe_is_non_destructive(
+    tmp_path, monkeypatch
+):
     """The probe returns True for a self-marker WITHOUT unlinking it.
 
     The shutdown handler performs the authoritative consume on its own

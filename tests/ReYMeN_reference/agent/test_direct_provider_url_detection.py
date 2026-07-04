@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import sys, os
+
 # ReYMeN's AIAgent lives in reymen/sistem/run_agent.py
-_reymen_root = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+_reymen_root = os.path.normpath(
+    os.path.join(os.path.dirname(__file__), "..", "..", "..")
+)
 _sistem_path = os.path.join(_reymen_root, "reymen", "sistem")
 if _sistem_path not in sys.path:
     sys.path.insert(0, _sistem_path)

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Testler: reymen.cereyan.stream_diagnostics"""
+
 import time
 import pytest
 from reymen.cereyan.stream_diagnostics import (

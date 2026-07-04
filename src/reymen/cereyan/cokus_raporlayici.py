@@ -65,7 +65,11 @@ def cokus_raporu_uret(
         hata_metni = "  (Hata kaydi yok)"
 
     # Denenen ajanlari formatla
-    ajan_metni = ", ".join(sorted(set(denenen_ajanlar))) if denenen_ajanlar else "Henuz ajan secilmemisti."
+    ajan_metni = (
+        ", ".join(sorted(set(denenen_ajanlar)))
+        if denenen_ajanlar
+        else "Henuz ajan secilmemisti."
+    )
 
     # Rapor sablonu (ReYMeN stili)
     rapor = f"""
@@ -135,7 +139,7 @@ if __name__ == "__main__":
         deneme_sayisi=10,
         hata_gecmisi=ornek_hata,
         denenen_ajanlar=["genel_cozucu", "kod_uzmani", "sistem_mimari"],
-        tiklanma_nedeni="API rate limit + SSL sertifikasi uyumsuzlugu."
+        tiklanma_nedeni="API rate limit + SSL sertifikasi uyumsuzlugu.",
     )
 
     # Son 500 karakteri goster

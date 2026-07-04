@@ -28,10 +28,13 @@ def curator_env(tmp_path, monkeypatch, capsys):
     monkeypatch.setattr(Path, "home", lambda: tmp_path)
 
     import ReYMeN_constants
+
     importlib.reload(ReYMeN_constants)
     from agent import curator
+
     importlib.reload(curator)
     from ReYMeN_cli import main as ReYMeN_main
+
     importlib.reload(ReYMeN_main)
 
     yield {

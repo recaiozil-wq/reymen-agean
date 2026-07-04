@@ -28,6 +28,7 @@ NISAN_DIZINI = Path(__file__).parent / ".ReYMeN" / "nisanlar"
 try:
     import cv2 as _cv2
     import numpy as _np
+
     _OPENCV_VAR = True
 except ImportError:
     _OPENCV_VAR = False
@@ -35,6 +36,7 @@ except ImportError:
 # mss (opsiyonel)
 try:
     import mss as _mss
+
     _MSS_VAR = True
 except ImportError:
     _MSS_VAR = False
@@ -42,6 +44,7 @@ except ImportError:
 # PIL (opsiyonel)
 try:
     from PIL import Image as _PIL_Image, ImageGrab as _PIL_Grab
+
     _PIL_VAR = True
 except ImportError:
     _PIL_VAR = False
@@ -49,6 +52,7 @@ except ImportError:
 # pytesseract (opsiyonel)
 try:
     import pytesseract as _pytesseract
+
     _TESSERACT_VAR = True
 except ImportError:
     _TESSERACT_VAR = False
@@ -67,23 +71,61 @@ class NisanBulucu:
 
     # Bilinen sablon -> DOM lokator donusumleri
     _SABLON_DOM = {
-        "giris_buton": ["//button[@type='submit']", "//input[@type='submit']",
-                        "//button[contains(text(), 'Giriş')]", "//button[contains(text(), 'Login')]",
-                        "//a[contains(text(), 'Giriş')]", "//a[contains(text(), 'Login')]"],
-        "kayit_buton": ["//a[contains(text(), 'Kayıt')]", "//a[contains(text(), 'Register')]",
-                        "//button[contains(text(), 'Kaydol')]", "//button[contains(text(), 'Register')]"],
-        "captcha_kutu": ["//iframe[contains(@src, 'recaptcha')]", "//div[@class='g-recaptcha']",
-                         "//div[contains(@class, 'captcha')]", "//img[contains(@src, 'captcha')]"],
-        "onay_kutusu":  ["//input[@type='checkbox']", "//*[@role='checkbox']",
-                         "//label[contains(text(), 'onay')]", "//label[contains(text(), 'accept')]"],
-        "ad_alani":     ["//input[@name='ad']", "//input[@name='firstname']", "//input[@name='first_name']",
-                         "//input[@placeholder='Ad']", "//input[@id='ad']"],
-        "soyad_alani":  ["//input[@name='soyad']", "//input[@name='lastname']", "//input[@name='last_name']"],
-        "eposta_alani": ["//input[@type='email']", "//input[@name='email']", "//input[@name='e-posta']"],
-        "sifre_alani":  ["//input[@type='password']"],
-        "adres_alani":  ["//textarea[@name='adres']", "//textarea[@name='address']",
-                         "//input[@name='address']", "//input[@name='adres']"],
-        "telefon_alani":["//input[@type='tel']", "//input[@name='phone']", "//input[@name='telefon']"],
+        "giris_buton": [
+            "//button[@type='submit']",
+            "//input[@type='submit']",
+            "//button[contains(text(), 'Giriş')]",
+            "//button[contains(text(), 'Login')]",
+            "//a[contains(text(), 'Giriş')]",
+            "//a[contains(text(), 'Login')]",
+        ],
+        "kayit_buton": [
+            "//a[contains(text(), 'Kayıt')]",
+            "//a[contains(text(), 'Register')]",
+            "//button[contains(text(), 'Kaydol')]",
+            "//button[contains(text(), 'Register')]",
+        ],
+        "captcha_kutu": [
+            "//iframe[contains(@src, 'recaptcha')]",
+            "//div[@class='g-recaptcha']",
+            "//div[contains(@class, 'captcha')]",
+            "//img[contains(@src, 'captcha')]",
+        ],
+        "onay_kutusu": [
+            "//input[@type='checkbox']",
+            "//*[@role='checkbox']",
+            "//label[contains(text(), 'onay')]",
+            "//label[contains(text(), 'accept')]",
+        ],
+        "ad_alani": [
+            "//input[@name='ad']",
+            "//input[@name='firstname']",
+            "//input[@name='first_name']",
+            "//input[@placeholder='Ad']",
+            "//input[@id='ad']",
+        ],
+        "soyad_alani": [
+            "//input[@name='soyad']",
+            "//input[@name='lastname']",
+            "//input[@name='last_name']",
+        ],
+        "eposta_alani": [
+            "//input[@type='email']",
+            "//input[@name='email']",
+            "//input[@name='e-posta']",
+        ],
+        "sifre_alani": ["//input[@type='password']"],
+        "adres_alani": [
+            "//textarea[@name='adres']",
+            "//textarea[@name='address']",
+            "//input[@name='address']",
+            "//input[@name='adres']",
+        ],
+        "telefon_alani": [
+            "//input[@type='tel']",
+            "//input[@name='phone']",
+            "//input[@name='telefon']",
+        ],
     }
 
     def __init__(self, guven_esigi: float = _GUVEN_ESIGI) -> None:
@@ -92,8 +134,9 @@ class NisanBulucu:
 
     # ── Ana API ────────────────────────────────────────────────────────
 
-    def bul(self, hedef: str, driver: Any = None,
-            metin_alternatif: str = "") -> Dict[str, Any]:
+    def bul(
+        self, hedef: str, driver: Any = None, metin_alternatif: str = ""
+    ) -> Dict[str, Any]:
         """3 asamali hiyerarsi ile hedefi bul.
 
         Args:
@@ -124,8 +167,15 @@ class NisanBulucu:
             if sonuc:
                 return sonuc
 
-        return {"asama": 0, "x": 0, "y": 0, "guven": 0.0,
-                "metin": "", "element": None, "hata": f"Hedef bulunamadi: {hedef}"}
+        return {
+            "asama": 0,
+            "x": 0,
+            "y": 0,
+            "guven": 0.0,
+            "metin": "",
+            "element": None,
+            "hata": f"Hedef bulunamadi: {hedef}",
+        }
 
     # ── Asama 1: DOM ──────────────────────────────────────────────────
 
@@ -135,6 +185,7 @@ class NisanBulucu:
             from selenium.webdriver.support.ui import WebDriverWait
             from selenium.webdriver.support import expected_conditions as EC
             from selenium.webdriver.common.by import By
+
             for secici in seciciler:
                 try:
                     element = WebDriverWait(driver, 3).until(
@@ -185,8 +236,13 @@ class NisanBulucu:
                 h, w = sablon.shape[:2]
                 merkez_x = max_loc[0] + w // 2
                 merkez_y = max_loc[1] + h // 2
-                logger.info("[Nisan] Sablon bulundu: %s (guven: %.2f, konum: %d,%d)",
-                           sablon_yolu.name, max_val, merkez_x, merkez_y)
+                logger.info(
+                    "[Nisan] Sablon bulundu: %s (guven: %.2f, konum: %d,%d)",
+                    sablon_yolu.name,
+                    max_val,
+                    merkez_x,
+                    merkez_y,
+                )
                 return {
                     "asama": 2,
                     "x": merkez_x,
@@ -196,8 +252,12 @@ class NisanBulucu:
                     "element": None,
                 }
             else:
-                logger.debug("[Nisan] Sablon eslesmedi: %s (guven: %.2f < %.2f)",
-                            sablon_yolu.name, max_val, self.guven_esigi)
+                logger.debug(
+                    "[Nisan] Sablon eslesmedi: %s (guven: %.2f < %.2f)",
+                    sablon_yolu.name,
+                    max_val,
+                    self.guven_esigi,
+                )
         except Exception as e:
             logger.debug("[Nisan] Sablon arama hatasi: %s", e)
         return None
@@ -225,15 +285,23 @@ class NisanBulucu:
                 img = _PIL_Image.frombytes("RGB", goruntu.size, goruntu.rgb)
 
             # pytesseract ile veri al (konum bilgisi icin)
-            veri = _pytesseract.image_to_data(img, lang="tur+eng", output_type=_pytesseract.Output.DICT)
+            veri = _pytesseract.image_to_data(
+                img, lang="tur+eng", output_type=_pytesseract.Output.DICT
+            )
 
             for i, metin in enumerate(veri["text"]):
                 if metin and aranan.lower() in metin.lower():
                     x = veri["left"][i] + veri["width"][i] // 2
                     y = veri["top"][i] + veri["height"][i] // 2
                     guven = veri["conf"][i] / 100.0 if veri["conf"][i] != "-1" else 0.5
-                    logger.info("[Nisan] OCR bulundu: '%s' (%s) -> (%d,%d) guven=%.2f",
-                               metin, aranan, x, y, guven)
+                    logger.info(
+                        "[Nisan] OCR bulundu: '%s' (%s) -> (%d,%d) guven=%.2f",
+                        metin,
+                        aranan,
+                        x,
+                        y,
+                        guven,
+                    )
                     return {
                         "asama": 3,
                         "x": x,
@@ -252,8 +320,9 @@ class NisanBulucu:
 _nisan_bulucu: Optional[NisanBulucu] = None
 
 
-def nisan_bul(hedef: str, driver: Any = None,
-              metin_alternatif: str = "") -> Dict[str, Any]:
+def nisan_bul(
+    hedef: str, driver: Any = None, metin_alternatif: str = ""
+) -> Dict[str, Any]:
     """Kuresel NisanBulucu ornegini kullanarak hedef bul (motor.py icin)."""
     global _nisan_bulucu
     if _nisan_bulucu is None:

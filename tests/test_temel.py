@@ -37,6 +37,7 @@ def test_mcp_client_import():
     """MCP client modulu import edilebiliyor mu?"""
     try:
         from reymen.arac.mcp_client_tool import MCPClientHTTP
+
         assert MCPClientHTTP is not None
     except Exception as e:
         pytest.fail(f"MCPClientHTTP import hatasi: {e}")
@@ -46,6 +47,7 @@ def test_vision_tools_import():
     """Vision tools modulu import edilebiliyor mu?"""
     try:
         from reymen.cereyan.tools.vision_tools import vision_analiz
+
         assert callable(vision_analiz)
     except Exception as e:
         pytest.fail(f"vision_tools import hatasi: {e}")

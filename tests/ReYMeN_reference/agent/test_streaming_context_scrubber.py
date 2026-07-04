@@ -125,7 +125,10 @@ class TestStreamingContextScrubberPartialTagFalsePositives:
             + s.feed("there was no matching fact.")
             + s.flush()
         )
-        assert out == "In that previous `<memory-context>` block, there was no matching fact."
+        assert (
+            out
+            == "In that previous `<memory-context>` block, there was no matching fact."
+        )
 
     def test_mid_sentence_memory_context_mention_is_not_scrubbed(self):
         """Only block-like memory-context spans are treated as leaked context."""
@@ -141,7 +144,10 @@ class TestStreamingContextScrubberPartialTagFalsePositives:
             + s.feed("<memory-context> is the literal tag name mentioned here.")
             + s.flush()
         )
-        assert out == "Visible intro\n<memory-context> is the literal tag name mentioned here."
+        assert (
+            out
+            == "Visible intro\n<memory-context> is the literal tag name mentioned here."
+        )
 
 
 class TestStreamingContextScrubberUnterminatedSpan:

@@ -3,6 +3,7 @@
 Bu modül, Hermes Agent'in tools/tts_tool.py'sini taklit eder.
 Tüm işlevler ReYMeN'in voice_engine.py'sine yönlendirilir.
 """
+
 from __future__ import annotations
 
 import logging
@@ -14,6 +15,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 # TTS Config
 # ---------------------------------------------------------------------------
+
 
 def _load_tts_config() -> Dict[str, Any]:
     """Hermes TTS config formatını taklit eder. Env var'dan okur."""
@@ -84,6 +86,7 @@ def stream_tts_to_speaker(
 # text_to_speech_tool — ana TTS fonksiyonu
 # ---------------------------------------------------------------------------
 
+
 def text_to_speech_tool(
     text: str,
     voice: Optional[str] = None,
@@ -112,8 +115,14 @@ def text_to_speech_tool(
 
         result = registry.seslendir(effective_provider, text, effective_voice)
 
-        if output_path and result and not result.startswith("[") and os.path.exists(result):
+        if (
+            output_path
+            and result
+            and not result.startswith("[")
+            and os.path.exists(result)
+        ):
             import shutil
+
             shutil.copy(result, output_path)
 
         return json.dumps({"success": True, "output": result})
@@ -125,6 +134,7 @@ def text_to_speech_tool(
 # ---------------------------------------------------------------------------
 # speech_to_text_tool
 # ---------------------------------------------------------------------------
+
 
 def speech_to_text_tool(
     audio_path: str,

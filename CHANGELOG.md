@@ -101,7 +101,7 @@
 ### 🏗️ Mimari Düzeltmeler
 
 #### Skill Sync (Profiller Arası Eşitleme)
-- **Ne:** 
+- **Ne:**
   - default/skills/ (0→447) — reymen'den kopyalandı
   - kiral38/skills/ (25→453) — reymen'den kopyalandı + 6 özel korundu
 - **Neden:** 3 bot eşit yetenek seviyesinde olmalı. kiral38'de sadece 25 skill vardı (bilinçli kısıtlama değil, self-improvement cron job'ı sadece reymen'e eklemişti).

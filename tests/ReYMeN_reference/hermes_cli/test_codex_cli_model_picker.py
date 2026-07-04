@@ -38,22 +38,29 @@ def ReYMeN_auth_only_env(tmp_path, monkeypatch):
     # Point CODEX_HOME to nonexistent dir to prove it's not needed
     monkeypatch.setenv("CODEX_HOME", str(tmp_path / "no_codex"))
 
-    (ReYMeN_home / "auth.json").write_text(json.dumps({
-        "version": 2,
-        "providers": {
-            "openai-codex": {
-                "tokens": {
-                    "access_token": _make_fake_jwt(),
-                    "refresh_token": "fake-refresh",
+    (ReYMeN_home / "auth.json").write_text(
+        json.dumps(
+            {
+                "version": 2,
+                "providers": {
+                    "openai-codex": {
+                        "tokens": {
+                            "access_token": _make_fake_jwt(),
+                            "refresh_token": "fake-refresh",
+                        },
+                        "last_refresh": "2026-04-12T00:00:00Z",
+                    }
                 },
-                "last_refresh": "2026-04-12T00:00:00Z",
             }
-        },
-    }))
+        )
+    )
 
     for var in [
-        "OPENROUTER_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY",
-        "NOUS_API_KEY", "DEEPSEEK_API_KEY",
+        "OPENROUTER_API_KEY",
+        "OPENAI_API_KEY",
+        "ANTHROPIC_API_KEY",
+        "NOUS_API_KEY",
+        "DEEPSEEK_API_KEY",
     ]:
         monkeypatch.delenv(var, raising=False)
 
@@ -72,18 +79,28 @@ def test_normal_path_still_works(ReYMeN_auth_only_env):
     assert "openai-codex" in slugs
 
 
-def test_codex_picker_uses_live_codex_catalog(ReYMeN_auth_only_env, tmp_path, monkeypatch):
+def test_codex_picker_uses_live_codex_catalog(
+    ReYMeN_auth_only_env, tmp_path, monkeypatch
+):
     """The gateway /model picker should surface Codex CLI-only listed models."""
     from ReYMeN_cli.model_switch import list_authenticated_providers
 
     codex_home = tmp_path / "codex-home"
     codex_home.mkdir()
-    (codex_home / "models_cache.json").write_text(json.dumps({
-        "models": [
-            {"slug": "gpt-5.5", "priority": 0, "supported_in_api": True},
-            {"slug": "gpt-5.3-codex-spark", "priority": 7, "supported_in_api": False},
-        ]
-    }))
+    (codex_home / "models_cache.json").write_text(
+        json.dumps(
+            {
+                "models": [
+                    {"slug": "gpt-5.5", "priority": 0, "supported_in_api": True},
+                    {
+                        "slug": "gpt-5.3-codex-spark",
+                        "priority": 7,
+                        "supported_in_api": False,
+                    },
+                ]
+            }
+        )
+    )
     monkeypatch.setenv("CODEX_HOME", str(codex_home))
     # Force the cache fallback path — without this the test issues a real
     # 10s HTTP probe to chatgpt.com/backend-api/codex/models which is both
@@ -115,28 +132,34 @@ def claude_code_only_env(tmp_path, monkeypatch):
     # No Codex CLI
     monkeypatch.setenv("CODEX_HOME", str(tmp_path / "no_codex"))
 
-    (ReYMeN_home / "auth.json").write_text(
-        json.dumps({"version": 2, "providers": {}})
-    )
+    (ReYMeN_home / "auth.json").write_text(json.dumps({"version": 2, "providers": {}}))
 
     # Claude Code credentials in the correct format
     claude_dir = tmp_path / ".claude"
     claude_dir.mkdir()
-    (claude_dir / ".credentials.json").write_text(json.dumps({
-        "claudeAiOauth": {
-            "accessToken": _make_fake_jwt(),
-            "refreshToken": "fake-refresh",
-            "expiresAt": int(time.time() * 1000) + 3_600_000,
-        }
-    }))
+    (claude_dir / ".credentials.json").write_text(
+        json.dumps(
+            {
+                "claudeAiOauth": {
+                    "accessToken": _make_fake_jwt(),
+                    "refreshToken": "fake-refresh",
+                    "expiresAt": int(time.time() * 1000) + 3_600_000,
+                }
+            }
+        )
+    )
 
     # Patch Path.home() so the adapter finds the file
     monkeypatch.setattr(Path, "home", classmethod(lambda cls: tmp_path))
 
     for var in [
-        "OPENROUTER_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY",
-        "ANTHROPIC_TOKEN", "CLAUDE_CODE_OAUTH_TOKEN",
-        "NOUS_API_KEY", "DEEPSEEK_API_KEY",
+        "OPENROUTER_API_KEY",
+        "OPENAI_API_KEY",
+        "ANTHROPIC_API_KEY",
+        "ANTHROPIC_TOKEN",
+        "CLAUDE_CODE_OAUTH_TOKEN",
+        "NOUS_API_KEY",
+        "DEEPSEEK_API_KEY",
     ]:
         monkeypatch.delenv(var, raising=False)
 
@@ -152,9 +175,9 @@ def test_claude_code_file_detected_by_model_picker(claude_code_only_env):
         max_models=10,
     )
     slugs = [p["slug"] for p in providers]
-    assert "anthropic" in slugs, (
-        f"anthropic not found in /model picker providers: {slugs}"
-    )
+    assert (
+        "anthropic" in slugs
+    ), f"anthropic not found in /model picker providers: {slugs}"
 
     anthropic = next(p for p in providers if p["slug"] == "anthropic")
     assert anthropic["is_current"] is True
@@ -169,14 +192,17 @@ def test_no_codex_when_no_credentials(tmp_path, monkeypatch):
     monkeypatch.setenv("ReYMeN_HOME", str(ReYMeN_home))
     monkeypatch.setenv("CODEX_HOME", str(tmp_path / "no_codex"))
 
-    (ReYMeN_home / "auth.json").write_text(
-        json.dumps({"version": 2, "providers": {}})
-    )
+    (ReYMeN_home / "auth.json").write_text(json.dumps({"version": 2, "providers": {}}))
 
     for var in [
-        "OPENROUTER_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY",
-        "NOUS_API_KEY", "DEEPSEEK_API_KEY", "COPILOT_GITHUB_TOKEN",
-        "GH_TOKEN", "GEMINI_API_KEY",
+        "OPENROUTER_API_KEY",
+        "OPENAI_API_KEY",
+        "ANTHROPIC_API_KEY",
+        "NOUS_API_KEY",
+        "DEEPSEEK_API_KEY",
+        "COPILOT_GITHUB_TOKEN",
+        "GH_TOKEN",
+        "GEMINI_API_KEY",
     ]:
         monkeypatch.delenv(var, raising=False)
 
@@ -187,6 +213,6 @@ def test_no_codex_when_no_credentials(tmp_path, monkeypatch):
         max_models=10,
     )
     slugs = [p["slug"] for p in providers]
-    assert "openai-codex" not in slugs, (
-        "openai-codex should not appear without any credentials"
-    )
+    assert (
+        "openai-codex" not in slugs
+    ), "openai-codex should not appear without any credentials"

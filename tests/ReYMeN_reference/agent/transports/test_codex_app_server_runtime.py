@@ -99,9 +99,9 @@ class TestMaybeApplyCodexAppServerRuntime:
             api_mode="anthropic_messages",
             model_cfg={"openai_runtime": "codex_app_server"},
         )
-        assert got == "anthropic_messages", (
-            f"provider={provider!r} should not be rerouted to codex_app_server"
-        )
+        assert (
+            got == "anthropic_messages"
+        ), f"provider={provider!r} should not be rerouted to codex_app_server"
 
 
 class TestCodexAppServerModule:
@@ -277,7 +277,9 @@ class TestSpawnEnvIsolation:
 
         monkeypatch.setattr(subprocess, "Popen", FakePopen)
         monkeypatch.setenv("HOME", "/users/alice")
-        monkeypatch.setenv("ReYMeN_HOME", "/users/alice/.ReYMeN/profiles/backend-worker")
+        monkeypatch.setenv(
+            "ReYMeN_HOME", "/users/alice/.ReYMeN/profiles/backend-worker"
+        )
         monkeypatch.setenv("ReYMeN_KANBAN_TASK", "t_smoke")
         monkeypatch.setenv(
             "ReYMeN_KANBAN_DB",

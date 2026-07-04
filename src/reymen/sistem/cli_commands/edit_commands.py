@@ -39,6 +39,7 @@ class MixinCommands:
         Delegates to :func:`handlers.edit.rollback_handler._handle_rollback_command`.
         """
         from .handlers.edit.rollback_handler import _handle_rollback_command
+
         _handle_rollback_command(self, command)
 
     def _handle_snapshot_command(self, command: str):
@@ -47,6 +48,7 @@ class MixinCommands:
         Delegates to :func:`handlers.edit.snapshot_handler._handle_snapshot_command`.
         """
         from .handlers.edit.snapshot_handler import _handle_snapshot_command
+
         _handle_snapshot_command(self, command)
 
     def _handle_stop_command(self):
@@ -55,6 +57,7 @@ class MixinCommands:
         Delegates to :func:`handlers.edit.stop_handler._handle_stop_command`.
         """
         from .handlers.edit.stop_handler import _handle_stop_command
+
         _handle_stop_command(self)
 
     def _handle_agents_command(self):
@@ -63,6 +66,7 @@ class MixinCommands:
         Delegates to :func:`handlers.edit.agents_handler._handle_agents_command`.
         """
         from .handlers.edit.agents_handler import _handle_agents_command
+
         _handle_agents_command(self)
 
     def _handle_paste_command(self):
@@ -71,6 +75,7 @@ class MixinCommands:
         Delegates to :func:`handlers.edit.paste_handler._handle_paste_command`.
         """
         from .handlers.edit.paste_handler import _handle_paste_command
+
         _handle_paste_command(self)
 
     def _write_osc52_clipboard(self, text: str) -> None:
@@ -127,6 +132,7 @@ class MixinCommands:
         Delegates to :func:`handlers.edit.copy_handler._handle_copy_command`.
         """
         from .handlers.edit.copy_handler import _handle_copy_command
+
         _handle_copy_command(self, cmd_original)
 
     def _handle_image_command(self, cmd_original: str):
@@ -135,9 +141,12 @@ class MixinCommands:
         Delegates to :func:`handlers.edit.image_handler._handle_image_command`.
         """
         from .handlers.edit.image_handler import _handle_image_command
+
         _handle_image_command(self, cmd_original)
 
-    def _preprocess_images_with_vision(self, text: str, images: list, *, announce: bool = True) -> str:
+    def _preprocess_images_with_vision(
+        self, text: str, images: list, *, announce: bool = True
+    ) -> str:
         """Analyze attached images via the vision tool and return enriched text.
 
         Instead of embedding raw base64 ``image_url`` content parts in the
@@ -167,7 +176,9 @@ class MixinCommands:
                 _cprint(f"  {_DIM}👁️  analyzing {img_path.name} ({size_kb}KB)...{_RST}")
             try:
                 result_json = _asyncio.run(
-                    vision_analyze_tool(image_url=str(img_path), user_prompt=analysis_prompt)
+                    vision_analyze_tool(
+                        image_url=str(img_path), user_prompt=analysis_prompt
+                    )
                 )
                 result = json.loads(result_json)
                 if result.get("success"):
@@ -186,7 +197,9 @@ class MixinCommands:
                         f"image_url: {img_path}]"
                     )
                     if announce:
-                        _cprint(f"  {_DIM}⚠ vision analysis failed — path included for retry{_RST}")
+                        _cprint(
+                            f"  {_DIM}⚠ vision analysis failed — path included for retry{_RST}"
+                        )
             except Exception as e:
                 enriched_parts.append(
                     f"[The user attached an image but analysis failed ({e}). "
@@ -194,7 +207,9 @@ class MixinCommands:
                     f"image_url: {img_path}]"
                 )
                 if announce:
-                    _cprint(f"  {_DIM}⚠ vision analysis error — path included for retry{_RST}")
+                    _cprint(
+                        f"  {_DIM}⚠ vision analysis error — path included for retry{_RST}"
+                    )
 
         # Combine: vision descriptions first, then the user's original text
         user_text = text if isinstance(text, str) and text else ""
@@ -226,21 +241,28 @@ class MixinCommands:
 
         try:
             with open(path, "w", encoding="utf-8") as f:
-                json.dump({
-                    "model": self.model,
-                    "session_id": self.session_id,
-                    "session_start": self.session_start.isoformat(),
-                    "messages": self.conversation_history,
-                }, f, indent=2, ensure_ascii=False)
+                json.dump(
+                    {
+                        "model": self.model,
+                        "session_id": self.session_id,
+                        "session_start": self.session_start.isoformat(),
+                        "messages": self.conversation_history,
+                    },
+                    f,
+                    indent=2,
+                    ensure_ascii=False,
+                )
             print(f"(^_^)v Conversation snapshot saved to: {path}")
             if self.session_id:
-                print(f"       Resume the live session with: ReYMeN --resume {self.session_id}")
+                print(
+                    f"       Resume the live session with: ReYMeN --resume {self.session_id}"
+                )
         except Exception as e:
             print(f"(x_x) Failed to save: {e}")
 
     def retry_last(self):
         """Retry the last user message by removing the last exchange and re-sending.
-        
+
         Removes the last assistant response (and any tool-call messages) and
         the last user message, then re-sends that user message to the agent.
         Returns the message to re-send, or None if there's nothing to retry.
@@ -248,23 +270,25 @@ class MixinCommands:
         if not self.conversation_history:
             print("(._.) No messages to retry.")
             return None
-        
+
         # Walk backwards to find the last user message
         last_user_idx = None
         for i in range(len(self.conversation_history) - 1, -1, -1):
             if self.conversation_history[i].get("role") == "user":
                 last_user_idx = i
                 break
-        
+
         if last_user_idx is None:
             print("(._.) No user message found to retry.")
             return None
-        
+
         # Extract the message text and remove everything from that point forward
         last_message = self.conversation_history[last_user_idx].get("content", "")
         self.conversation_history = self.conversation_history[:last_user_idx]
-        
-        print(f"(^_^)b Retrying: \"{last_message[:60]}{'...' if len(last_message) > 60 else ''}\"")
+
+        print(
+            f"(^_^)b Retrying: \"{last_message[:60]}{'...' if len(last_message) > 60 else ''}\""
+        )
         return last_message
 
     def undo_last(self, n: int = 1, prefill: bool = True):
@@ -389,4 +413,3 @@ class MixinCommands:
         # edit and resubmit (Claude-Code-style). Editable, not auto-sent.
         if prefill and removed_text:
             self._prefill_input_buffer(removed_text)
-

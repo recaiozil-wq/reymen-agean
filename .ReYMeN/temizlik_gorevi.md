@@ -57,7 +57,7 @@ Aşağıdaki çiftleri bul ve RAPORLA (birleştirme yapma):
 ```bash
 # Tüm import'lar çalışıyor mu kontrol
 python -c "from reymen.cereyan.beyin import Beyin; print('beyin OK')"
-python -c "from reymen.cereyan.motor import Motor; print('motor OK')"  
+python -c "from reymen.cereyan.motor import Motor; print('motor OK')"
 python -c "from reymen.cereyan.once_hafiza import *; print('once_hafiza OK')"
 python -c "from reymen.sistem.cli import *; print('cli OK')"
 python -c "from reymen.sistem.cron_scheduler import *; print('cron_scheduler OK')"

@@ -1,4 +1,5 @@
 """Auto-generated tests for reymen.sistem.cli_helpers."""
+
 import pytest
 from src.reymen.sistem.cli_helpers import (
     CanonicalUsage,

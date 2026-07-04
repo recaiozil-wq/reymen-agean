@@ -17,6 +17,7 @@ These tests pin the fixed behavior:
 * ``disabled`` membership is checked by the declared name, because that
   is what :func:`ReYMeN_cli.skills_config.save_disabled_skills` stores.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -59,7 +60,9 @@ def test_frontmatter_slug_matched_even_when_dir_name_differs(
     """
     from gateway import run as gateway_run
 
-    _write_skill(tmp_skills, "mlops/stable-diffusion", "Stable Diffusion Image Generation")
+    _write_skill(
+        tmp_skills, "mlops/stable-diffusion", "Stable Diffusion Image Generation"
+    )
 
     # Config disables by declared name (matches what `ReYMeN skills config` writes).
     monkeypatch.setattr(
@@ -94,9 +97,7 @@ def test_unknown_command_still_returns_none(
 
     with patch(
         "tools.skills_tool._get_disabled_skill_names", return_value=set()
-    ), patch(
-        "agent.skill_utils.get_all_skills_dirs", return_value=[tmp_skills]
-    ):
+    ), patch("agent.skill_utils.get_all_skills_dirs", return_value=[tmp_skills]):
         assert gateway_run._check_unavailable_skill("no-such-skill") is None
 
 
@@ -110,9 +111,7 @@ def test_matched_but_not_disabled_returns_none(
 
     with patch(
         "tools.skills_tool._get_disabled_skill_names", return_value=set()
-    ), patch(
-        "agent.skill_utils.get_all_skills_dirs", return_value=[tmp_skills]
-    ):
+    ), patch("agent.skill_utils.get_all_skills_dirs", return_value=[tmp_skills]):
         assert gateway_run._check_unavailable_skill("ascii-art") is None
 
 
@@ -127,9 +126,7 @@ def test_slug_normalization_strips_non_alnum(
     with patch(
         "tools.skills_tool._get_disabled_skill_names",
         return_value={"C++ Code Review"},
-    ), patch(
-        "agent.skill_utils.get_all_skills_dirs", return_value=[tmp_skills]
-    ):
+    ), patch("agent.skill_utils.get_all_skills_dirs", return_value=[tmp_skills]):
         msg = gateway_run._check_unavailable_skill("c-code-review")
 
     assert msg is not None
@@ -172,9 +169,7 @@ def test_optional_skill_uses_frontmatter_slug(
     empty_skills.mkdir()
     with patch(
         "tools.skills_tool._get_disabled_skill_names", return_value=set()
-    ), patch(
-        "agent.skill_utils.get_all_skills_dirs", return_value=[empty_skills]
-    ):
+    ), patch("agent.skill_utils.get_all_skills_dirs", return_value=[empty_skills]):
         msg = gateway_run._check_unavailable_skill("stable-diffusion-image-generation")
 
     assert msg is not None, (

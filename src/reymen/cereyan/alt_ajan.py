@@ -22,6 +22,7 @@ from src.reymen.cereyan.beyin import Beyin
 import yaml
 from pathlib import Path
 import logging
+
 logger = logging.getLogger(__name__)
 
 ROOT = Path(__file__).parent.resolve()
@@ -29,6 +30,7 @@ ROOT = Path(__file__).parent.resolve()
 # .env dosyasını yükle (API anahtarları için)
 try:
     from dotenv import load_dotenv
+
     load_dotenv(ROOT / ".env")
 except ImportError as _alt_ajan_e30:
     print(f"[UYARI] alt_ajan.py:31 - {_alt_ajan_e30}")
@@ -38,7 +40,9 @@ try:
     with open(ROOT / "config.yaml", encoding="utf-8") as f:
         _CONFIG = yaml.safe_load(f) or {}
 except (FileNotFoundError, OSError) as _alt_ajan_e35:
-    print(f"[UYARI] alt_ajan.py:35 - config.yaml bulunamadi, bos config kullaniliyor - {_alt_ajan_e35}")
+    print(
+        f"[UYARI] alt_ajan.py:35 - config.yaml bulunamadi, bos config kullaniliyor - {_alt_ajan_e35}"
+    )
     _CONFIG = {}
 _ALT_BEYIN = Beyin(_CONFIG)
 
@@ -53,20 +57,33 @@ def _alt_ajan_icinde_mi() -> bool:
 
 
 # Alt ajanların kullanabileceği araç seti (tehlikeli/alt-ajan araçları HARİÇ)
-_ALT_AJAN_IZINLI_ARACLAR = frozenset({
-    "KOMUT_CALISTIR", "PYTHON_CALISTIR", "DOSYA_YAZ", "DOSYA_OKU",
-    "HAFIZA_ARA", "IC_GOZLEM", "GOREV_BITTI",
-    "WEB_ARA", "TARAYICI_AC",
-    "PDF_OKU", "EXCEL_OKU", "CSV_OKU", "GORUNTU_ANALIZ", "DOSYA_ANALIZ",
-    "PROJE_TARA", "SKILL_ARA",
-    # ALT_AJAN_GOREVLENDIR BURADA YOK → zincir koruması
-})
+_ALT_AJAN_IZINLI_ARACLAR = frozenset(
+    {
+        "KOMUT_CALISTIR",
+        "PYTHON_CALISTIR",
+        "DOSYA_YAZ",
+        "DOSYA_OKU",
+        "HAFIZA_ARA",
+        "IC_GOZLEM",
+        "GOREV_BITTI",
+        "WEB_ARA",
+        "TARAYICI_AC",
+        "PDF_OKU",
+        "EXCEL_OKU",
+        "CSV_OKU",
+        "GORUNTU_ANALIZ",
+        "DOSYA_ANALIZ",
+        "PROJE_TARA",
+        "SKILL_ARA",
+        # ALT_AJAN_GOREVLENDIR BURADA YOK → zincir koruması
+    }
+)
 
 
 @dataclass
 class AltAjanSonuc:
     task_id: str
-    durum: str = "calisiyor"          # calisiyor | tamamlandi | hata
+    durum: str = "calisiyor"  # calisiyor | tamamlandi | hata
     sonuc: Optional[str] = None
     hata: Optional[str] = None
     adim_sayisi: int = 0
@@ -86,8 +103,14 @@ class AltAjan:
     Motor.calistir() çağrılarını thread-safe bir kilit ile yönetir.
     """
 
-    def __init__(self, gorev: str, baglam: str = "", max_adim: int = None,
-                 derinlik: int = 1, izinli_araclar: Optional[set] = None) -> None:
+    def __init__(
+        self,
+        gorev: str,
+        baglam: str = "",
+        max_adim: int = None,
+        derinlik: int = 1,
+        izinli_araclar: Optional[set] = None,
+    ) -> None:
         self.task_id = str(uuid.uuid4())[:8]
         self.gorev = gorev
         self.baglam = baglam
@@ -103,7 +126,7 @@ class AltAjan:
         )
         self._motor = None  # lazy import
         # Döngü dedektörü
-        self._onceki_gozlemler = []       # son 5 gözlemi tutar
+        self._onceki_gozlemler = []  # son 5 gözlemi tutar
         self._onceki_eylemler: list[str] = []  # son 5 eylemi tutar
         self._onceki_hata_sayaci: int = 0  # ardisik hata sayaci (circuit breaker)
         self._baslangic_zamani = time.time()
@@ -113,11 +136,9 @@ class AltAjan:
         """Lazy Motor instance — thread-safe."""
         if self._motor is None:
             from reymen.cereyan.motor import Motor
+
             try:
-                self._motor = Motor(
-                    backend_mode="local",
-                    config=_CONFIG
-                )
+                self._motor = Motor(backend_mode="local", config=_CONFIG)
             except Exception:
                 self._motor = Motor(backend_mode="local")
         return self._motor
@@ -142,7 +163,7 @@ class AltAjan:
 
     def _eylem_coz(self, cevap: str):
         """LLM çıktısından 'Eylem: ARAÇ("param")' yakalar."""
-        m = re.search(r'Eylem:\s*([A-Z_]+)\s*\((.*)\)', cevap, re.DOTALL)
+        m = re.search(r"Eylem:\s*([A-Z_]+)\s*\((.*)\)", cevap, re.DOTALL)
         if not m:
             return None, None
         arac = m.group(1).strip()
@@ -151,15 +172,17 @@ class AltAjan:
 
     def calistir(self) -> AltAjanSonuc:
         """Senkron çalışır — AltAjanYoneticisi bunu thread'de çağırır.
-        
+
         ReAct döngüsü: Düşünce → Eylem → Gözlem → Tekrar
         Motor üzerinden gerçek araçları kullanır.
-        
+
         Döngü dedektörü: Aynı gözlem/eylem 3x tekrarlanırsa GOREV_BITTI'yi zorlar.
         Zaman aşımı: ALT_AJAN_ZAMAN_ASIMI saniye sonra force bitirir.
         """
         try:
-            self.mesajlar.append({"role": "system", "content": self._baslangic_promptu()})
+            self.mesajlar.append(
+                {"role": "system", "content": self._baslangic_promptu()}
+            )
 
             for adim in range(1, self.max_adim + 1):
                 self.sonuc.adim_sayisi = adim
@@ -172,9 +195,9 @@ class AltAjan:
                     return self.sonuc
 
                 cevap = _ALT_BEYIN.uret(
-                    "ReAct formatina UY: Dusunce: ... Eylem: ARAC(\"param\"). "
-                    "Arac gerekmiyorsa Eylem: GOREV_BITTI(\"cevap\") yaz.",
-                    self.mesajlar
+                    'ReAct formatina UY: Dusunce: ... Eylem: ARAC("param"). '
+                    'Arac gerekmiyorsa Eylem: GOREV_BITTI("cevap") yaz.',
+                    self.mesajlar,
                 )
                 self.mesajlar.append({"role": "assistant", "content": cevap})
 
@@ -186,6 +209,7 @@ class AltAjan:
                 if "GOREV_BITTI" in cevap:
                     # GOREV_BITTI("...") içindeki metni çıkar
                     import re as _re
+
                     m = _re.search(r'GOREV_BITTI\s*\(\s*"([^"]*)"\s*\)', cevap)
                     if m:
                         self.sonuc.sonuc = m.group(1)
@@ -203,7 +227,9 @@ class AltAjan:
                         gozlem = f"[HATA] {arac} çalıştırılırken hata: {e}"
                         self._onceki_hata_sayaci += 1
                 elif arac:
-                    gozlem = f"[ENGELLENDI] '{arac}' aracı alt ajanlar için izinli değil."
+                    gozlem = (
+                        f"[ENGELLENDI] '{arac}' aracı alt ajanlar için izinli değil."
+                    )
                     self._onceki_hata_sayaci += 1
                 else:
                     # Eylem yok, düşünmeye devam et
@@ -281,17 +307,21 @@ class AltAjanYoneticisi:
     callback(task_id, sonuc) çağrılır. (ReYMeN delegate_task pattern'i)
     """
 
-    def __init__(self, sonuc_zaman_asimi: float = 1800.0,
-                 callback=None) -> None:
+    def __init__(self, sonuc_zaman_asimi: float = 1800.0, callback=None) -> None:
         self._gorevler: dict[str, AltAjanSonuc] = {}
         self._kilit = threading.Lock()
         self._sonuc_zaman_asimi = sonuc_zaman_asimi
         self._callback = callback  # background notification
 
-    def gorevlendir(self, gorev: str, baglam: str = "", max_adim: int = 8,
-                    izinli_araclar: Optional[set] = None) -> str:
+    def gorevlendir(
+        self,
+        gorev: str,
+        baglam: str = "",
+        max_adim: int = 8,
+        izinli_araclar: Optional[set] = None,
+    ) -> str:
         """Alt ajan başlatır, hemen task_id döner. Ana ajan bloklanmaz.
-        
+
         izinli_araclar: Alt ajanın kullanabileceği araç seti.
                         None = varsayılan kısıtlı set.
         """
@@ -324,8 +354,7 @@ class AltAjanYoneticisi:
                     print(f"[UYARI] alt_ajan.py:317 - {_alt_ajan_e316}")
 
         threading.Thread(
-            target=_calistir, daemon=True,
-            name=f"alt-ajan-{alt.task_id}"
+            target=_calistir, daemon=True, name=f"alt-ajan-{alt.task_id}"
         ).start()
         return alt.task_id
 
@@ -333,7 +362,9 @@ class AltAjanYoneticisi:
         with self._kilit:
             return self._gorevler.get(task_id)
 
-    def sonuc_bekle(self, task_id: str, timeout: float = 60.0) -> Optional[AltAjanSonuc]:
+    def sonuc_bekle(
+        self, task_id: str, timeout: float = 60.0
+    ) -> Optional[AltAjanSonuc]:
         """Gerekirse senkron bekleme (polling tercih edilir)."""
         baslangic = time.time()
         while time.time() - baslangic < timeout:
@@ -348,13 +379,15 @@ class AltAjanYoneticisi:
         simdi = time.time()
         with self._kilit:
             self._gorevler = {
-                tid: s for tid, s in self._gorevler.items()
+                tid: s
+                for tid, s in self._gorevler.items()
                 if s.durum == "calisiyor"
                 or (s.bitis and simdi - s.bitis < self._sonuc_zaman_asimi)
             }
 
 
 # ── 1) ALT AJAN RETRY ────────────────────────────────────────────────
+
 
 def alt_ajan_retry(task_id: str, max_retry: int = 2) -> Optional[str]:
     """Başarısız bir alt ajan görevini tekrar dene.
@@ -375,12 +408,16 @@ def alt_ajan_retry(task_id: str, max_retry: int = 2) -> Optional[str]:
             print(f"[alt_ajan_retry] '{task_id}' bulunamadi.")
             return None
         if eski_sonuc.durum != "hata":
-            print(f"[alt_ajan_retry] '{task_id}' durumu '{eski_sonuc.durum}', retry gerekmiyor.")
+            print(
+                f"[alt_ajan_retry] '{task_id}' durumu '{eski_sonuc.durum}', retry gerekmiyor."
+            )
             return None
 
         orijinal_gorev = eski_sonuc.gorev or "(bilinmiyor)"
         orijinal_baglam = eski_sonuc.baglam or ""
-        print(f"[alt_ajan_retry] '{task_id}' tekrar deneniyor (max_retry={max_retry})...")
+        print(
+            f"[alt_ajan_retry] '{task_id}' tekrar deneniyor (max_retry={max_retry})..."
+        )
         print(f"  Gorev: {orijinal_gorev[:80]}")
 
         yeni_task_id = None
@@ -393,14 +430,20 @@ def alt_ajan_retry(task_id: str, max_retry: int = 2) -> Optional[str]:
                     max_adim=12,
                 )
                 # Retry baslatildi, bekle ve sonucu kontrol et
-                yeni_sonuc = alt_ajan_yoneticisi.sonuc_bekle(yeni_task_id, timeout=120.0)
+                yeni_sonuc = alt_ajan_yoneticisi.sonuc_bekle(
+                    yeni_task_id, timeout=120.0
+                )
                 if yeni_sonuc and yeni_sonuc.durum == "tamamlandi":
                     print(f"[alt_ajan_retry] '{task_id}' -> '{yeni_task_id}' basarili!")
                     return yeni_task_id
                 elif yeni_sonuc and yeni_sonuc.durum == "hata":
-                    print(f"[alt_ajan_retry] Retry {deneme} basarisiz: {yeni_sonuc.hata[:100]}")
+                    print(
+                        f"[alt_ajan_retry] Retry {deneme} basarisiz: {yeni_sonuc.hata[:100]}"
+                    )
                 else:
-                    print(f"[alt_ajan_retry] Retry {deneme} sonuc: {yeni_sonuc.durum if yeni_sonuc else 'None'}")
+                    print(
+                        f"[alt_ajan_retry] Retry {deneme} sonuc: {yeni_sonuc.durum if yeni_sonuc else 'None'}"
+                    )
             except Exception as e:
                 print(f"[alt_ajan_retry] Retry {deneme} hata: {e}")
 
@@ -414,6 +457,7 @@ def alt_ajan_retry(task_id: str, max_retry: int = 2) -> Optional[str]:
 
 
 # ── 2) ALT AJAN SONUC CALLBACK ────────────────────────────────────────
+
 
 def _alt_ajan_varsayilan_callback(task_id: str, sonuc: "AltAjanSonuc") -> None:
     """Varsayılan callback: sonucu log'a yaz."""
@@ -454,18 +498,26 @@ def alt_ajan_sonuc_callback(task_id: str, callback_url: Optional[str] = None) ->
         if callback_url is None:
             # Varsayılan: log callback
             sonuc._callback_fn = _alt_ajan_varsayilan_callback
-            print(f"[alt_ajan_sonuc_callback] '{task_id}' -> varsayilan log callback atandi.")
+            print(
+                f"[alt_ajan_sonuc_callback] '{task_id}' -> varsayilan log callback atandi."
+            )
             return True
 
         # Dosya yolu callback
-        if callback_url.startswith("/") or callback_url.startswith("~") or ":" in callback_url:
+        if (
+            callback_url.startswith("/")
+            or callback_url.startswith("~")
+            or ":" in callback_url
+        ):
             from pathlib import Path as _Path
+
             callback_path = _Path(callback_url).expanduser().resolve()
 
             def _dosya_callback(tid: str, s: "AltAjanSonuc") -> None:
                 try:
                     import json as _json
                     import datetime as _dt
+
                     veri = {
                         "task_id": tid,
                         "durum": s.durum,
@@ -484,30 +536,43 @@ def alt_ajan_sonuc_callback(task_id: str, callback_url: Optional[str] = None) ->
                     print(f"[alt_ajan_callback] Dosya yazma hatasi: {e}")
 
             sonuc._callback_fn = _dosya_callback
-            print(f"[alt_ajan_sonuc_callback] '{task_id}' -> dosya callback: {callback_path}")
+            print(
+                f"[alt_ajan_sonuc_callback] '{task_id}' -> dosya callback: {callback_path}"
+            )
             return True
 
         # HTTP/HTTPS URL callback (ileriye donuk)
         if callback_url.startswith("http://") or callback_url.startswith("https://"):
+
             def _http_callback(tid: str, s: "AltAjanSonuc") -> None:
                 try:
                     import urllib.request as _req
                     import json as _json
-                    veri = _json.dumps({
-                        "task_id": tid,
-                        "durum": s.durum,
-                        "sonuc": s.sonuc,
-                        "hata": s.hata,
-                        "adim_sayisi": s.adim_sayisi,
-                    }).encode("utf-8")
-                    _req.urlopen(_req.Request(callback_url, data=veri,
-                                  headers={"Content-Type": "application/json"}),
-                                  timeout=10)
+
+                    veri = _json.dumps(
+                        {
+                            "task_id": tid,
+                            "durum": s.durum,
+                            "sonuc": s.sonuc,
+                            "hata": s.hata,
+                            "adim_sayisi": s.adim_sayisi,
+                        }
+                    ).encode("utf-8")
+                    _req.urlopen(
+                        _req.Request(
+                            callback_url,
+                            data=veri,
+                            headers={"Content-Type": "application/json"},
+                        ),
+                        timeout=10,
+                    )
                 except Exception as e:
                     print(f"[alt_ajan_callback] HTTP callback hatasi: {e}")
 
             sonuc._callback_fn = _http_callback
-            print(f"[alt_ajan_sonuc_callback] '{task_id}' -> HTTP callback: {callback_url}")
+            print(
+                f"[alt_ajan_sonuc_callback] '{task_id}' -> HTTP callback: {callback_url}"
+            )
             return True
 
         print(f"[alt_ajan_sonuc_callback] Bilinmeyen callback_url: {callback_url}")
@@ -521,6 +586,7 @@ def alt_ajan_sonuc_callback(task_id: str, callback_url: Optional[str] = None) ->
 
 # ── 3) GOREV HAVUZU (TASK POOL) ──────────────────────────────────────
 
+
 class AltAjanHavuzu:
     """Alt ajan gorev havuzu.
 
@@ -529,9 +595,9 @@ class AltAjanHavuzu:
     """
 
     def __init__(self, max_es_zamanli: int = 5) -> None:
-        self._kuyruk: list[dict] = []                # Bekleyen gorevler
+        self._kuyruk: list[dict] = []  # Bekleyen gorevler
         self._aktif_gorevler: dict[str, AltAjanSonuc] = {}  # Su an calisanlar
-        self._tamamlananlar: dict[str, AltAjanSonuc] = {}   # Bitenler
+        self._tamamlananlar: dict[str, AltAjanSonuc] = {}  # Bitenler
         self._max_es_zamanli = max_es_zamanli
         self._kilit = threading.Lock()
         self._kuyruk_thread = None
@@ -596,15 +662,21 @@ class AltAjanHavuzu:
         """Havuzu durdur."""
         try:
             self._calisiyor = False
-            print(f"[AltAjanHavuzu] Durduruldu. Kuyrukta {len(self._kuyruk)}, "
-                  f"aktif {len(self._aktif_gorevler)}, "
-                  f"tamamlanan {len(self._tamamlananlar)} gorev.")
+            print(
+                f"[AltAjanHavuzu] Durduruldu. Kuyrukta {len(self._kuyruk)}, "
+                f"aktif {len(self._aktif_gorevler)}, "
+                f"tamamlanan {len(self._tamamlananlar)} gorev."
+            )
         except Exception as e:
             print(f"[AltAjanHavuzu] Durdurma hatasi: {e}")
 
-    def alt_ajan_kuyruk_ekle(self, gorev: str, baglam: str = "",
-                              max_adim: int = 8,
-                              izinli_araclar: Optional[set] = None) -> bool:
+    def alt_ajan_kuyruk_ekle(
+        self,
+        gorev: str,
+        baglam: str = "",
+        max_adim: int = 8,
+        izinli_araclar: Optional[set] = None,
+    ) -> bool:
         """Bir gorevi kuyruga ekle.
 
         Args:
@@ -621,12 +693,14 @@ class AltAjanHavuzu:
                 print("[AltAjanHavuzu] Gorev metni bos, eklenemedi.")
                 return False
             with self._kilit:
-                self._kuyruk.append({
-                    "gorev": gorev,
-                    "baglam": baglam,
-                    "max_adim": max_adim,
-                    "izinli_araclar": izinli_araclar,
-                })
+                self._kuyruk.append(
+                    {
+                        "gorev": gorev,
+                        "baglam": baglam,
+                        "max_adim": max_adim,
+                        "izinli_araclar": izinli_araclar,
+                    }
+                )
             # Havuz calismiyorsa otomatik baslat
             if not self._calisiyor:
                 self.baslat()
@@ -662,7 +736,11 @@ class AltAjanHavuzu:
                     for tid, s in self._aktif_gorevler.items()
                 ]
                 tamam_liste = [
-                    {"task_id": tid, "durum": s.durum, "sonuc": str(s.sonuc)[:60] if s.sonuc else None}
+                    {
+                        "task_id": tid,
+                        "durum": s.durum,
+                        "sonuc": str(s.sonuc)[:60] if s.sonuc else None,
+                    }
                     for tid, s in list(self._tamamlananlar.items())[-20:]  # son 20
                 ]
                 return {
@@ -693,9 +771,13 @@ alt_ajan_havuzu = AltAjanHavuzu()
 
 # ── Kolaylik fonksiyonlari (dogrudan modul seviyesinde) ──────────────
 
-def alt_ajan_kuyruk_ekle(gorev: str, baglam: str = "",
-                           max_adim: int = 8,
-                           izinli_araclar: Optional[set] = None) -> bool:
+
+def alt_ajan_kuyruk_ekle(
+    gorev: str,
+    baglam: str = "",
+    max_adim: int = 8,
+    izinli_araclar: Optional[set] = None,
+) -> bool:
     """Bir gorevi kuyruga ekle (AltAjanHavuzu.alt_ajan_kuyruk_ekle wrapper).
 
     Args:

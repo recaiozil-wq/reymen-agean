@@ -11,7 +11,12 @@ import pytest
 
 import gateway.platforms.base as base_platform
 from gateway.config import Platform, PlatformConfig, StreamingConfig
-from gateway.platforms.base import BasePlatformAdapter, MessageEvent, MessageType, SendResult
+from gateway.platforms.base import (
+    BasePlatformAdapter,
+    MessageEvent,
+    MessageType,
+    SendResult,
+)
 from gateway.session import SessionSource
 
 
@@ -119,7 +124,9 @@ class NonEditingProgressCaptureAdapter(ProgressCaptureAdapter):
     SUPPORTS_MESSAGE_EDITING = False
 
     async def edit_message(self, chat_id, message_id, content) -> SendResult:
-        raise AssertionError("non-editable adapters should not receive edit_message calls")
+        raise AssertionError(
+            "non-editable adapters should not receive edit_message calls"
+        )
 
 
 class FakeAgent:
@@ -147,6 +154,7 @@ class FakeAgent:
 
 class LongPreviewAgent:
     """Agent that emits a tool call with a very long preview string."""
+
     LONG_CMD = "cd /home/teknium/.ReYMeN/ReYMeN-agent/.worktrees/ReYMeN-d8860339 && source .venv/bin/activate && python -m pytest tests/gateway/test_run_progress_topics.py -n0 -q"
 
     def __init__(self, **kwargs):
@@ -263,7 +271,9 @@ async def test_run_agent_progress_stays_in_originating_topic(monkeypatch, tmp_pa
     runner = _make_runner(adapter)
     gateway_run = importlib.import_module("gateway.run")
     monkeypatch.setattr(gateway_run, "_ReYMeN_home", tmp_path)
-    monkeypatch.setattr(gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "fake"})
+    monkeypatch.setattr(
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "fake"}
+    )
     source = SessionSource(
         platform=Platform.TELEGRAM,
         chat_id="-1001",
@@ -294,7 +304,9 @@ async def test_run_agent_progress_stays_in_originating_topic(monkeypatch, tmp_pa
 
 
 @pytest.mark.asyncio
-async def test_run_agent_progress_edits_keep_originating_topic_metadata(monkeypatch, tmp_path):
+async def test_run_agent_progress_edits_keep_originating_topic_metadata(
+    monkeypatch, tmp_path
+):
     monkeypatch.setenv("ReYMeN_TOOL_PROGRESS_MODE", "all")
 
     fake_dotenv = types.ModuleType("dotenv")
@@ -309,7 +321,9 @@ async def test_run_agent_progress_edits_keep_originating_topic_metadata(monkeypa
     runner = _make_runner(adapter)
     gateway_run = importlib.import_module("gateway.run")
     monkeypatch.setattr(gateway_run, "_ReYMeN_home", tmp_path)
-    monkeypatch.setattr(gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "fake"})
+    monkeypatch.setattr(
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "fake"}
+    )
     source = SessionSource(
         platform=Platform.TELEGRAM,
         chat_id="-1001",
@@ -332,7 +346,9 @@ async def test_run_agent_progress_edits_keep_originating_topic_metadata(monkeypa
 
 
 @pytest.mark.asyncio
-async def test_run_agent_progress_does_not_use_event_message_id_for_telegram_dm(monkeypatch, tmp_path):
+async def test_run_agent_progress_does_not_use_event_message_id_for_telegram_dm(
+    monkeypatch, tmp_path
+):
     """Telegram DM progress must not reuse event message id as thread metadata."""
     monkeypatch.setenv("ReYMeN_TOOL_PROGRESS_MODE", "all")
 
@@ -348,7 +364,9 @@ async def test_run_agent_progress_does_not_use_event_message_id_for_telegram_dm(
     runner = _make_runner(adapter)
     gateway_run = importlib.import_module("gateway.run")
     monkeypatch.setattr(gateway_run, "_ReYMeN_home", tmp_path)
-    monkeypatch.setattr(gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"})
+    monkeypatch.setattr(
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+    )
 
     source = SessionSource(
         platform=Platform.TELEGRAM,
@@ -374,13 +392,16 @@ async def test_run_agent_progress_does_not_use_event_message_id_for_telegram_dm(
 
 
 @pytest.mark.asyncio
-async def test_run_agent_progress_uses_event_message_id_for_slack_dm(monkeypatch, tmp_path):
+async def test_run_agent_progress_uses_event_message_id_for_slack_dm(
+    monkeypatch, tmp_path
+):
     """Slack DM progress should keep event ts fallback threading."""
     monkeypatch.setenv("ReYMeN_TOOL_PROGRESS_MODE", "all")
     # Since PR #8006, Slack's built-in display tier sets tool_progress="off"
     # by default. Override via config so this test still exercises the
     # progress-callback path the Slack DM event_message_id threading depends on.
     import yaml
+
     (tmp_path / "config.yaml").write_text(
         yaml.dump({"display": {"platforms": {"slack": {"tool_progress": "all"}}}}),
         encoding="utf-8",
@@ -398,7 +419,9 @@ async def test_run_agent_progress_uses_event_message_id_for_slack_dm(monkeypatch
     runner = _make_runner(adapter)
     gateway_run = importlib.import_module("gateway.run")
     monkeypatch.setattr(gateway_run, "_ReYMeN_home", tmp_path)
-    monkeypatch.setattr(gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"})
+    monkeypatch.setattr(
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+    )
 
     source = SessionSource(
         platform=Platform.SLACK,
@@ -420,11 +443,16 @@ async def test_run_agent_progress_uses_event_message_id_for_slack_dm(monkeypatch
     assert result["final_response"] == "done"
     assert adapter.sent
     assert adapter.sent[0]["metadata"] == {"thread_id": "1234567890.000001"}
-    assert all(call["metadata"] == {"thread_id": "1234567890.000001"} for call in adapter.typing)
+    assert all(
+        call["metadata"] == {"thread_id": "1234567890.000001"}
+        for call in adapter.typing
+    )
 
 
 @pytest.mark.asyncio
-async def test_run_agent_feishu_progress_replies_inside_existing_thread(monkeypatch, tmp_path):
+async def test_run_agent_feishu_progress_replies_inside_existing_thread(
+    monkeypatch, tmp_path
+):
     """Feishu needs reply_to plus reply_in_thread metadata for topic-scoped progress."""
     monkeypatch.setenv("ReYMeN_TOOL_PROGRESS_MODE", "all")
 
@@ -440,7 +468,9 @@ async def test_run_agent_feishu_progress_replies_inside_existing_thread(monkeypa
     runner = _make_runner(adapter)
     gateway_run = importlib.import_module("gateway.run")
     monkeypatch.setattr(gateway_run, "_ReYMeN_home", tmp_path)
-    monkeypatch.setattr(gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"})
+    monkeypatch.setattr(
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+    )
 
     source = SessionSource(
         platform=Platform.FEISHU,
@@ -500,7 +530,9 @@ def _run_long_preview_helper(monkeypatch, tmp_path, preview_length=0):
     runner = _make_runner(adapter)
     gateway_run = importlib.import_module("gateway.run")
     monkeypatch.setattr(gateway_run, "_ReYMeN_home", tmp_path)
-    monkeypatch.setattr(gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"})
+    monkeypatch.setattr(
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+    )
 
     source = SessionSource(
         platform=Platform.TELEGRAM,
@@ -532,38 +564,52 @@ def test_all_mode_default_truncation_40_chars(monkeypatch, tmp_path):
     assert "..." in content
     # Extract the preview part between quotes
     import re
+
     match = re.search(r'"(.+)"', content)
     assert match, f"No quoted preview found in: {content}"
     preview_text = match.group(1)
-    assert len(preview_text) <= 40, f"Preview too long ({len(preview_text)}): {preview_text}"
+    assert (
+        len(preview_text) <= 40
+    ), f"Preview too long ({len(preview_text)}): {preview_text}"
 
 
 def test_all_mode_respects_custom_preview_length(monkeypatch, tmp_path):
     """When tool_preview_length is explicitly set (e.g. 120), all/new mode uses that."""
-    adapter, result = _run_long_preview_helper(monkeypatch, tmp_path, preview_length=120)
+    adapter, result = _run_long_preview_helper(
+        monkeypatch, tmp_path, preview_length=120
+    )
     assert result["final_response"] == "done"
     assert adapter.sent
     content = adapter.sent[0]["content"]
     # With 120-char cap, the command (165 chars) should still be truncated but longer
     import re
+
     match = re.search(r'"(.+)"', content)
     assert match, f"No quoted preview found in: {content}"
     preview_text = match.group(1)
     # Should be longer than the 40-char default
-    assert len(preview_text) > 40, f"Preview suspiciously short ({len(preview_text)}): {preview_text}"
+    assert (
+        len(preview_text) > 40
+    ), f"Preview suspiciously short ({len(preview_text)}): {preview_text}"
     # But still capped at 120
-    assert len(preview_text) <= 120, f"Preview too long ({len(preview_text)}): {preview_text}"
+    assert (
+        len(preview_text) <= 120
+    ), f"Preview too long ({len(preview_text)}): {preview_text}"
 
 
 def test_all_mode_no_truncation_when_preview_fits(monkeypatch, tmp_path):
     """Short previews (under the cap) are not truncated."""
     # Set a generous cap — the LongPreviewAgent's command is ~165 chars
-    adapter, result = _run_long_preview_helper(monkeypatch, tmp_path, preview_length=200)
+    adapter, result = _run_long_preview_helper(
+        monkeypatch, tmp_path, preview_length=200
+    )
     assert result["final_response"] == "done"
     assert adapter.sent
     content = adapter.sent[0]["content"]
     # With a 200-char cap, the 165-char command should NOT be truncated
-    assert "..." not in content, f"Preview was truncated when it shouldn't be: {content}"
+    assert (
+        "..." not in content
+    ), f"Preview was truncated when it shouldn't be: {content}"
 
 
 class CommentaryAgent:
@@ -575,7 +621,9 @@ class CommentaryAgent:
 
     def run_conversation(self, message, conversation_history=None, task_id=None):
         if self.interim_assistant_callback:
-            self.interim_assistant_callback("I'll inspect the repo first.", already_streamed=False)
+            self.interim_assistant_callback(
+                "I'll inspect the repo first.", already_streamed=False
+            )
         time.sleep(0.1)
         if self.stream_delta_callback:
             self.stream_delta_callback("done")
@@ -631,7 +679,9 @@ class QueuedCommentaryAgent:
     def run_conversation(self, message, conversation_history=None, task_id=None):
         type(self).calls += 1
         if type(self).calls == 1 and self.interim_assistant_callback:
-            self.interim_assistant_callback("I'll inspect the repo first.", already_streamed=False)
+            self.interim_assistant_callback(
+                "I'll inspect the repo first.", already_streamed=False
+            )
         return {
             "final_response": f"final response {type(self).calls}",
             "messages": [],
@@ -656,6 +706,7 @@ class BackgroundReviewAgent:
 
 class VerboseAgent:
     """Agent that emits a tool call with args whose JSON exceeds 200 chars."""
+
     LONG_CODE = "x" * 300
 
     def __init__(self, **kwargs):
@@ -664,7 +715,9 @@ class VerboseAgent:
 
     def run_conversation(self, message, conversation_history=None, task_id=None):
         self.tool_progress_callback(
-            "tool.started", "execute_code", None,
+            "tool.started",
+            "execute_code",
+            None,
             {"code": self.LONG_CODE},
         )
         time.sleep(0.35)
@@ -708,7 +761,9 @@ async def _run_with_agent(
     if config_data and "streaming" in config_data:
         runner.config.streaming = StreamingConfig.from_dict(config_data["streaming"])
     monkeypatch.setattr(gateway_run, "_ReYMeN_home", tmp_path)
-    monkeypatch.setattr(gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"})
+    monkeypatch.setattr(
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+    )
     source = SessionSource(
         platform=platform,
         chat_id=chat_id,
@@ -738,7 +793,9 @@ async def _run_with_agent(
 
 
 @pytest.mark.asyncio
-async def test_run_agent_rolls_progress_bubble_before_platform_limit(monkeypatch, tmp_path):
+async def test_run_agent_rolls_progress_bubble_before_platform_limit(
+    monkeypatch, tmp_path
+):
     """Tool progress should start a second editable bubble before Telegram's limit.
 
     Regression: once the first progress bubble grew past the platform limit,
@@ -763,7 +820,9 @@ async def test_run_agent_rolls_progress_bubble_before_platform_limit(monkeypatch
 
     assert result["final_response"] == "done"
     assert isinstance(adapter, SmallLimitProgressAdapter)
-    assert len(adapter.sent) >= 2, "expected a fresh progress bubble after the first filled"
+    assert (
+        len(adapter.sent) >= 2
+    ), "expected a fresh progress bubble after the first filled"
     assert adapter.oversized_sends == []
     assert adapter.oversized_edits == []
     all_bubbles = [call["content"] for call in adapter.sent + adapter.edits]
@@ -781,7 +840,9 @@ async def test_run_agent_surfaces_real_interim_commentary(monkeypatch, tmp_path)
     )
 
     assert result.get("already_sent") is not True
-    assert any(call["content"] == "I'll inspect the repo first." for call in adapter.sent)
+    assert any(
+        call["content"] == "I'll inspect the repo first." for call in adapter.sent
+    )
 
 
 @pytest.mark.asyncio
@@ -793,11 +854,15 @@ async def test_run_agent_surfaces_interim_commentary_by_default(monkeypatch, tmp
         session_id="sess-commentary-default-on",
     )
 
-    assert any(call["content"] == "I'll inspect the repo first." for call in adapter.sent)
+    assert any(
+        call["content"] == "I'll inspect the repo first." for call in adapter.sent
+    )
 
 
 @pytest.mark.asyncio
-async def test_run_agent_suppresses_interim_commentary_when_disabled(monkeypatch, tmp_path):
+async def test_run_agent_suppresses_interim_commentary_when_disabled(
+    monkeypatch, tmp_path
+):
     adapter, result = await _run_with_agent(
         monkeypatch,
         tmp_path,
@@ -807,22 +872,30 @@ async def test_run_agent_suppresses_interim_commentary_when_disabled(monkeypatch
     )
 
     assert result.get("already_sent") is not True
-    assert not any(call["content"] == "I'll inspect the repo first." for call in adapter.sent)
+    assert not any(
+        call["content"] == "I'll inspect the repo first." for call in adapter.sent
+    )
 
 
 @pytest.mark.asyncio
-async def test_run_agent_tool_progress_does_not_control_interim_commentary(monkeypatch, tmp_path):
+async def test_run_agent_tool_progress_does_not_control_interim_commentary(
+    monkeypatch, tmp_path
+):
     """tool_progress=all with interim_assistant_messages=false should not surface commentary."""
     adapter, result = await _run_with_agent(
         monkeypatch,
         tmp_path,
         CommentaryAgent,
         session_id="sess-commentary-tool-progress",
-        config_data={"display": {"tool_progress": "all", "interim_assistant_messages": False}},
+        config_data={
+            "display": {"tool_progress": "all", "interim_assistant_messages": False}
+        },
     )
 
     assert result.get("already_sent") is not True
-    assert not any(call["content"] == "I'll inspect the repo first." for call in adapter.sent)
+    assert not any(
+        call["content"] == "I'll inspect the repo first." for call in adapter.sent
+    )
 
 
 @pytest.mark.asyncio
@@ -842,11 +915,15 @@ async def test_run_agent_streaming_does_not_enable_completed_interim_commentary(
     )
 
     assert result.get("already_sent") is True
-    assert not any(call["content"] == "I'll inspect the repo first." for call in adapter.sent)
+    assert not any(
+        call["content"] == "I'll inspect the repo first." for call in adapter.sent
+    )
 
 
 @pytest.mark.asyncio
-async def test_display_streaming_does_not_enable_gateway_streaming(monkeypatch, tmp_path):
+async def test_display_streaming_does_not_enable_gateway_streaming(
+    monkeypatch, tmp_path
+):
     adapter, result = await _run_with_agent(
         monkeypatch,
         tmp_path,
@@ -863,11 +940,15 @@ async def test_display_streaming_does_not_enable_gateway_streaming(monkeypatch, 
 
     assert result.get("already_sent") is not True
     assert adapter.edits == []
-    assert [call["content"] for call in adapter.sent] == ["I'll inspect the repo first."]
+    assert [call["content"] for call in adapter.sent] == [
+        "I'll inspect the repo first."
+    ]
 
 
 @pytest.mark.asyncio
-async def test_run_agent_interim_commentary_works_with_tool_progress_off(monkeypatch, tmp_path):
+async def test_run_agent_interim_commentary_works_with_tool_progress_off(
+    monkeypatch, tmp_path
+):
     adapter, result = await _run_with_agent(
         monkeypatch,
         tmp_path,
@@ -882,11 +963,15 @@ async def test_run_agent_interim_commentary_works_with_tool_progress_off(monkeyp
     )
 
     assert result.get("already_sent") is not True
-    assert any(call["content"] == "I'll inspect the repo first." for call in adapter.sent)
+    assert any(
+        call["content"] == "I'll inspect the repo first." for call in adapter.sent
+    )
 
 
 @pytest.mark.asyncio
-async def test_run_agent_bluebubbles_uses_commentary_send_path_for_quick_replies(monkeypatch, tmp_path):
+async def test_run_agent_bluebubbles_uses_commentary_send_path_for_quick_replies(
+    monkeypatch, tmp_path
+):
     adapter, result = await _run_with_agent(
         monkeypatch,
         tmp_path,
@@ -901,7 +986,9 @@ async def test_run_agent_bluebubbles_uses_commentary_send_path_for_quick_replies
     )
 
     assert result.get("already_sent") is not True
-    assert [call["content"] for call in adapter.sent] == ["I'll inspect the repo first."]
+    assert [call["content"] for call in adapter.sent] == [
+        "I'll inspect the repo first."
+    ]
     assert adapter.edits == []
 
 
@@ -928,7 +1015,11 @@ async def test_run_agent_matrix_streaming_omits_cursor(monkeypatch, tmp_path):
         session_id="sess-matrix-streaming",
         config_data={
             "display": {"tool_progress": "off", "interim_assistant_messages": False},
-            "streaming": {"enabled": True, "edit_interval": 0.01, "buffer_threshold": 1},
+            "streaming": {
+                "enabled": True,
+                "edit_interval": 0.01,
+                "buffer_threshold": 1,
+            },
         },
         platform=Platform.MATRIX,
         chat_id="!room:matrix.example.org",
@@ -937,7 +1028,9 @@ async def test_run_agent_matrix_streaming_omits_cursor(monkeypatch, tmp_path):
     )
 
     assert result.get("already_sent") is True
-    all_text = [call["content"] for call in adapter.sent] + [call["content"] for call in adapter.edits]
+    all_text = [call["content"] for call in adapter.sent] + [
+        call["content"] for call in adapter.edits
+    ]
     assert all_text, "expected streamed Matrix content to be sent or edited"
     assert all("▉" not in text for text in all_text)
     assert any("Continuing to refine:" in text for text in all_text)
@@ -967,7 +1060,9 @@ class TransformedStreamAgent:
 
 
 @pytest.mark.asyncio
-async def test_transformed_response_edits_streamed_message_in_place(monkeypatch, tmp_path):
+async def test_transformed_response_edits_streamed_message_in_place(
+    monkeypatch, tmp_path
+):
     """When a transform_llm_output hook modifies the response after streaming,
     the gateway must edit the existing streamed message in place with the full
     transformed content (so plugins like content filters / appenders reach the
@@ -980,7 +1075,11 @@ async def test_transformed_response_edits_streamed_message_in_place(monkeypatch,
         session_id="sess-transformed-stream",
         config_data={
             "display": {"tool_progress": "off", "interim_assistant_messages": False},
-            "streaming": {"enabled": True, "edit_interval": 0.01, "buffer_threshold": 1},
+            "streaming": {
+                "enabled": True,
+                "edit_interval": 0.01,
+                "buffer_threshold": 1,
+            },
         },
         platform=Platform.MATRIX,
         chat_id="!room:matrix.example.org",
@@ -994,13 +1093,15 @@ async def test_transformed_response_edits_streamed_message_in_place(monkeypatch,
     # The transformed final text reached the user — appended portion is present
     # in an edit_message call (not just in the streamed sends).
     edited_texts = [e["content"] for e in adapter.edits]
-    assert any("[plugin appended this]" in text for text in edited_texts), (
-        f"expected transformed text in adapter.edits, got: {edited_texts!r}"
-    )
+    assert any(
+        "[plugin appended this]" in text for text in edited_texts
+    ), f"expected transformed text in adapter.edits, got: {edited_texts!r}"
 
 
 @pytest.mark.asyncio
-async def test_run_agent_queued_message_does_not_treat_commentary_as_final(monkeypatch, tmp_path):
+async def test_run_agent_queued_message_does_not_treat_commentary_as_final(
+    monkeypatch, tmp_path
+):
     QueuedCommentaryAgent.calls = 0
     adapter, result = await _run_with_agent(
         monkeypatch,
@@ -1018,7 +1119,9 @@ async def test_run_agent_queued_message_does_not_treat_commentary_as_final(monke
 
 
 @pytest.mark.asyncio
-async def test_run_agent_defers_background_review_notification_until_release(monkeypatch, tmp_path):
+async def test_run_agent_defers_background_review_notification_until_release(
+    monkeypatch, tmp_path
+):
     adapter, result = await _run_with_agent(
         monkeypatch,
         tmp_path,
@@ -1134,7 +1237,9 @@ async def test_base_processing_stops_typing_before_hung_post_delivery_callback(
 
 
 @pytest.mark.asyncio
-async def test_run_agent_drops_tool_progress_after_generation_invalidation(monkeypatch, tmp_path):
+async def test_run_agent_drops_tool_progress_after_generation_invalidation(
+    monkeypatch, tmp_path
+):
     import yaml
 
     (tmp_path / "config.yaml").write_text(
@@ -1155,7 +1260,9 @@ async def test_run_agent_drops_tool_progress_after_generation_invalidation(monke
     runner = _make_runner(adapter)
     gateway_run = importlib.import_module("gateway.run")
     monkeypatch.setattr(gateway_run, "_ReYMeN_home", tmp_path)
-    monkeypatch.setattr(gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"})
+    monkeypatch.setattr(
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+    )
 
     source = SessionSource(
         platform=Platform.DISCORD,
@@ -1170,7 +1277,9 @@ async def test_run_agent_drops_tool_progress_after_generation_invalidation(monke
     invalidated = {"done": False}
 
     async def send_and_invalidate(chat_id, content, reply_to=None, metadata=None):
-        result = await original_send(chat_id, content, reply_to=reply_to, metadata=metadata)
+        result = await original_send(
+            chat_id, content, reply_to=reply_to, metadata=metadata
+        )
         if "first command" in content and not invalidated["done"]:
             invalidated["done"] = True
             runner._invalidate_session_run_generation(session_key, reason="test_stop")
@@ -1191,16 +1300,20 @@ async def test_run_agent_drops_tool_progress_after_generation_invalidation(monke
     all_progress_text = " ".join(call["content"] for call in adapter.sent)
     all_progress_text += " ".join(call["content"] for call in adapter.edits)
     assert result["final_response"] == "done"
-    assert 'first command' in all_progress_text
-    assert 'second command' not in all_progress_text
+    assert "first command" in all_progress_text
+    assert "second command" not in all_progress_text
 
 
 @pytest.mark.asyncio
-async def test_run_agent_drops_interim_commentary_after_generation_invalidation(monkeypatch, tmp_path):
+async def test_run_agent_drops_interim_commentary_after_generation_invalidation(
+    monkeypatch, tmp_path
+):
     import yaml
 
     (tmp_path / "config.yaml").write_text(
-        yaml.dump({"display": {"tool_progress": "off", "interim_assistant_messages": True}}),
+        yaml.dump(
+            {"display": {"tool_progress": "off", "interim_assistant_messages": True}}
+        ),
         encoding="utf-8",
     )
 
@@ -1216,7 +1329,9 @@ async def test_run_agent_drops_interim_commentary_after_generation_invalidation(
     runner = _make_runner(adapter)
     gateway_run = importlib.import_module("gateway.run")
     monkeypatch.setattr(gateway_run, "_ReYMeN_home", tmp_path)
-    monkeypatch.setattr(gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"})
+    monkeypatch.setattr(
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+    )
 
     source = SessionSource(
         platform=Platform.DISCORD,
@@ -1231,7 +1346,9 @@ async def test_run_agent_drops_interim_commentary_after_generation_invalidation(
     invalidated = {"done": False}
 
     async def send_and_invalidate(chat_id, content, reply_to=None, metadata=None):
-        result = await original_send(chat_id, content, reply_to=reply_to, metadata=metadata)
+        result = await original_send(
+            chat_id, content, reply_to=reply_to, metadata=metadata
+        )
         if content == "first interim" and not invalidated["done"]:
             invalidated["done"] = True
             runner._invalidate_session_run_generation(session_key, reason="test_stop")
@@ -1304,14 +1421,18 @@ async def test_verbose_mode_does_not_truncate_args_by_default(monkeypatch, tmp_p
 
 
 @pytest.mark.asyncio
-async def test_verbose_mode_respects_explicit_tool_preview_length(monkeypatch, tmp_path):
+async def test_verbose_mode_respects_explicit_tool_preview_length(
+    monkeypatch, tmp_path
+):
     """When tool_preview_length is set to a positive value, verbose truncates to that."""
     adapter, result = await _run_with_agent(
         monkeypatch,
         tmp_path,
         VerboseAgent,
         session_id="sess-verbose-explicit-cap",
-        config_data={"display": {"tool_progress": "verbose", "tool_preview_length": 50}},
+        config_data={
+            "display": {"tool_progress": "verbose", "tool_preview_length": 50}
+        },
     )
 
     assert result["final_response"] == "done"
@@ -1373,7 +1494,9 @@ async def test_terminal_progress_renders_fenced_code_block(monkeypatch, tmp_path
     runner = _make_runner(adapter)
     gateway_run = importlib.import_module("gateway.run")
     monkeypatch.setattr(gateway_run, "_ReYMeN_home", tmp_path)
-    monkeypatch.setattr(gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"})
+    monkeypatch.setattr(
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+    )
 
     source = SessionSource(
         platform=Platform.TELEGRAM,
@@ -1426,7 +1549,9 @@ async def test_terminal_progress_verbose_shows_full_command(monkeypatch, tmp_pat
     runner = _make_runner(adapter)
     gateway_run = importlib.import_module("gateway.run")
     monkeypatch.setattr(gateway_run, "_ReYMeN_home", tmp_path)
-    monkeypatch.setattr(gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"})
+    monkeypatch.setattr(
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+    )
 
     source = SessionSource(
         platform=Platform.TELEGRAM,
@@ -1474,7 +1599,9 @@ async def test_terminal_progress_no_bash_block_in_verbose_mode(monkeypatch, tmp_
     runner = _make_runner(adapter)
     gateway_run = importlib.import_module("gateway.run")
     monkeypatch.setattr(gateway_run, "_ReYMeN_home", tmp_path)
-    monkeypatch.setattr(gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"})
+    monkeypatch.setattr(
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+    )
 
     source = SessionSource(
         platform=Platform.TELEGRAM,
@@ -1496,6 +1623,7 @@ async def test_terminal_progress_no_bash_block_in_verbose_mode(monkeypatch, tmp_
     all_content = " ".join(call["content"] for call in adapter.sent)
     all_content += " ".join(call["content"] for call in adapter.edits)
     assert "```bash" not in all_content
+
 
 class MultiTerminalCommandAgent:
     """Emits several consecutive terminal tool.started events, then a
@@ -1536,7 +1664,9 @@ async def test_consecutive_terminal_progress_collapses_headers(monkeypatch, tmp_
     runner = _make_runner(adapter)
     gateway_run = importlib.import_module("gateway.run")
     monkeypatch.setattr(gateway_run, "_ReYMeN_home", tmp_path)
-    monkeypatch.setattr(gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"})
+    monkeypatch.setattr(
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+    )
 
     source = SessionSource(
         platform=Platform.TELEGRAM,

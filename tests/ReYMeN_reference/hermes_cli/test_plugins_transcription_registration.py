@@ -60,6 +60,7 @@ class TestRegisterTranscriptionProvider:
         from ReYMeN_cli.plugins import PluginManager
 
         from agent import transcription_registry
+
         transcription_registry._reset_for_tests()
 
         ReYMeN_home = Path(os.environ["ReYMeN_HOME"])
@@ -81,9 +82,9 @@ class TestRegisterTranscriptionProvider:
         mgr = PluginManager()
         mgr.discover_and_load()
 
-        assert mgr._plugins["my-stt-plugin"].enabled is True, (
-            f"Plugin failed to load: {mgr._plugins['my-stt-plugin'].error}"
-        )
+        assert (
+            mgr._plugins["my-stt-plugin"].enabled is True
+        ), f"Plugin failed to load: {mgr._plugins['my-stt-plugin'].error}"
         assert transcription_registry.get_provider("fake-stt") is not None
 
         transcription_registry._reset_for_tests()
@@ -92,6 +93,7 @@ class TestRegisterTranscriptionProvider:
         from ReYMeN_cli.plugins import PluginManager
 
         from agent import transcription_registry
+
         transcription_registry._reset_for_tests()
 
         ReYMeN_home = Path(os.environ["ReYMeN_HOME"])
@@ -117,6 +119,7 @@ class TestRegisterTranscriptionProvider:
         from ReYMeN_cli.plugins import PluginManager
 
         from agent import transcription_registry
+
         transcription_registry._reset_for_tests()
 
         ReYMeN_home = Path(os.environ["ReYMeN_HOME"])

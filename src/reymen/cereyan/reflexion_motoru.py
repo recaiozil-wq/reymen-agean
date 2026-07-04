@@ -93,7 +93,9 @@ class ReflexionMotoru:
         )
 
         try:
-            yanit = self._provider.uret(_YANSIMA_SISTEM, [{"role": "user", "content": kullanici_msg}])
+            yanit = self._provider.uret(
+                _YANSIMA_SISTEM, [{"role": "user", "content": kullanici_msg}]
+            )
             yansima = self._yanit_ayristir(yanit)
         except Exception as e:
             print(f"[Reflexion] LLM hatasi: {e}")
@@ -112,7 +114,9 @@ class ReflexionMotoru:
         if self._hafiza:
             self._vektore_kaydet(hedef, yansima)
 
-        print(f"[Reflexion] Yansima kaydedildi: {yansima.get('neden_basarisiz', '')[:80]}")
+        print(
+            f"[Reflexion] Yansima kaydedildi: {yansima.get('neden_basarisiz', '')[:80]}"
+        )
         return yansima
 
     def ilgili_dersleri_al(self, hedef: str, adet: int = 3) -> str:
@@ -127,11 +131,16 @@ class ReflexionMotoru:
         if self._hafiza:
             try:
                 from reymen.hafiza.vektorel_hafiza import anlamsal_hafiza_ara
-                vek_sonuc = anlamsal_hafiza_ara(self._hafiza, f"REFLEXION {hedef}", adet=adet)
+
+                vek_sonuc = anlamsal_hafiza_ara(
+                    self._hafiza, f"REFLEXION {hedef}", adet=adet
+                )
                 if vek_sonuc and "bulunamadi" not in vek_sonuc.lower():
                     return _DERS_ENJEKSIYON_SABLON.format(dersler=vek_sonuc[:600])
             except Exception as _e:
-                logger.warning("[ReflexionMotoru] except Exception (L130): %s", Exception)
+                logger.warning(
+                    "[ReflexionMotoru] except Exception (L130): %s", Exception
+                )
                 pass
 
         # 2. JSONL anahtar kelime tarama
@@ -155,10 +164,10 @@ class ReflexionMotoru:
     def _yanit_ayristir(yanit: str) -> Optional[dict]:
         """LLM ciktisini yapilandirilmis sozluge donustur."""
         satir_map = {
-            "neden_basarisiz":    r"NEDEN_BASARISIZ:\s*(.+)",
-            "kacinilacak":        r"KACINILACAK:\s*(.+)",
-            "daha_iyi_yaklasim":  r"DAHA_IYI_YAKLASIM:\s*(.+)",
-            "anahtar_kelimeler":  r"ANAHTAR_KELIMELER:\s*(.+)",
+            "neden_basarisiz": r"NEDEN_BASARISIZ:\s*(.+)",
+            "kacinilacak": r"KACINILACAK:\s*(.+)",
+            "daha_iyi_yaklasim": r"DAHA_IYI_YAKLASIM:\s*(.+)",
+            "anahtar_kelimeler": r"ANAHTAR_KELIMELER:\s*(.+)",
         }
         sonuc = {}
         for alan, kalip in satir_map.items():
@@ -189,13 +198,15 @@ class ReflexionMotoru:
             kacinilacak = "Kisitilanmis alanlara yazma deneme"
         elif "baglanti" in hata_lower or "connection" in hata_lower:
             neden = "Network baglantisi kurulamadi"
-            cozum = "Internet baglantisin varsa tekrar dene, yoksa cevrimici arac kullanma"
+            cozum = (
+                "Internet baglantisin varsa tekrar dene, yoksa cevrimici arac kullanma"
+            )
             kacinilacak = "Cevrimdisi ortamda ag gerektiren arac cagirma"
 
         anahtar = " ".join(hedef.lower().split()[:4])
         return {
-            "neden_basarisiz":   neden,
-            "kacinilacak":       kacinilacak,
+            "neden_basarisiz": neden,
+            "kacinilacak": kacinilacak,
             "daha_iyi_yaklasim": cozum,
             "anahtar_kelimeler": anahtar,
         }
@@ -210,7 +221,7 @@ class ReflexionMotoru:
 
             # Sinir kontrolu
             if len(satirlar) >= MAKS_YANSIMA:
-                satirlar = satirlar[-(MAKS_YANSIMA - 1):]  # En eskiyi at
+                satirlar = satirlar[-(MAKS_YANSIMA - 1) :]  # En eskiyi at
 
             satirlar.append(json.dumps(yansima, ensure_ascii=False))
             self._log.write_text("\n".join(satirlar) + "\n", encoding="utf-8")
@@ -221,13 +232,16 @@ class ReflexionMotoru:
         """ChromaDB hafizasina REFLEXION prefix ile kaydet."""
         try:
             from reymen.hafiza.vektorel_hafiza import tecrube_kaydet
+
             icerik = (
                 f"REFLEXION: {hedef}\n"
                 f"Neden: {yansima.get('neden_basarisiz', '')}\n"
                 f"Kacinilacak: {yansima.get('kacinilacak', '')}\n"
                 f"Cozum: {yansima.get('daha_iyi_yaklasim', '')}"
             )
-            kayit_id = f"reflexion-{abs(hash(hedef + yansima.get('zaman', ''))) % 999999}"
+            kayit_id = (
+                f"reflexion-{abs(hash(hedef + yansima.get('zaman', ''))) % 999999}"
+            )
             tecrube_kaydet(self._hafiza, kayit_id, icerik, {"tip": "reflexion"})
         except Exception as e:
             print(f"[Reflexion] Vektor kayit hatasi: {e}")
@@ -246,7 +260,9 @@ class ReflexionMotoru:
                     d = json.loads(satir)
                 except json.JSONDecodeError:
                     continue
-                anahtar = set((d.get("anahtar_kelimeler", "")).replace(",", " ").lower().split())
+                anahtar = set(
+                    (d.get("anahtar_kelimeler", "")).replace(",", " ").lower().split()
+                )
                 eski_hedef = set(d.get("hedef", "").lower().split())
                 toplam = anahtar | eski_hedef
                 eslesme = len(hedef_kelimeler & toplam)
@@ -273,15 +289,17 @@ if __name__ == "__main__":
         # Test 1: Kural tabanli yansima (LLM yok)
         yansima = rm.yansima_kaydet(
             "Web'den haber cek",
-            ["WEB_ARA(\"python news\")", "TARAYICI_AC(\"https://...\")"],
+            ['WEB_ARA("python news")', 'TARAYICI_AC("https://...")'],
             "[Hata]: timeout — 30 saniyede yanit gelmedi",
         )
-        print("[Test 1] Yansima:", json.dumps(yansima, ensure_ascii=False, indent=2)[:200])
+        print(
+            "[Test 1] Yansima:", json.dumps(yansima, ensure_ascii=False, indent=2)[:200]
+        )
 
         # Test 2: Ikinci yansima
         rm.yansima_kaydet(
             "Python dosyasini calistir",
-            ["PYTHON_CALISTIR(\"import tensorflow\")"],
+            ['PYTHON_CALISTIR("import tensorflow")'],
             "[Hata]: ModuleNotFoundError: tensorflow",
         )
 
@@ -292,6 +310,8 @@ if __name__ == "__main__":
 
         # Test 4: Alakasiz sorgu - ders gelmemeli
         alakasiz = rm.ilgili_dersleri_al("PDF dosyasini oku ve ozet cikar")
-        print(f"\n[Test 3] Alakasiz sorgu ders: {'(Bos - dogru)' if not alakasiz else alakasiz[:100]}")
+        print(
+            f"\n[Test 3] Alakasiz sorgu ders: {'(Bos - dogru)' if not alakasiz else alakasiz[:100]}"
+        )
 
         print("\n[Testler] Tamamlandi.")

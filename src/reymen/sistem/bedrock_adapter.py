@@ -15,6 +15,7 @@ try:
     import boto3
     from botocore.auth import SigV4Auth
     from botocore.awsrequest import AWSRequest
+
     BOTO3_AVAILABLE = True
 except ImportError:
     BOTO3_AVAILABLE = False
@@ -108,6 +109,8 @@ class BedrockAdapter:
 
 if __name__ == "__main__":
     b = BedrockAdapter()
-    print(f"Bedrock: {'HAZIR' if b.hazir_mi else 'BULUNAMADI (boto3 veya AWS creds gerekli)'}")
+    print(
+        f"Bedrock: {'HAZIR' if b.hazir_mi else 'BULUNAMADI (boto3 veya AWS creds gerekli)'}"
+    )
     if b.hazir_mi:
         print(f"  Modeller: {b.modelleri_listele()[:5]}")

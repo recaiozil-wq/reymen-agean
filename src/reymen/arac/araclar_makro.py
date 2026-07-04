@@ -10,20 +10,24 @@ Bağımlılık: pynput (kayıt için), pyautogui (oynatma için). Opsiyonel.
 DİKKAT: Bu KÖR tekrardır — aynı koordinatlara aynı sırayla tıklar.
 Pencere yeri/boyutu değişirse kayıt bozulabilir. Ekran-OCR-Tıkla daha dayanıklıdır.
 """
+
 import json
 import os
 import time
 import logging
+
 logger = logging.getLogger(__name__)
 
 try:
     from pynput import mouse, keyboard
+
     PYNPUT_OK = True
 except Exception:
     PYNPUT_OK = False
 
 try:
     import pyautogui
+
     PYAUTOGUI_OK = True
 except Exception:
     PYAUTOGUI_OK = False
@@ -47,12 +51,20 @@ class MakroKaydedici:
 
         def on_click(x, y, button, pressed):
             if pressed:
-                self._olaylar.append({"t": time.time() - self._baslangic,
-                                      "tip": "click", "x": x, "y": y, "buton": str(button)})
+                self._olaylar.append(
+                    {
+                        "t": time.time() - self._baslangic,
+                        "tip": "click",
+                        "x": x,
+                        "y": y,
+                        "buton": str(button),
+                    }
+                )
 
         def on_press(key):
-            self._olaylar.append({"t": time.time() - self._baslangic,
-                                  "tip": "tus", "key": str(key)})
+            self._olaylar.append(
+                {"t": time.time() - self._baslangic, "tip": "tus", "key": str(key)}
+            )
 
         self._mouse_listener = mouse.Listener(on_click=on_click)
         self._kb_listener = keyboard.Listener(on_press=on_press)
@@ -102,7 +114,9 @@ class MakroKaydedici:
         return f"[Makro]: '{makro_adi}' oynatıldı ({len(olaylar)} olay)."
 
     def makro_listesi(self):
-        dosyalar = [f[:-5] for f in os.listdir(self.kayit_dizini) if f.endswith(".json")]
+        dosyalar = [
+            f[:-5] for f in os.listdir(self.kayit_dizini) if f.endswith(".json")
+        ]
         return dosyalar
 
 

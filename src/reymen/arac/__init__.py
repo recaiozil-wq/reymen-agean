@@ -22,6 +22,7 @@ try:
         AutoGenAdaptor,
         framework_adaptor_durum,
     )
+
     _FRAMEWORK_ADAPTOR_MEVCUT = True
 except ImportError:
     _FRAMEWORK_ADAPTOR_MEVCUT = False

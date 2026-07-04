@@ -15,8 +15,11 @@ class TestAccountUsageInit:
     """AccountUsage başlangıç durumu."""
 
     def test_bos_baslangic(self, tmp_path):
-        with patch("reymen.sistem.account_usage.RAPOR_DOSYASI", tmp_path / "usage.json"):
+        with patch(
+            "reymen.sistem.account_usage.RAPOR_DOSYASI", tmp_path / "usage.json"
+        ):
             from reymen.sistem.account_usage import AccountUsage
+
             h = AccountUsage()
             assert h._veri["toplam_istek"] == 0
             assert h._veri["toplam_token"] == 0
@@ -31,12 +34,20 @@ class TestAccountUsageInit:
             "toplam_istek": 5,
             "toplam_token": 1000,
             "toplam_maliyet": 0.05,
-            "providerlar": {"deepseek": {"istek": 5, "token": 1000, "maliyet": 0.05, "model": "chat"}},
+            "providerlar": {
+                "deepseek": {
+                    "istek": 5,
+                    "token": 1000,
+                    "maliyet": 0.05,
+                    "model": "chat",
+                }
+            },
             "aylik_veri": {},
         }
         dosya.write_text(json.dumps(veri), encoding="utf-8")
         with patch("reymen.sistem.account_usage.RAPOR_DOSYASI", dosya):
             from reymen.sistem.account_usage import AccountUsage
+
             h = AccountUsage()
             assert h._veri["toplam_istek"] == 5
             assert h._veri["toplam_maliyet"] == 0.05
@@ -46,6 +57,7 @@ class TestAccountUsageInit:
         dosya.write_text("{bozuk json!!!", encoding="utf-8")
         with patch("reymen.sistem.account_usage.RAPOR_DOSYASI", dosya):
             from reymen.sistem.account_usage import AccountUsage
+
             h = AccountUsage()
             assert h._veri["toplam_istek"] == 0
 
@@ -54,8 +66,11 @@ class TestEkle:
     """ekle() — kullanım kaydı ekleme."""
 
     def _make(self, tmp_path):
-        with patch("reymen.sistem.account_usage.RAPOR_DOSYASI", tmp_path / "usage.json"):
+        with patch(
+            "reymen.sistem.account_usage.RAPOR_DOSYASI", tmp_path / "usage.json"
+        ):
             from reymen.sistem.account_usage import AccountUsage
+
             return AccountUsage()
 
     def test_ekle_tek(self, tmp_path):
@@ -101,8 +116,11 @@ class TestOzet:
     """ozet() — özet string."""
 
     def test_ozet_format(self, tmp_path):
-        with patch("reymen.sistem.account_usage.RAPOR_DOSYASI", tmp_path / "usage.json"):
+        with patch(
+            "reymen.sistem.account_usage.RAPOR_DOSYASI", tmp_path / "usage.json"
+        ):
             from reymen.sistem.account_usage import AccountUsage
+
             h = AccountUsage()
             h.ekle("deepseek", "chat", 100, 50, 0.001)
             sonuc = h.ozet()
@@ -114,8 +132,11 @@ class TestProviderRaporu:
     """provider_raporu() — provider detayı."""
 
     def test_meveut_provider(self, tmp_path):
-        with patch("reymen.sistem.account_usage.RAPOR_DOSYASI", tmp_path / "usage.json"):
+        with patch(
+            "reymen.sistem.account_usage.RAPOR_DOSYASI", tmp_path / "usage.json"
+        ):
             from reymen.sistem.account_usage import AccountUsage
+
             h = AccountUsage()
             h.ekle("deepseek", "chat", 100, 50, 0.001)
             sonuc = h.provider_raporu("deepseek")
@@ -123,8 +144,11 @@ class TestProviderRaporu:
             assert "chat" in sonuc
 
     def test_olmayan_provider(self, tmp_path):
-        with patch("reymen.sistem.account_usage.RAPOR_DOSYASI", tmp_path / "usage.json"):
+        with patch(
+            "reymen.sistem.account_usage.RAPOR_DOSYASI", tmp_path / "usage.json"
+        ):
             from reymen.sistem.account_usage import AccountUsage
+
             h = AccountUsage()
             sonuc = h.provider_raporu("yok")
             assert "kaydi yok" in sonuc.lower() or "yok" in sonuc.lower()
@@ -134,8 +158,11 @@ class TestAylikRapor:
     """aylik_rapor() — aylık rapor."""
 
     def test_meveut_ay(self, tmp_path):
-        with patch("reymen.sistem.account_usage.RAPOR_DOSYASI", tmp_path / "usage.json"):
+        with patch(
+            "reymen.sistem.account_usage.RAPOR_DOSYASI", tmp_path / "usage.json"
+        ):
             from reymen.sistem.account_usage import AccountUsage
+
             h = AccountUsage()
             h.ekle("deepseek", "chat", 100, 50, 0.001)
             ay = date.today().isoformat()[:7]
@@ -143,8 +170,11 @@ class TestAylikRapor:
             assert ay in sonuc
 
     def test_olmayan_ay(self, tmp_path):
-        with patch("reymen.sistem.account_usage.RAPOR_DOSYASI", tmp_path / "usage.json"):
+        with patch(
+            "reymen.sistem.account_usage.RAPOR_DOSYASI", tmp_path / "usage.json"
+        ):
             from reymen.sistem.account_usage import AccountUsage
+
             h = AccountUsage()
             sonuc = h.aylik_rapor("2020-01")
             assert "kayit yok" in sonuc.lower() or "2020-01" in sonuc
@@ -154,8 +184,11 @@ class TestButceUyarisi:
     """butce_uyarisi() — bütçe kontrolü."""
 
     def _make_with_data(self, tmp_path, maliyet):
-        with patch("reymen.sistem.account_usage.RAPOR_DOSYASI", tmp_path / "usage.json"):
+        with patch(
+            "reymen.sistem.account_usage.RAPOR_DOSYASI", tmp_path / "usage.json"
+        ):
             from reymen.sistem.account_usage import AccountUsage
+
             h = AccountUsage()
             # Fake the monthly data directly
             ay = date.today().isoformat()[:7]
@@ -189,8 +222,11 @@ class TestSifirla:
     """sifirla() — veri sıfırlama."""
 
     def test_sifirla(self, tmp_path):
-        with patch("reymen.sistem.account_usage.RAPOR_DOSYASI", tmp_path / "usage.json"):
+        with patch(
+            "reymen.sistem.account_usage.RAPOR_DOSYASI", tmp_path / "usage.json"
+        ):
             from reymen.sistem.account_usage import AccountUsage
+
             h = AccountUsage()
             h.ekle("deepseek", "chat", 100, 50, 0.001)
             assert h._veri["toplam_istek"] == 1
@@ -204,8 +240,11 @@ class TestGlobalFonksiyonlar:
     """hesap_ekle / hesap_ozet global fonksiyonları."""
 
     def test_hesap_ozet_donus_tipi(self, tmp_path):
-        with patch("reymen.sistem.account_usage.RAPOR_DOSYASI", tmp_path / "usage.json"):
+        with patch(
+            "reymen.sistem.account_usage.RAPOR_DOSYASI", tmp_path / "usage.json"
+        ):
             from reymen.sistem.account_usage import hesap_ozet
+
             sonuc = hesap_ozet()
             assert isinstance(sonuc, str)
             assert "Hesap" in sonuc or "istek" in sonuc.lower()

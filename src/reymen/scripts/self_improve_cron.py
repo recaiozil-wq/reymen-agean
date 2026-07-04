@@ -12,6 +12,7 @@ Her calistiginda:
 Kullanim:
     python -m reymen.scripts.self_improve_cron
 """
+
 from __future__ import annotations
 
 import json
@@ -23,6 +24,7 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 import logging
+
 logger = logging.getLogger(__name__)
 
 logging.basicConfig(level=logging.INFO, format="[SI_CRON] %(message)s")
@@ -30,7 +32,9 @@ log = logging.getLogger(__name__)
 
 # Proje koku
 ROOT = Path(__file__).resolve().parent.parent.parent
-CIKTI_DIZINI = Path(os.environ.get("HERMES_CIKTI", str(ROOT / ".ReYMeN" / "self_improve")))
+CIKTI_DIZINI = Path(
+    os.environ.get("HERMES_CIKTI", str(ROOT / ".ReYMeN" / "self_improve"))
+)
 CIKTI_DIZINI.mkdir(parents=True, exist_ok=True)
 
 
@@ -39,6 +43,7 @@ def _metrik_topla() -> dict:
     try:
         sys.path.insert(0, str(ROOT))
         from reymen.self_improve import report as si_report
+
         raw = si_report()
         # Map Turkish keys → English keys for cron template
         return {
@@ -49,7 +54,12 @@ def _metrik_topla() -> dict:
         }
     except Exception as e:
         log.warning("Metrik toplama hatasi: %s", e)
-        return {"total_steps": 0, "avg_score": 0.0, "pass_rate": 0.0, "low_quality_steps": 0}
+        return {
+            "total_steps": 0,
+            "avg_score": 0.0,
+            "pass_rate": 0.0,
+            "low_quality_steps": 0,
+        }
 
 
 def _kod_tarama() -> list[dict]:
@@ -64,14 +74,19 @@ def _kod_tarama() -> list[dict]:
         # Son 24 saatte degisen .py dosyalari
         sonuc = subprocess.run(
             ["git", "diff", "--name-only", "@{1.day.ago}"],
-            capture_output=True, text=True, timeout=30,
+            capture_output=True,
+            text=True,
+            timeout=30,
             cwd=str(ROOT),
         )
         if sonuc.returncode != 0:
             return [{"dosya": "git", "sorun": "git diff basarisiz", "seviye": "uyari"}]
 
-        degisen_dosyalar = [f for f in sonuc.stdout.strip().split("\n")
-                           if f.endswith(".py") and f.strip()]
+        degisen_dosyalar = [
+            f
+            for f in sonuc.stdout.strip().split("\n")
+            if f.endswith(".py") and f.strip()
+        ]
 
         for dosya in degisen_dosyalar[:20]:  # Ilk 20 ile sinirla
             dosya_yolu = ROOT / dosya
@@ -83,30 +98,42 @@ def _kod_tarama() -> list[dict]:
             # Basit kalite kontrolleri
             satir_sayisi = len(icerik.split("\n"))
             if satir_sayisi > 800:
-                bulgular.append({
-                    "dosya": dosya, "sorun": f"Cok uzun dosya: {satir_sayisi} satir",
-                    "seviye": "uyari",
-                })
+                bulgular.append(
+                    {
+                        "dosya": dosya,
+                        "sorun": f"Cok uzun dosya: {satir_sayisi} satir",
+                        "seviye": "uyari",
+                    }
+                )
 
             if "except:" in icerik or "except :" in icerik:
-                bulgular.append({
-                    "dosya": dosya, "sorun": "Bare except (except: ) tespit edildi",
-                    "seviye": "kritik",
-                })
+                bulgular.append(
+                    {
+                        "dosya": dosya,
+                        "sorun": "Bare except (except: ) tespit edildi",
+                        "seviye": "kritik",
+                    }
+                )
 
             if "import *" in icerik:
-                bulgular.append({
-                    "dosya": dosya, "sorun": "Wildcard import (import *)",
-                    "seviye": "uyari",
-                })
+                bulgular.append(
+                    {
+                        "dosya": dosya,
+                        "sorun": "Wildcard import (import *)",
+                        "seviye": "uyari",
+                    }
+                )
 
             if "TODO" in icerik or "FIXME" in icerik:
                 todo_sayisi = icerik.count("TODO") + icerik.count("FIXME")
                 if todo_sayisi > 3:
-                    bulgular.append({
-                        "dosya": dosya, "sorun": f"Cok fazla TODO/FIXME: {todo_sayisi} adet",
-                        "seviye": "uyari",
-                    })
+                    bulgular.append(
+                        {
+                            "dosya": dosya,
+                            "sorun": f"Cok fazla TODO/FIXME: {todo_sayisi} adet",
+                            "seviye": "uyari",
+                        }
+                    )
 
     except Exception as e:
         log.warning("Kod tarama hatasi: %s", e)
@@ -156,7 +183,9 @@ def _rapor_kaydet(rapor: dict) -> Path:
     """Raporu JSON ve MD olarak kaydet."""
     # JSON
     json_yol = CIKTI_DIZINI / "self_improve_rapor.json"
-    json_yol.write_text(json.dumps(rapor, indent=2, ensure_ascii=False), encoding="utf-8")
+    json_yol.write_text(
+        json.dumps(rapor, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
 
     # MD ozet
     md_yol = CIKTI_DIZINI / "self_improve_ozet.md"
@@ -208,7 +237,9 @@ def main() -> str:
 
     # 1. Metrik topla
     metrik = _metrik_topla()
-    log.info("Metrikler: %d adim, ortalama=%.2f", metrik["total_steps"], metrik["avg_score"])
+    log.info(
+        "Metrikler: %d adim, ortalama=%.2f", metrik["total_steps"], metrik["avg_score"]
+    )
 
     # 2. Kod tara
     bulgular = _kod_tarama()

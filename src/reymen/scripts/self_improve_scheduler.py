@@ -98,16 +98,21 @@ class KendiniGelistirScheduler:
     def _hafiza_budama_cagir(self) -> str:
         """Hafıza budamayı çalıştırır."""
         import importlib
+
         try:
             mod = importlib.import_module("reymen.hafiza.hafiza_budama")
-            budayici = mod.HafizaBudama() if hasattr(mod, 'HafizaBudama') else None
+            budayici = mod.HafizaBudama() if hasattr(mod, "HafizaBudama") else None
             if budayici is None:
                 # Try running directly
                 import subprocess
+
                 r = subprocess.run(
                     ["python", "-m", "reymen.hafiza.hafiza_budama"],
-                    capture_output=True, text=True, timeout=60,
-                    cwd=str(PROJE_KOK), env={**os.environ, "PYTHONPATH": str(ROOT)}
+                    capture_output=True,
+                    text=True,
+                    timeout=60,
+                    cwd=str(PROJE_KOK),
+                    env={**os.environ, "PYTHONPATH": str(ROOT)},
                 )
                 return r.stdout[:200] or r.stderr[:200] or "tamam"
             rapor = budayici.budama_yap(dry_run=False)
@@ -120,22 +125,27 @@ class KendiniGelistirScheduler:
     def _si_cron_cagir(self) -> str:
         """Self-improve cron metriklerini çalıştırır."""
         import subprocess
+
         r = subprocess.run(
             [sys.executable, "-m", "reymen.scripts.self_improve_cron"],
-            capture_output=True, text=True, timeout=120,
-            cwd=str(PROJE_KOK), env={**os.environ, "PYTHONPATH": str(ROOT)}
+            capture_output=True,
+            text=True,
+            timeout=120,
+            cwd=str(PROJE_KOK),
+            env={**os.environ, "PYTHONPATH": str(ROOT)},
         )
         return r.stdout[:200] or r.stderr[:200] or "tamam"
 
     def _skill_iyilestir_cagir(self) -> str:
         """Skill iyileştirme sistemini çalıştırır."""
         from reymen.scripts.skill_iyilestirici import SkillIyilestirici
+
         iyilestirici = SkillIyilestirici()
         adaylar = iyilestirici.iyilestirme_adaylari_bul()
         if adaylar:
             sonuc = iyilestirici.otomatik_iyilestir()
             if isinstance(sonuc, dict):
-                iyilestirilen = sonuc.get('iyilestirilen', sonuc.get('islenen', 0))
+                iyilestirilen = sonuc.get("iyilestirilen", sonuc.get("islenen", 0))
             else:
                 iyilestirilen = int(sonuc) if sonuc else 0
             return f"{len(adaylar)} aday bulundu, {iyilestirilen} iyilestirildi"
@@ -145,6 +155,7 @@ class KendiniGelistirScheduler:
         """Kod budama sistemini çalıştırır."""
         try:
             from reymen.cereyan.auto_budama import AutoBudama
+
             budayici = AutoBudama()
             rapor = budayici.budama_yap()
             if isinstance(rapor, dict):
@@ -157,6 +168,7 @@ class KendiniGelistirScheduler:
         """Nudge model raporunu oluşturur."""
         try:
             from reymen.cereyan.nudge_model import NudgeModel
+
             model = NudgeModel()
             rapor = model.rapor_uret()
             return rapor[:200]
@@ -167,6 +179,7 @@ class KendiniGelistirScheduler:
         """Proaktif kontrol durum raporunu alır."""
         try:
             from reymen.cereyan.proaktif_kontrol import proaktif_baslat
+
             denetci = proaktif_baslat()
             return denetci.durum_raporu()
         except ImportError:
@@ -176,10 +189,15 @@ class KendiniGelistirScheduler:
         """Son durumu JSON'a kaydet."""
         DURUM_DOSYASI.parent.mkdir(parents=True, exist_ok=True)
         with open(DURUM_DOSYASI, "w", encoding="utf-8") as f:
-            json.dump({
-                "son_guncelleme": datetime.now(timezone.utc).isoformat(),
-                "gorevler": self.sonuc,
-            }, f, indent=2, ensure_ascii=False)
+            json.dump(
+                {
+                    "son_guncelleme": datetime.now(timezone.utc).isoformat(),
+                    "gorevler": self.sonuc,
+                },
+                f,
+                indent=2,
+                ensure_ascii=False,
+            )
 
     def durum_goster(self) -> str:
         """Kayıtlı durumu göster."""
@@ -190,7 +208,9 @@ class KendiniGelistirScheduler:
         lines = [f"Son güncelleme: {data.get('son_guncelleme', '?')}"]
         for ad, kayit in data.get("gorevler", {}).items():
             durum = "✅" if kayit.get("basarili") else "❌"
-            lines.append(f"  {durum} {ad}: {kayit.get('mesaj', '')} ({kayit.get('sure_sn', '?')}s)")
+            lines.append(
+                f"  {durum} {ad}: {kayit.get('mesaj', '')} ({kayit.get('sure_sn', '?')}s)"
+            )
         return "\n".join(lines)
 
 

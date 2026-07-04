@@ -19,7 +19,10 @@ def cfg():
         "default_provider": "deepseek",
         "default_model": "deepseek-v4-flash",
         "providers": {
-            "deepseek": {"base_url": "https://api.deepseek.com", "api_key": "sk-test-key"},
+            "deepseek": {
+                "base_url": "https://api.deepseek.com",
+                "api_key": "sk-test-key",
+            },
         },
     }
 
@@ -32,8 +35,10 @@ def msgs():
 # Manual mock/restore (patch.object thread+onbellek sorunu yaratir)
 _ORIG = Beyin._cagir_ile_retry
 
+
 def _mock_retry(ret=None, err=None):
     Beyin._cagir_ile_retry = MagicMock(return_value=ret, side_effect=err)
+
 
 def _unmock():
     Beyin._cagir_ile_retry = _ORIG
@@ -55,13 +60,15 @@ class TestBeyinBaslatma:
 
     def test_iptal(self, cfg):
         b = Beyin(config=cfg)
-        b.iptal_et(); assert b._iptal_olayi.is_set()
-        b.sifirla(); assert not b._iptal_olayi.is_set()
+        b.iptal_et()
+        assert b._iptal_olayi.is_set()
+        b.sifirla()
+        assert not b._iptal_olayi.is_set()
 
 
 class TestDusun:
     """dusun() -> _cagir_ile_retry mock.
-    
+
     ONEMLI: Her test FARKLI prompt kullanir!
     Beyin prompt caching (_CACHE_AKTIF) ayni prompt+mesaj ciftini
     onbellekten dondurur, bu da test izolasyonunu bozar.
@@ -138,7 +145,8 @@ class TestCagir:
     def test_openai_uyumlu(self, cfg, msgs):
         with patch.object(Beyin, "_cagir_openai_uyumlu", return_value="OK"):
             r = Beyin(config=cfg)._cagir(
-                Beyin(config=cfg)._fallback_zinciri[0], "S", msgs)
+                Beyin(config=cfg)._fallback_zinciri[0], "S", msgs
+            )
         assert r.metin == "OK"
 
     def test_lmstudio(self, cfg, msgs):
@@ -150,15 +158,29 @@ class TestCagir:
 
 class TestUretV2:
     def test_basarili(self, cfg, msgs):
-        with patch.object(Beyin, "_cagir_openai_uyumlu_v2", return_value={
-            "role": "assistant", "content": "Selam!", "tool_calls": [],
-        }):
+        with patch.object(
+            Beyin,
+            "_cagir_openai_uyumlu_v2",
+            return_value={
+                "role": "assistant",
+                "content": "Selam!",
+                "tool_calls": [],
+            },
+        ):
             assert Beyin(config=cfg).uret_v2("S", msgs)["content"] == "Selam!"
 
     def test_tools(self, cfg, msgs):
-        mock_ret = {"role": "assistant", "content": "",
-                    "tool_calls": [{"id": "c1", "type": "function",
-                                    "function": {"name": "HESAPLA", "arguments": "{}"}}]}
+        mock_ret = {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+                {
+                    "id": "c1",
+                    "type": "function",
+                    "function": {"name": "HESAPLA", "arguments": "{}"},
+                }
+            ],
+        }
         with patch.object(Beyin, "_cagir_openai_uyumlu_v2", return_value=mock_ret):
             r = Beyin(config=cfg).uret_v2("S", msgs, tools=[{}])
         assert len(r["tool_calls"]) == 1
@@ -175,12 +197,16 @@ class TestUretV2:
 class TestRateLimit:
     def test_429(self, cfg):
         import requests as r
-        mr = MagicMock(); mr.status_code = 429
+
+        mr = MagicMock()
+        mr.status_code = 429
         assert Beyin(config=cfg)._rate_limit_mi(r.HTTPError(response=mr))
 
     def test_500_degil(self, cfg):
         import requests as r
-        mr = MagicMock(); mr.status_code = 500
+
+        mr = MagicMock()
+        mr.status_code = 500
         assert not Beyin(config=cfg)._rate_limit_mi(r.HTTPError(response=mr))
 
     def test_fc_destek(self, cfg):

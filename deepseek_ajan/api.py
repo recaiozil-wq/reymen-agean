@@ -1,8 +1,10 @@
 """DeepSeek API istemcisi."""
+
 import os, sys
 
 DEFAULT_MODEL = "deepseek-v4-flash"
 API_BASE = "https://api.deepseek.com/v1"
+
 
 def api_istek(messages, model=None, temperature=0.7, max_tokens=4096):
     try:
@@ -19,11 +21,15 @@ def api_istek(messages, model=None, temperature=0.7, max_tokens=4096):
     model = model or os.environ.get("DEEPSEEK_MODEL", DEFAULT_MODEL)
     try:
         r = client.chat.completions.create(
-            model=model, messages=messages,
-            max_tokens=max_tokens, temperature=temperature)
+            model=model,
+            messages=messages,
+            max_tokens=max_tokens,
+            temperature=temperature,
+        )
         return r.choices[0].message.content.strip() or ""
     except Exception as e:
         return f"[API Hatasi] {e}"
+
 
 def _dotenv_key():
     for p in [".env", os.path.expanduser("~/.deepseek_ajan/.env")]:

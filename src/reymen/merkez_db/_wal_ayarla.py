@@ -1,6 +1,8 @@
 """Tüm merkez_db'deki SQLite dosyalarına WAL + busy_timeout uygula."""
+
 import sqlite3, os
 import logging
+
 logger = logging.getLogger(__name__)
 
 DB_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -12,18 +14,18 @@ for db in sorted(dbs):
     try:
         con = sqlite3.connect(yol, timeout=10)
         cur = con.cursor()
-        
+
         # Her PRAGMA ayrı ayrı
         cur.execute("PRAGMA journal_mode=WAL")
         jm = cur.fetchone()
         jm = jm[0] if jm else "?"
-        
+
         cur.execute("PRAGMA busy_timeout=5000")
         bt = cur.fetchone()
         bt = bt[0] if bt else "?"
-        
+
         cur.execute("PRAGMA synchronous=NORMAL")
-        
+
         con.close()
         print(f"  ✅ {db:30s} journal={str(jm):4s} busy={bt}ms")
     except Exception as e:

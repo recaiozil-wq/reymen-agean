@@ -38,11 +38,7 @@ class ToolExecutor:
         self._max_gecmis = 100
         self._kilit = threading.Lock()
 
-    def calistir(
-        self,
-        arac: Callable,
-        **params
-    ) -> Dict[str, Any]:
+    def calistir(self, arac: Callable, **params) -> Dict[str, Any]:
         """
         Executes a tool with given parameters.
 
@@ -57,7 +53,9 @@ class ToolExecutor:
         baslangic = time.time()
 
         try:
-            logger.debug(f"Arac calistiriliyor: {getattr(arac, '__name__', str(arac))}, ID: {islem_id}")
+            logger.debug(
+                f"Arac calistiriliyor: {getattr(arac, '__name__', str(arac))}, ID: {islem_id}"
+            )
 
             # Islemi kaydet
             islem = {
@@ -117,10 +115,7 @@ class ToolExecutor:
                 self._aktif_islemler.pop(islem_id, None)
 
     def calistir_guvenli(
-        self,
-        arac: Callable,
-        timeout: Optional[float] = None,
-        **params
+        self, arac: Callable, timeout: Optional[float] = None, **params
     ) -> Dict[str, Any]:
         """
         Araci timeout ile calistirir.
@@ -179,10 +174,7 @@ class ToolExecutor:
         return run_fn
 
     def calistir_tool(
-        self,
-        module_name: str,
-        timeout: Optional[float] = None,
-        **params
+        self, module_name: str, timeout: Optional[float] = None, **params
     ) -> Dict[str, Any]:
         """tools.<module_name> icindeki run() fonksiyonunu calistirir."""
         try:
@@ -193,7 +185,9 @@ class ToolExecutor:
                 "hata": str(exc),
                 "timeout": False,
             }
-        return self.calistir_guvenli(run_fn, timeout=timeout or self._varsayilan_timeout, **params)
+        return self.calistir_guvenli(
+            run_fn, timeout=timeout or self._varsayilan_timeout, **params
+        )
 
     def _gecmis_kaydet(self, islem: Dict[str, Any]) -> None:
         """Islem gecmisine kaydeder."""
@@ -201,7 +195,7 @@ class ToolExecutor:
             with self._kilit:
                 self._gecmis.append(islem)
                 if len(self._gecmis) > self._max_gecmis:
-                    self._gecmis = self._gecmis[-self._max_gecmis:]
+                    self._gecmis = self._gecmis[-self._max_gecmis :]
         except Exception as e:
             logger.error(f"Gecmis kaydi hatasi: {e}")
 
@@ -261,9 +255,7 @@ class ToolExecutor:
             return {"hata": str(e)}
 
     def gecmis(
-        self,
-        limit: int = 10,
-        arac_adi: Optional[str] = None
+        self, limit: int = 10, arac_adi: Optional[str] = None
     ) -> List[Dict[str, Any]]:
         """
         Islem gecmisini dondurur.
@@ -292,7 +284,9 @@ class ToolExecutor:
         """Executor istatistiklerini dondurur."""
         try:
             with self._kilit:
-                basarili = sum(1 for k in self._gecmis if k.get("durum") == "tamamlandi")
+                basarili = sum(
+                    1 for k in self._gecmis if k.get("durum") == "tamamlandi"
+                )
                 hatali = sum(1 for k in self._gecmis if k.get("durum") == "hata")
 
             return {
@@ -309,7 +303,8 @@ class ToolExecutor:
         """Ortalama islem suresini hesaplar."""
         try:
             sureler = [
-                k.get("sure", 0) for k in self._gecmis
+                k.get("sure", 0)
+                for k in self._gecmis
                 if isinstance(k.get("sure"), (int, float))
             ]
             if sureler:
@@ -350,12 +345,16 @@ def run(**kwargs) -> str:
         gecmis_liste = executor.gecmis()
         istatistik = executor.istatistik()
 
-        return json.dumps({
-            "sonuc1": sonuc1,
-            "sonuc2": sonuc2,
-            "gecmis_sayisi": len(gecmis_liste),
-            "istatistik": istatistik,
-        }, ensure_ascii=False, indent=2)
+        return json.dumps(
+            {
+                "sonuc1": sonuc1,
+                "sonuc2": sonuc2,
+                "gecmis_sayisi": len(gecmis_liste),
+                "istatistik": istatistik,
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
 
     except Exception as e:
         return f"Tool executor hatasi: {e}"

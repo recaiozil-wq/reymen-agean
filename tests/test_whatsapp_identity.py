@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 """tests/test_whatsapp_identity.py — WhatsApp identity helpers birim testleri."""
+
 import json
 import sys
 import tempfile
 from pathlib import Path
+
 PROJE_KOK = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJE_KOK))
 import pytest
@@ -17,13 +19,18 @@ from gateway.whatsapp_identity import (
 
 class TestNormalizeWhatsAppIdentifier:
     def test_full_jid(self):
-        assert normalize_whatsapp_identifier("60123456789@s.whatsapp.net") == "60123456789"
+        assert (
+            normalize_whatsapp_identifier("60123456789@s.whatsapp.net") == "60123456789"
+        )
 
     def test_lid(self):
         assert normalize_whatsapp_identifier("999999999999999@lid") == "999999999999999"
 
     def test_with_device(self):
-        assert normalize_whatsapp_identifier("60123456789:47@s.whatsapp.net") == "60123456789"
+        assert (
+            normalize_whatsapp_identifier("60123456789:47@s.whatsapp.net")
+            == "60123456789"
+        )
 
     def test_plus_prefix(self):
         assert normalize_whatsapp_identifier("+60123456789") == "60123456789"
@@ -41,7 +48,9 @@ class TestNormalizeWhatsAppIdentifier:
         assert normalize_whatsapp_identifier("  60123456789  ") == "60123456789"
 
     def test_no_mutation(self):
-        assert normalize_whatsapp_identifier("15551234567@s.whatsapp.net") == "15551234567"
+        assert (
+            normalize_whatsapp_identifier("15551234567@s.whatsapp.net") == "15551234567"
+        )
 
 
 class TestExpandWhatsAppAliases:
@@ -97,8 +106,10 @@ class TestExpandWhatsAppAliases:
 
 class TestCanonicalWhatsAppIdentifier:
     def test_normalizes(self):
-        with patch("gateway.whatsapp_identity.get_hermes_home",
-                   return_value=Path(tempfile.mkdtemp())):
+        with patch(
+            "gateway.whatsapp_identity.get_hermes_home",
+            return_value=Path(tempfile.mkdtemp()),
+        ):
             result = canonical_whatsapp_identifier("60123456789@s.whatsapp.net")
             assert result == "60123456789"
 

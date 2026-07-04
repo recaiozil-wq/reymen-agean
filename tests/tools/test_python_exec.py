@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """python_exec modülü testleri."""
+
 from unittest.mock import MagicMock, patch
 from tools import python_exec
 

@@ -20,6 +20,7 @@ the SAME gateway_state.json the reconciler already consults, guarded by
 ``[ ! -f ]`` so persisted runtime state always wins on subsequent boots (a
 deliberately-stopped gateway must stay stopped across restarts).
 """
+
 from __future__ import annotations
 
 import json
@@ -46,8 +47,7 @@ def _seed_block(text: str) -> str:
     """Extract the ``if [ ! -f "$ReYMeN_HOME/gateway_state.json" ] && … fi``
     block that seeds the gateway state file from the bootstrap env var."""
     m = re.search(
-        r'(if \[ ! -f "\$ReYMeN_HOME/gateway_state\.json" \] && \\\n'
-        r"(?:.*\n)*?fi)",
+        r'(if \[ ! -f "\$ReYMeN_HOME/gateway_state\.json" \] && \\\n' r"(?:.*\n)*?fi)",
         text,
     )
     assert m, (
@@ -60,9 +60,9 @@ def _seed_block(text: str) -> str:
 def test_seed_block_present_and_guarded(stage2_text: str) -> None:
     block = _seed_block(stage2_text)
     # Must be a first-boot-only seed (the [ ! -f ] guard) keyed on the env var.
-    assert '[ ! -f "$ReYMeN_HOME/gateway_state.json" ]' in block, (
-        "seed must be guarded by [ ! -f ] so persisted state wins on restart"
-    )
+    assert (
+        '[ ! -f "$ReYMeN_HOME/gateway_state.json" ]' in block
+    ), "seed must be guarded by [ ! -f ] so persisted state wins on restart"
     assert "ReYMeN_GATEWAY_BOOTSTRAP_STATE" in block
     assert "gateway_state" in block
 
@@ -101,16 +101,12 @@ def _run_seed(
             f'ReYMeN_HOME="{home}"\n'
             # Stub privilege ops — the sandbox isn't root.
             "chown() { :; }\n"
-            "chmod() { :; }\n"
-            + env_line
-            + block
+            "chmod() { :; }\n" + env_line + block
         )
         script_path = dpath / "harness.sh"
         script_path.write_text(script)
 
-        proc = subprocess.run(
-            [bash, str(script_path)], capture_output=True, text=True
-        )
+        proc = subprocess.run([bash, str(script_path)], capture_output=True, text=True)
         assert proc.returncode == 0, proc.stderr
 
         if not state_file.exists():
@@ -147,6 +143,4 @@ def test_non_running_value_ignored(stage2_text: str) -> None:
     exactly {"running"}.)"""
     for bogus in ("stopped", "Running", "1", "true", "starting"):
         out = _run_seed(stage2_text, env_value=bogus, preexisting=None)
-        assert out is None, (
-            f"only 'running' should seed a state file, not {bogus!r}"
-        )
+        assert out is None, f"only 'running' should seed a state file, not {bogus!r}"

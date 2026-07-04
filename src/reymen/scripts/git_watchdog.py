@@ -32,12 +32,15 @@ SHARED_STATE = PROJE_YOLU / "shared_state" / "git_watchdog_state.json"
 # Kendi state dosyasini git status'tan filtrele (self-trigger)
 SHARED_STATE_REL = "shared_state/git_watchdog_state.json"
 
+
 # ── Ana fonksiyon ──────────────────────────────────────────────
 def main() -> int:
     """Git status --short calistir, degisiklik varsa yaz yoksa sessiz."""
     result = subprocess.run(
         ["git", "status", "--short"],
-        capture_output=True, text=True, timeout=30,
+        capture_output=True,
+        text=True,
+        timeout=30,
         cwd=str(PROJE_YOLU),
     )
 
@@ -84,27 +87,39 @@ def main() -> int:
         if len(deleted) > 5:
             print(f"  ... ve {len(deleted)-5} dosya daha")
 
-    print(f"\n📊 Toplam: {len(lines)} dosya ({len(modified)} degisen, {len(added)} yeni, {len(deleted)} silinen)")
+    print(
+        f"\n📊 Toplam: {len(lines)} dosya ({len(modified)} degisen, {len(added)} yeni, {len(deleted)} silinen)"
+    )
 
     # Paylasilan durum dosyasina kaydet (tum botlar okur)
     _durum_kaydet(len(lines), len(modified), len(added), len(deleted), lines)
     return 0
 
 
-def _durum_kaydet(toplam: int, degisen: int, yeni: int, silinen: int, ham_lines: list[str]):
+def _durum_kaydet(
+    toplam: int, degisen: int, yeni: int, silinen: int, ham_lines: list[str]
+):
     """Son durumu shared_state/git_watchdog_state.json'a yaz (tum botlar icin)."""
     import json
+
     try:
         SHARED_STATE.parent.mkdir(parents=True, exist_ok=True)
-        SHARED_STATE.write_text(json.dumps({
-            "timestamp": datetime.now().isoformat(),
-            "toplam": toplam,
-            "degisen": degisen,
-            "yeni": yeni,
-            "silinen": silinen,
-            "dosyalar": [l.strip() for l in ham_lines[:50]],  # Ilk 50 dosya
-            "ham_cikti": "\n".join(ham_lines),
-        }, indent=2, ensure_ascii=False), encoding="utf-8")
+        SHARED_STATE.write_text(
+            json.dumps(
+                {
+                    "timestamp": datetime.now().isoformat(),
+                    "toplam": toplam,
+                    "degisen": degisen,
+                    "yeni": yeni,
+                    "silinen": silinen,
+                    "dosyalar": [l.strip() for l in ham_lines[:50]],  # Ilk 50 dosya
+                    "ham_cikti": "\n".join(ham_lines),
+                },
+                indent=2,
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
     except Exception as e:
         print(f"[GIT_WATCHDOG] Durum kayit hatasi: {e}", file=sys.stderr)
 

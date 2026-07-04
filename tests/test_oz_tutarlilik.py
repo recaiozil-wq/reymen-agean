@@ -19,9 +19,16 @@ from reymen.cereyan.oz_tutarlilik import (
 
 # ── Sahte Provider ────────────────────────────────────────────────────────
 
+
 class SahteProvider:
     """Test provider — temperature ve mode'a göre farklı yanıt üretir."""
-    def __init__(self, planlar=None, judge_yanit="EN_IYI: 1", puan_yanit="PUAN: 8\nACIKLAMA: Iyi."):
+
+    def __init__(
+        self,
+        planlar=None,
+        judge_yanit="EN_IYI: 1",
+        puan_yanit="PUAN: 8\nACIKLAMA: Iyi.",
+    ):
         self._call_count = 0
         self._planlar = planlar or [
             "Plan A: WEB_ARA ile bilgi topla.",
@@ -42,6 +49,7 @@ class SahteProvider:
 
 # ── Init Tests ────────────────────────────────────────────────────────────
 
+
 class TestInit:
     def test_varsayilan_degerler(self):
         sc = OzTutarlilikDenetci()
@@ -54,7 +62,9 @@ class TestInit:
 
     def test_ozel_degerler(self):
         prov = SahteProvider()
-        sc = OzTutarlilikDenetci(provider=prov, varsayilan_n=5, sicaklik_adimi=0.3, aktif=False)
+        sc = OzTutarlilikDenetci(
+            provider=prov, varsayilan_n=5, sicaklik_adimi=0.3, aktif=False
+        )
         assert sc._provider is prov
         assert sc.varsayilan_n == 5
         assert sc.sicaklik_adimi == 0.3
@@ -63,40 +73,53 @@ class TestInit:
 
 # ── en_iyi_plani_sec Tests ───────────────────────────────────────────────
 
+
 class TestEnIyiPlaniSec:
     def test_aktif_degilse_none(self):
         sc = OzTutarlilikDenetci(provider=SahteProvider(), aktif=False)
-        result = sc.en_iyi_plani_sec("hedef", "prompt", [{"role": "user", "content": "x"}])
+        result = sc.en_iyi_plani_sec(
+            "hedef", "prompt", [{"role": "user", "content": "x"}]
+        )
         assert result is None
 
     def test_provider_yoksa_none(self):
         sc = OzTutarlilikDenetci(provider=None)
-        result = sc.en_iyi_plani_sec("hedef", "prompt", [{"role": "user", "content": "x"}])
+        result = sc.en_iyi_plani_sec(
+            "hedef", "prompt", [{"role": "user", "content": "x"}]
+        )
         assert result is None
 
     def test_n_1_sonuc_none(self):
         sc = OzTutarlilikDenetci(provider=SahteProvider())
-        result = sc.en_iyi_plani_sec("hedef", "prompt", [{"role": "user", "content": "x"}], n=1)
+        result = sc.en_iyi_plani_sec(
+            "hedef", "prompt", [{"role": "user", "content": "x"}], n=1
+        )
         assert result is None
 
     def test_n_0_uses_default(self):
         """n=0 → falsy → varsayilan_n kullanılır, None dönmez."""
         prov = SahteProvider(judge_yanit="EN_IYI: 1")
         sc = OzTutarlilikDenetci(provider=prov, varsayilan_n=3)
-        result = sc.en_iyi_plani_sec("hedef", "prompt", [{"role": "user", "content": "x"}], n=0)
+        result = sc.en_iyi_plani_sec(
+            "hedef", "prompt", [{"role": "user", "content": "x"}], n=0
+        )
         assert result is not None  # 0 or 3 = 3
 
     def test_tek_aday_dogrudan_donderir(self):
         provider = MagicMock()
         provider.uret.return_value = "Tek plan: Yap ve bitir."
         sc = OzTutarlilikDenetci(provider=provider, varsayilan_n=2)
-        result = sc.en_iyi_plani_sec("hedef", "prompt", [{"role": "user", "content": "x"}], n=2)
+        result = sc.en_iyi_plani_sec(
+            "hedef", "prompt", [{"role": "user", "content": "x"}], n=2
+        )
         assert result == "Tek plan: Yap ve bitir."
 
     def test_coklu_aday_judge_secimi(self):
         provider = SahteProvider(judge_yanit="EN_IYI: 2")
         sc = OzTutarlilikDenetci(provider=provider, varsayilan_n=3)
-        result = sc.en_iyi_plani_sec("hedef", "prompt", [{"role": "user", "content": "x"}], n=3)
+        result = sc.en_iyi_plani_sec(
+            "hedef", "prompt", [{"role": "user", "content": "x"}], n=3
+        )
         assert result is not None
         assert len(result) > 0
 
@@ -112,25 +135,32 @@ class TestEnIyiPlaniSec:
         provider = MagicMock()
         provider.uret.return_value = ""
         sc = OzTutarlilikDenetci(provider=provider, varsayilan_n=3)
-        result = sc.en_iyi_plani_sec("hedef", "prompt", [{"role": "user", "content": "x"}], n=3)
+        result = sc.en_iyi_plani_sec(
+            "hedef", "prompt", [{"role": "user", "content": "x"}], n=3
+        )
         assert result is None
 
     def test_sadece_bosluk_cevaplar_none(self):
         provider = MagicMock()
         provider.uret.return_value = "   \n  \n  "
         sc = OzTutarlilikDenetci(provider=provider, varsayilan_n=3)
-        result = sc.en_iyi_plani_sec("hedef", "prompt", [{"role": "user", "content": "x"}], n=3)
+        result = sc.en_iyi_plani_sec(
+            "hedef", "prompt", [{"role": "user", "content": "x"}], n=3
+        )
         assert result is None
 
     def test_n_one_degilse_varsayilan_kullan(self):
         prov = SahteProvider(judge_yanit="EN_IYI: 1")
         sc = OzTutarlilikDenetci(provider=prov, varsayilan_n=3)
         # n=None → varsayilan_n=3 kullanilir
-        result = sc.en_iyi_plani_sec("hedef", "prompt", [{"role": "user", "content": "x"}], n=None)
+        result = sc.en_iyi_plani_sec(
+            "hedef", "prompt", [{"role": "user", "content": "x"}], n=None
+        )
         assert result is not None
 
 
 # ── tek_cevap_puan Tests ─────────────────────────────────────────────────
+
 
 class TestTekCevapPuan:
     def test_provider_yoksa_varsayilan(self):
@@ -183,6 +213,7 @@ class TestTekCevapPuan:
 
 # ── coklu_oy_ver Tests ──────────────────────────────────────────────────
 
+
 class TestCokluOyVer:
     def test_bos_liste(self):
         sc = OzTutarlilikDenetci()
@@ -195,7 +226,11 @@ class TestCokluOyVer:
     def test_iki_farkli_aday_ilki_kazanir(self):
         sc = OzTutarlilikDenetci()
         # İkisi de birbirine benzer, üçüncü farklı → benzer olan kazanır
-        adaylar = ["Dosyayı aç, oku, kaydet.", "Dosyayı aç, oku, kaydet.", "Git, bul, sil."]
+        adaylar = [
+            "Dosyayı aç, oku, kaydet.",
+            "Dosyayı aç, oku, kaydet.",
+            "Git, bul, sil.",
+        ]
         kazanan = sc.coklu_oy_ver(adaylar)
         assert kazanan == adaylar[0]  # İkisi aynı → en yüksek skor
 
@@ -217,6 +252,7 @@ class TestCokluOyVer:
 
 
 # ── _judge_ayristir Tests ────────────────────────────────────────────────
+
 
 class TestJudgeAyrilstir:
     def test_normal_cikti(self):
@@ -255,6 +291,7 @@ class TestJudgeAyrilstir:
 
 # ── _puan_ayristir Tests ────────────────────────────────────────────────
 
+
 class TestPuanAyrilstir:
     def test_normal_puan_aciklama(self):
         result = OzTutarlilikDenetci._puan_ayristir("PUAN: 8\nACIKLAMA: Cok iyi.")
@@ -287,6 +324,7 @@ class TestPuanAyrilstir:
 
 # ── istatistik Tests ─────────────────────────────────────────────────────
 
+
 class TestIstatistik:
     def test_baslangic(self):
         sc = OzTutarlilikDenetci()
@@ -305,16 +343,19 @@ class TestIstatistik:
 
 # ── _judge_ile_sec Tests ────────────────────────────────────────────────
 
+
 class TestJudgeIleSec:
     def test_judge_hatasi_coklu_oy_geci(self):
         """Judge exception olursa cogunluk oyuna gecilmeli."""
         provider = MagicMock()
         call_count = [0]
+
         def uret_side_effect(sistem, mesajlar, **kwargs):
             call_count[0] += 1
             if "EN_IYI" in sistem:
                 raise RuntimeError("Judge API down")
             return "Plan X: basit plan."
+
         provider.uret.side_effect = uret_side_effect
 
         sc = OzTutarlilikDenetci(provider=provider, varsayilan_n=3)
@@ -341,12 +382,15 @@ class TestJudgeIleSec:
         sc._n_cevap_uret("prompt", [{"role": "user", "content": "x"}], n=3)
         calls = prov.uret.call_args_list
         # Sicakliklar: 0.7, 0.8, 0.9
-        temps = [c.kwargs.get("temperature", 0) for c in calls if "temperature" in c.kwargs]
+        temps = [
+            c.kwargs.get("temperature", 0) for c in calls if "temperature" in c.kwargs
+        ]
         if temps:
             assert temps[0] < temps[-1]
 
 
 # ── Sabit Dogrulama ─────────────────────────────────────────────────────
+
 
 class TestSabitDogrulama:
     def test_judge_sistemi_icerik(self):

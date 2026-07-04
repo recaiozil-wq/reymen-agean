@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 try:
     import litellm
     from litellm import completion, ModelResponse
+
     _LITELLM_MEVCUT = True
     # Rate limit ve retry ayarlari
     litellm.max_budget = 100.0  # $100 maks butce
@@ -43,40 +44,73 @@ except ImportError:
 # Tam liste: https://docs.litellm.ai/docs/providers
 POPULER_PROVIDERLER = {
     # OpenAI uyumlu
-    "openai": {"modeller": ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "o1", "o3-mini"], "api_key_env": "OPENAI_API_KEY"},
+    "openai": {
+        "modeller": ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "o1", "o3-mini"],
+        "api_key_env": "OPENAI_API_KEY",
+    },
     "azure": {"modeller": ["gpt-4o", "gpt-4"], "api_key_env": "AZURE_API_KEY"},
-    
     # Anthropic
-    "anthropic": {"modeller": ["claude-sonnet-4", "claude-haiku-4-5", "claude-opus-4"], "api_key_env": "ANTHROPIC_API_KEY"},
-    
+    "anthropic": {
+        "modeller": ["claude-sonnet-4", "claude-haiku-4-5", "claude-opus-4"],
+        "api_key_env": "ANTHROPIC_API_KEY",
+    },
     # Google
-    "gemini": {"modeller": ["gemini-2.5-pro", "gemini-2.0-flash"], "api_key_env": "GEMINI_API_KEY"},
-    "vertex_ai": {"modeller": ["gemini-2.5-pro"], "api_key_env": "VERTEX_AI_CREDENTIALS"},
-    
+    "gemini": {
+        "modeller": ["gemini-2.5-pro", "gemini-2.0-flash"],
+        "api_key_env": "GEMINI_API_KEY",
+    },
+    "vertex_ai": {
+        "modeller": ["gemini-2.5-pro"],
+        "api_key_env": "VERTEX_AI_CREDENTIALS",
+    },
     # Meta / Open
-    "together": {"modeller": ["llama-3.1-405b", "llama-3.1-70b", "deepseek-v4"], "api_key_env": "TOGETHER_API_KEY"},
-    "fireworks": {"modeller": ["llama-3.1-405b", "deepseek-v4"], "api_key_env": "FIREWORKS_API_KEY"},
-    "replicate": {"modeller": ["llama-3.1-405b", "llama-3.1-70b"], "api_key_env": "REPLICATE_API_KEY"},
-    
+    "together": {
+        "modeller": ["llama-3.1-405b", "llama-3.1-70b", "deepseek-v4"],
+        "api_key_env": "TOGETHER_API_KEY",
+    },
+    "fireworks": {
+        "modeller": ["llama-3.1-405b", "deepseek-v4"],
+        "api_key_env": "FIREWORKS_API_KEY",
+    },
+    "replicate": {
+        "modeller": ["llama-3.1-405b", "llama-3.1-70b"],
+        "api_key_env": "REPLICATE_API_KEY",
+    },
     # DeepSeek
-    "deepseek": {"modeller": ["deepseek-v4-flash", "deepseek-v4", "deepseek-r1"], "api_key_env": "DEEPSEEK_API_KEY"},
-    
+    "deepseek": {
+        "modeller": ["deepseek-v4-flash", "deepseek-v4", "deepseek-r1"],
+        "api_key_env": "DEEPSEEK_API_KEY",
+    },
     # Groq (hizli inference)
-    "groq": {"modeller": ["llama-3.1-70b", "llama-3.1-8b", "mixtral-8x7b"], "api_key_env": "GROQ_API_KEY"},
-    
+    "groq": {
+        "modeller": ["llama-3.1-70b", "llama-3.1-8b", "mixtral-8x7b"],
+        "api_key_env": "GROQ_API_KEY",
+    },
     # Amazon
-    "bedrock": {"modeller": ["claude-sonnet-4", "claude-haiku"], "api_key_env": "AWS_ACCESS_KEY_ID"},
+    "bedrock": {
+        "modeller": ["claude-sonnet-4", "claude-haiku"],
+        "api_key_env": "AWS_ACCESS_KEY_ID",
+    },
     "sagemaker": {"modeller": ["custom"], "api_key_env": "AWS_ACCESS_KEY_ID"},
-    
     # diger
-    "perplexity": {"modeller": ["sonar-pro", "sonar"], "api_key_env": "PERPLEXITY_API_KEY"},
-    "cohere": {"modeller": ["command-r-plus", "command-r"], "api_key_env": "COHERE_API_KEY"},
-    "mistral": {"modeller": ["mistral-large", "mistral-medium"], "api_key_env": "MISTRAL_API_KEY"},
+    "perplexity": {
+        "modeller": ["sonar-pro", "sonar"],
+        "api_key_env": "PERPLEXITY_API_KEY",
+    },
+    "cohere": {
+        "modeller": ["command-r-plus", "command-r"],
+        "api_key_env": "COHERE_API_KEY",
+    },
+    "mistral": {
+        "modeller": ["mistral-large", "mistral-medium"],
+        "api_key_env": "MISTRAL_API_KEY",
+    },
     "xai": {"modeller": ["grok-2", "grok-2-latest"], "api_key_env": "XAI_API_KEY"},
     "openrouter": {"modeller": ["*"], "api_key_env": "OPENROUTER_API_KEY"},
     "ollama": {"modeller": ["*"], "api_key_env": ""},
     "lmstudio": {"modeller": ["*"], "api_key_env": ""},
 }
+
 
 # Mevcut .env'den API key'leri oku
 def _env_anahtar(env_adi: str) -> Optional[str]:
@@ -106,20 +140,22 @@ def aktif_providerlar() -> List[Dict[str, Any]]:
     aktif = []
     for ad, bilgi in POPULER_PROVIDERLER.items():
         api_key = _env_anahtar(bilgi["api_key_env"])
-        if api_key or not bilgi["api_key_env"]:  # API key gerektirmeyenler (ollama, lmstudio)
-            aktif.append({
-                "ad": ad,
-                "modeller": bilgi["modeller"],
-                "api_key_var": bool(api_key),
-                "api_key_env": bilgi["api_key_env"],
-            })
+        if (
+            api_key or not bilgi["api_key_env"]
+        ):  # API key gerektirmeyenler (ollama, lmstudio)
+            aktif.append(
+                {
+                    "ad": ad,
+                    "modeller": bilgi["modeller"],
+                    "api_key_var": bool(api_key),
+                    "api_key_env": bilgi["api_key_env"],
+                }
+            )
     return aktif
 
 
 def litellm_calisitir(
-    model: str,
-    mesajlar: List[Dict[str, str]],
-    **kwargs
+    model: str, mesajlar: List[Dict[str, str]], **kwargs
 ) -> Optional[Dict[str, Any]]:
     """LiteLLM ile model cagrisi yap.
 
@@ -136,14 +172,10 @@ def litellm_calisitir(
         return None
 
     try:
-        response = completion(
-            model=model,
-            messages=mesajlar,
-            **kwargs
-        )
+        response = completion(model=model, messages=mesajlar, **kwargs)
         if response is None:
             return None
-        
+
         return {
             "icerik": response.choices[0].message.content if response.choices else "",
             "model": response.model if hasattr(response, "model") else model,
@@ -152,7 +184,9 @@ def litellm_calisitir(
                 "cikis": response.usage.completion_tokens if response.usage else 0,
                 "toplam": response.usage.total_tokens if response.usage else 0,
             },
-            "sure_sn": response._response_ms / 1000 if hasattr(response, "_response_ms") else 0,
+            "sure_sn": response._response_ms / 1000
+            if hasattr(response, "_response_ms")
+            else 0,
         }
     except Exception as e:
         logger.error("LiteLLM hatasi (%s): %s", model, e)
@@ -187,7 +221,7 @@ def litellm_durum() -> Dict[str, Any]:
     aktif = aktif_providerlar()
     toplam_provider = len(POPULER_PROVIDERLER)
     api_keyli = sum(1 for a in aktif if a["api_key_var"])
-    
+
     return {
         "litellm_kurulu": _LITELLM_MEVCUT,
         "toplam_provider": toplam_provider,

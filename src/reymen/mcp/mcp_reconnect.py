@@ -30,8 +30,8 @@ logger = logging.getLogger(__name__)
 
 # ── Varsayılan ayarlar ───────────────────────────────────────────────────
 HEARTBEAT_ARALIK_SN = 30  # Her N saniyede bir heartbeat
-MAX_YENIDEN_DENEME = 5    # Maksimum yeniden bağlanma denemesi
-MAX_BACKOFF_SN = 60       # Maksimum bekleme süresi (exponential backoff)
+MAX_YENIDEN_DENEME = 5  # Maksimum yeniden bağlanma denemesi
+MAX_BACKOFF_SN = 60  # Maksimum bekleme süresi (exponential backoff)
 
 # ── Global state ─────────────────────────────────────────────────────────
 _reconnect_gorev: Optional[asyncio.Task] = None
@@ -50,6 +50,7 @@ _durum: dict[str, Any] = {
 # Heartbeat — Her MCP Sunucusuna Periyodik Sinyal
 # ═══════════════════════════════════════════════════════════════════════════
 
+
 async def _heartbeat_gonder(
     baglanti: MCPServerBaglantisi,
 ) -> bool:
@@ -62,9 +63,7 @@ async def _heartbeat_gonder(
         istek = {"jsonrpc": "2.0", "id": 0, "method": "tools/list"}
         sonuc = await baglanti._gonder(istek)
         if "error" in sonuc:
-            logger.warning(
-                "MCP Heartbeat [%s]: hata %s", baglanti.ad, sonuc["error"]
-            )
+            logger.warning("MCP Heartbeat [%s]: hata %s", baglanti.ad, sonuc["error"])
             return False
         baglanti._baglandi = True
         return True
@@ -78,6 +77,7 @@ async def _heartbeat_gonder(
 # ═══════════════════════════════════════════════════════════════════════════
 # Yeniden Bağlanma — Exponential Backoff ile
 # ═══════════════════════════════════════════════════════════════════════════
+
 
 async def _yeniden_baglan(
     baglanti: MCPServerBaglantisi,
@@ -95,7 +95,10 @@ async def _yeniden_baglan(
     bekle_sn = min(2 ** (deneme + 1), MAX_BACKOFF_SN)
     logger.info(
         "MCP Yeniden Bağlanma [%s]: deneme %d/%d, %ds bekleniyor...",
-        baglanti.ad, deneme + 1, MAX_YENIDEN_DENEME, bekle_sn,
+        baglanti.ad,
+        deneme + 1,
+        MAX_YENIDEN_DENEME,
+        bekle_sn,
     )
     try:
         await asyncio.sleep(bekle_sn)
@@ -109,7 +112,9 @@ async def _yeniden_baglan(
         if "error" in sonuc:
             logger.warning(
                 "MCP Yeniden Bağlanma [%s]: deneme %d başarısız: %s",
-                baglanti.ad, deneme + 1, sonuc["error"],
+                baglanti.ad,
+                deneme + 1,
+                sonuc["error"],
             )
             return False
 
@@ -119,7 +124,8 @@ async def _yeniden_baglan(
         baglanti._baglandi = True
         logger.info(
             "MCP Yeniden Bağlanma [%s]: başarılı (%d tool)",
-            baglanti.ad, len(tools),
+            baglanti.ad,
+            len(tools),
         )
         return True
 
@@ -128,7 +134,9 @@ async def _yeniden_baglan(
     except Exception as e:
         logger.warning(
             "MCP Yeniden Bağlanma [%s]: deneme %d istisna: %s",
-            baglanti.ad, deneme + 1, e,
+            baglanti.ad,
+            deneme + 1,
+            e,
         )
         return False
 
@@ -136,6 +144,7 @@ async def _yeniden_baglan(
 # ═══════════════════════════════════════════════════════════════════════════
 # Ana Döngü — Heartbeat + Reconnect
 # ═══════════════════════════════════════════════════════════════════════════
+
 
 async def _reconnect_dongusu() -> None:
     """Heartbeat ve yeniden bağlanma ana döngüsü.
@@ -149,7 +158,9 @@ async def _reconnect_dongusu() -> None:
     _durum["aktif"] = True
     _durum["baslangic_zamani"] = time.time()
 
-    logger.info("MCP Reconnect: heartbeat döngüsü başladı (aralık: %ds)", HEARTBEAT_ARALIK_SN)
+    logger.info(
+        "MCP Reconnect: heartbeat döngüsü başladı (aralık: %ds)", HEARTBEAT_ARALIK_SN
+    )
 
     try:
         while not _durduruldu:
@@ -207,7 +218,8 @@ async def _reconnect_dongusu() -> None:
                         logger.error(
                             "MCP Reconnect [%s]: %d deneme sonunda bağlanamadı, "
                             "manuel müdahale gerekebilir",
-                            ad, MAX_YENIDEN_DENEME,
+                            ad,
+                            MAX_YENIDEN_DENEME,
                         )
 
             # Belirtilen aralık kadar bekle
@@ -224,6 +236,7 @@ async def _reconnect_dongusu() -> None:
 # ═══════════════════════════════════════════════════════════════════════════
 # Public API — Başlat / Durdur / Durum
 # ═══════════════════════════════════════════════════════════════════════════
+
 
 async def mcp_reconnect_baslat() -> bool:
     """Heartbeat + yeniden bağlanma döngüsünü başlat.
@@ -294,7 +307,9 @@ def mcp_reconnect_durum_raporu() -> str:
     """İnsan-okunabilir reconnect durum raporu."""
     durum = mcp_reconnect_durumu()
     aktif_str = "🟢 Çalışıyor" if durum["aktif"] else "🔴 Durduruldu"
-    sure_str = f"{durum['calisma_suresi_sn']:.0f}s" if durum["calisma_suresi_sn"] > 0 else "-"
+    sure_str = (
+        f"{durum['calisma_suresi_sn']:.0f}s" if durum["calisma_suresi_sn"] > 0 else "-"
+    )
 
     satirlar = [
         "[MCP Reconnect] Bağlantı İzleme Raporu",
@@ -315,7 +330,8 @@ def mcp_reconnect_durum_raporu() -> str:
             simge = "🟢" if sd["bagli"] else "🔴"
             son_hb = (
                 f"{(time.time() - sd['son_heartbeat']):.0f}s önce"
-                if sd["son_heartbeat"] else "hiç"
+                if sd["son_heartbeat"]
+                else "hiç"
             )
             satirlar.append(
                 f"    {simge} {ad}: son heartbeat {son_hb}, "
@@ -329,6 +345,7 @@ def mcp_reconnect_durum_raporu() -> str:
 # ═══════════════════════════════════════════════════════════════════════════
 # Motor Tool Kaydı
 # ═══════════════════════════════════════════════════════════════════════════
+
 
 def motor_kaydet(motor) -> None:
     """MCP_RECONNECT araçlarını Motor'a kaydet.
@@ -383,13 +400,16 @@ def _mcp_reconnect_baslat_sync() -> str:
 if __name__ == "__main__":
     import time
 
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+    logging.basicConfig(
+        level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
+    )
 
     print("=== MCP Reconnect Test ===\n")
 
     async def test():
         # Önce keşif yap
         from reymen.mcp.mcp_discovery import mcp_kesfet
+
         eklenen = mcp_kesfet()
         print(f"Keşfedilen sunucu: {eklenen}")
 

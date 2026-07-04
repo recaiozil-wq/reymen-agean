@@ -18,6 +18,7 @@ These tests verify the three load-bearing properties of that redirect:
 Every ``docker exec`` runs as ``ReYMeN`` per the conftest module
 docstring; see ``tests/docker/conftest.py`` for rationale.
 """
+
 from __future__ import annotations
 
 import subprocess
@@ -47,7 +48,8 @@ def _svstat_wants_up(container: str, slot: str = "gateway-default") -> bool:
 
 
 def test_gateway_run_redirects_to_supervised(
-    built_image: str, container_name: str,
+    built_image: str,
+    container_name: str,
 ) -> None:
     """``docker run <image> gateway run`` (the historical invocation)
     should now register and start the ``gateway-default`` s6 slot.
@@ -65,9 +67,19 @@ def test_gateway_run_redirects_to_supervised(
     # s6 image — the foreground gateway would crash without config,
     # the CMD would exit, /init would shut down).
     subprocess.run(
-        ["docker", "run", "-d", "--name", container_name, built_image,
-         "gateway", "run"],
-        check=True, capture_output=True, timeout=30,
+        [
+            "docker",
+            "run",
+            "-d",
+            "--name",
+            container_name,
+            built_image,
+            "gateway",
+            "run",
+        ],
+        check=True,
+        capture_output=True,
+        timeout=30,
     )
 
     # Give /init time to run cont-init.d, the wrapper time to dispatch
@@ -79,7 +91,9 @@ def test_gateway_run_redirects_to_supervised(
     # would be in `Exited` state by now.
     r = subprocess.run(
         ["docker", "inspect", "-f", "{{.State.Status}}", container_name],
-        capture_output=True, text=True, timeout=10,
+        capture_output=True,
+        text=True,
+        timeout=10,
     )
     assert r.returncode == 0 and r.stdout.strip() == "running", (
         f"container exited prematurely: {r.stdout!r}; "
@@ -91,9 +105,9 @@ def test_gateway_run_redirects_to_supervised(
     # gateway may or may not be currently up depending on whether the
     # harness profile has a configured model, but the want-intent
     # contract holds either way.
-    assert _svstat_wants_up(container_name), (
-        f"gateway-default slot want-state not up: {_svstat(container_name)!r}"
-    )
+    assert _svstat_wants_up(
+        container_name
+    ), f"gateway-default slot want-state not up: {_svstat(container_name)!r}"
 
     # The CMD process (PID under /init that the wrapper exec'd into)
     # should be sleeping, not the gateway. We grep `ps` for the
@@ -108,19 +122,20 @@ def test_gateway_run_redirects_to_supervised(
     # the upgrade explanation.
     r = subprocess.run(
         ["docker", "logs", container_name],
-        capture_output=True, text=True, timeout=10,
+        capture_output=True,
+        text=True,
+        timeout=10,
     )
     logs = r.stdout + r.stderr
-    assert "s6 supervision" in logs, (
-        f"expected loud breadcrumb in docker logs; got:\n{logs}"
-    )
-    assert "--no-supervise" in logs, (
-        f"breadcrumb missing opt-out hint; got:\n{logs}"
-    )
+    assert (
+        "s6 supervision" in logs
+    ), f"expected loud breadcrumb in docker logs; got:\n{logs}"
+    assert "--no-supervise" in logs, f"breadcrumb missing opt-out hint; got:\n{logs}"
 
 
 def test_gateway_run_no_supervise_flag_preserves_legacy_behavior(
-    built_image: str, container_name: str,
+    built_image: str,
+    container_name: str,
 ) -> None:
     """``docker run <image> gateway run --no-supervise`` opts out of
     the redirect and runs the gateway as the foreground CMD process
@@ -140,9 +155,20 @@ def test_gateway_run_no_supervise_flag_preserves_legacy_behavior(
       * No supervision-redirect breadcrumb appears in docker logs.
     """
     subprocess.run(
-        ["docker", "run", "-d", "--name", container_name, built_image,
-         "gateway", "run", "--no-supervise"],
-        check=True, capture_output=True, timeout=30,
+        [
+            "docker",
+            "run",
+            "-d",
+            "--name",
+            container_name,
+            built_image,
+            "gateway",
+            "run",
+            "--no-supervise",
+        ],
+        check=True,
+        capture_output=True,
+        timeout=30,
     )
     # Give startup time. The unconfigured-profile case used to fail
     # fast; with a config bind-mounted profile (and a real volume on
@@ -155,18 +181,27 @@ def test_gateway_run_no_supervise_flag_preserves_legacy_behavior(
     # (sleep infinity heartbeat + supervised gateway slot).
     inspect = subprocess.run(
         ["docker", "inspect", "-f", "{{.State.Status}}", container_name],
-        capture_output=True, text=True, timeout=10,
+        capture_output=True,
+        text=True,
+        timeout=10,
     )
     status = inspect.stdout.strip()
 
     # No redirect breadcrumb anywhere.
-    logs = subprocess.run(
-        ["docker", "logs", container_name],
-        capture_output=True, text=True, timeout=10,
-    ).stdout + subprocess.run(
-        ["docker", "logs", container_name],
-        capture_output=True, text=True, timeout=10,
-    ).stderr
+    logs = (
+        subprocess.run(
+            ["docker", "logs", container_name],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        ).stdout
+        + subprocess.run(
+            ["docker", "logs", container_name],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        ).stderr
+    )
     assert "s6 supervision" not in logs, (
         f"--no-supervise should have skipped the redirect; "
         f"breadcrumb in logs:\n{logs}"
@@ -178,7 +213,7 @@ def test_gateway_run_no_supervise_flag_preserves_legacy_behavior(
         r = _sh(
             container_name,
             "ps -eo pid,ppid,cmd | grep -v grep | awk '/main-wrapper.sh|rc.init top/ { wrapper_pid=$1 } "
-            "$3==\"sleep\" && $4==\"infinity\" && $2==wrapper_pid { c++ } END { print c+0 }'",
+            '$3=="sleep" && $4=="infinity" && $2==wrapper_pid { c++ } END { print c+0 }\'',
         )
         assert r.returncode == 0
         redirected_sleeps = int(r.stdout.strip() or 0)
@@ -204,7 +239,8 @@ def test_gateway_run_no_supervise_flag_preserves_legacy_behavior(
 
 
 def test_gateway_run_no_supervise_env_var(
-    built_image: str, container_name: str,
+    built_image: str,
+    container_name: str,
 ) -> None:
     """Env-var opt-out works identically to the CLI flag.
 
@@ -212,16 +248,29 @@ def test_gateway_run_no_supervise_env_var(
     (orchestration templates, K8s manifests) but can set env vars.
     """
     subprocess.run(
-        ["docker", "run", "-d", "--name", container_name,
-         "-e", "ReYMeN_GATEWAY_NO_SUPERVISE=1",
-         built_image, "gateway", "run"],
-        check=True, capture_output=True, timeout=30,
+        [
+            "docker",
+            "run",
+            "-d",
+            "--name",
+            container_name,
+            "-e",
+            "ReYMeN_GATEWAY_NO_SUPERVISE=1",
+            built_image,
+            "gateway",
+            "run",
+        ],
+        check=True,
+        capture_output=True,
+        timeout=30,
     )
     time.sleep(6)
 
     logs = subprocess.run(
         ["docker", "logs", container_name],
-        capture_output=True, text=True, timeout=10,
+        capture_output=True,
+        text=True,
+        timeout=10,
     )
     combined = logs.stdout + logs.stderr
     assert "s6 supervision" not in combined, (
@@ -233,7 +282,9 @@ def test_gateway_run_no_supervise_env_var(
     # it) but should not have want-state up.
     inspect = subprocess.run(
         ["docker", "inspect", "-f", "{{.State.Status}}", container_name],
-        capture_output=True, text=True, timeout=10,
+        capture_output=True,
+        text=True,
+        timeout=10,
     )
     if inspect.stdout.strip() == "running":
         assert not _svstat_wants_up(container_name, "gateway-default"), (
@@ -244,7 +295,8 @@ def test_gateway_run_no_supervise_env_var(
 
 
 def test_supervised_gateway_does_not_recurse(
-    built_image: str, container_name: str,
+    built_image: str,
+    container_name: str,
 ) -> None:
     """The ReYMeN_S6_SUPERVISED_CHILD sentinel must prevent the
     supervised ``ReYMeN gateway run`` from re-entering the redirect.
@@ -261,9 +313,19 @@ def test_supervised_gateway_does_not_recurse(
     via the redirect → start → run → redirect → ... loop.
     """
     subprocess.run(
-        ["docker", "run", "-d", "--name", container_name, built_image,
-         "gateway", "run"],
-        check=True, capture_output=True, timeout=30,
+        [
+            "docker",
+            "run",
+            "-d",
+            "--name",
+            container_name,
+            built_image,
+            "gateway",
+            "run",
+        ],
+        check=True,
+        capture_output=True,
+        timeout=30,
     )
     time.sleep(6)
 
@@ -271,7 +333,10 @@ def test_supervised_gateway_does_not_recurse(
     # recursion guard fails, s6 would respawn fresh `gateway run`
     # processes on every cycle, leaving multiple Python-process
     # descendants under the gateway-default supervise tree.
-    r = _sh(container_name, "ps -eo pid,cmd | grep -v grep | grep -E 'python.*ReYMeN.*gateway run' | wc -l")
+    r = _sh(
+        container_name,
+        "ps -eo pid,cmd | grep -v grep | grep -E 'python.*ReYMeN.*gateway run' | wc -l",
+    )
     assert r.returncode == 0
     n = int(r.stdout.strip() or 0)
     assert n <= 1, (
@@ -291,7 +356,7 @@ def test_supervised_gateway_does_not_recurse(
         # Find PID of the CMD process (main-wrapper.sh or its sh
         # parent), then count `sleep infinity` children.
         "ps -eo pid,ppid,cmd | grep -v grep | awk '/main-wrapper.sh|rc.init top/ { wrapper_pid=$1 } "
-        "$3==\"sleep\" && $4==\"infinity\" && $2==wrapper_pid { c++ } END { print c+0 }'",
+        '$3=="sleep" && $4=="infinity" && $2==wrapper_pid { c++ } END { print c+0 }\'',
     )
     assert r.returncode == 0
     redirected = int(r.stdout.strip() or 0)
@@ -303,7 +368,8 @@ def test_supervised_gateway_does_not_recurse(
 
 
 def test_dashboard_supervised_when_env_set(
-    built_image: str, container_name: str,
+    built_image: str,
+    container_name: str,
 ) -> None:
     """When ``ReYMeN_DASHBOARD=1`` is set, ``docker run <image> gateway
     run`` should result in BOTH the gateway and the dashboard being
@@ -313,24 +379,36 @@ def test_dashboard_supervised_when_env_set(
     dashboard, with zero extra user effort.
     """
     subprocess.run(
-        ["docker", "run", "-d", "--name", container_name,
-         "-e", "ReYMeN_DASHBOARD=1",
-         built_image, "gateway", "run"],
-        check=True, capture_output=True, timeout=30,
+        [
+            "docker",
+            "run",
+            "-d",
+            "--name",
+            container_name,
+            "-e",
+            "ReYMeN_DASHBOARD=1",
+            built_image,
+            "gateway",
+            "run",
+        ],
+        check=True,
+        capture_output=True,
+        timeout=30,
     )
     time.sleep(5)
 
     # Both slots should report want-up.
-    assert _svstat_wants_up(container_name, "gateway-default"), (
-        f"gateway-default slot not up: {_svstat(container_name)!r}"
-    )
-    assert _svstat_wants_up(container_name, "dashboard"), (
-        f"dashboard slot not up: {_svstat(container_name, 'dashboard')!r}"
-    )
+    assert _svstat_wants_up(
+        container_name, "gateway-default"
+    ), f"gateway-default slot not up: {_svstat(container_name)!r}"
+    assert _svstat_wants_up(
+        container_name, "dashboard"
+    ), f"dashboard slot not up: {_svstat(container_name, 'dashboard')!r}"
 
 
 def test_supervised_gateway_stdout_reaches_docker_logs(
-    built_image: str, container_name: str,
+    built_image: str,
+    container_name: str,
 ) -> None:
     """The supervised gateway's stdout — including the rich-console
     startup banner — must reach ``docker logs``, not just the rotated
@@ -355,9 +433,19 @@ def test_supervised_gateway_stdout_reaches_docker_logs(
     the stdout-tee is working.
     """
     subprocess.run(
-        ["docker", "run", "-d", "--name", container_name, built_image,
-         "gateway", "run"],
-        check=True, capture_output=True, timeout=30,
+        [
+            "docker",
+            "run",
+            "-d",
+            "--name",
+            container_name,
+            built_image,
+            "gateway",
+            "run",
+        ],
+        check=True,
+        capture_output=True,
+        timeout=30,
     )
     # Banner is printed during gateway startup — give it time to
     # initialize past the imports + config-load phase.
@@ -365,7 +453,9 @@ def test_supervised_gateway_stdout_reaches_docker_logs(
 
     logs = subprocess.run(
         ["docker", "logs", container_name],
-        capture_output=True, text=True, timeout=10,
+        capture_output=True,
+        text=True,
+        timeout=10,
     )
     combined = logs.stdout + logs.stderr
 
@@ -385,11 +475,11 @@ def test_supervised_gateway_stdout_reaches_docker_logs(
     # file version has s6-log's ISO 8601 timestamp prefix; the
     # docker logs version is raw.
     file_contents = _sh(
-        container_name, "cat /opt/data/logs/gateways/default/current",
+        container_name,
+        "cat /opt/data/logs/gateways/default/current",
     ).stdout
     assert "⚕" in file_contents or "ReYMeN Gateway Starting" in file_contents, (
         "Banner also missing from rotated log file — the file "
         "destination may have been dropped by the new s6-log script. "
         f"File contents:\n{file_contents}"
     )
-

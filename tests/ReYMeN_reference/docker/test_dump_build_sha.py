@@ -20,6 +20,7 @@ This test handles both cases:
   still holds — defensive guard against the helper accidentally
   reporting bogus data from somewhere else.
 """
+
 from __future__ import annotations
 
 import re
@@ -41,7 +42,9 @@ def _run_dump(image: str) -> str:
     """
     r = subprocess.run(
         ["docker", "run", "--rm", image, "dump"],
-        capture_output=True, text=True, timeout=120,
+        capture_output=True,
+        text=True,
+        timeout=120,
     )
     assert r.returncode == 0, (
         f"ReYMeN dump exited {r.returncode}: "
@@ -54,10 +57,17 @@ def _read_baked_sha_from_image(image: str) -> str | None:
     """Return the ``/opt/ReYMeN/.ReYMeN_build_sha`` content, or None if absent."""
     r = subprocess.run(
         [
-            "docker", "run", "--rm", "--entrypoint", "cat", image,
+            "docker",
+            "run",
+            "--rm",
+            "--entrypoint",
+            "cat",
+            image,
             "/opt/ReYMeN/.ReYMeN_build_sha",
         ],
-        capture_output=True, text=True, timeout=30,
+        capture_output=True,
+        text=True,
+        timeout=30,
     )
     if r.returncode != 0:
         return None
@@ -77,18 +87,18 @@ def test_dump_reports_baked_sha_when_present(built_image: str) -> None:
     match = _VERSION_LINE.search(stdout)
     assert match, f"no `version:` line in dump output:\n{stdout[:2000]}"
     sha_match = _SHA_BRACKET.search(match.group("rest"))
-    assert sha_match, (
-        f"`version:` line missing [<sha>] bracket: {match.group('rest')!r}"
-    )
+    assert (
+        sha_match
+    ), f"`version:` line missing [<sha>] bracket: {match.group('rest')!r}"
     reported = sha_match.group("sha")
 
     if baked is None:
         # Local-build path: no build-arg was passed.  Verify the legacy
         # fallback ``(unknown)`` is intact — guards against the helper
         # ever inventing a SHA from thin air.
-        assert reported == "(unknown)", (
-            f"expected '(unknown)' when no SHA baked, got {reported!r}"
-        )
+        assert (
+            reported == "(unknown)"
+        ), f"expected '(unknown)' when no SHA baked, got {reported!r}"
         return
 
     # CI path: build-arg was set, baked file exists.  ``ReYMeN dump``

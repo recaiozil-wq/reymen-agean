@@ -11,6 +11,7 @@ from reymen_skill_cli import SkillCLI
 
 # ── Fixture ─────────────────────────────────────────────────────────────
 
+
 @pytest.fixture
 def temp_skill_yolu(tmp_path):
     """Gecici skills dizini olustur."""
@@ -25,7 +26,9 @@ def cli(temp_skill_yolu):
     return SkillCLI(skill_yolu=str(temp_skill_yolu))
 
 
-def _skill_olustur(cli: SkillCLI, kategori: str, ad: str, description: str = "", tags: str = ""):
+def _skill_olustur(
+    cli: SkillCLI, kategori: str, ad: str, description: str = "", tags: str = ""
+):
     """Yardimci: test icin SKILL.md olustur."""
     kat_dizini = cli._kok / kategori
     kat_dizini.mkdir(parents=True, exist_ok=True)
@@ -42,6 +45,7 @@ def _skill_olustur(cli: SkillCLI, kategori: str, ad: str, description: str = "",
 
 
 # ── Test 1: Baslangic ───────────────────────────────────────────────────
+
 
 class TestBaslangic:
     def test_varsayilan_yol_olusturur(self, tmp_path):
@@ -65,6 +69,7 @@ class TestBaslangic:
 
 
 # ── Test 2: liste ───────────────────────────────────────────────────────
+
 
 class TestListe:
     def test_tek_skill_listele(self, cli, temp_skill_yolu):
@@ -90,7 +95,9 @@ class TestListe:
 
     def test_liste_meta_bilgileri(self, cli):
         """Liste donusunde meta bilgileri dogru olmali."""
-        _skill_olustur(cli, "genel", "my_skill", description="Deneme", tags="python, test")
+        _skill_olustur(
+            cli, "genel", "my_skill", description="Deneme", tags="python, test"
+        )
         liste = cli.liste()
         assert len(liste) == 1
         assert liste[0]["aciklama"] == "Deneme"
@@ -111,6 +118,7 @@ class TestListe:
 
 # ── Test 3: goruntule ───────────────────────────────────────────────────
 
+
 class TestGoruntule:
     def test_var_olan_skill(self, cli):
         """Var olan skill icerigi goruntulenebilmeli."""
@@ -130,6 +138,7 @@ class TestGoruntule:
 
 
 # ── Test 4: kategori_liste ──────────────────────────────────────────────
+
 
 class TestKategoriListe:
     def test_tek_kategori(self, cli):
@@ -154,6 +163,7 @@ class TestKategoriListe:
 
 
 # ── Test 5: _meta_oku ───────────────────────────────────────────────────
+
 
 class TestMetaOku:
     def test_frontmatter_parse(self, cli, temp_skill_yolu):
@@ -195,9 +205,7 @@ class TestMetaOku:
         skill_dizini.mkdir()
         md = skill_dizini / "SKILL.md"
         md.write_text(
-            "---\n"
-            "description: sadece aciklama\n"
-            "---\n\n# Icerik\n",
+            "---\n" "description: sadece aciklama\n" "---\n\n# Icerik\n",
             encoding="utf-8",
         )
         meta = cli._meta_oku(md)
@@ -217,6 +225,7 @@ class TestMetaOku:
 
 
 # ── Test 6: _tum_dosyalar ve istatistik ──────────────────────────────────
+
 
 class TestDosyalarVeIstatistik:
     def test_tum_dosyalar_bos(self, cli):

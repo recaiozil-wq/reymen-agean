@@ -2,6 +2,7 @@
 """
 test_agent_conversation_loop.py — agent/conversation_loop.py testleri (~35 test)
 """
+
 import pytest
 from unittest.mock import MagicMock, patch, PropertyMock, ANY
 
@@ -9,6 +10,7 @@ from unittest.mock import MagicMock, patch, PropertyMock, ANY
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def mock_agent():
@@ -104,10 +106,12 @@ def mock_agent():
 # _ollama_context_limit_error
 # ---------------------------------------------------------------------------
 
+
 class TestOllamaContextLimitError:
     @patch("agent.conversation_loop.MINIMUM_CONTEXT_LENGTH", 8192)
     def test_no_tools_none(self, mock_agent):
         from agent.conversation_loop import _ollama_context_limit_error
+
         agent = MagicMock()
         agent.tools = None
         agent._ollama_num_ctx = 4096
@@ -116,6 +120,7 @@ class TestOllamaContextLimitError:
     @patch("agent.conversation_loop.MINIMUM_CONTEXT_LENGTH", 8192)
     def test_no_ollama_num_ctx_none(self, mock_agent):
         from agent.conversation_loop import _ollama_context_limit_error
+
         agent = MagicMock()
         agent.tools = ["tool1"]
         agent._ollama_num_ctx = None
@@ -124,6 +129,7 @@ class TestOllamaContextLimitError:
     @patch("agent.conversation_loop.MINIMUM_CONTEXT_LENGTH", 8192)
     def test_runtime_ctx_yeterli_none(self, mock_agent):
         from agent.conversation_loop import _ollama_context_limit_error
+
         agent = MagicMock()
         agent.tools = ["tool1"]
         agent._ollama_num_ctx = 16384
@@ -132,6 +138,7 @@ class TestOllamaContextLimitError:
     @patch("agent.conversation_loop.MINIMUM_CONTEXT_LENGTH", 8192)
     def test_runtime_ctx_yetersiz_mesaj_doner(self, mock_agent):
         from agent.conversation_loop import _ollama_context_limit_error
+
         agent = MagicMock()
         agent.tools = ["tool1"]
         agent._ollama_num_ctx = 4096
@@ -150,34 +157,47 @@ class TestOllamaContextLimitError:
 # _is_nous_inference_route
 # ---------------------------------------------------------------------------
 
+
 class TestIsNousInferenceRoute:
     def test_nous_provider(self):
         from agent.conversation_loop import _is_nous_inference_route
+
         assert _is_nous_inference_route("nous", "") is True
 
     def test_nous_case_insensitive(self):
         from agent.conversation_loop import _is_nous_inference_route
+
         assert _is_nous_inference_route("Nous", "") is True
         assert _is_nous_inference_route("NOUS", "") is True
 
     def test_nous_inference_api_url(self):
         from agent.conversation_loop import _is_nous_inference_route
-        assert _is_nous_inference_route("", "https://inference-api.nousresearch.com/v1") is True
+
+        assert (
+            _is_nous_inference_route("", "https://inference-api.nousresearch.com/v1")
+            is True
+        )
 
     def test_nous_inference_url(self):
         from agent.conversation_loop import _is_nous_inference_route
-        assert _is_nous_inference_route("", "https://inference.nousresearch.com") is True
+
+        assert (
+            _is_nous_inference_route("", "https://inference.nousresearch.com") is True
+        )
 
     def test_other_provider(self):
         from agent.conversation_loop import _is_nous_inference_route
+
         assert _is_nous_inference_route("openai", "https://api.openai.com") is False
 
     def test_bos_both(self):
         from agent.conversation_loop import _is_nous_inference_route
+
         assert _is_nous_inference_route("", "") is False
 
     def test_none_values(self):
         from agent.conversation_loop import _is_nous_inference_route
+
         assert _is_nous_inference_route(None, None) is False
 
 
@@ -185,11 +205,18 @@ class TestIsNousInferenceRoute:
 # _billing_or_entitlement_message
 # ---------------------------------------------------------------------------
 
+
 class TestBillingOrEntitlementMessage:
     def test_nous_entitlement_calls_nous_func(self):
-        with patch("agent.conversation_loop._is_nous_inference_route", return_value=True):
-            with patch("agent.conversation_loop._nous_entitlement_message", return_value="Abonelik mesaji"):
+        with patch(
+            "agent.conversation_loop._is_nous_inference_route", return_value=True
+        ):
+            with patch(
+                "agent.conversation_loop._nous_entitlement_message",
+                return_value="Abonelik mesaji",
+            ):
                 from agent.conversation_loop import _billing_or_entitlement_message
+
                 msg = _billing_or_entitlement_message(
                     capability="tools",
                     provider="nous",
@@ -200,16 +227,22 @@ class TestBillingOrEntitlementMessage:
 
     def test_genel_faturalama_mesaji(self):
         from agent.conversation_loop import _billing_or_entitlement_message
+
         msg = _billing_or_entitlement_message(
             capability="tools",
             provider="openai",
             base_url="https://api.openai.com",
             model="gpt-4",
         )
-        assert "billing" in msg.lower() or "credits" in msg.lower() or "entitlement" in msg.lower()
+        assert (
+            "billing" in msg.lower()
+            or "credits" in msg.lower()
+            or "entitlement" in msg.lower()
+        )
 
     def test_openrouter_url_ek_ipucu_verir(self):
         from agent.conversation_loop import _billing_or_entitlement_message
+
         msg = _billing_or_entitlement_message(
             capability="tools",
             provider="openrouter",
@@ -220,6 +253,7 @@ class TestBillingOrEntitlementMessage:
 
     def test_model_degistirme_onerisi_var(self):
         from agent.conversation_loop import _billing_or_entitlement_message
+
         msg = _billing_or_entitlement_message(
             capability="tools",
             provider="openai",
@@ -233,28 +267,35 @@ class TestBillingOrEntitlementMessage:
 # _get_continuation_prompt
 # ---------------------------------------------------------------------------
 
+
 class TestGetContinuationPrompt:
     def test_partial_stub_with_dropped_tools(self):
         from agent.conversation_loop import _get_continuation_prompt
-        msg = _get_continuation_prompt(is_partial_stub=True, dropped_tools=["tool1", "tool2"])
+
+        msg = _get_continuation_prompt(
+            is_partial_stub=True, dropped_tools=["tool1", "tool2"]
+        )
         assert "too large" in msg.lower()
         assert "tool1" in msg
         assert "Do NOT retry" in msg
 
     def test_partial_stub_without_tools(self):
         from agent.conversation_loop import _get_continuation_prompt
+
         msg = _get_continuation_prompt(is_partial_stub=True)
         assert "cut off" in msg.lower()
         assert "Continue exactly" in msg
 
     def test_truncated_continuation(self):
         from agent.conversation_loop import _get_continuation_prompt
+
         msg = _get_continuation_prompt(is_partial_stub=False)
         assert "truncated" in msg.lower()
         assert "Continue exactly" in msg
 
     def test_dropped_tools_limited_to_3(self):
         from agent.conversation_loop import _get_continuation_prompt
+
         tools = [f"tool{i}" for i in range(10)]
         msg = _get_continuation_prompt(is_partial_stub=True, dropped_tools=tools)
         # Only first 3 should appear
@@ -268,9 +309,11 @@ class TestGetContinuationPrompt:
 # _restore_or_build_system_prompt
 # ---------------------------------------------------------------------------
 
+
 class TestRestoreOrBuildSystemPrompt:
     def test_stored_prompt_kullanilir(self, mock_agent):
         from agent.conversation_loop import _restore_or_build_system_prompt
+
         mock_agent._session_db = MagicMock()
         mock_agent._session_db.get_session = MagicMock(
             return_value={"system_prompt": "kaydedilmis prompt"}
@@ -281,6 +324,7 @@ class TestRestoreOrBuildSystemPrompt:
 
     def test_null_stored_prompt_yeniden_build_eder(self, mock_agent):
         from agent.conversation_loop import _restore_or_build_system_prompt
+
         mock_agent._session_db = MagicMock()
         mock_agent._session_db.get_session = MagicMock(
             return_value={"system_prompt": None}
@@ -290,11 +334,13 @@ class TestRestoreOrBuildSystemPrompt:
 
     def test_bos_gecmis_yine_de_build_eder(self, mock_agent):
         from agent.conversation_loop import _restore_or_build_system_prompt
+
         _restore_or_build_system_prompt(mock_agent, None, [])
         mock_agent._build_system_prompt.assert_called_once()
 
     def test_empty_stored_prompt_yeniden_build_eder(self, mock_agent):
         from agent.conversation_loop import _restore_or_build_system_prompt
+
         mock_agent._session_db = MagicMock()
         mock_agent._session_db.get_session = MagicMock(
             return_value={"system_prompt": ""}
@@ -304,16 +350,21 @@ class TestRestoreOrBuildSystemPrompt:
 
     def test_session_db_hatasi_warning_log(self, mock_agent, caplog):
         import logging
+
         caplog.set_level(logging.WARNING)
         from agent.conversation_loop import _restore_or_build_system_prompt
+
         mock_agent._session_db = MagicMock()
-        mock_agent._session_db.get_session = MagicMock(side_effect=ValueError("DB error"))
+        mock_agent._session_db.get_session = MagicMock(
+            side_effect=ValueError("DB error")
+        )
         _restore_or_build_system_prompt(mock_agent, None, [{"role": "user"}])
         assert any("Session DB get_session failed" in r.message for r in caplog.records)
         mock_agent._build_system_prompt.assert_called_once()
 
     def test_persist_sonrasi_update_cagrilir(self, mock_agent):
         from agent.conversation_loop import _restore_or_build_system_prompt
+
         mock_agent._session_db = MagicMock()
         mock_agent._session_db.get_session = MagicMock(return_value=None)
         _restore_or_build_system_prompt(mock_agent, None, [])
@@ -323,12 +374,14 @@ class TestRestoreOrBuildSystemPrompt:
 
     def test_system_message_iletildiginde_build_eder(self, mock_agent):
         from agent.conversation_loop import _restore_or_build_system_prompt
+
         _restore_or_build_system_prompt(mock_agent, "custom sys msg", [])
         mock_agent._build_system_prompt.assert_called_once_with("custom sys msg")
 
     def test_on_session_start_hook_cagrilir(self, mock_agent):
         from agent.conversation_loop import _restore_or_build_system_prompt
         import ReYMeN_cli.plugins
+
         mock_agent._session_db = MagicMock()
         mock_agent._session_db.get_session = MagicMock(return_value=None)
         mock_hook = MagicMock()
@@ -342,17 +395,25 @@ class TestRestoreOrBuildSystemPrompt:
 # _print_nous_entitlement_guidance
 # ---------------------------------------------------------------------------
 
+
 class TestPrintNousEntitlementGuidance:
     def test_mesaj_varsa_yazdirir(self, mock_agent):
-        with patch("agent.conversation_loop._nous_entitlement_message", return_value="Bilgilendirme mesaji"):
+        with patch(
+            "agent.conversation_loop._nous_entitlement_message",
+            return_value="Bilgilendirme mesaji",
+        ):
             from agent.conversation_loop import _print_nous_entitlement_guidance
+
             result = _print_nous_entitlement_guidance(mock_agent, "tools")
             assert result is True
             mock_agent._vprint.assert_called()
 
     def test_mesaj_yoksa_yazdirmaz(self, mock_agent):
-        with patch("agent.conversation_loop._nous_entitlement_message", return_value=""):
+        with patch(
+            "agent.conversation_loop._nous_entitlement_message", return_value=""
+        ):
             from agent.conversation_loop import _print_nous_entitlement_guidance
+
             result = _print_nous_entitlement_guidance(mock_agent, "tools")
             assert result is False
             mock_agent._vprint.assert_not_called()
@@ -362,10 +423,15 @@ class TestPrintNousEntitlementGuidance:
 # _print_billing_or_entitlement_guidance
 # ---------------------------------------------------------------------------
 
+
 class TestPrintBillingOrEntitlementGuidance:
     def test_mesaj_varsa_yazdirir(self, mock_agent):
-        with patch("agent.conversation_loop._billing_or_entitlement_message", return_value="Fatura uyarisi"):
+        with patch(
+            "agent.conversation_loop._billing_or_entitlement_message",
+            return_value="Fatura uyarisi",
+        ):
             from agent.conversation_loop import _print_billing_or_entitlement_guidance
+
             result = _print_billing_or_entitlement_guidance(
                 mock_agent,
                 capability="tools",
@@ -377,8 +443,11 @@ class TestPrintBillingOrEntitlementGuidance:
             mock_agent._vprint.assert_called()
 
     def test_mesaj_yoksa_yazdirmaz(self, mock_agent):
-        with patch("agent.conversation_loop._billing_or_entitlement_message", return_value=""):
+        with patch(
+            "agent.conversation_loop._billing_or_entitlement_message", return_value=""
+        ):
             from agent.conversation_loop import _print_billing_or_entitlement_guidance
+
             result = _print_billing_or_entitlement_guidance(
                 mock_agent,
                 capability="tools",
@@ -393,11 +462,13 @@ class TestPrintBillingOrEntitlementGuidance:
 # run_conversation (partial — stateless yardimcilari test ediyoruz)
 # ---------------------------------------------------------------------------
 
+
 class TestRunConversationHelpers:
     def test_import_hatasiz(self, mock_agent):
         """conversation_loop modulu import edilebilir olmali."""
         try:
             import agent.conversation_loop
+
             assert hasattr(agent.conversation_loop, "run_conversation")
         except Exception as e:
             pytest.fail(f"Import hatasi: {e}")
@@ -405,6 +476,7 @@ class TestRunConversationHelpers:
     def test_run_conversation_signature(self, mock_agent):
         from agent.conversation_loop import run_conversation
         import inspect
+
         sig = inspect.signature(run_conversation)
         params = list(sig.parameters.keys())
         assert "user_message" in params
@@ -415,11 +487,15 @@ class TestRunConversationHelpers:
     def test_run_conversation_temel_akisi(self, mock_agent):
         """run_conversation temel olarak cagrilabilir olmali (mock agent ile)."""
         from agent.conversation_loop import run_conversation
+
         # Cok genis bir fonksiyon oldugu icin sadece import ve cagri testi
         with patch("agent.conversation_loop._install_safe_stdio"):
             with patch("agent.conversation_loop.set_session_context"):
                 with patch("agent.conversation_loop.set_current_write_origin"):
-                    with patch("agent.conversation_loop._summarize_user_message_for_log", return_value="test"):
+                    with patch(
+                        "agent.conversation_loop._summarize_user_message_for_log",
+                        return_value="test",
+                    ):
                         # Burada gercek API cagrisi yapmamak icin _execute_api_call'i mockla
                         with patch.object(mock_agent, "_interrupt_requested", True):
                             result = run_conversation(mock_agent, "Merhaba", "System")
@@ -427,9 +503,11 @@ class TestRunConversationHelpers:
 
     def test_ollama_context_warning(self, mock_agent, caplog):
         import logging
+
         caplog.set_level(logging.WARNING)
         with patch("agent.conversation_loop.MINIMUM_CONTEXT_LENGTH", 8192):
             from agent.conversation_loop import _ollama_context_limit_error
+
             agent = MagicMock()
             agent.tools = ["tool1"]
             agent._ollama_num_ctx = 4096
@@ -445,26 +523,42 @@ class TestRunConversationHelpers:
 # _try_refresh_nous_paid_entitlement_credentials
 # ---------------------------------------------------------------------------
 
+
 class TestTryRefreshNousPaidEntitlement:
     def test_nous_yoksa_false_doner(self, mock_agent):
-        from agent.conversation_loop import _try_refresh_nous_paid_entitlement_credentials
+        from agent.conversation_loop import (
+            _try_refresh_nous_paid_entitlement_credentials,
+        )
+
         with patch("ReYMeN_cli.nous_account.get_nous_portal_account_info") as mock_info:
             mock_info.return_value.paid_service_access = True
-            mock_agent._try_refresh_nous_client_credentials = MagicMock(return_value=True)
+            mock_agent._try_refresh_nous_client_credentials = MagicMock(
+                return_value=True
+            )
             result = _try_refresh_nous_paid_entitlement_credentials(mock_agent)
             assert result is True
-            mock_agent._try_refresh_nous_client_credentials.assert_called_once_with(force=True)
+            mock_agent._try_refresh_nous_client_credentials.assert_called_once_with(
+                force=True
+            )
 
     def test_paid_access_yoksa_false(self, mock_agent):
-        from agent.conversation_loop import _try_refresh_nous_paid_entitlement_credentials
+        from agent.conversation_loop import (
+            _try_refresh_nous_paid_entitlement_credentials,
+        )
+
         with patch("ReYMeN_cli.nous_account.get_nous_portal_account_info") as mock_info:
             mock_info.return_value.paid_service_access = False
             result = _try_refresh_nous_paid_entitlement_credentials(mock_agent)
             assert result is False
 
     def test_exception_hatasinda_false(self, mock_agent):
-        from agent.conversation_loop import _try_refresh_nous_paid_entitlement_credentials
-        with patch("ReYMeN_cli.nous_account.get_nous_portal_account_info",
-                    side_effect=ValueError("hata")):
+        from agent.conversation_loop import (
+            _try_refresh_nous_paid_entitlement_credentials,
+        )
+
+        with patch(
+            "ReYMeN_cli.nous_account.get_nous_portal_account_info",
+            side_effect=ValueError("hata"),
+        ):
             result = _try_refresh_nous_paid_entitlement_credentials(mock_agent)
             assert result is False

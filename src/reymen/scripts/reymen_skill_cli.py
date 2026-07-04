@@ -102,12 +102,14 @@ class SkillCLI:
             if kategori is not None and kat != kategori:
                 continue
             meta = self._meta_oku(md)
-            sonuc.append({
-                "ad": md.parent.name,
-                "kategori": kat,
-                "aciklama": meta["aciklama"],
-                "tags": meta["tags"],
-            })
+            sonuc.append(
+                {
+                    "ad": md.parent.name,
+                    "kategori": kat,
+                    "aciklama": meta["aciklama"],
+                    "tags": meta["tags"],
+                }
+            )
         sonuc.sort(key=lambda s: s["ad"])
         return sonuc
 
@@ -198,11 +200,13 @@ class SkillCLI:
             skill_adi = md.parent.name
             if q in skill_adi.lower() or q in icerik:
                 meta = self._meta_oku(md)
-                sonuc.append({
-                    "ad": skill_adi,
-                    "kategori": md.parent.parent.name,
-                    "aciklama": meta["aciklama"],
-                    "tags": meta["tags"],
-                })
+                sonuc.append(
+                    {
+                        "ad": skill_adi,
+                        "kategori": md.parent.parent.name,
+                        "aciklama": meta["aciklama"],
+                        "tags": meta["tags"],
+                    }
+                )
         sonuc.sort(key=lambda s: s["ad"])
         return sonuc

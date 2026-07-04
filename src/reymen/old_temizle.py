@@ -1,4 +1,5 @@
 """old_temizle.py — 7 günden eski .old dosyalarını temizle."""
+
 import os, time, shutil
 from pathlib import Path
 

@@ -28,6 +28,7 @@ MEDIA format sözleşmesi (köprü/telegram_bot tarafından ayrıştırılması 
 
 Projenizdeki köprü farklı bir biçim bekliyorsa _media() fonksiyonunu güncelleyin.
 """
+
 import asyncio
 import logging
 import os
@@ -39,6 +40,7 @@ logger = logging.getLogger(__name__)
 
 try:
     import speech_recognition as sr
+
     SR_OK = True
 except Exception:
     SR_OK = False
@@ -83,6 +85,7 @@ class SesliKomut:
         """
         try:
             import pyttsx3
+
             motor = pyttsx3.init()
             motor.say(metin)
             motor.runAndWait()
@@ -113,6 +116,7 @@ def _faster_whisper_model(model_adi: str = "small"):
         with _model_lock:
             if _fw_model is None:
                 from faster_whisper import WhisperModel
+
                 _fw_model = WhisperModel(model_adi, device="cpu", compute_type="int8")
     return _fw_model
 
@@ -123,6 +127,7 @@ def _openai_whisper_model(model_adi: str = "base"):
         with _model_lock:
             if _ow_model is None:
                 import whisper
+
                 _ow_model = whisper.load_model(model_adi)
     return _ow_model
 
@@ -144,7 +149,9 @@ def ses_tanima(dosya_yolu: str, dil: str = "tr") -> str:
     except ImportError:
         logger.warning("[fix_01_sessiz_except] ImportError")
     except Exception as e:
-        logger.warning("[SES_TANIMA] faster-whisper hatası, openai-whisper deneniyor: %s", e)
+        logger.warning(
+            "[SES_TANIMA] faster-whisper hatası, openai-whisper deneniyor: %s", e
+        )
 
     try:
         model = _openai_whisper_model()
@@ -152,8 +159,10 @@ def ses_tanima(dosya_yolu: str, dil: str = "tr") -> str:
         metin = (sonuc.get("text") or "").strip()
         return f"[SES_TANIMA] (openai-whisper)\n{metin or '(boş)'}"
     except ImportError:
-        return ("[SES_TANIMA] Hata: whisper kurulu değil. "
-                "pip install faster-whisper  (veya)  pip install openai-whisper")
+        return (
+            "[SES_TANIMA] Hata: whisper kurulu değil. "
+            "pip install faster-whisper  (veya)  pip install openai-whisper"
+        )
     except Exception as e:
         logger.error("[SES_TANIMA] hata: %s", e)
         return f"[SES_TANIMA] Hata: {e}"
@@ -161,13 +170,16 @@ def ses_tanima(dosya_yolu: str, dil: str = "tr") -> str:
 
 # ── SESLENDIR (TTS) ──────────────────────────────────────────────────
 
+
 def seslendir(metin: str, ses: str = "tr-TR-AhmetNeural", dosya_yolu: str = "") -> str:
     """Metni sese çevirir; dosya yolunu MEDIA formatında döner. edge-tts > pyttsx3."""
     if not metin or not metin.strip():
         return "[SESLENDIR] Hata: 'metin' boş olamaz."
 
     if not dosya_yolu or not dosya_yolu.strip():
-        dosya_yolu = os.path.join(tempfile.gettempdir(), f"reymen_tts_{uuid.uuid4().hex[:8]}.mp3")
+        dosya_yolu = os.path.join(
+            tempfile.gettempdir(), f"reymen_tts_{uuid.uuid4().hex[:8]}.mp3"
+        )
 
     try:
         import edge_tts
@@ -185,13 +197,16 @@ def seslendir(metin: str, ses: str = "tr-TR-AhmetNeural", dosya_yolu: str = "") 
 
     try:
         import pyttsx3
+
         wav_yolu = dosya_yolu.rsplit(".", 1)[0] + ".wav"
         motor = pyttsx3.init()
         motor.save_to_file(metin.strip(), wav_yolu)
         motor.runAndWait()
         return _media("audio", wav_yolu, "Seslendirme (pyttsx3, offline)")
     except ImportError:
-        return "[SESLENDIR] Hata: edge-tts veya pyttsx3 kurulu değil. pip install edge-tts"
+        return (
+            "[SESLENDIR] Hata: edge-tts veya pyttsx3 kurulu değil. pip install edge-tts"
+        )
     except Exception as e:
         logger.error("[SESLENDIR] hata: %s", e)
         return f"[SESLENDIR] Hata: {e}"
@@ -199,8 +214,14 @@ def seslendir(metin: str, ses: str = "tr-TR-AhmetNeural", dosya_yolu: str = "") 
 
 # ── OPENAI TTS (Text-to-Speech) ───────────────────────────────────────
 
-def openai_tts(metin: str, ses: str = "alloy", model: str = "tts-1",
-               dosya_yolu: str = "", format: str = "mp3") -> str:
+
+def openai_tts(
+    metin: str,
+    ses: str = "alloy",
+    model: str = "tts-1",
+    dosya_yolu: str = "",
+    format: str = "mp3",
+) -> str:
     """OpenAI TTS API ile metni sese çevirir.
 
     https://api.openai.com/v1/audio/speech endpoint'ini çağırır.
@@ -231,12 +252,14 @@ def openai_tts(metin: str, ses: str = "alloy", model: str = "tts-1",
     import urllib.error
     import json as _json
 
-    body = _json.dumps({
-        "model": model,
-        "input": metin.strip(),
-        "voice": ses,
-        "response_format": format,
-    }).encode()
+    body = _json.dumps(
+        {
+            "model": model,
+            "input": metin.strip(),
+            "voice": ses,
+            "response_format": format,
+        }
+    ).encode()
 
     req = urllib.request.Request(
         "https://api.openai.com/v1/audio/speech",
@@ -256,8 +279,7 @@ def openai_tts(metin: str, ses: str = "alloy", model: str = "tts-1",
             f.write(ses_verisi)
 
         return _media(
-            "audio", dosya_yolu,
-            f"Seslendirme (OpenAI TTS, ses={ses}, model={model})"
+            "audio", dosya_yolu, f"Seslendirme (OpenAI TTS, ses={ses}, model={model})"
         )
     except urllib.error.HTTPError as e:
         if e.code == 401:
@@ -271,6 +293,7 @@ def openai_tts(metin: str, ses: str = "alloy", model: str = "tts-1",
 
 
 # ── OPENAI STT (Speech-to-Text / Whisper API) ────────────────────────
+
 
 def openai_stt(dosya_yolu: str, model: str = "whisper-1", dil: str = "tr") -> str:
     """OpenAI Whisper API ile ses dosyasını metne çevirir.
@@ -396,4 +419,3 @@ def motor_kaydet(motor):
 
 if __name__ == "__main__":
     print("SesliKomut hazir (SpeechRecognition:%s)" % SR_OK)
-

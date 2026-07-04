@@ -42,9 +42,9 @@ def test_apply_xai_auto_speech_tags_multi_paragraph_emits_single_pause():
     result = _apply_xai_auto_speech_tags(text)
 
     # Exactly one [pause] between the paragraphs, not two.
-    assert result.count("[pause]") == 1, (
-        f"expected single [pause], got {result.count('[pause]')} in {result!r}"
-    )
+    assert (
+        result.count("[pause]") == 1
+    ), f"expected single [pause], got {result.count('[pause]')} in {result!r}"
     assert result == (
         "Welcome to the demo of our new product line. [pause] It has many features."
     )
@@ -102,7 +102,9 @@ def test_generate_xai_tts_sends_auto_speech_tags_when_enabled(tmp_path, monkeypa
     assert captured["url"] == "https://api.x.ai/v1/tts"
     assert captured["json"]["voice_id"] == "ara"
     assert captured["json"]["language"] == "fr"
-    assert captured["json"]["text"] == "Bonjour Monsieur Talbot. [pause] Ceci est un test."
+    assert (
+        captured["json"]["text"] == "Bonjour Monsieur Talbot. [pause] Ceci est un test."
+    )
 
 
 def test_generate_xai_tts_leaves_text_plain_by_default(tmp_path, monkeypatch):

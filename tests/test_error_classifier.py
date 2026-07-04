@@ -58,25 +58,39 @@ class TestKategoriBul:
     """Kategori eşleştirme mantığını test eder."""
 
     def test_import_kategorisi_module_not_found(self, classifier: ErrorClassifier):
-        assert classifier._kategori_bul("ModuleNotFoundError: No module named 'flask'") == "import"
+        assert (
+            classifier._kategori_bul("ModuleNotFoundError: No module named 'flask'")
+            == "import"
+        )
 
     def test_import_kategorisi_import_error(self, classifier: ErrorClassifier):
         assert classifier._kategori_bul("ImportError: cannot import name X") == "import"
 
     def test_syntax_kategorisi(self, classifier: ErrorClassifier):
-        assert classifier._kategori_bul("SyntaxError: invalid syntax on line 5") == "syntax"
+        assert (
+            classifier._kategori_bul("SyntaxError: invalid syntax on line 5")
+            == "syntax"
+        )
 
     def test_indentation_error_syntax_kategorisi(self, classifier: ErrorClassifier):
-        assert classifier._kategori_bul("IndentationError: unexpected indent") == "syntax"
+        assert (
+            classifier._kategori_bul("IndentationError: unexpected indent") == "syntax"
+        )
 
     def test_dizin_kategorisi_file_not_found(self, classifier: ErrorClassifier):
-        assert classifier._kategori_bul("FileNotFoundError: config.yaml bulunamadi") == "dizin"
+        assert (
+            classifier._kategori_bul("FileNotFoundError: config.yaml bulunamadi")
+            == "dizin"
+        )
 
     def test_dizin_kategorisi_not_found_metni(self, classifier: ErrorClassifier):
         assert classifier._kategori_bul("hata: dosya not found") == "dizin"
 
     def test_baglanti_kategorisi_connection_error(self, classifier: ErrorClassifier):
-        assert classifier._kategori_bul("ConnectionRefusedError: sunucu kapali") == "baglanti"
+        assert (
+            classifier._kategori_bul("ConnectionRefusedError: sunucu kapali")
+            == "baglanti"
+        )
 
     def test_baglanti_kategorisi_ecnrefused(self, classifier: ErrorClassifier):
         assert classifier._kategori_bul("ECONNREFUSED: 127.0.0.1:8080") == "baglanti"
@@ -91,18 +105,26 @@ class TestKategoriBul:
         assert classifier._kategori_bul("API key gecersiz") == "api"
 
     def test_tip_kategorisi_type_error(self, classifier: ErrorClassifier):
-        assert classifier._kategori_bul("TypeError: unsupported operand type(s)") == "tip"
+        assert (
+            classifier._kategori_bul("TypeError: unsupported operand type(s)") == "tip"
+        )
 
     def test_tip_kategorisi_value_error(self, classifier: ErrorClassifier):
-        assert classifier._kategori_bul("ValueError: invalid literal for int()") == "tip"
+        assert (
+            classifier._kategori_bul("ValueError: invalid literal for int()") == "tip"
+        )
 
     def test_izin_kategorisi(self, classifier: ErrorClassifier):
-        assert classifier._kategori_bul("PermissionError: [Errno 13] izin yok") == "izin"
+        assert (
+            classifier._kategori_bul("PermissionError: [Errno 13] izin yok") == "izin"
+        )
 
     def test_zaman_asimi_kategorisi(self, classifier: ErrorClassifier):
         # "baglanti" / "Bağlantı" kelimeleri baglanti kategorisini tetikler,
         # bu yüzden nötr bir mesaj kullanıyoruz
-        assert classifier._kategori_bul("TimeoutError: islem zaman asimi") == "zaman_asimi"
+        assert (
+            classifier._kategori_bul("TimeoutError: islem zaman asimi") == "zaman_asimi"
+        )
 
     def test_timed_out_kelimesi(self, classifier: ErrorClassifier):
         assert classifier._kategori_bul("Connection timed out") == "zaman_asimi"
@@ -229,27 +251,33 @@ class TestSiniflandir:
         sonuc = classifier.siniflandir("")
         assert sonuc["kategori"] == "diger"
 
-    @pytest.mark.parametrize("hata_metni,beklenen_kategori", [
-        ("ModuleNotFoundError: No module named 'foo'", "import"),
-        ("SyntaxError: invalid syntax", "syntax"),
-        ("FileNotFoundError: x", "dizin"),
-        ("ConnectionError: x", "baglanti"),
-        ("HTTP 403: Forbidden", "api"),
-        ("TypeError: x", "tip"),
-        ("PermissionError: x", "izin"),
-        ("TimeoutError: x", "zaman_asimi"),
-        ("BilinmeyenHata: xyz", "diger"),
-    ])
+    @pytest.mark.parametrize(
+        "hata_metni,beklenen_kategori",
+        [
+            ("ModuleNotFoundError: No module named 'foo'", "import"),
+            ("SyntaxError: invalid syntax", "syntax"),
+            ("FileNotFoundError: x", "dizin"),
+            ("ConnectionError: x", "baglanti"),
+            ("HTTP 403: Forbidden", "api"),
+            ("TypeError: x", "tip"),
+            ("PermissionError: x", "izin"),
+            ("TimeoutError: x", "zaman_asimi"),
+            ("BilinmeyenHata: xyz", "diger"),
+        ],
+    )
     def test_parametrik_kategoriler(
         self, classifier: ErrorClassifier, hata_metni: str, beklenen_kategori: str
     ):
         sonuc = classifier.siniflandir(hata_metni)
         assert sonuc["kategori"] == beklenen_kategori
 
-    @pytest.mark.parametrize("hata_metni,beklenen_paket", [
-        ("No module named 'numpy'", "numpy"),
-        ("No module named 'django.core'", "django"),
-    ])
+    @pytest.mark.parametrize(
+        "hata_metni,beklenen_paket",
+        [
+            ("No module named 'numpy'", "numpy"),
+            ("No module named 'django.core'", "django"),
+        ],
+    )
     def test_no_module_named_cozumu(
         self, classifier: ErrorClassifier, hata_metni: str, beklenen_paket: str
     ):

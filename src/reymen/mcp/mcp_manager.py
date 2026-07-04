@@ -40,6 +40,7 @@ CONFIG_YOLLARI = [
 # pyyaml opsiyonel
 try:
     import yaml
+
     YAML_OK = True
 except ImportError:
     YAML_OK = False
@@ -48,6 +49,7 @@ except ImportError:
 # ═══════════════════════════════════════════════════════════════════
 # Transport İstemcileri
 # ═══════════════════════════════════════════════════════════════════
+
 
 class _StdioTransport:
     """Stdio (subprocess) ile JSON-RPC."""
@@ -142,6 +144,7 @@ class _TcpTransport:
 # MCP Sunucu Bağlantısı
 # ═══════════════════════════════════════════════════════════════════
 
+
 class MCPServerBaglantisi:
     """Tek bir MCP sunucusuna bağlantı."""
 
@@ -224,6 +227,7 @@ class MCPServerBaglantisi:
 # MCP Yöneticisi (Singleton)
 # ═══════════════════════════════════════════════════════════════════
 
+
 class MCPManager:
     """Tüm MCP sunucularını yönetir. Singleton."""
 
@@ -279,7 +283,9 @@ class MCPManager:
                 sayi = await baglanti.tools_kesfet()
                 logger.info(
                     "MCP [%s]: %s tool keşfedildi (%s)",
-                    ad, sayi, cfg.get("transport"),
+                    ad,
+                    sayi,
+                    cfg.get("transport"),
                 )
                 toplam += sayi
             except Exception as e:
@@ -289,9 +295,7 @@ class MCPManager:
         logger.info("MCP: %s sunucu, %s tool", len(self._sunucular), toplam)
         return toplam
 
-    async def cagir(
-        self, sunucu: str, arac: str, args: Optional[dict] = None
-    ) -> dict:
+    async def cagir(self, sunucu: str, arac: str, args: Optional[dict] = None) -> dict:
         """Bir MCP sunucusunda tool çağır.
 
         Args:

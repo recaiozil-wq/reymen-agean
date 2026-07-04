@@ -1,4 +1,5 @@
 """Test: reymen/reymen_cli/commands.py"""
+
 from __future__ import annotations
 import os, sys
 from pathlib import Path
@@ -11,4 +12,5 @@ sys.path.insert(0, str(PROJE_KOK))
 class TestCommands:
     def test_import(self):
         import reymen.reymen_cli.commands as m
+
         assert m is not None

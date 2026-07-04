@@ -35,15 +35,16 @@ DEFAULT_CONFIG_PATH = PROJE_KOK / ".ReYMeN" / "hata_toplama.json"
 @dataclass
 class HataKaydi:
     """Tek bir hata kaydi."""
+
     id: Optional[int] = None
     zaman: str = ""
     modul: str = ""
     arac: str = ""
     hata_tipi: str = ""
     hata_mesaji: str = ""
-    seviye: str = "UYARI"         # BILGI | UYARI | HATA | KRITIK
-    frekans_imzasi: str = ""      # Ayni hatalari gruplamak icin
-    ek_bilgi: str = ""            # JSON string
+    seviye: str = "UYARI"  # BILGI | UYARI | HATA | KRITIK
+    frekans_imzasi: str = ""  # Ayni hatalari gruplamak icin
+    ek_bilgi: str = ""  # JSON string
     cozuldu_mu: bool = False
     bildirim_gonderildi_mi: bool = False
 
@@ -94,24 +95,30 @@ class HataVeritabani:
     def kaydet(self, kayit: HataKaydi) -> int:
         """Yeni hata kaydi ekle. Doner: kayit id."""
         conn = self._baglan()
-        imza = kayit.frekans_imzasi or f"{kayit.modul}:{kayit.hata_tipi}:{kayit.hata_mesaji[:100]}"
-        cur = conn.execute("""
+        imza = (
+            kayit.frekans_imzasi
+            or f"{kayit.modul}:{kayit.hata_tipi}:{kayit.hata_mesaji[:100]}"
+        )
+        cur = conn.execute(
+            """
             INSERT INTO hata_kayitlari
                 (zaman, modul, arac, hata_tipi, hata_mesaji, seviye,
                  frekans_imzasi, ek_bilgi, cozuldu_mu, bildirim_gonderildi_mi)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-            kayit.zaman or datetime.now().isoformat(),
-            kayit.modul[:100],
-            kayit.arac[:100],
-            kayit.hata_tipi[:100],
-            kayit.hata_mesaji[:1000],
-            kayit.seviye,
-            imza[:200],
-            kayit.ek_bilgi or "{}",
-            1 if kayit.cozuldu_mu else 0,
-            1 if kayit.bildirim_gonderildi_mi else 0,
-        ))
+        """,
+            (
+                kayit.zaman or datetime.now().isoformat(),
+                kayit.modul[:100],
+                kayit.arac[:100],
+                kayit.hata_tipi[:100],
+                kayit.hata_mesaji[:1000],
+                kayit.seviye,
+                imza[:200],
+                kayit.ek_bilgi or "{}",
+                1 if kayit.cozuldu_mu else 0,
+                1 if kayit.bildirim_gonderildi_mi else 0,
+            ),
+        )
         conn.commit()
         return cur.lastrowid or 0
 
@@ -119,7 +126,8 @@ class HataVeritabani:
         """Son N saniyedeki hata frekanslari."""
         conn = self._baglan()
         sinir = (datetime.now() - timedelta(seconds=zaman_araligi_s)).isoformat()
-        cur = conn.execute("""
+        cur = conn.execute(
+            """
             SELECT frekans_imzasi, modul, hata_tipi, seviye,
                    COUNT(*) as sayi,
                    MAX(zaman) as son_zaman
@@ -128,37 +136,44 @@ class HataVeritabani:
             GROUP BY frekans_imzasi
             ORDER BY sayi DESC
             LIMIT 20
-        """, (sinir,))
+        """,
+            (sinir,),
+        )
         return [dict(row) for row in cur.fetchall()]
 
     def seviye_istatistik(self, zaman_araligi_s: int = 86400) -> dict[str, int]:
         """Son N saniyedeki seviye bazli hata sayilari."""
         conn = self._baglan()
         sinir = (datetime.now() - timedelta(seconds=zaman_araligi_s)).isoformat()
-        cur = conn.execute("""
+        cur = conn.execute(
+            """
             SELECT seviye, COUNT(*) as sayi
             FROM hata_kayitlari
             WHERE zaman > ?
             GROUP BY seviye
-        """, (sinir,))
+        """,
+            (sinir,),
+        )
         return {row["seviye"]: row["sayi"] for row in cur.fetchall()}
 
     def son_hatalar(self, limit: int = 20) -> list[dict]:
         """En son hata kayitlari."""
         conn = self._baglan()
-        cur = conn.execute("""
+        cur = conn.execute(
+            """
             SELECT * FROM hata_kayitlari
             ORDER BY id DESC
             LIMIT ?
-        """, (limit,))
+        """,
+            (limit,),
+        )
         return [dict(row) for row in cur.fetchall()]
 
     def cozuldu_isaretle(self, kayit_id: int) -> bool:
         """Bir hatayi cozuldu olarak isaretle."""
         conn = self._baglan()
         cur = conn.execute(
-            "UPDATE hata_kayitlari SET cozuldu_mu = 1 WHERE id = ?",
-            (kayit_id,)
+            "UPDATE hata_kayitlari SET cozuldu_mu = 1 WHERE id = ?", (kayit_id,)
         )
         conn.commit()
         return cur.rowcount > 0
@@ -168,7 +183,7 @@ class HataVeritabani:
         conn = self._baglan()
         cur = conn.execute(
             "UPDATE hata_kayitlari SET bildirim_gonderildi_mi = 1 WHERE id = ?",
-            (kayit_id,)
+            (kayit_id,),
         )
         conn.commit()
         return cur.rowcount > 0
@@ -212,9 +227,15 @@ class HataToplayici:
         """Bildirim gonderecek fonksiyonu ayarla (ornek: telegram_gonder)."""
         self._bildirim_fonksiyonu = fn
 
-    def hata_kaydet(self, modul: str = "", arac: str = "",
-                    hata_tipi: str = "", hata_mesaji: str = "",
-                    seviye: str = "UYARI", ek_bilgi: str = "") -> int:
+    def hata_kaydet(
+        self,
+        modul: str = "",
+        arac: str = "",
+        hata_tipi: str = "",
+        hata_mesaji: str = "",
+        seviye: str = "UYARI",
+        ek_bilgi: str = "",
+    ) -> int:
         """Bir hatayi kaydet ve gerekirse bildirim gonder.
 
         Args:
@@ -259,13 +280,18 @@ class HataToplayici:
             return False
 
         # Son N saniyede ayni imzali hata varsa atla (spam korumasi)
-        sinir = (datetime.now() - timedelta(seconds=self._bildirim_interval_s)).isoformat()
+        sinir = (
+            datetime.now() - timedelta(seconds=self._bildirim_interval_s)
+        ).isoformat()
         conn = self.db._baglan()
-        cur = conn.execute("""
+        cur = conn.execute(
+            """
             SELECT COUNT(*) as sayi
             FROM hata_kayitlari
             WHERE frekans_imzasi = ? AND zaman > ? AND bildirim_gonderildi_mi = 1
-        """, (imza, sinir))
+        """,
+            (imza, sinir),
+        )
         row = cur.fetchone()
         if row and row["sayi"] > 0:
             return False
@@ -368,7 +394,9 @@ class HataToplayici:
         if frekans:
             satirlar.append("  En sik (ilk 5):")
             for f in frekans[:5]:
-                satirlar.append(f"    {f['sayi']}x [{f['seviye']}] {f['modul']}/{f['hata_tipi']}")
+                satirlar.append(
+                    f"    {f['sayi']}x [{f['seviye']}] {f['modul']}/{f['hata_tipi']}"
+                )
 
         return {
             "toplam_hata": toplam,
@@ -409,6 +437,7 @@ def hata_toplayici() -> HataToplayici:
 
 # ── Motor Plugin API ───────────────────────────────────────────────────────
 
+
 def motor_kaydet(motor):
     """Motor'a hata toplama araclarini kaydet."""
     toplayici = hata_toplayici()
@@ -433,7 +462,9 @@ def motor_kaydet(motor):
         )
         motor._plugin_arac_kaydet(
             "HATA_COZ",
-            lambda kayit_id=0: "✅ Cozuldu" if hata_toplayici().db.cozuldu_isaretle(int(kayit_id)) else "❌ Bulunamadi",
+            lambda kayit_id=0: "✅ Cozuldu"
+            if hata_toplayici().db.cozuldu_isaretle(int(kayit_id))
+            else "❌ Bulunamadi",
             "Bir hatayi cozuldu olarak isaretle. Parametre: kayit_id (int)",
         )
 
@@ -443,16 +474,27 @@ def motor_kaydet(motor):
 # ── CLI Test ───────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO,
-                        format="%(asctime)s [%(levelname)s] %(message)s")
+    logging.basicConfig(
+        level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
+    )
 
     t = hata_toplayici()
 
     # Test kayitlari
-    t.hata_kaydet(modul="test", arac="CALISTIR", hata_tipi="ImportError",
-                   hata_mesaji="modul bulunamadi", seviye="HATA")
-    t.hata_kaydet(modul="test", arac="BAGLAN", hata_tipi="TimeoutError",
-                   hata_mesaji="zaman asimi", seviye="KRITIK")
+    t.hata_kaydet(
+        modul="test",
+        arac="CALISTIR",
+        hata_tipi="ImportError",
+        hata_mesaji="modul bulunamadi",
+        seviye="HATA",
+    )
+    t.hata_kaydet(
+        modul="test",
+        arac="BAGLAN",
+        hata_tipi="TimeoutError",
+        hata_mesaji="zaman asimi",
+        seviye="KRITIK",
+    )
 
     time.sleep(0.5)
     print(t.ozet_raporu(24)["ozet_text"])

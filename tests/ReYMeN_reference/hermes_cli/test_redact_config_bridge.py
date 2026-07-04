@@ -11,6 +11,7 @@ in .env), the toggle was silently ignored in both `ReYMeN chat` and
 Fix: bridge `security.redact_secrets` from config.yaml → `ReYMeN_REDACT_SECRETS`
 env var in `ReYMeN_cli/main.py` BEFORE the `setup_logging()` call.
 """
+
 import os
 import subprocess
 import sys
@@ -66,9 +67,9 @@ def test_redact_secrets_false_in_config_yaml_is_honored(tmp_path):
         timeout=30,
     )
     assert result.returncode == 0, f"probe failed: {result.stderr}"
-    assert "REDACT_ENABLED=False" in result.stdout, (
-        f"Config toggle not honored.\nstdout: {result.stdout}\nstderr: {result.stderr}"
-    )
+    assert (
+        "REDACT_ENABLED=False" in result.stdout
+    ), f"Config toggle not honored.\nstdout: {result.stdout}\nstderr: {result.stderr}"
     assert "ENV_VAR=false" in result.stdout
 
 
@@ -152,9 +153,9 @@ def test_redact_secrets_true_in_config_yaml_is_honored(tmp_path):
         timeout=30,
     )
     assert result.returncode == 0, f"probe failed: {result.stderr}"
-    assert "REDACT_ENABLED=True" in result.stdout, (
-        f"Config toggle not honored.\nstdout: {result.stdout}\nstderr: {result.stderr}"
-    )
+    assert (
+        "REDACT_ENABLED=True" in result.stdout
+    ), f"Config toggle not honored.\nstdout: {result.stdout}\nstderr: {result.stderr}"
     assert "ENV_VAR=true" in result.stdout
 
 

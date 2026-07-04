@@ -158,9 +158,7 @@ def test_ara_esik_alti_filtre(vektor_bellek):
 
     sonuc = vektor_bellek.ara("qwertyuiopasdfghjklzxcvbnm", k=5)
     for s in sonuc:
-        assert s[2] >= ESIK_BENZERLIK, (
-            f"Skor {s[2]:.4f} esiğin altında: {s[1][:40]}"
-        )
+        assert s[2] >= ESIK_BENZERLIK, f"Skor {s[2]:.4f} esiğin altında: {s[1][:40]}"
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -225,6 +223,7 @@ def test_bilgi(vektor_bellek):
 # ═══════════════════════════════════════════════════════════════════════════════
 #  Test: Doğrudan ChromaDB EphemeralClient (torch/embedding modeli OLMADAN)
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 def _mock_embedding(boyut: int = 384) -> list:
     """384 boyutlu sabit vektör — gerçek embedding modeli çağrılmaz."""

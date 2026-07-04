@@ -207,7 +207,9 @@ class WSLAdapter(PlatformAdapter):
         # \\wsl$\Distro\path  veya  \\wsl.localhost\Distro\path
         low = s.lower()
         if low.startswith("\\\\wsl$\\") or low.startswith("\\\\wsl.localhost\\"):
-            parts = s.split("\\", 4)  # ['', '', 'wsl$'/'wsl.localhost', 'Distro', 'path']
+            parts = s.split(
+                "\\", 4
+            )  # ['', '', 'wsl$'/'wsl.localhost', 'Distro', 'path']
             if len(parts) == 5:
                 return "/" + parts[4].replace("\\", "/")
             elif len(parts) == 4:
@@ -272,7 +274,9 @@ class WSLAdapter(PlatformAdapter):
 
         # WSL env değişkenleri: -- bash -c 'export X=Y; ...'
         if env:
-            env_prefix = " ".join(f"export {k}={shlex.quote(v)}" for k, v in env.items())
+            env_prefix = " ".join(
+                f"export {k}={shlex.quote(v)}" for k, v in env.items()
+            )
             shell_cmd = f"{env_prefix}; {shell_cmd}"
             full_cmd = self._wsl_prefix()
             if cwd:
@@ -361,6 +365,4 @@ def run(
     check: bool = False,
 ) -> subprocess.CompletedProcess[str]:
     """Global adapter üzerinden komut çalıştırır."""
-    return _get_adapter().run(
-        cmd, cwd=cwd, env=env, timeout=timeout, check=check
-    )
+    return _get_adapter().run(cmd, cwd=cwd, env=env, timeout=timeout, check=check)

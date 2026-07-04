@@ -30,13 +30,16 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 # ── Sabitler ──────────────────────────────────────────────────────────────────
 
 # durum.json proje kökünde — tüm botlar erişebilir
 # Ortak yol: her bot aynı proje dizininden çalışıyorsa
-_PROJE_KOKU = Path(__file__).resolve().parent.parent.parent  # reymen/sistem/ -> reymen/ -> proje/
+_PROJE_KOKU = (
+    Path(__file__).resolve().parent.parent.parent
+)  # reymen/sistem/ -> reymen/ -> proje/
 _DURUM_DOSYASI = _PROJE_KOKU / "durum.json"
 
 # Varsayılan durum şablonu (dosya yoksa kullanılır)
@@ -54,6 +57,7 @@ VARSAYILAN_DURUM: Dict[str, Any] = {
 
 
 # ── Ana Fonksiyonlar ───────────────────────────────────────────────────────────
+
 
 def _kilitle():
     """Basit dosya kilidi — aynı anda yazma çakışmasını önler."""
@@ -170,7 +174,9 @@ def durum_guncelle(
     ozellikler = mevcut.get("ozellikler", {})
     mevcut["toplam_ozellik"] = len(ozellikler)
     mevcut["tamam"] = sum(1 for o in ozellikler.values() if o.get("durum") == "tamam")
-    mevcut["isleniyor"] = sum(1 for o in ozellikler.values() if o.get("durum") == "isleniyor")
+    mevcut["isleniyor"] = sum(
+        1 for o in ozellikler.values() if o.get("durum") == "isleniyor"
+    )
 
     durum_yaz(mevcut, bot_adi)
     return mevcut
@@ -339,17 +345,22 @@ def durum_raporu() -> str:
 
 # ── CLI Entry ──────────────────────────────────────────────────────────────────
 
+
 def _cli():
     """Komut satırından kullanım: python -m reymen.sistem.durum_paylas --oku"""
     import argparse
 
     parser = argparse.ArgumentParser(description="Botlar Arası Paylaşımlı Durum")
     parser.add_argument("--oku", action="store_true", help="Durumu oku ve göster")
-    parser.add_argument("--rapor", action="store_true", help="İnsan-okunabilir rapor göster")
+    parser.add_argument(
+        "--rapor", action="store_true", help="İnsan-okunabilir rapor göster"
+    )
     parser.add_argument("--guncelle", action="store_true", help="Durum güncelle")
     parser.add_argument("--bot", default="cli", help="Güncelleyen bot adı")
     parser.add_argument("--ozellik", help="Özellik adı")
-    parser.add_argument("--durum", choices=["tamam", "isleniyor", "eksik"], help="Yeni durum")
+    parser.add_argument(
+        "--durum", choices=["tamam", "isleniyor", "eksik"], help="Yeni durum"
+    )
     parser.add_argument("--detay", default="", help="Açıklama")
 
     args = parser.parse_args()

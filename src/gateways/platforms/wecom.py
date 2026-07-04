@@ -13,6 +13,7 @@ Yapilandirma (ortam degiskenleri):
   - WECOM_AGENT_ID     — WeCom uygulama AgentID (opsiyonel, REST API icin)
   - WECOM_CORP_SECRET  — WeCom uygulama CorpSecret (opsiyonel, REST API icin)
 """
+
 import asyncio
 import hashlib
 import logging
@@ -25,6 +26,7 @@ from typing import Any, Dict, List, Optional
 from urllib.parse import urlencode, urlparse, urlunparse
 
 from pathlib import Path as _Path
+
 sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
 from src.gateways.config import Platform, PlatformConfig
@@ -43,6 +45,7 @@ logger = logging.getLogger(__name__)
 
 try:
     import httpx
+
     HTTPX_AVAILABLE = True
 except ImportError:
     HTTPX_AVAILABLE = False
@@ -56,11 +59,13 @@ def check_wecom_requirements() -> bool:
         return True
     try:
         from reymen.cron.hermes_stubs import ensure as _lazy_ensure
+
         _lazy_ensure("platform.wecom", prompt=False)
     except Exception:
         return False
     try:
         import httpx as _httpx
+
         httpx = _httpx
         HTTPX_AVAILABLE = True
         return True
@@ -108,10 +113,14 @@ class WeComAdapter(BasePlatformAdapter):
 
     def __init__(self, config: PlatformConfig):
         super().__init__(config, Platform.WECOM)
-        self._webhook_url: str = _env("WECOM_WEBHOOK_URL", config.extra.get("webhook_url", ""))
+        self._webhook_url: str = _env(
+            "WECOM_WEBHOOK_URL", config.extra.get("webhook_url", "")
+        )
         self._corp_id: str = _env("WECOM_CORP_ID", config.extra.get("corp_id", ""))
         self._agent_id: str = _env("WECOM_AGENT_ID", config.extra.get("agent_id", ""))
-        self._corp_secret: str = _env("WECOM_CORP_SECRET", config.extra.get("corp_secret", ""))
+        self._corp_secret: str = _env(
+            "WECOM_CORP_SECRET", config.extra.get("corp_secret", "")
+        )
 
         self._client: Optional[httpx.AsyncClient] = None
         self._access_token: Optional[str] = None
@@ -150,7 +159,11 @@ class WeComAdapter(BasePlatformAdapter):
             return False
 
         # Webhook URL formatini dogrula
-        if has_webhook and "key=" not in self._webhook_url and "/webhook/send" not in self._webhook_url:
+        if (
+            has_webhook
+            and "key=" not in self._webhook_url
+            and "/webhook/send" not in self._webhook_url
+        ):
             logger.warning(
                 "[WeCom] Webhook URL formatinda 'key' parametresi bulunamadi. "
                 "URL ornegi: https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxx"
@@ -272,7 +285,7 @@ class WeComAdapter(BasePlatformAdapter):
         return SendResult(
             False,
             error="Hicbir gonderim yontemi yapilandirilmamis "
-                  "(WECOM_WEBHOOK_URL veya WECOM_CORP_ID+WECOM_AGENT_ID+WECOM_CORP_SECRET)",
+            "(WECOM_WEBHOOK_URL veya WECOM_CORP_ID+WECOM_AGENT_ID+WECOM_CORP_SECRET)",
         )
 
     async def _send_via_webhook(
@@ -327,7 +340,9 @@ class WeComAdapter(BasePlatformAdapter):
             errcode = data.get("errcode", -1)
             if errcode != 0:
                 errmsg = data.get("errmsg", "Bilinmeyen hata")
-                logger.error("[WeCom] Robot webhook API hatasi (%d): %s", errcode, errmsg)
+                logger.error(
+                    "[WeCom] Robot webhook API hatasi (%d): %s", errcode, errmsg
+                )
                 return SendResult(
                     False,
                     error=f"WeCom webhook API hatasi: {errmsg}",
@@ -389,7 +404,9 @@ class WeComAdapter(BasePlatformAdapter):
             payload: Dict[str, Any] = {
                 **to_param,
                 "msgtype": msg_type,
-                "agentid": int(self._agent_id) if self._agent_id.isdigit() else self._agent_id,
+                "agentid": int(self._agent_id)
+                if self._agent_id.isdigit()
+                else self._agent_id,
                 "safe": safe,
             }
 

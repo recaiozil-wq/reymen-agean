@@ -4,6 +4,7 @@
 ModuleNotFoundError kalibini tani, ayni hata 3+ dosyada tekrarlanirsa
 otomatik shim/stub dosyasi olustur. Boylece test crash etmez.
 """
+
 import sys, os, json, re
 from pathlib import Path
 from collections import Counter
@@ -14,11 +15,16 @@ SHIM_DB = ROOT / "_shim_index.json"
 
 def puan_hesapla(basari_orani: float) -> int:
     """Basari oranina gore 0-5 arasi puan."""
-    if basari_orani >= 90: return 5
-    if basari_orani >= 70: return 4
-    if basari_orani >= 50: return 3
-    if basari_orani >= 30: return 2
-    if basari_orani >= 10: return 1
+    if basari_orani >= 90:
+        return 5
+    if basari_orani >= 70:
+        return 4
+    if basari_orani >= 50:
+        return 3
+    if basari_orani >= 30:
+        return 2
+    if basari_orani >= 10:
+        return 1
     return 0
 
 
@@ -32,7 +38,9 @@ def _shim_kayitlari() -> dict:
 
 
 def _shim_kaydet(kayitlar: dict):
-    SHIM_DB.write_text(json.dumps(kayitlar, indent=2, ensure_ascii=False), encoding="utf-8")
+    SHIM_DB.write_text(
+        json.dumps(kayitlar, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
 
 
 def modul_hatalarini_tara(sonuclar: dict, log_fn=print) -> list[str]:
@@ -88,7 +96,10 @@ def _shim_olustur(modul_adi: str, log_fn=print) -> str | None:
     # __init__.py olustur (gerekirse)
     init_yolu = shim_dizin / "__init__.py"
     if not init_yolu.exists():
-        init_yolu.write_text(f'# -*- coding: utf-8 -*-\n"""Otomatik shim: {modul_adi}"""\n', encoding="utf-8")
+        init_yolu.write_text(
+            f'# -*- coding: utf-8 -*-\n"""Otomatik shim: {modul_adi}"""\n',
+            encoding="utf-8",
+        )
 
     # Bos siniflar/fonksiyonlar iceren shim
     icerik = f'''# -*- coding: utf-8 -*-
@@ -132,6 +143,7 @@ def shimleri_temizle(log_fn=print):
     shim_dizin = ROOT / "tools" / "shim"
     if shim_dizin.exists():
         import shutil
+
         shutil.rmtree(shim_dizin)
         log_fn("[SHIM] Tum shim'ler temizlendi")
     if SHIM_DB.exists():
@@ -152,8 +164,15 @@ def kategorilendir(dosya_yolu: str) -> str:
     return "B"
 
 
-def rapor_olustur(gecti: int, basarisiz: int, timeout: int, toplam: int,
-                  kategori_sonuc: dict, shim_sayisi: int, log_fn=print):
+def rapor_olustur(
+    gecti: int,
+    basarisiz: int,
+    timeout: int,
+    toplam: int,
+    kategori_sonuc: dict,
+    shim_sayisi: int,
+    log_fn=print,
+):
     """Detayli kategori bazli test raporu olustur."""
     rapor = []
     rapor.append("=" * 55)
@@ -161,7 +180,9 @@ def rapor_olustur(gecti: int, basarisiz: int, timeout: int, toplam: int,
     rapor.append("=" * 55)
     rapor.append(f"  Toplam: {toplam} dosya")
     rapor.append(f"  GECTI: {gecti} | BASARISIZ: {basarisiz} | TIMEOUT: {timeout}")
-    rapor.append(f"  BASARI ORANI: {gecti/toplam*100:.1f}%" if toplam else "  BASARI ORANI: 0%")
+    rapor.append(
+        f"  BASARI ORANI: {gecti/toplam*100:.1f}%" if toplam else "  BASARI ORANI: 0%"
+    )
     rapor.append(f"  AKTIF SHIM: {shim_sayisi} adet")
     rapor.append("")
 
@@ -170,7 +191,9 @@ def rapor_olustur(gecti: int, basarisiz: int, timeout: int, toplam: int,
             k = kategori_sonuc[kat]
             basari = k["gecti"] / k["toplam"] * 100 if k["toplam"] else 0
             puan = int(basari / 20)  # 0-5 arasi puan
-            rapor.append(f"  KATEGORI {kat}: {k['gecti']}/{k['toplam']} ({basari:.0f}%) → PUAN: {puan}/5")
+            rapor.append(
+                f"  KATEGORI {kat}: {k['gecti']}/{k['toplam']} ({basari:.0f}%) → PUAN: {puan}/5"
+            )
             rapor.append(f"    {'⭐' * puan}{'☆' * (5 - puan)}")
 
     rapor.append("")
@@ -194,4 +217,6 @@ if __name__ == "__main__":
     print(f"Shim DB: {SHIM_DB}")
     print(f"Kategori test_A: {kategorilendir('tests/test_core.py')}")
     print(f"Kategori test_B: {kategorilendir('skills/test_x.py')}")
-    print(f"Kategori test_C: {kategorilendir('tests/ReYMeN_reference/agent/test_x.py')}")
+    print(
+        f"Kategori test_C: {kategorilendir('tests/ReYMeN_reference/agent/test_x.py')}"
+    )

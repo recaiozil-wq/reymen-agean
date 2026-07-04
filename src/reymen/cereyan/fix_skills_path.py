@@ -25,12 +25,12 @@ MERKEZI_SKILLS = Path(__file__).resolve().parent / "skills"  # cereyan/skills/
 
 # Tum skills dizinleri (__pycache__, node_modules, .git, .venv haric)
 TUM_SKILLS_DIZINLERI = [
-    PROJE_KOK / "skills",                            # root skills/ (duz .md)
-    PROJE_KOK / ".ReYMeN" / "skills",                # .ReYMeN/skills/
-    PROJE_KOK / "reymen" / "cereyan" / "skills",     # cereyan/skills/ (MERKEZ)
+    PROJE_KOK / "skills",  # root skills/ (duz .md)
+    PROJE_KOK / ".ReYMeN" / "skills",  # .ReYMeN/skills/
+    PROJE_KOK / "reymen" / "cereyan" / "skills",  # cereyan/skills/ (MERKEZ)
     PROJE_KOK / "reymen" / "cereyan" / ".ReYMeN" / "skills",  # cereyan/.ReYMeN/skills/
     PROJE_KOK / "reymen" / "hafiza" / ".ReYMeN" / "skills",  # hafiza/.ReYMeN/skills/
-    PROJE_KOK / "hermes_legacy" / "skills",          # hermes_legacy/skills/
+    PROJE_KOK / "hermes_legacy" / "skills",  # hermes_legacy/skills/
 ]
 
 
@@ -40,7 +40,13 @@ def _skills_ozet() -> dict[str, int]:
     for dizin in TUM_SKILLS_DIZINLERI:
         if dizin.exists():
             sayi = len(list(dizin.rglob("*.md")))
-            ozet[str(dizin.relative_to(PROJE_KOK) if dizin.is_relative_to(PROJE_KOK) else dizin)] = sayi
+            ozet[
+                str(
+                    dizin.relative_to(PROJE_KOK)
+                    if dizin.is_relative_to(PROJE_KOK)
+                    else dizin
+                )
+            ] = sayi
     return ozet
 
 
@@ -72,10 +78,14 @@ def _yeni_skill_tasi() -> int:
     merkez_md = {p.name for p in _merkezi_tara()}
     yeni = [p for p in root_md if p.name not in merkez_md]
     if yeni:
-        print(f"  [!] Root skills/ dizininde {len(yeni)} yeni/yedek .md dosyasi bulundu:")
+        print(
+            f"  [!] Root skills/ dizininde {len(yeni)} yeni/yedek .md dosyasi bulundu:"
+        )
         for p in yeni:
             print(f"      - {p.name}")
-        print(f"  [!) Bunlari manuel olarak reymen/cereyan/skills/<kategori>/ altina tasiyin.")
+        print(
+            f"  [!) Bunlari manuel olarak reymen/cereyan/skills/<kategori>/ altina tasiyin."
+        )
     return len(yeni)
 
 
@@ -124,7 +134,11 @@ def durum_bildir():
     if ozet:
         print(f"  Mevcut skills dizinleri:")
         for dizin, sayi in sorted(ozet.items()):
-            is_merkez = " [MERKEZ]" if (PROJE_KOK / dizin).resolve() == MERKEZI_SKILLS.resolve() else ""
+            is_merkez = (
+                " [MERKEZ]"
+                if (PROJE_KOK / dizin).resolve() == MERKEZI_SKILLS.resolve()
+                else ""
+            )
             print(f"    {dizin:<50} {sayi:>4} .md{is_merkez}")
     else:
         print(f"  Skills dizini bulunamadi.")
@@ -135,8 +149,12 @@ def durum_bildir():
     yeni_sayisi = _yeni_skill_tasi()
 
     print(f"\n  Oneri:")
-    print(f"    Kullan:  python -c 'from reymen.cereyan.fix_skills_path import *; sync_all()'")
-    print(f"    Durum:   python -c 'from reymen.cereyan.fix_skills_path import *; durum_bildir()'")
+    print(
+        f"    Kullan:  python -c 'from reymen.cereyan.fix_skills_path import *; sync_all()'"
+    )
+    print(
+        f"    Durum:   python -c 'from reymen.cereyan.fix_skills_path import *; durum_bildir()'"
+    )
 
 
 if __name__ == "__main__":

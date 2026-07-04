@@ -23,6 +23,7 @@ from anayasa_denetci import (
 # Fixture'lar
 # ══════════════════════════════════════════════════════════════════════════
 
+
 @pytest.fixture
 def mock_provider():
     """Sahte provider — ihlal olmadığını söyler."""
@@ -60,6 +61,7 @@ def denetci_ihlal(mock_provider_ihlal):
 # ══════════════════════════════════════════════════════════════════════════
 # Başlatma testleri (1-5)
 # ══════════════════════════════════════════════════════════════════════════
+
 
 class TestBaslatma:
     def test_varsayilan_ilkeler(self):
@@ -107,6 +109,7 @@ class TestBaslatma:
 # _basit_soru_mu testleri (6-9)
 # ══════════════════════════════════════════════════════════════════════════
 
+
 class TestBasitSoruMu:
     def test_selam_basit_soru(self):
         """'merhaba' basit soru olarak algılanmalı."""
@@ -135,6 +138,7 @@ class TestBasitSoruMu:
 # ══════════════════════════════════════════════════════════════════════════
 # denetle testleri (10-16)
 # ══════════════════════════════════════════════════════════════════════════
+
 
 class TestDenetle:
     def test_guvenli_cevap_gecer(self, denetci):
@@ -177,9 +181,7 @@ class TestDenetle:
 
     def test_ihlal_revize_etme_devre_disiyken(self, mock_provider_ihlal):
         """revize_et=False iken ihlalde revizyon yapılmamalı, uyarı dönmeli."""
-        mock_provider_ihlal.uret.return_value = (
-            "IHLAL_VAR: evet\nIHLAL_EDILEN_ILKE: 2. Zarar\nKISA_ELESTIRI: Zararli icerik."
-        )
+        mock_provider_ihlal.uret.return_value = "IHLAL_VAR: evet\nIHLAL_EDILEN_ILKE: 2. Zarar\nKISA_ELESTIRI: Zararli icerik."
         ad = AnayasaDenetci(provider=mock_provider_ihlal)
         onay, sonuc = ad.denetle("Hedef", "Tehlikeli kod", revize_et=False)
         assert onay is False
@@ -198,6 +200,7 @@ class TestDenetle:
 # ══════════════════════════════════════════════════════════════════════════
 # hizli_kontrol testleri (17-21)
 # ══════════════════════════════════════════════════════════════════════════
+
 
 class TestHizliKontrol:
     def test_rm_rf_yakalanir(self):
@@ -237,6 +240,7 @@ class TestHizliKontrol:
 # istatistik testleri (22-23)
 # ══════════════════════════════════════════════════════════════════════════
 
+
 class TestIstatistik:
     def test_revizyon_orani_hesaplanir(self, mock_provider_ihlal):
         """Revizyon oranı doğru hesaplanmalı."""
@@ -261,6 +265,7 @@ class TestIstatistik:
 # ══════════════════════════════════════════════════════════════════════════
 # _yanit_ayristir testleri (24-27)
 # ══════════════════════════════════════════════════════════════════════════
+
 
 class TestYanitAyristir:
     def test_ihlal_var_evet_ayristirilir(self):
@@ -296,6 +301,7 @@ class TestYanitAyristir:
 # _elestir / _revize_et testleri (28-30)
 # ══════════════════════════════════════════════════════════════════════════
 
+
 class TestElestirRevize:
     def test_elestir_cagrisi(self, denetci):
         """_elestir LLM çağrısı yapıp sonucu ayrıştırmalı."""
@@ -308,7 +314,11 @@ class TestElestirRevize:
         """_revize_et LLM çağrısı yapıp revize metnini dönmeli."""
         mock_provider_ihlal.uret.return_value = "Revize edilmis cevap."
         ad = AnayasaDenetci(provider=mock_provider_ihlal)
-        elestiri = {"ihlal_var": True, "ihlal_edilen": "1. Doğruluk", "kisa_elestiri": "Uydurma."}
+        elestiri = {
+            "ihlal_var": True,
+            "ihlal_edilen": "1. Doğruluk",
+            "kisa_elestiri": "Uydurma.",
+        }
         sonuc = ad._revize_et("Hedef", "Eski cevap", elestiri)
         assert sonuc == "Revize edilmis cevap."
 
@@ -324,6 +334,7 @@ class TestElestirRevize:
 # ══════════════════════════════════════════════════════════════════════════
 # Sabitler ve prompt formatı (31-32)
 # ══════════════════════════════════════════════════════════════════════════
+
 
 class TestSabitler:
     def test_anayasal_ilkeler_10_adet(self):

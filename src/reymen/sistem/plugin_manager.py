@@ -31,6 +31,7 @@ Kullanim:
     yonetici.list_plugins()
     yonetici.plugin_info("kanban")
 """
+
 from __future__ import annotations
 import importlib
 import importlib.util
@@ -125,7 +126,9 @@ class PluginManager:
         try:
             from reymen.hafiza.memory_provider import HafizaPluginKayit
         except ImportError:
-            logger.warning("memory_provider modulu bulunamadi, hafiza pluginleri yuklenemedi.")
+            logger.warning(
+                "memory_provider modulu bulunamadi, hafiza pluginleri yuklenemedi."
+            )
             return None
 
         if self._hafiza_kayit is None:
@@ -166,9 +169,7 @@ class PluginManager:
         # Tercih veya otomatik secim
         siralama = ([tercih] if tercih else []) + yuklenenler
         for ad in siralama:
-            if self._hafiza_kayit.aktif_saglayici_sec(
-                ad, oturum_id, **baslat_kwargs
-            ):
+            if self._hafiza_kayit.aktif_saglayici_sec(ad, oturum_id, **baslat_kwargs):
                 return self._hafiza_kayit.aktif_al()
 
         logger.info("Hic hafiza saglayici aktive edilemedi.")
@@ -217,6 +218,7 @@ class PluginYoneticisi:
     def __init__(self, plugin_dir: Path | str | None = None):
         if plugin_dir is None:
             from reymen.sistem.plugin_loader import PLUGIN_DIZIN
+
             self._dizin = PLUGIN_DIZIN
         else:
             self._dizin = Path(plugin_dir)
@@ -231,6 +233,7 @@ class PluginYoneticisi:
         if self._yukleyici is None:
             try:
                 from reymen.sistem.plugin_loader import PluginYukleyici
+
                 self._yukleyici = PluginYukleyici(dizin=self._dizin)
             except ImportError:
                 logger.error("plugin_loader.PluginYukleyici bulunamadi.")
@@ -249,6 +252,7 @@ class PluginYoneticisi:
             if yaml_dosya.exists():
                 try:
                     import yaml
+
                     with open(yaml_dosya, "r", encoding="utf-8") as f:
                         veri = yaml.safe_load(f)
                     if isinstance(veri, dict):
@@ -286,32 +290,36 @@ class PluginYoneticisi:
         for p in yl_tumu:
             klasor_adi = p["klasor"]
             yaml_veri = yl.plugin_yaml_bilgisi(klasor_adi) or {}
-            sonuc.append({
-                "name": p["adi"],
-                "version": p["versiyon"],
-                "kind": p["kind"],
-                "enabled": self._aktif_pluginler.get(klasor_adi, True),
-                "description": p["aciklama"],
-                "loaded": p["yuklu"],
-                "tools": len(yl.plugin_bilgisi(klasor_adi).get("araclar", [])),
-                "providers": yaml_veri.get("providers", []),
-            })
+            sonuc.append(
+                {
+                    "name": p["adi"],
+                    "version": p["versiyon"],
+                    "kind": p["kind"],
+                    "enabled": self._aktif_pluginler.get(klasor_adi, True),
+                    "description": p["aciklama"],
+                    "loaded": p["yuklu"],
+                    "tools": len(yl.plugin_bilgisi(klasor_adi).get("araclar", [])),
+                    "providers": yaml_veri.get("providers", []),
+                }
+            )
 
         # PluginManager'dan .py pluginlerini de ekle
         try:
             mgr = PluginManager(str(self._dizin))
             for p_adi in mgr.list_plugins():
                 if not any(s["name"] == p_adi for s in sonuc):
-                    sonuc.append({
-                        "name": p_adi,
-                        "version": "",
-                        "kind": "tool",
-                        "enabled": True,
-                        "description": "",
-                        "loaded": True,
-                        "tools": 1,
-                        "providers": [],
-                    })
+                    sonuc.append(
+                        {
+                            "name": p_adi,
+                            "version": "",
+                            "kind": "tool",
+                            "enabled": True,
+                            "description": "",
+                            "loaded": True,
+                            "tools": 1,
+                            "providers": [],
+                        }
+                    )
         except Exception as _plugin_m_e303:
             print(f"[UYARI] plugin_manager.py:304 - {_plugin_m_e303}")
 
@@ -333,7 +341,7 @@ class PluginYoneticisi:
 
         # plugin.yaml'den oku
         yaml_veri = yl.plugin_yaml_bilgisi(ad) or {}
-        
+
         # Plugin bilgisi
         bilgi = yl.plugin_bilgisi(ad)
 
@@ -378,6 +386,7 @@ class PluginYoneticisi:
             return False
         try:
             import yaml
+
             with open(yaml_dosya, "r", encoding="utf-8") as f:
                 veri = yaml.safe_load(f) or {}
             veri["enabled"] = True
@@ -398,6 +407,7 @@ class PluginYoneticisi:
             return False
         try:
             import yaml
+
             with open(yaml_dosya, "r", encoding="utf-8") as f:
                 veri = yaml.safe_load(f) or {}
             veri["enabled"] = False
@@ -453,7 +463,9 @@ class PluginYoneticisi:
         modul = yl._yuklu.get(ad)
         if modul is None:
             # Plugin yuklu degil, normal yeniden yukleme dene
-            logger.info("[Plugin] Hot-reload: '%s' yuklu degil, normal reload yapiliyor.", ad)
+            logger.info(
+                "[Plugin] Hot-reload: '%s' yuklu degil, normal reload yapiliyor.", ad
+            )
             return self.plugin_reload(ad)
 
         # Aktif durumunu koru
@@ -490,7 +502,8 @@ class PluginYoneticisi:
                     except Exception as dep_e:
                         logger.warning(
                             "[Plugin] Bagimli hot-reload hatasi [%s]: %s",
-                            dep_ad, dep_e,
+                            dep_ad,
+                            dep_e,
                         )
 
             logger.info("[Plugin] Hot-reload: %s (aktif=%s)", ad, was_active)
@@ -627,17 +640,22 @@ class PluginYoneticisi:
 
                     logger.info(
                         "[Plugin] ProviderPluginBase baslatildi: %s -> %s (provider: %s)",
-                        ad, instance.name, instance._active_provider,
+                        ad,
+                        instance.name,
+                        instance._active_provider,
                     )
                     provider_instance = instance
                 except Exception as exc:
                     logger.error(
                         "[Plugin] ProviderPluginBase baslatma hatasi [%s]: %s",
-                        ad, exc,
+                        ad,
+                        exc,
                     )
 
         if provider_instance is None:
-            logger.debug("[Plugin] '%s' icin ProviderPluginBase alt sinifi bulunamadi.", ad)
+            logger.debug(
+                "[Plugin] '%s' icin ProviderPluginBase alt sinifi bulunamadi.", ad
+            )
 
     def plugin_baslat(self, ad: str, provider: str | None = None) -> bool:
         """Bir plugini belirtilen provider ile baslat.
@@ -673,12 +691,16 @@ class PluginYoneticisi:
         secilen_provider = provider
         if provider is not None:
             providers = self.get_providers(ad)
-            provider_isimleri = [p.get("name") for p in providers if isinstance(p, dict)]
+            provider_isimleri = [
+                p.get("name") for p in providers if isinstance(p, dict)
+            ]
             if provider not in provider_isimleri:
                 logger.warning(
                     "[Plugin] '%s' icin gecersiz provider: '%s'. "
                     "Gecerli provider'lar: %s",
-                    ad, provider, provider_isimleri,
+                    ad,
+                    provider,
+                    provider_isimleri,
                 )
                 return False
 
@@ -757,7 +779,9 @@ class PluginYoneticisi:
                     metadata["dosyalar"].append(arcname)
 
             # Metadata ekle
-            zf.writestr("metadata.json", json.dumps(metadata, indent=2, ensure_ascii=False))
+            zf.writestr(
+                "metadata.json", json.dumps(metadata, indent=2, ensure_ascii=False)
+            )
 
         return f"[OK] '{ad}' -> {cikti_yol} ({len(metadata['dosyalar'])} dosya)"
 
@@ -817,24 +841,27 @@ class PluginYoneticisi:
             return f"[HATA] Import hatasi: {e}"
 
 
-
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     # Test PluginYoneticisi
     yonetici = PluginYoneticisi()
-    
+
     # Tum pluginleri listele
     tumu = yonetici.list_plugins()
     print(f"\n=== Plugin Listesi ({len(tumu)} adet) ===")
     for p in tumu:
         durum = "✓" if p["enabled"] else "✗"
         yuklu = "Y" if p["loaded"] else "-"
-        print(f"  {durum} [{yuklu}] {p['name']:25s} v{p['version']:8s} {p['kind']:8s} {p['description'][:50]}")
+        print(
+            f"  {durum} [{yuklu}] {p['name']:25s} v{p['version']:8s} {p['kind']:8s} {p['description'][:50]}"
+        )
 
     # Istatistikler
     istatistik = yonetici.plugin_sayisi()
-    print(f"\nIstatistik: {istatistik['toplam']} plugin, {istatistik['aktif']} aktif, {istatistik['devre_disi']} devre disi")
+    print(
+        f"\nIstatistik: {istatistik['toplam']} plugin, {istatistik['aktif']} aktif, {istatistik['devre_disi']} devre disi"
+    )
 
     # Detayli bilgi
     if tumu:

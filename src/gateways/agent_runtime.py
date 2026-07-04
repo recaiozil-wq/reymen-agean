@@ -12,6 +12,7 @@ Kullanim:
     rt = AgentRuntime(config)
     rt.calistir("Hedef")
 """
+
 import json
 import logging
 import os
@@ -29,21 +30,23 @@ ROOT = Path(__file__).parent.resolve()
 
 # ── Hata Siniflandirici ───────────────────────────────────────────────────────
 
+
 class HataSiniflandirici:
     """Gozlem stringlerini hata tiplerine gore siniflandirir."""
 
     KATEGORILER = {
-        "ag":         r"(ConnectionError|Timeout|HTTPError|network|socket)",
-        "dosya":      r"(FileNotFoundError|PermissionError|IsADirectory)",
-        "modul":      r"(ModuleNotFoundError|ImportError|No module)",
-        "python":     r"(SyntaxError|IndentationError|NameError|TypeError)",
-        "izin":       r"(PermissionError|Access.denied|Unauthorized)",
-        "zaman_asimi":r"(timeout|Timeout|timed out)",
+        "ag": r"(ConnectionError|Timeout|HTTPError|network|socket)",
+        "dosya": r"(FileNotFoundError|PermissionError|IsADirectory)",
+        "modul": r"(ModuleNotFoundError|ImportError|No module)",
+        "python": r"(SyntaxError|IndentationError|NameError|TypeError)",
+        "izin": r"(PermissionError|Access.denied|Unauthorized)",
+        "zaman_asimi": r"(timeout|Timeout|timed out)",
     }
 
     @classmethod
     def siniflandir(cls, gozlem: str) -> str:
         import re
+
         for kategori, desen in cls.KATEGORILER.items():
             if re.search(desen, gozlem, re.IGNORECASE):
                 return kategori
@@ -54,18 +57,19 @@ class HataSiniflandirici:
     @classmethod
     def kurtarma_onerisi(cls, kategori: str) -> str:
         oneriler = {
-            "ag":         "Ag baglantisini kontrol et veya WEB_ARA yerine DOSYA_OKU dene.",
-            "dosya":      "Dosya yolunu ve izinleri kontrol et. KOMUT_CALISTIR ile ls/dir dene.",
-            "modul":      "pip install ile eksik modulu yukle.",
-            "python":     "Kodu once PYTHON_CALISTIR ile test et.",
-            "izin":       "Yonetici olarak calistir veya farkli yol dene.",
-            "zaman_asimi":"Islemi daha kucuk parcalara bol.",
-            "genel":      "Farkli bir yaklasim dene.",
+            "ag": "Ag baglantisini kontrol et veya WEB_ARA yerine DOSYA_OKU dene.",
+            "dosya": "Dosya yolunu ve izinleri kontrol et. KOMUT_CALISTIR ile ls/dir dene.",
+            "modul": "pip install ile eksik modulu yukle.",
+            "python": "Kodu once PYTHON_CALISTIR ile test et.",
+            "izin": "Yonetici olarak calistir veya farkli yol dene.",
+            "zaman_asimi": "Islemi daha kucuk parcalara bol.",
+            "genel": "Farkli bir yaklasim dene.",
         }
         return oneriler.get(kategori, "Devam et.")
 
 
 # ── Runtime Helpers ──────────────────────────────────────────────────────────
+
 
 class RuntimeHelpers:
     """Ajan dongusunu destekleyen yardimci metodlar."""
@@ -84,23 +88,71 @@ class RuntimeHelpers:
         hedef_lower = hedef.lower().strip()
 
         # ── 0. Selamlasma/sosyal → direkt 1 ─────────────────────────
-        _selam = any(k in hedef_lower for k in [
-            "merhaba", "selam", "naber", "nasılsın", "nasilsin",
-            "iyi misin", "teşekkür", "tesekkur", "sağol", "sagol",
-            "günaydın", "gunaydin", "iyi günler", "iyi gunler",
-            "iyi akşamlar", "iyi aksamlar", "iyi geceler",
-            "ne yapıyorsun", "ne yapiyorsun", "napıyorsun", "napiyorsun",
-            "kolay gelsin", "hayırlı", "hayirli",
-        ])
+        _selam = any(
+            k in hedef_lower
+            for k in [
+                "merhaba",
+                "selam",
+                "naber",
+                "nasılsın",
+                "nasilsin",
+                "iyi misin",
+                "teşekkür",
+                "tesekkur",
+                "sağol",
+                "sagol",
+                "günaydın",
+                "gunaydin",
+                "iyi günler",
+                "iyi gunler",
+                "iyi akşamlar",
+                "iyi aksamlar",
+                "iyi geceler",
+                "ne yapıyorsun",
+                "ne yapiyorsun",
+                "napıyorsun",
+                "napiyorsun",
+                "kolay gelsin",
+                "hayırlı",
+                "hayirli",
+            ]
+        )
         if _selam:
-            _ek_islem = any(k in hedef_lower for k in [
-                "yap", "ara", "oku", "yaz", "sil", "bul",
-                "calistir", "çalıştır", "indir", "yukle", "yükle",
-                "kur", "gönder", "gonder", "tara", "kontrol",
-                "düzelt", "duzelt", "temizle", "düzenle", "duzenle",
-                "raporla", "analiz", "incele", "güncelle", "guncelle",
-                "aç", "ac", "kapat", "kes",
-            ])
+            _ek_islem = any(
+                k in hedef_lower
+                for k in [
+                    "yap",
+                    "ara",
+                    "oku",
+                    "yaz",
+                    "sil",
+                    "bul",
+                    "calistir",
+                    "çalıştır",
+                    "indir",
+                    "yukle",
+                    "yükle",
+                    "kur",
+                    "gönder",
+                    "gonder",
+                    "tara",
+                    "kontrol",
+                    "düzelt",
+                    "duzelt",
+                    "temizle",
+                    "düzenle",
+                    "duzenle",
+                    "raporla",
+                    "analiz",
+                    "incele",
+                    "güncelle",
+                    "guncelle",
+                    "aç",
+                    "ac",
+                    "kapat",
+                    "kes",
+                ]
+            )
             if not _ek_islem:
                 return {
                     "hedef_tur": "selam",
@@ -110,52 +162,170 @@ class RuntimeHelpers:
                 }
 
         # ── 1. Toplu gorev tespiti ─────────────────────────────────
-        _toplu = any(k in hedef_lower for k in [
-            "hepsini", "hepsin", "hepsi",
-            "tümünü", "tümü", "tüm", "tumu", "tumunu",
-            "bütün", "butun", "toplu",
-        ])
-        _islem = any(k in hedef_lower for k in [
-            "kontrol", "gider", "düzelt", "duzelt", "onar", "temizle",
-            "tara", "düzenle", "duzenle", "yap", "calistir", "çalıştır",
-            "incele", "dönüştür", "donustur", "güncelle", "guncelle",
-        ])
+        _toplu = any(
+            k in hedef_lower
+            for k in [
+                "hepsini",
+                "hepsin",
+                "hepsi",
+                "tümünü",
+                "tümü",
+                "tüm",
+                "tumu",
+                "tumunu",
+                "bütün",
+                "butun",
+                "toplu",
+            ]
+        )
+        _islem = any(
+            k in hedef_lower
+            for k in [
+                "kontrol",
+                "gider",
+                "düzelt",
+                "duzelt",
+                "onar",
+                "temizle",
+                "tara",
+                "düzenle",
+                "duzenle",
+                "yap",
+                "calistir",
+                "çalıştır",
+                "incele",
+                "dönüştür",
+                "donustur",
+                "güncelle",
+                "guncelle",
+            ]
+        )
 
         # ── 2. Cok adimli gorev tespiti ────────────────────────────
-        _cok_adim_baglac = any(k in hedef_lower for k in [
-            "ve", "sonra", "ardindan", "ardından", "daha sonra",
-            "once", "önce", "daha önce", "daha once",
-        ])
+        _cok_adim_baglac = any(
+            k in hedef_lower
+            for k in [
+                "ve",
+                "sonra",
+                "ardindan",
+                "ardından",
+                "daha sonra",
+                "once",
+                "önce",
+                "daha önce",
+                "daha once",
+            ]
+        )
         _cok_adim_virgul = hedef_lower.count(",") >= 2
         _cok_adim = _cok_adim_baglac or _cok_adim_virgul
 
         # ── 3. Kategori bazli ipucu tespiti ─────────────────────────
         kategoriler = {
-            "dosya_islemi": ["dosya", "klasör", "klasor", "dizin", "belge",
-                            "uzanti"],
-            "web_islemi":   ["web", "arama", "internet", "url", "site", "sayfa",
-                            "link", "indir", "yukle", "yükle", "gönder", "gonder"],
-            "kod_islemi":   ["kod", "python", "script", "calistir", "çalıştır",
-                            "analiz", "derle", "debug", "test"],
-            "yazma_islem":  ["yaz", "oluştur", "olustur", "kaydet", "ekle",
-                            "güncelle", "guncelle", "sil", "düzenle", "duzenle",
-                            "temizle", "dönüştür", "donustur", "düzelt", "duzelt",
-                            "onar"],
-            "hafiza_islemi":["hatirla", "hatırla", "unutma", "not"],
-            "sistem_islemi":["komut", "terminal", "powershell", "sistem",
-                            "servis", "port", "ağ", "ag", "islem", "işlem",
-                            "durdur"],
-            "arama_islem":  ["ara", "bul", "tara", "sorgula", "keşfet", "kesfet",
-                            "listele", "getir", "incele"],
-            "guvenlik":     ["güvenlik", "guvenlik", "şifre", "sifre", "izin",
-                            "yetki", "erişim", "erisim"],
-            "github_islem": ["git", "github", "repo", "commit", "push", "pull",
-                            "clone", "branch", "merge"],
+            "dosya_islemi": ["dosya", "klasör", "klasor", "dizin", "belge", "uzanti"],
+            "web_islemi": [
+                "web",
+                "arama",
+                "internet",
+                "url",
+                "site",
+                "sayfa",
+                "link",
+                "indir",
+                "yukle",
+                "yükle",
+                "gönder",
+                "gonder",
+            ],
+            "kod_islemi": [
+                "kod",
+                "python",
+                "script",
+                "calistir",
+                "çalıştır",
+                "analiz",
+                "derle",
+                "debug",
+                "test",
+            ],
+            "yazma_islem": [
+                "yaz",
+                "oluştur",
+                "olustur",
+                "kaydet",
+                "ekle",
+                "güncelle",
+                "guncelle",
+                "sil",
+                "düzenle",
+                "duzenle",
+                "temizle",
+                "dönüştür",
+                "donustur",
+                "düzelt",
+                "duzelt",
+                "onar",
+            ],
+            "hafiza_islemi": ["hatirla", "hatırla", "unutma", "not"],
+            "sistem_islemi": [
+                "komut",
+                "terminal",
+                "powershell",
+                "sistem",
+                "servis",
+                "port",
+                "ağ",
+                "ag",
+                "islem",
+                "işlem",
+                "durdur",
+            ],
+            "arama_islem": [
+                "ara",
+                "bul",
+                "tara",
+                "sorgula",
+                "keşfet",
+                "kesfet",
+                "listele",
+                "getir",
+                "incele",
+            ],
+            "guvenlik": [
+                "güvenlik",
+                "guvenlik",
+                "şifre",
+                "sifre",
+                "izin",
+                "yetki",
+                "erişim",
+                "erisim",
+            ],
+            "github_islem": [
+                "git",
+                "github",
+                "repo",
+                "commit",
+                "push",
+                "pull",
+                "clone",
+                "branch",
+                "merge",
+            ],
         }
 
         # Ekstra puan veren kelimeler (kategori disi kapsam artirici)
-        _ekstra_kelimeler = ["raporla", "özet", "ozet", "karşılaştır", "karsilastir",
-                            "birleştir", "birlestir", "görsel", "gorsel", "grafik"]
+        _ekstra_kelimeler = [
+            "raporla",
+            "özet",
+            "ozet",
+            "karşılaştır",
+            "karsilastir",
+            "birleştir",
+            "birlestir",
+            "görsel",
+            "gorsel",
+            "grafik",
+        ]
 
         aktif = []
         _bulunan_kategori = 0
@@ -216,6 +386,7 @@ class RuntimeHelpers:
 
 
 # ── Background Review (Arka Plan Gozden Gecirme) ─────────────────────────────
+
 
 class BackgroundReview:
     """
@@ -296,6 +467,7 @@ class BackgroundReview:
                 return
             # BECERI_ADI: ..., ACIKLAMA: ..., ADIMLAR: ... parse et
             import re
+
             ad = re.search(r"BECERI_ADI:\s*(.+)", cevap)
             acik = re.search(r"ACIKLAMA:\s*(.+)", cevap)
             adimlar = re.search(r"ADIMLAR:\s*(.+)", cevap, re.DOTALL)
@@ -312,7 +484,9 @@ class BackgroundReview:
         """MEMORY.md'ye ekle."""
         memory_yolu = ROOT / ".ReYMeN" / "MEMORY.md"
         try:
-            mevcut = memory_yolu.read_text(encoding="utf-8") if memory_yolu.exists() else ""
+            mevcut = (
+                memory_yolu.read_text(encoding="utf-8") if memory_yolu.exists() else ""
+            )
             zaman = datetime.now().strftime("%Y-%m-%d")
             ek = f"\n\n## [{zaman}] {hedef[:50]}\n{icerik}\n"
             memory_yolu.write_text(mevcut + ek, encoding="utf-8")
@@ -322,6 +496,7 @@ class BackgroundReview:
 
 
 # ── Agent Runtime ─────────────────────────────────────────────────────────────
+
 
 class AgentRuntime:
     """
@@ -343,12 +518,15 @@ class AgentRuntime:
 
     def _agent_olustur(self):
         from reymen.sistem.main import AIAgentOrchestrator
+
         max_tur = int(self.config.get("max_tur", 15))
         onay = self.config.get("onay_iste", False)
         mod = self.config.get("backend_mode", "local")
         self._agent = AIAgentOrchestrator(
-            config=self.config, backend_mode=mod,
-            max_tur=max_tur, onay_iste=onay,
+            config=self.config,
+            backend_mode=mod,
+            max_tur=max_tur,
+            onay_iste=onay,
         )
         self._background = BackgroundReview(
             provider=self._agent.provider,
@@ -366,8 +544,10 @@ class AgentRuntime:
             self._baslangic = time.time()
 
         analiz = RuntimeHelpers.hedef_analiz_et(hedef)
-        logger.info(f"[Runtime] Calisma {self._calisma_id}: {hedef[:60]} "
-                    f"(karmasiklik:{analiz['karmasiklik']})")
+        logger.info(
+            f"[Runtime] Calisma {self._calisma_id}: {hedef[:60]} "
+            f"(karmasiklik:{analiz['karmasiklik']})"
+        )
 
         try:
             if not self._agent:
@@ -375,8 +555,9 @@ class AgentRuntime:
 
             # Karmasikliga gore max_tur ayarla
             if analiz["karmasiklik"] > 3:
-                self._agent.max_tur = max(self._agent.max_tur,
-                                          analiz["onerilen_max_tur"])
+                self._agent.max_tur = max(
+                    self._agent.max_tur, analiz["onerilen_max_tur"]
+                )
 
             sonuc = self._agent.run_conversation(hedef)
             sure = round(time.time() - self._baslangic, 2)
@@ -430,11 +611,16 @@ class AgentRuntime:
 if __name__ == "__main__":
     import sys
     from pathlib import Path
+
     sys.path.insert(0, str(ROOT))
     from dotenv import load_dotenv
+
     load_dotenv(ROOT / ".env", override=True)
 
     from reymen.sistem.main import CONFIG
+
     rt = AgentRuntime(CONFIG)
     print(f"[Runtime] Durum: {rt.durum()}")
-    print(f"[Hedef Analizi]: {RuntimeHelpers.hedef_analiz_et('Python dosyasi olustur ve test et')}")
+    print(
+        f"[Hedef Analizi]: {RuntimeHelpers.hedef_analiz_et('Python dosyasi olustur ve test et')}"
+    )

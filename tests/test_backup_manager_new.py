@@ -8,6 +8,7 @@ Kapsanan kategoriler:
   - yedek_listele, durum, backup_manager_al
   - motor_kaydet, _yedek_al_tool, _yedek_liste_tool, _geri_yukle_tool
 """
+
 from __future__ import annotations
 
 import json
@@ -31,6 +32,7 @@ sys.path.insert(0, str(PROJE_KOK))
 #  subprocess.run mock ile Git push backup
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class TestGitYedek:
     """_git_yedek: subprocess.run mock ile Git push backup."""
 
@@ -46,6 +48,7 @@ class TestGitYedek:
         """Tum git komutlari basarili (kod=0)."""
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import BackupManager
+
             bm = BackupManager(yedek_dizini=Path(td) / "yedekler")
             mp = self._make_process(0)
             with patch("reymen.core.backup_manager.subprocess.run", return_value=mp):
@@ -62,6 +65,7 @@ class TestGitYedek:
         """'nothing to commit' mesaji basari sayilir (L214)."""
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import BackupManager
+
             bm = BackupManager(yedek_dizini=Path(td) / "yedekler")
 
             def side_effect(cmd, **kw):
@@ -69,10 +73,14 @@ class TestGitYedek:
                 if "push" in cmd_str:
                     return self._make_process(0, "Everything up-to-date")
                 if "commit" in cmd_str:
-                    return self._make_process(1, "nothing to commit, working tree clean")
+                    return self._make_process(
+                        1, "nothing to commit, working tree clean"
+                    )
                 return self._make_process(0)
 
-            with patch("reymen.core.backup_manager.subprocess.run", side_effect=side_effect):
+            with patch(
+                "reymen.core.backup_manager.subprocess.run", side_effect=side_effect
+            ):
                 with patch("reymen.core.backup_manager.PROJE_KOK", Path(td)):
                     sonuc = bm.yedek_al(tip="git")
 
@@ -82,6 +90,7 @@ class TestGitYedek:
         """Bazi komutlar basarisiz → durum='kismi' (L214 testi)."""
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import BackupManager
+
             bm = BackupManager(yedek_dizini=Path(td) / "yedekler")
 
             def side_effect(cmd, **kw):
@@ -90,7 +99,9 @@ class TestGitYedek:
                     return self._make_process(1, stderr="fatal: not a git repository")
                 return self._make_process(0)
 
-            with patch("reymen.core.backup_manager.subprocess.run", side_effect=side_effect):
+            with patch(
+                "reymen.core.backup_manager.subprocess.run", side_effect=side_effect
+            ):
                 with patch("reymen.core.backup_manager.PROJE_KOK", Path(td)):
                     sonuc = bm.yedek_al(tip="git")
 
@@ -100,10 +111,13 @@ class TestGitYedek:
         """subprocess.TimeoutExpired yakalanir (L208-209)."""
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import BackupManager
+
             bm = BackupManager(yedek_dizini=Path(td) / "yedekler")
 
-            with patch("reymen.core.backup_manager.subprocess.run",
-                       side_effect=subprocess.TimeoutExpired("git push", 60)):
+            with patch(
+                "reymen.core.backup_manager.subprocess.run",
+                side_effect=subprocess.TimeoutExpired("git push", 60),
+            ):
                 with patch("reymen.core.backup_manager.PROJE_KOK", Path(td)):
                     sonuc = bm.yedek_al(tip="git")
 
@@ -115,10 +129,13 @@ class TestGitYedek:
         """_git_yedek disindaki Exception yakalanir (L224-226)."""
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import BackupManager
+
             bm = BackupManager(yedek_dizini=Path(td) / "yedekler")
 
-            with patch("reymen.core.backup_manager.subprocess.run",
-                       side_effect=PermissionError("Erisim engellendi")):
+            with patch(
+                "reymen.core.backup_manager.subprocess.run",
+                side_effect=PermissionError("Erisim engellendi"),
+            ):
                 with patch("reymen.core.backup_manager.PROJE_KOK", Path(td)):
                     sonuc = bm.yedek_al(tip="git")
 
@@ -129,6 +146,7 @@ class TestGitYedek:
         """stdout/stderr 200 karakterle sinirlanir (L204-205)."""
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import BackupManager
+
             bm = BackupManager(yedek_dizini=Path(td) / "yedekler")
             mp = self._make_process(0, "x" * 500, "y" * 500)
 
@@ -146,6 +164,7 @@ class TestGitYedek:
 #  7. _metadata_yaz() — L241-256
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class TestMetadataYaz:
     """_metadata_yaz: metadata.json olusturma ve hata yonetimi."""
 
@@ -153,6 +172,7 @@ class TestMetadataYaz:
         """_metadata_yaz dogru icerikte JSON dosyasi olusturur (L243-254)."""
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import BackupManager
+
             bm = BackupManager(yedek_dizini=Path(td) / "yedekler")
             hedef = Path(td) / "yedek_klasoru"
             hedef.mkdir()
@@ -172,6 +192,7 @@ class TestMetadataYaz:
         """Gecersiz hedef yolunda except yakalanir (L255-256)."""
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import BackupManager
+
             bm = BackupManager(yedek_dizini=Path(td) / "yedekler")
             olmayan_yol = Path(td) / "olmayan" / "klasor"
 
@@ -183,13 +204,16 @@ class TestMetadataYaz:
         """_metadata_yaz zip tipi ile de calisir."""
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import BackupManager
+
             bm = BackupManager(yedek_dizini=Path(td) / "yedekler")
             hedef = Path(td) / "yedek_zip"
             hedef.mkdir()
 
             bm._metadata_yaz(hedef, "zip", [])
 
-            meta = json.loads((hedef / "yedek_metadata.json").read_text(encoding="utf-8"))
+            meta = json.loads(
+                (hedef / "yedek_metadata.json").read_text(encoding="utf-8")
+            )
             assert meta["tip"] == "zip"
             assert meta["yedeklenen"] == []
 
@@ -198,6 +222,7 @@ class TestMetadataYaz:
 #  8. _temizle_eski() — L258-273
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class TestTemizleEski:
     """_temizle_eski: MAX_YEDEK'ten fazla yedek varsa en eskileri silinir."""
 
@@ -205,13 +230,16 @@ class TestTemizleEski:
         """MAX_YEDEK'ten az yedek varsa hicbiri silinmez (L262)."""
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import BackupManager, MAX_YEDEK
+
             yedek_dizini = Path(td) / "yedekler"
             yedek_dizini.mkdir(parents=True)
 
             for i in range(MAX_YEDEK - 1):
                 klasor = yedek_dizini / f"kismi_20260629_{i:06d}"
                 klasor.mkdir()
-                (klasor / "yedek_metadata.json").write_text('{"tip":"kismi","yedeklenen":[]}', encoding="utf-8")
+                (klasor / "yedek_metadata.json").write_text(
+                    '{"tip":"kismi","yedeklenen":[]}', encoding="utf-8"
+                )
 
             bm = BackupManager(yedek_dizini=yedek_dizini)
             bm._temizle_eski("kismi")
@@ -228,6 +256,7 @@ class TestTemizleEski:
         """
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import BackupManager, MAX_YEDEK
+
             yedek_dizini = Path(td) / "yedekler"
             yedek_dizini.mkdir(parents=True)
 
@@ -235,7 +264,9 @@ class TestTemizleEski:
             for i in range(MAX_YEDEK + 1):
                 klasor = yedek_dizini / f"kismi_20260629_{i:06d}"
                 klasor.mkdir()
-                (klasor / "yedek_metadata.json").write_text('{"tip":"kismi","yedeklenen":[]}', encoding="utf-8")
+                (klasor / "yedek_metadata.json").write_text(
+                    '{"tip":"kismi","yedeklenen":[]}', encoding="utf-8"
+                )
 
             bm = BackupManager(yedek_dizini=yedek_dizini)
             bm._temizle_eski("kismi")
@@ -250,12 +281,13 @@ class TestTemizleEski:
         """ZIP yedekler icin de calisir (.zip dosyasi silme - L270)."""
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import BackupManager, MAX_YEDEK
+
             yedek_dizini = Path(td) / "yedekler"
             yedek_dizini.mkdir(parents=True)
 
             for i in range(MAX_YEDEK + 1):
                 zip_path = yedek_dizini / f"tam_20260629_{i:06d}.zip"
-                with zipfile.ZipFile(zip_path, 'w') as zf:
+                with zipfile.ZipFile(zip_path, "w") as zf:
                     zf.writestr("dummy.txt", "data")
 
             bm = BackupManager(yedek_dizini=yedek_dizini)
@@ -268,6 +300,7 @@ class TestTemizleEski:
         """Bos yedek dizininde hata firlatmaz (L272-273)."""
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import BackupManager
+
             yedek_dizini = Path(td) / "yedekler"
             yedek_dizini.mkdir(parents=True)
 
@@ -278,6 +311,7 @@ class TestTemizleEski:
         """Var olmayan tip ile hata firlatmaz (L272-273 except)."""
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import BackupManager
+
             yedek_dizini = Path(td) / "yedekler"
             yedek_dizini.mkdir(parents=True)
 
@@ -289,6 +323,7 @@ class TestTemizleEski:
 #  9. geri_yukle() / _kismi_geri_yukle() — L334-401
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class TestGeriYukle:
     """geri_yukle: routing + _kismi_geri_yukle."""
 
@@ -296,6 +331,7 @@ class TestGeriYukle:
         """Var olmayan kaynak → hata (L346-347)."""
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import BackupManager
+
             bm = BackupManager(yedek_dizini=Path(td) / "yedekler")
             sonuc = bm.geri_yukle("/var/olmayan/yedek")
 
@@ -306,6 +342,7 @@ class TestGeriYukle:
         """Ne klasor ne ZIP → hata (L354-355)."""
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import BackupManager
+
             bm = BackupManager(yedek_dizini=Path(td) / "yedekler")
             bilinmeyen = Path(td) / "backup.tar.gz"
             bilinmeyen.write_text("not a zip")
@@ -318,6 +355,7 @@ class TestGeriYukle:
         """Kismi yedekten tum klasorler geri yuklenir (L372-381)."""
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import BackupManager
+
             kok = Path(td)
             yedek_dizini = kok / "yedekler"
             yedek_dizini.mkdir(parents=True)
@@ -347,6 +385,7 @@ class TestGeriYukle:
         """Kismi yedekten config_yaml ve env dosyalari geri yuklenir (L384-393)."""
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import BackupManager
+
             kok = Path(td)
             yedek_dizini = kok / "yedekler"
             yedek_dizini.mkdir(parents=True)
@@ -372,6 +411,7 @@ class TestGeriYukle:
         """Kaynakta sadece bazi klasorler varsa onlar yuklenir (L374)."""
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import BackupManager
+
             kok = Path(td)
             yedek_dizini = kok / "yedekler"
             yedek_dizini.mkdir(parents=True)
@@ -395,12 +435,16 @@ class TestGeriYukle:
         """geri_yukle'deki genel except yakalanir (L356-358)."""
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import BackupManager
+
             kok = Path(td)
             kaynak = kok / "yedek_klasoru"
             kaynak.mkdir()
 
-            with patch.object(BackupManager, "_kismi_geri_yukle",
-                              side_effect=RuntimeError("Beklenmeyen hata")):
+            with patch.object(
+                BackupManager,
+                "_kismi_geri_yukle",
+                side_effect=RuntimeError("Beklenmeyen hata"),
+            ):
                 bm = BackupManager(yedek_dizini=kok / "yedekler")
                 sonuc = bm.geri_yukle(str(kaynak))
 
@@ -411,6 +455,7 @@ class TestGeriYukle:
         """Klasor geri yuklemede hata → atlanir (L380-381)."""
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import BackupManager
+
             kok = Path(td)
             yedek_dizini = kok / "yedekler"
             yedek_dizini.mkdir(parents=True)
@@ -426,8 +471,10 @@ class TestGeriYukle:
             (kok / "memory").mkdir(parents=True, exist_ok=True)
 
             with patch("reymen.core.backup_manager.PROJE_KOK", kok):
-                with patch("reymen.core.backup_manager.shutil.copytree",
-                           side_effect=PermissionError("Engelli")):
+                with patch(
+                    "reymen.core.backup_manager.shutil.copytree",
+                    side_effect=PermissionError("Engelli"),
+                ):
                     bm = BackupManager(yedek_dizini=yedek_dizini)
                     sonuc = bm.geri_yukle(str(kaynak))
 
@@ -438,6 +485,7 @@ class TestGeriYukle:
         """Tek dosya geri yuklemede hata → atlanir (L392-393)."""
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import BackupManager
+
             kok = Path(td)
             yedek_dizini = kok / "yedekler"
             yedek_dizini.mkdir(parents=True)
@@ -450,8 +498,10 @@ class TestGeriYukle:
             (kok / "config.yaml").write_text("old: config")
 
             with patch("reymen.core.backup_manager.PROJE_KOK", kok):
-                with patch("reymen.core.backup_manager.shutil.copy2",
-                           side_effect=PermissionError("Yazma engelli")):
+                with patch(
+                    "reymen.core.backup_manager.shutil.copy2",
+                    side_effect=PermissionError("Yazma engelli"),
+                ):
                     bm = BackupManager(yedek_dizini=yedek_dizini)
                     sonuc = bm.geri_yukle(str(kaynak))
 
@@ -463,6 +513,7 @@ class TestGeriYukle:
 #  10. _zip_geri_yukle() — L403-421
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class TestGeriYukleZip:
     """_zip_geri_yukle: ZIP yedekten geri yukleme."""
 
@@ -470,12 +521,13 @@ class TestGeriYukleZip:
         """ZIP dosyasindan basarili geri yukleme (L408-419)."""
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import BackupManager
+
             kok = Path(td)
             yedek_dizini = kok / "yedekler"
             yedek_dizini.mkdir(parents=True)
 
             zip_path = yedek_dizini / "tam_20260629_120000.zip"
-            with zipfile.ZipFile(zip_path, 'w') as zf:
+            with zipfile.ZipFile(zip_path, "w") as zf:
                 zf.writestr("main.py", "print('hello')")
                 zf.writestr("data/info.txt", "info")
 
@@ -494,6 +546,7 @@ class TestGeriYukleZip:
         """Bozuk ZIP dosyasi → hata (L420-421)."""
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import BackupManager
+
             kok = Path(td)
             yedek_dizini = kok / "yedekler"
             yedek_dizini.mkdir(parents=True)
@@ -512,12 +565,13 @@ class TestGeriYukleZip:
         """Cikti dizini otomatik olusturulur (L405-406)."""
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import BackupManager
+
             kok = Path(td)
             yedek_dizini = kok / "yedekler"
             yedek_dizini.mkdir(parents=True)
 
             zip_path = yedek_dizini / "tam_20260629_120000.zip"
-            with zipfile.ZipFile(zip_path, 'w') as zf:
+            with zipfile.ZipFile(zip_path, "w") as zf:
                 zf.writestr("test.txt", "data")
 
             with patch("reymen.core.backup_manager.PROJE_KOK", kok):
@@ -534,6 +588,7 @@ class TestGeriYukleZip:
 #  11. yedek_listele() / _yedekleri_listele() — L277-330
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class TestYedekListele:
     """yedek_listele / _yedekleri_listele."""
 
@@ -541,6 +596,7 @@ class TestYedekListele:
         """Henuz yedek yokken bos liste doner (L292-293)."""
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import BackupManager
+
             yedek_dizini = Path(td) / "yedekler"
             yedek_dizini.mkdir(parents=True)
 
@@ -553,6 +609,7 @@ class TestYedekListele:
         """Kismi ve ZIP yedekler birlikte listelenir (L296-324)."""
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import BackupManager
+
             yedek_dizini = Path(td) / "yedekler"
             yedek_dizini.mkdir(parents=True)
 
@@ -560,13 +617,13 @@ class TestYedekListele:
             kismi1.mkdir()
             (kismi1 / "yedek_metadata.json").write_text(
                 '{"tip":"kismi","tarih":"2026-06-29T12:00:00","yedeklenen":["skills"]}',
-                encoding="utf-8"
+                encoding="utf-8",
             )
             (kismi1 / "skills").mkdir()
             (kismi1 / "skills" / "a.txt").write_text("x" * 100)
 
             zip_path = yedek_dizini / "tam_20260629_130000.zip"
-            with zipfile.ZipFile(zip_path, 'w') as zf:
+            with zipfile.ZipFile(zip_path, "w") as zf:
                 zf.writestr("main.py", "print('ok')")
 
             bm = BackupManager(yedek_dizini=yedek_dizini)
@@ -581,15 +638,18 @@ class TestYedekListele:
         """tip='kismi' filtresi sadece kismi yedekleri gosterir (L327-328)."""
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import BackupManager
+
             yedek_dizini = Path(td) / "yedekler"
             yedek_dizini.mkdir(parents=True)
 
             kismi1 = yedek_dizini / "kismi_20260629_120000"
             kismi1.mkdir()
-            (kismi1 / "yedek_metadata.json").write_text('{"tip":"kismi","yedeklenen":[]}', encoding="utf-8")
+            (kismi1 / "yedek_metadata.json").write_text(
+                '{"tip":"kismi","yedeklenen":[]}', encoding="utf-8"
+            )
 
             zip_path = yedek_dizini / "tam_20260629_130000.zip"
-            with zipfile.ZipFile(zip_path, 'w') as zf:
+            with zipfile.ZipFile(zip_path, "w") as zf:
                 zf.writestr("dummy.txt", "x")
 
             bm = BackupManager(yedek_dizini=yedek_dizini)
@@ -602,15 +662,18 @@ class TestYedekListele:
         """tip='zip' filtresi sadece ZIP yedekleri gosterir."""
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import BackupManager
+
             yedek_dizini = Path(td) / "yedekler"
             yedek_dizini.mkdir(parents=True)
 
             kismi1 = yedek_dizini / "kismi_20260629_120000"
             kismi1.mkdir()
-            (kismi1 / "yedek_metadata.json").write_text('{"tip":"kismi","yedeklenen":[]}', encoding="utf-8")
+            (kismi1 / "yedek_metadata.json").write_text(
+                '{"tip":"kismi","yedeklenen":[]}', encoding="utf-8"
+            )
 
             zip_path = yedek_dizini / "tam_20260629_130000.zip"
-            with zipfile.ZipFile(zip_path, 'w') as zf:
+            with zipfile.ZipFile(zip_path, "w") as zf:
                 zf.writestr("dummy.txt", "x")
 
             bm = BackupManager(yedek_dizini=yedek_dizini)
@@ -623,12 +686,15 @@ class TestYedekListele:
         """Bozuk metadata.json → hata atlanir, yedek yine listelenir (L303-304)."""
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import BackupManager
+
             yedek_dizini = Path(td) / "yedekler"
             yedek_dizini.mkdir(parents=True)
 
             kismi1 = yedek_dizini / "kismi_20260629_120000"
             kismi1.mkdir()
-            (kismi1 / "yedek_metadata.json").write_text("not valid json{{{", encoding="utf-8")
+            (kismi1 / "yedek_metadata.json").write_text(
+                "not valid json{{{", encoding="utf-8"
+            )
 
             bm = BackupManager(yedek_dizini=yedek_dizini)
             yedekler = bm.yedek_listele()
@@ -641,6 +707,7 @@ class TestYedekListele:
         """Metadata dosyasi olmayan yedek listelenir (L299-300)."""
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import BackupManager
+
             yedek_dizini = Path(td) / "yedekler"
             yedek_dizini.mkdir(parents=True)
 
@@ -658,11 +725,12 @@ class TestYedekListele:
         """ZIP yedek boyut bilgisi dogru (L322-323)."""
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import BackupManager
+
             yedek_dizini = Path(td) / "yedekler"
             yedek_dizini.mkdir(parents=True)
 
             zip_path = yedek_dizini / "tam_20260629_120000.zip"
-            with zipfile.ZipFile(zip_path, 'w') as zf:
+            with zipfile.ZipFile(zip_path, "w") as zf:
                 zf.writestr("data.bin", b"x" * 1024 * 10)
 
             bm = BackupManager(yedek_dizini=yedek_dizini)
@@ -679,6 +747,7 @@ class TestYedekListele:
 #  12. durum() — L425-439
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class TestDurum:
     """durum() yedekleme sistemi durumu."""
 
@@ -686,6 +755,7 @@ class TestDurum:
         """Henuz yedek yokken durum bilgisi (L427-438)."""
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import BackupManager
+
             yedek_dizini = Path(td) / "yedekler"
             yedek_dizini.mkdir(parents=True)
 
@@ -705,17 +775,20 @@ class TestDurum:
         """Yedekler varken durum dogru sayilari verir."""
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import BackupManager
+
             yedek_dizini = Path(td) / "yedekler"
             yedek_dizini.mkdir(parents=True)
 
             for i in range(2):
                 k = yedek_dizini / f"kismi_20260629_{i:06d}"
                 k.mkdir()
-                (k / "yedek_metadata.json").write_text('{"tip":"kismi","yedeklenen":[]}', encoding="utf-8")
+                (k / "yedek_metadata.json").write_text(
+                    '{"tip":"kismi","yedeklenen":[]}', encoding="utf-8"
+                )
                 (k / "a.txt").write_text("x" * 100)
 
             zip_path = yedek_dizini / "tam_20260629_120000.zip"
-            with zipfile.ZipFile(zip_path, 'w') as zf:
+            with zipfile.ZipFile(zip_path, "w") as zf:
                 zf.writestr("dummy.txt", "x")
 
             bm = BackupManager(yedek_dizini=yedek_dizini)
@@ -732,12 +805,14 @@ class TestDurum:
 #  13. backup_manager_al() — L449-454
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class TestBackupManagerAl:
     """backup_manager_al singleton."""
 
     def test_backup_manager_al_singleton(self):
         """backup_manager_al her seferinde ayni instance'i doner (L452-454)."""
         import reymen.core.backup_manager as bm_mod
+
         bm_mod._backup_manager_instance = None
 
         bm1 = bm_mod.backup_manager_al()
@@ -748,6 +823,7 @@ class TestBackupManagerAl:
     def test_backup_manager_al_instance_turu(self):
         """backup_manager_al BackupManager dondurur."""
         import reymen.core.backup_manager as bm_mod
+
         bm_mod._backup_manager_instance = None
 
         bm = bm_mod.backup_manager_al()
@@ -756,6 +832,7 @@ class TestBackupManagerAl:
     def test_backup_manager_al_farkli_instance(self):
         """Singleton'i sifirlayinca yeni instance alinir."""
         import reymen.core.backup_manager as bm_mod
+
         bm_mod._backup_manager_instance = None
 
         bm1 = bm_mod.backup_manager_al()
@@ -769,12 +846,14 @@ class TestBackupManagerAl:
 #  14. motor_kaydet() — L462-491
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class TestMotorKaydet:
     """motor_kaydet: motor'a 3 arac kaydedilir."""
 
     def test_motor_kaydet_uc_arac(self):
         """motor_kaydet 3 kere _plugin_arac_kaydet cagirir (L470-490)."""
         from reymen.core.backup_manager import motor_kaydet
+
         motor = MagicMock()
 
         motor_kaydet(motor)
@@ -784,6 +863,7 @@ class TestMotorKaydet:
     def test_motor_kaydet_yedek_al_kaydedilir(self):
         """YEDEK_AL aracı kaydedilir (L470-476)."""
         from reymen.core.backup_manager import motor_kaydet
+
         motor = MagicMock()
 
         motor_kaydet(motor)
@@ -794,6 +874,7 @@ class TestMotorKaydet:
     def test_motor_kaydet_yedek_liste_kaydedilir(self):
         """YEDEK_LISTE aracı kaydedilir (L477-483)."""
         from reymen.core.backup_manager import motor_kaydet
+
         motor = MagicMock()
 
         motor_kaydet(motor)
@@ -804,6 +885,7 @@ class TestMotorKaydet:
     def test_motor_kaydet_geri_yukle_kaydedilir(self):
         """GERI_YUKLE aracı kaydedilir (L484-490)."""
         from reymen.core.backup_manager import motor_kaydet
+
         motor = MagicMock()
 
         motor_kaydet(motor)
@@ -816,12 +898,14 @@ class TestMotorKaydet:
 #  15. _yedek_al_tool() — L494-534
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class TestYedekAlTool:
     """_yedek_al_tool: YEDEK_AL motor tool wrapper."""
 
     def test_yedek_al_tool_gecersiz_tip(self):
         """Gecersiz tip → hata mesaji (L499-500)."""
         from reymen.core.backup_manager import _yedek_al_tool
+
         sonuc = _yedek_al_tool(tip="ftp")
         assert "gecersiz tip" in sonuc
         assert "ftp" in sonuc
@@ -829,6 +913,7 @@ class TestYedekAlTool:
     def test_yedek_al_tool_gecersiz_tip_args(self):
         """Args ile gecersiz tip → hata mesaji (L496-500)."""
         from reymen.core.backup_manager import _yedek_al_tool
+
         sonuc = _yedek_al_tool(args=["invalid"])
         assert "gecersiz tip" in sonuc
 
@@ -837,6 +922,7 @@ class TestYedekAlTool:
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import _yedek_al_tool
             import reymen.core.backup_manager as bm_mod
+
             bm_mod._backup_manager_instance = None
 
             kok = Path(td)
@@ -857,6 +943,7 @@ class TestYedekAlTool:
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import _yedek_al_tool
             import reymen.core.backup_manager as bm_mod
+
             bm_mod._backup_manager_instance = None
 
             kok = Path(td)
@@ -876,6 +963,7 @@ class TestYedekAlTool:
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import _yedek_al_tool
             import reymen.core.backup_manager as bm_mod
+
             bm_mod._backup_manager_instance = None
 
             mp = MagicMock(spec=subprocess.CompletedProcess)
@@ -895,6 +983,7 @@ class TestYedekAlTool:
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import _yedek_al_tool
             import reymen.core.backup_manager as bm_mod
+
             bm_mod._backup_manager_instance = None
 
             kok = Path(td)
@@ -915,6 +1004,7 @@ class TestYedekAlTool:
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import _yedek_al_tool
             import reymen.core.backup_manager as bm_mod
+
             bm_mod._backup_manager_instance = None
 
             kok = Path(td)
@@ -937,10 +1027,13 @@ class TestYedekAlTool:
         with tempfile.TemporaryDirectory() as td:
             from reymen.core.backup_manager import _yedek_al_tool
             import reymen.core.backup_manager as bm_mod
+
             bm_mod._backup_manager_instance = None
 
-            with patch("reymen.core.backup_manager.subprocess.run",
-                       side_effect=PermissionError("Erisim yok")):
+            with patch(
+                "reymen.core.backup_manager.subprocess.run",
+                side_effect=PermissionError("Erisim yok"),
+            ):
                 with patch("reymen.core.backup_manager.PROJE_KOK", Path(td)):
                     sonuc = _yedek_al_tool(tip="git")
 
@@ -951,6 +1044,7 @@ class TestYedekAlTool:
 #  16. _yedek_liste_tool() — L537-565
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class TestYedekListeTool:
     """_yedek_liste_tool: YEDEK_LISTE motor tool."""
 
@@ -958,6 +1052,7 @@ class TestYedekListeTool:
         """Henuz yedek yokken uygun mesaj (L545-546)."""
         from reymen.core.backup_manager import _yedek_liste_tool
         import reymen.core.backup_manager as bm_mod
+
         bm_mod._backup_manager_instance = None
 
         with tempfile.TemporaryDirectory() as td:
@@ -972,6 +1067,7 @@ class TestYedekListeTool:
         """Kismi yedek varken dogru listelenir (L560-561)."""
         from reymen.core.backup_manager import _yedek_liste_tool
         import reymen.core.backup_manager as bm_mod
+
         bm_mod._backup_manager_instance = None
 
         with tempfile.TemporaryDirectory() as td:
@@ -983,7 +1079,7 @@ class TestYedekListeTool:
             k1.mkdir()
             (k1 / "yedek_metadata.json").write_text(
                 '{"tip":"kismi","tarih":"2026-06-29T12:00:00","yedeklenen":["skills"]}',
-                encoding="utf-8"
+                encoding="utf-8",
             )
             (k1 / "a.txt").write_text("x")
 
@@ -996,6 +1092,7 @@ class TestYedekListeTool:
         """ZIP yedek varken dogru listelenir (L562-563)."""
         from reymen.core.backup_manager import _yedek_liste_tool
         import reymen.core.backup_manager as bm_mod
+
         bm_mod._backup_manager_instance = None
 
         with tempfile.TemporaryDirectory() as td:
@@ -1004,7 +1101,7 @@ class TestYedekListeTool:
             bm_mod.YEDEK_DIZINI = yedek_dizini
 
             zip_path = yedek_dizini / "tam_20260629_120000.zip"
-            with zipfile.ZipFile(zip_path, 'w') as zf:
+            with zipfile.ZipFile(zip_path, "w") as zf:
                 zf.writestr("dummy.txt", "x")
 
             sonuc = _yedek_liste_tool()
@@ -1016,6 +1113,7 @@ class TestYedekListeTool:
         """Args ile tip filtreleme (L540)."""
         from reymen.core.backup_manager import _yedek_liste_tool
         import reymen.core.backup_manager as bm_mod
+
         bm_mod._backup_manager_instance = None
 
         with tempfile.TemporaryDirectory() as td:
@@ -1028,7 +1126,7 @@ class TestYedekListeTool:
             (k1 / "yedek_metadata.json").write_text('{"tip":"kismi"}', encoding="utf-8")
 
             zip_path = yedek_dizini / "tam_20260629_130000.zip"
-            with zipfile.ZipFile(zip_path, 'w') as zf:
+            with zipfile.ZipFile(zip_path, "w") as zf:
                 zf.writestr("dummy.txt", "x")
 
             sonuc = _yedek_liste_tool(args=["kismi"])
@@ -1040,24 +1138,28 @@ class TestYedekListeTool:
 #  17. _geri_yukle_tool() — L568-588
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class TestGeriYukleTool:
     """_geri_yukle_tool: GERI_YUKLE motor tool."""
 
     def test_geri_yukle_tool_kaynak_yok(self):
         """Kaynak parametresi yoksa hata (L573-574)."""
         from reymen.core.backup_manager import _geri_yukle_tool
+
         sonuc = _geri_yukle_tool()
         assert "kaynak parametresi zorunlu" in sonuc
 
     def test_geri_yukle_tool_kaynak_yok_args(self):
         """Args bossa kaynak yok hatasi."""
         from reymen.core.backup_manager import _geri_yukle_tool
+
         sonuc = _geri_yukle_tool(args=[])
         assert "kaynak parametresi zorunlu" in sonuc
 
     def test_geri_yukle_tool_hata_durumu(self):
         """Geri yukleme basarisizsa hata mesaji (L579-580)."""
         from reymen.core.backup_manager import _geri_yukle_tool
+
         sonuc = _geri_yukle_tool(kaynak="/var/olmayan/yedek")
         assert "[HATA]" in sonuc
 
@@ -1065,6 +1167,7 @@ class TestGeriYukleTool:
         """Geri yukleme basariliysa basari mesaji (L582-588)."""
         from reymen.core.backup_manager import _geri_yukle_tool
         import reymen.core.backup_manager as bm_mod
+
         bm_mod._backup_manager_instance = None
 
         with tempfile.TemporaryDirectory() as td:

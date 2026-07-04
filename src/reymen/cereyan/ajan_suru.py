@@ -77,8 +77,10 @@ Yaniti Turkce yaz. Maks 10 eylem maddesi.
 
 # ─── Yardimci: LLM cagrisi ───────────────────────────────────────────────────
 
-def _rol_cagrisi(provider, sistem_prompt: str, kullanici_mesaji: str,
-                  max_token: int = 1200) -> str:
+
+def _rol_cagrisi(
+    provider, sistem_prompt: str, kullanici_mesaji: str, max_token: int = 1200
+) -> str:
     """Provider'i belirli bir rol promptuyla cagir."""
     try:
         return provider.uret(
@@ -90,6 +92,7 @@ def _rol_cagrisi(provider, sistem_prompt: str, kullanici_mesaji: str,
 
 
 # ─── Rol sinifları ───────────────────────────────────────────────────────────
+
 
 class MimarAjan:
     """Problemi 3 farkli stratejiyle analiz eder."""
@@ -105,7 +108,9 @@ class MimarAjan:
     @staticmethod
     def en_iyi_stratejiyi_sec(mimar_ciktisi: str) -> str:
         """Mimar ciktisinden ilk (veya en az dezavantajli) stratejiyi sec."""
-        m = re.search(r"### Strateji 1:(.*?)(?=### Strateji 2:|$)", mimar_ciktisi, re.DOTALL)
+        m = re.search(
+            r"### Strateji 1:(.*?)(?=### Strateji 2:|$)", mimar_ciktisi, re.DOTALL
+        )
         if m:
             return m.group(1).strip()
         # Tum ciktiyi don
@@ -135,8 +140,9 @@ class DenetciAjan:
         self._provider = provider
         self._maks_tur = maks_tur
 
-    def denetle(self, hedef: str, plan: str, gelistirici: GelistiriciAjan,
-                 strateji: str) -> tuple[str, bool]:
+    def denetle(
+        self, hedef: str, plan: str, gelistirici: GelistiriciAjan, strateji: str
+    ) -> tuple[str, bool]:
         """Plani denetle; gerekirse gelistiriciyi yeniden cagir.
 
         Returns:
@@ -145,9 +151,7 @@ class DenetciAjan:
         mevcut_plan = plan
         for tur in range(1, self._maks_tur + 1):
             print(f"[Denetci] Tur {tur}/{self._maks_tur} — plan inceleniyor...")
-            kullanici_msg = (
-                f"Problem: {hedef}\n\nEylem Plani:\n{mevcut_plan}"
-            )
+            kullanici_msg = f"Problem: {hedef}\n\nEylem Plani:\n{mevcut_plan}"
             yanit = _rol_cagrisi(self._provider, _DENETCI_SISTEM, kullanici_msg)
 
             if yanit.strip().startswith("ONAY"):
@@ -159,7 +163,9 @@ class DenetciAjan:
             duzeltme_m = re.search(r"DUZELTME:(.*?)$", yanit, re.DOTALL)
             duzeltme_ipucu = duzeltme_m.group(1).strip() if duzeltme_m else yanit
 
-            yeni_strateji = f"{strateji}\n\n[Denetci Duzeltme Onerileri]:\n{duzeltme_ipucu[:400]}"
+            yeni_strateji = (
+                f"{strateji}\n\n[Denetci Duzeltme Onerileri]:\n{duzeltme_ipucu[:400]}"
+            )
             mevcut_plan = gelistirici.plan_olustur(hedef, yeni_strateji)
 
         print("[Denetci] Maks tur asildi, son plan kabul ediliyor.")
@@ -251,15 +257,17 @@ if __name__ == "__main__":
                 )
             if "gelistirici" in sistem.lower() or "eylem plani" in sistem.lower():
                 return (
-                    "EYLEM 1: DOSYA_OKU(\"kaynak.txt\")\n"
-                    "EYLEM 2: PYTHON_CALISTIR(\"veri_isle()\")\n"
-                    "EYLEM 3: DOSYA_YAZ(\"sonuc.txt\")\n"
+                    'EYLEM 1: DOSYA_OKU("kaynak.txt")\n'
+                    'EYLEM 2: PYTHON_CALISTIR("veri_isle()")\n'
+                    'EYLEM 3: DOSYA_YAZ("sonuc.txt")\n'
                     "BEKLENEN_SONUC: Dosya islendi ve kaydedildi."
                 )
             if "denetci" in sistem.lower() or "kalite" in sistem.lower():
                 if n <= 4:
                     return "ONAY: Plan yeterli. Guvenli ve eksiksiz."
-                return "RED: Hata yakalama eksik.\nDUZELTME: try/except blogu eklenmeli."
+                return (
+                    "RED: Hata yakalama eksik.\nDUZELTME: try/except blogu eklenmeli."
+                )
             if "orkestrator" in sistem.lower() or "sentez" in sistem.lower():
                 return (
                     "1. DOSYA_OKU ile kaynak dosyayi oku.\n"

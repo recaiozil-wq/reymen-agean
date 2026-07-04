@@ -80,59 +80,93 @@ def _test_verisi_ekle(db_path: Path):
         "INSERT INTO sessions (id, source, user_id, model, started_at, title, "
         "message_count, tool_call_count) "
         "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        ("session-001", "web", "user1", "gpt-4",
-         "2025-01-01T10:00:00", "Test Session 1", 3, 1),
+        (
+            "session-001",
+            "web",
+            "user1",
+            "gpt-4",
+            "2025-01-01T10:00:00",
+            "Test Session 1",
+            3,
+            1,
+        ),
     )
     # Session 2
     con.execute(
         "INSERT INTO sessions (id, source, user_id, model, started_at, title, "
         "message_count, tool_call_count) "
         "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        ("session-002", "api", "user2", "gpt-3.5",
-         "2025-01-02T10:00:00", "Test Session 2", 2, 0),
+        (
+            "session-002",
+            "api",
+            "user2",
+            "gpt-3.5",
+            "2025-01-02T10:00:00",
+            "Test Session 2",
+            2,
+            0,
+        ),
     )
 
     # Mesajlar — session-001
     con.execute(
         "INSERT INTO session_messages (id, session_id, rol, icerik, created_at) "
         "VALUES (?, ?, ?, ?, ?)",
-        (1, "session-001", "user",
-         "Merhaba, bugün hava nasıl?", "2025-01-01T10:00:01"),
+        (1, "session-001", "user", "Merhaba, bugün hava nasıl?", "2025-01-01T10:00:01"),
     )
     con.execute(
         "INSERT INTO session_messages (id, session_id, rol, icerik, created_at) "
         "VALUES (?, ?, ?, ?, ?)",
-        (2, "session-001", "assistant",
-         "Bugün hava güneşli ve sıcak.", "2025-01-01T10:00:02"),
+        (
+            2,
+            "session-001",
+            "assistant",
+            "Bugün hava güneşli ve sıcak.",
+            "2025-01-01T10:00:02",
+        ),
     )
     con.execute(
         "INSERT INTO session_messages (id, session_id, rol, icerik, created_at) "
         "VALUES (?, ?, ?, ?, ?)",
-        (3, "session-001", "user",
-         "Teşekkür ederim!", "2025-01-01T10:00:03"),
+        (3, "session-001", "user", "Teşekkür ederim!", "2025-01-01T10:00:03"),
     )
 
     # Mesajlar — session-002
     con.execute(
         "INSERT INTO session_messages (id, session_id, rol, icerik, created_at) "
         "VALUES (?, ?, ?, ?, ?)",
-        (4, "session-002", "user",
-         "Python ile dosya nasıl okunur?", "2025-01-02T10:00:01"),
+        (
+            4,
+            "session-002",
+            "user",
+            "Python ile dosya nasıl okunur?",
+            "2025-01-02T10:00:01",
+        ),
     )
     con.execute(
         "INSERT INTO session_messages (id, session_id, rol, icerik, created_at) "
         "VALUES (?, ?, ?, ?, ?)",
-        (5, "session-002", "assistant",
-         "open() fonksiyonu ile dosya okuyabilirsiniz.", "2025-01-02T10:00:02"),
+        (
+            5,
+            "session-002",
+            "assistant",
+            "open() fonksiyonu ile dosya okuyabilirsiniz.",
+            "2025-01-02T10:00:02",
+        ),
     )
 
     # Tool calls — session-001
     con.execute(
         "INSERT INTO session_tool_calls (id, session_id, tool_name, args, result, created_at) "
         "VALUES (?, ?, ?, ?, ?, ?)",
-        (1, "session-001", "get_weather",
-         '{"location": "Istanbul"}', '{"temp": 25}',
-         "2025-01-01T10:00:01"),
+        (
+            1,
+            "session-001",
+            "get_weather",
+            '{"location": "Istanbul"}',
+            '{"temp": 25}',
+            "2025-01-01T10:00:01",
+        ),
     )
 
     con.commit()
@@ -306,8 +340,11 @@ class TestSessionAra:
         con.close()
 
         sonuclar = ss.session_ara("AAA")
-        bulunan = [s for s in sonuclar if s["session_id"] == "session-001"
-                   and s["icerik"].startswith("A")]
+        bulunan = [
+            s
+            for s in sonuclar
+            if s["session_id"] == "session-001" and s["icerik"].startswith("A")
+        ]
         assert len(bulunan) >= 1
         assert len(bulunan[0]["icerik"]) == 500
 
@@ -634,14 +671,13 @@ class TestDbContextManager:
 
     def test_rollback_on_exception(self, db_fts5_var):
         """Hata durumunda rollback yapılmalı (commit yapılmamalı)."""
+
         class TestException(Exception):
             pass
 
         try:
             with ss._db() as con:
-                con.execute(
-                    "INSERT INTO sessions (id) VALUES (?)", ("test-rollback",)
-                )
+                con.execute("INSERT INTO sessions (id) VALUES (?)", ("test-rollback",))
                 raise TestException("test rollback")
         except TestException:
             pass

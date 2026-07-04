@@ -1,4 +1,5 @@
 """Tests for reymen.sistem.cli_commands."""
+
 import pytest
 from unittest.mock import patch
 from src.reymen.sistem.cli_commands import load_cli_config

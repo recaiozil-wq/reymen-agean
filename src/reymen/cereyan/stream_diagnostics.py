@@ -18,6 +18,7 @@ from typing import List, Optional
 @dataclass
 class StreamDenemesi:
     """Tek bir stream girişiminin istatistikleri."""
+
     baslangic: float = field(default_factory=time.monotonic)
     ilk_token_zamani: Optional[float] = None
     bitis: Optional[float] = None

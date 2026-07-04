@@ -1,4 +1,5 @@
 """Tests for the Gemini free-tier block in the setup wizard."""
+
 from __future__ import annotations
 
 from unittest.mock import patch
@@ -56,12 +57,13 @@ class TestGeminiSetupFreeTierBlock:
 
         # Config must NOT show gemini as the provider
         import yaml
+
         cfg = yaml.safe_load((config_home / "config.yaml").read_text()) or {}
         model = cfg.get("model")
         if isinstance(model, dict):
-            assert model.get("provider") != "gemini", (
-                "Free-tier key should not have saved gemini as provider"
-            )
+            assert (
+                model.get("provider") != "gemini"
+            ), "Free-tier key should not have saved gemini as provider"
         # If still a string, also fine — nothing was saved
 
     def test_paid_tier_key_proceeds(self, config_home, monkeypatch, capsys):
@@ -87,6 +89,7 @@ class TestGeminiSetupFreeTierBlock:
         assert "Not saving Gemini" not in output
 
         import yaml
+
         cfg = yaml.safe_load((config_home / "config.yaml").read_text()) or {}
         model = cfg.get("model")
         assert isinstance(model, dict), f"model should be dict, got {type(model)}"
@@ -116,6 +119,7 @@ class TestGeminiSetupFreeTierBlock:
         assert "Not saving Gemini" not in output
 
         import yaml
+
         cfg = yaml.safe_load((config_home / "config.yaml").read_text()) or {}
         model = cfg.get("model")
         assert isinstance(model, dict)

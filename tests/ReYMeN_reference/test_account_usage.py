@@ -91,7 +91,9 @@ def test_fetch_account_usage_codex(monkeypatch):
     assert len(snapshot.windows) == 2
     assert snapshot.windows[0].label == "Session"
     assert snapshot.windows[0].used_percent == 15.0
-    assert snapshot.windows[0].reset_at == datetime.fromtimestamp(1_900_000_000, tz=timezone.utc)
+    assert snapshot.windows[0].reset_at == datetime.fromtimestamp(
+        1_900_000_000, tz=timezone.utc
+    )
     assert "Credits balance: $12.50" in snapshot.details
 
 
@@ -118,7 +120,9 @@ def test_render_account_usage_lines_includes_reset_and_provider():
     assert "Credits balance: $9.99" in lines[3]
 
 
-def test_fetch_account_usage_openrouter_uses_limit_remaining_and_ignores_deprecated_rate_limit(monkeypatch):
+def test_fetch_account_usage_openrouter_uses_limit_remaining_and_ignores_deprecated_rate_limit(
+    monkeypatch,
+):
     monkeypatch.setattr(
         "agent.account_usage.resolve_runtime_provider",
         lambda requested, explicit_base_url=None, explicit_api_key=None: {
@@ -161,11 +165,18 @@ def test_fetch_account_usage_openrouter_uses_limit_remaining_and_ignores_depreca
         ),
     )
     assert "Credits balance: $289.08" in snapshot.details
-    assert "API key usage: $12.50 total • $0.50 today • $2.00 this week • $8.00 this month" in snapshot.details
-    assert all("-1 requests / 10s" not in line for line in render_account_usage_lines(snapshot))
+    assert (
+        "API key usage: $12.50 total • $0.50 today • $2.00 this week • $8.00 this month"
+        in snapshot.details
+    )
+    assert all(
+        "-1 requests / 10s" not in line for line in render_account_usage_lines(snapshot)
+    )
 
 
-def test_fetch_account_usage_openrouter_omits_quota_window_when_key_has_no_limit(monkeypatch):
+def test_fetch_account_usage_openrouter_omits_quota_window_when_key_has_no_limit(
+    monkeypatch,
+):
     monkeypatch.setattr(
         "agent.account_usage.resolve_runtime_provider",
         lambda requested, explicit_base_url=None, explicit_api_key=None: {
@@ -200,4 +211,7 @@ def test_fetch_account_usage_openrouter_omits_quota_window_when_key_has_no_limit
     assert snapshot is not None
     assert snapshot.windows == ()
     assert "Credits balance: $74.50" in snapshot.details
-    assert "API key usage: $25.50 total • $1.25 today • $4.50 this week • $18.00 this month" in snapshot.details
+    assert (
+        "API key usage: $25.50 total • $1.25 today • $4.50 this week • $18.00 this month"
+        in snapshot.details
+    )

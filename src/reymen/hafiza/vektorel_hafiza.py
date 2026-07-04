@@ -19,11 +19,12 @@ logger = logging.getLogger(__name__)
 
 try:
     import chromadb
+
     CHROMA_AVAILABLE = True
 except ImportError:
     CHROMA_AVAILABLE = False
 
-MAKS_HAFIZA = 2000   # En fazla bu kadar kayit
+MAKS_HAFIZA = 2000  # En fazla bu kadar kayit
 ESIK_BENZERLIK = 0.85  # Bu benzerligin ustundeki kayit tekrar kaydedilmez
 
 
@@ -109,7 +110,9 @@ def vektorel_hafiza_sistemini_kur(yol="./vektor_hafizasi"):
     return _BasitYedek()
 
 
-def tecrube_kaydet(collection, kayit_id: str, icerik: str, metadata: dict = None) -> bool:
+def tecrube_kaydet(
+    collection, kayit_id: str, icerik: str, metadata: dict = None
+) -> bool:
     """Tecrube kaydet — zaman damgasi ve metadata otomatik eklenir.
 
     Cok benzer bir kayit zaten varsa tekrar kaydedilmez (dedup).
@@ -201,15 +204,23 @@ def hafiza_ozeti_al(collection, adet: int = 5) -> str:
 def basarili_tecrube_kaydet(collection, hedef: str, ozet: str):
     """Basarili gorev tecrübesini kaydet (kullanim kolayligi)."""
     kayit_id = f"basarili-{abs(hash(hedef)) % 100000}"
-    tecrube_kaydet(collection, kayit_id, f"[BASARILI] {hedef[:80]}: {ozet[:120]}",
-                   {"tur": "basarili", "hedef": hedef[:80]})
+    tecrube_kaydet(
+        collection,
+        kayit_id,
+        f"[BASARILI] {hedef[:80]}: {ozet[:120]}",
+        {"tur": "basarili", "hedef": hedef[:80]},
+    )
 
 
 def basarisiz_tecrube_kaydet(collection, hedef: str, hata: str):
     """Basarisiz gorev tecrübesini kaydet."""
     kayit_id = f"hata-{abs(hash(hedef + hata)) % 100000}"
-    tecrube_kaydet(collection, kayit_id, f"[HATA] {hedef[:80]}: {hata[:120]}",
-                   {"tur": "hata", "hedef": hedef[:80]})
+    tecrube_kaydet(
+        collection,
+        kayit_id,
+        f"[HATA] {hedef[:80]}: {hata[:120]}",
+        {"tur": "hata", "hedef": hedef[:80]},
+    )
 
 
 class VektorelHafiza:
@@ -253,10 +264,7 @@ class VektorelHafiza:
         Returns:
             Basariliysa True, dedup veya hata durumunda False.
         """
-        kayit_id = (
-            f"vh_{abs(hash(text)) % 1000000}_"
-            f"{int(time.time() * 1000)}"
-        )
+        kayit_id = f"vh_{abs(hash(text)) % 1000000}_" f"{int(time.time() * 1000)}"
         return tecrube_kaydet(self._collection, kayit_id, text, metadata)
 
     def ara(self, query: str, limit: int = 3) -> dict:
@@ -296,12 +304,14 @@ class VektorelHafiza:
             results = []
             for i, doc in enumerate(dokumanlar):
                 score = 1 - mesafeler[i] if i < len(mesafeler) else 0.0
-                results.append({
-                    "id": idler[i] if i < len(idler) else "",
-                    "text": doc,
-                    "metadata": metadatalar[i] if i < len(metadatalar) else {},
-                    "score": round(score, 4),
-                })
+                results.append(
+                    {
+                        "id": idler[i] if i < len(idler) else "",
+                        "text": doc,
+                        "metadata": metadatalar[i] if i < len(metadatalar) else {},
+                        "score": round(score, 4),
+                    }
+                )
 
             # Skora gore sirala (yuksek skor once)
             results.sort(key=lambda x: x["score"], reverse=True)
@@ -340,10 +350,7 @@ class VektorelHafiza:
             return 0
 
     def __repr__(self):
-        return (
-            f"<VektorelHafiza chromadb={CHROMA_AVAILABLE} "
-            f"kayit={len(self)}>"
-        )
+        return f"<VektorelHafiza chromadb={CHROMA_AVAILABLE} " f"kayit={len(self)}>"
 
 
 if __name__ == "__main__":

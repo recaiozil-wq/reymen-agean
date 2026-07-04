@@ -15,21 +15,24 @@ from ReYMeN_cli.main import _session_browse_picker
 
 # ─── Sample session data ──────────────────────────────────────────────────────
 
+
 def _make_sessions(n=5):
     """Generate a list of fake rich-session dicts."""
     now = time.time()
     sessions = []
     for i in range(n):
-        sessions.append({
-            "id": f"20260308_{i:06d}_abcdef",
-            "source": "cli" if i % 2 == 0 else "telegram",
-            "model": "test/model",
-            "title": f"Session {i}" if i % 3 != 0 else None,
-            "preview": f"Hello from session {i}",
-            "last_active": now - i * 3600,
-            "started_at": now - i * 3600 - 60,
-            "message_count": (i + 1) * 5,
-        })
+        sessions.append(
+            {
+                "id": f"20260308_{i:06d}_abcdef",
+                "source": "cli" if i % 2 == 0 else "telegram",
+                "model": "test/model",
+                "title": f"Session {i}" if i % 3 != 0 else None,
+                "preview": f"Hello from session {i}",
+                "last_active": now - i * 3600,
+                "started_at": now - i * 3600 - 60,
+                "message_count": (i + 1) * 5,
+            }
+        )
     return sessions
 
 
@@ -37,6 +40,7 @@ SAMPLE_SESSIONS = _make_sessions(5)
 
 
 # ─── _session_browse_picker ──────────────────────────────────────────────────
+
 
 class TestSessionBrowsePicker:
     """Tests for the _session_browse_picker function."""
@@ -56,6 +60,7 @@ class TestSessionBrowsePicker:
 
         # Mock curses import to fail, forcing fallback
         import builtins
+
         original_import = builtins.__import__
 
         def mock_import(name, *args, **kwargs):
@@ -74,6 +79,7 @@ class TestSessionBrowsePicker:
         sessions = _make_sessions(3)
 
         import builtins
+
         original_import = builtins.__import__
 
         def mock_import(name, *args, **kwargs):
@@ -92,6 +98,7 @@ class TestSessionBrowsePicker:
         sessions = _make_sessions(3)
 
         import builtins
+
         original_import = builtins.__import__
 
         def mock_import(name, *args, **kwargs):
@@ -110,6 +117,7 @@ class TestSessionBrowsePicker:
         sessions = _make_sessions(3)
 
         import builtins
+
         original_import = builtins.__import__
 
         def mock_import(name, *args, **kwargs):
@@ -128,6 +136,7 @@ class TestSessionBrowsePicker:
         sessions = _make_sessions(3)
 
         import builtins
+
         original_import = builtins.__import__
 
         def mock_import(name, *args, **kwargs):
@@ -146,6 +155,7 @@ class TestSessionBrowsePicker:
         sessions = _make_sessions(4)
 
         import builtins
+
         original_import = builtins.__import__
 
         def mock_import(name, *args, **kwargs):
@@ -166,15 +176,18 @@ class TestSessionBrowsePicker:
 
     def test_fallback_shows_title_over_preview(self, capsys):
         """When a session has a title, show it instead of the preview."""
-        sessions = [{
-            "id": "test_001",
-            "source": "cli",
-            "title": "My Cool Project",
-            "preview": "some preview text",
-            "last_active": time.time(),
-        }]
+        sessions = [
+            {
+                "id": "test_001",
+                "source": "cli",
+                "title": "My Cool Project",
+                "preview": "some preview text",
+                "last_active": time.time(),
+            }
+        ]
 
         import builtins
+
         original_import = builtins.__import__
 
         def mock_import(name, *args, **kwargs):
@@ -191,15 +204,18 @@ class TestSessionBrowsePicker:
 
     def test_fallback_shows_preview_when_no_title(self, capsys):
         """When no title, show preview."""
-        sessions = [{
-            "id": "test_002",
-            "source": "cli",
-            "title": None,
-            "preview": "Hello world test message",
-            "last_active": time.time(),
-        }]
+        sessions = [
+            {
+                "id": "test_002",
+                "source": "cli",
+                "title": None,
+                "preview": "Hello world test message",
+                "last_active": time.time(),
+            }
+        ]
 
         import builtins
+
         original_import = builtins.__import__
 
         def mock_import(name, *args, **kwargs):
@@ -216,15 +232,18 @@ class TestSessionBrowsePicker:
 
     def test_fallback_shows_id_when_no_title_or_preview(self, capsys):
         """When neither title nor preview, show session ID."""
-        sessions = [{
-            "id": "test_003_fallback",
-            "source": "cli",
-            "title": None,
-            "preview": "",
-            "last_active": time.time(),
-        }]
+        sessions = [
+            {
+                "id": "test_003_fallback",
+                "source": "cli",
+                "title": None,
+                "preview": "",
+                "last_active": time.time(),
+            }
+        ]
 
         import builtins
+
         original_import = builtins.__import__
 
         def mock_import(name, *args, **kwargs):
@@ -241,6 +260,7 @@ class TestSessionBrowsePicker:
 
 
 # ─── Curses-based picker (mocked curses) ────────────────────────────────────
+
 
 class TestCursesBrowse:
     """Tests for the curses-based interactive picker via simulated key sequences."""
@@ -274,18 +294,21 @@ class TestCursesBrowse:
 
     def test_down_then_enter_selects_second(self):
         import curses
+
         sessions = _make_sessions(3)
         result = self._run_with_keys(sessions, [curses.KEY_DOWN, 10])
         assert result == sessions[1]["id"]
 
     def test_down_down_enter_selects_third(self):
         import curses
+
         sessions = _make_sessions(5)
         result = self._run_with_keys(sessions, [curses.KEY_DOWN, curses.KEY_DOWN, 10])
         assert result == sessions[2]["id"]
 
     def test_up_wraps_to_last(self):
         import curses
+
         sessions = _make_sessions(3)
         result = self._run_with_keys(sessions, [curses.KEY_UP, 10])
         assert result == sessions[2]["id"]
@@ -297,15 +320,33 @@ class TestCursesBrowse:
 
     def test_q_cancels(self):
         sessions = _make_sessions(3)
-        result = self._run_with_keys(sessions, [ord('q')])
+        result = self._run_with_keys(sessions, [ord("q")])
         assert result is None
 
     def test_type_to_filter_then_enter(self):
         """Typing characters filters the list, Enter selects from filtered."""
         sessions = [
-            {"id": "s1", "source": "cli", "title": "Alpha project", "preview": "", "last_active": time.time()},
-            {"id": "s2", "source": "cli", "title": "Beta project", "preview": "", "last_active": time.time()},
-            {"id": "s3", "source": "cli", "title": "Gamma project", "preview": "", "last_active": time.time()},
+            {
+                "id": "s1",
+                "source": "cli",
+                "title": "Alpha project",
+                "preview": "",
+                "last_active": time.time(),
+            },
+            {
+                "id": "s2",
+                "source": "cli",
+                "title": "Beta project",
+                "preview": "",
+                "last_active": time.time(),
+            },
+            {
+                "id": "s3",
+                "source": "cli",
+                "title": "Gamma project",
+                "preview": "",
+                "last_active": time.time(),
+            },
         ]
         # Type "Beta" then Enter — should select s2
         keys = [ord(c) for c in "Beta"] + [10]
@@ -322,11 +363,23 @@ class TestCursesBrowse:
     def test_backspace_removes_filter_char(self):
         """Backspace removes the last character from the filter."""
         sessions = [
-            {"id": "s1", "source": "cli", "title": "Alpha", "preview": "", "last_active": time.time()},
-            {"id": "s2", "source": "cli", "title": "Beta", "preview": "", "last_active": time.time()},
+            {
+                "id": "s1",
+                "source": "cli",
+                "title": "Alpha",
+                "preview": "",
+                "last_active": time.time(),
+            },
+            {
+                "id": "s2",
+                "source": "cli",
+                "title": "Beta",
+                "preview": "",
+                "last_active": time.time(),
+            },
         ]
         # Type "Bet", backspace, backspace, backspace (clears filter), then Enter (selects first)
-        keys = [ord('B'), ord('e'), ord('t'), 127, 127, 127, 10]
+        keys = [ord("B"), ord("e"), ord("t"), 127, 127, 127, 10]
         result = self._run_with_keys(sessions, keys)
         assert result == "s1"
 
@@ -334,15 +387,27 @@ class TestCursesBrowse:
         """First Esc clears the search text, second Esc exits."""
         sessions = _make_sessions(3)
         # Type "ab" then Esc (clears filter) then Enter (selects first)
-        keys = [ord('a'), ord('b'), 27, 10]
+        keys = [ord("a"), ord("b"), 27, 10]
         result = self._run_with_keys(sessions, keys)
         assert result == sessions[0]["id"]
 
     def test_filter_matches_preview(self):
         """Typing should match against session preview text."""
         sessions = [
-            {"id": "s1", "source": "cli", "title": None, "preview": "Set up Minecraft server", "last_active": time.time()},
-            {"id": "s2", "source": "cli", "title": None, "preview": "Review PR 438", "last_active": time.time()},
+            {
+                "id": "s1",
+                "source": "cli",
+                "title": None,
+                "preview": "Set up Minecraft server",
+                "last_active": time.time(),
+            },
+            {
+                "id": "s2",
+                "source": "cli",
+                "title": None,
+                "preview": "Review PR 438",
+                "last_active": time.time(),
+            },
         ]
         keys = [ord(c) for c in "Mine"] + [10]
         result = self._run_with_keys(sessions, keys)
@@ -351,8 +416,20 @@ class TestCursesBrowse:
     def test_filter_matches_source(self):
         """Typing a source name should filter by source."""
         sessions = [
-            {"id": "s1", "source": "telegram", "title": "TG session", "preview": "", "last_active": time.time()},
-            {"id": "s2", "source": "cli", "title": "CLI session", "preview": "", "last_active": time.time()},
+            {
+                "id": "s1",
+                "source": "telegram",
+                "title": "TG session",
+                "preview": "",
+                "last_active": time.time(),
+            },
+            {
+                "id": "s2",
+                "source": "cli",
+                "title": "CLI session",
+                "preview": "",
+                "last_active": time.time(),
+            },
         ]
         keys = [ord(c) for c in "telegram"] + [10]
         result = self._run_with_keys(sessions, keys)
@@ -361,24 +438,37 @@ class TestCursesBrowse:
     def test_q_quits_when_no_filter_active(self):
         """When no search text is active, 'q' should quit (not filter)."""
         sessions = _make_sessions(3)
-        result = self._run_with_keys(sessions, [ord('q')])
+        result = self._run_with_keys(sessions, [ord("q")])
         assert result is None
 
     def test_q_types_into_filter_when_filter_active(self):
         """When search text is already active, 'q' should add to filter, not quit."""
         sessions = [
-            {"id": "s1", "source": "cli", "title": "the sequel", "preview": "", "last_active": time.time()},
-            {"id": "s2", "source": "cli", "title": "other thing", "preview": "", "last_active": time.time()},
+            {
+                "id": "s1",
+                "source": "cli",
+                "title": "the sequel",
+                "preview": "",
+                "last_active": time.time(),
+            },
+            {
+                "id": "s2",
+                "source": "cli",
+                "title": "other thing",
+                "preview": "",
+                "last_active": time.time(),
+            },
         ]
         # Type "se" first (activates filter, matches "the sequel")
         # Then type "q" — should add 'q' to filter (filter="seq"), NOT quit
         # "seq" still matches "the sequel" → Enter selects it
-        keys = [ord('s'), ord('e'), ord('q'), 10]
+        keys = [ord("s"), ord("e"), ord("q"), 10]
         result = self._run_with_keys(sessions, keys)
         assert result == "s1"  # "the sequel" matches "seq"
 
 
 # ─── Argument parser registration ──────────────────────────────────────────
+
 
 class TestSessionBrowseArgparse:
     """Verify the 'browse' subcommand is properly registered."""
@@ -391,12 +481,14 @@ class TestSessionBrowseArgparse:
         # Re-create the parser portion
         # Instead, let's just verify the import works and the function exists
         from ReYMeN_cli.main import _session_browse_picker
+
         assert callable(_session_browse_picker)
 
     def test_browse_default_limit_is_500(self):
         """The default --limit for browse should be 500."""
         # Build the same argparse tree cmd_sessions uses and verify the default.
         import argparse
+
         parser = argparse.ArgumentParser()
         subparsers = parser.add_subparsers(dest="sessions_action")
         browse = subparsers.add_parser("browse")
@@ -412,6 +504,7 @@ class TestSessionBrowseArgparse:
 
 # ─── Integration: cmd_sessions browse action ────────────────────────────────
 
+
 class TestCmdSessionsBrowse:
     """Integration tests for the 'browse' action in cmd_sessions."""
 
@@ -425,10 +518,17 @@ class TestCmdSessionsBrowse:
     def test_browse_with_source_filter(self):
         """The --source flag should be passed to list_sessions_rich."""
         sessions = [
-            {"id": "s1", "source": "cli", "title": "CLI only", "preview": "", "last_active": time.time()},
+            {
+                "id": "s1",
+                "source": "cli",
+                "title": "CLI only",
+                "preview": "",
+                "last_active": time.time(),
+            },
         ]
 
         import builtins
+
         original_import = builtins.__import__
 
         def mock_import(name, *args, **kwargs):
@@ -445,6 +545,7 @@ class TestCmdSessionsBrowse:
 
 # ─── Edge cases ──────────────────────────────────────────────────────────────
 
+
 class TestEdgeCases:
     """Edge case handling for the session browser."""
 
@@ -455,6 +556,7 @@ class TestEdgeCases:
         ]
 
         import builtins
+
         original_import = builtins.__import__
 
         def mock_import(name, *args, **kwargs):
@@ -471,10 +573,17 @@ class TestEdgeCases:
     def test_single_session(self):
         """A single session in the list should work fine."""
         sessions = [
-            {"id": "only_one", "source": "cli", "title": "Solo", "preview": "", "last_active": time.time()},
+            {
+                "id": "only_one",
+                "source": "cli",
+                "title": "Solo",
+                "preview": "",
+                "last_active": time.time(),
+            },
         ]
 
         import builtins
+
         original_import = builtins.__import__
 
         def mock_import(name, *args, **kwargs):
@@ -490,15 +599,18 @@ class TestEdgeCases:
 
     def test_long_title_truncated_in_fallback(self, capsys):
         """Very long titles should be truncated in fallback mode."""
-        sessions = [{
-            "id": "long_title_001",
-            "source": "cli",
-            "title": "A" * 100,
-            "preview": "",
-            "last_active": time.time(),
-        }]
+        sessions = [
+            {
+                "id": "long_title_001",
+                "source": "cli",
+                "title": "A" * 100,
+                "preview": "",
+                "last_active": time.time(),
+            }
+        ]
 
         import builtins
+
         original_import = builtins.__import__
 
         def mock_import(name, *args, **kwargs):
@@ -518,12 +630,31 @@ class TestEdgeCases:
         """Verify various time deltas format correctly."""
         now = time.time()
         sessions = [
-            {"id": "recent", "source": "cli", "title": None, "preview": "just now test", "last_active": now},
-            {"id": "hour_ago", "source": "cli", "title": None, "preview": "hour ago test", "last_active": now - 7200},
-            {"id": "days_ago", "source": "cli", "title": None, "preview": "days ago test", "last_active": now - 259200},
+            {
+                "id": "recent",
+                "source": "cli",
+                "title": None,
+                "preview": "just now test",
+                "last_active": now,
+            },
+            {
+                "id": "hour_ago",
+                "source": "cli",
+                "title": None,
+                "preview": "hour ago test",
+                "last_active": now - 7200,
+            },
+            {
+                "id": "days_ago",
+                "source": "cli",
+                "title": None,
+                "preview": "days ago test",
+                "last_active": now - 259200,
+            },
         ]
 
         import builtins
+
         original_import = builtins.__import__
 
         def mock_import(name, *args, **kwargs):

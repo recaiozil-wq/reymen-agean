@@ -49,6 +49,7 @@ from pydantic import BaseModel, Field
 
 class ChatCompletionRequest(BaseModel):
     """OpenAI /v1/chat/completions istek þemasý."""
+
     model: Optional[str] = None
     messages: list[dict] = Field(..., description="Konuþma mesajlarý")
     stream: bool = False
@@ -63,12 +64,14 @@ class ChatCompletionRequest(BaseModel):
 
 class ChatCompletionMessage(BaseModel):
     """OpenAI yanýt mesajý."""
+
     role: str = "assistant"
     content: str = ""
 
 
 class ChatCompletionChoice(BaseModel):
     """OpenAI yanýt seçeneði."""
+
     index: int = 0
     message: ChatCompletionMessage
     finish_reason: str = "stop"
@@ -76,6 +79,7 @@ class ChatCompletionChoice(BaseModel):
 
 class ChatCompletionUsage(BaseModel):
     """OpenAI kullaným istatistiði."""
+
     prompt_tokens: int = 0
     completion_tokens: int = 0
     total_tokens: int = 0
@@ -83,6 +87,7 @@ class ChatCompletionUsage(BaseModel):
 
 class ChatCompletionResponse(BaseModel):
     """OpenAI /v1/chat/completions yanýt þemasý."""
+
     id: str
     object: str = "chat.completion"
     created: int
@@ -93,6 +98,7 @@ class ChatCompletionResponse(BaseModel):
 
 class ModelPermission(BaseModel):
     """Model izin þemasý (OpenAI uyumluluðu için)."""
+
     id: str = ""
     object: str = "model_permission"
     created: int = 0
@@ -109,6 +115,7 @@ class ModelPermission(BaseModel):
 
 class ModelObject(BaseModel):
     """OpenAI model nesnesi."""
+
     id: str
     object: str = "model"
     created: int = 0
@@ -118,6 +125,7 @@ class ModelObject(BaseModel):
 
 class ModelList(BaseModel):
     """GET /v1/models yanýtý."""
+
     object: str = "list"
     data: list[ModelObject]
 
@@ -142,7 +150,9 @@ def _config_yukle() -> dict[str, Any]:
         raise ImportError("pyyaml kurulu deðil. 'pip install pyyaml' ile kur.")
 
     if not _CONFIG_YOLU.exists():
-        logger.warning("config.yaml bulunamadý: %s — varsayýlan config kullanýlýyor.", _CONFIG_YOLU)
+        logger.warning(
+            "config.yaml bulunamadý: %s — varsayýlan config kullanýlýyor.", _CONFIG_YOLU
+        )
         return {
             "default_provider": "deepseek",
             "default_model": "deepseek-v4-flash",
@@ -154,7 +164,9 @@ def _config_yukle() -> dict[str, Any]:
 
     # Ana config'den provider/default model
     provider = raw.get("model", {}).get("provider") or raw.get("provider", "deepseek")
-    model = raw.get("model", {}).get("default") or raw.get("general", {}).get("default_model", "deepseek-v4-flash")
+    model = raw.get("model", {}).get("default") or raw.get("general", {}).get(
+        "default_model", "deepseek-v4-flash"
+    )
 
     # fallback_providers → providers dict
     providers: dict[str, dict[str, str]] = {}
@@ -183,6 +195,7 @@ def _env_yukle() -> None:
     """.env dosyasýný ortam deðiþkenlerine yükle."""
     try:
         from dotenv import load_dotenv
+
         load_dotenv(_ENV_YOLU, override=True)
         logger.info(".env yüklendi: %s", _ENV_YOLU)
     except ImportError:
@@ -283,10 +296,12 @@ class APIServer:
         if self._beyin is None:
             try:
                 from reymen.cereyan.beyin import Beyin
+
                 self._beyin = Beyin(config=self._beyin_config)
                 logger.info(
                     "Beyin baþlatýldý: provider=%s model=%s",
-                    self._beyin.provider, self._beyin.model,
+                    self._beyin.provider,
+                    self._beyin.model,
                 )
             except Exception as e:
                 logger.error("Beyin baþlatýlamadý: %s", e)
@@ -359,11 +374,13 @@ class APIServer:
             birincil_model = cfg.get("default_model", "deepseek-v4-flash")
 
             # Birincil model
-            modeller.append(ModelObject(
-                id=f"{birincil_provider}/{birincil_model}",
-                created=suan,
-                owned_by=birincil_provider,
-            ))
+            modeller.append(
+                ModelObject(
+                    id=f"{birincil_provider}/{birincil_model}",
+                    created=suan,
+                    owned_by=birincil_provider,
+                )
+            )
 
             # Fallback provider'lardaki modeller
             for pname in cfg.get("providers", {}):
@@ -371,11 +388,13 @@ class APIServer:
                 pmid = _BEYIN_VARSAYILAN_MODELLER.get(pname, f"{pname}/default")
                 mid = f"{pname}/{pmid}"
                 if mid not in {m.id for m in modeller}:
-                    modeller.append(ModelObject(
-                        id=mid,
-                        created=suan,
-                        owned_by=pname,
-                    ))
+                    modeller.append(
+                        ModelObject(
+                            id=mid,
+                            created=suan,
+                            owned_by=pname,
+                        )
+                    )
 
             return ModelList(data=modeller)
 
@@ -407,7 +426,9 @@ class APIServer:
                 parts = model_adi.split("/", 1)
                 provider_adi = parts[0]
                 model_adi = parts[1]
-                logger.debug("Çözümlenen: provider=%s model=%s", provider_adi, model_adi)
+                logger.debug(
+                    "Çözümlenen: provider=%s model=%s", provider_adi, model_adi
+                )
 
             # Mesajlarý ayýr: sistem prompt'u ayrý
             sistem_prompt = ""
@@ -416,10 +437,12 @@ class APIServer:
                 if msg.get("role") == "system":
                     sistem_prompt = msg.get("content", "")
                 else:
-                    mesajlar.append({
-                        "role": msg.get("role", "user"),
-                        "content": msg.get("content", ""),
-                    })
+                    mesajlar.append(
+                        {
+                            "role": msg.get("role", "user"),
+                            "content": msg.get("content", ""),
+                        }
+                    )
 
             # OpenAI-uyumlu yanýt ID'si
             yanit_id = f"chatcmpl-{uuid.uuid4().hex[:12]}"
@@ -427,6 +450,7 @@ class APIServer:
 
             # ── Streaming mod ─────────────────────────────────────────
             if body.stream:
+
                 async def _stream_generator() -> AsyncGenerator[str, None]:
                     """SSE akýþý üretir."""
                     try:
@@ -436,11 +460,13 @@ class APIServer:
                             "object": "chat.completion.chunk",
                             "created": suan,
                             "model": model_adi,
-                            "choices": [{
-                                "index": 0,
-                                "delta": {"role": "assistant", "content": ""},
-                                "finish_reason": None,
-                            }],
+                            "choices": [
+                                {
+                                    "index": 0,
+                                    "delta": {"role": "assistant", "content": ""},
+                                    "finish_reason": None,
+                                }
+                            ],
                         }
                         yield f"data: {json.dumps(ilk_chunk, ensure_ascii=False)}\n\n"
 
@@ -455,11 +481,13 @@ class APIServer:
                                 "object": "chat.completion.chunk",
                                 "created": suan,
                                 "model": model_adi,
-                                "choices": [{
-                                    "index": 0,
-                                    "delta": {"content": token},
-                                    "finish_reason": None,
-                                }],
+                                "choices": [
+                                    {
+                                        "index": 0,
+                                        "delta": {"content": token},
+                                        "finish_reason": None,
+                                    }
+                                ],
                             }
                             yield f"data: {json.dumps(chunk, ensure_ascii=False)}\n\n"
 
@@ -469,11 +497,13 @@ class APIServer:
                             "object": "chat.completion.chunk",
                             "created": suan,
                             "model": model_adi,
-                            "choices": [{
-                                "index": 0,
-                                "delta": {},
-                                "finish_reason": "stop",
-                            }],
+                            "choices": [
+                                {
+                                    "index": 0,
+                                    "delta": {},
+                                    "finish_reason": "stop",
+                                }
+                            ],
                         }
                         yield f"data: {json.dumps(son_chunk, ensure_ascii=False)}\n\n"
                         yield "data: [DONE]\n\n"
@@ -485,11 +515,13 @@ class APIServer:
                             "object": "chat.completion.chunk",
                             "created": suan,
                             "model": model_adi,
-                            "choices": [{
-                                "index": 0,
-                                "delta": {},
-                                "finish_reason": "error",
-                            }],
+                            "choices": [
+                                {
+                                    "index": 0,
+                                    "delta": {},
+                                    "finish_reason": "error",
+                                }
+                            ],
                         }
                         yield f"data: {json.dumps(hata_chunk, ensure_ascii=False)}\n\n"
                         yield "data: [DONE]\n\n"
@@ -566,7 +598,8 @@ class APIServer:
 
         logger.info(
             "ReYMeN API sunucusu baþlatýlýyor → http://%s:%s",
-            self.host, self.port,
+            self.host,
+            self.port,
         )
         logger.info(
             "Beyin: provider=%s model=%s",
@@ -601,7 +634,8 @@ def main() -> None:
         description="ReYMeN API Sunucusu — OpenAI-uyumlu REST API",
     )
     parser.add_argument(
-        "--port", "-p",
+        "--port",
+        "-p",
         type=int,
         default=int(os.environ.get("API_PORT", "8000")),
         help="Dinlenecek port (ortam: API_PORT, varsayýlan: 8000)",

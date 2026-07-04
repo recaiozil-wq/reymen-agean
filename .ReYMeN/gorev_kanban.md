@@ -43,7 +43,7 @@ Mevcut `reymen/arac/kanban_orchestrator.py` (454 satır) geliştir.
   - Ortalama tamamlanma süresi
 
 ### 6. Motor Kaydı
-- `motor_kaydet("kanban_ekle", ...)` 
+- `motor_kaydet("kanban_ekle", ...)`
 - `motor_kaydet("kanban_liste", ...)`
 - `motor_kaydet("kanban_guncelle", ...)`
 - `motor_kaydet("kanban_ozet", ...)`

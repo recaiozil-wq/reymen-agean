@@ -47,8 +47,16 @@ def _run_cli(args, timeout=60):
 def test_dashboard_tui_flag_is_accepted_not_rejected():
     """The exact argv an old desktop app sends must parse without argparse error."""
     result = _run_cli(
-        ["dashboard", "--no-open", "--tui", "--host", "127.0.0.1",
-         "--port", "39997", "--status"]
+        [
+            "dashboard",
+            "--no-open",
+            "--tui",
+            "--host",
+            "127.0.0.1",
+            "--port",
+            "39997",
+            "--status",
+        ]
     )
     combined = (result.stdout or "") + (result.stderr or "")
     # The pre-fix failure signature.
@@ -72,8 +80,7 @@ def test_dashboard_tui_flag_is_hidden_from_help():
 def test_dashboard_without_tui_still_parses():
     """Sanity: the modern (no --tui) invocation is unaffected by the shim."""
     result = _run_cli(
-        ["dashboard", "--no-open", "--host", "127.0.0.1",
-         "--port", "39996", "--status"]
+        ["dashboard", "--no-open", "--host", "127.0.0.1", "--port", "39996", "--status"]
     )
     combined = (result.stdout or "") + (result.stderr or "")
     assert "unrecognized arguments" not in combined, combined

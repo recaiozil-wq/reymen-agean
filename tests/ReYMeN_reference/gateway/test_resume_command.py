@@ -14,8 +14,9 @@ from gateway.platforms.base import MessageEvent
 from gateway.session import SessionSource, build_session_key
 
 
-def _make_event(text="/resume", platform=Platform.TELEGRAM,
-                user_id="12345", chat_id="67890"):
+def _make_event(
+    text="/resume", platform=Platform.TELEGRAM, user_id="12345", chat_id="67890"
+):
     """Build a MessageEvent for testing."""
     source = SessionSource(
         platform=platform,
@@ -31,10 +32,10 @@ def _session_key_for_event(event):
     return build_session_key(event.source)
 
 
-def _make_runner(session_db=None, current_session_id="current_session_001",
-                 event=None):
+def _make_runner(session_db=None, current_session_id="current_session_001", event=None):
     """Create a bare GatewayRunner with a mock session_store and optional session_db."""
     from gateway.run import GatewayRunner
+
     runner = object.__new__(GatewayRunner)
     runner.adapters = {}
     runner.config = SimpleNamespace(platforms={})
@@ -79,6 +80,7 @@ class TestHandleResumeCommand:
     async def test_list_named_sessions_when_no_arg(self, tmp_path):
         """With no argument, lists recently titled sessions."""
         from ReYMeN_state import SessionDB
+
         db = SessionDB(db_path=tmp_path / "state.db")
         db.create_session("sess_001", "telegram")
         db.create_session("sess_002", "telegram")
@@ -100,6 +102,7 @@ class TestHandleResumeCommand:
     async def test_list_shows_usage_when_no_titled(self, tmp_path):
         """With no arg and no titled sessions, shows instructions."""
         from ReYMeN_state import SessionDB
+
         db = SessionDB(db_path=tmp_path / "state.db")
         db.create_session("sess_001", "telegram")  # No title
 
@@ -114,6 +117,7 @@ class TestHandleResumeCommand:
     async def test_resume_by_index(self, tmp_path):
         """Numeric argument resumes the indexed titled session from the list."""
         from ReYMeN_state import SessionDB
+
         db = SessionDB(db_path=tmp_path / "state.db")
         db.create_session("sess_001", "telegram")
         db.create_session("sess_002", "telegram")
@@ -122,8 +126,9 @@ class TestHandleResumeCommand:
         db.create_session("current_session_001", "telegram")
 
         event = _make_event(text="/resume 2")
-        runner = _make_runner(session_db=db, current_session_id="current_session_001",
-                              event=event)
+        runner = _make_runner(
+            session_db=db, current_session_id="current_session_001", event=event
+        )
         result = await runner._handle_resume_command(event)
 
         assert "Resumed" in result
@@ -136,14 +141,16 @@ class TestHandleResumeCommand:
     async def test_resume_index_out_of_range(self, tmp_path):
         """Out-of-range numeric arguments show a helpful error."""
         from ReYMeN_state import SessionDB
+
         db = SessionDB(db_path=tmp_path / "state.db")
         db.create_session("sess_001", "telegram")
         db.set_session_title("sess_001", "Research")
         db.create_session("current_session_001", "telegram")
 
         event = _make_event(text="/resume 9")
-        runner = _make_runner(session_db=db, current_session_id="current_session_001",
-                              event=event)
+        runner = _make_runner(
+            session_db=db, current_session_id="current_session_001", event=event
+        )
         result = await runner._handle_resume_command(event)
 
         assert "out of range" in result.lower()
@@ -155,14 +162,16 @@ class TestHandleResumeCommand:
     async def test_resume_by_name(self, tmp_path):
         """Resolves a title and switches to that session."""
         from ReYMeN_state import SessionDB
+
         db = SessionDB(db_path=tmp_path / "state.db")
         db.create_session("old_session_abc", "telegram")
         db.set_session_title("old_session_abc", "My Project")
         db.create_session("current_session_001", "telegram")
 
         event = _make_event(text="/resume My Project")
-        runner = _make_runner(session_db=db, current_session_id="current_session_001",
-                              event=event)
+        runner = _make_runner(
+            session_db=db, current_session_id="current_session_001", event=event
+        )
         result = await runner._handle_resume_command(event)
 
         assert "Resumed" in result
@@ -177,6 +186,7 @@ class TestHandleResumeCommand:
     async def test_resume_nonexistent_name(self, tmp_path):
         """Returns error for unknown session name."""
         from ReYMeN_state import SessionDB
+
         db = SessionDB(db_path=tmp_path / "state.db")
         db.create_session("current_session_001", "telegram")
 
@@ -190,13 +200,15 @@ class TestHandleResumeCommand:
     async def test_resume_already_on_session(self, tmp_path):
         """Returns friendly message when already on the requested session."""
         from ReYMeN_state import SessionDB
+
         db = SessionDB(db_path=tmp_path / "state.db")
         db.create_session("current_session_001", "telegram")
         db.set_session_title("current_session_001", "Active Project")
 
         event = _make_event(text="/resume Active Project")
-        runner = _make_runner(session_db=db, current_session_id="current_session_001",
-                              event=event)
+        runner = _make_runner(
+            session_db=db, current_session_id="current_session_001", event=event
+        )
         result = await runner._handle_resume_command(event)
         assert "Already on session" in result
         db.close()
@@ -205,6 +217,7 @@ class TestHandleResumeCommand:
     async def test_resume_auto_lineage(self, tmp_path):
         """Asking for 'My Project' when 'My Project #2' exists gets the latest."""
         from ReYMeN_state import SessionDB
+
         db = SessionDB(db_path=tmp_path / "state.db")
         db.create_session("sess_v1", "telegram")
         db.set_session_title("sess_v1", "My Project")
@@ -213,8 +226,9 @@ class TestHandleResumeCommand:
         db.create_session("current_session_001", "telegram")
 
         event = _make_event(text="/resume My Project")
-        runner = _make_runner(session_db=db, current_session_id="current_session_001",
-                              event=event)
+        runner = _make_runner(
+            session_db=db, current_session_id="current_session_001", event=event
+        )
         result = await runner._handle_resume_command(event)
 
         assert "Resumed" in result
@@ -232,7 +246,9 @@ class TestHandleResumeCommand:
         db.create_session("compressed_root", "telegram")
         db.set_session_title("compressed_root", "Compressed Work")
         db.end_session("compressed_root", "compression")
-        db.create_session("compressed_child", "telegram", parent_session_id="compressed_root")
+        db.create_session(
+            "compressed_child", "telegram", parent_session_id="compressed_root"
+        )
         db.append_message("compressed_child", "user", "hello from continuation")
         db.create_session("current_session_001", "telegram")
 
@@ -261,14 +277,16 @@ class TestHandleResumeCommand:
     async def test_resume_clears_running_agent(self, tmp_path):
         """Switching sessions clears any cached running agent."""
         from ReYMeN_state import SessionDB
+
         db = SessionDB(db_path=tmp_path / "state.db")
         db.create_session("old_session", "telegram")
         db.set_session_title("old_session", "Old Work")
         db.create_session("current_session_001", "telegram")
 
         event = _make_event(text="/resume Old Work")
-        runner = _make_runner(session_db=db, current_session_id="current_session_001",
-                              event=event)
+        runner = _make_runner(
+            session_db=db, current_session_id="current_session_001", event=event
+        )
         # Simulate a running agent using the real session key
         real_key = _session_key_for_event(event)
         runner._running_agents[real_key] = MagicMock()
@@ -287,14 +305,16 @@ class TestHandleResumeCommand:
         """
         import threading
         from ReYMeN_state import SessionDB
+
         db = SessionDB(db_path=tmp_path / "state.db")
         db.create_session("old_session", "telegram")
         db.set_session_title("old_session", "Old Work")
         db.create_session("current_session_001", "telegram")
 
         event = _make_event(text="/resume Old Work")
-        runner = _make_runner(session_db=db, current_session_id="current_session_001",
-                              event=event)
+        runner = _make_runner(
+            session_db=db, current_session_id="current_session_001", event=event
+        )
         # Seed the cache with a fake agent
         real_key = _session_key_for_event(event)
         runner._agent_cache = {real_key: (MagicMock(), object())}
@@ -314,6 +334,7 @@ class TestHandleResumeCommand:
         ``/resume abc123``.
         """
         from ReYMeN_state import SessionDB
+
         db = SessionDB(db_path=tmp_path / "state.db")
         db.create_session("abc123", "telegram")
         db.set_session_title("abc123", "Bracketed")
@@ -329,9 +350,9 @@ class TestHandleResumeCommand:
             result = await runner._handle_resume_command(event)
             # Either the session was resumed (and we get a "Resumed" / "Already on" reply)
             # or it was found-then-redirected. Failure mode = "No session found matching '<abc123>'".
-            assert "abc123" not in str(result) or "not found" not in str(result).lower(), (
-                f"bracket stripping failed for {raw!r}: gateway returned {result!r}"
-            )
+            assert (
+                "abc123" not in str(result) or "not found" not in str(result).lower()
+            ), f"bracket stripping failed for {raw!r}: gateway returned {result!r}"
         db.close()
 
     @pytest.mark.asyncio
@@ -343,6 +364,7 @@ class TestHandleResumeCommand:
         returned "Session not found" even for valid IDs.
         """
         from ReYMeN_state import SessionDB
+
         db = SessionDB(db_path=tmp_path / "state.db")
         db.create_session("unnamed_session_xyz", "telegram")
         # Deliberately no title set — this session can ONLY be resolved by ID.
@@ -357,11 +379,10 @@ class TestHandleResumeCommand:
         result = await runner._handle_resume_command(event)
 
         # Should NOT be the not-found error.
-        assert "not found" not in str(result).lower(), (
-            f"session-id lookup failed: {result!r}"
-        )
+        assert (
+            "not found" not in str(result).lower()
+        ), f"session-id lookup failed: {result!r}"
         db.close()
-
 
 
 class TestHandleSessionsCommand:
@@ -370,6 +391,7 @@ class TestHandleSessionsCommand:
     @pytest.mark.asyncio
     async def test_sessions_command_lists_current_platform_sessions(self, tmp_path):
         from ReYMeN_state import SessionDB
+
         db = SessionDB(db_path=tmp_path / "state.db")
         db.create_session("tg_session", "telegram")
         db.set_session_title("tg_session", "Telegram Work")
@@ -388,8 +410,11 @@ class TestHandleSessionsCommand:
         db.close()
 
     @pytest.mark.asyncio
-    async def test_sessions_all_full_lists_cross_platform_unnamed_sessions(self, tmp_path):
+    async def test_sessions_all_full_lists_cross_platform_unnamed_sessions(
+        self, tmp_path
+    ):
         from ReYMeN_state import SessionDB
+
         db = SessionDB(db_path=tmp_path / "state.db")
         db.create_session("tg_named", "telegram")
         db.set_session_title("tg_named", "Telegram Work")
@@ -409,6 +434,7 @@ class TestHandleSessionsCommand:
     @pytest.mark.asyncio
     async def test_gateway_dispatches_sessions_command(self, tmp_path):
         from ReYMeN_state import SessionDB
+
         db = SessionDB(db_path=tmp_path / "state.db")
         db.create_session("tg_session", "telegram")
         db.set_session_title("tg_session", "Telegram Work")

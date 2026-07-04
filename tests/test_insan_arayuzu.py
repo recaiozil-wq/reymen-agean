@@ -18,12 +18,14 @@ from insan_arayuzu import HumanInterface, InsanArayuzu
 
 # ── Fikstür ─────────────────────────────────────────────────────────
 
+
 @pytest.fixture
 def ui():
     return HumanInterface(genislik=20, sembol="=", bos_sembol=".")
 
 
 # ── 1. __init__ Testleri ──────────────────────────────────────────
+
 
 class TestInit:
     """1. __init__ — genislik dogru set, _genislik alias var."""
@@ -50,6 +52,7 @@ class TestInit:
 
 
 # ── 2-11. progress_bar() Testleri ──────────────────────────────────
+
 
 class TestProgressBar:
     """2-11: progress_bar testleri."""
@@ -116,6 +119,7 @@ class TestProgressBar:
 
 # ── 12-16. tablo() Testleri ────────────────────────────────────────
 
+
 class TestTablo:
     """12-16: tablo testleri."""
 
@@ -163,6 +167,7 @@ class TestTablo:
 
 # ── 17-19. menu() Testleri ─────────────────────────────────────────
 
+
 class TestMenu:
     """17-19: menu testleri."""
 
@@ -170,7 +175,9 @@ class TestMenu:
     def test_secim_1(self, monkeypatch):
         monkeypatch.setattr("builtins.input", lambda _: "1")
         ui = HumanInterface()
-        sonuc = ui.menu("Ana Menu", [("secenek_1", "Ilk Secim"), ("secenek_2", "Ikinci Secim")])
+        sonuc = ui.menu(
+            "Ana Menu", [("secenek_1", "Ilk Secim"), ("secenek_2", "Ikinci Secim")]
+        )
         assert sonuc == "secenek_1"
 
     # 18: gecersiz secim (monkeypatch "abc") -> tekrar sor
@@ -195,13 +202,16 @@ class TestMenu:
 
     # Ek: EOFError -> ilk secenek
     def test_eof_first(self, monkeypatch):
-        monkeypatch.setattr("builtins.input", lambda _: (_ for _ in ()).throw(EOFError()))
+        monkeypatch.setattr(
+            "builtins.input", lambda _: (_ for _ in ()).throw(EOFError())
+        )
         ui = HumanInterface()
         sonuc = ui.menu("Test", [("ilk", "Ilk Secim")])
         assert sonuc == "ilk"
 
 
 # ── 20. run() Testleri ─────────────────────────────────────────────
+
 
 class TestRun:
     """20: run — str donuyor mu (hata yok)."""
@@ -249,6 +259,7 @@ class TestRun:
 
 
 # ── 21-23. onay() Testleri ─────────────────────────────────────────
+
 
 class TestOnay:
     """21-23: onay testleri."""
@@ -303,7 +314,9 @@ class TestOnay:
 
     # Ek: EOFError -> varsayilan
     def test_onay_eof(self, monkeypatch):
-        monkeypatch.setattr("builtins.input", lambda _: (_ for _ in ()).throw(EOFError()))
+        monkeypatch.setattr(
+            "builtins.input", lambda _: (_ for _ in ()).throw(EOFError())
+        )
         ui = HumanInterface()
         assert ui.onay("Devam?", varsayilan=False) is False
 
@@ -322,6 +335,7 @@ class TestOnay:
 
 
 # ── 24. onay_iste() Testleri ───────────────────────────────────────
+
 
 class TestOnayIste:
     """24: onay_iste testleri."""
@@ -343,6 +357,7 @@ class TestOnayIste:
     # Ek: ctypes MessageBoxW IDYES=6 -> True
     def test_onay_iste_ctypes_evet(self, monkeypatch):
         from unittest.mock import patch
+
         with patch("ctypes.windll.user32.MessageBoxW", return_value=6):
             ui = HumanInterface()
             assert ui.onay_iste("Test", "Onay?") is True
@@ -350,12 +365,14 @@ class TestOnayIste:
     # Ek: ctypes MessageBoxW IDYES!=6 -> False
     def test_onay_iste_ctypes_hayir(self, monkeypatch):
         from unittest.mock import patch
+
         with patch("ctypes.windll.user32.MessageBoxW", return_value=7):
             ui = HumanInterface()
             assert ui.onay_iste("Test", "Onay?") is False
 
 
 # ── 25-28. input() Testleri ────────────────────────────────────────
+
 
 class TestInput:
     """25-28: input testleri."""
@@ -400,18 +417,23 @@ class TestInput:
 
     # Ek: EOFError -> varsayilan
     def test_eof_varsayilan(self, monkeypatch):
-        monkeypatch.setattr("builtins.input", lambda _: (_ for _ in ()).throw(EOFError()))
+        monkeypatch.setattr(
+            "builtins.input", lambda _: (_ for _ in ()).throw(EOFError())
+        )
         ui = HumanInterface()
         assert ui.input("Test", varsayilan="varsay") == "varsay"
 
     # Ek: KeyboardInterrupt -> ""
     def test_keyboard_interrupt(self, monkeypatch):
-        monkeypatch.setattr("builtins.input", lambda _: (_ for _ in ()).throw(KeyboardInterrupt()))
+        monkeypatch.setattr(
+            "builtins.input", lambda _: (_ for _ in ()).throw(KeyboardInterrupt())
+        )
         ui = HumanInterface()
         assert ui.input("Test") == ""
 
 
 # ── 29. _konsol_boyut() Testleri ───────────────────────────────────
+
 
 class TestKonsolBoyut:
     """29: _konsol_boyut — >= 20 donuyor."""
@@ -429,6 +451,7 @@ class TestKonsolBoyut:
 
 # ── Eski Ad Uyumlulugu ─────────────────────────────────────────────
 
+
 class TestInsanArayuzuAlias:
     """InsanArayuzu eski ad uyumlulugu."""
 
@@ -443,6 +466,7 @@ class TestInsanArayuzuAlias:
 
 
 # ── Entegrasyon: Birden cok metod zinciri ──────────────────────────
+
 
 class TestEntegrasyon:
     """Birden cok HumanInterface metodunun birlikte calismasi."""

@@ -37,6 +37,7 @@ class TirithSecurity:
             return True, ""
         try:
             from reymen.guvenlik.file_safety import guvenli_mi
+
             return guvenli_mi(dosya_yolu)
         except ImportError:
             return True, ""
@@ -47,6 +48,7 @@ class TirithSecurity:
             return True, ""
         try:
             from reymen.guvenlik.url_safety import url_guvenli_mi
+
             return url_guvenli_mi(url)
         except ImportError:
             return True, ""
@@ -57,6 +59,7 @@ class TirithSecurity:
             return True, ""
         try:
             from reymen.guvenlik.threat_patterns import ThreatDetector
+
             sonuc = ThreatDetector().prompt_kontrol(prompt)
             return sonuc["guvenli"], sonuc["tespit"]
         except ImportError:
@@ -68,6 +71,7 @@ class TirithSecurity:
             return cikti
         try:
             from reymen.guvenlik.redact import tam_temizle
+
             return tam_temizle(cikti)
         except ImportError:
             return cikti

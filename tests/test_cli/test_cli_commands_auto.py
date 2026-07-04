@@ -1,4 +1,5 @@
 """Auto-generated tests for reymen.sistem.cli_commands."""
+
 import pytest
 from src.reymen.sistem.cli_commands import (
     load_cli_config,

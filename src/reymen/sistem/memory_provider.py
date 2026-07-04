@@ -40,6 +40,7 @@ logger = logging.getLogger(__name__)
 # sqlite3 guvenli import (standart kutuphanede olsa da)
 try:
     import sqlite3
+
     _SQLITE_AVAILABLE = True
 except ImportError:
     _SQLITE_AVAILABLE = False
@@ -47,6 +48,7 @@ except ImportError:
 # chromadb guvenli import
 try:
     import chromadb
+
     _CHROMA_AVAILABLE = True
 except ImportError:
     _CHROMA_AVAILABLE = False
@@ -55,6 +57,7 @@ except ImportError:
 # =====================================================================
 # KATMAN 1: DEPOLAMA BACKEND ARAYUZU
 # =====================================================================
+
 
 class MemoryProvider(ABC):
     """Tum depolama backend'leri icin temel sinif.
@@ -123,6 +126,7 @@ class MemoryProvider(ABC):
 # PLUGIN KAYIT SISTEMI
 # =====================================================================
 
+
 class MemoryProviderRegistry:
     """Depolama backend'lerini kaydetmek ve secmek icin merkezi kayit defteri.
 
@@ -149,7 +153,9 @@ class MemoryProviderRegistry:
             cls._providers[name] = provider_class
             logger.debug(f"MemoryProviderRegistry: '{name}' kayit edildi")
         except Exception as e:
-            logger.warning(f"MemoryProviderRegistry: {provider_class.__name__} kayit basarisiz — {e}")
+            logger.warning(
+                f"MemoryProviderRegistry: {provider_class.__name__} kayit basarisiz — {e}"
+            )
         return provider_class
 
     @classmethod
@@ -180,6 +186,7 @@ class MemoryProviderRegistry:
 # =====================================================================
 # JSON BACKEND
 # =====================================================================
+
 
 @MemoryProviderRegistry.register
 class JsonBackend(MemoryProvider):
@@ -216,13 +223,18 @@ class JsonBackend(MemoryProvider):
             if yeni_yol != self._dosya_yolu:
                 self._dosya_yolu = yeni_yol
                 self._yukle()
-        logger.info(f"JsonBackend baslatildi: session={session_id}, dosya={self._dosya_yolu}")
+        logger.info(
+            f"JsonBackend baslatildi: session={session_id}, dosya={self._dosya_yolu}"
+        )
 
     def save(self, collection: str, document: dict, **kwargs) -> str:
         """Bir dokumani koleksiyona ekler. Dondurulen: dokuman ID."""
         try:
             dokuman = dict(document)
-            dok_id = dokuman.get("id") or f"doc_{int(time.time() * 1000)}_{len(self._veri.get(collection, []))}"
+            dok_id = (
+                dokuman.get("id")
+                or f"doc_{int(time.time() * 1000)}_{len(self._veri.get(collection, []))}"
+            )
             dokuman["id"] = dok_id
             dokuman.setdefault("zaman", time.time())
 
@@ -237,7 +249,9 @@ class JsonBackend(MemoryProvider):
             logger.error(f"JsonBackend.save hatasi: {e}")
             return ""
 
-    def search(self, collection: str, query: str, limit: int = 5) -> List[Dict[str, Any]]:
+    def search(
+        self, collection: str, query: str, limit: int = 5
+    ) -> List[Dict[str, Any]]:
         """Koleksiyonda metin sorgusu yapar. Bos sorgu tum kayitlari dondurur."""
         try:
             dokumanlar = self._veri.get(collection, [])
@@ -343,7 +357,9 @@ class JsonBackend(MemoryProvider):
     def kaydet(self, koleksiyon: str, dokuman: Dict[str, Any]) -> str:
         return self.save(koleksiyon, dokuman)
 
-    def sorgula(self, koleksiyon: str, sorgu: str, limit: int = 5) -> List[Dict[str, Any]]:
+    def sorgula(
+        self, koleksiyon: str, sorgu: str, limit: int = 5
+    ) -> List[Dict[str, Any]]:
         return self.search(koleksiyon, sorgu, limit)
 
     def sil(self, koleksiyon: str, doc_id: str) -> bool:
@@ -363,6 +379,7 @@ class JsonBackend(MemoryProvider):
 # =====================================================================
 # SQLITE BACKEND
 # =====================================================================
+
 
 @MemoryProviderRegistry.register
 class SQLiteBackend(MemoryProvider):
@@ -404,7 +421,9 @@ class SQLiteBackend(MemoryProvider):
                 self._db_yolu = yeni_yol
                 self._baglan()
                 self._tablolari_olustur()
-        logger.info(f"SQLiteBackend baslatildi: session={session_id}, db={self._db_yolu}")
+        logger.info(
+            f"SQLiteBackend baslatildi: session={session_id}, db={self._db_yolu}"
+        )
 
     def save(self, collection: str, document: dict, **kwargs) -> str:
         """Bir dokumani koleksiyona kaydeder."""
@@ -414,17 +433,17 @@ class SQLiteBackend(MemoryProvider):
             cursor = self._conn.cursor()
             cursor.execute(
                 "INSERT OR IGNORE INTO koleksiyonlar (ad, olusturma_zamani) VALUES (?, ?)",
-                (collection, time.time())
+                (collection, time.time()),
             )
             dok_id = document.get("id") or f"doc_{int(time.time() * 1000)}"
             icerik = document.get("icerik", json.dumps(document, ensure_ascii=False))
             metadata = json.dumps(
                 {k: v for k, v in document.items() if k not in ("id", "icerik")},
-                ensure_ascii=False
+                ensure_ascii=False,
             )
             cursor.execute(
                 "INSERT OR REPLACE INTO dokumanlar (id, koleksiyon_adi, icerik, metadata, zaman) VALUES (?, ?, ?, ?, ?)",
-                (dok_id, collection, icerik, metadata, time.time())
+                (dok_id, collection, icerik, metadata, time.time()),
             )
             self._conn.commit()
             logger.info(f"SQLiteBackend.save: koleksiyon={collection}, id={dok_id}")
@@ -433,7 +452,9 @@ class SQLiteBackend(MemoryProvider):
             logger.error(f"SQLiteBackend.save hatasi: {e}")
             return ""
 
-    def search(self, collection: str, query: str, limit: int = 5) -> List[Dict[str, Any]]:
+    def search(
+        self, collection: str, query: str, limit: int = 5
+    ) -> List[Dict[str, Any]]:
         """Koleksiyonda LIKE ile sorgu yapar. Bos sorgu tum kayitlari dondurur."""
         if not _SQLITE_AVAILABLE or not self._conn:
             return []
@@ -445,14 +466,14 @@ class SQLiteBackend(MemoryProvider):
                        FROM dokumanlar
                        WHERE koleksiyon_adi = ? AND (icerik LIKE ? OR metadata LIKE ?)
                        ORDER BY zaman DESC LIMIT ?""",
-                    (collection, f"%{query}%", f"%{query}%", limit)
+                    (collection, f"%{query}%", f"%{query}%", limit),
                 )
             else:
                 cursor.execute(
                     """SELECT id, koleksiyon_adi, icerik, metadata, zaman
                        FROM dokumanlar WHERE koleksiyon_adi = ?
                        ORDER BY zaman DESC LIMIT ?""",
-                    (collection, limit)
+                    (collection, limit),
                 )
             sonuclar = []
             for row in cursor.fetchall():
@@ -481,7 +502,7 @@ class SQLiteBackend(MemoryProvider):
             cursor = self._conn.cursor()
             cursor.execute(
                 "SELECT id, koleksiyon_adi, icerik, metadata, zaman FROM dokumanlar WHERE koleksiyon_adi = ? AND id = ?",
-                (collection, doc_id)
+                (collection, doc_id),
             )
             row = cursor.fetchone()
             if not row:
@@ -510,12 +531,14 @@ class SQLiteBackend(MemoryProvider):
             cursor = self._conn.cursor()
             cursor.execute(
                 "DELETE FROM dokumanlar WHERE koleksiyon_adi = ? AND id = ?",
-                (collection, doc_id)
+                (collection, doc_id),
             )
             self._conn.commit()
             silindi = cursor.rowcount > 0
             if silindi:
-                logger.info(f"SQLiteBackend.delete: koleksiyon={collection}, id={doc_id}")
+                logger.info(
+                    f"SQLiteBackend.delete: koleksiyon={collection}, id={doc_id}"
+                )
             return silindi
         except sqlite3.Error as e:
             logger.error(f"SQLiteBackend.delete hatasi: {e}")
@@ -539,7 +562,9 @@ class SQLiteBackend(MemoryProvider):
             return False
         try:
             cursor = self._conn.cursor()
-            cursor.execute("DELETE FROM dokumanlar WHERE koleksiyon_adi = ?", (collection,))
+            cursor.execute(
+                "DELETE FROM dokumanlar WHERE koleksiyon_adi = ?", (collection,)
+            )
             self._conn.commit()
             return True
         except sqlite3.Error as e:
@@ -620,7 +645,9 @@ class SQLiteBackend(MemoryProvider):
     def kaydet(self, koleksiyon: str, dokuman: Dict[str, Any]) -> str:
         return self.save(koleksiyon, dokuman)
 
-    def sorgula(self, koleksiyon: str, sorgu: str, limit: int = 5) -> List[Dict[str, Any]]:
+    def sorgula(
+        self, koleksiyon: str, sorgu: str, limit: int = 5
+    ) -> List[Dict[str, Any]]:
         return self.search(koleksiyon, sorgu, limit)
 
     def sil(self, koleksiyon: str, doc_id: str) -> bool:
@@ -640,6 +667,7 @@ SqliteBackend = SQLiteBackend
 # =====================================================================
 # CHROMA BACKEND (opsiyonel — chromadb yoksa graceful degrade)
 # =====================================================================
+
 
 @MemoryProviderRegistry.register
 class ChromaBackend(MemoryProvider):
@@ -672,7 +700,11 @@ class ChromaBackend(MemoryProvider):
         """ChromaDB istemcisini baslatir. chromadb yoksa sessizce atlar."""
         self._session_id = session_id
         hermes_home = kwargs.get("hermes_home")
-        yol = os.path.join(str(hermes_home), "chroma") if hermes_home else self._chroma_yolu
+        yol = (
+            os.path.join(str(hermes_home), "chroma")
+            if hermes_home
+            else self._chroma_yolu
+        )
         if not _CHROMA_AVAILABLE:
             logger.warning("ChromaBackend: chromadb kurulu degil, devre disi")
             return
@@ -690,7 +722,9 @@ class ChromaBackend(MemoryProvider):
             return None
         if collection not in self._koleksiyonlar:
             try:
-                self._koleksiyonlar[collection] = self._client.get_or_create_collection(name=collection)
+                self._koleksiyonlar[collection] = self._client.get_or_create_collection(
+                    name=collection
+                )
             except Exception as e:
                 logger.error(f"ChromaBackend koleksiyon hatasi: {e}")
                 return None
@@ -703,7 +737,9 @@ class ChromaBackend(MemoryProvider):
         try:
             dok_id = document.get("id") or f"doc_{int(time.time() * 1000)}"
             icerik = document.get("icerik", json.dumps(document, ensure_ascii=False))
-            metadata = {k: str(v) for k, v in document.items() if k not in ("id", "icerik")}
+            metadata = {
+                k: str(v) for k, v in document.items() if k not in ("id", "icerik")
+            }
             kol.upsert(ids=[dok_id], documents=[icerik], metadatas=[metadata])
             logger.info(f"ChromaBackend.save: koleksiyon={collection}, id={dok_id}")
             return dok_id
@@ -711,7 +747,9 @@ class ChromaBackend(MemoryProvider):
             logger.error(f"ChromaBackend.save hatasi: {e}")
             return ""
 
-    def search(self, collection: str, query: str, limit: int = 5) -> List[Dict[str, Any]]:
+    def search(
+        self, collection: str, query: str, limit: int = 5
+    ) -> List[Dict[str, Any]]:
         kol = self._kol_al(collection)
         if not kol:
             return []
@@ -740,7 +778,10 @@ class ChromaBackend(MemoryProvider):
             result = kol.get(ids=[doc_id])
             if not result["ids"]:
                 return None
-            entry: Dict[str, Any] = {"id": result["ids"][0], "icerik": result["documents"][0]}
+            entry: Dict[str, Any] = {
+                "id": result["ids"][0],
+                "icerik": result["documents"][0],
+            }
             if result.get("metadatas") and result["metadatas"][0]:
                 entry.update(result["metadatas"][0])
             return entry
@@ -801,7 +842,9 @@ class ChromaBackend(MemoryProvider):
     def kaydet(self, koleksiyon: str, dokuman: Dict[str, Any]) -> str:
         return self.save(koleksiyon, dokuman)
 
-    def sorgula(self, koleksiyon: str, sorgu: str, limit: int = 5) -> List[Dict[str, Any]]:
+    def sorgula(
+        self, koleksiyon: str, sorgu: str, limit: int = 5
+    ) -> List[Dict[str, Any]]:
         return self.search(koleksiyon, sorgu, limit)
 
     def sil(self, koleksiyon: str, doc_id: str) -> bool:
@@ -818,7 +861,10 @@ class ChromaBackend(MemoryProvider):
 # YARDIMCI FONKSİYON
 # =====================================================================
 
-def get_default_provider(backend: str = "json", dosya_yolu: Optional[str] = None) -> MemoryProvider:
+
+def get_default_provider(
+    backend: str = "json", dosya_yolu: Optional[str] = None
+) -> MemoryProvider:
     """Registry'den backend secip baslatilmamis ornek dondurur.
 
     Eski MemoryProvider(backend_turu=...) kullanimi icin uyumluluk koprusu.
@@ -838,6 +884,7 @@ def get_default_provider(backend: str = "json", dosya_yolu: Optional[str] = None
 # =====================================================================
 # KATMAN 2: ReYMeN MEMORY PROVIDER PLUGIN ARAYUZU
 # =====================================================================
+
 
 class AbstraktHafizaSaglayici(ABC):
     """ReYMeN Memory Provider Plugin ABC'si — ReYMeN uyarlamasi.
@@ -898,11 +945,13 @@ class AbstraktHafizaSaglayici(ABC):
 
     def tur_senkronize(self, mesajlar: List[Dict[str, Any]]) -> None:
         """Tur bittikten sonra konusmayi kalici hafizaya kaydet. NON-BLOCKING."""
+
         def _arka_plan():
             try:
                 self._tur_senkronize_impl(mesajlar)
             except Exception as e:
                 logger.debug(f"[{self.ad}] tur_senkronize hata: {e}")
+
         threading.Thread(target=_arka_plan, daemon=True).start()
 
     def _tur_senkronize_impl(self, mesajlar: List[Dict[str, Any]]) -> None:
@@ -921,6 +970,7 @@ class AbstraktHafizaSaglayici(ABC):
 # =====================================================================
 # HAFIZA PLUGIN KAYIT BAGLAMI
 # =====================================================================
+
 
 class HafizaPluginKayit:
     """Plugin kayit baglami.
@@ -1002,6 +1052,7 @@ def global_hafiza_kayit_al() -> HafizaPluginKayit:
 # MODUL TEST FONKSİYONU
 # =====================================================================
 
+
 def run(**kwargs) -> str:
     """memory_provider modulunu basit bir donguyle test eder.
 
@@ -1016,11 +1067,14 @@ def run(**kwargs) -> str:
         provider = get_default_provider(backend=backend_adi)
         provider.initialize(session_id="test_session")
 
-        doc_id = provider.save("test_koleksiyon", {
-            "id": "test_doc_1",
-            "baslik": "Test Dokumani",
-            "icerik": "Bu bir test dokumanidir.",
-        })
+        doc_id = provider.save(
+            "test_koleksiyon",
+            {
+                "id": "test_doc_1",
+                "baslik": "Test Dokumani",
+                "icerik": "Bu bir test dokumanidir.",
+            },
+        )
 
         sonuclar = provider.search("test_koleksiyon", "test")
         silindi = provider.delete("test_koleksiyon", "test_doc_1")
@@ -1031,26 +1085,39 @@ def run(**kwargs) -> str:
         # AbstraktHafizaSaglayici ABC dogrulama
         class _TestSaglayici(AbstraktHafizaSaglayici):
             @property
-            def ad(self): return "test"
-            def musait_mi(self): return True
-            def baslat(self, oturum_id, **kw): pass
-            def arac_sema_al(self): return []
-            def arac_cagri_isle(self, arac, args, **kw): return "ok"
+            def ad(self):
+                return "test"
+
+            def musait_mi(self):
+                return True
+
+            def baslat(self, oturum_id, **kw):
+                pass
+
+            def arac_sema_al(self):
+                return []
+
+            def arac_cagri_isle(self, arac, args, **kw):
+                return "ok"
 
         ts = _TestSaglayici()
         kayit = HafizaPluginKayit()
         kayit.hafiza_saglayici_kaydet(ts)
         aktif = kayit.aktif_saglayici_sec("test", "oturum-001")
 
-        return json.dumps({
-            "backend": backend_adi,
-            "kaydedilen_id": doc_id,
-            "bulunan_sonuc": len(sonuclar),
-            "silindi": silindi,
-            "istatistik": provider.stats(),
-            "available_backends": MemoryProviderRegistry.list_available(),
-            "abc_test": "basarili" if aktif else "basarisiz",
-        }, ensure_ascii=False, indent=2)
+        return json.dumps(
+            {
+                "backend": backend_adi,
+                "kaydedilen_id": doc_id,
+                "bulunan_sonuc": len(sonuclar),
+                "silindi": silindi,
+                "istatistik": provider.stats(),
+                "available_backends": MemoryProviderRegistry.list_available(),
+                "abc_test": "basarili" if aktif else "basarisiz",
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
 
     except Exception as e:
         logger.error(f"run() hatasi: {e}")

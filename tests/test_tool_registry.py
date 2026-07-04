@@ -2,6 +2,7 @@
 """tool_registry.py icin pytest testleri."""
 
 import sys
+
 sys.path.insert(0, ".")
 
 from tool_registry import ToolRegistry, AracMeta
@@ -27,8 +28,9 @@ class TestAracMeta:
 
     def test_ozet_dict(self):
         """ozet() dogru dict dondurmeli."""
-        meta = AracMeta("TEST", lambda x: x, aciklama="test arac",
-                        risk_seviyesi=2, kategori="test")
+        meta = AracMeta(
+            "TEST", lambda x: x, aciklama="test arac", risk_seviyesi=2, kategori="test"
+        )
         o = meta.ozet()
         assert o["ad"] == "TEST"
         assert o["aciklama"] == "test arac"

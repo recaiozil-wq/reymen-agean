@@ -1,4 +1,5 @@
 """Shared gateway restart constants and parsing helpers."""
+
 from __future__ import annotations
 
 # Varsayilan config degerleri (DEFAULT_CONFIG yerine)
@@ -14,7 +15,11 @@ DEFAULT_GATEWAY_RESTART_DRAIN_TIMEOUT = _DEFAULT_RESTART_DRAIN_TIMEOUT
 def parse_restart_drain_timeout(raw: object) -> float:
     """Parse a configured drain timeout, falling back to the shared default."""
     try:
-        value = float(raw) if str(raw or "").strip() else DEFAULT_GATEWAY_RESTART_DRAIN_TIMEOUT
+        value = (
+            float(raw)
+            if str(raw or "").strip()
+            else DEFAULT_GATEWAY_RESTART_DRAIN_TIMEOUT
+        )
     except (TypeError, ValueError):
         return DEFAULT_GATEWAY_RESTART_DRAIN_TIMEOUT
     return max(0.0, value)

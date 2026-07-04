@@ -22,6 +22,7 @@ import requests
 # Sabitler
 # ════════════════════════════════════════════════════════════════
 
+
 class TestSabitler:
     def test_skills_klasor_yolu(self):
         assert ".ReYMeN" in str(SKILLS_KLASOR)
@@ -41,6 +42,7 @@ class TestSabitler:
 # hub_listele
 # ════════════════════════════════════════════════════════════════
 
+
 class TestHubListele:
     def test_listele_icerir(self):
         sonuc = hub_listele()
@@ -57,6 +59,7 @@ class TestHubListele:
 # ════════════════════════════════════════════════════════════════
 # hub_ekle
 # ════════════════════════════════════════════════════════════════
+
 
 class TestHubEkle:
     def test_yeni_hub_ekle(self):
@@ -76,6 +79,7 @@ class TestHubEkle:
 # ════════════════════════════════════════════════════════════════
 # hub_indir
 # ════════════════════════════════════════════════════════════════
+
 
 class TestHubIndir:
     def test_bilinmeyen_hub(self):
@@ -148,6 +152,7 @@ class TestHubIndir:
 # ════════════════════════════════════════════════════════════════
 # Yan etki: HUBS degisikliklerini temizle
 # ════════════════════════════════════════════════════════════════
+
 
 class TestHubTemiz:
     def test_varsayilan_hublar_bozulmamis(self):

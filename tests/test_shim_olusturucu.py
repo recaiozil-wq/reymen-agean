@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Tests for shim_olusturucu.py — automatic shim generation for missing modules."""
+
 import json
 import os
 import tempfile
@@ -26,6 +27,7 @@ from reymen.cereyan.shim_olusturucu import (
 # ════════════════════════════════════════════════════════════════
 # puan_hesapla
 # ════════════════════════════════════════════════════════════════
+
 
 class TestPuanHesapla:
     def test_100_verir_5(self):
@@ -60,6 +62,7 @@ class TestPuanHesapla:
 # test_kategorisi
 # ════════════════════════════════════════════════════════════════
 
+
 class TestKategori:
     def test_cekirdek_testi(self):
         assert kategorilendir("tests/test_core.py") == "A"
@@ -86,6 +89,7 @@ class TestKategori:
 # ════════════════════════════════════════════════════════════════
 # _shim_kayitlari / _shim_kaydet
 # ════════════════════════════════════════════════════════════════
+
 
 class TestShimKayit:
     def test_db_yoksa_bos_doner(self, tmp_path):
@@ -115,19 +119,24 @@ class TestShimKayit:
 # _shim_olustur
 # ════════════════════════════════════════════════════════════════
 
+
 class TestShimOlustur:
     def test_yeni_shim_olusturur(self, tmp_path):
         with patch.object(real_mod, "ROOT", tmp_path):
             shim_yolu = _shim_olustur("gateway.platforms.base")
             assert shim_yolu is not None
-            shim_file = tmp_path / "tools" / "shim" / "gateway" / "platforms" / "base.py"
+            shim_file = (
+                tmp_path / "tools" / "shim" / "gateway" / "platforms" / "base.py"
+            )
             assert shim_file.exists()
             assert "StubBase" in shim_file.read_text(encoding="utf-8")
 
     def test_init_py_olusturulur(self, tmp_path):
         with patch.object(real_mod, "ROOT", tmp_path):
             _shim_olustur("gateway.platforms.base")
-            init_file = tmp_path / "tools" / "shim" / "gateway" / "platforms" / "__init__.py"
+            init_file = (
+                tmp_path / "tools" / "shim" / "gateway" / "platforms" / "__init__.py"
+            )
             assert init_file.exists()
             assert "shim" in init_file.read_text(encoding="utf-8")
 
@@ -140,7 +149,9 @@ class TestShimOlustur:
     def test_init_pye_export_ekler(self, tmp_path):
         with patch.object(real_mod, "ROOT", tmp_path):
             _shim_olustur("gateway.platforms.base")
-            init_file = tmp_path / "tools" / "shim" / "gateway" / "platforms" / "__init__.py"
+            init_file = (
+                tmp_path / "tools" / "shim" / "gateway" / "platforms" / "__init__.py"
+            )
             icerik = init_file.read_text(encoding="utf-8")
             assert "from .base import *" in icerik
 
@@ -148,7 +159,9 @@ class TestShimOlustur:
         with patch.object(real_mod, "ROOT", tmp_path):
             _shim_olustur("gateway.platforms.base")
             _shim_olustur("gateway.platforms.advanced")
-            init_file = tmp_path / "tools" / "shim" / "gateway" / "platforms" / "__init__.py"
+            init_file = (
+                tmp_path / "tools" / "shim" / "gateway" / "platforms" / "__init__.py"
+            )
             icerik = init_file.read_text(encoding="utf-8")
             assert "from .base import *" in icerik
             assert "from .advanced import *" in icerik
@@ -164,6 +177,7 @@ class TestShimOlustur:
 # ════════════════════════════════════════════════════════════════
 # shimleri_temizle
 # ════════════════════════════════════════════════════════════════
+
 
 class TestShimleriTemizle:
     def test_shimleri_siler(self, tmp_path):
@@ -192,6 +206,7 @@ class TestShimleriTemizle:
 # modul_hatalarini_tara
 # ════════════════════════════════════════════════════════════════
 
+
 class TestModulHatalariniTara:
     def test_eksik_modul_yoksa_bos(self, tmp_path):
         sonuclar = {"tests/test_a.py": "PASS", "tests/test_b.py": "PASS"}
@@ -213,7 +228,11 @@ class TestModulHatalariniTara:
             assert sonuc == []  # sadece 2, 3 gerekli
 
     def test_3_tekrarda_shim_olusturur(self, tmp_path):
-        sonuclar = {"tests/test_a.py": "FAIL", "tests/test_b.py": "FAIL", "tests/test_c.py": "FAIL"}
+        sonuclar = {
+            "tests/test_a.py": "FAIL",
+            "tests/test_b.py": "FAIL",
+            "tests/test_c.py": "FAIL",
+        }
         hatalar = {
             "tests/test_a.py": "ModuleNotFoundError: No module named 'foo.bar'",
             "tests/test_b.py": "ModuleNotFoundError: No module named 'foo.bar'",
@@ -242,6 +261,7 @@ class TestModulHatalariniTara:
 # rapor_olustur
 # ════════════════════════════════════════════════════════════════
 
+
 class TestRaporOlustur:
     def test_rapor_icerik(self, tmp_path):
         kat_sonuc = {
@@ -251,8 +271,12 @@ class TestRaporOlustur:
         }
         with patch.object(real_mod, "ROOT", tmp_path):
             rapor = rapor_olustur(
-                gecti=23, basarisiz=5, timeout=2, toplam=30,
-                kategori_sonuc=kat_sonuc, shim_sayisi=3,
+                gecti=23,
+                basarisiz=5,
+                timeout=2,
+                toplam=30,
+                kategori_sonuc=kat_sonuc,
+                shim_sayisi=3,
             )
             assert "REYMEN TEST SONUC RAPORU" in rapor
             assert "Toplam: 30" in rapor

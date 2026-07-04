@@ -210,15 +210,32 @@ class TestGatewayConfigRoundtrip:
         assert Platform.TELEGRAM in restored.platforms
         assert restored.platforms[Platform.TELEGRAM].token == "tok_123"
         assert restored.reset_triggers == ["/new"]
-        assert restored.quick_commands == {"limits": {"type": "exec", "command": "echo ok"}}
+        assert restored.quick_commands == {
+            "limits": {"type": "exec", "command": "echo ok"}
+        }
         assert restored.group_sessions_per_user is False
         assert restored.thread_sessions_per_user is True
 
     def test_max_concurrent_sessions_from_dict_normalizes_disabled_values(self):
         assert GatewayConfig.from_dict({}).max_concurrent_sessions is None
-        assert GatewayConfig.from_dict({"max_concurrent_sessions": None}).max_concurrent_sessions is None
-        assert GatewayConfig.from_dict({"max_concurrent_sessions": 0}).max_concurrent_sessions is None
-        assert GatewayConfig.from_dict({"max_concurrent_sessions": -1}).max_concurrent_sessions is None
+        assert (
+            GatewayConfig.from_dict(
+                {"max_concurrent_sessions": None}
+            ).max_concurrent_sessions
+            is None
+        )
+        assert (
+            GatewayConfig.from_dict(
+                {"max_concurrent_sessions": 0}
+            ).max_concurrent_sessions
+            is None
+        )
+        assert (
+            GatewayConfig.from_dict(
+                {"max_concurrent_sessions": -1}
+            ).max_concurrent_sessions
+            is None
+        )
 
     def test_max_concurrent_sessions_from_dict_accepts_positive_integer(self):
         config = GatewayConfig.from_dict({"max_concurrent_sessions": "3"})
@@ -265,7 +282,10 @@ class TestGatewayConfigRoundtrip:
         restored = GatewayConfig.from_dict(config.to_dict())
 
         assert restored.unauthorized_dm_behavior == "ignore"
-        assert restored.platforms[Platform.WHATSAPP].extra["unauthorized_dm_behavior"] == "pair"
+        assert (
+            restored.platforms[Platform.WHATSAPP].extra["unauthorized_dm_behavior"]
+            == "pair"
+        )
 
     def test_from_dict_coerces_quoted_false_always_log_local(self):
         restored = GatewayConfig.from_dict({"always_log_local": "false"})
@@ -309,9 +329,13 @@ class TestLoadGatewayConfig:
 
         config = load_gateway_config()
 
-        assert config.quick_commands == {"limits": {"type": "exec", "command": "echo ok"}}
+        assert config.quick_commands == {
+            "limits": {"type": "exec", "command": "echo ok"}
+        }
 
-    def test_bridges_group_sessions_per_user_from_config_yaml(self, tmp_path, monkeypatch):
+    def test_bridges_group_sessions_per_user_from_config_yaml(
+        self, tmp_path, monkeypatch
+    ):
         ReYMeN_home = tmp_path / ".ReYMeN"
         ReYMeN_home.mkdir()
         config_path = ReYMeN_home / "config.yaml"
@@ -323,7 +347,9 @@ class TestLoadGatewayConfig:
 
         assert config.group_sessions_per_user is False
 
-    def test_bridges_thread_sessions_per_user_from_config_yaml(self, tmp_path, monkeypatch):
+    def test_bridges_thread_sessions_per_user_from_config_yaml(
+        self, tmp_path, monkeypatch
+    ):
         ReYMeN_home = tmp_path / ".ReYMeN"
         ReYMeN_home.mkdir()
         config_path = ReYMeN_home / "config.yaml"
@@ -347,7 +373,9 @@ class TestLoadGatewayConfig:
 
         assert config.thread_sessions_per_user is False
 
-    def test_bridges_top_level_max_concurrent_sessions_from_config_yaml(self, tmp_path, monkeypatch):
+    def test_bridges_top_level_max_concurrent_sessions_from_config_yaml(
+        self, tmp_path, monkeypatch
+    ):
         ReYMeN_home = tmp_path / ".ReYMeN"
         ReYMeN_home.mkdir()
         config_path = ReYMeN_home / "config.yaml"
@@ -359,13 +387,14 @@ class TestLoadGatewayConfig:
 
         assert config.max_concurrent_sessions == 2
 
-    def test_bridges_nested_max_concurrent_sessions_from_config_yaml(self, tmp_path, monkeypatch):
+    def test_bridges_nested_max_concurrent_sessions_from_config_yaml(
+        self, tmp_path, monkeypatch
+    ):
         ReYMeN_home = tmp_path / ".ReYMeN"
         ReYMeN_home.mkdir()
         config_path = ReYMeN_home / "config.yaml"
         config_path.write_text(
-            "gateway:\n"
-            "  max_concurrent_sessions: 3\n",
+            "gateway:\n" "  max_concurrent_sessions: 3\n",
             encoding="utf-8",
         )
 
@@ -375,7 +404,9 @@ class TestLoadGatewayConfig:
 
         assert config.max_concurrent_sessions == 3
 
-    def test_top_level_max_concurrent_sessions_overrides_nested_config_yaml(self, tmp_path, monkeypatch):
+    def test_top_level_max_concurrent_sessions_overrides_nested_config_yaml(
+        self, tmp_path, monkeypatch
+    ):
         ReYMeN_home = tmp_path / ".ReYMeN"
         ReYMeN_home.mkdir()
         config_path = ReYMeN_home / "config.yaml"
@@ -392,14 +423,15 @@ class TestLoadGatewayConfig:
 
         assert config.max_concurrent_sessions == 2
 
-    def test_bridges_discord_thread_require_mention_from_config_yaml(self, tmp_path, monkeypatch):
+    def test_bridges_discord_thread_require_mention_from_config_yaml(
+        self, tmp_path, monkeypatch
+    ):
         """discord.thread_require_mention in config.yaml should reach the runtime env var."""
         ReYMeN_home = tmp_path / ".ReYMeN"
         ReYMeN_home.mkdir()
         config_path = ReYMeN_home / "config.yaml"
         config_path.write_text(
-            "discord:\n"
-            "  thread_require_mention: true\n",
+            "discord:\n" "  thread_require_mention: true\n",
             encoding="utf-8",
         )
 
@@ -410,14 +442,15 @@ class TestLoadGatewayConfig:
 
         assert os.environ.get("DISCORD_THREAD_REQUIRE_MENTION") == "true"
 
-    def test_thread_require_mention_yaml_does_not_overwrite_env(self, tmp_path, monkeypatch):
+    def test_thread_require_mention_yaml_does_not_overwrite_env(
+        self, tmp_path, monkeypatch
+    ):
         """Explicit env var should win over config.yaml (env > yaml precedence)."""
         ReYMeN_home = tmp_path / ".ReYMeN"
         ReYMeN_home.mkdir()
         config_path = ReYMeN_home / "config.yaml"
         config_path.write_text(
-            "discord:\n"
-            "  thread_require_mention: false\n",
+            "discord:\n" "  thread_require_mention: false\n",
             encoding="utf-8",
         )
 
@@ -437,8 +470,8 @@ class TestLoadGatewayConfig:
         config_path.write_text(
             "discord:\n"
             "  allow_from:\n"
-            "    - \"123456789012345678\"\n"
-            "    - \"999888777666555444\"\n",
+            '    - "123456789012345678"\n'
+            '    - "999888777666555444"\n',
             encoding="utf-8",
         )
 
@@ -455,7 +488,9 @@ class TestLoadGatewayConfig:
             "123456789012345678,999888777666555444"
         )
 
-    def test_bridges_discord_platform_extra_allow_from_to_env(self, tmp_path, monkeypatch):
+    def test_bridges_discord_platform_extra_allow_from_to_env(
+        self, tmp_path, monkeypatch
+    ):
         """platforms.discord.extra.allow_from should reach DISCORD_ALLOWED_USERS too."""
         ReYMeN_home = tmp_path / ".ReYMeN"
         ReYMeN_home.mkdir()
@@ -465,7 +500,7 @@ class TestLoadGatewayConfig:
             "  discord:\n"
             "    extra:\n"
             "      allow_from:\n"
-            "        - \"123456789012345678\"\n",
+            '        - "123456789012345678"\n',
             encoding="utf-8",
         )
 
@@ -479,14 +514,14 @@ class TestLoadGatewayConfig:
         ]
         assert os.environ.get("DISCORD_ALLOWED_USERS") == "123456789012345678"
 
-    def test_bridges_quoted_false_platform_enabled_from_config_yaml(self, tmp_path, monkeypatch):
+    def test_bridges_quoted_false_platform_enabled_from_config_yaml(
+        self, tmp_path, monkeypatch
+    ):
         ReYMeN_home = tmp_path / ".ReYMeN"
         ReYMeN_home.mkdir()
         config_path = ReYMeN_home / "config.yaml"
         config_path.write_text(
-            "platforms:\n"
-            "  api_server:\n"
-            "    enabled: \"false\"\n",
+            "platforms:\n" "  api_server:\n" '    enabled: "false"\n',
             encoding="utf-8",
         )
 
@@ -497,7 +532,9 @@ class TestLoadGatewayConfig:
         assert config.platforms[Platform.API_SERVER].enabled is False
         assert Platform.API_SERVER not in config.get_connected_platforms()
 
-    def test_bridges_nested_gateway_platforms_from_config_yaml(self, tmp_path, monkeypatch):
+    def test_bridges_nested_gateway_platforms_from_config_yaml(
+        self, tmp_path, monkeypatch
+    ):
         ReYMeN_home = tmp_path / ".ReYMeN"
         ReYMeN_home.mkdir()
         config_path = ReYMeN_home / "config.yaml"
@@ -509,7 +546,7 @@ class TestLoadGatewayConfig:
             "      token: nested-token\n"
             "      home_channel:\n"
             "        platform: telegram\n"
-            "        chat_id: \"123\"\n"
+            '        chat_id: "123"\n'
             "        name: Nested Home\n"
             "      extra:\n"
             "        reply_prefix: nested\n",
@@ -530,7 +567,9 @@ class TestLoadGatewayConfig:
         )
         assert telegram.extra["reply_prefix"] == "nested"
 
-    def test_top_level_platforms_override_nested_gateway_platforms(self, tmp_path, monkeypatch):
+    def test_top_level_platforms_override_nested_gateway_platforms(
+        self, tmp_path, monkeypatch
+    ):
         ReYMeN_home = tmp_path / ".ReYMeN"
         ReYMeN_home.mkdir()
         config_path = ReYMeN_home / "config.yaml"
@@ -560,7 +599,9 @@ class TestLoadGatewayConfig:
         assert telegram.token == "top-token"
         assert telegram.extra["reply_prefix"] == "top"
 
-    def test_shared_key_loop_bridges_allow_from_from_nested_platforms(self, tmp_path, monkeypatch):
+    def test_shared_key_loop_bridges_allow_from_from_nested_platforms(
+        self, tmp_path, monkeypatch
+    ):
         """Regression: shared-key loop must bridge allow_from / require_mention
         into PlatformConfig.extra even when the platform is configured only
         under ``platforms:`` (no top-level ``telegram:`` block).
@@ -577,8 +618,8 @@ class TestLoadGatewayConfig:
             "platforms:\n"
             "  telegram:\n"
             "    allow_from:\n"
-            "      - \"111222333\"\n"
-            "      - \"444555666\"\n"
+            '      - "111222333"\n'
+            '      - "444555666"\n'
             "    require_mention: true\n",
             encoding="utf-8",
         )
@@ -597,7 +638,9 @@ class TestLoadGatewayConfig:
             "bridged into PlatformConfig.extra by the shared-key loop"
         )
 
-    def test_shared_key_loop_bridges_allow_from_from_nested_gateway_platforms(self, tmp_path, monkeypatch):
+    def test_shared_key_loop_bridges_allow_from_from_nested_gateway_platforms(
+        self, tmp_path, monkeypatch
+    ):
         """Same regression check for ``gateway.platforms:`` path."""
         ReYMeN_home = tmp_path / ".ReYMeN"
         ReYMeN_home.mkdir()
@@ -607,7 +650,7 @@ class TestLoadGatewayConfig:
             "  platforms:\n"
             "    telegram:\n"
             "      allow_from:\n"
-            "        - \"777888999\"\n"
+            '        - "777888999"\n'
             "      require_mention: false\n",
             encoding="utf-8",
         )
@@ -623,13 +666,14 @@ class TestLoadGatewayConfig:
         )
         assert telegram.extra.get("require_mention") is False
 
-    def test_bridges_quoted_false_session_notify_from_config_yaml(self, tmp_path, monkeypatch):
+    def test_bridges_quoted_false_session_notify_from_config_yaml(
+        self, tmp_path, monkeypatch
+    ):
         ReYMeN_home = tmp_path / ".ReYMeN"
         ReYMeN_home.mkdir()
         config_path = ReYMeN_home / "config.yaml"
         config_path.write_text(
-            "session_reset:\n"
-            "  notify: \"false\"\n",
+            "session_reset:\n" '  notify: "false"\n',
             encoding="utf-8",
         )
 
@@ -639,12 +683,14 @@ class TestLoadGatewayConfig:
 
         assert config.default_reset_policy.notify is False
 
-    def test_bridges_quoted_false_always_log_local_from_config_yaml(self, tmp_path, monkeypatch):
+    def test_bridges_quoted_false_always_log_local_from_config_yaml(
+        self, tmp_path, monkeypatch
+    ):
         ReYMeN_home = tmp_path / ".ReYMeN"
         ReYMeN_home.mkdir()
         config_path = ReYMeN_home / "config.yaml"
         config_path.write_text(
-            "always_log_local: \"false\"\n",
+            'always_log_local: "false"\n',
             encoding="utf-8",
         )
 
@@ -654,14 +700,16 @@ class TestLoadGatewayConfig:
 
         assert config.always_log_local is False
 
-    def test_bridges_discord_channel_prompts_from_config_yaml(self, tmp_path, monkeypatch):
+    def test_bridges_discord_channel_prompts_from_config_yaml(
+        self, tmp_path, monkeypatch
+    ):
         ReYMeN_home = tmp_path / ".ReYMeN"
         ReYMeN_home.mkdir()
         config_path = ReYMeN_home / "config.yaml"
         config_path.write_text(
             "discord:\n"
             "  channel_prompts:\n"
-            "    \"123\": Research mode\n"
+            '    "123": Research mode\n'
             "    456: Therapist mode\n",
             encoding="utf-8",
         )
@@ -675,14 +723,14 @@ class TestLoadGatewayConfig:
             "456": "Therapist mode",
         }
 
-    def test_bridges_discord_history_backfill_settings_from_config_yaml(self, tmp_path, monkeypatch):
+    def test_bridges_discord_history_backfill_settings_from_config_yaml(
+        self, tmp_path, monkeypatch
+    ):
         ReYMeN_home = tmp_path / ".ReYMeN"
         ReYMeN_home.mkdir()
         config_path = ReYMeN_home / "config.yaml"
         config_path.write_text(
-            "discord:\n"
-            "  history_backfill: true\n"
-            "  history_backfill_limit: 17\n",
+            "discord:\n" "  history_backfill: true\n" "  history_backfill_limit: 17\n",
             encoding="utf-8",
         )
 
@@ -695,7 +743,9 @@ class TestLoadGatewayConfig:
         assert os.getenv("DISCORD_HISTORY_BACKFILL") == "true"
         assert os.getenv("DISCORD_HISTORY_BACKFILL_LIMIT") == "17"
 
-    def test_bridges_telegram_channel_prompts_from_config_yaml(self, tmp_path, monkeypatch):
+    def test_bridges_telegram_channel_prompts_from_config_yaml(
+        self, tmp_path, monkeypatch
+    ):
         ReYMeN_home = tmp_path / ".ReYMeN"
         ReYMeN_home.mkdir()
         config_path = ReYMeN_home / "config.yaml"
@@ -716,14 +766,14 @@ class TestLoadGatewayConfig:
             "789": "Creative writing",
         }
 
-    def test_bridges_slack_channel_prompts_from_config_yaml(self, tmp_path, monkeypatch):
+    def test_bridges_slack_channel_prompts_from_config_yaml(
+        self, tmp_path, monkeypatch
+    ):
         ReYMeN_home = tmp_path / ".ReYMeN"
         ReYMeN_home.mkdir()
         config_path = ReYMeN_home / "config.yaml"
         config_path.write_text(
-            "slack:\n"
-            "  channel_prompts:\n"
-            '    "C01ABC": Code review mode\n',
+            "slack:\n" "  channel_prompts:\n" '    "C01ABC": Code review mode\n',
             encoding="utf-8",
         )
 
@@ -735,7 +785,9 @@ class TestLoadGatewayConfig:
             "C01ABC": "Code review mode",
         }
 
-    def test_bridges_feishu_allow_bots_from_config_yaml_to_env(self, tmp_path, monkeypatch):
+    def test_bridges_feishu_allow_bots_from_config_yaml_to_env(
+        self, tmp_path, monkeypatch
+    ):
         ReYMeN_home = tmp_path / ".ReYMeN"
         ReYMeN_home.mkdir()
         config_path = ReYMeN_home / "config.yaml"
@@ -751,7 +803,9 @@ class TestLoadGatewayConfig:
 
         assert os.environ.get("FEISHU_ALLOW_BOTS") == "mentions"
 
-    def test_feishu_allow_bots_env_takes_precedence_over_config_yaml(self, tmp_path, monkeypatch):
+    def test_feishu_allow_bots_env_takes_precedence_over_config_yaml(
+        self, tmp_path, monkeypatch
+    ):
         ReYMeN_home = tmp_path / ".ReYMeN"
         ReYMeN_home.mkdir()
         config_path = ReYMeN_home / "config.yaml"
@@ -767,7 +821,9 @@ class TestLoadGatewayConfig:
 
         assert os.environ.get("FEISHU_ALLOW_BOTS") == "none"
 
-    def test_invalid_quick_commands_in_config_yaml_are_ignored(self, tmp_path, monkeypatch):
+    def test_invalid_quick_commands_in_config_yaml_are_ignored(
+        self, tmp_path, monkeypatch
+    ):
         ReYMeN_home = tmp_path / ".ReYMeN"
         ReYMeN_home.mkdir()
         config_path = ReYMeN_home / "config.yaml"
@@ -779,7 +835,9 @@ class TestLoadGatewayConfig:
 
         assert config.quick_commands == {}
 
-    def test_bridges_unauthorized_dm_behavior_from_config_yaml(self, tmp_path, monkeypatch):
+    def test_bridges_unauthorized_dm_behavior_from_config_yaml(
+        self, tmp_path, monkeypatch
+    ):
         ReYMeN_home = tmp_path / ".ReYMeN"
         ReYMeN_home.mkdir()
         config_path = ReYMeN_home / "config.yaml"
@@ -795,15 +853,19 @@ class TestLoadGatewayConfig:
         config = load_gateway_config()
 
         assert config.unauthorized_dm_behavior == "ignore"
-        assert config.platforms[Platform.WHATSAPP].extra["unauthorized_dm_behavior"] == "pair"
+        assert (
+            config.platforms[Platform.WHATSAPP].extra["unauthorized_dm_behavior"]
+            == "pair"
+        )
 
-    def test_bridges_telegram_disable_link_previews_from_config_yaml(self, tmp_path, monkeypatch):
+    def test_bridges_telegram_disable_link_previews_from_config_yaml(
+        self, tmp_path, monkeypatch
+    ):
         ReYMeN_home = tmp_path / ".ReYMeN"
         ReYMeN_home.mkdir()
         config_path = ReYMeN_home / "config.yaml"
         config_path.write_text(
-            "telegram:\n"
-            "  disable_link_previews: true\n",
+            "telegram:\n" "  disable_link_previews: true\n",
             encoding="utf-8",
         )
 
@@ -811,9 +873,13 @@ class TestLoadGatewayConfig:
 
         config = load_gateway_config()
 
-        assert config.platforms[Platform.TELEGRAM].extra["disable_link_previews"] is True
+        assert (
+            config.platforms[Platform.TELEGRAM].extra["disable_link_previews"] is True
+        )
 
-    def test_loads_telegram_rich_messages_from_gateway_platform_extra(self, tmp_path, monkeypatch):
+    def test_loads_telegram_rich_messages_from_gateway_platform_extra(
+        self, tmp_path, monkeypatch
+    ):
         ReYMeN_home = tmp_path / ".ReYMeN"
         ReYMeN_home.mkdir()
         config_path = ReYMeN_home / "config.yaml"
@@ -832,7 +898,9 @@ class TestLoadGatewayConfig:
 
         assert config.platforms[Platform.TELEGRAM].extra["rich_messages"] is False
 
-    def test_load_config_default_disables_telegram_rich_messages(self, tmp_path, monkeypatch):
+    def test_load_config_default_disables_telegram_rich_messages(
+        self, tmp_path, monkeypatch
+    ):
         ReYMeN_home = tmp_path / ".ReYMeN"
         ReYMeN_home.mkdir()
 
@@ -844,7 +912,9 @@ class TestLoadGatewayConfig:
 
         assert config["telegram"]["extra"]["rich_messages"] is False
 
-    def test_bridges_telegram_extra_base_url_from_config_yaml(self, tmp_path, monkeypatch):
+    def test_bridges_telegram_extra_base_url_from_config_yaml(
+        self, tmp_path, monkeypatch
+    ):
         ReYMeN_home = tmp_path / ".ReYMeN"
         ReYMeN_home.mkdir()
         config_path = ReYMeN_home / "config.yaml"
@@ -869,8 +939,7 @@ class TestLoadGatewayConfig:
         ReYMeN_home.mkdir()
         config_path = ReYMeN_home / "config.yaml"
         config_path.write_text(
-            "slack:\n"
-            "  notice_delivery: private\n",
+            "slack:\n" "  notice_delivery: private\n",
             encoding="utf-8",
         )
 
@@ -885,8 +954,7 @@ class TestLoadGatewayConfig:
         ReYMeN_home.mkdir()
         config_path = ReYMeN_home / "config.yaml"
         config_path.write_text(
-            "telegram:\n"
-            "  proxy_url: socks5://127.0.0.1:1080\n",
+            "telegram:\n" "  proxy_url: socks5://127.0.0.1:1080\n",
             encoding="utf-8",
         )
 
@@ -896,15 +964,17 @@ class TestLoadGatewayConfig:
         load_gateway_config()
 
         import os
+
         assert os.environ.get("TELEGRAM_PROXY") == "socks5://127.0.0.1:1080"
 
-    def test_telegram_proxy_env_takes_precedence_over_config(self, tmp_path, monkeypatch):
+    def test_telegram_proxy_env_takes_precedence_over_config(
+        self, tmp_path, monkeypatch
+    ):
         ReYMeN_home = tmp_path / ".ReYMeN"
         ReYMeN_home.mkdir()
         config_path = ReYMeN_home / "config.yaml"
         config_path.write_text(
-            "telegram:\n"
-            "  proxy_url: http://from-config:8080\n",
+            "telegram:\n" "  proxy_url: http://from-config:8080\n",
             encoding="utf-8",
         )
 
@@ -914,6 +984,7 @@ class TestLoadGatewayConfig:
         load_gateway_config()
 
         import os
+
         assert os.environ.get("TELEGRAM_PROXY") == "socks5://from-env:1080"
 
 
@@ -942,9 +1013,15 @@ class TestHomeChannelEnvOverrides:
                 Platform.SIGNAL,
                 PlatformConfig(
                     enabled=True,
-                    extra={"http_url": "http://localhost:9090", "account": "+15551234567"},
+                    extra={
+                        "http_url": "http://localhost:9090",
+                        "account": "+15551234567",
+                    },
                 ),
-                {"SIGNAL_HOME_CHANNEL": "+1555000", "SIGNAL_HOME_CHANNEL_NAME": "Phone"},
+                {
+                    "SIGNAL_HOME_CHANNEL": "+1555000",
+                    "SIGNAL_HOME_CHANNEL_NAME": "Phone",
+                },
                 ("+1555000", "Phone"),
             ),
             (
@@ -954,7 +1031,10 @@ class TestHomeChannelEnvOverrides:
                     token="mm-token",
                     extra={"url": "https://mm.example.com"},
                 ),
-                {"MATTERMOST_HOME_CHANNEL": "ch_abc123", "MATTERMOST_HOME_CHANNEL_NAME": "General"},
+                {
+                    "MATTERMOST_HOME_CHANNEL": "ch_abc123",
+                    "MATTERMOST_HOME_CHANNEL_NAME": "General",
+                },
                 ("ch_abc123", "General"),
             ),
             (
@@ -964,7 +1044,10 @@ class TestHomeChannelEnvOverrides:
                     token="syt_abc123",
                     extra={"homeserver": "https://matrix.example.org"},
                 ),
-                {"MATRIX_HOME_ROOM": "!room123:example.org", "MATRIX_HOME_ROOM_NAME": "Bot Room"},
+                {
+                    "MATRIX_HOME_ROOM": "!room123:example.org",
+                    "MATRIX_HOME_ROOM_NAME": "Bot Room",
+                },
                 ("!room123:example.org", "Bot Room"),
             ),
             (
@@ -977,13 +1060,19 @@ class TestHomeChannelEnvOverrides:
                         "smtp_host": "smtp.test.com",
                     },
                 ),
-                {"EMAIL_HOME_ADDRESS": "user@test.com", "EMAIL_HOME_ADDRESS_NAME": "Inbox"},
+                {
+                    "EMAIL_HOME_ADDRESS": "user@test.com",
+                    "EMAIL_HOME_ADDRESS_NAME": "Inbox",
+                },
                 ("user@test.com", "Inbox"),
             ),
             (
                 Platform.SMS,
                 PlatformConfig(enabled=True, api_key="token_abc"),
-                {"SMS_HOME_CHANNEL": "+15559876543", "SMS_HOME_CHANNEL_NAME": "My Phone"},
+                {
+                    "SMS_HOME_CHANNEL": "+15559876543",
+                    "SMS_HOME_CHANNEL_NAME": "My Phone",
+                },
                 ("+15559876543", "My Phone"),
             ),
         ]
@@ -994,5 +1083,7 @@ class TestHomeChannelEnvOverrides:
                 _apply_env_overrides(config)
 
             home = config.platforms[platform].home_channel
-            assert home is not None, f"{platform.value}: home_channel should not be None"
+            assert (
+                home is not None
+            ), f"{platform.value}: home_channel should not be None"
             assert (home.chat_id, home.name) == expected, platform.value

@@ -47,6 +47,7 @@ _VARSAYILAN_SICAKLIK: float = 0.7
 
 # ── Veri Yapıları ────────────────────────────────────────────────────────────
 
+
 @dataclass
 class ProviderYanit:
     """Sağlayıcıdan dönen yanıt.
@@ -59,6 +60,7 @@ class ProviderYanit:
         basarili:   Başarılı mı?
         hata:       Hata mesajı (başarısızsa).
     """
+
     metin: str = ""
     provider: str = ""
     model: str = ""
@@ -69,28 +71,34 @@ class ProviderYanit:
 
 # ── Hata Sınıfları ───────────────────────────────────────────────────────────
 
+
 class ProviderHatasi(Exception):
     """Sağlayıcı çağrıları sırasında oluşan genel hata."""
+
     pass
 
 
 class ProviderGecersizKey(ProviderHatasi):
     """API anahtarı geçersiz (401/403)."""
+
     pass
 
 
 class ProviderKrediBitti(ProviderHatasi):
     """402 Payment Required — kredi bitti."""
+
     pass
 
 
 class ProviderRateLimit(ProviderHatasi):
     """429 — hız sınırı aşıldı."""
+
     pass
 
 
 class ProviderZamanAsimi(ProviderHatasi):
     """İstek zaman aşımı."""
+
     pass
 
 
@@ -98,10 +106,10 @@ class ProviderZamanAsimi(ProviderHatasi):
 
 # Provider → env değişken adları (beyin.py ile uyumlu)
 _PROVIDER_ENV: dict[str, str] = {
-    "deepseek":   "DEEPSEEK_API_KEY",
-    "openai":     "OPENAI_API_KEY",
-    "anthropic":  "ANTHROPIC_API_KEY",
-    "xai":        "XAI_API_KEY",
+    "deepseek": "DEEPSEEK_API_KEY",
+    "openai": "OPENAI_API_KEY",
+    "anthropic": "ANTHROPIC_API_KEY",
+    "xai": "XAI_API_KEY",
     "openrouter": "OPENROUTER_API_KEY",
 }
 
@@ -125,7 +133,9 @@ def _anahtar_bul(provider: str, config: dict[str, Any]) -> str:
             return deger
 
     # 2. config.yaml providers.<name>.api_key
-    prov_conf = (config.get("providers", {}) if isinstance(config, dict) else {}).get(provider, {})
+    prov_conf = (config.get("providers", {}) if isinstance(config, dict) else {}).get(
+        provider, {}
+    )
     deger = prov_conf.get("api_key", "")
     if deger and not deger.startswith("***"):
         return deger
@@ -133,6 +143,7 @@ def _anahtar_bul(provider: str, config: dict[str, Any]) -> str:
     # 3. credential_pool (opsiyonel)
     try:
         from reymen.sistem.credential_persistence import credential_pool  # type: ignore[import]
+
         if env_adi and hasattr(credential_pool, "anahtar_al"):
             deger = credential_pool.anahtar_al(env_adi)  # type: ignore[union-attr]
             if deger:
@@ -142,6 +153,7 @@ def _anahtar_bul(provider: str, config: dict[str, Any]) -> str:
 
     try:
         from reymen.sistem.credential_pool import credential_pool  # type: ignore[import]
+
         if env_adi and hasattr(credential_pool, "anahtar_al"):
             deger = credential_pool.anahtar_al(env_adi)  # type: ignore[union-attr]
             if deger:
@@ -156,6 +168,7 @@ def _anahtar_bul(provider: str, config: dict[str, Any]) -> str:
 
 
 # ── Temel Sınıf ──────────────────────────────────────────────────────────────
+
 
 class ProviderBase(abc.ABC):
     """Tüm sağlayıcıların türemesi gereken soyut temel sınıf.
@@ -298,8 +311,10 @@ class ProviderBase(abc.ABC):
         if not self.hazir_mi():
             return ProviderYanit(
                 metin="",
-                provider=self.ad, model=self._model,
-                basarili=False, hata=f"{self.ad}: API anahtari eksik",
+                provider=self.ad,
+                model=self._model,
+                basarili=False,
+                hata=f"{self.ad}: API anahtari eksik",
             )
         try:
             t0 = time.monotonic()
@@ -308,8 +323,11 @@ class ProviderBase(abc.ABC):
             return yanit
         except Exception as e:
             return ProviderYanit(
-                metin="", provider=self.ad, model=self._model,
-                basarili=False, hata=str(e),
+                metin="",
+                provider=self.ad,
+                model=self._model,
+                basarili=False,
+                hata=str(e),
             )
 
     def chat_stream(
@@ -321,21 +339,28 @@ class ProviderBase(abc.ABC):
         """Streaming LLM yanıtı — token token yield eder."""
         if not self.hazir_mi():
             yield ProviderYanit(
-                metin="", provider=self.ad, model=self._model,
-                basarili=False, hata=f"{self.ad}: API anahtari eksik",
+                metin="",
+                provider=self.ad,
+                model=self._model,
+                basarili=False,
+                hata=f"{self.ad}: API anahtari eksik",
             )
             return
         try:
             yield from self._api_istek_stream(mesajlar, sistem_prompt, **kwargs)
         except Exception as e:
             yanit = ProviderYanit(
-                metin="", provider=self.ad, model=self._model,
-                basarili=False, hata=str(e),
+                metin="",
+                provider=self.ad,
+                model=self._model,
+                basarili=False,
+                hata=str(e),
             )
             return yanit
 
 
 # ── OpenAI-uyumlu Sağlayıcı (ortak taban) ────────────────────────────────────
+
 
 class OpenAIUyumluProvider(ProviderBase):
     """OpenAI /v1/chat/completions endpoint'ine istek atan ortak sınıf.
@@ -374,7 +399,9 @@ class OpenAIUyumluProvider(ProviderBase):
         veri = r.json()
         metin = veri["choices"][0]["message"]["content"] or ""
         return ProviderYanit(
-            metin=metin, provider=self.ad, model=model,
+            metin=metin,
+            provider=self.ad,
+            model=model,
         )
 
     def _api_istek_stream(
@@ -402,7 +429,11 @@ class OpenAIUyumluProvider(ProviderBase):
         }
         son_yanit = ProviderYanit(provider=self.ad, model=model)
         with requests.post(
-            url, headers=headers, json=payload, stream=True, timeout=_TIMEOUT_SANIYE,
+            url,
+            headers=headers,
+            json=payload,
+            stream=True,
+            timeout=_TIMEOUT_SANIYE,
         ) as r:
             r.raise_for_status()
             metin_parcalari: list[str] = []
@@ -429,6 +460,7 @@ class OpenAIUyumluProvider(ProviderBase):
 
 
 # ── Sağlayıcı Sınıfları ──────────────────────────────────────────────────────
+
 
 class DeepseekProvider(OpenAIUyumluProvider):
     ad = "deepseek"
@@ -494,7 +526,9 @@ class AnthropicProvider(ProviderBase):
         veri = r.json()
         metin = veri["content"][0]["text"]
         return ProviderYanit(
-            metin=metin, provider=self.ad, model=model,
+            metin=metin,
+            provider=self.ad,
+            model=model,
         )
 
     def _api_istek_stream(
@@ -523,7 +557,11 @@ class AnthropicProvider(ProviderBase):
         son_yanit = ProviderYanit(provider=self.ad, model=model)
         metin_parcalari: list[str] = []
         with requests.post(
-            url, headers=headers, json=payload, stream=True, timeout=_TIMEOUT_SANIYE,
+            url,
+            headers=headers,
+            json=payload,
+            stream=True,
+            timeout=_TIMEOUT_SANIYE,
         ) as r:
             r.raise_for_status()
             for satir in r.iter_lines():
@@ -550,10 +588,10 @@ class AnthropicProvider(ProviderBase):
 # ── Sağlayıcı Kaydı (Registry) ───────────────────────────────────────────────
 
 _PROVIDER_SINIFLAR: dict[str, type[ProviderBase]] = {
-    "deepseek":   DeepseekProvider,
-    "openai":     OpenAIProvider,
-    "anthropic":  AnthropicProvider,
-    "xai":        XAIProvider,
+    "deepseek": DeepseekProvider,
+    "openai": OpenAIProvider,
+    "anthropic": AnthropicProvider,
+    "xai": XAIProvider,
     "openrouter": OpenRouterProvider,
 }
 
@@ -568,10 +606,10 @@ _FALLBACK_SIRASI: list[str] = [
 
 # Varsayılan model adları (config'de model belirtilmemişse kullanılır)
 _VARSAYILAN_MODELLER: dict[str, str] = {
-    "deepseek":   "deepseek-chat",
-    "openai":     "gpt-4o-mini",
-    "anthropic":  "claude-haiku-4-5-20251001",
-    "xai":        "grok-2-latest",
+    "deepseek": "deepseek-chat",
+    "openai": "gpt-4o-mini",
+    "anthropic": "claude-haiku-4-5-20251001",
+    "xai": "grok-2-latest",
     "openrouter": "deepseek/deepseek-chat",
 }
 
@@ -668,7 +706,11 @@ def saglayiciyi_yapilandir(
         model_adi = model_blok.get("model") or model_blok.get("default", "")
     else:
         provider_adi = config.get("provider", "deepseek")
-        model_adi = config.get("model", {}).get("default", "") if isinstance(config.get("model"), dict) else ""
+        model_adi = (
+            config.get("model", {}).get("default", "")
+            if isinstance(config.get("model"), dict)
+            else ""
+        )
 
     if not model_adi:
         model_adi = _VARSAYILAN_MODELLER.get(provider_adi, "deepseek-chat")

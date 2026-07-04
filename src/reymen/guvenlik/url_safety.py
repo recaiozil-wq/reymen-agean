@@ -20,15 +20,32 @@ YASAKLI_PROTOKOLLER = [
 
 # Guvenilmeyen TLD'ler (genelde kotu amacli)
 RISKLI_TLD = [
-    ".tk", ".ml", ".ga", ".cf", ".gq",  # ucretsiz TLD'ler
-    ".xyz", ".top", ".loan", ".win", ".bid",
+    ".tk",
+    ".ml",
+    ".ga",
+    ".cf",
+    ".gq",  # ucretsiz TLD'ler
+    ".xyz",
+    ".top",
+    ".loan",
+    ".win",
+    ".bid",
 ]
 
 # Riskli anahtar kelimeler (URL icinde)
 RISKLI_KELIMELER = [
-    "login", "verify", "secure", "account",
-    "update", "confirm", "banking", "password",
-    "payment", "wallet", "recover", "2fa",
+    "login",
+    "verify",
+    "secure",
+    "account",
+    "update",
+    "confirm",
+    "banking",
+    "password",
+    "payment",
+    "wallet",
+    "recover",
+    "2fa",
 ]
 
 
@@ -67,6 +84,7 @@ def url_guvenli_mi(url: str) -> tuple[bool, str]:
 def url_temizle(url: str) -> str:
     """URL'den guvensiz parametreleri temizle."""
     import urllib.parse
+
     parsed = urllib.parse.urlparse(url)
     if parsed.query:
         # Sadece guvenli parametrelere izin ver

@@ -23,7 +23,7 @@ from typing import Generator
 
 # ── Sabitler ────────────────────────────────────────────────────────────────
 
-PROJE_KOKU = Path(__file__).resolve().parents[2]          # reymen/ üstü
+PROJE_KOKU = Path(__file__).resolve().parents[2]  # reymen/ üstü
 SISTEM_DIZIN = PROJE_KOKU / "reymen" / "sistem"
 TEST_HEDEF = PROJE_KOKU / "reymen" / "test" / "test_sistem"
 AGENTS_DOSYA = PROJE_KOKU / "AGENTS.md"
@@ -33,21 +33,24 @@ HARIÇ_TUTULAN = frozenset({"main.py", "run_agent.py", "__init__.py"})
 CLI_ÖNEKI = "cli_"
 
 # AGENTS.md'de tutulacak bölüm başlıkları (büyük/küçük harf duyarsız eşleşme)
-AGENTS_KRITIK_BÖLÜMLER = frozenset({
-    "genel bakış",
-    "overview",
-    "mimari",
-    "architecture",
-    "komutlar",
-    "commands",
-    "önemli kurallar",
-    "critical rules",
-    "notlar",
-    "notes",
-})
+AGENTS_KRITIK_BÖLÜMLER = frozenset(
+    {
+        "genel bakış",
+        "overview",
+        "mimari",
+        "architecture",
+        "komutlar",
+        "commands",
+        "önemli kurallar",
+        "critical rules",
+        "notlar",
+        "notes",
+    }
+)
 
 
 # ── Adım 1: Modülleri tara ──────────────────────────────────────────────────
+
 
 def adim1_tara_moduller() -> list[dict]:
     """
@@ -75,11 +78,13 @@ def adim1_tara_moduller() -> list[dict]:
             continue
 
         modul_adi = _modul_adi_hesapla(py_dosya)
-        sonuclar.append({
-            "path": py_dosya,
-            "modul_adi": modul_adi,
-            "fonksiyonlar": fonksiyonlar,
-        })
+        sonuclar.append(
+            {
+                "path": py_dosya,
+                "modul_adi": modul_adi,
+                "fonksiyonlar": fonksiyonlar,
+            }
+        )
 
     print(f"📦 ADIM 1: {len(sonuclar)} modül bulundu")
     return sonuclar
@@ -127,6 +132,7 @@ def _modul_adi_hesapla(dosya: Path) -> str:
 
 
 # ── Adım 2-3: Test üret ve yaz ──────────────────────────────────────────────
+
 
 def adim2_test_uret(modul: dict) -> str:
     """
@@ -214,6 +220,7 @@ def adim3_test_yaz(moduller: list[dict]) -> tuple[int, int]:
 
 # ── Adım 4: Coverage ölç ────────────────────────────────────────────────────
 
+
 def adim4_coverage_olc() -> dict:
     """
     pytest --cov=reymen.sistem çalıştırır.
@@ -229,7 +236,9 @@ def adim4_coverage_olc() -> dict:
         }
     """
     cmd = [
-        sys.executable, "-m", "pytest",
+        sys.executable,
+        "-m",
+        "pytest",
         str(TEST_HEDEF),
         "--cov=reymen.sistem",
         "--cov-report=json:coverage.json",
@@ -287,6 +296,7 @@ def adim4_coverage_olc() -> dict:
 
 # ── Adım 5: AGENTS.md temizle ───────────────────────────────────────────────
 
+
 def adim5_agents_temizle() -> tuple[int, int]:
     """
     AGENTS.md'yi okur; kritik olmayan bölümleri kırpar.
@@ -316,8 +326,7 @@ def adim5_agents_temizle() -> tuple[int, int]:
         if satir.startswith("#"):
             başlık_metni = satir.lstrip("#").strip().lower()
             aktif_bölüm = any(
-                kritik in başlık_metni
-                for kritik in AGENTS_KRITIK_BÖLÜMLER
+                kritik in başlık_metni for kritik in AGENTS_KRITIK_BÖLÜMLER
             )
 
         if aktif_bölüm:
@@ -331,6 +340,7 @@ def adim5_agents_temizle() -> tuple[int, int]:
 
 
 # ── Adım 6: Rapor yaz ───────────────────────────────────────────────────────
+
 
 def adim6_rapor_yaz(
     moduller: list[dict],
@@ -361,6 +371,7 @@ def adim6_rapor_yaz(
 
 
 # ── main ─────────────────────────────────────────────────────────────────────
+
 
 def main() -> None:
     print("=" * 60)

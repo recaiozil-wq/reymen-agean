@@ -147,7 +147,9 @@ def ana():
             p = processes.get(ad)
             if p and p.poll() is not None:
                 # Crash'te restart
-                print(f"[{ad}] CRASH (PID={p.pid}, kod={p.returncode}). Yeniden baslatiliyor...")
+                print(
+                    f"[{ad}] CRASH (PID={p.pid}, kod={p.returncode}). Yeniden baslatiliyor..."
+                )
                 yenisi = bot_baslat(bot)
                 if yenisi:
                     processes[ad] = yenisi

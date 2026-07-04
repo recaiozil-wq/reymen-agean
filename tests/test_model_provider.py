@@ -8,7 +8,12 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 import pytest
-from src.core.model_provider import ProviderChain, ProviderKayit, CalistirSonuc, _provider_fabrikasi
+from src.core.model_provider import (
+    ProviderChain,
+    ProviderKayit,
+    CalistirSonuc,
+    _provider_fabrikasi,
+)
 
 
 class TestProviderChain:

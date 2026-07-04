@@ -37,7 +37,8 @@ class WindowsEventBus:
         with self._lock:
             if olay_tipi in self._dinleyiciler:
                 self._dinleyiciler[olay_tipi] = [
-                    (s, f) for s, f in self._dinleyiciler[olay_tipi]
+                    (s, f)
+                    for s, f in self._dinleyiciler[olay_tipi]
                     if f is not fonksiyon
                 ]
 
@@ -48,11 +49,11 @@ class WindowsEventBus:
 
         # Gecmise ekle
         with self._lock:
-            self._gecmis.append({
-                "tip": olay_tipi, "veri": veri, "zaman": time.monotonic()
-            })
+            self._gecmis.append(
+                {"tip": olay_tipi, "veri": veri, "zaman": time.monotonic()}
+            )
             if len(self._gecmis) > self._maks_gecmis:
-                self._gecmis = self._gecmis[-self._maks_gecmis:]
+                self._gecmis = self._gecmis[-self._maks_gecmis :]
 
         # Dinleyicileri cagir (lock disinda, deadlock riski yok)
         with self._lock:

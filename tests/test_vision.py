@@ -7,9 +7,10 @@ import pytest
 def test_vision_adapter_import():
     """VisionAdapter import edilebiliyor mu?"""
     from reymen.cereyan.conversation_loop import VisionAdapter
+
     va = VisionAdapter()
     assert va is not None
-    assert hasattr(va, '_vision_analiz')
+    assert hasattr(va, "_vision_analiz")
     # Henüz ConversationLoop'a bağlı değil, statik mesaj döndürür
     sonuc = va._vision_analiz("test")
     assert sonuc is not None
@@ -19,6 +20,7 @@ def test_vision_adapter_import():
 def test_vision_tools_import():
     """vision_tools modulu import edilebiliyor mu?"""
     from reymen.cereyan.tools.vision_tools import vision_analiz
+
     assert callable(vision_analiz)
     sonuc = vision_analiz(gorsel_yolu="test.jpg", soru="Bu nedir?")
     assert sonuc is not None
@@ -26,7 +28,18 @@ def test_vision_tools_import():
 
 def test_vision_kelime_tetikleyicileri():
     """Gorsel kelime tetikleyicileri dogru calisiyor mu?"""
-    gorsel_kelimeler = ["foto", "resim", "gorsel", "goruntu", "ekran", "ss", "screenshot", "image", "photo", "picture"]
+    gorsel_kelimeler = [
+        "foto",
+        "resim",
+        "gorsel",
+        "goruntu",
+        "ekran",
+        "ss",
+        "screenshot",
+        "image",
+        "photo",
+        "picture",
+    ]
     test_sorgular = {
         "bu fotoyu analiz et": True,
         "ekran goruntusu al": True,
@@ -42,7 +55,8 @@ def test_vision_kelime_tetikleyicileri():
 def test_vision_url_bulma():
     """URL/resim yolu regex calisiyor mu?"""
     import re
-    pattern = r'https?://[^\s]+\.(jpg|jpeg|png|gif|webp|bmp)'
+
+    pattern = r"https?://[^\s]+\.(jpg|jpeg|png|gif|webp|bmp)"
     testler = {
         "https://example.com/image.jpg": True,
         "https://site.com/foto.png": True,

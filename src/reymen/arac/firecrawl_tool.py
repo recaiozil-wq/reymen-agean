@@ -67,11 +67,13 @@ def firecrawl_web_extract(url: str, format: str = "markdown") -> str:
     url = url.strip()
     api_key = _api_key()
 
-    body = json.dumps({
-        "url": url,
-        "formats": [format],
-        "onlyMainContent": True,
-    }).encode()
+    body = json.dumps(
+        {
+            "url": url,
+            "formats": [format],
+            "onlyMainContent": True,
+        }
+    ).encode()
 
     req = urllib.request.Request(
         f"{_API_BASE}/scrape",
@@ -86,7 +88,11 @@ def firecrawl_web_extract(url: str, format: str = "markdown") -> str:
 
         if sonuc.get("success"):
             data = sonuc.get("data", {})
-            icerik = data.get(format, "") or data.get("markdown", "") or data.get("content", "")
+            icerik = (
+                data.get(format, "")
+                or data.get("markdown", "")
+                or data.get("content", "")
+            )
             metadata = data.get("metadata", {})
             baslik = metadata.get("title", "")
             kaynak_url = metadata.get("sourceURL", url)
@@ -137,11 +143,14 @@ def firecrawl_durum() -> str:
     api_key = _api_key()
     if api_key:
         return "[FIRECRAWL] API key mevcut. Hazır."
-    return ("[FIRECRAWL] API key YOK. FIRECRAWL_API_KEY env var gerekli. "
-            "https://firecrawl.dev'den key alın.")
+    return (
+        "[FIRECRAWL] API key YOK. FIRECRAWL_API_KEY env var gerekli. "
+        "https://firecrawl.dev'den key alın."
+    )
 
 
 # ── Motor kayıt ───────────────────────────────────────────────────────────
+
 
 def motor_kaydet(motor) -> None:
     """Firecrawl tool'larını motora kaydet.
@@ -175,6 +184,7 @@ firecrawl_web_extract = firecrawl_web_extract
 
 if __name__ == "__main__":
     import sys
+
     print(firecrawl_durum())
     print()
     if len(sys.argv) > 1:

@@ -22,7 +22,7 @@ TRAJ_DIZINI = Path(__file__).parent / ".ReYMeN" / "trajectories"
 TRAJ_DIZINI.mkdir(parents=True, exist_ok=True)
 
 SHAREGPT_TAMAMLANDI = TRAJ_DIZINI / "trajectory_samples.jsonl"
-SHAREGPT_BASARISIZ  = TRAJ_DIZINI / "failed_trajectories.jsonl"
+SHAREGPT_BASARISIZ = TRAJ_DIZINI / "failed_trajectories.jsonl"
 
 
 class Trajectory:
@@ -34,13 +34,15 @@ class Trajectory:
         self._tamamlandi = False
 
     def adim_ekle(self, tur: int, dusunce: str, eylem: str, gozlem: str):
-        self.adimlar.append({
-            "tur": tur,
-            "dusunce": dusunce,
-            "eylem": eylem,
-            "gozlem": gozlem[:500],
-            "zaman": datetime.now().isoformat(),
-        })
+        self.adimlar.append(
+            {
+                "tur": tur,
+                "dusunce": dusunce,
+                "eylem": eylem,
+                "gozlem": gozlem[:500],
+                "zaman": datetime.now().isoformat(),
+            }
+        )
 
     def tamamla(self):
         """Gorev basarili bitti olarak isaretle."""
@@ -87,22 +89,30 @@ class Trajectory:
     def _dosya_adi_temizle(metin: str, max_uzunluk: int = 40) -> str:
         """Windows/Linux icin gecersiz karakterleri kaldir."""
         import re
+
         temiz = re.sub(r'[\\/:*?"<>|]', "_", metin)
         temiz = re.sub(r"\s+", "_", temiz)
         return temiz[:max_uzunluk]
 
     def kaydet(self):
         """Ozel ReYMeN JSON formatinda kaydet."""
-        dosya = TRAJ_DIZINI / f"{self._oturum_id}_{self._dosya_adi_temizle(self.hedef)}.json"
+        dosya = (
+            TRAJ_DIZINI
+            / f"{self._oturum_id}_{self._dosya_adi_temizle(self.hedef)}.json"
+        )
         dosya.write_text(
-            json.dumps({
-                "hedef": self.hedef,
-                "model": self.model,
-                "tamamlandi": self._tamamlandi,
-                "adim_sayisi": len(self.adimlar),
-                "adimlar": self.adimlar,
-                "tool_istatistik": self.tool_istatistik(),
-            }, ensure_ascii=False, indent=2),
+            json.dumps(
+                {
+                    "hedef": self.hedef,
+                    "model": self.model,
+                    "tamamlandi": self._tamamlandi,
+                    "adim_sayisi": len(self.adimlar),
+                    "adimlar": self.adimlar,
+                    "tool_istatistik": self.tool_istatistik(),
+                },
+                ensure_ascii=False,
+                indent=2,
+            ),
             encoding="utf-8",
         )
 
@@ -191,8 +201,8 @@ class Trajectory:
 
 if __name__ == "__main__":
     t = Trajectory("test gorevi", model="llama3.1:8b")
-    t.adim_ekle(1, "Dosyayi okumaliyim", "DOSYA_OKU(\"test.txt\")", "Icerik: merhaba")
-    t.adim_ekle(2, "Tamamlandi", "GOREV_BITTI(\"dosya okundu\")", "OK")
+    t.adim_ekle(1, "Dosyayi okumaliyim", 'DOSYA_OKU("test.txt")', "Icerik: merhaba")
+    t.adim_ekle(2, "Tamamlandi", 'GOREV_BITTI("dosya okundu")', "OK")
     t.tamamla()
 
     print("== Ozet ==")
@@ -205,5 +215,7 @@ if __name__ == "__main__":
     t.sharegpt_kaydet(sistem_prompt="Sen bir ajan sistemisin.")
     print(f"\n== ShareGPT kayit: {SHAREGPT_TAMAMLANDI} ==")
     yuklu = Trajectory.sharegpt_yukle()
-    print(f"   {len(yuklu)} giris yuklu, ilk konusma: {len(yuklu[0]['conversations'])} mesaj")
+    print(
+        f"   {len(yuklu)} giris yuklu, ilk konusma: {len(yuklu[0]['conversations'])} mesaj"
+    )
     print("\nTum testler basarili.")

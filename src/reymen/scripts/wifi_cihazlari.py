@@ -11,22 +11,26 @@ SelfHeal test örneği:
 import subprocess, re, sys, json
 from datetime import datetime
 import logging
+
 logger = logging.getLogger(__name__)
 
 # ── 1. Ağ arayüzünü bul ──────────────────────────────────────
+
 
 def aktif_interface_bul() -> str:
     """WiFi arayüzünün IP'sini bul — dynamic ARP entry'si olan tercih edilir."""
     try:
         # Önce arp -a ile dynamic entry'si olan interface'i bul
-        arp_r = subprocess.run(["arp", "-a"], capture_output=True, text=False, timeout=15)
+        arp_r = subprocess.run(
+            ["arp", "-a"], capture_output=True, text=False, timeout=15
+        )
         arp_cikti = arp_r.stdout.decode("utf-8", errors="replace")
 
         # Her interface bloğunu ayır
         bloklar = arp_cikti.split("Interface:")
         for blok in bloklar[1:]:  # ilk blok header
             ilk_satir = blok.splitlines()[0] if blok.splitlines() else ""
-            m_if = re.search(r'(\d+\.\d+\.\d+\.\d+)', ilk_satir)
+            m_if = re.search(r"(\d+\.\d+\.\d+\.\d+)", ilk_satir)
             if not m_if:
                 continue
             if_ip = m_if.group(1)
@@ -38,7 +42,7 @@ def aktif_interface_bul() -> str:
         r = subprocess.run(["ipconfig"], capture_output=True, text=False, timeout=15)
         cikti = r.stdout.decode("utf-8", errors="replace")
         for line in cikti.splitlines():
-            m = re.search(r'IPv4[^:]*:\s*(\d+\.\d+\.\d+\.\d+)', line)
+            m = re.search(r"IPv4[^:]*:\s*(\d+\.\d+\.\d+\.\d+)", line)
             if m:
                 ip = m.group(1)
                 if ip.startswith(("192.168.", "10.")):
@@ -57,6 +61,7 @@ def subnet_bul(ip: str) -> str:
 
 # ── 2. ARP tablosu ──────────────────────────────────────────
 
+
 def arp_tara() -> list[dict]:
     """arp -a komutu ile cihazları bul."""
     cihazlar = []
@@ -65,8 +70,7 @@ def arp_tara() -> list[dict]:
         cikti = r.stdout.decode("utf-8", errors="replace")
         for line in cikti.splitlines():
             m = re.search(
-                r'(\d+\.\d+\.\d+\.\d+)\s+([0-9a-fA-F\-]{17})\s+(dynamic|static)',
-                line
+                r"(\d+\.\d+\.\d+\.\d+)\s+([0-9a-fA-F\-]{17})\s+(dynamic|static)", line
             )
             if m:
                 ip = m.group(1)
@@ -82,36 +86,38 @@ def arp_tara() -> list[dict]:
 
 # ── 3. Nmap taraması ────────────────────────────────────────
 
+
 def nmap_tara(subnet: str) -> list[dict]:
     """nmap -sn ile canlı cihazları tara."""
     cihazlar = []
     try:
         r = subprocess.run(
-            ["nmap", "-sn", subnet],
-            capture_output=True, text=False, timeout=60
+            ["nmap", "-sn", subnet], capture_output=True, text=False, timeout=60
         )
         cikti = r.stdout.decode("utf-8", errors="replace")
         ip_bulundu = None
         for line in cikti.splitlines():
-            m_ip = re.search(r'Nmap scan report for (\d+\.\d+\.\d+\.\d+)', line)
+            m_ip = re.search(r"Nmap scan report for (\d+\.\d+\.\d+\.\d+)", line)
             if m_ip:
                 ip_bulundu = m_ip.group(1)
                 continue
-            m_mac = re.search(r'MAC Address:\s+([0-9A-Fa-f:]{17})', line)
+            m_mac = re.search(r"MAC Address:\s+([0-9A-Fa-f:]{17})", line)
             if m_mac and ip_bulundu:
                 mac = m_mac.group(1).lower()
                 # Uretici bilgisi de var: MAC Address: XX:XX:XX:XX:XX:XX (Intel)
                 uretici = ""
-                u_m = re.search(r'MAC Address:\s+[0-9A-Fa-f:]{17}\s+\((.+)\)', line)
+                u_m = re.search(r"MAC Address:\s+[0-9A-Fa-f:]{17}\s+\((.+)\)", line)
                 if u_m:
                     uretici = u_m.group(1)
                 if not ip_bulundu.startswith(("224.", "239.", "255.")):
-                    cihazlar.append({
-                        "ip": ip_bulundu,
-                        "mac": mac,
-                        "uretici": uretici,
-                        "turu": "dynamic"
-                    })
+                    cihazlar.append(
+                        {
+                            "ip": ip_bulundu,
+                            "mac": mac,
+                            "uretici": uretici,
+                            "turu": "dynamic",
+                        }
+                    )
                 ip_bulundu = None
     except subprocess.TimeoutExpired:
         print("[UYARI] nmap zaman aşımı (60s)")
@@ -123,6 +129,7 @@ def nmap_tara(subnet: str) -> list[dict]:
 
 
 # ── 4. Ana ───────────────────────────────────────────────────
+
 
 def main():
     print("╔══════════════════════════════════════════════╗")
@@ -187,7 +194,7 @@ def main():
         "interface_ip": ip,
         "subnet": subnet,
         "cihaz_sayisi": len(tum_cihazlar),
-        "cihazlar": tum_cihazlar
+        "cihazlar": tum_cihazlar,
     }
     with open("wifi_cihazlari_sonuc.json", "w", encoding="utf-8") as f:
         json.dump(cikti, f, indent=2, ensure_ascii=False)

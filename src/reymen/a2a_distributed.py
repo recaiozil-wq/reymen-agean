@@ -37,6 +37,7 @@ A2A_CONFIG_PATH = PROJE_KOK.parent / ".ReYMeN" / "a2a_nodes.json"
 # Dağıtık A2A Yöneticisi
 # ---------------------------------------------------------------------------
 
+
 class A2ADistributed:
     """Dağıtık A2A node yöneticisi — config dosyası + heartbeat + otomatik bağlan.
 
@@ -139,7 +140,10 @@ class A2ADistributed:
                 time.sleep(interval)
                 for name, node in list(self._nodes.items()):
                     if not self.bagli_mi(name):
-                        logger.warning("[A2A-DIST] %s baglantisi koptu, yeniden baglaniliyor...", name)
+                        logger.warning(
+                            "[A2A-DIST] %s baglantisi koptu, yeniden baglaniliyor...",
+                            name,
+                        )
                         self.baglan(node)
 
         self._heartbeat_thread = threading.Thread(target=_loop, daemon=True)
@@ -192,17 +196,18 @@ _A2A_DIST = None
 def motor_kaydet(motor) -> None:
     """Motor'a dağıtık A2A araçlarını kaydet."""
     motor._plugin_arac_kaydet(
-        "A2A_DIST_BASLAT", _dist_baslat,
+        "A2A_DIST_BASLAT",
+        _dist_baslat,
         "Config dosyasindaki tum uzak A2A node'larina baglan. "
-        "Parametre yok. Config: .ReYMeN/a2a_nodes.json"
+        "Parametre yok. Config: .ReYMeN/a2a_nodes.json",
     )
     motor._plugin_arac_kaydet(
-        "A2A_DIST_DURUM", _dist_durum,
-        "Bagli uzak A2A node'larinin durumunu goster."
+        "A2A_DIST_DURUM", _dist_durum, "Bagli uzak A2A node'larinin durumunu goster."
     )
     motor._plugin_arac_kaydet(
-        "A2A_DIST_GONDER", _dist_gonder,
-        "Tum bagli node'lara mesaj gonder. Parametre: receiver, content"
+        "A2A_DIST_GONDER",
+        _dist_gonder,
+        "Tum bagli node'lara mesaj gonder. Parametre: receiver, content",
     )
     logger.info("[A2A-DIST] Motor'a 3 arac kaydedildi")
 

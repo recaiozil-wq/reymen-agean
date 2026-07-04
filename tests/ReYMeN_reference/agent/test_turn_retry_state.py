@@ -40,9 +40,9 @@ def test_all_guards_default_false():
 
 def test_field_set_matches_contract():
     names = {f.name for f in fields(TurnRetryState)}
-    assert names == EXPECTED_FIELDS, (
-        f"unexpected drift: missing={EXPECTED_FIELDS - names} extra={names - EXPECTED_FIELDS}"
-    )
+    assert (
+        names == EXPECTED_FIELDS
+    ), f"unexpected drift: missing={EXPECTED_FIELDS - names} extra={names - EXPECTED_FIELDS}"
 
 
 def test_loop_control_vars_are_not_on_state():

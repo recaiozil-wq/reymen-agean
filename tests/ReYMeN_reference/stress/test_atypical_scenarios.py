@@ -43,6 +43,7 @@ def scenario(name):
     The returned function is named `_scenario_<name>` so discovery can
     find it in globals() reliably.
     """
+
     def wrap(fn):
         def run():
             home = tempfile.mkdtemp(prefix=f"ReYMeN_atyp_{name}_")
@@ -53,6 +54,7 @@ def scenario(name):
                     del sys.modules[m]
             sys.path.insert(0, str(WT))
             from ReYMeN_cli import kanban_db as kb  # noqa: F401
+
             print(f"\n═══ {name} ═══")
             try:
                 fn(home, kb)
@@ -65,6 +67,7 @@ def scenario(name):
                 msg = f"{name}: unexpected {type(e).__name__}: {e}"
                 FAILURES.append(msg)
                 import traceback
+
                 traceback.print_exc()
                 print(f"  ✗ ERROR: {msg}")
             finally:
@@ -72,16 +75,19 @@ def scenario(name):
                     shutil.rmtree(home)
                 except Exception:
                     pass
+
         run.__name__ = f"_scenario_{name}"
         # Register in a module-level list so discovery is trivial.
         _REGISTERED.append(run)
         return run
+
     return wrap
 
 
 # =============================================================================
 # DATA WEIRDNESS
 # =============================================================================
+
 
 @scenario("unicode_and_emoji")
 def _(home, kb):
@@ -101,9 +107,9 @@ def _(home, kb):
         for title, kind in cases:
             tid = kb.create_task(conn, title=title, assignee="w")
             back = kb.get_task(conn, tid)
-            assert back.title == title, (
-                f"[{kind}] round-trip mismatch: {title!r} → {back.title!r}"
-            )
+            assert (
+                back.title == title
+            ), f"[{kind}] round-trip mismatch: {title!r} → {back.title!r}"
         print(f"  {len(cases)} unicode titles round-tripped")
 
         # Metadata with non-ASCII + emoji
@@ -116,15 +122,16 @@ def _(home, kb):
             "mixed_list": ["normal", "日本語", "🇺🇸"],
         }
         kb.complete_task(
-            conn, tid,
+            conn,
+            tid,
             summary="完成了 📝 résumé",
             metadata=meta,
         )
         run = kb.latest_run(conn, tid)
         assert run.summary == "完成了 📝 résumé", f"summary round-trip failed"
-        assert run.metadata == meta, (
-            f"metadata round-trip failed: {run.metadata} != {meta}"
-        )
+        assert (
+            run.metadata == meta
+        ), f"metadata round-trip failed: {run.metadata} != {meta}"
         print(f"  metadata with CJK + emoji round-tripped")
     finally:
         conn.close()
@@ -143,13 +150,18 @@ def _(home, kb):
         for _ in range(50):
             meta = {"nested": meta}
         tid = kb.create_task(
-            conn, title="huge task", body=huge_body, assignee="w",
+            conn,
+            title="huge task",
+            body=huge_body,
+            assignee="w",
         )
         kb.claim_task(conn, tid)
         kb.complete_task(conn, tid, summary=huge_summary, metadata=meta)
 
         back = kb.get_task(conn, tid)
-        assert back.body == huge_body, f"body truncated: {len(back.body)} vs {len(huge_body)}"
+        assert (
+            back.body == huge_body
+        ), f"body truncated: {len(back.body)} vs {len(huge_body)}"
         run = kb.latest_run(conn, tid)
         assert run.summary == huge_summary
         assert run.metadata == meta
@@ -167,7 +179,7 @@ def _(home, kb):
     try:
         payloads = [
             "'; DROP TABLE tasks; --",
-            "\" OR 1=1 --",
+            '" OR 1=1 --',
             "'; DELETE FROM task_runs; --",
             "Robert'); DROP TABLE students;--",  # Little Bobby Tables
             "\\x00\\x01\\x02",
@@ -175,7 +187,11 @@ def _(home, kb):
         ]
         for p in payloads:
             tid = kb.create_task(
-                conn, title=p, body=p, assignee=p, tenant=p,
+                conn,
+                title=p,
+                body=p,
+                assignee=p,
+                tenant=p,
             )
             back = kb.get_task(conn, tid)
             assert back.title == p
@@ -207,9 +223,9 @@ def _(home, kb):
         assert run.summary == multi, "full summary should survive in kernel"
         # Event payload takes first line (for notifier brevity)
         events = [e for e in kb.list_events(conn, tid) if e.kind == "completed"]
-        assert events[0].payload["summary"] == "line 1", (
-            f"event payload should be first line, got {events[0].payload['summary']!r}"
-        )
+        assert (
+            events[0].payload["summary"] == "line 1"
+        ), f"event payload should be first line, got {events[0].payload['summary']!r}"
         print("  multiline summary preserved on run; first line in event")
     finally:
         conn.close()
@@ -235,9 +251,19 @@ def _(home, kb):
     ]
     for bad in bad_metas:
         r = subprocess.run(
-            [sys.executable, "-m", "ReYMeN_cli.main", "kanban",
-             "complete", tid, "--metadata", bad],
-            capture_output=True, text=True, env=env,
+            [
+                sys.executable,
+                "-m",
+                "ReYMeN_cli.main",
+                "kanban",
+                "complete",
+                tid,
+                "--metadata",
+                bad,
+            ],
+            capture_output=True,
+            text=True,
+            env=env,
         )
         # Should print an error to stderr, exit non-zero, not touch the task
         assert "metadata" in r.stderr.lower() or "json" in r.stderr.lower(), (
@@ -257,6 +283,7 @@ def _(home, kb):
 # DEPENDENCY GRAPH PATHOLOGIES
 # =============================================================================
 
+
 @scenario("dependency_cycle")
 def _(home, kb):
     """A → B → A should be refused. If it's allowed, recompute_ready
@@ -272,22 +299,23 @@ def _(home, kb):
             # If that didn't raise, the kernel allowed a cycle.
             # Verify recompute_ready at least doesn't hang.
             import threading
+
             done = threading.Event()
             result = []
+
             def run():
                 try:
                     result.append(kb.recompute_ready(conn))
                 except Exception as e:
                     result.append(e)
                 done.set()
+
             t = threading.Thread(target=run, daemon=True)
             t.start()
             done.wait(timeout=5)
             if not done.is_set():
                 assert False, "recompute_ready HUNG on cyclic graph"
-            raise AssertionError(
-                "cycle creation was allowed; kernel should reject"
-            )
+            raise AssertionError("cycle creation was allowed; kernel should reject")
         except (ValueError, RuntimeError, sqlite3.IntegrityError) as e:
             # Expected: kernel refuses the cycle
             print(f"  cycle correctly rejected: {e}")
@@ -386,16 +414,19 @@ def _(home, kb):
             kb.create_task(conn, title=f"p{i}", assignee="w") for i in range(500)
         ]
         child = kb.create_task(
-            conn, title="leaf", assignee="w", parents=parents,
+            conn,
+            title="leaf",
+            assignee="w",
+            parents=parents,
         )
         # Complete 499 parents
         for p in parents[:-1]:
             kb.claim_task(conn, p)
             kb.complete_task(conn, p)
         kb.recompute_ready(conn)
-        assert kb.get_task(conn, child).status == "todo", (
-            "child should still be todo with 1/500 parents incomplete"
-        )
+        assert (
+            kb.get_task(conn, child).status == "todo"
+        ), "child should still be todo with 1/500 parents incomplete"
         # Finish the last one
         kb.claim_task(conn, parents[-1])
         kb.complete_task(conn, parents[-1])
@@ -410,6 +441,7 @@ def _(home, kb):
 # WORKSPACE EDGE CASES
 # =============================================================================
 
+
 @scenario("workspace_path_traversal")
 def _(home, kb):
     """`workspace_path='../../../etc/passwd'` or absolute-outside-home
@@ -419,7 +451,8 @@ def _(home, kb):
     try:
         # Direct kernel API — create with an attacker-ish path
         tid = kb.create_task(
-            conn, title="path-traversal",
+            conn,
+            title="path-traversal",
             assignee="w",
             workspace_kind="dir",
             workspace_path="../../../tmp/attacker",
@@ -433,15 +466,20 @@ def _(home, kb):
         # allow escape.
         try:
             from ReYMeN_cli.kanban_db import resolve_workspace
+
             resolved = resolve_workspace(task)
             # If resolve succeeded, check it's actually escape-safe.
             resolved_abs = str(Path(resolved).resolve())
             home_abs = str(Path(os.environ["ReYMeN_HOME"]).resolve())
-            if not resolved_abs.startswith(home_abs) and resolved_abs.startswith("/tmp"):
+            if not resolved_abs.startswith(home_abs) and resolved_abs.startswith(
+                "/tmp"
+            ):
                 # This is escaping the home dir. Whether that's actually
                 # a problem depends on the threat model. Flag for attention.
                 print(f"  ⚠ workspace resolved OUTSIDE ReYMeN_home: {resolved}")
-                print(f"    (not necessarily a bug — dir: workspaces are intentionally arbitrary, but worth documenting)")
+                print(
+                    f"    (not necessarily a bug — dir: workspaces are intentionally arbitrary, but worth documenting)"
+                )
         except Exception as e:
             print(f"  resolve_workspace rejected: {e}")
     finally:
@@ -456,7 +494,9 @@ def _(home, kb):
     conn = kb.connect()
     try:
         tid = kb.create_task(
-            conn, title="bad-workspace", assignee="w",
+            conn,
+            title="bad-workspace",
+            assignee="w",
             workspace_kind="dir",
             workspace_path="/nonexistent/path/that/does/not/exist",
         )
@@ -486,6 +526,7 @@ def _(home, kb):
 # =============================================================================
 # CLOCK SKEW
 # =============================================================================
+
 
 @scenario("clock_skew_start_greater_than_end")
 def _(home, kb):
@@ -526,6 +567,7 @@ def _(home, kb):
 # =============================================================================
 # FILESYSTEM WEIRDNESS
 # =============================================================================
+
 
 @scenario("ReYMeN_home_with_spaces")
 def _(home, kb):
@@ -601,9 +643,9 @@ def _(home, kb):
         conn2 = kb.connect()
         # Should see the task we created via link1
         all_tasks = kb.list_tasks(conn2)
-        assert len(all_tasks) == 1, (
-            f"symlinks to same dir should share DB, got {len(all_tasks)} tasks"
-        )
+        assert (
+            len(all_tasks) == 1
+        ), f"symlinks to same dir should share DB, got {len(all_tasks)} tasks"
         conn2.close()
         print("  symlinks to same ReYMeN_HOME share DB correctly")
     finally:
@@ -618,6 +660,7 @@ def _(home, kb):
 # =============================================================================
 # SCALE EXTREMES
 # =============================================================================
+
 
 @scenario("huge_run_count_on_one_task")
 def _(home, kb):
@@ -635,7 +678,8 @@ def _(home, kb):
             kb._end_run(conn, tid, outcome="reclaimed", summary=f"attempt {i}")
             conn.execute(
                 "UPDATE tasks SET status='ready', claim_lock=NULL, "
-                "claim_expires=NULL WHERE id=?", (tid,),
+                "claim_expires=NULL WHERE id=?",
+                (tid,),
             )
             conn.commit()
         runs = kb.list_runs(conn, tid)
@@ -647,10 +691,14 @@ def _(home, kb):
         # The "Prior attempts" section renders ALL closed runs.
         # For 1000 runs this could produce a massive string.
         # Fair question: is this bounded? Let's measure.
-        print(f"  1000 runs → list_runs OK; build_worker_context = {elapsed:.0f}ms, {len(ctx)} chars")
+        print(
+            f"  1000 runs → list_runs OK; build_worker_context = {elapsed:.0f}ms, {len(ctx)} chars"
+        )
         if len(ctx) > 200_000:
-            print(f"  ⚠ build_worker_context unbounded on retry-heavy tasks "
-                  f"({len(ctx)} chars) — worker context will be huge")
+            print(
+                f"  ⚠ build_worker_context unbounded on retry-heavy tasks "
+                f"({len(ctx)} chars) — worker context will be huge"
+            )
     finally:
         conn.close()
 
@@ -665,7 +713,8 @@ def _(home, kb):
         for t in range(100):
             for i in range(50):
                 kb.create_task(
-                    conn, title=f"tenant-{t}-task-{i}",
+                    conn,
+                    title=f"tenant-{t}-task-{i}",
                     tenant=f"tenant_{t:03d}",
                     assignee="w",
                 )
@@ -675,7 +724,9 @@ def _(home, kb):
         t0 = time.monotonic()
         tasks = kb.list_tasks(conn)
         el_list = (time.monotonic() - t0) * 1000
-        print(f"  5000 tasks / 100 tenants: stats={el_stats:.0f}ms, list={el_list:.0f}ms")
+        print(
+            f"  5000 tasks / 100 tenants: stats={el_stats:.0f}ms, list={el_list:.0f}ms"
+        )
         assert len(tasks) == 5000
     finally:
         conn.close()
@@ -685,8 +736,10 @@ def _(home, kb):
 # CONCURRENCY CORNERS
 # =============================================================================
 
-def _idempotency_race_worker(ReYMeN_home: str, key: str, result_file: str,
-                             barrier_path: str) -> None:
+
+def _idempotency_race_worker(
+    ReYMeN_home: str, key: str, result_file: str, barrier_path: str
+) -> None:
     """Subprocess body for the idempotency race test."""
     os.environ["ReYMeN_HOME"] = ReYMeN_home
     os.environ["HOME"] = ReYMeN_home
@@ -700,8 +753,10 @@ def _idempotency_race_worker(ReYMeN_home: str, key: str, result_file: str,
     conn = kb.connect()
     try:
         tid = kb.create_task(
-            conn, title=f"race pid={os.getpid()}",
-            assignee="w", idempotency_key=key,
+            conn,
+            title=f"race pid={os.getpid()}",
+            assignee="w",
+            idempotency_key=key,
         )
     finally:
         conn.close()
@@ -738,9 +793,9 @@ def _(home, kb):
 
     tids = [open(r).read().strip() for r in results if os.path.exists(r)]
     assert len(tids) == 2, f"only {len(tids)} workers finished"
-    assert tids[0] == tids[1], (
-        f"idempotency key race produced two different tasks: {tids}"
-    )
+    assert (
+        tids[0] == tids[1]
+    ), f"idempotency key race produced two different tasks: {tids}"
     # Also verify there's only ONE row in the DB
     conn = kb.connect()
     try:
@@ -754,10 +809,10 @@ def _(home, kb):
     print(f"  idempotency race: both workers got {tids[0]}")
 
 
-
 # =============================================================================
 # MORE EDGE CASES
 # =============================================================================
+
 
 @scenario("assignee_with_special_chars")
 def _(home, kb):
@@ -780,7 +835,9 @@ def _(home, kb):
             back = kb.get_task(conn, tid)
             # Empty string is coerced to None by kernel, or stored verbatim?
             if a:
-                assert back.assignee == a, f"assignee round-trip: {a!r} → {back.assignee!r}"
+                assert (
+                    back.assignee == a
+                ), f"assignee round-trip: {a!r} → {back.assignee!r}"
         print(f"  {len(assignees)} weird assignee names round-tripped")
     finally:
         conn.close()
@@ -873,7 +930,9 @@ def _(home, kb):
         t0 = time.monotonic()
         ctx = kb.build_worker_context(conn, tid)
         elapsed = (time.monotonic() - t0) * 1000
-        print(f"  1000 comments: list in {elapsed:.0f}ms, context size = {len(ctx)} chars")
+        print(
+            f"  1000 comments: list in {elapsed:.0f}ms, context size = {len(ctx)} chars"
+        )
         if len(ctx) > 200_000:
             print(f"  ⚠ comment thread unbounded in worker context")
     finally:
@@ -921,7 +980,9 @@ def _(home, kb):
     conn = kb.connect()
     try:
         weird_tenant = "line1\nline2\tindented"
-        tid = kb.create_task(conn, title="weird tenant", assignee="w", tenant=weird_tenant)
+        tid = kb.create_task(
+            conn, title="weird tenant", assignee="w", tenant=weird_tenant
+        )
         back = kb.get_task(conn, tid)
         assert back.tenant == weird_tenant
         # board_stats groups by tenant — verify it doesn't fall over
@@ -953,15 +1014,18 @@ def _(home, kb):
 
         # Child with just one parent, cycle it through each state
         for parent, expected in [
-            (p_ready, "todo"),     # parent not done → child stays todo
+            (p_ready, "todo"),  # parent not done → child stays todo
             (p_running, "todo"),
             (p_blocked, "todo"),
             (p_triage, "todo"),
             (p_archived, "todo"),  # archived != done!
-            (p_done, "ready"),     # only done parent unblocks child
+            (p_done, "ready"),  # only done parent unblocks child
         ]:
             child = kb.create_task(
-                conn, title=f"child-of-{parent}", assignee="w", parents=[parent],
+                conn,
+                title=f"child-of-{parent}",
+                assignee="w",
+                parents=[parent],
             )
             kb.recompute_ready(conn)
             actual = kb.get_task(conn, child).status
@@ -987,6 +1051,7 @@ def _(home, kb):
     from fastapi import FastAPI
     from fastapi.testclient import TestClient
     from plugins.kanban.dashboard.plugin_api import router as kanban_router
+
     app = FastAPI()
     app.include_router(kanban_router, prefix="/api/plugins/kanban")
     client = TestClient(app)
@@ -1005,23 +1070,32 @@ def _(home, kb):
     assert r.status_code == 200
 
     # Unicode + emoji
-    r = client.post("/api/plugins/kanban/tasks", json={
-        "title": "📋 deploy 🚀 to 生产",
-        "body": "日本語 body",
-        "assignee": "deploy-bot",
-    })
+    r = client.post(
+        "/api/plugins/kanban/tasks",
+        json={
+            "title": "📋 deploy 🚀 to 生产",
+            "body": "日本語 body",
+            "assignee": "deploy-bot",
+        },
+    )
     assert r.status_code == 200
     tid = r.json()["task"]["id"]
     assert r.json()["task"]["title"] == "📋 deploy 🚀 to 生产"
 
     # Invalid JSON schema — unknown field, pydantic should either ignore or 422
-    r = client.post("/api/plugins/kanban/tasks", json={
-        "title": "fine", "nonexistent_field": "whatever",
-    })
+    r = client.post(
+        "/api/plugins/kanban/tasks",
+        json={
+            "title": "fine",
+            "nonexistent_field": "whatever",
+        },
+    )
     assert r.status_code in {200, 422}
 
     # Priority as non-int
-    r = client.post("/api/plugins/kanban/tasks", json={"title": "prio", "priority": "high"})
+    r = client.post(
+        "/api/plugins/kanban/tasks", json={"title": "prio", "priority": "high"}
+    )
     assert r.status_code == 422, f"string priority should 422, got {r.status_code}"
 
     # PATCH with empty body (no changes requested)
@@ -1030,9 +1104,11 @@ def _(home, kb):
     assert r.status_code in {200, 400}
     print("  dashboard REST handles weird inputs correctly")
 
+
 # =============================================================================
 # RUN ALL
 # =============================================================================
+
 
 def main():
     print(f"Running {len(_REGISTERED)} atypical-scenario tests...")

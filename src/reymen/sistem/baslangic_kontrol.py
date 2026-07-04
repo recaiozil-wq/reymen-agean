@@ -16,31 +16,34 @@ import subprocess
 import time
 from pathlib import Path
 import logging
+
 logger = logging.getLogger(__name__)
 
-OLLAMA_BASE   = "http://localhost:11434"
+OLLAMA_BASE = "http://localhost:11434"
 LMSTUDIO_BASE = "http://localhost:1234"
 _HTTP_TIMEOUT = 3
 
 # Kontrol edilecek harici API anahtarları (env değişken adı → provider adı)
 HARICI_API_ENV = {
-    "DEEPSEEK_API_KEY":  "DeepSeek",
+    "DEEPSEEK_API_KEY": "DeepSeek",
     "ANTHROPIC_API_KEY": "Anthropic",
-    "OPENAI_API_KEY":    "OpenAI",
-    "GROQ_API_KEY":      "Groq",
-    "MOONSHOT_API_KEY":  "Moonshot",
+    "OPENAI_API_KEY": "OpenAI",
+    "GROQ_API_KEY": "Groq",
+    "MOONSHOT_API_KEY": "Moonshot",
 }
 
 # Ollama'dan indirilecek modeller (hafif genel + görsel)
-ONERILIR_MODEL   = "llama3.2:3b"   # küçük ama yetenekli
-GORUNTUSEL_MODEL = "llava:7b"      # görsel/OCR için
+ONERILIR_MODEL = "llama3.2:3b"  # küçük ama yetenekli
+GORUNTUSEL_MODEL = "llava:7b"  # görsel/OCR için
 
 
 # ── Yardımcı fonksiyonlar ─────────────────────────────────────────────────────
 
+
 def _reymen_env_yolu() -> Path:
     """Platform-bagimsiz .env yolu (Windows / Linux / macOS)."""
     import platform
+
     ev = Path.home()
     if platform.system() == "Windows":
         return ev / "AppData" / "Local" / "reymen" / ".env"
@@ -79,6 +82,7 @@ def lmstudio_modeller(base_url: str = LMSTUDIO_BASE) -> list:
     """LM Studio'da yuklü modellerin isim listesini donDur."""
     try:
         import urllib.request
+
         req = urllib.request.Request(
             f"{base_url}/v1/models",
             headers={"Authorization": "Bearer not-needed"},
@@ -93,7 +97,10 @@ def ollama_calisiyor_mu() -> bool:
     """Ollama servisinin calisip calismadigini kontrol et."""
     try:
         import urllib.request
-        with urllib.request.urlopen(f"{OLLAMA_BASE}/api/tags", timeout=_HTTP_TIMEOUT) as r:
+
+        with urllib.request.urlopen(
+            f"{OLLAMA_BASE}/api/tags", timeout=_HTTP_TIMEOUT
+        ) as r:
             return r.status == 200
     except Exception:
         return False
@@ -103,6 +110,7 @@ def ollama_modeller() -> list:
     """Ollama'da yüklü modellerin isim listesini döndür."""
     try:
         import urllib.request
+
         with urllib.request.urlopen(f"{OLLAMA_BASE}/api/tags", timeout=5) as r:
             data = json.loads(r.read().decode())
             return [m["name"] for m in data.get("models", [])]
@@ -120,6 +128,7 @@ def model_indir(model_adi: str) -> bool:
     print(f"\n  İndiriliyor: {model_adi} ...")
     try:
         import urllib.request
+
         istek = json.dumps({"name": model_adi, "stream": True}).encode()
         req = urllib.request.Request(
             f"{OLLAMA_BASE}/api/pull",
@@ -158,6 +167,7 @@ def model_indir(model_adi: str) -> bool:
 
 # ── Ana başlangıç kontrolü ────────────────────────────────────────────────────
 
+
 def baslangic_kontrolu(config: dict) -> dict:
     """
     Program başlangıcında çalışır. Config'i doğrular/günceller.
@@ -168,35 +178,46 @@ def baslangic_kontrolu(config: dict) -> dict:
 
     # 0. Kaydedilmis bulut tercihi var mi? → LM Studio'yu gecersiz kilma
     _BULUT_ENV_MAP = {
-        "deepseek":   "DEEPSEEK_API_KEY",
-        "openai":     "OPENAI_API_KEY",
-        "anthropic":  "ANTHROPIC_API_KEY",
-        "groq":       "GROQ_API_KEY",
+        "deepseek": "DEEPSEEK_API_KEY",
+        "openai": "OPENAI_API_KEY",
+        "anthropic": "ANTHROPIC_API_KEY",
+        "groq": "GROQ_API_KEY",
         "openrouter": "OPENROUTER_API_KEY",
     }
     try:
         _setup_dosya = Path(__file__).parent / ".ReYMeN" / "setup.json"
         if _setup_dosya.exists():
             _saved = json.loads(_setup_dosya.read_text(encoding="utf-8"))
-            _tercih_prov  = _saved.get("tercih_provider", "")
+            _tercih_prov = _saved.get("tercih_provider", "")
             _tercih_model = _saved.get("tercih_model", "")
-            if _tercih_prov and _tercih_prov not in ("lmstudio", "ollama") and _tercih_model:
+            if (
+                _tercih_prov
+                and _tercih_prov not in ("lmstudio", "ollama")
+                and _tercih_model
+            ):
                 _env_key = _BULUT_ENV_MAP.get(_tercih_prov, "")
                 if _env_key and os.environ.get(_env_key, "").strip():
                     config["default_provider"] = _tercih_prov
-                    config["default_model"]    = _tercih_model
+                    config["default_model"] = _tercih_model
                     return config
     except Exception as _baslangi_e186:
         print(f"[UYARI] baslangic_kontrol.py:187 - {_baslangi_e186}")
 
     # 1. LM Studio kontrolü (API anahtarına gerek yok)
-    ls_url = config.get("providers", {}).get("lmstudio", {}).get("base_url", LMSTUDIO_BASE)
+    ls_url = (
+        config.get("providers", {}).get("lmstudio", {}).get("base_url", LMSTUDIO_BASE)
+    )
     ls_modeller = lmstudio_modeller(ls_url)
     if ls_modeller:
-        vizyon_m = next((m for m in ls_modeller if "llava" in m.lower() or "vision" in m.lower()), None)
+        vizyon_m = next(
+            (m for m in ls_modeller if "llava" in m.lower() or "vision" in m.lower()),
+            None,
+        )
         if vizyon_m:
-            config.setdefault("auxiliary", {}).setdefault("vision", {})["model"] = vizyon_m
-        config["default_model"]    = ls_modeller[0]
+            config.setdefault("auxiliary", {}).setdefault("vision", {})["model"] = (
+                vizyon_m
+            )
+        config["default_model"] = ls_modeller[0]
         config["default_provider"] = "lmstudio"
         return config
 
@@ -204,7 +225,7 @@ def baslangic_kontrolu(config: dict) -> dict:
     aktif_api = api_anahtari_var_mi()
     if aktif_api:
         provider_listesi = ", ".join(aktif_api.keys())
-        return config   # Ollama'ya gerek yok
+        return config  # Ollama'ya gerek yok
 
     # 3. API yok → Ollama zorunlu
     print("\n  LM Studio ve harici API anahtarı bulunamadı.")
@@ -219,7 +240,11 @@ def baslangic_kontrolu(config: dict) -> dict:
         print("    3. LM Studio'yu baslatın")
         print("    4. API anahtarı ekleyin (.env dosyasına DEEPSEEK_API_KEY vb.)")
         print()
-        yanit = input("  Ollama zaten calisıyor, tekrar kontrol et? [e/h]: ").strip().lower()
+        yanit = (
+            input("  Ollama zaten calisıyor, tekrar kontrol et? [e/h]: ")
+            .strip()
+            .lower()
+        )
         if yanit == "e" and ollama_calisiyor_mu():
             print("  Ollama baglantısı saglandi.")
         else:
@@ -246,7 +271,9 @@ def baslangic_kontrolu(config: dict) -> dict:
 
         if yanit == "İ" or yanit == "I":
             # Genel model — sadece listede yoksa indir
-            genel_yuklu = any(ONERILIR_MODEL.split(":")[0] in m for m in mevcut_modeller)
+            genel_yuklu = any(
+                ONERILIR_MODEL.split(":")[0] in m for m in mevcut_modeller
+            )
             if not genel_yuklu:
                 model_indir(ONERILIR_MODEL)
             else:
@@ -269,7 +296,9 @@ def baslangic_kontrolu(config: dict) -> dict:
         print(f"\n  Görsel model hazır: {llava_adi}")
 
     # 5. Varsayılan provider'ı Ollama'ya ayarla
-    if not config.get("default_provider") or config["default_provider"] in ("lmstudio",):
+    if not config.get("default_provider") or config["default_provider"] in (
+        "lmstudio",
+    ):
         if mevcut_modeller:
             config["default_provider"] = "ollama"
             config["default_model"] = mevcut_modeller[0]
@@ -283,6 +312,7 @@ def baslangic_kontrolu(config: dict) -> dict:
     # 6. Arka planda güncelleme kontrolü başlat (kullanıcıyı bekletmez)
     try:
         from reymen.sistem.guncelle import arka_plan_baslat
+
         arka_plan_baslat()
     except ImportError as _baslangi_e284:
         print(f"[UYARI] baslangic_kontrol.py:285 - {_baslangi_e284}")
@@ -292,22 +322,37 @@ def baslangic_kontrolu(config: dict) -> dict:
 
 # Bulut sağlayıcı → (model_adi, aciklama) listesi
 _BULUT_MODELLER = {
-    "deepseek":  [("deepseek-chat", "DeepSeek Chat"), ("deepseek-reasoner", "DeepSeek Reasoner")],
-    "openai":    [("gpt-4o", "GPT-4o"), ("gpt-4o-mini", "GPT-4o Mini")],
-    "anthropic": [("claude-haiku-4-5-20251001", "Claude Haiku 4.5"), ("claude-sonnet-4-6", "Claude Sonnet 4.6")],
-    "groq":      [("llama-3.1-70b-versatile", "LLaMA 3.1 70B (Groq)"), ("mixtral-8x7b-32768", "Mixtral 8x7B")],
-    "moonshot":  [("moonshot-v1-8k", "Moonshot 8k"), ("moonshot-v1-32k", "Moonshot 32k")],
+    "deepseek": [
+        ("deepseek-chat", "DeepSeek Chat"),
+        ("deepseek-reasoner", "DeepSeek Reasoner"),
+    ],
+    "openai": [("gpt-4o", "GPT-4o"), ("gpt-4o-mini", "GPT-4o Mini")],
+    "anthropic": [
+        ("claude-haiku-4-5-20251001", "Claude Haiku 4.5"),
+        ("claude-sonnet-4-6", "Claude Sonnet 4.6"),
+    ],
+    "groq": [
+        ("llama-3.1-70b-versatile", "LLaMA 3.1 70B (Groq)"),
+        ("mixtral-8x7b-32768", "Mixtral 8x7B"),
+    ],
+    "moonshot": [
+        ("moonshot-v1-8k", "Moonshot 8k"),
+        ("moonshot-v1-32k", "Moonshot 32k"),
+    ],
 }
 
 # Bulut provider → env degisken adi
 _BULUT_ENV = {
-    "deepseek": "DEEPSEEK_API_KEY", "openai": "OPENAI_API_KEY",
-    "anthropic": "ANTHROPIC_API_KEY", "groq": "GROQ_API_KEY",
+    "deepseek": "DEEPSEEK_API_KEY",
+    "openai": "OPENAI_API_KEY",
+    "anthropic": "ANTHROPIC_API_KEY",
+    "groq": "GROQ_API_KEY",
     "moonshot": "MOONSHOT_API_KEY",
 }
 
 
 # ── /model komutu ─────────────────────────────────────────────────────────────
+
 
 def model_degistir(agent) -> bool:
     """
@@ -319,8 +364,12 @@ def model_degistir(agent) -> bool:
         False → iptal
     """
     mevcut_p = agent.config.get("default_provider", "?")
-    mevcut_m = agent.config.get("default_model",    "?")
-    ls_url   = agent.config.get("providers", {}).get("lmstudio", {}).get("base_url", LMSTUDIO_BASE)
+    mevcut_m = agent.config.get("default_model", "?")
+    ls_url = (
+        agent.config.get("providers", {})
+        .get("lmstudio", {})
+        .get("base_url", LMSTUDIO_BASE)
+    )
 
     print(f"\n  Mevcut: [{mevcut_p}] {mevcut_m}")
     print("  " + "─" * 50)
@@ -382,14 +431,18 @@ def model_degistir(agent) -> bool:
             return False
     else:
         # İsim ile kısmi eşleşme
-        eslesen = [(p, m, a) for p, m, a in secenekler if yanit.lower() in m.lower() or yanit.lower() in a.lower()]
+        eslesen = [
+            (p, m, a)
+            for p, m, a in secenekler
+            if yanit.lower() in m.lower() or yanit.lower() in a.lower()
+        ]
         if not eslesen:
             print(f"  '{yanit}' adında model bulunamadı.")
             return False
         yeni_provider, yeni_model, _ = eslesen[0]
 
     # Agent config'ini guncelle
-    agent.config["default_model"]    = yeni_model
+    agent.config["default_model"] = yeni_model
     agent.config["default_provider"] = yeni_provider
 
     if yeni_provider == "ollama":
@@ -403,10 +456,13 @@ def model_degistir(agent) -> bool:
         print(f"  {yeni_provider} kontrol ediliyor...")
         import urllib.request as _ureq
         import urllib.error as _uerr
+
         try:
             prov_conf = agent.config.get("providers", {}).get(yeni_provider, {})
             base_url = prov_conf.get("base_url", "")
-            api_key = prov_conf.get("api_key", "") or _env_deger(_BULUT_ENV.get(yeni_provider, ""))
+            api_key = prov_conf.get("api_key", "") or _env_deger(
+                _BULUT_ENV.get(yeni_provider, "")
+            )
             if not api_key:
                 print(f"  [HATA] API anahtari bulunamadi ({yeni_provider})")
                 return False
@@ -437,11 +493,13 @@ def model_degistir(agent) -> bool:
     # Provider'i yeniden olustur
     try:
         from reymen.cereyan.beyin import Beyin
+
         yeni_beyin = Beyin(agent.config)
         agent.provider = yeni_beyin
         # planlayici da yenile (Planlayici(provider) alıyor)
         try:
             from reymen.cereyan.planlayici import Planlayici
+
             agent.planlayici = Planlayici(agent.provider)
         except Exception as _baslangi_e443:
             print(f"[UYARI] baslangic_kontrol.py:444 - {_baslangi_e443}")

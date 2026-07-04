@@ -23,6 +23,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Callable, Awaitable
 
 from pathlib import Path as _Path
+
 sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
 from src.gateways.config import Platform, PlatformConfig
@@ -42,6 +43,7 @@ logger = logging.getLogger(__name__)
 
 try:
     import httpx
+
     HTTPX_AVAILABLE = True
 except ImportError:
     HTTPX_AVAILABLE = False
@@ -55,11 +57,13 @@ def check_feishu_requirements() -> bool:
         return True
     try:
         from reymen.cron.hermes_stubs import ensure as _lazy_ensure
+
         _lazy_ensure("platform.feishu", prompt=False)
     except Exception:
         return False
     try:
         import httpx as _httpx
+
         httpx = _httpx
         HTTPX_AVAILABLE = True
         return True
@@ -107,7 +111,9 @@ class FeishuAdapter(BasePlatformAdapter):
     def __init__(self, config: PlatformConfig):
         super().__init__(config, Platform.FEISHU)
         self._app_id: str = _env("FEISHU_APP_ID", config.extra.get("app_id", ""))
-        self._app_secret: str = _env("FEISHU_APP_SECRET", config.extra.get("app_secret", ""))
+        self._app_secret: str = _env(
+            "FEISHU_APP_SECRET", config.extra.get("app_secret", "")
+        )
 
         self._client: Optional[httpx.AsyncClient] = None
         self._tenant_access_token: Optional[str] = None
@@ -329,7 +335,11 @@ class FeishuAdapter(BasePlatformAdapter):
                     msg,
                 )
                 # Token suresi dolmus olabilir, yenilemeyi dene
-                retryable = code in (99991663, 99991664, 99991668)  # token-related hatalar
+                retryable = code in (
+                    99991663,
+                    99991664,
+                    99991668,
+                )  # token-related hatalar
                 if retryable:
                     self._tenant_access_token = None
                 return SendResult(

@@ -13,6 +13,7 @@ Kullanim:
     python self_improvement.py              -- Analiz yap ve rapor goster
     python self_improvement.py --uygula    -- Onerileri uygula (SOUL.md guncelle)
 """
+
 import json
 import sys
 from datetime import datetime, timezone
@@ -33,6 +34,7 @@ class OzGelistirmeMotoru:
         """SQLite oturum gunlugundan hatalari analiz et."""
         try:
             import sqlite3
+
             db = ROOT.parent / "merkez_db" / "session_cereyan.db"
             if not db.exists():
                 return {"hata_sayisi": 0, "en_sik_hatalar": [], "basarisiz_araclar": []}
@@ -68,6 +70,7 @@ class OzGelistirmeMotoru:
         """Tamamlanan gorevleri analiz et, eksik beceri alanlari bul."""
         try:
             import sqlite3
+
             db = ROOT.parent / "merkez_db" / "session_cereyan.db"
             if not db.exists():
                 return []
@@ -116,11 +119,17 @@ Format:
         basarisiz = dict(analiz.get("basarisiz_araclar", []))
 
         if basarisiz.get("KOMUT_CALISTIR", 0) > 3:
-            oneriler.append("1. KOMUT_CALISTIR yerine PYTHON_CALISTIR tercih et — daha guvenilir sandbox")
+            oneriler.append(
+                "1. KOMUT_CALISTIR yerine PYTHON_CALISTIR tercih et — daha guvenilir sandbox"
+            )
         if basarisiz.get("TARAYICI_AC", 0) > 2:
-            oneriler.append("2. TARAYICI_AC basarisizsa WEB_ARA'ya don — Playwright gerekmez")
+            oneriler.append(
+                "2. TARAYICI_AC basarisizsa WEB_ARA'ya don — Playwright gerekmez"
+            )
         if basarisiz.get("EKRAN_TIKLA", 0) > 2:
-            oneriler.append("3. EKRAN_TIKLA oncesi EKRAN_NISAN kullan — hedef noktayi dogrula")
+            oneriler.append(
+                "3. EKRAN_TIKLA oncesi EKRAN_NISAN kullan — hedef noktayi dogrula"
+            )
         if not oneriler:
             oneriler = [
                 "1. Her islemden once HAFIZA_ARA yap — benzer gecmis tecrubelerden yararlan",
@@ -175,6 +184,7 @@ if __name__ == "__main__":
     try:
         from reymen.cereyan.beyin import Beyin
         from reymen.sistem.main import CONFIG
+
         prov = Beyin(CONFIG)
     except Exception:
         prov = None

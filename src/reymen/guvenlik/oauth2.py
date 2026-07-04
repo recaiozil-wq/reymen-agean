@@ -35,9 +35,11 @@ PROJE_KOK = Path(__file__).resolve().parent.parent.parent
 # Veri yapıları
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class OAuth2Token:
     """Bir OAuth2 provider'dan alınan token bilgisi."""
+
     access_token: str
     token_type: str = "Bearer"
     expires_in: int = 3600
@@ -55,7 +57,8 @@ class OAuth2Token:
 @dataclass
 class OAuth2UserInfo:
     """Provider'dan dönen kullanıcı bilgisi (normalleştirilmiş)."""
-    provider_id: str          # provider içindeki unique ID
+
+    provider_id: str  # provider içindeki unique ID
     email: str = ""
     display_name: str = ""
     avatar_url: str = ""
@@ -65,6 +68,7 @@ class OAuth2UserInfo:
 # ---------------------------------------------------------------------------
 # OAuth2Provider ABC
 # ---------------------------------------------------------------------------
+
 
 class OAuth2Provider(ABC):
     """OAuth2 sağlayıcı temel sınıfı.
@@ -184,10 +188,11 @@ class OAuth2Provider(ABC):
 # Hata sınıfı
 # ---------------------------------------------------------------------------
 
+
 class OAuth2ProviderError(Exception):
     """OAuth2 işlemleri sırasında oluşan hata."""
-    def __init__(self, message: str, provider: str = "",
-                 status_code: int = 0):
+
+    def __init__(self, message: str, provider: str = "", status_code: int = 0):
         self.provider = provider
         self.status_code = status_code
         super().__init__(message)
@@ -196,6 +201,7 @@ class OAuth2ProviderError(Exception):
 # ---------------------------------------------------------------------------
 # GoogleOAuth2Provider
 # ---------------------------------------------------------------------------
+
 
 class GoogleOAuth2Provider(OAuth2Provider):
     """Google OAuth2 sağlayıcısı.
@@ -239,6 +245,7 @@ class GoogleOAuth2Provider(OAuth2Provider):
 # DiscordOAuth2Provider
 # ---------------------------------------------------------------------------
 
+
 class DiscordOAuth2Provider(OAuth2Provider):
     """Discord OAuth2 sağlayıcısı.
 
@@ -274,14 +281,12 @@ class DiscordOAuth2Provider(OAuth2Provider):
         if avatar_hash and user_id:
             ext = "gif" if avatar_hash.startswith("a_") else "png"
             avatar_url = (
-                f"https://cdn.discordapp.com/avatars/"
-                f"{user_id}/{avatar_hash}.{ext}"
+                f"https://cdn.discordapp.com/avatars/" f"{user_id}/{avatar_hash}.{ext}"
             )
         return OAuth2UserInfo(
             provider_id=user_id,
             email=raw.get("email", ""),
-            display_name=raw.get("global_name")
-                        or raw.get("username", ""),
+            display_name=raw.get("global_name") or raw.get("username", ""),
             avatar_url=avatar_url,
             raw=raw,
         )
@@ -290,6 +295,7 @@ class DiscordOAuth2Provider(OAuth2Provider):
 # ---------------------------------------------------------------------------
 # OAuth2Registry (singleton)
 # ---------------------------------------------------------------------------
+
 
 class OAuth2Registry:
     """OAuth2 provider registry — singleton pattern."""
@@ -307,9 +313,7 @@ class OAuth2Registry:
         if not provider.provider_id:
             raise ValueError("OAuth2Provider.provider_id boş olamaz")
         self._providers[provider.provider_id] = provider
-        logger.info(
-            "[OAuth2Registry] Kaydedildi: %s", provider.provider_id
-        )
+        logger.info("[OAuth2Registry] Kaydedildi: %s", provider.provider_id)
 
     def get(self, provider_id: str) -> Optional[OAuth2Provider]:
         return self._providers.get(provider_id)
@@ -327,6 +331,7 @@ class OAuth2Registry:
 # ---------------------------------------------------------------------------
 # Token Storage — JSON file
 # ---------------------------------------------------------------------------
+
 
 class OAuth2TokenStorage:
     """OAuth2 token'larını .ReYMeN/oauth/tokens.json'da saklar."""
@@ -351,15 +356,18 @@ class OAuth2TokenStorage:
             encoding="utf-8",
         )
 
-    def get_token(self, provider_id: str, user_id: str = "default") -> Optional[OAuth2Token]:
+    def get_token(
+        self, provider_id: str, user_id: str = "default"
+    ) -> Optional[OAuth2Token]:
         data = self._load()
         token_data = data.get(provider_id, {}).get(user_id)
         if token_data:
             return OAuth2Token(**token_data)
         return None
 
-    def save_token(self, provider_id: str, token: OAuth2Token,
-                   user_id: str = "default") -> None:
+    def save_token(
+        self, provider_id: str, token: OAuth2Token, user_id: str = "default"
+    ) -> None:
         data = self._load()
         if provider_id not in data:
             data[provider_id] = {}
@@ -380,16 +388,19 @@ class OAuth2TokenStorage:
         result = []
         for provider_id, users in data.items():
             for user_id in users:
-                result.append({
-                    "provider": provider_id,
-                    "user_id": user_id,
-                })
+                result.append(
+                    {
+                        "provider": provider_id,
+                        "user_id": user_id,
+                    }
+                )
         return result
 
 
 # ---------------------------------------------------------------------------
 # OAuth2Manager — full flow
 # ---------------------------------------------------------------------------
+
 
 class OAuth2Manager:
     """OAuth2 akış yöneticisi.
@@ -402,15 +413,17 @@ class OAuth2Manager:
         new_token = manager.refresh_token("google", token.refresh_token)
     """
 
-    def __init__(self,
-                 registry: OAuth2Registry | None = None,
-                 storage: OAuth2TokenStorage | None = None):
+    def __init__(
+        self,
+        registry: OAuth2Registry | None = None,
+        storage: OAuth2TokenStorage | None = None,
+    ):
         self.registry = registry or oauth2_registry
         self.storage = storage or token_storage
 
-    def get_auth_url(self, provider_id: str,
-                     state: str = "",
-                     redirect_uri: str = "") -> str:
+    def get_auth_url(
+        self, provider_id: str, state: str = "", redirect_uri: str = ""
+    ) -> str:
         """Kullanıcıyı OAuth2 onay sayfasına yönlendirecek URL."""
         provider = self.registry.get(provider_id)
         if not provider:
@@ -420,8 +433,9 @@ class OAuth2Manager:
             )
         return provider.get_auth_url(state=state, redirect_uri=redirect_uri)
 
-    def exchange_code(self, provider_id: str, code: str,
-                      redirect_uri: str = "") -> OAuth2Token:
+    def exchange_code(
+        self, provider_id: str, code: str, redirect_uri: str = ""
+    ) -> OAuth2Token:
         """Authorization code ile token al ve kaydet."""
         provider = self.registry.get(provider_id)
         if not provider:
@@ -444,15 +458,12 @@ class OAuth2Manager:
             user_info = provider.normalize_user_info(user_raw)
             token.user_id = user_info.provider_id
         except Exception as e:
-            logger.warning(
-                "[OAuth2Manager] Kullanıcı bilgisi alınamadı: %s", e
-            )
+            logger.warning("[OAuth2Manager] Kullanıcı bilgisi alınamadı: %s", e)
         # Token'ı kaydet
         self.storage.save_token(provider_id, token)
         return token
 
-    def get_user_info(self, provider_id: str,
-                      access_token: str) -> OAuth2UserInfo:
+    def get_user_info(self, provider_id: str, access_token: str) -> OAuth2UserInfo:
         """Access token ile kullanıcı bilgisi al."""
         provider = self.registry.get(provider_id)
         if not provider:
@@ -463,8 +474,7 @@ class OAuth2Manager:
         raw = provider.get_user_info(access_token)
         return provider.normalize_user_info(raw)
 
-    def refresh_token(self, provider_id: str,
-                      refresh_token: str) -> OAuth2Token:
+    def refresh_token(self, provider_id: str, refresh_token: str) -> OAuth2Token:
         """Refresh token ile yeni access token al ve kaydet."""
         provider = self.registry.get(provider_id)
         if not provider:

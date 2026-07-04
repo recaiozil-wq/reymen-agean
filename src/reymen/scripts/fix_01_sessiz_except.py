@@ -6,24 +6,56 @@ Test  : Her düzeltilen dosyayı ast.parse ile doğrular
 Rapor : fix_01_rapor.json + konsol özeti
 Kullanım: python fix_01_sessiz_except.py [proje_koku]
 """
+
 import ast, os, sys, json, re, shutil, time
 from pathlib import Path
 from datetime import datetime
 
+
 class C:
-    RED="\033[91m"; YEL="\033[93m"; GRN="\033[92m"; BLU="\033[94m"; BOLD="\033[1m"; RESET="\033[0m"
+    RED = "\033[91m"
+    YEL = "\033[93m"
+    GRN = "\033[92m"
+    BLU = "\033[94m"
+    BOLD = "\033[1m"
+    RESET = "\033[0m"
 
-def ok(m):   print(f"  {C.GRN}✅ {m}{C.RESET}")
-def warn(m): print(f"  {C.YEL}⚠️  {m}{C.RESET}")
-def err(m):  print(f"  {C.RED}❌ {m}{C.RESET}")
-def hdr(t):  print(f"\n{C.BOLD}{C.BLU}{'═'*60}\n  {t}\n{'═'*60}{C.RESET}")
 
-EXCLUDE = {"__pycache__", ".venv", "venv", "site-packages", ".git", "node_modules", "bot_venv"}
-LOGGER_IMPORT = 'import logging\nlogger = logging.getLogger(__name__)'
+def ok(m):
+    print(f"  {C.GRN}✅ {m}{C.RESET}")
+
+
+def warn(m):
+    print(f"  {C.YEL}⚠️  {m}{C.RESET}")
+
+
+def err(m):
+    print(f"  {C.RED}❌ {m}{C.RESET}")
+
+
+def hdr(t):
+    print(f"\n{C.BOLD}{C.BLU}{'═'*60}\n  {t}\n{'═'*60}{C.RESET}")
+
+
+EXCLUDE = {
+    "__pycache__",
+    ".venv",
+    "venv",
+    "site-packages",
+    ".git",
+    "node_modules",
+    "bot_venv",
+}
+LOGGER_IMPORT = "import logging\nlogger = logging.getLogger(__name__)"
+
 
 def logger_ekle(src: str) -> str:
     """Dosyada logger tanımı yoksa, import'lardan sonra logger satırını ekle."""
-    if "logger = logging.getLogger" in src or "logger = getLogger" in src or "from hermes_tools" in src:
+    if (
+        "logger = logging.getLogger" in src
+        or "logger = getLogger" in src
+        or "from hermes_tools" in src
+    ):
         return src
     lines = src.splitlines(keepends=True)
     # import satırlarından sonra ekle
@@ -40,10 +72,13 @@ def logger_ekle(src: str) -> str:
     lines.insert(insert_at, LOGGER_IMPORT + "\n")
     return "".join(lines)
 
+
 def except_duzelt(src: str) -> tuple[str, int]:
     """Sessiz except bloklarını logger.warning'e çevir. Düzeltme sayısını döndür."""
-    try: tree = ast.parse(src)
-    except SyntaxError: return src, 0
+    try:
+        tree = ast.parse(src)
+    except SyntaxError:
+        return src, 0
 
     duzeltmeler = []
     for node in ast.walk(tree):
@@ -75,13 +110,15 @@ def except_duzelt(src: str) -> tuple[str, int]:
                 exc_type = "Exception"
 
             dosya_adi = os.path.basename(sys.argv[0]).replace(".py", "")
-            
+
             if node.name:
                 # except X as e: → e kullan
-                warning_line = f"    logger.warning(\"[{dosya_adi}] {exc_type}: %s\", {node.name})"
+                warning_line = (
+                    f'    logger.warning("[{dosya_adi}] {exc_type}: %s", {node.name})'
+                )
             else:
                 # except: → traceback ekle
-                warning_line = f"    logger.warning(\"[{dosya_adi}] {exc_type}\")"
+                warning_line = f'    logger.warning("[{dosya_adi}] {exc_type}")'
 
             duzeltmeler.append((lineno, warning_line))
 
@@ -101,6 +138,7 @@ def except_duzelt(src: str) -> tuple[str, int]:
 
     return "".join(lines), len(duzeltmeler)
 
+
 def dosya_test_et(yol: Path) -> tuple[bool, str]:
     try:
         src = yol.read_text(encoding="utf-8", errors="ignore")
@@ -109,20 +147,35 @@ def dosya_test_et(yol: Path) -> tuple[bool, str]:
     except SyntaxError as e:
         return False, f"SyntaxError: {e}"
 
+
 def main():
     kok = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else Path(".").resolve()
     hdr(f"FIX 01 — Sessiz Except Temizleyici\nKök: {kok}")
     t0 = time.time()
-    rapor = {"tarih": datetime.now().isoformat(), "kok": str(kok), "islenen": [], "atlanan": [], "test_hata": [], "toplam_duzeltme": 0, "test_gecen": []}
+    rapor = {
+        "tarih": datetime.now().isoformat(),
+        "kok": str(kok),
+        "islenen": [],
+        "atlanan": [],
+        "test_hata": [],
+        "toplam_duzeltme": 0,
+        "test_gecen": [],
+    }
 
     py_files = sorted(kok.rglob("*.py"))
-    py_files = [f for f in py_files if not any(p in str(f) for p in EXCLUDE) and "test" not in f.name.lower()]
+    py_files = [
+        f
+        for f in py_files
+        if not any(p in str(f) for p in EXCLUDE) and "test" not in f.name.lower()
+    ]
 
     print(f"  Taranan dosya: {len(py_files)}")
 
     for f in py_files:
-        try: src = f.read_text(encoding="utf-8", errors="ignore")
-        except Exception: continue
+        try:
+            src = f.read_text(encoding="utf-8", errors="ignore")
+        except Exception:
+            continue
 
         # Sessiz except var mı?
         yeni_src, sayi = except_duzelt(src)
@@ -144,12 +197,15 @@ def main():
         if gecti:
             ok(f"{str(f.relative_to(kok)):<60} {sayi} düzeltme")
             yedek.unlink(missing_ok=True)
-            rapor["islenen"].append({"dosya": str(f.relative_to(kok)), "duzeltme": sayi})
+            rapor["islenen"].append(
+                {"dosya": str(f.relative_to(kok)), "duzeltme": sayi}
+            )
             rapor["toplam_duzeltme"] += sayi
             rapor["test_gecen"].append(str(f.relative_to(kok)))
         else:
             err(f"{f.relative_to(kok)} → TEST HATA: {mesaj} — GERİ ALINDI")
-            shutil.copy2(yedek, f); yedek.unlink(missing_ok=True)
+            shutil.copy2(yedek, f)
+            yedek.unlink(missing_ok=True)
             rapor["test_hata"].append({"dosya": str(f.relative_to(kok)), "hata": mesaj})
 
     rapor["sure"] = round(time.time() - t0, 1)
@@ -161,7 +217,10 @@ def main():
     print(f"  Süre              : {rapor['sure']}s")
 
     rapor_yolu = kok / "fix_01_rapor.json"
-    with open(rapor_yolu, "w", encoding="utf-8") as fp: json.dump(rapor, fp, ensure_ascii=False, indent=2)
+    with open(rapor_yolu, "w", encoding="utf-8") as fp:
+        json.dump(rapor, fp, ensure_ascii=False, indent=2)
     ok(f"JSON rapor: {rapor_yolu}")
 
-if __name__ == "__main__": main()
+
+if __name__ == "__main__":
+    main()

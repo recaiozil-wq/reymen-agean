@@ -1,4 +1,5 @@
 """ReYMeN tools.send_message_tool shim — Hermes mesajlaşma fonksiyonlarını yönlendirir."""
+
 from __future__ import annotations
 
 import json
@@ -32,11 +33,13 @@ def _send_to_platform(
             import urllib.parse
 
             url = f"https://api.telegram.org/bot{token}/sendMessage"
-            data = urllib.parse.urlencode({
-                "chat_id": chat_id,
-                "text": message[:4096],
-                "parse_mode": "Markdown",
-            }).encode()
+            data = urllib.parse.urlencode(
+                {
+                    "chat_id": chat_id,
+                    "text": message[:4096],
+                    "parse_mode": "Markdown",
+                }
+            ).encode()
             req = urllib.request.Request(url, data=data, method="POST")
             with urllib.request.urlopen(req, timeout=10) as resp:
                 return resp.status == 200
@@ -65,14 +68,17 @@ def telegram_resim_gonder(chat_id: str, resim_yolu: str, altyazi: str = "") -> s
 
         url = f"https://api.telegram.org/bot{token}/sendPhoto"
         import json as _json
-        data = _json.dumps({
-            "chat_id": chat_id,
-            "photo": resim_yolu,
-            "caption": altyazi,
-        }).encode()
-        req = urllib.request.Request(url, data=data,
-                                      headers={"Content-Type": "application/json"},
-                                      method="POST")
+
+        data = _json.dumps(
+            {
+                "chat_id": chat_id,
+                "photo": resim_yolu,
+                "caption": altyazi,
+            }
+        ).encode()
+        req = urllib.request.Request(
+            url, data=data, headers={"Content-Type": "application/json"}, method="POST"
+        )
         with urllib.request.urlopen(req, timeout=30) as resp:
             success = resp.status == 200
             return json.dumps({"success": success, "chat_id": chat_id})

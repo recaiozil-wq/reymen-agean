@@ -22,11 +22,13 @@ import time
 from pathlib import Path
 from typing import Optional
 import logging
+
 logger = logging.getLogger(__name__)
 
 # ChromaDB varsa vektörel, yoksa hash tabanlı çalışır
 try:
     import chromadb
+
     _CHROMA_VAR = True
 except ImportError:
     _CHROMA_VAR = False
@@ -34,6 +36,7 @@ except ImportError:
 # Gömme (embedding) için SentenceTransformers opsiyonel
 try:
     from sentence_transformers import SentenceTransformer
+
     _EMBED_VAR = True
 except ImportError:
     _EMBED_VAR = False
@@ -47,11 +50,13 @@ class SemanticCache:
     yoksa SHA-256 karma ile tam eslesme yapar.
     """
 
-    def __init__(self,
-                 esik: float = 0.90,
-                 maks_kayit: int = 500,
-                 gecerlilik_sn: int = 3600,
-                 cache_dizin: str = ".ReYMeN/semantic_cache"):
+    def __init__(
+        self,
+        esik: float = 0.90,
+        maks_kayit: int = 500,
+        gecerlilik_sn: int = 3600,
+        cache_dizin: str = ".ReYMeN/semantic_cache",
+    ):
         """
         Args:
             esik:           Benzerlik esigi (0-1). Bu deger asildiysa onbellekten don.
@@ -63,7 +68,7 @@ class SemanticCache:
         self.maks_kayit = maks_kayit
         self.gecerlilik_sn = gecerlilik_sn
         self._cache_dizin = Path(cache_dizin)
-        self._hash_cache: dict = {}       # {hash: (yanit, zaman)}
+        self._hash_cache: dict = {}  # {hash: (yanit, zaman)}
         self._hit_sayisi = 0
         self._miss_sayisi = 0
 
@@ -73,7 +78,9 @@ class SemanticCache:
         if _CHROMA_VAR and _EMBED_VAR:
             try:
                 self._cache_dizin.mkdir(parents=True, exist_ok=True)
-                client = chromadb.PersistentClient(path=str(self._cache_dizin / "chroma"))
+                client = chromadb.PersistentClient(
+                    path=str(self._cache_dizin / "chroma")
+                )
                 self._chroma = client.get_or_create_collection(
                     name="semantic_cache",
                     metadata={"hnsw:space": "cosine"},
@@ -92,8 +99,12 @@ class SemanticCache:
     def _anahtar(sistem_prompt: str, mesajlar: list) -> str:
         """SHA-256 tabanlı deterministik anahtar."""
         ham = json.dumps(
-            {"sp": sistem_prompt[:500], "msgs": [m.get("content", "")[:200] for m in mesajlar[-4:]]},
-            ensure_ascii=False, sort_keys=True,
+            {
+                "sp": sistem_prompt[:500],
+                "msgs": [m.get("content", "")[:200] for m in mesajlar[-4:]],
+            },
+            ensure_ascii=False,
+            sort_keys=True,
         )
         return hashlib.sha256(ham.encode("utf-8")).hexdigest()[:32]
 
@@ -144,7 +155,8 @@ class SemanticCache:
             metin = self._metin_birlestir(sistem_prompt, mesajlar)
             vektor = self._embed_fn.encode([metin]).tolist()
             sonuclar = self._chroma.query(
-                query_embeddings=vektor, n_results=1,
+                query_embeddings=vektor,
+                n_results=1,
                 include=["documents", "distances", "metadatas"],
             )
             if not sonuclar["ids"][0]:
@@ -158,7 +170,10 @@ class SemanticCache:
                 meta = sonuclar["metadatas"][0][0]
                 # Gecerlilik kontrolu
                 zaman = float(meta.get("zaman", 0))
-                if self.gecerlilik_sn == 0 or (time.time() - zaman) < self.gecerlilik_sn:
+                if (
+                    self.gecerlilik_sn == 0
+                    or (time.time() - zaman) < self.gecerlilik_sn
+                ):
                     self._hit_sayisi += 1
                     return sonuclar["documents"][0][0]
 
@@ -187,7 +202,9 @@ class SemanticCache:
             print(f"[UYARI] semantic_cache.py:184 - {_semantic_e183}")
         # Kapasite temizligi
         if len(self._hash_cache) > self.maks_kayit:
-            silmek = list(self._hash_cache.keys())[:len(self._hash_cache) - self.maks_kayit]
+            silmek = list(self._hash_cache.keys())[
+                : len(self._hash_cache) - self.maks_kayit
+            ]
             for k in silmek:
                 del self._hash_cache[k]
                 try:

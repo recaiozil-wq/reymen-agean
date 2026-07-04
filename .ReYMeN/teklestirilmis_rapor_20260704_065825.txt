@@ -121,15 +121,15 @@
 6. KRİTİK RİSKLER VE TEKNİK BORÇ
 ============================================================
 
-Öncelik      Risk                                Açıklama                                                    
---------     ----                                ---------                                                   
+Öncelik      Risk                                Açıklama
+--------     ----                                ---------
 🔴 KRİTİK     Test coverage %1.5                  618 dosyaya karşı sadece 15 test dosyası. Satış öncesi en az %30'a çekilmeli.
-🔴 KRİTİK     Kod notu F (0.55)                   SQLite snapshot güncellenmedi — güncel durum yansımıyor.    
+🔴 KRİTİK     Kod notu F (0.55)                   SQLite snapshot güncellenmedi — güncel durum yansımıyor.
 🟠 YÜKSEK     self_update.py em dash (U+2014)     Docstring içinde em dash karakteri var, ast.parse kırılıyor.
 🟠 YÜKSEK     cli.py 15.762 satır                 En büyük dosya, henüz bölünmedi (gorev_cli_bolme_main.md var).
 🟠 YÜKSEK     Paylaşımlı state (shared_solutions.db) 3 profil aynı çözüm DB'sini paylaşıyor — kontaminasyon riski.
-🟡 ORTA       Self-improvement cron K5-K6 kuralları yeni K5/K6 06:20'de eklendi, henüz uzun vadeli test edilmedi.    
-🟡 ORTA       K2 backup atlama geçmişi            06:20 SKILL.md patch'inde backup alınmamıştı — düzeltildi.  
+🟡 ORTA       Self-improvement cron K5-K6 kuralları yeni K5/K6 06:20'de eklendi, henüz uzun vadeli test edilmedi.
+🟡 ORTA       K2 backup atlama geçmişi            06:20 SKILL.md patch'inde backup alınmamıştı — düzeltildi.
 
 ============================================================
 7. ÖNERİLEN SIRADAKİ ADIMLAR

@@ -1,5 +1,5 @@
-
 """Test: reymen/ag/gateway_temel.py"""
+
 from __future__ import annotations
 import os, sys
 from pathlib import Path
@@ -12,6 +12,7 @@ sys.path.insert(0, str(PROJE_KOK))
 class MockMotor:
     def __init__(self):
         self.tools = {}
+
     def _plugin_arac_kaydet(self, ad, fonk, aciklama=""):
         self.tools[ad] = fonk
 
@@ -19,10 +20,12 @@ class MockMotor:
 class TestGateway:
     def test_import(self):
         from reymen.ag.gateway_temel import motor_kaydet
+
         assert motor_kaydet is not None
 
     def test_motor_kaydet(self):
         from reymen.ag.gateway_temel import motor_kaydet
+
         m = MockMotor()
         motor_kaydet(m)
         assert len(m.tools) > 0

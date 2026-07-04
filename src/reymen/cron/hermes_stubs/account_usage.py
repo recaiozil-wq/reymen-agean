@@ -3,14 +3,17 @@
 account_usage.py — ReYMeN stub. Hermes account_usage API'sini taklit eder.
 Apache 2.0 — inspired by NousResearch/hermes-agent
 """
+
 from __future__ import annotations
 import logging
 from typing import Optional
+
 logger = logging.getLogger(__name__)
 
 
 class AccountUsageSnapshot:
     """Minimal stub: always returns 'bilgi yok'."""
+
     def __init__(self):
         self.available = False
         self.total_usage = 0.0
@@ -23,6 +26,7 @@ class AccountUsageSnapshot:
 
 class CreditsView:
     """Minimal stub."""
+
     def __init__(self):
         self.lines = []
         self.error = None

@@ -22,6 +22,7 @@ The script writes JSON-RPC framed messages to stdout and reads from
 stdin.  No third-party dependencies — uses only stdlib so it runs
 under whatever Python the test process picks up.
 """
+
 from __future__ import annotations
 
 import json
@@ -72,7 +73,10 @@ def main():
                     "result": {
                         "capabilities": {
                             "textDocumentSync": 1,  # Full
-                            "diagnosticProvider": {"interFileDependencies": False, "workspaceDiagnostics": False},
+                            "diagnosticProvider": {
+                                "interFileDependencies": False,
+                                "workspaceDiagnostics": False,
+                            },
                         },
                         "serverInfo": {"name": "mock-lsp", "version": "0.1"},
                     },
@@ -150,7 +154,10 @@ def main():
                 {
                     "jsonrpc": "2.0",
                     "id": msg["id"],
-                    "error": {"code": -32601, "message": f"method not found: {msg.get('method')}"},
+                    "error": {
+                        "code": -32601,
+                        "message": f"method not found: {msg.get('method')}",
+                    },
                 }
             )
 

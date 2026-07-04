@@ -20,13 +20,19 @@ def _handle_personality_command(cli, cmd: str):
                 print("(^_^) Personality cleared (session only)")
             print("  No personality overlay — using base agent behavior.")
         elif personality_name in cli.personalities:
-            cli.system_prompt = cli._resolve_personality_prompt(cli.personalities[personality_name])
+            cli.system_prompt = cli._resolve_personality_prompt(
+                cli.personalities[personality_name]
+            )
             cli.agent = None  # Force re-init
             if save_config_value("agent.system_prompt", cli.system_prompt):
-                print(f"(^_^)b Personality set to '{personality_name}' (saved to config)")
+                print(
+                    f"(^_^)b Personality set to '{personality_name}' (saved to config)"
+                )
             else:
                 print(f"(^_^) Personality set to '{personality_name}' (session only)")
-            print(f"  \"{cli.system_prompt[:60]}{'...' if len(cli.system_prompt) > 60 else ''}\"")
+            print(
+                f"  \"{cli.system_prompt[:60]}{'...' if len(cli.system_prompt) > 60 else ''}\""
+            )
         else:
             print(f"(._.) Unknown personality: {personality_name}")
             print(f"  Available: none, {', '.join(cli.personalities.keys())}")
@@ -40,7 +46,9 @@ def _handle_personality_command(cli, cmd: str):
         print(f"  {'none':<12} - (no personality overlay)")
         for name, prompt in cli.personalities.items():
             if isinstance(prompt, dict):
-                preview = prompt.get("description") or prompt.get("system_prompt", "")[:50]
+                preview = (
+                    prompt.get("description") or prompt.get("system_prompt", "")[:50]
+                )
             else:
                 preview = str(prompt)[:50]
             print(f"  {name:<12} - {preview}")

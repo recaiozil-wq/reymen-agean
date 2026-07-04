@@ -22,6 +22,7 @@ _media() fonksiyonunu güncellemeniz yeterli — diğer kod değişmez.
 Tasarım ilkesi: hiçbir import hatası modülün tamamen çökmesine yol açmaz;
 her araç kendi içinde try/except ile sessizce (ama loglayarak) degrade eder.
 """
+
 import base64
 import json
 import logging
@@ -41,6 +42,7 @@ _OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434").rstrip("/")
 
 # ── Yardımcılar ───────────────────────────────────────────────────────
 
+
 def _media(tip: str, kaynak: str, aciklama: str = "") -> str:
     blok = f'[MEDIA type="{tip}" src="{kaynak}"]'
     if aciklama:
@@ -49,10 +51,13 @@ def _media(tip: str, kaynak: str, aciklama: str = "") -> str:
     return blok
 
 
-def _http_post_json(url: str, payload: dict, headers: dict = None, timeout: int = 60) -> dict:
+def _http_post_json(
+    url: str, payload: dict, headers: dict = None, timeout: int = 60
+) -> dict:
     data = json.dumps(payload).encode()
     req = urllib.request.Request(
-        url, data=data,
+        url,
+        data=data,
         headers={"Content-Type": "application/json", **(headers or {})},
     )
     with urllib.request.urlopen(req, timeout=timeout) as r:
@@ -79,22 +84,24 @@ def _resim_openrouter_fallback(prompt: str, en: str = "1024", boy: str = "1024")
     """OpenRouter uzerinden gorsel uret (FAL_KEY yoksa)."""
     api_key = os.environ.get("OPENROUTER_API_KEY", "").strip()
     if not api_key:
-        return ("[RESIM_OLUSTUR] Hata: FAL_KEY/FAL_API_KEY/OPENROUTER_API_KEY "
-                "tanimli degil. Gorsel uretim icin bir API anahtari gerekli.")
+        return (
+            "[RESIM_OLUSTUR] Hata: FAL_KEY/FAL_API_KEY/OPENROUTER_API_KEY "
+            "tanimli degil. Gorsel uretim icin bir API anahtari gerekli."
+        )
 
     try:
         size = f"{en}x{boy}"
         payload = {
             "model": _OR_IMAGE_MODEL,
-            "messages": [
-                {"role": "user", "content": f"Generate an image: {prompt}"}
-            ],
+            "messages": [{"role": "user", "content": f"Generate an image: {prompt}"}],
         }
         sonuc = _http_post_json(
             _OR_IMAGE_URL,
             payload,
-            headers={"Authorization": f"Bearer {api_key}",
-                      "HTTP-Referer": "https://github.com/Watcher-ReYMeN/ReYMeN-Ajan"},
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "HTTP-Referer": "https://github.com/Watcher-ReYMeN/ReYMeN-Ajan",
+            },
             timeout=90,
         )
         # OpenAI uyumlu yanıt
@@ -111,6 +118,7 @@ def _resim_openrouter_fallback(prompt: str, en: str = "1024", boy: str = "1024")
 
 
 # ── RESIM_OLUSTUR ─────────────────────────────────────────────────────
+
 
 def resim_olustur(prompt: str, en: str = "1024", boy: str = "1024") -> str:
     """FAL.ai FLUX (flux-1-1-pro) ile prompt'tan görsel üretir."""
@@ -157,7 +165,10 @@ def resim_olustur(prompt: str, en: str = "1024", boy: str = "1024") -> str:
 
 # ── VISION_ANALIZ (FAL, GORUNTU_ANALIZ'e fallback) ───────────────────
 
-def vision_analiz(kaynak: str, soru: str = "Bu görselde ne var, detaylı açıkla.") -> str:
+
+def vision_analiz(
+    kaynak: str, soru: str = "Bu görselde ne var, detaylı açıkla."
+) -> str:
     """FAL.ai vision modeliyle görsel analiz eder (URL veya yerel dosya yolu)."""
     if not kaynak or not kaynak.strip():
         return "[VISION_ANALIZ] Hata: görsel kaynağı (url/yol) boş olamaz."
@@ -178,7 +189,9 @@ def vision_analiz(kaynak: str, soru: str = "Bu görselde ne var, detaylı açık
         )
         metin = sonuc.get("output") or sonuc.get("text") or sonuc.get("response")
         if not metin:
-            return _ollama_fallback(kaynak, soru, neden=f"beklenmeyen FAL cevabı: {json.dumps(sonuc)[:200]}")
+            return _ollama_fallback(
+                kaynak, soru, neden=f"beklenmeyen FAL cevabı: {json.dumps(sonuc)[:200]}"
+            )
         return f"[VISION_ANALIZ]\n{metin.strip()}"
     except Exception as e:
         logger.warning("[VISION_ANALIZ] FAL hatası, Ollama LLaVA'ya düşülüyor: %s", e)
@@ -203,29 +216,46 @@ def _ollama_fallback(kaynak: str, soru: str, neden: str = "") -> str:
         mime = mimetypes.guess_type(kaynak)[0] or "image/jpeg"
         payload = {
             "model": _OR_VISION_MODEL,
-            "messages": [{"role": "user", "content": [
-                {"type": "text", "text": soru},
-                {"type": "image_url", "image_url": {"url": f"data:{mime};base64,{b64}"}}
-            ]}],
+            "messages": [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": soru},
+                        {
+                            "type": "image_url",
+                            "image_url": {"url": f"data:{mime};base64,{b64}"},
+                        },
+                    ],
+                }
+            ],
             "max_tokens": 1024,
         }
         req = urllib.request.Request(
-            _OR_VISION_URL, data=json.dumps(payload).encode(),
-            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json",
-                     "HTTP-Referer": "https://github.com/Watcher-ReYMeN/ReYMeN-Ajan"},
+            _OR_VISION_URL,
+            data=json.dumps(payload).encode(),
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+                "HTTP-Referer": "https://github.com/Watcher-ReYMeN/ReYMeN-Ajan",
+            },
             method="POST",
         )
         with urllib.request.urlopen(req, timeout=60) as r:
             cevap = json.loads(r.read().decode())
-        return cevap.get("choices", [{}])[0].get("message", {}).get("content", "") or "Görsel analiz edilemedi."
+        return (
+            cevap.get("choices", [{}])[0].get("message", {}).get("content", "")
+            or "Görsel analiz edilemedi."
+        )
     except Exception as e:
         return f"[VISION] OpenRouter hatasi: {e}"
 
 
 # ── GORUNTU_ANALIZ (Ollama LLaVA — yerel/offline fallback) ───────────
 
-def goruntu_analiz(kaynak: str, soru: str = "Bu görselde ne var, detaylı açıkla.",
-                    model: str = "llava") -> str:
+
+def goruntu_analiz(
+    kaynak: str, soru: str = "Bu görselde ne var, detaylı açıkla.", model: str = "llava"
+) -> str:
     """Ollama üzerinde çalışan LLaVA modeliyle yerel/offline görsel analiz."""
     if not kaynak or not kaynak.strip():
         return "[GORUNTU_ANALIZ] Hata: görsel kaynağı (url/yol) boş olamaz."
@@ -247,8 +277,10 @@ def goruntu_analiz(kaynak: str, soru: str = "Bu görselde ne var, detaylı açı
         metin = (sonuc.get("response") or "").strip()
         return f"[GORUNTU_ANALIZ]\n{metin or '(boş yanıt)'}"
     except urllib.error.URLError as e:
-        return (f"[GORUNTU_ANALIZ] Hata: Ollama'ya bağlanılamadı ({_OLLAMA_URL}). "
-                f"Ollama kurulu ve çalışıyor mu? ('ollama pull llava') Detay: {e}")
+        return (
+            f"[GORUNTU_ANALIZ] Hata: Ollama'ya bağlanılamadı ({_OLLAMA_URL}). "
+            f"Ollama kurulu ve çalışıyor mu? ('ollama pull llava') Detay: {e}"
+        )
     except FileNotFoundError:
         return f"[GORUNTU_ANALIZ] Hata: dosya bulunamadı: {kaynak}"
     except Exception as e:
@@ -257,6 +289,7 @@ def goruntu_analiz(kaynak: str, soru: str = "Bu görselde ne var, detaylı açı
 
 
 # ── Motor kayıt ───────────────────────────────────────────────────────
+
 
 def motor_kaydet(motor) -> None:
     if not hasattr(motor, "_plugin_arac_kaydet"):
@@ -289,5 +322,7 @@ def motor_kaydet(motor) -> None:
 
 
 if __name__ == "__main__":
-    print("araclar_goruntu hazır. FAL_KEY:", "var" if os.environ.get("FAL_KEY") else "yok")
+    print(
+        "araclar_goruntu hazır. FAL_KEY:", "var" if os.environ.get("FAL_KEY") else "yok"
+    )
     print("OLLAMA_URL:", _OLLAMA_URL)

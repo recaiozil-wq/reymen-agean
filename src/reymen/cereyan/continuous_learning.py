@@ -92,6 +92,7 @@ class ContinuousLearning:
     def _closed_loop_yukle(self):
         try:
             from reymen.cereyan.closed_learning_loop import ClosedLearningLoop
+
             self._closed_loop = ClosedLearningLoop()
             logger.info("[CL] ClosedLearningLoop yuklendi")
         except ImportError:
@@ -103,16 +104,22 @@ class ContinuousLearning:
             rows = con.execute(
                 "SELECT session_id, baslangic, gorev_sayisi, basari_sayisi, "
                 "hata_sayisi, ogrenme_sayisi, ozet FROM session_ozet "
-                "ORDER BY baslangic DESC LIMIT ?", (limit,)
+                "ORDER BY baslangic DESC LIMIT ?",
+                (limit,),
             ).fetchall()
             con.close()
             for r in rows:
-                self._onceki_session_ozetleri.append({
-                    "session_id": r[0], "baslangic": r[1],
-                    "gorev_sayisi": r[2], "basari_sayisi": r[3],
-                    "hata_sayisi": r[4], "ogrenme_sayisi": r[5],
-                    "ozet": r[6] or "",
-                })
+                self._onceki_session_ozetleri.append(
+                    {
+                        "session_id": r[0],
+                        "baslangic": r[1],
+                        "gorev_sayisi": r[2],
+                        "basari_sayisi": r[3],
+                        "hata_sayisi": r[4],
+                        "ogrenme_sayisi": r[5],
+                        "ozet": r[6] or "",
+                    }
+                )
         except Exception as _e:
             __import__("logging").getLogger(__name__).warning(
                 "[SessizExcept] %%s: %%s", type(_e).__name__, _e
@@ -124,8 +131,10 @@ class ContinuousLearning:
         self._session_ogrenmeler = []
         try:
             con = _db_baglan()
-            con.execute("INSERT OR REPLACE INTO session_ozet (session_id, baslangic) VALUES (?, ?)",
-                       (session_id, self._session_baslangic))
+            con.execute(
+                "INSERT OR REPLACE INTO session_ozet (session_id, baslangic) VALUES (?, ?)",
+                (session_id, self._session_baslangic),
+            )
             con.commit()
             con.close()
         except Exception as e:
@@ -139,8 +148,14 @@ class ContinuousLearning:
                 )
         logger.info("[CL] Session basladi: %s", session_id)
 
-    def ogrenmeyi_kaydet(self, tip: str, icerik: str, kaynak: str = "",
-                         basari: bool = True, etiketler: Optional[List[str]] = None) -> int:
+    def ogrenmeyi_kaydet(
+        self,
+        tip: str,
+        icerik: str,
+        kaynak: str = "",
+        basari: bool = True,
+        etiketler: Optional[List[str]] = None,
+    ) -> int:
         if not self._aktif_session_id:
             return -1
         try:
@@ -148,23 +163,40 @@ class ContinuousLearning:
             con.execute(
                 "INSERT INTO ogrenmeler (session_id, tip, icerik, kaynak, basari, etiketler) "
                 "VALUES (?, ?, ?, ?, ?, ?)",
-                (self._aktif_session_id, tip, icerik[:5000], kaynak[:200],
-                 int(basari), json.dumps(etiketler or [])))
+                (
+                    self._aktif_session_id,
+                    tip,
+                    icerik[:5000],
+                    kaynak[:200],
+                    int(basari),
+                    json.dumps(etiketler or []),
+                ),
+            )
             kayit_id = con.execute("SELECT last_insert_rowid()").fetchone()[0]
-            con.execute("UPDATE session_ozet SET ogrenme_sayisi=ogrenme_sayisi+1 WHERE session_id=?",
-                       (self._aktif_session_id,))
+            con.execute(
+                "UPDATE session_ozet SET ogrenme_sayisi=ogrenme_sayisi+1 WHERE session_id=?",
+                (self._aktif_session_id,),
+            )
             if basari:
-                con.execute("UPDATE session_ozet SET basari_sayisi=basari_sayisi+1, gorev_sayisi=gorev_sayisi+1 WHERE session_id=?",
-                           (self._aktif_session_id,))
+                con.execute(
+                    "UPDATE session_ozet SET basari_sayisi=basari_sayisi+1, gorev_sayisi=gorev_sayisi+1 WHERE session_id=?",
+                    (self._aktif_session_id,),
+                )
             else:
-                con.execute("UPDATE session_ozet SET hata_sayisi=hata_sayisi+1, gorev_sayisi=gorev_sayisi+1 WHERE session_id=?",
-                           (self._aktif_session_id,))
+                con.execute(
+                    "UPDATE session_ozet SET hata_sayisi=hata_sayisi+1, gorev_sayisi=gorev_sayisi+1 WHERE session_id=?",
+                    (self._aktif_session_id,),
+                )
             con.commit()
             con.close()
-            self._session_ogrenmeler.append({"id": kayit_id, "tip": tip, "icerik": icerik[:200], "basari": basari})
+            self._session_ogrenmeler.append(
+                {"id": kayit_id, "tip": tip, "icerik": icerik[:200], "basari": basari}
+            )
             if tip == "beceri" and self._closed_loop:
                 try:
-                    self._closed_loop.beceri_kristallestir(ad=f"cl_{kayit_id}", aciklama=icerik[:200], icerik=icerik)
+                    self._closed_loop.beceri_kristallestir(
+                        ad=f"cl_{kayit_id}", aciklama=icerik[:200], icerik=icerik
+                    )
                 except Exception as _e:
                     __import__("logging").getLogger(__name__).warning(
                         "[SessizExcept] %%s: %%s", type(_e).__name__, _e
@@ -176,12 +208,18 @@ class ContinuousLearning:
 
     def session_bitir(self, session_id: str) -> Dict[str, Any]:
         bitis = _su_an()
-        ozet = {"session_id": session_id, "baslangic": self._session_baslangic, "bitis": bitis,
-                "ogrenme_sayisi": len(self._session_ogrenmeler)}
+        ozet = {
+            "session_id": session_id,
+            "baslangic": self._session_baslangic,
+            "bitis": bitis,
+            "ogrenme_sayisi": len(self._session_ogrenmeler),
+        }
         try:
             con = _db_baglan()
-            con.execute("UPDATE session_ozet SET bitis=?, ozet=? WHERE session_id=?",
-                       (bitis, json.dumps(ozet), session_id))
+            con.execute(
+                "UPDATE session_ozet SET bitis=?, ozet=? WHERE session_id=?",
+                (bitis, json.dumps(ozet), session_id),
+            )
             con.commit()
             con.close()
         except Exception as _e:
@@ -196,20 +234,32 @@ class ContinuousLearning:
         if self._onceki_session_ozetleri:
             parcalar.append("## Gecmis Session Ogrenmeleri")
             for s in self._onceki_session_ozetleri[:5]:
-                basari_yuzde = int(s["basari_sayisi"] / max(s["gorev_sayisi"], 1) * 100) if s["gorev_sayisi"] > 0 else 0
-                parcalar.append(f"- Session {s['session_id'][:12]}: {s['gorev_sayisi']} gorev, %{basari_yuzde} basari, {s['ogrenme_sayisi']} ogrenme")
+                basari_yuzde = (
+                    int(s["basari_sayisi"] / max(s["gorev_sayisi"], 1) * 100)
+                    if s["gorev_sayisi"] > 0
+                    else 0
+                )
+                parcalar.append(
+                    f"- Session {s['session_id'][:12]}: {s['gorev_sayisi']} gorev, %{basari_yuzde} basari, {s['ogrenme_sayisi']} ogrenme"
+                )
         if self._session_ogrenmeler:
             parcalar.append(f"\n## Bu Session {len(self._session_ogrenmeler)} Ogrenme")
             for o in self._session_ogrenmeler[-5:]:
                 ikon = "\u2705" if o.get("basari") else "\u274c"
-                parcalar.append(f"- {ikon} [{o.get('tip','?')}] {o.get('icerik','')[:150]}")
+                parcalar.append(
+                    f"- {ikon} [{o.get('tip','?')}] {o.get('icerik','')[:150]}"
+                )
         if self._closed_loop and self._aktif_session_id:
             try:
-                b = self._closed_loop.beceri_baglani_al_yapisal(sorgu=self._aktif_session_id, limit=3)
+                b = self._closed_loop.beceri_baglani_al_yapisal(
+                    sorgu=self._aktif_session_id, limit=3
+                )
                 if b and "beceriler" in b:
                     parcalar.append(f"\n## Ilgili Beceriler ({len(b['beceriler'])})")
                     for bec in b["beceriler"][:3]:
-                        parcalar.append(f"- {bec.get('ad','?')}: {bec.get('aciklama','')[:100]}")
+                        parcalar.append(
+                            f"- {bec.get('ad','?')}: {bec.get('aciklama','')[:100]}"
+                        )
             except Exception as _e:
                 __import__("logging").getLogger(__name__).warning(
                     "[SessizExcept] %%s: %%s", type(_e).__name__, _e
@@ -219,15 +269,33 @@ class ContinuousLearning:
             metin = metin[:max_char] + "\n...(kesildi)"
         return metin
 
-    def gecmis_ogrenmeleri_getir(self, tip: Optional[str] = None, limit: int = 10) -> List[Dict[str, Any]]:
+    def gecmis_ogrenmeleri_getir(
+        self, tip: Optional[str] = None, limit: int = 10
+    ) -> List[Dict[str, Any]]:
         try:
             con = _db_baglan()
             if tip:
-                rows = con.execute("SELECT id, session_id, tip, icerik, basari, olusturma FROM ogrenmeler WHERE tip=? ORDER BY id DESC LIMIT ?", (tip, limit)).fetchall()
+                rows = con.execute(
+                    "SELECT id, session_id, tip, icerik, basari, olusturma FROM ogrenmeler WHERE tip=? ORDER BY id DESC LIMIT ?",
+                    (tip, limit),
+                ).fetchall()
             else:
-                rows = con.execute("SELECT id, session_id, tip, icerik, basari, olusturma FROM ogrenmeler ORDER BY id DESC LIMIT ?", (limit,)).fetchall()
+                rows = con.execute(
+                    "SELECT id, session_id, tip, icerik, basari, olusturma FROM ogrenmeler ORDER BY id DESC LIMIT ?",
+                    (limit,),
+                ).fetchall()
             con.close()
-            return [{"id": r[0], "session_id": r[1][:12], "tip": r[2], "icerik": r[3][:300], "basari": bool(r[4]), "tarih": r[5]} for r in rows]
+            return [
+                {
+                    "id": r[0],
+                    "session_id": r[1][:12],
+                    "tip": r[2],
+                    "icerik": r[3][:300],
+                    "basari": bool(r[4]),
+                    "tarih": r[5],
+                }
+                for r in rows
+            ]
         except Exception:
             return []
 
@@ -235,10 +303,18 @@ class ContinuousLearning:
         try:
             con = _db_baglan()
             toplam = con.execute("SELECT COUNT(*) FROM ogrenmeler").fetchone()[0]
-            tipler = con.execute("SELECT tip, COUNT(*) FROM ogrenmeler GROUP BY tip").fetchall()
-            session_sayisi = con.execute("SELECT COUNT(*) FROM session_ozet").fetchone()[0]
+            tipler = con.execute(
+                "SELECT tip, COUNT(*) FROM ogrenmeler GROUP BY tip"
+            ).fetchall()
+            session_sayisi = con.execute(
+                "SELECT COUNT(*) FROM session_ozet"
+            ).fetchone()[0]
             con.close()
-            return {"toplam_ogrenme": toplam, "tipler": {r[0]: r[1] for r in tipler}, "toplam_session": session_sayisi}
+            return {
+                "toplam_ogrenme": toplam,
+                "tipler": {r[0]: r[1] for r in tipler},
+                "toplam_session": session_sayisi,
+            }
         except Exception as e:
             return {"hata": str(e)}
 

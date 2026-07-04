@@ -14,10 +14,12 @@ HASSASİYET (v1.0):
 
 GÜVENLİK (v0.9'dan): güven eşiği, çoklu eşleşme, FAILSAFE, tıklama sayacı.
 """
+
 import os
 
 try:
     import pyautogui
+
     pyautogui.FAILSAFE = True
     PYAUTOGUI_OK = True
 except Exception:
@@ -25,19 +27,23 @@ except Exception:
 
 try:
     import easyocr
+
     EASYOCR_OK = True
 except Exception:
     EASYOCR_OK = False
 
 try:
     from PIL import Image, ImageDraw
+
     PIL_OK = True
 except Exception:
     PIL_OK = False
 
 
 class EkranOCRTikla:
-    def __init__(self, guven_esigi=0.45, max_tiklama=50, nisan_dizini=".ReYMeN/nisanlar"):
+    def __init__(
+        self, guven_esigi=0.45, max_tiklama=50, nisan_dizini=".ReYMeN/nisanlar"
+    ):
         self._reader = None
         self.guven_esigi = guven_esigi
         self.max_tiklama = max_tiklama
@@ -59,6 +65,7 @@ class EkranOCRTikla:
 
     def _eslesmeleri_bul(self, aranan_yazi):
         import numpy as np
+
         kare = np.array(pyautogui.screenshot())
         sonuclar = self._okuyucu().readtext(kare)
         hedef = aranan_yazi.lower().strip()
@@ -66,10 +73,15 @@ class EkranOCRTikla:
         for kutu, metin, guven in sonuclar:
             if hedef in metin.lower() and guven >= self.guven_esigi:
                 cx, cy = self._centroid(kutu)
-                eslesmeler.append({
-                    "metin": metin, "x": cx, "y": cy,
-                    "guven": round(float(guven), 2), "kutu": kutu,
-                })
+                eslesmeler.append(
+                    {
+                        "metin": metin,
+                        "x": cx,
+                        "y": cy,
+                        "guven": round(float(guven), 2),
+                        "kutu": kutu,
+                    }
+                )
         return eslesmeler
 
     def nisan_ciz(self, x, y, dosya_adi="nisan.png", adaylar=None):
@@ -98,8 +110,9 @@ class EkranOCRTikla:
         if etiket:
             draw.text((x + r + 2, y - r), etiket, fill=renk)
 
-    def yaziyi_bul_ve_tikla(self, aranan_yazi, tikla=True, hangi=0,
-                            dx=0, dy=0, nisan=False):
+    def yaziyi_bul_ve_tikla(
+        self, aranan_yazi, tikla=True, hangi=0, dx=0, dy=0, nisan=False
+    ):
         """Yazıyı bulur, HASSAS nokta hesaplar, isteğe bağlı nişan çizer, tıklar.
         dx,dy: tıklama noktasına ofset (yan kutucuğa tıklamak için).
         nisan=True: tıklamadan önce görsel nişan dosyası üretir (onay için)."""
@@ -115,13 +128,24 @@ class EkranOCRTikla:
             return f"[Ekran]: '{aranan_yazi}' yeterli güvenle bulunamadı (eşik {self.guven_esigi})."
 
         if len(eslesmeler) > 1 and hangi == -1:
-            yol = self.nisan_ciz(eslesmeler[0]["x"], eslesmeler[0]["y"],
-                                 "adaylar.png", adaylar=eslesmeler) if nisan else None
+            yol = (
+                self.nisan_ciz(
+                    eslesmeler[0]["x"],
+                    eslesmeler[0]["y"],
+                    "adaylar.png",
+                    adaylar=eslesmeler,
+                )
+                if nisan
+                else None
+            )
             satir = "\n".join(
                 f"  [{i}] '{e['metin']}' ({e['x']},{e['y']}) güven={e['guven']}"
-                for i, e in enumerate(eslesmeler))
+                for i, e in enumerate(eslesmeler)
+            )
             ek = f"\n  Görsel: {yol}" if yol else ""
-            return f"[Ekran]: '{aranan_yazi}' için {len(eslesmeler)} eşleşme:\n{satir}{ek}"
+            return (
+                f"[Ekran]: '{aranan_yazi}' için {len(eslesmeler)} eşleşme:\n{satir}{ek}"
+            )
 
         if hangi < 0 or hangi >= len(eslesmeler):
             hangi = 0
@@ -136,20 +160,25 @@ class EkranOCRTikla:
 
         if not tikla:
             ek = f" Nişan: {nisan_yolu}" if nisan_yolu else ""
-            return (f"[Ekran]: '{secili['metin']}' hedef nokta ({hedef_x},{hedef_y}), "
-                    f"tıklanmadı.{ek}")
+            return (
+                f"[Ekran]: '{secili['metin']}' hedef nokta ({hedef_x},{hedef_y}), "
+                f"tıklanmadı.{ek}"
+            )
 
         pyautogui.moveTo(hedef_x, hedef_y, duration=0.3)
         pyautogui.click()
         self._tiklama_sayaci += 1
         ek = f" Nişan: {nisan_yolu}" if nisan_yolu else ""
-        return (f"[Ekran]: '{secili['metin']}' tıklandı ({hedef_x},{hedef_y}, "
-                f"güven={secili['guven']}). Tıklama #{self._tiklama_sayaci}.{ek}")
+        return (
+            f"[Ekran]: '{secili['metin']}' tıklandı ({hedef_x},{hedef_y}, "
+            f"güven={secili['guven']}). Tıklama #{self._tiklama_sayaci}.{ek}"
+        )
 
     def ekran_metnini_oku(self):
         if not (PYAUTOGUI_OK and EASYOCR_OK):
             return "[Ekran]: pyautogui veya easyocr kurulu değil."
         import numpy as np
+
         kare = np.array(pyautogui.screenshot())
         return "[Ekran Metni]:\n" + " | ".join(self._okuyucu().readtext(kare, detail=0))
 
@@ -177,5 +206,7 @@ def motor_kaydet(motor):
 
 if __name__ == "__main__":
     e = EkranOCRTikla()
-    print("EkranOCRTikla HASSAS surum (pyautogui:%s, easyocr:%s, PIL:%s)"
-          % (PYAUTOGUI_OK, EASYOCR_OK, PIL_OK))
+    print(
+        "EkranOCRTikla HASSAS surum (pyautogui:%s, easyocr:%s, PIL:%s)"
+        % (PYAUTOGUI_OK, EASYOCR_OK, PIL_OK)
+    )

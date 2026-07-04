@@ -150,9 +150,7 @@ def test_read_file_tool_blocks_relative_path_under_terminal_cwd(
     # while the Python process cwd remains tmp_path (a different directory).
     monkeypatch.setenv("TERMINAL_CWD", str(fake_home))
     monkeypatch.chdir(tmp_path)
-    monkeypatch.setattr(
-        ft, "_get_live_tracking_cwd", lambda task_id="default": None
-    )
+    monkeypatch.setattr(ft, "_get_live_tracking_cwd", lambda task_id="default": None)
 
     out = json.loads(ft.read_file_tool("auth.json"))
     assert "error" in out
@@ -179,9 +177,7 @@ def test_read_file_tool_blocks_nested_google_oauth_path(
         encoding="utf-8",
     )
     monkeypatch.chdir(tmp_path)
-    monkeypatch.setattr(
-        ft, "_get_live_tracking_cwd", lambda task_id="default": None
-    )
+    monkeypatch.setattr(ft, "_get_live_tracking_cwd", lambda task_id="default": None)
 
     out = json.loads(ft.read_file_tool(str(oauth), task_id="google-oauth-test"))
     assert "error" in out
@@ -246,9 +242,7 @@ def test_mcp_tokens_dir_itself_blocked(fake_home):
     assert "MCP token" in err
 
 
-def test_identically_named_ReYMeN_files_outside_home_not_blocked(
-    fake_home, tmp_path
-):
+def test_identically_named_ReYMeN_files_outside_home_not_blocked(fake_home, tmp_path):
     """ReYMeN-specific filenames (``auth.json``, ``mcp-tokens/``, ``google_oauth.json``)
     outside ReYMeN_HOME must remain readable — the gate is per-location for
     those, not per-filename. ``.env`` is the exception: it's blocked anywhere
@@ -261,9 +255,9 @@ def test_identically_named_ReYMeN_files_outside_home_not_blocked(
     # auth.json outside ReYMeN_HOME — readable (per-location gate).
     p = project / "auth.json"
     p.write_text("not secret here", encoding="utf-8")
-    assert get_read_block_error(str(p)) is None, (
-        "auth.json outside ReYMeN_HOME should NOT be blocked"
-    )
+    assert (
+        get_read_block_error(str(p)) is None
+    ), "auth.json outside ReYMeN_HOME should NOT be blocked"
 
     google_oauth = project / "auth" / "google_oauth.json"
     google_oauth.parent.mkdir()
@@ -328,9 +322,7 @@ def test_profile_mode_blocks_root_credentials(tmp_path, monkeypatch):
     root_google_oauth = root / "auth" / "google_oauth.json"
     root_google_oauth.parent.mkdir(parents=True, exist_ok=True)
     root_google_oauth.write_text("x")
-    assert "credential store" in (
-        get_read_block_error(str(root_google_oauth)) or ""
-    )
+    assert "credential store" in (get_read_block_error(str(root_google_oauth)) or "")
 
     # Root-level mcp-tokens: blocked
     root_tok = root / "mcp-tokens" / "gh.json"

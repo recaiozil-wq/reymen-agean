@@ -28,6 +28,7 @@ honour it too:
 These tests document the wire-level contract so a regression in any of
 those rules surfaces before a Mission Control deploy.
 """
+
 from __future__ import annotations
 
 import pytest
@@ -112,9 +113,9 @@ class TestGateRedirectsCarryPrefix:
         # /login redirect must include the prefix or the browser will
         # follow it to mission-control.tilos.com/login (which the proxy
         # doesn't route to the dashboard).
-        assert r.headers["location"].startswith("/ReYMeN/login"), (
-            f"Location header lost prefix: {r.headers['location']!r}"
-        )
+        assert r.headers["location"].startswith(
+            "/ReYMeN/login"
+        ), f"Location header lost prefix: {r.headers['location']!r}"
 
     def test_api_401_envelope_login_url_carries_prefix(self, gated_app_proxied):
         r = gated_app_proxied.get(
@@ -126,9 +127,9 @@ class TestGateRedirectsCarryPrefix:
         body = r.json()
         # SPA does window.location.assign(body.login_url); this MUST
         # include the prefix.
-        assert body["login_url"].startswith("/ReYMeN/login"), (
-            f"401 envelope login_url lost prefix: {body['login_url']!r}"
-        )
+        assert body["login_url"].startswith(
+            "/ReYMeN/login"
+        ), f"401 envelope login_url lost prefix: {body['login_url']!r}"
 
     def test_no_prefix_header_keeps_unprefixed_paths(self, gated_app_direct):
         """When no X-Forwarded-Prefix is sent, the Location header must
@@ -158,9 +159,7 @@ class TestGateRedirectsCarryPrefix:
 
 
 class TestOAuthRedirectUriRespectsPrefix:
-    def test_redirect_uri_includes_prefix_in_authorize_url(
-        self, gated_app_proxied
-    ):
+    def test_redirect_uri_includes_prefix_in_authorize_url(self, gated_app_proxied):
         """The IDP returns the user to the redirect_uri we sent. If we
         don't include the prefix, the IDP redirects to
         ``https://mission-control.tilos.com/auth/callback`` instead of
@@ -178,6 +177,7 @@ class TestOAuthRedirectUriRespectsPrefix:
         # real IDP would consume it and later use it to redirect the
         # user, so the byte-exact value MUST include the prefix.
         from urllib.parse import urlparse
+
         # Stub returns ``{redirect_uri}?code=stub_code&state=...`` — so
         # we read up to the first ``?``.
         redirect_uri = location.split("?", 1)[0]
@@ -185,19 +185,16 @@ class TestOAuthRedirectUriRespectsPrefix:
         parsed = urlparse(redirect_uri)
         assert parsed.scheme == "https"
         assert parsed.netloc == "mission-control.tilos.com"
-        assert parsed.path == "/ReYMeN/auth/callback", (
-            f"redirect_uri dropped prefix: {redirect_uri!r}"
-        )
+        assert (
+            parsed.path == "/ReYMeN/auth/callback"
+        ), f"redirect_uri dropped prefix: {redirect_uri!r}"
 
-    def test_redirect_uri_no_prefix_when_direct_deploy(
-        self, gated_app_direct
-    ):
-        r = gated_app_direct.get(
-            "/auth/login?provider=stub", follow_redirects=False
-        )
+    def test_redirect_uri_no_prefix_when_direct_deploy(self, gated_app_direct):
+        r = gated_app_direct.get("/auth/login?provider=stub", follow_redirects=False)
         assert r.status_code == 302
         redirect_uri = r.headers["location"].split("?", 1)[0]
         from urllib.parse import urlparse
+
         parsed = urlparse(redirect_uri)
         assert parsed.netloc == "fly-app.fly.dev"
         assert parsed.path == "/auth/callback"
@@ -242,9 +239,7 @@ class TestPublicUrlOverride:
             cfg = {}
             if public_url is not None:
                 cfg = {"dashboard": {"public_url": public_url}}
-            monkeypatch.setattr(
-                "ReYMeN_cli.config.load_config", lambda: cfg
-            )
+            monkeypatch.setattr("ReYMeN_cli.config.load_config", lambda: cfg)
 
         return _set
 
@@ -268,7 +263,8 @@ class TestPublicUrlOverride:
         whose proxy headers don't match the public URL."""
         patch_config(None)
         monkeypatch.setenv(
-            "ReYMeN_DASHBOARD_PUBLIC_URL", "https://custom.example",
+            "ReYMeN_DASHBOARD_PUBLIC_URL",
+            "https://custom.example",
         )
         redirect_uri = self._redirect_uri(gated_app_direct)
         assert redirect_uri == "https://custom.example/auth/callback", (
@@ -290,7 +286,8 @@ class TestPublicUrlOverride:
         """Precedence pin — env wins over config.yaml. Fly.io / CI
         secret injection depends on this ordering."""
         monkeypatch.setenv(
-            "ReYMeN_DASHBOARD_PUBLIC_URL", "https://from-env.example",
+            "ReYMeN_DASHBOARD_PUBLIC_URL",
+            "https://from-env.example",
         )
         patch_config("https://from-config.example")
         redirect_uri = self._redirect_uri(gated_app_direct)
@@ -308,7 +305,8 @@ class TestPublicUrlOverride:
         whole authority; we trust them."""
         patch_config(None)
         monkeypatch.setenv(
-            "ReYMeN_DASHBOARD_PUBLIC_URL", "https://example.com/ReYMeN",
+            "ReYMeN_DASHBOARD_PUBLIC_URL",
+            "https://example.com/ReYMeN",
         )
         redirect_uri = self._redirect_uri(gated_app_direct)
         assert redirect_uri == "https://example.com/ReYMeN/auth/callback"
@@ -322,15 +320,14 @@ class TestPublicUrlOverride:
         the operator already baked their prefix into public_url."""
         patch_config(None)
         monkeypatch.setenv(
-            "ReYMeN_DASHBOARD_PUBLIC_URL", "https://example.com/already-prefixed",
+            "ReYMeN_DASHBOARD_PUBLIC_URL",
+            "https://example.com/already-prefixed",
         )
         redirect_uri = self._redirect_uri(
             gated_app_proxied,
             headers={"x-forwarded-prefix": "/should-be-ignored"},
         )
-        assert (
-            redirect_uri == "https://example.com/already-prefixed/auth/callback"
-        ), (
+        assert redirect_uri == "https://example.com/already-prefixed/auth/callback", (
             f"public_url should suppress X-Forwarded-Prefix layering, "
             f"got {redirect_uri!r}"
         )
@@ -342,7 +339,8 @@ class TestPublicUrlOverride:
         produce identical results — no ``//auth/callback`` double slash."""
         patch_config(None)
         monkeypatch.setenv(
-            "ReYMeN_DASHBOARD_PUBLIC_URL", "https://example.com/",
+            "ReYMeN_DASHBOARD_PUBLIC_URL",
+            "https://example.com/",
         )
         redirect_uri = self._redirect_uri(gated_app_direct)
         assert redirect_uri == "https://example.com/auth/callback"
@@ -360,9 +358,9 @@ class TestPublicUrlOverride:
         for bad in [
             "javascript:alert(1)",
             "ftp://example.com",
-            "example.com",                          # missing scheme
-            "https://",                             # missing host
-            'https://example.com/"injected',       # quote char
+            "example.com",  # missing scheme
+            "https://",  # missing host
+            'https://example.com/"injected',  # quote char
             "https://example.com/\nhttps://evil",  # CRLF injection
         ]:
             monkeypatch.setenv("ReYMeN_DASHBOARD_PUBLIC_URL", bad)
@@ -409,9 +407,7 @@ class TestPublicUrlOverride:
 
         assert result == ""  # scheme-less value is still rejected
         warnings = [
-            r.getMessage()
-            for r in caplog.records
-            if r.levelno == logging.WARNING
+            r.getMessage() for r in caplog.records if r.levelno == logging.WARNING
         ]
         assert any(
             "ReYMeN_DASHBOARD_PUBLIC_URL" in m
@@ -441,17 +437,14 @@ class TestPublicUrlOverride:
         scheme_warnings = [
             r
             for r in caplog.records
-            if r.levelno == logging.WARNING
-            and "ReYMeN.domain.com" in r.getMessage()
+            if r.levelno == logging.WARNING and "ReYMeN.domain.com" in r.getMessage()
         ]
         assert len(scheme_warnings) == 1, (
             f"expected exactly one warning across 5 calls, "
             f"got {len(scheme_warnings)}"
         )
 
-    def test_valid_public_url_emits_no_warning(
-        self, patch_config, monkeypatch, caplog
-    ):
+    def test_valid_public_url_emits_no_warning(self, patch_config, monkeypatch, caplog):
         """A correctly-formed value must not produce a spurious warning."""
         import logging
 
@@ -459,17 +452,13 @@ class TestPublicUrlOverride:
 
         prefix_mod._warned_malformed_public_urls.clear()
         patch_config(None)
-        monkeypatch.setenv(
-            "ReYMeN_DASHBOARD_PUBLIC_URL", "https://ReYMeN.domain.com"
-        )
+        monkeypatch.setenv("ReYMeN_DASHBOARD_PUBLIC_URL", "https://ReYMeN.domain.com")
 
         with caplog.at_level(logging.WARNING, logger=prefix_mod.__name__):
             result = prefix_mod.resolve_public_url()
 
         assert result == "https://ReYMeN.domain.com"
-        assert not [
-            r for r in caplog.records if r.levelno == logging.WARNING
-        ]
+        assert not [r for r in caplog.records if r.levelno == logging.WARNING]
 
 
 # ---------------------------------------------------------------------------
@@ -503,13 +492,9 @@ class TestCookiePathRespectsPrefix:
         # the cookie's Path attribute, so we need /ReYMeN here. Bare
         # /-rooted cookies would still be sent but would also be sent
         # to /billing/... etc.
-        assert "Path=/ReYMeN" in pkce, (
-            f"PKCE cookie has wrong Path: {pkce!r}"
-        )
+        assert "Path=/ReYMeN" in pkce, f"PKCE cookie has wrong Path: {pkce!r}"
 
-    def test_pkce_cookie_uses_secure_prefix_when_proxied(
-        self, gated_app_proxied
-    ):
+    def test_pkce_cookie_uses_secure_prefix_when_proxied(self, gated_app_proxied):
         """Behind a proxy with Path != /, ``__Host-`` is disallowed
         (the spec requires Path=/). Fall back to ``__Secure-``, which
         carries the same Secure-required guarantee but allows any Path.
@@ -522,31 +507,22 @@ class TestCookiePathRespectsPrefix:
         cookies = r.headers.get_list("set-cookie")
         # The PKCE cookie name carries the __Secure- prefix.
         pkce_candidates = [
-            c for c in cookies
-            if c.startswith("__Secure-ReYMeN_session_pkce=")
+            c for c in cookies if c.startswith("__Secure-ReYMeN_session_pkce=")
         ]
-        assert pkce_candidates, (
-            f"PKCE cookie missing __Secure- prefix: {cookies!r}"
-        )
+        assert pkce_candidates, f"PKCE cookie missing __Secure- prefix: {cookies!r}"
 
-    def test_pkce_cookie_uses_host_prefix_when_direct(
-        self, gated_app_direct
-    ):
+    def test_pkce_cookie_uses_host_prefix_when_direct(self, gated_app_direct):
         """Fly-direct deploy: Path=/ is available, so we can use the
         stricter ``__Host-`` prefix. This binds the cookie to the
         exact origin (no Domain attribute) — best practice for
         single-host single-app deploys."""
-        r = gated_app_direct.get(
-            "/auth/login?provider=stub", follow_redirects=False
-        )
+        r = gated_app_direct.get("/auth/login?provider=stub", follow_redirects=False)
         cookies = r.headers.get_list("set-cookie")
         pkce_candidates = [
-            c for c in cookies
-            if c.startswith("__Host-ReYMeN_session_pkce=")
+            c for c in cookies if c.startswith("__Host-ReYMeN_session_pkce=")
         ]
         assert pkce_candidates, (
-            f"PKCE cookie missing __Host- prefix on direct deploy: "
-            f"{cookies!r}"
+            f"PKCE cookie missing __Host- prefix on direct deploy: " f"{cookies!r}"
         )
         # __Host- requires Path=/ and Secure (cookies spec); both must
         # be present even if a regression flips one off.
@@ -574,18 +550,15 @@ class TestCookiePathRespectsPrefix:
         r = client.get("/set")
         cookies = r.headers.get_list("set-cookie")
         # Bare cookie name, no prefix.
-        assert any(c.startswith("ReYMeN_session_pkce=") for c in cookies), (
-            f"Loopback cookie should be bare-named: {cookies!r}"
-        )
+        assert any(
+            c.startswith("ReYMeN_session_pkce=") for c in cookies
+        ), f"Loopback cookie should be bare-named: {cookies!r}"
         # And no __Host- / __Secure- variant accidentally emitted.
         assert not any(
-            c.startswith("__Host-") or c.startswith("__Secure-")
-            for c in cookies
+            c.startswith("__Host-") or c.startswith("__Secure-") for c in cookies
         )
 
-    def test_cookies_read_back_round_trip_through_prefix(
-        self, gated_app_proxied
-    ):
+    def test_cookies_read_back_round_trip_through_prefix(self, gated_app_proxied):
         """The end-to-end property: after a successful OAuth round
         trip via the proxy, the session-AT cookie carries the
         __Secure- prefix AND Path=/ReYMeN, so the next request under
@@ -611,8 +584,7 @@ class TestCookiePathRespectsPrefix:
             follow_redirects=False,
         )
         pkce_set = next(
-            c for c in r1.headers.get_list("set-cookie")
-            if "ReYMeN_session_pkce" in c
+            c for c in r1.headers.get_list("set-cookie") if "ReYMeN_session_pkce" in c
         )
         # Parse "__Secure-ReYMeN_session_pkce=...; HttpOnly; ...".
         pkce_kv = pkce_set.split(";", 1)[0]  # "__Secure-ReYMeN_session_pkce=value"
@@ -631,13 +603,8 @@ class TestCookiePathRespectsPrefix:
         )
         assert r2.status_code == 302, r2.text
         cookies = r2.headers.get_list("set-cookie")
-        at_cookies = [
-            c for c in cookies
-            if c.startswith("__Secure-ReYMeN_session_at=")
-        ]
-        assert at_cookies, (
-            f"session_at missing __Secure- prefix: {cookies!r}"
-        )
+        at_cookies = [c for c in cookies if c.startswith("__Secure-ReYMeN_session_at=")]
+        assert at_cookies, f"session_at missing __Secure- prefix: {cookies!r}"
         assert "Path=/ReYMeN" in at_cookies[0]
         assert "Secure" in at_cookies[0]
         assert "HttpOnly" in at_cookies[0]

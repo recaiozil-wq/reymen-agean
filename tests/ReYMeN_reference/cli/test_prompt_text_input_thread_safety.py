@@ -25,8 +25,9 @@ class TestPromptTextInputThreadSafety:
         """On the main thread with an active app, route through run_in_terminal."""
         cli = _make_cli()
 
-        with patch("prompt_toolkit.application.run_in_terminal") as mock_rit, \
-             patch("builtins.input", return_value="2"):
+        with patch("prompt_toolkit.application.run_in_terminal") as mock_rit, patch(
+            "builtins.input", return_value="2"
+        ):
             cli._prompt_text_input("Choice: ")
 
         # run_in_terminal was invoked; the _ask closure passed to it would
@@ -50,8 +51,9 @@ class TestPromptTextInputThreadSafety:
         result_holder = {}
 
         def run_on_daemon():
-            with patch("prompt_toolkit.application.run_in_terminal") as mock_rit, \
-                 patch("builtins.input", side_effect=fake_input):
+            with patch("prompt_toolkit.application.run_in_terminal") as mock_rit, patch(
+                "builtins.input", side_effect=fake_input
+            ):
                 result_holder["value"] = cli._prompt_text_input("Choice [1/2/3]: ")
                 result_holder["rit_called"] = mock_rit.called
 

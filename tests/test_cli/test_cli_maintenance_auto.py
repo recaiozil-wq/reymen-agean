@@ -1,4 +1,5 @@
 """Auto-generated tests for reymen.sistem.cli_maintenance."""
+
 import pytest
 from src.reymen.sistem.cli_maintenance import (
     _normalize_git_bash_path,

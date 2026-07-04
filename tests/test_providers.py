@@ -6,6 +6,7 @@ Her plugin'in import edilebilirliğini, ping() metodunun çalışmasını
 ve kayıt sisteminin doğru kurulduğunu doğrular. Ağ erişimi olmasa
 bile testler geçer (ping başarısız olabilir, hata fırlatmamalı).
 """
+
 import sys
 from pathlib import Path
 
@@ -15,10 +16,12 @@ sys.path.insert(0, str(PROJE_KOK))
 
 # ── Plugin Base ───────────────────────────────────────────────────────
 
+
 def test_plugin_base_import():
     """plugin_base modülünün ve ProviderPlugin ABC'nin import edildiğini doğrular."""
     try:
         from providers.plugin_base import ProviderPlugin, Renk
+
         assert ProviderPlugin is not None
         assert Renk.YESIL != ""
         print("  plugin_base: OK")
@@ -28,10 +31,12 @@ def test_plugin_base_import():
 
 # ── Yerel Plugin'ler ──────────────────────────────────────────────────
 
+
 def test_lmstudio_plugin():
     """LM Studio plugin'ini test eder; her durumda (çevrimdışı dahil) hata fırlatmaz."""
     try:
         from providers.lmstudio_plugin import LMStudioPlugin
+
         p = LMStudioPlugin()
         assert p.provider_adi == "lmstudio"
         assert "localhost" in p.base_url
@@ -49,6 +54,7 @@ def test_ollama_plugin():
     """Ollama plugin'ini test eder; her durumda hata fırlatmaz."""
     try:
         from providers.ollama_plugin import OllamaPlugin
+
         p = OllamaPlugin()
         assert p.provider_adi == "ollama"
         assert "localhost" in p.base_url
@@ -64,10 +70,12 @@ def test_ollama_plugin():
 
 # ── Bulut Plugin'leri ─────────────────────────────────────────────────
 
+
 def test_deepseek_plugin():
     """DeepSeek plugin'ini test eder; API anahtarı yoksa False döner, hata fırlatmaz."""
     try:
         from providers.deepseek_plugin import DeepSeekPlugin
+
         p = DeepSeekPlugin()
         assert p.provider_adi == "deepseek"
         assert "deepseek.com" in p.base_url
@@ -85,6 +93,7 @@ def test_openai_plugin():
     """OpenAI plugin'ini test eder; API anahtarı yoksa False döner, hata fırlatmaz."""
     try:
         from providers.openai_plugin import OpenAIPlugin
+
         p = OpenAIPlugin()
         assert p.provider_adi == "openai"
         assert "openai.com" in p.base_url
@@ -102,6 +111,7 @@ def test_anthropic_plugin():
     """Anthropic plugin'ini test eder; özel x-api-key başlığı kullanır."""
     try:
         from providers.anthropic_plugin import AnthropicPlugin
+
         p = AnthropicPlugin()
         assert p.provider_adi == "anthropic"
         assert "anthropic.com" in p.base_url
@@ -118,6 +128,7 @@ def test_groq_plugin():
     """Groq plugin'ini test eder; /openai/v1/models endpoint'ini kullanır."""
     try:
         from providers.groq_plugin import GroqPlugin
+
         p = GroqPlugin()
         assert p.provider_adi == "groq"
         assert "groq.com" in p.base_url
@@ -134,6 +145,7 @@ def test_google_plugin():
     """Google Gemini plugin'ini test eder; GOOGLE_API_KEY veya GEMINI_API_KEY arar."""
     try:
         from providers.google_plugin import GooglePlugin
+
         p = GooglePlugin()
         assert p.provider_adi == "google"
         assert "googleapis.com" in p.base_url
@@ -150,6 +162,7 @@ def test_openrouter_plugin():
     """OpenRouter plugin'ini test eder."""
     try:
         from providers.openrouter_plugin import OpenRouterPlugin
+
         p = OpenRouterPlugin()
         assert p.provider_adi == "openrouter"
         assert "openrouter.ai" in p.base_url
@@ -165,6 +178,7 @@ def test_together_plugin():
     """Together AI plugin'ini test eder."""
     try:
         from providers.together_plugin import TogetherPlugin
+
         p = TogetherPlugin()
         assert p.provider_adi == "together"
         assert "together.xyz" in p.base_url
@@ -180,6 +194,7 @@ def test_fireworks_plugin():
     """Fireworks AI plugin'ini test eder."""
     try:
         from providers.fireworks_plugin import FireworksPlugin
+
         p = FireworksPlugin()
         assert p.provider_adi == "fireworks"
         assert "fireworks.ai" in p.base_url
@@ -195,6 +210,7 @@ def test_xai_plugin():
     """xAI Grok plugin'ini test eder."""
     try:
         from providers.xai_plugin import XAIPlugin
+
         p = XAIPlugin()
         assert p.provider_adi == "xai"
         assert "x.ai" in p.base_url
@@ -211,6 +227,7 @@ def test_mistral_plugin():
     """Mistral AI plugin'ini test eder."""
     try:
         from providers.mistral_plugin import MistralPlugin
+
         p = MistralPlugin()
         assert p.provider_adi == "mistral"
         ok, msg = p.ping()
@@ -224,6 +241,7 @@ def test_cohere_plugin():
     """Cohere AI plugin'ini test eder."""
     try:
         from providers.cohere_plugin import CoherePlugin
+
         p = CoherePlugin()
         assert p.provider_adi == "cohere"
         ok, msg = p.ping()
@@ -237,6 +255,7 @@ def test_perplexity_plugin():
     """Perplexity AI plugin'ini test eder."""
     try:
         from providers.perplexity_plugin import PerplexityPlugin
+
         p = PerplexityPlugin()
         assert p.provider_adi == "perplexity"
         ok, msg = p.ping()
@@ -248,10 +267,12 @@ def test_perplexity_plugin():
 
 # ── Registry Sistemi ──────────────────────────────────────────────────
 
+
 def test_plugin_kayit_sistemi():
     """Plugin kayıt sisteminin doğru kurulduğunu doğrular."""
     try:
         from providers import plugin_listele, plugin_al, plugin_ping
+
         liste = plugin_listele()
         assert isinstance(liste, list)
         assert len(liste) > 0, "Plugin listesi boş olmamalı"
@@ -268,6 +289,7 @@ def test_plugin_al():
     """plugin_al() fonksiyonunun doğru plugin döndürdüğünü doğrular."""
     try:
         from providers import plugin_al
+
         plugin = plugin_al("lmstudio")
         assert plugin is not None, "lmstudio plugin'i bulunamadı"
         assert plugin.provider_adi == "lmstudio"
@@ -283,6 +305,7 @@ def test_plugin_ping():
     """plugin_ping() fonksiyonunun hata fırlatmadığını doğrular."""
     try:
         from providers import plugin_ping
+
         ok, msg = plugin_ping("lmstudio")
         assert isinstance(ok, bool)
         assert isinstance(msg, str)
@@ -299,6 +322,7 @@ def test_eski_api_geriye_uyumluluk():
     """Eski statik provider API'sinin hâlâ çalıştığını doğrular (geriye uyumluluk)."""
     try:
         from providers import get_provider, list_providers, mevcut_providerlar
+
         liste = list_providers()
         assert len(liste) >= 20, f"Provider sayısı düşük: {len(liste)}"
         profil = get_provider("lmstudio")
@@ -317,6 +341,7 @@ def test_plugin_test_metodu():
     try:
         from providers.lmstudio_plugin import LMStudioPlugin
         from providers.ollama_plugin import OllamaPlugin
+
         for sinif in [LMStudioPlugin, OllamaPlugin]:
             p = sinif()
             ok, msg = p.test()
@@ -373,4 +398,6 @@ if __name__ == "__main__":
             print(f"{Renk.KIRMIZI}✗{Renk.RESET} {isim}: {e}")
             kalan += 1
     print("=" * 50)
-    print(f"Sonuç: {Renk.YESIL}{gecen} geçti{Renk.RESET}, {Renk.KIRMIZI}{kalan} kaldı{Renk.RESET}")
+    print(
+        f"Sonuç: {Renk.YESIL}{gecen} geçti{Renk.RESET}, {Renk.KIRMIZI}{kalan} kaldı{Renk.RESET}"
+    )

@@ -6,11 +6,16 @@ try:
     from reymen.tools.delegate_task_tool import delegate_task
 
     # Alt ajanlara dagitilacak gorev listesi
-    gorevler = json.dumps([
-        {"gorev": "2+2 kac eder? Kisa cevap ver.", "baglam": "matematik"},
-        {"gorev": "Turkive'nin baskenti neresidir?", "baglam": "cografya"},
-        {"gorev": "Python'da 'merhaba dunya' yazdiran kod yaz.", "baglam": "programlama"},
-    ])
+    gorevler = json.dumps(
+        [
+            {"gorev": "2+2 kac eder? Kisa cevap ver.", "baglam": "matematik"},
+            {"gorev": "Turkive'nin baskenti neresidir?", "baglam": "cografya"},
+            {
+                "gorev": "Python'da 'merhaba dunya' yazdiran kod yaz.",
+                "baglam": "programlama",
+            },
+        ]
+    )
 
     print("=== Delegasyon Basliyor ===")
     print(f"Gorev sayisi: 3")

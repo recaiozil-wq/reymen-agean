@@ -33,6 +33,7 @@ _yazma_kilit = threading.Lock()
 
 # ── Yardımcılar ───────────────────────────────────────────────────────────────
 
+
 def _task_yolu(task_id: str) -> Path:
     """task_id'ye ait JSON dosya yolunu döndürür."""
     return HAFIZA_DIZINI / f"{task_id}.json"
@@ -53,9 +54,10 @@ def _dizin_temizle():
 
 # ── Ana Sınıf ─────────────────────────────────────────────────────────────────
 
+
 class AltAjanHafiza:
     """Task ID bazlı kalıcı JSON hafızası.
-    
+
     Her task için tek bir JSON dosyası. Her kayıt append değil,
     dosyayı oku → güncelle → yaz şeklinde (küçük task'lar için ideal).
     """
@@ -66,7 +68,7 @@ class AltAjanHafiza:
 
     def kaydet(self, task_id: str, tur: str, veri: dict) -> None:
         """Bir adım/sonuç/hata kaydını task JSON'una ekler.
-        
+
         Args:
             task_id: Alt ajan task ID'si
             tur: "adim" | "sonuc" | "hata" | "gozlem"
@@ -86,11 +88,13 @@ class AltAjanHafiza:
                     kayit = {"task_id": task_id, "kayitlar": []}
 
                 # Yeni kaydı ekle
-                kayit["kayitlar"].append({
-                    "tur": tur,
-                    "ts": time.time(),
-                    "veri": veri,
-                })
+                kayit["kayitlar"].append(
+                    {
+                        "tur": tur,
+                        "ts": time.time(),
+                        "veri": veri,
+                    }
+                )
                 kayit["son_guncelleme"] = time.time()
 
                 # Yaz
@@ -101,17 +105,24 @@ class AltAjanHafiza:
                 # Bozuk dosya varsa sıfırdan başla
                 try:
                     with open(dosya, "w", encoding="utf-8") as f:
-                        json.dump({
-                            "task_id": task_id,
-                            "kayitlar": [{"tur": tur, "ts": time.time(), "veri": veri}],
-                            "son_guncelleme": time.time(),
-                        }, f, ensure_ascii=False, indent=2)
+                        json.dump(
+                            {
+                                "task_id": task_id,
+                                "kayitlar": [
+                                    {"tur": tur, "ts": time.time(), "veri": veri}
+                                ],
+                                "son_guncelleme": time.time(),
+                            },
+                            f,
+                            ensure_ascii=False,
+                            indent=2,
+                        )
                 except OSError as _e:
                     pass  # Sessiz geç — disk dolmuş olabilir
 
     def yukle(self, task_id: str) -> dict | None:
         """Task'ın tüm kayıtlarını yükler.
-        
+
         Returns:
             Kayıt sözlüğü veya None (dosya yoksa / bozuksa)
         """
@@ -145,12 +156,16 @@ class AltAjanHafiza:
             try:
                 with open(f, "r", encoding="utf-8") as fh:
                     data = json.load(fh)
-                sonuclar.append({
-                    "task_id": data.get("task_id", f.stem),
-                    "kayit_sayisi": len(data.get("kayitlar", [])),
-                    "son_guncelleme": data.get("son_guncelleme", 0),
-                    "son_tur": data["kayitlar"][-1]["tur"] if data.get("kayitlar") else None,
-                })
+                sonuclar.append(
+                    {
+                        "task_id": data.get("task_id", f.stem),
+                        "kayit_sayisi": len(data.get("kayitlar", [])),
+                        "son_guncelleme": data.get("son_guncelleme", 0),
+                        "son_tur": data["kayitlar"][-1]["tur"]
+                        if data.get("kayitlar")
+                        else None,
+                    }
+                )
             except (OSError, json.JSONDecodeError) as _hafiza_e150:
                 print(f"[UYARI] hafiza.py:151 - {_hafiza_e150}")
         return sonuclar

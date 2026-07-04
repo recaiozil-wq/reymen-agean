@@ -81,7 +81,9 @@ exec {PY} -m ReYMeN_cli.main "$@"
     tids = []
     for i in range(3):
         tid = kb.create_task(
-            conn, title=f"real-e2e-{i}", assignee="default",
+            conn,
+            title=f"real-e2e-{i}",
+            assignee="default",
         )
         tids.append(tid)
 
@@ -108,18 +110,24 @@ exec {PY} -m ReYMeN_cli.main "$@"
     for tid in tids:
         task = kb.get_task(conn, tid)
         runs = kb.list_runs(conn, tid)
-        print(f"  task {tid}: status={task.status}, current_run_id={task.current_run_id}, "
-              f"runs={[(r.id, r.outcome) for r in runs]}")
+        print(
+            f"  task {tid}: status={task.status}, current_run_id={task.current_run_id}, "
+            f"runs={[(r.id, r.outcome) for r in runs]}"
+        )
         if task.status != "done":
             failures.append(f"task {tid} not done: status={task.status}")
         if task.current_run_id is not None:
-            failures.append(f"task {tid} has dangling current_run_id={task.current_run_id}")
+            failures.append(
+                f"task {tid} has dangling current_run_id={task.current_run_id}"
+            )
         if len(runs) != 1:
             failures.append(f"task {tid} has {len(runs)} runs, expected 1")
         else:
             r = runs[0]
             if r.outcome != "completed":
-                failures.append(f"task {tid} run outcome={r.outcome}, expected completed")
+                failures.append(
+                    f"task {tid} run outcome={r.outcome}, expected completed"
+                )
             if not r.summary or "real-subprocess worker finished" not in r.summary:
                 failures.append(f"task {tid} summary missing: {r.summary!r}")
             if not r.metadata or r.metadata.get("iterations") != 3:
@@ -145,7 +153,9 @@ exec {PY} -m ReYMeN_cli.main "$@"
     print("=" * 60)
 
     crash_tid = kb.create_task(
-        conn, title="crash-e2e", assignee="default",
+        conn,
+        title="crash-e2e",
+        assignee="default",
     )
 
     # Spawn a worker that sleeps long enough for us to kill it.
@@ -158,7 +168,8 @@ exec {PY} -m ReYMeN_cli.main "$@"
         r, w = os.pipe()
         middleman = subprocess.Popen(
             [
-                PY, "-c",
+                PY,
+                "-c",
                 "import os,sys,subprocess;"
                 "p=subprocess.Popen(['sleep','30'],"
                 "stdin=subprocess.DEVNULL,"
@@ -213,6 +224,7 @@ exec {PY} -m ReYMeN_cli.main "$@"
     print("=" * 60)
     # Scenario A workers wrote to /tmp/ReYMeN_e2e_*/worker_*.log
     import glob
+
     logs = glob.glob(os.path.join(home, "worker_*.log"))
     print(f"  {len(logs)} worker log files")
     for lp in logs[:3]:

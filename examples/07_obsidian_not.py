@@ -50,6 +50,7 @@ try:
 
         # 5. Temizlik (test notunu sil)
         import os
+
         try:
             os.remove(os.path.join(vault_yolu, test_not_yolu))
             print(f"\n🧹 Test notu temizlendi.")

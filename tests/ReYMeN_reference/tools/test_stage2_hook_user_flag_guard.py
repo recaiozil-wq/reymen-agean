@@ -20,6 +20,7 @@ unaffected.
 Extraction + stubbed-shell-run mirrors
 tests/tools/test_stage2_hook_toplevel_chown.py.
 """
+
 from __future__ import annotations
 
 import re
@@ -64,7 +65,9 @@ def test_guard_present_and_mentions_remediation(path: Path) -> None:
     assert "PUID" in block and "PGID" in block
 
 
-def _run_guard(text: str, *, cur_uid: int, ReYMeN_uid: int = 10000) -> subprocess.CompletedProcess:
+def _run_guard(
+    text: str, *, cur_uid: int, ReYMeN_uid: int = 10000
+) -> subprocess.CompletedProcess:
     """Run the extracted guard with `id` stubbed. Returns the completed process
     (rc 1 + stderr message when rejected, rc 0 when allowed through)."""
     bash = shutil.which("bash")

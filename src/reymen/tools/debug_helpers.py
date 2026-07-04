@@ -25,7 +25,9 @@ class DebugSession:
         self._start_time = datetime.datetime.now().isoformat() if self.enabled else ""
         if self.enabled:
             self.log_dir.mkdir(parents=True, exist_ok=True)
-            logger.debug("%s debug mode enabled - Session ID: %s", tool_name, self.session_id)
+            logger.debug(
+                "%s debug mode enabled - Session ID: %s", tool_name, self.session_id
+            )
 
     @property
     def active(self) -> bool:
@@ -34,11 +36,13 @@ class DebugSession:
     def log_call(self, call_name: str, call_data: Dict[str, Any]) -> None:
         if not self.enabled:
             return
-        self._calls.append({
-            "timestamp": datetime.datetime.now().isoformat(),
-            "tool_name": call_name,
-            **call_data,
-        })
+        self._calls.append(
+            {
+                "timestamp": datetime.datetime.now().isoformat(),
+                "tool_name": call_name,
+                **call_data,
+            }
+        )
 
     def save(self) -> None:
         if not self.enabled:
@@ -52,7 +56,9 @@ class DebugSession:
                 "end_time": datetime.datetime.now().isoformat(),
                 "calls": list(self._calls),
             }
-            filepath.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+            filepath.write_text(
+                json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8"
+            )
             logger.debug("Debug log saved: %s", filepath)
         except Exception as exc:
             logger.warning("Failed to save debug log: %s", exc)

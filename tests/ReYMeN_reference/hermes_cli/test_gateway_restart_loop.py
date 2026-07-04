@@ -21,54 +21,69 @@ from ReYMeN_cli.cron import (
 # Defense 2: _contains_gateway_lifecycle_command pattern tests
 # ---------------------------------------------------------------------------
 
+
 class TestGatewayLifecyclePattern:
     """Verify the regex catches gateway lifecycle commands."""
 
-    @pytest.mark.parametrize("text", [
-        "ReYMeN gateway restart",
-        "ReYMeN gateway stop",
-        "ReYMeN gateway start",
-        "ReYMeN  gateway  restart",         # double spaces
-        "Hermez Gateway Restart".lower().replace("z", "s"),  # case handled
-        "ReYMeN GATEWAY RESTART",           # uppercase
-    ])
+    @pytest.mark.parametrize(
+        "text",
+        [
+            "ReYMeN gateway restart",
+            "ReYMeN gateway stop",
+            "ReYMeN gateway start",
+            "ReYMeN  gateway  restart",  # double spaces
+            "Hermez Gateway Restart".lower().replace("z", "s"),  # case handled
+            "ReYMeN GATEWAY RESTART",  # uppercase
+        ],
+    )
     def test_ReYMeN_gateway_commands(self, text):
         assert _contains_gateway_lifecycle_command(text), f"Should match: {text!r}"
 
-    @pytest.mark.parametrize("text", [
-        "launchctl kickstart gui/501/ai.ReYMeN.gateway",
-        "launchctl unload ~/Library/LaunchAgents/ai.ReYMeN.gateway.plist",
-        "launchctl stop ai.ReYMeN.gateway",
-        "systemctl restart ReYMeN-gateway",
-        "systemctl stop ReYMeN-gateway.service",
-        "systemctl start ReYMeN-gateway",
-    ])
+    @pytest.mark.parametrize(
+        "text",
+        [
+            "launchctl kickstart gui/501/ai.ReYMeN.gateway",
+            "launchctl unload ~/Library/LaunchAgents/ai.ReYMeN.gateway.plist",
+            "launchctl stop ai.ReYMeN.gateway",
+            "systemctl restart ReYMeN-gateway",
+            "systemctl stop ReYMeN-gateway.service",
+            "systemctl start ReYMeN-gateway",
+        ],
+    )
     def test_service_manager_commands(self, text):
         assert _contains_gateway_lifecycle_command(text), f"Should match: {text!r}"
 
-    @pytest.mark.parametrize("text", [
-        "kill ReYMeN gateway process",
-        "pkill -f ReYMeN.*gateway",
-    ])
+    @pytest.mark.parametrize(
+        "text",
+        [
+            "kill ReYMeN gateway process",
+            "pkill -f ReYMeN.*gateway",
+        ],
+    )
     def test_kill_commands(self, text):
         assert _contains_gateway_lifecycle_command(text), f"Should match: {text!r}"
 
-    @pytest.mark.parametrize("text", [
-        "restart the server application",
-        "ReYMeN cron list",
-        "ReYMeN update",
-        "ReYMeN config set model claude",
-        "echo 'just a normal cron job'",
-        "run the backup script",
-        "gateway is running fine",
-        # Regression (#30728 follow-up): legit prompts that merely mention an
-        # unrelated gateway + a restart must NOT be blocked.
-        "Summarize the API gateway logs and report any restart events from last night",
-        "Check if the payment gateway needs a restart after the deploy",
-        "Monitor the gateway and tell me if a restart is recommended",
-    ])
+    @pytest.mark.parametrize(
+        "text",
+        [
+            "restart the server application",
+            "ReYMeN cron list",
+            "ReYMeN update",
+            "ReYMeN config set model claude",
+            "echo 'just a normal cron job'",
+            "run the backup script",
+            "gateway is running fine",
+            # Regression (#30728 follow-up): legit prompts that merely mention an
+            # unrelated gateway + a restart must NOT be blocked.
+            "Summarize the API gateway logs and report any restart events from last night",
+            "Check if the payment gateway needs a restart after the deploy",
+            "Monitor the gateway and tell me if a restart is recommended",
+        ],
+    )
     def test_safe_commands(self, text):
-        assert not _contains_gateway_lifecycle_command(text), f"Should NOT match: {text!r}"
+        assert not _contains_gateway_lifecycle_command(
+            text
+        ), f"Should NOT match: {text!r}"
 
 
 class TestCronCreateLifecycleBlock:
@@ -193,12 +208,14 @@ class TestCronCreateLifecycleBlock:
 # Defense 1: gateway stop/restart refuse inside gateway
 # ---------------------------------------------------------------------------
 
+
 class TestGatewaySelfTargetingGuard:
     """Verify ReYMeN gateway stop/restart refuse when _ReYMeN_GATEWAY=1."""
 
     def test_stop_refuses_inside_gateway(self, monkeypatch):
         monkeypatch.setenv("_ReYMeN_GATEWAY", "1")
         from ReYMeN_cli.gateway import gateway_command
+
         args = Namespace(gateway_command="stop", all=False, system=False)
         with pytest.raises(SystemExit) as exc_info:
             gateway_command(args)
@@ -207,6 +224,7 @@ class TestGatewaySelfTargetingGuard:
     def test_restart_refuses_inside_gateway(self, monkeypatch):
         monkeypatch.setenv("_ReYMeN_GATEWAY", "1")
         from ReYMeN_cli.gateway import gateway_command
+
         args = Namespace(gateway_command="restart", all=False, system=False)
         with pytest.raises(SystemExit) as exc_info:
             gateway_command(args)

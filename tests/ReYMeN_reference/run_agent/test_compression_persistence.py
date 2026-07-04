@@ -22,10 +22,10 @@ from pathlib import Path
 from unittest.mock import patch
 
 
-
 # ---------------------------------------------------------------------------
 # Part 1: Agent-side — _flush_messages_to_session_db after compression
 # ---------------------------------------------------------------------------
+
 
 class TestFlushAfterCompression:
     """Verify that compressed messages are flushed to the new session's SQLite
@@ -35,6 +35,7 @@ class TestFlushAfterCompression:
     def _make_agent(self, session_db):
         with patch.dict(os.environ, {"OPENROUTER_API_KEY": "test-key"}):
             from run_agent import AIAgent
+
             agent = AIAgent(
                 api_key="test-key",
                 base_url="https://openrouter.ai/api/v1",
@@ -65,8 +66,10 @@ class TestFlushAfterCompression:
 
             # Simulate the original long history (200 messages)
             original_history = [
-                {"role": "user" if i % 2 == 0 else "assistant",
-                 "content": f"message {i}"}
+                {
+                    "role": "user" if i % 2 == 0 else "assistant",
+                    "content": f"message {i}",
+                }
                 for i in range(200)
             ]
 
@@ -134,6 +137,7 @@ class TestFlushAfterCompression:
 # Part 2: Gateway-side — history_offset after session split
 # ---------------------------------------------------------------------------
 
+
 class TestGatewayHistoryOffsetAfterSplit:
     """Verify that when the agent creates a new session during compression,
     the gateway uses history_offset=0 so all compressed messages are written
@@ -150,7 +154,7 @@ class TestGatewayHistoryOffsetAfterSplit:
         agent_history_len = 200
 
         # Simulate the gateway's offset calculation (post-fix)
-        _session_was_split = (agent_session_id != original_session_id)
+        _session_was_split = agent_session_id != original_session_id
         _effective_history_offset = 0 if _session_was_split else agent_history_len
 
         assert _session_was_split is True
@@ -162,7 +166,7 @@ class TestGatewayHistoryOffsetAfterSplit:
         agent_session_id = "session-abc"  # Same = no compression
         agent_history_len = 200
 
-        _session_was_split = (agent_session_id != session_id)
+        _session_was_split = agent_session_id != session_id
         _effective_history_offset = 0 if _session_was_split else agent_history_len
 
         assert _session_was_split is False
@@ -180,10 +184,14 @@ class TestGatewayHistoryOffsetAfterSplit:
         ]
         history_offset = 0  # After fix: 0 on session split
 
-        new_messages = agent_messages[history_offset:] if len(agent_messages) > history_offset else []
-        assert len(new_messages) == 5, (
-            f"Expected all 5 messages with offset=0, got {len(new_messages)}"
+        new_messages = (
+            agent_messages[history_offset:]
+            if len(agent_messages) > history_offset
+            else []
         )
+        assert (
+            len(new_messages) == 5
+        ), f"Expected all 5 messages with offset=0, got {len(new_messages)}"
 
     def test_new_messages_empty_with_stale_offset(self):
         """Demonstrates the bug: stale offset produces empty new_messages."""
@@ -194,7 +202,11 @@ class TestGatewayHistoryOffsetAfterSplit:
         # Bug: offset is the pre-compression history length
         history_offset = 200
 
-        new_messages = agent_messages[history_offset:] if len(agent_messages) > history_offset else []
-        assert len(new_messages) == 0, (
-            "Expected 0 messages with stale offset=200 (demonstrates the bug)"
+        new_messages = (
+            agent_messages[history_offset:]
+            if len(agent_messages) > history_offset
+            else []
         )
+        assert (
+            len(new_messages) == 0
+        ), "Expected 0 messages with stale offset=200 (demonstrates the bug)"

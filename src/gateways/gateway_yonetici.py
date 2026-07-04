@@ -59,14 +59,18 @@ class GatewayManager:
         """
         async with self._kilit:
             if platform in self._gw_havuzu:
-                logger.warning(f"[GatewayManager] '{platform}' zaten kayitli, degistiriliyor.")
+                logger.warning(
+                    f"[GatewayManager] '{platform}' zaten kayitli, degistiriliyor."
+                )
                 # Eskisini durdur
                 eski = self._gw_havuzu[platform]
                 if eski.calisiyor:
                     await eski.stop()
 
             self._gw_havuzu[platform] = gateway
-            logger.info(f"[GatewayManager] '{platform}' kaydedildi ({type(gateway).__name__}).")
+            logger.info(
+                f"[GatewayManager] '{platform}' kaydedildi ({type(gateway).__name__})."
+            )
             return True
 
     async def kaldir(self, platform: str) -> Optional[GatewayBase]:
@@ -175,9 +179,13 @@ class GatewayManager:
 
     # ── Mesaj Gonderimi ─────────────────────────────────────────────
 
-    async def gonder(self, mesaj: str, platform: str,
-                     hedef: Optional[str] = None,
-                     meta: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    async def gonder(
+        self,
+        mesaj: str,
+        platform: str,
+        hedef: Optional[str] = None,
+        meta: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
         """
         Belirli bir platforma mesaj gonderir.
 
@@ -199,10 +207,13 @@ class GatewayManager:
 
         return await gateway.send(mesaj, hedef=hedef, meta=meta)
 
-    async def broadcast(self, mesaj: str,
-                        hedef: Optional[str] = None,
-                        meta: Optional[Dict[str, Any]] = None,
-                        platformlar: Optional[List[str]] = None) -> Dict[str, Any]:
+    async def broadcast(
+        self,
+        mesaj: str,
+        hedef: Optional[str] = None,
+        meta: Optional[Dict[str, Any]] = None,
+        platformlar: Optional[List[str]] = None,
+    ) -> Dict[str, Any]:
         """
         Belirtilen (veya tum aktif) platformlara mesaj gonderir.
 
@@ -224,10 +235,13 @@ class GatewayManager:
 
         return sonuclar
 
-    async def broadcast_paralel(self, mesaj: str,
-                                 hedef: Optional[str] = None,
-                                 meta: Optional[Dict[str, Any]] = None,
-                                 platformlar: Optional[List[str]] = None) -> Dict[str, Any]:
+    async def broadcast_paralel(
+        self,
+        mesaj: str,
+        hedef: Optional[str] = None,
+        meta: Optional[Dict[str, Any]] = None,
+        platformlar: Optional[List[str]] = None,
+    ) -> Dict[str, Any]:
         """
         Tum platformlara eszamanli (paralel) mesaj gonderir.
 
@@ -261,8 +275,9 @@ class GatewayManager:
 
     # ── Mesaj Dinleme ───────────────────────────────────────────────
 
-    async def dinlemeye_basla(self, platform: str,
-                               callback: Optional[callable] = None) -> bool:
+    async def dinlemeye_basla(
+        self, platform: str, callback: Optional[callable] = None
+    ) -> bool:
         """
         Bir platformdan mesaj dinlemeye baslar.
 
@@ -313,7 +328,10 @@ class GatewayManager:
             try:
                 await gorev
             except asyncio.CancelledError as _e:
-                logger.warning("[GatewayYonetici] except asyncio.CancelledError (L315): %s", asyncio.CancelledError)
+                logger.warning(
+                    "[GatewayYonetici] except asyncio.CancelledError (L315): %s",
+                    asyncio.CancelledError,
+                )
                 pass
 
     def genel_callback_ayarla(self, callback: callable) -> None:
@@ -368,11 +386,14 @@ class GatewayManager:
         await self.hepsini_durdur()
 
     def __repr__(self) -> str:
-        return (f"<GatewayManager platform={len(self._gw_havuzu)} "
-                f"aktif={len(self._aktif_platformlar)}>")
+        return (
+            f"<GatewayManager platform={len(self._gw_havuzu)} "
+            f"aktif={len(self._aktif_platformlar)}>"
+        )
 
 
 # ── Motor Kayit ─────────────────────────────────────────────────────
+
 
 def motor_kaydet(motor) -> None:
     """Motor'a GatewayManager araçlarını kaydeder."""
@@ -388,6 +409,7 @@ def motor_kaydet(motor) -> None:
     )
     motor._plugin_arac_kaydet(
         "GATEWAY_BROADCAST",
-        lambda mesaj="", platformlar="[]": f"GatewayManager.broadcast('{mesaj}', platformlar={platformlar})",
+        lambda mesaj="",
+        platformlar="[]": f"GatewayManager.broadcast('{mesaj}', platformlar={platformlar})",
         "Tum platformlara (veya belirtilenlere) mesaj gonderir",
     )

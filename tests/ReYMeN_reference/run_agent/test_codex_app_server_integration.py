@@ -29,10 +29,17 @@ def fake_session(monkeypatch):
         return TurnResult(
             final_text=f"echo: {user_input}",
             projected_messages=[
-                {"role": "assistant", "content": None,
-                 "tool_calls": [{"id": "exec_1", "type": "function",
-                                 "function": {"name": "exec_command",
-                                              "arguments": "{}"}}]},
+                {
+                    "role": "assistant",
+                    "content": None,
+                    "tool_calls": [
+                        {
+                            "id": "exec_1",
+                            "type": "function",
+                            "function": {"name": "exec_command", "arguments": "{}"},
+                        }
+                    ],
+                },
                 {"role": "tool", "tool_call_id": "exec_1", "content": "ok"},
                 {"role": "assistant", "content": f"echo: {user_input}"},
             ],
@@ -144,8 +151,11 @@ class TestRunConversationCodexPath:
         assert msgs[0]["role"] == "user"
         assert msgs[0]["content"] == "hello"
         # Last assistant message has the final text
-        final = [m for m in msgs if m.get("role") == "assistant"
-                 and m.get("content") == "echo: hello"]
+        final = [
+            m
+            for m in msgs
+            if m.get("role") == "assistant" and m.get("content") == "echo: hello"
+        ]
         assert final, f"expected final assistant message in {msgs}"
 
     def test_nudge_counters_tick(self, fake_session):
@@ -175,10 +185,13 @@ class TestRunConversationCodexPath:
         with patch.object(agent, "_spawn_background_review", return_value=None):
             result = agent.run_conversation("ping unique 12345")
         user_count = sum(
-            1 for m in result["messages"]
+            1
+            for m in result["messages"]
             if m.get("role") == "user" and m.get("content") == "ping unique 12345"
         )
-        assert user_count == 1, f"user message appeared {user_count}× in {result['messages']}"
+        assert (
+            user_count == 1
+        ), f"user message appeared {user_count}× in {result['messages']}"
 
     def test_background_review_NOT_invoked_below_threshold(self, fake_session):
         """A single turn shouldn't trigger background review — counters
@@ -187,23 +200,24 @@ class TestRunConversationCodexPath:
         agent._memory_nudge_interval = 10
         agent._skill_nudge_interval = 10
         agent._iters_since_skill = 0
-        with patch.object(agent, "_spawn_background_review",
-                          return_value=None) as spawn:
+        with patch.object(
+            agent, "_spawn_background_review", return_value=None
+        ) as spawn:
             agent.run_conversation("ping")
         # Below threshold → review should NOT fire (was a real bug:
         # the helper was calling _spawn_background_review() with no
         # args after every turn, which would crash with TypeError).
         assert not spawn.called
 
-    def test_background_review_skill_trigger_fires_above_threshold(
-        self, monkeypatch
-    ):
+    def test_background_review_skill_trigger_fires_above_threshold(self, monkeypatch):
         """When tool iterations cross the skill nudge interval, the
         background review fires with review_skills=True and the right
         messages_snapshot signature."""
         from agent.transports.codex_app_server_session import (
-            CodexAppServerSession, TurnResult,
+            CodexAppServerSession,
+            TurnResult,
         )
+
         # Make the fake session report 10 tool iterations in one turn
         # (matching the default skill threshold).
         def fake_run_turn(self, user_input: str, **kwargs):
@@ -213,12 +227,12 @@ class TestRunConversationCodexPath:
                     {"role": "assistant", "content": f"echo: {user_input}"},
                 ],
                 tool_iterations=10,
-                turn_id="t1", thread_id="th1",
+                turn_id="t1",
+                thread_id="th1",
             )
+
         monkeypatch.setattr(CodexAppServerSession, "run_turn", fake_run_turn)
-        monkeypatch.setattr(
-            CodexAppServerSession, "ensure_started", lambda self: "th1"
-        )
+        monkeypatch.setattr(CodexAppServerSession, "ensure_started", lambda self: "th1")
 
         agent = _make_codex_agent()
         agent._skill_nudge_interval = 10
@@ -227,8 +241,9 @@ class TestRunConversationCodexPath:
         agent.valid_tool_names = set(getattr(agent, "valid_tool_names", set()))
         agent.valid_tool_names.add("skill_manage")
 
-        with patch.object(agent, "_spawn_background_review",
-                          return_value=None) as spawn:
+        with patch.object(
+            agent, "_spawn_background_review", return_value=None
+        ) as spawn:
             agent.run_conversation("do tool work")
 
         assert spawn.called, "skill threshold tripped but review didn't fire"
@@ -254,8 +269,9 @@ class TestRunConversationCodexPath:
         agent.valid_tool_names = set(getattr(agent, "valid_tool_names", set()))
         agent.valid_tool_names.add("skill_manage")
 
-        with patch.object(agent, "_spawn_background_review",
-                          return_value=None) as spawn:
+        with patch.object(
+            agent, "_spawn_background_review", return_value=None
+        ) as spawn:
             agent.run_conversation("first")
         # The fake session reports tool_iterations=1, which trips
         # _skill_nudge_interval=1. So review should fire.
@@ -294,6 +310,7 @@ class TestReviewForkApiModeDowngrade:
         verify the review_agent gets api_mode=codex_responses when the
         parent is codex_app_server."""
         from unittest.mock import MagicMock, patch as _patch
+
         agent = _make_codex_agent()
         # Pretend memory + skills are configured so the review fork
         # reaches the AIAgent constructor.
@@ -329,10 +346,12 @@ class TestReviewForkApiModeDowngrade:
 
             def _no_op_run_conv(*a, **kw):
                 return {"final_response": "", "messages": []}
+
             self.run_conversation = _no_op_run_conv
 
             def _no_op_close(*a, **kw):
                 return None
+
             self.close = _no_op_close
 
         with _patch("run_agent.AIAgent.__init__", _capture_init):
@@ -343,6 +362,7 @@ class TestReviewForkApiModeDowngrade:
             )
             # Wait for the spawned thread to actually execute
             import time
+
             for _ in range(30):
                 if "api_mode" in captured:
                     break
@@ -359,8 +379,7 @@ class TestErrorHandling:
         def boom_run_turn(self, user_input, **kwargs):
             raise RuntimeError("subprocess died")
 
-        monkeypatch.setattr(CodexAppServerSession, "ensure_started",
-                            lambda self: "t1")
+        monkeypatch.setattr(CodexAppServerSession, "ensure_started", lambda self: "t1")
         monkeypatch.setattr(CodexAppServerSession, "run_turn", boom_run_turn)
 
         agent = _make_codex_agent()
@@ -382,8 +401,8 @@ class TestErrorHandling:
                 turn_id="t",
                 thread_id="th",
             )
-        monkeypatch.setattr(CodexAppServerSession, "ensure_started",
-                            lambda self: "th")
+
+        monkeypatch.setattr(CodexAppServerSession, "ensure_started", lambda self: "th")
         monkeypatch.setattr(CodexAppServerSession, "run_turn", interrupted_turn)
 
         agent = _make_codex_agent()
@@ -416,8 +435,7 @@ class TestSessionRetirementOnRunAgent:
         def fake_close(self):
             closes["count"] += 1
 
-        monkeypatch.setattr(CodexAppServerSession, "ensure_started",
-                            lambda self: "th1")
+        monkeypatch.setattr(CodexAppServerSession, "ensure_started", lambda self: "th1")
         monkeypatch.setattr(CodexAppServerSession, "run_turn", fake_run_turn)
         monkeypatch.setattr(CodexAppServerSession, "close", fake_close)
 
@@ -453,8 +471,7 @@ class TestSessionRetirementOnRunAgent:
         def fake_close(self):
             closes["count"] += 1
 
-        monkeypatch.setattr(CodexAppServerSession, "ensure_started",
-                            lambda self: "th1")
+        monkeypatch.setattr(CodexAppServerSession, "ensure_started", lambda self: "th1")
         monkeypatch.setattr(CodexAppServerSession, "run_turn", boom_run_turn)
         monkeypatch.setattr(CodexAppServerSession, "close", fake_close)
 

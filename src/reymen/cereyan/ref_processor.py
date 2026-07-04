@@ -45,6 +45,7 @@ def _config_oku() -> bool:
     """
     try:
         import yaml
+
         for y in [
             Path.cwd() / "config.yaml",
             Path(__file__).resolve().parent.parent.parent / "config.yaml",
@@ -67,7 +68,9 @@ def _config_oku() -> bool:
 _REF_PROCESSOR_AKTIF = _config_oku()
 
 
-def _dosya_oku(dosya_yolu: str, max_karakter: int = _VARSAYILAN_MAX_KARAKTER) -> Tuple[bool, str, str]:
+def _dosya_oku(
+    dosya_yolu: str, max_karakter: int = _VARSAYILAN_MAX_KARAKTER
+) -> Tuple[bool, str, str]:
     """@file: ile belirtilen dosyayi guvenlik kontrolunden gecirerek oku.
 
     Args:
@@ -81,6 +84,7 @@ def _dosya_oku(dosya_yolu: str, max_karakter: int = _VARSAYILAN_MAX_KARAKTER) ->
         # Guvenlik kontrolu
         try:
             from reymen.guvenlik.file_safety import guvenli_mi
+
             guvenli, hata = guvenli_mi(dosya_yolu)
             if not guvenli:
                 return False, "", f"Guvenlik engeli: {hata}"
@@ -107,8 +111,11 @@ def _dosya_oku(dosya_yolu: str, max_karakter: int = _VARSAYILAN_MAX_KARAKTER) ->
             return False, "", f"Okunamiyor (binary olabilir): {yol.name}"
 
         if len(icerik) > max_karakter:
-            log.warning("[RefProcessor] Dosya cok buyuk, ilk %d karakter alindi: %s",
-                        max_karakter, yol.name)
+            log.warning(
+                "[RefProcessor] Dosya cok buyuk, ilk %d karakter alindi: %s",
+                max_karakter,
+                yol.name,
+            )
             icerik = icerik[:max_karakter] + "\n\n... [kesildi]"
 
         return True, icerik, ""
@@ -118,7 +125,9 @@ def _dosya_oku(dosya_yolu: str, max_karakter: int = _VARSAYILAN_MAX_KARAKTER) ->
         return False, "", f"Dosya okuma hatasi: {e}"
 
 
-def _url_oku(url: str, max_karakter: int = _VARSAYILAN_MAX_KARAKTER) -> Tuple[bool, str, str]:
+def _url_oku(
+    url: str, max_karakter: int = _VARSAYILAN_MAX_KARAKTER
+) -> Tuple[bool, str, str]:
     """@url: ile belirtilen URL'yi guvenlik kontrolunden gecirerek icerigini cek.
 
     Args:
@@ -138,6 +147,7 @@ def _url_oku(url: str, max_karakter: int = _VARSAYILAN_MAX_KARAKTER) -> Tuple[bo
         # Guvenlik kontrolu
         try:
             from reymen.guvenlik.url_safety import url_guvenli_mi
+
             guvenli, hata = url_guvenli_mi(url)
             if not guvenli:
                 return False, "", f"URL guvenlik engeli: {hata}"
@@ -147,15 +157,19 @@ def _url_oku(url: str, max_karakter: int = _VARSAYILAN_MAX_KARAKTER) -> Tuple[bo
         # HTTP istegi
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-                          "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         }
         yanit = _requests.get(url, headers=headers, timeout=15, allow_redirects=True)
         yanit.raise_for_status()
 
         # Icerik tipine gore isle
         content_type = yanit.headers.get("Content-Type", "").lower()
-        if "text/" not in content_type and "application/json" not in content_type \
-           and "application/xml" not in content_type and "html" not in content_type:
+        if (
+            "text/" not in content_type
+            and "application/json" not in content_type
+            and "application/xml" not in content_type
+            and "html" not in content_type
+        ):
             return False, "", f"Desteklenmeyen icerik turu: {content_type}"
 
         # Encoding tespiti
@@ -174,8 +188,11 @@ def _url_oku(url: str, max_karakter: int = _VARSAYILAN_MAX_KARAKTER) -> Tuple[bo
                 pass  # HTML temizleme basarisiz olursa ham icerigi kullan
 
         if len(icerik) > max_karakter:
-            log.warning("[RefProcessor] URL icerigi cok buyuk, ilk %d karakter alindi: %s",
-                        max_karakter, url)
+            log.warning(
+                "[RefProcessor] URL icerigi cok buyuk, ilk %d karakter alindi: %s",
+                max_karakter,
+                url,
+            )
             icerik = icerik[:max_karakter] + "\n\n... [kesildi]"
 
         return True, icerik, ""
@@ -191,9 +208,11 @@ def _url_oku(url: str, max_karakter: int = _VARSAYILAN_MAX_KARAKTER) -> Tuple[bo
         return False, "", f"URL okuma hatasi: {e}"
 
 
-def ref_isle(metin: str,
-             max_karakter: int = _VARSAYILAN_MAX_KARAKTER,
-             aktif: Optional[bool] = None) -> Tuple[str, List[dict]]:
+def ref_isle(
+    metin: str,
+    max_karakter: int = _VARSAYILAN_MAX_KARAKTER,
+    aktif: Optional[bool] = None,
+) -> Tuple[str, List[dict]]:
     """Metindeki @file: ve @url: referanslarini isle.
 
     Ornek:
@@ -239,9 +258,7 @@ def ref_isle(metin: str,
         referanslar.append(ref_kayit)
 
         if basarili:
-            zengin_metin = zengin_metin.replace(
-                eslesme.group(0), f"[REF:{dosya_adi}]"
-            )
+            zengin_metin = zengin_metin.replace(eslesme.group(0), f"[REF:{dosya_adi}]")
         else:
             log.warning("[RefProcessor] @file basarisiz: %s — %s", dosya_yolu, hata)
             zengin_metin = zengin_metin.replace(
@@ -268,9 +285,7 @@ def ref_isle(metin: str,
         referanslar.append(ref_kayit)
 
         if basarili:
-            zengin_metin = zengin_metin.replace(
-                eslesme.group(0), f"[REF:{etiket}]"
-            )
+            zengin_metin = zengin_metin.replace(eslesme.group(0), f"[REF:{etiket}]")
         else:
             log.warning("[RefProcessor] @url basarisiz: %s — %s", url, hata)
             zengin_metin = zengin_metin.replace(
@@ -313,8 +328,6 @@ def ref_context_olustur(referanslar: List[dict]) -> Optional[str]:
     context = (
         "[REFERANSLAR]\n"
         "Asagida kullanicinin @file/@url ile belirttigi referanslarin "
-        "icerigi yer almaktadir:\n\n"
-        + "\n\n".join(bolumler) +
-        "\n[/REFERANSLAR]"
+        "icerigi yer almaktadir:\n\n" + "\n\n".join(bolumler) + "\n[/REFERANSLAR]"
     )
     return context

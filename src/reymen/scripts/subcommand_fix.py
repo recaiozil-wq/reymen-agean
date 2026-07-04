@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """subcommand_fix.py — 29 subcommand run_* stub'larini doldur."""
+
 import os
 import re
 from pathlib import Path
@@ -67,8 +68,8 @@ for py in sorted(SUBCMD_DIR.glob("*.py")):
 
     # Eski pattern: """..."""\n    pass
     # Yeni: """..."""\n    <implementasyon>
-    eski = f'pass\n\n\nif __name__'
-    yeni = f'{yeni_impl}\n\n\nif __name__'
+    eski = f"pass\n\n\nif __name__"
+    yeni = f"{yeni_impl}\n\n\nif __name__"
 
     if eski in icerik:
         icerik = icerik.replace(eski, yeni, 1)

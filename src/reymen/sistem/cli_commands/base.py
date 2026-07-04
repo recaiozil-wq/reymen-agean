@@ -76,17 +76,29 @@ class MixinCommands:
         """Open the active input buffer in an external editor."""
         app = getattr(self, "_app", None)
         if not app:
-            _cprint(f"{_DIM}External editor is only available inside the interactive CLI.{_RST}")
+            _cprint(
+                f"{_DIM}External editor is only available inside the interactive CLI.{_RST}"
+            )
             return False
         if self._command_running:
-            _cprint(f"{_DIM}Wait for the current command to finish before opening the editor.{_RST}")
+            _cprint(
+                f"{_DIM}Wait for the current command to finish before opening the editor.{_RST}"
+            )
             return False
-        if self._sudo_state or self._secret_state or self._approval_state or getattr(self, "_slash_confirm_state", None) or self._clarify_state:
+        if (
+            self._sudo_state
+            or self._secret_state
+            or self._approval_state
+            or getattr(self, "_slash_confirm_state", None)
+            or self._clarify_state
+        ):
             _cprint(f"{_DIM}Finish the active prompt before opening the editor.{_RST}")
             return False
         target_buffer = buffer or getattr(app, "current_buffer", None)
         if target_buffer is None:
-            _cprint(f"{_DIM}No active input buffer is available for the external editor.{_RST}")
+            _cprint(
+                f"{_DIM}No active input buffer is available for the external editor.{_RST}"
+            )
             return False
         try:
             existing_text = getattr(target_buffer, "text", "")
@@ -109,24 +121,30 @@ class MixinCommands:
         """Display the welcome banner in Claude Code style."""
         self.console.clear()
         ctx_len = None
-        if hasattr(self, 'agent') and self.agent and hasattr(self.agent, 'context_compressor'):
+        if (
+            hasattr(self, "agent")
+            and self.agent
+            and hasattr(self.agent, "context_compressor")
+        ):
             ctx_len = self.agent.context_compressor.context_length
-        
+
         # Auto-compact for narrow terminals — the full banner with caduceus
         # + tool list needs ~80 columns minimum to render without wrapping.
         term_width = shutil.get_terminal_size().columns
         use_compact = self.compact or term_width < 80
-        
+
         if use_compact:
             self._console_print(_build_compact_banner())
             self._show_status()
         else:
             # Get tools for display
-            tools = get_tool_definitions(enabled_toolsets=self.enabled_toolsets, quiet_mode=True)
-            
+            tools = get_tool_definitions(
+                enabled_toolsets=self.enabled_toolsets, quiet_mode=True
+            )
+
             # Get terminal working directory (where commands will execute)
             cwd = os.getenv("TERMINAL_CWD", os.getcwd())
-            
+
             # Build and display the banner
             build_welcome_banner(
                 console=self.console,
@@ -137,7 +155,7 @@ class MixinCommands:
                 session_id=self.session_id,
                 context_length=ctx_len,
             )
-        
+
         # Tool discovery is intentionally deferred on the Termux bare prompt
         # path; availability warnings are shown once tools are initialized.
         if os.environ.get("ReYMeN_DEFER_AGENT_STARTUP") != "1":
@@ -217,8 +235,8 @@ class MixinCommands:
 
         # Collect displayable entries (skip system, tool-result messages)
         entries = []  # list of (role, display_text)
-        _last_asst_idx = None       # index of last assistant entry
-        _last_asst_full = None      # un-truncated display text for last assistant
+        _last_asst_idx = None  # index of last assistant entry
+        _last_asst_full = None  # un-truncated display text for last assistant
         for msg in self.conversation_history:
             role = msg.get("role", "")
             content = msg.get("content")
@@ -263,7 +281,11 @@ class MixinCommands:
                     names = []
                     for tc in tool_calls:
                         fn = tc.get("function", {})
-                        name = fn.get("name", "unknown") if isinstance(fn, dict) else "unknown"
+                        name = (
+                            fn.get("name", "unknown")
+                            if isinstance(fn, dict)
+                            else "unknown"
+                        )
                         if name not in names:
                             names.append(name)
                     names_str = ", ".join(names[:4])
@@ -306,6 +328,7 @@ class MixinCommands:
 
         try:
             from reymen.reymen_cli.skin_engine import get_active_skin
+
             _skin = get_active_skin()
             _history_text_c = _skin.get_color("banner_text", "#FFF8DC")
             _session_label_c = _skin.get_color("session_label", "#DAA520")
@@ -355,7 +378,9 @@ class MixinCommands:
             padding=(0, 1),
             style=_history_text_c,
         )
-        _record_output_history_entry(lambda: self._render_resume_history_panel_lines(panel))
+        _record_output_history_entry(
+            lambda: self._render_resume_history_panel_lines(panel)
+        )
         with _suspend_output_history():
             self._console_print(panel)
 
@@ -384,6 +409,7 @@ class MixinCommands:
 
         try:
             from reymen.reymen_cli.skin_engine import get_active_help_header
+
             header = get_active_help_header("(^_^)? Available Commands")
         except Exception:
             header = "(^_^)? Available Commands"
@@ -400,11 +426,15 @@ class MixinCommands:
             for cmd, desc in commands.items():
                 if not self._command_available(cmd):
                     continue
-                ChatConsole().print(f"    [bold {_accent_hex()}]{cmd:<15}[/] [dim]-[/] {_escape(desc)}")
+                ChatConsole().print(
+                    f"    [bold {_accent_hex()}]{cmd:<15}[/] [dim]-[/] {_escape(desc)}"
+                )
 
         skill_commands = _ensure_skill_commands()
         if skill_commands:
-            _cprint(f"\n  ⚡ {_BOLD}Skill Commands{_RST} ({len(skill_commands)} installed):")
+            _cprint(
+                f"\n  ⚡ {_BOLD}Skill Commands{_RST} ({len(skill_commands)} installed):"
+            )
             for cmd, info in sorted(skill_commands.items()):
                 ChatConsole().print(
                     f"    [bold {_accent_hex()}]{cmd:<22}[/] [dim]-[/] {_escape(info['description'])}"
@@ -412,7 +442,9 @@ class MixinCommands:
 
         _bundles_now = get_skill_bundles()
         if _bundles_now:
-            _cprint(f"\n  ▣ {_BOLD}Skill Bundles{_RST} ({len(_bundles_now)} installed):")
+            _cprint(
+                f"\n  ▣ {_BOLD}Skill Bundles{_RST} ({len(_bundles_now)} installed):"
+            )
             for cmd, info in sorted(_bundles_now.items()):
                 skill_count = len(info.get("skills", []))
                 desc = info.get("description") or f"Load {skill_count} skills"
@@ -425,18 +457,22 @@ class MixinCommands:
         _cprint(f"  {_DIM}Multi-line: Alt+Enter for a new line{_RST}")
         _cprint(f"  {_DIM}Draft editor: Ctrl+G (Alt+G in VSCode/Cursor){_RST}")
         if _is_termux_environment():
-            _cprint(f"  {_DIM}Attach image: /image {_termux_example_image_path()} or start your prompt with a local image path{_RST}\n")
+            _cprint(
+                f"  {_DIM}Attach image: /image {_termux_example_image_path()} or start your prompt with a local image path{_RST}\n"
+            )
         else:
             _cprint(f"  {_DIM}Paste image: Alt+V (or /paste){_RST}\n")
 
     def show_tools(self):
         """Display available tools with kawaii ASCII art."""
-        tools = get_tool_definitions(enabled_toolsets=self.enabled_toolsets, quiet_mode=True)
-        
+        tools = get_tool_definitions(
+            enabled_toolsets=self.enabled_toolsets, quiet_mode=True
+        )
+
         if not tools:
             print("(;_;) No tools available")
             return
-        
+
         # Header
         print()
         title = "(^_^)/ Available Tools"
@@ -446,7 +482,7 @@ class MixinCommands:
         print("|" + " " * (pad // 2) + title + " " * (pad - pad // 2) + "|")
         print("+" + "-" * width + "+")
         print()
-        
+
         # Group tools by toolset
         toolsets = {}
         for tool in sorted(tools, key=lambda t: t["function"]["name"]):
@@ -458,23 +494,23 @@ class MixinCommands:
             # First sentence: split on ". " (period+space) to avoid breaking on "e.g." or "v2.0"
             desc = desc.split("\n")[0]
             if ". " in desc:
-                desc = desc[:desc.index(". ") + 1]
+                desc = desc[: desc.index(". ") + 1]
             toolsets[toolset].append((name, desc))
-        
+
         # Display by toolset
         for toolset in sorted(toolsets.keys()):
             print(f"  [{toolset}]")
             for name, desc in toolsets[toolset]:
                 print(f"    * {name:<20} - {desc}")
             print()
-        
+
         print(f"  Total: {len(tools)} tools  ヽ(^o^)ノ")
         print()
 
     def show_toolsets(self):
         """Display available toolsets with kawaii ASCII art."""
         all_toolsets = get_all_toolsets()
-        
+
         # Header
         print()
         title = "(^_^)b Available Toolsets"
@@ -484,17 +520,21 @@ class MixinCommands:
         print("|" + " " * (pad // 2) + title + " " * (pad - pad // 2) + "|")
         print("+" + "-" * width + "+")
         print()
-        
+
         for name in sorted(all_toolsets.keys()):
             info = get_toolset_info(name)
             if info:
                 tool_count = info["tool_count"]
                 desc = info["description"]
-                
+
                 # Mark if currently enabled
-                marker = "(*)" if self.enabled_toolsets and name in self.enabled_toolsets else "   "
+                marker = (
+                    "(*)"
+                    if self.enabled_toolsets and name in self.enabled_toolsets
+                    else "   "
+                )
                 print(f"  {marker} {name:<18} [{tool_count:>2} tools] - {desc}")
-        
+
         print()
         print("  (*) = currently enabled")
         print()
@@ -508,25 +548,26 @@ class MixinCommands:
         terminal_env = os.getenv("TERMINAL_ENV", "local")
         terminal_cwd = os.getenv("TERMINAL_CWD", os.getcwd())
         terminal_timeout = os.getenv("TERMINAL_TIMEOUT", "60")
-        
-        user_config_path = _ReYMeN_home / 'config.yaml'
-        project_config_path = Path(__file__).parent / 'cli-config.yaml'
+
+        user_config_path = _ReYMeN_home / "config.yaml"
+        project_config_path = Path(__file__).parent / "cli-config.yaml"
         if user_config_path.exists():
             config_path = user_config_path
         else:
             config_path = project_config_path
         config_status = "(loaded)" if config_path.exists() else "(not found)"
-        
+
         # ``self.api_key`` may be a callable (Azure Foundry Entra ID bearer
         # provider). Never invoke it; just identify the auth surface.
         from agent.azure_identity_adapter import is_token_provider
+
         if is_token_provider(self.api_key):
             api_key_display = "Microsoft Entra ID"
         elif isinstance(self.api_key, str) and len(self.api_key) > 12:
             api_key_display = f"{self.api_key[:8]}...{self.api_key[-4:]}"
         else:
             api_key_display = "Not set!"
-        
+
         print()
         title = "(^_^) Configuration"
         width = 50
@@ -552,7 +593,9 @@ class MixinCommands:
         print()
         print("  -- Agent --")
         print(f"  Max Turns:  {self.max_turns}")
-        print(f"  Toolsets:   {', '.join(self.enabled_toolsets) if self.enabled_toolsets else 'all'}")
+        print(
+            f"  Toolsets:   {', '.join(self.enabled_toolsets) if self.enabled_toolsets else 'all'}"
+        )
         print(f"  Verbose:    {self.verbose}")
         print()
         print("  -- Session --")
@@ -635,6 +678,7 @@ class MixinCommands:
         """
         try:
             from reymen.reymen_cli.plugins import invoke_hook as _invoke_hook
+
             _invoke_hook(
                 event_type,
                 session_id=self.agent.session_id if self.agent else None,
@@ -643,7 +687,9 @@ class MixinCommands:
         except Exception:
             logger.warning("[fix_01_sessiz_except] Exception")
 
-    def _run_curses_picker(self, title: str, items: list[str], default_index: int = 0) -> int | None:
+    def _run_curses_picker(
+        self, title: str, items: list[str], default_index: int = 0
+    ) -> int | None:
         """Run curses_single_select via run_in_terminal so prompt_toolkit handles terminal ownership cleanly."""
         import threading
         from reymen.reymen_cli.curses_ui import curses_single_select
@@ -660,6 +706,7 @@ class MixinCommands:
 
         if self._app and in_main_thread:
             from prompt_toolkit.application import run_in_terminal
+
             was_visible = self._status_bar_visible
             self._status_bar_visible = False
             self._app.invalidate()
@@ -685,6 +732,7 @@ class MixinCommands:
         ``input()`` when we're off the main thread.
         """
         import threading
+
         result = [None]
 
         def _ask():
@@ -697,6 +745,7 @@ class MixinCommands:
 
         if self._app and in_main_thread:
             from prompt_toolkit.application import run_in_terminal
+
             was_visible = self._status_bar_visible
             self._status_bar_visible = False
             self._app.invalidate()
@@ -899,13 +948,26 @@ class MixinCommands:
         choices = state.get("choices") or []
         selected = state.get("selected", 0)
 
-        def _panel_box_width(title_text: str, content_lines: list[str], min_width: int = 56, max_width: int = 86) -> int:
+        def _panel_box_width(
+            title_text: str,
+            content_lines: list[str],
+            min_width: int = 56,
+            max_width: int = 86,
+        ) -> int:
             term_cols = shutil.get_terminal_size((100, 20)).columns
-            longest = max([len(title_text)] + [len(line) for line in content_lines] + [min_width - 4])
-            inner = min(max(longest + 4, min_width - 2), max_width - 2, max(24, term_cols - 6))
+            longest = max(
+                [len(title_text)]
+                + [len(line) for line in content_lines]
+                + [min_width - 4]
+            )
+            inner = min(
+                max(longest + 4, min_width - 2), max_width - 2, max(24, term_cols - 6)
+            )
             return inner + 2
 
-        def _wrap_panel_text(text: str, width: int, subsequent_indent: str = "") -> list[str]:
+        def _wrap_panel_text(
+            text: str, width: int, subsequent_indent: str = ""
+        ) -> list[str]:
             wrapped = textwrap.wrap(
                 text,
                 width=max(8, width),
@@ -915,7 +977,9 @@ class MixinCommands:
             )
             return wrapped or [""]
 
-        def _append_panel_line(lines, border_style: str, content_style: str, text: str, box_width: int) -> None:
+        def _append_panel_line(
+            lines, border_style: str, content_style: str, text: str, box_width: int
+        ) -> None:
             inner_width = max(0, box_width - 2)
             lines.append((border_style, "│ "))
             lines.append((content_style, text.ljust(inner_width)))
@@ -929,7 +993,13 @@ class MixinCommands:
             preview_lines.extend(_wrap_panel_text(line, 72))
         for idx, (_value, label, desc) in enumerate(choices):
             marker = "❯" if idx == selected else " "
-            preview_lines.extend(_wrap_panel_text(f"{marker} [{idx + 1}] {label} — {desc}", 72, subsequent_indent="    "))
+            preview_lines.extend(
+                _wrap_panel_text(
+                    f"{marker} [{idx + 1}] {label} — {desc}",
+                    72,
+                    subsequent_indent="    ",
+                )
+            )
         preview_lines.append("Type 1/2/3 or use ↑/↓ then Enter. ESC/Ctrl+C cancels.")
 
         box_width = _panel_box_width(title, preview_lines)
@@ -940,7 +1010,11 @@ class MixinCommands:
         choice_wrapped: list[tuple[int, str]] = []
         for idx, (_value, label, desc) in enumerate(choices):
             marker = "❯" if idx == selected else " "
-            for wrapped in _wrap_panel_text(f"{marker} [{idx + 1}] {label} — {desc}", inner_text_width, subsequent_indent="    "):
+            for wrapped in _wrap_panel_text(
+                f"{marker} [{idx + 1}] {label} — {desc}",
+                inner_text_width,
+                subsequent_indent="    ",
+            ):
                 choice_wrapped.append((idx, wrapped))
 
         term_rows = shutil.get_terminal_size((100, 24)).lines
@@ -954,18 +1028,38 @@ class MixinCommands:
             detail_wrapped = detail_wrapped[:keep] + ["… (detail truncated)"]
 
         lines = []
-        lines.append(('class:approval-border', '╭' + ('─' * box_width) + '╮\n'))
-        _append_panel_line(lines, 'class:approval-border', 'class:approval-title', title, box_width)
-        _append_blank_panel_line(lines, 'class:approval-border', box_width)
+        lines.append(("class:approval-border", "╭" + ("─" * box_width) + "╮\n"))
+        _append_panel_line(
+            lines, "class:approval-border", "class:approval-title", title, box_width
+        )
+        _append_blank_panel_line(lines, "class:approval-border", box_width)
         for wrapped in detail_wrapped:
-            _append_panel_line(lines, 'class:approval-border', 'class:approval-desc', wrapped, box_width)
-        _append_blank_panel_line(lines, 'class:approval-border', box_width)
+            _append_panel_line(
+                lines,
+                "class:approval-border",
+                "class:approval-desc",
+                wrapped,
+                box_width,
+            )
+        _append_blank_panel_line(lines, "class:approval-border", box_width)
         for idx, wrapped in choice_wrapped:
-            style = 'class:approval-selected' if idx == selected else 'class:approval-choice'
-            _append_panel_line(lines, 'class:approval-border', style, wrapped, box_width)
-        _append_blank_panel_line(lines, 'class:approval-border', box_width)
-        _append_panel_line(lines, 'class:approval-border', 'class:approval-cmd', 'Type 1/2/3 or use ↑/↓ then Enter. ESC/Ctrl+C cancels.', box_width)
-        lines.append(('class:approval-border', '╰' + ('─' * box_width) + '╯\n'))
+            style = (
+                "class:approval-selected"
+                if idx == selected
+                else "class:approval-choice"
+            )
+            _append_panel_line(
+                lines, "class:approval-border", style, wrapped, box_width
+            )
+        _append_blank_panel_line(lines, "class:approval-border", box_width)
+        _append_panel_line(
+            lines,
+            "class:approval-border",
+            "class:approval-cmd",
+            "Type 1/2/3 or use ↑/↓ then Enter. ESC/Ctrl+C cancels.",
+            box_width,
+        )
+        lines.append(("class:approval-border", "╰" + ("─" * box_width) + "╯\n"))
         return lines
 
     def _output_console(self):
@@ -1049,7 +1143,9 @@ class MixinCommands:
             approvals = cfg.get("approvals") if isinstance(cfg, dict) else None
             confirm_required = True
             if isinstance(approvals, dict):
-                confirm_required = bool(approvals.get("destructive_slash_confirm", True))
+                confirm_required = bool(
+                    approvals.get("destructive_slash_confirm", True)
+                )
         except Exception:
             confirm_required = True
 
@@ -1083,8 +1179,12 @@ class MixinCommands:
 
         if choice == "always":
             if save_config_value("approvals.destructive_slash_confirm", False):
-                print("🔒 Future /clear, /new, /reset, and /undo will run without confirmation.")
-                print("   Re-enable via `approvals.destructive_slash_confirm: true` in config.yaml.")
+                print(
+                    "🔒 Future /clear, /new, /reset, and /undo will run without confirmation."
+                )
+                print(
+                    "   Re-enable via `approvals.destructive_slash_confirm: true` in config.yaml."
+                )
             else:
                 print("⚠️  Couldn't persist opt-out — proceeding once.")
 
@@ -1103,10 +1203,18 @@ class MixinCommands:
         self._close_reasoning_box()
 
         from agent.display import get_tool_emoji
+
         emoji = get_tool_emoji(tool_name, default="⚡")
         _cprint(f"  ┊ {emoji} preparing {tool_name}…")
 
-    def _on_tool_progress(self, event_type: str, function_name: str = None, preview: str = None, function_args: dict = None, **kwargs):
+    def _on_tool_progress(
+        self,
+        event_type: str,
+        function_name: str = None,
+        preview: str = None,
+        function_args: dict = None,
+        **kwargs,
+    ):
         """Called on tool lifecycle events (tool.started, tool.completed, reasoning.available, etc.).
 
         Updates the TUI spinner widget so the user can see what the agent
@@ -1133,13 +1241,22 @@ class MixinCommands:
                 if stored is not None and not stored:
                     del self._pending_tool_info[function_name]
                 # "new" mode: skip consecutive repeats of the same tool
-                if self.tool_progress_mode == "new" and function_name == self._last_scrollback_tool:
+                if (
+                    self.tool_progress_mode == "new"
+                    and function_name == self._last_scrollback_tool
+                ):
                     self._invalidate()
                     return
                 self._last_scrollback_tool = function_name
                 try:
                     from agent.display import get_cute_tool_message
-                    line = get_cute_tool_message(function_name, stored_args, duration, result=kwargs.get("result"))
+
+                    line = get_cute_tool_message(
+                        function_name,
+                        stored_args,
+                        duration,
+                        result=kwargs.get("result"),
+                    )
                     _cprint(f"  {line}")
                 except Exception:
                     logger.warning("[fix_01_sessiz_except] Exception")
@@ -1161,11 +1278,14 @@ class MixinCommands:
                             mark_seen,
                             tool_progress_hint_cli,
                         )
+
                         if not is_seen(CLI_CONFIG, TOOL_PROGRESS_FLAG):
                             self._long_tool_hint_fired = True
                             _cprint(f"  {_DIM}{tool_progress_hint_cli()}{_RST}")
                             mark_seen(_ReYMeN_home / "config.yaml", TOOL_PROGRESS_FLAG)
-                            CLI_CONFIG.setdefault("onboarding", {}).setdefault("seen", {})[TOOL_PROGRESS_FLAG] = True
+                            CLI_CONFIG.setdefault("onboarding", {}).setdefault(
+                                "seen", {}
+                            )[TOOL_PROGRESS_FLAG] = True
                 except Exception:
                     logger.warning("[fix_01_sessiz_except] Exception")
             self._invalidate()
@@ -1174,12 +1294,14 @@ class MixinCommands:
             return
         if function_name and not function_name.startswith("_"):
             from agent.display import get_tool_emoji
+
             emoji = get_tool_emoji(function_name)
             label = preview or function_name
             from agent.display import get_tool_preview_max_len
+
             _pl = get_tool_preview_max_len()
             if _pl > 0 and len(label) > _pl:
-                label = label[:_pl - 3] + "..."
+                label = label[: _pl - 3] + "..."
             self._spinner_text = f"{emoji} {label}"
             self._tool_start_time = time.monotonic()
             # Store args for stacked scrollback line on completion
@@ -1188,7 +1310,9 @@ class MixinCommands:
             )
             self._invalidate()
 
-    def _on_tool_start(self, tool_call_id: str, function_name: str, function_args: dict):
+    def _on_tool_start(
+        self, tool_call_id: str, function_name: str, function_args: dict
+    ):
         """Capture local before-state for write-capable tools."""
         try:
             from agent.display import capture_local_edit_snapshot
@@ -1197,9 +1321,17 @@ class MixinCommands:
             if snapshot is not None:
                 self._pending_edit_snapshots[tool_call_id] = snapshot
         except Exception:
-            logger.debug("Edit snapshot capture failed for %s", function_name, exc_info=True)
+            logger.debug(
+                "Edit snapshot capture failed for %s", function_name, exc_info=True
+            )
 
-    def _on_tool_complete(self, tool_call_id: str, function_name: str, function_args: dict, function_result: str):
+    def _on_tool_complete(
+        self,
+        tool_call_id: str,
+        function_name: str,
+        function_args: dict,
+        function_result: str,
+    ):
         """Render file edits with inline diff after write-capable tools complete."""
         snapshot = self._pending_edit_snapshots.pop(tool_call_id, None)
         try:
@@ -1213,14 +1345,16 @@ class MixinCommands:
                 print_fn=_cprint,
             )
         except Exception:
-            logger.debug("Edit diff preview failed for %s", function_name, exc_info=True)
+            logger.debug(
+                "Edit diff preview failed for %s", function_name, exc_info=True
+            )
 
 
 def _parse_reasoning_config(effort: str) -> dict | None:
     """Parse a reasoning effort level into an OpenRouter reasoning config dict."""
     from reymen.sistem.ReYMeN_constants import parse_reasoning_effort
+
     result = parse_reasoning_effort(effort)
     if effort and effort.strip() and result is None:
         logger.warning("Unknown reasoning_effort '%s', using default (medium)", effort)
     return result
-

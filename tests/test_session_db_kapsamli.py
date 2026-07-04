@@ -1,4 +1,5 @@
 """Test: reymen/core/session_db.py — kapsamli coverage"""
+
 from __future__ import annotations
 import os, sys, json, sqlite3, time, tempfile
 from pathlib import Path
@@ -45,6 +46,7 @@ class TestSessionDBBaglanti:
     def test_baglan_connection_olusturur(self):
         """L43-51: Gecerli bir baglanti doner"""
         from reymen.core.session_db import _baglan
+
         td = Path(tempfile.mkdtemp())
         db_yol = td / "test.db"
         con = _baglan(db_yol)
@@ -55,6 +57,7 @@ class TestSessionDBBaglanti:
     def test_baglan_klasor_olusturur(self):
         """L46: parent klasor yoksa olusturur"""
         from reymen.core.session_db import _baglan
+
         td = Path(tempfile.mkdtemp())
         db_yol = td / "alt" / "test.db"
         con = _baglan(db_yol)
@@ -64,6 +67,7 @@ class TestSessionDBBaglanti:
     def test_baglan_wal_modu(self):
         """L48: WAL modu aktif"""
         from reymen.core.session_db import _baglan
+
         td = Path(tempfile.mkdtemp())
         con = _baglan(td / "wal_test.db")
         journal = con.execute("PRAGMA journal_mode").fetchone()[0]
@@ -73,6 +77,7 @@ class TestSessionDBBaglanti:
     def test_idempotent_tablolar_fts5_olusur(self):
         """L54-77: FTS5 tablolari olusur (base tablolar degil)"""
         from reymen.core.session_db import _baglan, _idempotent_tablolar
+
         td = Path(tempfile.mkdtemp())
         con = _baglan(td / "test.db")
         _idempotent_tablolar(con)
@@ -87,6 +92,7 @@ class TestSessionDBBaglanti:
     def test_idempotent_ikinci_cagri_hata_vermez(self):
         """L61: IF NOT EXISTS -> ikinci cagri hata firlatmaz"""
         from reymen.core.session_db import _baglan, _idempotent_tablolar
+
         td = Path(tempfile.mkdtemp())
         con = _baglan(td / "test.db")
         _idempotent_tablolar(con)
@@ -97,7 +103,10 @@ class TestSessionDBBaglanti:
     def test_baglan_varsayilan_yol(self):
         """L45: db_yol verilmezse DB_YOLU kullanilir"""
         from reymen.core.session_db import _baglan
-        with patch("reymen.core.session_db.DB_YOLU", Path(tempfile.mkdtemp()) / "default.db"):
+
+        with patch(
+            "reymen.core.session_db.DB_YOLU", Path(tempfile.mkdtemp()) / "default.db"
+        ):
             con = _baglan()
             assert con is not None
             con.close()
@@ -109,6 +118,7 @@ class TestSessionCrud:
     def _setup_db(self, td):
         """Helper: create full DB with base tables + FTS5"""
         from reymen.core.session_db import _baglan, _idempotent_tablolar
+
         db_yol = td / "test.db"
         con = _baglan(db_yol)
         _create_base_tables(con)
@@ -119,16 +129,23 @@ class TestSessionCrud:
     def test_session_olustur_happy_path(self):
         """L94-132: Yeni session olusur"""
         from reymen.core.session_db import session_olustur
+
         td = Path(tempfile.mkdtemp())
         db_yol = self._setup_db(td)
-        sonuc = session_olustur(source="test", user_id="user1", model="gpt4",
-                                title="Test Session", db_yol=db_yol)
+        sonuc = session_olustur(
+            source="test",
+            user_id="user1",
+            model="gpt4",
+            title="Test Session",
+            db_yol=db_yol,
+        )
         assert "id" in sonuc
         assert sonuc.get("source") == "test"
 
     def test_session_olustur_uuid_donner(self):
         """L111: UUID formatinda id"""
         from reymen.core.session_db import session_olustur
+
         td = Path(tempfile.mkdtemp())
         db_yol = self._setup_db(td)
         sonuc = session_olustur(db_yol=db_yol)
@@ -137,6 +154,7 @@ class TestSessionCrud:
     def test_session_getir_var(self):
         """L135-175: Session var -> session + mesajlar"""
         from reymen.core.session_db import session_olustur, session_getir
+
         td = Path(tempfile.mkdtemp())
         db_yol = self._setup_db(td)
         olusan = session_olustur(db_yol=db_yol)
@@ -147,6 +165,7 @@ class TestSessionCrud:
     def test_session_getir_yok(self):
         """L154-155: Session yok -> hata"""
         from reymen.core.session_db import session_getir
+
         td = Path(tempfile.mkdtemp())
         db_yol = self._setup_db(td)
         sonuc = session_getir("olmayan-id-123", db_yol=db_yol)
@@ -156,6 +175,7 @@ class TestSessionCrud:
     def test_session_listele_bos(self):
         """L178-221: Bos DB -> []"""
         from reymen.core.session_db import session_listele
+
         td = Path(tempfile.mkdtemp())
         db_yol = self._setup_db(td)
         liste = session_listele(db_yol=db_yol)
@@ -163,6 +183,7 @@ class TestSessionCrud:
 
     def test_session_listele_dolu(self):
         from reymen.core.session_db import session_olustur, session_listele
+
         td = Path(tempfile.mkdtemp())
         db_yol = self._setup_db(td)
         session_olustur(source="tg", db_yol=db_yol)
@@ -173,6 +194,7 @@ class TestSessionCrud:
     def test_session_listele_filtre(self):
         """L196-205: source filtresi"""
         from reymen.core.session_db import session_olustur, session_listele
+
         td = Path(tempfile.mkdtemp())
         db_yol = self._setup_db(td)
         session_olustur(source="telegram", db_yol=db_yol)
@@ -187,6 +209,7 @@ class TestMesajIslemleri:
 
     def _setup_db(self, td):
         from reymen.core.session_db import _baglan, _idempotent_tablolar
+
         db_yol = td / "test.db"
         con = _baglan(db_yol)
         _create_base_tables(con)
@@ -197,6 +220,7 @@ class TestMesajIslemleri:
     def test_mesaj_ekle_basarili(self):
         """L228-291: Mesaj eklenir, message_count artar"""
         from reymen.core.session_db import session_olustur, mesaj_ekle, session_getir
+
         td = Path(tempfile.mkdtemp())
         db_yol = self._setup_db(td)
         s = session_olustur(db_yol=db_yol)
@@ -209,6 +233,7 @@ class TestMesajIslemleri:
     def test_mesaj_ekle_session_yok(self):
         """L257-258: Session yoksa hata"""
         from reymen.core.session_db import mesaj_ekle
+
         td = Path(tempfile.mkdtemp())
         db_yol = self._setup_db(td)
         r = mesaj_ekle("olmayan-id", "user", "test", db_yol=db_yol)
@@ -217,6 +242,7 @@ class TestMesajIslemleri:
     def test_mesaj_ekle_coklu_mesaj(self):
         """Ardisik mesaj ekleme"""
         from reymen.core.session_db import session_olustur, mesaj_ekle, session_getir
+
         td = Path(tempfile.mkdtemp())
         db_yol = self._setup_db(td)
         s = session_olustur(db_yol=db_yol)
@@ -232,6 +258,7 @@ class TestArama:
 
     def _setup_db(self, td):
         from reymen.core.session_db import _baglan, _idempotent_tablolar
+
         db_yol = td / "test.db"
         con = _baglan(db_yol)
         _create_base_tables(con)
@@ -242,12 +269,14 @@ class TestArama:
     def test_mesaj_ara_fts5(self):
         """FTS5 ile arama"""
         from reymen.core.session_db import session_olustur, mesaj_ekle, mesaj_ara
+
         td = Path(tempfile.mkdtemp())
         db_yol = self._setup_db(td)
         s = session_olustur(db_yol=db_yol)
         mesaj_ekle(s["id"], "user", "bugun hava cok guzel", db_yol=db_yol)
         mesaj_ekle(s["id"], "user", "Python ile kod yaziyorum", db_yol=db_yol)
         import time as _time
+
         _time.sleep(0.1)  # FTS5 index'ini guncelle
         sonuc = mesaj_ara("hava", limit=5, db_yol=db_yol)
         assert len(sonuc) >= 1
@@ -255,6 +284,7 @@ class TestArama:
     def test_mesaj_ara_bos(self):
         """Eslesme yok -> []"""
         from reymen.core.session_db import session_olustur, mesaj_ekle, mesaj_ara
+
         td = Path(tempfile.mkdtemp())
         db_yol = self._setup_db(td)
         s = session_olustur(db_yol=db_yol)
@@ -265,6 +295,7 @@ class TestArama:
     def test_sync_fts5_basarili(self):
         """L80-87: FTS5 rebuild"""
         from reymen.core.session_db import _sync_fts5, _baglan, _idempotent_tablolar
+
         td = Path(tempfile.mkdtemp())
         db_yol = td / "test.db"
         con = _baglan(db_yol)
@@ -277,6 +308,7 @@ class TestArama:
     def test_sync_fts5_hatali(self):
         """L85-87: FTS5 rebuild hatasi -> 0"""
         from reymen.core.session_db import _sync_fts5
+
         td = Path(tempfile.mkdtemp())
         con = sqlite3.connect(str(td / "no_fts.db"))
         r = _sync_fts5(con)
@@ -286,9 +318,13 @@ class TestArama:
     def test_like_fallback(self):
         """FTS5 yoksa LIKE fallback calisir"""
         from reymen.core.session_db import (
-            _baglan, _idempotent_tablolar,
-            session_olustur, mesaj_ekle, mesaj_ara
+            _baglan,
+            _idempotent_tablolar,
+            session_olustur,
+            mesaj_ekle,
+            mesaj_ara,
         )
+
         td = Path(tempfile.mkdtemp())
         db_yol = td / "test.db"
         con = _baglan(db_yol)
@@ -307,20 +343,25 @@ class TestMotorTools:
 
     def test_session_ara_bos_sorgu(self):
         from reymen.core.session_db import _session_ara
+
         r = _session_ara(sorgu="")
         assert "Kullanim" in r
 
     def test_session_getir_bos_id(self):
         from reymen.core.session_db import _session_getir
+
         r = _session_getir(session_id="")
         assert "Kullanim" in r
 
     def test_motor_kaydet(self):
         from reymen.core.session_db import motor_kaydet
+
         class M:
             tools = set()
+
             def _plugin_arac_kaydet(self, a, f, d=""):
                 self.tools.add(a)
+
         m = M()
         motor_kaydet(m)
         assert "SESSION_ARA" in m.tools

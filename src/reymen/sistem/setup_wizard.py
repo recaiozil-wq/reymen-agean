@@ -25,25 +25,44 @@ import time
 from pathlib import Path
 from typing import Optional
 import logging
+
 logger = logging.getLogger(__name__)
 
 # ── Renkler (reymen_launcher.py ile uyumlu) ──────────────────────────────────
-_R   = "\033[0m"
-_C   = "\033[96m"   # cyan
-_G   = "\033[92m"   # green
-_Y   = "\033[93m"   # yellow
-_B   = "\033[94m"   # blue
-_M   = "\033[95m"   # magenta
-_W   = "\033[97m"   # white
-_D   = "\033[2m"    # dim
-_RED = "\033[91m"   # kirmizi
+_R = "\033[0m"
+_C = "\033[96m"  # cyan
+_G = "\033[92m"  # green
+_Y = "\033[93m"  # yellow
+_B = "\033[94m"  # blue
+_M = "\033[95m"  # magenta
+_W = "\033[97m"  # white
+_D = "\033[2m"  # dim
+_RED = "\033[91m"  # kirmizi
 
-def _c(t):   return f"{_C}{t}{_R}"
-def _g(t):   return f"{_G}{t}{_R}"
-def _y(t):   return f"{_Y}{t}{_R}"
-def _mavi(t): return f"{_B}{t}{_R}"
-def _d(t):   return f"{_D}{t}{_R}"
-def _r(t):   return f"{_RED}{t}{_R}"
+
+def _c(t):
+    return f"{_C}{t}{_R}"
+
+
+def _g(t):
+    return f"{_G}{t}{_R}"
+
+
+def _y(t):
+    return f"{_Y}{t}{_R}"
+
+
+def _mavi(t):
+    return f"{_B}{t}{_R}"
+
+
+def _d(t):
+    return f"{_D}{t}{_R}"
+
+
+def _r(t):
+    return f"{_RED}{t}{_R}"
+
 
 # ── Logo ──────────────────────────────────────────────────────────────────────
 _REYMEN_LOGO = f"""
@@ -90,8 +109,11 @@ def python_kontrol() -> bool:
     if yeterli:
         _kontrol_ad(f"Python {v.major}.{v.minor}.{v.micro}", True)
     else:
-        _kontrol_ad(f"Python {v.major}.{v.minor}.{v.micro}", False,
-                     f"3.11+ gerekli! Su an: {v.major}.{v.minor}")
+        _kontrol_ad(
+            f"Python {v.major}.{v.minor}.{v.micro}",
+            False,
+            f"3.11+ gerekli! Su an: {v.major}.{v.minor}",
+        )
     return yeterli
 
 
@@ -102,8 +124,9 @@ def git_kontrol() -> bool:
     git_path = shutil.which("git")
     if git_path:
         try:
-            r = subprocess.run(["git", "--version"], capture_output=True,
-                               text=True, timeout=5)
+            r = subprocess.run(
+                ["git", "--version"], capture_output=True, text=True, timeout=5
+            )
             versiyon = r.stdout.strip() if r.returncode == 0 else "bilinmiyor"
             _kontrol_ad(f"Git: {versiyon}", True)
             return True
@@ -122,8 +145,9 @@ def ffmpeg_kontrol() -> bool:
     ffmpeg_path = shutil.which("ffmpeg")
     if ffmpeg_path:
         try:
-            r = subprocess.run(["ffmpeg", "-version"], capture_output=True,
-                               text=True, timeout=5)
+            r = subprocess.run(
+                ["ffmpeg", "-version"], capture_output=True, text=True, timeout=5
+            )
             ilk_satir = r.stdout.splitlines()[0] if r.stdout else "ffmpeg"
             _kontrol_ad(f"FFmpeg: {ilk_satir[:50]}...", True)
             return True
@@ -142,6 +166,7 @@ def playwright_kontrol(oto_kur: bool = False) -> bool:
 
     # 1) Python paketi var mi?
     import importlib.util as _iu
+
     paket_var = _iu.find_spec("playwright") is not None
     if not paket_var:
         _kontrol_ad("playwright paketi", False, "yuklu degil")
@@ -150,14 +175,15 @@ def playwright_kontrol(oto_kur: bool = False) -> bool:
                 print(f"  {_y('⟳')} pip install playwright ...")
                 r = subprocess.run(
                     [sys.executable, "-m", "pip", "install", "playwright"],
-                    capture_output=True, text=True, timeout=120
+                    capture_output=True,
+                    text=True,
+                    timeout=120,
                 )
                 if r.returncode == 0:
                     _kontrol_ad("playwright paketi", True, "yuklendi")
                     paket_var = True
                 else:
-                    _kontrol_ad("playwright paketi", False,
-                                 f"hata: {r.stderr[:80]}")
+                    _kontrol_ad("playwright paketi", False, f"hata: {r.stderr[:80]}")
         else:
             _kontrol_ad("playwright paketi", False, "--fix ile otomatik kurulabilir")
     else:
@@ -167,18 +193,25 @@ def playwright_kontrol(oto_kur: bool = False) -> bool:
     if paket_var:
         try:
             from playwright.sync_api import sync_playwright
+
             with sync_playwright() as p:
-                browserler = [b for b in ["chromium", "firefox", "webkit"]
-                              if getattr(p, b, None) is not None]
+                browserler = [
+                    b
+                    for b in ["chromium", "firefox", "webkit"]
+                    if getattr(p, b, None) is not None
+                ]
                 _kontrol_ad(f"Playwright browser'lar ({', '.join(browserler)})", True)
         except Exception:
-            _kontrol_ad("Playwright browser binary'leri", False,
-                         "chromium install gerekebilir")
+            _kontrol_ad(
+                "Playwright browser binary'leri", False, "chromium install gerekebilir"
+            )
             if oto_kur and _evet_hayir("  Playwright browser'lari kuralim mi?", True):
                 print(f"  {_y('⟳')} playwright install chromium ...")
                 r = subprocess.run(
                     [sys.executable, "-m", "playwright", "install", "chromium"],
-                    capture_output=True, text=True, timeout=300
+                    capture_output=True,
+                    text=True,
+                    timeout=300,
                 )
                 if r.returncode == 0:
                     _kontrol_ad("Playwright chromium", True, "yuklendi")
@@ -248,7 +281,11 @@ def api_key_yapilandir(proje_kok: Path, oto_kur: bool = False) -> dict:
     for env_var, ad in diger_providerlar:
         anahtar = _api_key_kontrol(env_var, ad, env_yol)
         sonuclar[env_var] = anahtar is not None
-        if not anahtar and oto_kur and _evet_hayir(f"  {ad} API key eklemek ister misiniz?", False):
+        if (
+            not anahtar
+            and oto_kur
+            and _evet_hayir(f"  {ad} API key eklemek ister misiniz?", False)
+        ):
             girilen = _soru(f"  {ad} API Key girin (bos gecmek icin Enter):")
             if girilen:
                 _env_anahtar_ekle(env_yol, env_var, girilen)
@@ -318,7 +355,10 @@ def config_kontrol(proje_kok: Path, oto_kur: bool = False) -> bool:
         _kontrol_ad("config.yaml", True, f"{len(icerik)} bayt")
         # kurulum_tamamlandi anahtari var mi kontrol et
         if KURULUM_ANAHTARI not in icerik and oto_kur:
-            if _evet_hayir(f"  config.yaml'de '{KURULUM_ANAHTARI}' anahtari yok. Eklensin mi?", True):
+            if _evet_hayir(
+                f"  config.yaml'de '{KURULUM_ANAHTARI}' anahtari yok. Eklensin mi?",
+                True,
+            ):
                 _config_anahtar_ekle(config_yol)
         return True
     else:
@@ -342,14 +382,17 @@ def _config_olustur(config_yol: Path, proje_kok: Path) -> None:
         for satir in env_yol.read_text(encoding="utf-8").splitlines():
             satir = satir.strip()
             if satir.startswith("REYMEN_PROVIDER="):
-                config["model"]["provider"] = satir.split("=", 1)[1].strip().strip("\"'")
+                config["model"]["provider"] = (
+                    satir.split("=", 1)[1].strip().strip("\"'")
+                )
             elif satir.startswith("REYMEN_MODEL="):
                 config["model"]["default"] = satir.split("=", 1)[1].strip().strip("\"'")
 
     try:
         with open(config_yol, "w", encoding="utf-8") as f:
-            _yaml.dump(config, f, default_flow_style=False, allow_unicode=True,
-                       sort_keys=False)
+            _yaml.dump(
+                config, f, default_flow_style=False, allow_unicode=True, sort_keys=False
+            )
         _kontrol_ad("config.yaml olusturuldu", True)
     except Exception as e:
         _kontrol_ad("config.yaml olusturulamadi", False, str(e))
@@ -376,6 +419,7 @@ def kurulum_durumu_guncelle(proje_kok: Path, tamamlandi: bool = True) -> bool:
     try:
         icerik = config_yol.read_text(encoding="utf-8")
         import re
+
         yeni_icerik, sayi = re.subn(
             rf"^{KURULUM_ANAHTARI}\s*:\s*(true|false)",
             f"{KURULUM_ANAHTARI}: {str(tamamlandi).lower()}",
@@ -384,7 +428,9 @@ def kurulum_durumu_guncelle(proje_kok: Path, tamamlandi: bool = True) -> bool:
         )
         if sayi == 0:
             # Anahtar yoksa ekle
-            yeni_icerik = icerik.rstrip() + f"\n{KURULUM_ANAHTARI}: {str(tamamlandi).lower()}\n"
+            yeni_icerik = (
+                icerik.rstrip() + f"\n{KURULUM_ANAHTARI}: {str(tamamlandi).lower()}\n"
+            )
 
         config_yol.write_text(yeni_icerik, encoding="utf-8")
 
@@ -397,8 +443,9 @@ def kurulum_durumu_guncelle(proje_kok: Path, tamamlandi: bool = True) -> bool:
                     "tamamlandi": tamamlandi,
                     "tarih": time.strftime("%Y-%m-%d %H:%M:%S"),
                 }
-                durum_yol.write_text(json.dumps(durum, indent=2, ensure_ascii=False),
-                                      encoding="utf-8")
+                durum_yol.write_text(
+                    json.dumps(durum, indent=2, ensure_ascii=False), encoding="utf-8"
+                )
             except Exception:
                 logger.warning("[fix_01_sessiz_except] Exception")
 
@@ -416,7 +463,10 @@ def kurulum_tamamlandi_mi(proje_kok: Path) -> bool:
     try:
         icerik = config_yol.read_text(encoding="utf-8")
         import re
-        eslesme = re.search(rf"^{KURULUM_ANAHTARI}\s*:\s*(true|false)", icerik, re.MULTILINE)
+
+        eslesme = re.search(
+            rf"^{KURULUM_ANAHTARI}\s*:\s*(true|false)", icerik, re.MULTILINE
+        )
         if eslesme:
             return eslesme.group(1) == "true"
     except Exception:
@@ -510,8 +560,11 @@ def skills_kontrol(proje_kok: Path, oto_kur: bool = False) -> bool:
 
 
 # ── Ana Setup Sihirbazi ───────────────────────────────────────────────────────
-def setup_calistir(proje_kok: Optional[Path] = None, oto_kur: bool = False,
-                   sadece_kontrol: bool = False) -> dict:
+def setup_calistir(
+    proje_kok: Optional[Path] = None,
+    oto_kur: bool = False,
+    sadece_kontrol: bool = False,
+) -> dict:
     """Ana setup sihirbazini calistir.
 
     Args:
@@ -644,12 +697,13 @@ def main() -> int:
     import argparse
 
     parser = argparse.ArgumentParser(description="ReYMeN Kurulum Sihirbazi")
-    parser.add_argument("--fix", action="store_true",
-                        help="Eksikleri otomatik duzeltmeye calis")
-    parser.add_argument("--check", action="store_true",
-                        help="Sadece kontrol et, degisiklik yapma")
-    parser.add_argument("--proje", type=str, default=None,
-                        help="Proje kok dizini")
+    parser.add_argument(
+        "--fix", action="store_true", help="Eksikleri otomatik duzeltmeye calis"
+    )
+    parser.add_argument(
+        "--check", action="store_true", help="Sadece kontrol et, degisiklik yapma"
+    )
+    parser.add_argument("--proje", type=str, default=None, help="Proje kok dizini")
 
     args = parser.parse_args()
 

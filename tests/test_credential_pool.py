@@ -51,7 +51,9 @@ class TestCredentialPoolInit:
 class TestEnvOku:
     def test_valid_env(self, tmp_path):
         env_file = tmp_path / ".env"
-        env_file.write_text("DEEPSEEK_API_KEY=sk-test123\nOPENAI_API_KEY=sk-abc\n", encoding="utf-8")
+        env_file.write_text(
+            "DEEPSEEK_API_KEY=sk-test123\nOPENAI_API_KEY=sk-abc\n", encoding="utf-8"
+        )
         pool = CredentialPool()
         result = pool._env_oku(env_file)
         assert result["DEEPSEEK_API_KEY"] == "sk-test123"
@@ -66,7 +68,9 @@ class TestEnvOku:
 
     def test_comments_skipped(self, tmp_path):
         env_file = tmp_path / ".env"
-        env_file.write_text("# yorum satiri\nDEEPSEEK_API_KEY=sk-test\n", encoding="utf-8")
+        env_file.write_text(
+            "# yorum satiri\nDEEPSEEK_API_KEY=sk-test\n", encoding="utf-8"
+        )
         pool = CredentialPool()
         result = pool._env_oku(env_file)
         assert len(result) == 1
@@ -168,7 +172,10 @@ class TestTumAnahtarlar:
         with patch.dict(os.environ, {"DEEPSEEK_API_KEY": "sk-1234567890"}):
             pool._cache.clear()
             result = pool.tum_anahtarlar()
-            assert "***" in result["DEEPSEEK_API_KEY"] or result["DEEPSEEK_API_KEY"] == "YOK"
+            assert (
+                "***" in result["DEEPSEEK_API_KEY"]
+                or result["DEEPSEEK_API_KEY"] == "YOK"
+            )
 
     def test_short_values_not_masked(self):
         pool = CredentialPool()

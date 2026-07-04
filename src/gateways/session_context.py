@@ -62,13 +62,21 @@ _SESSION_ID: ContextVar = ContextVar("HERMES_SESSION_ID", default=_UNSET)
 # ID of the message that triggered the current turn. Used as a reply anchor
 # so background-process notifications stay inside the originating Telegram
 # private-chat topic (those lanes route only with thread id + reply anchor).
-_SESSION_MESSAGE_ID: ContextVar = ContextVar("HERMES_SESSION_MESSAGE_ID", default=_UNSET)
+_SESSION_MESSAGE_ID: ContextVar = ContextVar(
+    "HERMES_SESSION_MESSAGE_ID", default=_UNSET
+)
 
 # Cron auto-delivery vars — set per-job in run_job() so concurrent jobs
 # don't clobber each other's delivery targets.
-_CRON_AUTO_DELIVER_PLATFORM: ContextVar = ContextVar("HERMES_CRON_AUTO_DELIVER_PLATFORM", default=_UNSET)
-_CRON_AUTO_DELIVER_CHAT_ID: ContextVar = ContextVar("HERMES_CRON_AUTO_DELIVER_CHAT_ID", default=_UNSET)
-_CRON_AUTO_DELIVER_THREAD_ID: ContextVar = ContextVar("HERMES_CRON_AUTO_DELIVER_THREAD_ID", default=_UNSET)
+_CRON_AUTO_DELIVER_PLATFORM: ContextVar = ContextVar(
+    "HERMES_CRON_AUTO_DELIVER_PLATFORM", default=_UNSET
+)
+_CRON_AUTO_DELIVER_CHAT_ID: ContextVar = ContextVar(
+    "HERMES_CRON_AUTO_DELIVER_CHAT_ID", default=_UNSET
+)
+_CRON_AUTO_DELIVER_THREAD_ID: ContextVar = ContextVar(
+    "HERMES_CRON_AUTO_DELIVER_THREAD_ID", default=_UNSET
+)
 
 _VAR_MAP = {
     "HERMES_SESSION_PLATFORM": _SESSION_PLATFORM,

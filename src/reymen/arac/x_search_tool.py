@@ -13,7 +13,7 @@ import urllib.request
 from typing import Optional
 
 X_BEARER = os.environ.get("X_BEARER_TOKEN", "")
-X_BASE   = "https://api.twitter.com/2"
+X_BASE = "https://api.twitter.com/2"
 
 
 def _x_get(yol: str, params: dict) -> dict:
@@ -58,22 +58,22 @@ def tweet_ara(
     if exclude_retweets:
         q += " -is:retweet"
 
-    yanit = _x_get("/tweets/search/recent", {
-        "query":       q,
-        "max_results": min(max(max_sonuc, 10), 100),
-        "tweet.fields": "created_at,author_id,public_metrics,lang",
-        "expansions":  "author_id",
-        "user.fields": "name,username",
-    })
+    yanit = _x_get(
+        "/tweets/search/recent",
+        {
+            "query": q,
+            "max_results": min(max(max_sonuc, 10), 100),
+            "tweet.fields": "created_at,author_id,public_metrics,lang",
+            "expansions": "author_id",
+            "user.fields": "name,username",
+        },
+    )
 
     if "error" in yanit:
         return f"[X Arama]: {yanit['error']}"
 
     tweetler = yanit.get("data", [])
-    kullanicilar = {
-        u["id"]: u
-        for u in yanit.get("includes", {}).get("users", [])
-    }
+    kullanicilar = {u["id"]: u for u in yanit.get("includes", {}).get("users", [])}
 
     if not tweetler:
         return f"'{sorgu}' için sonuç bulunamadı."
@@ -81,7 +81,7 @@ def tweet_ara(
     satirlar = [f"X Arama: '{sorgu}' — {len(tweetler)} tweet"]
     for t in tweetler:
         yazar_id = t.get("author_id", "")
-        yazar    = kullanicilar.get(yazar_id, {})
+        yazar = kullanicilar.get(yazar_id, {})
         kullanici = yazar.get("username", yazar_id)
         metrikler = t.get("public_metrics", {})
         satirlar.append(
@@ -101,9 +101,12 @@ def kullanici_profili(kullanici_adi: str) -> str:
     Returns:
         Profil bilgisi metin olarak
     """
-    yanit = _x_get(f"/users/by/username/{kullanici_adi}", {
-        "user.fields": "name,description,public_metrics,created_at,verified",
-    })
+    yanit = _x_get(
+        f"/users/by/username/{kullanici_adi}",
+        {
+            "user.fields": "name,description,public_metrics,created_at,verified",
+        },
+    )
 
     if "error" in yanit:
         return f"[X Profil]: {yanit['error']}"
@@ -125,15 +128,18 @@ def kullanici_profili(kullanici_adi: str) -> str:
 def son_tweetler(kullanici_adi: str, max_sonuc: int = 5) -> str:
     """Kullanıcının son tweetlerini getir."""
     profil = _x_get(f"/users/by/username/{kullanici_adi}", {"user.fields": "id"})
-    uid    = profil.get("data", {}).get("id", "")
+    uid = profil.get("data", {}).get("id", "")
     if not uid:
         return f"[X]: @{kullanici_adi} bulunamadı."
 
-    yanit = _x_get(f"/users/{uid}/tweets", {
-        "max_results": min(max(max_sonuc, 5), 100),
-        "tweet.fields": "created_at,public_metrics",
-        "exclude":      "retweets,replies",
-    })
+    yanit = _x_get(
+        f"/users/{uid}/tweets",
+        {
+            "max_results": min(max(max_sonuc, 5), 100),
+            "tweet.fields": "created_at,public_metrics",
+            "exclude": "retweets,replies",
+        },
+    )
 
     tweetler = yanit.get("data", [])
     if not tweetler:

@@ -25,12 +25,12 @@ from typing import Optional
 logger = logging.getLogger(__name__)
 
 # ── Sabit yollar
-PROJE_KOK    = Path(__file__).parent.resolve()
-SOUL_YOLU    = PROJE_KOK / ".ReYMeN" / "SOUL.md"
-MEMORY_YOLU  = PROJE_KOK / ".ReYMeN" / "memories" / "MEMORY.md"
-USER_YOLU    = PROJE_KOK / ".ReYMeN" / "memories" / "USER.md"
-SKILLS_KLASOR= PROJE_KOK / ".ReYMeN" / "skills"
-KANBAN_YOLU  = PROJE_KOK / ".ReYMeN" / "kanban" / "gorevler.json"
+PROJE_KOK = Path(__file__).parent.resolve()
+SOUL_YOLU = PROJE_KOK / ".ReYMeN" / "SOUL.md"
+MEMORY_YOLU = PROJE_KOK / ".ReYMeN" / "memories" / "MEMORY.md"
+USER_YOLU = PROJE_KOK / ".ReYMeN" / "memories" / "USER.md"
+SKILLS_KLASOR = PROJE_KOK / ".ReYMeN" / "skills"
+KANBAN_YOLU = PROJE_KOK / ".ReYMeN" / "kanban" / "gorevler.json"
 
 CTX_TOKEN_LIMITI = 8000
 
@@ -43,7 +43,7 @@ VARSAYILAN_ARACLAR = [
     'WEB_ARA("sorgu")                   — web araması',
     'TARAYICI_AC("url")                 — sayfayı aç ve oku',
     'EKRAN_TIKLA("yazi")                — ekranda bul ve tıkla',
-    'EKRAN_OKU()                        — ekran metnini oku',
+    "EKRAN_OKU()                        — ekran metnini oku",
     'HAFIZA_ARA("sorgu")                — geçmiş deneyimlerde ara',
     'TELEGRAM_GONDER("mesaj")           — telegram bildirimi',
     'MAKRO_OYNAT("makro_adi")           — kayıtlı makro oynat',
@@ -139,8 +139,8 @@ class PromptBuilder:
         max_token: int = CTX_TOKEN_LIMITI,
     ):
         self.soul_dosyasi = soul_dosyasi or SOUL_YOLU
-        self.max_token    = max_token
-        self._araclar: list[str] = []      # motor tarafından doldurulur
+        self.max_token = max_token
+        self._araclar: list[str] = []  # motor tarafından doldurulur
 
     # ── Araç kaydı ────────────────────────────────────────────────────
 
@@ -179,13 +179,16 @@ class PromptBuilder:
             return ""
         try:
             gorevler = json.loads(KANBAN_YOLU.read_text(encoding="utf-8"))
-            aktif = [g for g in gorevler
-                     if g.get("durum") in ("devam", "yapiliyor", "bekliyor")]
+            aktif = [
+                g
+                for g in gorevler
+                if g.get("durum") in ("devam", "yapiliyor", "bekliyor")
+            ]
             if not aktif:
                 return ""
             satirlar = ["[Kanban Aktif Görevler]"]
             for g in aktif[:4]:
-                durum  = g.get("durum", "?").upper()
+                durum = g.get("durum", "?").upper()
                 baslik = g.get("baslik", g.get("hedef", "?"))[:55]
                 satirlar.append(f"  [{durum}] {baslik}")
             return "\n".join(satirlar)
@@ -200,7 +203,7 @@ class PromptBuilder:
             return ""
         satirlar = ["[Kullanılabilir Yetenekler]"]
         for s in dosyalar:
-            ad  = s.parent.name
+            ad = s.parent.name
             kat = s.parent.parent.name
             satirlar.append(f"  - {kat}/{ad}")
         return "\n".join(satirlar)
@@ -216,7 +219,7 @@ class PromptBuilder:
             satirlar = ["[Son Adımlar]"]
             for a in son:
                 t = a.get("tur", "?")
-                e = str(a.get("eylem",  ""))[:65]
+                e = str(a.get("eylem", ""))[:65]
                 g = str(a.get("gozlem", ""))[:65]
                 satirlar.append(f"  [T{t}] {e} → {g}")
             return "\n".join(satirlar)
@@ -230,9 +233,7 @@ class PromptBuilder:
         for d in dosyalar:
             try:
                 veri = json.loads(d.read_text(encoding="utf-8"))
-                satirlar.append(
-                    f"  {veri['hedef'][:45]}: {veri['adim_sayisi']} adım"
-                )
+                satirlar.append(f"  {veri['hedef'][:45]}: {veri['adim_sayisi']} adım")
             except Exception as _e:
                 logger.warning("[Trajectory gecmis] JSON: %s", _e)
 
@@ -284,13 +285,13 @@ class PromptBuilder:
         template = TEMPLATELER.get(gorev_tipi, TEMPLATELER["genel"])
 
         # Bileşenleri topla
-        soul       = self._soul_oku()
-        memory     = self._memory_oku()
+        soul = self._soul_oku()
+        memory = self._memory_oku()
         user_bilgi = self._user_oku()
-        skills     = self._skills_ozeti()
-        kanban     = self._kanban_ozeti()
-        traj       = self._trajectory_gecmis(adimlar)
-        ref        = self._referanslar_metni(referanslar)
+        skills = self._skills_ozeti()
+        kanban = self._kanban_ozeti()
+        traj = self._trajectory_gecmis(adimlar)
+        ref = self._referanslar_metni(referanslar)
 
         parcalar: list[str] = [soul]
 
@@ -366,12 +367,14 @@ class PromptBuilder:
     ) -> list[dict]:
         """OpenAI/LM Studio uyumlu [system, user] mesaj listesi."""
         sistem = self.sistem_prompt(
-            hedef=hedef, gorev_tipi=gorev_tipi,
-            adimlar=adimlar, referanslar=referanslar,
+            hedef=hedef,
+            gorev_tipi=gorev_tipi,
+            adimlar=adimlar,
+            referanslar=referanslar,
         )
         return [
             {"role": "system", "content": sistem},
-            {"role": "user",   "content": hedef},
+            {"role": "user", "content": hedef},
         ]
 
     def tur_mesaj_listesi(
@@ -385,28 +388,36 @@ class PromptBuilder:
     ) -> list[dict]:
         """Devam eden tur için tam konuşma geçmişli mesaj listesi."""
         sistem = self.sistem_prompt(
-            hedef=hedef, gorev_tipi=gorev_tipi,
-            adimlar=adimlar, referanslar=referanslar,
+            hedef=hedef,
+            gorev_tipi=gorev_tipi,
+            adimlar=adimlar,
+            referanslar=referanslar,
         )
         mesajlar: list[dict] = [{"role": "system", "content": sistem}]
 
         # Son 6 adımı konuşma geçmişi olarak ekle
         if adimlar:
             for a in adimlar[-6:]:
-                eylem  = str(a.get("eylem",  "")).strip()
+                eylem = str(a.get("eylem", "")).strip()
                 gozlem = str(a.get("gozlem", "")).strip()
                 if eylem:
                     mesajlar.append({"role": "assistant", "content": eylem})
                 if gozlem:
-                    mesajlar.append({
-                        "role": "user",
-                        "content": f"Gözlem: {_kes(gozlem, 150)}",
-                    })
+                    mesajlar.append(
+                        {
+                            "role": "user",
+                            "content": f"Gözlem: {_kes(gozlem, 150)}",
+                        }
+                    )
 
-        mesajlar.append({
-            "role": "user",
-            "content": self.tur_promptu(tur, onceki_gozlem=onceki_gozlem, hedef=hedef),
-        })
+        mesajlar.append(
+            {
+                "role": "user",
+                "content": self.tur_promptu(
+                    tur, onceki_gozlem=onceki_gozlem, hedef=hedef
+                ),
+            }
+        )
         return mesajlar
 
     def tur_promptu(
@@ -436,19 +447,19 @@ class PromptBuilder:
     ) -> dict:
         """Prompt bileşenlerinin tahmini token maliyeti."""
         bilesenler = {
-            "soul":          _token_say(self._soul_oku()),
-            "memory":        _token_say(self._memory_oku()),
-            "user_profil":   _token_say(self._user_oku()),
-            "kanban":        _token_say(self._kanban_ozeti()),
-            "skills":        _token_say(self._skills_ozeti()),
-            "trajectory":    _token_say(self._trajectory_gecmis(adimlar)),
-            "araclar":       _token_say(self._araclar_metni()),
-            "react_talimati":_token_say(REACT_TALIMATI),
-            "hedef":         _token_say(hedef),
+            "soul": _token_say(self._soul_oku()),
+            "memory": _token_say(self._memory_oku()),
+            "user_profil": _token_say(self._user_oku()),
+            "kanban": _token_say(self._kanban_ozeti()),
+            "skills": _token_say(self._skills_ozeti()),
+            "trajectory": _token_say(self._trajectory_gecmis(adimlar)),
+            "araclar": _token_say(self._araclar_metni()),
+            "react_talimati": _token_say(REACT_TALIMATI),
+            "hedef": _token_say(hedef),
         }
         bilesenler["toplam"] = sum(bilesenler.values())
-        bilesenler["limit"]  = self.max_token
-        bilesenler["asim"]   = max(0, bilesenler["toplam"] - self.max_token)
+        bilesenler["limit"] = self.max_token
+        bilesenler["asim"] = max(0, bilesenler["toplam"] - self.max_token)
         return bilesenler
 
 
@@ -477,13 +488,15 @@ def hizli_sistem_promptu(
 
 if __name__ == "__main__":
     pb = PromptBuilder()
-    pb.araclar_kaydet([
-        'DOSYA_OKU("yol")          — dosya içeriğini oku',
-        'DOSYA_YAZ("yol","icerik") — dosyaya yaz',
-        'WEB_ARA("sorgu")          — web araması',
-        'KOMUT("cmd")              — shell komutu',
-        'GOREV_BITTI("ozet")       — bitir',
-    ])
+    pb.araclar_kaydet(
+        [
+            'DOSYA_OKU("yol")          — dosya içeriğini oku',
+            'DOSYA_YAZ("yol","icerik") — dosyaya yaz',
+            'WEB_ARA("sorgu")          — web araması',
+            'KOMUT("cmd")              — shell komutu',
+            'GOREV_BITTI("ozet")       — bitir',
+        ]
+    )
 
     hedef = "Proje klasöründeki Python dosyalarını analiz et, özet rapor yaz"
 
@@ -497,10 +510,11 @@ if __name__ == "__main__":
 
     print("=== TUR MESAJ LİSTESİ (tur=3) ===")
     tur_mesajlari = pb.tur_mesaj_listesi(
-        hedef, tur=3,
+        hedef,
+        tur=3,
         adimlar=[
-            {"tur": 1, "eylem": 'KOMUT("ls")',      "gozlem": "3 dosya"},
-            {"tur": 2, "eylem": 'DOSYA_OKU("a.py")',"gozlem": "200 satir"},
+            {"tur": 1, "eylem": 'KOMUT("ls")', "gozlem": "3 dosya"},
+            {"tur": 2, "eylem": 'DOSYA_OKU("a.py")', "gozlem": "200 satir"},
         ],
     )
     print(f"{len(tur_mesajlari)} mesaj uretildi")

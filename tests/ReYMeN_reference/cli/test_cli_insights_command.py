@@ -21,8 +21,9 @@ def _run_show_insights(command: str):
     cli_obj = ReYMeNCLI.__new__(ReYMeNCLI)
     db = MagicMock()
     _InsightsEngineStub.calls = []
-    with patch("ReYMeN_state.SessionDB", return_value=db), \
-         patch("agent.insights.InsightsEngine", _InsightsEngineStub):
+    with patch("ReYMeN_state.SessionDB", return_value=db), patch(
+        "agent.insights.InsightsEngine", _InsightsEngineStub
+    ):
         cli_obj._show_insights(command)
     return _InsightsEngineStub.calls, db
 

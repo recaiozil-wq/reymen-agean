@@ -1,11 +1,19 @@
 """Coverage tests for reymen.sistem.cli_maintenance - actually calls every function."""
+
 import pytest
 from src.reymen.sistem.cli_maintenance import (
-    _normalize_git_bash_path, _git_repo_root, _path_is_within_root,
-    _setup_worktree, _worktree_has_unpushed_commits, _cleanup_worktree,
-    _run_state_db_auto_maintenance, _run_checkpoint_auto_maintenance,
-    _prune_stale_worktrees, _prune_orphaned_branches,
+    _normalize_git_bash_path,
+    _git_repo_root,
+    _path_is_within_root,
+    _setup_worktree,
+    _worktree_has_unpushed_commits,
+    _cleanup_worktree,
+    _run_state_db_auto_maintenance,
+    _run_checkpoint_auto_maintenance,
+    _prune_stale_worktrees,
+    _prune_orphaned_branches,
 )
+
 
 class TestCliMaintenanceCoverage:
     def test_normalize_git_bash_path(self):
@@ -18,6 +26,7 @@ class TestCliMaintenanceCoverage:
 
     def test_path_is_within_root(self):
         import pathlib
+
         _path_is_within_root(pathlib.Path("."), pathlib.Path(".."))
 
     def test_run_state_db_auto_maintenance(self):

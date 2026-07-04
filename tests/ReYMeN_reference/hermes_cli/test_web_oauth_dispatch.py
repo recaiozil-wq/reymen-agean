@@ -19,6 +19,7 @@ The fix:
 
 These tests pin the corrected behavior.
 """
+
 import asyncio
 import time
 from datetime import datetime, timezone
@@ -127,7 +128,9 @@ def test_nous_dashboard_device_flow_ignores_legacy_scope_override(monkeypatch):
         ws._oauth_sessions.pop(result["session_id"], None)
 
 
-def test_nous_dashboard_device_flow_does_not_retry_legacy_scope_on_invoke_refusal(monkeypatch):
+def test_nous_dashboard_device_flow_does_not_retry_legacy_scope_on_invoke_refusal(
+    monkeypatch,
+):
     from ReYMeN_cli import auth as auth_mod
     from ReYMeN_cli import web_server as ws
 
@@ -173,20 +176,29 @@ def test_codex_dashboard_worker_persists_runtime_provider(tmp_path, monkeypatch)
 
         def post(self, url, **kwargs):
             if url.endswith("/deviceauth/usercode"):
-                return _Resp(200, {
-                    "device_auth_id": "device-auth-id",
-                    "interval": 3,
-                    "user_code": "CODEX-1234",
-                })
+                return _Resp(
+                    200,
+                    {
+                        "device_auth_id": "device-auth-id",
+                        "interval": 3,
+                        "user_code": "CODEX-1234",
+                    },
+                )
             if url.endswith("/deviceauth/token"):
-                return _Resp(200, {
-                    "authorization_code": "authorization-code",
-                    "code_verifier": "code-verifier",
-                })
-            return _Resp(200, {
-                "access_token": access_token,
-                "refresh_token": "codex-refresh",
-            })
+                return _Resp(
+                    200,
+                    {
+                        "authorization_code": "authorization-code",
+                        "code_verifier": "code-verifier",
+                    },
+                )
+            return _Resp(
+                200,
+                {
+                    "access_token": access_token,
+                    "refresh_token": "codex-refresh",
+                },
+            )
 
     monkeypatch.setenv("ReYMeN_HOME", str(tmp_path))
     monkeypatch.setattr(httpx, "Client", _Client)
@@ -207,7 +219,9 @@ def test_codex_dashboard_worker_persists_runtime_provider(tmp_path, monkeypatch)
         ws._oauth_sessions.pop(sid, None)
 
 
-def test_nous_dashboard_poller_preserves_effective_scope_when_token_omits_scope(monkeypatch):
+def test_nous_dashboard_poller_preserves_effective_scope_when_token_omits_scope(
+    monkeypatch,
+):
     from ReYMeN_cli import auth as auth_mod
     from ReYMeN_cli import web_server as ws
 
@@ -377,7 +391,10 @@ def test_env_sourced_oauth_status_is_not_disconnectable(monkeypatch):
 
     assert providers["anthropic"]["status"]["source"] == "env_var"
     assert providers["anthropic"]["disconnectable"] is False
-    assert providers["anthropic"]["disconnect_hint"] == "Remove the API key from Settings → Keys instead."
+    assert (
+        providers["anthropic"]["disconnect_hint"]
+        == "Remove the API key from Settings → Keys instead."
+    )
 
     delete_resp = client.delete("/api/providers/oauth/anthropic", headers=HEADERS)
     assert delete_resp.status_code == 400, delete_resp.text
@@ -416,7 +433,12 @@ def test_xai_loopback_start_returns_authorize_url(monkeypatch):
     monkeypatch.setattr(
         auth_mod,
         "_xai_start_callback_server",
-        lambda *a, **k: (_FakeServer(), _FakeThread(), {"code": None, "error": None}, redirect_uri),
+        lambda *a, **k: (
+            _FakeServer(),
+            _FakeThread(),
+            {"code": None, "error": None},
+            redirect_uri,
+        ),
     )
     # Don't let the background worker run a real callback wait/exchange.
     monkeypatch.setattr(ws, "_xai_loopback_worker", lambda sid: None)

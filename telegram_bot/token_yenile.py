@@ -5,15 +5,16 @@ import subprocess
 import sys
 from pyrogram import Client
 import logging
+
 logger = logging.getLogger(__name__)
 
 # ============ SADECE BUNLARI DOLDUR ============
-API_ID = 12345678                          # my.telegram.org'dan al
+API_ID = 12345678  # my.telegram.org'dan al
 API_HASH = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-BOT_USERNAME = "ReYMeN_ReYMeNbot"          # @ olmadan bot kullanıcı adı
+BOT_USERNAME = "ReYMeN_ReYMeNbot"  # @ olmadan bot kullanıcı adı
 # =================================================
 
-TOKEN_PATTERN = re.compile(r'\d+:[A-Za-z0-9_-]{35}')
+TOKEN_PATTERN = re.compile(r"\d+:[A-Za-z0-9_-]{35}")
 SEARCH_ROOT = r"C:\Users\marko"
 
 
@@ -21,9 +22,11 @@ def find_bot_py():
     print("[1/6] bot.py dosyası aranıyor...")
     for root, dirs, files in os.walk(SEARCH_ROOT):
         # gereksiz yere derine inmesin diye bazı klasörleri atla
-        dirs[:] = [d for d in dirs if d not in (
-            "AppData", "node_modules", ".git", "venv", "__pycache__"
-        )]
+        dirs[:] = [
+            d
+            for d in dirs
+            if d not in ("AppData", "node_modules", ".git", "venv", "__pycache__")
+        ]
         if "bot.py" in files:
             path = os.path.join(root, "bot.py")
             print("    Bulundu:", path)
@@ -34,9 +37,12 @@ def find_bot_py():
 def kill_existing_python():
     print("[2/6] Lokal python süreçleri kapatılıyor...")
     subprocess.run(
-        ["powershell", "-Command",
-         "Stop-Process -Name python -Force -ErrorAction SilentlyContinue"],
-        check=False
+        [
+            "powershell",
+            "-Command",
+            "Stop-Process -Name python -Force -ErrorAction SilentlyContinue",
+        ],
+        check=False,
     )
     time.sleep(1)
 
@@ -61,9 +67,7 @@ def revoke_and_get_new_token(app: Client) -> str:
     msg = next(app.get_chat_history("BotFather", limit=1))
     match = TOKEN_PATTERN.search(msg.text or "")
     if not match:
-        raise RuntimeError(
-            "Yeni token bulunamadı. Son mesaj:\n" + str(msg.text)
-        )
+        raise RuntimeError("Yeni token bulunamadı. Son mesaj:\n" + str(msg.text))
     return match.group(0)
 
 
@@ -88,7 +92,7 @@ def restart_bot(bot_py_path: str):
     subprocess.Popen(
         ["python", bot_py_path],
         cwd=bot_dir,
-        creationflags=subprocess.CREATE_NEW_CONSOLE
+        creationflags=subprocess.CREATE_NEW_CONSOLE,
     )
     time.sleep(2)
     print("[6/6] Tamamlandı. Bot ayrı bir pencerede çalışıyor.")

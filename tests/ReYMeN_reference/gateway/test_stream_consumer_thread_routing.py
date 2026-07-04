@@ -6,6 +6,7 @@ the main group chat.
 
 Covers: #6969, #9916, #7355
 """
+
 from unittest.mock import AsyncMock, MagicMock
 from types import SimpleNamespace
 
@@ -46,9 +47,9 @@ class TestInitialReplyToId:
 
         adapter.send.assert_called_once()
         call_kwargs = adapter.send.call_args[1]
-        assert call_kwargs["reply_to"] == "om_user_msg_456", (
-            "First send should pass initial_reply_to_id as reply_to"
-        )
+        assert (
+            call_kwargs["reply_to"] == "om_user_msg_456"
+        ), "First send should pass initial_reply_to_id as reply_to"
         assert call_kwargs["chat_id"] == "chat_123"
 
     @pytest.mark.asyncio
@@ -115,9 +116,7 @@ class TestOverflowFirstMessage:
         """When first message exceeds platform limit and is split into chunks,
         each chunk should be threaded to initial_reply_to_id, not None."""
         adapter = _make_adapter(max_length=10)
-        adapter.truncate_message = MagicMock(
-            return_value=["chunk_1", "chunk_2"]
-        )
+        adapter.truncate_message = MagicMock(return_value=["chunk_1", "chunk_2"])
         consumer = GatewayStreamConsumer(
             adapter,
             "chat_123",
@@ -128,13 +127,15 @@ class TestOverflowFirstMessage:
         # Inject oversized accumulated text to trigger overflow path
         consumer._accumulated = "A" * 100
         consumer._current_edit_interval = 999
-        await consumer._send_new_chunk("chunk_1", consumer._message_id or consumer._initial_reply_to_id)
+        await consumer._send_new_chunk(
+            "chunk_1", consumer._message_id or consumer._initial_reply_to_id
+        )
 
         adapter.send.assert_called_once()
         call_kwargs = adapter.send.call_args[1]
-        assert call_kwargs["reply_to"] == "om_user_msg_789", (
-            "Overflow first chunk should use initial_reply_to_id"
-        )
+        assert (
+            call_kwargs["reply_to"] == "om_user_msg_789"
+        ), "Overflow first chunk should use initial_reply_to_id"
 
 
 class TestFeishuFallbackThreadRouting:
@@ -160,10 +161,13 @@ class TestFeishuFallbackThreadRouting:
         # Use the real implementation path
         adapter._client = mock_client
         adapter._build_create_message_body = FeishuAdapter._build_create_message_body
-        adapter._build_create_message_request = FeishuAdapter._build_create_message_request
+        adapter._build_create_message_request = (
+            FeishuAdapter._build_create_message_request
+        )
 
         # Call _send_raw_message with reply_to=None and thread_id in metadata
         import json
+
         result = await FeishuAdapter._send_raw_message(
             adapter,
             chat_id="oc_main_chat",
@@ -181,21 +185,24 @@ class TestFeishuFallbackThreadRouting:
         # Lark SDK builder exposes .body; the in-tree fallback exposes .request_body.
         # The contributor's branch had the lark SDK installed, the test environment
         # may not — handle both shapes.
-        body = getattr(call_args, "body", None) or getattr(call_args, "request_body", None)
+        body = getattr(call_args, "body", None) or getattr(
+            call_args, "request_body", None
+        )
         assert body is not None, "request has neither .body nor .request_body"
         # receive_id should be the thread_id, not the chat_id
         receive_id = getattr(body, "receive_id", None)
         if receive_id is None and isinstance(body, str):
             import json as _json
+
             receive_id = _json.loads(body).get("receive_id")
-        assert receive_id == "omt_topic_abc", (
-            f"Expected receive_id='omt_topic_abc', got '{receive_id}'"
-        )
+        assert (
+            receive_id == "omt_topic_abc"
+        ), f"Expected receive_id='omt_topic_abc', got '{receive_id}'"
         # And receive_id_type must be 'thread_id', not 'chat_id'
         receive_id_type = getattr(call_args, "receive_id_type", None)
-        assert receive_id_type == "thread_id", (
-            f"Expected receive_id_type='thread_id', got '{receive_id_type}'"
-        )
+        assert (
+            receive_id_type == "thread_id"
+        ), f"Expected receive_id_type='thread_id', got '{receive_id_type}'"
 
     @pytest.mark.asyncio
     async def test_create_uses_chat_id_when_no_thread(self):
@@ -213,9 +220,12 @@ class TestFeishuFallbackThreadRouting:
         adapter = MagicMock(spec=FeishuAdapter)
         adapter._client = mock_client
         adapter._build_create_message_body = FeishuAdapter._build_create_message_body
-        adapter._build_create_message_request = FeishuAdapter._build_create_message_request
+        adapter._build_create_message_request = (
+            FeishuAdapter._build_create_message_request
+        )
 
         import json
+
         result = await FeishuAdapter._send_raw_message(
             adapter,
             chat_id="oc_main_chat",

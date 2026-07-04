@@ -9,31 +9,49 @@ import os
 from pathlib import Path
 
 # ── RENK KODLARI ──────────────────────────────────────────────
-GREEN  = "\033[92m"
-RED    = "\033[91m"
+GREEN = "\033[92m"
+RED = "\033[91m"
 YELLOW = "\033[93m"
-BLUE   = "\033[94m"
-BOLD   = "\033[1m"
-RESET  = "\033[0m"
+BLUE = "\033[94m"
+BOLD = "\033[1m"
+RESET = "\033[0m"
 
-def log(msg):   print(f"{GREEN}{BOLD}[✓]{RESET} {msg}")
-def warn(msg):  print(f"{YELLOW}{BOLD}[!]{RESET} {msg}")
-def err(msg):   print(f"{RED}{BOLD}[✗]{RESET} {msg}")
-def info(msg):  print(f"{BLUE}{BOLD}[→]{RESET} {msg}")
+
+def log(msg):
+    print(f"{GREEN}{BOLD}[✓]{RESET} {msg}")
+
+
+def warn(msg):
+    print(f"{YELLOW}{BOLD}[!]{RESET} {msg}")
+
+
+def err(msg):
+    print(f"{RED}{BOLD}[✗]{RESET} {msg}")
+
+
+def info(msg):
+    print(f"{BLUE}{BOLD}[→]{RESET} {msg}")
+
 
 def run(cmd, cwd=None):
     """Komutu calistir, sonucu don."""
     info(f"Calistiriliyor: {' '.join(cmd)}")
     try:
         result = subprocess.run(
-            cmd, cwd=cwd,
-            capture_output=False, text=True,
-            encoding="utf-8", errors="replace"
+            cmd,
+            cwd=cwd,
+            capture_output=False,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
         )
         return result
     except FileNotFoundError as e:
         err(f"Komut bulunamadi: {e}")
-        return subprocess.CompletedProcess(args=cmd, returncode=-1, stdout="", stderr=str(e))
+        return subprocess.CompletedProcess(
+            args=cmd, returncode=-1, stdout="", stderr=str(e)
+        )
+
 
 # ── PROJE YOLU ────────────────────────────────────────────────
 PROJE = Path(__file__).resolve().parent.parent.parent
@@ -43,12 +61,13 @@ if not PROJE.exists():
     PROJE = Path(__file__).parent.resolve()
     warn(f"Varsayilan yol bulunamadi, mevcut dizin kullaniliyor: {PROJE}")
 
-VENV     = PROJE / "venv"
-PIP      = VENV / "Scripts" / "pip.exe"
-PYTHON   = VENV / "Scripts" / "python.exe"
-REQ      = PROJE / "requirements.txt"
-OTONOM   = PROJE / "reymen" / "_otonom_fix.py"
-TESTS    = PROJE / "tests"
+VENV = PROJE / "venv"
+PIP = VENV / "Scripts" / "pip.exe"
+PYTHON = VENV / "Scripts" / "python.exe"
+REQ = PROJE / "requirements.txt"
+OTONOM = PROJE / "reymen" / "_otonom_fix.py"
+TESTS = PROJE / "tests"
+
 
 def main():
     print(f"\n{'='*55}")
@@ -100,7 +119,11 @@ def main():
         # Kullanicidan onay al
         print()
         try:
-            cevap = input(f"{YELLOW}{BOLD}[?]{RESET} Fix uygulansin mi? (e/h): ").strip().lower()
+            cevap = (
+                input(f"{YELLOW}{BOLD}[?]{RESET} Fix uygulansin mi? (e/h): ")
+                .strip()
+                .lower()
+            )
         except (EOFError, OSError):
             cevap = "e"
             warn("Terminal interaktif degil, otomatik devam...")
@@ -118,12 +141,18 @@ def main():
     if not TESTS.exists():
         warn("tests/ klasoru bulunamadi")
     else:
-        r = run([
-            str(PYTHON), "-m", "pytest",
-            "tests/",
-            "-x", "--tb=short",
-            "--ignore=tests/ReYMeN_reference"
-        ], cwd=PROJE)
+        r = run(
+            [
+                str(PYTHON),
+                "-m",
+                "pytest",
+                "tests/",
+                "-x",
+                "--tb=short",
+                "--ignore=tests/ReYMeN_reference",
+            ],
+            cwd=PROJE,
+        )
 
         print()
         if r.returncode == 0:
@@ -138,6 +167,7 @@ def main():
     print(f"  Proje : {PROJE}")
     print(f"  Python: {PYTHON}")
     print(f"{'='*55}\n")
+
 
 if __name__ == "__main__":
     main()

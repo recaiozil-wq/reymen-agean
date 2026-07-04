@@ -123,6 +123,7 @@ class _FakeRunningRegistry:
 
 def _patch_process_registry(monkeypatch, count: int) -> None:
     import tools.process_registry as pr_mod
+
     monkeypatch.setattr(pr_mod, "process_registry", _FakeRunningRegistry(count))
 
 

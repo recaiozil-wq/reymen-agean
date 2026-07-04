@@ -39,6 +39,7 @@ class MixinCommands:
         Delegates to :func:`handlers.tools.tools_handler._handle_tools_command`.
         """
         from .handlers.tools.tools_handler import _handle_tools_command
+
         _handle_tools_command(self, cmd)
 
     def _handle_codex_runtime(self, cmd_original: str) -> None:
@@ -47,6 +48,7 @@ class MixinCommands:
         Delegates to :func:`handlers.tools.codex_runtime_handler._handle_codex_runtime`.
         """
         from .handlers.tools.codex_runtime_handler import _handle_codex_runtime
+
         _handle_codex_runtime(self, cmd_original)
 
     def _handle_cron_command(self, cmd: str):
@@ -55,6 +57,7 @@ class MixinCommands:
         Delegates to :func:`handlers.tools.cron_handler._handle_cron_command`.
         """
         from .handlers.tools.cron_handler import _handle_cron_command
+
         _handle_cron_command(self, cmd)
 
     def _handle_curator_command(self, cmd: str):
@@ -63,6 +66,7 @@ class MixinCommands:
         Delegates to :func:`handlers.tools.curator_handler._handle_curator_command`.
         """
         from .handlers.tools.curator_handler import _handle_curator_command
+
         _handle_curator_command(self, cmd)
 
     def _handle_kanban_command(self, cmd: str):
@@ -71,6 +75,7 @@ class MixinCommands:
         Delegates to :func:`handlers.tools.kanban_handler._handle_kanban_command`.
         """
         from .handlers.tools.kanban_handler import _handle_kanban_command
+
         _handle_kanban_command(self, cmd)
 
     def _handle_skills_command(self, cmd: str):
@@ -79,6 +84,7 @@ class MixinCommands:
         Delegates to :func:`handlers.tools.skills_handler._handle_skills_command`.
         """
         from .handlers.tools.skills_handler import _handle_skills_command
+
         _handle_skills_command(self, cmd)
 
     def _handle_background_command(self, cmd: str):
@@ -87,6 +93,7 @@ class MixinCommands:
         Delegates to :func:`handlers.tools.background_handler._handle_background_command`.
         """
         from .handlers.tools.background_handler import _handle_background_command
+
         _handle_background_command(self, cmd)
 
     def _try_launch_chrome_debug(port: int, system: str) -> bool:
@@ -98,6 +105,7 @@ class MixinCommands:
         Returns True if a launch command was executed (doesn't guarantee success).
         """
         from ReYMeN_cli.browser_connect import try_launch_chrome_debug
+
         return try_launch_chrome_debug(port, system)
 
     def _handle_bundles_command(self, cmd: str) -> None:
@@ -106,6 +114,7 @@ class MixinCommands:
         Delegates to :func:`handlers.tools.bundles_handler._handle_bundles_command`.
         """
         from .handlers.tools.bundles_handler import _handle_bundles_command
+
         _handle_bundles_command(self, cmd)
 
     def _handle_browser_command(self, cmd: str):
@@ -114,4 +123,5 @@ class MixinCommands:
         Delegates to :func:`handlers.tools.browser_handler._handle_browser_command`.
         """
         from .handlers.tools.browser_handler import _handle_browser_command
+
         _handle_browser_command(self, cmd)

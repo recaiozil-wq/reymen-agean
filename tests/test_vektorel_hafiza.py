@@ -23,6 +23,7 @@ def chroma_devre_disi(monkeypatch):
 def yedek():
     """Temiz bir _BasitYedek instance'i."""
     from reymen.hafiza.vektorel_hafiza import _BasitYedek
+
     return _BasitYedek()
 
 
@@ -31,6 +32,7 @@ def vh():
     """vektorel_hafiza modul referansi (import edilmisse bile taze)."""
     import importlib
     import reymen.hafiza.vektorel_hafiza as vh
+
     importlib.reload(vh)
     # Reload sonrasi CHROMA_AVAILABLE sifirlanir — tekrar kapat
     vh.CHROMA_AVAILABLE = False
@@ -47,9 +49,11 @@ class TestBasitYedekAddCount:
 
     def test_add_ve_count_3_kayit(self, yedek):
         """1. add ile 3 kayit, count() == 3"""
-        yedek.add(["id1", "id2", "id3"],
-                   ["dokuman bir", "dokuman iki", "dokuman uc"],
-                   [{"k": "v1"}, {"k": "v2"}, {"k": "v3"}])
+        yedek.add(
+            ["id1", "id2", "id3"],
+            ["dokuman bir", "dokuman iki", "dokuman uc"],
+            [{"k": "v1"}, {"k": "v2"}, {"k": "v3"}],
+        )
         assert yedek.count() == 3
 
 
@@ -58,9 +62,9 @@ class TestBasitYedekQuery:
 
     def test_jaccard_benzerlik_calisiyor(self, yedek):
         """2. query — basit Jaccard benzerlik calisiyor"""
-        yedek.add(["id1", "id2"],
-                   ["kedi kopek kus balik", "araba bisiklet ucak"],
-                   [{}, {}])
+        yedek.add(
+            ["id1", "id2"], ["kedi kopek kus balik", "araba bisiklet ucak"], [{}, {}]
+        )
         sonuc = yedek.query(query_texts=["kedi kopek"], n_results=2)
         dokumanlar = sonuc["documents"][0]
         assert len(dokumanlar) >= 1
@@ -103,9 +107,7 @@ class TestBasitYedekDelete:
 
     def test_delete_ids_ile_silinir(self, yedek):
         """6. delete(ids=[...]) -> o id'ler silindi"""
-        yedek.add(["id1", "id2", "id3"],
-                   ["a", "b", "c"],
-                   [{}, {}, {}])
+        yedek.add(["id1", "id2", "id3"], ["a", "b", "c"], [{}, {}, {}])
         yedek.delete(ids=["id1", "id3"])
         assert yedek.count() == 1
         assert yedek._kayitlar[0]["id"] == "id2"
@@ -116,18 +118,14 @@ class TestBasitYedekPeek:
 
     def test_peek_limit_2(self, yedek):
         """7. peek(limit=2) -> 2 kayit"""
-        yedek.add(["id1", "id2", "id3"],
-                   ["bir", "iki", "uc"],
-                   [{}, {}, {}])
+        yedek.add(["id1", "id2", "id3"], ["bir", "iki", "uc"], [{}, {}, {}])
         sonuc = yedek.peek(limit=2)
         assert len(sonuc["ids"]) == 2
         assert sonuc["ids"] == ["id1", "id2"]
 
     def test_peek_limit_100(self, yedek):
         """8. peek(limit=100) -> var olan kadar (3)"""
-        yedek.add(["id1", "id2", "id3"],
-                   ["a", "b", "c"],
-                   [{}, {}, {}])
+        yedek.add(["id1", "id2", "id3"], ["a", "b", "c"], [{}, {}, {}])
         sonuc = yedek.peek(limit=100)
         assert len(sonuc["ids"]) == 3
         assert len(sonuc["documents"]) == 3
@@ -158,6 +156,7 @@ class TestSisteminiKur:
         """11. temp yol -> _BasitYedek veya Collection donuyor"""
         col = vh.vektorel_hafiza_sistemini_kur(str(tmp_path / "test_hf"))
         from reymen.hafiza.vektorel_hafiza import _BasitYedek
+
         assert isinstance(col, (_BasitYedek, type(None)))
 
 
@@ -234,8 +233,9 @@ class TestAnlamsalHafizaAra:
 
         sonuc = vh.anlamsal_hafiza_ara(col, "dosya sorgulama islemi", adet=3)
         # En az 2 sonuc Jaccard eslesmesi beklenir
-        assert "dosya" in sonuc or "veritabani" in sonuc or "sorgulama" in sonuc, \
-            f"Ilgili icerik bulunamadi: {sonuc}"
+        assert (
+            "dosya" in sonuc or "veritabani" in sonuc or "sorgulama" in sonuc
+        ), f"Ilgili icerik bulunamadi: {sonuc}"
         # Birden fazla satir (en az 1-2 sonuc)
         assert sonuc.count("\n") >= 1
 
@@ -315,9 +315,7 @@ class TestBudamaYap:
         """MAKS_HAFIZA=2 iken 4 kayit varsa budama 2'ye indirir."""
         monkeypatch.setattr(vh, "MAKS_HAFIZA", 2)
         col = vh.vektorel_hafiza_sistemini_kur()
-        col.add(["id1", "id2", "id3", "id4"],
-                ["a", "b", "c", "d"],
-                [{}, {}, {}, {}])
+        col.add(["id1", "id2", "id3", "id4"], ["a", "b", "c", "d"], [{}, {}, {}, {}])
         vh._budama_yap(col)
         assert col.count() == 2
         # En eski 2 kayit silindi, en yeni 2 kaldi
@@ -352,6 +350,7 @@ class TestChromaDBMock:
         # import reymen.hafiza.vektorel_hafiza — bu kez chromadb import'u basarili olacak
         import importlib
         import reymen.hafiza.vektorel_hafiza
+
         importlib.reload(reymen.hafiza.vektorel_hafiza)
 
         assert reymen.hafiza.vektorel_hafiza.CHROMA_AVAILABLE is True

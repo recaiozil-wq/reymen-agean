@@ -17,7 +17,9 @@ class LMStudioReasoning:
     """LM Studio reasoning adapteri."""
 
     def __init__(self, base_url: str = ""):
-        self.base_url = base_url or os.environ.get("LMSTUDIO_BASE_URL", "http://localhost:1234")
+        self.base_url = base_url or os.environ.get(
+            "LMSTUDIO_BASE_URL", "http://localhost:1234"
+        )
 
     def ping(self) -> bool:
         try:
@@ -26,7 +28,9 @@ class LMStudioReasoning:
         except Exception:
             return False
 
-    def dusun(self, prompt: str, derinlik: str = "normal", max_tokens: int = 2048) -> dict:
+    def dusun(
+        self, prompt: str, derinlik: str = "normal", max_tokens: int = 2048
+    ) -> dict:
         """LM Studio'da reasoning ile yanit uret.
 
         Args:
@@ -38,6 +42,7 @@ class LMStudioReasoning:
             {"yanit": str, "thinking": str, "sure": float}
         """
         import time
+
         baslangic = time.time()
 
         # Derinlige gore system prompt
@@ -66,11 +71,23 @@ class LMStudioReasoning:
             if r.status_code == 200:
                 yanit = r.json()["choices"][0]["message"]["content"]
                 return {"yanit": yanit, "thinking": "", "sure": sure, "basarili": True}
-            return {"yanit": "", "thinking": "", "sure": sure, "basarili": False, "hata": str(r.status_code)}
+            return {
+                "yanit": "",
+                "thinking": "",
+                "sure": sure,
+                "basarili": False,
+                "hata": str(r.status_code),
+            }
 
         except Exception as e:
             sure = round(time.time() - baslangic, 2)
-            return {"yanit": "", "thinking": "", "sure": sure, "basarili": False, "hata": str(e)}
+            return {
+                "yanit": "",
+                "thinking": "",
+                "sure": sure,
+                "basarili": False,
+                "hata": str(e),
+            }
 
     def modelleri_listele(self) -> list[str]:
         try:

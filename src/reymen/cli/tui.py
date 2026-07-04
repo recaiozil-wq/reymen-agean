@@ -18,6 +18,7 @@ import threading
 from pathlib import Path
 from typing import Optional, Callable
 import logging
+
 logger = logging.getLogger(__name__)
 
 # ── Renk sabitleri (ANSI fallback) ────────────────────────────────────────
@@ -32,12 +33,28 @@ _RED = "\033[91m"
 _W = "\033[97m"
 
 
-def _g(t): return f"{_G}{t}{_R}"
-def _c(t): return f"{_C}{t}{_R}"
-def _y(t): return f"{_Y}{t}{_R}"
-def _mavi(t): return f"{_B}{t}{_R}"
-def _d(t): return f"{_D}{t}{_R}"
-def _r(t): return f"{_RED}{t}{_R}"
+def _g(t):
+    return f"{_G}{t}{_R}"
+
+
+def _c(t):
+    return f"{_C}{t}{_R}"
+
+
+def _y(t):
+    return f"{_Y}{t}{_R}"
+
+
+def _mavi(t):
+    return f"{_B}{t}{_R}"
+
+
+def _d(t):
+    return f"{_D}{t}{_R}"
+
+
+def _r(t):
+    return f"{_RED}{t}{_R}"
 
 
 # ── Durum verisi (synchronized) ───────────────────────────────────────────
@@ -53,9 +70,15 @@ class StatusData:
         self.token_cikis = 0
         self._durum = "hazir"
 
-    def guncelle(self, model: str = None, provider: str = None,
-                 sure: str = None, token_giris: int = None,
-                 token_cikis: int = None, durum: str = None):
+    def guncelle(
+        self,
+        model: str = None,
+        provider: str = None,
+        sure: str = None,
+        token_giris: int = None,
+        token_cikis: int = None,
+        durum: str = None,
+    ):
         with self._lock:
             if model is not None:
                 self.model = model
@@ -94,10 +117,13 @@ class ReYMeNTUI:
         tui.calistir()
     """
 
-    def __init__(self, soru_callback: Callable = None,
-                 model: str = "deepseek-v4-flash",
-                 provider: str = "deepseek",
-                 session_id: str = ""):
+    def __init__(
+        self,
+        soru_callback: Callable = None,
+        model: str = "deepseek-v4-flash",
+        provider: str = "deepseek",
+        session_id: str = "",
+    ):
         self.soru_callback = soru_callback
         self.session_id = session_id or os.urandom(4).hex()
         self.status = StatusData()
@@ -192,9 +218,12 @@ class ReYMeNTUI:
         footer_tablo.add_column(style="cyan", width=16)
 
         footer_tablo.add_row(
-            "Model:", durum["model"],
-            "Provider:", durum["provider"],
-            "Süre:", durum["sure"],
+            "Model:",
+            durum["model"],
+            "Provider:",
+            durum["provider"],
+            "Süre:",
+            durum["sure"],
         )
 
         # Komut ipucu
@@ -254,17 +283,23 @@ class ReYMeNTUI:
 
         durum_ikon = "🟢" if durum["durum"] == "hazir" else "🟡"
         footer_tablo.add_row(
-            f"{durum_ikon} Model:", durum["model"],
-            "Provider:", durum["provider"],
-            "Süre:", durum["sure"],
+            f"{durum_ikon} Model:",
+            durum["model"],
+            "Provider:",
+            durum["provider"],
+            "Süre:",
+            durum["sure"],
         )
 
         # Token bilgisi (varsa)
         if durum["token_giris"] > 0 or durum["token_cikis"] > 0:
             footer_tablo.add_row(
-                "", "",
-                "Token G:", str(durum["token_giris"]),
-                "Token C:", str(durum["token_cikis"]),
+                "",
+                "",
+                "Token G:",
+                str(durum["token_giris"]),
+                "Token C:",
+                str(durum["token_cikis"]),
             )
 
         ipucu = Text.from_markup("[dim]/yardim  /model  /temizle  /cik[/]")
@@ -294,6 +329,7 @@ class ReYMeNTUI:
         if os.name == "nt":
             try:
                 import colorama
+
                 colorama.init()
             except ImportError:
                 logger.warning("[fix_01_sessiz_except] ImportError")
@@ -312,8 +348,13 @@ class ReYMeNTUI:
             os.environ["TERM"] = "xterm-256color"
 
         # Live display ile baslat
-        with Live(layout, console=console, refresh_per_second=8,
-                  screen=True, auto_refresh=False) as live:
+        with Live(
+            layout,
+            console=console,
+            refresh_per_second=8,
+            screen=True,
+            auto_refresh=False,
+        ) as live:
             self._live = live
             self._live.refresh()
 
@@ -331,6 +372,7 @@ class ReYMeNTUI:
         if os.name == "nt":
             try:
                 import colorama
+
                 colorama.deinit()
             except ImportError:
                 logger.warning("[fix_01_sessiz_except] ImportError")
@@ -344,6 +386,7 @@ class ReYMeNTUI:
             from prompt_toolkit.history import InMemoryHistory
             from prompt_toolkit.key_binding import KeyBindings
             from prompt_toolkit.keys import Keys
+
             has_prompt_toolkit = True
         except ImportError:
             has_prompt_toolkit = False
@@ -365,14 +408,23 @@ class ReYMeNTUI:
 
         # Otomatik tamamlama kelimeleri
         komutlar = [
-            "/yardim", "/help", "/?",
+            "/yardim",
+            "/help",
+            "/?",
             "/model",
-            "/temizle", "/cls", "/clear",
-            "/cik", "/çık", "/exit", "/quit",
+            "/temizle",
+            "/cls",
+            "/clear",
+            "/cik",
+            "/çık",
+            "/exit",
+            "/quit",
             "/provider",
-            "/durum", "/status",
+            "/durum",
+            "/status",
             "/token",
-            "/versiyon", "/version",
+            "/versiyon",
+            "/version",
         ]
 
         completer = WordCompleter(komutlar, ignore_case=True)
@@ -392,9 +444,11 @@ class ReYMeNTUI:
             event.app.exit(result="")
 
         # Stil
-        stil = Style.from_dict({
-            "prompt": "bold cyan",
-        })
+        stil = Style.from_dict(
+            {
+                "prompt": "bold cyan",
+            }
+        )
 
         # Prompt HTML
         def _prompt_html():
@@ -468,7 +522,9 @@ class ReYMeNTUI:
         """input() ile basit girdi dongusu (prompt_toolkit yoksa)."""
         print("\n" * 2)
         print(f"  {_d('[TUI] prompt_toolkit yuklu degil. input() kullaniliyor.')}")
-        print(f"  {_d('pip install prompt_toolkit ile tab tamamlama ekleyebilirsiniz.')}")
+        print(
+            f"  {_d('pip install prompt_toolkit ile tab tamamlama ekleyebilirsiniz.')}"
+        )
         print()
 
         while self._calisiyor.is_set():
@@ -670,10 +726,12 @@ class ReYMeNTUI:
 
 
 # ── Kolay kullanim fonksiyonu ─────────────────────────────────────────────
-def tui_baslat(soru_callback: Callable = None,
-               model: str = "deepseek-v4-flash",
-               provider: str = "deepseek",
-               session_id: str = "") -> int:
+def tui_baslat(
+    soru_callback: Callable = None,
+    model: str = "deepseek-v4-flash",
+    provider: str = "deepseek",
+    session_id: str = "",
+) -> int:
     """TUI'yi baslat.
 
     Args:
@@ -705,6 +763,7 @@ def tui_baslat(soru_callback: Callable = None,
 
 # ── Dogrudan calistirma (test) ────────────────────────────────────────────
 if __name__ == "__main__":
+
     def _test_soru(soru: str) -> str:
         return f"Test cevap: '{soru}' icin isleniyor..."
 

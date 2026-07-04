@@ -50,6 +50,7 @@ import requests
 # 1. CONFIG — YAML'DAN OKU, YOKSA VARSAYILAN
 # ──────────────────────────────────────────────
 
+
 def _config_yukle() -> dict:
     """
     cua_config.yaml varsa oradan, yoksa varsayılanları döndürür.
@@ -69,20 +70,22 @@ def _config_yukle() -> dict:
         return varsayilan
     try:
         import yaml  # type: ignore
+
         with config_yol.open(encoding="utf-8") as f:
             kullanici = yaml.safe_load(f) or {}
         return {**varsayilan, **kullanici}
     except Exception:
         return varsayilan
 
+
 _CFG = _config_yukle()
 
-LM_STUDIO_URL: str        = _CFG["lm_studio_url"]
-LM_STUDIO_MODEL: str      = _CFG["lm_studio_model"]
-SCREENSHOT_DIR: Path      = Path(_CFG["screenshot_dir"])
-LOG_DOSYASI: Path         = Path(_CFG["log_dosyasi"])
-TIKLA_BEKLEME: float      = float(_CFG["tikla_bekleme"])
-MAX_DENEME_TABAN: int     = int(_CFG["max_deneme"])   # adaptif için taban
+LM_STUDIO_URL: str = _CFG["lm_studio_url"]
+LM_STUDIO_MODEL: str = _CFG["lm_studio_model"]
+SCREENSHOT_DIR: Path = Path(_CFG["screenshot_dir"])
+LOG_DOSYASI: Path = Path(_CFG["log_dosyasi"])
+TIKLA_BEKLEME: float = float(_CFG["tikla_bekleme"])
+MAX_DENEME_TABAN: int = int(_CFG["max_deneme"])  # adaptif için taban
 GUVENLI_BOLGE: tuple[int, int] = tuple(_CFG["guvenli_bolge"])  # type: ignore
 
 # ──────────────────────────────────────────────
@@ -108,6 +111,7 @@ log = logging.getLogger("CUA")
 
 _session_ref: Optional[weakref.ref] = None
 
+
 def _get_session() -> requests.Session:
     """
     Tek bir requests.Session döndürür; yoksa oluşturur.
@@ -124,6 +128,7 @@ def _get_session() -> requests.Session:
     _session_ref = weakref.ref(s)
     return s
 
+
 # Critic Note: _session_ref bir weakref.ref tutar; Python'ın GC'si
 # Session'ı referans kalmadığında temizler; bağlantı havuzu sızıntısı yok.
 
@@ -132,19 +137,24 @@ def _get_session() -> requests.Session:
 # VERİ YAPILARI
 # ──────────────────────────────────────────────
 
+
 @dataclass
 class CUASonucu:
     basarili: bool
     eylem: str
     koordinat: Optional[tuple[int, int]] = None
     vision_yaniti: str = ""
-    sonraki_koordinat: Optional[tuple[int, int]] = None   # v2: doğrulamadan gelen öneri
+    sonraki_koordinat: Optional[tuple[int, int]] = None  # v2: doğrulamadan gelen öneri
     hata: str = ""
     ekran_boyutu: tuple[int, int] = field(default_factory=lambda: (0, 0))
 
     def str(self) -> str:
         if self.basarili:
-            sonraki = f" | Sonraki öneri: {self.sonraki_koordinat}" if self.sonraki_koordinat else ""
+            sonraki = (
+                f" | Sonraki öneri: {self.sonraki_koordinat}"
+                if self.sonraki_koordinat
+                else ""
+            )
             return (
                 f"✅ Eylem: {self.eylem} | "
                 f"Koordinat: {self.koordinat} | "
@@ -157,6 +167,7 @@ class CUASonucu:
 # EKRAN GÖRÜNTÜSÜ
 # ──────────────────────────────────────────────
 
+
 def ekran_goruntusu_al() -> tuple[Image.Image, tuple[int, int]]:
     """
     Tam ekran görüntüsü alır.
@@ -168,6 +179,7 @@ def ekran_goruntusu_al() -> tuple[Image.Image, tuple[int, int]]:
     SCREENSHOT_DIR.mkdir(exist_ok=True)
     try:
         import mss
+
         with mss.mss() as sct:
             ham = sct.grab(sct.monitors[1])
             goruntu = Image.frombytes("RGB", ham.size, ham.bgra, "raw", "BGRX")
@@ -177,11 +189,14 @@ def ekran_goruntusu_al() -> tuple[Image.Image, tuple[int, int]]:
         log.warning("mss bulunamadı — pyautogui yedek devreye girdi.")
     try:
         import pyautogui
+
         goruntu = pyautogui.screenshot()
         log.info(f"Ekran alındı (pyautogui): {goruntu.size}")
         return goruntu, goruntu.size
     except ImportError:
-        raise ImportError("Ekran görüntüsü için mss veya pyautogui gerekli. pip install mss pyautogui")
+        raise ImportError(
+            "Ekran görüntüsü için mss veya pyautogui gerekli. pip install mss pyautogui"
+        )
 
 
 def goruntu_base64_yap(goruntu: Image.Image, max_genislik: int = 1280) -> str:
@@ -190,6 +205,7 @@ def goruntu_base64_yap(goruntu: Image.Image, max_genislik: int = 1280) -> str:
     Büyük ekranlarda yeniden boyutlandırır.
     """
     from PIL import Image
+
     if goruntu.width > max_genislik:
         oran = max_genislik / goruntu.width
         yeni_boyut = (max_genislik, int(goruntu.height * oran))
@@ -203,6 +219,7 @@ def goruntu_base64_yap(goruntu: Image.Image, max_genislik: int = 1280) -> str:
     gc.collect()
     return b64
 
+
 # Critic Note: BytesIO açıkça kapatılır, gc.collect() çağrılır;
 # büyük PIL nesnesi scope dışına çıktığında GC tarafından toplanır.
 
@@ -210,6 +227,7 @@ def goruntu_base64_yap(goruntu: Image.Image, max_genislik: int = 1280) -> str:
 # ──────────────────────────────────────────────
 # VİSİON MODEL İLETİŞİMİ
 # ──────────────────────────────────────────────
+
 
 def vision_modele_sor(
     goruntu_b64: str,
@@ -256,6 +274,7 @@ def vision_modele_sor(
         log.error(f"Vision API hatası: {e}")
         return f"HATA: {e}"
 
+
 # Critic Note: Session.post() bağlantıyı havuzda tutar; her çağrıda
 # yeni TCP el sıkışması açılmaz; timeout zorunlu; sızıntı yok.
 
@@ -267,6 +286,7 @@ def vision_modele_sor(
 _KOORDINAT_DESENI = re.compile(
     r"(?:x\s*[=:]\s*)?(\d{1,4})\s*[,\s]+(?:y\s*[=:]\s*)?(\d{1,4})"
 )
+
 
 def koordinat_parse(
     metin: str,
@@ -293,6 +313,7 @@ def koordinat_parse(
 # 2. EYLEM MOTORU — FailSafe tikla() içinde de yakalanıyor
 # ──────────────────────────────────────────────
 
+
 class FailSafeHatasi(Exception):
     """PyAutoGUI fare güvenli köşeye gittiğinde fırlatılır."""
 
@@ -317,6 +338,7 @@ def tikla(x: int, y: int, cift_tik: bool = False) -> None:
         log.critical(f"FailSafe tetiklendi tikla() içinde: {e}")
         raise FailSafeHatasi("Fare güvenli köşeye gitti.") from e
 
+
 # Critic Note: FailSafeException tikla() içinde yakalanıp FailSafeHatasi'na
 # dönüştürülür; üst katman (CUA_EKRAN_KULLAN) kendi try bloğunda bunu yakalar;
 # çift yakalama zincirleme istisna bilgisini korur.
@@ -324,12 +346,14 @@ def tikla(x: int, y: int, cift_tik: bool = False) -> None:
 
 def yaz(metin: str, gecikme: float = 0.05) -> None:
     import pyautogui
+
     pyautogui.typewrite(metin, interval=gecikme)
     log.info(f"Yazıldı: '{metin}'")
 
 
 def klavye_kisayol(*tuslar: str) -> None:
     import pyautogui
+
     pyautogui.hotkey(*tuslar)
     log.info(f"Kısayol: {'+'.join(tuslar)}")
 
@@ -359,6 +383,7 @@ def eylem_yorumla_ve_calistir(
 # 4. ADAPTİF DENEME SAYACI
 # ──────────────────────────────────────────────
 
+
 class AdaptifDenemeSayaci:
     """
     Başarısız parse girişimlerine göre MAX_DENEME'yi dinamik olarak artırır.
@@ -366,6 +391,7 @@ class AdaptifDenemeSayaci:
     Her ardışık başarısızlıkta +1 eklenir, maksimum taban × 2.
     Başarıda sıfırlanır.
     """
+
     def __init__(self) -> None:
         self._ardisik_basarisiz: int = 0
         self._taban: int = MAX_DENEME_TABAN
@@ -376,10 +402,13 @@ class AdaptifDenemeSayaci:
 
     def basarisiz_kaydet(self) -> None:
         self._ardisik_basarisiz += 1
-        log.info(f"Adaptif limit: {self.mevcut_limit} (ardışık başarısız: {self._ardisik_basarisiz})")
+        log.info(
+            f"Adaptif limit: {self.mevcut_limit} (ardışık başarısız: {self._ardisik_basarisiz})"
+        )
 
     def sifirla(self) -> None:
         self._ardisik_basarisiz = 0
+
 
 # Tek global sayaç — motor yaşam döngüsü boyunca öğrenir.
 _deneme_sayaci = AdaptifDenemeSayaci()
@@ -392,6 +421,7 @@ _deneme_sayaci = AdaptifDenemeSayaci()
 # 3. GELİŞTİRİLMİŞ DOĞRULAMA
 #    EVET/HAYIR + bir sonraki adım için koordinat önerisi
 # ──────────────────────────────────────────────
+
 
 def _dogrulama_yap(
     b64: str,
@@ -422,6 +452,7 @@ def _dogrulama_yap(
 
     return basarili, sonraki
 
+
 # Critic Note: b64 bu fonksiyona referans olarak geçer, kopyalanmaz;
 # sonraki koordinat sadece başarısız durumda ayrıştırılır — gereksiz parse yok.
 
@@ -449,6 +480,7 @@ def _on_kosul_kontrol() -> Optional[str]:
     # 1. PIL (pillow)
     try:
         from PIL import Image
+
         Image.new("RGB", (1, 1))
     except ImportError:
         uyarilar.append("PIL (pillow) kurulu değil: pip install pillow")
@@ -456,6 +488,7 @@ def _on_kosul_kontrol() -> Optional[str]:
     # 2. pyautogui
     try:
         import pyautogui
+
         pyautogui.size()
     except ImportError:
         uyarilar.append("pyautogui kurulu değil: pip install pyautogui")
@@ -463,11 +496,13 @@ def _on_kosul_kontrol() -> Optional[str]:
     # 3. Ekran görüntüsü (mss veya pyautogui)
     try:
         import mss
+
         with mss.mss() as sct:
             sct.monitors[1]
     except ImportError:
         try:
             import pyautogui
+
             pyautogui.screenshot()
         except Exception:
             uyarilar.append("Ekran görüntüsü alınamıyor — mss veya pyautogui gerekli")
@@ -477,8 +512,10 @@ def _on_kosul_kontrol() -> Optional[str]:
     # 4. LM Studio bağlantısı
     try:
         import requests
-        yanit = requests.get(LM_STUDIO_URL.replace("/v1/chat/completions", "/v1/models"),
-                            timeout=5)
+
+        yanit = requests.get(
+            LM_STUDIO_URL.replace("/v1/chat/completions", "/v1/models"), timeout=5
+        )
         if yanit.status_code == 200:
             modeller = yanit.json()
             model_listesi = [m.get("id", "") for m in modeller if isinstance(m, dict)]
@@ -501,7 +538,9 @@ def _on_kosul_kontrol() -> Optional[str]:
 
     _on_kosul_kontrolu_yapildi = True
     if uyarilar:
-        _on_kosul_sonuc = "⚠ CUA ön koşul hatası:\n" + "\n".join(f"  • {u}" for u in uyarilar)
+        _on_kosul_sonuc = "⚠ CUA ön koşul hatası:\n" + "\n".join(
+            f"  • {u}" for u in uyarilar
+        )
         log.warning(_on_kosul_sonuc)
     else:
         _on_kosul_sonuc = None
@@ -590,22 +629,26 @@ def CUA_EKRAN_KULLAN(hedef: str = "") -> str:
     gc.collect()
 
     if not koordinat:
-        return str(CUASonucu(
-            basarili=False,
-            eylem=hedef,
-            hata=f"Adaptif {limit} denemede koordinat alınamadı.",
-        ))
+        return str(
+            CUASonucu(
+                basarili=False,
+                eylem=hedef,
+                hata=f"Adaptif {limit} denemede koordinat alınamadı.",
+            )
+        )
 
     # 4. Eylem — FailSafe her iki katmanda da yakalanır
     try:
         eylem_aciklama = eylem_yorumla_ve_calistir(hedef, koordinat)
     except FailSafeHatasi as e:
-        return str(CUASonucu(
-            basarili=False,
-            eylem=hedef,
-            koordinat=koordinat,
-            hata=str(e),
-        ))
+        return str(
+            CUASonucu(
+                basarili=False,
+                eylem=hedef,
+                koordinat=koordinat,
+                hata=str(e),
+            )
+        )
 
     # 5. Doğrulama
     time.sleep(TIKLA_BEKLEME)
@@ -703,6 +746,7 @@ def CUA_ARACLARI_TARA(kok: str = ".") -> str:
     log.info("Araç tarama tamamlandı.")
     return rapor
 
+
 # Critic Note: Generator teker teker dosya okur; N dosya için O(1) bellek;
 # büyük projede bile yığın birikmez.
 
@@ -728,15 +772,15 @@ def motor_kaydet(motor: object):
 # MOTOR.PY + SİSTEM_TALİMATI.PY ENTEGRASYON BLOKLARI
 # ──────────────────────────────────────────────
 
-MOTOR_ENTEGRASYON_KODU = '''
+MOTOR_ENTEGRASYON_KODU = """
 # ── motor.py üstüne ekle ─────────────────────────────────────────
 from cua_motor_araci import CUA_EKRAN_KULLAN, CUA_ARACLARI_TARA
 
 ARACLAR["CUA_EKRAN_KULLAN"] = CUA_EKRAN_KULLAN
 ARACLAR["CUA_ARACLARI_TARA"] = CUA_ARACLARI_TARA
-'''
+"""
 
-SISTEM_TALIMATI_EKI = '''
+SISTEM_TALIMATI_EKI = """
 CUA_ARACLARI = [
     {
         "isim": "CUA_EKRAN_KULLAN",
@@ -754,7 +798,7 @@ CUA_ARACLARI = [
         "parametreler": {"kok": "str — taranacak dizin (varsayılan '.')"},
     },
 ]
-'''
+"""
 
 
 # ──────────────────────────────────────────────
@@ -772,6 +816,6 @@ if __name__ == "__main__":
         print(CUA_EKRAN_KULLAN(hedef_arg))
     else:
         print("\nKullanım : python cua_motor_araci.py '<hedef>'")
-        print("Örnek    : python cua_motor_araci.py \"WhatsApp ikonuna tıkla\"")
+        print('Örnek    : python cua_motor_araci.py "WhatsApp ikonuna tıkla"')
         print("\n--- motor.py entegrasyon kodu ---")
         print(MOTOR_ENTEGRASYON_KODU)

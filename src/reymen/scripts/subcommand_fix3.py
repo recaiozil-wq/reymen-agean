@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """subcommand_fix3.py — run_xxx fonksiyon govdesini bastan yaz."""
+
 import re
 from pathlib import Path
 import logging
+
 logger = logging.getLogger(__name__)
 
 SUBCMD_DIR = Path(__file__).parent.parent / "reymen_cli" / "subcommands"
@@ -81,7 +83,7 @@ for py in sorted(SUBCMD_DIR.glob("*.py")):
                 else:
                     brace_count = 1
                     continue
-        
+
         if in_func and brace_count > 0:
             yeni.append(line)
             if '"""' in line:
@@ -93,7 +95,11 @@ for py in sorted(SUBCMD_DIR.glob("*.py")):
         if in_func and func_started and not skip_rest:
             # run_xxx bodysini yeni implementasyonla degistir
             indent = "    "
-            if line.strip().startswith("def ") or line.strip().startswith("class ") or line.strip().startswith("if __name__"):
+            if (
+                line.strip().startswith("def ")
+                or line.strip().startswith("class ")
+                or line.strip().startswith("if __name__")
+            ):
                 # Fonksiyon bitti, yeni impl'i yerlestir
                 yeni.append(f"{indent}{impl}")
                 yeni.append(line)
@@ -111,6 +117,7 @@ for py in sorted(SUBCMD_DIR.glob("*.py")):
     # Syntax kontrol
     try:
         import ast
+
         ast.parse(py.read_text(encoding="utf-8"), str(py))
         print(f"  OK {py.name}")
         ok += 1

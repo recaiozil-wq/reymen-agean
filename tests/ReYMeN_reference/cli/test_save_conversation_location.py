@@ -27,6 +27,7 @@ def ReYMeN_home(tmp_path, monkeypatch):
     monkeypatch.setenv("ReYMeN_HOME", str(home))
     # Clear any cached ReYMeN_home computation
     import ReYMeN_constants
+
     if hasattr(ReYMeN_constants, "_ReYMeN_home_cache"):
         ReYMeN_constants._ReYMeN_home_cache = None
     return home
@@ -42,7 +43,9 @@ def _make_stub_cli(history):
     )
 
 
-def test_save_conversation_writes_under_ReYMeN_home(ReYMeN_home, tmp_path, monkeypatch, capsys):
+def test_save_conversation_writes_under_ReYMeN_home(
+    ReYMeN_home, tmp_path, monkeypatch, capsys
+):
     """Snapshot must land under ~/.ReYMeN/sessions/saved/, not CWD."""
     # Change CWD to a different directory to prove the file does NOT go there.
     work = tmp_path / "somewhere-else"
@@ -50,15 +53,19 @@ def test_save_conversation_writes_under_ReYMeN_home(ReYMeN_home, tmp_path, monke
     monkeypatch.chdir(work)
 
     # Import fresh to pick up the ReYMeN_HOME fixture
-    for mod in [m for m in sys.modules if m.startswith("cli") or m == "ReYMeN_constants"]:
+    for mod in [
+        m for m in sys.modules if m.startswith("cli") or m == "ReYMeN_constants"
+    ]:
         sys.modules.pop(mod, None)
 
     import cli  # noqa: F401  (module under test)
 
-    stub = _make_stub_cli([
-        {"role": "user", "content": "hi"},
-        {"role": "assistant", "content": "hello"},
-    ])
+    stub = _make_stub_cli(
+        [
+            {"role": "user", "content": "hi"},
+            {"role": "assistant", "content": "hello"},
+        ]
+    )
 
     # Call the unbound method against our stub.
     cli.ReYMeNCLI.save_conversation(stub)
@@ -88,7 +95,9 @@ def test_save_conversation_writes_under_ReYMeN_home(ReYMeN_home, tmp_path, monke
 
 
 def test_save_conversation_empty_history_does_nothing(ReYMeN_home, capsys):
-    for mod in [m for m in sys.modules if m.startswith("cli") or m == "ReYMeN_constants"]:
+    for mod in [
+        m for m in sys.modules if m.startswith("cli") or m == "ReYMeN_constants"
+    ]:
         sys.modules.pop(mod, None)
     import cli
 

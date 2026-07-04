@@ -3,11 +3,13 @@
 config.py — ReYMeN config yardimci fonksiyonlari (hermes_stubs.config).
 Apache 2.0 — inspired by NousResearch/hermes-agent
 """
+
 from __future__ import annotations
 import logging
 import os
 from pathlib import Path
 from typing import Any, Dict, Optional
+
 logger = logging.getLogger(__name__)
 
 
@@ -20,7 +22,7 @@ except ImportError:
 
 def cfg_get(cfg: Optional[Dict[str, Any]], *keys: str, default: Any = None) -> Any:
     """Ic ice dict'ten guvenli deger okuma.
-    
+
     Ornek: cfg_get(config, "agent", "model", default="gpt-4")
     """
     if not cfg or not keys:
@@ -40,6 +42,7 @@ def load_config() -> Dict[str, Any]:
     """Config yukle — reymen.sistem.hermes_uyum uzerinden."""
     try:
         from reymen.sistem.hermes_uyum import load_config as _load
+
         return _load() or {}
     except Exception as e:
         logger.debug("[config/stub] load_config: %s", e)

@@ -150,7 +150,9 @@ class SMSAdapter(BasePlatformAdapter):
         Twilio API'ye gercek bir baglanti yapilmaz (REST tabanli).
         """
         if not HTTPX_AVAILABLE:
-            logger.error("[SMS] httpx kutuphanesi bulunamadi. Kurulum: pip install httpx")
+            logger.error(
+                "[SMS] httpx kutuphanesi bulunamadi. Kurulum: pip install httpx"
+            )
             return False
 
         # Zorunlu degiskenleri dogrula
@@ -186,7 +188,9 @@ class SMSAdapter(BasePlatformAdapter):
                     account_data.get("status", "active"),
                 )
             elif resp.status_code == 401:
-                logger.error("[SMS] Twilio API yetkisiz — TWILIO_ACCOUNT_SID veya TWILIO_AUTH_TOKEN gecersiz.")
+                logger.error(
+                    "[SMS] Twilio API yetkisiz — TWILIO_ACCOUNT_SID veya TWILIO_AUTH_TOKEN gecersiz."
+                )
                 return False
             else:
                 logger.warning(
@@ -324,9 +328,7 @@ class SMSAdapter(BasePlatformAdapter):
     # Medya gonderimi (SMS desteklemez)
     # ------------------------------------------------------------------
 
-    async def send_typing(
-        self, chat_id: str, metadata: Optional[dict] = None
-    ) -> None:
+    async def send_typing(self, chat_id: str, metadata: Optional[dict] = None) -> None:
         """SMS typing indicator (no-op — SMS protokolunde yok)."""
         pass
 

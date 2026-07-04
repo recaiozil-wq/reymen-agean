@@ -37,6 +37,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class SubAgent:
     """Tek bir alt-ajanı temsil eder."""
+
     id: str
     goal: str
     context: str = ""
@@ -54,9 +55,15 @@ class SubAgent:
             "result": self.result[:500] if self.result else "",
             "created_at": self.created_at,
             "completed_at": self.completed_at,
-            "created_at_iso": datetime.fromtimestamp(self.created_at).isoformat() if self.created_at else "",
-            "completed_at_iso": datetime.fromtimestamp(self.completed_at).isoformat() if self.completed_at else "",
-            "sure": round(self.completed_at - self.created_at, 2) if self.completed_at and self.created_at else None,
+            "created_at_iso": datetime.fromtimestamp(self.created_at).isoformat()
+            if self.created_at
+            else "",
+            "completed_at_iso": datetime.fromtimestamp(self.completed_at).isoformat()
+            if self.completed_at
+            else "",
+            "sure": round(self.completed_at - self.created_at, 2)
+            if self.completed_at and self.created_at
+            else None,
         }
 
     def __repr__(self) -> str:
@@ -89,8 +96,12 @@ class TaskDecomposer:
         goal = goal.strip()
 
         # Strateji 1: "and" / "ve" ile ayrılmış cümleler
-        parts = TaskDecomposer._split_by_connector(goal, [" and ", ", and "], case_sensitive=False)
-        parts_v2 = TaskDecomposer._split_by_connector(goal, [" ve ", ", ve "], case_sensitive=False)
+        parts = TaskDecomposer._split_by_connector(
+            goal, [" and ", ", and "], case_sensitive=False
+        )
+        parts_v2 = TaskDecomposer._split_by_connector(
+            goal, [" ve ", ", ve "], case_sensitive=False
+        )
         if len(parts) > 1:
             sub_goals = [p.strip() for p in parts if p.strip()]
             return TaskDecomposer._to_subagents(sub_goals, base_context)
@@ -99,16 +110,21 @@ class TaskDecomposer:
             return TaskDecomposer._to_subagents(sub_goals, base_context)
 
         # Strateji 2: "then" / "sonra" ile ayrılmış adımlar
-        parts = TaskDecomposer._split_by_connector(goal, [" then ", ". then "], case_sensitive=False)
+        parts = TaskDecomposer._split_by_connector(
+            goal, [" then ", ". then "], case_sensitive=False
+        )
         if len(parts) <= 1:
-            parts = TaskDecomposer._split_by_connector(goal, [". sonra ", " sonra "], case_sensitive=False)
+            parts = TaskDecomposer._split_by_connector(
+                goal, [". sonra ", " sonra "], case_sensitive=False
+            )
         if len(parts) > 1:
             sub_goals = [p.strip().rstrip(".") + "." for p in parts if p.strip()]
             return TaskDecomposer._to_subagents(sub_goals, base_context)
 
         # Strateji 3: Numaralı listeler (1. 2. 3. veya 1) 2) 3))
         import re
-        numbered = re.split(r'\n\s*(?:\d+[\.\)]\s*)', goal)
+
+        numbered = re.split(r"\n\s*(?:\d+[\.\)]\s*)", goal)
         if len(numbered) > 2:  # En az 2 gerçek öğe
             sub_goals = [p.strip() for p in numbered if p.strip()]
             return TaskDecomposer._to_subagents(sub_goals, base_context)
@@ -121,27 +137,36 @@ class TaskDecomposer:
             return TaskDecomposer._to_subagents(sub_goals, base_context)
 
         # Strateji 5: Madde işaretleri (- / * / •)
-        bullet = [l.strip().lstrip("-*• ").strip() for l in goal.split("\n")
-                  if l.strip() and l.strip()[0] in ("-", "*", "•")]
+        bullet = [
+            l.strip().lstrip("-*• ").strip()
+            for l in goal.split("\n")
+            if l.strip() and l.strip()[0] in ("-", "*", "•")
+        ]
         bullet = [b for b in bullet if len(b.split()) >= 2]
         if len(bullet) >= 2:
             return TaskDecomposer._to_subagents(bullet, base_context)
 
         # Strateji 6: Nokta ile biten cümlelere böl (eğer >80 karakter)
         if len(goal) > 80:
-            sentences = [s.strip() for s in re.split(r'(?<=[.!?])\s+', goal) if s.strip()]
+            sentences = [
+                s.strip() for s in re.split(r"(?<=[.!?])\s+", goal) if s.strip()
+            ]
             if len(sentences) >= 2:
                 return TaskDecomposer._to_subagents(sentences, base_context)
 
         # Hiçbir strateji eşleşmezse: tek bir alt-görev döndür
-        return [SubAgent(
-            id=str(uuid.uuid4()),
-            goal=goal,
-            context=base_context,
-        )]
+        return [
+            SubAgent(
+                id=str(uuid.uuid4()),
+                goal=goal,
+                context=base_context,
+            )
+        ]
 
     @staticmethod
-    def _split_by_connector(text: str, connectors: List[str], case_sensitive: bool = True) -> List[str]:
+    def _split_by_connector(
+        text: str, connectors: List[str], case_sensitive: bool = True
+    ) -> List[str]:
         """Metni verilen bağlaçlardan bölmeyi dener."""
         for conn in connectors:
             if case_sensitive:
@@ -150,7 +175,7 @@ class TaskDecomposer:
             else:
                 idx = text.lower().find(conn.lower())
                 if idx != -1:
-                    return [text[:idx], text[idx + len(conn):]]
+                    return [text[:idx], text[idx + len(conn) :]]
         return [text]
 
     @staticmethod
@@ -193,11 +218,11 @@ class SubAgentRunner:
     def run(self, agent: SubAgent, timeout: int = 60) -> SubAgent:
         """
         Alt-ajanı çalıştırır ve sonucu SubAgent nesnesine yazar.
-        
+
         Args:
             agent: Çalıştırılacak SubAgent
             timeout: Maksimum bekleme süresi (saniye)
-            
+
         Returns:
             Güncellenmiş SubAgent (status + result dolu)
         """
@@ -211,10 +236,13 @@ class SubAgentRunner:
             return agent
 
         try:
-            payload = json.dumps({
-                "goal": agent.goal,
-                "context": agent.context,
-            }, ensure_ascii=False)
+            payload = json.dumps(
+                {
+                    "goal": agent.goal,
+                    "context": agent.context,
+                },
+                ensure_ascii=False,
+            )
 
             proc = subprocess.Popen(
                 [sys.executable or "python", str(self._runner)],
@@ -228,9 +256,13 @@ class SubAgentRunner:
 
             if proc.returncode != 0:
                 agent.status = "error"
-                agent.result = f"Subprocess çıkış kodu: {proc.returncode}\n{stderr[:500]}"
+                agent.result = (
+                    f"Subprocess çıkış kodu: {proc.returncode}\n{stderr[:500]}"
+                )
                 agent.completed_at = time.time()
-                logger.warning(f"[SubAgent {agent.id[:8]}] Subprocess hata kodu: {proc.returncode}")
+                logger.warning(
+                    f"[SubAgent {agent.id[:8]}] Subprocess hata kodu: {proc.returncode}"
+                )
                 return agent
 
             # JSON çıktıyı ayrıştır
@@ -244,7 +276,9 @@ class SubAgentRunner:
                 agent.result = stdout[:2000]
 
             agent.completed_at = time.time()
-            logger.info(f"[SubAgent {agent.id[:8]}] Tamamlandı: {agent.status} ({round(agent.completed_at - agent.created_at, 2)}s)")
+            logger.info(
+                f"[SubAgent {agent.id[:8]}] Tamamlandı: {agent.status} ({round(agent.completed_at - agent.created_at, 2)}s)"
+            )
 
         except subprocess.TimeoutExpired:
             proc.kill()
@@ -280,11 +314,11 @@ class DelegationManager:
     def delegate(self, goal: str, context: str = "") -> SubAgent:
         """
         Tek bir alt-ajan oluşturup çalıştırır.
-        
+
         Args:
             goal: Alt-ajanın hedefi
             context: Bağlam bilgisi (isteğe bağlı)
-            
+
         Returns:
             Çalıştırılmış SubAgent
         """
@@ -304,11 +338,11 @@ class DelegationManager:
     def decompose_and_delegate(self, goal: str, context: str = "") -> List[SubAgent]:
         """
         Hedefi alt-görevlere ayırır ve her birini çalıştırır.
-        
+
         Args:
             goal: Ayrıştırılacak karmaşık hedef
             context: Bağlam bilgisi
-            
+
         Returns:
             Çalıştırılmış SubAgent listesi
         """
@@ -324,7 +358,9 @@ class DelegationManager:
             self._runner.run(agent)
             results.append(agent)
 
-        logger.info(f"[Delegation] {len(sub_agents)} alt-görev ayrıştırıldı ve çalıştırıldı")
+        logger.info(
+            f"[Delegation] {len(sub_agents)} alt-görev ayrıştırıldı ve çalıştırıldı"
+        )
         return results
 
     # ── Sorgulama ─────────────────────────────────────────────────
@@ -355,7 +391,9 @@ class DelegationManager:
             agent.result = "İptal edildi (kullanıcı tarafından)"
             logger.info(f"[Delegation] Alt-ajan iptal edildi: {agent_id[:8]}")
             return True
-        logger.info(f"[Delegation] İptal reddedildi: {agent_id[:8]} durum={agent.status}")
+        logger.info(
+            f"[Delegation] İptal reddedildi: {agent_id[:8]} durum={agent.status}"
+        )
         return False
 
     # ── İstatistik ────────────────────────────────────────────────
@@ -374,14 +412,20 @@ class DelegationManager:
                 "ortalama_sure": 0.0,
             }
 
-        durumlar = {"pending": 0, "running": 0, "success": 0, "error": 0, "cancelled": 0}
+        durumlar = {
+            "pending": 0,
+            "running": 0,
+            "success": 0,
+            "error": 0,
+            "cancelled": 0,
+        }
         toplam_sure = 0.0
         tamamlanan = 0
 
         for a in self._agents.values():
             durumlar[a.status] = durumlar.get(a.status, 0) + 1
             if a.completed_at and a.created_at:
-                toplam_sure += (a.completed_at - a.created_at)
+                toplam_sure += a.completed_at - a.created_at
                 tamamlanan += 1
 
         basarili = durumlar.get("success", 0)
@@ -394,15 +438,20 @@ class DelegationManager:
             "success": basarili,
             "error": durumlar.get("error", 0),
             "cancelled": durumlar.get("cancelled", 0),
-            "success_rate": round(basarili / toplam_tamam * 100, 1) if toplam_tamam > 0 else 0.0,
-            "ortalama_sure": round(toplam_sure / tamamlanan, 2) if tamamlanan > 0 else 0.0,
+            "success_rate": round(basarili / toplam_tamam * 100, 1)
+            if toplam_tamam > 0
+            else 0.0,
+            "ortalama_sure": round(toplam_sure / tamamlanan, 2)
+            if tamamlanan > 0
+            else 0.0,
             "agents": [a.to_dict() for a in self._agents.values()],
         }
 
     def temizle(self) -> int:
         """Tamamlanmış tüm alt-ajanları temizle."""
         silinen_ids = [
-            aid for aid, a in self._agents.items()
+            aid
+            for aid, a in self._agents.items()
             if a.status in ("success", "error", "cancelled")
         ]
         for aid in silinen_ids:
@@ -434,7 +483,7 @@ def get_manager() -> DelegationManager:
 def motor_kaydet(motor) -> None:
     """
     Motor'a delegasyon araçlarını kaydeder.
-    
+
     Kaydettiği araçlar:
         - DELEGATE: Tek bir alt-ajan oluşturup çalıştır
         - TASK_DECOMPOSE: Hedefi alt-görevlere ayır
@@ -447,22 +496,24 @@ def motor_kaydet(motor) -> None:
         _delegate_tool,
         "DELEGATE(goal, context) — Alt-ajan oluşturup çalıştır. "
         "Parametre: goal=hedef_metni context=opsiyonel_bağlam. "
-        "Örnek: DELEGATE(goal='Dosyayı oku', context='test.txt')"
+        "Örnek: DELEGATE(goal='Dosyayı oku', context='test.txt')",
     )
     motor._plugin_arac_kaydet(
         "TASK_DECOMPOSE",
         _task_decompose_tool,
         "TASK_DECOMPOSE(goal, context) — Hedefi alt-görevlere ayır ve hepsini çalıştır. "
         "Parametre: goal=karmaşık_hedef context=opsiyonel_bağlam. "
-        "Örnek: TASK_DECOMPOSE(goal='Analiz yap ve rapor yaz')"
+        "Örnek: TASK_DECOMPOSE(goal='Analiz yap ve rapor yaz')",
     )
     motor._plugin_arac_kaydet(
         "DELEGATION_DURUM",
         _delegation_durum_tool,
         "DELEGATION_DURUM() — Delegasyon sistemi durumunu göster: "
-        "toplam alt-ajan sayısı, başarı/başarısızlık oranları, aktif görevler"
+        "toplam alt-ajan sayısı, başarı/başarısızlık oranları, aktif görevler",
     )
-    logger.info("[Delegation] Motor'a 3 araç kaydedildi (DELEGATE, TASK_DECOMPOSE, DELEGATION_DURUM)")
+    logger.info(
+        "[Delegation] Motor'a 3 araç kaydedildi (DELEGATE, TASK_DECOMPOSE, DELEGATION_DURUM)"
+    )
 
 
 def _delegate_tool(**kw) -> str:
@@ -477,7 +528,9 @@ def _delegate_tool(**kw) -> str:
     manager = get_manager()
     agent = manager.delegate(goal, context)
 
-    sure = round(agent.completed_at - agent.created_at, 2) if agent.completed_at else "?"
+    sure = (
+        round(agent.completed_at - agent.created_at, 2) if agent.completed_at else "?"
+    )
     return (
         f"[DELEGATE] Alt-ajan tamamlandı\n"
         f"  ID: {agent.id}\n"
@@ -541,9 +594,17 @@ def _delegation_durum_tool(**kw) -> str:
     ]
 
     for a in sorted(stats["agents"], key=lambda x: x["created_at"], reverse=True)[:10]:
-        ikon = {"success": "✅", "error": "❌", "cancelled": "⛔", "running": "⏳", "pending": "⏸️"}.get(a["status"], "❓")
+        ikon = {
+            "success": "✅",
+            "error": "❌",
+            "cancelled": "⛔",
+            "running": "⏳",
+            "pending": "⏸️",
+        }.get(a["status"], "❓")
         sure_str = f"{a['sure']}s" if a["sure"] else "?"
-        lines.append(f"  {ikon} [{a['status'][:8]}] {a['goal'][:55]:55s} {sure_str:>8s}")
+        lines.append(
+            f"  {ikon} [{a['status'][:8]}] {a['goal'][:55]:55s} {sure_str:>8s}"
+        )
 
     return "\n".join(lines)
 
@@ -564,7 +625,9 @@ def demo():
     # 1. Tekli delegasyon
     print("\n1️⃣  TEKLİ DELEGASYON")
     print("-" * 40)
-    agent = manager.delegate("Örnek bir analiz görevi gerçekleştir", context="test_verisi")
+    agent = manager.delegate(
+        "Örnek bir analiz görevi gerçekleştir", context="test_verisi"
+    )
     print(f"  ID: {agent.id}")
     print(f"  Durum: {agent.status}")
     print(f"  Sonuç: {agent.result[:150]}...")

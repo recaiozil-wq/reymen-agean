@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """cua_motor_araci.py testleri — vision/screenshot bagimliligi olmayan unit testler."""
+
 from __future__ import annotations
 
 import json
@@ -19,6 +20,7 @@ import pytest
 class TestCUASonucu:
     def test_basarili_str(self):
         from cua_motor_araci import CUASonucu
+
         sonuc = CUASonucu(basarili=True, eylem="tikla", koordinat=(100, 200))
         metin = sonuc.str()
         assert "✅" in metin
@@ -26,6 +28,7 @@ class TestCUASonucu:
 
     def test_basarisiz_str(self):
         from cua_motor_araci import CUASonucu
+
         sonuc = CUASonucu(basarili=False, eylem="tikla", hata="LM Studio bagli degil")
         metin = sonuc.str()
         assert "❌" in metin
@@ -33,12 +36,14 @@ class TestCUASonucu:
 
     def test_ekran_boyutu(self):
         from cua_motor_araci import CUASonucu
+
         sonuc = CUASonucu(basarili=True, eylem="tikla", ekran_boyutu=(1920, 1080))
         metin = sonuc.str()
         assert "1920" in metin
 
     def test_sonraki_koordinat(self):
         from cua_motor_araci import CUASonucu
+
         sonuc = CUASonucu(basarili=True, eylem="tikla", sonraki_koordinat=(300, 400))
         metin = sonuc.str()
         assert "300" in metin
@@ -51,6 +56,7 @@ class TestKoordinatParse:
     @pytest.fixture(autouse=True)
     def setup(self):
         from cua_motor_araci import koordinat_parse
+
         self.parse = koordinat_parse
 
     def test_basit_format(self):
@@ -111,6 +117,7 @@ class TestAdaptifDenemeSayaci:
     @pytest.fixture(autouse=True)
     def setup(self):
         from cua_motor_araci import AdaptifDenemeSayaci
+
         self.sayac = AdaptifDenemeSayaci()
 
     def test_baslangic_limit_taban(self):
@@ -142,6 +149,7 @@ class TestAdaptifDenemeSayaci:
 class TestConfigYukle:
     def test_config_yoksa_varsayilan(self):
         from reymen.arac.cua_motor_araci import _config_yukle
+
         with patch.object(Path, "exists", return_value=False):
             cfg = _config_yukle()
         assert cfg["lm_studio_url"] == "http://localhost:1234/v1/chat/completions"
@@ -154,6 +162,7 @@ class TestConfigYukle:
 class TestGoruntuBase64:
     def test_goruntu_base64_string_doner(self):
         from cua_motor_araci import goruntu_base64_yap
+
         mock_img = MagicMock()
         mock_img.width = 800
         mock_img.height = 600
@@ -168,10 +177,12 @@ class TestGoruntuBase64:
         assert isinstance(b64, str)
         assert len(b64) > 0
         import base64
+
         assert base64.b64decode(b64) == b"fake_jpeg_bytes"
 
     def test_buyuk_resim_resize_edilir(self):
         from cua_motor_araci import goruntu_base64_yap
+
         mock_img = MagicMock()
         mock_img.width = 2560
         mock_img.height = 1440
@@ -189,6 +200,7 @@ class TestGoruntuBase64:
 
     def test_resize_olmaz_kucuk(self):
         from cua_motor_araci import goruntu_base64_yap
+
         mock_img = MagicMock()
         mock_img.width = 800
         mock_img.height = 600
@@ -209,12 +221,14 @@ class TestGoruntuBase64:
 class TestCUAARaclariTara:
     def test_dosyalar_ok(self, tmp_path):
         from cua_motor_araci import CUA_ARACLARI_TARA
+
         sonuc = CUA_ARACLARI_TARA(kok=str(tmp_path))
         assert isinstance(sonuc, str)
         assert "CUA" in sonuc or "ReYMeN" in sonuc or "Bileşen" in sonuc
 
     def test_rapor_kapsami(self, tmp_path):
         from cua_motor_araci import CUA_ARACLARI_TARA
+
         sonuc = CUA_ARACLARI_TARA(kok=str(tmp_path))
         assert "Haz" in sonuc or "Eksik" in sonuc
 
@@ -226,6 +240,7 @@ class TestEylemYorumla:
     @pytest.fixture(autouse=True)
     def setup(self):
         from cua_motor_araci import eylem_yorumla_ve_calistir
+
         self.eylem = eylem_yorumla_ve_calistir
 
     def test_cift_tik(self):
@@ -254,6 +269,7 @@ class TestOnKosulKontrol:
         pytest.importorskip("PIL", reason="Pillow gerekli")
         from reymen.arac.cua_motor_araci import _on_kosul_kontrol
         import reymen.arac.cua_motor_araci as cua
+
         cua._on_kosul_kontrolu_yapildi = False
         cua._on_kosul_sonuc = None
 
@@ -268,6 +284,7 @@ class TestOnKosulKontrol:
         pytest.importorskip("PIL", reason="Pillow gerekli")
         from reymen.arac.cua_motor_araci import _on_kosul_kontrol
         import reymen.arac.cua_motor_araci as cua
+
         cua._on_kosul_kontrolu_yapildi = False
         cua._on_kosul_sonuc = None
 
@@ -286,11 +303,13 @@ class TestOnKosulKontrol:
 class TestMotorKaydet:
     def test_motor_kaydet_cagrilir(self):
         from cua_motor_araci import motor_kaydet
+
         motor = MagicMock()
         motor_kaydet(motor)
         assert motor._plugin_arac_kaydet.call_count >= 2
 
     def test_motor_kaydet_hasattr_yoksa(self):
         from cua_motor_araci import motor_kaydet
+
         motor = object()
         motor_kaydet(motor)

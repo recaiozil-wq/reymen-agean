@@ -4,11 +4,13 @@ subagent_runner.py — Alt-ajan çalıştırıcı.
 DelegationManager tarafından subprocess olarak çağrılır.
 Stdin'den JSON {goal, context} alır, stdout'a JSON {status, result} yazar.
 """
+
 import json
 import sys
 import time
 import traceback
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -35,16 +37,24 @@ def run(goal: str, context: str = "") -> dict:
         # Görev türüne göre basit bir çıktı oluştur
         goal_lower = baslik.lower()
         if "ara" in goal_lower or "search" in goal_lower or "bul" in goal_lower:
-            sonuc_parts.append(f"  [Arama] '{baslik[:60]}' için varsayılan arama yapıldı (simülasyon)")
+            sonuc_parts.append(
+                f"  [Arama] '{baslik[:60]}' için varsayılan arama yapıldı (simülasyon)"
+            )
             sonuc_parts.append("  Durum: Veri bulundu — örnek içerik üretildi")
         elif "yaz" in goal_lower or "write" in goal_lower or "oluştur" in goal_lower:
-            sonuc_parts.append(f"  [Yazma] '{baslik[:60]}' için içerik oluşturuldu (simülasyon)")
+            sonuc_parts.append(
+                f"  [Yazma] '{baslik[:60]}' için içerik oluşturuldu (simülasyon)"
+            )
             sonuc_parts.append("  Durum: İçerik hazır")
         elif "test" in goal_lower or "kontrol" in goal_lower or "check" in goal_lower:
-            sonuc_parts.append(f"  [Kontrol] '{baslik[:60]}' için test çalıştırıldı (simülasyon)")
+            sonuc_parts.append(
+                f"  [Kontrol] '{baslik[:60]}' için test çalıştırıldı (simülasyon)"
+            )
             sonuc_parts.append("  Durum: Test başarılı")
         elif "düzelt" in goal_lower or "fix" in goal_lower or "düzenle" in goal_lower:
-            sonuc_parts.append(f"  [Düzeltme] '{baslik[:60]}' için düzenleme yapıldı (simülasyon)")
+            sonuc_parts.append(
+                f"  [Düzeltme] '{baslik[:60]}' için düzenleme yapıldı (simülasyon)"
+            )
             sonuc_parts.append("  Durum: Düzeltme uygulandı")
         elif "analiz" in goal_lower or "analyze" in goal_lower or "rapor" in goal_lower:
             sonuc_parts.append(f"  [Analiz] '{baslik[:60]}' analiz edildi (simülasyon)")
@@ -75,7 +85,14 @@ def main():
         raw = sys.stdin.read()
         if not raw.strip():
             # Hiç girdi yoksa hata döndür
-            print(json.dumps({"status": "error", "result": "Stdin boş — JSON girişi bekleniyordu"}))
+            print(
+                json.dumps(
+                    {
+                        "status": "error",
+                        "result": "Stdin boş — JSON girişi bekleniyordu",
+                    }
+                )
+            )
             sys.exit(1)
 
         girdi = json.loads(raw)
@@ -86,16 +103,24 @@ def main():
         print(json.dumps(sonuc, ensure_ascii=False))
 
     except json.JSONDecodeError as e:
-        print(json.dumps({
-            "status": "error",
-            "result": f"JSON ayrıştırma hatası: {e}",
-        }))
+        print(
+            json.dumps(
+                {
+                    "status": "error",
+                    "result": f"JSON ayrıştırma hatası: {e}",
+                }
+            )
+        )
         sys.exit(1)
     except Exception as e:
-        print(json.dumps({
-            "status": "error",
-            "result": f"Beklenmeyen hata: {type(e).__name__}: {e}",
-        }))
+        print(
+            json.dumps(
+                {
+                    "status": "error",
+                    "result": f"Beklenmeyen hata: {type(e).__name__}: {e}",
+                }
+            )
+        )
         sys.exit(1)
 
 

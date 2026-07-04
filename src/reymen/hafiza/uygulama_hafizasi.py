@@ -7,6 +7,7 @@ gibi uygulamaya özel işlem bilgilerini saklar ve geri çağırır.
 Yapı: .ReYMeN/uygulama_hafizasi/<uygulama_adi>.json
 Her uygulamanın: islemler (ad -> adımlar), makrolar (ad -> makro dosyası), notlar.
 """
+
 import json
 import os
 
@@ -70,7 +71,12 @@ class UygulamaHafizasi:
 
 if __name__ == "__main__":
     h = UygulamaHafizasi(kok="/tmp/ReYMeN_uyg")
-    print(h.islem_kaydet("TinyTask", "yeni proje",
-                         ["File menüsü aç", "Record'a bas", "işlemi yap", "Save"]))
+    print(
+        h.islem_kaydet(
+            "TinyTask",
+            "yeni proje",
+            ["File menüsü aç", "Record'a bas", "işlemi yap", "Save"],
+        )
+    )
     print(h.islem_cagir("TinyTask", "yeni proje"))
     print(h.ozet("TinyTask"))

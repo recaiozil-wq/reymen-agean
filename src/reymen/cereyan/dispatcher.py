@@ -104,11 +104,17 @@ class ToolDispatcher:
         try:
             mod = importlib.import_module(f"tools.{module_name}")
         except Exception as exc:  # ImportError dahil
-            return {"ok": False, "error": f"Modul yuklenemedi (tools.{module_name}): {exc}"}
+            return {
+                "ok": False,
+                "error": f"Modul yuklenemedi (tools.{module_name}): {exc}",
+            }
 
         fn = getattr(mod, fonksiyon_adi, None)
         if not callable(fn):
-            return {"ok": False, "error": f"Fonksiyon bulunamadi: tools.{module_name}.{fonksiyon_adi}"}
+            return {
+                "ok": False,
+                "error": f"Fonksiyon bulunamadi: tools.{module_name}.{fonksiyon_adi}",
+            }
 
         return self.executor.calistir_guvenli(fn, timeout=timeout, **(args or {}))
 

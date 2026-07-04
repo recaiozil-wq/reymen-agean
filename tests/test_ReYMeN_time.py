@@ -28,6 +28,7 @@ def _reset_cache():
 # _resolve_timezone_name
 # ════════════════════════════════════════════════════════════════
 
+
 class TestResolveTimezoneName:
     def test_env_var_priority(self):
         """Environment variable has highest priority."""
@@ -60,8 +61,9 @@ class TestResolveTimezoneName:
 
         with (
             patch.dict(os.environ, {}, clear=True),
-            patch("reymen.sistem.ReYMeN_time.get_config_path",
-                  return_value=config_file),
+            patch(
+                "reymen.sistem.ReYMeN_time.get_config_path", return_value=config_file
+            ),
         ):
             assert _resolve_timezone_name() == "America/New_York"
 
@@ -75,8 +77,9 @@ class TestResolveTimezoneName:
 
         with (
             patch.dict(os.environ, {}, clear=True),
-            patch("reymen.sistem.ReYMeN_time.get_config_path",
-                  return_value=config_file),
+            patch(
+                "reymen.sistem.ReYMeN_time.get_config_path", return_value=config_file
+            ),
         ):
             assert _resolve_timezone_name() == ""
 
@@ -90,8 +93,9 @@ class TestResolveTimezoneName:
 
         with (
             patch.dict(os.environ, {}, clear=True),
-            patch("reymen.sistem.ReYMeN_time.get_config_path",
-                  return_value=config_file),
+            patch(
+                "reymen.sistem.ReYMeN_time.get_config_path", return_value=config_file
+            ),
         ):
             assert _resolve_timezone_name() == ""
 
@@ -101,8 +105,7 @@ class TestResolveTimezoneName:
         fake_path = Path(tempfile.mktemp(suffix=".yaml"))
         with (
             patch.dict(os.environ, {}, clear=True),
-            patch("reymen.sistem.ReYMeN_time.get_config_path",
-                  return_value=fake_path),
+            patch("reymen.sistem.ReYMeN_time.get_config_path", return_value=fake_path),
         ):
             assert _resolve_timezone_name() == ""
 
@@ -110,6 +113,7 @@ class TestResolveTimezoneName:
 # ════════════════════════════════════════════════════════════════
 # _get_zoneinfo
 # ════════════════════════════════════════════════════════════════
+
 
 class TestGetZoneinfo:
     def test_valid_timezone(self):
@@ -135,6 +139,7 @@ class TestGetZoneinfo:
 # ════════════════════════════════════════════════════════════════
 # get_timezone
 # ════════════════════════════════════════════════════════════════
+
 
 class TestGetTimezone:
     def test_returns_none_when_unconfigured(self):
@@ -186,12 +191,14 @@ class TestGetTimezone:
 # now()
 # ════════════════════════════════════════════════════════════════
 
+
 class TestNow:
     def test_returns_datetime(self):
         """now() always returns a datetime."""
         _reset_cache()
         result = now()
         from datetime import datetime
+
         assert isinstance(result, datetime)
 
     def test_timezone_aware(self):
@@ -225,16 +232,20 @@ class TestNow:
 # Edge cases
 # ════════════════════════════════════════════════════════════════
 
+
 class TestEdgeCases:
     def test_never_crashes_on_bad_tz(self):
         """Invalid timezone never crashes — falls back safely."""
         _reset_cache()
-        with patch.dict(os.environ, {"ReYMeN_TIMEZONE": "This/DoesNotExist!"}, clear=True):
+        with patch.dict(
+            os.environ, {"ReYMeN_TIMEZONE": "This/DoesNotExist!"}, clear=True
+        ):
             tz = get_timezone()
             assert tz is None
             # now() should still work with fallback
             result = now()
             from datetime import datetime
+
             assert isinstance(result, datetime)
             assert result.tzinfo is not None
 
@@ -247,8 +258,9 @@ class TestEdgeCases:
 
         with (
             patch.dict(os.environ, {}, clear=True),
-            patch("reymen.sistem.ReYMeN_time.get_config_path",
-                  return_value=config_file),
+            patch(
+                "reymen.sistem.ReYMeN_time.get_config_path", return_value=config_file
+            ),
         ):
             tz = get_timezone()
             assert tz is None

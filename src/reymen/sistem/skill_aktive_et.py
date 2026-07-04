@@ -54,12 +54,12 @@ def motor_kaydet(motor) -> None:
         motor._plugin_arac_kaydet(
             "SKILL_AKTIF",
             lambda ad: skill_aktif_et(ad.strip()) or f"[SKILL] '{ad}' bulunamadi.",
-            f"Bir skill'in icerigini getirir. {sayi} skill kayitli. Kullanim: SKILL_AKTIF(ad=\"skill_adi\")"
+            f'Bir skill\'in icerigini getirir. {sayi} skill kayitli. Kullanim: SKILL_AKTIF(ad="skill_adi")',
         )
         motor._plugin_arac_kaydet(
             "SKILL_LISTE",
             lambda: f"{sayi} skill kayitli. DURUM_OKU() ile detay gorebilirsin.",
-            "Aktif skill sayisini gosterir."
+            "Aktif skill sayisini gosterir.",
         )
         logger.info("[SkillAktif] %d skill kayitli, tool'lar kaydedildi", sayi)
     except Exception as e:

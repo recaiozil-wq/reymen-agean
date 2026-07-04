@@ -33,7 +33,9 @@ from typing import Any, Optional
 logger = logging.getLogger(__name__)
 
 # ── Sabitler ────────────────────────────────────────────────────────
-_PROJE_KOKU = Path(__file__).resolve().parent.parent.parent  # reymen/core/ -> reymen/ -> proje
+_PROJE_KOKU = (
+    Path(__file__).resolve().parent.parent.parent
+)  # reymen/core/ -> reymen/ -> proje
 _POOL_DOSYASI = _PROJE_KOKU / ".ReYMeN" / "credential_pool.json"
 _MAX_KEY_INDEX = 10  # provider basina en fazla bu kadar key tara
 
@@ -58,6 +60,7 @@ def _env_adi(provider: str, index: int = 1) -> str:
 # ═══════════════════════════════════════════════════════════════════
 # CredentialPool — Kimlik Havuzu Yoneticisi
 # ═══════════════════════════════════════════════════════════════════
+
 
 class CredentialPool:
     """Provider adina gore API anahtari havuzu.
@@ -139,9 +142,7 @@ class CredentialPool:
                 "[CredentialPool] python-dotenv yuklu degil, .env atlaniyor."
             )
         except Exception as exc:
-            logger.warning(
-                "[CredentialPool] .env yuklenemedi: %s", exc
-            )
+            logger.warning("[CredentialPool] .env yuklenemedi: %s", exc)
 
     # ── Gecersiz Key Kaliciligi ─────────────────────────────────
 
@@ -169,9 +170,7 @@ class CredentialPool:
                 self._pool_dosyasi,
             )
         except Exception as exc:
-            logger.warning(
-                "[CredentialPool] Gecersiz key dosyasi okunamadi: %s", exc
-            )
+            logger.warning("[CredentialPool] Gecersiz key dosyasi okunamadi: %s", exc)
 
     def _gecersizleri_kaydet(self) -> None:
         """Gecersiz key kumesini JSON dosyasina yazar."""
@@ -188,9 +187,7 @@ class CredentialPool:
                 encoding="utf-8",
             )
         except Exception as exc:
-            logger.warning(
-                "[CredentialPool] Gecersiz key dosyasi yazilamadi: %s", exc
-            )
+            logger.warning("[CredentialPool] Gecersiz key dosyasi yazilamadi: %s", exc)
 
     # ── Key Tarama ──────────────────────────────────────────────
 
@@ -351,14 +348,14 @@ class CredentialPool:
     def mark_invalid(self, provider: str) -> Optional[str]:
         """Mevcut aktif API anahtarini gecersiz isaretler ve rotate yapar.
 
-    401/402/403 hata alindiginda cagrilmalidir.
+        401/402/403 hata alindiginda cagrilmalidir.
 
-        Args:
-            provider: Provider adi
+            Args:
+                provider: Provider adi
 
-        Returns:
-            Yeni gecerli API anahtari veya None
-            (yeni key yoksa veya tumu gecersizse)
+            Returns:
+                Yeni gecerli API anahtari veya None
+                (yeni key yoksa veya tumu gecersizse)
         """
         with self._lock:
             kayit = self._havuzu_hazirla(provider)
@@ -491,9 +488,7 @@ class CredentialPool:
                     keys = self._provider_keyleri_tara(p)
                     self._havuz[p]["keys"] = keys
                     self._havuz[p]["aktif_index"] = 0
-                logger.info(
-                    "[CredentialPool] Tum provider'lar yeniden tarandi."
-                )
+                logger.info("[CredentialPool] Tum provider'lar yeniden tarandi.")
 
 
 # ── Modul seviyesinde yardimci ──────────────────────────────────────

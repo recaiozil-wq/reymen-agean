@@ -30,7 +30,9 @@ from tools.mcp_oauth import ReYMeNTokenStorage
 from tools.mcp_oauth_manager import _ReYMeN_PROVIDER_CLS
 
 
-def _make_metadata(token_endpoint: str = "https://auth.example.com/oauth/token") -> OAuthMetadata:
+def _make_metadata(
+    token_endpoint: str = "https://auth.example.com/oauth/token",
+) -> OAuthMetadata:
     return OAuthMetadata.model_validate(
         {
             "issuer": "https://auth.example.com",
@@ -128,10 +130,14 @@ class TestManagerOAuthProviderMetadata:
             asyncio.run(provider._initialize())
 
         assert provider.context.oauth_metadata is not None
-        assert str(provider.context.oauth_metadata.token_endpoint) == \
-            "https://mgr.example.com/token"
+        assert (
+            str(provider.context.oauth_metadata.token_endpoint)
+            == "https://mgr.example.com/token"
+        )
 
-    def test_initialize_skips_restore_when_in_memory_present(self, tmp_path, monkeypatch):
+    def test_initialize_skips_restore_when_in_memory_present(
+        self, tmp_path, monkeypatch
+    ):
         """If SDK already has metadata in memory, don't overwrite from disk."""
         monkeypatch.setenv("ReYMeN_HOME", str(tmp_path))
         storage = ReYMeNTokenStorage("mgr-srv2")
@@ -145,10 +151,14 @@ class TestManagerOAuthProviderMetadata:
         ):
             asyncio.run(provider._initialize())
 
-        assert str(provider.context.oauth_metadata.token_endpoint) == \
-            "https://memory.example.com/token"
+        assert (
+            str(provider.context.oauth_metadata.token_endpoint)
+            == "https://memory.example.com/token"
+        )
 
-    def test_persist_metadata_if_changed_writes_on_first_discover(self, tmp_path, monkeypatch):
+    def test_persist_metadata_if_changed_writes_on_first_discover(
+        self, tmp_path, monkeypatch
+    ):
         """When nothing on disk yet, persist what the SDK discovered in-memory."""
         monkeypatch.setenv("ReYMeN_HOME", str(tmp_path))
         storage = ReYMeNTokenStorage("persist-srv")
@@ -172,9 +182,7 @@ class TestManagerOAuthProviderMetadata:
 
         provider = _manager_provider_with_context(storage, oauth_metadata=meta)
 
-        with patch.object(
-            ReYMeNTokenStorage, "save_oauth_metadata"
-        ) as save_spy:
+        with patch.object(ReYMeNTokenStorage, "save_oauth_metadata") as save_spy:
             provider._persist_oauth_metadata_if_changed()
             save_spy.assert_not_called()
 
@@ -201,6 +209,7 @@ class TestManagerOAuthProviderMetadata:
             "async_auth_flow",
             new=fake_parent_flow,
         ), patch("tools.mcp_oauth_manager.get_manager", return_value=manager):
+
             async def drive():
                 gen = provider.async_auth_flow(MagicMock())
                 async for _ in gen:

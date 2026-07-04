@@ -17,6 +17,7 @@ import calendar
 from datetime import datetime, timedelta
 from typing import Optional, List, Dict, Any, Callable
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -48,7 +49,9 @@ class CronExpressionParser:
         self.ifade = ifade.strip()
         alanlar = self.ifade.split()
         if len(alanlar) != 5:
-            raise ValueError(f"Gecersiz cron ifadesi: '{ifade}'. 5 alan gerekli (dakika saat gun ay hafta_gunu).")
+            raise ValueError(
+                f"Gecersiz cron ifadesi: '{ifade}'. 5 alan gerekli (dakika saat gun ay hafta_gunu)."
+            )
 
         self.dakika = self._parse_alan(alanlar[0], 0, 59)
         self.saat = self._parse_alan(alanlar[1], 0, 23)
@@ -168,8 +171,15 @@ class CronScheduler:
             except Exception as _cron_sch_e165:
                 print(f"[UYARI] cron_scheduler.py:166 - {_cron_sch_e165}")
 
-    def ekle(self, job_id: str, zaman: str, fonk: Callable, args: Optional[tuple] = None,
-             tek_seferlik: bool = False, aciklama: str = "") -> bool:
+    def ekle(
+        self,
+        job_id: str,
+        zaman: str,
+        fonk: Callable,
+        args: Optional[tuple] = None,
+        tek_seferlik: bool = False,
+        aciklama: str = "",
+    ) -> bool:
         """
         Yeni bir zamanlanmis gorev ekler.
 
@@ -240,15 +250,17 @@ class CronScheduler:
             with self._kilit:
                 liste = []
                 for job_id, job in self._jobs.items():
-                    liste.append({
-                        "id": job["id"],
-                        "cron": job["cron"],
-                        "aciklama": job.get("aciklama", ""),
-                        "tek_seferlik": job.get("tek_seferlik", False),
-                        "eklenme": job.get("eklenme", 0),
-                        "son_calisma": job.get("son_calisma"),
-                        "calisma_sayisi": job.get("calisma_sayisi", 0),
-                    })
+                    liste.append(
+                        {
+                            "id": job["id"],
+                            "cron": job["cron"],
+                            "aciklama": job.get("aciklama", ""),
+                            "tek_seferlik": job.get("tek_seferlik", False),
+                            "eklenme": job.get("eklenme", 0),
+                            "son_calisma": job.get("son_calisma"),
+                            "calisma_sayisi": job.get("calisma_sayisi", 0),
+                        }
+                    )
                 return liste
         except Exception as e:
             return [{"hata": str(e)}]
@@ -293,7 +305,7 @@ class CronScheduler:
 
     def execute_tick_cycle(self) -> int:
         """Gateway tick loop'u icin: bir tikta calisacak gorevleri kontrol edip calistirir.
-        
+
         Returns:
             Calistirilan gorev sayisi.
         """
@@ -334,9 +346,7 @@ class CronScheduler:
                 for job_id, job in calistirilacak:
                     try:
                         threading.Thread(
-                            target=self._gorev_calistir,
-                            args=(job_id, job),
-                            daemon=True
+                            target=self._gorev_calistir, args=(job_id, job), daemon=True
                         ).start()
                     except Exception as e:
                         print(f"[Cron] Gorev baslatma hatasi ({job_id}): {e}")
@@ -405,6 +415,7 @@ class CronScheduler:
             JSON formatinda sonuc.
         """
         import json as json_mod
+
         try:
             action = kwargs.pop("action", "listele")
             if action == "ekle":
@@ -422,7 +433,9 @@ class CronScheduler:
                 basarili = self.durdur()
                 return json_mod.dumps({"basarili": basarili}, ensure_ascii=False)
             else:
-                return json_mod.dumps({"hata": f"Bilinmeyen action: {action}"}, ensure_ascii=False)
+                return json_mod.dumps(
+                    {"hata": f"Bilinmeyen action: {action}"}, ensure_ascii=False
+                )
         except Exception as e:
             return json_mod.dumps({"hata": str(e)}, ensure_ascii=False)
 

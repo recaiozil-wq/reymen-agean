@@ -36,10 +36,10 @@ class MixinCommands:
     def process_command(self, command: str) -> bool:
         """
         Process a slash command.
-        
+
         Args:
             command: The command string (starting with /)
-            
+
         Returns:
             bool: True to continue, False to exit
         """
@@ -50,6 +50,7 @@ class MixinCommands:
         # Resolve aliases via central registry so adding an alias is a one-line
         # change in ReYMeN_cli/commands.py instead of touching every dispatch site.
         from reymen.reymen_cli.commands import resolve_command as _resolve_cmd
+
         _base_word = cmd_lower.split()[0].lstrip("/")
         _cmd_def = _resolve_cmd(_base_word)
         canonical = _cmd_def.name if _cmd_def else _base_word
@@ -70,7 +71,9 @@ class MixinCommands:
             if _args in {"--delete", "-d"}:
                 self._delete_session_on_exit = True
             elif _args:
-                _cprint(f"  {_DIM}✗ Unknown argument: {_escape(_args)}. Use /exit --delete to also remove session history.{_RST}")
+                _cprint(
+                    f"  {_DIM}✗ Unknown argument: {_escape(_args)}. Use /exit --delete to also remove session history.{_RST}"
+                )
                 return True
             return False
         elif canonical == "help":
@@ -90,12 +93,15 @@ class MixinCommands:
             self._force_full_redraw()
             _cprint(f"  {_DIM}✓ UI redrawn{_RST}")
         elif canonical == "clear":
-            if self._confirm_destructive_slash(
-                "clear",
-                "This clears the screen and starts a new session.\n"
-                "The current conversation history will be discarded.",
-                cmd_original=cmd_original,
-            ) is None:
+            if (
+                self._confirm_destructive_slash(
+                    "clear",
+                    "This clears the screen and starts a new session.\n"
+                    "The current conversation history will be discarded.",
+                    cmd_original=cmd_original,
+                )
+                is None
+            ):
                 return
             self.new_session(silent=True)
             _clear_output_history()
@@ -120,10 +126,16 @@ class MixinCommands:
                 if self.compact or term_w < 80:
                     cc.print(_build_compact_banner())
                 else:
-                    tools = get_tool_definitions(enabled_toolsets=self.enabled_toolsets, quiet_mode=True)
+                    tools = get_tool_definitions(
+                        enabled_toolsets=self.enabled_toolsets, quiet_mode=True
+                    )
                     cwd = os.getenv("TERMINAL_CWD", os.getcwd())
                     ctx_len = None
-                    if hasattr(self, 'agent') and self.agent and hasattr(self.agent, 'context_compressor'):
+                    if (
+                        hasattr(self, "agent")
+                        and self.agent
+                        and hasattr(self.agent, "context_compressor")
+                    ):
                         ctx_len = self.agent.context_compressor.context_length
                     build_welcome_banner(
                         console=cc,
@@ -134,14 +146,20 @@ class MixinCommands:
                         session_id=self.session_id,
                         context_length=ctx_len,
                     )
-                _cprint("  ✨ (◕‿◕)✨ Fresh start! Screen cleared and conversation reset.\n")
+                _cprint(
+                    "  ✨ (◕‿◕)✨ Fresh start! Screen cleared and conversation reset.\n"
+                )
                 # Show a random tip on new session
                 try:
                     from reymen.reymen_cli.tips import get_random_tip
+
                     _tip = get_random_tip()
                     try:
                         from reymen.reymen_cli.skin_engine import get_active_skin
-                        _tip_color = get_active_skin().get_color("banner_dim", "#B8860B")
+
+                        _tip_color = get_active_skin().get_color(
+                            "banner_dim", "#B8860B"
+                        )
                     except Exception:
                         _tip_color = "#B8860B"
                     cc.print(f"[dim {_tip_color}]✦ Tip: {_tip}[/]")
@@ -149,14 +167,20 @@ class MixinCommands:
                     logger.warning("[fix_01_sessiz_except] Exception")
             else:
                 self.show_banner()
-                print("  ✨ (◕‿◕)✨ Fresh start! Screen cleared and conversation reset.\n")
+                print(
+                    "  ✨ (◕‿◕)✨ Fresh start! Screen cleared and conversation reset.\n"
+                )
                 # Show a random tip on new session
                 try:
                     from reymen.reymen_cli.tips import get_random_tip
+
                     _tip = get_random_tip()
                     try:
                         from reymen.reymen_cli.skin_engine import get_active_skin
-                        _tip_color = get_active_skin().get_color("banner_dim", "#B8860B")
+
+                        _tip_color = get_active_skin().get_color(
+                            "banner_dim", "#B8860B"
+                        )
                     except Exception:
                         _tip_color = "#B8860B"
                     self._console_print(f"[dim {_tip_color}]✦ Tip: {_tip}[/]")
@@ -173,16 +197,21 @@ class MixinCommands:
                         # Sanitize the title early so feedback matches what gets stored
                         try:
                             from reymen.sistem.ReYMeN_state import SessionDB
+
                             new_title = SessionDB.sanitize_title(raw_title)
                         except ValueError as e:
                             _cprint(f"  {e}")
                             new_title = None
                         if not new_title:
-                            _cprint("  Title is empty after cleanup. Please use printable characters.")
+                            _cprint(
+                                "  Title is empty after cleanup. Please use printable characters."
+                            )
                         elif self._session_db.get_session(self.session_id):
                             # Session exists in DB — set title directly
                             try:
-                                if self._session_db.set_session_title(self.session_id, new_title):
+                                if self._session_db.set_session_title(
+                                    self.session_id, new_title
+                                ):
                                     _cprint(f"  Session title set: {new_title}")
                                 else:
                                     _cprint("  Session not found in database.")
@@ -193,12 +222,19 @@ class MixinCommands:
                             # Check uniqueness proactively with the sanitized title
                             existing = self._session_db.get_session_by_title(new_title)
                             if existing:
-                                _cprint(f"  Title '{new_title}' is already in use by session {existing['id']}")
+                                _cprint(
+                                    f"  Title '{new_title}' is already in use by session {existing['id']}"
+                                )
                             else:
                                 self._pending_title = new_title
-                                _cprint(f"  Session title queued: {new_title} (will be saved on first message)")
+                                _cprint(
+                                    f"  Session title queued: {new_title} (will be saved on first message)"
+                                )
                     else:
-                        from reymen.sistem.ReYMeN_state import format_session_db_unavailable
+                        from reymen.sistem.ReYMeN_state import (
+                            format_session_db_unavailable,
+                        )
+
                         _cprint(f"  {format_session_db_unavailable()}")
                 else:
                     _cprint("  Usage: /title <your session title>")
@@ -214,6 +250,7 @@ class MixinCommands:
                     _cprint("  No title set. Usage: /title <your session title>")
             else:
                 from reymen.sistem.ReYMeN_state import format_session_db_unavailable
+
                 _cprint(f"  {format_session_db_unavailable()}")
         elif canonical == "handoff":
             if not self._handle_handoff_command(cmd_original):
@@ -224,12 +261,15 @@ class MixinCommands:
             # title="now My Session". See _split_destructive_skip.
             _new_args, _ = self._split_destructive_skip(cmd_original)
             title = _new_args.strip() or None
-            if self._confirm_destructive_slash(
-                "new",
-                "This starts a fresh session.\n"
-                "The current conversation history will be discarded.",
-                cmd_original=cmd_original,
-            ) is None:
+            if (
+                self._confirm_destructive_slash(
+                    "new",
+                    "This starts a fresh session.\n"
+                    "The current conversation history will be discarded.",
+                    cmd_original=cmd_original,
+                )
+                is None
+            ):
                 return
             self.new_session(title=title)
         elif canonical == "resume":
@@ -248,7 +288,7 @@ class MixinCommands:
             self._handle_personality_command(cmd_original)
         elif canonical == "retry":
             retry_msg = self.retry_last()
-            if retry_msg and hasattr(self, '_pending_input'):
+            if retry_msg and hasattr(self, "_pending_input"):
                 # Re-queue the message so process_loop sends it to the agent
                 self._pending_input.put(retry_msg)
         elif canonical == "undo":
@@ -259,7 +299,9 @@ class MixinCommands:
                 try:
                     _undo_n = int(_undo_parts[1])
                 except ValueError:
-                    print(f"(._.) Invalid count {_undo_parts[1]!r} — use /undo or /undo N.")
+                    print(
+                        f"(._.) Invalid count {_undo_parts[1]!r} — use /undo or /undo N."
+                    )
                     return
                 if _undo_n < 1:
                     _undo_n = 1
@@ -268,11 +310,14 @@ class MixinCommands:
                 if _undo_n == 1
                 else f"This removes the last {_undo_n} user turns from history."
             )
-            if self._confirm_destructive_slash(
-                "undo",
-                _undo_desc,
-                cmd_original=cmd_original,
-            ) is None:
+            if (
+                self._confirm_destructive_slash(
+                    "undo",
+                    _undo_desc,
+                    cmd_original=cmd_original,
+                )
+                is None
+            ):
                 return
             self.undo_last(_undo_n)
         elif canonical == "branch":
@@ -325,6 +370,7 @@ class MixinCommands:
             self._handle_image_command(cmd_original)
         elif canonical == "reload":
             from reymen.reymen_cli.config import reload_env
+
             count = reload_env()
             print(f"  Reloaded .env ({count} var(s) updated)")
         elif canonical == "reload-mcp":
@@ -342,11 +388,14 @@ class MixinCommands:
         elif canonical == "plugins":
             try:
                 from reymen.reymen_cli.plugins import get_plugin_manager
+
                 mgr = get_plugin_manager()
                 plugins = mgr.list_plugins()
                 if not plugins:
                     print("No plugins installed.")
-                    print(f"Drop plugin directories into {display_reymen_home()}/plugins/ to get started.")
+                    print(
+                        f"Drop plugin directories into {display_reymen_home()}/plugins/ to get started."
+                    )
                 else:
                     print(f"Plugins ({len(plugins)}):")
                     for p in plugins:
@@ -354,7 +403,9 @@ class MixinCommands:
                         version = f" v{p['version']}" if p["version"] else ""
                         tools = f"{p['tools']} tools" if p["tools"] else ""
                         hooks = f"{p['hooks']} hooks" if p["hooks"] else ""
-                        commands = f"{p['commands']} commands" if p.get("commands") else ""
+                        commands = (
+                            f"{p['commands']} commands" if p.get("commands") else ""
+                        )
                         parts = [x for x in [tools, hooks, commands] if x]
                         detail = f" ({', '.join(parts)})" if parts else ""
                         error = f" — {p['error']}" if p["error"] else ""
@@ -380,9 +431,13 @@ class MixinCommands:
             else:
                 self._pending_input.put(payload)
                 if self._agent_running:
-                    _cprint(f"  Queued for the next turn: {payload[:80]}{'...' if len(payload) > 80 else ''}")
+                    _cprint(
+                        f"  Queued for the next turn: {payload[:80]}{'...' if len(payload) > 80 else ''}"
+                    )
                 else:
-                    _cprint(f"  Queued: {payload[:80]}{'...' if len(payload) > 80 else ''}")
+                    _cprint(
+                        f"  Queued: {payload[:80]}{'...' if len(payload) > 80 else ''}"
+                    )
         elif canonical == "steer":
             # Inject a message after the next tool call without interrupting.
             # If the agent is actively running, push the text into the agent's
@@ -393,20 +448,28 @@ class MixinCommands:
             payload = parts[1].strip() if len(parts) > 1 else ""
             if not payload:
                 _cprint("  Usage: /steer <prompt>")
-            elif self._agent_running and self.agent is not None and hasattr(self.agent, "steer"):
+            elif (
+                self._agent_running
+                and self.agent is not None
+                and hasattr(self.agent, "steer")
+            ):
                 try:
                     accepted = self.agent.steer(payload)
                 except Exception as exc:
                     _cprint(f"  Steer failed: {exc}")
                 else:
                     if accepted:
-                        _cprint(f"  ⏩ Steer queued — arrives after the next tool call: {payload[:80]}{'...' if len(payload) > 80 else ''}")
+                        _cprint(
+                            f"  ⏩ Steer queued — arrives after the next tool call: {payload[:80]}{'...' if len(payload) > 80 else ''}"
+                        )
                     else:
                         _cprint("  Steer rejected (empty payload).")
             else:
                 # No active run — treat as a normal next-turn message.
                 self._pending_input.put(payload)
-                _cprint(f"  No agent running; queued as next turn: {payload[:80]}{'...' if len(payload) > 80 else ''}")
+                _cprint(
+                    f"  No agent running; queued as next turn: {payload[:80]}{'...' if len(payload) > 80 else ''}"
+                )
         elif canonical == "goal":
             self._handle_goal_command(cmd_original)
         elif canonical == "subgoal":
@@ -427,46 +490,64 @@ class MixinCommands:
                 qcmd = quick_commands[base_cmd.lstrip("/")]
                 if qcmd.get("type") == "exec":
                     import subprocess
+
                     exec_cmd = qcmd.get("command", "")
                     if exec_cmd:
                         try:
                             import shlex
+
                             args_list = shlex.split(exec_cmd, posix=(os.name != "nt"))
                             result = subprocess.run(  # nosec B603
-                                args_list, shell=False, capture_output=True,
-                                text=True, timeout=30
+                                args_list,
+                                shell=False,
+                                capture_output=True,
+                                text=True,
+                                timeout=30,
                             )
                             output = result.stdout.strip() or result.stderr.strip()
                             if output:
                                 self._console_print(_rich_text_from_ansi(output))
                             else:
-                                self._console_print("[dim]Command returned no output[/]")
+                                self._console_print(
+                                    "[dim]Command returned no output[/]"
+                                )
                         except subprocess.TimeoutExpired:
-                            self._console_print("[bold red]Quick command timed out (30s)[/]")
+                            self._console_print(
+                                "[bold red]Quick command timed out (30s)[/]"
+                            )
                         except Exception as e:
-                            self._console_print(f"[bold red]Quick command error: {e}[/]")
+                            self._console_print(
+                                f"[bold red]Quick command error: {e}[/]"
+                            )
                     else:
-                        self._console_print(f"[bold red]Quick command '{base_cmd}' has no command defined[/]")
+                        self._console_print(
+                            f"[bold red]Quick command '{base_cmd}' has no command defined[/]"
+                        )
                 elif qcmd.get("type") == "alias":
                     target = qcmd.get("target", "").strip()
                     if target:
                         target = target if target.startswith("/") else f"/{target}"
-                        user_args = cmd_original[len(base_cmd):].strip()
+                        user_args = cmd_original[len(base_cmd) :].strip()
                         aliased_command = f"{target} {user_args}".strip()
                         return self.process_command(aliased_command)
                     else:
-                        self._console_print(f"[bold red]Quick command '{base_cmd}' has no target defined[/]")
+                        self._console_print(
+                            f"[bold red]Quick command '{base_cmd}' has no target defined[/]"
+                        )
                 else:
-                    self._console_print(f"[bold red]Quick command '{base_cmd}' has unsupported type (supported: 'exec', 'alias')[/]")
+                    self._console_print(
+                        f"[bold red]Quick command '{base_cmd}' has unsupported type (supported: 'exec', 'alias')[/]"
+                    )
             # Check for plugin-registered slash commands
             elif base_cmd.lstrip("/") in _get_plugin_cmd_handler_names():
                 from reymen.reymen_cli.plugins import (
                     get_plugin_command_handler,
                     resolve_plugin_command_result,
                 )
+
                 plugin_handler = get_plugin_command_handler(base_cmd.lstrip("/"))
                 if plugin_handler:
-                    user_args = cmd_original[len(base_cmd):].strip()
+                    user_args = cmd_original[len(base_cmd) :].strip()
                     try:
                         result = resolve_plugin_command_result(
                             plugin_handler(user_args)
@@ -478,7 +559,7 @@ class MixinCommands:
             # Skill bundles take precedence over individual skills — /<bundle>
             # loads multiple skills at once. Rescans cheaply when files change.
             elif base_cmd in skill_bundles:
-                user_instruction = cmd_original[len(base_cmd):].strip()
+                user_instruction = cmd_original[len(base_cmd) :].strip()
                 bundle_result = build_bundle_invocation_message(
                     base_cmd, user_instruction, task_id=self.session_id
                 )
@@ -493,7 +574,7 @@ class MixinCommands:
                         ChatConsole().print(
                             f"[yellow]Skipped missing skills: {', '.join(missing)}[/]"
                         )
-                    if hasattr(self, '_pending_input'):
+                    if hasattr(self, "_pending_input"):
                         self._pending_input.put(msg)
                 else:
                     ChatConsole().print(
@@ -501,22 +582,25 @@ class MixinCommands:
                     )
             # Check for skill slash commands (/gif-search, /axolotl, etc.)
             elif base_cmd in skill_commands:
-                user_instruction = cmd_original[len(base_cmd):].strip()
+                user_instruction = cmd_original[len(base_cmd) :].strip()
                 msg = build_skill_invocation_message(
                     base_cmd, user_instruction, task_id=self.session_id
                 )
                 if msg:
                     skill_name = skill_commands[base_cmd]["name"]
                     print(f"\n⚡ Loading skill: {skill_name}")
-                    if hasattr(self, '_pending_input'):
+                    if hasattr(self, "_pending_input"):
                         self._pending_input.put(msg)
                 else:
-                    ChatConsole().print(f"[bold red]Failed to load skill for {base_cmd}[/]")
+                    ChatConsole().print(
+                        f"[bold red]Failed to load skill for {base_cmd}[/]"
+                    )
             else:
                 # Prefix matching: if input uniquely identifies one command, execute it.
                 # Matches against both built-in COMMANDS and installed skill commands so
                 # that execution-time resolution agrees with tab-completion.
                 from reymen.reymen_cli.commands import COMMANDS
+
                 typed_base = cmd_lower.split()[0]
                 all_known = set(COMMANDS) | set(skill_commands) | set(skill_bundles)
                 matches = [c for c in all_known if c.startswith(typed_base)]
@@ -541,9 +625,11 @@ class MixinCommands:
                     if full_name == typed_base:
                         # Already an exact token — no expansion possible; fall through
                         _cprint(f"\033[1;31mUnknown command: {cmd_lower}{_RST}")
-                        _cprint(f"{_DIM}{_ACCENT}Type /help for available commands{_RST}")
+                        _cprint(
+                            f"{_DIM}{_ACCENT}Type /help for available commands{_RST}"
+                        )
                     else:
-                        remainder = cmd_original.strip()[len(typed_base):]
+                        remainder = cmd_original.strip()[len(typed_base) :]
                         full_cmd = full_name + remainder
                         return self.process_command(full_cmd)
                 elif len(matches) > 1:
@@ -552,7 +638,7 @@ class MixinCommands:
                 else:
                     _cprint(f"\033[1;31mUnknown command: {cmd_lower}{_RST}")
                     _cprint(f"{_DIM}{_ACCENT}Type /help for available commands{_RST}")
-        
+
         return True
 
     def _handle_goal_command(self, cmd: str) -> None:
@@ -561,6 +647,7 @@ class MixinCommands:
         Delegates to :func:`handlers.system.goal_handler._handle_goal_command`.
         """
         from .handlers.system.goal_handler import _handle_goal_command
+
         _handle_goal_command(self, cmd)
 
     def _handle_subgoal_command(self, cmd: str) -> None:
@@ -581,6 +668,7 @@ class MixinCommands:
         Delegates to :func:`handlers.system.subgoal_handler._handle_subgoal_command`.
         """
         from .handlers.system.subgoal_handler import _handle_subgoal_command
+
         _handle_subgoal_command(self, cmd)
 
     def _maybe_continue_goal_after_turn(self) -> None:
@@ -670,7 +758,8 @@ class MixinCommands:
                         parts = [
                             p.get("text", "")
                             for p in content
-                            if isinstance(p, dict) and p.get("type") in {"text", "output_text"}
+                            if isinstance(p, dict)
+                            and p.get("type") in {"text", "output_text"}
                         ]
                         last_response = "\n".join(t for t in parts if t)
                     else:
@@ -705,6 +794,7 @@ class MixinCommands:
         Delegates to :func:`handlers.system.debug_handler._handle_debug_command`.
         """
         from .handlers.system.debug_handler import _handle_debug_command
+
         _handle_debug_command(self)
 
     def _handle_update_command(self) -> bool:
@@ -722,6 +812,7 @@ class MixinCommands:
         Delegates to :func:`handlers.system.update_handler._handle_update_command`.
         """
         from .handlers.system.update_handler import _handle_update_command
+
         return _handle_update_command(self)
 
     def _handle_voice_command(self, command: str):
@@ -730,6 +821,7 @@ class MixinCommands:
         Delegates to :func:`handlers.system.voice_handler._handle_voice_command`.
         """
         from .handlers.system.voice_handler import _handle_voice_command
+
         _handle_voice_command(self, command)
 
     def _toggle_voice_tts(self):
@@ -744,8 +836,10 @@ class MixinCommands:
 
         if self._voice_tts:
             from tools.tts_tool import check_tts_requirements
+
             if not check_tts_requirements():
-                _cprint(f"{_DIM}Warning: No TTS provider available. Install edge-tts or set API keys.{_RST}")
+                _cprint(
+                    f"{_DIM}Warning: No TTS provider available. Install edge-tts or set API keys.{_RST}"
+                )
 
         _cprint(f"{_ACCENT}Voice TTS {status}.{_RST}")
-

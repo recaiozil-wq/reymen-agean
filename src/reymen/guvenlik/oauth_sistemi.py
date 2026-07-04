@@ -45,9 +45,11 @@ SQLITE_DB = PROJE_KOK / ".ReYMeN" / "oauth" / "oauth_tokens.db"
 # Veri yapıları
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class OAuthToken:
     """Bir OAuth provider'dan alınan token bilgisi."""
+
     access_token: str = ""
     token_type: str = "Bearer"
     expires_in: int = 3600
@@ -82,10 +84,17 @@ class OAuthToken:
 # Hata sınıfı
 # ---------------------------------------------------------------------------
 
+
 class OAuthError(Exception):
     """OAuth işlemleri sırasında oluşan hata."""
-    def __init__(self, message: str, provider: str = "",
-                 status_code: int = 0, code: str = "oauth_error"):
+
+    def __init__(
+        self,
+        message: str,
+        provider: str = "",
+        status_code: int = 0,
+        code: str = "oauth_error",
+    ):
         self.provider = provider
         self.status_code = status_code
         self.code = code
@@ -95,6 +104,7 @@ class OAuthError(Exception):
 # ---------------------------------------------------------------------------
 # SQLite Token Deposu
 # ---------------------------------------------------------------------------
+
 
 class SQLiteTokenDeposu:
     """OAuth token'larını SQLite veritabanında saklar.
@@ -151,7 +161,8 @@ class SQLiteTokenDeposu:
     def kaydet(self, provider: str, token: OAuthToken) -> None:
         """Token'ı kaydet (varsa güncelle, yoksa ekle)."""
         with self._baglan() as conn:
-            conn.execute("""
+            conn.execute(
+                """
                 INSERT INTO oauth_tokens
                     (provider, user_id, access_token, refresh_token, token_type,
                      expires_in, scope, email, display_name, avatar_url, obtained_at,
@@ -169,20 +180,28 @@ class SQLiteTokenDeposu:
                     avatar_url    = excluded.avatar_url,
                     obtained_at   = excluded.obtained_at,
                     updated_at    = datetime('now')
-            """, (
-                provider, token.user_id, token.access_token,
-                token.refresh_token, token.token_type, token.expires_in,
-                token.scope, token.email, token.display_name,
-                token.avatar_url, token.obtained_at,
-            ))
+            """,
+                (
+                    provider,
+                    token.user_id,
+                    token.access_token,
+                    token.refresh_token,
+                    token.token_type,
+                    token.expires_in,
+                    token.scope,
+                    token.email,
+                    token.display_name,
+                    token.avatar_url,
+                    token.obtained_at,
+                ),
+            )
             conn.commit()
 
     def yukle(self, provider: str) -> Optional[OAuthToken]:
         """Provider'a ait token'ı yükle."""
         with self._baglan() as conn:
             row = conn.execute(
-                "SELECT * FROM oauth_tokens WHERE provider = ?",
-                (provider,)
+                "SELECT * FROM oauth_tokens WHERE provider = ?", (provider,)
             ).fetchone()
             if row is None:
                 return None
@@ -226,24 +245,25 @@ class SQLiteTokenDeposu:
                     display_name=row["display_name"],
                     obtained_at=row["obtained_at"],
                 )
-                result.append({
-                    "provider": row["provider"],
-                    "user_id": row["user_id"],
-                    "email": row["email"],
-                    "display_name": row["display_name"],
-                    "durum": "geçerli" if not token.is_expired else "süresi doldu",
-                    "expires_at": token.expires_at_local,
-                    "scope": row["scope"],
-                    "updated_at": row["updated_at"],
-                })
+                result.append(
+                    {
+                        "provider": row["provider"],
+                        "user_id": row["user_id"],
+                        "email": row["email"],
+                        "display_name": row["display_name"],
+                        "durum": "geçerli" if not token.is_expired else "süresi doldu",
+                        "expires_at": token.expires_at_local,
+                        "scope": row["scope"],
+                        "updated_at": row["updated_at"],
+                    }
+                )
             return result
 
     def var_mi(self, provider: str) -> bool:
         """Provider için kayıtlı token var mı?"""
         with self._baglan() as conn:
             row = conn.execute(
-                "SELECT 1 FROM oauth_tokens WHERE provider = ?",
-                (provider,)
+                "SELECT 1 FROM oauth_tokens WHERE provider = ?", (provider,)
             ).fetchone()
             return row is not None
 
@@ -251,6 +271,7 @@ class SQLiteTokenDeposu:
 # ---------------------------------------------------------------------------
 # OAuthProvider ABC
 # ---------------------------------------------------------------------------
+
 
 class OAuthProvider(ABC):
     """OAuth 2.0 sağlayıcı temel sınıfı (Authorization Code Flow).
@@ -412,8 +433,7 @@ class GoogleOAuthProvider(OAuthProvider):
     token_url = "https://oauth2.googleapis.com/token"
     userinfo_url = "https://www.googleapis.com/oauth2/v2/userinfo"
 
-    def __init__(self, scopes: Optional[list[str]] = None,
-                 redirect_uri: str = ""):
+    def __init__(self, scopes: Optional[list[str]] = None, redirect_uri: str = ""):
         self.scopes = scopes or [
             GOOGLE_SCOPE_GMAIL,
             GOOGLE_SCOPE_DRIVE,
@@ -489,8 +509,7 @@ class GitHubOAuthProvider(OAuthProvider):
     token_url = "https://github.com/login/oauth/access_token"
     userinfo_url = "https://api.github.com/user"
 
-    def __init__(self, scopes: Optional[list[str]] = None,
-                 redirect_uri: str = ""):
+    def __init__(self, scopes: Optional[list[str]] = None, redirect_uri: str = ""):
         self.scopes = scopes or [
             GITHUB_SCOPE_REPO,
             GITHUB_SCOPE_USER,
@@ -549,7 +568,8 @@ class GitHubOAuthProvider(OAuthProvider):
             logger.error("[OAuth:GitHub] POST HTTP %d: %s", e.code, body[:500])
             raise OAuthError(
                 f"GitHub token alınamadı: HTTP {e.code}",
-                provider=self.provider_id, status_code=e.code,
+                provider=self.provider_id,
+                status_code=e.code,
             ) from e
         except (urllib.error.URLError, OSError) as e:
             logger.error("[OAuth:GitHub] POST bağlantı hatası: %s", e)
@@ -563,7 +583,8 @@ class GitHubOAuthProvider(OAuthProvider):
         raise OAuthError(
             "GitHub OAuth'da refresh_token desteği yoktur. "
             "Token kalıcıdır, yeniden yetkilendirme gerekmez.",
-            provider=self.provider_id, code="github_no_refresh",
+            provider=self.provider_id,
+            code="github_no_refresh",
         )
 
     def get_user_info(self, access_token: str) -> dict[str, Any]:
@@ -585,7 +606,8 @@ class GitHubOAuthProvider(OAuthProvider):
             logger.error("[OAuth:GitHub] get_user_info HTTP %d: %s", e.code, body[:500])
             raise OAuthError(
                 f"GitHub kullanıcı bilgisi alınamadı: HTTP {e.code}",
-                provider=self.provider_id, status_code=e.code,
+                provider=self.provider_id,
+                status_code=e.code,
             ) from e
         except (urllib.error.URLError, OSError) as e:
             logger.error("[OAuth:GitHub] get_user_info bağlantı hatası: %s", e)
@@ -654,8 +676,7 @@ class DiscordOAuthProvider(OAuthProvider):
     token_url = "https://discord.com/api/oauth2/token"
     userinfo_url = "https://discord.com/api/users/@me"
 
-    def __init__(self, scopes: Optional[list[str]] = None,
-                 redirect_uri: str = ""):
+    def __init__(self, scopes: Optional[list[str]] = None, redirect_uri: str = ""):
         self.scopes = scopes or [
             DISCORD_SCOPE_IDENTIFY,
             DISCORD_SCOPE_EMAIL,
@@ -697,8 +718,7 @@ class DiscordOAuthProvider(OAuthProvider):
         if avatar_hash and user_id:
             ext = "gif" if avatar_hash.startswith("a_") else "png"
             avatar_url = (
-                f"https://cdn.discordapp.com/avatars/"
-                f"{user_id}/{avatar_hash}.{ext}"
+                f"https://cdn.discordapp.com/avatars/" f"{user_id}/{avatar_hash}.{ext}"
             )
         token.user_id = user_id
         token.email = raw.get("email", "")
@@ -730,6 +750,7 @@ class DiscordOAuthProvider(OAuthProvider):
 # OAuthSistemi — üst seviye OAuth yöneticisi
 # ---------------------------------------------------------------------------
 
+
 class OAuthSistemi:
     """OAuth 2.0 sistemi — tüm provider'ları ve token yönetimini birleştirir.
 
@@ -749,10 +770,13 @@ class OAuthSistemi:
         yeni_token = sistem.token_yenile("google")
     """
 
-    def __init__(self, deposu: Optional[SQLiteTokenDeposu] = None,
-                 google_scopes: Optional[list[str]] = None,
-                 github_scopes: Optional[list[str]] = None,
-                 discord_scopes: Optional[list[str]] = None):
+    def __init__(
+        self,
+        deposu: Optional[SQLiteTokenDeposu] = None,
+        google_scopes: Optional[list[str]] = None,
+        github_scopes: Optional[list[str]] = None,
+        discord_scopes: Optional[list[str]] = None,
+    ):
         self._depo = deposu or SQLiteTokenDeposu()
         self._google = GoogleOAuthProvider(scopes=google_scopes)
         self._github = GitHubOAuthProvider(scopes=github_scopes)
@@ -798,8 +822,11 @@ class OAuthSistemi:
         if not token.provider:
             token.provider = provider
         self._depo.kaydet(provider, token)
-        logger.info("[OAuthSistemi] Token kaydedildi: %s (kullanıcı: %s)",
-                     provider, token.email or token.user_id or "?")
+        logger.info(
+            "[OAuthSistemi] Token kaydedildi: %s (kullanıcı: %s)",
+            provider,
+            token.email or token.user_id or "?",
+        )
 
     def token_yukle(self, provider: str) -> Optional[OAuthToken]:
         """Token'ı SQLite deposundan yükle."""
@@ -854,10 +881,14 @@ class OAuthSistemi:
         """
         eski = self._depo.yukle(provider)
         if eski is None:
-            logger.warning("[OAuthSistemi] Token yenileme: %s için token bulunamadı", provider)
+            logger.warning(
+                "[OAuthSistemi] Token yenileme: %s için token bulunamadı", provider
+            )
             return None
         if not eski.refresh_token:
-            logger.warning("[OAuthSistemi] Token yenileme: %s için refresh_token yok", provider)
+            logger.warning(
+                "[OAuthSistemi] Token yenileme: %s için refresh_token yok", provider
+            )
             return None
 
         try:
@@ -949,9 +980,13 @@ class OAuthSistemi:
             return None
         if token.is_expired:
             if token.refresh_token:
-                logger.info("[OAuthSistemi] Token süresi dolmuş, yenileniyor: %s", provider)
+                logger.info(
+                    "[OAuthSistemi] Token süresi dolmuş, yenileniyor: %s", provider
+                )
                 return self.token_yenile(provider)
-            logger.warning("[OAuthSistemi] Token süresi dolmuş, refresh_token yok: %s", provider)
+            logger.warning(
+                "[OAuthSistemi] Token süresi dolmuş, refresh_token yok: %s", provider
+            )
             return None
         return token
 

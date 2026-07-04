@@ -23,7 +23,7 @@ from src.reymen.cron.scheduler import tick
 
 __all__ = [
     "create_job",
-    "get_job", 
+    "get_job",
     "list_jobs",
     "remove_job",
     "update_job",

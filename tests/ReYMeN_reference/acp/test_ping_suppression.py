@@ -96,7 +96,9 @@ class _FakeAgent:
     async def initialize(self, **kwargs):  # noqa: ANN003
         from acp.schema import AgentCapabilities, InitializeResponse
 
-        return InitializeResponse(protocol_version=1, agent_capabilities=AgentCapabilities())
+        return InitializeResponse(
+            protocol_version=1, agent_capabilities=AgentCapabilities()
+        )
 
     async def new_session(self, cwd, mcp_servers=None, **kwargs):  # noqa: ANN001, ANN003
         from acp.schema import NewSessionResponse
@@ -191,9 +193,9 @@ async def test_bare_ping_request_produces_proper_response_and_no_stderr_noise(
         assert response["error"]["data"] == {"method": "ping"}, response
 
         logs = stream.getvalue()
-        assert "Background task failed" not in logs, (
-            f"ping noise leaked to stderr:\n{logs}"
-        )
+        assert (
+            "Background task failed" not in logs
+        ), f"ping noise leaked to stderr:\n{logs}"
 
         # Clean shutdown
         in_write_file.close()

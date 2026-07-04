@@ -8,6 +8,7 @@ Kapsam:
   Beyin.fc_destekleniyor()— provider cache
   AIAgentOrchestrator     — FC loop: paralel araç, GOREV_BITTI, metin fallback
 """
+
 import sys
 import json
 from pathlib import Path
@@ -25,13 +26,14 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 # Motor.calistir_fc()
 # ─────────────────────────────────────────────────────────────────────────────
 
-class TestMotorCalistirFc:
 
+class TestMotorCalistirFc:
     def _motor(self):
         from reymen.cereyan.motor import Motor
+
         m = MagicMock(spec=Motor)
         m.calistir_fc = Motor.calistir_fc.__get__(m, Motor)
-        m.calistir    = MagicMock(return_value="OK")
+        m.calistir = MagicMock(return_value="OK")
         return m
 
     def test_bos_args_bos_ham(self):
@@ -79,20 +81,22 @@ class TestMotorCalistirFc:
 # Motor.tools_schema_al()
 # ─────────────────────────────────────────────────────────────────────────────
 
-class TestMotorToolsSchemaAl:
 
+class TestMotorToolsSchemaAl:
     def _motor_with_registry(self, araclar: dict):
         from reymen.cereyan.motor import Motor
+
         m = MagicMock(spec=Motor)
         m.tools_schema_al = Motor.tools_schema_al.__get__(m, Motor)
 
         mock_reg = MagicMock()
         mock_reg._tools = araclar
-        mock_reg._meta  = {}
+        mock_reg._meta = {}
 
         # Motor.__module__ ile her zaman dogru modulu bul
         # (sys.modules attribute'u vs gercek modul farki olabilir)
         import sys
+
         _motor_mod = sys.modules[Motor.__module__]
         with patch.object(_motor_mod, "_REGISTRY", mock_reg):
             return m.tools_schema_al()
@@ -108,10 +112,12 @@ class TestMotorToolsSchemaAl:
         assert "ozet" in gb["parameters"]["required"]
 
     def test_registry_araclari_eklenir(self):
-        schema = self._motor_with_registry({
-            "WEB_ARA": lambda: None,
-            "DOSYA_OKU": lambda: None,
-        })
+        schema = self._motor_with_registry(
+            {
+                "WEB_ARA": lambda: None,
+                "DOSYA_OKU": lambda: None,
+            }
+        )
         isimler = {s["function"]["name"] for s in schema}
         assert "WEB_ARA" in isimler
         assert "DOSYA_OKU" in isimler
@@ -124,12 +130,14 @@ class TestMotorToolsSchemaAl:
     def test_maks_siniri(self):
         araclar = {f"ARAC_{i}": lambda: None for i in range(100)}
         from reymen.cereyan.motor import Motor
+
         m = MagicMock(spec=Motor)
         m.tools_schema_al = Motor.tools_schema_al.__get__(m, Motor)
         mock_reg = MagicMock()
         mock_reg._tools = araclar
-        mock_reg._meta  = {}
+        mock_reg._meta = {}
         import sys
+
         _motor_mod = sys.modules[Motor.__module__]
         with patch.object(_motor_mod, "_REGISTRY", mock_reg):
             schema = m.tools_schema_al(maks=10)
@@ -138,23 +146,29 @@ class TestMotorToolsSchemaAl:
 
     def test_meta_aciklama_kullanilir(self):
         from reymen.cereyan.motor import Motor
+
         m = MagicMock(spec=Motor)
         m.tools_schema_al = Motor.tools_schema_al.__get__(m, Motor)
         mock_reg = MagicMock()
         mock_reg._tools = {"WEB_ARA": lambda: None}
-        mock_reg._meta  = {"WEB_ARA": {"aciklama": "İnternet'te ara"}}
+        mock_reg._meta = {"WEB_ARA": {"aciklama": "İnternet'te ara"}}
         import sys
+
         _motor_mod = sys.modules[Motor.__module__]
         with patch.object(_motor_mod, "_REGISTRY", mock_reg):
             schema = m.tools_schema_al()
-        web_fn = next(s["function"] for s in schema if s["function"]["name"] == "WEB_ARA")
+        web_fn = next(
+            s["function"] for s in schema if s["function"]["name"] == "WEB_ARA"
+        )
         assert "İnternet'te ara" in web_fn["description"]
 
     def test_registry_yok_sadece_gorev_bitti(self):
         from reymen.cereyan.motor import Motor
+
         m = MagicMock(spec=Motor)
         m.tools_schema_al = Motor.tools_schema_al.__get__(m, Motor)
         import reymen.cereyan.motor as _motor_mod
+
         with patch.object(_motor_mod, "_REGISTRY", None):
             schema = m.tools_schema_al()
         assert len(schema) == 1
@@ -175,12 +189,14 @@ class TestMotorToolsSchemaAl:
 # Beyin.uret_v2() & fc_destekleniyor()
 # ─────────────────────────────────────────────────────────────────────────────
 
-class TestBeyinUretV2:
 
+class TestBeyinUretV2:
     def _beyin(self):
         from reymen.cereyan.beyin import Beyin
+
         b = Beyin.__new__(Beyin)
         from reymen.cereyan.beyin import SaglayCiAdim
+
         b._fallback_zinciri = [
             SaglayCiAdim("deepseek", "deepseek-chat", "https://api.deepseek.com", "key")
         ]
@@ -193,21 +209,36 @@ class TestBeyinUretV2:
 
     def test_tool_calls_doner(self):
         b = self._beyin()
-        _tc = [{"id": "1", "function": {"name": "WEB_ARA", "arguments": '{"param":"test"}'}}]
-        with patch.object(b, "_cagir_openai_uyumlu_v2", return_value={"role": "assistant", "content": "", "tool_calls": _tc}):
+        _tc = [
+            {
+                "id": "1",
+                "function": {"name": "WEB_ARA", "arguments": '{"param":"test"}'},
+            }
+        ]
+        with patch.object(
+            b,
+            "_cagir_openai_uyumlu_v2",
+            return_value={"role": "assistant", "content": "", "tool_calls": _tc},
+        ):
             sonuc = b.uret_v2("sys", [{"role": "user", "content": "ara"}], tools=[{}])
         assert sonuc["tool_calls"] == _tc
 
     def test_bos_tool_calls_text_doner(self):
         b = self._beyin()
-        with patch.object(b, "_cagir_openai_uyumlu_v2", return_value={"role": "assistant", "content": "tamam", "tool_calls": []}):
+        with patch.object(
+            b,
+            "_cagir_openai_uyumlu_v2",
+            return_value={"role": "assistant", "content": "tamam", "tool_calls": []},
+        ):
             sonuc = b.uret_v2("sys", [{"role": "user", "content": "test"}])
         assert sonuc["content"] == "tamam"
         assert sonuc["tool_calls"] == []
 
     def test_provider_hata_fallback_metin(self):
         b = self._beyin()
-        with patch.object(b, "_cagir_openai_uyumlu_v2", side_effect=Exception("API hatası")):
+        with patch.object(
+            b, "_cagir_openai_uyumlu_v2", side_effect=Exception("API hatası")
+        ):
             with patch.object(b, "dusun", return_value="metin yanıt"):
                 sonuc = b.uret_v2("sys", [{"role": "user", "content": "test"}])
         assert sonuc["content"] == "metin yanıt"
@@ -223,6 +254,7 @@ class TestBeyinUretV2:
             _calls.append(has_tools)
             if has_tools:
                 import requests as _r
+
                 err_resp = MagicMock()
                 err_resp.status_code = 400
                 exc = _r.exceptions.HTTPError("400")
@@ -241,7 +273,7 @@ class TestBeyinUretV2:
             sonuc = b.uret_v2("sys", [], tools=[{"type": "function"}])
 
         assert sonuc["content"] == "ok"
-        assert True in _calls   # tools=True ile denendi
+        assert True in _calls  # tools=True ile denendi
         assert False in _calls  # tools=False ile yeniden denendi
 
     def test_fc_destekleniyor_baslangicta_true(self):
@@ -259,54 +291,64 @@ class TestBeyinUretV2:
 # ─────────────────────────────────────────────────────────────────────────────
 
 SISTEM = "Sen yardımcı bir ajansın."
-_TC_WEB = {"id": "tc_1", "function": {"name": "WEB_ARA", "arguments": '{"param":"python"}'}}
-_TC_GB  = {"id": "tc_2", "function": {"name": "GOREV_BITTI", "arguments": '{"ozet":"Tamamlandı."}'}}
+_TC_WEB = {
+    "id": "tc_1",
+    "function": {"name": "WEB_ARA", "arguments": '{"param":"python"}'},
+}
+_TC_GB = {
+    "id": "tc_2",
+    "function": {"name": "GOREV_BITTI", "arguments": '{"ozet":"Tamamlandı."}'},
+}
 
 
 def _mock_orchestrator():
     """Minimal AIAgentOrchestrator mock — test için gerçek dosya yazmaz."""
     from reymen.sistem.main import AIAgentOrchestrator
-    with patch.object(AIAgentOrchestrator, "_cekirdekleri_baslat", lambda s: None), \
-         patch.object(AIAgentOrchestrator, "_opsiyonel_modulleri_yukle", lambda s: None), \
-         patch.object(AIAgentOrchestrator, "_guvenligi_baslat", lambda s: None), \
-         patch.object(AIAgentOrchestrator, "_eklentileri_yukle", lambda s: None):
+
+    with patch.object(
+        AIAgentOrchestrator, "_cekirdekleri_baslat", lambda s: None
+    ), patch.object(
+        AIAgentOrchestrator, "_opsiyonel_modulleri_yukle", lambda s: None
+    ), patch.object(
+        AIAgentOrchestrator, "_guvenligi_baslat", lambda s: None
+    ), patch.object(AIAgentOrchestrator, "_eklentileri_yukle", lambda s: None):
         orch = AIAgentOrchestrator.__new__(AIAgentOrchestrator)
-        orch.config           = {"default_provider": "deepseek", "default_model": "deepseek-chat"}
-        orch.max_tur          = 15
-        orch.onay_iste        = False
-        orch.backend_mode     = "local"
-        orch._fc_mod          = None
-        orch.budget           = None
-        orch.trajectory       = None
+        orch.config = {"default_provider": "deepseek", "default_model": "deepseek-chat"}
+        orch.max_tur = 15
+        orch.onay_iste = False
+        orch.backend_mode = "local"
+        orch._fc_mod = None
+        orch.budget = None
+        orch.trajectory = None
         orch.halucination_filtresi = None
-        orch.adaptif_ogrenme  = None
-        orch.conv_compressor  = None
-        orch.planlayici       = MagicMock()
+        orch.adaptif_ogrenme = None
+        orch.conv_compressor = None
+        orch.planlayici = MagicMock()
         orch.planlayici.plani_uret = MagicMock(return_value=[])
-        orch.planlayici.riskli_mi  = MagicMock(return_value=False)
+        orch.planlayici.riskli_mi = MagicMock(return_value=False)
         orch.planlayici.tamamlanan_adim_isaretle = MagicMock()
-        orch.session          = MagicMock()
-        orch.bounded_memory   = MagicMock()
-        orch.learning         = MagicMock()
+        orch.session = MagicMock()
+        orch.bounded_memory = MagicMock()
+        orch.learning = MagicMock()
         orch.learning.beceri_baglamini_al = MagicMock(return_value="")
-        orch.reflexion        = None
-        orch.anayasa          = None
+        orch.reflexion = None
+        orch.anayasa = None
         orch.oz_tutarlilik_denetci = None
-        orch.meta_prompt      = None
-        orch.beceri_kb        = None
-        orch.ajan_suru        = None
+        orch.meta_prompt = None
+        orch.beceri_kb = None
+        orch.ajan_suru = None
         orch.aktif_hafiza_plugin = None
-        orch.compressor       = MagicMock()
+        orch.compressor = MagicMock()
         orch.compressor.compress = MagicMock(side_effect=lambda m, **kw: m)
-        orch.hafiza           = MagicMock()
-        orch.insan            = MagicMock()
-        orch.guvenlik         = None
-        orch.mem_guvenlik     = None
-        orch.salted_gate      = None
+        orch.hafiza = MagicMock()
+        orch.insan = MagicMock()
+        orch.guvenlik = None
+        orch.mem_guvenlik = None
+        orch.salted_gate = None
         orch.hitl_sikistirici = None
-        orch._plugin_yukleyici= None
+        orch._plugin_yukleyici = None
         orch._sistem_talimati_fn = None
-        orch.referanslar      = None
+        orch.referanslar = None
         return orch
 
 
@@ -315,49 +357,67 @@ class TestFcLoopGorevBittiNative:
 
     def test_gorev_bitti_fc_tool_donusu(self):
         orch = _mock_orchestrator()
-        orch.motor   = MagicMock()
-        orch.motor.tools_schema_al = MagicMock(return_value=[{"type": "function", "function": {"name": "GOREV_BITTI"}}])
-        orch.motor.eylemi_ayristir = MagicMock(return_value=("GOREV_BITTI", '"Tamamlandı."'))
-        orch.motor.calistir        = MagicMock(return_value="")
+        orch.motor = MagicMock()
+        orch.motor.tools_schema_al = MagicMock(
+            return_value=[{"type": "function", "function": {"name": "GOREV_BITTI"}}]
+        )
+        orch.motor.eylemi_ayristir = MagicMock(
+            return_value=("GOREV_BITTI", '"Tamamlandı."')
+        )
+        orch.motor.calistir = MagicMock(return_value="")
         orch.provider = MagicMock()
-        orch.provider.uret_v2 = MagicMock(return_value={
-            "role": "assistant", "content": "", "tool_calls": [_TC_GB]
-        })
+        orch.provider.uret_v2 = MagicMock(
+            return_value={"role": "assistant", "content": "", "tool_calls": [_TC_GB]}
+        )
         orch.provider.uret = MagicMock()
 
-        with patch("reymen.sistem.main.anlamsal_hafiza_ara", return_value=""), \
-             patch("reymen.sistem.main.tecrube_kaydet"), \
-             patch("reymen.sistem.main._get_once_hafiza") as _mock_oh, \
-             patch.object(orch, "_sistem_promptu_insa_et", return_value=SISTEM), \
-             patch.object(orch, "_giris_temizle", side_effect=lambda x: x), \
-             patch.object(orch, "_gorev_tamamla"):
+        with patch("reymen.sistem.main.anlamsal_hafiza_ara", return_value=""), patch(
+            "reymen.sistem.main.tecrube_kaydet"
+        ), patch("reymen.sistem.main._get_once_hafiza") as _mock_oh, patch.object(
+            orch, "_sistem_promptu_insa_et", return_value=SISTEM
+        ), patch.object(orch, "_giris_temizle", side_effect=lambda x: x), patch.object(
+            orch, "_gorev_tamamla"
+        ):
             _mock_oh.return_value.hafizada_ara.return_value = None
             sonuc = orch.run_conversation("test görevi")
 
         assert sonuc is not None
         assert "Tamamlandı" in str(sonuc)
-        orch.provider.uret.assert_not_called()   # metin modu hiç kullanılmadı
+        orch.provider.uret.assert_not_called()  # metin modu hiç kullanılmadı
 
     def test_gorev_bitti_fc_ozet_dogru_aktarilir(self):
         orch = _mock_orchestrator()
-        orch.motor   = MagicMock()
+        orch.motor = MagicMock()
         orch.motor.tools_schema_al = MagicMock(return_value=[{}])
-        orch.motor.eylemi_ayristir = MagicMock(return_value=("GOREV_BITTI", '"Dosya oluşturuldu."'))
-        orch.motor.calistir        = MagicMock(return_value="")
+        orch.motor.eylemi_ayristir = MagicMock(
+            return_value=("GOREV_BITTI", '"Dosya oluşturuldu."')
+        )
+        orch.motor.calistir = MagicMock(return_value="")
         orch.provider = MagicMock()
         _gb_ozet = "Dosya oluşturuldu."
-        orch.provider.uret_v2 = MagicMock(return_value={
-            "role": "assistant", "content": "",
-            "tool_calls": [{"id": "x", "function": {"name": "GOREV_BITTI",
-                            "arguments": json.dumps({"ozet": _gb_ozet})}}]
-        })
+        orch.provider.uret_v2 = MagicMock(
+            return_value={
+                "role": "assistant",
+                "content": "",
+                "tool_calls": [
+                    {
+                        "id": "x",
+                        "function": {
+                            "name": "GOREV_BITTI",
+                            "arguments": json.dumps({"ozet": _gb_ozet}),
+                        },
+                    }
+                ],
+            }
+        )
 
-        with patch("reymen.sistem.main.anlamsal_hafiza_ara", return_value=""), \
-             patch("reymen.sistem.main.tecrube_kaydet"), \
-             patch("reymen.sistem.main._get_once_hafiza") as _mock_oh, \
-             patch.object(orch, "_sistem_promptu_insa_et", return_value=SISTEM), \
-             patch.object(orch, "_giris_temizle", side_effect=lambda x: x), \
-             patch.object(orch, "_gorev_tamamla"):
+        with patch("reymen.sistem.main.anlamsal_hafiza_ara", return_value=""), patch(
+            "reymen.sistem.main.tecrube_kaydet"
+        ), patch("reymen.sistem.main._get_once_hafiza") as _mock_oh, patch.object(
+            orch, "_sistem_promptu_insa_et", return_value=SISTEM
+        ), patch.object(orch, "_giris_temizle", side_effect=lambda x: x), patch.object(
+            orch, "_gorev_tamamla"
+        ):
             _mock_oh.return_value.hafizada_ara.return_value = None
             sonuc = orch.run_conversation("dosya oluştur")
 
@@ -377,50 +437,72 @@ class TestFcLoopParalelAraclar:
 
         orch.motor = MagicMock()
         orch.motor.tools_schema_al = MagicMock(return_value=[{}])
-        orch.motor.calistir_fc     = MagicMock(side_effect=_fc)
+        orch.motor.calistir_fc = MagicMock(side_effect=_fc)
         orch.motor.eylemi_ayristir = MagicMock(return_value=("GOREV_BITTI", '"Bitti."'))
-        orch.motor.calistir        = MagicMock(return_value="")
+        orch.motor.calistir = MagicMock(return_value="")
 
         _tur = [0]
+
         def _uret_v2(sp, msgs, tools=None):
             _tur[0] += 1
             if _tur[0] == 1:
                 return {
-                    "role": "assistant", "content": "",
+                    "role": "assistant",
+                    "content": "",
                     "tool_calls": [
-                        {"id": "t1", "function": {"name": "DOSYA_OKU", "arguments": '{"dosya":"a.txt"}'}},
-                        {"id": "t2", "function": {"name": "WEB_ARA",   "arguments": '{"param":"test"}'}},
-                    ]
+                        {
+                            "id": "t1",
+                            "function": {
+                                "name": "DOSYA_OKU",
+                                "arguments": '{"dosya":"a.txt"}',
+                            },
+                        },
+                        {
+                            "id": "t2",
+                            "function": {
+                                "name": "WEB_ARA",
+                                "arguments": '{"param":"test"}',
+                            },
+                        },
+                    ],
                 }
             return {"role": "assistant", "content": "", "tool_calls": [_TC_GB]}
 
         orch.provider = MagicMock()
         orch.provider.uret_v2 = MagicMock(side_effect=_uret_v2)
 
-        with patch("reymen.sistem.main.anlamsal_hafiza_ara", return_value=""), \
-             patch("reymen.sistem.main.tecrube_kaydet"), \
-             patch.object(orch, "_sistem_promptu_insa_et", return_value=SISTEM), \
-             patch.object(orch, "_giris_temizle", side_effect=lambda x: x), \
-             patch.object(orch, "_gorev_tamamla"):
+        with patch("reymen.sistem.main.anlamsal_hafiza_ara", return_value=""), patch(
+            "reymen.sistem.main.tecrube_kaydet"
+        ), patch.object(
+            orch, "_sistem_promptu_insa_et", return_value=SISTEM
+        ), patch.object(orch, "_giris_temizle", side_effect=lambda x: x), patch.object(
+            orch, "_gorev_tamamla"
+        ):
             orch.run_conversation("iki aracı kullan")
 
         assert "DOSYA_OKU" in calistirildi
-        assert "WEB_ARA"   in calistirildi
+        assert "WEB_ARA" in calistirildi
 
     def test_tool_results_messages_eklendi(self):
         orch = _mock_orchestrator()
         orch.motor = MagicMock()
         orch.motor.tools_schema_al = MagicMock(return_value=[{}])
-        orch.motor.calistir_fc     = MagicMock(return_value="sonuç")
+        orch.motor.calistir_fc = MagicMock(return_value="sonuç")
         orch.motor.eylemi_ayristir = MagicMock(return_value=("GOREV_BITTI", '"Bitti."'))
-        orch.motor.calistir        = MagicMock(return_value="")
+        orch.motor.calistir = MagicMock(return_value="")
 
         _tur = [0]
+
         def _uret_v2(sp, msgs, tools=None):
             _tur[0] += 1
             if _tur[0] == 1:
-                return {"role": "assistant", "content": "",
-                        "tool_calls": [{"id": "t1", "function": {"name": "WEB_ARA", "arguments": "{}"}}]}
+                return {
+                    "role": "assistant",
+                    "content": "",
+                    "tool_calls": [
+                        {"id": "t1", "function": {"name": "WEB_ARA", "arguments": "{}"}}
+                    ],
+                }
             # İkinci turda mesajları kontrol edebilir gibiyiz
             # tool mesajı eklendi mi?
             has_tool = any(m.get("role") == "tool" for m in msgs)
@@ -430,11 +512,13 @@ class TestFcLoopParalelAraclar:
         orch.provider = MagicMock()
         orch.provider.uret_v2 = MagicMock(side_effect=_uret_v2)
 
-        with patch("reymen.sistem.main.anlamsal_hafiza_ara", return_value=""), \
-             patch("reymen.sistem.main.tecrube_kaydet"), \
-             patch.object(orch, "_sistem_promptu_insa_et", return_value=SISTEM), \
-             patch.object(orch, "_giris_temizle", side_effect=lambda x: x), \
-             patch.object(orch, "_gorev_tamamla"):
+        with patch("reymen.sistem.main.anlamsal_hafiza_ara", return_value=""), patch(
+            "reymen.sistem.main.tecrube_kaydet"
+        ), patch.object(
+            orch, "_sistem_promptu_insa_et", return_value=SISTEM
+        ), patch.object(orch, "_giris_temizle", side_effect=lambda x: x), patch.object(
+            orch, "_gorev_tamamla"
+        ):
             orch.run_conversation("web ara")
 
 
@@ -447,18 +531,19 @@ class TestFcLoopFallback:
         orch.motor = MagicMock()
         orch.motor.tools_schema_al = MagicMock(return_value=[{}])
         orch.motor.eylemi_ayristir = MagicMock(return_value=("GOREV_BITTI", '"Bitti."'))
-        orch.motor.calistir        = MagicMock(return_value="")
+        orch.motor.calistir = MagicMock(return_value="")
 
         orch.provider = MagicMock()
         orch.provider.uret_v2 = MagicMock(side_effect=Exception("FC desteklenmiyor"))
-        orch.provider.uret    = MagicMock(return_value='GOREV_BITTI("Metin modu bitti.")')
+        orch.provider.uret = MagicMock(return_value='GOREV_BITTI("Metin modu bitti.")')
 
-        with patch("reymen.sistem.main.anlamsal_hafiza_ara", return_value=""), \
-             patch("reymen.sistem.main.tecrube_kaydet"), \
-             patch("reymen.sistem.main._get_once_hafiza") as _mock_oh, \
-             patch.object(orch, "_sistem_promptu_insa_et", return_value=SISTEM), \
-             patch.object(orch, "_giris_temizle", side_effect=lambda x: x), \
-             patch.object(orch, "_gorev_tamamla"):
+        with patch("reymen.sistem.main.anlamsal_hafiza_ara", return_value=""), patch(
+            "reymen.sistem.main.tecrube_kaydet"
+        ), patch("reymen.sistem.main._get_once_hafiza") as _mock_oh, patch.object(
+            orch, "_sistem_promptu_insa_et", return_value=SISTEM
+        ), patch.object(orch, "_giris_temizle", side_effect=lambda x: x), patch.object(
+            orch, "_gorev_tamamla"
+        ):
             _mock_oh.return_value.hafizada_ara.return_value = None
             sonuc = orch.run_conversation("metin test")
 
@@ -472,18 +557,19 @@ class TestFcLoopFallback:
         orch.motor = MagicMock()
         orch.motor.tools_schema_al = MagicMock(return_value=[{}])
         orch.motor.eylemi_ayristir = MagicMock(return_value=("GOREV_BITTI", '"Bitti."'))
-        orch.motor.calistir        = MagicMock(return_value="")
+        orch.motor.calistir = MagicMock(return_value="")
 
         orch.provider = MagicMock()
         orch.provider.uret_v2 = MagicMock()
-        orch.provider.uret    = MagicMock(return_value='GOREV_BITTI("Tamam.")')
+        orch.provider.uret = MagicMock(return_value='GOREV_BITTI("Tamam.")')
 
-        with patch("reymen.sistem.main.anlamsal_hafiza_ara", return_value=""), \
-             patch("reymen.sistem.main.tecrube_kaydet"), \
-             patch("reymen.sistem.main._get_once_hafiza") as _mock_oh, \
-             patch.object(orch, "_sistem_promptu_insa_et", return_value=SISTEM), \
-             patch.object(orch, "_giris_temizle", side_effect=lambda x: x), \
-             patch.object(orch, "_gorev_tamamla"):
+        with patch("reymen.sistem.main.anlamsal_hafiza_ara", return_value=""), patch(
+            "reymen.sistem.main.tecrube_kaydet"
+        ), patch("reymen.sistem.main._get_once_hafiza") as _mock_oh, patch.object(
+            orch, "_sistem_promptu_insa_et", return_value=SISTEM
+        ), patch.object(orch, "_giris_temizle", side_effect=lambda x: x), patch.object(
+            orch, "_gorev_tamamla"
+        ):
             _mock_oh.return_value.hafizada_ara.return_value = None
             orch.run_conversation("direkt metin test")
 
@@ -496,27 +582,33 @@ class TestFcDizaynDogrulama:
 
     def test_motor_calistir_fc_mevcut(self):
         from reymen.cereyan.motor import Motor
+
         assert hasattr(Motor, "calistir_fc")
 
     def test_motor_tools_schema_al_mevcut(self):
         from reymen.cereyan.motor import Motor
+
         assert hasattr(Motor, "tools_schema_al")
 
     def test_beyin_uret_v2_mevcut(self):
         from reymen.cereyan.beyin import Beyin
+
         assert hasattr(Beyin, "uret_v2")
 
     def test_beyin_cagir_openai_uyumlu_v2_mevcut(self):
         from reymen.cereyan.beyin import Beyin
+
         assert hasattr(Beyin, "_cagir_openai_uyumlu_v2")
 
     def test_beyin_fc_destekleniyor_mevcut(self):
         from reymen.cereyan.beyin import Beyin
+
         assert hasattr(Beyin, "fc_destekleniyor")
 
     def test_beyin_fc_desteklenmeyen_instance_izole(self):
         """__init__ her instance için bağımsız set oluşturur."""
         from reymen.cereyan.beyin import Beyin
+
         b = Beyin.__new__(Beyin)
         b._fc_desteklenmeyen = set()
         assert isinstance(b._fc_desteklenmeyen, set)
@@ -525,13 +617,16 @@ class TestFcDizaynDogrulama:
     def test_orchestrator_fc_mod_attr(self):
         from reymen.sistem.main import AIAgentOrchestrator
         import inspect
+
         src = inspect.getsource(AIAgentOrchestrator._cekirdekleri_baslat)
         assert "_fc_mod" in src
 
     def test_main_json_import(self):
         import reymen.sistem.main as _m
+
         assert hasattr(_m, "_json"), "_json import edilmedi"
 
     def test_main_tpool_import(self):
         import reymen.sistem.main as _m
+
         assert hasattr(_m, "_TPool"), "_TPool import edilmedi"

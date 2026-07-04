@@ -37,7 +37,8 @@ def _handle_codex_runtime(cli, cmd_original: str) -> None:
 
     prefix = "✓" if result.success else "✗"
     for line in result.message.splitlines():
-        _cprint(f"  {prefix} {line}" if line.startswith("openai_runtime")
-                else f"    {line}")
+        _cprint(
+            f"  {prefix} {line}" if line.startswith("openai_runtime") else f"    {line}"
+        )
     if result.success and result.requires_new_session:
         _cprint("    Tip: `/reset` starts a new session immediately.")

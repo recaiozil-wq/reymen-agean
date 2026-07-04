@@ -7,6 +7,7 @@ try:
     # 1. Arama motorunu baslat (test icin gecici db)
     import tempfile
     import os
+
     gecici_db = os.path.join(tempfile.gettempdir(), "reymen_test_fts.db")
     searcher = SessionSearch(db_yolo=gecici_db)
 
@@ -30,8 +31,10 @@ try:
 
     # 5. Istatistik
     istatistik = searcher.istatistik()
-    print(f"\nIstatistik: {istatistik['toplam_mesaj']} mesaj, "
-          f"{istatistik['toplam_session']} session")
+    print(
+        f"\nIstatistik: {istatistik['toplam_mesaj']} mesaj, "
+        f"{istatistik['toplam_session']} session"
+    )
 
     # Temizlik (opsiyonel)
     os.remove(gecici_db)

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Tests for self_improvement.py — OzGelistirmeMotoru."""
+
 import json
 import os
 import sqlite3
@@ -21,6 +22,7 @@ import reymen.cereyan.self_improvement as real_mod
 # Init
 # ════════════════════════════════════════════════════════════════
 
+
 class TestInit:
     def test_varsayilan(self):
         m = OzGelistirmeMotoru()
@@ -35,6 +37,7 @@ class TestInit:
 # ════════════════════════════════════════════════════════════════
 # hata_analizi_yap
 # ════════════════════════════════════════════════════════════════
+
 
 class TestHataAnalizi:
     def test_db_yok(self, tmp_path):
@@ -69,9 +72,15 @@ class TestHataAnalizi:
         con = sqlite3.connect(str(db))
         con.execute("CREATE TABLE ajan_gunlugu (eylem TEXT, sonuc TEXT)")
         # LIKE pattern: '%[Hata]%' or '%Hatasi]%'
-        con.execute("INSERT INTO ajan_gunlugu VALUES ('KOMUT_CALISTIR(x)', 'Hatasi]: timeout')")
-        con.execute("INSERT INTO ajan_gunlugu VALUES ('KOMUT_CALISTIR(y)', 'Hatasi]: error2')")
-        con.execute("INSERT INTO ajan_gunlugu VALUES ('TARAYICI_AC()', '[Hata] acilmadi')")
+        con.execute(
+            "INSERT INTO ajan_gunlugu VALUES ('KOMUT_CALISTIR(x)', 'Hatasi]: timeout')"
+        )
+        con.execute(
+            "INSERT INTO ajan_gunlugu VALUES ('KOMUT_CALISTIR(y)', 'Hatasi]: error2')"
+        )
+        con.execute(
+            "INSERT INTO ajan_gunlugu VALUES ('TARAYICI_AC()', '[Hata] acilmadi')"
+        )
         con.execute("INSERT INTO ajan_gunlugu VALUES ('BASARILI()', 'OK tamam')")
         con.commit()
         con.close()
@@ -105,6 +114,7 @@ class TestHataAnalizi:
 # ════════════════════════════════════════════════════════════════
 # beceri_bosluk_analizi
 # ════════════════════════════════════════════════════════════════
+
 
 class TestBeceriBosluk:
     def test_db_yok(self, tmp_path):
@@ -159,6 +169,7 @@ class TestBeceriBosluk:
 # oneri_uret / _kural_tabanli_oneri
 # ════════════════════════════════════════════════════════════════
 
+
 class TestOneriUret:
     def test_kural_tabanli_komut_calistir(self):
         m = OzGelistirmeMotoru()
@@ -208,6 +219,7 @@ class TestOneriUret:
 # soul_guncelle
 # ════════════════════════════════════════════════════════════════
 
+
 class TestSoulGuncelle:
     def test_dosya_yok(self, tmp_path):
         m = OzGelistirmeMotoru()
@@ -233,6 +245,7 @@ class TestSoulGuncelle:
 # rapor_kaydet
 # ════════════════════════════════════════════════════════════════
 
+
 class TestRaporKaydet:
     def test_kaydet(self, tmp_path):
         rapor_yolu = tmp_path / ".ReYMeN" / "self_improvement.json"
@@ -249,6 +262,7 @@ class TestRaporKaydet:
 # calistir (entegrasyon)
 # ════════════════════════════════════════════════════════════════
 
+
 class TestCalistir:
     def test_calistir_basics(self, tmp_path):
         rapor_yolu = tmp_path / ".ReYMeN" / "self_improvement.json"
@@ -264,8 +278,9 @@ class TestCalistir:
         rapor_yolu = tmp_path / ".ReYMeN" / "self_improvement.json"
         fake_soul = tmp_path / "SOUL.md"
         m = OzGelistirmeMotoru()
-        with patch.object(real_mod, "ANALIZ_RAPOR", rapor_yolu), \
-             patch.object(real_mod, "SOUL_YOLU", fake_soul):
+        with patch.object(real_mod, "ANALIZ_RAPOR", rapor_yolu), patch.object(
+            real_mod, "SOUL_YOLU", fake_soul
+        ):
             r = m.calistir(uygula=True)
         # SOUL.md yok → soul_guncelle False doner ama calistir patlamaz
         assert "oneriler" in r
@@ -274,6 +289,7 @@ class TestCalistir:
 # ════════════════════════════════════════════════════════════════
 # Sabitler
 # ════════════════════════════════════════════════════════════════
+
 
 class TestSabitler:
     def test_analiz_rapor_path(self):

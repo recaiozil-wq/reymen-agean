@@ -38,8 +38,13 @@ except ImportError as e:
     VoiceEngine = None  # type: ignore
     VoiceRegistry = None  # type: ignore
     WhisperSTT = None  # type: ignore
-    seslendir = lambda text, voice="alloy", backend="": f"[Voice] Motor yuklenemedi: {text}"
-    yaziya_cevir = lambda ses_dosyasi, backend="whisper": f"[Voice] Motor yuklenemedi: {ses_dosyasi}"
+    seslendir = (
+        lambda text, voice="alloy", backend="": f"[Voice] Motor yuklenemedi: {text}"
+    )
+    yaziya_cevir = (
+        lambda ses_dosyasi,
+        backend="whisper": f"[Voice] Motor yuklenemedi: {ses_dosyasi}"
+    )
     voice_engine_listele = lambda: "[Voice] Motor yuklenemedi."
 
 

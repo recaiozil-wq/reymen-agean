@@ -61,6 +61,7 @@ _yazma_kilit = threading.Lock()
 #  Veri Modelleri
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 @dataclass
 class SkillMetadata:
     """Topluluk skill'inin metadata'si.
@@ -78,6 +79,7 @@ class SkillMetadata:
         kaynak: API kaynagi ("skills-sh")
         ham_veri: API'den gelen ham JSON (debug icin)
     """
+
     name: str = ""
     description: str = ""
     category: str = ""
@@ -94,6 +96,7 @@ class SkillMetadata:
 @dataclass
 class IndirmeSonucu:
     """Skill indirme sonucu."""
+
     basarili: bool = False
     name: str = ""
     hedef_yol: str = ""
@@ -105,8 +108,10 @@ class IndirmeSonucu:
 #  HTTP Yardimcilari
 # ═══════════════════════════════════════════════════════════════════════════════
 
-def _http_get(url: str, params: dict[str, Any] | None = None,
-              timeout: int = HTTP_TIMEOUT) -> dict[str, Any] | list[Any] | None:
+
+def _http_get(
+    url: str, params: dict[str, Any] | None = None, timeout: int = HTTP_TIMEOUT
+) -> dict[str, Any] | list[Any] | None:
     """Genel HTTP GET istegi.
 
     Args:
@@ -118,9 +123,7 @@ def _http_get(url: str, params: dict[str, Any] | None = None,
         JSON yaniti (dict veya list) veya None (hata durumunda)
     """
     if params:
-        qs = urllib.parse.urlencode(
-            {k: v for k, v in params.items() if v is not None}
-        )
+        qs = urllib.parse.urlencode({k: v for k, v in params.items() if v is not None})
         tam_url = f"{url}?{qs}"
     else:
         tam_url = url
@@ -182,6 +185,7 @@ def _indir_dosya(url: str, hedef: Path, timeout: int = HTTP_TIMEOUT) -> bool:
 # ═══════════════════════════════════════════════════════════════════════════════
 #  Veritabani Yonetimi
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 def _db_kur():
     """Skills Hub veritabanini olustur (varsa atla)."""
@@ -246,9 +250,10 @@ def _db_baglan() -> sqlite3.Connection:
 #  Skills.sh API Arayuzu
 # ═══════════════════════════════════════════════════════════════════════════════
 
-def _skills_sh_ara(sorgu: str = "", kategori: str = "",
-                   limit: int = VARSAYILAN_LIMIT,
-                   offset: int = 0) -> list[SkillMetadata]:
+
+def _skills_sh_ara(
+    sorgu: str = "", kategori: str = "", limit: int = VARSAYILAN_LIMIT, offset: int = 0
+) -> list[SkillMetadata]:
     """skills.sh API'sinde skill ara.
 
     API: GET /api/skills?query=...&category=...&limit=...&offset=...
@@ -281,7 +286,9 @@ def _skills_sh_ara(sorgu: str = "", kategori: str = "",
     if isinstance(yanit, list):
         ham_liste = yanit
     elif isinstance(yanit, dict):
-        ham_liste = yanit.get("skills") or yanit.get("data") or yanit.get("results") or []
+        ham_liste = (
+            yanit.get("skills") or yanit.get("data") or yanit.get("results") or []
+        )
 
     sonuclar: list[SkillMetadata] = []
     for ham in ham_liste:
@@ -326,10 +333,14 @@ def _skills_sh_nesne_coz(ham: dict[str, Any]) -> SkillMetadata | None:
     author = (ham.get("author") or ham.get("owner") or ham.get("creator") or "").strip()
 
     # Repo URL
-    repo_url = (ham.get("repo_url") or ham.get("repository") or ham.get("source") or "").strip()
+    repo_url = (
+        ham.get("repo_url") or ham.get("repository") or ham.get("source") or ""
+    ).strip()
 
     # Skill URL (SKILL.md'nin ham URL'si)
-    skill_url = (ham.get("skill_url") or ham.get("url") or ham.get("download_url") or "").strip()
+    skill_url = (
+        ham.get("skill_url") or ham.get("url") or ham.get("download_url") or ""
+    ).strip()
     # Eger dogrudan SKILL.md URL'si yoksa, repo URL'sinden turet
     if not skill_url and repo_url:
         if repo_url.endswith(".git"):
@@ -392,6 +403,7 @@ def _skills_sh_kategoriler() -> list[str]:
 #  Skills Hub Sinifi
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class SkillsHub:
     """Skills Hub — topluluk skill'lerini kesfetme, indirme ve yonetme.
 
@@ -414,15 +426,22 @@ class SkillsHub:
             skills_dizini: Skill'lerin kurulacagi dizin
                           (None = reymen/cereyan/skills/)
         """
-        self._skills_dizini = Path(skills_dizini) if skills_dizini else VARSAYILAN_SKILLS_DIZINI
+        self._skills_dizini = (
+            Path(skills_dizini) if skills_dizini else VARSAYILAN_SKILLS_DIZINI
+        )
         self._skills_dizini.mkdir(parents=True, exist_ok=True)
         _db_kur()
 
     # ── Arama ───────────────────────────────────────────────────────────
 
-    def ara(self, sorgu: str = "", kategori: str = "",
-            limit: int = VARSAYILAN_LIMIT, offset: int = 0,
-            kaynak: str = "skills-sh") -> list[SkillMetadata]:
+    def ara(
+        self,
+        sorgu: str = "",
+        kategori: str = "",
+        limit: int = VARSAYILAN_LIMIT,
+        offset: int = 0,
+        kaynak: str = "skills-sh",
+    ) -> list[SkillMetadata]:
         """Topluluk skill'lerinde ara.
 
         Birden fazla kaynagi destekler:
@@ -441,8 +460,10 @@ class SkillsHub:
         """
         if kaynak == "skills-sh":
             return _skills_sh_ara(
-                sorgu=sorgu, kategori=kategori,
-                limit=limit, offset=offset,
+                sorgu=sorgu,
+                kategori=kategori,
+                limit=limit,
+                offset=offset,
             )
         elif kaynak == "yerel":
             return self._yerel_ara(sorgu=sorgu, kategori=kategori, limit=limit)
@@ -457,7 +478,9 @@ class SkillsHub:
                 gorulen.add(m.name)
                 sonuclar.append(m)
 
-        uzak = _skills_sh_ara(sorgu=sorgu, kategori=kategori, limit=limit, offset=offset)
+        uzak = _skills_sh_ara(
+            sorgu=sorgu, kategori=kategori, limit=limit, offset=offset
+        )
         for m in uzak:
             if m.name not in gorulen and len(sonuclar) < limit:
                 gorulen.add(m.name)
@@ -465,8 +488,9 @@ class SkillsHub:
 
         return sonuclar[:limit]
 
-    def _yerel_ara(self, sorgu: str = "", kategori: str = "",
-                   limit: int = VARSAYILAN_LIMIT) -> list[SkillMetadata]:
+    def _yerel_ara(
+        self, sorgu: str = "", kategori: str = "", limit: int = VARSAYILAN_LIMIT
+    ) -> list[SkillMetadata]:
         """Yerel veritabaninda ara (indirilmis skill'ler)."""
         con = _db_baglan()
         try:
@@ -474,9 +498,7 @@ class SkillsHub:
             params: list[Any] = []
 
             if sorgu:
-                kosullar.append(
-                    "(name LIKE ? OR description LIKE ? OR tags LIKE ?)"
-                )
+                kosullar.append("(name LIKE ? OR description LIKE ? OR tags LIKE ?)")
                 like = f"%{sorgu}%"
                 params.extend([like, like, like])
 
@@ -498,18 +520,20 @@ class SkillsHub:
             sonuclar = []
             for r in rows:
                 tags = [t.strip() for t in (r["tags"] or "").split(",") if t.strip()]
-                sonuclar.append(SkillMetadata(
-                    name=r["name"],
-                    description=r["description"],
-                    category=r["category"],
-                    version=r["version"],
-                    author=r["author"],
-                    repo_url=r["repo_url"],
-                    skill_url=r["skill_url"],
-                    tags=tags,
-                    weekly_installs=r["weekly_installs"],
-                    kaynak=r["kaynak"],
-                ))
+                sonuclar.append(
+                    SkillMetadata(
+                        name=r["name"],
+                        description=r["description"],
+                        category=r["category"],
+                        version=r["version"],
+                        author=r["author"],
+                        repo_url=r["repo_url"],
+                        skill_url=r["skill_url"],
+                        tags=tags,
+                        weekly_installs=r["weekly_installs"],
+                        kaynak=r["kaynak"],
+                    )
+                )
             return sonuclar
         finally:
             con.close()
@@ -585,8 +609,9 @@ class SkillsHub:
 
     # ── Skill Indirme ───────────────────────────────────────────────────
 
-    def indir(self, name: str, kategori: str = "",
-              force: bool = False) -> IndirmeSonucu:
+    def indir(
+        self, name: str, kategori: str = "", force: bool = False
+    ) -> IndirmeSonucu:
         """Bir skill'i skills.sh'den indir ve kur.
 
         Indirme akisi:
@@ -628,7 +653,8 @@ class SkillsHub:
         # Zaten var mi kontrol et
         if hedef_dosya.exists() and not force:
             return IndirmeSonucu(
-                basarili=True, name=name,
+                basarili=True,
+                name=name,
                 hedef_yol=str(hedef_dosya),
                 kategori=hedef_kategori,
             )
@@ -641,7 +667,9 @@ class SkillsHub:
             # Daha basit: repo URL'sinden SKILL.md'yi bul
             if meta.repo_url and "github.com" in meta.repo_url:
                 # Raw GitHub URL'si olustur
-                raw_url = meta.repo_url.replace("github.com", "raw.githubusercontent.com")
+                raw_url = meta.repo_url.replace(
+                    "github.com", "raw.githubusercontent.com"
+                )
                 raw_url = raw_url.rstrip("/")
                 if raw_url.endswith(".git"):
                     raw_url = raw_url[:-4]
@@ -649,16 +677,17 @@ class SkillsHub:
 
         if not skill_url:
             return IndirmeSonucu(
-                basarili=False, name=name,
-                hata=f"Skill URL'si bulunamadi: {name}"
+                basarili=False, name=name, hata=f"Skill URL'si bulunamadi: {name}"
             )
 
         # Indir
         basari = _indir_dosya(skill_url, hedef_dosya)
         if not basari:
             return IndirmeSonucu(
-                basarili=False, name=name, kategori=hedef_kategori,
-                hata=f"Indirme basarisiz: {skill_url}"
+                basarili=False,
+                name=name,
+                kategori=hedef_kategori,
+                hata=f"Indirme basarisiz: {skill_url}",
             )
 
         # Veritabanina kaydet
@@ -666,13 +695,13 @@ class SkillsHub:
 
         logger.info("Skill basariyla indirildi: %s -> %s", name, hedef_dosya)
         return IndirmeSonucu(
-            basarili=True, name=name,
+            basarili=True,
+            name=name,
             hedef_yol=str(hedef_dosya),
             kategori=hedef_kategori,
         )
 
-    def _indirme_kaydet(self, meta: SkillMetadata, kategori: str,
-                        hedef_yol: str):
+    def _indirme_kaydet(self, meta: SkillMetadata, kategori: str, hedef_yol: str):
         """Indirilen skill'i veritabanina kaydet."""
         tags_str = ", ".join(meta.tags)
         simdi = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
@@ -688,11 +717,20 @@ class SkillsHub:
                         indirildi, indirilme_tarihi, hedef_yol, son_guncelleme, ham_json)
                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?)""",
                     (
-                        meta.name, meta.description[:500], kategori,
-                        meta.version, meta.author,
-                        meta.repo_url, meta.skill_url,
-                        tags_str, meta.weekly_installs, meta.kaynak,
-                        simdi, hedef_yol, simdi, ham_json,
+                        meta.name,
+                        meta.description[:500],
+                        kategori,
+                        meta.version,
+                        meta.author,
+                        meta.repo_url,
+                        meta.skill_url,
+                        tags_str,
+                        meta.weekly_installs,
+                        meta.kaynak,
+                        simdi,
+                        hedef_yol,
+                        simdi,
+                        ham_json,
                     ),
                 )
                 con.commit()
@@ -704,8 +742,9 @@ class SkillsHub:
 
     # ── Toplu Indirme / Guncelleme ──────────────────────────────────────
 
-    def haftalik_guncelleme(self, kategori: str = "",
-                            max_indir: int = 10) -> dict[str, Any]:
+    def haftalik_guncelleme(
+        self, kategori: str = "", max_indir: int = 10
+    ) -> dict[str, Any]:
         """Haftalik skills hub guncellemesi (cron icin).
 
         Akis:
@@ -727,16 +766,19 @@ class SkillsHub:
             }
         """
         baslama = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
-        logger.info("Skills Hub haftalik guncelleme basladi (kategori=%s, max=%d)",
-                     kategori or "(tumu)", max_indir)
+        logger.info(
+            "Skills Hub haftalik guncelleme basladi (kategori=%s, max=%d)",
+            kategori or "(tumu)",
+            max_indir,
+        )
 
         # skills.sh'den skill'leri getir
-        uzak_skills = _skills_sh_ara(sorgu="", kategori=kategori,
-                                      limit=max_indir * 3, offset=0)
+        uzak_skills = _skills_sh_ara(
+            sorgu="", kategori=kategori, limit=max_indir * 3, offset=0
+        )
         if not uzak_skills:
             logger.warning("skills.sh'den skill alinamadi, guncelleme atlandi.")
-            self._sync_log_kaydet(baslama, durum="hata",
-                                   mesaj="API yanit vermedi")
+            self._sync_log_kaydet(baslama, durum="hata", mesaj="API yanit vermedi")
             return {"yeni": 0, "guncellenen": 0, "hata": 1, "toplam": 0}
 
         yeni = 0
@@ -747,7 +789,8 @@ class SkillsHub:
         con = _db_baglan()
         try:
             indirilmis = set(
-                r["name"] for r in con.execute(
+                r["name"]
+                for r in con.execute(
                     "SELECT name FROM hub_skills WHERE indirildi = 1"
                 ).fetchall()
             )
@@ -767,8 +810,9 @@ class SkillsHub:
                         yeni += 1
                     else:
                         hata_say += 1
-                        logger.warning("Indirme basarisiz [%s]: %s",
-                                        skill.name, sonuc.hata)
+                        logger.warning(
+                            "Indirme basarisiz [%s]: %s", skill.name, sonuc.hata
+                        )
             except Exception as e:
                 hata_say += 1
                 logger.warning("Guncelleme hatasi [%s]: %s", skill.name, e)
@@ -776,13 +820,19 @@ class SkillsHub:
         # Sync log'una kaydet
         durum = "tamam" if hata_say == 0 else "kismi"
         self._sync_log_kaydet(
-            baslama, durum=durum,
-            yeni=yeni, hata=hata_say,
+            baslama,
+            durum=durum,
+            yeni=yeni,
+            hata=hata_say,
             mesaj=f"{yeni} yeni, {guncellenen} guncel, {hata_say} hata",
         )
 
-        logger.info("Skills Hub guncelleme tamam: %d yeni, %d guncel, %d hata",
-                     yeni, guncellenen, hata_say)
+        logger.info(
+            "Skills Hub guncelleme tamam: %d yeni, %d guncel, %d hata",
+            yeni,
+            guncellenen,
+            hata_say,
+        )
         return {
             "yeni": yeni,
             "guncellenen": guncellenen,
@@ -826,9 +876,14 @@ class SkillsHub:
             finally:
                 con.close()
 
-    def _sync_log_kaydet(self, baslama: str, durum: str = "tamam",
-                         yeni: int = 0, hata: int = 0,
-                         mesaj: str = ""):
+    def _sync_log_kaydet(
+        self,
+        baslama: str,
+        durum: str = "tamam",
+        yeni: int = 0,
+        hata: int = 0,
+        mesaj: str = "",
+    ):
         """Sync log'una kayit ekle."""
         bitis = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
         with _yazma_kilit:
@@ -888,8 +943,7 @@ class SkillsHub:
             "skills_dizini": str(self._skills_dizini),
         }
 
-    def indirilenler(self, kategori: str = "",
-                     limit: int = 50) -> list[dict[str, Any]]:
+    def indirilenler(self, kategori: str = "", limit: int = 50) -> list[dict[str, Any]]:
         """Indirilen skill'lerin listesi.
 
         Args:
@@ -943,8 +997,8 @@ class SkillsHub:
 #  Cron / CLI Yardimcilari
 # ═══════════════════════════════════════════════════════════════════════════════
 
-def cron_haftalik_guncelleme(kategori: str = "",
-                             max_indir: int = 10) -> dict[str, Any]:
+
+def cron_haftalik_guncelleme(kategori: str = "", max_indir: int = 10) -> dict[str, Any]:
     """Haftalik Skills Hub guncellemesi — cron job'u icin dogrudan cagri.
 
     Ornek cron tanimi (haftada bir, Pazartesi 03:00):
@@ -1046,12 +1100,16 @@ if __name__ == "__main__":
 
         else:
             print(f"Bilinmeyen komut: {komut}")
-            print("Kullanilabilir: ara, indir, kategoriler, guncelle, durum, indirilenler")
+            print(
+                "Kullanilabilir: ara, indir, kategoriler, guncelle, durum, indirilenler"
+            )
 
     else:
         # Varsayilan: durum goster
         d = hub.durum()
         print(f"\n=== Skills Hub ===")
-        print(f"  Durum: {d['toplam_skill']} skill kayitli, {d['indirilen']} indirilmis")
+        print(
+            f"  Durum: {d['toplam_skill']} skill kayitli, {d['indirilen']} indirilmis"
+        )
         print(f"  Kullanim: python skills_hub.py <komut>")
         print(f"  Komutlar: ara, indir, kategoriler, guncelle, durum, indirilenler\n")

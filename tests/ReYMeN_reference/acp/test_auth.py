@@ -29,7 +29,9 @@ class TestHasProvider:
         def _boom():
             raise RuntimeError("no provider")
 
-        monkeypatch.setattr("ReYMeN_cli.runtime_provider.resolve_runtime_provider", _boom)
+        monkeypatch.setattr(
+            "ReYMeN_cli.runtime_provider.resolve_runtime_provider", _boom
+        )
         assert has_provider("terminal_setup") is True
 
 
@@ -52,6 +54,7 @@ class TestBuildAuthMethods:
         methods = build_auth_methods(None)
         assert len(methods) == 1
         from acp_adapter.auth import ACPAuth
+
         assert isinstance(methods[0], ACPAuth)
 
     def test_build_auth_methods_with_token(self):

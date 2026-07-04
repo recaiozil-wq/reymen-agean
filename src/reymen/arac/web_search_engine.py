@@ -38,6 +38,7 @@ from typing import Optional
 
 import yaml
 import logging
+
 logger = logging.getLogger(__name__)
 
 log = logging.getLogger(__name__)
@@ -47,25 +48,25 @@ _UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
 _HEADERS = {"User-Agent": _UA}
 
 
-def _http_get(url: str, params: dict = None, headers: dict = None,
-              timeout: int = 15) -> str:
+def _http_get(
+    url: str, params: dict = None, headers: dict = None, timeout: int = 15
+) -> str:
     if params:
         url = url + "?" + urllib.parse.urlencode(params)
-    req = urllib.request.Request(
-        url, headers={**_HEADERS, **(headers or {})}
-    )
+    req = urllib.request.Request(url, headers={**_HEADERS, **(headers or {})})
     with urllib.request.urlopen(req, timeout=timeout) as r:
         charset = r.headers.get_content_charset("utf-8") or "utf-8"
         return r.read().decode(charset, errors="replace")
 
 
-def _http_post_json(url: str, data: dict, headers: dict = None,
-                    timeout: int = 20) -> str:
+def _http_post_json(
+    url: str, data: dict, headers: dict = None, timeout: int = 20
+) -> str:
     body = json.dumps(data).encode()
     req = urllib.request.Request(
-        url, data=body,
-        headers={**_HEADERS, "Content-Type": "application/json",
-                 **(headers or {})}
+        url,
+        data=body,
+        headers={**_HEADERS, "Content-Type": "application/json", **(headers or {})},
     )
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return r.read().decode("utf-8", errors="replace")
@@ -74,6 +75,7 @@ def _http_post_json(url: str, data: dict, headers: dict = None,
 # ═══════════════════════════════════════════════════════════════════════════════
 # Soyut Taban Sınıfı
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class WebSearchEngine(ABC):
     """Tüm web arama engine'leri için soyut taban sınıfı."""
@@ -126,6 +128,7 @@ class WebSearchEngine(ABC):
 # DuckDuckGo Engine
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class DuckDuckGoEngine(WebSearchEngine):
     """DuckDuckGo arama engine'i. API key gerekmez.
 
@@ -154,7 +157,11 @@ class DuckDuckGoEngine(WebSearchEngine):
                 ddgs.close()
             if results:
                 return [
-                    {"href": r.get("href", ""), "title": r.get("title", ""), "body": r.get("body", "")}
+                    {
+                        "href": r.get("href", ""),
+                        "title": r.get("title", ""),
+                        "body": r.get("body", ""),
+                    }
                     for r in results
                 ]
         except Exception as e:
@@ -174,7 +181,9 @@ class DuckDuckGoEngine(WebSearchEngine):
                 ad = dict(attrs)
                 if tag == "a" and "href" in ad:
                     href = ad["href"]
-                    if href.startswith("http") and not any(d in href for d in self._skip_domains):
+                    if href.startswith("http") and not any(
+                        d in href for d in self._skip_domains
+                    ):
                         self._in_link = True
                         self._current = {"href": href, "title": "", "body": ""}
 
@@ -183,7 +192,11 @@ class DuckDuckGoEngine(WebSearchEngine):
                     self._current["title"] += data.strip()
 
             def handle_endtag(self, tag):
-                if tag == "a" and self._current is not None and self._current.get("title", "").strip():
+                if (
+                    tag == "a"
+                    and self._current is not None
+                    and self._current.get("title", "").strip()
+                ):
                     self.results.append(self._current)
                     self._current = None
                     self._in_link = False
@@ -228,6 +241,7 @@ class DuckDuckGoEngine(WebSearchEngine):
 # Google Engine (Stub)
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class GoogleEngine(WebSearchEngine):
     """Google Custom Search JSON API stub.
 
@@ -261,6 +275,7 @@ class GoogleEngine(WebSearchEngine):
 # Bing Engine (Stub)
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class BingEngine(WebSearchEngine):
     """Bing Web Search API stub.
 
@@ -291,6 +306,7 @@ class BingEngine(WebSearchEngine):
 # Firecrawl Engine
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class FirecrawlEngine(WebSearchEngine):
     """Firecrawl API ile web araması. FIRECRAWL_API_KEY gerekli.
 
@@ -314,7 +330,8 @@ class FirecrawlEngine(WebSearchEngine):
             url = "https://api.firecrawl.dev/v1/search"
             data = {"query": sorgu, "limit": max_sonuc, "lang": "tr"}
             result_text = _http_post_json(
-                url, data,
+                url,
+                data,
                 headers={"Authorization": f"Bearer {api_key}"},
                 timeout=20,
             )
@@ -326,7 +343,9 @@ class FirecrawlEngine(WebSearchEngine):
                     {
                         "title": r.get("title", ""),
                         "url": r.get("url", ""),
-                        "body": (r.get("description", "") or r.get("content", "") or "")[:300],
+                        "body": (
+                            r.get("description", "") or r.get("content", "") or ""
+                        )[:300],
                     }
                     for r in raw_results[:max_sonuc]
                 ]
@@ -351,6 +370,7 @@ class FirecrawlEngine(WebSearchEngine):
 # ═══════════════════════════════════════════════════════════════════════════════
 # Brave Search Engine
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class BraveSearchEngine(WebSearchEngine):
     """Brave Search API ile web araması. BRAVE_API_KEY gerekli.
@@ -415,6 +435,7 @@ class BraveSearchEngine(WebSearchEngine):
 # SearXNG Engine
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class SearXNGEngine(WebSearchEngine):
     """SearXNG (kendi instance) ile web araması. SEARXNG_URL gerekli.
 
@@ -462,7 +483,9 @@ class SearXNGEngine(WebSearchEngine):
                 result_text = _http_get(
                     f"{url}/search",
                     params={"q": sorgu, "format": "json", "pageno": 1},
-                    headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"},
+                    headers={
+                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+                    },
                 )
                 veri = json.loads(result_text)
                 raw_results = veri.get("results", [])
@@ -490,6 +513,7 @@ class SearXNGEngine(WebSearchEngine):
 # ═══════════════════════════════════════════════════════════════════════════════
 # Exa Engine
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class ExaEngine(WebSearchEngine):
     """Exa API ile web araması. EXA_API_KEY gerekli.
@@ -550,6 +574,7 @@ class ExaEngine(WebSearchEngine):
 # ═══════════════════════════════════════════════════════════════════════════════
 # SearchDispatcher — Tek Dispatcher (multi-backend ABC wrapper)
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class SearchDispatcher:
     """Multi-backend web arama dispatcher'ı.
@@ -641,7 +666,11 @@ class SearchDispatcher:
         """Ada göre engine seç. Varsayılana düş."""
         eng = self._engines.get(ad)
         if eng is None and self._varsayilan:
-            log.warning("[SearchDispatcher] '%s' bulunamadi, varsayilana dusuluyor: %s", ad, self._varsayilan)
+            log.warning(
+                "[SearchDispatcher] '%s' bulunamadi, varsayilana dusuluyor: %s",
+                ad,
+                self._varsayilan,
+            )
             return self._engines.get(self._varsayilan)
         return eng
 
@@ -675,7 +704,9 @@ class SearchDispatcher:
             adi = engine
 
         if eng is None:
-            return f"[WEB_ARAMA] '{engine}' engine'i bulunamadi ve varsayilan engine yok."
+            return (
+                f"[WEB_ARAMA] '{engine}' engine'i bulunamadi ve varsayilan engine yok."
+            )
 
         if not eng.hazir:
             return f"[WEB_ARAMA] '{adi}' engine'i hazir degil (bagimlilik eksik)."
@@ -707,8 +738,10 @@ class SearchDispatcher:
 # WebSearchRegistry — Eski isim, geriye uyumluluk alias'ı
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class WebSearchRegistry(SearchDispatcher):
     """Geriye uyumluluk için eski isim. Yeni kod SearchDispatcher kullanmalı."""
+
     pass
 
 
@@ -728,6 +761,7 @@ def _load_config_for_registry() -> dict:
     # 1. CLI config
     try:
         from reymen_cli.config import load_config
+
         cfg = load_config() or {}
         if cfg.get("web"):
             return cfg
@@ -737,6 +771,7 @@ def _load_config_for_registry() -> dict:
         )
     try:
         from ReYMeN_cli.config import load_config
+
         cfg = load_config() or {}
         if cfg.get("web"):
             return cfg
@@ -747,6 +782,7 @@ def _load_config_for_registry() -> dict:
 
     # 2. Proje kökü config.yaml
     import yaml
+
     for cfg_yolu in [
         os.path.join(os.path.dirname(__file__), "..", "..", "config.yaml"),
         os.path.join(os.path.dirname(__file__), "..", "..", "config.yml"),
@@ -763,7 +799,9 @@ def _load_config_for_registry() -> dict:
 
     # 3. .ReYMeN/config.yaml
     try:
-        dot_reymen = os.path.join(os.path.dirname(__file__), "..", "..", ".ReYMeN", "config.yaml")
+        dot_reymen = os.path.join(
+            os.path.dirname(__file__), "..", "..", ".ReYMeN", "config.yaml"
+        )
         with open(os.path.abspath(dot_reymen)) as f:
             cfg = yaml.safe_load(f) or {}
             return cfg
@@ -800,6 +838,7 @@ def reset_registry() -> None:
 # Tool Fonksiyonu
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 def web_arama(sorgu: str, backend: str = "duckduckgo", max_sonuc: int = 5) -> str:
     """WEB_ARAMA tool'u — backend parametresi ile çoklu arama motoru.
 
@@ -827,6 +866,7 @@ def web_search_engine_listele() -> str:
 # Motor Kayit
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 def motor_kaydet(motor) -> None:
     """Motor tarafindan otomatik cagrilir. WEB_ARAMA tool'unu kaydeder."""
     if not hasattr(motor, "_plugin_arac_kaydet"):
@@ -839,7 +879,7 @@ def motor_kaydet(motor) -> None:
                 _web_arama_ayristir_ve_calistir(ham)
             ),
             "Web aramasi yapar (coklu back-end)."
-            " Kullanim: WEB_ARAMA(sorgu=\"...\", backend=\"duckduckgo|google|bing|firecrawl|brave|searxng|exa|auto\")\n"
+            ' Kullanim: WEB_ARAMA(sorgu="...", backend="duckduckgo|google|bing|firecrawl|brave|searxng|exa|auto")\n'
             "Varsayilan backend: auto-detect (config veya env var'larina gore en iyisi).\n"
             "DuckDuckGo API key gerekmez. Firecrawl icin FIRECRAWL_API_KEY, Brave icin BRAVE_API_KEY,\n"
             "SearXNG icin SEARXNG_URL, Exa icin EXA_API_KEY gerekli.",
@@ -856,6 +896,7 @@ def motor_kaydet(motor) -> None:
 def _web_arama_ayristir_ve_calistir(ham: str) -> str:
     """WEB_ARAMA(ham) -> sorgu, backend ayristir."""
     import re as _re
+
     # Pattern: WEB_ARAMA(sorgu="...", backend="...")
     sorgu = ""
     backend = "auto"
@@ -877,6 +918,7 @@ def _web_arama_ayristir_ve_calistir(ham: str) -> str:
 
 if __name__ == "__main__":
     import sys
+
     print(web_search_engine_listele())
     sorgu = " ".join(sys.argv[1:]) if len(sys.argv) > 1 else "python asyncio nedir"
     print("\n--- DuckDuckGo ---")

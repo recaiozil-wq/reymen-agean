@@ -41,12 +41,14 @@ _BASARI_ESIĞI = 0.4  # Başarı puanı eşiği (0.0-1.0)
 # ── LLM Sağlayıcı ─────────────────────────────────────────
 try:
     from reymen.cereyan.beyin import Beyin as _Beyin
+
     _LLM_HAZIR = True
 except ImportError:
     _LLM_HAZIR = False
 
 try:
     from reymen.arac.skill_utils import skill_olustur, skill_index_yenile
+
     _SKILL_UTILS_HAZIR = True
 except ImportError:
     _SKILL_UTILS_HAZIR = False
@@ -76,9 +78,9 @@ def _mesajlari_ozetle(messages: List[Dict[str, Any]]) -> str:
 def _skill_adi_ureti(ozet: str, konu: str = "") -> str:
     """Konuşma özetinden skill adı üret."""
     ad = (konu or ozet)[:60].lower()
-    ad = re.sub(r'[^a-z0-9\s-]', '', ad)
-    ad = re.sub(r'\s+', '-', ad.strip())
-    ad = re.sub(r'-+', '-', ad)
+    ad = re.sub(r"[^a-z0-9\s-]", "", ad)
+    ad = re.sub(r"\s+", "-", ad.strip())
+    ad = re.sub(r"-+", "-", ad)
     return ad[:50] or f"konusma_skill_{int(time.time())}"
 
 
@@ -103,7 +105,9 @@ def _beceri_puani_hesapla(messages: List[Dict]) -> float:
 
     # Kriter 2: Kullanıcı mesajı yeterince uzun mu?
     kullanici_mesajlari = [m for m in messages if m.get("role") == "user"]
-    uzun_mesaj = sum(1 for m in kullanici_mesajlari if len(str(m.get("content", ""))) > 100)
+    uzun_mesaj = sum(
+        1 for m in kullanici_mesajlari if len(str(m.get("content", ""))) > 100
+    )
     if uzun_mesaj > 0:
         puan += 0.2
 
@@ -121,7 +125,11 @@ def _beceri_puani_hesapla(messages: List[Dict]) -> float:
             uzun_yanit += 1
         elif isinstance(icerik, list):
             for p in icerik:
-                if isinstance(p, dict) and p.get("type") == "text" and len(p.get("text", "")) > 200:
+                if (
+                    isinstance(p, dict)
+                    and p.get("type") == "text"
+                    and len(p.get("text", "")) > 200
+                ):
                     uzun_yanit += 1
     if uzun_yanit > 0:
         puan += 0.3
@@ -165,7 +173,7 @@ Kurallar:
             return None
 
         # JSON çıktısını ayıkla
-        json_match = re.search(r'\{.*\}', yanit, re.DOTALL)
+        json_match = re.search(r"\{.*\}", yanit, re.DOTALL)
         if not json_match:
             return None
 
@@ -219,7 +227,9 @@ def konusmadan_skill_cikar(
 
     guven = skill_data.get("guven_skoru", 0.0)
     if guven < 0.3 and not zorla:
-        return f"[KonusmadanSkill] LLM guven skoru dusuk ({guven:.2f}), skill cikarilmadi"
+        return (
+            f"[KonusmadanSkill] LLM guven skoru dusuk ({guven:.2f}), skill cikarilmadi"
+        )
 
     ad = skill_data.get("ad", _skill_adi_ureti(ozet, konu))
     baslik = skill_data.get("baslik", ad)
@@ -268,7 +278,12 @@ created_at: {datetime.now().strftime("%Y-%m-%d %H:%M")}
 
         skill_index_yenile(zorla=True)
 
-        logger.info("[KonusmadanSkill] ✅ Skill olusturuldu: %s (guven=%.2f) -> %s", ad, guven, hedef_dosya)
+        logger.info(
+            "[KonusmadanSkill] ✅ Skill olusturuldu: %s (guven=%.2f) -> %s",
+            ad,
+            guven,
+            hedef_dosya,
+        )
         return f"[KonusmadanSkill] ✅ '{ad}' skill'i olusturuldu (guven: {guven:.0%})"
 
     except Exception as e:
@@ -322,7 +337,9 @@ Bu skill otomatik olarak bir konuşmadan çıkarılmıştır.
         hedef_dosya.write_text(skill_md, encoding="utf-8")
 
         skill_index_yenile(zorla=True)
-        logger.info("[KonusmadanSkill] ✅ Basit skill olusturuldu: %s -> %s", ad, hedef_dosya)
+        logger.info(
+            "[KonusmadanSkill] ✅ Basit skill olusturuldu: %s -> %s", ad, hedef_dosya
+        )
         return f"[KonusmadanSkill] ✅ '{ad}' basit skill olusturuldu ({hedef_dosya})"
     except Exception as e:
         logger.error("[KonusmadanSkill] Basit kayit hatasi: %s", e)
@@ -337,7 +354,7 @@ def motor_kaydet(motor: object) -> None:
             "KONUSMADAN_SKILL",
             konusmadan_skill_cikar,
             "Konusma gecmisinden skill cikar ve kaydet. "
-            "Parametre: messages=[...], basari=True/False, zorla=True/False, konu='...'"
+            "Parametre: messages=[...], basari=True/False, zorla=True/False, konu='...'",
         )
         logger.info("[KonusmadanSkill] Motor'a kaydedildi")
     except Exception as e:

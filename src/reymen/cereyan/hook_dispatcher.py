@@ -27,16 +27,18 @@ log = logging.getLogger("conversation_loop")
 _HOOK_KAYDI: Dict[str, List[Callable]] = {}
 
 # Desteklenen olay adları
-GECERLI_OLAYLAR = frozenset({
-    "on_session_start",
-    "on_session_end",
-    "on_turn_start",
-    "on_turn_end",
-    "on_tool_call",
-    "on_tool_result",
-    "on_error",
-    "on_context_compress",
-})
+GECERLI_OLAYLAR = frozenset(
+    {
+        "on_session_start",
+        "on_session_end",
+        "on_turn_start",
+        "on_turn_end",
+        "on_tool_call",
+        "on_tool_result",
+        "on_error",
+        "on_context_compress",
+    }
+)
 
 
 def hook_kaydet(olay: str, callback: Callable) -> None:
@@ -50,12 +52,18 @@ def hook_kaydet(olay: str, callback: Callable) -> None:
         ValueError: Bilinmeyen olay adı.
     """
     if olay not in GECERLI_OLAYLAR:
-        raise ValueError(f"Bilinmeyen hook olayı: {olay!r}. Geçerliler: {sorted(GECERLI_OLAYLAR)}")
+        raise ValueError(
+            f"Bilinmeyen hook olayı: {olay!r}. Geçerliler: {sorted(GECERLI_OLAYLAR)}"
+        )
     if olay not in _HOOK_KAYDI:
         _HOOK_KAYDI[olay] = []
     if callback not in _HOOK_KAYDI[olay]:
         _HOOK_KAYDI[olay].append(callback)
-        log.debug("Hook kayıt: olay=%s callback=%s", olay, getattr(callback, "__name__", repr(callback)))
+        log.debug(
+            "Hook kayıt: olay=%s callback=%s",
+            olay,
+            getattr(callback, "__name__", repr(callback)),
+        )
 
 
 def hook_kaldir(olay: str, callback: Callable) -> bool:
@@ -123,6 +131,7 @@ def kayitli_hooklar() -> Dict[str, List[str]]:
 
 # ── Decorator tabanlı kayıt ──────────────────────────────────────────────────
 
+
 def hook(olay: str) -> Callable:
     """Hook kaydı için decorator.
 
@@ -132,13 +141,16 @@ def hook(olay: str) -> Callable:
         def oturum_basladi(session_id: str, **kwargs):
             print(f"Oturum başladı: {session_id}")
     """
+
     def _decorator(fn: Callable) -> Callable:
         hook_kaydet(olay, fn)
         return fn
+
     return _decorator
 
 
 # ── Sık kullanılan olay ateşleyicileri ──────────────────────────────────────
+
 
 def oturum_baslat_tetikle(session_id: str, agent_adi: str = "", **kw) -> None:
     hook_cagir("on_session_start", session_id=session_id, agent_adi=agent_adi, **kw)
@@ -169,4 +181,9 @@ def hata_tetikle(hata: Exception, olay_baglami: str = "", **kw) -> None:
 
 
 def context_sikistirma_tetikle(mesaj_sayisi: int, token_tahmini: int = 0, **kw) -> None:
-    hook_cagir("on_context_compress", mesaj_sayisi=mesaj_sayisi, token_tahmini=token_tahmini, **kw)
+    hook_cagir(
+        "on_context_compress",
+        mesaj_sayisi=mesaj_sayisi,
+        token_tahmini=token_tahmini,
+        **kw,
+    )

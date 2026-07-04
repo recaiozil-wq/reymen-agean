@@ -18,6 +18,7 @@ import pytest
 # Fixture: main.py'yi sessizce import et, tum bagimli siniflari mock'la
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture
 def fresh_main():
     """main.py'yi sessizce import et, mock'lamaya hazirla."""
@@ -33,9 +34,15 @@ def fresh_main():
 
     # Ana siniflari MagicMock ile degistir
     for _name in [
-        "RuntimeProvider", "ContextCompressor", "BoundedMemory",
-        "ClosedLearningLoop", "PromptAssemblyEngine", "AdvancedSessionStorage",
-        "Motor", "Planlayici", "InsanArayuzu",
+        "RuntimeProvider",
+        "ContextCompressor",
+        "BoundedMemory",
+        "ClosedLearningLoop",
+        "PromptAssemblyEngine",
+        "AdvancedSessionStorage",
+        "Motor",
+        "Planlayici",
+        "InsanArayuzu",
     ]:
         setattr(m, _name, MagicMock(name=_name))
 
@@ -45,17 +52,36 @@ def fresh_main():
 
     # Opsiyonel modulleri kapat
     for _attr in [
-        "IterationBudget", "PromptBuilder", "Trajectory",
-        "_GUARDRAILS_VAR", "HITLSikistirici", "motor_hitl_yamas_uygula",
-        "HallucinationFiltresi", "ConversationCompressor",
-        "cache_ile_uret", "_sem_cache", "AdaptifOgrenme",
+        "IterationBudget",
+        "PromptBuilder",
+        "Trajectory",
+        "_GUARDRAILS_VAR",
+        "HITLSikistirici",
+        "motor_hitl_yamas_uygula",
+        "HallucinationFiltresi",
+        "ConversationCompressor",
+        "cache_ile_uret",
+        "_sem_cache",
+        "AdaptifOgrenme",
         "adaptif_ogrenme_sistemi_kur",
-        "_BeceriKutuphanesi", "_AjanSurusu", "_OzYansima",
-        "_ReflexionMotoru", "_AnayasaDenetci", "_OzTutarlilikDenetci",
-        "_MetaPromptOptimizer", "_cred_pool",
-        "_REYMEN_CLI", "_GATEWAY", "_PLUGINS", "_CRON",
-        "_TUI_GATEWAY", "_ACP_ADAPTER", "_LLM_PROVIDER",
-        "_NOTION_WRITER", "_TELEGRAM_BOT", "_DASHBOARD",
+        "_BeceriKutuphanesi",
+        "_AjanSurusu",
+        "_OzYansima",
+        "_ReflexionMotoru",
+        "_AnayasaDenetci",
+        "_OzTutarlilikDenetci",
+        "_MetaPromptOptimizer",
+        "_cred_pool",
+        "_REYMEN_CLI",
+        "_GATEWAY",
+        "_PLUGINS",
+        "_CRON",
+        "_TUI_GATEWAY",
+        "_ACP_ADAPTER",
+        "_LLM_PROVIDER",
+        "_NOTION_WRITER",
+        "_TELEGRAM_BOT",
+        "_DASHBOARD",
     ]:
         setattr(m, _attr, None)
 
@@ -69,14 +95,17 @@ def agent(fresh_main):
     m = fresh_main
 
     m.Motor.return_value = MagicMock(
-        _plugin_arac_kaydet=MagicMock(), hook_kaydet=MagicMock(),
+        _plugin_arac_kaydet=MagicMock(),
+        hook_kaydet=MagicMock(),
         onay_fonksiyonu=None,
         eylemi_ayristir=MagicMock(return_value=("GOREV_BITTI", '"bitti"')),
         calistir=MagicMock(return_value="[Basarili]"),
     )
     m.Planlayici.return_value = MagicMock(
-        plani_uret=MagicMock(return_value=[]), sifirla=MagicMock(),
-        tamamlanan_adim_isaretle=MagicMock(), riskli_mi=MagicMock(return_value=False),
+        plani_uret=MagicMock(return_value=[]),
+        sifirla=MagicMock(),
+        tamamlanan_adim_isaretle=MagicMock(),
+        riskli_mi=MagicMock(return_value=False),
     )
     m.RuntimeProvider.return_value = MagicMock(
         uret=MagicMock(return_value='GOREV_BITTI("bitti")')
@@ -110,16 +139,21 @@ def agent(fresh_main):
 # TEST 1-20
 # =========================================================================
 
+
 def test_01_init_parametreler(fresh_main):
     """1. __init__ — parametreler dogru set ediliyor."""
     m = fresh_main
     m.Motor.return_value = MagicMock(
-        _plugin_arac_kaydet=MagicMock(), hook_kaydet=MagicMock(), onay_fonksiyonu=None,
+        _plugin_arac_kaydet=MagicMock(),
+        hook_kaydet=MagicMock(),
+        onay_fonksiyonu=None,
     )
     m.Planlayici.return_value = MagicMock()
     m.RuntimeProvider.return_value = MagicMock()
 
-    a = m.AIAgentOrchestrator(config={"x": 1}, backend_mode="remote", max_tur=10, onay_iste=True)
+    a = m.AIAgentOrchestrator(
+        config={"x": 1}, backend_mode="remote", max_tur=10, onay_iste=True
+    )
     assert a.config == {"x": 1}
     assert a.backend_mode == "remote"
     assert a.max_tur == 10
@@ -130,7 +164,9 @@ def test_02_cekirdekleri_baslat(fresh_main):
     """2. _cekirdekleri_baslat — Motor ve Planlayici olusuyor."""
     m = fresh_main
     m.Motor.return_value = MagicMock(
-        _plugin_arac_kaydet=MagicMock(), hook_kaydet=MagicMock(), onay_fonksiyonu=None,
+        _plugin_arac_kaydet=MagicMock(),
+        hook_kaydet=MagicMock(),
+        onay_fonksiyonu=None,
     )
     m.Planlayici.return_value = MagicMock()
     m.RuntimeProvider.return_value = MagicMock()
@@ -156,13 +192,17 @@ def test_03_giris_temizle_strip(fresh_main):
     """
     m = fresh_main
     m.Motor.return_value = MagicMock(
-        _plugin_arac_kaydet=MagicMock(), hook_kaydet=MagicMock(), onay_fonksiyonu=None,
+        _plugin_arac_kaydet=MagicMock(),
+        hook_kaydet=MagicMock(),
+        onay_fonksiyonu=None,
     )
     m.Planlayici.return_value = MagicMock()
     m.RuntimeProvider.return_value = MagicMock()
 
     a = m.AIAgentOrchestrator(max_tur=5)
-    a.guvenlik = None; a.mem_guvenlik = None; a.referanslar = None
+    a.guvenlik = None
+    a.mem_guvenlik = None
+    a.referanslar = None
     # Gercek modulu bulmasin diye monkeypatch
     with patch.dict(sys.modules, {"message_sanitization": None}):
         with patch.dict(sys.modules, {"threat_patterns": MagicMock()}):
@@ -174,14 +214,20 @@ def test_04_giris_temizle_bos(fresh_main):
     """4. _giris_temizle — '' -> ''."""
     m = fresh_main
     m.Motor.return_value = MagicMock(
-        _plugin_arac_kaydet=MagicMock(), hook_kaydet=MagicMock(), onay_fonksiyonu=None,
+        _plugin_arac_kaydet=MagicMock(),
+        hook_kaydet=MagicMock(),
+        onay_fonksiyonu=None,
     )
     m.Planlayici.return_value = MagicMock()
     m.RuntimeProvider.return_value = MagicMock()
 
     a = m.AIAgentOrchestrator(max_tur=5)
-    a.guvenlik = None; a.mem_guvenlik = None; a.referanslar = None
-    with patch.dict(sys.modules, {"message_sanitization": None, "threat_patterns": MagicMock()}):
+    a.guvenlik = None
+    a.mem_guvenlik = None
+    a.referanslar = None
+    with patch.dict(
+        sys.modules, {"message_sanitization": None, "threat_patterns": MagicMock()}
+    ):
         assert a._giris_temizle("") == ""
 
 
@@ -192,14 +238,20 @@ def test_05_giris_temizle_yeni_satir(fresh_main):
     """
     m = fresh_main
     m.Motor.return_value = MagicMock(
-        _plugin_arac_kaydet=MagicMock(), hook_kaydet=MagicMock(), onay_fonksiyonu=None,
+        _plugin_arac_kaydet=MagicMock(),
+        hook_kaydet=MagicMock(),
+        onay_fonksiyonu=None,
     )
     m.Planlayici.return_value = MagicMock()
     m.RuntimeProvider.return_value = MagicMock()
 
     a = m.AIAgentOrchestrator(max_tur=5)
-    a.guvenlik = None; a.mem_guvenlik = None; a.referanslar = None
-    with patch.dict(sys.modules, {"message_sanitization": None, "threat_patterns": MagicMock()}):
+    a.guvenlik = None
+    a.mem_guvenlik = None
+    a.referanslar = None
+    with patch.dict(
+        sys.modules, {"message_sanitization": None, "threat_patterns": MagicMock()}
+    ):
         assert a._giris_temizle("\n\nTest\n") == "\n\nTest\n"
 
 
@@ -219,6 +271,7 @@ def test_10_hata_tipi_bul(agent):
     yoksa fallback keyword matching'e gecer. Bu test fallback'i test eder.
     """
     import types
+
     fake_ar = types.ModuleType("agent_runtime")
     with patch.dict(sys.modules, {"agent_runtime": fake_ar}):
         assert agent._hata_tipi_bul("Veritabani baglanti hatasi", False) == "ag"
@@ -259,7 +312,9 @@ def test_18_onay_iste_true(fresh_main):
     """18. onay_iste=True -> motor.onay_fonksiyonu atanir."""
     m = fresh_main
     mm = MagicMock(
-        _plugin_arac_kaydet=MagicMock(), hook_kaydet=MagicMock(), onay_fonksiyonu=None,
+        _plugin_arac_kaydet=MagicMock(),
+        hook_kaydet=MagicMock(),
+        onay_fonksiyonu=None,
     )
     m.Motor.return_value = mm
     m.Planlayici.return_value = MagicMock()
@@ -283,24 +338,32 @@ def test_20_kapsayici(fresh_main):
     """20. KAPSAYICI: run_conversation basit gorevde calisir."""
     m = fresh_main
     m.Motor.return_value = MagicMock(
-        _plugin_arac_kaydet=MagicMock(), hook_kaydet=MagicMock(), onay_fonksiyonu=None,
+        _plugin_arac_kaydet=MagicMock(),
+        hook_kaydet=MagicMock(),
+        onay_fonksiyonu=None,
         eylemi_ayristir=MagicMock(return_value=("GOREV_BITTI", '"bitti"')),
         calistir=MagicMock(return_value="[Basarili]"),
     )
     m.Planlayici.return_value = MagicMock(
-        plani_uret=MagicMock(return_value=[]), sifirla=MagicMock(),
-        tamamlanan_adim_isaretle=MagicMock(), riskli_mi=MagicMock(return_value=False),
+        plani_uret=MagicMock(return_value=[]),
+        sifirla=MagicMock(),
+        tamamlanan_adim_isaretle=MagicMock(),
+        riskli_mi=MagicMock(return_value=False),
     )
     m.RuntimeProvider.return_value = MagicMock(
         uret=MagicMock(return_value='GOREV_BITTI("bitti")')
     )
-    c = MagicMock(); c.compress = MagicMock(side_effect=lambda msgs, **kw: msgs)
+    c = MagicMock()
+    c.compress = MagicMock(side_effect=lambda msgs, **kw: msgs)
     m.ContextCompressor.return_value = c
-    l = MagicMock(); l.beceri_kristallestir = MagicMock(); l.beceri_baglamini_al = MagicMock(return_value="")
+    l = MagicMock()
+    l.beceri_kristallestir = MagicMock()
+    l.beceri_baglamini_al = MagicMock(return_value="")
     m.ClosedLearningLoop.return_value = l
     m.BoundedMemory.return_value = MagicMock(kaydet=MagicMock())
     m.AdvancedSessionStorage.return_value = MagicMock(gunluge_yaz=MagicMock())
-    pe = MagicMock(); pe.insa_et = MagicMock(return_value="sistem promptu")
+    pe = MagicMock()
+    pe.insa_et = MagicMock(return_value="sistem promptu")
     m.PromptAssemblyEngine.return_value = pe
     m.InsanArayuzu.return_value = MagicMock(onay_iste=MagicMock(return_value=True))
 
@@ -315,12 +378,15 @@ def test_20_kapsayici(fresh_main):
 # EK TESTLER
 # =========================================================================
 
+
 def test_motor_provider_ref(fresh_main):
     """_cekirdekleri_baslat — motor._provider_ref atanir."""
     m = fresh_main
     mm = MagicMock(
-        _plugin_arac_kaydet=MagicMock(), hook_kaydet=MagicMock(),
-        onay_fonksiyonu=None, _provider_ref=None,
+        _plugin_arac_kaydet=MagicMock(),
+        hook_kaydet=MagicMock(),
+        onay_fonksiyonu=None,
+        _provider_ref=None,
     )
     m.Motor.return_value = mm
     m.Planlayici.return_value = MagicMock()
@@ -348,13 +414,19 @@ def test_giris_temizle_fallback(fresh_main):
     """_giris_temizle — message_sanitization yoksa hedef degismez."""
     m = fresh_main
     m.Motor.return_value = MagicMock(
-        _plugin_arac_kaydet=MagicMock(), hook_kaydet=MagicMock(), onay_fonksiyonu=None,
+        _plugin_arac_kaydet=MagicMock(),
+        hook_kaydet=MagicMock(),
+        onay_fonksiyonu=None,
     )
     m.Planlayici.return_value = MagicMock()
     m.RuntimeProvider.return_value = MagicMock()
     a = m.AIAgentOrchestrator(max_tur=5)
-    a.guvenlik = None; a.mem_guvenlik = None; a.referanslar = None
-    with patch.dict(sys.modules, {"message_sanitization": None, "threat_patterns": MagicMock()}):
+    a.guvenlik = None
+    a.mem_guvenlik = None
+    a.referanslar = None
+    with patch.dict(
+        sys.modules, {"message_sanitization": None, "threat_patterns": MagicMock()}
+    ):
         assert a._giris_temizle("  Ham  ") == "  Ham  "
 
 
@@ -410,7 +482,9 @@ def test_init_varsayilanlar(fresh_main):
     """__init__ — varsayilan parametreler."""
     m = fresh_main
     m.Motor.return_value = MagicMock(
-        _plugin_arac_kaydet=MagicMock(), hook_kaydet=MagicMock(), onay_fonksiyonu=None,
+        _plugin_arac_kaydet=MagicMock(),
+        hook_kaydet=MagicMock(),
+        onay_fonksiyonu=None,
     )
     m.Planlayici.return_value = MagicMock()
     m.RuntimeProvider.return_value = MagicMock()
@@ -433,7 +507,9 @@ def test_sistem_promptu_talimat_fn(fresh_main):
     """_sistem_promptu_insa_et — _sistem_talimati_fn mock'la."""
     m = fresh_main
     m.Motor.return_value = MagicMock(
-        _plugin_arac_kaydet=MagicMock(), hook_kaydet=MagicMock(), onay_fonksiyonu=None,
+        _plugin_arac_kaydet=MagicMock(),
+        hook_kaydet=MagicMock(),
+        onay_fonksiyonu=None,
     )
     m.Planlayici.return_value = MagicMock()
     m.RuntimeProvider.return_value = MagicMock()
@@ -442,6 +518,12 @@ def test_sistem_promptu_talimat_fn(fresh_main):
     a._sistem_talimati_fn = MagicMock(return_value="talimat promptu")
     a.prompt_engine = None
     r = a._sistem_promptu_insa_et(
-        "t", {"karmasiklik": 2, "ipuclari": []}, "", 1, 5, False, "g",
+        "t",
+        {"karmasiklik": 2, "ipuclari": []},
+        "",
+        1,
+        5,
+        False,
+        "g",
     )
     assert r == "talimat promptu"

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Testler: reymen.cereyan.mesaj_tamirci"""
+
 import pytest
 from reymen.cereyan.mesaj_tamirci import (
     arac_cagri_argumanlarini_temizle,
@@ -12,6 +13,7 @@ from reymen.cereyan.mesaj_tamirci import (
 
 # ── Alias testleri ────────────────────────────────────────────────────────────
 
+
 class TestHermesAliaslar:
     def test_sanitize_alias(self):
         assert sanitize_tool_call_arguments is arac_cagri_argumanlarini_temizle
@@ -21,6 +23,7 @@ class TestHermesAliaslar:
 
 
 # ── arac_cagri_argumanlarini_temizle ─────────────────────────────────────────
+
 
 class TestAracCagriArgumentanlariniTemizle:
     def test_bos_liste_sifir_doner(self):
@@ -32,13 +35,18 @@ class TestAracCagriArgumentanlariniTemizle:
                 "role": "assistant",
                 "content": "",
                 "tool_calls": [
-                    {"id": "c1", "function": {"name": "arama", "arguments": '{"query":"test"}'}}
+                    {
+                        "id": "c1",
+                        "function": {"name": "arama", "arguments": '{"query":"test"}'},
+                    }
                 ],
             }
         ]
         n = arac_cagri_argumanlarini_temizle(mesajlar)
         assert n == 0
-        assert mesajlar[0]["tool_calls"][0]["function"]["arguments"] == '{"query":"test"}'
+        assert (
+            mesajlar[0]["tool_calls"][0]["function"]["arguments"] == '{"query":"test"}'
+        )
 
     def test_bozuk_json_arguman_temizlenir(self):
         mesajlar = [
@@ -154,6 +162,7 @@ class TestAracCagriArgumentanlariniTemizle:
 
 # ── mesaj_siralamasi_tamir_et ─────────────────────────────────────────────────
 
+
 class TestMesajSiralamasiTamirEt:
     def test_bos_liste(self):
         assert mesaj_siralamasi_tamir_et([]) == 0
@@ -224,7 +233,11 @@ class TestMesajSiralamasiTamirEt:
         mesajlar = [
             {"role": "user", "content": "İlk"},
             {"role": "user", "content": "İkinci"},  # ardışık → birleştir
-            {"role": "tool", "tool_call_id": "hayalet", "content": "yetim"},  # yetim → at
+            {
+                "role": "tool",
+                "tool_call_id": "hayalet",
+                "content": "yetim",
+            },  # yetim → at
         ]
         n = mesaj_siralamasi_tamir_et(mesajlar)
         assert n >= 2
@@ -255,6 +268,7 @@ class TestMesajSiralamasiTamirEt:
 
 
 # ── surrogate_karakterleri_temizle ───────────────────────────────────────────
+
 
 class TestSurrogateKarakterleriTemizle:
     def test_normal_metin_degismez(self):

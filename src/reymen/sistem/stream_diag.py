@@ -10,6 +10,7 @@ import statistics
 from datetime import datetime
 from collections import deque
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -74,25 +75,31 @@ class StreamDiagnostics:
 
                     toplam_sure = time.time() - baslangic
 
-                    kayit.update({
-                        "durum": "tamamlandi",
-                        "token_sayisi": token_sayisi,
-                        "toplam_boyut": toplam_boyut,
-                        "ilk_token_suresi": round(ilk_token, 4) if ilk_token else 0,
-                        "toplam_sure": round(toplam_sure, 4),
-                        "bitis": datetime.now().isoformat(),
-                    })
+                    kayit.update(
+                        {
+                            "durum": "tamamlandi",
+                            "token_sayisi": token_sayisi,
+                            "toplam_boyut": toplam_boyut,
+                            "ilk_token_suresi": round(ilk_token, 4) if ilk_token else 0,
+                            "toplam_sure": round(toplam_sure, 4),
+                            "bitis": datetime.now().isoformat(),
+                        }
+                    )
 
                     if token_sayisi > 0:
                         self._olcum_gecmisi.append(kayit)
 
                 except Exception as stream_hata:
-                    kayit.update({
-                        "durum": "hata",
-                        "hata": str(stream_hata),
-                        "bitis": datetime.now().isoformat(),
-                    })
-                    print(f"[StreamDiagnostics] Stream hatasi ({stream_id}): {stream_hata}")
+                    kayit.update(
+                        {
+                            "durum": "hata",
+                            "hata": str(stream_hata),
+                            "bitis": datetime.now().isoformat(),
+                        }
+                    )
+                    print(
+                        f"[StreamDiagnostics] Stream hatasi ({stream_id}): {stream_hata}"
+                    )
 
             self._stream_kayitlari[stream_id] = kayit
             return kayit
@@ -264,16 +271,25 @@ class StreamDiagnostics:
 
             rapor = {
                 "toplam_stream": len(self._olcum_gecmisi),
-                "ortalama_hiz_token_sn": round(statistics.mean(hizlar), 2) if hizlar else 0,
-                "ortalama_gecikme_ms": round(statistics.mean(gecikmeler), 2) if gecikmeler else 0,
+                "ortalama_hiz_token_sn": round(statistics.mean(hizlar), 2)
+                if hizlar
+                else 0,
+                "ortalama_gecikme_ms": round(statistics.mean(gecikmeler), 2)
+                if gecikmeler
+                else 0,
                 "max_hiz_token_sn": round(max(hizlar), 2) if hizlar else 0,
                 "min_hiz_token_sn": round(min(hizlar), 2) if hizlar else 0,
-                "toplam_token": sum(k.get("token_sayisi", 0) for k in self._olcum_gecmisi),
+                "toplam_token": sum(
+                    k.get("token_sayisi", 0) for k in self._olcum_gecmisi
+                ),
             }
             return rapor
 
         except statistics.StatisticsError:
-            return {"hata": "Istatistik hesaplama hatasi", "toplam_stream": len(self._olcum_gecmisi)}
+            return {
+                "hata": "Istatistik hesaplama hatasi",
+                "toplam_stream": len(self._olcum_gecmisi),
+            }
         except Exception as hata:
             print(f"[StreamDiagnostics] Raporlama hatasi: {hata}")
             return {"hata": str(hata)}

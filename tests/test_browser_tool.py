@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """BrowserTool._sayfa_al() testi — GERCEK sinif ile."""
+
 import sys, os, time, subprocess
 
 PROJE = r"C:\Users\marko\Desktop\Reymen Proje\ReYMeN-Ajan"
@@ -88,25 +89,30 @@ print(json.dumps({"sonuclar": sonuclar, "hatalar": hatalar}, ensure_ascii=False)
 
 os.chdir(PROJE)
 print("1/2: Calistiriliyor...", flush=True)
-r = subprocess.run([PYTHON, "-u", "-c", test_kodu], capture_output=True, text=True, timeout=90)
+r = subprocess.run(
+    [PYTHON, "-u", "-c", test_kodu], capture_output=True, text=True, timeout=90
+)
 print("2/2: Cikti isleniyor...", flush=True)
 
 import re, json
-m = re.search(r'###RAPOR###\s*\n(\{.+})', r.stdout, re.DOTALL)
+
+m = re.search(r"###RAPOR###\s*\n(\{.+})", r.stdout, re.DOTALL)
 if m:
     rapor = json.loads(m.group(1))
     sonuc = rapor["sonuclar"]
     hatalar = rapor["hatalar"]
     print("\n| Test | Beklenen | Gerçekleşen | Durum |")
     print("|------|----------|-------------|-------|")
-    for k in ["t1","t2","t3"]:
+    for k in ["t1", "t2", "t3"]:
         v = sonuc.get(k, {})
-        print(f"| {v.get('test',k)} | {v.get('beklenen','')} | {v.get('gerceklesen','')} | {v.get('durum','❌')} |")
+        print(
+            f"| {v.get('test',k)} | {v.get('beklenen','')} | {v.get('gerceklesen','')} | {v.get('durum','❌')} |"
+        )
     if hatalar:
         print(f"\n❌ HATALAR ({len(hatalar)}):")
         for adim, tb in hatalar:
             print(f"\n--- {adim} ---")
-            for l in tb.strip().split('\n')[-8:]:
+            for l in tb.strip().split("\n")[-8:]:
                 print(l)
     else:
         print("\n✅ Tum testler basarili")

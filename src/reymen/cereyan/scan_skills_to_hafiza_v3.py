@@ -60,7 +60,7 @@ atlanan = 0
 for i, dosya in enumerate(md_dosyalari):
     if i > 0 and i % 250 == 0:
         print(f"  ... {i}/{len(md_dosyalari)} dosya taranıyor...", flush=True)
-    
+
     kategori, dosya_adi = kategori_ve_ad(str(dosya))
     meta_adi = f"{kategori}/{dosya_adi}" if kategori else dosya_adi
 

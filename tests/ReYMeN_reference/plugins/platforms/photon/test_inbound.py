@@ -4,6 +4,7 @@ These bypass the loopback HTTP stream — they call ``_dispatch_inbound`` /
 ``_on_inbound_line`` / ``_is_duplicate`` directly, exercising the
 sidecar-event parsing without spawning the Node sidecar or binding ports.
 """
+
 from __future__ import annotations
 
 import base64
@@ -25,7 +26,9 @@ def _make_adapter(monkeypatch: pytest.MonkeyPatch) -> PhotonAdapter:
     return PhotonAdapter(cfg)
 
 
-def _capture(adapter: PhotonAdapter, monkeypatch: pytest.MonkeyPatch) -> List[MessageEvent]:
+def _capture(
+    adapter: PhotonAdapter, monkeypatch: pytest.MonkeyPatch
+) -> List[MessageEvent]:
     captured: List[MessageEvent] = []
 
     async def fake_handle(event: MessageEvent) -> None:
@@ -276,7 +279,9 @@ async def test_on_inbound_line_dispatches_and_dedups(
 
 
 @pytest.mark.asyncio
-async def test_on_inbound_line_ignores_bad_json(monkeypatch: pytest.MonkeyPatch) -> None:
+async def test_on_inbound_line_ignores_bad_json(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     adapter = _make_adapter(monkeypatch)
     captured = _capture(adapter, monkeypatch)
 

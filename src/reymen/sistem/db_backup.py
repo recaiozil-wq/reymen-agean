@@ -34,27 +34,38 @@ from pathlib import Path
 
 # ── Bulgu panosu audit (K1-K4) ──────────────────────────────
 _FB_IMPORTED = False
+
+
 def _findings_board_kaydet(sonuc: dict, tip: str):
     """db_backup sonucunu findings_board'a kaydet (otomatik)."""
     global _FB_IMPORTED
     try:
         if not _FB_IMPORTED:
             import importlib
+
             _fb = importlib.import_module("reymen.sistem.findings_board")
             globals()["_audit_tamamla"] = _fb.audit_tamamla
             _FB_IMPORTED = True
         basarili = sonuc.get("basarili", 0)
         basarisiz = sonuc.get("basarisiz", 0)
         toplam = sonuc.get("toplam_dosya", 0) or sonuc.get("taranan_dosya", 0)
-        globals()["_audit_tamamla"]("reymen", [{
-            "konu": f"db_backup {tip}: {toplam} dosya, {basarili} basarili, {basarisiz} basarisiz",
-            "onem": "kritik" if basarisiz > 0 else ("orta" if toplam > 0 else "dusuk"),
-            "dosya_yolu": f"db_backup/{tip}",
-            "aciklama": sonuc.get("mesaj", f"{tip} yedek tamamlandi"),
-            "durum": "duzeltildi" if basarisiz == 0 else "yeni",
-        }])
+        globals()["_audit_tamamla"](
+            "reymen",
+            [
+                {
+                    "konu": f"db_backup {tip}: {toplam} dosya, {basarili} basarili, {basarisiz} basarisiz",
+                    "onem": "kritik"
+                    if basarisiz > 0
+                    else ("orta" if toplam > 0 else "dusuk"),
+                    "dosya_yolu": f"db_backup/{tip}",
+                    "aciklama": sonuc.get("mesaj", f"{tip} yedek tamamlandi"),
+                    "durum": "duzeltildi" if basarisiz == 0 else "yeni",
+                }
+            ],
+        )
     except Exception:
         pass  # findings_board yoksa sessizce gec
+
 
 # ============================================================
 # KONFIGURASYON
@@ -83,12 +94,24 @@ CONFIG_DOSYALARI = [
 ]
 
 # HASSAS dosyalar — ASLA yedeklenmez
-HASSAS_DOSYALAR = [".env", "token.txt", "token.json", "credentials.json", "service_account.json"]
+HASSAS_DOSYALAR = [
+    ".env",
+    "token.txt",
+    "token.json",
+    "credentials.json",
+    "service_account.json",
+]
 
 # HARIC tutulacak klasorler
 HARIC_KLASORLER = {
-    "venv", ".git", "__pycache__", "node_modules",
-    ".venv", "env", ".pytest-cache", ".pytest_cache",
+    "venv",
+    ".git",
+    "__pycache__",
+    "node_modules",
+    ".venv",
+    "env",
+    ".pytest-cache",
+    ".pytest_cache",
     "__silinecek_eski",
 }
 
@@ -109,7 +132,9 @@ def _yonetim_oku() -> dict:
 def _yonetim_yaz(veri: dict):
     """Backup yonetim dosyasina yaz."""
     YONETIM_DOSYASI.parent.mkdir(parents=True, exist_ok=True)
-    YONETIM_DOSYASI.write_text(json.dumps(veri, indent=2, ensure_ascii=False), encoding="utf-8")
+    YONETIM_DOSYASI.write_text(
+        json.dumps(veri, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
 
 
 def _db_dosyalari() -> list[Path]:
@@ -205,24 +230,28 @@ def tam_yedek() -> dict:
                 ok, msg = _sqlite_integrity_check(dosya)
                 integrity = {"ok": ok, "msg": msg}
 
-            rapor["dosyalar"].append({
-                "dosya": str(rel_path),
-                "boyut": dosya.stat().st_size,
-                "hash": _dosya_hash(dosya),
-                "integrity": integrity,
-            })
+            rapor["dosyalar"].append(
+                {
+                    "dosya": str(rel_path),
+                    "boyut": dosya.stat().st_size,
+                    "hash": _dosya_hash(dosya),
+                    "integrity": integrity,
+                }
+            )
             rapor["basarili"] += 1
         except Exception as e:
             rapor["basarisiz"] += 1
             rapor["hatalar"].append(f"{dosya.name}: {e}")
 
     # Yonetim dosyasini guncelle
-    yonetim["full_backups"].append({
-        "tarih": datetime.now().isoformat(),
-        "hedef": str(hedef),
-        "dosya_sayisi": rapor["basarili"],
-        "toplam_boyut": sum(d["boyut"] for d in rapor["dosyalar"] if "boyut" in d),
-    })
+    yonetim["full_backups"].append(
+        {
+            "tarih": datetime.now().isoformat(),
+            "hedef": str(hedef),
+            "dosya_sayisi": rapor["basarili"],
+            "toplam_boyut": sum(d["boyut"] for d in rapor["dosyalar"] if "boyut" in d),
+        }
+    )
     _yonetim_yaz(yonetim)
 
     return rapor
@@ -241,7 +270,9 @@ def gunluk_yedek() -> dict:
 
     # Son 24 saatte degisen dosyalari bul
     son_24s = datetime.now() - timedelta(hours=24)
-    degisenler = [d for d in dosyalar if datetime.fromtimestamp(d.stat().st_mtime) > son_24s]
+    degisenler = [
+        d for d in dosyalar if datetime.fromtimestamp(d.stat().st_mtime) > son_24s
+    ]
 
     rapor = {
         "tarih": datetime.now().isoformat(),
@@ -262,18 +293,24 @@ def gunluk_yedek() -> dict:
             hedef_dosya = hedef / rel_path
             hedef_dosya.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(dosya, hedef_dosya)
-            rapor["dosyalar"].append({
-                "dosya": str(rel_path),
-                "boyut": dosya.stat().st_size,
-                "hash": _dosya_hash(dosya),
-                "degisim_tarihi": datetime.fromtimestamp(dosya.stat().st_mtime).isoformat(),
-            })
+            rapor["dosyalar"].append(
+                {
+                    "dosya": str(rel_path),
+                    "boyut": dosya.stat().st_size,
+                    "hash": _dosya_hash(dosya),
+                    "degisim_tarihi": datetime.fromtimestamp(
+                        dosya.stat().st_mtime
+                    ).isoformat(),
+                }
+            )
             rapor["basarili"] += 1
         except Exception as e:
             rapor["basarisiz"] += 1
             rapor["hatalar"].append(f"{dosya.name}: {e}")
 
-    rapor["mesaj"] = f"{rapor['degisen_dosya']} dosyadan {rapor['basarili']}'i yedeklendi"
+    rapor["mesaj"] = (
+        f"{rapor['degisen_dosya']} dosyadan {rapor['basarili']}'i yedeklendi"
+    )
     return rapor
 
 
@@ -303,7 +340,9 @@ def yedek_yasi_kontrol() -> dict:
     return {
         "analiz_tarihi": datetime.now().isoformat(),
         "son_tam_yedek_gun": gun_farki,
-        "son_tam_yedek_str": f"{gun_farki} gun once" if gun_farki < 365 else "Hic alinmamis",
+        "son_tam_yedek_str": f"{gun_farki} gun once"
+        if gun_farki < 365
+        else "Hic alinmamis",
         "memory_backup_yasi_gun": memory_yasi,
         "memory_backup_durum": "GUNUNU GECIRMIS" if memory_yasi > 14 else "GUNcel",
         "acil_mi": gun_farki > 7,
@@ -331,7 +370,9 @@ def restore_test() -> dict:
         "tarih": datetime.now().isoformat(),
         "yedek_tarihi": en_son["tarih"],
         "yedek_klasoru": str(hedef),
-        "test_klasoru": str(QUARANTINE / "restore_test" / datetime.now().strftime("%Y%m%d_%H%M%S")),
+        "test_klasoru": str(
+            QUARANTINE / "restore_test" / datetime.now().strftime("%Y%m%d_%H%M%S")
+        ),
         "durum": "BASARILI",
         "test_edilen_dosya": 0,
         "basarili": 0,
@@ -367,18 +408,22 @@ def restore_test() -> dict:
                 rapor["test_edilen_dosya"] += 1
                 if hash_ok:
                     rapor["basarili"] += 1
-                    rapor["detay"].append({
-                        "dosya": str(rel),
-                        "hash_dogrulama": "OK",
-                        "integrity": integrity,
-                    })
+                    rapor["detay"].append(
+                        {
+                            "dosya": str(rel),
+                            "hash_dogrulama": "OK",
+                            "integrity": integrity,
+                        }
+                    )
                 else:
                     rapor["basarisiz"] += 1
-                    rapor["detay"].append({
-                        "dosya": str(rel),
-                        "hash_dogrulama": "HATA",
-                        "integrity": integrity,
-                    })
+                    rapor["detay"].append(
+                        {
+                            "dosya": str(rel),
+                            "hash_dogrulama": "HATA",
+                            "integrity": integrity,
+                        }
+                    )
                     rapor["durum"] = "KISMEN BASARISIZ"
 
             except Exception as e:
@@ -409,17 +454,27 @@ def listele() -> list[dict]:
         for kayit in yonetim.get(tip, []):
             hedef = Path(kayit["hedef"])
             var_mi = hedef.exists() and any(hedef.iterdir())
-            liste.append({
-                "tip": tip.replace("_backups", ""),
-                "tarih": kayit["tarih"],
-                "dosya_sayisi": kayit.get("dosya_sayisi", "?"),
-                "klasor": kayit["hedef"],
-                "mevcut_mu": "EVET" if var_mi else "HAYIR (silinmis)",
-            })
+            liste.append(
+                {
+                    "tip": tip.replace("_backups", ""),
+                    "tarih": kayit["tarih"],
+                    "dosya_sayisi": kayit.get("dosya_sayisi", "?"),
+                    "klasor": kayit["hedef"],
+                    "mevcut_mu": "EVET" if var_mi else "HAYIR (silinmis)",
+                }
+            )
 
     restore_test_tarih = yonetim.get("last_restore_test", "Hic yapilmamis")
     if liste:
-        liste.append({"tip": "---", "tarih": f"Son restore testi: {restore_test_tarih}", "dosya_sayisi": "", "klasor": "", "mevcut_mu": ""})
+        liste.append(
+            {
+                "tip": "---",
+                "tarih": f"Son restore testi: {restore_test_tarih}",
+                "dosya_sayisi": "",
+                "klasor": "",
+                "mevcut_mu": "",
+            }
+        )
 
     return liste if liste else [{"mesaj": "Henuz yedek alinmamis."}]
 
@@ -430,7 +485,9 @@ def eski_kopyalari_quarantine() -> dict:
     if not memory_backup.exists():
         return {"durum": "ATLANDI", "mesaj": "ReYMeN-memory-backup klasoru yok"}
 
-    quarantine_klasor = QUARANTINE / f"memory_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    quarantine_klasor = (
+        QUARANTINE / f"memory_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    )
     tasinanlar = []
 
     # Eski DB kopyalarini bul
@@ -461,24 +518,28 @@ def ilk_tam_yedek_ve_temizlik():
     # 1. Eski kopyalari quarantine'e tasi
     print("\n[1/3] Eski kopyalar quarantine'e tasiniyor...")
     q_result = eski_kopyalari_quarantine()
-    print(f"  {q_result['durum']}: {q_result.get('mesaj', '')} ({q_result.get('tasinan_dosya', 0)} dosya)")
+    print(
+        f"  {q_result['durum']}: {q_result.get('mesaj', '')} ({q_result.get('tasinan_dosya', 0)} dosya)"
+    )
 
     # 2. Tam yedek al
     print("\n[2/3] Ilk tam yedek aliniyor...")
     tam = tam_yedek()
     print(f"  {tam['basarili']}/{tam['toplam_dosya']} dosya yedeklendi")
-    if tam['basarisiz'] > 0:
-        for h in tam['hatalar']:
+    if tam["basarisiz"] > 0:
+        for h in tam["hatalar"]:
             print(f"  HATA: {h}")
 
     # 3. Restore testi yap
     print("\n[3/3] Geri yuklenebilirlik testi yapiliyor...")
     test = restore_test()
     print(f"  {test['durum']}: {test.get('mesaj', '')}")
-    if test['basarisiz'] > 0:
-        for d in test['detay']:
-            if d.get('hash_dogrulama') == 'HATA' or d.get('hata'):
-                print(f"  SORUN: {d['dosya']} — {d.get('hata', 'hash dogrulama basarisiz')}")
+    if test["basarisiz"] > 0:
+        for d in test["detay"]:
+            if d.get("hash_dogrulama") == "HATA" or d.get("hata"):
+                print(
+                    f"  SORUN: {d['dosya']} — {d.get('hata', 'hash dogrulama basarisiz')}"
+                )
 
     print("\n" + "=" * 60)
     print(f"ILK YEDEK TAMAMLANDI — Hedef: {ONEDRIVE_BELGELER}")
@@ -495,9 +556,17 @@ if __name__ == "__main__":
     parser.add_argument("--full", action="store_true", help="Tam yedek")
     parser.add_argument("--list", action="store_true", help="Yedekleri listele")
     parser.add_argument("--check", action="store_true", help="Yedek yasini kontrol et")
-    parser.add_argument("--restore-test", action="store_true", help="Geri yuklenebilirlik testi")
-    parser.add_argument("--ilk", action="store_true", help="Ilk calistirma (temizlik + yedek + test)")
-    parser.add_argument("--quarantine-eski", action="store_true", help="Eski kopyalari quarantine'e tasi")
+    parser.add_argument(
+        "--restore-test", action="store_true", help="Geri yuklenebilirlik testi"
+    )
+    parser.add_argument(
+        "--ilk", action="store_true", help="Ilk calistirma (temizlik + yedek + test)"
+    )
+    parser.add_argument(
+        "--quarantine-eski",
+        action="store_true",
+        help="Eski kopyalari quarantine'e tasi",
+    )
 
     args = parser.parse_args()
 

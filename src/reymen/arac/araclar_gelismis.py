@@ -9,6 +9,7 @@ Araçlar:
 
 motor.py'e dogrudan kayit edilebilir veya bagimsiz kullanilabilir.
 """
+
 import os
 import re
 import subprocess
@@ -17,6 +18,7 @@ import threading
 import time
 from pathlib import Path
 import logging
+
 logger = logging.getLogger(__name__)
 
 ROOT = Path(__file__).parent
@@ -25,6 +27,7 @@ ROOT = Path(__file__).parent
 # ═══════════════════════════════════════════════════════════════
 # BROWSER TOOL — Headless Tarayici
 # ═══════════════════════════════════════════════════════════════
+
 
 class BrowserTool:
     """
@@ -57,6 +60,7 @@ class BrowserTool:
             return self._playwright_var
         try:
             from playwright.sync_api import sync_playwright
+
             self._playwright_var = True
         except ImportError:
             self._playwright_var = False
@@ -66,20 +70,24 @@ class BrowserTool:
     def _chrome_path():
         """Windows'ta Playwright headless shell yolunu bul."""
         import os
+
         base = os.path.expanduser("~/AppData/Local/ms-playwright")
         if not os.path.isdir(base):
             return ""
         dirs = sorted(
-            [d for d in os.listdir(base) if "headless_shell" in d],
-            reverse=True
+            [d for d in os.listdir(base) if "headless_shell" in d], reverse=True
         )
         if not dirs:
             return ""
         shell_dir = os.path.join(base, dirs[0])
         # Olası konumlar
         for cand in (
-            os.path.join(shell_dir, "chrome-headless-shell-win64", "chrome-headless-shell.exe"),
-            os.path.join(shell_dir, dirs[0].replace("_", "-"), "chrome-headless-shell.exe"),
+            os.path.join(
+                shell_dir, "chrome-headless-shell-win64", "chrome-headless-shell.exe"
+            ),
+            os.path.join(
+                shell_dir, dirs[0].replace("_", "-"), "chrome-headless-shell.exe"
+            ),
             os.path.join(shell_dir, "chrome-headless-shell.exe"),
         ):
             if os.path.isfile(cand):
@@ -111,6 +119,7 @@ class BrowserTool:
         # 3. Hic yoksa — SADECE burada browser baslat
         if not self._pw:
             from playwright.sync_api import sync_playwright
+
             self._pw = sync_playwright().start()
             chrome_path = self._chrome_path()
             launch_args = {"headless": self._headless, "args": ["--no-sandbox"]}
@@ -128,6 +137,7 @@ class BrowserTool:
     def _sayfa_kapandi(self, sayfa):
         """Sayfa kapandiginda referansi temizle."""
         import logging
+
         logging.getLogger("BrowserTool").warning(
             "[Browser] Sayfa kapatildi: %s", sayfa.url
         )
@@ -141,6 +151,7 @@ class BrowserTool:
     def _hata_kontrol(self, selector: str = "") -> str:
         """Hata anında screenshot al + log."""
         import time, logging
+
         log = logging.getLogger("BrowserTool")
         ts = int(time.time())
         ss_path = f"_browser_hata_{ts}.png"
@@ -172,6 +183,7 @@ class BrowserTool:
             return self._urllib_fallback(url)
         import time
         from playwright.sync_api import TimeoutError as PWTimeout
+
         son_hata = ""
         for deneme in range(3):
             try:
@@ -221,6 +233,7 @@ class BrowserTool:
             except Exception as e:
                 if deneme == 0:
                     import time
+
                     time.sleep(1)
                     continue
                 # Fallback: DOM ile oku
@@ -235,6 +248,7 @@ class BrowserTool:
         if not self._page:
             return "[Browser] Once ac() cagir."
         from playwright.sync_api import TimeoutError as PWTimeout
+
         for deneme in range(2):
             try:
                 self._page.click(secici, timeout=5000)
@@ -320,11 +334,12 @@ class BrowserTool:
         except Exception as e:
             try:
                 secenekler = self._page.eval_on_selector_all(
-                    f"{secici} option",
-                    "els => els.map(e => e.value)"
+                    f"{secici} option", "els => els.map(e => e.value)"
                 )
-                return (f"[Browser:Hata] '{deger}' bulunamadi: {e}\n"
-                        f"Mevcut secenekler ({len(secenekler)}): {secenekler[:20]}")
+                return (
+                    f"[Browser:Hata] '{deger}' bulunamadi: {e}\n"
+                    f"Mevcut secenekler ({len(secenekler)}): {secenekler[:20]}"
+                )
             except Exception:
                 self._hata_kontrol(secici)
                 return f"[Browser:Hata] Select: {e}"
@@ -357,6 +372,7 @@ class BrowserTool:
         if not self._page:
             return "[Browser] Once ac() cagir."
         from playwright.sync_api import TimeoutError as PWTimeout
+
         try:
             self._page.hover(secici, timeout=5000)
             if self._recorder:
@@ -443,15 +459,18 @@ class BrowserTool:
             yeni = self._context.new_page() if self._context else self._page
             if url:
                 yeni.goto(url, timeout=20000)
+
             # Kapanma olayını dinle
             def _tab_kapandi(sayfa):
                 import logging
+
                 idx = self._tabs.index(sayfa) if sayfa in self._tabs else -1
                 logging.getLogger("BrowserTool").warning(
                     "[Browser] Sekme kapatildi: #%d %s", idx, sayfa.url
                 )
                 if idx >= 0 and idx < len(self._tabs):
                     self._tabs[idx] = None  # işaretle
+
             yeni.on("close", _tab_kapandi)
             self._tabs.append(yeni)
             self._page = yeni
@@ -595,10 +614,13 @@ class BrowserTool:
             return "[Browser] Once ac() cagir."
         try:
             from playwright.sync_api import Request
+
             requests = []
+
             def _kaydet(req: Request):
                 if len(requests) < limit:
                     requests.append(f"{req.method} {req.url[:120]}")
+
             self._page.on("request", _kaydet)
             return f"[Browser] Network dinleyici aktif (son {limit} istek)."
         except Exception as e:
@@ -649,20 +671,34 @@ class BrowserTool:
     def _urllib_fallback(self, url: str) -> str:
         import urllib.request
         from html.parser import HTMLParser
+
         try:
             req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
             with urllib.request.urlopen(req, timeout=15) as r:
-                html = r.read().decode(r.headers.get_content_charset("utf-8") or "utf-8", errors="replace")
+                html = r.read().decode(
+                    r.headers.get_content_charset("utf-8") or "utf-8", errors="replace"
+                )
+
             class P(HTMLParser):
                 def __init__(self):
-                    super().__init__(); self._t=[]; self._s=False
+                    super().__init__()
+                    self._t = []
+                    self._s = False
+
                 def handle_starttag(self, t, _):
-                    if t in ("script","style"): self._s=True
+                    if t in ("script", "style"):
+                        self._s = True
+
                 def handle_endtag(self, t):
-                    if t in ("script","style"): self._s=False
+                    if t in ("script", "style"):
+                        self._s = False
+
                 def handle_data(self, d):
-                    if not self._s and d.strip(): self._t.append(d.strip())
-            p=P(); p.feed(html)
+                    if not self._s and d.strip():
+                        self._t.append(d.strip())
+
+            p = P()
+            p.feed(html)
             return "[Browser:urllib] " + " ".join(p._t)[:2000]
         except Exception as e:
             return f"[Browser] Hata: {e}"
@@ -671,6 +707,7 @@ class BrowserTool:
 # ═══════════════════════════════════════════════════════════════
 # APPROVAL TOOL — Onay Diyalogu
 # ═══════════════════════════════════════════════════════════════
+
 
 class ApprovalTool:
     """
@@ -701,13 +738,16 @@ class ApprovalTool:
         try:
             import tkinter as tk
             from tkinter import messagebox
+
             sonuc = [None]
+
             def _goster():
                 root = tk.Tk()
                 root.withdraw()
                 cevap = messagebox.askyesno(baslik, mesaj, default="no")
                 sonuc[0] = cevap
                 root.destroy()
+
             t = threading.Thread(target=_goster, daemon=True)
             t.start()
             t.join(timeout=self.timeout)
@@ -763,6 +803,7 @@ class ApprovalTool:
 # SUPERVISOR TOOL — Gorev Izleyici
 # ═══════════════════════════════════════════════════════════════
 
+
 class SupervisorTool:
     """
     Gorev izleyici — thread saglik kontrolu, zaman asimi, hata sayaci.
@@ -810,13 +851,15 @@ class SupervisorTool:
             for gid, g in self._gorevler.items():
                 sure = round(time.time() - g["baslangic"], 1)
                 canli = g["thread"].is_alive() if g.get("thread") else False
-                sonuc.append({
-                    "id": gid,
-                    "sure": sure,
-                    "canli": canli,
-                    "hata": g["hata_sayisi"],
-                    "durum": g["durum"],
-                })
+                sonuc.append(
+                    {
+                        "id": gid,
+                        "sure": sure,
+                        "canli": canli,
+                        "hata": g["hata_sayisi"],
+                        "durum": g["durum"],
+                    }
+                )
             return sonuc
 
     def _izle(self):
@@ -834,7 +877,9 @@ class SupervisorTool:
                         print(f"[Supervisor] Zaman asimi: {gid} ({sure:.0f}s)")
                     elif g["hata_sayisi"] >= self.hata_esigi:
                         g["durum"] = "hata_esigi"
-                        print(f"[Supervisor] Hata esigi: {gid} ({g['hata_sayisi']} hata)")
+                        print(
+                            f"[Supervisor] Hata esigi: {gid} ({g['hata_sayisi']} hata)"
+                        )
 
     def rapor(self) -> str:
         gorevler = self.tum_gorevler()
@@ -862,6 +907,7 @@ _supervisor.izlemeyi_baslat()
 def motor_kaydet(motor, onay_tool: ApprovalTool = None):
     """motor.py'ye gelismis araclari kaydet."""
     k = lambda ad, fonk, aciklama="": motor._plugin_arac_kaydet(ad, fonk, aciklama)
+
     def browser_ac(ham: str) -> str:
         params = re.findall(r'"((?:[^"\\]|\\.)*)"', ham)
         return _browser.ac(params[0] if params else ham.strip('"'))
@@ -962,10 +1008,12 @@ def motor_kaydet(motor, onay_tool: ApprovalTool = None):
 
     # ── Workflow Recorder araclari ──────────────────────────────────
     _recorder = None
+
     def _recorder_al():
         nonlocal _recorder
         if _recorder is None:
             from reymen.arac.workflow_recorder import WorkflowRecorder
+
             _recorder = WorkflowRecorder()
         return _recorder
 
@@ -996,6 +1044,7 @@ def motor_kaydet(motor, onay_tool: ApprovalTool = None):
     def browser_vision(ham: str) -> str:
         """BROWSER_VISION \"soru\": sayfanin screenshot'ini al, path doner"""
         import time
+
         ss_dosya = f"_browser_vision_{int(time.time())}.png"
         sonuc = _browser.screenshot(cikti=ss_dosya)
         if "hata" in sonuc.lower():
@@ -1038,9 +1087,17 @@ def motor_kaydet(motor, onay_tool: ApprovalTool = None):
     k("BROWSER_HOVER", browser_hover)
     k("BROWSER_CLOSE", browser_close)
     k("BROWSER_STATUS", browser_status)
-    k("WORKFLOW_BASLA", workflow_basla, "Is akisi kaydi baslat. Parametre: workflow_adi (bos olursa otomatik)")
+    k(
+        "WORKFLOW_BASLA",
+        workflow_basla,
+        "Is akisi kaydi baslat. Parametre: workflow_adi (bos olursa otomatik)",
+    )
     k("WORKFLOW_BITIR", workflow_bitir, "Aktif kaydi bitir ve JSON dosyasina kaydet")
-    k("WORKFLOW_TEKRARLA", workflow_tekrarla, "Kayitli workflow'u tekrarla. Parametre: workflow_adi")
+    k(
+        "WORKFLOW_TEKRARLA",
+        workflow_tekrarla,
+        "Kayitli workflow'u tekrarla. Parametre: workflow_adi",
+    )
     k("WORKFLOW_LISTELE", workflow_listele, "Kayitli workflow'lari listele")
     k("WORKFLOW_SIL", workflow_sil, "Bir workflow'u sil. Parametre: workflow_adi")
     print("[GelismisTools] 28 arac kayit edildi.")
@@ -1058,6 +1115,7 @@ def motor_kaydet(motor, onay_tool: ApprovalTool = None):
         def hyperframes_video_arac(ham: str) -> str:
             """HYPERFRAMES_VIDEO template,param_json,cikti_yolu"""
             import json
+
             params = ham.strip().split(",", 2)
             template = "METIN_ANIMASYONU"
             param_dict = {}
@@ -1071,7 +1129,9 @@ def motor_kaydet(motor, onay_tool: ApprovalTool = None):
                     return f"[HyperFrames] JSON hatasi: {params[1][:100]}"
             if len(params) >= 3 and params[2].strip():
                 cikti = params[2].strip()
-            sonuc = hyperframes_olustur(template=template, params=param_dict, cikti=cikti)
+            sonuc = hyperframes_olustur(
+                template=template, params=param_dict, cikti=cikti
+            )
             if sonuc["basarili"]:
                 return (
                     f"[HyperFrames] Video basariyla olusturuldu!\n"
@@ -1085,10 +1145,16 @@ def motor_kaydet(motor, onay_tool: ApprovalTool = None):
         def hyperframes_template_list(ham: str) -> str:
             return hf_template_listele()
 
-        k("HYPERFRAMES_VIDEO", hyperframes_video_arac,
-          "HTML+CSS+JS animasyon videosu. Parametreler: template, param_json (JSON), cikti_yolu (ops.)")
-        k("HYPERFRAMES_TEMPLATES", hyperframes_template_list,
-          "Mevcut HyperFrame template'lerini listeler.")
+        k(
+            "HYPERFRAMES_VIDEO",
+            hyperframes_video_arac,
+            "HTML+CSS+JS animasyon videosu. Parametreler: template, param_json (JSON), cikti_yolu (ops.)",
+        )
+        k(
+            "HYPERFRAMES_TEMPLATES",
+            hyperframes_template_list,
+            "Mevcut HyperFrame template'lerini listeler.",
+        )
         print("[GelismisTools] HyperFrames araclari eklendi.")
     except ImportError:
         pass  # hyperframes_tool yoksa sessiz gec

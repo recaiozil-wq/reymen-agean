@@ -195,7 +195,11 @@ class EmailAdapter(BasePlatformAdapter):
     async def _connect_smtp(self) -> bool:
         """SMTP sunucusuna baglan ve giris yap."""
         try:
-            if not self._smtp_host or not self._email_address or not self._email_password:
+            if (
+                not self._smtp_host
+                or not self._email_address
+                or not self._email_password
+            ):
                 logger.error("[Email] SMTP yapilandirmasi eksik")
                 return False
 
@@ -236,7 +240,11 @@ class EmailAdapter(BasePlatformAdapter):
     async def _connect_imap(self) -> bool:
         """IMAP sunucusuna baglan ve giris yap."""
         try:
-            if not self._imap_host or not self._email_address or not self._email_password:
+            if (
+                not self._imap_host
+                or not self._email_address
+                or not self._email_password
+            ):
                 logger.error("[Email] IMAP yapilandirmasi eksik")
                 return False
 
@@ -280,7 +288,11 @@ class EmailAdapter(BasePlatformAdapter):
 
             uids = messages[0].split()
             for uid_bytes in uids:
-                uid_str = uid_bytes.decode() if isinstance(uid_bytes, bytes) else str(uid_bytes)
+                uid_str = (
+                    uid_bytes.decode()
+                    if isinstance(uid_bytes, bytes)
+                    else str(uid_bytes)
+                )
                 if uid_str in self._seen_uids:
                     continue
 
@@ -301,8 +313,11 @@ class EmailAdapter(BasePlatformAdapter):
 
                 # Gonderici e-posta adresini ayikla (chat_id olarak kullanilir)
                 import re
+
                 sender_match = re.search(r"<([^>]+)>", from_header)
-                sender_email = sender_match.group(1) if sender_match else from_header.strip()
+                sender_email = (
+                    sender_match.group(1) if sender_match else from_header.strip()
+                )
 
                 # Mesaj icerigini ayikla
                 body = _extract_text_from_message(msg)
@@ -384,12 +399,16 @@ class EmailAdapter(BasePlatformAdapter):
             # SMTP baglantisi
             smtp_ok = await self._connect_smtp()
             if not smtp_ok:
-                logger.warning("[Email] SMTP baglantisi basarisiz, sadece IMAP modunda calisilacak")
+                logger.warning(
+                    "[Email] SMTP baglantisi basarisiz, sadece IMAP modunda calisilacak"
+                )
 
             # IMAP baglantisi
             imap_ok = await self._connect_imap()
             if not imap_ok:
-                logger.warning("[Email] IMAP baglantisi basarisiz, sadece SMTP modunda calisilacak")
+                logger.warning(
+                    "[Email] IMAP baglantisi basarisiz, sadece SMTP modunda calisilacak"
+                )
 
             if not smtp_ok and not imap_ok:
                 self._set_fatal_error(
@@ -524,7 +543,11 @@ class EmailAdapter(BasePlatformAdapter):
             else:
                 return SendResult(False, error="SMTP baglantisi yok")
 
-            logger.info("[Email] Mesaj basariyla gonderildi: %s -> %s", self._email_address, recipient)
+            logger.info(
+                "[Email] Mesaj basariyla gonderildi: %s -> %s",
+                self._email_address,
+                recipient,
+            )
 
             return SendResult(
                 success=True,

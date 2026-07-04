@@ -53,12 +53,16 @@ def _config_yukle() -> dict:
     """Load project config.yaml, return empty dict if missing."""
     try:
         import yaml
+
         if _CONFIG_YOLU.exists():
             with open(_CONFIG_YOLU, encoding="utf-8") as f:
                 return yaml.safe_load(f) or {}
     except Exception:
         logger.warning("[fix_01_sessiz_except] Exception")
-    return {"default_provider": "lmstudio", "default_model": "cognitivecomputations.dolphin3.0-llama3.1-8b"}
+    return {
+        "default_provider": "lmstudio",
+        "default_model": "cognitivecomputations.dolphin3.0-llama3.1-8b",
+    }
 
 
 _DELEGATE_CONFIG = _config_yukle()
@@ -67,6 +71,7 @@ _DELEGATE_CONFIG = _config_yukle()
 @dataclass
 class AltGorevSonuc:
     """Holds the result of a single sub-task."""
+
     gorev: str
     task_id: str
     basarili: bool
@@ -79,6 +84,7 @@ class AltGorevSonuc:
 @dataclass
 class DelegasyonSonuc:
     """Tüm delegasyonun toplu sonucu."""
+
     parent_task_id: str
     toplam_gorev: int
     basarili: int
@@ -157,6 +163,7 @@ def _alt_gorev_calistir(
             # GOREV_BITTI kontrolü
             if "GOREV_BITTI" in yanit:
                 import re
+
                 m = re.search(r'GOREV_BITTI\s*\(\s*"([^"]*)"\s*\)', yanit)
                 sonuc.sonuc = m.group(1) if m else yanit
                 break
@@ -171,10 +178,12 @@ def _alt_gorev_calistir(
                 sonuc.sonuc = yanit[:1000]
 
             # Devam mesajı
-            mesajlar.append({
-                "role": "user",
-                "content": "Devam et. Hedefe ulaştıysan GOREV_BITTI(\"cevap\") yaz."
-            })
+            mesajlar.append(
+                {
+                    "role": "user",
+                    "content": 'Devam et. Hedefe ulaştıysan GOREV_BITTI("cevap") yaz.',
+                }
+            )
 
         sonuc.basarili = True
         sonuc.adim_sayisi = adim
@@ -270,12 +279,14 @@ def _delegate_task_impl(
                     sonuc.basarisiz += 1
             except Exception as e:
                 sonuc.basarisiz += 1
-                sonuc.sonuclar.append(AltGorevSonuc(
-                    gorev="(bilinmiyor)",
-                    task_id=task_id,
-                    basarili=False,
-                    hata=f"Future hatası: {e}",
-                ))
+                sonuc.sonuclar.append(
+                    AltGorevSonuc(
+                        gorev="(bilinmiyor)",
+                        task_id=task_id,
+                        basarili=False,
+                        hata=f"Future hatası: {e}",
+                    )
+                )
 
     sonuc.toplam_sure_sn = round(time.time() - baslangic, 2)
 
@@ -312,6 +323,7 @@ def _ozet_olustur(ds: DelegasyonSonuc) -> str:
 
 
 # ── Ana fonksiyon: LLM'den çağrılır ──────────────────────────────────
+
 
 def delegate_task(
     gorev_tanimlari: str,
@@ -369,6 +381,7 @@ def delegate_task(
 
 # ── Motor entegrasyonu ───────────────────────────────────────────────
 
+
 def motor_kaydet(motor) -> None:
     """Motor'a DELEGATE_TASK aracını kaydet.
 
@@ -385,14 +398,14 @@ def motor_kaydet(motor) -> None:
             "Tüm sonuçlar toplanır ve özetlenir.\n\n"
             "Parametreler:\n"
             "  gorev_tanimlari (str, ZORUNLU): JSON string. "
-            "Her biri {\"gorev\": \"...\", \"baglam\": \"...\"} olan bir dizi.\n"
+            'Her biri {"gorev": "...", "baglam": "..."} olan bir dizi.\n'
             "  baglam_genel (str, opsiyonel): Tüm alt görevlere eklenecek genel bağlam.\n"
             "  max_paralel (int, opsiyonel): Aynı anda çalışacak maksimum alt ajan sayısı (varsayılan: 5).\n"
             "  timeout (int, opsiyonel): Her alt görev için maksimum süre (varsayılan: 120s).\n"
             "  max_adim (int, opsiyonel): Her alt görev için maksimum adım (varsayılan: 10).\n\n"
             "Örnek:\n"
-            "  DELEGATE_TASK('[{\"gorev\":\"Dosyayı oku ve özetle\",\"baglam\":\"test.py\"},"
-            "{\"gorev\":\"Web ara\",\"baglam\":\"yapay zeka\"}]')"
+            '  DELEGATE_TASK(\'[{"gorev":"Dosyayı oku ve özetle","baglam":"test.py"},'
+            '{"gorev":"Web ara","baglam":"yapay zeka"}]\')'
         ),
     )
 
@@ -401,9 +414,11 @@ def motor_kaydet(motor) -> None:
 
 if __name__ == "__main__":
     # Test: basit delegasyon
-    test_gorevler = json.dumps([
-        {"gorev": "Merhaba dünya yaz", "baglam": ""},
-        {"gorev": "2+2 kaç eder?", "baglam": "matematik"},
-    ])
+    test_gorevler = json.dumps(
+        [
+            {"gorev": "Merhaba dünya yaz", "baglam": ""},
+            {"gorev": "2+2 kaç eder?", "baglam": "matematik"},
+        ]
+    )
     sonuc = delegate_task(test_gorevler, max_paralel=2, timeout=30, max_adim=3)
     print(sonuc)

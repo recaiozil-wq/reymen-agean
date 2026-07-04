@@ -50,7 +50,9 @@ class TestSubAgentCalistir:
         """TEK mod subagent calistirma → status success olur."""
         manager = DelegationManager()
         agent = manager.delege_et("Test gorev: dosya tara")
-        assert agent.status == "success", f"Basit simulasyon success olmali: {agent.status}"
+        assert (
+            agent.status == "success"
+        ), f"Basit simulasyon success olmali: {agent.status}"
         assert agent.result, "Sonuc bos olmamali"
 
     def test_gorev_bol_ve_calistir(self):

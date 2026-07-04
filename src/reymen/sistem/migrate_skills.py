@@ -8,6 +8,7 @@ standart YAML frontmatter ekler. Önce skills_backup/ yedeği alır.
 Kullanim:
     python migrate_skills.py
 """
+
 import os
 import sys
 import shutil
@@ -15,6 +16,7 @@ import hashlib
 from datetime import datetime
 from pathlib import Path
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -43,6 +45,7 @@ def _fts5_index_guncelle(dosya_yolu: str, icerik: str) -> None:
     Bagimsiz calistigi icin hata sessizce loglanir, betik durmaz.
     """
     import sqlite3
+
     ROOT = Path(__file__).parent.resolve()
     db_yolu = str(ROOT / ".ReYMeN" / "skills_index.db")
     if not os.path.isfile(db_yolu):
@@ -97,7 +100,10 @@ def yedek_al() -> bool:
             print(f"[Migration] Eski yedek silinemedi: {e}")
             print("[Migration] Zaman damgali yedek aliniyor...")
             # Alternatif: zaman damgali yedek
-            zaman_damgali = BACKUP_DIR.parent / f"skills_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            zaman_damgali = (
+                BACKUP_DIR.parent
+                / f"skills_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            )
             shutil.copytree(SKILLS_DIR, zaman_damgali)
             print(f"[Migration] Yedek alindi: {zaman_damgali}")
             return True

@@ -20,6 +20,7 @@ import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import logging
+
 logger = logging.getLogger(__name__)
 
 # ── Sabitler ───────────────────────────────────────────────────
@@ -49,7 +50,14 @@ def config_drift_kontrol():
     """3 config.yaml kritik alanlarını karşılaştır."""
     import yaml
 
-    anahtarlar = ["model", "fallback_providers", "gateway", "terminal", "web", "browser"]
+    anahtarlar = [
+        "model",
+        "fallback_providers",
+        "gateway",
+        "terminal",
+        "web",
+        "browser",
+    ]
     degerler = {}
     for ad, yol in PROFILLER.items():
         cfg_yol = yol / "config.yaml"
@@ -100,10 +108,14 @@ def gateway_watchdog():
                 if platform.system() == "Windows":
                     r = subprocess.run(
                         ["tasklist", "/FI", f"PID eq {pid_int}", "/NH"],
-                        capture_output=True, text=True, timeout=10
+                        capture_output=True,
+                        text=True,
+                        timeout=10,
                     )
                     if str(pid_int) not in r.stdout:
-                        ekle("UYARI", f"[2] {ad} PID {pid_int} olmus, lock temizleniyor")
+                        ekle(
+                            "UYARI", f"[2] {ad} PID {pid_int} olmus, lock temizleniyor"
+                        )
                         lock.unlink(missing_ok=True)
                         pid.unlink(missing_ok=True)
             except (ValueError, subprocess.TimeoutExpired):
@@ -157,12 +169,16 @@ def state_db_prune():
             c = conn.cursor()
 
             # Session tablosu var mı?
-            c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='sessions'")
+            c.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name='sessions'"
+            )
             if not c.fetchone():
                 conn.close()
                 continue
 
-            c.execute("SELECT COUNT(*) FROM sessions WHERE started_at < ?", (kesim_saniye,))
+            c.execute(
+                "SELECT COUNT(*) FROM sessions WHERE started_at < ?", (kesim_saniye,)
+            )
             eski_sayisi = c.fetchone()[0]
 
             if eski_sayisi > 0:
@@ -299,7 +315,9 @@ def gateway_health():
                 if platform.system() == "Windows":
                     r = subprocess.run(
                         ["tasklist", "/FI", f"PID eq {pid_int}", "/NH"],
-                        capture_output=True, text=True, timeout=10
+                        capture_output=True,
+                        text=True,
+                        timeout=10,
                     )
                     if str(pid_int) not in r.stdout:
                         ekle("UYARI", f"[8] {ad} PID {pid_int} calismiyor")

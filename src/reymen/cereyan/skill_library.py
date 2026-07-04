@@ -38,6 +38,7 @@ _yazma_kilit = threading.Lock()
 
 # ── YAML Front-Matter Ayrıştırıcı ───────────────────────────────────────────
 
+
 def _yaml_front_matter_parse(content: str) -> tuple[dict[str, Any], str]:
     """
     .md dosyasındaki YAML front-matter'ı ayrıştırır.
@@ -58,7 +59,7 @@ def _yaml_front_matter_parse(content: str) -> tuple[dict[str, Any], str]:
         return meta, content_clean
 
     yaml_blok = match.group(1)
-    body = content_clean[match.end():].strip()
+    body = content_clean[match.end() :].strip()
 
     for line in yaml_blok.split("\n"):
         line = line.strip()
@@ -98,6 +99,7 @@ def _yaml_front_matter_parse(content: str) -> tuple[dict[str, Any], str]:
 
 # ── Veritabanı ──────────────────────────────────────────────────────────────
 
+
 def _kur(con: sqlite3.Connection) -> None:
     """skills tablosunu oluştur."""
     con.executescript("""
@@ -115,12 +117,14 @@ def _kur(con: sqlite3.Connection) -> None:
         CREATE INDEX IF NOT EXISTS idx_skills_etiketler  ON skills(etiketler);
     """)
     # Migration: eski tabloya kolon ekleme (güvenli)
-    for kolon, tip in [("baslik", "TEXT NOT NULL DEFAULT ''"),
-                        ("icerik_ozeti", "TEXT NOT NULL DEFAULT ''"),
-                        ("etiketler", "TEXT NOT NULL DEFAULT ''"),
-                        ("kaynak", "TEXT NOT NULL DEFAULT ''"),
-                        ("aktif", "INTEGER NOT NULL DEFAULT 0"),
-                        ("son_guncelleme", "TEXT NOT NULL DEFAULT (datetime('now'))")]:
+    for kolon, tip in [
+        ("baslik", "TEXT NOT NULL DEFAULT ''"),
+        ("icerik_ozeti", "TEXT NOT NULL DEFAULT ''"),
+        ("etiketler", "TEXT NOT NULL DEFAULT ''"),
+        ("kaynak", "TEXT NOT NULL DEFAULT ''"),
+        ("aktif", "INTEGER NOT NULL DEFAULT 0"),
+        ("son_guncelleme", "TEXT NOT NULL DEFAULT (datetime('now'))"),
+    ]:
         try:
             con.execute(f"ALTER TABLE skills ADD COLUMN {kolon} {tip}")
         except Exception as _e:
@@ -152,6 +156,7 @@ def _db_kur():
 
 
 # ── SkillLibrary Sınıfı ────────────────────────────────────────────────────
+
 
 class SkillLibrary:
     """
@@ -208,7 +213,9 @@ class SkillLibrary:
         # Etiketler: list -> virgülle ayrılmış string
         etiketler_raw = skill_dict.get("etiketler", "")
         if isinstance(etiketler_raw, list):
-            etiketler = ", ".join(str(e).strip() for e in etiketler_raw if str(e).strip())
+            etiketler = ", ".join(
+                str(e).strip() for e in etiketler_raw if str(e).strip()
+            )
         else:
             etiketler = str(etiketler_raw).strip()
 
@@ -273,9 +280,7 @@ class SkillLibrary:
             kosullar = []
             params: list[str] = []
             for kelime in kelimeler:
-                kosullar.append(
-                    "(LOWER(baslik) LIKE ? OR LOWER(etiketler) LIKE ?)"
-                )
+                kosullar.append("(LOWER(baslik) LIKE ? OR LOWER(etiketler) LIKE ?)")
                 params.extend([f"%{kelime}%", f"%{kelime}%"])
 
             where = " AND ".join(kosullar) if kosullar else "1=1"
@@ -320,16 +325,20 @@ class SkillLibrary:
 
             sonuc = []
             for r in rows:
-                etiket_list = [e.strip() for e in r["etiketler"].split(",") if e.strip()]
-                sonuc.append({
-                    "id": r["id"],
-                    "baslik": r["baslik"],
-                    "icerik_ozeti": r["icerik_ozeti"],
-                    "etiketler": etiket_list,
-                    "kaynak": r["kaynak"],
-                    "aktif": bool(r["aktif"]),
-                    "son_guncelleme": r["son_guncelleme"],
-                })
+                etiket_list = [
+                    e.strip() for e in r["etiketler"].split(",") if e.strip()
+                ]
+                sonuc.append(
+                    {
+                        "id": r["id"],
+                        "baslik": r["baslik"],
+                        "icerik_ozeti": r["icerik_ozeti"],
+                        "etiketler": etiket_list,
+                        "kaynak": r["kaynak"],
+                        "aktif": bool(r["aktif"]),
+                        "son_guncelleme": r["son_guncelleme"],
+                    }
+                )
 
             return sonuc
 
@@ -448,7 +457,11 @@ class SkillLibrary:
 
         logger.info(
             "[SkillLib] Sync tamam: +%d yeni, ~%d guncel, -%d silindi, !%d hata (%d dosya)",
-            yeni, guncellenen, silinen, hata, len(md_dosyalari),
+            yeni,
+            guncellenen,
+            silinen,
+            hata,
+            len(md_dosyalari),
         )
 
         return ozet
@@ -525,7 +538,9 @@ class SkillLibrary:
 
     # ── Tüm Skill'leri Listele ─────────────────────────────────────────
 
-    def tumu(self, aktif_mi: bool | None = None, limit: int = 100) -> list[dict[str, Any]]:
+    def tumu(
+        self, aktif_mi: bool | None = None, limit: int = 100
+    ) -> list[dict[str, Any]]:
         """
         Tüm skill'leri listele.
 
@@ -556,16 +571,20 @@ class SkillLibrary:
 
             sonuc = []
             for r in rows:
-                etiket_list = [e.strip() for e in r["etiketler"].split(",") if e.strip()]
-                sonuc.append({
-                    "id": r["id"],
-                    "baslik": r["baslik"],
-                    "icerik_ozeti": r["icerik_ozeti"],
-                    "etiketler": etiket_list,
-                    "kaynak": r["kaynak"],
-                    "aktif": bool(r["aktif"]),
-                    "son_guncelleme": r["son_guncelleme"],
-                })
+                etiket_list = [
+                    e.strip() for e in r["etiketler"].split(",") if e.strip()
+                ]
+                sonuc.append(
+                    {
+                        "id": r["id"],
+                        "baslik": r["baslik"],
+                        "icerik_ozeti": r["icerik_ozeti"],
+                        "etiketler": etiket_list,
+                        "kaynak": r["kaynak"],
+                        "aktif": bool(r["aktif"]),
+                        "son_guncelleme": r["son_guncelleme"],
+                    }
+                )
 
             return sonuc
         finally:
@@ -610,6 +629,7 @@ def get_library(db_yolu: str | Path | None = None) -> SkillLibrary:
 
 # ── Kolay kullanım fonksiyonları ────────────────────────────────────────────
 
+
 def kaydet(skill_dict: dict[str, Any]) -> str:
     """Skill ekle/güncelle (kolay kullanım)."""
     return get_library().kaydet(skill_dict)
@@ -640,7 +660,9 @@ def motor_kaydet(motor) -> None:
     if hasattr(motor, "_plugin_arac_kaydet"):
         motor._plugin_arac_kaydet(
             "SKILL_SENKRONIZE",
-            lambda kaynak="": sync(kaynak) if kaynak else {"hata": "kaynak_dizin parametresi gerekli"},
+            lambda kaynak="": sync(kaynak)
+            if kaynak
+            else {"hata": "kaynak_dizin parametresi gerekli"},
             "Skill dosyalarini kutuphaneye senkronize et. Parametre: kaynak_dizin",
         )
         motor._plugin_arac_kaydet(

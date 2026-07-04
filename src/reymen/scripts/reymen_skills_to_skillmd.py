@@ -14,6 +14,7 @@ import re
 import sys
 from pathlib import Path
 import logging
+
 logger = logging.getLogger(__name__)
 
 try:
@@ -38,27 +39,27 @@ def _kategori_adi(path: Path) -> str:
 def _dosya_adindan_title(name: str) -> str:
     """Dosya adindan okunabilir baslik olusturur."""
     name = name.replace(".md", "")
-    name = re.sub(r'^reymen[-_]', '', name)
-    name = re.sub(r'^autonomous-ai-agents[-_]', '', name)
-    name = re.sub(r'^security[-_]', '', name)
-    name = name.replace('-', ' ').replace('_', ' ')
+    name = re.sub(r"^reymen[-_]", "", name)
+    name = re.sub(r"^autonomous-ai-agents[-_]", "", name)
+    name = re.sub(r"^security[-_]", "", name)
+    name = name.replace("-", " ").replace("_", " ")
     return name.strip().title()
 
 
 def _body_temizle(body: str) -> str:
     """Body'deki baslangictaki --- ve kategori etiketlerini temizler."""
     # CRLF -> LF (Windows dosyalari icin)
-    body = body.replace('\r\n', '\n')
-    body = re.sub(r'^>\s*\*\*Kategori:\*\*.*\n?', '', body, flags=re.MULTILINE)
-    body = re.sub(r'^\*\*Kategori:\*\*.*\n?', '', body, flags=re.MULTILINE)
+    body = body.replace("\r\n", "\n")
+    body = re.sub(r"^>\s*\*\*Kategori:\*\*.*\n?", "", body, flags=re.MULTILINE)
+    body = re.sub(r"^\*\*Kategori:\*\*.*\n?", "", body, flags=re.MULTILINE)
     body = body.strip()
-    body = re.sub(r'^---\s*\n?', '', body, flags=re.MULTILINE)
+    body = re.sub(r"^---\s*\n?", "", body, flags=re.MULTILINE)
     return body.strip()
 
 
 def _frontmatter_parse(content: str) -> tuple:
     """Varolan frontmatter'i parse et. (fm_dict, body, has_fm) dondur."""
-    m = re.match(r'^---\s*\n(.*?)\n---', content, re.DOTALL)
+    m = re.match(r"^---\s*\n(.*?)\n---", content, re.DOTALL)
     if not m:
         return {}, content, False
     try:
@@ -67,7 +68,7 @@ def _frontmatter_parse(content: str) -> tuple:
             fm = {}
     except Exception:
         fm = {}
-    body = content[m.end():]
+    body = content[m.end() :]
     body = _body_temizle(body)
     return fm, body, True
 
@@ -97,7 +98,9 @@ def _frontmatter_olustur(fm: dict, kategori: str, dosya_adi: str) -> str:
         "category": fm["category"],
         "audience": fm["audience"],
     }
-    return yaml.dump(clean, default_flow_style=False, allow_unicode=True, sort_keys=False).strip()
+    return yaml.dump(
+        clean, default_flow_style=False, allow_unicode=True, sort_keys=False
+    ).strip()
 
 
 def process_file(path: Path) -> str:
@@ -130,7 +133,7 @@ def process_file(path: Path) -> str:
 
     # Frontmatter yok — kategori etiketi var mi?
     kat_from_tag = ""
-    m = re.search(r'>\s*\*\*Kategori:\*\*\s*(\S+)', content)
+    m = re.search(r">\s*\*\*Kategori:\*\*\s*(\S+)", content)
     if m:
         kat_from_tag = m.group(1).strip()
     if kat_from_tag:

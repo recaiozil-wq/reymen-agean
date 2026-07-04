@@ -55,7 +55,9 @@ def handle_handoff_command(cli, cmd_original: str) -> bool:
 
     pcfg = gw_config.platforms.get(platform)
     if not pcfg or not pcfg.enabled:
-        _cprint(f"  Platform '{platform_name}' is not configured/enabled in the gateway.")
+        _cprint(
+            f"  Platform '{platform_name}' is not configured/enabled in the gateway."
+        )
         return True
 
     home = gw_config.get_home_channel(platform)
@@ -67,13 +69,16 @@ def handle_handoff_command(cli, cmd_original: str) -> bool:
     # Refuse mid-turn: an in-flight agent run would race with the
     # gateway's switch_session and the synthetic turn dispatch.
     if getattr(cli, "_agent_running", False):
-        _cprint("  Agent is busy. Wait for the current turn to finish, then retry /handoff.")
+        _cprint(
+            "  Agent is busy. Wait for the current turn to finish, then retry /handoff."
+        )
         return True
 
     # Make sure we have a SessionDB handle.
     if not cli._session_db:
         try:
             from reymen.sistem.ReYMeN_state import SessionDB
+
             cli._session_db = SessionDB()
         except Exception:
             logger.warning("[fix_01_sessiz_except] Exception")
@@ -112,14 +117,19 @@ def handle_handoff_command(cli, cmd_original: str) -> bool:
     # Mark pending — gateway watcher will pick this up.
     ok = cli._session_db.request_handoff(cli.session_id, platform_name)
     if not ok:
-        _cprint("  Session is already in flight for handoff. Wait for it to settle, then retry.")
+        _cprint(
+            "  Session is already in flight for handoff. Wait for it to settle, then retry."
+        )
         return True
 
-    _cprint(f"  Queued handoff of '{session_title}' → {platform_name} (home: {home.name}).")
+    _cprint(
+        f"  Queued handoff of '{session_title}' → {platform_name} (home: {home.name})."
+    )
     _cprint(f"  Waiting for the gateway to pick it up...")
 
     # Poll-block on terminal state. Tick every 0.5s; bail at ~60s.
     import time as _time
+
     deadline = _time.time() + 60.0
     last_state = "pending"
     while _time.time() < deadline:
@@ -134,7 +144,9 @@ def handle_handoff_command(cli, cmd_original: str) -> bool:
             last_state = current
         if current == "completed":
             _cprint("")
-            _cprint(f"  ↻ Handoff complete. The session is now active on {platform_name}.")
+            _cprint(
+                f"  ↻ Handoff complete. The session is now active on {platform_name}."
+            )
             _cprint(f"  Resume it on this CLI later with: /resume {session_title}")
             _cprint("")
             # End the CLI cleanly — same exit semantics as /quit.
@@ -143,7 +155,9 @@ def handle_handoff_command(cli, cmd_original: str) -> bool:
         if current == "failed":
             err = (state_row or {}).get("error") or "unknown error"
             _cprint(f"  Handoff failed: {err}")
-            _cprint("  Your CLI session is intact. Try /handoff again, or /resume on the platform manually.")
+            _cprint(
+                "  Your CLI session is intact. Try /handoff again, or /resume on the platform manually."
+            )
             return True
         _time.sleep(0.5)
 

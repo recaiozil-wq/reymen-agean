@@ -28,7 +28,7 @@ logger = logging.getLogger("scan_skills")
 
 # ── Yollar ──────────────────────────────────────────────────────────────────
 ROOT = Path(__file__).parent.parent.resolve()  # reymen/
-SKILLS_DIR = ROOT / "cereyan" / "skills"       # taranacak klasör
+SKILLS_DIR = ROOT / "cereyan" / "skills"  # taranacak klasör
 SKILLS_DB = ROOT / "merkez_db" / "skills_index.db"
 OGRENME_DB = ROOT / "merkez_db" / "ogrenmeler.db"
 
@@ -133,7 +133,9 @@ def scan_and_sync() -> tuple[int, int, int]:
 
     meta_map = {}  # ad -> (dosya_hash, guncelleme)
     try:
-        meta_cur = con_skills.execute("SELECT ad, dosya_hash, guncelleme FROM beceriler_meta")
+        meta_cur = con_skills.execute(
+            "SELECT ad, dosya_hash, guncelleme FROM beceriler_meta"
+        )
         for row in meta_cur.fetchall():
             meta_map[row[0]] = (row[1], row[2] if len(row) > 2 else "")
     except sqlite3.OperationalError:
@@ -185,15 +187,21 @@ def scan_and_sync() -> tuple[int, int, int]:
             logger.info("🆕 YENİ: %s", meta_adi)
         elif eski_hash != guncel_hash:
             guncel_sayisi += 1
-            guncel_liste.append((meta_adi, str(dosya), guncel_hash, kategori, dosya_adi))
+            guncel_liste.append(
+                (meta_adi, str(dosya), guncel_hash, kategori, dosya_adi)
+            )
             logger.info("🔄 GÜNCELLENMİŞ: %s (hash değişmiş)", meta_adi)
         else:
             atlanan_sayisi += 1
 
     logger.info("=" * 60)
     logger.info("📊 KARŞILAŞTIRMA SONUCU:")
-    logger.info("   Yeni: %d | Güncellenecek: %d | Atlanan: %d",
-                yeni_sayisi, guncel_sayisi, atlanan_sayisi)
+    logger.info(
+        "   Yeni: %d | Güncellenecek: %d | Atlanan: %d",
+        yeni_sayisi,
+        guncel_sayisi,
+        atlanan_sayisi,
+    )
 
     # 5) Yeni dosyaları ekle
     if yeni_liste:

@@ -256,9 +256,7 @@ def test_termux_fast_tui_launch_uses_light_parser(monkeypatch, main_mod):
     captured = {}
 
     monkeypatch.setenv("TERMUX_VERSION", "1")
-    monkeypatch.setattr(
-        sys, "argv", ["ReYMeN", "--tui", "--toolsets", "web,terminal"]
-    )
+    monkeypatch.setattr(sys, "argv", ["ReYMeN", "--tui", "--toolsets", "web,terminal"])
     monkeypatch.setattr(
         main_mod,
         "cmd_chat",
@@ -389,7 +387,9 @@ def test_termux_fast_cli_launch_version_skips_update_check(monkeypatch, main_mod
     monkeypatch.delenv("ReYMeN_TUI", raising=False)
     monkeypatch.setattr(sys, "argv", ["ReYMeN", "version"])
     monkeypatch.setattr(
-        main_mod, "_print_version_info", lambda *, check_updates: captured.append(check_updates)
+        main_mod,
+        "_print_version_info",
+        lambda *, check_updates: captured.append(check_updates),
     )
 
     assert main_mod._try_termux_fast_cli_launch() is True
@@ -454,7 +454,9 @@ def test_termux_bundled_skills_stamp_controls_sync(monkeypatch, tmp_path, main_m
     assert main_mod._termux_bundled_skills_sync_needed() is True
 
 
-def test_termux_skips_bundled_skill_sync_when_stamp_fresh(monkeypatch, tmp_path, main_mod):
+def test_termux_skips_bundled_skill_sync_when_stamp_fresh(
+    monkeypatch, tmp_path, main_mod
+):
     calls = []
 
     monkeypatch.setenv("TERMUX_VERSION", "1")
@@ -821,7 +823,9 @@ def test_oneshot_wires_session_db_for_recall(monkeypatch):
         return module
 
     monkeypatch.setitem(sys.modules, "run_agent", mod("run_agent", AIAgent=FakeAgent))
-    monkeypatch.setitem(sys.modules, "ReYMeN_state", mod("ReYMeN_state", SessionDB=FakeSessionDB))
+    monkeypatch.setitem(
+        sys.modules, "ReYMeN_state", mod("ReYMeN_state", SessionDB=FakeSessionDB)
+    )
     monkeypatch.setitem(
         sys.modules,
         "ReYMeN_cli.config",
@@ -830,7 +834,10 @@ def test_oneshot_wires_session_db_for_recall(monkeypatch):
     monkeypatch.setitem(
         sys.modules,
         "ReYMeN_cli.models",
-        mod("ReYMeN_cli.models", detect_provider_for_model=lambda *_args, **_kwargs: None),
+        mod(
+            "ReYMeN_cli.models",
+            detect_provider_for_model=lambda *_args, **_kwargs: None,
+        ),
     )
     monkeypatch.setitem(
         sys.modules,
@@ -849,7 +856,10 @@ def test_oneshot_wires_session_db_for_recall(monkeypatch):
     monkeypatch.setitem(
         sys.modules,
         "ReYMeN_cli.tools_config",
-        mod("ReYMeN_cli.tools_config", _get_platform_tools=lambda *_args, **_kwargs: {"session_search"}),
+        mod(
+            "ReYMeN_cli.tools_config",
+            _get_platform_tools=lambda *_args, **_kwargs: {"session_search"},
+        ),
     )
 
     assert _run_agent("recall this") == "ok"
@@ -1007,7 +1017,9 @@ def test_make_tui_argv_dev_prebuilds_ReYMeN_ink(monkeypatch, main_mod, tmp_path)
     monkeypatch.setattr(main_mod, "_ensure_tui_node", lambda: None)
     monkeypatch.setattr(main_mod, "_tui_need_npm_install", lambda _tui_dir: False)
     monkeypatch.delenv("ReYMeN_TUI_DIR", raising=False)
-    monkeypatch.setattr(main_mod.shutil, "which", lambda bin_name: f"/usr/bin/{bin_name}")
+    monkeypatch.setattr(
+        main_mod.shutil, "which", lambda bin_name: f"/usr/bin/{bin_name}"
+    )
 
     calls = []
 

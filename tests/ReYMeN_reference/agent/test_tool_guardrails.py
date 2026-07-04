@@ -120,7 +120,11 @@ def test_hard_stop_enabled_blocks_repeated_exact_failure_before_next_execution()
 
 def test_success_resets_exact_signature_failure_streak():
     controller = ToolCallGuardrailController(
-        ToolCallGuardrailConfig(hard_stop_enabled=True, exact_failure_block_after=2, same_tool_failure_halt_after=99)
+        ToolCallGuardrailConfig(
+            hard_stop_enabled=True,
+            exact_failure_block_after=2,
+            same_tool_failure_halt_after=99,
+        )
     )
     args = {"query": "same"}
 
@@ -133,15 +137,19 @@ def test_success_resets_exact_signature_failure_streak():
 
 
 def test_file_mutation_lint_error_result_is_not_a_tool_failure():
-    write_result = json.dumps({
-        "bytes_written": 12,
-        "lint": {"status": "error", "output": "SyntaxError: invalid syntax"},
-    })
-    patch_result = json.dumps({
-        "success": True,
-        "diff": "--- a/tmp.py\n+++ b/tmp.py\n",
-        "lsp_diagnostics": "<diagnostics>ERROR [1:1] type mismatch</diagnostics>",
-    })
+    write_result = json.dumps(
+        {
+            "bytes_written": 12,
+            "lint": {"status": "error", "output": "SyntaxError: invalid syntax"},
+        }
+    )
+    patch_result = json.dumps(
+        {
+            "success": True,
+            "diff": "--- a/tmp.py\n+++ b/tmp.py\n",
+            "lsp_diagnostics": "<diagnostics>ERROR [1:1] type mismatch</diagnostics>",
+        }
+    )
 
     assert classify_tool_failure("write_file", write_result) == (False, "")
     assert classify_tool_failure("patch", patch_result) == (False, "")
@@ -149,13 +157,23 @@ def test_file_mutation_lint_error_result_is_not_a_tool_failure():
 
 def test_same_tool_varying_args_warns_by_default_without_halting():
     controller = ToolCallGuardrailController(
-        ToolCallGuardrailConfig(same_tool_failure_warn_after=2, same_tool_failure_halt_after=3)
+        ToolCallGuardrailConfig(
+            same_tool_failure_warn_after=2, same_tool_failure_halt_after=3
+        )
     )
 
-    first = controller.after_call("terminal", {"command": "cmd-1"}, '{"exit_code":1}', failed=True)
-    second = controller.after_call("terminal", {"command": "cmd-2"}, '{"exit_code":1}', failed=True)
-    third = controller.after_call("terminal", {"command": "cmd-3"}, '{"exit_code":1}', failed=True)
-    fourth = controller.after_call("terminal", {"command": "cmd-4"}, '{"exit_code":1}', failed=True)
+    first = controller.after_call(
+        "terminal", {"command": "cmd-1"}, '{"exit_code":1}', failed=True
+    )
+    second = controller.after_call(
+        "terminal", {"command": "cmd-2"}, '{"exit_code":1}', failed=True
+    )
+    third = controller.after_call(
+        "terminal", {"command": "cmd-3"}, '{"exit_code":1}', failed=True
+    )
+    fourth = controller.after_call(
+        "terminal", {"command": "cmd-4"}, '{"exit_code":1}', failed=True
+    )
 
     assert first.action == "allow"
     assert [second.action, third.action, fourth.action] == ["warn", "warn", "warn"]
@@ -177,12 +195,18 @@ def test_hard_stop_enabled_halts_same_tool_varying_args_failure_streak():
         )
     )
 
-    first = controller.after_call("terminal", {"command": "cmd-1"}, '{"exit_code":1}', failed=True)
+    first = controller.after_call(
+        "terminal", {"command": "cmd-1"}, '{"exit_code":1}', failed=True
+    )
     assert first.action == "allow"
-    second = controller.after_call("terminal", {"command": "cmd-2"}, '{"exit_code":1}', failed=True)
+    second = controller.after_call(
+        "terminal", {"command": "cmd-2"}, '{"exit_code":1}', failed=True
+    )
     assert second.action == "warn"
     assert second.code == "same_tool_failure_warning"
-    third = controller.after_call("terminal", {"command": "cmd-3"}, '{"exit_code":1}', failed=True)
+    third = controller.after_call(
+        "terminal", {"command": "cmd-3"}, '{"exit_code":1}', failed=True
+    )
     assert third.action == "halt"
     assert third.code == "same_tool_failure_halt"
     assert third.count == 3
@@ -217,7 +241,9 @@ def test_hard_stop_enabled_blocks_idempotent_no_progress_future_repeat():
     result = "same file contents"
 
     assert controller.before_call("read_file", args).action == "allow"
-    assert controller.after_call("read_file", args, result, failed=False).action == "allow"
+    assert (
+        controller.after_call("read_file", args, result, failed=False).action == "allow"
+    )
     assert controller.before_call("read_file", args).action == "allow"
     warn = controller.after_call("read_file", args, result, failed=False)
     assert warn.action == "warn"
@@ -234,18 +260,39 @@ def test_mutating_or_unknown_tools_are_not_blocked_for_repeated_identical_succes
     )
 
     for _ in range(3):
-        assert controller.before_call("write_file", {"path": "/tmp/x", "content": "x"}).action == "allow"
-        assert controller.after_call("write_file", {"path": "/tmp/x", "content": "x"}, "ok", failed=False).action == "allow"
+        assert (
+            controller.before_call(
+                "write_file", {"path": "/tmp/x", "content": "x"}
+            ).action
+            == "allow"
+        )
+        assert (
+            controller.after_call(
+                "write_file", {"path": "/tmp/x", "content": "x"}, "ok", failed=False
+            ).action
+            == "allow"
+        )
         assert controller.before_call("custom_tool", {"x": 1}).action == "allow"
-        assert controller.after_call("custom_tool", {"x": 1}, "ok", failed=False).action == "allow"
+        assert (
+            controller.after_call("custom_tool", {"x": 1}, "ok", failed=False).action
+            == "allow"
+        )
 
 
 def test_reset_for_turn_clears_bounded_guardrail_state():
     controller = ToolCallGuardrailController(
-        ToolCallGuardrailConfig(hard_stop_enabled=True, exact_failure_block_after=2, no_progress_block_after=2)
+        ToolCallGuardrailConfig(
+            hard_stop_enabled=True,
+            exact_failure_block_after=2,
+            no_progress_block_after=2,
+        )
     )
-    controller.after_call("web_search", {"query": "same"}, '{"error":"boom"}', failed=True)
-    controller.after_call("web_search", {"query": "same"}, '{"error":"boom"}', failed=True)
+    controller.after_call(
+        "web_search", {"query": "same"}, '{"error":"boom"}', failed=True
+    )
+    controller.after_call(
+        "web_search", {"query": "same"}, '{"error":"boom"}', failed=True
+    )
     controller.after_call("read_file", {"path": "/tmp/x"}, "same", failed=False)
     controller.after_call("read_file", {"path": "/tmp/x"}, "same", failed=False)
 

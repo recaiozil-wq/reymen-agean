@@ -88,9 +88,9 @@ def _fake_create_task(coro):
     so future tests that exercise ``disconnect()`` after patching
     ``asyncio.create_task`` won't trip over a non-awaitable MagicMock.
     """
-    assert asyncio.iscoroutine(coro), (
-        f"_fake_create_task expected a coroutine, got {type(coro).__name__}"
-    )
+    assert asyncio.iscoroutine(
+        coro
+    ), f"_fake_create_task expected a coroutine, got {type(coro).__name__}"
     coro.close()
     loop = asyncio.get_event_loop()
     return loop.create_task(_pending_for_fake_task())

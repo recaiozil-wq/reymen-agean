@@ -38,6 +38,6 @@ def test_session_col_names_are_safe_identifiers():
     identifiers = [c.strip() for c in cols.split(",")]
     safe_identifier = re.compile(r"^[a-zA-Z_][a-zA-Z0-9_]*$")
     for col in identifiers:
-        assert safe_identifier.match(col), (
-            f"Column name {col!r} is not a safe SQL identifier"
-        )
+        assert safe_identifier.match(
+            col
+        ), f"Column name {col!r} is not a safe SQL identifier"

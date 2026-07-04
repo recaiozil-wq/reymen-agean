@@ -184,13 +184,14 @@ class TestGenerate:
         submit = _submit_response()
         poll = _poll_response(_completed_job("https://krea.cdn/result.png"))
 
-        with patch("plugins.image_gen.krea.requests.post", return_value=submit) as mock_post, \
-             patch("plugins.image_gen.krea.requests.get", return_value=poll) as mock_get, \
-             patch(
-                 "plugins.image_gen.krea.save_url_image",
-                 return_value=Path("/tmp/krea_krea-2-medium_test.png"),
-             ) as mock_save, \
-             patch("plugins.image_gen.krea.time.sleep"):  # skip real waits
+        with patch(
+            "plugins.image_gen.krea.requests.post", return_value=submit
+        ) as mock_post, patch(
+            "plugins.image_gen.krea.requests.get", return_value=poll
+        ) as mock_get, patch(
+            "plugins.image_gen.krea.save_url_image",
+            return_value=Path("/tmp/krea_krea-2-medium_test.png"),
+        ) as mock_save, patch("plugins.image_gen.krea.time.sleep"):  # skip real waits
             result = KreaImageGenProvider().generate(prompt="A cinematic lamp")
 
         assert result["success"] is True
@@ -217,13 +218,14 @@ class TestGenerate:
         submit = _submit_response()
         poll = _poll_response(_completed_job())
 
-        with patch("plugins.image_gen.krea.requests.post", return_value=submit) as mock_post, \
-             patch("plugins.image_gen.krea.requests.get", return_value=poll), \
-             patch(
-                 "plugins.image_gen.krea.save_url_image",
-                 return_value=Path("/tmp/x.png"),
-             ), \
-             patch("plugins.image_gen.krea.time.sleep"):
+        with patch(
+            "plugins.image_gen.krea.requests.post", return_value=submit
+        ) as mock_post, patch(
+            "plugins.image_gen.krea.requests.get", return_value=poll
+        ), patch(
+            "plugins.image_gen.krea.save_url_image",
+            return_value=Path("/tmp/x.png"),
+        ), patch("plugins.image_gen.krea.time.sleep"):
             KreaImageGenProvider().generate(prompt="test")
 
         post_url = mock_post.call_args[0][0]
@@ -236,13 +238,14 @@ class TestGenerate:
         submit = _submit_response()
         poll = _poll_response(_completed_job())
 
-        with patch("plugins.image_gen.krea.requests.post", return_value=submit) as mock_post, \
-             patch("plugins.image_gen.krea.requests.get", return_value=poll), \
-             patch(
-                 "plugins.image_gen.krea.save_url_image",
-                 return_value=Path("/tmp/x.png"),
-             ), \
-             patch("plugins.image_gen.krea.time.sleep"):
+        with patch(
+            "plugins.image_gen.krea.requests.post", return_value=submit
+        ) as mock_post, patch(
+            "plugins.image_gen.krea.requests.get", return_value=poll
+        ), patch(
+            "plugins.image_gen.krea.save_url_image",
+            return_value=Path("/tmp/x.png"),
+        ), patch("plugins.image_gen.krea.time.sleep"):
             KreaImageGenProvider().generate(prompt="test", aspect_ratio="square")
 
         payload = mock_post.call_args.kwargs["json"]
@@ -255,13 +258,14 @@ class TestGenerate:
         submit = _submit_response()
         poll = _poll_response(_completed_job())
 
-        with patch("plugins.image_gen.krea.requests.post", return_value=submit) as mock_post, \
-             patch("plugins.image_gen.krea.requests.get", return_value=poll), \
-             patch(
-                 "plugins.image_gen.krea.save_url_image",
-                 return_value=Path("/tmp/x.png"),
-             ), \
-             patch("plugins.image_gen.krea.time.sleep"):
+        with patch(
+            "plugins.image_gen.krea.requests.post", return_value=submit
+        ) as mock_post, patch(
+            "plugins.image_gen.krea.requests.get", return_value=poll
+        ), patch(
+            "plugins.image_gen.krea.save_url_image",
+            return_value=Path("/tmp/x.png"),
+        ), patch("plugins.image_gen.krea.time.sleep"):
             KreaImageGenProvider().generate(prompt="test")
 
         headers = mock_post.call_args.kwargs["headers"]
@@ -274,19 +278,25 @@ class TestGenerate:
         submit = _submit_response()
         poll = _poll_response(_completed_job())
 
-        with patch("plugins.image_gen.krea.requests.post", return_value=submit) as mock_post, \
-             patch("plugins.image_gen.krea.requests.get", return_value=poll), \
-             patch(
-                 "plugins.image_gen.krea.save_url_image",
-                 return_value=Path("/tmp/x.png"),
-             ), \
-             patch("plugins.image_gen.krea.time.sleep"):
+        with patch(
+            "plugins.image_gen.krea.requests.post", return_value=submit
+        ) as mock_post, patch(
+            "plugins.image_gen.krea.requests.get", return_value=poll
+        ), patch(
+            "plugins.image_gen.krea.save_url_image",
+            return_value=Path("/tmp/x.png"),
+        ), patch("plugins.image_gen.krea.time.sleep"):
             KreaImageGenProvider().generate(
                 prompt="test",
                 seed=42,
                 styles=[{"id": "lora-1", "strength": 0.7}],
-                moodboards=[{"url": "https://x.com/mood.png"}, {"url": "https://x.com/mood2.png"}],
-                image_style_references=[{"url": f"https://x.com/{i}.png"} for i in range(15)],
+                moodboards=[
+                    {"url": "https://x.com/mood.png"},
+                    {"url": "https://x.com/mood2.png"},
+                ],
+                image_style_references=[
+                    {"url": f"https://x.com/{i}.png"} for i in range(15)
+                ],
                 creativity="high",
             )
 
@@ -304,13 +314,12 @@ class TestGenerate:
         submit = _submit_response()
         poll = _poll_response(_completed_job())
 
-        with patch("plugins.image_gen.krea.requests.post", return_value=submit), \
-             patch("plugins.image_gen.krea.requests.get", return_value=poll), \
-             patch(
-                 "plugins.image_gen.krea.save_url_image",
-                 return_value=Path("/tmp/x.png"),
-             ), \
-             patch("plugins.image_gen.krea.time.sleep"):
+        with patch("plugins.image_gen.krea.requests.post", return_value=submit), patch(
+            "plugins.image_gen.krea.requests.get", return_value=poll
+        ), patch(
+            "plugins.image_gen.krea.save_url_image",
+            return_value=Path("/tmp/x.png"),
+        ), patch("plugins.image_gen.krea.time.sleep"):
             result = KreaImageGenProvider().generate(
                 prompt="test",
                 fictional_param="should be ignored",
@@ -334,9 +343,7 @@ class TestGenerateErrors:
         resp.status_code = 401
         resp._content = b'{"error": {"message": "Invalid API key"}}'
         resp.headers["Content-Type"] = "application/json"
-        resp.raise_for_status = MagicMock(
-            side_effect=req_lib.HTTPError(response=resp)
-        )
+        resp.raise_for_status = MagicMock(side_effect=req_lib.HTTPError(response=resp))
 
         with patch("plugins.image_gen.krea.requests.post", return_value=resp):
             result = KreaImageGenProvider().generate(prompt="test")
@@ -397,12 +404,10 @@ class TestGenerateErrors:
         }
 
         submit = _submit_response()
-        with patch("plugins.image_gen.krea.requests.post", return_value=submit), \
-             patch(
-                 "plugins.image_gen.krea.requests.get",
-                 return_value=_poll_response(failed),
-             ), \
-             patch("plugins.image_gen.krea.time.sleep"):
+        with patch("plugins.image_gen.krea.requests.post", return_value=submit), patch(
+            "plugins.image_gen.krea.requests.get",
+            return_value=_poll_response(failed),
+        ), patch("plugins.image_gen.krea.time.sleep"):
             result = KreaImageGenProvider().generate(prompt="test")
 
         assert result["success"] is False
@@ -419,12 +424,12 @@ class TestGenerateErrors:
             "result": {},
         }
 
-        with patch("plugins.image_gen.krea.requests.post", return_value=_submit_response()), \
-             patch(
-                 "plugins.image_gen.krea.requests.get",
-                 return_value=_poll_response(cancelled),
-             ), \
-             patch("plugins.image_gen.krea.time.sleep"):
+        with patch(
+            "plugins.image_gen.krea.requests.post", return_value=_submit_response()
+        ), patch(
+            "plugins.image_gen.krea.requests.get",
+            return_value=_poll_response(cancelled),
+        ), patch("plugins.image_gen.krea.time.sleep"):
             result = KreaImageGenProvider().generate(prompt="test")
 
         assert result["success"] is False
@@ -440,12 +445,12 @@ class TestGenerateErrors:
             "result": {"urls": []},
         }
 
-        with patch("plugins.image_gen.krea.requests.post", return_value=_submit_response()), \
-             patch(
-                 "plugins.image_gen.krea.requests.get",
-                 return_value=_poll_response(completed_empty),
-             ), \
-             patch("plugins.image_gen.krea.time.sleep"):
+        with patch(
+            "plugins.image_gen.krea.requests.post", return_value=_submit_response()
+        ), patch(
+            "plugins.image_gen.krea.requests.get",
+            return_value=_poll_response(completed_empty),
+        ), patch("plugins.image_gen.krea.time.sleep"):
             result = KreaImageGenProvider().generate(prompt="test")
 
         assert result["success"] is False
@@ -460,13 +465,12 @@ class TestGenerateErrors:
         submit = _submit_response()
         poll = _poll_response(_completed_job(url))
 
-        with patch("plugins.image_gen.krea.requests.post", return_value=submit), \
-             patch("plugins.image_gen.krea.requests.get", return_value=poll), \
-             patch(
-                 "plugins.image_gen.krea.save_url_image",
-                 side_effect=req_lib.HTTPError("404"),
-             ), \
-             patch("plugins.image_gen.krea.time.sleep"):
+        with patch("plugins.image_gen.krea.requests.post", return_value=submit), patch(
+            "plugins.image_gen.krea.requests.get", return_value=poll
+        ), patch(
+            "plugins.image_gen.krea.save_url_image",
+            side_effect=req_lib.HTTPError("404"),
+        ), patch("plugins.image_gen.krea.time.sleep"):
             result = KreaImageGenProvider().generate(prompt="test")
 
         assert result["success"] is True
@@ -486,16 +490,15 @@ class TestGenerateErrors:
             "result": {"urls": ["https://krea.cdn/done.png"]},
         }
 
-        with patch("plugins.image_gen.krea.requests.post", return_value=_submit_response()), \
-             patch(
-                 "plugins.image_gen.krea.requests.get",
-                 return_value=_poll_response(oddball),
-             ), \
-             patch(
-                 "plugins.image_gen.krea.save_url_image",
-                 return_value=Path("/tmp/x.png"),
-             ), \
-             patch("plugins.image_gen.krea.time.sleep"):
+        with patch(
+            "plugins.image_gen.krea.requests.post", return_value=_submit_response()
+        ), patch(
+            "plugins.image_gen.krea.requests.get",
+            return_value=_poll_response(oddball),
+        ), patch(
+            "plugins.image_gen.krea.save_url_image",
+            return_value=Path("/tmp/x.png"),
+        ), patch("plugins.image_gen.krea.time.sleep"):
             result = KreaImageGenProvider().generate(prompt="test")
 
         assert result["success"] is True
@@ -511,9 +514,7 @@ class TestPollRetryPolicy:
         resp.status_code = status
         resp._content = b'{"error": "boom"}'
         resp.headers["Content-Type"] = "application/json"
-        resp.raise_for_status = MagicMock(
-            side_effect=req_lib.HTTPError(response=resp)
-        )
+        resp.raise_for_status = MagicMock(side_effect=req_lib.HTTPError(response=resp))
         return resp
 
     def test_poll_fails_fast_on_401(self):
@@ -522,9 +523,11 @@ class TestPollRetryPolicy:
 
         bad_poll = self._http_error_response(401)
 
-        with patch("plugins.image_gen.krea.requests.post", return_value=_submit_response()), \
-             patch("plugins.image_gen.krea.requests.get", return_value=bad_poll) as mock_get, \
-             patch("plugins.image_gen.krea.time.sleep"):
+        with patch(
+            "plugins.image_gen.krea.requests.post", return_value=_submit_response()
+        ), patch(
+            "plugins.image_gen.krea.requests.get", return_value=bad_poll
+        ) as mock_get, patch("plugins.image_gen.krea.time.sleep"):
             result = KreaImageGenProvider().generate(prompt="test")
 
         assert result["success"] is False
@@ -539,9 +542,11 @@ class TestPollRetryPolicy:
 
         bad_poll = self._http_error_response(404)
 
-        with patch("plugins.image_gen.krea.requests.post", return_value=_submit_response()), \
-             patch("plugins.image_gen.krea.requests.get", return_value=bad_poll) as mock_get, \
-             patch("plugins.image_gen.krea.time.sleep"):
+        with patch(
+            "plugins.image_gen.krea.requests.post", return_value=_submit_response()
+        ), patch(
+            "plugins.image_gen.krea.requests.get", return_value=bad_poll
+        ) as mock_get, patch("plugins.image_gen.krea.time.sleep"):
             result = KreaImageGenProvider().generate(prompt="test")
 
         assert result["success"] is False
@@ -555,9 +560,11 @@ class TestPollRetryPolicy:
 
         bad_poll = self._http_error_response(403)
 
-        with patch("plugins.image_gen.krea.requests.post", return_value=_submit_response()), \
-             patch("plugins.image_gen.krea.requests.get", return_value=bad_poll) as mock_get, \
-             patch("plugins.image_gen.krea.time.sleep"):
+        with patch(
+            "plugins.image_gen.krea.requests.post", return_value=_submit_response()
+        ), patch(
+            "plugins.image_gen.krea.requests.get", return_value=bad_poll
+        ) as mock_get, patch("plugins.image_gen.krea.time.sleep"):
             result = KreaImageGenProvider().generate(prompt="test")
 
         assert result["success"] is False
@@ -570,16 +577,15 @@ class TestPollRetryPolicy:
         flaky = self._http_error_response(503)
         good = _poll_response(_completed_job("https://krea.cdn/ok.png"))
 
-        with patch("plugins.image_gen.krea.requests.post", return_value=_submit_response()), \
-             patch(
-                 "plugins.image_gen.krea.requests.get",
-                 side_effect=[flaky, flaky, good],
-             ) as mock_get, \
-             patch(
-                 "plugins.image_gen.krea.save_url_image",
-                 return_value=Path("/tmp/x.png"),
-             ), \
-             patch("plugins.image_gen.krea.time.sleep"):
+        with patch(
+            "plugins.image_gen.krea.requests.post", return_value=_submit_response()
+        ), patch(
+            "plugins.image_gen.krea.requests.get",
+            side_effect=[flaky, flaky, good],
+        ) as mock_get, patch(
+            "plugins.image_gen.krea.save_url_image",
+            return_value=Path("/tmp/x.png"),
+        ), patch("plugins.image_gen.krea.time.sleep"):
             result = KreaImageGenProvider().generate(prompt="test")
 
         assert result["success"] is True
@@ -592,16 +598,15 @@ class TestPollRetryPolicy:
         rate_limited = self._http_error_response(429)
         good = _poll_response(_completed_job("https://krea.cdn/ok.png"))
 
-        with patch("plugins.image_gen.krea.requests.post", return_value=_submit_response()), \
-             patch(
-                 "plugins.image_gen.krea.requests.get",
-                 side_effect=[rate_limited, good],
-             ) as mock_get, \
-             patch(
-                 "plugins.image_gen.krea.save_url_image",
-                 return_value=Path("/tmp/x.png"),
-             ), \
-             patch("plugins.image_gen.krea.time.sleep"):
+        with patch(
+            "plugins.image_gen.krea.requests.post", return_value=_submit_response()
+        ), patch(
+            "plugins.image_gen.krea.requests.get",
+            side_effect=[rate_limited, good],
+        ) as mock_get, patch(
+            "plugins.image_gen.krea.save_url_image",
+            return_value=Path("/tmp/x.png"),
+        ), patch("plugins.image_gen.krea.time.sleep"):
             result = KreaImageGenProvider().generate(prompt="test")
 
         assert result["success"] is True

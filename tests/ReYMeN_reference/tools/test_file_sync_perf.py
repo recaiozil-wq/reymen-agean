@@ -16,9 +16,11 @@ import pytest
 # Backend fixtures
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture
 def local_env():
     from tools.environments.local import LocalEnvironment
+
     env = LocalEnvironment(cwd="/tmp", timeout=30)
     yield env
     env.cleanup()
@@ -27,11 +29,13 @@ def local_env():
 @pytest.fixture
 def ssh_env():
     import os
+
     host = os.environ.get("TERMINAL_SSH_HOST")
     user = os.environ.get("TERMINAL_SSH_USER")
     if not host or not user:
         pytest.skip("TERMINAL_SSH_HOST and TERMINAL_SSH_USER required")
     from tools.environments.ssh import SSHEnvironment
+
     env = SSHEnvironment(host=host, user=user, cwd="/tmp", timeout=30)
     yield env
     env.cleanup()
@@ -41,6 +45,7 @@ def ssh_env():
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _time_executions(env, command: str, n: int = 10) -> list[float]:
     """Run *command* n times and return per-call wall-clock durations."""
     durations = []
@@ -49,8 +54,9 @@ def _time_executions(env, command: str, n: int = 10) -> list[float]:
         result = env.execute(command, timeout=10)
         elapsed = time.monotonic() - t0
         durations.append(elapsed)
-        assert result.get("returncode", result.get("exit_code", -1)) == 0, \
-            f"command failed: {result}"
+        assert (
+            result.get("returncode", result.get("exit_code", -1)) == 0
+        ), f"command failed: {result}"
     return durations
 
 
@@ -60,7 +66,9 @@ def _report(label: str, durations: list[float]):
     mean = statistics.mean(durations)
     p95 = sorted(durations)[int(len(durations) * 0.95)]
     print(f"\n  {label}:")
-    print(f"    n={len(durations)}  median={med*1000:.0f}ms  mean={mean*1000:.0f}ms  p95={p95*1000:.0f}ms")
+    print(
+        f"    n={len(durations)}  median={med*1000:.0f}ms  mean={mean*1000:.0f}ms  p95={p95*1000:.0f}ms"
+    )
     print(f"    raw: {[f'{d*1000:.0f}ms' for d in durations]}")
     return med
 
@@ -68,6 +76,7 @@ def _report(label: str, durations: list[float]):
 # ---------------------------------------------------------------------------
 # Tests
 # ---------------------------------------------------------------------------
+
 
 class TestLocalPerf:
     """Local baseline — no file sync, no network. Sets the floor."""
@@ -112,7 +121,9 @@ class TestSSHPerf:
 
         # Even with sync triggered, mtime skip should keep it fast
         # Old rsync approach: ~2-3s. New mtime skip: should be < 1.5s
-        assert elapsed < 1.5, f"sync-triggered command took {elapsed*1000:.0f}ms (expected < 1500ms)"
+        assert (
+            elapsed < 1.5
+        ), f"sync-triggered command took {elapsed*1000:.0f}ms (expected < 1500ms)"
 
     def test_no_sync_within_interval(self, ssh_env):
         """Rapid sequential commands within 5s window — no sync at all."""

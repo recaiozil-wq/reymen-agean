@@ -15,10 +15,10 @@ import urllib.parse
 import urllib.request
 from typing import Optional
 
-YUANBAO_APP_ID     = os.environ.get("YUANBAO_APP_ID", "")
+YUANBAO_APP_ID = os.environ.get("YUANBAO_APP_ID", "")
 YUANBAO_SECRET_KEY = os.environ.get("YUANBAO_SECRET_KEY", "")
-YUANBAO_REGION     = os.environ.get("YUANBAO_REGION", "ap-guangzhou")
-HUNYUAN_BASE       = "https://hunyuan.tencentcloudapi.com"
+YUANBAO_REGION = os.environ.get("YUANBAO_REGION", "ap-guangzhou")
+HUNYUAN_BASE = "https://hunyuan.tencentcloudapi.com"
 
 
 def _imza_uret(yuk: str, zaman_damgasi: int, nonce: str) -> str:
@@ -39,17 +39,17 @@ def _hunyuan_istek(eylem: str, govde: dict) -> dict:
         return {"error": "YUANBAO_APP_ID veya YUANBAO_SECRET_KEY ayarlanmamış."}
 
     zaman_damgasi = int(time.time())
-    nonce         = str(zaman_damgasi)
-    yuk_json      = json.dumps(govde, ensure_ascii=False)
-    imza          = _imza_uret(yuk_json, zaman_damgasi, nonce)
+    nonce = str(zaman_damgasi)
+    yuk_json = json.dumps(govde, ensure_ascii=False)
+    imza = _imza_uret(yuk_json, zaman_damgasi, nonce)
 
     basliklar = {
-        "Content-Type":          "application/json",
-        "X-TC-Action":           eylem,
-        "X-TC-Version":          "2023-09-01",
-        "X-TC-Timestamp":        str(zaman_damgasi),
-        "X-TC-Region":           YUANBAO_REGION,
-        "X-TC-RequestClient":    "ReYMeN/1.0",
+        "Content-Type": "application/json",
+        "X-TC-Action": eylem,
+        "X-TC-Version": "2023-09-01",
+        "X-TC-Timestamp": str(zaman_damgasi),
+        "X-TC-Region": YUANBAO_REGION,
+        "X-TC-RequestClient": "ReYMeN/1.0",
         "Authorization": (
             f"TC3-HMAC-SHA256 Credential={YUANBAO_APP_ID},"
             f" SignedHeaders=content-type;host, Signature={imza}"
@@ -83,13 +83,16 @@ def hunyuan_sohbet(
     Returns:
         Yanıt metni
     """
-    yanit = _hunyuan_istek("ChatCompletions", {
-        "Model":    model,
-        "Messages": [
-            {"Role": "system",    "Content": sistem},
-            {"Role": "user",      "Content": mesaj},
-        ],
-    })
+    yanit = _hunyuan_istek(
+        "ChatCompletions",
+        {
+            "Model": model,
+            "Messages": [
+                {"Role": "system", "Content": sistem},
+                {"Role": "user", "Content": mesaj},
+            ],
+        },
+    )
 
     if "error" in yanit:
         return f"[Yuanbao]: {yanit['error']}"

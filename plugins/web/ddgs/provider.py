@@ -89,7 +89,9 @@ class DDGSWebSearchProvider(WebSearchProvider):
             logger.warning("DDGS search error: %s", exc)
             return {"success": False, "error": f"DuckDuckGo search failed: {exc}"}
 
-        logger.info("DDGS search '%s': %d results (limit %d)", query, len(web_results), limit)
+        logger.info(
+            "DDGS search '%s': %d results (limit %d)", query, len(web_results), limit
+        )
         return {"success": True, "data": {"web": web_results}}
 
     def get_setup_schema(self) -> Dict[str, Any]:

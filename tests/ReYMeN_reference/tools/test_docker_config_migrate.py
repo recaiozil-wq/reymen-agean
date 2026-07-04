@@ -13,7 +13,9 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = REPO_ROOT / "scripts" / "docker_config_migrate.py"
 
 
-def _run_migration(ReYMeN_home: Path, **env_overrides: str) -> subprocess.CompletedProcess[str]:
+def _run_migration(
+    ReYMeN_home: Path, **env_overrides: str
+) -> subprocess.CompletedProcess[str]:
     env = os.environ.copy()
     env.update(
         {
@@ -32,7 +34,9 @@ def _run_migration(ReYMeN_home: Path, **env_overrides: str) -> subprocess.Comple
     )
 
 
-def test_docker_config_migrate_backs_up_and_migrates_legacy_config(tmp_path: Path) -> None:
+def test_docker_config_migrate_backs_up_and_migrates_legacy_config(
+    tmp_path: Path,
+) -> None:
     config_path = tmp_path / "config.yaml"
     env_path = tmp_path / ".env"
     model_map = {
@@ -79,7 +83,9 @@ def test_docker_config_migrate_backs_up_and_migrates_legacy_config(tmp_path: Pat
     assert list(tmp_path.glob(".env.bak-*"))
 
 
-def test_docker_config_migrate_backs_up_and_migrates_unversioned_config(tmp_path: Path) -> None:
+def test_docker_config_migrate_backs_up_and_migrates_unversioned_config(
+    tmp_path: Path,
+) -> None:
     config_path = tmp_path / "config.yaml"
     config_path.write_text(
         yaml.safe_dump(

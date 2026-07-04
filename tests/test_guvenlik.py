@@ -45,6 +45,7 @@ from reymen.guvenlik.guardrails import HallucinationFiltresi, HITLSikistirici
 # file_safety.py - Dosya Guvenlik Taramasi
 # ==============================================================================
 
+
 class TestGuvenliMi:
     """guvenli_mi() fonksiyon testleri."""
 
@@ -181,6 +182,7 @@ class TestGuvenliMi:
 # path_security.py - Yol Guvenligi
 # ==============================================================================
 
+
 class TestYolDogrula:
     """yol_dogrula() fonksiyon testleri."""
 
@@ -262,17 +264,21 @@ class TestSembolikLink:
 # 3. PII REDACTION (HASSAS VERI GIZLEME) TESTLERI
 # ==============================================================================
 
+
 class TestPIIRedaction:
     """tam_temizle() ve alt fonksiyon testleri."""
 
     # -- Email --
 
-    @pytest.mark.parametrize("girdi, beklenen_bitis", [
-        ("test@gmail.com", "[EMAIL]"),
-        ("kullanici@ornek.org.tr", "[EMAIL]"),
-        ("ad.soyad@sirket.com.tr", "[EMAIL]"),
-        ("eposta@sub.domain.co", "[EMAIL]"),
-    ])
+    @pytest.mark.parametrize(
+        "girdi, beklenen_bitis",
+        [
+            ("test@gmail.com", "[EMAIL]"),
+            ("kullanici@ornek.org.tr", "[EMAIL]"),
+            ("ad.soyad@sirket.com.tr", "[EMAIL]"),
+            ("eposta@sub.domain.co", "[EMAIL]"),
+        ],
+    )
     def test_email_temizle(self, girdi, beklenen_bitis):
         """Email adresleri [EMAIL] ile maskeleniyor mu?"""
         assert email_temizle(girdi) == beklenen_bitis
@@ -290,11 +296,14 @@ class TestPIIRedaction:
 
     # -- API Key --
 
-    @pytest.mark.parametrize("girdi, beklenen", [
-        ("API_KEY=mykey123", "API_KEY= [GIZLI]"),
-        ("SECRET_KEY=my_secret", "SECRET_KEY= [GIZLI]"),
-        ("APIKEY=test123", "APIKEY= [GIZLI]"),
-    ])
+    @pytest.mark.parametrize(
+        "girdi, beklenen",
+        [
+            ("API_KEY=mykey123", "API_KEY= [GIZLI]"),
+            ("SECRET_KEY=my_secret", "SECRET_KEY= [GIZLI]"),
+            ("APIKEY=test123", "APIKEY= [GIZLI]"),
+        ],
+    )
     def test_api_key_temizle(self, girdi, beklenen):
         """API key'ler [GIZLI] ile maskeleniyor mu?"""
         assert api_key_temizle(girdi) == beklenen
@@ -309,55 +318,67 @@ class TestPIIRedaction:
 
     # -- Telefon --
 
-    @pytest.mark.parametrize("girdi, beklenen", [
-        ("5051234567", "[TELEFON]"),            # Turkcell
-        ("5329876543", "[TELEFON]"),            # Vodafone
-        ("5125551212", "[TELEFON]"),            # 5 ile baslayan 10 hane
-        ("123456", "123456"),                   # 6 hane -> temizlenmez
-        ("1234567890123456", "1234567890123456"),  # 16 hane -> kart, telefon degil
-    ])
+    @pytest.mark.parametrize(
+        "girdi, beklenen",
+        [
+            ("5051234567", "[TELEFON]"),  # Turkcell
+            ("5329876543", "[TELEFON]"),  # Vodafone
+            ("5125551212", "[TELEFON]"),  # 5 ile baslayan 10 hane
+            ("123456", "123456"),  # 6 hane -> temizlenmez
+            ("1234567890123456", "1234567890123456"),  # 16 hane -> kart, telefon degil
+        ],
+    )
     def test_telefon_temizle(self, girdi, beklenen):
         """10 haneli telefon numaralari [TELEFON] ile maskeleniyor mu?"""
         assert telefon_temizle(girdi) == beklenen
 
     # -- Kredi Karti --
 
-    @pytest.mark.parametrize("girdi, beklenen", [
-        ("4532123456789012", "[KART_NO]"),                   # duz
-        ("4532-1234-5678-9012", "[KART_NO]"),               # tireli
-        ("4532 1234 5678 9012", "[KART_NO]"),               # bosluklu
-    ])
+    @pytest.mark.parametrize(
+        "girdi, beklenen",
+        [
+            ("4532123456789012", "[KART_NO]"),  # duz
+            ("4532-1234-5678-9012", "[KART_NO]"),  # tireli
+            ("4532 1234 5678 9012", "[KART_NO]"),  # bosluklu
+        ],
+    )
     def test_kart_temizle(self, girdi, beklenen):
         """Kredi karti numaralari [KART_NO] ile maskeleniyor mu?"""
         assert kart_temizle(girdi) == beklenen
 
     # -- TC Kimlik --
 
-    @pytest.mark.parametrize("girdi, beklenen", [
-        ("12345678901", "[TC_KIMLIK]"),          # 11 hane, 1 ile baslar
-        ("01234567890", "01234567890"),          # 0 ile baslar -> gecersiz TC
-        ("1234567890", "1234567890"),            # 10 hane -> TC degil
-    ])
+    @pytest.mark.parametrize(
+        "girdi, beklenen",
+        [
+            ("12345678901", "[TC_KIMLIK]"),  # 11 hane, 1 ile baslar
+            ("01234567890", "01234567890"),  # 0 ile baslar -> gecersiz TC
+            ("1234567890", "1234567890"),  # 10 hane -> TC degil
+        ],
+    )
     def test_tc_temizle(self, girdi, beklenen):
         """TC kimlik numaralari [TC_KIMLIK] ile maskeleniyor mu?"""
         assert tc_temizle(girdi) == beklenen
 
     # -- tam_temizle (toplu) --
 
-    @pytest.mark.parametrize("girdi, beklenen_parcalar", [
-        (
-            "Email: test@gmail.com, API_KEY=abc123",
-            ["[EMAIL]", "[GIZLI]"],
-        ),
-        (
-            "Tel: 5051234567, TC: 12345678901",
-            ["[TELEFON]", "[TC_KIMLIK]"],
-        ),
-        (
-            "Kart: 4532-1234-5678-9012, Email: user@site.com",
-            ["[KART_NO]", "[EMAIL]"],
-        ),
-    ])
+    @pytest.mark.parametrize(
+        "girdi, beklenen_parcalar",
+        [
+            (
+                "Email: test@gmail.com, API_KEY=abc123",
+                ["[EMAIL]", "[GIZLI]"],
+            ),
+            (
+                "Tel: 5051234567, TC: 12345678901",
+                ["[TELEFON]", "[TC_KIMLIK]"],
+            ),
+            (
+                "Kart: 4532-1234-5678-9012, Email: user@site.com",
+                ["[KART_NO]", "[EMAIL]"],
+            ),
+        ],
+    )
     def test_tam_temizle_parametrize(self, girdi, beklenen_parcalar):
         """tam_temizle tum PII turlerini tek geciste maskeliyor mu?"""
         sonuc = tam_temizle(girdi)
@@ -378,6 +399,7 @@ class TestPIIRedaction:
 # ==============================================================================
 # 4. GUARDRAILS (guardrails.py) TESTLERI
 # ==============================================================================
+
 
 class TestGuardrailsHallucination:
     """HallucinationFiltresi - LLM yanitinda risk isaretlerini tespit eder."""
@@ -406,8 +428,7 @@ class TestGuardrailsHallucination:
         filtre = HallucinationFiltresi()
         # 'internetle kontrol ettim' - dogru regex kalibi
         _, uyarilar = filtre.filtrele(
-            "Dosyayi olusturdum ve internetle kontrol ettim.",
-            hedef="dosya olustur"
+            "Dosyayi olusturdum ve internetle kontrol ettim.", hedef="dosya olustur"
         )
         kodlar = [u.kod for u in uyarilar]
         assert "OZ_REFERANS" in kodlar
@@ -416,9 +437,7 @@ class TestGuardrailsHallucination:
         """Toplam risk skoru esigi asarsa uyari donmeli."""
         # Emin olmayan (0.5) + kesin iddia (1.0) = 1.5 -> 1.0 esigini asar
         filtre = HallucinationFiltresi(esik_skor=1.0)
-        _, uyarilar = filtre.filtrele(
-            "Bu kesinlikle dogru, galiba boyle calisiyor."
-        )
+        _, uyarilar = filtre.filtrele("Bu kesinlikle dogru, galiba boyle calisiyor.")
         assert len(uyarilar) >= 2
 
     def test_istatistik_birikir(self):
@@ -444,9 +463,11 @@ class TestGuardrailsHITL:
     @staticmethod
     def _mock_motor():
         """HITL icin gecerli bir mock motor nesnesi olusturur."""
+
         class MockMotor:
             def calistir(self, arac, param):
                 return "ok"
+
         m = MockMotor()
         m.ekstra_riskli = set()
         return m

@@ -32,7 +32,9 @@ from typing import Any, Callable, Optional
 # ============================================================================
 # PROJE KOKU & SYS.PATH
 # ============================================================================
-_PROJE_KOK = Path(__file__).resolve().parent.parent.parent  # reymen/ag/../../ = proje koku
+_PROJE_KOK = (
+    Path(__file__).resolve().parent.parent.parent
+)  # reymen/ag/../../ = proje koku
 if str(_PROJE_KOK) not in sys.path:
     sys.path.insert(0, str(_PROJE_KOK))
 _SRC = _PROJE_KOK / "src"
@@ -63,6 +65,7 @@ DISCORD_AVAILABLE = False
 try:
     import discord
     from discord.ext import commands
+
     DISCORD_AVAILABLE = True
 except ImportError:
     discord = None
@@ -72,6 +75,7 @@ except ImportError:
 BEYIN_CLS = None
 try:
     from reymen.cereyan.beyin import Beyin as _B
+
     BEYIN_CLS = _B
 except ImportError as e:
     logger.warning("Beyin import edilemedi: %s", e)
@@ -81,6 +85,7 @@ ONCE_HAFIZA_ARA = None
 ONCE_HAFIZA_KAYDET = None
 try:
     from reymen.cereyan.once_hafiza import hafizada_ara as _ara, kaydet as _kaydet
+
     ONCE_HAFIZA_ARA = _ara
     ONCE_HAFIZA_KAYDET = _kaydet
 except ImportError as e:
@@ -90,13 +95,17 @@ except ImportError as e:
 CONVERSATION_LOOP_CLS = None
 try:
     from reymen.cereyan.conversation_loop import ConversationLoop as _CL
+
     CONVERSATION_LOOP_CLS = _CL
 except ImportError as e:
     logger.warning("ConversationLoop import edilemedi: %s", e)
 
 # — Ortak komutlar —
 try:
-    from reymen.ag.ortak_komutlar import komut_isle as ortak_komut_isle, cmd_run as ortak_cmd_run
+    from reymen.ag.ortak_komutlar import (
+        komut_isle as ortak_komut_isle,
+        cmd_run as ortak_cmd_run,
+    )
 except ImportError:
     ortak_komut_isle = None
     ortak_cmd_run = None
@@ -105,6 +114,7 @@ except ImportError:
 try:
     from reymen.ag.gateway_yonetici import GatewayManager
     from reymen.ag.platform_gateways import DiscordGateway
+
     GATEWAY_MANAGER_AVAILABLE = True
 except ImportError:
     GatewayManager = None
@@ -140,7 +150,9 @@ def _env_yukle():
 
     # 2. Hermes profil .env
     profil = os.environ.get("HERMES_PROFILE", "reymen")
-    hermes_env = Path.home() / "AppData" / "Local" / "hermes" / "profiles" / profil / ".env"
+    hermes_env = (
+        Path.home() / "AppData" / "Local" / "hermes" / "profiles" / profil / ".env"
+    )
     if hermes_env.exists():
         load_dotenv(str(hermes_env), override=True)
         logger.info("Hermes profil .env yuklendi: %s (override=True)", hermes_env)
@@ -157,6 +169,7 @@ COMMAND_PREFIX = os.environ.get("DISCORD_COMMAND_PREFIX", "/")
 try:
     from reymen.sistem.ortak_komut import guncelle as durum_otomatik_guncelle
     from reymen.sistem.ortak_watchdog import watchdog_baslat
+
     durum_otomatik_guncelle()
     watchdog_baslat(interval=30)
 except Exception as e:
@@ -173,10 +186,12 @@ _aktif_gorev: Optional[dict] = None
 # YARDIMCI FONKSIYONLAR
 # ============================================================================
 
+
 def _durum_guncelle(bot_adi: str):
     """KATI KURAL: Her bot baslangicinda kendini durum.json'a ekler/gunceller."""
     try:
         from reymen.sistem.durum import degisiklik_ekle
+
         durum_yolu = _PROJE_KOK / "durum.json"
         if durum_yolu.exists():
             veri = json.loads(durum_yolu.read_text(encoding="utf-8"))
@@ -203,7 +218,9 @@ def _durum_guncelle(bot_adi: str):
                     "platform": "discord",
                 }
                 veri["botlar"] = botlar
-                durum_yolu.write_text(json.dumps(veri, ensure_ascii=False, indent=2), encoding="utf-8")
+                durum_yolu.write_text(
+                    json.dumps(veri, ensure_ascii=False, indent=2), encoding="utf-8"
+                )
                 logger.info("[%s] ✅ Yeni Discord bot durum.json'a eklendi!", bot_adi)
                 degisiklik_ekle(bot_adi, f"Discord bot otomatik eklendi: {bot_adi}")
             else:
@@ -243,7 +260,11 @@ class DiscordBotProcess:
         _env_yukle()
         self.token = token
         self.bot_ad = bot_ad or self._bot_bilgisi_al()
-        self.ayar_dosyasi = _PROJE_KOK / ".ReYMeN" / f"discord_bot_{self.bot_ad.replace('@', '').replace('#', '')}.json"
+        self.ayar_dosyasi = (
+            _PROJE_KOK
+            / ".ReYMeN"
+            / f"discord_bot_{self.bot_ad.replace('@', '').replace('#', '')}.json"
+        )
         self.ayarlar: dict = dict(_VARSAYILAN_AYARLAR)
         self._beyin = None
         self._loop = None
@@ -289,7 +310,9 @@ class DiscordBotProcess:
             self.ayarlar["bilinen_kanallar"] = kanallar
             self._ayar_kaydet()
 
-    def konusma_ekle(self, session_id: str, kullanici: str, asistan: str, maks: int = 10):
+    def konusma_ekle(
+        self, session_id: str, kullanici: str, asistan: str, maks: int = 10
+    ):
         sessionlar = self.ayarlar.setdefault("sessionlar", {})
         gecmis = sessionlar.setdefault(session_id, [])
         gecmis.append({"kullanici": kullanici, "asistan": asistan})
@@ -345,9 +368,13 @@ class DiscordBotProcess:
 
         if CONVERSATION_LOOP_CLS is not None:
             try:
-                self._loop = CONVERSATION_LOOP_CLS(beyin=self._beyin, motor=None, max_tur=5)
+                self._loop = CONVERSATION_LOOP_CLS(
+                    beyin=self._beyin, motor=None, max_tur=5
+                )
             except Exception as e:
-                logger.warning("[%s] ConversationLoop baslatma hatasi: %s", self.bot_ad, e)
+                logger.warning(
+                    "[%s] ConversationLoop baslatma hatasi: %s", self.bot_ad, e
+                )
 
         logger.info("[%s] Beyin aktif: %s / %s", self.bot_ad, provider, model)
 
@@ -362,17 +389,20 @@ class DiscordBotProcess:
         # 1. BING (en stabil)
         try:
             url = f"https://www.bing.com/search?q={_up.quote(sorgu)}&mkt=tr-TR"
-            headers = {"User-Agent": "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36"}
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36"
+            }
             r = _req.get(url, headers=headers, timeout=10)
             sonuc = " | ".join(
                 _re.findall(
                     r'<li[^>]*class="b_algo"[^>]*>.*?<h2[^>]*>(.*?)</h2>',
-                    r.text, _re.DOTALL
+                    r.text,
+                    _re.DOTALL,
                 )[:5]
             )
             if sonuc:
-                sonuc = _re.sub(r'<[^>]+>', '', sonuc)
-                sonuc = _re.sub(r'&#\d+;', '', sonuc)
+                sonuc = _re.sub(r"<[^>]+>", "", sonuc)
+                sonuc = _re.sub(r"&#\d+;", "", sonuc)
                 return sonuc.strip()
         except Exception as _e:
             logger.warning("[%s] Bing hatasi: %s", self.bot_ad, _e)
@@ -380,9 +410,13 @@ class DiscordBotProcess:
         # 2. DUCKDUCKGO FALLBACK
         try:
             url = f"https://html.duckduckgo.com/html/?q={_up.quote(sorgu)}"
-            headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+            }
             r = _req.get(url, headers=headers, timeout=10)
-            sonuc = " ".join(_re.findall(r'<a[^>]*class="result__a"[^>]*>(.*?)</a>', r.text)[:5])
+            sonuc = " ".join(
+                _re.findall(r'<a[^>]*class="result__a"[^>]*>(.*?)</a>', r.text)[:5]
+            )
             if sonuc:
                 return sonuc
         except Exception as e:
@@ -411,8 +445,10 @@ class DiscordBotProcess:
                     kayit = h[0] if isinstance(h[0], dict) else {}
                     guven = kayit.get("guven", 0) if isinstance(kayit, dict) else 0
                     if guven > 0.7:
-                        cozum = kayit.get("cozum", "") if isinstance(kayit, dict) else (
-                            kayit[3] if len(kayit) > 3 else ""
+                        cozum = (
+                            kayit.get("cozum", "")
+                            if isinstance(kayit, dict)
+                            else (kayit[3] if len(kayit) > 3 else "")
                         )
                         if cozum:
                             return cozum[:2000]
@@ -445,28 +481,50 @@ class DiscordBotProcess:
                             )
 
                     from datetime import date as _date
+
                     sistem += f"\n\n[TEMEL KURAL: ÖNCE BAK, SONRA KONUŞ]\n"
                     sistem += f"BUGUNUN TARIHI: {_date.today()}\n"
                     sistem += "1. Önce web'den araştır. Web sonucu varsa SADECE onu kullan, kendi ezberinden ASLA tahmin etme.\n"
                     sistem += "2. Web sonucu yoksa 'güncel veri alınamadı' de, kendi bilginle tahmin etme.\n"
                     sistem += "3. Sorunu analiz et, adım adım çözüm sun, alternatifleri belirt.\n"
-                    sistem += "4. Selam/teşekkür gibi basit mesajlarda kısa cevap ver.\n"
+                    sistem += (
+                        "4. Selam/teşekkür gibi basit mesajlarda kısa cevap ver.\n"
+                    )
 
                     # ── TOOL OTOMATIK CALISTIRMA ─────────────────────
                     _tool_cikti = ""
                     _mesaj_lower = mesaj.lower()
 
                     _soru_mi = (
-                        "?" in mesaj or "nedir" in _mesaj_lower or "nasıl" in _mesaj_lower
-                        or "ne" in _mesaj_lower or "mi" in _mesaj_lower
-                        or "kaç" in _mesaj_lower or "neden" in _mesaj_lower
+                        "?" in mesaj
+                        or "nedir" in _mesaj_lower
+                        or "nasıl" in _mesaj_lower
+                        or "ne" in _mesaj_lower
+                        or "mi" in _mesaj_lower
+                        or "kaç" in _mesaj_lower
+                        or "neden" in _mesaj_lower
                         or len(mesaj.split()) >= 4
                     )
-                    _selam_mi = _mesaj_lower.strip() in ["merhaba", "selam", "hey", "sa", "hi", "hello", "iyi günler"]
+                    _selam_mi = _mesaj_lower.strip() in [
+                        "merhaba",
+                        "selam",
+                        "hey",
+                        "sa",
+                        "hi",
+                        "hello",
+                        "iyi günler",
+                    ]
                     if _soru_mi and not _selam_mi:
-                        logger.info("[%s] 🔍 Web arama tetiklendi: %s", self.bot_ad, mesaj[:60])
+                        logger.info(
+                            "[%s] 🔍 Web arama tetiklendi: %s", self.bot_ad, mesaj[:60]
+                        )
                         _tool_cikti = self._tool_web_search(mesaj)
-                        logger.info("[%s] 🔍 Web sonucu (%d karakter): %s", self.bot_ad, len(_tool_cikti), _tool_cikti[:200])
+                        logger.info(
+                            "[%s] 🔍 Web sonucu (%d karakter): %s",
+                            self.bot_ad,
+                            len(_tool_cikti),
+                            _tool_cikti[:200],
+                        )
                         sistem += f"\n\n🔍 WEB ARAMA SONUCU:\n{_tool_cikti}\n"
 
                     # ── Session gecmisi ──────────────────────────────
@@ -479,9 +537,13 @@ class DiscordBotProcess:
                     for kayit in gecmis[-5:]:
                         if isinstance(kayit, dict):
                             if kayit.get("kullanici"):
-                                msg_list.append({"role": "user", "content": kayit["kullanici"]})
+                                msg_list.append(
+                                    {"role": "user", "content": kayit["kullanici"]}
+                                )
                             if kayit.get("asistan"):
-                                msg_list.append({"role": "assistant", "content": kayit["asistan"]})
+                                msg_list.append(
+                                    {"role": "assistant", "content": kayit["asistan"]}
+                                )
                     msg_list.append({"role": "user", "content": mesaj})
 
                     yanit = self._beyin.uret(sistem, msg_list)
@@ -499,7 +561,9 @@ class DiscordBotProcess:
             else:
                 if ONCE_HAFIZA_KAYDET is not None:
                     try:
-                        ONCE_HAFIZA_KAYDET(mesaj, "discord_sohbet", sonuc["cevap"], basari=True)
+                        ONCE_HAFIZA_KAYDET(
+                            mesaj, "discord_sohbet", sonuc["cevap"], basari=True
+                        )
                     except Exception as e:
                         log.warning(f"[discord_bot] Hafiza kaydi hatasi: {e}")
                         pass
@@ -536,7 +600,9 @@ class DiscordBotProcess:
         # — /new — Yeni session baslat
         if komut == COMMAND_PREFIX + "new":
             self.session_sifirla(session_id)
-            asyncio.create_task(_send("✅ Yeni konusma baslatildi! Nasil yardimci olabilirim?"))
+            asyncio.create_task(
+                _send("✅ Yeni konusma baslatildi! Nasil yardimci olabilirim?")
+            )
             return True
 
         # — /stop — Aktif gorevi durdur
@@ -565,9 +631,15 @@ class DiscordBotProcess:
         # — /model — Model goster
         elif komut == COMMAND_PREFIX + "model":
             if not arg:
-                asyncio.create_task(_send(f"🤖 Model: {self.ayarlar.get('model')} (kilitli)"))
+                asyncio.create_task(
+                    _send(f"🤖 Model: {self.ayarlar.get('model')} (kilitli)")
+                )
             else:
-                asyncio.create_task(_send("❌ Model degistirme devre disi. Sadece deepseek-v4-flash kullanilir."))
+                asyncio.create_task(
+                    _send(
+                        "❌ Model degistirme devre disi. Sadece deepseek-v4-flash kullanilir."
+                    )
+                )
             return True
 
         # — /status — Bot durumu
@@ -604,6 +676,7 @@ class DiscordBotProcess:
                 # Ortak komutlar icin async wrapper
                 def _gonder_async(cid, metin):
                     asyncio.create_task(channel.send(metin[:2000]))
+
                 return ortak_komut_isle(text, _gonder_async, channel.id)
             except Exception as e:
                 log.warning(f"[discord_bot] Mesaj gonderme hatasi: {e}")
@@ -632,7 +705,9 @@ class DiscordBotProcess:
         if not text:
             return
 
-        logger.info("[%s] [%s] %s: %.60s", self.bot_ad, channel.id, message.author, text)
+        logger.info(
+            "[%s] [%s] %s: %.60s", self.bot_ad, channel.id, message.author, text
+        )
 
         # Komut kontrol
         if self.komut_isle(channel, message.author, text):
@@ -666,7 +741,12 @@ class DiscordBotProcess:
                 if kanal:
                     await kanal.send(f"🟢 {self.bot_ad} Gateway Ready!")
             except Exception as e:
-                logger.warning("[%s] Startup mesaji gonderilemedi [%s]: %s", self.bot_ad, kanal_id, e)
+                logger.warning(
+                    "[%s] Startup mesaji gonderilemedi [%s]: %s",
+                    self.bot_ad,
+                    kanal_id,
+                    e,
+                )
 
     def run(self):
         """Discord bot'u baslat ve calistir."""
@@ -703,6 +783,7 @@ class DiscordBotProcess:
 # GATEWAY / MOTOR ENTEGRASYON
 # ============================================================================
 
+
 def motor_kaydet(motor):
     """Motor'a DISCORD_GONDER aracini ekle."""
     if not hasattr(motor, "_plugin_arac_kaydet"):
@@ -711,7 +792,8 @@ def motor_kaydet(motor):
         "DISCORD_GONDER",
         lambda metin="", kanal_id="": (
             f"[Discord] HEDEF: {kanal_id}, MESAJ: {metin[:100]}"
-            if metin else "[Discord] Gonderim aracı kayitli (arkaplan bot ile)."
+            if metin
+            else "[Discord] Gonderim aracı kayitli (arkaplan bot ile)."
         ),
         "Discord kanalina mesaj gonder (metin, kanal_id gerekli)",
     )
@@ -719,7 +801,8 @@ def motor_kaydet(motor):
         "DISCORD_BOT_GONDER",
         lambda metin="", kanal_id="": (
             f"[Discord] HEDEF: {kanal_id}, MESAJ: {metin[:100]}"
-            if metin else "[Discord] Gonderim aracı kayitli."
+            if metin
+            else "[Discord] Gonderim aracı kayitli."
         ),
         "Discord bot ile mesaj gonder (metin, kanal_id gerekli)",
     )
@@ -728,6 +811,7 @@ def motor_kaydet(motor):
 # ============================================================================
 # ANA GIRIS
 # ============================================================================
+
 
 def main():
     """Ana giris noktasi.

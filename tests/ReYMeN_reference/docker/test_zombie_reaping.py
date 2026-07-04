@@ -10,6 +10,7 @@ Every ``docker exec`` here runs as the unprivileged ``ReYMeN`` user
 (via :func:`docker_exec_sh` in conftest); see the conftest module
 docstring.
 """
+
 from __future__ import annotations
 
 import subprocess
@@ -19,13 +20,15 @@ from tests.docker.conftest import docker_exec, docker_exec_sh
 
 
 def test_orphan_zombies_reaped(
-    built_image: str, container_name: str,
+    built_image: str,
+    container_name: str,
 ) -> None:
     """Spawn an orphan child that exits immediately. PID 1 must reap it."""
     subprocess.run(
-        ["docker", "run", "-d", "--name", container_name, built_image,
-         "sleep", "60"],
-        check=True, capture_output=True, timeout=30,
+        ["docker", "run", "-d", "--name", container_name, built_image, "sleep", "60"],
+        check=True,
+        capture_output=True,
+        timeout=30,
     )
     time.sleep(2)
 
@@ -33,13 +36,12 @@ def test_orphan_zombies_reaped(
     # the original docker exec session — it becomes an orphan reparented
     # to PID 1 in the container. When it exits, PID 1 must reap it.
     docker_exec_sh(
-        container_name, "( ( sleep 0.1 & ) & ); sleep 1", timeout=10,
+        container_name,
+        "( ( sleep 0.1 & ) & ); sleep 1",
+        timeout=10,
     )
     time.sleep(1)
 
     r = docker_exec(container_name, "ps", "axo", "stat,pid,comm")
-    zombies = [
-        line for line in r.stdout.split("\n")
-        if line.strip().startswith("Z")
-    ]
+    zombies = [line for line in r.stdout.split("\n") if line.strip().startswith("Z")]
     assert not zombies, f"Zombies not reaped by PID 1: {zombies}"

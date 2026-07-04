@@ -1,4 +1,5 @@
 """ReYMeN tools.todo_tool shim — Hermes TODO fonksiyonlarını yönlendirir."""
+
 from __future__ import annotations
 
 import logging
@@ -14,7 +15,12 @@ class TodoStore:
         self._items: List[Dict[str, Any]] = []
 
     def add(self, content: str, **kwargs) -> Dict[str, Any]:
-        item = {"id": len(self._items) + 1, "content": content, "status": "pending", **kwargs}
+        item = {
+            "id": len(self._items) + 1,
+            "content": content,
+            "status": "pending",
+            **kwargs,
+        }
         self._items.append(item)
         return item
 

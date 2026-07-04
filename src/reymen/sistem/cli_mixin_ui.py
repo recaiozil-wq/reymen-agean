@@ -25,9 +25,9 @@ from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
 
+
 class MixinUI:
     """ReYMeNCLI UI/Aesthetics — skin, footer, agents list, kanban."""
-
 
     def _handle_agents_command(self):
         """Handle /agents — show background processes and agent status."""
@@ -49,7 +49,6 @@ class MixinUI:
         agent_running = getattr(self, "_agent_running", False)
         _cprint(f"  Agent: {'running' if agent_running else 'idle'}")
 
-
     def _handle_kanban_command(self, cmd: str):
         """Handle the /kanban command — delegate to the shared kanban CLI.
 
@@ -63,7 +62,7 @@ class MixinUI:
         if rest.startswith("/"):
             rest = rest.lstrip("/")
         if rest.startswith("kanban"):
-            rest = rest[len("kanban"):].lstrip()
+            rest = rest[len("kanban") :].lstrip()
         try:
             output = run_slash(rest)
         except Exception as exc:  # pragma: no cover - defensive
@@ -71,11 +70,14 @@ class MixinUI:
         if output:
             print(output)
 
-
     def _handle_skin_command(self, cmd: str):
         """Handle /skin [name] — show or change the display skin."""
         try:
-            from reymen.reymen_cli.skin_engine import list_skins, set_active_skin, get_active_skin_name
+            from reymen.reymen_cli.skin_engine import (
+                list_skins,
+                set_active_skin,
+                get_active_skin_name,
+            )
         except ImportError:
             print("Skin engine not available.")
             return
@@ -92,7 +94,9 @@ class MixinUI:
                 source = f" ({s['source']})" if s["source"] == "user" else ""
                 print(f"   {marker} {s['name']}{source} — {s['description']}")
             print("\n  Usage: /skin <name>")
-            print(f"  Custom skins: drop a YAML file in {display_reymen_home()}/skins/\n")
+            print(
+                f"  Custom skins: drop a YAML file in {display_reymen_home()}/skins/\n"
+            )
             return
 
         new_skin = parts[1].strip().lower()
@@ -113,7 +117,6 @@ class MixinUI:
         print("  Note: banner colors will update on next session start.")
         if self._apply_tui_skin_style():
             print("  Prompt + TUI colors updated.")
-
 
     def _handle_footer_command(self, cmd_original: str) -> None:
         """Toggle or inspect ``display.runtime_footer.enabled`` from the CLI.
@@ -136,7 +139,7 @@ class MixinUI:
             arg = ""
 
         cfg = load_config() or {}
-        footer_cfg = ((cfg.get("display") or {}).get("runtime_footer") or {})
+        footer_cfg = (cfg.get("display") or {}).get("runtime_footer") or {}
         current = bool(footer_cfg.get("enabled", False))
         fields = footer_cfg.get("fields") or ["model", "context_pct", "cwd"]
 
@@ -160,7 +163,8 @@ class MixinUI:
 
         if save_config_value("display.runtime_footer.enabled", new_state):
             state = (
-                f"{_Colors.GREEN}ON{_Colors.RESET}" if new_state
+                f"{_Colors.GREEN}ON{_Colors.RESET}"
+                if new_state
                 else f"{_Colors.DIM}OFF{_Colors.RESET}"
             )
             _cprint(f"  Runtime footer: {state}")
@@ -168,4 +172,4 @@ class MixinUI:
             _cprint("  Failed to save runtime_footer setting to config.yaml")
 
 
-__all__ = ['MixinUI']
+__all__ = ["MixinUI"]

@@ -18,6 +18,7 @@ def _handle_curator_command(cli, cmd: str):
 
     try:
         from reymen.reymen_cli.curator import cli_main
+
         cli_main(tokens)
     except SystemExit:
         # argparse calls sys.exit() on --help or errors; swallow so we

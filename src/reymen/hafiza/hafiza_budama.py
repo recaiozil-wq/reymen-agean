@@ -29,19 +29,21 @@ from typing import Any
 # ── Ayarlar ──────────────────────────────────────────────────────────────
 
 # MEMORY entry yaşam süreleri (gün)
-GUNLUK_GOREV_TTL = 3          # Günlük görev entry'leri 3 gün sonra temizlenir
-HAFIZA_ENTRY_TTL = 14         # Genel hafıza entry'leri 14 gün sonra temizlenir
-KURAL_TTL = 90                # Kalıcı kurallar 90 gün sonra gözden geçirilir
-DOSYA_TTL = 7                 # .ReYMeN/memories/ dosyaları 7 gün
+GUNLUK_GOREV_TTL = 3  # Günlük görev entry'leri 3 gün sonra temizlenir
+HAFIZA_ENTRY_TTL = 14  # Genel hafıza entry'leri 14 gün sonra temizlenir
+KURAL_TTL = 90  # Kalıcı kurallar 90 gün sonra gözden geçirilir
+DOSYA_TTL = 7  # .ReYMeN/memories/ dosyaları 7 gün
 
 # Budama eşikleri
-MAX_ENTRY_KARAKTER = 200      # Bir entry max 200 karakter (fazlası kesilir)
-MAX_BENZERLIK_ESIK = 0.6     # Benzerlik oranı > %60 ise birleştir
-MIN_BOSLUK = 500              # Budama sonrası en az 500 karakter boşluk bırak
+MAX_ENTRY_KARAKTER = 200  # Bir entry max 200 karakter (fazlası kesilir)
+MAX_BENZERLIK_ESIK = 0.6  # Benzerlik oranı > %60 ise birleştir
+MIN_BOSLUK = 500  # Budama sonrası en az 500 karakter boşluk bırak
 
 # Yollar
 PROJE = Path(__file__).parent.resolve()
-REYMEN_MEMORIES = Path.home() / "AppData" / "Local" / "hermes" / "profiles" / "reymen" / "memories"
+REYMEN_MEMORIES = (
+    Path.home() / "AppData" / "Local" / "hermes" / "profiles" / "reymen" / "memories"
+)
 REYMEN_CONFIG = Path.home() / "AppData" / "Local" / "hermes" / "config.yaml"
 REYMEN_DB = Path(str(PROJE) + "\\.reymen_hafiza\\hafiza.db")
 
@@ -51,6 +53,7 @@ logger = logging.getLogger(__name__)
 # ══════════════════════════════════════════════════════════════════════════
 # 1. REYMEN MEMORY BUDA
 # ══════════════════════════════════════════════════════════════════════════
+
 
 def reymen_memory_buda(dry_run: bool = False) -> dict:
     """ReYMeN MEMORY.md ve USER.md'deki entry'leri buda.
@@ -83,9 +86,8 @@ def reymen_memory_buda(dry_run: bool = False) -> dict:
         rapor["user"]["sonra"] = sonra
         rapor["user"]["silinen"] = onceki - sonra
 
-    rapor["toplam_kazanc"] = (
-        (rapor["memory"]["onceki"] - rapor["memory"]["sonra"]) +
-        (rapor["user"]["onceki"] - rapor["user"]["sonra"])
+    rapor["toplam_kazanc"] = (rapor["memory"]["onceki"] - rapor["memory"]["sonra"]) + (
+        rapor["user"]["onceki"] - rapor["user"]["sonra"]
     )
     return rapor
 
@@ -126,9 +128,11 @@ def _memory_dosyasi_buda(dosya_yolu: Path, dry_run: bool) -> tuple:
             logger.error("Yazma hatasi %s: %s", dosya_yolu, e)
 
     sonraki_char = len(yeni_icerik)
-    print(f"  {dosya_yolu.name}: {onceki_entry} entry → {len(yeni_entryler)} entry"
-          f" ({onceki_char} → {sonraki_char} karakter, {onceki_char - sonraki_char} kazanc)"
-          + (" [DRY RUN]" if dry_run else ""))
+    print(
+        f"  {dosya_yolu.name}: {onceki_entry} entry → {len(yeni_entryler)} entry"
+        f" ({onceki_char} → {sonraki_char} karakter, {onceki_char - sonraki_char} kazanc)"
+        + (" [DRY RUN]" if dry_run else "")
+    )
 
     return onceki_entry, len(yeni_entryler)
 
@@ -156,11 +160,11 @@ def _entryleri_temizle(entryler: list[str]) -> list[str]:
             continue
 
         # Sadece tarih/sayı entry'lerini atla
-        if re.match(r'^[\d\s\-:./,]+$', e):
+        if re.match(r"^[\d\s\-:./,]+$", e):
             continue
 
         # "test" veya "deneme" içeren çok kısa entry'leri atla
-        if len(e) < 30 and re.search(r'test|deneme|örnek|ornek', e, re.IGNORECASE):
+        if len(e) < 30 and re.search(r"test|deneme|örnek|ornek", e, re.IGNORECASE):
             continue
 
         # Eski tamamlanmış görev kayıtlarını temizle
@@ -171,7 +175,7 @@ def _entryleri_temizle(entryler: list[str]) -> list[str]:
 
         # Uzun entry'leri kısalt (fazla detayı kes)
         if len(e) > MAX_ENTRY_KARAKTER * 2:
-            e = e[:MAX_ENTRY_KARAKTER * 2] + "..."
+            e = e[: MAX_ENTRY_KARAKTER * 2] + "..."
 
         yeni.append(e)
 
@@ -181,11 +185,29 @@ def _entryleri_temizle(entryler: list[str]) -> list[str]:
 def _gorev_entry_mi(metin: str) -> bool:
     """Bir entry'nin eski bir görev kaydı olup olmadığını kontrol et."""
     gorev_isaretleri = [
-        "fix:", "düzeltildi", "duzeltildi", "tamamlandi", "tamamlandı",
-        "görev bitti", "gorev bitti", "cozuldu", "çözüldü",
-        "eklendi", "kaldirildi", "kaldırıldı", "guncellendi", "güncellendi",
-        "test gecti", "test geçti", "basarili", "başarılı",
-        "gorev_id", "task_id", "commit", "push edildi", "merged",
+        "fix:",
+        "düzeltildi",
+        "duzeltildi",
+        "tamamlandi",
+        "tamamlandı",
+        "görev bitti",
+        "gorev bitti",
+        "cozuldu",
+        "çözüldü",
+        "eklendi",
+        "kaldirildi",
+        "kaldırıldı",
+        "guncellendi",
+        "güncellendi",
+        "test gecti",
+        "test geçti",
+        "basarili",
+        "başarılı",
+        "gorev_id",
+        "task_id",
+        "commit",
+        "push edildi",
+        "merged",
     ]
     metin_lower = metin.lower()
     return any(isaret in metin_lower for isaret in gorev_isaretleri)
@@ -236,8 +258,8 @@ def _entryleri_birlestir(entryler: list[str]) -> list[str]:
 def _benzerlik_orani(s1: str, s2: str) -> float:
     """İki string arasındaki benzerlik oranı (0.0 - 1.0)."""
     # Aynı kelimelerin oranı
-    kelimeler1 = set(re.findall(r'\w+', s1.lower()))
-    kelimeler2 = set(re.findall(r'\w+', s2.lower()))
+    kelimeler1 = set(re.findall(r"\w+", s1.lower()))
+    kelimeler2 = set(re.findall(r"\w+", s2.lower()))
     if not kelimeler1 or not kelimeler2:
         return 0.0
     kesisim = kelimeler1 & kelimeler2
@@ -248,6 +270,7 @@ def _benzerlik_orani(s1: str, s2: str) -> float:
 # ══════════════════════════════════════════════════════════════════════════
 # 2. REYMEN SQLITE HAFIZA BUDA
 # ══════════════════════════════════════════════════════════════════════════
+
 
 def reymen_hafiza_buda(dry_run: bool = False) -> dict:
     """ReYMeN SQLite hafızasındaki eski kayıtları temizle.
@@ -270,25 +293,31 @@ def reymen_hafiza_buda(dry_run: bool = False) -> dict:
         c = conn.cursor()
 
         # Koleksiyon bazında kayıt sayıları
-        rows = c.execute("SELECT koleksiyon, COUNT(*) FROM kayitlar GROUP BY koleksiyon").fetchall()
+        rows = c.execute(
+            "SELECT koleksiyon, COUNT(*) FROM kayitlar GROUP BY koleksiyon"
+        ).fetchall()
         for koleksiyon, sayi in rows:
             rapor["toplam"] += sayi
             rapor["koleksiyonlar"][koleksiyon] = {"onceki": sayi, "silinen": 0}
 
         # 1. Expire zamanı geçmiş kayıtları sil
         simdi = time.time()
-        c.execute("DELETE FROM kayitlar WHERE expire_zaman > 0 AND expire_zaman < ?", (simdi,))
+        c.execute(
+            "DELETE FROM kayitlar WHERE expire_zaman > 0 AND expire_zaman < ?", (simdi,)
+        )
         silinen_expire = c.rowcount
 
         # 2. Konuşma kayıtları: 14 günden eski olanları temizle (son 50 kayıt hariç)
         # Her session için son 50 mesajı koru, öncesini sil
-        sessions = c.execute("SELECT DISTINCT session_id FROM kayitlar WHERE koleksiyon='konusmalar'").fetchall()
+        sessions = c.execute(
+            "SELECT DISTINCT session_id FROM kayitlar WHERE koleksiyon='konusmalar'"
+        ).fetchall()
         session_based = 0
         for (sid,) in sessions:
             # Session'daki toplam kayıt
             toplam_session = c.execute(
                 "SELECT COUNT(*) FROM kayitlar WHERE session_id=? AND koleksiyon='konusmalar'",
-                (sid,)
+                (sid,),
             ).fetchone()[0]
             if toplam_session > 50:
                 # Son 50 kaydın ID'sini bul
@@ -296,7 +325,7 @@ def reymen_hafiza_buda(dry_run: bool = False) -> dict:
                     """SELECT id FROM kayitlar
                        WHERE session_id=? AND koleksiyon='konusmalar'
                        ORDER BY id DESC LIMIT 50""",
-                    (sid,)
+                    (sid,),
                 )
                 korunacak = [row[0] for row in c.fetchall()]
                 if korunacak:
@@ -305,7 +334,7 @@ def reymen_hafiza_buda(dry_run: bool = False) -> dict:
                         f"""DELETE FROM kayitlar
                             WHERE session_id=? AND koleksiyon='konusmalar'
                             AND id NOT IN ({placeholders})""",
-                        (sid, *korunacak)
+                        (sid, *korunacak),
                     )
                     session_based += c.rowcount
 
@@ -313,7 +342,7 @@ def reymen_hafiza_buda(dry_run: bool = False) -> dict:
         eski_session = c.execute(
             """SELECT s.id FROM sessions s
                WHERE s.bitis > 0 AND s.bitis < ?""",
-            (simdi - GUNLUK_GOREV_TTL * 86400,)
+            (simdi - GUNLUK_GOREV_TTL * 86400,),
         ).fetchall()
 
         for (sid,) in eski_session:
@@ -326,7 +355,9 @@ def reymen_hafiza_buda(dry_run: bool = False) -> dict:
             conn.commit()
 
             # Koleksiyon bazında güncel sayılar
-            rows = c.execute("SELECT koleksiyon, COUNT(*) FROM kayitlar GROUP BY koleksiyon").fetchall()
+            rows = c.execute(
+                "SELECT koleksiyon, COUNT(*) FROM kayitlar GROUP BY koleksiyon"
+            ).fetchall()
             for koleksiyon, sayi in rows:
                 if koleksiyon in rapor["koleksiyonlar"]:
                     onceki = rapor["koleksiyonlar"][koleksiyon]["onceki"]
@@ -336,8 +367,10 @@ def reymen_hafiza_buda(dry_run: bool = False) -> dict:
         conn.close()
 
         rapor["silinen"] = toplam_silinen
-        print(f"  ReYMeN SQLite: {rapor['toplam']} kayit → {toplam_silinen} silindi"
-              + (" [DRY RUN]" if dry_run else ""))
+        print(
+            f"  ReYMeN SQLite: {rapor['toplam']} kayit → {toplam_silinen} silindi"
+            + (" [DRY RUN]" if dry_run else "")
+        )
 
     except Exception as e:
         print(f"  SQLite budama hatasi: {e}")
@@ -348,6 +381,7 @@ def reymen_hafiza_buda(dry_run: bool = False) -> dict:
 # ══════════════════════════════════════════════════════════════════════════
 # 3. MEMORY DOSYALARINI TEMIZLE
 # ══════════════════════════════════════════════════════════════════════════
+
 
 def memory_dosyalarini_temizle(dry_run: bool = False) -> dict:
     """.ReYMeN/memories/ içindeki eski dosyaları temizle.
@@ -391,15 +425,17 @@ def memory_dosyalarini_temizle(dry_run: bool = False) -> dict:
             print(f"[UYARI] hafiza_budama.py:390 - {_hafiza_b_e389}")
 
     rapor["kb_kazanc"] = round(rapor["kb_kazanc"] / 1024, 1)
-    print(f"  .ReYMeN/memories/: {rapor['toplam']} dosyadan {rapor['silinen']} silindi"
-          f" ({rapor['kb_kazanc']} KB kazanc)"
-          + (" [DRY RUN]" if dry_run else ""))
+    print(
+        f"  .ReYMeN/memories/: {rapor['toplam']} dosyadan {rapor['silinen']} silindi"
+        f" ({rapor['kb_kazanc']} KB kazanc)" + (" [DRY RUN]" if dry_run else "")
+    )
     return rapor
 
 
 # ══════════════════════════════════════════════════════════════════════════
 # 4. ANA BUDA FONKSIYONU
 # ══════════════════════════════════════════════════════════════════════════
+
 
 def buda(dry_run: bool = False) -> dict:
     """Tüm hafıza sistemlerini buda.
@@ -414,7 +450,9 @@ def buda(dry_run: bool = False) -> dict:
     print(f"  HAFIZA BUDA {'(DRY RUN - sadece rapor)' if dry_run else ''}")
     print(f"{'=' * 60}")
     print(f"  Baslama: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"  TTL: gorev={GUNLUK_GOREV_TTL}g, hafiza={HAFIZA_ENTRY_TTL}g, dosya={DOSYA_TTL}g")
+    print(
+        f"  TTL: gorev={GUNLUK_GOREV_TTL}g, hafiza={HAFIZA_ENTRY_TTL}g, dosya={DOSYA_TTL}g"
+    )
 
     baslama = time.time()
 
@@ -431,15 +469,23 @@ def buda(dry_run: bool = False) -> dict:
     d_rapor = memory_dosyalarini_temizle(dry_run)
 
     sure = round(time.time() - baslama, 2)
-    toplam_kazanc = h_rapor.get("toplam_kazanc", 0) + r_rapor.get("silinen", 0) + d_rapor.get("silinen", 0)
+    toplam_kazanc = (
+        h_rapor.get("toplam_kazanc", 0)
+        + r_rapor.get("silinen", 0)
+        + d_rapor.get("silinen", 0)
+    )
 
     print(f"\n{'=' * 60}")
     print(f"  BUDA TAMAMLANDI ({sure}s)")
-    print(f"  ReYMeN MEMORY: {h_rapor.get('memory', {}).get('silinen', 0)} entry temizlendi"
-          f" ({h_rapor.get('toplam_kazanc', 0)} karakter kazanc)")
+    print(
+        f"  ReYMeN MEMORY: {h_rapor.get('memory', {}).get('silinen', 0)} entry temizlendi"
+        f" ({h_rapor.get('toplam_kazanc', 0)} karakter kazanc)"
+    )
     print(f"  ReYMeN SQLite: {r_rapor.get('silinen', 0)} kayit temizlendi")
-    print(f"  Eski dosyalar: {d_rapor.get('silinen', 0)} dosya temizlendi"
-          f" ({d_rapor.get('kb_kazanc', 0)} KB)")
+    print(
+        f"  Eski dosyalar: {d_rapor.get('silinen', 0)} dosya temizlendi"
+        f" ({d_rapor.get('kb_kazanc', 0)} KB)"
+    )
     print(f"  Toplam kazanc: {toplam_kazanc} birim")
     print(f"{'=' * 60}")
 
@@ -456,6 +502,7 @@ def buda(dry_run: bool = False) -> dict:
 # 5. CRON ICIN ORNEK
 # ══════════════════════════════════════════════════════════════════════════
 
+
 def cron_budama_gorevi():
     """Cron job olarak çağrılmak üzere budama görevi.
 
@@ -466,7 +513,9 @@ def cron_budama_gorevi():
     """
     try:
         sonuc = buda(dry_run=False)
-        print(f"[CRON] Hafiza budama tamam: {sonuc.get('toplam_kazanc', 0)} birim temizlendi")
+        print(
+            f"[CRON] Hafiza budama tamam: {sonuc.get('toplam_kazanc', 0)} birim temizlendi"
+        )
         return sonuc
     except Exception as e:
         print(f"[CRON] Hafiza budama hatasi: {e}")

@@ -27,11 +27,20 @@ PROJE_KOK = Path(__file__).resolve().parent.parent  # ReYMeN-Ajan/
 HERMES_BASE = Path.home() / "AppData" / "Local" / "hermes" / "profiles"
 
 # Hermes CLI yolu
-_HERMES_CLI = str(Path.home() / "AppData" / "Local" / "hermes" / "hermes-agent" / "venv" / "Scripts" / "hermes.exe")
+_HERMES_CLI = str(
+    Path.home()
+    / "AppData"
+    / "Local"
+    / "hermes"
+    / "hermes-agent"
+    / "venv"
+    / "Scripts"
+    / "hermes.exe"
+)
 
 BOTLAR = [
-    {"ad": "Pasa_38",  "profil": "default"},
-    {"ad": "Kiral38",  "profil": "kiral38"},
+    {"ad": "Pasa_38", "profil": "default"},
+    {"ad": "Kiral38", "profil": "kiral38"},
     # ReYMeN_Bot ayri bir Gateway ile calisir — bu supervisor onu yonetmez
 ]
 
@@ -55,7 +64,11 @@ class BotYonetici:
         if not Path(hermes).exists():
             hermes = "hermes"  # PATH'te ara
 
-        log.info("[%s] Baslatiliyor... (hermes -p %s gateway run --replace)", self.ad, self.profil)
+        log.info(
+            "[%s] Baslatiliyor... (hermes -p %s gateway run --replace)",
+            self.ad,
+            self.profil,
+        )
         self.process = subprocess.Popen(
             [hermes, "-p", self.profil, "gateway", "run", "--replace"],
             env=os.environ.copy(),
@@ -124,8 +137,11 @@ def supervisor():
             if y.durduruldu:
                 continue
             if y.process and y.process.poll() is not None:
-                log.warning("[%s] Crash! (exit: %d) 5sn sonra restart...",
-                            y.ad, y.process.returncode)
+                log.warning(
+                    "[%s] Crash! (exit: %d) 5sn sonra restart...",
+                    y.ad,
+                    y.process.returncode,
+                )
                 time.sleep(5)
                 y.baslat()
 
@@ -133,10 +149,13 @@ def supervisor():
 def main():
     if "--stop" in sys.argv:
         import subprocess as sp
+
         # Gateway process'lerini bul ve oldur
         result = sp.run(
             ["tasklist", "/fi", "imagename eq hermes.exe", "/v", "/fo", "csv"],
-            capture_output=True, text=True, timeout=10
+            capture_output=True,
+            text=True,
+            timeout=10,
         )
         killed = 0
         for line in result.stdout.split("\n"):
@@ -145,8 +164,11 @@ def main():
                 if len(parts) >= 2:
                     pid = parts[1].strip().strip('"')
                     if pid.isdigit():
-                        sp.run(["taskkill", "/f", "/pid", pid],
-                               capture_output=True, timeout=5)
+                        sp.run(
+                            ["taskkill", "/f", "/pid", pid],
+                            capture_output=True,
+                            timeout=5,
+                        )
                         killed += 1
                         print(f"  PID {pid} olduruldu")
         print(f"Toplam {killed} Gateway process'i durduruldu.")
@@ -157,12 +179,18 @@ def main():
             hermes = _HERMES_CLI
             if not Path(hermes).exists():
                 hermes = "hermes"
-            log.info("[%s] Baslatiliyor... (hermes -p %s gateway run --replace)", bot["ad"], bot["profil"])
+            log.info(
+                "[%s] Baslatiliyor... (hermes -p %s gateway run --replace)",
+                bot["ad"],
+                bot["profil"],
+            )
             subprocess.Popen(
                 [hermes, "-p", bot["profil"], "gateway", "run", "--replace"],
                 env=os.environ.copy(),
                 cwd=str(PROJE_KOK),
-                stdout=open(PROJE_KOK / ".ReYMeN" / f"{bot['ad'].lower()}_bot.log", "w"),
+                stdout=open(
+                    PROJE_KOK / ".ReYMeN" / f"{bot['ad'].lower()}_bot.log", "w"
+                ),
                 stderr=subprocess.STDOUT,
                 creationflags=subprocess.DETACHED_PROCESS | subprocess.CREATE_NO_WINDOW,
             )

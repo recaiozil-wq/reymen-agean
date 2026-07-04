@@ -12,6 +12,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 import logging
+
 logger = logging.getLogger(__name__)
 
 ROOT = Path(__file__).parent.resolve()
@@ -30,12 +31,13 @@ _scheduler_calissin.set()  # Başlangıçta çalışsın
 
 # ── Job CRUD ──
 
+
 def _kaydet():
     """Jobs JSON dosyasına yaz."""
     try:
         _CRON_FILE.write_text(
             json.dumps(_jobs, ensure_ascii=False, indent=2, default=str),
-            encoding="utf-8"
+            encoding="utf-8",
         )
     except Exception as _zamanlay_e37:
         print(f"[UYARI] zamanlayici.py:38 - {_zamanlay_e37}")
@@ -51,8 +53,9 @@ def _yukle():
         _jobs = {}
 
 
-def cron_ekle(job_id: str, gorev: str, aralik_saniye: int,
-              baglam: str = "", max_adim: int = 5) -> str:
+def cron_ekle(
+    job_id: str, gorev: str, aralik_saniye: int, baglam: str = "", max_adim: int = 5
+) -> str:
     """Yeni zamanlanmış görev ekle.
 
     Args:
@@ -143,6 +146,7 @@ def cron_calistir_simdi(job_id: str) -> str:
 
 # ── Scheduler Döngüsü ──
 
+
 def _log_yaz(job_id: str, durum: str, detay: str = ""):
     """Her cron çalışmasını log dosyasına yazar."""
     log_file = _CRON_LOG_DIR / f"{job_id}.log"
@@ -200,7 +204,8 @@ def _scheduler_dongusu():
             simdi = time.time()
             with _kilit:
                 adaylar = {
-                    jid: j for jid, j in _jobs.items()
+                    jid: j
+                    for jid, j in _jobs.items()
                     if j.get("aktif", True)
                     and (simdi - j.get("son_ts", 0)) >= j.get("aralik_saniye", 3600)
                 }
@@ -210,7 +215,7 @@ def _scheduler_dongusu():
                     target=_gorev_calistir,
                     args=(jid, j),
                     daemon=True,
-                    name=f"cron-run-{jid}"
+                    name=f"cron-run-{jid}",
                 ).start()
         except Exception as _zamanlay_e212:
             print(f"[UYARI] zamanlayici.py:213 - {_zamanlay_e212}")
@@ -219,6 +224,7 @@ def _scheduler_dongusu():
 
 
 # ── Public API ──
+
 
 def scheduler_baslat():
     """Scheduler thread'ini başlatır (non-daemon)."""
@@ -231,7 +237,7 @@ def scheduler_baslat():
     _scheduler_thread = threading.Thread(
         target=_scheduler_dongusu,
         daemon=False,  # Bot yaşadıkça yaşar
-        name="cron-scheduler"
+        name="cron-scheduler",
     )
     _scheduler_thread.start()
     job_sayisi = len(_jobs)

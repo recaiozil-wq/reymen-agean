@@ -39,6 +39,7 @@ def _fresh_import():
     """
     sys.modules.pop("ReYMeN_bootstrap", None)
     import ReYMeN_bootstrap  # noqa: WPS433
+
     return ReYMeN_bootstrap
 
 
@@ -125,9 +126,9 @@ class TestUserOptOut:
     def test_user_pythonutf8_zero_preserved(self, monkeypatch):
         monkeypatch.setenv("PYTHONUTF8", "0")
         _fresh_import()
-        assert os.environ["PYTHONUTF8"] == "0", (
-            "bootstrap must not overwrite an explicit user setting"
-        )
+        assert (
+            os.environ["PYTHONUTF8"] == "0"
+        ), "bootstrap must not overwrite an explicit user setting"
 
     @pytest.mark.skipif(
         sys.platform != "win32",
@@ -183,9 +184,7 @@ class TestIdempotence:
         hb = _fresh_import()
         # First call already happened at import time.
         result = hb.apply_windows_utf8_bootstrap()
-        assert result is False, (
-            "Second call should return False (idempotent no-op)"
-        )
+        assert result is False, "Second call should return False (idempotent no-op)"
 
     def test_no_exceptions_on_repeated_calls(self):
         hb = _fresh_import()
@@ -222,6 +221,7 @@ class TestStdioReconfigureErrorHandling:
 
         class _BrokenStream:
             encoding = "utf-8"
+
             def reconfigure(self, **kwargs):
                 raise OSError("simulated: stream already closed")
 
@@ -240,12 +240,12 @@ class TestEntryPointsImportBootstrap:
     # Entry points that invoke ReYMeN as a process.  Each one must
     # import ReYMeN_bootstrap before doing any file I/O or stdout writes.
     ENTRY_POINTS = [
-        "ReYMeN_cli/main.py",   # ReYMeN CLI (console_script)
-        "run_agent.py",          # ReYMeN-agent (console_script)
+        "ReYMeN_cli/main.py",  # ReYMeN CLI (console_script)
+        "run_agent.py",  # ReYMeN-agent (console_script)
         "acp_adapter/entry.py",  # ReYMeN-acp (console_script)
-        "gateway/run.py",        # gateway
-        "batch_runner.py",       # batch mode
-        "cli.py",                # legacy direct-launch CLI
+        "gateway/run.py",  # gateway
+        "batch_runner.py",  # batch mode
+        "cli.py",  # legacy direct-launch CLI
     ]
 
     @pytest.mark.parametrize("path", ENTRY_POINTS)
@@ -269,6 +269,7 @@ class TestEntryPointsImportBootstrap:
         # Resolve relative to the ReYMeN-agent repo root.  Tests live
         # at tests/test_ReYMeN_bootstrap.py, so go up one dir.
         import pathlib
+
         here = pathlib.Path(__file__).resolve()
         repo_root = here.parent.parent  # tests/ -> repo root
         full_path = repo_root / path
@@ -279,6 +280,7 @@ class TestEntryPointsImportBootstrap:
         # Find the first non-comment, non-blank line that starts with
         # 'import ' or 'from ', or a Try block whose body is the import.
         import ast
+
         tree = ast.parse(source)
 
         first_import_node = None
@@ -290,15 +292,17 @@ class TestEntryPointsImportBootstrap:
             # Import node — this is the recovery-friendly form that lets
             # ReYMeN start even when ReYMeN_bootstrap hasn't been
             # re-registered in the venv yet.
-            if isinstance(node, ast.Try) and len(node.body) == 1 and isinstance(
-                node.body[0], (ast.Import, ast.ImportFrom)
+            if (
+                isinstance(node, ast.Try)
+                and len(node.body) == 1
+                and isinstance(node.body[0], (ast.Import, ast.ImportFrom))
             ):
                 first_import_node = node.body[0]
                 break
 
-        assert first_import_node is not None, (
-            f"{path}: no top-level imports found at all"
-        )
+        assert (
+            first_import_node is not None
+        ), f"{path}: no top-level imports found at all"
 
         if isinstance(first_import_node, ast.Import):
             first_import_name = first_import_node.names[0].name

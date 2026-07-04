@@ -16,7 +16,6 @@ from __future__ import annotations
 from unittest.mock import MagicMock, patch
 
 
-
 # ── Text aux tasks — _resolve_auto ──────────────────────────────────────────
 
 
@@ -33,9 +32,7 @@ class TestResolveAutoMainFirst:
         ), patch(
             "agent.auxiliary_client._read_main_model",
             return_value="anthropic/claude-sonnet-4.6",
-        ), patch(
-            "agent.auxiliary_client.resolve_provider_client"
-        ) as mock_resolve:
+        ), patch("agent.auxiliary_client.resolve_provider_client") as mock_resolve:
             mock_client = MagicMock()
             mock_resolve.return_value = (mock_client, "anthropic/claude-sonnet-4.6")
 
@@ -55,13 +52,12 @@ class TestResolveAutoMainFirst:
         """Nous Portal main user → aux uses their picked Nous model, not free-tier MiMo."""
         # No OPENROUTER_API_KEY → ensures if main failed we'd fall to chain
         with patch(
-            "agent.auxiliary_client._read_main_provider", return_value="nous",
+            "agent.auxiliary_client._read_main_provider",
+            return_value="nous",
         ), patch(
             "agent.auxiliary_client._read_main_model",
             return_value="anthropic/claude-opus-4.6",
-        ), patch(
-            "agent.auxiliary_client.resolve_provider_client"
-        ) as mock_resolve:
+        ), patch("agent.auxiliary_client.resolve_provider_client") as mock_resolve:
             mock_client = MagicMock()
             mock_resolve.return_value = (mock_client, "anthropic/claude-opus-4.6")
 
@@ -78,12 +74,12 @@ class TestResolveAutoMainFirst:
         monkeypatch.setenv("DEEPSEEK_API_KEY", "ds-test")
 
         with patch(
-            "agent.auxiliary_client._read_main_provider", return_value="deepseek",
+            "agent.auxiliary_client._read_main_provider",
+            return_value="deepseek",
         ), patch(
-            "agent.auxiliary_client._read_main_model", return_value="deepseek-chat",
-        ), patch(
-            "agent.auxiliary_client.resolve_provider_client"
-        ) as mock_resolve:
+            "agent.auxiliary_client._read_main_model",
+            return_value="deepseek-chat",
+        ), patch("agent.auxiliary_client.resolve_provider_client") as mock_resolve:
             mock_client = MagicMock()
             mock_resolve.return_value = (mock_client, "deepseek-chat")
 
@@ -101,9 +97,11 @@ class TestResolveAutoMainFirst:
 
         chain_client = MagicMock()
         with patch(
-            "agent.auxiliary_client._read_main_provider", return_value="anthropic",
+            "agent.auxiliary_client._read_main_provider",
+            return_value="anthropic",
         ), patch(
-            "agent.auxiliary_client._read_main_model", return_value="claude-opus",
+            "agent.auxiliary_client._read_main_model",
+            return_value="claude-opus",
         ), patch(
             "agent.auxiliary_client.resolve_provider_client",
             return_value=(None, None),  # main provider has no client
@@ -122,9 +120,11 @@ class TestResolveAutoMainFirst:
         """No main provider configured → skip step 1, use chain (no regression)."""
         chain_client = MagicMock()
         with patch(
-            "agent.auxiliary_client._read_main_provider", return_value="",
+            "agent.auxiliary_client._read_main_provider",
+            return_value="",
         ), patch(
-            "agent.auxiliary_client._read_main_model", return_value="",
+            "agent.auxiliary_client._read_main_model",
+            return_value="",
         ), patch(
             "agent.auxiliary_client._try_openrouter",
             return_value=(chain_client, "google/gemini-3-flash-preview"),
@@ -141,21 +141,22 @@ class TestResolveAutoMainFirst:
             "agent.auxiliary_client._read_main_provider",
             return_value="openrouter",
         ), patch(
-            "agent.auxiliary_client._read_main_model", return_value="config-model",
-        ), patch(
-            "agent.auxiliary_client.resolve_provider_client"
-        ) as mock_resolve:
+            "agent.auxiliary_client._read_main_model",
+            return_value="config-model",
+        ), patch("agent.auxiliary_client.resolve_provider_client") as mock_resolve:
             mock_resolve.return_value = (MagicMock(), "runtime-model")
 
             from agent.auxiliary_client import _resolve_auto
 
-            _resolve_auto(main_runtime={
-                "provider": "anthropic",
-                "model": "runtime-model",
-                "base_url": "",
-                "api_key": "",
-                "api_mode": "",
-            })
+            _resolve_auto(
+                main_runtime={
+                    "provider": "anthropic",
+                    "model": "runtime-model",
+                    "base_url": "",
+                    "api_key": "",
+                    "api_mode": "",
+                }
+            )
 
         # Runtime override wins
         assert mock_resolve.call_args.args[0] == "anthropic"
@@ -168,21 +169,22 @@ class TestResolveAutoMainFirst:
             "agent.auxiliary_client._read_main_provider",
             return_value="openrouter",
         ), patch(
-            "agent.auxiliary_client._read_main_model", return_value="config-model",
-        ), patch(
-            "agent.auxiliary_client.resolve_provider_client"
-        ) as mock_resolve:
+            "agent.auxiliary_client._read_main_model",
+            return_value="config-model",
+        ), patch("agent.auxiliary_client.resolve_provider_client") as mock_resolve:
             mock_resolve.return_value = (MagicMock(), "mimo-v2.5-pro")
 
             from agent.auxiliary_client import _resolve_auto
 
-            _resolve_auto(main_runtime={
-                "provider": "xiaomi",
-                "model": "mimo-v2.5-pro",
-                "base_url": token_plan_url,
-                "api_key": "tp-test-key",
-                "api_mode": "chat_completions",
-            })
+            _resolve_auto(
+                main_runtime={
+                    "provider": "xiaomi",
+                    "model": "mimo-v2.5-pro",
+                    "base_url": token_plan_url,
+                    "api_key": "tp-test-key",
+                    "api_mode": "chat_completions",
+                }
+            )
 
         assert mock_resolve.call_args.args[0] == "xiaomi"
         assert mock_resolve.call_args.args[1] == "mimo-v2.5-pro"
@@ -202,7 +204,8 @@ class TestResolveVisionMainFirst:
         monkeypatch.setenv("OPENROUTER_API_KEY", "or-key")
 
         with patch(
-            "agent.auxiliary_client._read_main_provider", return_value="openrouter",
+            "agent.auxiliary_client._read_main_provider",
+            return_value="openrouter",
         ), patch(
             "agent.auxiliary_client._read_main_model",
             return_value="anthropic/claude-sonnet-4.6",
@@ -232,7 +235,8 @@ class TestResolveVisionMainFirst:
     def test_nous_main_vision_uses_paid_nous_vision_backend(self):
         """Paid Nous main → aux vision uses the dedicated Nous vision backend."""
         with patch(
-            "agent.auxiliary_client._read_main_provider", return_value="nous",
+            "agent.auxiliary_client._read_main_provider",
+            return_value="nous",
         ), patch(
             "agent.auxiliary_client._read_main_model",
             return_value="openai/gpt-5",
@@ -254,7 +258,8 @@ class TestResolveVisionMainFirst:
     def test_nous_main_vision_uses_free_tier_nous_vision_backend(self):
         """Free-tier Nous main → aux vision uses MiMo omni, not the text main model."""
         with patch(
-            "agent.auxiliary_client._read_main_provider", return_value="nous",
+            "agent.auxiliary_client._read_main_provider",
+            return_value="nous",
         ), patch(
             "agent.auxiliary_client._read_main_model",
             return_value="xiaomi/mimo-v2-pro",
@@ -276,7 +281,8 @@ class TestResolveVisionMainFirst:
     def test_exotic_provider_with_vision_override_preserved(self):
         """xiaomi → mimo-v2.5 override still wins over main_model."""
         with patch(
-            "agent.auxiliary_client._read_main_provider", return_value="xiaomi",
+            "agent.auxiliary_client._read_main_provider",
+            return_value="xiaomi",
         ), patch(
             "agent.auxiliary_client._read_main_model",
             return_value="mimo-v2-pro",  # text model
@@ -309,9 +315,11 @@ class TestResolveVisionMainFirst:
             return {"Copilot-Vision-Request": "true"} if is_vision else {}
 
         with patch(
-            "agent.auxiliary_client._read_main_provider", return_value="copilot",
+            "agent.auxiliary_client._read_main_provider",
+            return_value="copilot",
         ), patch(
-            "agent.auxiliary_client._read_main_model", return_value="configured-copilot-model",
+            "agent.auxiliary_client._read_main_model",
+            return_value="configured-copilot-model",
         ), patch(
             "agent.auxiliary_client._resolve_task_provider_model",
             return_value=("auto", None, None, None, None),
@@ -339,7 +347,10 @@ class TestResolveVisionMainFirst:
         assert client is mock_client
         assert model == "configured-copilot-model"
         assert captured == {"is_agent_turn": True, "is_vision": True}
-        assert mock_openai.call_args.kwargs["default_headers"]["Copilot-Vision-Request"] == "true"
+        assert (
+            mock_openai.call_args.kwargs["default_headers"]["Copilot-Vision-Request"]
+            == "true"
+        )
 
     def test_text_copilot_does_not_set_vision_header(self, monkeypatch):
         """Text Copilot requests keep the vision-only header off."""
@@ -381,9 +392,11 @@ class TestResolveVisionMainFirst:
         """Main provider fails → fall back to OpenRouter/Nous strict backends."""
         fallback_client = MagicMock()
         with patch(
-            "agent.auxiliary_client._read_main_provider", return_value="deepseek",
+            "agent.auxiliary_client._read_main_provider",
+            return_value="deepseek",
         ), patch(
-            "agent.auxiliary_client._read_main_model", return_value="deepseek-chat",
+            "agent.auxiliary_client._read_main_model",
+            return_value="deepseek-chat",
         ), patch(
             "agent.auxiliary_client.resolve_provider_client",
             return_value=(None, None),
@@ -404,7 +417,8 @@ class TestResolveVisionMainFirst:
     def test_explicit_provider_override_still_wins(self):
         """Explicit config override bypasses main-first policy."""
         with patch(
-            "agent.auxiliary_client._read_main_provider", return_value="openrouter",
+            "agent.auxiliary_client._read_main_provider",
+            return_value="openrouter",
         ), patch(
             "agent.auxiliary_client._read_main_model",
             return_value="anthropic/claude-opus-4.6",

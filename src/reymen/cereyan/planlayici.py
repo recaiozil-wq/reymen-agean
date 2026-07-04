@@ -92,7 +92,9 @@ class Planlayici:
         if len(hedef.split()) <= 3:
             return [hedef]
         try:
-            cevap = self.provider.uret(PLAN_TALIMATI, [{"role": "user", "content": hedef}])
+            cevap = self.provider.uret(
+                PLAN_TALIMATI, [{"role": "user", "content": hedef}]
+            )
         except Exception:
             return [hedef]
         return self._satirlari_ayristir(cevap) or [hedef]
@@ -116,7 +118,9 @@ class Planlayici:
         for i, odak in enumerate(self._TOT_ODAKLAR, 1):
             prompt = TOT_STRATEJI_TALIMATI.format(numara=i, odak=odak, hedef=hedef)
             try:
-                cevap = self.provider.uret(prompt, [{"role": "user", "content": "Strateji:"}])
+                cevap = self.provider.uret(
+                    prompt, [{"role": "user", "content": "Strateji:"}]
+                )
                 adimlar = self._satirlari_ayristir(cevap)
                 if adimlar:
                     stratejiler.append(adimlar)
@@ -133,7 +137,9 @@ class Planlayici:
         # Modele hangi stratejiyi secmeli sor
         planlar_metni = ""
         for i, adimlar in enumerate(stratejiler, 1):
-            planlar_metni += f"\nPlan {i}:\n" + "\n".join(f"  {j}. {a}" for j, a in enumerate(adimlar, 1))
+            planlar_metni += f"\nPlan {i}:\n" + "\n".join(
+                f"  {j}. {a}" for j, a in enumerate(adimlar, 1)
+            )
 
         degerlendirme_prompt = TOT_DEGERLENDIRME_TALIMATI.format(
             strateji_sayisi=len(stratejiler),
@@ -142,12 +148,12 @@ class Planlayici:
         )
         try:
             karar = self.provider.uret(
-                degerlendirme_prompt,
-                [{"role": "user", "content": "En iyi plan:"}]
+                degerlendirme_prompt, [{"role": "user", "content": "En iyi plan:"}]
             )
             # "En iyi plan: N" formatini ayristir
             import re as _re
-            m = _re.search(r'(\d+)', karar)
+
+            m = _re.search(r"(\d+)", karar)
             if m:
                 idx = int(m.group(1)) - 1
                 if 0 <= idx < len(stratejiler):
@@ -166,9 +172,9 @@ class Planlayici:
         Returns:
             list[str]: Yeni adim listesi. Bos donerse teslim ol sinyali.
         """
-        tamamlanan_str = "\n".join(
-            f"- {a}" for a in tamamlanan_adimlar
-        ) or "(hic adim tamamlanmadi)"
+        tamamlanan_str = (
+            "\n".join(f"- {a}" for a in tamamlanan_adimlar) or "(hic adim tamamlanmadi)"
+        )
 
         prompt = YENIDEN_PLAN_TALIMATI.format(
             tamamlanan=tamamlanan_str,
@@ -176,7 +182,9 @@ class Planlayici:
             kalan_hedef=hedef[:200],
         )
         try:
-            cevap = self.provider.uret(prompt, [{"role": "user", "content": "Yeni strateji:"}])
+            cevap = self.provider.uret(
+                prompt, [{"role": "user", "content": "Yeni strateji:"}]
+            )
         except Exception:
             return []
         adimlar = self._satirlari_ayristir(cevap)
@@ -208,6 +216,7 @@ class Planlayici:
 
 
 if __name__ == "__main__":
+
     class _Sahte:
         def uret(self, sp, m, **k):
             return "1. Siteyi ac\n2. Veriyi cek\n3. [RISK] Dosyaya yaz"
@@ -218,5 +227,7 @@ if __name__ == "__main__":
     for a in plan:
         print(f"  Riskli mi? {p.riskli_mi(a):} — {a}")
     p.tamamlanan_adim_isaretle(plan[0])
-    yeni = p.yeniden_planla("veri cek", p.tamamlananlar(), "requests.get timeout hatasi")
+    yeni = p.yeniden_planla(
+        "veri cek", p.tamamlananlar(), "requests.get timeout hatasi"
+    )
     print("Yeni plan:", yeni)

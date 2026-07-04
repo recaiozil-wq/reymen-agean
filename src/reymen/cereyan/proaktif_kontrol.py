@@ -32,16 +32,16 @@ log = logging.getLogger(__name__)
 
 # ── Eksik kategorileri ─────────────────────────────────────────────────────
 EKSIK_KATEGORILER = {
-    "tablo":           r"(tablo|liste halinde|karşılaştır|özet tablosu)",
-    "kaynak":          r"(kaynak|referans|link|adres|site)",
-    "ornek":           r"(örnek|misal|demo|kod örneği)",
-    "nicel_veri":      r"(kaç|ne kadar|yüzde|oran|istatistik|sayısal)",
-    "edge_case":       r"(ya .+? ise|eğer .+? olmazsa|sınır durum|istisna)",
-    "karsilastirma":   r"(fark|karşılaş|kıyasla|vs|versus|arasındaki fark)",
-    "adim_adim":       r"(adım|sırayla|aşama|nasıl yapılır|prosedür)",
-    "neden":           r"(neden|niçin|sebep|gerekçe|kök neden)",
-    "ne_zaman":        r"(ne zaman|hangi durumda|hangi koşulda)",
-    "nerede":          r"(nerede|hangi dizin|hangi klasör|nereden)",
+    "tablo": r"(tablo|liste halinde|karşılaştır|özet tablosu)",
+    "kaynak": r"(kaynak|referans|link|adres|site)",
+    "ornek": r"(örnek|misal|demo|kod örneği)",
+    "nicel_veri": r"(kaç|ne kadar|yüzde|oran|istatistik|sayısal)",
+    "edge_case": r"(ya .+? ise|eğer .+? olmazsa|sınır durum|istisna)",
+    "karsilastirma": r"(fark|karşılaş|kıyasla|vs|versus|arasındaki fark)",
+    "adim_adim": r"(adım|sırayla|aşama|nasıl yapılır|prosedür)",
+    "neden": r"(neden|niçin|sebep|gerekçe|kök neden)",
+    "ne_zaman": r"(ne zaman|hangi durumda|hangi koşulda)",
+    "nerede": r"(nerede|hangi dizin|hangi klasör|nereden)",
 }
 
 # ── Cevap kalite kontrol listesi ───────────────────────────────────────────
@@ -60,7 +60,12 @@ class ProaktifDenetci:
     def __init__(self, db_yol: Optional[Path] = None):
         ROOT = Path(__file__).resolve().parent.parent.parent.parent
         koku = ROOT / "src" if (ROOT / "src").exists() else ROOT
-        self._db = db_yol or Path(str(koku.parent if (koku / "src").exists() else koku)) / ".ReYMeN" / "proaktif_ogrenme.db"
+        self._db = (
+            db_yol
+            or Path(str(koku.parent if (koku / "src").exists() else koku))
+            / ".ReYMeN"
+            / "proaktif_ogrenme.db"
+        )
         self._db.parent.mkdir(parents=True, exist_ok=True)
         self._vt_kur()
         self._son_analiz: Optional[dict] = None
@@ -162,35 +167,41 @@ class ProaktifDenetci:
         eksikler = a.get("eksikler", [])
         with sqlite3.connect(self._db) as vt:
             for eksik in eksikler:
-                vt.execute("""
+                vt.execute(
+                    """
                     INSERT INTO eksik_takip (kategori, toplam_eksik, son_tarih)
                     VALUES (?, 1, datetime('now'))
                     ON CONFLICT(kategori) DO UPDATE SET
                         toplam_eksik = toplam_eksik + 1,
                         son_tarih = datetime('now')
-                """, (eksik,))
+                """,
+                    (eksik,),
+                )
 
         # Düşük puanlı cevapları kaydet
         puan = a.get("puan", 100)
         if puan < 60 and analiz:
             with sqlite3.connect(self._db) as vt:
-                vt.execute("""
+                vt.execute(
+                    """
                     INSERT INTO analiz_gecmisi (soru, cevap_ozeti, eksik_kategorileri, kalite_puani, sure_ms)
                     VALUES (?, ?, ?, ?, ?)
-                """, (
-                    a.get("soru", "")[:200],
-                    a.get("cevap", "")[:200],
-                    ",".join(eksikler),
-                    puan,
-                    a.get("sure_ms", 0),
-                ))
+                """,
+                    (
+                        a.get("soru", "")[:200],
+                        a.get("cevap", "")[:200],
+                        ",".join(eksikler),
+                        puan,
+                        a.get("sure_ms", 0),
+                    ),
+                )
 
     def en_sik_eksikler(self, limit: int = 5) -> list[tuple]:
         """Returns the most frequently repeated missing categories."""
         with sqlite3.connect(self._db) as vt:
             cur = vt.execute(
                 "SELECT kategori, toplam_eksik FROM eksik_takip ORDER BY toplam_eksik DESC LIMIT ?",
-                (limit,)
+                (limit,),
             )
             return cur.fetchall()
 
@@ -242,8 +253,11 @@ def soru_sonrasi_kontrol(soru: str, cevap: str) -> dict:
     # Eksik varsa ders al
     if analiz.get("eksikler"):
         denetci.ders_al(analiz)
-        log.info("[PROAKTIF] Eksikler: %s (puan: %d)", 
-                 ", ".join(analiz["eksikler"]), analiz.get("puan", 0))
+        log.info(
+            "[PROAKTIF] Eksikler: %s (puan: %d)",
+            ", ".join(analiz["eksikler"]),
+            analiz.get("puan", 0),
+        )
 
     # Proaktif uyarı kontrolü
     uyari = denetci.proaktif_uyari(soru)

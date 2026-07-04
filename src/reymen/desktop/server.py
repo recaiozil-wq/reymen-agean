@@ -1,4 +1,5 @@
 """Web sunucu yoneticisi — soket bazli durum tespiti + arka plan process."""
+
 from __future__ import annotations
 import logging
 import os
@@ -71,7 +72,9 @@ class WebServerManager:
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
             cwd=str(root),
-            creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0,
+            creationflags=subprocess.CREATE_NO_WINDOW
+            if hasattr(subprocess, "CREATE_NO_WINDOW")
+            else 0,
         )
         self._write_pid(proc.pid)
 
@@ -116,6 +119,7 @@ class WebServerManager:
         # PID'siz de dene: port'tan process bul
         try:
             import psutil
+
             for conn in psutil.net_connections():
                 if conn.laddr.port == self.port:
                     os.kill(conn.pid, signal.SIGTERM)

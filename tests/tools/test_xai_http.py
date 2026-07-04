@@ -82,7 +82,9 @@ def test_run_sorgula_list_messages():
         }
         mock_post.return_value = mock_resp
         with patch("tools.xai_http._XAI_API_KEY", "test_key"):
-            sonuc = xai_http.run(islem="sorgula", mesaj=[{"role": "user", "content": "test"}])
+            sonuc = xai_http.run(
+                islem="sorgula", mesaj=[{"role": "user", "content": "test"}]
+            )
             assert "Merhaba" in sonuc
 
 

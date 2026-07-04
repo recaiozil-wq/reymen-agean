@@ -154,9 +154,7 @@ async def test_agent_failed_early_skip_db_when_agent_has_session_db(
 
 
 @pytest.mark.asyncio
-async def test_agent_failed_early_no_skip_db_when_no_session_db(
-    monkeypatch, tmp_path
-):
+async def test_agent_failed_early_no_skip_db_when_no_session_db(monkeypatch, tmp_path):
     runner = _bootstrap(monkeypatch, tmp_path)
     runner._session_db = None  # No agent DB → agent_persisted=False
 
@@ -213,9 +211,7 @@ async def test_not_new_messages_skip_db_when_agent_has_session_db(
 
 
 @pytest.mark.asyncio
-async def test_normal_path_skip_db_when_agent_has_session_db(
-    monkeypatch, tmp_path
-):
+async def test_normal_path_skip_db_when_agent_has_session_db(monkeypatch, tmp_path):
     runner = _bootstrap(monkeypatch, tmp_path)
 
     # Agent succeeds with new messages

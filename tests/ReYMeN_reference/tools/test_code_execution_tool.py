@@ -37,7 +37,9 @@ def test_run_timeout():
 def test_run_guvensiz():
     """_guvensiz_calistir mock ile test edilir."""
     with patch("tools.code_execution_tool._guvensiz_calistir") as mock_guvensiz:
-        mock_guvensiz.return_value = '{"durum": "basarili", "cikti": "guvensiz", "hata_metni": ""}'
+        mock_guvensiz.return_value = (
+            '{"durum": "basarili", "cikti": "guvensiz", "hata_metni": ""}'
+        )
         sonuc = code_execution_tool.run(kod="print('guvensiz')", guvenli=False)
         data = json.loads(sonuc)
         assert data.get("durum") == "basarili"

@@ -31,17 +31,18 @@ GOZLEM_DIZINI = ROOT / ".alt_ajan_gozlem"
 DISK_LOG_LIMIT = 10000  # En fazla 10K satır
 TOKEN_BASINA_MALIYET = {
     # $/1K token (girdi / çıktı) — yaklaşık fiyatlar
-    "deepseek":       (0.0005, 0.0020),
-    "openai":         (0.00015, 0.0006),
-    "anthropic":      (0.00025, 0.00125),
-    "groq":           (0.0001, 0.0001),
-    "lmstudio":       (0.0, 0.0),    # Yerel, ücretsiz
-    "ollama":         (0.0, 0.0),    # Yerel, ücretsiz
+    "deepseek": (0.0005, 0.0020),
+    "openai": (0.00015, 0.0006),
+    "anthropic": (0.00025, 0.00125),
+    "groq": (0.0001, 0.0001),
+    "lmstudio": (0.0, 0.0),  # Yerel, ücretsiz
+    "ollama": (0.0, 0.0),  # Yerel, ücretsiz
 }
 VARSAYILAN_MALIYET = (0.001, 0.003)  # Tahmini ortalama
 
 
 # ── Veri Yapıları ─────────────────────────────────────────────────────────────
+
 
 @dataclass
 class GozlemKaydi:
@@ -75,7 +76,7 @@ class Gozlemci:
         notlar: str = "",
     ) -> None:
         """Bir LLM çağrısını kaydeder.
-        
+
         Args:
             task_id: Hangi task'a ait
             sure_sn: Çağrı süresi (saniye)
@@ -185,11 +186,15 @@ class Gozlemci:
                 "toplam_sure_sn": round(toplam_sure, 2),
                 "basarili": basarili,
                 "basarisiz": len(self._kayitlar) - basarili,
-                "basarili_yuzde": round(basarili / len(self._kayitlar) * 100, 1) if self._kayitlar else 0,
+                "basarili_yuzde": round(basarili / len(self._kayitlar) * 100, 1)
+                if self._kayitlar
+                else 0,
                 "toplam_girdi_token": toplam_girdi,
                 "toplam_cikti_token": toplam_cikti,
                 "tahmini_maliyet_usd": round(toplam_maliyet, 4),
-                "en_pahali_task": max(self._task_maliyet.items(), key=lambda x: x[1])[0] if self._task_maliyet else None,
+                "en_pahali_task": max(self._task_maliyet.items(), key=lambda x: x[1])[0]
+                if self._task_maliyet
+                else None,
             }
 
     def temizle(self):
@@ -218,7 +223,9 @@ if __name__ == "__main__":
 
     genel = gozlemci.genel_ozet()
     assert genel["toplam_cagri"] == 3, "Toplam 3 cagri olmali"
-    print(f"[OK] Genel ozet: {genel['toplam_cagri']} cagri, ${genel['tahmini_maliyet_usd']:.6f}")
+    print(
+        f"[OK] Genel ozet: {genel['toplam_cagri']} cagri, ${genel['tahmini_maliyet_usd']:.6f}"
+    )
 
     # Disk log kontrolü
     log_path = GOZLEM_DIZINI / "gozlem_log.txt"

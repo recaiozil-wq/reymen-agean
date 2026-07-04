@@ -54,8 +54,11 @@ class BoundedMemory:
             "hit": 0,
             "miss": 0,
         }
-        logger.info("BoundedMemory baslatildi. Max: %d, Kayit: %s",
-                     self._max_boyut, self._kayit_yolu or "yok")
+        logger.info(
+            "BoundedMemory baslatildi. Max: %d, Kayit: %s",
+            self._max_boyut,
+            self._kayit_yolu or "yok",
+        )
 
     def hatirla(self, anahtar: str, deger: Any) -> str:
         """Bir degeri bellekte sakla.
@@ -228,11 +231,16 @@ class BoundedMemory:
             return
         try:
             with open(self._kayit_yolu, "w", encoding="utf-8") as f:
-                json.dump({
-                    "veri": dict(self._veri),
-                    "zaman_damgalari": self._zaman_damgalari,
-                    "istatistik": self._istatistik,
-                }, f, ensure_ascii=False, indent=2)
+                json.dump(
+                    {
+                        "veri": dict(self._veri),
+                        "zaman_damgalari": self._zaman_damgalari,
+                        "istatistik": self._istatistik,
+                    },
+                    f,
+                    ensure_ascii=False,
+                    indent=2,
+                )
         except Exception as e:
             logger.warning("Otomatik kayit basarisiz: %s", e)
 

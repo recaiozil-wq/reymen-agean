@@ -60,7 +60,9 @@ class _RaisingProvider(VideoGenProvider):
 
 
 class TestUnifiedDispatch:
-    def _run(self, args: Dict[str, Any], *, configured: Optional[str] = None) -> Dict[str, Any]:
+    def _run(
+        self, args: Dict[str, Any], *, configured: Optional[str] = None
+    ) -> Dict[str, Any]:
         from tools import video_generation_tool
         import ReYMeN_cli.plugins as plugins_module
 
@@ -98,10 +100,12 @@ class TestUnifiedDispatch:
     def test_image_to_video_routes_with_image_url(self):
         provider = _RecordingProvider("rec")
         video_gen_registry.register_provider(provider)
-        result = self._run({
-            "prompt": "animate this",
-            "image_url": "https://example.com/img.png",
-        })
+        result = self._run(
+            {
+                "prompt": "animate this",
+                "image_url": "https://example.com/img.png",
+            }
+        )
         assert result["success"] is True
         assert result["modality"] == "image"
         assert provider.last_kwargs["image_url"] == "https://example.com/img.png"
@@ -122,5 +126,6 @@ class TestUnifiedDispatch:
     def test_operation_field_not_in_schema(self):
         """Make sure we removed the operation field from the schema."""
         from tools.video_generation_tool import VIDEO_GENERATE_SCHEMA
+
         assert "operation" not in VIDEO_GENERATE_SCHEMA["parameters"]["properties"]
         assert "video_url" not in VIDEO_GENERATE_SCHEMA["parameters"]["properties"]

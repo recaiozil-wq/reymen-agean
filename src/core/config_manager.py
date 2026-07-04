@@ -33,7 +33,9 @@ import yaml
 logger = logging.getLogger(__name__)
 
 # ── Sabitler ────────────────────────────────────────────────
-_PROJE_KOKU = Path(__file__).resolve().parent.parent.parent  # reymen/core/ -> reymen/ -> projekt
+_PROJE_KOKU = (
+    Path(__file__).resolve().parent.parent.parent
+)  # reymen/core/ -> reymen/ -> projekt
 _VARSAYILAN_CONFIG_YOLU = _PROJE_KOKU / "config.yaml"
 _REYMEN_PROFIL_DIZINI = Path.home() / ".ReYMeN" / "profiles"
 
@@ -73,9 +75,11 @@ _ENV_MAP: dict[str, str] = {
 # Config — Merkezi yapilandirma yoneticisi
 # ═══════════════════════════════════════════════════════════════
 
+
 @dataclass
 class ProfilBilgisi:
     """Aktif profil bilgisi."""
+
     ad: str = "default"
     kaynak: str = "config.yaml"
     yuklendi: bool = False
@@ -163,7 +167,7 @@ class Config:
         reymen_prefix = "REYMEN_"
         for env_key, env_val in os.environ.items():
             if env_key.startswith(reymen_prefix):
-                config_key = env_key[len(reymen_prefix):].lower().replace("_", ".")
+                config_key = env_key[len(reymen_prefix) :].lower().replace("_", ".")
                 self._dict_set(self._data, config_key, env_val)
 
         # _ENV_MAP
@@ -245,8 +249,11 @@ class Config:
             return _VARSAYILAN_PROVIDER_SIRASI
 
         sirali = sorted(
-            [(ad, info.get("priority", 99)) for ad, info in providers.items()
-             if isinstance(info, dict)],
+            [
+                (ad, info.get("priority", 99))
+                for ad, info in providers.items()
+                if isinstance(info, dict)
+            ],
             key=lambda x: x[1],
         )
         return [ad for ad, _ in sirali] if sirali else _VARSAYILAN_PROVIDER_SIRASI
@@ -281,8 +288,14 @@ class Config:
             self._dict_merge(mevcut, self._data, prefix="")
 
             with open(self._config_yolu, "w", encoding="utf-8") as f:
-                yaml.dump(mevcut, f, allow_unicode=True, default_flow_style=False,
-                         sort_keys=False, indent=2)
+                yaml.dump(
+                    mevcut,
+                    f,
+                    allow_unicode=True,
+                    default_flow_style=False,
+                    sort_keys=False,
+                    indent=2,
+                )
 
             self._dirty = False
             logger.info("[Config] Config kaydedildi: %s", self._config_yolu)
@@ -301,14 +314,18 @@ class Config:
             for ad, info in providers.items():
                 if isinstance(info, dict):
                     api_key_env = info.get("api_key_env", "")
-                    api_key_var = bool(os.environ.get(api_key_env)) if api_key_env else False
-                    provider_bilgisi.append({
-                        "ad": ad,
-                        "base_url": info.get("base_url", ""),
-                        "api_key_env": api_key_env,
-                        "api_key_var": api_key_var,
-                        "model": info.get("model", ""),
-                    })
+                    api_key_var = (
+                        bool(os.environ.get(api_key_env)) if api_key_env else False
+                    )
+                    provider_bilgisi.append(
+                        {
+                            "ad": ad,
+                            "base_url": info.get("base_url", ""),
+                            "api_key_env": api_key_env,
+                            "api_key_var": api_key_var,
+                            "model": info.get("model", ""),
+                        }
+                    )
 
         return {
             "profil": {
@@ -372,8 +389,14 @@ class Config:
 
 # ── Varsayilan provider sirasi (config'de priority yoksa) ────
 _VARSAYILAN_PROVIDER_SIRASI = [
-    "deepseek", "openrouter", "xai", "groq", "lmstudio",
-    "openai", "anthropic", "gemini",
+    "deepseek",
+    "openrouter",
+    "xai",
+    "groq",
+    "lmstudio",
+    "openai",
+    "anthropic",
+    "gemini",
 ]
 
 
@@ -402,6 +425,7 @@ def config_yeniden_yukle(profil: Optional[str] = None) -> Config:
 # ═══════════════════════════════════════════════════════════════
 # Motor tool kayit
 # ═══════════════════════════════════════════════════════════════
+
 
 def motor_kaydet(motor: Any) -> None:
     """Config araçlarını Motor'a kaydeder."""
@@ -445,12 +469,15 @@ def motor_kaydet(motor: Any) -> None:
         _config_ayarla,
         "Config anahtari degistir ve kaydet: anahtar, deger",
     )
-    logger.info("[ConfigManager] Motor araclari kaydedildi: CONFIG_GOSTER, CONFIG_AYARLA")
+    logger.info(
+        "[ConfigManager] Motor araclari kaydedildi: CONFIG_GOSTER, CONFIG_AYARLA"
+    )
 
 
 # ═══════════════════════════════════════════════════════════════
 # ConfigManager — Basit get/set/list arayüzü (cli.py uyumlu)
 # ═══════════════════════════════════════════════════════════════
+
 
 class ConfigManager:
     """ConfigManager — proje kokundeki config.yaml uzerinde basit get/set/list.

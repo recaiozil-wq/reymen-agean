@@ -14,6 +14,7 @@ Every ``docker exec`` here runs as the unprivileged ``ReYMeN`` user
 (via :func:`docker_exec` / :func:`docker_exec_sh` in conftest); see
 the conftest module docstring.
 """
+
 from __future__ import annotations
 
 import subprocess
@@ -27,16 +28,22 @@ from tests.docker.conftest import docker_exec, docker_exec_sh
 def _docker(*args: str, **kw) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         ["docker", *args],
-        capture_output=True, text=True, timeout=kw.pop("timeout", 60),
+        capture_output=True,
+        text=True,
+        timeout=kw.pop("timeout", 60),
         **kw,
     )
 
 
-def _exec(container: str, *args: str, timeout: int = 30) -> subprocess.CompletedProcess[str]:
+def _exec(
+    container: str, *args: str, timeout: int = 30
+) -> subprocess.CompletedProcess[str]:
     return docker_exec(container, *args, timeout=timeout)
 
 
-def _sh(container: str, cmd: str, timeout: int = 30) -> subprocess.CompletedProcess[str]:
+def _sh(
+    container: str, cmd: str, timeout: int = 30
+) -> subprocess.CompletedProcess[str]:
     return docker_exec_sh(container, cmd, timeout=timeout)
 
 
@@ -106,9 +113,15 @@ def restart_container(request, built_image: str):
     _docker("volume", "rm", "-f", volume)
     _docker("volume", "create", volume, timeout=10).check_returncode()
     r = _docker(
-        "run", "-d", "--name", name,
-        "-v", f"{volume}:/opt/data",
-        built_image, "sleep", "infinity",
+        "run",
+        "-d",
+        "--name",
+        name,
+        "-v",
+        f"{volume}:/opt/data",
+        built_image,
+        "sleep",
+        "infinity",
         timeout=30,
     )
     r.check_returncode()
@@ -120,7 +133,12 @@ def restart_container(request, built_image: str):
     deadline = time.monotonic() + 30.0
     while time.monotonic() < deadline:
         r = _docker(
-            "exec", "-u", "ReYMeN", name, "sh", "-c",
+            "exec",
+            "-u",
+            "ReYMeN",
+            name,
+            "sh",
+            "-c",
             "cat /opt/data/logs/container-boot.log 2>/dev/null",
             timeout=5,
         )
@@ -131,9 +149,7 @@ def restart_container(request, built_image: str):
         # Defensive: surface a timeout from the fixture itself so the
         # test failure points at "container never finished cont-init"
         # rather than mid-test where the symptom would be obscure.
-        raise RuntimeError(
-            f"container {name} did not finish cont-init within 30s"
-        )
+        raise RuntimeError(f"container {name} did not finish cont-init within 30s")
     yield name
     _docker("rm", "-f", name)
     _docker("volume", "rm", "-f", volume)
@@ -179,14 +195,17 @@ def test_running_gateway_survives_container_restart(restart_container: str) -> N
     # restored slot. Polling the boot log gives us the first signal.
     _docker("restart", container, timeout=60).check_returncode()
     log = _wait_for_reconcile_log_mention(container, "coder", deadline_s=30.0)
-    assert "profile=coder" in log, (
-        f"reconciler never logged coder after restart: {log!r}"
-    )
+    assert (
+        "profile=coder" in log
+    ), f"reconciler never logged coder after restart: {log!r}"
     assert "action=started" in log
 
     # Service slot exists.
     assert _wait_for_path(
-        container, "/run/service/gateway-coder", kind="d", deadline_s=10.0,
+        container,
+        "/run/service/gateway-coder",
+        kind="d",
+        deadline_s=10.0,
     ), "slot not recreated after restart"
 
     # No `down` marker — we asked for auto-start.
@@ -214,7 +233,10 @@ def test_stopped_gateway_stays_stopped_after_restart(restart_container: str) -> 
 
     # Slot exists.
     assert _wait_for_path(
-        container, "/run/service/gateway-writer", kind="d", deadline_s=10.0,
+        container,
+        "/run/service/gateway-writer",
+        kind="d",
+        deadline_s=10.0,
     )
 
     # Down marker present.
@@ -299,9 +321,9 @@ def test_live_gateway_autostarts_after_real_restart_without_manual_state_stamp(
             if '"running"' in state:
                 break
         time.sleep(0.5)
-    assert '"running"' in state, (
-        f"gateway never persisted running state pre-restart: {state!r}"
-    )
+    assert (
+        '"running"' in state
+    ), f"gateway never persisted running state pre-restart: {state!r}"
 
     # Real restart — Docker sends SIGTERM to PID 1; s6 propagates it to the
     # supervised gateway. No planned-stop marker is written (this is not an
@@ -309,9 +331,7 @@ def test_live_gateway_autostarts_after_real_restart_without_manual_state_stamp(
     _docker("restart", container, timeout=60).check_returncode()
 
     log = _wait_for_reconcile_log_mention(container, "live", deadline_s=30.0)
-    assert "profile=live" in log, (
-        f"reconciler never logged live after restart: {log!r}"
-    )
+    assert "profile=live" in log, f"reconciler never logged live after restart: {log!r}"
     # The crux: the reconciler must AUTO-START it, not register it down.
     assert "action=started" in log, (
         f"gateway did NOT auto-start after a real restart (issue #42675 "
@@ -320,7 +340,10 @@ def test_live_gateway_autostarts_after_real_restart_without_manual_state_stamp(
 
     # Slot recreated, and NO down marker (we expect auto-start).
     assert _wait_for_path(
-        container, "/run/service/gateway-live", kind="d", deadline_s=10.0,
+        container,
+        "/run/service/gateway-live",
+        kind="d",
+        deadline_s=10.0,
     ), "slot not recreated after restart"
     r = _sh(container, "test -f /run/service/gateway-live/down")
     assert r.returncode != 0, (

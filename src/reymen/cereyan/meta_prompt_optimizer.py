@@ -95,7 +95,9 @@ class MetaPromptOptimizer:
 
         hata_ozeti = self._hatalari_topla()
         if not hata_ozeti or hata_ozeti.get("hata_sayisi", 0) < self.min_hata_sayisi:
-            print(f"[APE] Yeterli hata yok ({hata_ozeti.get('hata_sayisi', 0)}/{self.min_hata_sayisi})")
+            print(
+                f"[APE] Yeterli hata yok ({hata_ozeti.get('hata_sayisi', 0)}/{self.min_hata_sayisi})"
+            )
             return None
 
         oneri = self._llm_analiz_et(hata_ozeti)
@@ -184,7 +186,9 @@ class MetaPromptOptimizer:
     def _oneri_ayristir(yanit: str) -> Optional[str]:
         """LLM ciktisindaki ONERI_BLOK'u cikart."""
         # Blok araştır
-        m = re.search(r"ONERI_BLOK:\s*(.+?)(?:/ONERI_BLOK|$)", yanit, re.DOTALL | re.IGNORECASE)
+        m = re.search(
+            r"ONERI_BLOK:\s*(.+?)(?:/ONERI_BLOK|$)", yanit, re.DOTALL | re.IGNORECASE
+        )
         if m:
             blok = m.group(1).strip()
             if blok and len(blok) > 10:
@@ -267,6 +271,7 @@ if __name__ == "__main__":
         # Gecici log dizini
         import sys
         import meta_prompt_optimizer as mpm
+
         mpm.ONERI_LOG = Path(tmpdir) / "log.md"
         mpm.SISTEM_EKLERI = Path(tmpdir) / "ekler.md"
 
@@ -287,7 +292,9 @@ if __name__ == "__main__":
         print(f"\n[Test 2] Ekler yuklendi: {len(ekler)} karakter")
 
         # Test 3: Manuel analiz
-        manuel = optimizer.manuel_hata_analiz(["timeout", "import error", "permission denied"])
+        manuel = optimizer.manuel_hata_analiz(
+            ["timeout", "import error", "permission denied"]
+        )
         print(f"\n[Test 3] Manuel analiz: {bool(manuel)} (beklenen: True)")
 
     print("\n[Testler] Tamamlandi.")

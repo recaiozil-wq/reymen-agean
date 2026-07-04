@@ -50,6 +50,7 @@ __all__ = [
 
 # ── Proje kökünü bul ───────────────────────────────────────────────
 
+
 def _proje_koku() -> Path:
     """ReYMeN proje kökünü bul (__file__ üzerinden)."""
     return Path(__file__).resolve().parent.parent.parent.parent
@@ -67,9 +68,11 @@ def _db_yolu() -> Path:
 
 # ── Veri yapıları ──────────────────────────────────────────────────
 
+
 @dataclass
 class SkillBilgisi:
     """Bir SKILL.md dosyasından ayrıştırılmış bilgi."""
+
     dosya_yolu: str
     ad: str
     aciklama: str = ""
@@ -84,6 +87,7 @@ class SkillBilgisi:
 @dataclass
 class KullanimKaydi:
     """Bir skill'in kullanım kaydı."""
+
     skill_adi: str
     kullanim_sayisi: int = 0
     basarili_sayisi: int = 0
@@ -96,6 +100,7 @@ class KullanimKaydi:
 @dataclass
 class IyilestirmeOnerisi:
     """Bir skill için iyileştirme önerisi."""
+
     skill_adi: str
     tur: str  # "ornek_ekle", "hata_duzelt", "birlestir", "versiyon_guncelle", "meta_ekle"
     aciklama: str = ""
@@ -107,6 +112,7 @@ class IyilestirmeOnerisi:
 @dataclass
 class IyilestirmeRaporu:
     """İyileştirme sistemi raporu."""
+
     taranan_skill: int = 0
     toplam_kullanim: int = 0
     aday_sayisi: int = 0
@@ -116,6 +122,7 @@ class IyilestirmeRaporu:
 
 
 # ── Veritabanı yönetimi ────────────────────────────────────────────
+
 
 class _VT:
     """SQLite veritabanı yöneticisi (iç sınıf)."""
@@ -183,6 +190,7 @@ class _VT:
 
 # ── Skill ayrıştırıcı ──────────────────────────────────────────────
 
+
 class _SkillAyrıstırıcı:
     """SKILL.md dosyalarını ayrıştırır."""
 
@@ -203,9 +211,17 @@ class _SkillAyrıstırıcı:
             deger = deger.strip()
             # Listeler: [a, b, c] veya - a\n - b
             if deger.startswith("["):
-                deger = [d.strip().strip("\"'") for d in deger.strip("[]").split(",") if d.strip()]
+                deger = [
+                    d.strip().strip("\"'")
+                    for d in deger.strip("[]").split(",")
+                    if d.strip()
+                ]
             elif deger.startswith("- "):
-                deger = [d.strip("- ").strip("\"'") for d in yaml_blok.split("\n") if d.strip().startswith("- ")]
+                deger = [
+                    d.strip("- ").strip("\"'")
+                    for d in yaml_blok.split("\n")
+                    if d.strip().startswith("- ")
+                ]
             else:
                 deger = deger.strip("\"'")
             meta[anahtar] = deger
@@ -235,6 +251,7 @@ class _SkillAyrıstırıcı:
 
 
 # ── Ana sınıf ──────────────────────────────────────────────────────
+
 
 class SkillIyilestirici:
     """Skill İyileştirme/Optimizasyon Sistemi.
@@ -368,57 +385,57 @@ class SkillIyilestirici:
             skill_istatistik[s.ad] = istatistik
 
             # Kriter 1: Düşük başarı oranı
-            if (
-                istatistik.kullanim_sayisi >= 5
-                and istatistik.basari_orani < 60.0
-            ):
-                adaylar.append({
-                    "skill_adi": s.ad,
-                    "tur": "dusuk_basari",
-                    "aciklama": (
-                        f"Başarı oranı düşük: %{istatistik.basari_orani:.1f} "
-                        f"({istatistik.basarili_sayisi}/{istatistik.kullanim_sayisi} başarılı) — "
-                        f"hata senaryoları ve örnekler eklenmeli"
-                    ),
-                    "oncelik": 9,
-                    "veri": {
-                        "kullanim": istatistik.kullanim_sayisi,
-                        "basarili": istatistik.basarili_sayisi,
-                        "basari_orani": istatistik.basari_orani,
-                    },
-                })
+            if istatistik.kullanim_sayisi >= 5 and istatistik.basari_orani < 60.0:
+                adaylar.append(
+                    {
+                        "skill_adi": s.ad,
+                        "tur": "dusuk_basari",
+                        "aciklama": (
+                            f"Başarı oranı düşük: %{istatistik.basari_orani:.1f} "
+                            f"({istatistik.basarili_sayisi}/{istatistik.kullanim_sayisi} başarılı) — "
+                            f"hata senaryoları ve örnekler eklenmeli"
+                        ),
+                        "oncelik": 9,
+                        "veri": {
+                            "kullanim": istatistik.kullanim_sayisi,
+                            "basarili": istatistik.basarili_sayisi,
+                            "basari_orani": istatistik.basari_orani,
+                        },
+                    }
+                )
 
             # Kriter 2: Sık kullanılan ama düşük başarı
-            elif (
-                istatistik.kullanim_sayisi >= 20
-                and istatistik.basari_orani < 70.0
-            ):
-                adaylar.append({
-                    "skill_adi": s.ad,
-                    "tur": "sik_kullanilan_dusuk_basari",
-                    "aciklama": (
-                        f"Sık kullanılıyor ({istatistik.kullanim_sayisi} kez) ama "
-                        f"başarı oranı düşük: %{istatistik.basari_orani:.1f} — "
-                        f"pitfall'lar düzeltilmeli, daha net talimatlar eklenmeli"
-                    ),
-                    "oncelik": 8,
-                    "veri": {
-                        "kullanim": istatistik.kullanim_sayisi,
-                        "basarili": istatistik.basarili_sayisi,
-                        "basari_orani": istatistik.basari_orani,
-                    },
-                })
+            elif istatistik.kullanim_sayisi >= 20 and istatistik.basari_orani < 70.0:
+                adaylar.append(
+                    {
+                        "skill_adi": s.ad,
+                        "tur": "sik_kullanilan_dusuk_basari",
+                        "aciklama": (
+                            f"Sık kullanılıyor ({istatistik.kullanim_sayisi} kez) ama "
+                            f"başarı oranı düşük: %{istatistik.basari_orani:.1f} — "
+                            f"pitfall'lar düzeltilmeli, daha net talimatlar eklenmeli"
+                        ),
+                        "oncelik": 8,
+                        "veri": {
+                            "kullanim": istatistik.kullanim_sayisi,
+                            "basarili": istatistik.basarili_sayisi,
+                            "basari_orani": istatistik.basari_orani,
+                        },
+                    }
+                )
 
             # Kriter 3: Eksik metadata
             eksik = self._eksik_meta_kontrol(s)
             if eksik:
-                adaylar.append({
-                    "skill_adi": s.ad,
-                    "tur": "eksik_meta",
-                    "aciklama": f"Eksik metadata: {', '.join(eksik)}",
-                    "oncelik": 6,
-                    "veri": {"eksik_alanlar": eksik},
-                })
+                adaylar.append(
+                    {
+                        "skill_adi": s.ad,
+                        "tur": "eksik_meta",
+                        "aciklama": f"Eksik metadata: {', '.join(eksik)}",
+                        "oncelik": 6,
+                        "veri": {"eksik_alanlar": eksik},
+                    }
+                )
 
         # Kriter 4: Benzer skill'ler (kategori bazlı gruplama)
         for s1 in tum_skilller:
@@ -427,20 +444,22 @@ class SkillIyilestirici:
                     continue
                 benzerlik = self._benzerlik_skoru(s1, s2)
                 if benzerlik >= 0.6:
-                    adaylar.append({
-                        "skill_adi": f"{s1.ad} + {s2.ad}",
-                        "tur": "birlestir",
-                        "aciklama": (
-                            f"'{s1.ad}' ve '{s2.ad}' benzer (benzerlik: %{benzerlik:.0f}) — "
-                            f"tek bir skill'de birleştirilebilir"
-                        ),
-                        "oncelik": 4,
-                        "veri": {
-                            "skill1": s1.ad,
-                            "skill2": s2.ad,
-                            "benzerlik": round(benzerlik, 2),
-                        },
-                    })
+                    adaylar.append(
+                        {
+                            "skill_adi": f"{s1.ad} + {s2.ad}",
+                            "tur": "birlestir",
+                            "aciklama": (
+                                f"'{s1.ad}' ve '{s2.ad}' benzer (benzerlik: %{benzerlik:.0f}) — "
+                                f"tek bir skill'de birleştirilebilir"
+                            ),
+                            "oncelik": 4,
+                            "veri": {
+                                "skill1": s1.ad,
+                                "skill2": s2.ad,
+                                "benzerlik": round(benzerlik, 2),
+                            },
+                        }
+                    )
 
         # Kriter 5: Güncellenmemiş / hiç kullanılmamış skill
         simdi = time.time()
@@ -450,18 +469,20 @@ class SkillIyilestirici:
                 istatistik.kullanim_sayisi == 0
                 and (simdi - s.son_degisiklik) > 30 * 86400
             ):
-                adaylar.append({
-                    "skill_adi": s.ad,
-                    "tur": "kullanilmayan",
-                    "aciklama": (
-                        f"30 günden eski ({int((simdi - s.son_degisiklik) / 86400)} gün) "
-                        f"ve hiç kullanılmamış — gözden geçirilmeli veya kaldırılmalı"
-                    ),
-                    "oncelik": 3,
-                    "veri": {
-                        "gun_oncesi": int((simdi - s.son_degisiklik) / 86400),
-                    },
-                })
+                adaylar.append(
+                    {
+                        "skill_adi": s.ad,
+                        "tur": "kullanilmayan",
+                        "aciklama": (
+                            f"30 günden eski ({int((simdi - s.son_degisiklik) / 86400)} gün) "
+                            f"ve hiç kullanılmamış — gözden geçirilmeli veya kaldırılmalı"
+                        ),
+                        "oncelik": 3,
+                        "veri": {
+                            "gun_oncesi": int((simdi - s.son_degisiklik) / 86400),
+                        },
+                    }
+                )
 
         # Önerileri veritabanına kaydet
         self._oneri_kaydet(adaylar)
@@ -527,14 +548,16 @@ class SkillIyilestirici:
             istatistik = self.skill_istatistikleri(s.ad)
             toplam_kullanim += istatistik.kullanim_sayisi
             basarili_toplam += istatistik.basarili_sayisi
-            skill_detaylari.append({
-                "ad": s.ad,
-                "kategori": s.kategori,
-                "versiyon": s.versiyon,
-                "kullanim": istatistik.kullanim_sayisi,
-                "basari_orani": istatistik.basari_orani,
-                "ortalama_sure_ms": round(istatistik.ortalama_sure, 1),
-            })
+            skill_detaylari.append(
+                {
+                    "ad": s.ad,
+                    "kategori": s.kategori,
+                    "versiyon": s.versiyon,
+                    "kullanim": istatistik.kullanim_sayisi,
+                    "basari_orani": istatistik.basari_orani,
+                    "ortalama_sure_ms": round(istatistik.ortalama_sure, 1),
+                }
+            )
 
         # İyileştirme adayları
         adaylar = self.iyilestirme_adaylari_bul()
@@ -571,7 +594,11 @@ class SkillIyilestirici:
         # Skill detaylarını sırala (en çok kullanılan -> en az)
         skill_detaylari.sort(key=lambda x: x["kullanim"], reverse=True)
         for sd in skill_detaylari[:20]:  # İlk 20
-            basari_gostergesi = "✅" if sd["basari_orani"] >= 70 else ("⚠️" if sd["basari_orani"] >= 40 else "❌")
+            basari_gostergesi = (
+                "✅"
+                if sd["basari_orani"] >= 70
+                else ("⚠️" if sd["basari_orani"] >= 40 else "❌")
+            )
             satirlar.append(
                 f"  {basari_gostergesi} {sd['ad']} "
                 f"(v{sd['versiyon']}, {sd['kategori'] or 'kategorisiz'})"
@@ -583,10 +610,12 @@ class SkillIyilestirici:
             )
 
         if adaylar:
-            satirlar.extend([
-                "",
-                "── İYİLEŞTİRME ÖNERİLERİ ──",
-            ])
+            satirlar.extend(
+                [
+                    "",
+                    "── İYİLEŞTİRME ÖNERİLERİ ──",
+                ]
+            )
             # Önceliğe göre sırala
             adaylar.sort(key=lambda x: x["oncelik"], reverse=True)
             for i, aday in enumerate(adaylar[:10], 1):  # İlk 10
@@ -604,25 +633,34 @@ class SkillIyilestirici:
                 satirlar.append(f"     Öncelik: {aday['oncelik']}/10")
                 satirlar.append(f"     {aday['aciklama']}")
         else:
-            satirlar.extend([
-                "",
-                "── İYİLEŞTİRME ÖNERİLERİ ──",
-                "  ✅ Tüm skill'ler iyi durumda. İyileştirme gerekmiyor.",
-            ])
+            satirlar.extend(
+                [
+                    "",
+                    "── İYİLEŞTİRME ÖNERİLERİ ──",
+                    "  ✅ Tüm skill'ler iyi durumda. İyileştirme gerekmiyor.",
+                ]
+            )
 
-        satirlar.extend([
-            "",
-            "── SON İŞLEMLER ──",
-            f"  Son otomatik iyileştirmede {uygulanan} skill güncellendi.",
-            "",
-        ])
+        satirlar.extend(
+            [
+                "",
+                "── SON İŞLEMLER ──",
+                f"  Son otomatik iyileştirmede {uygulanan} skill güncellendi.",
+                "",
+            ]
+        )
 
         # Raporu veritabanına kaydet
         rapor_metni = "\n".join(satirlar)
         with self._vt._db() as db:
             db.execute(
                 "INSERT INTO iyilestirme_raporlari (timestamp, rapor_json) VALUES (?, ?)",
-                (time.time(), json.dumps({"rapor": rapor_metni, "tarih": str(datetime.now(timezone.utc))})),
+                (
+                    time.time(),
+                    json.dumps(
+                        {"rapor": rapor_metni, "tarih": str(datetime.now(timezone.utc))}
+                    ),
+                ),
             )
 
         return rapor_metni
@@ -708,7 +746,13 @@ class SkillIyilestirici:
                     """INSERT OR IGNORE INTO iyilestirme_onerileri
                        (skill_adi, tur, aciklama, oncelik, uygulandi, olusturulma)
                        VALUES (?, ?, ?, ?, 0, ?)""",
-                    (aday["skill_adi"], aday["tur"], aday["aciklama"], aday["oncelik"], simdi),
+                    (
+                        aday["skill_adi"],
+                        aday["tur"],
+                        aday["aciklama"],
+                        aday["oncelik"],
+                        simdi,
+                    ),
                 )
 
     def _meta_iyilestir(self, skill_adi: str) -> bool:
@@ -744,6 +788,7 @@ class SkillIyilestirici:
                             # Son ---'den önce ekle
                             ek = "\n".join(eklenecek)
                             return blok.rstrip("---\n") + "\n" + ek + "\n---"
+
                         yeni_icerik = re.sub(
                             r"^---\s*\n.*?\n---",
                             _ekle_meta,
@@ -757,7 +802,9 @@ class SkillIyilestirici:
                         yeni_icerik = yeni_meta + icerik
 
                     dosya.write_text(yeni_icerik, encoding="utf-8")
-                    logger.info("Meta iyilestirildi: %s (%s)", skill_adi, ", ".join(eklenecek))
+                    logger.info(
+                        "Meta iyilestirildi: %s (%s)", skill_adi, ", ".join(eklenecek)
+                    )
                     return True
         except Exception as e:
             logger.warning("Meta iyilestirme hatasi: %s — %s", skill_adi, e)
@@ -801,7 +848,9 @@ class SkillIyilestirici:
                     dosya.write_text(yeni_icerik, encoding="utf-8")
                     logger.info(
                         "Hata senaryosu eklendi: %s (basari: %%%.1f, kullanim: %d)",
-                        skill_adi, basari, kullanim,
+                        skill_adi,
+                        basari,
+                        kullanim,
                     )
                     return True
         except Exception as e:
@@ -870,14 +919,19 @@ class SkillIyilestirici:
         """Skill kullanım istatistiklerini sıfırla."""
         with self._vt._db() as db:
             if skill_adi:
-                db.execute("DELETE FROM kullanim_gecmisi WHERE skill_adi = ?", (skill_adi,))
+                db.execute(
+                    "DELETE FROM kullanim_gecmisi WHERE skill_adi = ?", (skill_adi,)
+                )
             else:
                 db.execute("DELETE FROM kullanim_gecmisi")
-            logger.info("Istatistikler sifirlandi%s",
-                        f" — {skill_adi}" if skill_adi else " (tum skill'ler)")
+            logger.info(
+                "Istatistikler sifirlandi%s",
+                f" — {skill_adi}" if skill_adi else " (tum skill'ler)",
+            )
 
 
 # ── CLI kullanımı ──────────────────────────────────────────────────
+
 
 def main() -> str:
     """CLI giriş noktası.

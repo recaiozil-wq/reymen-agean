@@ -25,10 +25,10 @@ from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
 
+
 class MixinCore:
     """ReYMeNCLI Ana/kalan metotlar."""
 
-    
     def __init__(
         self,
         model: str = None,
@@ -62,7 +62,11 @@ class MixinCore:
         # Initialize Rich console
         self.console = Console()
         self.config = CLI_CONFIG
-        self.compact = compact if compact is not None else CLI_CONFIG["display"].get("compact", False)
+        self.compact = (
+            compact
+            if compact is not None
+            else CLI_CONFIG["display"].get("compact", False)
+        )
         # tool_progress: "off", "new", "all", "verbose" (from config.yaml display section)
         # YAML 1.1 parses bare `off` as boolean False — normalise to string.
         _raw_tp = CLI_CONFIG["display"].get("tool_progress", "all")
@@ -80,7 +84,11 @@ class MixinCore:
         # busy_input_mode: "interrupt" (Enter interrupts current run),
         # "queue" (Enter queues for next turn), or "steer" (Enter injects
         # mid-run via /steer, arriving after the next tool call).
-        _bim = str(CLI_CONFIG["display"].get("busy_input_mode", "interrupt")).strip().lower()
+        _bim = (
+            str(CLI_CONFIG["display"].get("busy_input_mode", "interrupt"))
+            .strip()
+            .lower()
+        )
         if _bim == "queue":
             self.busy_input_mode = "queue"
         elif _bim == "steer":
@@ -94,14 +102,17 @@ class MixinCore:
         # Coupling the two (PR #6a1aa420e) caused all module DEBUG logs to spew
         # to console whenever a user set tool_progress: verbose in config.
         self.verbose = bool(verbose) if verbose is not None else False
-        
+
         # streaming: stream tokens to the terminal as they arrive (display.streaming in config.yaml)
         self.streaming_enabled = CLI_CONFIG["display"].get("streaming", False)
         # show_timestamps: prefix user and assistant labels with [HH:MM]
         self.show_timestamps = CLI_CONFIG["display"].get("timestamps", False)
-        self.final_response_markdown = str(
-            CLI_CONFIG["display"].get("final_response_markdown", "strip")
-        ).strip().lower() or "strip"
+        self.final_response_markdown = (
+            str(CLI_CONFIG["display"].get("final_response_markdown", "strip"))
+            .strip()
+            .lower()
+            or "strip"
+        )
         if self.final_response_markdown not in {"render", "strip", "raw"}:
             self.final_response_markdown = "strip"
 
@@ -124,10 +135,12 @@ class MixinCore:
         self.user_message_preview_last_lines = max(0, _ump_last_lines)
 
         # Streaming display state
-        self._stream_buf = ""        # Partial line buffer for line-buffered rendering
+        self._stream_buf = ""  # Partial line buffer for line-buffered rendering
         self._stream_started = False  # True once first delta arrives
         self._stream_box_opened = False  # True once the response box header is printed
-        self._reasoning_preview_buf = ""  # Coalesce tiny reasoning chunks for [thinking] output
+        self._reasoning_preview_buf = (
+            ""  # Coalesce tiny reasoning chunks for [thinking] output
+        )
         # Table-row buffer.  When a streamed line looks like it could be
         # part of a markdown table, hold it here until the block ends so
         # we can re-pad with wcwidth-aware widths.  Empty by default;
@@ -137,21 +150,30 @@ class MixinCore:
         self._pending_edit_snapshots = {}
         self._last_input_mode_recovery = 0.0
         self._input_mode_recovery_notice_shown = False
-        
+
         # Configuration - priority: CLI args > env vars > config file
         # Model comes from: CLI arg or config.yaml (single source of truth).
         # LLM_MODEL/OPENAI_MODEL env vars are NOT checked — config.yaml is
         # authoritative.  This avoids conflicts in multi-agent setups where
         # env vars would stomp each other.
         _model_config = CLI_CONFIG.get("model", {})
-        _config_model = (_model_config.get("default") or _model_config.get("model") or "") if isinstance(_model_config, dict) else (_model_config or "")
+        _config_model = (
+            (_model_config.get("default") or _model_config.get("model") or "")
+            if isinstance(_model_config, dict)
+            else (_model_config or "")
+        )
         _DEFAULT_CONFIG_MODEL = ""
         self.model = model or _config_model or _DEFAULT_CONFIG_MODEL
         # Auto-detect model from local server if still on default
         if self.model == _DEFAULT_CONFIG_MODEL:
-            _base_url = (_model_config.get("base_url") or "") if isinstance(_model_config, dict) else ""
+            _base_url = (
+                (_model_config.get("base_url") or "")
+                if isinstance(_model_config, dict)
+                else ""
+            )
             if "localhost" in _base_url or "127.0.0.1" in _base_url:
                 from reymen.reymen_cli.runtime_provider import _auto_detect_local_model
+
                 _detected = _auto_detect_local_model(_base_url)
                 if _detected:
                     self.model = _detected
@@ -189,9 +211,17 @@ class MixinCore:
         # custom endpoint → prefer OPENAI_API_KEY (issue #560).
         # Note: _ensure_runtime_credentials() re-resolves this before first use.
         if self.base_url and base_url_host_matches(self.base_url, "openrouter.ai"):
-            self.api_key = api_key or os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY")
+            self.api_key = (
+                api_key
+                or os.getenv("OPENROUTER_API_KEY")
+                or os.getenv("OPENAI_API_KEY")
+            )
         else:
-            self.api_key = api_key or os.getenv("OPENAI_API_KEY") or os.getenv("OPENROUTER_API_KEY")
+            self.api_key = (
+                api_key
+                or os.getenv("OPENAI_API_KEY")
+                or os.getenv("OPENROUTER_API_KEY")
+            )
         # Max turns priority: CLI arg > config file > env var > default
         if max_turns is not None:  # CLI arg was explicitly set
             self.max_turns = max_turns
@@ -206,7 +236,7 @@ class MixinCore:
                 self.max_turns = 90
         else:
             self.max_turns = 90
-        
+
         # Parse and validate toolsets
         self.enabled_toolsets = toolsets
         self.disabled_toolsets = CLI_CONFIG["agent"].get("disabled_toolsets") or []
@@ -216,10 +246,14 @@ class MixinCore:
             # live registry aliases (registered during discover_mcp_tools),
             # but discovery hasn't run yet at this point, so exclude them.
             mcp_names = set((CLI_CONFIG.get("mcp_servers") or {}).keys())
-            invalid = [t for t in toolsets if not validate_toolset(t) and t not in mcp_names]
+            invalid = [
+                t for t in toolsets if not validate_toolset(t) and t not in mcp_names
+            ]
             if invalid:
-                self._console_print(f"[bold red]Warning: Unknown toolsets: {', '.join(invalid)}[/]")
-        
+                self._console_print(
+                    f"[bold red]Warning: Unknown toolsets: {', '.join(invalid)}[/]"
+                )
+
         # Filesystem checkpoints: CLI flag > config
         cp_cfg = CLI_CONFIG.get("checkpoints", {})
         if isinstance(cp_cfg, bool):
@@ -234,19 +268,18 @@ class MixinCore:
         # pass skip_context_files=True and skip_memory=True to AIAgent so
         # AGENTS.md/SOUL.md/.cursorrules and persistent memory are not loaded.
         self.ignore_rules = ignore_rules or os.environ.get("ReYMeN_IGNORE_RULES") == "1"
-        
+
         # Ephemeral system prompt: env var takes precedence, then config
-        self.system_prompt = (
-            os.getenv("ReYMeN_EPHEMERAL_SYSTEM_PROMPT", "")
-            or CLI_CONFIG["agent"].get("system_prompt", "")
-        )
+        self.system_prompt = os.getenv(
+            "ReYMeN_EPHEMERAL_SYSTEM_PROMPT", ""
+        ) or CLI_CONFIG["agent"].get("system_prompt", "")
         self.personalities = CLI_CONFIG["agent"].get("personalities", {})
-        
+
         # Ephemeral prefill messages (few-shot priming, never persisted)
         self.prefill_messages = _load_prefill_messages(
             CLI_CONFIG["agent"].get("prefill_messages_file", "")
         )
-        
+
         # Reasoning config (OpenRouter reasoning effort level)
         self.reasoning_config = _parse_reasoning_config(
             CLI_CONFIG["agent"].get("reasoning_effort", "")
@@ -254,7 +287,7 @@ class MixinCore:
         self.service_tier = _parse_service_tier_config(
             CLI_CONFIG["agent"].get("service_tier", "")
         )
-        
+
         # OpenRouter provider routing preferences
         pr = CLI_CONFIG.get("provider_routing", {}) or {}
         self._provider_sort = pr.get("sort")
@@ -277,7 +310,7 @@ class MixinCore:
                     self._openrouter_min_coding_score = _f
             except (TypeError, ValueError):
                 logger.warning("[fix_01_sessiz_except] Exception")
-        
+
         # Fallback provider chain — tried in order when primary fails after retries.
         # Merge new ``fallback_providers`` entries with any legacy
         # ``fallback_model`` entries so old configs still participate.
@@ -293,7 +326,7 @@ class MixinCore:
         self._tool_callbacks_installed = False
         self._tirith_security_checked = False
         self._app = None  # prompt_toolkit Application (set in run())
-        
+
         # Conversation state
         self.conversation_history: List[Dict[str, Any]] = []
         self.session_start = datetime.now()
@@ -306,9 +339,13 @@ class MixinCore:
         self._session_db = None
         try:
             from reymen.sistem.ReYMeN_state import SessionDB
+
             self._session_db = SessionDB()
         except Exception as e:
-            logger.warning("Failed to initialize SessionDB — session will NOT be indexed for search: %s", e)
+            logger.warning(
+                "Failed to initialize SessionDB — session will NOT be indexed for search: %s",
+                e,
+            )
 
         # Opportunistic state.db maintenance — runs at most once per
         # min_interval_hours, tracked via state_meta in state.db itself so
@@ -323,7 +360,7 @@ class MixinCore:
 
         # Deferred title: stored in memory until the session is created in the DB
         self._pending_title: Optional[str] = None
-        
+
         # Session ID: reuse existing one when resuming, otherwise generate fresh
         if resume:
             self.session_id = resume
@@ -332,7 +369,7 @@ class MixinCore:
             timestamp_str = self.session_start.strftime("%Y%m%d_%H%M%S")
             short_uuid = uuid.uuid4().hex[:6]
             self.session_id = f"{timestamp_str}_{short_uuid}"
-        
+
         # History file for persistent input recall across sessions
         self._history_file = _ReYMeN_home / ".ReYMeN_history"
         self._last_invalidate: float = 0.0  # throttle UI repaints
@@ -382,9 +419,13 @@ class MixinCore:
         self._secret_state = None
         self._secret_deadline = 0
         self._spinner_text: str = ""  # thinking spinner text for TUI
-        self._tool_start_time: float = 0.0  # monotonic timestamp when current tool started (for live elapsed)
+        self._tool_start_time: float = (
+            0.0  # monotonic timestamp when current tool started (for live elapsed)
+        )
         self._pending_tool_info: dict = {}  # function_name -> list of (preview, args) for stacked scrollback
-        self._last_scrollback_tool: str = ""  # last tool name printed to scrollback (for "new" dedup)
+        self._last_scrollback_tool: str = (
+            ""  # last tool name printed to scrollback (for "new" dedup)
+        )
         self._command_running = False
         self._command_status = ""
         self._attached_images: list[Path] = []
@@ -419,8 +460,6 @@ class MixinCore:
         self._background_tasks: Dict[str, threading.Thread] = {}
         self._background_task_counter = 0
 
-
-
     @staticmethod
     def _compression_count_style(count: int) -> str:
         """Return a style class reflecting context compression pressure."""
@@ -430,23 +469,17 @@ class MixinCore:
             return "class:status-bar-warn"
         return "class:status-bar-dim"
 
-
-
     def _use_minimal_tui_chrome(self, width: Optional[int] = None) -> bool:
         """Hide low-value chrome on narrow/mobile terminals to preserve rows."""
         if width is None:
             width = self._get_tui_terminal_width()
         return width < 64
 
-
-
     def _agent_spacer_height(self, width: Optional[int] = None) -> int:
         """Return the spacer height shown above the status bar while the agent runs."""
         if not getattr(self, "_agent_running", False):
             return 0
         return 0 if self._use_minimal_tui_chrome(width=width) else 1
-
-
 
     def _get_voice_status_fragments(self, width: Optional[int] = None):
         """Return the voice status bar fragments for the interactive TUI."""
@@ -465,9 +498,9 @@ class MixinCore:
             return [("class:voice-status", f" 🎤 {label} ")]
         tts = " | TTS on" if self._voice_tts else ""
         cont = " | Continuous" if self._voice_continuous else ""
-        return [("class:voice-status", f" 🎤 Voice mode{tts}{cont}  —  {label} to record ")]
-
-
+        return [
+            ("class:voice-status", f" 🎤 Voice mode{tts}{cont}  —  {label} to record ")
+        ]
 
     def _normalize_model_for_provider(self, resolved_provider: str) -> bool:
         """Normalize provider-specific model IDs and routing."""
@@ -481,7 +514,9 @@ class MixinCore:
             )
 
             if resolved_provider not in _AGGREGATOR_PROVIDERS:
-                normalized_model = normalize_model_for_provider(current_model, resolved_provider)
+                normalized_model = normalize_model_for_provider(
+                    current_model, resolved_provider
+                )
                 if normalized_model and normalized_model != current_model:
                     if not self._model_is_default:
                         self._console_print(
@@ -495,9 +530,14 @@ class MixinCore:
 
         if resolved_provider == "copilot":
             try:
-                from reymen.reymen_cli.models import copilot_model_api_mode, normalize_copilot_model_id
+                from reymen.reymen_cli.models import (
+                    copilot_model_api_mode,
+                    normalize_copilot_model_id,
+                )
 
-                canonical = normalize_copilot_model_id(current_model, api_key=self.api_key)
+                canonical = normalize_copilot_model_id(
+                    current_model, api_key=self.api_key
+                )
                 if canonical and canonical != current_model:
                     if not self._model_is_default:
                         self._console_print(
@@ -507,7 +547,9 @@ class MixinCore:
                     current_model = canonical
                     changed = True
 
-                resolved_mode = copilot_model_api_mode(current_model, api_key=self.api_key)
+                resolved_mode = copilot_model_api_mode(
+                    current_model, api_key=self.api_key
+                )
                 if resolved_mode != self.api_mode:
                     self.api_mode = resolved_mode
                     changed = True
@@ -517,9 +559,14 @@ class MixinCore:
 
         if resolved_provider in {"opencode-zen", "opencode-go"}:
             try:
-                from reymen.reymen_cli.models import normalize_opencode_model_id, opencode_model_api_mode
+                from reymen.reymen_cli.models import (
+                    normalize_opencode_model_id,
+                    opencode_model_api_mode,
+                )
 
-                canonical = normalize_opencode_model_id(resolved_provider, current_model)
+                canonical = normalize_opencode_model_id(
+                    resolved_provider, current_model
+                )
                 if canonical and canonical != current_model:
                     if not self._model_is_default:
                         self._console_print(
@@ -529,7 +576,9 @@ class MixinCore:
                     current_model = canonical
                     changed = True
 
-                resolved_mode = opencode_model_api_mode(resolved_provider, current_model)
+                resolved_mode = opencode_model_api_mode(
+                    resolved_provider, current_model
+                )
                 if resolved_mode != self.api_mode:
                     self.api_mode = resolved_mode
                     changed = True
@@ -572,8 +621,6 @@ class MixinCore:
 
         return changed
 
-
-
     def _ensure_runtime_credentials(self) -> bool:
         """
         Ensure runtime credentials are resolved before agent use.
@@ -600,8 +647,13 @@ class MixinCore:
         # Primary provider auth failed — try fallback providers before giving up.
         if runtime is None and _primary_exc is not None:
             from reymen.reymen_cli.auth import AuthError
+
             if isinstance(_primary_exc, AuthError):
-                _fb_chain = self._fallback_model if isinstance(self._fallback_model, list) else []
+                _fb_chain = (
+                    self._fallback_model
+                    if isinstance(self._fallback_model, list)
+                    else []
+                )
                 for _fb in _fb_chain:
                     _fb_provider = (_fb.get("provider") or "").strip().lower()
                     _fb_model = (_fb.get("model") or "").strip()
@@ -611,9 +663,13 @@ class MixinCore:
                         runtime = resolve_runtime_provider(requested=_fb_provider)
                         logger.warning(
                             "Primary provider auth failed (%s). Falling through to fallback: %s/%s",
-                            _primary_exc, _fb_provider, _fb_model,
+                            _primary_exc,
+                            _fb_provider,
+                            _fb_model,
                         )
-                        _cprint(f"⚠️  Primary auth failed — switching to fallback: {_fb_provider} / {_fb_model}")
+                        _cprint(
+                            f"⚠️  Primary auth failed — switching to fallback: {_fb_provider} / {_fb_model}"
+                        )
                         self.requested_provider = _fb_provider
                         self.model = _fb_model
                         _primary_exc = None
@@ -622,7 +678,11 @@ class MixinCore:
                         continue
 
         if runtime is None:
-            message = format_runtime_provider_error(_primary_exc) if _primary_exc else "Provider resolution failed."
+            message = (
+                format_runtime_provider_error(_primary_exc)
+                if _primary_exc
+                else "Provider resolution failed."
+            )
             ChatConsole().print(f"[bold red]{message}[/]")
             return False
 
@@ -645,21 +705,30 @@ class MixinCore:
             # no API key was found, use a placeholder so the OpenAI SDK
             # doesn't reject the request and local servers just ignore it.
             _source = runtime.get("source", "")
-            _has_custom_base = isinstance(base_url, str) and base_url and "openrouter.ai" not in base_url
+            _has_custom_base = (
+                isinstance(base_url, str)
+                and base_url
+                and "openrouter.ai" not in base_url
+            )
             if _has_custom_base:
                 api_key = "no-key-required"
                 logger.debug(
                     "No API key for custom endpoint %s (source=%s), "
                     "using placeholder — local servers typically ignore auth",
-                    base_url, _source,
+                    base_url,
+                    _source,
                 )
             else:
-                print("\n⚠️  Provider resolver returned an empty API key. "
-                      "Set OPENROUTER_API_KEY or run: ReYMeN setup")
+                print(
+                    "\n⚠️  Provider resolver returned an empty API key. "
+                    "Set OPENROUTER_API_KEY or run: ReYMeN setup"
+                )
                 return False
         if not isinstance(base_url, str) or not base_url:
-            print("\n⚠️  Provider resolver returned an empty base URL. "
-                  "Check your provider config or run: ReYMeN setup")
+            print(
+                "\n⚠️  Provider resolver returned an empty base URL. "
+                "Check your provider config or run: ReYMeN setup"
+            )
             return False
 
         credentials_changed = api_key != self.api_key or base_url != self.base_url
@@ -687,9 +756,10 @@ class MixinCore:
         if runtime_model and isinstance(runtime_model, str):
             # Only use runtime model if: model is unset, or model equals provider name
             should_use_runtime_model = (
-                not self.model or  # No model configured yet
-                self.model == self.provider or  # Model is the provider slug
-                self.model == runtime.get("name")  # Model matches provider display name
+                not self.model  # No model configured yet
+                or self.model == self.provider  # Model is the provider slug
+                or self.model
+                == runtime.get("name")  # Model matches provider display name
             )
             if should_use_runtime_model:
                 self.model = runtime_model
@@ -700,12 +770,14 @@ class MixinCore:
         if not self.model and resolved_provider:
             try:
                 from reymen.reymen_cli.models import get_default_model_for_provider
+
                 _default = get_default_model_for_provider(resolved_provider)
                 if _default:
                     self.model = _default
                     logger.info(
                         "No model configured — defaulting to %s for provider %s",
-                        _default, resolved_provider,
+                        _default,
+                        resolved_provider,
                     )
             except Exception:
                 logger.warning("[fix_01_sessiz_except] Exception")
@@ -716,13 +788,13 @@ class MixinCore:
 
         # AIAgent/OpenAI client holds auth at init time, so rebuild if key,
         # routing, or the effective model changed.
-        if (credentials_changed or routing_changed or model_changed) and self.agent is not None:
+        if (
+            credentials_changed or routing_changed or model_changed
+        ) and self.agent is not None:
             self.agent = None
             self._active_agent_route_signature = None
 
         return True
-
-
 
     def _resolve_turn_agent_config(self, user_message: str) -> dict:
         """Build the effective model/runtime config for a single user turn.
@@ -768,8 +840,6 @@ class MixinCore:
         route["request_overrides"] = overrides
         return route
 
-
-
     def _install_tool_callbacks(self) -> None:
         """Install tool callbacks that need the live prompt UI."""
         if getattr(self, "_tool_callbacks_installed", False):
@@ -784,8 +854,6 @@ class MixinCore:
         except ImportError:
             logger.warning("[fix_01_sessiz_except] ImportError")
         self._tool_callbacks_installed = True
-
-
 
     def _ensure_tirith_security(self) -> None:
         """Check tirith availability once before tools can run terminal commands."""
@@ -807,13 +875,17 @@ class MixinCore:
         except Exception:
             logger.warning("[fix_01_sessiz_except] Exception")
 
-
-
-    def _init_agent(self, *, model_override: str = None, runtime_override: dict = None, request_overrides: dict | None = None) -> bool:
+    def _init_agent(
+        self,
+        *,
+        model_override: str = None,
+        runtime_override: dict = None,
+        request_overrides: dict | None = None,
+    ) -> bool:
         """
         Initialize the agent on first use.
         When resuming a session, restores conversation history from SQLite.
-        
+
         Returns:
             bool: True if successful, False otherwise
         """
@@ -835,10 +907,14 @@ class MixinCore:
         if self._session_db is None:
             try:
                 from reymen.sistem.ReYMeN_state import SessionDB
+
                 self._session_db = SessionDB()
             except Exception as e:
-                logger.warning("SQLite session store not available — session will NOT be indexed: %s", e)
-        
+                logger.warning(
+                    "SQLite session store not available — session will NOT be indexed: %s",
+                    e,
+                )
+
         # If resuming, validate the session exists and load its history.
         # _preload_resumed_session() may have already loaded it (called from
         # run() for immediate display).  In that case, conversation_history
@@ -860,13 +936,17 @@ class MixinCore:
                     )
                 else:
                     _cprint(f"\033[1;31mSession not found: {self.session_id}{_RST}")
-                    _cprint(f"{_DIM}Use a session ID from a previous CLI run (ReYMeN sessions list).{_RST}")
+                    _cprint(
+                        f"{_DIM}Use a session ID from a previous CLI run (ReYMeN sessions list).{_RST}"
+                    )
                 return False
             # If the requested session is the (empty) head of a compression
             # chain, walk to the descendant that actually holds the messages.
             # See #15000 and SessionDB.resolve_resume_session_id.
             try:
-                resolved_id = self._session_db.resolve_resume_session_id(self.session_id)
+                resolved_id = self._session_db.resolve_resume_session_id(
+                    self.session_id
+                )
             except Exception:
                 resolved_id = self.session_id
             if resolved_id and resolved_id != self.session_id:
@@ -920,7 +1000,7 @@ class MixinCore:
                 self._session_db._conn.commit()
             except Exception:
                 logger.warning("[fix_01_sessiz_except] Exception")
-        
+
         try:
             runtime = runtime_override or {
                 "api_key": self.api_key,
@@ -946,7 +1026,9 @@ class MixinCore:
                 disabled_toolsets=self.disabled_toolsets,
                 verbose_logging=self.verbose,
                 quiet_mode=not self.verbose,
-                ephemeral_system_prompt=self.system_prompt if self.system_prompt else None,
+                ephemeral_system_prompt=self.system_prompt
+                if self.system_prompt
+                else None,
                 prefill_messages=self.prefill_messages or None,
                 reasoning_config=self.reasoning_config,
                 service_tier=self.service_tier,
@@ -963,7 +1045,6 @@ class MixinCore:
                 session_db=self._session_db,
                 clarify_callback=self._clarify_callback,
                 reasoning_callback=self._current_reasoning_callback(),
-
                 fallback_model=self._fallback_model,
                 thinking_callback=self._on_thinking,
                 checkpoints_enabled=self.checkpoints_enabled,
@@ -974,10 +1055,18 @@ class MixinCore:
                 skip_context_files=self.ignore_rules,
                 skip_memory=self.ignore_rules,
                 tool_progress_callback=self._on_tool_progress,
-                tool_start_callback=self._on_tool_start if self._inline_diffs_enabled else None,
-                tool_complete_callback=self._on_tool_complete if self._inline_diffs_enabled else None,
-                stream_delta_callback=self._stream_delta if self.streaming_enabled else None,
-                tool_gen_callback=self._on_tool_gen_start if self.streaming_enabled else None,
+                tool_start_callback=self._on_tool_start
+                if self._inline_diffs_enabled
+                else None,
+                tool_complete_callback=self._on_tool_complete
+                if self._inline_diffs_enabled
+                else None,
+                stream_delta_callback=self._stream_delta
+                if self.streaming_enabled
+                else None,
+                tool_gen_callback=self._on_tool_gen_start
+                if self.streaming_enabled
+                else None,
             )
             # Store reference for atexit memory provider shutdown
             global _active_agent_ref
@@ -999,7 +1088,9 @@ class MixinCore:
                 try:
                     self.agent._ensure_db_session()
                     if self.agent._session_db_created:
-                        self._session_db.set_session_title(self.session_id, self._pending_title)
+                        self._session_db.set_session_title(
+                            self.session_id, self._pending_title
+                        )
                         _cprint(f"  Session title applied: {self._pending_title}")
                         self._pending_title = None
                     # else: row creation failed transiently — keep _pending_title for retry
@@ -1010,8 +1101,6 @@ class MixinCore:
         except Exception as e:
             ChatConsole().print(f"[bold red]Failed to initialize agent: {e}[/]")
             return False
-
-
 
     def _preload_resumed_session(self) -> bool:
         """Load a resumed session's history from the DB early (before first chat).
@@ -1029,9 +1118,7 @@ class MixinCore:
 
         session_meta = self._session_db.get_session(self.session_id)
         if not session_meta:
-            self._console_print(
-                f"[bold red]Session not found: {self.session_id}[/]"
-            )
+            self._console_print(f"[bold red]Session not found: {self.session_id}[/]")
             self._console_print(
                 "[dim]Use a session ID from a previous CLI run "
                 "(ReYMeN sessions list).[/]"
@@ -1090,8 +1177,6 @@ class MixinCore:
 
         return True
 
-
-
     def _resolve_checkpoint_ref(self, ref: str, checkpoints: list) -> str | None:
         """Resolve a checkpoint number or hash to a full commit hash."""
         try:
@@ -1105,8 +1190,6 @@ class MixinCore:
             # Treat as a git hash
             return ref
 
-
-    
     def _fast_command_available(self) -> bool:
         try:
             from reymen.reymen_cli.models import model_supports_fast_mode
@@ -1116,15 +1199,11 @@ class MixinCore:
         model = getattr(agent, "model", None) or getattr(self, "model", None)
         return model_supports_fast_mode(model)
 
-
-
     def _command_available(self, slash_command: str) -> bool:
         if slash_command == "/fast":
             return self._fast_command_available()
         return True
 
-
-    
     def _list_recent_sessions(self, limit: int = 10) -> list[dict[str, Any]]:
         """Return recent CLI sessions for in-chat browsing/resume affordances."""
         if not self._session_db:
@@ -1139,8 +1218,6 @@ class MixinCore:
             return []
         return [s for s in sessions if s.get("id") != self.session_id]
 
-
-
     @staticmethod
     def _undo_content_to_text(content) -> str:
         """Flatten message content (str or content-part list) to plain text."""
@@ -1154,7 +1231,6 @@ class MixinCore:
             ]
             return "\n".join(t for t in parts if t)
         return ""
-
 
     def _get_goal_manager(self):
         """Return the GoalManager bound to the current session_id.
@@ -1189,8 +1265,6 @@ class MixinCore:
         self._goal_manager = mgr
         return mgr
 
-
-
     def _enable_voice_mode(self):
         """Enable voice mode after checking requirements."""
         if self._voice_mode:
@@ -1215,10 +1289,16 @@ class MixinCore:
             if reqs["missing_packages"]:
                 if _is_termux_environment():
                     _cprint(f"\n  {_BOLD}Option 1: pkg install termux-api{_RST}")
-                    _cprint(f"  {_DIM}Then install/update the Termux:API Android app for microphone capture{_RST}")
-                    _cprint(f"  {_BOLD}Option 2: pkg install python-numpy portaudio && python -m pip install sounddevice{_RST}")
+                    _cprint(
+                        f"  {_DIM}Then install/update the Termux:API Android app for microphone capture{_RST}"
+                    )
+                    _cprint(
+                        f"  {_BOLD}Option 2: pkg install python-numpy portaudio && python -m pip install sounddevice{_RST}"
+                    )
                 else:
-                    _cprint(f"\n  {_BOLD}Install: {sys.executable} -m pip install {' '.join(reqs['missing_packages'])}{_RST}")
+                    _cprint(
+                        f"\n  {_BOLD}Install: {sys.executable} -m pip install {' '.join(reqs['missing_packages'])}{_RST}"
+                    )
             return
 
         with self._voice_lock:
@@ -1228,6 +1308,7 @@ class MixinCore:
         # leaves ``voice_config`` as a non-dict, so guard before .get()).
         try:
             from reymen.reymen_cli.config import load_config
+
             _raw_voice = load_config().get("voice")
             voice_config = _raw_voice if isinstance(_raw_voice, dict) else {}
             if voice_config.get("auto_tts", False):
@@ -1251,8 +1332,6 @@ class MixinCore:
         _cprint(f"  {_DIM}/voice tts  to toggle speech output{_RST}")
         _cprint(f"  {_DIM}/voice off  to disable voice mode{_RST}")
 
-
-
     def _disable_voice_mode(self):
         """Disable voice mode, cancel any active recording, and stop TTS."""
         recorder = None
@@ -1267,17 +1346,20 @@ class MixinCore:
 
         # Shut down the persistent audio stream in background
         if recorder is not None:
+
             def _bg_shutdown(rec=recorder):
                 try:
                     rec.shutdown()
                 except Exception:
                     logger.warning("[fix_01_sessiz_except] Exception")
+
             threading.Thread(target=_bg_shutdown, daemon=True).start()
             self._voice_recorder = None
 
         # Stop any active TTS playback
         try:
             from tools.voice_mode import stop_playback
+
             stop_playback()
         except Exception:
             logger.warning("[fix_01_sessiz_except] Exception")
@@ -1285,9 +1367,9 @@ class MixinCore:
 
         _cprint(f"\n{_DIM}Voice mode disabled.{_RST}")
 
-
-
-    def _computer_use_approval_callback(self, action: str, args: dict, summary: str) -> str:
+    def _computer_use_approval_callback(
+        self, action: str, args: dict, summary: str
+    ) -> str:
         """Adapt the generic approval UI for the computer_use tool.
 
         The computer_use handler expects verdicts of the form
@@ -1308,8 +1390,6 @@ class MixinCore:
             "deny": "deny",
         }.get(verdict, "deny")
 
-
-
     def _get_approval_display_fragments(self):
         """Render the dangerous-command approval panel for the prompt_toolkit UI.
 
@@ -1324,13 +1404,26 @@ class MixinCore:
         if not state:
             return []
 
-        def _panel_box_width(title_text: str, content_lines: list[str], min_width: int = 46, max_width: int = 76) -> int:
+        def _panel_box_width(
+            title_text: str,
+            content_lines: list[str],
+            min_width: int = 46,
+            max_width: int = 76,
+        ) -> int:
             term_cols = shutil.get_terminal_size((100, 20)).columns
-            longest = max([len(title_text)] + [len(line) for line in content_lines] + [min_width - 4])
-            inner = min(max(longest + 4, min_width - 2), max_width - 2, max(24, term_cols - 6))
+            longest = max(
+                [len(title_text)]
+                + [len(line) for line in content_lines]
+                + [min_width - 4]
+            )
+            inner = min(
+                max(longest + 4, min_width - 2), max_width - 2, max(24, term_cols - 6)
+            )
             return inner + 2
 
-        def _wrap_panel_text(text: str, width: int, subsequent_indent: str = "") -> list[str]:
+        def _wrap_panel_text(
+            text: str, width: int, subsequent_indent: str = ""
+        ) -> list[str]:
             wrapped = textwrap.wrap(
                 text,
                 width=max(8, width),
@@ -1340,7 +1433,9 @@ class MixinCore:
             )
             return wrapped or [""]
 
-        def _append_panel_line(lines, border_style: str, content_style: str, text: str, box_width: int) -> None:
+        def _append_panel_line(
+            lines, border_style: str, content_style: str, text: str, box_width: int
+        ) -> None:
             inner_width = max(0, box_width - 2)
             lines.append((border_style, "│ "))
             lines.append((content_style, text.ljust(inner_width)))
@@ -1356,7 +1451,9 @@ class MixinCore:
         show_full = state.get("show_full", False)
 
         title = "⚠️  Dangerous Command"
-        cmd_display = command if show_full or len(command) <= 70 else command[:70] + '...'
+        cmd_display = (
+            command if show_full or len(command) <= 70 else command[:70] + "..."
+        )
         choice_labels = {
             "once": "Allow once",
             "session": "Allow for this session",
@@ -1368,12 +1465,14 @@ class MixinCore:
         preview_lines = _wrap_panel_text(description, 60)
         preview_lines.extend(_wrap_panel_text(cmd_display, 60))
         for i, choice in enumerate(choices):
-            prefix = '❯ ' if i == selected else '  '
-            preview_lines.extend(_wrap_panel_text(
-                f"{prefix}{choice_labels.get(choice, choice)}",
-                60,
-                subsequent_indent="  ",
-            ))
+            prefix = "❯ " if i == selected else "  "
+            preview_lines.extend(
+                _wrap_panel_text(
+                    f"{prefix}{choice_labels.get(choice, choice)}",
+                    60,
+                    subsequent_indent="  ",
+                )
+            )
 
         box_width = _panel_box_width(title, preview_lines)
         inner_text_width = max(8, box_width - 2)
@@ -1389,14 +1488,16 @@ class MixinCore:
             if i < 9:
                 num_prefix = str(i + 1)
             elif i == 9:
-                num_prefix = '0'
+                num_prefix = "0"
             else:
-                num_prefix = ' '  # No number for items beyond 10th
+                num_prefix = " "  # No number for items beyond 10th
             if i == selected:
-                prefix = f'❯ {num_prefix}. '
+                prefix = f"❯ {num_prefix}. "
             else:
-                prefix = f'  {num_prefix}. '
-            for wrapped in _wrap_panel_text(f"{prefix}{label}", inner_text_width, subsequent_indent="    "):
+                prefix = f"  {num_prefix}. "
+            for wrapped in _wrap_panel_text(
+                f"{prefix}{label}", inner_text_width, subsequent_indent="    "
+            ):
                 choice_wrapped.append((i, wrapped))
 
         # Budget vertical space so HSplit never clips the command or choices.
@@ -1429,7 +1530,9 @@ class MixinCore:
         max_cmd_rows = max(1, available - chrome_rows - len(choice_wrapped))
         if len(cmd_wrapped) > max_cmd_rows:
             keep = max(1, max_cmd_rows - 1) if max_cmd_rows > 1 else 1
-            cmd_wrapped = cmd_wrapped[:keep] + ["… (command truncated — use /logs or /debug for full text)"]
+            cmd_wrapped = cmd_wrapped[:keep] + [
+                "… (command truncated — use /logs or /debug for full text)"
+            ]
 
         # Allocate any remaining rows to description. The extra -1 in full mode
         # accounts for the blank separator between choices and description.
@@ -1439,7 +1542,9 @@ class MixinCore:
         # Even on huge terminals, cap description height so the panel stays compact.
         available_for_desc = max(0, min(available_for_desc, 10))
 
-        desc_wrapped = _wrap_panel_text(description, inner_text_width) if description else []
+        desc_wrapped = (
+            _wrap_panel_text(description, inner_text_width) if description else []
+        )
         if available_for_desc < 1 or not desc_wrapped:
             desc_wrapped = []
         elif len(desc_wrapped) > available_for_desc:
@@ -1451,26 +1556,39 @@ class MixinCore:
         # content, never from the command or choices). Use compact chrome (no
         # blank separators) when the terminal is tight.
         lines = []
-        lines.append(('class:approval-border', '╭' + ('─' * box_width) + '╮\n'))
-        _append_panel_line(lines, 'class:approval-border', 'class:approval-title', title, box_width)
+        lines.append(("class:approval-border", "╭" + ("─" * box_width) + "╮\n"))
+        _append_panel_line(
+            lines, "class:approval-border", "class:approval-title", title, box_width
+        )
         if not use_compact_chrome:
-            _append_blank_panel_line(lines, 'class:approval-border', box_width)
+            _append_blank_panel_line(lines, "class:approval-border", box_width)
 
         for wrapped in cmd_wrapped:
-            _append_panel_line(lines, 'class:approval-border', 'class:approval-cmd', wrapped, box_width)
+            _append_panel_line(
+                lines, "class:approval-border", "class:approval-cmd", wrapped, box_width
+            )
         if not use_compact_chrome:
-            _append_blank_panel_line(lines, 'class:approval-border', box_width)
+            _append_blank_panel_line(lines, "class:approval-border", box_width)
 
         for i, wrapped in choice_wrapped:
-            style = 'class:approval-selected' if i == selected else 'class:approval-choice'
-            _append_panel_line(lines, 'class:approval-border', style, wrapped, box_width)
+            style = (
+                "class:approval-selected" if i == selected else "class:approval-choice"
+            )
+            _append_panel_line(
+                lines, "class:approval-border", style, wrapped, box_width
+            )
 
         if desc_wrapped:
             if not use_compact_chrome:
-                _append_blank_panel_line(lines, 'class:approval-border', box_width)
+                _append_blank_panel_line(lines, "class:approval-border", box_width)
             for wrapped in desc_wrapped:
-                _append_panel_line(lines, 'class:approval-border', 'class:approval-desc', wrapped, box_width)
+                _append_panel_line(
+                    lines,
+                    "class:approval-border",
+                    "class:approval-desc",
+                    wrapped,
+                    box_width,
+                )
 
-        lines.append(('class:approval-border', '╰' + ('─' * box_width) + '╯\n'))
+        lines.append(("class:approval-border", "╰" + ("─" * box_width) + "╯\n"))
         return lines
-

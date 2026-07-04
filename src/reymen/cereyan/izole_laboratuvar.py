@@ -5,12 +5,14 @@ DÜZELTME (HATA 2 / KRİTİK): Kök dizine (/) mount KALDIRILDI.
 Artık /workspace altına bind ediliyor; container host kök dosyalarına yazamaz.
 Docker yoksa import hata vermez (DOCKER_AVAILABLE=False), local'e düşülür.
 """
+
 import os
 import uuid
 import subprocess
 
 try:
     import docker
+
     DOCKER_AVAILABLE = True
     # Daemon gerçekten çalışıyor mu kontrol et
     try:
@@ -57,8 +59,12 @@ def _docker_run(dosya_adi, current_dir, image, timeout):
 def _local_run(tam_yol, timeout):
     try:
         sonuc = subprocess.run(
-            ["python", tam_yol], capture_output=True, text=True,
-            timeout=timeout, encoding="utf-8", errors="replace",
+            ["python", tam_yol],
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+            encoding="utf-8",
+            errors="replace",
         )
         return f"[ÇIKTI]\n{sonuc.stdout}\n[HATA]\n{sonuc.stderr}".strip()
     except subprocess.TimeoutExpired:

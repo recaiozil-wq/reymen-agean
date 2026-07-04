@@ -56,7 +56,9 @@ class TestGmiAliases:
         assert normalize_provider("gmicloud") == "gmi"
 
     def test_providers_normalize_provider(self):
-        from ReYMeN_cli.providers import normalize_provider as normalize_provider_in_providers
+        from ReYMeN_cli.providers import (
+            normalize_provider as normalize_provider_in_providers,
+        )
 
         assert normalize_provider_in_providers("gmi-cloud") == "gmi"
         assert normalize_provider_in_providers("gmicloud") == "gmi"
@@ -117,7 +119,9 @@ class TestGmiModelCatalog:
                 "source": "GMI_API_KEY",
             },
         )
-        monkeypatch.setattr("ReYMeN_cli.models.fetch_api_models", lambda api_key, base_url: None)
+        monkeypatch.setattr(
+            "ReYMeN_cli.models.fetch_api_models", lambda api_key, base_url: None
+        )
 
         assert provider_model_ids("gmi") == list(_PROVIDER_MODELS["gmi"])
 
@@ -213,7 +217,9 @@ class TestGmiDoctor:
 
         assert "API key or custom endpoint configured" in out
         assert "GMI Cloud" in out
-        assert any(url == "https://api.gmi-serving.com/v1/models" for url, _, _ in calls)
+        assert any(
+            url == "https://api.gmi-serving.com/v1/models" for url, _, _ in calls
+        )
 
 
 class TestGmiModelMetadata:
@@ -269,7 +275,9 @@ class TestGmiAuxiliary:
         assert client is not None
         assert model == "google/gemini-3.1-flash-lite-preview"
         assert mock_openai.call_args.kwargs["api_key"] == "gmi-test-key"
-        assert mock_openai.call_args.kwargs["base_url"] == "https://api.gmi-serving.com/v1"
+        assert (
+            mock_openai.call_args.kwargs["base_url"] == "https://api.gmi-serving.com/v1"
+        )
         # GMI profile declares default_headers with a ReYMeNAgent User-Agent
         # for traffic attribution. The generic profile-fallback branch in
         # resolve_provider_client should carry it through to the OpenAI client.
@@ -283,9 +291,9 @@ class TestGmiAuxiliary:
         profile = get_provider_profile("gmi")
         assert profile is not None
         ua = profile.default_headers.get("User-Agent", "")
-        assert ua.startswith("ReYMeNAgent/"), (
-            f"expected GMI profile User-Agent to start with 'ReYMeNAgent/', got {ua!r}"
-        )
+        assert ua.startswith(
+            "ReYMeNAgent/"
+        ), f"expected GMI profile User-Agent to start with 'ReYMeNAgent/', got {ua!r}"
 
     def test_resolve_provider_client_accepts_gmi_alias(self, monkeypatch):
         monkeypatch.setenv("GMI_API_KEY", "gmi-test-key")
@@ -318,16 +326,25 @@ class TestGmiMainFlow:
     def test_select_provider_and_model_routes_gmi_to_generic_flow(self, monkeypatch):
         recorded: dict[str, str] = {}
 
-        monkeypatch.setattr("ReYMeN_cli.auth.resolve_provider", lambda *args, **kwargs: None)
+        monkeypatch.setattr(
+            "ReYMeN_cli.auth.resolve_provider", lambda *args, **kwargs: None
+        )
 
         def fake_prompt_provider_choice(choices, default=0):
-            return next(i for i, label in enumerate(choices) if label.startswith("GMI Cloud"))
+            return next(
+                i for i, label in enumerate(choices) if label.startswith("GMI Cloud")
+            )
 
         def fake_model_flow_api_key_provider(config, provider_id, current_model=""):
             recorded["provider_id"] = provider_id
 
-        monkeypatch.setattr("ReYMeN_cli.main._prompt_provider_choice", fake_prompt_provider_choice)
-        monkeypatch.setattr("ReYMeN_cli.main._model_flow_api_key_provider", fake_model_flow_api_key_provider)
+        monkeypatch.setattr(
+            "ReYMeN_cli.main._prompt_provider_choice", fake_prompt_provider_choice
+        )
+        monkeypatch.setattr(
+            "ReYMeN_cli.main._model_flow_api_key_provider",
+            fake_model_flow_api_key_provider,
+        )
 
         from ReYMeN_cli.main import select_provider_and_model
 

@@ -39,36 +39,85 @@ logger = logging.getLogger(__name__)
 # ── Varsayılan Ayarlar ──────────────────────────────────────────────────
 
 # İzin verilen modüller (allowlist)
-VARSAYILAN_MODUL_LISTESI = frozenset({
-    # Python standart kütüphanesi (güvenli)
-    "math", "random", "datetime", "time", "json", "re", "collections",
-    "itertools", "functools", "typing", "enum", "dataclasses", "uuid",
-    "hashlib", "base64", "binascii", "string", "statistics", "decimal",
-    "fractions", "copy", "pprint", "textwrap", "stringprep",
-    # Temel işlemler
-    "bisect", "heapq", "operator", "functools", "abc",
-    "pathlib",  # sadece okuma için
-})
+VARSAYILAN_MODUL_LISTESI = frozenset(
+    {
+        # Python standart kütüphanesi (güvenli)
+        "math",
+        "random",
+        "datetime",
+        "time",
+        "json",
+        "re",
+        "collections",
+        "itertools",
+        "functools",
+        "typing",
+        "enum",
+        "dataclasses",
+        "uuid",
+        "hashlib",
+        "base64",
+        "binascii",
+        "string",
+        "statistics",
+        "decimal",
+        "fractions",
+        "copy",
+        "pprint",
+        "textwrap",
+        "stringprep",
+        # Temel işlemler
+        "bisect",
+        "heapq",
+        "operator",
+        "functools",
+        "abc",
+        "pathlib",  # sadece okuma için
+    }
+)
 
 # Kesinlikle yasaklı modüller/kodlar
 YASAKLI_ANAHTAR_KELIMELER = [
-    "import os", "from os", "import subprocess", "from subprocess",
-    "import sys", "from sys",
-    "import ctypes", "from ctypes",
-    "import socket", "from socket",
-    "eval(", "exec(", "compile(", "__import__(",
+    "import os",
+    "from os",
+    "import subprocess",
+    "from subprocess",
+    "import sys",
+    "from sys",
+    "import ctypes",
+    "from ctypes",
+    "import socket",
+    "from socket",
+    "eval(",
+    "exec(",
+    "compile(",
+    "__import__(",
     "open(",  # dosya okuma/yazma
-    "os.system", "os.popen", "os.spawn",
-    "subprocess.run", "subprocess.Popen", "subprocess.call",
-    "shutil.rmtree", "shutil.move", "shutil.copy",
-    "Path.unlink", "Path.rmdir",
-    "ctypes.CDLL", "ctypes.WinDLL", "ctypes.CreateProcess",
-    "socket.connect", "socket.send", "socket.recv",
-    "requests.get", "requests.post", "urllib.request",
+    "os.system",
+    "os.popen",
+    "os.spawn",
+    "subprocess.run",
+    "subprocess.Popen",
+    "subprocess.call",
+    "shutil.rmtree",
+    "shutil.move",
+    "shutil.copy",
+    "Path.unlink",
+    "Path.rmdir",
+    "ctypes.CDLL",
+    "ctypes.WinDLL",
+    "ctypes.CreateProcess",
+    "socket.connect",
+    "socket.send",
+    "socket.recv",
+    "requests.get",
+    "requests.post",
+    "urllib.request",
     "sqlite3.connect",
 ]
 
 # ── Hata Sınıfları ──────────────────────────────────────────────────────
+
 
 class SandboxError(RuntimeError):
     """Sandbox çalıştırma hatası."""
@@ -87,6 +136,7 @@ class CiktiSiniriHatasi(SandboxError):
 
 
 # ── Sandbox Sınıfı ──────────────────────────────────────────────────────
+
 
 class Sandbox:
     """Güvenli kod çalıştırma sandbox'ı.
@@ -107,7 +157,9 @@ class Sandbox:
     ) -> None:
         self.timeout = timeout
         self.max_chars = max_chars
-        self.modul_listesi = frozenset(modul_listesi) if modul_listesi else VARSAYILAN_MODUL_LISTESI
+        self.modul_listesi = (
+            frozenset(modul_listesi) if modul_listesi else VARSAYILAN_MODUL_LISTESI
+        )
         self._calisma_dizini = calisma_dizini
 
     # ── Ana API ─────────────────────────────────────────────────────────
@@ -134,6 +186,7 @@ class Sandbox:
 
         # 3. Subprocess ile çalıştır
         import subprocess
+
         try:
             process = subprocess.run(
                 [sys.executable, "-u", script],
@@ -149,16 +202,19 @@ class Sandbox:
         cikti = process.stdout + process.stderr
 
         if len(cikti) > self.max_chars:
-            cikti = cikti[:self.max_chars] + f"\n... [cikti {len(cikti)} karakter, sinir {self.max_chars}]"
+            cikti = (
+                cikti[: self.max_chars]
+                + f"\n... [cikti {len(cikti)} karakter, sinir {self.max_chars}]"
+            )
 
         return cikti
 
     def _script_olustur(self, kod: str, baglam: dict[str, Any]) -> str:
         """Kodu geçici bir script dosyasına yaz."""
         wrapper_bas = (
-            '# ReYMeN Sandbox - Izole Calistirma\n'
-            'import sys\n\n'
-            '_izinli_builtins = {\n'
+            "# ReYMeN Sandbox - Izole Calistirma\n"
+            "import sys\n\n"
+            "_izinli_builtins = {\n"
             '    "print": print, "len": len, "range": range,\n'
             '    "int": int, "float": float, "str": str,\n'
             '    "bool": bool, "list": list, "dict": dict,\n'
@@ -175,40 +231,45 @@ class Sandbox:
             '    "reversed": reversed, "round": round,\n'
             '    "slice": slice, "sorted": sorted, "sum": sum,\n'
             '    "type": type, "vars": vars, "zip": zip,\n'
-            '}\n\n'
-            'def _guvenli_import(name, *args, **kwargs):\n'
+            "}\n\n"
+            "def _guvenli_import(name, *args, **kwargs):\n"
             '    import_name = name.split(".")[0]\n'
-            '    if import_name not in _IZINLI_MODULLER:\n'
+            "    if import_name not in _IZINLI_MODULLER:\n"
             '        raise ImportError("Yasakli modul: " + import_name)\n'
-            '    return __import__(name, *args, **kwargs)\n\n'
+            "    return __import__(name, *args, **kwargs)\n\n"
             '_izinli_builtins["__import__"] = _guvenli_import\n\n'
-            '_IZINLI_MODULLER = ' + repr(sorted(self.modul_listesi)) + '\n\n'
-            '_baglam = ' + repr(baglam) + '\n\n'
-            '# Kodu calistir\n'
-            'try:\n'
+            "_IZINLI_MODULLER = " + repr(sorted(self.modul_listesi)) + "\n\n"
+            "_baglam = " + repr(baglam) + "\n\n"
+            "# Kodu calistir\n"
+            "try:\n"
             '    exec("""\n'
         )
-        
+
         # Kodu ekle (girintili)
-        kod_satirlari = kod.split('\n')
-        girintili_kod = '\n'.join(kod_satirlari)
-        
+        kod_satirlari = kod.split("\n")
+        girintili_kod = "\n".join(kod_satirlari)
+
         wrapper_son = (
             '\n""", {"__builtins__": _izinli_builtins, **_baglam}, {})\n'
-            'except Exception as e:\n'
+            "except Exception as e:\n"
             '    print("[HATA] %s: %s" % (type(e).__name__, e), file=sys.stderr)\n'
         )
-        
+
         wrapper = wrapper_bas + girintili_kod + wrapper_son
-        
+
         fd, yol = tempfile.mkstemp(suffix=".py", prefix="reymen_sandbox_", text=True)
         with os.fdopen(fd, "w", encoding="utf-8") as f:
             f.write(wrapper)
         self._son_script = yol
         return yol
+
     def __del__(self):
         # Geçici script dosyasını temizle
-        if hasattr(self, "_son_script") and self._son_script and os.path.exists(self._son_script):
+        if (
+            hasattr(self, "_son_script")
+            and self._son_script
+            and os.path.exists(self._son_script)
+        ):
             try:
                 os.unlink(self._son_script)
             except Exception as _e:
@@ -222,12 +283,9 @@ class Sandbox:
         """Kodu çalıştırmadan önce güvenlik kontrolü yap."""
         for yasakli in YASAKLI_ANAHTAR_KELIMELER:
             if yasakli in kod:
-                raise YasakliModulHatasi(
-                    f"Yasakli ifade tespit edildi: {yasakli!r}"
-                )
+                raise YasakliModulHatasi(f"Yasakli ifade tespit edildi: {yasakli!r}")
 
     # ── Kod Çalıştırma ──────────────────────────────────────────────────
-
 
     def _guvenli_import(self, name: str, *args: Any, **kwargs: Any) -> Any:
         """Sadece izin verilen modülleri import et."""
@@ -242,6 +300,7 @@ class Sandbox:
 
         # builtins.__import__ ile gerçek import
         import builtins
+
         return builtins.__import__(name, *args, **kwargs)
 
 
@@ -272,6 +331,7 @@ def guvenli_calistir(
 
 
 # ── Test ────────────────────────────────────────────────────────────────
+
 
 def _test() -> None:
     """Sandbox testleri."""

@@ -72,7 +72,9 @@ def test_prompt_reasoning_effort_falls_back_on_menu_runtime_error(monkeypatch):
     responses = iter(["3"])
     monkeypatch.setattr("builtins.input", lambda _prompt="": next(responses))
 
-    selected = _prompt_reasoning_effort_selection(["low", "medium", "high"], current_effort="")
+    selected = _prompt_reasoning_effort_selection(
+        ["low", "medium", "high"], current_effort=""
+    )
 
     assert selected == "high"
 
@@ -101,12 +103,17 @@ def test_remove_custom_provider_falls_back_on_menu_runtime_error(tmp_path, monke
     ]
 
 
-def test_named_custom_provider_model_picker_falls_back_on_menu_runtime_error(tmp_path, monkeypatch):
+def test_named_custom_provider_model_picker_falls_back_on_menu_runtime_error(
+    tmp_path, monkeypatch
+):
     from ReYMeN_cli.main import _model_flow_named_custom
 
     monkeypatch.setenv("ReYMeN_HOME", str(tmp_path))
     monkeypatch.setattr("ReYMeN_cli.curses_ui.curses_radiolist", _raise_menu)
-    monkeypatch.setattr("ReYMeN_cli.models.fetch_api_models", lambda *args, **kwargs: ["model-a", "model-b"])
+    monkeypatch.setattr(
+        "ReYMeN_cli.models.fetch_api_models",
+        lambda *args, **kwargs: ["model-a", "model-b"],
+    )
     monkeypatch.setattr("ReYMeN_cli.auth.deactivate_provider", lambda: None)
 
     cfg = load_config()

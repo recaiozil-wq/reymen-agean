@@ -47,6 +47,7 @@ except ImportError:
     def field_validator(*args, **kwargs):
         def decorator(func):
             return func
+
         return decorator
 
 
@@ -54,64 +55,92 @@ except ImportError:
 # 1. Tool Şema Modelleri — her tool'un giriş parametrelerini tanımlar
 # ══════════════════════════════════════════════════════════════════════════
 
+
 class ToolCallModel(BaseModel):
     """Tüm tool çağrıları için temel Pydantic model."""
+
     pass
 
 
 # ── Bilinen tool'lar için giriş şemaları ─────────────────────────────────
 
+
 class WebAraInput(ToolCallModel):
     """WEB_ARA tool girdisi."""
+
     sorgu: str = Field(..., description="Aranacak kelime veya cümle")
-    max_sonuc: Optional[int] = Field(default=5, ge=1, le=50, description="Maksimum sonuç sayısı")
+    max_sonuc: Optional[int] = Field(
+        default=5, ge=1, le=50, description="Maksimum sonuç sayısı"
+    )
 
 
 class DosyaOkuInput(ToolCallModel):
     """DOSYA_OKU tool girdisi."""
+
     dosya_yolu: str = Field(..., min_length=1, description="Okunacak dosyanın tam yolu")
     satir_bas: Optional[int] = Field(default=None, ge=1, description="Başlangıç satırı")
-    satir_limit: Optional[int] = Field(default=None, ge=1, le=2000, description="Maksimum satır sayısı")
+    satir_limit: Optional[int] = Field(
+        default=None, ge=1, le=2000, description="Maksimum satır sayısı"
+    )
 
 
 class DosyaYazInput(ToolCallModel):
     """DOSYA_YAZ tool girdisi."""
-    dosya_yolu: str = Field(..., min_length=1, description="Yazılacak dosyanın tam yolu")
+
+    dosya_yolu: str = Field(
+        ..., min_length=1, description="Yazılacak dosyanın tam yolu"
+    )
     icerik: str = Field(..., description="Dosyaya yazılacak içerik")
 
 
 class PythonCalistirInput(ToolCallModel):
     """PYTHON_CALISTIR tool girdisi."""
+
     kod: str = Field(..., min_length=1, description="Çalıştırılacak Python kodu")
 
 
 class KomutCalistirInput(ToolCallModel):
     """KOMUT_CALISTIR tool girdisi."""
+
     komut: str = Field(..., min_length=1, description="Çalıştırılacak shell komutu")
-    timeout: Optional[int] = Field(default=60, ge=1, le=600, description="Zaman aşımı saniye")
+    timeout: Optional[int] = Field(
+        default=60, ge=1, le=600, description="Zaman aşımı saniye"
+    )
 
 
 class GorevBittiInput(ToolCallModel):
     """GOREV_BITTI tool girdisi."""
-    ozet: str = Field(..., min_length=1, max_length=1000, description="Yapılanların özeti (2–5 cümle)")
+
+    ozet: str = Field(
+        ..., min_length=1, max_length=1000, description="Yapılanların özeti (2–5 cümle)"
+    )
 
 
 class ProfilDegistirInput(ToolCallModel):
     """PROFIL_DEGISTIR tool girdisi."""
-    profil_adi: str = Field(..., pattern=r"^[a-zA-Z0-9_-]+$", description="Geçilecek profil adı: reyment, dev, test, prod")
+
+    profil_adi: str = Field(
+        ...,
+        pattern=r"^[a-zA-Z0-9_-]+$",
+        description="Geçilecek profil adı: reyment, dev, test, prod",
+    )
 
 
 class SkillAktivasyonInput(ToolCallModel):
     """SKILL_AKTIVAT tool girdisi."""
+
     ad: str = Field(..., min_length=1, description="Aktive edilecek skill adı")
 
 
 class WebAraOutput(ToolCallModel):
     """WEB_ARA tool çıktısı."""
+
     baslik: str = Field(..., description="Sayfa başlığı")
     url: str = Field(..., description="Sayfa URL'si")
     ozet: Optional[str] = Field(default=None, description="Sayfa özeti")
-    skor: Optional[float] = Field(default=None, ge=0.0, le=1.0, description="Alaka skoru")
+    skor: Optional[float] = Field(
+        default=None, ge=0.0, le=1.0, description="Alaka skoru"
+    )
 
 
 # ── Tool → Schema eşleme sözlüğü ────────────────────────────────────────
@@ -134,6 +163,7 @@ TOOL_SCHEMALARI: Dict[str, tuple] = {
 # ══════════════════════════════════════════════════════════════════════════
 # 2. JSON Düzeltme
 # ══════════════════════════════════════════════════════════════════════════
+
 
 def _json_duzelt(ham: str) -> str:
     """JSON formatını otomatik düzelt.
@@ -214,6 +244,7 @@ def _schema_al(tool_adi: str):
 # 3. Tool Çağrısı Doğrulama
 # ══════════════════════════════════════════════════════════════════════════
 
+
 def validate_tool_call(
     tool_adi: str,
     args: Union[Dict[str, Any], str],
@@ -276,7 +307,8 @@ def validate_tool_call(
             # Orijinal args'i olduğu gibi kullan (graceful)
             logger.warning(
                 "[Pydantic] %s için JSON parse hatası: %s. Orijinal string args kullanılıyor.",
-                tool_adi, e,
+                tool_adi,
+                e,
             )
             sonuc["args"] = {"param": str(args)}
             sonuc["hata"] = f"JSON parse hatası: {e}"
@@ -287,7 +319,9 @@ def validate_tool_call(
     if not isinstance(args, dict):
         # Dict değilse stringe çevir ve param olarak ver
         sonuc["args"] = {"param": str(args)}
-        sonuc["hata"] = f"Args dict değil ({type(args).__name__}), string olarak iletiliyor"
+        sonuc["hata"] = (
+            f"Args dict değil ({type(args).__name__}), string olarak iletiliyor"
+        )
         sonuc["basarili"] = True  # Graceful degrade
         return sonuc
 
@@ -298,13 +332,16 @@ def validate_tool_call(
         sonuc["basarili"] = True
         logger.debug(
             "[Pydantic] %s validasyonu başarılı: %s",
-            tool_adi, sonuc["args"],
+            tool_adi,
+            sonuc["args"],
         )
     except ValidationError as e:
         hata_detay = _validation_hata_mesaji(e)
         logger.warning(
             "[Pydantic] %s validasyon hatası: %s. Args: %s",
-            tool_adi, hata_detay, args,
+            tool_adi,
+            hata_detay,
+            args,
         )
         sonuc["args"] = args  # Orijinal args'i koru (graceful)
         sonuc["hata"] = hata_detay
@@ -312,7 +349,8 @@ def validate_tool_call(
     except Exception as e:
         logger.error(
             "[Pydantic] %s beklenmeyen hata: %s",
-            tool_adi, e,
+            tool_adi,
+            e,
         )
         sonuc["args"] = args
         sonuc["hata"] = f"Beklenmeyen hata: {e}"
@@ -345,6 +383,7 @@ def _validation_hata_mesaji(e) -> str:
 # ══════════════════════════════════════════════════════════════════════════
 # 4. LLM Çıktısı Doğrulama
 # ══════════════════════════════════════════════════════════════════════════
+
 
 def validate_llm_output(
     output: Union[str, Dict[str, Any]],
@@ -420,6 +459,7 @@ def validate_llm_output(
 # ══════════════════════════════════════════════════════════════════════════
 # 5. Tools Schema Üretici (motor.py için yardımcı)
 # ══════════════════════════════════════════════════════════════════════════
+
 
 def schema_to_tool_def(ad: str, input_model, aciklama: str = "") -> Optional[dict]:
     """Pydantic model'den OpenAI-uyumlu tool definition üretir.
@@ -497,6 +537,7 @@ def tum_tools_schema() -> Dict[str, Optional[dict]]:
 # 6. Yardımcı: String args'ten dict oluşturma (mevcut sistemle uyum)
 # ══════════════════════════════════════════════════════════════════════════
 
+
 def ham_param_to_dict(tool_adi: str, ham_param: str) -> Dict[str, Any]:
     """Eski sistemin quoted-string ham_param'ını Pydantic schema ile dict'e çevir.
 
@@ -538,6 +579,7 @@ def ham_param_to_dict(tool_adi: str, ham_param: str) -> Dict[str, Any]:
 # ══════════════════════════════════════════════════════════════════════════
 # 7. Araç Çalıştırma Öncesi/Sonrası Hook
 # ══════════════════════════════════════════════════════════════════════════
+
 
 def tool_cagri_oncesi(tool_adi: str, args: Any) -> Dict[str, Any]:
     """Tool çağrılmadan önce args doğrulaması yap.

@@ -130,15 +130,15 @@ class CostTracker:
             )
             # Migration: add missing columns for existing DBs
             self._migrate_add_column(conn, "cost_log", "provider", "TEXT DEFAULT ''")
-            conn.execute(
-                "CREATE INDEX IF NOT EXISTS idx_cost_model ON cost_log(model)"
-            )
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_cost_model ON cost_log(model)")
             conn.execute(
                 "CREATE INDEX IF NOT EXISTS idx_cost_ts ON cost_log(timestamp)"
             )
 
     @staticmethod
-    def _migrate_add_column(conn: sqlite3.Connection, table: str, column: str, col_def: str) -> None:
+    def _migrate_add_column(
+        conn: sqlite3.Connection, table: str, column: str, col_def: str
+    ) -> None:
         """Add a column to an existing table if it doesn't already exist."""
         cursor = conn.execute(f"PRAGMA table_info({table})")
         existing_cols = {row[1] for row in cursor.fetchall()}
@@ -169,10 +169,9 @@ class CostTracker:
     ) -> float:
         """Verilen token sayıları için USD maliyeti hesaplar."""
         price = self._price_for(model)
-        cost = (
-            (prompt_tokens / 1_000_000.0) * price["prompt"]
-            + (completion_tokens / 1_000_000.0) * price["completion"]
-        )
+        cost = (prompt_tokens / 1_000_000.0) * price["prompt"] + (
+            completion_tokens / 1_000_000.0
+        ) * price["completion"]
         return round(cost, 6)
 
     # -- Kayıt --------------------------------------------------------------
@@ -221,6 +220,7 @@ class CostTracker:
         # Analitik modulune de kaydet (varsa)
         try:
             from reymen.sistem.analitik import kaydet
+
             kaydet(
                 tur="maliyet",
                 kaynak=provider or model,

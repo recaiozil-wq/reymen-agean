@@ -42,7 +42,9 @@ try:
     print("\n4. config.yaml:")
     # Gecici config olustur
     config_path = gecici_proje / "config.yaml"
-    config_path.write_text("model:\n  provider: deepseek\n  default: deepseek-v4-flash\n", encoding="utf-8")
+    config_path.write_text(
+        "model:\n  provider: deepseek\n  default: deepseek-v4-flash\n", encoding="utf-8"
+    )
     config_ok = config_kontrol(gecici_proje)
     print(f"   -> {'✅ Var' if config_ok else '❌ Yok'}")
 
@@ -78,6 +80,7 @@ try:
     print(f"  Skills: {'✅' if skills_ok else '❌'}")
 
     import shutil
+
     shutil.rmtree(str(gecici_proje), ignore_errors=True)
 
 except ImportError as e:

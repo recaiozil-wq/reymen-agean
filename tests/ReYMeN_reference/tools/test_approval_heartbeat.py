@@ -17,6 +17,7 @@ import os
 def _clear_approval_state():
     """Reset all module-level approval state between tests."""
     from tools import approval as mod
+
     mod._gateway_queues.clear()
     mod._gateway_notify_cbs.clear()
     mod._session_approved.clear()
@@ -38,8 +39,11 @@ class TestApprovalHeartbeat:
         _clear_approval_state()
         self._saved_env = {
             k: os.environ.get(k)
-            for k in ("ReYMeN_GATEWAY_SESSION", "ReYMeN_YOLO_MODE",
-                      "ReYMeN_SESSION_KEY")
+            for k in (
+                "ReYMeN_GATEWAY_SESSION",
+                "ReYMeN_YOLO_MODE",
+                "ReYMeN_SESSION_KEY",
+            )
         }
         os.environ.pop("ReYMeN_YOLO_MODE", None)
         os.environ["ReYMeN_GATEWAY_SESSION"] = "1"
@@ -55,6 +59,3 @@ class TestApprovalHeartbeat:
             else:
                 os.environ[k] = v
         _clear_approval_state()
-
-
-

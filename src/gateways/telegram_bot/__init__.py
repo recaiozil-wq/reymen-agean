@@ -16,6 +16,7 @@ import os
 import sys
 from pathlib import Path
 import logging
+
 logger = logging.getLogger(__name__)
 
 _PROJE_KOK = Path(__file__).resolve().parent.parent.parent
@@ -51,8 +52,12 @@ class ReYMeNTelegramBot:
     def _agent_al(self):
         if self._agent is None:
             from reymen.sistem.main import AIAgentOrchestrator
+
             self._agent = AIAgentOrchestrator(
-                config=None, backend_mode="local", max_tur=15, onay_iste=False,
+                config=None,
+                backend_mode="local",
+                max_tur=15,
+                onay_iste=False,
             )
             log.info("[%s] AIAgentOrchestrator hazir", self.bot_ad)
         return self._agent
@@ -65,7 +70,9 @@ class ReYMeNTelegramBot:
         self._app.add_handler(CommandHandler("start", self._cmd_start))
         self._app.add_handler(CommandHandler("yardim", self._cmd_yardim))
         self._app.add_handler(CommandHandler("temizle", self._cmd_temizle))
-        self._app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, self._mesaj_al))
+        self._app.add_handler(
+            MessageHandler(filters.TEXT & ~filters.COMMAND, self._mesaj_al)
+        )
         log.info("[%s] Polling...", self.bot_ad)
         self._app.run_polling(drop_pending_updates=True)
 
@@ -110,7 +117,9 @@ class ReYMeNTelegramBot:
                 "DURUM_OKU() cagirmadan cevap vermek yasaktir.\n"
             )
             sonuc = loop.run_conversation(f"{talimat}\n\n{hedef}")
-            yanit = sonuc.get("yanit", "") or sonuc.get("output", "") or "Yanit alinamadi."
+            yanit = (
+                sonuc.get("yanit", "") or sonuc.get("output", "") or "Yanit alinamadi."
+            )
             await update.message.reply_text(str(yanit)[:4000])
         except Exception as e:
             log.error("[%s] Hata: %s", self.bot_ad, e)

@@ -13,6 +13,7 @@ Yapilandirma (ortam degiskenleri):
   - MATTERMOST_TEAM_ID       — Takim ID'si (opsiyonel, ekip bazli islemler icin)
   - MATTERMOST_HOME_CHANNEL  — Varsayilan kanal ID'si
 """
+
 import asyncio
 import logging
 import os
@@ -22,6 +23,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
 
 from pathlib import Path as _Path
+
 sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
 from src.gateways.config import Platform, PlatformConfig
@@ -47,6 +49,7 @@ logger = logging.getLogger(__name__)
 
 try:
     import httpx
+
     HTTPX_AVAILABLE = True
 except ImportError:
     HTTPX_AVAILABLE = False
@@ -60,11 +63,13 @@ def check_mattermost_requirements() -> bool:
         return True
     try:
         from reymen.cron.hermes_stubs import ensure as _lazy_ensure
+
         _lazy_ensure("platform.mattermost", prompt=False)
     except Exception:
         return False
     try:
         import httpx as _httpx
+
         httpx = _httpx
         HTTPX_AVAILABLE = True
         return True
@@ -173,7 +178,8 @@ class MattermostAdapter(BasePlatformAdapter):
 
             logger.info(
                 "[Mattermost] Baglanti basarili: %s (%s)",
-                self._bot_username, self._bot_user_id,
+                self._bot_username,
+                self._bot_user_id,
             )
 
             self._mark_connected()
@@ -226,6 +232,7 @@ class MattermostAdapter(BasePlatformAdapter):
 
             # Session kaynagi olustur
             from src.gateways.session import SessionSource, build_session_key
+
             source = SessionSource(
                 platform=Platform.MATTERMOST,
                 chat_id=channel_id,
@@ -322,9 +329,7 @@ class MattermostAdapter(BasePlatformAdapter):
         except httpx.HTTPStatusError as e:
             error_msg = str(e)
             status = e.response.status_code if e.response else 0
-            logger.error(
-                "[Mattermost] HTTP hatasi (%d): %s", status, error_msg
-            )
+            logger.error("[Mattermost] HTTP hatasi (%d): %s", status, error_msg)
             return SendResult(
                 False,
                 error=error_msg,
@@ -392,7 +397,9 @@ class MattermostAdapter(BasePlatformAdapter):
 
             if resp.status_code == 404:
                 # Mesaj bulunamadi veya duzenleme desteklenmiyor
-                return SendResult(False, error="Mesaj bulunamadi veya duzenleme desteklenmiyor")
+                return SendResult(
+                    False, error="Mesaj bulunamadi veya duzenleme desteklenmiyor"
+                )
 
             resp.raise_for_status()
             data = resp.json()
@@ -548,7 +555,11 @@ class MattermostAdapter(BasePlatformAdapter):
     ) -> SendResult:
         """Mattermost kanalina dosya gonder."""
         return await self.send_image(
-            chat_id, file_path, caption=caption, reply_to=reply_to, metadata=metadata,
+            chat_id,
+            file_path,
+            caption=caption,
+            reply_to=reply_to,
+            metadata=metadata,
         )
 
     # ── Kanal/Kullanici Bilgileri ────────────────────────────────────
@@ -564,9 +575,7 @@ class MattermostAdapter(BasePlatformAdapter):
 
         try:
             client = await self._get_client()
-            resp = await client.get(
-                f"{self._api_base}/channels/{chat_id}"
-            )
+            resp = await client.get(f"{self._api_base}/channels/{chat_id}")
             resp.raise_for_status()
             data = resp.json()
 
@@ -595,9 +604,7 @@ class MattermostAdapter(BasePlatformAdapter):
 
         try:
             client = await self._get_client()
-            resp = await client.get(
-                f"{self._api_base}/users/{user_id}"
-            )
+            resp = await client.get(f"{self._api_base}/users/{user_id}")
             resp.raise_for_status()
             data = resp.json()
 
@@ -617,7 +624,9 @@ class MattermostAdapter(BasePlatformAdapter):
 
     # ── Channel/Team Yardimcilari ────────────────────────────────────
 
-    async def get_team_channels(self, team_id: Optional[str] = None) -> List[Dict[str, Any]]:
+    async def get_team_channels(
+        self, team_id: Optional[str] = None
+    ) -> List[Dict[str, Any]]:
         """
         Takimdaki kanallari listele.
 
@@ -639,9 +648,7 @@ class MattermostAdapter(BasePlatformAdapter):
 
         try:
             client = await self._get_client()
-            resp = await client.get(
-                f"{self._api_base}/teams/{tid}/channels"
-            )
+            resp = await client.get(f"{self._api_base}/teams/{tid}/channels")
             resp.raise_for_status()
             return resp.json()
 
@@ -652,9 +659,7 @@ class MattermostAdapter(BasePlatformAdapter):
             logger.error("[Mattermost] Beklenmeyen liste hatasi: %s", e)
             return []
 
-    async def create_direct_channel(
-        self, user_id: str
-    ) -> Optional[Dict[str, Any]]:
+    async def create_direct_channel(self, user_id: str) -> Optional[Dict[str, Any]]:
         """
         Kullaniciyla direkt mesaj kanali olustur.
 

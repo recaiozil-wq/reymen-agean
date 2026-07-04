@@ -24,13 +24,14 @@ import re
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 import logging
+
 logger = logging.getLogger(__name__)
 
 log = logging.getLogger(__name__)
 
 # ── Sabitler ──────────────────────────────────────────────────────────────
 ROOT = Path(__file__).parent.resolve()  # reymen/hafiza/
-PROJE = ROOT.parent.parent              # hermes_projesi/
+PROJE = ROOT.parent.parent  # hermes_projesi/
 
 # Kaydedilmiş hata çözümleri (HATA_COZUM_DB)
 HATA_DB_YOLU = PROJE / ".ReYMeN" / "hata_cozumleri.md"
@@ -41,16 +42,18 @@ SKILLS_DIR = PROJE / ".ReYMeN" / "skills"
 # HATA SINIFLANDIRMA
 # ══════════════════════════════════════════════════════════════════════════
 
+
 class HataSinifi:
     """Hata türü ve düzeltme stratejisi."""
-    MODUL_EKSIK = "modul_eksik"           # ImportError
-    DOSYA_EKSIK = "dosya_eksik"           # FileNotFoundError
-    IZIN_REDDI = "izin_reddi"             # PermissionError
-    BAGLANTI_HATASI = "baglanti_hatasi"   # ConnectionError / timeout
-    API_HATASI = "api_hatasi"             # API döndü hata
-    SENTAKS_HATASI = "sentaks_hatasi"     # SyntaxError / lint
-    TIP_HATASI = "tip_hatasi"             # TypeError
-    DIGER = "diger"                       # Sınıflandırılamayan
+
+    MODUL_EKSIK = "modul_eksik"  # ImportError
+    DOSYA_EKSIK = "dosya_eksik"  # FileNotFoundError
+    IZIN_REDDI = "izin_reddi"  # PermissionError
+    BAGLANTI_HATASI = "baglanti_hatasi"  # ConnectionError / timeout
+    API_HATASI = "api_hatasi"  # API döndü hata
+    SENTAKS_HATASI = "sentaks_hatasi"  # SyntaxError / lint
+    TIP_HATASI = "tip_hatasi"  # TypeError
+    DIGER = "diger"  # Sınıflandırılamayan
 
 
 HATA_SINIFLARI = {
@@ -116,6 +119,7 @@ def hata_siniflandir(hata_mesaji: str) -> Tuple[str, dict]:
 # HAFIZADA HATA ÇÖZÜMÜ ARA
 # ══════════════════════════════════════════════════════════════════════════
 
+
 def hata_cozumu_ara(hata_sinifi: str, hedef: str) -> Optional[str]:
     """Daha önce kaydedilmiş hata çözümlerini hafızada ara.
 
@@ -143,7 +147,10 @@ def hata_cozumu_ara(hata_sinifi: str, hedef: str) -> Optional[str]:
                 kelimeler = [k.lower() for k in hedef.split() if len(k) > 3]
                 for satir in bolum.split("\n"):
                     satir_lower = satir.lower()
-                    if sum(1 for k in kelimeler if k in satir_lower) >= len(kelimeler) // 2:
+                    if (
+                        sum(1 for k in kelimeler if k in satir_lower)
+                        >= len(kelimeler) // 2
+                    ):
                         return satir.strip()
 
     except Exception as e:
@@ -155,6 +162,7 @@ def hata_cozumu_ara(hata_sinifi: str, hedef: str) -> Optional[str]:
 # ══════════════════════════════════════════════════════════════════════════
 # ÇÖZÜM KAYDET
 # ══════════════════════════════════════════════════════════════════════════
+
 
 def hata_cozumu_kaydet(hata_sinifi: str, hata_mesaji: str, cozum: str, hedef: str):
     """Bulunan/kullanılan hata çözümünü HATA_COZUM_DB'ye kaydet.
@@ -205,6 +213,7 @@ def hata_cozumu_kaydet(hata_sinifi: str, hata_mesaji: str, cozum: str, hedef: st
 # ANA ANALİZ FONKSİYONU
 # ══════════════════════════════════════════════════════════════════════════
 
+
 def hata_analiz_et(hata_mesaji: str, hedef: str) -> dict:
     """Hata analizini yap, çözüm önerisi üret.
 
@@ -232,7 +241,9 @@ def hata_analiz_et(hata_mesaji: str, hedef: str) -> dict:
     if hafiza_cozum:
         cozum_onerisi = hafiza_cozum
     else:
-        cozum_onerisi = sinif_bilgi.get("cozum", "Bilinmeyen hata, manuel analiz gerekli")
+        cozum_onerisi = sinif_bilgi.get(
+            "cozum", "Bilinmeyen hata, manuel analiz gerekli"
+        )
 
     # 4. Kaydet (yeni hata olarak)
     if not hafiza_cozum:

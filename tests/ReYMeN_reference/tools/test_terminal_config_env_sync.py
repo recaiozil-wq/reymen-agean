@@ -73,6 +73,7 @@ def _extract_dict_keys(source: str, dict_name: str) -> set[str]:
 def _cli_env_map_keys() -> set[str]:
     """terminal config keys bridged by cli.load_cli_config()."""
     import cli
+
     source = inspect.getsource(cli.load_cli_config)
     return _extract_dict_keys(source, "env_mappings")
 
@@ -82,6 +83,7 @@ def _gateway_env_map_keys() -> set[str]:
     # gateway/run.py builds the dict at module top-level (not inside a
     # function), so inspect the whole module source.
     import gateway.run as gr
+
     source = inspect.getsource(gr)
     return _extract_dict_keys(source, "_terminal_env_map")
 
@@ -97,6 +99,7 @@ def _save_config_env_sync_keys() -> set[str]:
     literal that the consolidation removed.
     """
     from ReYMeN_cli import config as hc_config
+
     # set_config_value bridges every TERMINAL_CONFIG_ENV_MAP key except
     # terminal.cwd (see the ``key != "terminal.cwd"`` guard in
     # set_config_value); mirror that exclusion here.
@@ -105,25 +108,29 @@ def _save_config_env_sync_keys() -> set[str]:
 
 # Keys present in cli.py env_mappings but intentionally absent from
 # gateway/run.py or set_config_value.  Each entry must be justified.
-_CLI_ONLY_OK = frozenset({
-    # `env_type` is a legacy YAML key alias for `backend` that cli.py
-    # accepts for backwards-compat with older cli-config.yaml.  The
-    # gateway path normalizes on the canonical `backend` key, which is
-    # also in the map and handles the same bridging.  See cli.py ~line 515.
-    "env_type",
-    # sudo_password is not a terminal-backend option — it's a credential
-    # used across backends, bridged to $SUDO_PASSWORD (not TERMINAL_*).
-    # Treating it as terminal-only would be misleading.
-    "sudo_password",
-})
+_CLI_ONLY_OK = frozenset(
+    {
+        # `env_type` is a legacy YAML key alias for `backend` that cli.py
+        # accepts for backwards-compat with older cli-config.yaml.  The
+        # gateway path normalizes on the canonical `backend` key, which is
+        # also in the map and handles the same bridging.  See cli.py ~line 515.
+        "env_type",
+        # sudo_password is not a terminal-backend option — it's a credential
+        # used across backends, bridged to $SUDO_PASSWORD (not TERMINAL_*).
+        # Treating it as terminal-only would be misleading.
+        "sudo_password",
+    }
+)
 
 
 def _terminal_tool_env_var_names() -> set[str]:
     """All TERMINAL_* env vars actually consumed by terminal_tool."""
     import tools.terminal_tool as tt
+
     source = inspect.getsource(tt)
     # Naive scan: every os.getenv("TERMINAL_X", ...) and _parse_env_var("TERMINAL_X", ...).
     import re
+
     pat = re.compile(r'["\'](TERMINAL_[A-Z0-9_]+)["\']')
     return set(pat.findall(source))
 

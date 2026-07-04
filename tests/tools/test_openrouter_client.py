@@ -9,7 +9,9 @@ def test_run_modeller():
     with patch("requests.get") as mock_get:
         mock_resp = MagicMock()
         mock_resp.status_code = 200
-        mock_resp.json.return_value = {"data": [{"id": "openai/gpt-4o"}, {"id": "openai/gpt-4o-mini"}]}
+        mock_resp.json.return_value = {
+            "data": [{"id": "openai/gpt-4o"}, {"id": "openai/gpt-4o-mini"}]
+        }
         mock_get.return_value = mock_resp
         with patch("tools.openrouter_client._OPENROUTER_API_KEY", "test_key"):
             sonuc = openrouter_client.run(islem="modeller")
@@ -53,7 +55,9 @@ def test_run_sorgula_no_message():
 
 def test_run_sorgula_no_key():
     with patch("tools.openrouter_client._OPENROUTER_API_KEY", ""):
-        sonuc = openrouter_client.run(islem="sorgula", mesaj="test", model="openai/gpt-4o")
+        sonuc = openrouter_client.run(
+            islem="sorgula", mesaj="test", model="openai/gpt-4o"
+        )
         assert "bulunamadı" in sonuc
 
 
@@ -67,7 +71,9 @@ def test_run_sorgula_success():
         }
         mock_post.return_value = mock_resp
         with patch("tools.openrouter_client._OPENROUTER_API_KEY", "test_key"):
-            sonuc = openrouter_client.run(islem="sorgula", mesaj="Selam", model="openai/gpt-4o")
+            sonuc = openrouter_client.run(
+                islem="sorgula", mesaj="Selam", model="openai/gpt-4o"
+            )
             assert "Merhaba" in sonuc
 
 
@@ -84,7 +90,7 @@ def test_run_sorgula_list_messages():
             sonuc = openrouter_client.run(
                 islem="sorgula",
                 mesaj=[{"role": "user", "content": "test"}],
-                model="openai/gpt-4o"
+                model="openai/gpt-4o",
             )
             assert "OK" in sonuc
 

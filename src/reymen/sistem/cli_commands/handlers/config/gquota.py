@@ -4,7 +4,11 @@
 def _handle_gquota_command(cli, cmd_original: str) -> None:
     """Show Google Gemini Code Assist quota usage for the current OAuth account."""
     try:
-        from agent.google_oauth import get_valid_access_token, GoogleOAuthError, load_credentials
+        from agent.google_oauth import (
+            get_valid_access_token,
+            GoogleOAuthError,
+            load_credentials,
+        )
         from agent.google_code_assist import retrieve_user_quota, CodeAssistError
     except ImportError as exc:
         cli._console_print(f"  [red]Gemini modules unavailable: {exc}[/]")
@@ -14,7 +18,9 @@ def _handle_gquota_command(cli, cmd_original: str) -> None:
         access_token = get_valid_access_token()
     except GoogleOAuthError as exc:
         cli._console_print(f"  [yellow]{exc}[/]")
-        cli._console_print("  Run [bold]/model[/] and pick 'Google Gemini (OAuth)' to sign in.")
+        cli._console_print(
+            "  Run [bold]/model[/] and pick 'Google Gemini (OAuth)' to sign in."
+        )
         return
 
     creds = load_credentials()
@@ -27,13 +33,17 @@ def _handle_gquota_command(cli, cmd_original: str) -> None:
         return
 
     if not buckets:
-        cli._console_print("  [dim]No quota buckets reported (account may be on legacy/unmetered tier).[/]")
+        cli._console_print(
+            "  [dim]No quota buckets reported (account may be on legacy/unmetered tier).[/]"
+        )
         return
 
     # Sort for stable display, group by model
     buckets.sort(key=lambda b: (b.model_id, b.token_type))
     cli._console_print()
-    cli._console_print(f"  [bold]Gemini Code Assist quota[/]  (project: {project_id or '(auto / free-tier)'})")
+    cli._console_print(
+        f"  [bold]Gemini Code Assist quota[/]  (project: {project_id or '(auto / free-tier)'})"
+    )
     cli._console_print()
     for b in buckets:
         pct = max(0.0, min(1.0, b.remaining_fraction))

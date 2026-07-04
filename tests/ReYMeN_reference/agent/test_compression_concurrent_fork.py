@@ -130,18 +130,16 @@ def test_concurrent_compression_does_not_fork_session(tmp_path: Path) -> None:
 
     # And exactly one of the two agents actually rotated its session_id; the
     # other should still hold the parent_sid (its compression was skipped).
-    rotated = sum(
-        1 for a in (agent_a, agent_b) if a.session_id != parent_sid
-    )
+    rotated = sum(1 for a in (agent_a, agent_b) if a.session_id != parent_sid)
     assert rotated == 1, (
         f"Expected exactly one agent to rotate session_id, got {rotated}. "
         "Both agents rotating means the lock didn't serialize them."
     )
 
     # The lock must be released after the winner finished.
-    assert db.get_compression_lock_holder(parent_sid) is None, (
-        "Compression lock leaked: still held after both rotations completed."
-    )
+    assert (
+        db.get_compression_lock_holder(parent_sid) is None
+    ), "Compression lock leaked: still held after both rotations completed."
 
 
 def test_skipped_compression_returns_messages_unchanged(tmp_path: Path) -> None:
@@ -195,10 +193,14 @@ class _NoLockSubsystemDB:
         )
 
     def get_compression_lock_holder(self, *_a, **_k):
-        raise AttributeError("'SessionDB' object has no attribute 'get_compression_lock_holder'")
+        raise AttributeError(
+            "'SessionDB' object has no attribute 'get_compression_lock_holder'"
+        )
 
     def release_compression_lock(self, *_a, **_k):
-        raise AttributeError("'SessionDB' object has no attribute 'release_compression_lock'")
+        raise AttributeError(
+            "'SessionDB' object has no attribute 'release_compression_lock'"
+        )
 
     def __getattr__(self, name):
         # Everything else (create_session, append, rotation helpers) goes to
@@ -233,9 +235,9 @@ def test_missing_lock_subsystem_fails_open_not_infinite_loop(tmp_path: Path) -> 
     # Compression actually ran (proceeded past the broken lock) and made
     # progress, so the auto-compress loop would terminate.
     agent.context_compressor.compress.assert_called_once()
-    assert len(compressed) < len(messages), (
-        "Compression made no progress despite failing open — loop would still spin."
-    )
+    assert len(compressed) < len(
+        messages
+    ), "Compression made no progress despite failing open — loop would still spin."
     # Session rotated (compression succeeded end-to-end).
     assert agent.session_id != parent_sid
 

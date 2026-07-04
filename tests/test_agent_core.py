@@ -11,7 +11,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from agent_runtime import AgentRuntime, RuntimeHelpers, HataSiniflandirici, BackgroundReview
+from agent_runtime import (
+    AgentRuntime,
+    RuntimeHelpers,
+    HataSiniflandirici,
+    BackgroundReview,
+)
 from motor import Motor
 from beyin import Beyin
 
@@ -19,9 +24,19 @@ from beyin import Beyin
 class TestAgentRuntime:
     def test_runtime_baslatma(self):
         """AgentRuntime baslatma ve durum kontrolu."""
-        cfg = {"default_provider": "lmstudio", "default_model": "test",
-               "providers": {"lmstudio": {"base_url": "http://localhost:1234", "api_key": "not-needed"}},
-               "max_tur": 5, "onay_iste": False, "backend_mode": "local"}
+        cfg = {
+            "default_provider": "lmstudio",
+            "default_model": "test",
+            "providers": {
+                "lmstudio": {
+                    "base_url": "http://localhost:1234",
+                    "api_key": "not-needed",
+                }
+            },
+            "max_tur": 5,
+            "onay_iste": False,
+            "backend_mode": "local",
+        }
         rt = AgentRuntime(cfg)
         assert rt is not None
         assert rt._durum == "bosta"
@@ -29,8 +44,16 @@ class TestAgentRuntime:
 
     def test_runtime_durum(self):
         """durum() metodunun dogru dict dondurmesi."""
-        cfg = {"default_provider": "lmstudio", "default_model": "test",
-               "providers": {"lmstudio": {"base_url": "http://localhost:1234", "api_key": "not-needed"}}}
+        cfg = {
+            "default_provider": "lmstudio",
+            "default_model": "test",
+            "providers": {
+                "lmstudio": {
+                    "base_url": "http://localhost:1234",
+                    "api_key": "not-needed",
+                }
+            },
+        }
         rt = AgentRuntime(cfg)
         durum = rt.durum()
         assert "durum" in durum
@@ -40,8 +63,16 @@ class TestAgentRuntime:
 
     def test_runtime_calisirken_durum_kontrolu(self):
         """Ay ni calisirken tekrar calistirma engellenmeli."""
-        cfg = {"default_provider": "lmstudio", "default_model": "test",
-               "providers": {"lmstudio": {"base_url": "http://localhost:1234", "api_key": "not-needed"}}}
+        cfg = {
+            "default_provider": "lmstudio",
+            "default_model": "test",
+            "providers": {
+                "lmstudio": {
+                    "base_url": "http://localhost:1234",
+                    "api_key": "not-needed",
+                }
+            },
+        }
         rt = AgentRuntime(cfg)
         # _durum'u manuel calisiyor yap
         rt._durum = "calisiyor"
@@ -52,8 +83,16 @@ class TestAgentRuntime:
 
     def test_runtime_sifirla(self):
         """sifirla() metodunun dogru calismasi."""
-        cfg = {"default_provider": "lmstudio", "default_model": "test",
-               "providers": {"lmstudio": {"base_url": "http://localhost:1234", "api_key": "not-needed"}}}
+        cfg = {
+            "default_provider": "lmstudio",
+            "default_model": "test",
+            "providers": {
+                "lmstudio": {
+                    "base_url": "http://localhost:1234",
+                    "api_key": "not-needed",
+                }
+            },
+        }
         rt = AgentRuntime(cfg)
         rt._calisma_id = "abc123"
         rt._baslangic = time.time()
@@ -114,7 +153,9 @@ class TestRuntimeHelpers:
 class TestHataSiniflandirici:
     def test_siniflandir_ag(self):
         """Ag hatasi siniflandirmasi."""
-        kategori = HataSiniflandirici.siniflandir("ConnectionError: baglanti reddedildi")
+        kategori = HataSiniflandirici.siniflandir(
+            "ConnectionError: baglanti reddedildi"
+        )
         assert kategori == "ag"
 
     def test_siniflandir_dosya(self):
@@ -124,7 +165,9 @@ class TestHataSiniflandirici:
 
     def test_siniflandir_modul(self):
         """Modul hatasi siniflandirmasi."""
-        kategori = HataSiniflandirici.siniflandir("ModuleNotFoundError: No module named 'xyz'")
+        kategori = HataSiniflandirici.siniflandir(
+            "ModuleNotFoundError: No module named 'xyz'"
+        )
         assert kategori == "modul"
 
     def test_siniflandir_python(self):
@@ -160,7 +203,7 @@ class TestMotor:
         m = Motor(backend_mode="local")
         arac, ham = m.eylemi_ayristir('Eylem: DOSYA_OKU("test.txt")')
         assert arac == "DOSYA_OKU"
-        assert 'test.txt' in ham
+        assert "test.txt" in ham
 
     def test_motor_eylem_ayristir_bos(self):
         """Gecersiz eylem ayristirma."""
@@ -193,8 +236,16 @@ class TestMotor:
 class TestBeyin:
     def test_beyin_olusturma(self):
         """Beyin olusturma."""
-        cfg = {"default_provider": "lmstudio", "default_model": "test-model",
-               "providers": {"lmstudio": {"base_url": "http://localhost:1234", "api_key": "not-needed"}}}
+        cfg = {
+            "default_provider": "lmstudio",
+            "default_model": "test-model",
+            "providers": {
+                "lmstudio": {
+                    "base_url": "http://localhost:1234",
+                    "api_key": "not-needed",
+                }
+            },
+        }
         b = Beyin(cfg)
         assert b is not None
         assert b.provider == "lmstudio"
@@ -202,16 +253,32 @@ class TestBeyin:
 
     def test_beyin_anahtar_bul_lmstudio(self):
         """LM Studio icin anahtar bulma."""
-        cfg = {"default_provider": "lmstudio", "default_model": "test",
-               "providers": {"lmstudio": {"base_url": "http://localhost:1234", "api_key": "not-needed"}}}
+        cfg = {
+            "default_provider": "lmstudio",
+            "default_model": "test",
+            "providers": {
+                "lmstudio": {
+                    "base_url": "http://localhost:1234",
+                    "api_key": "not-needed",
+                }
+            },
+        }
         b = Beyin(cfg)
         anahtar = b._anahtar_bul("lmstudio", {"api_key": "not-needed"})
         assert anahtar == "not-needed"
 
     def test_beyin_varsayilan_model(self):
         """Varsayilan model adlari."""
-        cfg = {"default_provider": "lmstudio", "default_model": "test",
-               "providers": {"lmstudio": {"base_url": "http://localhost:1234", "api_key": "not-needed"}}}
+        cfg = {
+            "default_provider": "lmstudio",
+            "default_model": "test",
+            "providers": {
+                "lmstudio": {
+                    "base_url": "http://localhost:1234",
+                    "api_key": "not-needed",
+                }
+            },
+        }
         b = Beyin(cfg)
         assert b._varsayilan_model("deepseek") == "deepseek-chat"
         assert b._varsayilan_model("openai") == "gpt-4o-mini"
@@ -220,8 +287,16 @@ class TestBeyin:
 
     def test_beyin_fallback_zinciri(self):
         """Fallback zinciri olusumu."""
-        cfg = {"default_provider": "lmstudio", "default_model": "test",
-               "providers": {"lmstudio": {"base_url": "http://localhost:1234", "api_key": "not-needed"}}}
+        cfg = {
+            "default_provider": "lmstudio",
+            "default_model": "test",
+            "providers": {
+                "lmstudio": {
+                    "base_url": "http://localhost:1234",
+                    "api_key": "not-needed",
+                }
+            },
+        }
         b = Beyin(cfg)
         assert len(b._fallback_zinciri) >= 1
         assert b._fallback_zinciri[0].provider == "lmstudio"

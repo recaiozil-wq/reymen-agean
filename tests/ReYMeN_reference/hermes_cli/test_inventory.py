@@ -155,9 +155,15 @@ def _nous_row(model: str = "openai/gpt-5.5") -> dict:
 
 def test_build_models_payload_returns_expected_shape():
     rows = [
-        {"slug": "openrouter", "name": "OpenRouter", "models": ["m1"],
-         "total_models": 1, "is_current": True, "is_user_defined": False,
-         "source": "built-in"},
+        {
+            "slug": "openrouter",
+            "name": "OpenRouter",
+            "models": ["m1"],
+            "total_models": 1,
+            "is_current": True,
+            "is_user_defined": False,
+            "source": "built-in",
+        },
     ]
     ctx = _empty_ctx(provider="openrouter", model="m1", base_url="")
     with _list_auth_returning(rows):
@@ -175,12 +181,21 @@ def test_build_models_payload_does_not_call_provider_model_ids():
     caching). ``build_models_payload`` itself must not call the live fetcher
     directly; the test pins that boundary.
     """
-    rows = [{"slug": "nous", "name": "Nous", "models": ["ReYMeN-4-405b"],
-             "total_models": 1, "is_current": False, "is_user_defined": False,
-             "source": "built-in"}]
+    rows = [
+        {
+            "slug": "nous",
+            "name": "Nous",
+            "models": ["ReYMeN-4-405b"],
+            "total_models": 1,
+            "is_current": False,
+            "is_user_defined": False,
+            "source": "built-in",
+        }
+    ]
     ctx = _empty_ctx()
-    with _list_auth_returning(rows), \
-         patch("ReYMeN_cli.models.provider_model_ids") as mock_pm:
+    with _list_auth_returning(rows), patch(
+        "ReYMeN_cli.models.provider_model_ids"
+    ) as mock_pm:
         build_models_payload(ctx)
     mock_pm.assert_not_called()
 
@@ -249,7 +264,9 @@ def test_pricing_uses_cached_nous_tier_by_default():
                 },
             },
         ),
-        patch("ReYMeN_cli.models.check_nous_free_tier", return_value=False) as mock_free,
+        patch(
+            "ReYMeN_cli.models.check_nous_free_tier", return_value=False
+        ) as mock_free,
     ):
         build_models_payload(ctx, pricing=True)
 
@@ -270,7 +287,9 @@ def test_pricing_can_force_fresh_nous_tier():
                 },
             },
         ),
-        patch("ReYMeN_cli.models.check_nous_free_tier", return_value=False) as mock_free,
+        patch(
+            "ReYMeN_cli.models.check_nous_free_tier", return_value=False
+        ) as mock_free,
     ):
         build_models_payload(ctx, pricing=True, force_fresh_nous_tier=True)
 
@@ -282,9 +301,15 @@ def test_include_unconfigured_appends_canonical_skeletons():
     list_authenticated_providers didn't emit. Skeleton rows have empty
     models and source='canonical'."""
     rows = [
-        {"slug": "openrouter", "name": "OpenRouter", "models": ["m1"],
-         "total_models": 1, "is_current": True, "is_user_defined": False,
-         "source": "built-in"},
+        {
+            "slug": "openrouter",
+            "name": "OpenRouter",
+            "models": ["m1"],
+            "total_models": 1,
+            "is_current": True,
+            "is_user_defined": False,
+            "source": "built-in",
+        },
     ]
     ctx = _empty_ctx(provider="openrouter")
     with _list_auth_returning(rows):
@@ -297,8 +322,7 @@ def test_include_unconfigured_appends_canonical_skeletons():
     for entry in CANONICAL_PROVIDERS:
         assert entry.slug in seen_slugs, f"missing {entry.slug}"
     # Skeletons have empty models and source='canonical'.
-    skeletons = [r for r in payload["providers"]
-                 if r.get("source") == "canonical"]
+    skeletons = [r for r in payload["providers"] if r.get("source") == "canonical"]
     assert all(r["models"] == [] for r in skeletons)
     assert all(r["total_models"] == 0 for r in skeletons)
 
@@ -307,9 +331,15 @@ def test_include_unconfigured_skips_already_present_slugs():
     """If list_authenticated_providers already returned a row for a
     canonical slug, include_unconfigured must NOT duplicate it."""
     rows = [
-        {"slug": "openrouter", "name": "OpenRouter", "models": ["m1"],
-         "total_models": 1, "is_current": True, "is_user_defined": False,
-         "source": "built-in"},
+        {
+            "slug": "openrouter",
+            "name": "OpenRouter",
+            "models": ["m1"],
+            "total_models": 1,
+            "is_current": True,
+            "is_user_defined": False,
+            "source": "built-in",
+        },
     ]
     ctx = _empty_ctx()
     with _list_auth_returning(rows):
@@ -324,9 +354,15 @@ def test_include_unconfigured_skips_already_present_slugs():
 
 def test_picker_hints_marks_authed_rows_authenticated():
     rows = [
-        {"slug": "openrouter", "name": "OpenRouter", "models": ["m1"],
-         "total_models": 1, "is_current": True, "is_user_defined": False,
-         "source": "built-in"},
+        {
+            "slug": "openrouter",
+            "name": "OpenRouter",
+            "models": ["m1"],
+            "total_models": 1,
+            "is_current": True,
+            "is_user_defined": False,
+            "source": "built-in",
+        },
     ]
     ctx = _empty_ctx()
     with _list_auth_returning(rows):
@@ -341,10 +377,11 @@ def test_picker_hints_adds_warning_to_skeleton_rows():
     ctx = _empty_ctx()
     with _list_auth_returning(rows):
         payload = build_models_payload(
-            ctx, include_unconfigured=True, picker_hints=True,
+            ctx,
+            include_unconfigured=True,
+            picker_hints=True,
         )
-    skeleton_rows = [r for r in payload["providers"]
-                     if r.get("source") == "canonical"]
+    skeleton_rows = [r for r in payload["providers"] if r.get("source") == "canonical"]
     assert skeleton_rows, "test setup: expected at least one skeleton row"
     for row in skeleton_rows:
         assert row["authenticated"] is False
@@ -352,9 +389,8 @@ def test_picker_hints_adds_warning_to_skeleton_rows():
         assert "warning" in row
         # api_key providers get "paste X to activate" / others get the
         # ReYMeN model fallback.
-        assert (
-            row["warning"].startswith("paste ")
-            or row["warning"].startswith("run `ReYMeN model`")
+        assert row["warning"].startswith("paste ") or row["warning"].startswith(
+            "run `ReYMeN model`"
         )
 
 
@@ -365,12 +401,12 @@ def test_picker_hints_api_key_warning_format():
     ctx = _empty_ctx()
     with _list_auth_returning(rows):
         payload = build_models_payload(
-            ctx, include_unconfigured=True, picker_hints=True,
+            ctx,
+            include_unconfigured=True,
+            picker_hints=True,
         )
     # anthropic uses api_key + ANTHROPIC_API_KEY.
-    anthropic = next(
-        r for r in payload["providers"] if r["slug"] == "anthropic"
-    )
+    anthropic = next(r for r in payload["providers"] if r["slug"] == "anthropic")
     assert "ANTHROPIC_API_KEY" in anthropic["warning"]
     assert anthropic["warning"].startswith("paste ")
 
@@ -390,14 +426,26 @@ def test_canonical_order_uses_slug_not_is_user_defined_flag():
     canonical_slug = CANONICAL_PROVIDERS[2].slug  # any canonical
     rows = [
         # A truly-custom row (correct: is_user_defined=True)
-        {"slug": "custom:Ollama", "name": "Ollama", "models": [],
-         "total_models": 0, "is_current": False, "is_user_defined": True,
-         "source": "user-config"},
+        {
+            "slug": "custom:Ollama",
+            "name": "Ollama",
+            "models": [],
+            "total_models": 0,
+            "is_current": False,
+            "is_user_defined": True,
+            "source": "user-config",
+        },
         # A canonical row that the substrate flagged as user-defined
         # because the user configured it via providers: dict.
-        {"slug": canonical_slug, "name": "x", "models": ["m1"],
-         "total_models": 1, "is_current": False, "is_user_defined": True,
-         "source": "built-in"},
+        {
+            "slug": canonical_slug,
+            "name": "x",
+            "models": ["m1"],
+            "total_models": 1,
+            "is_current": False,
+            "is_user_defined": True,
+            "source": "built-in",
+        },
     ]
     ctx = _empty_ctx()
     with _list_auth_returning(rows):
@@ -422,9 +470,15 @@ def test_canonical_order_with_unconfigured_preserves_full_universe():
     from ReYMeN_cli.models import CANONICAL_PROVIDERS
 
     rows = [
-        {"slug": "custom:Ollama", "name": "Ollama", "models": [],
-         "total_models": 0, "is_current": False, "is_user_defined": True,
-         "source": "user-config"},
+        {
+            "slug": "custom:Ollama",
+            "name": "Ollama",
+            "models": [],
+            "total_models": 0,
+            "is_current": False,
+            "is_user_defined": True,
+            "source": "user-config",
+        },
     ]
     ctx = _empty_ctx()
     with _list_auth_returning(rows):
@@ -455,7 +509,9 @@ def test_end_to_end_with_real_context_no_credentials_leak(monkeypatch):
     with patch("ReYMeN_cli.config.load_config", return_value=cfg):
         ctx = load_picker_context()
     payload = build_models_payload(
-        ctx, include_unconfigured=True, picker_hints=True,
+        ctx,
+        include_unconfigured=True,
+        picker_hints=True,
     )
     import json as _json
 
@@ -468,17 +524,31 @@ def test_payload_shape_compatible_with_modelpickerdialog_frontend():
     Verify every authenticated/skeleton row exposes those keys.
     """
     rows = [
-        {"slug": "openrouter", "name": "OpenRouter", "models": ["m1"],
-         "total_models": 1, "is_current": True, "is_user_defined": False,
-         "source": "built-in"},
+        {
+            "slug": "openrouter",
+            "name": "OpenRouter",
+            "models": ["m1"],
+            "total_models": 1,
+            "is_current": True,
+            "is_user_defined": False,
+            "source": "built-in",
+        },
     ]
     ctx = _empty_ctx()
     with _list_auth_returning(rows):
         payload = build_models_payload(
-            ctx, include_unconfigured=True, picker_hints=True,
+            ctx,
+            include_unconfigured=True,
+            picker_hints=True,
         )
-    required_keys = {"name", "slug", "models", "total_models", "is_current",
-                     "authenticated"}
+    required_keys = {
+        "name",
+        "slug",
+        "models",
+        "total_models",
+        "is_current",
+        "authenticated",
+    }
     for row in payload["providers"]:
         missing = required_keys - row.keys()
         assert not missing, f"row {row['slug']} missing keys: {missing}"

@@ -31,7 +31,9 @@ def curator_modules(tmp_path, monkeypatch):
     return home, skill_usage, curator
 
 
-def test_recent_view_activity_prevents_false_stale_transition(curator_modules, monkeypatch):
+def test_recent_view_activity_prevents_false_stale_transition(
+    curator_modules, monkeypatch
+):
     home, skill_usage, curator = curator_modules
     skills_dir = home / "skills"
     _write_skill(skills_dir, "recently-viewed")
@@ -39,14 +41,16 @@ def test_recent_view_activity_prevents_false_stale_transition(curator_modules, m
     now = datetime(2026, 4, 30, tzinfo=timezone.utc)
     created_at = (now - timedelta(days=60)).isoformat()
     last_viewed_at = (now - timedelta(days=1)).isoformat()
-    skill_usage.save_usage({
-        "recently-viewed": {
-            "created_at": created_at,
-            "last_viewed_at": last_viewed_at,
-            "view_count": 1,
-            "state": "active",
+    skill_usage.save_usage(
+        {
+            "recently-viewed": {
+                "created_at": created_at,
+                "last_viewed_at": last_viewed_at,
+                "view_count": 1,
+                "state": "active",
+            }
         }
-    })
+    )
     monkeypatch.setattr(curator, "get_stale_after_days", lambda: 30)
     monkeypatch.setattr(curator, "get_archive_after_days", lambda: 90)
 

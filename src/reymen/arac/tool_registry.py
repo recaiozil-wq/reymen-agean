@@ -19,6 +19,7 @@ import time
 from pathlib import Path
 from typing import Any, Callable, Optional
 import logging
+
 logger = logging.getLogger(__name__)
 
 TOOLS_DIR = Path(__file__).parent / "tools"
@@ -29,8 +30,10 @@ _CHECK_FN_TTL = 30.0  # saniye
 
 def _ttl_cache(ttl: float = _CHECK_FN_TTL) -> Callable:
     """Simple TTL cache decorator — caches check_fn result for 30s."""
+
     def decorator(fn):
         _cache = {"sonuc": None, "zaman": 0.0}
+
         @functools.wraps(fn)
         def wrapper(*args, **kwargs):
             now = time.time()
@@ -42,8 +45,10 @@ def _ttl_cache(ttl: float = _CHECK_FN_TTL) -> Callable:
                 _cache["sonuc"] = False
             _cache["zaman"] = now
             return _cache["sonuc"]
+
         wrapper.ttl_tazele = lambda: _cache.update({"zaman": 0.0})  # type: ignore[attr-defined]
         return wrapper
+
     return decorator
 
 
@@ -172,8 +177,8 @@ class ToolRegistry:
         self._tools: dict[str, Callable] = {}
         self._aliases: dict[str, str] = {}
         self._check_fns: dict[str, Callable[[], bool]] = {}
-        self._meta: dict[str, dict] = {}          # arac_adi -> metadata
-        self._schemas: dict[str, dict] = {}       # arac_adi -> schema override
+        self._meta: dict[str, dict] = {}  # arac_adi -> metadata
+        self._schemas: dict[str, dict] = {}  # arac_adi -> schema override
         self.toolset = ToolsetManager()
 
         # Alias: ReYMeN araclari.
@@ -190,6 +195,7 @@ class ToolRegistry:
         if not TOOLS_DIR.exists():
             return
         import importlib.util
+
         for f in sorted(TOOLS_DIR.glob("*.py")):
             if f.name.startswith("_") or f.name == "__init__.py":
                 continue
@@ -207,16 +213,24 @@ class ToolRegistry:
                         self._meta[f.stem.upper()] = getattr(mod, "TOOL_META")
                     # check_fn varsa ekle
                     if hasattr(mod, "check_fn"):
-                        self._check_fns[f.stem.upper()] = _ttl_cache()(getattr(mod, "check_fn"))
+                        self._check_fns[f.stem.upper()] = _ttl_cache()(
+                            getattr(mod, "check_fn")
+                        )
             except Exception as _tool_reg_e237:
                 print(f"[UYARI] tool_registry.py:238 - {_tool_reg_e237}")
 
     # ── Kayit ──────────────────────────────────────────────────────────
 
-    def kaydet(self, ad: str, fonk: Callable, aciklama: str = "",
-               parametreler: Optional[list] = None, kategori: str = "",
-               check_fn: Optional[Callable[[], bool]] = None,
-               risk_seviyesi: int = 0) -> None:
+    def kaydet(
+        self,
+        ad: str,
+        fonk: Callable,
+        aciklama: str = "",
+        parametreler: Optional[list] = None,
+        kategori: str = "",
+        check_fn: Optional[Callable[[], bool]] = None,
+        risk_seviyesi: int = 0,
+    ) -> None:
         """Bir araci dogrudan kaydet (metadata ile)."""
         self._tools[ad] = fonk
         if check_fn is not None:
@@ -253,8 +267,10 @@ class ToolRegistry:
             arac_adi: Arac adi (ornek: WEB_ARA)
             env_var: .env'deki degisken adi (ornek: OPENROUTER_API_KEY)
         """
+
         def _env_check() -> bool:
             return bool(os.environ.get(env_var, "").strip())
+
         self._check_fns[arac_adi] = _ttl_cache()(_env_check)
 
     def check_fn_kaldir(self, arac_adi: str) -> None:
@@ -403,8 +419,11 @@ class ToolRegistry:
         for candidate in ("ping", "run"):
             if hasattr(mod, candidate):
                 return getattr(mod, candidate)
-        funcs = [getattr(mod, n) for n in dir(mod)
-                 if callable(getattr(mod, n)) and not n.startswith("_")]
+        funcs = [
+            getattr(mod, n)
+            for n in dir(mod)
+            if callable(getattr(mod, n)) and not n.startswith("_")
+        ]
         return funcs[0] if funcs else None
 
     def resolve(self, ad: str) -> Optional[dict[str, str]]:
@@ -414,7 +433,11 @@ class ToolRegistry:
         anahtar = ad.strip().upper()
         if anahtar in self._tools:
             fonk = self._tools[anahtar]
-            return {"module": anahtar.lower(), "callable": "run", "fonk": fonk.__name__ if hasattr(fonk, "__name__") else "run"}
+            return {
+                "module": anahtar.lower(),
+                "callable": "run",
+                "fonk": fonk.__name__ if hasattr(fonk, "__name__") else "run",
+            }
         alias = self._aliases.get(anahtar)
         if alias:
             parts = alias.split(".")
@@ -513,12 +536,14 @@ class ToolRegistry:
             meta = self._meta.get(ad, {})
             if not isinstance(meta, dict):
                 meta = {}
-            sonuc.append({
-                "ad": ad,
-                "aciklama": meta.get("aciklama", ""),
-                "risk": meta.get("risk", 0),
-                "musait": self.check_fn_kontrol_et(ad),
-            })
+            sonuc.append(
+                {
+                    "ad": ad,
+                    "aciklama": meta.get("aciklama", ""),
+                    "risk": meta.get("risk", 0),
+                    "musait": self.check_fn_kontrol_et(ad),
+                }
+            )
         return sonuc
 
 
@@ -531,9 +556,11 @@ if __name__ == "__main__":
 
     # TTL cache test
     call_sayisi = [0]
+
     def test_check():
         call_sayisi[0] += 1
         return True
+
     r.kaydet("TTL_TESTCACHE", lambda: "ok")
     r.check_fn_ekle("TTL_TESTCACHE", test_check)
     r.check_fn_kontrol_et("TTL_TESTCACHE")  # 1. cagri
@@ -553,7 +580,10 @@ if __name__ == "__main__":
     # Schema override test
     r.schema_guncelle("TTL_TESTCACHE", {"custom": "schema", "parametreler": []})
     sema = r.schema_al("TTL_TESTCACHE")
-    assert sema == {"custom": "schema", "parametreler": []}, f"Schema override basarisiz: {sema}"
+    assert sema == {
+        "custom": "schema",
+        "parametreler": [],
+    }, f"Schema override basarisiz: {sema}"
     print("[OK] Schema Override calisiyor")
 
     # Env check test

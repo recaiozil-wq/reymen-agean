@@ -94,7 +94,9 @@ class MemoryManager:
         yeni = self._anahtar_guncelle(icerik, anahtar, deger)
 
         if len(yeni) > sinir:
-            print(f"[MemoryManager] UYARI: {dosya.name} limit aşıldı ({len(yeni)}/{sinir})")
+            print(
+                f"[MemoryManager] UYARI: {dosya.name} limit aşıldı ({len(yeni)}/{sinir})"
+            )
             yeni = yeni[:sinir]
 
         return self._yaz(dosya, yeni)
@@ -116,7 +118,9 @@ class MemoryManager:
         yeni = icerik + f"\n- {metin}\n"
 
         if len(yeni) > sinir:
-            print(f"[MemoryManager] UYARI: {dosya.name} limit aşıldı ({len(yeni)}/{sinir})")
+            print(
+                f"[MemoryManager] UYARI: {dosya.name} limit aşıldı ({len(yeni)}/{sinir})"
+            )
             yeni = yeni[-sinir:]
 
         return self._yaz(dosya, yeni)

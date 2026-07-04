@@ -68,6 +68,7 @@ class MixinCommands:
             if hasattr(self.agent, "_todo_store"):
                 try:
                     from tools.todo_tool import TodoStore
+
                     self.agent._todo_store = TodoStore()
                 except Exception:
                     logger.warning("[fix_01_sessiz_except] Exception")
@@ -91,6 +92,7 @@ class MixinCommands:
                     logger.warning("[fix_01_sessiz_except] Exception")
                 if title and self._session_db:
                     from reymen.sistem.ReYMeN_state import SessionDB
+
                     try:
                         sanitized = SessionDB.sanitize_title(title)
                     except ValueError as e:
@@ -99,7 +101,9 @@ class MixinCommands:
                         title = None
                     if sanitized:
                         try:
-                            self._session_db.set_session_title(self.session_id, sanitized)
+                            self._session_db.set_session_title(
+                                self.session_id, sanitized
+                            )
                             self._pending_title = None
                             title = sanitized
                         except ValueError as e:
@@ -109,7 +113,9 @@ class MixinCommands:
                             title = None
                     elif title is not None:
                         # sanitize_title returned empty (whitespace-only / unprintable)
-                        _cprint("  Title is empty after cleanup — session started untitled.")
+                        _cprint(
+                            "  Title is empty after cleanup — session started untitled."
+                        )
                         title = None
             # Notify memory providers that session_id rotated to a fresh
             # conversation. reset=True signals providers to flush accumulated
@@ -312,19 +318,19 @@ class MixinCommands:
     def chat(self, message, images: list = None) -> Optional[str]:
         """
         Send a message to the agent and get a response.
-        
+
         Handles streaming output, interrupt detection (user typing while agent
         is working), and re-queueing of interrupted messages.
-        
+
         Uses a dedicated _interrupt_queue (separate from _pending_input) to avoid
         race conditions between the process_loop and interrupt monitoring. Messages
         typed while the agent is running go to _interrupt_queue; messages typed while
         idle go to _pending_input.
-        
+
         Args:
             message: The user's message (str or multimodal content list)
             images: Optional list of Path objects for attached images
-            
+
         Returns:
             The agent's response, or None on error
         """
@@ -355,7 +361,7 @@ class MixinCommands:
             request_overrides=turn_route.get("request_overrides"),
         ):
             return None
-        
+
         # Route image attachments based on the active model's vision capability.
         # "native" → pass pixels as OpenAI-style content parts (adapters
         #            translate for Anthropic/Gemini/Bedrock).
@@ -376,7 +382,9 @@ class MixinCommands:
                     load_config(),
                 )
             except Exception as _img_exc:
-                logging.debug("image_routing decision failed, defaulting to text: %s", _img_exc)
+                logging.debug(
+                    "image_routing decision failed, defaulting to text: %s", _img_exc
+                )
                 _img_mode = "text"
 
             if _img_mode == "native":
@@ -404,7 +412,9 @@ class MixinCommands:
                             message if isinstance(message, str) else "", images
                         )
                 except Exception as _img_exc:
-                    logging.warning("native image attach failed, falling back to text: %s", _img_exc)
+                    logging.warning(
+                        "native image attach failed, falling back to text: %s", _img_exc
+                    )
                     message = self._preprocess_images_with_vision(
                         message if isinstance(message, str) else "", images
                     )
@@ -418,20 +428,33 @@ class MixinCommands:
             try:
                 from agent.context_references import preprocess_context_references
                 from agent.model_metadata import get_model_context_length
+
                 _ctx_len = get_model_context_length(
-                    self.model, base_url=self.base_url or "", api_key=self.api_key or "",
-                    config_context_length=getattr(self.agent, "_config_context_length", None) if self.agent else None)
+                    self.model,
+                    base_url=self.base_url or "",
+                    api_key=self.api_key or "",
+                    config_context_length=getattr(
+                        self.agent, "_config_context_length", None
+                    )
+                    if self.agent
+                    else None,
+                )
                 _ctx_result = preprocess_context_references(
-                    message, cwd=os.getcwd(), context_length=_ctx_len)
+                    message, cwd=os.getcwd(), context_length=_ctx_len
+                )
                 if _ctx_result.expanded or _ctx_result.blocked:
                     if _ctx_result.references:
                         _cprint(
                             f"  {_DIM}[@ context: {len(_ctx_result.references)} ref(s), "
-                            f"{_ctx_result.injected_tokens} tokens]{_RST}")
+                            f"{_ctx_result.injected_tokens} tokens]{_RST}"
+                        )
                     for w in _ctx_result.warnings:
                         _cprint(f"  {_DIM}⚠ {w}{_RST}")
                     if _ctx_result.blocked:
-                        return "\n".join(_ctx_result.warnings) or "Context injection refused."
+                        return (
+                            "\n".join(_ctx_result.warnings)
+                            or "Context injection refused."
+                        )
                     message = _ctx_result.message
             except Exception as e:
                 logging.debug("@ context reference expansion failed: %s", e)
@@ -441,6 +464,7 @@ class MixinCommands:
         # UTF-8 and crash JSON serialization in the OpenAI SDK.
         if isinstance(message, str):
             from reymen.sistem.run_agent import _sanitize_surrogates
+
             message = _sanitize_surrogates(message)
 
         # Add user message to history
@@ -448,7 +472,7 @@ class MixinCommands:
 
         ChatConsole().print(f"[{_accent_hex()}]{'─' * 40}[/]")
         print(flush=True)
-        
+
         try:
             # Run the conversation with interrupt monitoring
             result = None
@@ -480,6 +504,7 @@ class MixinCommands:
                         _import_sounddevice,
                         stream_tts_to_speaker,
                     )
+
                     _tts_cfg = _load_tts_cfg()
                     if _get_prov(_tts_cfg) == "elevenlabs":
                         # Verify both ElevenLabs SDK and audio output are available
@@ -500,7 +525,9 @@ class MixinCommands:
                     nonlocal _streaming_box_opened
                     if not _streaming_box_opened:
                         _streaming_box_opened = True
-                        w = self._scrollback_box_width(getattr(self.console, "width", 80))
+                        w = self._scrollback_box_width(
+                            getattr(self.console, "width", 80)
+                        )
                         label = " ⚕ ReYMeN "
                         if self.show_timestamps:
                             label = f"{label}{datetime.now().strftime('%H:%M')} "
@@ -554,6 +581,7 @@ class MixinCommands:
                         reset_current_session_key,
                         set_current_session_key,
                     )
+
                     _approval_session_token = set_current_session_key(
                         self.session_id or "default"
                     )
@@ -562,28 +590,32 @@ class MixinCommands:
                     _approval_session_token = None
                 agent_message = _voice_prefix + message if _voice_prefix else message
                 # Prepend pending model switch note so the model knows about the switch
-                _msn = getattr(self, '_pending_model_switch_note', None)
+                _msn = getattr(self, "_pending_model_switch_note", None)
                 if _msn:
                     agent_message = _msn + "\n\n" + agent_message
                     self._pending_model_switch_note = None
                 # Prepend pending /reload-skills note so the model sees which
                 # skills were added/removed before handling this turn. Same
                 # one-shot queue pattern as the model-switch note above.
-                _srn = getattr(self, '_pending_skills_reload_note', None)
+                _srn = getattr(self, "_pending_skills_reload_note", None)
                 if _srn:
                     agent_message = _srn + "\n\n" + agent_message
                     self._pending_skills_reload_note = None
                 try:
                     result = self.agent.run_conversation(
                         user_message=agent_message,
-                        conversation_history=self.conversation_history[:-1],  # Exclude the message we just added
+                        conversation_history=self.conversation_history[
+                            :-1
+                        ],  # Exclude the message we just added
                         stream_callback=stream_callback,
                         task_id=self.session_id,
                         persist_user_message=message if _voice_prefix else None,
                     )
                 except Exception as exc:
                     logging.error("run_conversation raised: %s", exc, exc_info=True)
-                    _summary = getattr(self.agent, '_summarize_api_error', lambda e: str(e)[:300])(exc)
+                    _summary = getattr(
+                        self.agent, "_summarize_api_error", lambda e: str(e)[:300]
+                    )(exc)
                     result = {
                         "final_response": f"Error: {_summary}",
                         "messages": [],
@@ -605,7 +637,10 @@ class MixinCommands:
                     # state itself is preserved across turns (so /yolo persists
                     # for the whole CLI run); we just unbind the contextvar so a
                     # reused thread doesn't see stale identity on its next run.
-                    if _approval_session_token is not None and reset_current_session_key is not None:
+                    if (
+                        _approval_session_token is not None
+                        and reset_current_session_key is not None
+                    ):
                         try:
                             reset_current_session_key(_approval_session_token)
                         except Exception:
@@ -629,7 +664,7 @@ class MixinCommands:
             # so we skip interrupt processing to avoid stealing that input.
             interrupt_msg = None
             while agent_thread.is_alive():
-                if hasattr(self, '_interrupt_queue'):
+                if hasattr(self, "_interrupt_queue"):
                     try:
                         interrupt_msg = self._interrupt_queue.get(timeout=0.1)
                         if interrupt_msg:
@@ -647,11 +682,17 @@ class MixinCommands:
                             try:
                                 _dbg = _ReYMeN_home / "interrupt_debug.log"
                                 with open(_dbg, "a", encoding="utf-8") as _f:
-                                    _f.write(f"{time.strftime('%H:%M:%S')} interrupt fired: msg={str(interrupt_msg)[:60]!r}, "
-                                             f"children={len(self.agent._active_children)}, "
-                                             f"parent._interrupt={self.agent._interrupt_requested}\n")
-                                    for _ci, _ch in enumerate(self.agent._active_children):
-                                        _f.write(f"  child[{_ci}]._interrupt={_ch._interrupt_requested}\n")
+                                    _f.write(
+                                        f"{time.strftime('%H:%M:%S')} interrupt fired: msg={str(interrupt_msg)[:60]!r}, "
+                                        f"children={len(self.agent._active_children)}, "
+                                        f"parent._interrupt={self.agent._interrupt_requested}\n"
+                                    )
+                                    for _ci, _ch in enumerate(
+                                        self.agent._active_children
+                                    ):
+                                        _f.write(
+                                            f"  child[{_ci}]._interrupt={_ch._interrupt_requested}\n"
+                                        )
                             except Exception:
                                 logger.warning("[fix_01_sessiz_except] Exception")
                             break
@@ -680,7 +721,7 @@ class MixinCommands:
                         break
                     # Check if user fired ANOTHER interrupt (Ctrl+C sets
                     # _should_exit which process_loop checks on next pass).
-                    if getattr(self, '_should_exit', False):
+                    if getattr(self, "_should_exit", False):
                         break
                 if agent_thread.is_alive():
                     logger.warning(
@@ -706,6 +747,7 @@ class MixinCommands:
             # clients' __del__ would crash prompt_toolkit's loop on GC.
             try:
                 from agent.auxiliary_client import cleanup_stale_async_clients
+
                 cleanup_stale_async_clients()
             except Exception:
                 logger.warning("[fix_01_sessiz_except] Exception")
@@ -727,7 +769,11 @@ class MixinCommands:
             time.sleep(0.15)
 
             # Update history with full conversation
-            self.conversation_history = result.get("messages", self.conversation_history) if result else self.conversation_history
+            self.conversation_history = (
+                result.get("messages", self.conversation_history)
+                if result
+                else self.conversation_history
+            )
 
             # If auto-compression fired mid-turn, the agent created a new
             # continuation session and mutated self.agent.session_id. Sync
@@ -748,16 +794,24 @@ class MixinCommands:
             response = result.get("final_response", "") if result else ""
 
             # Auto-generate session title after first exchange (non-blocking)
-            if response and result and not result.get("failed") and not result.get("partial"):
+            if (
+                response
+                and result
+                and not result.get("failed")
+                and not result.get("partial")
+            ):
                 try:
                     from agent.title_generator import maybe_auto_title
+
                     # Route title-generation failures through the agent's
                     # user-visible warning channel so a depleted auxiliary
                     # provider doesn't silently leave sessions untitled
                     # (issue #15775).
-                    _title_failure_cb = getattr(
-                        self.agent, "_emit_auxiliary_failure", None
-                    ) if self.agent else None
+                    _title_failure_cb = (
+                        getattr(self.agent, "_emit_auxiliary_failure", None)
+                        if self.agent
+                        else None
+                    )
                     maybe_auto_title(
                         self._session_db,
                         self.session_id,
@@ -779,14 +833,20 @@ class MixinCommands:
             # Handle failed or partial results (e.g., non-retryable errors, rate limits,
             # truncated output, invalid tool calls). Both "failed" and "partial" with
             # an empty final_response mean the agent couldn't produce a usable answer.
-            if result and (result.get("failed") or result.get("partial")) and not response:
+            if (
+                result
+                and (result.get("failed") or result.get("partial"))
+                and not response
+            ):
                 error_detail = result.get("error", "Unknown error")
                 response = f"Error: {error_detail}"
                 # Stop continuous voice mode on persistent errors (e.g. 429 rate limit)
                 # to avoid an infinite error → record → error loop
                 if self._voice_continuous:
                     self._voice_continuous = False
-                    _cprint(f"\n{_DIM}Continuous voice mode stopped due to error.{_RST}")
+                    _cprint(
+                        f"\n{_DIM}Continuous voice mode stopped due to error.{_RST}"
+                    )
 
             # Handle interrupt - check if we were interrupted
             pending_message = None
@@ -798,9 +858,13 @@ class MixinCommands:
                 pending_message = result.get("interrupt_message") or interrupt_msg
                 # Add indicator that we were interrupted
                 if response and pending_message:
-                    response = response + "\n\n---\n_[Interrupted - processing new message]_"
+                    response = (
+                        response + "\n\n---\n_[Interrupted - processing new message]_"
+                    )
 
-            response_previewed = result.get("response_previewed", False) if result else False
+            response_previewed = (
+                result.get("response_previewed", False) if result else False
+            )
 
             # Display reasoning (thinking) box if enabled and available.
             # Skip when streaming already showed reasoning live.  Use the
@@ -808,7 +872,9 @@ class MixinCommands:
             # _reasoning_stream_started — the latter gets reset during
             # intermediate turn boundaries (tool-calling loops), which caused
             # the reasoning box to re-render after the final response.
-            _reasoning_already_shown = getattr(self, '_reasoning_shown_this_turn', False)
+            _reasoning_already_shown = getattr(
+                self, "_reasoning_shown_this_turn", False
+            )
             if self.show_reasoning and result and not _reasoning_already_shown:
                 reasoning = result.get("last_reasoning")
                 if reasoning:
@@ -821,7 +887,9 @@ class MixinCommands:
                     lines = reasoning.strip().splitlines()
                     if len(lines) > 10:
                         display_reasoning = "\n".join(lines[:10])
-                        display_reasoning += f"\n{_DIM}  ... ({len(lines) - 10} more lines){_RST}"
+                        display_reasoning += (
+                            f"\n{_DIM}  ... ({len(lines) - 10} more lines){_RST}"
+                        )
                     else:
                         display_reasoning = reasoning.strip()
                     _cprint(f"\n{r_top}\n{_DIM}{display_reasoning}{_RST}\n{r_bot}")
@@ -830,18 +898,33 @@ class MixinCommands:
                 # Use skin engine for label/color with fallback
                 try:
                     from reymen.reymen_cli.skin_engine import get_active_skin
+
                     _skin = get_active_skin()
                     label = _skin.get_branding("response_label", "⚕ ReYMeN")
-                    _resp_color = _maybe_remap_for_light_mode(_skin.get_color("response_border", "#CD7F32"))
-                    _resp_text = _maybe_remap_for_light_mode(_skin.get_color("banner_text", "#FFF8DC"))
+                    _resp_color = _maybe_remap_for_light_mode(
+                        _skin.get_color("response_border", "#CD7F32")
+                    )
+                    _resp_text = _maybe_remap_for_light_mode(
+                        _skin.get_color("banner_text", "#FFF8DC")
+                    )
                 except Exception:
                     label = "⚕ ReYMeN"
                     _resp_color = _maybe_remap_for_light_mode("#CD7F32")
                     _resp_text = _maybe_remap_for_light_mode("#FFF8DC")
 
-                is_error_response = result and (result.get("failed") or result.get("partial"))
-                already_streamed = self._stream_started and self._stream_box_opened and not is_error_response
-                if use_streaming_tts and _streaming_box_opened and not is_error_response:
+                is_error_response = result and (
+                    result.get("failed") or result.get("partial")
+                )
+                already_streamed = (
+                    self._stream_started
+                    and self._stream_box_opened
+                    and not is_error_response
+                )
+                if (
+                    use_streaming_tts
+                    and _streaming_box_opened
+                    and not is_error_response
+                ):
                     # Text was already printed sentence-by-sentence; just close the box
                     w = self._scrollback_box_width()
                     _cprint(f"\n{_ACCENT}╰{'─' * (w - 2)}╯{_RST}")
@@ -851,17 +934,20 @@ class MixinCommands:
                     pass
                 else:
                     _chat_console = ChatConsole()
-                    _chat_console.print(Panel(
-                        _render_final_assistant_content(response, mode=self.final_response_markdown),
-                        title=f"[{_resp_color} bold]{label}[/]",
-                        title_align="left",
-                        border_style=_resp_color,
-                        style=_resp_text,
-                        box=rich_box.HORIZONTALS,
-                        padding=(1, 4),
-                        width=self._scrollback_box_width(),
-                    ))
-
+                    _chat_console.print(
+                        Panel(
+                            _render_final_assistant_content(
+                                response, mode=self.final_response_markdown
+                            ),
+                            title=f"[{_resp_color} bold]{label}[/]",
+                            title_align="left",
+                            border_style=_resp_color,
+                            style=_resp_text,
+                            box=rich_box.HORIZONTALS,
+                            padding=(1, 4),
+                            width=self._scrollback_box_width(),
+                        )
+                    )
 
             # Play terminal bell when agent finishes (if enabled).
             # Works over SSH — the bell propagates to the user's terminal.
@@ -885,13 +971,12 @@ class MixinCommands:
             if self._voice_tts and response and not use_streaming_tts:
                 self._voice_speak_response_async(response)
 
-
             # Re-queue the interrupt message (and any that arrived while we were
             # processing the first) as the next prompt for process_loop.
             # Only reached when busy_input_mode == "interrupt" (the default).
             # In "queue" mode Enter routes directly to _pending_input so this
             # block is never hit.
-            if pending_message and hasattr(self, '_pending_input'):
+            if pending_message and hasattr(self, "_pending_input"):
                 all_parts = [pending_message]
                 while not self._interrupt_queue.empty():
                     try:
@@ -912,13 +997,15 @@ class MixinCommands:
             # If a /steer was left over (agent finished before another tool
             # batch could absorb it), deliver it as the next user turn.
             _leftover_steer = result.get("pending_steer") if result else None
-            if _leftover_steer and hasattr(self, '_pending_input'):
-                preview = _leftover_steer[:60] + ("..." if len(_leftover_steer) > 60 else "")
+            if _leftover_steer and hasattr(self, "_pending_input"):
+                preview = _leftover_steer[:60] + (
+                    "..." if len(_leftover_steer) > 60 else ""
+                )
                 print(f"\n⏩ Delivering leftover /steer as next turn: '{preview}'")
                 self._pending_input.put(_leftover_steer)
 
             return response
-            
+
         except Exception as e:
             print(f"Error: {e}")
             return None
@@ -969,11 +1056,17 @@ class MixinCommands:
 
         try:
             from reymen.reymen_cli.skin_engine import get_active_skin
+
             _welcome_skin = get_active_skin()
-            _welcome_text = _welcome_skin.get_branding("welcome", "Welcome to ReYMeN Agent! Type your message or /help for commands.")
+            _welcome_text = _welcome_skin.get_branding(
+                "welcome",
+                "Welcome to ReYMeN Agent! Type your message or /help for commands.",
+            )
             _welcome_color = _welcome_skin.get_color("banner_text", "#FFF8DC")
         except Exception:
-            _welcome_text = "Welcome to ReYMeN Agent! Type your message or /help for commands."
+            _welcome_text = (
+                "Welcome to ReYMeN Agent! Type your message or /help for commands."
+            )
             _welcome_color = "#FFF8DC"
         self._console_print(f"[{_welcome_color}]{_welcome_text}[/]")
 
@@ -1005,14 +1098,21 @@ class MixinCommands:
                 mark_seen,
                 openclaw_residue_hint_cli,
             )
-            if not is_seen(self.config, OPENCLAW_RESIDUE_FLAG) and detect_openclaw_residue():
+
+            if (
+                not is_seen(self.config, OPENCLAW_RESIDUE_FLAG)
+                and detect_openclaw_residue()
+            ):
                 try:
                     _resid_color = _welcome_skin.get_color("banner_dim", "#B8860B")
                 except Exception:
                     _resid_color = "#B8860B"
                 self._console_print(f"[{_resid_color}]{openclaw_residue_hint_cli()}[/]")
                 try:
-                    from reymen.reymen_cli.config import get_config_path as _get_cfg_path_resid
+                    from reymen.reymen_cli.config import (
+                        get_config_path as _get_cfg_path_resid,
+                    )
+
                     mark_seen(_get_cfg_path_resid(), OPENCLAW_RESIDUE_FLAG)
                 except Exception as _e:
                     __import__("logging").getLogger(__name__).warning(
@@ -1025,6 +1125,7 @@ class MixinCommands:
         # Show a random tip to help users discover features
         try:
             from reymen.reymen_cli.tips import get_random_tip
+
             _tip = get_random_tip()
             try:
                 _tip_color = _welcome_skin.get_color("banner_dim", "#B8860B")
@@ -1042,11 +1143,10 @@ class MixinCommands:
         # swallowed to avoid breaking session startup.
         try:
             from agent.curator import maybe_run_curator
+
             maybe_run_curator(
                 idle_for_seconds=float("inf"),  # CLI startup = fully idle
-                on_summary=lambda msg: self._console_print(
-                    f"[dim #6b7684]💾 {msg}[/]"
-                ),
+                on_summary=lambda msg: self._console_print(f"[dim #6b7684]💾 {msg}[/]"),
             )
         except Exception:
             logger.warning("[fix_01_sessiz_except] Exception")
@@ -1057,11 +1157,13 @@ class MixinCommands:
             )
             self._startup_skills_line_shown = True
         self._console_print()
-        
+
         # State for async operation
         self._agent_running = False
-        self._pending_input = queue.Queue()     # For normal input (commands + new queries)
-        self._interrupt_queue = queue.Queue()   # For messages typed while agent is running
+        self._pending_input = queue.Queue()  # For normal input (commands + new queries)
+        self._interrupt_queue = (
+            queue.Queue()
+        )  # For messages typed while agent is running
         # See constructor note. Mirrored here for the run() path that skips
         # the earlier __init__ branch.
         self._last_turn_interrupted = False
@@ -1070,31 +1172,41 @@ class MixinCommands:
 
         # Give plugin manager a CLI reference so plugins can inject messages
         from reymen.reymen_cli.plugins import get_plugin_manager
+
         get_plugin_manager()._cli_ref = self
 
         # Config file watcher — detect mcp_servers changes and auto-reload
         from reymen.reymen_cli.config import get_config_path as _get_config_path
+
         _cfg_path = _get_config_path()
-        self._config_mtime: float = _cfg_path.stat().st_mtime if _cfg_path.exists() else 0.0
+        self._config_mtime: float = (
+            _cfg_path.stat().st_mtime if _cfg_path.exists() else 0.0
+        )
         self._config_mcp_servers: dict = self.config.get("mcp_servers") or {}
         self._last_config_check: float = 0.0  # monotonic time of last check
 
         # Clarify tool state: interactive question/answer with the user.
         # When the agent calls the clarify tool, _clarify_state is set and
         # the prompt_toolkit UI switches to a selection mode.
-        self._clarify_state = None      # dict with question, choices, selected, response_queue
+        self._clarify_state = (
+            None  # dict with question, choices, selected, response_queue
+        )
         self._clarify_freetext = False  # True when user chose "Other" and is typing
-        self._clarify_deadline = 0      # monotonic timestamp when the clarify times out
+        self._clarify_deadline = 0  # monotonic timestamp when the clarify times out
 
         # Sudo password prompt state (similar mechanism to clarify)
-        self._sudo_state = None         # dict with response_queue when active
+        self._sudo_state = None  # dict with response_queue when active
         self._sudo_deadline = 0
         self._modal_input_snapshot = None
 
         # Dangerous command approval state (similar mechanism to clarify)
-        self._approval_state = None     # dict with command, description, choices, selected, response_queue
+        self._approval_state = (
+            None  # dict with command, description, choices, selected, response_queue
+        )
         self._approval_deadline = 0
-        self._approval_lock = threading.Lock()  # serialize concurrent approval prompts (delegation race fix)
+        self._approval_lock = (
+            threading.Lock()
+        )  # serialize concurrent approval prompts (delegation race fix)
 
         # Destructive slash-command confirmation state (/new, /clear, /undo).
         # These prompts are answered through the prompt_toolkit composer, not
@@ -1108,7 +1220,9 @@ class MixinCommands:
         self._command_status = ""
 
         # Secure secret capture state for skill setup
-        self._secret_state = None       # dict with var_name, prompt, metadata, response_queue
+        self._secret_state = (
+            None  # dict with var_name, prompt, metadata, response_queue
+        )
         self._secret_deadline = 0
 
         # Clipboard image attachments (paste images into the CLI)
@@ -1117,10 +1231,10 @@ class MixinCommands:
 
         # Voice mode state (protected by _voice_lock for cross-thread access)
         self._voice_lock = threading.Lock()
-        self._voice_mode = False        # Whether voice mode is enabled
-        self._voice_tts = False         # Whether TTS output is enabled
-        self._voice_recorder = None     # AudioRecorder instance (lazy init)
-        self._voice_recording = False   # Whether currently recording
+        self._voice_mode = False  # Whether voice mode is enabled
+        self._voice_tts = False  # Whether TTS output is enabled
+        self._voice_recorder = None  # AudioRecorder instance (lazy init)
+        self._voice_recording = False  # Whether currently recording
         self._voice_processing = False  # Whether STT is in progress
         self._voice_continuous = False  # Whether to auto-restart after agent responds
         self._voice_tts_done = threading.Event()  # Signals TTS playback finished
@@ -1131,7 +1245,7 @@ class MixinCommands:
 
         if os.environ.get("ReYMeN_DEFER_AGENT_STARTUP") != "1":
             self._ensure_tirith_security()
-        
+
         # Key bindings for the input area
         kb = KeyBindings()
 
@@ -1151,7 +1265,7 @@ class MixinCommands:
 
         def handle_enter(event):
             """Handle Enter key - submit input.
-            
+
             Routes to the correct queue based on active UI state:
             - Sudo password prompt: password goes to sudo response queue
             - Approval selection: selected choice goes to approval response queue
@@ -1188,7 +1302,11 @@ class MixinCommands:
             if self._slash_confirm_state:
                 text = event.app.current_buffer.text.strip()
                 choices = self._slash_confirm_state.get("choices") or []
-                choice = self._normalize_slash_confirm_choice(text, choices) if text else None
+                choice = (
+                    self._normalize_slash_confirm_choice(text, choices)
+                    if text
+                    else None
+                )
                 if choice is None:
                     selected = self._slash_confirm_state.get("selected", 0)
                     if 0 <= selected < len(choices):
@@ -1241,7 +1359,9 @@ class MixinCommands:
             if text or has_images:
                 # Handle /model directly on the UI thread so interactive pickers
                 # can safely use prompt_toolkit terminal handoff helpers.
-                if self._should_handle_model_command_inline(text, has_images=has_images):
+                if self._should_handle_model_command_inline(
+                    text, has_images=has_images
+                ):
                     if not self.process_command(text):
                         self._should_exit = True
                         if event.app.is_running:
@@ -1262,7 +1382,9 @@ class MixinCommands:
                 # blocked inside self.chat()), which turns /steer into a
                 # post-run next-turn message — defeating mid-run injection.
                 # agent.steer() is thread-safe (holds _pending_steer_lock).
-                if self._should_handle_steer_command_inline(text, has_images=has_images):
+                if self._should_handle_steer_command_inline(
+                    text, has_images=has_images
+                ):
                     self.process_command(text)
                     event.app.current_buffer.reset(append_to_history=True)
                     # Force a repaint after clearing the buffer.  /steer is
@@ -1280,7 +1402,9 @@ class MixinCommands:
                 event.app.invalidate()
                 # Bundle text + images as a tuple when images are present
                 payload = (text, images) if images else text
-                if self._agent_running and not (text and _looks_like_slash_command(text)):
+                if self._agent_running and not (
+                    text and _looks_like_slash_command(text)
+                ):
                     _effective_mode = self.busy_input_mode
                     if _effective_mode == "steer":
                         # Route Enter through /steer — inject mid-run after the
@@ -1293,10 +1417,14 @@ class MixinCommands:
                         else:
                             accepted = False
                             try:
-                                if self.agent is not None and hasattr(self.agent, "steer"):
+                                if self.agent is not None and hasattr(
+                                    self.agent, "steer"
+                                ):
                                     accepted = bool(self.agent.steer(text))
                             except Exception as exc:
-                                _cprint(f"  {_DIM}Steer failed ({exc}) — queued for next turn.{_RST}")
+                                _cprint(
+                                    f"  {_DIM}Steer failed ({exc}) — queued for next turn.{_RST}"
+                                )
                                 accepted = False
                             if accepted:
                                 preview = text[:80] + ("..." if len(text) > 80 else "")
@@ -1306,16 +1434,24 @@ class MixinCommands:
                     if _effective_mode == "queue":
                         # Queue for the next turn instead of interrupting
                         self._pending_input.put(payload)
-                        preview = text if text else f"[{len(images)} image{'s' if len(images) != 1 else ''} attached]"
-                        _cprint(f"  Queued for the next turn: {preview[:80]}{'...' if len(preview) > 80 else ''}")
+                        preview = (
+                            text
+                            if text
+                            else f"[{len(images)} image{'s' if len(images) != 1 else ''} attached]"
+                        )
+                        _cprint(
+                            f"  Queued for the next turn: {preview[:80]}{'...' if len(preview) > 80 else ''}"
+                        )
                     elif _effective_mode == "interrupt":
                         self._interrupt_queue.put(payload)
                         # Debug: log to file when message enters interrupt queue
                         try:
                             _dbg = _ReYMeN_home / "interrupt_debug.log"
                             with open(_dbg, "a", encoding="utf-8") as _f:
-                                _f.write(f"{time.strftime('%H:%M:%S')} ENTER: queued interrupt msg={str(payload)[:60]!r}, "
-                                         f"agent_running={self._agent_running}\n")
+                                _f.write(
+                                    f"{time.strftime('%H:%M:%S')} ENTER: queued interrupt msg={str(payload)[:60]!r}, "
+                                    f"agent_running={self._agent_running}\n"
+                                )
                         except Exception:
                             logger.warning("[fix_01_sessiz_except] Exception")
                     # First-touch onboarding: on the very first busy-while-running
@@ -1330,10 +1466,15 @@ class MixinCommands:
                             is_seen,
                             mark_seen,
                         )
+
                         if not is_seen(CLI_CONFIG, BUSY_INPUT_FLAG):
-                            _cprint(f"  {_DIM}{busy_input_hint_cli(self.busy_input_mode)}{_RST}")
+                            _cprint(
+                                f"  {_DIM}{busy_input_hint_cli(self.busy_input_mode)}{_RST}"
+                            )
                             mark_seen(_ReYMeN_home / "config.yaml", BUSY_INPUT_FLAG)
-                            CLI_CONFIG.setdefault("onboarding", {}).setdefault("seen", {})[BUSY_INPUT_FLAG] = True
+                            CLI_CONFIG.setdefault("onboarding", {}).setdefault(
+                                "seen", {}
+                            )[BUSY_INPUT_FLAG] = True
                     except Exception:
                         logger.warning("[fix_01_sessiz_except] Exception")
                 else:
@@ -1341,8 +1482,8 @@ class MixinCommands:
                 event.app.current_buffer.reset(append_to_history=True)
 
         _bind_prompt_submit_keys(kb, handle_enter)
-        
-        @kb.add('escape', 'enter')
+
+        @kb.add("escape", "enter")
         def handle_alt_enter(event):
             """Alt+Enter inserts a newline for multi-line input.
 
@@ -1351,10 +1492,11 @@ class MixinCommands:
             reaches here — Windows users get newline via Ctrl+Enter instead
             (bound below as c-j, since WT delivers Ctrl+Enter as LF).
             """
-            event.current_buffer.insert_text('\n')
+            event.current_buffer.insert_text("\n")
 
         if _preserve_ctrl_enter_newline():
-            @kb.add('c-j')
+
+            @kb.add("c-j")
             def handle_ctrl_enter_newline(event):
                 """Ctrl+Enter inserts a newline on Windows, WSL, SSH, and WT.
 
@@ -1367,23 +1509,26 @@ class MixinCommands:
                 key code — a harmless side effect since Ctrl+J has no
                 conflicting ReYMeN binding. See issue #22379.
                 """
-                event.current_buffer.insert_text('\n')
+                event.current_buffer.insert_text("\n")
 
         # VSCode/Cursor bind Ctrl+G to "Find Next" at the editor level, so
         # the keystroke never reaches the embedded terminal. Alt+G is unbound
         # in those IDEs and arrives here as ('escape', 'g') — register it as
         # a fallback so the editor handoff works inside Cursor/VSCode too.
         _editor_filter = Condition(
-            lambda: not self._clarify_state and not self._approval_state and not self._sudo_state and not self._secret_state
+            lambda: not self._clarify_state
+            and not self._approval_state
+            and not self._sudo_state
+            and not self._secret_state
         )
 
-        @kb.add('c-g', filter=_editor_filter)
-        @kb.add('escape', 'g', filter=_editor_filter)
+        @kb.add("c-g", filter=_editor_filter)
+        @kb.add("escape", "g", filter=_editor_filter)
         def handle_open_in_editor(event):
             """Ctrl+G (or Alt+G in VSCode/Cursor) opens the current draft in an external editor."""
             cli_ref._open_external_editor(event.current_buffer)
 
-        @kb.add('tab', eager=True)
+        @kb.add("tab", eager=True)
         def handle_tab(event):
             """Tab: accept completion, auto-suggestion, or start completions.
 
@@ -1404,7 +1549,9 @@ class MixinCommands:
                 if completion is None:
                     # Menu open but nothing selected — select first then grab it
                     buf.go_to_completion(0)
-                    completion = buf.complete_state and buf.complete_state.current_completion
+                    completion = (
+                        buf.complete_state and buf.complete_state.current_completion
+                    )
                 if completion is None:
                     return
                 # Accept the selected completion
@@ -1418,20 +1565,34 @@ class MixinCommands:
 
         # --- Clarify tool: arrow-key navigation for multiple-choice questions ---
 
-        @kb.add('up', filter=Condition(lambda: bool(self._clarify_state) and not self._clarify_freetext))
+        @kb.add(
+            "up",
+            filter=Condition(
+                lambda: bool(self._clarify_state) and not self._clarify_freetext
+            ),
+        )
         def clarify_up(event):
             """Move selection up in clarify choices."""
             if self._clarify_state:
-                self._clarify_state["selected"] = max(0, self._clarify_state["selected"] - 1)
+                self._clarify_state["selected"] = max(
+                    0, self._clarify_state["selected"] - 1
+                )
                 event.app.invalidate()
 
-        @kb.add('down', filter=Condition(lambda: bool(self._clarify_state) and not self._clarify_freetext))
+        @kb.add(
+            "down",
+            filter=Condition(
+                lambda: bool(self._clarify_state) and not self._clarify_freetext
+            ),
+        )
         def clarify_down(event):
             """Move selection down in clarify choices."""
             if self._clarify_state:
                 choices = self._clarify_state.get("choices") or []
                 max_idx = len(choices)  # last index is the "Other" option
-                self._clarify_state["selected"] = min(max_idx, self._clarify_state["selected"] + 1)
+                self._clarify_state["selected"] = min(
+                    max_idx, self._clarify_state["selected"] + 1
+                )
                 event.app.invalidate()
 
         # Number keys for quick clarify selection (1-9, 0 for 10th item)
@@ -1450,50 +1611,66 @@ class MixinCommands:
                         # Select "Other" option
                         self._clarify_freetext = True
                         event.app.invalidate()
+
             return handler
 
         for _num in range(10):
             # 1-9 select items 0-8, 0 selects item 9 (10thitem)
             _idx = 9 if _num == 0 else _num - 1
-            kb.add(str(_num), filter=Condition(lambda: bool(self._clarify_state) and not self._clarify_freetext))(_make_clarify_number_handler(_idx))
+            kb.add(
+                str(_num),
+                filter=Condition(
+                    lambda: bool(self._clarify_state) and not self._clarify_freetext
+                ),
+            )(_make_clarify_number_handler(_idx))
 
         # --- Dangerous command approval: arrow-key navigation ---
 
-        @kb.add('up', filter=Condition(lambda: bool(self._approval_state)))
+        @kb.add("up", filter=Condition(lambda: bool(self._approval_state)))
         def approval_up(event):
             if self._approval_state:
-                self._approval_state["selected"] = max(0, self._approval_state["selected"] - 1)
+                self._approval_state["selected"] = max(
+                    0, self._approval_state["selected"] - 1
+                )
                 event.app.invalidate()
 
-        @kb.add('down', filter=Condition(lambda: bool(self._approval_state)))
+        @kb.add("down", filter=Condition(lambda: bool(self._approval_state)))
         def approval_down(event):
             if self._approval_state:
                 max_idx = len(self._approval_state["choices"]) - 1
-                self._approval_state["selected"] = min(max_idx, self._approval_state["selected"] + 1)
+                self._approval_state["selected"] = min(
+                    max_idx, self._approval_state["selected"] + 1
+                )
                 event.app.invalidate()
 
         # --- Slash-command confirmation: arrow-key navigation ---
-        @kb.add('up', filter=Condition(lambda: bool(self._slash_confirm_state)))
+        @kb.add("up", filter=Condition(lambda: bool(self._slash_confirm_state)))
         def slash_confirm_up(event):
             if self._slash_confirm_state:
-                self._slash_confirm_state["selected"] = max(0, self._slash_confirm_state.get("selected", 0) - 1)
+                self._slash_confirm_state["selected"] = max(
+                    0, self._slash_confirm_state.get("selected", 0) - 1
+                )
                 event.app.invalidate()
 
-        @kb.add('down', filter=Condition(lambda: bool(self._slash_confirm_state)))
+        @kb.add("down", filter=Condition(lambda: bool(self._slash_confirm_state)))
         def slash_confirm_down(event):
             if self._slash_confirm_state:
                 max_idx = len(self._slash_confirm_state.get("choices") or []) - 1
-                self._slash_confirm_state["selected"] = min(max_idx, self._slash_confirm_state.get("selected", 0) + 1)
+                self._slash_confirm_state["selected"] = min(
+                    max_idx, self._slash_confirm_state.get("selected", 0) + 1
+                )
                 event.app.invalidate()
 
         # --- /model picker: arrow-key navigation ---
-        @kb.add('up', filter=Condition(lambda: bool(self._model_picker_state)))
+        @kb.add("up", filter=Condition(lambda: bool(self._model_picker_state)))
         def model_picker_up(event):
             if self._model_picker_state:
-                self._model_picker_state["selected"] = max(0, self._model_picker_state.get("selected", 0) - 1)
+                self._model_picker_state["selected"] = max(
+                    0, self._model_picker_state.get("selected", 0) - 1
+                )
                 event.app.invalidate()
 
-        @kb.add('down', filter=Condition(lambda: bool(self._model_picker_state)))
+        @kb.add("down", filter=Condition(lambda: bool(self._model_picker_state)))
         def model_picker_down(event):
             state = self._model_picker_state
             if not state:
@@ -1505,7 +1682,11 @@ class MixinCommands:
             state["selected"] = min(max_idx, state.get("selected", 0) + 1)
             event.app.invalidate()
 
-        @kb.add('escape', filter=Condition(lambda: bool(self._model_picker_state)), eager=True)
+        @kb.add(
+            "escape",
+            filter=Condition(lambda: bool(self._model_picker_state)),
+            eager=True,
+        )
         def model_picker_escape(event):
             """ESC closes the /model picker."""
             self._close_model_picker()
@@ -1519,46 +1700,59 @@ class MixinCommands:
                     self._approval_state["selected"] = idx
                     self._handle_approval_selection()
                     event.app.invalidate()
+
             return handler
 
         for _num in range(10):
             # 1-9 select items 0-8, 0 selects item 9 (10th item)
             _idx = 9 if _num == 0 else _num - 1
-            kb.add(str(_num), filter=Condition(lambda: bool(self._approval_state)))(_make_approval_number_handler(_idx))
+            kb.add(str(_num), filter=Condition(lambda: bool(self._approval_state)))(
+                _make_approval_number_handler(_idx)
+            )
 
         # Number keys for quick slash-confirm selection (1-9, 0 for 10th item)
         def _make_slash_confirm_number_handler(idx):
             def handler(event):
-                if self._slash_confirm_state and idx < len(self._slash_confirm_state.get("choices") or []):
+                if self._slash_confirm_state and idx < len(
+                    self._slash_confirm_state.get("choices") or []
+                ):
                     choice = self._slash_confirm_state["choices"][idx][0]
                     self._submit_slash_confirm_response(choice)
                     event.app.current_buffer.reset()
                     event.app.invalidate()
+
             return handler
 
         for _num in range(10):
             _idx = 9 if _num == 0 else _num - 1
-            kb.add(str(_num), filter=Condition(lambda: bool(self._slash_confirm_state)))(_make_slash_confirm_number_handler(_idx))
+            kb.add(
+                str(_num), filter=Condition(lambda: bool(self._slash_confirm_state))
+            )(_make_slash_confirm_number_handler(_idx))
 
         # --- History navigation: up/down browse history in normal input mode ---
         # The TextArea is multiline, so by default up/down only move the cursor.
         # Buffer.auto_up/auto_down handle both: cursor movement when multi-line,
         # history browsing when on the first/last line (or single-line input).
         _normal_input = Condition(
-            lambda: not self._clarify_state and not self._approval_state and not self._slash_confirm_state and not self._sudo_state and not self._secret_state and not self._model_picker_state
+            lambda: not self._clarify_state
+            and not self._approval_state
+            and not self._slash_confirm_state
+            and not self._sudo_state
+            and not self._secret_state
+            and not self._model_picker_state
         )
 
-        @kb.add('up', filter=_normal_input)
+        @kb.add("up", filter=_normal_input)
         def history_up(event):
             """Up arrow: browse history when on first line, else move cursor up."""
             event.app.current_buffer.auto_up(count=event.arg)
 
-        @kb.add('down', filter=_normal_input)
+        @kb.add("down", filter=_normal_input)
         def history_down(event):
             """Down arrow: browse history when on last line, else move cursor down."""
             event.app.current_buffer.auto_down(count=event.arg)
 
-        @kb.add('c-l')
+        @kb.add("c-l")
         def handle_ctrl_l(event):
             """Ctrl+L: force a clean full-screen repaint.
 
@@ -1569,10 +1763,10 @@ class MixinCommands:
             """
             self._force_full_redraw()
 
-        @kb.add('c-c')
+        @kb.add("c-c")
         def handle_ctrl_c(event):
             """Handle Ctrl+C - cancel interactive prompts, interrupt agent, or exit.
-            
+
             Priority:
             0. Cancel active voice recording
             1. Cancel active sudo/approval/clarify prompt
@@ -1594,9 +1788,7 @@ class MixinCommands:
                     _should_cancel_voice = True
             if _should_cancel_voice:
                 _cprint(f"\n{_DIM}Recording cancelled.{_RST}")
-                threading.Thread(
-                    target=_recorder_ref.cancel, daemon=True
-                ).start()
+                threading.Thread(target=_recorder_ref.cancel, daemon=True).start()
                 event.app.invalidate()
                 return
 
@@ -1652,7 +1844,7 @@ class MixinCommands:
                     self._should_exit = True
                     event.app.exit()
                     return
-                
+
                 self._last_ctrl_c_time = now
                 print("\n⚡ Interrupting agent... (press Ctrl+C again to force exit)")
                 self.agent.interrupt()
@@ -1675,7 +1867,7 @@ class MixinCommands:
         # startup crash with try/except. Both were based on a misreading of how
         # terminal key events propagate. Deleting the dead handler outright.
 
-        @kb.add('c-q')  # Ctrl+Q
+        @kb.add("c-q")  # Ctrl+Q
         def handle_ctrl_q(event):
             """Alternative interrupt/exit shortcut (Ctrl+Q).
 
@@ -1694,9 +1886,7 @@ class MixinCommands:
                     _should_cancel_voice = True
             if _should_cancel_voice:
                 _cprint(f"\n{_DIM}Recording cancelled.{_RST}")
-                threading.Thread(
-                    target=_recorder_ref.cancel, daemon=True
-                ).start()
+                threading.Thread(target=_recorder_ref.cancel, daemon=True).start()
                 event.app.invalidate()
                 return
 
@@ -1757,7 +1947,7 @@ class MixinCommands:
                 self._should_exit = True
                 event.app.exit()
 
-        @kb.add('c-d')
+        @kb.add("c-d")
         def handle_ctrl_d(event):
             """Ctrl+D: delete char under cursor (standard readline behaviour).
             Only exit when the input is empty — same as bash/zsh. Pending
@@ -1775,10 +1965,12 @@ class MixinCommands:
                 event.app.exit()
 
         _modal_prompt_active = Condition(
-            lambda: bool(self._secret_state or self._sudo_state or self._slash_confirm_state)
+            lambda: bool(
+                self._secret_state or self._sudo_state or self._slash_confirm_state
+            )
         )
 
-        @kb.add('escape', filter=_modal_prompt_active, eager=True)
+        @kb.add("escape", filter=_modal_prompt_active, eager=True)
         def handle_escape_modal(event):
             """ESC cancels active secret/sudo prompts."""
             if self._secret_state:
@@ -1797,21 +1989,24 @@ class MixinCommands:
                 event.app.invalidate()
                 return
 
-        @kb.add('c-z')
+        @kb.add("c-z")
         def handle_ctrl_z(event):
             """Handle Ctrl+Z - suspend process to background (Unix only)."""
-            if sys.platform == 'win32':
+            if sys.platform == "win32":
                 _cprint(f"\n{_DIM}Suspend (Ctrl+Z) is not supported on Windows.{_RST}")
                 event.app.invalidate()
                 return
             import signal as _sig
             from prompt_toolkit.application import run_in_terminal
             from reymen.reymen_cli.skin_engine import get_active_skin
+
             agent_name = get_active_skin().get_branding("agent_name", "ReYMeN Agent")
             msg = f"\n{agent_name} has been suspended. Run `fg` to bring {agent_name} back."
+
             def _suspend():
                 os.write(1, msg.encode())
                 os.kill(0, _sig.SIGTSTP)
+
             run_in_terminal(_suspend)
 
         # Voice push-to-talk key: configurable via config.yaml (voice.record_key)
@@ -1830,11 +2025,13 @@ class MixinCommands:
                 normalize_voice_record_key_for_prompt_toolkit,
                 voice_record_key_from_config,
             )
+
             _raw_key = voice_record_key_from_config(load_config())
             _voice_key = normalize_voice_record_key_for_prompt_toolkit(_raw_key)
             if (
                 isinstance(_raw_key, str)
-                and _raw_key.strip().lower().split("+", 1)[0].strip() in {"super", "win", "windows"}
+                and _raw_key.strip().lower().split("+", 1)[0].strip()
+                in {"super", "win", "windows"}
                 and _voice_key == "c-b"
             ):
                 logger.warning(
@@ -1878,7 +2075,12 @@ class MixinCommands:
                 # Guard: don't START recording during agent run or interactive prompts
                 if cli_ref._agent_running:
                     return
-                if cli_ref._clarify_state or cli_ref._sudo_state or cli_ref._approval_state or cli_ref._slash_confirm_state:
+                if (
+                    cli_ref._clarify_state
+                    or cli_ref._sudo_state
+                    or cli_ref._approval_state
+                    or cli_ref._slash_confirm_state
+                ):
                     return
                 # Guard: don't start while a previous stop/transcribe cycle is
                 # still running — recorder.stop() holds AudioRecorder._lock and
@@ -1891,6 +2093,7 @@ class MixinCommands:
                 if not cli_ref._voice_tts_done.is_set():
                     try:
                         from tools.voice_mode import stop_playback
+
                         stop_playback()
                         cli_ref._voice_tts_done.set()
                     except Exception:
@@ -1905,13 +2108,14 @@ class MixinCommands:
                 def _start_recording():
                     try:
                         cli_ref._voice_start_recording()
-                        if hasattr(cli_ref, '_app') and cli_ref._app:
+                        if hasattr(cli_ref, "_app") and cli_ref._app:
                             cli_ref._app.invalidate()
                     except Exception as e:
                         _cprint(f"\n{_DIM}Voice recording failed: {e}{_RST}")
 
                 threading.Thread(target=_start_recording, daemon=True).start()
                 event.app.invalidate()
+
         from prompt_toolkit.keys import Keys
 
         @kb.add(Keys.BracketedPaste, eager=True)
@@ -1936,39 +2140,61 @@ class MixinCommands:
             pasted_text = event.data or ""
             # Normalise line endings — Windows \r\n and old Mac \r both become \n
             # so the 5-line collapse threshold and display are consistent.
-            pasted_text = pasted_text.replace('\r\n', '\n').replace('\r', '\n')
+            pasted_text = pasted_text.replace("\r\n", "\n").replace("\r", "\n")
             pasted_text = _strip_leaked_bracketed_paste_wrappers(pasted_text)
-            pasted_text, _had_mouse_reports = _strip_leaked_terminal_responses_with_meta(pasted_text)
+            pasted_text, _had_mouse_reports = (
+                _strip_leaked_terminal_responses_with_meta(pasted_text)
+            )
             if _had_mouse_reports:
-                self._recover_terminal_input_modes(reason="mouse reports leaked into bracketed paste payload")
-            if _should_auto_attach_clipboard_image_on_paste(pasted_text) and self._try_attach_clipboard_image():
+                self._recover_terminal_input_modes(
+                    reason="mouse reports leaked into bracketed paste payload"
+                )
+            if (
+                _should_auto_attach_clipboard_image_on_paste(pasted_text)
+                and self._try_attach_clipboard_image()
+            ):
                 event.app.invalidate()
             if pasted_text:
                 # Sanitize surrogate characters (e.g. from Word/Google Docs paste) before writing
                 from reymen.sistem.run_agent import _sanitize_surrogates
+
                 pasted_text = _sanitize_surrogates(pasted_text)
-                line_count = pasted_text.count('\n')
+                line_count = pasted_text.count("\n")
                 buf = event.current_buffer
                 threshold = self.config.get("paste_collapse_threshold", 5)
                 char_threshold = self.config.get("paste_collapse_char_threshold", 2000)
                 lines_hit = threshold > 0 and line_count >= threshold
                 chars_hit = char_threshold > 0 and len(pasted_text) >= char_threshold
-                if (lines_hit or chars_hit) and not buf.text.strip().startswith('/'):
+                if (lines_hit or chars_hit) and not buf.text.strip().startswith("/"):
                     _paste_counter[0] += 1
                     paste_dir = _ReYMeN_home / "pastes"
                     paste_dir.mkdir(parents=True, exist_ok=True)
-                    paste_file = paste_dir / f"paste_{_paste_counter[0]}_{datetime.now().strftime('%H%M%S')}.txt"
+                    paste_file = (
+                        paste_dir
+                        / f"paste_{_paste_counter[0]}_{datetime.now().strftime('%H%M%S')}.txt"
+                    )
                     paste_file.write_text(pasted_text, encoding="utf-8")
-                    logger.info("Collapsed paste #%d: %d lines, %d chars -> %s", _paste_counter[0], line_count + 1, len(pasted_text), paste_file)
+                    logger.info(
+                        "Collapsed paste #%d: %d lines, %d chars -> %s",
+                        _paste_counter[0],
+                        line_count + 1,
+                        len(pasted_text),
+                        paste_file,
+                    )
                     placeholder = f"[Pasted text #{_paste_counter[0]}: {line_count + 1} lines \u2192 {paste_file}]"
                     prefix = ""
-                    if buf.cursor_position > 0 and buf.text[buf.cursor_position - 1] != '\n':
+                    if (
+                        buf.cursor_position > 0
+                        and buf.text[buf.cursor_position - 1] != "\n"
+                    ):
                         prefix = "\n"
                     _paste_just_collapsed[0] = True
                     buf.insert_text(prefix + placeholder)
                 else:
                     buf.insert_text(pasted_text)
-            _paste_handler_elapsed_ms = (time.perf_counter() - _paste_handler_start) * 1000.0
+            _paste_handler_elapsed_ms = (
+                time.perf_counter() - _paste_handler_start
+            ) * 1000.0
             if _paste_handler_elapsed_ms > 500.0:
                 logger.warning(
                     "Slow bracketed-paste handler: %.1fms to process %d bytes "
@@ -1976,11 +2202,11 @@ class MixinCommands:
                     "this, attach this log line to the bug report.",
                     _paste_handler_elapsed_ms,
                     _paste_raw_size,
-                    pasted_text.count('\n') + 1 if pasted_text else 0,
+                    pasted_text.count("\n") + 1 if pasted_text else 0,
                     sys.platform,
                 )
 
-        @kb.add('c-v')
+        @kb.add("c-v")
         def handle_ctrl_v(event):
             """Fallback image paste for terminals without bracketed paste.
 
@@ -1994,7 +2220,7 @@ class MixinCommands:
             if self._try_attach_clipboard_image():
                 event.app.invalidate()
 
-        @kb.add('escape', 'v')
+        @kb.add("escape", "v")
         def handle_alt_v(event):
             """Alt+V — paste image from clipboard.
 
@@ -2020,7 +2246,6 @@ class MixinCommands:
         # Create the input area with multiline (Alt+Enter), autocomplete, and paste handling
         from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 
-
         _completer = SlashCommandCompleter(
             skill_commands_provider=lambda: get_skill_commands(),
             command_filter=cli_ref._command_available,
@@ -2029,7 +2254,7 @@ class MixinCommands:
         input_area = TextArea(
             height=Dimension(min=1, max=8, preferred=1),
             prompt=get_prompt,
-            style='class:input-area',
+            style="class:input-area",
             multiline=True,
             wrap_lines=True,
             read_only=Condition(lambda: bool(cli_ref._command_running)),
@@ -2045,7 +2270,7 @@ class MixinCommands:
         # buffer.tempfile = "prompt.md" triggers its complex-tempfile branch,
         # which tries to mkdir() the mkdtemp() directory again and raises
         # EEXIST. The suffix keeps markdown highlighting without that bug.
-        input_area.buffer.tempfile_suffix = '.md'
+        input_area.buffer.tempfile_suffix = ".md"
 
         # Dynamic height: accounts for both explicit newlines AND visual
         # wrapping of long lines so the input area always fits its content.
@@ -2059,7 +2284,9 @@ class MixinCommands:
                 try:
                     available_width = get_app().output.get_size().columns - prompt_width
                 except Exception:
-                    available_width = shutil.get_terminal_size((80, 24)).columns - prompt_width
+                    available_width = (
+                        shutil.get_terminal_size((80, 24)).columns - prompt_width
+                    )
                 if available_width < 10:
                     available_width = 40
                 visual_lines = 0
@@ -2070,7 +2297,9 @@ class MixinCommands:
                     if line_width <= 0:
                         visual_lines += 1
                     else:
-                        visual_lines += max(1, -(-line_width // available_width))  # ceil division
+                        visual_lines += max(
+                            1, -(-line_width // available_width)
+                        )  # ceil division
                 return min(max(visual_lines, 1), 8)
             except Exception:
                 return 1
@@ -2102,23 +2331,25 @@ class MixinCommands:
             text = _strip_leaked_bracketed_paste_wrappers(buf.text)
             text, _had_mouse_reports = _strip_leaked_terminal_responses_with_meta(text)
             if _had_mouse_reports:
-                self._recover_terminal_input_modes(reason="mouse reports leaked into prompt buffer")
+                self._recover_terminal_input_modes(
+                    reason="mouse reports leaked into prompt buffer"
+                )
             if text != buf.text:
                 cursor = min(buf.cursor_position, len(text))
                 _paste_just_collapsed[0] = True
                 buf.text = text
                 buf.cursor_position = cursor
                 _prev_text_len[0] = len(text)
-                _prev_newline_count[0] = text.count('\n')
+                _prev_newline_count[0] = text.count("\n")
                 return
             chars_added = len(text) - _prev_text_len[0]
             _prev_text_len[0] = len(text)
             if _paste_just_collapsed[0] or self._skip_paste_collapse:
                 _paste_just_collapsed[0] = False
                 self._skip_paste_collapse = False
-                _prev_newline_count[0] = text.count('\n')
+                _prev_newline_count[0] = text.count("\n")
                 return
-            line_count = text.count('\n')
+            line_count = text.count("\n")
             newlines_added = line_count - _prev_newline_count[0]
             _prev_newline_count[0] = line_count
             is_paste = chars_added > 1 or newlines_added >= 4
@@ -2126,13 +2357,22 @@ class MixinCommands:
             char_threshold = self.config.get("paste_collapse_char_threshold", 2000)
             lines_hit = threshold > 0 and line_count >= threshold
             chars_hit = char_threshold > 0 and len(text) >= char_threshold
-            if (lines_hit or chars_hit) and is_paste and not text.startswith('/'):
+            if (lines_hit or chars_hit) and is_paste and not text.startswith("/"):
                 _paste_counter[0] += 1
                 paste_dir = _ReYMeN_home / "pastes"
                 paste_dir.mkdir(parents=True, exist_ok=True)
-                paste_file = paste_dir / f"paste_{_paste_counter[0]}_{datetime.now().strftime('%H%M%S')}.txt"
+                paste_file = (
+                    paste_dir
+                    / f"paste_{_paste_counter[0]}_{datetime.now().strftime('%H%M%S')}.txt"
+                )
                 paste_file.write_text(text, encoding="utf-8")
-                logger.info("Collapsed paste #%d: %d lines, %d chars -> %s (fallback)", _paste_counter[0], line_count + 1, len(text), paste_file)
+                logger.info(
+                    "Collapsed paste #%d: %d lines, %d chars -> %s (fallback)",
+                    _paste_counter[0],
+                    line_count + 1,
+                    len(text),
+                    paste_file,
+                )
                 _paste_just_collapsed[0] = True
                 buf.text = f"[Pasted text #{_paste_counter[0]}: {line_count + 1} lines \u2192 {paste_file}]"
                 buf.cursor_position = len(buf.text)
@@ -2153,6 +2393,7 @@ class MixinCommands:
 
         class _PlaceholderProcessor(Processor):
             """Render grayed-out placeholder text inside the input when empty."""
+
             def __init__(self, get_text):
                 self._get_text = get_text
 
@@ -2161,7 +2402,9 @@ class MixinCommands:
                     text = self._get_text()
                     if text:
                         # Append after existing fragments (preserves the ❯ prompt)
-                        return Transformation(fragments=ti.fragments + [('class:placeholder', text)])
+                        return Transformation(
+                            fragments=ti.fragments + [("class:placeholder", text)]
+                        )
                 return Transformation(fragments=ti.fragments)
 
         def _get_placeholder():
@@ -2193,7 +2436,9 @@ class MixinCommands:
                 return f"type or {_label} to record"
             return ""
 
-        input_area.control.input_processors.append(_PlaceholderProcessor(_get_placeholder))
+        input_area.control.input_processors.append(
+            _PlaceholderProcessor(_get_placeholder)
+        )
 
         # Hint line above input: shown only for interactive prompts that need
         # extra instructions (sudo countdown, approval navigation, clarify).
@@ -2202,54 +2447,66 @@ class MixinCommands:
             if cli_ref._sudo_state:
                 remaining = max(0, int(cli_ref._sudo_deadline - time.monotonic()))
                 return [
-                    ('class:hint', '  password hidden · Enter to skip'),
-                    ('class:clarify-countdown', f'  ({remaining}s)'),
+                    ("class:hint", "  password hidden · Enter to skip"),
+                    ("class:clarify-countdown", f"  ({remaining}s)"),
                 ]
 
             if cli_ref._secret_state:
                 remaining = max(0, int(cli_ref._secret_deadline - time.monotonic()))
                 return [
-                    ('class:hint', '  secret hidden · Enter to skip'),
-                    ('class:clarify-countdown', f'  ({remaining}s)'),
+                    ("class:hint", "  secret hidden · Enter to skip"),
+                    ("class:clarify-countdown", f"  ({remaining}s)"),
                 ]
 
             if cli_ref._approval_state:
                 remaining = max(0, int(cli_ref._approval_deadline - time.monotonic()))
                 return [
-                    ('class:hint', '  ↑/↓ to select, Enter to confirm'),
-                    ('class:clarify-countdown', f'  ({remaining}s)'),
+                    ("class:hint", "  ↑/↓ to select, Enter to confirm"),
+                    ("class:clarify-countdown", f"  ({remaining}s)"),
                 ]
 
             if cli_ref._slash_confirm_state:
-                remaining = max(0, int(cli_ref._slash_confirm_deadline - time.monotonic()))
+                remaining = max(
+                    0, int(cli_ref._slash_confirm_deadline - time.monotonic())
+                )
                 return [
-                    ('class:hint', '  type 1/2/3, or ↑/↓ to select, Enter to confirm'),
-                    ('class:clarify-countdown', f'  ({remaining}s)'),
+                    ("class:hint", "  type 1/2/3, or ↑/↓ to select, Enter to confirm"),
+                    ("class:clarify-countdown", f"  ({remaining}s)"),
                 ]
 
             if cli_ref._clarify_state:
                 remaining = max(0, int(cli_ref._clarify_deadline - time.monotonic()))
-                countdown = f'  ({remaining}s)' if cli_ref._clarify_deadline else ''
+                countdown = f"  ({remaining}s)" if cli_ref._clarify_deadline else ""
                 if cli_ref._clarify_freetext:
                     return [
-                        ('class:hint', '  type your answer and press Enter'),
-                        ('class:clarify-countdown', countdown),
+                        ("class:hint", "  type your answer and press Enter"),
+                        ("class:clarify-countdown", countdown),
                     ]
                 return [
-                    ('class:hint', '  ↑/↓ to select, Enter to confirm'),
-                    ('class:clarify-countdown', countdown),
+                    ("class:hint", "  ↑/↓ to select, Enter to confirm"),
+                    ("class:clarify-countdown", countdown),
                 ]
 
             if cli_ref._command_running:
                 frame = cli_ref._command_spinner_frame()
                 return [
-                    ('class:hint', f'  {frame} command in progress · input temporarily disabled'),
+                    (
+                        "class:hint",
+                        f"  {frame} command in progress · input temporarily disabled",
+                    ),
                 ]
 
             return []
 
         def get_hint_height():
-            if cli_ref._sudo_state or cli_ref._secret_state or cli_ref._approval_state or cli_ref._slash_confirm_state or cli_ref._clarify_state or cli_ref._command_running:
+            if (
+                cli_ref._sudo_state
+                or cli_ref._secret_state
+                or cli_ref._approval_state
+                or cli_ref._slash_confirm_state
+                or cli_ref._clarify_state
+                or cli_ref._command_running
+            ):
                 return 1
             # Keep a spacer while the agent runs on roomy terminals, but reclaim
             # the row on narrow/mobile screens where every line matters.
@@ -2259,7 +2516,7 @@ class MixinCommands:
             spinner_line = cli_ref._render_spinner_text()
             if not spinner_line:
                 return []
-            return [('class:hint', spinner_line)]
+            return [("class:hint", spinner_line)]
 
         def get_spinner_height():
             return cli_ref._spinner_widget_height()
@@ -2277,14 +2534,27 @@ class MixinCommands:
 
         # --- Clarify tool: dynamic display widget for questions + choices ---
 
-        def _panel_box_width(title: str, content_lines: list[str], min_width: int = 46, max_width: int = 76) -> int:
+        def _panel_box_width(
+            title: str,
+            content_lines: list[str],
+            min_width: int = 46,
+            max_width: int = 76,
+        ) -> int:
             """Choose a stable panel width wide enough for the title and content."""
             term_cols = shutil.get_terminal_size((100, 20)).columns
-            longest = max([len(title)] + [len(line) for line in content_lines] + [min_width - 4])
-            inner = min(max(longest + 4, min_width - 2), max_width - 2, max(24, term_cols - 6))
-            return inner + 2  # account for the single leading/trailing spaces inside borders
+            longest = max(
+                [len(title)] + [len(line) for line in content_lines] + [min_width - 4]
+            )
+            inner = min(
+                max(longest + 4, min_width - 2), max_width - 2, max(24, term_cols - 6)
+            )
+            return (
+                inner + 2
+            )  # account for the single leading/trailing spaces inside borders
 
-        def _wrap_panel_text(text: str, width: int, subsequent_indent: str = "") -> list[str]:
+        def _wrap_panel_text(
+            text: str, width: int, subsequent_indent: str = ""
+        ) -> list[str]:
             wrapped = textwrap.wrap(
                 text,
                 width=max(8, width),
@@ -2294,7 +2564,9 @@ class MixinCommands:
             )
             return wrapped or [""]
 
-        def _append_panel_line(lines, border_style: str, content_style: str, text: str, box_width: int) -> None:
+        def _append_panel_line(
+            lines, border_style: str, content_style: str, text: str, box_width: int
+        ) -> None:
             inner_width = max(0, box_width - 2)
             lines.append((border_style, "│ "))
             lines.append((content_style, text.ljust(inner_width)))
@@ -2324,28 +2596,34 @@ class MixinCommands:
                 if i < 9:
                     num_prefix = str(i + 1)
                 elif i == 9:
-                    num_prefix = '0'
+                    num_prefix = "0"
                 else:
-                    num_prefix = ' '
+                    num_prefix = " "
                 if i == selected and not cli_ref._clarify_freetext:
                     prefix = f"❯ {num_prefix}. "
                 else:
                     prefix = f"  {num_prefix}. "
-                preview_lines.extend(_wrap_panel_text(f"{prefix}{choice}", 60, subsequent_indent="    "))
+                preview_lines.extend(
+                    _wrap_panel_text(f"{prefix}{choice}", 60, subsequent_indent="    ")
+                )
             # "Other" option in preview
             other_num = len(choices) + 1
             if other_num < 10:
                 other_num_prefix = str(other_num)
             elif other_num == 10:
-                other_num_prefix = '0'
+                other_num_prefix = "0"
             else:
-                other_num_prefix = ' '
+                other_num_prefix = " "
             other_label = (
-                f"❯ {other_num_prefix}. Other (type below)" if cli_ref._clarify_freetext
-                else f"❯ {other_num_prefix}. Other (type your answer)" if selected == len(choices)
+                f"❯ {other_num_prefix}. Other (type below)"
+                if cli_ref._clarify_freetext
+                else f"❯ {other_num_prefix}. Other (type your answer)"
+                if selected == len(choices)
                 else f"  {other_num_prefix}. Other (type your answer)"
             )
-            preview_lines.extend(_wrap_panel_text(other_label, 60, subsequent_indent="    "))
+            preview_lines.extend(
+                _wrap_panel_text(other_label, 60, subsequent_indent="    ")
+            )
             box_width = _panel_box_width("ReYMeN needs your input", preview_lines)
             inner_text_width = max(8, box_width - 2)
 
@@ -2357,14 +2635,16 @@ class MixinCommands:
                     if i < 9:
                         num_prefix = str(i + 1)
                     elif i == 9:
-                        num_prefix = '0'
+                        num_prefix = "0"
                     else:
-                        num_prefix = ' '
+                        num_prefix = " "
                     if i == selected and not cli_ref._clarify_freetext:
-                        prefix = f'❯ {num_prefix}. '
+                        prefix = f"❯ {num_prefix}. "
                     else:
-                        prefix = f'  {num_prefix}. '
-                    for wrapped in _wrap_panel_text(f"{prefix}{choice}", inner_text_width, subsequent_indent="    "):
+                        prefix = f"  {num_prefix}. "
+                    for wrapped in _wrap_panel_text(
+                        f"{prefix}{choice}", inner_text_width, subsequent_indent="    "
+                    ):
                         choice_wrapped.append((i, wrapped))
                 # Trailing Other row(s)
                 other_idx = len(choices)
@@ -2372,16 +2652,18 @@ class MixinCommands:
                 if other_num < 10:
                     other_num_prefix = str(other_num)
                 elif other_num == 10:
-                    other_num_prefix = '0'
+                    other_num_prefix = "0"
                 else:
-                    other_num_prefix = ' '
+                    other_num_prefix = " "
                 if selected == other_idx and not cli_ref._clarify_freetext:
-                    other_label_mand = f'❯ {other_num_prefix}. Other (type your answer)'
+                    other_label_mand = f"❯ {other_num_prefix}. Other (type your answer)"
                 elif cli_ref._clarify_freetext:
-                    other_label_mand = f'❯ {other_num_prefix}. Other (type below)'
+                    other_label_mand = f"❯ {other_num_prefix}. Other (type below)"
                 else:
-                    other_label_mand = f'  {other_num_prefix}. Other (type your answer)'
-                other_wrapped = _wrap_panel_text(other_label_mand, inner_text_width, subsequent_indent="    ")
+                    other_label_mand = f"  {other_num_prefix}. Other (type your answer)"
+                other_wrapped = _wrap_panel_text(
+                    other_label_mand, inner_text_width, subsequent_indent="    "
+                )
             elif cli_ref._clarify_freetext:
                 # Freetext-only mode: the guidance line takes the place of choices.
                 other_wrapped = _wrap_panel_text(
@@ -2415,7 +2697,9 @@ class MixinCommands:
             use_compact_chrome = mandatory_full > available
             chrome_rows = chrome_tight if use_compact_chrome else chrome_full
 
-            max_question_rows = max(1, available - chrome_rows - len(choice_wrapped) - len(other_wrapped))
+            max_question_rows = max(
+                1, available - chrome_rows - len(choice_wrapped) - len(other_wrapped)
+            )
             max_question_rows = min(max_question_rows, 12)  # soft cap on huge terminals
 
             # When the choices alone (plus compact chrome) already exceed the
@@ -2423,7 +2707,9 @@ class MixinCommands:
             # thing the user must see to make a selection. Without this the
             # question would still claim its 1-row floor above and push the
             # tail of the choices off-screen (HSplit clips the overflow).
-            choices_overflow = chrome_rows + len(choice_wrapped) + len(other_wrapped) >= available
+            choices_overflow = (
+                chrome_rows + len(choice_wrapped) + len(other_wrapped) >= available
+            )
             if choices_overflow:
                 max_question_rows = 0
 
@@ -2440,29 +2726,54 @@ class MixinCommands:
 
             lines = []
             # Box top border
-            lines.append(('class:clarify-border', '╭─ '))
-            lines.append(('class:clarify-title', 'ReYMeN needs your input'))
-            lines.append(('class:clarify-border', ' ' + ('─' * max(0, box_width - len("ReYMeN needs your input") - 3)) + '╮\n'))
+            lines.append(("class:clarify-border", "╭─ "))
+            lines.append(("class:clarify-title", "ReYMeN needs your input"))
+            lines.append(
+                (
+                    "class:clarify-border",
+                    " "
+                    + ("─" * max(0, box_width - len("ReYMeN needs your input") - 3))
+                    + "╮\n",
+                )
+            )
             if not use_compact_chrome:
-                _append_blank_panel_line(lines, 'class:clarify-border', box_width)
+                _append_blank_panel_line(lines, "class:clarify-border", box_width)
 
             # Question text (bounded)
             for wrapped in question_wrapped:
-                _append_panel_line(lines, 'class:clarify-border', 'class:clarify-question', wrapped, box_width)
+                _append_panel_line(
+                    lines,
+                    "class:clarify-border",
+                    "class:clarify-question",
+                    wrapped,
+                    box_width,
+                )
             if not use_compact_chrome:
-                _append_blank_panel_line(lines, 'class:clarify-border', box_width)
+                _append_blank_panel_line(lines, "class:clarify-border", box_width)
 
             if cli_ref._clarify_freetext and not choices:
                 for wrapped in other_wrapped:
-                    _append_panel_line(lines, 'class:clarify-border', 'class:clarify-choice', wrapped, box_width)
+                    _append_panel_line(
+                        lines,
+                        "class:clarify-border",
+                        "class:clarify-choice",
+                        wrapped,
+                        box_width,
+                    )
                 if not use_compact_chrome:
-                    _append_blank_panel_line(lines, 'class:clarify-border', box_width)
+                    _append_blank_panel_line(lines, "class:clarify-border", box_width)
 
             if choices:
                 # Multiple-choice mode: show selectable options
                 for i, wrapped in choice_wrapped:
-                    style = 'class:clarify-selected' if i == selected and not cli_ref._clarify_freetext else 'class:clarify-choice'
-                    _append_panel_line(lines, 'class:clarify-border', style, wrapped, box_width)
+                    style = (
+                        "class:clarify-selected"
+                        if i == selected and not cli_ref._clarify_freetext
+                        else "class:clarify-choice"
+                    )
+                    _append_panel_line(
+                        lines, "class:clarify-border", style, wrapped, box_width
+                    )
 
                 # "Other" option (trailing row(s), only shown when choices exist)
                 other_idx = len(choices)
@@ -2471,22 +2782,24 @@ class MixinCommands:
                 if other_num < 10:
                     other_num_prefix = str(other_num)
                 elif other_num == 10:
-                    other_num_prefix = '0'
+                    other_num_prefix = "0"
                 else:
-                    other_num_prefix = ' '
-                
+                    other_num_prefix = " "
+
                 if selected == other_idx and not cli_ref._clarify_freetext:
-                    other_style = 'class:clarify-selected'
+                    other_style = "class:clarify-selected"
                 elif cli_ref._clarify_freetext:
-                    other_style = 'class:clarify-active-other'
+                    other_style = "class:clarify-active-other"
                 else:
-                    other_style = 'class:clarify-choice'
+                    other_style = "class:clarify-choice"
                 for wrapped in other_wrapped:
-                    _append_panel_line(lines, 'class:clarify-border', other_style, wrapped, box_width)
+                    _append_panel_line(
+                        lines, "class:clarify-border", other_style, wrapped, box_width
+                    )
 
             if not use_compact_chrome:
-                _append_blank_panel_line(lines, 'class:clarify-border', box_width)
-            lines.append(('class:clarify-border', '╰' + ('─' * box_width) + '╯\n'))
+                _append_blank_panel_line(lines, "class:clarify-border", box_width)
+            lines.append(("class:clarify-border", "╰" + ("─" * box_width) + "╯\n"))
             return lines
 
         clarify_widget = ConditionalContainer(
@@ -2503,17 +2816,24 @@ class MixinCommands:
             state = cli_ref._sudo_state
             if not state:
                 return []
-            title = '🔐 Sudo Password Required'
-            body = 'Enter password below (hidden), or press Enter to skip'
+            title = "🔐 Sudo Password Required"
+            body = "Enter password below (hidden), or press Enter to skip"
             box_width = _panel_box_width(title, [body])
             lines = []
-            lines.append(('class:sudo-border', '╭─ '))
-            lines.append(('class:sudo-title', title))
-            lines.append(('class:sudo-border', ' ' + ('─' * max(0, box_width - len(title) - 3)) + '╮\n'))
-            _append_blank_panel_line(lines, 'class:sudo-border', box_width)
-            _append_panel_line(lines, 'class:sudo-border', 'class:sudo-text', body, box_width)
-            _append_blank_panel_line(lines, 'class:sudo-border', box_width)
-            lines.append(('class:sudo-border', '╰' + ('─' * box_width) + '╯\n'))
+            lines.append(("class:sudo-border", "╭─ "))
+            lines.append(("class:sudo-title", title))
+            lines.append(
+                (
+                    "class:sudo-border",
+                    " " + ("─" * max(0, box_width - len(title) - 3)) + "╮\n",
+                )
+            )
+            _append_blank_panel_line(lines, "class:sudo-border", box_width)
+            _append_panel_line(
+                lines, "class:sudo-border", "class:sudo-text", body, box_width
+            )
+            _append_blank_panel_line(lines, "class:sudo-border", box_width)
+            lines.append(("class:sudo-border", "╰" + ("─" * box_width) + "╯\n"))
             return lines
 
         sudo_widget = ConditionalContainer(
@@ -2529,27 +2849,45 @@ class MixinCommands:
             if not state:
                 return []
 
-            title = '🔑 Skill Setup Required'
-            prompt = state.get("prompt") or f"Enter value for {state.get('var_name', 'secret')}"
+            title = "🔑 Skill Setup Required"
+            prompt = (
+                state.get("prompt")
+                or f"Enter value for {state.get('var_name', 'secret')}"
+            )
             metadata = state.get("metadata") or {}
             help_text = metadata.get("help")
-            body = 'Enter secret below (hidden), ESC or Ctrl+C to skip'
+            body = "Enter secret below (hidden), ESC or Ctrl+C to skip"
             content_lines = [prompt, body]
             if help_text:
                 content_lines.insert(1, str(help_text))
             box_width = _panel_box_width(title, content_lines)
             lines = []
-            lines.append(('class:sudo-border', '╭─ '))
-            lines.append(('class:sudo-title', title))
-            lines.append(('class:sudo-border', ' ' + ('─' * max(0, box_width - len(title) - 3)) + '╮\n'))
-            _append_blank_panel_line(lines, 'class:sudo-border', box_width)
-            _append_panel_line(lines, 'class:sudo-border', 'class:sudo-text', prompt, box_width)
+            lines.append(("class:sudo-border", "╭─ "))
+            lines.append(("class:sudo-title", title))
+            lines.append(
+                (
+                    "class:sudo-border",
+                    " " + ("─" * max(0, box_width - len(title) - 3)) + "╮\n",
+                )
+            )
+            _append_blank_panel_line(lines, "class:sudo-border", box_width)
+            _append_panel_line(
+                lines, "class:sudo-border", "class:sudo-text", prompt, box_width
+            )
             if help_text:
-                _append_panel_line(lines, 'class:sudo-border', 'class:sudo-text', str(help_text), box_width)
-            _append_blank_panel_line(lines, 'class:sudo-border', box_width)
-            _append_panel_line(lines, 'class:sudo-border', 'class:sudo-text', body, box_width)
-            _append_blank_panel_line(lines, 'class:sudo-border', box_width)
-            lines.append(('class:sudo-border', '╰' + ('─' * box_width) + '╯\n'))
+                _append_panel_line(
+                    lines,
+                    "class:sudo-border",
+                    "class:sudo-text",
+                    str(help_text),
+                    box_width,
+                )
+            _append_blank_panel_line(lines, "class:sudo-border", box_width)
+            _append_panel_line(
+                lines, "class:sudo-border", "class:sudo-text", body, box_width
+            )
+            _append_blank_panel_line(lines, "class:sudo-border", box_width)
+            lines.append(("class:sudo-border", "╰" + ("─" * box_width) + "╯\n"))
             return lines
 
         secret_widget = ConditionalContainer(
@@ -2612,7 +2950,9 @@ class MixinCommands:
                 else:
                     hint = "No models listed for this provider. Use Back or Cancel."
 
-            box_width = _panel_box_width(title, [hint] + choices, min_width=46, max_width=84)
+            box_width = _panel_box_width(
+                title, [hint] + choices, min_width=46, max_width=84
+            )
             inner_text_width = max(8, box_width - 6)
             selected = state.get("selected", 0)
 
@@ -2622,29 +2962,48 @@ class MixinCommands:
             # provider catalogs (e.g. Ollama Cloud's 36+ models).
             try:
                 from prompt_toolkit.application import get_app
+
                 term_rows = get_app().output.get_size().rows
             except Exception:
                 term_rows = shutil.get_terminal_size((100, 24)).lines
             scroll_offset, visible = ReYMeNCLI._compute_model_picker_viewport(
-                selected, state.get("_scroll_offset", 0), len(choices), term_rows,
+                selected,
+                state.get("_scroll_offset", 0),
+                len(choices),
+                term_rows,
             )
             state["_scroll_offset"] = scroll_offset
 
             lines = []
-            lines.append(('class:clarify-border', '╭─ '))
-            lines.append(('class:clarify-title', title))
-            lines.append(('class:clarify-border', ' ' + ('─' * max(0, box_width - len(title) - 3)) + '╮\n'))
-            _append_blank_panel_line(lines, 'class:clarify-border', box_width)
-            _append_panel_line(lines, 'class:clarify-border', 'class:clarify-hint', hint, box_width)
-            _append_blank_panel_line(lines, 'class:clarify-border', box_width)
+            lines.append(("class:clarify-border", "╭─ "))
+            lines.append(("class:clarify-title", title))
+            lines.append(
+                (
+                    "class:clarify-border",
+                    " " + ("─" * max(0, box_width - len(title) - 3)) + "╮\n",
+                )
+            )
+            _append_blank_panel_line(lines, "class:clarify-border", box_width)
+            _append_panel_line(
+                lines, "class:clarify-border", "class:clarify-hint", hint, box_width
+            )
+            _append_blank_panel_line(lines, "class:clarify-border", box_width)
             for idx in range(scroll_offset, scroll_offset + visible):
                 choice = choices[idx]
-                style = 'class:clarify-selected' if idx == selected else 'class:clarify-choice'
-                prefix = '❯ ' if idx == selected else '  '
-                for wrapped in _wrap_panel_text(prefix + choice, inner_text_width, subsequent_indent='  '):
-                    _append_panel_line(lines, 'class:clarify-border', style, wrapped, box_width)
-            _append_blank_panel_line(lines, 'class:clarify-border', box_width)
-            lines.append(('class:clarify-border', '╰' + ('─' * box_width) + '╯\n'))
+                style = (
+                    "class:clarify-selected"
+                    if idx == selected
+                    else "class:clarify-choice"
+                )
+                prefix = "❯ " if idx == selected else "  "
+                for wrapped in _wrap_panel_text(
+                    prefix + choice, inner_text_width, subsequent_indent="  "
+                ):
+                    _append_panel_line(
+                        lines, "class:clarify-border", style, wrapped, box_width
+                    )
+            _append_blank_panel_line(lines, "class:clarify-border", box_width)
+            lines.append(("class:clarify-border", "╰" + ("─" * box_width) + "╯\n"))
             return lines
 
         model_picker_widget = ConditionalContainer(
@@ -2659,14 +3018,14 @@ class MixinCommands:
         # On narrow/mobile terminals we keep the top separator for structure but
         # hide the bottom one to recover a full row for conversation content.
         input_rule_top = Window(
-            char='─',
+            char="─",
             height=lambda: cli_ref._tui_input_rule_height("top"),
-            style='class:input-rule',
+            style="class:input-rule",
         )
         input_rule_bot = Window(
-            char='─',
+            char="─",
             height=lambda: cli_ref._tui_input_rule_height("bottom"),
-            style='class:input-rule',
+            style="class:input-rule",
         )
 
         # Image attachment indicator — shows badges like [📎 Image #1] above input
@@ -2700,7 +3059,9 @@ class MixinCommands:
 
         status_bar = ConditionalContainer(
             Window(
-                content=FormattedTextControl(lambda: cli_ref._get_status_bar_fragments()),
+                content=FormattedTextControl(
+                    lambda: cli_ref._get_status_bar_fragments()
+                ),
                 height=1,
                 # Prevent fragments that overflow the terminal width from
                 # wrapping onto a second line, which causes the status bar to
@@ -2747,7 +3108,7 @@ class MixinCommands:
                 )
             )
         )
-        
+
         # Style for the application
         self._tui_style_base = {
             # Input area / prompt: empty style strings inherit the
@@ -2755,57 +3116,57 @@ class MixinCommands:
             # text is readable in both light and dark Terminal.app
             # color schemes.  (Hardcoding a near-white #FFF8DC made
             # input invisible on light backgrounds.)
-            'input-area': '',
-            'placeholder': '#888888 italic',
-            'prompt': '',
-            'prompt-working': '#888888 italic',
-            'hint': '#888888 italic',
-            'status-bar': 'bg:#1a1a2e #C0C0C0',
-            'status-bar-strong': 'bg:#1a1a2e #FFD700 bold',
-            'status-bar-dim': 'bg:#1a1a2e #8B8682',
-            'status-bar-good': 'bg:#1a1a2e #8FBC8F bold',
-            'status-bar-warn': 'bg:#1a1a2e #FFD700 bold',
-            'status-bar-bad': 'bg:#1a1a2e #FF8C00 bold',
-            'status-bar-critical': 'bg:#1a1a2e #FF6B6B bold',
-            'status-bar-yolo': 'bg:#1a1a2e #FF4444 bold',
+            "input-area": "",
+            "placeholder": "#888888 italic",
+            "prompt": "",
+            "prompt-working": "#888888 italic",
+            "hint": "#888888 italic",
+            "status-bar": "bg:#1a1a2e #C0C0C0",
+            "status-bar-strong": "bg:#1a1a2e #FFD700 bold",
+            "status-bar-dim": "bg:#1a1a2e #8B8682",
+            "status-bar-good": "bg:#1a1a2e #8FBC8F bold",
+            "status-bar-warn": "bg:#1a1a2e #FFD700 bold",
+            "status-bar-bad": "bg:#1a1a2e #FF8C00 bold",
+            "status-bar-critical": "bg:#1a1a2e #FF6B6B bold",
+            "status-bar-yolo": "bg:#1a1a2e #FF4444 bold",
             # Bronze horizontal rules around the input area
-            'input-rule': '#CD7F32',
+            "input-rule": "#CD7F32",
             # Clipboard image attachment badges
-            'image-badge': '#87CEEB bold',
-            'completion-menu': 'bg:#1a1a2e #FFF8DC',
-            'completion-menu.completion': 'bg:#1a1a2e #FFF8DC',
-            'completion-menu.completion.current': 'bg:#333355 #FFD700',
-            'completion-menu.meta.completion': 'bg:#1a1a2e #888888',
-            'completion-menu.meta.completion.current': 'bg:#333355 #FFBF00',
+            "image-badge": "#87CEEB bold",
+            "completion-menu": "bg:#1a1a2e #FFF8DC",
+            "completion-menu.completion": "bg:#1a1a2e #FFF8DC",
+            "completion-menu.completion.current": "bg:#333355 #FFD700",
+            "completion-menu.meta.completion": "bg:#1a1a2e #888888",
+            "completion-menu.meta.completion.current": "bg:#333355 #FFBF00",
             # Clarify question panel
-            'clarify-border': '#CD7F32',
-            'clarify-title': '#FFD700 bold',
-            'clarify-question': '#FFF8DC bold',
-            'clarify-choice': '#AAAAAA',
-            'clarify-selected': '#FFD700 bold',
-            'clarify-active-other': '#FFD700 italic',
-            'clarify-countdown': '#CD7F32',
+            "clarify-border": "#CD7F32",
+            "clarify-title": "#FFD700 bold",
+            "clarify-question": "#FFF8DC bold",
+            "clarify-choice": "#AAAAAA",
+            "clarify-selected": "#FFD700 bold",
+            "clarify-active-other": "#FFD700 italic",
+            "clarify-countdown": "#CD7F32",
             # Sudo password panel
-            'sudo-prompt': '#FF6B6B bold',
-            'sudo-border': '#CD7F32',
-            'sudo-title': '#FF6B6B bold',
-            'sudo-text': '#FFF8DC',
+            "sudo-prompt": "#FF6B6B bold",
+            "sudo-border": "#CD7F32",
+            "sudo-title": "#FF6B6B bold",
+            "sudo-text": "#FFF8DC",
             # Dangerous command approval panel
-            'approval-border': '#CD7F32',
-            'approval-title': '#FF8C00 bold',
-            'approval-desc': '#FFF8DC bold',
-            'approval-cmd': '#AAAAAA italic',
-            'approval-choice': '#AAAAAA',
-            'approval-selected': '#FFD700 bold',
+            "approval-border": "#CD7F32",
+            "approval-title": "#FF8C00 bold",
+            "approval-desc": "#FFF8DC bold",
+            "approval-cmd": "#AAAAAA italic",
+            "approval-choice": "#AAAAAA",
+            "approval-selected": "#FFD700 bold",
             # Voice mode
-            'voice-prompt': '#87CEEB',
-            'voice-recording': '#FF4444 bold',
-            'voice-processing': '#FFA500 italic',
-            'voice-status': 'bg:#1a1a2e #87CEEB',
-            'voice-status-recording': 'bg:#1a1a2e #FF4444 bold',
+            "voice-prompt": "#87CEEB",
+            "voice-recording": "#FF4444 bold",
+            "voice-processing": "#FFA500 italic",
+            "voice-status": "bg:#1a1a2e #87CEEB",
+            "voice-status-recording": "bg:#1a1a2e #FF4444 bold",
         }
         style = PTStyle.from_dict(self._build_tui_style_dict())
-        
+
         # Create the application
         app = Application(
             layout=layout,
@@ -2813,7 +3174,7 @@ class MixinCommands:
             style=style,
             full_screen=False,
             mouse_support=False,
-            **({'cursor': _STEADY_CURSOR} if _STEADY_CURSOR is not None else {}),
+            **({"cursor": _STEADY_CURSOR} if _STEADY_CURSOR is not None else {}),
         )
         _disable_prompt_toolkit_cpr_warning(app)
         self._app = app  # Store reference for clarify_callback
@@ -2842,11 +3203,21 @@ class MixinCommands:
             from prompt_toolkit.renderer import _output_screen_diff as _orig_osd
 
             if not getattr(_pt_renderer, "_ReYMeN_osd_patched", False):
+
                 def _patched_output_screen_diff(
-                    app, output, screen, current_pos, color_depth,
-                    previous_screen, last_style, is_done, full_screen,
-                    attrs_for_style_string, style_string_has_style,
-                    size, previous_width,
+                    app,
+                    output,
+                    screen,
+                    current_pos,
+                    color_depth,
+                    previous_screen,
+                    last_style,
+                    is_done,
+                    full_screen,
+                    attrs_for_style_string,
+                    style_string_has_style,
+                    size,
+                    previous_width,
                 ):
                     """Wraps pt's _output_screen_diff to suppress the
                     reserve-vertical-space scroll (renderer.py L232-242).
@@ -2865,17 +3236,28 @@ class MixinCommands:
                     leak between renders.
                     """
                     try:
-                        if previous_screen is not None and hasattr(previous_screen, "height"):
+                        if previous_screen is not None and hasattr(
+                            previous_screen, "height"
+                        ):
                             if previous_screen.height < screen.height:
                                 previous_screen.height = screen.height
                     except Exception:
                         logger.warning("[fix_01_sessiz_except] Exception")
 
                     return _orig_osd(
-                        app, output, screen, current_pos, color_depth,
-                        previous_screen, last_style, is_done, full_screen,
-                        attrs_for_style_string, style_string_has_style,
-                        size, previous_width,
+                        app,
+                        output,
+                        screen,
+                        current_pos,
+                        color_depth,
+                        previous_screen,
+                        last_style,
+                        is_done,
+                        full_screen,
+                        attrs_for_style_string,
+                        style_string_has_style,
+                        size,
+                        previous_width,
                     )
 
                 _pt_renderer._output_screen_diff = _patched_output_screen_diff
@@ -2912,7 +3294,7 @@ class MixinCommands:
 
         spinner_thread = threading.Thread(target=spinner_loop, daemon=True)
         spinner_thread.start()
-        
+
         # Background thread to process inputs and run agent
         def process_loop():
             while not self._should_exit:
@@ -2928,12 +3310,16 @@ class MixinCommands:
                             # and watch pattern matches) while agent is idle.
                             try:
                                 from tools.process_registry import process_registry
-                                for _evt, _synth in process_registry.drain_notifications():
+
+                                for (
+                                    _evt,
+                                    _synth,
+                                ) in process_registry.drain_notifications():
                                     self._pending_input.put(_synth)
                             except Exception:
                                 logger.warning("[fix_01_sessiz_except] Exception")
                         continue
-                    
+
                     if not user_input:
                         continue
 
@@ -2948,25 +3334,35 @@ class MixinCommands:
 
                     if isinstance(user_input, str):
                         user_input = _strip_leaked_bracketed_paste_wrappers(user_input)
-                        user_input, _had_mouse_reports = _strip_leaked_terminal_responses_with_meta(user_input)
+                        user_input, _had_mouse_reports = (
+                            _strip_leaked_terminal_responses_with_meta(user_input)
+                        )
                         if _had_mouse_reports:
-                            self._recover_terminal_input_modes(reason="mouse reports leaked into submitted input")
-                    
+                            self._recover_terminal_input_modes(
+                                reason="mouse reports leaked into submitted input"
+                            )
+
                     # Check for commands — but detect dragged/pasted file paths first.
                     # See _detect_file_drop() for details.
-                    _file_drop = _detect_file_drop(user_input) if isinstance(user_input, str) else None
+                    _file_drop = (
+                        _detect_file_drop(user_input)
+                        if isinstance(user_input, str)
+                        else None
+                    )
                     if _file_drop:
                         _drop_path = _file_drop["path"]
                         _remainder = _file_drop["remainder"]
                         if _file_drop["is_image"]:
                             submit_images.append(_drop_path)
-                            user_input = _remainder or f"[User attached image: {_drop_path.name}]"
+                            user_input = (
+                                _remainder
+                                or f"[User attached image: {_drop_path.name}]"
+                            )
                             _cprint(f"  📎 Auto-attached image: {_drop_path.name}")
                         else:
                             _cprint(f"  📄 Detected file: {_drop_path.name}")
-                            user_input = (
-                                f"[User attached file: {_drop_path}]"
-                                + (f"\n{_remainder}" if _remainder else "")
+                            user_input = f"[User attached file: {_drop_path}]" + (
+                                f"\n{_remainder}" if _remainder else ""
                             )
 
                     # A bare number right after a bare `/resume` prompt selects
@@ -2980,7 +3376,11 @@ class MixinCommands:
                     ):
                         continue
 
-                    if not _file_drop and isinstance(user_input, str) and _looks_like_slash_command(user_input):
+                    if (
+                        not _file_drop
+                        and isinstance(user_input, str)
+                        and _looks_like_slash_command(user_input)
+                    ):
                         _cprint(f"\n⚙️  {user_input}")
                         try:
                             if not self.process_command(user_input):
@@ -2996,19 +3396,27 @@ class MixinCommands:
                             # to the outer prompt_toolkit loop and the session dies.
                             _cprint("\n[dim]Command interrupted.[/dim]")
                         continue
-                    
+
                     # Expand paste references back to full content
-                    _paste_ref_re = re.compile(r'\[Pasted text #\d+: \d+ lines \u2192 (.+?)\]')
-                    paste_refs = list(_paste_ref_re.finditer(user_input)) if isinstance(user_input, str) else []
+                    _paste_ref_re = re.compile(
+                        r"\[Pasted text #\d+: \d+ lines \u2192 (.+?)\]"
+                    )
+                    paste_refs = (
+                        list(_paste_ref_re.finditer(user_input))
+                        if isinstance(user_input, str)
+                        else []
+                    )
                     if paste_refs:
                         user_input = self._expand_paste_references(user_input)
                     print()
                     self._print_user_message_preview(user_input)
-                    
+
                     # Show image attachment count
                     if submit_images:
                         n = len(submit_images)
-                        _cprint(f"  {_DIM}📎 {n} image{'s' if n > 1 else ''} attached{_RST}")
+                        _cprint(
+                            f"  {_DIM}📎 {n} image{'s' if n > 1 else ''} attached{_RST}"
+                        )
 
                     # Regular chat - run agent
                     self._agent_running = True
@@ -3034,13 +3442,20 @@ class MixinCommands:
                         try:
                             self._maybe_continue_goal_after_turn()
                         except Exception as _goal_exc:
-                            logging.debug("goal continuation hook failed: %s", _goal_exc)
+                            logging.debug(
+                                "goal continuation hook failed: %s", _goal_exc
+                            )
 
                         # Continuous voice: auto-restart recording after agent responds.
                         # Dispatch to a daemon thread so play_beep (sd.wait) and
                         # AudioRecorder.start (lock acquire) never block process_loop —
                         # otherwise queued user input would stall silently.
-                        if self._voice_mode and self._voice_continuous and not self._voice_recording:
+                        if (
+                            self._voice_mode
+                            and self._voice_continuous
+                            and not self._voice_recording
+                        ):
+
                             def _restart_recording():
                                 try:
                                     if self._voice_tts:
@@ -3049,13 +3464,19 @@ class MixinCommands:
                                     self._voice_start_recording()
                                     app.invalidate()
                                 except Exception as e:
-                                    _cprint(f"{_DIM}Voice auto-restart failed: {e}{_RST}")
-                            threading.Thread(target=_restart_recording, daemon=True).start()
+                                    _cprint(
+                                        f"{_DIM}Voice auto-restart failed: {e}{_RST}"
+                                    )
+
+                            threading.Thread(
+                                target=_restart_recording, daemon=True
+                            ).start()
 
                         # Drain process notifications (completions + watch matches)
                         # that arrived while the agent was running.
                         try:
                             from tools.process_registry import process_registry
+
                             for _evt, _synth in process_registry.drain_notifications():
                                 self._pending_input.put(_synth)
                         except Exception as _e:
@@ -3064,15 +3485,17 @@ class MixinCommands:
                             )  # Non-fatal — don't break the main loop
 
                 except Exception as e:
-                    logger.warning("process_loop unhandled error (msg may be lost): %s", e)
-        
+                    logger.warning(
+                        "process_loop unhandled error (msg may be lost): %s", e
+                    )
+
         # Start processing thread
         process_thread = threading.Thread(target=process_loop, daemon=True)
         process_thread.start()
-        
+
         # Register atexit cleanup so resources are freed even on unexpected exit
         atexit.register(_run_cleanup)
-        
+
         # Register signal handlers for graceful shutdown on SSH disconnect / SIGTERM
         def _signal_handler(signum, frame):
             """Handle SIGHUP/SIGTERM by triggering graceful cleanup.
@@ -3110,7 +3533,9 @@ class MixinCommands:
                     "[SessizExcept] %%s: %%s", type(_e).__name__, _e
                 )  # never let logging raise from a signal handler (#13710 regression)
             try:
-                if getattr(self, "agent", None) and getattr(self, "_agent_running", False):
+                if getattr(self, "agent", None) and getattr(
+                    self, "_agent_running", False
+                ):
                     self.agent.interrupt(f"received signal {signum}")
                     try:
                         _grace = float(os.getenv("ReYMeN_SIGTERM_GRACE", "1.5"))
@@ -3138,6 +3563,7 @@ class MixinCommands:
             # block at the bottom of the input loop handles the rest.
             try:
                 from prompt_toolkit.application.current import get_app_or_none
+
                 _app = get_app_or_none()
                 if _app is not None:
                     _loop = getattr(_app, "loop", None)
@@ -3147,11 +3573,12 @@ class MixinCommands:
             except Exception:
                 logger.warning("[fix_01_sessiz_except] Exception")
             raise KeyboardInterrupt()  # fallback for non-prompt_toolkit contexts
-        
+
         try:
             import signal as _signal
+
             _signal.signal(_signal.SIGTERM, _signal_handler)
-            if hasattr(_signal, 'SIGHUP'):
+            if hasattr(_signal, "SIGHUP"):
                 _signal.signal(_signal.SIGHUP, _signal_handler)
 
             # Windows: install a SIGINT handler that absorbs the signal
@@ -3173,6 +3600,7 @@ class MixinCommands:
             # POSIX: leave the default SIGINT handler alone. prompt_toolkit
             # installs its own handler there and it works as expected.
             if sys.platform == "win32":
+
                 def _sigint_absorb(signum, frame):
                     # Absorb silently. Do NOT call agent.interrupt() here:
                     # Windows fires spurious CTRL_C_EVENT whenever a
@@ -3182,12 +3610,13 @@ class MixinCommands:
                     # own c-c key binding at the TUI layer (same pattern as
                     # Claude Code's Windows handling).
                     return
+
                 _signal.signal(_signal.SIGINT, _sigint_absorb)
         except Exception as _e:
             __import__("logging").getLogger(__name__).warning(
                 "[SessizExcept] %%s: %%s", type(_e).__name__, _e
             )  # Signal handlers may fail in restricted environments
-        
+
         # Install a custom asyncio exception handler that suppresses the
         # "Event loop is closed" RuntimeError from httpx transport cleanup
         # and the "0 is not registered" KeyError from broken stdin (#6393).
@@ -3228,6 +3657,7 @@ class MixinCommands:
         if sys.platform == "darwin":
             try:
                 import selectors as _selectors
+
                 if hasattr(_selectors, "KqueueSelector"):
                     _kq = _selectors.KqueueSelector()
                     try:
@@ -3251,6 +3681,7 @@ class MixinCommands:
                 # Set the custom handler on prompt_toolkit's event loop
                 try:
                     import asyncio as _aio
+
                     # Use get_running_loop() to avoid DeprecationWarning on
                     # Python 3.10+ when called outside an async context.
                     _loop = _aio.get_running_loop()
@@ -3265,7 +3696,11 @@ class MixinCommands:
         except (KeyError, OSError) as _stdin_err:
             # Catch selector registration failures from broken stdin (#6393)
             # and I/O errors from broken stdout during interrupt (#13710).
-            _errno = getattr(_stdin_err, "errno", None) if isinstance(_stdin_err, OSError) else None
+            _errno = (
+                getattr(_stdin_err, "errno", None)
+                if isinstance(_stdin_err, OSError)
+                else None
+            )
             _msg = str(_stdin_err)
             if _errno == errno.EIO:
                 pass  # suppress broken-stdout I/O errors on interrupt (#13710)
@@ -3289,13 +3724,13 @@ class MixinCommands:
             # API calls and exits promptly (agent_thread is daemon, so the
             # process will exit once the main thread finishes, but interrupting
             # avoids wasted API calls and lets run_conversation clean up).
-            if self.agent and getattr(self, '_agent_running', False):
+            if self.agent and getattr(self, "_agent_running", False):
                 try:
                     self.agent.interrupt()
                 except Exception:
                     logger.warning("[fix_01_sessiz_except] Exception")
             # Shut down voice recorder (release persistent audio stream)
-            if hasattr(self, '_voice_recorder') and self._voice_recorder:
+            if hasattr(self, "_voice_recorder") and self._voice_recorder:
                 try:
                     self._voice_recorder.shutdown()
                 except Exception:
@@ -3304,6 +3739,7 @@ class MixinCommands:
             # Clean up old temp voice recordings
             try:
                 from tools.voice_mode import cleanup_temp_recordings
+
                 cleanup_temp_recordings()
             except Exception:
                 logger.warning("[fix_01_sessiz_except] Exception")
@@ -3312,38 +3748,46 @@ class MixinCommands:
             set_approval_callback(None)
             set_secret_capture_callback(None)
             # Close session in SQLite
-            if hasattr(self, '_session_db') and self._session_db and self.agent:
+            if hasattr(self, "_session_db") and self._session_db and self.agent:
                 try:
                     self._session_db.end_session(self.agent.session_id, "cli_close")
                 except (Exception, KeyboardInterrupt) as e:
                     logger.debug("Could not close session in DB: %s", e)
                 # /exit --delete: also remove the current session's transcripts
                 # and SQLite history. Ported from google-gemini/gemini-cli#19332.
-                if getattr(self, '_delete_session_on_exit', False):
+                if getattr(self, "_delete_session_on_exit", False):
                     try:
-                        from reymen.sistem.ReYMeN_constants import get_reymen_home as _ghh
+                        from reymen.sistem.ReYMeN_constants import (
+                            get_reymen_home as _ghh,
+                        )
+
                         _sessions_dir = _ghh() / "sessions"
                         _sid = self.agent.session_id
-                        if self._session_db.delete_session(_sid, sessions_dir=_sessions_dir):
+                        if self._session_db.delete_session(
+                            _sid, sessions_dir=_sessions_dir
+                        ):
                             _cprint(f"  {_DIM}✓ Session {_escape(_sid)} deleted{_RST}")
                         else:
-                            _cprint(f"  {_DIM}✗ Session {_escape(_sid)} not found for deletion{_RST}")
+                            _cprint(
+                                f"  {_DIM}✗ Session {_escape(_sid)} not found for deletion{_RST}"
+                            )
                     except (Exception, KeyboardInterrupt) as e:
                         logger.debug("Could not delete session on exit: %s", e)
             # Plugin hook: on_session_end — safety net for interrupted exits.
             # run_conversation() already fires this per-turn on normal completion,
             # so only fire here if the agent was mid-turn (_agent_running) when
             # the exit occurred, meaning run_conversation's hook didn't fire.
-            if self.agent and getattr(self, '_agent_running', False):
+            if self.agent and getattr(self, "_agent_running", False):
                 try:
                     from reymen.reymen_cli.plugins import invoke_hook as _invoke_hook
+
                     _invoke_hook(
                         "on_session_end",
                         session_id=self.agent.session_id,
                         completed=False,
                         interrupted=True,
-                        model=getattr(self.agent, 'model', None),
-                        platform=getattr(self.agent, 'platform', None) or "cli",
+                        model=getattr(self.agent, "model", None),
+                        platform=getattr(self.agent, "platform", None) or "cli",
                     )
                 except Exception:
                     logger.warning("[fix_01_sessiz_except] Exception")
@@ -3355,7 +3799,7 @@ class MixinCommands:
         # terminal modes — rather than from the background process_loop
         # thread (which would skip terminal cleanup on POSIX and only exit
         # the worker thread on Windows).
-        if getattr(self, '_pending_relaunch', None):
+        if getattr(self, "_pending_relaunch", None):
             from reymen.reymen_cli.relaunch import relaunch
-            relaunch(self._pending_relaunch, preserve_inherited=False)
 
+            relaunch(self._pending_relaunch, preserve_inherited=False)

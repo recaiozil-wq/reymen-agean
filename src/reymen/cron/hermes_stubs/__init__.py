@@ -105,6 +105,7 @@ def reset_time_cache() -> None:
 # utils stub
 # =============================================================================
 
+
 def atomic_replace(tmp_path: Union[str, Path], target: Union[str, Path]) -> str:
     """Atomik dosya degistirme (rename ile)."""
     tmp = Path(tmp_path)
@@ -138,10 +139,12 @@ def env_var_enabled(name: str, default: str = "") -> bool:
 # hermes_cli.config stub (minimal)
 # =============================================================================
 
+
 def atomic_yaml_write(data: Any, path: Union[str, Path], indent: int = 2) -> None:
     """YAML dosyasi yaz — stub, atomic_json_write kullanir."""
     try:
         import yaml
+
         with open(path, "w", encoding="utf-8") as f:
             yaml.dump(data, f, indent=indent, allow_unicode=True)
     except Exception as e:
@@ -151,6 +154,7 @@ def atomic_yaml_write(data: Any, path: Union[str, Path], indent: int = 2) -> Non
 def base_url_host_matches(url1: str, url2: str) -> bool:
     """Iki URL'nin host kismini karsilastir."""
     from urllib.parse import urlparse
+
     try:
         h1 = urlparse(url1).hostname or ""
         h2 = urlparse(url2).hostname or ""
@@ -158,9 +162,11 @@ def base_url_host_matches(url1: str, url2: str) -> bool:
     except Exception:
         return False
 
+
 def load_config() -> Dict[str, Any]:
     """Basit config yukleyici — .env dosyasindan okur."""
     import dotenv
+
     env_path = get_env_path()
     if env_path.exists():
         dotenv.load_dotenv(env_path)
@@ -197,6 +203,7 @@ def get_default_hermes_root() -> Path:
 
 
 # ... gateway stubs ...
+
 
 def is_truthy_value(value: Any, default: bool = False) -> bool:
     if isinstance(value, bool):
@@ -296,12 +303,27 @@ def clear_session_cwd() -> None:
 def _ensure_stubs() -> None:
     """Tum stub'lari dogrula (cagri yapmaz, sadece import kontrolu)."""
     _stubs = [
-        is_truthy_value, normalize_proxy_url, is_safe_url,
-        to_agent_visible_cache_path, get_tool_emoji, get_label,
-        group_providers, expensive_model_warning, should_bypass_active_session,
-        telegram_menu_commands, resolve_gateway_approval, resolve_gateway_clarify,
-        mark_awaiting_text, discover_plugins, has_usable_secret,
-        text_to_speech_tool, check_tts_requirements, vision_analyze_tool,
-        ensure, managed_scope, set_session_cwd, clear_session_cwd,
+        is_truthy_value,
+        normalize_proxy_url,
+        is_safe_url,
+        to_agent_visible_cache_path,
+        get_tool_emoji,
+        get_label,
+        group_providers,
+        expensive_model_warning,
+        should_bypass_active_session,
+        telegram_menu_commands,
+        resolve_gateway_approval,
+        resolve_gateway_clarify,
+        mark_awaiting_text,
+        discover_plugins,
+        has_usable_secret,
+        text_to_speech_tool,
+        check_tts_requirements,
+        vision_analyze_tool,
+        ensure,
+        managed_scope,
+        set_session_cwd,
+        clear_session_cwd,
     ]
     _ = _stubs  # noqa

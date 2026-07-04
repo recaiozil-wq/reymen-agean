@@ -58,7 +58,9 @@ def beceriden_baslik(icerik: str) -> str:
     return icerik[:200].strip()
 
 
-def skills_db_guncelle(meta_adi: str, dosya_yolu: str, icerik: str, new_hash: str) -> None:
+def skills_db_guncelle(
+    meta_adi: str, dosya_yolu: str, icerik: str, new_hash: str
+) -> None:
     """skills_index.db'de FTS5 + meta güncelle."""
     baslik = beceriden_baslik(icerik)
     su_an = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -106,7 +108,9 @@ def ogrenme_db_guncelle(meta_adi: str, icerik: str) -> None:
     su_an = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     con = sqlite3.connect(str(OGRENME_DB))
     try:
-        var = con.execute("SELECT id FROM ogrenmeler WHERE hedef = ?", (hedef,)).fetchone()
+        var = con.execute(
+            "SELECT id FROM ogrenmeler WHERE hedef = ?", (hedef,)
+        ).fetchone()
         if var:
             con.execute(
                 """UPDATE ogrenmeler SET cozum=?, son_basari=?, son_kullanim=?,

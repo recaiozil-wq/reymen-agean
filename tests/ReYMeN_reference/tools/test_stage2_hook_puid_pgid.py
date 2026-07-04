@@ -12,6 +12,7 @@ The s6-overlay rework moved bootstrap from docker/entrypoint.sh (now a shim)
 to docker/stage2-hook.sh, which is installed as /etc/cont-init.d/01-ReYMeN-setup
 by the Dockerfile.  This test targets the post-rework location.
 """
+
 from __future__ import annotations
 
 import os
@@ -43,12 +44,12 @@ def _alias_lines(text: str) -> list[str]:
 
 def test_stage2_hook_resolves_puid_pgid_aliases(stage2_text: str) -> None:
     alias_lines = _alias_lines(stage2_text)
-    assert any("PUID" in line for line in alias_lines), (
-        "docker/stage2-hook.sh must resolve ReYMeN_UID from a PUID alias; see #15290"
-    )
-    assert any("PGID" in line for line in alias_lines), (
-        "docker/stage2-hook.sh must resolve ReYMeN_GID from a PGID alias; see #15290"
-    )
+    assert any(
+        "PUID" in line for line in alias_lines
+    ), "docker/stage2-hook.sh must resolve ReYMeN_UID from a PUID alias; see #15290"
+    assert any(
+        "PGID" in line for line in alias_lines
+    ), "docker/stage2-hook.sh must resolve ReYMeN_GID from a PGID alias; see #15290"
 
 
 def _resolve(stage2_text: str, env: dict[str, str]) -> str:
@@ -86,7 +87,9 @@ def test_no_uid_vars_leaves_values_empty(stage2_text: str) -> None:
     assert _resolve(stage2_text, {}) == ":"
 
 
-def test_stage2_hook_creates_s6_envdir_before_writing_browser_path(stage2_text: str) -> None:
+def test_stage2_hook_creates_s6_envdir_before_writing_browser_path(
+    stage2_text: str,
+) -> None:
     """Regression guard for browser-path export on runtimes where the
     s6 container_environment directory is absent when the cont-init hook runs.
     """

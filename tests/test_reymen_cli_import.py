@@ -15,6 +15,7 @@ if str(PROJECT_ROOT) not in sys.path:
 def test_import_ReYMeN_cli_direct():
     """ReYMeN_cli (top-level package) must be importable directly."""
     import ReYMeN_cli
+
     assert ReYMeN_cli.__version__ == "1.0.0"
     # Check core functions exist
     assert hasattr(ReYMeN_cli, "kaydet")
@@ -27,6 +28,7 @@ def test_import_ReYMeN_cli_direct():
 def test_import_reymen_reymen_cli():
     """reymen.reymen_cli (nested package) must be importable."""
     from reymen import reymen_cli
+
     assert reymen_cli.__version__ == "1.0.0"
     # Check core functions exist
     assert hasattr(reymen_cli, "kaydet")
@@ -105,9 +107,9 @@ def test_profiles_uses_correct_path():
 
     # PROFIL_KLASOR should be PROJECT_ROOT /.ReYMeN/profiles
     expected = PROJECT_ROOT / ".ReYMeN" / "profiles"
-    assert profiles.PROFIL_KLASOR == expected, (
-        f"Expected {expected}, got {profiles.PROFIL_KLASOR}"
-    )
+    assert (
+        profiles.PROFIL_KLASOR == expected
+    ), f"Expected {expected}, got {profiles.PROFIL_KLASOR}"
 
 
 def test_yuklenme_durumu():

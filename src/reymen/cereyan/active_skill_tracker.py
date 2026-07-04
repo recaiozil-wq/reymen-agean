@@ -39,7 +39,9 @@ def aktif_skill_ayarla(ad: str, icerik: str) -> None:
     global _aktif_skill_adi, _aktif_skill_icerik
     _aktif_skill_adi = ad
     _aktif_skill_icerik = icerik
-    logger.info("[SkillTracker] Skill aktive edildi: %s (%d chars)", ad, len(icerik or ""))
+    logger.info(
+        "[SkillTracker] Skill aktive edildi: %s (%d chars)", ad, len(icerik or "")
+    )
 
 
 def aktif_skill_temizle() -> None:
@@ -81,14 +83,11 @@ def aktif_skill_context_ekle() -> str:
     if len(icerik) > 2000:
         kisaltilmis += f"\n... [{len(icerik)} karakter, ilk 2000 gosterildi]"
 
-    return (
-        f"\n\n=== AKTIF SKILL: {ad} ===\n"
-        f"{kisaltilmis}\n"
-        f"=== SKILL SONU ===\n"
-    )
+    return f"\n\n=== AKTIF SKILL: {ad} ===\n" f"{kisaltilmis}\n" f"=== SKILL SONU ===\n"
 
 
 # ── Motor / Plugin sistemi uyumlulugu ─────────────────────────────
+
 
 def motor_kaydet(motor) -> bool:
     """Motor sistemi tarafindan otomatik cagrilir.

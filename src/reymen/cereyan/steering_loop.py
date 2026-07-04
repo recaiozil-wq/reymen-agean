@@ -24,6 +24,7 @@ from typing import Any, Dict, List, Optional
 # ── SQLite (standart kütüphane) ─────────────────────────────────────────────
 import sqlite3
 import logging
+
 logger = logging.getLogger(__name__)
 _SQLITE_AVAILABLE = True
 
@@ -45,9 +46,10 @@ _yazma_kilit = threading.Lock()
 # KATMAN 1 — HAFIZA (SQLite + FTS5)
 # ════════════════════════════════════════════════════════════════════════════
 
+
 class Katman1Hafiza:
     """Görev ve konuşma hafızası — Kalıcı SQLite+FTS5.
-    
+
     Her alt ajan adımı, görev sonucu, kullanıcı mesajı
     FTS5 ile indexlenir. Tam metin arama.
     """
@@ -83,7 +85,9 @@ class Katman1Hafiza:
                     zaman REAL NOT NULL
                 )
             """)
-            c.execute("CREATE INDEX IF NOT EXISTS idx_k1_task ON katman1_kayit(task_id)")
+            c.execute(
+                "CREATE INDEX IF NOT EXISTS idx_k1_task ON katman1_kayit(task_id)"
+            )
             c.execute("CREATE INDEX IF NOT EXISTS idx_k1_tur ON katman1_kayit(tur)")
             # FTS5
             c.execute("""
@@ -111,7 +115,9 @@ class Katman1Hafiza:
         except sqlite3.Error as _steering_e108:
             print(f"[UYARI] steering_loop.py:109 - {_steering_e108}")
 
-    def kaydet(self, task_id: str, tur: str, icerik: str, metadata: Optional[dict] = None):
+    def kaydet(
+        self, task_id: str, tur: str, icerik: str, metadata: Optional[dict] = None
+    ):
         """Bir kayit ekle (adim, sonuc, hata, gozlem)."""
         if not self._conn:
             return False
@@ -120,7 +126,7 @@ class Katman1Hafiza:
             with _yazma_kilit:
                 self._conn.execute(
                     "INSERT INTO katman1_kayit (task_id, tur, icerik, metadata, zaman) VALUES (?, ?, ?, ?, ?)",
-                    (task_id, tur, icerik[:2000], meta, time.time())
+                    (task_id, tur, icerik[:2000], meta, time.time()),
                 )
                 self._conn.commit()
             return True
@@ -132,7 +138,8 @@ class Katman1Hafiza:
         if not self._conn or not sorgu.strip():
             return []
         import re
-        kelimeler = re.findall(r'\w+', sorgu)
+
+        kelimeler = re.findall(r"\w+", sorgu)
         if not kelimeler:
             return []
         fts_sorgu = " AND ".join(kelimeler[:10])
@@ -143,14 +150,17 @@ class Katman1Hafiza:
             if task_id:
                 params.append(task_id)
             params.append(limit)
-            c.execute(f"""
+            c.execute(
+                f"""
                 SELECT k.id, k.task_id, k.tur, k.icerik, k.zaman, fts.rank as skor
                 FROM katman1_fts fts
                 JOIN katman1_kayit k ON k.id = fts.rowid
                 WHERE katman1_fts MATCH ? {kosul}
                 ORDER BY fts.rank
                 LIMIT ?
-            """, params)
+            """,
+                params,
+            )
             return [dict(r) for r in c.fetchall()]
         except sqlite3.Error:
             return []
@@ -163,7 +173,7 @@ class Katman1Hafiza:
             c = self._conn.cursor()
             c.execute(
                 "SELECT * FROM katman1_kayit WHERE task_id = ? ORDER BY zaman ASC",
-                (task_id,)
+                (task_id,),
             )
             return [dict(r) for r in c.fetchall()]
         except sqlite3.Error:
@@ -187,9 +197,10 @@ class Katman1Hafiza:
 # KATMAN 4 — KANCA (SQLite persist)
 # ════════════════════════════════════════════════════════════════════════════
 
+
 class Katman4Kanca:
     """Eylem öncesi kural denetimi — SQLite persist + in-memory cache.
-    
+
     Kurallar:
     - Aynı eylem N kez art arda → DUR
     - Yasaklı araç → BLOKE
@@ -206,7 +217,9 @@ class Katman4Kanca:
         self._db = db_path
         self._conn: Optional[sqlite3.Connection] = None
         self._cache: Dict[str, dict] = {}  # task_id -> durum
-        self._cb: Optional[Any] = CircuitBreaker() if CircuitBreaker is not None else None
+        self._cb: Optional[Any] = (
+            CircuitBreaker() if CircuitBreaker is not None else None
+        )
         if _SQLITE_AVAILABLE:
             self._baglan()
             self._tablolari_olustur()
@@ -263,12 +276,16 @@ class Katman4Kanca:
                        (task_id, son_eylem, art_arda_sayac, toplam_eylem,
                         son_ts, bloke, bloke_nedeni, guncelleme_ts)
                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
-                    (task_id, durum.get("son_eylem", ""),
-                     durum.get("art_arda_sayac", 0),
-                     durum.get("toplam_eylem", 0),
-                     durum.get("son_ts", 0),
-                     1 if durum.get("bloke", False) else 0,
-                     durum.get("bloke_nedeni", ""), time.time())
+                    (
+                        task_id,
+                        durum.get("son_eylem", ""),
+                        durum.get("art_arda_sayac", 0),
+                        durum.get("toplam_eylem", 0),
+                        durum.get("son_ts", 0),
+                        1 if durum.get("bloke", False) else 0,
+                        durum.get("bloke_nedeni", ""),
+                        time.time(),
+                    ),
                 )
                 self._conn.commit()
         except sqlite3.Error as _steering_e271:
@@ -287,11 +304,17 @@ class Katman4Kanca:
             self._db_kaydet(task_id, self._cache[task_id])
             return f"[KANCA] '{arac}' yasakli araç — task bloke."
 
-        durum = self._cache.get(task_id, {
-            "son_eylem": "", "art_arda_sayac": 0,
-            "toplam_eylem": 0, "son_ts": 0,
-            "bloke": False, "bloke_nedeni": ""
-        })
+        durum = self._cache.get(
+            task_id,
+            {
+                "son_eylem": "",
+                "art_arda_sayac": 0,
+                "toplam_eylem": 0,
+                "son_ts": 0,
+                "bloke": False,
+                "bloke_nedeni": "",
+            },
+        )
 
         if durum.get("bloke", False):
             return f"[KANCA] Task bloke: {durum.get('bloke_nedeni', '?')}"
@@ -331,9 +354,14 @@ class Katman4Kanca:
 
     def bloke_coz(self, task_id: str) -> bool:
         if task_id in self._cache:
-            self._cache[task_id] = {"bloke": False, "bloke_nedeni": "",
-                                     "son_eylem": "", "art_arda_sayac": 0,
-                                     "toplam_eylem": 0, "son_ts": 0}
+            self._cache[task_id] = {
+                "bloke": False,
+                "bloke_nedeni": "",
+                "son_eylem": "",
+                "art_arda_sayac": 0,
+                "toplam_eylem": 0,
+                "son_ts": 0,
+            }
             self._db_kaydet(task_id, self._cache[task_id])
             return True
         return False
@@ -342,7 +370,9 @@ class Katman4Kanca:
         self._cache.pop(task_id, None)
         if self._conn:
             try:
-                self._conn.execute("DELETE FROM katman4_kanca WHERE task_id = ?", (task_id,))
+                self._conn.execute(
+                    "DELETE FROM katman4_kanca WHERE task_id = ?", (task_id,)
+                )
                 self._conn.commit()
             except sqlite3.Error as _steering_e344:
                 print(f"[UYARI] steering_loop.py:345 - {_steering_e344}")
@@ -367,16 +397,21 @@ class Katman4Kanca:
         aktif = len(self._cache)
         blokeli = sum(1 for d in self._cache.values() if d.get("bloke", False))
         cb_bilgi = self._cb.durum_bilgisi() if self._cb is not None else {}
-        return {"aktif_task": aktif, "blokeli_task": blokeli, "circuit_breaker": cb_bilgi}
+        return {
+            "aktif_task": aktif,
+            "blokeli_task": blokeli,
+            "circuit_breaker": cb_bilgi,
+        }
 
 
 # ════════════════════════════════════════════════════════════════════════════
 # KATMAN 5 — GOZLEM (SQLite persist)
 # ════════════════════════════════════════════════════════════════════════════
 
+
 class Katman5Gozlem:
     """LLM çağrı takibi — SQLite + token/maliyet analizi.
-    
+
     Her LLM çağrısı: task_id, sure, token, maliyet, basarili/basarisiz.
     """
 
@@ -422,7 +457,9 @@ class Katman5Gozlem:
                     ts REAL NOT NULL
                 )
             """)
-            c.execute("CREATE INDEX IF NOT EXISTS idx_k5_task ON katman5_gozlem(task_id)")
+            c.execute(
+                "CREATE INDEX IF NOT EXISTS idx_k5_task ON katman5_gozlem(task_id)"
+            )
             c.execute("CREATE INDEX IF NOT EXISTS idx_k5_ts ON katman5_gozlem(ts)")
             self._conn.commit()
         except sqlite3.Error as _steering_e425:
@@ -432,9 +469,16 @@ class Katman5Gozlem:
         g_mal, c_mal = self.VARSAYILAN_MALIYET
         return round((girdi * g_mal + cikti * c_mal) / 1000, 6)
 
-    def kaydet(self, task_id: str, sure_sn: float, cevap: str = "",
-               basarili: bool = True, girdi_token: int = 0,
-               cikti_token: int = 0, notlar: str = ""):
+    def kaydet(
+        self,
+        task_id: str,
+        sure_sn: float,
+        cevap: str = "",
+        basarili: bool = True,
+        girdi_token: int = 0,
+        cikti_token: int = 0,
+        notlar: str = "",
+    ):
         if not self._conn:
             return
         if cikti_token == 0 and cevap:
@@ -447,8 +491,16 @@ class Katman5Gozlem:
                        (task_id, sure_sn, girdi_token, cikti_token, basarili,
                         maliyet_usd, notlar, ts)
                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
-                    (task_id, round(sure_sn, 3), girdi_token, cikti_token,
-                     1 if basarili else 0, maliyet, notlar[:200], time.time())
+                    (
+                        task_id,
+                        round(sure_sn, 3),
+                        girdi_token,
+                        cikti_token,
+                        1 if basarili else 0,
+                        maliyet,
+                        notlar[:200],
+                        time.time(),
+                    ),
                 )
                 self._conn.commit()
         except sqlite3.Error as _steering_e451:
@@ -459,10 +511,13 @@ class Katman5Gozlem:
             return {"task_id": task_id, "cagri_sayisi": 0}
         try:
             c = self._conn.cursor()
-            c.execute("SELECT COUNT(*) as n, SUM(sure_sn) as sure, "
-                       "SUM(girdi_token) as gt, SUM(cikti_token) as ct, "
-                       "SUM(maliyet_usd) as mal, SUM(basarili) as ok "
-                       "FROM katman5_gozlem WHERE task_id = ?", (task_id,))
+            c.execute(
+                "SELECT COUNT(*) as n, SUM(sure_sn) as sure, "
+                "SUM(girdi_token) as gt, SUM(cikti_token) as ct, "
+                "SUM(maliyet_usd) as mal, SUM(basarili) as ok "
+                "FROM katman5_gozlem WHERE task_id = ?",
+                (task_id,),
+            )
             r = c.fetchone()
             if not r or r["n"] == 0:
                 return {"task_id": task_id, "cagri_sayisi": 0}
@@ -484,10 +539,12 @@ class Katman5Gozlem:
             return {"toplam_cagri": 0, "aktif_task": 0}
         try:
             c = self._conn.cursor()
-            c.execute("SELECT COUNT(*) as n, SUM(sure_sn) as sure, "
-                       "SUM(maliyet_usd) as mal, SUM(basarili) as ok, "
-                       "COUNT(DISTINCT task_id) as task "
-                       "FROM katman5_gozlem")
+            c.execute(
+                "SELECT COUNT(*) as n, SUM(sure_sn) as sure, "
+                "SUM(maliyet_usd) as mal, SUM(basarili) as ok, "
+                "COUNT(DISTINCT task_id) as task "
+                "FROM katman5_gozlem"
+            )
             r = c.fetchone()
             if not r or r["n"] == 0:
                 return {"toplam_cagri": 0}
@@ -507,9 +564,7 @@ class Katman5Gozlem:
             return []
         try:
             c = self._conn.cursor()
-            c.execute(
-                "SELECT * FROM katman5_gozlem ORDER BY ts DESC LIMIT 10"
-            )
+            c.execute("SELECT * FROM katman5_gozlem ORDER BY ts DESC LIMIT 10")
             return [dict(r) for r in c.fetchall()]
         except sqlite3.Error:
             return []
@@ -528,9 +583,10 @@ class Katman5Gozlem:
 # 5 KATMAN BIRLESIK ORKESTRASYON
 # ════════════════════════════════════════════════════════════════════════════
 
+
 class SteeringLoop:
     """5 katmanı tek API altında birleştirir.
-    
+
     Kullanim:
         from steering_loop import loop
         loop.hafiza_kaydet("task_01", "adim", "...")
@@ -544,20 +600,21 @@ class SteeringLoop:
         self.gozlem = Katman5Gozlem(db_path)
 
     # ── Katman 1: Hafiza ──
-    def hafiza_kaydet(self, task_id: str, tur: str, icerik: str,
-                      metadata: Optional[dict] = None) -> bool:
+    def hafiza_kaydet(
+        self, task_id: str, tur: str, icerik: str, metadata: Optional[dict] = None
+    ) -> bool:
         return self.hafiza.kaydet(task_id, tur, icerik, metadata)
 
-    def hafiza_ara(self, sorgu: str, task_id: str = "",
-                   limit: int = 10) -> List[Dict]:
+    def hafiza_ara(self, sorgu: str, task_id: str = "", limit: int = 10) -> List[Dict]:
         return self.hafiza.ara(sorgu, task_id, limit)
 
     def task_gecmis(self, task_id: str) -> List[Dict]:
         return self.hafiza.task_gecmis(task_id)
 
     # ── Katman 4: Kanca ──
-    def kanca_denetle(self, task_id: str, arac: str,
-                      derinlik: int = 1) -> Optional[str]:
+    def kanca_denetle(
+        self, task_id: str, arac: str, derinlik: int = 1
+    ) -> Optional[str]:
         return self.kanca.denetle(task_id, arac, derinlik)
 
     def kanca_coz(self, task_id: str) -> bool:
@@ -567,12 +624,19 @@ class SteeringLoop:
         self.kanca.task_temizle(task_id)
 
     # ── Katman 5: Gozlem ──
-    def gozlem_kaydet(self, task_id: str, sure_sn: float,
-                      cevap: str = "", basarili: bool = True,
-                      girdi_token: int = 0, cikti_token: int = 0,
-                      notlar: str = ""):
-        self.gozlem.kaydet(task_id, sure_sn, cevap, basarili,
-                           girdi_token, cikti_token, notlar)
+    def gozlem_kaydet(
+        self,
+        task_id: str,
+        sure_sn: float,
+        cevap: str = "",
+        basarili: bool = True,
+        girdi_token: int = 0,
+        cikti_token: int = 0,
+        notlar: str = "",
+    ):
+        self.gozlem.kaydet(
+            task_id, sure_sn, cevap, basarili, girdi_token, cikti_token, notlar
+        )
 
     def gozlem_ozet(self, task_id: str = "") -> dict:
         if task_id:
@@ -609,9 +673,10 @@ loop = SteeringLoop()
 
 if __name__ == "__main__":
     print("=== 5 KATMAN STEERING LOOP TEST ===")
-    
+
     # Her testten once DB'yi temizle
     import shutil
+
     _db_dir = Path(__file__).parent / ".reymen_hafiza"
     if _db_dir.exists():
         shutil.rmtree(str(_db_dir), ignore_errors=True)
@@ -619,7 +684,7 @@ if __name__ == "__main__":
 
     # Yeniden baslat
     loop = SteeringLoop()
-    
+
     # Test 1: Hafiza kaydet + FTS5 ara
     loop.hafiza_kaydet("test_01", "adim", "Python decorator nasil calisir?")
     loop.hafiza_kaydet("test_01", "sonuc", "Decorator fonksiyon alir, ozellik ekler")
@@ -644,20 +709,31 @@ if __name__ == "__main__":
 
     # Test 3: Gozlem
     import time as _t
+
     _uid = str(int(_t.time()))
-    loop.gozlem_kaydet(f"test_gozlem_{_uid}", 2.5, "merhaba", basarili=True,
-                        girdi_token=50, cikti_token=100)
+    loop.gozlem_kaydet(
+        f"test_gozlem_{_uid}",
+        2.5,
+        "merhaba",
+        basarili=True,
+        girdi_token=50,
+        cikti_token=100,
+    )
     loop.gozlem_kaydet(f"test_gozlem_{_uid}", 1.2, "nasilsin", basarili=True)
     loop.gozlem_kaydet(f"test_hata_{_uid}", 0.5, "", basarili=False, notlar="TIMEOUT")
     ozet = loop.gozlem_ozet(f"test_gozlem_{_uid}")
     assert ozet["cagri_sayisi"] == 2, "2 cagri olmali"
-    print(f"  ✅ Gozlem: {ozet['cagri_sayisi']} cagri, ${ozet['tahmini_maliyet_usd']:.6f}")
+    print(
+        f"  ✅ Gozlem: {ozet['cagri_sayisi']} cagri, ${ozet['tahmini_maliyet_usd']:.6f}"
+    )
 
     # Test 4: Genel durum
     d = loop.durum()
-    print(f"  ✅ Steering durum: {d['katman1_hafiza']['toplam_kayit']} kayit, "
-          f"{d['katman5_gozlem']['toplam_cagri']} cagri, "
-          f"{d['katman4_kanca']['aktif_task']} aktif")
+    print(
+        f"  ✅ Steering durum: {d['katman1_hafiza']['toplam_kayit']} kayit, "
+        f"{d['katman5_gozlem']['toplam_cagri']} cagri, "
+        f"{d['katman4_kanca']['aktif_task']} aktif"
+    )
 
     # Temizlik
     loop.kanca_temizle("test_kanca")

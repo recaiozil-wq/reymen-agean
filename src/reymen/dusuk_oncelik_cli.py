@@ -44,6 +44,7 @@ def _cmd_status(args: argparse.Namespace) -> int:
 def _get_version() -> str:
     try:
         from . import __version__
+
         return __version__
     except Exception:
         return "unknown"
@@ -92,10 +93,9 @@ def _cmd_quality(args: argparse.Namespace) -> int:
         _print_json(self_improve.report())
     elif args.sub == "history":
         history = self_improve._singleton.history()
-        _print_json([
-            {"metric": m.as_dict(), "report": r.as_dict()}
-            for m, r in history
-        ])
+        _print_json(
+            [{"metric": m.as_dict(), "report": r.as_dict()} for m, r in history]
+        )
     elif args.sub == "improve":
         suggestions = self_improve._singleton.auto_improve()
         _print_json(suggestions)
@@ -167,6 +167,7 @@ def _cmd_kanban(args: argparse.Namespace) -> int:
 
 def _exists(path: str) -> bool:
     from pathlib import Path
+
     return Path(path).exists()
 
 

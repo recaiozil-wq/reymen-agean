@@ -25,7 +25,7 @@ def _handle_footer_command(cli, cmd_original: str) -> None:
         arg = ""
 
     cfg = load_config() or {}
-    footer_cfg = ((cfg.get("display") or {}).get("runtime_footer") or {})
+    footer_cfg = (cfg.get("display") or {}).get("runtime_footer") or {}
     current = bool(footer_cfg.get("enabled", False))
     fields = footer_cfg.get("fields") or ["model", "context_pct", "cwd"]
 
@@ -49,7 +49,8 @@ def _handle_footer_command(cli, cmd_original: str) -> None:
 
     if save_config_value("display.runtime_footer.enabled", new_state):
         state = (
-            f"{_Colors.GREEN}ON{_Colors.RESET}" if new_state
+            f"{_Colors.GREEN}ON{_Colors.RESET}"
+            if new_state
             else f"{_Colors.DIM}OFF{_Colors.RESET}"
         )
         _cprint(f"  Runtime footer: {state}")

@@ -37,7 +37,9 @@ def _env_oku(anahtar: str, varsayilan: str = "") -> str:
             if k.strip() == anahtar:
                 return v.strip().strip('"').strip("'")
     # ReYMeN env fallback
-    kiral_env = Path.home() / "AppData" / "Local" / "reymen" / "profiles" / "kiral38" / ".env"
+    kiral_env = (
+        Path.home() / "AppData" / "Local" / "reymen" / "profiles" / "kiral38" / ".env"
+    )
     if kiral_env.exists():
         for satir in kiral_env.read_text(encoding="utf-8").splitlines():
             satir = satir.strip()
@@ -93,11 +95,13 @@ def sms_gonder(
     auth_b64 = base64.b64encode(auth_str.encode()).decode()
 
     # POST data
-    post_data = urllib.parse.urlencode({
-        "From": gonderici,
-        "To": telefon,
-        "Body": mesaj,
-    }).encode()
+    post_data = urllib.parse.urlencode(
+        {
+            "From": gonderici,
+            "To": telefon,
+            "Body": mesaj,
+        }
+    ).encode()
 
     url = f"{TWILIO_API_BASE}/Accounts/{sid}/Messages.json"
 
@@ -115,7 +119,9 @@ def sms_gonder(
             result = json.loads(resp.read().decode())
             sid_resp = result.get("sid")
             status = result.get("status", "?")
-            logger.info("SMS gonderildi: %s -> %s (status=%s)", sid_resp, telefon, status)
+            logger.info(
+                "SMS gonderildi: %s -> %s (status=%s)", sid_resp, telefon, status
+            )
             return {"ok": True, "mesaj_id": sid_resp, "durum": status, "hata": None}
 
     except urllib.error.HTTPError as e:
@@ -130,7 +136,9 @@ def sms_gonder(
         return {"ok": False, "hata": hata, "mesaj_id": None}
 
 
-def bakiye_kontrol(account_sid: Optional[str] = None, auth_token: Optional[str] = None) -> dict:
+def bakiye_kontrol(
+    account_sid: Optional[str] = None, auth_token: Optional[str] = None
+) -> dict:
     """Twilio hesap bakiyesini kontrol et."""
     sid = account_sid or _env_oku("TWILIO_ACCOUNT_SID")
     token = auth_token or _env_oku("TWILIO_AUTH_TOKEN")

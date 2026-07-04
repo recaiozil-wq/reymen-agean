@@ -6,6 +6,7 @@ therefore never cleared:
   - ContextCompressor._previous_summary
   - AIAgent._user_turn_count
 """
+
 import sys
 import types
 from pathlib import Path
@@ -85,9 +86,9 @@ class TestResetSessionState:
 
         agent.reset_session_state()
 
-        assert agent._user_turn_count == 0, (
-            f"_user_turn_count must be 0 after reset; got: {agent._user_turn_count}"
-        )
+        assert (
+            agent._user_turn_count == 0
+        ), f"_user_turn_count must be 0 after reset; got: {agent._user_turn_count}"
 
     def test_both_fields_cleared_together(self):
         """Both stale fields are cleared in a single reset_session_state() call."""

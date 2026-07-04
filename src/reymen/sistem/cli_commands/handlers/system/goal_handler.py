@@ -2,6 +2,7 @@
 
 from src.reymen.sistem.cli_display import _cprint, _DIM, _RST
 import logging
+
 logger = logging.getLogger(__name__)
 
 logger = __import__("logging").getLogger(__name__)

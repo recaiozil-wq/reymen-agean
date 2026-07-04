@@ -91,9 +91,20 @@ class TestFormDoldurucu:
         assert "eposta" in FormDoldurucu._ALAN_KARESi
 
     def test_alan_karesi_tum_anahtarlar(self):
-        beklenen = {"ad", "soyad", "eposta", "telefon", "sifre",
-                    "sifre_tekrar", "adres", "il", "ilce", "posta_kodu",
-                    "tc_kimlik", "kullanici_adi"}
+        beklenen = {
+            "ad",
+            "soyad",
+            "eposta",
+            "telefon",
+            "sifre",
+            "sifre_tekrar",
+            "adres",
+            "il",
+            "ilce",
+            "posta_kodu",
+            "tc_kimlik",
+            "kullanici_adi",
+        }
         assert beklenen.issubset(set(FormDoldurucu._ALAN_KARESi.keys()))
 
     def test_stratejiler_mevcut(self):

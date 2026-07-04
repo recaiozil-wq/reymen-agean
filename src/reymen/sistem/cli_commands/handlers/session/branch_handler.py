@@ -23,6 +23,7 @@ def handle_branch_command(cli, cmd_original: str) -> None:
 
     if not cli._session_db:
         from reymen.sistem.ReYMeN_state import format_session_db_unavailable
+
         _cprint(f"  {format_session_db_unavailable()}")
         return
 
@@ -112,6 +113,7 @@ def handle_branch_command(cli, cmd_original: str) -> None:
         if hasattr(cli.agent, "_todo_store"):
             try:
                 from tools.todo_tool import TodoStore
+
                 cli.agent._todo_store = TodoStore()
             except Exception:
                 logger.warning("[fix_01_sessiz_except] Exception")

@@ -41,7 +41,6 @@ def test_make_agent_passes_resolved_provider():
         ) as mock_resolve,
         patch("run_agent.AIAgent") as mock_agent,
     ):
-
         from tui_gateway.server import _make_agent
 
         _make_agent("sid-1", "key-1")
@@ -290,7 +289,6 @@ def test_make_agent_tolerates_null_config_sections():
         ),
         patch("run_agent.AIAgent") as mock_agent,
     ):
-
         from tui_gateway.server import _make_agent
 
         _make_agent("sid-null", "key-null")
@@ -390,9 +388,7 @@ def test_make_agent_honors_per_session_model_override():
 
         from tui_gateway.server import _make_agent
 
-        _make_agent(
-            "sid-override", "key-override", model_override=override
-        )
+        _make_agent("sid-override", "key-override", model_override=override)
 
         kwargs = mock_agent.call_args.kwargs
         assert kwargs["model"] == "zai/glm-5.1"
@@ -442,8 +438,10 @@ def test_apply_model_switch_does_not_leak_process_env():
     sess_a = {"agent": _FakeAgent(), "session_key": "k-A", "model_override": None}
 
     with (
-        patch("ReYMeN_cli.model_switch.parse_model_flags",
-              return_value=("glm-5.1", None, False, False)),
+        patch(
+            "ReYMeN_cli.model_switch.parse_model_flags",
+            return_value=("glm-5.1", None, False, False),
+        ),
         patch("ReYMeN_cli.model_switch.switch_model", return_value=_FakeResult()),
         patch("tui_gateway.server._emit"),
         patch("tui_gateway.server._restart_slash_worker"),

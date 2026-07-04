@@ -52,7 +52,7 @@ class ToolGuardrails:
     def __init__(
         self,
         riskli_araclar: Optional[Set[str]] = None,
-        yasakli_parametreler: Optional[Set[str]] = None
+        yasakli_parametreler: Optional[Set[str]] = None,
     ):
         """
         ToolGuardrails baslatici.
@@ -67,11 +67,7 @@ class ToolGuardrails:
         self._engellenen_islemler: List[Dict[str, Any]] = []
         self._guvenlik_seviyesi: int = 3  # 1: dusuk, 5: yuksek
 
-    def kontrolet(
-        self,
-        arac: Any,
-        **params
-    ) -> Dict[str, Any]:
+    def kontrolet(self, arac: Any, **params) -> Dict[str, Any]:
         """
         Bir arac ve parametrelerini guvenlik kontrolunden gecirir.
 
@@ -88,23 +84,27 @@ class ToolGuardrails:
             # 1. Arac adi kontrolu
             arac_kontrol = self._arac_kontrol(arac_adi)
             if not arac_kontrol["guvenli"]:
-                self._engellenen_islemler.append({
-                    "arac": arac_adi,
-                    "parametreler": params,
-                    "sebep": arac_kontrol["sebep"],
-                    "zaman": __import__("time").time(),
-                })
+                self._engellenen_islemler.append(
+                    {
+                        "arac": arac_adi,
+                        "parametreler": params,
+                        "sebep": arac_kontrol["sebep"],
+                        "zaman": __import__("time").time(),
+                    }
+                )
                 return arac_kontrol
 
             # 2. Parametre kontrolu
             parametre_kontrol = self._parametre_kontrol(params)
             if not parametre_kontrol["guvenli"]:
-                self._engellenen_islemler.append({
-                    "arac": arac_adi,
-                    "parametreler": params,
-                    "sebep": parametre_kontrol["sebep"],
-                    "zaman": __import__("time").time(),
-                })
+                self._engellenen_islemler.append(
+                    {
+                        "arac": arac_adi,
+                        "parametreler": params,
+                        "sebep": parametre_kontrol["sebep"],
+                        "zaman": __import__("time").time(),
+                    }
+                )
                 return parametre_kontrol
 
             # 3. Seviye kontrolu
@@ -113,15 +113,24 @@ class ToolGuardrails:
                     param_str = str(param_val).lower()
                     for yasak in self._yasakli_parametreler:
                         if yasak.lower() in param_str:
-                            self._engellenen_islemler.append({
-                                "arac": arac_adi,
-                                "parametreler": params,
-                                "sebep": f"Yuksek guvenlik: {yasak} tespit edildi",
-                                "zaman": __import__("time").time(),
-                            })
-                            return {"guvenli": False, "sebep": f"Yasakli icerik: {yasak}"}
+                            self._engellenen_islemler.append(
+                                {
+                                    "arac": arac_adi,
+                                    "parametreler": params,
+                                    "sebep": f"Yuksek guvenlik: {yasak} tespit edildi",
+                                    "zaman": __import__("time").time(),
+                                }
+                            )
+                            return {
+                                "guvenli": False,
+                                "sebep": f"Yasakli icerik: {yasak}",
+                            }
 
-            return {"guvenli": True, "arac": arac_adi, "seviye": self._guvenlik_seviyesi}
+            return {
+                "guvenli": True,
+                "arac": arac_adi,
+                "seviye": self._guvenlik_seviyesi,
+            }
 
         except Exception as e:
             logger.error(f"Guvenlik kontrol hatasi: {e}")
@@ -184,13 +193,13 @@ class ToolGuardrails:
     def _shell_injection_kontrol(self, metin: str) -> bool:
         """Shell injection pattern'lerini kontrol eder."""
         injection_patterns = [
-            r'[|;&`$\n]',
-            r'\$\{',
-            r'`.*`',
-            r'\$\(.*\)',
-            r'&&',
-            r'\|\|',
-            r';\s*',
+            r"[|;&`$\n]",
+            r"\$\{",
+            r"`.*`",
+            r"\$\(.*\)",
+            r"&&",
+            r"\|\|",
+            r";\s*",
         ]
         try:
             for pattern in injection_patterns:
@@ -312,13 +321,17 @@ def run(**kwargs) -> str:
         # Yasakli parametre kontrolu
         sonuc4 = guardrails.kontrolet("test_tool", komut="rm -rf /")
 
-        return json.dumps({
-            "guvenli_arac": sonuc1,
-            "riskli_izinsiz": sonuc2,
-            "riskli_izinli": sonuc3,
-            "yasakli_parametre": sonuc4,
-            "istatistik": guardrails.istatistik(),
-        }, ensure_ascii=False, indent=2)
+        return json.dumps(
+            {
+                "guvenli_arac": sonuc1,
+                "riskli_izinsiz": sonuc2,
+                "riskli_izinli": sonuc3,
+                "yasakli_parametre": sonuc4,
+                "istatistik": guardrails.istatistik(),
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
 
     except Exception as e:
         return f"Tool guardrails hatasi: {e}"

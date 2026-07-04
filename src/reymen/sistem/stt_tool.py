@@ -91,8 +91,11 @@ def sesi_metne_cevir(
         if not tam_metin:
             return "[UYARI] Ses taninamadi (bos transkripsiyon)."
 
-        logger.info("[STT] Transkripsiyon tamam: %d karakter, dil=%s",
-                     len(tam_metin), bil信息.language if hasattr(bilgi, 'language') else dil)
+        logger.info(
+            "[STT] Transkripsiyon tamam: %d karakter, dil=%s",
+            len(tam_metin),
+            bil信息.language if hasattr(bilgi, "language") else dil,
+        )
         return tam_metin
 
     except ImportError:
@@ -106,6 +109,7 @@ def stt_durum() -> str:
     """STT sistem durumu."""
     try:
         import faster_whisper
+
         fw_version = getattr(faster_whisper, "__version__", "?")
     except ImportError:
         return "❌ faster-whisper kurulu degil"
@@ -123,6 +127,7 @@ def stt_durum() -> str:
 
 
 # ── Motor kayit ──────────────────────────────────────────────────────────────
+
 
 def motor_kaydet(motor: Any) -> None:
     """Motor'a STT araclarini kaydet."""
@@ -155,22 +160,31 @@ def motor_kaydet(motor: Any) -> None:
                 sonuc = sesi_metne_cevir(ses_yolu)
                 if sonuc.startswith("[HATA]") or sonuc.startswith("[UYARI]"):
                     return f"❌ STT test basarisiz: {sonuc}"
-                return f"✅ STT test basarili: \"{sonuc[:100]}\""
+                return f'✅ STT test basarili: "{sonuc[:100]}"'
             return "✅ STT modeli yuklu, test icin bir ses dosyasi yolu verin."
         except Exception as e:
             return f"❌ STT test basarisiz: {e}"
 
     if hasattr(motor, "_plugin_arac_kaydet"):
-        motor._plugin_arac_kaydet("STT_CEVIR", _stt_cevir,
+        motor._plugin_arac_kaydet(
+            "STT_CEVIR",
+            _stt_cevir,
             "Ses dosyasini metne cevirir (faster-whisper). "
             "Parametreler: ses_yolu (str, zorunlu) — ses dosyasi yolu; "
             "dil (str, opsiyonel) — dil kodu (varsayilan: 'tr'). "
-            "Doner: transkripsiyon metni.")
-        motor._plugin_arac_kaydet("STT_DURUM", _stt_durum,
-            "STT sistem durumunu gosterir: model, dil, yuk durumu.")
-        motor._plugin_arac_kaydet("STT_TEST", _stt_test,
+            "Doner: transkripsiyon metni.",
+        )
+        motor._plugin_arac_kaydet(
+            "STT_DURUM",
+            _stt_durum,
+            "STT sistem durumunu gosterir: model, dil, yuk durumu.",
+        )
+        motor._plugin_arac_kaydet(
+            "STT_TEST",
+            _stt_test,
             "STT sistemini test eder. "
-            "Parametre: ses_yolu (str, opsiyonel) — test ses dosyasi.")
+            "Parametre: ses_yolu (str, opsiyonel) — test ses dosyasi.",
+        )
 
         logger.info("[STT] Motor araclari kaydedildi: STT_CEVIR, STT_DURUM, STT_TEST")
 

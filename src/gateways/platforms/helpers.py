@@ -66,7 +66,7 @@ class MessageDeduplicator:
                 newest = sorted(
                     self._seen.items(),
                     key=lambda item: item[1],
-                )[-self._max_size:]
+                )[-self._max_size :]
                 self._seen = dict(newest)
         return False
 
@@ -141,7 +141,11 @@ class TextBatchAggregator:
         last_len = getattr(pending, "_last_chunk_len", 0) if pending else 0
 
         # Use longer delay when the last chunk looks like a split message
-        delay = self._split_delay if last_len >= self._split_threshold else self._batch_delay
+        delay = (
+            self._split_delay
+            if last_len >= self._split_threshold
+            else self._batch_delay
+        )
         await asyncio.sleep(delay)
 
         event = self._pending.pop(key, None)
@@ -149,7 +153,9 @@ class TextBatchAggregator:
             try:
                 await self._handler(event)
             except Exception:
-                logger.exception("[TextBatchAggregator] Error dispatching batched event for %s", key)
+                logger.exception(
+                    "[TextBatchAggregator] Error dispatching batched event for %s", key
+                )
 
         if self._pending_tasks.get(key) is current_task:
             self._pending_tasks.pop(key, None)
@@ -228,6 +234,7 @@ class ThreadParticipationTracker:
 
     def _state_path(self) -> Path:
         from reymen.cron.hermes_stubs import get_hermes_home
+
         return get_hermes_home() / f"{self._platform}_threads.json"
 
     def _load(self) -> list[str]:
@@ -246,7 +253,7 @@ class ThreadParticipationTracker:
         path = self._state_path()
         thread_list = list(self._threads)
         if len(thread_list) > self._max_tracked:
-            thread_list = thread_list[-self._max_tracked:]
+            thread_list = thread_list[-self._max_tracked :]
             self._threads = dict.fromkeys(thread_list)
         atomic_json_write(path, thread_list, indent=None)
 

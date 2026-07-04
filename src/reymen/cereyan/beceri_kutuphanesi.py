@@ -27,6 +27,7 @@ from datetime import date
 from pathlib import Path
 from typing import Optional
 import logging
+
 logger = logging.getLogger(__name__)
 
 ROOT = Path(__file__).parent.resolve()
@@ -99,8 +100,10 @@ class BeceriKutuphanesi:
             )
             mevcut["tetikleyiciler"] = yeni_tetikleyiciler
             mevcut["son_basari"] = str(date.today())
-            print(f"[BeceriKutuphanesi] Guncellendi: {anahtar} "
-                  f"(kullanim={mevcut['kullanim_sayisi']})")
+            print(
+                f"[BeceriKutuphanesi] Guncellendi: {anahtar} "
+                f"(kullanim={mevcut['kullanim_sayisi']})"
+            )
         else:
             # Sinir kontrolu
             if len(self._beceriler) >= MAKS_BECERI:

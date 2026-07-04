@@ -14,8 +14,11 @@ sys.path.insert(0, str(PROJ_ROOT))
 import pytest
 from unittest.mock import MagicMock, patch
 from planlayici import (
-    Planlayici, PLAN_TALIMATI, YENIDEN_PLAN_TALIMATI,
-    TOT_STRATEJI_TALIMATI, TOT_DEGERLENDIRME_TALIMATI,
+    Planlayici,
+    PLAN_TALIMATI,
+    YENIDEN_PLAN_TALIMATI,
+    TOT_STRATEJI_TALIMATI,
+    TOT_DEGERLENDIRME_TALIMATI,
 )
 
 
@@ -32,6 +35,7 @@ def _mock_provider(return_value: str = ""):
 # ═══════════════════════════════════════════════════════════════════════════════
 # Test 1: __init__
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class TestInit:
     """Planlayici kurulum testleri — Test 1."""
@@ -53,6 +57,7 @@ class TestInit:
 # Test 2-6: plani_uret
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class TestPlaniUret:
     """plani_uret() normal (ToTsiz) plan uretme testleri — Test 2-6."""
 
@@ -72,7 +77,9 @@ class TestPlaniUret:
         # tot_plani_uret'i monte et
         p.tot_plani_uret = MagicMock(return_value=["plan_a", "plan_b", "plan_c"])
         sonuc = p.plani_uret("bir web sitesinden veri cek ve analiz et", tot=True)
-        p.tot_plani_uret.assert_called_once_with("bir web sitesinden veri cek ve analiz et")
+        p.tot_plani_uret.assert_called_once_with(
+            "bir web sitesinden veri cek ve analiz et"
+        )
         assert sonuc == ["plan_a", "plan_b", "plan_c"]
 
     def test_plani_uret_bos_cevap(self):
@@ -96,8 +103,12 @@ class TestPlaniUret:
         prov = MagicMock()
         prov.uret.side_effect = RuntimeError("Provider erisilemez")
         p = Planlayici(prov)
-        sonuc = p.plani_uret("bir web sitesindeki tum verileri cek ve json dosyasina kaydet")
-        assert sonuc == ["bir web sitesindeki tum verileri cek ve json dosyasina kaydet"]
+        sonuc = p.plani_uret(
+            "bir web sitesindeki tum verileri cek ve json dosyasina kaydet"
+        )
+        assert sonuc == [
+            "bir web sitesindeki tum verileri cek ve json dosyasina kaydet"
+        ]
 
     def test_plani_uret_basit_sorgu_bypass(self):
         """7: Basit sorgular (3 kelime veya az) provider'i cagirmadan direkt doner."""
@@ -117,6 +128,7 @@ class TestPlaniUret:
 # ═══════════════════════════════════════════════════════════════════════════════
 # Test 8-9, 24: tot_plani_uret ve _tot_yurut
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class TestTotPlaniUret:
     """Tree-of-Thought plan uretme testleri — Test 7-8, 23."""
@@ -206,6 +218,7 @@ class TestTotPlaniUret:
 # Test 9-10: yeniden_planla
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class TestYenidenPlanla:
     """Yeniden planlama testleri — Test 9-10."""
 
@@ -262,6 +275,7 @@ class TestYenidenPlanla:
 # Test 11-13: tamamlanan_adim_isaretle
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class TestTamamlananAdimIsaretle:
     """Adim tamamlama isaretleme testleri — Test 11-13."""
 
@@ -291,6 +305,7 @@ class TestTamamlananAdimIsaretle:
 # Test 14: tamamlananlar
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class TestTamamlananlar:
     """Tamamlanan adim listesi testleri — Test 14."""
 
@@ -311,6 +326,7 @@ class TestTamamlananlar:
 # ═══════════════════════════════════════════════════════════════════════════════
 # Test 15-17: riskli_mi
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class TestRiskliMi:
     """Risk degerlendirme testleri — Test 15-17."""
@@ -346,6 +362,7 @@ class TestRiskliMi:
 # Test 18: sifirla
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class TestSifirla:
     """Sifirlama testleri — Test 18."""
 
@@ -366,6 +383,7 @@ class TestSifirla:
 # ═══════════════════════════════════════════════════════════════════════════════
 # Test 19-22: _satirlari_ayristir
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class TestSatirlariAyristir:
     """_satirlari_ayristir yardimci metot testleri — Test 19-22.
@@ -432,6 +450,7 @@ class TestSatirlariAyristir:
 # ═══════════════════════════════════════════════════════════════════════════════
 # Ek: sabit metin varlik testleri
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class TestSabitMetinler:
     """Modul sabit metinleri ve yapisi."""

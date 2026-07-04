@@ -3,6 +3,7 @@
 from src.reymen.sistem.cli_display import _cprint
 from src.reymen.sistem.cli_helpers import _assistant_copy_text
 import logging
+
 logger = logging.getLogger(__name__)
 
 

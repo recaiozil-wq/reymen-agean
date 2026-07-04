@@ -12,7 +12,14 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from tool_guardrails import ToolGuardrails
 from credential_sources import CredentialSource
 from file_safety import guvenli_mi, YASAK_DIZINLER, YASAK_UZANTILAR, YASAK_DOSYALAR
-from threat_patterns import ThreatDetector, prompt_guvenli_mi, cikti_guvenli_mi, _JAILBREAK_DESENLERI, _ZARARLI_KOMUTLAR, _HASSAS_DESENLER
+from threat_patterns import (
+    ThreatDetector,
+    prompt_guvenli_mi,
+    cikti_guvenli_mi,
+    _JAILBREAK_DESENLERI,
+    _ZARARLI_KOMUTLAR,
+    _HASSAS_DESENLER,
+)
 
 
 class TestToolGuardrails:

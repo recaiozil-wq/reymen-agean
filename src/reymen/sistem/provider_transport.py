@@ -9,6 +9,7 @@ import time
 import socket
 from datetime import datetime
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -77,7 +78,11 @@ class ProviderTransport:
 
             kayit["basari"] = False
             self._mesaj_gecmisi.append(kayit)
-            return {"basari": False, "hata": "Tum denemeler basarisiz", "provider": provider}
+            return {
+                "basari": False,
+                "hata": "Tum denemeler basarisiz",
+                "provider": provider,
+            }
 
         except ConnectionError as e:
             return {"basari": False, "hata": str(e), "provider": provider}
@@ -102,7 +107,11 @@ class ProviderTransport:
 
             kanal = self._baglantilar[provider].get("dinleyici")
             if not kanal:
-                return {"basari": False, "hata": "Dinleyici bulunamadi", "provider": provider}
+                return {
+                    "basari": False,
+                    "hata": "Dinleyici bulunamadi",
+                    "provider": provider,
+                }
 
             mesaj = kanal(timeout=self._zaman_asimi)
             kayit = {

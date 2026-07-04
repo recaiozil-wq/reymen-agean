@@ -49,7 +49,9 @@ class TestImageTooLargeClassification:
                 "maximum: 12966600 bytes > 5242880 bytes"
             ),
         )
-        result = classify_api_error(err, provider="anthropic", model="claude-sonnet-4-6")
+        result = classify_api_error(
+            err, provider="anthropic", model="claude-sonnet-4-6"
+        )
         assert result.reason == FailoverReason.image_too_large
         assert result.retryable is True
 
@@ -70,7 +72,9 @@ class TestImageTooLargeClassification:
             status_code=400,
             message="image exceeds the limit for this model",
         )
-        result = classify_api_error(err, provider="anthropic", model="claude-sonnet-4-6")
+        result = classify_api_error(
+            err, provider="anthropic", model="claude-sonnet-4-6"
+        )
         assert result.reason == FailoverReason.image_too_large
 
     def test_regular_context_overflow_unaffected(self):
@@ -79,7 +83,9 @@ class TestImageTooLargeClassification:
             status_code=400,
             message="prompt is too long: context length 300000 exceeds max of 200000",
         )
-        result = classify_api_error(err, provider="anthropic", model="claude-sonnet-4-6")
+        result = classify_api_error(
+            err, provider="anthropic", model="claude-sonnet-4-6"
+        )
         assert result.reason == FailoverReason.context_overflow
 
     def test_anthropic_many_image_dimension_limit(self):
@@ -92,7 +98,9 @@ class TestImageTooLargeClassification:
                 "requests: 2000 pixels"
             ),
         )
-        result = classify_api_error(err, provider="openrouter", model="anthropic/claude-opus-4.8")
+        result = classify_api_error(
+            err, provider="openrouter", model="anthropic/claude-opus-4.8"
+        )
         assert result.reason == FailoverReason.image_too_large
         assert result.retryable is True
         assert _image_error_max_dimension(err) == 2000
@@ -110,6 +118,7 @@ def _big_png_data_url(size_kb: int) -> str:
 
 def _install_fake_pillow(monkeypatch, size: tuple[int, int]) -> None:
     """Install the tiny subset of Pillow used by the shrink preflight."""
+
     class _FakeImage:
         def __init__(self):
             self.size = size
@@ -132,6 +141,7 @@ def _install_fake_pillow(monkeypatch, size: tuple[int, int]) -> None:
 def _make_agent():
     """Build a bare AIAgent for method-level testing, no provider setup."""
     from run_agent import AIAgent
+
     agent = object.__new__(AIAgent)
     agent.provider = "anthropic"
     agent.model = "claude-sonnet-4-6"
@@ -160,17 +170,20 @@ class TestShrinkImagePartsHelper:
         resize_hits = {"count": 0}
         monkeypatch.setattr(
             "tools.vision_tools._resize_image_for_vision",
-            lambda *a, **kw: resize_hits.__setitem__("count", resize_hits["count"] + 1) or small_url,
+            lambda *a, **kw: resize_hits.__setitem__("count", resize_hits["count"] + 1)
+            or small_url,
             raising=False,
         )
 
-        msgs = [{
-            "role": "user",
-            "content": [
-                {"type": "text", "text": "hi"},
-                {"type": "image_url", "image_url": {"url": small_url}},
-            ],
-        }]
+        msgs = [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": "hi"},
+                    {"type": "image_url", "image_url": {"url": small_url}},
+                ],
+            }
+        ]
         assert agent._try_shrink_image_parts_in_messages(msgs) is False
         assert resize_hits["count"] == 0
         # URL unchanged.
@@ -182,7 +195,9 @@ class TestShrinkImagePartsHelper:
         oversized_url = _big_png_data_url(5000)  # ~5 MB raw → ~6.7 MB b64
         shrunk = "data:image/jpeg;base64," + "A" * 1000  # small
 
-        def _fake_resize(path, mime_type=None, max_base64_bytes=None, max_dimension=None):
+        def _fake_resize(
+            path, mime_type=None, max_base64_bytes=None, max_dimension=None
+        ):
             return shrunk
 
         monkeypatch.setattr(
@@ -191,13 +206,15 @@ class TestShrinkImagePartsHelper:
             raising=False,
         )
 
-        msgs = [{
-            "role": "user",
-            "content": [
-                {"type": "text", "text": "look"},
-                {"type": "image_url", "image_url": {"url": oversized_url}},
-            ],
-        }]
+        msgs = [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": "look"},
+                    {"type": "image_url", "image_url": {"url": oversized_url}},
+                ],
+            }
+        ]
         changed = agent._try_shrink_image_parts_in_messages(msgs)
         assert changed is True
         assert msgs[0]["content"][1]["image_url"]["url"] == shrunk
@@ -210,7 +227,9 @@ class TestShrinkImagePartsHelper:
         shrunk = "data:image/jpeg;base64," + "M" * 1000
         seen = {}
 
-        def _fake_resize(path, mime_type=None, max_base64_bytes=None, max_dimension=None):
+        def _fake_resize(
+            path, mime_type=None, max_base64_bytes=None, max_dimension=None
+        ):
             seen["max_dimension"] = max_dimension
             return shrunk
 
@@ -220,12 +239,14 @@ class TestShrinkImagePartsHelper:
             raising=False,
         )
 
-        msgs = [{
-            "role": "user",
-            "content": [
-                {"type": "image_url", "image_url": {"url": oversized_for_many}},
-            ],
-        }]
+        msgs = [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "image_url", "image_url": {"url": oversized_for_many}},
+                ],
+            }
+        ]
         changed = agent._try_shrink_image_parts_in_messages(
             msgs,
             max_dimension=2000,
@@ -246,13 +267,15 @@ class TestShrinkImagePartsHelper:
             raising=False,
         )
 
-        msgs = [{
-            "role": "user",
-            "content": [
-                {"type": "input_text", "text": "look"},
-                {"type": "input_image", "image_url": oversized_url},
-            ],
-        }]
+        msgs = [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "input_text", "text": "look"},
+                    {"type": "input_image", "image_url": oversized_url},
+                ],
+            }
+        ]
         changed = agent._try_shrink_image_parts_in_messages(msgs)
         assert changed is True
         assert msgs[0]["content"][1]["image_url"] == shrunk
@@ -269,14 +292,16 @@ class TestShrinkImagePartsHelper:
             raising=False,
         )
 
-        msgs = [{
-            "role": "user",
-            "content": [
-                {"type": "text", "text": "compare"},
-                {"type": "image_url", "image_url": {"url": big1}},
-                {"type": "image_url", "image_url": {"url": big2}},
-            ],
-        }]
+        msgs = [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": "compare"},
+                    {"type": "image_url", "image_url": {"url": big1}},
+                    {"type": "image_url", "image_url": {"url": big2}},
+                ],
+            }
+        ]
         changed = agent._try_shrink_image_parts_in_messages(msgs)
         assert changed is True
         assert msgs[0]["content"][1]["image_url"]["url"] == shrunk
@@ -289,17 +314,23 @@ class TestShrinkImagePartsHelper:
         resize_hits = {"count": 0}
         monkeypatch.setattr(
             "tools.vision_tools._resize_image_for_vision",
-            lambda *a, **kw: resize_hits.__setitem__("count", resize_hits["count"] + 1) or "shrunk",
+            lambda *a, **kw: resize_hits.__setitem__("count", resize_hits["count"] + 1)
+            or "shrunk",
             raising=False,
         )
 
-        msgs = [{
-            "role": "user",
-            "content": [
-                {"type": "text", "text": "at this url"},
-                {"type": "image_url", "image_url": {"url": "https://example.com/big.png"}},
-            ],
-        }]
+        msgs = [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": "at this url"},
+                    {
+                        "type": "image_url",
+                        "image_url": {"url": "https://example.com/big.png"},
+                    },
+                ],
+            }
+        ]
         assert agent._try_shrink_image_parts_in_messages(msgs) is False
         assert resize_hits["count"] == 0
 
@@ -314,12 +345,14 @@ class TestShrinkImagePartsHelper:
             raising=False,
         )
 
-        msgs = [{
-            "role": "user",
-            "content": [
-                {"type": "image_url", "image_url": {"url": oversized_url}},
-            ],
-        }]
+        msgs = [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "image_url", "image_url": {"url": oversized_url}},
+                ],
+            }
+        ]
         assert agent._try_shrink_image_parts_in_messages(msgs) is False
         assert msgs[0]["content"][0]["image_url"]["url"] == oversized_url
 
@@ -335,12 +368,14 @@ class TestShrinkImagePartsHelper:
             raising=False,
         )
 
-        msgs = [{
-            "role": "user",
-            "content": [
-                {"type": "image_url", "image_url": {"url": oversized_url}},
-            ],
-        }]
+        msgs = [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "image_url", "image_url": {"url": oversized_url}},
+                ],
+            }
+        ]
         assert agent._try_shrink_image_parts_in_messages(msgs) is False
         # Original URL still in place, not replaced by the bigger one.
         assert msgs[0]["content"][0]["image_url"]["url"] == oversized_url
@@ -379,13 +414,15 @@ class TestShrinkImagePartsHelper:
             raising=False,
         )
 
-        msgs = [{
-            "role": "tool",
-            "content": [
-                {"type": "image_url", "image_url": {"url": shrinkable}},
-                {"type": "image_url", "image_url": {"url": unshrinkable}},
-            ],
-        }]
+        msgs = [
+            {
+                "role": "tool",
+                "content": [
+                    {"type": "image_url", "image_url": {"url": shrinkable}},
+                    {"type": "image_url", "image_url": {"url": unshrinkable}},
+                ],
+            }
+        ]
         # One part shrank, one survived oversized → must NOT retry.
         assert agent._try_shrink_image_parts_in_messages(msgs) is False
         # The shrinkable one was still re-encoded (mutated in place).

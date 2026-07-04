@@ -70,9 +70,9 @@ class TestInitSessionCwdRespect:
 
         # The cd target must be the configured path (shlex.quote only adds
         # quotes when the path contains shell-special characters)
-        assert "/my/project" in bootstrap, (
-            "bootstrap cd must target the configured cwd (/my/project)"
-        )
+        assert (
+            "/my/project" in bootstrap
+        ), "bootstrap cd must target the configured cwd (/my/project)"
 
     def test_configured_cwd_survives_init_session(self):
         """self.cwd must be the configured path after init_session completes."""
@@ -96,9 +96,9 @@ class TestInitSessionCwdRespect:
         env._run_bash = mock_run_bash
         env.init_session()
 
-        assert env.cwd == configured_cwd, (
-            f"Expected cwd={configured_cwd!r} after init_session, got {env.cwd!r}"
-        )
+        assert (
+            env.cwd == configured_cwd
+        ), f"Expected cwd={configured_cwd!r} after init_session, got {env.cwd!r}"
 
     def test_default_cwd_still_works(self):
         """When no custom cwd is configured, default /tmp behavior is preserved."""
@@ -143,6 +143,6 @@ class TestInitSessionCwdRespect:
 
         bootstrap = captured["cmd"]
         # shlex.quote wraps paths with spaces in single quotes
-        assert "'/my project/with spaces'" in bootstrap, (
-            "bootstrap cd must properly quote paths with spaces"
-        )
+        assert (
+            "'/my project/with spaces'" in bootstrap
+        ), "bootstrap cd must properly quote paths with spaces"

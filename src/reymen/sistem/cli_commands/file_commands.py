@@ -32,4 +32,5 @@ logger = logging.getLogger(__name__)
 
 class MixinCommands:
     """Dosya komutları (şu anda boş — dosya işlemleri edit_commands içinde)."""
+
     pass

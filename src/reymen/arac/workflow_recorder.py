@@ -18,6 +18,7 @@ import time
 import os
 from pathlib import Path
 import logging
+
 logger = logging.getLogger(__name__)
 
 WORKFLOW_DIR = Path(__file__).parent / "workflows"
@@ -56,11 +57,7 @@ class WorkflowRecorder:
         """
         if not self._kayit_yapiliyor:
             return
-        self._adimlar.append({
-            "tur": adim_turu,
-            "zaman": time.time(),
-            **kwargs
-        })
+        self._adimlar.append({"tur": adim_turu, "zaman": time.time(), **kwargs})
 
     def bitir(self) -> str:
         """Kaydı bitir ve JSON dosyasına yaz.
@@ -144,7 +141,9 @@ class WorkflowRecorder:
                     browser_tool.hover(adim["secici"])
                     satirlar.append(f"  [{i+1}] ✅ hover: {adim.get('secici','')[:30]}")
                 elif tur == "screenshot":
-                    browser_tool.screenshot(adim.get("url", ""), adim.get("cikti", "screenshot.png"))
+                    browser_tool.screenshot(
+                        adim.get("url", ""), adim.get("cikti", "screenshot.png")
+                    )
                     satirlar.append(f"  [{i+1}] ✅ screenshot")
                 elif tur == "back":
                     browser_tool.back()
@@ -161,7 +160,9 @@ class WorkflowRecorder:
                 satirlar.append(f"  [{i+1}] ❌ {tur}: {e}")
                 break
 
-        satirlar.append(f"[Workflow] {'✅ Tamam' if '❌' not in satirlar[-1] else '❌ Yari'}")
+        satirlar.append(
+            f"[Workflow] {'✅ Tamam' if '❌' not in satirlar[-1] else '❌ Yari'}"
+        )
         return "\n".join(satirlar)
 
     def listele(self) -> str:

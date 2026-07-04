@@ -75,8 +75,16 @@ def _fake_http_ok(payload: dict):
 
 
 class TestHappyPath:
-    def _run(self, *, args, account_token="tok_abc", portal="https://portal.nousresearch.com",
-             response=None, captured=None, existing_client_id=None):
+    def _run(
+        self,
+        *,
+        args,
+        account_token="tok_abc",
+        portal="https://portal.nousresearch.com",
+        response=None,
+        captured=None,
+        existing_client_id=None,
+    ):
         response = response or {
             "client_id": "agent:selfhost-1",
             "id": "selfhost-1",
@@ -111,13 +119,9 @@ class TestHappyPath:
             "ReYMeN_cli.auth.resolve_nous_access_token", return_value=account_token
         ), patch("ReYMeN_cli.config.is_managed", return_value=False), patch.object(
             dr, "_resolve_portal_base_url", return_value=portal
-        ), patch(
-            "ReYMeN_cli.config.get_env_value", side_effect=fake_get_env
-        ), patch(
+        ), patch("ReYMeN_cli.config.get_env_value", side_effect=fake_get_env), patch(
             "ReYMeN_cli.config.save_env_value", side_effect=fake_save
-        ), patch.object(
-            dr.urllib.request, "urlopen", side_effect=fake_urlopen
-        ):
+        ), patch.object(dr.urllib.request, "urlopen", side_effect=fake_urlopen):
             dr.cmd_dashboard_register(args)
         return saved
 
@@ -318,9 +322,7 @@ class TestCustomPortalPersistence:
             "ReYMeN_cli.auth.resolve_nous_access_token", return_value="tok"
         ), patch("ReYMeN_cli.config.is_managed", return_value=False), patch.dict(
             dr.os.environ, {}, clear=False
-        ), patch.object(
-            dr, "_resolve_portal_base_url", return_value=portal
-        ), patch(
+        ), patch.object(dr, "_resolve_portal_base_url", return_value=portal), patch(
             "ReYMeN_cli.config.get_env_value", side_effect=fake_get_env_value
         ), patch(
             "ReYMeN_cli.config.save_env_value", side_effect=fake_save
@@ -350,9 +352,7 @@ class TestCustomPortalPersistence:
             portal="https://new-preview.example.com",
             existing_portal="https://old-preview.example.com",
         )
-        assert (
-            saved["ReYMeN_DASHBOARD_PORTAL_URL"] == "https://new-preview.example.com"
-        )
+        assert saved["ReYMeN_DASHBOARD_PORTAL_URL"] == "https://new-preview.example.com"
 
     def test_explicit_custom_url_persisted_even_when_equals_default(self, capsys):
         # User explicitly asked for the production portal — honour the explicit
@@ -362,9 +362,7 @@ class TestCustomPortalPersistence:
             portal="https://portal.nousresearch.com",
             existing_portal=None,
         )
-        assert (
-            saved["ReYMeN_DASHBOARD_PORTAL_URL"] == "https://portal.nousresearch.com"
-        )
+        assert saved["ReYMeN_DASHBOARD_PORTAL_URL"] == "https://portal.nousresearch.com"
 
     def test_explicit_custom_url_equal_to_existing_is_noop(self, capsys):
         # Already persisted with the same value → no redundant write.
@@ -441,7 +439,9 @@ class TestPublicUrlPersistence:
         ), patch("ReYMeN_cli.config.is_managed", return_value=False), patch.dict(
             dr.os.environ, {}, clear=False
         ), patch.object(
-            dr, "_resolve_portal_base_url", return_value="https://portal.nousresearch.com"
+            dr,
+            "_resolve_portal_base_url",
+            return_value="https://portal.nousresearch.com",
         ), patch(
             "ReYMeN_cli.config.get_env_value", side_effect=fake_get_env_value
         ), patch(
@@ -536,9 +536,7 @@ class TestPublicUrlPersistence:
             dr.os.environ, {}, clear=False
         ), patch.object(
             dr, "_resolve_portal_base_url", return_value="https://preview.example.com"
-        ), patch(
-            "ReYMeN_cli.config.get_env_value", return_value=None
-        ), patch(
+        ), patch("ReYMeN_cli.config.get_env_value", return_value=None), patch(
             "ReYMeN_cli.config.save_env_value", side_effect=fake_save
         ), patch.object(
             dr.urllib.request, "urlopen", return_value=_fake_http_ok(response)
@@ -595,7 +593,9 @@ class TestPortalErrors:
         with patch(
             "ReYMeN_cli.auth.resolve_nous_access_token", return_value="tok"
         ), patch("ReYMeN_cli.config.is_managed", return_value=False), patch.object(
-            dr, "_resolve_portal_base_url", return_value="https://portal.nousresearch.com"
+            dr,
+            "_resolve_portal_base_url",
+            return_value="https://portal.nousresearch.com",
         ), patch.object(dr.urllib.request, "urlopen", side_effect=err):
             with pytest.raises(SystemExit) as exc:
                 dr.cmd_dashboard_register(_ns())

@@ -46,9 +46,15 @@ def coverage_calistir(quick=False, html=False, xml=False, json_rapor=False):
     """coverage run ile olcum yap (pytest-cov yerine dogrudan coverage kullan)."""
 
     if quick:
-        kaynaklar = ["motor", "beyin", "main",
-                     "conversation_loop", "session_db",
-                     "agent/", "tools/"]
+        kaynaklar = [
+            "motor",
+            "beyin",
+            "main",
+            "conversation_loop",
+            "session_db",
+            "agent/",
+            "tools/",
+        ]
     else:
         kaynaklar = ["."]
 
@@ -62,10 +68,20 @@ def coverage_calistir(quick=False, html=False, xml=False, json_rapor=False):
     else:
         test_hedefi = "test_suite.py tests/"
 
-    args = [sys.executable, "-m", "coverage", "run",
-            "--source=" + ",".join(kaynaklar),
-            "--omit=*/tests/*,*/venv/*,*/venv2/*,*/__pycache__/*,*/.git/*,*/node_modules/*",
-            "-m", "pytest", test_hedefi, "-q", "--tb=short", "-x"]
+    args = [
+        sys.executable,
+        "-m",
+        "coverage",
+        "run",
+        "--source=" + ",".join(kaynaklar),
+        "--omit=*/tests/*,*/venv/*,*/venv2/*,*/__pycache__/*,*/.git/*,*/node_modules/*",
+        "-m",
+        "pytest",
+        test_hedefi,
+        "-q",
+        "--tb=short",
+        "-x",
+    ]
 
     print(f"\n{renkli('ReYMeN Coverage Olcum', 'kalın', 'cyan')}")
     print(f"{renkli('='*55, 'koyu')}")
@@ -76,20 +92,32 @@ def coverage_calistir(quick=False, html=False, xml=False, json_rapor=False):
     basla = time.time()
 
     # 1) coverage run ile testleri calistir
-    rc = subprocess.run(args, cwd=str(ROOT), capture_output=True, text=True,
-                        timeout=600, env=env)
+    rc = subprocess.run(
+        args, cwd=str(ROOT), capture_output=True, text=True, timeout=600, env=env
+    )
     sure_test = round(time.time() - basla, 2)
 
     # 2) coverage report al
-    report_args = [sys.executable, "-m", "coverage", "report", "--show-missing",
-                   "--omit=*/tests/*,*/venv/*,*/venv2/*,*/__pycache__/*,*/.git/*,*/node_modules/*"]
+    report_args = [
+        sys.executable,
+        "-m",
+        "coverage",
+        "report",
+        "--show-missing",
+        "--omit=*/tests/*,*/venv/*,*/venv2/*,*/__pycache__/*,*/.git/*,*/node_modules/*",
+    ]
     if html:
         COVERAGE_DIR.mkdir(parents=True, exist_ok=True)
-        subprocess.run([sys.executable, "-m", "coverage", "html",
-                       f"--directory={COVERAGE_DIR}"], cwd=str(ROOT),
-                       capture_output=True, timeout=30)
+        subprocess.run(
+            [sys.executable, "-m", "coverage", "html", f"--directory={COVERAGE_DIR}"],
+            cwd=str(ROOT),
+            capture_output=True,
+            timeout=30,
+        )
 
-    report_rc = subprocess.run(report_args, cwd=str(ROOT), capture_output=True, text=True, timeout=30)
+    report_rc = subprocess.run(
+        report_args, cwd=str(ROOT), capture_output=True, text=True, timeout=30
+    )
 
     sure = round(time.time() - basla, 2)
     raw = report_rc.stdout + report_rc.stderr
@@ -104,21 +132,34 @@ def coverage_calistir(quick=False, html=False, xml=False, json_rapor=False):
         elif "%" in s:
             yuzde = re.search(r"(\d+)%", s)
             if yuzde:
-                r = "yesil" if int(yuzde.group(1)) >= 80 else ("sari" if int(yuzde.group(1)) >= 50 else "kirmizi")
+                r = (
+                    "yesil"
+                    if int(yuzde.group(1)) >= 80
+                    else ("sari" if int(yuzde.group(1)) >= 50 else "kirmizi")
+                )
                 print(f"  {renkli(s, r)}")
             else:
                 print(f"  {s}")
-        elif not (s.startswith("---") or s.startswith("==") or s.startswith("..") or "warnings" in s.lower()):
+        elif not (
+            s.startswith("---")
+            or s.startswith("==")
+            or s.startswith("..")
+            or "warnings" in s.lower()
+        ):
             pass  # Sadece coverage ciktisini goster
 
     print(f"\n{renkli('─'*55, 'koyu')}")
     print(f"  Sure: {renkli(f'{sure}s', 'sari')}")
-    print(f"  Durum: {renkli('OK', 'yesil') if rc.returncode == 0 else renkli('FAIL', 'kirmizi')}")
+    print(
+        f"  Durum: {renkli('OK', 'yesil') if rc.returncode == 0 else renkli('FAIL', 'kirmizi')}"
+    )
 
     m = re.search(r"TOTAL\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)%", raw)
     if m:
-        print(f"  Statement: {m.group(1)}, Kapsanmayan: {m.group(2)}, "
-              f"Coverage: {renkli(f'%{m.group(5)}', 'yesil' if int(m.group(5)) >= 80 else 'sari')}")
+        print(
+            f"  Statement: {m.group(1)}, Kapsanmayan: {m.group(2)}, "
+            f"Coverage: {renkli(f'%{m.group(5)}', 'yesil' if int(m.group(5)) >= 80 else 'sari')}"
+        )
 
     if html:
         html_path = COVERAGE_DIR / "index.html"
@@ -132,22 +173,26 @@ def coverage_calistir(quick=False, html=False, xml=False, json_rapor=False):
         "basari": rc.returncode == 0,
     }
     if m:
-        cov_veri.update({
-            "statement": int(m.group(1)),
-            "kacirilan": int(m.group(2)),
-            "cover_yuzde": int(m.group(5)),
-        })
+        cov_veri.update(
+            {
+                "statement": int(m.group(1)),
+                "kacirilan": int(m.group(2)),
+                "cover_yuzde": int(m.group(5)),
+            }
+        )
     # Modul bazinda
     moduller = []
     for satir in raw.split("\n"):
         mm = re.match(r"^\s*(.+?)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)%\s*$", satir)
         if mm and mm.group(1).strip() != "TOTAL":
-            moduller.append({
-                "modul": mm.group(1).strip(),
-                "statement": int(mm.group(2)),
-                "kacirilan": int(mm.group(3)),
-                "cover": int(mm.group(5)),
-            })
+            moduller.append(
+                {
+                    "modul": mm.group(1).strip(),
+                    "statement": int(mm.group(2)),
+                    "kacirilan": int(mm.group(3)),
+                    "cover": int(mm.group(5)),
+                }
+            )
     cov_veri["moduller"] = moduller
     json_yol = ROOT / "tests" / "son_coverage.json"
     with open(json_yol, "w", encoding="utf-8") as f:
@@ -160,6 +205,7 @@ def coverage_calistir(quick=False, html=False, xml=False, json_rapor=False):
 
 def main():
     import argparse
+
     parser = argparse.ArgumentParser(description="ReYMeN Coverage Olcum Sistemi")
     parser.add_argument("--quick", action="store_true", help="Hizli mod")
     parser.add_argument("--html", action="store_true", help="HTML rapor")
@@ -168,8 +214,12 @@ def main():
     parser.add_argument("--open", action="store_true", help="Browser'da ac")
     args = parser.parse_args()
 
-    rc = coverage_calistir(quick=args.quick, html=args.html or args.open,
-                           xml=args.xml, json_rapor=args.json)
+    rc = coverage_calistir(
+        quick=args.quick,
+        html=args.html or args.open,
+        xml=args.xml,
+        json_rapor=args.json,
+    )
 
     if args.open:
         html_path = COVERAGE_DIR / "index.html"

@@ -13,22 +13,32 @@ import logging
 logger = logging.getLogger(__name__)
   sonuc = terminal_calistir("python --version")
 """
+
 import sys, os, subprocess, json, shlex, time
 from pathlib import Path
 from datetime import datetime
 
+
 # ── Renkler ──────────────────────────────────────
 class C:
-    RED = "\033[91m"; YEL = "\033[93m"; GRN = "\033[92m"
-    BLU = "\033[94m"; BOLD = "\033[1m"; RESET = "\033[0m"
+    RED = "\033[91m"
+    YEL = "\033[93m"
+    GRN = "\033[92m"
+    BLU = "\033[94m"
+    BOLD = "\033[1m"
+    RESET = "\033[0m"
+
 
 # ── Hata Sınıfları ───────────────────────────────
 class TerminalHatasi(Exception):
     """Terminal çalıştırma hatası."""
+
     pass
+
 
 class TerminalTimeout(TerminalHatasi):
     """Komut timeout ile sonlandı."""
+
     pass
 
 
@@ -101,9 +111,7 @@ def terminal_calistir(
             "shell": shell,
         }
     except subprocess.TimeoutExpired:
-        raise TerminalTimeout(
-            f"Komut {timeout}s içinde bitmedi: {komut[:60]}..."
-        )
+        raise TerminalTimeout(f"Komut {timeout}s içinde bitmedi: {komut[:60]}...")
     except FileNotFoundError as e:
         raise TerminalHatasi(f"Shell bulunamadı: {e}")
     except Exception as e:
@@ -136,11 +144,13 @@ if __name__ == "__main__":
         description="ReYMeN Terminal Tool — PowerShell/Bash komut çalıştırıcı"
     )
     parser.add_argument("komut", nargs="*", help="Çalıştırılacak komut")
-    parser.add_argument("--shell", default="auto",
-                        choices=["auto", "powershell", "bash", "cmd"])
+    parser.add_argument(
+        "--shell", default="auto", choices=["auto", "powershell", "bash", "cmd"]
+    )
     parser.add_argument("--timeout", type=int, default=60)
-    parser.add_argument("--json", action="store_true",
-                        help="Çıktıyı JSON formatında göster")
+    parser.add_argument(
+        "--json", action="store_true", help="Çıktıyı JSON formatında göster"
+    )
     parser.add_argument("--workdir", default=None)
 
     args = parser.parse_args()
@@ -156,8 +166,10 @@ if __name__ == "__main__":
                 if not girilen or girilen in ("exit", "quit", "q"):
                     break
                 sonuc = terminal_calistir(
-                    girilen, shell=args.shell,
-                    timeout=args.timeout, workdir=args.workdir
+                    girilen,
+                    shell=args.shell,
+                    timeout=args.timeout,
+                    workdir=args.workdir,
                 )
                 if args.json:
                     print(json.dumps(sonuc, ensure_ascii=False, indent=2))
@@ -173,8 +185,7 @@ if __name__ == "__main__":
         try:
             komut_str = " ".join(args.komut)
             sonuc = terminal_calistir(
-                komut_str, shell=args.shell,
-                timeout=args.timeout, workdir=args.workdir
+                komut_str, shell=args.shell, timeout=args.timeout, workdir=args.workdir
             )
             if args.json:
                 print(json.dumps(sonuc, ensure_ascii=False, indent=2))

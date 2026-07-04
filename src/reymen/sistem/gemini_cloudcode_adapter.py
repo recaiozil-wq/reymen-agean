@@ -15,9 +15,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-GCP_PROJECT  = os.environ.get("GCP_PROJECT_ID", "")
+GCP_PROJECT = os.environ.get("GCP_PROJECT_ID", "")
 GCP_LOCATION = os.environ.get("GCP_LOCATION", "us-central1")
-VERTEX_BASE  = f"https://{GCP_LOCATION}-aiplatform.googleapis.com/v1"
+VERTEX_BASE = f"https://{GCP_LOCATION}-aiplatform.googleapis.com/v1"
 
 _TOKEN_CACHE: dict = {"token": "", "bitis": 0.0}
 
@@ -25,6 +25,7 @@ _TOKEN_CACHE: dict = {"token": "", "bitis": 0.0}
 def _gcp_token() -> str:
     """GCP erişim token'ı al (Application Default Credentials)."""
     import time
+
     if time.time() < _TOKEN_CACHE["bitis"] and _TOKEN_CACHE["token"]:
         return _TOKEN_CACHE["token"]
 
@@ -36,19 +37,24 @@ def _gcp_token() -> str:
                 creds = json.load(f)
             if creds.get("type") == "service_account":
                 from _gcp_sa_token import sa_token_al  # type: ignore
+
                 token = sa_token_al(creds)
                 _TOKEN_CACHE["token"] = token
                 _TOKEN_CACHE["bitis"] = time.time() + 3500
                 return token
         except ImportError as _e:
-            logger.warning("[GeminiCloudcodeAdapter] Modul yuklenemedi (L40): %s", ImportError)
+            logger.warning(
+                "[GeminiCloudcodeAdapter] Modul yuklenemedi (L40): %s", ImportError
+            )
             pass
 
     # 2. gcloud CLI ile token al
     try:
         result = subprocess.run(
             ["gcloud", "auth", "print-access-token"],
-            capture_output=True, text=True, timeout=10,
+            capture_output=True,
+            text=True,
+            timeout=10,
         )
         if result.returncode == 0:
             token = result.stdout.strip()
@@ -89,8 +95,8 @@ class GeminiCloudCodeAdapter:
         project: str = GCP_PROJECT,
         location: str = GCP_LOCATION,
     ):
-        self.model    = model
-        self.project  = project
+        self.model = model
+        self.project = project
         self.location = location
 
     def _endpoint(self) -> str:
@@ -104,10 +110,12 @@ class GeminiCloudCodeAdapter:
         """OpenAI formatını Vertex AI Gemini formatına dönüştür."""
         icerikler = []
         if sistem:
-            icerikler.append({
-                "role": "user",
-                "parts": [{"text": f"[SİSTEM]\n{sistem}\n[/SİSTEM]"}],
-            })
+            icerikler.append(
+                {
+                    "role": "user",
+                    "parts": [{"text": f"[SİSTEM]\n{sistem}\n[/SİSTEM]"}],
+                }
+            )
             icerikler.append({"role": "model", "parts": [{"text": "Anladım."}]})
 
         for msg in mesajlar:
@@ -115,8 +123,8 @@ class GeminiCloudCodeAdapter:
             icerikler.append({"role": rol, "parts": [{"text": msg["content"]}]})
 
         return {
-            "contents":          icerikler,
-            "generationConfig":  {"maxOutputTokens": 4096, "temperature": 0.7},
+            "contents": icerikler,
+            "generationConfig": {"maxOutputTokens": 4096, "temperature": 0.7},
         }
 
     def tamamla(self, sistem: str, mesajlar: list[dict], **kwargs) -> dict:
@@ -135,7 +143,7 @@ class GeminiCloudCodeAdapter:
                 data=json.dumps(govde).encode("utf-8"),
                 headers={
                     "Authorization": f"Bearer {token}",
-                    "Content-Type":  "application/json",
+                    "Content-Type": "application/json",
                 },
             )
             with urllib.request.urlopen(req, timeout=60) as r:
@@ -151,7 +159,7 @@ class GeminiCloudCodeAdapter:
         adaylar = yanit.get("candidates", [])
         if adaylar:
             parcalar = adaylar[0].get("content", {}).get("parts", [])
-            metin    = " ".join(p.get("text", "") for p in parcalar)
+            metin = " ".join(p.get("text", "") for p in parcalar)
             return metin.strip() if metin.strip() else "[Gemini Vertex]: Boş yanıt"
         return f"[Gemini Vertex]: {yanit}"
 
@@ -164,8 +172,9 @@ class GeminiCloudCodeAdapter:
         token = _gcp_token()
         if not token:
             return {"ok": False, "sebep": "GCP token alınamadı"}
-        yanit = self.tamamla("test", [{"role": "user", "content": "hi"}],
-                              maxOutputTokens=5)
+        yanit = self.tamamla(
+            "test", [{"role": "user", "content": "hi"}], maxOutputTokens=5
+        )
         if "error" in yanit:
             return {"ok": False, "sebep": yanit["error"]}
         return {"ok": True, "model": self.model, "project": self.project}

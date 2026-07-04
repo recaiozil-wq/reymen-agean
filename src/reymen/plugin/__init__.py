@@ -90,9 +90,7 @@ class PluginBase:
         """
         return messages, context
 
-    def post_llm_call(
-        self, response: dict, context: dict
-    ) -> Dict[str, Any]:
+    def post_llm_call(self, response: dict, context: dict) -> Dict[str, Any]:
         """LLM yanıtı geldikten hemen sonra çağrılır.
 
         *response* dict'i üzerinde değişiklik yapıp döndürebilirsiniz.

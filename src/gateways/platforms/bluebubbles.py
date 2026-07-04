@@ -22,6 +22,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Callable, Awaitable
 
 from pathlib import Path as _Path
+
 sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
 from src.gateways.config import Platform, PlatformConfig
@@ -42,6 +43,7 @@ logger = logging.getLogger(__name__)
 
 try:
     import httpx
+
     HTTPX_AVAILABLE = True
 except ImportError:
     HTTPX_AVAILABLE = False
@@ -116,8 +118,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
 
         if not self._password:
             logger.error(
-                "[BlueBubbles] BLUEBUBBLES_PASSWORD ortam degiskeni "
-                "ayarlanmamis."
+                "[BlueBubbles] BLUEBUBBLES_PASSWORD ortam degiskeni " "ayarlanmamis."
             )
             return False
 
@@ -135,14 +136,10 @@ class BlueBubblesAdapter(BasePlatformAdapter):
             self._mark_connected()
             return True
         except httpx.HTTPError as e:
-            logger.error(
-                "[BlueBubbles] API baglanti hatasi: %s", e
-            )
+            logger.error("[BlueBubbles] API baglanti hatasi: %s", e)
             return False
         except Exception as e:
-            logger.error(
-                "[BlueBubbles] Beklenmeyen baglanti hatasi: %s", e
-            )
+            logger.error("[BlueBubbles] Beklenmeyen baglanti hatasi: %s", e)
             return False
 
     async def disconnect(self) -> None:
@@ -207,9 +204,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
             resp.raise_for_status()
             data = resp.json()
 
-            message_id = data.get("sentMessage", {}).get("guid") or data.get(
-                "guid", ""
-            )
+            message_id = data.get("sentMessage", {}).get("guid") or data.get("guid", "")
             return SendResult(
                 success=True,
                 message_id=str(message_id) if message_id else None,
@@ -229,9 +224,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
 
         except httpx.RequestError as e:
             logger.error("[BlueBubbles] Gonderim baglanti hatasi: %s", e)
-            return SendResult(
-                success=False, error=str(e), retryable=True
-            )
+            return SendResult(success=False, error=str(e), retryable=True)
 
         except Exception as e:
             logger.error("[BlueBubbles] Gonderim hatasi: %s", e)
@@ -239,9 +232,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
 
     # ── Typing Indicator ──────────────────────────────────────────────
 
-    async def send_typing(
-        self, chat_id: str, metadata: Optional[dict] = None
-    ) -> None:
+    async def send_typing(self, chat_id: str, metadata: Optional[dict] = None) -> None:
         """
         iMessage typing indicator gonder.
 
@@ -272,15 +263,11 @@ class BlueBubblesAdapter(BasePlatformAdapter):
             resp.raise_for_status()
 
         except Exception as e:
-            logger.debug(
-                "[BlueBubbles] Typing gonderim hatasi (%s): %s", chat_id, e
-            )
+            logger.debug("[BlueBubbles] Typing gonderim hatasi (%s): %s", chat_id, e)
 
     # ── Opsiyonel: Mesaj Silme ────────────────────────────────────────
 
-    async def delete_message(
-        self, chat_id: str, message_id: str
-    ) -> bool:
+    async def delete_message(self, chat_id: str, message_id: str) -> bool:
         """
         BlueBubbles API ile mesaj sil.
 
@@ -341,7 +328,5 @@ class BlueBubblesAdapter(BasePlatformAdapter):
             return data.get("messages", [])
 
         except Exception as e:
-            logger.debug(
-                "[BlueBubbles] Mesaj getirme hatasi (%s): %s", chat_id, e
-            )
+            logger.debug("[BlueBubbles] Mesaj getirme hatasi (%s): %s", chat_id, e)
             return None

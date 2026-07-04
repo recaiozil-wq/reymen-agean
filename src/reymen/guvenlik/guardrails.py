@@ -71,10 +71,10 @@ _OZ_REFERANS_KALIPLARI: list[str] = [
 ]
 
 # Derleme — tek seferlik, modül yüklenirken
-_EMIN_OLMAYAN_RE  = re.compile("|".join(_EMIN_OLMAYAN_KALIPLAR),  re.IGNORECASE)
-_KESIN_IDDIA_RE   = re.compile("|".join(_KESIN_IDDIA_KALIPLARI),  re.IGNORECASE)
-_YANLIS_SURUM_RE  = re.compile("|".join(_YANLIS_SURUM_KALIPLARI), re.IGNORECASE)
-_OZ_REFERANS_RE   = re.compile("|".join(_OZ_REFERANS_KALIPLARI),  re.IGNORECASE)
+_EMIN_OLMAYAN_RE = re.compile("|".join(_EMIN_OLMAYAN_KALIPLAR), re.IGNORECASE)
+_KESIN_IDDIA_RE = re.compile("|".join(_KESIN_IDDIA_KALIPLARI), re.IGNORECASE)
+_YANLIS_SURUM_RE = re.compile("|".join(_YANLIS_SURUM_KALIPLARI), re.IGNORECASE)
+_OZ_REFERANS_RE = re.compile("|".join(_OZ_REFERANS_KALIPLARI), re.IGNORECASE)
 
 # Uzun yanıt eşiği (karakter)
 _UZUN_YANIT_ESIGI: int = 2500
@@ -82,18 +82,21 @@ _UZUN_YANIT_ESIGI: int = 2500
 
 # ── Uyarı veri yapısı ────────────────────────────────────────────────────────
 
+
 @dataclass(frozen=True)
 class Uyari:
     """Tek bir hallucination uyarısı."""
-    kod:   str    # Makine tarafından okunabilir tanımlayıcı (ör. "EMIN_OLMAYAN")
-    mesaj: str    # İnsan için açıklama
-    skor:  float  # Bu uyarının risk puanına katkısı
+
+    kod: str  # Makine tarafından okunabilir tanımlayıcı (ör. "EMIN_OLMAYAN")
+    mesaj: str  # İnsan için açıklama
+    skor: float  # Bu uyarının risk puanına katkısı
 
     def __str__(self) -> str:
         return f"[Guardrail:{self.kod}] {self.mesaj}"
 
 
 # ── Hallucination filtresi ───────────────────────────────────────────────────
+
 
 class HallucinationFiltresi:
     """LLM yanıtında hallucination işaretlerini tespit eder.
@@ -111,7 +114,7 @@ class HallucinationFiltresi:
             raise ValueError(f"esik_skor pozitif olmalı, alınan: {esik_skor}")
         self.esik_skor = esik_skor
         self._toplam_kontrol: int = 0
-        self._uyarili_yanit:  int = 0
+        self._uyarili_yanit: int = 0
 
     # ── Ana API ─────────────────────────────────────────────────────────────
 
@@ -145,7 +148,8 @@ class HallucinationFiltresi:
             self._uyarili_yanit += 1
             logger.debug(
                 "[HallucinationFiltresi] Riskli yanıt tespit edildi (skor=%.2f, eşik=%.2f).",
-                toplam_skor, self.esik_skor,
+                toplam_skor,
+                self.esik_skor,
             )
 
         return yanit, uyarilar
@@ -154,85 +158,99 @@ class HallucinationFiltresi:
         """Birikimli kontrol istatistiklerini döndürür."""
         return {
             "toplam_kontrol": self._toplam_kontrol,
-            "uyarili":        self._uyarili_yanit,
-            "oran": round(
-                self._uyarili_yanit / self._toplam_kontrol, 3
-            ) if self._toplam_kontrol else 0.0,
+            "uyarili": self._uyarili_yanit,
+            "oran": round(self._uyarili_yanit / self._toplam_kontrol, 3)
+            if self._toplam_kontrol
+            else 0.0,
         }
 
     # ── Kontrol yöntemleri ──────────────────────────────────────────────────
 
     def _emin_olmayan_kontrol(self, yanit: str) -> list[Uyari]:
         if _EMIN_OLMAYAN_RE.search(yanit):
-            return [Uyari(
-                kod="EMIN_OLMAYAN",
-                mesaj="Yanıt belirsiz/emin olmayan dil içeriyor — doğrulama önerilir.",
-                skor=0.5,
-            )]
+            return [
+                Uyari(
+                    kod="EMIN_OLMAYAN",
+                    mesaj="Yanıt belirsiz/emin olmayan dil içeriyor — doğrulama önerilir.",
+                    skor=0.5,
+                )
+            ]
         return []
 
     def _kesin_iddia_kontrol(self, yanit: str) -> list[Uyari]:
         if _KESIN_IDDIA_RE.search(yanit):
-            return [Uyari(
-                kod="KESIN_IDDIA",
-                mesaj="Yanıt doğrulanamaz kesin iddia içeriyor.",
-                skor=1.0,
-            )]
+            return [
+                Uyari(
+                    kod="KESIN_IDDIA",
+                    mesaj="Yanıt doğrulanamaz kesin iddia içeriyor.",
+                    skor=1.0,
+                )
+            ]
         return []
 
     def _yanlis_surum_kontrol(self, yanit: str) -> list[Uyari]:
         m = _YANLIS_SURUM_RE.search(yanit)
         if m:
-            return [Uyari(
-                kod="YANLIS_SURUM",
-                mesaj=f"Eski/yanlış sürüm referansı: '{m.group()}'.",
-                skor=1.5,
-            )]
+            return [
+                Uyari(
+                    kod="YANLIS_SURUM",
+                    mesaj=f"Eski/yanlış sürüm referansı: '{m.group()}'.",
+                    skor=1.5,
+                )
+            ]
         return []
 
     def _oz_referans_kontrol(self, yanit: str) -> list[Uyari]:
         if _OZ_REFERANS_RE.search(yanit):
-            return [Uyari(
-                kod="OZ_REFERANS",
-                mesaj="LLM internet/disk erişimi iddiası — muhtemel halüsinasyon.",
-                skor=2.0,
-            )]
+            return [
+                Uyari(
+                    kod="OZ_REFERANS",
+                    mesaj="LLM internet/disk erişimi iddiası — muhtemel halüsinasyon.",
+                    skor=2.0,
+                )
+            ]
         return []
 
     def _uzun_yanit_kontrol(self, yanit: str) -> list[Uyari]:
         if len(yanit) > _UZUN_YANIT_ESIGI:
-            return [Uyari(
-                kod="UZUN_YANIT",
-                mesaj=f"Yanıt uzun ({len(yanit)} karakter) — baş/son kontrolü önerilir.",
-                skor=0.3,
-            )]
+            return [
+                Uyari(
+                    kod="UZUN_YANIT",
+                    mesaj=f"Yanıt uzun ({len(yanit)} karakter) — baş/son kontrolü önerilir.",
+                    skor=0.3,
+                )
+            ]
         return []
 
     def _iliski_kontrol(self, yanit: str, hedef: str) -> list[Uyari]:
         """Hedef kelimeleriyle yanıt arasındaki örtüşmeyi basitçe kontrol eder."""
         if len(hedef) <= 10 or len(yanit) <= 50:
             return []
-        hedef_kelimeleri  = set(hedef.lower().split()[:5])
-        yanit_kelimeleri  = set(yanit.lower().split())
+        hedef_kelimeleri = set(hedef.lower().split()[:5])
+        yanit_kelimeleri = set(yanit.lower().split())
         if hedef_kelimeleri and not hedef_kelimeleri & yanit_kelimeleri:
-            return [Uyari(
-                kod="ILISKISIZ",
-                mesaj="Yanıt hedefe çok az atıf içeriyor.",
-                skor=0.5,
-            )]
+            return [
+                Uyari(
+                    kod="ILISKISIZ",
+                    mesaj="Yanıt hedefe çok az atıf içeriyor.",
+                    skor=0.5,
+                )
+            ]
         return []
 
 
 # ── HITL Sıkılaştırma ───────────────────────────────────────────────────────
 
 # Varsayılan ek riskli araçlar
-_EK_RISKLI_ARACLAR: frozenset[str] = frozenset({
-    "DOSYA_YAZ",        # Disk yazma
-    "TARAYICI_AC",      # Tarayıcı açma
-    "WEB_ARA",          # İnternet erişimi
-    "TELEGRAM_GONDER",  # Dış mesaj gönderme
-    "GORUNTU_ANALIZ",   # Görüntü → LLaVA
-})
+_EK_RISKLI_ARACLAR: frozenset[str] = frozenset(
+    {
+        "DOSYA_YAZ",  # Disk yazma
+        "TARAYICI_AC",  # Tarayıcı açma
+        "WEB_ARA",  # İnternet erişimi
+        "TELEGRAM_GONDER",  # Dış mesaj gönderme
+        "GORUNTU_ANALIZ",  # Görüntü → LLaVA
+    }
+)
 
 
 class HITLSikistirici:
@@ -260,7 +278,9 @@ class HITLSikistirici:
     def sikilas(self) -> None:
         """RISKLI kümesini genişlet ve HITL eşiğini yükselt."""
         if self._aktif:
-            logger.debug("[HITL] Zaten sıkılaştırılmış, tekrar çağrı görmezden gelindi.")
+            logger.debug(
+                "[HITL] Zaten sıkılaştırılmış, tekrar çağrı görmezden gelindi."
+            )
             return
         if not self._motor:
             logger.warning("[HITL] Motor tanımlı değil; sıkılaştırma atlandı.")
@@ -274,9 +294,11 @@ class HITLSikistirici:
             self._motor.ekstra_riskli = set()  # type: ignore[union-attr]
 
         self._orijinal_riskli = set(self._motor.ekstra_riskli)  # type: ignore[union-attr]
-        self._motor.ekstra_riskli |= self._ek_araclar             # type: ignore[union-attr]
+        self._motor.ekstra_riskli |= self._ek_araclar  # type: ignore[union-attr]
         self._aktif = True
-        logger.info("[HITL] Sıkılaştırıldı: %d araç onaya eklendi.", len(self._ek_araclar))
+        logger.info(
+            "[HITL] Sıkılaştırıldı: %d araç onaya eklendi.", len(self._ek_araclar)
+        )
 
     def geri_al(self) -> None:
         """RISKLI kümesini eski haline getir."""
@@ -298,6 +320,7 @@ class HITLSikistirici:
 
 
 # ── Motor HITL yaması ─────────────────────────────────────────────────────────
+
 
 def motor_hitl_yamasi_uygula(motor: object) -> None:
     """motor.calistir() metoduna ekstra_riskli desteği ekler (monkey-patch).
@@ -333,6 +356,7 @@ def motor_hitl_yamasi_uygula(motor: object) -> None:
 
 if __name__ == "__main__":
     import logging as _logging
+
     _logging.basicConfig(level=_logging.DEBUG, format="%(levelname)s %(message)s")
 
     print("=== Hallucination Filtresi Testi ===")

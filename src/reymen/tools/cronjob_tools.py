@@ -1,4 +1,5 @@
 """ReYMeN tools.cronjob_tools shim — Hermes cronjob araçlarını yönlendirir."""
+
 from __future__ import annotations
 
 import logging
@@ -20,8 +21,10 @@ def _scan_cron_skill_assembled(skills: list) -> list:
 def cronjob(*args, **kwargs) -> str:
     """Hermes cronjob — cronjob tool'una yönlendirir."""
     import json
+
     try:
         from reymen.cron.cronjob_tool import cronjob as _cronjob
+
         return _cronjob(*args, **kwargs)
     except Exception as e:
         return json.dumps({"success": False, "error": f"Cronjob unavailable: {e}"})

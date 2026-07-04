@@ -41,6 +41,7 @@ PROJE_KOKU = Path(__file__).resolve().parent.parent.parent
 #  Platform Adapter (ABC)
 # ═══════════════════════════════════════════════════════════════════════
 
+
 class GatewayAdapter(ABC):
     """Tum platform gateway'leri icin soyut temel sinif.
 
@@ -70,8 +71,12 @@ class GatewayAdapter(ABC):
         ...
 
     @abstractmethod
-    async def mesaj_gonder(self, mesaj: str, hedef: Optional[str] = None,
-                            meta: Optional[dict[str, Any]] = None) -> dict[str, Any]:
+    async def mesaj_gonder(
+        self,
+        mesaj: str,
+        hedef: Optional[str] = None,
+        meta: Optional[dict[str, Any]] = None,
+    ) -> dict[str, Any]:
         """Platforma mesaj gonder.
 
         Args:
@@ -129,13 +134,16 @@ class GatewayAdapter(ABC):
 #  TelegramAdapter (mevcut bot.py'yi sarmalar)
 # ═══════════════════════════════════════════════════════════════════════
 
+
 class TelegramAdapter(GatewayAdapter):
     """Telegram platform adapteri — mevcut telegram_bot/bot.py'yi sarmalar.
 
     Bot.py'yi ayri bir subprocess olarak baslatir ve durumunu takip eder.
     """
 
-    def __init__(self, config: Optional[dict[str, Any]] = None, bot_yolu: Optional[str] = None):
+    def __init__(
+        self, config: Optional[dict[str, Any]] = None, bot_yolu: Optional[str] = None
+    ):
         super().__init__("telegram", config)
         self._bot_yolu = bot_yolu or str(PROJE_KOKU / "telegram_bot" / "bot.py")
         self._process: Optional[subprocess.Popen] = None
@@ -193,8 +201,12 @@ class TelegramAdapter(GatewayAdapter):
             logger.error("[TelegramAdapter] Durdurma hatasi: %s", e)
             return False
 
-    async def mesaj_gonder(self, mesaj: str, hedef: Optional[str] = None,
-                            meta: Optional[dict[str, Any]] = None) -> dict[str, Any]:
+    async def mesaj_gonder(
+        self,
+        mesaj: str,
+        hedef: Optional[str] = None,
+        meta: Optional[dict[str, Any]] = None,
+    ) -> dict[str, Any]:
         """Telegram'a mesaj gonder — durum dosyasina yazarak.
 
         Not: Bot.py telegram API'sine bagli oldugu icin dogrudan gonderim
@@ -270,15 +282,20 @@ class TelegramAdapter(GatewayAdapter):
 #  DiscordAdapter (mevcut discord_bot.py'yi sarmalar)
 # ═══════════════════════════════════════════════════════════════════════
 
+
 class DiscordAdapter(GatewayAdapter):
     """Discord platform adapteri — mevcut discord_bot.py'yi sarmalar.
 
     Discord bot'unu ayri bir subprocess olarak baslatir.
     """
 
-    def __init__(self, config: Optional[dict[str, Any]] = None, bot_yolu: Optional[str] = None):
+    def __init__(
+        self, config: Optional[dict[str, Any]] = None, bot_yolu: Optional[str] = None
+    ):
         super().__init__("discord", config)
-        self._bot_yolu = bot_yolu or str(PROJE_KOKU / "reymen" / "ag" / "discord_bot.py")
+        self._bot_yolu = bot_yolu or str(
+            PROJE_KOKU / "reymen" / "ag" / "discord_bot.py"
+        )
         self._process: Optional[subprocess.Popen] = None
         self._durum_dosyasi = PROJE_KOKU / ".ReYMeN" / "discord_status.json"
 
@@ -333,8 +350,12 @@ class DiscordAdapter(GatewayAdapter):
             logger.error("[DiscordAdapter] Durdurma hatasi: %s", e)
             return False
 
-    async def mesaj_gonder(self, mesaj: str, hedef: Optional[str] = None,
-                            meta: Optional[dict[str, Any]] = None) -> dict[str, Any]:
+    async def mesaj_gonder(
+        self,
+        mesaj: str,
+        hedef: Optional[str] = None,
+        meta: Optional[dict[str, Any]] = None,
+    ) -> dict[str, Any]:
         """Discord'a mesaj gonder — durum dosyasina yazarak."""
         try:
             if not self._calisiyor:
@@ -404,6 +425,7 @@ class DiscordAdapter(GatewayAdapter):
 #  CLIAdapter (stdin/stdout)
 # ═══════════════════════════════════════════════════════════════════════
 
+
 class CLIAdapter(GatewayAdapter):
     """CLI platform adapteri — stdin/stdout uzerinden iletisim.
 
@@ -448,8 +470,12 @@ class CLIAdapter(GatewayAdapter):
             self._son_hata = str(e)
             return False
 
-    async def mesaj_gonder(self, mesaj: str, hedef: Optional[str] = None,
-                            meta: Optional[dict[str, Any]] = None) -> dict[str, Any]:
+    async def mesaj_gonder(
+        self,
+        mesaj: str,
+        hedef: Optional[str] = None,
+        meta: Optional[dict[str, Any]] = None,
+    ) -> dict[str, Any]:
         """CLI'ya mesaj bas (stdout)."""
         try:
             timestamp = time.strftime("%H:%M:%S")
@@ -507,6 +533,7 @@ class CLIAdapter(GatewayAdapter):
 #  Gateway Yoneticisi (multi-platform)
 # ═══════════════════════════════════════════════════════════════════════
 
+
 class GatewayYoneticisi:
     """Coklu platform gateway yoneticisi — tum adapter'lari ayni anda yonetir.
 
@@ -554,7 +581,9 @@ class GatewayYoneticisi:
                     )
 
         self._adapters[adapter.ad] = adapter
-        logger.info("[Gateway] '%s' kaydedildi (%s).", adapter.ad, type(adapter).__name__)
+        logger.info(
+            "[Gateway] '%s' kaydedildi (%s).", adapter.ad, type(adapter).__name__
+        )
         return True
 
     def kaldir(self, ad: str) -> Optional[GatewayAdapter]:
@@ -643,9 +672,13 @@ class GatewayYoneticisi:
 
     # ── Mesaj Gonderimi ─────────────────────────────────────────────
 
-    async def mesaj_gonder(self, platform: str, mesaj: str,
-                            hedef: Optional[str] = None,
-                            meta: Optional[dict[str, Any]] = None) -> dict[str, Any]:
+    async def mesaj_gonder(
+        self,
+        platform: str,
+        mesaj: str,
+        hedef: Optional[str] = None,
+        meta: Optional[dict[str, Any]] = None,
+    ) -> dict[str, Any]:
         """Belirli bir platforma mesaj gonder.
 
         Args:
@@ -665,10 +698,13 @@ class GatewayYoneticisi:
 
         return await adapter.mesaj_gonder(mesaj, hedef=hedef, meta=meta)
 
-    async def broadcast(self, mesaj: str,
-                         hedef: Optional[str] = None,
-                         meta: Optional[dict[str, Any]] = None,
-                         platformlar: Optional[list[str]] = None) -> dict[str, Any]:
+    async def broadcast(
+        self,
+        mesaj: str,
+        hedef: Optional[str] = None,
+        meta: Optional[dict[str, Any]] = None,
+        platformlar: Optional[list[str]] = None,
+    ) -> dict[str, Any]:
         """Belirtilen (veya tum) platformlara mesaj gonder.
 
         Args:
@@ -753,6 +789,7 @@ def get_gateway_yoneticisi() -> GatewayYoneticisi:
 #  Motor Tool'lari
 # ═══════════════════════════════════════════════════════════════════════
 
+
 def _gateway_liste() -> str:
     """Motor tool: Kayitli gateway'leri listele.
 
@@ -784,7 +821,9 @@ def _gateway_baslat(platform: str = "") -> str:
         JSON formatinda sonuc
     """
     if not platform:
-        sonuclar = {"hata": "platform parametresi zorunlu. Secenekler: telegram, discord, cli"}
+        sonuclar = {
+            "hata": "platform parametresi zorunlu. Secenekler: telegram, discord, cli"
+        }
         return json.dumps(sonuclar, ensure_ascii=False)
 
     yonetici = get_gateway_yoneticisi()
@@ -797,13 +836,32 @@ def _gateway_baslat(platform: str = "") -> str:
             yonetici.kaydet(DiscordAdapter())
         elif platform == "cli":
             yonetici.kaydet(CLIAdapter())
-            return json.dumps({"basarili": True, "platform": "cli", "mesaj": "CLI zaten aktif"}, ensure_ascii=False)
+            return json.dumps(
+                {"basarili": True, "platform": "cli", "mesaj": "CLI zaten aktif"},
+                ensure_ascii=False,
+            )
         elif platform == "sms":
-            return json.dumps({"basarili": True, "platform": "sms", "mesaj": "SMS gateway baslatildi"}, ensure_ascii=False)
+            return json.dumps(
+                {
+                    "basarili": True,
+                    "platform": "sms",
+                    "mesaj": "SMS gateway baslatildi",
+                },
+                ensure_ascii=False,
+            )
         elif platform == "webhook":
-            return json.dumps({"basarili": True, "platform": "webhook", "mesaj": "Webhook gateway baslatildi"}, ensure_ascii=False)
+            return json.dumps(
+                {
+                    "basarili": True,
+                    "platform": "webhook",
+                    "mesaj": "Webhook gateway baslatildi",
+                },
+                ensure_ascii=False,
+            )
         else:
-            return json.dumps({"hata": f"Bilinmeyen platform: {platform}"}, ensure_ascii=False)
+            return json.dumps(
+                {"hata": f"Bilinmeyen platform: {platform}"}, ensure_ascii=False
+            )
 
     # Baslat
     try:
@@ -824,7 +882,9 @@ def _gateway_baslat(platform: str = "") -> str:
         sonuc = False
         logger.error("[Gateway] Baslatma hatasi: %s", e)
 
-    return json.dumps({"basarili": sonuc, "platform": platform}, indent=2, ensure_ascii=False)
+    return json.dumps(
+        {"basarili": sonuc, "platform": platform}, indent=2, ensure_ascii=False
+    )
 
 
 def _gateway_durdur(platform: str = "") -> str:
@@ -863,10 +923,13 @@ def _gateway_durdur(platform: str = "") -> str:
         sonuc = False
         logger.error("[Gateway] Durdurma hatasi: %s", e)
 
-    return json.dumps({"basarili": sonuc, "platform": platform}, indent=2, ensure_ascii=False)
+    return json.dumps(
+        {"basarili": sonuc, "platform": platform}, indent=2, ensure_ascii=False
+    )
 
 
 # ── Motor Kayit ─────────────────────────────────────────────────────
+
 
 def motor_kaydet(motor) -> None:
     """Motor'a gateway araçlarını kaydeder."""
@@ -889,4 +952,6 @@ def motor_kaydet(motor) -> None:
         "Bir gateway'i durdur. "
         "Parametre: platform (str, zorunlu) — 'telegram', 'discord', 'cli'.",
     )
-    logger.info("[Gateway] Motor araclari kaydedildi: GATEWAY_LISTE, GATEWAY_BASLAT, GATEWAY_DURDUR")
+    logger.info(
+        "[Gateway] Motor araclari kaydedildi: GATEWAY_LISTE, GATEWAY_BASLAT, GATEWAY_DURDUR"
+    )

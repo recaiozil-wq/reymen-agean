@@ -46,7 +46,9 @@ class TestMSGraphWebhookConfig:
         assert Platform.MSGRAPH_WEBHOOK in config.platforms
         assert Platform.MSGRAPH_WEBHOOK in config.get_connected_platforms()
 
-    def test_env_overrides_apply_to_existing_msgraph_webhook_platform(self, monkeypatch):
+    def test_env_overrides_apply_to_existing_msgraph_webhook_platform(
+        self, monkeypatch
+    ):
         config = GatewayConfig(
             platforms={Platform.MSGRAPH_WEBHOOK: PlatformConfig(enabled=True, extra={})}
         )
@@ -242,7 +244,9 @@ class TestMSGraphNotifications:
         }
         await adapter._handle_notification(_FakeRequest(json_payload=payload))
 
-        assert calls, "hmac.compare_digest was never called; clientState check is not timing-safe"
+        assert (
+            calls
+        ), "hmac.compare_digest was never called; clientState check is not timing-safe"
         provided, expected = calls[0]
         assert provided == "expected-client-state"
         assert expected == "expected-client-state"
@@ -381,7 +385,9 @@ class TestMSGraphNotifications:
                     }
                 ]
             }
-            return await adapter._handle_notification(_FakeRequest(json_payload=payload))
+            return await adapter._handle_notification(
+                _FakeRequest(json_payload=payload)
+            )
 
         first = await _post("notif-a")
         second = await _post("notif-b")

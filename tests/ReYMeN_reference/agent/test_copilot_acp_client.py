@@ -47,13 +47,15 @@ class CopilotACPClientSafetyTests(unittest.TestCase):
             cwd="/tmp",
         )
 
-        outcome = (((response.get("result") or {}).get("outcome") or {}).get("outcome"))
+        outcome = ((response.get("result") or {}).get("outcome") or {}).get("outcome")
         self.assertEqual(outcome, "cancelled")
 
     def test_read_text_file_blocks_internal_ReYMeN_hub_files(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             home = Path(tmpdir) / "home"
-            blocked = home / ".ReYMeN" / "skills" / ".hub" / "index-cache" / "entry.json"
+            blocked = (
+                home / ".ReYMeN" / "skills" / ".hub" / "index-cache" / "entry.json"
+            )
             blocked.parent.mkdir(parents=True, exist_ok=True)
             blocked.write_text('{"token":"sk-test-secret-1234567890"}')
 
@@ -94,7 +96,7 @@ class CopilotACPClientSafetyTests(unittest.TestCase):
                     cwd=str(root),
                 )
 
-        content = ((response.get("result") or {}).get("content") or "")
+        content = (response.get("result") or {}).get("content") or ""
         self.assertNotIn("abc123def456", content)
         self.assertIn("OPENAI_API_KEY=", content)
 
@@ -104,7 +106,11 @@ class CopilotACPClientSafetyTests(unittest.TestCase):
             target = home / ".ssh" / "id_rsa"
             target.parent.mkdir(parents=True, exist_ok=True)
 
-            with patch("agent.copilot_acp_client.is_write_denied", return_value=True, create=True):
+            with patch(
+                "agent.copilot_acp_client.is_write_denied",
+                return_value=True,
+                create=True,
+            ):
                 response = self._dispatch(
                     {
                         "jsonrpc": "2.0",
@@ -128,7 +134,9 @@ class CopilotACPClientSafetyTests(unittest.TestCase):
             safe_root.mkdir()
             outside = root / "outside.txt"
 
-            with patch.dict(os.environ, {"ReYMeN_WRITE_SAFE_ROOT": str(safe_root)}, clear=False):
+            with patch.dict(
+                os.environ, {"ReYMeN_WRITE_SAFE_ROOT": str(safe_root)}, clear=False
+            ):
                 response = self._dispatch(
                     {
                         "jsonrpc": "2.0",
@@ -171,10 +179,13 @@ def _fake_popen_capture(captured):
         captured["cmd"] = cmd
         captured["kwargs"] = kwargs
         raise FileNotFoundError("copilot not found")
+
     return _fake
 
 
-def test_run_prompt_preserves_real_home_when_profile_home_available(monkeypatch, tmp_path):
+def test_run_prompt_preserves_real_home_when_profile_home_available(
+    monkeypatch, tmp_path
+):
     ReYMeN_home = tmp_path / "ReYMeN"
     (ReYMeN_home / "home").mkdir(parents=True)
     real_home = tmp_path / "real-home"
@@ -186,7 +197,10 @@ def test_run_prompt_preserves_real_home_when_profile_home_available(monkeypatch,
     captured = {}
     client = _make_home_client(tmp_path)
 
-    with _patch("agent.copilot_acp_client.subprocess.Popen", side_effect=_fake_popen_capture(captured)):
+    with _patch(
+        "agent.copilot_acp_client.subprocess.Popen",
+        side_effect=_fake_popen_capture(captured),
+    ):
         with pytest.raises(RuntimeError, match="Could not start Copilot ACP command"):
             client._run_prompt("hello", timeout_seconds=1)
 
@@ -201,7 +215,10 @@ def test_run_prompt_passes_home_when_parent_env_is_clean(monkeypatch, tmp_path):
     captured = {}
     client = _make_home_client(tmp_path)
 
-    with _patch("agent.copilot_acp_client.subprocess.Popen", side_effect=_fake_popen_capture(captured)):
+    with _patch(
+        "agent.copilot_acp_client.subprocess.Popen",
+        side_effect=_fake_popen_capture(captured),
+    ):
         with pytest.raises(RuntimeError, match="Could not start Copilot ACP command"):
             client._run_prompt("hello", timeout_seconds=1)
 

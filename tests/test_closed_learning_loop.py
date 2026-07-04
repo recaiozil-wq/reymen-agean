@@ -21,6 +21,7 @@ from closed_learning_loop import (
 
 # ── Fixture ─────────────────────────────────────────────────────────────
 
+
 @pytest.fixture
 def temp_loop(tmp_path):
     """Gecici dizinde ClosedLearningLoop ornegi."""
@@ -38,21 +39,25 @@ def temp_loop(tmp_path):
 def indexed_loop(temp_loop):
     """Icinde birkac beceri olan loop."""
     temp_loop.beceri_kristallestir(
-        "web_scraping", "Web sayfasi icerik cekme",
-        "1. requests.get(url)\n2. BeautifulSoup parse\n3. Veri ayristir"
+        "web_scraping",
+        "Web sayfasi icerik cekme",
+        "1. requests.get(url)\n2. BeautifulSoup parse\n3. Veri ayristir",
     )
     temp_loop.beceri_kristallestir(
-        "python_veri_analizi", "Python ile veri analizi",
-        "1. pandas.read_csv()\n2. DataFrame.isnull()\n3. matplotlib.pyplot.plot()"
+        "python_veri_analizi",
+        "Python ile veri analizi",
+        "1. pandas.read_csv()\n2. DataFrame.isnull()\n3. matplotlib.pyplot.plot()",
     )
     temp_loop.beceri_kristallestir(
-        "veritabani_sorgulama", "SQL ile veritabani sorgulama",
-        "1. SELECT * FROM tablo\n2. WHERE kosulu\n3. JOIN islemi"
+        "veritabani_sorgulama",
+        "SQL ile veritabani sorgulama",
+        "1. SELECT * FROM tablo\n2. WHERE kosulu\n3. JOIN islemi",
     )
     return temp_loop
 
 
 # ── Test 1: Modul yardimci fonksiyonlar ─────────────────────────────────
+
 
 class TestYardimcilar:
     def test_guvenli_ad_bos(self):
@@ -122,6 +127,7 @@ class TestYardimcilar:
 
 # ── Test 2: Baslangic ───────────────────────────────────────────────────
 
+
 class TestBaslangic:
     def test_varsayilan_ayarlar(self):
         """Varsayilan parametrelerle baslangic calismali."""
@@ -160,6 +166,7 @@ class TestBaslangic:
 
 # ── Test 3: beceri_kristallestir ────────────────────────────────────────
 
+
 class TestBeceriKristallestir:
     def test_yeni_beceri_olustur(self, temp_loop):
         """Yeni beceri basariyla olusturulmali."""
@@ -173,9 +180,7 @@ class TestBeceriKristallestir:
     def test_beceri_merge(self, indexed_loop):
         """Ayni isimde beceri merge edilmeli (sayi artmamali)."""
         onceki = indexed_loop.toplam_beceri_sayisi()
-        indexed_loop.beceri_kristallestir(
-            "web scraping", "Varyasyon", "Yeni adim"
-        )
+        indexed_loop.beceri_kristallestir("web scraping", "Varyasyon", "Yeni adim")
         assert indexed_loop.toplam_beceri_sayisi() == onceki  # merge, yeni degil
 
     def test_beceri_merge_dosya_yolu_ayni(self, indexed_loop):
@@ -191,19 +196,17 @@ class TestBeceriKristallestir:
     def test_beceri_metadata_guncellenir(self, indexed_loop):
         """Merge sonrasi usage_count artmali."""
         # Ilk olusturma
-        indexed_loop.beceri_kristallestir(
-            "benzersiz_beceri_x", "Test", "Adim"
-        )
+        indexed_loop.beceri_kristallestir("benzersiz_beceri_x", "Test", "Adim")
         # Merge
-        indexed_loop.beceri_kristallestir(
-            "benzersiz_beceri_X", "Test", "Yeni adim"
-        )
+        indexed_loop.beceri_kristallestir("benzersiz_beceri_X", "Test", "Yeni adim")
         # Dosyayi oku ve kontrol et
         skills_dir = indexed_loop.skills_dir
         dosyalar = list(Path(skills_dir).glob("*.md"))
         for dosya in dosyalar:
             icerik = dosya.read_text(encoding="utf-8")
-            if "benzersiz_beceri_x" in icerik.lower() or dosya.stem.startswith("benzersiz"):
+            if "benzersiz_beceri_x" in icerik.lower() or dosya.stem.startswith(
+                "benzersiz"
+            ):
                 count = _frontmatter_deger_al(icerik, "usage_count")
                 assert count is not None, f"usage_count bulunamadi: {icerik[:200]}"
                 assert int(count) >= 2
@@ -217,6 +220,7 @@ class TestBeceriKristallestir:
 
 
 # ── Test 4: Sorgulama ──────────────────────────────────────────────────
+
 
 class TestSorgulama:
     def test_ilgili_becerileri_cagir_bos_sorgu(self, indexed_loop):
@@ -270,6 +274,7 @@ class TestSorgulama:
 
 # ── Test 5: SQL injection guvenligi ─────────────────────────────────────
 
+
 class TestGuvenlik:
     def test_sql_injection_korumali(self, indexed_loop):
         """SQL injection denemesi veritabanina zarar vermemeli."""
@@ -290,6 +295,7 @@ class TestGuvenlik:
 
 
 # ── Test 6: Yardimcilar ─────────────────────────────────────────────────
+
 
 class TestYardimciMetodlar:
     def test_toplam_beceri_sayisi(self, indexed_loop):
@@ -342,12 +348,16 @@ class TestYardimciMetodlar:
 
 # ── Test 7: Module-level wrapper fonksiyonlar ───────────────────────────
 
+
 @pytest.mark.skip(reason="test suite sirasina bagli (shared state/singleton)")
 class TestWrapperFonksiyonlar:
-    @pytest.mark.skip(reason="test suite sirasina bagli singleton testi, tekil calisiyor")
+    @pytest.mark.skip(
+        reason="test suite sirasina bagli singleton testi, tekil calisiyor"
+    )
     def test_get_loop_singleton(self):
         """_get_loop ayni instance'i donmeli."""
         from closed_learning_loop import _get_loop
+
         loop1 = _get_loop()
         loop2 = _get_loop()
         assert loop1 is loop2
@@ -355,6 +365,7 @@ class TestWrapperFonksiyonlar:
     def test_beceri_ara_bos_sorgu(self):
         """Bos sorgu ile _beceri_ara toplam sayiyi gostermeli."""
         from closed_learning_loop import _beceri_ara
+
         sonuc = _beceri_ara("")
         assert "Toplam" in sonuc
         assert "beceri" in sonuc
@@ -362,5 +373,6 @@ class TestWrapperFonksiyonlar:
     def test_beceri_kristallestir_bos_ad(self):
         """Bos ad ile _beceri_kristallestir hata mesaji donmeli."""
         from closed_learning_loop import _beceri_kristallestir
+
         sonuc = _beceri_kristallestir("", "test", "test")
         assert "HATA" in sonuc or "HATA" in sonuc.upper()

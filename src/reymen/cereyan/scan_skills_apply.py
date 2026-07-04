@@ -23,12 +23,14 @@ SKILLS_DIR = ROOT / "cereyan" / "skills"
 SKILLS_DB = ROOT / "cereyan" / ".ReYMeN" / "skills_index.db"
 OGRENME_DB = ROOT / "hafiza" / "ogrenme.db"
 
+
 def dosya_hash(dosya_yolu):
     h = hashlib.sha256()
     with open(dosya_yolu, "rb") as f:
         for chunk in iter(lambda: f.read(65536), b""):
             h.update(chunk)
     return h.hexdigest()[:16]
+
 
 def kategori_ve_ad(dosya_yolu):
     rel = os.path.relpath(dosya_yolu, str(SKILLS_DIR))
@@ -37,6 +39,7 @@ def kategori_ve_ad(dosya_yolu):
     if len(parts) == 1:
         return "", parts[0]
     return "/".join(parts[:-1]), parts[-1]
+
 
 # Find files that need updating
 md_dosyalari = sorted(SKILLS_DIR.rglob("*.md"))
@@ -64,13 +67,13 @@ guncellenen = 0
 for i, (meta_adi, dosya_yolu, new_hash) in enumerate(guncellenecek):
     if i > 0 and i % 50 == 0:
         print(f"  ... {i}/{len(guncellenecek)} işlendi...", flush=True)
-    
+
     try:
         with open(dosya_yolu, "r", encoding="utf-8", errors="replace") as f:
             icerik = f.read()
     except Exception:
         continue
-    
+
     baslik = ""
     for line in icerik.split("\n"):
         line = line.strip()
@@ -79,11 +82,11 @@ for i, (meta_adi, dosya_yolu, new_hash) in enumerate(guncellenecek):
             break
     if not baslik:
         baslik = icerik[:200].strip()
-    
+
     muhtemel_aciklama = baslik[:500]
     muhtemel_icerik = icerik[:10000]
     su_an = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    
+
     # Update skills_index.db
     con = sqlite3.connect(str(SKILLS_DB))
     try:
@@ -100,12 +103,14 @@ for i, (meta_adi, dosya_yolu, new_hash) in enumerate(guncellenecek):
         logger.warning("DB hatasi %s: %s", meta_adi, e)
     finally:
         con.close()
-    
+
     # Update ogrenme.db
     hedef = meta_adi.replace(".md", "").replace("/", "_")
     try:
         con2 = sqlite3.connect(str(OGRENME_DB))
-        var = con2.execute("SELECT id FROM ogrenmeler WHERE hedef = ?", (hedef,)).fetchone()
+        var = con2.execute(
+            "SELECT id FROM ogrenmeler WHERE hedef = ?", (hedef,)
+        ).fetchone()
         if var:
             con2.execute(
                 """UPDATE ogrenmeler SET cozum=?, son_basari=?, son_kullanim=?,
@@ -125,5 +130,7 @@ for i, (meta_adi, dosya_yolu, new_hash) in enumerate(guncellenecek):
     except Exception as e:
         logger.warning("ogrenme.db hatasi %s: %s", hedef, e)
 
-print(f"\n✅ Güncelleme tamamlandı: {guncellenen}/{len(guncellenecek)} dosya güncellendi.")
+print(
+    f"\n✅ Güncelleme tamamlandı: {guncellenen}/{len(guncellenecek)} dosya güncellendi."
+)
 print(f"SONUC|updated={guncellenen}")

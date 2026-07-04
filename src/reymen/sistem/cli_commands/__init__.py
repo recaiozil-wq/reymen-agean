@@ -13,7 +13,12 @@ from .config_commands import MixinCommands as _ConfigMixin
 from .system_commands import MixinCommands as _SystemMixin
 
 # load_cli_config — eski cli_commands.py'den buraya tasindi
-from src.reymen.sistem.cli_commands_flat import load_cli_config, _load_prefill_messages, _parse_reasoning_config, _parse_service_tier_config
+from src.reymen.sistem.cli_commands_flat import (
+    load_cli_config,
+    _load_prefill_messages,
+    _parse_reasoning_config,
+    _parse_service_tier_config,
+)
 
 
 class MixinCommands(
@@ -25,6 +30,7 @@ class MixinCommands(
     _SystemMixin,
 ):
     """Birleştirilmiş MixinCommands — tüm komut metotlarını içerir."""
+
     pass
 
 

@@ -15,6 +15,7 @@ from codex_runtime import CodexRuntime
 # Init
 # ════════════════════════════════════════════════════════════════
 
+
 class TestInit:
     def test_varsayilan(self):
         """Varsayilan init, codex_yolu=None."""
@@ -45,11 +46,15 @@ class TestInit:
 # _codex_bul
 # ════════════════════════════════════════════════════════════════
 
+
 class TestCodexBul:
     def test_aday_bulunamadi(self, monkeypatch):
         """Hicbir aday yoksa None doner."""
         monkeypatch.setattr(Path, "exists", lambda self: False)
-        monkeypatch.setattr("subprocess.run", lambda *a, **kw: (_ for _ in ()).throw(FileNotFoundError()))
+        monkeypatch.setattr(
+            "subprocess.run",
+            lambda *a, **kw: (_ for _ in ()).throw(FileNotFoundError()),
+        )
 
         rt = CodexRuntime(codex_yolu=None)
         assert rt.codex_yolu is None
@@ -128,6 +133,7 @@ class TestCodexBul:
         # This test requires a real Path.exists match for .codex/bin/codex
         # We need to use a real path since fake exists would interfere
         import tempfile
+
         tmp = Path(tempfile.mkdtemp())
         fake_bin = tmp / ".codex" / "bin"
         fake_bin.mkdir(parents=True)
@@ -141,6 +147,7 @@ class TestCodexBul:
 # ════════════════════════════════════════════════════════════════
 # hazir_mi / ping
 # ════════════════════════════════════════════════════════════════
+
 
 class TestHazirMi:
     def test_hazir_mi_false(self):
@@ -187,6 +194,7 @@ class TestHazirMi:
 # uret
 # ════════════════════════════════════════════════════════════════
 
+
 class TestUret:
     def test_hazir_degil(self):
         rt = CodexRuntime(codex_yolu=None)
@@ -218,7 +226,10 @@ class TestUret:
         fake = tmp_path / "codex"
         fake.write_text("")
         rt = CodexRuntime(codex_yolu=fake)
-        with patch("subprocess.run", side_effect=subprocess.TimeoutExpired(cmd="codex", timeout=5)):
+        with patch(
+            "subprocess.run",
+            side_effect=subprocess.TimeoutExpired(cmd="codex", timeout=5),
+        ):
             sonuc = rt.uret("sistem", [])
             assert "[Codex]: Zaman asimi" in sonuc
 
@@ -235,6 +246,7 @@ class TestUret:
 # ════════════════════════════════════════════════════════════════
 # modelleri_listele
 # ════════════════════════════════════════════════════════════════
+
 
 class TestModelleriListele:
     def test_hazir_degil(self):

@@ -12,6 +12,7 @@ Seeding `logs/gateways` in stage2 (cont-init runs before any service starts)
 guarantees the parent already exists ReYMeN-owned by the time the first
 log/run executes its `mkdir -p`.
 """
+
 from __future__ import annotations
 
 import re

@@ -4,22 +4,45 @@ FIX 05 — cli.py Bölme Planı
 Yapar : cli.py'deki blokları analiz eder, Claude Code task dosyası üretir
 Rapor : claude_code_task_cli_bolme.md + fix_05_rapor.json
 """
+
 import sys, json, time, ast
 from pathlib import Path
 from datetime import datetime
 import logging
+
 logger = logging.getLogger(__name__)
+
+
 class C:
-    RED="\033[91m"; YEL="\033[93m"; GRN="\033[92m"; BLU="\033[94m"; BOLD="\033[1m"; RESET="\033[0m"
-def ok(m):   print(f"  {C.GRN}✅ {m}{C.RESET}")
-def warn(m): print(f"  {C.YEL}⚠️  {m}{C.RESET}")
-def err(m):  print(f"  {C.RED}❌ {m}{C.RESET}")
-def hdr(t):  print(f"\n{C.BOLD}{C.BLU}{'═'*60}\n  {t}\n{'═'*60}{C.RESET}")
+    RED = "\033[91m"
+    YEL = "\033[93m"
+    GRN = "\033[92m"
+    BLU = "\033[94m"
+    BOLD = "\033[1m"
+    RESET = "\033[0m"
+
+
+def ok(m):
+    print(f"  {C.GRN}✅ {m}{C.RESET}")
+
+
+def warn(m):
+    print(f"  {C.YEL}⚠️  {m}{C.RESET}")
+
+
+def err(m):
+    print(f"  {C.RED}❌ {m}{C.RESET}")
+
+
+def hdr(t):
+    print(f"\n{C.BOLD}{C.BLU}{'═'*60}\n  {t}\n{'═'*60}{C.RESET}")
+
 
 def main():
     kok = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else Path(".").resolve()
-    hdr(f"FIX 05 — cli.py Bölme Planı\nKök: {kok}"); t0=time.time()
-    rapor={"tarih":datetime.now().isoformat(),"kok":str(kok)}
+    hdr(f"FIX 05 — cli.py Bölme Planı\nKök: {kok}")
+    t0 = time.time()
+    rapor = {"tarih": datetime.now().isoformat(), "kok": str(kok)}
 
     cli_dosyalari = list(kok.rglob("reymen/sistem/cli.py"))
     if not cli_dosyalari:
@@ -39,7 +62,13 @@ def main():
         if stripped.startswith("# ===") or stripped.startswith("# ───"):
             if current_blok:
                 bloklar.append(current_blok)
-            current_blok = {"baslik": stripped.strip("# ").strip("═─= "), "baslangic": i, "satirlar": 0, "fonksiyonlar": [], "siniflar": []}
+            current_blok = {
+                "baslik": stripped.strip("# ").strip("═─= "),
+                "baslangic": i,
+                "satirlar": 0,
+                "fonksiyonlar": [],
+                "siniflar": [],
+            }
         elif current_blok:
             try:
                 tree = ast.parse(line)
@@ -50,18 +79,21 @@ def main():
                         current_blok["siniflar"].append(node.name)
             except Exception as _e:
                 pass  # TODO: log ekle
-    if current_blok: bloklar.append(current_blok)
+    if current_blok:
+        bloklar.append(current_blok)
 
     # Satır sayılarını hesapla
     for i, blok in enumerate(bloklar):
         if i + 1 < len(bloklar):
-            blok["satirlar"] = bloklar[i+1]["baslangic"] - blok["baslangic"]
+            blok["satirlar"] = bloklar[i + 1]["baslangic"] - blok["baslangic"]
         else:
             blok["satirlar"] = n - blok["baslangic"] + 1
 
     print(f"\n  Tespit edilen blok: {len(bloklar)}")
     for b in bloklar:
-        print(f"  {C.YEL}{b['baslik'][:50]:<52}{C.RESET} {b['satirlar']:>5} satır  ({len(b['fonksiyonlar'])} fonk)")
+        print(
+            f"  {C.YEL}{b['baslik'][:50]:<52}{C.RESET} {b['satirlar']:>5} satır  ({len(b['fonksiyonlar'])} fonk)"
+        )
 
     # Claude Code task dosyası
     task = f"""# Claude Code Task: cli.py Bölme (15,762 → 7 Modül)
@@ -99,11 +131,17 @@ pytest tests/ -k cli -q --tb=no || echo 'Test yoksa sorun degil'
     ok(f"Task dosyası: {task_yolu}")
 
     rapor["blok_sayisi"] = len(bloklar)
-    rapor["bloklar"] = [{"baslik":b["baslik"],"satir":b["satirlar"],"fonk":len(b["fonksiyonlar"])} for b in bloklar]
+    rapor["bloklar"] = [
+        {"baslik": b["baslik"], "satir": b["satirlar"], "fonk": len(b["fonksiyonlar"])}
+        for b in bloklar
+    ]
     rapor["task_dosyasi"] = str(task_yolu)
     rapor["sure"] = round(time.time() - t0, 1)
     rapor_yolu = kok / "fix_05_rapor.json"
-    with open(rapor_yolu, "w") as fp: json.dump(rapor, fp, ensure_ascii=False, indent=2)
+    with open(rapor_yolu, "w") as fp:
+        json.dump(rapor, fp, ensure_ascii=False, indent=2)
     ok(f"JSON rapor: {rapor_yolu}")
 
-if __name__ == "__main__": main()
+
+if __name__ == "__main__":
+    main()

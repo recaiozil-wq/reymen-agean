@@ -11,6 +11,7 @@ Yapılandırma (ortam değişkenleri):
   - YUANBAO_APP_ID  — Yuanbao uygulama ID (zorunlu)
   - YUANBAO_TOKEN   — Yuanbao API token (zorunlu)
 """
+
 import asyncio
 import logging
 import os
@@ -20,6 +21,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from pathlib import Path as _Path
+
 sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
 from src.gateways.config import Platform, PlatformConfig
@@ -38,6 +40,7 @@ logger = logging.getLogger(__name__)
 
 try:
     import httpx
+
     HTTPX_AVAILABLE = True
 except ImportError:
     HTTPX_AVAILABLE = False
@@ -51,11 +54,13 @@ def check_yuanbao_requirements() -> bool:
         return True
     try:
         from reymen.cron.hermes_stubs import ensure as _lazy_ensure
+
         _lazy_ensure("platform.yuanbao", prompt=False)
     except Exception:
         return False
     try:
         import httpx as _httpx
+
         httpx = _httpx
         HTTPX_AVAILABLE = True
         return True

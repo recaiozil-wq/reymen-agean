@@ -194,9 +194,7 @@ def _config_ekle(sunucu_adi: str) -> bool:
         f"    args: {json.dumps(bilgi['args'])}\n"
     )
     if bilgi.get("env"):
-        env_yaml = "\n".join(
-            f"      {k}: \"${{{k}}}\"" for k in bilgi["env"]
-        )
+        env_yaml = "\n".join(f'      {k}: "${{{k}}}"' for k in bilgi["env"])
         yaml_ek += f"    env:\n{env_yaml}\n"
 
     try:

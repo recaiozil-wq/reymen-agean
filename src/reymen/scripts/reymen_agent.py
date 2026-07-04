@@ -477,7 +477,9 @@ def isleyen_gorev(
 ) -> str:
     """Ana işlev — görevi işler ve yanıt döndürür."""
     logger = _get_logger()
-    logger.info(f"Görev işleniyor: {task[:50]}... (use_agent={use_agent}, chat_id={chat_id})")
+    logger.info(
+        f"Görev işleniyor: {task[:50]}... (use_agent={use_agent}, chat_id={chat_id})"
+    )
 
     if use_agent:
         return _agent_loop(task)

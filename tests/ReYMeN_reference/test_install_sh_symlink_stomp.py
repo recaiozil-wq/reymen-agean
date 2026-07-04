@@ -21,7 +21,6 @@ import subprocess
 from pathlib import Path
 
 
-
 REPO_ROOT = Path(__file__).resolve().parent.parent
 INSTALL_SH = REPO_ROOT / "scripts" / "install.sh"
 
@@ -34,9 +33,9 @@ def _extract_setup_path_shim_block() -> str:
         text,
         re.DOTALL,
     )
-    assert match is not None, (
-        "Could not locate the setup_path shim-write block in scripts/install.sh"
-    )
+    assert (
+        match is not None
+    ), "Could not locate the setup_path shim-write block in scripts/install.sh"
     return match["block"]
 
 
@@ -52,9 +51,9 @@ def test_setup_path_shim_block_removes_old_link_before_writing() -> None:
         "See #21454."
     )
     assert cat_idx != -1, "expected `cat >` heredoc still present"
-    assert rm_idx < cat_idx, (
-        "`rm -f` must come *before* the `cat >` heredoc, not after."
-    )
+    assert (
+        rm_idx < cat_idx
+    ), "`rm -f` must come *before* the `cat >` heredoc, not after."
 
 
 def test_re_running_setup_path_block_preserves_pip_entry_point(tmp_path: Path) -> None:
@@ -76,7 +75,9 @@ def test_re_running_setup_path_block_preserves_pip_entry_point(tmp_path: Path) -
     venv_bin = tmp_path / "venv" / "bin"
     venv_bin.mkdir(parents=True)
     pip_entry = venv_bin / "ReYMeN"
-    pip_marker = "#!/usr/bin/env python\n# pip-generated entry point — must not be overwritten\n"
+    pip_marker = (
+        "#!/usr/bin/env python\n# pip-generated entry point — must not be overwritten\n"
+    )
     pip_entry.write_text(pip_marker)
     pip_entry.chmod(pip_entry.stat().st_mode | stat.S_IXUSR)
 
@@ -90,16 +91,16 @@ def test_re_running_setup_path_block_preserves_pip_entry_point(tmp_path: Path) -
 
     block = _extract_setup_path_shim_block()
     # Drive the block with the real env vars setup_path() sets.
-    script = f'set -e\nReYMeN_BIN={pip_entry!s}\ncommand_link_dir={command_link_dir!s}\n{block}\n'
+    script = f"set -e\nReYMeN_BIN={pip_entry!s}\ncommand_link_dir={command_link_dir!s}\n{block}\n"
     result = subprocess.run(
         ["bash", "-c", script],
         capture_output=True,
         text=True,
         cwd=tmp_path,
     )
-    assert result.returncode == 0, (
-        f"shim-write block failed:\nstdout={result.stdout}\nstderr={result.stderr}"
-    )
+    assert (
+        result.returncode == 0
+    ), f"shim-write block failed:\nstdout={result.stdout}\nstderr={result.stderr}"
 
     # The pip entry point must still be the original pip script — not a
     # re-written self-recursing bash shim.

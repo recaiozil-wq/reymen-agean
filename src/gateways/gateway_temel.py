@@ -34,8 +34,12 @@ class GatewayBase(ABC):
     # ── Zorunlu Metodlar ─────────────────────────────────────────────
 
     @abstractmethod
-    async def send(self, mesaj: str, hedef: Optional[str] = None,
-                   meta: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    async def send(
+        self,
+        mesaj: str,
+        hedef: Optional[str] = None,
+        meta: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
         """Platforma mesaj gonderir."""
         ...
 
@@ -129,6 +133,7 @@ class GatewayBase(ABC):
 
 
 # ── Motor Kayit ─────────────────────────────────────────────────────
+
 
 def motor_kaydet(motor) -> None:
     """Motor'a gateway araçlarını kaydeder."""

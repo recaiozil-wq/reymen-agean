@@ -27,6 +27,7 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Optional
 import logging
+
 logger = logging.getLogger(__name__)
 
 log = logging.getLogger(__name__)
@@ -44,12 +45,15 @@ _USER_AGENT = "ReYMeN-Ajan/1.0"
 _OPENAI_SESLER = {"alloy", "echo", "fable", "onyx", "nova", "shimmer"}
 
 # Varsayılan çıktı dizini
-_VOICE_OUTPUT_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "output", "voice")
+_VOICE_OUTPUT_DIR = os.path.join(
+    os.path.dirname(os.path.dirname(__file__)), "output", "voice"
+)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # Yardımcı fonksiyonlar
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 def _cikti_dizini() -> str:
     """Ses dosyaları için çıktı dizinini oluştur ve döndür."""
@@ -71,6 +75,7 @@ def _get_openai_api_key() -> str:
 # ═══════════════════════════════════════════════════════════════════════════════
 # Soyut Taban Sınıfı
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class VoiceEngine(ABC):
     """Tüm ses engine'leri için soyut taban sınıfı."""
@@ -105,6 +110,7 @@ class VoiceEngine(ABC):
 # ═══════════════════════════════════════════════════════════════════════════════
 # OpenAI TTS Engine
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class OpenAITTS(VoiceEngine):
     """OpenAI TTS API ile metni sese çevirir. OPENAI_API_KEY ortam değişkeni gerekli.
@@ -177,6 +183,7 @@ class OpenAITTS(VoiceEngine):
         except Exception as e:
             log.exception("[OpenAITTS] OpenAI TTS hatasi:")
             import urllib.error as _ue
+
             if hasattr(e, "read"):
                 try:
                     govde = e.read().decode(errors="replace")[:300]
@@ -200,6 +207,7 @@ class OpenAITTS(VoiceEngine):
 # Edge TTS Engine
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class EdgeTTS(VoiceEngine):
     """Microsoft Edge TTS ile metni sese çevirir (yerel, ücretsiz, internet gerekli).
 
@@ -216,10 +224,12 @@ class EdgeTTS(VoiceEngine):
         """edge-tts kullanılabilir mi kontrol et."""
         try:
             import edge_tts  # noqa: F401
+
             return True
         except ImportError:
             # CLI kontrolü
             import shutil
+
             return shutil.which("edge-tts") is not None
 
     def seslendir(self, text: str, voice: str = "tr-TR-AhmetNeural") -> str:
@@ -257,14 +267,25 @@ class EdgeTTS(VoiceEngine):
         except ImportError:
             # CLI ile dene
             import subprocess
+
             try:
                 subprocess.run(
-                    ["edge-tts", "--text", text.strip(), "--voice", ses, "--write-media", cikti],
+                    [
+                        "edge-tts",
+                        "--text",
+                        text.strip(),
+                        "--voice",
+                        ses,
+                        "--write-media",
+                        cikti,
+                    ],
                     capture_output=True,
                     timeout=60,
                     check=True,
                 )
-                log.info("[EdgeTTS] Ses dosyasi olusturuldu (CLI): %s (voice=%s)", cikti, ses)
+                log.info(
+                    "[EdgeTTS] Ses dosyasi olusturuldu (CLI): %s (voice=%s)", cikti, ses
+                )
                 return cikti
             except subprocess.CalledProcessError as e:
                 return f"[SESLENDIR/Edge] CLI hatasi: {e.stderr.decode(errors='replace')[:300]}"
@@ -285,6 +306,7 @@ class EdgeTTS(VoiceEngine):
 # ═══════════════════════════════════════════════════════════════════════════════
 # Whisper STT Engine
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class WhisperSTT(VoiceEngine):
     """OpenAI Whisper API ile ses dosyasını metne çevirir.
@@ -345,9 +367,13 @@ class WhisperSTT(VoiceEngine):
             body_parts.append(f"{self._model}\r\n")
             # file field
             body_parts.append(f"--{boundary}\r\n")
-            body_parts.append(f'Content-Disposition: form-data; name="file"; filename="{dosya_adi}"\r\n')
+            body_parts.append(
+                f'Content-Disposition: form-data; name="file"; filename="{dosya_adi}"\r\n'
+            )
             body_parts.append("Content-Type: audio/mpeg\r\n\r\n")
-            body_parts.append(file_data.decode("latin-1"))  # binary'yi latin-1 ile güvenli taşı
+            body_parts.append(
+                file_data.decode("latin-1")
+            )  # binary'yi latin-1 ile güvenli taşı
             body_parts.append(f"\r\n--{boundary}--\r\n")
 
             body = ""
@@ -376,13 +402,18 @@ class WhisperSTT(VoiceEngine):
             if not metin:
                 return "[YAZIYA_CEVIR/Whisper] Hata: metin bulunamadi."
 
-            log.info("[WhisperSTT] Ses dosyasi cozuldu: %s (%d karakter)", ses_dosyasi, len(metin))
+            log.info(
+                "[WhisperSTT] Ses dosyasi cozuldu: %s (%d karakter)",
+                ses_dosyasi,
+                len(metin),
+            )
             return metin
 
         except ImportError:
             # openai kütüphanesini dene
             try:
                 from openai import OpenAI
+
                 client = OpenAI(api_key=api_key)
                 with open(ses_dosyasi, "rb") as f:
                     transcript = client.audio.transcriptions.create(
@@ -392,7 +423,11 @@ class WhisperSTT(VoiceEngine):
                 metin = transcript.text.strip()
                 if not metin:
                     return "[YAZIYA_CEVIR/Whisper] Hata: metin bulunamadi."
-                log.info("[WhisperSTT] Ses dosyasi cozuldu (openai lib): %s (%d karakter)", ses_dosyasi, len(metin))
+                log.info(
+                    "[WhisperSTT] Ses dosyasi cozuldu (openai lib): %s (%d karakter)",
+                    ses_dosyasi,
+                    len(metin),
+                )
                 return metin
             except Exception as e:
                 log.exception("[WhisperSTT] openai kutuphanesi hatasi:")
@@ -401,6 +436,7 @@ class WhisperSTT(VoiceEngine):
         except Exception as e:
             log.exception("[WhisperSTT] Whisper API hatasi:")
             import urllib.error as _ue
+
             if hasattr(e, "read"):
                 try:
                     govde = e.read().decode(errors="replace")[:300]
@@ -415,6 +451,7 @@ class WhisperSTT(VoiceEngine):
 # ═══════════════════════════════════════════════════════════════════════════════
 # Stub Voice Engine (local dummy / simüle)
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class StubVoice(VoiceEngine):
     """Local dummy engine. API key gerekmez. Ses üretmez, simüle eder."""
@@ -443,6 +480,7 @@ class StubVoice(VoiceEngine):
 # Voice Registry
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class VoiceRegistry:
     """Ses engine'lerini kaydet, seç ve çalıştır.
 
@@ -469,15 +507,27 @@ class VoiceRegistry:
             self._varsayilan = adi
         elif adi == "whisper" and engine.hazir and self._varsayilan not in ("openai",):
             self._varsayilan = adi
-        elif adi == "edge" and engine.hazir and self._varsayilan not in ("openai", "whisper"):
+        elif (
+            adi == "edge"
+            and engine.hazir
+            and self._varsayilan not in ("openai", "whisper")
+        ):
             self._varsayilan = adi
-        log.info("[VoiceRegistry] Engine kaydedildi: %s (varsayilan: %s)", adi, self._varsayilan)
+        log.info(
+            "[VoiceRegistry] Engine kaydedildi: %s (varsayilan: %s)",
+            adi,
+            self._varsayilan,
+        )
 
     def sec(self, ad: str) -> Optional[VoiceEngine]:
         """Ada göre engine seç. Bulunamazsa varsayılanı döndür."""
         eng = self._engines.get(ad)
         if eng is None and self._varsayilan:
-            log.warning("[VoiceRegistry] '%s' bulunamadi, varsayilana dusuluyor: %s", ad, self._varsayilan)
+            log.warning(
+                "[VoiceRegistry] '%s' bulunamadi, varsayilana dusuluyor: %s",
+                ad,
+                self._varsayilan,
+            )
             return self._engines.get(self._varsayilan)
         return eng
 
@@ -556,6 +606,7 @@ def _get_registry() -> VoiceRegistry:
 # Tool Fonksiyonları
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 def seslendir(text: str, voice: str = "alloy", backend: str = "") -> str:
     """SESLENDIR tool'u — metni sese çevir.
 
@@ -609,6 +660,7 @@ def voice_engine_listele() -> str:
 # Motor Kayit
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 def motor_kaydet(motor) -> None:
     """Motor tarafindan otomatik cagrilir. SESLENDIR ve YAZIYA_CEVIR tool'larini kaydeder."""
     if not hasattr(motor, "_plugin_arac_kaydet"):
@@ -618,7 +670,7 @@ def motor_kaydet(motor) -> None:
             "SESLENDIR",
             lambda ham="": _seslendir_ayristir_ve_calistir(ham),
             "Metni sese cevirir (coklu back-end).\n"
-            " Kullanim: SESLENDIR(text=\"...\", voice=\"alloy\", backend=\"openai|edge|stub\")\n"
+            ' Kullanim: SESLENDIR(text="...", voice="alloy", backend="openai|edge|stub")\n'
             "Varsayilan: OpenAI TTS > Edge TTS > stub\n"
             "OpenAI: OPENAI_API_KEY ortam degiskeni gerekli.\n"
             "  Sesler: alloy, echo, fable, onyx, nova, shimmer\n"
@@ -630,7 +682,7 @@ def motor_kaydet(motor) -> None:
             "YAZIYA_CEVIR",
             lambda ham="": _yaziya_cevir_ayristir_ve_calistir(ham),
             "Ses dosyasini metne cevirir (Whisper STT).\n"
-            " Kullanim: YAZIYA_CEVIR(ses_dosyasi=\"...\", backend=\"whisper|stub\")\n"
+            ' Kullanim: YAZIYA_CEVIR(ses_dosyasi="...", backend="whisper|stub")\n'
             "Whisper: OPENAI_API_KEY ortam degiskeni gerekli.\n"
             "Stub: API key gerekmez, simulasyon yapar.",
         )
@@ -646,6 +698,7 @@ def motor_kaydet(motor) -> None:
 def _seslendir_ayristir_ve_calistir(ham: str) -> str:
     """SESLENDIR(ham) -> parametre ayristir."""
     import re as _re
+
     text = ""
     voice = "alloy"
     backend = ""
@@ -671,6 +724,7 @@ def _seslendir_ayristir_ve_calistir(ham: str) -> str:
 def _yaziya_cevir_ayristir_ve_calistir(ham: str) -> str:
     """YAZIYA_CEVIR(ham) -> parametre ayristir."""
     import re as _re
+
     ses_dosyasi = ""
     backend = "whisper"
 

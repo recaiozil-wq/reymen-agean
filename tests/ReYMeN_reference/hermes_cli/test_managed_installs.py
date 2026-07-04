@@ -34,8 +34,9 @@ def test_recommended_update_command_defaults_to_ReYMeN_update(monkeypatch):
     # somewhere with that marker, which would make get_managed_update_command()
     # return "Update your Nix flake input ..." instead of falling through to
     # detect_install_method().
-    with patch("ReYMeN_cli.config.get_managed_update_command", return_value=None), \
-         patch("ReYMeN_cli.config.detect_install_method", return_value="git"):
+    with patch(
+        "ReYMeN_cli.config.get_managed_update_command", return_value=None
+    ), patch("ReYMeN_cli.config.detect_install_method", return_value="git"):
         assert recommended_update_command() == "ReYMeN update"
 
 

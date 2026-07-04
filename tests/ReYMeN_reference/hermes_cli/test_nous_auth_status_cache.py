@@ -137,8 +137,8 @@ def test_get_nous_auth_status_caches_failure_path(tmp_path, monkeypatch):
         for _ in range(10):
             auth_mod.get_nous_auth_status()
 
-    assert call_count["n"] == 1, (
-        f"Logged-out snapshots must cache; got {call_count['n']} computes for 10 calls."
-    )
+    assert (
+        call_count["n"] == 1
+    ), f"Logged-out snapshots must cache; got {call_count['n']} computes for 10 calls."
 
     auth_mod.invalidate_nous_auth_status_cache()

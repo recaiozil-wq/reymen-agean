@@ -57,12 +57,10 @@ def test_save_auth_store_writes_0o600_with_0o700_parent(tmp_path, monkeypatch):
     mode = stat.S_IMODE(auth_path.stat().st_mode)
     parent_mode = stat.S_IMODE(auth_path.parent.stat().st_mode)
 
-    assert mode == 0o600, (
-        f"auth.json mode 0o{mode:o} != 0o600 — TOCTOU race regressed"
-    )
-    assert parent_mode == 0o700, (
-        f"auth.json parent dir mode 0o{parent_mode:o} != 0o700 — siblings can traverse"
-    )
+    assert mode == 0o600, f"auth.json mode 0o{mode:o} != 0o600 — TOCTOU race regressed"
+    assert (
+        parent_mode == 0o700
+    ), f"auth.json parent dir mode 0o{parent_mode:o} != 0o700 — siblings can traverse"
 
     # Content survived the rewrite
     data = json.loads(auth_path.read_text())
@@ -96,12 +94,12 @@ def test_save_qwen_cli_tokens_writes_0o600_with_0o700_parent(tmp_path, monkeypat
     mode = stat.S_IMODE(auth_path.stat().st_mode)
     parent_mode = stat.S_IMODE(auth_path.parent.stat().st_mode)
 
-    assert mode == 0o600, (
-        f"Qwen token file mode 0o{mode:o} != 0o600 — TOCTOU race regressed"
-    )
-    assert parent_mode == 0o700, (
-        f"Qwen token parent dir mode 0o{parent_mode:o} != 0o700"
-    )
+    assert (
+        mode == 0o600
+    ), f"Qwen token file mode 0o{mode:o} != 0o600 — TOCTOU race regressed"
+    assert (
+        parent_mode == 0o700
+    ), f"Qwen token parent dir mode 0o{parent_mode:o} != 0o700"
 
     data = json.loads(auth_path.read_text())
     assert data["access_token"] == "qwen-secret"
@@ -144,12 +142,12 @@ def test_shared_nous_store_writes_0o600_with_0o700_parent(tmp_path, monkeypatch)
     mode = stat.S_IMODE(path.stat().st_mode)
     parent_mode = stat.S_IMODE(path.parent.stat().st_mode)
 
-    assert mode == 0o600, (
-        f"Nous shared store mode 0o{mode:o} != 0o600 — TOCTOU race regressed"
-    )
-    assert parent_mode == 0o700, (
-        f"Nous shared store parent dir mode 0o{parent_mode:o} != 0o700"
-    )
+    assert (
+        mode == 0o600
+    ), f"Nous shared store mode 0o{mode:o} != 0o600 — TOCTOU race regressed"
+    assert (
+        parent_mode == 0o700
+    ), f"Nous shared store parent dir mode 0o{parent_mode:o} != 0o700"
 
     data = json.loads(path.read_text())
     assert data["refresh_token"] == "nous-refresh-xxx"

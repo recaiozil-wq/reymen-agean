@@ -14,7 +14,7 @@ def _handle_kanban_command(cli, cmd: str):
     if rest.startswith("/"):
         rest = rest.lstrip("/")
     if rest.startswith("kanban"):
-        rest = rest[len("kanban"):].lstrip()
+        rest = rest[len("kanban") :].lstrip()
     try:
         output = run_slash(rest)
     except Exception as exc:  # pragma: no cover - defensive

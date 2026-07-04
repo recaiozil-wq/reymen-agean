@@ -21,6 +21,7 @@ interface, the registry, and the plugin glue layer simultaneously.
 Mirrors ``tests/plugins/web/test_web_search_provider_plugins.py`` from
 PR #25182.
 """
+
 from __future__ import annotations
 
 import pytest
@@ -135,9 +136,7 @@ class TestBundledPluginsRegister:
         # default — we check by comparing the function reference.
         assert type(provider).create_session is not BrowserProvider.create_session
         assert type(provider).close_session is not BrowserProvider.close_session
-        assert (
-            type(provider).emergency_cleanup is not BrowserProvider.emergency_cleanup
-        )
+        assert type(provider).emergency_cleanup is not BrowserProvider.emergency_cleanup
 
 
 # ---------------------------------------------------------------------------
@@ -365,9 +364,9 @@ class TestPickerIntegration:
         from ReYMeN_cli.tools_config import _plugin_browser_providers
 
         for row in _plugin_browser_providers():
-            assert row.get("post_setup") == "agent_browser", (
-                f"plugin row {row['browser_provider']!r} missing post_setup hook"
-            )
+            assert (
+                row.get("post_setup") == "agent_browser"
+            ), f"plugin row {row['browser_provider']!r} missing post_setup hook"
 
     def test_picker_rows_carry_browser_plugin_name_marker(self) -> None:
         """`browser_plugin_name` matches `browser_provider` so downstream

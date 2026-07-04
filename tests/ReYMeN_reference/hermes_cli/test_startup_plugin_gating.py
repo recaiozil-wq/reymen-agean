@@ -91,8 +91,8 @@ def _live_subcommand_names() -> set[str]:
         (["ReYMeN", "-m", "gpt5", "--provider", "openai", "chat"], "chat"),
         (["ReYMeN", "-z", "hello world"], None),
         (["ReYMeN", "-z", "hello", "chat"], "chat"),
-        (["ReYMeN", "--model=gpt5", "chat"], "chat"),     # inline form
-        (["ReYMeN", "--", "chat"], "chat"),               # -- terminator
+        (["ReYMeN", "--model=gpt5", "chat"], "chat"),  # inline form
+        (["ReYMeN", "--", "chat"], "chat"),  # -- terminator
         (["ReYMeN", "-w", "--"], None),
         # Unknown positional after skipped flags → plugin-cmd candidate.
         (["ReYMeN", "some-plugin-cmd"], "some-plugin-cmd"),
@@ -110,17 +110,17 @@ def test_first_positional_argv(argv, expected):
 @pytest.mark.parametrize(
     "argv",
     [
-        ["ReYMeN"],                          # bare → chat
-        ["ReYMeN", "--help"],                # top-level help
+        ["ReYMeN"],  # bare → chat
+        ["ReYMeN", "--help"],  # top-level help
         ["ReYMeN", "-h"],
-        ["ReYMeN", "version"],               # known built-in
+        ["ReYMeN", "version"],  # known built-in
         ["ReYMeN", "logs"],
         ["ReYMeN", "gateway", "run"],
         ["ReYMeN", "--tui"],
         ["ReYMeN", "-w", "--tui"],
         ["ReYMeN", "chat", "hi"],
-        ["ReYMeN", "help"],                  # accepted built-in-ish
-        ["ReYMeN", "-m", "gpt5", "chat"],    # flag-value-skipping
+        ["ReYMeN", "help"],  # accepted built-in-ish
+        ["ReYMeN", "-m", "gpt5", "chat"],  # flag-value-skipping
     ],
 )
 def test_discovery_skipped_for_builtins(argv):
@@ -131,8 +131,8 @@ def test_discovery_skipped_for_builtins(argv):
 @pytest.mark.parametrize(
     "argv",
     [
-        ["ReYMeN", "meet", "join"],          # potential google_meet plugin
-        ["ReYMeN", "honcho", "status"],      # potential memory plugin
+        ["ReYMeN", "meet", "join"],  # potential google_meet plugin
+        ["ReYMeN", "honcho", "status"],  # potential memory plugin
         ["ReYMeN", "unknown-subcmd"],
     ],
 )

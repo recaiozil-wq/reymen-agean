@@ -23,9 +23,9 @@ class TestTipsCorpus:
     def test_max_length_reasonable(self):
         """Tips should fit on a single terminal line (~120 chars max)."""
         for i, tip in enumerate(TIPS):
-            assert len(tip) <= 150, (
-                f"Tip {i} too long ({len(tip)} chars): {tip[:60]}..."
-            )
+            assert (
+                len(tip) <= 150
+            ), f"Tip {i} too long ({len(tip)} chars): {tip[:60]}..."
 
     def test_no_leading_trailing_whitespace(self):
         for i, tip in enumerate(TIPS):
@@ -59,6 +59,7 @@ class TestTipIntegrationInCLI:
     def test_tip_import_works(self):
         """The import used in cli.py must succeed."""
         from ReYMeN_cli.tips import get_random_tip
+
         assert callable(get_random_tip)
 
     def test_tip_display_format(self):

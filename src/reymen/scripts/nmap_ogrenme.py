@@ -3,7 +3,10 @@
 
 import json
 import sys
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+sys.path.insert(
+    0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+)
 
 from src.reymen.hafiza.gorev_once_kontrol import hafizada_ara, kaydet_isle, isle
 
@@ -75,8 +78,13 @@ print("=" * 60)
 print("5. HA FIZADA ARA — tum nmap bilgileri")
 print("=" * 60)
 sonuc3 = hafizada_ara("nmap versiyon tespiti -sV", kategori="kali/network/nmap")
-print(json.dumps({k: v for k, v in sonuc3.items() if k != "icerik"}, indent=2, default=str))
+print(
+    json.dumps(
+        {k: v for k, v in sonuc3.items() if k != "icerik"}, indent=2, default=str
+    )
+)
 
 import json
+
 print()
 print("🔴 TUM TESTLER GECTI")

@@ -42,14 +42,18 @@ class CodexRuntime:
                 return a
         # which ile dene
         try:
-            r = subprocess.run(["where", "codex"], capture_output=True, text=True, timeout=5)
+            r = subprocess.run(
+                ["where", "codex"], capture_output=True, text=True, timeout=5
+            )
             if r.returncode == 0 and r.stdout.strip():
                 return Path(r.stdout.strip().split("\n")[0])
         except Exception as _e:
             logger.warning("[CodexRuntime] except Exception (L45): %s", Exception)
             pass
         try:
-            r = subprocess.run(["which", "codex"], capture_output=True, text=True, timeout=5)
+            r = subprocess.run(
+                ["which", "codex"], capture_output=True, text=True, timeout=5
+            )
             if r.returncode == 0 and r.stdout.strip():
                 return Path(r.stdout.strip())
         except Exception as _e:
@@ -68,7 +72,9 @@ class CodexRuntime:
         try:
             r = subprocess.run(
                 [str(self.codex_yolu), "--version"],
-                capture_output=True, text=True, timeout=10,
+                capture_output=True,
+                text=True,
+                timeout=10,
             )
             return r.returncode == 0
         except Exception:
@@ -98,7 +104,9 @@ class CodexRuntime:
         try:
             r = subprocess.run(
                 [str(self.codex_yolu), "--prompt", prompt],
-                capture_output=True, text=True, timeout=timeout,
+                capture_output=True,
+                text=True,
+                timeout=timeout,
                 cwd=str(Path.cwd()),
             )
             if r.returncode == 0:
@@ -116,7 +124,9 @@ class CodexRuntime:
         try:
             r = subprocess.run(
                 [str(self.codex_yolu), "--list-models"],
-                capture_output=True, text=True, timeout=10,
+                capture_output=True,
+                text=True,
+                timeout=10,
             )
             if r.returncode == 0:
                 return [m.strip() for m in r.stdout.strip().split("\n") if m.strip()]

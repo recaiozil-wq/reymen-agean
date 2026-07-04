@@ -96,7 +96,9 @@ def dispatcher():
 
     ex = MagicMock()
     ex.calistir_tool = MagicMock(return_value={"ok": True, "sonuc": "calisti"})
-    ex.calistir_guvenli = MagicMock(return_value={"ok": True, "sonuc": "guvenli_calisti"})
+    ex.calistir_guvenli = MagicMock(
+        return_value={"ok": True, "sonuc": "guvenli_calisti"}
+    )
 
     # ToolRegistry, ToolGuardrails, ToolExecutor constructor'larını mock'la
     mock_registry_module.ToolRegistry.return_value = reg
@@ -190,7 +192,9 @@ class TestDispatch:
 
     def test_alias_run_degilse_execute_function_cagrilir(self, dispatcher):
         """callable != 'run' ise _execute_function kullanılmalı."""
-        dispatcher._mock_registry.resolve.return_value = _mock_kayit(callable="ozel_fonksiyon")
+        dispatcher._mock_registry.resolve.return_value = _mock_kayit(
+            callable="ozel_fonksiyon"
+        )
         with patch.object(dispatcher, "_execute_function", return_value={"ok": True}):
             sonuc = dispatcher.dispatch("ornek_tool")
             assert sonuc["ok"] is True
@@ -211,9 +215,13 @@ class TestDispatch:
 
     def test_guardrails_module_name_ile_cagrilir(self, dispatcher):
         """Guardrails modül adı ile çağrılmalı."""
-        dispatcher._mock_registry.resolve.return_value = _mock_kayit(module="filtrelenen_modul")
+        dispatcher._mock_registry.resolve.return_value = _mock_kayit(
+            module="filtrelenen_modul"
+        )
         dispatcher.dispatch("ornek_tool")
-        dispatcher._mock_guardrails.kontrolet.assert_called_once_with("filtrelenen_modul")
+        dispatcher._mock_guardrails.kontrolet.assert_called_once_with(
+            "filtrelenen_modul"
+        )
 
 
 # ── _execute_function ──────────────────────────────────────────────────────
@@ -230,7 +238,9 @@ class TestExecuteFunction:
             setattr(mock_mod, "ozel_islem", mock_fn)
             mock_import.return_value = mock_mod
 
-            sonuc = dispatcher._execute_function("ornek_modul", "ozel_islem", {"x": 1}, None)
+            sonuc = dispatcher._execute_function(
+                "ornek_modul", "ozel_islem", {"x": 1}, None
+            )
             assert sonuc["ok"] is True
 
     def test_fonksiyon_bulunamazsa_hata(self, dispatcher):
@@ -239,13 +249,18 @@ class TestExecuteFunction:
             mock_mod = MagicMock(spec=[])  # hiçbir attribute yok
             mock_import.return_value = mock_mod
 
-            sonuc = dispatcher._execute_function("ornek_modul", "var_olmayan_fn", {}, None)
+            sonuc = dispatcher._execute_function(
+                "ornek_modul", "var_olmayan_fn", {}, None
+            )
             assert sonuc["ok"] is False
             assert "bulunamadi" in sonuc["error"]
 
     def test_exception_halinde_hata_yakalanir(self, dispatcher):
         """Fonksiyon içinde exception fırlatılırsa yakalanmalı."""
-        with patch("dispatcher.importlib.import_module", side_effect=ImportError("modul bulunamadi")):
+        with patch(
+            "dispatcher.importlib.import_module",
+            side_effect=ImportError("modul bulunamadi"),
+        ):
             sonuc = dispatcher._execute_function("olmayan_modul", "run", {}, None)
             assert sonuc["ok"] is False
             assert "modul bulunamadi" in sonuc["error"]
@@ -281,7 +296,9 @@ class TestToolSchema:
 
     def test_var_olan_tool_schema_dondurur(self, dispatcher):
         """Var olan bir tool için schema döndürülmeli."""
-        dispatcher._mock_registry.resolve.return_value = _mock_kayit(module="ornek_modul")
+        dispatcher._mock_registry.resolve.return_value = _mock_kayit(
+            module="ornek_modul"
+        )
         with patch("dispatcher.importlib.import_module") as mock_import:
             mock_mod = MagicMock()
             mock_mod.SCHEMA = {"type": "object", "properties": {}}
@@ -293,7 +310,9 @@ class TestToolSchema:
 
     def test_schema_yoksa_yok_bilgisi_dondurur(self, dispatcher):
         """SCHEMA attribute'u yoksa 'yok' döndürülmeli."""
-        dispatcher._mock_registry.resolve.return_value = _mock_kayit(module="schemasi_olmayan")
+        dispatcher._mock_registry.resolve.return_value = _mock_kayit(
+            module="schemasi_olmayan"
+        )
         with patch("dispatcher.importlib.import_module") as mock_import:
             mock_mod = MagicMock(spec=["__name__"])  # SCHEMA yok
             mock_import.return_value = mock_mod
@@ -309,8 +328,12 @@ class TestToolSchema:
 
     def test_import_exception_yakalanir(self, dispatcher):
         """Modül import edilemezse hata yakalanmalı."""
-        dispatcher._mock_registry.resolve.return_value = _mock_kayit(module="bozuk_modul")
-        with patch("dispatcher.importlib.import_module", side_effect=ImportError("bozuk")):
+        dispatcher._mock_registry.resolve.return_value = _mock_kayit(
+            module="bozuk_modul"
+        )
+        with patch(
+            "dispatcher.importlib.import_module", side_effect=ImportError("bozuk")
+        ):
             sonuc = dispatcher.tool_schema("ornek_tool")
             assert "error" in sonuc
 

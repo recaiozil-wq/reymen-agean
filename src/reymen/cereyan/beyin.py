@@ -36,6 +36,7 @@ try:
         ProviderYanit,
         _VARSAYILAN_MODELLER as _PA_VARSAYILAN_MODELLER,
     )
+
     _PA_AKTIF = True
 except ImportError:
     _PA_AKTIF = False
@@ -46,13 +47,16 @@ except ImportError:
 # ── Observability / Tracing (opsiyonel) ─────────────────────────────────────
 try:
     from reymen.core.observability import trace_llm_call
+
     _TRACE_LLM_AKTIF = True
 except ImportError:
     # Observability modülü yoksa no-op dekoratör
     def trace_llm_call(span_adi=None, attributes=None):
         def decorator(func):
             return func
+
         return decorator
+
     _TRACE_LLM_AKTIF = False
 
 # ── Modül düzeyinde logger ───────────────────────────────────────────────────
@@ -70,6 +74,7 @@ try:
         api_hatasini_siniflandir as _api_hatasini_siniflandir,
         FailoverReason as _FailoverReason,
     )
+
     _HATA_SINIF_AKTIF = True
 except ImportError:
     _api_hatasini_siniflandir = None  # type: ignore[assignment]
@@ -78,23 +83,27 @@ except ImportError:
 
 # ── Opsiyonel modül yükleyici ────────────────────────────────────────────────
 
+
 def _guvensiz_import(modul_adi: str) -> Any:
     """Modülü içe aktar; bulunamazsa None döndür (hata yükseltme)."""
     try:
         import importlib
+
         return importlib.import_module(modul_adi)
     except Exception:
         return None
 
 
-_credential_pool     = _guvensiz_import("reymen.sistem.credential_persistence") or _guvensiz_import("reymen.sistem.credential_pool")
-_prompt_caching      = _guvensiz_import("reymen.arac.prompt_caching")
-_nous_rate_guard     = _guvensiz_import("reymen.guvenlik.nous_rate_guard")
-_providers_registry  = _guvensiz_import("reymen.sistem.providers")
+_credential_pool = _guvensiz_import(
+    "reymen.sistem.credential_persistence"
+) or _guvensiz_import("reymen.sistem.credential_pool")
+_prompt_caching = _guvensiz_import("reymen.arac.prompt_caching")
+_nous_rate_guard = _guvensiz_import("reymen.guvenlik.nous_rate_guard")
+_providers_registry = _guvensiz_import("reymen.sistem.providers")
 
-_POOL_AKTIF   = _credential_pool is not None
-_CACHE_AKTIF  = _prompt_caching  is not None
-_GUARD_AKTIF  = (
+_POOL_AKTIF = _credential_pool is not None
+_CACHE_AKTIF = _prompt_caching is not None
+_GUARD_AKTIF = (
     _nous_rate_guard is not None
     and hasattr(_nous_rate_guard, "rate_guard_izin_ver")
     and hasattr(_nous_rate_guard, "rate_guard_basla")
@@ -105,9 +114,11 @@ _REGISTRY_AKTIF = _providers_registry is not None
 
 # ── Veri yapıları ────────────────────────────────────────────────────────────
 
+
 @dataclass
 class SaglayCiAdim:
     """Fallback zincirindeki tek bir sağlayıcı adımı."""
+
     provider: str
     model: str
     base_url: str
@@ -120,6 +131,7 @@ class SaglayCiAdim:
 @dataclass
 class LLMYanitMeta:
     """_cagir() dönüş değeri: metin + basit üstveri."""
+
     metin: str
     provider: str
     model: str
@@ -130,49 +142,50 @@ class LLMYanitMeta:
 # ── Sağlayıcı varsayılan modelleri ──────────────────────────────────────────
 
 _VARSAYILAN_MODELLER: dict[str, str] = {
-    "deepseek":           "deepseek-chat",
-    "openai":             "gpt-4o-mini",
-    "anthropic":          "claude-haiku-4-5-20251001",
-    "groq":               "llama-3.1-8b-instant",
-    "ollama":             "llama3.1:8b",
-    "moonshot":           "moonshot-v1-8k",
-    "azure":              "",          # env'den okunur
-    "bedrock":            "",          # env'den okunur
-    "gemini":             "gemini-1.5-flash",
-    "gemini_cloud":       "gemini-1.5-flash",
-    "openrouter":         "deepseek/deepseek-chat",
-    "lmstudio_reasoning": "",          # env'den okunur
-    "codex_responses":    "",          # env'den okunur
+    "deepseek": "deepseek-chat",
+    "openai": "gpt-4o-mini",
+    "anthropic": "claude-haiku-4-5-20251001",
+    "groq": "llama-3.1-8b-instant",
+    "ollama": "llama3.1:8b",
+    "moonshot": "moonshot-v1-8k",
+    "azure": "",  # env'den okunur
+    "bedrock": "",  # env'den okunur
+    "gemini": "gemini-1.5-flash",
+    "gemini_cloud": "gemini-1.5-flash",
+    "openrouter": "deepseek/deepseek-chat",
+    "lmstudio_reasoning": "",  # env'den okunur
+    "codex_responses": "",  # env'den okunur
     # ── Yeni OpenAI-uyumlu sağlayıcılar ──────────────────────────────
-    "together":           "mistralai/Mixtral-8x7B-Instruct-v0.1",
-    "fireworks":          "accounts/fireworks/models/llama-v3p1-8b-instruct",
-    "mistral":            "mistral-small-latest",
-    "cohere":             "command-r-plus",
-    "perplexity":         "llama-3.1-sonar-small-128k-online",
+    "together": "mistralai/Mixtral-8x7B-Instruct-v0.1",
+    "fireworks": "accounts/fireworks/models/llama-v3p1-8b-instruct",
+    "mistral": "mistral-small-latest",
+    "cohere": "command-r-plus",
+    "perplexity": "llama-3.1-sonar-small-128k-online",
 }
 
 # Provider → env değişken adları
 _PROVIDER_ENV: dict[str, str] = {
-    "deepseek":     "DEEPSEEK_API_KEY",
-    "openai":       "OPENAI_API_KEY",
-    "anthropic":    "ANTHROPIC_API_KEY",
-    "groq":         "GROQ_API_KEY",
-    "moonshot":     "MOONSHOT_API_KEY",
-    "azure":        "AZURE_OPENAI_API_KEY",
-    "bedrock":      "AWS_ACCESS_KEY_ID",
-    "gemini":       "GEMINI_API_KEY",
+    "deepseek": "DEEPSEEK_API_KEY",
+    "openai": "OPENAI_API_KEY",
+    "anthropic": "ANTHROPIC_API_KEY",
+    "groq": "GROQ_API_KEY",
+    "moonshot": "MOONSHOT_API_KEY",
+    "azure": "AZURE_OPENAI_API_KEY",
+    "bedrock": "AWS_ACCESS_KEY_ID",
+    "gemini": "GEMINI_API_KEY",
     "gemini_cloud": "GEMINI_API_KEY",
-    "openrouter":   "OPENROUTER_API_KEY",
+    "openrouter": "OPENROUTER_API_KEY",
     # ── Yeni OpenAI-uyumlu sağlayıcılar ──────────────────────────────
-    "together":     "TOGETHER_API_KEY",
-    "fireworks":    "FIREWORKS_API_KEY",
-    "mistral":      "MISTRAL_API_KEY",
-    "cohere":       "COHERE_API_KEY",
-    "perplexity":   "PERPLEXITY_API_KEY",
+    "together": "TOGETHER_API_KEY",
+    "fireworks": "FIREWORKS_API_KEY",
+    "mistral": "MISTRAL_API_KEY",
+    "cohere": "COHERE_API_KEY",
+    "perplexity": "PERPLEXITY_API_KEY",
 }
 
 
 # ── Ana sınıf ────────────────────────────────────────────────────────────────
+
 
 class Beyin:
     """Çok-sağlayıcılı LLM bağlantı katmanı.
@@ -217,22 +230,16 @@ class Beyin:
             model_model = ""
 
         # Önce üst düzey anahtarları, yoksa "general" altındakileri oku
-        self.provider: str = (
-            model_provider
-            or config.get(
-                "default_provider",
-                config.get("general", {}).get("default_provider", "lmstudio"),
-            )
+        self.provider: str = model_provider or config.get(
+            "default_provider",
+            config.get("general", {}).get("default_provider", "lmstudio"),
         )
-        self.model: str = (
-            model_model
-            or config.get(
+        self.model: str = model_model or config.get(
+            "default_model",
+            config.get("general", {}).get(
                 "default_model",
-                config.get("general", {}).get(
-                    "default_model",
-                    "cognitivecomputations.dolphin3.0-llama3.1-8b",
-                ),
-            )
+                "cognitivecomputations.dolphin3.0-llama3.1-8b",
+            ),
         )
 
         self.base_url, self.api_key = self._saglayici_baglantisi_kur(self.provider)
@@ -254,7 +261,9 @@ class Beyin:
         # Sağlayıcı kayıt defterinden varsayılan base_url
         if _REGISTRY_AKTIF:
             profil = _providers_registry.get_provider_profile(provider)  # type: ignore[union-attr]
-            base_url = prov_conf.get("base_url") or (profil.base_url if profil else "http://localhost:1234")
+            base_url = prov_conf.get("base_url") or (
+                profil.base_url if profil else "http://localhost:1234"
+            )
         else:
             base_url = prov_conf.get("base_url", "http://localhost:1234")
 
@@ -300,10 +309,14 @@ class Beyin:
     def _varsayilan_model(self, provider: str) -> str:
         """Provider için varsayılan model adını döndürür."""
         env_degerleri: dict[str, str] = {
-            "azure":              os.environ.get("AZURE_OPENAI_DEPLOYMENT", "gpt-4o"),
-            "bedrock":            os.environ.get("BEDROCK_MODEL_ID", "anthropic.claude-3-haiku-20240307-v1:0"),
-            "lmstudio_reasoning": os.environ.get("LMSTUDIO_MODEL", "cognitivecomputations.dolphin3.0-llama3.1-8b"),
-            "codex_responses":    os.environ.get("OPENAI_CODEX_MODEL", "o4-mini"),
+            "azure": os.environ.get("AZURE_OPENAI_DEPLOYMENT", "gpt-4o"),
+            "bedrock": os.environ.get(
+                "BEDROCK_MODEL_ID", "anthropic.claude-3-haiku-20240307-v1:0"
+            ),
+            "lmstudio_reasoning": os.environ.get(
+                "LMSTUDIO_MODEL", "cognitivecomputations.dolphin3.0-llama3.1-8b"
+            ),
+            "codex_responses": os.environ.get("OPENAI_CODEX_MODEL", "o4-mini"),
         }
         if provider in env_degerleri:
             return env_degerleri[provider]
@@ -410,7 +423,17 @@ class Beyin:
                 son_hata = hata
                 hata_str = str(hata)
                 # 402/403/401 — retry edilemez, hemen fallback'a git
-                if any(k in hata_str for k in ("402", "403", "401", "Payment Required", "Forbidden", "Unauthorized")):
+                if any(
+                    k in hata_str
+                    for k in (
+                        "402",
+                        "403",
+                        "401",
+                        "Payment Required",
+                        "Forbidden",
+                        "Unauthorized",
+                    )
+                ):
                     logger.warning(
                         "[Beyin] %s — retry edilmiyor, fallback'a geçiliyor.",
                         adim.provider,
@@ -419,7 +442,9 @@ class Beyin:
                 if self._rate_limit_mi(hata) and deneme < self.MAKS_DENEME:
                     logger.warning(
                         "[Beyin] Rate limit — %.1fs bekleniyor (%d/%d)…",
-                        bekleme, deneme, self.MAKS_DENEME - 1,
+                        bekleme,
+                        deneme,
+                        self.MAKS_DENEME - 1,
                     )
                     time.sleep(bekleme)
                     bekleme *= self.BEKLEME_CARPAN
@@ -438,7 +463,7 @@ class Beyin:
         eder ama sonucu görmezden gelinir (ReYMeN interruptible_api_call pattern).
         """
         sonuc_kabi: list[str | None] = [None]
-        hata_kabi:  list[Exception | None] = [None]
+        hata_kabi: list[Exception | None] = [None]
         tamam = threading.Event()
 
         def api_worker() -> None:
@@ -454,7 +479,9 @@ class Beyin:
 
         while not tamam.wait(timeout=0.5):
             if self._iptal_olayi.is_set():
-                raise InterruptedError("[Beyin] API çağrısı kullanıcı tarafından iptal edildi.")
+                raise InterruptedError(
+                    "[Beyin] API çağrısı kullanıcı tarafından iptal edildi."
+                )
 
         if hata_kabi[0] is not None:
             raise hata_kabi[0]
@@ -502,7 +529,9 @@ class Beyin:
                 if _GUARD_AKTIF:
                     try:
                         if not _nous_rate_guard.rate_guard_izin_ver(adim.provider):  # type: ignore[union-attr]
-                            logger.info("[RateGuard] %s hız sınırı — atlanıyor.", adim.provider)
+                            logger.info(
+                                "[RateGuard] %s hız sınırı — atlanıyor.", adim.provider
+                            )
                             continue
                         _nous_rate_guard.rate_guard_basla(adim.provider)  # type: ignore[union-attr]
                     except AttributeError:
@@ -522,13 +551,18 @@ class Beyin:
                     try:
                         _nous_rate_guard.rate_guard_bitir(adim.provider)  # type: ignore[union-attr]
                     except AttributeError as _e:
-                        logger.warning("[Beyin] Nitelik hatasi (L462): %s", AttributeError)
+                        logger.warning(
+                            "[Beyin] Nitelik hatasi (L462): %s", AttributeError
+                        )
                         pass
 
                 sure = time.monotonic() - t0
                 if i > 0:
                     logger.info(
-                        "[Beyin] Fallback #%d başarılı (%s, %.1fs)", i, adim.provider, sure
+                        "[Beyin] Fallback #%d başarılı (%s, %.1fs)",
+                        i,
+                        adim.provider,
+                        sure,
                     )
 
                 self._kullanim_kaydet(adim, sistem_prompt, mesajlar, sonuc)
@@ -542,7 +576,11 @@ class Beyin:
                     turkce_hata = f"❌ {adim.provider} kredisi bitti (402 Payment Required). Hesabına kredi yüklemelisin."
                 elif "401" in hata_str or "Unauthorized" in hata_str:
                     turkce_hata = f"❌ {adim.provider} API anahtarı geçersiz (401 Unauthorized). .env dosyasındaki key'i kontrol et."
-                elif "429" in hata_str or "Rate limit" in hata_str or "Too Many Requests" in hata_str:
+                elif (
+                    "429" in hata_str
+                    or "Rate limit" in hata_str
+                    or "Too Many Requests" in hata_str
+                ):
                     turkce_hata = f"⏳ {adim.provider} hız sınırı aşıldı (429). Kısa süre bekle, otomatik düzelecek."
                 elif "403" in hata_str or "Forbidden" in hata_str:
                     turkce_hata = f"🚫 {adim.provider} erişim reddedildi (403). API key izinlerini kontrol et."
@@ -555,14 +593,32 @@ class Beyin:
 
                 # OpenRouter fallback: 402/403/429 hatası varsa otomatik OpenRouter'a geç
                 if not openrouter_eklendi and adim.provider != "openrouter":
-                    if any(k in hata_str for k in ("402", "403", "429", "Payment Required", "Forbidden", "Rate limit")):
-                        openrouter_key = self._anahtar_bul("openrouter", self.config.get("providers", {}).get("openrouter", {}))
+                    if any(
+                        k in hata_str
+                        for k in (
+                            "402",
+                            "403",
+                            "429",
+                            "Payment Required",
+                            "Forbidden",
+                            "Rate limit",
+                        )
+                    ):
+                        openrouter_key = self._anahtar_bul(
+                            "openrouter",
+                            self.config.get("providers", {}).get("openrouter", {}),
+                        )
                         if openrouter_key and not openrouter_key.startswith("***"):
-                            openrouter_base = self.config.get("providers", {}).get("openrouter", {}).get("base_url", "https://openrouter.ai/api")
+                            openrouter_base = (
+                                self.config.get("providers", {})
+                                .get("openrouter", {})
+                                .get("base_url", "https://openrouter.ai/api")
+                            )
                             openrouter_model = self._varsayilan_model("openrouter")
                             logger.info(
                                 "[Beyin] %s hatasi — OpenRouter fallback deneniyor (%s)...",
-                                adim.provider, openrouter_model,
+                                adim.provider,
+                                openrouter_model,
                             )
                             # OpenRouter adımını zincire EKLE (bu turda da dene)
                             self._fallback_zinciri.append(
@@ -577,7 +633,8 @@ class Beyin:
 
                 if self._rate_limit_mi(e):
                     logger.warning(
-                        "[Beyin] Rate limit (%s) — sonraki sağlayıcıya geçiliyor.", adim.provider
+                        "[Beyin] Rate limit (%s) — sonraki sağlayıcıya geçiliyor.",
+                        adim.provider,
                     )
                 else:
                     logger.error("[Beyin] %s", turkce_hata)
@@ -688,7 +745,9 @@ class Beyin:
             if _try_with_tools and _kod in (400, 422):
                 # Provider tools'u reddetti → "no-fc" işaretle, tools'suz yeniden dene
                 self._fc_desteklenmeyen.add(_provider_key)
-                logger.info("[uret_v2] %s tools desteklemiyor (%s) → fallback.", model, _kod)
+                logger.info(
+                    "[uret_v2] %s tools desteklemiyor (%s) → fallback.", model, _kod
+                )
                 return _cagri_yap(with_tools=False)
             raise
 
@@ -720,34 +779,52 @@ class Beyin:
         for adim in self._fallback_zinciri:
             try:
                 return self._cagir_openai_uyumlu_v2(
-                    adim.base_url, adim.api_key, adim.model,
-                    sistem_prompt, mesajlar, tools=tools,
+                    adim.base_url,
+                    adim.api_key,
+                    adim.model,
+                    sistem_prompt,
+                    mesajlar,
+                    tools=tools,
                 )
             except Exception as e:
                 _son_hata = e
                 # Gelişmiş sınıflandırıcıyla karar ver
                 if _HATA_SINIF_AKTIF and _api_hatasini_siniflandir is not None:
                     try:
-                        sinif = _api_hatasini_siniflandir(e, provider=adim.provider, model=adim.model)
+                        sinif = _api_hatasini_siniflandir(
+                            e, provider=adim.provider, model=adim.model
+                        )
                         neden = sinif.neden
                         logger.debug(
                             "[uret_v2] %s başarısız (neden=%s, retry=%s): %s",
-                            adim.provider, neden.value, sinif.yeniden_denenebilir, e,
+                            adim.provider,
+                            neden.value,
+                            sinif.yeniden_denenebilir,
+                            e,
                         )
                         # İçerik politikası ihlali → fallback dene ama zinciri de kır
                         if neden == _FailoverReason.content_policy_blocked:
-                            logger.warning("[uret_v2] İçerik politikası ihlali (%s) — metin fallback.", adim.provider)
+                            logger.warning(
+                                "[uret_v2] İçerik politikası ihlali (%s) — metin fallback.",
+                                adim.provider,
+                            )
                             break
                         # Context overflow → tools olmadan denemeye devam et
                         if neden == _FailoverReason.context_overflow:
-                            logger.warning("[uret_v2] Context overflow (%s) — sıkıştırma gerekebilir.", adim.provider)
+                            logger.warning(
+                                "[uret_v2] Context overflow (%s) — sıkıştırma gerekebilir.",
+                                adim.provider,
+                            )
                     except Exception:
                         logger.debug("[uret_v2] %s başarısız: %s", adim.provider, e)
                 else:
                     logger.debug("[uret_v2] %s başarısız: %s", adim.provider, e)
                 continue
         # Tüm provider'lar başarısız → metin fallback
-        logger.warning("[uret_v2] Tüm provider'lar başarısız (%s) → metin moduna geçildi.", _son_hata)
+        logger.warning(
+            "[uret_v2] Tüm provider'lar başarısız (%s) → metin moduna geçildi.",
+            _son_hata,
+        )
         metin = self.dusun(sistem_prompt, mesajlar)
         return {"role": "assistant", "content": metin or "", "tool_calls": []}
 
@@ -779,9 +856,13 @@ class Beyin:
 
         if self.provider == "anthropic":
             try:
-                yield from self._stream_anthropic(self.api_key, aktif_model, sistem_prompt, mesajlar)
+                yield from self._stream_anthropic(
+                    self.api_key, aktif_model, sistem_prompt, mesajlar
+                )
             except Exception as e:
-                logger.warning("[Beyin] Anthropic stream başarısız, tam yanıta düşülüyor: %s", e)
+                logger.warning(
+                    "[Beyin] Anthropic stream başarısız, tam yanıta düşülüyor: %s", e
+                )
                 yield self.dusun(sistem_prompt, mesajlar, model=model)
             return
 
@@ -903,22 +984,50 @@ class Beyin:
         t0 = time.monotonic()
 
         dispatch: dict[str, Callable[[], str]] = {
-            "lmstudio":           lambda: self._cagir_lmstudio(adim.base_url, adim.model, sistem_prompt, mesajlar),
-            "anthropic":          lambda: self._cagir_anthropic(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
-            "moonshot":           lambda: self._cagir_moonshot(adim.api_key, adim.model, sistem_prompt, mesajlar),
-            "azure":              lambda: self._cagir_azure(adim.api_key, adim.model, sistem_prompt, mesajlar),
-            "bedrock":            lambda: self._cagir_bedrock(adim.model, sistem_prompt, mesajlar),
-            "gemini":             lambda: self._cagir_gemini(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
-            "gemini_cloud":       lambda: self._cagir_gemini(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
-            "openrouter":         lambda: self._cagir_openai_uyumlu(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
-            "lmstudio_reasoning": lambda: self._cagir_lmstudio_reasoning(adim.model, sistem_prompt, mesajlar),
-            "codex_responses":    lambda: self._cagir_codex_responses(adim.model, sistem_prompt, mesajlar),
+            "lmstudio": lambda: self._cagir_lmstudio(
+                adim.base_url, adim.model, sistem_prompt, mesajlar
+            ),
+            "anthropic": lambda: self._cagir_anthropic(
+                adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar
+            ),
+            "moonshot": lambda: self._cagir_moonshot(
+                adim.api_key, adim.model, sistem_prompt, mesajlar
+            ),
+            "azure": lambda: self._cagir_azure(
+                adim.api_key, adim.model, sistem_prompt, mesajlar
+            ),
+            "bedrock": lambda: self._cagir_bedrock(adim.model, sistem_prompt, mesajlar),
+            "gemini": lambda: self._cagir_gemini(
+                adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar
+            ),
+            "gemini_cloud": lambda: self._cagir_gemini(
+                adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar
+            ),
+            "openrouter": lambda: self._cagir_openai_uyumlu(
+                adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar
+            ),
+            "lmstudio_reasoning": lambda: self._cagir_lmstudio_reasoning(
+                adim.model, sistem_prompt, mesajlar
+            ),
+            "codex_responses": lambda: self._cagir_codex_responses(
+                adim.model, sistem_prompt, mesajlar
+            ),
             # ── Yeni OpenAI-uyumlu sağlayıcılar ──────────────────────
-            "together":           lambda: self._cagir_openai_uyumlu(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
-            "fireworks":          lambda: self._cagir_openai_uyumlu(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
-            "mistral":            lambda: self._cagir_openai_uyumlu(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
-            "cohere":             lambda: self._cagir_openai_uyumlu(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
-            "perplexity":         lambda: self._cagir_openai_uyumlu(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
+            "together": lambda: self._cagir_openai_uyumlu(
+                adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar
+            ),
+            "fireworks": lambda: self._cagir_openai_uyumlu(
+                adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar
+            ),
+            "mistral": lambda: self._cagir_openai_uyumlu(
+                adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar
+            ),
+            "cohere": lambda: self._cagir_openai_uyumlu(
+                adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar
+            ),
+            "perplexity": lambda: self._cagir_openai_uyumlu(
+                adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar
+            ),
         }
 
         # Provider Abstraction entegrasyonu — deepseek, openai, xai
@@ -937,17 +1046,22 @@ class Beyin:
             else:
                 fn = dispatch.get(
                     adim.provider,
-                    lambda: self._cagir_openai_uyumlu(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
+                    lambda: self._cagir_openai_uyumlu(
+                        adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar
+                    ),
                 )
         else:
             fn = dispatch.get(
                 adim.provider,
-                lambda: self._cagir_openai_uyumlu(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
+                lambda: self._cagir_openai_uyumlu(
+                    adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar
+                ),
             )
         metin = fn()
 
         tahmini_token = (
-            len(sistem_prompt.split()) + sum(len(m.get("content", "").split()) for m in mesajlar)
+            len(sistem_prompt.split())
+            + sum(len(m.get("content", "").split()) for m in mesajlar)
             + len(metin.split())
         )
 
@@ -1000,21 +1114,49 @@ class Beyin:
             t0 = time.monotonic()
 
             dispatch: dict[str, Callable[[], str]] = {
-                "lmstudio":           lambda: self._cagir_lmstudio(adim.base_url, adim.model, sistem_prompt, mesajlar),
-                "anthropic":          lambda: self._cagir_anthropic(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
-                "moonshot":           lambda: self._cagir_moonshot(adim.api_key, adim.model, sistem_prompt, mesajlar),
-                "azure":              lambda: self._cagir_azure(adim.api_key, adim.model, sistem_prompt, mesajlar),
-                "bedrock":            lambda: self._cagir_bedrock(adim.model, sistem_prompt, mesajlar),
-                "gemini":             lambda: self._cagir_gemini(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
-                "gemini_cloud":       lambda: self._cagir_gemini(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
-                "openrouter":         lambda: self._cagir_openai_uyumlu(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
-                "openai":             lambda: self._cagir_openai_uyumlu(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
+                "lmstudio": lambda: self._cagir_lmstudio(
+                    adim.base_url, adim.model, sistem_prompt, mesajlar
+                ),
+                "anthropic": lambda: self._cagir_anthropic(
+                    adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar
+                ),
+                "moonshot": lambda: self._cagir_moonshot(
+                    adim.api_key, adim.model, sistem_prompt, mesajlar
+                ),
+                "azure": lambda: self._cagir_azure(
+                    adim.api_key, adim.model, sistem_prompt, mesajlar
+                ),
+                "bedrock": lambda: self._cagir_bedrock(
+                    adim.model, sistem_prompt, mesajlar
+                ),
+                "gemini": lambda: self._cagir_gemini(
+                    adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar
+                ),
+                "gemini_cloud": lambda: self._cagir_gemini(
+                    adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar
+                ),
+                "openrouter": lambda: self._cagir_openai_uyumlu(
+                    adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar
+                ),
+                "openai": lambda: self._cagir_openai_uyumlu(
+                    adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar
+                ),
                 # ── Yeni OpenAI-uyumlu sağlayıcılar ──────────────────
-                "together":           lambda: self._cagir_openai_uyumlu(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
-                "fireworks":          lambda: self._cagir_openai_uyumlu(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
-                "mistral":            lambda: self._cagir_openai_uyumlu(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
-                "cohere":             lambda: self._cagir_openai_uyumlu(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
-                "perplexity":         lambda: self._cagir_openai_uyumlu(adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar),
+                "together": lambda: self._cagir_openai_uyumlu(
+                    adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar
+                ),
+                "fireworks": lambda: self._cagir_openai_uyumlu(
+                    adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar
+                ),
+                "mistral": lambda: self._cagir_openai_uyumlu(
+                    adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar
+                ),
+                "cohere": lambda: self._cagir_openai_uyumlu(
+                    adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar
+                ),
+                "perplexity": lambda: self._cagir_openai_uyumlu(
+                    adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar
+                ),
             }
 
             # Provider Abstraction entegrasyonu — deepseek, openai, xai
@@ -1034,28 +1176,40 @@ class Beyin:
                     fn = dispatch.get(
                         adim.provider,
                         lambda: self._cagir_openai_uyumlu(
-                            adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar,
+                            adim.base_url,
+                            adim.api_key,
+                            adim.model,
+                            sistem_prompt,
+                            mesajlar,
                         ),
                     )
             else:
                 fn = dispatch.get(
                     adim.provider,
                     lambda: self._cagir_openai_uyumlu(
-                        adim.base_url, adim.api_key, adim.model, sistem_prompt, mesajlar,
+                        adim.base_url,
+                        adim.api_key,
+                        adim.model,
+                        sistem_prompt,
+                        mesajlar,
                     ),
                 )
             metin = fn()
             sure = time.monotonic() - t0
             logger.info(
                 "[Beyin] provider_cagir(%s, %s) = %.1fs",
-                provider, model, sure,
+                provider,
+                model,
+                sure,
             )
             return metin
 
         except Exception as e:
             logger.error(
                 "[Beyin] provider_cagir(%s, %s) hatasi: %s",
-                provider, model, e,
+                provider,
+                model,
+                e,
             )
             return f"[Beyin Hatası] {provider}/{model}: {e}"
 
@@ -1074,10 +1228,14 @@ class Beyin:
         url = f"{base_url}/v1/chat/completions"
         donusturulmus: list[dict] = []
         if sistem_prompt:
-            donusturulmus.append({"role": "user", "content": f"[SISTEM]: {sistem_prompt}"})
+            donusturulmus.append(
+                {"role": "user", "content": f"[SISTEM]: {sistem_prompt}"}
+            )
         for m in mesajlar:
             if m["role"] == "system":
-                donusturulmus.append({"role": "user", "content": f"[SISTEM]: {m['content']}"})
+                donusturulmus.append(
+                    {"role": "user", "content": f"[SISTEM]: {m['content']}"}
+                )
             else:
                 donusturulmus.append(m)
 
@@ -1165,11 +1323,14 @@ class Beyin:
         """Moonshot AI çağrısı; moonshot_schema tercih edilir, yoksa REST."""
         try:
             from reymen.sistem.moonshot_schema import MoonshotProvider  # type: ignore[import]
+
             mp = MoonshotProvider(model=model, api_key=api_key)
             return mp.uret(sistem_prompt, mesajlar)
         except ImportError:
             url = os.environ.get("MOONSHOT_BASE_URL", "https://api.moonshot.cn/v1")
-            return self._cagir_openai_uyumlu(url, api_key, model, sistem_prompt, mesajlar)
+            return self._cagir_openai_uyumlu(
+                url, api_key, model, sistem_prompt, mesajlar
+            )
 
     def _cagir_azure(
         self,
@@ -1180,7 +1341,7 @@ class Beyin:
     ) -> str:
         """Azure OpenAI çağrısı."""
         endpoint = os.environ.get("AZURE_OPENAI_ENDPOINT", "").rstrip("/")
-        version   = os.environ.get("AZURE_OPENAI_API_VERSION", "2024-02-01")
+        version = os.environ.get("AZURE_OPENAI_API_VERSION", "2024-02-01")
         if not endpoint:
             raise ValueError("AZURE_OPENAI_ENDPOINT ortam değişkeni ayarlı değil")
 
@@ -1229,6 +1390,7 @@ class Beyin:
         # 1. Vertex AI / Cloud Code adapter (opsiyonel)
         try:
             from reymen.sistem.gemini_cloudcode_adapter import GeminiCloudCodeAdapter  # type: ignore[import]
+
             adapter = GeminiCloudCodeAdapter(
                 project=os.environ.get("GOOGLE_CLOUD_PROJECT", ""),
                 location=os.environ.get("VERTEX_AI_LOCATION", "us-central1"),
@@ -1250,19 +1412,23 @@ class Beyin:
         # Gemini mesaj formatı: contents[{role, parts[{text}]}]
         gemini_icerkler: list[dict] = []
         if sistem_prompt:
-            gemini_icerkler.append({
-                "role": "user",
-                "parts": [{"text": f"[SISTEM] {sistem_prompt}"}],
-            })
+            gemini_icerkler.append(
+                {
+                    "role": "user",
+                    "parts": [{"text": f"[SISTEM] {sistem_prompt}"}],
+                }
+            )
         for m in mesajlar:
             rol = m.get("role", "user")
             icerik = m.get("content", "")
             # Gemini roles: user, model (not assistant)
             gemini_rol = "model" if rol in ("assistant", "model") else "user"
-            gemini_icerkler.append({
-                "role": gemini_rol,
-                "parts": [{"text": icerik}],
-            })
+            gemini_icerkler.append(
+                {
+                    "role": gemini_rol,
+                    "parts": [{"text": icerik}],
+                }
+            )
 
         payload = {
             "contents": gemini_icerkler,
@@ -1273,7 +1439,11 @@ class Beyin:
         }
 
         r = requests.post(
-            url, headers=headers, params=params, json=payload, timeout=TIMEOUT_SANIYE,
+            url,
+            headers=headers,
+            params=params,
+            json=payload,
+            timeout=TIMEOUT_SANIYE,
         )
         r.raise_for_status()
         veri = r.json()
@@ -1294,6 +1464,7 @@ class Beyin:
         """LM Studio derin akıl yürütme modu; yoksa standart LM Studio'ya düşer."""
         try:
             from reymen.sistem.lmstudio_reasoning import LMStudioReasoning  # type: ignore[import]
+
             lm = LMStudioReasoning(base_url=self.base_url)
             tam_prompt = f"{sistem_prompt}\n\n" + "\n".join(
                 f"{m['role'].upper()}: {m['content']}" for m in mesajlar
@@ -1369,6 +1540,7 @@ class Beyin:
                 gorev_icin_model_sec,
                 musait_providerlar_bul,
             )
+
             musait = musait_providerlar_bul(self.config)
             if musait:
                 prov, mdl = gorev_icin_model_sec(hedef, musait)
@@ -1418,10 +1590,10 @@ if __name__ == "__main__":
 
     cfg: dict[str, Any] = {
         "default_provider": "lmstudio",
-        "default_model":    "cognitivecomputations.dolphin3.0-llama3.1-8b",
+        "default_model": "cognitivecomputations.dolphin3.0-llama3.1-8b",
         "providers": {
             "lmstudio": {"base_url": "http://localhost:1234", "api_key": "not-needed"},
-            "deepseek": {"base_url": "https://api.deepseek.com",  "api_key": ""},
+            "deepseek": {"base_url": "https://api.deepseek.com", "api_key": ""},
         },
         "fallback_model": None,
     }

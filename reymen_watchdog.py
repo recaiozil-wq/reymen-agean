@@ -21,11 +21,14 @@ from datetime import datetime
 
 # --- KONFİGÜASYON ---
 PROFILER = ["default", "reymen", "kiral38"]
-HERMES_BIN = str(Path.home() / "AppData/Local/hermes/hermes-agent/venv/Scripts/hermes.exe")
+HERMES_BIN = str(
+    Path.home() / "AppData/Local/hermes/hermes-agent/venv/Scripts/hermes.exe"
+)
 PROJE_DIR = Path(__file__).parent.resolve()
 LOG_FILE = PROJE_DIR / ".ReYMeN" / "watchdog.log"
 MAX_LOG_BYTES = 1_048_576  # 1MB
 CHECK_INTERVAL = 60  # saniye
+
 
 # --- LOG ---
 def log_yaz(msg: str):
@@ -52,27 +55,33 @@ def aktif_profiller() -> set[str]:
     try:
         # PowerShell: Win32_Process ile komut satırını oku
         ps_cmd = (
-            'Get-CimInstance Win32_Process -Filter "name=\'python.exe\' or name=\'hermes.exe\'" '
+            "Get-CimInstance Win32_Process -Filter \"name='python.exe' or name='hermes.exe'\" "
             "| Select-Object CommandLine | Format-Table -HideTableHeaders"
         )
         r = subprocess.run(
             ["powershell.exe", "-NoProfile", "-Command", ps_cmd],
-            capture_output=True, text=True, timeout=10
+            capture_output=True,
+            text=True,
+            timeout=10,
         )
         for line in r.stdout.splitlines():
             line = line.strip()
             if "--profile" in line:
-                m = re.search(r'--profile\s+(\S+)', line)
+                m = re.search(r"--profile\s+(\S+)", line)
                 if m:
                     aktif.add(m.group(1))
 
         # Fallback: tasklist ile hermes.exe var mı kontrol et
         r2 = subprocess.run(
             ["tasklist", "/FI", "IMAGENAME eq hermes.exe", "/FO", "CSV", "/NH"],
-            capture_output=True, text=True, timeout=5
+            capture_output=True,
+            text=True,
+            timeout=5,
         )
         if "hermes.exe" not in r2.stdout and not aktif:
-            log_yaz("⚠️ hermes.exe tasklist'te görünmüyor, tüm profiller eksik sayılacak")
+            log_yaz(
+                "⚠️ hermes.exe tasklist'te görünmüyor, tüm profiller eksik sayılacak"
+            )
 
     except Exception as e:
         log_yaz(f"⚠️ Process tarama hatası: {e}")
@@ -91,7 +100,7 @@ def bot_baslat(profil: str) -> bool:
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
             creationflags=subprocess.DETACHED_PROCESS | subprocess.CREATE_NO_WINDOW,
-            close_fds=True
+            close_fds=True,
         )
         log_yaz(f"✅ {profil} başlatıldı (PID: {process.pid})")
         return True
@@ -142,7 +151,9 @@ if __name__ == "__main__":
                 # Process yaşıyor mu kontrol et
                 r = subprocess.run(
                     ["tasklist", "/FI", f"PID eq {pid_str}", "/FO", "CSV", "/NH"],
-                    capture_output=True, text=True, timeout=5
+                    capture_output=True,
+                    text=True,
+                    timeout=5,
                 )
                 if pid_str in r.stdout:
                     print(f"⚠️ Watchdog zaten çalışıyor (PID: {pid_str}), çıkılıyor.")

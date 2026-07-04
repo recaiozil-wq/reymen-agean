@@ -51,6 +51,7 @@ logger = logging.getLogger(__name__)
 # Auth Headers / Token ??karma
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 def extract_token(headers: dict[str, str]) -> Optional[str]:
     """Extract Bearer token from HTTP headers.
 
@@ -83,6 +84,7 @@ def extract_token_from_cookies(cookies: dict[str, str]) -> Optional[str]:
 # Kullan?c? Bilgisi
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 def get_user_from_token(
     token: str,
     auth_manager_override: Any = None,
@@ -105,6 +107,7 @@ def get_user_from_token(
     auth = auth_manager_override
     if auth is None:
         from reymen.guvenlik.reymen_auth import auth_manager as reymen_auth
+
         auth = reymen_auth
     payload = auth.verify_token(token)
     if payload is None:
@@ -121,12 +124,14 @@ def get_user_from_token(
 def check_role_for_token(token: str, required_role: str) -> bool:
     """Check if the JWT token's user has the required role."""
     from reymen.guvenlik.reymen_auth import auth_manager
+
     return auth_manager.require_role(token, required_role)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # Yetkilendirme S?n?f?
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class Authorization:
     """Authorization helper for HTTP requests.
@@ -137,9 +142,12 @@ class Authorization:
         - Error messages (for HTTP responses)
     """
 
-    def __init__(self, headers: dict[str, str],
-                 cookies: Optional[dict[str, str]] = None,
-                 auth_manager_override: Any = None):
+    def __init__(
+        self,
+        headers: dict[str, str],
+        cookies: Optional[dict[str, str]] = None,
+        auth_manager_override: Any = None,
+    ):
         self.headers = headers
         self.cookies = cookies or {}
         self._auth_manager = auth_manager_override
@@ -187,9 +195,7 @@ class Authorization:
         required_level = hierarchy.get(required_role, 0)
         return user_level >= required_level
 
-    def error_response(
-        self, status_code: int = 401
-    ) -> tuple[dict[str, Any], int]:
+    def error_response(self, status_code: int = 401) -> tuple[dict[str, Any], int]:
         """Error message to return as HTTP response."""
         messages = {
             401: "Yetkilendirme gerekli",
@@ -235,6 +241,7 @@ try:
 
     def require_role(required_role: str):
         """FastAPI dependency: for endpoints requiring a specific role."""
+
         async def _dependency(
             user: dict[str, Any] = Depends(get_current_user),
         ) -> dict[str, Any]:
@@ -247,9 +254,7 @@ try:
                     status_code=403,
                     detail={
                         "error": True,
-                        "message": (
-                            f"Bu i?lem i?in '{required_role}' yetkisi gerekli"
-                        ),
+                        "message": (f"Bu i?lem i?in '{required_role}' yetkisi gerekli"),
                         "user_role": user.get("role"),
                         "required_role": required_role,
                         "status_code": 403,
@@ -271,12 +276,14 @@ except ImportError:
     def require_role(required_role: str):
         async def _dependency():
             raise RuntimeError("FastAPI y?kl? de?il")
+
         return _dependency
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # Flask Entegrasyonu
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class FlaskAuth:
     """Auth helper for Flask requests."""
@@ -319,6 +326,7 @@ def flask_auth_middleware():
     """
     try:
         from flask import g, request  # type: ignore
+
         auth = FlaskAuth(request)
         g.auth = auth  # type: ignore
         g.current_user = auth.user_info  # type: ignore
@@ -335,50 +343,75 @@ from functools import wraps
 
 def auth_required(func):
     """Generic auth decorator — requires token for HTTP requests."""
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         try:
             from flask import g, request as flask_request  # type: ignore
+
             auth = FlaskAuth(flask_request)
             if not auth.authenticated:
-                return json.dumps({
-                    "error": True,
-                    "message": "Yetkilendirme gerekli",
-                }), 401, {"Content-Type": "application/json"}
+                return (
+                    json.dumps(
+                        {
+                            "error": True,
+                            "message": "Yetkilendirme gerekli",
+                        }
+                    ),
+                    401,
+                    {"Content-Type": "application/json"},
+                )
             g.auth = auth  # type: ignore
             g.current_user = auth.user_info  # type: ignore
         except ImportError:
             logger.warning("[fix_01_sessiz_except] ImportError")
         return func(*args, **kwargs)
+
     return wrapper
 
 
 def role_required(required_role: str):
     """Role-based access decorator."""
+
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
             try:
                 from flask import g, request as flask_request  # type: ignore
+
                 auth = FlaskAuth(flask_request)
                 if not auth.authenticated:
-                    return json.dumps({
-                        "error": True,
-                        "message": "Yetkilendirme gerekli",
-                    }), 401, {"Content-Type": "application/json"}
-                if not auth.require_role(required_role):
-                    return json.dumps({
-                        "error": True,
-                        "message": (
-                            f"Bu i?lem i?in '{required_role}' yetkisi gerekli"
+                    return (
+                        json.dumps(
+                            {
+                                "error": True,
+                                "message": "Yetkilendirme gerekli",
+                            }
                         ),
-                        "user_role": auth.role,
-                        "required_role": required_role,
-                    }), 403, {"Content-Type": "application/json"}
+                        401,
+                        {"Content-Type": "application/json"},
+                    )
+                if not auth.require_role(required_role):
+                    return (
+                        json.dumps(
+                            {
+                                "error": True,
+                                "message": (
+                                    f"Bu i?lem i?in '{required_role}' yetkisi gerekli"
+                                ),
+                                "user_role": auth.role,
+                                "required_role": required_role,
+                            }
+                        ),
+                        403,
+                        {"Content-Type": "application/json"},
+                    )
                 g.auth = auth  # type: ignore
                 g.current_user = auth.user_info  # type: ignore
             except ImportError:
                 logger.warning("[fix_01_sessiz_except] ImportError")
             return func(*args, **kwargs)
+
         return wrapper
+
     return decorator

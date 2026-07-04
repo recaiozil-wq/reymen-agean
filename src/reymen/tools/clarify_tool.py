@@ -1,5 +1,5 @@
-"""ReYMeN tools.clarify_tool shim — Hermes clarify fonksiyonlarını ReYMeN'e yönlendirir.
-"""
+"""ReYMeN tools.clarify_tool shim — Hermes clarify fonksiyonlarını ReYMeN'e yönlendirir."""
+
 from __future__ import annotations
 
 import logging

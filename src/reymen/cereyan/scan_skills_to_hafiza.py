@@ -125,7 +125,9 @@ def scan_skills():
             _ogrenme_db_ekle(kategori, dosya_adi, str(dosya))
         elif eski_hash != guncel_hash:
             # GÜNCELLENMİŞ DOSYA
-            logger.info("🔄 GÜNCELLENMİŞ: %s (hash: %s → %s)", meta_adi, eski_hash, guncel_hash)
+            logger.info(
+                "🔄 GÜNCELLENMİŞ: %s (hash: %s → %s)", meta_adi, eski_hash, guncel_hash
+            )
             guncel_sayisi += 1
             _skills_db_guncelle(meta_adi, str(dosya), guncel_hash)
             _ogrenme_db_guncelle(kategori, dosya_adi, str(dosya))

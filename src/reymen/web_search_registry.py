@@ -57,7 +57,13 @@ def get_provider(name: str) -> Optional[WebSearchProvider]:
 
 
 _LEGACY_PREFERENCE = (
-    "firecrawl", "parallel", "tavily", "exa", "searxng", "brave-free", "ddgs",
+    "firecrawl",
+    "parallel",
+    "tavily",
+    "exa",
+    "searxng",
+    "brave-free",
+    "ddgs",
 )
 
 
@@ -73,7 +79,9 @@ def _get_env_backend(capability: str) -> Optional[str]:
     return None
 
 
-def _resolve(configured: Optional[str], *, capability: str) -> Optional[WebSearchProvider]:
+def _resolve(
+    configured: Optional[str], *, capability: str
+) -> Optional[WebSearchProvider]:
     with _lock:
         snapshot = dict(_providers)
 

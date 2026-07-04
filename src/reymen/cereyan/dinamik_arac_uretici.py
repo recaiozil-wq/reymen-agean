@@ -108,7 +108,9 @@ def _llm_arac_uret(problem: str, provider) -> str:
         "os, subprocess, socket, requests gibi tehlikeli modülleri KULLANMA. "
         "Yalnizca standart kütüphane (math, re, json, datetime, pathlib, csv vb.) kullan."
     )
-    mesajlar = [{"role": "user", "content": f"Problem: {problem}\n\nPython fonksiyonu yaz:"}]
+    mesajlar = [
+        {"role": "user", "content": f"Problem: {problem}\n\nPython fonksiyonu yaz:"}
+    ]
     try:
         return provider.uret(sistem, mesajlar)
     except Exception as e:
@@ -116,6 +118,7 @@ def _llm_arac_uret(problem: str, provider) -> str:
 
 
 # ── Ana API ───────────────────────────────────────────────────────────────────
+
 
 def arac_uret_ve_calistir(
     problem: str,
@@ -159,7 +162,10 @@ def arac_uret_ve_calistir(
             continue
 
         # Sandbox'ta test et
-        test_kodu = kod + f"\n\n# Test\nprint({fonk_adi}({repr(test_girdisi) if test_girdisi else ''}))"
+        test_kodu = (
+            kod
+            + f"\n\n# Test\nprint({fonk_adi}({repr(test_girdisi) if test_girdisi else ''}))"
+        )
         sonuc = guvenli_calistir(test_kodu, timeout=15)
 
         if "[Hata]" in sonuc or "[Guvenlik Reddi]" in sonuc:
@@ -181,11 +187,12 @@ def arac_uret_ve_calistir(
         # Beceri olarak kristallestir
         try:
             from reymen.cereyan.closed_learning_loop import ClosedLearningLoop
+
             loop = ClosedLearningLoop()
             loop.beceri_kristallestir(
                 f"dinamik_{fonk_adi}",
                 f"Otomatik uretilmis arac: {problem[:80]}",
-                f"ARAC_URET(\"{problem[:60]}\")\nFonksiyon: {fonk_adi}\nDosya: {dosya_yolu}",
+                f'ARAC_URET("{problem[:60]}")\nFonksiyon: {fonk_adi}\nDosya: {dosya_yolu}',
             )
         except Exception as e:
             print(f"[DinAmikArac] Beceri kristallestirme hatasi: {e}")
@@ -241,10 +248,12 @@ if __name__ == "__main__":
 
     with tempfile.TemporaryDirectory() as tmpdir:
         import sys
+
         sys.path.insert(0, tmpdir)
 
         # Dinamik dizini gecici klasore yonlendir
         from reymen.cereyan import dinamik_arac_uretici as dau
+
         orijinal_dizin = dau.DINAMIK_ARAC_DIZINI
         dau.DINAMIK_ARAC_DIZINI = Path(tmpdir) / "araclar_dinamik"
 

@@ -30,10 +30,12 @@ CIKTI_DIZINI.mkdir(parents=True, exist_ok=True)
 
 # ── TTS (Text-to-Speech) ──────────────────────────────────────────────
 
+
 async def _tts_async(metin: str, ses: str, dosya_yolu: str) -> str:
     """edge-tts ile metni sese cevir (asyncio)."""
     try:
         import edge_tts
+
         communicate = edge_tts.Communicate(metin, ses)
         await communicate.save(dosya_yolu)
         return dosya_yolu
@@ -61,6 +63,7 @@ def konus(metin: str, ses: str = VARSAYILAN_SES, dosya_adi: str = "") -> str:
 
     if not dosya_adi:
         import hashlib
+
         kod = hashlib.md5(metin.encode()).hexdigest()[:8]
         dosya_adi = f"tts_{kod}.mp3"
 
@@ -80,6 +83,7 @@ def ses_liste() -> str:
     """Kullanilabilir sesleri listele."""
     try:
         import edge_tts
+
         sesler = asyncio.run(edge_tts.list_voices())
         turkce = [s for s in sesler if "TR" in s.get("Locale", "")]
         satirlar = ["🔊 Kullanilabilir Sesler:", ""]
@@ -99,6 +103,7 @@ def ses_liste() -> str:
 
 
 # ── STT (Speech-to-Text) ──────────────────────────────────────────────
+
 
 def dinle(dosya_yolu: str, dil: str = "tr-TR") -> str:
     """Ses dosyasini metne cevirir.
@@ -140,6 +145,7 @@ def dinle(dosya_yolu: str, dil: str = "tr-TR") -> str:
 
 # ── Motor tool'lari ────────────────────────────────────────────────────
 
+
 def motor_kaydet(motor) -> None:
     """Motor tarafindan otomatik cagrilir."""
     if not hasattr(motor, "_plugin_arac_kaydet"):
@@ -148,17 +154,15 @@ def motor_kaydet(motor) -> None:
         motor._plugin_arac_kaydet(
             "TTS_KONUS",
             lambda metin="", ses=VARSAYILAN_SES: konus(metin, ses),
-            "Metni sese cevir. Kullanim: TTS_KONUS(metin, ses='tr-TR-EmelNeural') -> dosya_yolu"
+            "Metni sese cevir. Kullanim: TTS_KONUS(metin, ses='tr-TR-EmelNeural') -> dosya_yolu",
         )
         motor._plugin_arac_kaydet(
-            "TTS_SES_LISTE",
-            ses_liste,
-            "Kullanilabilir TTS seslerini listele."
+            "TTS_SES_LISTE", ses_liste, "Kullanilabilir TTS seslerini listele."
         )
         motor._plugin_arac_kaydet(
             "STT_DINLE",
             lambda dosya="", dil="tr-TR": dinle(dosya, dil),
-            "Ses dosyasini metne cevir. Kullanim: STT_DINLE(dosya_yolu, dil='tr-TR')"
+            "Ses dosyasini metne cevir. Kullanim: STT_DINLE(dosya_yolu, dil='tr-TR')",
         )
         logger.info("[TTS/STT] 3 tool kaydedildi.")
     except Exception as e:
@@ -169,6 +173,7 @@ def motor_kaydet(motor) -> None:
 
 if __name__ == "__main__":
     import sys
+
     if len(sys.argv) < 2:
         print("Kullanim: tts_stt_tool.py [konus|dinle|sesler] [args]")
         sys.exit(1)

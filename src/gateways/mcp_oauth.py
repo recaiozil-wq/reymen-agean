@@ -9,6 +9,7 @@ import json
 import requests
 from pathlib import Path
 import logging
+
 logger = logging.getLogger(__name__)
 
 OAUTH_DB = Path(__file__).parent / ".ReYMeN" / "mcp_oauth.json"
@@ -28,7 +29,9 @@ class MCPOAuth:
 
     def _kaydet(self):
         OAUTH_DB.parent.mkdir(parents=True, exist_ok=True)
-        OAUTH_DB.write_text(json.dumps(self._tokens, ensure_ascii=False, indent=2), encoding="utf-8")
+        OAUTH_DB.write_text(
+            json.dumps(self._tokens, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
 
     def token_al(self, sunucu: str) -> str:
         return self._tokens.get(sunucu, {}).get("access_token", "")
@@ -40,6 +43,7 @@ class MCPOAuth:
     def yetkilendir(self, auth_url: str, client_id: str, scope: str = "") -> str:
         """OAuth yetkilendirme URL'si olustur."""
         import uuid
+
         state = uuid.uuid4().hex[:16]
         params = f"response_type=token&client_id={client_id}&state={state}"
         if scope:
@@ -52,8 +56,10 @@ class MCPOAuth:
             return False
         try:
             import jwt
+
             decoded = jwt.decode(token, options={"verify_signature": False})
             import time
+
             return decoded.get("exp", 0) > time.time()
         except Exception:
             return bool(token)
@@ -72,7 +78,8 @@ def motor_kaydet(motor):
         return
     motor._plugin_arac_kaydet(
         "MCP_OAUTH_TOKEN",
-        lambda sunucu="": oauth_token_al(str(sunucu)) or f"[OAuth]: {sunucu} için token yok",
+        lambda sunucu="": oauth_token_al(str(sunucu))
+        or f"[OAuth]: {sunucu} için token yok",
         "MCP sunucu OAuth token'ını al (sunucu: sunucu adı)",
     )
 

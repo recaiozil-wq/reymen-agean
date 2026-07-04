@@ -59,7 +59,9 @@ def _make_event(text="hi", chat_id="42"):
     return MessageEvent(
         text=text,
         message_type=MessageType.TEXT,
-        source=SessionSource(platform=Platform.TELEGRAM, chat_id=chat_id, chat_type="dm"),
+        source=SessionSource(
+            platform=Platform.TELEGRAM, chat_id=chat_id, chat_type="dm"
+        ),
     )
 
 
@@ -204,9 +206,9 @@ async def test_no_pending_cleans_up_normally():
             break
         await asyncio.sleep(0.01)
 
-    assert sk not in adapter._active_sessions, (
-        "_active_sessions was not cleaned up after a normal turn with no pending"
-    )
+    assert (
+        sk not in adapter._active_sessions
+    ), "_active_sessions was not cleaned up after a normal turn with no pending"
     assert sk not in adapter._pending_messages
 
     await adapter.cancel_background_tasks()

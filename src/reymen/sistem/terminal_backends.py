@@ -14,12 +14,16 @@ from datetime import datetime
 try:
     from tools.environments.wsl import WSLEnvironment
 except ImportError:
+
     class WSLEnvironment:
         """Stub — WSLEnvironment not available."""
+
         def __init__(self, dagitim=None):
             self.dagitim = dagitim
+
         def execute(self, komut, timeout=None):
             return {"basarili": False, "hata": "WSL not available", "donus_kodu": -1}
+
         @staticmethod
         def detect() -> bool:
             return False
@@ -108,13 +112,15 @@ class TerminalBackend:
 
         except subprocess.TimeoutExpired:
             gecen_sure = time.time() - baslangic
-            self._calisma_gecmisi.append({
-                "zaman": datetime.now().isoformat(),
-                "komut": str(komut)[:200],
-                "hata": "zaman_asimi",
-                "gecen_sure": round(gecen_sure, 3),
-                "basarili": False,
-            })
+            self._calisma_gecmisi.append(
+                {
+                    "zaman": datetime.now().isoformat(),
+                    "komut": str(komut)[:200],
+                    "hata": "zaman_asimi",
+                    "gecen_sure": round(gecen_sure, 3),
+                    "basarili": False,
+                }
+            )
             return {
                 "basarili": False,
                 "cikti": "",
@@ -184,7 +190,9 @@ class TerminalBackend:
                     f"-p {port} {kullanici}@{host} 'echo SSH_BAGLANTI_BASARILI'"
                 )
                 sonuc = self.calistir(test_komut, timeout=timeout or 15)
-                if sonuc["basarili"] and "SSH_BAGLANTI_BASARILI" in (sonuc.get("cikti") or ""):
+                if sonuc["basarili"] and "SSH_BAGLANTI_BASARILI" in (
+                    sonuc.get("cikti") or ""
+                ):
                     baglanti_id = f"{kullanici}@{host}:{port}"
                     self._ssh_baglantilari[baglanti_id] = {
                         "host": host,
@@ -192,8 +200,15 @@ class TerminalBackend:
                         "port": port,
                         "baglani_zamani": datetime.now().isoformat(),
                     }
-                    return {"basarili": True, "mesaj": f"SSH baglantisi basarili: {baglanti_id}"}
-                return {"basarili": False, "hata": "SSH baglantisi basarisiz", "detay": sonuc.get("hata", "")}
+                    return {
+                        "basarili": True,
+                        "mesaj": f"SSH baglantisi basarili: {baglanti_id}",
+                    }
+                return {
+                    "basarili": False,
+                    "hata": "SSH baglantisi basarisiz",
+                    "detay": sonuc.get("hata", ""),
+                }
 
         except Exception as hata:
             print(f"[TerminalBackend] SSH hatasi: {hata}")
@@ -269,12 +284,14 @@ class TerminalBackend:
         try:
             env = WSLEnvironment(dagitim=dagitim)
             sonuc = env.execute(komut, timeout=timeout or self._varsayilan_timeout)
-            self._calisma_gecmisi.append({
-                "zaman": datetime.now().isoformat(),
-                "komut": f"wsl:{dagitim or 'varsayilan'} {str(komut)[:100]}",
-                "donus_kodu": sonuc.get("donus_kodu", -1),
-                "basarili": sonuc.get("basarili", False),
-            })
+            self._calisma_gecmisi.append(
+                {
+                    "zaman": datetime.now().isoformat(),
+                    "komut": f"wsl:{dagitim or 'varsayilan'} {str(komut)[:100]}",
+                    "donus_kodu": sonuc.get("donus_kodu", -1),
+                    "basarili": sonuc.get("basarili", False),
+                }
+            )
             return sonuc
         except Exception as hata:
             return {"basarili": False, "hata": str(hata)}
@@ -365,10 +382,13 @@ class TerminalBackendDispatcher(TerminalBackend):
         """Komutu çalıştır ve okunabilir metin döndür."""
         sonuc = super().calistir(komut, **kwargs)
         cikti = (sonuc.get("cikti") or "").strip()
-        hata  = (sonuc.get("hata")  or "").strip()
+        hata = (sonuc.get("hata") or "").strip()
         if sonuc.get("basarili"):
             return f"[Tamam]:\n{cikti}" if cikti else "[Tamam]: Komut tamamlandi."
-        return f"[Hata]: {hata}\n{cikti}".strip() or f"[Hata]: Komut basarisiz (kod {sonuc.get('donus_kodu','?')})."
+        return (
+            f"[Hata]: {hata}\n{cikti}".strip()
+            or f"[Hata]: Komut basarisiz (kod {sonuc.get('donus_kodu','?')})."
+        )
 
 
 if __name__ == "__main__":

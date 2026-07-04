@@ -43,13 +43,13 @@ MEMORY_LIMIT_CHARS = 50000
 USER_LIMIT_CHARS = 50000
 
 # Compaction esikleri
-COMPACTION_ESIK_YUZDE = 80       # %80 dolulukta otomatik compaction baslat
-COMPACTION_HEDEF_YUZDE = 60     # Compaction sonrasi hedef %60 doluluk
-ARCIV_MAX_ENTRY = 200            # Arsiv dosyasi basina max entry
+COMPACTION_ESIK_YUZDE = 80  # %80 dolulukta otomatik compaction baslat
+COMPACTION_HEDEF_YUZDE = 60  # Compaction sonrasi hedef %60 doluluk
+ARCIV_MAX_ENTRY = 200  # Arsiv dosyasi basina max entry
 
 # Onem siralamasi (yuksek = korunur)
 ONEM_ETIKETLERI = {
-    "ZORUNLU KURAL": 100,        # Kalici kurallar — en yuksek onem
+    "ZORUNLU KURAL": 100,  # Kalici kurallar — en yuksek onem
     "KALICI KURAL": 95,
     "KURAL": 90,
     "ZORUNLU": 85,
@@ -77,7 +77,7 @@ ONEM_ETIKETLERI = {
 VARSAYILAN_ONEM = 30
 
 # Entry yas sinirlari (gun)
-GUNLUK_ESKI_ESIK = 14    # 14 gun + onceki seviye
+GUNLUK_ESKI_ESIK = 14  # 14 gun + onceki seviye
 HAFTALIK_ESKI_ESIK = 90  # 90 gun = cok eski
 
 # Yollar
@@ -88,6 +88,7 @@ _MEMORY_YOLU = _HAFIZA_DIZINI / "MEMORY.md"
 _USER_YOLU = _HAFIZA_DIZINI / "USER.md"
 
 # ── Yardimci Fonksiyonlar ────────────────────────────────────────────────
+
 
 def _entryleri_parcala(icerik: str) -> List[Dict[str, Any]]:
     """MEMORY.md/USER.md icerigini entry'lere ayir ve metadata cikar.
@@ -114,15 +115,17 @@ def _entryleri_parcala(icerik: str) -> List[Dict[str, Any]]:
         etiket = _etiket_bul(metin)
         tarih = _tarih_bul(metin)
 
-        entryler.append({
-            "metin": metin,
-            "sira": i,
-            "karakter": len(metin),
-            "onem_puani": onem_puani,
-            "tarih": tarih,
-            "etiket": etiket,
-            "eski_mi": _eski_mi(tarih) if tarih else False,
-        })
+        entryler.append(
+            {
+                "metin": metin,
+                "sira": i,
+                "karakter": len(metin),
+                "onem_puani": onem_puani,
+                "tarih": tarih,
+                "etiket": etiket,
+                "eski_mi": _eski_mi(tarih) if tarih else False,
+            }
+        )
 
     return entryler
 
@@ -147,9 +150,17 @@ def _onem_puanla(metin: str) -> int:
 
     # Gorev/log entry'leri dusuk onem
     gorev_isaretleri = [
-        "fix:", "duzeltildi", "tamamlandi", "gorev bitti",
-        "eklendi", "kaldirildi", "guncellendi", "test gecti",
-        "gorev_id", "task_id", "commit",
+        "fix:",
+        "duzeltildi",
+        "tamamlandi",
+        "gorev bitti",
+        "eklendi",
+        "kaldirildi",
+        "guncellendi",
+        "test gecti",
+        "gorev_id",
+        "task_id",
+        "commit",
     ]
     if any(isaret in metin.lower() for isaret in gorev_isaretleri):
         en_yuksek = min(en_yuksek, 20)
@@ -175,15 +186,15 @@ def _etiket_bul(metin: str) -> str:
 def _tarih_bul(metin: str) -> Optional[str]:
     """Entry icinde bir tarih varsa bul (YYYY-MM-DD veya benzeri)."""
     # YYYY-MM-DD
-    m = re.search(r'(\d{4})-(\d{2})-(\d{2})', metin)
+    m = re.search(r"(\d{4})-(\d{2})-(\d{2})", metin)
     if m:
         return m.group(0)
     # DD.MM.YYYY
-    m = re.search(r'(\d{2})\.(\d{2})\.(\d{4})', metin)
+    m = re.search(r"(\d{2})\.(\d{2})\.(\d{4})", metin)
     if m:
         return f"{m.group(3)}-{m.group(2)}-{m.group(1)}"
     # DD/MM/YYYY
-    m = re.search(r'(\d{2})/(\d{2})/(\d{4})', metin)
+    m = re.search(r"(\d{2})/(\d{2})/(\d{4})", metin)
     if m:
         return f"{m.group(3)}-{m.group(2)}-{m.group(1)}"
     return None
@@ -214,8 +225,10 @@ def _dosya_boyut_kontrol(dosya_yolu: Path, limit: int) -> Tuple[int, float]:
 
 # ── Ana Compaction Fonksiyonlari ─────────────────────────────────────────
 
-def _compaction_yap(icerik: str, dosya_adi: str, limit: int,
-                    zorla: bool = False) -> Tuple[str, Dict[str, Any]]:
+
+def _compaction_yap(
+    icerik: str, dosya_adi: str, limit: int, zorla: bool = False
+) -> Tuple[str, Dict[str, Any]]:
     """Bir memory dosyasinda compaction yap.
 
     Args:
@@ -260,15 +273,17 @@ def _compaction_yap(icerik: str, dosya_adi: str, limit: int,
 
     # --- COMPACTION BASLA ---
     rapor["compaction_yapildi"] = True
-    logger.info("[Compaction] %s: %d/%d karakter (%d%%) — compaction basliyor",
-                dosya_adi, boyut, limit, int(yuzde))
+    logger.info(
+        "[Compaction] %s: %d/%d karakter (%d%%) — compaction basliyor",
+        dosya_adi,
+        boyut,
+        limit,
+        int(yuzde),
+    )
 
     # 1. Entry'leri onem puanina ve yasina gore sirala
     #    (dusuk onemli + eski entry'ler once silinir)
-    sirali = sorted(
-        entryler,
-        key=lambda e: (e["onem_puani"], 0 if e["eski_mi"] else 1)
-    )
+    sirali = sorted(entryler, key=lambda e: (e["onem_puani"], 0 if e["eski_mi"] else 1))
 
     # 2. Arsivlenecek ve silinecek entry'leri belirle
     korunanlar = []
@@ -299,15 +314,18 @@ def _compaction_yap(icerik: str, dosya_adi: str, limit: int,
             continue
 
     # 3. Kalanlari koru
-    korunan_idler = {e["sira"] for e in entryler} - \
-                    {e["sira"] for e in silinecekler} - \
-                    {e["sira"] for e in arsivlenecekler}
+    korunan_idler = (
+        {e["sira"] for e in entryler}
+        - {e["sira"] for e in silinecekler}
+        - {e["sira"] for e in arsivlenecekler}
+    )
     korunanlar = [e for e in entryler if e["sira"] in korunan_idler]
 
     # 4. Silinenleri raporla
     for e in silinecekler:
-        logger.debug("[Compaction] SILINDI [onem=%d]: %.60s",
-                     e["onem_puani"], e["metin"][:60])
+        logger.debug(
+            "[Compaction] SILINDI [onem=%d]: %.60s", e["onem_puani"], e["metin"][:60]
+        )
 
     # 5. Arsivle
     if arsivlenecekler:
@@ -328,11 +346,15 @@ def _compaction_yap(icerik: str, dosya_adi: str, limit: int,
     rapor["arsivlenen_entry"] = len(arsivlenecekler)
     rapor["budanan_karakter"] = boyut - len(yeni_icerik)
 
-    logger.info("[Compaction] %s: %d entry -> %d entry (%d silindi, %d arsivlendi, %d karakter budandi)",
-                dosya_adi,
-                rapor["onceki_entry"], rapor["sonraki_entry"],
-                rapor["silinen_entry"], rapor["arsivlenen_entry"],
-                rapor["budanan_karakter"])
+    logger.info(
+        "[Compaction] %s: %d entry -> %d entry (%d silindi, %d arsivlendi, %d karakter budandi)",
+        dosya_adi,
+        rapor["onceki_entry"],
+        rapor["sonraki_entry"],
+        rapor["silinen_entry"],
+        rapor["arsivlenen_entry"],
+        rapor["budanan_karakter"],
+    )
 
     return yeni_icerik, rapor
 
@@ -348,9 +370,13 @@ def _arsive_kaydet(dosya_adi: str, entryler: List[Dict[str, Any]]) -> bool:
         # Arsiv dosyasi adi: MEMORY_2026-07-02_001.md
         bugun = datetime.now().strftime("%Y-%m-%d")
         # Mevcut arsiv dosyalarini say
-        mevcut = list(_ARSIV_DIZINI.glob(f"{dosya_adi.replace('.md', '')}_{bugun}_*.md"))
+        mevcut = list(
+            _ARSIV_DIZINI.glob(f"{dosya_adi.replace('.md', '')}_{bugun}_*.md")
+        )
         sira = len(mevcut) + 1
-        arsiv_yolu = _ARSIV_DIZINI / f"{dosya_adi.replace('.md', '')}_{bugun}_{sira:03d}.md"
+        arsiv_yolu = (
+            _ARSIV_DIZINI / f"{dosya_adi.replace('.md', '')}_{bugun}_{sira:03d}.md"
+        )
 
         # Arsiv icerigi
         arsiv_satirlar = [
@@ -362,7 +388,9 @@ def _arsive_kaydet(dosya_adi: str, entryler: List[Dict[str, Any]]) -> bool:
         ]
 
         for e in entryler:
-            arsiv_satirlar.append(f"## Entry #{e['sira']+1} (onem={e['onem_puani']}, etiket={e['etiket']})")
+            arsiv_satirlar.append(
+                f"## Entry #{e['sira']+1} (onem={e['onem_puani']}, etiket={e['etiket']})"
+            )
             if e["tarih"]:
                 arsiv_satirlar.append(f"**Tarih:** {e['tarih']}")
             if e["eski_mi"]:
@@ -376,7 +404,9 @@ def _arsive_kaydet(dosya_adi: str, entryler: List[Dict[str, Any]]) -> bool:
         _ARSIV_DIZINI.mkdir(parents=True, exist_ok=True)
         arsiv_yolu.write_text("\n".join(arsiv_satirlar), encoding="utf-8")
 
-        logger.info("[Compaction] Arsivlendi: %s (%d entry)", arsiv_yolu.name, len(entryler))
+        logger.info(
+            "[Compaction] Arsivlendi: %s (%d entry)", arsiv_yolu.name, len(entryler)
+        )
         return True
 
     except Exception as e:
@@ -385,6 +415,7 @@ def _arsive_kaydet(dosya_adi: str, entryler: List[Dict[str, Any]]) -> bool:
 
 
 # ── Cache Temizleme ──────────────────────────────────────────────────────
+
 
 def cache_tazele() -> Dict[str, Any]:
     """@lru_cache ile cache'lenmis fonksiyonlari temizle.
@@ -401,6 +432,7 @@ def cache_tazele() -> Dict[str, Any]:
     # 1. prompt_assembly._dosya_oku
     try:
         from reymen.cereyan import prompt_assembly
+
         prompt_assembly._dosya_oku.cache_clear()
         temizlenen += 1
         moduller.append("prompt_assembly._dosya_oku")
@@ -423,13 +455,15 @@ def cache_tazele() -> Dict[str, Any]:
     # (placeholder)
 
     if temizlenen > 0:
-        logger.info("[Cache] %d cache fonksiyon temizlendi: %s",
-                    temizlenen, ", ".join(moduller))
+        logger.info(
+            "[Cache] %d cache fonksiyon temizlendi: %s", temizlenen, ", ".join(moduller)
+        )
 
     return {"temizlenen": temizlenen, "moduller": moduller}
 
 
 # ── Ana Compaction Fonksiyonu ────────────────────────────────────────────
+
 
 def memory_compaction_check(zorla: bool = False) -> Dict[str, Any]:
     """MEMORY.md ve USER.md'de compaction kontrolu yap.
@@ -463,7 +497,7 @@ def memory_compaction_check(zorla: bool = False) -> Dict[str, Any]:
         if not dosya_yolu.exists():
             rapor["dosyalar"][dosya_adi] = {
                 "durum": "yok",
-                "mesaj": f"Dosya bulunamadi: {dosya_yolu}"
+                "mesaj": f"Dosya bulunamadi: {dosya_yolu}",
             }
             logger.debug("[Compaction] %s bulunamadi: %s", dosya_adi, dosya_yolu)
             continue
@@ -475,9 +509,12 @@ def memory_compaction_check(zorla: bool = False) -> Dict[str, Any]:
             # Degisiklik varsa yaz
             if dosya_raporu["compaction_yapildi"] and yeni_icerik != icerik:
                 dosya_yolu.write_text(yeni_icerik, encoding="utf-8")
-                logger.info("[Compaction] %s guncellendi: %d -> %d karakter",
-                            dosya_adi, dosya_raporu["onceki_karakter"],
-                            dosya_raporu["sonraki_karakter"])
+                logger.info(
+                    "[Compaction] %s guncellendi: %d -> %d karakter",
+                    dosya_adi,
+                    dosya_raporu["onceki_karakter"],
+                    dosya_raporu["sonraki_karakter"],
+                )
 
             rapor["dosyalar"][dosya_adi] = dosya_raporu
             rapor["toplam_budanan_karakter"] += dosya_raporu.get("budanan_karakter", 0)
@@ -497,12 +534,14 @@ def memory_compaction_check(zorla: bool = False) -> Dict[str, Any]:
 
     rapor["sure_sn"] = round(time.time() - baslama, 2)
 
-    logger.info("[Compaction] ===== TAMAMLANDI: %d karakter budandi, "
-                "%d entry silindi, %d entry arsivlendi (%.2fs) =====",
-                rapor["toplam_budanan_karakter"],
-                rapor["toplam_silinen_entry"],
-                rapor["toplam_arsivlenen_entry"],
-                rapor["sure_sn"])
+    logger.info(
+        "[Compaction] ===== TAMAMLANDI: %d karakter budandi, "
+        "%d entry silindi, %d entry arsivlendi (%.2fs) =====",
+        rapor["toplam_budanan_karakter"],
+        rapor["toplam_silinen_entry"],
+        rapor["toplam_arsivlenen_entry"],
+        rapor["sure_sn"],
+    )
 
     return rapor
 
@@ -531,8 +570,11 @@ def hafif_compaction_kontrol() -> Dict[str, Any]:
 
         if yuzde >= COMPACTION_ESIK_YUZDE:
             rapor["islem_yapildi"] = True
-            logger.info("[Compaction] Hafif kontrol: %s %d%% dolu — compaction basliyor",
-                        dosya_adi, int(yuzde))
+            logger.info(
+                "[Compaction] Hafif kontrol: %s %d%% dolu — compaction basliyor",
+                dosya_adi,
+                int(yuzde),
+            )
 
     if rapor["islem_yapildi"]:
         comp_rapor = memory_compaction_check(zorla=True)
@@ -542,6 +584,7 @@ def hafif_compaction_kontrol() -> Dict[str, Any]:
 
 
 # ── Cron Gorevi ──────────────────────────────────────────────────────────
+
 
 def cron_compaction_gorevi() -> Dict[str, Any]:
     """Cron job olarak cagrilmak uzere compaction gorevi.
@@ -577,10 +620,12 @@ def cron_compaction_gorevi() -> Dict[str, Any]:
 
         if sonuc.get("toplam_budanan_karakter", 0) > 0:
             seviye = logging.INFO
-            mesaj = (f"[Cron-Compaction] Basarili: "
-                     f"{sonuc['toplam_budanan_karakter']} karakter budandi, "
-                     f"{sonuc['toplam_silinen_entry']} entry silindi, "
-                     f"{sonuc['toplam_arsivlenen_entry']} entry arsivlendi")
+            mesaj = (
+                f"[Cron-Compaction] Basarili: "
+                f"{sonuc['toplam_budanan_karakter']} karakter budandi, "
+                f"{sonuc['toplam_silinen_entry']} entry silindi, "
+                f"{sonuc['toplam_arsivlenen_entry']} entry arsivlendi"
+            )
         else:
             seviye = logging.DEBUG
             mesaj = "[Cron-Compaction] Compaction gerektiren dosya bulunamadi"
@@ -594,6 +639,7 @@ def cron_compaction_gorevi() -> Dict[str, Any]:
 
 
 # ── Compaction Ozeti ─────────────────────────────────────────────────────
+
 
 def compaction_ozet() -> str:
     """MEMORY.md ve USER.md'nin guncel doluluk ozetini dondur."""
@@ -621,16 +667,13 @@ def compaction_ozet() -> str:
             durum = "⚪ DUSUK"
 
         satirlar.append(
-            f"{durum} {dosya_adi}: {boyut:,}/{limit:,} karakter "
-            f"(%{yuzde:.1f})"
+            f"{durum} {dosya_adi}: {boyut:,}/{limit:,} karakter " f"(%{yuzde:.1f})"
         )
 
     # Arsiv bilgisi
     if _ARSIV_DIZINI.exists():
         arsiv_sayisi = len(list(_ARSIV_DIZINI.glob("*.md")))
-        arsiv_boyut = sum(
-            f.stat().st_size for f in _ARSIV_DIZINI.glob("*.md")
-        )
+        arsiv_boyut = sum(f.stat().st_size for f in _ARSIV_DIZINI.glob("*.md"))
         satirlar.append(f"")
         satirlar.append(f"📦 Arsiv: {arsiv_sayisi} dosya, {arsiv_boyut // 1024} KB")
 

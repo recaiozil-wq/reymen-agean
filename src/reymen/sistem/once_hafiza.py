@@ -45,6 +45,7 @@ from src.reymen.cereyan.once_hafiza import (
     _benzerlik_skoru as _cereyan_benzerlik,
     eski_kayitlari_temizle as _cereyan_temizle,
 )
+
 # Module-level alias (aynı isimle kullanım için)
 _kademeli_guven = _cereyan_kademeli_guven
 
@@ -52,7 +53,7 @@ _kademeli_guven = _cereyan_kademeli_guven
 class OnceHafiza:
     """
     Önce Hafızaya Bak prensibi.
-    
+
     Her işlem öncesi:
     1. Hafızada benzer çözüm ara
     2. Bulursan direkt uygula (tekrar keşfetme)
@@ -129,7 +130,10 @@ class OnceHafiza:
             try:
                 con.execute(idx_sql)
             except sqlite3.OperationalError as _e:
-                logger.warning("[OnceHafiza] Veritabani hatasi (L131): %s", sqlite3.OperationalError)
+                logger.warning(
+                    "[OnceHafiza] Veritabani hatasi (L131): %s",
+                    sqlite3.OperationalError,
+                )
                 pass
         con.commit()
         con.close()
@@ -178,7 +182,11 @@ class OnceHafiza:
                 ).fetchone()
                 if row:
                     logger.info("[OnceHafiza] 🔍 Skills FTS5'te bulundu: %s", row[0])
-                    return {"hedef": row[0], "cozum": row[2], "kaynak": row[3] or "skills"}
+                    return {
+                        "hedef": row[0],
+                        "cozum": row[2],
+                        "kaynak": row[3] or "skills",
+                    }
             except Exception:
                 logger.warning("[fix_01_sessiz_except] Exception")
             finally:
@@ -200,13 +208,21 @@ class OnceHafiza:
                 sql += " LIMIT 1"
                 row = con.execute(sql, params).fetchone()
                 if row:
-                    logger.info("[OnceHafiza] 🔍 Ogrenme DB'de bulundu: %s (kat=%s)", row[0], row[7] or "yok")
+                    logger.info(
+                        "[OnceHafiza] 🔍 Ogrenme DB'de bulundu: %s (kat=%s)",
+                        row[0],
+                        row[7] or "yok",
+                    )
 
                     guven_skor = row[6] if len(row) > 6 and row[6] is not None else 1.0
 
                     # Güven < 0.5 → belirsiz
                     if guven_skor < 0.5:
-                        logger.warning("[OnceHafiza] ⚠️ Guven skoru dusuk (%.2f): %s", guven_skor, row[0])
+                        logger.warning(
+                            "[OnceHafiza] ⚠️ Guven skoru dusuk (%.2f): %s",
+                            guven_skor,
+                            row[0],
+                        )
                         return {
                             "durum": "belirsiz",
                             "hedef": row[0],
@@ -223,9 +239,15 @@ class OnceHafiza:
 
                     # Güven skoru + son kullanım güncelle (kademeli sigmoid)
                     if len(row) > 6:
-                        basari_say = row[3] if len(row) > 3 else 1  # basari_sayisi (index 3)
-                        hata_say = row[4] if len(row) > 4 else 0    # hata_sayisi (index 4)
-                        yeni_guven = round(self._kademeli_guven(basari_say + 1, hata_say), 4)
+                        basari_say = (
+                            row[3] if len(row) > 3 else 1
+                        )  # basari_sayisi (index 3)
+                        hata_say = (
+                            row[4] if len(row) > 4 else 0
+                        )  # hata_sayisi (index 4)
+                        yeni_guven = round(
+                            self._kademeli_guven(basari_say + 1, hata_say), 4
+                        )
                         con.execute(
                             "UPDATE ogrenmeler SET basari_sayisi = basari_sayisi + 1, "
                             "son_basari = datetime('now'), "
@@ -244,11 +266,18 @@ class OnceHafiza:
                         )
                     con.commit()
 
-                    sonuc = {"hedef": row[0], "cozum": row[1], "kaynak": row[4] or "ogrenme", "guven": guven_skor}
+                    sonuc = {
+                        "hedef": row[0],
+                        "cozum": row[1],
+                        "kaynak": row[4] or "ogrenme",
+                        "guven": guven_skor,
+                    }
                     if len(row) > 7 and row[7]:
                         sonuc["kategori"] = row[7]
                     if gecerlilik_asmis:
-                        sonuc["uyari"] = f"⚠️ Bu bilginin geçerlilik tarihi {gecerli} — güncelliğini yitirmiş olabilir!"
+                        sonuc["uyari"] = (
+                            f"⚠️ Bu bilginin geçerlilik tarihi {gecerli} — güncelliğini yitirmiş olabilir!"
+                        )
                     return sonuc
             except Exception as _e:
                 logger.warning("[OnceHafiza] except Exception (L251): %s", Exception)
@@ -272,13 +301,19 @@ class OnceHafiza:
                 sql += " ORDER BY basari_sayisi DESC LIMIT 1"
                 row = con.execute(sql, params).fetchone()
                 if row:
-                    logger.info("[OnceHafiza] 🔍 Ogrenme DB'de (kismi): %s (kat=%s)", row[0], row[7] or "yok")
+                    logger.info(
+                        "[OnceHafiza] 🔍 Ogrenme DB'de (kismi): %s (kat=%s)",
+                        row[0],
+                        row[7] or "yok",
+                    )
 
                     guven_skor = row[6] if len(row) > 6 and row[6] is not None else 1.0
 
                     # Güven < 0.5 → belirsiz
                     if guven_skor < 0.5:
-                        logger.warning("[OnceHafiza] ⚠️ Guven skoru dusuk (kismi): %.2f", guven_skor)
+                        logger.warning(
+                            "[OnceHafiza] ⚠️ Guven skoru dusuk (kismi): %.2f", guven_skor
+                        )
                         return {
                             "durum": "belirsiz",
                             "hedef": row[0],
@@ -288,7 +323,12 @@ class OnceHafiza:
                             "uyari": f"⚠️ Kısmi eşleşme ama güven skoru düşük ({guven_skor:.2f})",
                         }
 
-                    return {"hedef": row[0], "cozum": row[1], "kaynak": row[2] or "ogrenme_kismi", "guven": guven_skor}
+                    return {
+                        "hedef": row[0],
+                        "cozum": row[1],
+                        "kaynak": row[2] or "ogrenme_kismi",
+                        "guven": guven_skor,
+                    }
             except Exception as _e:
                 logger.warning("[OnceHafiza] except Exception (L288): %s", Exception)
                 pass
@@ -302,8 +342,14 @@ class OnceHafiza:
 
     # ── ADIM 2: Kaydet ──────────────────────────────────────────────────
 
-    def kaydet(self, hedef: str, cozum: str, kaynak: str = "kesif", kategori: str = "",
-                kaynak_url: str | None = None) -> None:
+    def kaydet(
+        self,
+        hedef: str,
+        cozum: str,
+        kaynak: str = "kesif",
+        kategori: str = "",
+        kaynak_url: str | None = None,
+    ) -> None:
         """Başarılı çözümü öğrenme DB'sine kaydet.
 
         Varsa: basari_sayisi++ güncelle, guven_skoru yeniden hesapla
@@ -324,8 +370,10 @@ class OnceHafiza:
                 su_an = datetime.now(timezone.utc)
                 bugun = su_an.strftime("%Y-%m-%d")
                 # +6 ay (basit: 180 gün)
-                gelecek = su_an.replace(month=su_an.month + 6 if su_an.month <= 6 else su_an.month - 6,
-                                        year=su_an.year + (1 if su_an.month > 6 else 0))
+                gelecek = su_an.replace(
+                    month=su_an.month + 6 if su_an.month <= 6 else su_an.month - 6,
+                    year=su_an.year + (1 if su_an.month > 6 else 0),
+                )
                 gecerlilik = gelecek.strftime("%Y-%m-%d")
 
                 # Var mı kontrol et
@@ -353,12 +401,28 @@ class OnceHafiza:
                     "cozum = excluded.cozum, "
                     "kaynak_url = COALESCE(?, kaynak_url), "
                     "kategori = CASE WHEN excluded.kategori != '' THEN excluded.kategori ELSE kategori END",
-                    (hedef[:500], cozum, kaynak, bugun, bugun, guven, kategori[:50], gecerlilik,
-                     kaynak_url, guven, kaynak_url),
+                    (
+                        hedef[:500],
+                        cozum,
+                        kaynak,
+                        bugun,
+                        bugun,
+                        guven,
+                        kategori[:50],
+                        gecerlilik,
+                        kaynak_url,
+                        guven,
+                        kaynak_url,
+                    ),
                 )
                 con.commit()
-                logger.info("[OnceHafiza] ✅ Kaydedildi: %s (guven=%.2f, kategori=%s, gecerlilik=%s)",
-                            hedef[:50], guven, kategori or "yok", gecerlilik)
+                logger.info(
+                    "[OnceHafiza] ✅ Kaydedildi: %s (guven=%.2f, kategori=%s, gecerlilik=%s)",
+                    hedef[:50],
+                    guven,
+                    kategori or "yok",
+                    gecerlilik,
+                )
             except Exception as e:
                 logger.warning("[OnceHafiza] Kayit hatasi: %s", e)
             finally:
@@ -545,7 +609,9 @@ class OnceHafiza:
         kayit = self.hafizada_ara(hedef, kategori=kategori)
         if kayit:
             if kayit.get("durum") == "belirsiz":
-                logger.warning("[OnceHafiza] ⚠️ Belirsiz cozum, LLM'e birakiliyor: %s", hedef[:50])
+                logger.warning(
+                    "[OnceHafiza] ⚠️ Belirsiz cozum, LLM'e birakiliyor: %s", hedef[:50]
+                )
                 return {
                     "durum": "belirsiz",
                     "sonuc": kayit["cozum"],
@@ -635,10 +701,16 @@ def _get_once_hafiza() -> OnceHafiza:
     return _INSTANCE
 
 
-def isle(hedef: str, calistirici: Callable | None = None, kategori: str = "",
-         kaynak_url: str | None = None) -> dict[str, Any]:
+def isle(
+    hedef: str,
+    calistirici: Callable | None = None,
+    kategori: str = "",
+    kaynak_url: str | None = None,
+) -> dict[str, Any]:
     """Kullanması kolay modül-level fonksiyon."""
-    return _get_once_hafiza().isle(hedef, calistirici, kategori=kategori, kaynak_url=kaynak_url)
+    return _get_once_hafiza().isle(
+        hedef, calistirici, kategori=kategori, kaynak_url=kaynak_url
+    )
 
 
 def hafizada_ara(hedef: str, kategori: str = "") -> dict[str, Any] | None:
@@ -646,10 +718,17 @@ def hafizada_ara(hedef: str, kategori: str = "") -> dict[str, Any] | None:
     return _get_once_hafiza().hafizada_ara(hedef, kategori=kategori)
 
 
-def kaydet(hedef: str, cozum: str, kategori: str = "", kaynak: str = "kesif",
-            kaynak_url: str | None = None) -> None:
+def kaydet(
+    hedef: str,
+    cozum: str,
+    kategori: str = "",
+    kaynak: str = "kesif",
+    kaynak_url: str | None = None,
+) -> None:
     """Çözümü kaydet."""
-    _get_once_hafiza().kaydet(hedef, cozum, kategori=kategori, kaynak=kaynak, kaynak_url=kaynak_url)
+    _get_once_hafiza().kaydet(
+        hedef, cozum, kategori=kategori, kaynak=kaynak, kaynak_url=kaynak_url
+    )
 
 
 # ── cereyan/once_hafiza.py'den 4 fonksiyon alias (module-level) ──────────
@@ -672,7 +751,10 @@ if __name__ == "__main__":
 
     # Test 2: Kaydet
     print("\n[Test 2] Kaydet")
-    oh.kaydet("dosya_sifreleme_cozumu", "openssl ile AES-256 sifreleme: `openssl enc -aes-256-cbc`")
+    oh.kaydet(
+        "dosya_sifreleme_cozumu",
+        "openssl ile AES-256 sifreleme: `openssl enc -aes-256-cbc`",
+    )
 
     # Test 3: Aynı hedef tekrar → hafızadan
     print("\n[Test 3] Ayni hedef tekrar (hafizadan gelmeli)")
@@ -682,7 +764,9 @@ if __name__ == "__main__":
 
     # Test 4: Hata analizi
     print("\n[Test 4] Hata analizi")
-    analiz = oh.analiz_et("api_baglantisi", "Connection refused: API sunucusuna baglanilamiyor")
+    analiz = oh.analiz_et(
+        "api_baglantisi", "Connection refused: API sunucusuna baglanilamiyor"
+    )
     print(f"  Analiz: {analiz}")
 
     print("\n✅ Tum testler gecti")

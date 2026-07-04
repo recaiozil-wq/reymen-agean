@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """akilli_yonlendirici.py testleri."""
+
 import sys
 from pathlib import Path
 
@@ -58,7 +59,9 @@ class TestGoreviSiniflandir:
     def test_guvensiz_onceceligi(self):
         """guvensiz kategori digerlerinden once gelmeli."""
         assert router.gorevi_siniflandir("gizli kod yaz") == "guvensiz"  # gizli > kod
-        assert router.gorevi_siniflandir("gizli matematik formulu") == "guvensiz"  # gizli > mantik
+        assert (
+            router.gorevi_siniflandir("gizli matematik formulu") == "guvensiz"
+        )  # gizli > mantik
 
     def test_kod_onceceligi(self):
         """kod, mantik/hizli/yaratici'dan once gelmeli."""
@@ -139,21 +142,15 @@ class TestGorevIcinModelSec:
 
     def test_model_adi_dogru(self):
         """Provider'a gore dogru model adi donmeli."""
-        _, model = router.gorev_icin_model_sec(
-            "python kodu yaz", ["deepseek"]
-        )
+        _, model = router.gorev_icin_model_sec("python kodu yaz", ["deepseek"])
         assert model == "deepseek-reasoner"
 
-        _, model = router.gorev_icin_model_sec(
-            "kisa ozet", ["groq"]
-        )
+        _, model = router.gorev_icin_model_sec("kisa ozet", ["groq"])
         assert model == "llama-3.1-8b-instant"
 
     def test_musait_olmayan_provider_atlanir(self):
         """Musait olmayan provider listede yoksa atlanir."""
-        prov, _ = router.gorev_icin_model_sec(
-            "kod yaz", ["sanal_provider"]
-        )
+        prov, _ = router.gorev_icin_model_sec("kod yaz", ["sanal_provider"])
         assert prov == "sanal_provider"  # ilk musait
 
     def test_kuvvetli_mod_hizliyi_yukseltir(self):
@@ -172,40 +169,75 @@ class TestStratejikAjanSec:
         assert router.stratejik_ajan_sec("genel_cozucu", None) == "genel_cozucu"
 
     def test_syntax_hata_kod_uzmani(self):
-        assert router.stratejik_ajan_sec("genel_cozucu", "SyntaxError: invalid syntax") == "kod_uzmani"
+        assert (
+            router.stratejik_ajan_sec("genel_cozucu", "SyntaxError: invalid syntax")
+            == "kod_uzmani"
+        )
 
     def test_import_hata_kod_uzmani(self):
-        assert router.stratejik_ajan_sec("genel_cozucu", "ImportError: no module named x") == "kod_uzmani"
+        assert (
+            router.stratejik_ajan_sec("genel_cozucu", "ImportError: no module named x")
+            == "kod_uzmani"
+        )
 
     def test_timeout_sistem_mimari(self):
-        assert router.stratejik_ajan_sec("genel_cozucu", "TimeoutError: connection timed out") == "sistem_mimari"
+        assert (
+            router.stratejik_ajan_sec(
+                "genel_cozucu", "TimeoutError: connection timed out"
+            )
+            == "sistem_mimari"
+        )
 
     def test_dosya_bulunamadi_sistem_mimari(self):
-        assert router.stratejik_ajan_sec("genel_cozucu", "FileNotFoundError: no such file") == "sistem_mimari"
+        assert (
+            router.stratejik_ajan_sec("genel_cozucu", "FileNotFoundError: no such file")
+            == "sistem_mimari"
+        )
 
     def test_permission_error_sistem_mimari(self):
         """PermissionError sistem_mimari'ye gitmeli (kod hata onceligi degil)."""
-        assert router.stratejik_ajan_sec("genel_cozucu", "PermissionError: access denied") == "sistem_mimari"
+        assert (
+            router.stratejik_ajan_sec("genel_cozucu", "PermissionError: access denied")
+            == "sistem_mimari"
+        )
 
     def test_rate_limit_guvenlik_uzmani(self):
-        assert router.stratejik_ajan_sec("genel_cozucu", "rate limit asildi") == "guvenlik_uzmani"
+        assert (
+            router.stratejik_ajan_sec("genel_cozucu", "rate limit asildi")
+            == "guvenlik_uzmani"
+        )
 
     def test_veritabani_veri_uzmani(self):
-        assert router.stratejik_ajan_sec("genel_cozucu", "sqlite3.OperationalError: no such table") == "veri_uzmani"
+        assert (
+            router.stratejik_ajan_sec(
+                "genel_cozucu", "sqlite3.OperationalError: no such table"
+            )
+            == "veri_uzmani"
+        )
 
     def test_json_decode_veri_uzmani(self):
-        assert router.stratejik_ajan_sec("genel_cozucu", "json.decoder.JSONDecodeError") == "veri_uzmani"
+        assert (
+            router.stratejik_ajan_sec("genel_cozucu", "json.decoder.JSONDecodeError")
+            == "veri_uzmani"
+        )
 
     def test_utf8_veri_uzmani(self):
-        assert router.stratejik_ajan_sec("genel_cozucu", "UnicodeDecodeError: utf-8") == "veri_uzmani"
+        assert (
+            router.stratejik_ajan_sec("genel_cozucu", "UnicodeDecodeError: utf-8")
+            == "veri_uzmani"
+        )
 
     def test_tanimsiz_hata_mevcut_kalir(self):
-        assert router.stratejik_ajan_sec("veri_uzmani", "bilinmeyen hata") == "veri_uzmani"
+        assert (
+            router.stratejik_ajan_sec("veri_uzmani", "bilinmeyen hata") == "veri_uzmani"
+        )
 
     def test_kod_onceceligi_guvenlige_gore(self):
         """Kod hatalari guvenlik hatalarindan once kontrol edilmeli."""
         # SyntaxError icinde 'forbidden' kelimesi gecse bile kod_uzmani secilmeli
-        sonuc = router.stratejik_ajan_sec("genel_cozucu", "SyntaxError: forbidden token")
+        sonuc = router.stratejik_ajan_sec(
+            "genel_cozucu", "SyntaxError: forbidden token"
+        )
         assert sonuc == "kod_uzmani"
 
     def test_buyuk_kucuk_duyarsiz(self):

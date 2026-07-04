@@ -10,6 +10,7 @@ import pytest
 # Fixtures
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture
 def ReYMeN_home(tmp_path, monkeypatch):
     """Set up an isolated ReYMeN_HOME with minimal logs."""
@@ -41,6 +42,7 @@ def ReYMeN_home(tmp_path, monkeypatch):
 # ---------------------------------------------------------------------------
 # Unit tests for upload helpers
 # ---------------------------------------------------------------------------
+
 
 class TestUploadPasteRs:
     """Test paste.rs upload path."""
@@ -104,8 +106,9 @@ class TestUploadToPastebin:
     def test_tries_paste_rs_first(self):
         from ReYMeN_cli.debug import upload_to_pastebin
 
-        with patch("ReYMeN_cli.debug._upload_paste_rs",
-                    return_value="https://paste.rs/test") as prs:
+        with patch(
+            "ReYMeN_cli.debug._upload_paste_rs", return_value="https://paste.rs/test"
+        ) as prs:
             url = upload_to_pastebin("content")
 
         assert url == "https://paste.rs/test"
@@ -114,10 +117,12 @@ class TestUploadToPastebin:
     def test_falls_back_to_dpaste_com(self):
         from ReYMeN_cli.debug import upload_to_pastebin
 
-        with patch("ReYMeN_cli.debug._upload_paste_rs",
-                    side_effect=Exception("down")), \
-             patch("ReYMeN_cli.debug._upload_dpaste_com",
-                    return_value="https://dpaste.com/TEST") as dp:
+        with patch(
+            "ReYMeN_cli.debug._upload_paste_rs", side_effect=Exception("down")
+        ), patch(
+            "ReYMeN_cli.debug._upload_dpaste_com",
+            return_value="https://dpaste.com/TEST",
+        ) as dp:
             url = upload_to_pastebin("content")
 
         assert url == "https://dpaste.com/TEST"
@@ -126,10 +131,9 @@ class TestUploadToPastebin:
     def test_raises_when_both_fail(self):
         from ReYMeN_cli.debug import upload_to_pastebin
 
-        with patch("ReYMeN_cli.debug._upload_paste_rs",
-                    side_effect=Exception("err1")), \
-             patch("ReYMeN_cli.debug._upload_dpaste_com",
-                    side_effect=Exception("err2")):
+        with patch(
+            "ReYMeN_cli.debug._upload_paste_rs", side_effect=Exception("err1")
+        ), patch("ReYMeN_cli.debug._upload_dpaste_com", side_effect=Exception("err2")):
             with pytest.raises(RuntimeError, match="Failed to upload"):
                 upload_to_pastebin("content")
 
@@ -137,6 +141,7 @@ class TestUploadToPastebin:
 # ---------------------------------------------------------------------------
 # Log reading
 # ---------------------------------------------------------------------------
+
 
 class TestCaptureLogSnapshot:
     """Test _capture_log_snapshot for log reading and truncation."""
@@ -155,6 +160,7 @@ class TestCaptureLogSnapshot:
         monkeypatch.setenv("ReYMeN_HOME", str(home))
 
         from ReYMeN_cli.debug import _capture_log_snapshot
+
         snap = _capture_log_snapshot("agent", tail_lines=10)
         assert snap.full_text is None
         assert snap.tail_text == "(file not found)"
@@ -164,6 +170,7 @@ class TestCaptureLogSnapshot:
         (ReYMeN_home / "logs" / "agent.log").write_text("")
 
         from ReYMeN_cli.debug import _capture_log_snapshot
+
         snap = _capture_log_snapshot("agent", tail_lines=10)
         assert snap.full_text is None
         assert snap.tail_text == "(file empty)"
@@ -231,6 +238,7 @@ class TestCaptureLogSnapshot:
 
     def test_unknown_log_returns_none(self, ReYMeN_home):
         from ReYMeN_cli.debug import _capture_log_snapshot
+
         snap = _capture_log_snapshot("nonexistent", tail_lines=10)
         assert snap.full_text is None
 
@@ -413,6 +421,7 @@ class TestCaptureLogSnapshotRedaction:
 # Debug report collection
 # ---------------------------------------------------------------------------
 
+
 class TestCollectDebugReport:
     """Test the debug report builder."""
 
@@ -480,6 +489,7 @@ class TestCollectDebugReport:
 # CLI entry point — run_debug_share
 # ---------------------------------------------------------------------------
 
+
 class TestRunDebugShare:
     """Test the run_debug_share CLI handler."""
 
@@ -492,10 +502,11 @@ class TestRunDebugShare:
         args.expire = 7
         args.local = False
 
-        with patch("ReYMeN_cli.dump.run_dump"), \
-             patch("ReYMeN_cli.debug._sweep_expired_pastes", return_value=(0, 0)) as mock_sweep, \
-             patch("ReYMeN_cli.debug.upload_to_pastebin",
-                    return_value="https://paste.rs/test"):
+        with patch("ReYMeN_cli.dump.run_dump"), patch(
+            "ReYMeN_cli.debug._sweep_expired_pastes", return_value=(0, 0)
+        ) as mock_sweep, patch(
+            "ReYMeN_cli.debug.upload_to_pastebin", return_value="https://paste.rs/test"
+        ):
             run_debug_share(args)
 
         mock_sweep.assert_called_once()
@@ -510,13 +521,12 @@ class TestRunDebugShare:
         args.expire = 7
         args.local = False
 
-        with patch("ReYMeN_cli.dump.run_dump"), \
-             patch(
-                 "ReYMeN_cli.debug._sweep_expired_pastes",
-                 side_effect=RuntimeError("offline"),
-             ), \
-             patch("ReYMeN_cli.debug.upload_to_pastebin",
-                    return_value="https://paste.rs/test"):
+        with patch("ReYMeN_cli.dump.run_dump"), patch(
+            "ReYMeN_cli.debug._sweep_expired_pastes",
+            side_effect=RuntimeError("offline"),
+        ), patch(
+            "ReYMeN_cli.debug.upload_to_pastebin", return_value="https://paste.rs/test"
+        ):
             run_debug_share(args)
 
         assert "https://paste.rs/test" in capsys.readouterr().out
@@ -549,15 +559,18 @@ class TestRunDebugShare:
 
         call_count = [0]
         uploaded_content = []
+
         def _mock_upload(content, expiry_days=7):
             call_count[0] += 1
             uploaded_content.append(content)
             return f"https://paste.rs/paste{call_count[0]}"
 
-        with patch("ReYMeN_cli.dump.run_dump") as mock_dump, \
-             patch("ReYMeN_cli.debug.upload_to_pastebin",
-                    side_effect=_mock_upload):
-            mock_dump.side_effect = lambda a: print("--- ReYMeN dump ---\nversion: test\n--- end dump ---")
+        with patch("ReYMeN_cli.dump.run_dump") as mock_dump, patch(
+            "ReYMeN_cli.debug.upload_to_pastebin", side_effect=_mock_upload
+        ):
+            mock_dump.side_effect = lambda a: print(
+                "--- ReYMeN dump ---\nversion: test\n--- end dump ---"
+            )
             run_debug_share(args)
 
         out = capsys.readouterr().out
@@ -583,9 +596,14 @@ class TestRunDebugShare:
         assert "--- ReYMeN dump ---" in desktop_paste
         assert "--- full desktop.log ---" in desktop_paste
 
-    def test_share_keeps_report_and_full_log_on_same_snapshot(self, ReYMeN_home, capsys):
+    def test_share_keeps_report_and_full_log_on_same_snapshot(
+        self, ReYMeN_home, capsys
+    ):
         """A mid-run rotation must not make full agent.log older than the report."""
-        from ReYMeN_cli.debug import run_debug_share, collect_debug_report as real_collect_debug_report
+        from ReYMeN_cli.debug import (
+            run_debug_share,
+            collect_debug_report as real_collect_debug_report,
+        )
 
         logs_dir = ReYMeN_home / "logs"
         (logs_dir / "agent.log").write_text(
@@ -606,7 +624,9 @@ class TestRunDebugShare:
             uploaded_content.append(content)
             return f"https://paste.rs/paste{len(uploaded_content)}"
 
-        def _wrapped_collect_debug_report(*, log_lines=200, dump_text="", log_snapshots=None):
+        def _wrapped_collect_debug_report(
+            *, log_lines=200, dump_text="", log_snapshots=None
+        ):
             report = real_collect_debug_report(
                 log_lines=log_lines,
                 dump_text=dump_text,
@@ -621,9 +641,10 @@ class TestRunDebugShare:
             )
             return report
 
-        with patch("ReYMeN_cli.dump.run_dump"), \
-             patch("ReYMeN_cli.debug.collect_debug_report", side_effect=_wrapped_collect_debug_report), \
-             patch("ReYMeN_cli.debug.upload_to_pastebin", side_effect=_mock_upload):
+        with patch("ReYMeN_cli.dump.run_dump"), patch(
+            "ReYMeN_cli.debug.collect_debug_report",
+            side_effect=_wrapped_collect_debug_report,
+        ), patch("ReYMeN_cli.debug.upload_to_pastebin", side_effect=_mock_upload):
             run_debug_share(args)
 
         report_paste = uploaded_content[0]
@@ -646,13 +667,14 @@ class TestRunDebugShare:
         args.local = False
 
         call_count = [0]
+
         def _mock_upload(content, expiry_days=7):
             call_count[0] += 1
             return f"https://paste.rs/paste{call_count[0]}"
 
-        with patch("ReYMeN_cli.dump.run_dump"), \
-             patch("ReYMeN_cli.debug.upload_to_pastebin",
-                    side_effect=_mock_upload):
+        with patch("ReYMeN_cli.dump.run_dump"), patch(
+            "ReYMeN_cli.debug.upload_to_pastebin", side_effect=_mock_upload
+        ):
             run_debug_share(args)
 
         out = capsys.readouterr().out
@@ -670,15 +692,16 @@ class TestRunDebugShare:
         args.local = False
 
         call_count = [0]
+
         def _mock_upload(content, expiry_days=7):
             call_count[0] += 1
             if call_count[0] > 1:
                 raise RuntimeError("upload failed")
             return "https://paste.rs/report"
 
-        with patch("ReYMeN_cli.dump.run_dump"), \
-             patch("ReYMeN_cli.debug.upload_to_pastebin",
-                    side_effect=_mock_upload):
+        with patch("ReYMeN_cli.dump.run_dump"), patch(
+            "ReYMeN_cli.debug.upload_to_pastebin", side_effect=_mock_upload
+        ):
             run_debug_share(args)
 
         out = capsys.readouterr().out
@@ -695,9 +718,10 @@ class TestRunDebugShare:
         args.expire = 7
         args.local = False
 
-        with patch("ReYMeN_cli.dump.run_dump"), \
-             patch("ReYMeN_cli.debug.upload_to_pastebin",
-                    side_effect=RuntimeError("all failed")):
+        with patch("ReYMeN_cli.dump.run_dump"), patch(
+            "ReYMeN_cli.debug.upload_to_pastebin",
+            side_effect=RuntimeError("all failed"),
+        ):
             with pytest.raises(SystemExit) as exc_info:
                 run_debug_share(args)
 
@@ -709,6 +733,7 @@ class TestRunDebugShare:
 # ---------------------------------------------------------------------------
 # Share-time redaction wiring + visible banner
 # ---------------------------------------------------------------------------
+
 
 class TestRunDebugShareRedaction:
     """End-to-end: --no-redact flag, banner injection, default behavior."""
@@ -750,17 +775,17 @@ class TestRunDebugShareRedaction:
             captured.append(content)
             return f"https://paste.rs/{len(captured)}"
 
-        with patch("ReYMeN_cli.dump.run_dump"), \
-             patch("ReYMeN_cli.debug._sweep_expired_pastes", return_value=(0, 0)), \
-             patch("ReYMeN_cli.debug.upload_to_pastebin", side_effect=fake_upload):
+        with patch("ReYMeN_cli.dump.run_dump"), patch(
+            "ReYMeN_cli.debug._sweep_expired_pastes", return_value=(0, 0)
+        ), patch("ReYMeN_cli.debug.upload_to_pastebin", side_effect=fake_upload):
             run_debug_share(args)
 
         # At least the report plus one full log paste reached the upload path.
         assert len(captured) >= 2
         for content in captured:
-            assert _REDACT_FIXTURE_TOKEN not in content, (
-                "raw token leaked into upload-bound content"
-            )
+            assert (
+                _REDACT_FIXTURE_TOKEN not in content
+            ), "raw token leaked into upload-bound content"
 
     def test_default_share_includes_redaction_banner(
         self, ReYMeN_home_with_secret, capsys
@@ -780,15 +805,15 @@ class TestRunDebugShareRedaction:
             captured.append(content)
             return f"https://paste.rs/{len(captured)}"
 
-        with patch("ReYMeN_cli.dump.run_dump"), \
-             patch("ReYMeN_cli.debug._sweep_expired_pastes", return_value=(0, 0)), \
-             patch("ReYMeN_cli.debug.upload_to_pastebin", side_effect=fake_upload):
+        with patch("ReYMeN_cli.dump.run_dump"), patch(
+            "ReYMeN_cli.debug._sweep_expired_pastes", return_value=(0, 0)
+        ), patch("ReYMeN_cli.debug.upload_to_pastebin", side_effect=fake_upload):
             run_debug_share(args)
 
         for content in captured:
-            assert "redacted at upload time" in content, (
-                "redaction banner missing from upload-bound content"
-            )
+            assert (
+                "redacted at upload time" in content
+            ), "redaction banner missing from upload-bound content"
 
     def test_no_redact_flag_disables_redaction_and_banner(
         self, ReYMeN_home_with_secret, capsys
@@ -808,25 +833,26 @@ class TestRunDebugShareRedaction:
             captured.append(content)
             return f"https://paste.rs/{len(captured)}"
 
-        with patch("ReYMeN_cli.dump.run_dump"), \
-             patch("ReYMeN_cli.debug._sweep_expired_pastes", return_value=(0, 0)), \
-             patch("ReYMeN_cli.debug.upload_to_pastebin", side_effect=fake_upload):
+        with patch("ReYMeN_cli.dump.run_dump"), patch(
+            "ReYMeN_cli.debug._sweep_expired_pastes", return_value=(0, 0)
+        ), patch("ReYMeN_cli.debug.upload_to_pastebin", side_effect=fake_upload):
             run_debug_share(args)
 
         # The agent.log paste should now contain the raw token.
-        assert any(_REDACT_FIXTURE_TOKEN in c for c in captured), (
-            "expected raw token in --no-redact upload"
-        )
+        assert any(
+            _REDACT_FIXTURE_TOKEN in c for c in captured
+        ), "expected raw token in --no-redact upload"
         # No banner anywhere when redaction is disabled.
         for content in captured:
-            assert "redacted at upload time" not in content, (
-                "banner present with --no-redact"
-            )
+            assert (
+                "redacted at upload time" not in content
+            ), "banner present with --no-redact"
 
 
 # ---------------------------------------------------------------------------
 # run_debug router
 # ---------------------------------------------------------------------------
+
 
 class TestRunDebug:
     def test_no_subcommand_shows_usage(self, capsys):
@@ -863,25 +889,31 @@ class TestRunDebug:
 # Delete / auto-delete
 # ---------------------------------------------------------------------------
 
+
 class TestExtractPasteId:
     def test_paste_rs_url(self):
         from ReYMeN_cli.debug import _extract_paste_id
+
         assert _extract_paste_id("https://paste.rs/abc123") == "abc123"
 
     def test_paste_rs_trailing_slash(self):
         from ReYMeN_cli.debug import _extract_paste_id
+
         assert _extract_paste_id("https://paste.rs/abc123/") == "abc123"
 
     def test_http_variant(self):
         from ReYMeN_cli.debug import _extract_paste_id
+
         assert _extract_paste_id("http://paste.rs/xyz") == "xyz"
 
     def test_non_paste_rs_returns_none(self):
         from ReYMeN_cli.debug import _extract_paste_id
+
         assert _extract_paste_id("https://dpaste.com/ABCDEF") is None
 
     def test_empty_returns_none(self):
         from ReYMeN_cli.debug import _extract_paste_id
+
         assert _extract_paste_id("") is None
 
 
@@ -894,8 +926,9 @@ class TestDeletePaste:
         mock_resp.__enter__ = lambda s: s
         mock_resp.__exit__ = MagicMock(return_value=False)
 
-        with patch("ReYMeN_cli.debug.urllib.request.urlopen",
-                    return_value=mock_resp) as mock_open:
+        with patch(
+            "ReYMeN_cli.debug.urllib.request.urlopen", return_value=mock_resp
+        ) as mock_open:
             result = delete_paste("https://paste.rs/abc123")
 
         assert result is True
@@ -951,16 +984,17 @@ class TestScheduleAutoDelete:
             "_schedule_auto_delete must not spawn subprocesses — "
             "use pending.json + _sweep_expired_pastes instead"
         )
-        assert "subprocess" not in code_only, (
-            "_schedule_auto_delete must not reference subprocess at all"
-        )
-        assert "time.sleep" not in code_only, (
-            "Regression: sleeping in _schedule_auto_delete is the bug being fixed"
-        )
+        assert (
+            "subprocess" not in code_only
+        ), "_schedule_auto_delete must not reference subprocess at all"
+        assert (
+            "time.sleep" not in code_only
+        ), "Regression: sleeping in _schedule_auto_delete is the bug being fixed"
 
         # And verify that calling it doesn't produce any orphaned children
         # (it should just write pending.json synchronously).
         import os as _os
+
         before = set(_os.listdir("/proc")) if _os.path.exists("/proc") else None
         _schedule_auto_delete(
             ["https://paste.rs/abc", "https://paste.rs/def"],
@@ -978,9 +1012,9 @@ class TestScheduleAutoDelete:
                 try:
                     with open(f"/proc/{pid}/cmdline", "rb") as f:
                         cmdline = f.read().decode("utf-8", errors="replace")
-                    assert "time.sleep" not in cmdline, (
-                        f"Leaked sleeper subprocess PID {pid}: {cmdline}"
-                    )
+                    assert (
+                        "time.sleep" not in cmdline
+                    ), f"Leaked sleeper subprocess PID {pid}: {cmdline}"
                 except OSError:
                     pass  # process exited already
 
@@ -1004,6 +1038,7 @@ class TestScheduleAutoDelete:
 
         # expire_at is ~now + delay_seconds
         import time
+
         for e in entries:
             assert e["expire_at"] > time.time()
             assert e["expire_at"] <= time.time() + 15
@@ -1059,10 +1094,12 @@ class TestSweepExpiredPastes:
         import time
 
         # Seed pending.json with one expired + one future entry
-        _save_pending([
-            {"url": "https://paste.rs/expired", "expire_at": time.time() - 100},
-            {"url": "https://paste.rs/future", "expire_at": time.time() + 3600},
-        ])
+        _save_pending(
+            [
+                {"url": "https://paste.rs/expired", "expire_at": time.time() - 100},
+                {"url": "https://paste.rs/future", "expire_at": time.time() + 3600},
+            ]
+        )
 
         delete_calls = []
 
@@ -1085,10 +1122,12 @@ class TestSweepExpiredPastes:
         from ReYMeN_cli.debug import _sweep_expired_pastes, _save_pending
         import time
 
-        _save_pending([
-            {"url": "https://paste.rs/future1", "expire_at": time.time() + 3600},
-            {"url": "https://paste.rs/future2", "expire_at": time.time() + 7200},
-        ])
+        _save_pending(
+            [
+                {"url": "https://paste.rs/future1", "expire_at": time.time() + 3600},
+                {"url": "https://paste.rs/future2", "expire_at": time.time() + 7200},
+            ]
+        )
 
         with patch("ReYMeN_cli.debug.delete_paste") as mock_delete:
             deleted, remaining = _sweep_expired_pastes()
@@ -1106,9 +1145,11 @@ class TestSweepExpiredPastes:
         )
         import time
 
-        _save_pending([
-            {"url": "https://paste.rs/flaky", "expire_at": time.time() - 100},
-        ])
+        _save_pending(
+            [
+                {"url": "https://paste.rs/flaky", "expire_at": time.time() - 100},
+            ]
+        )
 
         with patch(
             "ReYMeN_cli.debug.delete_paste",
@@ -1132,9 +1173,11 @@ class TestSweepExpiredPastes:
 
         # Expired 25 hours ago → past the 24h grace window
         very_old = time.time() - (25 * 3600)
-        _save_pending([
-            {"url": "https://paste.rs/ancient", "expire_at": very_old},
-        ])
+        _save_pending(
+            [
+                {"url": "https://paste.rs/ancient", "expire_at": very_old},
+            ]
+        )
 
         with patch(
             "ReYMeN_cli.debug.delete_paste",
@@ -1199,8 +1242,9 @@ class TestRunDebugDelete:
         args = MagicMock()
         args.urls = ["https://paste.rs/abc"]
 
-        with patch("ReYMeN_cli.debug.delete_paste",
-                    side_effect=Exception("network error")):
+        with patch(
+            "ReYMeN_cli.debug.delete_paste", side_effect=Exception("network error")
+        ):
             run_debug_delete(args)
 
         out = capsys.readouterr().out
@@ -1229,10 +1273,9 @@ class TestShareIncludesAutoDelete:
         args.expire = 7
         args.local = False
 
-        with patch("ReYMeN_cli.dump.run_dump"), \
-             patch("ReYMeN_cli.debug.upload_to_pastebin",
-                    return_value="https://paste.rs/test1"), \
-             patch("ReYMeN_cli.debug._schedule_auto_delete") as mock_sched:
+        with patch("ReYMeN_cli.dump.run_dump"), patch(
+            "ReYMeN_cli.debug.upload_to_pastebin", return_value="https://paste.rs/test1"
+        ), patch("ReYMeN_cli.debug._schedule_auto_delete") as mock_sched:
             run_debug_share(args)
 
         # auto-delete was scheduled with the uploaded URLs
@@ -1251,10 +1294,9 @@ class TestShareIncludesAutoDelete:
         args.expire = 7
         args.local = False
 
-        with patch("ReYMeN_cli.dump.run_dump"), \
-             patch("ReYMeN_cli.debug.upload_to_pastebin",
-                    return_value="https://paste.rs/test"), \
-             patch("ReYMeN_cli.debug._schedule_auto_delete"):
+        with patch("ReYMeN_cli.dump.run_dump"), patch(
+            "ReYMeN_cli.debug.upload_to_pastebin", return_value="https://paste.rs/test"
+        ), patch("ReYMeN_cli.debug._schedule_auto_delete"):
             run_debug_share(args)
 
         out = capsys.readouterr().out

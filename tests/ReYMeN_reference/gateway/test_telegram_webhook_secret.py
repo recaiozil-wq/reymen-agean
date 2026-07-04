@@ -40,8 +40,9 @@ class TestTelegramWebhookSecretRequired:
         src = self._get_source()
         # The guard must appear after TELEGRAM_WEBHOOK_URL is set
         assert re.search(
-            r'TELEGRAM_WEBHOOK_SECRET.*?\.strip\(\)\s*\n\s*if not webhook_secret:',
-            src, re.DOTALL,
+            r"TELEGRAM_WEBHOOK_SECRET.*?\.strip\(\)\s*\n\s*if not webhook_secret:",
+            src,
+            re.DOTALL,
         ), (
             "TelegramAdapter.connect() must strip TELEGRAM_WEBHOOK_SECRET "
             "and raise when the secret is empty — see GHSA-3vpc-7q5r-276h"
@@ -54,7 +55,7 @@ class TestTelegramWebhookSecretRequired:
         # Between the "if not webhook_secret:" line and the next blank
         # line block, we should see a RuntimeError being raised
         guard_match = re.search(
-            r'if not webhook_secret:\s*\n\s*raise\s+RuntimeError\(',
+            r"if not webhook_secret:\s*\n\s*raise\s+RuntimeError\(",
             src,
         )
         assert guard_match, (
@@ -66,9 +67,9 @@ class TestTelegramWebhookSecretRequired:
         """The RuntimeError message should reference the advisory so
         operators can read the full context."""
         src = self._get_source()
-        assert "GHSA-3vpc-7q5r-276h" in src, (
-            "Guard error message must cite the advisory for operator context"
-        )
+        assert (
+            "GHSA-3vpc-7q5r-276h" in src
+        ), "Guard error message must cite the advisory for operator context"
 
     def test_guard_message_explains_remediation(self):
         """The error should tell the operator how to fix it."""
@@ -89,8 +90,9 @@ class TestTelegramWebhookSecretRequired:
         # polling branch, and there's no secret-check in that polling
         # branch.
         webhook_block = re.search(
-            r'if webhook_url:\s*\n(.*?)\n            else:\s*\n(.*?)\n',
-            src, re.DOTALL,
+            r"if webhook_url:\s*\n(.*?)\n            else:\s*\n(.*?)\n",
+            src,
+            re.DOTALL,
         )
         if webhook_block:
             webhook_body = webhook_block.group(1)

@@ -1,17 +1,34 @@
 """Coverage tests for reymen.sistem.cli_stream - actually calls every function."""
+
 import pytest
 from src.reymen.sistem.cli_stream import (
-    _termux_example_image_path, _split_path_input, _resolve_attachment_path,
-    _detect_file_drop, _format_image_attachment_badges,
-    _should_auto_attach_clipboard_image_on_paste, _strip_leaked_bracketed_paste_wrappers,
-    _apply_bracketed_paste_timeout_patch, _preserve_ctrl_enter_newline,
-    _bind_prompt_submit_keys, _disable_prompt_toolkit_cpr_warning,
-    _strip_leaked_terminal_responses_with_meta, _strip_leaked_terminal_responses,
-    _collect_query_images, _build_compact_banner, _looks_like_slash_command,
-    _ensure_skill_commands, get_skill_commands, build_skill_invocation_message,
-    build_preloaded_skills_prompt, get_skill_bundles, build_bundle_invocation_message,
-    _get_plugin_cmd_handler_names, _parse_skills_argument, save_config_value,
+    _termux_example_image_path,
+    _split_path_input,
+    _resolve_attachment_path,
+    _detect_file_drop,
+    _format_image_attachment_badges,
+    _should_auto_attach_clipboard_image_on_paste,
+    _strip_leaked_bracketed_paste_wrappers,
+    _apply_bracketed_paste_timeout_patch,
+    _preserve_ctrl_enter_newline,
+    _bind_prompt_submit_keys,
+    _disable_prompt_toolkit_cpr_warning,
+    _strip_leaked_terminal_responses_with_meta,
+    _strip_leaked_terminal_responses,
+    _collect_query_images,
+    _build_compact_banner,
+    _looks_like_slash_command,
+    _ensure_skill_commands,
+    get_skill_commands,
+    build_skill_invocation_message,
+    build_preloaded_skills_prompt,
+    get_skill_bundles,
+    build_bundle_invocation_message,
+    _get_plugin_cmd_handler_names,
+    _parse_skills_argument,
+    save_config_value,
 )
+
 
 class TestCliStreamCoverage:
     def test_termux_example_image_path(self):

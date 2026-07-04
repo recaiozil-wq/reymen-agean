@@ -96,11 +96,13 @@ class AdaptifOgrenme:
         mevcut_metinler = {t["metin"] for t in self._tercihler}
         if metin in mevcut_metinler:
             return False
-        self._tercihler.append({
-            "metin": metin,
-            "kaynak": kaynak,
-            "zaman": time.strftime("%Y-%m-%d %H:%M"),
-        })
+        self._tercihler.append(
+            {
+                "metin": metin,
+                "kaynak": kaynak,
+                "zaman": time.strftime("%Y-%m-%d %H:%M"),
+            }
+        )
         # Kapasite sınırı
         if len(self._tercihler) > MAKS_TERCIH:
             self._tercihler = self._tercihler[-MAKS_TERCIH:]
@@ -169,7 +171,11 @@ class AdaptifOgrenme:
 
         for deneme in range(max_deneme + 1):
             sonuc = motor.calistir("PYTHON_CALISTIR", f'"{mevcut_kod}"')
-            if "[Hata]" not in sonuc and "Error" not in sonuc and "Traceback" not in sonuc:
+            if (
+                "[Hata]" not in sonuc
+                and "Error" not in sonuc
+                and "Traceback" not in sonuc
+            ):
                 if deneme > 0:
                     print(f"[Self-correction]: {deneme}. denemede düzeldi.")
                 return sonuc
@@ -205,6 +211,7 @@ class AdaptifOgrenme:
 
 
 # ── Motor entegrasyon yardımcısı ──────────────────────────────────────────────
+
 
 def adaptif_ogrenme_sistemi_kur() -> AdaptifOgrenme:
     """Create a global AdaptifOgrenme instance."""

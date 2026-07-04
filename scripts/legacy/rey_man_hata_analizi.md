@@ -1,7 +1,7 @@
 # ReYMeN Agent — 5 Kategoride Hata Analizi Raporu
 
-> **Tarih:** 2026-06-21  
-> **Veritabanı:** 54 kayıt | `reymen/cereyan/.ReYMeN/ogrenmeler.db`  
+> **Tarih:** 2026-06-21
+> **Veritabanı:** 54 kayıt | `reymen/cereyan/.ReYMeN/ogrenmeler.db`
 > **Analiz Edilen Dosyalar:** `once_hafiza.py` (604 satır), `conversation_loop.py` (1619 satır), `gorev_once_kontrol.py` (940 satır), `_web_tetikleyici.py` (183 satır), `AGENTS.md`
 
 ---
@@ -35,7 +35,7 @@
 
 ### Hata 1A: T4 Geçerlilik — Sadece Tarihe Bakıyor, İçerik Eskiyebilir
 
-**(1) Tanım:** T4 tetikleyicisi (`tetikleyici_4_gecerlilik_asmis`) sadece `gecerlilik_tarihi < bugün` kontrolü yapıyor. 
+**(1) Tanım:** T4 tetikleyicisi (`tetikleyici_4_gecerlilik_asmis`) sadece `gecerlilik_tarihi < bugün` kontrolü yapıyor.
 `ara()` fonksiyonu da benzer şekilde `gecerlilik_tarihi >= date('now')` filtreliyor.
 
 ```python
@@ -46,7 +46,7 @@ row = con.execute(
 ).fetchone()
 ```
 
-**(2) Ne Zaman Oluşur:** 
+**(2) Ne Zaman Oluşur:**
 - Bir tool'un versiyonu değiştiğinde (örn. nmap 7.x → 8.x, yeni parametreler geldi)
 - Web API'leri güncellendiğinde (endpoint değişikliği, yeni auth)
 - 180 gün dolmamış olsa bile içerik kullanılamaz hale geldiğinde
@@ -127,14 +127,14 @@ AGENTS.md'de tanımlanan 5 kriterli puanlama sistemi (hız %20, başarı %30, ç
 
 ### Hata 2B: Dinamik Eşik Yok
 
-**(1) Tanım:** `isle()` fonksiyonu `min_guven=0.5` sabit eşikle çalışır. 
+**(1) Tanım:** `isle()` fonksiyonu `min_guven=0.5` sabit eşikle çalışır.
 ```python
 kayitlar = ara(hedef, kategori, min_guven=min_guven, gecerli_mi=gecerli_mi)
 ```
 
 **(2) Ne Zaman Oluşur:** Her `isle()` çağrısında. Kritik görevler (sistem değişikliği, dosya silme) için 0.5 çok düşük, basit görevler (bilgi sorgulama) için 0.5 çok yüksek olabilir.
 
-**(3) Sonucu:** 
+**(3) Sonucu:**
 - Kritik görevlerde düşük güvenli bilgi kullanılabilir
 - Basit görevlerde hafıza kullanılamaz, gereksiz yere tekrar çalıştırılır
 

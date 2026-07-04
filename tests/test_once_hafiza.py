@@ -3,6 +3,7 @@
 tests/test_once_hafiza.py — once_hafiza.py kapsamlı testi.
 Temp DB ile çalışır, prod DB'ye dokunmaz.
 """
+
 import math
 import os
 import sqlite3
@@ -42,6 +43,7 @@ def _temp_db(tmp_path):
     """Her test'i izole temp DB ile çalıştır."""
     db_path = tmp_path / "ogrenmeler.db"
     import reymen.cereyan.once_hafiza as _mod
+
     with patch.object(_mod, "DB_YOLU", db_path):
         _db_kur()
         yield db_path
@@ -115,7 +117,9 @@ class TestKaydet:
 
     def test_kaynak_url_kaydet(self):
         """kaynak_url kaydedilmeli"""
-        kaydet("url test", "test", "içerik", basari=True, kaynak_url="https://example.com")
+        kaydet(
+            "url test", "test", "içerik", basari=True, kaynak_url="https://example.com"
+        )
         sonuclar = ara("url test", "test")
         assert sonuclar[0]["kaynak_url"] == "https://example.com"
 
@@ -281,7 +285,9 @@ class TestEskiKayitlariTemizle:
         sonuclar = ara("koru", "test", min_guven=0.0, gecerli_mi=False)
         # En azından kayıt hâlâ DB'de (gecerli_mi=False ile bulabiliriz)
         with _baglanti() as con:
-            var_mi = con.execute("SELECT COUNT(*) FROM ogrenmeler WHERE id = ?", (kid,)).fetchone()[0]
+            var_mi = con.execute(
+                "SELECT COUNT(*) FROM ogrenmeler WHERE id = ?", (kid,)
+            ).fetchone()[0]
         assert var_mi == 1
 
 
@@ -300,6 +306,7 @@ class TestIsle:
     def test_exec_yolu(self):
         """Hafızada yoksa çalıştırır ve kaydeder"""
         called = []
+
         def calistir():
             called.append(True)
             return "yeni_sonuc"
@@ -328,6 +335,7 @@ class TestIsle:
 
     def test_hata_yakalar_ve_kaydeder(self):
         """calistir() exception fırlatırsa → kaydeder + raise"""
+
         def hatali():
             raise ValueError("test hatası")
 
@@ -507,7 +515,9 @@ class TestDBKurulum:
     def test_migration_kaynak_url(self):
         """kaynak_url kolonu mevcut olmalı"""
         with _baglanti() as con:
-            kolonlar = [r[1] for r in con.execute("PRAGMA table_info(ogrenmeler)").fetchall()]
+            kolonlar = [
+                r[1] for r in con.execute("PRAGMA table_info(ogrenmeler)").fetchall()
+            ]
             assert "kaynak_url" in kolonlar
 
 

@@ -29,7 +29,7 @@ class RobustExecutor:
         self,
         checkpoint_dizini: str = ".checkpoints",
         max_deneme: int = 3,
-        bekleme_suresi: float = 1.0
+        bekleme_suresi: float = 1.0,
     ):
         """
         RobustExecutor baslatici.
@@ -52,12 +52,7 @@ class RobustExecutor:
         except OSError as e:
             logger.warning(f"Checkpoint dizini olusturulamadi: {e}")
 
-    def calistir(
-        self,
-        fonk: Callable,
-        *args,
-        **kwargs
-    ) -> Dict[str, Any]:
+    def calistir(self, fonk: Callable, *args, **kwargs) -> Dict[str, Any]:
         """
         Bir fonksiyonu calistirir.
 
@@ -77,13 +72,15 @@ class RobustExecutor:
             logger.debug(f"Calistirma #{calistirma_id}: {fonk.__name__}")
 
             # Geri alma icin kaydet
-            self._geri_alma_gecmisi.append({
-                "id": calistirma_id,
-                "fonk_adi": getattr(fonk, "__name__", str(fonk)),
-                "args": args,
-                "kwargs": kwargs,
-                "baslangic": baslangic,
-            })
+            self._geri_alma_gecmisi.append(
+                {
+                    "id": calistirma_id,
+                    "fonk_adi": getattr(fonk, "__name__", str(fonk)),
+                    "args": args,
+                    "kwargs": kwargs,
+                    "baslangic": baslangic,
+                }
+            )
 
             # Fonksiyonu calistir
             sonuc = fonk(*args, **kwargs)
@@ -112,9 +109,7 @@ class RobustExecutor:
             self._geri_alma_gecmisi[-1]["basarili"] = False
             self._geri_alma_gecmisi[-1]["sure"] = sure
 
-            logger.error(
-                f"Calistirma #{calistirma_id} hatasi: {e}\n{hata_detay}"
-            )
+            logger.error(f"Calistirma #{calistirma_id} hatasi: {e}\n{hata_detay}")
 
             return {
                 "basarili": False,
@@ -125,11 +120,7 @@ class RobustExecutor:
             }
 
     def yeniden_dene(
-        self,
-        fonk: Callable,
-        *args,
-        max_deneme: Optional[int] = None,
-        **kwargs
+        self, fonk: Callable, *args, max_deneme: Optional[int] = None, **kwargs
     ) -> Dict[str, Any]:
         """
         Fonksiyonu hata durumunda yeniden dener.
@@ -149,9 +140,7 @@ class RobustExecutor:
 
         for deneme in range(1, deneme_sayisi + 1):
             try:
-                logger.info(
-                    f"Deneme {deneme}/{deneme_sayisi}: {fonk.__name__}"
-                )
+                logger.info(f"Deneme {deneme}/{deneme_sayisi}: {fonk.__name__}")
 
                 sonuc = fonk(*args, **kwargs)
 
@@ -339,12 +328,16 @@ def run(**kwargs) -> str:
 
         durum = executor.durum()
 
-        return json.dumps({
-            "basarili_calistirma": sonuc1,
-            "yeniden_deneme": sonuc2,
-            "checkpoint_yukleme": "yuklendi" if yuklenen else "bulunamadi",
-            "durum": durum,
-        }, ensure_ascii=False, indent=2)
+        return json.dumps(
+            {
+                "basarili_calistirma": sonuc1,
+                "yeniden_deneme": sonuc2,
+                "checkpoint_yukleme": "yuklendi" if yuklenen else "bulunamadi",
+                "durum": durum,
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
 
     except Exception as e:
         return f"Robust execution hatasi: {e}"

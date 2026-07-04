@@ -1,4 +1,5 @@
 """Test: reymen/cost_tracker.py — CostTracker, CostRecord, singleton testleri"""
+
 from __future__ import annotations
 
 import sys
@@ -15,6 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 @pytest.fixture
 def tracker(tmp_path):
     from reymen.cost_tracker import CostTracker
+
     db_path = tmp_path / "test_costs.db"
     t = CostTracker(db_path=db_path)
     yield t
@@ -22,10 +24,14 @@ def tracker(tmp_path):
 
 # ── CostRecord ───────────────────────────────────────────────────────────
 
+
 class TestCostRecord:
     def test_as_dict(self):
         from reymen.cost_tracker import CostRecord
-        r = CostRecord(model="gpt-4o", prompt_tokens=100, completion_tokens=50, cost_usd=0.005)
+
+        r = CostRecord(
+            model="gpt-4o", prompt_tokens=100, completion_tokens=50, cost_usd=0.005
+        )
         d = r.as_dict()
         assert d["model"] == "gpt-4o"
         assert d["prompt_tokens"] == 100
@@ -35,13 +41,17 @@ class TestCostRecord:
 
     def test_default_values(self):
         from reymen.cost_tracker import CostRecord
-        r = CostRecord(model="test", prompt_tokens=10, completion_tokens=5, cost_usd=0.001)
+
+        r = CostRecord(
+            model="test", prompt_tokens=10, completion_tokens=5, cost_usd=0.001
+        )
         assert r.provider == ""
         assert r.session_id is None
         assert r.metadata == {}
 
 
 # ── Price computation ────────────────────────────────────────────────────
+
 
 class TestPriceFor:
     def test_exact_model_match(self, tracker):
@@ -60,6 +70,7 @@ class TestPriceFor:
 
     def test_custom_price_table(self, tmp_path):
         from reymen.cost_tracker import CostTracker
+
         custom = {
             "my-model": {"prompt": 10.0, "completion": 20.0},
             "default": {"prompt": 1.0, "completion": 2.0},
@@ -93,6 +104,7 @@ class TestComputeCost:
 
 # ── Record ───────────────────────────────────────────────────────────────
 
+
 class TestRecord:
     def test_basic_record(self, tracker):
         rec = tracker.record("gpt-4o", 1000, 500)
@@ -103,7 +115,9 @@ class TestRecord:
 
     def test_record_with_provider_and_session(self, tracker):
         rec = tracker.record(
-            "gpt-4o", 100, 50,
+            "gpt-4o",
+            100,
+            50,
             provider="openai",
             session_id="sess-001",
             metadata={"test": True},
@@ -129,6 +143,7 @@ class TestRecord:
 
 
 # ── Summary ──────────────────────────────────────────────────────────────
+
 
 class TestSummary:
     def test_empty_summary(self, tracker):
@@ -180,6 +195,7 @@ class TestSummary:
 
 # ── DumpLog ──────────────────────────────────────────────────────────────
 
+
 class TestDumpLog:
     def test_dump_empty(self, tracker):
         logs = tracker.dump_log()
@@ -208,6 +224,7 @@ class TestDumpLog:
 
 # ── Reset ────────────────────────────────────────────────────────────────
 
+
 class TestReset:
     def test_reset_clears_records(self, tracker):
         tracker.record("gpt-4o", 100, 50)
@@ -224,9 +241,11 @@ class TestReset:
 
 # ── IterRecords ──────────────────────────────────────────────────────────
 
+
 class TestIterRecords:
     def test_iter_returns_records(self, tracker):
         from reymen.cost_tracker import CostRecord
+
         tracker.record("gpt-4o", 100, 50)
         tracker.record("claude-3-5-sonnet", 200, 100)
         records = list(tracker.iter_records())
@@ -240,9 +259,11 @@ class TestIterRecords:
 
 # ── Module-level functions ───────────────────────────────────────────────
 
+
 class TestModuleFunctions:
     def test_record_usage_and_summary(self, tmp_path, monkeypatch):
         from reymen import cost_tracker
+
         monkeypatch.setenv("ReYMeN_HOME", str(tmp_path))
         cost_tracker.set_db_path(tmp_path / "mod.db")
         rec = cost_tracker.record_usage("gpt-4o", 1000, 500, provider="openai")
@@ -254,6 +275,7 @@ class TestModuleFunctions:
 
     def test_dump_log_module(self, tmp_path, monkeypatch):
         from reymen import cost_tracker
+
         monkeypatch.setenv("ReYMeN_HOME", str(tmp_path))
         cost_tracker.set_db_path(tmp_path / "mod2.db")
         cost_tracker.record_usage("gpt-4o", 100, 50)
@@ -263,9 +285,13 @@ class TestModuleFunctions:
 
     def test_set_price_table_module(self, tmp_path, monkeypatch):
         from reymen import cost_tracker
+
         monkeypatch.setenv("ReYMeN_HOME", str(tmp_path))
         cost_tracker.set_db_path(tmp_path / "mod3.db")
-        custom = {"my-model": {"prompt": 99.0, "completion": 199.0}, "default": {"prompt": 1.0, "completion": 2.0}}
+        custom = {
+            "my-model": {"prompt": 99.0, "completion": 199.0},
+            "default": {"prompt": 1.0, "completion": 2.0},
+        }
         cost_tracker.set_price_table(custom)
         rec = cost_tracker.record_usage("my-model", 1_000_000, 0)
         assert rec.cost_usd == 99.0

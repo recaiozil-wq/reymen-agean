@@ -35,6 +35,7 @@ POLLUTION_DOSYALARI = {"__pycache__", ".git", ".venv", "venv", "node_modules"}
 
 # ── Hash Islemleri ────────────────────────────────────────────────────────
 
+
 def _dosya_hash(dosya: Path) -> str:
     """Bir dosyanin hizli hash'ini hesapla (isim + boyut + mtime)."""
     try:
@@ -61,8 +62,8 @@ def _proje_hash() -> str:
 def _hash_kaydet(h: str) -> None:
     HASH_DOSYASI.parent.mkdir(parents=True, exist_ok=True)
     HASH_DOSYASI.write_text(
-        json.dumps({"hash": h, "zaman": datetime.now().isoformat()},
-                    indent=2), encoding="utf-8"
+        json.dumps({"hash": h, "zaman": datetime.now().isoformat()}, indent=2),
+        encoding="utf-8",
     )
 
 
@@ -78,6 +79,7 @@ def _hash_oku() -> str:
 
 # ── Ana Fonksiyon ─────────────────────────────────────────────────────────
 
+
 def degisiklik_kontrol() -> bool:
     """Projede degisiklik var mi? Varsa durum.json'u guncelle.
 
@@ -92,6 +94,7 @@ def degisiklik_kontrol() -> bool:
 
     try:
         from reymen.sistem.ortak_komut import guncelle
+
         guncelle()
         _hash_kaydet(yeni_hash)
         logger.info("[Watchdog] ✅ Degisiklik algilandi, durum.json guncellendi")
@@ -104,6 +107,7 @@ def degisiklik_kontrol() -> bool:
 
 
 # ── Watchdog Thread ───────────────────────────────────────────────────────
+
 
 def _watchdog_dongu(interval: int = SCAN_ARALIGI) -> None:
     """Her N saniyede bir degisiklik kontrolu yap."""
@@ -142,10 +146,17 @@ def watchdog_baslat(interval: int = SCAN_ARALIGI) -> None:
 
 if __name__ == "__main__":
     import argparse
+
     parser = argparse.ArgumentParser(description="ReYMeN Otonom Watchdog")
     parser.add_argument("--check", action="store_true", help="Tek seferlik kontrol")
-    parser.add_argument("--watch", type=int, nargs="?", const=30, default=0,
-                        help="Watchdog baslat (opsiyonel: interval sn)")
+    parser.add_argument(
+        "--watch",
+        type=int,
+        nargs="?",
+        const=30,
+        default=0,
+        help="Watchdog baslat (opsiyonel: interval sn)",
+    )
     args = parser.parse_args()
 
     if args.check:

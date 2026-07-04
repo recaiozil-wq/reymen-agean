@@ -7,6 +7,7 @@ Kullanim:
     python modul_tamamla.py --sync
     python modul_tamamla.py --list
 """
+
 import json, sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -60,7 +61,9 @@ def modul_ekle(modul, coverage, test_sayisi, aciklama):
 
     data = _sync(data)
     _kaydet(data)
-    print(f"OK {modul}: coverage_durumu.core -> tamamlanan_moduller senkron (%{coverage}, {test_sayisi} test)")
+    print(
+        f"OK {modul}: coverage_durumu.core -> tamamlanan_moduller senkron (%{coverage}, {test_sayisi} test)"
+    )
     return True
 
 
@@ -80,12 +83,16 @@ def listele():
     print("coverage_durumu.core (KAYNAK):")
     for mod in sorted(core):
         i = core[mod]
-        print(f"  {mod:25s} %{i.get('coverage','?'):>8s}  {i.get('test_sayisi',0)} test")
+        print(
+            f"  {mod:25s} %{i.get('coverage','?'):>8s}  {i.get('test_sayisi',0)} test"
+        )
     print()
     print("tamamlanan_moduller (SENKRON):")
     for mod in sorted(tm):
         i = tm[mod]
-        print(f"  {mod:25s} %{i.get('coverage','?'):>8s}  {i.get('test_sayisi',0)} test")
+        print(
+            f"  {mod:25s} %{i.get('coverage','?'):>8s}  {i.get('test_sayisi',0)} test"
+        )
 
 
 if __name__ == "__main__":

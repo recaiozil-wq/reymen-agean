@@ -25,6 +25,7 @@ from closed_learning_loop import ClosedLearningLoop
 
 # ── Fixtures ─────────────────────────────────────────────────────────────────
 
+
 @pytest.fixture
 def ortam(tmp_path):
     """Birbirinden izole tum ogrenme sistemi bilesenleri."""
@@ -49,14 +50,16 @@ def ortam(tmp_path):
 # 1. KONUSMA AKISI
 # ══════════════════════════════════════════════════════════════════════════════
 
-class TestKonusmaAkisi:
 
+class TestKonusmaAkisi:
     def test_konusma_kaydedilip_fts5_ile_bulunur(self, ortam):
         hg = ortam["hafiza"]
-        hg.kaydet("Python lambda fonksiyonlari nasil kullanilir?",
-                   koleksiyon="konusmalar", anahtar="python_lambda")
-        hg.kaydet("Lambda tek satirlik anonim fonksiyondur",
-                   koleksiyon="konusmalar")
+        hg.kaydet(
+            "Python lambda fonksiyonlari nasil kullanilir?",
+            koleksiyon="konusmalar",
+            anahtar="python_lambda",
+        )
+        hg.kaydet("Lambda tek satirlik anonim fonksiyondur", koleksiyon="konusmalar")
         sonuclar = hg.ara("lambda")
         assert len(sonuclar) >= 1
         assert any("lambda" in s["icerik"].lower() for s in sonuclar)
@@ -69,23 +72,29 @@ class TestKonusmaAkisi:
 
     def test_konu_cikar_anlamli_kelime(self, ortam):
         hg = ortam["hafiza"]
-        hg.kaydet("SQLite veritabani indeksleme performans optimizasyon",
-                   koleksiyon="konusmalar")
-        hg.kaydet("SQLite FTS5 indeksleme hizi artirma yontemi",
-                   koleksiyon="konusmalar")
+        hg.kaydet(
+            "SQLite veritabani indeksleme performans optimizasyon",
+            koleksiyon="konusmalar",
+        )
+        hg.kaydet(
+            "SQLite FTS5 indeksleme hizi artirma yontemi", koleksiyon="konusmalar"
+        )
         konular = hg.konu_cikar("entegrasyon_ses_01", limit=5)
         assert len(konular) >= 1
         # En az bir anlamli teknik kelime bekleniyor
         tum_metin = " ".join(konular).lower()
-        assert any(kw in tum_metin for kw in ["sqlite", "indeks", "fts", "veritaban", "performans"])
+        assert any(
+            kw in tum_metin
+            for kw in ["sqlite", "indeks", "fts", "veritaban", "performans"]
+        )
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # 2. STEERING + HAFIZA BIRLIKTE
 # ══════════════════════════════════════════════════════════════════════════════
 
-class TestSteeringHafizaBirlikte:
 
+class TestSteeringHafizaBirlikte:
     def test_steering_ve_hafiza_bagimsiz_db(self, ortam):
         hg = ortam["hafiza"]
         sl = ortam["steering"]
@@ -117,8 +126,14 @@ class TestSteeringHafizaBirlikte:
         sl = ortam["steering"]
 
         hg.kaydet("Paralel test icerigi", koleksiyon="konusmalar")
-        sl.gozlem_kaydet("task_paralel", 1.5, cevap="cevap", basarili=True,
-                          girdi_token=100, cikti_token=200)
+        sl.gozlem_kaydet(
+            "task_paralel",
+            1.5,
+            cevap="cevap",
+            basarili=True,
+            girdi_token=100,
+            cikti_token=200,
+        )
 
         hg_durum = hg.durum()
         sl_durum = sl.durum()
@@ -130,8 +145,8 @@ class TestSteeringHafizaBirlikte:
 # 3. OGRENME DONGUSU TAM TUR
 # ══════════════════════════════════════════════════════════════════════════════
 
-class TestOgrenmeDogusuTamTur:
 
+class TestOgrenmeDogusuTamTur:
     def test_tam_ogrenme_turu(self, ortam):
         """Kullanici sorar -> hafizaya kaydet -> ara -> konu_cikar -> beceri kristallestir."""
         hg = ortam["hafiza"]
@@ -177,7 +192,9 @@ class TestOgrenmeDogusuTamTur:
         ilk = loop.ara("tekrar_test")
         assert len(ilk) >= 1
 
-        loop.beceri_kristallestir("tekrar_test", "Guncellenmis baslik", "Guncellenmis icerik")
+        loop.beceri_kristallestir(
+            "tekrar_test", "Guncellenmis baslik", "Guncellenmis icerik"
+        )
         guncellenmis = loop.ara("tekrar_test")
         assert len(guncellenmis) >= 1
 
@@ -186,8 +203,8 @@ class TestOgrenmeDogusuTamTur:
 # 4. VERI TUTARLILIGI
 # ══════════════════════════════════════════════════════════════════════════════
 
-class TestVeriTutarliligi:
 
+class TestVeriTutarliligi:
     def test_hafiza_kendi_db_tutarli(self, ortam):
         hg = ortam["hafiza"]
         n = 15

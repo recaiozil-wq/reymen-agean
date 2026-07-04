@@ -26,10 +26,13 @@ from agent.conversation_loop import _get_continuation_prompt
 
 # ── Helpers (mirrors test_streaming.py) ────────────────────────────────────
 
+
 def _make_stream_chunk(content=None, tool_calls=None, finish_reason=None):
     delta = SimpleNamespace(
-        content=content, tool_calls=tool_calls,
-        reasoning_content=None, reasoning=None,
+        content=content,
+        tool_calls=tool_calls,
+        reasoning_content=None,
+        reasoning=None,
     )
     choice = SimpleNamespace(index=0, delta=delta, finish_reason=finish_reason)
     return SimpleNamespace(choices=[choice], model=None, usage=None)
@@ -42,6 +45,7 @@ def _make_tool_call_delta(index=0, tc_id=None, name=None, arguments=None):
 
 def _make_agent():
     from run_agent import AIAgent
+
     agent = AIAgent(
         api_key="test-key",
         base_url="https://example.com/v1",
@@ -57,13 +61,16 @@ def _make_agent():
 
 # ── Stub finish_reason ────────────────────────────────────────────────────
 
+
 class TestPartialStreamStubFinishReason:
     """The stub returned by interruptible_streaming_api_call when the
     upstream connection dies mid-flight."""
 
     @patch("run_agent.AIAgent._create_request_openai_client")
     @patch("run_agent.AIAgent._close_request_openai_client")
-    def test_text_only_partial_returns_length(self, _mock_close, mock_create, monkeypatch):
+    def test_text_only_partial_returns_length(
+        self, _mock_close, mock_create, monkeypatch
+    ):
         """#30963: text-only partials must classify as length so the loop
         keeps continuing instead of exiting with budget remaining."""
 
@@ -72,7 +79,9 @@ class TestPartialStreamStubFinishReason:
             raise RuntimeError("simulated upstream stall")
 
         mock_client = MagicMock()
-        mock_client.chat.completions.create.side_effect = lambda *a, **kw: _stalling_stream()
+        mock_client.chat.completions.create.side_effect = (
+            lambda *a, **kw: _stalling_stream()
+        )
         mock_create.return_value = mock_client
 
         agent = _make_agent()
@@ -100,16 +109,22 @@ class TestPartialStreamStubFinishReason:
 
         def _stalling_stream():
             yield _make_stream_chunk(content="Let me write the audit: ")
-            yield _make_stream_chunk(tool_calls=[
-                _make_tool_call_delta(index=0, tc_id="call_1", name="write_file"),
-            ])
-            yield _make_stream_chunk(tool_calls=[
-                _make_tool_call_delta(index=0, arguments='{"path": "/tmp/x", '),
-            ])
+            yield _make_stream_chunk(
+                tool_calls=[
+                    _make_tool_call_delta(index=0, tc_id="call_1", name="write_file"),
+                ]
+            )
+            yield _make_stream_chunk(
+                tool_calls=[
+                    _make_tool_call_delta(index=0, arguments='{"path": "/tmp/x", '),
+                ]
+            )
             raise RuntimeError("simulated upstream stall")
 
         mock_client = MagicMock()
-        mock_client.chat.completions.create.side_effect = lambda *a, **kw: _stalling_stream()
+        mock_client.chat.completions.create.side_effect = (
+            lambda *a, **kw: _stalling_stream()
+        )
         mock_create.return_value = mock_client
 
         agent = _make_agent()
@@ -138,6 +153,7 @@ class TestPartialStreamStubFinishReason:
 
 # ── Clean stream-end mid-tool-call (no exception, no finish_reason) ─────────
 
+
 class TestCleanStreamEndMidToolCall:
     """The upstream closes the SSE stream cleanly after delivering a tool
     name + the opening '{' of its arguments — NO exception, NO finish_reason,
@@ -154,19 +170,26 @@ class TestCleanStreamEndMidToolCall:
     @patch("run_agent.AIAgent._create_request_openai_client")
     @patch("run_agent.AIAgent._close_request_openai_client")
     def test_no_finish_reason_partial_tool_args_routes_to_stub(
-        self, _mock_close, mock_create, monkeypatch,
+        self,
+        _mock_close,
+        mock_create,
+        monkeypatch,
     ):
         def _clean_ending_stream():
             # Reasoning + tool name + the lone opening brace, then the
             # generator simply RETURNS (StopIteration) — no raise, no
             # finish_reason chunk, no [DONE].
             yield _make_stream_chunk(content="\n")
-            yield _make_stream_chunk(tool_calls=[
-                _make_tool_call_delta(index=0, tc_id="call_x", name="execute_code"),
-            ])
-            yield _make_stream_chunk(tool_calls=[
-                _make_tool_call_delta(index=0, arguments="{"),
-            ])
+            yield _make_stream_chunk(
+                tool_calls=[
+                    _make_tool_call_delta(index=0, tc_id="call_x", name="execute_code"),
+                ]
+            )
+            yield _make_stream_chunk(
+                tool_calls=[
+                    _make_tool_call_delta(index=0, arguments="{"),
+                ]
+            )
             # falls off the end — clean close, no terminator
 
         mock_client = MagicMock()
@@ -187,27 +210,34 @@ class TestCleanStreamEndMidToolCall:
             "length limit' error."
         )
         assert response.choices[0].finish_reason == FINISH_REASON_LENGTH
-        assert response.choices[0].message.tool_calls is None, (
-            "Incomplete tool args must never auto-execute."
-        )
+        assert (
+            response.choices[0].message.tool_calls is None
+        ), "Incomplete tool args must never auto-execute."
         assert getattr(response, "_dropped_tool_names", None) == ["execute_code"]
 
     @patch("run_agent.AIAgent._create_request_openai_client")
     @patch("run_agent.AIAgent._close_request_openai_client")
     def test_real_length_truncation_still_uses_uuid_id(
-        self, _mock_close, mock_create, monkeypatch,
+        self,
+        _mock_close,
+        mock_create,
+        monkeypatch,
     ):
         """Control: when the provider DOES send finish_reason='length' with
         partial tool args, it is a genuine output cap — keep the existing
         non-stub behaviour (boost max_tokens and retry)."""
 
         def _capped_stream():
-            yield _make_stream_chunk(tool_calls=[
-                _make_tool_call_delta(index=0, tc_id="call_y", name="execute_code"),
-            ])
-            yield _make_stream_chunk(tool_calls=[
-                _make_tool_call_delta(index=0, arguments="{"),
-            ])
+            yield _make_stream_chunk(
+                tool_calls=[
+                    _make_tool_call_delta(index=0, tc_id="call_y", name="execute_code"),
+                ]
+            )
+            yield _make_stream_chunk(
+                tool_calls=[
+                    _make_tool_call_delta(index=0, arguments="{"),
+                ]
+            )
             # Provider explicitly reports the output cap.
             yield _make_stream_chunk(finish_reason="length")
 
@@ -232,6 +262,7 @@ class TestCleanStreamEndMidToolCall:
 
 
 # ── Length-continuation prompt branching ──────────────────────────────────
+
 
 class TestLengthContinuationPromptBranching:
     """When finish_reason=length, the continuation prompt that reaches the
@@ -263,7 +294,8 @@ class TestLengthContinuationPromptBranching:
         must guide the model to break its output into smaller chunks
         instead of retrying the same large tool call (#31998)."""
         prompt = self._simulate_branch(
-            PARTIAL_STREAM_STUB_ID, dropped_tools=["write_file"],
+            PARTIAL_STREAM_STUB_ID,
+            dropped_tools=["write_file"],
         )
         assert "too large" in prompt
         assert "break" in prompt.lower()
@@ -274,11 +306,13 @@ class TestLengthContinuationPromptBranching:
 
 # ── Integration: live conversation loop ───────────────────────────────────
 
+
 @pytest.fixture()
 def loop_agent():
     """AIAgent with a mocked OpenAI client (mirrors test_run_agent's fixture)
     so we can stage a stub + continuation pair on .chat.completions.create."""
     from run_agent import AIAgent
+
     with (
         patch("run_agent.get_tool_definitions", return_value=[]),
         patch("run_agent.check_toolset_requirements", return_value={}),
@@ -316,20 +350,24 @@ class TestConversationLoopPartialStreamContinuation:
         partial_stub = SimpleNamespace(
             id=PARTIAL_STREAM_STUB_ID,
             model="test/model",
-            choices=[SimpleNamespace(
-                index=0,
-                message=_mock_assistant_msg(content="The first half of "),
-                finish_reason=FINISH_REASON_LENGTH,
-            )],
+            choices=[
+                SimpleNamespace(
+                    index=0,
+                    message=_mock_assistant_msg(content="The first half of "),
+                    finish_reason=FINISH_REASON_LENGTH,
+                )
+            ],
             usage=None,
         )
         # Second API call: model continues with the rest, clean stop.
         continuation = _mock_response(
-            content="the answer is forty-two.", finish_reason="stop",
+            content="the answer is forty-two.",
+            finish_reason="stop",
         )
 
         loop_agent.client.chat.completions.create.side_effect = [
-            partial_stub, continuation,
+            partial_stub,
+            continuation,
         ]
 
         with (
@@ -349,9 +387,12 @@ class TestConversationLoopPartialStreamContinuation:
         # no-ops with "I wasn't truncated, I'm done."
         # We assert it indirectly by inspecting the second-call kwargs.
         second_call_kwargs = loop_agent.client.chat.completions.create.call_args_list[1]
-        msgs = second_call_kwargs.kwargs.get("messages") or second_call_kwargs.args[0].get("messages")
+        msgs = second_call_kwargs.kwargs.get("messages") or second_call_kwargs.args[
+            0
+        ].get("messages")
         last_user = next(
-            (m for m in reversed(msgs) if m.get("role") == "user"), None,
+            (m for m in reversed(msgs) if m.get("role") == "user"),
+            None,
         )
         assert last_user is not None
         assert "network error mid-stream" in (last_user.get("content") or ""), (

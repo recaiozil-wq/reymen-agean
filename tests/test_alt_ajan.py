@@ -44,12 +44,14 @@ def _mock_alt_ajan_module():
 
     # Sahte yaml
     mock_yaml = types.ModuleType("yaml")
-    mock_yaml.safe_load = MagicMock(return_value={
-        "model": "test-model",
-        "toolsets": ["file"],
-        "max_turns": 5,
-        "compression": {"enabled": False},
-    })
+    mock_yaml.safe_load = MagicMock(
+        return_value={
+            "model": "test-model",
+            "toolsets": ["file"],
+            "max_turns": 5,
+            "compression": {"enabled": False},
+        }
+    )
 
     # sys.modules'a ekle
     for name, mod in [
@@ -61,13 +63,21 @@ def _mock_alt_ajan_module():
         sys.modules.setdefault(name, mod)
 
     # config.yaml okuma ve alt_ajan import
-    with patch("builtins.open", MagicMock(return_value=MagicMock(
-        __enter__=MagicMock(return_value=MagicMock(read=MagicMock(return_value="{}"))),
-        __exit__=MagicMock(return_value=False)
-    ))):
+    with patch(
+        "builtins.open",
+        MagicMock(
+            return_value=MagicMock(
+                __enter__=MagicMock(
+                    return_value=MagicMock(read=MagicMock(return_value="{}"))
+                ),
+                __exit__=MagicMock(return_value=False),
+            )
+        ),
+    ):
         if "alt_ajan" in sys.modules:
             return sys.modules["alt_ajan"]
         import importlib
+
         return importlib.import_module("alt_ajan")
 
 
@@ -85,7 +95,7 @@ except Exception as _import_err:
 # ── Skip dekoratoru ───────────────────────────────────────────────────────────
 skipif_import = pytest.mark.skipif(
     not _IMPORT_OK,
-    reason=f"alt_ajan yuklenemedi: {_IMPORT_ERR if not _IMPORT_OK else ''}"
+    reason=f"alt_ajan yuklenemedi: {_IMPORT_ERR if not _IMPORT_OK else ''}",
 )
 
 
@@ -93,9 +103,9 @@ skipif_import = pytest.mark.skipif(
 # __init__ Testleri
 # ══════════════════════════════════════════════════════════════════════════════
 
+
 @skipif_import
 class TestAltAjanInit:
-
     def test_hata_sayaci_baslangic_sifir(self):
         aj = AltAjan("test gorevi")
         assert aj._onceki_hata_sayaci == 0
@@ -121,9 +131,9 @@ class TestAltAjanInit:
 # Hata Sayacı Testleri
 # ══════════════════════════════════════════════════════════════════════════════
 
+
 @skipif_import
 class TestHataSayaci:
-
     def _ajan_olustur(self, gorev="test gorevi"):
         aj = AltAjan(gorev)
         # _motor_al'i mock'la
@@ -161,9 +171,9 @@ class TestHataSayaci:
 # REACT_LOOP_DETECTOR Mesaj Formatı Testleri
 # ══════════════════════════════════════════════════════════════════════════════
 
+
 @skipif_import
 class TestReactLoopDetectorMesaj:
-
     def _sonuc_ile_calistir(self, beyin_cevaplari, gorev="test gorevi"):
         """AltAjan.calistir()'i mock Beyin cevaplariyla calistir."""
         aj = AltAjan(gorev, max_adim=20)
@@ -275,9 +285,9 @@ class TestReactLoopDetectorMesaj:
 # REACT_LOOP_DETECTOR Kelime Kontrolü
 # ══════════════════════════════════════════════════════════════════════════════
 
+
 @skipif_import
 class TestMesajFormat:
-
     def test_gozlem_dongu_mesaji_3x_icerir(self):
         """Döngü mesajı '3x' ifadesini içermeli."""
         mesaj = (

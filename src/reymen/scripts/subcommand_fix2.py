@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """subcommand_fix2.py — Tek satirlik print ile 37 subcommand'i duzelt."""
+
 import re
 from pathlib import Path
 
@@ -78,7 +79,7 @@ for py in sorted(SUBCMD_DIR.glob("*.py")):
                 continue
             # pass veya print satirini degistir
             if line.strip() == "pass" or line.strip().startswith("print("):
-                indent = line[:len(line) - len(line.lstrip())]
+                indent = line[: len(line) - len(line.lstrip())]
                 yeni_lines.append(f"{indent}{impl}")
                 degisti = True
                 in_func = False

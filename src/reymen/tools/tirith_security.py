@@ -1,4 +1,5 @@
 """ReYMeN tools.tirith_security shim — Hermes Tirith güvenlik kontrollerini yönlendirir."""
+
 from __future__ import annotations
 
 import logging

@@ -26,11 +26,13 @@ class TestWriteAndRead:
 
     def test_write_deduplicates_duplicate_ids(self):
         store = TodoStore()
-        result = store.write([
-            {"id": "1", "content": "First version", "status": "pending"},
-            {"id": "2", "content": "Other task", "status": "pending"},
-            {"id": "1", "content": "Latest version", "status": "in_progress"},
-        ])
+        result = store.write(
+            [
+                {"id": "1", "content": "First version", "status": "pending"},
+                {"id": "2", "content": "Other task", "status": "pending"},
+                {"id": "1", "content": "Latest version", "status": "in_progress"},
+            ]
+        )
         assert result == [
             {"id": "2", "content": "Other task", "status": "pending"},
             {"id": "1", "content": "Latest version", "status": "in_progress"},
@@ -55,11 +57,13 @@ class TestFormatForInjection:
 
     def test_non_empty_has_markers(self):
         store = TodoStore()
-        store.write([
-            {"id": "1", "content": "Do thing", "status": "completed"},
-            {"id": "2", "content": "Next", "status": "pending"},
-            {"id": "3", "content": "Working", "status": "in_progress"},
-        ])
+        store.write(
+            [
+                {"id": "1", "content": "Do thing", "status": "completed"},
+                {"id": "2", "content": "Next", "status": "pending"},
+                {"id": "3", "content": "Working", "status": "in_progress"},
+            ]
+        )
         text = store.format_for_injection()
         # Completed items are filtered out of injection
         assert "[x]" not in text
@@ -75,9 +79,11 @@ class TestFormatForInjection:
 class TestMergeMode:
     def test_update_existing_by_id(self):
         store = TodoStore()
-        store.write([
-            {"id": "1", "content": "Original", "status": "pending"},
-        ])
+        store.write(
+            [
+                {"id": "1", "content": "Original", "status": "pending"},
+            ]
+        )
         store.write(
             [{"id": "1", "status": "completed"}],
             merge=True,
@@ -108,10 +114,12 @@ class TestTodoToolFunction:
 
     def test_write_mode(self):
         store = TodoStore()
-        result = json.loads(todo_tool(
-            todos=[{"id": "1", "content": "New", "status": "in_progress"}],
-            store=store,
-        ))
+        result = json.loads(
+            todo_tool(
+                todos=[{"id": "1", "content": "New", "status": "in_progress"}],
+                store=store,
+            )
+        )
         assert result["summary"]["in_progress"] == 1
 
     def test_no_store_returns_error(self):
@@ -132,6 +140,7 @@ class TestTodoStoreBounds:
 
     def test_oversized_content_is_truncated(self):
         from tools.todo_tool import MAX_TODO_CONTENT_CHARS
+
         store = TodoStore()
         store.write([{"id": "1", "content": "A" * 50001, "status": "pending"}])
         item = store.read()[0]
@@ -140,6 +149,7 @@ class TestTodoStoreBounds:
 
     def test_injection_block_is_bounded(self):
         from tools.todo_tool import MAX_TODO_CONTENT_CHARS
+
         store = TodoStore()
         store.write([{"id": "1", "content": "A" * 50001, "status": "pending"}])
         inj = store.format_for_injection()
@@ -150,6 +160,7 @@ class TestTodoStoreBounds:
         """The merge path updates content directly, bypassing _validate —
         verify it is capped too."""
         from tools.todo_tool import MAX_TODO_CONTENT_CHARS
+
         store = TodoStore()
         store.write([{"id": "1", "content": "short", "status": "pending"}])
         store.write([{"id": "1", "content": "B" * 50001}], merge=True)
@@ -157,21 +168,26 @@ class TestTodoStoreBounds:
 
     def test_item_count_is_bounded(self):
         from tools.todo_tool import MAX_TODO_ITEMS
+
         store = TodoStore()
-        store.write([
-            {"id": str(i), "content": f"task {i}", "status": "pending"}
-            for i in range(5000)
-        ])
+        store.write(
+            [
+                {"id": str(i), "content": f"task {i}", "status": "pending"}
+                for i in range(5000)
+            ]
+        )
         assert len(store.read()) == MAX_TODO_ITEMS
 
     def test_normal_list_is_unchanged(self):
         """No regression: ordinary plans pass through untouched (no marker,
         same content, same order)."""
         store = TodoStore()
-        store.write([
-            {"id": "1", "content": "write the report", "status": "in_progress"},
-            {"id": "2", "content": "review PR", "status": "pending"},
-        ])
+        store.write(
+            [
+                {"id": "1", "content": "write the report", "status": "in_progress"},
+                {"id": "2", "content": "review PR", "status": "pending"},
+            ]
+        )
         items = store.read()
         assert [i["content"] for i in items] == ["write the report", "review PR"]
         assert "[truncated]" not in items[0]["content"]

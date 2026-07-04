@@ -30,10 +30,11 @@ class TrajectoryCompressor:
     def _llm_ozetle(self, adimlar: list[dict]) -> str:
         satirlar = []
         for a in adimlar:
-            satirlar.append(f"[{a.get('tur','?')}] {a.get('eylem','')[:80]} -> {a.get('gozlem','')[:80]}")
-        prompt = (
-            "Asagidaki ajan adimlarini 2-3 cumleyle ozetle:\n"
-            + "\n".join(satirlar)
+            satirlar.append(
+                f"[{a.get('tur','?')}] {a.get('eylem','')[:80]} -> {a.get('gozlem','')[:80]}"
+            )
+        prompt = "Asagidaki ajan adimlarini 2-3 cumleyle ozetle:\n" + "\n".join(
+            satirlar
         )
         try:
             return self.provider.uret(prompt, [{"role": "user", "content": "Ozetle."}])
@@ -56,7 +57,16 @@ class TrajectoryCompressor:
 
 if __name__ == "__main__":
     c = TrajectoryCompressor()
-    print(c.ozetle([
-        {"tur": 1, "eylem": "DOSYA_OKU(\"test.txt\")", "gozlem": "[Tamam]"},
-        {"tur": 2, "eylem": "DOSYA_YAZ(\"out.txt\", \"icirk\")", "gozlem": "[Tamam]"},
-    ], 1))
+    print(
+        c.ozetle(
+            [
+                {"tur": 1, "eylem": 'DOSYA_OKU("test.txt")', "gozlem": "[Tamam]"},
+                {
+                    "tur": 2,
+                    "eylem": 'DOSYA_YAZ("out.txt", "icirk")',
+                    "gozlem": "[Tamam]",
+                },
+            ],
+            1,
+        )
+    )

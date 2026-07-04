@@ -58,7 +58,9 @@ def _make_event(text="hi", chat_id="42"):
     return MessageEvent(
         text=text,
         message_type=MessageType.TEXT,
-        source=SessionSource(platform=Platform.TELEGRAM, chat_id=chat_id, chat_type="dm"),
+        source=SessionSource(
+            platform=Platform.TELEGRAM, chat_id=chat_id, chat_type="dm"
+        ),
     )
 
 
@@ -119,9 +121,9 @@ async def test_in_band_drain_does_not_grow_stack():
 
     await adapter.cancel_background_tasks()
 
-    assert len(depths) == N, (
-        f"expected {N} handler runs in the chain, got {len(depths)}: depths={depths!r}"
-    )
+    assert (
+        len(depths) == N
+    ), f"expected {N} handler runs in the chain, got {len(depths)}: depths={depths!r}"
     max_depth = max(depths)
     assert max_depth <= 2, (
         f"in-band drain is recursing instead of spawning a fresh task — "

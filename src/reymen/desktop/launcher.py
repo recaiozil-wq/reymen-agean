@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """ReYMeN Desktop CLI — baslat/durdur/durum/tray."""
+
 from __future__ import annotations
 import sys
 from src.reymen.desktop.server import web_server
 from src.reymen.desktop.autostart import AutoStartManager
+
 
 def main():
     args = sys.argv[1:]
@@ -34,6 +36,7 @@ def main():
         print(f"Auto-start: {'Aktif' if AutoStartManager.is_enabled() else 'Pasif'}")
     elif cmd == "tray":
         from reymen.desktop.tray import run_tray
+
         print("Sistem tepsisi baslatiliyor...")
         run_tray(web_server)
     elif cmd == "autostart":
@@ -44,6 +47,7 @@ def main():
     else:
         print(f"Bilinmeyen komut: {cmd}")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

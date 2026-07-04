@@ -23,7 +23,9 @@ class SkillActivator:
 
     def __init__(self, registry_path: Optional[Path] = None):
         self._registry: Dict[str, str] = {}  # name -> full file path
-        self._registry_path = registry_path or Path.home() / ".reymen" / "skill_registry.json"
+        self._registry_path = (
+            registry_path or Path.home() / ".reymen" / "skill_registry.json"
+        )
 
     # ── Registry management ──────────────────────────────────────────────
 
@@ -139,4 +141,6 @@ class SkillActivator:
         return name in self._registry
 
     def __repr__(self) -> str:
-        return f"SkillActivator(entries={len(self._registry)}, path={self._registry_path})"
+        return (
+            f"SkillActivator(entries={len(self._registry)}, path={self._registry_path})"
+        )

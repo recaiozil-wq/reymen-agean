@@ -36,20 +36,28 @@ logger = logging.getLogger(__name__)
 # ── Varsayilanlar ──────────────────────────────────────────────────────────
 
 # Varsayilan izin verilen IP'ler (her zaman acik)
-VARSAYILAN_IZINLI = frozenset({
-    "127.0.0.1",
-    "::1",
-})
+VARSAYILAN_IZINLI = frozenset(
+    {
+        "127.0.0.1",
+        "::1",
+    }
+)
 
 # Varsayilan engellenen CIDR'ler (tum ozel aglar dahil)
-VARSAYILAN_ENGEL = frozenset({
-    "0.0.0.0/0",       # Tum IPv4
-    "::/0",            # Tum IPv6
-})
+VARSAYILAN_ENGEL = frozenset(
+    {
+        "0.0.0.0/0",  # Tum IPv4
+        "::/0",  # Tum IPv6
+    }
+)
 
 # Windows hosts dosyasi yolu
-HOSTS_DOSYASI = os.environ.get("SystemRoot", "C:\\Windows") + r"\System32\drivers\etc\hosts"
-HOSTS_DOSYASI_ALT = os.environ.get("SystemRoot", "C:\\Windows") + r"\SysWOW64\drivers\etc\hosts"
+HOSTS_DOSYASI = (
+    os.environ.get("SystemRoot", "C:\\Windows") + r"\System32\drivers\etc\hosts"
+)
+HOSTS_DOSYASI_ALT = (
+    os.environ.get("SystemRoot", "C:\\Windows") + r"\SysWOW64\drivers\etc\hosts"
+)
 
 # ReYMeN network restriction etiketi
 REYMEN_ETIKETI = "# REYMEN_NETWORK_RESTRICTION"
@@ -58,6 +66,7 @@ REYMEN_BITIS = "# REYMEN_NETWORK_END"
 
 
 # ── Yardimci Fonksiyonlar ─────────────────────────────────────────────────
+
 
 def _sistem_tespit() -> str:
     """Calisma ortamini tespit et: windows, linux, wsl."""
@@ -143,8 +152,7 @@ def _hosts_etkilesim(eklenecek: list, kaldirilacak: list) -> dict:
         # Kaldirilacak domain'leri temizle
         for domain in kaldirilacak:
             yeni_satirlar = [
-                s for s in yeni_satirlar
-                if domain.lower() not in s.lower()
+                s for s in yeni_satirlar if domain.lower() not in s.lower()
             ]
             mesaj["kaldirilan"] += 1
 
@@ -195,7 +203,11 @@ def _wfw_kural_ekle(kural_adi: str, uzak_ip: str = "*", aksiyon: str = "block") 
     try:
         if aksiyon == "block":
             cmd = [
-                "netsh", "advfirewall", "firewall", "add", "rule",
+                "netsh",
+                "advfirewall",
+                "firewall",
+                "add",
+                "rule",
                 f"name={kural_adi}",
                 "dir=out",
                 f"remoteip={uzak_ip}",
@@ -204,7 +216,11 @@ def _wfw_kural_ekle(kural_adi: str, uzak_ip: str = "*", aksiyon: str = "block") 
             ]
         else:
             cmd = [
-                "netsh", "advfirewall", "firewall", "add", "rule",
+                "netsh",
+                "advfirewall",
+                "firewall",
+                "add",
+                "rule",
                 f"name={kural_adi}",
                 "dir=out",
                 f"remoteip={uzak_ip}",
@@ -212,9 +228,7 @@ def _wfw_kural_ekle(kural_adi: str, uzak_ip: str = "*", aksiyon: str = "block") 
                 "enable=yes",
             ]
 
-        r = subprocess.run(
-            cmd, capture_output=True, text=True, timeout=30
-        )
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
         return r.returncode == 0
     except Exception as e:
         logger.warning("[WFW] Kural ekleme hatasi: %s", e)
@@ -225,9 +239,10 @@ def _wfw_kural_kaldir(kural_adi: str) -> bool:
     """Windows Firewall kuralini kaldir."""
     try:
         r = subprocess.run(
-            ["netsh", "advfirewall", "firewall", "delete", "rule",
-             f"name={kural_adi}"],
-            capture_output=True, text=True, timeout=30,
+            ["netsh", "advfirewall", "firewall", "delete", "rule", f"name={kural_adi}"],
+            capture_output=True,
+            text=True,
+            timeout=30,
         )
         return r.returncode == 0
     except Exception as e:
@@ -244,18 +259,23 @@ def _iptables_kural_ekle(izinli_cidr: str) -> bool:
         # Zincir olustur (ilk sefer)
         subprocess.run(
             ["iptables", "-N", "REYMEN-OUT"],
-            capture_output=True, text=True, timeout=10,
+            capture_output=True,
+            text=True,
+            timeout=10,
         )
         # Zinciri OUTPUT'a bagla
         subprocess.run(
             ["iptables", "-I", "OUTPUT", "-j", "REYMEN-OUT"],
-            capture_output=True, text=True, timeout=10,
+            capture_output=True,
+            text=True,
+            timeout=10,
         )
         # Izin ver
         r = subprocess.run(
-            ["iptables", "-A", "REYMEN-OUT", "-d", izinli_cidr,
-             "-j", "ACCEPT"],
-            capture_output=True, text=True, timeout=10,
+            ["iptables", "-A", "REYMEN-OUT", "-d", izinli_cidr, "-j", "ACCEPT"],
+            capture_output=True,
+            text=True,
+            timeout=10,
         )
         return r.returncode == 0
     except Exception as e:
@@ -269,16 +289,22 @@ def _iptables_kurallari_temizle() -> bool:
         # OUTPUT'tan ayir
         subprocess.run(
             ["iptables", "-D", "OUTPUT", "-j", "REYMEN-OUT"],
-            capture_output=True, text=True, timeout=10,
+            capture_output=True,
+            text=True,
+            timeout=10,
         )
         # Zinciri sil (flush + delete)
         subprocess.run(
             ["iptables", "-F", "REYMEN-OUT"],
-            capture_output=True, text=True, timeout=10,
+            capture_output=True,
+            text=True,
+            timeout=10,
         )
         subprocess.run(
             ["iptables", "-X", "REYMEN-OUT"],
-            capture_output=True, text=True, timeout=10,
+            capture_output=True,
+            text=True,
+            timeout=10,
         )
         return True
     except Exception as e:
@@ -291,30 +317,48 @@ def _iptables_kurallari_temizle() -> bool:
 # Bilinen genel domain'ler (tumunu engellemek icin)
 TUM_DOMAIN_YONLENDIR = [
     # Genel web siteleri
-    "google.com", "www.google.com",
-    "youtube.com", "www.youtube.com",
-    "facebook.com", "www.facebook.com",
-    "twitter.com", "www.twitter.com", "x.com", "www.x.com",
-    "instagram.com", "www.instagram.com",
-    "linkedin.com", "www.linkedin.com",
-    "reddit.com", "www.reddit.com",
-    "github.com", "www.github.com",
-    "stackoverflow.com", "www.stackoverflow.com",
-    "pypi.org", "www.pypi.org",
-    "python.org", "www.python.org",
-    "docker.com", "www.docker.com",
-    "amazon.com", "www.amazon.com",
+    "google.com",
+    "www.google.com",
+    "youtube.com",
+    "www.youtube.com",
+    "facebook.com",
+    "www.facebook.com",
+    "twitter.com",
+    "www.twitter.com",
+    "x.com",
+    "www.x.com",
+    "instagram.com",
+    "www.instagram.com",
+    "linkedin.com",
+    "www.linkedin.com",
+    "reddit.com",
+    "www.reddit.com",
+    "github.com",
+    "www.github.com",
+    "stackoverflow.com",
+    "www.stackoverflow.com",
+    "pypi.org",
+    "www.pypi.org",
+    "python.org",
+    "www.python.org",
+    "docker.com",
+    "www.docker.com",
+    "amazon.com",
+    "www.amazon.com",
     "aws.amazon.com",
     "azure.microsoft.com",
     "cloud.google.com",
     "api.openai.com",
     "api.anthropic.com",
     # DNS
-    "1.1.1.1", "8.8.8.8", "8.8.4.4",
+    "1.1.1.1",
+    "8.8.8.8",
+    "8.8.4.4",
 ]
 
 
 # ── NetworkRestriction Sinifi ─────────────────────────────────────────────
+
 
 class NetworkRestriction:
     """Ag kisitlama yoneticisi.
@@ -364,7 +408,8 @@ class NetworkRestriction:
 
         logger.info(
             "[NetworkRestriction] Baslatildi. Sistem: %s, Kalici IP: %s",
-            self._sistem, sorted(self._her_zaman_izinli),
+            self._sistem,
+            sorted(self._her_zaman_izinli),
         )
 
     @property
@@ -378,7 +423,9 @@ class NetworkRestriction:
         return {
             "aktif": self._aktif,
             "sistem": self._sistem,
-            "baslangic": self._baslangic_zamani.isoformat() if self._baslangic_zamani else None,
+            "baslangic": self._baslangic_zamani.isoformat()
+            if self._baslangic_zamani
+            else None,
             "her_zaman_izinli": sorted(self._her_zaman_izinli),
             "eklenen_kurallar": len(self._eklenen_kurallar),
             "eklenen_domainler": len(self._eklenen_domainler),
@@ -534,7 +581,9 @@ class NetworkRestriction:
                 if hedef in ag:
                     return {"ip": ip_adresi, "izinli": True, "neden": "cidr_eslesmesi"}
             except ValueError as _e:
-                logger.warning("[NetworkRestriction] Gecersiz deger (L535): %s", ValueError)
+                logger.warning(
+                    "[NetworkRestriction] Gecersiz deger (L535): %s", ValueError
+                )
                 pass
 
         if self._aktif:
@@ -554,22 +603,28 @@ class NetworkRestriction:
 
         # Block all outbound
         if _wfw_kural_ekle(self._kural_adi_block, "*", "block"):
-            self._eklenen_kurallar.append({
-                "tip": "block",
-                "hedef": "*",
-                "kural": self._kural_adi_block,
-            })
+            self._eklenen_kurallar.append(
+                {
+                    "tip": "block",
+                    "hedef": "*",
+                    "kural": self._kural_adi_block,
+                }
+            )
             basarili_sayisi += 1
 
         # Allow specific IP'ler
         for izin in izinli_liste:
-            kural_adi = f"{self._kural_adi_allow}-{izin.replace('/', '_').replace(':', '_')}"
+            kural_adi = (
+                f"{self._kural_adi_allow}-{izin.replace('/', '_').replace(':', '_')}"
+            )
             if _wfw_kural_ekle(kural_adi, izin, "allow"):
-                self._eklenen_kurallar.append({
-                    "tip": "allow",
-                    "hedef": izin,
-                    "kural": kural_adi,
-                })
+                self._eklenen_kurallar.append(
+                    {
+                        "tip": "allow",
+                        "hedef": izin,
+                        "kural": kural_adi,
+                    }
+                )
                 basarili_sayisi += 1
 
         if basarili_sayisi > 0:
@@ -646,7 +701,11 @@ class NetworkRestriction:
         try:
             return self._linux_kaldir()
         except Exception:
-            return {"basarili": True, "mesaj": "WSL kisitlamasi kaldirildi.", "detay": {}}
+            return {
+                "basarili": True,
+                "mesaj": "WSL kisitlamasi kaldirildi.",
+                "detay": {},
+            }
 
     def _linux_uygula(self, izinli_liste: list) -> dict:
         """Linux iptables ile outbound kisitlamasi uygula.
@@ -662,7 +721,9 @@ class NetworkRestriction:
         try:
             subprocess.run(
                 ["iptables", "-F", "REYMEN-OUT"],
-                capture_output=True, text=True, timeout=10,
+                capture_output=True,
+                text=True,
+                timeout=10,
             )
         except Exception as _e:
             __import__("logging").getLogger(__name__).warning(
@@ -672,32 +733,43 @@ class NetworkRestriction:
         # Zincir olustur (yoksa)
         subprocess.run(
             ["iptables", "-N", "REYMEN-OUT"],
-            capture_output=True, text=True, timeout=10,
+            capture_output=True,
+            text=True,
+            timeout=10,
         )
 
         # OUTPUT'a bagla (ilk siraya)
         subprocess.run(
             ["iptables", "-I", "OUTPUT", "-j", "REYMEN-OUT"],
-            capture_output=True, text=True, timeout=10,
+            capture_output=True,
+            text=True,
+            timeout=10,
         )
 
         # Izin verilen IP'ler icin ACCEPT
         for izin in izinli_liste:
             r = subprocess.run(
-                ["iptables", "-A", "REYMEN-OUT", "-d", izin,
-                 "-j", "ACCEPT"],
-                capture_output=True, text=True, timeout=10,
+                ["iptables", "-A", "REYMEN-OUT", "-d", izin, "-j", "ACCEPT"],
+                capture_output=True,
+                text=True,
+                timeout=10,
             )
             if r.returncode == 0:
-                self._eklenen_kurallar.append({
-                    "tip": "allow", "hedef": izin, "kural": izin,
-                })
+                self._eklenen_kurallar.append(
+                    {
+                        "tip": "allow",
+                        "hedef": izin,
+                        "kural": izin,
+                    }
+                )
                 basarili_sayisi += 1
 
         # Varsayilan: DROP (engelle)
         r = subprocess.run(
             ["iptables", "-A", "REYMEN-OUT", "-j", "DROP"],
-            capture_output=True, text=True, timeout=10,
+            capture_output=True,
+            text=True,
+            timeout=10,
         )
 
         if basarili_sayisi > 0 or r.returncode == 0:
@@ -723,7 +795,9 @@ class NetworkRestriction:
         basarili = _iptables_kurallari_temizle()
         return {
             "basarili": basarili,
-            "mesaj": "iptables REYMEN-OUT zinciri kaldirildi." if basarili else "iptables temizleme basarisiz.",
+            "mesaj": "iptables REYMEN-OUT zinciri kaldirildi."
+            if basarili
+            else "iptables temizleme basarisiz.",
             "detay": {},
         }
 
@@ -749,10 +823,7 @@ def network_kisitla(
     try:
         sonuc = _VARSAYILAN_NETWORK.apply(allowlist, block_domainler)
         if sonuc["basarili"]:
-            return (
-                f"[GUVENLIK] Network kisitlamasi aktif. "
-                f"{sonuc['mesaj']}"
-            )
+            return f"[GUVENLIK] Network kisitlamasi aktif. " f"{sonuc['mesaj']}"
         return f"[GUVENLIK] Network kisitlamasi basarisiz: {sonuc['mesaj']}"
     except Exception as e:
         logger.error("[NetworkRestriction] Apply hatasi: %s", e)
@@ -796,6 +867,7 @@ def network_durum_text() -> str:
 
 # ── Docker Network Entegrasyonu ──────────────────────────────────────────
 
+
 class DockerNetworkRestriction:
     """Docker icin network restriction yardimcisi.
 
@@ -815,7 +887,9 @@ class DockerNetworkRestriction:
             # Once mevcut mu kontrol et
             r = subprocess.run(
                 ["docker", "network", "inspect", self.network_adi],
-                capture_output=True, text=True, timeout=10,
+                capture_output=True,
+                text=True,
+                timeout=10,
             )
             if r.returncode == 0:
                 self._olusturuldu = True
@@ -823,11 +897,18 @@ class DockerNetworkRestriction:
 
             # --internal: container'lar birbirine erisebilir ama disariya cikamaz
             r = subprocess.run(
-                ["docker", "network", "create",
-                 "--internal",
-                 "--label", "reymen=sandbox-network",
-                 self.network_adi],
-                capture_output=True, text=True, timeout=30,
+                [
+                    "docker",
+                    "network",
+                    "create",
+                    "--internal",
+                    "--label",
+                    "reymen=sandbox-network",
+                    self.network_adi,
+                ],
+                capture_output=True,
+                text=True,
+                timeout=30,
             )
             self._olusturuldu = r.returncode == 0
             return self._olusturuldu
@@ -845,7 +926,9 @@ class DockerNetworkRestriction:
         try:
             r = subprocess.run(
                 ["docker", "network", "rm", self.network_adi],
-                capture_output=True, text=True, timeout=30,
+                capture_output=True,
+                text=True,
+                timeout=30,
             )
             self._olusturuldu = False
             return r.returncode == 0
@@ -865,6 +948,7 @@ class DockerNetworkRestriction:
 
 
 # ── Motor Plugin API ─────────────────────────────────────────────────────
+
 
 def motor_kaydet(motor):
     """Motor'a network restriction araclarini kaydet."""
@@ -890,8 +974,10 @@ def motor_kaydet(motor):
         "Network restriction durum raporu",
     )
 
-    logger.info("[NetworkRestriction] Motor'a 3 arac kaydedildi: "
-                "GUVENLIK_KISITLA, GUVENLIK_KISIT_KALDIR, GUVENLIK_DURUM")
+    logger.info(
+        "[NetworkRestriction] Motor'a 3 arac kaydedildi: "
+        "GUVENLIK_KISITLA, GUVENLIK_KISIT_KALDIR, GUVENLIK_DURUM"
+    )
 
 
 # ── CLI Test ─────────────────────────────────────────────────────────────
@@ -917,7 +1003,9 @@ if __name__ == "__main__":
     test_ipleri = ["127.0.0.1", "8.8.8.8", "192.168.1.1", "10.0.0.1"]
     for ip in test_ipleri:
         sonuc = _VARSAYILAN_NETWORK.ip_kontrol(ip)
-        print(f"  IP {ip}: {'✅ Izinli' if sonuc['izinli'] else '❌ Engelli'} ({sonuc['neden']})")
+        print(
+            f"  IP {ip}: {'✅ Izinli' if sonuc['izinli'] else '❌ Engelli'} ({sonuc['neden']})"
+        )
 
     print()
 
@@ -934,7 +1022,9 @@ if __name__ == "__main__":
         # 5. Baglantı testi
         print("Baglanti testi (8.8.8.8:80)...")
         baglanti = _VARSAYILAN_NETWORK.test_connectivity()
-        print(f"  {'❌ Engelli (beklenen)' if not baglanti else '⚠️ Acik (beklenmeyen)'}")
+        print(
+            f"  {'❌ Engelli (beklenen)' if not baglanti else '⚠️ Acik (beklenmeyen)'}"
+        )
 
         print()
 

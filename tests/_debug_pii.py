@@ -1,9 +1,15 @@
 """Debug: PII satir 319 kontrolu"""
+
 import sys
+
 sys.path.insert(0, r"C:\Users\marko\Desktop\Reymen Proje\ReYMeN-Ajan")
 from reymen.core.guardrails_manager import GuardrailsManager
 import re
-from reymen.core.guardrails_manager import _HASSAS_DESENLER, _YASAKLI_ICERIK, _KOD_EXEC_DESENLERI
+from reymen.core.guardrails_manager import (
+    _HASSAS_DESENLER,
+    _YASAKLI_ICERIK,
+    _KOD_EXEC_DESENLERI,
+)
 
 gm = GuardrailsManager()
 
