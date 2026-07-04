@@ -131,7 +131,7 @@ terminal:
   cwd: .
   timeout: 180
 web:
-  backend: firecrawl
+  backend: duckduckgo
 # ── Container Sandbox (Docker) ────────────────────────────────────────────────
 # Terminal komutlarini Docker container icinde izole calistir.
 # Modlar:

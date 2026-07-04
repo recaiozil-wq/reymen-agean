@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 
 # ── Proje kokunu bul ────────────────────────────────────────────────────
 
-PROJE_KOK: Path = Path(__file__).resolve().parent.parent.parent
+PROJE_KOK: Path = Path(__file__).resolve().parent.parent.parent.parent
 DURUM_DOSYASI: Path = PROJE_KOK / "durum.json"
 
 

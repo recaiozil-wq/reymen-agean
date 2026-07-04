@@ -1,0 +1,65 @@
+═══════════════════════════════════════════════════════════
+                   R E Y M E N   D E F T E R
+═══════════════════════════════════════════════════════════
+Tarih: 2026-07-04
+───────────────────────────────────────────────────────────
+
+1) DEEPSEEK API KEY YENİLEME
+─────────────────────────────
+- Eski key: 401 (geçersiz)
+- Yeni key: sk-050be4c36f1944b4b4de1269826f30f7
+- 3 profile de yazıldı:
+  • default/ → .env
+  • reymen/ → .env
+  • kiral38/ → .env
+- Test: HTTP 200 OK
+
+2) REYMEN LAUNCHER MODEL DÜZELTME
+─────────────────────────────────
+- Sorun: Varsayılan model deepseek-chat (artık yok)
+- Çözüm: .env'ye REYMEN_MODEL=deepseek-v4-flash yazıldı
+- Etkilenen: reymen_launcher.py (5 yerde deepseek-chat fallback)
+- Sonuç: PowerShell'den reymen yazınca Hermes gibi çalışır
+
+3) GATEWAY'LER YENİDEN BAŞLATILDI
+──────────────────────────────────
+- Hermes_Gateway (default) → Running
+- Hermes_Gateway_reymen → Running (PID 41888)
+- Hermes_Gateway_kiral38 → Running (PID 4068)
+- .cmd dosyaları düzeltildi (@exit /b 0 → gerçek komut)
+- Eski PID'ler öldürüldü (32912, 18984, 31868)
+
+4) GIT-WATCHDOG CRON DÜZELTME
+───────────────────────────────
+- Script: C:\Users\marko\AppData\Local\hermes\scripts\git_watchdog.py
+- Sorun: ROOT yolu parent.parent.parent ile yanlış
+- Çözüm: Mutlak yol + env override + parent traversal
+- Test: exit=0, çalışıyor
+
+5) SELF-IMPROVE CRON DÜZELTME
+───────────────────────────────
+- Script: C:\Users\marko\AppData\Local\hermes\scripts\self_improve_cron.py
+- Sorunlar: ROOT yolu yanlış, 3 yerde KeyError
+- Çözüm: ROOT düzeltildi, .get() korumaları eklendi
+- Test: exit=0, çalışıyor
+
+6) CRON İPTALLERİ
+──────────────────
+- Kendini Geliştirme Döngüsü → kalıcı silindi
+- reymen-self-improvement → deliver=origin → local
+- self-improve-dongusu → script düzeltildi
+
+7) reymen/ vs src/reymen/ DRİFTİ
+──────────────────────────────────
+- 30 ölü dosya silindi (reymen/ag/, reymen/scripts/, tbench*, .bak*)
+- 94.020 satır temizlendi
+- Commit: 1a373d0f → GitHub push
+
+8) GÜNCEL DURUM
+────────────────
+✓ DeepSeek API: HTTP 200
+✓ 3 gateway: Running
+✓ 3 bot: Telegram'a bağlı
+✓ Cron'lar: 11 aktif, hepsi OK
+✓ Model: deepseek-v4-flash
+═══════════════════════════════════════════════════════════

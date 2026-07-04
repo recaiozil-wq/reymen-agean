@@ -15,12 +15,17 @@ from closed_learning_loop import ClosedLearningLoop
 
 # turn_context modulu su anda stub olarak proje kokunde bulunuyor
 # (bkz: ./turn_context.py)
+TurnContext = None
+TurnKarari = None
+TurnYoneticisi = None
 try:
-    from turn_context import TurnContext, TurnKarari, TurnYoneticisi
-except ImportError:
-    TurnContext = None
-    TurnKarari = None
-    TurnYoneticisi = None
+    import importlib as _importlib
+    _tc = _importlib.import_module("turn_context")
+    TurnContext = getattr(_tc, "TurnContext", None)
+    TurnKarari = getattr(_tc, "TurnKarari", None)
+    TurnYoneticisi = getattr(_tc, "TurnYoneticisi", None)
+except (ImportError, Exception):
+    pass
 
 
 class TestConversationLoop:

@@ -11,29 +11,28 @@ sys.path.insert(0, str(PROJE_KOK))
 
 class TestSelfImproveKapsamli:
     def test_import(self):
-        from reymen.self_improve import SelfImprove
+        from reymen.self_improve import SelfImprover
 
-        assert SelfImprove is not None
+        assert SelfImprover is not None
 
     def test_olustur(self):
-        from reymen.self_improve import SelfImprove
+        from reymen.self_improve import SelfImprover
 
-        si = SelfImprove()
+        si = SelfImprover()
         assert si is not None
 
     def test_kayit_ekle(self):
-        from reymen.self_improve import SelfImprove
+        from reymen.self_improve import SelfImprover
 
-        si = SelfImprove()
-        si.kayit_ekle("test_meta", {"test": "veri"})
-        # Hata vermemeli
+        si = SelfImprover()
+        si.record("test_meta", {"test": "veri"})
         assert True
 
     def test_son_kayit(self):
-        from reymen.self_improve import SelfImprove
+        from reymen.self_improve import SelfImprover
 
-        si = SelfImprove()
-        si.kayit_ekle("meta1", {"d": "1"})
-        si.kayit_ekle("meta2", {"d": "2"})
-        son = si.son_kayit()
+        si = SelfImprover()
+        si.record("meta1", {"d": "1"})
+        si.record("meta2", {"d": "2"})
+        son = si.history()
         assert son is not None

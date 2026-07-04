@@ -489,6 +489,7 @@ class TestRunConversationHelpers:
         from agent.conversation_loop import run_conversation
 
         # Cok genis bir fonksiyon oldugu icin sadece import ve cagri testi
+        mock_ra = MagicMock()
         with patch("agent.conversation_loop._install_safe_stdio"):
             with patch("agent.conversation_loop.set_session_context"):
                 with patch("agent.conversation_loop.set_current_write_origin"):
@@ -496,9 +497,9 @@ class TestRunConversationHelpers:
                         "agent.conversation_loop._summarize_user_message_for_log",
                         return_value="test",
                     ):
-                        # Burada gercek API cagrisi yapmamak icin _execute_api_call'i mockla
-                        with patch.object(mock_agent, "_interrupt_requested", True):
-                            result = run_conversation(mock_agent, "Merhaba", "System")
+                        with patch("agent.conversation_loop._ra", return_value=mock_ra):
+                            with patch.object(mock_agent, "_interrupt_requested", True):
+                                result = run_conversation(mock_agent, "Merhaba", "System")
         assert isinstance(result, dict)
 
     def test_ollama_context_warning(self, mock_agent, caplog):

@@ -881,7 +881,8 @@ class ConversationLoop:
         _storage = None
         if _SESSION_AKTIF and _SessionStorage:
             try:
-                _storage = _SessionStorage()
+                _db_yol = str(Path(__file__).resolve().parent.parent.parent.parent / "merkez_db" / "session.db")
+                _storage = _SessionStorage(_db_yol)
                 model_adi = getattr(self.beyin, "model", None) if self.beyin else None
                 session_id = _storage.session_baslat(
                     source="run_conversation",
@@ -1041,6 +1042,26 @@ class ConversationLoop:
             user_msg = f"{baglam_str}\n\n{hedef}"
         messages.append({"role": "user", "content": user_msg})
 
+        # ── OTOMATIK WEB ARAMASI (guncel bilgi gerektiren sorgular) ──────
+        try:
+            _guncel_kelimeler = [
+                "fiyat", "dolar", "euro", "altin", "ons", "doviz", "borsa",
+                "bitcoin", "kripto", "hava", "sıcaklik", "yagmur",
+                "bugun", "yarin", "saat", "tarih", "2025", "2026",
+                "haber", "guncel", "son dakika", "skor", "mac sonucu",
+                "kazandi", "kaybetti", "canli", "anlik",
+            ]
+            _hedef_lower = (hedef or "").lower()
+            if any(_kw in _hedef_lower for _kw in _guncel_kelimeler):
+                _web_sonuc = self._web_ara(_hedef, maks_sonuc=5)
+                if _web_sonuc:
+                    messages.insert(-1, {
+                        "role": "system",
+                        "content": f"[WEB ARAMA SONUCU - anlik guncel bilgi]:\n{_web_sonuc}\n\nYukaridaki web arama sonucunu kullanici sorusunu cevaplarken kullan. Bu bilgiler senin egitim verinden daha gunceldir."
+                    })
+        except Exception:
+            pass
+
         # Session Search: kullanici mesajini kaydet
         self._session_search_kaydet(session_id, user_msg, "user")
 
@@ -1124,7 +1145,23 @@ class ConversationLoop:
             except Exception:
                 logger.warning("[plugin] pre_llm_call sessiz_except")
             try:
-                api_yanit = self._direct_api_call(messages, tools_bos=False)
+                # ONCE tools'suz dene: selam/chat icin DeepSeek direkt cevap versin
+                api_yanit = self._direct_api_call(messages, tools_bos=True)
+                if api_yanit:
+                    icerik = self._yanit_icerigi_al(api_yanit)
+                    tcalls = self._tool_calls_al(api_yanit)
+                    # tools'suz yanit geldi ve bos degil -> kullan
+                    if icerik and icerik.strip():
+                        pass  # tools_bos=True ile gelen yanit, kullan
+                    elif tcalls:
+                        pass  # tool_calls geldi, isle
+                    else:
+                        # tools'suz bos yanit -> tools ILE tekrar dene
+                        log.debug("[%s] tools_bos=True bos yanit, tools ILE deneniyor", task_id)
+                        api_yanit = self._direct_api_call(messages, tools_bos=False)
+                else:
+                    # tools'suz basarisiz -> tools ILE dene
+                    api_yanit = self._direct_api_call(messages, tools_bos=False)
             except Exception as _ae:
                 log.warning(
                     "[%s] API cagri hatasi (tur %d): %s", task_id, api_call_count, _ae
@@ -1153,6 +1190,25 @@ class ConversationLoop:
                     )
             except Exception:
                 logger.warning("[plugin] post_llm_call sessiz_except")
+
+            # Bos yanit kontrolu: icerik yok + tool_calls yoksa kisa prompt ile tekrar dene
+            if api_yanit is not None:
+                _yc = self._yanit_icerigi_al(api_yanit)
+                _tc = self._tool_calls_al(api_yanit)
+                if (not _yc or not _yc.strip()) and not _tc:
+                    log.debug("[%s] Bos yanit alindi, kisa prompt ile tekrar deneniyor", task_id)
+                    kisa_prompt = "Sen yardimci bir asistansin. Kisa ve oz cevap ver."
+                    kisa_messages = [{"role": "system", "content": kisa_prompt}]
+                    for m in messages:
+                        if m.get("role") in ("user", "assistant"):
+                            kisa_messages.append(m)
+                    api_yanit = self._direct_api_call(kisa_messages, tools_bos=True)
+                    if api_yanit:
+                        _yc2 = self._yanit_icerigi_al(api_yanit)
+                        _tc2 = self._tool_calls_al(api_yanit)
+                        if (not _yc2 or not _yc2.strip()) and not _tc2:
+                            # Hala bos -> tools ILE dene
+                            api_yanit = self._direct_api_call(kisa_messages, tools_bos=False)
 
             if api_yanit is None:
                 sonuc["hata"] = f"API cagrisi basarisiz (tur {api_call_count})"
@@ -1208,7 +1264,14 @@ class ConversationLoop:
                 budget.tur_bitir(basarili=True)
                 continue
             elif yanit_icerik:
-                final_yanit = yanit_icerik
+                # Minimum anlamli yanit kontrolu (bosluk/\\n gibi yanitlari atla)
+                yanit_stripped = yanit_icerik.strip()
+                if len(yanit_stripped) < 2:
+                    sonuc["hata"] = f"Bos yanit (tur {api_call_count})"
+                    self._hata_cozumle(sonuc["hata"], kaynak="bos_yanit")
+                    budget.tur_bitir(basarili=False)
+                    break
+                final_yanit = self._yanit_temizle(yanit_icerik)
                 sonuc["basarili"] = True
                 messages.append({"role": "assistant", "content": final_yanit})
                 # Session Search: asistan yanitini kaydet
@@ -1276,6 +1339,8 @@ class ConversationLoop:
             for m in messages
             if m.get("role") in ("user", "assistant") and m.get("content")
         ][-self._max_gecmis_mesaj :]
+        # fix #10: _konusma_gecmisi de guncellensin (REPL'de hafiza kaybolmasin)
+        self._konusma_gecmisi = list(self._gecmis_mesajlar)
 
         # Hook: tur bitisi
         if _HOOK_AKTIF and _tur_bitir_tetikle is not None:
@@ -2069,12 +2134,12 @@ class ConversationLoop:
         # Session messages tablosuna da kaydet (ID=26 fix) — mesaj_ekle() ile
         try:
             if not hasattr(self, "_session_ekleme_storage") or self._session_ekleme_storage is None:
-                _db_yol = str(Path(__file__).parent.parent.parent.parent / ".ReYMeN" / "session.db")
+                _db_yol = str(Path(__file__).parent.parent.parent.parent / "merkez_db" / "session.db")
                 from reymen.hafiza.session_db import AdvancedSessionStorage
                 self._session_ekleme_storage = AdvancedSessionStorage(_db_yol)
             self._session_ekleme_storage.mesaj_ekle(session_id, role, message)
         except Exception as _sm_e:
-            log.warning("[SESSION_MSGS] mesaj_ekle hatasi: %s", _sm_e)
+            log.debug("[SESSION_MSGS] mesaj_ekle hatasi: %s", _sm_e)
 
     def _hata_cozumle(self, hata_metni: str, kaynak: str = "genel") -> None:
         """Hata aninda Reasoning-Core'u tetikle.
@@ -2817,6 +2882,39 @@ class ConversationLoop:
             return ""
         return yanit.get("content") or ""
 
+    def _yanit_temizle(self, metin: str) -> str:
+        """DÜŞÜN/EYLEM gibi ic dusunce bloklarini temizle, GOREV_BITTI icindeki metni cikar."""
+        if not metin:
+            return metin
+        import re as _re
+
+        # 1. GOREV_BITTI("...") → icindeki metni cikar
+        gorev_m = _re.search(r'GOREV_BITTI\s*\(\s*"([^"]*)"\s*\)', metin)
+        if gorev_m:
+            return gorev_m.group(1).strip()
+
+        # 2. DÜŞÜN/EYLEM bloklarini temizle
+        satirlar = metin.split("\n")
+        temiz = []
+        atla = False
+        for s in satirlar:
+            if _re.match(r"^\s*DÜŞÜN\s*[:\-]", s):
+                atla = True
+                continue
+            if _re.match(r"^\s*EYLEM\s*[:\-]", s):
+                atla = True
+                continue
+            if atla and s.strip() == "":
+                continue
+            if atla and not _re.match(r"^\s*(DÜŞÜN|EYLEM)\s*[:\-]", s):
+                atla = False
+            if not atla:
+                temiz.append(s)
+        sonuc = "\n".join(temiz).strip()
+        # DÜŞÜN/EYLEM bloklari filtrelenince tum metin giderse bos don
+        # (orijinali geri verme, yoksa kullanici ic dusunceyi gorur)
+        return sonuc
+
     # ══════════════════════════════════════════════════════════════════
     # MEVCUT YARDIMCI METODLAR (coz() icin)
     # ══════════════════════════════════════════════════════════════════
@@ -2945,7 +3043,7 @@ class ConversationLoop:
                 return {
                     "basarili": bool(sonuc),
                     "cikti": str(sonuc or "Bulunamadi"),
-                    "tamamlandi": False,
+                    "tamamlandi": bool(sonuc),
                 }
             return {
                 "basarili": False,

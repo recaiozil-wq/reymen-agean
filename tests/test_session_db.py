@@ -10,12 +10,18 @@ sys.path.insert(0, str(PROJE_KOK))
 
 
 class TestSessionDB:
-    def test_core_import(self):
-        import reymen.core.session_db
-
-        assert reymen.core.session_db is not None
-
     def test_hafiza_import(self):
         import reymen.hafiza.session_db
 
         assert reymen.hafiza.session_db is not None
+
+    def test_session_db_has_class(self):
+        from reymen.hafiza.session_db import SessionDB, AdvancedSessionStorage
+
+        assert SessionDB is not None
+        assert AdvancedSessionStorage is not None
+
+    def test_core_session_db_import(self):
+        from src.core.session_db import SessionDB
+
+        assert SessionDB is not None

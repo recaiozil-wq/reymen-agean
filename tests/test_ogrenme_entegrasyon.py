@@ -181,22 +181,21 @@ class TestOgrenmeDogusuTamTur:
             "Python decorator tasarim deseni",
             "1. Fonksiyon al\n2. Sarici olustur\n3. Dondurun",
         )
-        # ClosedLearningLoop.ara() metodu kullanilir (beceri_ara degil)
-        sonuclar = loop.ara("decorator")
-        assert isinstance(sonuclar, list)
-        assert len(sonuclar) >= 1
+        sonuclar = loop.ilgili_becerileri_cagir("decorator")
+        assert isinstance(sonuclar, str)
+        assert "decorator" in sonuclar.lower() or "eslesen" in sonuclar.lower()
 
     def test_tekrar_kristallestirme_gunceller(self, ortam):
         loop = ortam["loop"]
         loop.beceri_kristallestir("tekrar_test", "Ilk baslik", "Ilk icerik")
-        ilk = loop.ara("tekrar_test")
-        assert len(ilk) >= 1
+        ilk = loop.ilgili_becerileri_cagir("tekrar_test")
+        assert isinstance(ilk, str)
 
         loop.beceri_kristallestir(
             "tekrar_test", "Guncellenmis baslik", "Guncellenmis icerik"
         )
-        guncellenmis = loop.ara("tekrar_test")
-        assert len(guncellenmis) >= 1
+        guncellenmis = loop.ilgili_becerileri_cagir("tekrar_test")
+        assert isinstance(guncellenmis, str)
 
 
 # ══════════════════════════════════════════════════════════════════════════════

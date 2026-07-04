@@ -2,6 +2,7 @@
 """Check remaining unclassified DBs"""
 
 import sqlite3, os
+from pathlib import Path
 import logging
 
 logger = logging.getLogger(__name__)

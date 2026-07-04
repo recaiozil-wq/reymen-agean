@@ -6,6 +6,6 @@
     "aktif": true,
     "aciklama": "Skills FTS5 index senkronizasyonu",
     "kaynak": "cron_skill_sync.py",
-    "olusturma": "2026-07-04 06:20:17.049768"
+    "olusturma": "2026-07-04 17:16:15.105173"
   }
 }

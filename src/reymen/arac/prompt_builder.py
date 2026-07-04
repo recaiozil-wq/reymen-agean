@@ -79,30 +79,7 @@ TEMPLATELER = {
 }
 
 # ── ReAct format talimatı ─────────────────────────────────────────────
-REACT_TALIMATI = """## Çalışma Döngüsü (ReAct)
-
-Her turda şu sırayı takip et:
-  DÜŞÜN: Hedefi analiz et, bir sonraki adımı planla.
-  EYLEM: Yalnızca bir araç çağır.
-  GÖZLEM: Araç sonucunu değerlendir, bir sonraki adıma geç.
-
-Eylem formatı (tam bu şekilde kullan):
-  ARAC_ADI("parametre1", "parametre2")
-
-Özel durumlar:
-  DUSUN("...") — sadece düşünce, eylem yok
-  YARDIM_ISTE("ne bilmediğin") — belirsizlik varsa
-  GOREV_BITTI("kullanıcıya verilecek yanıt") — tamamlandığında
-
-ÖNEMLİ: GOREV_BITTI argümanı doğrudan kullanıcıya gösterilir.
-  • Sohbet sorusuna yanıt → GOREV_BITTI("Merhaba! Nasıl yardımcı olabilirim?")
-  • Görev tamamlandı  → GOREV_BITTI("Dosyayı oluşturdum: test.py — 42 satır.")
-  • "Kullanıcıya tanıttım" / "görev tamam" gibi iç özet YAZMA.
-
-Kurallar:
-  • Her cevapta tam olarak BİR eylem veya GOREV_BITTI yaz.
-  • Türkçe yanıt ver.
-  • Asla: rm -rf, del /f, format, ../../ gibi yıkıcı/traversal işlem yapma."""
+REACT_TALIMATI = ""
 
 
 # ── Token yönetimi ────────────────────────────────────────────────────
@@ -435,7 +412,7 @@ class PromptBuilder:
             satirlar.append(f"Gözlem: {_kes(onceki_gozlem, 200)}")
         if dusunce:
             satirlar.append(f"Düşünce: {dusunce}")
-        satirlar.append("\nŞimdi: Düşünce + Eylem üret.")
+        satirlar.append("\nŞimdi: Doğrudan yanıt ver veya uygun aracı kullan.")
         return "\n".join(satirlar)
 
     # ── Token analizi ─────────────────────────────────────────────────

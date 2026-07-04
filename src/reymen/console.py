@@ -441,7 +441,10 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.set_defaults(func=None)
 
-    sub = parser.add_subparsers(dest="command", required=True)
+    parser.add_argument("-z", "--oneshot", type=str, metavar="SORU",
+                        help="Tek seferlik soru sor (REPL yok, direkt yanıt)")
+
+    sub = parser.add_subparsers(dest="command")
 
     # version
     p_ver = sub.add_parser("version", help="Versiyon bilgisi")

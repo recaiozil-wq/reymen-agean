@@ -176,7 +176,7 @@ class TestAnalizEt:
 
     def test_toplu_sadece_karmasiklik_4(self):
         b = IterationBudget()
-        r = b.analiz_et("tum dosyalar")
+        r = b.analiz_et("tüm dosya listesi")
         assert r["karmasiklik"] == 4
 
     def test_cok_adimli_artis(self):

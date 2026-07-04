@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""test_cron_manager.py — CronManager birim testleri (yüzeyel geçiş)."""
+"""test_cron_manager.py — CronManager birim testleri."""
 
 import json
 import uuid
@@ -12,24 +12,24 @@ from src.core.cron_manager import CronManager, CronJob
 
 @pytest.fixture
 def cron() -> CronManager:
-    """Temiz CronManager örneği (dosya I/O'su devre dışı)."""
+    """Temiz CronManager ornegi (dosya I/O'su devre disi)."""
     with (
-        patch("reymen.core.cron_manager._json_oku", return_value={}),
-        patch("reymen.core.cron_manager._json_yaz"),
-        patch("reymen.core.cron_manager._watchdog_log"),
+        patch("src.core.cron_manager._json_oku", return_value={}),
+        patch("src.core.cron_manager._json_yaz"),
+        patch("src.core.cron_manager._watchdog_log"),
     ):
         mgr = CronManager()
     return mgr
 
 
-# ── Happy Path ──────────────────────────────────────────────────────────
+# -- Happy Path ----------------------------------------------------------
 
 
 class TestCronEkle:
-    """CronJob ekleme işlemleri."""
+    """CronJob ekleme islemleri."""
 
     def test_ekle_basarili(self, cron: CronManager):
-        """Yeni cron işi ekleme → başarılı."""
+        """Yeni cron isi ekleme -> basarili."""
         sonuc = cron.ekle(
             ad="test_job",
             komut="echo merhaba",
@@ -41,7 +41,7 @@ class TestCronEkle:
         assert len(sonuc["id"]) == 12  # uuid4[:12]
 
     def test_eklenen_is_listede_gorunur(self, cron: CronManager):
-        """Eklenen iş liste() içinde döner."""
+        """Eklenen is liste() icinde doner."""
         cron.ekle(ad="liste_test", komut="ls", cron_ifade="* * * * *")
         isler = cron.liste()
         assert len(isler) == 1
@@ -50,10 +50,10 @@ class TestCronEkle:
 
 
 class TestCronSil:
-    """CronJob silme işlemleri."""
+    """CronJob silme islemleri."""
 
     def test_sil_basarili(self, cron: CronManager):
-        """Var olan işi silme → başarılı, listeden kaybolur."""
+        """Var olan is silme -> basarili, listeden kaybolur."""
         sonuc = cron.ekle(ad="silinecek", komut="echo sil", cron_ifade="0 0 * * *")
         job_id = sonuc["id"]
 
@@ -62,21 +62,21 @@ class TestCronSil:
         assert len(cron.liste()) == 0
 
     def test_sil_olmayan_id(self, cron: CronManager):
-        """Var olmayan job_id silme → hata döner."""
+        """Var olmayan job_id silme -> hata doner."""
         sonuc = cron.sil("non_existent_id_123")
         assert sonuc["basarili"] is False
         assert "bulunamadi" in sonuc["hata"]
 
 
 class TestCronListe:
-    """CronJob listeleme işlemleri."""
+    """CronJob listeleme islemleri."""
 
     def test_liste_bos(self, cron: CronManager):
-        """Hiç iş yokken liste boş döner."""
+        """Hic is yokken liste bos doner."""
         assert cron.liste() == []
 
     def test_liste_aktif_filtre(self, cron: CronManager):
-        """aktif_mi parametresine göre filtreleme."""
+        """aktif_mi parametresine gore filtreleme."""
         cron.ekle(ad="aktif_is", komut="echo a", cron_ifade="* * * * *", aktif=True)
         cron.ekle(ad="pasif_is", komut="echo p", cron_ifade="* * * * *", aktif=False)
 
@@ -89,14 +89,12 @@ class TestCronListe:
 
 
 class TestCronHata:
-    """Hata senaryoları."""
+    """Hata senaryolari."""
 
     def test_ekle_bos_ad_hata(self, cron: CronManager):
-        """Boş ad ile ekleme → _cron_ekle tool'u hata döner,
-        ancak CronManager.ekle() kendisi boş ada izin verir.
-        Doğrudan _cron_ekle motor tool'una bakarız."""
-        from reymen.core.cron_manager import _cron_ekle
+        """Bos ad ile _cron_ekle tool'u hata doner."""
+        from src.core.cron_manager import _cron_ekle
 
         sonuc = json.loads(_cron_ekle(ad=""))
         assert "hata" in sonuc
-        assert "adi zorunlu" in sonuc["hata"]
+        assert "zorunlu" in sonuc["hata"]

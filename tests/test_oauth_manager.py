@@ -1594,18 +1594,18 @@ class TestSingleton:
         from reymen.core.oauth_manager import oauth_manager_al
 
         # Singleton'u sifirla
-        import reymen.core.oauth_manager as om_mod
+        import src.core.oauth_manager as real_mod
 
-        om_mod._oauth_manager_instance = None
+        real_mod._oauth_manager_instance = None
         o1 = oauth_manager_al()
         o2 = oauth_manager_al()
         assert o1 is o2
 
     def test_singleton_instance_type(self):
         from reymen.core.oauth_manager import oauth_manager_al, OAuthManager
-        import reymen.core.oauth_manager as om_mod
+        import src.core.oauth_manager as real_mod
 
-        om_mod._oauth_manager_instance = None
+        real_mod._oauth_manager_instance = None
         instance = oauth_manager_al()
         assert isinstance(instance, OAuthManager)
 
@@ -1632,9 +1632,9 @@ class TestMotorTools:
 
     def _reset_singleton(self):
         """Singleton'u sifirla."""
-        import reymen.core.oauth_manager as om_mod
+        import src.core.oauth_manager as real_mod
 
-        om_mod._oauth_manager_instance = None
+        real_mod._oauth_manager_instance = None
 
     def test_motor_kaydet_araclar(self):
         """motor_kaydet 2 arac kaydeder: OAUTH_GIRIS ve OAUTH_DURUM."""
@@ -1666,9 +1666,9 @@ class TestMotorTools:
             with tempfile.TemporaryDirectory() as td:
                 depo = OAuthTokenDeposu(base_path=Path(td))
                 om = OAuthManager(deposu=depo)
-                import reymen.core.oauth_manager as om_mod
+                import src.core.oauth_manager as real_mod
 
-                om_mod._oauth_manager_instance = om
+                real_mod._oauth_manager_instance = om
                 m = self._make_motor()
                 motor_kaydet(m)
                 result = m.tools["OAUTH_GIRIS"](provider="google")
@@ -1695,9 +1695,9 @@ class TestMotorTools:
             with tempfile.TemporaryDirectory() as td:
                 depo = OAuthTokenDeposu(base_path=Path(td))
                 om = OAuthManager(deposu=depo)
-                import reymen.core.oauth_manager as om_mod
+                import src.core.oauth_manager as real_mod
 
-                om_mod._oauth_manager_instance = om
+                real_mod._oauth_manager_instance = om
                 m = self._make_motor()
                 motor_kaydet(m)
                 result = m.tools["OAUTH_GIRIS"](args=["google"])
@@ -1715,9 +1715,9 @@ class TestMotorTools:
         with tempfile.TemporaryDirectory() as td:
             depo = OAuthTokenDeposu(base_path=Path(td))
             om = OAuthManager(deposu=depo)
-            import reymen.core.oauth_manager as om_mod
+            import src.core.oauth_manager as real_mod
 
-            om_mod._oauth_manager_instance = om
+            real_mod._oauth_manager_instance = om
             m = self._make_motor()
             motor_kaydet(m)
             result = m.tools["OAUTH_GIRIS"](args=[])
@@ -1736,9 +1736,9 @@ class TestMotorTools:
         with tempfile.TemporaryDirectory() as td:
             depo = OAuthTokenDeposu(base_path=Path(td))
             om = OAuthManager(deposu=depo)
-            import reymen.core.oauth_manager as om_mod
+            import src.core.oauth_manager as real_mod
 
-            om_mod._oauth_manager_instance = om
+            real_mod._oauth_manager_instance = om
             m = self._make_motor()
             motor_kaydet(m)
             result = m.tools["OAUTH_GIRIS"](provider="bilinmeyen")
@@ -1764,9 +1764,9 @@ class TestMotorTools:
                 email="a@b.com",
             )
             depo.kaydet(t)
-            import reymen.core.oauth_manager as om_mod
+            import src.core.oauth_manager as real_mod
 
-            om_mod._oauth_manager_instance = om
+            real_mod._oauth_manager_instance = om
             m = self._make_motor()
             motor_kaydet(m)
             result = m.tools["OAUTH_DURUM"](provider="giris_test")
@@ -1787,9 +1787,9 @@ class TestMotorTools:
             om = OAuthManager(deposu=depo)
             m = self._make_motor()
             motor_kaydet(m)
-            import reymen.core.oauth_manager as om_mod
+            import src.core.oauth_manager as real_mod
 
-            om_mod._oauth_manager_instance = om
+            real_mod._oauth_manager_instance = om
             result = m.tools["OAUTH_DURUM"](provider="yok_prov")
             assert "bulunamadi" in result
 
@@ -1807,9 +1807,9 @@ class TestMotorTools:
             om = OAuthManager(deposu=depo)
             m = self._make_motor()
             motor_kaydet(m)
-            import reymen.core.oauth_manager as om_mod
+            import src.core.oauth_manager as real_mod
 
-            om_mod._oauth_manager_instance = om
+            real_mod._oauth_manager_instance = om
             result = m.tools["OAUTH_DURUM"]()
             assert "OAUTH" in result
 
@@ -1827,9 +1827,9 @@ class TestMotorTools:
             om = OAuthManager(deposu=depo)
             m = self._make_motor()
             motor_kaydet(m)
-            import reymen.core.oauth_manager as om_mod
+            import src.core.oauth_manager as real_mod
 
-            om_mod._oauth_manager_instance = om
+            real_mod._oauth_manager_instance = om
             result = m.tools["OAUTH_DURUM"](args=["yok_prov"])
             assert "bulunamadi" in result
 
@@ -1857,9 +1857,9 @@ class TestMotorTools:
             depo.kaydet(t)
             m = self._make_motor()
             motor_kaydet(m)
-            import reymen.core.oauth_manager as om_mod
+            import src.core.oauth_manager as real_mod
 
-            om_mod._oauth_manager_instance = om
+            real_mod._oauth_manager_instance = om
             result = m.tools["OAUTH_DURUM"](provider="test_gecerli")
             assert "✅" in result
             assert "e@mail.com" in result

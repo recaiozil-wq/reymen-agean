@@ -122,7 +122,7 @@ _API_CACHE: dict = {}
 # ── ReYMeN config (sabit) ──────────────────────────────────────────────────────
 _REYMEN_CONFIG = {
     "provider": os.environ.get("REYMEN_PROVIDER", "deepseek"),
-    "model": os.environ.get("REYMEN_MODEL", "deepseek-v4-flash"),
+    "model": os.environ.get("REYMEN_MODEL", "deepseek-chat"),
     "temperature": 0.7,
     "max_tokens": 4096,
     "frequency_penalty": 0.8,
@@ -132,7 +132,7 @@ _REYMEN_CONFIG = {
 _MODEL_DB = {
     "deepseek": {
         "ad": "DeepSeek",
-        "modeller": ["deepseek-v4-flash", "deepseek-chat"],
+        "modeller": ["deepseek-chat", "deepseek-chat"],
         "env": "DEEPSEEK_API_KEY",
         "url": "https://api.deepseek.com/v1/models",
     },
@@ -164,7 +164,7 @@ _MODEL_DB = {
 
 
 def _mevcut_model():
-    m = os.environ.get("REYMEN_MODEL", "deepseek-v4-flash")
+    m = os.environ.get("REYMEN_MODEL", "deepseek-chat")
     p = os.environ.get("REYMEN_PROVIDER", "deepseek")
     return m, p
 
@@ -370,8 +370,11 @@ def _spinner(stop_evt):
     print(f"\r{' '*30}\r", end="", flush=True)
 
 
-# ── ReYMeN cagrisi ────────────────────────────────────────────────────────────
+# ── ReYMeN cagrisi ────────────────────────────────────────────
 _ilk_tur = True
+_repl_beyin = None
+_repl_motor = None
+_repl_cl = None
 
 
 def _sistem_prompu_al() -> str:
@@ -398,7 +401,7 @@ def _sistem_prompu_al() -> str:
 
 def _sor(soru: str) -> tuple[str, str]:
     """ReYMeN'e soru sor — Telegram bot ile AYNI full pipeline."""
-    global _ilk_tur
+    global _ilk_tur, _repl_beyin, _repl_motor, _repl_cl
     _ilk_tur = False
 
     stop = threading.Event()
@@ -410,21 +413,22 @@ def _sor(soru: str) -> tuple[str, str]:
         from reymen.cereyan.motor import Motor
         from reymen.cereyan.conversation_loop import ConversationLoop
 
-        # fix #2: SOUL.md entegrasyonu
-        system_prompt = _sistem_prompu_al()
-        config = dict(_REYMEN_CONFIG)
-        config["system_prompt"] = system_prompt
+        # fix #9: REPL'de ilk cagrida olustur, sonraki cagrilarda yeniden kullan
+        # Boylece konusma gecmisi (messages) kaybolmaz
+        if _repl_cl is None:
+            system_prompt = _sistem_prompu_al()
+            config = dict(_REYMEN_CONFIG)
+            config["system_prompt"] = system_prompt
+            _repl_beyin = Beyin(config=config)
+            _repl_motor = Motor()
+            _repl_motor._plugin_moduller_yukle()
+            _repl_cl = ConversationLoop(
+                motor=_repl_motor,
+                beyin=_repl_beyin,
+                max_tur=15,
+            )
 
-        beyin = Beyin(config=config)
-        motor = Motor()
-        motor._plugin_moduller_yukle()
-        cl = ConversationLoop(
-            motor=motor,
-            beyin=beyin,
-            max_tur=15,
-        )
-        # fix #1: provider hardcode kaldirildi
-        sonuc = cl.run_conversation(
+        sonuc = _repl_cl.run_conversation(
             hedef=soru,
             provider=_REYMEN_CONFIG["provider"],
         )
@@ -465,9 +469,41 @@ _YARDIM = f"""
   {_c('/model')}         Model değiştir
   {_c('/temizle')}       Ekranı temizle
   {_c('/cik')}           Çıkış
+  {_c('/search <sorgu>')}  Gecmis konusmalarda FTS5 ile ara
+  {_c('/image <prompt>')}  Gorsel uret (FAL/OpenAI/xAI)
 
   {_d('Herhangi bir metin yaz → ReYMeN cevaplar.')}
 """
+
+
+# ── Yanit temizleme (DÜŞÜN/EYLEM bloklarini filtrele) ─────────────────────
+def _yanit_temizle_repl(metin: str) -> str:
+    """DÜŞÜN/EYLEM gibi ic dusunce bloklarini temizle, GOREV_BITTI icindeki metni cikar."""
+    if not metin or not isinstance(metin, str):
+        return metin
+    # 1. GOREV_BITTI("...") → icindeki metni cikar
+    gorev_m = _re.search(r'GOREV_BITTI\s*\(\s*"([^"]*)"\s*\)', metin)
+    if gorev_m:
+        return gorev_m.group(1).strip()
+    # 2. DÜŞÜN/EYLEM bloklarini temizle
+    satirlar = metin.split("\n")
+    temiz = []
+    atla = False
+    for s in satirlar:
+        if _re.match(r"^\s*DÜŞÜN\s*[:\-]", s):
+            atla = True
+            continue
+        if _re.match(r"^\s*EYLEM\s*[:\-]", s):
+            atla = True
+            continue
+        if atla and s.strip() == "":
+            continue
+        if atla and not _re.match(r"^\s*(DÜŞÜN|EYLEM)\s*[:\-]", s):
+            atla = False
+        if not atla:
+            temiz.append(s)
+    sonuc = "\n".join(temiz).strip()
+    return sonuc if sonuc else metin
 
 
 # ── Ana REPL ──────────────────────────────────────────────────────────────────
@@ -503,6 +539,49 @@ def _repl(session_id=""):
             _model_sec()
             continue
 
+        if girdi.lower().startswith("/search "):
+            sorgu = girdi[8:].strip()
+            if sorgu:
+                try:
+                    import json
+                    from reymen.tools.session_search_tool import session_search
+                    sonuc = json.loads(session_search(query=sorgu, limit=5))
+                    if sonuc.get("success"):
+                        print(f"\n  {_gb('Arama Sonuclari')} ({sonuc.get('count', 0)} adet):\n")
+                        for r in sonuc.get("results", [])[:5]:
+                            print(f"  {_c('→')} {r['session_id'][:20]}...")
+                            snippet = (r.get('snippet') or '')[:120]
+                            print(f"    {_d(snippet)}")
+                            print()
+                    else:
+                        print(f"\n  {_r('Hata:')} {sonuc.get('error', 'Bilinmeyen hata')}\n")
+                except Exception as e:
+                    print(f"\n  {_r('Hata:')} {e}\n")
+            else:
+                print(f"\n  {_y('Kullanim:')} /search <sorgu>\n")
+            continue
+
+        if girdi.lower().startswith("/image "):
+            prompt = girdi[7:].strip()
+            if prompt:
+                try:
+                    import json
+                    from reymen.tools.image_generation_tool import image_generate_tool
+                    sonuc = json.loads(image_generate_tool(prompt=prompt))
+                    if sonuc.get("success"):
+                        img = sonuc.get("image", "")
+                        if img:
+                            print(f"\n  {_gb('Gorsel Olusturuldu')}\n  {_c(img)}\n")
+                        else:
+                            print(f"\n  {_y('Gorsel olusturuldu ancak URL alinamadi.')}\n")
+                    else:
+                        print(f"\n  {_r('Hata:')} {sonuc.get('error', 'Bilinmeyen hata')}\n")
+                except Exception as e:
+                    print(f"\n  {_r('Hata:')} {e}\n")
+            else:
+                print(f"\n  {_y('Kullanim:')} /image <prompt>\n")
+            continue
+
         # Ortak komut modulune yonlendir
         try:
             from reymen.ag.ortak_komutlar import komut_isle
@@ -517,6 +596,8 @@ def _repl(session_id=""):
         t0 = time.time()
         cevap, kaynak = _sor(girdi)
         dt = time.time() - t0
+        # DÜŞÜN/EYLEM ic dusunce bloklarini temizle (yedek filtre)
+        cevap = _yanit_temizle_repl(cevap)
         print(f"\n  {'─'*50}")
         print(f"  {cevap}")
         print(f"  {'─'*50}")
@@ -889,7 +970,7 @@ def _oneshot(prompt: str):
     from reymen.cereyan.motor import Motor
     from reymen.cereyan.conversation_loop import ConversationLoop
 
-    model = os.environ.get("REYMEN_MODEL", "deepseek-v4-flash")
+    model = os.environ.get("REYMEN_MODEL", "deepseek-chat")
     provider = os.environ.get("REYMEN_PROVIDER", "deepseek")
 
     config = dict(_REYMEN_CONFIG)
@@ -957,7 +1038,7 @@ def main():
 
     # --provider override (model yoksa da çalışır)
     if getattr(args, "provider", None) and not getattr(args, "model", None):
-        cur_m = os.environ.get("REYMEN_MODEL", "deepseek-v4-flash")
+        cur_m = os.environ.get("REYMEN_MODEL", "deepseek-chat")
         _model_guncelle(args.provider, cur_m)
 
     # -z / --oneshot: banner yok, direkt cevap

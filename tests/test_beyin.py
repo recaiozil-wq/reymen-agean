@@ -143,17 +143,19 @@ class TestCagir:
     """_cagir dispatcher (thread'siz, dogrudan)."""
 
     def test_openai_uyumlu(self, cfg, msgs):
-        with patch.object(Beyin, "_cagir_openai_uyumlu", return_value="OK"):
-            r = Beyin(config=cfg)._cagir(
-                Beyin(config=cfg)._fallback_zinciri[0], "S", msgs
-            )
-        assert r.metin == "OK"
+        with patch("reymen.cereyan.beyin._PA_AKTIF", False):
+            with patch.object(Beyin, "_cagir_openai_uyumlu", return_value="OK"):
+                r = Beyin(config=cfg)._cagir(
+                    Beyin(config=cfg)._fallback_zinciri[0], "S", msgs
+                )
+            assert r.metin == "OK"
 
     def test_lmstudio(self, cfg, msgs):
-        with patch.object(Beyin, "_cagir_lmstudio", return_value="LM"):
-            adim = SaglayCiAdim("lmstudio", "m", "http://localhost:1234", "")
-            r = Beyin(config=cfg)._cagir(adim, "S", msgs)
-        assert r.metin == "LM"
+        with patch("reymen.cereyan.beyin._PA_AKTIF", False):
+            with patch.object(Beyin, "_cagir_lmstudio", return_value="LM"):
+                adim = SaglayCiAdim("lmstudio", "m", "http://localhost:1234", "")
+                r = Beyin(config=cfg)._cagir(adim, "S", msgs)
+            assert r.metin == "LM"
 
 
 class TestUretV2:

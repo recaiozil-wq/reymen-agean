@@ -19,7 +19,7 @@ class TestConstants:
         from agent.prompt_builder import DEFAULT_AGENT_IDENTITY
 
         assert isinstance(DEFAULT_AGENT_IDENTITY, str)
-        assert "ReYMeN Agent" in DEFAULT_AGENT_IDENTITY
+        assert "Hermes Agent" in DEFAULT_AGENT_IDENTITY
         assert len(DEFAULT_AGENT_IDENTITY) > 50
 
     def test_MEMORY_GUIDANCE_var(self):

@@ -1,0 +1,29 @@
+{
+  "proje": "ReYMeN Agent",
+  "surum": "2026-07-04 17:21",
+  "botlar": {
+    "pasa_38": {
+      "profil": "default",
+      "gateway": "pasif",
+      "pid": null,
+      "yetki": "tam",
+      "browser": "acik",
+      "terminal": "acik",
+      "web": "firecrawl"
+    },
+    "kiral38": {
+      "profil": "kiral38",
+      "gateway": "aktif",
+      "pid": 47472,
+      "yetki": "tam",
+      "browser": "acik",
+      "terminal": "acik",
+      "web": "firecrawl"
+    }
+  },
+  "supervisor": {
+    "calisiyor": true,
+    "son_guncelleme": "2026-07-04T17:21:39.345417",
+    "aciklama": "bot_supervisor.py ile yonetiliyor"
+  }
+}

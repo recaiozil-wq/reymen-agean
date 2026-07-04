@@ -44,15 +44,19 @@ _original_modules = {}
 
 def _install_mocks():
     """Mock modülleri sys.modules'a yerleştir."""
+    _original_modules["src.reymen.arac.tool_registry"] = sys.modules.get("src.reymen.arac.tool_registry")
+    _original_modules["src.reymen.guvenlik.tool_guardrails"] = sys.modules.get("src.reymen.guvenlik.tool_guardrails")
+    _original_modules["src.reymen.arac.tool_executor"] = sys.modules.get("src.reymen.arac.tool_executor")
     _original_modules["tool_registry"] = sys.modules.get("tool_registry")
     _original_modules["tool_guardrails"] = sys.modules.get("tool_guardrails")
     _original_modules["tool_executor"] = sys.modules.get("tool_executor")
 
+    sys.modules["src.reymen.arac.tool_registry"] = mock_registry_module
+    sys.modules["src.reymen.guvenlik.tool_guardrails"] = mock_guardrails_module
+    sys.modules["src.reymen.arac.tool_executor"] = mock_executor_module
     sys.modules["tool_registry"] = mock_registry_module
     sys.modules["tool_guardrails"] = mock_guardrails_module
     sys.modules["tool_executor"] = mock_executor_module
-
-    # agent package gerekli degil — dispatcher root-level import kullaniyor
 
 
 def _restore_mocks():
@@ -105,7 +109,7 @@ def dispatcher():
     mock_guardrails_module.ToolGuardrails.return_value = gr
     mock_executor_module.ToolExecutor.return_value = ex
 
-    from dispatcher import ToolDispatcher
+    from reymen.cereyan.dispatcher import ToolDispatcher
 
     d = ToolDispatcher()
     d._mock_registry = reg
@@ -232,7 +236,7 @@ class TestExecuteFunction:
 
     def test_basarili_fonksiyon_cagrisi(self, dispatcher):
         """Alias fonksiyon başarıyla çağrılmalı."""
-        with patch("dispatcher.importlib.import_module") as mock_import:
+        with patch("reymen.cereyan.dispatcher.importlib.import_module") as mock_import:
             mock_mod = MagicMock()
             mock_fn = MagicMock(return_value={"ok": True, "sonuc": "aliastan"})
             setattr(mock_mod, "ozel_islem", mock_fn)
@@ -245,7 +249,7 @@ class TestExecuteFunction:
 
     def test_fonksiyon_bulunamazsa_hata(self, dispatcher):
         """Olmayan bir fonksiyon için hata döndürülmeli."""
-        with patch("dispatcher.importlib.import_module") as mock_import:
+        with patch("reymen.cereyan.dispatcher.importlib.import_module") as mock_import:
             mock_mod = MagicMock(spec=[])  # hiçbir attribute yok
             mock_import.return_value = mock_mod
 
@@ -258,7 +262,7 @@ class TestExecuteFunction:
     def test_exception_halinde_hata_yakalanir(self, dispatcher):
         """Fonksiyon içinde exception fırlatılırsa yakalanmalı."""
         with patch(
-            "dispatcher.importlib.import_module",
+            "reymen.cereyan.dispatcher.importlib.import_module",
             side_effect=ImportError("modul bulunamadi"),
         ):
             sonuc = dispatcher._execute_function("olmayan_modul", "run", {}, None)
@@ -299,7 +303,7 @@ class TestToolSchema:
         dispatcher._mock_registry.resolve.return_value = _mock_kayit(
             module="ornek_modul"
         )
-        with patch("dispatcher.importlib.import_module") as mock_import:
+        with patch("reymen.cereyan.dispatcher.importlib.import_module") as mock_import:
             mock_mod = MagicMock()
             mock_mod.SCHEMA = {"type": "object", "properties": {}}
             mock_import.return_value = mock_mod
@@ -313,7 +317,7 @@ class TestToolSchema:
         dispatcher._mock_registry.resolve.return_value = _mock_kayit(
             module="schemasi_olmayan"
         )
-        with patch("dispatcher.importlib.import_module") as mock_import:
+        with patch("reymen.cereyan.dispatcher.importlib.import_module") as mock_import:
             mock_mod = MagicMock(spec=["__name__"])  # SCHEMA yok
             mock_import.return_value = mock_mod
 
@@ -332,7 +336,7 @@ class TestToolSchema:
             module="bozuk_modul"
         )
         with patch(
-            "dispatcher.importlib.import_module", side_effect=ImportError("bozuk")
+            "reymen.cereyan.dispatcher.importlib.import_module", side_effect=ImportError("bozuk")
         ):
             sonuc = dispatcher.tool_schema("ornek_tool")
             assert "error" in sonuc

@@ -7,6 +7,7 @@ import sys
 from types import ModuleType
 
 _OLD_TO_NEW = {
+    # cereyan
     "beyin": "reymen.cereyan.beyin",
     "motor": "reymen.cereyan.motor",
     "gozlem": "reymen.cereyan.gozlem",
@@ -22,24 +23,57 @@ _OLD_TO_NEW = {
     "self_improvement": "reymen.cereyan.self_improvement",
     "codex_runtime": "reymen.cereyan.codex_runtime",
     "skills_hub": "reymen.cereyan.skills_hub",
-    "web_ui": "reymen.web_ui",
+    "iteration_budget": "reymen.cereyan.iteration_budget",
+    "akilli_yonlendirici": "reymen.cereyan.akilli_yonlendirici",
+    "cokus_raporlayici": "reymen.cereyan.cokus_raporlayici",
+    # guvenlik
     "file_safety": "reymen.guvenlik.file_safety",
     "threat_patterns": "reymen.guvenlik.threat_patterns",
     "tool_guardrails": "reymen.guvenlik.tool_guardrails",
     "anayasa_denetci": "reymen.guvenlik.anayasa_denetci",
+    "tirith_security": "reymen.guvenlik.tirith_security",
+    "security_engine": "reymen.guvenlik.security_engine",
+    "guvenli_sandbox": "reymen.guvenlik.guvenli_sandbox",
+    # sistem
     "auto_recovery": "reymen.sistem.auto_recovery",
     "display": "reymen.sistem.display",
     "state_machine": "reymen.sistem.state_machine",
     "terminal_backends": "reymen.sistem.terminal_backends",
-    "acp_server": "reymen.ag.acp_server",
-    "agent_runtime": "reymen.ag.agent_runtime",
     "config_loader": "reymen.sistem.config_loader",
     "cron_scheduler": "reymen.sistem.cron_scheduler",
+    "main": "reymen.sistem.main",
+    # arac
     "tool_registry": "reymen.arac.tool_registry",
     "tool_executor": "reymen.arac.tool_executor",
-    "session_db": "reymen.hafiza.session_db",
-    "iteration_budget": "reymen.cereyan.iteration_budget",
     "prompt_caching": "reymen.arac.prompt_caching",
+    "araclar_ekran": "reymen.arac.araclar_ekran",
+    "araclar_makro": "reymen.arac.araclar_makro",
+    "araclar_nisan": "reymen.arac.araclar_nisan",
+    "araclar_ses": "reymen.arac.araclar_ses",
+    "araclar_telegram": "reymen.arac.araclar_telegram",
+    # hafiza
+    "session_db": "reymen.hafiza.session_db",
+    "hafiza_genislet": "reymen.hafiza.hafiza_genislet",
+    "memory_manager": "reymen.hafiza.memory_manager",
+    "memory_provider": "reymen.hafiza.memory_provider",
+    "context_compressor": "reymen.hafiza.context_compressor",
+    "context_references": "reymen.hafiza.context_references",
+    # gateways
+    "acp_server": "gateways.acp_server",
+    "agent_runtime": "gateways.agent_runtime",
+    # tools
+    "tools": "reymen.tools",
+    # web
+    "web_ui": "reymen.web_ui",
+    "web_search_provider": "reymen.web_search_provider",
+    # scripts
+    "reymen_skill_cli": "reymen.scripts.reymen_skill_cli",
+    "sistem_talimati": "reymen.scripts.sistem_talimati",
+    "anayasa_denetcisi": "reymen.scripts.anayasa_denetcisi",
+    # windows
+    "tor_otomasyonu": "reymen.windows.tor_otomasyonu",
+    # package
+    "ReYMeN": "reymen",
 }
 
 _IN_PROGRESS = set()
@@ -74,39 +108,17 @@ class _ImportShimFinder:
 if not any(isinstance(f, _ImportShimFinder) for f in sys.meta_path):
     sys.meta_path.insert(0, _ImportShimFinder())
 
+# Sadece GERÇEKTEN var olmayan modüller
 _MISSING_MODULES = [
-    "agent",
-    "anayasa_denetcisi",
-    "araclar_ekran",
-    "araclar_makro",
-    "araclar_nisan",
-    "araclar_ses",
-    "araclar_telegram",
     "auxiliary_client",
     "chat_completion_helpers",
-    "context_compressor",
     "context_engine",
-    "context_references",
     "credential_sources",
-    "error_classifier",
-    "gateway",
-    "hafiza_genislet",
-    "memory_manager",
-    "memory_provider",
     "onboarding",
     "processors",
     "providers",
     "proxy",
-    "reymen_skill_cli",
-    "sistem_talimati",
-    "tools",
-    "tor_otomasyonu",
     "turn_context",
-    "web_search_provider",
-    "akilli_yonlendirici",
-    "cokus_raporlayici",
-    "main",
-    "ReYMeN",
 ]
 
 

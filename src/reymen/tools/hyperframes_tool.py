@@ -1118,8 +1118,8 @@ def motor_kaydet(motor) -> None:
         "Hızlı grafik animasyonu. Parametreler: baslik, grafik_tipi (bar|horizontal-bar|line), veri_json (JSON)",
     )
 
-    print("[HyperFrames] 4 arac kayit edildi.")
-    logger.info("[HyperFrames] 4 arac motor'a kaydedildi.")
+    logger.debug("[HyperFrames] 4 arac kayit edildi.")
+    logger.debug("[HyperFrames] 4 arac motor'a kaydedildi.")
 
 
 # ── Test / Demo ──────────────────────────────────────────────────────────

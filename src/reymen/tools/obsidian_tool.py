@@ -666,8 +666,8 @@ def motor_kaydet(motor) -> None:
         "Örnek: OBSIDIAN_BILGI veya OBSIDIAN_BILGI(C:/Users/marko/Vault)",
     )
 
-    print(
+    logger.debug(
         "[Obsidian] 6 arac kayit edildi: OBSIDIAN_LISTE, OBSIDIAN_OKU, OBSIDIAN_YAZ, "
         "OBSIDIAN_GUNCELLE, OBSIDIAN_ARA, OBSIDIAN_BILGI"
     )
-    logger.info("[Obsidian] 6 arac motor'a kaydedildi.")
+    logger.debug("[Obsidian] 6 arac motor'a kaydedildi.")

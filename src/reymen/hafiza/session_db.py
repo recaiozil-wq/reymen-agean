@@ -233,11 +233,13 @@ class AdvancedSessionStorage:
                 )
                 conn.commit()
                 log.info("session_baslat: %s (source=%s, model=%s)", sid, source, model)
+                return sid
             except Exception as e:
-                log.error("session_baslat hatasi: %s", e)
+                log.error("session_baslat hatasi: %s (sid=%s)", e, sid)
+                return None
             finally:
                 conn.close()
-        return sid
+        return None
 
     def session_bitir(self, session_id: str, end_reason: str = None):
         """Session'i kapat; ended_at ve end_reason ayarla."""
@@ -251,15 +253,27 @@ class AdvancedSessionStorage:
                 conn.commit()
                 log.info("session_bitir: %s (neden=%s)", session_id, end_reason)
             except Exception as e:
-                log.error("session_bitir hatasi: %s", e)
+                log.debug("session_bitir hatasi: %s", e)
             finally:
                 conn.close()
 
     def mesaj_ekle(self, session_id: str, rol: str, icerik: str):
-        """Session'a mesaj ekle; message_count artir. FTS tablolarini da guncelle."""
+        """Session'a mesaj ekle; message_count artir. FTS tablolarini da guncelle.
+        Session yoksa otomatik olustur.
+        """
         with self._lock:
             conn = self._baglan()
             try:
+                # Session var mi kontrol et, yoksa otomatik olustur
+                var = conn.execute(
+                    "SELECT COUNT(*) FROM sessions WHERE id=?", (session_id,)
+                ).fetchone()[0]
+                if var == 0:
+                    conn.execute(
+                        "INSERT INTO sessions (id, source, started_at) VALUES (?,?,?)",
+                        (session_id, "auto_created", time.time()),
+                    )
+                    log.info("mesaj_ekle: session otomatik olusturuldu: %s", session_id)
                 cur = conn.execute(
                     "INSERT INTO session_messages (session_id, rol, icerik, created_at) "
                     "VALUES (?,?,?,?)",
@@ -290,7 +304,7 @@ class AdvancedSessionStorage:
                 conn.commit()
                 log.debug("mesaj_ekle: session=%s rol=%s", session_id, rol)
             except Exception as e:
-                log.error("mesaj_ekle hatasi: %s", e)
+                log.debug("mesaj_ekle hatasi: %s", e)
             finally:
                 conn.close()
 

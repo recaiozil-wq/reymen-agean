@@ -1,21 +1,27 @@
 {
-  "olusturma": "2026-07-03T14:06:35.518875",
-  "toplam_istek": 8,
-  "toplam_token": 4379,
-  "toplam_maliyet": 4379.0,
+  "olusturma": "2026-07-04T15:37:37.591830",
+  "toplam_istek": 6,
+  "toplam_token": 131,
+  "toplam_maliyet": 127.0003,
   "providerlar": {
+    "test": {
+      "istek": 2,
+      "token": 4,
+      "maliyet": 0.0003,
+      "model": "m"
+    },
     "deepseek": {
-      "istek": 8,
-      "token": 4379,
-      "maliyet": 4379.0,
+      "istek": 4,
+      "token": 127,
+      "maliyet": 127.0,
       "model": "deepseek-v4-flash"
     }
   },
   "aylik_veri": {
     "2026-07": {
-      "istek": 8,
-      "token": 4379,
-      "maliyet": 4379.0
+      "istek": 6,
+      "token": 131,
+      "maliyet": 127.0003
     }
   }
 }

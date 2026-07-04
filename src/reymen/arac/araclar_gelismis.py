@@ -1100,7 +1100,7 @@ def motor_kaydet(motor, onay_tool: ApprovalTool = None):
     )
     k("WORKFLOW_LISTELE", workflow_listele, "Kayitli workflow'lari listele")
     k("WORKFLOW_SIL", workflow_sil, "Bir workflow'u sil. Parametre: workflow_adi")
-    print("[GelismisTools] 28 arac kayit edildi.")
+    logger.debug("[GelismisTools] 28 arac kayit edildi.")
 
     # ── HyperFrames Video Generation ─────────────────────────────────
     try:
@@ -1155,7 +1155,7 @@ def motor_kaydet(motor, onay_tool: ApprovalTool = None):
             hyperframes_template_list,
             "Mevcut HyperFrame template'lerini listeler.",
         )
-        print("[GelismisTools] HyperFrames araclari eklendi.")
+        logger.debug("[GelismisTools] HyperFrames araclari eklendi.")
     except ImportError:
         pass  # hyperframes_tool yoksa sessiz gec
     except Exception as e:

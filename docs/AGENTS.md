@@ -1,7 +1,7 @@
 # ReYMeN — AGENTS.md
 
-> ReYMeN = ReYMeN AI Agent, **fully independent**.
-> Requires **zero** Hermes Agent dependencies.
+> ReYMeN = Hermes Agent **reymen profili**.
+> Hermes altyapısı üzerinde çalışır, tam yetkili ReYMeN kişiliği.
 > Project root: `C:\Users\marko\Desktop\Reymen Proje\ReYMeN-Ajan`
 
 ---

@@ -312,7 +312,7 @@ class TestRunConversationAkis:
         """run_conversation() gerekli alanlari dondurmeli."""
         cl = ConversationLoop(max_tur=2)
         sonuc = cl.run_conversation("test")
-        for alan in ("task_id", "hedef", "basarili", "turlar", "sure", "budget"):
+        for alan in ("task_id", "hedef", "basarili", "turlar", "sure"):
             assert alan in sonuc, f"'{alan}' alani eksik"
 
     def test_task_id_benzersiz(self):

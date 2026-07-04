@@ -51,9 +51,9 @@ class TestHataAnalizi:
 
     def test_db_var_bos(self, tmp_path):
         """DB var ama tablo bos."""
-        db_dir = tmp_path / ".ReYMeN"
+        db_dir = tmp_path / "merkez_db"
         db_dir.mkdir()
-        db = db_dir / "session.db"
+        db = db_dir / "session_cereyan.db"
         con = sqlite3.connect(str(db))
         con.execute("CREATE TABLE ajan_gunlugu (eylem TEXT, sonuc TEXT)")
         con.commit()
@@ -66,12 +66,11 @@ class TestHataAnalizi:
 
     def test_hata_var(self, tmp_path):
         """Hatali kayitlar tespit edilmeli."""
-        db_dir = tmp_path / ".ReYMeN"
+        db_dir = tmp_path / "merkez_db"
         db_dir.mkdir()
-        db = db_dir / "session.db"
+        db = db_dir / "session_cereyan.db"
         con = sqlite3.connect(str(db))
         con.execute("CREATE TABLE ajan_gunlugu (eylem TEXT, sonuc TEXT)")
-        # LIKE pattern: '%[Hata]%' or '%Hatasi]%'
         con.execute(
             "INSERT INTO ajan_gunlugu VALUES ('KOMUT_CALISTIR(x)', 'Hatasi]: timeout')"
         )
@@ -90,15 +89,14 @@ class TestHataAnalizi:
             r = m.hata_analizi_yap()
         assert r["hata_sayisi"] == 3
         assert len(r["en_sik_hatalar"]) == 3
-        # KOMUT_CALISTIR en sik olmali
         arac_map = dict(r["basarisiz_araclar"])
         assert arac_map.get("KOMUT_CALISTIR") == 2
 
     def test_tablo_yok(self, tmp_path):
         """ajan_gunlugu tablosu yoksa hata donmeli."""
-        db_dir = tmp_path / ".ReYMeN"
+        db_dir = tmp_path / "merkez_db"
         db_dir.mkdir()
-        db = db_dir / "session.db"
+        db = db_dir / "session_cereyan.db"
         con = sqlite3.connect(str(db))
         con.execute("CREATE TABLE farkli_tablo (a TEXT)")
         con.commit()
@@ -107,7 +105,6 @@ class TestHataAnalizi:
         m = OzGelistirmeMotoru()
         with patch.object(real_mod, "ROOT", tmp_path):
             r = m.hata_analizi_yap()
-        # Tablo yoksa rows=[] olur, hata donmez
         assert r["hata_sayisi"] == 0
 
 
@@ -124,9 +121,9 @@ class TestBeceriBosluk:
         assert r == []
 
     def test_gorevler_var(self, tmp_path):
-        db_dir = tmp_path / ".ReYMeN"
+        db_dir = tmp_path / "merkez_db"
         db_dir.mkdir()
-        db = db_dir / "session.db"
+        db = db_dir / "session_cereyan.db"
         con = sqlite3.connect(str(db))
         con.execute("CREATE TABLE ajan_gunlugu (eylem TEXT, hedef TEXT, sonuc TEXT)")
         for i in range(5):
@@ -141,14 +138,12 @@ class TestBeceriBosluk:
         with patch.object(real_mod, "ROOT", tmp_path):
             r = m.beceri_bosluk_analizi()
         assert len(r) == 5
-        # ORDER BY rowid DESC → en son eklenen ilk sirada
         assert r[0] == "dosya_4.py tamamla"
 
     def test_limit_10(self, tmp_path):
-        """Maks 10 donmeli."""
-        db_dir = tmp_path / ".ReYMeN"
+        db_dir = tmp_path / "merkez_db"
         db_dir.mkdir()
-        db = db_dir / "session.db"
+        db = db_dir / "session_cereyan.db"
         con = sqlite3.connect(str(db))
         con.execute("CREATE TABLE ajan_gunlugu (eylem TEXT, hedef TEXT, sonuc TEXT)")
         for i in range(20):
@@ -187,7 +182,6 @@ class TestOneriUret:
         assert "EKRAN_NISAN" in r
 
     def test_kural_tabanli_bos(self):
-        """Hic basarisiz arac yoksa varsayilan oneriler."""
         m = OzGelistirmeMotoru()
         r = m._kural_tabanli_oneri({"basarisiz_araclar": []})
         assert "HAFIZA_ARA" in r
@@ -207,12 +201,11 @@ class TestOneriUret:
         prov.uret.assert_called_once()
 
     def test_oneri_uret_provider_hatasi(self):
-        """Provider hata verirse fallback."""
         prov = MagicMock()
         prov.uret.side_effect = RuntimeError("API error")
         m = OzGelistirmeMotoru(provider=prov)
         r = m.oneri_uret({"hata_sayisi": 5, "basarisiz_araclar": []})
-        assert "HAFIZA_ARA" in r  # fallback
+        assert "HAFIZA_ARA" in r
 
 
 # ════════════════════════════════════════════════════════════════
@@ -282,7 +275,6 @@ class TestCalistir:
             real_mod, "SOUL_YOLU", fake_soul
         ):
             r = m.calistir(uygula=True)
-        # SOUL.md yok → soul_guncelle False doner ama calistir patlamaz
         assert "oneriler" in r
 
 
