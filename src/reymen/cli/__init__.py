@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
-"""reymen_cli — ReYMeN'teki hermes_cli/ paketinin ReYMeN karsiligi.
-Stub: Henuz tam tasinmadi, yavas yavas dolduruluyor.
+"""reymen.cli — ReYMeN CLI modulu.
+
+Slash komut registry (commands.py), profil yonetimi (profiles.py),
+TUI (tui.py), ve alt komut parser'lari (subcommands/) icerir.
 """

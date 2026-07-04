@@ -22,3 +22,16 @@
 **Tarih:** 2026-07-04
 **Ne yapıldı:** `_yanit_temizle()`'ye GOREV_BITTI("...") regex eklendi. İçindeki metni çıkarır, sadece kullanıcıya gösterir. Aynı fix `_yanit_temizle_repl()`'e de eklendi.
 **Neden:** prompt_builder.py ReAct formatında GOREV_BITTI("yanit") kullanır. Model bu talimata uyup ham formatı döndürüyordu.
+
+## Karar #37 — 2026-07-04 | 5 Eksik Fix Batch
+
+**Ne yapıldı:** Screenshot'taki Hermes özellik karşılaştırmasındaki 5 eksik kapatıldı:
+1. Skill Hub: skills/ → src/reymen/cereyan/skills/ (531→532 SKILL.md)
+2. Encryption: src/reymen/guvenlik/sifreleme.py (Fernet)
+3. Audit Log: kancalar.py + .ReYMeN/audit_log.db
+4. Gateway: Discord (REST API) + Email (SMTP_SSL)
+5. Video Gen: FAL video API entegrasyonu
+
+**Neden:** 11 maddelik listede 5'i KISMEN/EKSIKTI. Hepsini TAM'a çekmek için.
+
+**Sonuç:** GitHub push başarılı (cc16c4b9). defter.txt güncellendi.

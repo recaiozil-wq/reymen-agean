@@ -1,0 +1,8 @@
+{
+  "name": "reymen",
+  "model": "deepseek-v4-flash",
+  "provider": "deepseek",
+  "gateway": "cli",
+  "skills_dir": ".ReYMeN/skills",
+  "description": "ReYMeN ana profili — tam yetkili ajan modu"
+}

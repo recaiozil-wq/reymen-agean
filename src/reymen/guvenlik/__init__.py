@@ -52,6 +52,9 @@ from reymen.guvenlik.oauth2 import (
     oauth2_registry,
 )
 
+# Config şifreleme (Fernet)
+from reymen.guvenlik.sifreleme import encrypt_config, decrypt_config
+
 __all__ = [
     # Auth
     "AuthManager",
@@ -86,4 +89,7 @@ __all__ = [
     "OAuth2ProviderError",
     "oauth2_manager",
     "oauth2_registry",
+    # Config Encryption (Fernet)
+    "encrypt_config",
+    "decrypt_config",
 ]

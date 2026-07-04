@@ -177,4 +177,71 @@ ReYMeN = Akilli, otonom, ozellestirilmis (self-improvement, ogrenme, 3 bot)
 - Fonksiyon: slack_gonder(mesaj, webhook_url)
 - Markdown destegi (mrkdwn)
 - .env: SLACK_WEBHOOK_URL
+
+19) OTOMATIK WEB ARAMA VE SESSION FIX [Kiral38]
+───────────────────────────────────────────
+- Sorun: Guncel sorulara (fiyat, hava, haber) web aramasi yapmiyordu
+- Cozum: conversation_loop.py'ye otomatik web tetikleyici eklendi (26 kelime)
+- Session: mesaj_ekle() fonksiyonu aktif edildi (raw SQL yerine)
+- Web search engine: Config backend=auto, DuckDuckGo fallback calisiyor
+- Test: DDG ile arama basarili (Istanbul hava durumu)
+
+20) DB BACKUP WRAPPER VE CRON GUNCELLEME [Kiral38]
+───────────────────────────────────────────
+- Sorun: kiral38'de db_backup.py wrapper'i yoktu
+- Cozum: src/reymen/sistem/db_backup_wrapper.py (130 satir)
+- Cron: db-backup-daily script'i wrapper'a yonlendirildi (no_agent=True)
+- Log: logs/db_backup_wrapper.log
+- Test: 29/29 dosya yedeklendi
+
+21) HERMES vs REYMEN KARSILASTIRMASI VE DOGRULAMA [Kiral38]
+───────────────────────────────────────────
+- 11 Hermes ozelligi ReYMeN'de tek tek kontrol edildi
+- Sonuc: 8/11 ✅ VAR, 2/11 ⚠️ KISMİ, 1/11 ❌ YOK
+- Eksik: Multi-Profile (boş), CLI (6 komut, Hermes 26+)
+- Skills: 531 .md (iddia 532), SKILL.md adi yok
+- Defter Madde 16 dogrulandi: 10/14 Tam, 2 Kismi, 1 Eksik
+
+22) DERINLEMESINE TEST ZORUNLU KURALI [ReYMeN]
+───────────────────────────────────────────
+- Tarih: 2026-07-04
+- Kural: Herhangi bir seyin calistigini iddia etmeden once
+  mutlaka fiilen test edilecek. Tool cagrilip cikti kanit
+  olarak gosterilecek. Yuzeyden bakip "var" demek yasak.
+- Ihlal Edilen: Session_search tool "var" denildi ama CLI
+  komutu ve REPL handler'i eksikti. Pasa_38 uyardi.
+- Bu kural KESIN ve DEGISMEZDIR.
 ═══════════════════════════════════════════════════════════
+
+23) HER DEGISIKLIK DEFTER'E ISLENMELI KURALI [Kiral38]
+───────────────────────────────────────────
+- Tarih: 2026-07-04
+- Kural: Yapilan HER degisiklik (kod, config, dosya, cron, test,
+  analiz) defter.txt'ye islenmek ZORUNDADIR.
+- Format: N) BASLIK [BotAdi] → islem, sebep, cozum, test sonucu
+- Islenmeyen degisiklik "yapilmamis" sayilir.
+- SOUL.md Madde 7'ye de eklendi.
+- Bu kural KESIN ve DEGISMEZDIR.
+═══════════════════════════════════════════════════════════
+19) SKILL.md FORMATI DUZELTILDI (2026-07-04) [ReYMeN]
+------------------------------------------------------
+- Sorun: skills/ altinda 531 .md var, hicbiri SKILL.md adinda degil
+- Cozum: Her .md dosyasi kendi klasorune tasindi, SKILL.md adi verildi
+- Ornek: skills/3d-pipeline.md -> skills/3d-pipeline/SKILL.md
+- Script: convert_to_skillmd.py (proje kokunde)
+- Sonuc: 531 klasor, her birinde SKILL.md
+
+20) PROFILES SISTEMI DUZELTILDI (2026-07-04) [ReYMeN]
+------------------------------------------------------
+- Sorun: .ReYMeN/profiles/ bos, profiles.py stub
+- Cozum: default.json + reymen.json olusturuldu
+- Fonksiyonlar: profil_oku, profil_yaz, list_profiles, profil_olustur
+- src/reymen/cli/profiles.py stub -> full kod
+
+21) SLASH KOMUTLAR GUCLENDIRILDI (2026-07-04) [ReYMeN]
+------------------------------------------------------
+- Sorun: src/reymen/cli/commands.py stub (24 satir)
+- Cozum: 12 temel slash komut + 8 Turkce alias ile full registry
+- Komut: /help /search /image /config /session /backup /doctor /skills /model /status /gateway /cron
+- Handler'lar mevcut parser'lara yonlendiriliyor
+- ReYMeN_cli/commands.py'ye /backup ve /doctor eklendi (80 komut)
