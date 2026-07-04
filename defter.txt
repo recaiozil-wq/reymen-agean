@@ -1430,3 +1430,45 @@ KALAN AKTIF DB (19 adet):
 DB: 24 -> 19 (5 duplicate/bos temizlendi)
 NOT: 5 mesgul dosya sonraki restart'ta temizlenecek
 ═══════════════════════════════════════════════════════════
+
+═══════════════════════════════════════════════════════════
+97) GATEWAY — SADECE TELEGRAM KULLANILIYOR (2026-07-04) [KIRAL38]
+───────────────────────────────────────────────────────────
+KARAR: 21 platform kodu var ama sadece Telegram kullaniliyor.
+  Diger 20 platform (Discord, Slack, WhatsApp, Email, vs.)
+  icin API key gerekmez -- kullanilmiyor.
+
+Telegram tokenlari profil .env'lerinde:
+  - kiral38: TELEGRAM_BOT_TOKEN (8858...) var
+  - reymen: TELEGRAM_BOT_TOKEN (8774...) var
+  - pasa_38: Hermes profili, kendi tokeni ile calisir
+
+GATEWAY: REYMEN = HERMES (sadece Telegram kullaniyoruz)
+═══════════════════════════════════════════════════════════
+
+═══════════════════════════════════════════════════════════
+98) MCP FORMAT DUZELTME — npx.cmd -> cmd /c npx (2026-07-04) [KIRAL38]
+───────────────────────────────────────────────────────────
+Windows icin dogru MCP format: cmd /c npx (resmi dokuman)
+Eski: npx.cmd -y paket (calisiyordu ama resmi degil)
+Yeni: cmd /c npx -y paket (resmi Windows formati)
+
+npm'de OLMAYAN paketler (katalogda yanlis):
+  sqlite, fetch, git, arxiv, csv, docker, cron, websocket,
+  svn, nginx, pm2, excel, math, wikipedia, time, browser-use
+
+  Bunlar @modelcontextprotocol/server-XX olarak npm'de yok.
+  Bazilari Python tabanli (git = mcp-server-git pip paketi)
+  Bazilari baska isimde olabilir - arastirilmadi.
+
+Aktif MCP sunuculari (kiral38 + reymen):
+  1) firecrawl     - cmd /c npx -y firecrawl-mcp
+  2) github        - cmd /c npx -y @modelcontextprotocol/server-github
+  3) playwright    - cmd /c npx -y @playwright/mcp
+  4) filesystem    - cmd /c npx -y @modelcontextprotocol/server-filesystem .
+  5) sequential    - cmd /c npx -y @modelcontextprotocol/server-sequential-thinking
+  6) memory        - cmd /c npx -y @modelcontextprotocol/server-memory
+  7) pdf           - cmd /c npx -y @modelcontextprotocol/server-pdf
+
+MCP: 7 sunucu aktif, 3 format duzeltildi
+═══════════════════════════════════════════════════════════
