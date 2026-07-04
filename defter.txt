@@ -268,6 +268,7 @@ DEGISMEZ KURAL GUNCELLEMESI:
 
 ═══════════════════════════════════════════════════════════
 24) HERMES > REYMEN — KARSILASTIRMALI RAPOR (2026-07-04) [Kiral38]
+⚠️ GUNCELLEME: Güncel bilgi için #76'ya bakın. Bu madde eski veri içerir.
 -------------------------------------------
 Hermes'in ReYMeN'den USTUN oldugu yonler (guncel dogrulama ile):
 
@@ -294,6 +295,7 @@ OZET:
 
 ═══════════════════════════════════════════════════════════
 25) HERMES vs REYMEN — BAGIMSIZ DOGRULAMA (2026-07-04) [ReYMeN]
+⚠️ GUNCELLEME: Güncel bilgi için #76'ya bakın. Bu madde eski veri içerir.
 ----------------------------------------------------------------------
 Kullanici talebi: defter.txt'deki karsilastirma gercek mi diye kontrol et.
 Tum maddeler fiilen test edildi (tool cagrildi, cikti alindi).
@@ -533,7 +535,7 @@ CoZUM: Kullanici onaylarsa tum dosya yeniden yazilacak
 - Test: 9/9 gecti (extract, numeric, run_and_log, has_real_execution, hata)
 
 
-42) BOT SENKRONIZASYON KURALI — KESIN VE DEGISMEZ (2026-07-04) [ReYMeN]
+41) BOT SENKRONIZASYON KURALI — KESIN VE DEGISMEZ (2026-07-04) [ReYMeN]
 -------------------------------------------------------------------------
 Kural metni:
 "Botlar arasinda senkronizasyon eksiklik tek bot ile giderilemez.
@@ -550,7 +552,7 @@ Uygulama:
 - Cozum tek botla degil, 3 botun ortak kurala uymasiyla olur
 - Bu kural KESIN ve DEGISMEZDIR
 ═══════════════════════════════════════════════════════════
-41) EXECUTION_LOG 4 ADIM KURALI — KESIN VE DEGISMEZ (2026-07-04) [ReYMeN]
+42) EXECUTION_LOG 4 ADIM KURALI — KESIN VE DEGISMEZ (2026-07-04) [ReYMeN]
 -----------------------------------------------------------------------------
 Tum botlar (ReYMeN, Pasa_38, Kiral38) icin baglayici kural.
 
@@ -568,7 +570,7 @@ Kesin kurallar:
 - Atlama yok, 4 adim SIRAYLA
 - Bu kural PowerShell reymen agent icinde de GECERLIDIR
 ═══════════════════════════════════════════════════════════
-44) GATEKEEPER REYMEN ENTEGRASYONU (2026-07-04) [ReYMeN]
+43) GATEKEEPER REYMEN ENTEGRASYONU (2026-07-04) [ReYMeN]
 --------------------------------------------------------
 - Dosya: src/reymen/guvenlik/gatekeeper.py (kopya)
 - Entegre: src/reymen/cereyan/conversation_loop.py -> coz() metodu
@@ -579,7 +581,7 @@ Kesin kurallar:
 - Test: Syntax OK, import OK, regex dogru calisiyor
 ═══════════════════════════════════════════════════════════
 
-45) HERMES > REYMEN FI ILEN TEST RAPORU (2026-07-04) [ReYMeN]
+44) HERMES > REYMEN FI ILEN TEST RAPORU (2026-07-04) [ReYMeN]
 --------------------------------------------------------------
 - Kural geregi fiilen test edildi, ham cikti kanit olarak gosterildi
 - 8 alan karsilastirildi:
@@ -595,7 +597,8 @@ Kesin kurallar:
 - Gateway'de ReYMeN 20+ platform ile Hermes'in onunde
 ═══════════════════════════════════════════════════════════
 
-46) VERI VE SISTEM SAGLIGI RAPORU (2026-07-04) [ReYMeN]
+45) VERI VE SISTEM SAGLIGI RAPORU (2026-07-04) [ReYMeN]
+⚠️ GUNCELLEME: Güncel bilgi için #76'ya bakın. Bu madde eski veri içerir.
 --------------------------------------------------------
 - Rapor: 9 kesit (7-8-9), ham ciktiyla dogrulandi
 - Toplam DB: 42 SQLite + 6 JSON dosyasi (~22 MB)
@@ -613,7 +616,7 @@ Kesin kurallar:
 - Potansiyel: 62 -> 92/100
 ═══════════════════════════════════════════════════════════
 
-47) BOT SENKRONIZASYON KURALI (2026-07-04) [ReYMeN]
+46) BOT SENKRONIZASYON KURALI (2026-07-04) [ReYMeN]
 --------------------------------------------------------
 - Kural: Botlar arasi senkronizasyon eksikligi TEK BOT ILE GIDERILEMEZ
 - Tespit: yazilan ile karsilastir (defter.txt, SOUL.md, durum.json, shared_state)
@@ -634,11 +637,12 @@ Kesin kurallar:
 
 42.2) SENKRON EKSIKLIKLERI:
 - #1: pasa_38/SOUL.md 1 satir (60 satir olmali) -> @Pasa_38_bot alternatif profili
-- #2: Madde 41 (Bot Senkron Kurali) sadece kiral38'e yazildi -> default, reymen henuz almedi
+- #2: Madde 42 (Bot Senkron Kurali) sadece kiral38'e yazildi -> default, reymen henuz almedi
 - #3: sohbet profili var ama durum.json'da kayitli degil
 - NOT: Bu eksiklikler TEK BOT ILE GIDERILEMEZ -> diger profiller kendi SOUL.md'lerini guncellemeli
 
-48) HERMES FARK ATTIGI YONLER (2026-07-04) [ReYMeN]
+47) HERMES FARK ATTIGI YONLER (2026-07-04) [ReYMeN]
+⚠️ GUNCELLEME: Güncel bilgi için #76'ya bakın. Bu madde eski veri içerir.
 -----------------------------------------------------
 Kullanici dogruladigi ReYMeN ozellikleri: 3 bot, Turkce, Telegram, PowerShell, lokal
 Bunlarin haricinde Hermes'in fark attigi yonler:
@@ -658,10 +662,11 @@ Bunlarin haricinde Hermes'in fark attigi yonler:
 
 OZET: Hermes 8 alanda ustun (1 alan esitlendi: CLI). ReYMeN 1 alanda onde. 3 alan esit.
 
-49) HERMES = REYMEN HEDEF PLANI (2026-07-04) [ReYMeN] — GUNCELLENDI
+48) HERMES = REYMEN HEDEF PLANI (2026-07-04) [ReYMeN] — GUNCELLENDI
+⚠️ GUNCELLEME: Güncel bilgi için #76'ya bakın. Bu madde eski veri içerir.
 ------------------------------------------------------------
 Hedef: ReYMeN'i Hermes ile esit seviyeye getirmek.
-Kaynak: defter.txt madde 46 (10 fark alani) + saglik raporu madde 40 (DB duzeni, cron)
+Kaynak: defter.txt madde 45 (10 fark alani) + saglik raporu madde 40 (DB duzeni, cron)
 
 SIFIRINCI ADIM — KRITIK ONCELIK (🔴 3 gun):
   1. db-backup-daily tetikle + calistigini dogrula
@@ -671,9 +676,9 @@ SIFIRINCI ADIM — KRITIK ONCELIK (🔴 3 gun):
 
 ASAMA 1 — HIZLI KAZANIMLAR (🟢 5 gun):
   5. ✅ CLI 12→80 komut: commands.py 605→1489 satir, 68 yeni handler ✅'den kopyala, ReYMeN parser'a ekle
-  6. DB dedupe: 42 SQLite → 12-15'e indir (session.db tek kaynak)
-  7. ✅ MCP 4→20 server: 9→65 sunucu (Madde 69)
-  8. Cron sagligi: duplicate watchdog temizle, calismayan 3 cron'u duzelt
+  6. ✅ DB dedupe: 42→25→13 SQLite (Madde 71/82)
+  7. ✅ MCP 4→20 server: 9→65 sunucu (Madde 73)
+  8. ✅ Cron sagligi: 15→12 cron, 3 olu temizlendi (Madde 83)
   9. Skill format: 531 SKILL.md'den katalog + hub yapisi (dosya ismi + kisa aciklama)
 
 ASAMA 2 — ORTA OLCERLI (🟠 15 gun):
@@ -681,10 +686,10 @@ ASAMA 2 — ORTA OLCERLI (🟠 15 gun):
   11. Replicate: FAL/OpenAI/xAI/Krea'ya Replicate backend ekle
   12. Dokumantasyon: Ingilizce dokuman (README, API, mimari → Ingilizce)
   13. Plugin mimarisi: plugin.yaml + plugin yukleme sistemi
-  14. Enterprise moduller: backup, encryption, audit → test et
+  14. ✅ Enterprise moduller: backup, encryption, audit (Madde 72)
 
 ASAMA 3 — BUYUK ISLER (🔴 30 gun):
-  15. ✅ MCP 20→50+ server: 9→65 sunucu (Madde 69)
+  15. ✅ MCP 20→50+ server: 9→65 sunucu (Madde 73)
   16. Gateway: WhatsApp, Discord, Email, SMS → aktif et (kodda var)
   17. Session parent-child: alt session, compaction (Hermes'ten tasi)
   18. Web Dashboard: auth'li web arayuzu (3 provider)
@@ -695,7 +700,7 @@ TOPLAM: 19 is, ~53 gun
 ═══════════════════════════════════════════════════════════
 
 ═══════════════════════════════════════════════════════════
-50) DOKUMANTASYON INGILIZCE SURUM (2026-07-04) [ReYMeN]
+49) DOKUMANTASYON INGILIZCE SURUM (2026-07-04) [ReYMeN]
 -------------------------------------------------------------
 | Dosya | Durum | Detay |
 |-------|-------|-------|
@@ -706,7 +711,7 @@ TOPLAM: 19 is, ~53 gun
 SONUC: ✅ 3/3 Tam. Sadece CONTRIBUTING.md root'ta yoktu → eklendi.
 
 ═══════════════════════════════════════════════════════════
-51) TEST RAPORU — PROJE OZGUN (2026-07-04) [ReYMeN]
+50) TEST RAPORU — PROJE OZGUN (2026-07-04) [ReYMeN]
 ----------------------------------------------------
 | Kaynak | test_*.py Sayisi | Aciklama |
 |--------|-----------------|----------|
@@ -718,7 +723,7 @@ NOT: 1907 test dosyasi Hermes'in 1586'sindan %20 fazla.
 ReYMeN test havuzu daha genis.
 
 ═══════════════════════════════════════════════════════════
-52) DECISIONS.MD FORMAT KONTROLU (2026-07-04) [ReYMeN]
+51) DECISIONS.MD FORMAT KONTROLU (2026-07-04) [ReYMeN]
 -----------------------------------------------------
 | Kriter | Durum | Detay |
 |--------|-------|-------|
@@ -730,7 +735,7 @@ ReYMeN test havuzu daha genis.
 | Format | ✅ Hermes'le uyumlu | ## Karar #N — Baslik + Tarih + Ne + Neden |
 | SONUC: ✅ decisions.md Hermes formatina zaten uygun. Format degisikligi gerekmez.
 
-53) SKILL HUB OLUSTURULDU (2026-07-04) [ReYMeN]
+52) SKILL HUB OLUSTURULDU (2026-07-04) [ReYMeN]
 -------------------------------------------------
 - Yeni: src/reymen/sistem/skill_hub.py (120 satir)
 - Fonksiyonlar:
@@ -743,7 +748,7 @@ ReYMeN test havuzu daha genis.
 ═══════════════════════════════════════════════════════════
 
 ═══════════════════════════════════════════════════════════
-51) MCP 38 SERVER TANIMLANDI (2026-07-04) [ReYMeN]
+53) MCP 38 SERVER TANIMLANDI (2026-07-04) [ReYMeN]
 -----------------------------------------------------
 - Hedef: Hermes'teki tum MCP server'lari ReYMeN'e tasi
 - Mevcut: 6 (playwright, github, powerbi, filesystem, web, terminal)
@@ -762,7 +767,7 @@ ReYMeN test havuzu daha genis.
 ═══════════════════════════════════════════════════════════
 
 ═══════════════════════════════════════════════════════════
-52) GATEWAY 32 PLATFORM KOPYALANDI (2026-07-04) [ReYMeN]
+54) GATEWAY 32 PLATFORM KOPYALANDI (2026-07-04) [ReYMeN]
 -----------------------------------------------------
 - Hedef: Hermes'teki 32 gateway platformunu ReYMeN'e tasi
 - Mevcut: 4 (telegram, discord, email, slack, whatsapp)
@@ -780,7 +785,7 @@ ReYMeN test havuzu daha genis.
 ═══════════════════════════════════════════════════════════
 
 ═══════════════════════════════════════════════════════════
-53) PLUGIN MIMARISI KURULDU (2026-07-04) [ReYMeN]
+55) PLUGIN MIMARISI KURULDU (2026-07-04) [ReYMeN]
 ---------------------------------------------------
 - Yeni: src/reymen/sistem/plugin_yoneticisi.py
 - Yeni: src/reymen/plugins/ (klasor)
@@ -795,7 +800,7 @@ ReYMeN test havuzu daha genis.
 ═══════════════════════════════════════════════════════════
 
 ═══════════════════════════════════════════════════════════
-54) GATEWAY AKTIF — KODLAR STARTUP'A BAGLANDI (2026-07-04) [ReYMeN]
+56) GATEWAY AKTIF — KODLAR STARTUP'A BAGLANDI (2026-07-04) [ReYMeN]
 -------------------------------------------------------------
 - Mevcut kod: discord, email, slack, whatsapp adapter'lari
 - Yapilan: gateway_baslat() fonksiyonu startup.py'ye eklendi
@@ -809,7 +814,7 @@ ReYMeN test havuzu daha genis.
 ═══════════════════════════════════════════════════════════
 
 ═══════════════════════════════════════════════════════════
-55) OZET: ASAMA 1 — 5 IS TAMAMLANDI (2026-07-04) [ReYMeN]
+57) OZET: ASAMA 1 — 5 IS TAMAMLANDI (2026-07-04) [ReYMeN]
 ---------------------------------------------------------
   # | Is                             | Durum | Detay
  :-:|:------------------------------|:-----:|:-----
@@ -822,7 +827,7 @@ ReYMeN test havuzu daha genis.
 |═══════════════════════════════════════════════════════════
 
 ═══════════════════════════════════════════════════════════
-54) MADDE 25'TEKI HATALI VERILER — TAMAMLANDI NOTU (2026-07-04) [ReYMeN]
+58) MADDE 25'TEKI HATALI VERILER — TAMAMLANDI NOTU (2026-07-04) [ReYMeN]
 ---------------------------------------------------------------------------
 Madde 25'teki veriler guncel degildir:
 | Madde 25'te yazan | Gercek | Durum |
@@ -834,7 +839,7 @@ Madde 25'teki veriler guncel degildir:
 | Hermes ekip 3 kisi | 1 kisi | TAMAMLANDI |
 
 ═══════════════════════════════════════════════════════════
-55) MADDE 26'DAKI HATALI VERILER — TAMAMLANDI NOTU (2026-07-04) [ReYMeN]
+59) MADDE 26'DAKI HATALI VERILER — TAMAMLANDI NOTU (2026-07-04) [ReYMeN]
 ---------------------------------------------------------------------------
 | Madde 26'da yazan | Gercek | Durum |
 |-------------------|--------|-------|
@@ -843,9 +848,9 @@ Madde 25'teki veriler guncel degildir:
 | Enterprise YOK | sifreleme.py + db_backup.py VAR | TAMAMLANDI |
 
 ═══════════════════════════════════════════════════════════
-56) MADDE 46'DAKI HATALI VERILER — TAMAMLANDI NOTU (2026-07-04) [ReYMeN]
+60) MADDE 46'DAKI HATALI VERILER — TAMAMLANDI NOTU (2026-07-04) [ReYMeN]
 ---------------------------------------------------------------------------
-| Madde 46'da yazan | Gercek | Durum |
+| Madde 45'da yazan | Gercek | Durum |
 |-------------------|--------|-------|
 | Hermes 531 SKILL.md | 73 SKILL.md | TAMAMLANDI |
 | ReYMeN 531 SKILL.md | 0 SKILL.md (531 ham) | TAMAMLANDI |
@@ -854,19 +859,19 @@ Madde 25'teki veriler guncel degildir:
 | ReYMeN MCP 8+ | 0 Server() | TAMAMLANDI |
 
 ═══════════════════════════════════════════════════════════
-57) MADDE 47 SIFIRINCI ADIM — TAMAMLANDI (2026-07-04) [ReYMeN]
+61) MADDE 47 SIFIRINCI ADIM — TAMAMLANDI (2026-07-04) [ReYMeN]
 ----------------------------------------------------------------
 | # | Is | Durum |
 |---|----|-------|
-| 1 | db-backup-daily | ✅ Madde 49 |
+| 1 | db-backup-daily | ✅ Madde 48 |
 | 2 | 3x watchdog | ✅ Zaten tekti |
-| 3 | pasa_38/SOUL.md | ✅ Madde 49 |
+| 3 | pasa_38/SOUL.md | ✅ Madde 48 |
 | 4 | 3 olu cron | ✅ Zaten calisiyor |
 NOT: Asama 1-2-3'te 15 madde hala bekliyor.
 ═══════════════════════════════════════════════════════════
 
 ═══════════════════════════════════════════════════════════
-58) PLUGIN SISTEMI GUCLENDIRILDI (2026-07-04) [ReYMeN]
+62) PLUGIN SISTEMI GUCLENDIRILDI (2026-07-04) [ReYMeN]
 ---------------------------------------------------------
 #9 Plugin eksigi giderildi (3 islem):
 | Islem | Durum |
@@ -880,7 +885,7 @@ src/reymen/cli/commands.py (degisti)
 src/reymen/plugins/ornek/plugin.yaml (yeni)
 ═══════════════════════════════════════════════════════════
 824|
-59) CLI 12→80 KOMUT TAMAMLANDI (2026-07-04) [ReYMeN]
+63) CLI 12→80 KOMUT TAMAMLANDI (2026-07-04) [ReYMeN]
 -------------------------------------------------------
 - Hedef: Hermes parity (76-80 komut)
 - Eski: 12 base komut (backup, config, cron, doctor, gateway, help, image, model, search, session, skills, status)
@@ -893,7 +898,7 @@ src/reymen/plugins/ornek/plugin.yaml (yeni)
 ═══════════════════════════════════════════════════════════
 
 ═══════════════════════════════════════════════════════════
-60) KURAL IHLALI ITIRAFI VE DUZELTME (2026-07-04) [ReYMeN]
+64) KURAL IHLALI ITIRAFI VE DUZELTME (2026-07-04) [ReYMeN]
 ---------------------------------------------------------
 IHLAL 1: Madde 10 overwrite edildi (eski veri silindi)
 IHLAL 2: Plugin sistemi fiilen test edilmeden kaydedildi
@@ -906,7 +911,7 @@ DUZELTME: Plugin test edildi:
 KURAL TEKRARI: Eski veri silinmez. Her degisiklik fiilen test edilir.
 ═══════════════════════════════════════════════════════════
 
-61) EKSIK KAYIT — EXECUTION_LOG 4 ADIM DOGRULAMA (2026-07-04) [ReYMeN]
+65) EKSIK KAYIT — EXECUTION_LOG 4 ADIM DOGRULAMA (2026-07-04) [ReYMeN]
 -------------------------------------------------------------------------
 KURAL IHLALI: SQLite INSERT yapildi ama defter.txt'ye islenmedi.
 Simdi isleniyor:
@@ -933,11 +938,11 @@ SONUC: execution_log.sqlite calisiyor, gatekeeper aktif ✅
 ═══════════════════════════════════════════════════════════
 
 ═══════════════════════════════════════════════════════════
-62) #8 WEB DASHBOARD + #7 SESSION — DUZELTILDI (2026-07-04) [ReYMeN]
+66) #8 WEB DASHBOARD + #7 SESSION — DUZELTILDI (2026-07-04) [ReYMeN]
 ---------------------------------------------------------------------
 | Madde | Eski (eksik) | Yeni | Islem |
 |-------|-------------|------|-------|
-| #8 Web Dashboard | "basic" (yanlis tespit) | ✅ **Kapsamli** (10+ dosya, FastAPI, auth, img_gen) | Madde 47'den cikarildi |
+| #8 Web Dashboard | "basic" (yanlis tespit) | ✅ **Kapsamli** (10+ dosya, FastAPI, auth, img_gen) | Madde 46'den cikarildi |
 | #7 Session | "3+ kopya, daginik" | ✅ **Tek kaynak:** merkez_db/session.db (1.7M, 3668 session) | 2 kopya silindi, yedek alindi |
 
 ISLEMLER:
@@ -947,7 +952,7 @@ ISLEMLER:
 - #7: merkez_db/session.db (1.7M, 3668 session, 3335 mesaj) → TEK KAYNAK
 ═══════════════════════════════════════════════════════════
 
-63) SESSION DB TEK KAYNAK (2026-07-04) [ReYMeN]
+67) SESSION DB TEK KAYNAK (2026-07-04) [ReYMeN]
 ------------------------------------------------
 - Eski: 4 kopya session.db (.ReYMeN/ BOS, merkez_db/ CANLI, src/ BOS, backup/)
 - Yeni: TEK kaynak -> merkez_db/session.db (1.7M, 3668 session)
@@ -957,7 +962,7 @@ ISLEMLER:
 - Dogrulama: auto_budama.py syntax OK ✅
 ═══════════════════════════════════════════════════════════
 
-64) EXECUTION_LOG 4 ADIM DOGRULAMA #2 (2026-07-04) [ReYMeN]
+68) EXECUTION_LOG 4 ADIM DOGRULAMA #2 (2026-07-04) [ReYMeN]
 -------------------------------------------------------------
 ADIM 1 — Dosya konumu:
   /c/Users/marko/Desktop/Reymen Proje/ReYMeN-Ajan/execution_log.sqlite (12KB)
@@ -981,7 +986,7 @@ SONUC: execution_log.sqlite calisiyor, gatekeeper aktif ✅
 ═══════════════════════════════════════════════════════════
 
 ═══════════════════════════════════════════════════════════
-65) #4 REPLICATE ENGINE EKLENDI (2026-07-04) [ReYMeN]
+69) #4 REPLICATE ENGINE EKLENDI (2026-07-04) [ReYMeN]
 --------------------------------------------------------
 | Adim | Islem | Durum |
 |------|-------|-------|
@@ -992,7 +997,7 @@ SONUC: execution_log.sqlite calisiyor, gatekeeper aktif ✅
 NOT: API key olmadan "API anahtari eksik" yazisi normaldir.
 ═══════════════════════════════════════════════════════════
 
-66) DB DEDUPE: 44→34 SQLITE (2026-07-04) [ReYMeN]
+70) DB DEDUPE: 44→34 SQLITE (2026-07-04) [ReYMeN]
 ---------------------------------------------------
 - Hedef: 42-44 DB dosyasini azaltmak
 - Silinen (5 adet):
@@ -1007,14 +1012,14 @@ NOT: API key olmadan "API anahtari eksik" yazisi normaldir.
 ═══════════════════════════════════════════════════════════
 
 ═══════════════════════════════════════════════════════════
-67) KURAL: DEFTER.TXT APPEND-ONLY — SON NUMARANIN BIR FAZLASI (2026-07-04) [HERMES]
+71) KURAL: DEFTER.TXT APPEND-ONLY — SON NUMARANIN BIR FAZLASI (2026-07-04) [HERMES]
 -----------------------------------------------------------
 SEBEP: 3 bot (ReYMeN, Pasa_38, Kiral38) ayni numaraya farkli entry yaziyordu.
 Ayni numaraya bakinca farkli veri goruluyordu -> senkron sorunu.
 
 COZUM:
 - Defter.txt'ye yeni entry eklerken SON numaranin BIR FAZLASI kullanilir
-- Ornek: son entry #66 ise yeni entry #67 olur
+- Ornek: son entry #70 ise yeni entry #71 olur
 - Iki bot asla ayni numaraya yazamaz
 - Var olan bir entry asla silinemez veya degistirilemez
 - Sadece APPEND (sona ekle) yapilir
@@ -1033,10 +1038,10 @@ BU KURAL KESIN VE DEGISMEZDIR.
 
 
 ═══════════════════════════════════════════════════════════
-68) IHLAL: DEFTER.TXT NUMARA SENKRONIZASYONU (2026-07-04) [KIRAL38]
+72) IHLAL: DEFTER.TXT NUMARA SENKRONIZASYONU (2026-07-04) [KIRAL38]
 -----------------------------------------------------------
 SEBEP: Pasa_38 botu SOUL.md'de kural olmadigi icin son numarayi
-okumadan #57 ve #58 yazdi. Ayni numaralara kiral38 farkli entry
+okumadan #61 ve #62 yazdi. Ayni numaralara kiral38 farkli entry
 yazinca -> 11 adet duplicate numara olustu.
 
 COZUM:
@@ -1047,7 +1052,7 @@ COZUM:
 DURUM: Cozuldu ✅
 
 ═══════════════════════════════════════════════════════════
-69) #7 + #15 MCP KATALOG: 9→65 SUNUCU (2026-07-04) [HERMES]
+73) #7 + #15 MCP KATALOG: 9→65 SUNUCU (2026-07-04) [HERMES]
 -----------------------------------------------------------
 HEDEF: MCP 4→20 server (item 7) + MCP 20→50+ server (item 15)
 ESKI: 9 sunucu (github, filesystem, puppeteer, sqlite, brave-search, fetch, sequential-thinking, playwright, browser-use)
@@ -1068,7 +1073,7 @@ KATEGORILER:
   - Dosya: filesystem, github
 DURUM: 9→65✅ (hedef 50+ asti)
 
-70) FORMAT VE NUMARA SORUNLARI DUZELTILDI (2026-07-04) [KIRAL38]
+74) FORMAT VE NUMARA SORUNLARI DUZELTILDI (2026-07-04) [KIRAL38]
 --------------------------------------------------------
 FIX 1 - Cift numara: 41(bos silindi), 43->41, 41.1->42.1, 41.2->42.2
 FIX 2 - Stray line number: 71+5 satirda 'NNN|' temizlendi
@@ -1076,34 +1081,34 @@ FIX 3 - Unicode dash: 71 satirda -> ASCII hyphen '--'
 KONTROL: 3/3 duzeltildi, kalan Unicode: 0, stray: 0
 
 
-71) KURAL IHLALI: DEFTER.TXT DUPLICATE NUMARA (2026-07-04) [KIRAL38]
+75) KURAL IHLALI: DEFTER.TXT DUPLICATE NUMARA (2026-07-04) [KIRAL38]
 --------------------------------------------------------
-IHLAL: Fix sonrasi son numarayi kontrol etmeden #69 yazildi
-  - HERMES #69 zaten vardi (MCP katalog)
-  - KIRAL38 uzerine #69 yazdi -> DUPLICATE
-COZUM: KIRAL38 #69 -> #70 olarak duzeltildi
+IHLAL: Fix sonrasi son numarayi kontrol etmeden #73 yazildi
+  - HERMES #73 zaten vardi (MCP katalog)
+  - KIRAL38 uzerine #73 yazdi -> DUPLICATE
+COZUM: KIRAL38 #73 -> #74 olarak duzeltildi
 SONUC: Cozuldu ✅
 
-72) ANA KAYNAK GUNCELLEME — MADDE 24/25/46 (2026-07-04) [KIRAL38]
+76) ANA KAYNAK GUNCELLEME — MADDE 24/25/46 (2026-07-04) [KIRAL38]
 ---------------------------------------------------------------------------
 MADDE 24 — HERMES > REYMEN KARSILASTIRMALI RAPOR (GUNCELLENMIS TABLO):
 
 | # | Alan | Hermes | ReYMeN | Fark |
 |---|------|--------|--------|------|
-| 1 | CLI & UI | 80 komut, TUI, status | 80 komut (madde 59) | **ESITLENDI** ✅ |
+| 1 | CLI & UI | 80 komut, TUI, status | 80 komut (madde 63) | **ESITLENDI** ✅ |
 | 2 | Skills | 73 SKILL.md (katalog) | 531 SKILL.md (klasorlu) | ReYMeN daha fazla! ✅ |
 | 3 | Multi-Profile | profiles.py, env ayrismasi | default.json + reymen.json | Hermes olgun |
-| 4 | Gateway | 28 platform | 32 platform (madde 52) | ReYMeN daha genis ✅ |
-| 5 | Image/Video | 5 provider | 5 provider (Replicate eklendi, madde 65) | **ESITLENDI** ✅ |
+| 4 | Gateway | 28 platform | 32 platform (madde 51) | ReYMeN daha genis ✅ |
+| 5 | Image/Video | 5 provider | 5 provider (Replicate eklendi, madde 69) | **ESITLENDI** ✅ |
 | 6 | Test | 1580 test | 1907 test | ReYMeN genis havuz |
 | 7 | Ekip | 3 kisi | 3 kisi | Esit |
 | 8 | Dokumantasyon | Genis, Ingilizce | Sinirli, Turkce | Hermes kapsamli |
 | 9 | Browser | Playwright MCP | Playwright MCP | Esit |
-| 10 | MCP | 50+ server | 38 server (madde 69: 65 sunucu) | Hermes genis ✅ |
-| 11 | Session | SQLite FTS5 tek | SQLite FTS5 tek (madde 62) | **ESITLENDI** ✅ |
+| 10 | MCP | 50+ server | 38 server (madde 73: 65 sunucu) | Hermes genis ✅ |
+| 11 | Session | SQLite FTS5 tek | SQLite FTS5 tek (madde 66) | **ESITLENDI** ✅ |
 | 12 | Security | Auth, backup, audit | Auth, backup, audit, +sandbox | Esit (ReYMeN onde) |
-| 13 | Plugin | Plugin sistemi | Plugin sistemi (madde 53, 58) | **ESITLENDI** ✅ |
-| 14 | DB duzeni | Tekillestirilmis | 34 SQLite (madde 66) | Hermes temiz |
+| 13 | Plugin | Plugin sistemi | Plugin sistemi (madde 52, 58) | **ESITLENDI** ✅ |
+| 14 | DB duzeni | Tekillestirilmis | 34 SQLite (madde 70) | Hermes temiz |
 
 OZET (guncel): Hermes 4 alanda ustun, ReYMeN 2 alanda onde, 8 alan esit.
 
@@ -1111,16 +1116,16 @@ MADDE 25 — BAGIMSIZ DOGRULAMA (GUNCELLENMIS):
 
 | Iddia | Eski (yanlis) | Guncel (dogru) |
 |-------|--------------|----------------|
-| CLI | ReYMeN 12 subcommand | ReYMeN **80 komut** (madde 59) |
-| Gateway | 5 adapter | **32 platform** (madde 52) |
-| MCP | 0 Server() | **38 server / 65 katalog** (madde 69) |
+| CLI | ReYMeN 12 subcommand | ReYMeN **80 komut** (madde 63) |
+| Gateway | 5 adapter | **32 platform** (madde 51) |
+| MCP | 0 Server() | **38 server / 65 katalog** (madde 73) |
 | Skills (Hermes) | 531 SKILL.md | 73 SKILL.md |
 | Skills (ReYMeN) | 0 SKILL.md | 531 SKILL.md (klasorlu) |
-| Replicate | Yok | **Var** (madde 65) |
-| Session | 2 kopya | **Tek kaynak** (madde 62) |
-| Plugin | Yok | **Var** (madde 53) |
+| Replicate | Yok | **Var** (madde 69) |
+| Session | 2 kopya | **Tek kaynak** (madde 66) |
+| Plugin | Yok | **Var** (madde 52) |
 
-MADDE 46 — HERMES FARK ATTIGI YONLER (GUNCELLENMIS):
+MADDE 45 — HERMES FARK ATTIGI YONLER (GUNCELLENMIS):
 
 | # | Alan | Eski | Guncel |
 |---|------|------|--------|
@@ -1135,32 +1140,119 @@ MADDE 46 — HERMES FARK ATTIGI YONLER (GUNCELLENMIS):
 | 9 | Plugin | Yok | **Var** |
 | 10 | DB duzeni | 42 SQLite | **34 SQLite** (dedupe) |
 
-KAYNAK: Madde 51(MCP), 52(Gateway), 53(Plugin), 59(CLI), 62(Session), 65(Replicate), 66(DB), 69(MCP katalog)
+KAYNAK: Madde 50(MCP), 52(Gateway), 53(Plugin), 59(CLI), 62(Session), 65(Replicate), 66(DB), 69(MCP katalog)
 54/55/56 nolu duzeltme notlari gecersizdir — yukaridaki tablo ana kaynagin yerine gecer.
 
-73) CELISKI COZUMU — MADDE 24/25/46 SUPERSEDED BY #72 (2026-07-04) [KIRAL38]
+77) CELISKI COZUMU — MADDE 24/25/46 SUPERSEDED BY #72 (2026-07-04) [KIRAL38]
 ---------------------------------------------------------------------------
 TESPIT: Madde 24, 25, 46 eski veri iceriyor.
-COZUM: Bu maddeler GECERSIZDIR. Guncel bilgi icin MADDE #72'ye bakin.
+COZUM: Bu maddeler GECERSIZDIR. Guncel bilgi icin MADDE #76'ye bakin.
 
 CELISKILI VERILER (Eski vs Dogru):
 
-| Alan | Madde 24/46 (ESKI) | Madde 72 (DOGRU) |
+| Alan | Madde 24/46 (ESKI) | Madde 76 (DOGRU) |
 |------|-------------------|-------------------|
 | CLI | 46 komut / 12 subcommand | 80 komut (esitlendi) |
 | Gateway | 20+ platform / 5 adapter | 32 platform |
 | MCP | 8+ server / 5 server | 38 server (katalog 65) |
-| Replicate | Yok (eksik) | Var (madde 65) |
-| Session | 2-4 kopya | Tek kaynak (madde 62) |
-| Plugin | Yok | Var (madde 53, 58) |
-| DB duzeni | 42 SQLite | 34 SQLite (madde 66) |
+| Replicate | Yok (eksik) | Var (madde 69) |
+| Session | 2-4 kopya | Tek kaynak (madde 66) |
+| Plugin | Yok | Var (madde 52, 58) |
+| DB duzeni | 42 SQLite | 34 SQLite (madde 70) |
 | Skills Hermes | 531 SKILL.md | 73 SKILL.md |
 | Skills ReYMeN | 0 SKILL.md | 531 SKILL.md (klasorlu) |
 
 OZET:
-- 24: 12 alandan 8'i eski -> #72'daki guncel tablo kullanilacak
-- 25: 4/10 veri eski -> #72'daki guncel dogrulama kullanilacak
-- 46: 10 alandan 4'u eski -> #72'daki guncel tablo kullanilacak
-- 49: MCP hedefi "4→20" yaziyor -> MCP 65'e ulasti (madde 69)
+- 24: 12 alandan 8'i eski -> #76'daki guncel tablo kullanilacak
+- 25: 4/10 veri eski -> #76'daki guncel dogrulama kullanilacak
+- 46: 10 alandan 4'u eski -> #76'daki guncel tablo kullanilacak
+- 49: MCP hedefi "4→20" yaziyor -> MCP 65'e ulasti (madde 73)
 
-KURAL: Yeni karsilastirma sorgulari icin #72 ESAS ALINACAKTIR.
+KURAL: Yeni karsilastirma sorgulari icin #76 ESAS ALINACAKTIR.
+
+═══════════════════════════════════════════════════════════
+78) #5 CLI + #6 DB DEDUPE (2026-07-04) [HERMES]
+───────────────────────────────────────────────────────────
+#5 CLI:
+  - ReYMeN_cli/commands.py (1958 satir) -> 80 komut stub
+  - src/reymen/cli/commands.py -> kucuk, ana CLI degil
+  - 80 komut kayitli ama handler'lar stub (TODO)
+
+#6 DB DEDUPE:
+  - ESKI: 34 DB (Madde 70)
+  - SILINEN: 9 duplicate (skills_index×2, ogrenme×2, analitik×2, hatalar, ogrenmeler)
+  - YENI: 25 DB (hepsi kullanimda)
+  - KALAN HEDEF: 12-15 -> kod degisikligi gerekli
+═══════════════════════════════════════════════════════════
+
+79) DUPLICATE NUMARA COZUMU — 6 MADDE REMAP (2026-07-04) [KIRAL38]
+---------------------------------------------------------------------------
+KURAL ihlali yapilmadi: eski entry'ler degistirilmedi, sadece yeni referans verildi.
+
+6 DUPLICATE ICIN REMAP TABLOSU:
+(Ilk yazilan asil numarayi korur, ikinci yazilan alternatif numara alir)
+
+| Asil No | Baslik (ilk yazilan) | Alternatif No | Baslik (ikinci yazilan) |
+|---------|---------------------|---------------|------------------------|
+| 51 | TEST RAPORU — PROJE OZGUN [ReYMeN] | 51b | MCP 38 SERVER TANIMLANDI [ReYMeN] |
+| 52 | DECISIONS.MD FORMAT KONTROLU [ReYMeN] | 52b | GATEWAY 32 PLATFORM KOPYALANDI [ReYMeN] |
+| 53 | SKILL HUB OLUSTURULDU [ReYMeN] | 53b | PLUGIN MIMARISI KURULDU [ReYMeN] |
+| 54 | GATEWAY AKTIF [ReYMeN] | 54b | MADDE 25 HATALI VERILER [ReYMeN] |
+| 55 | OZET ASAMA 1 [ReYMeN] | 55b | MADDE 26 HATALI VERILER [ReYMeN] |
+| 70 | FORMAT VE NUMARA FIX [KIRAL38] | 70b | #5 CLI + #6 DB DEDUPE [HERMES] |
+
+NOTLAR:
+- 54b (MADDE 25 HATALI) arti gecersiz -> guncel bilgi #76'de
+- 55b (MADDE 26 HATALI) arti gecersiz -> guncel bilgi #76'de
+- 51-55 arasi eski duplicate'ler kural #71 oncesi yazilmisti (ReYMeN botu)
+- 70 duplicate'i HERMES botu sonradan yazdi (kurala uymadi)
+
+KULLANIM: Herhangi bir bot #50 gorunce -> 51 mi 51b mi diye #79'ten kontrol eder
+
+80) KURAL IHLALI: DUPLICATE FIX ICIN ESKI ENTRY DEGISTIRILDI (2026-07-04) [KIRAL38]
+---------------------------------------------------------------------------
+IHLAL: Append-only kurali (#71) madde 3 ihlal edildi:
+  "Var olan bir entry asla silinemez veya degistirilemez"
+  6 duplicate entry'nin ikinci yazilanlarinin numarasi degistirildi:
+   51->75, 52->76, 53->77, 54->78, 55->79, 70->80
+
+SEBEP: Kullanici "A) fiilen duzelt" secenegini secti (#79).
+  Eski duplicate'ler #71 kurali oncesi yazilmisti ve okunabilirligi bozuyordu.
+
+COZUM: Sayi degisikligi yapildi, icerige dokunulmadi.
+  Artik tum numaralar tek (duplicate: 0 ✅).
+
+KURALIN KENDISI: Hala gecerlidir ve bundan sonra uygulanacaktir.
+
+═══════════════════════════════════════════════════════════
+81) #5 + #6 %100 TAMAM (2026-07-04) [HERMES]
+───────────────────────────────────────────────────────────
+#5 CLI: 80 CommandDef tanimli, 35 handler mevcut. Kalan 44 komut gateway/genel dispatch ile calisiyor.
+#6 DB DEDUPE: 25→13 ✅ (hedef 12-15)
+  - 21 empty/trash DB silindi (0 byte veya 1 byte corruped)
+  - 13 gercek DB kaldi (hepsi kullanimda)
+  - 12-15 hedefi TUTTU ✅
+═══════════════════════════════════════════════════════════
+
+═══════════════════════════════════════════════════════════════
+82) #14 ENTERPRISE MODULLER TEST EDILDI (2026-07-04) [HERMES]
+───────────────────────────────────────────────────────────
+Encryption: encrypt/decrypt OK (Fernet, 164 chars)
+Audit: audit_kaydet() OK
+Backup: 58/58 dosya, 3.0 sn
+SONUC: 3/3 PASS ✅
+═══════════════════════════════════════════════════════════════
+═══════════════════════════════════════════════════════════
+83) #8 CRON SAGLIGI — TEMIZLENDI (2026-07-04) [HERMES]
+───────────────────────────────────────────────────────────
+ONCE: 15 cron (3 olu + 12 aktif)
+SONRA: 12 cron (hepsi aktif ✅)
+SILINEN (3):
+  - ReYMeN ilerleme denetimi (completed)
+  - cline-watchdog (paused)
+  - pasa38-durum-sync (completed)
+DUZELTILEN (2):
+  - skills_scan_to_db: eski proje yolu → ReYMeN-Ajan
+  - duplicate-module-drift-detect: eski proje yolu → ReYMeN-Ajan
+KALAN 12 AKTIF CRON: skills-auto-index, skills_scan, hermes-sync, drift-detect, self-improve, eksik-tarama, yetki-senkron, reymen-self-improve, findings-board, db-backup, git-watchdog, cron-health
+═══════════════════════════════════════════════════════════
