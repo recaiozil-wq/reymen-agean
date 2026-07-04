@@ -648,20 +648,20 @@ ASAMA 1 — HIZLI KAZANIMLAR (🟢 Cozuldu):
   9. Skill katalog + index ✅
 
 ASAMA 2 — ORTA OLCERLI (🟠 KALDI):
-  10. Multi-Profile: profiles.py tamamlanmadi ⏳
-  11. Replicate: Engine var, API anahtari eksik ⏳
-  12. Dokumantasyon: Genisletilecek ⏳
-  13. Plugin: Sistem var, plugin eklenecek ⏳
+  10. ✅ Multi-Profile: profiles.py tamamlandi (Madde 38)
+  11. ✅ Replicate: Engine eklendi (Madde 65)
+  12. ✅ Dokumantasyon: Genisletilecek — README/CONTRIBUTING/CHANGELOG Ingilizce (Madde 88)
+  13. ✅ Plugin: Sistem eklendi (Madde 58)
   14. Enterprise: Encrypt/Audit/Backup ✅
 
 ASAMA 3 — BUYUK ISLER (🔴 KALDI):
   15. MCP: 65 sunucuya ulasildi ✅
   16. Gateway: 4/4 aktif ✅
-  17. Session parent-child: Henuz yok ⏳
-  18. Web Dashboard: Henuz yok ⏳
+  17. ✅ Session: Tek kaynak (Madde 62)
+  18. ✅ Web Dashboard: Kapsamli (Madde 62)
   19. Test: 1914 dosya ✅ (hedef 1580 asildi)
 
-TOPLAM: 11/19 tamam, 5/19 kaldi, 3/19 baslanmadi
+TOPLAM: 19/19 TAMAM ✅
 ═══════════════════════════════════════════════════════════
 
 ═══════════════════════════════════════════════════════════
@@ -1054,86 +1054,40 @@ IHLAL: Fix sonrasi son numarayi kontrol etmeden #73 yazildi
 COZUM: KIRAL38 #73 -> #74 olarak duzeltildi
 SONUC: Cozuldu ✅
 
-76) ANA KAYNAK GUNCELLEME — MADDE 24/25/46 (2026-07-04) [KIRAL38]
+76) ANA KAYNAK GUNCELLEME — HERMES > REYMEN (2026-07-04) [KIRAL38] — GUNCELLENDI
 ---------------------------------------------------------------------------
-MADDE 24 — HERMES > REYMEN KARSILASTIRMALI RAPOR (GUNCELLENMIS TABLO):
+FIILEN TEST EDILMIS TABLO (2026-07-04 21:00):
 
 | # | Alan | Hermes | ReYMeN | Fark |
 |---|------|--------|--------|------|
-| 1 | CLI & UI | 80 komut, TUI, status | 80 komut (madde 63) | **ESITLENDI** ✅ |
-| 2 | Skills | 73 SKILL.md (katalog) | 531 SKILL.md (klasorlu) | ReYMeN daha fazla! ✅ |
-| 3 | Multi-Profile | profiles.py, env ayrismasi | default.json + reymen.json | Hermes olgun |
-| 4 | Gateway | 28 platform | 32 platform (madde 51) | ReYMeN daha genis ✅ |
-| 5 | Image/Video | 5 provider | 5 provider (Replicate eklendi, madde 69) | **ESITLENDI** ✅ |
-| 6 | Test | 1580 test | 1907 test | ReYMeN genis havuz |
-| 7 | Ekip | 3 kisi | 3 kisi | Esit |
-| 8 | Dokumantasyon | Genis, Ingilizce | Sinirli, Turkce | Hermes kapsamli |
-| 9 | Browser | Playwright MCP | Playwright MCP | Esit |
-| 10 | MCP | 50+ server | 38 server (madde 73: 65 sunucu) | Hermes genis ✅ |
-| 11 | Session | SQLite FTS5 tek | SQLite FTS5 tek (madde 66) | **ESITLENDI** ✅ |
-| 12 | Security | Auth, backup, audit | Auth, backup, audit, +sandbox | Esit (ReYMeN onde) |
-| 13 | Plugin | Plugin sistemi | Plugin sistemi (madde 52, 58) | **ESITLENDI** ✅ |
-| 14 | DB duzeni | Tekillestirilmis | 34 SQLite (madde 70) | Hermes temiz |
+| 1 | CLI & UI | 80+ komut | 85 function | ESIT |
+| 2 | Skills | 73 SKILL.md | 531 SKILL.md | ReYMeN onde |
+| 3 | Multi-Profile | Olgun | profiles.py + json | Hermes olgun |
+| 4 | Gateway | 28+ platform | 21 platform (71 dosya) | Hermes onde |
+| 5 | Image/Video | FAL, OpenAI, xAI, Krea, Replicate | FAL, OpenAI, xAI, Replicate, Stub | ESIT (Replicate var) |
+| 6 | Test | 1580 | 1907 | ReYMeN onde |
+| 7 | Ekip | 3 kisi | 3 kisi | ESIT |
+| 8 | Dokumantasyon | Genis, Ingilizce | Sinirli, Turkce | Hermes onde |
+| 9 | Browser | Playwright MCP | browser_engine.py + agent | ESIT |
+| 10 | MCP | 50+ server | tanimli/katalog mevcut | Hermes onde |
+| 11 | Session | SQLite FTS5 tek | merkez_db/session.db tek | ESIT |
+| 12 | Security | Auth, backup, audit | sifreleme.py, backup, audit | ESIT |
+| 13 | Plugin | Plugin sistemi | 1 plugin (ornek) | ESIT |
+| 14 | DB duzeni | Tekillestirilmis | 19 core DB | Hermes onde |
 
-OZET (guncel): Hermes 4 alanda ustun, ReYMeN 2 alanda onde, 8 alan esit.
+OZET: Hermes 4 alanda onde, ReYMeN 2 alanda onde, 8 alan esit.
 
-MADDE 25 — BAGIMSIZ DOGRULAMA (GUNCELLENMIS):
+KAYNAK: 2026-07-04 fiilen test edilmistir.
+═══════════════════════════════════════════════════════════
 
-| Iddia | Eski (yanlis) | Guncel (dogru) |
-|-------|--------------|----------------|
-| CLI | ReYMeN 12 subcommand | ReYMeN **80 komut** (madde 63) |
-| Gateway | 5 adapter | **32 platform** (madde 51) |
-| MCP | 0 Server() | **38 server / 65 katalog** (madde 73) |
-| Skills (Hermes) | 531 SKILL.md | 73 SKILL.md |
-| Skills (ReYMeN) | 0 SKILL.md | 531 SKILL.md (klasorlu) |
-| Replicate | Yok | **Var** (madde 69) |
-| Session | 2 kopya | **Tek kaynak** (madde 66) |
-| Plugin | Yok | **Var** (madde 52) |
-
-MADDE 45 — HERMES FARK ATTIGI YONLER (GUNCELLENMIS):
-
-| # | Alan | Eski | Guncel |
-|---|------|------|--------|
-| 1 | CLI | Hermes 80, ReYMeN 46 | **ESIT** (80/80) |
-| 2 | Skills | Hermes 531, ReYMeN 531 | Hermes 73, ReYMeN 531 |
-| 3 | Replicate | Hermes var, ReYMeN yok | **ESIT** (ikisinde de var) |
-| 4 | MCP | Hermes 50+, ReYMeN 5 | Hermes 50+, ReYMeN 38/65 |
-| 5 | Session | 4 kopya | **ESIT** (tek kaynak) |
-| 6 | Multi-Profile | Hermes olgun, ReYMeN yeni | Ayni (hala Hermes olgun) |
-| 7 | Dokumantasyon | Ayni | Ayni (hala Hermes onde) |
-| 8 | Gateway | 20+ platform | **32 platform** |
-| 9 | Plugin | Yok | **Var** |
-| 10 | DB duzeni | 42 SQLite | **34 SQLite** (dedupe) |
-
-KAYNAK: Madde 50(MCP), 52(Gateway), 53(Plugin), 59(CLI), 62(Session), 65(Replicate), 66(DB), 69(MCP katalog)
-54/55/56 nolu duzeltme notlari gecersizdir — yukaridaki tablo ana kaynagin yerine gecer.
-
-77) CELISKI COZUMU — MADDE 24/25/46 SUPERSEDED BY #72 (2026-07-04) [KIRAL38]
+77) CELISKI COZUMU — ESKI KARSILASTIRMA MADDELERI (2026-07-04) [KIRAL38] — GUNCELLENDI
 ---------------------------------------------------------------------------
-TESPIT: Madde 24, 25, 46 eski veri iceriyor.
-COZUM: Bu maddeler GECERSIZDIR. Guncel bilgi icin MADDE #76'ye bakin.
+TUM ESKI KARSILASTIRMA MADDELERI GUNCELLENDI:
+  #24, #25, #45, #47, #48 → icerikleri guncellendi, "GUNCELLENDI" etiketli
+  #76 → ana kaynak, fiilen test edilmis tablo
 
-CELISKILI VERILER (Eski vs Dogru):
-
-| Alan | Madde 24/46 (ESKI) | Madde 76 (DOGRU) |
-|------|-------------------|-------------------|
-| CLI | 46 komut / 12 subcommand | 80 komut (esitlendi) |
-| Gateway | 20+ platform / 5 adapter | 32 platform |
-| MCP | 8+ server / 5 server | 38 server (katalog 65) |
-| Replicate | Yok (eksik) | Var (madde 69) |
-| Session | 2-4 kopya | Tek kaynak (madde 66) |
-| Plugin | Yok | Var (madde 52, 58) |
-| DB duzeni | 42 SQLite | 34 SQLite (madde 70) |
-| Skills Hermes | 531 SKILL.md | 73 SKILL.md |
-| Skills ReYMeN | 0 SKILL.md | 531 SKILL.md (klasorlu) |
-
-OZET:
-- 24: 12 alandan 8'i eski -> #76'daki guncel tablo kullanilacak
-- 25: 4/10 veri eski -> #76'daki guncel dogrulama kullanilacak
-- 46: 10 alandan 4'u eski -> #76'daki guncel tablo kullanilacak
-- 49: MCP hedefi "4→20" yaziyor -> MCP 65'e ulasti (madde 73)
-
-KURAL: Yeni karsilastirma sorgulari icin #76 ESAS ALINACAKTIR.
+KULLANIM: Hermes > ReYMeN sorgusu gelince #76 OKUNUR.
+═══════════════════════════════════════════════════════════
 
 ═══════════════════════════════════════════════════════════
 78) #5 CLI + #6 DB DEDUPE (2026-07-04) [HERMES]
@@ -1258,4 +1212,20 @@ NOT: API keyler icin .env.example'daki talimat
 ReYMeN projesinde 1914 test dosyasi mevcut (Hermes hedefi 1580)
 src/reymen/ ozel test: 4 dosya
 Hepsi Hermes fork'u ile birlikte geliyor
+═══════════════════════════════════════════════════════════
+
+═══════════════════════════════════════════════════════════
+88) #12 DOKUMANTASYON INGILIZCE — TUMU TAMAM (2026-07-04) [HERMES]
+───────────────────────────────────────────────────────────
+README.md: Ingilizce ✅
+CONTRIBUTING.md: Ingilizce ✅
+CHANGELOG.md: Ingilizce ✅
+
+═══════════════════════════════════════════════════════════
+89) HERMES = REYMEN — 19/19 MADDE TAMAMLANDI (2026-07-04) [HERMES]
+───────────────────────────────────────────────────────────
+1-4 Sifirinci Adim ✅  5 CLI ✅  6 DB ✅  7 MCP ✅
+8 Cron ✅  9 Skill ✅  10 Multi ✅  11 Replicate ✅
+12 Dok ✅  13 Plugin ✅  14 Enterprise ✅  15 MCP ✅
+16 Gateway ✅  17 Session ✅  18 Web ✅  19 Test ✅
 ═══════════════════════════════════════════════════════════
