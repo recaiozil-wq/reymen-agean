@@ -29,6 +29,8 @@ if not (PROJE_YOLU / ".git").exists():
 
 # Paylasilan durum dosyasi (tum botlar okur)
 SHARED_STATE = PROJE_YOLU / "shared_state" / "git_watchdog_state.json"
+# Kendi state dosyasini git status'tan filtrele (self-trigger)
+SHARED_STATE_REL = "shared_state/git_watchdog_state.json"
 
 # ── Ana fonksiyon ──────────────────────────────────────────────
 def main() -> int:
@@ -50,7 +52,9 @@ def main() -> int:
         return 0
 
     # Degisiklik var → raporla
-    lines = [l for l in output.split("\n") if l.strip()]
+    raw_lines = [l for l in output.split("\n") if l.strip()]
+    # Kendi state dosyasini filtrele (self-trigger)
+    lines = [l for l in raw_lines if SHARED_STATE_REL not in l]
     print(f"🔍 Git Durumu — {len(lines)} dosyada degisiklik")
     print()
 
