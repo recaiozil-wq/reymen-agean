@@ -1060,7 +1060,7 @@ FIILEN TEST EDILMIS TABLO (2026-07-04 21:00):
 
 | # | Alan | Hermes | ReYMeN | Fark |
 |---|------|--------|--------|------|
-| 1 | CLI & UI | 80+ komut | 85 function | ESIT |
+| 1 | CLI & UI | 80+ komut | 79 handler | ESIT |
 | 2 | Skills | 73 SKILL.md | 531 SKILL.md | ReYMeN onde |
 | 3 | Multi-Profile | Olgun | profiles.py + json | Hermes olgun |
 | 4 | Gateway | 28+ platform | 21 platform (71 dosya) | Hermes onde |
@@ -1069,15 +1069,15 @@ FIILEN TEST EDILMIS TABLO (2026-07-04 21:00):
 | 7 | Ekip | 3 kisi | 3 kisi | ESIT |
 | 8 | Dokumantasyon | Genis, Ingilizce | Sinirli, Turkce | Hermes onde |
 | 9 | Browser | Playwright MCP | browser_engine.py + agent | ESIT |
-| 10 | MCP | 50+ server | tanimli/katalog mevcut | Hermes onde |
-| 11 | Session | SQLite FTS5 tek | merkez_db/session.db tek | ESIT |
-| 12 | Security | Auth, backup, audit | sifreleme.py, backup, audit | ESIT |
+| 10 | MCP | 50+ server | config'de tanimli degil | Hermes onde |
+| 11 | Session | SQLite FTS5 tek | merkez_db/session.db tek (2 backup) | ESIT |
+| 12 | Security | Auth, backup, audit | sifreleme.py, backup.py var | ESIT |
 | 13 | Plugin | Plugin sistemi | 1 plugin (ornek) | ESIT |
 | 14 | DB duzeni | Tekillestirilmis | 19 core DB | Hermes onde |
 
 OZET: Hermes 4 alanda onde, ReYMeN 2 alanda onde, 8 alan esit.
 
-KAYNAK: 2026-07-04 fiilen test edilmistir.
+KAYNAK: 2026-07-04 21:00 fiilen test edilmistir.
 ═══════════════════════════════════════════════════════════
 
 77) CELISKI COZUMU — ESKI KARSILASTIRMA MADDELERI (2026-07-04) [KIRAL38] — GUNCELLENDI
