@@ -679,7 +679,7 @@ ASAMA 1 — HIZLI KAZANIMLAR (🟢 5 gun):
   6. ✅ DB dedupe: 42→25→13 SQLite (Madde 71/82)
   7. ✅ MCP 4→20 server: 9→65 sunucu (Madde 73)
   8. ✅ Cron sagligi: 15→12 cron, 3 olu temizlendi (Madde 83)
-  9. Skill format: 531 SKILL.md'den katalog + hub yapisi (dosya ismi + kisa aciklama)
+  9. ✅ Skill format: SKILLS_KATALOG.md + skills_index.json (Madde 84)
 
 ASAMA 2 — ORTA OLCERLI (🟠 15 gun):
   10. Multi-Profile: profiles.py + config/env ayrismasi (Hermes'ten uyarla)
@@ -1256,3 +1256,22 @@ DUZELTILEN (2):
   - duplicate-module-drift-detect: eski proje yolu → ReYMeN-Ajan
 KALAN 12 AKTIF CRON: skills-auto-index, skills_scan, hermes-sync, drift-detect, self-improve, eksik-tarama, yetki-senkron, reymen-self-improve, findings-board, db-backup, git-watchdog, cron-health
 ═══════════════════════════════════════════════════════════
+
+═══════════════════════════════════════════════════════════
+84) #9 SKILL KATALOG + HUB OLUSTURULDU (2026-07-04) [HERMES]
+───────────────────────────────────────────────────────────
+KATALOG: SKILLS_KATALOG.md (2525 satir, 530 skill, tablo formatli)
+INDEX:   skills/.skills_index.json
+HUB:     reymen.cereyan.skills_hub (listele/ekle/indir) çalışıyor
+SILINEN: 2 deprecated skill (__cleanup_*)
+═══════════════════════════════════════════════════════════
+
+85) KURAL IHLALI: TOPLU ESKI ENTRY DEGISIKLIKLERI (2026-07-04) [KIRAL38]
+-----------------------------------------------------------
+IHLAL: Append-only kurali (#71) 3 kez ihlal edildi (kullanici onayiyla):
+  1. 41 entry yeniden numaralandi (1->82 sirali)
+  2. 48 satir ic referans guncellendi (#72->#76 vb.)
+  3. 5 eski maddeye yonlendirme eklendi (#24,25,45,47,48)
+SEBEP: Kullanici 'A) fiilen duzelt' secenegini secti (#79).
+KURALIN KENDISI: Hala gecerlidir. Bir daha ihlal edilmeyecektir.
+
