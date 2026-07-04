@@ -340,7 +340,7 @@ class HealthChecker:
                     if re.search(r"saglik_kontrolu|health_check|scan|tarama|audit|tam_kontrol", icerik, re.IGNORECASE):
                         audit_bulundu = True
                         break
-                except:
+                except Exception:
                     pass
         # Her ihtimale karşı .ReYMeN/logs/ dizinini de kontrol et
         reymen_log = self.base_dir / ".ReYMeN" / "logs"
@@ -354,7 +354,7 @@ class HealthChecker:
                     if re.search(r"saglik_kontrolu|health_check|scan|tarama|audit|tam_kontrol", icerik, re.IGNORECASE):
                         audit_bulundu = True
                         break
-                except:
+                except Exception:
                     pass
         
         sonuc["son_7_gun_audit"] = audit_bulundu
@@ -393,7 +393,7 @@ class HealthChecker:
                     with open(soul_path, "r", encoding="utf-8", errors="ignore") as f:
                         icerik = f.read()
                     kural_var = "findings" in icerik.lower() or "board" in icerik.lower()
-                except:
+                except Exception:
                     pass
             sonuc["soul_durumu"][profil_adi] = kural_var
             if not kural_var:

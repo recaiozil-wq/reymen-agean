@@ -5,22 +5,21 @@ WORKDIR /app
 # Sistem bağımlılıkları
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
-    ffmpeg \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Python bağımlılıkları
-COPY pyproject.toml .
-RUN pip install --no-cache-dir .
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Kaynak kod
+# Proje dosyaları
 COPY . .
 
-# Hassas dosyaları temizle (kullanıcı kendi .env'ini oluştursun)
-RUN rm -f .env token.txt 2>/dev/null; true
+# Hatchling ile kurulum
+RUN pip install --no-cache-dir -e .
 
-# Varsayılan ortam değişkenleri
-ENV HERMES_HOME=/app
-ENV PYTHONPATH=/app/src
+# Port
+EXPOSE 8080
 
-# Entry point
-CMD ["python", "-m", "reymen"]
+# Varsayılan: web UI
+CMD ["python", "-m", "src.reymen.web_ui"]

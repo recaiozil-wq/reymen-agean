@@ -44,7 +44,7 @@ def kontrol():
                 rapor.append(f"[WATCHDOG] kiral38 PID {pid} olmus, lock temizleniyor")
                 lock.unlink(missing_ok=True)
                 pidf.unlink(missing_ok=True)
-        except:
+        except Exception:
             logger.warning("[fix_01_sessiz_except] Exception")
 
     # 3. state.db boyut izle

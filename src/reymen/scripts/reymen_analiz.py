@@ -47,7 +47,7 @@ def asama1_profil(kok):
     for f in py_files(kok):
         rel = f.relative_to(kok)
         try: n = len(f.read_text(encoding="utf-8",errors="ignore").splitlines())
-        except: n=0
+        except Exception: n=0
         buyuk.append((n,str(rel)))
         if "test" in f.name.lower() or (len(rel.parts)>1 and "test" in rel.parts[0].lower()):
             toplam_test+=1
@@ -84,7 +84,7 @@ def asama1_profil(kok):
     try:
         son_commit = subprocess.check_output(["git","-C",str(kok),"log","--oneline","-1"],stderr=subprocess.DEVNULL).decode().strip()
         ok(f"Son commit: {son_commit}")
-    except: warn("Git repo bulunamadı veya commit yok.")
+    except Exception: warn("Git repo bulunamadı veya commit yok.")
 
     sure=time.time()-t0
     ok(f"Aşama 1 tamamlandı ({sure:.1f}s)")
@@ -179,7 +179,7 @@ def asama3_kalite(kok):
     for f in py_files(kok):
         if "test" in f.name.lower(): continue
         try: src=f.read_text(encoding="utf-8",errors="ignore"); tree=ast.parse(src)
-        except: continue
+        except Exception: continue
         for node in ast.walk(tree):
             if isinstance(node,ast.ExceptHandler):
                 body=node.body

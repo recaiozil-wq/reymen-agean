@@ -51,7 +51,7 @@ for dosya in md_dosyalari:
     meta_adi = f"{kategori}/{dosya_adi}" if kategori else dosya_adi
     try:
         guncel_hash = dosya_hash(str(dosya))
-    except:
+    except Exception:
         continue
     eski_hash = meta_map.get(meta_adi)
     if eski_hash and eski_hash != guncel_hash:
@@ -68,7 +68,7 @@ for i, (meta_adi, dosya_yolu, new_hash) in enumerate(guncellenecek):
     try:
         with open(dosya_yolu, "r", encoding="utf-8", errors="replace") as f:
             icerik = f.read()
-    except:
+    except Exception:
         continue
     
     baslik = ""

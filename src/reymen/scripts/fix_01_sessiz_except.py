@@ -122,7 +122,7 @@ def main():
 
     for f in py_files:
         try: src = f.read_text(encoding="utf-8", errors="ignore")
-        except: continue
+        except Exception: continue
 
         # Sessiz except var mı?
         yeni_src, sayi = except_duzelt(src)

@@ -38,7 +38,7 @@ class OgrenmeDeposu:
             with open(self._dosya, "a", encoding="utf-8") as f:
                 f.write(json.dumps(o.to_dict(), ensure_ascii=False) + "\n")
             self._temizle(); return True
-        except: return False
+        except Exception: return False
     def hepsini_getir(self, alan: str = None, limit: int = 50) -> list:
         if not self._dosya.exists(): return []
         sonuc = []

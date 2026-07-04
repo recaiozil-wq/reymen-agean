@@ -352,7 +352,7 @@ def cmd_doctor(gonder, cid, arg=""):
         import os as _os
         toplam = sum(1 for _ in _os.walk(_PROJE_KOK) for _ in _[2] if _.endswith('.py') and '__pycache__' not in _[0])
         satirlar.append(f"Python dosyasi: ~{toplam}")
-    except:
+    except Exception:
         logger.warning("[fix_01_sessiz_except] Exception")
     gonder(cid, "\n".join(satirlar))
 
