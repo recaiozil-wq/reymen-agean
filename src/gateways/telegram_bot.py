@@ -652,7 +652,8 @@ class BotProcess:
             sonuc = " ".join(_re.findall(r'<a[^>]*class="result__a"[^>]*>(.*?)</a>', r.text)[:5])
             if sonuc:
                 return sonuc
-        except:
+        except Exception as e:
+            log.warning(f"[telegram_bot] Web arama hatasi: {e}")
             pass
 
         return "(web arama su an kullanilamiyor)"
@@ -1026,7 +1027,8 @@ def _cmd_run(msg: dict, hedef: str):
                 try:
                     from reymen.sistem.ortak_komut import reasoning_loop as _rl, guncelle as _og
                     _rl(hata_listesi[0], str(_og())[:2000], "telegram_bot", [])
-                except Exception:
+                except Exception as e:
+                    log.warning(f"[telegram_bot] Hafiza kaydi hatasi: {e}")
                     pass
             else:
                 sonuc = sonuc_listesi[0] or "(tamamlandi, cikti yok)"

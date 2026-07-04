@@ -385,7 +385,8 @@ class DiscordBotProcess:
             sonuc = " ".join(_re.findall(r'<a[^>]*class="result__a"[^>]*>(.*?)</a>', r.text)[:5])
             if sonuc:
                 return sonuc
-        except Exception:
+        except Exception as e:
+            log.warning(f"[discord_bot] Web arama hatasi: {e}")
             pass
 
         return "(web arama su an kullanilamiyor)"
@@ -416,6 +417,7 @@ class DiscordBotProcess:
                         if cozum:
                             return cozum[:2000]
             except Exception as _e:
+                log.warning(f"[discord_bot] Cozum bulma hatasi: {_e}")
                 pass
 
         # 2. Dogrudan Beyin (30sn timeout ile)
@@ -498,7 +500,8 @@ class DiscordBotProcess:
                 if ONCE_HAFIZA_KAYDET is not None:
                     try:
                         ONCE_HAFIZA_KAYDET(mesaj, "discord_sohbet", sonuc["cevap"], basari=True)
-                    except Exception:
+                    except Exception as e:
+                        log.warning(f"[discord_bot] Hafiza kaydi hatasi: {e}")
                         pass
                 if session_id:
                     self.konusma_ekle(session_id, mesaj, sonuc["cevap"])
@@ -602,7 +605,8 @@ class DiscordBotProcess:
                 def _gonder_async(cid, metin):
                     asyncio.create_task(channel.send(metin[:2000]))
                 return ortak_komut_isle(text, _gonder_async, channel.id)
-            except Exception:
+            except Exception as e:
+                log.warning(f"[discord_bot] Mesaj gonderme hatasi: {e}")
                 pass
 
         return False

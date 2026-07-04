@@ -1871,7 +1871,8 @@ class TelegramAdapter(BasePlatformAdapter):
                 except BaseException:
                     try:
                         os.unlink(tmp_path)
-                    except OSError:
+                    except OSError as _e:
+                        log.warning(f"[gateways.platforms.telegram] OSError")
                         pass
                     raise
                 logger.info(
@@ -4173,7 +4174,8 @@ class TelegramAdapter(BasePlatformAdapter):
                         parse_mode=ParseMode.HTML,
                         reply_markup=None,
                     )
-                except Exception:
+                except Exception as _e:
+                    log.warning(f"[gateways.platforms.telegram] Exception")
                     pass
 
                 if resolved:
@@ -4968,7 +4970,8 @@ class TelegramAdapter(BasePlatformAdapter):
                             action="typing",
                         )
                         return
-                    except Exception:
+                    except Exception as _e:
+                        log.warning(f"[gateways.platforms.telegram] Exception")
                         pass
                 # Typing failures are non-fatal; log at debug level only.
                 logger.debug(

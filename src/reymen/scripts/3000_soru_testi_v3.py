@@ -184,7 +184,8 @@ def main():
             baslangic_idx = cp.get("islenen", 0)
             if baslangic_idx > 0:
                 print(f"  Checkpoint: {baslangic_idx} soru onceden islenmis", flush=True)
-        except:
+        except Exception:
+            print("[UYARI] Checkpoint okunamadi, sifirdan baslaniyor")
             pass
     
     sonuclar = []

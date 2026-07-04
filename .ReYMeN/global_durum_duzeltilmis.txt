@@ -1,0 +1,164 @@
+╔══════════════════════════════════════════════════════════════════╗
+║     REYMEN-AJAN — DÜZELTİLMİŞ GLOBAL DURUM RAPORU              ║
+║     Hazırlayan: HERMES (bağımsız doğrulama)                    ║
+║     Tarih: 2026-07-04 ~07:45                                    ║
+╚══════════════════════════════════════════════════════════════════╝
+
+═══════════════════════════════════════════════════════════════════
+A — GERÇEK DURUM (19 MADDENİN HER BİRİ İÇİN KESİN KANIT)
+═══════════════════════════════════════════════════════════════════
+
+ ✅  #1  allowed_chats (3 profil)
+      Kanıt: 3 profilde de allowed_chats=6328823909, whitelist mode.
+      Dosya: ~/hermes/profiles/{default,reymen,kiral38}/config.yaml
+
+ ✅  #2  approvals.mode ayarı
+      Kanıt: 3 profilde de mode: gateway (gevşetilmedi).
+      Dosya: ~/hermes/profiles/{*}/config.yaml → approvals.mode
+
+ ✅  #3  token.txt güvenli konum
+      Kanıt: 0 adet token.txt (node_modules/venv hariç).
+      Tüm token'lar .env dosyalarında, hex-byte encoding ile yazılı.
+
+ ✅  #4  Gateway Scheduled Task
+      Kanıt: schtasks /query /fo CSV /v çıktısında "hermes" geçiyor.
+      (Ancak hangi profilde olduğu doğrulanmadı)
+
+ ✅  #5  bot_supervisor.py
+      Kanıt: Proje altında 2 bot_supervisor.py mevcut.
+
+ ✅  #6  Self-improvement K1-K6 kuralları
+      Kanıt: SKILL.md'de K1,K2,K3,K4,K5,K6 satırları mevcut.
+      K5+K6 bugün 06:20'de eklendi (K4 ihlali sonrası).
+      K2 backup kuralı güçlendirildi (otomatik cp komutu eklendi).
+
+ ❌  #7  Telegram bildirim
+      Kanıt: Cron job deliver=local, Telegram'a bildirim GİTMİYOR.
+      Kullanıcı self-improvement sonuçlarını görmüyor.
+      Çözüm: Cron deliver=telegram:6328823909 olarak fixlenmeli (2dk).
+
+ ✅  #8  except:pass = 0
+      Kanıt: src/ altında 0 kaldı. 21 dosyada 32 fix uygulandı.
+      Önce: 78 (self_improve.db snapshot). Sonra: 0.
+
+ ✅  #9  Pre-commit hook (Ruff E722)
+      Kanıt: .pre-commit-config.yaml mevcut.
+      except:pass yasaklayan Ruff E722 kuralı aktif.
+
+ ⚠️  #10 DB backup script var, cron yok
+      Kanıt: db_backup script'i mevcut ama cron job olarak
+      schedule edilmemiş. Haftalık otomatik backup yok.
+
+ ❌  #11 quarantine klasörü
+      Kanıt: quarantine/ YOK. Kopya DB'lerin taşınacağı yer yok.
+      Çözüm: quarantine/ klasörü oluştur (1dk).
+
+ ❌  #12 durum.json filelock
+      Kanıt: durum.py'de 'filelock' geçmiyor. 3 bot + 2 cron
+      aynı dosyaya yazıyor — çakışma riski var.
+      Çözüm: filelock ekle (5dk).
+
+ ❌  #13 self_update.py em dash
+      Kanıt: self_update.py'de hala U+2014 em dash karakteri var.
+      Docstring içinde "—" karakteri ast.parse'i kırıyor.
+      Çözüm: em dash → normal tire (5dk).
+
+ ❌  #14 3 profil config aynı değil
+      Kanıt: default=12145B, reymen=kiral38=12715B (570 byte fark).
+      reymen=kiral38 ✅ birebir aynı.
+      default FARKLI ⚠️ (muhtemelen CRLF satır sonu farkından).
+      Çözüm: default config'i reymen ile sync (5dk).
+
+ ✅  #15 findings_board.db SQLite WAL
+      Kanıt: DB var (28KB), journal_mode=wal, 31 kayıt.
+      Concurrent write test: 3/3 başarılı, 0 lock hatası.
+      CHECK constraint'leri çalışıyor.
+
+ ⚠️  #16 Kiral38 bulguları
+      Kanıt: kiral38 adına 8 kayıt var (concurrent test arttırdı).
+      Ama Kiral38'in kendi eklediği 1 kayıt ("7 kesit" gruplu).
+      Gerçek: 7 ayrı bulgu olmalı → 1 gruplanmış = ⚠️
+      Çözüm: 7 bulguyu ayrıştır (5dk).
+
+ ❌  #17 Katman 1 — audit_tamamla()
+      Kanıt: Hiçbir .py dosyasında 'audit_tamamla' YOK.
+      health_check.py'ye check_findings_board_health eklendi ama
+      audit_tamamla fonksiyonu henüz yazılmadı.
+      Çözüm: audit_tamamla() yaz (10dk).
+
+ ⚠️  #18 Katman 2 — check_findings_board_health() + cron
+      Kanıt: Fonksiyon health_check.py'de VAR ✅.
+      Cron job oluşturuldu (findings-board-health-check, Çarşamba
+      09:00). Ancak Çalıştığı test EDİLMEDİ ⚠️.
+      Çözüm: Cron job'u test et (5dk).
+
+ ✅  #19 07:22 self-improvement patch K1-K4 uyumu
+      Kanıt: Sadece SKILL.md + references/*.md değiştirildi (K4 uygun).
+      K2 backup atlanmıştı → sonra düzeltildi (Backup Automation eklendi).
+
+═══════════════════════════════════════════════════════════════════
+ÖZET: ✅ 11/19 tam  ⚠️ 2/19 kısmi  ❌ 6/19 eksik
+═══════════════════════════════════════════════════════════════════
+
+═══════════════════════════════════════════════════════════════════
+B — GERÇEK PUAN
+═══════════════════════════════════════════════════════════════════
+
+  ReYMeN iddiası: 62 → 98
+  GERÇEK PUAN: ~72/100 (ağırlıklı: audit_tamamla + filelock kırıyor)
+
+  Kırılan büyük kalemler:
+    #7 Telegram bildirim:     -100  (kullanıcı sonuç görmüyor)
+    #11 quarantine:           -50   (küçük iş)
+    #12 filelock:             -100  (eşzamanlı yazma riski)
+    #13 em dash:              -40   (düşük etki)
+    #14 config farkı:         -35   (düşük etki)
+    #17 audit_tamamla():      -100  (BÜYÜK — katman 1 eksik)
+
+═══════════════════════════════════════════════════════════════════
+C — KALAN İŞ (GERÇEK, ÇELİŞKİSİZ)
+═══════════════════════════════════════════════════════════════════
+
+  #  Görev                         Süre   Öncelik
+  ──  ────                          ────   ───────
+  17  audit_tamamla() yaz           10dk   1-KRİTİK
+  12  durum.py filelock ekle         5dk   1-KRİTİK
+  7   Telegram bildirim cron fix     2dk   1-KRİTİK
+  18  check_findings cron test       5dk   1-KRİTİK
+  16  Kiral38 7 bulguyu ayır         5dk   1-KRİTİK
+  14  default config sync            5dk   2-ORTA
+  10  DB backup cron job'u kur      15dk   2-ORTA
+  13  em dash temizle                5dk   3-DÜŞÜK
+  11  quarantine oluştur             1dk   3-DÜŞÜK
+  ──  ────                         ────   ───────
+      TOPLAM                       53dk   Bugün biter ✅
+
+═══════════════════════════════════════════════════════════════════
+D — PROJE DURUM ÖZETİ
+═══════════════════════════════════════════════════════════════════
+
+  Güvenlik:     🟡 ORTA
+                ✅ allowed_chats whitelist
+                ✅ approvals.mode gateway
+                ✅ token.txt ortada yok
+                ❌ filelock (durum.json eşzamanlı yazma korumasız)
+                ❌ audit_tamamla() yok
+
+  Kararlılık:  🟡 ORTA
+                ✅ except:pass = 0
+                ✅ findings_board.db WAL + concurrent test
+                ✅ K1-K6 kuralları
+                ❌ DB backup cron yok
+                ❌ Telegram bildirim gitmiyor
+
+  Kod kalitesi: 🔴 DÜŞÜK
+                ✅ except:pass temiz
+                ❌ Test coverage %1.5
+                ❌ Kod notu F (0.55)
+                ❌ cli.py 15.762 satır (bölünmedi)
+
+  Satışa hazır: ❌ HAYIR
+                1. Katman 1 (audit_tamamla) eksik
+                2. Test coverage %1.5 (en az %30 gerek)
+                3. Kod notu F — yatırımcı için risk işareti
+                En erken tahmin: 1-2 hafta (test yazma kampanyası ile)

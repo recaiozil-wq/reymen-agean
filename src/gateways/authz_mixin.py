@@ -287,7 +287,8 @@ class GatewayAuthorizationMixin:
                         platform_env_map[source.platform] = entry.allowed_users_env
                     if entry.allow_all_env:
                         platform_allow_all_map[source.platform] = entry.allow_all_env
-            except Exception:
+            except Exception as e:
+                log.warning(f"[authz_mixin] Yetki kurali okunamadi: {e}")
                 pass
 
         # Per-platform allow-all flag (e.g., DISCORD_ALLOW_ALL_USERS=true)

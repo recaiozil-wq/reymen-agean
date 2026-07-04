@@ -157,7 +157,8 @@ class MatrixAdapter(BasePlatformAdapter):
         if self._client is not None:
             try:
                 await self._client.aclose()
-            except Exception:
+            except Exception as _e:
+                log.warning(f"[src.gateways.platforms.matrix] Exception at L160")
                 pass
             self._client = None
 

@@ -21,7 +21,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from src.reymen.hafiza.vektor_bellek import VektorBellek, vektor_bellek_al
+from .vektor_bellek import VektorBellek, vektor_bellek_al
 
 logger = logging.getLogger(__name__)
 

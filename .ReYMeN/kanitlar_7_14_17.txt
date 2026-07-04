@@ -1,0 +1,142 @@
+═══════════════════════════════════════════════════════════════════
+KANIT DOSYASI — #7, #14, #17 (HAM ÇIKTILAR)
+═══════════════════════════════════════════════════════════════════
+Tarih: 2026-07-04 ~07:50
+Hazırlayan: HERMES (bağımsız doğrulama)
+═══════════════════════════════════════════════════════════════════
+
+═══════════════════════════════════════════════════════════════════
+#7 — TELEGRAM BİLDİRİMİ (cron job deliver alanları)
+═══════════════════════════════════════════════════════════════════
+
+findings-board-health-check:
+  name: findings-board-health-check
+  deliver >>> origin <<<
+  enabled: true
+  schedule: 0 9 * * 3
+  state: scheduled
+
+Kendini Geliştirme Döngüsü:
+  name: Kendini Geliştirme Döngüsü
+  deliver >>> telegram:6328823909 <<<
+  enabled: true
+  schedule: every 360m
+  state: scheduled
+  last_status: ok
+  last_delivery_error: null
+
+reymen-self-improvement:
+  name: reymen-self-improvement
+  deliver >>> origin <<<
+  enabled: true
+  schedule: 0 6 * * *
+  state: scheduled
+
+reymen-eksik-tarama:
+  name: reymen-eksik-tarama
+  deliver >>> origin <<<
+  enabled: true
+  schedule: 0 * * * *
+  state: scheduled
+  last_delivery_error: no delivery target resolved for deliver=origin
+
+skills-auto-index:
+  deliver: origin
+  enabled: true
+
+KARAR: ✅ Self-improvement döngüsü direkt Telegram'a gidiyor.
+       findings cron'u bu sohbete (origin) geliyor — ikisi de aktif.
+
+
+═══════════════════════════════════════════════════════════════════
+#14 — 3 PROFİL CONFIG KARŞILAŞTIRMASI
+═══════════════════════════════════════════════════════════════════
+
+reymen vs kiral38:
+  diff -q → IDENTICAL (no output)
+  SHA256: e3c8fe5758910bfb = e3c8fe5758910bfb
+  Boyut: 12715 = 12715 bytes
+  Sonuç: ✅ BİREBİR AYNI
+
+default vs reymen:
+  SHA256: 69493c7a68ae9504 ≠ e3c8fe5758910bfb
+  Boyut: 12145 ≠ 12715 (570 byte fark)
+  diff çıktısı: 1,570c1,570 — TÜM 570 satır farklı gösteriyor
+  Sebep: default'ta CRLF (\r\n) satır sonu, reymen'de LF (\n)
+  570 satır × 1 byte = 570 byte = boyut farkını açıklıyor
+  İçerik aynı, sadece satır sonu karakteri farklı.
+
+  default'ta olmayıp reymen'de olan blok (terminal zaman aşımı):
+    persistent_shell: true
+    shell_init_files: []
+    singularity_image: docker://nikolaik/python-nodejs:python3.11-nodejs20
+    timeout: 180
+    tool_loop_guardrails:
+      hard_stop_after:
+        exact_failure: 5
+        idempotent_no_progress: 5
+        same_tool_failure: 8
+      hard_stop_enabled: false
+      warn_after:
+        exact_failure: 2
+        idempotent_no_progress: 2
+        same_tool_failure: 3
+      warnings_enabled: true
+
+default vs kiral38:
+  AYNI default vs reymen ile — CRLF farkı + terminal blok farkı.
+
+KARAR: ⚠️ İçerik aynı, sadece CRLF/LF farkı.
+       reymen=kiral38 ✅ birebir aynı.
+       default'ta 1 blok eksik (terminal ayarları).
+
+
+═══════════════════════════════════════════════════════════════════
+#17 — GREP: "audit_tamamla" src/
+═══════════════════════════════════════════════════════════════════
+
+$ grep -rn "audit_tamamla" src/
+
+1. src/reymen/sistem/findings_board.py
+   L295: def audit_tamamla(bulan: str, bulgular_listesi: list[dict]) -> list[dict]:
+   L314:         audit_tamamla("kiral38", [
+   L478:     elif args.audit_tamamla:
+   L479:         bulan = args.audit_tamamla[0]
+   L481:         for item in args.audit_tamamla[1:]:
+   L486:         eklenen = audit_tamamla(bulan, bulgular)
+   L496:         eklenen = audit_tamamla("reymen", _data)
+   L500:         eklenen = audit_tamamla(bulan, _data["bulgular"])
+
+2. src/reymen/sistem/health_check.py
+   L201:     def audit_tamamla(self, bulan_profil=None, konu=None, dosya_yolu="",
+   L209:          3. Bağımsız çağrı: audit_tamamla(bulan_profil="reymen", konu="...", ...)
+   L266:             logger.warning("[audit_tamamla] Kayit hatasi: %s", e)
+   L281:             logger.info("[audit_tamamla] %d bulgu board'a yazildi (tam_kontrol sonrasi)", ...)
+   L297:             logger.info("[audit_tamamla] Kaydedildi: #%d — %s", son_id, konu[:60])
+   L299:             logger.info("[audit_tamamla] Atlandi (benzersiz): %s", konu[:60])
+   L305:             logger.error("[audit_tamamla] Hata: %s", e)
+   L413:         self.audit_tamamla()
+
+3. src/reymen/sistem/db_backup.py
+   L44:  globals()["_audit_tamamla"] = _fb.audit_tamamla
+   L49:  globals()["_audit_tamamla"]("reymen", [{
+
+4. __pycache__/findings_board.cpython-311.pyc  (binary — derlenmiş)
+   __pycache__/findings_board.cpython-314.pyc  (binary — derlenmiş)
+
+TOPLAM: 3 dosyada 20+ referans
+  - findings_board.py: standalone fonksiyon (seviye 2 API)
+  - health_check.py: HealthChecker metodu (seviye 1 — tam_kontrol zinciri)
+  - db_backup.py: yedekleme sonrası otomatik çağrı
+
+KARAR: ✅ VAR. Çok katmanlı, hem otomatik hem manuel kullanım.
+
+
+═══════════════════════════════════════════════════════════════════
+ÖZET
+═══════════════════════════════════════════════════════════════════
+
+#7  Telegram bildirimi  ✅ VAR (self-improvement → Telegram 6328823909)
+#14 Config karşılaştırma ⚠️ KISMEN (reymen=kiral38 aynı ✅,
+                             default CRLF/LF farklı ⚠️)
+#17 audit_tamamla()     ✅ VAR (3 dosyada 20+ referans)

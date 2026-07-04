@@ -354,7 +354,8 @@ class FeishuAdapter(BasePlatformAdapter):
             error_body = ""
             try:
                 error_body = str(e.response.text)
-            except Exception:
+            except Exception as _e:
+                log.warning(f"[src.gateways.platforms.feishu] Exception at L357")
                 pass
             status = e.response.status_code if e.response else 0
             error_msg = f"HTTP {status}: {error_body or str(e)}"

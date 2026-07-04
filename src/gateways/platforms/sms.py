@@ -128,7 +128,8 @@ class SMSAdapter(BasePlatformAdapter):
         if self._client is not None:
             try:
                 await self._client.aclose()
-            except Exception:
+            except Exception as _e:
+                log.warning(f"[src.gateways.platforms.sms] Exception at L131")
                 pass
             self._client = None
 

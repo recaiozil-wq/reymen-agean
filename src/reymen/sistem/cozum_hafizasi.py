@@ -153,7 +153,8 @@ class CozumHafizasi:
                         (fts_sorgu, limit * 3),
                     ).fetchall()
                     ham_sonuc = [dict(r) for r in rows]
-            except sqlite3.OperationalError:
+            except sqlite3.OperationalError as e:
+                log.warning(f"[cozum_hafizasi] FTS5 sorgu hatasi: {e}")
                 pass
 
             if not ham_sonuc:
@@ -250,7 +251,8 @@ class CozumHafizasi:
                        VALUES (?, ?, ?, ?, ?)""",
                     (kayit_id, problem, cozum, root_cause, kategori),
                 )
-            except sqlite3.OperationalError:
+            except sqlite3.OperationalError as e:
+                log.warning(f"[cozum_hafizasi] DB yazma hatasi: {e}")
                 pass
             conn.commit()
             logger.info("[CozumHafizasi] Kaydedildi: #%d — %s", kayit_id, problem[:60])
@@ -415,7 +417,8 @@ class CozumHafizasi:
             cur = conn.execute("DELETE FROM cozumler WHERE id=?", (kayit_id,))
             try:
                 conn.execute("DELETE FROM cozumler_fts WHERE rowid=?", (kayit_id,))
-            except sqlite3.OperationalError:
+            except sqlite3.OperationalError as e:
+                log.warning(f"[cozum_hafizasi] DB silme hatasi: {e}")
                 pass
             conn.commit()
             return cur.rowcount > 0

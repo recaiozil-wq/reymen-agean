@@ -16,6 +16,12 @@ logger = logging.getLogger(__name__)
 KOK = Path(__file__).parent.resolve()  # proje koku
 sys.path.insert(0, str(KOK))
 
+# Kilit mekanizmasi icin durum_paylas
+import importlib
+_dp = importlib.import_module("reymen.sistem.durum_paylas")
+_kilitle = _dp._kilitle
+_kilidi_ac = _dp._kilidi_ac
+
 def _py_dosyalari_tara():
     """Projedeki .py dosyalarini tara, metrikleri topla."""
     toplam_dosya = 0
@@ -121,9 +127,14 @@ def main():
         d["son_guncelleme"] = time.strftime("%Y-%m-%d %H:%M")
         d["guncelleyen_bot"] = "ReYMeN_Cron_2100"
 
-        # 6. Yaz
-        with open(durum_yol, "w", encoding="utf-8") as f:
-            json.dump(d, f, indent=2, ensure_ascii=False)
+        # 6. Yaz (kilitli)
+        kilitli = _kilitle()
+        try:
+            with open(durum_yol, "w", encoding="utf-8") as f:
+                json.dump(d, f, indent=2, ensure_ascii=False)
+        finally:
+            if kilitli:
+                _kilidi_ac()
 
         print(f"[OK] durum.json guncellendi — {time.strftime('%Y-%m-%d %H:%M')}")
         print(f"  Dosya: {kod['toplam_dosya']}, Satir: {kod['toplam_satir']}")

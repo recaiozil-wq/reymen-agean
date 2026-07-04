@@ -224,7 +224,8 @@ class EmailAdapter(BasePlatformAdapter):
             except Exception:
                 try:
                     self._smtp.close()
-                except Exception:
+                except Exception as _e:
+                    log.warning(f"[gateways.platforms.email] Exception")
                     pass
             self._smtp = None
 
@@ -257,7 +258,8 @@ class EmailAdapter(BasePlatformAdapter):
         if self._imap is not None:
             try:
                 self._imap.logout()
-            except Exception:
+            except Exception as _e:
+                log.warning(f"[gateways.platforms.email] Exception")
                 pass
             self._imap = None
 
@@ -312,7 +314,8 @@ class EmailAdapter(BasePlatformAdapter):
                         parsed = parsedate_to_datetime(date_str)
                         if parsed:
                             timestamp = parsed
-                    except Exception:
+                    except Exception as _e:
+                        log.warning(f"[gateways.platforms.email] Exception")
                         pass
 
                 # Mesaj icerigi
@@ -424,7 +427,8 @@ class EmailAdapter(BasePlatformAdapter):
             self._poll_task.cancel()
             try:
                 await self._poll_task
-            except asyncio.CancelledError:
+            except asyncio.CancelledError as _e:
+                log.warning(f"[gateways.platforms.email] CancelledError")
                 pass
             self._poll_task = None
 

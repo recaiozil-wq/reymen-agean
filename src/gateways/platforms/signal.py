@@ -152,7 +152,8 @@ class SignalAdapter(BasePlatformAdapter):
         if self._client is not None:
             try:
                 await self._client.aclose()
-            except Exception:
+            except Exception as _e:
+                log.warning(f"[src.gateways.platforms.signal] Exception at L155")
                 pass
             self._client = None
 

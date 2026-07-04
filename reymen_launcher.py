@@ -875,24 +875,8 @@ def main():
             session_id=session_id,
         )
 
-    # ── Kurulum kontrolu (her REPL baslangicinda) ──────────────────────
-    try:
-        from reymen.sistem.setup_wizard import kurulum_tamamlandi_mi
-        if not kurulum_tamamlandi_mi(_KOK):
-            print(f"\n  {_y('!'*50)}")
-            print(f"  {_y('!')}  ReYMeN henuz kurulmamis!")
-            print(f"  {_y('!')}  Kurulum icin: {_c('reymen setup')}")
-            print(f"  {_y('!')}  Otomatik kurulum icin: {_c('reymen setup --fix')}")
-            print(f"  {_y('!'*50)}")
-            print()
-            cevap = input(f"  Kurulum sihirbazini baslat? [Y/n] ").strip().lower()
-            if not cevap or cevap in ("y", "yes", "e", "evet"):
-                _cmd_setup(type("Args", (), {"fix": True})())
-            else:
-                print(f"  {_d('Devam ediliyor... (reymen setup ile sonra kurabilirsiniz)')}")
-            print()
-    except Exception:
-        pass
+    # ── Kurulum kontrolu (PASIF: launcher direkt REPL baslatir) ────────
+    # Setup icin: reymen setup
 
     # Varsayılan: REPL başlat
     session_id = _uid.uuid4().hex[:8]

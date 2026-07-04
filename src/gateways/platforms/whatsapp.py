@@ -552,7 +552,8 @@ class WhatsAppClient:
             error_body = ""
             try:
                 error_body = resp.text
-            except Exception:
+            except Exception as _e:
+                log.warning(f"[src.gateways.platforms.whatsapp] Exception at L555")
                 pass
             logger.error(
                 "[WhatsApp] API hatasi (%s): %s — %s",

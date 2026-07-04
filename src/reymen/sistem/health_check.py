@@ -198,12 +198,219 @@ class HealthChecker:
         self.rapor["kontroller"]["dosya_sistemi"] = sonuc
         return sonuc
 
+    def audit_tamamla(self, bulan_profil=None, konu=None, dosya_yolu="",
+                      onem_derecesi="orta", aciklama=""):
+        """
+        Katman 1 — Denetim sonucunu bulgu panosuna OTOMATİK kaydeder.
+        
+        Her tam_kontrol() çalıştığında bu fonksiyon çağrılır:
+          1. HealthChecker bulgularını (self.sorunlar) board'a yazar
+          2. Eğer hiç sorun yoksa "Temiz rapor" kaydı düşer
+          3. Bağımsız çağrı: audit_tamamla(bulan_profil="reymen", konu="...", ...)
+        
+        Parametreler:
+            bulan_profil: "reymen"/"kiral38"/"pasa_38"/"default"
+            konu: Bulgu başlığı
+            dosya_yolu: İlgili dosya (opsiyonel)
+            onem_derecesi: "kritik"/"orta"/"dusuk"
+            aciklama: Açıklama metni
+        Returns:
+            {"basarili": bool, "id": int|None, "hata": str|None}
+        """
+        import datetime, sqlite3, logging
+        logger = logging.getLogger(__name__)
+        
+        # Board yolunu bul
+        board_path = self.base_dir / "shared_state" / "findings_board.db"
+        
+        # DB yoksa oluştur
+        board_path.parent.mkdir(parents=True, exist_ok=True)
+        conn = sqlite3.connect(str(board_path))
+        cur = conn.cursor()
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS findings (
+                id              INTEGER PRIMARY KEY AUTOINCREMENT,
+                bulan_profil    TEXT NOT NULL,
+                tarih           TEXT NOT NULL,
+                konu            TEXT NOT NULL,
+                dosya_yolu      TEXT DEFAULT '',
+                onem_derecesi   TEXT NOT NULL CHECK(onem_derecesi IN ('kritik','orta','dusuk')),
+                durum           TEXT NOT NULL DEFAULT 'yeni'
+                                CHECK(durum IN ('yeni','inceleniyor','duzeltildi','reddedildi','beklemede')),
+                aciklama        TEXT DEFAULT '',
+                duzelten_profil TEXT DEFAULT '',
+                dogrulayan_profil TEXT DEFAULT '',
+                guncelleme_tarihi TEXT DEFAULT '',
+                UNIQUE(konu, bulan_profil)
+            )
+        """)
+        
+        now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+        profil = bulan_profil or "reymen"
+        
+        # Eğer spesifik konu verilmemişse, self.sorunlar'ı board'a yaz
+        if konu is None:
+            yazilan = 0
+            for sorun in self.sorunlar:
+                try:
+                    baslik = "[{}] {}".format(sorun["alan"], sorun["mesaj"][:80])
+                    cur.execute("""
+                        INSERT OR IGNORE INTO findings
+                        (bulan_profil, tarih, konu, dosya_yolu, onem_derecesi, durum, aciklama)
+                        VALUES (?, ?, ?, ?, ?, 'yeni', ?)
+                    """, (profil, now, baslik, dosya_yolu,
+                          sorun["seviye"], sorun["mesaj"]))
+                    if cur.rowcount > 0:
+                        yazilan += 1
+                except Exception as e:
+                    logger.warning("[audit_tamamla] Kayit hatasi: %s", e)
+            
+            if yazilan == 0 and not self.sorunlar:
+                # Hiç sorun yok — "temiz" kaydı
+                cur.execute("""
+                    INSERT OR IGNORE INTO findings
+                    (bulan_profil, tarih, konu, dosya_yolu, onem_derecesi, durum, aciklama)
+                    VALUES (?, ?, ?, ?, 'dusuk', 'yeni', ?)
+                """, (profil, now, "Saglik kontrolu: Temiz rapor", dosya_yolu,
+                      "{} kontrollerin hicbirinde sorun bulunamadi.".format(now)))
+                yazilan = 1 if cur.rowcount > 0 else 0
+            
+            conn.commit()
+            son_id = cur.lastrowid
+            conn.close()
+            logger.info("[audit_tamamla] %d bulgu board'a yazildi (tam_kontrol sonrasi)", yazilan)
+            return {"basarili": True, "id": son_id, "yazilan": yazilan, "hata": None}
+        
+        # Spesifik kayıt
+        try:
+            cur.execute("""
+                INSERT OR IGNORE INTO findings
+                (bulan_profil, tarih, konu, dosya_yolu, onem_derecesi, durum, aciklama)
+                VALUES (?, ?, ?, ?, ?, 'yeni', ?)
+            """, (profil, now, konu, dosya_yolu, onem_derecesi, aciklama))
+            conn.commit()
+            son_id = cur.lastrowid
+            yazildi = cur.rowcount > 0
+            conn.close()
+            
+            if yazildi:
+                logger.info("[audit_tamamla] Kaydedildi: #%d — %s", son_id, konu[:60])
+            else:
+                logger.info("[audit_tamamla] Atlandi (benzersiz): %s", konu[:60])
+            
+            return {"basarili": True, "id": son_id, "yazilan": 1 if yazildi else 0, "yeni_mi": yazildi, "hata": None}
+        
+        except Exception as e:
+            conn.close()
+            logger.error("[audit_tamamla] Hata: %s", e)
+            return {"basarili": False, "id": None, "yazilan": 0, "hata": str(e)}
+
+    def check_findings_board_health(self):
+        """
+        Katman 2 — Bulgu Panosu (findings_board.db) Sağlık Kontrolü.
+        
+        1. Son 7 günde en az 1 audit/tarama çalıştı mı? (log'lardan kontrol)
+        2. Audit çalıştıysa, aynı dönemde board'a yeni bulgu eklendi mi?
+        3. Audit var ama board güncel değilse → Telegram uyarısı
+        4. 3 profilin SOUL.md'sinde findings_board kuralı hala var mı? (haftalık)
+        """
+        import datetime, json, re
+        
+        sonuc = {
+            "son_7_gun_audit": False,
+            "son_7_gun_board_guncellemesi": False,
+            "uyari_mesaji": None,
+            "soul_durumu": {},
+        }
+        
+        now = datetime.datetime.now()
+        yedi_gun_once = now - datetime.timedelta(days=7)
+        yedi_gun_once_ts = yedi_gun_once.timestamp()
+        
+        # 1) Log'lardan son 7 günde audit/tarama ara
+        log_dir = self.base_dir / "logs"
+        audit_bulundu = False
+        if log_dir.exists():
+            for log_file in log_dir.glob("*.log"):
+                if log_file.stat().st_mtime < yedi_gun_once_ts:
+                    continue
+                try:
+                    with open(log_file, "r", encoding="utf-8", errors="ignore") as f:
+                        icerik = f.read()
+                    if re.search(r"saglik_kontrolu|health_check|scan|tarama|audit|tam_kontrol", icerik, re.IGNORECASE):
+                        audit_bulundu = True
+                        break
+                except:
+                    pass
+        # Her ihtimale karşı .ReYMeN/logs/ dizinini de kontrol et
+        reymen_log = self.base_dir / ".ReYMeN" / "logs"
+        if not audit_bulundu and reymen_log.exists():
+            for log_file in reymen_log.glob("*.log"):
+                if log_file.stat().st_mtime < yedi_gun_once_ts:
+                    continue
+                try:
+                    with open(log_file, "r", encoding="utf-8", errors="ignore") as f:
+                        icerik = f.read()
+                    if re.search(r"saglik_kontrolu|health_check|scan|tarama|audit|tam_kontrol", icerik, re.IGNORECASE):
+                        audit_bulundu = True
+                        break
+                except:
+                    pass
+        
+        sonuc["son_7_gun_audit"] = audit_bulundu
+        
+        # 2) Board'da son 7 günde yeni bulgu var mı?
+        board_guncellendi = False
+        board_path = self.base_dir / "shared_state" / "findings_board.db"
+        if board_path.exists():
+            try:
+                import sqlite3
+                board_conn = sqlite3.connect(str(board_path))
+                board_cur = board_conn.cursor()
+                board_cur.execute("SELECT COUNT(*) FROM findings WHERE tarih >= ?", (yedi_gun_once.strftime("%Y-%m-%d"),))
+                yeni_bulgu = board_cur.fetchone()[0]
+                board_conn.close()
+                board_guncellendi = yeni_bulgu > 0
+            except Exception as e:
+                sonuc["board_hatasi"] = str(e)
+        
+        sonuc["son_7_gun_board_guncellemesi"] = board_guncellendi
+        
+        # 3) Audit var ama board güncel değilse uyarı
+        if audit_bulundu and not board_guncellendi:
+            uyari = ("Denetim yapildi ama bulgu panosuna yazilmadi, "
+                     "kural bozulmus olabilir!")
+            sonuc["uyari_mesaji"] = uyari
+            self._sorun_ekle(HealthDurum.UYARI, "findings_board", uyari)
+        
+        # 4) 3 profilin SOUL.md'sinde kural hala var mı?
+        hermes_profiles = Path.home() / "AppData" / "Local" / "hermes" / "profiles"
+        for profil_adi in ["default", "reymen", "kiral38"]:
+            soul_path = hermes_profiles / profil_adi / "SOUL.md"
+            kural_var = False
+            if soul_path.exists():
+                try:
+                    with open(soul_path, "r", encoding="utf-8", errors="ignore") as f:
+                        icerik = f.read()
+                    kural_var = "findings" in icerik.lower() or "board" in icerik.lower()
+                except:
+                    pass
+            sonuc["soul_durumu"][profil_adi] = kural_var
+            if not kural_var:
+                self._sorun_ekle(HealthDurum.UYARI, "soul_md",
+                    "{} SOUL.md'de findings_board kurali eksik!".format(profil_adi))
+        
+        self.rapor["kontroller"]["findings_board"] = sonuc
+        return sonuc
+
     def tam_kontrol(self):
         self.disk_kontrol()
         self.bellek_kontrol()
         self.modul_kontrolu()
         self.api_baglantisi()
         self.dosya_sistemi_kontrol()
+        self.check_findings_board_health()
+        self.audit_tamamla()
         self.rapor["sorunlar"] = self.sorunlar
         self.rapor["toplam_sorun"] = len(self.sorunlar)
         self.rapor["sorun_ozeti"] = {

@@ -27,22 +27,33 @@ from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
-# ── ChromaDB ──────────────────────────────────────────────────────────────────
-try:
-    import chromadb
-    from chromadb.config import Settings as _ChromaSettings
+# ── ChromaDB (LAZY import — modül seviyesinde degil, ilk kullanimda yuklenir)
+# Agir bagimliliklari (torch vb.) nedeniyle modül seviyesinde import edilmez.
+CHROMA_MEVCUT = None
+SENTENCE_TRANSFORMERS_MEVCUT = None
 
-    CHROMA_MEVCUT = True
-except ImportError:
-    CHROMA_MEVCUT = False
+def _chromada_kontrol_et() -> bool:
+    """ChromaDB kullanilabilir mi? (Lazy check, ilk cagrida bir kez dener.)"""
+    global CHROMA_MEVCUT, chromadb, _ChromaSettings
+    if CHROMA_MEVCUT is None:
+        try:
+            import chromadb  # noqa: F401
+            from chromadb.config import Settings as _ChromaSettings  # noqa: F401
+            CHROMA_MEVCUT = True
+        except ImportError:
+            CHROMA_MEVCUT = False
+    return CHROMA_MEVCUT
 
-# ── sentence-transformers (opsiyonel) ─────────────────────────────────────────
-try:
-    import sentence_transformers
-
-    SENTENCE_TRANSFORMERS_MEVCUT = True
-except ImportError:
-    SENTENCE_TRANSFORMERS_MEVCUT = False
+def _sentence_transformers_kontrol_et() -> bool:
+    """sentence-transformers kullanilabilir mi? (Lazy check)"""
+    global SENTENCE_TRANSFORMERS_MEVCUT, sentence_transformers
+    if SENTENCE_TRANSFORMERS_MEVCUT is None:
+        try:
+            import sentence_transformers  # noqa: F401
+            SENTENCE_TRANSFORMERS_MEVCUT = True
+        except ImportError:
+            SENTENCE_TRANSFORMERS_MEVCUT = False
+    return SENTENCE_TRANSFORMERS_MEVCUT
 
 # ── Varsayilan sabitler ───────────────────────────────────────────────────────
 VARSAYILAN_DIZIN = str(Path(__file__).parent.parent.parent / "vektor_hafizasi")

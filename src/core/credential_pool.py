@@ -227,7 +227,8 @@ class CredentialPool:
                     if wcm_val and wcm_val not in gorulen:
                         gorulen.add(wcm_val)
                         keys.append(wcm_val)
-                except Exception:
+                except Exception as e:
+                    log.warning(f"[credential_pool] WCM anahtar okuma hatasi: {e}")
                     pass
 
         if not keys:

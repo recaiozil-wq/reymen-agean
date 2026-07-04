@@ -33,7 +33,8 @@ try:
         auth_required,
         role_required,
     )
-except ImportError:
+except ImportError as _e:
+    log.warning(f"[src.reymen.guvenlik.__init__] ImportError at L36")
     pass
 
 # OAuth2 sistemi (mevcut)

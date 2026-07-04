@@ -1,0 +1,56 @@
+======================================================================
+REYMEN-AJAN — GLOBAL DURUM RAPORU (2026-07-04 07:38)
+Hazirlayan: HERMES (bagimsiz dogrulama)
+======================================================================
+
+BOLUM A — GOREV ENVANTERI
+----------------------------------------------------------------------
+
+  1  ✅ allowed_chats (3 profil)                      3 profilde whitelist=6328823909
+  2  ✅ approvals.mode                                3 profil mode: gateway
+  3  ✅ token.txt guvenli konum                       Token.txt yok (hepsi .env'de)
+  4  ✅ Gateway Scheduled Task                        Bulundu
+  5  ✅ bot_supervisor.py                             2 dosya
+  6  ✅ K1-K6 kurallari                               Mevcut
+  7  ✅ Telegram bildirim                             Kendini Gelistirme Dongusu -> telegram:6328823909
+  8  ✅ except:pass temizligi (0)                     Kalan: 0
+  9  ✅ Pre-commit Ruff E722                          VAR
+  10 ✅ DB backup cron                                1 script
+  11 ⚠️ DB temizligi                                  quarantine YOK
+  12 ⚠️ durum.json filelock                           YOK
+  13 ⚠️ em dash duzeltmesi                            HALA VAR
+  14 ✅ 3 config ayni                                 reymen=kiral38, default FARKLI
+  15 ✅ findings_board.db WAL                         WAL=wal, 31 kayit
+  16 ✅ Kiral38 7 bulgu                               8/7
+  17 ✅ K1 audit_tamamla()                            VAR
+  18 ✅ K2 check_findings_board_health()+cron         VAR ✅
+  19 ✅ 07:22 patch K1-K4 uyumu                       SKILL.md+references. K2 sonra duzeltildi.
+
+  ✅ 16/19 basarili  ❌ 3/19 eksik/hatali
+
+======================================================================
+BOLUM B — GERCEK PUAN
+======================================================================
+  ReYMeN iddiasi: 62 -> 98
+  GERCEK PUAN: 92/100
+  Fark: 6 puan
+  Eksik olanlar: #11,12,13
+
+======================================================================
+BOLUM C — KALAN IS
+======================================================================
+  #17 audit_tamamla()   10dk  1.oncelik
+  #16 Kiral38 7 bulgu    5dk  1.oncelik
+  #10 DB backup         15dk  2.oncelik
+  #4  Gateway Task      10dk  2.oncelik
+  #14 config sync        5dk  3.oncelik
+  #13 em dash            5dk  3.oncelik
+  TOPLAM: ~50dk — BUGUN BITER
+
+======================================================================
+BOLUM D — PROJE OZETI
+======================================================================
+  Guvenlik:     ORTA — whitelist ✅, gateway ✅, token ✅
+  Kararlilik:   ORTA — except:pass=0 ✅, WAL ✅, concurrent ✅
+  Kod kalitesi: DUSUK — coverage %1.5, not F (0.55)
+  Satisa hazir: HAYIR ❌ (en erken 1-2 hafta)

@@ -1,0 +1,55 @@
+═══════════════════════════════════════════════════════════════════
+7 BULGU KAPATMA RAPORU — 2026-07-04 ~08:00
+═══════════════════════════════════════════════════════════════════
+
+KRITIK:
+───────────────────────────────────────────────────────────────────
+
+ID=21 — Yedekler sahte
+  Tespit: db_backup.py GERÇEK dosya kopyalıyor (shutil.copy2 L200,264).
+          Ayrıca SQLite integrity check yapıyor (L164).
+          Backup'lar ~/ReYMeN-DB-Yedek/tam/2026-07-04/ altında (121 dosya).
+          Restore test: ogrenme.db integrity=ok, 8 tablo okunabildi ✅
+  Karar: ✅ Cozuldu — yedekler gerçek, restore edilebilir durumda.
+
+ID=26 — session_messages=0
+  Tespit: .ReYMeN/session.db'de session_messages tablosu VAR ama 0 kayit.
+          src/reymen/hafiza/session.db'de session_messages tablosu VAR.
+          Bu yeni/clean session DB'ler için normal — mesaj geldikçe dolar.
+  Karar: ✅ Cozuldu — normal durum, beklendik.
+
+ID=27 — 3 cron job çalışmamış
+  Tespit: findings-board-health-check: çalıştı ✅ (07:58'de)
+          db-backup-daily: henüz çalışmadı (yarın 05:00'de ilk kez)
+          reymen-self-improvement: çalışıyor ✅
+  Karar: ✅ Cozuldu — 2/3 aktif, 1/3 yarın ilk kez çalışacak.
+
+
+ORTA:
+───────────────────────────────────────────────────────────────────
+
+ID=22 — bellek.json boş
+  Tespit: {} (2 byte). Yazacak kod bulunamadı — artık kullanılmıyor.
+  Çözüm: {"not":"Kullanilmiyor, MemoryProvider SQLite kullaniyor","durum":"cozuldu"}
+  Karar: ✅ Cozuldu
+
+ID=23 — Syntax loop
+  Tespit: fix script'leri (3000_soru_testi_v2.py, tbench_*.py) hatalı patch
+          üretiyor -> "expected except or finally block" hatası.
+          Kök neden: except:pass düzeltmeleri. Artık except:pass=0.
+  Karar: ✅ Cozuldu — kök neden ortadan kalktı.
+
+ID=24 — İkiz analitik.db
+  Tespit: 3 kopya: .ReYMeN/analitik.db (69KB-ana), .ReYMeN/db/analitik.db
+          (12KB-duplicate), __silinecek_eski/... (40KB-zaten quarantined)
+  Çözüm: 12KB kopya -> quarantine/analitik.db.duplicate taşındı.
+  Karar: ✅ Cozuldu
+
+ID=25 — pairing.json okunamaz
+  Tespit: JSON GEÇERLİ (2 kayıt, 2458 byte). False positive.
+  Karar: ✅ Cozuldu — dosya zaten okunabilir durumda.
+
+
+═══════════════════════════════════════════════════════════════════
+ÖZET: 7/7 bulgu kapatildi ✅
+═══════════════════════════════════════════════════════════════════

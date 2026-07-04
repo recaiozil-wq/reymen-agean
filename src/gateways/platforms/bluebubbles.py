@@ -220,7 +220,8 @@ class BlueBubblesAdapter(BasePlatformAdapter):
             error_body = ""
             try:
                 error_body = str(e.response.text)
-            except Exception:
+            except Exception as _e:
+                log.warning(f"[src.gateways.platforms.bluebubbles] Exception at L223")
                 pass
             error_msg = f"HTTP {e.response.status_code}: {error_body or str(e)}"
             logger.error("[BlueBubbles] Gonderim HTTP hatasi: %s", error_msg)

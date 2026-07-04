@@ -348,7 +348,8 @@ class SlackAdapter(BasePlatformAdapter):
             # reactions.add veya ephemeral mesaj kullanilabilir
             # Simdilik no-op (Slack Web API typing indicator desteklemez)
             pass
-        except Exception:
+        except Exception as _e:
+            log.warning(f"[src.gateways.platforms.slack] Exception at L351")
             pass
 
     async def send_image(

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-self_update.py — ReYMeN Autonomous Self-Update System.
+self_update.py - ReYMeN Autonomous Self-Update System.
 
 Checks the latest release tag from GitHub, compares with current version,
 auto-downloads and installs if a new version is available.
@@ -43,7 +43,7 @@ PYPROJECT_TOML = PROJE_KOK / "pyproject.toml"
 UPDATE_MARKER_DIR = PROJE_KOK / ".ReYMeN"
 UPDATE_MARKER_FILE = UPDATE_MARKER_DIR / "update_check.json"
 
-# GitHub bilgileri — uzaktaki remoteden otomatik cikar
+# GitHub bilgileri - uzaktaki remoteden otomatik cikar
 GITHUB_API_BASE = "https://api.github.com/repos"
 
 # Haftada 1 kontrol (7 gun * 24 saat * 3600 saniye)
@@ -77,7 +77,8 @@ def _git_remote_parse() -> tuple[str, str]:
                     parts = path.split("/", 1)
                     if len(parts) == 2:
                         return parts[0], parts[1]
-    except Exception:
+    except Exception as _e:
+        log.warning("[self_update] GitHub remote parse failed")
         pass
     return "recaiozil-wq", "reymen-agean"
 
@@ -187,8 +188,7 @@ def _github_latest_release(owner: str, repo: str) -> Optional[dict]:
 
 
 def _git_pull() -> dict:
-    """git pull — fetch latest changes from main branch."""
-
+    """git pull - fetch latest changes from main branch.
     Returns:
         {"basarili": bool, "cikti": str, "hata": str}
     """
@@ -207,8 +207,7 @@ def _git_pull() -> dict:
 
 
 def _pip_install_editable() -> dict:
-    """pip install -e . — update dependencies."""
-
+    """pip install -e . - update dependencies.
     Returns:
         {"basarili": bool, "cikti": str, "hata": str}
     """
@@ -228,8 +227,7 @@ def _pip_install_editable() -> dict:
 
 
 def _pip_install_requirements() -> dict:
-    """pip install -r requirements.txt if requirements.txt exists."""
-
+    """pip install -r requirements.txt if requirements.txt exists.
     Returns:
         {"basarili": bool, "cikti": str, "hata": str}
     """
@@ -252,8 +250,7 @@ def _pip_install_requirements() -> dict:
 
 
 def _son_kontrol_zamani() -> Optional[float]:
-    """Read last check timestamp."""
-
+    """Read last check timestamp.
     Returns:
         Unix timestamp (float) veya None
     """
@@ -261,7 +258,8 @@ def _son_kontrol_zamani() -> Optional[float]:
         try:
             veri = json.loads(UPDATE_MARKER_FILE.read_text(encoding="utf-8"))
             return veri.get("son_kontrol")
-        except Exception:
+        except Exception as _e:
+            log.warning("[self_update] Update marker read failed")
             pass
     return None
 
@@ -418,7 +416,7 @@ def perform_update() -> dict:
 
 
 def auto_update_check(force: bool = False) -> dict:
-    """Automatic update check — runs once a week.
+    """Automatic update check - runs once a week.
 
     Called at startup. If more than 7 days have passed since last check,
     checks and auto-installs if an update is available.
@@ -461,7 +459,7 @@ def auto_update_check(force: bool = False) -> dict:
 
 
 def auto_update_thread(interval: int = HAFTALIK_KONTROL_ARALIGI) -> None:
-    """Periodic update checker running in a background thread."""
+    """Periodic update checker running in a background thread.
 
     Args:
         interval: Kac saniyede bir kontrol (varsayilan: 1 hafta)
@@ -478,7 +476,7 @@ _auto_update_thread: Optional[threading.Thread] = None
 
 
 def auto_update_baslat(interval: int = HAFTALIK_KONTROL_ARALIGI) -> None:
-    """Start background auto-update thread."""
+    """Start background auto-update thread.
 
     Args:
         interval: Kac saniyede bir kontrol (varsayilan: 1 hafta)

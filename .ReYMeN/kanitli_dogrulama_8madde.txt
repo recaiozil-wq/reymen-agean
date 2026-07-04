@@ -1,0 +1,116 @@
+═══════════════════════════════════════════════════════════════════
+MADDE BAZINDA KANITLI DOGRULAMA (DÜZELTİLMİŞ)
+═══════════════════════════════════════════════════════════════════
+
+───────────────────────────────────────────────────────────────────
+MADDE 1: durum.py'de filelock
+───────────────────────────────────────────────────────────────────
+ARANAN: _kilitle / _kilidi_ac
+KOMUT: grep -rn '_kilitle\|_kilidi_ac' src/reymen/sistem/durum.py
+ÇIKTI:
+  27: from reymen.sistem.durum_paylas import _kilitle, _kilidi_ac
+ 217:         kilitli = _kilitle()
+ 223:                 _kilidi_ac()
+SONUÇ: VAR (3 referans — import, kilitle, kilit aç)
+
+───────────────────────────────────────────────────────────────────
+MADDE 2: Kiral38 7 bulgu board'da
+───────────────────────────────────────────────────────────────────
+ARANAN: findings_board.db'de kiral38 aktif kayitlar
+KOMUT: SELECT id, konu, durum FROM findings WHERE bulan_profil='kiral38' AND durum='yeni'
+ÇIKTI:
+  ID=21 | Yedekler sahte — gercek backup calismiyor          | yeni
+  ID=22 | bellek.json bos — hafiza dosyasi ici bos           | yeni
+  ID=23 | Syntax loop — surekli ayni hata tekrari            | yeni
+  ID=24 | Ikiz analitik.db — 2 ayri yerde analitik.db var    | yeni
+  ID=25 | pairing.json okunamaz durumda                      | yeni
+  ID=26 | session_messages=0 — hic mesaj kaydi yok           | yeni
+  ID=27 | 3 cron job hic calismamis                          | yeni
+SONUÇ: VAR (7/7 kayit aktif)
+
+───────────────────────────────────────────────────────────────────
+MADDE 3: check_findings_board_health cron testi
+───────────────────────────────────────────────────────────────────
+ARANAN: findings-board-health-check cron job
+KOMUT: grep -rn 'findings-board-health-check' ~/AppData/Local/hermes/ (BOŞ — state.db'de)
+KOMUT: cronjob list (Hermes API)
+ÇIKTI:
+  job_id: d9b6f3121867
+  name: findings-board-health-check
+  schedule: 0 9 * * 3
+  deliver: origin
+  enabled: true
+  state: scheduled
+  last_run_at: 2026-07-04T07:58:22.358704+03:00
+  last_status: ok
+SONUÇ: VAR (çalıştı, başarılı ✅)
+
+───────────────────────────────────────────────────────────────────
+MADDE 4: default config = reymen config
+───────────────────────────────────────────────────────────────────
+ARANAN: SHA256 karsilastirmasi
+KOMUT: sha256sum default/config.yaml reymen/config.yaml
+ÇIKTI:
+  default: 12715B SHA256:e3c8fe5758910bfb
+  reymen: 12715B SHA256:e3c8fe5758910bfb
+KOMUT: diff -q default/config.yaml reymen/config.yaml
+ÇIKTI: (boş — dosyalar aynı)
+SONUÇ: VAR (birebir aynı ✅)
+
+───────────────────────────────────────────────────────────────────
+MADDE 5: DB backup cron
+───────────────────────────────────────────────────────────────────
+ARANAN: db-backup-daily cron job
+KOMUT: grep -rn 'db-backup-daily' (BOŞ — state.db'de)
+KOMUT: cronjob list (Hermes API)
+ÇIKTI:
+  job_id: 7ee46f549449
+  name: db-backup-daily
+  schedule: 0 5 * * *
+  deliver: origin
+  enabled: true
+  state: scheduled
+
+ARANAN: db_backup.py script
+KOMUT: find src -name 'db_backup.py'
+ÇIKTI: src/reymen/sistem/db_backup.py (18823 bytes)
+SONUÇ: VAR (cron + script)
+
+───────────────────────────────────────────────────────────────────
+MADDE 6: reymen-eksik-tarama deliver fix
+───────────────────────────────────────────────────────────────────
+ARANAN: reymen-eksik-tarama cron job deliver alani
+KOMUT: grep -rn (BOŞ — state.db'de)
+KOMUT: cronjob list (Hermes API)
+ÇIKTI:
+  name: reymen-eksik-tarama
+  deliver: telegram:6328823909
+  schedule: 0 * * * *
+  enabled: true
+  last_error: (once: "no delivery target resolved") → artik telegram'a gidiyor
+SONUÇ: VAR (deliver=telegram ✅)
+
+───────────────────────────────────────────────────────────────────
+MADDE 7: self_update.py em dash
+───────────────────────────────────────────────────────────────────
+ARANAN: U+2014 (em dash) karakteri
+KOMUT: grep -rn $'\u2014' src/reymen/sistem/self_update.py
+ÇIKTI: 0 adet ✅
+KOMUT: python -c "import ast; ast.parse(open('self_update.py').read())"
+ÇIKTI: ✅ PASSED
+SONUÇ: VAR (0 em dash, syntax geçiyor ✅)
+
+───────────────────────────────────────────────────────────────────
+MADDE 8: quarantine klasoru
+───────────────────────────────────────────────────────────────────
+ARANAN: quarantine/ klasoru
+KOMUT: ls -la quarantine/
+ÇIKTI:
+  quarantine/ klasoru VAR
+  Icerik: ['README.md']
+  README.md icerigi: "# Quarantine — Tespit Edilen Kopya/Eski Dosyalar"
+SONUÇ: VAR ✅
+
+═══════════════════════════════════════════════════════════════════
+OZET: 8/8 VAR ✅
+═══════════════════════════════════════════════════════════════════

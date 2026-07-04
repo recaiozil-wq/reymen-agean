@@ -20,8 +20,11 @@ from __future__ import annotations
 import json
 import logging
 import os
+import time
 from pathlib import Path
 from typing import Any, Optional
+
+from reymen.sistem.durum_paylas import _kilitle, _kilidi_ac
 
 logger = logging.getLogger(__name__)
 
@@ -211,8 +214,13 @@ def degisiklik_ekle(bot_adi: str, degisiklik: str, kategori: str = "genel") -> N
             kayitlar[:] = kayitlar[:50]
         veri["son_guncelleme"] = __import__("datetime").datetime.now().strftime("%Y-%m-%d %H:%M")
         veri["guncelleyen_bot"] = bot_adi
-        with open(DURUM_DOSYASI, "w", encoding="utf-8") as f:
-            json.dump(veri, f, indent=2, ensure_ascii=False)
+        kilitli = _kilitle()
+        try:
+            with open(DURUM_DOSYASI, "w", encoding="utf-8") as f:
+                json.dump(veri, f, indent=2, ensure_ascii=False)
+        finally:
+            if kilitli:
+                _kilidi_ac()
     except Exception as _e:
         logger.warning("[degisiklik_ekle] Hata: %s", _e)
 

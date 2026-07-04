@@ -220,7 +220,8 @@ def stop_memory_monitoring(timeout: float = 2.0) -> None:
     # Join outside the lock so a stuck log call can't deadlock shutdown.
     try:
         thread.join(timeout=timeout)
-    except Exception:
+    except Exception as _e:
+        log.warning(f"[src.gateways.memory_monitor] Exception at L223")
         pass
 
     logger.info("[MEMORY] Periodic memory monitoring stopped")

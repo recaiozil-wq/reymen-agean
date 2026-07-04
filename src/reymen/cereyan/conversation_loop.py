@@ -1826,6 +1826,23 @@ class ConversationLoop:
             self._session_search.save(session_id, message, role)
         except Exception as _ss_e:
             log.debug("[SESSION_SEARCH] Kayit hatasi: %s", _ss_e)
+        # Session messages tablosuna da kaydet (ID=26 fix)
+        try:
+            import sqlite3 as _sqlite3
+            _db_path = Path(__file__).parent.parent.parent.parent / ".ReYMeN" / "session.db"
+            _conn = _sqlite3.connect(str(_db_path))
+            _conn.execute(
+                "INSERT OR IGNORE INTO sessions (id, source, started_at) VALUES (?,?,?)",
+                (session_id, "conversation_loop", time.time())
+            )
+            _conn.execute(
+                "INSERT INTO session_messages (session_id, rol, icerik, created_at) VALUES (?,?,?,?)",
+                (session_id, role, message, time.time())
+            )
+            _conn.commit()
+            _conn.close()
+        except Exception as _sm_e:
+            log.debug("[SESSION_MSGS] Kayit hatasi: %s", _sm_e)
 
     def _hata_cozumle(self, hata_metni: str, kaynak: str = "genel") -> None:
         """Hata aninda Reasoning-Core'u tetikle.

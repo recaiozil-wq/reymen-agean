@@ -1,0 +1,297 @@
+================================================================
+REYMEN 4 MADDE PLANI — COZUM YOLLARI KARSILASTIRMASI
+================================================================
+Tarih: 2026-07-04
+
+================================================================
+MADDE 1 — HAFTALIK OTOMATIK DB BACKUP
+================================================================
+
+1.1 Backup Konumu
+
+COZUM A — Ayni diskte ayri klasor
+  Arti: Cok hizli, kod basit, bagimlilik yok
+  Eksi: Disk arızasinda tum veri gider, fiziksel guvenlik yok
+
+COZUM B — Farkli disk/harici surucu
+  Arti: Disk arızasina dayanikli, ayri fiziksel ortam
+  Eksi: Harici surucu her zaman takili olmayabilir, cron basarisiz olur
+
+COZUM C — Bulut depolama (OneDrive/Google Drive)
+  Arti: En guvenli, uzaktan erisim, otomatik senkronizasyon
+  Eksi: Internet bagimli, token sizintisi riski, gizlilik sorunu
+
+ONERI: B + C hibrit
+  Birincil: OneDrive Belgeler (bulut korumasi + otomatik senkro)
+  Ikincil: Yerel yedek (OneDrive cokse bile yerelde var)
+  Gerekce: OneDrive zaten calisiyor (Obsidian vault icin kullaniliyor),
+  ekstra maliyet yok. Hassas dosyalar (.env) backup disi birakilir.
+
+1.2 Backup Sikligi ve Kapsami
+
+COZUM A — Haftalik tam yedek
+  Arti: Basit, tek dosya, kolay geri yukleme
+  Eksi: 1 haftalik veri kaybi riski, disk alani hizla buyur
+
+COZUM B — Gunluk incremental + haftalik tam
+  Arti: En fazla 1 gunluk veri kaybi, daha az disk alani
+  Eksi: Karmasik, incremental geri yukleme daha zor
+
+ONERI: B (gunluk incremental + haftalik tam)
+  Gerekce: 1 gunluk veri kaybi 7 gunluge tercih edilir.
+  Kapsam: SADECE .db DEGIL — config.yaml, durum.json, .env.example de dahil.
+  .env HARIc (hassas). Config kaybi veri kaybi kadar kritik.
+
+1.3 Mevcut 18 Gunluk Boslugun Kapatilmasi
+
+ONERI: Once temizle, sonra yedekle
+  1. ReYMeN-memory-backup icindeki eski/kopya DB'leri quarantine'e tasi
+  2. Sonra ilk tam backup'i al (temiz baslangic)
+  3. Eski kopyalar yedeklenmez — zaten guncel degiller
+  Gerekce: Eski kopyalari da yedeklemek "kopya kopyasi" olusturur.
+  Sadece GERCEK veri yedeklenmeli.
+
+1.4 Backup Sagliginin Izlenmesi
+
+ONERI: sistem_health.py'ye 2 satir ekle
+  - check_backup_age() fonksiyonu: backup_state.json'dan son yedek tarihini oku
+  - 7 gunu gecmisse Telegram uyari: "DB backup {N} gundur guncel degil!"
+  Gerekce: sistem_health.py zaten her 10 dk calisiyor. Ek cron gerektirmez.
+
+1.5 Geri Yuklenebilirlik Testi
+
+ONERI: Ayda bir cron ile backup_restore_test.py
+  - En son backup'i gecici klasore cikar
+  - Her .db'yi sqlite3 ile ac, PRAGMA integrity_check calistir
+  - .env.example ve config.yaml'i diff et (mevcutla karsilastir)
+  - Sonucu Telegram'a gonder (basarili/basarisiz)
+  Gerekce: Backup almak yetmez, geri yukleme calistigi kanitlanmali.
+
+1.6 Encryption/Gizlilik
+
+DEGERLENDIRME:
+  - .env icinde API key'ler var (DeepSeek, OpenRouter, Groq vb.)
+  - Token.txt, credentials.json hassas
+  - OneDrive Microsoft sunucularinda duz metin duracak
+
+ONERI:
+  - Hassas dosyalari (.env, token.txt) backup'a HIC dahil etme
+  - Bunlarin backup'i ayri encrypted ZIP (7-Zip AES-256)
+  - Otomatik backup sadece .db + config.yaml + durum.json gibi hassas
+    OLMAYAN dosyalari icersin
+  - .env.example (token'siz surum) backup'a eklenebilir
+
+================================================================
+MADDE 2 — EXCEPT:PASS KOD INCELEME KURALI
+================================================================
+
+2.1 Onceliklendirme Stratejisi
+
+COZUM A — Kritiklik sirasina gore
+  Arti: Risk azaltma odakli (credential/gateway/DB once)
+  Eksi: Kritik dosyayi bulmak icin on analiz gerek, uzun surer
+
+COZUM B — Dosya bazinda toplu
+  Arti: Verimli, hizli, en cok ihlali en hizli temizler
+  Eksi: Kritik hatalar sona kalabilir
+
+COZUM C — Otomatik + manuel karisik
+  Arti: En dengeli, dusuk riskli pattern'ler script ile duzeltilir
+  Eksi: Iki yontem de gerektirir, koordinasyon gerek
+
+ONERI: C (otomatik + manuel karisik)
+  Gerekce: Onceki commit'te 1.435 duzeltme yapilmis. Kalan ~10-20 dosya
+  icin Batch 1: basit pattern'leri script ile fixle (30 dk).
+  Batch 2: Gateway/credential kritik dosyalari elle incele (1-2 saat).
+  Tahmini sure: 2 saat.
+
+2.2 Yeni Kod Icin Onleme
+
+COZUM A — Sadece skill/prompt kurali
+  Arti: Kolay, hizli, ek yapilandirma gerektirmez
+  Eksi: Ajanin kendi disiplinine bagli, 1.435 kere ihlal edilmis
+
+COZUM B — Pre-commit hook veya linter
+  Arti: Mekanik engel, AI/insan hatasindan bagimsiz, otomatik
+  Eksi: pre-commit kurulumu gerek, her gelistiricide calismali
+
+ONERI: B (pre-commit hook)
+  Gerekce: A secenegi (sadece kural) 1.435 kere basarisiz olmus.
+  Mekanik engel (Ruff E722) hatayi imkansiz kilar.
+  Ruff zaten projede kullanilabiliyor, ek yuk yok.
+
+2.3 Loglama Standardi
+
+ONERI — Standart format:
+  print("[%s] %s: %s", kaynak_dosya, hata_tipi, hata_mesaji)
+  Ornek: print("[UYARI] checkpoint okunamadi, sifirdan baslaniyor")
+
+  Asgari 3 alan:
+  1. Kaynak dosya adi (otomatik __name__)
+  2. Hata tipi (type(e).__name__)
+  3. Hata mesaji (str(e))
+
+  Gerekce: Tek tip log = okunabilir, filtrelenebilir, aksetilebilir.
+
+2.4 Log Hacmi Riski
+
+DEGERLENDIRME:
+  - 1.435 except blogu su AN loglama yapmiyor (pass ile yutuluyor)
+  - Sadece 2 dosyada kalmisti, onlar da duzeltildi
+  - Yeni kodda pre-commit ile engellenecek
+
+ONERI:
+  - Su an icin ek log rotasyonu GEREKMEZ (sadece 2 dosya etkilendi)
+  - Ileride toplu loglama eklenirse: RotatingFileHandler
+    (maxBytes=10MB, backupCount=5)
+  - Sik tetiklenen hatalar icin rate limiting:
+    (ayni hata 1 dakikada 1 kereden fazla loglanmasin)
+
+================================================================
+MADDE 3 — VERITABANI TEMIZLIGI + TEK KAYNAK
+================================================================
+
+3.1 Kopya Tespiti ve Dogru Kaynak
+
+ONERI:
+  Once kodda her DB yolunun kac yerde referans edildigini bul:
+  - search_files ile "hatalar.db", "skills_index.db" vb. ara
+  - Referans EDILMEYEN kopyalar direk temizlik adayi
+  - Referans EDILEN ama MD5 ayni olanlar: eski kopya, silinebilir
+
+  On tespit:
+  - hatalar.db: 2 kopya (MD5 ayni) -> biri silinebilir
+  - skills_index.db: 3 kopya (2'si bos 4KB) -> bos olanlar silinebilir
+  - ogrenme.db: 2 kopya (farkli MD5) -> kucuk olan eski kopya
+  - chroma.sqlite3: projede 4, backup'ta 2 -> tek kaynak belirlenmeli
+
+3.2 Silme Oncesi Guvenlik
+
+COZUM A — Direkt sil
+  Arti: Hemen belli olur sorun varsa
+  Eksi: Geri donus imkansiz, backup yeni alinmis olsa bile
+
+COZUM B — Once quarantine, 2 hafta bekle
+  Arti: Geri donus sansi, sorun cikmazsa kalici sil
+  Eksi: Ekstra adim, 2 hafta boyunca diskte durur
+
+ONERI: B (quarantine)
+  Gerekce: Temkinli yaklasim. 2 hafta icinde sorun cikmazsa
+  otomatik temizlenebilir. Proaktif bulgu: "Duzelt-sonra-tekrarla"
+  pattern'i riskini azaltir.
+
+3.3 improvements.db Temizlik Politikasi
+
+DEGERLENDIRME:
+  - 8.529 "uygulandi=1" kaydi: audit degeri VAR
+  - Hangi skill'in ne zaman birlestirildigini gosterir
+  - Ama 15.146 kaydin tamami audit icin gerekli DEGIL
+
+ONERI:
+  - 30 gun TTL uygun (aylik denetim icin yeterli)
+  - "uygulandi=1" ve 30 gunden eski kayitlar:
+    -> improvements_arsiv.csv'ye export et (sikistirilmis ozet)
+    -> DB'den sil
+  - "uygulandi=0" ve "birlestir" tipindeki 1.416 kayit:
+    -> once incele, gercekten gecerliyse uygula
+    -> degilse sil
+  - Audit degeri CSV'de korunur, DB sisme2
+
+3.4 cozum_hafizasi.db Test Verisi
+
+ONERI:
+  - id 1 ve 2 (torch import, 409 Conflict) -> KORU
+  - id 3-10 (test verisi) -> SIL
+  - Gelecek icin: test DB'si ayri (cozum_hafizasi_test.db)
+  - Production kod asla test DB'sine yazmasin
+  - Gerekce: 10 kaydin 8'i test = cozum bulmak imkansiz
+
+3.5 durum.json Cakismasi
+
+DEGERLENDIRME:
+  - Kok/durum.json: AKTIF (degisiklik_ekle, durum_guncelle, 3 bot)
+  - src/durum.json: ESKI KOPYA (kodda referans edilmiyor)
+  - soul_boyut farki (1806 vs 1672) -> guncellligini yitirmis
+
+ONERI:
+  - Kodda src/durum.json'u referans alan yer yoksa -> SIL
+  - Varsa -> kok'e symlink yap (Windows: mklink)
+  - Gerekce: Iki ayri amaca hizmet etmiyor, ikisi de runtime.
+
+3.6 Kullanilmayan DB'ler
+
+ONERI:
+  - src/reymen/merkez_db/analitik.db (40KB, 0 kayit) -> SIL
+  - src/merkez_db/ogrenme.db (32KB, 0 kayit) -> SIL
+  - src/reymen/merkez_db/skills_index.db (4KB, 0 kayit) -> SIL
+  - src/merkez_db/skills_index.db (4KB, 0 kayit) -> SIL
+  - src/merkez_db/hatalar.db (16KB, kok ile ayni) -> SIL
+  - vektor_hafizasi/vector_memory.db (4KB, 0 kayit) -> kontrol edilecek
+
+3.7 Gelecekte Tekrarini Onleme
+
+ONERI:
+  self-improvement ve gelistirme kurallarina EKLENECEK MADDE:
+
+  "YENI DB KURALI:
+  1. Yeni bir .db/.sqlite dosyasi olusturmadan once mevcut bir DB'ye
+     yeni tablo eklenebilir mi kontrol et (tercih edilen)
+  2. Yeni DB zorunluysa bu karari decisions.md'ye kaydet
+  3. Yeni DB'nin backup kapsamina alindigindan emin ol
+  4. Eski/kullanilmayan DB'leri aylik temizlikte sil"
+
+  Bu kural self-improvement rutinine ve genel gelistirme
+  prensiplerine kalici olarak eklenmeli.
+
+================================================================
+MADDE 4 — ESZAMANLI YAZMA RISKI
+================================================================
+
+4.1-4.3 Cozum Karsilastirmasi
+
+COZUM A — Dosya kilidi (filelock)
+  Karmasiklik: DUSUK (2 satir kod)
+  Performans: COK IYI
+  Gelecege donuk: HAYIR (hala JSON)
+  Kisa vade: UYGUN
+  Uzun vade: DEGIL
+
+COZUM B — Merkezi yazma kuyrugu
+  Karmasiklik: ORTA
+  Performans: IYI (kuyruk gecikmesi)
+  Gelecege donuk: KISMEN
+  Kisa vade: DEGIL (cok karmasik)
+  Uzun vade: BELKI
+
+COZUM C — SQLite WAL moduna gecis
+  Karmasiklik: YUKSEK (migration gerek)
+  Performans: COK IYI (native WAL)
+  Gelecege donuk: EVET
+  Kisa vade: DEGIL
+  Uzun vade: EN IYI
+
+ONERI:
+  KISA VADE (bu hafta): A (dosya kilidi)
+  - durum_paylas.py'deki _kilitle()/_kilidi_ac() mekanizmasi kullan
+  - durum.py'deki degisiklik_ekle()'ye kilit ekle
+  - durum_guncelle.py'deki yazma islemine kilit ekle
+  - 3 satir kod, 10 dakika is
+
+  UZUN VADE (gelecek ay): C (SQLite WAL)
+  - durum.json'u bir SQLite DB'ye tasi
+  - Tablo: bot_durum (her bot kendi satirini gunceller)
+  - WAL modu = eszamanli yazma native destek
+  - filelock gecici cozum olarak kalir, migration tamamlanana kadar
+
+================================================================
+GENEL SIRALAMA
+================================================================
+
+1. MADDE 1 — Backup (once guvenli yedek, sonra temizlik)
+2. MADDE 4 — Eszamanli yazma kilidi (hizli, kisa vadeli)
+3. MADDE 3 — Veritabani temizligi (backup var, guvendeyiz)
+4. MADDE 2 — except:pass duzeltmeleri (en uzun, en sona)
+
+================================================================
+RAPOR SONU — ONAY BEKLIYOR
+================================================================

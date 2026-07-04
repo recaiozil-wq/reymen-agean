@@ -1,0 +1,18 @@
+{
+  "full_backups": [
+    {
+      "tarih": "2026-07-04T06:52:56.590001",
+      "hedef": "C:\\Users\\marko\\ReYMeN-DB-Yedek\\tam\\2026-07-04",
+      "dosya_sayisi": 121,
+      "toplam_boyut": 11408356
+    },
+    {
+      "tarih": "2026-07-04T08:16:12.199369",
+      "hedef": "C:\\Users\\marko\\ReYMeN-DB-Yedek\\tam\\2026-07-04",
+      "dosya_sayisi": 115,
+      "toplam_boyut": 8113148
+    }
+  ],
+  "incremental_backups": [],
+  "last_restore_test": "2026-07-04T08:15:39.517880"
+}

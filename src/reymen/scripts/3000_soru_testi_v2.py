@@ -43,7 +43,8 @@ def checkpoint_yukle():
         try:
             with open(CHECKPOINT_DOSYASI, "r", encoding="utf-8") as f:
                 return json.load(f)
-        except:
+        except Exception:
+            print("[UYARI] Checkpoint dosyasi okunamadi, sifirdan baslaniyor")
             pass
     return None
 

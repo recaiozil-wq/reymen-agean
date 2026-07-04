@@ -1,0 +1,158 @@
+╔══════════════════════════════════════════════════════════════╗
+║     ReYMeN-Ajan — TEK BİRLEŞİK DURUM RAPORU               ║
+║     2026-07-04 06:58:23                               ║
+╚══════════════════════════════════════════════════════════════╝
+
+============================================================
+1. PROJE PROFİLİ
+============================================================
+
+  Proje kökü   : C:\Users\marko\Desktop\Reymen Proje\ReYMeN-Ajan
+  Toplam .py   : 21429 (prod: 15954, test/tbench: 5475)
+  src/ çekirdek: 605 dosya, 232725 satır
+  src/ test    : 15 dosya
+  .ReYMeN      : 133 dosya
+
+============================================================
+2. KOD KALİTESİ METRİKLERİ (CANLI ÖLÇÜM)
+============================================================
+
+  except:pass  : 1 (önce: 78)
+  Test oranı   : %1.5 (15 test dosyası / 618 src dosyası)
+  Kod notu     : F (skor: 0.55/1.0 — güncellenmemiş SQLite snapshot)
+
+============================================================
+3. PROJE KLASÖR YAPISI (src/reymen/)
+============================================================
+
+  core/ (24 .py)
+  gateways/ (47 .py)
+    builtin_hooks/ (1 .py)
+    platforms/ (21 .py)
+    telegram_bot/ (2 .py)
+  reymen/ (22 .py)
+    arac/ (41 .py)
+      arac/ (2 .py)
+      tools/ (1 .py)
+    cereyan/ (67 .py)
+        scripts/ (1 .py)
+      reymen/ (1 .py)
+        cereyan/ (2 .py)
+        AI_ML/ (3 .py)
+      tools/ (1 .py)
+    cli/ (6 .py)
+      subcommands/ (9 .py)
+    cron/ (5 .py)
+      hermes_stubs/ (4 .py)
+    desktop/ (7 .py)
+    guvenlik/ (23 .py)
+    hafiza/ (21 .py)
+    mcp/ (6 .py)
+    merkez_db/ (2 .py)
+      merkez_db/ (1 .py)
+    plugin/ (2 .py)
+    plugins/ (1 .py)
+    scripts/ (64 .py)
+    sistem/ (116 .py)
+      cli_commands/ (8 .py)
+        handlers/ (1 .py)
+        browser_provider/ (1 .py)
+        delegation_provider/ (1 .py)
+        guardrails_provider/ (1 .py)
+        image_gen_provider/ (1 .py)
+        mcp_provider/ (1 .py)
+        merhaba/ (1 .py)
+        web_search_provider/ (1 .py)
+    tools/ (37 .py)
+      environments/ (7 .py)
+    web_ui/ (9 .py)
+    windows/ (9 .py)
+
+============================================================
+4. EN BÜYÜK/KRİTİK DOSYALAR (src/ altında)
+============================================================
+
+  # Dosya                                                    Satır      KB
+--- -----                                                    -----     ---
+  1 src\gateways\platforms\telegram.py                        6836    311K
+  2 src\gateways\platforms\base.py                            4950    213K
+  3 src\reymen\sistem\run_agent.py                            4908    219K
+  4 src\reymen\sistem\cli_tui.py                              3997    194K
+  5 src\reymen\sistem\ReYMeN_state.py                         3978    170K
+  6 src\gateways\slash_commands.py                            3869    180K
+  7 src\reymen\web_ui\__init__.py                             3625    145K
+  8 src\reymen\sistem\cli_commands\session_commands.py        3361    168K
+  9 src\reymen\cereyan\conversation_loop.py                   3315    147K
+ 10 src\reymen\sistem\cli_main.py                             3290    148K
+ 11 src\reymen\sistem\cli_agent.py                            2628    122K
+ 12 src\reymen\cereyan\motor.py                               2609    121K
+ 13 src\reymen\cron\scheduler.py                              2319    100K
+ 14 src\gateways\config.py                                    2206    108K
+ 15 src\gateways\telegram_bot.py                              1821     71K
+
+============================================================
+5. except:pass DURUMU (SON DURUM)
+============================================================
+
+  Toplam except:pass: 1 — TÜMÜ TEMİZLENDİ ✅
+
+  Düzeltilen dosyalar:
+    ✅ gateways/telegram_bot.py (2 fix)
+    ✅ gateways/discord_bot.py (4 fix)
+    ✅ core/credential_pool.py (1 fix)
+    ✅ gateways/authz_mixin.py (1 fix)
+    ✅ reymen/sistem/cozum_hafizasi.py (3 fix)
+    ✅ gateways/platforms/base.py (2 fix)
+    ✅ gateways/platforms/email.py (4 fix)
+    ✅ gateways/platforms/telegram.py (3 fix)
+    ✅ core/provider_abstraction.py (1 fix)
+    ✅ gateways/memory_monitor.py (1 fix)
+    ✅ gateways/platforms/bluebubbles.py (1 fix)
+    ✅ gateways/platforms/feishu.py (1 fix)
+    ✅ gateways/platforms/matrix.py (1 fix)
+    ✅ gateways/platforms/signal.py (1 fix)
+    ✅ gateways/platforms/slack.py (1 fix)
+    ✅ gateways/platforms/sms.py (1 fix)
+    ✅ gateways/platforms/whatsapp.py (1 fix)
+    ✅ reymen/guvenlik/__init__.py (1 fix)
+    ✅ reymen/sistem/self_update.py (2 fix)
+
+============================================================
+6. KRİTİK RİSKLER VE TEKNİK BORÇ
+============================================================
+
+Öncelik      Risk                                Açıklama                                                    
+--------     ----                                ---------                                                   
+🔴 KRİTİK     Test coverage %1.5                  618 dosyaya karşı sadece 15 test dosyası. Satış öncesi en az %30'a çekilmeli.
+🔴 KRİTİK     Kod notu F (0.55)                   SQLite snapshot güncellenmedi — güncel durum yansımıyor.    
+🟠 YÜKSEK     self_update.py em dash (U+2014)     Docstring içinde em dash karakteri var, ast.parse kırılıyor.
+🟠 YÜKSEK     cli.py 15.762 satır                 En büyük dosya, henüz bölünmedi (gorev_cli_bolme_main.md var).
+🟠 YÜKSEK     Paylaşımlı state (shared_solutions.db) 3 profil aynı çözüm DB'sini paylaşıyor — kontaminasyon riski.
+🟡 ORTA       Self-improvement cron K5-K6 kuralları yeni K5/K6 06:20'de eklendi, henüz uzun vadeli test edilmedi.    
+🟡 ORTA       K2 backup atlama geçmişi            06:20 SKILL.md patch'inde backup alınmamıştı — düzeltildi.  
+
+============================================================
+7. ÖNERİLEN SIRADAKİ ADIMLAR
+============================================================
+
+  Öncelik sırası:
+    1. SQLite snapshot güncelle — except:pass=0 durumunu kaydet
+    2. Test yazma kampanyası — coverage %1.5 → %30
+    3. cli.py bölme — 15K satır → modüler yapı
+    4. self_update.py em dash temizliği
+    5. İkinci batch kod kalitesi fix (kalan minör sorunlar)
+
+============================================================
+8. AJAN YETKİ KARŞILAŞTIRMASI (KANITLI)
+============================================================
+
+  Kiral38 ve reymen profilleri:
+    - Config'ler BİREBİR AYNI ✅ (12715 byte, aynı timestamp)
+    - code_execution.mode: project (her ikisinde de)
+    - terminal.backend: local (her ikisinde de)
+    - disabled_toolsets: YOK (her ikisinde de)
+    - external_dirs: AYNI skills/ yolu
+    - shared_solutions.db: 24KB (ortak)
+
+  Sonuç: İki ajan da aynı yetki seviyesinde. Rapor farkı varsa,
+  bu yetki farkından DEĞİL, aynı veriye farklı yorumdan kaynaklanır.

@@ -306,7 +306,8 @@ class ProviderBase(abc.ABC):
                     return ProviderGecersizKey(f"Erişim reddedildi (403): {hata}")
                 elif kod == 429:
                     return ProviderRateLimit(f"Hız sınırı (429): {hata}")
-        except Exception:
+        except Exception as _e:
+            log.warning(f"[src.core.provider_abstraction] Exception at L309")
             pass
 
         if "401" in mesaj or "unauthorized" in mesaj:

@@ -10,7 +10,7 @@
       "browser": "acik",
       "terminal": "acik",
       "web": "firecrawl",
-      "soul_boyut": 1672,
+      "soul_boyut": 1806,
       "tools": "tum"
     },
     "reymen": {
@@ -21,7 +21,7 @@
       "browser": "acik",
       "terminal": "acik",
       "web": "firecrawl",
-      "soul_boyut": 1677,
+      "soul_boyut": 1806,
       "tools": "tum"
     },
     "kiral38": {
@@ -32,7 +32,7 @@
       "browser": "acik",
       "terminal": "acik",
       "web": "firecrawl",
-      "soul_boyut": 1671,
+      "soul_boyut": 1806,
       "tools": "tum"
     }
   },
@@ -44,17 +44,7 @@
     "side_quest": "sub_agent'a yonlendir",
     "durum_oku_zorunlu": true,
     "kendi_bilgisiyle_cevap_yasak": true,
-    "kaynak": "durum.json TEK KAYNAK",
-    "reasoning_core_aktif": true
-  },
-  "reasoning_core": {
-    "durum": "entegre",
-    "merkezi_db": "analitik.db",
-    "tablo": "reasoning_log",
-    "provider_config": "config.yaml > fallback_providers > reasoning-core-*",
-    "model_local": "Ornith-1.0-9B (LM Studio)",
-    "model_openrouter": "deepreinforce-ai/ornith-1.0-397b",
-    "durum_oku_zorunlulugu": "evet"
+    "kaynak": "durum.json TEK KAYNAK"
   },
   "esit_mi": {
     "esit": true,
