@@ -746,6 +746,25 @@ class ConversationLoop:
             Cozum sonucu dict'i.
         """
         self._durum = "calisiyor"
+        # ── Gatekeeper: sayisal/DB iddiasi varsa once dogrula ──
+        try:
+            from reymen.guvenlik.gatekeeper import (
+                response_makes_numeric_claim,
+                run_gatekept_turn
+            )
+            if response_makes_numeric_claim(hedef):
+                import time as _time
+                msgs = [{"role": "user", "content": hedef}]
+                gk_sid = getattr(self, "session_id", None) or "gk_" + str(int(_time.time()))
+                gk_sonuc = run_gatekept_turn(gk_sid, msgs)
+                if gk_sonuc and not gk_sonuc.startswith("GATEKEEPER:"):
+                    self.son_mesaj = gk_sonuc
+                    return {"hedef": hedef, "basarili": True,
+                            "yanit": gk_sonuc, "turlar": 1,
+                            "gatekeeper": True}
+        except Exception as e:
+            logger.warning("Gatekeeper devre disi: %s", e)
+
         baslama = time.time()
         tur = 0
 
@@ -1146,7 +1165,7 @@ class ConversationLoop:
                 logger.warning("[plugin] pre_llm_call sessiz_except")
             try:
                 # ONCE tools'suz dene: selam/chat icin DeepSeek direkt cevap versin
-                api_yanit = self._direct_api_call(messages, tools_bos=True)
+                api_yanit = self._direct_api_call(messages, tools_bos=True, session_id=session_id)
                 if api_yanit:
                     icerik = self._yanit_icerigi_al(api_yanit)
                     tcalls = self._tool_calls_al(api_yanit)
@@ -1158,10 +1177,10 @@ class ConversationLoop:
                     else:
                         # tools'suz bos yanit -> tools ILE tekrar dene
                         log.debug("[%s] tools_bos=True bos yanit, tools ILE deneniyor", task_id)
-                        api_yanit = self._direct_api_call(messages, tools_bos=False)
+                        api_yanit = self._direct_api_call(messages, tools_bos=False, session_id=session_id)
                 else:
                     # tools'suz basarisiz -> tools ILE dene
-                    api_yanit = self._direct_api_call(messages, tools_bos=False)
+                    api_yanit = self._direct_api_call(messages, tools_bos=False, session_id=session_id)
             except Exception as _ae:
                 log.warning(
                     "[%s] API cagri hatasi (tur %d): %s", task_id, api_call_count, _ae
@@ -1173,7 +1192,7 @@ class ConversationLoop:
                     if yeni_provider:
                         sonuc["provider"] = yeni_provider
                         log.info("[%s] Fallback provider: %s", task_id, yeni_provider)
-                        api_yanit = self._direct_api_call(messages, tools_bos=False)
+                        api_yanit = self._direct_api_call(messages, tools_bos=False, session_id=session_id)
                 except Exception:
                     logger.warning("[fix_01_sessiz_except] Exception")
 
@@ -2671,10 +2690,42 @@ class ConversationLoop:
             return mesajlar
 
     def _direct_api_call(
-        self, mesajlar: List[dict], tools_bos: bool = False
+        self, mesajlar: List[dict], tools_bos: bool = False,
+        session_id: Optional[str] = None
     ) -> Optional[dict]:
         """Dogrudan OpenAI SDK ile DeepSeek API cagrisi (beyin yoksa fallback).
-        tools_bos=True ise tools listesi gonderilmez (DeepSeek direkt cevap versin)."""
+        tools_bos=True ise tools listesi gonderilmez (DeepSeek direkt cevap versin).
+        
+        Gatekeeper: Kullanici mesaji sayisal/DB iddiasi iceriyorsa
+        run_gatekept_turn() devreye girer (kod calistirma zorunlulugu).
+        """
+        # ── Gatekeeper kontrolu ──────────────────────────────────
+        try:
+            son_kullanici_msg = ""
+            for m in reversed(mesajlar):
+                if m.get("role") == "user":
+                    son_kullanici_msg = m.get("content", "")
+                    break
+            from reymen.guvenlik.agent_gatekeeper import (
+                response_makes_numeric_claim,
+                run_gatekept_turn,
+            )
+            if son_kullanici_msg and response_makes_numeric_claim(son_kullanici_msg):
+                gk_messages = []
+                for m in mesajlar:
+                    gk_messages.append({"role": m.get("role","user"), "content": m.get("content","")})
+                gk_yanit = run_gatekept_turn(
+                    session_id=session_id or "gatekeeper-unknown",
+                    messages=gk_messages,
+                )
+                if gk_yanit and not gk_yanit.startswith("GATEKEEPER:"):
+                    return {"role": "assistant", "content": gk_yanit, "tool_calls": []}
+                # Gatekeeper basarisiz olursa normal akisa devam
+                log.warning("Gatekeeper basarisiz, normal API cagrisina dusuluyor: %s", gk_yanit[:100])
+        except ImportError:
+            pass  # agent_gatekeeper yoksa normal akis
+        except Exception as gk_e:
+            log.warning("Gatekeeper hatasi (sessiz): %s", gk_e)
         try:
             from openai import OpenAI
 

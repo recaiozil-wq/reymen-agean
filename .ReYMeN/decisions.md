@@ -35,3 +35,16 @@
 **Neden:** 11 maddelik listede 5'i KISMEN/EKSIKTI. Hepsini TAM'a çekmek için.
 
 **Sonuç:** GitHub push başarılı (cc16c4b9). defter.txt güncellendi.
+
+## Karar #38 — 2026-07-04 | Derinlemesine Test Zorunluluğu
+
+**Ne oldu:** Kral_38 bot'un yaptığı kontrolde 3 eksik tespit edildi (SKILL.md adı, profiles, slash komutlar), ben yüzeysel grep ile "tamam" demiştim.
+
+**Kök neden:** Yüzeysel dosya varlığı kontrolü yaptım, içerik kalitesini/stub durumunu atladım.
+
+**Kural (KESIN - değişmez):** "Tamam" demeden ÖNCE:
+1. Dosyada fiziksel var mı kontrol et
+2. İçerik stub mu, gerçek kod mu? (satır sayısı, import edilebilirlik)
+3. `python -c` ile çalışma testi yap
+4. Tüm alt lokasyonlarda ara (sadece 1 yerde değil)
+5. En az 3 farklı yöntemle doğrula
