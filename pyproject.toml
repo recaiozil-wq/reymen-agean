@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "reymen-agent"
-version = "2026.07.01"
+version = "2026.07.04"
 description = "Autonomous AI agent with reasoning core, multi-platform gateways, and plugin system"
 readme = "README.md"
 license = { text = "MIT" }

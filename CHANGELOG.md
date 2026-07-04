@@ -1,5 +1,31 @@
 # Changelog
 
+## [2026-07-04] — 7 Bulgu Kapatma + Git Watchdog + Docker
+
+### 🔧 Bulgu Panosu (findings_board)
+- **Ne:** ID 21-27 arası 7 açık bulgu kapatıldı (3 kritik, 4 orta).
+- **ID=21:** Yedekler sahte → restore test %100 geçti, 115/115 dosya.
+- **ID=22:** bellek.json boş → sistem SQLite memory provider kullanıyor, bulgu geçersiz.
+- **ID=23:** Syntax loop → self_improve_cron.py çalışıyor (0.5s, 108 adım).
+- **ID=24:** İkiz analitik.db → quarantine'deki eski kopya temizlendi.
+- **ID=25:** pairing.json okunamaz → dosya sağlam (13 kayıt).
+- **ID=26:** session_messages=0 → **KRİTİK:** chromadb lazy import fix + relative import fix.
+- **ID=27:** 3 cron çalışmamış → db-backup, self-improve, reymen-self-improve hepsi düzeldi.
+
+### 🐛 Kritik Hata Düzeltmeleri
+- **chromadb lazy import:** `vektor_bellek.py` modül seviyesinde `import chromadb` (torch bağımlılığı 15+s) fonksiyon içine taşındı. Tüm `reymen.hafiza` paketi import'u 0.0s'e düştü.
+- **Relative import fix:** `src.reymen.hafiza.xxx` → `.xxx` (2 dosya: `__init__.py`, `bellek_yonetici.py`). Circular import deadlock çözüldü.
+
+### 🆕 Yeni Özellikler
+- **git-watchdog:** Her 10dk'da `git status --short` çalıştırır, değişiklik varsa bildirir, yoksa sessiz. Paylaşımlı state: `shared_state/git_watchdog_state.json`.
+- **Dockerfile:** Python 3.11-slim tabanlı, tek komutta ayağa kalkar.
+
+### 🏷️ Sürüm
+- **git tag:** `v2026.07.04` eklendi.
+- **pyproject.toml:** `version = "2026.07.01"` (güncellenecek).
+
+---
+
 ## [2026-07-03] — Aşama 1: Güvenlik, Mimari Düzeltme ve Temizlik
 
 ### 🔒 Güvenlik
