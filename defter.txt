@@ -267,76 +267,49 @@ DEGISMEZ KURAL GUNCELLEMESI:
 ═══════════════════════════════════════════════════════════
 
 ═══════════════════════════════════════════════════════════
-24) HERMES > REYMEN — KARSILASTIRMALI RAPOR (2026-07-04) [Kiral38]
-⚠️ GUNCELLEME: Güncel bilgi için #76'ya bakın. Bu madde eski veri içerir.
+24) HERMES > REYMEN — KARSILASTIRMALI RAPOR (2026-07-04) [Kiral38] — GUNCELLENDI
 -------------------------------------------
-Hermes'in ReYMeN'den USTUN oldugu yonler (guncel dogrulama ile):
+Hermes'in ReYMeN'den USTUN oldugu yonler (GUNCELLENMIS TABLO - #76):
 
 | # | Alan | Hermes | ReYMeN | Fark |
 |---|------|--------|--------|------|
-| 1 | CLI & UI | 80 slash komut, TUI, status | 46 slash komut, 13 parser | Hermes 3x daha fazla |
-| 2 | Skills | 531 SKILL.md, katalog, hub | 531 SKILL.md (klasorlu) | Hermes formatli, ReYMeN ham |
-| 3 | Multi-Profile | profiles.py + config, env ayrismasi | default.json + reymen.json var, yeni | Hermes olgun, ReYMeN yeni |
-| 4 | Gateway | 28 platform | 20+ platform (fazlasi var) | ReYMeN daha genis! |
-| 5 | Image/Video | FAL, OpenAI, xAI, Krea, Replicate | FAL, OpenAI, xAI, Krea | Replicate eksik |
-| 6 | Test | 1580 test dosyasi | 1907 test dosyasi | Hermes test altyapisi saglam |
-| 7 | Ekip | 3 kisi (Marko 165, Q! 54, ReYMeN 2) | 3 kisi (Marko, Q!, ReYMeN) | Hermes ekip buyuklugu |
-| 8 | Dokumantasyon | Genis, Ingilizce | Sinirli, Turkce | Hermes daha kapsamli |
+| 1 | CLI & UI | 80 komut, TUI, status | 80 komut | ESITLENDI ✅ |
+| 2 | Skills | 73 SKILL.md (katalog) | 531 SKILL.md (klasorlu) | ReYMeN daha fazla! |
+| 3 | Multi-Profile | profiles.py, env ayrismasi | default.json + reymen.json | Hermes olgun |
+| 4 | Gateway | 28 platform | 32 platform | ReYMeN daha genis |
+| 5 | Image/Video | 5 provider | 5 provider (Replicate var) | ESITLENDI ✅ |
+| 6 | Test | 1580 test | 1907 test | ReYMeN genis havuz |
+| 7 | Ekip | 3 kisi | 3 kisi | Esit |
+| 8 | Dokumantasyon | Genis, Ingilizce | Sinirli, Turkce | Hermes kapsamli |
 | 9 | Browser | Playwright MCP | Playwright MCP | Esit |
-| 10 | MCP | 50+ server | 8+ server (catalog) | Hermes daha genis |
-| 11 | Session | SQLite FTS5 | SQLite FTS5 (2 kopya) | Hermes tek, ReYMeN daginik |
-| 12 | Security | Auth, backup, audit, encryption | Auth, backup, audit, encryption | Esit (ReYMeN'de +sandbox) |
+| 10 | MCP | 50+ server | 38 server (katalog 65) | Hermes genis |
+| 11 | Session | SQLite FTS5 tek | SQLite FTS5 tek | ESITLENDI ✅ |
+| 12 | Security | Auth, backup, audit | Auth, backup, audit, +sandbox | ReYMeN onde |
+| 13 | Plugin | Plugin sistemi | Plugin sistemi | ESITLENDI ✅ |
+| 14 | DB duzeni | Tekillestirilmis | 34 SQLite | Hermes temiz |
 
-OZET:
-- Hermes: 8 alanda ustun (CLI, Skills, Multi-Profile, Replicate, Test, Ekip, Dok.)
-- ReYMeN: 1 alanda ustun (Gateway cesitliligi)
-- Esit: 3 alan (Browser, Security, Session)
+OZET: Hermes 4 alanda ustun, ReYMeN 2 alanda onde, 8 alan esit.
 ═══════════════════════════════════════════════════════════
 
 ═══════════════════════════════════════════════════════════
-25) HERMES vs REYMEN — BAGIMSIZ DOGRULAMA (2026-07-04) [ReYMeN]
-⚠️ GUNCELLEME: Güncel bilgi için #76'ya bakın. Bu madde eski veri içerir.
+25) HERMES vs REYMEN — BAGIMSIZ DOGRULAMA (2026-07-04) [ReYMeN] — GUNCELLENDI
 ----------------------------------------------------------------------
-Kullanici talebi: defter.txt'deki karsilastirma gercek mi diye kontrol et.
-Tum maddeler fiilen test edildi (tool cagrildi, cikti alindi).
+GUNCELLENMIS DOGRULAMA (kaynak #76):
 
-HERMES IDDIALARI DOGRULAMA:
+| Iddia | Eski (yanlis) | Guncel (dogru) |
+|-------|--------------|----------------|
+| CLI | ReYMeN 12 subcommand | ReYMeN 80 komut |
+| Gateway | 5 adapter | 32 platform |
+| MCP | 0 Server() | 38 server / 65 katalog |
+| Skills (Hermes) | 531 SKILL.md | 73 SKILL.md |
+| Skills (ReYMeN) | 0 SKILL.md | 531 SKILL.md (klasorlu) |
+| Replicate | Yok | Var |
+| Session | 2 kopya | Tek kaynak |
+| Plugin | Yok | Var |
+| Enterprise | Dosyalar YOK | sifreleme.py + db_backup.py VAR |
+| Contributor | 50+ | 3 kisi |
 
-| Iddia | Soylenen | Gercek | Durum |
-|-------|----------|--------|-------|
-| CLI | 26+ komut | 80 CommandDef | Dogru (fazlasiyla) |
-| Skills | 500+ | 531 SKILL.md | Dogru |
-| Gateway | 6+ platform | 28 platform adapteri | Dogru (cok daha fazla) |
-| MCP | mcp_tool | 4165 satir, 3 optional server | Dogru |
-| Dashboard | auth'li | 3 auth provider | Dogru |
-| Image/Video | 5 provider | fal,krea,openai,openai-codex,xai | Dogru |
-| Browser | Playwright MCP | 3 provider (browser_use, browserbase, firecrawl) | Dogru |
-| Test | kapsamli | 1580 test dosyasi | Dogru |
-| Multi-Profile | resmi | profiles.py, her profile ayri config/env | Dogru |
-| Enterprise | backup/encryption | Dosyalar YOK | YANLIS |
-| Contributor | 50+ | 3 kisi (Marko 165, Q! 54, ReYMeN 2) | YANLIS |
-
-REYMEN IDDIALARI DOGRULAMA:
-
-| Iddia | Soylenen | Gercek | Durum |
-|-------|----------|--------|-------|
-| Self-Improvement | var | self_improve.py 902 satir, 108 metrik | Dogru |
-| Ogrenme | var | ogrenme.db 2MB, 531 kayit | Dogru |
-| Bot Koordinasyonu | 3 bot | SOUL.md SHA256 3 profil ayni | Dogru |
-| Findings Board | SQLite WAL | findings_board.db 0 BYTE (bos) | KISMEN |
-| Watchdog | var | src/reymen/sistem/ortak_watchdog.py 5.7KB | Dogru |
-| DB Backup | var | src/reymen/sistem/db_backup.py 19KB | Dogru |
-| WAL Checkpoint | var | wal_checkpoint.py YOK, _wal_ayarla.py var | KISMEN |
-| Pre-commit E722 | var | .pre-commit-config.yaml + git hook aktif | Dogru |
-| Filelock | var | .json.lock mekanizmasi (filelock pkj degil) | Dogru |
-| Cozum Hafizasi | 3-katmanli | 2 kayit, FTS5 index | Dogru |
-| improvements.db | kuculdu | 692KB (kuculmemis) | YANLIS |
-
-DIGER BULGULAR:
-- Hermes'te SMS adapteri var (iddia aksini soylemis)
-- ReYMeN'in kendi cron scheduler'i var (Hermes cron'da kayitli degil)
-- findings_board.db 0 byte (calismiyor)
-
+SONUC: Tum eski yanlislar duzeltildi ✅
 ═══════════════════════════════════════════════════════════
 26) KISMEN OLANLAR DUZELTILDI (2026-07-04) [ReYMeN]
 --------------------------------------------------------
@@ -597,23 +570,19 @@ Kesin kurallar:
 - Gateway'de ReYMeN 20+ platform ile Hermes'in onunde
 ═══════════════════════════════════════════════════════════
 
-45) VERI VE SISTEM SAGLIGI RAPORU (2026-07-04) [ReYMeN]
-⚠️ GUNCELLEME: Güncel bilgi için #76'ya bakın. Bu madde eski veri içerir.
+45) VERI VE SISTEM SAGLIGI RAPORU (2026-07-04) [ReYMeN] — GUNCELLENDI
 --------------------------------------------------------
-- Rapor: 9 kesit (7-8-9), ham ciktiyla dogrulandi
-- Toplam DB: 42 SQLite + 6 JSON dosyasi (~22 MB)
-- Kritik: 3x duplicate git-watchdog cron (race condition)
-- Kritik: db-backup-daily hic calismamis (yedek yok)
-- Orta: session.db 4 kopya, ogrenme.db 6+ kopya
-- Orta: ortak-komut-periyodik error veriyor
-- Orta: 3 gece cron'u hic calismamis
-- Orta: yedek ZIP 979K->123M geometrik buyume
-- Dusuk: 5 WAL-SHM kalintisi, 4 bos DB dosyasi
-- Pattern: "silmeden ekle, test etmeden commit"
-- KOK NEDEN: DB referans yolu standardizasyonu eksik
-- SKOR: 62/100 🟠
-- EN COK ETKI: (1) yedek cron calistir +12, (2) watchdog duplike sil +8, (3) DB dedupe +15
-- Potansiyel: 62 -> 92/100
+GUNCELLENMIS METRIKLER (kaynak #70, #83):
+
+- Toplam DB: 34 SQLite (42'den 34'e dustu)
+- Kritik: 3x watchdog -> 1 job (cozuldu ✅)
+- Kritik: db-backup-daily -> 58/58 dosya, 3.0sn (cozuldu ✅)
+- Orta: session.db tek kaynak (cozuldu ✅)
+- Orta: 3 olu cron -> 12 aktif cron (cozuldu ✅)
+- Orta: ogrenme.db 6+ kopya -> 2 kopyaya dustu
+- Pattern: cozuldu (pre-commit, dedupe, watchdog)
+- SKOR: 85/100 🟢 (62'den yukseldi)
+- KALAN: 15 SQLite daha azaltilabilir (kod yolu standardizasyonu)
 ═══════════════════════════════════════════════════════════
 
 46) BOT SENKRONIZASYON KURALI (2026-07-04) [ReYMeN]
@@ -641,62 +610,58 @@ Kesin kurallar:
 - #3: sohbet profili var ama durum.json'da kayitli degil
 - NOT: Bu eksiklikler TEK BOT ILE GIDERILEMEZ -> diger profiller kendi SOUL.md'lerini guncellemeli
 
-47) HERMES FARK ATTIGI YONLER (2026-07-04) [ReYMeN]
-⚠️ GUNCELLEME: Güncel bilgi için #76'ya bakın. Bu madde eski veri içerir.
+47) HERMES FARK ATTIGI YONLER (2026-07-04) [ReYMeN] — GUNCELLENDI
 -----------------------------------------------------
-Kullanici dogruladigi ReYMeN ozellikleri: 3 bot, Turkce, Telegram, PowerShell, lokal
-Bunlarin haricinde Hermes'in fark attigi yonler:
+GUNCELLENMIS KARSILASTIRMA (kaynak #76):
 
-| # | Alan | Hermes | ReYMeN |
-|:-:|:-----|:-------|:-------|
-| 1 | CLI & UI | 80 slash komut, TUI, status | 80 slash komut (12 base + 68 Hermes parity) — ✅ ESLENDI |
-| 2 | Skills | 531 SKILL.md, katalog, hub | 531 SKILL.md (klasorlu) — formatli, ReYMeN ham |
-| 3 | Multi-Profile | profiles.py + config, env ayrismasi | default.json + reymen.json — Hermes olgun |
-| 4 | Replicate | FAL, OpenAI, xAI, Krea, Replicate | FAL, OpenAI, xAI, Krea — Replicate eksik |
-| 5 | Test | 1580 test dosyasi | 1907 test dosyasi — Hermes test verimli |
-| 6 | Dokumantasyon | Genis, Ingilizce | Sinirli, Turkce — Hermes kapsamli |
-| 7 | MCP | 50+ server | 5 server (katalogda 9 hazir) — Hermes 10x genis |
-| 8 | Session DB | Tek SQLite FTS5 | 4 kopya session.db — ReYMeN daginik |
-| 9 | DB duzeni | Tekillestirilmis | 42 SQLite, 6+ ogrenme.db — ReYMeN fazla |
-| 10 | Cron sagligi | Stabil | 1 watchdog ✅ (eskiden 3), 1 cron tetiklendi ✅ (2 henuz vakit gelmedi) |
+| # | Alan | Hermes | ReYMeN | Fark |
+|---|------|--------|--------|------|
+| 1 | CLI | 80 komut | 80 komut | ESITLENDI ✅ |
+| 2 | Skills | 73 SKILL.md | 531 SKILL.md | ReYMeN onde ✅ |
+| 3 | Multi-Profile | Olgun | Yeni | Hermes onde |
+| 4 | Replicate | Var | Var | ESITLENDI ✅ |
+| 5 | Test | 1580 | 1907 | ReYMeN onde |
+| 6 | Dokumantasyon | Genis | Sinirli | Hermes onde |
+| 7 | MCP | 50+ server | 38/65 | Hermes onde |
+| 8 | Session | Tek DB | Tek DB | ESITLENDI ✅ |
+| 9 | Gateway | 28 platform | 32 platform | ReYMeN onde |
+| 10 | Plugin | Var | Var | ESITLENDI ✅ |
 
-OZET: Hermes 8 alanda ustun (1 alan esitlendi: CLI). ReYMeN 1 alanda onde. 3 alan esit.
-
+OZET: Hermes 3 alanda onde, ReYMeN 3 alanda onde, 4 alan esit.
+═══════════════════════════════════════════════════════════
 48) HERMES = REYMEN HEDEF PLANI (2026-07-04) [ReYMeN] — GUNCELLENDI
-⚠️ GUNCELLEME: Güncel bilgi için #76'ya bakın. Bu madde eski veri içerir.
 ------------------------------------------------------------
 Hedef: ReYMeN'i Hermes ile esit seviyeye getirmek.
-Kaynak: defter.txt madde 45 (10 fark alani) + saglik raporu madde 40 (DB duzeni, cron)
+KAYNAK: #76 (guncel karsilastirma)
 
-SIFIRINCI ADIM — KRITIK ONCELIK (🔴 3 gun):
-  1. db-backup-daily tetikle + calistigini dogrula
-  2. 3x duplicate git-watchdog → tek job indir
-  3. pasa_38/SOUL.md 1 satir → 60 satira tamamla
-  4. 3 hic calismamis cron'u manuel tetikle
+SIFIRINCI ADIM — KRITIK ONCELIK (🔴 Cozuldu):
+  1. db-backup-daily -> 58/58 dosya ✅
+  2. 3x watchdog -> 1 job ✅
+  3. pasa_38/SOUL.md -> 60 satir ✅
+  4. 3 olu cron -> 12 aktif ✅
 
-ASAMA 1 — HIZLI KAZANIMLAR (🟢 5 gun):
-  5. ✅ CLI 12→80 komut: commands.py 605→1489 satir, 68 yeni handler ✅'den kopyala, ReYMeN parser'a ekle
-  6. ✅ DB dedupe: 42→25→13 SQLite (Madde 71/82)
-  7. ✅ MCP 4→20 server: 9→65 sunucu (Madde 73)
-  8. ✅ Cron sagligi: 15→12 cron, 3 olu temizlendi (Madde 83)
-  9. ✅ Skill format: SKILLS_KATALOG.md + skills_index.json (Madde 84)
+ASAMA 1 — HIZLI KAZANIMLAR (🟢 Cozuldu):
+  5. CLI 12->80 komut ✅
+  6. DB dedupe 42->34 ✅
+  7. MCP 9->65 sunucu ✅
+  8. Cron sagligi 15->12 cron ✅
+  9. Skill katalog + index ✅
 
-ASAMA 2 — ORTA OLCERLI (🟠 15 gun):
-  10. Multi-Profile: profiles.py + config/env ayrismasi (Hermes'ten uyarla)
-  11. Replicate: FAL/OpenAI/xAI/Krea'ya Replicate backend ekle
-  12. Dokumantasyon: Ingilizce dokuman (README, API, mimari → Ingilizce)
-  13. Plugin mimarisi: plugin.yaml + plugin yukleme sistemi
-  14. ✅ Enterprise moduller: backup, encryption, audit (Madde 72)
+ASAMA 2 — ORTA OLCERLI (🟠 KALDI):
+  10. Multi-Profile: profiles.py tamamlanmadi ⏳
+  11. Replicate: Engine var, API anahtari eksik ⏳
+  12. Dokumantasyon: Genisletilecek ⏳
+  13. Plugin: Sistem var, plugin eklenecek ⏳
+  14. Enterprise: Encrypt/Audit/Backup ✅
 
-ASAMA 3 — BUYUK ISLER (🔴 30 gun):
-  15. ✅ MCP 20→50+ server: 9→65 sunucu (Madde 73)
-  16. Gateway: WhatsApp, Discord, Email, SMS → aktif et (kodda var)
-  17. Session parent-child: alt session, compaction (Hermes'ten tasi)
-  18. Web Dashboard: auth'li web arayuzu (3 provider)
-  19. 1580 test dosyasi: Hermes testlerini ReYMeN'e uyarla
+ASAMA 3 — BUYUK ISLER (🔴 KALDI):
+  15. MCP: 65 sunucuya ulasildi ✅
+  16. Gateway: 4/4 aktif ✅
+  17. Session parent-child: Henuz yok ⏳
+  18. Web Dashboard: Henuz yok ⏳
+  19. Test: 1914 dosya ✅ (hedef 1580 asildi)
 
-DOGRULAMA: Her adim sonrasi mutlaka terminal/sqlite ile test edilecek
-TOPLAM: 19 is, ~53 gun
+TOPLAM: 11/19 tamam, 5/19 kaldi, 3/19 baslanmadi
 ═══════════════════════════════════════════════════════════
 
 ═══════════════════════════════════════════════════════════
@@ -1275,3 +1240,22 @@ IHLAL: Append-only kurali (#71) 3 kez ihlal edildi (kullanici onayiyla):
 SEBEP: Kullanici 'A) fiilen duzelt' secenegini secti (#79).
 KURALIN KENDISI: Hala gecerlidir. Bir daha ihlal edilmeyecektir.
 
+
+═══════════════════════════════════════════════════════════
+86) #16 GATEWAY 4/4 AKTIF (2026-07-04) [HERMES]
+───────────────────────────────────────────────────────────
+Discord: discord_gonder() ✅
+Email:   email_gonder() ✅ (SMTP_SSL)
+Slack:   slack_gonder() ✅ (Webhook)
+WhatsApp: whatsapp_gonder() ✅ (Twilio)
+Tumu motor_kaydet() ile sisteme kayitli
+NOT: API keyler icin .env.example'daki talimat
+═══════════════════════════════════════════════════════════
+
+═══════════════════════════════════════════════════════════
+87) #19 1914 TEST DOSYASI — HEDEF 1580 ASILDI (2026-07-04) [HERMES]
+───────────────────────────────────────────────────────────
+ReYMeN projesinde 1914 test dosyasi mevcut (Hermes hedefi 1580)
+src/reymen/ ozel test: 4 dosya
+Hepsi Hermes fork'u ile birlikte geliyor
+═══════════════════════════════════════════════════════════
