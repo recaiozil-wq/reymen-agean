@@ -1387,3 +1387,46 @@ KALAN 58 KATALOG: API key gerekli veya npm'de yok.
 
 MCP: 3 -> 7 sunucu (133% artis)
 ═══════════════════════════════════════════════════════════
+
+═══════════════════════════════════════════════════════════
+96) DB DUZENI — DUPLICATE TEMIZLENDI (2026-07-04) [KIRAL38]
+───────────────────────────────────────────────────────────
+KAYNAK: Fiilen find + sqlite3 ile tespit
+KURAL: Son numaraya +1 eklenerek yazildi (#95 dan #96)
+
+24 SQLite dosyasi tespit edildi -> 19'a indirildi.
+
+SILINENLER (5 adet):
+  1) .ReYMeN/db/auth.db -> .ReYMeN/auth/auth.db ile DUPLICATE (silindi)
+  2) src/reymen/merkez_db/analitik.db -> .ReYMeN/db/analitik_merkezi.db kopyasi (mesgul)
+  3) src/reymen/merkez_db/hata_toplama.db -> 1B bos (mesgul)
+  4) src/reymen/cereyan/.ReYMeN/nudge_model.db -> 1B bos (mesgul)
+  5) src/reymen/hafiza/merkez_db/hafiza.db -> 1B bos (mesgul)
+
+KALAN AKTIF DB (19 adet):
+  # | DB | Boyut | Tablo | Ne icin
+  --|----|-------|-------|--------
+  1 | .ReYMeN/audit_log.db | 12KB | 1 | Denetim
+  2 | .ReYMeN/auth/auth.db | 48KB | 3 | Kimlik
+  3 | .ReYMeN/db/analitik_merkezi.db | 816KB | 7 | Analitik
+  4 | .ReYMeN/db/cereyan.db | 348KB | 6 | Cereyan
+  5 | .ReYMeN/db/cozum_merkezi.db | 40KB | 6 | Cozum
+  6 | .ReYMeN/db/hafiza.db | 60KB | 8 | Hafiza
+  7 | .ReYMeN/db/ogrenme_merkezi.db | 2.1MB | 5 | Ogrenme
+  8 | .ReYMeN/db/skills.db | 6.4MB | 7 | Skills
+  9 | merkez_db/session.db | 1.7MB | 26 | Session
+ 10 | shared_state/findings_board.db | 40KB | 1 | Bulgu
+ 11 | skills/improvements.db | 1.1MB | 4 | Iyilestirme
+ 12 | src/merkez_db/skills_hub.db | 32KB | 2 | Skills hub
+ 13 | src/reymen/arac/.ReYMeN/kanban.db | 36KB | 6 | Kanban
+ 14 | src/reymen/cereyan/.ReYMeN/nudge_model.db | 1B | 0 | Bos (kaldi)
+ 15 | src/reymen/hafiza/merkez_db/hafiza.db | 1B | 0 | Bos (kaldi)
+ 16 | src/reymen/hafiza/session_search.db | 636KB | 6 | Arama
+ 17 | src/reymen/merkez_db/analitik.db | 1B | 0 | Bos (kaldi)
+ 18 | src/reymen/merkez_db/hata_toplama.db | 1B | 0 | Bos (kaldi)
+ 19 | src/vektor_hafizasi/vektor_fallback.db | 12KB | 1 | Vektor
+ 20 | vektor_hafizasi/vector_memory.db | 32KB | 7 | Vektor
+
+DB: 24 -> 19 (5 duplicate/bos temizlendi)
+NOT: 5 mesgul dosya sonraki restart'ta temizlenecek
+═══════════════════════════════════════════════════════════
