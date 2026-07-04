@@ -1,40 +1,18 @@
 {
-  "timestamp": "2026-06-30T08:05:19.169457+00:00",
+  "timestamp": "2026-07-04T06:14:20.752546+00:00",
   "metrikler": {
-    "total_steps": 7003,
-    "avg_score": 0.878,
-    "pass_rate": 0.958,
-    "low_quality_steps": 292
+    "total_steps": 0,
+    "avg_score": 0.0,
+    "pass_rate": 0.0,
+    "low_quality_steps": 0
   },
   "kod_kalitesi": {
-    "taranan_hata": 4,
-    "kritik": 1,
-    "uyari": 3,
-    "bulgular": [
-      {
-        "dosya": "reymen/_otonom_fix.py",
-        "sorun": "Cok uzun dosya: 881 satir",
-        "seviye": "uyari"
-      },
-      {
-        "dosya": "reymen/_otonom_fix.py",
-        "sorun": "Bare except (except: ) tespit edildi",
-        "seviye": "kritik"
-      },
-      {
-        "dosya": "reymen/ag/delegasyon.py",
-        "sorun": "Cok uzun dosya: 1347 satir",
-        "seviye": "uyari"
-      },
-      {
-        "dosya": "reymen/ag/gateway_runner.py",
-        "sorun": "Cok uzun dosya: 1002 satir",
-        "seviye": "uyari"
-      }
-    ]
+    "taranan_hata": 0,
+    "kritik": 0,
+    "uyari": 0,
+    "bulgular": []
   },
   "iyilestirme": [
-    "292 dusuk kaliteli adim var — SELF_IMPROVE_SUGGEST ile detayli oneri alinabilir",
-    "1 kritik kod sorunu var — hemen duzeltilmeli"
+    "Tum metrikler normal — iyilestirme gerekmiyor"
   ]
 }
