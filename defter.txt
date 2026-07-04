@@ -143,20 +143,38 @@ ReYMeN = Akilli, otonom, ozellestirilmis (self-improvement, ogrenme, 3 bot)
 
 16) SON KARSILASTIRMA (2026-07-04)
 -----------------------------------------------
-| # | Ozellik               | Once       | Sonra       |
-|---|----------------------|------------|------------|
-| 1 | CLI and UI           | Tam        | Tam         |
-| 2 | Skill Sistemi        | Bos (0)    | 532 SKILL.md|
-| 3 | Plugin               | Tam        | Tam         |
-| 4 | Gateway (Discord)    | Yok        | REST API    |
-| 5 | Gateway (Email)      | Yok        | SMTP_SSL    |
-| 6 | Multi-Profile        | Tam        | Tam         |
-| 7 | Session              | Tam        | Tam         |
-| 8 | MCP                  | Tam        | Tam         |
-| 9 | Web Dashboard        | Tam        | Tam         |
-|10 | Image/Video Gen      | Slayt      | FAL video   |
-|11 | Browser              | Tam        | Tam         |
-|12 | Auth/Backup/Security | Tam        | Tam         |
-|13 | Audit Log            | Yok        | SQLite      |
-|14 | Encryption           | Yok        | Fernet      |
-===============================================
+| #  | Özellik              | Önce         | Sonra          |
+|----|----------------------|--------------|----------------|
+| 1  | CLI & UI             | ✅ Tam       | ✅ Tam         |
+| 2  | Skill Sistemi        | ❌ Boş (0)   | ✅ 532 SKILL.md|
+| 3  | Plugin               | ✅ Tam       | ✅ Tam         |
+| 4  | Gateway (Discord)    | ❌ Yok       | ✅ REST API    |
+| 5  | Gateway (Email)      | ❌ Yok       | ✅ SMTP_SSL    |
+| 6  | Multi-Profile        | ✅ Tam       | ✅ Tam         |
+| 7  | Session              | ✅ Tam       | ✅ Tam         |
+| 8  | MCP                  | ✅ Tam       | ✅ Tam         |
+| 9  | Web Dashboard        | ✅ Tam       | ✅ Tam         |
+| 10 | Image/Video Gen      | ⚠️ Slayt     | ✅ FAL video   |
+| 11 | Browser              | ✅ Tam       | ✅ Tam         |
+| 12 | Auth/Backup/Security | ✅ Tam       | ✅ Tam         |
+| 13 | Audit Log            | ❌ Yok       | ✅ SQLite      |
+| 14 | Encryption           | ❌ Yok       | ✅ Fernet      |
+| 15 | WhatsApp Gateway      | ❌ Yok       | ✅ Twilio API  |
+| 16 | Slack Gateway         | ❌ Yok       | ✅ Webhook     |
+═══════════════════════════════════════════════════════════
+
+17) WHATSAPP GATEWAY (2026-07-04) [ReYMeN]
+-----------------------------------------------
+- Yeni: src/reymen/ag/whatsapp_gateway.py
+- Twilio REST API (urllib, harici kutuphane gerekmez)
+- Fonksiyon: whatsapp_gonder(numara, mesaj)
+- .env: WHATSAPP_ACCOUNT_SID, WHATSAPP_AUTH_TOKEN, WHATSAPP_NUMBER
+
+18) SLACK GATEWAY (2026-07-04) [ReYMeN]
+-----------------------------------------------
+- Yeni: src/reymen/ag/slack_gateway.py
+- Slack Incoming Webhook (urllib)
+- Fonksiyon: slack_gonder(mesaj, webhook_url)
+- Markdown destegi (mrkdwn)
+- .env: SLACK_WEBHOOK_URL
+═══════════════════════════════════════════════════════════
