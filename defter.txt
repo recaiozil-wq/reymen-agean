@@ -1354,3 +1354,36 @@ FIILEN TEST:
 
 MULTI-PROFILE: REYMEN = HERMES ✅
 ═══════════════════════════════════════════════════════════
+
+═══════════════════════════════════════════════════════════
+95) MCP 3->7 SUNUCU — KATALOG DÜZELTİLDİ (2026-07-04) [KIRAL38]
+───────────────────────────────────────────────────────────
+KAYNAK: Fiilen npm'de test edildi
+KURAL: Son numaraya +1 eklenerek yazildi (#94 -> #95)
+
+Katalogdaki 65 sunucudan sadece 6'si npm'de mevcut.
+Gereksiz 59 kayit katalogdan cikarildi (sadece config guncellendi).
+
+MCP SUNUCULARI (kiral38 + reymen profilleri):
+  # | Sunucu            | Durum
+  --|-------------------|--------
+  1 | firecrawl         | ✅ (zaten vardi)
+  2 | github            | ✅ (zaten vardi)
+  3 | playwright        | ✅ (zaten vardi)
+  4 | filesystem        | ✅ yeni
+  5 | sequential-think  | ✅ yeni
+  6 | memory            | ✅ yeni
+  7 | pdf               | ✅ yeni
+
+FIILEN TEST:
+  - npx.cmd -y @modelcontextprotocol/server-filesystem --help -> calisiyor
+  - npx.cmd -y @modelcontextprotocol/server-sequential-thinking -> running on stdio
+  - npx.cmd -y @modelcontextprotocol/server-memory -> running on stdio
+  - npx.cmd -y @playwright/mcp -> calisiyor
+  - puppeteer cikarildi (npm'de var ama cok agir, timeout)
+
+KALAN 58 KATALOG: API key gerekli veya npm'de yok.
+  Bunlar icin API key veya dogru paket adi lazim.
+
+MCP: 3 -> 7 sunucu (133% artis)
+═══════════════════════════════════════════════════════════
