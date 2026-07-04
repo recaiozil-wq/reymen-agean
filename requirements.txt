@@ -69,4 +69,4 @@ aiohttp>=3.9.0
 # pytest-cov>=4.1.0
 
 # === SECURITY ===
-# cryptography>=41.0.0
+cryptography>=41.0.0

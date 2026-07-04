@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
+
 """Video Generation Engine - ReYMeN video uretme motoru.
 
 Desteklenen backends:
   1. moviepy (image+audio -> slideshow) - her zaman calisir
-  2. FAL.ai AI video - API key varsa
+  2. FAL.ai AI video (vectara-video / runway-gen3) - API key varsa
   3. HyperFrames - kuruluysa
 """
 
@@ -17,6 +18,8 @@ import json
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional
+
+import requests
 
 logger = logging.getLogger(__name__)
 
@@ -152,7 +155,7 @@ def _moviepy_slayt(
         return f"[HATA] {type(e).__name__}: {e}"
 
 
-# ── FAL.ai ile AI Video Uretimi ─────────────────────────────────────────────
+# ── FAL.ai ile AI Video Uretimi (fal_client) ────────────────────────────────
 
 
 def _fal_video(
@@ -161,7 +164,7 @@ def _fal_video(
     sure: int = 5,
     resim_yolu: str = "",
 ) -> str:
-    """FAL.ai uzerinden AI video uret.
+    """FAL.ai uzerinden AI video uret (fal_client ile).
 
     Args:
         prompt: Video promptu.
@@ -223,6 +226,149 @@ def _fal_video(
         return f"[HATA] {type(e).__name__}: {e}"
 
 
+# ── FAL.ai Vectara Video (requests ile dogrudan HTTP) ───────────────────────
+
+
+def video_olustur_fal(
+    prompt: str,
+    aspect_ratio: str = "16:9",
+) -> str:
+    """FAL.ai Vectara Video API ile AI video uret (requests ile).
+
+    2 mod: 'slayt' (moviepy) veya 'fal_video' (FAL Vectara).
+
+    Args:
+        prompt: Video promptu.
+        aspect_ratio: Video en-boy orani ("16:9", "9:16", "1:1").
+
+    Returns:
+        Video dosyasi yolu (indirilir) veya hata mesaji.
+    """
+    api_key = os.environ.get("FAL_KEY") or os.environ.get("FAL_API_KEY") or ""
+    if not api_key:
+        return "[HATA] FAL_KEY ortam degiskeni bulunamadi."
+
+    endpoint = "https://fal.run/fal-ai/vectara-video"
+    headers = {
+        "Authorization": f"Key {api_key}",
+        "Content-Type": "application/json",
+    }
+    payload: dict[str, Any] = {
+        "prompt": prompt,
+        "aspect_ratio": aspect_ratio,
+    }
+
+    logger.info(
+        "[VideoGen] FAL Vectara video istegi: prompt=%s, aspect_ratio=%s",
+        prompt[:50],
+        aspect_ratio,
+    )
+
+    try:
+        # Sync POST — FAL ya dogrudan sonucu doner ya da status_url verir
+        resp = requests.post(endpoint, headers=headers, json=payload, timeout=120)
+        resp.raise_for_status()
+        data: dict[str, Any] = resp.json()
+
+        # 1) Dogrudan video URL'si geldi mi?
+        video_url = ""
+        if isinstance(data, dict):
+            video_url = data.get("video", {}).get("url", "") or data.get(
+                "output", {}
+            ).get("video_url", "")
+
+        if video_url:
+            logger.info("[VideoGen] FAL Vectara video uretildi: %s", video_url[:80])
+            return _fal_video_indir(video_url)
+
+        # 2) Async — status_url ile polling
+        status_url = data.get("status_url", "") or data.get("links", {}).get(
+            "status", ""
+        )
+        request_id = data.get("request_id", "")
+
+        if status_url:
+            logger.info(
+                "[VideoGen] FAL Vectara async baslatildi, polling: %s",
+                request_id or status_url,
+            )
+            for _ in range(60):  # max 5 dk bekle
+                time.sleep(5)
+                try:
+                    sr = requests.get(status_url, headers=headers, timeout=30)
+                    if sr.status_code != 200:
+                        break
+                    sd: dict[str, Any] = sr.json()
+                    status = sd.get("status", "")
+                    if status == "COMPLETED":
+                        video_url = (
+                            sd.get("video", {}).get("url", "")
+                            or sd.get("output", {}).get("video_url", "")
+                        )
+                        if video_url:
+                            logger.info(
+                                "[VideoGen] FAL Vectara video hazir: %s",
+                                video_url[:80],
+                            )
+                            return _fal_video_indir(video_url)
+                        break
+                    elif status in ("FAILED", "CANCELLED", "ERROR"):
+                        err = sd.get("error", "Bilinmeyen hata")
+                        return f"[HATA] FAL video basarisiz: {err}"
+                except requests.exceptions.RequestException as e:
+                    logger.warning("[VideoGen] FAL polling hatasi: %s", e)
+                    break
+
+            return "[HATA] FAL video zaman asimi (5 dk) veya URL alinamadi."
+
+        return f"[HATA] FAL API yaniti: video URL'si veya status_url bulunamadi: {str(data)[:200]}"
+
+    except requests.exceptions.Timeout:
+        return "[HATA] FAL API zaman asimi (120 saniye)."
+    except requests.exceptions.RequestException as e:
+        return f"[HATA] FAL API hatasi: {type(e).__name__}: {e}"
+    except Exception as e:
+        logger.exception("[VideoGen] FAL Vectara video hatasi: %s", e)
+        return f"[HATA] {type(e).__name__}: {e}"
+
+
+def _fal_video_indir(video_url: str) -> str:
+    """FAL'dan gelen video URL'sini lokal onbellege indir.
+
+    Args:
+        video_url: FAL video URL'si.
+
+    Returns:
+        Yerel dosya yolu veya URL (indirme basarisizsa).
+    """
+    try:
+        zaman = datetime.now().strftime("%Y%m%d_%H%M%S")
+        yerel_yol = str(VIDEO_CACHE / f"fal_video_{zaman}.mp4")
+
+        r = requests.get(video_url, stream=True, timeout=120)
+        r.raise_for_status()
+
+        with open(yerel_yol, "wb") as f:
+            for chunk in r.iter_content(chunk_size=8192):
+                f.write(chunk)
+
+        if os.path.exists(yerel_yol) and os.path.getsize(yerel_yol) > 0:
+            logger.info(
+                "[VideoGen] FAL video indirildi: %s (%d bytes)",
+                yerel_yol,
+                os.path.getsize(yerel_yol),
+            )
+            return yerel_yol
+
+        logger.warning("[VideoGen] FAL video indirilemedi, URL donuluyor: %s", video_url)
+        return video_url
+    except Exception as e:
+        logger.warning(
+            "[VideoGen] FAL video indirme hatasi: %s, URL donuluyor: %s", e, video_url
+        )
+        return video_url
+
+
 # ── HyperFrames ile Video ────────────────────────────────────────────────────
 
 
@@ -265,6 +411,7 @@ def video_uret(
     sure: int = 5,
     model: str = "moviepy",
     cikti: str = "",
+    aspect_ratio: str = "16:9",
 ) -> str:
     """Video uret.
 
@@ -273,13 +420,17 @@ def video_uret(
         resimler: Resim dosya yollari (slayt icin).
         ses_yolu: Opsiyonel ses dosyasi.
         sure: Video suresi (saniye).
-        model: Video motoru (moviepy, fal, hyperframes).
+        model: Video motoru (moviepy, fal_video, fal, hyperframes).
         cikti: Cikti dosya yolu.
+        aspect_ratio: En-boy orani (sadece fal_video modunda).
 
     Doner:
         Video dosyasi yolu veya URL.
     """
-    if model == "fal":
+    if model == "fal_video":
+        return video_olustur_fal(prompt, aspect_ratio=aspect_ratio)
+
+    elif model == "fal":
         return _fal_video(prompt, sure=sure, resim_yolu=resimler[0] if resimler else "")
 
     elif model == "hyperframes":
@@ -298,8 +449,9 @@ def video_durum() -> str:
     """Video gen sistem durumu."""
     satirlar = [
         "=== Video Generation Durumu ===",
-        f"moviepy: {'✅' if _moviepy_mevcut() else '❌'}",
-        f"FAL.ai: {'✅' if _fal_mevcut() else '❌'}",
+        f"moviepy (slayt): {'✅' if _moviepy_mevcut() else '❌'}",
+        f"FAL.ai (fal_client): {'✅' if _fal_mevcut() else '❌'}",
+        f"FAL.ai (vectara-video, requests): {'✅' if _fal_key_var() else '❌'}",
         f"HyperFrames: {'✅' if _hyperframes_mevcut() else '❌'}",
         f"Video cache: {VIDEO_CACHE}",
     ]
@@ -318,6 +470,11 @@ def _moviepy_mevcut() -> bool:
         return False
 
 
+def _fal_key_var() -> bool:
+    """FAL_KEY ortam degiskeni var mi (kutuphane olmadan)."""
+    return bool(os.environ.get("FAL_KEY") or os.environ.get("FAL_API_KEY") or "")
+
+
 # ── Motor Kayit ──────────────────────────────────────────────────────────────
 
 
@@ -330,6 +487,7 @@ def motor_kaydet(motor: Any) -> None:
         ses_yolu: str = "",
         sure: int = 5,
         model: str = "moviepy",
+        aspect_ratio: str = "16:9",
     ) -> str:
         """VIDEO_OLUSTUR: Video uret.
 
@@ -338,14 +496,17 @@ def motor_kaydet(motor: Any) -> None:
             resimler (str) — Virgulle ayrilmis resim yollari (slayt icin).
             ses_yolu (str) — Opsiyonel arka plan ses dosyasi.
             sure (int) — Video suresi (saniye, varsayilan: 5).
-            model (str) — Video motoru: 'moviepy' (varsayilan), 'fal', 'hyperframes'.
+            model (str) — Video motoru: 'moviepy' (varsayilan), 'fal_video',
+                          'fal', 'hyperframes'.
+            aspect_ratio (str) — En-boy orani '16:9' (varsayilan), '9:16', '1:1'
+                                 (sadece fal_video modunda).
 
         Doner: Video dosyasi yolu veya URL.
         """
         resim_list = (
             [r.strip() for r in resimler.split(",") if r.strip()] if resimler else []
         )
-        return video_uret(prompt, resim_list, ses_yolu, sure, model)
+        return video_uret(prompt, resim_list, ses_yolu, sure, model, aspect_ratio=aspect_ratio)
 
     def _video_durum() -> str:
         """VIDEO_DURUM: Video gen sistem durumu."""
@@ -382,7 +543,8 @@ def motor_kaydet(motor: Any) -> None:
             "Video uretir. Parametreler: prompt=str (AI prompt), "
             "resimler=str (virgulle ayrilmis resim yollari), "
             "ses_yolu=str (opsiyonel), sure=int (saniye), "
-            "model=str (moviepy/fal/hyperframes). "
+            "model=str (moviepy/fal_video/fal/hyperframes), "
+            "aspect_ratio=str (16:9/9:16/1:1, fal_video icin). "
             "Doner: video dosyasi yolu veya URL.",
         )
         motor._plugin_arac_kaydet(

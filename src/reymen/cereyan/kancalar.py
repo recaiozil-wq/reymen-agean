@@ -21,10 +21,13 @@ Kullanım:
         # Eylem çalıştırılır
 """
 
+import os
+import sqlite3
 import time
 import threading
 from collections import defaultdict
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from typing import Optional
 
 
@@ -41,6 +44,73 @@ ENGELLENEN_ARACLAR = frozenset(
         "BICAKLA",  # Tehlikeli araçlar
     }
 )
+
+# ── Audit Log (SQLite) ─────────────────────────────────────────────────────────
+
+_PROJE_KOKU = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "..", "..")
+)
+AUDIT_DB_DIZINI = os.path.join(_PROJE_KOKU, ".ReYMeN")
+AUDIT_DB_YOL = os.path.join(AUDIT_DB_DIZINI, "audit_log.db")
+
+_kilit_audit = threading.Lock()
+
+
+def _audit_tablo_var_mi() -> bool:
+    """audit_log tablosunun var olduğunu kontrol eder, yoksa oluşturur."""
+    os.makedirs(AUDIT_DB_DIZINI, exist_ok=True)
+    with _kilit_audit:
+        con = sqlite3.connect(AUDIT_DB_YOL)
+        try:
+            con.execute(
+                """
+                CREATE TABLE IF NOT EXISTS audit_log (
+                    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                    eylem       TEXT    NOT NULL,
+                    kullanici   TEXT    NOT NULL DEFAULT 'system',
+                    hedef       TEXT    NOT NULL DEFAULT '',
+                    durum       TEXT    NOT NULL DEFAULT 'pending',
+                    timestamp   TEXT    NOT NULL
+                )
+                """
+            )
+            con.commit()
+        finally:
+            con.close()
+    return True
+
+
+def audit_kaydet(
+    eylem: str,
+    kullanici: str = "system",
+    hedef: str = "",
+    durum: str = "pending",
+) -> None:
+    """Bir eylemi audit log'a kaydeder.
+
+    Args:
+        eylem: Gerçekleştirilen eylem adı (örn. \"KOMUT_CALISTIR\").
+        kullanici: Eylemi başlatan kullanıcı/görev ID'si (varsayılan: 'system').
+        hedef: Eylemin hedefi (varsayılan: '').
+        durum: Eylem durumu (varsayılan: 'pending').
+
+    Tablo şeması: audit_log(id, eylem, kullanici, hedef, durum, timestamp)
+    """
+    _audit_tablo_var_mi()
+    ts = datetime.now(timezone.utc).isoformat()
+    with _kilit_audit:
+        con = sqlite3.connect(AUDIT_DB_YOL)
+        try:
+            con.execute(
+                """
+                INSERT INTO audit_log (eylem, kullanici, hedef, durum, timestamp)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                (eylem, kullanici, hedef, durum, ts),
+            )
+            con.commit()
+        finally:
+            con.close()
 
 
 # ── Veri Yapıları ─────────────────────────────────────────────────────────────
@@ -93,6 +163,14 @@ class KancaMotoru:
         """
         with self._kilit:
             durum = self._durum[task_id]
+
+            # Audit log — her eylem öncesi kayıt
+            audit_kaydet(
+                eylem=arac,
+                kullanici=task_id,
+                hedef=f"derinlik={derinlik}",
+                durum="denetleniyor",
+            )
 
             # Bloke kontrolü
             if durum.bloke:

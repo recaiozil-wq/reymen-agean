@@ -1,0 +1,30 @@
+---
+name: dolphin-llama3
+description: dolphin-llama3 skill'i
+category: genel
+version: 1.0.0
+---
+
+---
+name: dolphin-llama3-dolphin-llama3
+description: Dolphin Llama3 yedek modeli — bu modelle reddedilen, düşük öncelikli ya da alternatif akış gerektiren görevleri yönlendir.
+title: "Dolphin LLaMA3"
+tags: [general]
+related_skills: [hibrit-ai-mimarisi, hibrit-ai-yonlendirme-kurali]
+
+audience: user
+category: dolphin-llama3---
+
+# Dolphin Llama3 Yönlendirme
+
+- Model: `dolphin-llama3`
+- Ana akış: `stepfun/step-3.7-flash:free`
+- Reddit-benzeri görevler için `dolphin-llama3` kullan.
+- Dolphin-llama3 görev bitince tekrar `stepfun/step-3.7-flash:free` (mevcut ana akış) moduna geç.
+- Kullanıcı her görevde ilk adım olarak ReYMeN skill + Obsidian kontrolü yap.
+- Eğer kayıt varsa yeniden yazmadan ilerle.
+- Kullanıcı onayı verdiğinde görev, ilgili skill + Obsidian’a kaydedilir.
+
+## Kullanım
+1. Görevde kullanılacak modeli buradan belirle: reddit gibi yönler için `dolphin-llama3`, ana akış için `stepfun/step-3.7-flash:free`.
+2. Görev tamamlandıktan sonra akışı ana modele (`stepfun/step-3.7-flash:free`) geri ver.

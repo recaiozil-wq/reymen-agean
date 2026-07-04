@@ -2,64 +2,161 @@
                    R E Y M E N   D E F T E R
 ═══════════════════════════════════════════════════════════
 Tarih: 2026-07-04
+Not: Her madde hangi bot tarafindan yazildigini belirtir.
+Botlar: @ReYMeN_ReYMeNbot (ReYMeN), @Pasa_38_bot (Pasa_38),
+@Kiral38bot (Kiral38).
 ───────────────────────────────────────────────────────────
 
-1) DEEPSEEK API KEY YENİLEME
-─────────────────────────────
-- Eski key: 401 (geçersiz)
-- Yeni key: sk-050be4c36f1944b4b4de1269826f30f7
-- 3 profile de yazıldı:
-  • default/ → .env
-  • reymen/ → .env
-  • kiral38/ → .env
+1) DEEPSEEK API KEY YENILEME [ReYMeN]
+──────────────────────────────────────
+- Eski key: 401 (gecersiz)
+- Yeni key: sk-050...30f7
+- 3 profile de yazildi: default/, reymen/, kiral38/
 - Test: HTTP 200 OK
 
-2) REYMEN LAUNCHER MODEL DÜZELTME
-─────────────────────────────────
-- Sorun: Varsayılan model deepseek-chat (artık yok)
-- Çözüm: .env'ye REYMEN_MODEL=deepseek-v4-flash yazıldı
+2) REYMEN LAUNCHER MODEL DUZELTME [ReYMeN]
+───────────────────────────────────────────
+- Sorun: Varsayilan model deepseek-chat (artik yok)
+- Cozum: .env'ye REYMEN_MODEL=deepseek-v4-flash yazildi
 - Etkilenen: reymen_launcher.py (5 yerde deepseek-chat fallback)
-- Sonuç: PowerShell'den reymen yazınca Hermes gibi çalışır
 
-3) GATEWAY'LER YENİDEN BAŞLATILDI
-──────────────────────────────────
-- Hermes_Gateway (default) → Running
-- Hermes_Gateway_reymen → Running (PID 41888)
-- Hermes_Gateway_kiral38 → Running (PID 4068)
-- .cmd dosyaları düzeltildi (@exit /b 0 → gerçek komut)
-- Eski PID'ler öldürüldü (32912, 18984, 31868)
+3) GATEWAY'LER YENIDEN BASLATILDI [ReYMeN]
+───────────────────────────────────────────
+- Hermes_Gateway (default) -> Running
+- Hermes_Gateway_reymen -> Running (PID 41888)
+- Hermes_Gateway_kiral38 -> Running (PID 4068)
+- .cmd dosyalari duzeltildi
 
-4) GIT-WATCHDOG CRON DÜZELTME
-───────────────────────────────
-- Script: C:\Users\marko\AppData\Local\hermes\scripts\git_watchdog.py
-- Sorun: ROOT yolu parent.parent.parent ile yanlış
-- Çözüm: Mutlak yol + env override + parent traversal
-- Test: exit=0, çalışıyor
+4) GIT-WATCHDOG CRON DUZELTME [ReYMeN]
+───────────────────────────────────────
+- ROOT yolu parent.parent.parent ile yanlis
+- Cozum: Mutlak yol + env override
+- Test: exit=0, calisiyor
 
-5) SELF-IMPROVE CRON DÜZELTME
-───────────────────────────────
-- Script: C:\Users\marko\AppData\Local\hermes\scripts\self_improve_cron.py
-- Sorunlar: ROOT yolu yanlış, 3 yerde KeyError
-- Çözüm: ROOT düzeltildi, .get() korumaları eklendi
-- Test: exit=0, çalışıyor
+5) SELF-IMPROVE CRON DUZELTME [ReYMeN]
+───────────────────────────────────────
+- ROOT yolu yanlis, 3 yerde KeyError
+- Cozum: ROOT duzeltildi, .get() korumalari eklendi
 
-6) CRON İPTALLERİ
-──────────────────
-- Kendini Geliştirme Döngüsü → kalıcı silindi
-- reymen-self-improvement → deliver=origin → local
-- self-improve-dongusu → script düzeltildi
+6) CRON IPTALLERI [ReYMeN]
+───────────────────────────
+- Kendini Gelistirme Dongusu -> kalici silindi
+- reymen-self-improvement -> deliver=origin -> local
 
-7) reymen/ vs src/reymen/ DRİFTİ
-──────────────────────────────────
-- 30 ölü dosya silindi (reymen/ag/, reymen/scripts/, tbench*, .bak*)
-- 94.020 satır temizlendi
-- Commit: 1a373d0f → GitHub push
+7) reymen/ vs src/reymen/ DRIFTI [ReYMeN]
+──────────────────────────────────────────
+- 30 olu dosya silindi (reymen/ag/, .bak*)
+- 94.020 satir temizlendi
+- Commit: 1a373d0f -> GitHub push
 
-8) GÜNCEL DURUM
-────────────────
-✓ DeepSeek API: HTTP 200
-✓ 3 gateway: Running
-✓ 3 bot: Telegram'a bağlı
-✓ Cron'lar: 11 aktif, hepsi OK
-✓ Model: deepseek-v4-flash
+8) GUNCEL DURUM [ReYMeN]
+─────────────────────────
+- DeepSeek API: HTTP 200
+- 3 gateway: Running
+- 3 bot: Telegram'a bagli
+- Cron'lar: 11 aktif
+- Model: deepseek-v4-flash
+
+9) TOOL ENTEGRASYONU (2026-07-04) [ReYMeN]
+───────────────────────────────────────────
+- Eksik tespit: Session Search tool YOKTU
+- Yeni: src/reymen/tools/session_search_tool.py
+- Degisen: ReYMeN_cli/commands.py -> /search, /image eklendi
+- Degisen: reymen_launcher.py -> REPL'de /search, /image handler
+- Test: session_search 4 mod calisiyor
+
+10) HERMES vs REYMEN KARSILASTIRMASI [ReYMeN]
+──────────────────────────────────────────────
+HERMES'IN USTUN YONLERI:
+- CLI & UI: Tam CLI (26+ alt komut), TUI, status bar
+- Skill Sistemi: 500+ skill, katalog, import/export/hub
+- Plugin Mimarisi: browser, image_gen, cron, auth plugin'leri
+- Gateway: Telegram, Discord, WhatsApp, Email, SMS, Slack
+- Multi-Profile: Resmi destek, her profile ayri config/env
+- Session: SQLite DB (session_messages, FTS5, parent-child)
+- MCP: Yerlesik MCP client (50+ server)
+- Web Dashboard: Auth'li dashboard
+- Image/Video: FAL, OpenAI, xAI, Krea, Replicate
+- Browser: Playwright MCP (full snapshot/click/type)
+- Enterprise: Auth, backup, security, audit, encryption
+- Test: Kapsamli pytest suite
+- Ekip: 50+ contributor
+
+REYMEN'IN USTUN YONLERI:
+- Turkce: Tam Turkce (kod, yorum, cikti, SOUL.md)
+- Self-Improvement: Otonom kendini gelistirme dongusu
+- Ogrenme Sistemi: ogrenme.db, cozum_hafizasi, FTS5
+- Bot Koordinasyonu: 3 bot ayni durumu paylasir
+- Findings Board: Ortak bulgu panosu (SQLite WAL)
+- Otonom Fix: Geceleri except:pass, hata, eksik fix'leri
+- Watchdog: Git status watchdog + auto-commit
+- DB Backup: Otomatik gunluk/haftalik yedekleme
+- WAL Checkpoint: 6 saatte bir WAL checkpoint
+- Pre-commit: Ruff E722 ile except:pass engelleme
+- Cozum Hafizasi: 3-katmanli confidence ile cozum kaydi
+- Veri Temizligi: improvements.db, kopya DB temizleme
+- Filelock: durum.json eszamanli yazma korumasi
+- Ozellestirme: Tam kontrol, istegine gore sekillendirme
+
+OZET:
+Hermes = Genis, olgun, kurumsal (500 skill, 26 CLI komut, 6+ platform)
+ReYMeN = Akilli, otonom, ozellestirilmis (self-improvement, ogrenme, 3 bot)
 ═══════════════════════════════════════════════════════════
+
+11) SKILL HUB DONUSTURMESI (2026-07-04) [ReYMeN]
+------------------------------------------------
+- Sorun: src/reymen/cereyan/skills/ bos (0 SKILL.md)
+- Cozum: skills/ -> src/reymen/cereyan/skills/ batch donusum
+- Donusen: 531 .md dosyasi SKILL.md formatina cevrildi
+- YAML frontmatter: name, description, category + tags
+- Script: convert_skills.py (proje kokunde)
+- Sonuc: 532 SKILL.md
+
+12) ENCRYPTION EKLENDI (2026-07-04) [ReYMeN]
+-----------------------------------------------
+- Yeni: src/reymen/guvenlik/sifreleme.py
+- Fernet simetrik sifreleme (cryptography)
+- Fonksiyonlar: encrypt_config, decrypt_config
+- Anahtar: .env ENCRYPTION_KEY (otomatik uret)
+- Test: dict sifreleme/cozme basarili
+
+13) AUDIT LOG SISTEMI (2026-07-04) [ReYMeN]
+-----------------------------------------------
+- Mevcut: kancalar.py -> audit_kaydet() eklendi
+- Tablo: audit_log(id, eylem, kullanici, hedef, durum, timestamp)
+- DB: .ReYMeN/audit_log.db (SQLite, thread-safe)
+- Entegrasyon: kural_denetimi() icinde
+
+14) GATEWAY GENISLETME (2026-07-04) [ReYMeN]
+-----------------------------------------------
+- Discord: src/reymen/ag/discord_bot.py (REST API)
+- Email: src/reymen/ag/email_gateway.py (SMTP_SSL, HTML)
+- .env.example: DISCORD_BOT_TOKEN, EMAIL_* eklendi
+- Paket: reymen.ag __init__.py
+
+15) VIDEO GEN FAL ENTEGRASYONU (2026-07-04) [ReYMeN]
+-------------------------------------------------------
+- Mevcut: video_gen_engine.py -> FAL video API eklendi
+- Yeni: video_olustur_fal(prompt, aspect_ratio)
+- 2 mod: moviepy (slayt) / fal_video (FAL AI)
+- Async polling: 5dk, her 5sn kontrol
+
+16) SON KARSILASTIRMA (2026-07-04)
+-----------------------------------------------
+| # | Ozellik               | Once       | Sonra       |
+|---|----------------------|------------|------------|
+| 1 | CLI and UI           | Tam        | Tam         |
+| 2 | Skill Sistemi        | Bos (0)    | 532 SKILL.md|
+| 3 | Plugin               | Tam        | Tam         |
+| 4 | Gateway (Discord)    | Yok        | REST API    |
+| 5 | Gateway (Email)      | Yok        | SMTP_SSL    |
+| 6 | Multi-Profile        | Tam        | Tam         |
+| 7 | Session              | Tam        | Tam         |
+| 8 | MCP                  | Tam        | Tam         |
+| 9 | Web Dashboard        | Tam        | Tam         |
+|10 | Image/Video Gen      | Slayt      | FAL video   |
+|11 | Browser              | Tam        | Tam         |
+|12 | Auth/Backup/Security | Tam        | Tam         |
+|13 | Audit Log            | Yok        | SQLite      |
+|14 | Encryption           | Yok        | Fernet      |
+===============================================
