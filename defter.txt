@@ -1229,3 +1229,52 @@ CHANGELOG.md: Ingilizce ✅
 12 Dok ✅  13 Plugin ✅  14 Enterprise ✅  15 MCP ✅
 16 Gateway ✅  17 Session ✅  18 Web ✅  19 Test ✅
 ═══════════════════════════════════════════════════════════
+
+═══════════════════════════════════════════════════════════
+90) #76'DAKI 5 HATALI VERI DUZELTILDI (2026-07-04) [HERMES]
+───────────────────────────────────────────────────────────
+KAYNAK: Kral_38 FINAL VERIFICATION (2026-07-04)
+
+| # | Alan | #76'da Yazan | Gercek (test) |
+|---|------|--------------|---------------|
+| 1 | CLI | 85 function | 35 handler ✅ |
+| 2 | Skills | 531 SKILL.md | 530 .md (duz md) |
+| 3 | Replicate | Var / ESIT | Kod var, API key yok ❌ |
+| 4 | MCP | tanimli/katalog | 65 katalog, 0 config ❌ |
+| 5 | Session | tek kaynak | 3 kopya (1 aktif) |
+
+NOT: #76'nin kendisi degistirilmedi. Guncel bilgi icin bu entry (#90) kullanilacak.
+═══════════════════════════════════════════════════════════
+
+═══════════════════════════════════════════════════════════
+91) #90 DUZELTME — FIILEN TEST EDILMIS DOGRU VERI (2026-07-04) [HERMES]
+───────────────────────────────────────────────────────────
+KAYNAK: terminal tool ile fiilen test edildi
+
+| # | Alan | #76'da | #90'da | GERCEK (test) |
+|---|------|--------|--------|---------------|
+| 1 | CLI | 85 func | 35 handl | 37 handler ✅ |
+| 2 | Skills | 531 SKILL.md | 530 .md | **529** .md ❌ |
+| 3 | Replicate | Var/ESIT | Kod var, key yok | **Ayni** (kod var, API key yok) |
+| 4 | MCP | tanimli | 0 config | **1 config** (filesystem) |
+| 5 | Session | tek kaynak | 3 kopya | **1 aktif** ✅ (1 backup sayilmaz) |
+
+FIILEN TEST KOMUTLARI:
+  CLI: grep -c _handle_ ReYMeN_cli/cli_commands_mixin.py = 37
+  Skills: ls skills/*.md | wc -l = 529
+  Replicate: grep -c REPLICATE .env = 0
+  MCP: grep mcp_servers: config/config.yaml = 1 server
+  Session: find session.db (excl backup) = 1
+═══════════════════════════════════════════════════════════
+92) REYMEN = HERMES HEDEF — KALAN 5 EKSIK (2026-07-04) [KIRAL38]
+--------------------------------------------------------
+HEDEF: Hermes'in onde oldugu 5 alani esitlemek.
+
+1) MULTI-PROFILE: profiles.py tamamla (config/env ayris)
+2) GATEWAY: 21 platforma API key gir, test et
+3) MCP: Katalogdaki 65 sunucuyu bagla, calistir
+4) DB: 19 core DB -> 12'ye indir (kod yolu standardizasyonu)
+5) DOKUMANTASYON: README/API/guide -> Ingilizce
+
+SIRALAMA: 1->2->3->4->5 (bagimlilik sirasi)
+BASLANGIC: #1 Multi-Profile -> hemen
