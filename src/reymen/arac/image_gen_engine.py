@@ -354,6 +354,61 @@ class xAIEngine(ImageGenEngine):
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# Replicate Engine (replicate.com API)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+
+class ReplicateEngine(ImageGenEngine):
+    """Replicate.com ile gorsel uretir. REPLICATE_API_TOKEN ortam degiskeni gerekli."""
+
+    @property
+    def ad(self) -> str:
+        return "replicate"
+
+    def _bagimliliklari_kontrol_et(self) -> bool:
+        return bool(os.environ.get("REPLICATE_API_TOKEN", "").strip())
+
+    def calistir(self, prompt: str, en: str = "1024", boy: str = "1024") -> str:
+        api_key = os.environ.get("REPLICATE_API_TOKEN", "").strip()
+        if not api_key:
+            return "[RESIM_OLUSTUR/Replicate] Hata: REPLICATE_API_TOKEN tanimli degil."
+        try:
+            import json, time
+            veri = json.dumps({
+                "version": "black-forest-labs/flux-schnell",
+                "input": {"prompt": prompt}
+            }).encode()
+            req = urllib.request.Request(
+                "https://api.replicate.com/v1/predictions",
+                data=veri,
+                headers={
+                    "Authorization": f"Token {api_key}",
+                    "Content-Type": "application/json",
+                }
+            )
+            with urllib.request.urlopen(req, timeout=30) as yanit:
+                bas = json.loads(yanit.read().decode())
+            get_url = bas.get("urls", {}).get("get", "")
+            if not get_url:
+                return "[RESIM_OLUSTUR/Replicate] Hata: API yanitinda get URL yok."
+            for _ in range(30):
+                time.sleep(1)
+                g_req = urllib.request.Request(get_url, headers={"Authorization": f"Token {api_key}"})
+                with urllib.request.urlopen(g_req, timeout=10) as g_yanit:
+                    durum = json.loads(g_yanit.read().decode())
+                if durum.get("status") == "succeeded":
+                    resim = (durum.get("output") or [None])[0]
+                    if resim:
+                        return self._media("gorsel", resim, f"Replicate: {prompt[:60]}")
+                    break
+                elif durum.get("status") in ("failed", "canceled"):
+                    break
+            return "[RESIM_OLUSTUR/Replicate] Hata: Zaman asimi."
+        except Exception as e:
+            return f"[RESIM_OLUSTUR/Replicate] Hata: {e}"
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # Stub Engine (local dummy / simüle)
 # ═══════════════════════════════════════════════════════════════════════════════
 
@@ -464,6 +519,11 @@ def _get_registry() -> ImageGenRegistry:
             _registry.kaydet(xAIEngine())
         except Exception as e:
             log.warning("[ImageGenRegistry] xAIEngine yuklenemedi: %s", e)
+        # Replicate
+        try:
+            _registry.kaydet(ReplicateEngine())
+        except Exception as e:
+            log.warning("[ImageGenRegistry] ReplicateEngine yuklenemedi: %s", e)
     return _registry
 
 

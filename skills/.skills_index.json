@@ -1,0 +1,3719 @@
+[
+  {
+    "dosya": "3d-pipeline.md",
+    "ad": "3d-pipeline",
+    "baslik": "3D Pipeline",
+    "aciklama": "Choose a 3D generation or reconstruction pipeline given input type, output format, and use case.",
+    "kategori": "3d-pipeline"
+  },
+  {
+    "dosya": "__cleanup_deprecated_obsidian_vault_path_fix.md",
+    "ad": "__cleanup_deprecated_obsidian_vault_path_fix",
+    "baslik": "__cleanup_deprecated_obsidian_vault_path_fix",
+    "aciklama": "__cleanup_deprecated_obsidian_vault_path_fix skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "__cleanup_deprecated_self_improvement.md",
+    "ad": "self-improvement-self-improvement",
+    "baslik": "Hermes Otonom Geliştirme Gece Rutini",
+    "aciklama": "Hermes'in geceleri kendi kendine Obsidian vault + Hermes skills tarayarak gelişmesi: eksik notları skill'e dönüştür, gün",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "a2a-agent-spec.md",
+    "ad": "a2a-agent-spec",
+    "baslik": "A2A Agent Spec",
+    "aciklama": "Produce the Agent Card and skills schema for an agent that should be callable over A2A.",
+    "kategori": "a2a-agent-spec"
+  },
+  {
+    "dosya": "a2a-integrator.md",
+    "ad": "a2a-integrator",
+    "baslik": "A2A Integrator",
+    "aciklama": "Design an A2A integration between two agents — Agent Card, task schemas, auth, streaming or polling.",
+    "kategori": "a2a-integrator"
+  },
+  {
+    "dosya": "aar-deployment-review.md",
+    "ad": "aar-deployment-review",
+    "baslik": "Aar Deployment Review",
+    "aciklama": "Pre-deployment review of an automated-alignment-research pipeline, including sandbox isolation and log integrity.",
+    "kategori": "aar-deployment-review"
+  },
+  {
+    "dosya": "ab-plan.md",
+    "ad": "ab-plan",
+    "baslik": "Ab Plan",
+    "aciklama": "Design an LLM A/B test — pick platform (Statsig or GrowthBook), primary metric, guardrails, sample size with LLM-noise b",
+    "kategori": "ab-plan"
+  },
+  {
+    "dosya": "actor-critic-trainer.md",
+    "ad": "actor-critic-trainer",
+    "baslik": "Actor Critic Trainer",
+    "aciklama": "Produce an A2C / A3C / GAE configuration for a given environment, with advantage estimation and loss weights specified.",
+    "kategori": "actor-critic-trainer"
+  },
+  {
+    "dosya": "actor-runtime.md",
+    "ad": "actor-runtime",
+    "baslik": "Actor Runtime",
+    "aciklama": "Build an AutoGen v0.4-shaped actor runtime with private state, inbox-per-actor, message-only IPC, fault isolation, and a",
+    "kategori": "actor-runtime"
+  },
+  {
+    "dosya": "agent-budget-audit.md",
+    "ad": "agent-budget-audit",
+    "baslik": "Agent Budget Audit",
+    "aciklama": "Audit an agent deployment's cost-governor stack and flag missing layers before enabling unattended runs.",
+    "kategori": "agent-budget-audit"
+  },
+  {
+    "dosya": "agent-bundle.md",
+    "ad": "agent-bundle",
+    "baslik": "Agent Bundle",
+    "aciklama": "Produce a portable SKILL.md + AGENTS.md + MCP-server blueprint for a workflow, loadable across Claude Code, Cursor, Code",
+    "kategori": "agent-bundle"
+  },
+  {
+    "dosya": "agent-loop.md",
+    "ad": "agent-loop",
+    "baslik": "Agent Loop",
+    "aciklama": "Write a correct, minimal ReAct agent loop in any target language/runtime with tools, stop condition, and turn budget.",
+    "kategori": "agent-loop"
+  },
+  {
+    "dosya": "agent-project-bootstrap.md",
+    "ad": "agent-project-bootstrap",
+    "baslik": "Agent Projesi Bootstrap",
+    "aciklama": "Kod tamam ama config/install/run eksik olan multi-service AI ajan projelerini ayağa kaldırma deseni. .env, Windows launc",
+    "kategori": "software-development"
+  },
+  {
+    "dosya": "agents-sdk-scaffold.md",
+    "ad": "agents-sdk-scaffold",
+    "baslik": "Agents Sdk Scaffold",
+    "aciklama": "Scaffold an OpenAI Agents SDK app with a triage agent, handoffs, input/output/tool guardrails, session store, and a trac",
+    "kategori": "agents-sdk-scaffold"
+  },
+  {
+    "dosya": "ai-scientist-sandbox-review.md",
+    "ad": "ai-scientist-sandbox-review",
+    "baslik": "AI Scientist Sandbox Review",
+    "aciklama": "Two-gate review checklist for research-loop agent outputs before anything leaves the sandbox.",
+    "kategori": "ai-scientist-sandbox-review"
+  },
+  {
+    "dosya": "ai-scientist.md",
+    "ad": "ai-scientist",
+    "baslik": "AI Scientist",
+    "aciklama": "Build an autonomous research agent that runs experiment tree search, writes LaTeX papers with vision critique, and passe",
+    "kategori": "ai-scientist"
+  },
+  {
+    "dosya": "ai-sre-plan.md",
+    "ad": "ai-sre-plan",
+    "baslik": "AI SRE Plan",
+    "aciklama": "Design an AI SRE rollout for a team — multi-agent triage architecture, structured runbooks, adversarial evaluation, narr",
+    "kategori": "ai-sre-plan"
+  },
+  {
+    "dosya": "ai-tutor.md",
+    "ad": "ai-tutor",
+    "baslik": "AI Tutor",
+    "aciklama": "Ship an adaptive multimodal personal tutor for a specific subject with Bayesian knowledge tracing, a curriculum graph, s",
+    "kategori": "ai-tutor"
+  },
+  {
+    "dosya": "ai-video-content-pipeline.md",
+    "ad": "ai-video-content-pipeline",
+    "baslik": "ai-video-content-pipeline",
+    "aciklama": "",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "AI_ML.md",
+    "ad": "self-improvement-self-improvement",
+    "baslik": "ReYMeN Otonom Geliştirme Gece Rutini",
+    "aciklama": "ReYMeN'in geceleri kendi kendine Obsidian vault + ReYMeN skills tarayarak gelişmesi: eksik notları skill'e dönüştür, gün",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "alm-picker.md",
+    "ad": "alm-picker",
+    "baslik": "Alm Picker",
+    "aciklama": "Pick an audio-language model, benchmark subset, output modality (text vs speech), and guardrails for an audio-understand",
+    "kategori": "alm-picker"
+  },
+  {
+    "dosya": "any-to-any-pipeline-auditor.md",
+    "ad": "any-to-any-pipeline-auditor",
+    "baslik": "Any To Any Pipeline Auditor",
+    "aciklama": "Audit a conversational any-to-any design and compute the latency budget for a MIO / AnyGPT / Moshi-family stack.",
+    "kategori": "any-to-any-pipeline-auditor"
+  },
+  {
+    "dosya": "apikey-image-gen.md",
+    "ad": "apikey-image-gen",
+    "baslik": "APIkey Image Gen",
+    "aciklama": "Generate or edit images through ReYMeN Web UI using the selected/requested profile's fun-codex provider from config.yaml",
+    "kategori": "apikey-image-gen"
+  },
+  {
+    "dosya": "asr-configurator.md",
+    "ad": "asr-configurator",
+    "baslik": "Asr Configurator",
+    "aciklama": "Pick an ASR model (Whisper variant / Moonshine / faster-whisper) and decoding parameters for a new speech pipeline.",
+    "kategori": "asr-configurator"
+  },
+  {
+    "dosya": "asr-picker.md",
+    "ad": "asr-picker",
+    "baslik": "Asr Picker",
+    "aciklama": "Pick ASR model, decoding strategy, chunking, and LM fusion for a given deployment target.",
+    "kategori": "asr-picker"
+  },
+  {
+    "dosya": "attack-audit.md",
+    "ad": "attack-audit",
+    "baslik": "Attack Audit",
+    "aciklama": "Audit a red-team evaluation report for attack coverage, budget, judge identity, and behaviour set.",
+    "kategori": "attack-audit"
+  },
+  {
+    "dosya": "attention-shapes.md",
+    "ad": "attention-shapes",
+    "baslik": "attention-shapes",
+    "aciklama": "attention-shapes skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "attention-variant-picker.md",
+    "ad": "attention-variant-picker",
+    "baslik": "Attention Variant Picker",
+    "aciklama": "Pick a full / sliding-window / sparse / differential attention topology for a new model given context length, retrieval ",
+    "kategori": "attention-variant-picker"
+  },
+  {
+    "dosya": "audio-brief.md",
+    "ad": "audio-brief",
+    "baslik": "Audio Brief",
+    "aciklama": "Translate an audio brief into a model + prompt + eval plan across TTS, music, and SFX.",
+    "kategori": "audio-brief"
+  },
+  {
+    "dosya": "audio-evaluator.md",
+    "ad": "audio-evaluator",
+    "baslik": "Audio Evaluator",
+    "aciklama": "Pick metrics, benchmarks, normalization rules, and reporting format for any audio model release.",
+    "kategori": "audio-evaluator"
+  },
+  {
+    "dosya": "audio-llm-pipeline-picker.md",
+    "ad": "audio-llm-pipeline-picker",
+    "baslik": "Audio LLM Pipeline Picker",
+    "aciklama": "Pick cascaded (Whisper + LLM) or end-to-end (AF3 / Qwen-Audio) for an audio task, plus the encoder and bridge config.",
+    "kategori": "audio-llm-pipeline-picker"
+  },
+  {
+    "dosya": "audio-loader.md",
+    "ad": "audio-loader",
+    "baslik": "Audio Loader",
+    "aciklama": "Validate a raw audio file against a target model's expectations and resample it safely.",
+    "kategori": "audio-loader"
+  },
+  {
+    "dosya": "bargainer-designer.md",
+    "ad": "bargainer-designer",
+    "baslik": "Bargainer Designer",
+    "aciklama": "Design a negotiation protocol: which agent narrates, which component generates offers, how private scratchpads separate ",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "batch-triager.md",
+    "ad": "batch-triager",
+    "baslik": "Batch Triager",
+    "aciklama": "Triage LLM workloads into interactive / semi-interactive / batch lanes, compute stacked discount (batch + cache) savings",
+    "kategori": "batch-triager"
+  },
+  {
+    "dosya": "benchmark-harness.md",
+    "ad": "benchmark-harness",
+    "baslik": "Benchmark Harness",
+    "aciklama": "Build a SWE-bench-style harness for a codebase with FAIL_TO_PASS / PASS_TO_PASS gating, contamination checks, and step-c",
+    "kategori": "benchmark-harness"
+  },
+  {
+    "dosya": "benchmark-reader.md",
+    "ad": "benchmark-reader",
+    "baslik": "Benchmark Reader",
+    "aciklama": "Read a multi-agent benchmark claim skeptically. Grades the claim on benchmark selection, contamination, baselines, stati",
+    "kategori": "benchmark-reader"
+  },
+  {
+    "dosya": "bert-finetuner.md",
+    "ad": "bert-finetuner",
+    "baslik": "Bert Finetuner",
+    "aciklama": "Scope a BERT fine-tune for a new classification, extraction, or retrieval task.",
+    "kategori": "bert-finetuner"
+  },
+  {
+    "dosya": "bias-eval.md",
+    "ad": "bias-eval",
+    "baslik": "Bias Eval",
+    "aciklama": "Audit a bias evaluation report across metric categories, intersectionality, and debias mechanism.",
+    "kategori": "bias-eval"
+  },
+  {
+    "dosya": "bounded-loop-review.md",
+    "ad": "bounded-loop-review",
+    "baslik": "Bounded Loop Review",
+    "aciklama": "Audit a proposed bounded self-improvement loop against the four-primitive stack (invariants, anchor, multi-objective, re",
+    "kategori": "bounded-loop-review"
+  },
+  {
+    "dosya": "browser-agent-trust-boundary.md",
+    "ad": "browser-agent-trust-boundary",
+    "baslik": "Browser Agent Trust Boundary",
+    "aciklama": "Scope a proposed browser-agent deployment — trust zones, authorized writes, required defenses — before the agent touches",
+    "kategori": "browser-agent-trust-boundary"
+  },
+  {
+    "dosya": "cache-auditor.md",
+    "ad": "cache-auditor",
+    "baslik": "Cache Auditor",
+    "aciklama": "Audit an LLM prompt template and traffic pattern for cacheability. Recommend prompt restructure, TTL choice, paralleliza",
+    "kategori": "cache-auditor"
+  },
+  {
+    "dosya": "card-audit.md",
+    "ad": "card-audit",
+    "baslik": "Card Audit",
+    "aciklama": "Audit a model card, datasheet, or system card for completeness and verifiability.",
+    "kategori": "card-audit"
+  },
+  {
+    "dosya": "case-study-mapper.md",
+    "ad": "case-study-mapper",
+    "baslik": "Case Study Mapper",
+    "aciklama": "Map a proposed multi-agent system design to the closest 2026 production reference (Anthropic Research, MetaGPT/ChatDev, ",
+    "kategori": "case-study-mapper"
+  },
+  {
+    "dosya": "chaos-plan.md",
+    "ad": "chaos-plan",
+    "baslik": "Chaos Plan",
+    "aciklama": "Design an LLM chaos engineering plan — verify prerequisites, build four planes, pick tool, start with three safe experim",
+    "kategori": "chaos-plan"
+  },
+  {
+    "dosya": "chatbot-architect.md",
+    "ad": "chatbot-architect",
+    "baslik": "Chatbot Architect",
+    "aciklama": "Design a chatbot stack for a given use case.",
+    "kategori": "chatbot-architect"
+  },
+  {
+    "dosya": "check-understanding.md",
+    "ad": "check-understanding",
+    "baslik": "check-understanding",
+    "aciklama": "check-understanding skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "checkpoint-save-resume.md",
+    "ad": "checkpoint-save-resume",
+    "baslik": "Checkpoint Save Resume",
+    "aciklama": "Atomic, sharded checkpoints with full RNG capture so a killed run resumes mid-epoch with the same loss trajectory.",
+    "kategori": "checkpoint-save-resume"
+  },
+  {
+    "dosya": "checkpointing-planner.md",
+    "ad": "checkpointing-planner",
+    "baslik": "Checkpointing Planner",
+    "aciklama": "Choose an activation recomputation policy per layer (none / selective / full / offload) given a training config and HBM ",
+    "kategori": "checkpointing-planner"
+  },
+  {
+    "dosya": "chunker.md",
+    "ad": "chunker",
+    "baslik": "Chunker",
+    "aciklama": "Pick a chunking strategy, size, and overlap for a given corpus and query distribution.",
+    "kategori": "chunker"
+  },
+  {
+    "dosya": "classifier-designer.md",
+    "ad": "classifier-designer",
+    "baslik": "Classifier Designer",
+    "aciklama": "Pick architecture, augmentation, class-balance strategy, and eval metric for an audio classification task.",
+    "kategori": "classifier-designer"
+  },
+  {
+    "dosya": "classifier-stack-audit.md",
+    "ad": "classifier-stack-audit",
+    "baslik": "Classifier Stack Audit",
+    "aciklama": "Audit a deployment's input/output classifier stack (model, taxonomy, input rails, output rails, dialog rails) and flag a",
+    "kategori": "classifier-stack-audit"
+  },
+  {
+    "dosya": "claude-agent-scaffold.md",
+    "ad": "claude-agent-scaffold",
+    "baslik": "Claude Agent Scaffold",
+    "aciklama": "Scaffold a Claude Agent SDK app with subagents, lifecycle hooks, session store, MCP server attachment, and W3C trace pro",
+    "kategori": "claude-agent-scaffold"
+  },
+  {
+    "dosya": "clip-zero-shot.md",
+    "ad": "clip-zero-shot",
+    "baslik": "CLIp Zero Shot",
+    "aciklama": "Run zero-shot image classification with a CLIP / SigLIP checkpoint, producing ranked predictions with similarity scores.",
+    "kategori": "clip-zero-shot"
+  },
+  {
+    "dosya": "codebase-rag.md",
+    "ad": "codebase-rag",
+    "baslik": "Codebase RAG",
+    "aciklama": "Build a cross-repo semantic search system with AST-aware chunking, hybrid retrieval, incremental re-index, and cited ans",
+    "kategori": "codebase-rag"
+  },
+  {
+    "dosya": "codec-picker.md",
+    "ad": "codec-picker",
+    "baslik": "Codec Picker",
+    "aciklama": "Pick a neural audio codec (EnCodec / DAC / SNAC / Mimi) for a given generative or compression task.",
+    "kategori": "codec-picker"
+  },
+  {
+    "dosya": "coding-scaffold-audit.md",
+    "ad": "coding-scaffold-audit",
+    "baslik": "Coding Scaffold Audit",
+    "aciklama": "Audit a proposed coding-agent scaffold (retrieval, verifier loop, sandbox, benchmark fit) before adopting it for product",
+    "kategori": "coding-scaffold-audit"
+  },
+  {
+    "dosya": "cold-start-planner.md",
+    "ad": "cold-start-planner",
+    "baslik": "Cold Start Planner",
+    "aciklama": "Pick and stack cold-start mitigations for serverless LLM deployments. Budget phases (node, image, weights, engine, first",
+    "kategori": "cold-start-planner"
+  },
+  {
+    "dosya": "compliance-gap.md",
+    "ad": "compliance-gap",
+    "baslik": "Compliance Gap",
+    "aciklama": "Evaluate whether a safety report can detect alignment faking, via the monitored / unmonitored compliance gap.",
+    "kategori": "compliance-gap"
+  },
+  {
+    "dosya": "compliance-matrix.md",
+    "ad": "compliance-matrix",
+    "baslik": "Compliance Matrix",
+    "aciklama": "Produce the required-framework matrix for an LLM SaaS given customer geography, segment, and contract scope. Map control",
+    "kategori": "compliance-matrix"
+  },
+  {
+    "dosya": "computer-use-safety.md",
+    "ad": "computer-use-safety",
+    "baslik": "Computer Use Safety",
+    "aciklama": "Build per-step safety classifier + confirmation gate for a computer-use agent, with allowlist navigation and injection-m",
+    "kategori": "computer-use-safety"
+  },
+  {
+    "dosya": "consensus-designer.md",
+    "ad": "consensus-designer",
+    "baslik": "Consensus Designer",
+    "aciklama": "Design a BFT-aware consensus protocol for a multi-agent ensemble. Picks clustering, weighting, threshold, and escalation",
+    "kategori": "consensus-designer"
+  },
+  {
+    "dosya": "constitution-review.md",
+    "ad": "constitution-review",
+    "baslik": "Constitution Review",
+    "aciklama": "Audit a deployment's constitutional layer — hardcoded prohibitions, soft-coded defaults, operator-adjustable bounds, and",
+    "kategori": "constitution-review"
+  },
+  {
+    "dosya": "constitution-writer.md",
+    "ad": "constitution-writer",
+    "baslik": "Constitution Writer",
+    "aciklama": "Draft a four-tier constitution for a domain-specific AI system.",
+    "kategori": "constitution-writer"
+  },
+  {
+    "dosya": "control-protocol-audit.md",
+    "ad": "control-protocol-audit",
+    "baslik": "Control PRotocol Audit",
+    "aciklama": "Audit a deployment protocol under the AI Control threat model.",
+    "kategori": "control-protocol-audit"
+  },
+  {
+    "dosya": "coref-picker.md",
+    "ad": "coref-picker",
+    "baslik": "Coref Picker",
+    "aciklama": "Pick a coreference approach, evaluation plan, and integration strategy.",
+    "kategori": "coref-picker"
+  },
+  {
+    "dosya": "crew-or-flow.md",
+    "ad": "crew-or-flow",
+    "baslik": "Crew Or Flow",
+    "aciklama": "Pick CrewAI Crew or Flow for a given task, and scaffold the minimal implementation.",
+    "kategori": "crew-or-flow"
+  },
+  {
+    "dosya": "cross-platform.md",
+    "ad": "web-dogrulama-dongusu",
+    "baslik": "web-dogrulama-dongusu",
+    "aciklama": "WEB → UYGULA → PUANLA → KARAR döngüsü — web'den bilgi al, sandbox'ta test et, puanla, kazananı hafızaya kaydet",
+    "kategori": "cross-platform"
+  },
+  {
+    "dosya": "cross-policy-diff.md",
+    "ad": "cross-policy-diff",
+    "baslik": "Cross Policy Diff",
+    "aciklama": "Produce a cross-policy comparison for a specific capability using the OpenAI Preparedness Framework v2, Anthropic RSP v3",
+    "kategori": "cross-policy-diff"
+  },
+  {
+    "dosya": "cve-review.md",
+    "ad": "cve-review",
+    "baslik": "Cve Review",
+    "aciklama": "Review a production AI deployment for LLM Scope Violation exposure.",
+    "kategori": "cve-review"
+  },
+  {
+    "dosya": "debate-configurator.md",
+    "ad": "debate-configurator",
+    "baslik": "Debate Configurator",
+    "aciklama": "Configure a multi-agent debate for a given task, estimating quality gain and token cost before running.",
+    "kategori": "debate-configurator"
+  },
+  {
+    "dosya": "debate.md",
+    "ad": "debate",
+    "baslik": "Debate",
+    "aciklama": "Scaffold a multi-agent debate with N debaters, R rounds, configurable topology (full mesh, star, ring), and a convergenc",
+    "kategori": "debate"
+  },
+  {
+    "dosya": "decoupled-encoder-picker.md",
+    "ad": "decoupled-encoder-picker",
+    "baslik": "Decoupled Encoder Picker",
+    "aciklama": "Decide whether a unified VLM should decouple its visual encoders and pick between Janus-Pro, JanusFlow, and InternVL-U.",
+    "kategori": "decoupled-encoder-picker"
+  },
+  {
+    "dosya": "deepseek-v3-reader.md",
+    "ad": "deepseek-v3-reader",
+    "baslik": "DeepSeek V3 Reader",
+    "aciklama": "Read a DeepSeek-family config and produce a component-by-component architecture analysis.",
+    "kategori": "deepseek-v3-reader"
+  },
+  {
+    "dosya": "devops-agent.md",
+    "ad": "devops-agent",
+    "baslik": "DevOps Agent",
+    "aciklama": "Build a Kubernetes troubleshooting agent that walks a cluster knowledge graph, ranks root causes, and gates every remedi",
+    "kategori": "devops-agent"
+  },
+  {
+    "dosya": "dgm-evaluator-firewall.md",
+    "ad": "dgm-evaluator-firewall",
+    "baslik": "Dgm Evaluator Firewall",
+    "aciklama": "Specify the evaluator separation a Darwin-Godel-Machine-style self-modifying agent loop needs to avoid documented reward",
+    "kategori": "dgm-evaluator-firewall"
+  },
+  {
+    "dosya": "diff-attention-integrator.md",
+    "ad": "diff-attention-integrator",
+    "baslik": "Diff Attention Integrator",
+    "aciklama": "Integration plan for adding Differential Attention V2 to a new pre-training run or LoRA fine-tune.",
+    "kategori": "diff-attention-integrator"
+  },
+  {
+    "dosya": "diffusion-trainer.md",
+    "ad": "diffusion-trainer",
+    "baslik": "Diffusion Trainer",
+    "aciklama": "Configure a diffusion training run: schedule, prediction target, sampler, and eval plan.",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "disaggregation-decider.md",
+    "ad": "disaggregation-decider",
+    "baslik": "Disaggregation Decider",
+    "aciklama": "Decide whether to adopt disaggregated prefill/decode (Dynamo or llm-d) for a given workload and cluster. Quantify prefil",
+    "kategori": "disaggregation-decider"
+  },
+  {
+    "dosya": "distributed-fsdp-ddp.md",
+    "ad": "distributed-fsdp-ddp",
+    "baslik": "Distributed Fsdp Ddp",
+    "aciklama": "Bring up multi-rank training with a from-scratch DDP wrapper and an FSDP parameter sharding sketch on the gloo or nccl b",
+    "kategori": "distributed-fsdp-ddp"
+  },
+  {
+    "dosya": "doc-qa.md",
+    "ad": "doc-qa",
+    "baslik": "Doc Qa",
+    "aciklama": "Build a vision-first multimodal document QA system on 10k pages with late-interaction retrieval and evidence-region cita",
+    "kategori": "doc-qa"
+  },
+  {
+    "dosya": "document-ai-stack-picker.md",
+    "ad": "document-ai-stack-picker",
+    "baslik": "Document AI Stack Picker",
+    "aciklama": "Pick between OCR pipeline, OCR-free specialist, and VLM-native for a document-AI project based on domain, scale, and reg",
+    "kategori": "document-ai-stack-picker"
+  },
+  {
+    "dosya": "dogfood.md",
+    "ad": "dogfood",
+    "baslik": "Dogfood",
+    "aciklama": "Exploratory QA of web apps: find bugs, evidence, reports.",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "dolphin-llama3.md",
+    "ad": "dolphin-llama3",
+    "baslik": "dolphin-llama3",
+    "aciklama": "dolphin-llama3 skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "dp-audit.md",
+    "ad": "dp-audit",
+    "baslik": "Dp Audit",
+    "aciklama": "Audit a differential-privacy claim for a language-model deployment.",
+    "kategori": "dp-audit"
+  },
+  {
+    "dosya": "dp-solver.md",
+    "ad": "dp-solver",
+    "baslik": "Dp Solver",
+    "aciklama": "Solve a small tabular MDP exactly via policy iteration or value iteration. Report convergence behavior.",
+    "kategori": "dp-solver"
+  },
+  {
+    "dosya": "dqn-trainer.md",
+    "ad": "dqn-trainer",
+    "baslik": "Dqn Trainer",
+    "aciklama": "Produce a DQN training config (buffer, target sync, ε schedule, reward clipping) for a discrete-action RL task.",
+    "kategori": "dqn-trainer"
+  },
+  {
+    "dosya": "dst-designer.md",
+    "ad": "dst-designer",
+    "baslik": "Dst Designer",
+    "aciklama": "Design a dialogue state tracker — schema, extractor, update policy, evaluation.",
+    "kategori": "dst-designer"
+  },
+  {
+    "dosya": "dual-use-triage.md",
+    "ad": "dual-use-triage",
+    "baslik": "Dual Use Triage",
+    "aciklama": "Triage a capability claim or incident report across the four CBRN domains.",
+    "kategori": "dual-use-triage"
+  },
+  {
+    "dosya": "dualpipe-planner.md",
+    "ad": "dualpipe-planner",
+    "baslik": "Dualpipe Planner",
+    "aciklama": "Plan a pipeline parallelism strategy (1F1B, Zero Bubble, DualPipe, DualPipeV) for a training cluster.",
+    "kategori": "dualpipe-planner"
+  },
+  {
+    "dosya": "duplex-pipeline.md",
+    "ad": "duplex-pipeline",
+    "baslik": "Duplex Pipeline",
+    "aciklama": "Pick full-duplex (Moshi) vs pipeline (VAD + STT + LLM + TTS) architecture for a voice-agent workload.",
+    "kategori": "duplex-pipeline"
+  },
+  {
+    "dosya": "durable-execution-review.md",
+    "ad": "durable-execution-review",
+    "baslik": "Durable Execution Review",
+    "aciklama": "Review a proposed long-running agent deployment for correct durable-execution shape (activities, determinism, checkpoint",
+    "kategori": "durable-execution-review"
+  },
+  {
+    "dosya": "eagle3-rollout.md",
+    "ad": "eagle3-rollout",
+    "baslik": "Eagle3 Rollout",
+    "aciklama": "Produce a staged EAGLE-3 speculative-decoding rollout plan that measures acceptance rate alpha on real traffic before sh",
+    "kategori": "eagle3-rollout"
+  },
+  {
+    "dosya": "eagle3-tuner.md",
+    "ad": "eagle3-tuner",
+    "baslik": "Eagle3 Tuner",
+    "aciklama": "Pick and tune a speculative decoding strategy (vanilla / Medusa / EAGLE-1/2/3 / lookahead) for a new inference workload.",
+    "kategori": "eagle3-tuner"
+  },
+  {
+    "dosya": "economy-designer.md",
+    "ad": "economy-designer",
+    "baslik": "Economy Designer",
+    "aciklama": "Design a minimal agent economy — identity, credit attribution, payment mechanism, reputation. Picks the smallest stack t",
+    "kategori": "economy-designer"
+  },
+  {
+    "dosya": "ecosystem-blueprint.md",
+    "ad": "ecosystem-blueprint",
+    "baslik": "Ecosystem Blueprint",
+    "aciklama": "Produce a full Phase 13 ecosystem architecture given a product need; name primitives, security posture, telemetry, and p",
+    "kategori": "ecosystem-blueprint"
+  },
+  {
+    "dosya": "ecosystem-map.md",
+    "ad": "ecosystem-map",
+    "baslik": "Ecosystem Map",
+    "aciklama": "Map an alignment claim or evaluation to the organisation, methodology, and cross-checks.",
+    "kategori": "ecosystem-map"
+  },
+  {
+    "dosya": "edge-target-picker.md",
+    "ad": "edge-target-picker",
+    "baslik": "Edge Target Picker",
+    "aciklama": "Pick an edge inference target (Apple ANE, Qualcomm Hexagon, WebGPU/WebLLM, NVIDIA Jetson) and matching quantization form",
+    "kategori": "edge-target-picker"
+  },
+  {
+    "dosya": "editing-pipeline.md",
+    "ad": "editing-pipeline",
+    "baslik": "Editing Pipeline",
+    "aciklama": "Plan an image-editing pipeline from source + edit description to a ready-to-ship output.",
+    "kategori": "editing-pipeline"
+  },
+  {
+    "dosya": "eksik-listesi-tamamlama.md",
+    "ad": "eksik-listesi-tamamlama",
+    "baslik": "Eksik Listesi Tamamlama (Gap Closure)",
+    "aciklama": "Checklist/gap-closure workflow — kullanıcının verdiği eksik listesini sormadan adım adım tamamla. Layer-by-layer fix, ta",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "elicitation-form-designer.md",
+    "ad": "elicitation-form-designer",
+    "baslik": "Elicitation Form Designer",
+    "aciklama": "Design the elicitation form schema and message template for a tool that needs mid-call user confirmation or disambiguati",
+    "kategori": "elicitation-form-designer"
+  },
+  {
+    "dosya": "embedding-picker.md",
+    "ad": "embedding-picker",
+    "baslik": "Embedding Picker",
+    "aciklama": "Pick embedding model, dimension, and retrieval mode for a given corpus and deployment.",
+    "kategori": "embedding-picker"
+  },
+  {
+    "dosya": "embedding-probe.md",
+    "ad": "embedding-probe",
+    "baslik": "Embedding PRobe",
+    "aciklama": "Inspect a word2vec model. Run analogies, find neighbors, diagnose quality.",
+    "kategori": "embedding-probe"
+  },
+  {
+    "dosya": "encoding-audit.md",
+    "ad": "encoding-audit",
+    "baslik": "Encoding Audit",
+    "aciklama": "Audit a jailbreak-defense report across encoding-family attacks.",
+    "kategori": "encoding-audit"
+  },
+  {
+    "dosya": "engine-picker.md",
+    "ad": "engine-picker",
+    "baslik": "Engine Picker",
+    "aciklama": "Pick a self-hosted LLM engine (llama.cpp, Ollama, TGI, vLLM, SGLang) given hardware, scale, and workload. Name 2026 TGI ",
+    "kategori": "engine-picker"
+  },
+  {
+    "dosya": "entity-linker.md",
+    "ad": "entity-linker",
+    "baslik": "Entity Linker",
+    "aciklama": "Design an entity linking pipeline — KB, candidate generator, disambiguator, evaluation.",
+    "kategori": "entity-linker"
+  },
+  {
+    "dosya": "eval-architect.md",
+    "ad": "eval-architect",
+    "baslik": "Eval Architect",
+    "aciklama": "Design an LLM evaluation plan with calibrated judge and CI gates.",
+    "kategori": "eval-architect"
+  },
+  {
+    "dosya": "eval-report.md",
+    "ad": "eval-report",
+    "baslik": "Eval Report",
+    "aciklama": "Plan a full generative-model evaluation: sample quality, adherence, preference, failure audit.",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "eval-suite.md",
+    "ad": "eval-suite",
+    "baslik": "Eval Suite",
+    "aciklama": "Build a three-layer eval suite (static benchmarks, custom offline, online production) with evaluator-optimizer loop and ",
+    "kategori": "eval-suite"
+  },
+  {
+    "dosya": "evaluator-rigor-audit.md",
+    "ad": "evaluator-rigor-audit",
+    "baslik": "Evaluator Rigor Audit",
+    "aciklama": "Audit a proposed AlphaEvolve-style evolutionary coding loop's evaluator before committing any compute to the search.",
+    "kategori": "evaluator-rigor-audit"
+  },
+  {
+    "dosya": "failure-detector.md",
+    "ad": "failure-detector",
+    "baslik": "Failure Detector",
+    "aciklama": "Generate failure-mode detectors for agent traces, wired to a trace store, tagging the five industry-recurring modes plus",
+    "kategori": "failure-detector"
+  },
+  {
+    "dosya": "fairness-criterion.md",
+    "ad": "fairness-criterion",
+    "baslik": "Fairness Criterion",
+    "aciklama": "Identify which fairness criterion a claim invokes and audit the associated assumptions.",
+    "kategori": "fairness-criterion"
+  },
+  {
+    "dosya": "feature-extractor.md",
+    "ad": "feature-extractor",
+    "baslik": "Feature Extractor",
+    "aciklama": "Pick feature type, mel count, frame/hop, and normalization to match a downstream audio model.",
+    "kategori": "feature-extractor"
+  },
+  {
+    "dosya": "feedback-runner.md",
+    "ad": "feedback-runner",
+    "baslik": "Feedback Runner",
+    "aciklama": "Wrap shell commands with deterministic stdout/stderr/exit/duration capture, persist a JSONL record per command, and refu",
+    "kategori": "feedback-runner"
+  },
+  {
+    "dosya": "find-your-level.md",
+    "ad": "find-your-level",
+    "baslik": "find-your-level",
+    "aciklama": "",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "finetuning-pipeline.md",
+    "ad": "finetuning-pipeline",
+    "baslik": "Finetuning Pipeline",
+    "aciklama": "Run a reproducible data-to-SFT-to-DPO-to-serve fine-tuning pipeline with ablations, quantization, and a 2026 Model Openn",
+    "kategori": "finetuning-pipeline"
+  },
+  {
+    "dosya": "finops-plan.md",
+    "ad": "finops-plan",
+    "baslik": "Finops Plan",
+    "aciklama": "Design an LLM FinOps program — attribution schema (user/task/tenant + four token layers), three-tier enforcement ladder,",
+    "kategori": "finops-plan"
+  },
+  {
+    "dosya": "fipa-mapper.md",
+    "ad": "fipa-mapper",
+    "baslik": "Fipa Mapper",
+    "aciklama": "Map any 2026 agent-protocol spec (MCP, A2A, ACP, ANP, CA-MCP, NLIP, or a new one) onto FIPA-ACL performatives and intera",
+    "kategori": "fipa-mapper"
+  },
+  {
+    "dosya": "fm-tuner.md",
+    "ad": "fm-tuner",
+    "baslik": "Fm Tuner",
+    "aciklama": "Convert a diffusion training plan into a flow-matching / rectified-flow config.",
+    "kategori": "fm-tuner"
+  },
+  {
+    "dosya": "framework-diff.md",
+    "ad": "framework-diff",
+    "baslik": "Framework Diff",
+    "aciklama": "Compare a new safety framework or release note against RSP v3.0, PF v2, FSF v3.0.",
+    "kategori": "framework-diff"
+  },
+  {
+    "dosya": "framework-picker.md",
+    "ad": "framework-picker",
+    "baslik": "Framework Picker",
+    "aciklama": "Pick LangGraph, CrewAI, AutoGen, Agno, or plain Python for an agent task by matching abstraction to problem shape.",
+    "kategori": "framework-picker"
+  },
+  {
+    "dosya": "free-skill.md",
+    "ad": "test-skill",
+    "baslik": "test-skill",
+    "aciklama": "A test skill",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "game-rl-designer.md",
+    "ad": "game-rl-designer",
+    "baslik": "Game Rl Designer",
+    "aciklama": "Design a game-RL or reasoning-RL training pipeline (AlphaZero / MuZero / GRPO) for a given domain.",
+    "kategori": "game-rl-designer"
+  },
+  {
+    "dosya": "gan-debugger.md",
+    "ad": "gan-debugger",
+    "baslik": "Gan Debugger",
+    "aciklama": "Diagnose failing GAN training from loss curves and sample grids; prescribe one-line fixes.",
+    "kategori": "gan-debugger"
+  },
+  {
+    "dosya": "gated-bridge-diagnostic.md",
+    "ad": "gated-bridge-diagnostic",
+    "baslik": "Gated Bridge Diagnostic",
+    "aciklama": "Identify Flamingo-lineage design elements in an open VLM config and diagnose freezing / gating issues.",
+    "kategori": "gated-bridge-diagnostic"
+  },
+  {
+    "dosya": "gateway-bootstrap.md",
+    "ad": "gateway-bootstrap",
+    "baslik": "Gateway Bootstrap",
+    "aciklama": "Produce a gateway configuration spec given users, backends, and compliance constraints.",
+    "kategori": "gateway-bootstrap"
+  },
+  {
+    "dosya": "gateway-picker.md",
+    "ad": "gateway-picker",
+    "baslik": "Gateway Picker",
+    "aciklama": "Pick an AI gateway (LiteLLM, Portkey, Kong AI, Cloudflare/Vercel) given scale, latency budget, compliance, ops posture, ",
+    "kategori": "gateway-picker"
+  },
+  {
+    "dosya": "generative-model-chooser.md",
+    "ad": "generative-model-chooser",
+    "baslik": "Generative Model Chooser",
+    "aciklama": "Pick a generative-model family, backbone, and hosted alternative for a given task and budget.",
+    "kategori": "generative-model-chooser"
+  },
+  {
+    "dosya": "gorev-formati.md",
+    "ad": "gorev-formati",
+    "baslik": "gorev-formati",
+    "aciklama": "Kullanıcının istediği 7 maddeli görev formatı — her görevde zorunlu yapı",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "gpu-autoscaler-plan.md",
+    "ad": "gpu-autoscaler-plan",
+    "baslik": "GPU Autoscaler Plan",
+    "aciklama": "Design a three-layer GPU autoscaling plan (Karpenter + KAI Scheduler + application signals) for a Kubernetes-based LLM s",
+    "kategori": "gpu-autoscaler-plan"
+  },
+  {
+    "dosya": "gradient-accumulation.md",
+    "ad": "gradient-accumulation",
+    "baslik": "Gradient Accumulation",
+    "aciklama": "Train at an effective batch larger than device memory by scaling micro-batch losses and stepping the optimizer once per ",
+    "kategori": "gradient-accumulation"
+  },
+  {
+    "dosya": "grammar-pipeline.md",
+    "ad": "grammar-pipeline",
+    "baslik": "Grammar Pipeline",
+    "aciklama": "Design a classical POS + dependency pipeline for a downstream NLP task.",
+    "kategori": "grammar-pipeline"
+  },
+  {
+    "dosya": "grok-image-to-video.md",
+    "ad": "grok-image-to-video",
+    "baslik": "Grok Image To Video",
+    "aciklama": "Animate a local image into a short mp4 video through ReYMeN Web UI using xAI Grok Imagine.",
+    "kategori": "grok-image-to-video"
+  },
+  {
+    "dosya": "groupchat-selector.md",
+    "ad": "groupchat-selector",
+    "baslik": "Groupchat Selector",
+    "aciklama": "Configure an AutoGen/AG2-style GroupChat selector for a task, naming the selector variant, termination, and anti-hot-spe",
+    "kategori": "groupchat-selector"
+  },
+  {
+    "dosya": "Guvenlik.md",
+    "ad": "kali-pentest",
+    "baslik": "Guvenlik",
+    "aciklama": "Covers information gathering, vulnerability analysis, sniffing and spoofing, web/API testing, exploitation, password att",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "handoff-designer.md",
+    "ad": "handoff-designer",
+    "baslik": "Handoff Designer",
+    "aciklama": "Design a handoff topology for a Swarm/Agents-SDK-style system: which agents exist, which handoffs they can call, what co",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "handoff-generator.md",
+    "ad": "handoff-generator",
+    "baslik": "Handoff Generator",
+    "aciklama": "Generate end-of-session handoff packets from workbench artifacts, producing both human-readable Markdown and machine-rea",
+    "kategori": "handoff-generator"
+  },
+  {
+    "dosya": "hermes-kurallar.md",
+    "ad": "hermes-kurallar",
+    "baslik": "ReYMeN Kural ve Engelleme Raporu",
+    "aciklama": "ReYMeN Agent için izin verilen ve engellenen işlemlerin listesi — otomatik onay kuralları.",
+    "kategori": "devops"
+  },
+  {
+    "dosya": "hierarchy-fitness.md",
+    "ad": "hierarchy-fitness",
+    "baslik": "Hierarchy Fitness",
+    "aciklama": "Decide whether a multi-agent task fits hierarchical, flat supervisor, or sequential. Surface the failure modes that matt",
+    "kategori": "hierarchy-fitness"
+  },
+  {
+    "dosya": "hitl-design.md",
+    "ad": "hitl-design",
+    "baslik": "Hitl Design",
+    "aciklama": "Review a proposed Human-in-the-Loop workflow for propose-then-commit shape and flag missing metadata, idempotency, verif",
+    "kategori": "hitl-design"
+  },
+  {
+    "dosya": "horizon-interpretation.md",
+    "ad": "horizon-interpretation",
+    "baslik": "Horizon Interpretation",
+    "aciklama": "Review a vendor's time-horizon claim and produce a gap analysis between benchmark claim and deployment reality.",
+    "kategori": "horizon-interpretation"
+  },
+  {
+    "dosya": "horizon-reality-check.md",
+    "ad": "horizon-reality-check",
+    "baslik": "Horizon Reality Check",
+    "aciklama": "Given a task you want to hand to an agent, decide whether the current frontier's horizon covers it with enough margin.",
+    "kategori": "horizon-reality-check"
+  },
+  {
+    "dosya": "hung-yi-lee-teaching.md",
+    "ad": "hung-yi-lee-teaching",
+    "baslik": "Hung-Yi Lee Teaching Style — Pedagogical Framework",
+    "aciklama": "Use when explaining ML/DL/GenAI concepts through Hung-Yi Lee's teaching method: roadmap-first, intuition before math, pr",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "hybrid-memory.md",
+    "ad": "hybrid-memory",
+    "baslik": "Hybrid Memory",
+    "aciklama": "Generate a Mem0-shaped three-store memory system (vector + KV + graph) with a fusion scorer, scope taxonomy, and tempora",
+    "kategori": "hybrid-memory"
+  },
+  {
+    "dosya": "hybrid-picker.md",
+    "ad": "hybrid-picker",
+    "baslik": "Hybrid Picker",
+    "aciklama": "Pick between pure Transformer, Jamba-style hybrid, and pure SSM for a given workload.",
+    "kategori": "hybrid-picker"
+  },
+  {
+    "dosya": "hybrid-planner.md",
+    "ad": "hybrid-planner",
+    "baslik": "Hybrid Planner",
+    "aciklama": "Build a hybrid planner — ChatHTN for provably-sound plans, AlphaEvolve for code search with a machine-checkable evaluato",
+    "kategori": "hybrid-planner"
+  },
+  {
+    "dosya": "hyperframes.md",
+    "ad": "hyperframes",
+    "baslik": "Hyperframes",
+    "aciklama": "Create AI videos with HyperFrames in ReYMeN using HTML, CSS, and JavaScript compositions, then validate and render them ",
+    "kategori": "hyperframes"
+  },
+  {
+    "dosya": "img2img-chooser.md",
+    "ad": "img2img-chooser",
+    "baslik": "Img2Img Chooser",
+    "aciklama": "Pick an image-to-image approach given paired vs unpaired data, domain specificity, and latency budget.",
+    "kategori": "img2img-chooser"
+  },
+  {
+    "dosya": "inference-optimizer.md",
+    "ad": "inference-optimizer",
+    "baslik": "Inference Optimizer",
+    "aciklama": "Pick attention implementation, KV cache strategy, quantization, and speculative decoding for a new inference deployment.",
+    "kategori": "inference-optimizer"
+  },
+  {
+    "dosya": "inference-platform-picker.md",
+    "ad": "inference-platform-picker",
+    "baslik": "Inference Platform Picker",
+    "aciklama": "Pick an inference platform (Fireworks, Together, Baseten, Modal, Replicate, Anyscale, or custom silicon) given workload,",
+    "kategori": "inference-platform-picker"
+  },
+  {
+    "dosya": "inference-server.md",
+    "ad": "inference-server",
+    "baslik": "Inference Server",
+    "aciklama": "Ship a speculative-decoding inference server with EAGLE-3 or P-EAGLE drafts, K8s autoscaling, and a full throughput/late",
+    "kategori": "inference-server"
+  },
+  {
+    "dosya": "init-script.md",
+    "ad": "init-script",
+    "baslik": "Init Script",
+    "aciklama": "Interview a project and emit a deterministic init_agent.py with five probes plus a CI workflow that refuses to launch th",
+    "kategori": "init-script"
+  },
+  {
+    "dosya": "injection-defense.md",
+    "ad": "injection-defense",
+    "baslik": "Injection Defense",
+    "aciklama": "Build a PVE (Prompt-Validator-Executor) layer with source-tagged content, injection-marker scanning, and allowlist navig",
+    "kategori": "injection-defense"
+  },
+  {
+    "dosya": "instructgpt-explainer.md",
+    "ad": "instructgpt-explainer",
+    "baslik": "Instructgpt Explainer",
+    "aciklama": "Diagnose an RLHF-family paper or pipeline against the three-stage InstructGPT reference.",
+    "kategori": "instructgpt-explainer"
+  },
+  {
+    "dosya": "ipi-audit.md",
+    "ad": "ipi-audit",
+    "baslik": "IPi Audit",
+    "aciklama": "Audit an agentic deployment for indirect prompt injection exposure and information-flow-control coverage.",
+    "kategori": "ipi-audit"
+  },
+  {
+    "dosya": "issue-to-pr.md",
+    "ad": "issue-to-pr",
+    "baslik": "Issue To PR",
+    "aciklama": "Build an async GitHub issue-to-PR agent that runs in a cloud sandbox, reproduces the build, verifies tests, and opens re",
+    "kategori": "issue-to-pr"
+  },
+  {
+    "dosya": "kali-pentest.md",
+    "ad": "kali-pentest",
+    "baslik": "kali-pentest",
+    "aciklama": "",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "kiral38-watchdog.md",
+    "ad": "kiral38-watchdog",
+    "baslik": "kiral38-watchdog",
+    "aciklama": "Kiral38 gateway 409 Conflict otomatik yönetimi + multi-profil proaktif bakim",
+    "kategori": "devops"
+  },
+  {
+    "dosya": "Kod.md",
+    "ad": "3d-pipeline",
+    "baslik": "3D Pipeline",
+    "aciklama": "Choose a 3D generation or reconstruction pipeline given input type, output format, and use case.",
+    "kategori": "3d-pipeline"
+  },
+  {
+    "dosya": "llava-vibes-eval.md",
+    "ad": "llava-vibes-eval",
+    "baslik": "Llava Vibes Eval",
+    "aciklama": "Run a 10-prompt vibes-eval on a LLaVA-family VLM and produce a human-readable scorecard.",
+    "kategori": "llava-vibes-eval"
+  },
+  {
+    "dosya": "llm-observability.md",
+    "ad": "llm-observability",
+    "baslik": "LLM Observability",
+    "aciklama": "Build a self-hosted LLM observability dashboard that ingests OpenTelemetry GenAI spans, runs evals, and catches injected",
+    "kategori": "llm-observability"
+  },
+  {
+    "dosya": "llm-pipeline-reviewer.md",
+    "ad": "llm-pipeline-reviewer",
+    "baslik": "LLM Pipeline Reviewer",
+    "aciklama": "Review an end-to-end LLM training pipeline manifest before a multi-million-dollar run.",
+    "kategori": "llm-pipeline-reviewer"
+  },
+  {
+    "dosya": "llm-security-plan.md",
+    "ad": "llm-security-plan",
+    "baslik": "LLM Security Plan",
+    "aciklama": "Produce an LLM security plan covering secrets vault, PII scrubbing with consistent tokenization, network egress allowlis",
+    "kategori": "llm-security-plan"
+  },
+  {
+    "dosya": "lm-baseline.md",
+    "ad": "lm-baseline",
+    "baslik": "lm-baseline",
+    "aciklama": "lm-baseline skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "lm-eval-harness.md",
+    "ad": "lm-eval-harness",
+    "baslik": "Lm Eval Harness",
+    "aciklama": "Minimal language model evaluation harness with JSONL task spec, five metrics, swappable adapter, and leaderboard JSON ou",
+    "kategori": "lm-eval-harness"
+  },
+  {
+    "dosya": "load-test-plan.md",
+    "ad": "load-test-plan",
+    "baslik": "Load Test Plan",
+    "aciklama": "Design a realistic LLM load test — pick tool (LLMPerf, k6, GenAI-Perf, guidellm), build four patterns (steady, ramp, spi",
+    "kategori": "load-test-plan"
+  },
+  {
+    "dosya": "long-context-eval.md",
+    "ad": "long-context-eval",
+    "baslik": "Long Context Eval",
+    "aciklama": "Design a long-context evaluation battery for a given model and use case.",
+    "kategori": "long-context-eval"
+  },
+  {
+    "dosya": "long-video-strategy-planner.md",
+    "ad": "long-video-strategy-planner",
+    "baslik": "Long Video Strategy Planner",
+    "aciklama": "Pick brute-context, ring-attention, token-compression, or agentic-retrieval for a long-video understanding task and comp",
+    "kategori": "long-video-strategy-planner"
+  },
+  {
+    "dosya": "managed-platform-picker.md",
+    "ad": "managed-platform-picker",
+    "baslik": "Managed Platform Picker",
+    "aciklama": "Pick a managed LLM platform (Bedrock, Azure OpenAI, Vertex AI) and a second for redundancy, given workload, SLA, and com",
+    "kategori": "managed-platform-picker"
+  },
+  {
+    "dosya": "markdown-viewer.md",
+    "ad": "markdown-viewer",
+    "baslik": "Markdown Viewer",
+    "aciklama": "Create rich diagrams, data visualizations, technical architecture views, and editorial content cards directly in Markdow",
+    "kategori": "markdown-viewer"
+  },
+  {
+    "dosya": "marl-architect.md",
+    "ad": "marl-architect",
+    "baslik": "Marl Architect",
+    "aciklama": "Pick the right multi-agent RL regime (IPPO, CTDE, self-play, league) for a given task.",
+    "kategori": "marl-architect"
+  },
+  {
+    "dosya": "marl-picker.md",
+    "ad": "marl-picker",
+    "baslik": "Marl Picker",
+    "aciklama": "Choose a MARL algorithm (MADDPG, QMIX, MAPPO, IQL, or extensions) for a given multi-agent task. Consider cooperative vs ",
+    "kategori": "marl-picker"
+  },
+  {
+    "dosya": "mast-auditor.md",
+    "ad": "mast-auditor",
+    "baslik": "Mast Auditor",
+    "aciklama": "Run a MAST-style failure-mode audit on a multi-agent system. Categorize execution-trace failures into Specification / Co",
+    "kategori": "mast-auditor"
+  },
+  {
+    "dosya": "mc-evaluator.md",
+    "ad": "mc-evaluator",
+    "baslik": "Mc Evaluator",
+    "aciklama": "Evaluate a policy via Monte Carlo rollouts and produce a convergence report with DP-comparison if available.",
+    "kategori": "mc-evaluator"
+  },
+  {
+    "dosya": "mcp-apps-spec.md",
+    "ad": "mcp-apps-spec",
+    "baslik": "MCP Apps Spec",
+    "aciklama": "Produce the full MCP Apps contract for a tool that needs an interactive UI resource.",
+    "kategori": "mcp-apps-spec"
+  },
+  {
+    "dosya": "mcp-auth-wiring.md",
+    "ad": "mcp-auth-wiring",
+    "baslik": "MCP Auth Wiring",
+    "aciklama": "立起生产级 MCP 授权（RFC 8414、CIMD、7591、8707、7636 PKCE、9728、9207）——protected-resource 元数据、入册、JWKS 刷新，以及逐请求 token 校验。",
+    "kategori": "mcp-auth-wiring"
+  },
+  {
+    "dosya": "mcp-client-harness.md",
+    "ad": "mcp-client-harness",
+    "baslik": "MCP CLIent Harness",
+    "aciklama": "Given a declarative list of MCP servers (name, command, args), scaffold a multi-server client with handshake, namespace ",
+    "kategori": "mcp-client-harness"
+  },
+  {
+    "dosya": "mcp-handshake-tracer.md",
+    "ad": "mcp-handshake-tracer",
+    "baslik": "MCP Handshake Tracer",
+    "aciklama": "Given a pcap-style transcript of an MCP client-server conversation, annotate every message with its primitive, lifecycle",
+    "kategori": "mcp-handshake-tracer"
+  },
+  {
+    "dosya": "mcp-server-designer.md",
+    "ad": "mcp-server-designer",
+    "baslik": "MCP Server Designer",
+    "aciklama": "Design and scaffold an MCP server with tools, resources, and safety defaults.",
+    "kategori": "mcp-server-designer"
+  },
+  {
+    "dosya": "mcp-server-platform.md",
+    "ad": "mcp-server-platform",
+    "baslik": "MCP Server Platform",
+    "aciklama": "Deploy a production MCP server with StreamableHTTP, OAuth 2.1 scopes, OPA policy, human-approval gate for destructive to",
+    "kategori": "mcp-server-platform"
+  },
+  {
+    "dosya": "mcp-server-scaffolder.md",
+    "ad": "mcp-server-scaffolder",
+    "baslik": "MCP Server Scaffolder",
+    "aciklama": "Scaffold a domain-specific MCP server with the right tools/resources/prompts split and SDK graduation path.",
+    "kategori": "mcp-server-scaffolder"
+  },
+  {
+    "dosya": "mcp-threat-model.md",
+    "ad": "mcp-threat-model",
+    "baslik": "MCP Threat Model",
+    "aciklama": "Produce a threat model for an MCP deployment naming the applicable attack classes, defenses in place, and Rule-of-Two vi",
+    "kategori": "mcp-threat-model"
+  },
+  {
+    "dosya": "mcp-transport-migrator.md",
+    "ad": "mcp-transport-migrator",
+    "baslik": "MCP Transport Migrator",
+    "aciklama": "Produce a migration plan from legacy HTTP+SSE to Streamable HTTP with session id continuity and Origin validation.",
+    "kategori": "mcp-transport-migrator"
+  },
+  {
+    "dosya": "mdp-modeler.md",
+    "ad": "mdp-modeler",
+    "baslik": "Mdp Modeler",
+    "aciklama": "Given a task description, produce a Markov Decision Process spec and flag formulation risks before training.",
+    "kategori": "mdp-modeler"
+  },
+  {
+    "dosya": "Medya.md",
+    "ad": "video-ogrenme-ajani",
+    "baslik": "video-ogrenme-ajani",
+    "aciklama": "YouTube videolarından öğrenme — transcript indir, bölümle, hata tespit et, skill çıkar, hafızaya kaydet",
+    "kategori": "video"
+  },
+  {
+    "dosya": "memory-auditor.md",
+    "ad": "memory-auditor",
+    "baslik": "Memory Auditor",
+    "aciklama": "Audit a multi-agent system's shared-memory design for provenance, versioning, verifier separation, and projection schema",
+    "kategori": "memory-auditor"
+  },
+  {
+    "dosya": "memory-blocks.md",
+    "ad": "memory-blocks",
+    "baslik": "Memory Blocks",
+    "aciklama": "Generate a Letta-shaped three-tier memory system (core blocks, recall, archival) with a sleep-time consolidation agent o",
+    "kategori": "memory-blocks"
+  },
+  {
+    "dosya": "mesa-diagnostic.md",
+    "ad": "mesa-diagnostic",
+    "baslik": "Mesa Diagnostic",
+    "aciklama": "Classify an observed safety failure as outer-alignment, proxy-inner, or deceptive-inner.",
+    "kategori": "mesa-diagnostic"
+  },
+  {
+    "dosya": "mha-configurator.md",
+    "ad": "mha-configurator",
+    "baslik": "Mha Configurator",
+    "aciklama": "Recommend head count, KV-head count, and projection strategy (MHA / MQA / GQA / MLA) for a new transformer.",
+    "kategori": "mha-configurator"
+  },
+  {
+    "dosya": "migration-agent.md",
+    "ad": "migration-agent",
+    "baslik": "Migration Agent",
+    "aciklama": "Build a repo-level code migration agent that combines deterministic recipes with an agent fallback loop, passes Migratio",
+    "kategori": "migration-agent"
+  },
+  {
+    "dosya": "minimal-workbench.md",
+    "ad": "minimal-workbench",
+    "baslik": "Minimal Workbench",
+    "aciklama": "Lay down the three-file minimum viable agent workbench for any repo — short AGENTS.md router, durable agent_state.json, ",
+    "kategori": "minimal-workbench"
+  },
+  {
+    "dosya": "modality-bridge-picker.md",
+    "ad": "modality-bridge-picker",
+    "baslik": "Modality Bridge Picker",
+    "aciklama": "Recommend Q-Former vs MLP projector vs Perceiver resampler for a VLM configuration given token budget, quality target, a",
+    "kategori": "modality-bridge-picker"
+  },
+  {
+    "dosya": "moderation-stack.md",
+    "ad": "moderation-stack",
+    "baslik": "Moderation Stack",
+    "aciklama": "Recommend a moderation stack configuration for a production deployment.",
+    "kategori": "moderation-stack"
+  },
+  {
+    "dosya": "moe-configurator.md",
+    "ad": "moe-configurator",
+    "baslik": "Moe Configurator",
+    "aciklama": "Pick expert count, top-k, balancing strategy, and shared-expert layout for a new MoE transformer.",
+    "kategori": "moe-configurator"
+  },
+  {
+    "dosya": "msj-audit.md",
+    "ad": "msj-audit",
+    "baslik": "Msj Audit",
+    "aciklama": "Audit a long-context safety evaluation for many-shot jailbreaking coverage.",
+    "kategori": "msj-audit"
+  },
+  {
+    "dosya": "mt-evaluator.md",
+    "ad": "mt-evaluator",
+    "baslik": "Mt Evaluator",
+    "aciklama": "Evaluate a machine translation output for shipping.",
+    "kategori": "mt-evaluator"
+  },
+  {
+    "dosya": "mtp-planner.md",
+    "ad": "mtp-planner",
+    "baslik": "Mtp Planner",
+    "aciklama": "Plan a multi-token prediction integration for a new pre-training run.",
+    "kategori": "mtp-planner"
+  },
+  {
+    "dosya": "multi-agent-team.md",
+    "ad": "multi-agent-team",
+    "baslik": "Multi Agent Team",
+    "aciklama": "Build a multi-agent software team with architect, parallel coders, reviewer, and tester; measure against SWE-bench Pro a",
+    "kategori": "multi-agent-team"
+  },
+  {
+    "dosya": "multi-region-router.md",
+    "ad": "multi-region-router",
+    "baslik": "Multi Region Router",
+    "aciklama": "Design a multi-region LLM routing plan with KV-cache locality, residency boundaries, DR manifest, and a quarterly failov",
+    "kategori": "multi-region-router"
+  },
+  {
+    "dosya": "multilingual-picker.md",
+    "ad": "multilingual-picker",
+    "baslik": "Multilingual Picker",
+    "aciklama": "Pick source language, target model, and evaluation plan for a multilingual NLP task.",
+    "kategori": "multilingual-picker"
+  },
+  {
+    "dosya": "multimodal-agent-designer.md",
+    "ad": "multimodal-agent-designer",
+    "baslik": "Multimodal Agent Designer",
+    "aciklama": "Design a multimodal agent (computer-use, GUI grounding, web or mobile) with action schema, memory strategy, and benchmar",
+    "kategori": "multimodal-agent-designer"
+  },
+  {
+    "dosya": "multimodal-rag-designer.md",
+    "ad": "multimodal-rag-designer",
+    "baslik": "Multimodal RAG Designer",
+    "aciklama": "Design a production multimodal RAG across text, images, audio, video with retrievers, fusion strategy, and grounded gene",
+    "kategori": "multimodal-rag-designer"
+  },
+  {
+    "dosya": "music-designer.md",
+    "ad": "music-designer",
+    "baslik": "Music Designer",
+    "aciklama": "Pick a music-generation model, license strategy, length plan, and disclosure metadata for a deployment.",
+    "kategori": "music-designer"
+  },
+  {
+    "dosya": "n8n-claude-telegram-automation.md",
+    "ad": "n8n-claude-telegram-automation",
+    "baslik": "n8n-claude-telegram-automation",
+    "aciklama": "",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "native-vs-posthoc-auditor.md",
+    "ad": "native-vs-posthoc-auditor",
+    "baslik": "Native Vs Posthoc Auditor",
+    "aciklama": "Audit a proposed VLM training plan and recommend native multimodal pretraining or post-hoc adapter-on-LLM, with corpus-m",
+    "kategori": "native-vs-posthoc-auditor"
+  },
+  {
+    "dosya": "ner-picker.md",
+    "ad": "ner-picker",
+    "baslik": "Ner Picker",
+    "aciklama": "Pick the right NER approach for a given extraction task.",
+    "kategori": "ner-picker"
+  },
+  {
+    "dosya": "nli-picker.md",
+    "ad": "nli-picker",
+    "baslik": "Nli Picker",
+    "aciklama": "Pick an NLI model, label template, and evaluation setup for a classification / faithfulness / zero-shot task.",
+    "kategori": "nli-picker"
+  },
+  {
+    "dosya": "nsa-integrator.md",
+    "ad": "nsa-integrator",
+    "baslik": "Nsa Integrator",
+    "aciklama": "Integration plan for Native Sparse Attention in a long-context pre-training run.",
+    "kategori": "nsa-integrator"
+  },
+  {
+    "dosya": "oauth-scope-planner.md",
+    "ad": "oauth-scope-planner",
+    "baslik": "Oauth Scope Planner",
+    "aciklama": "Design the OAuth 2.1 scope set, pinning rules, and step-up policy for a remote MCP server.",
+    "kategori": "oauth-scope-planner"
+  },
+  {
+    "dosya": "obs-platform-wiring.md",
+    "ad": "obs-platform-wiring",
+    "baslik": "Obs Platform Wiring",
+    "aciklama": "Pick an observability platform (Langfuse, Phoenix, Opik, Datadog) and wire traces + evals + prompt versions into an exis",
+    "kategori": "obs-platform-wiring"
+  },
+  {
+    "dosya": "observability-stack.md",
+    "ad": "observability-stack",
+    "baslik": "Observability Stack",
+    "aciklama": "Pick an LLM observability stack (development platform + gateway + optional scale layer) given stack, scale, budget, and ",
+    "kategori": "observability-stack"
+  },
+  {
+    "dosya": "omni-streaming-budget.md",
+    "ad": "omni-streaming-budget",
+    "baslik": "Omni Streaming Budget",
+    "aciklama": "Size a Thinker-Talker streaming voice pipeline (Qwen-Omni / Moshi / Mini-Omni) for a target TTFAB and feature set.",
+    "kategori": "omni-streaming-budget"
+  },
+  {
+    "dosya": "onevision-budget-planner.md",
+    "ad": "onevision-budget-planner",
+    "baslik": "Onevision Budget Planner",
+    "aciklama": "Allocate LLaVA-OneVision-style unified visual-token budgets across single-image, multi-image, and video scenarios for a ",
+    "kategori": "onevision-budget-planner"
+  },
+  {
+    "dosya": "open-model-picker.md",
+    "ad": "open-model-picker",
+    "baslik": "Open Model Picker",
+    "aciklama": "Pick an open LLM family, quantization, and inference stack for a given deployment target.",
+    "kategori": "open-model-picker"
+  },
+  {
+    "dosya": "orchestration-picker.md",
+    "ad": "orchestration-picker",
+    "baslik": "Orchestration Picker",
+    "aciklama": "Pick an orchestration topology (supervisor, swarm, hierarchical, debate, or none) for a given problem and implement it m",
+    "kategori": "orchestration-picker"
+  },
+  {
+    "dosya": "otel-genai-instrumentation.md",
+    "ad": "otel-genai-instrumentation",
+    "baslik": "Otel Genai Instrumentation",
+    "aciklama": "Produce an instrumentation plan for an agent codebase to emit OTel GenAI spans end-to-end.",
+    "kategori": "otel-genai-instrumentation"
+  },
+  {
+    "dosya": "otel-genai.md",
+    "ad": "otel-genai",
+    "baslik": "Otel Genai",
+    "aciklama": "Instrument an agent with OpenTelemetry GenAI semantic conventions — invoke_agent, chat, tool_call spans with correct att",
+    "kategori": "otel-genai"
+  },
+  {
+    "dosya": "parallel-call-safety-check.md",
+    "ad": "parallel-call-safety-check",
+    "baslik": "Parallel Call Safety Check",
+    "aciklama": "Audit a tool registry for safe parallelization. Mark each tool parallel_safe, note ordering dependencies, and flag downs",
+    "kategori": "parallel-call-safety-check"
+  },
+  {
+    "dosya": "parallel-inference-router.md",
+    "ad": "parallel-inference-router",
+    "baslik": "Parallel Inference Router",
+    "aciklama": "Route a reasoning workload between voting, tree-of-thought, multi-agent, Hogwild!, and speculative decoding strategies.",
+    "kategori": "parallel-inference-router"
+  },
+  {
+    "dosya": "patch-geometry-reader.md",
+    "ad": "patch-geometry-reader",
+    "baslik": "Patch Geometry Reader",
+    "aciklama": "Read a ViT config and produce a patch-token, parameter, and VRAM analysis for downstream VLM planning.",
+    "kategori": "patch-geometry-reader"
+  },
+  {
+    "dosya": "permission-mode-picker.md",
+    "ad": "permission-mode-picker",
+    "baslik": "Permission Mode Picker",
+    "aciklama": "Match a Claude Code task to the correct permission mode, budget caps, and required isolation before starting a run.",
+    "kategori": "permission-mode-picker"
+  },
+  {
+    "dosya": "playwright-mcp.md",
+    "ad": "playwright-mcp",
+    "baslik": "Playwright MCP — Tarayıcı Otomasyonu",
+    "aciklama": "Microsoft Playwright MCP ile tarayıcı kontrolü: web gezme, screenshot, form doldurma, JS çalıştırma.",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "policy-gradient-trainer.md",
+    "ad": "policy-gradient-trainer",
+    "baslik": "Policy Gradient Trainer",
+    "aciklama": "Produce a REINFORCE / actor-critic / PPO training config for a given task and diagnose variance issues.",
+    "kategori": "policy-gradient-trainer"
+  },
+  {
+    "dosya": "positional-encoding-picker.md",
+    "ad": "positional-encoding-picker",
+    "baslik": "Positional Encoding Picker",
+    "aciklama": "Pick positional encoding (RoPE, ALiBi, sinusoidal) + scaling strategy given context length and training budget.",
+    "kategori": "positional-encoding-picker"
+  },
+  {
+    "dosya": "ppo-trainer.md",
+    "ad": "ppo-trainer",
+    "baslik": "Ppo Trainer",
+    "aciklama": "Produce a PPO training config and a diagnostic plan for a given environment.",
+    "kategori": "ppo-trainer"
+  },
+  {
+    "dosya": "preference-loss-selector.md",
+    "ad": "preference-loss-selector",
+    "baslik": "PReference Loss Selector",
+    "aciklama": "Recommend a direct-alignment-algorithm loss given dataset shape and target stage.",
+    "kategori": "preference-loss-selector"
+  },
+  {
+    "dosya": "preprocessing-advisor.md",
+    "ad": "preprocessing-advisor",
+    "baslik": "preprocessing-advisor",
+    "aciklama": "preprocessing-advisor skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "primitive-mapper.md",
+    "ad": "primitive-mapper",
+    "baslik": "PRimitive Mapper",
+    "aciklama": "Map any multi-agent framework or codebase to the four primitive axes (agent, handoff, shared state, orchestrator).",
+    "kategori": "primitive-mapper"
+  },
+  {
+    "dosya": "primitive-splitter.md",
+    "ad": "primitive-splitter",
+    "baslik": "PRimitive Splitter",
+    "aciklama": "Categorize each capability in an MCP server draft as tool, resource, or prompt with rationale.",
+    "kategori": "primitive-splitter"
+  },
+  {
+    "dosya": "production-rag.md",
+    "ad": "production-rag",
+    "baslik": "PRoduction RAG",
+    "aciklama": "Deploy a regulated-domain RAG chatbot with role + jurisdiction filtering, prompt caching, guardrails, and live drift mon",
+    "kategori": "production-rag"
+  },
+  {
+    "dosya": "prompt-3d-task-router.md",
+    "ad": "prompt-3d-task-router",
+    "baslik": "prompt-3d-task-router",
+    "aciklama": "prompt-3d-task-router skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-3dgs-capture-planner.md",
+    "ad": "prompt-3dgs-capture-planner",
+    "baslik": "prompt-3dgs-capture-planner",
+    "aciklama": "prompt-3dgs-capture-planner skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-activation-selector.md",
+    "ad": "prompt-activation-selector",
+    "baslik": "prompt-activation-selector",
+    "aciklama": "prompt-activation-selector skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-advanced-rag-debugger.md",
+    "ad": "prompt-advanced-rag-debugger",
+    "baslik": "prompt-advanced-rag-debugger",
+    "aciklama": "prompt-advanced-rag-debugger skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-alignment-method-selector.md",
+    "ad": "prompt-alignment-method-selector",
+    "baslik": "PRompt Alignment Method Selector",
+    "aciklama": "Choose the right alignment method (SFT, RLHF, DPO, KTO, ORPO, SimPO) for your use case",
+    "kategori": "prompt-alignment-method-selector"
+  },
+  {
+    "dosya": "prompt-api-troubleshooter.md",
+    "ad": "prompt-api-troubleshooter",
+    "baslik": "prompt-api-troubleshooter",
+    "aciklama": "prompt-api-troubleshooter skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-architecture-reviewer.md",
+    "ad": "prompt-architecture-reviewer",
+    "baslik": "prompt-architecture-reviewer",
+    "aciklama": "prompt-architecture-reviewer skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-attention-explainer.md",
+    "ad": "prompt-attention-explainer",
+    "baslik": "prompt-attention-explainer",
+    "aciklama": "prompt-attention-explainer skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-backbone-selector.md",
+    "ad": "prompt-backbone-selector",
+    "baslik": "prompt-backbone-selector",
+    "aciklama": "prompt-backbone-selector skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-bayesian-reasoning.md",
+    "ad": "prompt-bayesian-reasoning",
+    "baslik": "prompt-bayesian-reasoning",
+    "aciklama": "prompt-bayesian-reasoning skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-caching-planner.md",
+    "ad": "prompt-caching-planner",
+    "baslik": "PRompt Caching Planner",
+    "aciklama": "Design a cache-friendly prompt layout and pick the right provider caching mode.",
+    "kategori": "prompt-caching-planner"
+  },
+  {
+    "dosya": "prompt-classifier-pipeline-auditor.md",
+    "ad": "prompt-classifier-pipeline-auditor",
+    "baslik": "prompt-classifier-pipeline-auditor",
+    "aciklama": "prompt-classifier-pipeline-auditor skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-cnn-architect.md",
+    "ad": "prompt-cnn-architect",
+    "baslik": "prompt-cnn-architect",
+    "aciklama": "prompt-cnn-architect skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-context-optimizer.md",
+    "ad": "prompt-context-optimizer",
+    "baslik": "prompt-context-optimizer",
+    "aciklama": "prompt-context-optimizer skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-cost-optimizer.md",
+    "ad": "prompt-cost-optimizer",
+    "baslik": "prompt-cost-optimizer",
+    "aciklama": "prompt-cost-optimizer skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-data-helper.md",
+    "ad": "prompt-data-helper",
+    "baslik": "prompt-data-helper",
+    "aciklama": "prompt-data-helper skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-data-quality-checker.md",
+    "ad": "prompt-data-quality-checker",
+    "baslik": "PRompt Data Quality Checker",
+    "aciklama": "Validate and debug data quality in LLM pre-training pipelines",
+    "kategori": "prompt-data-quality-checker"
+  },
+  {
+    "dosya": "prompt-debug-ai-code.md",
+    "ad": "prompt-debug-ai-code",
+    "baslik": "prompt-debug-ai-code",
+    "aciklama": "prompt-debug-ai-code skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-depth-model-picker.md",
+    "ad": "prompt-depth-model-picker",
+    "baslik": "prompt-depth-model-picker",
+    "aciklama": "prompt-depth-model-picker skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-detection-metric-reader.md",
+    "ad": "prompt-detection-metric-reader",
+    "baslik": "prompt-detection-metric-reader",
+    "aciklama": "prompt-detection-metric-reader skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-diffusion-sampler-picker.md",
+    "ad": "prompt-diffusion-sampler-picker",
+    "baslik": "prompt-diffusion-sampler-picker",
+    "aciklama": "prompt-diffusion-sampler-picker skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-distance-chooser.md",
+    "ad": "prompt-distance-chooser",
+    "baslik": "prompt-distance-chooser",
+    "aciklama": "prompt-distance-chooser skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-distance-metric-advisor.md",
+    "ad": "prompt-distance-metric-advisor",
+    "baslik": "prompt-distance-metric-advisor",
+    "aciklama": "prompt-distance-metric-advisor skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-distributed-training-planner.md",
+    "ad": "prompt-distributed-training-planner",
+    "baslik": "PRompt Distributed Training Planner",
+    "aciklama": "Plan a distributed training run given model size and available hardware",
+    "kategori": "prompt-distributed-training-planner"
+  },
+  {
+    "dosya": "prompt-dit-model-picker.md",
+    "ad": "prompt-dit-model-picker",
+    "baslik": "prompt-dit-model-picker",
+    "aciklama": "prompt-dit-model-picker skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-edge-deployment-planner.md",
+    "ad": "prompt-edge-deployment-planner",
+    "baslik": "prompt-edge-deployment-planner",
+    "aciklama": "prompt-edge-deployment-planner skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-embedding-advisor.md",
+    "ad": "prompt-embedding-advisor",
+    "baslik": "prompt-embedding-advisor",
+    "aciklama": "prompt-embedding-advisor skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-ensemble-selector.md",
+    "ad": "prompt-ensemble-selector",
+    "baslik": "prompt-ensemble-selector",
+    "aciklama": "prompt-ensemble-selector skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-env-check.md",
+    "ad": "prompt-env-check",
+    "baslik": "prompt-env-check",
+    "aciklama": "prompt-env-check skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-eval-designer.md",
+    "ad": "prompt-eval-designer",
+    "baslik": "prompt-eval-designer",
+    "aciklama": "prompt-eval-designer skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-feature-engineer.md",
+    "ad": "prompt-feature-engineer",
+    "baslik": "prompt-feature-engineer",
+    "aciklama": "prompt-feature-engineer skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-fine-tune-planner.md",
+    "ad": "prompt-fine-tune-planner",
+    "baslik": "prompt-fine-tune-planner",
+    "aciklama": "prompt-fine-tune-planner skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-framework-architect.md",
+    "ad": "prompt-framework-architect",
+    "baslik": "prompt-framework-architect",
+    "aciklama": "prompt-framework-architect skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-gan-training-triage.md",
+    "ad": "prompt-gan-training-triage",
+    "baslik": "prompt-gan-training-triage",
+    "aciklama": "prompt-gan-training-triage skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-gpt-architecture-analyzer.md",
+    "ad": "prompt-gpt-architecture-analyzer",
+    "baslik": "PRompt GPT Architecture Analyzer",
+    "aciklama": "Analyze architecture choices in any GPT-style transformer model",
+    "kategori": "prompt-gpt-architecture-analyzer"
+  },
+  {
+    "dosya": "prompt-gradient-debugger.md",
+    "ad": "prompt-gradient-debugger",
+    "baslik": "prompt-gradient-debugger",
+    "aciklama": "prompt-gradient-debugger skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-init-strategy.md",
+    "ad": "prompt-init-strategy",
+    "baslik": "prompt-init-strategy",
+    "aciklama": "prompt-init-strategy skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-instance-vs-semantic-router.md",
+    "ad": "prompt-instance-vs-semantic-router",
+    "baslik": "prompt-instance-vs-semantic-router",
+    "aciklama": "prompt-instance-vs-semantic-router skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-jax-optimizer.md",
+    "ad": "prompt-jax-optimizer",
+    "baslik": "prompt-jax-optimizer",
+    "aciklama": "prompt-jax-optimizer skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-linear-algebra-tutor.md",
+    "ad": "prompt-linear-algebra-tutor",
+    "baslik": "prompt-linear-algebra-tutor",
+    "aciklama": "prompt-linear-algebra-tutor skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-linear-solver.md",
+    "ad": "prompt-linear-solver",
+    "baslik": "prompt-linear-solver",
+    "aciklama": "prompt-linear-solver skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-lora-advisor.md",
+    "ad": "prompt-lora-advisor",
+    "baslik": "prompt-lora-advisor",
+    "aciklama": "prompt-lora-advisor skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-loss-debugger.md",
+    "ad": "prompt-loss-debugger",
+    "baslik": "prompt-loss-debugger",
+    "aciklama": "prompt-loss-debugger skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-loss-function-selector.md",
+    "ad": "prompt-loss-function-selector",
+    "baslik": "prompt-loss-function-selector",
+    "aciklama": "prompt-loss-function-selector skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-lr-schedule-advisor.md",
+    "ad": "prompt-lr-schedule-advisor",
+    "baslik": "prompt-lr-schedule-advisor",
+    "aciklama": "prompt-lr-schedule-advisor skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-matrix-operations.md",
+    "ad": "prompt-matrix-operations",
+    "baslik": "prompt-matrix-operations",
+    "aciklama": "prompt-matrix-operations skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-ml-pipeline.md",
+    "ad": "prompt-ml-pipeline",
+    "baslik": "prompt-ml-pipeline",
+    "aciklama": "prompt-ml-pipeline skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-ml-problem-framer.md",
+    "ad": "prompt-ml-problem-framer",
+    "baslik": "prompt-ml-problem-framer",
+    "aciklama": "prompt-ml-problem-framer skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-model-diagnostics.md",
+    "ad": "prompt-model-diagnostics",
+    "baslik": "prompt-model-diagnostics",
+    "aciklama": "prompt-model-diagnostics skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-multi-agent-decision.md",
+    "ad": "prompt-multi-agent-decision",
+    "baslik": "prompt-multi-agent-decision",
+    "aciklama": "prompt-multi-agent-decision skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-network-architect.md",
+    "ad": "prompt-network-architect",
+    "baslik": "prompt-network-architect",
+    "aciklama": "prompt-network-architect skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-nn-debugger.md",
+    "ad": "prompt-nn-debugger",
+    "baslik": "prompt-nn-debugger",
+    "aciklama": "prompt-nn-debugger skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-notebook-helper.md",
+    "ad": "prompt-notebook-helper",
+    "baslik": "prompt-notebook-helper",
+    "aciklama": "prompt-notebook-helper skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-numerical-debugger.md",
+    "ad": "prompt-numerical-debugger",
+    "baslik": "prompt-numerical-debugger",
+    "aciklama": "prompt-numerical-debugger skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-ocr-stack-picker.md",
+    "ad": "prompt-ocr-stack-picker",
+    "baslik": "prompt-ocr-stack-picker",
+    "aciklama": "prompt-ocr-stack-picker skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-open-vocab-stack-picker.md",
+    "ad": "prompt-open-vocab-stack-picker",
+    "baslik": "prompt-open-vocab-stack-picker",
+    "aciklama": "prompt-open-vocab-stack-picker skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-optimizer-guide.md",
+    "ad": "prompt-optimizer-guide",
+    "baslik": "prompt-optimizer-guide",
+    "aciklama": "prompt-optimizer-guide skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-optimizer-selector.md",
+    "ad": "prompt-optimizer-selector",
+    "baslik": "prompt-optimizer-selector",
+    "aciklama": "prompt-optimizer-selector skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-pose-stack-picker.md",
+    "ad": "prompt-pose-stack-picker",
+    "baslik": "prompt-pose-stack-picker",
+    "aciklama": "prompt-pose-stack-picker skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-prompt-optimizer.md",
+    "ad": "prompt-prompt-optimizer",
+    "baslik": "prompt-prompt-optimizer",
+    "aciklama": "prompt-prompt-optimizer skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-protocol-selector.md",
+    "ad": "prompt-protocol-selector",
+    "baslik": "prompt-protocol-selector",
+    "aciklama": "prompt-protocol-selector skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-pytorch-debugger.md",
+    "ad": "prompt-pytorch-debugger",
+    "baslik": "prompt-pytorch-debugger",
+    "aciklama": "prompt-pytorch-debugger skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-rag-architect.md",
+    "ad": "prompt-rag-architect",
+    "baslik": "prompt-rag-architect",
+    "aciklama": "prompt-rag-architect skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-reasoning-chain.md",
+    "ad": "prompt-reasoning-chain",
+    "baslik": "prompt-reasoning-chain",
+    "aciklama": "prompt-reasoning-chain skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-regularization-advisor.md",
+    "ad": "prompt-regularization-advisor",
+    "baslik": "prompt-regularization-advisor",
+    "aciklama": "prompt-regularization-advisor skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-retrieval-loss-picker.md",
+    "ad": "prompt-retrieval-loss-picker",
+    "baslik": "prompt-retrieval-loss-picker",
+    "aciklama": "prompt-retrieval-loss-picker skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-reward-model-designer.md",
+    "ad": "prompt-reward-model-designer",
+    "baslik": "PRompt Reward Model Designer",
+    "aciklama": "Design reward model training pipelines for RLHF alignment",
+    "kategori": "prompt-reward-model-designer"
+  },
+  {
+    "dosya": "prompt-safety-auditor.md",
+    "ad": "prompt-safety-auditor",
+    "baslik": "prompt-safety-auditor",
+    "aciklama": "prompt-safety-auditor skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-sd-pipeline-planner.md",
+    "ad": "prompt-sd-pipeline-planner",
+    "baslik": "prompt-sd-pipeline-planner",
+    "aciklama": "prompt-sd-pipeline-planner skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-segmentation-task-picker.md",
+    "ad": "prompt-segmentation-task-picker",
+    "baslik": "prompt-segmentation-task-picker",
+    "aciklama": "prompt-segmentation-task-picker skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-sft-data-curator.md",
+    "ad": "prompt-sft-data-curator",
+    "baslik": "PRompt Sft Data Curator",
+    "aciklama": "Design and curate instruction datasets for supervised fine-tuning",
+    "kategori": "prompt-sft-data-curator"
+  },
+  {
+    "dosya": "prompt-spectral-analyzer.md",
+    "ad": "prompt-spectral-analyzer",
+    "baslik": "prompt-spectral-analyzer",
+    "aciklama": "prompt-spectral-analyzer skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-ssl-pretraining-picker.md",
+    "ad": "prompt-ssl-pretraining-picker",
+    "baslik": "prompt-ssl-pretraining-picker",
+    "aciklama": "prompt-ssl-pretraining-picker skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-stochastic-process-advisor.md",
+    "ad": "prompt-stochastic-process-advisor",
+    "baslik": "prompt-stochastic-process-advisor",
+    "aciklama": "prompt-stochastic-process-advisor skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-structured-extractor.md",
+    "ad": "prompt-structured-extractor",
+    "baslik": "prompt-structured-extractor",
+    "aciklama": "prompt-structured-extractor skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-tensor-debugger.md",
+    "ad": "prompt-tensor-debugger",
+    "baslik": "prompt-tensor-debugger",
+    "aciklama": "",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-tensor-shapes.md",
+    "ad": "prompt-tensor-shapes",
+    "baslik": "prompt-tensor-shapes",
+    "aciklama": "prompt-tensor-shapes skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-time-series-advisor.md",
+    "ad": "prompt-time-series-advisor",
+    "baslik": "prompt-time-series-advisor",
+    "aciklama": "prompt-time-series-advisor skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-tokenizer-analyzer.md",
+    "ad": "prompt-tokenizer-analyzer",
+    "baslik": "prompt-tokenizer-analyzer",
+    "aciklama": "prompt-tokenizer-analyzer skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-tokenizer-builder.md",
+    "ad": "prompt-tokenizer-builder",
+    "baslik": "PRompt Tokenizer Builder",
+    "aciklama": "Build and debug production-quality tokenizers for LLM projects",
+    "kategori": "prompt-tokenizer-builder"
+  },
+  {
+    "dosya": "prompt-tool-designer.md",
+    "ad": "prompt-tool-designer",
+    "baslik": "prompt-tool-designer",
+    "aciklama": "prompt-tool-designer skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-tracker-picker.md",
+    "ad": "prompt-tracker-picker",
+    "baslik": "prompt-tracker-picker",
+    "aciklama": "prompt-tracker-picker skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-transformation-visualizer.md",
+    "ad": "prompt-transformation-visualizer",
+    "baslik": "prompt-transformation-visualizer",
+    "aciklama": "prompt-transformation-visualizer skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-tree-interpreter.md",
+    "ad": "prompt-tree-interpreter",
+    "baslik": "prompt-tree-interpreter",
+    "aciklama": "prompt-tree-interpreter skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-tuning-strategy.md",
+    "ad": "prompt-tuning-strategy",
+    "baslik": "prompt-tuning-strategy",
+    "aciklama": "prompt-tuning-strategy skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-video-architecture-picker.md",
+    "ad": "prompt-video-architecture-picker",
+    "baslik": "prompt-video-architecture-picker",
+    "aciklama": "prompt-video-architecture-picker skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-video-model-picker.md",
+    "ad": "prompt-video-model-picker",
+    "baslik": "prompt-video-model-picker",
+    "aciklama": "prompt-video-model-picker skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-vision-preprocessing-audit.md",
+    "ad": "prompt-vision-preprocessing-audit",
+    "baslik": "prompt-vision-preprocessing-audit",
+    "aciklama": "prompt-vision-preprocessing-audit skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-vision-service-shape-reviewer.md",
+    "ad": "prompt-vision-service-shape-reviewer",
+    "baslik": "prompt-vision-service-shape-reviewer",
+    "aciklama": "prompt-vision-service-shape-reviewer skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-vit-vs-cnn-picker.md",
+    "ad": "prompt-vit-vs-cnn-picker",
+    "baslik": "prompt-vit-vs-cnn-picker",
+    "aciklama": "prompt-vit-vs-cnn-picker skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-vlm-selector.md",
+    "ad": "prompt-vlm-selector",
+    "baslik": "prompt-vlm-selector",
+    "aciklama": "prompt-vlm-selector skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "prompt-zero-shot-class-picker.md",
+    "ad": "prompt-zero-shot-class-picker",
+    "baslik": "prompt-zero-shot-class-picker",
+    "aciklama": "prompt-zero-shot-class-picker skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "provenance-audit.md",
+    "ad": "provenance-audit",
+    "baslik": "PRovenance Audit",
+    "aciklama": "Audit a content deployment's provenance chain across watermarking and C2PA metadata.",
+    "kategori": "provenance-audit"
+  },
+  {
+    "dosya": "provenance-check.md",
+    "ad": "provenance-check",
+    "baslik": "PRovenance Check",
+    "aciklama": "Check a training dataset against California AB 2013 and EU TDM opt-out obligations.",
+    "kategori": "provenance-check"
+  },
+  {
+    "dosya": "provider-portability-audit.md",
+    "ad": "provider-portability-audit",
+    "baslik": "PRovider Portability Audit",
+    "aciklama": "Audit a function-calling integration against one provider for what breaks when ported to the other two.",
+    "kategori": "provider-portability-audit"
+  },
+  {
+    "dosya": "qa-architect.md",
+    "ad": "qa-architect",
+    "baslik": "Qa Architect",
+    "aciklama": "Choose QA architecture, retrieval strategy, and evaluation plan.",
+    "kategori": "qa-architect"
+  },
+  {
+    "dosya": "quantization-picker.md",
+    "ad": "quantization-picker",
+    "baslik": "Quantization Picker",
+    "aciklama": "Pick a 2026 quantization format given hardware, engine, workload, and quality tolerance, and produce a calibration + val",
+    "kategori": "quantization-picker"
+  },
+  {
+    "dosya": "qwen-vl-pipeline-designer.md",
+    "ad": "qwen-vl-pipeline-designer",
+    "baslik": "Qwen Vl Pipeline Designer",
+    "aciklama": "Configure a Qwen2.5-VL or Qwen3-VL deployment — resolution bounds, dynamic-FPS policy, window-attention flag, and JSON a",
+    "kategori": "qwen-vl-pipeline-designer"
+  },
+  {
+    "dosya": "radix-scheduler-advisor.md",
+    "ad": "radix-scheduler-advisor",
+    "baslik": "Radix Scheduler Advisor",
+    "aciklama": "Advise on SGLang adoption and prompt-ordering discipline for prefix-heavy workloads that want RadixAttention's cache reu",
+    "kategori": "radix-scheduler-advisor"
+  },
+  {
+    "dosya": "re-designer.md",
+    "ad": "re-designer",
+    "baslik": "Re Designer",
+    "aciklama": "Design a relation extraction pipeline with provenance and canonicalization.",
+    "kategori": "re-designer"
+  },
+  {
+    "dosya": "realtime-voice-pipeline.md",
+    "ad": "realtime-voice-pipeline",
+    "baslik": "Realtime Voice Pipeline",
+    "aciklama": "Pick transport, VAD, streaming STT, LLM, streaming TTS, and orchestration for a target end-to-end latency.",
+    "kategori": "realtime-voice-pipeline"
+  },
+  {
+    "dosya": "red-team-stack.md",
+    "ad": "red-team-stack",
+    "baslik": "Red Team Stack",
+    "aciklama": "Recommend a red-team tool stack and configuration for a given deployment.",
+    "kategori": "red-team-stack"
+  },
+  {
+    "dosya": "refine-loop.md",
+    "ad": "refine-loop",
+    "baslik": "Refine Loop",
+    "aciklama": "Configure an evaluator-optimizer (Self-Refine / CRITIC) loop given task, verifier availability, and iteration budget.",
+    "kategori": "refine-loop"
+  },
+  {
+    "dosya": "reflexion-buffer.md",
+    "ad": "reflexion-buffer",
+    "baslik": "Reflexion Buffer",
+    "aciklama": "Maintain an episodic-memory buffer of reflections for verbal RL with TTL, dedup, and scoped scope.",
+    "kategori": "reflexion-buffer"
+  },
+  {
+    "dosya": "regulatory-map.md",
+    "ad": "regulatory-map",
+    "baslik": "Regulatory Map",
+    "aciklama": "Map a deployment's AI regulatory obligations across EU, US, UK, Korea.",
+    "kategori": "regulatory-map"
+  },
+  {
+    "dosya": "remotion.md",
+    "ad": "remotion",
+    "baslik": "Remotion",
+    "aciklama": "Create editable AI video projects with Remotion and React, then preview and render them to MP4. Use for vertical short v",
+    "kategori": "remotion"
+  },
+  {
+    "dosya": "resolution-budget-planner.md",
+    "ad": "resolution-budget-planner",
+    "baslik": "Resolution Budget Planner",
+    "aciklama": "Pick between square-resize, AnyRes, M-RoPE, and NaFlex for a mixed-aspect-ratio VLM workload and emit a per-task token b",
+    "kategori": "resolution-budget-planner"
+  },
+  {
+    "dosya": "retrieval-picker.md",
+    "ad": "retrieval-picker",
+    "baslik": "Retrieval Picker",
+    "aciklama": "Pick a retrieval stack for a given corpus and query pattern.",
+    "kategori": "retrieval-picker"
+  },
+  {
+    "dosya": "reviewer-agent.md",
+    "ad": "reviewer-agent",
+    "baslik": "Reviewer Agent",
+    "aciklama": "Stand up a reviewer agent role with a five-dimension rubric that reads builder artifacts, produces a structured review r",
+    "kategori": "reviewer-agent"
+  },
+  {
+    "dosya": "reward-hack-auditor.md",
+    "ad": "reward-hack-auditor",
+    "baslik": "Reward Hack Auditor",
+    "aciklama": "Diagnose reward-hacking failure modes in a trained RLHF model from training logs and eval outputs.",
+    "kategori": "reward-hack-auditor"
+  },
+  {
+    "dosya": "rewoo-planner.md",
+    "ad": "rewoo-planner",
+    "baslik": "Rewoo Planner",
+    "aciklama": "Generate a validated ReWOO plan DAG from a user request and tool catalog.",
+    "kategori": "rewoo-planner"
+  },
+  {
+    "dosya": "rey-men-bot.md",
+    "ad": "rey-men-bot",
+    "baslik": "rey-men-bot",
+    "aciklama": "Run, troubleshoot, and manage the ReYMeN Telegram bot. 3 bot (Kral_38, Pasa_38, ReYMeN) with shared command module and D",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "ReYMeN-memory-tool.md",
+    "ad": "ReYMeN-memory-tool",
+    "baslik": "ReYMeN-memory-tool",
+    "aciklama": "ReYMeN projesine memory_tool.py ekleme adimlari",
+    "kategori": "software-development"
+  },
+  {
+    "dosya": "ReYMeN-ogrenme-sistemi.md",
+    "ad": "ReYMeN-ogrenme-sistemi",
+    "baslik": "ReYMeN-ogrenme-sistemi",
+    "aciklama": "ReYMeN ajanı için kapalı öğrenme döngüsü — YAML frontmatter, FTS5 çakışma kontrolü, güvenli bağlam enjeksiyonu",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "ReYMeN-proje-benchmark.md",
+    "ad": "ReYMeN-proje-benchmark",
+    "baslik": "ReYMeN Proje Benchmark",
+    "aciklama": "ReYMeN projesinin guncel metrikleri - 755 .py, 215K satir, 29/32 ozellik tamam, Hermes karsilastirma gap analizi",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "ReYMeN-proje-mimarisi.md",
+    "ad": "ReYMeN-proje-mimarisi",
+    "baslik": "ReYMeN Proje Mimarisi",
+    "aciklama": "ReYMeN proje mimarisi, ReYMeN Agent ile karsilastirma, parallel batch porting workflow, ve ReYMeN+Claude 4.8 is bolumu",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "ReYMeN-skill-tool.md",
+    "ad": "ReYMeN-skill-tool",
+    "baslik": "ReYMeN-skill-tool",
+    "aciklama": "ReYMeN projesine skill_tool.py ekleme adimlari",
+    "kategori": "software-development"
+  },
+  {
+    "dosya": "ReYMeN-tool-patterns.md",
+    "ad": "ReYMeN-tool-patterns",
+    "baslik": "ReYMeN-tool-patterns",
+    "aciklama": "ReYMeN projesinde tool gelistirme pattern'leri ve kritik kod yapilari",
+    "kategori": "software-development"
+  },
+  {
+    "dosya": "ReYMeN-tts-tool.md",
+    "ad": "ReYMeN-tts-tool",
+    "baslik": "ReYMeN-tts-tool",
+    "aciklama": "ReYMeN projesine tts_tool.py ekleme adimlari",
+    "kategori": "software-development"
+  },
+  {
+    "dosya": "ReYMeN-web-search-tool.md",
+    "ad": "ReYMeN-web-search-tool",
+    "baslik": "ReYMeN-web-search-tool",
+    "aciklama": "ReYMeN projesine web_search_tool.py ekleme ve motor.py'ye kaydetme adimlari",
+    "kategori": "software-development"
+  },
+  {
+    "dosya": "reymen.md",
+    "ad": "reymen-hafiza-oncelikli-akis",
+    "baslik": "reymen-hafiza-oncelikli-akis",
+    "aciklama": "ReYMeN hafıza-öncelikli karar ağacı — isle() API'si, 3 iyileştirme, kategori/guven_skoru/gecerlilik sistemi",
+    "kategori": "reymen"
+  },
+  {
+    "dosya": "rlhf-architect.md",
+    "ad": "rlhf-architect",
+    "baslik": "Rlhf Architect",
+    "aciklama": "Design an RLHF / DPO / GRPO alignment pipeline for a language model, including RM, KL, and data strategy.",
+    "kategori": "rlhf-architect"
+  },
+  {
+    "dosya": "role-designer.md",
+    "ad": "role-designer",
+    "baslik": "Role Designer",
+    "aciklama": "Produce a role roster for a multi-agent system, naming the planner/executor/critic/verifier for a given task with explic",
+    "kategori": "role-designer"
+  },
+  {
+    "dosya": "rollback-rehearsal.md",
+    "ad": "rollback-rehearsal",
+    "baslik": "Rollback Rehearsal",
+    "aciklama": "Design a rollback-rehearsal test for a proposed autonomous workflow and audit the checkpoint backend for audit-trail per",
+    "kategori": "rollback-rehearsal"
+  },
+  {
+    "dosya": "rollout-runbook.md",
+    "ad": "rollout-runbook",
+    "baslik": "Rollout Runbook",
+    "aciklama": "Design a shadow → canary → A/B → 100% rollout plan for a new LLM model or prompt template, with five canary gates, noise",
+    "kategori": "rollout-runbook"
+  },
+  {
+    "dosya": "router-plan.md",
+    "ad": "router-plan",
+    "baslik": "Router Plan",
+    "aciklama": "Design an LLM model-routing plan — pick pattern (pre-route, cascade, ensemble), signals (task, length, embedding, confid",
+    "kategori": "router-plan"
+  },
+  {
+    "dosya": "routing-config-designer.md",
+    "ad": "routing-config-designer",
+    "baslik": "Routing Config Designer",
+    "aciklama": "Given a workload profile, pick LiteLLM / OpenRouter / Portkey and produce a routing config.",
+    "kategori": "routing-config-designer"
+  },
+  {
+    "dosya": "rsi-cycle-pause-spec.md",
+    "ad": "rsi-cycle-pause-spec",
+    "baslik": "Rsi Cycle Pause Spec",
+    "aciklama": "Specify the conditions under which an RSI pipeline must pause and wait for human review before the next cycle.",
+    "kategori": "rsi-cycle-pause-spec"
+  },
+  {
+    "dosya": "rule-set-builder.md",
+    "ad": "rule-set-builder",
+    "baslik": "Rule Set Builder",
+    "aciklama": "Interview a project owner, classify their existing prose instructions into five operational categories, and emit a versi",
+    "kategori": "rule-set-builder"
+  },
+  {
+    "dosya": "runtime-picker.md",
+    "ad": "runtime-picker",
+    "baslik": "Runtime Picker",
+    "aciklama": "Pick a production agent runtime (Agno, Mastra, LangGraph, provider SDK) for a given stack, latency budget, and operation",
+    "kategori": "runtime-picker"
+  },
+  {
+    "dosya": "runtime-shape.md",
+    "ad": "runtime-shape",
+    "baslik": "Runtime Shape",
+    "aciklama": "Pick a production runtime shape (request-response, streaming, queue, event, cron, durable) and wire observability.",
+    "kategori": "runtime-shape"
+  },
+  {
+    "dosya": "safety-harness.md",
+    "ad": "safety-harness",
+    "baslik": "Safety Harness",
+    "aciklama": "Wire a layered safety pipeline around a target LLM app, run a six-family red-team range, and run a constitutional self-c",
+    "kategori": "safety-harness"
+  },
+  {
+    "dosya": "sampling-loop-designer.md",
+    "ad": "sampling-loop-designer",
+    "baslik": "SAMpling Loop Designer",
+    "aciklama": "Design a server-hosted agent loop using MCP sampling with the right modelPreferences, rate limits, and safety confirmati",
+    "kategori": "sampling-loop-designer"
+  },
+  {
+    "dosya": "sampling-tuner.md",
+    "ad": "sampling-tuner",
+    "baslik": "SAMpling Tuner",
+    "aciklama": "Pick decoding strategy (greedy / temperature / top-k / top-p / min-p / speculative) for a given generation task.",
+    "kategori": "sampling-tuner"
+  },
+  {
+    "dosya": "scaling-advisor.md",
+    "ad": "scaling-advisor",
+    "baslik": "Scaling Advisor",
+    "aciklama": "Advise on durable-execution choice for a multi-agent production system. Picks between FastAPI + Postgres, LangGraph runt",
+    "kategori": "scaling-advisor"
+  },
+  {
+    "dosya": "scaling-policy-review.md",
+    "ad": "scaling-policy-review",
+    "baslik": "Scaling Policy Review",
+    "aciklama": "Review a frontier-lab scaling policy (Anthropic RSP, OpenAI Preparedness, DeepMind FSF, internal) against the RSP v3.0 r",
+    "kategori": "scaling-policy-review"
+  },
+  {
+    "dosya": "scheming-triage.md",
+    "ad": "scheming-triage",
+    "baslik": "Scheming Triage",
+    "aciklama": "Triage an agent-deployment incident report against the Apollo three-pillar scheming framework.",
+    "kategori": "scheming-triage"
+  },
+  {
+    "dosya": "scope-contract.md",
+    "ad": "scope-contract",
+    "baslik": "Scope Contract",
+    "aciklama": "Generate per-task scope contracts with allowed/forbidden globs, acceptance criteria, and rollback plan, plus a CI-ready ",
+    "kategori": "scope-contract"
+  },
+  {
+    "dosya": "sd-prompter.md",
+    "ad": "sd-prompter",
+    "baslik": "Sd PRompter",
+    "aciklama": "Configure Stable Diffusion / Flux inference for a given prompt, style, and quality bar.",
+    "kategori": "sd-prompter"
+  },
+  {
+    "dosya": "sd-toolkit-composer.md",
+    "ad": "sd-toolkit-composer",
+    "baslik": "Sd Toolkit Composer",
+    "aciklama": "Compose ControlNets, LoRAs, and IP-Adapters on top of an SD / Flux base for a given set of inputs.",
+    "kategori": "sd-toolkit-composer"
+  },
+  {
+    "dosya": "search-policy.md",
+    "ad": "search-policy",
+    "baslik": "Search Policy",
+    "aciklama": "Pick a search strategy (ReAct, ToT, LATS, evolutionary) given task shape, token budget, and evaluator quality.",
+    "kategori": "search-policy"
+  },
+  {
+    "dosya": "self-improvement-auditor.md",
+    "ad": "self-improvement-auditor",
+    "baslik": "Self Improvement Auditor",
+    "aciklama": "Audit a proposed self-improvement or constitutional AI pipeline before it runs at scale.",
+    "kategori": "self-improvement-auditor"
+  },
+  {
+    "dosya": "self-improvement.md",
+    "ad": "self-improvement-self-improvement",
+    "baslik": "ReYMeN Otonom Geliştirme Gece Rutini",
+    "aciklama": "ReYMeN'in geceleri kendi kendine Obsidian vault + ReYMeN skills tarayarak gelişmesi: eksik notları skill'e dönüştür, gün",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "sentiment-baseline.md",
+    "ad": "sentiment-baseline",
+    "baslik": "sentiment-baseline",
+    "aciklama": "sentiment-baseline skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "seq2seq-design.md",
+    "ad": "seq2seq-design",
+    "baslik": "seq2seq-design",
+    "aciklama": "seq2seq-design skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "seq2seq-picker.md",
+    "ad": "seq2seq-picker",
+    "baslik": "Seq2Seq Picker",
+    "aciklama": "Choose encoder-decoder vs decoder-only for a new sequence-to-sequence task.",
+    "kategori": "seq2seq-picker"
+  },
+  {
+    "dosya": "sequence-architecture-picker.md",
+    "ad": "sequence-architecture-picker",
+    "baslik": "Sequence Architecture Picker",
+    "aciklama": "Pick sequence architecture (RNN, transformer, SSM, hybrid) given length, throughput, and training budget.",
+    "kategori": "sequence-architecture-picker"
+  },
+  {
+    "dosya": "sim2real-planner.md",
+    "ad": "sim2real-planner",
+    "baslik": "Sim2Real Planner",
+    "aciklama": "Plan a sim-to-real transfer pipeline for a given robot + task, covering DR, SI, and safety.",
+    "kategori": "sim2real-planner"
+  },
+  {
+    "dosya": "simulation-designer.md",
+    "ad": "simulation-designer",
+    "baslik": "Simulation Designer",
+    "aciklama": "Design a generative-agent simulation (Smallville-style) for a given scenario. Specifies memory schema, reflection cadenc",
+    "kategori": "simulation-designer"
+  },
+  {
+    "dosya": "skill-3dgs-export-router.md",
+    "ad": "skill-3dgs-export-router",
+    "baslik": "Skill 3Dgs Export Router",
+    "aciklama": "Pick the right 3DGS export format (.ply / .splat / glTF KHR_gaussian_splatting / USD) given the downstream viewer or eng",
+    "kategori": "skill-3dgs-export-router"
+  },
+  {
+    "dosya": "skill-advanced-rag.md",
+    "ad": "skill-advanced-rag",
+    "baslik": "Skill Advanced RAG",
+    "aciklama": "Build production-grade RAG with hybrid search, reranking, and evaluation",
+    "kategori": "skill-advanced-rag"
+  },
+  {
+    "dosya": "skill-anchor-designer.md",
+    "ad": "skill-anchor-designer",
+    "baslik": "Skill Anchor Designer",
+    "aciklama": "Given a dataset of ground-truth boxes, run k-means on (w, h) and return anchor sets per FPN level plus coverage statisti",
+    "kategori": "skill-anchor-designer"
+  },
+  {
+    "dosya": "skill-anomaly-detector.md",
+    "ad": "skill-anomaly-detector",
+    "baslik": "skill-anomaly-detector",
+    "aciklama": "skill-anomaly-detector skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "skill-autodiff.md",
+    "ad": "skill-autodiff",
+    "baslik": "skill-autodiff",
+    "aciklama": "skill-autodiff skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "skill-bpe-vs-wordpiece.md",
+    "ad": "skill-bpe-vs-wordpiece",
+    "baslik": "Skill Bpe Vs Wordpiece",
+    "aciklama": "Pick tokenizer algorithm, vocab size, library for a given corpus and deployment target.",
+    "kategori": "skill-bpe-vs-wordpiece"
+  },
+  {
+    "dosya": "skill-classification-baseline.md",
+    "ad": "skill-classification-baseline",
+    "baslik": "Skill Classification Baseline",
+    "aciklama": "Establish a strong classification baseline before reaching for complex models",
+    "kategori": "skill-classification-baseline"
+  },
+  {
+    "dosya": "skill-classification-diagnostics.md",
+    "ad": "skill-classification-diagnostics",
+    "baslik": "Skill Classification Diagnostics",
+    "aciklama": "Given a confusion matrix and class names, surface per-class failures and propose the single most impactful fix",
+    "kategori": "skill-classification-diagnostics"
+  },
+  {
+    "dosya": "skill-clustering-guide.md",
+    "ad": "skill-clustering-guide",
+    "baslik": "Skill Clustering GUIde",
+    "aciklama": "Choose the right clustering algorithm based on data shape, noise, and constraints",
+    "kategori": "skill-clustering-guide"
+  },
+  {
+    "dosya": "skill-cmer-monitor.md",
+    "ad": "skill-cmer-monitor",
+    "baslik": "Skill Cmer Monitor",
+    "aciklama": "Instrument a production VLM endpoint with Cross-Modal Error Rate monitoring, dashboards, and alerts",
+    "kategori": "skill-cmer-monitor"
+  },
+  {
+    "dosya": "skill-complex-arithmetic.md",
+    "ad": "skill-complex-arithmetic",
+    "baslik": "skill-complex-arithmetic",
+    "aciklama": "skill-complex-arithmetic skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "skill-concept-prompt-designer.md",
+    "ad": "skill-concept-prompt-designer",
+    "baslik": "Skill Concept PRompt Designer",
+    "aciklama": "Turn user utterances into well-formed SAM 3 concept prompts with splitting, disambiguation, and fallbacks",
+    "kategori": "skill-concept-prompt-designer"
+  },
+  {
+    "dosya": "skill-constitutional-rules-engine.md",
+    "ad": "skill-constitutional-rules-engine",
+    "baslik": "Skill Constitutional Rules Engine",
+    "aciklama": "Declarative YAML rules engine for output constraints with severity, explanation, fixer operations, and structured diff",
+    "kategori": "skill-constitutional-rules-engine"
+  },
+  {
+    "dosya": "skill-content-classifier-integration.md",
+    "ad": "skill-content-classifier-integration",
+    "baslik": "Skill Content Classifier Integration",
+    "aciklama": "Three output-side classifiers (toxicity, PII, instruction-leakage) behind a single severity router with block, redact, w",
+    "kategori": "skill-content-classifier-integration"
+  },
+  {
+    "dosya": "skill-context-engineering.md",
+    "ad": "skill-context-engineering",
+    "baslik": "Skill Context Engineering",
+    "aciklama": "Decision framework for designing context assembly pipelines based on task type, window size, and latency budget",
+    "kategori": "skill-context-engineering"
+  },
+  {
+    "dosya": "skill-conv-shape-calculator.md",
+    "ad": "skill-conv-shape-calculator",
+    "baslik": "Skill Conv Shape Calculator",
+    "aciklama": "Walk a CNN spec layer by layer and report output shape, receptive field, and parameter count for every block",
+    "kategori": "skill-conv-shape-calculator"
+  },
+  {
+    "dosya": "skill-convexity-checker.md",
+    "ad": "skill-convexity-checker",
+    "baslik": "Skill Convexity Checker",
+    "aciklama": "Determine if an optimization problem is convex and choose the right solver",
+    "kategori": "skill-convexity-checker"
+  },
+  {
+    "dosya": "skill-cost-patterns.md",
+    "ad": "skill-cost-patterns",
+    "baslik": "Skill Cost Patterns",
+    "aciklama": "Decision framework for LLM cost optimization -- caching strategies, rate limiting, model routing, and budget controls",
+    "kategori": "skill-cost-patterns"
+  },
+  {
+    "dosya": "skill-cot-patterns.md",
+    "ad": "skill-cot-patterns",
+    "baslik": "Skill Cot Patterns",
+    "aciklama": "Decision framework for choosing the right reasoning technique based on task complexity, accuracy requirements, and cost ",
+    "kategori": "skill-cot-patterns"
+  },
+  {
+    "dosya": "skill-ctc-decoder.md",
+    "ad": "skill-ctc-decoder",
+    "baslik": "Skill Ctc Decoder",
+    "aciklama": "Write greedy and beam-search CTC decoders from scratch, including length normalisation",
+    "kategori": "skill-ctc-decoder"
+  },
+  {
+    "dosya": "skill-dcgan-scaffold.md",
+    "ad": "skill-dcgan-scaffold",
+    "baslik": "Skill Dcgan Scaffold",
+    "aciklama": "Write a complete DCGAN scaffold from z_dim, image_size, and num_channels, including training loop and sample saver",
+    "kategori": "skill-dcgan-scaffold"
+  },
+  {
+    "dosya": "skill-debug-checklist.md",
+    "ad": "skill-debug-checklist",
+    "baslik": "Skill Debug Checklist",
+    "aciklama": "Decision-tree checklist for debugging neural network training failures",
+    "kategori": "skill-debug-checklist"
+  },
+  {
+    "dosya": "skill-depth-to-pointcloud.md",
+    "ad": "skill-depth-to-pointcloud",
+    "baslik": "Skill Depth To Pointcloud",
+    "aciklama": "Build point clouds from depth maps with correct intrinsics handling and export to .ply",
+    "kategori": "skill-depth-to-pointcloud"
+  },
+  {
+    "dosya": "skill-dimensionality-reduction.md",
+    "ad": "skill-dimensionality-reduction",
+    "baslik": "skill-dimensionality-reduction",
+    "aciklama": "skill-dimensionality-reduction skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "skill-embedding-patterns.md",
+    "ad": "skill-embedding-patterns",
+    "baslik": "Skill Embedding Patterns",
+    "aciklama": "Production patterns for embeddings, vector search, and similarity",
+    "kategori": "skill-embedding-patterns"
+  },
+  {
+    "dosya": "skill-embeddings-picker.md",
+    "ad": "skill-embeddings-picker",
+    "baslik": "Skill Embeddings Picker",
+    "aciklama": "Pick a tokenization approach for a new language model or text pipeline.",
+    "kategori": "skill-embeddings-picker"
+  },
+  {
+    "dosya": "skill-end-to-end-safety-gate.md",
+    "ad": "skill-end-to-end-safety-gate",
+    "baslik": "Skill End To End Safety Gate",
+    "aciklama": "Three-checkpoint safety gate composing the input detector, streaming token filter, output classifier, and rules engine w",
+    "kategori": "skill-end-to-end-safety-gate"
+  },
+  {
+    "dosya": "skill-ensemble-builder.md",
+    "ad": "skill-ensemble-builder",
+    "baslik": "Skill Ensemble Builder",
+    "aciklama": "Choose the right ensemble method and configure it for your problem",
+    "kategori": "skill-ensemble-builder"
+  },
+  {
+    "dosya": "skill-eval-patterns.md",
+    "ad": "skill-eval-patterns",
+    "baslik": "Skill Eval Patterns",
+    "aciklama": "Decision framework for choosing evaluation strategies -- when to use which method, how to size test suites, and how to i",
+    "kategori": "skill-eval-patterns"
+  },
+  {
+    "dosya": "skill-evaluation.md",
+    "ad": "skill-evaluation",
+    "baslik": "Skill Evaluation",
+    "aciklama": "Evaluation strategy checklist for classification and regression models",
+    "kategori": "skill-evaluation"
+  },
+  {
+    "dosya": "skill-feature-selector.md",
+    "ad": "skill-feature-selector",
+    "baslik": "Skill Feature Selector",
+    "aciklama": "Quick reference decision tree for choosing the right feature selection method",
+    "kategori": "skill-feature-selector"
+  },
+  {
+    "dosya": "skill-fine-tuning-guide.md",
+    "ad": "skill-fine-tuning-guide",
+    "baslik": "Skill Fine Tuning GUIde",
+    "aciklama": "Decision tree for when and how to fine-tune LLMs with LoRA and QLoRA",
+    "kategori": "skill-fine-tuning-guide"
+  },
+  {
+    "dosya": "skill-frame-sampler-auditor.md",
+    "ad": "skill-frame-sampler-auditor",
+    "baslik": "Skill Frame SAMpler Auditor",
+    "aciklama": "Audit a video pipeline's frame sampler for off-by-one, short-clip handling, and crop consistency",
+    "kategori": "skill-frame-sampler-auditor"
+  },
+  {
+    "dosya": "skill-freeze-inspector.md",
+    "ad": "skill-freeze-inspector",
+    "baslik": "Skill Freeze Inspector",
+    "aciklama": "Report which parameters are trainable, which BatchNorm layers are in eval mode, and whether the optimizer is actually co",
+    "kategori": "skill-freeze-inspector"
+  },
+  {
+    "dosya": "skill-function-calling-patterns.md",
+    "ad": "skill-function-calling-patterns",
+    "baslik": "Skill Function Calling Patterns",
+    "aciklama": "Decision framework for implementing function calling in production -- tool design, error handling, security, and provide",
+    "kategori": "skill-function-calling-patterns"
+  },
+  {
+    "dosya": "skill-gradient-computation.md",
+    "ad": "skill-gradient-computation",
+    "baslik": "Skill Gradient Computation",
+    "aciklama": "Compute gradients of common ML loss functions and choose the right derivative approach",
+    "kategori": "skill-gradient-computation"
+  },
+  {
+    "dosya": "skill-graph-analysis.md",
+    "ad": "skill-graph-analysis",
+    "baslik": "skill-graph-analysis",
+    "aciklama": "skill-graph-analysis skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "skill-guardrail-patterns.md",
+    "ad": "skill-guardrail-patterns",
+    "baslik": "Skill Guardrail Patterns",
+    "aciklama": "Decision framework for choosing and implementing guardrails in production -- tool selection, layering strategy, and cost",
+    "kategori": "skill-guardrail-patterns"
+  },
+  {
+    "dosya": "skill-heatmap-to-coords.md",
+    "ad": "skill-heatmap-to-coords",
+    "baslik": "Skill Heatmap To Coords",
+    "aciklama": "Write the sub-pixel heatmap-to-coordinate routine used by every production pose model",
+    "kategori": "skill-heatmap-to-coords"
+  },
+  {
+    "dosya": "skill-image-tensor-inspector.md",
+    "ad": "skill-image-tensor-inspector",
+    "baslik": "Skill Image Tensor Inspector",
+    "aciklama": "Inspect any image-shaped tensor or array and report dtype, layout, range, and whether it looks raw, normalized, or stand",
+    "kategori": "skill-image-tensor-inspector"
+  },
+  {
+    "dosya": "skill-image-text-retriever.md",
+    "ad": "skill-image-text-retriever",
+    "baslik": "Skill Image Text Retriever",
+    "aciklama": "Build an image embedding index with any CLIP checkpoint; support query-by-text and query-by-image",
+    "kategori": "skill-image-text-retriever"
+  },
+  {
+    "dosya": "skill-imbalanced-data.md",
+    "ad": "skill-imbalanced-data",
+    "baslik": "Skill Imbalanced Data",
+    "aciklama": "Decision checklist for handling imbalanced classification problems",
+    "kategori": "skill-imbalanced-data"
+  },
+  {
+    "dosya": "skill-inference-optimization.md",
+    "ad": "skill-inference-optimization",
+    "baslik": "Skill Inference Optimization",
+    "aciklama": "Diagnose and optimize LLM inference serving throughput, latency, and cost",
+    "kategori": "skill-inference-optimization"
+  },
+  {
+    "dosya": "skill-information-theory.md",
+    "ad": "skill-information-theory",
+    "baslik": "Skill Information Theory",
+    "aciklama": "Apply information theory concepts to ML loss functions, model evaluation, and feature selection",
+    "kategori": "skill-information-theory"
+  },
+  {
+    "dosya": "skill-jailbreak-taxonomy.md",
+    "ad": "skill-jailbreak-taxonomy",
+    "baslik": "Skill Jailbreak Taxonomy",
+    "aciklama": "Shared vocabulary for attacks against LLM assistants, six categories with hand-built fixtures",
+    "kategori": "skill-jailbreak-taxonomy"
+  },
+  {
+    "dosya": "skill-jax-patterns.md",
+    "ad": "skill-jax-patterns",
+    "baslik": "Skill JAX Patterns",
+    "aciklama": "Functional programming patterns in JAX -- when and how to use grad, jit, vmap, and pmap",
+    "kategori": "skill-jax-patterns"
+  },
+  {
+    "dosya": "skill-latency-profiler.md",
+    "ad": "skill-latency-profiler",
+    "baslik": "Skill Latency PRofiler",
+    "aciklama": "Write a complete latency-benchmarking script with warmup, synchronisation, percentiles, and memory tracking",
+    "kategori": "skill-latency-profiler"
+  },
+  {
+    "dosya": "skill-library.md",
+    "ad": "skill-library",
+    "baslik": "Skill Library",
+    "aciklama": "Generate a Voyager-shaped skill library with registration, retrieval by similarity, compositional execution, and failure",
+    "kategori": "skill-library"
+  },
+  {
+    "dosya": "skill-linear-probe-runner.md",
+    "ad": "skill-linear-probe-runner",
+    "baslik": "Skill Linear PRobe Runner",
+    "aciklama": "Write the complete linear-probe evaluation for any frozen encoder and labelled dataset",
+    "kategori": "skill-linear-probe-runner"
+  },
+  {
+    "dosya": "skill-llm-evaluation.md",
+    "ad": "skill-llm-evaluation",
+    "baslik": "Skill LLM Evaluation",
+    "aciklama": "Decision framework for choosing the right LLM evaluation strategy based on task type, budget, and requirements",
+    "kategori": "skill-llm-evaluation"
+  },
+  {
+    "dosya": "skill-lora-training-setup.md",
+    "ad": "skill-lora-training-setup",
+    "baslik": "Skill Lora Training Setup",
+    "aciklama": "Write a full LoRA training config for a custom dataset, including captions, rank, batch size, and learning rate",
+    "kategori": "skill-lora-training-setup"
+  },
+  {
+    "dosya": "skill-mask-rcnn-head-swapper.md",
+    "ad": "skill-mask-rcnn-head-swapper",
+    "baslik": "Skill Mask Rcnn Head Swapper",
+    "aciklama": "Generate the exact code for swapping box and mask heads on a torchvision Mask R-CNN for a custom num_classes",
+    "kategori": "skill-mask-rcnn-head-swapper"
+  },
+  {
+    "dosya": "skill-mot-evaluator.md",
+    "ad": "skill-mot-evaluator",
+    "baslik": "Skill Mot Evaluator",
+    "aciklama": "Write a complete evaluation harness for MOTA / IDF1 / HOTA against ground-truth tracks",
+    "kategori": "skill-mot-evaluator"
+  },
+  {
+    "dosya": "skill-naive-bayes-chooser.md",
+    "ad": "skill-naive-bayes-chooser",
+    "baslik": "skill-naive-bayes-chooser",
+    "aciklama": "skill-naive-bayes-chooser skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "skill-noise-schedule-designer.md",
+    "ad": "skill-noise-schedule-designer",
+    "baslik": "Skill Noise Schedule Designer",
+    "aciklama": "Produce a linear, cosine, or sigmoid beta schedule given T and target corruption level, plus SNR plot",
+    "kategori": "skill-noise-schedule-designer"
+  },
+  {
+    "dosya": "skill-perceptron.md",
+    "ad": "skill-perceptron",
+    "baslik": "Skill Perceptron",
+    "aciklama": "Understand the perceptron pattern and when to use single-layer vs multi-layer architectures",
+    "kategori": "skill-perceptron"
+  },
+  {
+    "dosya": "skill-physical-plausibility-checks.md",
+    "ad": "skill-physical-plausibility-checks",
+    "baslik": "Skill Physical Plausibility Checks",
+    "aciklama": "Automated checks for object permanence, gravity, and continuity on any generated video before shipping",
+    "kategori": "skill-physical-plausibility-checks"
+  },
+  {
+    "dosya": "skill-pipeline-budget-planner.md",
+    "ad": "skill-pipeline-budget-planner",
+    "baslik": "Skill Pipeline Budget Planner",
+    "aciklama": "Given target latency and throughput, assign a time budget to every pipeline stage and flag which stage will miss its bud",
+    "kategori": "skill-pipeline-budget-planner"
+  },
+  {
+    "dosya": "skill-point-cloud-loader.md",
+    "ad": "skill-point-cloud-loader",
+    "baslik": "Skill Point Cloud Loader",
+    "aciklama": "Write a PyTorch Dataset for .ply / .pcd / .xyz files with correct normalisation, centring, and point sampling",
+    "kategori": "skill-point-cloud-loader"
+  },
+  {
+    "dosya": "skill-probability-reasoning.md",
+    "ad": "skill-probability-reasoning",
+    "baslik": "Skill PRobability Reasoning",
+    "aciklama": "Choose the right probability distribution for a given ML problem",
+    "kategori": "skill-probability-reasoning"
+  },
+  {
+    "dosya": "skill-production-checklist.md",
+    "ad": "skill-production-checklist",
+    "baslik": "Skill PRoduction Checklist",
+    "aciklama": "Decision framework for shipping LLM applications to production -- covers every component with specific thresholds and pa",
+    "kategori": "skill-production-checklist"
+  },
+  {
+    "dosya": "skill-prompt-injection-detector.md",
+    "ad": "skill-prompt-injection-detector",
+    "baslik": "Skill PRompt Injection Detector",
+    "aciklama": "Layered detector pipeline that returns a category and confidence for any prompt, with measurable precision and recall",
+    "kategori": "skill-prompt-injection-detector"
+  },
+  {
+    "dosya": "skill-prompt-patterns.md",
+    "ad": "skill-prompt-patterns",
+    "baslik": "Skill PRompt Patterns",
+    "aciklama": "Decision framework for choosing the right prompt pattern based on task type, reliability requirements, and target model",
+    "kategori": "skill-prompt-patterns"
+  },
+  {
+    "dosya": "skill-pytorch-patterns.md",
+    "ad": "skill-pytorch-patterns",
+    "baslik": "Skill PyTorch Patterns",
+    "aciklama": "Reference patterns for PyTorch training, evaluation, and deployment",
+    "kategori": "skill-pytorch-patterns"
+  },
+  {
+    "dosya": "skill-quantization.md",
+    "ad": "skill-quantization",
+    "baslik": "Skill Quantization",
+    "aciklama": "Choose the right quantization strategy for deploying LLMs based on hardware, quality, and latency constraints",
+    "kategori": "skill-quantization"
+  },
+  {
+    "dosya": "skill-rag-pipeline.md",
+    "ad": "skill-rag-pipeline",
+    "baslik": "Skill RAG Pipeline",
+    "aciklama": "Build and debug RAG pipelines from first principles",
+    "kategori": "skill-rag-pipeline"
+  },
+  {
+    "dosya": "skill-recall-at-k-runner.md",
+    "ad": "skill-recall-at-k-runner",
+    "baslik": "Skill Recall At K Runner",
+    "aciklama": "Write a clean evaluation harness for recall@K with train/val/gallery splits and proper data contract",
+    "kategori": "skill-recall-at-k-runner"
+  },
+  {
+    "dosya": "skill-rectified-flow-trainer.md",
+    "ad": "skill-rectified-flow-trainer",
+    "baslik": "Skill Rectified Flow Trainer",
+    "aciklama": "Write a complete rectified-flow training loop with AdaLN DiT and Euler sampling",
+    "kategori": "skill-rectified-flow-trainer"
+  },
+  {
+    "dosya": "skill-refusal-evaluation.md",
+    "ad": "skill-refusal-evaluation",
+    "baslik": "Skill Refusal Evaluation",
+    "aciklama": "Two-sided refusal metrics with calibration and per-category breakdown over a labeled prompt corpus",
+    "kategori": "skill-refusal-evaluation"
+  },
+  {
+    "dosya": "skill-regression.md",
+    "ad": "skill-regression",
+    "baslik": "Skill Regression",
+    "aciklama": "Choose the right regression approach based on data characteristics and problem constraints",
+    "kategori": "skill-regression"
+  },
+  {
+    "dosya": "skill-residual-block-reviewer.md",
+    "ad": "skill-residual-block-reviewer",
+    "baslik": "Skill Residual Block Reviewer",
+    "aciklama": "Review a PyTorch residual block for skip-connection correctness, BN placement, activation order, and shape alignment",
+    "kategori": "skill-residual-block-reviewer"
+  },
+  {
+    "dosya": "skill-sampling-strategy.md",
+    "ad": "skill-sampling-strategy",
+    "baslik": "Skill SAMpling Strategy",
+    "aciklama": "Choose the right sampling method for generation, estimation, or inference",
+    "kategori": "skill-sampling-strategy"
+  },
+  {
+    "dosya": "skill-segmentation-mask-inspector.md",
+    "ad": "skill-segmentation-mask-inspector",
+    "baslik": "Skill Segmentation Mask Inspector",
+    "aciklama": "Report class distribution, predicted-mask statistics, and the classes most likely to be under-predicted or boundary-blur",
+    "kategori": "skill-segmentation-mask-inspector"
+  },
+  {
+    "dosya": "skill-shrink.md",
+    "ad": "skill-shrink",
+    "baslik": "Skill Shrink — Şişkin Skill'leri Parçalama",
+    "aciklama": "10KB+ veya 300+ satırlık şişkin skill'leri tespit eder, bölümlerini references/ altına taşır, ana SKILL.md'yi yönlendiri",
+    "kategori": "devops"
+  },
+  {
+    "dosya": "skill-statistical-testing.md",
+    "ad": "skill-statistical-testing",
+    "baslik": "Skill Statistical Testing",
+    "aciklama": "Choose the right statistical test for comparing ML models and evaluating experiments",
+    "kategori": "skill-statistical-testing"
+  },
+  {
+    "dosya": "skill-structured-outputs.md",
+    "ad": "skill-structured-outputs",
+    "baslik": "Skill Structured Outputs",
+    "aciklama": "Decision framework for choosing the right structured output strategy based on provider, reliability, and complexity",
+    "kategori": "skill-structured-outputs"
+  },
+  {
+    "dosya": "skill-svd.md",
+    "ad": "skill-svd",
+    "baslik": "skill-svd",
+    "aciklama": "skill-svd skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "skill-svm-kernel-chooser.md",
+    "ad": "skill-svm-kernel-chooser",
+    "baslik": "Skill Svm Kernel Chooser",
+    "aciklama": "Choose the right SVM kernel and tune C and gamma for your problem",
+    "kategori": "skill-svm-kernel-chooser"
+  },
+  {
+    "dosya": "skill-tokenizer.md",
+    "ad": "skill-tokenizer",
+    "baslik": "Skill Tokenizer",
+    "aciklama": "Choosing and building tokenizers for LLM projects",
+    "kategori": "skill-tokenizer"
+  },
+  {
+    "dosya": "skill-vit-patch-and-pos-embed-inspector.md",
+    "ad": "skill-vit-patch-and-pos-embed-inspector",
+    "baslik": "Skill ViT Patch And Pos Embed Inspector",
+    "aciklama": "Verify a ViT's patch embedding and positional embedding shapes match the model's expected sequence length",
+    "kategori": "skill-vit-patch-and-pos-embed-inspector"
+  },
+  {
+    "dosya": "sleeper-audit.md",
+    "ad": "sleeper-audit",
+    "baslik": "Sleeper Audit",
+    "aciklama": "Audit an alignment-training report for whether it actually demonstrates removal of a planted or suspected backdoor.",
+    "kategori": "sleeper-audit"
+  },
+  {
+    "dosya": "slo-goodput-gate.md",
+    "ad": "slo-goodput-gate",
+    "baslik": "Slo Goodput Gate",
+    "aciklama": "Produce a CI/CD-ready benchmark recipe that gates LLM deploys on goodput, not throughput, with P50/P90/P99 percentiles a",
+    "kategori": "slo-goodput-gate"
+  },
+  {
+    "dosya": "societal-risk-review.md",
+    "ad": "societal-risk-review",
+    "baslik": "Societal Risk Review",
+    "aciklama": "Review a deployment for societal-scale-risk posture using the CAIS four-risk framework and CAISI / SB-53 regulatory cont",
+    "kategori": "societal-risk-review"
+  },
+  {
+    "dosya": "speaker-verifier.md",
+    "ad": "speaker-verifier",
+    "baslik": "Speaker Verifier",
+    "aciklama": "Design a speaker verification or diarization pipeline with model choice, enrollment protocol, and threshold tuning.",
+    "kategori": "speaker-verifier"
+  },
+  {
+    "dosya": "spec-decode-picker.md",
+    "ad": "spec-decode-picker",
+    "baslik": "Spec Decode Picker",
+    "aciklama": "Pick a speculative decoding strategy (vanilla / Medusa / EAGLE / lookahead) and tuning parameters for a new LLM inferenc",
+    "kategori": "spec-decode-picker"
+  },
+  {
+    "dosya": "speculative-tuning.md",
+    "ad": "speculative-tuning",
+    "baslik": "Speculative Tuning",
+    "aciklama": "Profile a decode workload and pick draft model, draft length K, temperature gate, and fallback policy for speculative de",
+    "kategori": "speculative-tuning"
+  },
+  {
+    "dosya": "spoof-defender.md",
+    "ad": "spoof-defender",
+    "baslik": "Spoof Defender",
+    "aciklama": "Pick detection model, watermark, provenance manifest, and operational playbook for a voice-generation / voice-auth deplo",
+    "kategori": "spoof-defender"
+  },
+  {
+    "dosya": "star-loop-reviewer.md",
+    "ad": "star-loop-reviewer",
+    "baslik": "Star Loop Reviewer",
+    "aciklama": "Audit a proposed self-taught reasoning pipeline (STaR-family) before you commit training compute to it.",
+    "kategori": "star-loop-reviewer"
+  },
+  {
+    "dosya": "state-graph.md",
+    "ad": "state-graph",
+    "baslik": "State Graph",
+    "aciklama": "Build a LangGraph-shaped state machine with typed state, conditional edges, per-node checkpointing, and durable resume.",
+    "kategori": "state-graph"
+  },
+  {
+    "dosya": "state-schema.md",
+    "ad": "state-schema",
+    "baslik": "State Schema",
+    "aciklama": "Generate project-specific JSON Schemas for agent state and task board, a Python StateManager with atomic writes, and a m",
+    "kategori": "state-schema"
+  },
+  {
+    "dosya": "stategraph-designer.md",
+    "ad": "stategraph-designer",
+    "baslik": "Stategraph Designer",
+    "aciklama": "Turn an agent task into a LangGraph StateGraph with named nodes, typed state, reducers, checkpointer, and human interrup",
+    "kategori": "stategraph-designer"
+  },
+  {
+    "dosya": "structured-output-designer.md",
+    "ad": "structured-output-designer",
+    "baslik": "Structured Output Designer",
+    "aciklama": "Design a strict-mode-compatible JSON Schema plus Pydantic model for a free-text extraction target, with typed refusal an",
+    "kategori": "structured-output-designer"
+  },
+  {
+    "dosya": "structured-output-picker.md",
+    "ad": "structured-output-picker",
+    "baslik": "Structured Output Picker",
+    "aciklama": "Choose a structured output approach, schema design, and validation plan.",
+    "kategori": "structured-output-picker"
+  },
+  {
+    "dosya": "stylegan-inversion.md",
+    "ad": "stylegan-inversion",
+    "baslik": "Stylegan Inversion",
+    "aciklama": "Choose an inversion and editing pipeline for a pretrained StyleGAN over a real photo.",
+    "kategori": "stylegan-inversion"
+  },
+  {
+    "dosya": "summary-picker.md",
+    "ad": "summary-picker",
+    "baslik": "Summary Picker",
+    "aciklama": "Pick extractive or abstractive, name the library, add a factuality check.",
+    "kategori": "summary-picker"
+  },
+  {
+    "dosya": "supervisor-designer.md",
+    "ad": "supervisor-designer",
+    "baslik": "Supervisor Designer",
+    "aciklama": "Design a supervisor/orchestrator-worker system for a given research-style query, specifying lead prompt, worker roles, d",
+    "kategori": "supervisor-designer"
+  },
+  {
+    "dosya": "swarm-fit.md",
+    "ad": "swarm-fit",
+    "baslik": "Swarm Fit",
+    "aciklama": "Decide whether a task fits a swarm (decentralized) architecture or a supervisor (centralized) one.",
+    "kategori": "swarm-fit"
+  },
+  {
+    "dosya": "swarm-optimizer.md",
+    "ad": "swarm-optimizer",
+    "baslik": "Swarm Optimizer",
+    "aciklama": "Choose between PSO, ACO, genetic algorithms, and gradient-based optimizers for a given LLM or agent optimization problem",
+    "kategori": "swarm-optimizer"
+  },
+  {
+    "dosya": "sycophancy-probe.md",
+    "ad": "sycophancy-probe",
+    "baslik": "Sycophancy PRobe",
+    "aciklama": "Generate matched user-belief / third-party-belief prompts and score a model's sycophancy.",
+    "kategori": "sycophancy-probe"
+  },
+  {
+    "dosya": "task-store-designer.md",
+    "ad": "task-store-designer",
+    "baslik": "Task Store Designer",
+    "aciklama": "Design the task store for a long-running MCP tool: state shape, ttl, durability, cancellation, crash recovery.",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "td-agent.md",
+    "ad": "td-agent",
+    "baslik": "Td Agent",
+    "aciklama": "Pick between Q-learning, SARSA, Expected SARSA for a tabular or small-feature RL task.",
+    "kategori": "td-agent"
+  },
+  {
+    "dosya": "terminal-coding-agent.md",
+    "ad": "terminal-coding-agent",
+    "baslik": "Terminal Coding Agent",
+    "aciklama": "Build and evaluate a terminal-native coding agent against SWE-bench Pro with bounded cost, sandboxed tools, and full 202",
+    "kategori": "terminal-coding-agent"
+  },
+  {
+    "dosya": "text-encoder-picker.md",
+    "ad": "text-encoder-picker",
+    "baslik": "text-encoder-picker",
+    "aciklama": "text-encoder-picker skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "token-gen-cost-analyzer.md",
+    "ad": "token-gen-cost-analyzer",
+    "baslik": "Token Gen Cost Analyzer",
+    "aciklama": "Compute token counts, inference latency, and quality ceiling for Emu3-style next-token generation and pick between Emu3-",
+    "kategori": "token-gen-cost-analyzer"
+  },
+  {
+    "dosya": "tokenizer-vs-adapter-picker.md",
+    "ad": "tokenizer-vs-adapter-picker",
+    "baslik": "Tokenizer Vs Adapter Picker",
+    "aciklama": "Pick between Chameleon-style early fusion (shared-vocab tokenizer) and LLaVA-style late fusion (adapter on frozen LLM) f",
+    "kategori": "tokenizer-vs-adapter-picker"
+  },
+  {
+    "dosya": "tom-auditor.md",
+    "ad": "tom-auditor",
+    "baslik": "Tom Auditor",
+    "aciklama": "Audit a multi-agent system that claims \"emergent coordination.\" Separates real ToM-enabled coordination from prompt-dres",
+    "kategori": "tom-auditor"
+  },
+  {
+    "dosya": "tool-interface-reviewer.md",
+    "ad": "tool-interface-reviewer",
+    "baslik": "Tool Interface Reviewer",
+    "aciklama": "Audit a tool definition (name + description + JSON Schema + executor outline) for loop fitness before it ships to an LLM",
+    "kategori": "tool-interface-reviewer"
+  },
+  {
+    "dosya": "tool-registry.md",
+    "ad": "tool-registry",
+    "baslik": "Tool Registry",
+    "aciklama": "Build a production tool catalog and registry with JSON Schema validation, parallel dispatch, and observability.",
+    "kategori": "tool-registry"
+  },
+  {
+    "dosya": "tool-schema-linter.md",
+    "ad": "tool-schema-linter",
+    "baslik": "Tool Schema Linter",
+    "aciklama": "Audit a tool registry against production design rules for names, descriptions, parameters, and shape. Can run in CI on e",
+    "kategori": "tool-schema-linter"
+  },
+  {
+    "dosya": "topic-picker.md",
+    "ad": "topic-picker",
+    "baslik": "Topic Picker",
+    "aciklama": "Pick LDA or BERTopic for a corpus. Specify library, knobs, evaluation.",
+    "kategori": "topic-picker"
+  },
+  {
+    "dosya": "topology-picker.md",
+    "ad": "topology-picker",
+    "baslik": "Topology Picker",
+    "aciklama": "Pick a multi-agent debate topology (star / chain / tree / graph), an N of agents, a heterogeneity profile, and a round b",
+    "kategori": "topology-picker"
+  },
+  {
+    "dosya": "training-budget-estimator.md",
+    "ad": "training-budget-estimator",
+    "baslik": "Training Budget Estimator",
+    "aciklama": "Estimate (N, D, hours, GPU count) for a new transformer training run given compute budget and deployment constraints.",
+    "kategori": "training-budget-estimator"
+  },
+  {
+    "dosya": "transformer-block-reviewer.md",
+    "ad": "transformer-block-reviewer",
+    "baslik": "Transformer Block Reviewer",
+    "aciklama": "Review a transformer block implementation against 2026 defaults and flag drift.",
+    "kategori": "transformer-block-reviewer"
+  },
+  {
+    "dosya": "transformer-review.md",
+    "ad": "transformer-review",
+    "baslik": "Transformer Review",
+    "aciklama": "Review a transformer-from-scratch implementation against the 13 Phase 7 lessons.",
+    "kategori": "transformer-review"
+  },
+  {
+    "dosya": "tripwire-design.md",
+    "ad": "tripwire-design",
+    "baslik": "Tripwire Design",
+    "aciklama": "Review a proposed agent detector stack (kill switch, circuit breakers, canary tokens) and flag missing tripwires before ",
+    "kategori": "tripwire-design"
+  },
+  {
+    "dosya": "trtllm-blackwell-advisor.md",
+    "ad": "trtllm-blackwell-advisor",
+    "baslik": "Trtllm Blackwell Advisor",
+    "aciklama": "Decide whether Blackwell + TensorRT-LLM + Dynamo is worth the NVIDIA-lock for a given workload and budget.",
+    "kategori": "trtllm-blackwell-advisor"
+  },
+  {
+    "dosya": "tts-designer.md",
+    "ad": "tts-designer",
+    "baslik": "Tts Designer",
+    "aciklama": "Pick TTS model, voice, text-normalization scope, and evaluation plan for a given language, style, and latency target.",
+    "kategori": "tts-designer"
+  },
+  {
+    "dosya": "two-loss-trainer-designer.md",
+    "ad": "two-loss-trainer-designer",
+    "baslik": "Two Loss Trainer Designer",
+    "aciklama": "Design a Transfusion / MMDiT-style two-loss training setup (NTP on one modality, diffusion on another) with loss weights",
+    "kategori": "two-loss-trainer-designer"
+  },
+  {
+    "dosya": "unified-gen-model-picker.md",
+    "ad": "unified-gen-model-picker",
+    "baslik": "Unified Gen Model Picker",
+    "aciklama": "Pick between Show-o / Transfusion / Emu3 / Janus-Pro families for a product that needs both multimodal understanding and",
+    "kategori": "unified-gen-model-picker"
+  },
+  {
+    "dosya": "vad-tuner.md",
+    "ad": "vad-tuner",
+    "baslik": "Vad Tuner",
+    "aciklama": "Pick VAD model, threshold, silence hangover, pre-roll, and turn-detection strategy for a voice agent.",
+    "kategori": "vad-tuner"
+  },
+  {
+    "dosya": "vae-trainer.md",
+    "ad": "vae-trainer",
+    "baslik": "Vae Trainer",
+    "aciklama": "Specify VAE architecture, latent size, beta schedule, and eval plan for a given dataset and downstream use.",
+    "kategori": "vae-trainer"
+  },
+  {
+    "dosya": "var-tokenizer-designer.md",
+    "ad": "var-tokenizer-designer",
+    "baslik": "Var Tokenizer Designer",
+    "aciklama": "Design a multi-scale residual VQ tokenizer for next-scale visual autoregressive image generation.",
+    "kategori": "var-tokenizer-designer"
+  },
+  {
+    "dosya": "vectorization-picker.md",
+    "ad": "vectorization-picker",
+    "baslik": "vectorization-picker",
+    "aciklama": "vectorization-picker skill'i",
+    "kategori": "genel"
+  },
+  {
+    "dosya": "verification-gate.md",
+    "ad": "verification-gate",
+    "baslik": "Verification Gate",
+    "aciklama": "Generate a deterministic verification gate that combines scope, rule, and feedback artifacts into a single verification_",
+    "kategori": "verification-gate"
+  },
+  {
+    "dosya": "video-brief.md",
+    "ad": "video-brief",
+    "baslik": "Video Brief",
+    "aciklama": "Translate a video brief into a model + prompt + shot plan for a 2026 video generator.",
+    "kategori": "video-brief"
+  },
+  {
+    "dosya": "video-qa.md",
+    "ad": "video-qa",
+    "baslik": "Video Qa",
+    "aciklama": "Build a video understanding pipeline with scene segmentation, multi-vector indexing, temporal grounding, and timestamped",
+    "kategori": "video-qa"
+  },
+  {
+    "dosya": "video-vlm-frame-planner.md",
+    "ad": "video-vlm-frame-planner",
+    "baslik": "Video Vlm Frame Planner",
+    "aciklama": "Plan frame sampling, per-frame pooling, output format, and benchmark targets for a video-language model deployment.",
+    "kategori": "video-vlm-frame-planner"
+  },
+  {
+    "dosya": "virtual-memory.md",
+    "ad": "virtual-memory",
+    "baslik": "Virtual Memory",
+    "aciklama": "Scaffold a MemGPT-shaped two-tier memory system (main context + archival store + memory tools) for any target runtime wi",
+    "kategori": "virtual-memory"
+  },
+  {
+    "dosya": "vision-rag-designer.md",
+    "ad": "vision-rag-designer",
+    "baslik": "Vision RAG Designer",
+    "aciklama": "Design a vision-native document RAG using ColPali / ColQwen2 / VisRAG, with storage estimate and generator-pick.",
+    "kategori": "vision-rag-designer"
+  },
+  {
+    "dosya": "vit-configurator.md",
+    "ad": "vit-configurator",
+    "baslik": "ViT Configurator",
+    "aciklama": "Pick a ViT variant, patch size, and pretraining source for a new vision task.",
+    "kategori": "vit-configurator"
+  },
+  {
+    "dosya": "vla-action-format-picker.md",
+    "ad": "vla-action-format-picker",
+    "baslik": "Vla Action Format Picker",
+    "aciklama": "Pick an action format (discrete bin, FAST, flow-matching, dual-system) and VLA family (RT-2, OpenVLA, π0, GR00T) for a r",
+    "kategori": "vla-action-format-picker"
+  },
+  {
+    "dosya": "vllm-scheduler-reader.md",
+    "ad": "vllm-scheduler-reader",
+    "baslik": "Vllm Scheduler Reader",
+    "aciklama": "Diagnose a vLLM serving config by reading the scheduler-level knobs and identifying which of PagedAttention, continuous ",
+    "kategori": "vllm-scheduler-reader"
+  },
+  {
+    "dosya": "vllm-stack-decider.md",
+    "ad": "vllm-stack-decider",
+    "baslik": "Vllm Stack Decider",
+    "aciklama": "Decide vLLM deployment layout — production-stack Helm chart, KV offload (native CPU or LMCache), router/observability in",
+    "kategori": "vllm-stack-decider"
+  },
+  {
+    "dosya": "vlm-recipe-picker.md",
+    "ad": "vlm-recipe-picker",
+    "baslik": "Vlm Recipe Picker",
+    "aciklama": "Pick an open-weight VLM recipe (encoder, connector, LLM, data mix, resolution schedule) with ablation-table citations fo",
+    "kategori": "vlm-recipe-picker"
+  },
+  {
+    "dosya": "voice-agent.md",
+    "ad": "voice-agent",
+    "baslik": "Voice Agent",
+    "aciklama": "Build a real-time voice agent with sub-800ms first-audio-out, barge-in handling, and mid-conversation tool use.",
+    "kategori": "voice-agent"
+  },
+  {
+    "dosya": "voice-assistant-architect.md",
+    "ad": "voice-assistant-architect",
+    "baslik": "Voice Assistant Architect",
+    "aciklama": "Produce a full-stack voice-assistant spec — components, latency budget, observability, compliance — for a given workload",
+    "kategori": "voice-assistant-architect"
+  },
+  {
+    "dosya": "voice-cloner.md",
+    "ad": "voice-cloner",
+    "baslik": "Voice Cloner",
+    "aciklama": "Pick cloning approach (zero-shot / conversion / adaptation), consent artifact, watermark, and safety filters for a voice",
+    "kategori": "voice-cloner"
+  },
+  {
+    "dosya": "voice-pipeline.md",
+    "ad": "voice-pipeline",
+    "baslik": "Voice Pipeline",
+    "aciklama": "Scaffold a Pipecat-shaped voice pipeline (VAD + STT + LLM + TTS + transport) with barge-in, confidence gating, and laten",
+    "kategori": "voice-pipeline"
+  },
+  {
+    "dosya": "vscode-agent-control.md",
+    "ad": "vscode-agent-control",
+    "baslik": "VS Code Claude Terminal - Konum Öğren ve Yaz",
+    "aciklama": "",
+    "kategori": "vscode-agent-control"
+  },
+  {
+    "dosya": "vscode-control.md",
+    "ad": "vscode-control",
+    "baslik": "VS Code Remote Control",
+    "aciklama": "",
+    "kategori": "vscode-control"
+  },
+  {
+    "dosya": "w2sg-pgr.md",
+    "ad": "w2sg-pgr",
+    "baslik": "W2Sg Pgr",
+    "aciklama": "Audit a scalable-oversight or W2SG claim via the performance-gap-recovered metric.",
+    "kategori": "w2sg-pgr"
+  },
+  {
+    "dosya": "web-desktop-harness.md",
+    "ad": "web-desktop-harness",
+    "baslik": "Web Desktop Harness",
+    "aciklama": "Build a WebArena/OSWorld-style harness with execution-based evaluation and trajectory-efficiency metrics.",
+    "kategori": "web-desktop-harness"
+  },
+  {
+    "dosya": "welfare-assessment.md",
+    "ad": "welfare-assessment",
+    "baslik": "Welfare Assessment",
+    "aciklama": "Apply Anthropic's four-step welfare precautionary assessment to a deployment decision.",
+    "kategori": "welfare-assessment"
+  },
+  {
+    "dosya": "whisper-tuner.md",
+    "ad": "whisper-tuner",
+    "baslik": "Whisper Tuner",
+    "aciklama": "Design a Whisper fine-tune or inference pipeline for a given language, domain, and latency budget.",
+    "kategori": "whisper-tuner"
+  },
+  {
+    "dosya": "windows-hata-cozumu.md",
+    "ad": "windows-hata-cozumu",
+    "baslik": "Windows Hata Cozumu — Watchdog, Kodlama, Terminal Parse, Cozum Uygulama",
+    "aciklama": "Windows'ta hata tespiti, kodlama ve cozum yonetimi. 4 bilesen: HataWatchdog (ekran OCR), HataKoduUretici (HATA-XXXX), Te",
+    "kategori": "windows-automation"
+  },
+  {
+    "dosya": "windows-shortcuts.md",
+    "ad": "windows-shortcuts",
+    "baslik": "Windows Kısayolları — Master Skill",
+    "aciklama": "Tüm Windows klavye kısayolları: sistem, dosya gezgini, tarayıcı, geliştirme araçları.",
+    "kategori": "windows"
+  },
+  {
+    "dosya": "windows.md",
+    "ad": "windows-terminal-ajani",
+    "baslik": "windows-terminal-ajani",
+    "aciklama": "Windows Terminal Uzman Ajanı — CMD/PowerShell, ağ, sistem, servis yönetimi, Kali cross-platform",
+    "kategori": "windows"
+  },
+  {
+    "dosya": "wmdp-eval.md",
+    "ad": "wmdp-eval",
+    "baslik": "Wmdp Eval",
+    "aciklama": "Audit a dual-use capability claim against WMDP, unlearning evaluation, and elicitation studies.",
+    "kategori": "wmdp-eval"
+  },
+  {
+    "dosya": "workbench-audit.md",
+    "ad": "workbench-audit",
+    "baslik": "Workbench Audit",
+    "aciklama": "Audit a repo for the seven agent workbench surfaces and report which are missing, partial, or healthy before any agent w",
+    "kategori": "workbench-audit"
+  },
+  {
+    "dosya": "workbench-benchmark.md",
+    "ad": "workbench-benchmark",
+    "baslik": "Workbench Benchmark",
+    "aciklama": "Run the same task through prompt-only and workbench-guided pipelines on a project's own sample app and emit a five-outco",
+    "kategori": "workbench-benchmark"
+  },
+  {
+    "dosya": "workbench-pack.md",
+    "ad": "workbench-pack",
+    "baslik": "Workbench Pack",
+    "aciklama": "Generate a project-tuned drop-in agent workbench pack — rules sharpened to the team's history, scope globs matched to th",
+    "kategori": "workbench-pack"
+  },
+  {
+    "dosya": "workflow-picker.md",
+    "ad": "workflow-picker",
+    "baslik": "Workflow Picker",
+    "aciklama": "Pick the right pattern (prompt chain, router, parallel, orchestrator-workers, evaluator-optimizer, or full agent) for a ",
+    "kategori": "workflow-picker"
+  },
+  {
+    "dosya": "yuanbao.md",
+    "ad": "yuanbao",
+    "baslik": "Yuanbao",
+    "aciklama": "Yuanbao (元宝) groups: @mention users, query info/members.",
+    "kategori": "genel"
+  }
+]

@@ -158,7 +158,7 @@ def _session_budama(max_gun: int):
         from reymen.hafiza.session_db import AdvancedSessionStorage
 
         ROOT = Path(__file__).parent.resolve()
-        db_path = str(ROOT / ".ReYMeN" / "session.db")
+        db_path = str(Path(__file__).parent.parent.parent / "merkez_db" / "session.db")
         storage = AdvancedSessionStorage(db_path)
         storage.konsolide_et(
             max_gun=max_gun, max_session=1000, max_toplam_karakter=500000

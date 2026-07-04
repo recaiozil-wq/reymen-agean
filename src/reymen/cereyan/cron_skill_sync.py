@@ -27,7 +27,7 @@ logger = logging.getLogger("cron_skill_sync")
 
 ROOT = Path(__file__).parent.resolve()
 SKILLS_DIR = ROOT / "skills"
-DB_PATH = ROOT / ".ReYMeN" / "skills_index.db"
+DB_PATH = ROOT.parent / ".ReYMeN" / "db" / "skills.db"  # consolidated: skills_index + skill_library
 DECISIONS_LOG = ROOT / ".ReYMeN" / "cron" / "skill_sync_log.md"
 CRON_JOBS_PATH = ROOT.parent / ".ReYMeN" / "cron" / "jobs.json"
 

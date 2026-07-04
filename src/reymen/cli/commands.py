@@ -381,6 +381,410 @@ def _handler_image(args: str = "") -> str:
 
 
 # ---------------------------------------------------------------------------
+
+
+def _handler_agents(args: str = "") -> str:
+    """/agents — Show active agents and running tasks"""
+    # TODO: implementasyon eklenecek
+    return f"/agents stub — Show active agents and running tasks"
+
+
+def _handler_approve(args: str = "") -> str:
+    """/approve — Approve a pending dangerous command"""
+    # TODO: implementasyon eklenecek
+    return f"/approve stub — Approve a pending dangerous command"
+
+
+def _handler_background(args: str = "") -> str:
+    """/background — Run a prompt in the background"""
+    # TODO: implementasyon eklenecek
+    return f"/background stub — Run a prompt in the background"
+
+
+def _handler_billing(args: str = "") -> str:
+    """/billing — Manage Nous terminal billing — buy credits, auto-reload, limits"""
+    # TODO: implementasyon eklenecek
+    return f"/billing stub — Manage Nous terminal billing — buy credits, auto-reload, limits"
+
+
+def _handler_blueprint(args: str = "") -> str:
+    """/blueprint — Set up an automation from a blueprint template"""
+    # TODO: implementasyon eklenecek
+    return f"/blueprint stub — Set up an automation from a blueprint template"
+
+
+def _handler_branch(args: str = "") -> str:
+    """/branch — Branch the current session (explore a different path)"""
+    # TODO: implementasyon eklenecek
+    return f"/branch stub — Branch the current session (explore a different path)"
+
+
+def _handler_browser(args: str = "") -> str:
+    """/browser — Connect browser tools to your live Chromium-family browser via CDP"""
+    # TODO: implementasyon eklenecek
+    return f"/browser stub — Connect browser tools to your live Chromium-family browser via CDP"
+
+
+def _handler_bundles(args: str = "") -> str:
+    """/bundles — List skill bundles (aliases /<name> for multiple skills)"""
+    # TODO: implementasyon eklenecek
+    return f"/bundles stub — List skill bundles (aliases /<name> for multiple skills)"
+
+
+def _handler_busy(args: str = "") -> str:
+    """/busy — Control what Enter does while Hermes is working"""
+    # TODO: implementasyon eklenecek
+    return f"/busy stub — Control what Enter does while Hermes is working"
+
+
+def _handler_clear(args: str = "") -> str:
+    """/clear — Clear screen and start a new session"""
+    # TODO: implementasyon eklenecek
+    return f"/clear stub — Clear screen and start a new session"
+
+
+def _handler_codex_runtime(args: str = "") -> str:
+    """/codex-runtime — Toggle codex app-server runtime for OpenAI/Codex models"""
+    # TODO: implementasyon eklenecek
+    return f"/codex-runtime stub — Toggle codex app-server runtime for OpenAI/Codex models"
+
+
+def _handler_commands(args: str = "") -> str:
+    """/commands — Browse all commands and skills (paginated)"""
+    # TODO: implementasyon eklenecek
+    return f"/commands stub — Browse all commands and skills (paginated)"
+
+
+def _handler_compress(args: str = "") -> str:
+    """/compress — Compress conversation context (add 'here [N]' to keep recent N turns)"""
+    # TODO: implementasyon eklenecek
+    return f"/compress stub — Compress conversation context (add 'here [N]' to keep recent N turns)"
+
+
+def _handler_copy(args: str = "") -> str:
+    """/copy — Copy the last assistant response to clipboard"""
+    # TODO: implementasyon eklenecek
+    return f"/copy stub — Copy the last assistant response to clipboard"
+
+
+def _handler_credits(args: str = "") -> str:
+    """/credits — Show Nous credit balance and top up"""
+    # TODO: implementasyon eklenecek
+    return f"/credits stub — Show Nous credit balance and top up"
+
+
+def _handler_curator(args: str = "") -> str:
+    """/curator — Background skill maintenance (status, run, pin, archive, list-archived)"""
+    # TODO: implementasyon eklenecek
+    return f"/curator stub — Background skill maintenance (status, run, pin, archive, list-archived)"
+
+
+def _handler_debug(args: str = "") -> str:
+    """/debug — Upload debug report (system info + logs) and get shareable links"""
+    # TODO: implementasyon eklenecek
+    return f"/debug stub — Upload debug report (system info + logs) and get shareable links"
+
+
+def _handler_deny(args: str = "") -> str:
+    """/deny — Deny a pending dangerous command"""
+    # TODO: implementasyon eklenecek
+    return f"/deny stub — Deny a pending dangerous command"
+
+
+def _handler_fast(args: str = "") -> str:
+    """/fast — Toggle fast mode — OpenAI Priority Processing / Anthropic Fast Mode (Normal/Fast)"""
+    # TODO: implementasyon eklenecek
+    return f"/fast stub — Toggle fast mode — OpenAI Priority Processing / Anthropic Fast Mode (Normal/Fast)"
+
+
+def _handler_footer(args: str = "") -> str:
+    """/footer — Toggle gateway runtime-metadata footer on final replies"""
+    # TODO: implementasyon eklenecek
+    return f"/footer stub — Toggle gateway runtime-metadata footer on final replies"
+
+
+def _handler_goal(args: str = "") -> str:
+    """/goal — Set a standing goal Hermes works on across turns until achieved"""
+    # TODO: implementasyon eklenecek
+    return f"/goal stub — Set a standing goal Hermes works on across turns until achieved"
+
+
+def _handler_gquota(args: str = "") -> str:
+    """/gquota — Show Google Gemini Code Assist quota usage"""
+    # TODO: implementasyon eklenecek
+    return f"/gquota stub — Show Google Gemini Code Assist quota usage"
+
+
+def _handler_handoff(args: str = "") -> str:
+    """/handoff — Hand off this session to a messaging platform (Telegram, Discord, etc.)"""
+    # TODO: implementasyon eklenecek
+    return f"/handoff stub — Hand off this session to a messaging platform (Telegram, Discord, etc.)"
+
+
+def _handler_history(args: str = "") -> str:
+    """/history — Show conversation history"""
+    # TODO: implementasyon eklenecek
+    return f"/history stub — Show conversation history"
+
+
+def _handler_indicator(args: str = "") -> str:
+    """/indicator — Pick the TUI busy-indicator style"""
+    # TODO: implementasyon eklenecek
+    return f"/indicator stub — Pick the TUI busy-indicator style"
+
+
+def _handler_insights(args: str = "") -> str:
+    """/insights — Show usage insights and analytics"""
+    # TODO: implementasyon eklenecek
+    return f"/insights stub — Show usage insights and analytics"
+
+
+def _handler_kanban(args: str = "") -> str:
+    """/kanban — Multi-profile collaboration board (tasks, links, comments)"""
+    # TODO: implementasyon eklenecek
+    return f"/kanban stub — Multi-profile collaboration board (tasks, links, comments)"
+
+
+def _handler_memory(args: str = "") -> str:
+    """/memory — Review pending memory writes / toggle the approval gate"""
+    # TODO: implementasyon eklenecek
+    return f"/memory stub — Review pending memory writes / toggle the approval gate"
+
+
+def _handler_new(args: str = "") -> str:
+    """/new — Start a new session (fresh session ID + history)"""
+    # TODO: implementasyon eklenecek
+    return f"/new stub — Start a new session (fresh session ID + history)"
+
+
+def _handler_paste(args: str = "") -> str:
+    """/paste — Attach clipboard image from your clipboard"""
+    # TODO: implementasyon eklenecek
+    return f"/paste stub — Attach clipboard image from your clipboard"
+
+
+def _handler_personality(args: str = "") -> str:
+    """/personality — Set a predefined personality"""
+    # TODO: implementasyon eklenecek
+    return f"/personality stub — Set a predefined personality"
+
+
+def _handler_platform(args: str = "") -> str:
+    """/platform — Pause, resume, or list a failing gateway platform"""
+    # TODO: implementasyon eklenecek
+    return f"/platform stub — Pause, resume, or list a failing gateway platform"
+
+
+def _handler_plugins(args: str = "") -> str:
+    """/plugins — List installed plugins and their status"""
+    # TODO: implementasyon eklenecek
+    return f"/plugins stub — List installed plugins and their status"
+
+
+def _handler_profile(args: str = "") -> str:
+    """/profile — Show active profile name and home directory"""
+    # TODO: implementasyon eklenecek
+    return f"/profile stub — Show active profile name and home directory"
+
+
+def _handler_queue(args: str = "") -> str:
+    """/queue — Queue a prompt for the next turn (doesn't interrupt)"""
+    # TODO: implementasyon eklenecek
+    return f"/queue stub — Queue a prompt for the next turn (doesn't interrupt)"
+
+
+def _handler_quit(args: str = "") -> str:
+    """/quit — Exit the CLI (use --delete to also remove session history)"""
+    # TODO: implementasyon eklenecek
+    return f"/quit stub — Exit the CLI (use --delete to also remove session history)"
+
+
+def _handler_reasoning(args: str = "") -> str:
+    """/reasoning — Manage reasoning effort and display"""
+    # TODO: implementasyon eklenecek
+    return f"/reasoning stub — Manage reasoning effort and display"
+
+
+def _handler_redraw(args: str = "") -> str:
+    """/redraw — Force a full UI repaint (recovers from terminal drift)"""
+    # TODO: implementasyon eklenecek
+    return f"/redraw stub — Force a full UI repaint (recovers from terminal drift)"
+
+
+def _handler_reload(args: str = "") -> str:
+    """/reload — Reload .env variables into the running session"""
+    # TODO: implementasyon eklenecek
+    return f"/reload stub — Reload .env variables into the running session"
+
+
+def _handler_reload_mcp(args: str = "") -> str:
+    """/reload-mcp — Reload MCP servers from config"""
+    # TODO: implementasyon eklenecek
+    return f"/reload-mcp stub — Reload MCP servers from config"
+
+
+def _handler_reload_skills(args: str = "") -> str:
+    """/reload-skills — Re-scan ~/.hermes/skills/ for newly installed or removed skills"""
+    # TODO: implementasyon eklenecek
+    return f"/reload-skills stub — Re-scan ~/.hermes/skills/ for newly installed or removed skills"
+
+
+def _handler_restart(args: str = "") -> str:
+    """/restart — Gracefully restart the gateway after draining active runs"""
+    # TODO: implementasyon eklenecek
+    return f"/restart stub — Gracefully restart the gateway after draining active runs"
+
+
+def _handler_resume(args: str = "") -> str:
+    """/resume — Resume a previously-named session"""
+    # TODO: implementasyon eklenecek
+    return f"/resume stub — Resume a previously-named session"
+
+
+def _handler_retry(args: str = "") -> str:
+    """/retry — Retry the last message (resend to agent)"""
+    # TODO: implementasyon eklenecek
+    return f"/retry stub — Retry the last message (resend to agent)"
+
+
+def _handler_rollback(args: str = "") -> str:
+    """/rollback — List or restore filesystem checkpoints"""
+    # TODO: implementasyon eklenecek
+    return f"/rollback stub — List or restore filesystem checkpoints"
+
+
+def _handler_save(args: str = "") -> str:
+    """/save — Save the current conversation"""
+    # TODO: implementasyon eklenecek
+    return f"/save stub — Save the current conversation"
+
+
+def _handler_sethome(args: str = "") -> str:
+    """/sethome — Set this chat as the home channel"""
+    # TODO: implementasyon eklenecek
+    return f"/sethome stub — Set this chat as the home channel"
+
+
+def _handler_skin(args: str = "") -> str:
+    """/skin — Show or change the display skin/theme"""
+    # TODO: implementasyon eklenecek
+    return f"/skin stub — Show or change the display skin/theme"
+
+
+def _handler_snapshot(args: str = "") -> str:
+    """/snapshot — Create or restore state snapshots of Hermes config/state"""
+    # TODO: implementasyon eklenecek
+    return f"/snapshot stub — Create or restore state snapshots of Hermes config/state"
+
+
+def _handler_start(args: str = "") -> str:
+    """/start — Acknowledge platform start pings without a reply"""
+    # TODO: implementasyon eklenecek
+    return f"/start stub — Acknowledge platform start pings without a reply"
+
+
+def _handler_statusbar(args: str = "") -> str:
+    """/statusbar — Toggle the context/model status bar"""
+    # TODO: implementasyon eklenecek
+    return f"/statusbar stub — Toggle the context/model status bar"
+
+
+def _handler_steer(args: str = "") -> str:
+    """/steer — Inject a message after the next tool call without interrupting"""
+    # TODO: implementasyon eklenecek
+    return f"/steer stub — Inject a message after the next tool call without interrupting"
+
+
+def _handler_stop(args: str = "") -> str:
+    """/stop — Kill all running background processes"""
+    # TODO: implementasyon eklenecek
+    return f"/stop stub — Kill all running background processes"
+
+
+def _handler_subgoal(args: str = "") -> str:
+    """/subgoal — Add or manage extra criteria on the active goal"""
+    # TODO: implementasyon eklenecek
+    return f"/subgoal stub — Add or manage extra criteria on the active goal"
+
+
+def _handler_suggestions(args: str = "") -> str:
+    """/suggestions — Review suggested automations (accept/dismiss)"""
+    # TODO: implementasyon eklenecek
+    return f"/suggestions stub — Review suggested automations (accept/dismiss)"
+
+
+def _handler_title(args: str = "") -> str:
+    """/title — Set a title for the current session"""
+    # TODO: implementasyon eklenecek
+    return f"/title stub — Set a title for the current session"
+
+
+def _handler_tools(args: str = "") -> str:
+    """/tools — Manage tools: /tools [list|disable|enable] [name...]"""
+    # TODO: implementasyon eklenecek
+    return f"/tools stub — Manage tools: /tools [list|disable|enable] [name...]"
+
+
+def _handler_toolsets(args: str = "") -> str:
+    """/toolsets — List available toolsets"""
+    # TODO: implementasyon eklenecek
+    return f"/toolsets stub — List available toolsets"
+
+
+def _handler_topic(args: str = "") -> str:
+    """/topic — Enable or inspect Telegram DM topic sessions"""
+    # TODO: implementasyon eklenecek
+    return f"/topic stub — Enable or inspect Telegram DM topic sessions"
+
+
+def _handler_undo(args: str = "") -> str:
+    """/undo — Back up N user turns and re-prompt (default 1)"""
+    # TODO: implementasyon eklenecek
+    return f"/undo stub — Back up N user turns and re-prompt (default 1)"
+
+
+def _handler_update(args: str = "") -> str:
+    """/update — Update Hermes Agent to the latest version"""
+    # TODO: implementasyon eklenecek
+    return f"/update stub — Update Hermes Agent to the latest version"
+
+
+def _handler_usage(args: str = "") -> str:
+    """/usage — Show token usage and rate limits for the current session"""
+    # TODO: implementasyon eklenecek
+    return f"/usage stub — Show token usage and rate limits for the current session"
+
+
+def _handler_verbose(args: str = "") -> str:
+    """/verbose — Cycle tool progress display: off -> new -> all -> verbose"""
+    # TODO: implementasyon eklenecek
+    return f"/verbose stub — Cycle tool progress display: off -> new -> all -> verbose"
+
+
+def _handler_version(args: str = "") -> str:
+    """/version — Show Hermes Agent version"""
+    # TODO: implementasyon eklenecek
+    return f"/version stub — Show Hermes Agent version"
+
+
+def _handler_voice(args: str = "") -> str:
+    """/voice — Toggle voice mode"""
+    # TODO: implementasyon eklenecek
+    return f"/voice stub — Toggle voice mode"
+
+
+def _handler_whoami(args: str = "") -> str:
+    """/whoami — Show your slash command access (admin / user)"""
+    # TODO: implementasyon eklenecek
+    return f"/whoami stub — Show your slash command access (admin / user)"
+
+
+def _handler_yolo(args: str = "") -> str:
+    """/yolo — Toggle YOLO mode (skip all dangerous command approvals)"""
+    # TODO: implementasyon eklenecek
+    return f"/yolo stub — Toggle YOLO mode (skip all dangerous command approvals)"
+
+
 # Handler yonlendirme tablosu: komut_adi -> handler fonksiyonu
 # ---------------------------------------------------------------------------
 
@@ -397,6 +801,74 @@ HANDLER_TABLE: dict[str, Callable[[str], str]] = {
     "status": _handler_status,
     "gateway": _handler_gateway,
     "cron": _handler_cron,
+
+    "agents": _handler_agents,
+    "approve": _handler_approve,
+    "background": _handler_background,
+    "billing": _handler_billing,
+    "blueprint": _handler_blueprint,
+    "branch": _handler_branch,
+    "browser": _handler_browser,
+    "bundles": _handler_bundles,
+    "busy": _handler_busy,
+    "clear": _handler_clear,
+    "codex-runtime": _handler_codex_runtime,
+    "commands": _handler_commands,
+    "compress": _handler_compress,
+    "copy": _handler_copy,
+    "credits": _handler_credits,
+    "curator": _handler_curator,
+    "debug": _handler_debug,
+    "deny": _handler_deny,
+    "fast": _handler_fast,
+    "footer": _handler_footer,
+    "goal": _handler_goal,
+    "gquota": _handler_gquota,
+    "handoff": _handler_handoff,
+    "history": _handler_history,
+    "indicator": _handler_indicator,
+    "insights": _handler_insights,
+    "kanban": _handler_kanban,
+    "memory": _handler_memory,
+    "new": _handler_new,
+    "paste": _handler_paste,
+    "personality": _handler_personality,
+    "platform": _handler_platform,
+    "plugins": _handler_plugins,
+    "profile": _handler_profile,
+    "queue": _handler_queue,
+    "quit": _handler_quit,
+    "reasoning": _handler_reasoning,
+    "redraw": _handler_redraw,
+    "reload": _handler_reload,
+    "reload-mcp": _handler_reload_mcp,
+    "reload-skills": _handler_reload_skills,
+    "restart": _handler_restart,
+    "resume": _handler_resume,
+    "retry": _handler_retry,
+    "rollback": _handler_rollback,
+    "save": _handler_save,
+    "sethome": _handler_sethome,
+    "skin": _handler_skin,
+    "snapshot": _handler_snapshot,
+    "start": _handler_start,
+    "statusbar": _handler_statusbar,
+    "steer": _handler_steer,
+    "stop": _handler_stop,
+    "subgoal": _handler_subgoal,
+    "suggestions": _handler_suggestions,
+    "title": _handler_title,
+    "tools": _handler_tools,
+    "toolsets": _handler_toolsets,
+    "topic": _handler_topic,
+    "undo": _handler_undo,
+    "update": _handler_update,
+    "usage": _handler_usage,
+    "verbose": _handler_verbose,
+    "version": _handler_version,
+    "voice": _handler_voice,
+    "whoami": _handler_whoami,
+    "yolo": _handler_yolo,
 }
 
 
@@ -519,6 +991,418 @@ SLASH_COMMANDS: dict[str, CommandDef] = {
         args_hint="[list|status|create|pause|resume|remove|run]",
         handler=_handler_cron,
     ),
+    "plugin": CommandDef(
+        name="plugin",
+        description="Plugin yonetimi (list/yukle/kaldir)",
+        category="Sistem",
+        aliases=("eklenti", "plugins"),
+        args_hint="[list|load|unload]",
+        handler=_handler_plugins,
+    ),
+    "agents": CommandDef(
+        name="agents",
+        description="Show active agents and running tasks",
+        category="Session",
+        handler=_handler_agents,
+    ),
+    "approve": CommandDef(
+        name="approve",
+        description="Approve a pending dangerous command",
+        category="Session",
+        handler=_handler_approve,
+    ),
+    "background": CommandDef(
+        name="background",
+        description="Run a prompt in the background",
+        category="Session",
+        handler=_handler_background,
+    ),
+    "billing": CommandDef(
+        name="billing",
+        description="Manage Nous terminal billing — buy credits, auto-reload, limits",
+        category="Info",
+        handler=_handler_billing,
+    ),
+    "blueprint": CommandDef(
+        name="blueprint",
+        description="Set up an automation from a blueprint template",
+        category="Tools & Skills",
+        handler=_handler_blueprint,
+    ),
+    "branch": CommandDef(
+        name="branch",
+        description="Branch the current session (explore a different path)",
+        category="Session",
+        handler=_handler_branch,
+    ),
+    "browser": CommandDef(
+        name="browser",
+        description="Connect browser tools to your live Chromium-family browser via CDP",
+        category="Tools & Skills",
+        handler=_handler_browser,
+    ),
+    "bundles": CommandDef(
+        name="bundles",
+        description="List skill bundles (aliases /<name> for multiple skills)",
+        category="Tools & Skills",
+        handler=_handler_bundles,
+    ),
+    "busy": CommandDef(
+        name="busy",
+        description="Control what Enter does while Hermes is working",
+        category="Configuration",
+        handler=_handler_busy,
+    ),
+    "clear": CommandDef(
+        name="clear",
+        description="Clear screen and start a new session",
+        category="Session",
+        handler=_handler_clear,
+    ),
+    "codex-runtime": CommandDef(
+        name="codex-runtime",
+        description="Toggle codex app-server runtime for OpenAI/Codex models",
+        category="Configuration",
+        handler=_handler_codex_runtime,
+    ),
+    "commands": CommandDef(
+        name="commands",
+        description="Browse all commands and skills (paginated)",
+        category="Info",
+        handler=_handler_commands,
+    ),
+    "compress": CommandDef(
+        name="compress",
+        description="Compress conversation context (add 'here [N]' to keep recent N turns)",
+        category="Session",
+        handler=_handler_compress,
+    ),
+    "copy": CommandDef(
+        name="copy",
+        description="Copy the last assistant response to clipboard",
+        category="Info",
+        handler=_handler_copy,
+    ),
+    "credits": CommandDef(
+        name="credits",
+        description="Show Nous credit balance and top up",
+        category="Info",
+        handler=_handler_credits,
+    ),
+    "curator": CommandDef(
+        name="curator",
+        description="Background skill maintenance (status, run, pin, archive, list-archived)",
+        category="Tools & Skills",
+        handler=_handler_curator,
+    ),
+    "debug": CommandDef(
+        name="debug",
+        description="Upload debug report (system info + logs) and get shareable links",
+        category="Info",
+        handler=_handler_debug,
+    ),
+    "deny": CommandDef(
+        name="deny",
+        description="Deny a pending dangerous command",
+        category="Session",
+        handler=_handler_deny,
+    ),
+    "fast": CommandDef(
+        name="fast",
+        description="Toggle fast mode — OpenAI Priority Processing / Anthropic Fast Mode (Normal/Fast)",
+        category="Configuration",
+        handler=_handler_fast,
+    ),
+    "footer": CommandDef(
+        name="footer",
+        description="Toggle gateway runtime-metadata footer on final replies",
+        category="Configuration",
+        handler=_handler_footer,
+    ),
+    "goal": CommandDef(
+        name="goal",
+        description="Set a standing goal Hermes works on across turns until achieved",
+        category="Session",
+        handler=_handler_goal,
+    ),
+    "gquota": CommandDef(
+        name="gquota",
+        description="Show Google Gemini Code Assist quota usage",
+        category="Info",
+        handler=_handler_gquota,
+    ),
+    "handoff": CommandDef(
+        name="handoff",
+        description="Hand off this session to a messaging platform (Telegram, Discord, etc.)",
+        category="Session",
+        handler=_handler_handoff,
+    ),
+    "history": CommandDef(
+        name="history",
+        description="Show conversation history",
+        category="Session",
+        handler=_handler_history,
+    ),
+    "indicator": CommandDef(
+        name="indicator",
+        description="Pick the TUI busy-indicator style",
+        category="Configuration",
+        handler=_handler_indicator,
+    ),
+    "insights": CommandDef(
+        name="insights",
+        description="Show usage insights and analytics",
+        category="Info",
+        handler=_handler_insights,
+    ),
+    "kanban": CommandDef(
+        name="kanban",
+        description="Multi-profile collaboration board (tasks, links, comments)",
+        category="Tools & Skills",
+        handler=_handler_kanban,
+    ),
+    "memory": CommandDef(
+        name="memory",
+        description="Review pending memory writes / toggle the approval gate",
+        category="Tools & Skills",
+        handler=_handler_memory,
+    ),
+    "new": CommandDef(
+        name="new",
+        description="Start a new session (fresh session ID + history)",
+        category="Session",
+        handler=_handler_new,
+    ),
+    "paste": CommandDef(
+        name="paste",
+        description="Attach clipboard image from your clipboard",
+        category="Info",
+        handler=_handler_paste,
+    ),
+    "personality": CommandDef(
+        name="personality",
+        description="Set a predefined personality",
+        category="Configuration",
+        handler=_handler_personality,
+    ),
+    "platform": CommandDef(
+        name="platform",
+        description="Pause, resume, or list a failing gateway platform",
+        category="Info",
+        handler=_handler_platform,
+    ),
+    "plugins": CommandDef(
+        name="plugins",
+        description="List installed plugins and their status",
+        category="Tools & Skills",
+        handler=_handler_plugins,
+    ),
+    "profile": CommandDef(
+        name="profile",
+        description="Show active profile name and home directory",
+        category="Info",
+        handler=_handler_profile,
+    ),
+    "queue": CommandDef(
+        name="queue",
+        description="Queue a prompt for the next turn (doesn't interrupt)",
+        category="Session",
+        handler=_handler_queue,
+    ),
+    "quit": CommandDef(
+        name="quit",
+        description="Exit the CLI (use --delete to also remove session history)",
+        category="Exit",
+        handler=_handler_quit,
+    ),
+    "reasoning": CommandDef(
+        name="reasoning",
+        description="Manage reasoning effort and display",
+        category="Configuration",
+        handler=_handler_reasoning,
+    ),
+    "redraw": CommandDef(
+        name="redraw",
+        description="Force a full UI repaint (recovers from terminal drift)",
+        category="Session",
+        handler=_handler_redraw,
+    ),
+    "reload": CommandDef(
+        name="reload",
+        description="Reload .env variables into the running session",
+        category="Tools & Skills",
+        handler=_handler_reload,
+    ),
+    "reload-mcp": CommandDef(
+        name="reload-mcp",
+        description="Reload MCP servers from config",
+        category="Tools & Skills",
+        handler=_handler_reload_mcp,
+    ),
+    "reload-skills": CommandDef(
+        name="reload-skills",
+        description="Re-scan ~/.hermes/skills/ for newly installed or removed skills",
+        category="Tools & Skills",
+        handler=_handler_reload_skills,
+    ),
+    "restart": CommandDef(
+        name="restart",
+        description="Gracefully restart the gateway after draining active runs",
+        category="Session",
+        handler=_handler_restart,
+    ),
+    "resume": CommandDef(
+        name="resume",
+        description="Resume a previously-named session",
+        category="Session",
+        handler=_handler_resume,
+    ),
+    "retry": CommandDef(
+        name="retry",
+        description="Retry the last message (resend to agent)",
+        category="Session",
+        handler=_handler_retry,
+    ),
+    "rollback": CommandDef(
+        name="rollback",
+        description="List or restore filesystem checkpoints",
+        category="Session",
+        handler=_handler_rollback,
+    ),
+    "save": CommandDef(
+        name="save",
+        description="Save the current conversation",
+        category="Session",
+        handler=_handler_save,
+    ),
+    "sethome": CommandDef(
+        name="sethome",
+        description="Set this chat as the home channel",
+        category="Session",
+        handler=_handler_sethome,
+    ),
+    "skin": CommandDef(
+        name="skin",
+        description="Show or change the display skin/theme",
+        category="Configuration",
+        handler=_handler_skin,
+    ),
+    "snapshot": CommandDef(
+        name="snapshot",
+        description="Create or restore state snapshots of Hermes config/state",
+        category="Session",
+        handler=_handler_snapshot,
+    ),
+    "start": CommandDef(
+        name="start",
+        description="Acknowledge platform start pings without a reply",
+        category="Session",
+        handler=_handler_start,
+    ),
+    "statusbar": CommandDef(
+        name="statusbar",
+        description="Toggle the context/model status bar",
+        category="Configuration",
+        handler=_handler_statusbar,
+    ),
+    "steer": CommandDef(
+        name="steer",
+        description="Inject a message after the next tool call without interrupting",
+        category="Session",
+        handler=_handler_steer,
+    ),
+    "stop": CommandDef(
+        name="stop",
+        description="Kill all running background processes",
+        category="Session",
+        handler=_handler_stop,
+    ),
+    "subgoal": CommandDef(
+        name="subgoal",
+        description="Add or manage extra criteria on the active goal",
+        category="Session",
+        handler=_handler_subgoal,
+    ),
+    "suggestions": CommandDef(
+        name="suggestions",
+        description="Review suggested automations (accept/dismiss)",
+        category="Tools & Skills",
+        handler=_handler_suggestions,
+    ),
+    "title": CommandDef(
+        name="title",
+        description="Set a title for the current session",
+        category="Session",
+        handler=_handler_title,
+    ),
+    "tools": CommandDef(
+        name="tools",
+        description="Manage tools: /tools [list|disable|enable] [name...]",
+        category="Tools & Skills",
+        handler=_handler_tools,
+    ),
+    "toolsets": CommandDef(
+        name="toolsets",
+        description="List available toolsets",
+        category="Tools & Skills",
+        handler=_handler_toolsets,
+    ),
+    "topic": CommandDef(
+        name="topic",
+        description="Enable or inspect Telegram DM topic sessions",
+        category="Session",
+        handler=_handler_topic,
+    ),
+    "undo": CommandDef(
+        name="undo",
+        description="Back up N user turns and re-prompt (default 1)",
+        category="Session",
+        handler=_handler_undo,
+    ),
+    "update": CommandDef(
+        name="update",
+        description="Update Hermes Agent to the latest version",
+        category="Info",
+        handler=_handler_update,
+    ),
+    "usage": CommandDef(
+        name="usage",
+        description="Show token usage and rate limits for the current session",
+        category="Info",
+        handler=_handler_usage,
+    ),
+    "verbose": CommandDef(
+        name="verbose",
+        description="Cycle tool progress display: off -> new -> all -> verbose",
+        category="Configuration",
+        handler=_handler_verbose,
+    ),
+    "version": CommandDef(
+        name="version",
+        description="Show Hermes Agent version",
+        category="Info",
+        aliases=['v', ''],
+        handler=_handler_version,
+    ),
+    "voice": CommandDef(
+        name="voice",
+        description="Toggle voice mode",
+        category="Configuration",
+        handler=_handler_voice,
+    ),
+    "whoami": CommandDef(
+        name="whoami",
+        description="Show your slash command access (admin / user)",
+        category="Info",
+        handler=_handler_whoami,
+    ),
+    "yolo": CommandDef(
+        name="yolo",
+        description="Toggle YOLO mode (skip all dangerous command approvals)",
+        category="Configuration",
+        handler=_handler_yolo,
+    ),
+
 }
 
 

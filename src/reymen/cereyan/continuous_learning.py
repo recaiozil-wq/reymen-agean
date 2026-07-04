@@ -33,7 +33,7 @@ from typing import Any, Dict, List, Optional
 logger = logging.getLogger(__name__)
 
 ROOT = Path(__file__).parent.resolve()
-DB_PATH = ROOT / ".ReYMeN" / "continuous_learning.db"
+DB_PATH = ROOT.parent.parent / ".ReYMeN" / "db" / "cereyan.db"  # consolidated: continuous_learning + nudge_model + steering
 _MAX_OGRENME_BAGLAM = 3000
 _MAX_GECMIS_SESSION = 20
 

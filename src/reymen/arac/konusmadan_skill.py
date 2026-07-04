@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 # ── Sabitler ──────────────────────────────────────────────
 ROOT = Path(__file__).resolve().parent.parent  # reymen/
 SKILLS_DIR = ROOT / "cereyan" / ".ReYMeN" / "skills"
-INDEX_DB = ROOT / "cereyan" / ".ReYMeN" / "skills_index.db"
+INDEX_DB = ROOT.parent / ".ReYMeN" / "db" / "skills.db"  # consolidated: skills_index.db + skill_library.db
 _MAKS_ACIKLAMA = 300
 _MAKS_ADIM = 2000
 _MIN_MESAJ_SAYISI = 3  # En az 3 mesaj varsa skill çıkar

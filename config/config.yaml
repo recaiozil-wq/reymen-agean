@@ -86,6 +86,31 @@ mcp_servers:
     - .
     command: mcp-server-filesystem
     connect_timeout: 30
+  sqlite:
+    args:
+    - .
+    command: npx
+    args: ["-y", "@modelcontextprotocol/server-sqlite", "."]
+  fetch:
+    command: npx
+    args: ["-y", "@modelcontextprotocol/server-fetch"]
+  sequential-thinking:
+    command: npx
+    args: ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+  time:
+    command: npx
+    args: ["-y", "@modelcontextprotocol/server-time"]
+  brave-search:
+    command: npx
+    args: ["-y", "@modelcontextprotocol/server-brave-search"]
+    env:
+      BRAVE_API_KEY: "${BRAVE_API_KEY}"
+  git:
+    command: npx
+    args: ["-y", "@modelcontextprotocol/server-git"]
+  memory:
+    command: npx
+    args: ["-y", "@modelcontextprotocol/server-memory"]
     timeout: 60
   playwright:
     args:

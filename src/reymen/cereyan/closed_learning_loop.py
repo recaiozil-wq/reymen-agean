@@ -148,7 +148,7 @@ class ClosedLearningLoop:
         skills_dir: str | Path | None = None,
         auto_index: bool = False,
     ) -> None:
-        self.db_yolu = str(db_yolu or ROOT / ".ReYMeN" / "skills_index.db")
+        self.db_yolu = str(db_yolu or ROOT.parent.parent / ".ReYMeN" / "db" / "skills.db")  # consolidated: skills_index + skill_library
         self.skills_dir = str(skills_dir or ROOT / "skills")
         self._lock = threading.Lock()
 

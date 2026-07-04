@@ -27,8 +27,8 @@ logger = logging.getLogger("scan_skills")
 # ── Yollar ──────────────────────────────────────────────────────────────────
 ROOT = Path(__file__).parent.parent.resolve()  # reymen/
 SKILLS_DIR = ROOT / "cereyan" / "skills"  # taranacak klasör
-SKILLS_DB = ROOT / "cereyan" / ".ReYMeN" / "skills_index.db"
-OGRENME_DB = ROOT / "hafiza" / "ogrenme.db"  # OnceHafiza ogrenme DB
+SKILLS_DB = ROOT.parent / ".ReYMeN" / "db" / "skills.db"  # consolidated: skills_index + skill_library
+OGRENME_DB = ROOT.parent / ".ReYMeN" / "db" / "ogrenme_merkezi.db"  # consolidated: ogrenme.db + ogrenmeler.db + proaktif_ogrenme
 
 
 def dosya_hash(dosya_yolu: str) -> str:

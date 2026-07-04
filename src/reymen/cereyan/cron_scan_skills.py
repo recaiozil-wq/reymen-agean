@@ -29,8 +29,8 @@ logger = logging.getLogger("cron_scan_skills")
 
 ROOT = Path(__file__).parent.parent.resolve()
 SKILLS_DIR = ROOT / "cereyan" / "skills"
-SKILLS_DB = ROOT / "cereyan" / ".ReYMeN" / "skills_index.db"
-OGRENME_DB = ROOT / "hafiza" / "ogrenme.db"
+SKILLS_DB = ROOT.parent / ".ReYMeN" / "db" / "skills.db"  # consolidated: skills_index + skill_library
+OGRENME_DB = ROOT.parent / ".ReYMeN" / "db" / "ogrenme_merkezi.db"  # consolidated: ogrenme.db + ogrenmeler.db + proaktif_ogrenme
 
 
 def dosya_hash(dosya_yolu: str) -> str:

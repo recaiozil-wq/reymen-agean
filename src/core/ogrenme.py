@@ -13,7 +13,7 @@ from contextlib import contextmanager
 
 logger = logging.getLogger(__name__)
 
-DB_PATH = Path("reymen/merkez_db/memory.db")
+DB_PATH = Path(".ReYMeN/db/cozum_merkezi.db")  # consolidated: memory.db + hatalar.db + cozum_hafizasi.db + hata_toplama.db
 TTL_GUN = 30
 TTL_MUAF_BASARI = 3
 

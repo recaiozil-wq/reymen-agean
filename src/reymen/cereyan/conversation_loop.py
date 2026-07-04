@@ -765,6 +765,19 @@ class ConversationLoop:
         except Exception as e:
             logger.warning("Gatekeeper devre disi: %s", e)
 
+        # ── Plugin: on_message hook ──
+        try:
+            from reymen.plugin.manager import PluginManager
+            pm = getattr(self, "_plugin_manager", None)
+            if pm is None:
+                pm = PluginManager()
+                pm.config_yukle("config/config.yaml")
+                pm.tumunu_yukle()
+                self._plugin_manager = pm
+            pm.hook_cagir("on_message", message=hedef, context={"session_id": getattr(self, "session_id", None)})
+        except Exception as e:
+            logger.debug("Plugin hook atlandi: %s", e)
+
         baslama = time.time()
         tur = 0
 

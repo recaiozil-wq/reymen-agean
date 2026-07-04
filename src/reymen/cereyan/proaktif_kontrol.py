@@ -63,8 +63,7 @@ class ProaktifDenetci:
         self._db = (
             db_yol
             or Path(str(koku.parent if (koku / "src").exists() else koku))
-            / ".ReYMeN"
-            / "proaktif_ogrenme.db"
+            / ".ReYMeN" / "db" / "ogrenme_merkezi.db"  # consolidated: proaktif_ogrenme + ogrenme.db + ogrenmeler.db
         )
         self._db.parent.mkdir(parents=True, exist_ok=True)
         self._vt_kur()

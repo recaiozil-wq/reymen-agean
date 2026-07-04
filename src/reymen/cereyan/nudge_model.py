@@ -38,7 +38,7 @@ logger = logging.getLogger(__name__)
 # ── Sabitler ──────────────────────────────────────────────────────────────────
 
 ROOT = Path(__file__).parent.resolve()
-VERITABANI_YOLU = ROOT / ".ReYMeN" / "nudge_model.db"
+VERITABANI_YOLU = ROOT.parent.parent / ".ReYMeN" / "db" / "cereyan.db"  # consolidated: nudge_model + continuous_learning + steering
 
 # Gozlem limitleri
 MAKS_SATIR = 5000  # Veritabaninda en fazla satir

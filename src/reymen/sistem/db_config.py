@@ -24,15 +24,23 @@ DB_KOK.mkdir(parents=True, exist_ok=True)
 
 # ── Tüm botların (Pasa_38, Kiral38, ReYMeN_ReYMeNbot, DiscordBot) ─────
 # ── ortak kullandığı tekil DB yolları ─────────────────────────────────
+# NOT: DB dedupe (Item 6) sonrası 25→12 DB'ye düşürüldü.
+# Eski dağınık DB'ler .old sonekiyle işaretlendi, kodda hala eski yolu
+# kullanan bölümler varsa bu sözlükteki canonical yola yönlendirilmelidir.
 DB = {
     "session": DB_KOK / "session.db",
-    "ogrenmeler": DB_KOK / "ogrenmeler.db",  # OnceHafiza
-    "skills_index": DB_KOK / "skills_index.db",
+    "ogrenmeler": DB_KOK / "ogrenme_merkezi.db",  # OnceHafiza — merged
+    "skills_index": DB_KOK / "skills.db",          # merged with skill_library
     "hafiza": DB_KOK / "hafiza.db",
-    "self_improve": DB_KOK / "self_improve.db",
-    "continuous_learning": DB_KOK / "continuous_learning.db",
-    "analitik": DB_KOK / "analitik.db",  # reasoning_loop kayıtları burada
+    "self_improve": DB_KOK / "analitik_merkezi.db",  # merged with analitik + execution_log
+    "continuous_learning": DB_KOK / "cereyan.db",    # merged with nudge_model + steering
+    "analitik": DB_KOK / "analitik_merkezi.db",      # merged with self_improve + execution_log
     "karar": DB_KOK / "karar.db",
+    # ── Yeni consolidated DB'ler ──
+    "auth": DB_KOK / "auth.db",                      # auth + oauth + audit_log
+    "cozum_merkezi": DB_KOK / "cozum_merkezi.db",    # hatalar + memory + cozum_hafizasi + hata_toplama
+    "cereyan": DB_KOK / "cereyan.db",                # continuous_learning + nudge + steering
+    "skills": DB_KOK / "skills.db",                  # skills_index + skill_library
 }
 
 
