@@ -1,7 +1,7 @@
-"""Phase B: ReYMeNCLI class'ını 6 mixin'e böl.
+﻿"""Phase B: ReYMeNCLI class'Ä±nÄ± 6 mixin'e bÃ¶l.
 
-Her mixin dosyası: reymen/sistem/cli_mixin_*.py
-Kaynak: cli_main.py içindeki ReYMeNCLI class'ı (185 metot)
+Her mixin dosyasÄ±: reymen/sistem/cli_mixin_*.py
+Kaynak: cli_main.py iÃ§indeki ReYMeNCLI class'Ä± (185 metot)
 """
 
 import ast
@@ -17,7 +17,7 @@ MIXIN_DIR = os.path.join(ROOT, "reymen", "sistem")
 CATEGORIES = {
     "display": {
         "name": "MixinDisplay",
-        "desc": "UI/ekran/çıktı formatlama metotları",
+        "desc": "UI/ekran/Ã§Ä±ktÄ± formatlama metotlarÄ±",
         "patterns": [
             "_format_",
             "_print_",
@@ -55,7 +55,7 @@ CATEGORIES = {
     },
     "stream": {
         "name": "MixinStream",
-        "desc": "Stream/akış metotları",
+        "desc": "Stream/akÄ±ÅŸ metotlarÄ±",
         "patterns": [
             "_stream_",
             "_flush_",
@@ -73,7 +73,7 @@ CATEGORIES = {
     },
     "voice": {
         "name": "MixinVoice",
-        "desc": "Ses/voice metotları",
+        "desc": "Ses/voice metotlarÄ±",
         "patterns": [
             "_voice_",
             "set_voice_",
@@ -82,7 +82,7 @@ CATEGORIES = {
     },
     "approval": {
         "name": "MixinApproval",
-        "desc": "Onay/güvenlik metotları",
+        "desc": "Onay/gÃ¼venlik metotlarÄ±",
         "patterns": [
             "_approval_",
             "_sudo_",
@@ -98,7 +98,7 @@ CATEGORIES = {
     },
     "commands": {
         "name": "MixinCommands",
-        "desc": "Komut işleyiciler",
+        "desc": "Komut iÅŸleyiciler",
         "patterns": [
             "_handle_",
             "process_command",
@@ -168,7 +168,7 @@ CATEGORIES = {
 
 
 def categorize(method_name):
-    """Bir metodun hangi kategoriye ait olduğunu belirle."""
+    """Bir metodun hangi kategoriye ait olduÄŸunu belirle."""
     for cat_key, cat_info in CATEGORIES.items():
         if method_name in cat_info.get("exclude", []):
             continue
@@ -179,7 +179,7 @@ def categorize(method_name):
 
 
 def extract_method_source(main_path, method_name):
-    """Ast kullanarak bir metodun kaynak kodunu çıkar."""
+    """Ast kullanarak bir metodun kaynak kodunu Ã§Ä±kar."""
     with open(main_path, "r", encoding="utf-8") as f:
         lines = f.readlines()
 
@@ -202,7 +202,7 @@ def extract_method_source(main_path, method_name):
 
 
 def main():
-    # 1) Tüm metodları parse et
+    # 1) TÃ¼m metodlarÄ± parse et
     with open(MAIN_PATH, "r", encoding="utf-8") as f:
         content = f.read()
 
@@ -219,7 +219,7 @@ def main():
 
     print(f"Toplam metot: {len(all_methods)}")
 
-    # Kategori bazında say
+    # Kategori bazÄ±nda say
     cat_counts = {}
     for name, cat, _, _ in all_methods:
         cat_counts[cat] = cat_counts.get(cat, 0) + 1
@@ -229,13 +229,13 @@ def main():
         desc = CATEGORIES.get(cat, {}).get("desc", "")
         print(f"  {cat_name:25s} ({cat:15s}): {cat_counts[cat]:3d} metot  {desc}")
 
-    # 2) Her kategori için mixin dosyası oluştur
+    # 2) Her kategori iÃ§in mixin dosyasÄ± oluÅŸtur
     import_line = "from reymen.sistem.cli_main import ReYMeNCLI"
 
     # Kategori listesi
     all_cats = list(CATEGORIES.keys()) + ["core"]
 
-    # core kategorisi için dict
+    # core kategorisi iÃ§in dict
     CATEGORIES["core"] = {
         "name": "MixinCore",
         "desc": "Ana/kalan metotlar",
@@ -251,16 +251,16 @@ def main():
         cat_methods = [(n, c, s, e) for n, c, s, e in all_methods if c == cat_key]
 
         if not cat_methods:
-            print(f"  ⚠️  {cat_info['name']}: boş, oluşturulmayacak")
+            print(f"  âš ï¸  {cat_info['name']}: boÅŸ, oluÅŸturulmayacak")
             continue
 
         mixin_name = cat_info["name"]
         file_name = f"cli_mixin_{cat_key}.py"
         file_path = os.path.join(MIXIN_DIR, file_name)
 
-        # Mixin içeriğini oluştur
+        # Mixin iÃ§eriÄŸini oluÅŸtur
         mixin_lines = [
-            f'"""ReYMeNCLI {mixin_name} — {cat_info["desc"]}."""',
+            f'"""ReYMeNCLI {mixin_name} â€” {cat_info["desc"]}."""',
             "",
             "",
             f"class {mixin_name}:",
@@ -268,14 +268,14 @@ def main():
             "",
         ]
 
-        # Her metodun kaynağını al ve ekle
+        # Her metodun kaynaÄŸÄ±nÄ± al ve ekle
         with open(MAIN_PATH, "r", encoding="utf-8") as f:
             all_lines = f.readlines()
 
         for meth_name, _, start, end in sorted(cat_methods, key=lambda x: x[2]):
             source = "".join(all_lines[start - 1 : end])
             if source:
-                # İlk satırdaki decorator'ları da al (varsa)
+                # Ä°lk satÄ±rdaki decorator'larÄ± da al (varsa)
                 actual_start = start - 1
                 for i in range(start - 2, max(0, start - 5), -1):
                     stripped = all_lines[i].strip()
@@ -292,21 +292,21 @@ def main():
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(content_out)
 
-        print(f"  ✅ {file_name} oluşturuldu ({len(cat_methods)} metot)")
+        print(f"  âœ… {file_name} oluÅŸturuldu ({len(cat_methods)} metot)")
         mixin_imports.append(
             f'from reymen.sistem.{file_name.replace(".py","")} import {mixin_name}'
         )
         mixin_names.append(mixin_name)
 
-    # 3) cli_main.py'yi güncelle
-    # Import'ları ekle
+    # 3) cli_main.py'yi gÃ¼ncelle
+    # Import'larÄ± ekle
     import_block = "\n".join(mixin_imports)
 
-    # Class tanımını bul ve değiştir
+    # Class tanÄ±mÄ±nÄ± bul ve deÄŸiÅŸtir
     with open(MAIN_PATH, "r", encoding="utf-8") as f:
         main_content = f.read()
 
-    # Eski class ReYMeNCLI satırını mixin miraslı hale getir
+    # Eski class ReYMeNCLI satÄ±rÄ±nÄ± mixin miraslÄ± hale getir
     class_line_pattern = r"^class ReYMeNCLI\([^)]*\):"
     match = re.search(class_line_pattern, main_content, re.MULTILINE)
 
@@ -315,16 +315,16 @@ def main():
         inheritance = ", ".join(mixin_names)
         new_class_line = f"class ReYMeNCLI({inheritance}):"
 
-        # Import'ları en başa ekle (ilk import bloğundan sonra)
+        # Import'larÄ± en baÅŸa ekle (ilk import bloÄŸundan sonra)
         lines = main_content.split("\n")
 
-        # class tanımını değiştir
+        # class tanÄ±mÄ±nÄ± deÄŸiÅŸtir
         for i, line in enumerate(lines):
             if line.rstrip() == old_class_line.rstrip():
                 lines[i] = new_class_line
                 break
 
-        # Import'ları ekle (en üstteki __init__ dışı import'lardan sonra)
+        # Import'larÄ± ekle (en Ã¼stteki __init__ dÄ±ÅŸÄ± import'lardan sonra)
         last_import = 0
         for i, line in enumerate(lines):
             if line.startswith(("import ", "from ")):
@@ -339,10 +339,10 @@ def main():
         with open(MAIN_PATH, "w", encoding="utf-8") as f:
             f.write(main_content)
 
-        print(f"\n✅ cli_main.py güncellendi: {old_class_line} → {new_class_line}")
+        print(f"\nâœ… cli_main.py gÃ¼ncellendi: {old_class_line} â†’ {new_class_line}")
         print(f"   {len(mixin_imports)} import eklendi")
 
-    print("\n✅ Phase B tamam!")
+    print("\nâœ… Phase B tamam!")
 
 
 if __name__ == "__main__":

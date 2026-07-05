@@ -1,10 +1,10 @@
-"""💰 Cost tracking — API harcama takibi + log.
+﻿"""ğŸ’° Cost tracking â€” API harcama takibi + log.
 
-Model API çağrılarının token maliyetlerini ve dolar bazlı harcamalarını
-izler. Veriler SQLite ile kalıcı olarak saklanır; tablo yoksa otomatik
-oluşturulur. Fiyat tablosu config üzerinden geçersiz kılınabilir.
+Model API Ã§aÄŸrÄ±larÄ±nÄ±n token maliyetlerini ve dolar bazlÄ± harcamalarÄ±nÄ±
+izler. Veriler SQLite ile kalÄ±cÄ± olarak saklanÄ±r; tablo yoksa otomatik
+oluÅŸturulur. Fiyat tablosu config Ã¼zerinden geÃ§ersiz kÄ±lÄ±nabilir.
 
-Örnek::
+Ã–rnek::
 
     from ReYMeN.cost_tracker import record_usage, summary
 import logging
@@ -38,7 +38,7 @@ __all__ = [
 ]
 
 # ---------------------------------------------------------------------------
-# Varsayılan fiyat tablosu (USD / 1M token). Config ile geçersiz kılınabilir.
+# VarsayÄ±lan fiyat tablosu (USD / 1M token). Config ile geÃ§ersiz kÄ±lÄ±nabilir.
 # ---------------------------------------------------------------------------
 DEFAULT_PRICE_TABLE: dict[str, dict[str, float]] = {
     "gpt-4o": {"prompt": 5.0, "completion": 15.0},
@@ -50,13 +50,13 @@ DEFAULT_PRICE_TABLE: dict[str, dict[str, float]] = {
     "claude-3-opus": {"prompt": 15.0, "completion": 75.0},
     "o1": {"prompt": 15.0, "completion": 60.0},
     "o1-mini": {"prompt": 3.0, "completion": 12.0},
-    # Bilinmeyen modeller için güvenli fallback
+    # Bilinmeyen modeller iÃ§in gÃ¼venli fallback
     "default": {"prompt": 1.0, "completion": 3.0},
 }
 
 
 def _default_db_path() -> Path:
-    """ReYMeN home dizini altında costs.db yolu döndürür."""
+    """ReYMeN home dizini altÄ±nda costs.db yolu dÃ¶ndÃ¼rÃ¼r."""
     home = os.environ.get("ReYMeN_HOME")
     if home:
         base = Path(home)
@@ -68,7 +68,7 @@ def _default_db_path() -> Path:
 
 @dataclass
 class CostRecord:
-    """Tek bir API çağrısının maliyet kaydı."""
+    """Tek bir API Ã§aÄŸrÄ±sÄ±nÄ±n maliyet kaydÄ±."""
 
     model: str
     prompt_tokens: int
@@ -93,11 +93,11 @@ class CostRecord:
 
 
 class CostTracker:
-    """Thread-safe, SQLite destekli maliyet takipçisi.
+    """Thread-safe, SQLite destekli maliyet takipÃ§isi.
 
-    Tüm metotlar aynı ``CostTracker`` örneği üzerinde thread-safe'dir.
-    Modül seviyesindeki kolaylık fonksiyonları (``record_usage`` vb.) global
-    bir singleton üzerinden çalışır.
+    TÃ¼m metotlar aynÄ± ``CostTracker`` Ã¶rneÄŸi Ã¼zerinde thread-safe'dir.
+    ModÃ¼l seviyesindeki kolaylÄ±k fonksiyonlarÄ± (``record_usage`` vb.) global
+    bir singleton Ã¼zerinden Ã§alÄ±ÅŸÄ±r.
     """
 
     def __init__(
@@ -155,7 +155,7 @@ class CostTracker:
     def _price_for(self, model: str) -> dict[str, float]:
         if model in self._price_table:
             return self._price_table[model]
-        # Prefix eşleştirme: "gpt-4o-2024-08-06" -> "gpt-4o"
+        # Prefix eÅŸleÅŸtirme: "gpt-4o-2024-08-06" -> "gpt-4o"
         for key in self._price_table:
             if key != "default" and model.startswith(key):
                 return self._price_table[key]
@@ -167,14 +167,14 @@ class CostTracker:
         prompt_tokens: int,
         completion_tokens: int,
     ) -> float:
-        """Verilen token sayıları için USD maliyeti hesaplar."""
+        """Verilen token sayÄ±larÄ± iÃ§in USD maliyeti hesaplar."""
         price = self._price_for(model)
         cost = (prompt_tokens / 1_000_000.0) * price["prompt"] + (
             completion_tokens / 1_000_000.0
         ) * price["completion"]
         return round(cost, 6)
 
-    # -- Kayıt --------------------------------------------------------------
+    # -- KayÄ±t --------------------------------------------------------------
     def record(
         self,
         model: str,
@@ -185,9 +185,9 @@ class CostTracker:
         session_id: str | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> CostRecord:
-        """Tek bir API kullanımını kaydeder ve ``CostRecord`` döndürür."""
+        """Tek bir API kullanÄ±mÄ±nÄ± kaydeder ve ``CostRecord`` dÃ¶ndÃ¼rÃ¼r."""
         if prompt_tokens < 0 or completion_tokens < 0:
-            raise ValueError("token sayıları negatif olamaz")
+            raise ValueError("token sayÄ±larÄ± negatif olamaz")
         cost = self.compute_cost(model, prompt_tokens, completion_tokens)
         record = CostRecord(
             model=model,
@@ -243,9 +243,9 @@ class CostTracker:
         session_id: str | None = None,
         since: float | None = None,
     ) -> dict[str, Any]:
-        """Özet rapor döndürür.
+        """Ã–zet rapor dÃ¶ndÃ¼rÃ¼r.
 
-        Parametreler ile filtreleme yapılabilir. Dönüş değeri::
+        Parametreler ile filtreleme yapÄ±labilir. DÃ¶nÃ¼ÅŸ deÄŸeri::
 
             {
                 "total_calls": int,
@@ -343,7 +343,7 @@ class CostTracker:
         limit: int = 100,
         model: str | None = None,
     ) -> list[dict[str, Any]]:
-        """Ham kayıtları döndürür (en yeni first)."""
+        """Ham kayÄ±tlarÄ± dÃ¶ndÃ¼rÃ¼r (en yeni first)."""
         clauses: list[str] = []
         params: list[Any] = []
         if model is not None:
@@ -384,13 +384,13 @@ class CostTracker:
         return result
 
     def reset(self) -> int:
-        """Tüm kayıtları siler, silinen satır sayısını döndürür."""
+        """TÃ¼m kayÄ±tlarÄ± siler, silinen satÄ±r sayÄ±sÄ±nÄ± dÃ¶ndÃ¼rÃ¼r."""
         with self._lock, self._connect() as conn:
             cur = conn.execute("DELETE FROM cost_log")
             return int(cur.rowcount)
 
     def iter_records(self) -> Iterable[CostRecord]:
-        """Tüm kayıtları ``CostRecord`` olarak iterasyon."""
+        """TÃ¼m kayÄ±tlarÄ± ``CostRecord`` olarak iterasyon."""
         with self._connect() as conn:
             rows = conn.execute(
                 """
@@ -416,7 +416,7 @@ class CostTracker:
 
 
 # ---------------------------------------------------------------------------
-# Modül-seviyesi singleton + kolaylık fonksiyonları
+# ModÃ¼l-seviyesi singleton + kolaylÄ±k fonksiyonlarÄ±
 # ---------------------------------------------------------------------------
 _singleton: CostTracker | None = None
 _singleton_lock = threading.Lock()
@@ -432,14 +432,14 @@ def _get_tracker() -> CostTracker:
 
 
 def set_db_path(path: str | Path) -> None:
-    """Singleton tracker'ı yeniden oluşturur ve DB yolunu ayarlar."""
+    """Singleton tracker'Ä± yeniden oluÅŸturur ve DB yolunu ayarlar."""
     global _singleton
     with _singleton_lock:
         _singleton = CostTracker(db_path=path)
 
 
 def set_price_table(table: dict[str, dict[str, float]]) -> None:
-    """Singleton tracker için fiyat tablosunu günceller."""
+    """Singleton tracker iÃ§in fiyat tablosunu gÃ¼nceller."""
     _get_tracker()._price_table = table
 
 
@@ -452,7 +452,7 @@ def record_usage(
     session_id: str | None = None,
     metadata: dict[str, Any] | None = None,
 ) -> CostRecord:
-    """Global tracker üzerinden kullanım kaydı ekler."""
+    """Global tracker Ã¼zerinden kullanÄ±m kaydÄ± ekler."""
     return _get_tracker().record(
         model,
         prompt_tokens,
@@ -464,15 +464,15 @@ def record_usage(
 
 
 def summary(**filters: Any) -> dict[str, Any]:
-    """Global tracker üzerinden özet rapor."""
+    """Global tracker Ã¼zerinden Ã¶zet rapor."""
     return _get_tracker().summary(**filters)
 
 
 def dump_log(**filters: Any) -> list[dict[str, Any]]:
-    """Global tracker üzerinden ham kayıtlar."""
+    """Global tracker Ã¼zerinden ham kayÄ±tlar."""
     return _get_tracker().dump_log(**filters)
 
 
 def reset() -> int:
-    """Global tracker kayıtlarını temizler."""
+    """Global tracker kayÄ±tlarÄ±nÄ± temizler."""
     return _get_tracker().reset()

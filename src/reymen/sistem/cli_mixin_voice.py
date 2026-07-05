@@ -1,4 +1,4 @@
-"""ReYMeNCLI mixin module."""
+﻿"""ReYMeNCLI mixin module."""
 
 import logging
 import os
@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 
 class MixinVoice:
-    """ReYMeNCLI Ses/voice metotları."""
+    """ReYMeNCLI Ses/voice metotlarÄ±."""
 
     def _voice_record_key_label(self) -> str:
         """Return the configured voice push-to-talk key formatted for UI.
@@ -44,7 +44,7 @@ class MixinVoice:
           start via ``@kb.add(_voice_key)``; re-reading config per
           render meant the status bar could advertise a new shortcut
           after a config edit while the actual binding was still the
-          startup chord — exactly the display/binding drift this PR
+          startup chord â€” exactly the display/binding drift this PR
           is trying to eliminate.
         * The label is on the hot render path (status bar + composer
           placeholder invalidated every 150ms during recording), so
@@ -127,7 +127,7 @@ class MixinVoice:
         # Apply config-driven silence params (numeric-guarded so YAML
         # scalar corruption doesn't break recording start-up).
         #
-        # ``bool`` is explicitly excluded from the numeric check — in
+        # ``bool`` is explicitly excluded from the numeric check â€” in
         # Python bool is a subclass of int, so a hand-edited
         # ``silence_threshold: true`` would otherwise be forwarded as
         # ``1`` instead of falling back to the 200 default (Copilot
@@ -179,7 +179,7 @@ class MixinVoice:
             _recording_hint = f"Termux:API capture | {_label} to stop"
         else:
             _recording_hint = f"{_label} to stop"
-        _cprint(f"\n{_ACCENT}● Recording...{_RST} {_DIM}({_recording_hint}){_RST}")
+        _cprint(f"\n{_ACCENT}â— Recording...{_RST} {_DIM}({_recording_hint}){_RST}")
 
         # Periodically refresh prompt to update audio level indicator
         def _refresh_level():

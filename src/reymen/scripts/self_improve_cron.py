@@ -1,13 +1,13 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-self_improve_cron.py — Periyodik self-improvement dongusu.
+self_improve_cron.py â€” Periyodik self-improvement dongusu.
 
 Her calistiginda:
   1. Self-improve metriklerini topla
   2. Dusuk kaliteli alanlari tespit et
   3. Kod kalitesi taramasi yap (son 24 saat)
   4. Rapor olustur ve kaydet
-  5. Raporu ~/.hermes/cron/output/ altina yaz
+  5. Raporu ~/.reymen/cron/output/ altina yaz
 
 Kullanim:
     python -m reymen.scripts.self_improve_cron
@@ -33,7 +33,7 @@ log = logging.getLogger(__name__)
 # Proje koku
 ROOT = Path(__file__).resolve().parent.parent.parent
 CIKTI_DIZINI = Path(
-    os.environ.get("HERMES_CIKTI", str(ROOT / ".ReYMeN" / "self_improve"))
+    os.environ.get("REYMEN_CIKTI", os.environ.get("HERMES_CIKTI", str(ROOT / ".ReYMeN" / "self_improve")))
 )
 CIKTI_DIZINI.mkdir(parents=True, exist_ok=True)
 
@@ -45,7 +45,7 @@ def _metrik_topla() -> dict:
         from reymen.self_improve import report as si_report
 
         raw = si_report()
-        # Map Turkish keys → English keys for cron template
+        # Map Turkish keys â†’ English keys for cron template
         return {
             "total_steps": raw.get("toplam_adim", 0),
             "avg_score": raw.get("ortalama_skor", 0.0),
@@ -158,23 +158,23 @@ def _rapor_olustur(metrik: dict, bulgular: list[dict]) -> dict:
     # Metrik bazli iyilestirme onerileri
     if metrik.get("low_quality_steps", 0) > 0:
         rapor["iyilestirme"].append(
-            f"{metrik['low_quality_steps']} dusuk kaliteli adim var — "
+            f"{metrik['low_quality_steps']} dusuk kaliteli adim var â€” "
             f"SELF_IMPROVE_SUGGEST ile detayli oneri alinabilir"
         )
     if metrik.get("avg_score", 1.0) < 0.7:
         rapor["iyilestirme"].append(
-            f"Ortalama kalite skoru dusuk ({metrik['avg_score']:.2f}) — "
+            f"Ortalama kalite skoru dusuk ({metrik['avg_score']:.2f}) â€” "
             f"cozum adimlarinda hata yakalama ve dogrulama iyilestirilmeli"
         )
     if bulgular:
         kritik_sayisi = rapor["kod_kalitesi"]["kritik"]
         if kritik_sayisi > 0:
             rapor["iyilestirme"].append(
-                f"{kritik_sayisi} kritik kod sorunu var — hemen duzeltilmeli"
+                f"{kritik_sayisi} kritik kod sorunu var â€” hemen duzeltilmeli"
             )
 
     if not rapor["iyilestirme"]:
-        rapor["iyilestirme"].append("Tum metrikler normal — iyilestirme gerekmiyor")
+        rapor["iyilestirme"].append("Tum metrikler normal â€” iyilestirme gerekmiyor")
 
     return rapor
 
@@ -212,11 +212,11 @@ def _rapor_kaydet(rapor: dict) -> Path:
     if rapor["kod_kalitesi"]["bulgular"]:
         satirlar.append("### Bulgular")
         for b in rapor["kod_kalitesi"]["bulgular"]:
-            ikon = "🔴" if b["seviye"] == "kritik" else "🟡"
+            ikon = "ğŸ”´" if b["seviye"] == "kritik" else "ğŸŸ¡"
             satirlar.append(f"- {ikon} **{b['dosya']}**: {b['sorun']}")
         satirlar.append("")
 
-    satirlar.append("## İyileştirme Önerileri")
+    satirlar.append("## Ä°yileÅŸtirme Ã–nerileri")
     for o in rapor["iyilestirme"]:
         satirlar.append(f"- {o}")
 
@@ -226,7 +226,7 @@ def _rapor_kaydet(rapor: dict) -> Path:
 
 
 def main() -> str:
-    """Ana dongu — raporu olustur ve dosyaya yaz.
+    """Ana dongu â€” raporu olustur ve dosyaya yaz.
 
     Returns:
         Kullaniciya gosterilecek ozet metin.

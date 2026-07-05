@@ -1,10 +1,10 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
-git_watchdog.py — Her 10dk'da bir git status --short calistirir.
+git_watchdog.py â€” Her 10dk'da bir git status --short calistirir.
 
 Davranis:
-- Degisiklik > 0 → stdout'a yaz (cron deliver eder)
-- Degisiklik = 0 → sessiz, cikti vermez
+- Degisiklik > 0 â†’ stdout'a yaz (cron deliver eder)
+- Degisiklik = 0 â†’ sessiz, cikti vermez
 
 Kullanim (no_agent=True ile cron job):
     cronjob create --script git_watchdog.py --no-agent --schedule "every 10m"
@@ -18,7 +18,7 @@ import sys
 from pathlib import Path
 from datetime import datetime
 
-# ── Konfigurasyon ──────────────────────────────────────────────
+# â”€â”€ Konfigurasyon â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # ReYMeN-Ajan projesi
 PROJE_YOLU = Path(__file__).resolve().parent.parent.parent
 if not (PROJE_YOLU / ".git").exists():
@@ -33,7 +33,7 @@ SHARED_STATE = PROJE_YOLU / "shared_state" / "git_watchdog_state.json"
 SHARED_STATE_REL = "shared_state/git_watchdog_state.json"
 
 
-# ── Ana fonksiyon ──────────────────────────────────────────────
+# â”€â”€ Ana fonksiyon â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def main() -> int:
     """Git status --short calistir, degisiklik varsa yaz yoksa sessiz."""
     result = subprocess.run(
@@ -51,14 +51,14 @@ def main() -> int:
 
     output = result.stdout.strip()
     if not output:
-        # Degisiklik yok → sessiz
+        # Degisiklik yok â†’ sessiz
         return 0
 
-    # Degisiklik var → raporla
+    # Degisiklik var â†’ raporla
     raw_lines = [l for l in output.split("\n") if l.strip()]
     # Kendi state dosyasini filtrele (self-trigger)
     lines = [l for l in raw_lines if SHARED_STATE_REL not in l]
-    print(f"🔍 Git Durumu — {len(lines)} dosyada degisiklik")
+    print(f"ğŸ” Git Durumu â€” {len(lines)} dosyada degisiklik")
     print()
 
     # Gruplandir: M, ?? basliklari
@@ -67,28 +67,28 @@ def main() -> int:
     deleted = [l for l in lines if l.startswith(" D") or l.startswith("D")]
 
     if modified:
-        print(f"📝 Degisen ({len(modified)}):")
+        print(f"ğŸ“ Degisen ({len(modified)}):")
         for l in modified[:15]:
             print(f"  {l.strip()}")
         if len(modified) > 15:
             print(f"  ... ve {len(modified)-15} dosya daha")
 
     if added:
-        print(f"\n🆕 Yeni ({len(added)}):")
+        print(f"\nğŸ†• Yeni ({len(added)}):")
         for l in added[:10]:
             print(f"  {l.strip()}")
         if len(added) > 10:
             print(f"  ... ve {len(added)-10} dosya daha")
 
     if deleted:
-        print(f"\n🗑️ Silinen ({len(deleted)}):")
+        print(f"\nğŸ—‘ï¸ Silinen ({len(deleted)}):")
         for l in deleted[:5]:
             print(f"  {l.strip()}")
         if len(deleted) > 5:
             print(f"  ... ve {len(deleted)-5} dosya daha")
 
     print(
-        f"\n📊 Toplam: {len(lines)} dosya ({len(modified)} degisen, {len(added)} yeni, {len(deleted)} silinen)"
+        f"\nğŸ“Š Toplam: {len(lines)} dosya ({len(modified)} degisen, {len(added)} yeni, {len(deleted)} silinen)"
     )
 
     # Paylasilan durum dosyasina kaydet (tum botlar okur)

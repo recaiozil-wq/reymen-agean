@@ -1,13 +1,13 @@
-"""
-ReYMeN Gateway — Signal platform adapter.
+﻿"""
+ReYMeN Gateway â€” Signal platform adapter.
 
 Signal REST API (signal-cli REST) uzerinden mesaj alip gonderir.
 signal-cli-rest-api Docker konteyneri ile calisir.
 
 Yapilandirma (ortam degiskenleri):
-  - SIGNAL_URL            — signal-cli REST API URL (ornek: http://localhost:8080)
-  - SIGNAL_NUMBER         — Signal numarasi (+905551234567 formatinda)
-  - SIGNAL_HOME_CHANNEL   — Varsayilan kanal/hedef numarasi
+  - SIGNAL_URL            â€” signal-cli REST API URL (ornek: http://localhost:8080)
+  - SIGNAL_NUMBER         â€” Signal numarasi (+905551234567 formatinda)
+  - SIGNAL_HOME_CHANNEL   â€” Varsayilan kanal/hedef numarasi
 """
 
 import asyncio
@@ -21,15 +21,15 @@ from pathlib import Path as _Path
 
 sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
-from src.gateways.config import Platform, PlatformConfig
-from src.gateways.platforms.base import (
+from gateways.config import Platform, PlatformConfig
+from gateways.platforms.base import (
     BasePlatformAdapter,
     MessageEvent,
     MessageType,
     ProcessingOutcome,
     SendResult,
 )
-from src.gateways.platforms.helpers import (
+from gateways.platforms.helpers import (
     MessageDeduplicator,
     strip_markdown,
 )
@@ -55,7 +55,7 @@ def check_signal_requirements() -> bool:
     if HTTPX_AVAILABLE:
         return True
     try:
-        from src.reymen.cron.hermes_stubs import ensure as _lazy_ensure
+        from reymen.sistem.reymen_stubs import ensure as _lazy_ensure
 
         _lazy_ensure("platform.signal", prompt=False)
     except Exception:
@@ -91,7 +91,7 @@ class SignalAdapter(BasePlatformAdapter):
     Signal platform adapter.
 
     signal-cli REST API (http://signal-cli:8080/v2/send) uzerinden
-    mesaj gonderir. Webhook tabanli degil — push mesajlasmasi icin
+    mesaj gonderir. Webhook tabanli degil â€” push mesajlasmasi icin
     ayri bir websocket veya polling mekanizmasi gerekebilir.
     Bu adapter yalnizca giden mesaj (send) islemlerini kapsar.
     """
@@ -312,7 +312,7 @@ class SignalAdapter(BasePlatformAdapter):
         try:
             client = await self._get_client()
 
-            # Signal duz metin platformudur — markdown temizle
+            # Signal duz metin platformudur â€” markdown temizle
             plain_text = strip_markdown(content)
 
             payload: Dict[str, Any] = {

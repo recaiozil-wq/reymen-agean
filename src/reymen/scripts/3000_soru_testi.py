@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
 3000 soruluk ReYMeN test script'i.
 Her soru ConversationLoop.run_conversation() ile ReYMeN'e sorulur,
@@ -36,7 +36,7 @@ PROJE_KOK = Path(__file__).resolve().parent.parent.parent
 os.chdir(str(PROJE_KOK))
 sys.path.insert(0, str(PROJE_KOK))
 
-# ── SORU LISTESI (3000 soru) ──────────────────────────────────────────
+# â”€â”€ SORU LISTESI (3000 soru) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 SORULAR = [
     # ============ KATEGORI 1: Yapay Zeka / LLM (1-300) ============
     # Guncel (2026) sorular - web'den bulunan konular
@@ -70,7 +70,7 @@ SORULAR = [
     "SGLang nedir ve LLM serving'de ne gibi avantajlar sunar?",
     "OpenAI API ile Anthropic API arasindaki farklar nelerdir?",
     "LLM'lerde rate limiting ve retry stratejileri nasil olmali?",
-    # LLM güvenlik
+    # LLM gÃ¼venlik
     "Prompt injection saldirisi nedir ve nasil onlenir?",
     "Jailbreak teknikleri nelerdir ve bunlara karsi nasil savunulur?",
     "LLM'lerde output guardrails nasil uygulanir?",
@@ -81,7 +81,7 @@ SORULAR = [
     "LLM'lerde membership inference saldirisi nedir?",
     "Adversarial attack nedir ve LLM'lerde nasil calisir?",
     "Red teaming nedir ve AI guvenliginde neden onemlidir?",
-    # LLM değerlendirme
+    # LLM deÄŸerlendirme
     "LLM benchmark'lari (MMLU, HumanEval, GSM8K) neyi olcer?",
     "BLEU ve ROUGE metrikleri arasindaki fark nedir?",
     "Perplexity nedir ve LLM degerlendirmede nasil kullanilir?",
@@ -741,13 +741,13 @@ def sorulari_olustur():
         for s_idx in range(min(3, len(sablonlar))):
             sorular.append(sablonlar[s_idx].format(konu))
 
-    # 6. Web teknolojileri (2'şer soru)
+    # 6. Web teknolojileri (2'ÅŸer soru)
     for konu in WEB_KONULARI:
         sablonlar = SABLONLAR["web_teknoloji"]
         for s_idx in range(min(2, len(sablonlar))):
             sorular.append(sablonlar[s_idx].format(konu))
 
-    # 7. Linux komutlari (2'şer soru)
+    # 7. Linux komutlari (2'ÅŸer soru)
     i = 0
     while i < len(LINUX_KONULARI) - 1:
         komut1 = LINUX_KONULARI[i]
@@ -756,7 +756,7 @@ def sorulari_olustur():
         sorular.append(SABLONLAR["linux_komut"][2].format(komut1, komut2))
         i += 2
 
-    # 8. DevOps (2'şer soru)
+    # 8. DevOps (2'ÅŸer soru)
     for konu in DEVOPS_KONULARI:
         sablonlar = SABLONLAR["devops"]
         for s_idx in range(min(2, len(sablonlar))):
@@ -990,7 +990,7 @@ def sorulari_olustur():
     return sorular[:3000]
 
 
-# ── TEST MOTORU ──────────────────────────────────────────────────────
+# â”€â”€ TEST MOTORU â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 class ReYMeNTestMotoru:
     """3000 soruluk testi calistirir."""
 
@@ -1071,7 +1071,7 @@ class ReYMeNTestMotoru:
 
             # Ekrana da yaz (stdout'a)
             print("\n" + "=" * 60)
-            print(f"📊 3000 SORU TESTI RAPORU")
+            print(f"ğŸ“Š 3000 SORU TESTI RAPORU")
             print("=" * 60)
             print(f"Toplam soru: {self.toplam}")
             print(f"Islenen: {len(self.sonuclar)}")
@@ -1081,7 +1081,7 @@ class ReYMeNTestMotoru:
             print(
                 f"Ortalama: {round(sure / len(self.sonuclar), 2) if self.sonuclar else 0}sn/soru"
             )
-            print(f"\n🔴 Hata Turleri:")
+            print(f"\nğŸ”´ Hata Turleri:")
             for hata, sayi in sorted(hata_turleri.items(), key=lambda x: -x[1])[:10]:
                 print(f"  {hata}: {sayi}")
             print("=" * 60)
@@ -1091,7 +1091,7 @@ class ReYMeNTestMotoru:
 
     def calistir(self):
         """Ana test dongusu."""
-        print(f"\n🚀 ReYMeN 3000 Soru Testi Basliyor...")
+        print(f"\nğŸš€ ReYMeN 3000 Soru Testi Basliyor...")
         print(f"Toplam soru: {self.toplam}")
         print(f"Onceden islenmis: {len(self.sonuclar)}")
         print(f"Kalan: {self.toplam - len(self.sonuclar)}")
@@ -1158,7 +1158,7 @@ class ReYMeNTestMotoru:
                         1 for s in self.sonuclar if s.get("basarili", False)
                     )
                     print(
-                        f"[{idx+1}/{self.toplam}] ✅ {basarili_sayisi}/{idx+1} basarili | "
+                        f"[{idx+1}/{self.toplam}] âœ… {basarili_sayisi}/{idx+1} basarili | "
                         f"{hiz:.0f} soru/dk | kalan: {kalan:.0f}dk"
                     )
 
@@ -1182,11 +1182,11 @@ class ReYMeNTestMotoru:
                     son_3 = self.sonuclar[-3:]
                     if all(not s.get("basarili", False) for s in son_3):
                         log.warning("3 hata ust uste - devam ediliyor")
-                        print(f"⚠️  Soru #{idx+1}: HATA - devam ediliyor...")
+                        print(f"âš ï¸  Soru #{idx+1}: HATA - devam ediliyor...")
 
         # BITIS: raporu kaydet
         self._rapor_kaydet()
-        print(f"\n✅ 3000 soru testi TAMAMLANDI!")
+        print(f"\nâœ… 3000 soru testi TAMAMLANDI!")
         print(f"Rapor: {self.rapor_yolu}")
 
 

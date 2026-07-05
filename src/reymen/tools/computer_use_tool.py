@@ -1,4 +1,4 @@
-"""ReYMeN tools.computer_use_tool shim — Hermes computer use fonksiyonlarını yönlendirir."""
+﻿"""ReYMeN tools.computer_use_tool shim â€” ReYMeN computer use fonksiyonlarÄ±nÄ± yÃ¶nlendirir."""
 
 from __future__ import annotations
 

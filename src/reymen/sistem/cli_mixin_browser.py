@@ -1,4 +1,4 @@
-"""ReYMeNCLI mixin module — Browser management."""
+﻿"""ReYMeNCLI mixin module â€” Browser management."""
 
 import logging
 import os
@@ -27,10 +27,10 @@ logger = logging.getLogger(__name__)
 
 
 class MixinBrowser:
-    """ReYMeNCLI Browser management — connect/disconnect/status live CDP browser."""
+    """ReYMeNCLI Browser management â€” connect/disconnect/status live CDP browser."""
 
     def _handle_browser_command(self, cmd: str):
-        """Handle /browser connect|disconnect|status — manage live Chromium-family CDP connection."""
+        """Handle /browser connect|disconnect|status â€” manage live Chromium-family CDP connection."""
         import platform as _plat
 
         parts = cmd.strip().split(None, 1)
@@ -51,7 +51,7 @@ class MixinBrowser:
             if parsed_cdp.scheme not in {"http", "https", "ws", "wss"}:
                 print()
                 print(
-                    f"   ⚠ Unsupported browser url scheme: {parsed_cdp.scheme or '(missing)'} "
+                    f"   âš  Unsupported browser url scheme: {parsed_cdp.scheme or '(missing)'} "
                     "(expected one of: http, https, ws, wss)"
                 )
                 print()
@@ -62,12 +62,12 @@ class MixinBrowser:
                 )
             except ValueError:
                 print()
-                print(f"   ⚠ Invalid port in browser url: {cdp_url}")
+                print(f"   âš  Invalid port in browser url: {cdp_url}")
                 print()
                 return
             if not parsed_cdp.hostname:
                 print()
-                print(f"   ⚠ Missing host in browser url: {cdp_url}")
+                print(f"   âš  Missing host in browser url: {cdp_url}")
                 print()
                 return
             _host = parsed_cdp.hostname
@@ -96,12 +96,12 @@ class MixinBrowser:
 
             if _already_open:
                 print(
-                    f"   ✓ Chromium-family browser is already listening on port {_port}"
+                    f"   âœ“ Chromium-family browser is already listening on port {_port}"
                 )
             elif cdp_url == _DEFAULT_CDP:
                 # Try to auto-launch a Chromium-family browser with remote debugging
                 print(
-                    "   Chromium-family browser isn't running with remote debugging — attempting to launch..."
+                    "   Chromium-family browser isn't running with remote debugging â€” attempting to launch..."
                 )
                 _launched = self._try_launch_chrome_debug(_port, _plat.system())
                 if _launched:
@@ -113,17 +113,17 @@ class MixinBrowser:
                         time.sleep(0.5)
                     if _already_open:
                         print(
-                            f"   ✓ Chromium-family browser launched and listening on port {_port}"
+                            f"   âœ“ Chromium-family browser launched and listening on port {_port}"
                         )
                     else:
                         print(
-                            f"   ⚠ Browser launched but port {_port} isn't responding yet"
+                            f"   âš  Browser launched but port {_port} isn't responding yet"
                         )
                         print(
-                            "     Try again in a few seconds — the debug instance may still be starting"
+                            "     Try again in a few seconds â€” the debug instance may still be starting"
                         )
                 else:
-                    print("   ⚠ Could not auto-launch a Chromium-family browser")
+                    print("   âš  Could not auto-launch a Chromium-family browser")
                     sys_name = _plat.system()
                     chrome_cmd = manual_chrome_debug_command(_port, sys_name)
                     if chrome_cmd:
@@ -134,12 +134,12 @@ class MixinBrowser:
                             "     No supported Chromium-family browser executable found in this environment"
                         )
             else:
-                print(f"   ⚠ Port {_port} is not reachable at {cdp_url}")
+                print(f"   âš  Port {_port} is not reachable at {cdp_url}")
 
             if not _already_open:
                 print()
                 print(
-                    "Browser not connected — start a Chromium-family browser with remote debugging and retry /browser connect"
+                    "Browser not connected â€” start a Chromium-family browser with remote debugging and retry /browser connect"
                 )
                 print()
                 return
@@ -154,7 +154,7 @@ class MixinBrowser:
             except Exception:
                 logger.warning("[fix_01_sessiz_except] Exception")
             print()
-            print("🌐 Browser connected to live Chromium-family browser via CDP")
+            print("ğŸŒ Browser connected to live Chromium-family browser via CDP")
             print(f"   Endpoint: {cdp_url}")
             print()
 
@@ -187,7 +187,7 @@ class MixinBrowser:
                 except Exception:
                     logger.warning("[fix_01_sessiz_except] Exception")
                 print()
-                print("🌐 Browser disconnected from live Chromium-family browser")
+                print("ğŸŒ Browser disconnected from live Chromium-family browser")
                 print(
                     "   Browser tools reverted to default mode (local headless or cloud provider)"
                 )
@@ -208,7 +208,7 @@ class MixinBrowser:
         elif sub == "status":
             print()
             if current:
-                print("🌐 Browser: connected to live Chromium-family browser via CDP")
+                print("ğŸŒ Browser: connected to live Chromium-family browser via CDP")
                 print(f"   Endpoint: {current}")
 
                 _port = 9222
@@ -223,9 +223,9 @@ class MixinBrowser:
                     s.settimeout(1)
                     s.connect(("127.0.0.1", _port))
                     s.close()
-                    print("   Status: ✓ reachable")
+                    print("   Status: âœ“ reachable")
                 except (OSError, Exception):
-                    print("   Status: ⚠ not reachable (browser may not be running)")
+                    print("   Status: âš  not reachable (browser may not be running)")
             else:
                 try:
                     from tools.browser_tool import _get_cloud_provider
@@ -235,7 +235,7 @@ class MixinBrowser:
                     provider = None
 
                 if provider is not None:
-                    print(f"🌐 Browser: {provider.provider_name()} (cloud)")
+                    print(f"ğŸŒ Browser: {provider.provider_name()} (cloud)")
                 else:
                     # Show engine info for local mode
                     try:
@@ -246,25 +246,25 @@ class MixinBrowser:
                         engine = "auto"
                     if engine == "lightpanda":
                         print(
-                            "🌐 Browser: local Lightpanda (agent-browser --engine lightpanda)"
+                            "ğŸŒ Browser: local Lightpanda (agent-browser --engine lightpanda)"
                         )
                         print(
-                            "   ⚡ Lightpanda: faster navigation, no screenshot support"
+                            "   âš¡ Lightpanda: faster navigation, no screenshot support"
                         )
                         print(
                             "   Automatic Chromium fallback for screenshots and failed commands"
                         )
                     elif engine == "chrome":
                         print(
-                            "🌐 Browser: local headless Chromium (agent-browser --engine chrome)"
+                            "ğŸŒ Browser: local headless Chromium (agent-browser --engine chrome)"
                         )
                     else:
-                        print("🌐 Browser: local headless Chromium (agent-browser)")
+                        print("ğŸŒ Browser: local headless Chromium (agent-browser)")
             print()
             print(
-                "   /browser connect      — connect to your live Chromium-family browser"
+                "   /browser connect      â€” connect to your live Chromium-family browser"
             )
-            print("   /browser disconnect   — revert to default")
+            print("   /browser disconnect   â€” revert to default")
             print()
 
         else:

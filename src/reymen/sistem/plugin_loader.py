@@ -1,28 +1,28 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-plugin_loader.py — ReYMeN Plugin Sistemi (ReYMeN-seviyesi).
+plugin_loader.py â€” ReYMeN Plugin Sistemi (ReYMeN-seviyesi).
 
-İki plugin kategorisi:
-  1. Araç plugin'leri — plugins/<ad>/__init__.py
-       Arayüz: plugin_adi, plugin_aciklamasi, kaydet(motor)
+Ä°ki plugin kategorisi:
+  1. AraÃ§ plugin'leri â€” plugins/<ad>/__init__.py
+       ArayÃ¼z: plugin_adi, plugin_aciklamasi, kaydet(motor)
 
-  2. Hafıza plugin'leri — plugins/memory/<ad>/__init__.py
-       Arayüz: AbstraktHafizaSaglayici alt sinifi + kaydet(ctx)
+  2. HafÄ±za plugin'leri â€” plugins/memory/<ad>/__init__.py
+       ArayÃ¼z: AbstraktHafizaSaglayici alt sinifi + kaydet(ctx)
        ctx: HafizaPluginKayit nesnesi
 
 ReYMeN UYUMLULUK:
   - plugin.yaml okuma ve parse etme
-  - kind: backend  → otomatik yukle
-  - kind: tool     → istege bagli yukle
+  - kind: backend  â†’ otomatik yukle
+  - kind: tool     â†’ istege bagli yukle
   - register(ctx) fonksiyonu olan plugin'leri cagir
   - PluginYoneticisi ile tam uyum
 
 Dizin yapisi:
   plugins/
-    web_scraper/__init__.py     ← arac plugin (kind: tool)
-    kanban/__init__.py          ← arac plugin (kind: tool)
+    web_scraper/__init__.py     â† arac plugin (kind: tool)
+    kanban/__init__.py          â† arac plugin (kind: tool)
     memory/
-      sqlite_fts/__init__.py   ← hafiza plugin (kind: backend)
+      sqlite_fts/__init__.py   â† hafiza plugin (kind: backend)
 
 Kullanim:
   from plugin_loader import PluginYukleyici
@@ -50,7 +50,7 @@ PLUGIN_DIZIN = Path(__file__).parent / "plugins"
 
 
 class PluginYukleyici:
-    """ReYMeN plugin yukleyici — ReYMeN seviyesinde plugin yonetimi.
+    """ReYMeN plugin yukleyici â€” ReYMeN seviyesinde plugin yonetimi.
 
     Ozellikler:
       - plugin.yaml dosyasini okuyup parse eder
@@ -67,7 +67,7 @@ class PluginYukleyici:
         self._hafiza_yoneticisi = None  # PluginManager (hafiza discovery icin)
         self._ctx: Optional[Any] = None  # register(ctx) icin context nesnesi
 
-    # ── Ana yukleme ─────────────────────────────────────────────────────────
+    # â”€â”€ Ana yukleme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def hepsini_yukle(self) -> list[str]:
         """plugins/ altindaki tum kind: backend pluginleri yukle.
@@ -88,7 +88,7 @@ class PluginYukleyici:
             self._yaml_bilgisi[klasor.name] = yaml_veri
             kind = yaml_veri.get("kind", "backend")
 
-            # kind: backend → otomatik yukle
+            # kind: backend â†’ otomatik yukle
             if kind == "backend" and (klasor / "__init__.py").exists():
                 basari = self._yukle(klasor.name)
                 if basari:
@@ -117,7 +117,7 @@ class PluginYukleyici:
                     yuklenenler.append(klasor.name)
         return yuklenenler
 
-    # ── plugin.yaml okuma ───────────────────────────────────────────────────
+    # â”€â”€ plugin.yaml okuma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _yaml_yukle(self, klasor: Path) -> dict | None:
         """Bir plugin klasorundeki plugin.yaml dosyasini oku ve parse et.
@@ -135,7 +135,7 @@ class PluginYukleyici:
                 veri = yaml.safe_load(f)
             return veri if isinstance(veri, dict) else {}
         except ImportError:
-            # yaml kutuphanesi yok — basit satir bazli parse dene
+            # yaml kutuphanesi yok â€” basit satir bazli parse dene
             return self._yaml_basit_parse(yaml_dosya)
         except Exception as exc:
             logger.debug("plugin.yaml parse hatasi [%s]: %s", klasor.name, exc)
@@ -163,7 +163,7 @@ class PluginYukleyici:
         """Bir pluginin plugin.yaml verisini dondur."""
         return self._yaml_bilgisi.get(plugin_adi, {})
 
-    # ── Modul yukleme ──────────────────────────────────────────────────────
+    # â”€â”€ Modul yukleme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _yukle(self, plugin_adi: str) -> bool:
         """Tek bir plugin modulunu yukle."""
@@ -186,7 +186,7 @@ class PluginYukleyici:
             logger.warning("[Plugin] '%s' yuklenemedi: %s", plugin_adi, e)
             return False
 
-    # ── register(ctx) destegi ───────────────────────────────────────────────
+    # â”€â”€ register(ctx) destegi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def ctx_ata(self, ctx: Any) -> None:
         """register(ctx) icin context nesnesini ata.
@@ -211,7 +211,7 @@ class PluginYukleyici:
                 logger.warning("[Plugin] '%s'.register(ctx) hatasi: %s", plugin_adi, e)
         return False
 
-    # ── Motor kayit ─────────────────────────────────────────────────────────
+    # â”€â”€ Motor kayit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def motora_kaydet(self, motor) -> None:
         """Yuklu pluginlerin araclarini motor'a kaydet.
@@ -227,7 +227,7 @@ class PluginYukleyici:
                 except Exception as e:
                     logger.warning("[Plugin] '%s' kayit hatasi: %s", adi, e)
 
-    # ── Plugin bilgisi / listeleme ─────────────────────────────────────────
+    # â”€â”€ Plugin bilgisi / listeleme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def plugin_bilgisi(self, plugin_adi: str) -> dict:
         """Bir pluginin meta bilgisini dondur."""
@@ -284,7 +284,7 @@ class PluginYukleyici:
             del self._yaml_bilgisi[plugin_adi]
         return self._yukle(plugin_adi)
 
-    # ── Yardimcilar ────────────────────────────────────────────────────────
+    # â”€â”€ Yardimcilar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _butun_plugin_klasorleri(self) -> list[Path]:
         """plugins/ altindaki tum __init__.py + plugin.yaml iceren klasorleri bul (recursive).
@@ -307,7 +307,7 @@ class PluginYukleyici:
             klasorler.append(parent)
         return sorted(klasorler, key=lambda p: str(p.relative_to(self.dizin)))
 
-    # ── Hafıza plugin'leri (geriye uyumluluk) ──────────────────────────────
+    # â”€â”€ HafÄ±za plugin'leri (geriye uyumluluk) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def hafiza_pluginlerini_yukle(
         self,

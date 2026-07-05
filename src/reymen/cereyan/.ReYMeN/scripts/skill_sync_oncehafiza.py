@@ -1,16 +1,16 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-skill_sync_oncehafiza.py — Cron job: skills/.md -> OnceHafiza DB sync.
+skill_sync_oncehafiza.py â€” Cron job: skills/.md -> OnceHafiza DB sync.
 
-Her ├ºal─▒┼ƒt─▒r─▒l─▒┼ƒ─▒nda:
-  1. reymen/cereyan/skills/ alt─▒ndaki t├╝m .md dosyalar─▒n─▒ tara
+Her â”œÂºalâ”€â–’â”¼Æ’tâ”€â–’râ”€â–’lâ”€â–’â”¼Æ’â”€â–’nda:
+  1. reymen/cereyan/skills/ altâ”€â–’ndaki tâ”œâ•m .md dosyalarâ”€â–’nâ”€â–’ tara
   2. SHA256 hash hesapla
-  3. skill_hashes tablosuyla kar┼ƒ─▒la┼ƒt─▒r:
+  3. skill_hashes tablosuyla karâ”¼Æ’â”€â–’laâ”¼Æ’tâ”€â–’r:
      - Yeni dosya -> ogrenmeler + skill_hashes INSERT
-     - De─ƒi┼ƒen hash -> ogrenmeler UPDATE + skill_hashes UPDATE
-     - Hash ayn─▒ -> atla
-  4. Rapor: ka├º yeni, ka├º g├╝ncellendi, ka├º atland─▒
+     - Deâ”€Æ’iâ”¼Æ’en hash -> ogrenmeler UPDATE + skill_hashes UPDATE
+     - Hash aynâ”€â–’ -> atla
+  4. Rapor: kaâ”œÂº yeni, kaâ”œÂº gâ”œâ•ncellendi, kaâ”œÂº atlandâ”€â–’
 """
 
 import hashlib
@@ -23,7 +23,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# ── Yollar ────────────────────────────────────────────────────────────────
+# â”€â”€ Yollar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 SCRIPT_DIR = Path(__file__).resolve().parent
 CEREYAN_DIR = SCRIPT_DIR.parent.parent  # reymen/cereyan
 SKILLS_ROOT = CEREYAN_DIR / "skills"
@@ -68,7 +68,7 @@ def kategori_from_path(rel_path: str) -> str:
     parent = str(p.parent)
     if parent == ".":
         return "skills/genel"
-    # Alt klas├Ârleri "skills/" ile baslat ve "/" -> "/" olarak koru
+    # Alt klasâ”œÃ‚rleri "skills/" ile baslat ve "/" -> "/" olarak koru
     return f"skills/{parent}"
 
 
@@ -86,11 +86,11 @@ def main():
         log(f"  HATA: DB dosyasi bulunamadi: {DB_PATH}")
         return 1
 
-    # ── 1. T├╝m .md dosyalar─▒n─▒ tara ─────────────────────────────────────
+    # â”€â”€ 1. Tâ”œâ•m .md dosyalarâ”€â–’nâ”€â–’ tara â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     md_files = sorted(SKILLS_ROOT.rglob("*.md"))
     log(f"  Toplam .md dosyasi bulundu: {len(md_files)}")
 
-    # ── 2. DB'ye ba─ƒlan ──────────────────────────────────────────────────
+    # â”€â”€ 2. DB'ye baâ”€Æ’lan â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     conn = sqlite3.connect(str(DB_PATH), timeout=30)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA journal_mode=WAL")
@@ -107,13 +107,13 @@ def main():
     """)
     conn.commit()
 
-    # ── 3. Mevcut hash'leri yukle ──────────────────────────────────────
+    # â”€â”€ 3. Mevcut hash'leri yukle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     mevcut_hashler = {}
     for row in conn.execute("SELECT dosya_yolu, hash_256 FROM skill_hashes"):
         mevcut_hashler[row["dosya_yolu"]] = row["hash_256"]
     log(f"  Mevcut skill_hashes kaydi: {len(mevcut_hashler)}")
 
-    # ── 4. Her dosyayi isle ─────────────────────────────────────────────
+    # â”€â”€ 4. Her dosyayi isle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     yeni = 0
     guncellenen = 0
     atlanan = 0
@@ -150,7 +150,7 @@ def main():
             atlanan += 1
             continue
 
-        # ── Hedef ve kategori hesapla ─────────────────────────────────
+        # â”€â”€ Hedef ve kategori hesapla â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         hedef = hedef_from_path(rel)
         kategori = kategori_from_path(rel)
         try:
@@ -161,7 +161,7 @@ def main():
             continue
 
         if eski_hash is None:
-            # ── YENI DOSYA -> INSERT into both tables ──────────────
+            # â”€â”€ YENI DOSYA -> INSERT into both tables â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             try:
                 conn.execute(
                     """INSERT INTO ogrenmeler
@@ -222,7 +222,7 @@ def main():
                     log(f"  HATA (kurtarma) [{rel}]: {e2}")
                     hata += 1
         else:
-            # ── VAR OLAN DOSYA -> hash degismis -> guncelle ────────────
+            # â”€â”€ VAR OLAN DOSYA -> hash degismis -> guncelle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             try:
                 existing = conn.execute(
                     "SELECT id FROM ogrenmeler WHERE hedef = ? AND kategori = ?",
@@ -270,7 +270,7 @@ def main():
                 log(f"  HATA (guncelleme) [{rel}]: {e}")
                 hata += 1
 
-    # ── 5. Temizlik: skill_hashes'te olup skills klasorunde olmayan kayitlari sil
+    # â”€â”€ 5. Temizlik: skill_hashes'te olup skills klasorunde olmayan kayitlari sil
     tum_rel_paths = set()
     for fp in md_files:
         try:
@@ -291,7 +291,7 @@ def main():
 
     conn.close()
 
-    # ── 6. Rapor ──────────────────────────────────────────────────────
+    # â”€â”€ 6. Rapor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     log(f"=== SKILL -> OnceHafiza Sync Tamam ===")
     log(f"  YENI eklenen:    {yeni}")
     log(f"  GUNCELLENEN:     {guncellenen}")
@@ -309,7 +309,7 @@ def main():
     karar_yolu = CEREYAN_DIR / ".ReYMeN" / "decisions.md"
     try:
         with open(karar_yolu, "a", encoding="utf-8") as f:
-            f.write(f"## {simdi[:10]} {simdi[11:16]} — Skill -> OnceHafiza Sync\n")
+            f.write(f"## {simdi[:10]} {simdi[11:16]} â€” Skill -> OnceHafiza Sync\n")
             f.write(
                 f"- Yeni: {yeni}, Guncellenen: {guncellenen}, Atanan: {atlanan}, Hata: {hata}\n"
             )

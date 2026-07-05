@@ -1,28 +1,28 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-provider_abstraction.py — ReYMeN Sağlayıcı Soyutlama Katmanı (cereyan).
+provider_abstraction.py â€” ReYMeN SaÄŸlayÄ±cÄ± Soyutlama KatmanÄ± (cereyan).
 
-Kullanıcı config.yaml'da sadece:
+KullanÄ±cÄ± config.yaml'da sadece:
     model:
       provider: deepseek  # deepseek|openai|anthropic|xai|openrouter
       model: deepseek-v4-flash
 
-ile tek satırda model sağlayıcı değiştirebilir.
+ile tek satÄ±rda model saÄŸlayÄ±cÄ± deÄŸiÅŸtirebilir.
 
-Sağlayıcılar:
-    DeepSeek  → api.deepseek.com
-    OpenAI    → api.openai.com
-    Anthropic → api.anthropic.com  (Messages API)
-    xAI       → api.x.ai
-    OpenRouter → openrouter.ai/api
+SaÄŸlayÄ±cÄ±lar:
+    DeepSeek  â†’ api.deepseek.com
+    OpenAI    â†’ api.openai.com
+    Anthropic â†’ api.anthropic.com  (Messages API)
+    xAI       â†’ api.x.ai
+    OpenRouter â†’ openrouter.ai/api
 
-API anahtarı arama sırası (provider_abstraction.py):
+API anahtarÄ± arama sÄ±rasÄ± (provider_abstraction.py):
     1. .env / os.environ
     2. config.yaml providers.<name>.api_key
     3. credential_pool (reymen.sistem.credential_persistence)
-    4. Her profil .env'si (AppData/Local/hermes/profiles/<profil>/.env)
+    4. Her profil .env'si (AppData/Local/reymen/profiles/<profil>/.env)
 
-Tüm dokümantasyon Türkçe'dir.
+TÃ¼m dokÃ¼mantasyon TÃ¼rkÃ§e'dir.
 """
 
 from __future__ import annotations
@@ -39,26 +39,26 @@ import requests
 
 logger = logging.getLogger(__name__)
 
-# ── Sabitler ─────────────────────────────────────────────────────────────────
+# â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _TIMEOUT_SANIYE: int = 300
 _VARSAYILAN_MAX_TOKEN: int = 4096
 _VARSAYILAN_SICAKLIK: float = 0.7
 
 
-# ── Veri Yapıları ────────────────────────────────────────────────────────────
+# â”€â”€ Veri YapÄ±larÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 @dataclass
 class ProviderYanit:
-    """Sağlayıcıdan dönen yanıt.
+    """SaÄŸlayÄ±cÄ±dan dÃ¶nen yanÄ±t.
 
     Attributes:
-        metin:      LLM yanıt metni.
-        provider:   Kullanılan sağlayıcı adı.
-        model:      Kullanılan model adı.
-        sure_sn:    İstek süresi (saniye).
-        basarili:   Başarılı mı?
-        hata:       Hata mesajı (başarısızsa).
+        metin:      LLM yanÄ±t metni.
+        provider:   KullanÄ±lan saÄŸlayÄ±cÄ± adÄ±.
+        model:      KullanÄ±lan model adÄ±.
+        sure_sn:    Ä°stek sÃ¼resi (saniye).
+        basarili:   BaÅŸarÄ±lÄ± mÄ±?
+        hata:       Hata mesajÄ± (baÅŸarÄ±sÄ±zsa).
     """
 
     metin: str = ""
@@ -69,42 +69,42 @@ class ProviderYanit:
     hata: str = ""
 
 
-# ── Hata Sınıfları ───────────────────────────────────────────────────────────
+# â”€â”€ Hata SÄ±nÄ±flarÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class ProviderHatasi(Exception):
-    """Sağlayıcı çağrıları sırasında oluşan genel hata."""
+    """SaÄŸlayÄ±cÄ± Ã§aÄŸrÄ±larÄ± sÄ±rasÄ±nda oluÅŸan genel hata."""
 
     pass
 
 
 class ProviderGecersizKey(ProviderHatasi):
-    """API anahtarı geçersiz (401/403)."""
+    """API anahtarÄ± geÃ§ersiz (401/403)."""
 
     pass
 
 
 class ProviderKrediBitti(ProviderHatasi):
-    """402 Payment Required — kredi bitti."""
+    """402 Payment Required â€” kredi bitti."""
 
     pass
 
 
 class ProviderRateLimit(ProviderHatasi):
-    """429 — hız sınırı aşıldı."""
+    """429 â€” hÄ±z sÄ±nÄ±rÄ± aÅŸÄ±ldÄ±."""
 
     pass
 
 
 class ProviderZamanAsimi(ProviderHatasi):
-    """İstek zaman aşımı."""
+    """Ä°stek zaman aÅŸÄ±mÄ±."""
 
     pass
 
 
-# ── API Anahtarı Bulucu ──────────────────────────────────────────────────────
+# â”€â”€ API AnahtarÄ± Bulucu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-# Provider → env değişken adları (beyin.py ile uyumlu)
+# Provider â†’ env deÄŸiÅŸken adlarÄ± (beyin.py ile uyumlu)
 _PROVIDER_ENV: dict[str, str] = {
     "deepseek": "DEEPSEEK_API_KEY",
     "openai": "OPENAI_API_KEY",
@@ -115,11 +115,11 @@ _PROVIDER_ENV: dict[str, str] = {
 
 
 def _anahtar_bul(provider: str, config: dict[str, Any]) -> str:
-    """API anahtarını sırayla dener: os.environ → config → credential_pool.
+    """API anahtarÄ±nÄ± sÄ±rayla dener: os.environ â†’ config â†’ credential_pool.
 
     Args:
-        provider: Sağlayıcı adı (ör. "deepseek").
-        config:   config.yaml'nin tamamı (veya providers sözlüğü).
+        provider: SaÄŸlayÄ±cÄ± adÄ± (Ã¶r. "deepseek").
+        config:   config.yaml'nin tamamÄ± (veya providers sÃ¶zlÃ¼ÄŸÃ¼).
 
     Returns:
         Bulunan anahtar ya da "".
@@ -161,27 +161,27 @@ def _anahtar_bul(provider: str, config: dict[str, Any]) -> str:
     except Exception:
         logger.warning("[fix_01_sessiz_except] Exception")
 
-    # 4. WCM / profil .env'si — zaten os.environ'a yüklenmiş olmalı
-    # (profil .env'si Hermes tarafından os.environ'a eklenir)
+    # 4. WCM / profil .env'si â€” zaten os.environ'a yÃ¼klenmiÅŸ olmalÄ±
+    # (profil .env'si ReYMeN tarafÄ±ndan os.environ'a eklenir)
 
     return ""
 
 
-# ── Temel Sınıf ──────────────────────────────────────────────────────────────
+# â”€â”€ Temel SÄ±nÄ±f â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class ProviderBase(abc.ABC):
-    """Tüm sağlayıcıların türemesi gereken soyut temel sınıf.
+    """TÃ¼m saÄŸlayÄ±cÄ±larÄ±n tÃ¼remesi gereken soyut temel sÄ±nÄ±f.
 
-    Alt sınıflar tanımlamalı:
-        ad:               Sağlayıcı kısa adı (ör. "deepseek").
-        varsayilan_model: Varsayılan model adı.
-        varsayilan_url:   Varsayılan API base URL.
-        api_key_env:      Ortam değişkeni adı.
+    Alt sÄ±nÄ±flar tanÄ±mlamalÄ±:
+        ad:               SaÄŸlayÄ±cÄ± kÄ±sa adÄ± (Ã¶r. "deepseek").
+        varsayilan_model: VarsayÄ±lan model adÄ±.
+        varsayilan_url:   VarsayÄ±lan API base URL.
+        api_key_env:      Ortam deÄŸiÅŸkeni adÄ±.
 
-    Kullanıma hazır:
-        chat(mesajlar, sistem_prompt) → ProviderYanit
-        chat_stream(...) → Generator[str, None, ProviderYanit]
+    KullanÄ±ma hazÄ±r:
+        chat(mesajlar, sistem_prompt) â†’ ProviderYanit
+        chat_stream(...) â†’ Generator[str, None, ProviderYanit]
     """
 
     ad: str = ""
@@ -197,13 +197,13 @@ class ProviderBase(abc.ABC):
         api_key: Optional[str] = None,
         config: Optional[dict[str, Any]] = None,
     ) -> None:
-        """Sağlayıcı örneğini başlatır.
+        """SaÄŸlayÄ±cÄ± Ã¶rneÄŸini baÅŸlatÄ±r.
 
         Args:
-            model:    Model adı (None = varsayılan).
-            base_url: API base URL (None = varsayılan).
-            api_key:  API anahtarı (None = otomatik bul).
-            config:   config.yaml sözlüğü (anahtar araması için).
+            model:    Model adÄ± (None = varsayÄ±lan).
+            base_url: API base URL (None = varsayÄ±lan).
+            api_key:  API anahtarÄ± (None = otomatik bul).
+            config:   config.yaml sÃ¶zlÃ¼ÄŸÃ¼ (anahtar aramasÄ± iÃ§in).
         """
         self._model = model or self.varsayilan_model
         self._base_url = (base_url or self.varsayilan_url).rstrip("/")
@@ -227,13 +227,13 @@ class ProviderBase(abc.ABC):
         return self._api_key
 
     def hazir_mi(self) -> bool:
-        """API anahtarı mevcut mu?"""
+        """API anahtarÄ± mevcut mu?"""
         if self.api_key_gerekli and not self._api_key:
             logger.debug("[%s] API anahtari eksik (env: %s)", self.ad, self.api_key_env)
             return False
         return True
 
-    # ── Soyut metotlar ──────────────────────────────────────────────────
+    # â”€â”€ Soyut metotlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @abc.abstractmethod
     def _api_istek(
@@ -242,7 +242,7 @@ class ProviderBase(abc.ABC):
         sistem_prompt: str = "",
         **kwargs: Any,
     ) -> ProviderYanit:
-        """Ham API çağrısı — alt sınıflar uygulamalı."""
+        """Ham API Ã§aÄŸrÄ±sÄ± â€” alt sÄ±nÄ±flar uygulamalÄ±."""
         ...
 
     @abc.abstractmethod
@@ -252,17 +252,17 @@ class ProviderBase(abc.ABC):
         sistem_prompt: str = "",
         **kwargs: Any,
     ) -> Generator[str, None, ProviderYanit]:
-        """Streaming API çağrısı — alt sınıflar uygulamalı."""
+        """Streaming API Ã§aÄŸrÄ±sÄ± â€” alt sÄ±nÄ±flar uygulamalÄ±."""
         ...
-        # yield ''  # noqa  — Generator olduğu için dummy yield
+        # yield ''  # noqa  â€” Generator olduÄŸu iÃ§in dummy yield
         if False:
             yield ""
 
-    # ── Hata sınıflandırma ──────────────────────────────────────────────
+    # â”€â”€ Hata sÄ±nÄ±flandÄ±rma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @staticmethod
     def _hatayi_siniflandir(hata: Exception) -> ProviderHatasi:
-        """HTTP hatasını türüne göre sınıflandırır."""
+        """HTTP hatasÄ±nÄ± tÃ¼rÃ¼ne gÃ¶re sÄ±nÄ±flandÄ±rÄ±r."""
         mesaj = str(hata).lower()
         try:
             resp = getattr(hata, "response", None)
@@ -273,9 +273,9 @@ class ProviderBase(abc.ABC):
                 elif kod == 402:
                     return ProviderKrediBitti(f"Kredi bitti (402): {hata}")
                 elif kod == 403:
-                    return ProviderGecersizKey(f"Erişim reddedildi (403): {hata}")
+                    return ProviderGecersizKey(f"EriÅŸim reddedildi (403): {hata}")
                 elif kod == 429:
-                    return ProviderRateLimit(f"Hız sınırı (429): {hata}")
+                    return ProviderRateLimit(f"HÄ±z sÄ±nÄ±rÄ± (429): {hata}")
         except Exception:
             logger.warning("[fix_01_sessiz_except] Exception")
         if "401" in mesaj or "unauthorized" in mesaj:
@@ -290,7 +290,7 @@ class ProviderBase(abc.ABC):
             return ProviderZamanAsimi(str(hata))
         return ProviderHatasi(str(hata))
 
-    # ── Yüksek seviye API ───────────────────────────────────────────────
+    # â”€â”€ YÃ¼ksek seviye API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def chat(
         self,
@@ -298,11 +298,11 @@ class ProviderBase(abc.ABC):
         sistem_prompt: str = "",
         **kwargs: Any,
     ) -> ProviderYanit:
-        """LLM'den yanıt üretir.
+        """LLM'den yanÄ±t Ã¼retir.
 
         Args:
             mesajlar:      [{"role": "user", "content": "..."}, ...]
-            sistem_prompt: Sistem talimatı.
+            sistem_prompt: Sistem talimatÄ±.
             **kwargs:      temperature, max_tokens, model override.
 
         Returns:
@@ -336,7 +336,7 @@ class ProviderBase(abc.ABC):
         sistem_prompt: str = "",
         **kwargs: Any,
     ) -> Generator[str, None, ProviderYanit]:
-        """Streaming LLM yanıtı — token token yield eder."""
+        """Streaming LLM yanÄ±tÄ± â€” token token yield eder."""
         if not self.hazir_mi():
             yield ProviderYanit(
                 metin="",
@@ -359,15 +359,15 @@ class ProviderBase(abc.ABC):
             return yanit
 
 
-# ── OpenAI-uyumlu Sağlayıcı (ortak taban) ────────────────────────────────────
+# â”€â”€ OpenAI-uyumlu SaÄŸlayÄ±cÄ± (ortak taban) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class OpenAIUyumluProvider(ProviderBase):
-    """OpenAI /v1/chat/completions endpoint'ine istek atan ortak sınıf.
+    """OpenAI /v1/chat/completions endpoint'ine istek atan ortak sÄ±nÄ±f.
 
-    deepseek, openai, xai, openrouter gibi tüm OpenAI-uyumlu sağlayıcılar
-    bu sınıfı kullanır — sadece ad, varsayilan_model, varsayilan_url ve
-    api_key_env değerlerini tanımlarlar.
+    deepseek, openai, xai, openrouter gibi tÃ¼m OpenAI-uyumlu saÄŸlayÄ±cÄ±lar
+    bu sÄ±nÄ±fÄ± kullanÄ±r â€” sadece ad, varsayilan_model, varsayilan_url ve
+    api_key_env deÄŸerlerini tanÄ±mlarlar.
     """
 
     api_key_gerekli = True
@@ -459,7 +459,7 @@ class OpenAIUyumluProvider(ProviderBase):
         return son_yanit
 
 
-# ── Sağlayıcı Sınıfları ──────────────────────────────────────────────────────
+# â”€â”€ SaÄŸlayÄ±cÄ± SÄ±nÄ±flarÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class DeepseekProvider(OpenAIUyumluProvider):
@@ -491,7 +491,7 @@ class OpenRouterProvider(OpenAIUyumluProvider):
 
 
 class AnthropicProvider(ProviderBase):
-    """Anthropic Messages API kullanır (OpenAI uyumlu değil)."""
+    """Anthropic Messages API kullanÄ±r (OpenAI uyumlu deÄŸil)."""
 
     ad = "anthropic"
     varsayilan_model = "claude-haiku-4-5-20251001"
@@ -585,7 +585,7 @@ class AnthropicProvider(ProviderBase):
         return son_yanit
 
 
-# ── Sağlayıcı Kaydı (Registry) ───────────────────────────────────────────────
+# â”€â”€ SaÄŸlayÄ±cÄ± KaydÄ± (Registry) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _PROVIDER_SINIFLAR: dict[str, type[ProviderBase]] = {
     "deepseek": DeepseekProvider,
@@ -595,7 +595,7 @@ _PROVIDER_SINIFLAR: dict[str, type[ProviderBase]] = {
     "openrouter": OpenRouterProvider,
 }
 
-# Fallback sırası (birincil başarısız olursa)
+# Fallback sÄ±rasÄ± (birincil baÅŸarÄ±sÄ±z olursa)
 _FALLBACK_SIRASI: list[str] = [
     "deepseek",
     "openai",
@@ -604,7 +604,7 @@ _FALLBACK_SIRASI: list[str] = [
     "anthropic",
 ]
 
-# Varsayılan model adları (config'de model belirtilmemişse kullanılır)
+# VarsayÄ±lan model adlarÄ± (config'de model belirtilmemiÅŸse kullanÄ±lÄ±r)
 _VARSAYILAN_MODELLER: dict[str, str] = {
     "deepseek": "deepseek-chat",
     "openai": "gpt-4o-mini",
@@ -621,21 +621,21 @@ def get_provider(
     base_url: Optional[str] = None,
     config: Optional[dict[str, Any]] = None,
 ) -> Optional[ProviderBase]:
-    """Sağlayıcı örneği döndürür.
+    """SaÄŸlayÄ±cÄ± Ã¶rneÄŸi dÃ¶ndÃ¼rÃ¼r.
 
     Args:
-        name:     Sağlayıcı adı (deepseek|openai|anthropic|xai|openrouter).
-        model:    Model adı (None = varsayılan).
-        api_key:  API anahtarı (None = otomatik bul).
-        base_url: API base URL (None = varsayılan).
-        config:   config.yaml sözlüğü (anahtar araması için).
+        name:     SaÄŸlayÄ±cÄ± adÄ± (deepseek|openai|anthropic|xai|openrouter).
+        model:    Model adÄ± (None = varsayÄ±lan).
+        api_key:  API anahtarÄ± (None = otomatik bul).
+        base_url: API base URL (None = varsayÄ±lan).
+        config:   config.yaml sÃ¶zlÃ¼ÄŸÃ¼ (anahtar aramasÄ± iÃ§in).
 
     Returns:
-        ProviderBase örneği veya None (bilinmeyen sağlayıcı).
+        ProviderBase Ã¶rneÄŸi veya None (bilinmeyen saÄŸlayÄ±cÄ±).
     """
     sinif = _PROVIDER_SINIFLAR.get(name)
     if sinif is None:
-        logger.warning("[get_provider] Bilinmeyen sağlayıcı: %s", name)
+        logger.warning("[get_provider] Bilinmeyen saÄŸlayÄ±cÄ±: %s", name)
         return None
 
     return sinif(
@@ -650,16 +650,16 @@ def get_fallback_zinciri(
     birincil: str,
     config: Optional[dict[str, Any]] = None,
 ) -> list[ProviderBase]:
-    """Fallback zinciri oluşturur: birincil → diğerleri.
+    """Fallback zinciri oluÅŸturur: birincil â†’ diÄŸerleri.
 
-    Sıra: birincil → _FALLBACK_SIRASI'ndaki diğer sağlayıcılar (API anahtarı olanlar).
+    SÄ±ra: birincil â†’ _FALLBACK_SIRASI'ndaki diÄŸer saÄŸlayÄ±cÄ±lar (API anahtarÄ± olanlar).
 
     Args:
-        birincil: Birincil sağlayıcı adı.
-        config:   config.yaml sözlüğü.
+        birincil: Birincil saÄŸlayÄ±cÄ± adÄ±.
+        config:   config.yaml sÃ¶zlÃ¼ÄŸÃ¼.
 
     Returns:
-        Kullanıma hazır ProviderBase örnekleri listesi.
+        KullanÄ±ma hazÄ±r ProviderBase Ã¶rnekleri listesi.
     """
     zincir: list[ProviderBase] = []
     eklenen: set[str] = set()
@@ -670,7 +670,7 @@ def get_fallback_zinciri(
         zincir.append(p)
         eklenen.add(birincil)
 
-    # Fallback sırası
+    # Fallback sÄ±rasÄ±
     for ad in _FALLBACK_SIRASI:
         if ad in eklenen:
             continue
@@ -685,10 +685,10 @@ def get_fallback_zinciri(
 def saglayiciyi_yapilandir(
     config: dict[str, Any],
 ) -> dict[str, Any]:
-    """config.yaml'daki model.provider değerini okuyarak
-    get_provider için hazır config sözlüğü döndürür.
+    """config.yaml'daki model.provider deÄŸerini okuyarak
+    get_provider iÃ§in hazÄ±r config sÃ¶zlÃ¼ÄŸÃ¼ dÃ¶ndÃ¼rÃ¼r.
 
-    config.yaml beklenen yapı:
+    config.yaml beklenen yapÄ±:
         model:
           provider: deepseek  # deepseek|openai|anthropic|xai|openrouter
           model: deepseek-v4-flash
@@ -722,7 +722,7 @@ def saglayiciyi_yapilandir(
     }
 
 
-# ── Hızlı test ──────────────────────────────────────────────────────────────
+# â”€â”€ HÄ±zlÄ± test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
 

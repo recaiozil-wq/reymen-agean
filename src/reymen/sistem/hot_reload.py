@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-hot_reload.py — Motor icin sicak yukleme (hot-reload) modulu.
+hot_reload.py â€” Motor icin sicak yukleme (hot-reload) modulu.
 
 Calisma zamaninda plugin/skill/modul degisikliklerini algilar
 ve motor'a yeniden yukler. importlib.reload + watchdog ile.
@@ -156,7 +156,7 @@ class HotReloader:
         return False
 
 
-# ── Motor Tool'lari ─────────────────────────────────────────────────────────
+# â”€â”€ Motor Tool'lari â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _HOT_RELOADER: Optional[HotReloader] = None
 

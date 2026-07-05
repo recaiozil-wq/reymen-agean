@@ -1,4 +1,4 @@
-"""ReYMeN tools.voice_mode shim — Hermes voice mode fonksiyonlarını yönlendirir."""
+﻿"""ReYMeN tools.voice_mode shim â€” ReYMeN voice mode fonksiyonlarÄ±nÄ± yÃ¶nlendirir."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 def check_voice_requirements() -> Dict[str, Any]:
-    """Hermes check_voice_requirements — ses gereksinimlerini kontrol eder."""
+    """ReYMeN check_voice_requirements â€” ses gereksinimlerini kontrol eder."""
     result = {
         "microphone": False,
         "speaker": False,
@@ -42,10 +42,10 @@ def check_voice_requirements() -> Dict[str, Any]:
 
 
 def detect_audio_environment() -> Dict[str, Any]:
-    """Hermes detect_audio_environment — ses ortamını algılar."""
+    """ReYMeN detect_audio_environment â€” ses ortamÄ±nÄ± algÄ±lar."""
     return check_voice_requirements()
 
 
 def stop_playback(*args, **kwargs) -> None:
-    """Hermes stop_playback — oynatmayı durdurur."""
-    logger.debug("stop_playback — ReYMeN stub")
+    """ReYMeN stop_playback â€” oynatmayÄ± durdurur."""
+    logger.debug("stop_playback â€” ReYMeN stub")

@@ -1,13 +1,13 @@
-"""
-ReYMeN tools.environments.daytona — Daytona cloud sandbox environment.
+﻿"""
+ReYMeN tools.environments.daytona â€” Daytona cloud sandbox environment.
 
 Daytona (https://daytona.io) ile cloud'da izole sandbox ortami olusturur
 ve komut calistirir. Python SDK (pip install daytona) ile calisir.
 
 Yapilandirma (ortam degiskenleri):
-  - DAYTONA_API_KEY — Daytona API anahtari (zorunlu)
-  - DAYTONA_TARGET  — Hedef bolge (opsiyonel, varsayilan: "us")
-  - DAYTONA_TIMEOUT — Komut zamani asimi saniye (opsiyonel, varsayilan: 60)
+  - DAYTONA_API_KEY â€” Daytona API anahtari (zorunlu)
+  - DAYTONA_TARGET  â€” Hedef bolge (opsiyonel, varsayilan: "us")
+  - DAYTONA_TIMEOUT â€” Komut zamani asimi saniye (opsiyonel, varsayilan: 60)
 
 Kullanim:
     env = DaytonaEnvironment()
@@ -119,7 +119,7 @@ class DaytonaEnvironment:
         self._client: Optional[Daytona] = None
         self._sandbox: Any = None  # daytona.Sandbox
 
-    # ── Bagimlilik Kontrolu ──────────────────────────────────────────
+    # â”€â”€ Bagimlilik Kontrolu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @property
     def hazir(self) -> bool:
@@ -131,7 +131,7 @@ class DaytonaEnvironment:
             return False
         return True
 
-    # ── Istemci Yonetimi ─────────────────────────────────────────────
+    # â”€â”€ Istemci Yonetimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _get_client(self) -> Daytona:
         """Daytona istemcisini olusturur (lazy init)."""
@@ -161,7 +161,7 @@ class DaytonaEnvironment:
         finally:
             self._sandbox = None
 
-    # ── Komut Calistirma ─────────────────────────────────────────────
+    # â”€â”€ Komut Calistirma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     async def calistir(
         self,
@@ -267,7 +267,7 @@ class DaytonaEnvironment:
             # Sandbox'i temizle
             await self._delete_sandbox()
 
-    # ── Bilgi Metodlari ──────────────────────────────────────────────
+    # â”€â”€ Bilgi Metodlari â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def __repr__(self) -> str:
         return (

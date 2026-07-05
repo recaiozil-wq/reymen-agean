@@ -1,4 +1,4 @@
-"""ReYMeN tools.xai_http stub — sadece env var ile çalışır."""
+﻿"""ReYMeN tools.xai_http stub â€” sadece env var ile Ã§alÄ±ÅŸÄ±r."""
 
 import json
 import os
@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 def has_xai_credentials() -> bool:
-    """XAI_API_KEY env var'ı kontrol eder."""
+    """XAI_API_KEY env var'Ä± kontrol eder."""
     key = os.getenv("XAI_API_KEY", "").strip()
     if key:
         return True
@@ -34,7 +34,7 @@ def has_xai_credentials() -> bool:
 
 
 def get_env_value(name: str, default=None):
-    """Önce REYMEN_HOME/.env, sonra os.environ."""
+    """Ã–nce REYMEN_HOME/.env, sonra os.environ."""
     reymen_home = Path(os.environ.get("REYMEN_HOME", str(Path.home() / ".reymen")))
     dotenv_path = reymen_home / ".env"
     if dotenv_path.exists():
@@ -59,7 +59,7 @@ def hermes_xai_user_agent() -> str:
 
 
 def resolve_xai_http_credentials(*, force_refresh: bool = False) -> Dict[str, str]:
-    """XAI_API_KEY'den bearer token oluşturur."""
+    """XAI_API_KEY'den bearer token oluÅŸturur."""
     key = get_env_value("XAI_API_KEY", "")
     if key:
         return {"Authorization": f"Bearer {key}"}

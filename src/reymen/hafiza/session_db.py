@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-session_db.py — AdvancedSessionStorage. SQLite WAL + FTS5 ajan günlüğü
+session_db.py â€” AdvancedSessionStorage. SQLite WAL + FTS5 ajan gÃ¼nlÃ¼ÄŸÃ¼
 + ReYMeN Agent seviyesi sessions tablosu (~30 sutun).
 
 Geriye uyumluluk: FTS5 ajan_gunlugu tablosu korunur.
@@ -24,7 +24,7 @@ log = logging.getLogger(__name__)
 
 
 class AdvancedSessionStorage:
-    """SQLite tabanli session ve ajan günlüğü deposu.
+    """SQLite tabanli session ve ajan gÃ¼nlÃ¼ÄŸÃ¼ deposu.
 
     Kullanim:
         storage = AdvancedSessionStorage("merkez_db/session.db")
@@ -39,7 +39,7 @@ class AdvancedSessionStorage:
         self._lock = threading.Lock()
         self._kur()
 
-    # ── Bağlantı ──────────────────────────────────────────────────────
+    # â”€â”€ BaÄŸlantÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _baglan(self) -> sqlite3.Connection:
         conn = sqlite3.connect(self.db_yolu, check_same_thread=False)
@@ -48,7 +48,7 @@ class AdvancedSessionStorage:
         conn.execute("PRAGMA foreign_keys=ON;")
         return conn
 
-    # ── Şema kurulumu ─────────────────────────────────────────────────
+    # â”€â”€ Åema kurulumu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _kur(self):
         with self._lock:
@@ -88,7 +88,7 @@ class AdvancedSessionStorage:
                     )
                 """)
 
-                # İndeksler
+                # Ä°ndeksler
                 conn.execute(
                     "CREATE INDEX IF NOT EXISTS idx_sessions_source "
                     "ON sessions(source)"
@@ -106,7 +106,7 @@ class AdvancedSessionStorage:
                     "ON sessions(title) WHERE title IS NOT NULL"
                 )
 
-                # Mesaj geçmişi tablosu
+                # Mesaj geÃ§miÅŸi tablosu
                 conn.execute("""
                     CREATE TABLE IF NOT EXISTS session_messages (
                         id         INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -118,7 +118,7 @@ class AdvancedSessionStorage:
                     )
                 """)
 
-                # Tool call geçmişi tablosu
+                # Tool call geÃ§miÅŸi tablosu
                 conn.execute("""
                     CREATE TABLE IF NOT EXISTS session_tool_calls (
                         id          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -185,7 +185,7 @@ class AdvancedSessionStorage:
             finally:
                 conn.close()
 
-    # ── Session işlemleri ─────────────────────────────────────────────
+    # â”€â”€ Session iÅŸlemleri â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def session_baslat(
         self,
@@ -284,7 +284,7 @@ class AdvancedSessionStorage:
                     "UPDATE sessions SET message_count = message_count + 1 WHERE id=?",
                     (session_id,),
                 )
-                # FTS content table — rowid eslestirmesi ile
+                # FTS content table â€” rowid eslestirmesi ile
                 try:
                     conn.execute(
                         "INSERT INTO session_messages_fts(rowid, session_id, rol, icerik) "
@@ -365,7 +365,7 @@ class AdvancedSessionStorage:
         cache_write_tokens: int = 0,
         reasoning_tokens: int = 0,
     ):
-        """Token sayaçlarını artır (kümülatif)."""
+        """Token sayaÃ§larÄ±nÄ± artÄ±r (kÃ¼mÃ¼latif)."""
         with self._lock:
             conn = self._baglan()
             try:
@@ -409,7 +409,7 @@ class AdvancedSessionStorage:
         cost_source: str = None,
         pricing_version: str = None,
     ):
-        """Maliyet bilgilerini güncelle."""
+        """Maliyet bilgilerini gÃ¼ncelle."""
         with self._lock:
             conn = self._baglan()
             try:
@@ -443,10 +443,10 @@ class AdvancedSessionStorage:
             finally:
                 conn.close()
 
-    # ── Sorgulama ─────────────────────────────────────────────────────
+    # â”€â”€ Sorgulama â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def session_bul(self, session_id: str) -> dict:
-        """Session'ı id ile bul; bulunamazsa {} döner."""
+        """Session'Ä± id ile bul; bulunamazsa {} dÃ¶ner."""
         with self._lock:
             conn = self._baglan()
             try:
@@ -513,8 +513,8 @@ class AdvancedSessionStorage:
             sorgu:        Aranacak kelime/ifade.
             limit:        Maks sonuc sayisi.
             kismi:        True -> trigram (substring) arama; False -> tam kelime FTS5.
-            baslangic_ts: (opsiyonel) Unix epoch — bu zamandan sonraki mesajlar.
-            bitis_ts:     (opsiyonel) Unix epoch — bu zamandan once'ki mesajlar.
+            baslangic_ts: (opsiyonel) Unix epoch â€” bu zamandan sonraki mesajlar.
+            bitis_ts:     (opsiyonel) Unix epoch â€” bu zamandan once'ki mesajlar.
 
         Returns:
             [{session_id, rol, icerik, created_at}, ...]
@@ -659,7 +659,7 @@ class AdvancedSessionStorage:
             if len(gruplar[sid]) < 3:  # session basina en fazla 3 ornek mesaj
                 icerik = m["icerik"] or ""
                 if len(icerik) > 240:
-                    icerik = icerik[:240] + "…"
+                    icerik = icerik[:240] + "â€¦"
                 gruplar[sid].append(
                     {"rol": m["rol"], "icerik": icerik, "created_at": m["created_at"]}
                 )
@@ -685,7 +685,7 @@ class AdvancedSessionStorage:
         return sonuc
 
     def son_sessionlar(self, source: str = None, limit: int = 10) -> list:
-        """En son sessionları getir; source filtresi opsiyonel."""
+        """En son sessionlarÄ± getir; source filtresi opsiyonel."""
         with self._lock:
             conn = self._baglan()
             try:
@@ -708,7 +708,7 @@ class AdvancedSessionStorage:
                 conn.close()
 
     def istatistik(self) -> dict:
-        """Toplam session, token ve maliyet özetini döndür."""
+        """Toplam session, token ve maliyet Ã¶zetini dÃ¶ndÃ¼r."""
         with self._lock:
             conn = self._baglan()
             try:
@@ -731,7 +731,7 @@ class AdvancedSessionStorage:
             finally:
                 conn.close()
 
-    # ── Disa / Ice aktarma ────────────────────────────────────────────
+    # â”€â”€ Disa / Ice aktarma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def session_export(self, session_id: str, format: str = "json") -> str:
         """Session'i JSON veya Markdown olarak disa aktar.
@@ -747,7 +747,7 @@ class AdvancedSessionStorage:
         try:
             session = self.session_bul(session_id)
             if not session:
-                log.warning("session_export: session bulunamadi — %s", session_id)
+                log.warning("session_export: session bulunamadi â€” %s", session_id)
                 return ""
 
             mesajlar = self._mesajlari_getir(session_id)
@@ -972,13 +972,13 @@ class AdvancedSessionStorage:
             )
             return yeni_id
         except (json.JSONDecodeError, KeyError) as e:
-            log.error("session_import: veri cozulemedi — %s", e)
+            log.error("session_import: veri cozulemedi â€” %s", e)
             return ""
         except Exception as e:
             log.error("session_import hatasi: %s", e)
             return ""
 
-    # ── Temizlik / Budama ──────────────────────────────────────────────
+    # â”€â”€ Temizlik / Budama â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def session_temizle(self, days: int = 90) -> int:
         """Belirtilen gunden eski ve end_reason='completed' olan session'lari siler.
@@ -1061,7 +1061,7 @@ class AdvancedSessionStorage:
             log.error("session_temizle hatasi: %s", e)
             return 0
 
-    # ── Geriye uyumluluk: FTS5 ajan_gunlugu ───────────────────────────
+    # â”€â”€ Geriye uyumluluk: FTS5 ajan_gunlugu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def gunluge_yaz(self, hedef: str, eylem: str, sonuc: str):
         """FTS5 ajan_gunlugu'na yaz (geriye uyumluluk)."""
@@ -1104,7 +1104,7 @@ class AdvancedSessionStorage:
                 conn.close()
 
     def hata_ozeti_cek(self, son_n: int = 50) -> dict:
-        """Son N adımdaki hata örüntülerini analiz et (FAZ 6 uyumlu)."""
+        """Son N adÄ±mdaki hata Ã¶rÃ¼ntÃ¼lerini analiz et (FAZ 6 uyumlu)."""
         with self._lock:
             conn = self._baglan()
             try:
@@ -1158,7 +1158,7 @@ class AdvancedSessionStorage:
         }
 
 
-# Geriye dönük uyumluluk aliası
+# Geriye dÃ¶nÃ¼k uyumluluk aliasÄ±
 SessionDB = AdvancedSessionStorage
 
 
@@ -1190,7 +1190,7 @@ if __name__ == "__main__":
 
     s = AdvancedSessionStorage(db_yolu=yol)
 
-    # Session yaşam döngüsü
+    # Session yaÅŸam dÃ¶ngÃ¼sÃ¼
     sid = s.session_baslat(
         source="cli",
         model="deepseek-chat",
@@ -1201,7 +1201,7 @@ if __name__ == "__main__":
     print(f"session_baslat OK: {sid}")
 
     s.mesaj_ekle(sid, "user", "Merhaba")
-    s.mesaj_ekle(sid, "assistant", "Nasıl yardımcı olabilirim?")
+    s.mesaj_ekle(sid, "assistant", "NasÄ±l yardÄ±mcÄ± olabilirim?")
     print("mesaj_ekle OK")
 
     s.tool_call_kaydet(sid, "dosya_yaz", {"path": "test.txt"}, "OK", 120)

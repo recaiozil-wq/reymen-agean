@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-db_backup.py — ReYMeN Veritabani Yedekleme Sistemi
+db_backup.py â€” ReYMeN Veritabani Yedekleme Sistemi
 
 *** YENI DB KURALI (MADDE 3.7): ***
 Yeni bir .db/.sqlite dosyasi olusturmadan once:
@@ -11,7 +11,7 @@ Yeni bir .db/.sqlite dosyasi olusturmadan once:
 *** IHLAL: Duzelt-sonra-tekrarla pattern'ini tetikler ***
 
 Hedef: OneDrive Belgeler + yerel yedek (hibrit)
-Sıklik: Haftalik tam + gunluk incremental
+SÄ±klik: Haftalik tam + gunluk incremental
 Kapsam: .db, .sqlite3, config.yaml, durum.json, .env.example
 (Hassas .env DAHIL EDILMEZ)
 
@@ -32,7 +32,7 @@ import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
-# ── Bulgu panosu audit (K1-K4) ──────────────────────────────
+# â”€â”€ Bulgu panosu audit (K1-K4) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _FB_IMPORTED = False
 
 
@@ -93,7 +93,7 @@ CONFIG_DOSYALARI = [
     ".gitignore",
 ]
 
-# HASSAS dosyalar — ASLA yedeklenmez
+# HASSAS dosyalar â€” ASLA yedeklenmez
 HASSAS_DOSYALAR = [
     ".env",
     "token.txt",
@@ -201,7 +201,7 @@ def _sqlite_integrity_check(db_yolu: Path) -> tuple[bool, str]:
 
 
 def tam_yedek() -> dict:
-    """Tum DB + config dosyalarinin tam yedeğini al."""
+    """Tum DB + config dosyalarinin tam yedeÄŸini al."""
     yonetim = _yonetim_oku()
     hedef = _yedek_klasoru(tam_mi=True)
     dosyalar = _db_dosyalari()
@@ -258,7 +258,7 @@ def tam_yedek() -> dict:
 
 
 def gunluk_yedek() -> dict:
-    """Sadece degisen dosyalarin yedeğini al (incremental)."""
+    """Sadece degisen dosyalarin yedeÄŸini al (incremental)."""
     yonetim = _yonetim_oku()
     hedef = _yedek_klasoru(tam_mi=False)
     dosyalar = _db_dosyalari()
@@ -347,9 +347,9 @@ def yedek_yasi_kontrol() -> dict:
         "memory_backup_durum": "GUNUNU GECIRMIS" if memory_yasi > 14 else "GUNcel",
         "acil_mi": gun_farki > 7,
         "oneri": (
-            f"⚠️ Son yedek {gun_farki} gun once! Hemen tam yedek al."
+            f"âš ï¸ Son yedek {gun_farki} gun once! Hemen tam yedek al."
             if gun_farki > 7
-            else f"✅ Son yedek {gun_farki} gun once. Durum normal."
+            else f"âœ… Son yedek {gun_farki} gun once. Durum normal."
         ),
     }
 
@@ -512,7 +512,7 @@ def eski_kopyalari_quarantine() -> dict:
 def ilk_tam_yedek_ve_temizlik():
     """MADDE 1.3: Ilk calistirmada mevcut durumu yedekle + eski kopyalari temizle."""
     print("=" * 60)
-    print("REYMEN DB BACKUP — ILK CALISTIRMA")
+    print("REYMEN DB BACKUP â€” ILK CALISTIRMA")
     print("=" * 60)
 
     # 1. Eski kopyalari quarantine'e tasi
@@ -538,11 +538,11 @@ def ilk_tam_yedek_ve_temizlik():
         for d in test["detay"]:
             if d.get("hash_dogrulama") == "HATA" or d.get("hata"):
                 print(
-                    f"  SORUN: {d['dosya']} — {d.get('hata', 'hash dogrulama basarisiz')}"
+                    f"  SORUN: {d['dosya']} â€” {d.get('hata', 'hash dogrulama basarisiz')}"
                 )
 
     print("\n" + "=" * 60)
-    print(f"ILK YEDEK TAMAMLANDI — Hedef: {ONEDRIVE_BELGELER}")
+    print(f"ILK YEDEK TAMAMLANDI â€” Hedef: {ONEDRIVE_BELGELER}")
     print(f"Quarantine: {QUARANTINE}")
     print("=" * 60)
 

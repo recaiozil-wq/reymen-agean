@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-budget_config.py — Butce ayarlari.
+budget_config.py â€” Butce ayarlari.
 
 Provider ve islem tiplerine gore butce yonetimi.
 Her tip icin ayri limit, kullanim ve sifirlama destegi.

@@ -1,31 +1,31 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-anayasa_denetcisi.py — Turkish content moderation / filtering module.
+anayasa_denetcisi.py â€” Turkish content moderation / filtering module.
 
 Exports:
     kural_varmi(text) -> (blocked: bool, reason: str)
     mesaj_guvenli_mi(text) -> bool
-    _KESIN_GEC              — frozenset of safe Turkish words
-    _ENGELLI_DESENLER       — list of compiled regex patterns for blocked content
-    _KIBAR_IFADELER         — compiled regex matching polite Turkish phrases
+    _KESIN_GEC              â€” frozenset of safe Turkish words
+    _ENGELLI_DESENLER       â€” list of compiled regex patterns for blocked content
+    _KIBAR_IFADELER         â€” compiled regex matching polite Turkish phrases
 """
 
 import re
 
 # ---------------------------------------------------------------------------
-# Safe words that are always allowed (kesin geçiş listesi)
+# Safe words that are always allowed (kesin geÃ§iÅŸ listesi)
 # ---------------------------------------------------------------------------
 _KESIN_GEC: frozenset = frozenset(
     {
         "merhaba",
         "selam",
-        "teşekkür",
-        "teşekkürler",
-        "günaydın",
+        "teÅŸekkÃ¼r",
+        "teÅŸekkÃ¼rler",
+        "gÃ¼naydÄ±n",
         "iyi geceler",
-        "lütfen",
+        "lÃ¼tfen",
         "rica",
-        "yardım",
+        "yardÄ±m",
     }
 )
 
@@ -33,18 +33,18 @@ _KESIN_GEC: frozenset = frozenset(
 # Blocked content patterns (engelli desenler)
 # ---------------------------------------------------------------------------
 _ENGELLI_DESENLER: list = [
-    # Turkish swear / profanity words (no trailing \b — catches substrings like siktir)
+    # Turkish swear / profanity words (no trailing \b â€” catches substrings like siktir)
     re.compile(
-        r"(?:\bamına\s*koyayım|"
+        r"(?:\bamÄ±na\s*koyayÄ±m|"
         r"\bamk\b|"
-        r"\bananı\s*sik|"
-        r"\borospu\s*[çc]o[cç]u[ğg]u|"
-        r"\borošpu|"
-        r"\boroşpu|"
+        r"\bananÄ±\s*sik|"
+        r"\borospu\s*[Ã§c]o[cÃ§]u[ÄŸg]u|"
+        r"\boroÅ¡pu|"
+        r"\boroÅŸpu|"
         r"\bsik(?:tir|ik|)\b|"
-        r"\bpiç\b|"
+        r"\bpiÃ§\b|"
         r"\bibne\b|"
-        r"\byavşak\b|"
+        r"\byavÅŸak\b|"
         r"\baptal\s*herif|"
         r"\bmal\s*mal\b)",
         re.IGNORECASE,
@@ -52,17 +52,17 @@ _ENGELLI_DESENLER: list = [
     # Bomb / explosive / malware / harmful instructions
     re.compile(
         r"(?:\bbomba\s*yap|"
-        r"\bpatlayıcı\s*yap|"
+        r"\bpatlayÄ±cÄ±\s*yap|"
         r"\btnt\s*yap|"
         r"\bmolotof|"
         r"\bnapalm\b|"
         r"\bbomb\s*making|"
         r"\bexplosive\s*device|"
-        r"\bzararl[ıi]\s*yazılım|"
-        r"\bnasıl\s*öldür|"
-        r"\bcinayet\s*işle|"
-        r"\badam\s*öldür|"
-        r"\böldürmek\s*için)",
+        r"\bzararl[Ä±i]\s*yazÄ±lÄ±m|"
+        r"\bnasÄ±l\s*Ã¶ldÃ¼r|"
+        r"\bcinayet\s*iÅŸle|"
+        r"\badam\s*Ã¶ldÃ¼r|"
+        r"\bÃ¶ldÃ¼rmek\s*iÃ§in)",
         re.IGNORECASE,
     ),
     # Three or more consecutive URLs (with OR without spaces between them)
@@ -78,11 +78,11 @@ _ENGELLI_DESENLER: list = [
 # ---------------------------------------------------------------------------
 _KIBAR_IFADELER: re.Pattern = re.compile(
     r"\b(?:"
-    r"lütfen|teşekkür\s*ederim|teşekkürler|rica\s*ederim|"
-    r"afferin|sağ\s*ol|sağol|ellerine\s*sağlık|"
-    r"memnun\s*oldum|kusura\s*bakma|özür\s*dilerim|"
-    r"pardon|afedersiniz|yardımcı\s*olabilir|"
-    r"iyi\s*çalışmalar|kolay\s*gelsin|hayırlı\s*işler"
+    r"lÃ¼tfen|teÅŸekkÃ¼r\s*ederim|teÅŸekkÃ¼rler|rica\s*ederim|"
+    r"afferin|saÄŸ\s*ol|saÄŸol|ellerine\s*saÄŸlÄ±k|"
+    r"memnun\s*oldum|kusura\s*bakma|Ã¶zÃ¼r\s*dilerim|"
+    r"pardon|afedersiniz|yardÄ±mcÄ±\s*olabilir|"
+    r"iyi\s*Ã§alÄ±ÅŸmalar|kolay\s*gelsin|hayÄ±rlÄ±\s*iÅŸler"
     r")\b",
     re.IGNORECASE,
 )
@@ -93,7 +93,7 @@ def _desen_tarama(text: str) -> tuple:
     for pat in _ENGELLI_DESENLER:
         m = pat.search(text)
         if m:
-            return (True, f"Uygunsuz içerik tespit edildi: '{m.group()}'")
+            return (True, f"Uygunsuz iÃ§erik tespit edildi: '{m.group()}'")
     return (False, "")
 
 
@@ -110,7 +110,7 @@ def kural_varmi(text) -> tuple:
     if not text_stripped:
         return (False, "")
 
-    # Blocked patterns — checked before all exemptions
+    # Blocked patterns â€” checked before all exemptions
     blocked, reason = _desen_tarama(text_stripped)
     if blocked:
         return (blocked, reason)

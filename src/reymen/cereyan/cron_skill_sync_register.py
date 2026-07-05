@@ -1,6 +1,6 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
-cron_skill_sync_register.py — Skill sync cron job kaydi.
+cron_skill_sync_register.py â€” Skill sync cron job kaydi.
 
 Bu script, cron_skill_sync.py'yi ReYMeN cron sistemine kaydeder:
 - skills_index.db (FTS5) her 6 saatte bir otomatik guncellenir
@@ -50,8 +50,8 @@ def _jobs_yaz(joblar: dict) -> None:
 
 
 def kaydet() -> str:
-    """Skill sync cron job'unu kaydet."""
-    sync_script = str(ROOT / "cron_skill_sync.py")
+    """Skill sync cron job'unu kaydet (kullan: scan_skills_to_hafiza_cron.py)."""
+    sync_script = str(ROOT / "scan_skills_to_hafiza_cron.py")
     komut = f"{sys.executable} {sync_script}"
 
     joblar = _jobs_oku()

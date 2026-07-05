@@ -1,10 +1,10 @@
-"""
+﻿"""
 Cron job scheduler - executes due jobs.
 
 Provides tick() which checks for due jobs and runs them. The gateway
 calls this every 60 seconds from a background thread.
 
-Uses a file-based lock (~/.hermes/cron/.tick.lock) so only one tick
+Uses a file-based lock (~/.reymen/cron/.tick.lock) so only one tick
 runs at a time if multiple processes overlap.
 """
 
@@ -33,8 +33,8 @@ except ImportError:
 from pathlib import Path
 from typing import List, Optional
 
-from src.reymen.cron.hermes_stubs import (
-    get_hermes_home,
+from reymen.sistem.reymen_stubs import (
+    get_reymen_home,
     now as _hermes_now,
     load_config,
 )
@@ -61,14 +61,14 @@ def _summarize_cron_failure_for_delivery(job: dict, error: str | None) -> str:
         elif "quota" in lower:
             reason = "quota limit"
         return (
-            f"⚠️ Cron '{job_name}' failed: provider {reason}. "
+            f"âš ï¸ Cron '{job_name}' failed: provider {reason}. "
             "Fallback chain was exhausted or unavailable. "
             "Full details saved in cron output."
         )
 
     if "readtimeout" in lower or "timed out" in lower or "timeout" in lower:
         return (
-            f"⚠️ Cron '{job_name}' failed: provider timeout. "
+            f"âš ï¸ Cron '{job_name}' failed: provider timeout. "
             "Fallback chain was exhausted or unavailable. "
             "Full details saved in cron output."
         )
@@ -78,7 +78,7 @@ def _summarize_cron_failure_for_delivery(job: dict, error: str | None) -> str:
     # not trip a misleading auth message.
     if re.search(r"authenticat|authoriz", lower) or re.search(r"\b(401|403)\b", text):
         return (
-            f"⚠️ Cron '{job_name}' failed: provider authentication error. "
+            f"âš ï¸ Cron '{job_name}' failed: provider authentication error. "
             "Full details saved in cron output."
         )
 
@@ -93,7 +93,7 @@ def _summarize_cron_failure_for_delivery(job: dict, error: str | None) -> str:
     cleaned = re.sub(r"\s+", " ", cleaned).strip()
     if len(cleaned) > 180:
         cleaned = cleaned[:177].rstrip() + "..."
-    return f"⚠️ Cron '{job_name}' failed: {cleaned}"
+    return f"âš ï¸ Cron '{job_name}' failed: {cleaned}"
 
 
 class CronPromptInjectionBlocked(Exception):
@@ -113,13 +113,13 @@ def _resolve_cron_disabled_toolsets(cfg: dict) -> list[str]:
     """Toolsets a cron-spawned agent must never receive.
 
     Three protected toolsets are always disabled in cron context:
-      - ``cronjob`` — would let a cron-spawned agent schedule more cron jobs
-      - ``messaging`` — interactive, needs a live gateway session
-      - ``clarify`` — interactive, blocks waiting for user input
+      - ``cronjob`` â€” would let a cron-spawned agent schedule more cron jobs
+      - ``messaging`` â€” interactive, needs a live gateway session
+      - ``clarify`` â€” interactive, blocks waiting for user input
 
     User-level ``agent.disabled_toolsets`` from config.yaml is layered on top
     so per-job ``enabled_toolsets`` cannot bypass policy that applies to
-    ordinary agent runs (#25752 — LLM-supplied enabled_toolsets was widening
+    ordinary agent runs (#25752 â€” LLM-supplied enabled_toolsets was widening
     past config.yaml's denylist).
     """
     disabled = ["cronjob", "messaging", "clarify"]
@@ -137,26 +137,30 @@ def _resolve_cron_enabled_toolsets(job: dict, cfg: dict) -> list[str] | None:
 
     Precedence:
     1. Per-job ``enabled_toolsets`` (set via ``cronjob`` tool on create/update).
-       Keeps the agent's job-scoped toolset override intact — #6130.
-    2. Per-platform ``hermes tools`` config for the ``cron`` platform.
+       Keeps the agent's job-scoped toolset override intact â€” #6130.
+    2. Per-platform ``reymen tools`` config for the ``cron`` platform.
        Mirrors gateway behavior (``_get_platform_tools(cfg, platform_key)``)
        so users can gate cron toolsets globally without recreating every job.
-    3. ``None`` on any lookup failure — AIAgent loads the full default set
+    3. ``None`` on any lookup failure â€” AIAgent loads the full default set
        (legacy behavior before this change, preserved as the safety net).
 
     _DEFAULT_OFF_TOOLSETS ({moa, homeassistant, rl}) are removed by
     ``_get_platform_tools`` for unconfigured platforms, so fresh installs
-    get cron WITHOUT ``moa`` by default (issue reported by Norbert —
+    get cron WITHOUT ``moa`` by default (issue reported by Norbert â€”
     surprise $4.63 run).
     """
     per_job = job.get("enabled_toolsets")
     if per_job:
         return per_job
     try:
-        from hermes_cli.tools_config import (
-            _get_platform_tools,
-        )  # lazy: avoid heavy import at cron module load
-
+        try:
+            from reymen.sistem.reymen_stubs import _get_platform_tools as _get_platform_tools_base
+            from reymen.sistem.reymen_stubs import discover_plugins
+            # Wrap to match hermes_cli signature (cfg, platform_key -> ignore)
+            _get_platform_tools = lambda cfg=None, platform=None: _get_platform_tools_base()
+        except ImportError:
+            from reymen.sistem.reymen_stubs import _get_platform_tools
+            from reymen.sistem.reymen_stubs import discover_plugins
         return sorted(_get_platform_tools(cfg or {}, "cron"))
     except Exception as exc:
         logger.warning(
@@ -166,7 +170,7 @@ def _resolve_cron_enabled_toolsets(job: dict, cfg: dict) -> list[str] | None:
         return None
 
 
-# Valid delivery platforms — used to validate user-supplied platform names
+# Valid delivery platforms â€” used to validate user-supplied platform names
 # in cron delivery targets, preventing env var enumeration via crafted names.
 _KNOWN_DELIVERY_PLATFORMS = frozenset(
     {
@@ -214,14 +218,14 @@ _HOME_TARGET_ENV_VARS = {
 }
 
 # Legacy env var names kept for back-compat.  Each entry is the current
-# primary env var → the previous name.  _get_home_target_chat_id falls
+# primary env var â†’ the previous name.  _get_home_target_chat_id falls
 # back to the legacy name if the primary is unset, so users who set the
 # old name before the rename keep working until they migrate.
 _LEGACY_HOME_TARGET_ENV_VARS = {
     "QQBOT_HOME_CHANNEL": "QQ_HOME_CHANNEL",
 }
 
-from src.reymen.cron.jobs import (
+from reymen.cron.jobs import (
     get_due_jobs,
     mark_job_run,
     save_job_output,
@@ -243,8 +247,8 @@ _parallel_pool_max_workers: Optional[int] = None
 _running_job_ids: set = set()
 _running_lock = threading.Lock()
 
-# Sequential (env-mutating) cron jobs — workdir jobs that touch
-# process-global runtime state — must run one at a time, but must NOT block the
+# Sequential (env-mutating) cron jobs â€” workdir jobs that touch
+# process-global runtime state â€” must run one at a time, but must NOT block the
 # ticker thread.  A persistent single-thread executor preserves ordering across
 # ticks while keeping dispatch fire-and-forget, the same as the parallel pool.
 _sequential_pool: Optional[concurrent.futures.ThreadPoolExecutor] = None
@@ -299,18 +303,18 @@ atexit.register(_shutdown_parallel_pool)
 
 
 # Backward-compatible module override used by tests and emergency monkeypatches.
-_hermes_home: Path | None = None
+_reymen_home: Path | None = None
 
 
-def _get_hermes_home() -> Path:
-    """Resolve Hermes home dynamically while preserving test monkeypatch hooks."""
-    return _hermes_home or get_hermes_home()
+def _get_reymen_home() -> Path:
+    """Resolve ReYMeN home dynamically while preserving test monkeypatch hooks."""
+    return _reymen_home or get_reymen_home()
 
 
 def _get_lock_paths() -> tuple[Path, Path]:
     """Resolve cron lock paths at call time so profile/env changes are honored."""
-    hermes_home = _get_hermes_home()
-    lock_dir = hermes_home / "cron"
+    reymen_home = _get_reymen_home()
+    lock_dir = reymen_home / "cron"
     return lock_dir, lock_dir / ".tick.lock"
 
 
@@ -322,7 +326,7 @@ def _resolve_origin(job: dict) -> Optional[dict]:
     crashing with ``AttributeError`` on ``origin.get(...)``. Without this
     guard, a job tagged with e.g. ``"combined-digest-replaces-x-and-y"``
     crashed every fire attempt with
-    ``'str' object has no attribute 'get'`` — ``mark_job_run`` recorded the
+    ``'str' object has no attribute 'get'`` â€” ``mark_job_run`` recorded the
     failure, but the next tick re-loaded the same poisoned origin and
     crashed identically until the field was patched manually (#18722).
     """
@@ -375,7 +379,10 @@ def _plugin_cron_env_var(platform_name: str) -> str:
     support without editing this module.
     """
     try:
-        from hermes_cli.plugins import discover_plugins
+        try:
+            from reymen.sistem.reymen_stubs import discover_plugins
+        except ImportError:
+            from reymen.sistem.reymen_stubs import discover_plugins
 
         discover_plugins()  # idempotent
         from gateway.platform_registry import platform_registry
@@ -434,7 +441,7 @@ def _get_home_target_thread_id(platform_name: str) -> Optional[str]:
     Telegram-only override: ``TELEGRAM_CRON_THREAD_ID`` takes precedence over
     ``TELEGRAM_HOME_CHANNEL_THREAD_ID`` for cron delivery. When topic mode is
     enabled, deliveries that land in the root DM (thread_id unset) end up in
-    the system-only lobby where the user cannot reply — the gateway returns
+    the system-only lobby where the user cannot reply â€” the gateway returns
     the lobby reminder and drops ``reply_to_message_id`` (#24409). Pointing
     cron at a dedicated topic via this env var lets replies work as expected
     without changing the lobby invariant.
@@ -462,7 +469,10 @@ def _iter_home_target_platforms():
     for name in _HOME_TARGET_ENV_VARS:
         yield name
     try:
-        from hermes_cli.plugins import discover_plugins
+        try:
+            from reymen.sistem.reymen_stubs import discover_plugins
+        except ImportError:
+            from reymen.sistem.reymen_stubs import discover_plugins
 
         discover_plugins()  # idempotent
         from gateway.platform_registry import platform_registry
@@ -482,12 +492,12 @@ def cron_delivery_targets() -> list[dict]:
     user pick a cron delivery target. A platform is included when it is a valid
     cron delivery platform AND its gateway is configured (enabled + credentials
     present). Each entry reports whether the platform's home target (the
-    room/channel cron posts to) is set — a platform can be configured for
+    room/channel cron posts to) is set â€” a platform can be configured for
     interactive use but still lack the home target an unattended cron job needs.
 
     Returns a list of dicts: ``{"id", "name", "home_target_set", "home_env_var"}``
     ordered by the gateway's canonical platform order. Callers should always
-    prepend the implicit ``local`` option themselves — it needs no config.
+    prepend the implicit ``local`` option themselves â€” it needs no config.
     """
     targets: list[dict] = []
     try:
@@ -531,7 +541,7 @@ def _resolve_single_delivery_target(job: dict, deliver_value: str) -> Optional[d
                 "chat_id": str(origin["chat_id"]),
                 "thread_id": origin.get("thread_id"),
             }
-        # Origin missing (e.g. job created via API/script) — try each
+        # Origin missing (e.g. job created via API/script) â€” try each
         # platform's home channel as a fallback instead of silently dropping.
         for platform_name in _iter_home_target_platforms():
             chat_id = _get_home_target_chat_id(platform_name)
@@ -613,8 +623,8 @@ def _normalize_deliver_value(deliver) -> str:
 
     The contract is that ``deliver`` is a string (``"local"``, ``"origin"``,
     ``"telegram"``, ``"telegram:-1001:17"``, or comma-separated combinations).
-    Historically some callers — MCP clients passing an array, direct edits of
-    ``jobs.json``, or stale code paths — have stored a list/tuple like
+    Historically some callers â€” MCP clients passing an array, direct edits of
+    ``jobs.json``, or stale code paths â€” have stored a list/tuple like
     ``["telegram"]``.  ``str(["telegram"])`` would serialize to the literal
     string ``"['telegram']"``, which is not a known platform and fails
     resolution silently.  Flatten lists/tuples into a comma-separated string
@@ -628,7 +638,7 @@ def _normalize_deliver_value(deliver) -> str:
     return str(deliver)
 
 
-# Routing intent tokens — resolved at fire time, not create time, so a
+# Routing intent tokens â€” resolved at fire time, not create time, so a
 # job created before Telegram was wired up will pick up Telegram once it
 # comes online.  ``all`` expands into the set of connected platforms
 # (those with a configured home chat_id) in _expand_routing_tokens.
@@ -696,7 +706,7 @@ def _resolve_delivery_target(job: dict) -> Optional[dict]:
     return targets[0] if targets else None
 
 
-# Media extension sets — audio routing is centralized in gateway.platforms.base
+# Media extension sets â€” audio routing is centralized in gateway.platforms.base
 # via should_send_media_as_audio() so Telegram-specific rules stay in one place.
 _VIDEO_EXTS = frozenset({".mp4", ".mov", ".avi", ".mkv", ".webm", ".3gp"})
 _IMAGE_EXTS = frozenset({".jpg", ".jpeg", ".png", ".webp", ".gif"})
@@ -714,7 +724,7 @@ def _send_media_via_adapter(
     """Send extracted MEDIA files as native platform attachments via a live adapter.
 
     Routes each file to the appropriate adapter method (send_voice, send_image_file,
-    send_video, send_document) based on file extension — mirroring the routing logic
+    send_video, send_document) based on file extension â€” mirroring the routing logic
     in ``BasePlatformAdapter._process_message_background``.
     """
     from pathlib import Path
@@ -782,7 +792,7 @@ def _deliver_result(job: dict, content: str, adapters=None, loop=None) -> Option
     Deliver job output to the configured target(s) (origin chat, specific platform, etc.).
 
     When ``adapters`` and ``loop`` are provided (gateway is running), tries to
-    use the live adapter first — this supports E2EE rooms (e.g. Matrix) where
+    use the live adapter first â€” this supports E2EE rooms (e.g. Matrix) where
     the standalone HTTP path cannot encrypt.  Falls back to standalone send if
     the adapter path fails or is unavailable.
 
@@ -796,7 +806,7 @@ def _deliver_result(job: dict, content: str, adapters=None, loop=None) -> Option
             )
             logger.warning("Job '%s': %s", job["id"], msg)
             return msg
-        return None  # local-only jobs don't deliver — not a failure
+        return None  # local-only jobs don't deliver â€” not a failure
 
     from tools.send_message_tool import _send_to_platform
     from gateway.config import load_gateway_config, Platform
@@ -885,7 +895,7 @@ def _deliver_result(job: dict, content: str, adapters=None, loop=None) -> Option
             delivery_errors.append(msg)
             continue
 
-        # Prefer the live adapter when the gateway is running — this supports E2EE
+        # Prefer the live adapter when the gateway is running â€” this supports E2EE
         # rooms (e.g. Matrix) where the standalone HTTP path cannot encrypt.
         runtime_adapter = (adapters or {}).get(platform)
         delivered = False
@@ -896,7 +906,7 @@ def _deliver_result(job: dict, content: str, adapters=None, loop=None) -> Option
         ):
             send_metadata = {"thread_id": thread_id} if thread_id else None
             try:
-                # Send cleaned text (MEDIA tags stripped) — not the raw content
+                # Send cleaned text (MEDIA tags stripped) â€” not the raw content
                 text_to_send = cleaned_delivery_content.strip()
                 adapter_ok = True
                 if text_to_send:
@@ -986,7 +996,7 @@ def _deliver_result(job: dict, content: str, adapters=None, loop=None) -> Option
                 result = asyncio.run(coro)
             except RuntimeError:
                 # asyncio.run() checks for a running loop before awaiting the coroutine;
-                # when it raises, the original coro was never started — close it to
+                # when it raises, the original coro was never started â€” close it to
                 # prevent "coroutine was never awaited" RuntimeWarning, then retry in a
                 # fresh thread that has no running loop.
                 coro.close()
@@ -1042,7 +1052,7 @@ def _get_script_timeout() -> int:
                 _SCRIPT_TIMEOUT,
             )
 
-    env_value = os.getenv("HERMES_CRON_SCRIPT_TIMEOUT", "").strip()
+    env_value = os.getenv("REYMEN_CRON_SCRIPT_TIMEOUT", os.getenv("HERMES_CRON_SCRIPT_TIMEOUT", "")).strip()
     if env_value:
         try:
             timeout = int(float(env_value))
@@ -1050,7 +1060,7 @@ def _get_script_timeout() -> int:
                 return timeout
         except Exception:
             logger.warning(
-                "Invalid HERMES_CRON_SCRIPT_TIMEOUT=%r; using config/default", env_value
+                "Invalid REYMEN_CRON_SCRIPT_TIMEOUT=%r; using config/default", env_value
             )
 
     try:
@@ -1070,15 +1080,15 @@ def _get_script_timeout() -> int:
 def _run_job_script(script_path: str) -> tuple[bool, str]:
     """Execute a cron job's data-collection script and capture its output.
 
-    Scripts must reside within HERMES_HOME/scripts/.  Both relative and
+    Scripts must reside within REYMEN_HOME/scripts/.  Both relative and
     absolute paths are resolved and validated against this directory to
     prevent arbitrary script execution via path traversal or absolute
     path injection.
 
     Supported interpreters (chosen by file extension):
 
-    * ``.sh`` / ``.bash`` — run with ``/bin/bash``
-    * anything else — run with the current Python interpreter
+    * ``.sh`` / ``.bash`` â€” run with ``/bin/bash``
+    * anything else â€” run with the current Python interpreter
       (``sys.executable``), preserving the original behaviour for
       Python-based pre-check and data-collection scripts.
 
@@ -1087,14 +1097,14 @@ def _run_job_script(script_path: str) -> tuple[bool, str]:
 
     Args:
         script_path: Path to the script.  Relative paths are resolved
-            against HERMES_HOME/scripts/.  Absolute and ~-prefixed paths
+            against REYMEN_HOME/scripts/.  Absolute and ~-prefixed paths
             are also validated to ensure they stay within the scripts dir.
 
     Returns:
-        (success, output) — on failure *output* contains the error message so the
+        (success, output) â€” on failure *output* contains the error message so the
         LLM can report the problem to the user.
     """
-    scripts_dir = _get_hermes_home() / "scripts"
+    scripts_dir = _get_reymen_home() / "scripts"
     scripts_dir.mkdir(parents=True, exist_ok=True)
     scripts_dir_resolved = scripts_dir.resolve()
 
@@ -1105,7 +1115,7 @@ def _run_job_script(script_path: str) -> tuple[bool, str]:
         path = (scripts_dir / raw).resolve()
 
     # Guard against path traversal, absolute path injection, and symlink
-    # escape — scripts MUST reside within HERMES_HOME/scripts/.
+    # escape â€” scripts MUST reside within REYMEN_HOME/scripts/.
     try:
         path.relative_to(scripts_dir_resolved)
     except ValueError:
@@ -1129,7 +1139,7 @@ def _run_job_script(script_path: str) -> tuple[bool, str]:
     if suffix in {".sh", ".bash"}:
         # Resolve bash dynamically so Windows (Git Bash) and Linux/macOS
         # all work.  On native Windows without Git for Windows installed
-        # shutil.which returns None — fall back to a clear error rather
+        # shutil.which returns None â€” fall back to a clear error rather
         # than a FileNotFoundError with a confusing "[WinError 2]"
         # traceback.
         _bash = shutil.which("bash") or (
@@ -1191,7 +1201,7 @@ def _parse_wake_gate(script_output: str) -> bool:
     as a wake gate.
 
     The convention (ported from nanoclaw #1232): if the last stdout line is
-    JSON like ``{"wakeAgent": false}``, the agent is skipped entirely — no
+    JSON like ``{"wakeAgent": false}``, the agent is skipped entirely â€” no
     LLM run, no delivery. Any other output (non-JSON, missing flag, gate
     absent, or ``wakeAgent: true``) means wake the agent normally.
 
@@ -1230,7 +1240,7 @@ def _build_job_prompt(job: dict, prerun_script: Optional[tuple] = None) -> str:
     # has been injected into the prompt. Data content legitimately quotes
     # command-shape strings (a triage feed ingesting a bug report that
     # pastes `rm -rf /`), so it must not be scanned with the strict
-    # user-prompt pattern set — see _scan_assembled_cron_prompt.
+    # user-prompt pattern set â€” see _scan_assembled_cron_prompt.
     has_injected_data = False
 
     # Run data-collection script if configured, inject output as context.
@@ -1251,7 +1261,7 @@ def _build_job_prompt(job: dict, prerun_script: Optional[tuple] = None) -> str:
                 )
                 has_injected_data = True
             else:
-                # Script produced no output — nothing to report, skip AI call.
+                # Script produced no output â€” nothing to report, skip AI call.
                 return None
         else:
             prompt = (
@@ -1270,7 +1280,7 @@ def _build_job_prompt(job: dict, prerun_script: Optional[tuple] = None) -> str:
         if isinstance(context_from, str):
             context_from = [context_from]
         for source_job_id in context_from:
-            # Guard against path traversal — valid job IDs are 12-char hex strings
+            # Guard against path traversal â€” valid job IDs are 12-char hex strings
             if not source_job_id or not all(
                 c in "0123456789abcdef" for c in source_job_id
             ):
@@ -1285,14 +1295,14 @@ def _build_job_prompt(job: dict, prerun_script: Optional[tuple] = None) -> str:
             try:
                 job_output_dir = OUTPUT_DIR / source_job_id
                 if not job_output_dir.exists():
-                    continue  # silent skip — no output yet
+                    continue  # silent skip â€” no output yet
                 output_files = sorted(
                     job_output_dir.glob("*.md"),
                     key=lambda f: f.stat().st_mtime,
                     reverse=True,
                 )
                 if not output_files:
-                    continue  # silent skip — no output yet
+                    continue  # silent skip â€” no output yet
                 latest_output = output_files[0].read_text(encoding="utf-8").strip()
                 # Truncate to 8K characters to avoid prompt bloat
                 _MAX_CONTEXT_CHARS = 8000
@@ -1311,26 +1321,26 @@ def _build_job_prompt(job: dict, prerun_script: Optional[tuple] = None) -> str:
                     )
                     has_injected_data = True
                 else:
-                    continue  # silent skip — empty output
+                    continue  # silent skip â€” empty output
             except (OSError, PermissionError) as e:
                 logger.warning(
                     "context_from: failed to read output for job %r: %s",
                     source_job_id,
                     e,
                 )
-                # silent skip — do not pollute the prompt with error messages
+                # silent skip â€” do not pollute the prompt with error messages
 
     # Always prepend cron execution guidance so the agent knows how
     # delivery works and can suppress delivery when appropriate.
     cron_hint = (
         "[IMPORTANT: You are running as a scheduled cron job. "
         "DELIVERY: Your final response will be automatically delivered "
-        "to the user — do NOT use send_message or try to deliver "
+        "to the user â€” do NOT use send_message or try to deliver "
         "the output yourself. Just produce your report/output as your "
         "final response and the system handles the rest. "
         "SILENT: If there is genuinely nothing new to report, respond "
         'with exactly "[SILENT]" (nothing else) to suppress delivery. '
-        "Never combine [SILENT] with content — either report your "
+        "Never combine [SILENT] with content â€” either report your "
         "findings normally, or say [SILENT] and nothing more.]\n\n"
     )
     prompt = cron_hint + prompt
@@ -1400,7 +1410,7 @@ def _build_job_prompt(job: dict, prerun_script: Optional[tuple] = None) -> str:
         if not loaded.get("success"):
             error = loaded.get("error") or f"Failed to load skill '{skill_name}'"
             logger.warning(
-                "Cron job '%s': skill not found, skipping — %s",
+                "Cron job '%s': skill not found, skipping â€” %s",
                 job.get("name", job.get("id")),
                 error,
             )
@@ -1433,7 +1443,7 @@ def _build_job_prompt(job: dict, prerun_script: Optional[tuple] = None) -> str:
             f"[IMPORTANT: The following skill(s) were listed for this job but could not be found "
             f"and were skipped: {', '.join(skipped)}. "
             f"Start your response with a brief notice so the user is aware, e.g.: "
-            f"'⚠️ Skill(s) not found and skipped: {', '.join(skipped)}']"
+            f"'âš ï¸ Skill(s) not found and skipped: {', '.join(skipped)}']"
         )
         parts.insert(0, notice)
 
@@ -1472,16 +1482,16 @@ def _scan_assembled_cron_prompt(
       hint (no skills, no injected data), the STRICT ``_scan_cron_prompt``
       patterns apply: a bare ``rm -rf /`` in a small directive prompt is a
       smoking gun, not prose.
-    - When the assembled prompt includes runtime-loaded content — skill
+    - When the assembled prompt includes runtime-loaded content â€” skill
       markdown (``has_skills=True``) or DATA injected from a job script's
-      stdout / an upstream job's output (``has_injected_data=True``) — the
+      stdout / an upstream job's output (``has_injected_data=True``) â€” the
       LOOSER ``_scan_cron_skill_assembled`` pattern set is used: only
       unambiguous prompt-injection directives block; command-shape
       patterns are dropped and invisible unicode is sanitized (stripped +
       logged) rather than blocked, to avoid false-positives that
       permanently kill a job. Skill bodies are vetted at install time by
       ``skills_guard.py``; script output is produced by operator-authored
-      code, the same trust class — and data feeds (e.g. a triage bot
+      code, the same trust class â€” and data feeds (e.g. a triage bot
       ingesting bug reports) legitimately quote dangerous commands.
 
     When the looser tier is selected because of injected data only,
@@ -1509,7 +1519,7 @@ def _scan_assembled_cron_prompt(
     if scan_error:
         job_label = job.get("name") or job.get("id") or "<unknown>"
         logger.warning(
-            "Cron job '%s': assembled prompt blocked by injection scanner — %s",
+            "Cron job '%s': assembled prompt blocked by injection scanner â€” %s",
             job_label,
             scan_error,
         )
@@ -1528,7 +1538,7 @@ def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
     job_name = str(job.get("name") or job.get("prompt") or job_id or "cron job")
 
     # ---------------------------------------------------------------
-    # no_agent short-circuit — the script IS the job, no LLM involvement.
+    # no_agent short-circuit â€” the script IS the job, no LLM involvement.
     # ---------------------------------------------------------------
     # This mirrors the classic "run a bash script on a timer, send its
     # stdout to telegram" watchdog pattern. The agent path is skipped
@@ -1539,10 +1549,10 @@ def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
     # to use. Keep this block self-contained.
     #
     # Semantics:
-    #   - script stdout (trimmed) → delivered verbatim as the final message
-    #   - empty stdout            → silent run (no delivery, success=True)
-    #   - non-zero exit / timeout → delivered as an error alert, success=False
-    #   - wakeAgent=false gate    → treated like empty stdout (silent), since
+    #   - script stdout (trimmed) â†’ delivered verbatim as the final message
+    #   - empty stdout            â†’ silent run (no delivery, success=True)
+    #   - non-zero exit / timeout â†’ delivered as an error alert, success=False
+    #   - wakeAgent=false gate    â†’ treated like empty stdout (silent), since
     #                               the whole point of no_agent is that there
     #                               is no agent to wake
     if job.get("no_agent"):
@@ -1552,7 +1562,7 @@ def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
             logger.error("Job '%s': %s", job_id, err)
             return False, "", "", err
 
-        # Apply workdir if configured — lets scripts use predictable relative
+        # Apply workdir if configured â€” lets scripts use predictable relative
         # paths. For no_agent jobs this is just the subprocess cwd (not an
         # agent TERMINAL_CWD bridge).
         _job_workdir = (job.get("workdir") or "").strip() or None
@@ -1580,10 +1590,10 @@ def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
 
         if not ok:
             # Script crashed / timed out / exited non-zero.  Deliver the
-            # error so the user knows the watchdog itself broke — silent
+            # error so the user knows the watchdog itself broke â€” silent
             # failure for an alerting job is the worst-case outcome.
             alert = (
-                f"⚠ Cron watchdog '{job_name}' script failed\n\n"
+                f"âš  Cron watchdog '{job_name}' script failed\n\n"
                 f"{output}\n\n"
                 f"Time: {now_iso}"
             )
@@ -1597,11 +1607,11 @@ def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
             )
             return False, doc, alert, output
 
-        # Honour the wakeAgent gate as a silent signal — `wakeAgent: false`
+        # Honour the wakeAgent gate as a silent signal â€” `wakeAgent: false`
         # means "nothing to report this tick", same as empty stdout.
         if not _parse_wake_gate(output):
             logger.info(
-                "Job '%s' (no_agent): wakeAgent=false gate — silent run", job_id
+                "Job '%s' (no_agent): wakeAgent=false gate â€” silent run", job_id
             )
             silent_doc = (
                 f"# Cron Job: {job_name}\n\n"
@@ -1613,7 +1623,7 @@ def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
             return True, silent_doc, SILENT_MARKER, None
 
         if not output.strip():
-            logger.info("Job '%s' (no_agent): empty stdout — silent run", job_id)
+            logger.info("Job '%s' (no_agent): empty stdout â€” silent run", job_id)
             silent_doc = (
                 f"# Cron Job: {job_name}\n\n"
                 f"**Job ID:** {job_id}\n"
@@ -1634,7 +1644,7 @@ def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
         return True, doc, output, None
 
     # ---------------------------------------------------------------
-    # Default (LLM) path — import and construct the agent machinery now
+    # Default (LLM) path â€” import and construct the agent machinery now
     # that we know we actually need it. Doing these imports here instead of
     # at module top keeps no_agent ticks from paying for AIAgent / SessionDB
     # construction costs.
@@ -1645,7 +1655,7 @@ def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
     # and discoverable via session_search (same pattern as gateway/run.py).
     _session_db = None
     try:
-        from hermes_state import SessionDB
+        from reymen.sistem.reymen_stubs import SessionDB
 
         _session_db = SessionDB()
     except Exception as e:
@@ -1672,7 +1682,7 @@ def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
                 f"# Cron Job: {job_name}\n\n"
                 f"**Job ID:** {job_id}\n"
                 f"**Run Time:** {_hermes_now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
-                "Script gate returned `wakeAgent=false` — agent skipped.\n"
+                "Script gate returned `wakeAgent=false` â€” agent skipped.\n"
             )
             return True, silent_doc, SILENT_MARKER, None
 
@@ -1684,7 +1694,7 @@ def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
         # a clear failure to the operator so they see WHY the scheduled job
         # didn't run and can audit the offending skill.
         logger.warning(
-            "Job '%s' (ID: %s): blocked by prompt-injection scanner — %s",
+            "Job '%s' (ID: %s): blocked by prompt-injection scanner â€” %s",
             job_name,
             job_id,
             block_exc,
@@ -1716,45 +1726,56 @@ def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
 
     # Mark this as a cron session so the approval system can apply cron_mode.
     # This env var is process-wide and persists for the lifetime of the
-    # scheduler process — every job this process runs is a cron job.
-    os.environ["HERMES_CRON_SESSION"] = "1"
+    # scheduler process â€” every job this process runs is a cron job.
+    os.environ["REYMEN_CRON_SESSION"] = "1"
+    os.environ.setdefault("REYMEN_CRON_SESSION", os.environ.get("HERMES_CRON_SESSION", "1"))
 
     # Use ContextVars for per-job session/delivery state so parallel jobs
     # don't clobber each other's targets (os.environ is process-global).
     from gateway.session_context import set_session_vars, clear_session_vars, _VAR_MAP
 
     # Cron execution is an internal scheduler context, not a live inbound
-    # gateway message. Do not seed HERMES_SESSION_* contextvars from the
+    # gateway message. Do not seed REYMEN_SESSION_* contextvars from the
     # stored ``origin`` (which is delivery routing metadata, not a sender
     # identity). Several tool consumers branch on these vars during job
     # execution and would otherwise behave as if a real user from the
     # origin chat was driving the agent:
     #   - tools/terminal_tool.py: background-process notification routing
-    #     (notify_on_complete / watch_patterns) reads HERMES_SESSION_PLATFORM
-    #     and HERMES_SESSION_CHAT_ID to populate watcher_platform / chat_id,
+    #     (notify_on_complete / watch_patterns) reads REYMEN_SESSION_PLATFORM
+    #     and REYMEN_SESSION_CHAT_ID to populate watcher_platform / chat_id,
     #     which would route completion notifications to the origin chat
-    #     instead of via HERMES_CRON_AUTO_DELIVER_* below.
+    #     instead of via REYMEN_CRON_AUTO_DELIVER_* below.
     #   - tools/tts_tool.py: picks Opus vs MP3 based on
-    #     HERMES_SESSION_PLATFORM == "telegram".
+    #     REYMEN_SESSION_PLATFORM == "telegram".
     #   - tools/skills_tool.py + agent/prompt_builder.py: per-platform
     #     skill-disable lists and the system-prompt cache key both consume
-    #     HERMES_SESSION_PLATFORM.
+    #     REYMEN_SESSION_PLATFORM.
     #   - tools/send_message_tool.py: mirror source labelling and the
-    #     send_message gate read HERMES_SESSION_PLATFORM.
+    #     send_message gate read REYMEN_SESSION_PLATFORM.
     # Cron output delivery itself reads job["origin"] directly via
-    # _resolve_origin(job) and the HERMES_CRON_AUTO_DELIVER_* vars set
-    # below, so clearing HERMES_SESSION_* here does not affect delivery.
+    # _resolve_origin(job) and the REYMEN_CRON_AUTO_DELIVER_* vars set
+    # below, so clearing REYMEN_SESSION_* here does not affect delivery.
     _ctx_tokens = set_session_vars(
         platform="",
         chat_id="",
         chat_name="",
     )
     _cron_delivery_vars = (
+        "REYMEN_CRON_AUTO_DELIVER_PLATFORM",
+        "REYMEN_CRON_AUTO_DELIVER_CHAT_ID",
+        "REYMEN_CRON_AUTO_DELIVER_THREAD_ID",
+    )
+    # Backward compat: also set legacy HERMES_* names for downstream tools
+    _hermes_legacy_delivery_vars = (
         "HERMES_CRON_AUTO_DELIVER_PLATFORM",
         "HERMES_CRON_AUTO_DELIVER_CHAT_ID",
         "HERMES_CRON_AUTO_DELIVER_THREAD_ID",
     )
     for _var_name in _cron_delivery_vars:
+        _VAR_MAP[_var_name].set("")
+    for _var_name in _hermes_legacy_delivery_vars:
+        if _var_name not in _VAR_MAP:
+            continue
         _VAR_MAP[_var_name].set("")
 
     # Per-job working directory.  When set (and validated at create/update
@@ -1765,14 +1786,14 @@ def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
     #
     # tick() serializes workdir-jobs outside the parallel pool, so mutating
     # os.environ["TERMINAL_CWD"] here is safe for those jobs.  For workdir-less
-    # jobs we leave TERMINAL_CWD untouched — preserves the original behaviour
+    # jobs we leave TERMINAL_CWD untouched â€” preserves the original behaviour
     # (skip_context_files=True, tools use whatever cwd the scheduler has).
     _job_workdir = (job.get("workdir") or "").strip() or None
     if _job_workdir and not Path(_job_workdir).is_dir():
         # Directory was removed between create-time validation and now.  Log
         # and drop back to old behaviour rather than crashing the job.
         logger.warning(
-            "Job '%s': configured workdir %r no longer exists — running without it",
+            "Job '%s': configured workdir %r no longer exists â€” running without it",
             job_id,
             _job_workdir,
         )
@@ -1789,15 +1810,34 @@ def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
 
         try:
             load_dotenv(
-                str(_get_hermes_home() / ".env"), override=True, encoding="utf-8"
+                str(_get_reymen_home() / ".env"), override=True, encoding="utf-8"
             )
         except UnicodeDecodeError:
             load_dotenv(
-                str(_get_hermes_home() / ".env"), override=True, encoding="latin-1"
+                str(_get_reymen_home() / ".env"), override=True, encoding="latin-1"
             )
+        # Backward compat: also load from legacy ~/.reymen/.env if present
+        try:
+            _legacy_env = Path.home() / ".reymen" / ".env"
+            if _legacy_env.exists():
+                load_dotenv(str(_legacy_env), override=False, encoding="utf-8")
+        except Exception:
+            pass
 
         delivery_target = _resolve_delivery_target(job)
         if delivery_target:
+            _VAR_MAP["REYMEN_CRON_AUTO_DELIVER_PLATFORM"].set(
+                delivery_target["platform"]
+            )
+            _VAR_MAP["REYMEN_CRON_AUTO_DELIVER_CHAT_ID"].set(
+                str(delivery_target["chat_id"])
+            )
+            _VAR_MAP["REYMEN_CRON_AUTO_DELIVER_THREAD_ID"].set(
+                ""
+                if delivery_target.get("thread_id") is None
+                else str(delivery_target["thread_id"])
+            )
+            # Backward compat: set legacy HERMES_* names for downstream tools
             _VAR_MAP["HERMES_CRON_AUTO_DELIVER_PLATFORM"].set(
                 delivery_target["platform"]
             )
@@ -1810,14 +1850,14 @@ def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
                 else str(delivery_target["thread_id"])
             )
 
-        model = job.get("model") or os.getenv("HERMES_MODEL") or ""
+        model = job.get("model") or os.getenv("REYMEN_MODEL", os.getenv("HERMES_MODEL")) or ""
 
         # Load config.yaml for model, reasoning, prefill, toolsets, provider routing
         _cfg = {}
         try:
             import yaml
 
-            _cfg_path = str(_get_hermes_home() / "config.yaml")
+            _cfg_path = str(_get_reymen_home() / "config.yaml")
             if os.path.exists(_cfg_path):
                 with open(_cfg_path, encoding="utf-8") as _f:
                     _cfg = yaml.safe_load(_f) or {}
@@ -1826,7 +1866,9 @@ def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
                 # builds its own dict, so overlay managed values via the shared
                 # helper (fail-open, no-op when no managed scope).
                 try:
-                    from hermes_cli import managed_scope
+                    from reymen.sistem.reymen_stubs import managed_scope
+                except ImportError:
+                    from reymen.sistem.reymen_stubs import managed_scope
 
                     _cfg = managed_scope.apply_managed_overlay(_cfg)
                 except Exception as _e:
@@ -1848,7 +1890,7 @@ def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
 
         # Apply IPv4 preference if configured.
         try:
-            from hermes_constants import apply_ipv4_preference
+            from reymen.sistem.reymen_stubs import apply_ipv4_preference
 
             _net_cfg = _cfg.get("network", {})
             if isinstance(_net_cfg, dict) and _net_cfg.get("force_ipv4"):
@@ -1858,7 +1900,7 @@ def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
             pass
 
         # Reasoning config from config.yaml
-        from hermes_constants import parse_reasoning_effort
+        from reymen.sistem.reymen_stubs import parse_reasoning_effort
 
         effort = str(_cfg.get("agent", {}).get("reasoning_effort", "")).strip()
         reasoning_config = parse_reasoning_effort(effort)
@@ -1871,14 +1913,14 @@ def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
             _cfg.get("agent", {}) if isinstance(_cfg.get("agent", {}), dict) else {}
         )
         prefill_file = (
-            os.getenv("HERMES_PREFILL_MESSAGES_FILE", "")
+            os.getenv("REYMEN_PREFILL_MESSAGES_FILE", os.getenv("HERMES_PREFILL_MESSAGES_FILE", ""))
             or _cfg.get("prefill_messages_file", "")
             or agent_cfg.get("prefill_messages_file", "")
         )
         if prefill_file:
             pfpath = Path(prefill_file).expanduser()
             if not pfpath.is_absolute():
-                pfpath = _get_hermes_home() / pfpath
+                pfpath = _get_reymen_home() / pfpath
             if pfpath.exists():
                 try:
                     with open(pfpath, "r", encoding="utf-8") as _pf:
@@ -1902,11 +1944,15 @@ def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
         # Provider routing
         pr = _cfg.get("provider_routing", {})
 
-        from hermes_cli.runtime_provider import (
-            resolve_runtime_provider,
-            format_runtime_provider_error,
-        )
-        from hermes_cli.auth import AuthError
+        try:
+            from reymen.sistem.reymen_stubs import managed_scope as _ms
+            # Stub: resolve_runtime_provider not available without Hermes
+            resolve_runtime_provider = lambda **kw: {"provider": "", "model": ""}
+            format_runtime_provider_error = lambda e: f"Runtime provider unavailable: {e}"
+            AuthError = type("AuthError", (Exception,), {})
+        except ImportError:
+            from reymen.sistem.reymen_stubs import managed_scope
+            from reymen.sistem.reymen_stubs import managed_scope
 
         try:
             # Do not inject HERMES_INFERENCE_PROVIDER here. resolve_runtime_provider()
@@ -1921,7 +1967,7 @@ def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
                 runtime_kwargs["explicit_base_url"] = job.get("base_url")
             runtime = resolve_runtime_provider(**runtime_kwargs)
         except AuthError as auth_exc:
-            # Primary provider auth failed — try fallback chain before giving up.
+            # Primary provider auth failed â€” try fallback chain before giving up.
             logger.warning(
                 "Job '%s': primary auth failed (%s), trying fallback", job_id, auth_exc
             )
@@ -1987,7 +2033,7 @@ def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
 
         # Initialize MCP servers so configured mcp_servers are available to
         # the agent's tool registry before AIAgent is constructed. Without
-        # this, cron jobs never saw any MCP tools — only the gateway / CLI
+        # this, cron jobs never saw any MCP tools â€” only the gateway / CLI
         # paths called discover_mcp_tools() at startup. Idempotent: subsequent
         # ticks short-circuit on already-connected servers inside
         # register_mcp_servers(). Non-fatal on failure: a broken MCP server
@@ -2052,7 +2098,7 @@ def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
         #
         # Uses the agent's built-in activity tracker (updated by
         # _touch_activity() on every tool call, API call, and stream delta).
-        _raw_cron_timeout = os.getenv("HERMES_CRON_TIMEOUT", "").strip()
+        _raw_cron_timeout = os.getenv("REYMEN_CRON_TIMEOUT", os.getenv("HERMES_CRON_TIMEOUT", "")).strip()
         if _raw_cron_timeout:
             try:
                 _cron_timeout = float(_raw_cron_timeout)
@@ -2077,7 +2123,7 @@ def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
         _inactivity_timeout = False
         try:
             if _cron_inactivity_limit is None:
-                # Unlimited — just wait for the result.
+                # Unlimited â€” just wait for the result.
                 result = _cron_future.result()
             else:
                 result = None
@@ -2089,7 +2135,7 @@ def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
                     if done:
                         result = _cron_future.result()
                         break
-                    # Agent still running — check inactivity.
+                    # Agent still running â€” check inactivity.
                     _idle_secs = 0.0
                     if hasattr(agent, "get_activity_summary"):
                         try:
@@ -2142,7 +2188,7 @@ def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
             raise TimeoutError(
                 f"Cron job '{job_name}' idle for "
                 f"{int(_secs_ago)}s (limit {int(_cron_inactivity_limit)}s) "
-                f"— last activity: {_last_desc}"
+                f"â€” last activity: {_last_desc}"
             )
 
         # Guard against non-dict returns from run_conversation under error conditions
@@ -2230,9 +2276,9 @@ def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
         for _var_name in _cron_delivery_vars:
             _VAR_MAP[_var_name].set("")
         if _session_db:
-            # Title the cron session from the job (name → short prompt → id) so
+            # Title the cron session from the job (name â†’ short prompt â†’ id) so
             # sidebars/history show a meaningful label instead of the injected
-            # "[IMPORTANT: …]" hint that is the session's first message. Set here
+            # "[IMPORTANT: â€¦]" hint that is the session's first message. Set here
             # (not at create time) so the agent's own INSERT keeps model /
             # system_prompt; this only UPDATEs the title column. The run-time
             # suffix keeps it unique against the sessions.title index across runs.
@@ -2240,7 +2286,7 @@ def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
                 _title_base = (
                     " ".join(job_name.split())[:60].strip() or f"cron {job_id}"
                 )
-                _cron_title = f"{_title_base} · {_hermes_now().strftime('%b %d %H:%M')}"
+                _cron_title = f"{_title_base} Â· {_hermes_now().strftime('%b %d %H:%M')}"
                 _session_db.set_session_title(_cron_session_id, _cron_title)
             except (Exception, KeyboardInterrupt) as e:
                 logger.debug(
@@ -2267,7 +2313,7 @@ def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
             logger.debug("Job '%s': failed to close agent resources: %s", job_id, e)
         # Each cron run spins up a short-lived worker thread whose event loop
         # dies as soon as the ``ThreadPoolExecutor`` shuts down. Any async
-        # httpx clients cached under that loop are now unusable — reap them
+        # httpx clients cached under that loop are now unusable â€” reap them
         # so their transports don't accumulate in the process-global cache.
         try:
             from agent.auxiliary_client import cleanup_stale_async_clients
@@ -2280,18 +2326,18 @@ def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
 
 
 def run_one_job(job: dict, *, adapters=None, loop=None, verbose: bool = False) -> bool:
-    """Run ONE due job end-to-end: execute → save output → deliver → mark.
+    """Run ONE due job end-to-end: execute â†’ save output â†’ deliver â†’ mark.
 
     This is the shared firing body extracted from ``tick``'s per-job closure so
     that BOTH the built-in ticker and an external provider's ``fire_due`` (e.g.
-    Chronos) run the identical sequence — no duplicated correctness.
+    Chronos) run the identical sequence â€” no duplicated correctness.
 
     It does NOT decide whether the job is due, claim it, or compute the next
-    run — those are the caller's concern (``tick`` advances ``next_run_at``
+    run â€” those are the caller's concern (``tick`` advances ``next_run_at``
     under the file lock before dispatch; an external provider claims via the
     store CAS). This function only fires the given job once.
 
-    Returns True if the job was processed (even if the job itself failed —
+    Returns True if the job was processed (even if the job itself failed â€”
     failure is recorded via ``mark_job_run``), False only if processing raised.
     """
     try:
@@ -2319,7 +2365,7 @@ def run_one_job(job: dict, *, adapters=None, loop=None, verbose: bool = False) -
             and SILENT_MARKER in deliver_content.strip().upper()
         ):
             logger.info(
-                "Job '%s': agent returned %s — skipping delivery",
+                "Job '%s': agent returned %s â€” skipping delivery",
                 job["id"],
                 SILENT_MARKER,
             )
@@ -2336,7 +2382,7 @@ def run_one_job(job: dict, *, adapters=None, loop=None, verbose: bool = False) -
                 logger.error("Delivery failed for job %s: %s", job["id"], de)
 
         # Treat empty final_response as a soft failure so last_status
-        # is not "ok" — the agent ran but produced nothing useful.
+        # is not "ok" â€” the agent ran but produced nothing useful.
         # (issue #8585)
         if success and not final_response.strip():
             success = False
@@ -2359,7 +2405,7 @@ def _notify_provider_jobs_changed() -> None:
     provider (Chronos) can re-provision/cancel the affected one-shot via NAS.
     No-op for the built-in (it re-reads jobs.json each tick), so the default
     path is unchanged. Lives here (not in cron/jobs.py) to keep the store free
-    of provider imports — avoids an import cycle and keeps jobs.py low-coupling.
+    of provider imports â€” avoids an import cycle and keeps jobs.py low-coupling.
     Never raises into the caller.
     """
     try:
@@ -2379,7 +2425,7 @@ def tick(verbose: bool = True, adapters=None, loop=None, sync: bool = True) -> i
 
     Args:
         verbose: Whether to print status messages
-        adapters: Optional dict mapping Platform → live adapter (from gateway)
+        adapters: Optional dict mapping Platform â†’ live adapter (from gateway)
         loop: Optional asyncio event loop (from gateway) for live adapter sends
 
     Returns:
@@ -2397,7 +2443,7 @@ def tick(verbose: bool = True, adapters=None, loop=None, sync: bool = True) -> i
         elif msvcrt:
             msvcrt.locking(lock_fd.fileno(), msvcrt.LK_NBLCK, 1)
     except (OSError, IOError):
-        logger.debug("Tick skipped — another instance holds the lock")
+        logger.debug("Tick skipped â€” another instance holds the lock")
         if lock_fd is not None:
             lock_fd.close()
         return 0
@@ -2426,7 +2472,7 @@ def tick(verbose: bool = True, adapters=None, loop=None, sync: bool = True) -> i
         # Set HERMES_CRON_MAX_PARALLEL=1 to restore old serial behaviour.
         _max_workers: Optional[int] = None
         try:
-            _env_par = os.getenv("HERMES_CRON_MAX_PARALLEL", "").strip()
+            _env_par = os.getenv("REYMEN_CRON_MAX_PARALLEL", os.getenv("HERMES_CRON_MAX_PARALLEL", "")).strip()
             if _env_par:
                 _max_workers = int(_env_par) or None
         except (ValueError, TypeError):
@@ -2454,12 +2500,12 @@ def tick(verbose: bool = True, adapters=None, loop=None, sync: bool = True) -> i
         def _process_job(job: dict) -> bool:
             """Run one due job end-to-end. Thin wrapper around the shared
             module-level ``run_one_job`` so ``tick`` and external providers
-            (Chronos ``fire_due``) use the identical execute→save→deliver→mark
+            (Chronos ``fire_due``) use the identical executeâ†’saveâ†’deliverâ†’mark
             body."""
             return run_one_job(job, adapters=adapters, loop=loop, verbose=verbose)
 
         # Partition due jobs: those with a per-job workdir mutate
-        # os.environ["TERMINAL_CWD"] inside run_job, which is process-global —
+        # os.environ["TERMINAL_CWD"] inside run_job, which is process-global â€”
         # so they MUST run sequentially to avoid corrupting each other.  Jobs
         # without a workdir leave env untouched and stay parallel-safe.
         sequential_jobs = [j for j in due_jobs if (j.get("workdir") or "").strip()]
@@ -2479,7 +2525,7 @@ def tick(verbose: bool = True, adapters=None, loop=None, sync: bool = True) -> i
             with _running_lock:
                 if job_id in _running_job_ids:
                     logger.info(
-                        "Job '%s' already running — skipping", job.get("name", job_id)
+                        "Job '%s' already running â€” skipping", job.get("name", job_id)
                     )
                     return None
                 _running_job_ids.add(job_id)
@@ -2496,7 +2542,7 @@ def tick(verbose: bool = True, adapters=None, loop=None, sync: bool = True) -> i
 
         # Sequential pass for env-mutating (workdir) jobs.
         # Queued to a persistent single-thread pool so they run one at a time
-        # WITHOUT blocking the ticker thread — a long workdir job no
+        # WITHOUT blocking the ticker thread â€” a long workdir job no
         # longer starves the rest of the schedule (same fix as the parallel
         # pass, just serialized).  The in-flight guard prevents a still-running
         # job from being re-queued on the next tick.
@@ -2510,7 +2556,7 @@ def tick(verbose: bool = True, adapters=None, loop=None, sync: bool = True) -> i
                 if not sync:
                     _results.append(True)  # optimistically counted
 
-        # Parallel pass — persistent pool, non-blocking dispatch.
+        # Parallel pass â€” persistent pool, non-blocking dispatch.
         # Jobs that are already running (from a previous tick) are skipped.
         # mark_job_run() updates next_run_at on completion, so the next tick
         # after completion finds the job due again naturally.  No catch-up
@@ -2527,7 +2573,7 @@ def tick(verbose: bool = True, adapters=None, loop=None, sync: bool = True) -> i
 
         # Best-effort sweep of MCP stdio subprocesses that survived their
         # session teardown.  Must run AFTER jobs finish so active sessions
-        # (including live user chats) are never touched — only PIDs explicitly
+        # (including live user chats) are never touched â€” only PIDs explicitly
         # detected as orphans in tools.mcp_tool._run_stdio's finally block are
         # reaped.
         def _sweep_mcp_orphans() -> None:
@@ -2564,7 +2610,7 @@ def tick(verbose: bool = True, adapters=None, loop=None, sync: bool = True) -> i
             for _f in _all_futures:
                 _f.add_done_callback(_on_done)
         else:
-            # Nothing dispatched (all skipped / no due jobs) — sweep inline.
+            # Nothing dispatched (all skipped / no due jobs) â€” sweep inline.
             _sweep_mcp_orphans()
 
         return sum(_results)

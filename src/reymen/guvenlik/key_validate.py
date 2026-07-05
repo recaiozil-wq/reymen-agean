@@ -1,10 +1,10 @@
-# -*- coding: utf-8 -*-
-"""key_validate.py — API anahtarı doğrulama modülü.
+﻿# -*- coding: utf-8 -*-
+"""key_validate.py â€” API anahtarÄ± doÄŸrulama modÃ¼lÃ¼.
 
-Kurulum sırasında ve her başlangıçta API key'lerinin
-varlığını ve formatını kontrol eder.
+Kurulum sÄ±rasÄ±nda ve her baÅŸlangÄ±Ã§ta API key'lerinin
+varlÄ±ÄŸÄ±nÄ± ve formatÄ±nÄ± kontrol eder.
 
-Kullanım:
+KullanÄ±m:
     from reymen.guvenlik.key_validate import key_kontrol, KEY_TANIMLARI
     eksikler = key_kontrol()
     if eksikler:
@@ -15,47 +15,47 @@ import os
 import re
 from typing import Dict, List, Optional, Tuple
 
-# Provider key tanımları: (env_adı, zorunlu mu?, format_regex, açıklama)
+# Provider key tanÄ±mlarÄ±: (env_adÄ±, zorunlu mu?, format_regex, aÃ§Ä±klama)
 KEY_TANIMLARI: Dict[str, Tuple[bool, Optional[str], str]] = {
-    # (zorunlu, format_regex, açıklama)
+    # (zorunlu, format_regex, aÃ§Ä±klama)
     "DEEPSEEK_API_KEY": (
         True,
         r"^sk-[A-Za-z0-9]{20,}$",
-        "DeepSeek API anahtarı (sk- ile başlar)",
+        "DeepSeek API anahtarÄ± (sk- ile baÅŸlar)",
     ),
     "OPENAI_API_KEY": (
         False,
         r"^sk-[A-Za-z0-9]{20,}$",
-        "OpenAI API anahtarı (sk- ile başlar)",
+        "OpenAI API anahtarÄ± (sk- ile baÅŸlar)",
     ),
     "ANTHROPIC_API_KEY": (
         False,
         r"^sk-ant-[A-Za-z0-9]{20,}$",
-        "Anthropic API anahtarı (sk-ant- ile başlar)",
+        "Anthropic API anahtarÄ± (sk-ant- ile baÅŸlar)",
     ),
     "OPENROUTER_API_KEY": (
         False,
         None,
-        "OpenRouter API anahtarı",
+        "OpenRouter API anahtarÄ±",
     ),
     "GROQ_API_KEY": (
         False,
         r"^gsk_[A-Za-z0-9]{20,}$",
-        "Groq API anahtarı (gsk_ ile başlar)",
+        "Groq API anahtarÄ± (gsk_ ile baÅŸlar)",
     ),
     "XAI_API_KEY": (
         False,
         None,
-        "xAI (Grok) API anahtarı",
+        "xAI (Grok) API anahtarÄ±",
     ),
     "XIAOMI_API_KEY": (
         False,
         None,
-        "Xiaomi/MiMo API anahtarı",
+        "Xiaomi/MiMo API anahtarÄ±",
     ),
 }
 
-# Telegram bot token'ları (opsiyonel, format kontrollü)
+# Telegram bot token'larÄ± (opsiyonel, format kontrollÃ¼)
 BOT_TOKEN_TANIMLARI: Dict[str, Tuple[bool, str]] = {
     "BOT_TOKEN_REYMEN": (False, "ReYMeN Ana Bot"),
     "BOT_TOKEN_PASA": (False, "Pasa_38 Bot"),
@@ -68,7 +68,7 @@ BOT_TOKEN_REGEX = re.compile(r"^\d{8,10}:[A-Za-z0-9_-]{30,}$")
 
 
 def key_format_kontrol(key: str, regex: Optional[str]) -> bool:
-    """Key formatını kontrol et. regex=None ise sadece boş kontrolü yap."""
+    """Key formatÄ±nÄ± kontrol et. regex=None ise sadece boÅŸ kontrolÃ¼ yap."""
     if not key or key == "buraya_yaz":
         return False
     if regex is None:
@@ -77,14 +77,14 @@ def key_format_kontrol(key: str, regex: Optional[str]) -> bool:
 
 
 def key_kontrol() -> Dict[str, List[str]]:
-    """Tüm API anahtarlarını kontrol et.
+    """TÃ¼m API anahtarlarÄ±nÄ± kontrol et.
 
     Returns:
         {
-            "eksik_zorunlu": ["DEEPSEEK_API_KEY"],   # Hiç yok veya buraya_yaz
-            "format_hatali": ["OPENAI_API_KEY"],      # Var ama format yanlış
+            "eksik_zorunlu": ["DEEPSEEK_API_KEY"],   # HiÃ§ yok veya buraya_yaz
+            "format_hatali": ["OPENAI_API_KEY"],      # Var ama format yanlÄ±ÅŸ
             "eksik_opsiyonel": ["GROQ_API_KEY"],      # Opsiyonel ama yok
-            "uyari": ["BOT_TOKEN_PASA"]               # Bot token formatı hatalı
+            "uyari": ["BOT_TOKEN_PASA"]               # Bot token formatÄ± hatalÄ±
         }
     """
     sonuc: Dict[str, List[str]] = {
@@ -103,56 +103,56 @@ def key_kontrol() -> Dict[str, List[str]]:
             else:
                 sonuc["eksik_opsiyonel"].append(env_ad)
         elif regex and not key_format_kontrol(value, regex):
-            sonuc["format_hatali"].append(f"{env_ad} — beklenen format: {regex}")
+            sonuc["format_hatali"].append(f"{env_ad} â€” beklenen format: {regex}")
 
-    # Bot token'ları
+    # Bot token'larÄ±
     for env_ad, (zorunlu, aciklama) in BOT_TOKEN_TANIMLARI.items():
         value = os.environ.get(env_ad, "") or ""
         if value and value != "buraya_yaz":
             if not BOT_TOKEN_REGEX.match(value.strip()):
                 sonuc["uyari"].append(
-                    f"{env_ad} ({aciklama}) — format: 1234567890:ABCdef..."
+                    f"{env_ad} ({aciklama}) â€” format: 1234567890:ABCdef..."
                 )
 
     return sonuc
 
 
 def ozet_ver(kontrol_sonuc: Dict[str, List[str]]) -> str:
-    """Kontrol sonucunu okunabilir metne çevir."""
+    """Kontrol sonucunu okunabilir metne Ã§evir."""
     satirlar = []
 
     if kontrol_sonuc["eksik_zorunlu"]:
-        satirlar.append("❌ EKSİK ZORUNLU KEY'LER:")
+        satirlar.append("âŒ EKSÄ°K ZORUNLU KEY'LER:")
         for k in kontrol_sonuc["eksik_zorunlu"]:
-            satirlar.append(f"   • {k}")
+            satirlar.append(f"   â€¢ {k}")
 
     if kontrol_sonuc["format_hatali"]:
-        satirlar.append("⚠️ FORMAT HATALI KEY'LER:")
+        satirlar.append("âš ï¸ FORMAT HATALI KEY'LER:")
         for k in kontrol_sonuc["format_hatali"]:
-            satirlar.append(f"   • {k}")
+            satirlar.append(f"   â€¢ {k}")
 
     if kontrol_sonuc["eksik_opsiyonel"]:
-        satirlar.append("ℹ️ EKSİK OPSİYONEL KEY'LER (pasif kalacak):")
+        satirlar.append("â„¹ï¸ EKSÄ°K OPSÄ°YONEL KEY'LER (pasif kalacak):")
         for k in kontrol_sonuc["eksik_opsiyonel"]:
-            satirlar.append(f"   • {k}")
+            satirlar.append(f"   â€¢ {k}")
 
     if kontrol_sonuc["uyari"]:
-        satirlar.append("⚠️ BOT TOKEN UYARILARI:")
+        satirlar.append("âš ï¸ BOT TOKEN UYARILARI:")
         for k in kontrol_sonuc["uyari"]:
-            satirlar.append(f"   • {k} — format kontrolü başarısız")
+            satirlar.append(f"   â€¢ {k} â€” format kontrolÃ¼ baÅŸarÄ±sÄ±z")
 
     if not any(kontrol_sonuc.values()):
-        satirlar.append("✅ Tüm API anahtarları tamam ve formatları doğru.")
+        satirlar.append("âœ… TÃ¼m API anahtarlarÄ± tamam ve formatlarÄ± doÄŸru.")
 
     return "\n".join(satirlar)
 
 
 def env_dogrula(env_path: str) -> Optional[str]:
-    """.env dosyasını oku ve doğrula. Hata varsa mesaj döndür."""
+    """.env dosyasÄ±nÄ± oku ve doÄŸrula. Hata varsa mesaj dÃ¶ndÃ¼r."""
     if not os.path.isfile(env_path):
         return (
-            f".env dosyası bulunamadı: {env_path}\n"
-            "Çözüm: cp .env.example .env (Linux) veya copy .env.example .env (Windows)"
+            f".env dosyasÄ± bulunamadÄ±: {env_path}\n"
+            "Ã‡Ã¶zÃ¼m: cp .env.example .env (Linux) veya copy .env.example .env (Windows)"
         )
     return None
 

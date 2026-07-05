@@ -1,4 +1,4 @@
-"""Adim 1: Restart dogrulama - Merkez DB yazma testi"""
+﻿"""Adim 1: Restart dogrulama - Merkez DB yazma testi"""
 
 import sqlite3, time, os
 
@@ -19,7 +19,7 @@ row = con.execute("SELECT * FROM test_merkez ORDER BY id DESC LIMIT 1").fetchone
 con.execute("DELETE FROM test_merkez")
 con.commit()
 con.close()
-print(f"✅ Merkez DB yazma basarili: {row}")
+print(f"âœ… Merkez DB yazma basarili: {row}")
 
 # 2. Eski DB yollarina yazma kontrolu
 import subprocess
@@ -33,4 +33,4 @@ r = subprocess.run(
 print(f"\n=== ESKI DB (.old) KONTROLU ===")
 print(f"Toplam .old dosyasi: {len(r.stdout.splitlines())}")
 
-print("\n✅ Adim 1 tamam")
+print("\nâœ… Adim 1 tamam")

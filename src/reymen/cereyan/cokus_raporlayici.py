@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-cokus_raporlayici.py — Otonom Sistem Cokus Raporlayicisi.
+cokus_raporlayici.py â€” Otonom Sistem Cokus Raporlayicisi.
 
 Ne yapar:
   Otonom cozum sinirlari tukendiginde devreye girer, insan-okunabilir
@@ -74,7 +74,7 @@ def cokus_raporu_uret(
     # Rapor sablonu (ReYMeN stili)
     rapor = f"""
 ============================================================
-🚨 [OTONOM SISTEM COKUS / TAHLIYE RAPORU] 🚨
+ğŸš¨ [OTONOM SISTEM COKUS / TAHLIYE RAPORU] ğŸš¨
 ============================================================
 Kritik Zaman Dilimi    : {tarih}
 Basarisiz Olunan Gorev : {gorev}
@@ -85,22 +85,22 @@ kritik kilitlenme yasamistir. Donem icinde devreye alinan
 tum uzman yapay zeka personalari basarisiz olmustur.
 
 ------------------------------------------------------------
-🔍 [KRONOLOJIK HATA VE ADAPTASYON GECMISI]
+ğŸ” [KRONOLOJIK HATA VE ADAPTASYON GECMISI]
 ------------------------------------------------------------
 {hata_metni}
 
 ------------------------------------------------------------
-🧠 [GOREV SURESINCE DENENEN AJANLAR]
+ğŸ§  [GOREV SURESINCE DENENEN AJANLAR]
 ------------------------------------------------------------
 {ajan_metni}
 
 ------------------------------------------------------------
-⚠️  [OLUMCUL KILITLENME NOKTASI (KOK NEDEN)]
+âš ï¸  [OLUMCUL KILITLENME NOKTASI (KOK NEDEN)]
 ------------------------------------------------------------
 {tiklanma_nedeni}
 
 ============================================================
-🚨 KULLANICI ACIL MUDAHALE VE GOREV DEVRİ PROTOKOLU
+ğŸš¨ KULLANICI ACIL MUDAHALE VE GOREV DEVRÄ° PROTOKOLU
 ============================================================
 Otonom dongunun tiklanma noktasi yukarida teshis edilmistir.
 Sistemin kendini guncelleyerek genisleyebilmesi adina:

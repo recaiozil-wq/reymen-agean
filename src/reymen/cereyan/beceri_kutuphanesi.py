@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-beceri_kutuphanesi.py — FAZ 6: JSON sematik beceri kutuphanesi.
+beceri_kutuphanesi.py â€” FAZ 6: JSON sematik beceri kutuphanesi.
 
 closed_learning_loop.py .md karti uretir; bu modul uzerine
 yapilandirilmis JSON sablonlari ekler:
@@ -43,7 +43,7 @@ class BeceriKutuphanesi:
         self._dosya.parent.mkdir(parents=True, exist_ok=True)
         self._beceriler: dict[str, dict] = self._yukle()
 
-    # ── Dosya I/O ────────────────────────────────────────────────────────────
+    # â”€â”€ Dosya I/O â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _yukle(self) -> dict:
         if not self._dosya.exists():
@@ -62,7 +62,7 @@ class BeceriKutuphanesi:
         except OSError as e:
             print(f"[BeceriKutuphanesi] Yazma hatasi: {e}")
 
-    # ── Kaydetme ─────────────────────────────────────────────────────────────
+    # â”€â”€ Kaydetme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def kaydet(
         self,
@@ -87,7 +87,7 @@ class BeceriKutuphanesi:
         anahtar = self._normalize(beceri_adi)
 
         if anahtar in self._beceriler:
-            # Guncelle — adim dizisini birlestir, kullanim sayisini artir
+            # Guncelle â€” adim dizisini birlestir, kullanim sayisini artir
             mevcut = self._beceriler[anahtar]
             mevcut["kullanim_sayisi"] = mevcut.get("kullanim_sayisi", 1) + 1
             yeni_adimlar = mevcut.get("adimlar", [])
@@ -138,12 +138,12 @@ class BeceriKutuphanesi:
             mevcut["son_basari"] = str(date.today())
         self._kaydet_dosya()
 
-    # ── Arama ────────────────────────────────────────────────────────────────
+    # â”€â”€ Arama â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def benzer_bul(self, sorgu: str, esik_skor: float = 0.15) -> Optional[dict]:
         """Sorguyla en cok eslesen beceliyi dondur.
 
-        Kelime otusmasi skoru kullanir (basit, kütüphane gerektirmez).
+        Kelime otusmasi skoru kullanir (basit, kÃ¼tÃ¼phane gerektirmez).
         esik_skor altindaysa None doner.
         """
         if not self._beceriler:
@@ -189,7 +189,7 @@ class BeceriKutuphanesi:
             + (f"Basari kriteri: {kriter}\n" if kriter else "")
         )
 
-    # ── Yardimcilar ──────────────────────────────────────────────────────────
+    # â”€â”€ Yardimcilar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @staticmethod
     def _normalize(ad: str) -> str:
@@ -214,7 +214,7 @@ class BeceriKutuphanesi:
         return list(self._beceriler.values())
 
 
-# ── Kolaylik fonksiyonu ───────────────────────────────────────────────────────
+# â”€â”€ Kolaylik fonksiyonu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _global_kb: Optional[BeceriKutuphanesi] = None
 
@@ -226,7 +226,7 @@ def global_beceri_kutuphanesi() -> BeceriKutuphanesi:
     return _global_kb
 
 
-# ── Test ─────────────────────────────────────────────────────────────────────
+# â”€â”€ Test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
     import tempfile

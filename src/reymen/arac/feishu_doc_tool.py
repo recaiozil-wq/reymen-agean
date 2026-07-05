@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
-"""feishu_doc_tool.py — Feishu (Lark) Doküman Aracı.
+﻿# -*- coding: utf-8 -*-
+"""feishu_doc_tool.py â€” Feishu (Lark) DokÃ¼man AracÄ±.
 
-Feishu Docs API v1: döküman oluştur, oku, güncelle, listele.
-gateway/feishu.py'den bağımsız; doküman odaklı motor aracı.
+Feishu Docs API v1: dÃ¶kÃ¼man oluÅŸtur, oku, gÃ¼ncelle, listele.
+gateway/feishu.py'den baÄŸÄ±msÄ±z; dokÃ¼man odaklÄ± motor aracÄ±.
 ENV: FEISHU_APP_ID, FEISHU_APP_SECRET
 """
 
@@ -21,7 +21,7 @@ _TOKEN_CACHE: dict = {"token": "", "bitis": 0.0}
 
 
 def _feishu_token() -> str:
-    """Tenant access token al (önbellekli)."""
+    """Tenant access token al (Ã¶nbellekli)."""
     if time.time() < _TOKEN_CACHE["bitis"] and _TOKEN_CACHE["token"]:
         return _TOKEN_CACHE["token"]
     if not FEISHU_APP_ID or not FEISHU_APP_SECRET:
@@ -50,7 +50,7 @@ def _feishu_token() -> str:
 def _fs_get(yol: str, params: dict = None) -> dict:
     token = _feishu_token()
     if not token:
-        return {"error": "Feishu token alınamadı."}
+        return {"error": "Feishu token alÄ±namadÄ±."}
     url = f"{FEISHU_BASE}{yol}"
     if params:
         url += "?" + urllib.parse.urlencode(params)
@@ -71,7 +71,7 @@ def _fs_get(yol: str, params: dict = None) -> dict:
 def _fs_post(yol: str, veri: dict) -> dict:
     token = _feishu_token()
     if not token:
-        return {"error": "Feishu token alınamadı."}
+        return {"error": "Feishu token alÄ±namadÄ±."}
     try:
         req = urllib.request.Request(
             f"{FEISHU_BASE}{yol}",
@@ -90,7 +90,7 @@ def _fs_post(yol: str, veri: dict) -> dict:
 def _fs_patch(yol: str, veri: dict) -> dict:
     token = _feishu_token()
     if not token:
-        return {"error": "Feishu token alınamadı."}
+        return {"error": "Feishu token alÄ±namadÄ±."}
     try:
         govde = json.dumps(veri).encode("utf-8")
         req = urllib.request.Request(
@@ -108,18 +108,18 @@ def _fs_patch(yol: str, veri: dict) -> dict:
         return {"error": str(e)}
 
 
-# ── Döküman İşlemleri ─────────────────────────────────────────────────
+# â”€â”€ DÃ¶kÃ¼man Ä°ÅŸlemleri â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def dokuman_olustur(baslik: str, klasor_token: str = "") -> str:
-    """Yeni Feishu dokümanı oluştur.
+    """Yeni Feishu dokÃ¼manÄ± oluÅŸtur.
 
     Args:
-        baslik:        Döküman başlığı
-        klasor_token:  Klasör token'ı (boşsa root)
+        baslik:        DÃ¶kÃ¼man baÅŸlÄ±ÄŸÄ±
+        klasor_token:  KlasÃ¶r token'Ä± (boÅŸsa root)
 
     Returns:
-        Döküman URL veya hata
+        DÃ¶kÃ¼man URL veya hata
     """
     veri: dict = {"title": baslik}
     if klasor_token:
@@ -127,40 +127,40 @@ def dokuman_olustur(baslik: str, klasor_token: str = "") -> str:
 
     yanit = _fs_post("/docx/v1/documents", veri)
     if "error" in yanit:
-        return f"[Feishu Döküman]: {yanit['error']}"
+        return f"[Feishu DÃ¶kÃ¼man]: {yanit['error']}"
 
     doc_id = yanit.get("data", {}).get("document", {}).get("document_id", "")
     url = f"https://docs.larksuite.com/docx/{doc_id}" if doc_id else ""
-    return f"Döküman oluşturuldu: {doc_id}\nURL: {url}"
+    return f"DÃ¶kÃ¼man oluÅŸturuldu: {doc_id}\nURL: {url}"
 
 
 def dokuman_oku(document_id: str) -> str:
-    """Feishu dökümanı içeriğini oku.
+    """Feishu dÃ¶kÃ¼manÄ± iÃ§eriÄŸini oku.
 
     Args:
-        document_id: Döküman ID'si
+        document_id: DÃ¶kÃ¼man ID'si
 
     Returns:
-        Döküman içeriği metin olarak
+        DÃ¶kÃ¼man iÃ§eriÄŸi metin olarak
     """
     yanit = _fs_get(f"/docx/v1/documents/{document_id}/raw_content")
     if "error" in yanit:
-        return f"[Feishu Döküman]: {yanit['error']}"
+        return f"[Feishu DÃ¶kÃ¼man]: {yanit['error']}"
 
     icerik = yanit.get("data", {}).get("content", "")
-    return icerik or "[Boş döküman]"
+    return icerik or "[BoÅŸ dÃ¶kÃ¼man]"
 
 
 def dokuman_blok_ekle(document_id: str, metin: str, blok_tipi: str = "text") -> str:
-    """Dökümanın sonuna blok ekle.
+    """DÃ¶kÃ¼manÄ±n sonuna blok ekle.
 
     Args:
-        document_id: Döküman ID'si
+        document_id: DÃ¶kÃ¼man ID'si
         metin:       Eklenecek metin
         blok_tipi:   text | heading1 | heading2 | bullet | ordered
 
     Returns:
-        Sonuç metni
+        SonuÃ§ metni
     """
     tip_map = {
         "text": 2,
@@ -187,14 +187,14 @@ def dokuman_blok_ekle(document_id: str, metin: str, blok_tipi: str = "text") -> 
 
 
 def dokuman_ara(arama_terimi: str, max_sonuc: int = 10) -> str:
-    """Feishu dökümanlarında ara.
+    """Feishu dÃ¶kÃ¼manlarÄ±nda ara.
 
     Args:
-        arama_terimi: Aranacak kelime/cümle
-        max_sonuc:    Kaç sonuç döneceği
+        arama_terimi: Aranacak kelime/cÃ¼mle
+        max_sonuc:    KaÃ§ sonuÃ§ dÃ¶neceÄŸi
 
     Returns:
-        Sonuçlar metin olarak
+        SonuÃ§lar metin olarak
     """
     yanit = _fs_post(
         "/suite/docs-api/search/object",
@@ -209,47 +209,47 @@ def dokuman_ara(arama_terimi: str, max_sonuc: int = 10) -> str:
 
     oge_listesi = yanit.get("data", {}).get("docs_entities", [])
     if not oge_listesi:
-        return f"'{arama_terimi}' için sonuç bulunamadı."
+        return f"'{arama_terimi}' iÃ§in sonuÃ§ bulunamadÄ±."
 
-    satirlar = [f"Feishu Arama: '{arama_terimi}' — {len(oge_listesi)} sonuç"]
+    satirlar = [f"Feishu Arama: '{arama_terimi}' â€” {len(oge_listesi)} sonuÃ§"]
     for oge in oge_listesi:
         satirlar.append(
-            f"  [{oge.get('docs_type','?')}] {oge.get('title','İsimsiz')} "
-            f"— {oge.get('url','')}"
+            f"  [{oge.get('docs_type','?')}] {oge.get('title','Ä°simsiz')} "
+            f"â€” {oge.get('url','')}"
         )
     return "\n".join(satirlar)
 
 
 def motor_kaydet(motor):
-    """Feishu döküman araçlarını motora kaydet."""
+    """Feishu dÃ¶kÃ¼man araÃ§larÄ±nÄ± motora kaydet."""
     if not hasattr(motor, "_plugin_arac_kaydet"):
         return
 
     motor._plugin_arac_kaydet(
         "FEISHU_DOC_OLUSTUR",
         lambda baslik, klasor="": dokuman_olustur(baslik, klasor),
-        "Feishu'da yeni döküman oluştur",
+        "Feishu'da yeni dÃ¶kÃ¼man oluÅŸtur",
     )
     motor._plugin_arac_kaydet(
         "FEISHU_DOC_OKU",
         lambda document_id: dokuman_oku(document_id),
-        "Feishu dökümanını oku",
+        "Feishu dÃ¶kÃ¼manÄ±nÄ± oku",
     )
     motor._plugin_arac_kaydet(
         "FEISHU_DOC_BLOK_EKLE",
         lambda document_id, metin, blok_tipi="text": dokuman_blok_ekle(
             document_id, metin, blok_tipi
         ),
-        "Feishu dökümanına içerik ekle",
+        "Feishu dÃ¶kÃ¼manÄ±na iÃ§erik ekle",
     )
     motor._plugin_arac_kaydet(
         "FEISHU_DOC_ARA",
         lambda arama_terimi, max_sonuc=10: dokuman_ara(arama_terimi, int(max_sonuc)),
-        "Feishu dökümanlarında ara",
+        "Feishu dÃ¶kÃ¼manlarÄ±nda ara",
     )
 
 
 if __name__ == "__main__":
-    print(f"App ID: {'✓' if FEISHU_APP_ID else '✗'}")
+    print(f"App ID: {'âœ“' if FEISHU_APP_ID else 'âœ—'}")
     if FEISHU_APP_ID:
         print(dokuman_ara("test", max_sonuc=3))

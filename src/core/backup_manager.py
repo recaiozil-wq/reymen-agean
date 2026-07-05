@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-backup_manager.py — Basit Git tabanli yedekleme sistemi.
+backup_manager.py â€” Basit Git tabanli yedekleme sistemi.
 
 BackupManager sinifi:
     - create()   -> str (backup commit hash) veya None
@@ -85,7 +85,7 @@ class BackupManager:
                 timeout=30,
             )
             if r.returncode != 0:
-                # "nothing to commit" — hata degil
+                # "nothing to commit" â€” hata degil
                 if "nothing to commit" in r.stderr:
                     logger.info("[BackupManager] Yedeklenecek yeni dosya yok.")
                     # Yine de son commit hash'ini don

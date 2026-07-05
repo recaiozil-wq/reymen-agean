@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-gateway_manager.py — Gateway Sistemi (multi-platform).
+gateway_manager.py â€” Gateway Sistemi (multi-platform).
 
 Platform adapter ABC + somut implementasyonlar:
   - GatewayAdapter (ABC): ad, baslat(), durdur(), mesaj_gonder(), durum()
@@ -33,13 +33,13 @@ from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
-# ── Sabitler ─────────────────────────────────────────────────────────
+# â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 PROJE_KOKU = Path(__file__).resolve().parent.parent.parent
 
 
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Platform Adapter (ABC)
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class GatewayAdapter(ABC):
@@ -58,7 +58,7 @@ class GatewayAdapter(ABC):
         self._baslangic_zamani: float = 0.0
         self._mesaj_sayisi: int = 0
 
-    # ── Zorunlu Metodlar ────────────────────────────────────────────
+    # â”€â”€ Zorunlu Metodlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @abstractmethod
     async def baslat(self) -> bool:
@@ -98,7 +98,7 @@ class GatewayAdapter(ABC):
         """
         ...
 
-    # ── Ortak Metodlar ──────────────────────────────────────────────
+    # â”€â”€ Ortak Metodlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @property
     def ad(self) -> str:
@@ -130,13 +130,13 @@ class GatewayAdapter(ABC):
         return f"<{self.__class__.__name__}[{self._ad}] calisiyor={self._calisiyor}>"
 
 
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  TelegramAdapter (mevcut bot.py'yi sarmalar)
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class TelegramAdapter(GatewayAdapter):
-    """Telegram platform adapteri — mevcut telegram_bot/bot.py'yi sarmalar.
+    """Telegram platform adapteri â€” mevcut telegram_bot/bot.py'yi sarmalar.
 
     Bot.py'yi ayri bir subprocess olarak baslatir ve durumunu takip eder.
     """
@@ -207,7 +207,7 @@ class TelegramAdapter(GatewayAdapter):
         hedef: Optional[str] = None,
         meta: Optional[dict[str, Any]] = None,
     ) -> dict[str, Any]:
-        """Telegram'a mesaj gonder — durum dosyasina yazarak.
+        """Telegram'a mesaj gonder â€” durum dosyasina yazarak.
 
         Not: Bot.py telegram API'sine bagli oldugu icin dogrudan gonderim
         yerine durum dosyasi uzerinden iletisim saglanir.
@@ -278,13 +278,13 @@ class TelegramAdapter(GatewayAdapter):
         }
 
 
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  DiscordAdapter (mevcut discord_bot.py'yi sarmalar)
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class DiscordAdapter(GatewayAdapter):
-    """Discord platform adapteri — mevcut discord_bot.py'yi sarmalar.
+    """Discord platform adapteri â€” mevcut discord_bot.py'yi sarmalar.
 
     Discord bot'unu ayri bir subprocess olarak baslatir.
     """
@@ -356,7 +356,7 @@ class DiscordAdapter(GatewayAdapter):
         hedef: Optional[str] = None,
         meta: Optional[dict[str, Any]] = None,
     ) -> dict[str, Any]:
-        """Discord'a mesaj gonder — durum dosyasina yazarak."""
+        """Discord'a mesaj gonder â€” durum dosyasina yazarak."""
         try:
             if not self._calisiyor:
                 return {"basarili": False, "hata": "Discord bot calismiyor"}
@@ -421,13 +421,13 @@ class DiscordAdapter(GatewayAdapter):
         }
 
 
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  CLIAdapter (stdin/stdout)
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class CLIAdapter(GatewayAdapter):
-    """CLI platform adapteri — stdin/stdout uzerinden iletisim.
+    """CLI platform adapteri â€” stdin/stdout uzerinden iletisim.
 
     Mevcut CLIGateway (reymen.ag.platform_gateways) ile uyumludur.
     """
@@ -438,7 +438,7 @@ class CLIAdapter(GatewayAdapter):
         self._okuyucu_gorev: Optional[asyncio.Task] = None
 
     async def baslat(self) -> bool:
-        """CLI kanalini baslat — stdin okuyucuyu baslat."""
+        """CLI kanalini baslat â€” stdin okuyucuyu baslat."""
         try:
             self._okuyucu_gorev = asyncio.create_task(self._stdin_okuyucu())
             self._calisiyor = True
@@ -529,13 +529,13 @@ class CLIAdapter(GatewayAdapter):
             )
 
 
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Gateway Yoneticisi (multi-platform)
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class GatewayYoneticisi:
-    """Coklu platform gateway yoneticisi — tum adapter'lari ayni anda yonetir.
+    """Coklu platform gateway yoneticisi â€” tum adapter'lari ayni anda yonetir.
 
     Kullanim:
         yonetici = GatewayYoneticisi()
@@ -550,7 +550,7 @@ class GatewayYoneticisi:
     def __init__(self):
         self._adapters: dict[str, GatewayAdapter] = {}
 
-    # ── Kayit / Kaldirma ────────────────────────────────────────────
+    # â”€â”€ Kayit / Kaldirma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def kaydet(self, adapter: GatewayAdapter) -> bool:
         """Bir gateway adapter'ini kaydet.
@@ -570,7 +570,7 @@ class GatewayYoneticisi:
             # Eskisini durdur
             eski = self._adapters[adapter.ad]
             if eski.calisiyor:
-                # Senkron durdur — arkaplan thread'de
+                # Senkron durdur â€” arkaplan thread'de
                 try:
                     loop = asyncio.get_event_loop()
                     if loop.is_running():
@@ -612,7 +612,7 @@ class GatewayYoneticisi:
         """Adapter'i ada gore getir."""
         return self._adapters.get(ad)
 
-    # ── Yasam Dongusu ───────────────────────────────────────────────
+    # â”€â”€ Yasam Dongusu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     async def baslat(self, ad: str) -> bool:
         """Belirli bir gateway adapter'ini baslat.
@@ -670,7 +670,7 @@ class GatewayYoneticisi:
             sonuclar[ad] = await self.durdur(ad)
         return sonuclar
 
-    # ── Mesaj Gonderimi ─────────────────────────────────────────────
+    # â”€â”€ Mesaj Gonderimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     async def mesaj_gonder(
         self,
@@ -723,7 +723,7 @@ class GatewayYoneticisi:
             sonuclar[platform] = sonuc
         return sonuclar
 
-    # ── Listeleme ───────────────────────────────────────────────────
+    # â”€â”€ Listeleme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def liste(self) -> list[dict[str, Any]]:
         """Kayitli tum gateway'lerin durum ozetini listele.
@@ -758,7 +758,7 @@ class GatewayYoneticisi:
             "zaman": time.time(),
         }
 
-    # ── Yardimci ────────────────────────────────────────────────────
+    # â”€â”€ Yardimci â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     async def __aenter__(self):
         return self
@@ -770,9 +770,9 @@ class GatewayYoneticisi:
         return f"<GatewayYoneticisi platform={len(self._adapters)}>"
 
 
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Tekil Ornek
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 _gateway_yonetici: Optional[GatewayYoneticisi] = None
 
@@ -785,9 +785,9 @@ def get_gateway_yoneticisi() -> GatewayYoneticisi:
     return _gateway_yonetici
 
 
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Motor Tool'lari
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _gateway_liste() -> str:
@@ -802,7 +802,7 @@ def _gateway_liste() -> str:
     yonetici = get_gateway_yoneticisi()
     liste = yonetici.liste()
     if not liste:
-        return "[] — hic gateway kayitli degil"
+        return "[] â€” hic gateway kayitli degil"
     return json.dumps(liste, indent=2, ensure_ascii=False, default=str)
 
 
@@ -867,13 +867,13 @@ def _gateway_baslat(platform: str = "") -> str:
     try:
         loop = asyncio.get_event_loop()
         if loop.is_running():
-            # Zaten calisan loop var — task olarak baslat
+            # Zaten calisan loop var â€” task olarak baslat
             future = asyncio.run_coroutine_threadsafe(yonetici.baslat(platform), loop)
             sonuc = future.result(timeout=10)
         else:
             sonuc = loop.run_until_complete(yonetici.baslat(platform))
     except RuntimeError:
-        # Loop yok — yeni loop
+        # Loop yok â€” yeni loop
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         sonuc = loop.run_until_complete(yonetici.baslat(platform))
@@ -928,11 +928,11 @@ def _gateway_durdur(platform: str = "") -> str:
     )
 
 
-# ── Motor Kayit ─────────────────────────────────────────────────────
+# â”€â”€ Motor Kayit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def motor_kaydet(motor) -> None:
-    """Motor'a gateway araçlarını kaydeder."""
+    """Motor'a gateway araÃ§larÄ±nÄ± kaydeder."""
     motor._plugin_arac_kaydet(
         "GATEWAY_LISTE",
         _gateway_liste,
@@ -943,14 +943,14 @@ def motor_kaydet(motor) -> None:
         "GATEWAY_BASLAT",
         _gateway_baslat,
         "Bir gateway'i baslat. "
-        "Parametre: platform (str, zorunlu) — 'telegram', 'discord', 'cli'. "
+        "Parametre: platform (str, zorunlu) â€” 'telegram', 'discord', 'cli'. "
         "Adapter yoksa otomatik olusturulur.",
     )
     motor._plugin_arac_kaydet(
         "GATEWAY_DURDUR",
         _gateway_durdur,
         "Bir gateway'i durdur. "
-        "Parametre: platform (str, zorunlu) — 'telegram', 'discord', 'cli'.",
+        "Parametre: platform (str, zorunlu) â€” 'telegram', 'discord', 'cli'.",
     )
     logger.info(
         "[Gateway] Motor araclari kaydedildi: GATEWAY_LISTE, GATEWAY_BASLAT, GATEWAY_DURDUR"

@@ -1,10 +1,10 @@
-"""Gateway runtime-metadata footer.
+﻿"""Gateway runtime-metadata footer.
 
 Renders a compact footer showing runtime state (model, context %, cwd) and
 appends it to the FINAL message of an agent turn when enabled.  Off by default
 to keep replies minimal.
 
-Config (``~/.hermes/config.yaml``)::
+Config (``~/.reymen/config.yaml``)::
 
     display:
       runtime_footer:
@@ -16,7 +16,7 @@ Users can toggle the global setting with ``/footer on|off`` from both the CLI
 and any gateway platform.
 
 The footer is appended to the final response text in ``gateway/run.py`` right
-before returning the response to the adapter send path — so it only lands on
+before returning the response to the adapter send path â€” so it only lands on
 the final message a user sees, not on tool-progress updates or streaming
 partials.  When streaming is on and the final text has already been delivered
 piecemeal, the footer is sent as a separate trailing message via
@@ -29,7 +29,7 @@ import os
 from typing import Any, Iterable, Optional
 
 _DEFAULT_FIELDS: tuple[str, ...] = ("model", "context_pct", "cwd")
-_SEP = " · "
+_SEP = " Â· "
 
 
 def _home_relative_cwd(cwd: str) -> str:
@@ -47,7 +47,7 @@ def _home_relative_cwd(cwd: str) -> str:
 
 
 def _model_short(model: Optional[str]) -> str:
-    """Drop ``vendor/`` prefix for readability (``openai/gpt-5.4`` → ``gpt-5.4``)."""
+    """Drop ``vendor/`` prefix for readability (``openai/gpt-5.4`` â†’ ``gpt-5.4``)."""
     if not model:
         return ""
     return model.rsplit("/", 1)[-1]
@@ -101,7 +101,7 @@ def format_runtime_footer(
 ) -> str:
     """Render the footer line, or return "" if no fields have data.
 
-    Fields are skipped silently when their underlying data is missing — a
+    Fields are skipped silently when their underlying data is missing â€” a
     partially-populated footer is better than a line with ``?%`` or empty slots.
     """
     parts: list[str] = []

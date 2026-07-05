@@ -1,16 +1,16 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-model_provider.py — ReYMeN Provider Sistemi (model routing, failover).
+model_provider.py â€” ReYMeN Provider Sistemi (model routing, failover).
 
-ModelProvider ABC + ProviderChain ile çoklu API sağlayıcı yönetimi.
-Failover: 401/402/429/500 → sonraki provider'a otomatik geçiş.
-Her adımda log + süre takibi.
+ModelProvider ABC + ProviderChain ile Ã§oklu API saÄŸlayÄ±cÄ± yÃ¶netimi.
+Failover: 401/402/429/500 â†’ sonraki provider'a otomatik geÃ§iÅŸ.
+Her adÄ±mda log + sÃ¼re takibi.
 
-Motor araçları:
-  - PROVIDER_CALISTIR:  Bir zincirdeki provider'ları sırayla dene
+Motor araÃ§larÄ±:
+  - PROVIDER_CALISTIR:  Bir zincirdeki provider'larÄ± sÄ±rayla dene
   - PROVIDER_ZINCIR_DURUM: Zincir durum raporu
 
-Kullanım:
+KullanÄ±m:
     chain = ProviderChain()
     yanit, provider_adi = chain.calistir(messages, system_content)
 """
@@ -28,17 +28,17 @@ import httpx
 
 logger = logging.getLogger(__name__)
 
-# ── HTTP timeout ──────────────────────────────────────────────
+# â”€â”€ HTTP timeout â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _HTTP_TIMEOUT = 120.0
 
 
-# ═══════════════════════════════════════════════════════════════
-# ModelProvider — Soyut temel sinif
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ModelProvider â€” Soyut temel sinif
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class ModelProvider(abc.ABC):
-    """Tüm provider'ların uyması gereken soyut ara yüz.
+    """TÃ¼m provider'larÄ±n uymasÄ± gereken soyut ara yÃ¼z.
 
     Class attributes (her alt sinif tanimlamali):
         ad:          Provider'in kisa adi (ornek: "deepseek")
@@ -47,8 +47,8 @@ class ModelProvider(abc.ABC):
         base_url:    API temel URL'i
 
     Metotlar:
-        hazir_mi()  → bool
-        calistir()  → (yanit: str, hata: str | None)
+        hazir_mi()  â†’ bool
+        calistir()  â†’ (yanit: str, hata: str | None)
     """
 
     ad: str = ""
@@ -118,9 +118,9 @@ class ModelProvider(abc.ABC):
         return f"<{self.__class__.__name__} ad={self.ad!r} model={self._model!r}>"
 
 
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # OpenAI uyumlu provider (DeepSeek, OpenRouter, xAI, Groq, ...)
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class OpenAICompatibleProvider(ModelProvider):
@@ -187,7 +187,7 @@ class OpenAICompatibleProvider(ModelProvider):
 
             # Failover tetikleyici hata kodlari
             if status in (401, 402, 429, 500):
-                return "", f"{self.ad}: HTTP {status} — {resp.text[:200]}"
+                return "", f"{self.ad}: HTTP {status} â€” {resp.text[:200]}"
 
             resp.raise_for_status()
             data = resp.json()
@@ -198,20 +198,20 @@ class OpenAICompatibleProvider(ModelProvider):
             code = e.response.status_code if e.response else 0
             if code in (401, 402, 429, 500):
                 return "", f"{self.ad}: HTTP {code}"
-            return "", f"{self.ad}: HTTP hatasi — {e}"
+            return "", f"{self.ad}: HTTP hatasi â€” {e}"
         except httpx.TimeoutException:
             return "", f"{self.ad}: Zaman asimi"
         except Exception as e:
             return "", f"{self.ad}: {type(e).__name__}: {e}"
 
 
-# ═══════════════════════════════════════════════════════════════
-# MiniMax (xiaomi) provider — farkli API formatı
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# MiniMax (xiaomi) provider â€” farkli API formatÄ±
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class MiniMaxProvider(ModelProvider):
-    """MiniMax (xiaomi) API — /v1/text/chatcompletion_v2."""
+    """MiniMax (xiaomi) API â€” /v1/text/chatcompletion_v2."""
 
     ad: str = "xiaomi"
     model: str = "MiniMax-Text-01"
@@ -260,14 +260,14 @@ class MiniMaxProvider(ModelProvider):
             code = e.response.status_code if e.response else 0
             if code in (401, 402, 429, 500):
                 return "", f"{self.ad}: HTTP {code}"
-            return "", f"{self.ad}: HTTP hatasi — {e}"
+            return "", f"{self.ad}: HTTP hatasi â€” {e}"
         except Exception as e:
             return "", f"{self.ad}: {type(e).__name__}: {e}"
 
 
-# ═══════════════════════════════════════════════════════════════
-# LiteLLM Provider — 100+ provider tek API ile
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# LiteLLM Provider â€” 100+ provider tek API ile
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class LiteLLMProvider(ModelProvider):
@@ -331,9 +331,9 @@ class LiteLLMProvider(ModelProvider):
             return "", f"{type(e).__name__}: {e}"
 
 
-# ═══════════════════════════════════════════════════════════════
-# Provider Fabrikası
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# Provider FabrikasÄ±
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _provider_fabrikasi(
@@ -425,9 +425,9 @@ def _provider_fabrikasi(
         return cls(**defaults)
 
 
-# ═══════════════════════════════════════════════════════════════
-# ProviderChain — Failover zinciri
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ProviderChain â€” Failover zinciri
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 @dataclass
@@ -527,7 +527,7 @@ class ProviderChain:
             **kwargs:        Ek parametreler
 
         Returns:
-            CalistirSonuc — yanit, provider adi, basari durumu, sure, detay
+            CalistirSonuc â€” yanit, provider adi, basari durumu, sure, detay
         """
         sonuc = CalistirSonuc()
         baslangic = time.time()
@@ -577,13 +577,13 @@ class ProviderChain:
                     }
                 )
                 logger.info(
-                    "[ProviderChain] ✅ %s basarili (%.0f ms)",
+                    "[ProviderChain] âœ… %s basarili (%.0f ms)",
                     kayit.ad,
                     prov_sure,
                 )
                 return sonuc
             else:
-                # Basarisiz — failover
+                # Basarisiz â€” failover
                 failover_kodlari = (
                     "401",
                     "402",
@@ -605,7 +605,7 @@ class ProviderChain:
                     }
                 )
                 logger.warning(
-                    "[ProviderChain] ✗ %s basarisiz (%s) — %s (%.0f ms)",
+                    "[ProviderChain] âœ— %s basarisiz (%s) â€” %s (%.0f ms)",
                     kayit.ad,
                     durum,
                     hata[:80],
@@ -650,16 +650,16 @@ class ProviderChain:
         self._instances.clear()
 
 
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Varsayilan zincir singleton
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 _varsayilan_zincir: Optional[ProviderChain] = None
 
 
-# ═══════════════════════════════════════════════════════════════
-# Provider Kesif — OpenRouter uzerinden model listesi
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# Provider Kesif â€” OpenRouter uzerinden model listesi
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def provider_kesfet(api_key: Optional[str] = None) -> str:
@@ -672,7 +672,7 @@ def provider_kesfet(api_key: Optional[str] = None) -> str:
 
     key = api_key or os.environ.get("OPENROUTER_API_KEY", "")
     if not key:
-        return "❌ OpenRouter API key bulunamadi (OPENROUTER_API_KEY)"
+        return "âŒ OpenRouter API key bulunamadi (OPENROUTER_API_KEY)"
 
     try:
         resp = httpx.get(
@@ -681,7 +681,7 @@ def provider_kesfet(api_key: Optional[str] = None) -> str:
             timeout=30.0,
         )
         if resp.status_code != 200:
-            return f"❌ OpenRouter hatasi: {resp.status_code}"
+            return f"âŒ OpenRouter hatasi: {resp.status_code}"
 
         modeller = resp.json().get("data", [])
         from collections import Counter
@@ -694,12 +694,12 @@ def provider_kesfet(api_key: Optional[str] = None) -> str:
                 provider_sayaci[prov] += 1
 
         satirlar = [
-            "📡 **OpenRouter ile Kullanilabilir Provider'lar**",
+            "ğŸ“¡ **OpenRouter ile Kullanilabilir Provider'lar**",
             f"  Toplam model: {len(modeller)}",
             "",
         ]
         for prov, adet in sorted(provider_sayaci.items(), key=lambda x: -x[1]):
-            satirlar.append(f"  {prov:20s} → {adet:4d} model")
+            satirlar.append(f"  {prov:20s} â†’ {adet:4d} model")
         satirlar.append("")
         satirlar.append(f"  Toplam provider: {len(provider_sayaci)}")
         satirlar.append(f"  (OpenRouter API key ile erisilebilir)")
@@ -726,15 +726,15 @@ def provider_kesfet(api_key: Optional[str] = None) -> str:
             satirlar.append("")
             satirlar.append("**Populer:**")
             for p in populer:
-                satirlar.append(f"  ✅ {p}: {provider_sayaci[p]} model")
+                satirlar.append(f"  âœ… {p}: {provider_sayaci[p]} model")
 
         return "\n".join(satirlar)
     except Exception as e:
-        return f"❌ Kesif hatasi: {type(e).__name__}: {e}"
+        return f"âŒ Kesif hatasi: {type(e).__name__}: {e}"
 
 
 def provider_kesif_motor(params: str = "") -> str:
-    """PROVIDER_KESFET() — OpenRouter uzerinden model listesi."""
+    """PROVIDER_KESFET() â€” OpenRouter uzerinden model listesi."""
     return provider_kesfet()
 
 
@@ -754,13 +754,13 @@ def zinciri_sifirla() -> None:
     _varsayilan_zincir = ProviderChain()
 
 
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Motor tool kayit (motor.py otomatik import eder)
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def motor_kaydet(motor: Any) -> None:
-    """Provider araçlarını Motor'a kaydeder.
+    """Provider araÃ§larÄ±nÄ± Motor'a kaydeder.
 
     Motor, _plugin_moduller_yukle() icinde importlib.import_module
     ile bu modulu yukler ve motor_kaydet() fonksiyonunu cagirir.

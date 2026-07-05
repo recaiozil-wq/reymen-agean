@@ -1,4 +1,4 @@
-"""ReYMeN 300 soru test - hizli, output gorunur"""
+﻿"""ReYMeN 300 soru test - hizli, output gorunur"""
 
 import os, sys, json, time, random, string
 
@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 load_dotenv(".env", override=True)
 
-from src.reymen.cereyan.conversation_loop import ConversationLoop
+from reymen.cereyan.conversation_loop import ConversationLoop
 
 cl = ConversationLoop(motor=None, beyin=None, max_tur=3)
 

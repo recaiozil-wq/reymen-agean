@@ -1,4 +1,4 @@
-"""_handle_browser_command handler."""
+﻿"""_handle_browser_command handler."""
 
 import logging
 import os
@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 def _handle_browser_command(cli, cmd: str):
-    """Handle /browser connect|disconnect|status — manage live Chromium-family CDP connection."""
+    """Handle /browser connect|disconnect|status â€” manage live Chromium-family CDP connection."""
     from ReYMeN_cli.browser_connect import (
         DEFAULT_BROWSER_CDP_URL,
         is_browser_debug_ready,
@@ -35,7 +35,7 @@ def _handle_browser_command(cli, cmd: str):
         if parsed_cdp.scheme not in {"http", "https", "ws", "wss"}:
             print()
             print(
-                f"   ⚠ Unsupported browser url scheme: {parsed_cdp.scheme or '(missing)'} "
+                f"   âš  Unsupported browser url scheme: {parsed_cdp.scheme or '(missing)'} "
                 "(expected one of: http, https, ws, wss)"
             )
             print()
@@ -46,12 +46,12 @@ def _handle_browser_command(cli, cmd: str):
             )
         except ValueError:
             print()
-            print(f"   ⚠ Invalid port in browser url: {cdp_url}")
+            print(f"   âš  Invalid port in browser url: {cdp_url}")
             print()
             return
         if not parsed_cdp.hostname:
             print()
-            print(f"   ⚠ Missing host in browser url: {cdp_url}")
+            print(f"   âš  Missing host in browser url: {cdp_url}")
             print()
             return
         _host = parsed_cdp.hostname
@@ -79,11 +79,11 @@ def _handle_browser_command(cli, cmd: str):
         _already_open = is_browser_debug_ready(cdp_url, timeout=1.0)
 
         if _already_open:
-            print(f"   ✓ Chromium-family browser is already listening on port {_port}")
+            print(f"   âœ“ Chromium-family browser is already listening on port {_port}")
         elif cdp_url == _DEFAULT_CDP:
             # Try to auto-launch a Chromium-family browser with remote debugging
             print(
-                "   Chromium-family browser isn't running with remote debugging — attempting to launch..."
+                "   Chromium-family browser isn't running with remote debugging â€” attempting to launch..."
             )
             _launched = cli._try_launch_chrome_debug(_port, _plat.system())
             if _launched:
@@ -95,17 +95,17 @@ def _handle_browser_command(cli, cmd: str):
                     time.sleep(0.5)
                 if _already_open:
                     print(
-                        f"   ✓ Chromium-family browser launched and listening on port {_port}"
+                        f"   âœ“ Chromium-family browser launched and listening on port {_port}"
                     )
                 else:
                     print(
-                        f"   ⚠ Browser launched but port {_port} isn't responding yet"
+                        f"   âš  Browser launched but port {_port} isn't responding yet"
                     )
                     print(
-                        "     Try again in a few seconds — the debug instance may still be starting"
+                        "     Try again in a few seconds â€” the debug instance may still be starting"
                     )
             else:
-                print("   ⚠ Could not auto-launch a Chromium-family browser")
+                print("   âš  Could not auto-launch a Chromium-family browser")
                 sys_name = _plat.system()
                 chrome_cmd = manual_chrome_debug_command(_port, sys_name)
                 if chrome_cmd:
@@ -116,12 +116,12 @@ def _handle_browser_command(cli, cmd: str):
                         "     No supported Chromium-family browser executable found in this environment"
                     )
         else:
-            print(f"   ⚠ Port {_port} is not reachable at {cdp_url}")
+            print(f"   âš  Port {_port} is not reachable at {cdp_url}")
 
         if not _already_open:
             print()
             print(
-                "Browser not connected — start a Chromium-family browser with remote debugging and retry /browser connect"
+                "Browser not connected â€” start a Chromium-family browser with remote debugging and retry /browser connect"
             )
             print()
             return
@@ -136,7 +136,7 @@ def _handle_browser_command(cli, cmd: str):
         except Exception:
             logger.warning("[fix_01_sessiz_except] Exception")
         print()
-        print("🌐 Browser connected to live Chromium-family browser via CDP")
+        print("ğŸŒ Browser connected to live Chromium-family browser via CDP")
         print(f"   Endpoint: {cdp_url}")
         print()
 
@@ -169,7 +169,7 @@ def _handle_browser_command(cli, cmd: str):
             except Exception:
                 logger.warning("[fix_01_sessiz_except] Exception")
             print()
-            print("🌐 Browser disconnected from live Chromium-family browser")
+            print("ğŸŒ Browser disconnected from live Chromium-family browser")
             print(
                 "   Browser tools reverted to default mode (local headless or cloud provider)"
             )
@@ -190,7 +190,7 @@ def _handle_browser_command(cli, cmd: str):
     elif sub == "status":
         print()
         if current:
-            print("🌐 Browser: connected to live Chromium-family browser via CDP")
+            print("ğŸŒ Browser: connected to live Chromium-family browser via CDP")
             print(f"   Endpoint: {current}")
 
             _port = 9222
@@ -203,9 +203,9 @@ def _handle_browser_command(cli, cmd: str):
                 s.settimeout(1)
                 s.connect(("127.0.0.1", _port))
                 s.close()
-                print("   Status: ✓ reachable")
+                print("   Status: âœ“ reachable")
             except (OSError, Exception):
-                print("   Status: ⚠ not reachable (browser may not be running)")
+                print("   Status: âš  not reachable (browser may not be running)")
         else:
             try:
                 from tools.browser_tool import _get_cloud_provider
@@ -215,7 +215,7 @@ def _handle_browser_command(cli, cmd: str):
                 provider = None
 
             if provider is not None:
-                print(f"🌐 Browser: {provider.provider_name()} (cloud)")
+                print(f"ğŸŒ Browser: {provider.provider_name()} (cloud)")
             else:
                 # Show engine info for local mode
                 try:
@@ -226,21 +226,21 @@ def _handle_browser_command(cli, cmd: str):
                     engine = "auto"
                 if engine == "lightpanda":
                     print(
-                        "🌐 Browser: local Lightpanda (agent-browser --engine lightpanda)"
+                        "ğŸŒ Browser: local Lightpanda (agent-browser --engine lightpanda)"
                     )
-                    print("   ⚡ Lightpanda: faster navigation, no screenshot support")
+                    print("   âš¡ Lightpanda: faster navigation, no screenshot support")
                     print(
                         "   Automatic Chromium fallback for screenshots and failed commands"
                     )
                 elif engine == "chrome":
                     print(
-                        "🌐 Browser: local headless Chromium (agent-browser --engine chrome)"
+                        "ğŸŒ Browser: local headless Chromium (agent-browser --engine chrome)"
                     )
                 else:
-                    print("🌐 Browser: local headless Chromium (agent-browser)")
+                    print("ğŸŒ Browser: local headless Chromium (agent-browser)")
         print()
-        print("   /browser connect      — connect to your live Chromium-family browser")
-        print("   /browser disconnect   — revert to default")
+        print("   /browser connect      â€” connect to your live Chromium-family browser")
+        print("   /browser disconnect   â€” revert to default")
         print()
 
     else:

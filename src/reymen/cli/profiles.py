@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""profiles.py — Profil yonetimi: Hermes profillerine entegre, JSON tabanli ReYMeN profilleri ile uyumlu."""
+﻿# -*- coding: utf-8 -*-
+"""profiles.py â€” Profil yonetimi: bagimsiz ReYMeN profilleri + opsiyonel ReYMeN uyumlulugu."""
 
 from __future__ import annotations
 
@@ -11,11 +11,14 @@ from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
-# ── Sabitler ────────────────────────────────────────────────
+# â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _REYMEN_PROJE_KOKU = Path(__file__).resolve().parent.parent.parent.parent
 _REYMEN_PROFIL_DIZINI = _REYMEN_PROJE_KOKU / ".ReYMeN" / "profiles"
-_HERMES_PROFIL_DIZINI = Path.home() / ".hermes" / "profiles"
+_ESKI_PROFIL_DIZINI = Path.home() / ".reymen" / "profiles"
+
+# ReYMeN yoksa baÄŸÄ±msÄ±z Ã§alÄ±ÅŸ â€” kritik baÄŸÄ±mlÄ±lÄ±k kaldÄ±rma
+_ESKI_PROFIL_MEVCUT = _ESKI_PROFIL_DIZINI.exists()
 
 _VARSAYILAN_PROFIL: dict[str, Any] = {
     "name": "default",
@@ -26,9 +29,9 @@ _VARSAYILAN_PROFIL: dict[str, Any] = {
 }
 
 
-# ═══════════════════════════════════════════════════════════════
-# Profil JSON oku/yaz / listele (ReYMeN eski API — geri uyumlu)
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# Profil JSON oku/yaz / listele (ReYMeN eski API â€” geri uyumlu)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _reymen_profil_yolu(profil_adi: str) -> Path:
@@ -37,17 +40,25 @@ def _reymen_profil_yolu(profil_adi: str) -> Path:
 
 
 def _hermes_profil_yolu(profil_adi: str) -> Optional[Path]:
-    """Hermes profil dizin yolunu doner (varsa)."""
-    yol = _HERMES_PROFIL_DIZINI / profil_adi
+    """Eski profil dizin yolunu doner (varsa)."""
+    yol = _ESKI_PROFIL_DIZINI / profil_adi
     return yol if yol.is_dir() else None
 
 
 def _profil_yolu(profil_adi: str) -> Path:
-    """Profil yolunu doner: once Hermes, sonra ReYMeN."""
-    h = _hermes_profil_yolu(profil_adi)
-    if h:
-        return h / "config.yaml"
-    return _reymen_profil_yolu(profil_adi)
+    """Profil yolunu doner: once ReYMeN, sonra ReYMeN (opsiyonel)."""
+    # Once ReYMeN profili
+    reymen_yol = _reymen_profil_yolu(profil_adi)
+    if reymen_yol.exists():
+        return reymen_yol
+
+    # Sonra ReYMeN (eger installed ise)
+    if _ESKI_PROFIL_MEVCUT:
+        h = _hermes_profil_yolu(profil_adi)
+        if h:
+            return h / "config.yaml"
+
+    return reymen_yol
 
 
 def profil_oku(profil_adi: str) -> dict[str, Any]:
@@ -58,9 +69,9 @@ def profil_oku(profil_adi: str) -> dict[str, Any]:
 
     Returns:
         Profil sozlugu. Dosya yoksa varsayilan profil doner.
-        Hermes profili ise config.yaml + .env + mcp.json + SOUL.md bilgilerini ekler.
+        ReYMeN profili ise config.yaml + .env + mcp.json + SOUL.md bilgilerini ekler.
     """
-    # Once Hermes profili olarak dene
+    # Once ReYMeN profili olarak dene
     hermes_yol = _hermes_profil_yolu(profil_adi)
     if hermes_yol:
         return _hermes_profil_oku(profil_adi, hermes_yol)
@@ -87,10 +98,10 @@ def profil_oku(profil_adi: str) -> dict[str, Any]:
 
 
 def _hermes_profil_oku(profil_adi: str, hermes_yol: Path) -> dict[str, Any]:
-    """Hermes profil dizinindeki tum dosyalari okuyarak profil sozlugu olusturur."""
+    """ReYMeN profil dizinindeki tum dosyalari okuyarak profil sozlugu olusturur."""
     profil: dict[str, Any] = {
         "name": profil_adi,
-        "kaynak": "hermes",
+        "kaynak": "reymen",
         "dizin": str(hermes_yol),
     }
 
@@ -161,16 +172,16 @@ def profil_yaz(profil_adi: str, profil: dict[str, Any]) -> bool:
 
 
 def list_profiles() -> list[dict[str, Any]]:
-    """Profil listesini doner: Hermes + ReYMeN profilleri birlikte.
+    """Profil listesini doner: ReYMeN + ReYMeN profilleri birlikte.
 
     Returns:
         Profil bilgisi sozlukleri listesi (name, kaynak, dizin, vs.)
     """
     profiller: list[dict[str, Any]] = []
 
-    # Hermes profilleri
-    if _HERMES_PROFIL_DIZINI.exists():
-        for entry in sorted(_HERMES_PROFIL_DIZINI.iterdir()):
+    # ReYMeN profilleri (opsiyonel)
+    if _ESKI_PROFIL_MEVCUT:
+        for entry in sorted(_ESKI_PROFIL_DIZINI.iterdir()):
             if entry.is_dir() and not entry.name.startswith("."):
                 profiller.append(_hermes_profil_oku(entry.name, entry))
 
@@ -178,8 +189,8 @@ def list_profiles() -> list[dict[str, Any]]:
     if _REYMEN_PROFIL_DIZINI.exists():
         for entry in sorted(_REYMEN_PROFIL_DIZINI.iterdir()):
             if entry.suffix == ".json" and entry.stem:
-                # Hermes'te varsa ekleme
-                if not any(p["name"] == entry.stem and p.get("kaynak") == "hermes" for p in profiller):
+                # ReYMeN'te varsa ekleme
+                if not any(p["name"] == entry.stem and p.get("kaynak") == "reymen" for p in profiller):
                     try:
                         with open(entry, "r", encoding="utf-8") as f:
                             data = json.load(f)
@@ -204,7 +215,7 @@ def list_profiles() -> list[dict[str, Any]]:
 
 
 def list_profile_names() -> list[str]:
-    """Sadece profil adlarini listeler (eski API — geri uyumlu)."""
+    """Sadece profil adlarini listeler (eski API â€” geri uyumlu)."""
     return [p["name"] for p in list_profiles()]
 
 
@@ -212,25 +223,23 @@ def get_active_profile_name() -> str:
     """Aktif profil adini doner.
 
     Oncelik sirasi:
-    1. HERMES_PROFILE ortam degiskeni
-    2. mevcut Hermes profili (.hermes konfig)
-    3. reymen ReYMeN profili
+    1. REYMEN_PROFILE / HERMES_PROFILE ortam degiskeni
+    2. ReYMeN profili (.ReYMeN/profiles/)
+    3. ReYMeN profili (eger installed ise)
     4. default
     """
-    # HERMES_PROFILE env
-    env_profil = os.environ.get("HERMES_PROFILE")
+    # REYMEN_PROFILE env (once kendi env'miz)
+    env_profil = os.environ.get("REYMEN_PROFILE") or os.environ.get("HERMES_PROFILE")
     if env_profil:
         return env_profil
 
-    # mevcut Hermes profili -> ~/.hermes/profiles/<profil>/. aktif profil
-    # kiral38 profili aktif (bu session'dan goruluyor)
-    # once aktif Hermes profilini bul
-    if _hermes_profil_yolu("kiral38"):
-        return "kiral38"
-
-    # ReYMeN profili
+    # ReYMeN profilleri (bagimsiz calisir)
     if _reymen_profil_yolu("reymen").exists():
         return "reymen"
+
+    # ReYMeN profilleri (opsiyonel â€” sadece installed ise)
+    if _ESKI_PROFIL_MEVCUT and _hermes_profil_yolu("kiral38"):
+        return "kiral38"
 
     return "default"
 
@@ -286,15 +295,15 @@ def profil_sil(profil_adi: str) -> bool:
 
     Returns:
         Basarili ise True. "default" profili silinemez.
-        Hermes profilleri bu fonksiyonla silinemez (dizindir).
+        ReYMeN profilleri bu fonksiyonla silinemez (dizindir).
     """
     if profil_adi == "default":
         logger.warning("[Profiles] default profili silinemez")
         return False
 
-    # Hermes profili mi?
-    if _hermes_profil_yolu(profil_adi):
-        logger.warning("[Profiles] Hermes profilleri silinemez: %s", profil_adi)
+    # ReYMeN profili mi? (sadece okunabilir)
+    if _ESKI_PROFIL_MEVCUT and _hermes_profil_yolu(profil_adi):
+        logger.warning("[Profiles] ReYMeN profilleri silinemez: %s", profil_adi)
         return False
 
     yol = _reymen_profil_yolu(profil_adi)
@@ -311,16 +320,16 @@ def profil_sil(profil_adi: str) -> bool:
         return False
 
 
-# ═══════════════════════════════════════════════════════════════
-# Yeni: Hermes profil detaylari
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# Yeni: ReYMeN profil detaylari
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def profil_detay(profil_adi: str) -> dict[str, Any]:
     """Profilin tum dosyalarini ve meta bilgilerini doner."""
     profil = profil_oku(profil_adi)
 
-    # Hermes profiliyse dosya listesi ekle
+    # ReYMeN profiliyse dosya listesi ekle
     hermes_yol = _hermes_profil_yolu(profil_adi)
     if hermes_yol:
         dosyalar = []

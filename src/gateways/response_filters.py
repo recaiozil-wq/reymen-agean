@@ -1,4 +1,4 @@
-"""Gateway response filtering helpers.
+﻿"""Gateway response filtering helpers.
 
 These helpers operate at the gateway boundary: they decide whether a completed
 agent turn should be delivered to the chat, not what should be persisted in the

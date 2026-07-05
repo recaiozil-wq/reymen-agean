@@ -1,23 +1,23 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-service_bridge.py — ReYMeN Servis Köprüsü (Event Bus).
+service_bridge.py â€” ReYMeN Servis KÃ¶prÃ¼sÃ¼ (Event Bus).
 
-Component'ler arası gevşek bağlı iletişim sağlar.
-Publish/Subscribe pattern ile çalışır:
+Component'ler arasÄ± gevÅŸek baÄŸlÄ± iletiÅŸim saÄŸlar.
+Publish/Subscribe pattern ile Ã§alÄ±ÅŸÄ±r:
     bridge = ServiceBridge()
     bridge.subscribe("state_changed", on_state_change)
     bridge.publish("state_changed", {"from": "idle", "to": "thinking"})
 
 Desteklenen event tipleri:
-    - state_changed:     State machine geçişleri
-    - tool_call_start:   Araç çağrısı başladı
-    - tool_call_end:     Araç çağrısı bitti
-    - error:             Bileşen hatası
-    - recovery_start:    Kurtarma başladı
-    - recovery_end:      Kurtarma tamamlandı
-    - heartbeat:         Bileşen canlılık sinyali
-    - shutdown:          Sistem kapanıyor
-    - config_reload:     Config yeniden yüklendi
+    - state_changed:     State machine geÃ§iÅŸleri
+    - tool_call_start:   AraÃ§ Ã§aÄŸrÄ±sÄ± baÅŸladÄ±
+    - tool_call_end:     AraÃ§ Ã§aÄŸrÄ±sÄ± bitti
+    - error:             BileÅŸen hatasÄ±
+    - recovery_start:    Kurtarma baÅŸladÄ±
+    - recovery_end:      Kurtarma tamamlandÄ±
+    - heartbeat:         BileÅŸen canlÄ±lÄ±k sinyali
+    - shutdown:          Sistem kapanÄ±yor
+    - config_reload:     Config yeniden yÃ¼klendi
 """
 
 from __future__ import annotations
@@ -48,18 +48,18 @@ class EventType(enum.Enum):
     COMPONENT_START = "component_start"
     COMPONENT_STOP = "component_stop"
     BRIDGE_STATUS = "bridge_status"
-    CUSTOM = "custom"  # Kullanıcı tanımlı event'ler için joker
+    CUSTOM = "custom"  # KullanÄ±cÄ± tanÄ±mlÄ± event'ler iÃ§in joker
 
 
 @dataclass
 class Event:
-    """Event mesajı."""
+    """Event mesajÄ±."""
 
-    type: str  # EventType.value veya özel isim
-    source: str  # Hangi bileşenden geldiği
+    type: str  # EventType.value veya Ã¶zel isim
+    source: str  # Hangi bileÅŸenden geldiÄŸi
     data: Dict[str, Any] = field(default_factory=dict)
     timestamp: float = field(default_factory=time.time)
-    id: Optional[str] = None  # Opsiyonel event kimliği
+    id: Optional[str] = None  # Opsiyonel event kimliÄŸi
 
     def __post_init__(self):
         if self.id is None:
@@ -67,11 +67,11 @@ class Event:
 
 
 EventHandler = Callable[[Event], None]
-"""Event handler imzası: (Event) -> None"""
+"""Event handler imzasÄ±: (Event) -> None"""
 
 
 class ServiceBridge:
-    """Thread-safe event bus / servis köprüsü."""
+    """Thread-safe event bus / servis kÃ¶prÃ¼sÃ¼."""
 
     def __init__(self, max_queue_size: int = 1000, log_events: bool = True):
         self._subscribers: Dict[str, List[EventHandler]] = defaultdict(list)
@@ -79,17 +79,17 @@ class ServiceBridge:
         self._max_queue_size = max_queue_size
         self._log_events = log_events
         self._event_count: int = 0
-        self._last_events: List[Event] = []  # Son N event (debug için)
+        self._last_events: List[Event] = []  # Son N event (debug iÃ§in)
         self._started_at: float = time.time()
-        self._component_health: Dict[str, float] = {}  # bileşen -> son heartbeat
+        self._component_health: Dict[str, float] = {}  # bileÅŸen -> son heartbeat
 
-    # ── Abonelik ───────────────────────────────────────────────────────
+    # â”€â”€ Abonelik â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def subscribe(self, event_type: str, handler: EventHandler) -> None:
         """Bir event tipine abone ol.
 
         Args:
-            event_type: EventType.value veya "*" (tüm eventler)
+            event_type: EventType.value veya "*" (tÃ¼m eventler)
             handler: Callback fonksiyonu
         """
         with self._lock:
@@ -98,17 +98,17 @@ class ServiceBridge:
                 logger.debug(f"Abone eklendi: {event_type} -> {handler.__name__}")
 
     def unsubscribe(self, event_type: str, handler: EventHandler) -> None:
-        """Abonelikten çık."""
+        """Abonelikten Ã§Ä±k."""
         with self._lock:
             if handler in self._subscribers.get(event_type, []):
                 self._subscribers[event_type].remove(handler)
                 logger.debug(f"Abone cikarildi: {event_type} -> {handler.__name__}")
 
     def subscribe_all(self, handler: EventHandler) -> None:
-        """Tüm eventlere abone ol (wildcard)."""
+        """TÃ¼m eventlere abone ol (wildcard)."""
         self.subscribe("*", handler)
 
-    # ── Yayınlama ──────────────────────────────────────────────────────
+    # â”€â”€ YayÄ±nlama â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def publish(
         self,
@@ -117,16 +117,16 @@ class ServiceBridge:
         source: str = "unknown",
         event_id: Optional[str] = None,
     ) -> Event:
-        """Event yayınla — tüm abonelere ilet.
+        """Event yayÄ±nla â€” tÃ¼m abonelere ilet.
 
         Args:
-            event_type: Event tipi (EventType.value veya özel)
+            event_type: Event tipi (EventType.value veya Ã¶zel)
             data: Event verisi
-            source: Gönderen bileşen adı
+            source: GÃ¶nderen bileÅŸen adÄ±
             event_id: Opsiyonel event ID
 
         Returns:
-            Oluşturulan Event nesnesi
+            OluÅŸturulan Event nesnesi
         """
         event = Event(
             type=event_type,
@@ -143,13 +143,13 @@ class ServiceBridge:
 
             # Belirtilen event tipi aboneleri
             handlers = list(self._subscribers.get(event_type, []))
-            # Wildcard aboneleri (tekrarları önle)
+            # Wildcard aboneleri (tekrarlarÄ± Ã¶nle)
             wildcard_handlers = list(self._subscribers.get("*", []))
 
         if self._log_events and event_type not in ("heartbeat",):
             logger.debug(f"[Bridge] {source} -> {event_type}: {data}")
 
-        # Handler'ları lock dışında çağır (deadlock riski yok)
+        # Handler'larÄ± lock dÄ±ÅŸÄ±nda Ã§aÄŸÄ±r (deadlock riski yok)
         for handler in handlers:
             try:
                 handler(event)
@@ -157,7 +157,7 @@ class ServiceBridge:
                 logger.error(f"Bridge handler hatasi [{event_type}]: {e}")
 
         for handler in wildcard_handlers:
-            if handler in handlers:  # Çift çağrıyı önle
+            if handler in handlers:  # Ã‡ift Ã§aÄŸrÄ±yÄ± Ã¶nle
                 continue
             try:
                 handler(event)
@@ -166,15 +166,15 @@ class ServiceBridge:
 
         return event
 
-    # ── Heartbeat (bileşen canlılık) ────────────────────────────────────
+    # â”€â”€ Heartbeat (bileÅŸen canlÄ±lÄ±k) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def heartbeat(self, component: str) -> None:
-        """Bileşen canlılık sinyali."""
+        """BileÅŸen canlÄ±lÄ±k sinyali."""
         with self._lock:
             self._component_health[component] = time.time()
 
     def component_healthy(self, component: str, max_age_sec: float = 30.0) -> bool:
-        """Bileşen belirtilen süre içinde heartbeat göndermiş mi?"""
+        """BileÅŸen belirtilen sÃ¼re iÃ§inde heartbeat gÃ¶ndermiÅŸ mi?"""
         with self._lock:
             last = self._component_health.get(component)
             if last is None:
@@ -184,13 +184,13 @@ class ServiceBridge:
     def all_components_healthy(
         self, components: List[str], max_age_sec: float = 30.0
     ) -> bool:
-        """Tüm belirtilen bileşenler sağlıklı mı?"""
+        """TÃ¼m belirtilen bileÅŸenler saÄŸlÄ±klÄ± mÄ±?"""
         return all(self.component_healthy(c, max_age_sec) for c in components)
 
-    # ── Durum / metrik ─────────────────────────────────────────────────
+    # â”€â”€ Durum / metrik â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def status(self) -> Dict[str, Any]:
-        """Köprü durum raporu."""
+        """KÃ¶prÃ¼ durum raporu."""
         with self._lock:
             return {
                 "aktif": True,
@@ -213,7 +213,7 @@ class ServiceBridge:
             return list(self._last_events[-count:])
 
 
-# ── Hızlı test ───────────────────────────────────────────────────────────────
+# â”€â”€ HÄ±zlÄ± test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
 

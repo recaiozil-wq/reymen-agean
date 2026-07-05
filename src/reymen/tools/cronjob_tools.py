@@ -1,4 +1,4 @@
-"""ReYMeN tools.cronjob_tools shim — Hermes cronjob araçlarını yönlendirir."""
+﻿"""ReYMeN tools.cronjob_tools shim â€” ReYMeN cronjob araÃ§larÄ±nÄ± yÃ¶nlendirir."""
 
 from __future__ import annotations
 
@@ -9,17 +9,17 @@ logger = logging.getLogger(__name__)
 
 
 def _scan_cron_prompt(prompt: str) -> dict:
-    """Hermes _scan_cron_prompt — cron prompt'unu tarar."""
+    """ReYMeN _scan_cron_prompt â€” cron prompt'unu tarar."""
     return {"prompt": prompt, "schedule": None}
 
 
 def _scan_cron_skill_assembled(skills: list) -> list:
-    """Hermes _scan_cron_skill_assembled — skill listesini tarar."""
+    """ReYMeN _scan_cron_skill_assembled â€” skill listesini tarar."""
     return skills
 
 
 def cronjob(*args, **kwargs) -> str:
-    """Hermes cronjob — cronjob tool'una yönlendirir."""
+    """ReYMeN cronjob â€” cronjob tool'una yÃ¶nlendirir."""
     import json
 
     try:

@@ -1,16 +1,16 @@
-"""
-ReYMeN Gateway — BlueBubbles platform adapter.
+﻿"""
+ReYMeN Gateway â€” BlueBubbles platform adapter.
 
-BlueBubbles self-hosted API (https://bluebubbles.app) üzerinden
+BlueBubbles self-hosted API (https://bluebubbles.app) Ã¼zerinden
 Apple iMessage mesajlasmasini saglar.
 
 Bagimliliklar:
   - httpx (HTTP istemcisi)
 
 Yapilandirma (ortam degiskenleri):
-  - BLUEBUBBLES_URL       — BlueBubbles API base URL (varsayilan:
+  - BLUEBUBBLES_URL       â€” BlueBubbles API base URL (varsayilan:
                             http://localhost:1234/api/v1)
-  - BLUEBUBBLES_PASSWORD  — API erisim sifresi (zorunlu)
+  - BLUEBUBBLES_PASSWORD  â€” API erisim sifresi (zorunlu)
 """
 
 import asyncio
@@ -25,8 +25,8 @@ from pathlib import Path as _Path
 
 sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
-from src.gateways.config import Platform, PlatformConfig
-from src.gateways.platforms.base import (
+from gateways.config import Platform, PlatformConfig
+from gateways.platforms.base import (
     BasePlatformAdapter,
     MessageEvent,
     MessageType,
@@ -90,7 +90,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
 
         self._client: Optional[httpx.AsyncClient] = None
 
-    # ── HTTP Istemci ──────────────────────────────────────────────────
+    # â”€â”€ HTTP Istemci â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     async def _get_client(self) -> httpx.AsyncClient:
         """Lazy-init async HTTP client."""
@@ -103,7 +103,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
             await self._client.aclose()
         self._client = None
 
-    # ── Baglanti Yonetimi ─────────────────────────────────────────────
+    # â”€â”€ Baglanti Yonetimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     async def connect(self) -> bool:
         """
@@ -148,7 +148,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
         self._mark_disconnected()
         logger.info("[BlueBubbles] Baglanti kapatildi.")
 
-    # ── Mesaj Gonderme ────────────────────────────────────────────────
+    # â”€â”€ Mesaj Gonderme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     async def send(
         self,
@@ -230,7 +230,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
             logger.error("[BlueBubbles] Gonderim hatasi: %s", e)
             return SendResult(success=False, error=str(e))
 
-    # ── Typing Indicator ──────────────────────────────────────────────
+    # â”€â”€ Typing Indicator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     async def send_typing(self, chat_id: str, metadata: Optional[dict] = None) -> None:
         """
@@ -265,7 +265,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
         except Exception as e:
             logger.debug("[BlueBubbles] Typing gonderim hatasi (%s): %s", chat_id, e)
 
-    # ── Opsiyonel: Mesaj Silme ────────────────────────────────────────
+    # â”€â”€ Opsiyonel: Mesaj Silme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     async def delete_message(self, chat_id: str, message_id: str) -> bool:
         """
@@ -292,7 +292,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
             )
             return False
 
-    # ── Opsiyonel: Mesaj Getirme ──────────────────────────────────────
+    # â”€â”€ Opsiyonel: Mesaj Getirme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     async def get_messages(
         self,

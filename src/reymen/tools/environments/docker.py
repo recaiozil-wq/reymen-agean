@@ -1,4 +1,4 @@
-"""ReYMeN tools.environments.docker shim — Hermes Docker ortamını yönlendirir."""
+﻿"""ReYMeN tools.environments.docker shim â€” ReYMeN Docker ortamÄ±nÄ± yÃ¶nlendirir."""
 
 from __future__ import annotations
 
@@ -8,6 +8,6 @@ logger = logging.getLogger(__name__)
 
 
 class DockerEnvironment:
-    """Hermes DockerEnvironment — ReYMeN'de stub."""
+    """ReYMeN DockerEnvironment â€” ReYMeN'de stub."""
 
     pass

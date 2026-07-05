@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-reymen_agent.py — ReYMeN ana agent modülü.
-DeepSoek API, agent orchestrator, beceri bağlamı ve format temizleme.
+reymen_agent.py â€” ReYMeN ana agent modÃ¼lÃ¼.
+DeepSoek API, agent orchestrator, beceri baÄŸlamÄ± ve format temizleme.
 """
 
 import json
@@ -14,11 +14,11 @@ from typing import Any, Optional
 import requests
 
 
-# ── Global state ──────────────────────────────────────────────
+# â”€â”€ Global state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _agent = None
 _logger = None
 
-# ── Sabitler ──────────────────────────────────────────────────
+# â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 DEEPSEEK_API_URL = "https://api.deepseek.com/chat/completions"
 DEEPSEEK_MODEL = "deepseek-chat"
 MAX_YANIT_UZUNLUK = 4000
@@ -26,13 +26,13 @@ MAX_BECERI_UZUNLUK = 1500
 MAX_MESAJ_UZUNLUK = 500
 
 
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # _get_logger
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _get_logger(name: str = "reymen_agent") -> logging.Logger:
-    """Singleton logger oluşturur/döndürür."""
+    """Singleton logger oluÅŸturur/dÃ¶ndÃ¼rÃ¼r."""
     global _logger
     if _logger is None:
         _logger = logging.getLogger(name)
@@ -47,13 +47,13 @@ def _get_logger(name: str = "reymen_agent") -> logging.Logger:
     return _logger
 
 
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # _agent_instance
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _agent_instance(config: Optional[dict] = None) -> Any:
-    """Agent singleton — AIAgentOrchestrator instance'ı döndürür."""
+    """Agent singleton â€” AIAgentOrchestrator instance'Ä± dÃ¶ndÃ¼rÃ¼r."""
     global _agent
     if _agent is not None:
         return _agent
@@ -67,56 +67,56 @@ def _agent_instance(config: Optional[dict] = None) -> Any:
         return None
 
 
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # _beceri_baglami_al
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _beceri_baglami_al(hedef: str) -> str:
-    """closed_learning_loop._beceri_ara üzerinden beceri bağlamı alır."""
+    """closed_learning_loop._beceri_ara Ã¼zerinden beceri baÄŸlamÄ± alÄ±r."""
     try:
         from closed_learning_loop import _beceri_ara
 
-        # Mesajı 500 karaktere kısalt
+        # MesajÄ± 500 karaktere kÄ±salt
         sorgu = hedef[:MAX_MESAJ_UZUNLUK] if hedef else ""
 
         sonuc = _beceri_ara(sorgu)
 
-        # Beceri bulunamadi / toplam kontrolü
+        # Beceri bulunamadi / toplam kontrolÃ¼
         if not sonuc or "beceri bulunamadi" in sonuc.lower():
             return ""
         if "toplam" in sonuc.lower():
             return ""
 
-        # Uzun metni kısalt
+        # Uzun metni kÄ±salt
         if len(sonuc) > MAX_BECERI_UZUNLUK:
             sonuc = sonuc[:MAX_BECERI_UZUNLUK] + "..."
 
-        return f"\n\n## İLGİLİ BECERİLER:\n{sonuc}\n"
+        return f"\n\n## Ä°LGÄ°LÄ° BECERÄ°LER:\n{sonuc}\n"
     except Exception:
         return ""
 
 
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # _deepseek_sohbet
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _deepseek_sohbet(messages: Any, config: Optional[dict] = None) -> str:
-    """DeepSeek API'ye sohbet isteği gönderir."""
+    """DeepSeek API'ye sohbet isteÄŸi gÃ¶nderir."""
     logger = _get_logger()
 
-    # API anahtarı kontrolü
+    # API anahtarÄ± kontrolÃ¼
     api_key = os.environ.get("DEEPSEEK_API_KEY")
     if not api_key:
-        logger.warning("DeepSeek API anahtarı bulunamadı")
-        return "API anahtarı bulunamadı"
+        logger.warning("DeepSeek API anahtarÄ± bulunamadÄ±")
+        return "API anahtarÄ± bulunamadÄ±"
 
-    # Mesajı string'den listeye çevir
+    # MesajÄ± string'den listeye Ã§evir
     if isinstance(messages, str):
         user_message = messages
     elif isinstance(messages, list):
-        # Eğer messages bir liste ise son user mesajını bul
+        # EÄŸer messages bir liste ise son user mesajÄ±nÄ± bul
         user_texts = [
             m["content"]
             for m in messages
@@ -126,18 +126,18 @@ def _deepseek_sohbet(messages: Any, config: Optional[dict] = None) -> str:
     else:
         user_message = str(messages)
 
-    # Beceri bağlamını al
+    # Beceri baÄŸlamÄ±nÄ± al
     beceri_baglama = _beceri_baglami_al(user_message)
 
-    # System mesajı oluştur
+    # System mesajÄ± oluÅŸtur
     system_content = (
-        "Sen yardımsever bir ReYMeN asistansın. "
-        "Kullanıcıya net ve doğrudan yanıtlar ver."
+        "Sen yardÄ±msever bir ReYMeN asistansÄ±n. "
+        "KullanÄ±cÄ±ya net ve doÄŸrudan yanÄ±tlar ver."
     )
     if beceri_baglama:
         system_content += beceri_baglama
 
-    # API isteği
+    # API isteÄŸi
     payload = {
         "model": DEEPSEEK_MODEL,
         "messages": [
@@ -152,40 +152,40 @@ def _deepseek_sohbet(messages: Any, config: Optional[dict] = None) -> str:
     }
 
     try:
-        logger.info("DeepSeek API çağrısı yapılıyor...")
+        logger.info("DeepSeek API Ã§aÄŸrÄ±sÄ± yapÄ±lÄ±yor...")
         resp = requests.post(
             DEEPSEEK_API_URL, headers=headers, json=payload, timeout=60
         )
         resp.raise_for_status()
         data = resp.json()
         yanit = data["choices"][0]["message"]["content"]
-        logger.info("DeepSeek API yanıtı başarılı")
+        logger.info("DeepSeek API yanÄ±tÄ± baÅŸarÄ±lÄ±")
         return yanit
     except Exception as e:
-        logger.error(f"DeepSeek API hatası: {e}")
-        return f"API hatası: {e}"
+        logger.error(f"DeepSeek API hatasÄ±: {e}")
+        return f"API hatasÄ±: {e}"
 
 
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # _agent_loop
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _agent_loop(hedef: str, config: Optional[dict] = None) -> str:
-    """Agent loop — orchestrator üzerinden konuşma çalıştırır."""
+    """Agent loop â€” orchestrator Ã¼zerinden konuÅŸma Ã§alÄ±ÅŸtÄ±rÄ±r."""
     logger = _get_logger()
-    logger.info(f"Agent loop başlatılıyor: {hedef[:50]}...")
+    logger.info(f"Agent loop baÅŸlatÄ±lÄ±yor: {hedef[:50]}...")
 
     try:
         agent = _agent_instance(config)
         if agent is None:
-            logger.warning("Agent yok, fallback kullanılıyor")
+            logger.warning("Agent yok, fallback kullanÄ±lÄ±yor")
             return _deepseek_fallback(hedef)
 
-        # Agent ile konuşmayı çalıştır
+        # Agent ile konuÅŸmayÄ± Ã§alÄ±ÅŸtÄ±r
         agent.run_conversation(hedef)
 
-        # Yanıtı conversation_history'den al
+        # YanÄ±tÄ± conversation_history'den al
         yanit = None
         if hasattr(agent, "conversation_history") and agent.conversation_history:
             for msg in reversed(agent.conversation_history):
@@ -202,29 +202,29 @@ def _agent_loop(hedef: str, config: Optional[dict] = None) -> str:
             raw = str(getattr(agent, "conversation_history", ""))
             yanit = _yanit_ayikla(raw)
 
-        # 4000 karakter sınırı
+        # 4000 karakter sÄ±nÄ±rÄ±
         if yanit and len(yanit) > MAX_YANIT_UZUNLUK:
             yanit = yanit[:MAX_YANIT_UZUNLUK]
 
         return yanit or ""
     except Exception as e:
-        logger.error(f"Agent loop hatası: {e}")
+        logger.error(f"Agent loop hatasÄ±: {e}")
         return _deepseek_fallback(str(e))
 
 
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # _yanit_ayikla
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _yanit_ayikla(raw: str) -> str:
-    """Ham çıktıdan yanıt metnini ayıklar."""
+    """Ham Ã§Ä±ktÄ±dan yanÄ±t metnini ayÄ±klar."""
     if not raw:
         return ""
 
     satirlar = raw.split("\n")
 
-    # Markör öncelik sırası (en yüksek → düşük)
+    # MarkÃ¶r Ã¶ncelik sÄ±rasÄ± (en yÃ¼ksek â†’ dÃ¼ÅŸÃ¼k)
     markorler = [
         ("[TAMAMLANDI]", 3),
         ("[SONUC]", 2),
@@ -238,10 +238,10 @@ def _yanit_ayikla(raw: str) -> str:
                 if len(icerik) >= 3:
                     return icerik
 
-    # Markör bulunamadı — son 5 satırdan en uzun içerikli satır
+    # MarkÃ¶r bulunamadÄ± â€” son 5 satÄ±rdan en uzun iÃ§erikli satÄ±r
     son_satirlar = satirlar[-5:]
 
-    # Filtrele: kısa/kalıp satırları atla
+    # Filtrele: kÄ±sa/kalÄ±p satÄ±rlarÄ± atla
     filtrelenmis = []
     for satir in son_satirlar:
         satir_stripped = satir.strip()
@@ -251,39 +251,39 @@ def _yanit_ayikla(raw: str) -> str:
             continue
         if satir_stripped == "===":
             continue
-        if "[Budget]" in satir_stripped or "[Bütçe]" in satir_stripped:
+        if "[Budget]" in satir_stripped or "[BÃ¼tÃ§e]" in satir_stripped:
             continue
         if "--- TUR" in satir_stripped:
             continue
         filtrelenmis.append(satir_stripped)
 
     if not filtrelenmis:
-        # Hepsi filtrelendiyse son satırı al
+        # Hepsi filtrelendiyse son satÄ±rÄ± al
         return son_satirlar[-1].strip() if son_satirlar else ""
 
-    # En uzun içerikli satırı seç
+    # En uzun iÃ§erikli satÄ±rÄ± seÃ§
     return max(filtrelenmis, key=len)
 
 
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # _deepseek_fallback
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _deepseek_fallback(
     error: str, messages: Any = None, config: Optional[dict] = None
 ) -> str:
-    """Fallback — agent başarısız olursa direkt DeepSeek API çağrısı."""
+    """Fallback â€” agent baÅŸarÄ±sÄ±z olursa direkt DeepSeek API Ã§aÄŸrÄ±sÄ±."""
     logger = _get_logger()
-    logger.warning(f"Fallback kullanılıyor: {error}")
+    logger.warning(f"Fallback kullanÄ±lÄ±yor: {error}")
 
     api_key = os.environ.get("DEEPSEEK_API_KEY")
     if not api_key:
-        return "API anahtarı bulunamadı"
+        return "API anahtarÄ± bulunamadÄ±"
 
-    # Kullanılacak mesaj
+    # KullanÄ±lacak mesaj
     if messages is None:
-        mesaj = f"Hata oluştu: {error}. Lütfen kullanıcıya yardımcı ol."
+        mesaj = f"Hata oluÅŸtu: {error}. LÃ¼tfen kullanÄ±cÄ±ya yardÄ±mcÄ± ol."
     elif isinstance(messages, str):
         mesaj = messages
     else:
@@ -295,8 +295,8 @@ def _deepseek_fallback(
             {
                 "role": "system",
                 "content": (
-                    "Sen bir fallback asistansın. Ana sistem hatası nedeniyle "
-                    "devreye girdin. Kullanıcıya yardımcı ol."
+                    "Sen bir fallback asistansÄ±n. Ana sistem hatasÄ± nedeniyle "
+                    "devreye girdin. KullanÄ±cÄ±ya yardÄ±mcÄ± ol."
                 ),
             },
             {"role": "user", "content": mesaj},
@@ -316,23 +316,23 @@ def _deepseek_fallback(
         data = resp.json()
         return data["choices"][0]["message"]["content"]
     except Exception as e:
-        logger.error(f"Fallback API hatası: {e}")
-        return f"API hatası: {e}"
+        logger.error(f"Fallback API hatasÄ±: {e}")
+        return f"API hatasÄ±: {e}"
 
 
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # _format_temizle
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _format_temizle(text: str) -> str:
-    """Metin formatını temizler — backtick ve kod bloklarını düzeltir."""
+    """Metin formatÄ±nÄ± temizler â€” backtick ve kod bloklarÄ±nÄ± dÃ¼zeltir."""
     if not text:
         return text
 
-    # Kod bloğu içinde olup olmadığımızı takip et
+    # Kod bloÄŸu iÃ§inde olup olmadÄ±ÄŸÄ±mÄ±zÄ± takip et
     def _kod_ici_indexler(satirlar):
-        """Kod bloğu içindeki satırların index setini döndürür."""
+        """Kod bloÄŸu iÃ§indeki satÄ±rlarÄ±n index setini dÃ¶ndÃ¼rÃ¼r."""
         kod_ici = set()
         acik = False
         for i, satir in enumerate(satirlar):
@@ -348,15 +348,15 @@ def _format_temizle(text: str) -> str:
     yeni_satirlar = []
     for i, satir in enumerate(satirlar):
         if i in kod_ici:
-            # Kod bloğu içindeki satırları değiştirme
+            # Kod bloÄŸu iÃ§indeki satÄ±rlarÄ± deÄŸiÅŸtirme
             yeni_satirlar.append(satir)
             continue
 
         yeni_satir = satir
 
-        # 4+ backtick → 3 backtick
+        # 4+ backtick â†’ 3 backtick
         if yeni_satir.startswith("````"):
-            # Kaç backtick var?
+            # KaÃ§ backtick var?
             count = 0
             for ch in yeni_satir:
                 if ch == "`":
@@ -367,26 +367,26 @@ def _format_temizle(text: str) -> str:
                 gerisi = yeni_satir[count:]
                 yeni_satir = "```" + gerisi
 
-        # Çift backtick + dil → üçlü backtick + dil (açılış)
+        # Ã‡ift backtick + dil â†’ Ã¼Ã§lÃ¼ backtick + dil (aÃ§Ä±lÄ±ÅŸ)
         if yeni_satir.startswith("``") and not yeni_satir.startswith("```"):
             gerisi = yeni_satir[2:]
             if gerisi and not gerisi.startswith("`"):
                 yeni_satir = "```" + gerisi
 
-        # Satır başı tek backtick → üçlü backtick
+        # SatÄ±r baÅŸÄ± tek backtick â†’ Ã¼Ã§lÃ¼ backtick
         if yeni_satir.startswith("`") and not yeni_satir.startswith("``"):
-            # Kod bloğu açma mı yoksa inline kod mu?
+            # Kod bloÄŸu aÃ§ma mÄ± yoksa inline kod mu?
             gerisi = yeni_satir[1:]
             if gerisi.strip():
                 yeni_satir = "```" + gerisi
 
         yeni_satirlar.append(yeni_satir)
 
-    # Kod bloğu kapanışını düzelt: tek backtick → üçlü
+    # Kod bloÄŸu kapanÄ±ÅŸÄ±nÄ± dÃ¼zelt: tek backtick â†’ Ã¼Ã§lÃ¼
     metin = "\n".join(yeni_satirlar)
     if metin.rstrip().endswith("`") and not metin.rstrip().endswith("```"):
-        # Son satır tek backtick ile bitiyor
-        # ``` ile başlayan bir bloğun kapanışı mı?
+        # Son satÄ±r tek backtick ile bitiyor
+        # ``` ile baÅŸlayan bir bloÄŸun kapanÄ±ÅŸÄ± mÄ±?
         satirlar_yeni = metin.split("\n")
         acik_blok_sayisi = 0
         for s in satirlar_yeni:
@@ -396,11 +396,11 @@ def _format_temizle(text: str) -> str:
                 acik_blok_sayisi += 1
 
         if acik_blok_sayisi % 2 != 0:
-            # Açık blok var, kapat
+            # AÃ§Ä±k blok var, kapat
             for j in range(len(satirlar_yeni) - 1, -1, -1):
                 s = satirlar_yeni[j]
                 if s.rstrip().endswith("`") and not s.rstrip().endswith("```"):
-                    # Tek backtick ile biten satır
+                    # Tek backtick ile biten satÄ±r
                     if s.rstrip().endswith("`"):
                         # Son backtick(ler)i say
                         sondaki_backtick = 0
@@ -414,7 +414,7 @@ def _format_temizle(text: str) -> str:
                             break
             metin = "\n".join(satirlar_yeni)
 
-    # 2+ ardışık Python kodu satırını blokla (kod bloğu dışında)
+    # 2+ ardÄ±ÅŸÄ±k Python kodu satÄ±rÄ±nÄ± blokla (kod bloÄŸu dÄ±ÅŸÄ±nda)
     satirlar_son = metin.split("\n")
     kod_ici2 = _kod_ici_indexler(satirlar_son)
     yeni_satirlar2 = []
@@ -425,12 +425,12 @@ def _format_temizle(text: str) -> str:
             i += 1
             continue
 
-        # 2+ ardışık Python kodu satırı ara
+        # 2+ ardÄ±ÅŸÄ±k Python kodu satÄ±rÄ± ara
         python_satirlari = []
         j = i
         while j < len(satirlar_son) and j not in kod_ici2:
             s = satirlar_son[j]
-            # Python kodu: indent (4 boşluk) veya def/class/if/for/with ile başlayan
+            # Python kodu: indent (4 boÅŸluk) veya def/class/if/for/with ile baÅŸlayan
             if (
                 s.startswith("    ")
                 or s.startswith("\t")
@@ -467,18 +467,18 @@ def _format_temizle(text: str) -> str:
     return "\n".join(yeni_satirlar2).strip()
 
 
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # isleyen_gorev
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def isleyen_gorev(
     task: str, use_agent: bool = False, chat_id: Optional[str] = None
 ) -> str:
-    """Ana işlev — görevi işler ve yanıt döndürür."""
+    """Ana iÅŸlev â€” gÃ¶revi iÅŸler ve yanÄ±t dÃ¶ndÃ¼rÃ¼r."""
     logger = _get_logger()
     logger.info(
-        f"Görev işleniyor: {task[:50]}... (use_agent={use_agent}, chat_id={chat_id})"
+        f"GÃ¶rev iÅŸleniyor: {task[:50]}... (use_agent={use_agent}, chat_id={chat_id})"
     )
 
     if use_agent:
@@ -487,20 +487,20 @@ def isleyen_gorev(
         return _deepseek_sohbet(task)
 
 
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # kopru_deepseek_istek
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def kopru_deepseek_istek(messages: Any, config: Optional[dict] = None) -> str:
-    """Köprü entegrasyonu — isleyen_gorev'e yönlendirir."""
+    """KÃ¶prÃ¼ entegrasyonu â€” isleyen_gorev'e yÃ¶nlendirir."""
     logger = _get_logger()
-    logger.info("Köprü isteği alındı, isleyen_gorev'e yönlendiriliyor...")
+    logger.info("KÃ¶prÃ¼ isteÄŸi alÄ±ndÄ±, isleyen_gorev'e yÃ¶nlendiriliyor...")
 
     if isinstance(messages, str):
         return isleyen_gorev(messages, chat_id="kopru")
     elif isinstance(messages, list):
-        # Liste ise son user mesajını çıkar
+        # Liste ise son user mesajÄ±nÄ± Ã§Ä±kar
         user_texts = [
             m["content"]
             for m in messages

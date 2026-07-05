@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-windows_entegrasyon.py — ReYMeN Windows Otomasyon Entegrasyonu
+windows_entegrasyon.py â€” ReYMeN Windows Otomasyon Entegrasyonu
 
 Tum Windows modullerini event bus uzerinden birbirine baglar.
 Tek cagri: windows_entegrasyonu_baslat()
@@ -17,12 +17,12 @@ def windows_entegrasyonu_baslat():
     """Windows modullerini event bus ile birbirine bagla.
 
     Baglanti Semasi:
-        tor_otomasyonu.py ──tor_hata──→ hata_cozucu.py
-        tor_otomasyonu.py ──tor_basarili──→ akilli_yonlendirici.py
-        araclar_nisan.py  ──nisan──→ tor_otomasyonu.py
-        hata_cozucu.py    ──cozum_uygulandi──→ motor.py (log)
-        motor.py          ──hata──→ cokus_raporlayici.py
-        cokus_raporlayici.py ──cokus──→ kullanici (bildirim)
+        tor_otomasyonu.py â”€â”€tor_hataâ”€â”€â†’ hata_cozucu.py
+        tor_otomasyonu.py â”€â”€tor_basariliâ”€â”€â†’ akilli_yonlendirici.py
+        araclar_nisan.py  â”€â”€nisanâ”€â”€â†’ tor_otomasyonu.py
+        hata_cozucu.py    â”€â”€cozum_uygulandiâ”€â”€â†’ motor.py (log)
+        motor.py          â”€â”€hataâ”€â”€â†’ cokus_raporlayici.py
+        cokus_raporlayici.py â”€â”€cokusâ”€â”€â†’ kullanici (bildirim)
     """
     try:
         from reymen.windows.windows_events import (
@@ -38,7 +38,7 @@ def windows_entegrasyonu_baslat():
         bus = event_bus_al()
         baglanti_sayisi = 0
 
-        # 1. tor_otomasyonu hata → hata_cozucu
+        # 1. tor_otomasyonu hata â†’ hata_cozucu
         try:
             from reymen.cereyan.hata_cozucu import CozumUygulayici
 
@@ -51,7 +51,7 @@ def windows_entegrasyonu_baslat():
             )
             pass
 
-        # 2. nisan bulundu → tor_otomasyonu
+        # 2. nisan bulundu â†’ tor_otomasyonu
         try:
             from reymen.windows.tor_otomasyonu import TorNavigator
 
@@ -64,7 +64,7 @@ def windows_entegrasyonu_baslat():
             )
             pass
 
-        # 3. hata → cokus raporu (son cares)
+        # 3. hata â†’ cokus raporu (son cares)
         try:
             from reymen.cereyan.cokus_raporlayici import cokus_raporu_uret
 
@@ -76,7 +76,7 @@ def windows_entegrasyonu_baslat():
             )
             pass
 
-        # 4. tor basarili → akilli_yonlendirici (istenirse sec)
+        # 4. tor basarili â†’ akilli_yonlendirici (istenirse sec)
         try:
             from reymen.cereyan.akilli_yonlendirici import gorev_icin_model_sec
 
@@ -112,11 +112,11 @@ def _tor_hatasini_coz(veri, cozum):
     """Tor hatasi algilandiginda CozumUygulayici'yi cagir."""
     hata = veri.get("mesaj", "") or veri.get("hata", "")
     kaynak = veri.get("kaynak", "tor")
-    print(f"[WindowsEnt] 🔧 Tor hatasi cozuluyor: {hata[:80]}")
+    print(f"[WindowsEnt] ğŸ”§ Tor hatasi cozuluyor: {hata[:80]}")
     try:
         sonuc = cozum.cozum_uygula(hata, kaynak=kaynak)
         if sonuc:
-            print(f"[WindowsEnt] ✅ Cozum uygulandi: {sonuc[:100]}")
+            print(f"[WindowsEnt] âœ… Cozum uygulandi: {sonuc[:100]}")
     except Exception as e:
         logger.error("[WindowsEnt] Cozum hatasi: %s", e)
 
@@ -124,7 +124,7 @@ def _tor_hatasini_coz(veri, cozum):
 def _nisana_git(veri, tor):
     """Nisan bulundugunda Tor navigator'una git komutu ver."""
     hedef = veri.get("hedef", "") or veri.get("url", "")
-    print(f"[WindowsEnt] 🎯 Nisana gidiliyor: {hedef[:80]}")
+    print(f"[WindowsEnt] ğŸ¯ Nisana gidiliyor: {hedef[:80]}")
     try:
         tor.git(hedef)
     except Exception as e:
@@ -140,17 +140,17 @@ def _cokus_kontrol(veri, cokus_fn):
             deneme_sayisi=hata_sayisi,
         )
         if rapor:
-            print(f"[WindowsEnt] 💥 Cokus raporu: {rapor[:100]}...")
+            print(f"[WindowsEnt] ğŸ’¥ Cokus raporu: {rapor[:100]}...")
 
 
 def _basarili_log(veri):
     """Basarili islemi logla."""
     adim = veri.get("adim", "")
     sure = veri.get("sure_sn", 0)
-    print(f"[WindowsEnt] ✅ {adim} basarili ({sure:.1f}s)")
+    print(f"[WindowsEnt] âœ… {adim} basarili ({sure:.1f}s)")
 
 
 def _cozum_log(veri):
     """Cozum uygulandigini logla."""
     cozum_adi = veri.get("cozum", "")
-    print(f"[WindowsEnt] 🔧 Cozum uygulandi: {cozum_adi[:60]}")
+    print(f"[WindowsEnt] ğŸ”§ Cozum uygulandi: {cozum_adi[:60]}")

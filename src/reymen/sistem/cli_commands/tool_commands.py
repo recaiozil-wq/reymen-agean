@@ -1,7 +1,7 @@
-"""Tool çağrı komutları — MixinCommands alt modülü.
+﻿"""Tool Ã§aÄŸrÄ± komutlarÄ± â€” MixinCommands alt modÃ¼lÃ¼.
 
-Bu dosya otomatik olarak cli_mixin_commands.py'den ayrılmıştır.
-MixinCommands sınıfının ilgili metotlarını içerir.
+Bu dosya otomatik olarak cli_mixin_commands.py'den ayrÄ±lmÄ±ÅŸtÄ±r.
+MixinCommands sÄ±nÄ±fÄ±nÄ±n ilgili metotlarÄ±nÄ± iÃ§erir.
 """
 
 import logging
@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 
 class MixinCommands:
-    """Tool çağrı komutları."""
+    """Tool Ã§aÄŸrÄ± komutlarÄ±."""
 
     def _handle_tools_command(self, cmd: str):
         """Handle /tools [list|disable|enable] slash commands.
@@ -43,7 +43,7 @@ class MixinCommands:
         _handle_tools_command(self, cmd)
 
     def _handle_codex_runtime(self, cmd_original: str) -> None:
-        """Handle /codex-runtime — toggle the codex app-server runtime opt-in.
+        """Handle /codex-runtime â€” toggle the codex app-server runtime opt-in.
 
         Delegates to :func:`handlers.tools.codex_runtime_handler._handle_codex_runtime`.
         """
@@ -70,7 +70,7 @@ class MixinCommands:
         _handle_curator_command(self, cmd)
 
     def _handle_kanban_command(self, cmd: str):
-        """Handle the /kanban command — delegate to the shared kanban CLI.
+        """Handle the /kanban command â€” delegate to the shared kanban CLI.
 
         Delegates to :func:`handlers.tools.kanban_handler._handle_kanban_command`.
         """
@@ -79,7 +79,7 @@ class MixinCommands:
         _handle_kanban_command(self, cmd)
 
     def _handle_skills_command(self, cmd: str):
-        """Handle /skills slash command — delegates to ReYMeN_cli.skills_hub.
+        """Handle /skills slash command â€” delegates to ReYMeN_cli.skills_hub.
 
         Delegates to :func:`handlers.tools.skills_handler._handle_skills_command`.
         """
@@ -88,7 +88,7 @@ class MixinCommands:
         _handle_skills_command(self, cmd)
 
     def _handle_background_command(self, cmd: str):
-        """Handle /background <prompt> — run a prompt in a separate background session.
+        """Handle /background <prompt> â€” run a prompt in a separate background session.
 
         Delegates to :func:`handlers.tools.background_handler._handle_background_command`.
         """
@@ -109,7 +109,7 @@ class MixinCommands:
         return try_launch_chrome_debug(port, system)
 
     def _handle_bundles_command(self, cmd: str) -> None:
-        """In-session ``/bundles`` — show installed skill bundles.
+        """In-session ``/bundles`` â€” show installed skill bundles.
 
         Delegates to :func:`handlers.tools.bundles_handler._handle_bundles_command`.
         """
@@ -118,7 +118,7 @@ class MixinCommands:
         _handle_bundles_command(self, cmd)
 
     def _handle_browser_command(self, cmd: str):
-        """Handle /browser connect|disconnect|status — manage live Chromium-family CDP connection.
+        """Handle /browser connect|disconnect|status â€” manage live Chromium-family CDP connection.
 
         Delegates to :func:`handlers.tools.browser_handler._handle_browser_command`.
         """

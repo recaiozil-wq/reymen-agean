@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""gateway.webhook — Webhook gateway (stub)."""
+﻿# -*- coding: utf-8 -*-
+"""gateway.webhook â€” Webhook gateway (stub)."""
 
 
 class WebhookGateway:

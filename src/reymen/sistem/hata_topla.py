@@ -1,17 +1,17 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-reymen/sistem/hata_topla.py — Merkezi Hata Toplama ve Bildirim Sistemi.
+reymen/sistem/hata_topla.py â€” Merkezi Hata Toplama ve Bildirim Sistemi.
 
-Özellikler:
-  - sys.excepthook ile yakalanamayan hataları yakalar
-  - logging.Handler ile tüm log'ları toplar
-  - JSONL formatında ~/.hermes/errors/ klasörüne kaydeder
-  - Kritik hatalarda Telegram/webhook bildirimi gönderir
-  - Web UI üzerinden görüntüleme ve yönetim
+Ã–zellikler:
+  - sys.excepthook ile yakalanamayan hatalarÄ± yakalar
+  - logging.Handler ile tÃ¼m log'larÄ± toplar
+  - JSONL formatÄ±nda ~/.reymen/errors/ klasÃ¶rÃ¼ne kaydeder
+  - Kritik hatalarda Telegram/webhook bildirimi gÃ¶nderir
+  - Web UI Ã¼zerinden gÃ¶rÃ¼ntÃ¼leme ve yÃ¶netim
 
-Kullanım:
+KullanÄ±m:
     from reymen.sistem.hata_topla import hata_topla
-    hata_topla.baslat()  # Uygulama başlangıcında çağır
+    hata_topla.baslat()  # Uygulama baÅŸlangÄ±cÄ±nda Ã§aÄŸÄ±r
 """
 
 from __future__ import annotations
@@ -29,10 +29,10 @@ from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
-# ── Varsayılan yapılandırma ───────────────────────────────────────
+# â”€â”€ VarsayÄ±lan yapÄ±landÄ±rma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 HATA_DIZINI = Path.home() / ".ReYMeN" / "errors"
 HATA_DOSYASI = HATA_DIZINI / "errors.jsonl"
-AZAMI_KAYIT = 500  # maksimum kayıt sayısı
+AZAMI_KAYIT = 500  # maksimum kayÄ±t sayÄ±sÄ±
 SEVIYE_SIRASI = {
     "DEBUG": 0,
     "INFO": 1,
@@ -41,7 +41,7 @@ SEVIYE_SIRASI = {
     "CRITICAL": 4,
 }
 
-# ── Bildirim kanalları ───────────────────────────────────────────
+# â”€â”€ Bildirim kanallarÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _bildirim_kanallari: list[dict] = []
 
 
@@ -51,13 +51,13 @@ def bildirim_kanal_ekle(
     esik: str = "ERROR",
     token: str = "",
 ) -> None:
-    """Bildirim kanalı ekle.
+    """Bildirim kanalÄ± ekle.
 
     Args:
         tur: "telegram", "webhook", "log"
         hedef: Telegram chat_id veya webhook URL
         esik: Minimum seviye (DEBUG/INFO/WARNING/ERROR/CRITICAL)
-        token: Telegram bot token (telegram için)
+        token: Telegram bot token (telegram iÃ§in)
     """
     _bildirim_kanallari.append(
         {
@@ -70,25 +70,25 @@ def bildirim_kanal_ekle(
     )
 
 
-# ═══════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Hata Deposu
-# ═══════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class HataDeposu:
-    """JSONL dosyasına hata kayıtlarını yaz/oku."""
+    """JSONL dosyasÄ±na hata kayÄ±tlarÄ±nÄ± yaz/oku."""
 
     def __init__(self, dosya_yolu: Path = HATA_DOSYASI):
         self.dosya = dosya_yolu
         self._kilit = threading.Lock()
 
     def kaydet(self, kayit: dict) -> None:
-        """Tek kaydı JSONL'e ekle (thread-safe)."""
+        """Tek kaydÄ± JSONL'e ekle (thread-safe)."""
         with self._kilit:
             self.dosya.parent.mkdir(parents=True, exist_ok=True)
             with open(self.dosya, "a", encoding="utf-8") as f:
                 f.write(json.dumps(kayit, ensure_ascii=False) + "\n")
-            # Eşik aşıldıysa temizle
+            # EÅŸik aÅŸÄ±ldÄ±ysa temizle
             self._boyut_kontrol()
 
     def listele(
@@ -98,7 +98,7 @@ class HataDeposu:
         seviye: str = "",
         kaynak: str = "",
     ) -> list[dict]:
-        """Kayıtları listele (en yeni en üstte)."""
+        """KayÄ±tlarÄ± listele (en yeni en Ã¼stte)."""
         if not self.dosya.exists():
             return []
 
@@ -125,12 +125,12 @@ class HataDeposu:
                 k for k in kayitlar if kaynak.lower() in k.get("kaynak", "").lower()
             ]
 
-        # Ters sırala (en yeni ilk)
+        # Ters sÄ±rala (en yeni ilk)
         kayitlar.reverse()
         return kayitlar[offset : offset + limit]
 
     def temizle(self) -> int:
-        """Tüm kayıtları sil."""
+        """TÃ¼m kayÄ±tlarÄ± sil."""
         say = 0
         if self.dosya.exists():
             # Say
@@ -142,7 +142,7 @@ class HataDeposu:
         return say
 
     def ozet(self) -> dict:
-        """Özet istatistikler."""
+        """Ã–zet istatistikler."""
         if not self.dosya.exists():
             return {"toplam": 0, "error": 0, "critical": 0, "warning": 0, "info": 0}
 
@@ -162,24 +162,24 @@ class HataDeposu:
         return sayac
 
     def _boyut_kontrol(self) -> None:
-        """AZAMI_KAYIT aşıldıysa eski kayıtları sil."""
+        """AZAMI_KAYIT aÅŸÄ±ldÄ±ysa eski kayÄ±tlarÄ± sil."""
         if not self.dosya.exists():
             return
         with open(self.dosya, "r") as f:
             satirlar = f.readlines()
         if len(satirlar) > AZAMI_KAYIT:
-            # Son AZAMI_KAYIT satırı tut
+            # Son AZAMI_KAYIT satÄ±rÄ± tut
             with open(self.dosya, "w") as f:
                 f.writelines(satirlar[-AZAMI_KAYIT:])
 
 
-# ═══════════════════════════════════════════════════════════════════
-# Log Handler (logging modülü için)
-# ═══════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# Log Handler (logging modÃ¼lÃ¼ iÃ§in)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class HataLogHandler(logging.Handler):
-    """Log kayıtlarını HataDeposu'na yönlendirir."""
+    """Log kayÄ±tlarÄ±nÄ± HataDeposu'na yÃ¶nlendirir."""
 
     def __init__(self, depo: HataDeposu, seviye: int = logging.WARNING):
         super().__init__(seviye)
@@ -207,15 +207,15 @@ class HataLogHandler(logging.Handler):
             self.handleError(record)
 
 
-# ═══════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Exception Hook (sys.excepthook)
-# ═══════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 _eski_excepthook: Optional[Any] = None
 
 
 def _excepthook(tip, deger, tb):
-    """Yakalanamayan istisnaları kaydet."""
+    """Yakalanamayan istisnalarÄ± kaydet."""
     try:
         kayit = {
             "zaman": datetime.now().isoformat(),
@@ -237,13 +237,13 @@ def _excepthook(tip, deger, tb):
             _eski_excepthook(tip, deger, tb)
 
 
-# ═══════════════════════════════════════════════════════════════════
-# Bildirim Gönderme
-# ═══════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# Bildirim GÃ¶nderme
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _bildirim_gonder(kayit: dict) -> None:
-    """Kayıtlı kanallara bildirim gönder."""
+    """KayÄ±tlÄ± kanallara bildirim gÃ¶nder."""
     seviye = kayit.get("seviye", "INFO")
     for kanal in _bildirim_kanallari:
         if not kanal.get("aktif", True):
@@ -265,18 +265,18 @@ def _bildirim_gonder(kayit: dict) -> None:
             elif tur == "webhook":
                 _bildirim_webhook(hedef, kayit)
         except Exception as e:
-            logger.debug("Bildirim hatası (%s): %s", kanal["tur"], e)
+            logger.debug("Bildirim hatasÄ± (%s): %s", kanal["tur"], e)
 
 
 def _bildirim_telegram(token: str, chat_id: str, kayit: dict) -> None:
-    """Telegram'a hata bildirimi gönder."""
+    """Telegram'a hata bildirimi gÃ¶nder."""
     import urllib.request
     import urllib.parse
 
     seviye = kayit.get("seviye", "INFO")
-    ikon = "🔴" if seviye == "CRITICAL" else "🟠" if seviye == "ERROR" else "🟡"
+    ikon = "ğŸ”´" if seviye == "CRITICAL" else "ğŸŸ " if seviye == "ERROR" else "ğŸŸ¡"
     mesaj = (
-        f"{ikon} *HATA BİLDİRİMİ*\n"
+        f"{ikon} *HATA BÄ°LDÄ°RÄ°MÄ°*\n"
         f"Seviye: {seviye}\n"
         f"Kaynak: {kayit.get('kaynak', '?')}\n"
         f"Zaman: {kayit.get('zaman', '?')}\n"
@@ -297,7 +297,7 @@ def _bildirim_telegram(token: str, chat_id: str, kayit: dict) -> None:
 
 
 def _bildirim_webhook(url: str, kayit: dict) -> None:
-    """Webhook'a hata bildirimi gönder."""
+    """Webhook'a hata bildirimi gÃ¶nder."""
     import urllib.request
     import json
 
@@ -311,15 +311,15 @@ def _bildirim_webhook(url: str, kayit: dict) -> None:
     urllib.request.urlopen(req, timeout=10)
 
 
-# ═══════════════════════════════════════════════════════════════════
-# Ana Sınıf (Singleton)
-# ═══════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# Ana SÄ±nÄ±f (Singleton)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class HataToplayici:
     """Merkezi hata toplama sistemi.
 
-    Singleton: hata_topla() ile erişilir.
+    Singleton: hata_topla() ile eriÅŸilir.
     """
 
     def __init__(self):
@@ -334,7 +334,7 @@ class HataToplayici:
         telegram_chat: str = "",
         webhook_url: str = "",
     ) -> None:
-        """Hata toplamayı başlat.
+        """Hata toplamayÄ± baÅŸlat.
 
         Args:
             log_seviye: Minimum log seviyesi
@@ -361,17 +361,17 @@ class HataToplayici:
         root_logger.addHandler(self._handler)
         root_logger.setLevel(logging.WARNING)
 
-        # Bildirim kanalları
+        # Bildirim kanallarÄ±
         if telegram_token and telegram_chat:
             bildirim_kanal_ekle("telegram", telegram_chat, "ERROR", telegram_token)
         if webhook_url:
             bildirim_kanal_ekle("webhook", webhook_url, "ERROR")
 
         self._basladi = True
-        logger.info("HataToplayici başlatıldı")
+        logger.info("HataToplayici baÅŸlatÄ±ldÄ±")
 
     def durdur(self) -> None:
-        """Hata toplamayı durdur."""
+        """Hata toplamayÄ± durdur."""
         if self._basladi:
             sys.excepthook = _eski_excepthook
             if self._handler:
@@ -385,7 +385,7 @@ class HataToplayici:
         mesaj: str = "",
         traceback_str: str = "",
     ) -> dict:
-        """Elle hata kaydı ekle."""
+        """Elle hata kaydÄ± ekle."""
         kayit = {
             "zaman": datetime.now().isoformat(),
             "seviye": seviye,
@@ -400,7 +400,7 @@ class HataToplayici:
         return kayit
 
 
-# ── Singleton erişimcisi ─────────────────────────────────────────
+# â”€â”€ Singleton eriÅŸimcisi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _hata_topla_instance: Optional[HataToplayici] = None
 
 

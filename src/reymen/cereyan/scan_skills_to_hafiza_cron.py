@@ -1,12 +1,12 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-scan_skills_to_hafiza_cron.py — Cron job: Skills → OnceHafiza DB senkronizasyonu.
+scan_skills_to_hafiza_cron.py â€” Cron job: Skills â†’ OnceHafiza DB senkronizasyonu.
 
-Her 6 saatte bir çalışır.
+Her 6 saatte bir Ã§alÄ±ÅŸÄ±r.
 reymen/cereyan/skills/ -> skills_index.db (meta) -> ogrenmeler.db (OnceHafiza)
 
-Sadece gerçekten yeni dosyaları ekler ve gerçekten değişmiş dosyaları günceller.
-Hash karşılaştırması tam SHA256 ile yapılır.
+Sadece gerÃ§ekten yeni dosyalarÄ± ekler ve gerÃ§ekten deÄŸiÅŸmiÅŸ dosyalarÄ± gÃ¼nceller.
+Hash karÅŸÄ±laÅŸtÄ±rmasÄ± tam SHA256 ile yapÄ±lÄ±r.
 """
 
 import hashlib
@@ -25,9 +25,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger("scan_skills_cron")
 
-# ── Yollar ──────────────────────────────────────────────────────────────────
-ROOT = Path(__file__).parent.parent.parent.parent.resolve()  # proje kökü
-SKILLS_DIR = ROOT / "skills"  # taranacak klasör
+# â”€â”€ Yollar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+ROOT = Path(__file__).parent.parent.parent.parent.resolve()  # proje kÃ¶kÃ¼
+SKILLS_DIR = ROOT / "skills"  # taranacak klasÃ¶r
 SKILLS_DB = ROOT / "merkez_db" / "skills_index.db"
 OGRENME_DB = ROOT / "merkez_db" / "ogrenme.db"
 
@@ -42,7 +42,7 @@ def dosya_hash_full(dosya_yolu: str) -> str:
 
 
 def kategori_ve_ad(dosya_yolu: str) -> tuple[str, str]:
-    """Göreli yoldan kategori ve dosya adını çıkar."""
+    """GÃ¶reli yoldan kategori ve dosya adÄ±nÄ± Ã§Ä±kar."""
     rel = os.path.relpath(dosya_yolu, str(SKILLS_DIR))
     rel = rel.replace("\\", "/")
     parts = rel.split("/")
@@ -52,7 +52,7 @@ def kategori_ve_ad(dosya_yolu: str) -> tuple[str, str]:
 
 
 def ogrenme_db_kur(con: sqlite3.Connection):
-    """ogrenme.db tablosunu oluştur (mevcut schema ile uyumlu)."""
+    """ogrenme.db tablosunu oluÅŸtur (mevcut schema ile uyumlu)."""
     con.executescript("""
         CREATE TABLE IF NOT EXISTS ogrenmeler (
             id                INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -79,7 +79,7 @@ def ogrenme_db_kur(con: sqlite3.Connection):
 
 
 def skills_db_kur(con: sqlite3.Connection):
-    """skills_index.db tablolarını oluştur."""
+    """skills_index.db tablolarÄ±nÄ± oluÅŸtur."""
     con.executescript("""
         CREATE TABLE IF NOT EXISTS beceriler (
             ad        TEXT PRIMARY KEY,
@@ -96,7 +96,7 @@ def skills_db_kur(con: sqlite3.Connection):
 
 
 def _baglan(path: Path) -> sqlite3.Connection:
-    """DB bağlantısı — WAL + busy_timeout=120s + retry."""
+    """DB baÄŸlantÄ±sÄ± â€” WAL + busy_timeout=120s + retry."""
     for i in range(10):
         try:
             con = sqlite3.connect(str(path), timeout=120)
@@ -105,30 +105,30 @@ def _baglan(path: Path) -> sqlite3.Connection:
             return con
         except sqlite3.OperationalError as e:
             if i < 9:
-                logger.warning("⚠️  DB kilitli (%s), %ds bekleniyor...", e, 5)
+                logger.warning("âš ï¸  DB kilitli (%s), %ds bekleniyor...", e, 5)
                 time.sleep(5)
             else:
                 raise
-    raise sqlite3.OperationalError(f"DB {path} bağlanamadı (10 deneme)")
+    raise sqlite3.OperationalError(f"DB {path} baÄŸlanamadÄ± (10 deneme)")
 
 
 def scan_and_sync() -> tuple[int, int]:
-    """Skills → OnceHafiza senkronizasyonu.
+    """Skills â†’ OnceHafiza senkronizasyonu.
 
     Returns:
         (yeni_sayisi, guncel_sayisi)
     """
     logger.info("=" * 60)
-    logger.info("🔍 Skills → OnceHafiza DB cron taraması")
+    logger.info("ğŸ” Skills â†’ OnceHafiza DB cron taramasÄ±")
     logger.info("   Skills: %s", SKILLS_DIR)
     logger.info("   Meta:   %s", SKILLS_DB)
     logger.info("   Hafiza: %s", OGRENME_DB)
 
-    # 1) Skills klasöründeki tüm .md dosyaları
+    # 1) Skills klasÃ¶rÃ¼ndeki tÃ¼m .md dosyalarÄ±
     md_dosyalari = sorted(SKILLS_DIR.rglob("*.md"))
-    logger.info("📄 Skills: %d .md dosyası", len(md_dosyalari))
+    logger.info("ğŸ“„ Skills: %d .md dosyasÄ±", len(md_dosyalari))
 
-    # 2) skills_index.db'den meta yükle (tam hash ile karşılaştırma)
+    # 2) skills_index.db'den meta yÃ¼kle (tam hash ile karÅŸÄ±laÅŸtÄ±rma)
     SKILLS_DB.parent.mkdir(parents=True, exist_ok=True)
     con_skills = _baglan(SKILLS_DB)
     skills_db_kur(con_skills)
@@ -141,9 +141,9 @@ def scan_and_sync() -> tuple[int, int]:
     except sqlite3.OperationalError:
         logger.warning("[fix_01_sessiz_except] OperationalError")
     con_skills.close()
-    logger.info("📚 Skills DB meta: %d kayıt", len(meta_map))
+    logger.info("ğŸ“š Skills DB meta: %d kayÄ±t", len(meta_map))
 
-    # 3) ogrenmeler.db'den mevcut kayıtları yükle
+    # 3) ogrenmeler.db'den mevcut kayÄ±tlarÄ± yÃ¼kle
     OGRENME_DB.parent.mkdir(parents=True, exist_ok=True)
     con_ogren = _baglan(OGRENME_DB)
     ogrenme_db_kur(con_ogren)
@@ -154,11 +154,11 @@ def scan_and_sync() -> tuple[int, int]:
     except sqlite3.OperationalError:
         logger.warning("[fix_01_sessiz_except] OperationalError")
     con_ogren.close()
-    logger.info("📚 OnceHafiza DB: %d kayıt", len(ogrenme_set))
+    logger.info("ğŸ“š OnceHafiza DB: %d kayÄ±t", len(ogrenme_set))
 
-    # 4) Her dosyayı tara, yeni/değişenleri belirle
+    # 4) Her dosyayÄ± tara, yeni/deÄŸiÅŸenleri belirle
     yeni_liste = []  # skills_index.db'de olmayan (yepyeni)
-    guncel_liste = []  # skills_index.db'de var ama hash değişmiş
+    guncel_liste = []  # skills_index.db'de var ama hash deÄŸiÅŸmiÅŸ
     oncehafiza_ekle = []  # skills_index.db'de var ama OnceHafiza'da yok
     atlanan = 0
 
@@ -174,17 +174,17 @@ def scan_and_sync() -> tuple[int, int]:
         eski_hash = meta_map.get(meta_adi)
 
         if eski_hash is None:
-            # Skills_index.db'de yok → yepyeni
+            # Skills_index.db'de yok â†’ yepyeni
             yeni_liste.append((meta_adi, str(dosya), guncel_hash, kategori, dosya_adi))
         elif eski_hash != guncel_hash:
-            # Hash değişmiş → güncelle
+            # Hash deÄŸiÅŸmiÅŸ â†’ gÃ¼ncelle
             guncel_liste.append(
                 (meta_adi, str(dosya), guncel_hash, kategori, dosya_adi)
             )
         else:
             atlanan += 1
 
-        # OnceHafiza'da var mı kontrol et (hedef = dosya_adi .md'siz)
+        # OnceHafiza'da var mÄ± kontrol et (hedef = dosya_adi .md'siz)
         hedef = dosya_adi.replace(".md", "")
         if hedef not in ogrenme_set:
             oncehafiza_ekle.append(
@@ -192,14 +192,14 @@ def scan_and_sync() -> tuple[int, int]:
             )
 
     logger.info(
-        "📊 Analiz: yeni=%d, guncel=%d, atlanan=%d, OnceHafiza'ya_ek=%d",
+        "ğŸ“Š Analiz: yeni=%d, guncel=%d, atlanan=%d, OnceHafiza'ya_ek=%d",
         len(yeni_liste),
         len(guncel_liste),
         atlanan,
         len(oncehafiza_ekle),
     )
 
-    # 5) skills_index.db'yi güncelle (yeni + güncellenen)
+    # 5) skills_index.db'yi gÃ¼ncelle (yeni + gÃ¼ncellenen)
     con_s = _baglan(SKILLS_DB)
     skills_eklenen = 0
     skills_guncellenen = 0
@@ -260,17 +260,17 @@ def scan_and_sync() -> tuple[int, int]:
         con_s.close()
 
     logger.info(
-        "✅ Skills DB: %d yeni + %d güncellendi", skills_eklenen, skills_guncellenen
+        "âœ… Skills DB: %d yeni + %d gÃ¼ncellendi", skills_eklenen, skills_guncellenen
     )
 
-    # 6) OnceHafiza DB'sini güncelle (ogrenmeler.db)
-    # Kullanılacak kaynak: birleştir (yeni + güncel + OnceHafiza'da olmayan)
-    # Ama: bir dosya hem yeni hem oncehafiza_ekle'de olabilir → dedup
+    # 6) OnceHafiza DB'sini gÃ¼ncelle (ogrenmeler.db)
+    # KullanÄ±lacak kaynak: birleÅŸtir (yeni + gÃ¼ncel + OnceHafiza'da olmayan)
+    # Ama: bir dosya hem yeni hem oncehafiza_ekle'de olabilir â†’ dedup
     ekle_set = set()
     oncehafiza_kaynak = []
 
-    # Öncelik: güncellenenler içinden OnceHafiza'da olmayanları bul
-    # Basitçe: oncehafiza_ekle listesini kullan, hepsi skills_index.db'de var olan ama ogrenmeler'de olmayanlar
+    # Ã–ncelik: gÃ¼ncellenenler iÃ§inden OnceHafiza'da olmayanlarÄ± bul
+    # BasitÃ§e: oncehafiza_ekle listesini kullan, hepsi skills_index.db'de var olan ama ogrenmeler'de olmayanlar
     for item in oncehafiza_ekle:
         meta_adi, dosya_yolu, guncel_hash, kategori, dosya_adi = item
         if meta_adi not in ekle_set:
@@ -302,11 +302,11 @@ def scan_and_sync() -> tuple[int, int]:
             )
             ogrenme_eklenen += 1
 
-        # Güncellemeler: hash değişmiş dosyalardan OnceHafiza'da olanları güncelle
+        # GÃ¼ncellemeler: hash deÄŸiÅŸmiÅŸ dosyalardan OnceHafiza'da olanlarÄ± gÃ¼ncelle
         for meta_adi, dosya_yolu, guncel_hash, kategori, dosya_adi in guncel_liste:
             hedef = dosya_adi.replace(".md", "")
             if hedef not in ogrenme_set:
-                continue  # OnceHafiza'da yoksa atla (yukarıda eklenmiş olabilir)
+                continue  # OnceHafiza'da yoksa atla (yukarÄ±da eklenmiÅŸ olabilir)
             try:
                 with open(dosya_yolu, "r", encoding="utf-8", errors="replace") as f:
                     icerik = f.read()
@@ -329,17 +329,17 @@ def scan_and_sync() -> tuple[int, int]:
         con_o.close()
 
     logger.info(
-        "✅ OnceHafiza DB: %d yeni eklendi + %d güncellendi",
+        "âœ… OnceHafiza DB: %d yeni eklendi + %d gÃ¼ncellendi",
         ogrenme_eklenen,
         ogrenme_guncellenen,
     )
     logger.info("=" * 60)
-    logger.info("📊 CRON RAPORU:")
+    logger.info("ğŸ“Š CRON RAPORU:")
     logger.info(
-        "   Skills DB  → yeni: %d, güncel: %d", skills_eklenen, skills_guncellenen
+        "   Skills DB  â†’ yeni: %d, gÃ¼ncel: %d", skills_eklenen, skills_guncellenen
     )
     logger.info(
-        "   OnceHafiza → yeni: %d, güncel: %d", ogrenme_eklenen, ogrenme_guncellenen
+        "   OnceHafiza â†’ yeni: %d, gÃ¼ncel: %d", ogrenme_eklenen, ogrenme_guncellenen
     )
     logger.info("=" * 60)
 

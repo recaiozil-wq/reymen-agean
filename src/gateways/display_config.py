@@ -1,13 +1,13 @@
-"""Per-platform display/verbosity configuration resolver.
+﻿"""Per-platform display/verbosity configuration resolver.
 
-Provides ``resolve_display_setting()`` — the single entry-point for reading
+Provides ``resolve_display_setting()`` â€” the single entry-point for reading
 display settings with platform-specific overrides and sensible defaults.
 
 Resolution order (first non-None wins):
-    1. ``display.platforms.<platform>.<key>``  — explicit per-platform user override
-    2. ``display.<key>``                       — global user setting
-    3. ``_PLATFORM_DEFAULTS[<platform>][<key>]``  — built-in sensible default
-    4. ``_GLOBAL_DEFAULTS[<key>]``              — built-in global default
+    1. ``display.platforms.<platform>.<key>``  â€” explicit per-platform user override
+    2. ``display.<key>``                       â€” global user setting
+    3. ``_PLATFORM_DEFAULTS[<platform>][<key>]``  â€” built-in sensible default
+    4. ``_GLOBAL_DEFAULTS[<key>]``              â€” built-in global default
 
 Exception: ``display.streaming`` is CLI-only.  Gateway streaming follows the
 top-level ``streaming`` config unless ``display.platforms.<platform>.streaming``
@@ -41,20 +41,20 @@ _GLOBAL_DEFAULTS: dict[str, Any] = {
     "interim_assistant_messages": True,
     "long_running_notifications": True,
     "busy_ack_detail": True,
-    # When true, delete tool-progress / "⏳ Working — N min" / status bubbles
+    # When true, delete tool-progress / "â³ Working â€” N min" / status bubbles
     # after the final response lands on platforms that support message
-    # deletion (e.g. Telegram). Off by default — progress is still shown
+    # deletion (e.g. Telegram). Off by default â€” progress is still shown
     # live, just cleaned up after success so the chat doesn't fill up with
     # stale breadcrumbs. Failed runs leave bubbles in place as breadcrumbs.
     "cleanup_progress": False,
 }
 
 # ---------------------------------------------------------------------------
-# Sensible per-platform defaults — tiered by platform capability
+# Sensible per-platform defaults â€” tiered by platform capability
 # ---------------------------------------------------------------------------
 # Tier 1 (high): Supports message editing, typically personal/team use
 # Tier 2 (medium): Supports editing but often workspace/customer-facing
-# Tier 3 (low): No edit support — each progress msg is permanent
+# Tier 3 (low): No edit support â€” each progress msg is permanent
 # Tier 4 (minimal): Batch/non-interactive delivery
 
 _TIER_HIGH = {
@@ -98,7 +98,7 @@ _TIER_MINIMAL = {
 }
 
 _PLATFORM_DEFAULTS: dict[str, dict[str, Any]] = {
-    # Tier 1 — full edit support, personal/team use
+    # Tier 1 â€” full edit support, personal/team use
     # Telegram is usually a mobile inbox: keep tool_progress quiet and skip
     # the verbose busy-ack iteration counter, but DO surface real mid-turn
     # assistant commentary (interim_assistant_messages) and DO send periodic
@@ -112,18 +112,18 @@ _PLATFORM_DEFAULTS: dict[str, dict[str, Any]] = {
         "busy_ack_detail": False,
     },
     "discord": _TIER_HIGH,
-    # Tier 2 — edit support, often customer/workspace channels
-    # Slack: tool_progress off by default — Bolt posts cannot be edited like CLI;
-    # "new"/"all" spam permanent lines in channels (hermes-agent#14663).
+    # Tier 2 â€” edit support, often customer/workspace channels
+    # Slack: tool_progress off by default â€” Bolt posts cannot be edited like CLI;
+    # "new"/"all" spam permanent lines in channels (reymen-agent#14663).
     "slack": {**_TIER_MEDIUM, "tool_progress": "off"},
     "mattermost": _TIER_MEDIUM,
     "matrix": _TIER_MEDIUM,
     "feishu": _TIER_MEDIUM,
-    # Tier 3 — no edit support, progress messages are permanent
+    # Tier 3 â€” no edit support, progress messages are permanent
     "signal": _TIER_LOW,
     "whatsapp": _TIER_MEDIUM,  # Baileys bridge supports /edit
     # WhatsApp Cloud API: Meta added message editing in 2023 but the
-    # Hermes Cloud adapter doesn't implement edit_message yet, so we
+    # ReYMeN Cloud adapter doesn't implement edit_message yet, so we
     # stay on TIER_LOW (tool_progress off) to avoid spamming each
     # status update as a separate message. Promote to TIER_MEDIUM once
     # Cloud's edit_message lands.
@@ -133,7 +133,7 @@ _PLATFORM_DEFAULTS: dict[str, dict[str, Any]] = {
     "wecom": _TIER_LOW,
     "wecom_callback": _TIER_LOW,
     "dingtalk": _TIER_LOW,
-    # Tier 4 — batch or non-interactive delivery
+    # Tier 4 â€” batch or non-interactive delivery
     "email": _TIER_MINIMAL,
     "sms": _TIER_MINIMAL,
     "webhook": _TIER_MINIMAL,
@@ -216,7 +216,7 @@ def resolve_display_setting(
 
 
 def _normalise(setting: str, value: Any) -> Any:
-    """Normalise YAML quirks (bare ``off`` → False in YAML 1.1)."""
+    """Normalise YAML quirks (bare ``off`` â†’ False in YAML 1.1)."""
     if setting == "tool_progress":
         if value is False:
             return "off"

@@ -1,15 +1,15 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-cron_scan_skills.py — ReYMeN OnceHafiza skills tarama cron job.
-Her 6 saatte bir çalışır.
+cron_scan_skills.py â€” ReYMeN OnceHafiza skills tarama cron job.
+Her 6 saatte bir Ã§alÄ±ÅŸÄ±r.
 
-Kullanım:
+KullanÄ±m:
     python reymen/cereyan/cron_scan_skills.py
 
-Çıktı:
+Ã‡Ä±ktÄ±:
     - Normal rapor (okunabilir)
-    - SONUC|new=X|updated=Y|skipped=Z (makine formatı)
+    - SONUC|new=X|updated=Y|skipped=Z (makine formatÄ±)
 """
 
 import hashlib
@@ -43,14 +43,14 @@ def dosya_hash(dosya_yolu: str) -> str:
 
 
 def kategori_ve_ad(dosya_yolu: str) -> tuple[str, str]:
-    """Göreli yoldan kategori ve dosya adı."""
+    """GÃ¶reli yoldan kategori ve dosya adÄ±."""
     rel = os.path.relpath(dosya_yolu, str(SKILLS_DIR)).replace("\\", "/")
     parts = rel.split("/")
     return ("", parts[0]) if len(parts) == 1 else ("/".join(parts[:-1]), parts[-1])
 
 
 def beceriden_baslik(icerik: str) -> str:
-    """Markdown'dan ilk # başlığını bul."""
+    """Markdown'dan ilk # baÅŸlÄ±ÄŸÄ±nÄ± bul."""
     for line in icerik.split("\n"):
         line = line.strip()
         if line.startswith("# "):
@@ -61,7 +61,7 @@ def beceriden_baslik(icerik: str) -> str:
 def skills_db_guncelle(
     meta_adi: str, dosya_yolu: str, icerik: str, new_hash: str
 ) -> None:
-    """skills_index.db'de FTS5 + meta güncelle."""
+    """skills_index.db'de FTS5 + meta gÃ¼ncelle."""
     baslik = beceriden_baslik(icerik)
     su_an = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     con = sqlite3.connect(str(SKILLS_DB))
@@ -76,13 +76,13 @@ def skills_db_guncelle(
         )
         con.commit()
     except Exception as e:
-        logger.warning("skills_db güncelleme hatası (%s): %s", meta_adi, e)
+        logger.warning("skills_db gÃ¼ncelleme hatasÄ± (%s): %s", meta_adi, e)
     finally:
         con.close()
 
 
 def skills_db_ekle(meta_adi: str, dosya_yolu: str, icerik: str, new_hash: str) -> None:
-    """skills_index.db'ye yeni kayıt ekle."""
+    """skills_index.db'ye yeni kayÄ±t ekle."""
     baslik = beceriden_baslik(icerik)
     su_an = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     con = sqlite3.connect(str(SKILLS_DB))
@@ -97,13 +97,13 @@ def skills_db_ekle(meta_adi: str, dosya_yolu: str, icerik: str, new_hash: str) -
         )
         con.commit()
     except Exception as e:
-        logger.warning("skills_db ekleme hatası (%s): %s", meta_adi, e)
+        logger.warning("skills_db ekleme hatasÄ± (%s): %s", meta_adi, e)
     finally:
         con.close()
 
 
 def ogrenme_db_guncelle(meta_adi: str, icerik: str) -> None:
-    """OnceHafiza ogrenme.db'yi güncelle."""
+    """OnceHafiza ogrenme.db'yi gÃ¼ncelle."""
     hedef = meta_adi.replace(".md", "").replace("/", "_")
     su_an = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     con = sqlite3.connect(str(OGRENME_DB))
@@ -126,29 +126,29 @@ def ogrenme_db_guncelle(meta_adi: str, icerik: str) -> None:
             )
         con.commit()
     except Exception as e:
-        logger.warning("ogrenme.db hatası (%s): %s", hedef, e)
+        logger.warning("ogrenme.db hatasÄ± (%s): %s", hedef, e)
     finally:
         con.close()
 
 
 def main() -> None:
     logger.info("=" * 60)
-    logger.info("🔍 CRON: Skills → OnceHafiza taraması başlıyor")
-    logger.info("   Klasör:   %s", SKILLS_DIR)
+    logger.info("ğŸ” CRON: Skills â†’ OnceHafiza taramasÄ± baÅŸlÄ±yor")
+    logger.info("   KlasÃ¶r:   %s", SKILLS_DIR)
     logger.info("   Skills DB: %s", SKILLS_DB)
-    logger.info("   Öğrenme DB: %s", OGRENME_DB)
+    logger.info("   Ã–ÄŸrenme DB: %s", OGRENME_DB)
 
     # 1) Skills dizinini tara
     md_dosyalari = sorted(SKILLS_DIR.rglob("*.md"))
-    logger.info("📄 %d .md dosyası bulundu.", len(md_dosyalari))
+    logger.info("ğŸ“„ %d .md dosyasÄ± bulundu.", len(md_dosyalari))
 
-    # 2) Mevcut meta tablosunu yükle
+    # 2) Mevcut meta tablosunu yÃ¼kle
     con = sqlite3.connect(str(SKILLS_DB))
     meta_map = dict(con.execute("SELECT ad, dosya_hash FROM beceriler_meta").fetchall())
     con.close()
-    logger.info("📚 DB'de %d kayıtlı dosya.", len(meta_map))
+    logger.info("ğŸ“š DB'de %d kayÄ±tlÄ± dosya.", len(meta_map))
 
-    # 3) Tarama + güncelleme
+    # 3) Tarama + gÃ¼ncelleme
     yeni_say = 0
     guncel_say = 0
     atlanan_say = 0
@@ -160,49 +160,49 @@ def main() -> None:
         try:
             guncel_hash = dosya_hash(str(dosya))
         except (OSError, IOError) as e:
-            logger.warning("⚠️  Okunamadı: %s — %s", dosya, e)
+            logger.warning("âš ï¸  OkunamadÄ±: %s â€” %s", dosya, e)
             continue
 
         eski_hash = meta_map.get(meta_adi)
 
         if eski_hash is None:
-            # 🆕 YENİ
+            # ğŸ†• YENÄ°
             try:
                 with open(dosya, "r", encoding="utf-8", errors="replace") as f:
                     icerik = f.read()
             except Exception as e:
-                logger.warning("⚠️  Okunamadı: %s — %s", dosya, e)
+                logger.warning("âš ï¸  OkunamadÄ±: %s â€” %s", dosya, e)
                 continue
             skills_db_ekle(meta_adi, str(dosya), icerik, guncel_hash)
             ogrenme_db_guncelle(meta_adi, icerik)
             yeni_say += 1
-            logger.info("  🆕 YENİ: %s", meta_adi)
+            logger.info("  ğŸ†• YENÄ°: %s", meta_adi)
 
         elif eski_hash != guncel_hash:
-            # 🔄 GÜNCELLENMİŞ
+            # ğŸ”„ GÃœNCELLENMÄ°Å
             try:
                 with open(dosya, "r", encoding="utf-8", errors="replace") as f:
                     icerik = f.read()
             except Exception as e:
-                logger.warning("⚠️  Okunamadı: %s — %s", dosya, e)
+                logger.warning("âš ï¸  OkunamadÄ±: %s â€” %s", dosya, e)
                 continue
             skills_db_guncelle(meta_adi, str(dosya), icerik, guncel_hash)
             ogrenme_db_guncelle(meta_adi, icerik)
             guncel_say += 1
-            logger.info("  🔄 GÜNCELLENDİ: %s", meta_adi)
+            logger.info("  ğŸ”„ GÃœNCELLENDÄ°: %s", meta_adi)
         else:
             atlanan_say += 1
 
     # 4) Rapor
     logger.info("=" * 60)
-    logger.info("✅ CRON taraması tamamlandı!")
-    logger.info("   🆕 Yeni eklenen:   %d", yeni_say)
-    logger.info("   🔄 Güncellenen:    %d", guncel_say)
-    logger.info("   ⏭  Atlanan:        %d", atlanan_say)
-    logger.info("   📊 Toplam:         %d", len(md_dosyalari))
+    logger.info("âœ… CRON taramasÄ± tamamlandÄ±!")
+    logger.info("   ğŸ†• Yeni eklenen:   %d", yeni_say)
+    logger.info("   ğŸ”„ GÃ¼ncellenen:    %d", guncel_say)
+    logger.info("   â­  Atlanan:        %d", atlanan_say)
+    logger.info("   ğŸ“Š Toplam:         %d", len(md_dosyalari))
     logger.info("=" * 60)
 
-    # Makine formatı
+    # Makine formatÄ±
     print(f"\nSONUC|new={yeni_say}|updated={guncel_say}|skipped={atlanan_say}")
 
 

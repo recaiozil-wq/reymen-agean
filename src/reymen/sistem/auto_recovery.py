@@ -1,19 +1,19 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-auto_recovery.py — ReYMeN Otomatik Kurtarma ve Watchdog Sistemi.
+auto_recovery.py â€” ReYMeN Otomatik Kurtarma ve Watchdog Sistemi.
 
-Tüm sistem bileşenlerini izler, heartbeat timeout'larını kontrol eder,
-stuck/kilitlenmiş durumları tespit eder ve otomatik kurtarma dener.
+TÃ¼m sistem bileÅŸenlerini izler, heartbeat timeout'larÄ±nÄ± kontrol eder,
+stuck/kilitlenmiÅŸ durumlarÄ± tespit eder ve otomatik kurtarma dener.
 
-Bileşenler:
-    - ComponentWatcher: Her bileşen için heartbeat + timeout izleme
-    - AutoRecovery: Ana kurtarma yöneticisi (state machine + bridge entegre)
+BileÅŸenler:
+    - ComponentWatcher: Her bileÅŸen iÃ§in heartbeat + timeout izleme
+    - AutoRecovery: Ana kurtarma yÃ¶neticisi (state machine + bridge entegre)
 
-Kullanım:
+KullanÄ±m:
     recovery = AutoRecovery(state_machine, bridge)
     recovery.watch("provider", heartbeat_interval=15, timeout=45)
     recovery.start()
-    # Periyodik olarak recovery.tick() çağrılır
+    # Periyodik olarak recovery.tick() Ã§aÄŸrÄ±lÄ±r
     recovery.stop()
 """
 
@@ -30,31 +30,31 @@ logger = logging.getLogger(__name__)
 
 
 class ComponentStatus(Enum):
-    """Bileşen sağlık durumu."""
+    """BileÅŸen saÄŸlÄ±k durumu."""
 
     HEALTHY = "healthy"
     STALE = "stale"  # Heartbeat timeout
-    FAILING = "failing"  # Art arda başarısız
+    FAILING = "failing"  # Art arda baÅŸarÄ±sÄ±z
     RECOVERING = "recovering"
-    DEAD = "dead"  # Kurtarılamaz
+    DEAD = "dead"  # KurtarÄ±lamaz
 
 
 @dataclass
 class WatchConfig:
-    """Her bileşen için watchdog yapılandırması."""
+    """Her bileÅŸen iÃ§in watchdog yapÄ±landÄ±rmasÄ±."""
 
     name: str
     heartbeat_interval_sec: float = 15.0
-    timeout_sec: float = 45.0  # heartbeat alınmazsa STALE sayılır
-    max_failures: int = 3  # art arda başarısızlık limiti
-    cooldown_sec: float = 60.0  # kurtarma sonrası bekleme
-    restart_attempts: int = 3  # maksimum yeniden başlatma
+    timeout_sec: float = 45.0  # heartbeat alÄ±nmazsa STALE sayÄ±lÄ±r
+    max_failures: int = 3  # art arda baÅŸarÄ±sÄ±zlÄ±k limiti
+    cooldown_sec: float = 60.0  # kurtarma sonrasÄ± bekleme
+    restart_attempts: int = 3  # maksimum yeniden baÅŸlatma
     enabled: bool = True
 
 
 @dataclass
 class WatchState:
-    """Bileşen izleme durumu."""
+    """BileÅŸen izleme durumu."""
 
     status: ComponentStatus = ComponentStatus.HEALTHY
     last_heartbeat: float = field(default_factory=time.time)
@@ -67,11 +67,11 @@ class WatchState:
 
 
 RecoveryHandler = Callable[[str, str], bool]
-"""Kurtarma handler imzası: (bilesen_adi, hata_mesaji) -> basarili_mi"""
+"""Kurtarma handler imzasÄ±: (bilesen_adi, hata_mesaji) -> basarili_mi"""
 
 
 class ComponentWatcher:
-    """Tek bir bileşeni izleyen watchdog."""
+    """Tek bir bileÅŸeni izleyen watchdog."""
 
     def __init__(self, config: WatchConfig):
         self.config = config
@@ -80,17 +80,17 @@ class ComponentWatcher:
         self._lock = threading.RLock()
 
     def heartbeat(self) -> None:
-        """Bileşenden canlılık sinyali al."""
+        """BileÅŸenden canlÄ±lÄ±k sinyali al."""
         with self._lock:
             self.state.last_heartbeat = time.time()
             if self.state.status in (ComponentStatus.STALE, ComponentStatus.FAILING):
-                # Heartbeat geldi — düzelmiş olabilir
+                # Heartbeat geldi â€” dÃ¼zelmiÅŸ olabilir
                 self.state.status = ComponentStatus.HEALTHY
                 self.state.last_status_change = time.time()
                 logger.info(f"[Watcher/{self.config.name}] Heartbeat alindi -> HEALTHY")
 
     def record_error(self, error_msg: str) -> None:
-        """Bileşen hatası kaydet."""
+        """BileÅŸen hatasÄ± kaydet."""
         with self._lock:
             self.state.consecutive_failures += 1
             self.state.last_error = error_msg
@@ -108,7 +108,7 @@ class ComponentWatcher:
             )
 
     def check(self) -> Optional[ComponentStatus]:
-        """Bileşen sağlığını kontrol et.
+        """BileÅŸen saÄŸlÄ±ÄŸÄ±nÄ± kontrol et.
 
         Returns:
             Stuck/sorunlu ise status, HEALTHY ise None
@@ -120,7 +120,7 @@ class ComponentWatcher:
             elapsed = time.time() - self.state.last_heartbeat
 
             if self.state.status == ComponentStatus.RECOVERING:
-                # Kurtarma aşamasında — timeout farklı hesapla
+                # Kurtarma aÅŸamasÄ±nda â€” timeout farklÄ± hesapla
                 recovery_elapsed = time.time() - (self.state.last_recovery or 0)
                 if recovery_elapsed > self.config.timeout_sec:
                     self.state.status = ComponentStatus.DEAD
@@ -142,10 +142,10 @@ class ComponentWatcher:
             return None
 
     def start_recovery(self) -> bool:
-        """Kurtarma başlat.
+        """Kurtarma baÅŸlat.
 
         Returns:
-            Kurtarma handler'larından en az biri başarılıysa True
+            Kurtarma handler'larÄ±ndan en az biri baÅŸarÄ±lÄ±ysa True
         """
         with self._lock:
             if self.state.restart_count >= self.config.restart_attempts:
@@ -160,7 +160,7 @@ class ComponentWatcher:
             self.state.last_status_change = time.time()
             self.state.restart_count += 1
 
-        # Handler'ları dene
+        # Handler'larÄ± dene
         for handler in self._recovery_handlers:
             try:
                 if handler(self.config.name, self.state.last_error or ""):
@@ -187,12 +187,12 @@ class ComponentWatcher:
         return False
 
     def on_recovery(self, handler: RecoveryHandler) -> None:
-        """Kurtarma handler'ı ekle."""
+        """Kurtarma handler'Ä± ekle."""
         with self._lock:
             self._recovery_handlers.append(handler)
 
     def reset(self) -> None:
-        """İzleme durumunu sıfırla."""
+        """Ä°zleme durumunu sÄ±fÄ±rla."""
         with self._lock:
             self.state = WatchState(last_heartbeat=time.time())
             logger.info(f"[Watcher/{self.config.name}] Resetlendi")
@@ -212,9 +212,9 @@ class ComponentWatcher:
 
 
 class AutoRecovery:
-    """Ana otomatik kurtarma yöneticisi.
+    """Ana otomatik kurtarma yÃ¶neticisi.
 
-    Tüm bileşenleri izler, state machine ve bridge ile entegre çalışır.
+    TÃ¼m bileÅŸenleri izler, state machine ve bridge ile entegre Ã§alÄ±ÅŸÄ±r.
     """
 
     def __init__(
@@ -244,10 +244,10 @@ class AutoRecovery:
         self._recovery_count: int = 0
         self._system_crashed: bool = False
 
-        # Varsayılan kurtarma handler'ları
+        # VarsayÄ±lan kurtarma handler'larÄ±
         self._default_handlers: Dict[str, List[RecoveryHandler]] = {}
 
-    # ── Bileşen yönetimi ───────────────────────────────────────────────
+    # â”€â”€ BileÅŸen yÃ¶netimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def watch(
         self,
@@ -258,18 +258,18 @@ class AutoRecovery:
         restart_attempts: Optional[int] = None,
         enabled: bool = True,
     ) -> ComponentWatcher:
-        """Yeni bir bileşeni izlemeye başla.
+        """Yeni bir bileÅŸeni izlemeye baÅŸla.
 
         Args:
-            name: Bileşen adı
-            heartbeat_interval: Heartbeat beklenti aralığı (saniye)
+            name: BileÅŸen adÄ±
+            heartbeat_interval: Heartbeat beklenti aralÄ±ÄŸÄ± (saniye)
             timeout: Heartbeat timeout (saniye)
-            max_failures: Art arda başarısızlık limiti
-            restart_attempts: Maksimum yeniden başlatma denemesi
-            enabled: İzleme aktif mi
+            max_failures: Art arda baÅŸarÄ±sÄ±zlÄ±k limiti
+            restart_attempts: Maksimum yeniden baÅŸlatma denemesi
+            enabled: Ä°zleme aktif mi
 
         Returns:
-            Oluşturulan ComponentWatcher
+            OluÅŸturulan ComponentWatcher
         """
         config = WatchConfig(
             name=name,
@@ -281,7 +281,7 @@ class AutoRecovery:
         )
         watcher = ComponentWatcher(config)
 
-        # Varsayılan handler'ları ekle
+        # VarsayÄ±lan handler'larÄ± ekle
         for handler in self._default_handlers.get(name, []):
             watcher.on_recovery(handler)
 
@@ -292,20 +292,20 @@ class AutoRecovery:
             f"[AutoRecovery] Izleniyor: {name} (timeout={timeout}s, max_fail={max_failures})"
         )
 
-        # Bridge'e heartbeat aboneliği
+        # Bridge'e heartbeat aboneliÄŸi
         if self._bridge:
             self._bridge.heartbeat(f"recovery.{name}")
 
         return watcher
 
     def unwatch(self, name: str) -> None:
-        """Bileşen izlemeyi durdur."""
+        """BileÅŸen izlemeyi durdur."""
         with self._lock:
             self._watchers.pop(name, None)
         logger.info(f"[AutoRecovery] Izleme durduruldu: {name}")
 
     def heartbeat(self, component: str) -> None:
-        """Bileşen canlılık sinyali gönder."""
+        """BileÅŸen canlÄ±lÄ±k sinyali gÃ¶nder."""
         with self._lock:
             watcher = self._watchers.get(component)
         if watcher:
@@ -314,7 +314,7 @@ class AutoRecovery:
                 self._bridge.heartbeat(f"recovery.{component}")
 
     def record_error(self, component: str, error_msg: str) -> None:
-        """Bileşen hatası kaydet."""
+        """BileÅŸen hatasÄ± kaydet."""
         with self._lock:
             watcher = self._watchers.get(component)
         if watcher:
@@ -330,9 +330,9 @@ class AutoRecovery:
                 )
 
     def on_recovery(self, component: str, handler: RecoveryHandler) -> None:
-        """Bir bileşen için kurtarma handler'ı ekle.
+        """Bir bileÅŸen iÃ§in kurtarma handler'Ä± ekle.
 
-        Henüz oluşturulmamış bileşenler için de kaydedilir (future watchers).
+        HenÃ¼z oluÅŸturulmamÄ±ÅŸ bileÅŸenler iÃ§in de kaydedilir (future watchers).
         """
         with self._lock:
             if component not in self._default_handlers:
@@ -343,10 +343,10 @@ class AutoRecovery:
         if watcher:
             watcher.on_recovery(handler)
 
-    # ── Ana döngü ──────────────────────────────────────────────────────
+    # â”€â”€ Ana dÃ¶ngÃ¼ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def start(self) -> None:
-        """Arka plan watchdog thread'ini başlat."""
+        """Arka plan watchdog thread'ini baÅŸlat."""
         with self._lock:
             if self._running:
                 return
@@ -368,10 +368,10 @@ class AutoRecovery:
         logger.info("[AutoRecovery] Watchdog durduruldu")
 
     def tick(self) -> Dict[str, Any]:
-        """Tek bir kontrol döngüsü (manuel çağrı için).
+        """Tek bir kontrol dÃ¶ngÃ¼sÃ¼ (manuel Ã§aÄŸrÄ± iÃ§in).
 
         Returns:
-            Kontrol sonuçları
+            Kontrol sonuÃ§larÄ±
         """
         self._tick_count += 1
         self._last_tick = time.time()
@@ -393,7 +393,7 @@ class AutoRecovery:
                 results["checked"].append(name)
                 continue
 
-            # Sorun var — kurtarma dene
+            # Sorun var â€” kurtarma dene
             if status in (ComponentStatus.STALE, ComponentStatus.FAILING):
                 if self._state_machine:
                     self._state_machine.set_state("recovering", f"kurtarma: {name}")
@@ -447,9 +447,9 @@ class AutoRecovery:
 
             elif status == ComponentStatus.DEAD:
                 results["dead"].append(name)
-                logger.error(f"[AutoRecovery] OLU: {name} — kurtarilamaz durumda")
+                logger.error(f"[AutoRecovery] OLU: {name} â€” kurtarilamaz durumda")
 
-        # Çok fazla ölü bileşen varsa sistemi çökert
+        # Ã‡ok fazla Ã¶lÃ¼ bileÅŸen varsa sistemi Ã§Ã¶kert
         if len(results["dead"]) >= self._max_concurrent_failures:
             self._system_crashed = True
             if self._state_machine:
@@ -461,7 +461,7 @@ class AutoRecovery:
         return results
 
     def _loop(self) -> None:
-        """Arka plan watchdog döngüsü."""
+        """Arka plan watchdog dÃ¶ngÃ¼sÃ¼."""
         while True:
             with self._lock:
                 if not self._running:
@@ -472,10 +472,10 @@ class AutoRecovery:
                 logger.error(f"[AutoRecovery] Tick hatasi: {e}")
             time.sleep(self._check_interval)
 
-    # ── Durum sorgulama ────────────────────────────────────────────────
+    # â”€â”€ Durum sorgulama â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def status_report(self) -> Dict[str, Any]:
-        """Tüm sistem durum raporu."""
+        """TÃ¼m sistem durum raporu."""
         with self._lock:
             watcher_statuses = {}
             for name, watcher in self._watchers.items():
@@ -507,13 +507,13 @@ class AutoRecovery:
             }
 
     def status(self, name: str) -> Optional[Dict[str, Any]]:
-        """Belirli bir bileşenin durumu."""
+        """Belirli bir bileÅŸenin durumu."""
         with self._lock:
             watcher = self._watchers.get(name)
         return watcher.status() if watcher else None
 
 
-# ── Hızlı test ───────────────────────────────────────────────────────────────
+# â”€â”€ HÄ±zlÄ± test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
 
@@ -525,14 +525,14 @@ if __name__ == "__main__":
 
     recovery = AutoRecovery(sm, bridge, check_interval_sec=1, max_restart_attempts=2)
 
-    # Bileşenleri izlemeye al
+    # BileÅŸenleri izlemeye al
     w1 = recovery.watch("provider", heartbeat_interval=5, timeout=10, max_failures=2)
     w2 = recovery.watch("session", heartbeat_interval=10, timeout=20, max_failures=3)
 
-    # Kurtarma handler'ı
-    w1.on_recovery(lambda n, e: True)  # her zaman başarılı
+    # Kurtarma handler'Ä±
+    w1.on_recovery(lambda n, e: True)  # her zaman baÅŸarÄ±lÄ±
 
-    # Heartbeat gönder
+    # Heartbeat gÃ¶nder
     recovery.heartbeat("provider")
     recovery.heartbeat("session")
 
@@ -545,7 +545,7 @@ if __name__ == "__main__":
     print(f"Tick: {result}")
     print(f"Durum: {recovery.status_report()}")
 
-    # Provider kurtarılmalı, session sağlıklı
+    # Provider kurtarÄ±lmalÄ±, session saÄŸlÄ±klÄ±
     prov_status = recovery.status("provider")
     sess_status = recovery.status("session")
     print(f"Provider: {prov_status['status'] if prov_status else 'N/A'}")

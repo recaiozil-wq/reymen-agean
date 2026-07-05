@@ -1,19 +1,19 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-voice_engine.py — Çok back-end'li ses motoru (ABC tabanlı).
+voice_engine.py â€” Ã‡ok back-end'li ses motoru (ABC tabanlÄ±).
 
 VoiceEngine ABC:
-  - Soyut seslendir(text, voice) → str (ses dosyası yolu)
-  - Soyut yaziya_cevir(ses_dosyasi) → str (metin)
+  - Soyut seslendir(text, voice) â†’ str (ses dosyasÄ± yolu)
+  - Soyut yaziya_cevir(ses_dosyasi) â†’ str (metin)
 
 Engine'ler:
-  - OpenAITTS    — OpenAI TTS API (OPENAI_API_KEY ortam değişkeni)
-  - EdgeTTS      — edge-tts (yerel, ücretsiz, internet gerekli)
-  - WhisperSTT   — OpenAI Whisper API (ses → yazı, OPENAI_API_KEY gerekli)
-  - StubVoice    — local dummy (bağımlılık gerektirmez, simüle eder)
+  - OpenAITTS    â€” OpenAI TTS API (OPENAI_API_KEY ortam deÄŸiÅŸkeni)
+  - EdgeTTS      â€” edge-tts (yerel, Ã¼cretsiz, internet gerekli)
+  - WhisperSTT   â€” OpenAI Whisper API (ses â†’ yazÄ±, OPENAI_API_KEY gerekli)
+  - StubVoice    â€” local dummy (baÄŸÄ±mlÄ±lÄ±k gerektirmez, simÃ¼le eder)
 
 VoiceRegistry:
-  - engine kaydet / seç (ad ile) / seslendir / yaziya_cevir
+  - engine kaydet / seÃ§ (ad ile) / seslendir / yaziya_cevir
 """
 
 from __future__ import annotations
@@ -33,9 +33,9 @@ logger = logging.getLogger(__name__)
 log = logging.getLogger(__name__)
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Sabitler
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 _OPENAI_TTS_URL = "https://api.openai.com/v1/audio/speech"
 _OPENAI_STT_URL = "https://api.openai.com/v1/audio/transcriptions"
@@ -44,56 +44,56 @@ _USER_AGENT = "ReYMeN-Ajan/1.0"
 # OpenAI TTS'de desteklenen sesler
 _OPENAI_SESLER = {"alloy", "echo", "fable", "onyx", "nova", "shimmer"}
 
-# Varsayılan çıktı dizini
+# VarsayÄ±lan Ã§Ä±ktÄ± dizini
 _VOICE_OUTPUT_DIR = os.path.join(
     os.path.dirname(os.path.dirname(__file__)), "output", "voice"
 )
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# Yardımcı fonksiyonlar
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# YardÄ±mcÄ± fonksiyonlar
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _cikti_dizini() -> str:
-    """Ses dosyaları için çıktı dizinini oluştur ve döndür."""
+    """Ses dosyalarÄ± iÃ§in Ã§Ä±ktÄ± dizinini oluÅŸtur ve dÃ¶ndÃ¼r."""
     out_dir = _VOICE_OUTPUT_DIR
     os.makedirs(out_dir, exist_ok=True)
     return out_dir
 
 
 def _ses_dosyasi_adi(prefix: str = "ses", ext: str = ".mp3") -> str:
-    """Benzersiz ses dosyası adı oluştur."""
+    """Benzersiz ses dosyasÄ± adÄ± oluÅŸtur."""
     return os.path.join(_cikti_dizini(), f"{prefix}_{uuid.uuid4().hex[:8]}{ext}")
 
 
 def _get_openai_api_key() -> str:
-    """OPENAI_API_KEY ortam değişkenini döndür."""
+    """OPENAI_API_KEY ortam deÄŸiÅŸkenini dÃ¶ndÃ¼r."""
     return os.environ.get("OPENAI_API_KEY", "").strip()
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# Soyut Taban Sınıfı
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# Soyut Taban SÄ±nÄ±fÄ±
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class VoiceEngine(ABC):
-    """Tüm ses engine'leri için soyut taban sınıfı."""
+    """TÃ¼m ses engine'leri iÃ§in soyut taban sÄ±nÄ±fÄ±."""
 
     @property
     @abstractmethod
     def ad(self) -> str:
-        """Engine'in benzersiz adı (küçük harf)."""
+        """Engine'in benzersiz adÄ± (kÃ¼Ã§Ã¼k harf)."""
         ...
 
     @abstractmethod
     def seslendir(self, text: str, voice: str = "alloy") -> str:
-        """Metni sese çevir, ses dosyası yolunu döndür."""
+        """Metni sese Ã§evir, ses dosyasÄ± yolunu dÃ¶ndÃ¼r."""
         ...
 
     @abstractmethod
     def yaziya_cevir(self, ses_dosyasi: str) -> str:
-        """Ses dosyasını metne çevir, metni döndür."""
+        """Ses dosyasÄ±nÄ± metne Ã§evir, metni dÃ¶ndÃ¼r."""
         ...
 
     def __init__(self) -> None:
@@ -107,16 +107,16 @@ class VoiceEngine(ABC):
         return self._hazir
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # OpenAI TTS Engine
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class OpenAITTS(VoiceEngine):
-    """OpenAI TTS API ile metni sese çevirir. OPENAI_API_KEY ortam değişkeni gerekli.
+    """OpenAI TTS API ile metni sese Ã§evirir. OPENAI_API_KEY ortam deÄŸiÅŸkeni gerekli.
 
     Desteklenen sesler: alloy, echo, fable, onyx, nova, shimmer
-    Model: tts-1 (varsayılan) veya tts-1-hd
+    Model: tts-1 (varsayÄ±lan) veya tts-1-hd
     """
 
     def __init__(self, model: str = "tts-1") -> None:
@@ -131,14 +131,14 @@ class OpenAITTS(VoiceEngine):
         return bool(_get_openai_api_key())
 
     def seslendir(self, text: str, voice: str = "alloy") -> str:
-        """Metni OpenAI TTS ile sese çevir.
+        """Metni OpenAI TTS ile sese Ã§evir.
 
         Args:
             text: Seslendirilecek metin.
             voice: Ses (alloy, echo, fable, onyx, nova, shimmer).
 
         Returns:
-            Ses dosyasının yolu veya hata mesajı.
+            Ses dosyasÄ±nÄ±n yolu veya hata mesajÄ±.
         """
         api_key = _get_openai_api_key()
         if not api_key:
@@ -195,25 +195,25 @@ class OpenAITTS(VoiceEngine):
             return f"[SESLENDIR/OpenAI] Hata: {e}"
 
     def yaziya_cevir(self, ses_dosyasi: str) -> str:
-        """Ses dosyasını OpenAI Whisper ile metne çevir.
+        """Ses dosyasÄ±nÄ± OpenAI Whisper ile metne Ã§evir.
 
-        Not: OpenAITTS engine'i STT için değil TTS içindir.
-        WhisperSTT engine'ini kullanın.
+        Not: OpenAITTS engine'i STT iÃ§in deÄŸil TTS iÃ§indir.
+        WhisperSTT engine'ini kullanÄ±n.
         """
         return "[SESLENDIR/OpenAI] Bu engine TTS icindir. STT icin WhisperSTT kullanin."
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Edge TTS Engine
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class EdgeTTS(VoiceEngine):
-    """Microsoft Edge TTS ile metni sese çevirir (yerel, ücretsiz, internet gerekli).
+    """Microsoft Edge TTS ile metni sese Ã§evirir (yerel, Ã¼cretsiz, internet gerekli).
 
-    edge-tts pip paketi veya edge-tts CLI kullanır.
-    Desteklenen sesler Microsoft Edge tarafından belirlenir.
-    Varsayılan ses: tr-TR-AhmetNeural (Türkçe erkek)
+    edge-tts pip paketi veya edge-tts CLI kullanÄ±r.
+    Desteklenen sesler Microsoft Edge tarafÄ±ndan belirlenir.
+    VarsayÄ±lan ses: tr-TR-AhmetNeural (TÃ¼rkÃ§e erkek)
     """
 
     @property
@@ -221,26 +221,26 @@ class EdgeTTS(VoiceEngine):
         return "edge"
 
     def _bagimliliklari_kontrol_et(self) -> bool:
-        """edge-tts kullanılabilir mi kontrol et."""
+        """edge-tts kullanÄ±labilir mi kontrol et."""
         try:
             import edge_tts  # noqa: F401
 
             return True
         except ImportError:
-            # CLI kontrolü
+            # CLI kontrolÃ¼
             import shutil
 
             return shutil.which("edge-tts") is not None
 
     def seslendir(self, text: str, voice: str = "tr-TR-AhmetNeural") -> str:
-        """Metni Edge TTS ile sese çevir.
+        """Metni Edge TTS ile sese Ã§evir.
 
         Args:
             text: Seslendirilecek metin.
-            voice: Edge TTS ses adı (örn. tr-TR-AhmetNeural, en-US-AriaNeural).
+            voice: Edge TTS ses adÄ± (Ã¶rn. tr-TR-AhmetNeural, en-US-AriaNeural).
 
         Returns:
-            Ses dosyasının yolu veya hata mesajı.
+            Ses dosyasÄ±nÄ±n yolu veya hata mesajÄ±.
         """
         if not text or not text.strip():
             return "[SESLENDIR/Edge] Hata: 'text' bos olamaz."
@@ -252,7 +252,7 @@ class EdgeTTS(VoiceEngine):
         cikti = _ses_dosyasi_adi(prefix="edge_tts", ext=".mp3")
 
         try:
-            # edge-tts kütüphane API'sini dene
+            # edge-tts kÃ¼tÃ¼phane API'sini dene
             import edge_tts as _edge_tts
             import asyncio
 
@@ -303,16 +303,16 @@ class EdgeTTS(VoiceEngine):
         return "[SESLENDIR/Edge] Bu engine TTS icindir, STT desteklemez."
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Whisper STT Engine
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class WhisperSTT(VoiceEngine):
-    """OpenAI Whisper API ile ses dosyasını metne çevirir.
+    """OpenAI Whisper API ile ses dosyasÄ±nÄ± metne Ã§evirir.
 
-    OPENAI_API_KEY ortam değişkeni gerekli.
-    Model: whisper-1 (varsayılan)
+    OPENAI_API_KEY ortam deÄŸiÅŸkeni gerekli.
+    Model: whisper-1 (varsayÄ±lan)
     Desteklenen formatlar: mp3, mp4, mpeg, mpga, m4a, wav, webm
     """
 
@@ -328,17 +328,17 @@ class WhisperSTT(VoiceEngine):
         return bool(_get_openai_api_key())
 
     def seslendir(self, text: str, voice: str = "alloy") -> str:
-        """Whisper STT metin üretir, ses üretmez."""
+        """Whisper STT metin Ã¼retir, ses Ã¼retmez."""
         return "[YAZIYA_CEVIR/Whisper] Bu engine STT icindir. TTS icin OpenAITTS veya EdgeTTS kullanin."
 
     def yaziya_cevir(self, ses_dosyasi: str) -> str:
-        """Ses dosyasını OpenAI Whisper ile metne çevir.
+        """Ses dosyasÄ±nÄ± OpenAI Whisper ile metne Ã§evir.
 
         Args:
-            ses_dosyasi: Ses dosyasının yolu (.mp3, .wav, .m4a, vb.).
+            ses_dosyasi: Ses dosyasÄ±nÄ±n yolu (.mp3, .wav, .m4a, vb.).
 
         Returns:
-            Çevrilen metin veya hata mesajı.
+            Ã‡evrilen metin veya hata mesajÄ±.
         """
         api_key = _get_openai_api_key()
         if not api_key:
@@ -350,16 +350,16 @@ class WhisperSTT(VoiceEngine):
         try:
             import urllib.request as _req
 
-            # Multipart form-data ile dosya gönder
+            # Multipart form-data ile dosya gÃ¶nder
             boundary = "----WebKitFormBoundary" + uuid.uuid4().hex
 
-            # Dosya içeriğini oku
+            # Dosya iÃ§eriÄŸini oku
             with open(ses_dosyasi, "rb") as f:
                 file_data = f.read()
 
             dosya_adi = os.path.basename(ses_dosyasi)
 
-            # Multipart body oluştur
+            # Multipart body oluÅŸtur
             body_parts = []
             # model field
             body_parts.append(f"--{boundary}\r\n")
@@ -373,7 +373,7 @@ class WhisperSTT(VoiceEngine):
             body_parts.append("Content-Type: audio/mpeg\r\n\r\n")
             body_parts.append(
                 file_data.decode("latin-1")
-            )  # binary'yi latin-1 ile güvenli taşı
+            )  # binary'yi latin-1 ile gÃ¼venli taÅŸÄ±
             body_parts.append(f"\r\n--{boundary}--\r\n")
 
             body = ""
@@ -410,7 +410,7 @@ class WhisperSTT(VoiceEngine):
             return metin
 
         except ImportError:
-            # openai kütüphanesini dene
+            # openai kÃ¼tÃ¼phanesini dene
             try:
                 from openai import OpenAI
 
@@ -448,13 +448,13 @@ class WhisperSTT(VoiceEngine):
             return f"[YAZIYA_CEVIR/Whisper] Hata: {e}"
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# Stub Voice Engine (local dummy / simüle)
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# Stub Voice Engine (local dummy / simÃ¼le)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class StubVoice(VoiceEngine):
-    """Local dummy engine. API key gerekmez. Ses üretmez, simüle eder."""
+    """Local dummy engine. API key gerekmez. Ses Ã¼retmez, simÃ¼le eder."""
 
     @property
     def ad(self) -> str:
@@ -476,20 +476,20 @@ class StubVoice(VoiceEngine):
         )
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Voice Registry
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class VoiceRegistry:
-    """Ses engine'lerini kaydet, seç ve çalıştır.
+    """Ses engine'lerini kaydet, seÃ§ ve Ã§alÄ±ÅŸtÄ±r.
 
-    Kullanım:
+    KullanÄ±m:
         vr = VoiceRegistry()
         vr.kaydet("openai", OpenAITTS())
         vr.kaydet("edge", EdgeTTS())
         engine = vr.sec("openai")
-        engine.seslendir("Merhaba Dünya")
+        engine.seslendir("Merhaba DÃ¼nya")
     """
 
     def __init__(self) -> None:
@@ -500,7 +500,7 @@ class VoiceRegistry:
         """Bir engine kaydet."""
         adi = engine.ad
         self._engines[adi] = engine
-        # Varsayılan: openai > whisper > edge > stub
+        # VarsayÄ±lan: openai > whisper > edge > stub
         if self._varsayilan is None:
             self._varsayilan = adi
         elif adi == "openai" and engine.hazir:
@@ -520,7 +520,7 @@ class VoiceRegistry:
         )
 
     def sec(self, ad: str) -> Optional[VoiceEngine]:
-        """Ada göre engine seç. Bulunamazsa varsayılanı döndür."""
+        """Ada gÃ¶re engine seÃ§. Bulunamazsa varsayÄ±lanÄ± dÃ¶ndÃ¼r."""
         eng = self._engines.get(ad)
         if eng is None and self._varsayilan:
             log.warning(
@@ -533,11 +533,11 @@ class VoiceRegistry:
 
     @property
     def varsayilan(self) -> Optional[VoiceEngine]:
-        """Varsayılan engine'i döndür."""
+        """VarsayÄ±lan engine'i dÃ¶ndÃ¼r."""
         return self._engines.get(self._varsayilan) if self._varsayilan else None
 
     def seslendir(self, engine_adi: str, text: str, voice: str = "alloy") -> str:
-        """Bir engine ile metni sese çevir."""
+        """Bir engine ile metni sese Ã§evir."""
         if not text or not text.strip():
             return "[SESLENDIR] Hata: 'text' bos olamaz."
         eng = self.sec(engine_adi)
@@ -552,7 +552,7 @@ class VoiceRegistry:
             return f"[SESLENDIR] '{engine_adi}' hatasi: {e}"
 
     def yaziya_cevir(self, engine_adi: str, ses_dosyasi: str) -> str:
-        """Bir engine ile ses dosyasını metne çevir."""
+        """Bir engine ile ses dosyasÄ±nÄ± metne Ã§evir."""
         if not ses_dosyasi:
             return "[YAZIYA_CEVIR] Hata: 'ses_dosyasi' bos olamaz."
         eng = self.sec(engine_adi)
@@ -567,17 +567,17 @@ class VoiceRegistry:
             return f"[YAZIYA_CEVIR] '{engine_adi}' hatasi: {e}"
 
 
-# ── Global registry singleton ──────────────────────────────────────────────────
+# â”€â”€ Global registry singleton â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _registry: Optional[VoiceRegistry] = None
 
 
 def _get_registry() -> VoiceRegistry:
-    """Global VoiceRegistry singleton'ını oluştur/döndür."""
+    """Global VoiceRegistry singleton'Ä±nÄ± oluÅŸtur/dÃ¶ndÃ¼r."""
     global _registry
     if _registry is None:
         _registry = VoiceRegistry()
-        # Stub her zaman çalışır
+        # Stub her zaman Ã§alÄ±ÅŸÄ±r
         _registry.kaydet(StubVoice())
         # OpenAI TTS
         try:
@@ -602,13 +602,13 @@ def _get_registry() -> VoiceRegistry:
     return _registry
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# Tool Fonksiyonları
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# Tool FonksiyonlarÄ±
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def seslendir(text: str, voice: str = "alloy", backend: str = "") -> str:
-    """SESLENDIR tool'u — metni sese çevir.
+    """SESLENDIR tool'u â€” metni sese Ã§evir.
 
     Args:
         text: Seslendirilecek metin.
@@ -631,7 +631,7 @@ def seslendir(text: str, voice: str = "alloy", backend: str = "") -> str:
 
 
 def yaziya_cevir(ses_dosyasi: str, backend: str = "whisper") -> str:
-    """YAZIYA_CEVIR tool'u — ses dosyasını metne çevir.
+    """YAZIYA_CEVIR tool'u â€” ses dosyasÄ±nÄ± metne Ã§evir.
 
     Args:
         ses_dosyasi: Ses dosyasinin yolu.
@@ -656,9 +656,9 @@ def voice_engine_listele() -> str:
     return "\n".join(satirlar)
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Motor Kayit
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def motor_kaydet(motor) -> None:
@@ -742,13 +742,13 @@ def _yaziya_cevir_ayristir_ve_calistir(ham: str) -> str:
     return yaziya_cevir(ses_dosyasi, backend)
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Test
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 if __name__ == "__main__":
     print(voice_engine_listele())
     print("\n--- Stub Test ---")
-    print(seslendir("Merhaba Dünya", backend="stub"))
+    print(seslendir("Merhaba DÃ¼nya", backend="stub"))
     print("\n--- Stub STT Test ---")
     print(yaziya_cevir("test.mp3", backend="stub"))

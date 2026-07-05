@@ -1,4 +1,4 @@
-"""
+﻿"""
 ReYMeN Gateway — Mattermost platform adapter.
 
 Mattermost REST API (http://mattermost.server/api/v4/) uzerinden
@@ -26,8 +26,8 @@ from pathlib import Path as _Path
 
 sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
-from src.gateways.config import Platform, PlatformConfig
-from src.gateways.platforms.base import (
+from gateways.config import Platform, PlatformConfig
+from gateways.platforms.base import (
     BasePlatformAdapter,
     MessageEvent,
     MessageType,
@@ -36,7 +36,7 @@ from src.gateways.platforms.base import (
     cache_image_from_bytes,
     resolve_proxy_url,
 )
-from src.gateways.platforms.helpers import (
+from gateways.platforms.helpers import (
     MessageDeduplicator,
     TextBatchAggregator,
 )
@@ -62,7 +62,7 @@ def check_mattermost_requirements() -> bool:
     if HTTPX_AVAILABLE:
         return True
     try:
-        from reymen.cron.hermes_stubs import ensure as _lazy_ensure
+        from reymen.sistem.reymen_stubs import ensure as _lazy_ensure
 
         _lazy_ensure("platform.mattermost", prompt=False)
     except Exception:
@@ -231,7 +231,7 @@ class MattermostAdapter(BasePlatformAdapter):
             # (Mattermost webhook'ta medya tipi belirlemek icin ek kontroller eklenebilir)
 
             # Session kaynagi olustur
-            from src.gateways.session import SessionSource, build_session_key
+            from gateways.session import SessionSource, build_session_key
 
             source = SessionSource(
                 platform=Platform.MATTERMOST,

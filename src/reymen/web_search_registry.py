@@ -1,13 +1,13 @@
-"""ReYMeN Web Search Provider Registry
+﻿"""ReYMeN Web Search Provider Registry
 ======================================
 
-Central map of registered web providers. Basitleştirilmiş ReYMeN sürümü —
-Hermes config.yaml bağımlılığı yoktur, sadece env var + kayıtlı provider'lar.
+Central map of registered web providers. BasitleÅŸtirilmiÅŸ ReYMeN sÃ¼rÃ¼mÃ¼ â€”
+ReYMeN config.yaml baÄŸÄ±mlÄ±lÄ±ÄŸÄ± yoktur, sadece env var + kayÄ±tlÄ± provider'lar.
 
 Active selection:
 1. REYMEN_SEARCH_BACKEND / REYMEN_EXTRACT_BACKEND env var
 2. REYMEN_WEB_BACKEND env var (shared fallback)
-3. Legacy preference: firecrawl → parallel → tavily → exa → searxng → brave-free → ddgs
+3. Legacy preference: firecrawl â†’ parallel â†’ tavily â†’ exa â†’ searxng â†’ brave-free â†’ ddgs
 """
 
 from __future__ import annotations

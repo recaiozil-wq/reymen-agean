@@ -1,4 +1,4 @@
-"""Web sunucu yoneticisi — soket bazli durum tespiti + arka plan process."""
+﻿"""Web sunucu yoneticisi â€” soket bazli durum tespiti + arka plan process."""
 
 from __future__ import annotations
 import logging

@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-mcp_oauth_manager.py — MCP OAuth yoneticisi.
+mcp_oauth_manager.py â€” MCP OAuth yoneticisi.
 
 MCP sunuculari icin OAuth token yonetimi: alma, yenileme,
 kontrol ve iptal islemleri.

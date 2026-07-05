@@ -1,12 +1,12 @@
-"""_handle_skin_command handler."""
+﻿"""_handle_skin_command handler."""
 
-from src.reymen.sistem.ReYMeN_constants import display_reymen_home
-from src.reymen.sistem.cli_stream import save_config_value
-from src.reymen.sistem.cli_display import _ACCENT
+from reymen.sistem.ReYMeN_constants import display_reymen_home
+from reymen.sistem.cli_stream import save_config_value
+from reymen.sistem.cli_display import _ACCENT
 
 
 def _handle_skin_command(cli, cmd: str):
-    """Handle /skin [name] — show or change the display skin."""
+    """Handle /skin [name] â€” show or change the display skin."""
     try:
         from reymen.reymen_cli.skin_engine import (
             list_skins,
@@ -25,9 +25,9 @@ def _handle_skin_command(cli, cmd: str):
         print(f"\n  Current skin: {current}")
         print("  Available skins:")
         for s in skins:
-            marker = " ●" if s["name"] == current else "  "
+            marker = " â—" if s["name"] == current else "  "
             source = f" ({s['source']})" if s["source"] == "user" else ""
-            print(f"   {marker} {s['name']}{source} — {s['description']}")
+            print(f"   {marker} {s['name']}{source} â€” {s['description']}")
         print("\n  Usage: /skin <name>")
         print(f"  Custom skins: drop a YAML file in {display_reymen_home()}/skins/\n")
         return

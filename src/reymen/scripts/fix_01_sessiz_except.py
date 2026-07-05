@@ -1,10 +1,10 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
-FIX 01 — Sessiz Except Temizleyici
-Yapar : except:pass / except Exception:pass → logger.warning(...)
-Test  : Her düzeltilen dosyayı ast.parse ile doğrular
-Rapor : fix_01_rapor.json + konsol özeti
-Kullanım: python fix_01_sessiz_except.py [proje_koku]
+FIX 01 â€” Sessiz Except Temizleyici
+Yapar : except:pass / except Exception:pass â†’ logger.warning(...)
+Test  : Her dÃ¼zeltilen dosyayÄ± ast.parse ile doÄŸrular
+Rapor : fix_01_rapor.json + konsol Ã¶zeti
+KullanÄ±m: python fix_01_sessiz_except.py [proje_koku]
 """
 
 import ast, os, sys, json, re, shutil, time
@@ -22,19 +22,19 @@ class C:
 
 
 def ok(m):
-    print(f"  {C.GRN}✅ {m}{C.RESET}")
+    print(f"  {C.GRN}âœ… {m}{C.RESET}")
 
 
 def warn(m):
-    print(f"  {C.YEL}⚠️  {m}{C.RESET}")
+    print(f"  {C.YEL}âš ï¸  {m}{C.RESET}")
 
 
 def err(m):
-    print(f"  {C.RED}❌ {m}{C.RESET}")
+    print(f"  {C.RED}âŒ {m}{C.RESET}")
 
 
 def hdr(t):
-    print(f"\n{C.BOLD}{C.BLU}{'═'*60}\n  {t}\n{'═'*60}{C.RESET}")
+    print(f"\n{C.BOLD}{C.BLU}{'â•'*60}\n  {t}\n{'â•'*60}{C.RESET}")
 
 
 EXCLUDE = {
@@ -50,7 +50,7 @@ LOGGER_IMPORT = "import logging\nlogger = logging.getLogger(__name__)"
 
 
 def logger_ekle(src: str) -> str:
-    """Dosyada logger tanımı yoksa, import'lardan sonra logger satırını ekle."""
+    """Dosyada logger tanÄ±mÄ± yoksa, import'lardan sonra logger satÄ±rÄ±nÄ± ekle."""
     if (
         "logger = logging.getLogger" in src
         or "logger = getLogger" in src
@@ -58,7 +58,7 @@ def logger_ekle(src: str) -> str:
     ):
         return src
     lines = src.splitlines(keepends=True)
-    # import satırlarından sonra ekle
+    # import satÄ±rlarÄ±ndan sonra ekle
     insert_at = 0
     last_import = -1
     for i, line in enumerate(lines):
@@ -74,7 +74,7 @@ def logger_ekle(src: str) -> str:
 
 
 def except_duzelt(src: str) -> tuple[str, int]:
-    """Sessiz except bloklarını logger.warning'e çevir. Düzeltme sayısını döndür."""
+    """Sessiz except bloklarÄ±nÄ± logger.warning'e Ã§evir. DÃ¼zeltme sayÄ±sÄ±nÄ± dÃ¶ndÃ¼r."""
     try:
         tree = ast.parse(src)
     except SyntaxError:
@@ -84,21 +84,21 @@ def except_duzelt(src: str) -> tuple[str, int]:
     for node in ast.walk(tree):
         if isinstance(node, ast.ExceptHandler):
             body = node.body
-            # Sessiz except kontrolü: sadece pass/.../None
+            # Sessiz except kontrolÃ¼: sadece pass/.../None
             sessiz = all(
                 isinstance(stmt, (ast.Pass, ast.Expr, ast.Raise)) for stmt in body
             )
             if not sessiz:
                 continue
 
-            # node.lineno ile satır numarası
+            # node.lineno ile satÄ±r numarasÄ±
             lineno = node.lineno
-            # except satırını bul
+            # except satÄ±rÄ±nÄ± bul
             lines = src.splitlines()
             if lineno <= 0 or lineno > len(lines):
                 continue
 
-            # Hata mesajı oluştur
+            # Hata mesajÄ± oluÅŸtur
             if node.type:
                 if isinstance(node.type, ast.Name):
                     exc_type = node.type.id
@@ -112,20 +112,20 @@ def except_duzelt(src: str) -> tuple[str, int]:
             dosya_adi = os.path.basename(sys.argv[0]).replace(".py", "")
 
             if node.name:
-                # except X as e: → e kullan
+                # except X as e: â†’ e kullan
                 warning_line = (
                     f'    logger.warning("[{dosya_adi}] {exc_type}: %s", {node.name})'
                 )
             else:
-                # except: → traceback ekle
+                # except: â†’ traceback ekle
                 warning_line = f'    logger.warning("[{dosya_adi}] {exc_type}")'
 
             duzeltmeler.append((lineno, warning_line))
 
-    # Satır bazlı düzeltme (ters sırada)
+    # SatÄ±r bazlÄ± dÃ¼zeltme (ters sÄ±rada)
     lines = src.splitlines(keepends=True)
     for lineno, warning_line in sorted(duzeltmeler, reverse=True):
-        # except satırından sonraki pass/... satırlarını bul ve değiştir
+        # except satÄ±rÄ±ndan sonraki pass/... satÄ±rlarÄ±nÄ± bul ve deÄŸiÅŸtir
         for j in range(lineno, len(lines)):
             s = lines[j].strip()
             if s == "pass" or s == "...":
@@ -150,7 +150,7 @@ def dosya_test_et(yol: Path) -> tuple[bool, str]:
 
 def main():
     kok = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else Path(".").resolve()
-    hdr(f"FIX 01 — Sessiz Except Temizleyici\nKök: {kok}")
+    hdr(f"FIX 01 â€” Sessiz Except Temizleyici\nKÃ¶k: {kok}")
     t0 = time.time()
     rapor = {
         "tarih": datetime.now().isoformat(),
@@ -177,7 +177,7 @@ def main():
         except Exception:
             continue
 
-        # Sessiz except var mı?
+        # Sessiz except var mÄ±?
         yeni_src, sayi = except_duzelt(src)
         if sayi == 0:
             continue
@@ -195,7 +195,7 @@ def main():
         # Test
         gecti, mesaj = dosya_test_et(f)
         if gecti:
-            ok(f"{str(f.relative_to(kok)):<60} {sayi} düzeltme")
+            ok(f"{str(f.relative_to(kok)):<60} {sayi} dÃ¼zeltme")
             yedek.unlink(missing_ok=True)
             rapor["islenen"].append(
                 {"dosya": str(f.relative_to(kok)), "duzeltme": sayi}
@@ -203,18 +203,18 @@ def main():
             rapor["toplam_duzeltme"] += sayi
             rapor["test_gecen"].append(str(f.relative_to(kok)))
         else:
-            err(f"{f.relative_to(kok)} → TEST HATA: {mesaj} — GERİ ALINDI")
+            err(f"{f.relative_to(kok)} â†’ TEST HATA: {mesaj} â€” GERÄ° ALINDI")
             shutil.copy2(yedek, f)
             yedek.unlink(missing_ok=True)
             rapor["test_hata"].append({"dosya": str(f.relative_to(kok)), "hata": mesaj})
 
     rapor["sure"] = round(time.time() - t0, 1)
     hdr("RAPOR")
-    print(f"  Düzeltme          : {C.GRN}{rapor['toplam_duzeltme']}{C.RESET}")
-    print(f"  Dosya işlenen     : {C.GRN}{len(rapor['islenen'])}{C.RESET}")
-    print(f"  Test geçen        : {C.GRN}{len(rapor['test_gecen'])}{C.RESET}")
+    print(f"  DÃ¼zeltme          : {C.GRN}{rapor['toplam_duzeltme']}{C.RESET}")
+    print(f"  Dosya iÅŸlenen     : {C.GRN}{len(rapor['islenen'])}{C.RESET}")
+    print(f"  Test geÃ§en        : {C.GRN}{len(rapor['test_gecen'])}{C.RESET}")
     print(f"  Test hata         : {C.RED}{len(rapor['test_hata'])}{C.RESET}")
-    print(f"  Süre              : {rapor['sure']}s")
+    print(f"  SÃ¼re              : {rapor['sure']}s")
 
     rapor_yolu = kok / "fix_01_rapor.json"
     with open(rapor_yolu, "w", encoding="utf-8") as fp:

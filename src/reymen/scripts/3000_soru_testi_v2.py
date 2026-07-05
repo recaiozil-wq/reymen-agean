@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
 3000 Soru ReYMeN Testi - Optimize Edilmis Surum
 reymen_agent._deepseek_sohbet() kullanir, her soru ayri API cagrisi.
@@ -592,14 +592,14 @@ def testi_baslat():
         print(f"  .env yuklendi: {env_path}")
     else:
         # reymen profil .env
-        env_path2 = Path.home() / "AppData/Local/hermes/profiles/reymen/.env"
+        env_path2 = Path.home() / "AppData/Local/reymen/profiles/reymen/.env"
         if env_path2.exists():
             load_dotenv(str(env_path2))
             print(f"  .env yuklendi: {env_path2}")
 
     api_key = os.environ.get("DEEPSEEK_API_KEY", "")
     if not api_key:
-        print("  ❌ DEEPSEEK_API_KEY bulunamadi!")
+        print("  âŒ DEEPSEEK_API_KEY bulunamadi!")
         return
     print(f"  API Key: {api_key[:8]}...{api_key[-4:]}")
 
@@ -627,9 +627,9 @@ def testi_baslat():
     try:
         from reymen_agent import _deepseek_sohbet, isleyen_gorev
 
-        print("  ✓ reymen_agent import edildi")
+        print("  âœ“ reymen_agent import edildi")
     except Exception as e:
-        print(f"  ❌ Import hatasi: {e}")
+        print(f"  âŒ Import hatasi: {e}")
         log_yaz("HATA", f"Import: {e}")
         return
 
@@ -672,7 +672,7 @@ def testi_baslat():
                 hiz = (idx + 1) / (gecen / 60) if gecen > 0 else 0
                 kalan = (len(sorular) - idx - 1) / hiz if hiz > 0 else 0
 
-                durum = f"[{idx+1}/{len(sorular)}] ✅{basarili_sayac}/{idx+1-basarisiz_sayac} basarili | {hiz:.0f} soru/dk | kalan: {kalan:.0f}dk"
+                durum = f"[{idx+1}/{len(sorular)}] âœ…{basarili_sayac}/{idx+1-basarisiz_sayac} basarili | {hiz:.0f} soru/dk | kalan: {kalan:.0f}dk"
                 print(f"  {durum}")
                 log_yaz("BILGI", durum)
 
@@ -707,7 +707,7 @@ def testi_baslat():
             # 2 hata ust uste gelirse bekle ve devam et
             son_2 = sonuclar[-2:] if len(sonuclar) >= 2 else []
             if len(son_2) == 2 and all(not s.get("basarili", False) for s in son_2):
-                print(f"  ⚠️ 2 hata ust uste - 3sn bekleniyor...")
+                print(f"  âš ï¸ 2 hata ust uste - 3sn bekleniyor...")
                 log_yaz("UYARI", "2 hata ust uste - bekleme")
                 time.sleep(3)
 
@@ -718,20 +718,20 @@ def testi_baslat():
     rapor = rapor_olustur(sonuclar, baslangic, len(sorular))
 
     print("=" * 60)
-    print(f"  📊 3000 SORU TESTI RAPORU")
+    print(f"  ğŸ“Š 3000 SORU TESTI RAPORU")
     print("=" * 60)
     print(f"  Toplam:      {rapor['toplam_soru']}")
     print(f"  Islenen:     {rapor['islenen']}")
-    print(f"  ✅ Basarili:  {rapor['basarili']} ({rapor['basarili_orani']})")
-    print(f"  ❌ Basarisiz: {rapor['basarisiz']}")
-    print(f"  ⏱ Sure:       {rapor['toplam_sure_sn']}sn")
-    print(f"  📈 Hiz:       {rapor['soru_hizi']}")
-    print(f"  ⚡ Ortalama:  {rapor['ortalama_soru_suresi_sn']}sn/soru")
-    print(f"\n  🔴 Hata Turleri (ilk 10):")
+    print(f"  âœ… Basarili:  {rapor['basarili']} ({rapor['basarili_orani']})")
+    print(f"  âŒ Basarisiz: {rapor['basarisiz']}")
+    print(f"  â± Sure:       {rapor['toplam_sure_sn']}sn")
+    print(f"  ğŸ“ˆ Hiz:       {rapor['soru_hizi']}")
+    print(f"  âš¡ Ortalama:  {rapor['ortalama_soru_suresi_sn']}sn/soru")
+    print(f"\n  ğŸ”´ Hata Turleri (ilk 10):")
     for hata, sayi in list(rapor["hata_turleri"].items())[:10]:
         print(f"    {hata}: {sayi}")
-    print(f"\n  📂 Rapor: {RAPOR_DOSYASI}")
-    print(f"  📂 Log: {LOG_DOSYASI}")
+    print(f"\n  ğŸ“‚ Rapor: {RAPOR_DOSYASI}")
+    print(f"  ğŸ“‚ Log: {LOG_DOSYASI}")
     print("=" * 60)
 
 

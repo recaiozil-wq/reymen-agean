@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-adaptif_ogrenme.py — Adaptive learning and self-correction module.
+adaptif_ogrenme.py â€” Adaptive learning and self-correction module.
 
 Two functions:
   1. User preferences: saves corrections like "no, do it this way".
@@ -34,23 +34,23 @@ logger = logging.getLogger(__name__)
 
 ROOT = Path(__file__).parent.resolve()
 TERCIH_DOSYASI = ROOT / ".ReYMeN" / "kullanici_tercihleri.json"
-MAKS_TERCIH = 50  # En fazla bu kadar tercih saklanır
+MAKS_TERCIH = 50  # En fazla bu kadar tercih saklanÄ±r
 
-# Kullanıcı düzeltme sinyalleri
+# KullanÄ±cÄ± dÃ¼zeltme sinyalleri
 _DUZELTME_SINYALLERI = [
-    r"\bhay[ıi]r\b",
-    r"\bdeğil\b",
+    r"\bhay[Ä±i]r\b",
+    r"\bdeÄŸil\b",
     r"\byapma\b",
     r"\bstop\b",
     r"\bher\s+zaman\b",
-    r"\bhiç(?:bir\s+zaman)?\b",
-    r"\bböyle\s+(?:yapma|yap)\b",
-    r"\b(?:şöyle|bu\s+şekilde)\s+yap\b",
+    r"\bhiÃ§(?:bir\s+zaman)?\b",
+    r"\bbÃ¶yle\s+(?:yapma|yap)\b",
+    r"\b(?:ÅŸÃ¶yle|bu\s+ÅŸekilde)\s+yap\b",
     r"\bkullanma\b",
     r"\bnot:\b",
-    r"\bhatırl[ae]\b",
-    r"\blütfen\s+(?:bir\s+daha)?\s*yapma\b",
-    r"\bgeleceğe\s+not\b",
+    r"\bhatÄ±rl[ae]\b",
+    r"\blÃ¼tfen\s+(?:bir\s+daha)?\s*yapma\b",
+    r"\bgeleceÄŸe\s+not\b",
 ]
 
 _DUZELTME_RE = re.compile("|".join(_DUZELTME_SINYALLERI), re.IGNORECASE)
@@ -64,7 +64,7 @@ class AdaptifOgrenme:
         self._dosya.parent.mkdir(parents=True, exist_ok=True)
         self._tercihler: list = self._yukle()
 
-    # ── Tercih yönetimi ───────────────────────────────────────────────────────
+    # â”€â”€ Tercih yÃ¶netimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _yukle(self) -> list:
         if self._dosya.exists():
@@ -82,7 +82,7 @@ class AdaptifOgrenme:
                 encoding="utf-8",
             )
         except Exception as e:
-            print(f"[Adaptif]: Tercih kaydetme hatası: {e}")
+            print(f"[Adaptif]: Tercih kaydetme hatasÄ±: {e}")
 
     def tercih_ekle(self, metin: str, kaynak: str = "kullanici") -> bool:
         """Add a new preference. Does not add if the same text already exists.
@@ -103,7 +103,7 @@ class AdaptifOgrenme:
                 "zaman": time.strftime("%Y-%m-%d %H:%M"),
             }
         )
-        # Kapasite sınırı
+        # Kapasite sÄ±nÄ±rÄ±
         if len(self._tercihler) > MAKS_TERCIH:
             self._tercihler = self._tercihler[-MAKS_TERCIH:]
         self._kaydet()
@@ -126,7 +126,7 @@ class AdaptifOgrenme:
             return ""
         son = self._tercihler[-limit:]
         satirlar = "\n".join(f"- {t['metin']}" for t in son)
-        return f"\n== KULLANICI TERCİHLERİ (bunlara uy) ==\n{satirlar}\n"
+        return f"\n== KULLANICI TERCÄ°HLERÄ° (bunlara uy) ==\n{satirlar}\n"
 
     def tercih_sayisi(self) -> int:
         return len(self._tercihler)
@@ -146,7 +146,7 @@ class AdaptifOgrenme:
         self._tercihler.clear()
         self._kaydet()
 
-    # ── Self-correction ───────────────────────────────────────────────────────
+    # â”€â”€ Self-correction â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def python_duzelt_ve_calistir(
         self,
@@ -177,40 +177,40 @@ class AdaptifOgrenme:
                 and "Traceback" not in sonuc
             ):
                 if deneme > 0:
-                    print(f"[Self-correction]: {deneme}. denemede düzeldi.")
+                    print(f"[Self-correction]: {deneme}. denemede dÃ¼zeldi.")
                 return sonuc
 
             son_hata = sonuc
             if deneme >= max_deneme or provider is None:
                 break
 
-            # LLM'den düzeltme iste
+            # LLM'den dÃ¼zeltme iste
             duzeltme_promptu = (
-                f"Aşağıdaki Python kodu şu hatayı verdi:\n\n"
+                f"AÅŸaÄŸÄ±daki Python kodu ÅŸu hatayÄ± verdi:\n\n"
                 f"KOD:\n```python\n{mevcut_kod}\n```\n\n"
                 f"HATA:\n{son_hata[:500]}\n\n"
-                f"Kodu düzelt ve SADECE düzeltilmiş kodu yaz. Açıklama ekleme."
+                f"Kodu dÃ¼zelt ve SADECE dÃ¼zeltilmiÅŸ kodu yaz. AÃ§Ä±klama ekleme."
             )
             try:
                 yanit = provider.uret(
-                    "Sen bir Python kod düzeltici asistanısın.",
+                    "Sen bir Python kod dÃ¼zeltici asistanÄ±sÄ±n.",
                     [{"role": "user", "content": duzeltme_promptu}],
                 )
-                # Kod bloğunu çıkar
+                # Kod bloÄŸunu Ã§Ä±kar
                 m = re.search(r"```(?:python)?\s*\n(.+?)```", yanit, re.DOTALL)
                 if m:
                     mevcut_kod = m.group(1).strip()
                 else:
                     mevcut_kod = yanit.strip()
-                print(f"[Self-correction]: Deneme {deneme + 1}, kod düzeltildi.")
+                print(f"[Self-correction]: Deneme {deneme + 1}, kod dÃ¼zeltildi.")
             except Exception as e:
-                print(f"[Self-correction]: LLM hatası: {e}")
+                print(f"[Self-correction]: LLM hatasÄ±: {e}")
                 break
 
-        return f"[Self-correction]: {max_deneme} denemede düzeltilemedi.\nSon hata: {son_hata[:300]}"
+        return f"[Self-correction]: {max_deneme} denemede dÃ¼zeltilemedi.\nSon hata: {son_hata[:300]}"
 
 
-# ── Motor entegrasyon yardımcısı ──────────────────────────────────────────────
+# â”€â”€ Motor entegrasyon yardÄ±mcÄ±sÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def adaptif_ogrenme_sistemi_kur() -> AdaptifOgrenme:
@@ -221,15 +221,15 @@ def adaptif_ogrenme_sistemi_kur() -> AdaptifOgrenme:
 if __name__ == "__main__":
     ao = AdaptifOgrenme()
 
-    # Düzeltme tespiti testi
+    # DÃ¼zeltme tespiti testi
     testler = [
-        "hayır, her zaman UTF-8 kullan",
+        "hayÄ±r, her zaman UTF-8 kullan",
         "tamam harika",
-        "bunu bir daha yapma lütfen",
-        "dosya oluştur",
-        "hatırla: API key'i asla yazdırma",
+        "bunu bir daha yapma lÃ¼tfen",
+        "dosya oluÅŸtur",
+        "hatÄ±rla: API key'i asla yazdÄ±rma",
     ]
-    print("=== Düzeltme Tespiti ===")
+    print("=== DÃ¼zeltme Tespiti ===")
     for t in testler:
         tespit = ao.kullanici_mesaji_isle(t)
         print(f"{'[KAYDEDILDI]' if tespit else '[normal]  '} {t}")

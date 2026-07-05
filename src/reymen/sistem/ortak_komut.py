@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-ortak_komut.py — 3 bot + ReYMeN Agent ortak yetki/komut merkezi.
+ortak_komut.py â€” 3 bot + ReYMeN Agent ortak yetki/komut merkezi.
 Her degisiklikte otomatik guncellenir. Tum botlar burayi okur.
 """
 
@@ -21,18 +21,18 @@ import sys as _sys
 # __file__ = .../reymen/sistem/ortak_komut.py -> 4x parent = proje koku
 _sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent.parent))
 
-from src.reymen.sistem.db_config import DB
+from reymen.sistem.db_config import DB
 
 logger = logging.getLogger(__name__)
 
 # __file__ = .../reymen/sistem/ortak_komut.py -> 4x parent = proje koku
 PROJE_KOK = Path(__file__).resolve().parent.parent.parent.parent
-HERMES_HOME = Path.home() / ".hermes"
+REYMEN_HOME = Path.home() / ".reymen"
 
-# ── Reasoning-Core sağlayıcı adı (config.yaml > fallback_providers'ta aranır)
+# â”€â”€ Reasoning-Core saÄŸlayÄ±cÄ± adÄ± (config.yaml > fallback_providers'ta aranÄ±r)
 _REASONING_PROVIDER_ADI = "reasoning-core"
 
-# ── Bot Profil Yapilari ────────────────────────────────────────────────
+# â”€â”€ Bot Profil Yapilari â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 BOTLAR = {
     "pasa_38": {
@@ -70,7 +70,7 @@ BOTLAR = {
     },
 }
 
-# ── Ortak Komutlar ─────────────────────────────────────────────────────
+# â”€â”€ Ortak Komutlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 ORTAK_KOMUTLAR = {
     "cevap_formati": "emoji+baslik+tablo+yorum",
@@ -84,24 +84,24 @@ ORTAK_KOMUTLAR = {
     "reasoning_core_aktif": True,
 }
 
-# ── Dosya Yollari ──────────────────────────────────────────────────────
+# â”€â”€ Dosya Yollari â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 SOUL_DOSYALARI = {
-    "default": HERMES_HOME / "profiles" / "default" / "SOUL.md",
-    "reymen": HERMES_HOME / "profiles" / "reymen" / "SOUL.md",
-    "kiral38": HERMES_HOME / "profiles" / "kiral38" / "SOUL.md",
+        "default": REYMEN_HOME / "profiles" / "default" / "SOUL.md",
+        "reymen": REYMEN_HOME / "profiles" / "reymen" / "SOUL.md",
+        "kiral38": REYMEN_HOME / "profiles" / "kiral38" / "SOUL.md",
 }
 
 CONFIG_DOSYALARI = {
-    "default": HERMES_HOME / "profiles" / "default" / "config.yaml",
-    "reymen": HERMES_HOME / "profiles" / "reymen" / "config.yaml",
-    "kiral38": HERMES_HOME / "profiles" / "kiral38" / "config.yaml",
+        "default": REYMEN_HOME / "profiles" / "default" / "config.yaml",
+        "reymen": REYMEN_HOME / "profiles" / "reymen" / "config.yaml",
+        "kiral38": REYMEN_HOME / "profiles" / "kiral38" / "config.yaml",
 }
 
 DURUM_JSON = PROJE_KOK / "durum.json"
 
 
-# ── Tarama Fonksiyonu ──────────────────────────────────────────────────
+# â”€â”€ Tarama Fonksiyonu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def tara_profil(profil: str) -> dict:
@@ -141,7 +141,7 @@ def guncelle() -> dict:
     """Tum profilleri tara, BOTLAR'i guncelle, durum.json'a yaz.
 
     Dinamik olarak eklenen botlari (yeni kullanicinin kendi botu gibi)
-    korur — sadece hardcoded BOTLAR'daki botlari degil, durum.json'da
+    korur â€” sadece hardcoded BOTLAR'daki botlari degil, durum.json'da
     zaten kayitli olan tum botlari muhafaza eder.
     """
     # Mevcut durum.json'u oku (dinamik botlari korumak icin)
@@ -237,11 +237,11 @@ def _butun_botlar_esit_mi() -> dict:
     }
 
 
-# ── Reasoning-Core Fonksiyonlari ───────────────────────────────────────
+# â”€â”€ Reasoning-Core Fonksiyonlari â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _analitik_db_hazirla() -> None:
-    """analitik.db'de reasoning_log tablosu yoksa oluşturur (idempotent)."""
+    """analitik.db'de reasoning_log tablosu yoksa oluÅŸturur (idempotent)."""
     with sqlite3.connect(DB["analitik"]) as conn:
         conn.execute(
             """
@@ -264,13 +264,13 @@ def _analitik_db_hazirla() -> None:
 def _reasoning_core_cagir(
     prompt: str, fallback_providers: list[dict], timeout: int = 60
 ) -> dict:
-    """config.yaml > fallback_providers içindeki 'reasoning-core' girdisini
-    bulup OpenAI-uyumlu chat/completions isteği atar.
+    """config.yaml > fallback_providers iÃ§indeki 'reasoning-core' girdisini
+    bulup OpenAI-uyumlu chat/completions isteÄŸi atar.
 
-    Ornith-1.0 ailesi (bkz. deep-reinforce.com/ornith_1_0.html) yanıtı
-    <think>...</think> bloğuyla açar ve sunucu tarafında reasoning-parser
-    açıksa bunu ayrı bir `reasoning_content` alanında döner. Bu fonksiyon
-    her iki durumu da (ayrı alan / metin içi <think>) destekler.
+    Ornith-1.0 ailesi (bkz. deep-reinforce.com/ornith_1_0.html) yanÄ±tÄ±
+    <think>...</think> bloÄŸuyla aÃ§ar ve sunucu tarafÄ±nda reasoning-parser
+    aÃ§Ä±ksa bunu ayrÄ± bir `reasoning_content` alanÄ±nda dÃ¶ner. Bu fonksiyon
+    her iki durumu da (ayrÄ± alan / metin iÃ§i <think>) destekler.
     """
     provider_cfg = next(
         (
@@ -282,8 +282,8 @@ def _reasoning_core_cagir(
     )
     if provider_cfg is None:
         raise RuntimeError(
-            "config.yaml > fallback_providers içinde 'reasoning-core*' ile "
-            "başlayan bir sağlayıcı bulunamadı. Önce config.yaml'ı güncelle."
+            "config.yaml > fallback_providers iÃ§inde 'reasoning-core*' ile "
+            "baÅŸlayan bir saÄŸlayÄ±cÄ± bulunamadÄ±. Ã–nce config.yaml'Ä± gÃ¼ncelle."
         )
 
     base_url = provider_cfg["base_url"].rstrip("/")
@@ -334,39 +334,39 @@ def reasoning_loop(
     bot_adi: str,
     fallback_providers: list[dict],
 ) -> dict:
-    """Bir hata oluştuğunda çağrılan otonom akış:
+    """Bir hata oluÅŸtuÄŸunda Ã§aÄŸrÄ±lan otonom akÄ±ÅŸ:
 
-        1) durum_ozeti (DURUM_OKU() çıktısı) + hata_metni birlikte
-           Reasoning-Core'a gönderilir.
-        2) Dönen düşünce zinciri (CoT) ve çözüm ayrıştırılır.
-        3) Sonuç analitik.db > reasoning_log tablosuna yazılır.
+        1) durum_ozeti (DURUM_OKU() Ã§Ä±ktÄ±sÄ±) + hata_metni birlikte
+           Reasoning-Core'a gÃ¶nderilir.
+        2) DÃ¶nen dÃ¼ÅŸÃ¼nce zinciri (CoT) ve Ã§Ã¶zÃ¼m ayrÄ±ÅŸtÄ±rÄ±lÄ±r.
+        3) SonuÃ§ analitik.db > reasoning_log tablosuna yazÄ±lÄ±r.
 
-    SOUL.md > 'DURUM_OKU() ZORUNLULUĞU' kuralı gereği bu fonksiyon
-    durum_ozeti'ni KENDİSİ üretmez — çağıran taraf (ör. hata yakalama
-    handler'ı) önce DURUM_OKU() çağırıp sonucu buraya parametre olarak
-    geçirmelidir. Bu fonksiyon durum_ozeti boşsa çalışmayı reddeder,
-    aksi halde kural ihlal edilmiş olur.
+    SOUL.md > 'DURUM_OKU() ZORUNLULUÄU' kuralÄ± gereÄŸi bu fonksiyon
+    durum_ozeti'ni KENDÄ°SÄ° Ã¼retmez â€” Ã§aÄŸÄ±ran taraf (Ã¶r. hata yakalama
+    handler'Ä±) Ã¶nce DURUM_OKU() Ã§aÄŸÄ±rÄ±p sonucu buraya parametre olarak
+    geÃ§irmelidir. Bu fonksiyon durum_ozeti boÅŸsa Ã§alÄ±ÅŸmayÄ± reddeder,
+    aksi halde kural ihlal edilmiÅŸ olur.
     """
     if not durum_ozeti or not durum_ozeti.strip():
         raise ValueError(
-            "reasoning_loop çağrılmadan önce DURUM_OKU() çalıştırılmalı ve "
-            "sonucu durum_ozeti parametresine verilmeli (SOUL.md kuralı)."
+            "reasoning_loop Ã§aÄŸrÄ±lmadan Ã¶nce DURUM_OKU() Ã§alÄ±ÅŸtÄ±rÄ±lmalÄ± ve "
+            "sonucu durum_ozeti parametresine verilmeli (SOUL.md kuralÄ±)."
         )
 
     _analitik_db_hazirla()
 
     prompt = (
-        "Aşağıda bir yazılım sisteminde oluşan hata ve mevcut sistem "
-        "durumu veriliyor. Kök nedeni adım adım analiz et, sonra somut "
-        "bir çözüm öner.\n\n"
-        f"--- SİSTEM DURUMU (DURUM_OKU) ---\n{durum_ozeti}\n\n"
+        "AÅŸaÄŸÄ±da bir yazÄ±lÄ±m sisteminde oluÅŸan hata ve mevcut sistem "
+        "durumu veriliyor. KÃ¶k nedeni adÄ±m adÄ±m analiz et, sonra somut "
+        "bir Ã§Ã¶zÃ¼m Ã¶ner.\n\n"
+        f"--- SÄ°STEM DURUMU (DURUM_OKU) ---\n{durum_ozeti}\n\n"
         f"--- HATA ---\n{hata_metni}\n"
     )
 
     try:
         sonuc = _reasoning_core_cagir(prompt, fallback_providers)
     except Exception as exc:
-        logger.warning("reasoning_loop: Reasoning-Core çağrısı başarısız: %s", exc)
+        logger.warning("reasoning_loop: Reasoning-Core Ã§aÄŸrÄ±sÄ± baÅŸarÄ±sÄ±z: %s", exc)
         return {"basarili": False, "hata": str(exc)}
 
     kayit = {
@@ -394,19 +394,19 @@ def reasoning_loop(
         conn.commit()
 
     logger.info(
-        "reasoning_loop: %s botunda hata çözümü %ss içinde analitik.db'ye kaydedildi.",
+        "reasoning_loop: %s botunda hata Ã§Ã¶zÃ¼mÃ¼ %ss iÃ§inde analitik.db'ye kaydedildi.",
         bot_adi,
         kayit["sure_sn"],
     )
     return {"basarili": True, **kayit}
 
 
-# ── CLI ─────────────────────────────────────────────────────────────────
+# â”€â”€ CLI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
     import sys
 
-    # CLI'da sys.path'e proje kökünü ekle (reymen paketini bulmak için)
+    # CLI'da sys.path'e proje kÃ¶kÃ¼nÃ¼ ekle (reymen paketini bulmak iÃ§in)
     # __file__ = .../reymen/sistem/ortak_komut.py -> 4x parent = proje koku
     _cli_kok = Path(__file__).resolve().parent.parent.parent.parent
     if str(_cli_kok) not in sys.path:
@@ -419,6 +419,6 @@ if __name__ == "__main__":
             )
     elif len(sys.argv) > 1 and sys.argv[1] == "guncelle":
         sonuc = guncelle()
-        print(f"✅ durum.json guncellendi. Botlar esit mi: {sonuc['esit_mi']['esit']}")
+        print(f"âœ… durum.json guncellendi. Botlar esit mi: {sonuc['esit_mi']['esit']}")
     else:
         print("Kullanim: python ortak_komut.py [tara|guncelle]")

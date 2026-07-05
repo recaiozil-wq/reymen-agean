@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-memory_agent.py — ReYMeN Konusma Hafiza Sistemi.
+memory_agent.py â€” ReYMeN Konusma Hafiza Sistemi.
 
 Sliding-window context + otomatik ozetleme + JSON'a kalici kayit.
 DeepSeek API ile calisir, gerektiginde ChromaDB ile vektorel hafiza.
@@ -32,7 +32,7 @@ class Message:
 
 
 class MemoryAgent:
-    """Konusma hafiza yoneticisi — sliding window + ozetleme + kalici kayit."""
+    """Konusma hafiza yoneticisi â€” sliding window + ozetleme + kalici kayit."""
 
     def __init__(
         self,
@@ -98,7 +98,7 @@ class MemoryAgent:
                 metadatas=[{"role": role, "index": str(len(self.history))}],
             )
 
-        # Sliding window — context_length asimsa ozetle
+        # Sliding window â€” context_length asimsa ozetle
         if len(self.history) > self.context_length:
             self._summarize_oldest()
 
@@ -115,7 +115,7 @@ class MemoryAgent:
         text_block = "\n".join(f"{m.role}: {m.content}" for m in to_summarize)
         prompt = (
             f"Asagidaki konusmayi 3-4 cumlede ozetle. "
-            f"�nemli detaylari, kararlari ve talepleri KORU:\n{text_block}"
+            f"ï¿½nemli detaylari, kararlari ve talepleri KORU:\n{text_block}"
         )
 
         try:
@@ -244,7 +244,7 @@ class MemoryAgent:
         }
 
 
-# ─── Module-level singleton ──────────────────────────────────────────
+# â”€â”€â”€ Module-level singleton â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _HAFIZA: Optional[MemoryAgent] = None
 
 

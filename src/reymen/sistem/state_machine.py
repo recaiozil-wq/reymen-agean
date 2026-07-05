@@ -1,17 +1,17 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-state_machine.py — ReYMeN Runtime State Machine.
+state_machine.py â€” ReYMeN Runtime State Machine.
 
 Agent'in operasyonel durumunu (IDLE, THINKING, TOOL_CALL, ERROR, RECOVERING
-vb.) takip eder. Her durum geçişini loglar, timeout kontrolü yapar,
-state değişikliklerinde hook'ları tetikler.
+vb.) takip eder. Her durum geÃ§iÅŸini loglar, timeout kontrolÃ¼ yapar,
+state deÄŸiÅŸikliklerinde hook'larÄ± tetikler.
 
-Kullanım:
+KullanÄ±m:
     sm = StateMachine()
-    sm.on_transition(my_callback)  # state değişince çağrılır
+    sm.on_transition(my_callback)  # state deÄŸiÅŸince Ã§aÄŸrÄ±lÄ±r
     sm.set_state(StateMachine.IDLE)
-    sm.tick()  # heartbeat kontrolü
-    if sm.is_stuck():  # belirlenen sürede heartbeat alınmadıysa
+    sm.tick()  # heartbeat kontrolÃ¼
+    if sm.is_stuck():  # belirlenen sÃ¼rede heartbeat alÄ±nmadÄ±ysa
         sm.recover()
 """
 
@@ -27,30 +27,30 @@ logger = logging.getLogger(__name__)
 
 
 class State(enum.Enum):
-    """ReYMeN runtime state machine durumları."""
+    """ReYMeN runtime state machine durumlarÄ±."""
 
-    # Başlangıç / çalışmıyor
+    # BaÅŸlangÄ±Ã§ / Ã§alÄ±ÅŸmÄ±yor
     UNINITIALIZED = "uninitialized"
     INITIALIZING = "initializing"
     IDLE = "idle"
 
-    # Aktif çalışma
-    THINKING = "thinking"  # LLM çağrısı bekleniyor
-    TOOL_CALL = "tool_call"  # Araç çalıştırılıyor
-    WAITING = "waiting"  # Dış girdi bekleniyor (HITL / kullanıcı)
+    # Aktif Ã§alÄ±ÅŸma
+    THINKING = "thinking"  # LLM Ã§aÄŸrÄ±sÄ± bekleniyor
+    TOOL_CALL = "tool_call"  # AraÃ§ Ã§alÄ±ÅŸtÄ±rÄ±lÄ±yor
+    WAITING = "waiting"  # DÄ±ÅŸ girdi bekleniyor (HITL / kullanÄ±cÄ±)
 
     # Hata / kurtarma
-    ERROR = "error"  # Geçici hata
+    ERROR = "error"  # GeÃ§ici hata
     RECOVERING = "recovering"  # Otomatik kurtarma devam ediyor
-    DEGRADED = "degraded"  # Çalışıyor ama kısıtlı kapasite
+    DEGRADED = "degraded"  # Ã‡alÄ±ÅŸÄ±yor ama kÄ±sÄ±tlÄ± kapasite
 
     # Terminal
     SHUTDOWN = "shutdown"
-    CRASHED = "crashed"  # Kurtarılamaz hata
+    CRASHED = "crashed"  # KurtarÄ±lamaz hata
 
 
-# --- Geçerli durum geçişleri ---
-# Hangi durumdan hangi duruma geçilebilir
+# --- GeÃ§erli durum geÃ§iÅŸleri ---
+# Hangi durumdan hangi duruma geÃ§ilebilir
 _TRANSITIONS: Dict[State, Set[State]] = {
     State.UNINITIALIZED: {State.INITIALIZING},
     State.INITIALIZING: {State.IDLE, State.ERROR, State.SHUTDOWN},
@@ -94,7 +94,7 @@ _TRANSITIONS: Dict[State, Set[State]] = {
 # Hata/kurtarma kategorisindeki durumlar
 _ERROR_STATES = {State.ERROR, State.RECOVERING, State.DEGRADED, State.CRASHED}
 
-# Aktif çalışma durumları (IDLE + meşgul)
+# Aktif Ã§alÄ±ÅŸma durumlarÄ± (IDLE + meÅŸgul)
 _ACTIVE_STATES = {
     State.IDLE,
     State.THINKING,
@@ -103,22 +103,22 @@ _ACTIVE_STATES = {
     State.DEGRADED,
 }
 
-# Ölü/kilitli durumlar
+# Ã–lÃ¼/kilitli durumlar
 _STUCK_STATES = {State.UNINITIALIZED, State.ERROR, State.SHUTDOWN, State.CRASHED}
 
 
 class StateTransitionError(ValueError):
-    """Geçersiz durum geçişi."""
+    """GeÃ§ersiz durum geÃ§iÅŸi."""
 
     pass
 
 
 TransitionCallback = Callable[[State, State, Optional[str]], None]
-"""Hook imzası: (eski_durum, yeni_durum, neden) -> None"""
+"""Hook imzasÄ±: (eski_durum, yeni_durum, neden) -> None"""
 
 
 class StateMachine:
-    """Runtime state machine — thread-safe."""
+    """Runtime state machine â€” thread-safe."""
 
     def __init__(self, heartbeat_interval_sec: int = 30, stale_timeout_sec: int = 120):
         self._state: State = State.UNINITIALIZED
@@ -131,7 +131,7 @@ class StateMachine:
         self._transition_count: int = 0
         self._history: List[Dict[str, Any]] = []
 
-    # ── State sorgulama ─────────────────────────────────────────────────
+    # â”€â”€ State sorgulama â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @property
     def current(self) -> State:
@@ -159,7 +159,7 @@ class StateMachine:
         return self.current in _ERROR_STATES
 
     def is_stuck(self) -> bool:
-        """Heartbeat timeout aştıysa stuck/kilitli kabul et."""
+        """Heartbeat timeout aÅŸtÄ±ysa stuck/kilitli kabul et."""
         with self._lock:
             if self._state in _STUCK_STATES:
                 return True
@@ -176,22 +176,22 @@ class StateMachine:
         return self.current in {State.ERROR, State.DEGRADED, State.RECOVERING}
 
     def current_state_duration(self) -> float:
-        """Bu state'te kaç saniyedir bekleniyor."""
+        """Bu state'te kaÃ§ saniyedir bekleniyor."""
         return time.time() - self._state_since
 
-    # ── State yönetimi ──────────────────────────────────────────────────
+    # â”€â”€ State yÃ¶netimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def set_state(self, new_state: State, reason: Optional[str] = None) -> bool:
-        """State değiştir. Geçersiz geçişte log at ama kırılma (exception atma)."""
+        """State deÄŸiÅŸtir. GeÃ§ersiz geÃ§iÅŸte log at ama kÄ±rÄ±lma (exception atma)."""
         with self._lock:
             old = self._state
 
-            # Aynı state'e geçiş — heartbeat say
+            # AynÄ± state'e geÃ§iÅŸ â€” heartbeat say
             if old == new_state:
                 self._heartbeat()
                 return True
 
-            # UNINITIALIZED'den çıkış özel izin
+            # UNINITIALIZED'den Ã§Ä±kÄ±ÅŸ Ã¶zel izin
             if old == State.UNINITIALIZED:
                 allowed = True
             else:
@@ -199,7 +199,7 @@ class StateMachine:
 
             if not allowed:
                 logger.warning(
-                    f"Geçersiz state geçişi engellendi: {old.value} -> {new_state.value}"
+                    f"GeÃ§ersiz state geÃ§iÅŸi engellendi: {old.value} -> {new_state.value}"
                     f"{' (' + reason + ')' if reason else ''}"
                 )
                 return False
@@ -227,7 +227,7 @@ class StateMachine:
             else:
                 logger.info(log_msg)
 
-            # Hook'ları tetikle
+            # Hook'larÄ± tetikle
             for cb in self._callbacks:
                 try:
                     cb(old, new_state, reason)
@@ -237,7 +237,7 @@ class StateMachine:
             return True
 
     def heartbeat(self) -> None:
-        """Her heartbeat sinyalinde state'in hala canlı olduğunu bildir."""
+        """Her heartbeat sinyalinde state'in hala canlÄ± olduÄŸunu bildir."""
         self._heartbeat()
 
     def _heartbeat(self) -> None:
@@ -245,19 +245,19 @@ class StateMachine:
             self._last_heartbeat = time.time()
 
     def tick(self) -> Optional[State]:
-        """Periyodik kontrol — stuck durumdaysa belirle.
+        """Periyodik kontrol â€” stuck durumdaysa belirle.
 
         Returns:
-            Stuck ise mevcut state, değilse None.
+            Stuck ise mevcut state, deÄŸilse None.
         """
         if self.is_stuck():
             return self.current
         return None
 
-    # ── Callback yönetimi ───────────────────────────────────────────────
+    # â”€â”€ Callback yÃ¶netimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def on_transition(self, callback: TransitionCallback) -> None:
-        """State değişikliklerinde çağrılacak callback ekle."""
+        """State deÄŸiÅŸikliklerinde Ã§aÄŸrÄ±lacak callback ekle."""
         with self._lock:
             self._callbacks.append(callback)
 
@@ -266,15 +266,15 @@ class StateMachine:
             if callback in self._callbacks:
                 self._callbacks.remove(callback)
 
-    # ── Geçmiş / durum raporu ───────────────────────────────────────────
+    # â”€â”€ GeÃ§miÅŸ / durum raporu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def get_history(self, limit: int = 20) -> List[Dict[str, Any]]:
-        """Son N state geçişini döndür."""
+        """Son N state geÃ§iÅŸini dÃ¶ndÃ¼r."""
         with self._lock:
             return list(self._history[-limit:])
 
     def status_report(self) -> Dict[str, Any]:
-        """Anlık durum raporu."""
+        """AnlÄ±k durum raporu."""
         with self._lock:
             return {
                 "state": self._state.value,
@@ -288,7 +288,7 @@ class StateMachine:
                 "stale_timeout": self._stale_timeout,
             }
 
-    # ── Yardımcılar ─────────────────────────────────────────────────────
+    # â”€â”€ YardÄ±mcÄ±lar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def idle(self, reason: Optional[str] = None) -> bool:
         return self.set_state(State.IDLE, reason)
@@ -318,7 +318,7 @@ class StateMachine:
         return self.set_state(State.DEGRADED, reason)
 
 
-# ── Hızlı test ───────────────────────────────────────────────────────────────
+# â”€â”€ HÄ±zlÄ± test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     sm = StateMachine()
@@ -327,7 +327,7 @@ if __name__ == "__main__":
     sm.set_state(State.THINKING, "kullanici hedef verdi")
     sm.set_state(State.ERROR, "API hatasi")
     assert sm.is_error()
-    assert sm.is_stuck() or True  # henüz timeout olmamış
+    assert sm.is_stuck() or True  # henÃ¼z timeout olmamÄ±ÅŸ
     sm.set_state(State.RECOVERING, "yeniden deneniyor")
     sm.set_state(State.IDLE, "kurtarildi")
     print(f"State: {sm.current.value}, Gecis: {sm.transition_count}")

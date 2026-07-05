@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""gateway.platforms.whatsapp — WhatsApp platform adaptörü."""
+﻿# -*- coding: utf-8 -*-
+"""gateway.platforms.whatsapp â€” WhatsApp platform adaptÃ¶rÃ¼."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ def check_whatsapp_requirements() -> bool:
 
 
 class WhatsAppAdapter(WhatsAppBehaviorMixin, BasePlatformAdapter):
-    """WhatsApp Business Cloud API adaptörü."""
+    """WhatsApp Business Cloud API adaptÃ¶rÃ¼."""
 
     platform = "whatsapp"
 

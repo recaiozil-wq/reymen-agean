@@ -1,14 +1,14 @@
-"""_handle_copy_command handler."""
+﻿"""_handle_copy_command handler."""
 
-from src.reymen.sistem.cli_display import _cprint
-from src.reymen.sistem.cli_helpers import _assistant_copy_text
+from reymen.sistem.cli_display import _cprint
+from reymen.sistem.cli_helpers import _assistant_copy_text
 import logging
 
 logger = logging.getLogger(__name__)
 
 
 def _handle_copy_command(cli, cmd_original: str) -> None:
-    """Handle /copy [number] — copy assistant output to clipboard."""
+    """Handle /copy [number] â€” copy assistant output to clipboard."""
     parts = cmd_original.split(maxsplit=1)
     arg = parts[1].strip() if len(parts) > 1 else ""
 

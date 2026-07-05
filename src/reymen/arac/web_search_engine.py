@@ -1,27 +1,27 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-web_search_engine.py — Çok back-end'li web arama motoru (ABC tabanlı).
+web_search_engine.py â€” Ã‡ok back-end'li web arama motoru (ABC tabanlÄ±).
 
 WebSearchEngine ABC:
-  - Soyut calistir(sorgu, max_sonuc) → str
+  - Soyut calistir(sorgu, max_sonuc) â†’ str
 
 Engine'ler:
-  - DuckDuckGoEngine  — duckduckgo-search kütüphanesi (öncelikli) / DDG Lite HTML (fallback)
-  - GoogleEngine      — stub (GOOGLE_API_KEY gerektirir, NotImplementedError)
-  - BingEngine        — stub (BING_API_KEY gerektirir, NotImplementedError)
-  - FirecrawlEngine   — Firecrawl API (FIRECRAWL_API_KEY)
-  - BraveSearchEngine — Brave Search API (BRAVE_API_KEY)
-  - SearXNGEngine     — SearXNG örnek (SEARXNG_URL)
-  - ExaEngine         — Exa API (EXA_API_KEY)
+  - DuckDuckGoEngine  â€” duckduckgo-search kÃ¼tÃ¼phanesi (Ã¶ncelikli) / DDG Lite HTML (fallback)
+  - GoogleEngine      â€” stub (GOOGLE_API_KEY gerektirir, NotImplementedError)
+  - BingEngine        â€” stub (BING_API_KEY gerektirir, NotImplementedError)
+  - FirecrawlEngine   â€” Firecrawl API (FIRECRAWL_API_KEY)
+  - BraveSearchEngine â€” Brave Search API (BRAVE_API_KEY)
+  - SearXNGEngine     â€” SearXNG Ã¶rnek (SEARXNG_URL)
+  - ExaEngine         â€” Exa API (EXA_API_KEY)
 
 WebSearchRegistry:
-  - engine kaydet / seç (ad ile) / calistir (engine adı + sorgu ile)
-  - Auto-detect: env var'larına göre hangi engine'lerin hazır olduğunu belirler
-  - Config backend seçimi: config'de web.backend veya web.search_backend varsa o engine kullanılır
-  - Varsayılan engine: duckduckgo (her zaman çalışır)
+  - engine kaydet / seÃ§ (ad ile) / calistir (engine adÄ± + sorgu ile)
+  - Auto-detect: env var'larÄ±na gÃ¶re hangi engine'lerin hazÄ±r olduÄŸunu belirler
+  - Config backend seÃ§imi: config'de web.backend veya web.search_backend varsa o engine kullanÄ±lÄ±r
+  - VarsayÄ±lan engine: duckduckgo (her zaman Ã§alÄ±ÅŸÄ±r)
 
 Motor tool:
-  WEB_ARAMA(sorgu, backend="duckduckgo") → str
+  WEB_ARAMA(sorgu, backend="duckduckgo") â†’ str
 """
 
 from __future__ import annotations
@@ -72,46 +72,46 @@ def _http_post_json(
         return r.read().decode("utf-8", errors="replace")
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# Soyut Taban Sınıfı
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# Soyut Taban SÄ±nÄ±fÄ±
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class WebSearchEngine(ABC):
-    """Tüm web arama engine'leri için soyut taban sınıfı."""
+    """TÃ¼m web arama engine'leri iÃ§in soyut taban sÄ±nÄ±fÄ±."""
 
     @property
     @abstractmethod
     def ad(self) -> str:
-        """Engine'in benzersiz adı (küçük harf)."""
+        """Engine'in benzersiz adÄ± (kÃ¼Ã§Ã¼k harf)."""
 
     @abstractmethod
     def calistir(self, sorgu: str, max_sonuc: int = 5) -> str:
-        """Web araması yap, formatlı metin döndür."""
+        """Web aramasÄ± yap, formatlÄ± metin dÃ¶ndÃ¼r."""
         ...
 
     def __init__(self) -> None:
         self._hazir = self._bagimliliklari_kontrol_et()
 
     def _bagimliliklari_kontrol_et(self) -> bool:
-        """Alt sınıflar override edebilir. Varsayılan: True."""
+        """Alt sÄ±nÄ±flar override edebilir. VarsayÄ±lan: True."""
         return True
 
     @property
     def hazir(self) -> bool:
-        """Engine kullanıma hazır mı?"""
+        """Engine kullanÄ±ma hazÄ±r mÄ±?"""
         return self._hazir
 
     def hazir_degilse_hata(self) -> Optional[str]:
-        """Engine hazır değilse açıklayıcı hata mesajı döndür, yoksa None."""
+        """Engine hazÄ±r deÄŸilse aÃ§Ä±klayÄ±cÄ± hata mesajÄ± dÃ¶ndÃ¼r, yoksa None."""
         return None
 
     @staticmethod
     def _sonuc_formatla(results: list, kaynak: str) -> str:
-        """Sonuçları formatla — tüm engine'ler ortak kullanır."""
+        """SonuÃ§larÄ± formatla â€” tÃ¼m engine'ler ortak kullanÄ±r."""
         if not results:
             return ""
-        satirlar = [f"[Web Arama — {kaynak}]:", "=" * 50]
+        satirlar = [f"[Web Arama â€” {kaynak}]:", "=" * 50]
         for i, r in enumerate(results, 1):
             title = r.get("title", "") or r.get("baslik", "") or ""
             href = r.get("href", "") or r.get("url", "") or ""
@@ -120,19 +120,19 @@ class WebSearchEngine(ABC):
             if href:
                 satirlar.append(f"   URL: {href}")
             if body:
-                satirlar.append(f"   Özet: {body[:180]}")
+                satirlar.append(f"   Ã–zet: {body[:180]}")
         return "\n".join(satirlar)
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # DuckDuckGo Engine
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class DuckDuckGoEngine(WebSearchEngine):
     """DuckDuckGo arama engine'i. API key gerekmez.
 
-    Öncelik: duckduckgo-search kütüphanesi
+    Ã–ncelik: duckduckgo-search kÃ¼tÃ¼phanesi
     Fallback: DDG Lite HTML scraping
     """
 
@@ -141,7 +141,7 @@ class DuckDuckGoEngine(WebSearchEngine):
         return "duckduckgo"
 
     def _bagimliliklari_kontrol_et(self) -> bool:
-        # duckduckgo-search isteğe bağlı — hiçbiri yoksa Lite HTML fallback çalışır
+        # duckduckgo-search isteÄŸe baÄŸlÄ± â€” hiÃ§biri yoksa Lite HTML fallback Ã§alÄ±ÅŸÄ±r
         return True
 
     def _ddgs_library_ara(self, sorgu: str, max_sonuc: int = 5) -> Optional[list[dict]]:
@@ -237,16 +237,16 @@ class DuckDuckGoEngine(WebSearchEngine):
         return "\n".join(satirlar)
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Google Engine (Stub)
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class GoogleEngine(WebSearchEngine):
     """Google Custom Search JSON API stub.
 
-    GOOGLE_API_KEY + GOOGLE_CX ortam değişkenleri gerekli.
-    Mevcut değilse NotImplementedError fırlatır.
+    GOOGLE_API_KEY + GOOGLE_CX ortam deÄŸiÅŸkenleri gerekli.
+    Mevcut deÄŸilse NotImplementedError fÄ±rlatÄ±r.
     """
 
     @property
@@ -263,24 +263,24 @@ class GoogleEngine(WebSearchEngine):
         cx = os.environ.get("GOOGLE_CX", "").strip()
         if not api_key or not cx:
             raise NotImplementedError(
-                "GoogleEngine: GOOGLE_API_KEY ve GOOGLE_CX ortam değişkenleri gerekli."
+                "GoogleEngine: GOOGLE_API_KEY ve GOOGLE_CX ortam deÄŸiÅŸkenleri gerekli."
             )
         raise NotImplementedError(
-            "GoogleEngine henüz implemente edilmedi. "
-            "GOOGLE_API_KEY ve GOOGLE_CX ayarlandı ancak HTTP istemcisi eksik."
+            "GoogleEngine henÃ¼z implemente edilmedi. "
+            "GOOGLE_API_KEY ve GOOGLE_CX ayarlandÄ± ancak HTTP istemcisi eksik."
         )
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Bing Engine (Stub)
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class BingEngine(WebSearchEngine):
     """Bing Web Search API stub.
 
-    BING_API_KEY ortam değişkeni gerekli.
-    Mevcut değilse NotImplementedError fırlatır.
+    BING_API_KEY ortam deÄŸiÅŸkeni gerekli.
+    Mevcut deÄŸilse NotImplementedError fÄ±rlatÄ±r.
     """
 
     @property
@@ -294,23 +294,23 @@ class BingEngine(WebSearchEngine):
         api_key = os.environ.get("BING_API_KEY", "").strip()
         if not api_key:
             raise NotImplementedError(
-                "BingEngine: BING_API_KEY ortam değişkeni gerekli."
+                "BingEngine: BING_API_KEY ortam deÄŸiÅŸkeni gerekli."
             )
         raise NotImplementedError(
-            "BingEngine henüz implemente edilmedi. "
-            "BING_API_KEY ayarlandı ancak HTTP istemcisi eksik."
+            "BingEngine henÃ¼z implemente edilmedi. "
+            "BING_API_KEY ayarlandÄ± ancak HTTP istemcisi eksik."
         )
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Firecrawl Engine
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class FirecrawlEngine(WebSearchEngine):
-    """Firecrawl API ile web araması. FIRECRAWL_API_KEY gerekli.
+    """Firecrawl API ile web aramasÄ±. FIRECRAWL_API_KEY gerekli.
 
-    https://api.firecrawl.dev/v1/search endpoint'ini kullanır.
+    https://api.firecrawl.dev/v1/search endpoint'ini kullanÄ±r.
     """
 
     @property
@@ -351,31 +351,31 @@ class FirecrawlEngine(WebSearchEngine):
                 ]
                 if formatted:
                     return self._sonuc_formatla(formatted, "Firecrawl")
-                return f"[FIRECRAWL] '{sorgu}' için sonuç bulunamadı."
+                return f"[FIRECRAWL] '{sorgu}' iÃ§in sonuÃ§ bulunamadÄ±."
             hata = sonuc.get("error", "Bilinmeyen hata")
-            return f"[FIRECRAWL] Arama başarısız: {hata}"
+            return f"[FIRECRAWL] Arama baÅŸarÄ±sÄ±z: {hata}"
         except urllib.error.HTTPError as e:
             if e.code == 401:
-                return "[FIRECRAWL] Kimlik doğrulama hatası. FIRECRAWL_API_KEY kontrol edin."
+                return "[FIRECRAWL] Kimlik doÄŸrulama hatasÄ±. FIRECRAWL_API_KEY kontrol edin."
             elif e.code == 402:
-                return "[FIRECRAWL] Kredi limiti doldu. Firecrawl dashboard'dan kredi yükleyin."
+                return "[FIRECRAWL] Kredi limiti doldu. Firecrawl dashboard'dan kredi yÃ¼kleyin."
             elif e.code == 429:
-                return "[FIRECRAWL] Rate limit aşıldı. Daha sonra tekrar deneyin."
+                return "[FIRECRAWL] Rate limit aÅŸÄ±ldÄ±. Daha sonra tekrar deneyin."
             return f"[FIRECRAWL] HTTP {e.code}: {e.reason}"
         except Exception as e:
             log.exception("[FirecrawlEngine] arama hatasi:")
             return f"[FIRECRAWL] Hata: {e}"
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Brave Search Engine
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class BraveSearchEngine(WebSearchEngine):
-    """Brave Search API ile web araması. BRAVE_API_KEY gerekli.
+    """Brave Search API ile web aramasÄ±. BRAVE_API_KEY gerekli.
 
-    https://api.search.brave.com/res/v1/web/search endpoint'ini kullanır.
+    https://api.search.brave.com/res/v1/web/search endpoint'ini kullanÄ±r.
     Brave Search API, API key olmadan calismaz (rate-limited endpoint yoktur).
     Ucretsiz API key: https://brave.com/search/api/
     """
@@ -425,25 +425,25 @@ class BraveSearchEngine(WebSearchEngine):
             ]
             if formatted:
                 return self._sonuc_formatla(formatted, "Brave Search")
-            return f"[BRAVE] '{sorgu}' için sonuç bulunamadı."
+            return f"[BRAVE] '{sorgu}' iÃ§in sonuÃ§ bulunamadÄ±."
         except Exception as e:
             log.exception("[BraveSearchEngine] arama hatasi:")
             return f"[BRAVE] Hata: {e}"
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # SearXNG Engine
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class SearXNGEngine(WebSearchEngine):
-    """SearXNG (kendi instance) ile web araması. SEARXNG_URL gerekli.
+    """SearXNG (kendi instance) ile web aramasÄ±. SEARXNG_URL gerekli.
 
-    SearXNG instance'ının /search endpoint'ine JSON formatında sorgu gönderir.
-    Eğer SEARXNG_URL ayarlanmamışsa, herkese açık instance'ları dener.
+    SearXNG instance'Ä±nÄ±n /search endpoint'ine JSON formatÄ±nda sorgu gÃ¶nderir.
+    EÄŸer SEARXNG_URL ayarlanmamÄ±ÅŸsa, herkese aÃ§Ä±k instance'larÄ± dener.
     """
 
-    # Herkese açık SearXNG instance'ları (son çare fallback)
+    # Herkese aÃ§Ä±k SearXNG instance'larÄ± (son Ã§are fallback)
     PUBLIC_INSTANCES = [
         "https://searx.be",
         "https://search.sapti.me",
@@ -510,15 +510,15 @@ class SearXNGEngine(WebSearchEngine):
         return f"[SEARXNG] Hicbir instance calismadi. {last_error}"
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Exa Engine
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class ExaEngine(WebSearchEngine):
-    """Exa API ile web araması. EXA_API_KEY gerekli.
+    """Exa API ile web aramasÄ±. EXA_API_KEY gerekli.
 
-    https://api.exa.ai/search endpoint'ine POST JSON sorgu gönderir.
+    https://api.exa.ai/search endpoint'ine POST JSON sorgu gÃ¶nderir.
     """
 
     @property
@@ -559,30 +559,30 @@ class ExaEngine(WebSearchEngine):
             ]
             if formatted:
                 return self._sonuc_formatla(formatted, "Exa")
-            return f"[EXA] '{sorgu}' için sonuç bulunamadı."
+            return f"[EXA] '{sorgu}' iÃ§in sonuÃ§ bulunamadÄ±."
         except urllib.error.HTTPError as e:
             if e.code == 401:
-                return "[EXA] Kimlik doğrulama hatası. EXA_API_KEY kontrol edin."
+                return "[EXA] Kimlik doÄŸrulama hatasÄ±. EXA_API_KEY kontrol edin."
             elif e.code == 429:
-                return "[EXA] Rate limit aşıldı. Daha sonra tekrar deneyin."
+                return "[EXA] Rate limit aÅŸÄ±ldÄ±. Daha sonra tekrar deneyin."
             return f"[EXA] HTTP {e.code}: {e.reason}"
         except Exception as e:
             log.exception("[ExaEngine] arama hatasi:")
             return f"[EXA] Hata: {e}"
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# SearchDispatcher — Tek Dispatcher (multi-backend ABC wrapper)
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# SearchDispatcher â€” Tek Dispatcher (multi-backend ABC wrapper)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class SearchDispatcher:
-    """Multi-backend web arama dispatcher'ı.
+    """Multi-backend web arama dispatcher'Ä±.
 
-    Tüm engine'leri registry'de tutar, config ve env var'larına göre
-    default engine'i seçer.
+    TÃ¼m engine'leri registry'de tutar, config ve env var'larÄ±na gÃ¶re
+    default engine'i seÃ§er.
 
-    Kullanım:
+    KullanÄ±m:
         dispatcher = SearchDispatcher(config=my_config)
         dispatcher.kaydet(DuckDuckGoEngine())
         sonuc = dispatcher.ara("python asyncio", engine="duckduckgo")
@@ -603,9 +603,9 @@ class SearchDispatcher:
         log.info("[SearchDispatcher] Engine kaydedildi: %s", adi)
 
     def _resolve_backend_from_config(self) -> Optional[str]:
-        """Config'den backend seçimini çözümle.
+        """Config'den backend seÃ§imini Ã§Ã¶zÃ¼mle.
 
-        Öncelik sırası:
+        Ã–ncelik sÄ±rasÄ±:
           1. web.search_backend (per-capability override)
           2. web.backend (genel web backend)
           3. WEB_SEARCH_BACKEND env var
@@ -626,14 +626,14 @@ class SearchDispatcher:
         return None
 
     def _auto_detect_best(self) -> str:
-        """En iyi kullanılabilir engine'i auto-detect et.
+        """En iyi kullanÄ±labilir engine'i auto-detect et.
 
-        Öncelik sırası:
+        Ã–ncelik sÄ±rasÄ±:
           1. firecrawl (FIRECRAWL_API_KEY)
           2. exa (EXA_API_KEY)
           3. brave (BRAVE_API_KEY)
           4. searxng (SEARXNG_URL)
-          5. duckduckgo (her zaman hazır, fallback)
+          5. duckduckgo (her zaman hazÄ±r, fallback)
         """
         fc_key = os.environ.get("FIRECRAWL_API_KEY") or os.environ.get("FIRECRAWL_KEY")
         if fc_key and not fc_key.startswith("***") and "firecrawl" in self._engines:
@@ -650,7 +650,7 @@ class SearchDispatcher:
         return "duckduckgo"
 
     def _sec_varsayilan(self) -> Optional[WebSearchEngine]:
-        """Config'den veya auto-detect'ten varsayılan engine'i seç."""
+        """Config'den veya auto-detect'ten varsayÄ±lan engine'i seÃ§."""
         config_backend = self._resolve_backend_from_config()
         if config_backend and config_backend in self._engines:
             eng = self._engines[config_backend]
@@ -663,7 +663,7 @@ class SearchDispatcher:
         return self._engines.get("duckduckgo")
 
     def sec(self, ad: str) -> Optional[WebSearchEngine]:
-        """Ada göre engine seç. Varsayılana düş."""
+        """Ada gÃ¶re engine seÃ§. VarsayÄ±lana dÃ¼ÅŸ."""
         eng = self._engines.get(ad)
         if eng is None and self._varsayilan:
             log.warning(
@@ -684,15 +684,15 @@ class SearchDispatcher:
         return eng.ad if eng else ""
 
     def ara(self, sorgu: str, engine: Optional[str] = None, max_sonuc: int = 5) -> str:
-        """Ana arama metodu — tek dispatcher.
+        """Ana arama metodu â€” tek dispatcher.
 
         Args:
             sorgu: Arama sorgusu.
-            engine: Kullanılacak engine adı (None veya "auto" = config'deki default).
-            max_sonuc: Maksimum sonuç sayısı.
+            engine: KullanÄ±lacak engine adÄ± (None veya "auto" = config'deki default).
+            max_sonuc: Maksimum sonuÃ§ sayÄ±sÄ±.
 
         Returns:
-            Formatlı arama sonuçları veya hata mesajı.
+            FormatlÄ± arama sonuÃ§larÄ± veya hata mesajÄ±.
         """
         if not engine or engine == "auto":
             eng = self._sec_varsayilan()
@@ -734,28 +734,28 @@ class SearchDispatcher:
         return "\n".join(satirlar)
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# WebSearchRegistry — Eski isim, geriye uyumluluk alias'ı
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# WebSearchRegistry â€” Eski isim, geriye uyumluluk alias'Ä±
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class WebSearchRegistry(SearchDispatcher):
-    """Geriye uyumluluk için eski isim. Yeni kod SearchDispatcher kullanmalı."""
+    """Geriye uyumluluk iÃ§in eski isim. Yeni kod SearchDispatcher kullanmalÄ±."""
 
     pass
 
 
-# ── Global dispatcher singleton ────────────────────────────────────────────────
+# â”€â”€ Global dispatcher singleton â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _dispatcher: Optional[SearchDispatcher] = None
 
 
 def _load_config_for_registry() -> dict:
-    """Config dosyasını oku — varsa web.backend/web.search_backend için.
+    """Config dosyasÄ±nÄ± oku â€” varsa web.backend/web.search_backend iÃ§in.
 
-    Öncelik sırası:
-      1. reymen_cli.config / ReYMeN_cli.config (CLI yapılandırması)
-      2. Proje kökündeki config.yaml (doğrudan YAML okuma)
+    Ã–ncelik sÄ±rasÄ±:
+      1. reymen_cli.config / ReYMeN_cli.config (CLI yapÄ±landÄ±rmasÄ±)
+      2. Proje kÃ¶kÃ¼ndeki config.yaml (doÄŸrudan YAML okuma)
       3. .ReYMeN/config.yaml (ikincil config)
     """
     # 1. CLI config
@@ -780,7 +780,7 @@ def _load_config_for_registry() -> dict:
             "[SessizExcept] %s: %s", type(_e).__name__, _e
         )
 
-    # 2. Proje kökü config.yaml
+    # 2. Proje kÃ¶kÃ¼ config.yaml
     import yaml
 
     for cfg_yolu in [
@@ -829,24 +829,24 @@ def _get_registry() -> SearchDispatcher:
 
 
 def reset_registry() -> None:
-    """Dispatcher'i sıfırla (test / yeniden yapılandırma için)."""
+    """Dispatcher'i sÄ±fÄ±rla (test / yeniden yapÄ±landÄ±rma iÃ§in)."""
     global _dispatcher
     _dispatcher = None
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Tool Fonksiyonu
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def web_arama(sorgu: str, backend: str = "duckduckgo", max_sonuc: int = 5) -> str:
-    """WEB_ARAMA tool'u — backend parametresi ile çoklu arama motoru.
+    """WEB_ARAMA tool'u â€” backend parametresi ile Ã§oklu arama motoru.
 
     Args:
         sorgu: Arama sorgusu.
         backend: Kullanilacak engine adi (duckduckgo, google, bing,
                  firecrawl, brave, searxng, exa, auto).
-                 "auto" veya boş: config/auto-detect ile en iyi engine seçilir.
+                 "auto" veya boÅŸ: config/auto-detect ile en iyi engine seÃ§ilir.
         max_sonuc: Maksimum sonuc sayisi.
 
     Returns:
@@ -862,9 +862,9 @@ def web_search_engine_listele() -> str:
     return reg.engine_listele()
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Motor Kayit
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def motor_kaydet(motor) -> None:
@@ -907,14 +907,14 @@ def _web_arama_ayristir_ve_calistir(ham: str) -> str:
     if b_match:
         backend = b_match.group(1)
     if not sorgu:
-        # Fallback: tüm string'i sorgu olarak al
+        # Fallback: tÃ¼m string'i sorgu olarak al
         sorgu = ham.strip().strip('"').strip("'")
     return web_arama(sorgu, backend)
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Test
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 if __name__ == "__main__":
     import sys

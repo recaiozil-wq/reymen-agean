@@ -1,15 +1,15 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-gateway_runner.py — Gelişmiş Çoklu Kanal Gateway Runner
-ReYMeN için Terminal, Telegram, WebSocket kanal yönetimi.
+gateway_runner.py â€” GeliÅŸmiÅŸ Ã‡oklu Kanal Gateway Runner
+ReYMeN iÃ§in Terminal, Telegram, WebSocket kanal yÃ¶netimi.
 
-Özellikler:
-- Terminal kanalı (doğrudan kullanıcı girdisi)
-- Telegram kanalı (telegram_bot/bot.py'yi başlatır)
-- WebSocket kanalı (web_ui.py için)
-- Thread-safe mesaj kuyruğu (queue.Queue)
-- Kanal durumu takibi (aktif/pasif/bağlantı hatası)
-- Mesaj yönlendirme (kanaldan kanala)
+Ã–zellikler:
+- Terminal kanalÄ± (doÄŸrudan kullanÄ±cÄ± girdisi)
+- Telegram kanalÄ± (telegram_bot/bot.py'yi baÅŸlatÄ±r)
+- WebSocket kanalÄ± (web_ui.py iÃ§in)
+- Thread-safe mesaj kuyruÄŸu (queue.Queue)
+- Kanal durumu takibi (aktif/pasif/baÄŸlantÄ± hatasÄ±)
+- Mesaj yÃ¶nlendirme (kanaldan kanala)
 - JSON log (logs/gateway.jsonl)
 """
 
@@ -26,7 +26,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Optional
 
-# ── Proje kokunu sys.path'e ekle (src/ altindaki moduller icin) ──
+# â”€â”€ Proje kokunu sys.path'e ekle (src/ altindaki moduller icin) â”€â”€
 _PROJE_KOK = Path(__file__).resolve().parent.parent.parent
 _SRC = _PROJE_KOK / "src"
 if str(_SRC) not in sys.path:
@@ -58,10 +58,10 @@ try:
 except ImportError:
     _MIRROR_AKTIF = False
 
-# ── Logging ──────────────────────────────────────────────────────────
+# â”€â”€ Logging â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 logger = logging.getLogger("gateway_runner")
 
-# ── Sabitler ─────────────────────────────────────────────────────────
+# â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 PROJE_KOK = Path(__file__).parent.resolve()
 LOGS_DIR = PROJE_KOK / "logs"
 GATEWAY_LOG = LOGS_DIR / "gateway.jsonl"
@@ -69,7 +69,7 @@ TELEGRAM_BOT_PATH = PROJE_KOK / "telegram_bot" / "bot.py"
 GATEWAY_PID_DOSYASI = PROJE_KOK / ".ReYMeN" / "gateway.pid"
 
 
-# ── PID Yönetimi ─────────────────────────────────────────────────────
+# â”€â”€ PID YÃ¶netimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _pid_kaydet():
@@ -97,7 +97,7 @@ def _eski_pid_oldur():
         eski_pid = int(GATEWAY_PID_DOSYASI.read_text().strip())
         if eski_pid == os.getpid():
             return  # Kendimiz
-        logger.warning(f"[gateway] Eski PID bulundu: {eski_pid} — sonlandiriliyor")
+        logger.warning(f"[gateway] Eski PID bulundu: {eski_pid} â€” sonlandiriliyor")
         if sys.platform == "win32":
             subprocess.run(
                 ["taskkill", "/F", "/PID", str(eski_pid)],
@@ -118,9 +118,9 @@ def _eski_pid_oldur():
         _pid_sil()
 
 
-# ── Channel Handler Prototypes ──────────────────────────────────────
+# â”€â”€ Channel Handler Prototypes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 class ChannelHandler:
-    """Kanal işleyici temel sınıfı. Her kanal bunu extend eder."""
+    """Kanal iÅŸleyici temel sÄ±nÄ±fÄ±. Her kanal bunu extend eder."""
 
     def __init__(self, name: str):
         self.name = name
@@ -141,25 +141,25 @@ class ChannelHandler:
         return self._error
 
     def start(self) -> None:
-        """Kanala özel başlatma. Alt sınıflar override eder."""
+        """Kanala Ã¶zel baÅŸlatma. Alt sÄ±nÄ±flar override eder."""
         self._running = True
         self._status = "running"
         self._error = None
 
     def stop(self) -> None:
-        """Kanala özel durdurma. Alt sınıflar override eder."""
+        """Kanala Ã¶zel durdurma. Alt sÄ±nÄ±flar override eder."""
         self._running = False
         self._status = "stopped"
         self._error = None
 
     def send(self, message: str) -> None:
-        """Kanala mesaj gönder. Alt sınıflar override eder."""
+        """Kanala mesaj gÃ¶nder. Alt sÄ±nÄ±flar override eder."""
         raise NotImplementedError(
             f"Kanal '{self.name}' send() metodunu override etmeli"
         )
 
     def info(self) -> dict:
-        """Kanal durum bilgisini döndür."""
+        """Kanal durum bilgisini dÃ¶ndÃ¼r."""
         return {
             "name": self.name,
             "running": self._running,
@@ -169,7 +169,7 @@ class ChannelHandler:
 
 
 class TerminalChannel(ChannelHandler):
-    """Terminal kanalı — doğrudan stdin'den okur, stdout'a yazar."""
+    """Terminal kanalÄ± â€” doÄŸrudan stdin'den okur, stdout'a yazar."""
 
     def __init__(self):
         super().__init__("terminal")
@@ -182,14 +182,14 @@ class TerminalChannel(ChannelHandler):
             target=self._stdin_reader, daemon=True, name="terminal-reader"
         )
         self._reader_thread.start()
-        logger.info("[terminal] Kanal başlatıldı (stdin okuyucu)")
+        logger.info("[terminal] Kanal baÅŸlatÄ±ldÄ± (stdin okuyucu)")
 
     def stop(self) -> None:
         super().stop()
         logger.info("[terminal] Kanal durduruldu")
 
     def send(self, message: str) -> None:
-        """Terminal kanalına mesaj bas (stdout)."""
+        """Terminal kanalÄ±na mesaj bas (stdout)."""
         if not self._running:
             return
         timestamp = datetime.now().strftime("%H:%M:%S")
@@ -210,7 +210,7 @@ class TerminalChannel(ChannelHandler):
                 except (EOFError, OSError):
                     time.sleep(0.5)
         except Exception as e:
-            logger.error(f"[terminal] stdin okuyucu hatası: {e}")
+            logger.error(f"[terminal] stdin okuyucu hatasÄ±: {e}")
             self._status = "error"
             self._error = str(e)
 
@@ -223,7 +223,7 @@ class TerminalChannel(ChannelHandler):
 
 
 class TelegramChannel(ChannelHandler):
-    """Telegram kanalı — telegram_bot/bot.py'yi alt süreç olarak başlatır."""
+    """Telegram kanalÄ± â€” telegram_bot/bot.py'yi alt sÃ¼reÃ§ olarak baÅŸlatÄ±r."""
 
     def __init__(self):
         super().__init__("telegram")
@@ -231,10 +231,10 @@ class TelegramChannel(ChannelHandler):
         self._monitor_thread: Optional[threading.Thread] = None
 
     def start(self) -> None:
-        """Telegram bot'u subprocess olarak başlat."""
+        """Telegram bot'u subprocess olarak baÅŸlat."""
         if not TELEGRAM_BOT_PATH.exists():
             self._status = "error"
-            self._error = f"Telegram bot bulunamadı: {TELEGRAM_BOT_PATH}"
+            self._error = f"Telegram bot bulunamadÄ±: {TELEGRAM_BOT_PATH}"
             logger.error(f"[telegram] {self._error}")
             return
 
@@ -250,7 +250,7 @@ class TelegramChannel(ChannelHandler):
 
         if not token:
             self._status = "error"
-            self._error = "TELEGRAM_BOT_TOKEN bulunamadı"
+            self._error = "TELEGRAM_BOT_TOKEN bulunamadÄ±"
             logger.error(f"[telegram] {self._error}")
             return
 
@@ -270,14 +270,14 @@ class TelegramChannel(ChannelHandler):
                 name="telegram-monitor",
             )
             self._monitor_thread.start()
-            logger.info("[telegram] Bot süreci başlatıldı (PID: %d)", self._process.pid)
+            logger.info("[telegram] Bot sÃ¼reci baÅŸlatÄ±ldÄ± (PID: %d)", self._process.pid)
         except Exception as e:
             self._status = "error"
             self._error = str(e)
-            logger.error(f"[telegram] Başlatma hatası: {e}")
+            logger.error(f"[telegram] BaÅŸlatma hatasÄ±: {e}")
 
     def stop(self) -> None:
-        """Telegram bot sürecini durdur."""
+        """Telegram bot sÃ¼recini durdur."""
         if self._process and self._process.poll() is None:
             self._process.terminate()
             try:
@@ -285,26 +285,26 @@ class TelegramChannel(ChannelHandler):
             except subprocess.TimeoutExpired:
                 self._process.kill()
                 self._process.wait(timeout=2)
-            logger.info("[telegram] Bot süreci sonlandırıldı")
+            logger.info("[telegram] Bot sÃ¼reci sonlandÄ±rÄ±ldÄ±")
         super().stop()
 
     def send(self, message: str) -> None:
-        """Telegram kanalına mesaj gönderme (şimdilik log'a yaz)."""
+        """Telegram kanalÄ±na mesaj gÃ¶nderme (ÅŸimdilik log'a yaz)."""
         if not self._running:
             return
-        # Telegram bot'una mesaj göndermek için python-telegram-bot API'si kullanılabilir
-        # Şimdilik log ile yetiniyoruz, bot.py kendi mesajlarını yönetir
+        # Telegram bot'una mesaj gÃ¶ndermek iÃ§in python-telegram-bot API'si kullanÄ±labilir
+        # Åimdilik log ile yetiniyoruz, bot.py kendi mesajlarÄ±nÄ± yÃ¶netir
         logger.info(
-            f"[telegram] Gönderilecek mesaj (bot.py yönetir): {message[:60]}..."
+            f"[telegram] GÃ¶nderilecek mesaj (bot.py yÃ¶netir): {message[:60]}..."
         )
 
     def _monitor_process(self) -> None:
-        """Bot sürecini izle, çökerse durumu güncelle."""
+        """Bot sÃ¼recini izle, Ã§Ã¶kerse durumu gÃ¼ncelle."""
         try:
             stdout, stderr = self._process.communicate()
             if self._running:
                 logger.warning(
-                    "[telegram] Bot süreci beklenmedik şekilde sonlandı.\n"
+                    "[telegram] Bot sÃ¼reci beklenmedik ÅŸekilde sonlandÄ±.\n"
                     f"  stdout: {stdout[-200:] if stdout else ''}\n"
                     f"  stderr: {stderr[-200:] if stderr else ''}"
                 )
@@ -313,7 +313,7 @@ class TelegramChannel(ChannelHandler):
                     f"Process exited: {stderr[-200:] if stderr else 'unknown'}"
                 )
         except Exception as e:
-            logger.error(f"[telegram] Monitör hatası: {e}")
+            logger.error(f"[telegram] MonitÃ¶r hatasÄ±: {e}")
 
 
 class DashboardChannel(ChannelHandler):
@@ -344,7 +344,7 @@ class DashboardChannel(ChannelHandler):
             self._status = "error"
             self._error = str(e)
             logger.warning(
-                f"[dashboard] Kanal baslatılamadi (dashboard calismiyor): {e}"
+                f"[dashboard] Kanal baslatÄ±lamadi (dashboard calismiyor): {e}"
             )
 
     def send(self, message: str) -> None:
@@ -357,7 +357,7 @@ class DashboardChannel(ChannelHandler):
 
 
 class DiscordChannel(ChannelHandler):
-    """Discord kanali — discord_bot.py'yi alt surec olarak baslatir."""
+    """Discord kanali â€” discord_bot.py'yi alt surec olarak baslatir."""
 
     def __init__(self):
         super().__init__("discord")
@@ -448,7 +448,7 @@ class DiscordChannel(ChannelHandler):
 
 
 class WebSocketChannel(ChannelHandler):
-    """WebSocket kanalı — web_ui.py için FastAPI WebSocket endpoint'ine bağlanır."""
+    """WebSocket kanalÄ± â€” web_ui.py iÃ§in FastAPI WebSocket endpoint'ine baÄŸlanÄ±r."""
 
     def __init__(self):
         super().__init__("websocket")
@@ -457,45 +457,45 @@ class WebSocketChannel(ChannelHandler):
         self._ws_thread: Optional[threading.Thread] = None
 
     def start(self) -> None:
-        """WebSocket sunucusunu başlat (web_ui.py zaten çalışıyorken)."""
+        """WebSocket sunucusunu baÅŸlat (web_ui.py zaten Ã§alÄ±ÅŸÄ±yorken)."""
         super().start()
         self._ws_thread = threading.Thread(
             target=self._websocket_poller, daemon=True, name="ws-poller"
         )
         self._ws_thread.start()
-        logger.info("[websocket] Kanal başlatıldı")
+        logger.info("[websocket] Kanal baÅŸlatÄ±ldÄ±")
 
     def stop(self) -> None:
         super().stop()
         logger.info("[websocket] Kanal durduruldu")
 
     def send(self, message: str) -> None:
-        """Bağlı tüm WebSocket istemcilerine mesaj gönder."""
+        """BaÄŸlÄ± tÃ¼m WebSocket istemcilerine mesaj gÃ¶nder."""
         if not self._running:
             return
         with self._lock:
             for client in list(self._clients):
                 try:
-                    # WebSocket client'ına mesaj gönderme
-                    # (web_ui.py içindeki global ws_clients listesine ekleme)
-                    logger.debug(f"[websocket] İstemciye mesaj: {message[:40]}...")
+                    # WebSocket client'Ä±na mesaj gÃ¶nderme
+                    # (web_ui.py iÃ§indeki global ws_clients listesine ekleme)
+                    logger.debug(f"[websocket] Ä°stemciye mesaj: {message[:40]}...")
                 except Exception as e:
-                    logger.error(f"[websocket] İstemci gönderme hatası: {e}")
+                    logger.error(f"[websocket] Ä°stemci gÃ¶nderme hatasÄ±: {e}")
                     self._clients.remove(client)
 
     def register_client(self, client: Any) -> None:
         """Yeni bir WebSocket istemcisi kaydet."""
         with self._lock:
             self._clients.append(client)
-            logger.debug(f"[websocket] İstemci eklendi (toplam: {len(self._clients)})")
+            logger.debug(f"[websocket] Ä°stemci eklendi (toplam: {len(self._clients)})")
 
     def unregister_client(self, client: Any) -> None:
-        """WebSocket istemcisini kaldır."""
+        """WebSocket istemcisini kaldÄ±r."""
         with self._lock:
             if client in self._clients:
                 self._clients.remove(client)
                 logger.debug(
-                    f"[websocket] İstemci çıkarıldı (toplam: {len(self._clients)})"
+                    f"[websocket] Ä°stemci Ã§Ä±karÄ±ldÄ± (toplam: {len(self._clients)})"
                 )
 
     @property
@@ -504,28 +504,28 @@ class WebSocketChannel(ChannelHandler):
             return len(self._clients)
 
     def _websocket_poller(self) -> None:
-        """WebSocket bağlantılarını yokla (arka plan)."""
+        """WebSocket baÄŸlantÄ±larÄ±nÄ± yokla (arka plan)."""
         while self._running:
             time.sleep(5)
 
 
-# ── GatewayRunner ────────────────────────────────────────────────────
+# â”€â”€ GatewayRunner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class GatewayRunner:
     """
-    Çoklu kanal iletişim merkezi.
+    Ã‡oklu kanal iletiÅŸim merkezi.
 
-    Kullanım:
+    KullanÄ±m:
         gr = GatewayRunner()
         gr.register_channel("terminal", TerminalChannel())
         gr.register_channel("telegram", TelegramChannel())
         gr.start()
 
-        # Tüm kanallara mesaj gönder
-        gr.broadcast("Sistem başlatıldı.")
+        # TÃ¼m kanallara mesaj gÃ¶nder
+        gr.broadcast("Sistem baÅŸlatÄ±ldÄ±.")
 
-        # Belirli kanala mesaj gönder
+        # Belirli kanala mesaj gÃ¶nder
         gr.send("Sadece terminale", channel="terminal")
 
         # Durum sorgula
@@ -540,23 +540,23 @@ class GatewayRunner:
         self._main_thread: Optional[threading.Thread] = None
         self._queue_processor: Optional[threading.Thread] = None
 
-        # logs/ klasörünü oluştur
+        # logs/ klasÃ¶rÃ¼nÃ¼ oluÅŸtur
         LOGS_DIR.mkdir(parents=True, exist_ok=True)
 
-    # ── Kanal Yönetimi ──────────────────────────────────────────────
+    # â”€â”€ Kanal YÃ¶netimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def register_channel(self, name: str, handler: ChannelHandler) -> None:
         """
         Yeni bir kanal kaydet.
 
         Args:
-            name: Kanal adı (ör: "terminal", "telegram", "websocket")
-            handler: ChannelHandler alt sınıfı örneği
+            name: Kanal adÄ± (Ã¶r: "terminal", "telegram", "websocket")
+            handler: ChannelHandler alt sÄ±nÄ±fÄ± Ã¶rneÄŸi
         """
         with self._lock:
             if name in self._channels:
                 logger.warning(
-                    f"[gateway] '{name}' kanalı zaten kayıtlı, değiştiriliyor"
+                    f"[gateway] '{name}' kanalÄ± zaten kayÄ±tlÄ±, deÄŸiÅŸtiriliyor"
                 )
             self._channels[name] = handler
             logger.info(
@@ -564,26 +564,26 @@ class GatewayRunner:
             )
 
     def unregister_channel(self, name: str) -> Optional[ChannelHandler]:
-        """Bir kanalı kaldır ve durdur."""
+        """Bir kanalÄ± kaldÄ±r ve durdur."""
         with self._lock:
             handler = self._channels.pop(name, None)
         if handler:
             handler.stop()
-            logger.info(f"[gateway] Kanal kaldırıldı: '{name}'")
+            logger.info(f"[gateway] Kanal kaldÄ±rÄ±ldÄ±: '{name}'")
         return handler
 
     def get_channel(self, name: str) -> Optional[ChannelHandler]:
-        """İsme göre kanal handler'ını döndür."""
+        """Ä°sme gÃ¶re kanal handler'Ä±nÄ± dÃ¶ndÃ¼r."""
         with self._lock:
             return self._channels.get(name)
 
-    # ── Yaşam Döngüsü ───────────────────────────────────────────────
+    # â”€â”€ YaÅŸam DÃ¶ngÃ¼sÃ¼ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def start(self) -> None:
-        """Tüm kayıtlı kanalları başlat ve mesaj kuyruğunu işlemeye başla."""
+        """TÃ¼m kayÄ±tlÄ± kanallarÄ± baÅŸlat ve mesaj kuyruÄŸunu iÅŸlemeye baÅŸla."""
         with self._lock:
             if self._running:
-                logger.warning("[gateway] Zaten çalışıyor")
+                logger.warning("[gateway] Zaten Ã§alÄ±ÅŸÄ±yor")
                 return
             self._running = True
 
@@ -598,7 +598,7 @@ class GatewayRunner:
 
         # SIGTERM/SIGINT yakalayici
         def _sinyal_isle(sig, frame):
-            logger.info(f"[gateway] Sinyal alindi ({sig}) — duruluyor")
+            logger.info(f"[gateway] Sinyal alindi ({sig}) â€” duruluyor")
             _pid_sil()
             self.stop()
             sys.exit(0)
@@ -609,19 +609,19 @@ class GatewayRunner:
         except Exception as _gateway__e486:
             print(f"[UYARI] gateway_runner.py:487 - {_gateway__e486}")
 
-        # Tüm kanalları başlat
+        # TÃ¼m kanallarÄ± baÅŸlat
         with self._lock:
             channel_list = list(self._channels.items())
         for name, handler in channel_list:
             try:
                 handler.start()
-                self._log_entry("system", f"Kanal başlatıldı: {name}")
+                self._log_entry("system", f"Kanal baÅŸlatÄ±ldÄ±: {name}")
             except Exception as e:
-                logger.error(f"[gateway] '{name}' kanalı başlatılamadı: {e}")
+                logger.error(f"[gateway] '{name}' kanalÄ± baÅŸlatÄ±lamadÄ±: {e}")
                 handler._status = "error"
                 handler._error = str(e)
 
-        # Kuyruk işleyici thread'ini başlat
+        # Kuyruk iÅŸleyici thread'ini baÅŸlat
         self._queue_processor = threading.Thread(
             target=self._process_message_queue,
             daemon=True,
@@ -653,24 +653,24 @@ class GatewayRunner:
                         stderr=subprocess.PIPE,
                     )
                     logger.info(
-                        f"[gateway] MCP sunucu başlatıldı (pid={self._mcp_proc.pid})"
+                        f"[gateway] MCP sunucu baÅŸlatÄ±ldÄ± (pid={self._mcp_proc.pid})"
                     )
                     self._log_entry("system", f"mcp_serve pid={self._mcp_proc.pid}")
                 except Exception as e:
-                    logger.warning(f"[gateway] MCP sunucu başlatılamadı: {e}")
+                    logger.warning(f"[gateway] MCP sunucu baÅŸlatÄ±lamadÄ±: {e}")
 
         logger.info(
-            f"[gateway] GatewayRunner başlatıldı — " f"{len(channel_list)} kanal aktif"
+            f"[gateway] GatewayRunner baÅŸlatÄ±ldÄ± â€” " f"{len(channel_list)} kanal aktif"
         )
-        self._log_entry("system", "GatewayRunner başlatıldı")
+        self._log_entry("system", "GatewayRunner baÅŸlatÄ±ldÄ±")
 
     def stop(self) -> None:
-        """Tüm kanalları durdur ve kuyruk işlemeyi sonlandır."""
+        """TÃ¼m kanallarÄ± durdur ve kuyruk iÅŸlemeyi sonlandÄ±r."""
         with self._lock:
             self._running = False
         _pid_sil()
 
-        # Tüm kanalları durdur
+        # TÃ¼m kanallarÄ± durdur
         with self._lock:
             channel_list = list(self._channels.items())
         for name, handler in channel_list:
@@ -678,24 +678,24 @@ class GatewayRunner:
                 handler.stop()
                 self._log_entry("system", f"Kanal durduruldu: {name}")
             except Exception as e:
-                logger.error(f"[gateway] '{name}' kanalı durdurulamadı: {e}")
+                logger.error(f"[gateway] '{name}' kanalÄ± durdurulamadÄ±: {e}")
 
-        # Kuyruk işleyicinin bitmesini bekle
+        # Kuyruk iÅŸleyicinin bitmesini bekle
         if self._queue_processor and self._queue_processor.is_alive():
             self._queue_processor.join(timeout=3)
 
         logger.info("[gateway] GatewayRunner durduruldu")
         self._log_entry("system", "GatewayRunner durduruldu")
 
-    # ── Mesaj Gönderme ──────────────────────────────────────────────
+    # â”€â”€ Mesaj GÃ¶nderme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def send(self, message: str, channel: Optional[str] = None) -> None:
         """
-        Belirtilen kanala veya tüm kanallara mesaj gönder.
+        Belirtilen kanala veya tÃ¼m kanallara mesaj gÃ¶nder.
 
         Args:
-            message: Gönderilecek mesaj
-            channel: Kanal adı (None = tüm kanallar)
+            message: GÃ¶nderilecek mesaj
+            channel: Kanal adÄ± (None = tÃ¼m kanallar)
         """
         entry = {
             "type": "outgoing",
@@ -712,10 +712,10 @@ class GatewayRunner:
                     try:
                         handler.send(message)
                     except Exception as e:
-                        logger.error(f"[gateway] '{channel}' gönderme hatası: {e}")
+                        logger.error(f"[gateway] '{channel}' gÃ¶nderme hatasÄ±: {e}")
                 else:
                     logger.warning(
-                        f"[gateway] '{channel}' kanalı çalışmıyor veya bulunamadı"
+                        f"[gateway] '{channel}' kanalÄ± Ã§alÄ±ÅŸmÄ±yor veya bulunamadÄ±"
                     )
             else:
                 for cname, handler in self._channels.items():
@@ -723,19 +723,19 @@ class GatewayRunner:
                         try:
                             handler.send(message)
                         except Exception as e:
-                            logger.error(f"[gateway] '{cname}' gönderme hatası: {e}")
+                            logger.error(f"[gateway] '{cname}' gÃ¶nderme hatasÄ±: {e}")
 
     def broadcast(self, message: str) -> None:
-        """Tüm kanallara mesaj gönder (send ile aynı, channel=None)."""
+        """TÃ¼m kanallara mesaj gÃ¶nder (send ile aynÄ±, channel=None)."""
         self.send(message, channel=None)
 
     def enqueue_message(self, message: str, source: str = "external") -> None:
         """
-        Mesajı işlenmek üzere kuyruğa ekle.
+        MesajÄ± iÅŸlenmek Ã¼zere kuyruÄŸa ekle.
 
         Args:
-            message: Mesaj içeriği
-            source: Mesaj kaynağı (örn: "terminal", "telegram", "websocket")
+            message: Mesaj iÃ§eriÄŸi
+            source: Mesaj kaynaÄŸÄ± (Ã¶rn: "terminal", "telegram", "websocket")
         """
         entry = {
             "type": "incoming",
@@ -745,12 +745,12 @@ class GatewayRunner:
         }
         self._message_queue.put(entry)
         self._log_entry_raw(entry)
-        logger.debug(f"[gateway] Kuyruğa eklendi ({source}): {message[:40]}...")
+        logger.debug(f"[gateway] KuyruÄŸa eklendi ({source}): {message[:40]}...")
 
-    # ── Kuyruk İşleme ───────────────────────────────────────────────
+    # â”€â”€ Kuyruk Ä°ÅŸleme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _process_message_queue(self) -> None:
-        """Kuyruktaki mesajları sürekli işleyen arka plan thread'i."""
+        """Kuyruktaki mesajlarÄ± sÃ¼rekli iÅŸleyen arka plan thread'i."""
         while self._running:
             try:
                 entry = self._message_queue.get(timeout=1.0)
@@ -760,12 +760,12 @@ class GatewayRunner:
             try:
                 self._handle_message(entry)
             except Exception as e:
-                logger.error(f"[gateway] Mesaj işleme hatası: {e}")
+                logger.error(f"[gateway] Mesaj iÅŸleme hatasÄ±: {e}")
 
             self._message_queue.task_done()
 
     def _cron_tick_loop(self) -> None:
-        """Her 60 saniyede CronSchedulerCore.execute_tick_cycle() çalıştır."""
+        """Her 60 saniyede CronSchedulerCore.execute_tick_cycle() Ã§alÄ±ÅŸtÄ±r."""
         try:
             from reymen.sistem.cron_scheduler import CronScheduler
 
@@ -787,20 +787,20 @@ class GatewayRunner:
                     ram = _psutil.virtual_memory().percent
                     if cpu > 85 or ram > 90:
                         logger.warning(
-                            f"[kaynak] Yüksek kullanım — CPU:{cpu:.1f}% RAM:{ram:.1f}%"
+                            f"[kaynak] YÃ¼ksek kullanÄ±m â€” CPU:{cpu:.1f}% RAM:{ram:.1f}%"
                         )
                         self._log_entry(
-                            "system", f"yüksek kaynak: cpu={cpu:.1f} ram={ram:.1f}"
+                            "system", f"yÃ¼ksek kaynak: cpu={cpu:.1f} ram={ram:.1f}"
                         )
                 except Exception as _gateway__e663:
                     print(f"[UYARI] gateway_runner.py:664 - {_gateway__e663}")
             try:
                 n = cron.execute_tick_cycle()
                 if n > 0:
-                    logger.info(f"[cron] {n} iş çalıştırıldı")
+                    logger.info(f"[cron] {n} iÅŸ Ã§alÄ±ÅŸtÄ±rÄ±ldÄ±")
                     self._log_entry("cron", f"{n} cron isi calistirildi")
             except Exception as e:
-                logger.warning(f"[cron] Tick hatası: {e}")
+                logger.warning(f"[cron] Tick hatasÄ±: {e}")
 
     def _watchdog(self) -> None:
         """Kuyruk isleyici thread cokerse yeniden baslatir."""
@@ -823,25 +823,25 @@ class GatewayRunner:
                 )
 
     def _handle_message(self, entry: dict) -> None:
-        """Kuyruktan gelen bir mesajı işle (tüm kanallara yönlendir)."""
+        """Kuyruktan gelen bir mesajÄ± iÅŸle (tÃ¼m kanallara yÃ¶nlendir)."""
         message = entry.get("message", "")
         source = entry.get("source", "unknown")
 
-        # Kaynak kanal hariç tüm kanallara yönlendir
+        # Kaynak kanal hariÃ§ tÃ¼m kanallara yÃ¶nlendir
         with self._lock:
             for cname, handler in self._channels.items():
                 if cname != source and handler.running:
                     try:
-                        handler.send(f"[{source} → {cname}] {message}")
+                        handler.send(f"[{source} â†’ {cname}] {message}")
                     except Exception as e:
                         logger.error(
-                            f"[gateway] Yönlendirme hatası {source}→{cname}: {e}"
+                            f"[gateway] YÃ¶nlendirme hatasÄ± {source}â†’{cname}: {e}"
                         )
 
-    # ── Durum Sorgulama ─────────────────────────────────────────────
+    # â”€â”€ Durum Sorgulama â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def status(self) -> dict:
-        """Tüm kanalların durumunu döndür."""
+        """TÃ¼m kanallarÄ±n durumunu dÃ¶ndÃ¼r."""
         with self._lock:
             channels = {
                 name: handler.info() for name, handler in self._channels.items()
@@ -854,29 +854,29 @@ class GatewayRunner:
         }
 
     def status_text(self) -> str:
-        """İnsan tarafından okunabilir durum metni."""
+        """Ä°nsan tarafÄ±ndan okunabilir durum metni."""
         s = self.status()
         lines = [
-            "📡 GatewayRunner Durumu",
-            f"   Çalışıyor: {'✅' if s['running'] else '❌'}",
+            "ğŸ“¡ GatewayRunner Durumu",
+            f"   Ã‡alÄ±ÅŸÄ±yor: {'âœ…' if s['running'] else 'âŒ'}",
         ]
         lines.append(f"   Kuyruk: {s['queue_size']} mesaj")
         lines.append("")
         for cname, info in s["channels"].items():
             status_icon = {
-                "running": "🟢",
-                "stopped": "⚫",
-                "error": "🔴",
-            }.get(info["status"], "⚪")
+                "running": "ğŸŸ¢",
+                "stopped": "âš«",
+                "error": "ğŸ”´",
+            }.get(info["status"], "âšª")
             lines.append(f"   {status_icon} {cname}: {info['status']}")
             if info.get("error"):
-                lines.append(f"      └ Hata: {info['error']}")
+                lines.append(f"      â”” Hata: {info['error']}")
         return "\n".join(lines)
 
-    # ── JSON Log ─────────────────────────────────────────────────────
+    # â”€â”€ JSON Log â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _log_entry(self, event_type: str, message: str) -> None:
-        """Sistemsel bir olayı JSON log'a yaz."""
+        """Sistemsel bir olayÄ± JSON log'a yaz."""
         self._log_entry_raw(
             {
                 "type": event_type,
@@ -886,15 +886,15 @@ class GatewayRunner:
         )
 
     def _log_entry_raw(self, entry: dict) -> None:
-        """Ham bir entry'yi JSON log dosyasına ekle."""
+        """Ham bir entry'yi JSON log dosyasÄ±na ekle."""
         try:
             with open(GATEWAY_LOG, "a", encoding="utf-8") as f:
                 f.write(json.dumps(entry, ensure_ascii=False) + "\n")
         except Exception as e:
-            logger.error(f"[gateway] Log yazma hatası: {e}")
+            logger.error(f"[gateway] Log yazma hatasÄ±: {e}")
 
     def get_logs(self, limit: int = 50) -> list[dict]:
-        """JSON log'dan son N kaydı oku."""
+        """JSON log'dan son N kaydÄ± oku."""
         if not GATEWAY_LOG.exists():
             return []
         try:
@@ -910,26 +910,26 @@ class GatewayRunner:
                         continue
             return entries
         except Exception as e:
-            logger.error(f"[gateway] Log okuma hatası: {e}")
+            logger.error(f"[gateway] Log okuma hatasÄ±: {e}")
             return []
 
-    # ── Yönetici Metodları ───────────────────────────────────────────
+    # â”€â”€ YÃ¶netici MetodlarÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def wait_for_input(self, timeout: float = 0.1) -> Optional[str]:
-        """Terminal kanalından girdi bekle (non-blocking)."""
+        """Terminal kanalÄ±ndan girdi bekle (non-blocking)."""
         terminal = self.get_channel("terminal")
         if isinstance(terminal, TerminalChannel):
             return terminal.get_input(timeout=timeout)
         return None
 
 
-# ── Varsayılan Kanal Kurulumu ────────────────────────────────────────
+# â”€â”€ VarsayÄ±lan Kanal Kurulumu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def create_default_gateway() -> GatewayRunner:
     """
-    Varsayılan kanallarla (terminal, telegram, websocket)
-    hazır bir GatewayRunner oluştur.
+    VarsayÄ±lan kanallarla (terminal, telegram, websocket)
+    hazÄ±r bir GatewayRunner oluÅŸtur.
     """
     gr = GatewayRunner()
     gr.register_channel("terminal", TerminalChannel())
@@ -940,16 +940,16 @@ def create_default_gateway() -> GatewayRunner:
     return gr
 
 
-# ── CLI Entry Point ──────────────────────────────────────────────────
+# â”€â”€ CLI Entry Point â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def interactive_mode(gr: GatewayRunner) -> None:
     """
-    Etkileşimli terminal modu.
-    Kullanıcı girdilerini alır, kuyruğa ekler, gateway durumunu gösterir.
+    EtkileÅŸimli terminal modu.
+    KullanÄ±cÄ± girdilerini alÄ±r, kuyruÄŸa ekler, gateway durumunu gÃ¶sterir.
     """
     print("\n" + "=" * 56)
-    print("  ReYMeN Gateway Runner — Etkileşimli Mod")
+    print("  ReYMeN Gateway Runner â€” EtkileÅŸimli Mod")
     print("  Komutlar: /status, /channels, /logs, /broadcast <msg>")
     print("            /send <kanal> <msg>, /stop, /help")
     print("=" * 56 + "\n")
@@ -968,16 +968,16 @@ def interactive_mode(gr: GatewayRunner) -> None:
                     print("\n" + gr.status_text() + "\n")
 
                 elif cmd == "/channels":
-                    print("\n📋 Kayıtlı Kanallar:")
+                    print("\nğŸ“‹ KayÄ±tlÄ± Kanallar:")
                     for cname, handler in gr._channels.items():
                         h = handler.info()
-                        print(f"   • {cname}: {h['status']} ({type(handler).__name__})")
+                        print(f"   â€¢ {cname}: {h['status']} ({type(handler).__name__})")
                     print()
 
                 elif cmd == "/logs":
                     limit = int(parts[1]) if len(parts) > 1 else 10
                     logs = gr.get_logs(limit=limit)
-                    print(f"\n📜 Son {len(logs)} log kaydı:")
+                    print(f"\nğŸ“œ Son {len(logs)} log kaydÄ±:")
                     for log_entry in logs:
                         ts = log_entry.get("timestamp", "?")[:19]
                         msg = log_entry.get("message", "")[:60]
@@ -987,55 +987,55 @@ def interactive_mode(gr: GatewayRunner) -> None:
 
                 elif cmd == "/broadcast" and len(parts) > 1:
                     msg = parts[1]
-                    print(f"📢 Tüm kanallara gönderiliyor: {msg}")
+                    print(f"ğŸ“¢ TÃ¼m kanallara gÃ¶nderiliyor: {msg}")
                     gr.broadcast(msg)
 
                 elif cmd == "/send" and len(parts) > 2:
                     target = parts[1]
                     msg = parts[2]
-                    print(f"📤 '{target}' kanalına gönderiliyor: {msg}")
+                    print(f"ğŸ“¤ '{target}' kanalÄ±na gÃ¶nderiliyor: {msg}")
                     gr.send(msg, channel=target)
 
                 elif cmd == "/stop":
-                    print("🛑 Durduruluyor...")
+                    print("ğŸ›‘ Durduruluyor...")
                     gr.stop()
                     break
 
                 elif cmd == "/help" or cmd == "/?":
                     print("""
   Mevcut Komutlar:
-    /status              — Kanal durumlarını göster
-    /channels            — Kayıtlı kanalları listele
-    /logs [N]            — Son N log kaydını göster (varsayılan: 10)
-    /broadcast <msg>     — Tüm kanallara mesaj gönder
-    /send <kanal> <msg>  — Belirtilen kanala mesaj gönder
-    /stop                — Gateway'i durdur
-    /help                — Bu yardım mesajını göster
+    /status              â€” Kanal durumlarÄ±nÄ± gÃ¶ster
+    /channels            â€” KayÄ±tlÄ± kanallarÄ± listele
+    /logs [N]            â€” Son N log kaydÄ±nÄ± gÃ¶ster (varsayÄ±lan: 10)
+    /broadcast <msg>     â€” TÃ¼m kanallara mesaj gÃ¶nder
+    /send <kanal> <msg>  â€” Belirtilen kanala mesaj gÃ¶nder
+    /stop                â€” Gateway'i durdur
+    /help                â€” Bu yardÄ±m mesajÄ±nÄ± gÃ¶ster
 
-  Normal yazılan her şey mesaj kuyruğuna eklenir.
+  Normal yazÄ±lan her ÅŸey mesaj kuyruÄŸuna eklenir.
 """)
 
             else:
-                # Normal mesaj — kuyruğa ekle
+                # Normal mesaj â€” kuyruÄŸa ekle
                 gr.enqueue_message(line, source="terminal")
 
     except KeyboardInterrupt:
-        print("\n\n⚠️  Kesme sinyali alındı, durduruluyor...")
+        print("\n\nâš ï¸  Kesme sinyali alÄ±ndÄ±, durduruluyor...")
         gr.stop()
 
 
 def main():
-    """Ana giriş noktası — gateway'i başlat ve etkileşimli moda geç."""
+    """Ana giriÅŸ noktasÄ± â€” gateway'i baÅŸlat ve etkileÅŸimli moda geÃ§."""
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
     )
 
     print("""
-    ╔══════════════════════════════════════════╗
-    ║     ReYMeN Gateway Runner  v2.0         ║
-    ║     Çoklu Kanal İletişim Merkezi          ║
-    ╚══════════════════════════════════════════╝
+    â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+    â•‘     ReYMeN Gateway Runner  v2.0         â•‘
+    â•‘     Ã‡oklu Kanal Ä°letiÅŸim Merkezi          â•‘
+    â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     """)
 
     gr = create_default_gateway()
@@ -1044,10 +1044,10 @@ def main():
     try:
         interactive_mode(gr)
     except KeyboardInterrupt:
-        print("\n🛑 Kapatılıyor...")
+        print("\nğŸ›‘ KapatÄ±lÄ±yor...")
         gr.stop()
 
-    print("✅ Gateway durduruldu. Hoşça kal!")
+    print("âœ… Gateway durduruldu. HoÅŸÃ§a kal!")
 
 
 if __name__ == "__main__":

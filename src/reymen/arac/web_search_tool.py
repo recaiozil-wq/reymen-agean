@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-
-"""web_search_tool.py — WEB_ARA tool implementasyonu.
+﻿# -*- coding: utf-8 -*-
+"""web_search_tool.py â€” WEB_ARA tool implementasyonu.
 
-Bu dosya, web_search_engine.py'deki SearchDispatcher'a yönlendirme yapar.
-Geriye uyumluluk için korunuyor (motor.py tarafından _plugin_moduller_yukle()
-ile yüklenir). Tüm arama mantığı web_search_engine.py'dedir.
+Bu dosya, web_search_engine.py'deki SearchDispatcher'a yÃ¶nlendirme yapar.
+Geriye uyumluluk iÃ§in korunuyor (motor.py tarafÄ±ndan _plugin_moduller_yukle()
+ile yÃ¼klenir). TÃ¼m arama mantÄ±ÄŸÄ± web_search_engine.py'dedir.
 
 Kullanim:
     from reymen.arac.web_search_tool import web_ara, web_arama_kaydet
@@ -11,7 +11,7 @@ Kullanim:
 """
 
 import logging
-from src.reymen.arac.web_search_engine import web_arama as _web_arama, _get_registry
+from reymen.arac.web_search_engine import web_arama as _web_arama, _get_registry
 
 log = logging.getLogger(__name__)
 

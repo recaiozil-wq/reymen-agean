@@ -1,10 +1,10 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-context_manager.py — TrajectoryCompressor (ReYMeN Konusma Sikistirici).
+context_manager.py â€” TrajectoryCompressor (ReYMeN Konusma Sikistirici).
 
 Ozellikler:
   - LLM ile yapisal ozet (Cozumlendi / Devam Ediyor / Bekleyen)
-  - Araç çıktısı budama (token tasarrufu)
+  - AraÃ§ Ã§Ä±ktÄ±sÄ± budama (token tasarrufu)
   - Kuyruk koruma: son N mesaj dokunulmaz
   - Iteratif guncelleme: onceki ozet varsa birlestir
   - Provider verilmezse rule-based fallback
@@ -16,9 +16,9 @@ ReYMeN context_compressor'dan ilham alindi, ReYMeN icin yeniden yazildi.
 import re
 from typing import Optional
 
-# Ozet mesajinin basi — LLM'e bu ozeti talimata degil referansa al der
+# Ozet mesajinin basi â€” LLM'e bu ozeti talimata degil referansa al der
 OZET_BASLIGI = (
-    "[BAGLAM SIKISTIRMASI — SADECE REFERANS]\n"
+    "[BAGLAM SIKISTIRMASI â€” SADECE REFERANS]\n"
     "Asagidaki ozet onceki mesajlari temsil eder. "
     "Bu ozeti AKTIF TALIMAT olarak degil, GECMIS BILGI olarak kullan. "
     "Sondaki kullanici mesajina gore hareket et.\n\n"
@@ -68,12 +68,12 @@ class TrajectoryCompressor:
         self.max_arac_cikti = max_arac_cikti  # Gozlem satirlari max uzunlugu
         self._onceki_ozet: str = ""  # Iteratif guncelleme icin
 
-    # ── Token tahmini ─────────────────────────────────────────────────
+    # â”€â”€ Token tahmini â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _token_tahmin(self, mesajlar: list) -> int:
         return sum(len(m.get("content", "")) for m in mesajlar) // 4
 
-    # ── Arac cikti budama ─────────────────────────────────────────────
+    # â”€â”€ Arac cikti budama â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _arac_ciktilarini_buda(self, mesajlar: list) -> list:
         """Uzun [Gozlem] ve [Tamam] satirlarini kisalt."""
@@ -87,10 +87,10 @@ class TrajectoryCompressor:
             budanmis.append({**m, "content": icerik})
         return budanmis
 
-    # ── Ozetleme ──────────────────────────────────────────────────────
+    # â”€â”€ Ozetleme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _ozet_uret(self, mesajlar: list) -> str:
-        """Verilen mesajlar listesini ozetle — LLM varsa LLM, yoksa kural."""
+        """Verilen mesajlar listesini ozetle â€” LLM varsa LLM, yoksa kural."""
         if self.provider:
             return self._llm_ile_ozetle(mesajlar)
         return self._kural_ile_ozetle(mesajlar)
@@ -98,7 +98,7 @@ class TrajectoryCompressor:
     def _llm_ile_ozetle(self, mesajlar: list) -> str:
         """LLM kullanarak yapisal ozet uret."""
         parcalar = []
-        for m in mesajlar[-40:]:  # Son 40 mesaj — daha fazlasi cok token
+        for m in mesajlar[-40:]:  # Son 40 mesaj â€” daha fazlasi cok token
             rol = m.get("role", "?")
             icerik = m.get("content", "")[:400]
             parcalar.append(f"[{rol}]: {icerik}")
@@ -151,11 +151,11 @@ class TrajectoryCompressor:
         self._onceki_ozet = ozet
         return ozet
 
-    # ── Ana sikistirma ────────────────────────────────────────────────
+    # â”€â”€ Ana sikistirma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def compress(self, mesajlar: list, context_length: int = 8192) -> list:
         """
-        Token bütçesi esigi asilinca sikistir.
+        Token bÃ¼tÃ§esi esigi asilinca sikistir.
         Son `korunan_son` mesaj her zaman korunur.
         """
         if len(mesajlar) <= self.korunan_son:
@@ -170,7 +170,7 @@ class TrajectoryCompressor:
         eski = mesajlar[: -self.korunan_son]
         son = mesajlar[-self.korunan_son :]
 
-        # Eski ozet mesajini kaldır (tekrar ozetleme)
+        # Eski ozet mesajini kaldÄ±r (tekrar ozetleme)
         eski = [
             m
             for m in eski
@@ -194,7 +194,7 @@ class TrajectoryCompressor:
 
 # Geriye donuk uyumluluk takma adlari
 class AdvancedContextCompressor(TrajectoryCompressor):
-    """Eski isim — TrajectoryCompressor'in takma adi."""
+    """Eski isim â€” TrajectoryCompressor'in takma adi."""
 
     pass
 
@@ -215,5 +215,5 @@ if __name__ == "__main__":
         )
 
     sonuc = comp.compress(msgs, context_length=8192)
-    print(f"Onceki: {len(msgs)} mesaj → Sonraki: {len(sonuc)} mesaj")
+    print(f"Onceki: {len(msgs)} mesaj â†’ Sonraki: {len(sonuc)} mesaj")
     print(sonuc[0]["content"][:300])

@@ -1,11 +1,11 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-image_gen.py — AI_ML skill: Görsel üretim (Image Generation) motoru.
+image_gen.py â€” AI_ML skill: GÃ¶rsel Ã¼retim (Image Generation) motoru.
 
-Bağımlılıklar:
-  - reymen.arac.image_gen_engine — FAL, OpenAI, xAI, Stub engine'leri
+BaÄŸÄ±mlÄ±lÄ±klar:
+  - reymen.arac.image_gen_engine â€” FAL, OpenAI, xAI, Stub engine'leri
 
-Kullanım:
+KullanÄ±m:
   from reymen.cereyan.skills.AI_ML.image_gen import image_olustur
   sonuc = image_olustur("bir kedi", en=1024, boy=1024, backend="fal")
 """
@@ -16,7 +16,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
-# Engine'i içe aktar
+# Engine'i iÃ§e aktar
 try:
     from reymen.arac.image_gen_engine import (
         FALEngine,
@@ -49,16 +49,16 @@ def image_olustur(
     boy: int = 1024,
     backend: str = "",
 ) -> str:
-    """Görsel üret — skill arayüzü.
+    """GÃ¶rsel Ã¼ret â€” skill arayÃ¼zÃ¼.
 
     Args:
-        prompt: Görsel tanımı.
-        en: Genişlik (piksel).
-        boy: Yükseklik (piksel).
-        backend: "fal", "openai", "xai", "stub" veya boş (varsayılan).
+        prompt: GÃ¶rsel tanÄ±mÄ±.
+        en: GeniÅŸlik (piksel).
+        boy: YÃ¼kseklik (piksel).
+        backend: "fal", "openai", "xai", "stub" veya boÅŸ (varsayÄ±lan).
 
     Returns:
-        [MEDIA] formatında sonuç veya hata mesajı.
+        [MEDIA] formatÄ±nda sonuÃ§ veya hata mesajÄ±.
     """
     return resim_olustur(prompt, str(en), str(boy), backend)
 

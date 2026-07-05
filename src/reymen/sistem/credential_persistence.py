@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""credential_persistence.py — Kimlik Kaliciligi.
+﻿# -*- coding: utf-8 -*-
+"""credential_persistence.py â€” Kimlik Kaliciligi.
 
 API anahtarlarini Windows Credential Manager veya
 sifrelenmis dosyada kalici olarak saklar.

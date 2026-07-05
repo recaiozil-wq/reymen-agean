@@ -1,4 +1,4 @@
-"""ReYMeN tools.tirith_security shim — Hermes Tirith güvenlik kontrollerini yönlendirir."""
+﻿"""ReYMeN tools.tirith_security shim â€” ReYMeN Tirith gÃ¼venlik kontrollerini yÃ¶nlendirir."""
 
 from __future__ import annotations
 
@@ -8,10 +8,10 @@ logger = logging.getLogger(__name__)
 
 
 def ensure_installed() -> bool:
-    """Hermes ensure_installed — ReYMeN'de Tirith kullanılmaz."""
+    """ReYMeN ensure_installed â€” ReYMeN'de Tirith kullanÄ±lmaz."""
     return True
 
 
 def is_platform_supported() -> bool:
-    """Hermes is_platform_supported — ReYMeN'de her platform desteklenir."""
+    """ReYMeN is_platform_supported â€” ReYMeN'de her platform desteklenir."""
     return True

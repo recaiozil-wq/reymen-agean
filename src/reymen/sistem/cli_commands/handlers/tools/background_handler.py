@@ -1,4 +1,4 @@
-"""_handle_background_command handler."""
+﻿"""_handle_background_command handler."""
 
 import logging
 import sys
@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 def _handle_background_command(cli, cmd: str):
-    """Handle /background <prompt> — run a prompt in a separate background session.
+    """Handle /background <prompt> â€” run a prompt in a separate background session.
 
     Spawns a new AIAgent in a background thread with its own session.
     When it completes, prints the result to the CLI without modifying
@@ -54,10 +54,10 @@ def _handle_background_command(cli, cmd: str):
         return
 
     _cprint(
-        f"  🔄 Background task #{task_num} started: \"{prompt[:60]}{'...' if len(prompt) > 60 else ''}\""
+        f"  ğŸ”„ Background task #{task_num} started: \"{prompt[:60]}{'...' if len(prompt) > 60 else ''}\""
     )
     _cprint(f"  Task ID: {task_id}")
-    _cprint("  You can continue chatting — results will appear when done.\n")
+    _cprint("  You can continue chatting â€” results will appear when done.\n")
 
     turn_route = cli._resolve_turn_agent_config(prompt)
 
@@ -124,16 +124,16 @@ def _handle_background_command(cli, cmd: str):
                 cli._app.invalidate()
                 time.sleep(0.05)  # brief pause for refresh
             print()
-            ChatConsole().print(f"[{_accent_hex()}]{'─' * 40}[/]")
-            _cprint(f"  ✅ Background task #{task_num} complete")
+            ChatConsole().print(f"[{_accent_hex()}]{'â”€' * 40}[/]")
+            _cprint(f"  âœ… Background task #{task_num} complete")
             _cprint(f"  Prompt: \"{prompt[:60]}{'...' if len(prompt) > 60 else ''}\"")
-            ChatConsole().print(f"[{_accent_hex()}]{'─' * 40}[/]")
+            ChatConsole().print(f"[{_accent_hex()}]{'â”€' * 40}[/]")
             if response:
                 try:
                     from reymen.reymen_cli.skin_engine import get_active_skin
 
                     _skin = get_active_skin()
-                    label = _skin.get_branding("response_label", "⚕ ReYMeN")
+                    label = _skin.get_branding("response_label", "âš• ReYMeN")
                     _resp_color = _maybe_remap_for_light_mode(
                         _skin.get_color("response_border", "#CD7F32")
                     )
@@ -141,7 +141,7 @@ def _handle_background_command(cli, cmd: str):
                         _skin.get_color("banner_text", "#FFF8DC")
                     )
                 except Exception:
-                    label = "⚕ ReYMeN"
+                    label = "âš• ReYMeN"
                     _resp_color = "#CD7F32"
                     _resp_text = "#FFF8DC"
 
@@ -175,7 +175,7 @@ def _handle_background_command(cli, cmd: str):
                 cli._app.invalidate()
                 time.sleep(0.05)
             print()
-            _cprint(f"  ❌ Background task #{task_num} failed: {e}")
+            _cprint(f"  âŒ Background task #{task_num} failed: {e}")
         finally:
             try:
                 set_sudo_password_callback(None)

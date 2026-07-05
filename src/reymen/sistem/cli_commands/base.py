@@ -1,7 +1,7 @@
-"""Ortak yardımcı metotlar — MixinCommands alt modülü.
+﻿"""Ortak yardÄ±mcÄ± metotlar â€” MixinCommands alt modÃ¼lÃ¼.
 
-Bu dosya otomatik olarak cli_mixin_commands.py'den ayrılmıştır.
-MixinCommands sınıfının ilgili metotlarını içerir.
+Bu dosya otomatik olarak cli_mixin_commands.py'den ayrÄ±lmÄ±ÅŸtÄ±r.
+MixinCommands sÄ±nÄ±fÄ±nÄ±n ilgili metotlarÄ±nÄ± iÃ§erir.
 """
 
 import logging
@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 
 class MixinCommands:
-    """Ortak yardımcı metotlar."""
+    """Ortak yardÄ±mcÄ± metotlar."""
 
     def _slow_command_status(self, command: str) -> str:
         """Return a user-facing status message for slower slash commands."""
@@ -65,7 +65,7 @@ class MixinCommands:
         self._command_status = status
         self._invalidate(min_interval=0.0)
         try:
-            print(f"⏳ {status}")
+            print(f"â³ {status}")
             yield
         finally:
             self._command_running = False
@@ -128,7 +128,7 @@ class MixinCommands:
         ):
             ctx_len = self.agent.context_compressor.context_length
 
-        # Auto-compact for narrow terminals — the full banner with caduceus
+        # Auto-compact for narrow terminals â€” the full banner with caduceus
         # + tool list needs ~80 columns minimum to render without wrapping.
         term_width = shutil.get_terminal_size().columns
         use_compact = self.compact or term_width < 80
@@ -170,7 +170,7 @@ class MixinCommands:
         if ctx_len and ctx_len < MINIMUM_CONTEXT_LENGTH:
             self._console_print()
             self._console_print(
-                f"[yellow]⚠️  Context length is only {ctx_len:,} tokens — "
+                f"[yellow]âš ï¸  Context length is only {ctx_len:,} tokens â€” "
                 f"this is likely too low for agent use with tools.[/]"
             )
             self._console_print(
@@ -183,7 +183,7 @@ class MixinCommands:
                 )
             elif "1234" in base_url:
                 self._console_print(
-                    "[dim]   LM Studio fix: Set context length in model settings → reload model[/]"
+                    "[dim]   LM Studio fix: Set context length in model settings â†’ reload model[/]"
                 )
             else:
                 self._console_print(
@@ -197,7 +197,7 @@ class MixinCommands:
         if is_nous_ReYMeN_non_agentic(model_name):
             self._console_print()
             self._console_print(
-                "[bold yellow]⚠  Nous Research ReYMeN 3 & 4 models are NOT agentic and are not "
+                "[bold yellow]âš   Nous Research ReYMeN 3 & 4 models are NOT agentic and are not "
                 "designed for use with ReYMeN Agent.[/]"
             )
             self._console_print(
@@ -349,7 +349,7 @@ class MixinCommands:
 
         for i, (role, text) in enumerate(entries):
             if role == "user":
-                lines.append("  ● You: ", style=f"dim bold {_session_label_c}")
+                lines.append("  â— You: ", style=f"dim bold {_session_label_c}")
                 # Show first line inline, indent rest
                 msg_lines = text.splitlines()
                 lines.append(msg_lines[0] + "\n", style="dim")
@@ -357,13 +357,13 @@ class MixinCommands:
                     lines.append(f"         {ml}\n", style="dim")
             elif role == "assistant_last":
                 # Last assistant response shown in full, non-dim
-                lines.append("  ◆ ReYMeN: ", style=f"bold {_assistant_label_c}")
+                lines.append("  â—† ReYMeN: ", style=f"bold {_assistant_label_c}")
                 msg_lines = text.splitlines()
                 lines.append(msg_lines[0] + "\n", style="")
                 for ml in msg_lines[1:]:
                     lines.append(f"            {ml}\n", style="")
             else:
-                lines.append("  ◆ ReYMeN: ", style=f"dim bold {_assistant_label_c}")
+                lines.append("  â—† ReYMeN: ", style=f"dim bold {_assistant_label_c}")
                 msg_lines = text.splitlines()
                 lines.append(msg_lines[0] + "\n", style="dim")
                 for ml in msg_lines[1:]:
@@ -422,7 +422,7 @@ class MixinCommands:
         _cprint(f"{_BOLD}+{'-' * inner_width}+{_RST}")
 
         for category, commands in COMMANDS_BY_CATEGORY.items():
-            _cprint(f"\n  {_BOLD}── {category} ──{_RST}")
+            _cprint(f"\n  {_BOLD}â”€â”€ {category} â”€â”€{_RST}")
             for cmd, desc in commands.items():
                 if not self._command_available(cmd):
                     continue
@@ -433,7 +433,7 @@ class MixinCommands:
         skill_commands = _ensure_skill_commands()
         if skill_commands:
             _cprint(
-                f"\n  ⚡ {_BOLD}Skill Commands{_RST} ({len(skill_commands)} installed):"
+                f"\n  âš¡ {_BOLD}Skill Commands{_RST} ({len(skill_commands)} installed):"
             )
             for cmd, info in sorted(skill_commands.items()):
                 ChatConsole().print(
@@ -443,7 +443,7 @@ class MixinCommands:
         _bundles_now = get_skill_bundles()
         if _bundles_now:
             _cprint(
-                f"\n  ▣ {_BOLD}Skill Bundles{_RST} ({len(_bundles_now)} installed):"
+                f"\n  â–£ {_BOLD}Skill Bundles{_RST} ({len(_bundles_now)} installed):"
             )
             for cmd, info in sorted(_bundles_now.items()):
                 skill_count = len(info.get("skills", []))
@@ -504,7 +504,7 @@ class MixinCommands:
                 print(f"    * {name:<20} - {desc}")
             print()
 
-        print(f"  Total: {len(tools)} tools  ヽ(^o^)ノ")
+        print(f"  Total: {len(tools)} tools  ãƒ½(^o^)ãƒ")
         print()
 
     def show_toolsets(self):
@@ -673,7 +673,7 @@ class MixinCommands:
     def _notify_session_boundary(self, event_type: str) -> None:
         """Fire a session-boundary plugin hook (on_session_finalize or on_session_reset).
 
-        Non-blocking — errors are caught and logged.  Safe to call from any
+        Non-blocking â€” errors are caught and logged.  Safe to call from any
         lifecycle point (shutdown, /new, /reset).
         """
         try:
@@ -699,7 +699,7 @@ class MixinCommands:
         def _pick():
             result[0] = curses_single_select(title, items, default_index=default_index)
 
-        # run_in_terminal requires an asyncio event loop — only exists in the
+        # run_in_terminal requires an asyncio event loop â€” only exists in the
         # main prompt_toolkit thread.  If we're in a background thread (e.g.
         # process_loop), fall back to direct curses call.
         in_main_thread = threading.current_thread() is threading.main_thread()
@@ -727,7 +727,7 @@ class MixinCommands:
         returns a coroutine that must be awaited by the prompt_toolkit event loop,
         which only exists on the main thread.  Slash commands are dispatched from
         the ``process_loop`` daemon thread (see issue #23185), so calling
-        ``run_in_terminal`` from there orphans the coroutine — ``_ask`` never runs,
+        ``run_in_terminal`` from there orphans the coroutine â€” ``_ask`` never runs,
         and user keystrokes leak into the composer instead.  Fall back to a direct
         ``input()`` when we're off the main thread.
         """
@@ -783,7 +783,7 @@ class MixinCommands:
         choices visible and lets the normal Enter key binding submit the typed
         or highlighted choice.
 
-        **Platform note (Windows dead-lock — issue #30768):**
+        **Platform note (Windows dead-lock â€” issue #30768):**
         The queue-based modal relies on prompt_toolkit key bindings receiving
         keyboard events and calling ``_submit_slash_confirm_response``.  On
         Windows (PowerShell / Windows Terminal) the prompt_toolkit input
@@ -795,9 +795,9 @@ class MixinCommands:
         To avoid this, we fall back to ``_prompt_text_input`` (a simple
         ``input()``-based prompt) when any of these conditions hold:
 
-        * ``sys.platform == "win32"`` — native Windows console (ConPTY /
+        * ``sys.platform == "win32"`` â€” native Windows console (ConPTY /
           win32_input) does not support the modal reliably.
-        * ``self._app`` is not set — unit tests / non-interactive contexts.
+        * ``self._app`` is not set â€” unit tests / non-interactive contexts.
 
         On non-Windows platforms the modal itself is still safe from the
         ``process_loop`` daemon thread as long as the main-thread event loop
@@ -817,7 +817,7 @@ class MixinCommands:
             return self._prompt_text_input("Choice [1/2/3]: ")
 
         # On Windows the prompt_toolkit input channel can deadlock when the
-        # modal is entered from the process_loop daemon thread — keystrokes
+        # modal is entered from the process_loop daemon thread â€” keystrokes
         # never reach the key bindings, so response_queue.get() blocks for
         # the full timeout (issue #30768).  Fall back to the simpler
         # stdin-based prompt which works reliably on Windows.
@@ -981,26 +981,26 @@ class MixinCommands:
             lines, border_style: str, content_style: str, text: str, box_width: int
         ) -> None:
             inner_width = max(0, box_width - 2)
-            lines.append((border_style, "│ "))
+            lines.append((border_style, "â”‚ "))
             lines.append((content_style, text.ljust(inner_width)))
-            lines.append((border_style, " │\n"))
+            lines.append((border_style, " â”‚\n"))
 
         def _append_blank_panel_line(lines, border_style: str, box_width: int) -> None:
-            lines.append((border_style, "│" + (" " * box_width) + "│\n"))
+            lines.append((border_style, "â”‚" + (" " * box_width) + "â”‚\n"))
 
         preview_lines = []
         for line in detail.splitlines():
             preview_lines.extend(_wrap_panel_text(line, 72))
         for idx, (_value, label, desc) in enumerate(choices):
-            marker = "❯" if idx == selected else " "
+            marker = "â¯" if idx == selected else " "
             preview_lines.extend(
                 _wrap_panel_text(
-                    f"{marker} [{idx + 1}] {label} — {desc}",
+                    f"{marker} [{idx + 1}] {label} â€” {desc}",
                     72,
                     subsequent_indent="    ",
                 )
             )
-        preview_lines.append("Type 1/2/3 or use ↑/↓ then Enter. ESC/Ctrl+C cancels.")
+        preview_lines.append("Type 1/2/3 or use â†‘/â†“ then Enter. ESC/Ctrl+C cancels.")
 
         box_width = _panel_box_width(title, preview_lines)
         inner_text_width = max(8, box_width - 2)
@@ -1009,9 +1009,9 @@ class MixinCommands:
             detail_wrapped.extend(_wrap_panel_text(line, inner_text_width))
         choice_wrapped: list[tuple[int, str]] = []
         for idx, (_value, label, desc) in enumerate(choices):
-            marker = "❯" if idx == selected else " "
+            marker = "â¯" if idx == selected else " "
             for wrapped in _wrap_panel_text(
-                f"{marker} [{idx + 1}] {label} — {desc}",
+                f"{marker} [{idx + 1}] {label} â€” {desc}",
                 inner_text_width,
                 subsequent_indent="    ",
             ):
@@ -1025,10 +1025,10 @@ class MixinCommands:
         max_detail_rows = min(max_detail_rows, 8)
         if len(detail_wrapped) > max_detail_rows:
             keep = max(1, max_detail_rows - 1)
-            detail_wrapped = detail_wrapped[:keep] + ["… (detail truncated)"]
+            detail_wrapped = detail_wrapped[:keep] + ["â€¦ (detail truncated)"]
 
         lines = []
-        lines.append(("class:approval-border", "╭" + ("─" * box_width) + "╮\n"))
+        lines.append(("class:approval-border", "â•­" + ("â”€" * box_width) + "â•®\n"))
         _append_panel_line(
             lines, "class:approval-border", "class:approval-title", title, box_width
         )
@@ -1056,10 +1056,10 @@ class MixinCommands:
             lines,
             "class:approval-border",
             "class:approval-cmd",
-            "Type 1/2/3 or use ↑/↓ then Enter. ESC/Ctrl+C cancels.",
+            "Type 1/2/3 or use â†‘/â†“ then Enter. ESC/Ctrl+C cancels.",
             box_width,
         )
-        lines.append(("class:approval-border", "╰" + ("─" * box_width) + "╯\n"))
+        lines.append(("class:approval-border", "â•°" + ("â”€" * box_width) + "â•¯\n"))
         return lines
 
     def _output_console(self):
@@ -1086,7 +1086,7 @@ class MixinCommands:
         tokens = cmd_text.strip().split()
         if not tokens:
             return "", False
-        # Drop leading "/cmd" word — callers pass the full command text.
+        # Drop leading "/cmd" word â€” callers pass the full command text.
         if tokens[0].startswith("/"):
             tokens = tokens[1:]
         skip = False
@@ -1109,11 +1109,11 @@ class MixinCommands:
         Used by ``/clear``, ``/new``/``/reset``, and ``/undo`` before they
         discard conversation state.  Three-option prompt:
 
-          1. Approve Once — proceed this time only
-          2. Always Approve — proceed and persist
+          1. Approve Once â€” proceed this time only
+          2. Always Approve â€” proceed and persist
              ``approvals.destructive_slash_confirm: false`` so future
              destructive commands run without confirmation
-          3. Cancel — abort
+          3. Cancel â€” abort
 
         Gated by ``approvals.destructive_slash_confirm`` (default on).  If the
         gate is off the function returns ``"once"`` immediately without
@@ -1123,21 +1123,21 @@ class MixinCommands:
         ``-y`` as an argument (e.g. ``/reset now``, ``/new --yes My title``),
         the modal is bypassed and ``"once"`` is returned immediately. This is
         an escape hatch for platforms where the prompt_toolkit modal hangs
-        (issue #30768 — native Windows PowerShell). Callers are responsible
+        (issue #30768 â€” native Windows PowerShell). Callers are responsible
         for stripping the skip tokens from any remaining argument parsing
         (see :meth:`_split_destructive_skip`).
 
         Returns ``"once"``, ``"always"``, or ``None`` (cancelled).  Callers
         proceed with the destructive action when the result is non-None.
         """
-        # Inline-skip escape hatch — works regardless of platform/modal state.
+        # Inline-skip escape hatch â€” works regardless of platform/modal state.
         # See class-level _DESTRUCTIVE_SKIP_TOKENS for the accepted tokens.
         if cmd_original:
             _, _skip = self._split_destructive_skip(cmd_original)
             if _skip:
                 return "once"
 
-        # Gate check — respects prior "Always Approve" clicks.
+        # Gate check â€” respects prior "Always Approve" clicks.
         try:
             cfg = load_cli_config()
             approvals = cfg.get("approvals") if isinstance(cfg, dict) else None
@@ -1161,32 +1161,32 @@ class MixinCommands:
             ("cancel", "Cancel", "keep current conversation"),
         ]
         raw = self._prompt_text_input_modal(
-            title=f"⚠️  /{command} — destroys conversation state",
+            title=f"âš ï¸  /{command} â€” destroys conversation state",
             detail=detail,
             choices=choices,
         )
         if raw is None:
-            print(f"🟡 /{command} cancelled (no input).")
+            print(f"ğŸŸ¡ /{command} cancelled (no input).")
             return None
         choice = self._normalize_slash_confirm_choice(raw, choices)
         if choice is None:
-            print(f"🟡 Unrecognized choice '{raw}'. /{command} cancelled.")
+            print(f"ğŸŸ¡ Unrecognized choice '{raw}'. /{command} cancelled.")
             return None
 
         if choice == "cancel":
-            print(f"🟡 /{command} cancelled. Conversation unchanged.")
+            print(f"ğŸŸ¡ /{command} cancelled. Conversation unchanged.")
             return None
 
         if choice == "always":
             if save_config_value("approvals.destructive_slash_confirm", False):
                 print(
-                    "🔒 Future /clear, /new, /reset, and /undo will run without confirmation."
+                    "ğŸ”’ Future /clear, /new, /reset, and /undo will run without confirmation."
                 )
                 print(
                     "   Re-enable via `approvals.destructive_slash_confirm: true` in config.yaml."
                 )
             else:
-                print("⚠️  Couldn't persist opt-out — proceeding once.")
+                print("âš ï¸  Couldn't persist opt-out â€” proceeding once.")
 
         return choice
 
@@ -1204,8 +1204,8 @@ class MixinCommands:
 
         from agent.display import get_tool_emoji
 
-        emoji = get_tool_emoji(tool_name, default="⚡")
-        _cprint(f"  ┊ {emoji} preparing {tool_name}…")
+        emoji = get_tool_emoji(tool_name, default="âš¡")
+        _cprint(f"  â”Š {emoji} preparing {tool_name}â€¦")
 
     def _on_tool_progress(
         self,

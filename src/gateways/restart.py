@@ -1,11 +1,11 @@
-"""Shared gateway restart constants and parsing helpers."""
+﻿"""Shared gateway restart constants and parsing helpers."""
 
 from __future__ import annotations
 
 # Varsayilan config degerleri (DEFAULT_CONFIG yerine)
 _DEFAULT_RESTART_DRAIN_TIMEOUT = 30.0
 
-# EX_TEMPFAIL from sysexits.h — used to ask the service manager to restart
+# EX_TEMPFAIL from sysexits.h â€” used to ask the service manager to restart
 # the gateway after a graceful drain/reload path completes.
 GATEWAY_SERVICE_RESTART_EXIT_CODE = 75
 

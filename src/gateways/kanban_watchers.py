@@ -1,4 +1,4 @@
-"""Kanban board watcher methods for GatewayRunner.
+﻿"""Kanban board watcher methods for GatewayRunner.
 
 Extracted verbatim from ``gateway/run.py`` (god-file decomposition Phase 3).
 These are the background-loop methods that subscribe to kanban boards, deliver
@@ -107,16 +107,17 @@ class GatewayKanbanWatchersMixin:
         # in the dispatch owner's per-board DBs. This prevents N-gateway -shm contention.
         # TODO: gate per-board when per-board dispatcher_owner tracking lands.
         try:
-            from reymen.cron.hermes_stubs.config import load_config as _load_config
+            from reymen.sistem.reymen_stubs import load_config as _load_config
         except Exception:
             logger.warning("kanban notifier: config loader unavailable; disabled")
             return
         env_override = (
-            os.environ.get("HERMES_KANBAN_DISPATCH_IN_GATEWAY", "").strip().lower()
+            os.environ.get("REYMEN_KANBAN_DISPATCH_IN_GATEWAY",
+                           os.environ.get("HERMES_KANBAN_DISPATCH_IN_GATEWAY", "")).strip().lower()
         )
         if env_override in {"0", "false", "no", "off"}:
             logger.info(
-                "kanban notifier: disabled via HERMES_KANBAN_DISPATCH_IN_GATEWAY env"
+                "kanban notifier: disabled via REYMEN_KANBAN_DISPATCH_IN_GATEWAY env"
             )
             return
         try:
@@ -133,7 +134,7 @@ class GatewayKanbanWatchersMixin:
         from reymen.gateway.config import Platform as _Platform
 
         try:
-            from reymen.cron.hermes_stubs import kanban_db as _kb
+            from reymen.sistem.reymen_stubs import kanban_db as _kb
         except Exception:
             logger.warning(
                 "kanban notifier: kanban_db not importable; notifier disabled"
@@ -185,7 +186,7 @@ class GatewayKanbanWatchersMixin:
 
                     # Enumerate every board on disk, but poll each resolved DB
                     # path once. Multiple slugs can point at the same DB when
-                    # HERMES_KANBAN_DB pins the board path; without this guard
+                    # REYMEN_KANBAN_DB pins the board path; without this guard
                     # one gateway could collect the same subscription/event
                     # more than once before advancing the cursor.
                     try:
@@ -510,7 +511,7 @@ class GatewayKanbanWatchersMixin:
         ``board`` scopes the DB connection to the board that owns this
         subscription. Unsub cursors in one board can't touch another's.
         """
-        from reymen.cron.hermes_stubs import kanban_db as _kb
+        from reymen.sistem.reymen_stubs import kanban_db as _kb
 
         conn = _kb.connect(board=board)
         try:
@@ -526,7 +527,7 @@ class GatewayKanbanWatchersMixin:
             conn.close()
 
     def _kanban_unsub(self, sub: dict, board: Optional[str] = None) -> None:
-        from reymen.cron.hermes_stubs import kanban_db as _kb
+        from reymen.sistem.reymen_stubs import kanban_db as _kb
 
         conn = _kb.connect(board=board)
         try:
@@ -548,7 +549,7 @@ class GatewayKanbanWatchersMixin:
         board: Optional[str] = None,
     ) -> None:
         """Sync helper: undo a claimed notification cursor after send failure."""
-        from reymen.cron.hermes_stubs import kanban_db as _kb
+        from reymen.sistem.reymen_stubs import kanban_db as _kb
 
         conn = _kb.connect(board=board)
         try:
@@ -689,7 +690,7 @@ class GatewayKanbanWatchersMixin:
 
         Gated by `kanban.dispatch_in_gateway` in config.yaml (default True).
         When true, the gateway hosts the single dispatcher for this profile:
-        no separate `hermes kanban daemon` process needed. When false, the
+        no separate `reymen kanban daemon` process needed. When false, the
         loop exits immediately and an external daemon is expected.
 
         Each tick calls :func:`kanban_db.dispatch_once` inside
@@ -704,19 +705,20 @@ class GatewayKanbanWatchersMixin:
         """
         # Read config once at boot. If the user flips the flag later, they
         # restart the gateway; same pattern as every other background
-        # watcher here. Honours HERMES_KANBAN_DISPATCH_IN_GATEWAY env var
+        # watcher here. Honours REYMEN_KANBAN_DISPATCH_IN_GATEWAY env var
         # as an escape hatch (false-y value disables without editing YAML).
         try:
-            from reymen.cron.hermes_stubs.config import load_config as _load_config
+            from reymen.sistem.reymen_stubs import load_config as _load_config
         except Exception:
             logger.warning("kanban dispatcher: config loader unavailable; disabled")
             return
         env_override = (
-            os.environ.get("HERMES_KANBAN_DISPATCH_IN_GATEWAY", "").strip().lower()
+            os.environ.get("REYMEN_KANBAN_DISPATCH_IN_GATEWAY",
+                           os.environ.get("HERMES_KANBAN_DISPATCH_IN_GATEWAY", "")).strip().lower()
         )
         if env_override in {"0", "false", "no", "off"}:
             logger.info(
-                "kanban dispatcher: disabled via HERMES_KANBAN_DISPATCH_IN_GATEWAY env"
+                "kanban dispatcher: disabled via REYMEN_KANBAN_DISPATCH_IN_GATEWAY env"
             )
             return
 
@@ -733,7 +735,7 @@ class GatewayKanbanWatchersMixin:
             return
 
         try:
-            from reymen.cron.hermes_stubs import kanban_db as _kb
+            from reymen.sistem.reymen_stubs import kanban_db as _kb
         except Exception:
             logger.warning(
                 "kanban dispatcher: kanban_db not importable; dispatcher disabled"
@@ -986,7 +988,7 @@ class GatewayKanbanWatchersMixin:
                         "SQLite database; pausing dispatch for this board until "
                         "the file changes, the gateway restarts, or the "
                         "quarantine timer expires. Move or restore the file, "
-                        "then run `hermes kanban init` if you need a fresh board.",
+                        "then run `reymen kanban init` if you need a fresh board.",
                         slug,
                         fingerprint[0],
                     )
@@ -1001,7 +1003,7 @@ class GatewayKanbanWatchersMixin:
                         "SQLite database; pausing dispatch for this board until "
                         "the file changes, the gateway restarts, or the "
                         "quarantine timer expires. Move or restore the file, "
-                        "then run `hermes kanban init` if you need a fresh board.",
+                        "then run `reymen kanban init` if you need a fresh board.",
                         slug,
                         fingerprint[0],
                     )
@@ -1037,7 +1039,7 @@ class GatewayKanbanWatchersMixin:
 
         def _ready_nonempty() -> bool:
             """Cheap probe: is there at least one ready+assigned+unclaimed
-            task on ANY board whose assignee maps to a real Hermes profile
+            task on ANY board whose assignee maps to a real ReYMeN profile
             (i.e. one the dispatcher would actually spawn for)?
 
             Tasks assigned to control-plane lanes (e.g. ``orion-cc``,
@@ -1045,7 +1047,7 @@ class GatewayKanbanWatchersMixin:
             ``claim_task`` directly and never spawnable, so a queue full
             of those is "correctly idle", not "stuck". Filtering them out
             here keeps the stuck-warn fire only on real failures (broken
-            PATH, missing venv, credential loss for a real Hermes profile).
+            PATH, missing venv, credential loss for a real ReYMeN profile).
             """
             try:
                 boards = _kb.list_boards(include_archived=False)
@@ -1096,7 +1098,7 @@ class GatewayKanbanWatchersMixin:
             successfully decomposed or specified this tick.
             """
             try:
-                from reymen.cron.hermes_stubs import kanban_decompose as _decomp
+                from reymen.sistem.reymen_stubs import kanban_decompose as _decomp
             except Exception as exc:  # pragma: no cover
                 logger.warning(
                     "kanban auto-decompose: import failed (%s); skipping",
@@ -1117,9 +1119,10 @@ class GatewayKanbanWatchersMixin:
                 # pattern as the dashboard specify endpoint. The
                 # decomposer module connects with no board kwarg and
                 # relies on the env var.
-                prev_env = os.environ.get("HERMES_KANBAN_BOARD")
+                prev_env = os.environ.get("REYMEN_KANBAN_BOARD",
+                                          os.environ.get("HERMES_KANBAN_BOARD"))
                 try:
-                    os.environ["HERMES_KANBAN_BOARD"] = slug
+                    os.environ["REYMEN_KANBAN_BOARD"] = slug
                     try:
                         triage_ids = _decomp.list_triage_ids()
                     except Exception as exc:
@@ -1170,9 +1173,9 @@ class GatewayKanbanWatchersMixin:
                             )
                 finally:
                     if prev_env is None:
-                        os.environ.pop("HERMES_KANBAN_BOARD", None)
+                        os.environ.pop("REYMEN_KANBAN_BOARD", None)
                     else:
-                        os.environ["HERMES_KANBAN_BOARD"] = prev_env
+                        os.environ["REYMEN_KANBAN_BOARD"] = prev_env
             return successes
 
         logger.info("kanban dispatcher: embedded in gateway (interval=%.1fs)", interval)
@@ -1228,7 +1231,7 @@ class GatewayKanbanWatchersMixin:
                             "kanban dispatcher stuck: ready queue non-empty for "
                             "%d consecutive ticks but 0 workers spawned. Check "
                             "profile health (venv, PATH, credentials) and "
-                            "`hermes kanban list --status ready`.",
+                            "`reymen kanban list --status ready`.",
                             bad_ticks,
                         )
                         last_warn_at = now

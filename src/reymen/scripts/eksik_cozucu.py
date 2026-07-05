@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""eksik_cozucu.py — ReYMeN 3 eksigi otomatik cozer.
+﻿# -*- coding: utf-8 -*-
+"""eksik_cozucu.py â€” ReYMeN 3 eksigi otomatik cozer.
 
 Yaptigi isler:
   1. .coveragerc olusturur (windows/ modullerini disarida birakarak)

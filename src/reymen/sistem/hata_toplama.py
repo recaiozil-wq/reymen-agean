@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""hata_toplama.py — Merkezi Hata Toplama + Bildirim Sistemi
+﻿# -*- coding: utf-8 -*-
+"""hata_toplama.py â€” Merkezi Hata Toplama + Bildirim Sistemi
 
 Tum motor/plugin/tool hatalarini merkezi olarak toplar, kategorize eder,
 frekans analizi yapar ve bildirim gonderir.
@@ -26,7 +26,7 @@ from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
-# ── Varsayilan yollar ──────────────────────────────────────────────────────
+# â”€â”€ Varsayilan yollar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 PROJE_KOK = Path(__file__).parent.parent
 DEFAULT_DB_PATH = PROJE_KOK / "merkez_db" / "hata_toplama.db"
 DEFAULT_CONFIG_PATH = PROJE_KOK / ".ReYMeN" / "hata_toplama.json"
@@ -303,7 +303,7 @@ class HataToplayici:
         try:
             if self._bildirim_fonksiyonu:
                 mesaj = (
-                    f"⚠️ *Hata Bildirimi* [{kayit.seviye}]\n"
+                    f"âš ï¸ *Hata Bildirimi* [{kayit.seviye}]\n"
                     f"Modul: `{kayit.modul}`\n"
                     f"Arac: `{kayit.arac}`\n"
                     f"Tip: `{kayit.hata_tipi}`\n"
@@ -315,7 +315,7 @@ class HataToplayici:
         except Exception as e:
             logger.error("[HataToplama] Bildirim hatasi: %s", e)
 
-    # ── Motor Integration ─────────────────────────────────────────────────
+    # â”€â”€ Motor Integration â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def motor_hook_handler(self, olay: str, **kwargs) -> None:
         """Motor hook'larindan gelen hatalari topla.
@@ -347,7 +347,7 @@ class HataToplayici:
         except Exception as e:
             logger.warning("[HataToplama] Hook kayit hatasi: %s", e)
 
-    # ── Periyodik Istatistik ──────────────────────────────────────────────
+    # â”€â”€ Periyodik Istatistik â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def periyodik_istatistik_baslat(self, interval_s: int = 3600):
         """Periyodik hata istatistigi olustur (arkaplan thread)."""
@@ -377,7 +377,7 @@ class HataToplayici:
     def periyodik_istatistik_durdur(self):
         self._calisiyor = False
 
-    # ── Raporlama ─────────────────────────────────────────────────────────
+    # â”€â”€ Raporlama â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def ozet_raporu(self, saat: int = 24) -> dict:
         """N saatlik hata ozet raporu."""
@@ -414,7 +414,7 @@ class HataToplayici:
 
         satirlar = ["[HataToplama] Son Hatalar:", "=" * 50]
         for h in hatalar:
-            cozuldu = "✅" if h["cozuldu_mu"] else "❌"
+            cozuldu = "âœ…" if h["cozuldu_mu"] else "âŒ"
             satirlar.append(
                 f"#{h['id']} [{h['seviye']}] {cozuldu} "
                 f"{h['modul']}/{h['arac']}: {h['hata_mesaji'][:100]}"
@@ -422,7 +422,7 @@ class HataToplayici:
         return "\n".join(satirlar)
 
 
-# ── Singleton ──────────────────────────────────────────────────────────────
+# â”€â”€ Singleton â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _TOPLAYICI: Optional[HataToplayici] = None
 
@@ -435,7 +435,7 @@ def hata_toplayici() -> HataToplayici:
     return _TOPLAYICI
 
 
-# ── Motor Plugin API ───────────────────────────────────────────────────────
+# â”€â”€ Motor Plugin API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def motor_kaydet(motor):
@@ -462,16 +462,16 @@ def motor_kaydet(motor):
         )
         motor._plugin_arac_kaydet(
             "HATA_COZ",
-            lambda kayit_id=0: "✅ Cozuldu"
+            lambda kayit_id=0: "âœ… Cozuldu"
             if hata_toplayici().db.cozuldu_isaretle(int(kayit_id))
-            else "❌ Bulunamadi",
+            else "âŒ Bulunamadi",
             "Bir hatayi cozuldu olarak isaretle. Parametre: kayit_id (int)",
         )
 
     logger.info("[HataToplama] Motor'a kaydedildi")
 
 
-# ── CLI Test ───────────────────────────────────────────────────────────────
+# â”€â”€ CLI Test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
     logging.basicConfig(

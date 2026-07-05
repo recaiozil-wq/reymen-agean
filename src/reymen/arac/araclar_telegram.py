@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-araclar_telegram.py — Telegram araclari.
+araclar_telegram.py â€” Telegram araclari.
 
 Telegram botu uzerinden mesaj gonderme, okuma, dosya gonderme
 ve baglanti testi islemlerini saglayan sinif.
@@ -317,7 +317,7 @@ class TelegramTools:
             logger.exception("Stream mesaj gonderme hatasi")
             return f"[TelegramTools] Beklenmeyen hata: {e}"
 
-    def reaction_ekle(self, chat_id: str, mesaj_id: int, emoji: str = "👍") -> str:
+    def reaction_ekle(self, chat_id: str, mesaj_id: int, emoji: str = "ğŸ‘") -> str:
         """Mesaja reaction (emoji tepki) ekle.
 
         Args:
@@ -433,7 +433,7 @@ def run(**kwargs) -> str:
             return bot.reaction_ekle(
                 chat_id=kwargs.get("chat_id", bot._chat_id),
                 mesaj_id=kwargs.get("mesaj_id", 0),
-                emoji=kwargs.get("emoji", "👍"),
+                emoji=kwargs.get("emoji", "ğŸ‘"),
             )
         else:
             return bot.ping()

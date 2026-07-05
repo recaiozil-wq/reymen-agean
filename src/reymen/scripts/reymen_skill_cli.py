@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
-"""reymen_skill_cli.py — SkillCLI: dosya tabanlı skill yönetim arayüzü.
+﻿# -*- coding: utf-8 -*-
+"""reymen_skill_cli.py â€” SkillCLI: dosya tabanlÄ± skill yÃ¶netim arayÃ¼zÃ¼.
 
 Export:
-    SkillCLI — ana sınıf
+    SkillCLI â€” ana sÄ±nÄ±f
 
 Test: tests/test_reymen_skill_cli.py
 """
@@ -15,37 +15,37 @@ from typing import Any, Dict, List, Optional
 
 
 class SkillCLI:
-    """Dosya tabanlı skill deposu.
+    """Dosya tabanlÄ± skill deposu.
 
-    Dizin yapısı::
+    Dizin yapÄ±sÄ±::
 
         skill_yolu/
             kategori/
                 skill_adi/
-                    SKILL.md   (YAML frontmatter + içerik)
+                    SKILL.md   (YAML frontmatter + iÃ§erik)
 
     Parametreler:
-        skill_yolu: Skill'lerin saklanacağı dizin (str veya Path).
+        skill_yolu: Skill'lerin saklanacaÄŸÄ± dizin (str veya Path).
     """
 
     def __init__(self, skill_yolu: str) -> None:
         self._kok = Path(skill_yolu)
         self._kok.mkdir(parents=True, exist_ok=True)
 
-    # ═══════════════════════════════════════════════════════════════════
-    # Yardımcı / internal metodlar
-    # ═══════════════════════════════════════════════════════════════════
+    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    # YardÄ±mcÄ± / internal metodlar
+    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
     def _tum_dosyalar(self) -> List[Path]:
-        """Tüm SKILL.md dosyalarını (sıralı) döndürür."""
+        """TÃ¼m SKILL.md dosyalarÄ±nÄ± (sÄ±ralÄ±) dÃ¶ndÃ¼rÃ¼r."""
         if not self._kok.exists():
             return []
         return sorted(self._kok.rglob("SKILL.md"))
 
     def _meta_oku(self, md_dosyasi: Path) -> Dict[str, Any]:
-        """SKILL.md dosyasındaki YAML frontmatter'ı parse eder.
+        """SKILL.md dosyasÄ±ndaki YAML frontmatter'Ä± parse eder.
 
-        Dönüş: {"aciklama": str, "tags": list[str]}
+        DÃ¶nÃ¼ÅŸ: {"aciklama": str, "tags": list[str]}
         """
         try:
             ham = md_dosyasi.read_text(encoding="utf-8")
@@ -77,23 +77,23 @@ class SkillCLI:
         return {"aciklama": aciklama, "tags": etiketler}
 
     def _skill(self, name: str) -> Optional[Path]:
-        """Adı verilen skill'in SKILL.md yolunu bulur (bulamazsa None)."""
+        """AdÄ± verilen skill'in SKILL.md yolunu bulur (bulamazsa None)."""
         for md in self._tum_dosyalar():
             if md.parent.name == name:
                 return md
         return None
 
-    # ═══════════════════════════════════════════════════════════════════
-    # Türkçe metodlar (test uyumluluğu)
-    # ═══════════════════════════════════════════════════════════════════
+    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    # TÃ¼rkÃ§e metodlar (test uyumluluÄŸu)
+    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
     def liste(self, kategori: Optional[str] = None) -> List[Dict[str, Any]]:
-        """Tüm skill'leri listeler.
+        """TÃ¼m skill'leri listeler.
 
         Parametreler:
-            kategori: Sadece bu kategoridekileri getir (None = tümü).
+            kategori: Sadece bu kategoridekileri getir (None = tÃ¼mÃ¼).
 
-        Dönüş: Sıralı sözlük listesi —
+        DÃ¶nÃ¼ÅŸ: SÄ±ralÄ± sÃ¶zlÃ¼k listesi â€”
                [{"ad", "kategori", "aciklama", "tags"}, ...]
         """
         sonuc: List[Dict[str, Any]] = []
@@ -114,9 +114,9 @@ class SkillCLI:
         return sonuc
 
     def goruntule(self, name: str) -> Optional[str]:
-        """Bir skill'in SKILL.md dosyasının tüm içeriğini döndürür.
+        """Bir skill'in SKILL.md dosyasÄ±nÄ±n tÃ¼m iÃ§eriÄŸini dÃ¶ndÃ¼rÃ¼r.
 
-        Bulamazsa None döner.
+        Bulamazsa None dÃ¶ner.
         """
         md = self._skill(name)
         if md is None:
@@ -124,7 +124,7 @@ class SkillCLI:
         return md.read_text(encoding="utf-8")
 
     def kategori_liste(self) -> List[str]:
-        """Mevcut tüm kategorileri alfabetik sırada döndürür."""
+        """Mevcut tÃ¼m kategorileri alfabetik sÄ±rada dÃ¶ndÃ¼rÃ¼r."""
         kategoriler: set[str] = set()
         for md in self._tum_dosyalar():
             kategoriler.add(md.parent.parent.name)
@@ -133,7 +133,7 @@ class SkillCLI:
     def istatistik(self) -> Dict[str, Any]:
         """Skill deposu istatistikleri.
 
-        Dönüş: {"toplam_skill": int, "kategori_sayisi": int, "kategoriler": list[str]}
+        DÃ¶nÃ¼ÅŸ: {"toplam_skill": int, "kategori_sayisi": int, "kategoriler": list[str]}
         """
         skills = self.liste()
         kategoriler = sorted({s["kategori"] for s in skills})
@@ -143,24 +143,24 @@ class SkillCLI:
             "kategoriler": kategoriler,
         }
 
-    # ═══════════════════════════════════════════════════════════════════
-    # İngilizce alias metodlar (task spesifikasyonu)
-    # ═══════════════════════════════════════════════════════════════════
+    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    # Ä°ngilizce alias metodlar (task spesifikasyonu)
+    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
     def list_skills(self) -> List[Dict[str, Any]]:
-        """Tüm skill'leri listeler (İngilizce alias)."""
+        """TÃ¼m skill'leri listeler (Ä°ngilizce alias)."""
         return self.liste()
 
     def create_skill(self, name: str, content: str) -> str:
-        """Yeni bir skill oluşturur.
+        """Yeni bir skill oluÅŸturur.
 
-        Varsayılan kategori 'genel' altında skil_adi/SKILL.md yazar.
+        VarsayÄ±lan kategori 'genel' altÄ±nda skil_adi/SKILL.md yazar.
 
         Parametreler:
-            name: Skill adı (dizin adı olarak kullanılır).
-            content: SKILL.md içeriği (frontmatter + markdown).
+            name: Skill adÄ± (dizin adÄ± olarak kullanÄ±lÄ±r).
+            content: SKILL.md iÃ§eriÄŸi (frontmatter + markdown).
 
-        Dönüş: Kaydedilen içerik metni.
+        DÃ¶nÃ¼ÅŸ: Kaydedilen iÃ§erik metni.
         """
         kategori = "genel"
         skill_dizini = self._kok / kategori / name
@@ -170,13 +170,13 @@ class SkillCLI:
         return content
 
     def view_skill(self, name: str) -> Optional[str]:
-        """Bir skill'in içeriğini döndürür (İngilizce alias)."""
+        """Bir skill'in iÃ§eriÄŸini dÃ¶ndÃ¼rÃ¼r (Ä°ngilizce alias)."""
         return self.goruntule(name)
 
     def delete_skill(self, name: str) -> bool:
         """Bir skill'i siler.
 
-        Dönüş: Başarılıysa True, skill bulunamazsa False.
+        DÃ¶nÃ¼ÅŸ: BaÅŸarÄ±lÄ±ysa True, skill bulunamazsa False.
         """
         md = self._skill(name)
         if md is None:
@@ -185,9 +185,9 @@ class SkillCLI:
         return True
 
     def search_skills(self, query: str) -> List[Dict[str, Any]]:
-        """Skill adı ve içeriğinde arama yapar (büyük/küçük harf duyarsız).
+        """Skill adÄ± ve iÃ§eriÄŸinde arama yapar (bÃ¼yÃ¼k/kÃ¼Ã§Ã¼k harf duyarsÄ±z).
 
-        Dönüş: Sıralı sözlük listesi —
+        DÃ¶nÃ¼ÅŸ: SÄ±ralÄ± sÃ¶zlÃ¼k listesi â€”
                [{"ad", "kategori", "aciklama", "tags"}, ...]
         """
         q = query.lower()

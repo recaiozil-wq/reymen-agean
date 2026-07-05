@@ -1,16 +1,16 @@
-"""
-🔄 Self-improvement — Aktif kendini geliştirme döngüsü.
+﻿"""
+ğŸ”„ Self-improvement â€” Aktif kendini geliÅŸtirme dÃ¶ngÃ¼sÃ¼.
 
-Kalite metrikleri toplar, SQLite ile kalıcı depolar, trend analizi yapar,
-otomatik hedef belirler ve iyileştirme önerileri üretir.
+Kalite metrikleri toplar, SQLite ile kalÄ±cÄ± depolar, trend analizi yapar,
+otomatik hedef belirler ve iyileÅŸtirme Ã¶nerileri Ã¼retir.
 
-Özellikler:
-- SQLite kalıcı depolama (oturumlar arası veri korunur)
-- Zaman bazlı trend/ilerleme takibi
-- Otomatik hedef belirleme (en zayıf metrik hangisi?)
-- Kod kalite analizi (projeyi tarar, metrik çıkarır)
-- Aktif iyileştirme döngüsü (düşük kaliteli adımları otomatik analiz eder)
-- conversation_loop entegrasyonu (her tur sonrası otomatik kayıt)
+Ã–zellikler:
+- SQLite kalÄ±cÄ± depolama (oturumlar arasÄ± veri korunur)
+- Zaman bazlÄ± trend/ilerleme takibi
+- Otomatik hedef belirleme (en zayÄ±f metrik hangisi?)
+- Kod kalite analizi (projeyi tarar, metrik Ã§Ä±karÄ±r)
+- Aktif iyileÅŸtirme dÃ¶ngÃ¼sÃ¼ (dÃ¼ÅŸÃ¼k kaliteli adÄ±mlarÄ± otomatik analiz eder)
+- conversation_loop entegrasyonu (her tur sonrasÄ± otomatik kayÄ±t)
 """
 
 from __future__ import annotations
@@ -45,7 +45,7 @@ __all__ = [
     "conversation_loop_hook",
 ]
 
-# ── SQLite yolu ─────────────────────────────────────────────────────────
+# â”€â”€ SQLite yolu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _DB_DIR = Path(__file__).parent / "merkez_db"
 _DB_PATH = _DB_DIR / "self_improve.db"
 
@@ -60,7 +60,7 @@ def _db_connection() -> sqlite3.Connection:
 
 
 def _db_init() -> None:
-    """Tablo yapısını oluştur (idempotent)."""
+    """Tablo yapÄ±sÄ±nÄ± oluÅŸtur (idempotent)."""
     with _db_connection() as db:
         db.executescript("""
             CREATE TABLE IF NOT EXISTS metrics (
@@ -109,12 +109,12 @@ def _db_init() -> None:
         """)
 
 
-# ── Data Classes ────────────────────────────────────────────────────────
+# â”€â”€ Data Classes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 @dataclass
 class QualityMetric:
-    """Tek bir çözüm adımının kalite metrikleri."""
+    """Tek bir Ã§Ã¶zÃ¼m adÄ±mÄ±nÄ±n kalite metrikleri."""
 
     success: bool
     errors: int = 0
@@ -131,7 +131,7 @@ class QualityMetric:
 
 @dataclass
 class QualityReport:
-    """Kalite değerlendirme raporu."""
+    """Kalite deÄŸerlendirme raporu."""
 
     score: float
     grade: str
@@ -154,7 +154,7 @@ class QualityReport:
 
 @dataclass
 class ImprovementGoal:
-    """İyileştirme hedefi."""
+    """Ä°yileÅŸtirme hedefi."""
 
     metric_name: str
     current_val: float = 0.0
@@ -168,7 +168,7 @@ class ImprovementGoal:
         return asdict(self)
 
 
-# ── Değerlendirme ──────────────────────────────────────────────────────
+# â”€â”€ DeÄŸerlendirme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _grade_for(score: float) -> str:
@@ -184,14 +184,14 @@ def _grade_for(score: float) -> str:
 
 
 def evaluate(metric: QualityMetric) -> QualityReport:
-    """Kalite metriklerini değerlendirip rapor döndürür."""
+    """Kalite metriklerini deÄŸerlendirip rapor dÃ¶ndÃ¼rÃ¼r."""
     score = 0.0
     issues: list[str] = []
 
     if metric.success:
         score += 0.5
     else:
-        issues.append("adım başarısız")
+        issues.append("adÄ±m baÅŸarÄ±sÄ±z")
 
     if metric.errors == 0:
         score += 0.2
@@ -199,7 +199,7 @@ def evaluate(metric: QualityMetric) -> QualityReport:
         penalty = min(0.2, metric.errors * 0.05)
         score += 0.2 - penalty
         if metric.errors >= 3:
-            issues.append(f"yüksek hata sayısı ({metric.errors})")
+            issues.append(f"yÃ¼ksek hata sayÄ±sÄ± ({metric.errors})")
 
     if metric.retries == 0:
         score += 0.15
@@ -207,7 +207,7 @@ def evaluate(metric: QualityMetric) -> QualityReport:
         penalty = min(0.15, metric.retries * 0.05)
         score += 0.15 - penalty
         if metric.retries >= 3:
-            issues.append(f"çok fazla yeniden deneme ({metric.retries})")
+            issues.append(f"Ã§ok fazla yeniden deneme ({metric.retries})")
 
     if metric.duration <= 0:
         score += 0.0
@@ -216,7 +216,7 @@ def evaluate(metric: QualityMetric) -> QualityReport:
     elif metric.duration < 30.0:
         score += 0.10
     else:
-        issues.append(f"uzun süre ({metric.duration:.1f}s)")
+        issues.append(f"uzun sÃ¼re ({metric.duration:.1f}s)")
 
     score = max(0.0, min(1.0, score))
     return QualityReport(
@@ -228,43 +228,43 @@ def evaluate(metric: QualityMetric) -> QualityReport:
 
 
 def suggest_fix(metric: QualityMetric) -> list[str]:
-    """Düşük kaliteli adımlar için iyileştirme önerileri üretir."""
+    """DÃ¼ÅŸÃ¼k kaliteli adÄ±mlar iÃ§in iyileÅŸtirme Ã¶nerileri Ã¼retir."""
     suggestions: list[str] = []
     if not metric.success:
-        suggestions.append("Adım başarısız — hata loglarını inceleyip kök nedeni bul.")
+        suggestions.append("AdÄ±m baÅŸarÄ±sÄ±z â€” hata loglarÄ±nÄ± inceleyip kÃ¶k nedeni bul.")
     if metric.errors >= 3:
         suggestions.append(
-            "Çok hata var — input validasyonu ve hata yakalama (try/except) ekle."
+            "Ã‡ok hata var â€” input validasyonu ve hata yakalama (try/except) ekle."
         )
     if metric.retries >= 3:
         suggestions.append(
-            "Çok yeniden deneme — backoff stratejisi veya farklı yaklaşım dene."
+            "Ã‡ok yeniden deneme â€” backoff stratejisi veya farklÄ± yaklaÅŸÄ±m dene."
         )
     if metric.duration > 30.0:
         suggestions.append(
-            "Yavaş adım — paralelleştirme, önbellekleme veya batch işlem düşün."
+            "YavaÅŸ adÄ±m â€” paralelleÅŸtirme, Ã¶nbellekleme veya batch iÅŸlem dÃ¼ÅŸÃ¼n."
         )
     if metric.tokens_used > 10_000:
-        suggestions.append("Yüksek token kullanımı — prompt'u kısalt veya özetle.")
+        suggestions.append("YÃ¼ksek token kullanÄ±mÄ± â€” prompt'u kÄ±salt veya Ã¶zetle.")
     if not suggestions:
-        suggestions.append("İyi performans — iyileştirme gerekmiyor.")
+        suggestions.append("Ä°yi performans â€” iyileÅŸtirme gerekmiyor.")
     return suggestions
 
 
-# ── SelfImprover (SQLite destekli) ──────────────────────────────────────
+# â”€â”€ SelfImprover (SQLite destekli) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class SelfImprover:
-    """Adım geçmişini SQLite'da tutar, trend analizi yapar, hedef belirler."""
+    """AdÄ±m geÃ§miÅŸini SQLite'da tutar, trend analizi yapar, hedef belirler."""
 
     def __init__(self, threshold: float = 0.6) -> None:
         self.threshold = threshold
         _db_init()
 
-    # -- Kayıt ----------------------------------------------------------------
+    # -- KayÄ±t ----------------------------------------------------------------
 
     def record(self, metric: QualityMetric) -> QualityReport:
-        """Adımı değerlendirir ve SQLite'a kaydeder."""
+        """AdÄ±mÄ± deÄŸerlendirir ve SQLite'a kaydeder."""
         report = evaluate(metric)
         if not report.passed:
             report.suggestions = suggest_fix(metric)
@@ -293,7 +293,7 @@ class SelfImprover:
     # -- Sorgulama ------------------------------------------------------------
 
     def history(self, limit: int = 100, source: str | None = None) -> list[dict]:
-        """Son N kaydı döndür."""
+        """Son N kaydÄ± dÃ¶ndÃ¼r."""
         with _db_connection() as db:
             if source:
                 rows = db.execute(
@@ -308,7 +308,7 @@ class SelfImprover:
             return [dict(r) for r in rows]
 
     def trend(self, days: int = 7) -> dict[str, Any]:
-        """Kalite trend özeti (son N gün)."""
+        """Kalite trend Ã¶zeti (son N gÃ¼n)."""
         cutoff = time.time() - days * 86400
         with _db_connection() as db:
             rows = db.execute(
@@ -343,7 +343,7 @@ class SelfImprover:
         }
 
     def haftalik_ilerleme(self) -> list[dict]:
-        """Haftalık ortalama skorları döndür (son 8 hafta)."""
+        """HaftalÄ±k ortalama skorlarÄ± dÃ¶ndÃ¼r (son 8 hafta)."""
         sonuc = []
         for i in range(8):
             bas = time.time() - (i + 1) * 7 * 86400
@@ -363,7 +363,7 @@ class SelfImprover:
     # -- Hedef belirleme -----------------------------------------------------
 
     def hedef_belirle(self) -> ImprovementGoal | None:
-        """En zayıf metriği tespit edip hedef oluşturur."""
+        """En zayÄ±f metriÄŸi tespit edip hedef oluÅŸturur."""
         with _db_connection() as db:
             rows = db.execute(
                 "SELECT * FROM metrics WHERE timestamp > ? ORDER BY score ASC LIMIT 10",
@@ -373,7 +373,7 @@ class SelfImprover:
         if not rows:
             return None
 
-        # En sık görülen sorun
+        # En sÄ±k gÃ¶rÃ¼len sorun
         error_adimlari = [r for r in rows if r["errors"] > 2]
         retry_adimlari = [r for r in rows if r["retries"] > 2]
         sure_adimlari = [r for r in rows if r["duration"] > 30]
@@ -386,7 +386,7 @@ class SelfImprover:
                 / len(error_adimlari),
                 target_val=1.0,
                 strategy="try/except ekle, input dogrulamasi yap",
-                notes=f"Son 7 günde {len(error_adimlari)} adım yüksek hatalı",
+                notes=f"Son 7 gÃ¼nde {len(error_adimlari)} adÄ±m yÃ¼ksek hatalÄ±",
                 created_at=time.time(),
             )
         elif len(retry_adimlari) >= 3:
@@ -396,7 +396,7 @@ class SelfImprover:
                 / len(retry_adimlari),
                 target_val=1.0,
                 strategy="backoff stratejisi ekle, alternatif cozum dene",
-                notes=f"Son 7 günde {len(retry_adimlari)} adım yüksek retry'li",
+                notes=f"Son 7 gÃ¼nde {len(retry_adimlari)} adÄ±m yÃ¼ksek retry'li",
                 created_at=time.time(),
             )
         elif len(sure_adimlari) >= 2:
@@ -406,19 +406,19 @@ class SelfImprover:
                 / len(sure_adimlari),
                 target_val=15.0,
                 strategy="paralellestir, cache ekle",
-                notes=f"Son 7 günde {len(sure_adimlari)} adım yavaş",
+                notes=f"Son 7 gÃ¼nde {len(sure_adimlari)} adÄ±m yavaÅŸ",
                 created_at=time.time(),
             )
 
         if hedef:
             with _db_connection() as db:
-                # Aynı metrik için aktif hedef var mı kontrol et
+                # AynÄ± metrik iÃ§in aktif hedef var mÄ± kontrol et
                 mevcut = db.execute(
                     "SELECT id FROM improvement_goals WHERE metric_name=? AND status='active' LIMIT 1",
                     (hedef.metric_name,),
                 ).fetchone()
                 if mevcut:
-                    # Varolan hedefi güncelle
+                    # Varolan hedefi gÃ¼ncelle
                     db.execute(
                         "UPDATE improvement_goals SET current_val=?, target_val=? WHERE id=?",
                         (hedef.current_val, hedef.target_val, mevcut["id"]),
@@ -440,7 +440,7 @@ class SelfImprover:
         return hedef
 
     def aktif_hedefler(self) -> list[dict]:
-        """Aktif iyileştirme hedeflerini döndür."""
+        """Aktif iyileÅŸtirme hedeflerini dÃ¶ndÃ¼r."""
         with _db_connection() as db:
             rows = db.execute(
                 "SELECT * FROM improvement_goals WHERE status='active' ORDER BY created_at DESC"
@@ -448,7 +448,7 @@ class SelfImprover:
             return [dict(r) for r in rows]
 
     def hedef_tamamla(self, goal_id: int) -> bool:
-        """Hedefi tamamlandı olarak işaretle."""
+        """Hedefi tamamlandÄ± olarak iÅŸaretle."""
         with _db_connection() as db:
             cur = db.execute(
                 "UPDATE improvement_goals SET status='completed' WHERE id=?",
@@ -456,10 +456,10 @@ class SelfImprover:
             )
             return cur.rowcount > 0
 
-    # -- İyileştirme döngüsü -------------------------------------------------
+    # -- Ä°yileÅŸtirme dÃ¶ngÃ¼sÃ¼ -------------------------------------------------
 
     def auto_improve(self) -> list[str]:
-        """Düşük kaliteli adımlar için toplu öneri üretir + hedef belirler."""
+        """DÃ¼ÅŸÃ¼k kaliteli adÄ±mlar iÃ§in toplu Ã¶neri Ã¼retir + hedef belirler."""
         all_suggestions: list[str] = []
 
         with _db_connection() as db:
@@ -483,7 +483,7 @@ class SelfImprover:
         hedef = self.hedef_belirle()
         if hedef:
             all_suggestions.append(
-                f"[HEDEF] {hedef.metric_name}: {hedef.current_val:.1f} → {hedef.target_val:.1f} "
+                f"[HEDEF] {hedef.metric_name}: {hedef.current_val:.1f} â†’ {hedef.target_val:.1f} "
                 f"({hedef.strategy})"
             )
 
@@ -496,7 +496,7 @@ class SelfImprover:
         return unique
 
     def auto_fix_script_uret(self) -> str | None:
-        """En düşük kaliteli alan için otomatik fix script'i üret."""
+        """En dÃ¼ÅŸÃ¼k kaliteli alan iÃ§in otomatik fix script'i Ã¼ret."""
         hedefler = self.aktif_hedefler()
         if not hedefler:
             return None
@@ -506,7 +506,7 @@ class SelfImprover:
         metric = h.get("metric_name", "")
 
         script = f"""# ReYMeN Self-Improve: Otomatik Fix
-# Hedef: {metric} ({h.get('current_val', 0):.1f} → {h.get('target_val', 0):.1f})
+# Hedef: {metric} ({h.get('current_val', 0):.1f} â†’ {h.get('target_val', 0):.1f})
 # Strateji: {strategy}
 
 import logging
@@ -526,27 +526,27 @@ if __name__ == "__main__":
         return script
 
     def reset(self) -> None:
-        """Tüm kayıtları temizle."""
+        """TÃ¼m kayÄ±tlarÄ± temizle."""
         with _db_connection() as db:
             db.execute("DELETE FROM metrics")
             db.execute("DELETE FROM improvement_goals")
             db.execute("DELETE FROM code_quality_snapshots")
 
 
-# ── Kod Kalite Analizi ──────────────────────────────────────────────────
+# â”€â”€ Kod Kalite Analizi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def kod_kalite_analizi(proje_yolu: str | None = None) -> dict[str, Any]:
-    """Proje kod tabanını tarar, kalite metriklerini çıkarır.
+    """Proje kod tabanÄ±nÄ± tarar, kalite metriklerini Ã§Ä±karÄ±r.
 
     Args:
-        proje_yolu: Proje kök dizini (None = otomatik algıla).
+        proje_yolu: Proje kÃ¶k dizini (None = otomatik algÄ±la).
 
     Returns:
-        Kalite metrikleri sözlüğü.
+        Kalite metrikleri sÃ¶zlÃ¼ÄŸÃ¼.
     """
     if proje_yolu is None:
-        # Varsayılan: src/reymen'in parentı (src/), ama proje kökünde durum.json varsa onu kullan
+        # VarsayÄ±lan: src/reymen'in parentÄ± (src/), ama proje kÃ¶kÃ¼nde durum.json varsa onu kullan
         default = Path(__file__).parent.parent  # src/
         if (default / "durum.json").exists() or (default / ".git").exists():
             proje_yolu = str(default)
@@ -560,7 +560,7 @@ def kod_kalite_analizi(proje_yolu: str | None = None) -> dict[str, Any]:
     kok = Path(proje_yolu)
     py_dosyalari = list(kok.rglob("*.py"))
 
-    # Gizli, __pycache__, venv klasörlerini atla
+    # Gizli, __pycache__, venv klasÃ¶rlerini atla
     EXCLUDE = {
         ".git",
         "__pycache__",
@@ -574,7 +574,7 @@ def kod_kalite_analizi(proje_yolu: str | None = None) -> dict[str, Any]:
         "bot_venv",
         "reymen_venv",
         "ReYMeN_cli",
-        "hermes-memory-backup",
+        "reymen-memory-backup",
         "ReYMeN-memory-backup",
         "_claude_multi_output",
         ".yedek",
@@ -622,7 +622,7 @@ def kod_kalite_analizi(proje_yolu: str | None = None) -> dict[str, Any]:
         except Exception:
             import_hatalari += 1
 
-    # Test dosyaları
+    # Test dosyalarÄ±
     test_dosyalari = [p for p in py_dosyalari if "test" in p.stem.lower()]
     test_satir = sum(
         len(p.read_text(encoding="utf-8", errors="replace").splitlines())
@@ -676,7 +676,7 @@ def kod_kalite_analizi(proje_yolu: str | None = None) -> dict[str, Any]:
 
 
 def kod_kalite_gecmisi(limit: int = 10) -> list[dict]:
-    """Geçmiş kod kalite snapshot'larını döndür."""
+    """GeÃ§miÅŸ kod kalite snapshot'larÄ±nÄ± dÃ¶ndÃ¼r."""
     _db_init()
     with _db_connection() as db:
         rows = db.execute(
@@ -686,30 +686,30 @@ def kod_kalite_gecmisi(limit: int = 10) -> list[dict]:
         return [dict(r) for r in rows]
 
 
-# ── Aktif iyileştirme döngüsü ─────────────────────────────────────────
+# â”€â”€ Aktif iyileÅŸtirme dÃ¶ngÃ¼sÃ¼ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def auto_improve_cycle(proje_yolu: str | None = None) -> dict[str, Any]:
-    """Tam iyileştirme döngüsü: kod tara → metrik çıkar → hedef belirle → öneri üret.
+    """Tam iyileÅŸtirme dÃ¶ngÃ¼sÃ¼: kod tara â†’ metrik Ã§Ä±kar â†’ hedef belirle â†’ Ã¶neri Ã¼ret.
 
     Returns:
-        Döngü sonucu sözlüğü.
+        DÃ¶ngÃ¼ sonucu sÃ¶zlÃ¼ÄŸÃ¼.
     """
     improver = _singleton
 
     # 1. Kod kalite analizi
     kalite = kod_kalite_analizi(proje_yolu)
 
-    # 2. Son 7 gün trendi
+    # 2. Son 7 gÃ¼n trendi
     trend = improver.trend(days=7)
 
     # 3. Hedef belirle
     hedef = improver.hedef_belirle()
 
-    # 4. Öneriler
+    # 4. Ã–neriler
     oneriler = improver.auto_improve()
 
-    # 5. Otomatik metrik kaydı (kod kalitesini metrik olarak kaydet)
+    # 5. Otomatik metrik kaydÄ± (kod kalitesini metrik olarak kaydet)
     dosya_metric = QualityMetric(
         success=kalite["import_hatali"] == 0,
         errors=kalite["except_pass"] // 10,
@@ -731,11 +731,11 @@ def auto_improve_cycle(proje_yolu: str | None = None) -> dict[str, Any]:
     }
 
 
-# ── conversation_loop entegrasyonu ─────────────────────────────────────
+# â”€â”€ conversation_loop entegrasyonu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def conversation_loop_hook(**kwargs) -> None:
-    """conversation_loop'dan çağrılacak hook.
+    """conversation_loop'dan Ã§aÄŸrÄ±lacak hook.
 
     Her tur sonunda otomatik kalite metriklerini kaydeder.
     """
@@ -753,7 +753,7 @@ def conversation_loop_hook(**kwargs) -> None:
     improver.record(metric)
 
 
-# ── Singleton ───────────────────────────────────────────────────────────
+# â”€â”€ Singleton â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _singleton = SelfImprover()
 
@@ -803,11 +803,11 @@ def record_step_with_cost(
     return _singleton.record(metric)
 
 
-# ── Motor Kaydı ────────────────────────────────────────────────────────
+# â”€â”€ Motor KaydÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def motor_kaydet(motor) -> None:
-    """Motor'a self-improvement araçlarını kaydet."""
+    """Motor'a self-improvement araÃ§larÄ±nÄ± kaydet."""
     motor._plugin_arac_kaydet(
         "SELF_IMPROVE_REPORT",
         _tool_report,
@@ -876,7 +876,7 @@ def _tool_record(
     return (
         f"[SELF_IMPROVE] Kaydedildi: adim={step_name} "
         f"skor={rapor.score:.2f} not={rapor.grade} "
-        f"{'✅' if rapor.passed else '⚠️'}"
+        f"{'âœ…' if rapor.passed else 'âš ï¸'}"
     )
 
 

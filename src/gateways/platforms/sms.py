@@ -1,13 +1,13 @@
-"""
-ReYMeN Gateway — SMS (Twilio) platform adapter.
+﻿"""
+ReYMeN Gateway â€” SMS (Twilio) platform adapter.
 
 Twilio REST API uzerinden SMS mesaji gonderir.
 Gelen mesaj destegi yoktur (yalnizca cikis yonlu).
 
 Yapilandirma (ortam degiskenleri):
-  - TWILIO_ACCOUNT_SID     — Twilio Account SID (zorunlu)
-  - TWILIO_AUTH_TOKEN      — Twilio Auth Token (zorunlu)
-  - TWILIO_FROM_NUMBER     — Gonderen telefon numarasi (zorunlu, E.164 formatinda)
+  - TWILIO_ACCOUNT_SID     â€” Twilio Account SID (zorunlu)
+  - TWILIO_AUTH_TOKEN      â€” Twilio Auth Token (zorunlu)
+  - TWILIO_FROM_NUMBER     â€” Gonderen telefon numarasi (zorunlu, E.164 formatinda)
 """
 
 import asyncio
@@ -22,8 +22,8 @@ from pathlib import Path as _Path
 
 sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
-from src.gateways.config import Platform, PlatformConfig
-from src.gateways.platforms.base import (
+from gateways.config import Platform, PlatformConfig
+from gateways.platforms.base import (
     BasePlatformAdapter,
     MessageEvent,
     MessageType,
@@ -189,19 +189,19 @@ class SMSAdapter(BasePlatformAdapter):
                 )
             elif resp.status_code == 401:
                 logger.error(
-                    "[SMS] Twilio API yetkisiz — TWILIO_ACCOUNT_SID veya TWILIO_AUTH_TOKEN gecersiz."
+                    "[SMS] Twilio API yetkisiz â€” TWILIO_ACCOUNT_SID veya TWILIO_AUTH_TOKEN gecersiz."
                 )
                 return False
             else:
                 logger.warning(
-                    "[SMS] Twilio API yaniti: HTTP %d — %s",
+                    "[SMS] Twilio API yaniti: HTTP %d â€” %s",
                     resp.status_code,
                     resp.text[:200],
                 )
 
         except httpx.ConnectError as e:
             logger.warning("[SMS] Twilio API baglantisi basarisiz: %s", e)
-            # Devam et — runtime'da mesaj gonderiminde tekrar dene
+            # Devam et â€” runtime'da mesaj gonderiminde tekrar dene
         except Exception as e:
             logger.warning("[SMS] Twilio API dogrulama hatasi: %s", e)
 
@@ -329,7 +329,7 @@ class SMSAdapter(BasePlatformAdapter):
     # ------------------------------------------------------------------
 
     async def send_typing(self, chat_id: str, metadata: Optional[dict] = None) -> None:
-        """SMS typing indicator (no-op — SMS protokolunde yok)."""
+        """SMS typing indicator (no-op â€” SMS protokolunde yok)."""
         pass
 
     async def send_image(

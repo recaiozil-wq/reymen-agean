@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""dispatcher.py — Tool dispatch orkestratoru.
+﻿# -*- coding: utf-8 -*-
+"""dispatcher.py â€” Tool dispatch orkestratoru.
 
 Uc bileseni birlestirir:
   - ToolRegistry   (tool_registry)        : ad -> {module, callable} cozumleme
@@ -21,9 +21,9 @@ import importlib
 import logging
 from typing import Any, Dict, Optional
 
-from src.reymen.arac.tool_registry import ToolRegistry
-from src.reymen.guvenlik.tool_guardrails import ToolGuardrails
-from src.reymen.arac.tool_executor import ToolExecutor
+from reymen.arac.tool_registry import ToolRegistry
+from reymen.guvenlik.tool_guardrails import ToolGuardrails
+from reymen.arac.tool_executor import ToolExecutor
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +42,7 @@ class ToolDispatcher:
         self.executor = ToolExecutor()
         self._varsayilan_timeout = varsayilan_timeout
 
-    # ── dispatch ──────────────────────────────────────────────────────
+    # â”€â”€ dispatch â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     def dispatch(
         self,
         name: str,
@@ -73,7 +73,7 @@ class ToolDispatcher:
         module_name = kayit["module"]
         callable_adi = kayit["callable"]
 
-        # 2) Guvenlik kapisi — modul adi ile
+        # 2) Guvenlik kapisi â€” modul adi ile
         guard = self.guardrails.kontrolet(module_name)
         if not guard.get("guvenli", False):
             return {
@@ -88,7 +88,7 @@ class ToolDispatcher:
             return self.executor.calistir_tool(module_name, timeout=timeout, **args)
         return self._execute_function(module_name, callable_adi, args, timeout)
 
-    # ── alias fonksiyon calistirma ────────────────────────────────────
+    # â”€â”€ alias fonksiyon calistirma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     def _execute_function(
         self,
         module_name: str,
@@ -99,7 +99,7 @@ class ToolDispatcher:
         """callable != 'run' oldugunda modulden ozel fonksiyonu cagirir.
 
         Returns:
-            dict: {'ok': bool, ...} — hata durumunda 'error' icerir.
+            dict: {'ok': bool, ...} â€” hata durumunda 'error' icerir.
         """
         try:
             mod = importlib.import_module(f"tools.{module_name}")
@@ -118,7 +118,7 @@ class ToolDispatcher:
 
         return self.executor.calistir_guvenli(fn, timeout=timeout, **(args or {}))
 
-    # ── yardimci sorgular ─────────────────────────────────────────────
+    # â”€â”€ yardimci sorgular â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     def list_tools(self) -> Any:
         """Kayitli tool adlarinin listesi (registry.liste())."""
         return self.registry.liste()

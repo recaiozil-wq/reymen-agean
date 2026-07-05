@@ -1,26 +1,26 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-araclar_goruntu.py — Görsel üretim ve analiz araçları.
+araclar_goruntu.py â€” GÃ¶rsel Ã¼retim ve analiz araÃ§larÄ±.
 
-  RESIM_OLUSTUR   — FAL.ai FLUX ile prompt'tan görsel üretir.
-  VISION_ANALIZ   — FAL.ai vision endpoint ile görsel analiz eder
-                    (FAL_KEY yoksa/başarısız olursa GORUNTU_ANALIZ'e düşer).
-  GORUNTU_ANALIZ  — Ollama LLaVA ile yerel/offline görsel analiz (fallback).
+  RESIM_OLUSTUR   â€” FAL.ai FLUX ile prompt'tan gÃ¶rsel Ã¼retir.
+  VISION_ANALIZ   â€” FAL.ai vision endpoint ile gÃ¶rsel analiz eder
+                    (FAL_KEY yoksa/baÅŸarÄ±sÄ±z olursa GORUNTU_ANALIZ'e dÃ¼ÅŸer).
+  GORUNTU_ANALIZ  â€” Ollama LLaVA ile yerel/offline gÃ¶rsel analiz (fallback).
 
-Bağımlılık yok — sadece stdlib (urllib). Ollama için yerel sunucu gerekir
-(varsayılan http://localhost:11434, OLLAMA_URL ile değiştirilebilir).
+BaÄŸÄ±mlÄ±lÄ±k yok â€” sadece stdlib (urllib). Ollama iÃ§in yerel sunucu gerekir
+(varsayÄ±lan http://localhost:11434, OLLAMA_URL ile deÄŸiÅŸtirilebilir).
 
-MEDIA format sözleşmesi (köprü/telegram_bot tarafından ayrıştırılması beklenir):
+MEDIA format sÃ¶zleÅŸmesi (kÃ¶prÃ¼/telegram_bot tarafÄ±ndan ayrÄ±ÅŸtÄ±rÄ±lmasÄ± beklenir):
 
     [MEDIA type="image" src="<url-veya-dosya-yolu>"]
-    <açıklama>
+    <aÃ§Ä±klama>
     [/MEDIA]
 
-Projenizdeki köprü/telegram_bot modülü farklı bir biçim bekliyorsa sadece
-_media() fonksiyonunu güncellemeniz yeterli — diğer kod değişmez.
+Projenizdeki kÃ¶prÃ¼/telegram_bot modÃ¼lÃ¼ farklÄ± bir biÃ§im bekliyorsa sadece
+_media() fonksiyonunu gÃ¼ncellemeniz yeterli â€” diÄŸer kod deÄŸiÅŸmez.
 
-Tasarım ilkesi: hiçbir import hatası modülün tamamen çökmesine yol açmaz;
-her araç kendi içinde try/except ile sessizce (ama loglayarak) degrade eder.
+TasarÄ±m ilkesi: hiÃ§bir import hatasÄ± modÃ¼lÃ¼n tamamen Ã§Ã¶kmesine yol aÃ§maz;
+her araÃ§ kendi iÃ§inde try/except ile sessizce (ama loglayarak) degrade eder.
 """
 
 import base64
@@ -40,7 +40,7 @@ _OR_VISION_MODEL = "meta-llama/llama-3.2-11b-vision-instruct"
 _OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434").rstrip("/")
 
 
-# ── Yardımcılar ───────────────────────────────────────────────────────
+# â”€â”€ YardÄ±mcÄ±lar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _media(tip: str, kaynak: str, aciklama: str = "") -> str:
@@ -65,7 +65,7 @@ def _http_post_json(
 
 
 def _kaynak_to_data_url(yol_veya_url: str) -> str:
-    """Yerel dosya yolunu base64 data: URL'e çevirir; zaten URL ise olduğu gibi döner."""
+    """Yerel dosya yolunu base64 data: URL'e Ã§evirir; zaten URL ise olduÄŸu gibi dÃ¶ner."""
     if yol_veya_url.startswith(("http://", "https://", "data:")):
         return yol_veya_url
     with open(yol_veya_url, "rb") as f:
@@ -74,7 +74,7 @@ def _kaynak_to_data_url(yol_veya_url: str) -> str:
     return f"data:{mime};base64,{base64.b64encode(veri).decode()}"
 
 
-# ── OpenRouter Görsel Üretim Fallback ──────────────────────────────
+# â”€â”€ OpenRouter GÃ¶rsel Ãœretim Fallback â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _OR_IMAGE_URL = "https://openrouter.ai/api/v1/chat/completions"
 _OR_IMAGE_MODEL = "openai/dall-e-3"
@@ -104,7 +104,7 @@ def _resim_openrouter_fallback(prompt: str, en: str = "1024", boy: str = "1024")
             },
             timeout=90,
         )
-        # OpenAI uyumlu yanıt
+        # OpenAI uyumlu yanÄ±t
         choices = sonuc.get("choices", [])
         if choices:
             msg = choices[0].get("message", {})
@@ -117,13 +117,13 @@ def _resim_openrouter_fallback(prompt: str, en: str = "1024", boy: str = "1024")
         return f"[RESIM_OLUSTUR] Hata: FAL ve OpenRouter basarisiz: {e}"
 
 
-# ── RESIM_OLUSTUR ─────────────────────────────────────────────────────
+# â”€â”€ RESIM_OLUSTUR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def resim_olustur(prompt: str, en: str = "1024", boy: str = "1024") -> str:
-    """FAL.ai FLUX (flux-1-1-pro) ile prompt'tan görsel üretir."""
+    """FAL.ai FLUX (flux-1-1-pro) ile prompt'tan gÃ¶rsel Ã¼retir."""
     if not prompt or not prompt.strip():
-        return "[RESIM_OLUSTUR] Hata: 'prompt' boş olamaz."
+        return "[RESIM_OLUSTUR] Hata: 'prompt' boÅŸ olamaz."
 
     api_key = os.environ.get("FAL_KEY", "").strip()
     if not api_key:
@@ -153,31 +153,31 @@ def resim_olustur(prompt: str, en: str = "1024", boy: str = "1024") -> str:
             url = sonuc["image"]
 
         if not url:
-            return f"[RESIM_OLUSTUR] Hata: beklenmeyen FAL cevabı: {json.dumps(sonuc)[:300]}"
+            return f"[RESIM_OLUSTUR] Hata: beklenmeyen FAL cevabÄ±: {json.dumps(sonuc)[:300]}"
         return _media("image", url, f"Prompt: {prompt.strip()}")
     except urllib.error.HTTPError as e:
         govde = e.read().decode(errors="replace")[:300]
-        return f"[RESIM_OLUSTUR] FAL API hatası ({e.code}): {govde}"
+        return f"[RESIM_OLUSTUR] FAL API hatasÄ± ({e.code}): {govde}"
     except Exception as e:
         logger.error("[RESIM_OLUSTUR] hata: %s", e)
         return f"[RESIM_OLUSTUR] Hata: {e}"
 
 
-# ── VISION_ANALIZ (FAL, GORUNTU_ANALIZ'e fallback) ───────────────────
+# â”€â”€ VISION_ANALIZ (FAL, GORUNTU_ANALIZ'e fallback) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def vision_analiz(
-    kaynak: str, soru: str = "Bu görselde ne var, detaylı açıkla."
+    kaynak: str, soru: str = "Bu gÃ¶rselde ne var, detaylÄ± aÃ§Ä±kla."
 ) -> str:
-    """FAL.ai vision modeliyle görsel analiz eder (URL veya yerel dosya yolu)."""
+    """FAL.ai vision modeliyle gÃ¶rsel analiz eder (URL veya yerel dosya yolu)."""
     if not kaynak or not kaynak.strip():
-        return "[VISION_ANALIZ] Hata: görsel kaynağı (url/yol) boş olamaz."
+        return "[VISION_ANALIZ] Hata: gÃ¶rsel kaynaÄŸÄ± (url/yol) boÅŸ olamaz."
 
     api_key = os.environ.get("FAL_KEY", "").strip()
     if not api_key:
         api_key = os.environ.get("FAL_API_KEY", "").strip()
     if not api_key:
-        return _ollama_fallback(kaynak, soru, neden="FAL_KEY tanımlı değil")
+        return _ollama_fallback(kaynak, soru, neden="FAL_KEY tanÄ±mlÄ± deÄŸil")
 
     try:
         gorsel_url = _kaynak_to_data_url(kaynak.strip())
@@ -190,21 +190,21 @@ def vision_analiz(
         metin = sonuc.get("output") or sonuc.get("text") or sonuc.get("response")
         if not metin:
             return _ollama_fallback(
-                kaynak, soru, neden=f"beklenmeyen FAL cevabı: {json.dumps(sonuc)[:200]}"
+                kaynak, soru, neden=f"beklenmeyen FAL cevabÄ±: {json.dumps(sonuc)[:200]}"
             )
         return f"[VISION_ANALIZ]\n{metin.strip()}"
     except Exception as e:
-        logger.warning("[VISION_ANALIZ] FAL hatası, Ollama LLaVA'ya düşülüyor: %s", e)
+        logger.warning("[VISION_ANALIZ] FAL hatasÄ±, Ollama LLaVA'ya dÃ¼ÅŸÃ¼lÃ¼yor: %s", e)
         return _ollama_fallback(kaynak, soru, neden=str(e))
 
 
 def _ollama_fallback(kaynak: str, soru: str, neden: str = "") -> str:
     """Fallback: OpenRouter vision API (Ollama kaldirildigi icin)."""
     if neden:
-        logger.warning("[VISION] FAL basarisiz: %s → OpenRouter deneniyor", neden)
+        logger.warning("[VISION] FAL basarisiz: %s â†’ OpenRouter deneniyor", neden)
     api_key = os.environ.get("OPENROUTER_API_KEY", "").strip()
     if not api_key:
-        return f"[VISION] Görsel analizi icin OPENROUTER_API_KEY gerekli."
+        return f"[VISION] GÃ¶rsel analizi icin OPENROUTER_API_KEY gerekli."
     try:
         if kaynak.startswith(("http://", "https://")):
             with urllib.request.urlopen(kaynak, timeout=30) as r:
@@ -244,21 +244,21 @@ def _ollama_fallback(kaynak: str, soru: str, neden: str = "") -> str:
             cevap = json.loads(r.read().decode())
         return (
             cevap.get("choices", [{}])[0].get("message", {}).get("content", "")
-            or "Görsel analiz edilemedi."
+            or "GÃ¶rsel analiz edilemedi."
         )
     except Exception as e:
         return f"[VISION] OpenRouter hatasi: {e}"
 
 
-# ── GORUNTU_ANALIZ (Ollama LLaVA — yerel/offline fallback) ───────────
+# â”€â”€ GORUNTU_ANALIZ (Ollama LLaVA â€” yerel/offline fallback) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def goruntu_analiz(
-    kaynak: str, soru: str = "Bu görselde ne var, detaylı açıkla.", model: str = "llava"
+    kaynak: str, soru: str = "Bu gÃ¶rselde ne var, detaylÄ± aÃ§Ä±kla.", model: str = "llava"
 ) -> str:
-    """Ollama üzerinde çalışan LLaVA modeliyle yerel/offline görsel analiz."""
+    """Ollama Ã¼zerinde Ã§alÄ±ÅŸan LLaVA modeliyle yerel/offline gÃ¶rsel analiz."""
     if not kaynak or not kaynak.strip():
-        return "[GORUNTU_ANALIZ] Hata: görsel kaynağı (url/yol) boş olamaz."
+        return "[GORUNTU_ANALIZ] Hata: gÃ¶rsel kaynaÄŸÄ± (url/yol) boÅŸ olamaz."
 
     try:
         if kaynak.startswith(("http://", "https://")):
@@ -275,20 +275,20 @@ def goruntu_analiz(
             timeout=120,
         )
         metin = (sonuc.get("response") or "").strip()
-        return f"[GORUNTU_ANALIZ]\n{metin or '(boş yanıt)'}"
+        return f"[GORUNTU_ANALIZ]\n{metin or '(boÅŸ yanÄ±t)'}"
     except urllib.error.URLError as e:
         return (
-            f"[GORUNTU_ANALIZ] Hata: Ollama'ya bağlanılamadı ({_OLLAMA_URL}). "
-            f"Ollama kurulu ve çalışıyor mu? ('ollama pull llava') Detay: {e}"
+            f"[GORUNTU_ANALIZ] Hata: Ollama'ya baÄŸlanÄ±lamadÄ± ({_OLLAMA_URL}). "
+            f"Ollama kurulu ve Ã§alÄ±ÅŸÄ±yor mu? ('ollama pull llava') Detay: {e}"
         )
     except FileNotFoundError:
-        return f"[GORUNTU_ANALIZ] Hata: dosya bulunamadı: {kaynak}"
+        return f"[GORUNTU_ANALIZ] Hata: dosya bulunamadÄ±: {kaynak}"
     except Exception as e:
         logger.error("[GORUNTU_ANALIZ] hata: %s", e)
         return f"[GORUNTU_ANALIZ] Hata: {e}"
 
 
-# ── Motor kayıt ───────────────────────────────────────────────────────
+# â”€â”€ Motor kayÄ±t â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def motor_kaydet(motor) -> None:
@@ -298,14 +298,14 @@ def motor_kaydet(motor) -> None:
         motor._plugin_arac_kaydet(
             "RESIM_OLUSTUR",
             resim_olustur,
-            "FAL.ai FLUX ile prompt'tan görsel üretir (FAL_KEY gerekli). "
+            "FAL.ai FLUX ile prompt'tan gÃ¶rsel Ã¼retir (FAL_KEY gerekli). "
             "Parametreler: prompt, en, boy.",
         )
         motor._plugin_arac_kaydet(
             "VISION_ANALIZ",
             vision_analiz,
-            "FAL.ai vision modeliyle görseli analiz eder (FAL_KEY gerekli; yoksa "
-            "otomatik olarak Ollama LLaVA'ya düşer). Parametreler: kaynak (url/yol), soru.",
+            "FAL.ai vision modeliyle gÃ¶rseli analiz eder (FAL_KEY gerekli; yoksa "
+            "otomatik olarak Ollama LLaVA'ya dÃ¼ÅŸer). Parametreler: kaynak (url/yol), soru.",
         )
         # GORUNTU_ANALIZ sadece henuz kaydedilmemisse eklenir.
         # reymen.cereyan.tools.vision_tools (DeepSeek V4 Flash + OpenRouter)
@@ -313,16 +313,16 @@ def motor_kaydet(motor) -> None:
         motor._plugin_arac_kaydet(
             "GORUNTU_ANALIZ",
             goruntu_analiz,
-            "Ollama LLaVA ile yerel/offline görsel analiz eder. "
+            "Ollama LLaVA ile yerel/offline gÃ¶rsel analiz eder. "
             "Parametreler: kaynak (url/yol), soru, model.",
             only_if_missing=True,
         )
     except Exception as e:
-        print(f"[AraclarGoruntu] Motor kayıt hatası: {e}")
+        print(f"[AraclarGoruntu] Motor kayÄ±t hatasÄ±: {e}")
 
 
 if __name__ == "__main__":
     print(
-        "araclar_goruntu hazır. FAL_KEY:", "var" if os.environ.get("FAL_KEY") else "yok"
+        "araclar_goruntu hazÄ±r. FAL_KEY:", "var" if os.environ.get("FAL_KEY") else "yok"
     )
     print("OLLAMA_URL:", _OLLAMA_URL)

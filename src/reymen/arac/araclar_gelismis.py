@@ -1,11 +1,11 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-araclar_gelismis.py — Gelismis Arac Seti.
+araclar_gelismis.py â€” Gelismis Arac Seti.
 
-Araçlar:
-  BrowserTool      — Headless tarayici + screenshot + JS inject
-  ApprovalTool     — Kullanici onay diyalogu (GUI/terminal)
-  SupervisorTool   — Gorev izleme, thread saglik kontrolu, zaman asimi
+AraÃ§lar:
+  BrowserTool      â€” Headless tarayici + screenshot + JS inject
+  ApprovalTool     â€” Kullanici onay diyalogu (GUI/terminal)
+  SupervisorTool   â€” Gorev izleme, thread saglik kontrolu, zaman asimi
 
 motor.py'e dogrudan kayit edilebilir veya bagimsiz kullanilabilir.
 """
@@ -24,24 +24,24 @@ logger = logging.getLogger(__name__)
 ROOT = Path(__file__).parent
 
 
-# ═══════════════════════════════════════════════════════════════
-# BROWSER TOOL — Headless Tarayici
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# BROWSER TOOL â€” Headless Tarayici
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class BrowserTool:
     """
     Playwright varsa: headless Chromium, screenshot, JS.
-    Yoksa: urllib ile HTML → temiz metin fallback.
+    Yoksa: urllib ile HTML â†’ temiz metin fallback.
 
-    Gelişmiş özellikler:
+    GeliÅŸmiÅŸ Ã¶zellikler:
     - Form doldurma (fill, select_option)
     - Element bekleme (wait_for)
-    - Hover, scroll, geçmiş
-    - Sekme yönetimi
+    - Hover, scroll, geÃ§miÅŸ
+    - Sekme yÃ¶netimi
     - Sayfa snapshot / HTML
     - Network izleme
-    - Dialog yönetimi
+    - Dialog yÃ¶netimi
     """
 
     def __init__(self, headless: bool = True):
@@ -80,7 +80,7 @@ class BrowserTool:
         if not dirs:
             return ""
         shell_dir = os.path.join(base, dirs[0])
-        # Olası konumlar
+        # OlasÄ± konumlar
         for cand in (
             os.path.join(
                 shell_dir, "chrome-headless-shell-win64", "chrome-headless-shell.exe"
@@ -95,9 +95,9 @@ class BrowserTool:
         return ""
 
     def _sayfa_al(self):
-        """Mevcut sayfayı döndür, kapalıysa yenisini aç.
+        """Mevcut sayfayÄ± dÃ¶ndÃ¼r, kapalÄ±ysa yenisini aÃ§.
 
-        Birlesik versiyon — 3 katmanli fallback:
+        Birlesik versiyon â€” 3 katmanli fallback:
         1. Mevcut page saglikliysa -> aynisini don
         2. Context varsa -> yeni tab
         3. Hic yoksa -> yeni browser baslat
@@ -116,7 +116,7 @@ class BrowserTool:
             self._page.on("close", self._sayfa_kapandi)
             return self._page
 
-        # 3. Hic yoksa — SADECE burada browser baslat
+        # 3. Hic yoksa â€” SADECE burada browser baslat
         if not self._pw:
             from playwright.sync_api import sync_playwright
 
@@ -144,12 +144,12 @@ class BrowserTool:
         if self._page is sayfa:
             self._page = None
 
-    # ── Yardımcı: güvenli hata yönetimi ─────────────────────────────
+    # â”€â”€ YardÄ±mcÄ±: gÃ¼venli hata yÃ¶netimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     _MAX_RETRY = 3
     _retry_counter = 0
 
     def _hata_kontrol(self, selector: str = "") -> str:
-        """Hata anında screenshot al + log."""
+        """Hata anÄ±nda screenshot al + log."""
         import time, logging
 
         log = logging.getLogger("BrowserTool")
@@ -164,9 +164,9 @@ class BrowserTool:
         return ss_path
 
     def _sayfa_saglik_kontrol(self) -> bool:
-        """Sayfa hala açık mı, kapandıysa sıfırla."""
+        """Sayfa hala aÃ§Ä±k mÄ±, kapandÄ±ysa sÄ±fÄ±rla."""
         try:
-            self._sayfa_al()  # canlılık testi + otomatik yeniden açma
+            self._sayfa_al()  # canlÄ±lÄ±k testi + otomatik yeniden aÃ§ma
             self._retry_counter = 0
             return True
         except Exception:
@@ -176,7 +176,7 @@ class BrowserTool:
                 return False
             return self._sayfa_al() is not None
 
-    # ── Temel ──────────────────────────────────────────────────────
+    # â”€â”€ Temel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def ac(self, url: str) -> str:
         if not self._playwright_yukle():
@@ -208,7 +208,7 @@ class BrowserTool:
 
     def screenshot(self, url: str = "", cikti: str = "screenshot.png") -> str:
         if not self._playwright_yukle():
-            return "[Browser] Playwright yuklu degil — screenshot alinamaz."
+            return "[Browser] Playwright yuklu degil â€” screenshot alinamaz."
         try:
             p = self._sayfa_al()
             if url and self._page:
@@ -286,10 +286,10 @@ class BrowserTool:
         self._context = None
         self._tab_index = 0
 
-    # ── Gelişmiş ───────────────────────────────────────────────────
+    # â”€â”€ GeliÅŸmiÅŸ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def fill(self, secici: str, deger: str) -> str:
-        """Form alanını doldur."""
+        """Form alanÄ±nÄ± doldur."""
         if not self._page:
             return "[Browser] Once ac() cagir."
         try:
@@ -323,7 +323,7 @@ class BrowserTool:
             return f"[Browser] Type hatasi: {e}"
 
     def select_option(self, secici: str, deger: str) -> str:
-        """Dropdown'tan değer seç."""
+        """Dropdown'tan deÄŸer seÃ§."""
         if not self._page:
             return "[Browser] Once ac() cagir."
         try:
@@ -345,7 +345,7 @@ class BrowserTool:
                 return f"[Browser:Hata] Select: {e}"
 
     def wait_for(self, secici: str, timeout: int = 10) -> str:
-        """Element sayfada görünene kadar bekle."""
+        """Element sayfada gÃ¶rÃ¼nene kadar bekle."""
         if not self._page:
             return "[Browser] Once ac() cagir."
         try:
@@ -355,7 +355,7 @@ class BrowserTool:
             return f"[Browser] Wait hatasi: {e}"
 
     def wait_for_text(self, metin: str, timeout: int = 10) -> str:
-        """Metin sayfada görünene kadar bekle."""
+        """Metin sayfada gÃ¶rÃ¼nene kadar bekle."""
         if not self._page:
             return "[Browser] Once ac() cagir."
         try:
@@ -368,7 +368,7 @@ class BrowserTool:
             return f"[Browser] Wait text hatasi: {e}"
 
     def hover(self, secici: str) -> str:
-        """Elementin üzerine gel."""
+        """Elementin Ã¼zerine gel."""
         if not self._page:
             return "[Browser] Once ac() cagir."
         from playwright.sync_api import TimeoutError as PWTimeout
@@ -393,7 +393,7 @@ class BrowserTool:
             return f"[Browser:Hata] Hover: {e}"
 
     def scroll(self, dx: int = 0, dy: int = 300) -> str:
-        """Sayfayı kaydır."""
+        """SayfayÄ± kaydÄ±r."""
         if not self._page:
             return "[Browser] Once ac() cagir."
         try:
@@ -405,7 +405,7 @@ class BrowserTool:
             return f"[Browser] Scroll hatasi: {e}"
 
     def scroll_to(self, secici: str) -> str:
-        """Elemente kaydır."""
+        """Elemente kaydÄ±r."""
         if not self._page:
             return "[Browser] Once ac() cagir."
         try:
@@ -416,7 +416,7 @@ class BrowserTool:
             return f"[Browser] Scroll hatasi: {e}"
 
     def back(self) -> str:
-        """Önceki sayfaya git."""
+        """Ã–nceki sayfaya git."""
         if not self._page:
             return "[Browser] Once ac() cagir."
         try:
@@ -440,7 +440,7 @@ class BrowserTool:
             return f"[Browser] Ileri hatasi: {e}"
 
     def reload(self) -> str:
-        """Sayfayı yenile."""
+        """SayfayÄ± yenile."""
         if not self._page:
             return "[Browser] Once ac() cagir."
         try:
@@ -450,7 +450,7 @@ class BrowserTool:
             return f"[Browser] Yenileme hatasi: {e}"
 
     def new_tab(self, url: str = "") -> str:
-        """Yeni sekme aç."""
+        """Yeni sekme aÃ§."""
         if not self._playwright_yukle():
             return "[Browser] Playwright yuklu degil."
         try:
@@ -460,7 +460,7 @@ class BrowserTool:
             if url:
                 yeni.goto(url, timeout=20000)
 
-            # Kapanma olayını dinle
+            # Kapanma olayÄ±nÄ± dinle
             def _tab_kapandi(sayfa):
                 import logging
 
@@ -469,28 +469,28 @@ class BrowserTool:
                     "[Browser] Sekme kapatildi: #%d %s", idx, sayfa.url
                 )
                 if idx >= 0 and idx < len(self._tabs):
-                    self._tabs[idx] = None  # işaretle
+                    self._tabs[idx] = None  # iÅŸaretle
 
             yeni.on("close", _tab_kapandi)
             self._tabs.append(yeni)
             self._page = yeni
             self._tab_index = len(self._tabs) - 1
-            # Boş referansları temizle
+            # BoÅŸ referanslarÄ± temizle
             self._tabs = [t for t in self._tabs if t is not None]
             return f"[Browser] Yeni sekme #{self._tab_index}: {yeni.title()}"
         except Exception as e:
             return f"[Browser:Hata] Yeni sekme: {e}"
 
     def switch_tab(self, index: int) -> str:
-        """Sekmeye geç."""
-        # Önce boş referansları temizle
+        """Sekmeye geÃ§."""
+        # Ã–nce boÅŸ referanslarÄ± temizle
         self._tabs = [t for t in self._tabs if t is not None]
         if not self._tabs:
             return "[Browser] Acik sekme yok."
         if index < 0 or index >= len(self._tabs):
             return f"[Browser] Gecersiz sekme: {index} (0-{len(self._tabs)-1})"
         try:
-            # Sayfanın hala açık olduğunu kontrol et
+            # SayfanÄ±n hala aÃ§Ä±k olduÄŸunu kontrol et
             sayfa = self._tabs[index]
             try:
                 sayfa.evaluate("1")
@@ -532,7 +532,7 @@ class BrowserTool:
             return f"[Browser:Hata] Sekme kapatma: {e}"
 
     def tabs_list(self) -> str:
-        """Açık sekmeleri listele."""
+        """AÃ§Ä±k sekmeleri listele."""
         if not self._tabs:
             return "[Browser] Acik sekme yok."
         satirlar = [f"[Browser] {len(self._tabs)} sekme:"]
@@ -544,10 +544,10 @@ class BrowserTool:
                 satirlar.append(f"  {isaret} #{i}: [kapali]")
         return "\n".join(satirlar)
 
-    # ── Sayfa içeriği ──────────────────────────────────────────────
+    # â”€â”€ Sayfa iÃ§eriÄŸi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def snapshot(self, maks: int = 3000) -> str:
-        """Sayfanın tüm metnini döndür."""
+        """SayfanÄ±n tÃ¼m metnini dÃ¶ndÃ¼r."""
         if not self._page:
             return "[Browser] Once ac() cagir."
         try:
@@ -557,7 +557,7 @@ class BrowserTool:
             return f"[Browser] Snapshot hatasi: {e}"
 
     def html(self, maks: int = 3000) -> str:
-        """Sayfanın HTML kaynağını döndür."""
+        """SayfanÄ±n HTML kaynaÄŸÄ±nÄ± dÃ¶ndÃ¼r."""
         if not self._page:
             return "[Browser] Once ac() cagir."
         try:
@@ -567,7 +567,7 @@ class BrowserTool:
             return f"[Browser] HTML hatasi: {e}"
 
     def title(self) -> str:
-        """Sayfa başlığını döndür."""
+        """Sayfa baÅŸlÄ±ÄŸÄ±nÄ± dÃ¶ndÃ¼r."""
         if not self._page:
             return "[Browser] Sayfa acik degil."
         try:
@@ -576,7 +576,7 @@ class BrowserTool:
             return f"[Browser] Baslik hatasi: {e}"
 
     def url(self) -> str:
-        """Mevcut URL'yi döndür."""
+        """Mevcut URL'yi dÃ¶ndÃ¼r."""
         if not self._page:
             return "[Browser] Sayfa acik degil."
         try:
@@ -584,7 +584,7 @@ class BrowserTool:
         except Exception as e:
             return f"[Browser] URL hatasi: {e}"
 
-    # ── Dialog ─────────────────────────────────────────────────────
+    # â”€â”€ Dialog â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def dialog_accept(self) -> str:
         """Dialog'u onayla (alert/confirm/prompt)."""
@@ -606,7 +606,7 @@ class BrowserTool:
         except Exception as e:
             return f"[Browser] Dialog hatasi: {e}"
 
-    # ── Network ─────────────────────────────────────────────────────
+    # â”€â”€ Network â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def network_requests(self, limit: int = 10) -> str:
         """Son network isteklerini listele (sadece URL)."""
@@ -627,7 +627,7 @@ class BrowserTool:
             return f"[Browser] Network hatasi: {e}"
 
     def clear_network(self) -> str:
-        """Network log'larını temizle."""
+        """Network log'larÄ±nÄ± temizle."""
         if not self._page:
             return "[Browser] Once ac() cagir."
         try:
@@ -636,7 +636,7 @@ class BrowserTool:
         except Exception as e:
             return f"[Browser] Temizleme hatasi: {e}"
 
-    # ── Devlet yönetimi ────────────────────────────────────────────
+    # â”€â”€ Devlet yÃ¶netimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def cookies(self) -> str:
         """Mevcut cookie'leri listele."""
@@ -666,7 +666,7 @@ class BrowserTool:
         except Exception as e:
             return f"[Browser] State temizleme hatasi: {e}"
 
-    # ── Fallback ───────────────────────────────────────────────────
+    # â”€â”€ Fallback â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _urllib_fallback(self, url: str) -> str:
         import urllib.request
@@ -704,9 +704,9 @@ class BrowserTool:
             return f"[Browser] Hata: {e}"
 
 
-# ═══════════════════════════════════════════════════════════════
-# APPROVAL TOOL — Onay Diyalogu
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# APPROVAL TOOL â€” Onay Diyalogu
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class ApprovalTool:
@@ -730,11 +730,11 @@ class ApprovalTool:
         if self._gui_dene(baslik, tam_mesaj):
             return True
 
-        # Terminal fallback — zaman asimi ile
+        # Terminal fallback â€” zaman asimi ile
         return self._terminal_onay(baslik, tam_mesaj)
 
     def _gui_dene(self, baslik: str, mesaj: str) -> bool | None:
-        """tkinter mesaj kutusu — True=onay, None=GUI yok/hata."""
+        """tkinter mesaj kutusu â€” True=onay, None=GUI yok/hata."""
         try:
             import tkinter as tk
             from tkinter import messagebox
@@ -756,7 +756,7 @@ class ApprovalTool:
             return None
 
     def _terminal_onay(self, baslik: str, mesaj: str) -> bool:
-        """Terminal'de [e/H] onayi — zaman asimi = ret."""
+        """Terminal'de [e/H] onayi â€” zaman asimi = ret."""
         print(f"\n{'='*50}")
         print(f"  ONAY GEREKIYOR: {baslik}")
         print(f"  {mesaj}")
@@ -784,14 +784,14 @@ class ApprovalTool:
 
     def motor_onay_fonksiyonu(self, arac: str, ozet: str) -> bool:
         """motor.py onay_fonksiyonu formatina uygun wrapper."""
-        RISKLI_ARAÇLAR = {
+        RISKLI_ARAÃ‡LAR = {
             "KOMUT_CALISTIR": "Sistem komutu calistirilacak",
             "PYTHON_CALISTIR": "Python kodu calistirilacak",
             "DOSYA_YAZ": "Dosya yazilacak",
             "TARAYICI_AC": "Tarayici acilacak",
             "EKRAN_TIKLA": "Ekrana tiklanacak",
         }
-        aciklama = RISKLI_ARAÇLAR.get(arac, f"{arac} calismak uzerine")
+        aciklama = RISKLI_ARAÃ‡LAR.get(arac, f"{arac} calismak uzerine")
         return self.onay_iste(
             f"Onay: {arac}",
             f"{aciklama}:\n{ozet[:200]}",
@@ -799,14 +799,14 @@ class ApprovalTool:
         )
 
 
-# ═══════════════════════════════════════════════════════════════
-# SUPERVISOR TOOL — Gorev Izleyici
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# SUPERVISOR TOOL â€” Gorev Izleyici
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class SupervisorTool:
     """
-    Gorev izleyici — thread saglik kontrolu, zaman asimi, hata sayaci.
+    Gorev izleyici â€” thread saglik kontrolu, zaman asimi, hata sayaci.
     Ana dongunun disinda bir watchdog gibi calisir.
     """
 
@@ -895,9 +895,9 @@ class SupervisorTool:
         return "\n".join(satirlar)
 
 
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Motor kayit fonksiyonu
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 _browser = BrowserTool()
 _supervisor = SupervisorTool()
@@ -1006,7 +1006,7 @@ def motor_kaydet(motor, onay_tool: ApprovalTool = None):
             return f"[Browser] Acik: {_browser.title()}\n{_browser.url()}"
         return "[Browser] Kapali."
 
-    # ── Workflow Recorder araclari ──────────────────────────────────
+    # â”€â”€ Workflow Recorder araclari â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     _recorder = None
 
     def _recorder_al():
@@ -1068,7 +1068,7 @@ def motor_kaydet(motor, onay_tool: ApprovalTool = None):
     k("SUPERVISOR_RAPOR", supervisor_rapor)
     k("ONAY_ISTE", onay_iste_arac)
 
-    # Gelişmiş browser
+    # GeliÅŸmiÅŸ browser
     k("BROWSER_FILL", browser_fill)
     k("BROWSER_CLICK", browser_click)
     k("BROWSER_WAIT", browser_wait)
@@ -1102,7 +1102,7 @@ def motor_kaydet(motor, onay_tool: ApprovalTool = None):
     k("WORKFLOW_SIL", workflow_sil, "Bir workflow'u sil. Parametre: workflow_adi")
     logger.debug("[GelismisTools] 28 arac kayit edildi.")
 
-    # ── HyperFrames Video Generation ─────────────────────────────────
+    # â”€â”€ HyperFrames Video Generation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     try:
         from reymen.tools.hyperframes_tool import (
             hyperframes_olustur,
@@ -1162,6 +1162,6 @@ def motor_kaydet(motor, onay_tool: ApprovalTool = None):
         print(f"[GelismisTools] HyperFrames yukleme hatasi: {e}")
 
 
-# ═══════════════════════════════════════════════════════════════
-# FAL.AI — Görsel Oluşturma (KALDIRILDI: araclar_goruntu.py'ye tasindi)
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# FAL.AI â€” GÃ¶rsel OluÅŸturma (KALDIRILDI: araclar_goruntu.py'ye tasindi)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•

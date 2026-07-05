@@ -1,16 +1,16 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-reflexion_motoru.py — Reflexion Pattern (Shinn et al. 2023).
+reflexion_motoru.py â€” Reflexion Pattern (Shinn et al. 2023).
 
 Buyuk LLM sistemlerindeki ilke:
   "Basarisizliktan ogren: sozel yansima uret, hafizaya kaydet,
    benzer gorevi tekrarlarken onceki dersi getir."
 
 Fark (klasik hata kaydindan):
-  - Normal hata logu: "[Hata]: timeout" — ne oldu
+  - Normal hata logu: "[Hata]: timeout" â€” ne oldu
   - Reflexion: "Web_Ara aracini kullanirken timeout aldim cunku sorgu
     cok genel ve 10+ saniye surdu. Gelecekte sorguyu daraltmaliyim
-    ve PYTHON_CALISTIR ile dogrulama adimi eklemeliyim." — NE YAPMALI
+    ve PYTHON_CALISTIR ile dogrulama adimi eklemeliyim." â€” NE YAPMALI
 
 Entegrasyon (main.py):
     from reflexion_motoru import ReflexionMotoru
@@ -36,7 +36,7 @@ ROOT = Path(__file__).parent.resolve()
 YANSIMA_LOG = ROOT / ".ReYMeN" / "reflexion_log.jsonl"
 MAKS_YANSIMA = 200  # Dosya satir siniri
 
-# ── Prompt sablon ─────────────────────────────────────────────────────────────
+# â”€â”€ Prompt sablon â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _YANSIMA_SISTEM = """Sen deneyimli bir yapay zeka sistemi analisti ve ogretmenisin.
 Sana basarisiz bir ajan gorevi sunulacak.
@@ -64,7 +64,7 @@ class ReflexionMotoru:
         self._log = Path(log_yolu) if log_yolu else YANSIMA_LOG
         self._log.parent.mkdir(parents=True, exist_ok=True)
 
-    # ── Ana API ──────────────────────────────────────────────────────────────
+    # â”€â”€ Ana API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def yansima_kaydet(
         self,
@@ -158,7 +158,7 @@ class ReflexionMotoru:
 
         return _DERS_ENJEKSIYON_SABLON.format(dersler="\n".join(satirlar))
 
-    # ── Ic yardimcilar ───────────────────────────────────────────────────────
+    # â”€â”€ Ic yardimcilar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @staticmethod
     def _yanit_ayristir(yanit: str) -> Optional[dict]:
@@ -274,7 +274,7 @@ class ReflexionMotoru:
             return []
 
 
-# ── Test ─────────────────────────────────────────────────────────────────────
+# â”€â”€ Test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
     import tempfile
@@ -290,7 +290,7 @@ if __name__ == "__main__":
         yansima = rm.yansima_kaydet(
             "Web'den haber cek",
             ['WEB_ARA("python news")', 'TARAYICI_AC("https://...")'],
-            "[Hata]: timeout — 30 saniyede yanit gelmedi",
+            "[Hata]: timeout â€” 30 saniyede yanit gelmedi",
         )
         print(
             "[Test 1] Yansima:", json.dumps(yansima, ensure_ascii=False, indent=2)[:200]

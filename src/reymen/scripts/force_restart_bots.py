@@ -1,11 +1,11 @@
-"""force_restart_bots.py — T\u00fcm python process'lerini oldur, botlari temiz baslat."""
+﻿"""force_restart_bots.py â€” T\u00fcm python process'lerini oldur, botlari temiz baslat."""
 
 import os, subprocess, time, json, urllib.request
 
 import pathlib as _pl
 
 PROJE = str(_pl.Path(__file__).resolve().parent.parent.parent)  # ReYMeN-Ajan
-HERMES_BASE = str(_pl.Path.home() / "AppData" / "Local" / "hermes" / "profiles")
+REYMEN_BASE = str(_pl.Path.home() / "AppData" / "Local" / "reymen" / "profiles")
 
 print("=" * 50)
 print("ADIM 1: TUM PYTHON PROCESS'LERI OLDURULUYOR")
@@ -16,14 +16,14 @@ time.sleep(3)
 print("ADIM 2: STALE GATEWAY STATE TEMIZLENIYOR")
 for p in ["default", "kiral38", "reymen"]:
     for fname in ["gateway_state.json", "gateway.lock", "gateway.pid"]:
-        f = f"{HERMES_BASE}/{p}/{fname}"
+        f = f"{REYMEN_BASE}/{p}/{fname}"
         if os.path.exists(f):
             os.remove(f)
             print(f"  Silindi: {f}")
 
 print("ADIM 3: WEBHOOKLAR TEMIZLENIYOR")
 for profil in ["default", "kiral38", "reymen"]:
-    with open(f"{HERMES_BASE}/{profil}/.env") as f:
+    with open(f"{REYMEN_BASE}/{profil}/.env") as f:
         token = ""
         for line in f:
             line = line.strip()
@@ -51,7 +51,7 @@ bots = [
 ]
 
 for ad, profil in bots:
-    with open(f"{HERMES_BASE}/{profil}/.env") as f:
+    with open(f"{REYMEN_BASE}/{profil}/.env") as f:
         token = ""
         for line in f:
             line = line.strip()
@@ -65,8 +65,8 @@ for ad, profil in bots:
 
     env = os.environ.copy()
     env["TELEGRAM_BOT_TOKEN"] = token
-    env["HERMES_PROFILE"] = profil
-    env["HERMES_GATEWAY"] = "http"
+    env["REYMEN_PROFILE"] = profil
+    env["REYMEN_GATEWAY"] = "http"
 
     log_path = f"{PROJE}/.ReYMeN/{ad.lower()}_bot.log"
     os.makedirs(os.path.dirname(log_path), exist_ok=True)
@@ -99,7 +99,7 @@ for ad, profil in bots:
     # Check errors
     has_error = any(w in content for w in ["ERROR", "Hata", "409", "Traceback"])
     has_running = "Polling basliyor" in content
-    status = "🔴 HATA" if has_error else "✅ CALISIYOR"
+    status = "ğŸ”´ HATA" if has_error else "âœ… CALISIYOR"
     detail = " (polling aktif)" if has_running else ""
     print(f"  {status} {ad}{detail} - {count} satir - son: {last[:90]}")
 

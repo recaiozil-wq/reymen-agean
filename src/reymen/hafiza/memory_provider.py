@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-memory_provider.py — Plugin tabanli bellek saglayici sistemi.
+memory_provider.py â€” Plugin tabanli bellek saglayici sistemi.
 
 Iki katman:
   1. MemoryProvider (ABC) + MemoryProviderRegistry
@@ -82,7 +82,7 @@ class MemoryProvider(ABC):
         """Ajan baslarken bir kez cagirilir.
 
         kwargs her zaman icermelidir:
-          hermes_home (str): Aktif REYMEN_HOME_PATH dizin yolu — depolama icin kullan.
+          hermes_home (str): Aktif REYMEN_HOME_PATH dizin yolu â€” depolama icin kullan.
         """
         ...
 
@@ -144,7 +144,7 @@ class MemoryProviderRegistry:
         """Provider sinifini kaydet. Dekorator olarak kullanilir.
 
         Oncelik sirasi: sinif uzerindeki _provider_name attribute'u;
-        yoksa provider_class().name ile anlık ornekleme.
+        yoksa provider_class().name ile anlÄ±k ornekleme.
         """
         try:
             name = getattr(provider_class, "_provider_name", None)
@@ -154,7 +154,7 @@ class MemoryProviderRegistry:
             logger.debug(f"MemoryProviderRegistry: '{name}' kayit edildi")
         except Exception as e:
             logger.warning(
-                f"MemoryProviderRegistry: {provider_class.__name__} kayit basarisiz — {e}"
+                f"MemoryProviderRegistry: {provider_class.__name__} kayit basarisiz â€” {e}"
             )
         return provider_class
 
@@ -343,7 +343,7 @@ class JsonBackend(MemoryProvider):
                 with open(self._dosya_yolu, "r", encoding="utf-8") as f:
                     self._veri = json.load(f)
         except (json.JSONDecodeError, IOError) as e:
-            logger.warning(f"JSON yuklenemedi: {e}, yeni baslanıyor")
+            logger.warning(f"JSON yuklenemedi: {e}, yeni baslanÄ±yor")
             self._veri = {}
 
     def _kaydet_dosya(self) -> None:
@@ -672,7 +672,7 @@ SqliteBackend = SQLiteBackend
 
 
 # =====================================================================
-# CHROMA BACKEND (opsiyonel — chromadb yoksa graceful degrade)
+# CHROMA BACKEND (opsiyonel â€” chromadb yoksa graceful degrade)
 # =====================================================================
 
 
@@ -865,7 +865,7 @@ class ChromaBackend(MemoryProvider):
 
 
 # =====================================================================
-# YARDIMCI FONKSİYON
+# YARDIMCI FONKSÄ°YON
 # =====================================================================
 
 
@@ -878,7 +878,7 @@ def get_default_provider(
     """
     provider_cls = MemoryProviderRegistry.get(backend)
     if provider_cls is None:
-        logger.warning(f"Bilinmeyen backend '{backend}', JSON kullanilıyor")
+        logger.warning(f"Bilinmeyen backend '{backend}', JSON kullanilÄ±yor")
         provider_cls = JsonBackend
 
     if backend == "sqlite":
@@ -894,17 +894,17 @@ def get_default_provider(
 
 
 class AbstraktHafizaSaglayici(ABC):
-    """ReYMeN Memory Provider Plugin ABC'si — ReYMeN uyarlamasi.
+    """ReYMeN Memory Provider Plugin ABC'si â€” ReYMeN uyarlamasi.
 
     Her hafiza plugin'i bu sinifi miras alir ve plugins/memory/<ad>/ altinda
     yasar. Tek bir eklenti ayni anda aktif olabilir (cakisma onleme).
 
     Zorunlu metodlar:
-        ad              — saglayici tanimlanici (property)
-        musait_mi()     — dis bagimlilik kontrolu (ag cagrisi yapma)
-        baslat()        — ajan baslatildiginda cagrilir
-        arac_sema_al()  — ajan arac listesine enjekte edilecek schema
-        arac_cagri_isle() — arac cagrilarini isle
+        ad              â€” saglayici tanimlanici (property)
+        musait_mi()     â€” dis bagimlilik kontrolu (ag cagrisi yapma)
+        baslat()        â€” ajan baslatildiginda cagrilir
+        arac_sema_al()  â€” ajan arac listesine enjekte edilecek schema
+        arac_cagri_isle() â€” arac cagrilarini isle
 
     Opsiyonel kancalar (override et):
         sistem_prompt_bloku()
@@ -1062,7 +1062,7 @@ def global_hafiza_kayit_al() -> HafizaPluginKayit:
 
 
 # =====================================================================
-# MODUL TEST FONKSİYONU
+# MODUL TEST FONKSÄ°YONU
 # =====================================================================
 
 
@@ -1073,7 +1073,7 @@ def run(**kwargs) -> str:
         backend (str): "json", "sqlite" veya "chroma"
 
     Returns:
-        str: JSON formatlı test sonucu
+        str: JSON formatlÄ± test sonucu
     """
     try:
         backend_adi = kwargs.get("backend", "json")

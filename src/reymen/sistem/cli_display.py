@@ -1,4 +1,4 @@
-from collections import deque
+﻿from collections import deque
 
 # ============================================================================
 # ASCII Art & Branding
@@ -18,7 +18,7 @@ _RichText = str
 # - Dim: #B8860B (muted text)
 
 # ANSI building blocks for conversation display
-_ACCENT_ANSI_DEFAULT = "\033[1;38;2;255;215;0m"  # True-color #FFD700 bold — fallback
+_ACCENT_ANSI_DEFAULT = "\033[1;38;2;255;215;0m"  # True-color #FFD700 bold â€” fallback
 _BOLD = "\033[1m"
 _RST = "\033[0m"
 _STREAM_PAD = (
@@ -44,7 +44,7 @@ def _hex_to_ansi(hex_color: str, *, bold: bool = False) -> str:
         return _ACCENT_ANSI_DEFAULT if bold else "\033[38;2;184;134;11m"
 
 
-# ────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # Light/dark terminal mode detection.
 #
 # Mirrors ui-tui/src/theme.ts detectLightMode().  Used to decide whether
@@ -53,11 +53,11 @@ def _hex_to_ansi(hex_color: str, *, bold: bool = False) -> str:
 # Terminal.app / iTerm2 background.
 #
 # Detection priority:
-#   1. ReYMeN_LIGHT / ReYMeN_TUI_LIGHT env (true/false) — explicit override
-#   2. ReYMeN_TUI_THEME=light|dark — explicit theme
-#   3. ReYMeN_TUI_BACKGROUND=#RRGGBB — explicit bg hint
-#   4. COLORFGBG env (set by xterm/Konsole/urxvt) — bg slot 7/15 = light
-#   5. OSC 11 query (\x1b]11;?\x1b\\) — ask the terminal directly
+#   1. ReYMeN_LIGHT / ReYMeN_TUI_LIGHT env (true/false) â€” explicit override
+#   2. ReYMeN_TUI_THEME=light|dark â€” explicit theme
+#   3. ReYMeN_TUI_BACKGROUND=#RRGGBB â€” explicit bg hint
+#   4. COLORFGBG env (set by xterm/Konsole/urxvt) â€” bg slot 7/15 = light
+#   5. OSC 11 query (\x1b]11;?\x1b\\) â€” ask the terminal directly
 #   6. Default: assume dark (matches the legacy ReYMeN assumption)
 #
 # Cached after first call so we don't query the terminal repeatedly.
@@ -91,7 +91,7 @@ def _query_osc11_background() -> str | None:
     Returns "#RRGGBB" or None on timeout / non-tty.
 
     Skipped over SSH: the round-trip routinely exceeds our 100ms budget, so a
-    late reply lands after prompt_toolkit has grabbed the tty — its payload
+    late reply lands after prompt_toolkit has grabbed the tty â€” its payload
     leaks in as typed text and the BEL terminator reads as Ctrl+G (open
     editor), trapping the user in a stray editor. Remote sessions fall back to
     COLORFGBG / env hints / the dark default instead.
@@ -141,7 +141,7 @@ def _query_osc11_background() -> str | None:
         if not m:
             return None
 
-        # Each component is 1-4 hex digits — normalize to 8-bit
+        # Each component is 1-4 hex digits â€” normalize to 8-bit
         def norm(h: bytes) -> int:
             v = int(h, 16)
             # Scale to 0-255 based on hex length
@@ -152,7 +152,7 @@ def _query_osc11_background() -> str | None:
         return f"#{r:02X}{g:02X}{b:02X}"
     finally:
         # TCSAFLUSH discards any unread input as it restores the original
-        # attributes — scrubs a slow/partial OSC 11 reply out of the tty
+        # attributes â€” scrubs a slow/partial OSC 11 reply out of the tty
         # buffer before prompt_toolkit can read it as keystrokes.
         try:
             termios.tcsetattr(fd, termios.TCSAFLUSH, old)
@@ -229,7 +229,7 @@ def _detect_light_mode() -> bool:
 #
 # IMPORTANT: only remap colors that are used as STANDALONE foregrounds
 # on the terminal's background.  Don't remap colors that are paired
-# with a dark bg (e.g. status bar text on bg:#1a1a2e) — those would
+# with a dark bg (e.g. status bar text on bg:#1a1a2e) â€” those would
 # become invisible the OTHER direction (dark gray on dark navy).
 _LIGHT_MODE_REMAP: dict[str, str] = {
     # Original (dark-mode) -> Light-mode replacement (darker, readable)
@@ -245,7 +245,7 @@ _LIGHT_MODE_REMAP: dict[str, str] = {
     "#FFF0D4": "#1A1A1A",
     "#CD7F32": "#8A4F1A",  # bronze -> darker bronze
     "#FFEFB5": "#3A2A00",
-    # NOTE: skipping #C0C0C0/#888888/#555555/#8B8682 — those are
+    # NOTE: skipping #C0C0C0/#888888/#555555/#8B8682 â€” those are
     # status-bar foregrounds paired with dark navy bg, where dark
     # remap values would become invisible.
 }
@@ -459,8 +459,8 @@ def _render_final_assistant_content(text: str, mode: str = "render"):
 
     normalized_mode = str(mode or "render").strip().lower()
     if normalized_mode == "strip":
-        # Strip first — inline markdown inside cells (`code`, **bold**, ~~strike~~)
-        # changes cell display width — then re-align so the column padding
+        # Strip first â€” inline markdown inside cells (`code`, **bold**, ~~strike~~)
+        # changes cell display width â€” then re-align so the column padding
         # reflects the final visible text, not the marker-decorated source.
         return _RichText(
             realign_markdown_tables(_strip_markdown_syntax(text), panel_width)
@@ -582,7 +582,7 @@ def _cprint(text: str):
 
     When called from a background thread while a prompt_toolkit
     ``Application`` is running (the common case for the self-improvement
-    background review's ``💾 …`` summary, curator summaries, and other
+    background review's ``ğŸ’¾ â€¦`` summary, curator summaries, and other
     bg-thread emissions), a direct ``_pt_print`` races with the input
     area's redraw and the line can end up visually buried behind the
     prompt.  Route those cases through ``run_in_terminal`` via
@@ -605,7 +605,7 @@ def _cprint(text: str):
 
     # No active app, or we're already on the app's main thread: the
     # direct prompt_toolkit print is safe and matches existing behavior
-    # (spinner frames, streamed tokens, tool activity prefixes, …).
+    # (spinner frames, streamed tokens, tool activity prefixes, â€¦).
     if app is None or not getattr(app, "_is_running", False):
         try:
             _pt_print(_PT_ANSI(text))
@@ -639,22 +639,22 @@ def _cprint(text: str):
         current_loop = None
     except Exception:
         current_loop = None
-    # Same thread as the app's loop → safe to print directly.
+    # Same thread as the app's loop â†’ safe to print directly.
     if current_loop is loop and loop.is_running():
         _pt_print(_PT_ANSI(text))
         return
 
     # Cross-thread emission: ask the app's event loop to schedule a
     # ``run_in_terminal`` that wraps ``_pt_print``.  This hides the
-    # prompt, prints, and redraws.  Fire-and-forget — if scheduling
+    # prompt, prints, and redraws.  Fire-and-forget â€” if scheduling
     # fails we fall back to a direct print so the line isn't lost.
     def _schedule():
         # run_in_terminal() may return either:
-        #   • a coroutine / Future (prompt_toolkit ≥ 3.0) — must be scheduled
+        #   â€¢ a coroutine / Future (prompt_toolkit â‰¥ 3.0) â€” must be scheduled
         #     via ensure_future so the coroutine is actually awaited; calling
         #     it bare would leave it unawaited and silently drop the output
         #     (fixes #23185 Bug A).
-        #   • None (some mocks / older PT builds) — just call the inner
+        #   â€¢ None (some mocks / older PT builds) â€” just call the inner
         #     function directly since PT already executed it synchronously.
         # Do NOT fall back to a bare _pt_print when ensure_future raises,
         # because run_in_terminal already invoked the lambda in that case
@@ -685,7 +685,7 @@ def _cprint(text: str):
 
 
 # ---------------------------------------------------------------------------
-# File-drop / local attachment detection — extracted as pure helpers for tests.
+# File-drop / local attachment detection â€” extracted as pure helpers for tests.
 # ---------------------------------------------------------------------------
 
 _IMAGE_EXTENSIONS = frozenset(
@@ -704,7 +704,7 @@ _IMAGE_EXTENSIONS = frozenset(
 )
 
 
-from src.reymen.sistem.ReYMeN_constants import is_termux as _is_termux_environment
+from reymen.sistem.ReYMeN_constants import is_termux as _is_termux_environment
 import re
 import sys
 import shutil

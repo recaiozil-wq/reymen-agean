@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-"""nmap_ogrenme.py — Kali nmap taramasi OnceHafiza testi"""
+﻿#!/usr/bin/env python3
+"""nmap_ogrenme.py â€” Kali nmap taramasi OnceHafiza testi"""
 
 import json
 import sys
@@ -8,10 +8,10 @@ sys.path.insert(
     0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
 
-from src.reymen.hafiza.gorev_once_kontrol import hafizada_ara, kaydet_isle, isle
+from reymen.hafiza.gorev_once_kontrol import hafizada_ara, kaydet_isle, isle
 
 print("=" * 60)
-print("1. HAFIZADA ARA — daha once nmap taramasi yapilmis mi?")
+print("1. HAFIZADA ARA â€” daha once nmap taramasi yapilmis mi?")
 print("=" * 60)
 sonuc = hafizada_ara("nmap ile port tara", kategori="kali/network/nmap")
 print(f'  bulundu: {sonuc["bulundu"]}')
@@ -26,7 +26,7 @@ else:
 
 print()
 print("=" * 60)
-print("2. KAYDET — kali/network/nmap + guven_skoru")
+print("2. KAYDET â€” kali/network/nmap + guven_skoru")
 print("=" * 60)
 hedef = "localhost 127.0.0.1 servis versiyon taramasi"
 ozet = (
@@ -48,7 +48,7 @@ print(f'  kategori: {sonuc["kategori"]}')
 
 print()
 print("=" * 60)
-print("3. DOGRULAMA — hafizada_ara tekrar")
+print("3. DOGRULAMA â€” hafizada_ara tekrar")
 print("=" * 60)
 sonuc2 = hafizada_ara("nmap localhost servis tespiti", kategori="kali/network/nmap")
 print(f'  bulundu: {sonuc2["bulundu"]}')
@@ -60,7 +60,7 @@ print(f'  kaynak: {sonuc2["kaynak"]}')
 
 print()
 print("=" * 60)
-print("4. ISLE() API — ayni gorev tekrar gelince")
+print("4. ISLE() API â€” ayni gorev tekrar gelince")
 print("=" * 60)
 isle_sonuc = isle(
     "localhost servis versiyon taramasi",
@@ -75,7 +75,7 @@ print(f'  basarili: {isle_sonuc["basarili"]}')
 
 print()
 print("=" * 60)
-print("5. HA FIZADA ARA — tum nmap bilgileri")
+print("5. HA FIZADA ARA â€” tum nmap bilgileri")
 print("=" * 60)
 sonuc3 = hafizada_ara("nmap versiyon tespiti -sV", kategori="kali/network/nmap")
 print(
@@ -87,4 +87,4 @@ print(
 import json
 
 print()
-print("🔴 TUM TESTLER GECTI")
+print("ğŸ”´ TUM TESTLER GECTI")

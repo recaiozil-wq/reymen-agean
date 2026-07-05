@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
-"""circuit_breaker.py — Circuit Breaker pattern (ReYMeN SOUL.md standardı).
+﻿# -*- coding: utf-8 -*-
+"""circuit_breaker.py â€” Circuit Breaker pattern (ReYMeN SOUL.md standardÄ±).
 
-5 ardisik hata → circuit OPEN (30sn bekle) → HALF_OPEN → basarili cagri → CLOSED.
+5 ardisik hata â†’ circuit OPEN (30sn bekle) â†’ HALF_OPEN â†’ basarili cagri â†’ CLOSED.
 
 Kullanim:
     cb = CircuitBreaker()
@@ -29,8 +29,8 @@ class CircuitBreaker:
     """Hata esigi asildiktan sonra sistemi gecici olarak devre disi birakir.
 
     Durum makinesi:
-      CLOSED → (5 hata) → OPEN → (30sn) → HALF_OPEN → (basari) → CLOSED
-                                                        → (hata)  → OPEN
+      CLOSED â†’ (5 hata) â†’ OPEN â†’ (30sn) â†’ HALF_OPEN â†’ (basari) â†’ CLOSED
+                                                        â†’ (hata)  â†’ OPEN
     """
 
     ESIK: int = 5
@@ -44,7 +44,7 @@ class CircuitBreaker:
     def denetle(self) -> Optional[str]:
         """Circuit aciksa engel mesaji doner, aksi halde None.
 
-        OPEN durumunda BEKLEME_SURESI geçtiyse otomatik HALF_OPEN'a gecer.
+        OPEN durumunda BEKLEME_SURESI geÃ§tiyse otomatik HALF_OPEN'a gecer.
         """
         if self.durum == CircuitBreakerState.OPEN:
             gecen = time.time() - self.son_acilma
@@ -52,7 +52,7 @@ class CircuitBreaker:
                 self.durum = CircuitBreakerState.HALF_OPEN
                 return None
             kalan = int(self.BEKLEME_SURESI - gecen)
-            return f"[CIRCUIT_BREAKER] Circuit open — {kalan}s kaldi"
+            return f"[CIRCUIT_BREAKER] Circuit open â€” {kalan}s kaldi"
         return None
 
     def hata_kaydet(self) -> Optional[str]:
@@ -62,19 +62,19 @@ class CircuitBreaker:
             self.durum = CircuitBreakerState.OPEN
             self.son_acilma = time.time()
             return (
-                f"[CIRCUIT_BREAKER] {self.ardisik_hata} ardisik hata — "
+                f"[CIRCUIT_BREAKER] {self.ardisik_hata} ardisik hata â€” "
                 f"circuit open ({self.BEKLEME_SURESI}sn)"
             )
         return None
 
     def basari_kaydet(self) -> None:
-        """Basarili islem bildir. HALF_OPEN → CLOSED, sayac sifirlanir."""
+        """Basarili islem bildir. HALF_OPEN â†’ CLOSED, sayac sifirlanir."""
         if self.durum == CircuitBreakerState.HALF_OPEN:
             self.durum = CircuitBreakerState.CLOSED
         self.ardisik_hata = 0
 
     def sifirla(self) -> None:
-        """Tam sifirla — test veya manuel mudahale icin."""
+        """Tam sifirla â€” test veya manuel mudahale icin."""
         self.durum = CircuitBreakerState.CLOSED
         self.ardisik_hata = 0
         self.son_acilma = 0.0

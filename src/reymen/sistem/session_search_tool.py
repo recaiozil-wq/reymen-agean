@@ -1,11 +1,11 @@
-# -*- coding: utf-8 -*-
-"""session_search_tool.py — Oturumlar Arası Arama Aracı.
+﻿# -*- coding: utf-8 -*-
+"""session_search_tool.py â€” Oturumlar ArasÄ± Arama AracÄ±.
 
-ReYMeN'teki session_search tool'un ReYMeN uyarlaması.
-FTS5 altyapısını (hafiza_genislet.py) kullanarak
-geçmiş konuşmalarda tam metin arama yapar.
+ReYMeN'teki session_search tool'un ReYMeN uyarlamasÄ±.
+FTS5 altyapÄ±sÄ±nÄ± (hafiza_genislet.py) kullanarak
+geÃ§miÅŸ konuÅŸmalarda tam metin arama yapar.
 
-ToolRegistry'e kayıt için:
+ToolRegistry'e kayÄ±t iÃ§in:
     TOOL_META = {...}
     def run(...)
 """
@@ -21,22 +21,22 @@ logger = logging.getLogger(__name__)
 TOOL_META = {
     "ad": "session_search",
     "versiyon": "1.0.0",
-    "aciklama": "Geçmiş konuşmalarda FTS5 ile tam metin arama yapar.",
+    "aciklama": "GeÃ§miÅŸ konuÅŸmalarda FTS5 ile tam metin arama yapar.",
     "kategori": "bellek",
     "parametreler": {
         "sorgu": {
             "tip": "str",
-            "aciklama": "FTS5 arama sorgusu (örn: 'decorator AND python')",
+            "aciklama": "FTS5 arama sorgusu (Ã¶rn: 'decorator AND python')",
             "zorunlu": True,
         },
         "limit": {
             "tip": "int",
-            "aciklama": "Maksimum sonuç sayısı (varsayılan: 5)",
+            "aciklama": "Maksimum sonuÃ§ sayÄ±sÄ± (varsayÄ±lan: 5)",
             "zorunlu": False,
         },
         "koleksiyon": {
             "tip": "str",
-            "aciklama": "Koleksiyon filtresi (boş = tümü)",
+            "aciklama": "Koleksiyon filtresi (boÅŸ = tÃ¼mÃ¼)",
             "zorunlu": False,
         },
     },
@@ -45,7 +45,7 @@ TOOL_META = {
 
 
 def _get_hafiza():
-    """GelismisHafiza örneğini al."""
+    """GelismisHafiza Ã¶rneÄŸini al."""
     try:
         from reymen.hafiza.hafiza_genislet import GelismisHafiza
 
@@ -58,22 +58,22 @@ def _get_hafiza():
 
 
 def run(sorgu: str, limit: int = 5, koleksiyon: str = "") -> str:
-    """Geçmiş konuşmalarda FTS5 ile tam metin arama yap.
+    """GeÃ§miÅŸ konuÅŸmalarda FTS5 ile tam metin arama yap.
 
     Args:
-        sorgu: FTS5 sorgusu (örn: 'decorator AND python')
-        limit: Maks sonuç sayısı (varsayılan: 5)
-        koleksiyon: Koleksiyon filtresi (boş = tümü)
+        sorgu: FTS5 sorgusu (Ã¶rn: 'decorator AND python')
+        limit: Maks sonuÃ§ sayÄ±sÄ± (varsayÄ±lan: 5)
+        koleksiyon: Koleksiyon filtresi (boÅŸ = tÃ¼mÃ¼)
 
     Returns:
-        str: Formatlanmış arama sonuçları
+        str: FormatlanmÄ±ÅŸ arama sonuÃ§larÄ±
     """
     if not sorgu.strip():
-        return "[SESSION_SEARCH] Sorgu boş, sonuç yok."
+        return "[SESSION_SEARCH] Sorgu boÅŸ, sonuÃ§ yok."
 
     hf = _get_hafiza()
     if not hf:
-        # Alternatif: session.db üzerinden SQLite arama
+        # Alternatif: session.db Ã¼zerinden SQLite arama
         return _fallback_ara(sorgu, limit, koleksiyon)
 
     try:
@@ -86,10 +86,10 @@ def run(sorgu: str, limit: int = 5, koleksiyon: str = "") -> str:
         return f"[SESSION_SEARCH_HATASI] {e}"
 
     if not sonuclar:
-        return f"[SESSION_SEARCH] '{sorgu}' için sonuç bulunamadı."
+        return f"[SESSION_SEARCH] '{sorgu}' iÃ§in sonuÃ§ bulunamadÄ±."
 
     satirlar = []
-    satirlar.append(f"🔍 '{sorgu}' için {len(sonuclar)} sonuç:")
+    satirlar.append(f"ğŸ” '{sorgu}' iÃ§in {len(sonuclar)} sonuÃ§:")
     satirlar.append("")
 
     for i, doc in enumerate(sonuclar, 1):
@@ -101,9 +101,9 @@ def run(sorgu: str, limit: int = 5, koleksiyon: str = "") -> str:
 
         satirlar.append(f"  {i}. [{koleks}] S:{session}")
         if zaman:
-            satirlar.append(f"     ⏱ {zaman}")
-        satirlar.append(f"     📄 {icerik}")
-        satirlar.append(f"     ⭐ skor: {skor:.2f}")
+            satirlar.append(f"     â± {zaman}")
+        satirlar.append(f"     ğŸ“„ {icerik}")
+        satirlar.append(f"     â­ skor: {skor:.2f}")
         satirlar.append("")
 
     return "\n".join(satirlar)
@@ -127,7 +127,7 @@ def _fallback_ara(sorgu: str, limit: int = 5, koleksiyon: str = "") -> str:
                 # LIKE ile basit arama
                 like_sorgu = f"%{sorgu}%"
                 satirlar = []
-                satirlar.append(f"🔍 '{sorgu}' için fallback arama ({db_yol.name}):")
+                satirlar.append(f"ğŸ” '{sorgu}' iÃ§in fallback arama ({db_yol.name}):")
 
                 try:
                     c.execute(
@@ -138,27 +138,27 @@ def _fallback_ara(sorgu: str, limit: int = 5, koleksiyon: str = "") -> str:
                     if rows:
                         for i, (sid, icerik) in enumerate(rows, 1):
                             satirlar.append(
-                                f"  {i}. S:{str(sid)[:20]} → {str(icerik)[:150]}"
+                                f"  {i}. S:{str(sid)[:20]} â†’ {str(icerik)[:150]}"
                             )
                     else:
-                        satirlar.append("  Sonuç yok.")
+                        satirlar.append("  SonuÃ§ yok.")
                 except Exception:
-                    satirlar.append("  Tablo bulunamadı.")
+                    satirlar.append("  Tablo bulunamadÄ±.")
 
                 conn.close()
                 return "\n".join(satirlar)
     except Exception as _session__e144:
         print(f"[UYARI] session_search_tool.py:145 - {_session__e144}")
 
-    return f"[SESSION_SEARCH] Hafıza sistemi mevcut değil (pip install gerekiyor olabilir)."
+    return f"[SESSION_SEARCH] HafÄ±za sistemi mevcut deÄŸil (pip install gerekiyor olabilir)."
 
 
 def check_fn(parametreler: dict) -> tuple:
-    """Doğrulama: sorgu parametresi zorunlu."""
+    """DoÄŸrulama: sorgu parametresi zorunlu."""
     if not parametreler.get("sorgu"):
         return False, "SESSION_SEARCH: 'sorgu' parametresi zorunludur"
     return True, ""
 
 
-# Kısa kullanım alias
+# KÄ±sa kullanÄ±m alias
 SESSION_SEARCH = run

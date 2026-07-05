@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-insan_arayuzu.py — Kullanıcı arayüzü.
+insan_arayuzu.py â€” KullanÄ±cÄ± arayÃ¼zÃ¼.
 
 HumanInterface sinifi ile konsol tabanli kullanici arayuzu
 bilesenleri sunar. Progress bar, kullanici girdisi, onay
@@ -178,8 +178,8 @@ class HumanInterface:
         """
         Kullanicidan onay alir.
 
-        REYMEN_OTOMATIK_ONAY=true ise direkt True döner (kullanıcıya sormaz).
-        ReYMeN Agent'ın approvals.mode=off / Allow Once pattern'i ile aynı.
+        REYMEN_OTOMATIK_ONAY=true ise direkt True dÃ¶ner (kullanÄ±cÄ±ya sormaz).
+        ReYMeN Agent'Ä±n approvals.mode=off / Allow Once pattern'i ile aynÄ±.
 
         Args:
             mesaj: Onay mesaji.
@@ -346,7 +346,7 @@ class HumanInterface:
         """Windows MessageBox veya konsol onay diyalogu.
 
         Args:
-            baslik: Pencere / konsol basligı
+            baslik: Pencere / konsol basligÄ±
             mesaj:  Kullaniciya gosterilecek mesaj
 
         Returns:

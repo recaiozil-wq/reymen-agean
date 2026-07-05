@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 
-from src.reymen.arac.image_gen_engine import (
+from reymen.arac.image_gen_engine import (
     FALEngine,
     ImageGenEngine,
     ImageGenRegistry,
@@ -14,7 +14,7 @@ from src.reymen.arac.image_gen_engine import (
 
 # Framework adaptor (opsiyonel)
 try:
-    from src.reymen.arac.framework_adaptor import (
+    from reymen.arac.framework_adaptor import (
         FrameworkYonetici,
         framework_adaptor,
         LangGraphAdaptor,

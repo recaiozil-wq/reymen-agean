@@ -1,4 +1,4 @@
-"""ReYMeN tools.mcp_tool shim — Hermes MCP tool fonksiyonlarını yönlendirir."""
+﻿"""ReYMeN tools.mcp_tool shim â€” ReYMeN MCP tool fonksiyonlarÄ±nÄ± yÃ¶nlendirir."""
 
 from __future__ import annotations
 
@@ -12,15 +12,15 @@ _lock = None
 
 
 def discover_mcp_tools(*args, **kwargs) -> List[Dict[str, Any]]:
-    """Hermes discover_mcp_tools — ReYMeN stub."""
+    """ReYMeN discover_mcp_tools â€” ReYMeN stub."""
     return []
 
 
 def shutdown_mcp_servers() -> None:
-    """Hermes shutdown_mcp_servers — ReYMeN stub."""
+    """ReYMeN shutdown_mcp_servers â€” ReYMeN stub."""
     pass
 
 
 def _kill_orphaned_mcp_children() -> None:
-    """Hermes _kill_orphaned_mcp_children — ReYMeN stub."""
+    """ReYMeN _kill_orphaned_mcp_children â€” ReYMeN stub."""
     pass

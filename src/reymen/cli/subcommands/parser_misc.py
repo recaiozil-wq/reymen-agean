@@ -1,4 +1,4 @@
-"""misc parsers (status, model, cost, doctor)."""
+﻿"""misc parsers (status, model, cost, doctor)."""
 
 from __future__ import annotations
 import argparse

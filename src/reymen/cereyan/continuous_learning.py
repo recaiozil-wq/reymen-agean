@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-continuous_learning.py — Cross-Session Continuous Learning System.
+continuous_learning.py â€” Cross-Session Continuous Learning System.
 
 ReYMeN's implementation of the "inter-session learning" feature.
 

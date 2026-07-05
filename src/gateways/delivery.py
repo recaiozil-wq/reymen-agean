@@ -1,9 +1,9 @@
-"""
+﻿"""
 Delivery routing for cron job outputs and agent responses.
 
 Routes messages to the appropriate destination based on:
 - Explicit targets (e.g., "telegram:123456789")
-- Platform home channels (e.g., "telegram" → home channel)
+- Platform home channels (e.g., "telegram" â†’ home channel)
 - Origin (back to where the job was created)
 - Local (always saved to files)
 """
@@ -16,7 +16,7 @@ from datetime import datetime
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Any
 
-from src.reymen.cron.hermes_stubs import get_hermes_home
+from reymen.sistem.reymen_stubs import get_reymen_home
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ TRUNCATED_VISIBLE = 3800
 
 # Matches strings that are *only* a "silence" narration with optional markdown
 # wrappers. Covers: *(silent)*, _silent_, `silent`, ~silent~, (silent), silent,
-# 🔇, a bare ".", "…", and the whitespace/marker-padded variants seen in the
+# ğŸ”‡, a bare ".", "â€¦", and the whitespace/marker-padded variants seen in the
 # wild. Anchored to start/end so substantive messages that merely *contain* the
 # word "silent" are never matched.
 _SILENCE_NARRATION = re.compile(
@@ -40,7 +40,7 @@ def _is_silence_narration(content: Optional[str]) -> bool:
 
     Length-guarded (real messages are longer) and anchored to the whole string
     so legitimate prose like "The deployment ran silently" or "Silence is
-    golden — here is the plan..." is never flagged.
+    golden â€” here is the plan..." is never flagged.
     """
     if not content:
         return False
@@ -98,10 +98,10 @@ class DeliveryTarget:
     A single delivery target.
 
     Represents where a message should be sent:
-    - "origin" → back to source
-    - "local" → save to local files
-    - "telegram" → Telegram home channel
-    - "telegram:123456" → specific Telegram chat
+    - "origin" â†’ back to source
+    - "local" â†’ save to local files
+    - "telegram" â†’ Telegram home channel
+    - "telegram:123456" â†’ specific Telegram chat
     """
 
     platform: Platform
@@ -118,10 +118,10 @@ class DeliveryTarget:
         Parse a delivery target string.
 
         Formats:
-        - "origin" → back to source
-        - "local" → local files only
-        - "telegram" → Telegram home channel
-        - "telegram:123456" → specific Telegram chat
+        - "origin" â†’ back to source
+        - "local" â†’ local files only
+        - "telegram" â†’ Telegram home channel
+        - "telegram:123456" â†’ specific Telegram chat
         """
         target_stripped = target.strip()
         target_lower = target_stripped.lower()
@@ -199,7 +199,7 @@ class DeliveryRouter:
         """
         self.config = config
         self.adapters = adapters or {}
-        self.output_dir = get_hermes_home() / "cron" / "output"
+        self.output_dir = get_reymen_home() / "cron" / "output"
 
     async def deliver(
         self,
@@ -283,7 +283,7 @@ class DeliveryRouter:
     def _save_full_output(self, content: str, job_id: str) -> Path:
         """Save full cron output to disk and return the file path."""
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        out_dir = get_hermes_home() / "cron" / "output"
+        out_dir = get_reymen_home() / "cron" / "output"
         out_dir.mkdir(parents=True, exist_ok=True)
         path = out_dir / f"{job_id}_{timestamp}.txt"
         path.write_text(content)
@@ -296,7 +296,7 @@ class DeliveryRouter:
         otherwise the ``gateway.filter_silence_narration`` config flag wins
         (default True).
         """
-        env = os.getenv("HERMES_FILTER_SILENCE_NARRATION")
+        env = os.getenv("REYMEN_FILTER_SILENCE_NARRATION", os.getenv("HERMES_FILTER_SILENCE_NARRATION"))
         if env is not None:
             return env.strip().lower() in ("1", "true", "yes", "on")
         return bool(getattr(self.config, "filter_silence_narration", True))
@@ -318,7 +318,7 @@ class DeliveryRouter:
             job_id = (metadata or {}).get("job_id", "unknown")
             saved_path = self._save_full_output(content, job_id)
             logger.info(
-                "Cron output truncated (%d chars) — full output: %s",
+                "Cron output truncated (%d chars) â€” full output: %s",
                 len(content),
                 saved_path,
             )
@@ -328,13 +328,13 @@ class DeliveryRouter:
             )
 
         # Substrate-level anti-loop guard: drop hallucinated "silence narration"
-        # (*(silent)*, 🔇, a bare ".", etc.) before it ever reaches the adapter.
+        # (*(silent)*, ğŸ”‡, a bare ".", etc.) before it ever reaches the adapter.
         # In bot-to-bot channels these tokens mirror back and forth until a
         # model crashes with "no content after all retries". Behavioral prompt
         # rules drift across providers; this single chokepoint covers every
         # platform adapter regardless of which persona's prompt failed.
         # Local/file delivery (_deliver_local) is a separate path and is never
-        # filtered — saved silence has no loop risk.
+        # filtered â€” saved silence has no loop risk.
         if self._filter_silence_narration_enabled() and _is_silence_narration(content):
             logger.warning(
                 "Dropped silence-narration outbound to %s (chat=%s): %r",

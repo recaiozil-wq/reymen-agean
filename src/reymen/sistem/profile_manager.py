@@ -1,11 +1,11 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-profile_manager.py — ReYMeN Çoklu Profil Yöneticisi.
+profile_manager.py â€” ReYMeN Ã‡oklu Profil YÃ¶neticisi.
 
-config.yaml'daki profiles: bölümünü okur, profil değiştirme ve listeleme
-işlemlerini yönetir. Her profil farklı providers/modeller kullanabilir.
+config.yaml'daki profiles: bÃ¶lÃ¼mÃ¼nÃ¼ okur, profil deÄŸiÅŸtirme ve listeleme
+iÅŸlemlerini yÃ¶netir. Her profil farklÄ± providers/modeller kullanabilir.
 
-Kullanım:
+KullanÄ±m:
     from profile_manager import ProfileManager
     pm = ProfileManager("config.yaml")
     pm.profil_listele()
@@ -21,7 +21,7 @@ from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
-# --- YAML yükleyici ---
+# --- YAML yÃ¼kleyici ---
 try:
     import yaml
 
@@ -32,7 +32,7 @@ except ImportError:
 
 
 class ProfileManager:
-    """Profil yöneticisi — config.yaml'daki profilleri okur ve yönetir."""
+    """Profil yÃ¶neticisi â€” config.yaml'daki profilleri okur ve yÃ¶netir."""
 
     def __init__(self, config_path: Optional[str] = None):
         if config_path is None:
@@ -44,7 +44,7 @@ class ProfileManager:
         self._yukle()
 
     def _yukle(self) -> None:
-        """Profilleri config.yaml'dan yükle."""
+        """Profilleri config.yaml'dan yÃ¼kle."""
         if not _YAML_MEVCUT:
             logger.error("PyYAML kurulu degil, profil yuklemesi yapilamadi")
             return
@@ -129,13 +129,13 @@ class ProfileManager:
             )
 
     def profil_degistir(self, ad: str) -> str:
-        """Aktif profili değiştir.
+        """Aktif profili deÄŸiÅŸtir.
 
         Args:
             ad: Profil adi (reyment, dev, test, prod)
 
         Returns:
-            str: Başarılı/başarısız mesajı
+            str: BaÅŸarÄ±lÄ±/baÅŸarÄ±sÄ±z mesajÄ±
         """
         ad = ad.strip().lower()
         if ad not in self._profiller:
@@ -162,7 +162,7 @@ class ProfileManager:
         )
 
     def profil_listele(self) -> str:
-        """Tüm profilleri listele."""
+        """TÃ¼m profilleri listele."""
         if not self._profiller:
             return "[Profil] UYARI: Hicbir profil tanimlanmamis."
 

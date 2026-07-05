@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""commands.py — Slash komut registry ve handler yonlendirme.
+﻿# -*- coding: utf-8 -*-
+"""commands.py â€” Slash komut registry ve handler yonlendirme.
 
 Bu modul, ``ReYMeN_cli/commands.py`` ile ayni ``CommandDef`` yapisini kullanir,
 ancak ReYMeN'in kendi CLI (``reymen.console`` / ``reymen.cli.tui``) icin
@@ -37,11 +37,11 @@ class CommandDef:
     """Tek bir slash komut tanimi.
 
     Attributes:
-        name:        Kanonik komut adi (slash yok) — orn: "help", "search".
+        name:        Kanonik komut adi (slash yok) â€” orn: "help", "search".
         description: Insan-okunabilir aciklama.
-        category:    Kategori adi — "Bilgi", "Oturum", "Yapilandirma", vb.
-        aliases:    Alternatif adlar — orn: ("h", "yardim").
-        args_hint:  Arguman ipucu — orn: "<sorgu>", "[model]".
+        category:    Kategori adi â€” "Bilgi", "Oturum", "Yapilandirma", vb.
+        aliases:    Alternatif adlar â€” orn: ("h", "yardim").
+        args_hint:  Arguman ipucu â€” orn: "<sorgu>", "[model]".
         handler:    Komutu calistiracak fonksiyon (Callable[[str], str]).
     """
 
@@ -54,7 +54,7 @@ class CommandDef:
 
 
 # ---------------------------------------------------------------------------
-# Handler'lar — mevcut parser'lara yonlendirme
+# Handler'lar â€” mevcut parser'lara yonlendirme
 # ---------------------------------------------------------------------------
 
 def _handler_help(args: str = "") -> str:
@@ -63,7 +63,7 @@ def _handler_help(args: str = "") -> str:
 
     satirlar = [
         f"{g('ReYMeN Slash Komutlari')}",
-        f"{d('─' * 45)}",
+        f"{d('â”€' * 45)}",
     ]
     # Mevcut kayitli komutlari listele
     for cmd in SLASH_COMMANDS.values():
@@ -77,7 +77,7 @@ def _handler_help(args: str = "") -> str:
 
 
 def _handler_status(args: str = "") -> str:
-    """Genel durum raporu — parser_misc.add_status_parser yapisina yonlenir."""
+    """Genel durum raporu â€” parser_misc.add_status_parser yapisina yonlenir."""
     import argparse
 
     parser = argparse.ArgumentParser(prog="reymen")
@@ -95,7 +95,7 @@ def _handler_status(args: str = "") -> str:
 
 
 def _handler_model(args: str = "") -> str:
-    """Model secimi — parser_misc.add_model_parser yapisina yonlenir."""
+    """Model secimi â€” parser_misc.add_model_parser yapisina yonlenir."""
     import argparse
 
     parser = argparse.ArgumentParser(prog="reymen")
@@ -116,7 +116,7 @@ def _handler_model(args: str = "") -> str:
 
 
 def _handler_search(args: str = "") -> str:
-    """Gecmis konusma arama — session_search_tool yapisina yonlenir."""
+    """Gecmis konusma arama â€” session_search_tool yapisina yonlenir."""
     if not args.strip():
         return (
             "[Arama] Kullanim: /search <sorgu> [--limit N]\n"
@@ -134,7 +134,7 @@ def _handler_search(args: str = "") -> str:
 
 
 def _handler_backup(args: str = "") -> str:
-    """Git yedekleme — parser_backup.add_backup_parser yapisina yonlenir."""
+    """Git yedekleme â€” parser_backup.add_backup_parser yapisina yonlenir."""
     import argparse
 
     parser = argparse.ArgumentParser(prog="reymen")
@@ -163,19 +163,19 @@ def _handler_backup(args: str = "") -> str:
 
 
 def _handler_doctor(args: str = "") -> str:
-    """Sistem saglik kontrolu — parser_misc.add_doctor_parser yapisina yonlenir."""
+    """Sistem saglik kontrolu â€” parser_misc.add_doctor_parser yapisina yonlenir."""
     import sys
     from pathlib import Path
 
-    satirlar = ["🩺 ReYMeN Sistem Saglik Kontrolu", "─" * 40]
+    satirlar = ["ğŸ©º ReYMeN Sistem Saglik Kontrolu", "â”€" * 40]
     satirlar.append(f"  Python:    {sys.version.split()[0]}")
     env_paths = [Path.cwd() / ".env", Path.home() / ".reymen" / ".env"]
     for ep in env_paths:
         if ep.exists():
-            satirlar.append(f"  .env:      {ep} (✓)")
+            satirlar.append(f"  .env:      {ep} (âœ“)")
             break
     else:
-        satirlar.append("  .env:      Bulunamadi (✗)")
+        satirlar.append("  .env:      Bulunamadi (âœ—)")
     try:
         from reymen.cli.profiles import list_profiles
         profiller = list_profiles()
@@ -183,12 +183,12 @@ def _handler_doctor(args: str = "") -> str:
     except ImportError:
         satirlar.append("  Profiller: profil modulu yuklu degil")
     satirlar.append("")
-    satirlar.append("✅ Sistem saglikli gorunuyor.")
+    satirlar.append("âœ… Sistem saglikli gorunuyor.")
     return "\n".join(satirlar)
 
 
 def _handler_config(args: str = "") -> str:
-    """Config goruntuleme — parser_config.add_config_parser yapisina yonlenir."""
+    """Config goruntuleme â€” parser_config.add_config_parser yapisina yonlenir."""
     import argparse
 
     parser = argparse.ArgumentParser(prog="reymen")
@@ -210,7 +210,7 @@ def _handler_config(args: str = "") -> str:
             return f"  {ns.key}: {val}"
         elif sub_cmd == "set" and hasattr(ns, "key") and hasattr(ns, "value"):
             config_manager.set(ns.key, ns.value)
-            return f"  ✅ {ns.key} = {ns.value}"
+            return f"  âœ… {ns.key} = {ns.value}"
         elif sub_cmd == "path":
             return f"  Config yolu: {config_manager.config_path or 'Bilinmiyor'}"
         elif sub_cmd in ("env", "list"):
@@ -224,7 +224,7 @@ def _handler_config(args: str = "") -> str:
 
 
 def _handler_session(args: str = "") -> str:
-    """Session yonetimi — parser_session.add_session_parser yapisina yonlenir."""
+    """Session yonetimi â€” parser_session.add_session_parser yapisina yonlenir."""
     import argparse
 
     parser = argparse.ArgumentParser(prog="reymen")
@@ -242,12 +242,12 @@ def _handler_session(args: str = "") -> str:
         db = SessionDB()
         if sub_cmd == "list":
             sessions = db.list_sessions(limit=limit)
-            lines = [f"  {s.get('session_id', s.get('id', '?'))[:12]} | {s.get('title', s.get('name', 'İsimsiz'))}" for s in sessions]
+            lines = [f"  {s.get('session_id', s.get('id', '?'))[:12]} | {s.get('title', s.get('name', 'Ä°simsiz'))}" for s in sessions]
             return f"[Oturumlar] ({len(sessions)} adet)\n" + "\n".join(lines)
         elif sub_cmd == "last":
             s = db.get_last_session()
             if s:
-                return f"[Son Oturum] {s.get('session_id', s.get('id', '?'))[:12]} | {s.get('title', s.get('name', 'İsimsiz'))}"
+                return f"[Son Oturum] {s.get('session_id', s.get('id', '?'))[:12]} | {s.get('title', s.get('name', 'Ä°simsiz'))}"
             return "[Son Oturum] Bulunamadi."
         return "[Oturum] Kullanim: /session [list|last] [--limit N]"
     except ImportError:
@@ -257,7 +257,7 @@ def _handler_session(args: str = "") -> str:
 
 
 def _handler_skills(args: str = "") -> str:
-    """Skill yonetimi — parser_misc.add_skills_parser yapisina yonlenir."""
+    """Skill yonetimi â€” parser_misc.add_skills_parser yapisina yonlenir."""
     try:
         from reymen.core.skills_hub import SkillsHub
 
@@ -276,7 +276,7 @@ def _handler_skills(args: str = "") -> str:
 
 
 def _handler_gateway(args: str = "") -> str:
-    """Gateway yonetimi — parser_gateway.add_gateway_parser yapisina yonlenir."""
+    """Gateway yonetimi â€” parser_gateway.add_gateway_parser yapisina yonlenir."""
     import argparse
 
     parser = argparse.ArgumentParser(prog="reymen")
@@ -295,7 +295,7 @@ def _handler_gateway(args: str = "") -> str:
             return f"[Gateway Durumu]\n{durum}"
         elif sub_cmd == "list":
             platforms = gw.list_platforms()
-            lines = [f"  {p['name']:<20} {'🟢' if p.get('active') else '🔴'}" for p in platforms]
+            lines = [f"  {p['name']:<20} {'ğŸŸ¢' if p.get('active') else 'ğŸ”´'}" for p in platforms]
             return f"[Gateway Platformlari]\n" + "\n".join(lines)
         elif sub_cmd == "start":
             profil = getattr(ns, "profil", None)
@@ -315,7 +315,7 @@ def _handler_gateway(args: str = "") -> str:
 
 
 def _handler_cron(args: str = "") -> str:
-    """Cron yonetimi — parser_cron.add_cron_parser yapisina yonlenir."""
+    """Cron yonetimi â€” parser_cron.add_cron_parser yapisina yonlenir."""
     import argparse
 
     parser = argparse.ArgumentParser(prog="reymen")
@@ -375,7 +375,7 @@ def _handler_image(args: str = "") -> str:
         result = gorsel_olustur(prompt=args.strip())
         return f"[Gorsel: {args.strip()}]\n{result}"
     except ImportError:
-        return f"[Gorsel] '{args.strip()}' — gorsel olusturma araci yuklu degil."
+        return f"[Gorsel] '{args.strip()}' â€” gorsel olusturma araci yuklu degil."
     except Exception as e:
         return f"[Gorsel] Hata: {e}"
 
@@ -384,405 +384,405 @@ def _handler_image(args: str = "") -> str:
 
 
 def _handler_agents(args: str = "") -> str:
-    """/agents — Show active agents and running tasks"""
+    """/agents â€” Show active agents and running tasks"""
     # TODO: implementasyon eklenecek
-    return f"/agents stub — Show active agents and running tasks"
+    return f"/agents stub â€” Show active agents and running tasks"
 
 
 def _handler_approve(args: str = "") -> str:
-    """/approve — Approve a pending dangerous command"""
+    """/approve â€” Approve a pending dangerous command"""
     # TODO: implementasyon eklenecek
-    return f"/approve stub — Approve a pending dangerous command"
+    return f"/approve stub â€” Approve a pending dangerous command"
 
 
 def _handler_background(args: str = "") -> str:
-    """/background — Run a prompt in the background"""
+    """/background â€” Run a prompt in the background"""
     # TODO: implementasyon eklenecek
-    return f"/background stub — Run a prompt in the background"
+    return f"/background stub â€” Run a prompt in the background"
 
 
 def _handler_billing(args: str = "") -> str:
-    """/billing — Manage Nous terminal billing — buy credits, auto-reload, limits"""
+    """/billing â€” Manage Nous terminal billing â€” buy credits, auto-reload, limits"""
     # TODO: implementasyon eklenecek
-    return f"/billing stub — Manage Nous terminal billing — buy credits, auto-reload, limits"
+    return f"/billing stub â€” Manage Nous terminal billing â€” buy credits, auto-reload, limits"
 
 
 def _handler_blueprint(args: str = "") -> str:
-    """/blueprint — Set up an automation from a blueprint template"""
+    """/blueprint â€” Set up an automation from a blueprint template"""
     # TODO: implementasyon eklenecek
-    return f"/blueprint stub — Set up an automation from a blueprint template"
+    return f"/blueprint stub â€” Set up an automation from a blueprint template"
 
 
 def _handler_branch(args: str = "") -> str:
-    """/branch — Branch the current session (explore a different path)"""
+    """/branch â€” Branch the current session (explore a different path)"""
     # TODO: implementasyon eklenecek
-    return f"/branch stub — Branch the current session (explore a different path)"
+    return f"/branch stub â€” Branch the current session (explore a different path)"
 
 
 def _handler_browser(args: str = "") -> str:
-    """/browser — Connect browser tools to your live Chromium-family browser via CDP"""
+    """/browser â€” Connect browser tools to your live Chromium-family browser via CDP"""
     # TODO: implementasyon eklenecek
-    return f"/browser stub — Connect browser tools to your live Chromium-family browser via CDP"
+    return f"/browser stub â€” Connect browser tools to your live Chromium-family browser via CDP"
 
 
 def _handler_bundles(args: str = "") -> str:
-    """/bundles — List skill bundles (aliases /<name> for multiple skills)"""
+    """/bundles â€” List skill bundles (aliases /<name> for multiple skills)"""
     # TODO: implementasyon eklenecek
-    return f"/bundles stub — List skill bundles (aliases /<name> for multiple skills)"
+    return f"/bundles stub â€” List skill bundles (aliases /<name> for multiple skills)"
 
 
 def _handler_busy(args: str = "") -> str:
-    """/busy — Control what Enter does while Hermes is working"""
+    """/busy â€” Control what Enter does while ReYMeN is working"""
     # TODO: implementasyon eklenecek
-    return f"/busy stub — Control what Enter does while Hermes is working"
+    return f"/busy stub â€” Control what Enter does while ReYMeN is working"
 
 
 def _handler_clear(args: str = "") -> str:
-    """/clear — Clear screen and start a new session"""
+    """/clear â€” Clear screen and start a new session"""
     # TODO: implementasyon eklenecek
-    return f"/clear stub — Clear screen and start a new session"
+    return f"/clear stub â€” Clear screen and start a new session"
 
 
 def _handler_codex_runtime(args: str = "") -> str:
-    """/codex-runtime — Toggle codex app-server runtime for OpenAI/Codex models"""
+    """/codex-runtime â€” Toggle codex app-server runtime for OpenAI/Codex models"""
     # TODO: implementasyon eklenecek
-    return f"/codex-runtime stub — Toggle codex app-server runtime for OpenAI/Codex models"
+    return f"/codex-runtime stub â€” Toggle codex app-server runtime for OpenAI/Codex models"
 
 
 def _handler_commands(args: str = "") -> str:
-    """/commands — Browse all commands and skills (paginated)"""
+    """/commands â€” Browse all commands and skills (paginated)"""
     # TODO: implementasyon eklenecek
-    return f"/commands stub — Browse all commands and skills (paginated)"
+    return f"/commands stub â€” Browse all commands and skills (paginated)"
 
 
 def _handler_compress(args: str = "") -> str:
-    """/compress — Compress conversation context (add 'here [N]' to keep recent N turns)"""
+    """/compress â€” Compress conversation context (add 'here [N]' to keep recent N turns)"""
     # TODO: implementasyon eklenecek
-    return f"/compress stub — Compress conversation context (add 'here [N]' to keep recent N turns)"
+    return f"/compress stub â€” Compress conversation context (add 'here [N]' to keep recent N turns)"
 
 
 def _handler_copy(args: str = "") -> str:
-    """/copy — Copy the last assistant response to clipboard"""
+    """/copy â€” Copy the last assistant response to clipboard"""
     # TODO: implementasyon eklenecek
-    return f"/copy stub — Copy the last assistant response to clipboard"
+    return f"/copy stub â€” Copy the last assistant response to clipboard"
 
 
 def _handler_credits(args: str = "") -> str:
-    """/credits — Show Nous credit balance and top up"""
+    """/credits â€” Show Nous credit balance and top up"""
     # TODO: implementasyon eklenecek
-    return f"/credits stub — Show Nous credit balance and top up"
+    return f"/credits stub â€” Show Nous credit balance and top up"
 
 
 def _handler_curator(args: str = "") -> str:
-    """/curator — Background skill maintenance (status, run, pin, archive, list-archived)"""
+    """/curator â€” Background skill maintenance (status, run, pin, archive, list-archived)"""
     # TODO: implementasyon eklenecek
-    return f"/curator stub — Background skill maintenance (status, run, pin, archive, list-archived)"
+    return f"/curator stub â€” Background skill maintenance (status, run, pin, archive, list-archived)"
 
 
 def _handler_debug(args: str = "") -> str:
-    """/debug — Upload debug report (system info + logs) and get shareable links"""
+    """/debug â€” Upload debug report (system info + logs) and get shareable links"""
     # TODO: implementasyon eklenecek
-    return f"/debug stub — Upload debug report (system info + logs) and get shareable links"
+    return f"/debug stub â€” Upload debug report (system info + logs) and get shareable links"
 
 
 def _handler_deny(args: str = "") -> str:
-    """/deny — Deny a pending dangerous command"""
+    """/deny â€” Deny a pending dangerous command"""
     # TODO: implementasyon eklenecek
-    return f"/deny stub — Deny a pending dangerous command"
+    return f"/deny stub â€” Deny a pending dangerous command"
 
 
 def _handler_fast(args: str = "") -> str:
-    """/fast — Toggle fast mode — OpenAI Priority Processing / Anthropic Fast Mode (Normal/Fast)"""
+    """/fast â€” Toggle fast mode â€” OpenAI Priority Processing / Anthropic Fast Mode (Normal/Fast)"""
     # TODO: implementasyon eklenecek
-    return f"/fast stub — Toggle fast mode — OpenAI Priority Processing / Anthropic Fast Mode (Normal/Fast)"
+    return f"/fast stub â€” Toggle fast mode â€” OpenAI Priority Processing / Anthropic Fast Mode (Normal/Fast)"
 
 
 def _handler_footer(args: str = "") -> str:
-    """/footer — Toggle gateway runtime-metadata footer on final replies"""
+    """/footer â€” Toggle gateway runtime-metadata footer on final replies"""
     # TODO: implementasyon eklenecek
-    return f"/footer stub — Toggle gateway runtime-metadata footer on final replies"
+    return f"/footer stub â€” Toggle gateway runtime-metadata footer on final replies"
 
 
 def _handler_goal(args: str = "") -> str:
-    """/goal — Set a standing goal Hermes works on across turns until achieved"""
+    """/goal â€” Set a standing goal ReYMeN works on across turns until achieved"""
     # TODO: implementasyon eklenecek
-    return f"/goal stub — Set a standing goal Hermes works on across turns until achieved"
+    return f"/goal stub â€” Set a standing goal ReYMeN works on across turns until achieved"
 
 
 def _handler_gquota(args: str = "") -> str:
-    """/gquota — Show Google Gemini Code Assist quota usage"""
+    """/gquota â€” Show Google Gemini Code Assist quota usage"""
     # TODO: implementasyon eklenecek
-    return f"/gquota stub — Show Google Gemini Code Assist quota usage"
+    return f"/gquota stub â€” Show Google Gemini Code Assist quota usage"
 
 
 def _handler_handoff(args: str = "") -> str:
-    """/handoff — Hand off this session to a messaging platform (Telegram, Discord, etc.)"""
+    """/handoff â€” Hand off this session to a messaging platform (Telegram, Discord, etc.)"""
     # TODO: implementasyon eklenecek
-    return f"/handoff stub — Hand off this session to a messaging platform (Telegram, Discord, etc.)"
+    return f"/handoff stub â€” Hand off this session to a messaging platform (Telegram, Discord, etc.)"
 
 
 def _handler_history(args: str = "") -> str:
-    """/history — Show conversation history"""
+    """/history â€” Show conversation history"""
     # TODO: implementasyon eklenecek
-    return f"/history stub — Show conversation history"
+    return f"/history stub â€” Show conversation history"
 
 
 def _handler_indicator(args: str = "") -> str:
-    """/indicator — Pick the TUI busy-indicator style"""
+    """/indicator â€” Pick the TUI busy-indicator style"""
     # TODO: implementasyon eklenecek
-    return f"/indicator stub — Pick the TUI busy-indicator style"
+    return f"/indicator stub â€” Pick the TUI busy-indicator style"
 
 
 def _handler_insights(args: str = "") -> str:
-    """/insights — Show usage insights and analytics"""
+    """/insights â€” Show usage insights and analytics"""
     # TODO: implementasyon eklenecek
-    return f"/insights stub — Show usage insights and analytics"
+    return f"/insights stub â€” Show usage insights and analytics"
 
 
 def _handler_kanban(args: str = "") -> str:
-    """/kanban — Multi-profile collaboration board (tasks, links, comments)"""
+    """/kanban â€” Multi-profile collaboration board (tasks, links, comments)"""
     # TODO: implementasyon eklenecek
-    return f"/kanban stub — Multi-profile collaboration board (tasks, links, comments)"
+    return f"/kanban stub â€” Multi-profile collaboration board (tasks, links, comments)"
 
 
 def _handler_memory(args: str = "") -> str:
-    """/memory — Review pending memory writes / toggle the approval gate"""
+    """/memory â€” Review pending memory writes / toggle the approval gate"""
     # TODO: implementasyon eklenecek
-    return f"/memory stub — Review pending memory writes / toggle the approval gate"
+    return f"/memory stub â€” Review pending memory writes / toggle the approval gate"
 
 
 def _handler_new(args: str = "") -> str:
-    """/new — Start a new session (fresh session ID + history)"""
+    """/new â€” Start a new session (fresh session ID + history)"""
     # TODO: implementasyon eklenecek
-    return f"/new stub — Start a new session (fresh session ID + history)"
+    return f"/new stub â€” Start a new session (fresh session ID + history)"
 
 
 def _handler_paste(args: str = "") -> str:
-    """/paste — Attach clipboard image from your clipboard"""
+    """/paste â€” Attach clipboard image from your clipboard"""
     # TODO: implementasyon eklenecek
-    return f"/paste stub — Attach clipboard image from your clipboard"
+    return f"/paste stub â€” Attach clipboard image from your clipboard"
 
 
 def _handler_personality(args: str = "") -> str:
-    """/personality — Set a predefined personality"""
+    """/personality â€” Set a predefined personality"""
     # TODO: implementasyon eklenecek
-    return f"/personality stub — Set a predefined personality"
+    return f"/personality stub â€” Set a predefined personality"
 
 
 def _handler_platform(args: str = "") -> str:
-    """/platform — Pause, resume, or list a failing gateway platform"""
+    """/platform â€” Pause, resume, or list a failing gateway platform"""
     # TODO: implementasyon eklenecek
-    return f"/platform stub — Pause, resume, or list a failing gateway platform"
+    return f"/platform stub â€” Pause, resume, or list a failing gateway platform"
 
 
 def _handler_plugins(args: str = "") -> str:
-    """/plugins — List installed plugins and their status"""
+    """/plugins â€” List installed plugins and their status"""
     # TODO: implementasyon eklenecek
-    return f"/plugins stub — List installed plugins and their status"
+    return f"/plugins stub â€” List installed plugins and their status"
 
 
 def _handler_profile(args: str = "") -> str:
-    """/profile — Show active profile name and home directory"""
+    """/profile â€” Show active profile name and home directory"""
     # TODO: implementasyon eklenecek
-    return f"/profile stub — Show active profile name and home directory"
+    return f"/profile stub â€” Show active profile name and home directory"
 
 
 def _handler_queue(args: str = "") -> str:
-    """/queue — Queue a prompt for the next turn (doesn't interrupt)"""
+    """/queue â€” Queue a prompt for the next turn (doesn't interrupt)"""
     # TODO: implementasyon eklenecek
-    return f"/queue stub — Queue a prompt for the next turn (doesn't interrupt)"
+    return f"/queue stub â€” Queue a prompt for the next turn (doesn't interrupt)"
 
 
 def _handler_quit(args: str = "") -> str:
-    """/quit — Exit the CLI (use --delete to also remove session history)"""
+    """/quit â€” Exit the CLI (use --delete to also remove session history)"""
     # TODO: implementasyon eklenecek
-    return f"/quit stub — Exit the CLI (use --delete to also remove session history)"
+    return f"/quit stub â€” Exit the CLI (use --delete to also remove session history)"
 
 
 def _handler_reasoning(args: str = "") -> str:
-    """/reasoning — Manage reasoning effort and display"""
+    """/reasoning â€” Manage reasoning effort and display"""
     # TODO: implementasyon eklenecek
-    return f"/reasoning stub — Manage reasoning effort and display"
+    return f"/reasoning stub â€” Manage reasoning effort and display"
 
 
 def _handler_redraw(args: str = "") -> str:
-    """/redraw — Force a full UI repaint (recovers from terminal drift)"""
+    """/redraw â€” Force a full UI repaint (recovers from terminal drift)"""
     # TODO: implementasyon eklenecek
-    return f"/redraw stub — Force a full UI repaint (recovers from terminal drift)"
+    return f"/redraw stub â€” Force a full UI repaint (recovers from terminal drift)"
 
 
 def _handler_reload(args: str = "") -> str:
-    """/reload — Reload .env variables into the running session"""
+    """/reload â€” Reload .env variables into the running session"""
     # TODO: implementasyon eklenecek
-    return f"/reload stub — Reload .env variables into the running session"
+    return f"/reload stub â€” Reload .env variables into the running session"
 
 
 def _handler_reload_mcp(args: str = "") -> str:
-    """/reload-mcp — Reload MCP servers from config"""
+    """/reload-mcp â€” Reload MCP servers from config"""
     # TODO: implementasyon eklenecek
-    return f"/reload-mcp stub — Reload MCP servers from config"
+    return f"/reload-mcp stub â€” Reload MCP servers from config"
 
 
 def _handler_reload_skills(args: str = "") -> str:
-    """/reload-skills — Re-scan ~/.hermes/skills/ for newly installed or removed skills"""
+    """/reload-skills â€” Re-scan .ReYMeN/skills/ for newly installed or removed skills"""
     # TODO: implementasyon eklenecek
-    return f"/reload-skills stub — Re-scan ~/.hermes/skills/ for newly installed or removed skills"
+    return f"/reload-skills stub â€” Re-scan .ReYMeN/skills/ for newly installed or removed skills"
 
 
 def _handler_restart(args: str = "") -> str:
-    """/restart — Gracefully restart the gateway after draining active runs"""
+    """/restart â€” Gracefully restart the gateway after draining active runs"""
     # TODO: implementasyon eklenecek
-    return f"/restart stub — Gracefully restart the gateway after draining active runs"
+    return f"/restart stub â€” Gracefully restart the gateway after draining active runs"
 
 
 def _handler_resume(args: str = "") -> str:
-    """/resume — Resume a previously-named session"""
+    """/resume â€” Resume a previously-named session"""
     # TODO: implementasyon eklenecek
-    return f"/resume stub — Resume a previously-named session"
+    return f"/resume stub â€” Resume a previously-named session"
 
 
 def _handler_retry(args: str = "") -> str:
-    """/retry — Retry the last message (resend to agent)"""
+    """/retry â€” Retry the last message (resend to agent)"""
     # TODO: implementasyon eklenecek
-    return f"/retry stub — Retry the last message (resend to agent)"
+    return f"/retry stub â€” Retry the last message (resend to agent)"
 
 
 def _handler_rollback(args: str = "") -> str:
-    """/rollback — List or restore filesystem checkpoints"""
+    """/rollback â€” List or restore filesystem checkpoints"""
     # TODO: implementasyon eklenecek
-    return f"/rollback stub — List or restore filesystem checkpoints"
+    return f"/rollback stub â€” List or restore filesystem checkpoints"
 
 
 def _handler_save(args: str = "") -> str:
-    """/save — Save the current conversation"""
+    """/save â€” Save the current conversation"""
     # TODO: implementasyon eklenecek
-    return f"/save stub — Save the current conversation"
+    return f"/save stub â€” Save the current conversation"
 
 
 def _handler_sethome(args: str = "") -> str:
-    """/sethome — Set this chat as the home channel"""
+    """/sethome â€” Set this chat as the home channel"""
     # TODO: implementasyon eklenecek
-    return f"/sethome stub — Set this chat as the home channel"
+    return f"/sethome stub â€” Set this chat as the home channel"
 
 
 def _handler_skin(args: str = "") -> str:
-    """/skin — Show or change the display skin/theme"""
+    """/skin â€” Show or change the display skin/theme"""
     # TODO: implementasyon eklenecek
-    return f"/skin stub — Show or change the display skin/theme"
+    return f"/skin stub â€” Show or change the display skin/theme"
 
 
 def _handler_snapshot(args: str = "") -> str:
-    """/snapshot — Create or restore state snapshots of Hermes config/state"""
+    """/snapshot â€” Create or restore state snapshots of ReYMeN config/state"""
     # TODO: implementasyon eklenecek
-    return f"/snapshot stub — Create or restore state snapshots of Hermes config/state"
+    return f"/snapshot stub â€” Create or restore state snapshots of ReYMeN config/state"
 
 
 def _handler_start(args: str = "") -> str:
-    """/start — Acknowledge platform start pings without a reply"""
+    """/start â€” Acknowledge platform start pings without a reply"""
     # TODO: implementasyon eklenecek
-    return f"/start stub — Acknowledge platform start pings without a reply"
+    return f"/start stub â€” Acknowledge platform start pings without a reply"
 
 
 def _handler_statusbar(args: str = "") -> str:
-    """/statusbar — Toggle the context/model status bar"""
+    """/statusbar â€” Toggle the context/model status bar"""
     # TODO: implementasyon eklenecek
-    return f"/statusbar stub — Toggle the context/model status bar"
+    return f"/statusbar stub â€” Toggle the context/model status bar"
 
 
 def _handler_steer(args: str = "") -> str:
-    """/steer — Inject a message after the next tool call without interrupting"""
+    """/steer â€” Inject a message after the next tool call without interrupting"""
     # TODO: implementasyon eklenecek
-    return f"/steer stub — Inject a message after the next tool call without interrupting"
+    return f"/steer stub â€” Inject a message after the next tool call without interrupting"
 
 
 def _handler_stop(args: str = "") -> str:
-    """/stop — Kill all running background processes"""
+    """/stop â€” Kill all running background processes"""
     # TODO: implementasyon eklenecek
-    return f"/stop stub — Kill all running background processes"
+    return f"/stop stub â€” Kill all running background processes"
 
 
 def _handler_subgoal(args: str = "") -> str:
-    """/subgoal — Add or manage extra criteria on the active goal"""
+    """/subgoal â€” Add or manage extra criteria on the active goal"""
     # TODO: implementasyon eklenecek
-    return f"/subgoal stub — Add or manage extra criteria on the active goal"
+    return f"/subgoal stub â€” Add or manage extra criteria on the active goal"
 
 
 def _handler_suggestions(args: str = "") -> str:
-    """/suggestions — Review suggested automations (accept/dismiss)"""
+    """/suggestions â€” Review suggested automations (accept/dismiss)"""
     # TODO: implementasyon eklenecek
-    return f"/suggestions stub — Review suggested automations (accept/dismiss)"
+    return f"/suggestions stub â€” Review suggested automations (accept/dismiss)"
 
 
 def _handler_title(args: str = "") -> str:
-    """/title — Set a title for the current session"""
+    """/title â€” Set a title for the current session"""
     # TODO: implementasyon eklenecek
-    return f"/title stub — Set a title for the current session"
+    return f"/title stub â€” Set a title for the current session"
 
 
 def _handler_tools(args: str = "") -> str:
-    """/tools — Manage tools: /tools [list|disable|enable] [name...]"""
+    """/tools â€” Manage tools: /tools [list|disable|enable] [name...]"""
     # TODO: implementasyon eklenecek
-    return f"/tools stub — Manage tools: /tools [list|disable|enable] [name...]"
+    return f"/tools stub â€” Manage tools: /tools [list|disable|enable] [name...]"
 
 
 def _handler_toolsets(args: str = "") -> str:
-    """/toolsets — List available toolsets"""
+    """/toolsets â€” List available toolsets"""
     # TODO: implementasyon eklenecek
-    return f"/toolsets stub — List available toolsets"
+    return f"/toolsets stub â€” List available toolsets"
 
 
 def _handler_topic(args: str = "") -> str:
-    """/topic — Enable or inspect Telegram DM topic sessions"""
+    """/topic â€” Enable or inspect Telegram DM topic sessions"""
     # TODO: implementasyon eklenecek
-    return f"/topic stub — Enable or inspect Telegram DM topic sessions"
+    return f"/topic stub â€” Enable or inspect Telegram DM topic sessions"
 
 
 def _handler_undo(args: str = "") -> str:
-    """/undo — Back up N user turns and re-prompt (default 1)"""
+    """/undo â€” Back up N user turns and re-prompt (default 1)"""
     # TODO: implementasyon eklenecek
-    return f"/undo stub — Back up N user turns and re-prompt (default 1)"
+    return f"/undo stub â€” Back up N user turns and re-prompt (default 1)"
 
 
 def _handler_update(args: str = "") -> str:
-    """/update — Update Hermes Agent to the latest version"""
+    """/update â€” Update ReYMeN Agent to the latest version"""
     # TODO: implementasyon eklenecek
-    return f"/update stub — Update Hermes Agent to the latest version"
+    return f"/update stub â€” Update ReYMeN Agent to the latest version"
 
 
 def _handler_usage(args: str = "") -> str:
-    """/usage — Show token usage and rate limits for the current session"""
+    """/usage â€” Show token usage and rate limits for the current session"""
     # TODO: implementasyon eklenecek
-    return f"/usage stub — Show token usage and rate limits for the current session"
+    return f"/usage stub â€” Show token usage and rate limits for the current session"
 
 
 def _handler_verbose(args: str = "") -> str:
-    """/verbose — Cycle tool progress display: off -> new -> all -> verbose"""
+    """/verbose â€” Cycle tool progress display: off -> new -> all -> verbose"""
     # TODO: implementasyon eklenecek
-    return f"/verbose stub — Cycle tool progress display: off -> new -> all -> verbose"
+    return f"/verbose stub â€” Cycle tool progress display: off -> new -> all -> verbose"
 
 
 def _handler_version(args: str = "") -> str:
-    """/version — Show Hermes Agent version"""
+    """/version â€” Show ReYMeN Agent version"""
     # TODO: implementasyon eklenecek
-    return f"/version stub — Show Hermes Agent version"
+    return f"/version stub â€” Show ReYMeN Agent version"
 
 
 def _handler_voice(args: str = "") -> str:
-    """/voice — Toggle voice mode"""
+    """/voice â€” Toggle voice mode"""
     # TODO: implementasyon eklenecek
-    return f"/voice stub — Toggle voice mode"
+    return f"/voice stub â€” Toggle voice mode"
 
 
 def _handler_whoami(args: str = "") -> str:
-    """/whoami — Show your slash command access (admin / user)"""
+    """/whoami â€” Show your slash command access (admin / user)"""
     # TODO: implementasyon eklenecek
-    return f"/whoami stub — Show your slash command access (admin / user)"
+    return f"/whoami stub â€” Show your slash command access (admin / user)"
 
 
 def _handler_yolo(args: str = "") -> str:
-    """/yolo — Toggle YOLO mode (skip all dangerous command approvals)"""
+    """/yolo â€” Toggle YOLO mode (skip all dangerous command approvals)"""
     # TODO: implementasyon eklenecek
-    return f"/yolo stub — Toggle YOLO mode (skip all dangerous command approvals)"
+    return f"/yolo stub â€” Toggle YOLO mode (skip all dangerous command approvals)"
 
 
 # Handler yonlendirme tablosu: komut_adi -> handler fonksiyonu
@@ -895,7 +895,7 @@ def get_handler(command_name: str) -> Callable[[str], str] | None:
 
 
 # ---------------------------------------------------------------------------
-# Slash komut registry — tek dogruluk kaynagi
+# Slash komut registry â€” tek dogruluk kaynagi
 # ---------------------------------------------------------------------------
 
 SLASH_COMMANDS: dict[str, CommandDef] = {
@@ -1019,7 +1019,7 @@ SLASH_COMMANDS: dict[str, CommandDef] = {
     ),
     "billing": CommandDef(
         name="billing",
-        description="Manage Nous terminal billing — buy credits, auto-reload, limits",
+        description="Manage Nous terminal billing â€” buy credits, auto-reload, limits",
         category="Info",
         handler=_handler_billing,
     ),
@@ -1049,7 +1049,7 @@ SLASH_COMMANDS: dict[str, CommandDef] = {
     ),
     "busy": CommandDef(
         name="busy",
-        description="Control what Enter does while Hermes is working",
+        description="Control what Enter does while ReYMeN is working",
         category="Configuration",
         handler=_handler_busy,
     ),
@@ -1109,7 +1109,7 @@ SLASH_COMMANDS: dict[str, CommandDef] = {
     ),
     "fast": CommandDef(
         name="fast",
-        description="Toggle fast mode — OpenAI Priority Processing / Anthropic Fast Mode (Normal/Fast)",
+        description="Toggle fast mode â€” OpenAI Priority Processing / Anthropic Fast Mode (Normal/Fast)",
         category="Configuration",
         handler=_handler_fast,
     ),
@@ -1121,7 +1121,7 @@ SLASH_COMMANDS: dict[str, CommandDef] = {
     ),
     "goal": CommandDef(
         name="goal",
-        description="Set a standing goal Hermes works on across turns until achieved",
+        description="Set a standing goal ReYMeN works on across turns until achieved",
         category="Session",
         handler=_handler_goal,
     ),
@@ -1241,7 +1241,7 @@ SLASH_COMMANDS: dict[str, CommandDef] = {
     ),
     "reload-skills": CommandDef(
         name="reload-skills",
-        description="Re-scan ~/.hermes/skills/ for newly installed or removed skills",
+        description="Re-scan .ReYMeN/skills/ for newly installed or removed skills",
         category="Tools & Skills",
         handler=_handler_reload_skills,
     ),
@@ -1289,7 +1289,7 @@ SLASH_COMMANDS: dict[str, CommandDef] = {
     ),
     "snapshot": CommandDef(
         name="snapshot",
-        description="Create or restore state snapshots of Hermes config/state",
+        description="Create or restore state snapshots of ReYMeN config/state",
         category="Session",
         handler=_handler_snapshot,
     ),
@@ -1361,7 +1361,7 @@ SLASH_COMMANDS: dict[str, CommandDef] = {
     ),
     "update": CommandDef(
         name="update",
-        description="Update Hermes Agent to the latest version",
+        description="Update ReYMeN Agent to the latest version",
         category="Info",
         handler=_handler_update,
     ),
@@ -1379,7 +1379,7 @@ SLASH_COMMANDS: dict[str, CommandDef] = {
     ),
     "version": CommandDef(
         name="version",
-        description="Show Hermes Agent version",
+        description="Show ReYMeN Agent version",
         category="Info",
         aliases=['v', ''],
         handler=_handler_version,
@@ -1463,13 +1463,13 @@ def execute_command(text: str) -> str:
             logger.exception("Slash command /%s failed: %s", cmd_name, e)
             return f"[HATA] /{cmd_name} komutu calisirken hata: {e}"
 
-    # Bilinmeyen komut — ReYMeN_cli/commands.py registry'sinde de ara
+    # Bilinmeyen komut â€” ReYMeN_cli/commands.py registry'sinde de ara
     try:
         from ReYMeN_cli.commands import resolve_command as resolve_cli_cmd
 
         cli_cmd = resolve_cli_cmd(cmd_name)
         if cli_cmd:
-            return f"[Bilinmeyen] /{cmd_name} — ReYMeN CLI'da tanimli ama henuz tasinmadi: {cli_cmd.description}"
+            return f"[Bilinmeyen] /{cmd_name} â€” ReYMeN CLI'da tanimli ama henuz tasinmadi: {cli_cmd.description}"
     except ImportError:
         pass
 

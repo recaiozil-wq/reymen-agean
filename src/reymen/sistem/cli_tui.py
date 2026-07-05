@@ -1,4 +1,4 @@
-"""cli_tui.py - ReYMeNCLI TUI/UI metotlari."""
+﻿"""cli_tui.py - ReYMeNCLI TUI/UI metotlari."""
 
 import logging, os, re, sys, time, json, math, threading, shutil, textwrap
 from datetime import datetime
@@ -7,12 +7,12 @@ from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
 logger = logging.getLogger(__name__)
 
-from src.reymen.sistem.cli_helpers import *
-from src.reymen.sistem.cli_display import *
-from src.reymen.sistem.cli_commands import *
-from src.reymen.sistem.cli_auth import *
-from src.reymen.sistem.cli_maintenance import *
-from src.reymen.sistem.cli_stream import *
+from reymen.sistem.cli_helpers import *
+from reymen.sistem.cli_display import *
+from reymen.sistem.cli_commands import *
+from reymen.sistem.cli_auth import *
+from reymen.sistem.cli_maintenance import *
+from reymen.sistem.cli_stream import *
 from contextlib import contextmanager
 
 
@@ -23,7 +23,7 @@ class TUIMixin:
         """Force a clean full-screen repaint of the prompt_toolkit UI.
 
         Used to recover from terminal buffer drift caused by external
-        redraws we can't detect — e.g. macOS cmux / tmux tab switches,
+        redraws we can't detect â€” e.g. macOS cmux / tmux tab switches,
         ``clear`` issued from a subshell, or SSH window restores. These
         wipe or repaint the terminal without firing SIGWINCH, so
         prompt_toolkit's tracked ``_cursor_pos`` no longer matches reality
@@ -108,25 +108,25 @@ class TUIMixin:
     def _build_context_bar(self, percent_used: Optional[int], width: int = 10) -> str:
         safe_percent = max(0, min(100, percent_used or 0))
         filled = round((safe_percent / 100) * width)
-        return f"[{('█' * filled) + ('░' * max(0, width - filled))}]"
+        return f"[{('â–ˆ' * filled) + ('â–‘' * max(0, width - filled))}]"
 
     def _format_prompt_elapsed(
         prompt_start_time: Optional[float], prompt_duration: float, live: bool = False
     ) -> str:
         """Format per-prompt elapsed time for the status bar.
 
-        Always returns a string — shows 0s on fresh start before first turn.
+        Always returns a string â€” shows 0s on fresh start before first turn.
         Keeps seconds visible at all scales so it increments smoothly:
-            59s → 1m → 1m 1s → ... → 1m 59s → 2m → 2m 1s → ...
-            59m 59s → 1h → 1h 0m 1s → ...
-            23h 59m 59s → 1d → 1d 0h 1m → ...
+            59s â†’ 1m â†’ 1m 1s â†’ ... â†’ 1m 59s â†’ 2m â†’ 2m 1s â†’ ...
+            59m 59s â†’ 1h â†’ 1h 0m 1s â†’ ...
+            23h 59m 59s â†’ 1d â†’ 1d 0h 1m â†’ ...
 
-        Emoji prefix: ⏱ when turn is live, ⏲ when frozen or fresh start.
+        Emoji prefix: â± when turn is live, â² when frozen or fresh start.
         Uses width-1 (no variation selector) glyphs so the status bar stays
         aligned in monospace terminals.
         """
         if prompt_start_time is None and prompt_duration == 0.0:
-            return "⏲ 0s"
+            return "â² 0s"
         elapsed = (
             time.time() - prompt_start_time
             if prompt_start_time is not None
@@ -152,11 +152,11 @@ class TUIMixin:
         else:
             time_str = f"{int(elapsed)}s"
 
-        emoji = "⏱" if live else "⏲"
+        emoji = "â±" if live else "â²"
         return f"{emoji} {time_str}"
 
     def _get_status_bar_snapshot(self) -> Dict[str, Any]:
-        # Prefer the agent's model name — it updates on fallback.
+        # Prefer the agent's model name â€” it updates on fallback.
         # self.model reflects the originally configured model and never
         # changes mid-session, so the TUI would show a stale name after
         # _try_activate_fallback() switches provider/model.
@@ -246,7 +246,7 @@ class TUIMixin:
             # last_prompt_tokens is parked at the -1 sentinel right after a
             # compression, until the next real API call reports a prompt count
             # (awaiting_real_usage_after_compression). The status bar must not
-            # render that sentinel verbatim — it produced "-1/200K" / "-1%".
+            # render that sentinel verbatim â€” it produced "-1/200K" / "-1%".
             # Clamp it to 0 so the one transitional turn reads as empty context.
             context_tokens = getattr(compressor, "last_prompt_tokens", 0) or 0
             if context_tokens < 0:
@@ -289,11 +289,11 @@ class TUIMixin:
         ``_output_screen_diff`` monkey-patch landed in #26137 (salvaging
         #25981) to keep chrome out of scrollback in the first place, and
         accept that an aggressive column-shrink may visually reflow already
-        printed Panel borders — that's a cosmetic artifact of stamped
+        printed Panel borders â€” that's a cosmetic artifact of stamped
         scrollback history, not a live-render bug.
 
         A small floor (32 cols) is kept so the box still renders on tiny
-        terminals without negative ``'─' * (w - 2)`` math.
+        terminals without negative ``'â”€' * (w - 2)`` math.
         """
         if width is None:
             try:
@@ -359,18 +359,18 @@ class TUIMixin:
         label = self._voice_record_key_label()
         if self._voice_recording:
             if compact:
-                return [("class:voice-status-recording", " ● REC ")]
-            return [("class:voice-status-recording", f" ● REC  {label} to stop ")]
+                return [("class:voice-status-recording", " â— REC ")]
+            return [("class:voice-status-recording", f" â— REC  {label} to stop ")]
         if self._voice_processing:
             if compact:
-                return [("class:voice-status", " ◉ STT ")]
-            return [("class:voice-status", " ◉ Transcribing... ")]
+                return [("class:voice-status", " â—‰ STT ")]
+            return [("class:voice-status", " â—‰ Transcribing... ")]
         if compact:
-            return [("class:voice-status", f" 🎤 {label} ")]
+            return [("class:voice-status", f" ğŸ¤ {label} ")]
         tts = " | TTS on" if self._voice_tts else ""
         cont = " | Continuous" if self._voice_continuous else ""
         return [
-            ("class:voice-status", f" 🎤 Voice mode{tts}{cont}  —  {label} to record ")
+            ("class:voice-status", f" ğŸ¤ Voice mode{tts}{cont}  â€”  {label} to record ")
         ]
 
     def _get_status_bar_fragments(self):
@@ -379,7 +379,7 @@ class TUIMixin:
         try:
             snapshot = self._get_status_bar_snapshot()
             # Use prompt_toolkit's own terminal width when running inside the
-            # TUI — shutil.get_terminal_size() can return stale or fallback
+            # TUI â€” shutil.get_terminal_size() can return stale or fallback
             # values (especially on SSH) that differ from what prompt_toolkit
             # actually renders, causing the fragments to overflow to a second
             # line and produce duplicated status bar rows over long sessions.
@@ -389,14 +389,14 @@ class TUIMixin:
 
             if width < 52:
                 frags = [
-                    ("class:status-bar", " ⚕ "),
+                    ("class:status-bar", " âš• "),
                     ("class:status-bar-strong", snapshot["model_short"]),
-                    ("class:status-bar-dim", " · "),
+                    ("class:status-bar-dim", " Â· "),
                     ("class:status-bar-dim", duration_label),
                 ]
                 if yolo_active:
-                    frags.append(("class:status-bar-dim", " · "))
-                    frags.append(("class:status-bar-yolo", "⚠ YOLO"))
+                    frags.append(("class:status-bar-dim", " Â· "))
+                    frags.append(("class:status-bar-yolo", "âš  YOLO"))
                 frags.append(("class:status-bar", " "))
             else:
                 percent = snapshot["context_percent"]
@@ -406,34 +406,34 @@ class TUIMixin:
                     bg_count = snapshot.get("active_background_tasks", 0)
                     bg_proc_count = snapshot.get("active_background_processes", 0)
                     frags = [
-                        ("class:status-bar", " ⚕ "),
+                        ("class:status-bar", " âš• "),
                         ("class:status-bar-strong", snapshot["model_short"]),
-                        ("class:status-bar-dim", " · "),
+                        ("class:status-bar-dim", " Â· "),
                         (self._status_bar_context_style(percent), percent_label),
                     ]
                     if compressions:
-                        frags.append(("class:status-bar-dim", " · "))
+                        frags.append(("class:status-bar-dim", " Â· "))
                         frags.append(
                             (
                                 self._compression_count_style(compressions),
-                                f"🗜️ {compressions}",
+                                f"ğŸ—œï¸ {compressions}",
                             )
                         )
                     if bg_count:
-                        frags.append(("class:status-bar-dim", " · "))
-                        frags.append(("class:status-bar-strong", f"▶ {bg_count}"))
+                        frags.append(("class:status-bar-dim", " Â· "))
+                        frags.append(("class:status-bar-strong", f"â–¶ {bg_count}"))
                     if bg_proc_count:
-                        frags.append(("class:status-bar-dim", " · "))
-                        frags.append(("class:status-bar-strong", f"⚙ {bg_proc_count}"))
+                        frags.append(("class:status-bar-dim", " Â· "))
+                        frags.append(("class:status-bar-strong", f"âš™ {bg_proc_count}"))
                     frags.extend(
                         [
-                            ("class:status-bar-dim", " · "),
+                            ("class:status-bar-dim", " Â· "),
                             ("class:status-bar-dim", duration_label),
                         ]
                     )
                     if yolo_active:
-                        frags.append(("class:status-bar-dim", " · "))
-                        frags.append(("class:status-bar-yolo", "⚠ YOLO"))
+                        frags.append(("class:status-bar-dim", " Â· "))
+                        frags.append(("class:status-bar-yolo", "âš  YOLO"))
                     frags.append(("class:status-bar", " "))
                 else:
                     if snapshot["context_length"]:
@@ -450,43 +450,43 @@ class TUIMixin:
                     bg_count = snapshot.get("active_background_tasks", 0)
                     bg_proc_count = snapshot.get("active_background_processes", 0)
                     frags = [
-                        ("class:status-bar", " ⚕ "),
+                        ("class:status-bar", " âš• "),
                         ("class:status-bar-strong", snapshot["model_short"]),
-                        ("class:status-bar-dim", " │ "),
+                        ("class:status-bar-dim", " â”‚ "),
                         ("class:status-bar-dim", context_label),
-                        ("class:status-bar-dim", " │ "),
+                        ("class:status-bar-dim", " â”‚ "),
                         (bar_style, self._build_context_bar(percent)),
                         ("class:status-bar-dim", " "),
                         (bar_style, percent_label),
                     ]
                     if compressions:
-                        frags.append(("class:status-bar-dim", " │ "))
+                        frags.append(("class:status-bar-dim", " â”‚ "))
                         frags.append(
                             (
                                 self._compression_count_style(compressions),
-                                f"🗜️ {compressions}",
+                                f"ğŸ—œï¸ {compressions}",
                             )
                         )
                     if bg_count:
-                        frags.append(("class:status-bar-dim", " │ "))
-                        frags.append(("class:status-bar-strong", f"▶ {bg_count}"))
+                        frags.append(("class:status-bar-dim", " â”‚ "))
+                        frags.append(("class:status-bar-strong", f"â–¶ {bg_count}"))
                     if bg_proc_count:
-                        frags.append(("class:status-bar-dim", " │ "))
-                        frags.append(("class:status-bar-strong", f"⚙ {bg_proc_count}"))
+                        frags.append(("class:status-bar-dim", " â”‚ "))
+                        frags.append(("class:status-bar-strong", f"âš™ {bg_proc_count}"))
                     frags.extend(
                         [
-                            ("class:status-bar-dim", " │ "),
+                            ("class:status-bar-dim", " â”‚ "),
                             ("class:status-bar-dim", duration_label),
                         ]
                     )
                     # Position 7: per-prompt elapsed timer (live or frozen)
                     prompt_elapsed = snapshot.get("prompt_elapsed")
                     if prompt_elapsed:
-                        frags.append(("class:status-bar-dim", " │ "))
+                        frags.append(("class:status-bar-dim", " â”‚ "))
                         frags.append(("class:status-bar-dim", prompt_elapsed))
                     if yolo_active:
-                        frags.append(("class:status-bar-dim", " │ "))
-                        frags.append(("class:status-bar-yolo", "⚠ YOLO"))
+                        frags.append(("class:status-bar-dim", " â”‚ "))
+                        frags.append(("class:status-bar-yolo", "âš  YOLO"))
                     frags.append(("class:status-bar", " "))
 
             total_width = sum(self._status_bar_display_width(text) for _, text in frags)
@@ -521,12 +521,12 @@ class TUIMixin:
 
     def _print_user_message_preview(self, user_input: str) -> None:
         """Render a user message using the normal chat scrollback style."""
-        ChatConsole().print(f"[{_accent_hex()}]{'─' * 40}[/]")
+        ChatConsole().print(f"[{_accent_hex()}]{'â”€' * 40}[/]")
         text = str(user_input or "")
         if "\n" in text:
             ChatConsole().print(self._format_submitted_user_message_preview(text))
         else:
-            ChatConsole().print(f"[bold {_accent_hex()}]●[/] [bold]{_escape(text)}[/]")
+            ChatConsole().print(f"[bold {_accent_hex()}]â—[/] [bold]{_escape(text)}[/]")
 
     def _render_resume_history_panel_lines(self, panel) -> list[str]:
         """Render the resume panel at the current terminal width for resize replay."""
@@ -584,7 +584,7 @@ class TUIMixin:
         with self._voice_lock:
             self._voice_mode = True
 
-        # Check config for auto_tts (shape-safe — malformed ``voice:`` YAML
+        # Check config for auto_tts (shape-safe â€” malformed ``voice:`` YAML
         # leaves ``voice_config`` as a non-dict, so guard before .get()).
         try:
             from reymen.reymen_cli.config import load_config
@@ -603,7 +603,7 @@ class TUIMixin:
 
         tts_status = " (TTS enabled)" if self._voice_tts else ""
         # Use the startup-pinned cache so the advertised shortcut always
-        # matches the live prompt_toolkit binding — reading live config
+        # matches the live prompt_toolkit binding â€” reading live config
         # here would drift after a mid-session config edit (Copilot
         # round-14 on #19835, same class as round-13).
         _ptt_display = self._voice_record_key_label()
@@ -713,12 +713,12 @@ class TUIMixin:
             lines, border_style: str, content_style: str, text: str, box_width: int
         ) -> None:
             inner_width = max(0, box_width - 2)
-            lines.append((border_style, "│ "))
+            lines.append((border_style, "â”‚ "))
             lines.append((content_style, text.ljust(inner_width)))
-            lines.append((border_style, " │\n"))
+            lines.append((border_style, " â”‚\n"))
 
         def _append_blank_panel_line(lines, border_style: str, box_width: int) -> None:
-            lines.append((border_style, "│" + (" " * box_width) + "│\n"))
+            lines.append((border_style, "â”‚" + (" " * box_width) + "â”‚\n"))
 
         command = state["command"]
         description = state["description"]
@@ -726,7 +726,7 @@ class TUIMixin:
         selected = state.get("selected", 0)
         show_full = state.get("show_full", False)
 
-        title = "⚠️  Dangerous Command"
+        title = "âš ï¸  Dangerous Command"
         cmd_display = (
             command if show_full or len(command) <= 70 else command[:70] + "..."
         )
@@ -741,7 +741,7 @@ class TUIMixin:
         preview_lines = _wrap_panel_text(description, 60)
         preview_lines.extend(_wrap_panel_text(cmd_display, 60))
         for i, choice in enumerate(choices):
-            prefix = "❯ " if i == selected else "  "
+            prefix = "â¯ " if i == selected else "  "
             preview_lines.extend(
                 _wrap_panel_text(
                     f"{prefix}{choice_labels.get(choice, choice)}",
@@ -753,7 +753,7 @@ class TUIMixin:
         box_width = _panel_box_width(title, preview_lines)
         inner_text_width = max(8, box_width - 2)
 
-        # Pre-wrap the mandatory content — command + choices must always render.
+        # Pre-wrap the mandatory content â€” command + choices must always render.
         cmd_wrapped = _wrap_panel_text(cmd_display, inner_text_width)
 
         # (choice_index, wrapped_line) so we can re-apply selected styling below
@@ -768,7 +768,7 @@ class TUIMixin:
             else:
                 num_prefix = " "  # No number for items beyond 10th
             if i == selected:
-                prefix = f"❯ {num_prefix}. "
+                prefix = f"â¯ {num_prefix}. "
             else:
                 prefix = f"  {num_prefix}. "
             for wrapped in _wrap_panel_text(
@@ -807,7 +807,7 @@ class TUIMixin:
         if len(cmd_wrapped) > max_cmd_rows:
             keep = max(1, max_cmd_rows - 1) if max_cmd_rows > 1 else 1
             cmd_wrapped = cmd_wrapped[:keep] + [
-                "… (command truncated — use /logs or /debug for full text)"
+                "â€¦ (command truncated â€” use /logs or /debug for full text)"
             ]
 
         # Allocate any remaining rows to description. The extra -1 in full mode
@@ -825,14 +825,14 @@ class TUIMixin:
             desc_wrapped = []
         elif len(desc_wrapped) > available_for_desc:
             keep = max(1, available_for_desc - 1)
-            desc_wrapped = desc_wrapped[:keep] + ["… (description truncated)"]
+            desc_wrapped = desc_wrapped[:keep] + ["â€¦ (description truncated)"]
 
-        # Render: title → command → choices → description (description last so
+        # Render: title â†’ command â†’ choices â†’ description (description last so
         # any remaining overflow clips from the bottom of the least-critical
         # content, never from the command or choices). Use compact chrome (no
         # blank separators) when the terminal is tight.
         lines = []
-        lines.append(("class:approval-border", "╭" + ("─" * box_width) + "╮\n"))
+        lines.append(("class:approval-border", "â•­" + ("â”€" * box_width) + "â•®\n"))
         _append_panel_line(
             lines, "class:approval-border", "class:approval-title", title, box_width
         )
@@ -866,7 +866,7 @@ class TUIMixin:
                     box_width,
                 )
 
-        lines.append(("class:approval-border", "╰" + ("─" * box_width) + "╯\n"))
+        lines.append(("class:approval-border", "â•°" + ("â”€" * box_width) + "â•¯\n"))
         return lines
 
     def _get_tui_prompt_symbols(self) -> tuple[str, str]:
@@ -877,16 +877,16 @@ class TUIMixin:
         should render after their leading icon.
 
         When a profile is active (not "default"), the profile name is
-        prepended to the prompt symbol: ``coder ❯`` instead of ``❯``.
+        prepended to the prompt symbol: ``coder â¯`` instead of ``â¯``.
         """
         try:
             from reymen.reymen_cli.skin_engine import get_active_prompt_symbol
 
-            symbol = get_active_prompt_symbol("❯ ")
+            symbol = get_active_prompt_symbol("â¯ ")
         except Exception:
-            symbol = "❯ "
+            symbol = "â¯ "
 
-        symbol = (symbol or "❯ ").rstrip() + " "
+        symbol = (symbol or "â¯ ").rstrip() + " "
 
         # Prepend profile name when not default
         try:
@@ -899,11 +899,11 @@ class TUIMixin:
             logger.warning("[fix_01_sessiz_except] Exception")
         stripped = symbol.rstrip()
         if not stripped:
-            return "❯ ", "❯ "
+            return "â¯ ", "â¯ "
 
         parts = stripped.split()
         candidate = parts[-1] if parts else ""
-        arrow_chars = ("❯", ">", "$", "#", "›", "»", "→")
+        arrow_chars = ("â¯", ">", "$", "#", "â€º", "Â»", "â†’")
         if any(ch in candidate for ch in arrow_chars):
             return symbol, candidate.rstrip() + " "
 
@@ -927,19 +927,19 @@ class TUIMixin:
 
         if self._voice_recording:
             bar = self._audio_level_bar()
-            return _state_fragment("class:voice-recording", "●", bar)
+            return _state_fragment("class:voice-recording", "â—", bar)
         if self._voice_processing:
-            return _state_fragment("class:voice-processing", "◉")
+            return _state_fragment("class:voice-processing", "â—‰")
         if self._sudo_state:
-            return _state_fragment("class:sudo-prompt", "🔐")
+            return _state_fragment("class:sudo-prompt", "ğŸ”")
         if self._secret_state:
-            return _state_fragment("class:sudo-prompt", "🔑")
+            return _state_fragment("class:sudo-prompt", "ğŸ”‘")
         if self._approval_state:
-            return _state_fragment("class:prompt-working", "⚠")
+            return _state_fragment("class:prompt-working", "âš ")
         if getattr(self, "_slash_confirm_state", None):
-            return _state_fragment("class:prompt-working", "⚠")
+            return _state_fragment("class:prompt-working", "âš ")
         if self._clarify_freetext:
-            return _state_fragment("class:clarify-selected", "✎")
+            return _state_fragment("class:clarify-selected", "âœ")
         if self._clarify_state:
             return _state_fragment("class:prompt-working", "?")
         if self._command_running:
@@ -947,9 +947,9 @@ class TUIMixin:
                 "class:prompt-working", self._command_spinner_frame()
             )
         if self._agent_running:
-            return _state_fragment("class:prompt-working", "⚕")
+            return _state_fragment("class:prompt-working", "âš•")
         if self._voice_mode:
-            return _state_fragment("class:voice-prompt", "🎤")
+            return _state_fragment("class:voice-prompt", "ğŸ¤")
         return [("class:prompt", symbol)]
 
     def _get_tui_prompt_text(self) -> str:
@@ -972,7 +972,7 @@ class TUIMixin:
         except Exception:
             logger.warning("[fix_01_sessiz_except] Exception")
         # Light-mode remap on the style strings.  Each value is a pt
-        # style string like "bg:#1a1a2e #C0C0C0 bold" — split on space,
+        # style string like "bg:#1a1a2e #C0C0C0 bold" â€” split on space,
         # rewrite any "#XXX" tokens (including "bg:#XXX") through the
         # light-mode remap, rejoin.
         #
@@ -981,7 +981,7 @@ class TUIMixin:
         # with `bg:#1a1a2e ...`).  Those colors were tuned for that
         # specific dark bg and remapping the FG to a dark equivalent
         # would produce dark-on-dark (invisible).  The terminal's BG
-        # mode is irrelevant — what matters is the bg the style itself
+        # mode is irrelevant â€” what matters is the bg the style itself
         # paints.
         try:
             if _detect_light_mode():
@@ -992,7 +992,7 @@ class TUIMixin:
                     tokens = v.split()
                     has_explicit_bg = any(t.startswith("bg:") for t in tokens)
                     if has_explicit_bg:
-                        # The style paints its own bg — leave its fg alone.
+                        # The style paints its own bg â€” leave its fg alone.
                         return v
                     return " ".join(
                         _maybe_remap_for_light_mode(t) if t.startswith("#") else t
@@ -1219,25 +1219,25 @@ class TUIMixin:
 
             yolo_active = self._is_session_yolo_active()
             if width < 52:
-                text = f"⚕ {snapshot['model_short']} · {duration_label}"
+                text = f"âš• {snapshot['model_short']} Â· {duration_label}"
                 if yolo_active:
-                    text += " · ⚠ YOLO"
+                    text += " Â· âš  YOLO"
                 return self._trim_status_bar_text(text, width)
             if width < 76:
-                parts = [f"⚕ {snapshot['model_short']}", percent_label]
+                parts = [f"âš• {snapshot['model_short']}", percent_label]
                 compressions = snapshot.get("compressions", 0)
                 if compressions:
-                    parts.append(f"🗜️ {compressions}")
+                    parts.append(f"ğŸ—œï¸ {compressions}")
                 bg_count = snapshot.get("active_background_tasks", 0)
                 if bg_count:
-                    parts.append(f"▶ {bg_count}")
+                    parts.append(f"â–¶ {bg_count}")
                 bg_proc_count = snapshot.get("active_background_processes", 0)
                 if bg_proc_count:
-                    parts.append(f"⚙ {bg_proc_count}")
+                    parts.append(f"âš™ {bg_proc_count}")
                 parts.append(duration_label)
                 if yolo_active:
-                    parts.append("⚠ YOLO")
-                return self._trim_status_bar_text(" · ".join(parts), width)
+                    parts.append("âš  YOLO")
+                return self._trim_status_bar_text(" Â· ".join(parts), width)
 
             if snapshot["context_length"]:
                 ctx_total = _format_context_length(snapshot["context_length"])
@@ -1247,24 +1247,24 @@ class TUIMixin:
                 context_label = "ctx --"
 
             compressions = snapshot.get("compressions", 0)
-            parts = [f"⚕ {snapshot['model_short']}", context_label, percent_label]
+            parts = [f"âš• {snapshot['model_short']}", context_label, percent_label]
             if compressions:
-                parts.append(f"🗜️ {compressions}")
+                parts.append(f"ğŸ—œï¸ {compressions}")
             bg_count = snapshot.get("active_background_tasks", 0)
             if bg_count:
-                parts.append(f"▶ {bg_count}")
+                parts.append(f"â–¶ {bg_count}")
             bg_proc_count = snapshot.get("active_background_processes", 0)
             if bg_proc_count:
-                parts.append(f"⚙ {bg_proc_count}")
+                parts.append(f"âš™ {bg_proc_count}")
             parts.append(duration_label)
             prompt_elapsed = snapshot.get("prompt_elapsed")
             if prompt_elapsed:
                 parts.append(prompt_elapsed)
             if yolo_active:
-                parts.append("⚠ YOLO")
-            return self._trim_status_bar_text(" │ ".join(parts), width)
+                parts.append("âš  YOLO")
+            return self._trim_status_bar_text(" â”‚ ".join(parts), width)
         except Exception:
-            return f"⚕ {self.model if getattr(self, 'model', None) else 'ReYMeN'}"
+            return f"âš• {self.model if getattr(self, 'model', None) else 'ReYMeN'}"
 
     def _format_submitted_user_message_preview(self, user_input: str) -> str:
         """Format the submitted user-message scrollback preview."""
@@ -1276,7 +1276,7 @@ class TUIMixin:
         lines = user_input.split("\n")
         if len(lines) <= 1:
             return (
-                f"[bold {_accent_hex()}]●[/] [bold]{_escape(user_input)}[/]{ts_suffix}"
+                f"[bold {_accent_hex()}]â—[/] [bold]{_escape(user_input)}[/]{ts_suffix}"
             )
 
         first_lines = int(getattr(self, "user_message_preview_first_lines", 2))
@@ -1294,7 +1294,7 @@ class TUIMixin:
             tail = []
 
         preview_lines = [
-            f"[bold {_accent_hex()}]●[/] [bold]{_escape(head[0])}[/]{ts_suffix}"
+            f"[bold {_accent_hex()}]â—[/] [bold]{_escape(head[0])}[/]{ts_suffix}"
         ]
         preview_lines.extend(f"[bold]{_escape(line)}[/]" for line in head[1:])
 
@@ -1310,10 +1310,10 @@ class TUIMixin:
 
         Opens a dim reasoning box on first token, streams line-by-line.
         The box is closed automatically when content tokens start arriving
-        (via _stream_delta → _emit_stream_text).
+        (via _stream_delta â†’ _emit_stream_text).
 
         Once the response box is open, suppress any further reasoning
-        rendering — a late thinking block (e.g. after an interrupt) would
+        rendering â€” a late thinking block (e.g. after an interrupt) would
         otherwise draw a reasoning box inside the response box.
         """
         if not text:
@@ -1328,7 +1328,7 @@ class TUIMixin:
             w = self._scrollback_box_width()
             r_label = " Reasoning "
             r_fill = w - 2 - len(r_label)
-            _cprint(f"\n{_DIM}┌─{r_label}{'─' * max(r_fill - 1, 0)}┐{_RST}")
+            _cprint(f"\n{_DIM}â”Œâ”€{r_label}{'â”€' * max(r_fill - 1, 0)}â”{_RST}")
 
         self._reasoning_buf = getattr(self, "_reasoning_buf", "") + text
 
@@ -1365,11 +1365,11 @@ class TUIMixin:
 
         self._stream_started = True
 
-        # ── Tag-based reasoning suppression ──
+        # â”€â”€ Tag-based reasoning suppression â”€â”€
         # Track whether we're inside a reasoning/thinking block.
         # These tags are model-generated (system prompt tells the model
         # to use them) and get stripped from final_response. We must
-        # suppress them during streaming too — unless show_reasoning is
+        # suppress them during streaming too â€” unless show_reasoning is
         # enabled, in which case we route the inner content to the
         # reasoning display box instead of discarding it.
         _OPEN_TAGS = (
@@ -1415,7 +1415,7 @@ class TUIMixin:
                     # Check if this is a block boundary position
                     preceding = self._stream_prefilt[:idx]
                     if idx == 0:
-                        # At buffer start — only a boundary if we're at
+                        # At buffer start â€” only a boundary if we're at
                         # a line start (stream start or last emit ended
                         # with newline)
                         is_block_boundary = getattr(
@@ -1425,7 +1425,7 @@ class TUIMixin:
                         # Find last newline in the buffer before the tag
                         last_nl = preceding.rfind("\n")
                         if last_nl == -1:
-                            # No newline in buffer — boundary only if
+                            # No newline in buffer â€” boundary only if
                             # last emit was a newline AND only whitespace
                             # has accumulated before the tag
                             is_block_boundary = (
@@ -1444,12 +1444,12 @@ class TUIMixin:
                         self._in_reasoning_block = True
                         self._stream_prefilt = self._stream_prefilt[idx + len(tag) :]
                         break
-                    # Not a block boundary — keep searching after this occurrence
+                    # Not a block boundary â€” keep searching after this occurrence
                     search_start = idx + 1
                 if getattr(self, "_in_reasoning_block", False):
                     break
 
-            # Could also be a partial open tag at the end — hold it back
+            # Could also be a partial open tag at the end â€” hold it back
             if not getattr(self, "_in_reasoning_block", False):
                 # Check for partial tag match at the end
                 safe = self._stream_prefilt
@@ -1464,7 +1464,7 @@ class TUIMixin:
                     self._stream_prefilt = self._stream_prefilt[len(safe) :]
                 return
 
-        # Inside a reasoning block — look for close tag.
+        # Inside a reasoning block â€” look for close tag.
         # Keep accumulating _stream_prefilt because close tags can arrive
         # split across multiple tokens (e.g. "</REASONING_SCRATCH" + "PAD>...").
         if getattr(self, "_in_reasoning_block", False):
@@ -1523,10 +1523,10 @@ class TUIMixin:
                 from reymen.reymen_cli.skin_engine import get_active_skin
 
                 _skin = get_active_skin()
-                label = _skin.get_branding("response_label", "⚕ ReYMeN")
+                label = _skin.get_branding("response_label", "âš• ReYMeN")
                 _text_hex = _skin.get_color("banner_text", "#FFF8DC")
             except Exception:
-                label = "⚕ ReYMeN"
+                label = "âš• ReYMeN"
                 _text_hex = "#FFF8DC"
             # Build a true-color ANSI escape for the response text color
             # so streamed content matches the Rich Panel appearance.
@@ -1541,7 +1541,7 @@ class TUIMixin:
                 label = f"{label} {datetime.now().strftime('%H:%M')}"
             w = self._scrollback_box_width()
             fill = w - 2 - ReYMeNCLI._status_bar_display_width(label)
-            _cprint(f"\n{_ACCENT}╭─{label}{'─' * max(fill - 1, 0)}╮{_RST}")
+            _cprint(f"\n{_ACCENT}â•­â”€{label}{'â”€' * max(fill - 1, 0)}â•®{_RST}")
 
         self._stream_buf += text
 
@@ -1585,7 +1585,7 @@ class TUIMixin:
                 if looks_like_table_row(line) or is_table_divider(line):
                     self._stream_table_buf.append(line)
                     continue
-                # Block ended — flush the realigned table, then fall
+                # Block ended â€” flush the realigned table, then fall
                 # through to print the current (non-table) line.
                 _flush_table_buf()
             elif looks_like_table_row(line):
@@ -1630,7 +1630,7 @@ class TUIMixin:
         self._command_status = status
         self._invalidate(min_interval=0.0)
         try:
-            print(f"⏳ {status}")
+            print(f"â³ {status}")
             yield
         finally:
             self._command_running = False
@@ -1684,7 +1684,7 @@ class TUIMixin:
 
     def _audio_level_bar(self) -> str:
         """Return a visual audio level indicator based on current RMS."""
-        _LEVEL_BARS = " ▁▂▃▄▅▆▇"
+        _LEVEL_BARS = " â–â–‚â–ƒâ–„â–…â–†â–‡"
         rec = getattr(self, "_voice_recorder", None)
         if rec is None:
             return ""
@@ -1713,7 +1713,7 @@ class TUIMixin:
         except Exception:
             logger.warning("[fix_01_sessiz_except] Exception")
         # Push the entire TUI to the bottom of the terminal so the banner,
-        # responses, and prompt all appear pinned to the bottom — empty
+        # responses, and prompt all appear pinned to the bottom â€” empty
         # space stays above, not below.  This prints enough blank lines to
         # scroll the cursor to the last row before any content is rendered.
         try:
@@ -1751,13 +1751,13 @@ class TUIMixin:
 
         # Redaction opt-out warning (#17691): ON by default, loud when off.
         # The redactor snapshots its state at import time so any toggle now
-        # won't affect the running process — we just want the operator to
+        # won't affect the running process â€” we just want the operator to
         # see that they're running without the safety net.
         try:
             _redact_raw = os.getenv("ReYMeN_REDACT_SECRETS", "true")
             if _redact_raw.lower() not in {"1", "true", "yes", "on"}:
                 self._console_print(
-                    "[bold red]⚠  Secret redaction is DISABLED[/] "
+                    "[bold red]âš   Secret redaction is DISABLED[/] "
                     f"(ReYMeN_REDACT_SECRETS={_redact_raw}). "
                     "API keys and tokens may appear verbatim in chat output, "
                     "session JSONs, and logs. Set "
@@ -1766,8 +1766,8 @@ class TUIMixin:
                 )
         except Exception:
             logger.warning("[fix_01_sessiz_except] Exception")
-        # First-time OpenClaw-residue banner — fires once if ~/.openclaw/ exists
-        # after an OpenClaw→ReYMeN migration (especially migrations done by
+        # First-time OpenClaw-residue banner â€” fires once if ~/.openclaw/ exists
+        # after an OpenClawâ†’ReYMeN migration (especially migrations done by
         # OpenClaw's own tool, which doesn't archive the source directory).
         try:
             from agent.onboarding import (
@@ -1796,11 +1796,11 @@ class TUIMixin:
                 except Exception as _e:
                     __import__("logging").getLogger(__name__).warning(
                         "[SessizExcept] %%s: %%s", type(_e).__name__, _e
-                    )  # best-effort — banner will fire again next session
+                    )  # best-effort â€” banner will fire again next session
         except Exception as _e:
             __import__("logging").getLogger(__name__).warning(
                 "[SessizExcept] %%s: %%s", type(_e).__name__, _e
-            )  # banner is non-critical — never break startup
+            )  # banner is non-critical â€” never break startup
         # Show a random tip to help users discover features
         try:
             from reymen.reymen_cli.tips import get_random_tip
@@ -1810,13 +1810,13 @@ class TUIMixin:
                 _tip_color = _welcome_skin.get_color("banner_dim", "#B8860B")
             except Exception:
                 _tip_color = "#B8860B"
-            self._console_print(f"[dim {_tip_color}]✦ Tip: {_tip}[/]")
+            self._console_print(f"[dim {_tip_color}]âœ¦ Tip: {_tip}[/]")
         except Exception as _e:
             __import__("logging").getLogger(__name__).warning(
                 "[SessizExcept] %%s: %%s", type(_e).__name__, _e
-            )  # Tips are non-critical — never break startup
+            )  # Tips are non-critical â€” never break startup
 
-        # Curator — kick off a background skill-maintenance pass on startup
+        # Curator â€” kick off a background skill-maintenance pass on startup
         # if the schedule says we're due.  Runs in a daemon thread so it
         # never blocks the interactive loop.  Best-effort; any failure is
         # swallowed to avoid breaking session startup.
@@ -1825,7 +1825,7 @@ class TUIMixin:
 
             maybe_run_curator(
                 idle_for_seconds=float("inf"),  # CLI startup = fully idle
-                on_summary=lambda msg: self._console_print(f"[dim #6b7684]💾 {msg}[/]"),
+                on_summary=lambda msg: self._console_print(f"[dim #6b7684]ğŸ’¾ {msg}[/]"),
             )
         except Exception:
             logger.warning("[fix_01_sessiz_except] Exception")
@@ -1854,7 +1854,7 @@ class TUIMixin:
 
         get_plugin_manager()._cli_ref = self
 
-        # Config file watcher — detect mcp_servers changes and auto-reload
+        # Config file watcher â€” detect mcp_servers changes and auto-reload
         from reymen.reymen_cli.config import get_config_path as _get_config_path
 
         _cfg_path = _get_config_path()
@@ -2000,7 +2000,7 @@ class TUIMixin:
                 try:
                     self._handle_model_picker_selection()
                 except Exception as _exc:
-                    _cprint(f"  ✗ Model selection failed: {_exc}")
+                    _cprint(f"  âœ— Model selection failed: {_exc}")
                     self._close_model_picker()
                 event.app.current_buffer.reset()
                 event.app.invalidate()
@@ -2027,7 +2027,7 @@ class TUIMixin:
                     self._clarify_state = None
                     event.app.invalidate()
                 else:
-                    # "Other" selected → switch to freetext
+                    # "Other" selected â†’ switch to freetext
                     self._clarify_freetext = True
                     event.app.invalidate()
                 return
@@ -2051,7 +2051,7 @@ class TUIMixin:
                     # invalidates the app, so the just-cleared input area can
                     # keep showing the submitted text until some unrelated
                     # redraw fires. Every other early-return branch in this
-                    # handler invalidates after reset — match them.
+                    # handler invalidates after reset â€” match them.
                     event.app.invalidate()
                     return
 
@@ -2059,7 +2059,7 @@ class TUIMixin:
                 # UI thread.  Queuing through _pending_input would deadlock the
                 # steer until after the agent loop finishes (process_loop is
                 # blocked inside self.chat()), which turns /steer into a
-                # post-run next-turn message — defeating mid-run injection.
+                # post-run next-turn message â€” defeating mid-run injection.
                 # agent.steer() is thread-safe (holds _pending_steer_lock).
                 if self._should_handle_steer_command_inline(
                     text, has_images=has_images
@@ -2086,7 +2086,7 @@ class TUIMixin:
                 ):
                     _effective_mode = self.busy_input_mode
                     if _effective_mode == "steer":
-                        # Route Enter through /steer — inject mid-run after the
+                        # Route Enter through /steer â€” inject mid-run after the
                         # next tool call.  Images can't ride along (steer only
                         # appends text), so fall back to queue when images are
                         # attached.  If the agent lacks steer() or rejects the
@@ -2102,12 +2102,12 @@ class TUIMixin:
                                     accepted = bool(self.agent.steer(text))
                             except Exception as exc:
                                 _cprint(
-                                    f"  {_DIM}Steer failed ({exc}) — queued for next turn.{_RST}"
+                                    f"  {_DIM}Steer failed ({exc}) â€” queued for next turn.{_RST}"
                                 )
                                 accepted = False
                             if accepted:
                                 preview = text[:80] + ("..." if len(text) > 80 else "")
-                                _cprint(f"  {_ACCENT}⏩ Steered: '{preview}'{_RST}")
+                                _cprint(f"  {_ACCENT}â© Steered: '{preview}'{_RST}")
                             else:
                                 _effective_mode = "queue"
                     if _effective_mode == "queue":
@@ -2168,7 +2168,7 @@ class TUIMixin:
 
             Works on mac/Linux/WSL. On Windows Terminal this keystroke is
             intercepted at the terminal layer (toggles fullscreen) and never
-            reaches here — Windows users get newline via Ctrl+Enter instead
+            reaches here â€” Windows users get newline via Ctrl+Enter instead
             (bound below as c-j, since WT delivers Ctrl+Enter as LF).
             """
             event.current_buffer.insert_text("\n")
@@ -2185,14 +2185,14 @@ class TUIMixin:
                 terminals, giving an Enter-involving newline keystroke
                 without requiring terminal settings changes. Ctrl+J (the raw
                 LF keystroke) also triggers this by virtue of being the same
-                key code — a harmless side effect since Ctrl+J has no
+                key code â€” a harmless side effect since Ctrl+J has no
                 conflicting ReYMeN binding. See issue #22379.
                 """
                 event.current_buffer.insert_text("\n")
 
         # VSCode/Cursor bind Ctrl+G to "Find Next" at the editor level, so
         # the keystroke never reaches the embedded terminal. Alt+G is unbound
-        # in those IDEs and arrives here as ('escape', 'g') — register it as
+        # in those IDEs and arrives here as ('escape', 'g') â€” register it as
         # a fallback so the editor handoff works inside Cursor/VSCode too.
         _editor_filter = Condition(
             lambda: not self._clarify_state
@@ -2212,9 +2212,9 @@ class TUIMixin:
             """Tab: accept completion, auto-suggestion, or start completions.
 
             Priority:
-            1. Completion menu open → accept selected completion
-            2. Ghost text suggestion available → accept auto-suggestion
-            3. Otherwise → start completion menu
+            1. Completion menu open â†’ accept selected completion
+            2. Ghost text suggestion available â†’ accept auto-suggestion
+            3. Otherwise â†’ start completion menu
 
             After accepting a provider like 'anthropic:', the completion menu
             closes and complete_while_typing doesn't fire (no keystroke).
@@ -2223,10 +2223,10 @@ class TUIMixin:
             """
             buf = event.current_buffer
             if buf.complete_state:
-                # Completion menu is open — accept the selection
+                # Completion menu is open â€” accept the selection
                 completion = buf.complete_state.current_completion
                 if completion is None:
-                    # Menu open but nothing selected — select first then grab it
+                    # Menu open but nothing selected â€” select first then grab it
                     buf.go_to_completion(0)
                     completion = (
                         buf.complete_state and buf.complete_state.current_completion
@@ -2236,10 +2236,10 @@ class TUIMixin:
                 # Accept the selected completion
                 buf.apply_completion(completion)
             elif buf.suggestion and buf.suggestion.text:
-                # No completion menu, but there's a ghost text auto-suggestion — accept it
+                # No completion menu, but there's a ghost text auto-suggestion â€” accept it
                 buf.insert_text(buf.suggestion.text)
             else:
-                # No menu and no suggestion — start completions from scratch
+                # No menu and no suggestion â€” start completions from scratch
                 buf.start_completion()
 
         # --- Clarify tool: arrow-key navigation for multiple-choice questions ---
@@ -2435,9 +2435,9 @@ class TUIMixin:
         def handle_ctrl_l(event):
             """Ctrl+L: force a clean full-screen repaint.
 
-            Recovers the UI after external terminal buffer drift — tmux /
+            Recovers the UI after external terminal buffer drift â€” tmux /
             cmux tab switches, ``clear`` from a subshell, SSH window
-            restores, etc. — that prompt_toolkit can't detect on its own.
+            restores, etc. â€” that prompt_toolkit can't detect on its own.
             Matches the universal bash/zsh/fish/vim/htop convention.
             """
             self._force_full_redraw()
@@ -2519,13 +2519,13 @@ class TUIMixin:
 
             if self._agent_running and self.agent:
                 if now - self._last_ctrl_c_time < 2.0:
-                    print("\n⚡ Force exiting...")
+                    print("\nâš¡ Force exiting...")
                     self._should_exit = True
                     event.app.exit()
                     return
 
                 self._last_ctrl_c_time = now
-                print("\n⚡ Interrupting agent... (press Ctrl+C again to force exit)")
+                print("\nâš¡ Interrupting agent... (press Ctrl+C again to force exit)")
                 self.agent.interrupt()
             # If there's text or images, clear them (like bash).
             # If everything is already empty, exit.
@@ -2539,7 +2539,7 @@ class TUIMixin:
 
         # Ctrl+Shift+C: no binding needed. Terminal emulators (GNOME Terminal,
         # iTerm2, kitty, Windows Terminal, etc.) intercept Ctrl+Shift+C before
-        # the keystroke reaches the application's stdin — prompt_toolkit never
+        # the keystroke reaches the application's stdin â€” prompt_toolkit never
         # sees it, and prompt_toolkit's key spec parser doesn't even recognise
         # 'c-S-c' anyway (the Shift modifier is meaningless on control-sequence
         # keys). #19884 added a handler for this; #19895 patched the resulting
@@ -2616,7 +2616,7 @@ class TUIMixin:
                 return
 
             if self._agent_running and self.agent:
-                print("\n⚡ Interrupting agent...")
+                print("\nâš¡ Interrupting agent...")
                 self.agent.interrupt()
             elif event.app.current_buffer.text or self._attached_images:
                 event.app.current_buffer.reset()
@@ -2629,7 +2629,7 @@ class TUIMixin:
         @kb.add("c-d")
         def handle_ctrl_d(event):
             """Ctrl+D: delete char under cursor (standard readline behaviour).
-            Only exit when the input is empty — same as bash/zsh. Pending
+            Only exit when the input is empty â€” same as bash/zsh. Pending
             attached images count as input and block the EOF-exit so the
             user doesn't lose them silently.
             """
@@ -2637,7 +2637,7 @@ class TUIMixin:
             if buf.text:
                 buf.delete()
             elif self._attached_images:
-                # Empty text but pending attachments — no-op, don't exit.
+                # Empty text but pending attachments â€” no-op, don't exit.
                 return
             else:
                 self._should_exit = True
@@ -2695,7 +2695,7 @@ class TUIMixin:
         # so the same config value binds identically in the TUI and CLI
         # (Copilot round-9 review on #19835). ``super``/``win``/``windows``
         # configs silently fall back to the default here since prompt_toolkit
-        # has no super modifier — log a warning so users notice the
+        # has no super modifier â€” log a warning so users notice the
         # TUI/CLI split instead of a silent mismatch (round-11).
         _raw_key: object = "ctrl+b"
         try:
@@ -2722,7 +2722,7 @@ class TUIMixin:
         except Exception:
             _voice_key = "c-b"
 
-        # Cache the UI label here — same ``_raw_key`` that drives the
+        # Cache the UI label here â€” same ``_raw_key`` that drives the
         # prompt_toolkit binding below. Every status / placeholder /
         # recording-hint render reads this cached value so display can
         # never drift from the live keybinding even if the user edits
@@ -2762,7 +2762,7 @@ class TUIMixin:
                 ):
                     return
                 # Guard: don't start while a previous stop/transcribe cycle is
-                # still running — recorder.stop() holds AudioRecorder._lock and
+                # still running â€” recorder.stop() holds AudioRecorder._lock and
                 # start() would block the event-loop thread waiting for it.
                 if cli_ref._voice_processing:
                     return
@@ -2799,7 +2799,7 @@ class TUIMixin:
 
         @kb.add(Keys.BracketedPaste, eager=True)
         def handle_paste(event):
-            """Handle terminal paste — detect clipboard images.
+            """Handle terminal paste â€” detect clipboard images.
 
             When the terminal supports bracketed paste, Ctrl+V / Cmd+V
             triggers this with the pasted text. We only auto-attach a
@@ -2817,7 +2817,7 @@ class TUIMixin:
             _paste_handler_start = time.perf_counter()
             _paste_raw_size = len(event.data or "")
             pasted_text = event.data or ""
-            # Normalise line endings — Windows \r\n and old Mac \r both become \n
+            # Normalise line endings â€” Windows \r\n and old Mac \r both become \n
             # so the 5-line collapse threshold and display are consistent.
             pasted_text = pasted_text.replace("\r\n", "\n").replace("\r", "\n")
             pasted_text = _strip_leaked_bracketed_paste_wrappers(pasted_text)
@@ -2901,7 +2901,7 @@ class TUIMixin:
 
         @kb.add("escape", "v")
         def handle_alt_v(event):
-            """Alt+V — paste image from clipboard.
+            """Alt+V â€” paste image from clipboard.
 
             Alt key combos pass through all terminal emulators (sent as
             ESC + key), unlike Ctrl+V which terminals intercept for text
@@ -2912,7 +2912,7 @@ class TUIMixin:
             if self._try_attach_clipboard_image():
                 event.app.invalidate()
             else:
-                # No image found — show a hint
+                # No image found â€” show a hint
                 pass  # silent when no image (avoid noise on accidental press)
 
         # Dynamic prompt: shows ReYMeN symbol when agent is working,
@@ -3000,9 +3000,9 @@ class TUIMixin:
             terminals without bracketed paste support.
 
             Two heuristics (either triggers collapse):
-            1. Many characters added at once (chars_added > 1) — works
+            1. Many characters added at once (chars_added > 1) â€” works
                when the terminal delivers the paste in one event-loop tick.
-            2. Newline count jumped by 4+ in a single text-change event —
+            2. Newline count jumped by 4+ in a single text-change event â€”
                catches terminals that feed characters individually but
                still batch newlines.  Alt+Enter only adds 1 newline per
                event so it never triggers this.
@@ -3080,7 +3080,7 @@ class TUIMixin:
                 if not ti.document.text and ti.lineno == 0:
                     text = self._get_text()
                     if text:
-                        # Append after existing fragments (preserves the ❯ prompt)
+                        # Append after existing fragments (preserves the â¯ prompt)
                         return Transformation(
                             fragments=ti.fragments + [("class:placeholder", text)]
                         )
@@ -3093,13 +3093,13 @@ class TUIMixin:
             if cli_ref._voice_processing:
                 return "transcribing..."
             if cli_ref._sudo_state:
-                return "type password (hidden), Enter to submit · ESC to skip"
+                return "type password (hidden), Enter to submit Â· ESC to skip"
             if cli_ref._secret_state:
-                return "type secret (hidden), Enter to submit · ESC to skip"
+                return "type secret (hidden), Enter to submit Â· ESC to skip"
             if cli_ref._approval_state:
                 return ""
             if cli_ref._slash_confirm_state:
-                return "type 1/2/3, or use ↑/↓ then Enter"
+                return "type 1/2/3, or use â†‘/â†“ then Enter"
             if cli_ref._clarify_freetext:
                 return "type your answer here and press Enter"
             if cli_ref._clarify_state:
@@ -3109,7 +3109,7 @@ class TUIMixin:
                 status = cli_ref._command_status or "Processing command..."
                 return f"{frame} {status}"
             if cli_ref._agent_running:
-                return "msg=interrupt · /queue · /bg · /steer · Ctrl+C cancel"
+                return "msg=interrupt Â· /queue Â· /bg Â· /steer Â· Ctrl+C cancel"
             if cli_ref._voice_mode:
                 _label = cli_ref._voice_record_key_label()
                 return f"type or {_label} to record"
@@ -3126,21 +3126,21 @@ class TUIMixin:
             if cli_ref._sudo_state:
                 remaining = max(0, int(cli_ref._sudo_deadline - time.monotonic()))
                 return [
-                    ("class:hint", "  password hidden · Enter to skip"),
+                    ("class:hint", "  password hidden Â· Enter to skip"),
                     ("class:clarify-countdown", f"  ({remaining}s)"),
                 ]
 
             if cli_ref._secret_state:
                 remaining = max(0, int(cli_ref._secret_deadline - time.monotonic()))
                 return [
-                    ("class:hint", "  secret hidden · Enter to skip"),
+                    ("class:hint", "  secret hidden Â· Enter to skip"),
                     ("class:clarify-countdown", f"  ({remaining}s)"),
                 ]
 
             if cli_ref._approval_state:
                 remaining = max(0, int(cli_ref._approval_deadline - time.monotonic()))
                 return [
-                    ("class:hint", "  ↑/↓ to select, Enter to confirm"),
+                    ("class:hint", "  â†‘/â†“ to select, Enter to confirm"),
                     ("class:clarify-countdown", f"  ({remaining}s)"),
                 ]
 
@@ -3149,7 +3149,7 @@ class TUIMixin:
                     0, int(cli_ref._slash_confirm_deadline - time.monotonic())
                 )
                 return [
-                    ("class:hint", "  type 1/2/3, or ↑/↓ to select, Enter to confirm"),
+                    ("class:hint", "  type 1/2/3, or â†‘/â†“ to select, Enter to confirm"),
                     ("class:clarify-countdown", f"  ({remaining}s)"),
                 ]
 
@@ -3162,7 +3162,7 @@ class TUIMixin:
                         ("class:clarify-countdown", countdown),
                     ]
                 return [
-                    ("class:hint", "  ↑/↓ to select, Enter to confirm"),
+                    ("class:hint", "  â†‘/â†“ to select, Enter to confirm"),
                     ("class:clarify-countdown", countdown),
                 ]
 
@@ -3171,7 +3171,7 @@ class TUIMixin:
                 return [
                     (
                         "class:hint",
-                        f"  {frame} command in progress · input temporarily disabled",
+                        f"  {frame} command in progress Â· input temporarily disabled",
                     ),
                 ]
 
@@ -3247,12 +3247,12 @@ class TUIMixin:
             lines, border_style: str, content_style: str, text: str, box_width: int
         ) -> None:
             inner_width = max(0, box_width - 2)
-            lines.append((border_style, "│ "))
+            lines.append((border_style, "â”‚ "))
             lines.append((content_style, text.ljust(inner_width)))
-            lines.append((border_style, " │\n"))
+            lines.append((border_style, " â”‚\n"))
 
         def _append_blank_panel_line(lines, border_style: str, box_width: int) -> None:
-            lines.append((border_style, "│" + (" " * box_width) + "│\n"))
+            lines.append((border_style, "â”‚" + (" " * box_width) + "â”‚\n"))
 
         def _get_clarify_display():
             """Build styled text for the clarify question/choices panel.
@@ -3279,7 +3279,7 @@ class TUIMixin:
                 else:
                     num_prefix = " "
                 if i == selected and not cli_ref._clarify_freetext:
-                    prefix = f"❯ {num_prefix}. "
+                    prefix = f"â¯ {num_prefix}. "
                 else:
                     prefix = f"  {num_prefix}. "
                 preview_lines.extend(
@@ -3294,9 +3294,9 @@ class TUIMixin:
             else:
                 other_num_prefix = " "
             other_label = (
-                f"❯ {other_num_prefix}. Other (type below)"
+                f"â¯ {other_num_prefix}. Other (type below)"
                 if cli_ref._clarify_freetext
-                else f"❯ {other_num_prefix}. Other (type your answer)"
+                else f"â¯ {other_num_prefix}. Other (type your answer)"
                 if selected == len(choices)
                 else f"  {other_num_prefix}. Other (type your answer)"
             )
@@ -3306,7 +3306,7 @@ class TUIMixin:
             box_width = _panel_box_width("ReYMeN needs your input", preview_lines)
             inner_text_width = max(8, box_width - 2)
 
-            # Pre-wrap choices + Other option — these are mandatory.
+            # Pre-wrap choices + Other option â€” these are mandatory.
             choice_wrapped: list[tuple[int, str]] = []
             if choices:
                 for i, choice in enumerate(choices):
@@ -3318,7 +3318,7 @@ class TUIMixin:
                     else:
                         num_prefix = " "
                     if i == selected and not cli_ref._clarify_freetext:
-                        prefix = f"❯ {num_prefix}. "
+                        prefix = f"â¯ {num_prefix}. "
                     else:
                         prefix = f"  {num_prefix}. "
                     for wrapped in _wrap_panel_text(
@@ -3335,9 +3335,9 @@ class TUIMixin:
                 else:
                     other_num_prefix = " "
                 if selected == other_idx and not cli_ref._clarify_freetext:
-                    other_label_mand = f"❯ {other_num_prefix}. Other (type your answer)"
+                    other_label_mand = f"â¯ {other_num_prefix}. Other (type your answer)"
                 elif cli_ref._clarify_freetext:
-                    other_label_mand = f"❯ {other_num_prefix}. Other (type below)"
+                    other_label_mand = f"â¯ {other_num_prefix}. Other (type below)"
                 else:
                     other_label_mand = f"  {other_num_prefix}. Other (type your answer)"
                 other_wrapped = _wrap_panel_text(
@@ -3369,7 +3369,7 @@ class TUIMixin:
             # The compact decision must reserve room for at least one question
             # row on top of the choices, otherwise full chrome (3 blank
             # separators) gets kept when there is no room for it and the panel
-            # overflows the viewport — HSplit then clips the panel's tail,
+            # overflows the viewport â€” HSplit then clips the panel's tail,
             # silently dropping the choices (the reported bug).
             mandatory_full = chrome_full + 1 + len(choice_wrapped) + len(other_wrapped)
 
@@ -3382,7 +3382,7 @@ class TUIMixin:
             max_question_rows = min(max_question_rows, 12)  # soft cap on huge terminals
 
             # When the choices alone (plus compact chrome) already exceed the
-            # viewport, drop the question entirely — the choices are the only
+            # viewport, drop the question entirely â€” the choices are the only
             # thing the user must see to make a selection. Without this the
             # question would still claim its 1-row floor above and push the
             # tail of the choices off-screen (HSplit clips the overflow).
@@ -3398,21 +3398,21 @@ class TUIMixin:
             elif len(question_wrapped) > max_question_rows:
                 # The truncation marker is itself a row, so it must count
                 # against the budget. With a 1-row budget there is no room for
-                # both a question line and the marker — show the marker alone
+                # both a question line and the marker â€” show the marker alone
                 # so the rendered question never exceeds max_question_rows.
                 keep = max(0, max_question_rows - 1)
-                question_wrapped = question_wrapped[:keep] + ["… (question truncated)"]
+                question_wrapped = question_wrapped[:keep] + ["â€¦ (question truncated)"]
 
             lines = []
             # Box top border
-            lines.append(("class:clarify-border", "╭─ "))
+            lines.append(("class:clarify-border", "â•­â”€ "))
             lines.append(("class:clarify-title", "ReYMeN needs your input"))
             lines.append(
                 (
                     "class:clarify-border",
                     " "
-                    + ("─" * max(0, box_width - len("ReYMeN needs your input") - 3))
-                    + "╮\n",
+                    + ("â”€" * max(0, box_width - len("ReYMeN needs your input") - 3))
+                    + "â•®\n",
                 )
             )
             if not use_compact_chrome:
@@ -3478,7 +3478,7 @@ class TUIMixin:
 
             if not use_compact_chrome:
                 _append_blank_panel_line(lines, "class:clarify-border", box_width)
-            lines.append(("class:clarify-border", "╰" + ("─" * box_width) + "╯\n"))
+            lines.append(("class:clarify-border", "â•°" + ("â”€" * box_width) + "â•¯\n"))
             return lines
 
         clarify_widget = ConditionalContainer(
@@ -3495,16 +3495,16 @@ class TUIMixin:
             state = cli_ref._sudo_state
             if not state:
                 return []
-            title = "🔐 Sudo Password Required"
+            title = "ğŸ” Sudo Password Required"
             body = "Enter password below (hidden), or press Enter to skip"
             box_width = _panel_box_width(title, [body])
             lines = []
-            lines.append(("class:sudo-border", "╭─ "))
+            lines.append(("class:sudo-border", "â•­â”€ "))
             lines.append(("class:sudo-title", title))
             lines.append(
                 (
                     "class:sudo-border",
-                    " " + ("─" * max(0, box_width - len(title) - 3)) + "╮\n",
+                    " " + ("â”€" * max(0, box_width - len(title) - 3)) + "â•®\n",
                 )
             )
             _append_blank_panel_line(lines, "class:sudo-border", box_width)
@@ -3512,7 +3512,7 @@ class TUIMixin:
                 lines, "class:sudo-border", "class:sudo-text", body, box_width
             )
             _append_blank_panel_line(lines, "class:sudo-border", box_width)
-            lines.append(("class:sudo-border", "╰" + ("─" * box_width) + "╯\n"))
+            lines.append(("class:sudo-border", "â•°" + ("â”€" * box_width) + "â•¯\n"))
             return lines
 
         sudo_widget = ConditionalContainer(
@@ -3528,7 +3528,7 @@ class TUIMixin:
             if not state:
                 return []
 
-            title = "🔑 Skill Setup Required"
+            title = "ğŸ”‘ Skill Setup Required"
             prompt = (
                 state.get("prompt")
                 or f"Enter value for {state.get('var_name', 'secret')}"
@@ -3541,12 +3541,12 @@ class TUIMixin:
                 content_lines.insert(1, str(help_text))
             box_width = _panel_box_width(title, content_lines)
             lines = []
-            lines.append(("class:sudo-border", "╭─ "))
+            lines.append(("class:sudo-border", "â•­â”€ "))
             lines.append(("class:sudo-title", title))
             lines.append(
                 (
                     "class:sudo-border",
-                    " " + ("─" * max(0, box_width - len(title) - 3)) + "╮\n",
+                    " " + ("â”€" * max(0, box_width - len(title) - 3)) + "â•®\n",
                 )
             )
             _append_blank_panel_line(lines, "class:sudo-border", box_width)
@@ -3566,7 +3566,7 @@ class TUIMixin:
                 lines, "class:sudo-border", "class:sudo-text", body, box_width
             )
             _append_blank_panel_line(lines, "class:sudo-border", box_width)
-            lines.append(("class:sudo-border", "╰" + ("─" * box_width) + "╯\n"))
+            lines.append(("class:sudo-border", "â•°" + ("â”€" * box_width) + "â•¯\n"))
             return lines
 
         secret_widget = ConditionalContainer(
@@ -3608,22 +3608,22 @@ class TUIMixin:
                 return []
             stage = state.get("stage", "provider")
             if stage == "provider":
-                title = "⚙ Model Picker — Select Provider"
+                title = "âš™ Model Picker â€” Select Provider"
                 choices = []
                 _providers = state.get("providers")
                 for p in _providers if isinstance(_providers, list) else []:
                     count = p.get("total_models", len(p.get("models", [])))
                     label = f"{p['name']} ({count} model{'s' if count != 1 else ''})"
                     if p.get("is_current"):
-                        label += "  ← current"
+                        label += "  â† current"
                     choices.append(label)
                 choices.append("Cancel")
                 hint = f"Current: {state.get('current_model', 'unknown')} on {state.get('current_provider', 'unknown')}"
             else:
                 provider_data = state.get("provider_data") or {}
                 model_list = state.get("model_list") or []
-                title = f"⚙ Model Picker — {provider_data.get('name', provider_data.get('slug', 'Provider'))}"
-                choices = list(model_list) + ["← Back", "Cancel"]
+                title = f"âš™ Model Picker â€” {provider_data.get('name', provider_data.get('slug', 'Provider'))}"
+                choices = list(model_list) + ["â† Back", "Cancel"]
                 if model_list:
                     hint = f"Select a model ({len(model_list)} available)"
                 else:
@@ -3654,12 +3654,12 @@ class TUIMixin:
             state["_scroll_offset"] = scroll_offset
 
             lines = []
-            lines.append(("class:clarify-border", "╭─ "))
+            lines.append(("class:clarify-border", "â•­â”€ "))
             lines.append(("class:clarify-title", title))
             lines.append(
                 (
                     "class:clarify-border",
-                    " " + ("─" * max(0, box_width - len(title) - 3)) + "╮\n",
+                    " " + ("â”€" * max(0, box_width - len(title) - 3)) + "â•®\n",
                 )
             )
             _append_blank_panel_line(lines, "class:clarify-border", box_width)
@@ -3674,7 +3674,7 @@ class TUIMixin:
                     if idx == selected
                     else "class:clarify-choice"
                 )
-                prefix = "❯ " if idx == selected else "  "
+                prefix = "â¯ " if idx == selected else "  "
                 for wrapped in _wrap_panel_text(
                     prefix + choice, inner_text_width, subsequent_indent="  "
                 ):
@@ -3682,7 +3682,7 @@ class TUIMixin:
                         lines, "class:clarify-border", style, wrapped, box_width
                     )
             _append_blank_panel_line(lines, "class:clarify-border", box_width)
-            lines.append(("class:clarify-border", "╰" + ("─" * box_width) + "╯\n"))
+            lines.append(("class:clarify-border", "â•°" + ("â”€" * box_width) + "â•¯\n"))
             return lines
 
         model_picker_widget = ConditionalContainer(
@@ -3697,17 +3697,17 @@ class TUIMixin:
         # On narrow/mobile terminals we keep the top separator for structure but
         # hide the bottom one to recover a full row for conversation content.
         input_rule_top = Window(
-            char="─",
+            char="â”€",
             height=lambda: cli_ref._tui_input_rule_height("top"),
             style="class:input-rule",
         )
         input_rule_bot = Window(
-            char="─",
+            char="â”€",
             height=lambda: cli_ref._tui_input_rule_height("bottom"),
             style="class:input-rule",
         )
 
-        # Image attachment indicator — shows badges like [📎 Image #1] above input
+        # Image attachment indicator â€” shows badges like [ğŸ“ Image #1] above input
         cli_ref = self
 
         def _get_image_bar():
@@ -3858,7 +3858,7 @@ class TUIMixin:
         _disable_prompt_toolkit_cpr_warning(app)
         self._app = app  # Store reference for clarify_callback
 
-        # ── Fix ghost status-bar lines on terminal resize ──────────────
+        # â”€â”€ Fix ghost status-bar lines on terminal resize â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         # Resize handling: monkey-patch prompt_toolkit's _output_screen_diff
         # to suppress the deliberate "reserve vertical space" scroll-up.
         #
@@ -3870,7 +3870,7 @@ class TUIMixin:
         # input rules) into terminal scrollback on every render.  When
         # the terminal column-shrinks, the emulator reflows the previously
         # rendered full-width rows into multiple narrower rows that get
-        # pushed up — leaving ghost duplicates AND polluting scrollback.
+        # pushed up â€” leaving ghost duplicates AND polluting scrollback.
         # Same issue as pt #29 (open since 2014), #1675, #1933.
         #
         # Surgical fix: wrap _output_screen_diff so that when its internal
@@ -3908,7 +3908,7 @@ class TUIMixin:
                     other code path's behavior.
 
                     Critical: do NOT replace a None previous_screen with
-                    a fresh Screen() — that would skip the proper
+                    a fresh Screen() â€” that would skip the proper
                     reset_attributes()+erase_down() at L178-185 which
                     fires when previous_screen is None (first-paint /
                     width-change).  Without that reset, ANSI styles
@@ -3982,7 +3982,7 @@ class TUIMixin:
                     try:
                         user_input = self._pending_input.get(timeout=0.1)
                     except queue.Empty:
-                        # Periodic config watcher — auto-reload MCP on mcp_servers change
+                        # Periodic config watcher â€” auto-reload MCP on mcp_servers change
                         if not self._agent_running:
                             self._check_config_mcp_changes()
                             # Check for background process notifications (completions
@@ -4021,7 +4021,7 @@ class TUIMixin:
                                 reason="mouse reports leaked into submitted input"
                             )
 
-                    # Check for commands — but detect dragged/pasted file paths first.
+                    # Check for commands â€” but detect dragged/pasted file paths first.
                     # See _detect_file_drop() for details.
                     _file_drop = (
                         _detect_file_drop(user_input)
@@ -4037,9 +4037,9 @@ class TUIMixin:
                                 _remainder
                                 or f"[User attached image: {_drop_path.name}]"
                             )
-                            _cprint(f"  📎 Auto-attached image: {_drop_path.name}")
+                            _cprint(f"  ğŸ“ Auto-attached image: {_drop_path.name}")
                         else:
-                            _cprint(f"  📄 Detected file: {_drop_path.name}")
+                            _cprint(f"  ğŸ“„ Detected file: {_drop_path.name}")
                             user_input = f"[User attached file: {_drop_path}]" + (
                                 f"\n{_remainder}" if _remainder else ""
                             )
@@ -4060,7 +4060,7 @@ class TUIMixin:
                         and isinstance(user_input, str)
                         and _looks_like_slash_command(user_input)
                     ):
-                        _cprint(f"\n⚙️  {user_input}")
+                        _cprint(f"\nâš™ï¸  {user_input}")
                         try:
                             if not self.process_command(user_input):
                                 self._should_exit = True
@@ -4094,7 +4094,7 @@ class TUIMixin:
                     if submit_images:
                         n = len(submit_images)
                         _cprint(
-                            f"  {_DIM}📎 {n} image{'s' if n > 1 else ''} attached{_RST}"
+                            f"  {_DIM}ğŸ“ {n} image{'s' if n > 1 else ''} attached{_RST}"
                         )
 
                     # Regular chat - run agent
@@ -4127,7 +4127,7 @@ class TUIMixin:
 
                         # Continuous voice: auto-restart recording after agent responds.
                         # Dispatch to a daemon thread so play_beep (sd.wait) and
-                        # AudioRecorder.start (lock acquire) never block process_loop —
+                        # AudioRecorder.start (lock acquire) never block process_loop â€”
                         # otherwise queued user input would stall silently.
                         if (
                             self._voice_mode
@@ -4161,7 +4161,7 @@ class TUIMixin:
                         except Exception as _e:
                             __import__("logging").getLogger(__name__).warning(
                                 "[SessizExcept] %%s: %%s", type(_e).__name__, _e
-                            )  # Non-fatal — don't break the main loop
+                            )  # Non-fatal â€” don't break the main loop
 
                 except Exception as e:
                     logger.warning(
@@ -4183,14 +4183,14 @@ class TUIMixin:
             thread's poll loop sees the per-thread interrupt and kills the
             tool's subprocess group via ``_kill_process`` (os.killpg).
             Without this, the main thread dies from KeyboardInterrupt and
-            the daemon thread is killed with it — before it can run one
+            the daemon thread is killed with it â€” before it can run one
             more poll iteration to clean up the subprocess, which was
             spawned with ``os.setsid`` and therefore survives as an orphan
             with PPID=1.
 
             Grace window (``ReYMeN_SIGTERM_GRACE``, default 1.5 s) gives
-            the daemon time to: detect the interrupt (next 200 ms poll) →
-            call _kill_process (SIGTERM + 1 s wait + SIGKILL if needed) →
+            the daemon time to: detect the interrupt (next 200 ms poll) â†’
+            call _kill_process (SIGTERM + 1 s wait + SIGKILL if needed) â†’
             return from _wait_for_process.  ``time.sleep`` releases the
             GIL so the daemon actually runs during the window.
 
@@ -4228,13 +4228,13 @@ class TUIMixin:
                 )  # never block signal handling
             # Prefer a clean prompt_toolkit exit over `raise KeyboardInterrupt()`.
             # Raising KBI from a signal handler unwinds into whatever Python
-            # frame the interpreter happens to be running — typically an
+            # frame the interpreter happens to be running â€” typically an
             # `await asyncio.sleep()` inside prompt_toolkit's
             # `_poll_output_size` coroutine.  The KBI becomes a Task
             # exception, prompt_toolkit's `_handle_exception` prints
             # "Unhandled exception in event loop" + the full traceback, and
             # parks the terminal on "Press ENTER to continue..." (#13710
-            # variant — same root cause, different surface).
+            # variant â€” same root cause, different surface).
             #
             # `app.exit()` scheduled via `call_soon_threadsafe` lets the
             # event loop unwind normally; `app.run()` returns and our
@@ -4248,7 +4248,7 @@ class TUIMixin:
                     _loop = getattr(_app, "loop", None)
                     if _loop is not None:
                         _loop.call_soon_threadsafe(_app.exit)
-                        return  # clean unwind — no traceback, no ENTER pause
+                        return  # clean unwind â€” no traceback, no ENTER pause
             except Exception:
                 logger.warning("[fix_01_sessiz_except] Exception")
             raise KeyboardInterrupt()  # fallback for non-prompt_toolkit contexts
@@ -4268,7 +4268,7 @@ class TUIMixin:
             # subprocess Popen path). The default Python SIGINT handler
             # would then unwind prompt_toolkit's app.run(), trigger
             # _run_cleanup mid-turn, and close browser sessions mid-open
-            # — causing "Daemon process exited during startup" errors.
+            # â€” causing "Daemon process exited during startup" errors.
             #
             # The handler is a silent no-op. Real user Ctrl+C still works
             # because prompt_toolkit binds c-c at the TUI layer and never
@@ -4299,7 +4299,7 @@ class TUIMixin:
         # Install a custom asyncio exception handler that suppresses the
         # "Event loop is closed" RuntimeError from httpx transport cleanup
         # and the "0 is not registered" KeyError from broken stdin (#6393).
-        # The RuntimeError fix is defense-in-depth — the primary fix is
+        # The RuntimeError fix is defense-in-depth â€” the primary fix is
         # neuter_async_httpx_del which disables __del__ entirely.  The
         # KeyError fix handles macOS + uv-managed Python environments where
         # fd 0 is not reliably available to the asyncio selector.
@@ -4314,7 +4314,7 @@ class TUIMixin:
             # Fall back to default handler for everything else
             loop.default_exception_handler(context)
 
-        # Validate stdin before launching prompt_toolkit — on macOS with
+        # Validate stdin before launching prompt_toolkit â€” on macOS with
         # uv-managed Python, fd 0 can be invalid or unregisterable with the
         # asyncio selector, causing "KeyError: '0 is not registered'" (#6393).
         try:
@@ -4445,14 +4445,14 @@ class TUIMixin:
                         if self._session_db.delete_session(
                             _sid, sessions_dir=_sessions_dir
                         ):
-                            _cprint(f"  {_DIM}✓ Session {_escape(_sid)} deleted{_RST}")
+                            _cprint(f"  {_DIM}âœ“ Session {_escape(_sid)} deleted{_RST}")
                         else:
                             _cprint(
-                                f"  {_DIM}✗ Session {_escape(_sid)} not found for deletion{_RST}"
+                                f"  {_DIM}âœ— Session {_escape(_sid)} not found for deletion{_RST}"
                             )
                     except (Exception, KeyboardInterrupt) as e:
                         logger.debug("Could not delete session on exit: %s", e)
-            # Plugin hook: on_session_end — safety net for interrupted exits.
+            # Plugin hook: on_session_end â€” safety net for interrupted exits.
             # run_conversation() already fires this per-turn on normal completion,
             # so only fire here if the agent was mid-turn (_agent_running) when
             # the exit occurred, meaning run_conversation's hook didn't fire.
@@ -4474,8 +4474,8 @@ class TUIMixin:
             self._print_exit_summary()
 
         # Deferred relaunch: /update sets _pending_relaunch so the exec
-        # happens here — after prompt_toolkit has exited and fully restored
-        # terminal modes — rather than from the background process_loop
+        # happens here â€” after prompt_toolkit has exited and fully restored
+        # terminal modes â€” rather than from the background process_loop
         # thread (which would skip terminal cleanup on POSIX and only exit
         # the worker thread on Windows).
         if getattr(self, "_pending_relaunch", None):

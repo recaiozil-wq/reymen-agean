@@ -1,18 +1,18 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-araclar_ekran.py — Ekran-OCR-Tıkla aracı (hassas + görsel onay sürümü).
+araclar_ekran.py â€” Ekran-OCR-TÄ±kla aracÄ± (hassas + gÃ¶rsel onay sÃ¼rÃ¼mÃ¼).
 
-Akış: ekran al -> yazıyı OCR ile bul -> HASSAS nokta hesapla ->
-isteğe bağlı görsel nişan çiz (onay için) -> fareyi yolla -> tıkla.
+AkÄ±ÅŸ: ekran al -> yazÄ±yÄ± OCR ile bul -> HASSAS nokta hesapla ->
+isteÄŸe baÄŸlÄ± gÃ¶rsel niÅŸan Ã§iz (onay iÃ§in) -> fareyi yolla -> tÄ±kla.
 
-HASSASİYET (v1.0):
-- Ağırlık merkezi: kutunun 4 köşesinden gerçek merkez (poligon centroid).
-- Ofset: yazının yanındaki kutucuğa/ikona tıklamak için dx,dy kayması.
-- Görsel nişan: tıklanacak noktaya çapraz çizgi + daire çizip dosyaya kaydeder
-  (sen görüp onaylarsın -> "nokta konum belirlenip onay" akışı).
-- Çoklu adayı görselde numaralandırma.
+HASSASÄ°YET (v1.0):
+- AÄŸÄ±rlÄ±k merkezi: kutunun 4 kÃ¶ÅŸesinden gerÃ§ek merkez (poligon centroid).
+- Ofset: yazÄ±nÄ±n yanÄ±ndaki kutucuÄŸa/ikona tÄ±klamak iÃ§in dx,dy kaymasÄ±.
+- GÃ¶rsel niÅŸan: tÄ±klanacak noktaya Ã§apraz Ã§izgi + daire Ã§izip dosyaya kaydeder
+  (sen gÃ¶rÃ¼p onaylarsÄ±n -> "nokta konum belirlenip onay" akÄ±ÅŸÄ±).
+- Ã‡oklu adayÄ± gÃ¶rselde numaralandÄ±rma.
 
-GÜVENLİK (v0.9'dan): güven eşiği, çoklu eşleşme, FAILSAFE, tıklama sayacı.
+GÃœVENLÄ°K (v0.9'dan): gÃ¼ven eÅŸiÄŸi, Ã§oklu eÅŸleÅŸme, FAILSAFE, tÄ±klama sayacÄ±.
 """
 
 import os
@@ -57,7 +57,7 @@ class EkranOCRTikla:
         return self._reader
 
     def _centroid(self, kutu):
-        """Poligon ağırlık merkezi (basit ortalama 4 köşe yerine alan-ağırlıklı)."""
+        """Poligon aÄŸÄ±rlÄ±k merkezi (basit ortalama 4 kÃ¶ÅŸe yerine alan-aÄŸÄ±rlÄ±klÄ±)."""
         n = len(kutu)
         cx = sum(p[0] for p in kutu) / n
         cy = sum(p[1] for p in kutu) / n
@@ -85,8 +85,8 @@ class EkranOCRTikla:
         return eslesmeler
 
     def nisan_ciz(self, x, y, dosya_adi="nisan.png", adaylar=None):
-        """Tıklanacak noktaya görsel nişan çizer, dosyaya kaydeder (onay için).
-        adaylar verilirse hepsini numaralandırır."""
+        """TÄ±klanacak noktaya gÃ¶rsel niÅŸan Ã§izer, dosyaya kaydeder (onay iÃ§in).
+        adaylar verilirse hepsini numaralandÄ±rÄ±r."""
         if not (PYAUTOGUI_OK and PIL_OK):
             return None
         img = pyautogui.screenshot()
@@ -102,7 +102,7 @@ class EkranOCRTikla:
         return yol
 
     def _tek_nisan(self, draw, x, y, etiket="", renk="red", r=18):
-        # çapraz çizgi
+        # Ã§apraz Ã§izgi
         draw.line([(x - r, y), (x + r, y)], fill=renk, width=2)
         draw.line([(x, y - r), (x, y + r)], fill=renk, width=2)
         # daire
@@ -113,19 +113,19 @@ class EkranOCRTikla:
     def yaziyi_bul_ve_tikla(
         self, aranan_yazi, tikla=True, hangi=0, dx=0, dy=0, nisan=False
     ):
-        """Yazıyı bulur, HASSAS nokta hesaplar, isteğe bağlı nişan çizer, tıklar.
-        dx,dy: tıklama noktasına ofset (yan kutucuğa tıklamak için).
-        nisan=True: tıklamadan önce görsel nişan dosyası üretir (onay için)."""
+        """YazÄ±yÄ± bulur, HASSAS nokta hesaplar, isteÄŸe baÄŸlÄ± niÅŸan Ã§izer, tÄ±klar.
+        dx,dy: tÄ±klama noktasÄ±na ofset (yan kutucuÄŸa tÄ±klamak iÃ§in).
+        nisan=True: tÄ±klamadan Ã¶nce gÃ¶rsel niÅŸan dosyasÄ± Ã¼retir (onay iÃ§in)."""
         if not PYAUTOGUI_OK:
-            return "[Ekran]: pyautogui kurulu değil."
+            return "[Ekran]: pyautogui kurulu deÄŸil."
         if not EASYOCR_OK:
-            return "[Ekran]: easyocr kurulu değil."
+            return "[Ekran]: easyocr kurulu deÄŸil."
         if self._tiklama_sayaci >= self.max_tiklama:
-            return f"[Ekran]: Tıklama sınırı ({self.max_tiklama}) aşıldı."
+            return f"[Ekran]: TÄ±klama sÄ±nÄ±rÄ± ({self.max_tiklama}) aÅŸÄ±ldÄ±."
 
         eslesmeler = self._eslesmeleri_bul(aranan_yazi)
         if not eslesmeler:
-            return f"[Ekran]: '{aranan_yazi}' yeterli güvenle bulunamadı (eşik {self.guven_esigi})."
+            return f"[Ekran]: '{aranan_yazi}' yeterli gÃ¼venle bulunamadÄ± (eÅŸik {self.guven_esigi})."
 
         if len(eslesmeler) > 1 and hangi == -1:
             yol = (
@@ -139,12 +139,12 @@ class EkranOCRTikla:
                 else None
             )
             satir = "\n".join(
-                f"  [{i}] '{e['metin']}' ({e['x']},{e['y']}) güven={e['guven']}"
+                f"  [{i}] '{e['metin']}' ({e['x']},{e['y']}) gÃ¼ven={e['guven']}"
                 for i, e in enumerate(eslesmeler)
             )
-            ek = f"\n  Görsel: {yol}" if yol else ""
+            ek = f"\n  GÃ¶rsel: {yol}" if yol else ""
             return (
-                f"[Ekran]: '{aranan_yazi}' için {len(eslesmeler)} eşleşme:\n{satir}{ek}"
+                f"[Ekran]: '{aranan_yazi}' iÃ§in {len(eslesmeler)} eÅŸleÅŸme:\n{satir}{ek}"
             )
 
         if hangi < 0 or hangi >= len(eslesmeler):
@@ -153,30 +153,30 @@ class EkranOCRTikla:
         hedef_x = secili["x"] + dx
         hedef_y = secili["y"] + dy
 
-        # Görsel onay için nişan çiz
+        # GÃ¶rsel onay iÃ§in niÅŸan Ã§iz
         nisan_yolu = None
         if nisan:
             nisan_yolu = self.nisan_ciz(hedef_x, hedef_y, "hedef.png")
 
         if not tikla:
-            ek = f" Nişan: {nisan_yolu}" if nisan_yolu else ""
+            ek = f" NiÅŸan: {nisan_yolu}" if nisan_yolu else ""
             return (
                 f"[Ekran]: '{secili['metin']}' hedef nokta ({hedef_x},{hedef_y}), "
-                f"tıklanmadı.{ek}"
+                f"tÄ±klanmadÄ±.{ek}"
             )
 
         pyautogui.moveTo(hedef_x, hedef_y, duration=0.3)
         pyautogui.click()
         self._tiklama_sayaci += 1
-        ek = f" Nişan: {nisan_yolu}" if nisan_yolu else ""
+        ek = f" NiÅŸan: {nisan_yolu}" if nisan_yolu else ""
         return (
-            f"[Ekran]: '{secili['metin']}' tıklandı ({hedef_x},{hedef_y}, "
-            f"güven={secili['guven']}). Tıklama #{self._tiklama_sayaci}.{ek}"
+            f"[Ekran]: '{secili['metin']}' tÄ±klandÄ± ({hedef_x},{hedef_y}, "
+            f"gÃ¼ven={secili['guven']}). TÄ±klama #{self._tiklama_sayaci}.{ek}"
         )
 
     def ekran_metnini_oku(self):
         if not (PYAUTOGUI_OK and EASYOCR_OK):
-            return "[Ekran]: pyautogui veya easyocr kurulu değil."
+            return "[Ekran]: pyautogui veya easyocr kurulu deÄŸil."
         import numpy as np
 
         kare = np.array(pyautogui.screenshot())
@@ -193,14 +193,14 @@ def motor_kaydet(motor):
     motor._plugin_arac_kaydet(
         "EKRAN_OKU",
         lambda: _ekran.ekran_metnini_oku(),
-        "Ekrandaki tüm metni OCR ile oku",
+        "Ekrandaki tÃ¼m metni OCR ile oku",
     )
     motor._plugin_arac_kaydet(
         "EKRAN_TIKLA",
         lambda yazi="", hangi="0": _ekran.yaziyi_bul_ve_tikla(
             yazi, hangi=int(hangi) if str(hangi).lstrip("-").isdigit() else 0
         ),
-        "Ekrandaki yazıyı OCR ile bul ve tıkla (yazi, hangi: eşleşme indisi)",
+        "Ekrandaki yazÄ±yÄ± OCR ile bul ve tÄ±kla (yazi, hangi: eÅŸleÅŸme indisi)",
     )
 
 

@@ -1,1 +1,1 @@
-"""Edit command handlers — extracted from edit_commands.py."""
+﻿"""Edit command handlers â€” extracted from edit_commands.py."""

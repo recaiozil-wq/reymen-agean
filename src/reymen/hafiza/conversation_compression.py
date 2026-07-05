@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""conversation_compression.py — Konusma Sikistirma.
+﻿# -*- coding: utf-8 -*-
+"""conversation_compression.py â€” Konusma Sikistirma.
 
 Uzun konusma gecmisini LLM ile ozetleyerek context'e sigdirir.
 context_manager.py ile birlikte calisir.
@@ -12,13 +12,13 @@ from typing import Optional
 
 
 class ConversationCompressor:
-    """Sliding Window Memory — uzun konusmalari ozetleyerek context'e sigdirir.
+    """Sliding Window Memory â€” uzun konusmalari ozetleyerek context'e sigdirir.
 
-    Yapılandırılabilir pencere boyutuyla son N tur korunur,
-    daha eski turlar iteratif LLM ozeti olarak sıkıştırılır.
+    YapÄ±landÄ±rÄ±labilir pencere boyutuyla son N tur korunur,
+    daha eski turlar iteratif LLM ozeti olarak sÄ±kÄ±ÅŸtÄ±rÄ±lÄ±r.
     """
 
-    _OZET_BASLIGI = "[Önceki Konuşma Özeti]\n"
+    _OZET_BASLIGI = "[Ã–nceki KonuÅŸma Ã–zeti]\n"
 
     def __init__(self, provider=None, pencere_boyutu: int = 6, esik_token: int = 3500):
         """
@@ -33,18 +33,18 @@ class ConversationCompressor:
         self._diyalog_ozeti = ""  # Iteratif ozet: her sikistirmada guncellenir
         self._sikistirma_sayisi = 0
 
-    # ── Token tahmini ──────────────────────────────────────────────────
+    # â”€â”€ Token tahmini â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @staticmethod
     def _token_tahmin(mesajlar: list) -> int:
         return sum(len(m.get("content", "")) // 4 for m in mesajlar)
 
-    # ── Ozetleme ──────────────────────────────────────────────────────
+    # â”€â”€ Ozetleme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _llm_ozetle(self, mesajlar: list) -> str:
         """LLM kullanarak anlamli, gorev-odakli ozet uret."""
         satirlar = []
-        for m in mesajlar[-20:]:  # Son 20 mesajı al (sınırlı)
+        for m in mesajlar[-20:]:  # Son 20 mesajÄ± al (sÄ±nÄ±rlÄ±)
             rol = m.get("role", "?")
             icerik = m.get("content", "")[:300]
             satirlar.append(f"[{rol.upper()}]: {icerik}")
@@ -59,7 +59,7 @@ class ConversationCompressor:
             f"{onceki_bolum}"
             "Asagidaki ajan turlarini MAKSIMUM 5 cumlede ozetle.\n"
             "Odaklan: tamamlanan eylemler, ortaya cikan hatalar, kritik bulgular.\n"
-            "KISA VE BILGI-YOGUN yaz — model duygusal anlati degil, eylem ozeti bekliyor.\n\n"
+            "KISA VE BILGI-YOGUN yaz â€” model duygusal anlati degil, eylem ozeti bekliyor.\n\n"
             + "\n".join(satirlar)
         )
         try:
@@ -75,7 +75,7 @@ class ConversationCompressor:
         hatalar = []
         for m in mesajlar:
             icerik = m.get("content", "")
-            # Eylem satırlarını yakala
+            # Eylem satÄ±rlarÄ±nÄ± yakala
             for satir in icerik.splitlines():
                 satir = satir.strip()
                 if "Eylem:" in satir or "ACTION:" in satir:
@@ -85,7 +85,7 @@ class ConversationCompressor:
 
         parcalar = []
         if self._diyalog_ozeti:
-            parcalar.append(f"[Önceki]: {self._diyalog_ozeti[:200]}")
+            parcalar.append(f"[Ã–nceki]: {self._diyalog_ozeti[:200]}")
         if eylemler:
             parcalar.append("Eylemler: " + "; ".join(eylemler[-5:]))
         if hatalar:
@@ -94,20 +94,20 @@ class ConversationCompressor:
             parcalar.append(f"{len(mesajlar)} mesaj islendi.")
         return "\n".join(parcalar)
 
-    # ── Ana sikistirma ─────────────────────────────────────────────────
+    # â”€â”€ Ana sikistirma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def sikistir(self, mesajlar: list, esik_token: int = None) -> list:
-        """Mesaj listesini sliding window ile sıkıştırır.
+        """Mesaj listesini sliding window ile sÄ±kÄ±ÅŸtÄ±rÄ±r.
 
         Son ``pencere_boyutu`` mesaj korunur, daha eskiler ozetlenir.
-        Token esiginin altındaysa dokunulmaz.
+        Token esiginin altÄ±ndaysa dokunulmaz.
 
         Args:
             mesajlar:   [{"role":..., "content":...}, ...] listesi.
             esik_token: Bu degerin ustundeyse sikistirma yapar.
 
         Returns:
-            Sıkıştırılmış mesaj listesi.
+            SÄ±kÄ±ÅŸtÄ±rÄ±lmÄ±ÅŸ mesaj listesi.
         """
         esik = esik_token or self.esik_token
         if self._token_tahmin(mesajlar) <= esik:
@@ -130,7 +130,7 @@ class ConversationCompressor:
 
         return [{"role": "system", "content": self._OZET_BASLIGI + ozet}] + yeni
 
-    # ── Yardimci ──────────────────────────────────────────────────────
+    # â”€â”€ Yardimci â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def ozeti_al(self) -> str:
         """Son ozet metnini donDur."""

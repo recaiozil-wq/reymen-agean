@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-robust_execution.py — Saglam calistirma modulu.
+robust_execution.py â€” Saglam calistirma modulu.
 
 Yeniden deneme, geri alma ve checkpoint mekanizmalari
 ile guvenilir fonksiyon calistirma saglar.

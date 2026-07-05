@@ -1,4 +1,4 @@
-from typing import Any
+﻿from typing import Any
 
 #!/usr/bin/env python3
 """
@@ -14,13 +14,13 @@ Usage:
     python cli.py --list-tools             # List available tools and exit
 """
 
-# IMPORTANT: ReYMeN_bootstrap must be the very first import — UTF-8 stdio
+# IMPORTANT: ReYMeN_bootstrap must be the very first import â€” UTF-8 stdio
 # on Windows.  No-op on POSIX.  See ReYMeN_bootstrap.py for full rationale.
 try:
     from reymen.sistem import ReYMeN_bootstrap  # noqa: F401
 except ModuleNotFoundError:
     # Graceful fallback when ReYMeN_bootstrap isn't registered in the venv
-    # yet — happens during partial ``ReYMeN update`` where git-reset landed
+    # yet â€” happens during partial ``ReYMeN update`` where git-reset landed
     # new code but ``uv pip install -e .`` didn't finish.  Missing bootstrap
     # means UTF-8 stdio setup is skipped on Windows; POSIX is unaffected.
     logger.warning("[fix_01_sessiz_except] ModuleNotFoundError")
@@ -181,16 +181,16 @@ def realign_markdown_tables(*args, **kwargs):
 
 
 # NOTE: `from agent.account_usage import ...` is deliberately NOT at module
-# top — it transitively pulls the OpenAI SDK chain (~230 ms cold) and is only
+# top â€” it transitively pulls the OpenAI SDK chain (~230 ms cold) and is only
 # needed when the user runs `/limits`. Lazy-imported inside the handler below.
 from ReYMeN_cli.banner import _format_context_length, format_banner_version_label
 
-_COMMAND_SPINNER_FRAMES = ("⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏")
+_COMMAND_SPINNER_FRAMES = ("â ‹", "â ™", "â ¹", "â ¸", "â ¼", "â ´", "â ¦", "â §", "â ‡", "â ")
 
 
 # Load .env from ~/.ReYMeN/.env first, then project root as dev fallback.
 # User-managed env files should override stale shell exports on restart.
-from src.reymen.sistem.ReYMeN_constants import get_reymen_home, display_reymen_home
+from reymen.sistem.ReYMeN_constants import get_reymen_home, display_reymen_home
 from ReYMeN_cli.browser_connect import (
     DEFAULT_BROWSER_CDP_URL,
     is_browser_debug_ready,
@@ -198,7 +198,7 @@ from ReYMeN_cli.browser_connect import (
     try_launch_chrome_debug,
 )
 from ReYMeN_cli.env_loader import load_reymen_dotenv
-from src.reymen.sistem.utils import base_url_host_matches
+from reymen.sistem.utils import base_url_host_matches
 
 _ReYMeN_home = get_reymen_home()
 _project_env = Path(__file__).parent / ".env"
@@ -218,7 +218,7 @@ def _strip_reasoning_tags(text: str) -> str:
     """Remove reasoning/thinking blocks from displayed text.
 
     Handles every case:
-      * Closed pairs ``<tag>…</tag>`` (case-insensitive, multi-line).
+      * Closed pairs ``<tag>â€¦</tag>`` (case-insensitive, multi-line).
       * Unterminated open tags that run to end-of-text (e.g. truncated
         generations on NIM/MiniMax where the close tag is dropped).
       * Stray orphan close tags (``stuff</think>answer``) left behind by
@@ -232,19 +232,19 @@ def _strip_reasoning_tags(text: str) -> str:
 
     Also strips tool-call XML blocks some open models leak into visible
     content (``<tool_call>``, ``<function_calls>``, Gemma-style
-    ``<function name="…">…</function>``). Ported from
+    ``<function name="â€¦">â€¦</function>``). Ported from
     openclaw/openclaw#67318.
     """
     cleaned = text
     for tag in _REASONING_TAGS:
-        # Closed pair — case-insensitive so <THINK>…</THINK> is handled too.
+        # Closed pair â€” case-insensitive so <THINK>â€¦</THINK> is handled too.
         cleaned = re.sub(
             rf"<{tag}>.*?</{tag}>\s*",
             "",
             cleaned,
             flags=re.DOTALL | re.IGNORECASE,
         )
-        # Unterminated open tag — strip from the tag to end of text.
+        # Unterminated open tag â€” strip from the tag to end of text.
         cleaned = re.sub(
             rf"<{tag}>.*$",
             "",
@@ -272,7 +272,7 @@ def _strip_reasoning_tags(text: str) -> str:
             cleaned,
             flags=re.DOTALL | re.IGNORECASE,
         )
-    # <function name="..."> — boundary + attribute gated to avoid prose FPs.
+    # <function name="..."> â€” boundary + attribute gated to avoid prose FPs.
     cleaned = re.sub(
         r"(?:(?<=^)|(?<=[\n\r.!?:]))[ \t]*"
         r"<function\b[^>]*\bname\s*=[^>]*>"

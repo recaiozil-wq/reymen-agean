@@ -1,10 +1,10 @@
-# -*- coding: utf-8 -*-
-"""browser_engine.py — Unified Browser Automation Engine.
+﻿# -*- coding: utf-8 -*-
+"""browser_engine.py â€” Unified Browser Automation Engine.
 
 Playwright MCP + Browser Use entegrasyonu.
 Ayrik MCP sunucu baglantisi yerine dogrudan Python API'si sunar.
 
-State yönetimi: SekmeYoneticisi ile tekil sekme kontrolü.
+State yÃ¶netimi: SekmeYoneticisi ile tekil sekme kontrolÃ¼.
 
 Kullanim:
     from reymen.arac.browser_engine import BrowserEngine
@@ -27,14 +27,14 @@ import shutil
 
 logger = logging.getLogger(__name__)
 
-# ── Sekme State Yönetimi ────────────────────────────────────────────
+# â”€â”€ Sekme State YÃ¶netimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def log_sekme_durumu(browser, baglam: str = "", olay: str = ""):
-    """Teşhis: açık sekmeleri ve çağrı yığınını logla.
+    """TeÅŸhis: aÃ§Ä±k sekmeleri ve Ã§aÄŸrÄ± yÄ±ÄŸÄ±nÄ±nÄ± logla.
 
-    Kullanım:
-        log_sekme_durumu(browser, "gorev_baslat", "new_page öncesi")
+    KullanÄ±m:
+        log_sekme_durumu(browser, "gorev_baslat", "new_page Ã¶ncesi")
     """
     try:
         sekmeler = browser.pages if hasattr(browser, "pages") else []
@@ -45,7 +45,7 @@ def log_sekme_durumu(browser, baglam: str = "", olay: str = ""):
             except Exception:
                 url = "[kapali]"
             logger.info("  [%d] %s", i, url)
-        # Kim çağırdı?
+        # Kim Ã§aÄŸÄ±rdÄ±?
         logger.info("  Cagri yigini (son 3):")
         for line in traceback.format_stack(limit=3)[:-1]:
             logger.info("    %s", line.strip())
@@ -54,10 +54,10 @@ def log_sekme_durumu(browser, baglam: str = "", olay: str = ""):
 
 
 class SekmeYoneticisi:
-    """Tekil sekme yöneticisi — invisible döngü tuzağını önler.
+    """Tekil sekme yÃ¶neticisi â€” invisible dÃ¶ngÃ¼ tuzaÄŸÄ±nÄ± Ã¶nler.
 
-    Bot artık her yerde sekme_al() çağırır — kendi kendine açıp kapamaz,
-    çünkü sekme varlığı merkezi bir yerden kontrol ediliyor.
+    Bot artÄ±k her yerde sekme_al() Ã§aÄŸÄ±rÄ±r â€” kendi kendine aÃ§Ä±p kapamaz,
+    Ã§Ã¼nkÃ¼ sekme varlÄ±ÄŸÄ± merkezi bir yerden kontrol ediliyor.
 
     Kullanim:
         sy = SekmeYoneticisi(browser)
@@ -82,7 +82,7 @@ class SekmeYoneticisi:
         return ""
 
     def sekme_al(self):
-        """Aktif sekmeyi döndür, yoksa yeni aç.
+        """Aktif sekmeyi dÃ¶ndÃ¼r, yoksa yeni aÃ§.
 
         Returns:
             Page nesnesi veya None
@@ -94,7 +94,7 @@ class SekmeYoneticisi:
             logger.warning("[BrowserEngine] except Exception (L92): %s", Exception)
             pass
 
-        # Kapali/yok → yeni sekme aç
+        # Kapali/yok â†’ yeni sekme aÃ§
         log_sekme_durumu(self.browser, "SekmeYoneticisi", "sekme_al:yeni")
         try:
             self._aktif_sekme = self.browser.new_page()
@@ -106,7 +106,7 @@ class SekmeYoneticisi:
         return self._aktif_sekme
 
     def sekme_kapat(self):
-        """Aktif sekmeyi güvenli şekilde kapat."""
+        """Aktif sekmeyi gÃ¼venli ÅŸekilde kapat."""
         try:
             if self._aktif_sekme and not self._aktif_sekme.is_closed():
                 log_sekme_durumu(self.browser, "SekmeYoneticisi", "sekme_kapat:once")
@@ -268,10 +268,10 @@ class BrowserUseEngine:
         if not BROWSER_USE_OK:
             return "[BrowserUse] pip install browser-use gerekli"
 
-        # LLM zorunlu — yoksa Playwright fallback'i oner veya hata don
+        # LLM zorunlu â€” yoksa Playwright fallback'i oner veya hata don
         if llm is None:
             return (
-                "[BrowserUse] LLM gerekli — Agent(task=..., llm=...) ile bir LLM saglayin. "
+                "[BrowserUse] LLM gerekli â€” Agent(task=..., llm=...) ile bir LLM saglayin. "
                 "Ornek: ChatOpenAI(model='gpt-4'). "
                 "Alternatif: Playwright MCP (npx @playwright/mcp) kullanin."
             )
@@ -289,10 +289,10 @@ class BrowserEngine:
 
     Otomatik olarak Playwright MCP'yi dener, yoksa Browser Use'a gecer.
 
-    State yönetimi:
-      - SekmeYoneticisi ile tekil sekme kontrolü
-      - Her adımda sekme varlığı kontrolü
-      - Invisible döngü tespiti
+    State yÃ¶netimi:
+      - SekmeYoneticisi ile tekil sekme kontrolÃ¼
+      - Her adÄ±mda sekme varlÄ±ÄŸÄ± kontrolÃ¼
+      - Invisible dÃ¶ngÃ¼ tespiti
     """
 
     def __init__(self):
@@ -303,7 +303,7 @@ class BrowserEngine:
 
     @property
     def sekme_yoneticisi(self):
-        """Sekme yöneticisini lazy al."""
+        """Sekme yÃ¶neticisini lazy al."""
         return self._sekme_yoneticisi
 
     def baslat(self) -> str:
@@ -311,8 +311,8 @@ class BrowserEngine:
         # Once Playwright MCP'yi dene
         if self._playwright.baslat():
             self._aktif = "playwright"
-            # Sekme yöneticisi Playwright MCP üzerinden çalışır
-            # (MCP tool'ları browser.pages'a erişemez — engine seviyesinde)
+            # Sekme yÃ¶neticisi Playwright MCP Ã¼zerinden Ã§alÄ±ÅŸÄ±r
+            # (MCP tool'larÄ± browser.pages'a eriÅŸemez â€” engine seviyesinde)
             return "[Browser] Playwright MCP baslatildi"
         # Yoksa Browser Use
         if BROWSER_USE_OK:
@@ -368,7 +368,7 @@ def motor_kaydet(motor):
         logger.info("[Browser] Motor'a 3 arac kaydedildi")
 
 
-# ── Test ───────────────────────────────────────────────────────────────────
+# â”€â”€ Test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)

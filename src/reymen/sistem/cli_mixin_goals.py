@@ -1,4 +1,4 @@
-"""ReYMeNCLI mixin module — Goal management (goal, subgoal)."""
+﻿"""ReYMeNCLI mixin module â€” Goal management (goal, subgoal)."""
 
 import logging
 import os
@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 
 class MixinGoals:
-    """ReYMeNCLI Goal management — goal and subgoal commands."""
+    """ReYMeNCLI Goal management â€” goal and subgoal commands."""
 
     def _handle_goal_command(self, cmd: str) -> None:
         """Dispatch /goal subcommands: set / status / pause / resume / clear."""
@@ -41,7 +41,7 @@ class MixinGoals:
 
         lower = arg.lower()
 
-        # Bare /goal or /goal status → show current state
+        # Bare /goal or /goal status â†’ show current state
         if not arg or lower == "status":
             _cprint(f"  {mgr.status_line()}")
             return
@@ -51,7 +51,7 @@ class MixinGoals:
             if state is None:
                 _cprint(f"  {_DIM}No goal set.{_RST}")
             else:
-                _cprint(f"  ⏸ Goal paused: {state.goal}")
+                _cprint(f"  â¸ Goal paused: {state.goal}")
             return
 
         if lower == "resume":
@@ -59,7 +59,7 @@ class MixinGoals:
             if state is None:
                 _cprint(f"  {_DIM}No goal to resume.{_RST}")
             else:
-                _cprint(f"  ▶ Goal resumed: {state.goal}")
+                _cprint(f"  â–¶ Goal resumed: {state.goal}")
                 _cprint(
                     f"  {_DIM}Send any message (or press Enter on an empty prompt "
                     f"is a no-op; type 'continue' to kick it off).{_RST}"
@@ -70,7 +70,7 @@ class MixinGoals:
             had = mgr.has_goal()
             mgr.clear()
             if had:
-                _cprint("  ✓ Goal cleared.")
+                _cprint("  âœ“ Goal cleared.")
             else:
                 _cprint(f"  {_DIM}No active goal.{_RST}")
             return
@@ -82,7 +82,7 @@ class MixinGoals:
             _cprint(f"  Invalid goal: {exc}")
             return
 
-        _cprint(f"  ⊙ Goal set ({state.max_turns}-turn budget): {state.goal}")
+        _cprint(f"  âŠ™ Goal set ({state.max_turns}-turn budget): {state.goal}")
         _cprint(
             f"  {_DIM}After each turn, a judge model will check if the goal is done. "
             f"ReYMeN keeps working until it is, you pause/clear it, or the budget is "
@@ -107,7 +107,7 @@ class MixinGoals:
         Subgoals are extra criteria the user adds mid-loop. They get
         appended to both the judge prompt (verdict must consider them)
         and the continuation prompt (agent sees them) on the next turn
-        boundary. No special kick — the running turn finishes, the next
+        boundary. No special kick â€” the running turn finishes, the next
         judge call includes them.
         """
         parts = (cmd or "").strip().split(None, 2)
@@ -122,7 +122,7 @@ class MixinGoals:
             _cprint(f"  {_DIM}No active goal. Set one with /goal <text>.{_RST}")
             return
 
-        # No args → list current subgoals.
+        # No args â†’ list current subgoals.
         if not arg:
             _cprint(f"  {mgr.status_line()}")
             _cprint(f"  {mgr.render_subgoals()}")
@@ -146,7 +146,7 @@ class MixinGoals:
             except (IndexError, RuntimeError) as exc:
                 _cprint(f"  /subgoal remove: {exc}")
                 return
-            _cprint(f"  ✓ Removed subgoal {idx}: {removed}")
+            _cprint(f"  âœ“ Removed subgoal {idx}: {removed}")
             return
 
         if verb == "clear":
@@ -156,19 +156,19 @@ class MixinGoals:
                 _cprint(f"  /subgoal clear: {exc}")
                 return
             if prev:
-                _cprint(f"  ✓ Cleared {prev} subgoal{'s' if prev != 1 else ''}.")
+                _cprint(f"  âœ“ Cleared {prev} subgoal{'s' if prev != 1 else ''}.")
             else:
                 _cprint(f"  {_DIM}No subgoals to clear.{_RST}")
             return
 
-        # Otherwise — append the whole arg as a new subgoal.
+        # Otherwise â€” append the whole arg as a new subgoal.
         try:
             text = mgr.add_subgoal(arg)
         except (ValueError, RuntimeError) as exc:
             _cprint(f"  /subgoal: {exc}")
             return
         idx = len(mgr.state.subgoals) if mgr.state else 0
-        _cprint(f"  ✓ Added subgoal {idx}: {text}")
+        _cprint(f"  âœ“ Added subgoal {idx}: {text}")
 
 
 __all__ = ["MixinGoals"]

@@ -1,10 +1,10 @@
-"""🎬 Video araçları — yt-dlp + ffmpeg wrapper.
+﻿"""ğŸ¬ Video araÃ§larÄ± â€” yt-dlp + ffmpeg wrapper.
 
-Video indirme (yt-dlp) ve dönüştürme/kesme (ffmpeg) için CLI sarmalayıcıları.
-İkili dosyalar sistemde yoksa ``VideoToolError`` fırlatılır; ``check_available``
-ile varlık kontrolü yapılabilir.
+Video indirme (yt-dlp) ve dÃ¶nÃ¼ÅŸtÃ¼rme/kesme (ffmpeg) iÃ§in CLI sarmalayÄ±cÄ±larÄ±.
+Ä°kili dosyalar sistemde yoksa ``VideoToolError`` fÄ±rlatÄ±lÄ±r; ``check_available``
+ile varlÄ±k kontrolÃ¼ yapÄ±labilir.
 
-Örnek::
+Ã–rnek::
 
     from ReYMeN.video_tools import download, convert, probe
 import logging
@@ -43,19 +43,19 @@ __all__ = [
 # Hatalar
 # ---------------------------------------------------------------------------
 class VideoToolError(RuntimeError):
-    """Video araçları hatası."""
+    """Video araÃ§larÄ± hatasÄ±."""
 
 
 # ---------------------------------------------------------------------------
-# Varlık kontrolü
+# VarlÄ±k kontrolÃ¼
 # ---------------------------------------------------------------------------
 def _find_tool(name: str) -> str | None:
-    """Sistemde bir CLI aracını arar."""
+    """Sistemde bir CLI aracÄ±nÄ± arar."""
     return shutil.which(name)
 
 
 def check_available() -> dict[str, bool]:
-    """yt-dlp ve ffmpeg'in kurulu olup olmadığını döndürür."""
+    """yt-dlp ve ffmpeg'in kurulu olup olmadÄ±ÄŸÄ±nÄ± dÃ¶ndÃ¼rÃ¼r."""
     return {
         "yt-dlp": _find_tool("yt-dlp") is not None,
         "ffmpeg": _find_tool("ffmpeg") is not None,
@@ -64,22 +64,22 @@ def check_available() -> dict[str, bool]:
 
 
 def ensure_tool(name: str) -> str:
-    """Aracın yolunu döndürür; yoksa ``VideoToolError`` fırlatır."""
+    """AracÄ±n yolunu dÃ¶ndÃ¼rÃ¼r; yoksa ``VideoToolError`` fÄ±rlatÄ±r."""
     path = _find_tool(name)
     if path is None:
         raise VideoToolError(
-            f"'{name}' sistemde bulunamadı. Lütfen kurun: "
+            f"'{name}' sistemde bulunamadÄ±. LÃ¼tfen kurun: "
             f"{'pip install yt-dlp' if name == 'yt-dlp' else 'https://ffmpeg.org'}"
         )
     return path
 
 
 # ---------------------------------------------------------------------------
-# Veri yapıları
+# Veri yapÄ±larÄ±
 # ---------------------------------------------------------------------------
 @dataclass
 class VideoInfo:
-    """İndirilen video bilgisi."""
+    """Ä°ndirilen video bilgisi."""
 
     url: str
     title: str = ""
@@ -140,15 +140,15 @@ def download(
 
     Args:
         url: Video URL'si.
-        output: Çıktı dosya şablonu (yt-dlp formatı).
-        output_dir: Çıktı dizini (None ise mevcut dizin).
-        format: Format seçimi (örn. "best", "bestvideo+bestaudio").
+        output: Ã‡Ä±ktÄ± dosya ÅŸablonu (yt-dlp formatÄ±).
+        output_dir: Ã‡Ä±ktÄ± dizini (None ise mevcut dizin).
+        format: Format seÃ§imi (Ã¶rn. "best", "bestvideo+bestaudio").
         audio_only: Sadece ses indir (mp3).
-        extra_args: yt-dlp'ye ek argümanlar.
+        extra_args: yt-dlp'ye ek argÃ¼manlar.
         timeout: Saniye cinsinden timeout.
 
     Returns:
-        ``VideoInfo`` — indirilen video bilgisi.
+        ``VideoInfo`` â€” indirilen video bilgisi.
     """
     ytdlp = ensure_tool("yt-dlp")
 
@@ -190,10 +190,10 @@ def download(
 
     if result.returncode != 0:
         raise VideoToolError(
-            f"yt-dlp başarısız (exit {result.returncode}): {result.stderr.strip()}"
+            f"yt-dlp baÅŸarÄ±sÄ±z (exit {result.returncode}): {result.stderr.strip()}"
         )
 
-    # yt-dlp --print-json her satırda bir JSON yazar
+    # yt-dlp --print-json her satÄ±rda bir JSON yazar
     info_data: dict[str, Any] = {}
     for line in result.stdout.strip().splitlines():
         try:
@@ -222,7 +222,7 @@ def download(
 # ffprobe: meta veri
 # ---------------------------------------------------------------------------
 def probe(filepath: str | Path) -> dict[str, Any]:
-    """ffprobe ile medya meta verilerini döndürür."""
+    """ffprobe ile medya meta verilerini dÃ¶ndÃ¼rÃ¼r."""
     ffprobe = ensure_tool("ffprobe")
     cmd = [
         ffprobe,
@@ -236,12 +236,12 @@ def probe(filepath: str | Path) -> dict[str, Any]:
     ]
     result = subprocess.run(cmd, capture_output=True, text=True, check=False)
     if result.returncode != 0:
-        raise VideoToolError(f"ffprobe başarısız: {result.stderr.strip()}")
+        raise VideoToolError(f"ffprobe baÅŸarÄ±sÄ±z: {result.stderr.strip()}")
     return json.loads(result.stdout)
 
 
 # ---------------------------------------------------------------------------
-# ffmpeg: dönüştürme
+# ffmpeg: dÃ¶nÃ¼ÅŸtÃ¼rme
 # ---------------------------------------------------------------------------
 def _run_ffmpeg(
     cmd: list[str],
@@ -281,16 +281,16 @@ def convert(
     extra_args: Sequence[str] | None = None,
     timeout: float | None = None,
 ) -> FFmpegResult:
-    """ffmpeg ile video/ses dönüştürme.
+    """ffmpeg ile video/ses dÃ¶nÃ¼ÅŸtÃ¼rme.
 
     Args:
-        input_path: Girdi dosyası.
-        output_path: Çıktı dosyası (uzantı formatı belirler).
-        format: Çıktı formatı (örn. "mp3", "mp4").
-        video_codec: Video kodeği (örn. "libx264").
-        audio_codec: Ses kodeği (örn. "aac", "libmp3lame").
-        bitrate: Bitrate (örn. "192k").
-        extra_args: ffmpeg'ye ek argümanlar.
+        input_path: Girdi dosyasÄ±.
+        output_path: Ã‡Ä±ktÄ± dosyasÄ± (uzantÄ± formatÄ± belirler).
+        format: Ã‡Ä±ktÄ± formatÄ± (Ã¶rn. "mp3", "mp4").
+        video_codec: Video kodeÄŸi (Ã¶rn. "libx264").
+        audio_codec: Ses kodeÄŸi (Ã¶rn. "aac", "libmp3lame").
+        bitrate: Bitrate (Ã¶rn. "192k").
+        extra_args: ffmpeg'ye ek argÃ¼manlar.
         timeout: Saniye cinsinden timeout.
 
     Returns:
@@ -314,7 +314,7 @@ def convert(
     result = _run_ffmpeg(cmd, timeout=timeout)
     if not result.success:
         raise VideoToolError(
-            f"ffmpeg dönüştürme başarısız (exit {result.returncode}): "
+            f"ffmpeg dÃ¶nÃ¼ÅŸtÃ¼rme baÅŸarÄ±sÄ±z (exit {result.returncode}): "
             f"{result.stderr.strip()}"
         )
     return result
@@ -328,7 +328,7 @@ def extract_audio(
     bitrate: str = "192k",
     timeout: float | None = None,
 ) -> FFmpegResult:
-    """Videodan ses çıkarır (kısayol)."""
+    """Videodan ses Ã§Ä±karÄ±r (kÄ±sayol)."""
     return convert(
         input_path,
         output_path,
@@ -350,19 +350,19 @@ def cut(
     copy_codecs: bool = True,
     timeout: float | None = None,
 ) -> FFmpegResult:
-    """Videodan belirli bir bölümü keser.
+    """Videodan belirli bir bÃ¶lÃ¼mÃ¼ keser.
 
     Args:
-        input_path: Girdi dosyası.
-        output_path: Çıktı dosyası.
-        start: Başlangıç zamanı (örn. "00:01:30" veya "90").
-        duration: Süre (örn. "00:00:30"). ``end`` ile birlikte kullanılamaz.
-        end: Bitiş zamanı. ``duration`` ile birlikte kullanılamaz.
-        copy_codecs: Hızlı kesim için kodek kopyalama (yeniden kodlama yok).
+        input_path: Girdi dosyasÄ±.
+        output_path: Ã‡Ä±ktÄ± dosyasÄ±.
+        start: BaÅŸlangÄ±Ã§ zamanÄ± (Ã¶rn. "00:01:30" veya "90").
+        duration: SÃ¼re (Ã¶rn. "00:00:30"). ``end`` ile birlikte kullanÄ±lamaz.
+        end: BitiÅŸ zamanÄ±. ``duration`` ile birlikte kullanÄ±lamaz.
+        copy_codecs: HÄ±zlÄ± kesim iÃ§in kodek kopyalama (yeniden kodlama yok).
         timeout: Saniye cinsinden timeout.
     """
     if duration and end:
-        raise ValueError("'duration' ve 'end' birlikte kullanılamaz")
+        raise ValueError("'duration' ve 'end' birlikte kullanÄ±lamaz")
 
     cmd: list[str] = ["-ss", str(start)]
     if end:
@@ -380,7 +380,7 @@ def cut(
     result = _run_ffmpeg(cmd, timeout=timeout)
     if not result.success:
         raise VideoToolError(
-            f"ffmpeg kesim başarısız (exit {result.returncode}): "
+            f"ffmpeg kesim baÅŸarÄ±sÄ±z (exit {result.returncode}): "
             f"{result.stderr.strip()}"
         )
     return result

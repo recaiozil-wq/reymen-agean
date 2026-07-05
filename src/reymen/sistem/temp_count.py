@@ -1,4 +1,4 @@
-import subprocess
+﻿import subprocess
 import os
 from pathlib import Path
 
@@ -18,7 +18,7 @@ print("...")
 print("last:", lines[-1] if lines else "<none>")
 
 # Registry counts
-from src.reymen.arac import tool_registry
+from reymen.arac import tool_registry
 
 registry = tool_registry.ToolRegistry()
 print("tool_list_count", len(registry.liste()))

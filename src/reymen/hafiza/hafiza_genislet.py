@@ -1,21 +1,21 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-hafiza_genislet.py — ReYMeN Gelişmiş Hafıza Sistemi.
+hafiza_genislet.py â€” ReYMeN GeliÅŸmiÅŸ HafÄ±za Sistemi.
 
-ReYMeN Agent'in SQLite FTS5 tabanlı session hafızasına benzer bir sistem.
-Özellikler:
+ReYMeN Agent'in SQLite FTS5 tabanlÄ± session hafÄ±zasÄ±na benzer bir sistem.
+Ã–zellikler:
   - SQLite + FTS5 tam metin arama
-  - Oturum (session) bazlı konuşma geçmişi
-  - Kullanıcı tercihleri kalıcı kaydı
-  - Cross-session arama (geçmiş oturumlarda ara)
-  - Otomatik kayıt (her N mesajda bir checkpoint)
+  - Oturum (session) bazlÄ± konuÅŸma geÃ§miÅŸi
+  - KullanÄ±cÄ± tercihleri kalÄ±cÄ± kaydÄ±
+  - Cross-session arama (geÃ§miÅŸ oturumlarda ara)
+  - Otomatik kayÄ±t (her N mesajda bir checkpoint)
 
 Kullanim:
     from hafiza_genislet import hafiza
     hafiza.initialize("oturum_123")
     hafiza.kaydet("Python decorator nedir?", "kullanici_sorusu")
     sonuc = hafiza.ara("decorator")
-    tercih = hafiza.tercih_al("dil", default="Türkçe")
+    tercih = hafiza.tercih_al("dil", default="TÃ¼rkÃ§e")
 """
 
 import json
@@ -27,7 +27,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-# SQLite (standart kütüphane)
+# SQLite (standart kÃ¼tÃ¼phane)
 try:
     import sqlite3
 
@@ -37,7 +37,7 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
-# ── Sabitler ──────────────────────────────────────────────────────────────
+# â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 ROOT = Path(__file__).parent.resolve()
 _DB_DIR = ROOT / "merkez_db"
@@ -61,7 +61,7 @@ _TURKCE_STOP_WORDS = frozenset(
         "ancak",
         "bana",
         "bazi",
-        "bazı",
+        "bazÄ±",
         "belki",
         "bende",
         "beni",
@@ -71,9 +71,9 @@ _TURKCE_STOP_WORDS = frozenset(
         "bir",
         "biraz",
         "biri",
-        "birkaç",
+        "birkaÃ§",
         "birsey",
-        "birşey",
+        "birÅŸey",
         "biz",
         "bize",
         "bizi",
@@ -84,14 +84,14 @@ _TURKCE_STOP_WORDS = frozenset(
         "bundan",
         "bunlar",
         "bunlari",
-        "bunları",
+        "bunlarÄ±",
         "bunlardan",
         "bunlarin",
-        "bunların",
+        "bunlarÄ±n",
         "bunu",
         "bunun",
         "burada",
-        "böyle",
+        "bÃ¶yle",
         "bu",
         "buna",
         "da",
@@ -100,23 +100,23 @@ _TURKCE_STOP_WORDS = frozenset(
         "de",
         "defa",
         "diye",
-        "diğer",
+        "diÄŸer",
         "diger",
         "dolayi",
-        "dolayı",
+        "dolayÄ±",
         "dolayisiyla",
-        "dolayısıyla",
+        "dolayÄ±sÄ±yla",
         "eger",
         "elbette",
         "en",
         "evet",
-        "eğer",
+        "eÄŸer",
         "fakat",
         "falan",
         "filan",
         "gene",
         "gibi",
-        "göre",
+        "gÃ¶re",
         "gore",
         "halen",
         "hangi",
@@ -124,7 +124,7 @@ _TURKCE_STOP_WORDS = frozenset(
         "hatta",
         "hem",
         "henuz",
-        "henüz",
+        "henÃ¼z",
         "hep",
         "hepsi",
         "her",
@@ -133,9 +133,9 @@ _TURKCE_STOP_WORDS = frozenset(
         "herkes",
         "hic",
         "hicbir",
-        "hâlâ",
-        "hiç",
-        "hiçbir",
+        "hÃ¢lÃ¢",
+        "hiÃ§",
+        "hiÃ§bir",
         "icin",
         "ile",
         "ilgili",
@@ -143,14 +143,14 @@ _TURKCE_STOP_WORDS = frozenset(
         "ister",
         "itibaren",
         "itibariyle",
-        "için",
-        "içinde",
-        "işte",
+        "iÃ§in",
+        "iÃ§inde",
+        "iÅŸte",
         "kadar",
         "karsi",
         "karsin",
-        "karsı",
-        "karşın",
+        "karsÄ±",
+        "karÅŸÄ±n",
         "kendine",
         "kendini",
         "kendi",
@@ -166,10 +166,10 @@ _TURKCE_STOP_WORDS = frozenset(
         "mi",
         "milyon",
         "mu",
-        "mü",
-        "mı",
+        "mÃ¼",
+        "mÄ±",
         "nasil",
-        "nasıl",
+        "nasÄ±l",
         "ne",
         "neden",
         "nedenle",
@@ -179,7 +179,7 @@ _TURKCE_STOP_WORDS = frozenset(
         "neyse",
         "nice",
         "niye",
-        "niçin",
+        "niÃ§in",
         "nu",
         "nun",
         "o",
@@ -187,8 +187,8 @@ _TURKCE_STOP_WORDS = frozenset(
         "olarak",
         "oldu",
         "oldugu",
-        "olduğu",
-        "olmadı",
+        "olduÄŸu",
+        "olmadÄ±",
         "olmak",
         "olsa",
         "olur",
@@ -198,22 +198,22 @@ _TURKCE_STOP_WORDS = frozenset(
         "onlari",
         "onlardan",
         "onlarin",
-        "onları",
-        "onların",
+        "onlarÄ±",
+        "onlarÄ±n",
         "onu",
         "onun",
         "orada",
         "oysa",
         "oysaki",
         "pek",
-        "rağmen",
+        "raÄŸmen",
         "sadece",
         "sanki",
         "sen",
         "siz",
         "sizin",
         "soyle",
-        "söyle",
+        "sÃ¶yle",
         "su",
         "suna",
         "sunda",
@@ -222,22 +222,22 @@ _TURKCE_STOP_WORDS = frozenset(
         "sunun",
         "seye",
         "sey",
-        "şu",
-        "şuna",
-        "şunda",
-        "şundan",
-        "şunları",
-        "şunu",
-        "şey",
-        "şeye",
-        "şeyi",
+        "ÅŸu",
+        "ÅŸuna",
+        "ÅŸunda",
+        "ÅŸundan",
+        "ÅŸunlarÄ±",
+        "ÅŸunu",
+        "ÅŸey",
+        "ÅŸeye",
+        "ÅŸeyi",
         "tarafindan",
-        "tarafından",
+        "tarafÄ±ndan",
         "tum",
-        "tüm",
+        "tÃ¼m",
         "uzere",
-        "üzerinde",
-        "üzere",
+        "Ã¼zerinde",
+        "Ã¼zere",
         "var",
         "ve",
         "veya",
@@ -246,10 +246,10 @@ _TURKCE_STOP_WORDS = frozenset(
         "yani",
         "yapacak",
         "yapilan",
-        "yapılan",
+        "yapÄ±lan",
         "yapmak",
         "yapti",
-        "yaptı",
+        "yaptÄ±",
         "yeter",
         "yine",
         "yo",
@@ -262,9 +262,9 @@ _TURKCE_STOP_WORDS = frozenset(
 _yazma_kilit = threading.Lock()
 
 
-# ══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # GELISMIS HAFIZA SINIFI (SQLite + FTS5)
-# ══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class GelismisHafiza:
@@ -293,7 +293,7 @@ class GelismisHafiza:
         else:
             print("[Hafiza] sqlite3 modulu bulunamadi! Hafiza devre disi.")
 
-    # ── Dahili ──────────────────────────────────────────────────────────
+    # â”€â”€ Dahili â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _baglan(self) -> None:
         """SQLite baglantisi ac (WAL modu + Row factory)."""
@@ -348,7 +348,7 @@ class GelismisHafiza:
                 )
             """)
 
-            # FTS5 virtual table — tam metin arama
+            # FTS5 virtual table â€” tam metin arama
             # icerik + metadata + anahtar alanlarinda ara
             c.execute("""
                 CREATE VIRTUAL TABLE IF NOT EXISTS kayitlar_fts USING fts5(
@@ -371,7 +371,7 @@ class GelismisHafiza:
                 "CREATE INDEX IF NOT EXISTS idx_kayit_expire ON kayitlar(expire_zaman)"
             )
 
-            # FTS5 content sync trigger'ları
+            # FTS5 content sync trigger'larÄ±
             c.execute("""
                 CREATE TRIGGER IF NOT EXISTS kayitlar_ai AFTER INSERT ON kayitlar BEGIN
                     INSERT INTO kayitlar_fts(rowid, icerik, metadata, anahtar)
@@ -401,7 +401,7 @@ class GelismisHafiza:
         """Koleksiyon adindan ID al (yoksa olustur). Artik gerekmiyor."""
         return 0
 
-    # ── Session Yonetimi ────────────────────────────────────────────────
+    # â”€â”€ Session Yonetimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def initialize(self, session_id: str, baslik: str = "") -> None:
         """Yeni bir oturum baslat. Her bot konusmasi bir session'dir."""
@@ -435,7 +435,7 @@ class GelismisHafiza:
             print(f"[UYARI] hafiza_genislet.py:260 - {_hafiza_g_e259}")
         self._aktif_session = ""
 
-    # ── Kayit Islemleri ─────────────────────────────────────────────────
+    # â”€â”€ Kayit Islemleri â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def kaydet(
         self,
@@ -514,7 +514,7 @@ class GelismisHafiza:
         except sqlite3.Error:
             return False
 
-    # ── Arama ────────────────────────────────────────────────────────────
+    # â”€â”€ Arama â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def ara(
         self, sorgu: str, koleksiyon: str = "", limit: int = 10, session_id: str = ""
@@ -533,7 +533,7 @@ class GelismisHafiza:
         if not self._hazir or not self._conn or not sorgu.strip():
             return []
 
-        # FTS5 query escape — ozel karakterleri temizle
+        # FTS5 query escape â€” ozel karakterleri temizle
         fts_sorgu = self._fts_escape(sorgu.strip())
 
         try:
@@ -807,7 +807,7 @@ class GelismisHafiza:
             logger.error(f"arama_sirala beklenmeyen hata: {e}")
             return []
 
-    # ── Kullanici Tercihleri ─────────────────────────────────────────────
+    # â”€â”€ Kullanici Tercihleri â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def tercih_kaydet(self, anahtar: str, deger: str) -> bool:
         """Kullanici tercihini kaydet (ornek: dil='Turkce')."""
@@ -864,7 +864,7 @@ class GelismisHafiza:
         except sqlite3.Error:
             return False
 
-    # ── Session Gecmisi ──────────────────────────────────────────────────
+    # â”€â”€ Session Gecmisi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def session_ara(self, sorgu: str, limit: int = 5) -> List[Dict[str, Any]]:
         """Gecmis session'larda (konusma icerigi + ozetler) FTS5 ara.
@@ -1027,7 +1027,7 @@ class GelismisHafiza:
             import re
 
             tum_metin = " ".join(row["icerik"] or "" for row in satirlar)
-            kelimeler = re.findall(r"[a-zA-ZğüşıöçĞÜŞİÖÇ0-9]+", tum_metin.lower())
+            kelimeler = re.findall(r"[a-zA-ZÄŸÃ¼ÅŸÄ±Ã¶Ã§ÄÃœÅÄ°Ã–Ã‡0-9]+", tum_metin.lower())
 
             # 2. Stop words + kisa kelimeleri filtrele
             filtrelenmis = [
@@ -1058,7 +1058,7 @@ class GelismisHafiza:
                 # Goreli frekans (TF)
                 tf = sayi / toplam_kelime if toplam_kelime > 0 else 0
 
-                # Genel frekans (IDF benzeri) — tum kayitlarda kac satirda gecmis
+                # Genel frekans (IDF benzeri) â€” tum kayitlarda kac satirda gecmis
                 c.execute(
                     """SELECT COUNT(DISTINCT id) as n FROM kayitlar
                        WHERE icerik LIKE ? AND koleksiyon = ?
@@ -1191,7 +1191,7 @@ class GelismisHafiza:
             logger.error(f"session_birlestir beklenmeyen hata: {e}")
             return False
 
-    # ── Notlar (Kisa Hatirlatmalar) ──────────────────────────────────────
+    # â”€â”€ Notlar (Kisa Hatirlatmalar) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def not_ekle(self, baslik: str, icerik: str = "", ttl_saat: float = 0) -> bool:
         """Kisa bir not/hatirlatma ekle. _COLL_NOTLAR koleksiyonuna kaydeder."""
@@ -1219,7 +1219,7 @@ class GelismisHafiza:
         except sqlite3.Error:
             return []
 
-    # ── Bakim ────────────────────────────────────────────────────────────
+    # â”€â”€ Bakim â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _checkpoint(self) -> None:
         """WAL checkpoint + eski kayit temizleme."""
@@ -1305,7 +1305,7 @@ class GelismisHafiza:
             print(f"[UYARI] hafiza_genislet.py:1071 - {_hafiza_g_e1070}")
 
 
-# ── Otomatik Consolidation Thread (arka planda hafiza budama) ──
+# â”€â”€ Otomatik Consolidation Thread (arka planda hafiza budama) â”€â”€
 
 _AUTO_CONSOLIDATION_INTERVAL = 3600  # Her 1 saatte bir
 _auto_consolidation_thread = None
@@ -1383,27 +1383,27 @@ def auto_consolidation_durdur() -> None:
         _auto_consolidation_thread = None
 
 
-# ══════════════════════════════════════════════════════════════════════════
-# MOTOR ENTEGRASYONU — araçları motor.py'ye kaydet
-# ══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# MOTOR ENTEGRASYONU â€” araÃ§larÄ± motor.py'ye kaydet
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def motor_kaydet(motor: Any) -> None:
-    """hafiza_genislet.py araçlarını Motor'a kaydet.
+    """hafiza_genislet.py araÃ§larÄ±nÄ± Motor'a kaydet.
 
-    Motor._plugin_moduller_yukle() tarafından otomatik keşfedilir.
+    Motor._plugin_moduller_yukle() tarafÄ±ndan otomatik keÅŸfedilir.
     """
     if not hasattr(motor, "_plugin_arac_kaydet"):
         return
 
-    # HAFIZA_DURUM — hafıza istatistikleri
+    # HAFIZA_DURUM â€” hafÄ±za istatistikleri
     motor._plugin_arac_kaydet(
         "HAFIZA_DURUM",
         lambda: json.dumps(hafiza.durum(), ensure_ascii=False, indent=2, default=str),
         "Gelismis hafiza sisteminin durumunu ve istatistiklerini gosterir",
     )
 
-    # HAFIZA_ARA — FTS5 tam metin arama
+    # HAFIZA_ARA â€” FTS5 tam metin arama
     motor._plugin_arac_kaydet(
         "HAFIZA_ARA",
         lambda sorgu="", limit="10": json.dumps(
@@ -1415,7 +1415,7 @@ def motor_kaydet(motor: Any) -> None:
         "Hafizada FTS5 ile tam metin ara. Kullanim: HAFIZA_ARA(sorgu='decorator', limit='10')",
     )
 
-    # HAFIZA_KAYDET — hafızaya kayıt ekle
+    # HAFIZA_KAYDET â€” hafÄ±zaya kayÄ±t ekle
     motor._plugin_arac_kaydet(
         "HAFIZA_KAYDET",
         lambda icerik="", koleksiyon="konusmalar", anahtar="", ttl_saat="0": json.dumps(
@@ -1433,7 +1433,7 @@ def motor_kaydet(motor: Any) -> None:
         "Hafizaya kayit ekler. Kullanim: HAFIZA_KAYDET(icerik='...', koleksiyon='konusmalar', anahtar='...', ttl_saat='0')",
     )
 
-    # HAFIZA_SESSION_ARA — geçmiş session'larda FTS5 arama (ReYMeN session_search benzeri)
+    # HAFIZA_SESSION_ARA â€” geÃ§miÅŸ session'larda FTS5 arama (ReYMeN session_search benzeri)
     motor._plugin_arac_kaydet(
         "HAFIZA_SESSION_ARA",
         lambda sorgu="", limit="5": json.dumps(
@@ -1445,7 +1445,7 @@ def motor_kaydet(motor: Any) -> None:
         "Gecmis oturumlarda FTS5 ile ara. Kullanim: HAFIZA_SESSION_ARA(sorgu='decorator', limit='5')",
     )
 
-    # HAFIZA_SESSION_LISTE — son session'ları listele
+    # HAFIZA_SESSION_LISTE â€” son session'larÄ± listele
     motor._plugin_arac_kaydet(
         "HAFIZA_SESSION_LISTE",
         lambda limit="10": json.dumps(
@@ -1457,7 +1457,7 @@ def motor_kaydet(motor: Any) -> None:
         "Son oturumlari listeler. Kullanim: HAFIZA_SESSION_LISTE(limit='10')",
     )
 
-    # HAFIZA_NOT_EKLE — kısa not ekle
+    # HAFIZA_NOT_EKLE â€” kÄ±sa not ekle
     motor._plugin_arac_kaydet(
         "HAFIZA_NOT_EKLE",
         lambda baslik="", icerik="", ttl_saat="0": json.dumps(
@@ -1473,7 +1473,7 @@ def motor_kaydet(motor: Any) -> None:
         "Kisa not/hatirlatma ekler. Kullanim: HAFIZA_NOT_EKLE(baslik='ornek', icerik='...', ttl_saat='24')",
     )
 
-    # HAFIZA_NOT_LISTE — notları listele
+    # HAFIZA_NOT_LISTE â€” notlarÄ± listele
     motor._plugin_arac_kaydet(
         "HAFIZA_NOT_LISTE",
         lambda limit="20": json.dumps(
@@ -1485,7 +1485,7 @@ def motor_kaydet(motor: Any) -> None:
         "Tum aktif notlari listeler. Kullanim: HAFIZA_NOT_LISTE(limit='20')",
     )
 
-    # HAFIZA_TERCIH_KAYDET — kullanıcı tercihi kaydet
+    # HAFIZA_TERCIH_KAYDET â€” kullanÄ±cÄ± tercihi kaydet
     motor._plugin_arac_kaydet(
         "HAFIZA_TERCIH_KAYDET",
         lambda anahtar="", deger="": json.dumps(
@@ -1497,7 +1497,7 @@ def motor_kaydet(motor: Any) -> None:
         "Kullanici tercihi kaydeder. Kullanim: HAFIZA_TERCIH_KAYDET(anahtar='dil', deger='Turkce')",
     )
 
-    # HAFIZA_TERCIH_AL — kullanıcı tercihini oku
+    # HAFIZA_TERCIH_AL â€” kullanÄ±cÄ± tercihini oku
     motor._plugin_arac_kaydet(
         "HAFIZA_TERCIH_AL",
         lambda anahtar="", default="": json.dumps(
@@ -1510,7 +1510,7 @@ def motor_kaydet(motor: Any) -> None:
         "Kullanici tercihini okur. Kullanim: HAFIZA_TERCIH_AL(anahtar='dil', default='Turkce')",
     )
 
-    # HAFIZA_TEMIZLE — eski kayıtları temizle (memory consolidation)
+    # HAFIZA_TEMIZLE â€” eski kayÄ±tlarÄ± temizle (memory consolidation)
     motor._plugin_arac_kaydet(
         "HAFIZA_TEMIZLE",
         lambda yas_saat="72": json.dumps(
@@ -1526,8 +1526,8 @@ def motor_kaydet(motor: Any) -> None:
     )
 
 
-# ══════════════════════════════════════════════════════════════════════════
-# SINGLETON — tum moduller ayni instance'i kullanir
-# ══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# SINGLETON â€” tum moduller ayni instance'i kullanir
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 hafiza = GelismisHafiza()

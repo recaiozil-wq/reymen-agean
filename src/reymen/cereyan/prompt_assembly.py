@@ -1,18 +1,18 @@
-# -*- coding: utf-8 -*-
-"""prompt_assembly.py — Sistem prompt'u tek noktadan topla.
+﻿# -*- coding: utf-8 -*-
+"""prompt_assembly.py â€” Sistem prompt'u tek noktadan topla.
 
 Hedef yapi:
-    system_prompt = config.yaml → SOUL.md → USER.md
+    system_prompt = config.yaml â†’ SOUL.md â†’ USER.md
 
 conversation_loop ve diger moduller buradan okur, kendi icinde
 sabit string tutmaz. SOUL.md ve USER.md diskten her defasinda
-okunmaz — lru_cache ile bir kez yuklenir, bellekten servis edilir.
+okunmaz â€” lru_cache ile bir kez yuklenir, bellekten servis edilir.
 
 Yol bilgileri:
-    SOUL.md  → ~/.hermes/profiles/<profil>/SOUL.md (oncelikli)
+    SOUL.md  â†’ ~/.reymen/profiles/<profil>/SOUL.md (oncelikli)
               veya proje kokundeki SOUL.md (fallback)
-    USER.md  → reymen/hafiza/USER.md
-    config   → proje kokundeki config.yaml
+    USER.md  â†’ reymen/hafiza/USER.md
+    config   â†’ proje kokundeki config.yaml
 """
 
 import functools
@@ -23,7 +23,7 @@ from typing import Optional
 
 log = logging.getLogger(__name__)
 
-# ── Varsayilan yollar ──────────────────────────────────────────────────
+# â”€â”€ Varsayilan yollar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _PROJE_KOKU = Path(__file__).resolve().parent.parent.parent  # ReYMeN-Ajan/
 _VARSAYILAN_USER_MD = _PROJE_KOKU / "reymen" / "hafiza" / "USER.md"
 _VARSAYILAN_SOUL_MD = _PROJE_KOKU / "SOUL.md"
@@ -32,7 +32,7 @@ _VARSAYILAN_CONFIG = _PROJE_KOKU / "config.yaml"
 # ReYMeN profil SOUL.md (varsa oncelikli)
 _REYMEN_PROFIL = (
     Path(os.environ.get("LOCALAPPDATA", ""))
-    / "reymen"
+    / "hermes"
     / "profiles"
     / "reymen"
     / "SOUL.md"
@@ -101,7 +101,7 @@ def _config_prompt_al() -> str:
 
 
 def sistem_prompt_al(tema: Optional[str] = None, ek_bilgi: str = "") -> str:
-    """Sistem prompt'unu config→SOUL.md→USER.md sirasiyla birlestir.
+    """Sistem prompt'unu configâ†’SOUL.mdâ†’USER.md sirasiyla birlestir.
 
     Args:
         tema:    Opsiyonel tema/task bilgisi (en alta eklenir).
@@ -117,13 +117,13 @@ def sistem_prompt_al(tema: Optional[str] = None, ek_bilgi: str = "") -> str:
     if config_prompt:
         bolumler.append(config_prompt)
 
-    # 2. SOUL.md — kisilik/identity
+    # 2. SOUL.md â€” kisilik/identity
     soul_yol = _profil_soul_yolu()
     soul = _dosya_oku(soul_yol)
     if soul:
         bolumler.append(soul)
 
-    # 3. USER.md — kullanici profili
+    # 3. USER.md â€” kullanici profili
     user = _dosya_oku(_VARSAYILAN_USER_MD)
     if user:
         bolumler.append(f"## Kullanici Profili\n{user}")
@@ -146,7 +146,7 @@ def sistem_prompt_al(tema: Optional[str] = None, ek_bilgi: str = "") -> str:
 
 
 class PromptAssemblyEngine:
-    """PromptAssemblyEngine — `sistem_prompt_al` fonksiyonlarini class arayuzuyle saran katman.
+    """PromptAssemblyEngine â€” `sistem_prompt_al` fonksiyonlarini class arayuzuyle saran katman.
 
     Kullanim:
         engine = PromptAssemblyEngine(bounded_memory=..., learning_loop=...)
@@ -183,7 +183,7 @@ class PromptAssemblyEngine:
         toplam_tur: int = 15,
         ic_gozlem_modu: bool = False,
     ) -> str:
-        """_sistem_promptu_insa_et fallback'i — prompt_assembly'den sistem prompt'u al.
+        """_sistem_promptu_insa_et fallback'i â€” prompt_assembly'den sistem prompt'u al.
 
         Bu fonksiyon `AIAgentOrchestrator._sistem_promptu_insa_et()` tarafindan
         PromptBuilder ve _sistem_talimati_fn yoksa cagrilir.

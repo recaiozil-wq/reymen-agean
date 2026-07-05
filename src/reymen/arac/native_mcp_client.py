@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-native_mcp_client.py — LEGACY Native MCP Client (Korunuyor).
+native_mcp_client.py â€” LEGACY Native MCP Client (Korunuyor).
 
-⚠️  LEGACY / ESKI — Sadece geriye uyumluluk icin korunuyor.
+âš ï¸  LEGACY / ESKI â€” Sadece geriye uyumluluk icin korunuyor.
     Yeni gelistirmeler icin reymen/mcp/* paketini kullanin:
       - reymen.mcp.mcp_manager      (async MCP yoneticisi)
       - reymen.mcp.mcp_reconnect    (heartbeat + yeniden baglanma)
@@ -22,7 +22,7 @@ ReYMeN Native MCP Client ozellikleri (legacy):
   - YAPI konfig (config.yaml) + JSON geriye uyumluluk
 
 Konfig
-  ~/.hermes/config.yaml veya .ReYMeN/config.yaml icinde:
+  ~/.reymen/config.yaml veya .ReYMeN/config.yaml icinde:
     mcp_servers:
       filesystem:
         command: "npx"
@@ -47,7 +47,7 @@ from typing import Any, Callable, Optional
 
 logger = logging.getLogger(__name__)
 
-# ── Varsayilan konfig yollari ──────────────────────────────────────────────
+# â”€â”€ Varsayilan konfig yollari â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 REYMEN_KOK = Path(__file__).parent.parent  # reymen/
 CONFIG_YOLLARI = [
     REYMEN_KOK / ".ReYMeN" / "config.yaml",
@@ -108,7 +108,7 @@ class MCPBaglanti:
         self._thread: Optional[threading.Thread] = None
         self._durduruldu = False
 
-    # ── Public API ────────────────────────────────────────────────────────
+    # â”€â”€ Public API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @property
     def bagli(self) -> bool:
@@ -170,7 +170,7 @@ class MCPBaglanti:
                     self._proses.kill()
         self._bagli = False
 
-    # ── HTTP Transport ────────────────────────────────────────────────────
+    # â”€â”€ HTTP Transport â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _http_thread_loop(self):
         """HTTP baglantisi icin ayri event loop thread'i."""
@@ -224,7 +224,7 @@ class MCPBaglanti:
                         len(self._araclar),
                     )
 
-                    # Baglantiyi canli tut — sunucu kapatana kadar bekle
+                    # Baglantiyi canli tut â€” sunucu kapatana kadar bekle
                     while not self._durduruldu:
                         await asyncio.sleep(1)
 
@@ -299,7 +299,7 @@ class MCPBaglanti:
             )
         return str(sonuc)
 
-    # ── Stdio Transport ────────────────────────────────────────────────────
+    # â”€â”€ Stdio Transport â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _stdio_baglan(self) -> bool:
         """Stdio baglantisi baslat."""
@@ -448,7 +448,7 @@ class NativeMCPClient:
         self._motor_ref: Any = None
         self._kesfedildi = False
 
-    # ── Config Yukleme ────────────────────────────────────────────────────
+    # â”€â”€ Config Yukleme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def konfig_yukle(self) -> list[MCPSunucuConfig]:
         """Config dosyasindan MCP sunucu ayarlarini yukle.
@@ -456,7 +456,7 @@ class NativeMCPClient:
         Oncelik sirasi:
           1. .ReYMeN/config.yaml (mcp_servers:)
           2. .ReYMeN/mcp_client.json (servers:)
-          3. ~/.hermes/config.yaml (mcp_servers:)
+          3. ~/.reymen/config.yaml (mcp_servers:)
         """
         for yol in CONFIG_YOLLARI:
             if not yol.exists():
@@ -565,7 +565,7 @@ class NativeMCPClient:
                 )
         return sonuc
 
-    # ── Baglanti Yonetimi ─────────────────────────────────────────────────
+    # â”€â”€ Baglanti Yonetimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def baglan(self, config: MCPSunucuConfig) -> bool:
         """Bir MCP sunucusuna baglan."""
@@ -598,7 +598,7 @@ class NativeMCPClient:
         for ad in list(self._baglantilar.keys()):
             self.baglanti_kaldir(ad)
 
-    # ── Araclari Kesfetme ve Kaydetme ─────────────────────────────────────
+    # â”€â”€ Araclari Kesfetme ve Kaydetme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def discover_mcp_tools(self, motor_ref: Any = None):
         """ReYMeN-tarzi otomatik MCP arac kesfi.
@@ -648,7 +648,7 @@ class NativeMCPClient:
 
         for sunucu_ad, baglanti in self._baglantilar.items():
             for arac in baglanti.araclar:
-                # mcp_{sunucu}_{arac} — ReYMeN standardi
+                # mcp_{sunucu}_{arac} â€” ReYMeN standardi
                 arac_adi = f"mcp_{sunucu_ad}_{arac['name']}"
                 # Karakter temizligi (tire/nokta -> altcizgi)
                 arac_adi = arac_adi.replace("-", "_").replace(".", "_").upper()
@@ -678,7 +678,7 @@ class NativeMCPClient:
             return ""
         return str(sonuc)
 
-    # ── Durum Raporu ──────────────────────────────────────────────────────
+    # â”€â”€ Durum Raporu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def durum(self) -> dict[str, Any]:
         """Tum MCP sunucu durumlari."""
@@ -702,7 +702,7 @@ class NativeMCPClient:
         for ad, bilgi in durum.items():
             satirlar.append(
                 f"  {ad} ({bilgi['transport']}): "
-                f"{'🟢' if bilgi['bagli'] else '🔴'} "
+                f"{'ğŸŸ¢' if bilgi['bagli'] else 'ğŸ”´'} "
                 f"{bilgi['tool_sayisi']} tool"
             )
             for tool in bilgi["tools"]:
@@ -710,7 +710,7 @@ class NativeMCPClient:
         return "\n".join(satirlar)
 
 
-# ── Singleton ──────────────────────────────────────────────────────────────
+# â”€â”€ Singleton â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _NATIVE_MCP: Optional[NativeMCPClient] = None
 
@@ -738,7 +738,7 @@ def motor_kaydet(motor):
     native_mcp().motor_kaydet()
 
 
-# ── CLI Test ───────────────────────────────────────────────────────────────
+# â”€â”€ CLI Test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
     import sys

@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """Renk sabitleri ve ortak yardimcilar."""
 
 from __future__ import annotations

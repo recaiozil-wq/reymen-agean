@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-batch_engine.py — Toplu işlem motoru.
+batch_engine.py â€” Toplu iÅŸlem motoru.
 
 BatchEngine sinifi ile gorevleri kuyruga ekleyip thread pool ile
 paralel olarak calistirir. Gorev durumu takibi, iptal ve sonuc
@@ -119,7 +119,7 @@ class BatchEngine:
                 t.start()
                 self._thread_pool.append(t)
 
-            # Tüm görevler işlenene kadar bekle, sonra thread'leri durdur
+            # TÃ¼m gÃ¶revler iÅŸlenene kadar bekle, sonra thread'leri durdur
             self._kuyruk.join()
             self._durdu.set()
             for t in self._thread_pool:
@@ -378,28 +378,28 @@ _GLOBAL_ENGINE = BatchEngine()
 
 
 def motor_kaydet(motor):
-    """BatchEngine araçlarını motora kaydet."""
+    """BatchEngine araÃ§larÄ±nÄ± motora kaydet."""
     if not hasattr(motor, "_plugin_arac_kaydet"):
         return
     motor._plugin_arac_kaydet(
         "BATCH_EKLE",
         lambda gorev="": (_GLOBAL_ENGINE.ekle(gorev=str(gorev)),)[0],
-        "Batch kuyruğuna görev ekle, gorev_id döndürür (gorev: çalıştırılacak metin/komut)",
+        "Batch kuyruÄŸuna gÃ¶rev ekle, gorev_id dÃ¶ndÃ¼rÃ¼r (gorev: Ã§alÄ±ÅŸtÄ±rÄ±lacak metin/komut)",
     )
     motor._plugin_arac_kaydet(
         "BATCH_CALISTIR",
         lambda paralel="3": _GLOBAL_ENGINE.run(action="calistir", paralel=int(paralel)),
-        "Kuyruktaki görevleri paralel çalıştır (paralel: thread sayısı 1-20)",
+        "Kuyruktaki gÃ¶revleri paralel Ã§alÄ±ÅŸtÄ±r (paralel: thread sayÄ±sÄ± 1-20)",
     )
     motor._plugin_arac_kaydet(
         "BATCH_LISTELE",
         lambda durum="": _GLOBAL_ENGINE.run(action="listele", durum=durum or None),
-        "Batch kuyruğundaki görevleri listele (durum: bekliyor/calisiyor/basarili/hata/boş=hepsi)",
+        "Batch kuyruÄŸundaki gÃ¶revleri listele (durum: bekliyor/calisiyor/basarili/hata/boÅŸ=hepsi)",
     )
     motor._plugin_arac_kaydet(
         "BATCH_DURUM",
         lambda gorev_id="": _GLOBAL_ENGINE.run(action="durum", gorev_id=str(gorev_id)),
-        "Batch görevi durumunu sorgula (gorev_id)",
+        "Batch gÃ¶revi durumunu sorgula (gorev_id)",
     )
 
 

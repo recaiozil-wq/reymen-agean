@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-otonom_nisan_olusturucu.py — DOM uzerinden tam otonom sablon cikarma araci.
+otonom_nisan_olusturucu.py â€” DOM uzerinden tam otonom sablon cikarma araci.
 
 Insan etkilesimi gerektirmez. Tor Browser acilir, belirtilen URL'ye gidilir,
 XPATH ile hedef elementler bulunur, element screenshot'i .png olarak kaydedilir.
@@ -170,7 +170,7 @@ if __name__ == "__main__":
         HEDEF_SITE = "https://example.com"
         print("[!] Varsayilan URL kullaniliyor.")
 
-    print(f"\n[SISTEM] {HEDEF_SITE} taranıyor...")
+    print(f"\n[SISTEM] {HEDEF_SITE} taranÄ±yor...")
     sonuc = otonom_sablon_olustur(HEDEF_SITE)
 
     print(f"\n=== RAPOR ===")

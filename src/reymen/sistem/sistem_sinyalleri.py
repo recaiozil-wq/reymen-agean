@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-sistem_sinyalleri.py — Sistem sinyalleri.
+sistem_sinyalleri.py â€” Sistem sinyalleri.
 
 SignalHandler sinifi ile isletim sistemi sinyallerini (SIGINT, SIGTERM vb.)
 dinler, kaydeder ve uygun sekilde yonetir. Graceful shutdown ve restart

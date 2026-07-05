@@ -1,4 +1,4 @@
-import sys, os
+﻿import sys, os
 
 sys.path.insert(
     0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -9,6 +9,6 @@ print("init var:", os.path.isfile(os.path.join(sys.path[0], "ReYMeN", "__init__.
 try:
     import ReYMeN.cost_tracker
 
-    print("✅ OK")
+    print("âœ… OK")
 except Exception as e:
-    print(f"❌ {e}")
+    print(f"âŒ {e}")

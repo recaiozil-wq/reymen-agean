@@ -1,4 +1,4 @@
-"""ReYMeN tools.clarify_tool shim — Hermes clarify fonksiyonlarını ReYMeN'e yönlendirir."""
+﻿"""ReYMeN tools.clarify_tool shim â€” ReYMeN clarify fonksiyonlarÄ±nÄ± ReYMeN'e yÃ¶nlendirir."""
 
 from __future__ import annotations
 
@@ -13,21 +13,21 @@ def run(
     secenekler: Optional[List[str]] = None,
     varsayilan: str = "",
 ) -> str:
-    """Hermes clarify_tool.run — ReYMeN için basit implementasyon.
+    """ReYMeN clarify_tool.run â€” ReYMeN iÃ§in basit implementasyon.
 
-    Kullanıcıya soru sorar ve cevabı döndürür.
-    Telegram bot için direkt input() kullanır.
+    KullanÄ±cÄ±ya soru sorar ve cevabÄ± dÃ¶ndÃ¼rÃ¼r.
+    Telegram bot iÃ§in direkt input() kullanÄ±r.
     """
     if secenekler:
         secenek_metni = "\n".join(f"  {i+1}. {s}" for i, s in enumerate(secenekler))
         prompt = f"{soru}\n{secenek_metni}\n"
         if varsayilan:
-            prompt += f"Varsayılan: {varsayilan}\n"
-        prompt += "Cevabınız: "
+            prompt += f"VarsayÄ±lan: {varsayilan}\n"
+        prompt += "CevabÄ±nÄ±z: "
     else:
         prompt = f"{soru}: "
         if varsayilan:
-            prompt += f" (varsayılan: {varsayilan}) "
+            prompt += f" (varsayÄ±lan: {varsayilan}) "
 
     try:
         cevap = input(prompt).strip()
@@ -43,6 +43,6 @@ def ask_user(
     choices: Optional[List[str]] = None,
     default: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """Hermes ask_user — ReYMeN için basit implementasyon."""
+    """ReYMeN ask_user â€” ReYMeN iÃ§in basit implementasyon."""
     result = run(question, choices, default or "")
     return {"result": result, "cancelled": result == "[iptal]"}

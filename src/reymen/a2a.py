@@ -1,10 +1,10 @@
-"""📡 A2A prototip — Basit agent mesajlaşma.
+﻿"""ğŸ“¡ A2A prototip â€” Basit agent mesajlaÅŸma.
 
-Agent'lar arası mesajlaşma prototipi. Bellek içi kuyruk tabanlı basit
-bir protokol sağlar. Her agent bir inbox'a sahiptir; ``Broker`` mesajları
+Agent'lar arasÄ± mesajlaÅŸma prototipi. Bellek iÃ§i kuyruk tabanlÄ± basit
+bir protokol saÄŸlar. Her agent bir inbox'a sahiptir; ``Broker`` mesajlarÄ±
 hedef agent'a iletir. Thread-safe'dir.
 
-Örnek::
+Ã–rnek::
 
     from ReYMeN.a2a import Agent, Broker, Message
 
@@ -43,7 +43,7 @@ __all__ = [
 # Hatalar
 # ---------------------------------------------------------------------------
 class A2AError(RuntimeError):
-    """A2A mesajlaşma hatası."""
+    """A2A mesajlaÅŸma hatasÄ±."""
 
 
 # ---------------------------------------------------------------------------
@@ -67,7 +67,7 @@ class MessageType(str, Enum):
 # ---------------------------------------------------------------------------
 @dataclass
 class Message:
-    """A2A mesajı."""
+    """A2A mesajÄ±."""
 
     sender: str
     receiver: str
@@ -91,7 +91,7 @@ class Message:
         }
 
     def reply(self, content: Any, *, msg_type: MessageType | None = None) -> "Message":
-        """Bu mesaja yanıt oluşturur (sender/receiver ters çevrilir)."""
+        """Bu mesaja yanÄ±t oluÅŸturur (sender/receiver ters Ã§evrilir)."""
         return Message(
             sender=self.receiver,
             receiver=self.sender,
@@ -105,10 +105,10 @@ class Message:
 # Broker
 # ---------------------------------------------------------------------------
 class Broker:
-    """Merkezi mesaj broker'ı.
+    """Merkezi mesaj broker'Ä±.
 
-    Her agent için bir inbox (kuyruk) tutar. Thread-safe'dir. Mesajlar
-    hedef agent kayıtlıysa iletilir; değilse ``A2AError`` fırlatılır.
+    Her agent iÃ§in bir inbox (kuyruk) tutar. Thread-safe'dir. Mesajlar
+    hedef agent kayÄ±tlÄ±ysa iletilir; deÄŸilse ``A2AError`` fÄ±rlatÄ±lÄ±r.
     """
 
     def __init__(self) -> None:
@@ -118,16 +118,16 @@ class Broker:
         self._handlers: dict[str, Callable[[Message], None]] = {}
         self._log: list[Message] = []
 
-    # -- Kayıt --------------------------------------------------------------
+    # -- KayÄ±t --------------------------------------------------------------
     def register(self, agent_id: str) -> None:
-        """Agent'ı broker'a kaydeder."""
+        """Agent'Ä± broker'a kaydeder."""
         with self._global_lock:
             if agent_id not in self._inboxes:
                 self._inboxes[agent_id] = deque()
                 self._conditions[agent_id] = threading.Condition()
 
     def unregister(self, agent_id: str) -> None:
-        """Agent kaydını siler."""
+        """Agent kaydÄ±nÄ± siler."""
         with self._global_lock:
             self._inboxes.pop(agent_id, None)
             self._conditions.pop(agent_id, None)
@@ -136,12 +136,12 @@ class Broker:
     def is_registered(self, agent_id: str) -> bool:
         return agent_id in self._inboxes
 
-    # -- Gönderim -----------------------------------------------------------
+    # -- GÃ¶nderim -----------------------------------------------------------
     def send(self, message: Message) -> None:
-        """Mesajı hedef agent'ın inbox'ına bırakır."""
+        """MesajÄ± hedef agent'Ä±n inbox'Ä±na bÄ±rakÄ±r."""
         with self._global_lock:
             if message.receiver not in self._inboxes:
-                raise A2AError(f"Alıcı '{message.receiver}' kayıtlı değil")
+                raise A2AError(f"AlÄ±cÄ± '{message.receiver}' kayÄ±tlÄ± deÄŸil")
             inbox = self._inboxes[message.receiver]
             condition = self._conditions[message.receiver]
 
@@ -151,7 +151,7 @@ class Broker:
 
         self._log.append(message)
 
-        # Handler varsa çağır
+        # Handler varsa Ã§aÄŸÄ±r
         handler = self._handlers.get(message.receiver)
         if handler is not None:
             try:
@@ -159,15 +159,15 @@ class Broker:
             except Exception as _e:
                 __import__("logging").getLogger(__name__).warning(
                     "[SessizExcept] %%s: %%s", type(_e).__name__, _e
-                )  # Handler hatası mesaj akışını bozmamalı
+                )  # Handler hatasÄ± mesaj akÄ±ÅŸÄ±nÄ± bozmamalÄ±
 
     def broadcast(
         self, sender: str, content: Any, *, exclude: set[str] | None = None
     ) -> list[str]:
-        """Tüm kayıtlı agent'lara broadcast mesaj gönderir.
+        """TÃ¼m kayÄ±tlÄ± agent'lara broadcast mesaj gÃ¶nderir.
 
         Returns:
-            Mesajın iletildiği agent ID'leri.
+            MesajÄ±n iletildiÄŸi agent ID'leri.
         """
         exclude = exclude or set()
         exclude.add(sender)
@@ -193,19 +193,19 @@ class Broker:
         timeout: float | None = None,
         block: bool = True,
     ) -> Message | None:
-        """Agent'ın inbox'ından mesaj alır.
+        """Agent'Ä±n inbox'Ä±ndan mesaj alÄ±r.
 
         Args:
             agent_id: Agent ID.
-            timeout: Saniye cinsinden bekleme süresi (None = sonsuz).
-            block: ``False`` ise boş inbox'ta hemen None döner.
+            timeout: Saniye cinsinden bekleme sÃ¼resi (None = sonsuz).
+            block: ``False`` ise boÅŸ inbox'ta hemen None dÃ¶ner.
 
         Returns:
-            ``Message`` veya inbox boşsa ``None``.
+            ``Message`` veya inbox boÅŸsa ``None``.
         """
         with self._global_lock:
             if agent_id not in self._inboxes:
-                raise A2AError(f"Agent '{agent_id}' kayıtlı değil")
+                raise A2AError(f"Agent '{agent_id}' kayÄ±tlÄ± deÄŸil")
             inbox = self._inboxes[agent_id]
             condition = self._conditions[agent_id]
 
@@ -217,10 +217,10 @@ class Broker:
             return None
 
     def peek(self, agent_id: str) -> Message | None:
-        """Inbox'tan mesajı silmeden okur."""
+        """Inbox'tan mesajÄ± silmeden okur."""
         with self._global_lock:
             if agent_id not in self._inboxes:
-                raise A2AError(f"Agent '{agent_id}' kayıtlı değil")
+                raise A2AError(f"Agent '{agent_id}' kayÄ±tlÄ± deÄŸil")
             inbox = self._inboxes[agent_id]
             condition = self._conditions[agent_id]
 
@@ -228,28 +228,28 @@ class Broker:
             return inbox[0] if inbox else None
 
     def inbox_size(self, agent_id: str) -> int:
-        """Agent'ın inbox'undaki mesaj sayısı."""
+        """Agent'Ä±n inbox'undaki mesaj sayÄ±sÄ±."""
         with self._global_lock:
             if agent_id not in self._inboxes:
-                raise A2AError(f"Agent '{agent_id}' kayıtlı değil")
+                raise A2AError(f"Agent '{agent_id}' kayÄ±tlÄ± deÄŸil")
             return len(self._inboxes[agent_id])
 
     # -- Handler ------------------------------------------------------------
     def set_handler(self, agent_id: str, handler: Callable[[Message], None]) -> None:
-        """Agent için mesaj handler'ı ayarlar (mesaj geldiğinde çağrılır)."""
+        """Agent iÃ§in mesaj handler'Ä± ayarlar (mesaj geldiÄŸinde Ã§aÄŸrÄ±lÄ±r)."""
         with self._global_lock:
             if agent_id not in self._inboxes:
-                raise A2AError(f"Agent '{agent_id}' kayıtlı değil")
+                raise A2AError(f"Agent '{agent_id}' kayÄ±tlÄ± deÄŸil")
             self._handlers[agent_id] = handler
 
     def clear_handler(self, agent_id: str) -> None:
-        """Agent'ın handler'ını temizler."""
+        """Agent'Ä±n handler'Ä±nÄ± temizler."""
         with self._global_lock:
             self._handlers.pop(agent_id, None)
 
     # -- Log / istatistik ---------------------------------------------------
     def message_log(self) -> list[Message]:
-        """Tüm iletilen mesajların kopyası."""
+        """TÃ¼m iletilen mesajlarÄ±n kopyasÄ±."""
         return list(self._log)
 
     def stats(self) -> dict[str, Any]:
@@ -262,7 +262,7 @@ class Broker:
             }
 
     def reset(self) -> None:
-        """Tüm inbox'ları ve log'u temizler."""
+        """TÃ¼m inbox'larÄ± ve log'u temizler."""
         with self._global_lock:
             for inbox in self._inboxes.values():
                 inbox.clear()
@@ -276,10 +276,10 @@ class Broker:
 # Agent
 # ---------------------------------------------------------------------------
 class Agent:
-    """A2A agent'ı.
+    """A2A agent'Ä±.
 
-    Bir ``Broker`` üzerinden mesaj gönderir/alır. ``on_message`` callback'i
-    ile asenkron mesaj işleme yapılabilir.
+    Bir ``Broker`` Ã¼zerinden mesaj gÃ¶nderir/alÄ±r. ``on_message`` callback'i
+    ile asenkron mesaj iÅŸleme yapÄ±labilir.
     """
 
     def __init__(
@@ -295,7 +295,7 @@ class Agent:
         if on_message is not None:
             self.broker.set_handler(agent_id, on_message)
 
-    # -- Gönderim -----------------------------------------------------------
+    # -- GÃ¶nderim -----------------------------------------------------------
     def send(
         self,
         receiver: str,
@@ -305,7 +305,7 @@ class Agent:
         reply_to: str | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> Message:
-        """Başka bir agent'a mesaj gönderir."""
+        """BaÅŸka bir agent'a mesaj gÃ¶nderir."""
         msg = Message(
             sender=self.id,
             receiver=receiver,
@@ -318,11 +318,11 @@ class Agent:
         return msg
 
     def broadcast(self, content: Any, *, exclude: set[str] | None = None) -> list[str]:
-        """Tüm agent'lara broadcast."""
+        """TÃ¼m agent'lara broadcast."""
         return self.broker.broadcast(self.id, content, exclude=exclude)
 
     def reply(self, original: Message, content: Any) -> Message:
-        """Bir mesaja yanıt verir."""
+        """Bir mesaja yanÄ±t verir."""
         msg = original.reply(content)
         self.broker.send(msg)
         return msg
@@ -334,30 +334,30 @@ class Agent:
         timeout: float | None = None,
         block: bool = True,
     ) -> Message | None:
-        """Inbox'tan mesaj alır."""
+        """Inbox'tan mesaj alÄ±r."""
         return self.broker.receive(self.id, timeout=timeout, block=block)
 
     def peek(self) -> Message | None:
-        """Inbox'tan mesajı silmeden okur."""
+        """Inbox'tan mesajÄ± silmeden okur."""
         return self.broker.peek(self.id)
 
     @property
     def inbox_size(self) -> int:
-        """Bekleyen mesaj sayısı."""
+        """Bekleyen mesaj sayÄ±sÄ±."""
         return self.broker.inbox_size(self.id)
 
     # -- Handler ------------------------------------------------------------
     def set_handler(self, handler: Callable[[Message], None]) -> None:
-        """Mesaj handler'ı ayarlar."""
+        """Mesaj handler'Ä± ayarlar."""
         self.broker.set_handler(self.id, handler)
 
     def clear_handler(self) -> None:
-        """Handler'ı temizler."""
+        """Handler'Ä± temizler."""
         self.broker.clear_handler(self.id)
 
     # -- Temizlik -----------------------------------------------------------
     def close(self) -> None:
-        """Agent'ı broker'dan kaydını siler."""
+        """Agent'Ä± broker'dan kaydÄ±nÄ± siler."""
         self.broker.unregister(self.id)
 
     def __repr__(self) -> str:

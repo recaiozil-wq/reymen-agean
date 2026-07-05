@@ -1,4 +1,4 @@
-"""Adapter-driven dispatch of structured stream events to a delivery sink.
+﻿"""Adapter-driven dispatch of structured stream events to a delivery sink.
 
 ``GatewayEventDispatcher`` is the seam Tobi asked for: the agent emits typed
 events (gateway/stream_events.py), and the *adapter* decides how each one is
@@ -8,8 +8,8 @@ and routes each event through the adapter's render hooks.
 
 Message/commentary/segment events flow into the consumer (native draft on
 Telegram DMs, edit-in-place elsewhere).  Tool events are formatted by the
-adapter — which may return None to *eat* the event on platforms that can't
-render tool chrome — and the rendered line is enqueued onto the same tool
+adapter â€” which may return None to *eat* the event on platforms that can't
+render tool chrome â€” and the rendered line is enqueued onto the same tool
 progress queue the gateway already drains, so the two no longer race through
 independent code paths.
 
@@ -23,7 +23,7 @@ from __future__ import annotations
 import logging
 from typing import Any, Callable, Optional
 
-from src.gateways.stream_events import (
+from gateways.stream_events import (
     Commentary,
     GatewayNotice,
     LongToolHint,
@@ -82,7 +82,7 @@ class GatewayEventDispatcher:
         self.preview_max_len = preview_max_len
         self._on_long_tool = on_long_tool
         self._on_notice = on_notice
-        # "new" mode dedup — only report when the tool changes.
+        # "new" mode dedup â€” only report when the tool changes.
         self._last_tool: Optional[str] = None
 
     def dispatch(self, event: StreamEvent) -> None:
@@ -116,7 +116,7 @@ class GatewayEventDispatcher:
             return
 
         if isinstance(event, ToolCallFinished):
-            # Default: no chrome on completion (matches today — the gateway only
+            # Default: no chrome on completion (matches today â€” the gateway only
             # rendered "started" events).  Completion drives onboarding hints.
             return
 

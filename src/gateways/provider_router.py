@@ -1,12 +1,12 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-provider_router.py — Akıllı sağlayıcı yönlendirici
+provider_router.py â€” AkÄ±llÄ± saÄŸlayÄ±cÄ± yÃ¶nlendirici
 
-Özellikler:
-  - Circuit breaker: hata veren provider'ı geçici kara listeye al
-  - Sağlık kontrolü: başlangıçta tüm provider'ları pingle
-  - Skorlama: yerel (hızlı) → uzak (yavaş) sıralaması
-  - Thread-safe: threading.Lock ile korumalı
+Ã–zellikler:
+  - Circuit breaker: hata veren provider'Ä± geÃ§ici kara listeye al
+  - SaÄŸlÄ±k kontrolÃ¼: baÅŸlangÄ±Ã§ta tÃ¼m provider'larÄ± pingle
+  - Skorlama: yerel (hÄ±zlÄ±) â†’ uzak (yavaÅŸ) sÄ±ralamasÄ±
+  - Thread-safe: threading.Lock ile korumalÄ±
 """
 
 from __future__ import annotations
@@ -19,11 +19,11 @@ from typing import Optional
 
 logger = logging.getLogger(__name__)
 
-# ── Yapılandırma ──────────────────────────────────────────────────────────────
+# â”€â”€ YapÄ±landÄ±rma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-_BREAKER_HATA_LIMITI: int = 2  # Kaç hata sonra kara listeye alınsın?
-_BREAKER_BEKLEME_SN: int = 120  # Kara listede kaç saniye kalsın?
-_PING_TIMEOUT_SN: int = 5  # Ping zaman aşımı
+_BREAKER_HATA_LIMITI: int = 2  # KaÃ§ hata sonra kara listeye alÄ±nsÄ±n?
+_BREAKER_BEKLEME_SN: int = 120  # Kara listede kaÃ§ saniye kalsÄ±n?
+_PING_TIMEOUT_SN: int = 5  # Ping zaman aÅŸÄ±mÄ±
 _LOCAL_PROVIDERS: frozenset = frozenset(
     {
         "lmstudio",
@@ -31,7 +31,7 @@ _LOCAL_PROVIDERS: frozenset = frozenset(
         "ollama",
     }
 )
-# LiteLLM destegi — tum litellm provider'lari remote kabul et
+# LiteLLM destegi â€” tum litellm provider'lari remote kabul et
 _LITELLM_PROVIDERLER: frozenset = frozenset(
     {
         "openai",
@@ -59,7 +59,7 @@ _KARMA_PROVIDERS: frozenset = frozenset(
 )
 
 
-# ── Veri yapıları ─────────────────────────────────────────────────────────────
+# â”€â”€ Veri yapÄ±larÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 @dataclass
@@ -67,12 +67,12 @@ class SaglayiciDurum:
     ad: str
     hata_sayisi: int = 0
     kara_liste_saati: float = 0.0  # time.monotonic()
-    ping_canli: Optional[bool] = None  # None = henüz pinglenmedi
-    ping_suresi_sn: float = 0.0  # 0 = hiç pinglenmedi / başarısız
+    ping_canli: Optional[bool] = None  # None = henÃ¼z pinglenmedi
+    ping_suresi_sn: float = 0.0  # 0 = hiÃ§ pinglenmedi / baÅŸarÄ±sÄ±z
 
     @property
     def aktif(self) -> bool:
-        """Provider şu an kullanılabilir mi?"""
+        """Provider ÅŸu an kullanÄ±labilir mi?"""
         if self.kara_liste_saati == 0:
             return True
         return (time.monotonic() - self.kara_liste_saati) > _BREAKER_BEKLEME_SN
@@ -82,53 +82,53 @@ class SaglayiciDurum:
         if self.hata_sayisi >= _BREAKER_HATA_LIMITI:
             self.kara_liste_saati = time.monotonic()
             logger.warning(
-                "[Router] ⛔ %s kara listeye alındı (%d hata, %ds bekleme)",
+                "[Router] â›” %s kara listeye alÄ±ndÄ± (%d hata, %ds bekleme)",
                 self.ad,
                 self.hata_sayisi,
                 _BREAKER_BEKLEME_SN,
             )
 
     def basari_kaydet(self):
-        """Başarılı çağrı → hata sayacını sıfırla"""
+        """BaÅŸarÄ±lÄ± Ã§aÄŸrÄ± â†’ hata sayacÄ±nÄ± sÄ±fÄ±rla"""
         self.hata_sayisi = 0
         self.kara_liste_saati = 0
 
 
-# ── Ana sınıf ─────────────────────────────────────────────────────────────────
+# â”€â”€ Ana sÄ±nÄ±f â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class SaglayiciYonlendirici:
-    """Provider'ları yönetir, sıralar, kara listeye alır."""
+    """Provider'larÄ± yÃ¶netir, sÄ±ralar, kara listeye alÄ±r."""
 
     def __init__(self):
         self._durumlar: dict[str, SaglayiciDurum] = {}
         self._lock = threading.Lock()
 
-    # ── Durum yönetimi ─────────────────────────────────────────────────────
+    # â”€â”€ Durum yÃ¶netimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def kaydet(self, ad: str) -> SaglayiciDurum:
-        """Provider'ı takip listesine ekle (eğer yoksa)."""
+        """Provider'Ä± takip listesine ekle (eÄŸer yoksa)."""
         with self._lock:
             if ad not in self._durumlar:
                 self._durumlar[ad] = SaglayiciDurum(ad=ad)
             return self._durumlar[ad]
 
     def hata_bildir(self, ad: str):
-        """Provider hata verdi → hata sayacını artır, gerekirse kara listele."""
+        """Provider hata verdi â†’ hata sayacÄ±nÄ± artÄ±r, gerekirse kara listele."""
         with self._lock:
             durum = self._durumlar.get(ad)
             if durum:
                 durum.hata_kaydet()
 
     def basari_bildir(self, ad: str):
-        """Provider başarılı → hata sayacını sıfırla."""
+        """Provider baÅŸarÄ±lÄ± â†’ hata sayacÄ±nÄ± sÄ±fÄ±rla."""
         with self._lock:
             durum = self._durumlar.get(ad)
             if durum:
                 durum.basari_kaydet()
 
     def aktif_mi(self, ad: str) -> bool:
-        """Provider şu an kullanılabilir mi? (kara listede değil mi?)"""
+        """Provider ÅŸu an kullanÄ±labilir mi? (kara listede deÄŸil mi?)"""
         with self._lock:
             durum = self._durumlar.get(ad)
             if durum is None:
@@ -136,15 +136,15 @@ class SaglayiciYonlendirici:
             return durum.aktif
 
     def durum_ozeti(self) -> str:
-        """Tüm provider'ların durum özeti (debug için)."""
+        """TÃ¼m provider'larÄ±n durum Ã¶zeti (debug iÃ§in)."""
         with self._lock:
             if not self._durumlar:
-                return "  (kayıtlı provider yok)"
+                return "  (kayÄ±tlÄ± provider yok)"
             satirlar = []
             for ad, d in sorted(self._durumlar.items()):
-                ikon = "✅" if d.aktif else "⛔"
+                ikon = "âœ…" if d.aktif else "â›”"
                 canli = (
-                    f"ping:{'✅' if d.ping_canli else '❌'}"
+                    f"ping:{'âœ…' if d.ping_canli else 'âŒ'}"
                     if d.ping_canli is not None
                     else ""
                 )
@@ -154,35 +154,35 @@ class SaglayiciYonlendirici:
                 satirlar.append(f"  {ikon} {ad}{canli}{kara}{hata}{sure}")
             return "\n".join(satirlar)
 
-    # ── Sağlık kontrolü ────────────────────────────────────────────────────
+    # â”€â”€ SaÄŸlÄ±k kontrolÃ¼ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def saglik_kontrolu(
         self,
         provider_list: list[tuple[str, str, str]],  # (ad, base_url, api_key)
     ) -> dict[str, bool]:
-        """Tüm provider'ları paralel pingle, canlılık raporu döndür.
+        """TÃ¼m provider'larÄ± paralel pingle, canlÄ±lÄ±k raporu dÃ¶ndÃ¼r.
 
         Args:
             provider_list: (provider_adi, base_url, api_key) tuple listesi
 
         Returns:
-            {provider_adi: canli_mi} sözlüğü
+            {provider_adi: canli_mi} sÃ¶zlÃ¼ÄŸÃ¼
         """
         import requests
         from concurrent.futures import ThreadPoolExecutor, as_completed
 
         def _ping(ad: str, base_url: str, api_key: str) -> tuple[str, bool, float]:
-            """Tek provider'ı pingle — basit bir GET isteği."""
+            """Tek provider'Ä± pingle â€” basit bir GET isteÄŸi."""
             t0 = time.monotonic()
             try:
                 if "localhost" in base_url or "127.0.0.1" in base_url:
-                    # Local provider'lar için basit model listesi sorgusu
+                    # Local provider'lar iÃ§in basit model listesi sorgusu
                     url = f"{base_url.rstrip('/')}/v1/models"
                     resp = requests.get(url, timeout=_PING_TIMEOUT_SN)
                     canli = resp.status_code == 200
                 elif api_key and api_key != "not-needed":
-                    # API provider'ları için basit bir ping
-                    # Sadece URL erişilebilir mi kontrol et
+                    # API provider'larÄ± iÃ§in basit bir ping
+                    # Sadece URL eriÅŸilebilir mi kontrol et
                     url = f"{base_url.rstrip('/')}/v1/models"
                     headers = {"Authorization": f"Bearer {api_key}"}
                     resp = requests.get(url, timeout=_PING_TIMEOUT_SN, headers=headers)
@@ -190,7 +190,7 @@ class SaglayiciYonlendirici:
                         200,
                         401,
                         403,
-                    )  # 401/403 = API canlı ama yetki yok
+                    )  # 401/403 = API canlÄ± ama yetki yok
                 else:
                     canli = False
                 sure = time.monotonic() - t0
@@ -203,7 +203,7 @@ class SaglayiciYonlendirici:
             futures = []
             for ad, base_url, api_key in provider_list:
                 if not base_url or (api_key in ("", "not-needed") and ad != "lmstudio"):
-                    # Anahtarı olmayanı pingleme
+                    # AnahtarÄ± olmayanÄ± pingleme
                     with self._lock:
                         durum = self._durumlar.get(ad)
                         if durum:
@@ -224,18 +224,18 @@ class SaglayiciYonlendirici:
 
         return sonuclar
 
-    # ── Provider sıralama ──────────────────────────────────────────────────
+    # â”€â”€ Provider sÄ±ralama â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def sirala(
         self,
         zincir: list,
         ad_al=None,
     ) -> list:
-        """Provider zincirini akıllıca sırala:
-        1. Kara listede olmayanlar önce
-        2. Yerel (LM Studio, Ollama) önce
-        3. Ping canlı olanlar önce
-        4. Hızlı ping süresine göre
+        """Provider zincirini akÄ±llÄ±ca sÄ±rala:
+        1. Kara listede olmayanlar Ã¶nce
+        2. Yerel (LM Studio, Ollama) Ã¶nce
+        3. Ping canlÄ± olanlar Ã¶nce
+        4. HÄ±zlÄ± ping sÃ¼resine gÃ¶re
         """
 
         def skor(adim) -> float:
@@ -248,7 +248,7 @@ class SaglayiciYonlendirici:
                 durum = self._durumlar.get(ad)
 
             if durum is None:
-                return 100.0  # bilinmeyen = en düşük öncelik
+                return 100.0  # bilinmeyen = en dÃ¼ÅŸÃ¼k Ã¶ncelik
 
             # Kara listedeyse en sona at
             if not durum.aktif:
@@ -256,30 +256,30 @@ class SaglayiciYonlendirici:
 
             s = 0.0
 
-            # Yerel provider çok hızlı
+            # Yerel provider Ã§ok hÄ±zlÄ±
             if ad in _LOCAL_PROVIDERS:
                 s += 10.0
             elif ad in _KARMA_PROVIDERS:
                 s += 5.0
 
-            # Ping canlıysa bonus
+            # Ping canlÄ±ysa bonus
             if durum.ping_canli:
                 s += 15.0
             elif durum.ping_canli is False:
-                s -= 10.0  # ping başarısız = düşük öncelik
+                s -= 10.0  # ping baÅŸarÄ±sÄ±z = dÃ¼ÅŸÃ¼k Ã¶ncelik
 
-            # Hızlı ping süresi bonus
+            # HÄ±zlÄ± ping sÃ¼resi bonus
             if durum.ping_suresi_sn > 0:
                 s += max(0, 5.0 - durum.ping_suresi_sn)
 
-            return -s  # küçük skor = önce
+            return -s  # kÃ¼Ã§Ã¼k skor = Ã¶nce
 
         return sorted(zincir, key=skor)
 
-    # ── CLI/Uyumluluk arayüzü ──────────────────────────────────────────────
+    # â”€â”€ CLI/Uyumluluk arayÃ¼zÃ¼ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def saglayici_listele(self) -> list[str]:
-        """Kayıtlı tüm provider adlarını döndür."""
+        """KayÄ±tlÄ± tÃ¼m provider adlarÄ±nÄ± dÃ¶ndÃ¼r."""
         with self._lock:
             return list(self._durumlar.keys())
 
@@ -287,26 +287,26 @@ class SaglayiciYonlendirici:
         """Provider kara listede mi? (Circuit breaker aktif mi?)
 
         Args:
-            ad: Provider adı
+            ad: Provider adÄ±
 
         Returns:
-            True = kara listede (kullanılamaz), False = kullanılabilir
+            True = kara listede (kullanÄ±lamaz), False = kullanÄ±labilir
         """
         with self._lock:
             durum = self._durumlar.get(ad)
             if durum is None:
-                return False  # bilinmeyen provider kara listede sayılmaz
+                return False  # bilinmeyen provider kara listede sayÄ±lmaz
             if durum.kara_liste_saati == 0:
                 return False
-            # Kara listedeyse süre dolmuş mu kontrol et
+            # Kara listedeyse sÃ¼re dolmuÅŸ mu kontrol et
             return (time.monotonic() - durum.kara_liste_saati) <= _BREAKER_BEKLEME_SN
 
     def liste(self) -> list[str]:
-        """CLI uyumlu: kayıtlı provider listesi (saglayici_listele alias)."""
+        """CLI uyumlu: kayÄ±tlÄ± provider listesi (saglayici_listele alias)."""
         return self.saglayici_listele()
 
     def aktif_sayisi(self) -> int:
-        """CLI uyumlu: şu an kullanılabilir (kara listede olmayan) kaç provider var?"""
+        """CLI uyumlu: ÅŸu an kullanÄ±labilir (kara listede olmayan) kaÃ§ provider var?"""
         sayi = 0
         with self._lock:
             for durum in self._durumlar.values():
@@ -315,15 +315,15 @@ class SaglayiciYonlendirici:
         return sayi
 
     def failover_chain(self) -> list[str]:
-        """CLI uyumlu: kayıtlı provider'ların failover sırası (skorlama bazlı).
+        """CLI uyumlu: kayÄ±tlÄ± provider'larÄ±n failover sÄ±rasÄ± (skorlama bazlÄ±).
 
-        Provider'ları sirala() mantığına göre sıralar — önce yerel,
-        sonra API provider'ları, kara listedekiler en sona atılır.
+        Provider'larÄ± sirala() mantÄ±ÄŸÄ±na gÃ¶re sÄ±ralar â€” Ã¶nce yerel,
+        sonra API provider'larÄ±, kara listedekiler en sona atÄ±lÄ±r.
         """
         with self._lock:
             adlar = list(self._durumlar.keys())
 
-        # Skorlama: önce yerel, sonra API, kara listedekiler en son
+        # Skorlama: Ã¶nce yerel, sonra API, kara listedekiler en son
         def _siralama_skoru(ad: str) -> float:
             durum = self._durumlar.get(ad)
             if durum is None:
@@ -340,7 +340,7 @@ class SaglayiciYonlendirici:
         return sorted(adlar, key=_siralama_skoru)
 
 
-# ── Singleton ──────────────────────────────────────────────────────────────────
+# â”€â”€ Singleton â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _yonlendirici: Optional[SaglayiciYonlendirici] = None
 _yonlendirici_lock = threading.Lock()

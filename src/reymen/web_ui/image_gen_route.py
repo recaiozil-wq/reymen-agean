@@ -1,10 +1,10 @@
-#!/usr/bin/env python3
-# Apache 2.0 — ReYMeN Web UI Image Gen Route
+﻿#!/usr/bin/env python3
+# Apache 2.0 â€” ReYMeN Web UI Image Gen Route
 """
-image_gen_route.py — FastAPI route for image generation.
+image_gen_route.py â€” FastAPI route for image generation.
 
-GET  /image-gen  → HTML form
-POST /image-gen  → Generate image via ReYMeN engine
+GET  /image-gen  â†’ HTML form
+POST /image-gen  â†’ Generate image via ReYMeN engine
 
 Uses ``src.reymen.tools.image_generation_tool.image_generate_tool``
 which delegates to the ReYMeN image_gen_engine (FAL / OpenAI / xAI).
@@ -22,13 +22,13 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 
 # ReYMeN image gen engine
-from src.reymen.tools.image_generation_tool import image_generate_tool
+from reymen.tools.image_generation_tool import image_generate_tool
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["image-gen"])
 
-# Templates — parent dir'deki templates/ klasörü
+# Templates â€” parent dir'deki templates/ klasÃ¶rÃ¼
 from pathlib import Path
 
 _TEMPLATE_DIR = Path(__file__).parent / "templates"
@@ -37,7 +37,7 @@ templates = Jinja2Templates(directory=str(_TEMPLATE_DIR))
 
 @router.get("/image-gen", response_class=HTMLResponse)
 async def image_gen_form(request: Request):
-    """GET — Image generation form."""
+    """GET â€” Image generation form."""
     return templates.TemplateResponse(request, "image_gen.html", {})
 
 
@@ -48,7 +48,7 @@ async def image_gen_generate(
     provider: str = Form("auto"),
     aspect_ratio: str = Form("square"),
 ):
-    """POST — Generate image.
+    """POST â€” Generate image.
 
     Form fields:
         prompt (str): Image prompt.
@@ -64,14 +64,14 @@ async def image_gen_generate(
         return JSONResponse(
             {
                 "success": False,
-                "error": "Prompt boş olamaz.",
+                "error": "Prompt boÅŸ olamaz.",
             }
         )
 
     try:
-        # Provider'a göre davran
+        # Provider'a gÃ¶re davran
         if provider == "stub":
-            # Stub: her zaman place holder döndür
+            # Stub: her zaman place holder dÃ¶ndÃ¼r
             result = _stub_generate(prompt, aspect_ratio)
         else:
             # ReYMeN engine (auto-selection)
@@ -103,7 +103,7 @@ async def image_gen_generate(
                 "provider": provider,
                 "model": result.get("model", ""),
                 "duration": round(duration, 2),
-                "error": result.get("error", "Görsel üretilemedi."),
+                "error": result.get("error", "GÃ¶rsel Ã¼retilemedi."),
             }
         )
 
@@ -122,7 +122,7 @@ async def image_gen_generate(
 
 
 def _stub_generate(prompt: str, aspect_ratio: str) -> dict[str, Any]:
-    """Stub/fallback — SVG placeholder üret."""
+    """Stub/fallback â€” SVG placeholder Ã¼ret."""
     import hashlib
     import base64
 
@@ -133,9 +133,9 @@ def _stub_generate(prompt: str, aspect_ratio: str) -> dict[str, Any]:
     svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}">
   <rect width="{w}" height="{h}" fill="#1a1a2e"/>
   <rect x="16" y="16" width="{w-32}" height="{h-32}" rx="12" fill="#16213e" stroke="#0f3460" stroke-width="2"/>
-  <text x="{w//2}" y="{h//2-20}" text-anchor="middle" font-family="Arial" font-size="36" fill="#e94560">🎨</text>
+  <text x="{w//2}" y="{h//2-20}" text-anchor="middle" font-family="Arial" font-size="36" fill="#e94560">ğŸ¨</text>
   <text x="{w//2}" y="{h//2+30}" text-anchor="middle" font-family="Arial" font-size="11" fill="#a0a0b0">{_esc(prompt[:50])}</text>
-  <text x="{w//2}" y="{h//2+55}" text-anchor="middle" font-family="Arial" font-size="10" fill="#606080">STUB — placeholder</text>
+  <text x="{w//2}" y="{h//2+55}" text-anchor="middle" font-family="Arial" font-size="10" fill="#606080">STUB â€” placeholder</text>
 </svg>"""
 
     b64 = base64.b64encode(svg.encode()).decode()

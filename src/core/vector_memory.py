@@ -1,14 +1,14 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-vector_memory.py — P2 Vector Memory: Embedding + semantic search.
+vector_memory.py â€” P2 Vector Memory: Embedding + semantic search.
 
 Vektor bellek sistemi. Mevcut VektorBellek (reymen/hafiza/vektor_bellek.py)
-üzerine kurulmuştur. DeepSeek embeddings API ile embedding üretir,
-ChromaDB (varsa) veya SQLite fallback kullanır.
+Ã¼zerine kurulmuÅŸtur. DeepSeek embeddings API ile embedding Ã¼retir,
+ChromaDB (varsa) veya SQLite fallback kullanÄ±r.
 
 Motor Tools:
-    VEKTOR_EKLE(metin, metadata) → Kayıt ekle
-    VEKTOR_ARA(sorgu, limit)     → Anlamsal arama
+    VEKTOR_EKLE(metin, metadata) â†’ KayÄ±t ekle
+    VEKTOR_ARA(sorgu, limit)     â†’ Anlamsal arama
 """
 
 from __future__ import annotations
@@ -22,7 +22,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
-# ── Mevcut VektorBellek'i kullan ──────────────────────────────────────────────
+# â”€â”€ Mevcut VektorBellek'i kullan â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 try:
     from reymen.hafiza.vektor_bellek import (
         VektorBellek as _VektorBellek,
@@ -37,7 +37,7 @@ except ImportError:
     CHROMA_MEVCUT = False
     VARSAYILAN_VB_MEVCUT = False
 
-# ── DeepSeek embeddings API (opsiyonel) ───────────────────────────────────────
+# â”€â”€ DeepSeek embeddings API (opsiyonel) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 try:
     from openai import OpenAI
 
@@ -45,7 +45,7 @@ try:
 except ImportError:
     _OPENAI_MEVCUT = False
 
-# ── numpy (opsiyonel, embedding islemleri icin) ────────────────────────────────
+# â”€â”€ numpy (opsiyonel, embedding islemleri icin) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 try:
     import numpy as np
 
@@ -53,7 +53,7 @@ try:
 except ImportError:
     _NUMPY_MEVCUT = False
 
-# ── Varsayilan sabitler ────────────────────────────────────────────────────────
+# â”€â”€ Varsayilan sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 VARSAYILAN_MODEL = "text-embedding-ada-002"  # DeepSeek / OpenAI uyumlu
 VARSAYILAN_DIZIN = str(Path(__file__).parent.parent.parent / "vektor_hafizasi")
 ESIK_BENZERLIK = 0.15
@@ -61,9 +61,9 @@ MAKS_EMBEDDING_BOYUT = 2048
 EMBEDDING_BATCH_SIZE = 10
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Embedding Motoru (LLM / DeepSeek API)
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class EmbeddingMotor:
@@ -129,7 +129,7 @@ class EmbeddingMotor:
                 return resp.data[0].embedding if resp.data else []
             except Exception as e:
                 logger.warning(
-                    "[EmbeddingMotor] API embedding hatasi: %s — fallback", e
+                    "[EmbeddingMotor] API embedding hatasi: %s â€” fallback", e
                 )
                 self._fallback_aktif = True
 
@@ -149,7 +149,7 @@ class EmbeddingMotor:
                 return [d.embedding for d in resp.data] if resp.data else []
             except Exception as e:
                 logger.warning(
-                    "[EmbeddingMotor] Batch embedding hatasi: %s — fallback", e
+                    "[EmbeddingMotor] Batch embedding hatasi: %s â€” fallback", e
                 )
                 self._fallback_aktif = True
 
@@ -169,9 +169,9 @@ class EmbeddingMotor:
         return not self._fallback_aktif or self._client is not None
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  VectorMemory Ana Sinif (Mevcut VektorBellek'i sarmalar)
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class VectorMemory:
@@ -219,7 +219,7 @@ class VectorMemory:
                 )
             except Exception as e:
                 logger.warning(
-                    "[VectorMemory] VektorBellek baslatma hatasi: %s — SQLite fallback",
+                    "[VectorMemory] VektorBellek baslatma hatasi: %s â€” SQLite fallback",
                     e,
                 )
                 self._vb = None
@@ -227,7 +227,7 @@ class VectorMemory:
         # SQLite fallback (her zaman hazir)
         self._sqlite = _SQLiteVectorMemory(kalici_dizin=self._kalici_dizin)
 
-    # ── Temel Metotlar ───────────────────────────────────────────────────────
+    # â”€â”€ Temel Metotlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def ekle(self, metin: str, metadata: Optional[Dict] = None) -> str:
         """Metni vektor bellege ekle.
@@ -285,7 +285,7 @@ class VectorMemory:
                         for sid, metin, skor, meta in chroma_sonuc
                     ]
         except Exception as e:
-            logger.debug("[VectorMemory] ChromaDB arama hatasi: %s — SQLite", e)
+            logger.debug("[VectorMemory] ChromaDB arama hatasi: %s â€” SQLite", e)
 
         # Fallback: SQLite + embedding benzerligi
         sorgu_embed = self._embedder.embed(sorgu)
@@ -368,9 +368,9 @@ class VectorMemory:
         }
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  SQLite Vector Memory (Embedding destekli fallback)
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class _SQLiteVectorMemory:
@@ -570,9 +570,9 @@ class _SQLiteVectorMemory:
             )
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Singleton
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 _vector_memory_instance: Optional[VectorMemory] = None
 
@@ -585,9 +585,9 @@ def vector_memory_al() -> VectorMemory:
     return _vector_memory_instance
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Motor Tools
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def motor_kaydet(motor) -> None:
@@ -602,14 +602,14 @@ def motor_kaydet(motor) -> None:
     motor._plugin_arac_kaydet(
         "VEKTOR_EKLE",
         _vektor_ekle_tool,
-        "VEKTOR_EKLE(metin, metadata) — Metni vektor bellege ekle. "
+        "VEKTOR_EKLE(metin, metadata) â€” Metni vektor bellege ekle. "
         "Parametreler: metin=eklenecek_metin metadata=opsiyonel_json_dict. "
         'Ornek: VEKTOR_EKLE(metin=\'Bugun hava cok guzel\', metadata={"kategori":"not"})',
     )
     motor._plugin_arac_kaydet(
         "VEKTOR_ARA",
         _vektor_ara_tool,
-        "VEKTOR_ARA(sorgu, limit) — Anlamsal arama yap. "
+        "VEKTOR_ARA(sorgu, limit) â€” Anlamsal arama yap. "
         "Parametreler: sorgu=arama_sorgusu limit=kac_sonuc (varsayilan 5). "
         "Ornek: VEKTOR_ARA(sorgu='hava durumu', limit=3)",
     )
@@ -617,7 +617,7 @@ def motor_kaydet(motor) -> None:
 
 
 def _vektor_ekle_tool(**kw) -> str:
-    """VEKTOR_EKLE aracı."""
+    """VEKTOR_EKLE aracÄ±."""
     args = kw.get("args", [])
     metin = args[0] if args else kw.get("metin", "")
     metadata = args[1] if len(args) > 1 else kw.get("metadata", None)
@@ -634,7 +634,7 @@ def _vektor_ekle_tool(**kw) -> str:
 
 
 def _vektor_ara_tool(**kw) -> str:
-    """VEKTOR_ARA aracı."""
+    """VEKTOR_ARA aracÄ±."""
     args = kw.get("args", [])
     sorgu = args[0] if args else kw.get("sorgu", "")
     limit = int(args[1]) if len(args) > 1 else int(kw.get("limit", 5))
@@ -655,9 +655,9 @@ def _vektor_ara_tool(**kw) -> str:
     return "\n".join(satirlar)
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Test
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
@@ -688,4 +688,4 @@ if __name__ == "__main__":
     for kayit in vm.listele():
         print(f"  {kayit['id']}: {kayit['metin'][:60]}")
 
-    print("\n✓ Test tamamlandi")
+    print("\nâœ“ Test tamamlandi")

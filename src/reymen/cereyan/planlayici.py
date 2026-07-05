@@ -1,16 +1,16 @@
-import logging
+﻿import logging
 
 logger = logging.getLogger(__name__)
 # -*- coding: utf-8 -*-
 """
-planlayici.py — Planlama / alt-gorev bolme ve adaptif yeniden planlama.
+planlayici.py â€” Planlama / alt-gorev bolme ve adaptif yeniden planlama.
 Iyilestirmeler:
 - yeniden_planla(): takilma durumunda strateji degistir
 - tamamlanan_adim_isaretle(): ilerlemeyi takip et
 - risk_degerlendirmesi(): riskli adimlar onceden isaretlenir
 """
 
-PLAN_TALIMATI = """Sen bir gorev planlayicisisin. Verilen hedefi yurutülebilir
+PLAN_TALIMATI = """Sen bir gorev planlayicisisin. Verilen hedefi yurutÃ¼lebilir
 alt gorevlere bol. SADECE numarali liste dondur, baska aciklama yazma.
 Hedef basitse tek satir yaz. En fazla 7 adim.
 
@@ -46,7 +46,7 @@ Yeni strateji icin alternatif adimlar yaz (numarali liste, en fazla 5 adim).
 Ayni yaklasimi tekrarlama, farkli araclar veya yontemler oner.
 """
 
-# ── Tree-of-Thought sabit metinleri ──────────────────────────────────────────
+# â”€â”€ Tree-of-Thought sabit metinleri â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 TOT_STRATEJI_TALIMATI = """Sen bir otonom ajan icin alternatif plan ureten bir planlayicisin.
 Asagidaki hedef icin FARKLI bir strateji (yaklasim) uret.
@@ -86,7 +86,7 @@ class Planlayici:
         Returns:
             list[str]: Adim listesi. Model erisilemazse [hedef] doner.
         """
-        # Basit sorgu bypass (3 kelime veya az) — provider cagrilmaz
+        # Basit sorgu bypass (3 kelime veya az) â€” provider cagrilmaz
         if tot:
             return self.tot_plani_uret(hedef)
         if len(hedef.split()) <= 3:
@@ -102,7 +102,7 @@ class Planlayici:
     def tot_plani_uret(self, hedef: str) -> list:
         """Tree-of-Thought planlama: 3 strateji uret, en iyisini sec.
 
-        1. Her odak icin ayri strateji uret (paralel veya siralı).
+        1. Her odak icin ayri strateji uret (paralel veya siralÄ±).
         2. Modele hangi stratejinin daha iyi oldugunu sec.
         3. Secilen stratejinin adimlarini dondur.
 
@@ -225,7 +225,7 @@ if __name__ == "__main__":
     plan = p.plani_uret("bir siteden veri cek")
     print("Plan:", plan)
     for a in plan:
-        print(f"  Riskli mi? {p.riskli_mi(a):} — {a}")
+        print(f"  Riskli mi? {p.riskli_mi(a):} â€” {a}")
     p.tamamlanan_adim_isaretle(plan[0])
     yeni = p.yeniden_planla(
         "veri cek", p.tamamlananlar(), "requests.get timeout hatasi"

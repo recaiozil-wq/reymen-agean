@@ -1,4 +1,4 @@
-"""ReYMeN tools.approval shim — Hermes onay mekanizmasını ReYMeN'e yönlendirir."""
+﻿"""ReYMeN tools.approval shim â€” ReYMeN onay mekanizmasÄ±nÄ± ReYMeN'e yÃ¶nlendirir."""
 
 from __future__ import annotations
 
@@ -20,13 +20,13 @@ def request_approval(
     details: str = "",
     timeout: float = 30.0,
 ) -> bool:
-    """Hermes request_approval — ReYMeN'de varsayılan olarak onaylar."""
+    """ReYMeN request_approval â€” ReYMeN'de varsayÄ±lan olarak onaylar."""
     if _approval_callback:
         try:
             return bool(_approval_callback(action, details))
         except Exception as e:
             logger.warning("Approval callback failed: %s", e)
-    return True  # Varsayılan: onayla
+    return True  # VarsayÄ±lan: onayla
 
 
 def request_approval_async(

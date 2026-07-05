@@ -1,12 +1,12 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-reymen/core/mcp_server.py — ReYMeN MCP Server Host (ReYMeN seviyesi).
+reymen/core/mcp_server.py â€” ReYMeN MCP Server Host (ReYMeN seviyesi).
 
-ReYMeN'i bir MCP (Model Context Protocol) sunucusu olarak yayınlar.
-Diğer MCP client'ları (Claude Code, Cursor, Windsurf vb.) buraya bağlanıp
-ReYMeN'in tool'larını, resource'larını ve prompt'larını kullanabilir.
+ReYMeN'i bir MCP (Model Context Protocol) sunucusu olarak yayÄ±nlar.
+DiÄŸer MCP client'larÄ± (Claude Code, Cursor, Windsurf vb.) buraya baÄŸlanÄ±p
+ReYMeN'in tool'larÄ±nÄ±, resource'larÄ±nÄ± ve prompt'larÄ±nÄ± kullanabilir.
 
-Desteklenen MCP özellikleri:
+Desteklenen MCP Ã¶zellikleri:
   - tools/list, tools/call
   - resources/list, resources/read
   - prompts/list, prompts/get
@@ -18,7 +18,7 @@ Desteklenen MCP özellikleri:
   - Session management (multi-client)
   - Ping/health
 
-Kullanım:
+KullanÄ±m:
     # Stdio (Claude Code entegrasyonu)
     python -m reymen.core.mcp_server --transport stdio
 
@@ -49,16 +49,16 @@ from typing import Any, Callable
 
 logger = logging.getLogger(__name__)
 
-# ── Sabitler ────────────────────────────────────────────────────────────
+# â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 PROTOCOL_VERSION = "2024-11-05"
 SERVER_INFO = {"name": "ReYMeN", "version": "2.0.0"}
 
-# ── JSON Schema doğrulama ───────────────────────────────────────────────
+# â”€â”€ JSON Schema doÄŸrulama â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _schema_dogrula(schema: dict, data: dict) -> str | None:
-    """JSON Schema'ya göre argümanları doğrula. Hata varsa döndür."""
+    """JSON Schema'ya gÃ¶re argÃ¼manlarÄ± doÄŸrula. Hata varsa dÃ¶ndÃ¼r."""
     props = schema.get("properties", {})
     required = schema.get("required", [])
 
@@ -72,25 +72,25 @@ def _schema_dogrula(schema: dict, data: dict) -> str | None:
             continue
         prop_type = prop.get("type", "string")
         if prop_type == "string" and not isinstance(value, str):
-            return f"'{key}' string olmalı, {type(value).__name__} geldi"
+            return f"'{key}' string olmalÄ±, {type(value).__name__} geldi"
         elif prop_type == "integer" and not isinstance(value, int):
-            return f"'{key}' integer olmalı, {type(value).__name__} geldi"
+            return f"'{key}' integer olmalÄ±, {type(value).__name__} geldi"
         elif prop_type == "number" and not isinstance(value, (int, float)):
-            return f"'{key}' sayı olmalı, {type(value).__name__} geldi"
+            return f"'{key}' sayÄ± olmalÄ±, {type(value).__name__} geldi"
         elif prop_type == "boolean" and not isinstance(value, bool):
-            return f"'{key}' boolean olmalı, {type(value).__name__} geldi"
+            return f"'{key}' boolean olmalÄ±, {type(value).__name__} geldi"
         elif prop_type == "array" and not isinstance(value, list):
-            return f"'{key}' array olmalı, {type(value).__name__} geldi"
+            return f"'{key}' array olmalÄ±, {type(value).__name__} geldi"
         elif prop_type == "object" and not isinstance(value, dict):
-            return f"'{key}' object olmalı, {type(value).__name__} geldi"
-        # Enum kontrolü
+            return f"'{key}' object olmalÄ±, {type(value).__name__} geldi"
+        # Enum kontrolÃ¼
         if "enum" in prop and value not in prop["enum"]:
-            return f"'{key}' geçersiz değer: {value}. İzin verilenler: {prop['enum']}"
+            return f"'{key}' geÃ§ersiz deÄŸer: {value}. Ä°zin verilenler: {prop['enum']}"
 
     return None
 
 
-# ── Tool Registry ────────────────────────────────────────────────────────
+# â”€â”€ Tool Registry â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _TOOLS: dict[str, dict] = {}
 _HANDLERS: dict[str, Callable] = {}
@@ -102,10 +102,10 @@ def tool_kaydet(
     """Bir MCP tool'u kaydet.
 
     Args:
-        name: Tool adı (örn "ReYMeN_run")
-        description: Tool açıklaması
+        name: Tool adÄ± (Ã¶rn "ReYMeN_run")
+        description: Tool aÃ§Ä±klamasÄ±
         input_schema: JSON Schema
-        handler: Args dict alır, str döndürür
+        handler: Args dict alÄ±r, str dÃ¶ndÃ¼rÃ¼r
     """
     _TOOLS[name] = {
         "name": name,
@@ -128,7 +128,7 @@ def get_tools() -> list[dict]:
     return list(_TOOLS.values())
 
 
-# ── Resources Registry ──────────────────────────────────────────────────
+# â”€â”€ Resources Registry â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _RESOURCES: dict[str, dict] = {}
 _RESOURCE_HANDLERS: dict[str, Callable] = {}
@@ -144,11 +144,11 @@ def resource_kaydet(
     """Bir MCP resource kaydet.
 
     Args:
-        uri: Resource URI'si (örn "reymen://status")
-        name: Resource adı
-        description: Açıklama
+        uri: Resource URI'si (Ã¶rn "reymen://status")
+        name: Resource adÄ±
+        description: AÃ§Ä±klama
         mime_type: MIME tipi
-        handler: Resource içeriğini döndüren fonksiyon
+        handler: Resource iÃ§eriÄŸini dÃ¶ndÃ¼ren fonksiyon
     """
     _RESOURCES[uri] = {
         "uri": uri,
@@ -174,7 +174,7 @@ def get_resources() -> list[dict]:
 
 
 def resource_oku(uri: str) -> dict | None:
-    """Resource içeriğini oku. {contents: [...]} döndür veya None."""
+    """Resource iÃ§eriÄŸini oku. {contents: [...]} dÃ¶ndÃ¼r veya None."""
     meta = _RESOURCES.get(uri)
     if not meta:
         return None
@@ -191,7 +191,7 @@ def resource_oku(uri: str) -> dict | None:
     }
 
 
-# ── Prompts Registry ────────────────────────────────────────────────────
+# â”€â”€ Prompts Registry â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _PROMPTS: dict[str, dict] = {}
 _PROMPT_HANDLERS: dict[str, Callable] = {}
@@ -206,10 +206,10 @@ def prompt_kaydet(
     """Bir MCP prompt kaydet.
 
     Args:
-        name: Prompt adı
-        description: Açıklama
-        arguments: Argüman tanımları [{"name": "...", "description": "...", "required": bool}]
-        handler: Args dict alır, prompt mesaj metnini döndürür
+        name: Prompt adÄ±
+        description: AÃ§Ä±klama
+        arguments: ArgÃ¼man tanÄ±mlarÄ± [{"name": "...", "description": "...", "required": bool}]
+        handler: Args dict alÄ±r, prompt mesaj metnini dÃ¶ndÃ¼rÃ¼r
     """
     _PROMPTS[name] = {
         "name": name,
@@ -234,7 +234,7 @@ def get_prompts() -> list[dict]:
 
 
 def prompt_get(name: str, args: dict | None = None) -> dict | None:
-    """Prompt mesajlarını oluştur. {messages: [...]} döndür veya None."""
+    """Prompt mesajlarÄ±nÄ± oluÅŸtur. {messages: [...]} dÃ¶ndÃ¼r veya None."""
     meta = _PROMPTS.get(name)
     if not meta:
         return None
@@ -243,14 +243,14 @@ def prompt_get(name: str, args: dict | None = None) -> dict | None:
     return {"messages": [{"role": "user", "content": {"type": "text", "text": text}}]}
 
 
-# ── Roots Registry ──────────────────────────────────────────────────────
+# â”€â”€ Roots Registry â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _ROOTS: list[dict] = []
 _ROOT_WATCHERS: list[str] = []
 
 
 def root_ekle(uri: str, name: str = "") -> None:
-    """Root (dosya sistemi kökü) ekle."""
+    """Root (dosya sistemi kÃ¶kÃ¼) ekle."""
     _ROOTS.append({"uri": uri, "name": name or uri})
     roots_changed_notify_all()
 
@@ -268,11 +268,11 @@ def get_roots() -> list[dict]:
     return list(_ROOTS)
 
 
-# ── Session Management ──────────────────────────────────────────────────
+# â”€â”€ Session Management â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class ClientSession:
-    """Bağlı bir MCP client'ının oturumu."""
+    """BaÄŸlÄ± bir MCP client'Ä±nÄ±n oturumu."""
 
     def __init__(self, client_id: str, transport: str):
         self.id = client_id
@@ -332,11 +332,11 @@ def get_sessions() -> list[dict]:
 
 
 def roots_changed_notify_all() -> None:
-    """roots/list_changed notification'ını tüm watcher'lara gönder."""
+    """roots/list_changed notification'Ä±nÄ± tÃ¼m watcher'lara gÃ¶nder."""
     pass  # Transport implementasyonunda override edilir
 
 
-# ── Varsayılan Tool'lar ─────────────────────────────────────────────────
+# â”€â”€ VarsayÄ±lan Tool'lar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 
@@ -395,7 +395,7 @@ def _tool_file_read(args: dict) -> str:
     yol = Path(dosya) if Path(dosya).is_absolute() else ROOT / dosya
     if not yol.exists():
         return f"Dosya bulunamadi: {dosya}"
-    # Root güvenlik kontrolü
+    # Root gÃ¼venlik kontrolÃ¼
     if not _root_icinde_mi(yol):
         return f"Erisim reddedildi: {dosya} root dizininda degil"
     try:
@@ -443,7 +443,7 @@ def _tool_shell(args: dict) -> str:
 
 
 def _root_icinde_mi(yol: Path) -> bool:
-    """Dosya proje root'u içinde mi?"""
+    """Dosya proje root'u iÃ§inde mi?"""
     try:
         return ROOT in yol.parents or yol == ROOT
     except ValueError:
@@ -451,7 +451,7 @@ def _root_icinde_mi(yol: Path) -> bool:
 
 
 def _rootlarda_mi(yol: Path) -> bool:
-    """Dosya kayıtlı root'lardan birinin altında mı?"""
+    """Dosya kayÄ±tlÄ± root'lardan birinin altÄ±nda mÄ±?"""
     for r in _ROOTS:
         try:
             rp = Path(r["uri"].replace("file://", ""))
@@ -463,7 +463,7 @@ def _rootlarda_mi(yol: Path) -> bool:
 
 
 def _varsayilan_toollari_kaydet() -> None:
-    """ReYMeN'in temel tool'larını MCP olarak kaydet."""
+    """ReYMeN'in temel tool'larÄ±nÄ± MCP olarak kaydet."""
     tool_kaydet(
         "ReYMeN_status",
         "ReYMeN ajan durumu.",
@@ -532,7 +532,7 @@ def _varsayilan_toollari_kaydet() -> None:
 
 
 def _varsayilan_resources_kaydet() -> None:
-    """Varsayılan resource'ları kaydet."""
+    """VarsayÄ±lan resource'larÄ± kaydet."""
     resource_kaydet(
         "reymen://status",
         "ReYMeN Status",
@@ -559,7 +559,7 @@ def _varsayilan_resources_kaydet() -> None:
     )
 
 
-# ── JSON-RPC İşleyici ───────────────────────────────────────────────────
+# â”€â”€ JSON-RPC Ä°ÅŸleyici â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _yanit(req_id, sonuc):
@@ -577,14 +577,14 @@ def _hata_yaniti(req_id, code, mesaj):
 
 
 def _istek_isle(istek: dict, session: ClientSession | None = None) -> str | None:
-    """Bir JSON-RPC isteğini işle.
+    """Bir JSON-RPC isteÄŸini iÅŸle.
 
     Args:
-        istek: JSON-RPC isteği.
-        session: Varsa oturum (notifications için).
+        istek: JSON-RPC isteÄŸi.
+        session: Varsa oturum (notifications iÃ§in).
 
     Returns:
-        JSON yanıt string'i veya None (bildirimse).
+        JSON yanÄ±t string'i veya None (bildirimse).
     """
     method = istek.get("method", "")
     req_id = istek.get("id")
@@ -593,19 +593,19 @@ def _istek_isle(istek: dict, session: ClientSession | None = None) -> str | None
     if session:
         session.touch()
 
-    # ── Lifecycle ──────────────────────────────────────────────────────
+    # â”€â”€ Lifecycle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if method == "initialize":
         if session:
             session.initialized = True
             session.client_info = params.get("clientInfo", {})
 
-        # Client capabilities'den roots watcher kontrolü
+        # Client capabilities'den roots watcher kontrolÃ¼
         capabilities = params.get("capabilities", {})
         roots_caps = capabilities.get("roots", {})
         if roots_caps.get("listChanged") and session:
             session.root_watcher = True
 
-        # Varsayılan root ekle
+        # VarsayÄ±lan root ekle
         if not _ROOTS:
             root_ekle(f"file://{ROOT}", "ReYMeN Project Root")
 
@@ -628,10 +628,10 @@ def _istek_isle(istek: dict, session: ClientSession | None = None) -> str | None
         )
 
     if method == "notifications/initialized":
-        # Client initialized bildirimi aldı
+        # Client initialized bildirimi aldÄ±
         return None
 
-    # ── Tools ──────────────────────────────────────────────────────────
+    # â”€â”€ Tools â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if method == "tools/list":
         cursor = params.get("cursor")
         tools = get_tools()
@@ -645,7 +645,7 @@ def _istek_isle(istek: dict, session: ClientSession | None = None) -> str | None
         if name not in _HANDLERS:
             return _hata_yaniti(req_id, -32601, f"Tool bulunamadi: {name}")
 
-        # Schema doğrulama
+        # Schema doÄŸrulama
         tool_meta = _TOOLS.get(name, {})
         schema = tool_meta.get("inputSchema", {})
         schema_hata = _schema_dogrula(schema, args)
@@ -659,7 +659,7 @@ def _istek_isle(istek: dict, session: ClientSession | None = None) -> str | None
             logger.exception("Tool hatasi: %s", name)
             return _hata_yaniti(req_id, -32603, str(e))
 
-    # ── Resources ──────────────────────────────────────────────────────
+    # â”€â”€ Resources â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if method == "resources/list":
         return _yanit(req_id, {"resources": get_resources()})
 
@@ -679,7 +679,7 @@ def _istek_isle(istek: dict, session: ClientSession | None = None) -> str | None
     if method == "resources/unsubscribe":
         return _yanit(req_id, {})
 
-    # ── Prompts ────────────────────────────────────────────────────────
+    # â”€â”€ Prompts â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if method == "prompts/list":
         return _yanit(req_id, {"prompts": get_prompts()})
 
@@ -691,29 +691,29 @@ def _istek_isle(istek: dict, session: ClientSession | None = None) -> str | None
             return _hata_yaniti(req_id, -32602, f"Prompt bulunamadi: {name}")
         return _yanit(req_id, icerik)
 
-    # ── Roots ──────────────────────────────────────────────────────────
+    # â”€â”€ Roots â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if method == "roots/list":
         return _yanit(req_id, {"roots": get_roots()})
 
-    # ── Ping / Sağlık ──────────────────────────────────────────────────
+    # â”€â”€ Ping / SaÄŸlÄ±k â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if method == "ping":
         return _yanit(req_id, {})
 
-    # ── Bildirimler ────────────────────────────────────────────────────
+    # â”€â”€ Bildirimler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if method.startswith("notifications/"):
         if method == "notifications/roots/list_changed" and session:
-            # Client root'ları değişti
+            # Client root'larÄ± deÄŸiÅŸti
             pass
         return None
 
     return _hata_yaniti(req_id, -32601, f"Method not found: {method}")
 
 
-# ── Stdio Transport ─────────────────────────────────────────────────────
+# â”€â”€ Stdio Transport â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def stdio_dongu():
-    """MCP stdio protokolü: her satır bir JSON-RPC isteği."""
+    """MCP stdio protokolÃ¼: her satÄ±r bir JSON-RPC isteÄŸi."""
     session = _session_ac(transport="stdio")
     logger.info("MCP Server stdio modunda basladi (session=%s)", session.id)
 
@@ -739,11 +739,11 @@ def stdio_dongu():
         logger.info("MCP Server stdio kapandi (session=%s)", session.id)
 
 
-# ── HTTP Transport (Streamable HTTP / SSE) ──────────────────────────────
+# â”€â”€ HTTP Transport (Streamable HTTP / SSE) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def http_baslat(host: str = "0.0.0.0", port: int = 9000):
-    """HTTP tabanlı MCP sunucusu başlat (FastAPI + SSE)."""
+    """HTTP tabanlÄ± MCP sunucusu baÅŸlat (FastAPI + SSE)."""
     try:
         import asyncio
         import uvicorn
@@ -782,21 +782,21 @@ def http_baslat(host: str = "0.0.0.0", port: int = 9000):
                 },
             )
 
-        # Session yönetimi (HTTP header'dan client_id)
+        # Session yÃ¶netimi (HTTP header'dan client_id)
         client_id = request.headers.get("X-MCP-Client-Id", "")
         session = _session_bul(client_id) if client_id else None
         if session is None:
             session = _session_ac(client_id or None, transport="http")
             session.initialized = True
 
-        # SSE event stream isteği mi?
+        # SSE event stream isteÄŸi mi?
         if body.get("method") == "sse/connect":
             queue: asyncio.Queue = asyncio.Queue()
             _sse_clients[session.id] = queue
 
             async def event_stream():
                 try:
-                    # İlk event: endpoint bilgisi
+                    # Ä°lk event: endpoint bilgisi
                     yield f"event: endpoint\ndata: {json.dumps({'endpoint': f'http://{host}:{port}/mcp'})}\n\n"
                     while True:
                         try:
@@ -832,7 +832,7 @@ def http_baslat(host: str = "0.0.0.0", port: int = 9000):
     uvicorn.run(app, host=host, port=port, log_level="info")
 
 
-# ── CLI Giriş ───────────────────────────────────────────────────────────
+# â”€â”€ CLI GiriÅŸ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def main():
@@ -855,14 +855,14 @@ def main():
         http_baslat(args.host, args.port)
 
 
-# ── Motor Entegrasyonu ──────────────────────────────────────────────────
+# â”€â”€ Motor Entegrasyonu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def motor_kaydet(motor) -> None:
-    """Motor'a MCP server başlatma/kontrol araçlarını kaydet.
+    """Motor'a MCP server baÅŸlatma/kontrol araÃ§larÄ±nÄ± kaydet.
 
     Args:
-        motor: Motor instance'ı.
+        motor: Motor instance'Ä±.
     """
     motor._plugin_arac_kaydet(
         "MCP_SERVER_BASLAT",
@@ -896,7 +896,7 @@ def motor_kaydet(motor) -> None:
 
 
 def _mcp_baslat(transport: str = "stdio", port: int = 9000) -> str:
-    """MCP sunucusunu background thread'de başlat."""
+    """MCP sunucusunu background thread'de baÅŸlat."""
     import threading as _t
 
     _varsayilan_toollari_kaydet()
@@ -940,14 +940,14 @@ def _mcp_tool_ekle(
     input_schema: str = "{}",
     handler_turu: str = "builtin",
 ) -> str:
-    """Çalışma zamanında MCP tool ekle."""
+    """Ã‡alÄ±ÅŸma zamanÄ±nda MCP tool ekle."""
     try:
         schema = json.loads(input_schema)
     except json.JSONDecodeError:
         return "[MCP] Gecersiz input_schema JSON"
 
     if handler_turu == "builtin":
-        # Bilinen handler'lara yönlendir
+        # Bilinen handler'lara yÃ¶nlendir
         handler_map = {
             "status": _tool_status,
             "file_read": _tool_file_read,
@@ -973,7 +973,7 @@ def _mcp_tool_ekle(
 def _mcp_resource_ekle(
     uri: str, name: str, description: str = "", mime_type: str = "text/plain"
 ) -> str:
-    """Çalışma zamanında MCP resource ekle."""
+    """Ã‡alÄ±ÅŸma zamanÄ±nda MCP resource ekle."""
     resource_kaydet(uri, name, description, mime_type)
     return f"[MCP] Resource eklendi: {uri} ({name})"
 

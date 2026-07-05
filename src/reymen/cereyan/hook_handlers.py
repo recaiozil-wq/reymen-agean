@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""Varsayılan hook callback fonksiyonları — motor ve döngü olaylarını dinler.
+﻿# -*- coding: utf-8 -*-
+"""VarsayÄ±lan hook callback fonksiyonlarÄ± â€” motor ve dÃ¶ngÃ¼ olaylarÄ±nÄ± dinler.
 
 Her fonksiyon ``hook_dispatcher.hook_kaydet()`` ile kaydedilir.
 Ortak imza: fn(olay: str, **data) -> None
@@ -14,7 +14,7 @@ from typing import Any
 
 logger = logging.getLogger(__name__)
 
-# ── Metrik toplama ──────────────────────────────────────────────────────────
+# â”€â”€ Metrik toplama â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _olay_sayaci: dict[str, int] = defaultdict(int)
 _olay_suresi: dict[str, float] = defaultdict(float)
@@ -23,22 +23,22 @@ _baslangic = time.time()
 
 
 def _log_cb(olay: str, **data: Any) -> None:
-    """Tüm hook'ları DEBUG seviyesinde logla. Hata ayıklama için."""
+    """TÃ¼m hook'larÄ± DEBUG seviyesinde logla. Hata ayÄ±klama iÃ§in."""
     logger.debug("[HOOK] %s -> %s", olay, {k: str(v)[:80] for k, v in data.items()})
 
 
 def _metrik_cb(olay: str, **data: Any) -> None:
-    """Hook olaylarını say ve süre tut. Hata ayıklama/metrik için."""
+    """Hook olaylarÄ±nÄ± say ve sÃ¼re tut. Hata ayÄ±klama/metrik iÃ§in."""
     _olay_sayaci[olay] += 1
     _son_olay_zamani[olay] = time.time()
 
 
 def _session_izleme_cb(olay: str, **data: Any) -> None:
-    """Session başlangıç/bitiş olaylarını logla."""
+    """Session baÅŸlangÄ±Ã§/bitiÅŸ olaylarÄ±nÄ± logla."""
     if olay == "on_session_start":
         session_id = data.get("session_id", "?")
         logger.info(
-            "[HOOK] Session başladı: %s (task=%s)", session_id, data.get("task_id", "?")
+            "[HOOK] Session baÅŸladÄ±: %s (task=%s)", session_id, data.get("task_id", "?")
         )
     elif olay == "on_session_end":
         session_id = data.get("session_id", "?")
@@ -52,7 +52,7 @@ def _session_izleme_cb(olay: str, **data: Any) -> None:
 
 
 def _hata_izleme_cb(olay: str, **data: Any) -> None:
-    """Hata olaylarını WARNING seviyesinde logla. Kritik hataları ayır."""
+    """Hata olaylarÄ±nÄ± WARNING seviyesinde logla. Kritik hatalarÄ± ayÄ±r."""
     if olay == "on_error":
         hata = data.get("hata", "?")
         baglam = data.get("olay_baglami", "")
@@ -66,34 +66,34 @@ def _hata_izleme_cb(olay: str, **data: Any) -> None:
 
 
 def _tool_izleme_cb(olay: str, **data: Any) -> None:
-    """Tool çağrılarını izle. Hata durumunda uyar."""
+    """Tool Ã§aÄŸrÄ±larÄ±nÄ± izle. Hata durumunda uyar."""
     if olay == "on_tool_call":
         arac = data.get("arac_adi", "?")
-        logger.debug("[HOOK] Tool çağrısı: %s", arac)
+        logger.debug("[HOOK] Tool Ã§aÄŸrÄ±sÄ±: %s", arac)
     elif olay == "on_tool_result":
         arac = data.get("arac_adi", "?")
         sure = data.get("sure_sn", 0)
         if sure > 10:
-            logger.info("[HOOK] Yavaş tool: %s (%.1fs)", arac, sure)
+            logger.info("[HOOK] YavaÅŸ tool: %s (%.1fs)", arac, sure)
 
 
 def _context_izleme_cb(olay: str, **data: Any) -> None:
-    """Context sıkıştırma olaylarını izle."""
+    """Context sÄ±kÄ±ÅŸtÄ±rma olaylarÄ±nÄ± izle."""
     if olay == "on_context_compress":
         mesaj = data.get("mesaj_sayisi", "?")
         token = data.get("token_tahmini", "?")
-        logger.info("[HOOK] Context sıkıştırma: %s mesaj, ~%s token", mesaj, token)
+        logger.info("[HOOK] Context sÄ±kÄ±ÅŸtÄ±rma: %s mesaj, ~%s token", mesaj, token)
 
 
-# ── Tüm varsayılan callback'leri kaydet ─────────────────────────────────────
+# â”€â”€ TÃ¼m varsayÄ±lan callback'leri kaydet â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def varsayilan_hooklari_kaydet(hook_sistemi: Any = None) -> None:
-    """Tüm varsayılan hook callback'lerini kaydet.
+    """TÃ¼m varsayÄ±lan hook callback'lerini kaydet.
 
     Args:
         hook_sistemi: Motor._hooks (AsynchronousHookDispatcher) veya None.
-                      None ise cereyan.hook_dispatcher.hook_kaydet kullanılır.
+                      None ise cereyan.hook_dispatcher.hook_kaydet kullanÄ±lÄ±r.
     """
     from reymen.cereyan.hook_dispatcher import hook_kaydet as _kaydet_fonk
 
@@ -121,14 +121,14 @@ def varsayilan_hooklari_kaydet(hook_sistemi: Any = None) -> None:
         except Exception as e:
             logger.warning("[HOOK] Kayit hatasi %s/%s: %s", olay, cb.__name__, e)
 
-    logger.info("[HOOK] %d varsayılan hook callback kaydedildi", len(callbacks))
+    logger.info("[HOOK] %d varsayÄ±lan hook callback kaydedildi", len(callbacks))
 
 
-# ── Metrik görüntüleme ──────────────────────────────────────────────────────
+# â”€â”€ Metrik gÃ¶rÃ¼ntÃ¼leme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def metrik_raporu() -> dict:
-    """Hook metriklerini döndür: olay bazlı sayı ve süre."""
+    """Hook metriklerini dÃ¶ndÃ¼r: olay bazlÄ± sayÄ± ve sÃ¼re."""
     return {
         "olay_sayaci": dict(_olay_sayaci),
         "calisma_suresi": round(time.time() - _baslangic, 1),

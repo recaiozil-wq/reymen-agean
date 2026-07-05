@@ -1,11 +1,11 @@
-"""🔐 ReYMeN Auth — Provider pattern + JWT cookie + roller.
+﻿"""ğŸ” ReYMeN Auth â€” Provider pattern + JWT cookie + roller.
 
-ReYMeN dashboard_auth pattern'inin birebir kopyası:
+ReYMeN dashboard_auth pattern'inin birebir kopyasÄ±:
   - AuthProvider ABC (ReYMeN'teki DashboardAuthProvider)
   - Session dataclass (user_id, display_name, role, provider, expires_at)
   - Provider registry (register_provider, get_provider, list_providers)
   - JWT cookie (reymen_session_at / reymen_session_rt)
-  - Role bazlı izin sistemi
+  - Role bazlÄ± izin sistemi
   - Audit logging
 
 Kullanim:
@@ -14,7 +14,7 @@ Kullanim:
         user_manager, token_manager, Session,
     )
 
-    # Kullanici yönetimi
+    # Kullanici yÃ¶netimi
     user_manager.kullanici_ekle("operator", "sifre", role="operator")
 
     # Provider registry
@@ -47,8 +47,8 @@ PROJE_KOK = Path(__file__).resolve().parent.parent.parent
 
 class Role(str, Enum):
     ADMIN = "admin"  # Tam yetki
-    OPERATOR = "operator"  # Araç kullanabilir, yapılandıramaz
-    VIEWER = "viewer"  # Sadece görüntüleme
+    OPERATOR = "operator"  # AraÃ§ kullanabilir, yapÄ±landÄ±ramaz
+    VIEWER = "viewer"  # Sadece gÃ¶rÃ¼ntÃ¼leme
 
 
 ROLE_PERMISSIONS = {
@@ -139,7 +139,7 @@ class AuthProvider(ABC):
 
     Alt siniflar su alanlari tanimlamali:
       - name: str          (provider kimligi, orn: "password")
-      - display_name: str  (kullaniciya gosterilen ad, orn: "Şifre ile Giriş")
+      - display_name: str  (kullaniciya gosterilen ad, orn: "Åifre ile GiriÅŸ")
 
     Metodlar:
       - verify_session(access_token) -> Session | None
@@ -487,7 +487,7 @@ class PasswordAuthProvider(AuthProvider):
     """
 
     name = "password"
-    display_name = "Şifre ile Giriş"
+    display_name = "Åifre ile GiriÅŸ"
 
     def __init__(
         self,
@@ -616,7 +616,7 @@ def audit_log(
     }
     entry.update(extra)
     logger.info(
-        "AUTH: %s — user=%s provider=%s ip=%s reason=%s",
+        "AUTH: %s â€” user=%s provider=%s ip=%s reason=%s",
         event,
         user_id,
         provider,

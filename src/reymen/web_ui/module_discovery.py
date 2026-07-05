@@ -1,4 +1,4 @@
-"""📦 Dinamik modül keşfi — reymen/ altındaki tüm modülleri bulur ve durumlarını raporlar."""
+﻿"""ğŸ“¦ Dinamik modÃ¼l keÅŸfi â€” reymen/ altÄ±ndaki tÃ¼m modÃ¼lleri bulur ve durumlarÄ±nÄ± raporlar."""
 
 from __future__ import annotations
 
@@ -13,12 +13,12 @@ logger = logging.getLogger(__name__)
 REYMEN_PAKET = "reymen"
 
 # ---------------------------------------------------------------------------
-# Modül bilgisi
+# ModÃ¼l bilgisi
 # ---------------------------------------------------------------------------
 
 
 class ModulBilgisi:
-    """Bir modülün adı, yolu, yüklenme durumu ve açıklaması."""
+    """Bir modÃ¼lÃ¼n adÄ±, yolu, yÃ¼klenme durumu ve aÃ§Ä±klamasÄ±."""
 
     __slots__ = ("adi", "yolu", "yuklu", "hata", "aciklama", "satir_sayisi", "kategori")
 
@@ -53,22 +53,22 @@ class ModulBilgisi:
 
 
 # ---------------------------------------------------------------------------
-# Modül tarayıcı
+# ModÃ¼l tarayÄ±cÄ±
 # ---------------------------------------------------------------------------
 
 
 class ModulTarayici:
-    """reymen/ paketini tarar, tüm alt modülleri keşfeder."""
+    """reymen/ paketini tarar, tÃ¼m alt modÃ¼lleri keÅŸfeder."""
 
     def __init__(self, kok: Path | None = None) -> None:
         self.kok = kok or Path(__file__).resolve().parent.parent
 
     def tara(self) -> list[ModulBilgisi]:
-        """Tüm reymen.* modüllerini tara ve durumlarını döndür."""
+        """TÃ¼m reymen.* modÃ¼llerini tara ve durumlarÄ±nÄ± dÃ¶ndÃ¼r."""
         moduller: list[ModulBilgisi] = []
         gorulen: set[str] = set()
 
-        # 1. pkgutil ile paket taraması
+        # 1. pkgutil ile paket taramasÄ±
         try:
             import reymen
 
@@ -89,7 +89,7 @@ class ModulTarayici:
         return sorted(moduller, key=lambda m: m.adi)
 
     def _modul_bilgisi(self, mod_adi: str, is_pkg: bool = False) -> ModulBilgisi:
-        """Tek modül için bilgi topla."""
+        """Tek modÃ¼l iÃ§in bilgi topla."""
         yuklu = mod_adi in sys.modules
         hata = ""
         satir_sayisi = 0
@@ -106,7 +106,7 @@ class ModulTarayici:
                     )
                 doc = getattr(mod, "__doc__", "") or ""
                 if doc:
-                    # İlk satırı al
+                    # Ä°lk satÄ±rÄ± al
                     aciklama = doc.strip().split("\n")[0][:120]
             except Exception as _e:
                 __import__("logging").getLogger(__name__).warning(
@@ -131,7 +131,7 @@ class ModulTarayici:
 
     @staticmethod
     def _filtrele(m: ModulBilgisi) -> bool:
-        """__pycache__, .venv, site-packages içindekileri filtrele."""
+        """__pycache__, .venv, site-packages iÃ§indekileri filtrele."""
         if not m.yolu:
             return True
         y = m.yolu.replace("\\", "/")
@@ -143,7 +143,7 @@ class ModulTarayici:
 
 
 def modul_kategorileri(moduller: list[ModulBilgisi]) -> dict[str, list[ModulBilgisi]]:
-    """Modülleri kategorilerine göre grupla."""
+    """ModÃ¼lleri kategorilerine gÃ¶re grupla."""
     kategoriler: dict[str, list[ModulBilgisi]] = {}
     for m in moduller:
         kat = m.kategori or "kok"

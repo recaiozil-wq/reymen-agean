@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
-"""setup_wizard.py — ReYMeN first setup wizard (reymen setup).
+﻿# -*- coding: utf-8 -*-
+"""setup_wizard.py â€” ReYMeN first setup wizard (reymen setup).
 
-ReYMeN counterpart of Hermes' 'hermes setup' command.
+ReYMeN counterpart of ReYMeN' 'reymen setup' command.
 Automatically starts on missing setup or via reymen setup.
 
 Checklist:
@@ -28,7 +28,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# ── Renkler (reymen_launcher.py ile uyumlu) ──────────────────────────────────
+# â”€â”€ Renkler (reymen_launcher.py ile uyumlu) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _R = "\033[0m"
 _C = "\033[96m"  # cyan
 _G = "\033[92m"  # green
@@ -64,18 +64,18 @@ def _r(t):
     return f"{_RED}{t}{_R}"
 
 
-# ── Logo ──────────────────────────────────────────────────────────────────────
+# â”€â”€ Logo â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _REYMEN_LOGO = f"""
-{_c('██████╗ ███████╗██╗   ██╗███╗   ███╗███████╗███╗   ██╗')}
-{_c('██╔══██╗██╔════╝╚██╗ ██╔╝████╗ ████║██╔════╝████╗  ██║')}
-{_y('██████╔╝█████╗   ╚████╔╝ ██╔████╔██║█████╗  ██╔██╗ ██║')}
-{_y('██╔══██╗██╔══╝    ╚██╔╝  ██║╚██╔╝██║██╔══╝  ██║╚██╗██║')}
-{_mavi('██║  ██║███████╗   ██║   ██║ ╚═╝ ██║███████╗██║ ╚████║')}
-{_mavi('╚═╝  ╚═╝╚══════╝   ╚═╝   ╚═╝     ╚═╝╚══════╝╚═╝  ╚═══╝')}
+{_c('â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•—   â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•—')}
+{_c('â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•â•â•â•šâ–ˆâ–ˆâ•— â–ˆâ–ˆâ•”â•â–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•‘')}
+{_y('â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—   â•šâ–ˆâ–ˆâ–ˆâ–ˆâ•”â• â–ˆâ–ˆâ•”â–ˆâ–ˆâ–ˆâ–ˆâ•”â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•”â–ˆâ–ˆâ•— â–ˆâ–ˆâ•‘')}
+{_y('â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•    â•šâ–ˆâ–ˆâ•”â•  â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘')}
+{_mavi('â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘ â•šâ•â• â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘ â•šâ–ˆâ–ˆâ–ˆâ–ˆâ•‘')}
+{_mavi('â•šâ•â•  â•šâ•â•â•šâ•â•â•â•â•â•â•   â•šâ•â•   â•šâ•â•     â•šâ•â•â•šâ•â•â•â•â•â•â•â•šâ•â•  â•šâ•â•â•â•')}
 """
 
 
-# ── Yardimcilar ───────────────────────────────────────────────────────────────
+# â”€â”€ Yardimcilar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def _soru(prompt: str, varsayilan: str = "") -> str:
     """Kullanicidan girdi al, varsayilan deger destekli."""
     if varsayilan:
@@ -95,15 +95,15 @@ def _evet_hayir(prompt: str, varsayilan: bool = True) -> bool:
 
 def _kontrol_ad(ad: str, durum: bool, mesaj: str = "") -> None:
     """Standart kontrol satiri yazdir."""
-    ikon = _g("✓") if durum else _r("✗")
-    ek = f" — {_d(mesaj)}" if mesaj else ""
+    ikon = _g("âœ“") if durum else _r("âœ—")
+    ek = f" â€” {_d(mesaj)}" if mesaj else ""
     print(f"  {ikon} {ad}{ek}")
 
 
-# ── 1. Python versiyon kontrolu ───────────────────────────────────────────────
+# â”€â”€ 1. Python versiyon kontrolu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def python_kontrol() -> bool:
     """Python 3.11+ kontrolu."""
-    print(f"\n  {_c('▸ Python Versiyon Kontrolü')}")
+    print(f"\n  {_c('â–¸ Python Versiyon KontrolÃ¼')}")
     v = sys.version_info
     yeterli = v.major == 3 and v.minor >= 11
     if yeterli:
@@ -117,10 +117,10 @@ def python_kontrol() -> bool:
     return yeterli
 
 
-# ── 2. Git kontrolu ───────────────────────────────────────────────────────────
+# â”€â”€ 2. Git kontrolu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def git_kontrol() -> bool:
     """Git yuklu mu kontrol et."""
-    print(f"\n  {_c('▸ Git Kontrolü')}")
+    print(f"\n  {_c('â–¸ Git KontrolÃ¼')}")
     git_path = shutil.which("git")
     if git_path:
         try:
@@ -138,10 +138,10 @@ def git_kontrol() -> bool:
         return False
 
 
-# ── 3. FFmpeg kontrolu ────────────────────────────────────────────────────────
+# â”€â”€ 3. FFmpeg kontrolu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def ffmpeg_kontrol() -> bool:
     """FFmpeg yuklu mu."""
-    print(f"\n  {_c('▸ FFmpeg Kontrolü')}")
+    print(f"\n  {_c('â–¸ FFmpeg KontrolÃ¼')}")
     ffmpeg_path = shutil.which("ffmpeg")
     if ffmpeg_path:
         try:
@@ -159,10 +159,10 @@ def ffmpeg_kontrol() -> bool:
         return False
 
 
-# ── 4. Playwright kontrolu + kurulum ──────────────────────────────────────────
+# â”€â”€ 4. Playwright kontrolu + kurulum â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def playwright_kontrol(oto_kur: bool = False) -> bool:
     """Playwright yuklu mu, gerekirse kur."""
-    print(f"\n  {_c('▸ Playwright Kontrolü')}")
+    print(f"\n  {_c('â–¸ Playwright KontrolÃ¼')}")
 
     # 1) Python paketi var mi?
     import importlib.util as _iu
@@ -172,7 +172,7 @@ def playwright_kontrol(oto_kur: bool = False) -> bool:
         _kontrol_ad("playwright paketi", False, "yuklu degil")
         if oto_kur:
             if _evet_hayir("  Playwright kurulsun mu?", True):
-                print(f"  {_y('⟳')} pip install playwright ...")
+                print(f"  {_y('âŸ³')} pip install playwright ...")
                 r = subprocess.run(
                     [sys.executable, "-m", "pip", "install", "playwright"],
                     capture_output=True,
@@ -206,7 +206,7 @@ def playwright_kontrol(oto_kur: bool = False) -> bool:
                 "Playwright browser binary'leri", False, "chromium install gerekebilir"
             )
             if oto_kur and _evet_hayir("  Playwright browser'lari kuralim mi?", True):
-                print(f"  {_y('⟳')} playwright install chromium ...")
+                print(f"  {_y('âŸ³')} playwright install chromium ...")
                 r = subprocess.run(
                     [sys.executable, "-m", "playwright", "install", "chromium"],
                     capture_output=True,
@@ -220,7 +220,7 @@ def playwright_kontrol(oto_kur: bool = False) -> bool:
     return paket_var
 
 
-# ── 5. API Key yapilandirmasi ─────────────────────────────────────────────────
+# â”€â”€ 5. API Key yapilandirmasi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def _api_key_kontrol(env_var: str, ad: str, dosya_yolu: Path) -> Optional[str]:
     """Belirtilen env var'ini kontrol et, yoksa kullaniciya sor."""
     # Once .env'den oku
@@ -245,7 +245,7 @@ def _api_key_kontrol(env_var: str, ad: str, dosya_yolu: Path) -> Optional[str]:
 
 def api_key_yapilandir(proje_kok: Path, oto_kur: bool = False) -> dict:
     """API anahtarlarini kontrol et ve yapilandir."""
-    print(f"\n  {_c('▸ API Key Yapılandırması')}")
+    print(f"\n  {_c('â–¸ API Key YapÄ±landÄ±rmasÄ±')}")
     env_yol = proje_kok / ".env"
 
     oncelikli_provider = "DeepSeek"
@@ -314,7 +314,7 @@ def _env_anahtar_ekle(env_yol: Path, key: str, value: str) -> None:
     env_yol.write_text("".join(lines), encoding="utf-8")
 
 
-# ── 6. config.yaml kontrolu ───────────────────────────────────────────────────
+# â”€â”€ 6. config.yaml kontrolu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 KURULUM_ANAHTARI = "kurulum_tamamlandi"
 VARSAYILAN_CONFIG = {
     "agent": {
@@ -347,7 +347,7 @@ VARSAYILAN_CONFIG = {
 
 def config_kontrol(proje_kok: Path, oto_kur: bool = False) -> bool:
     """config.yaml kontrol et, yoksa olustur."""
-    print(f"\n  {_c('▸ config.yaml Kontrolü')}")
+    print(f"\n  {_c('â–¸ config.yaml KontrolÃ¼')}")
     config_yol = proje_kok / "config.yaml"
 
     if config_yol.exists():
@@ -475,10 +475,10 @@ def kurulum_tamamlandi_mi(proje_kok: Path) -> bool:
     return False
 
 
-# ── 7. SOUL.md kontrolu ───────────────────────────────────────────────────────
+# â”€â”€ 7. SOUL.md kontrolu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def soul_kontrol(proje_kok: Path, oto_kur: bool = False) -> bool:
     """SOUL.md kontrol et, yoksa olustur."""
-    print(f"\n  {_c('▸ SOUL.md Kontrolü')}")
+    print(f"\n  {_c('â–¸ SOUL.md KontrolÃ¼')}")
     soul_yol = proje_kok / "SOUL.md"
 
     if soul_yol.exists():
@@ -496,7 +496,7 @@ def soul_kontrol(proje_kok: Path, oto_kur: bool = False) -> bool:
 
 def _soul_olustur(soul_yol: Path) -> None:
     """Varsayilan SOUL.md olustur."""
-    icerik = """# ReYMeN — SOUL.md
+    icerik = """# ReYMeN â€” SOUL.md
 
 > ReYMeN, yardimsever ve bagimsiz bir AI asistanidir.
 > Kisa ve oz cevap verir. Turkce konusur.
@@ -526,10 +526,10 @@ def _soul_olustur(soul_yol: Path) -> None:
     _kontrol_ad("SOUL.md", True, "varsayilan olarak olusturuldu")
 
 
-# ── 8. skills/ dizini kontrolu ────────────────────────────────────────────────
+# â”€â”€ 8. skills/ dizini kontrolu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def skills_kontrol(proje_kok: Path, oto_kur: bool = False) -> bool:
     """skills/ dizinini kontrol et."""
-    print(f"\n  {_c('▸ Skills Dizini Kontrolü')}")
+    print(f"\n  {_c('â–¸ Skills Dizini KontrolÃ¼')}")
 
     skills_dizinleri = [
         proje_kok / "skills",
@@ -559,7 +559,7 @@ def skills_kontrol(proje_kok: Path, oto_kur: bool = False) -> bool:
         return False
 
 
-# ── Ana Setup Sihirbazi ───────────────────────────────────────────────────────
+# â”€â”€ Ana Setup Sihirbazi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def setup_calistir(
     proje_kok: Optional[Path] = None,
     oto_kur: bool = False,
@@ -584,12 +584,12 @@ def setup_calistir(
 
     proje_kok = Path(proje_kok).resolve()
     print()
-    print(f"  {'═' * 55}")
+    print(f"  {'â•' * 55}")
     print(f"  {_c('ReYMeN Kurulum Sihirbazi')}    {_d('v1.0.0')}")
-    print(f"  {'═' * 55}")
+    print(f"  {'â•' * 55}")
     print(f"  {_d('Proje:')} {proje_kok}")
     print(f"  {_d('Tarih:')} {time.strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"  {'═' * 55}")
+    print(f"  {'â•' * 55}")
     print(f"  {_g('Hosgeldiniz!')} ReYMeN Ajan kurulumu basliyor.")
     print()
 
@@ -649,10 +649,10 @@ def setup_calistir(
     if not sonuclar["skills"]:
         hatali += 1
 
-    # ── Ozet ──────────────────────────────────────────────────────────────────
-    print(f"\n  {'─' * 55}")
-    print(f"  {_c('Kurulum Özeti')}")
-    print(f"  {'─' * 55}")
+    # â”€â”€ Ozet â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    print(f"\n  {'â”€' * 55}")
+    print(f"  {_c('Kurulum Ã–zeti')}")
+    print(f"  {'â”€' * 55}")
 
     for ad, durum in sonuclar.items():
         if ad == "api_keys":
@@ -662,9 +662,9 @@ def setup_calistir(
         else:
             _kontrol_ad(f"  {ad}", durum)
 
-    print(f"  {'─' * 55}")
+    print(f"  {'â”€' * 55}")
     if hatali == 0:
-        print(f"  {_g('✓ Tum kontroller basarili!')}")
+        print(f"  {_g('âœ“ Tum kontroller basarili!')}")
         print(f"  {_g('ReYMeN kullanima hazir.')}")
     else:
         print(f"  {_y(f'{hatali}/{toplam} kontrol basarisiz')}")
@@ -673,7 +673,7 @@ def setup_calistir(
         else:
             print(f"  {_y('--fix ile otomatik duzeltmeyi dene.')}")
 
-    print(f"  {'─' * 55}")
+    print(f"  {'â”€' * 55}")
     print()
 
     basarili = hatali == 0
@@ -691,7 +691,7 @@ def setup_calistir(
     }
 
 
-# ── Dogrudan calistirma ────────────────────────────────────────────────────────
+# â”€â”€ Dogrudan calistirma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def main() -> int:
     """Komut satirindan calistirildiginda."""
     import argparse

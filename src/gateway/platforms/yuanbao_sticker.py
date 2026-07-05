@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""Yuanbao sticker utilities — lookup, search, random selection."""
+﻿# -*- coding: utf-8 -*-
+"""Yuanbao sticker utilities â€” lookup, search, random selection."""
 
 from __future__ import annotations
 
@@ -7,33 +7,33 @@ import random
 from typing import Any, Dict, List, Optional
 
 
-# ── Sticker Map ─────────────────────────────────────────────────────────────
+# â”€â”€ Sticker Map â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 STICKER_MAP: Dict[str, Dict[str, str]] = {
-    "六六六": {"sticker_id": "278", "package_id": "1003", "name": "六六六", "description": "awesome six"},
-    "爱心": {"sticker_id": "138", "package_id": "1003", "name": "爱心", "description": "love heart"},
-    "抱抱": {"sticker_id": "139", "package_id": "1003", "name": "抱抱", "description": "hug"},
-    "点赞": {"sticker_id": "140", "package_id": "1003", "name": "点赞", "description": "thumbs up"},
-    "开心": {"sticker_id": "141", "package_id": "1003", "name": "开心", "description": "happy"},
-    "大笑": {"sticker_id": "142", "package_id": "1003", "name": "大笑", "description": "laugh"},
-    "哭": {"sticker_id": "143", "package_id": "1003", "name": "哭", "description": "cry"},
-    "生气": {"sticker_id": "144", "package_id": "1003", "name": "生气", "description": "angry"},
-    "惊讶": {"sticker_id": "145", "package_id": "1003", "name": "惊讶", "description": "surprised"},
-    "思考": {"sticker_id": "146", "package_id": "1003", "name": "思考", "description": "thinking"},
-    "加油": {"sticker_id": "147", "package_id": "1003", "name": "加油", "description": "cheer up"},
-    "晚安": {"sticker_id": "148", "package_id": "1003", "name": "晚安", "description": "good night"},
-    "早安": {"sticker_id": "149", "package_id": "1003", "name": "早安", "description": "good morning"},
-    "谢谢": {"sticker_id": "150", "package_id": "1003", "name": "谢谢", "description": "thank you"},
-    "恭喜": {"sticker_id": "151", "package_id": "1003", "name": "恭喜", "description": "congratulations"},
-    "干杯": {"sticker_id": "152", "package_id": "1003", "name": "干杯", "description": "cheers"},
-    "比心": {"sticker_id": "153", "package_id": "1003", "name": "比心", "description": "finger heart"},
-    "厉害": {"sticker_id": "154", "package_id": "1003", "name": "厉害", "description": "amazing"},
-    "加油鸭": {"sticker_id": "155", "package_id": "1003", "name": "加油鸭", "description": "cheer duck"},
-    "冲鸭": {"sticker_id": "156", "package_id": "1003", "name": "冲鸭", "description": "charge duck"},
+    "å…­å…­å…­": {"sticker_id": "278", "package_id": "1003", "name": "å…­å…­å…­", "description": "awesome six"},
+    "çˆ±å¿ƒ": {"sticker_id": "138", "package_id": "1003", "name": "çˆ±å¿ƒ", "description": "love heart"},
+    "æŠ±æŠ±": {"sticker_id": "139", "package_id": "1003", "name": "æŠ±æŠ±", "description": "hug"},
+    "ç‚¹èµ": {"sticker_id": "140", "package_id": "1003", "name": "ç‚¹èµ", "description": "thumbs up"},
+    "å¼€å¿ƒ": {"sticker_id": "141", "package_id": "1003", "name": "å¼€å¿ƒ", "description": "happy"},
+    "å¤§ç¬‘": {"sticker_id": "142", "package_id": "1003", "name": "å¤§ç¬‘", "description": "laugh"},
+    "å“­": {"sticker_id": "143", "package_id": "1003", "name": "å“­", "description": "cry"},
+    "ç”Ÿæ°”": {"sticker_id": "144", "package_id": "1003", "name": "ç”Ÿæ°”", "description": "angry"},
+    "æƒŠè®¶": {"sticker_id": "145", "package_id": "1003", "name": "æƒŠè®¶", "description": "surprised"},
+    "æ€è€ƒ": {"sticker_id": "146", "package_id": "1003", "name": "æ€è€ƒ", "description": "thinking"},
+    "åŠ æ²¹": {"sticker_id": "147", "package_id": "1003", "name": "åŠ æ²¹", "description": "cheer up"},
+    "æ™šå®‰": {"sticker_id": "148", "package_id": "1003", "name": "æ™šå®‰", "description": "good night"},
+    "æ—©å®‰": {"sticker_id": "149", "package_id": "1003", "name": "æ—©å®‰", "description": "good morning"},
+    "è°¢è°¢": {"sticker_id": "150", "package_id": "1003", "name": "è°¢è°¢", "description": "thank you"},
+    "æ­å–œ": {"sticker_id": "151", "package_id": "1003", "name": "æ­å–œ", "description": "congratulations"},
+    "å¹²æ¯": {"sticker_id": "152", "package_id": "1003", "name": "å¹²æ¯", "description": "cheers"},
+    "æ¯”å¿ƒ": {"sticker_id": "153", "package_id": "1003", "name": "æ¯”å¿ƒ", "description": "finger heart"},
+    "å‰å®³": {"sticker_id": "154", "package_id": "1003", "name": "å‰å®³", "description": "amazing"},
+    "åŠ æ²¹é¸­": {"sticker_id": "155", "package_id": "1003", "name": "åŠ æ²¹é¸­", "description": "cheer duck"},
+    "å†²é¸­": {"sticker_id": "156", "package_id": "1003", "name": "å†²é¸­", "description": "charge duck"},
 }
 
 
-# ── Helper functions ────────────────────────────────────────────────────────
+# â”€â”€ Helper functions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _normalize_text(text: str) -> str:
@@ -100,7 +100,7 @@ def _score_field(query: str, field: str) -> float:
     )
 
 
-# ── Public API ──────────────────────────────────────────────────────────────
+# â”€â”€ Public API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def get_sticker_by_name(query: str) -> Optional[Dict[str, str]]:

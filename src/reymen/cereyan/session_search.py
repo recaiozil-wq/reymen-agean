@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""session_search.py — FTS5-based session message search engine.
+﻿# -*- coding: utf-8 -*-
+"""session_search.py â€” FTS5-based session message search engine.
 
 Saves each message to SQLite FTS5, performs full-text search.
 Runs independently (separate from session_db.py, for fast searching).
@@ -20,7 +20,7 @@ from typing import List, Dict, Optional
 
 logger = logging.getLogger(__name__)
 
-# Varsayilan DB yolu — reymen/hafiza/ altinda
+# Varsayilan DB yolu â€” reymen/hafiza/ altinda
 _DEFAULT_DB_DIR = Path(__file__).resolve().parent.parent / "hafiza"
 _DEFAULT_DB_PATH = str(_DEFAULT_DB_DIR / "session_search.db")
 
@@ -39,7 +39,7 @@ class SessionSearch:
         self._lock = threading.Lock()
         self._kur()
 
-    # ── Baglanti ──────────────────────────────────────────────────────
+    # â”€â”€ Baglanti â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _baglan(self) -> sqlite3.Connection:
         conn = sqlite3.connect(self.db_yolu, check_same_thread=False)
@@ -47,7 +47,7 @@ class SessionSearch:
         conn.execute("PRAGMA journal_mode=WAL;")
         return conn
 
-    # ── Sema Kurulumu ─────────────────────────────────────────────────
+    # â”€â”€ Sema Kurulumu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _kur(self):
         """Create the FTS5 table (idempotent)."""
@@ -71,7 +71,7 @@ class SessionSearch:
             finally:
                 conn.close()
 
-    # ── Kaydet (Save) ─────────────────────────────────────────────────
+    # â”€â”€ Kaydet (Save) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def save(self, session_id: str, message: str, role: str = "user") -> bool:
         """Save a message to the FTS5 table.
@@ -110,7 +110,7 @@ class SessionSearch:
             finally:
                 conn.close()
 
-    # ── Ara (Search) ──────────────────────────────────────────────────
+    # â”€â”€ Ara (Search) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def search(
         self, query: str, limit: int = 10, session_id: Optional[str] = None
@@ -122,7 +122,7 @@ class SessionSearch:
                    "word1 word2" -> AND, "word1 OR word2" -> OR,
                    "word*" -> prefix, "\"exact phrase\"" -> exact.
             limit: Max result count.
-            session_id: Optional — search only within a specific session.
+            session_id: Optional â€” search only within a specific session.
 
         Returns:
             [{"session_id", "message", "role", "timestamp", "rank"}, ...]
@@ -174,7 +174,7 @@ class SessionSearch:
             finally:
                 conn.close()
 
-    # ── Session Mesajlarini Listele ───────────────────────────────────
+    # â”€â”€ Session Mesajlarini Listele â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def session_mesajlari(self, session_id: str, limit: int = 50) -> List[Dict]:
         """Get all messages for a specific session.
@@ -204,7 +204,7 @@ class SessionSearch:
             finally:
                 conn.close()
 
-    # ── Istatistik ────────────────────────────────────────────────────
+    # â”€â”€ Istatistik â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def istatistik(self) -> Dict:
         """Total record count and other statistics."""
@@ -228,7 +228,7 @@ class SessionSearch:
             finally:
                 conn.close()
 
-    # ── Yardimci ──────────────────────────────────────────────────────
+    # â”€â”€ Yardimci â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @staticmethod
     def _sorgu_temizle(sorgu: str) -> str:
@@ -245,7 +245,7 @@ class SessionSearch:
         return temiz if temiz else sorgu
 
 
-# ── Singleton / Module-level instance ────────────────────────────────
+# â”€â”€ Singleton / Module-level instance â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _session_search_instance: Optional[SessionSearch] = None
 _session_search_lock = threading.Lock()
@@ -261,14 +261,14 @@ def session_search_al(db_yolu: Optional[str] = None) -> SessionSearch:
     return _session_search_instance
 
 
-# ── Kolay Kullanim Fonksiyonlari (dogrudan import icin) ─────────────
+# â”€â”€ Kolay Kullanim Fonksiyonlari (dogrudan import icin) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def save(session_id: str, message: str, role: str = "user") -> bool:
-    """Easy save — via singleton."""
+    """Easy save â€” via singleton."""
     return session_search_al().save(session_id, message, role)
 
 
 def search(query: str, limit: int = 10, session_id: Optional[str] = None) -> List[Dict]:
-    """Easy search — via singleton."""
+    """Easy search â€” via singleton."""
     return session_search_al().search(query, limit=limit, session_id=session_id)

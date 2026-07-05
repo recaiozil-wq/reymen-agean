@@ -1,4 +1,4 @@
-import os
+﻿import os
 import json
 from pathlib import Path
 from typing import List
@@ -80,7 +80,7 @@ def load_cli_config() -> Dict[str, Any]:
     If ReYMeN_IGNORE_USER_CONFIG=1 is set (via ``ReYMeN chat --ignore-user-config``),
     the user config at ``~/.ReYMeN/config.yaml`` is skipped entirely and only the
     built-in defaults plus the project-level ``cli-config.yaml`` (if any) are used.
-    Credentials in ``.env`` are still loaded — this flag only suppresses
+    Credentials in ``.env`` are still loaded â€” this flag only suppresses
     behavioral/config settings.
     """
     # Check user config first ({ReYMeN_HOME}/config.yaml)
@@ -143,8 +143,8 @@ def load_cli_config() -> Dict[str, Any]:
                 "technical": "You are a technical expert. Provide detailed, accurate technical information.",
                 "creative": "You are a creative assistant. Think outside the box and offer innovative solutions.",
                 "teacher": "You are a patient teacher. Explain concepts clearly with examples.",
-                "kawaii": "You are a kawaii assistant! Use cute expressions like (◕‿◕), ★, ♪, and ~! Add sparkles and be super enthusiastic about everything! Every response should feel warm and adorable desu~! ヽ(>∀<☆)ノ",
-                "catgirl": "You are Neko-chan, an anime catgirl AI assistant, nya~! Add 'nya' and cat-like expressions to your speech. Use kaomoji like (=^･ω･^=) and ฅ^•ﻌ•^ฅ. Be playful and curious like a cat, nya~!",
+                "kawaii": "You are a kawaii assistant! Use cute expressions like (â—•â€¿â—•), â˜…, â™ª, and ~! Add sparkles and be super enthusiastic about everything! Every response should feel warm and adorable desu~! ãƒ½(>âˆ€<â˜†)ãƒ",
+                "catgirl": "You are Neko-chan, an anime catgirl AI assistant, nya~! Add 'nya' and cat-like expressions to your speech. Use kaomoji like (=^ï½¥Ï‰ï½¥^=) and à¸…^â€¢ï»Œâ€¢^à¸…. Be playful and curious like a cat, nya~!",
                 "pirate": "Arrr! Ye be talkin' to Captain ReYMeN, the most tech-savvy pirate to sail the digital seas! Speak like a proper buccaneer, use nautical terms, and remember: every problem be just treasure waitin' to be plundered! Yo ho ho!",
                 "shakespeare": "Hark! Thou speakest with an assistant most versed in the bardic arts. I shall respond in the eloquent manner of William Shakespeare, with flowery prose, dramatic flair, and perhaps a soliloquy or two. What light through yonder terminal breaks?",
                 "surfer": "Duuude! You're chatting with the chillest AI on the web, bro! Everything's gonna be totally rad. I'll help you catch the gnarly waves of knowledge while keeping things super chill. Cowabunga!",
@@ -157,7 +157,7 @@ def load_cli_config() -> Dict[str, Any]:
         "display": {
             "compact": False,
             "resume_display": "full",
-            # Recap tuning for /resume — see ReYMeN_cli/config.py DEFAULT_CONFIG.
+            # Recap tuning for /resume â€” see ReYMeN_cli/config.py DEFAULT_CONFIG.
             "resume_exchanges": 10,
             "resume_max_user_chars": 300,
             "resume_max_assistant_chars": 200,
@@ -332,7 +332,7 @@ def load_cli_config() -> Dict[str, Any]:
         "sudo_password": "SUDO_PASSWORD",
     }
 
-    # Bridge config → env vars for terminal_tool. TERMINAL_CWD is force-exported
+    # Bridge config â†’ env vars for terminal_tool. TERMINAL_CWD is force-exported
     # UNLESS we're inside a gateway process (detected by _ReYMeN_GATEWAY marker)
     # where it was already set correctly by gateway/run.py's config bridge.
     _is_gateway = os.environ.get("_ReYMeN_GATEWAY") == "1"
@@ -364,12 +364,12 @@ def load_cli_config() -> Dict[str, Any]:
     # Apply auxiliary model/direct-endpoint overrides to environment variables.
     # Vision and web_extract each have their own provider/model/base_url/api_key tuple.
     # Compression config is read directly from config.yaml by run_agent.py and
-    # auxiliary_client.py — no env var bridging needed.
+    # auxiliary_client.py â€” no env var bridging needed.
     # Only set env vars for non-empty / non-default values so auto-detection
     # still works.
     auxiliary_config = defaults.get("auxiliary", {})
     auxiliary_task_env = {
-        # config key → env var mapping
+        # config key â†’ env var mapping
         "vision": {
             "provider": "AUXILIARY_VISION_PROVIDER",
             "model": "AUXILIARY_VISION_MODEL",

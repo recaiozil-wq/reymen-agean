@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-stream_diag.py — StreamDiagnostics.
+stream_diag.py â€” StreamDiagnostics.
 Stream teshis ve performans izleme modulu.
 ReYMeN kimligi: Turkce docstring, try/except, class-based.
 """

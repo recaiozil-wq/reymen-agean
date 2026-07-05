@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""run_all_tests.py — Tum Reymen testlerini topluca calistirir."""
+﻿# -*- coding: utf-8 -*-
+"""run_all_tests.py â€” Tum Reymen testlerini topluca calistirir."""
 
 import sys, os, time, traceback
 from pathlib import Path
@@ -81,16 +81,16 @@ print()
 if gecti:
     print("  Basarili:")
     for ad, kat, sure in gecti:
-        print(f"    ✅ [{kat}] {ad} ({sure:.1f}s)")
+        print(f"    âœ… [{kat}] {ad} ({sure:.1f}s)")
 
 if gecemedi:
     print("  Basarisiz:")
     for ad, kat, sure, hata in gecemedi:
         hata_kisa = hata.strip()[:120].replace("\n", " | ")
-        print(f"    ❌ [{kat}] {ad} — {hata_kisa}")
+        print(f"    âŒ [{kat}] {ad} â€” {hata_kisa}")
         print(f"       ({sure:.1f}s)")
 
 if zaman_asimi:
     print("  Zaman asimi:")
     for ad, kat in zaman_asimi:
-        print(f"    ⏰ [{kat}] {ad}")
+        print(f"    â° [{kat}] {ad}")

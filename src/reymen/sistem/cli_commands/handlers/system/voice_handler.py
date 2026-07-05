@@ -1,6 +1,6 @@
-"""_handle_voice_command handler."""
+﻿"""_handle_voice_command handler."""
 
-from src.reymen.sistem.cli_display import _cprint, _DIM, _RST, _ACCENT
+from reymen.sistem.cli_display import _cprint, _DIM, _RST, _ACCENT
 
 
 def _handle_voice_command(cli, command: str):

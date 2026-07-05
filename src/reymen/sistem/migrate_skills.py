@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-migrate_skills.py — Tek seferlik veri taşıma betiği.
+migrate_skills.py â€” Tek seferlik veri taÅŸÄ±ma betiÄŸi.
 
-Mevcut skills/ dizinindeki frontmatter içermeyen .md dosyalarına
-standart YAML frontmatter ekler. Önce skills_backup/ yedeği alır.
+Mevcut skills/ dizinindeki frontmatter iÃ§ermeyen .md dosyalarÄ±na
+standart YAML frontmatter ekler. Ã–nce skills_backup/ yedeÄŸi alÄ±r.
 
 Kullanim:
     python migrate_skills.py
@@ -165,7 +165,7 @@ def migration_yap() -> int:
 
 def main():
     print("=" * 50)
-    print("  migrate_skills.py — Veri Taşıma Betiği")
+    print("  migrate_skills.py â€” Veri TaÅŸÄ±ma BetiÄŸi")
     print(f"  Tarih: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
     print("=" * 50)
     print()
@@ -177,7 +177,7 @@ def main():
     print()
 
     # 2. Frontmatter'siz dosyalari tara
-    print("[2/3] Frontmatter'siz dosyalar taranıyor...")
+    print("[2/3] Frontmatter'siz dosyalar taranÄ±yor...")
     toplam_md = sum(1 for _ in SKILLS_DIR.rglob("*.md"))
     frontmatterli = 0
     frontmattersiz = 0
@@ -198,7 +198,7 @@ def main():
     print()
 
     if frontmattersiz == 0:
-        print("[Migration] Guncellenecek dosya yok. Tüm dosyalar frontmatter içeriyor.")
+        print("[Migration] Guncellenecek dosya yok. TÃ¼m dosyalar frontmatter iÃ§eriyor.")
         print("[Migration] Migration tamamlandi: 0 dosya guncellendi.")
         return
 

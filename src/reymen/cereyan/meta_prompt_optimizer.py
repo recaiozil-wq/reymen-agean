@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-meta_prompt_optimizer.py — Automatic Prompt Engineering (APE, Zhou et al. 2022).
+meta_prompt_optimizer.py â€” Automatic Prompt Engineering (APE, Zhou et al. 2022).
 
 Buyuk LLM sistemlerinden ilham alinan ilke:
   "Sistem promptunu otomatik analiz et; tekrarlayan hatalara gore
@@ -33,12 +33,12 @@ ROOT = Path(__file__).parent.resolve()
 ONERI_LOG = ROOT / ".ReYMeN" / "prompt_gelistirme_log.md"
 SISTEM_EKLERI = ROOT / ".ReYMeN" / "sistem_ekleri.md"
 
-# ── Promptlar ─────────────────────────────────────────────────────────────────
+# â”€â”€ Promptlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-_ANALIZ_SISTEM = """Sen bir yapay zeka sistem mimarissin ve prompt mühendisisin.
+_ANALIZ_SISTEM = """Sen bir yapay zeka sistem mimarissin ve prompt mÃ¼hendisisin.
 Sana bir otonom ajandaki son hata kayitlari verilecek.
 Bu hatalari analiz ederek sistem tarimantinin hangi alaninda iyilestirme
-yapilmasi gerektigini belirle ve YENİ bir ek blok yaz.
+yapilmasi gerektigini belirle ve YENÄ° bir ek blok yaz.
 
 ONEMLI KURALLAR:
 - Mevcut talimatin uzerine yazma; SADECE eklenecek YENI bir blok yaz.
@@ -48,7 +48,7 @@ ONEMLI KURALLAR:
 - Turkce yaz.
 
 Yanit formati:
-BULGU: [tek cumle — hangi hata deseni tespit edildi]
+BULGU: [tek cumle â€” hangi hata deseni tespit edildi]
 ONERI_BLOK:
 == [BASLIK] ==
 - kural 1
@@ -57,7 +57,7 @@ ONERI_BLOK:
 /ONERI_BLOK
 """
 
-_REVIZYON_SISTEM = """Sen bir teknik yazar ve prompt mühendisisin.
+_REVIZYON_SISTEM = """Sen bir teknik yazar ve prompt mÃ¼hendisisin.
 Sana iki sistem talimati blogu verilecek: MEVCUT ve ONERI.
 Cakismalari tespit et ve MEVCUT blogu ONERI ile birlestirecek
 FINAL blogu yaz. Muzikeri KALDIR; YENILERI EKLE.
@@ -82,7 +82,7 @@ class MetaPromptOptimizer:
         self.min_hata_sayisi = min_hata_sayisi
         ONERI_LOG.parent.mkdir(parents=True, exist_ok=True)
 
-    # ── Ana API ──────────────────────────────────────────────────────────────
+    # â”€â”€ Ana API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def analiz_et_ve_oner(self) -> Optional[str]:
         """Hatalari analiz et, sistem talimatina ek blok oner.
@@ -145,7 +145,7 @@ class MetaPromptOptimizer:
         }
         return self._llm_analiz_et(ozet)
 
-    # ── Ic yardimcilar ───────────────────────────────────────────────────────
+    # â”€â”€ Ic yardimcilar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _hatalari_topla(self) -> Optional[dict]:
         """session_db'den hata ozetini topla."""
@@ -185,7 +185,7 @@ class MetaPromptOptimizer:
     @staticmethod
     def _oneri_ayristir(yanit: str) -> Optional[str]:
         """LLM ciktisindaki ONERI_BLOK'u cikart."""
-        # Blok araştır
+        # Blok araÅŸtÄ±r
         m = re.search(
             r"ONERI_BLOK:\s*(.+?)(?:/ONERI_BLOK|$)", yanit, re.DOTALL | re.IGNORECASE
         )
@@ -234,7 +234,7 @@ class MetaPromptOptimizer:
             print(f"[APE] Sistem eki kayit hatasi: {e}")
 
 
-# ── Test ─────────────────────────────────────────────────────────────────────
+# â”€â”€ Test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
     import tempfile
@@ -249,7 +249,7 @@ if __name__ == "__main__":
                 "== [PYTHON CALISTIRMA KURALLAR] ==\n"
                 "- 30 saniyeden uzun surecek kodlari parcalara bol.\n"
                 "- Buyuk veri setlerini direkt islemek yerine dosyaya yaz.\n"
-                "- Her PYTHON_CALISTIR oncesinde timeout riskini degerlendır.\n"
+                "- Her PYTHON_CALISTIR oncesinde timeout riskini degerlendÄ±r.\n"
                 "/ONERI_BLOK"
             )
 

@@ -1,10 +1,10 @@
-#!/usr/bin/env python3
-"""ReYMeN Desktop CLI — baslat/durdur/durum/tray."""
+﻿#!/usr/bin/env python3
+"""ReYMeN Desktop CLI â€” baslat/durdur/durum/tray."""
 
 from __future__ import annotations
 import sys
-from src.reymen.desktop.server import web_server
-from src.reymen.desktop.autostart import AutoStartManager
+from reymen.desktop.server import web_server
+from reymen.desktop.autostart import AutoStartManager
 
 
 def main():

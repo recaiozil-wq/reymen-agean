@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-gateway_yonetici.py — Çoklu platform gateway yöneticisi.
+gateway_yonetici.py â€” Ã‡oklu platform gateway yÃ¶neticisi.
 
-GatewayManager ile birden çok platform gateway'ini ayni anda
+GatewayManager ile birden Ã§ok platform gateway'ini ayni anda
 yonetebilir, mesaj broadcast yapabilir, platform bazli routing
 uygulayabilirsiniz.
 """
@@ -12,14 +12,14 @@ import logging
 import time
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
-from src.gateways.gateway_temel import GatewayBase
+from gateways.gateway_temel import GatewayBase
 
 logger = logging.getLogger(__name__)
 
 
 class GatewayManager:
     """
-    Çoklu platform gateway yöneticisi.
+    Ã‡oklu platform gateway yÃ¶neticisi.
 
     Kullanim:
         yonetici = GatewayManager()
@@ -44,7 +44,7 @@ class GatewayManager:
         self._dinleme_gorevleri: Dict[str, asyncio.Task] = {}
         self._mesaj_callback: Optional[callable] = None
 
-    # ── Kayit / Kaldirma ────────────────────────────────────────────
+    # â”€â”€ Kayit / Kaldirma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     async def kaydet(self, platform: str, gateway: GatewayBase) -> bool:
         """
@@ -103,7 +103,7 @@ class GatewayManager:
         """Kayitli platformlari listeler."""
         return list(self._gw_havuzu.keys())
 
-    # ── Yasam Dongusu ───────────────────────────────────────────────
+    # â”€â”€ Yasam Dongusu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     async def baslat(self, platform: str) -> bool:
         """
@@ -177,7 +177,7 @@ class GatewayManager:
             sonuclar[platform] = await self.durdur(platform)
         return sonuclar
 
-    # ── Mesaj Gonderimi ─────────────────────────────────────────────
+    # â”€â”€ Mesaj Gonderimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     async def gonder(
         self,
@@ -273,7 +273,7 @@ class GatewayManager:
 
         return sonuclar
 
-    # ── Mesaj Dinleme ───────────────────────────────────────────────
+    # â”€â”€ Mesaj Dinleme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     async def dinlemeye_basla(
         self, platform: str, callback: Optional[callable] = None
@@ -338,7 +338,7 @@ class GatewayManager:
         """Tum platformlardan gelen mesajlar icin genel callback."""
         self._mesaj_callback = callback
 
-    # ── Durum / Rapor ───────────────────────────────────────────────
+    # â”€â”€ Durum / Rapor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     async def durum_raporu(self) -> Dict[str, Any]:
         """Tum platformlarin durum raporu."""
@@ -367,7 +367,7 @@ class GatewayManager:
         return rapor
 
     async def saglik_kontrolu(self) -> Dict[str, str]:
-        """Hizli saglik kontrolu — her platform icin tek kelime."""
+        """Hizli saglik kontrolu â€” her platform icin tek kelime."""
         sonuclar = {}
         for platform, gateway in self._gw_havuzu.items():
             try:
@@ -377,7 +377,7 @@ class GatewayManager:
                 sonuclar[platform] = "hata"
         return sonuclar
 
-    # ── Yardimcilar ─────────────────────────────────────────────────
+    # â”€â”€ Yardimcilar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     async def __aenter__(self):
         return self
@@ -392,19 +392,19 @@ class GatewayManager:
         )
 
 
-# ── Motor Kayit ─────────────────────────────────────────────────────
+# â”€â”€ Motor Kayit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def motor_kaydet(motor) -> None:
-    """Motor'a GatewayManager araçlarını kaydeder."""
+    """Motor'a GatewayManager araÃ§larÄ±nÄ± kaydeder."""
     motor._plugin_arac_kaydet(
         "GATEWAY_YONETICI_OLUSTUR",
-        lambda: "GatewayManager() — yeni bir gateway yoneticisi olusturur",
+        lambda: "GatewayManager() â€” yeni bir gateway yoneticisi olusturur",
         "Yeni GatewayManager ornegi olusturur",
     )
     motor._plugin_arac_kaydet(
         "GATEWAY_YONETICI_DURUM",
-        lambda: "GatewayManager.durum_raporu() — tum platform durumlarini gosterir",
+        lambda: "GatewayManager.durum_raporu() â€” tum platform durumlarini gosterir",
         "GatewayManager durum raporu",
     )
     motor._plugin_arac_kaydet(

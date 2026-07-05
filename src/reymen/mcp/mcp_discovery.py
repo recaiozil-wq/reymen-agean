@@ -1,17 +1,17 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-reymen/mcp/mcp_discovery.py — MCP Sunucu Otomatik Keşif Modülü.
+reymen/mcp/mcp_discovery.py â€” MCP Sunucu Otomatik KeÅŸif ModÃ¼lÃ¼.
 
-MCP sunucularını birden fazla kaynaktan otomatik keşfeder:
-  1. config.yaml → mcp_servers: bölümü (proje + .ReYMeN/)
-  2. ~/.hermes/profiles/reymen/config.yaml → mcp_servers: bölümü (Hermes profili)
-  3. .env → MCP_* / MCP_SERVER_* / MCP_SUNUCU_* prefixli değişkenler
-  4. OS environment → MCP_* / MCP_SERVER_* / MCP_SUNUCU_* prefixli değişkenler
+MCP sunucularÄ±nÄ± birden fazla kaynaktan otomatik keÅŸfeder:
+  1. config.yaml â†’ mcp_servers: bÃ¶lÃ¼mÃ¼ (proje + .ReYMeN/)
+  2. ~/.reymen/profiles/reymen/config.yaml â†’ mcp_servers: bÃ¶lÃ¼mÃ¼ (ReYMeN profili)
+  3. .env â†’ MCP_* / MCP_SERVER_* / MCP_SUNUCU_* prefixli deÄŸiÅŸkenler
+  4. OS environment â†’ MCP_* / MCP_SERVER_* / MCP_SUNUCU_* prefixli deÄŸiÅŸkenler
 
-Keşfedilen sunucuları mcp_manager'a kaydeder ve Motor'a MCP_DISCOVERY aracı olarak ekler.
-Motor başlatılırken (reymen.mcp import edildiğinde) otomatik keşif çalıştırılır.
+KeÅŸfedilen sunucularÄ± mcp_manager'a kaydeder ve Motor'a MCP_DISCOVERY aracÄ± olarak ekler.
+Motor baÅŸlatÄ±lÄ±rken (reymen.mcp import edildiÄŸinde) otomatik keÅŸif Ã§alÄ±ÅŸtÄ±rÄ±lÄ±r.
 
-Kullanım:
+KullanÄ±m:
     from reymen.mcp.mcp_discovery import mcp_kesfet, motor_kaydet
     yeni_sayisi = mcp_kesfet()
 """
@@ -28,63 +28,63 @@ from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
-# ── Varsayılan config/env yolları ────────────────────────────────────────
+# â”€â”€ VarsayÄ±lan config/env yollarÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 PROJE_KOK = Path(__file__).parent.parent.parent
-HERMES_PROFIL_KOK = Path.home() / ".ReYMeN" / "profiles" / "reymen"
+REYMEN_PROFIL_KOK = Path.home() / ".ReYMeN" / "profiles" / "reymen"
 
 CONFIG_YOLLARI = [
     PROJE_KOK / "config.yaml",
     PROJE_KOK / ".ReYMeN" / "config.yaml",
-    HERMES_PROFIL_KOK / "config.yaml",
+    REYMEN_PROFIL_KOK / "config.yaml",
 ]
 ENV_YOLLARI = [
     PROJE_KOK / ".env",
     PROJE_KOK / ".ReYMeN" / ".env",
     Path.home() / ".ReYMeN" / ".env",
-    HERMES_PROFIL_KOK / ".env",
+    REYMEN_PROFIL_KOK / ".env",
 ]
 
 
-# ═══════════════════════════════════════════════════════════════════════════
-# .env'den MCP Sunucu Keşfi
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# .env'den MCP Sunucu KeÅŸfi
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
-# .env'de desteklenen değişken şablonları:
+# .env'de desteklenen deÄŸiÅŸken ÅŸablonlarÄ±:
 #   MCP_SUNUCU_ADI_KOMUT = "npx"
 #   MCP_SUNUCU_ADI_ARGS  = "-y @modelcontextprotocol/server-github"
 #   MCP_SUNUCU_ADI_URL   = "https://mcp.example.com/mcp"
-#   MCP_SUNUCU_ADI_TRANSPORT = "stdio"  (stdio / http varsayılan: stdio)
+#   MCP_SUNUCU_ADI_TRANSPORT = "stdio"  (stdio / http varsayÄ±lan: stdio)
 #   MCP_SUNUCU_ADI_TIMEOUT = "30"
 #   MCP_SUNUCU_ADI_ENV_KEY = "value"
 #
-# Ayrıca İngilizce/Türkçe varyantları da desteklenir:
+# AyrÄ±ca Ä°ngilizce/TÃ¼rkÃ§e varyantlarÄ± da desteklenir:
 #   MCP_SERVER_NAME_COMMAND = "npx"          (MCP_SERVER_*)
 #   MCP_SUNUCU_ADI_KOMUT   = "npx"          (MCP_SUNUCU_*)
 #
-# NOT: MCP_SERVER_* ve MCP_SUNUCU_* aynı anda varsa, MCP_SERVER_* önceliklidir.
+# NOT: MCP_SERVER_* ve MCP_SUNUCU_* aynÄ± anda varsa, MCP_SERVER_* Ã¶nceliklidir.
 _MCP_ENV_RE = re.compile(r"^MCP_([A-Z0-9_]+)_(.+)$")
 _MCP_SERVER_ENV_RE = re.compile(r"^MCP_SERVER_([A-Z0-9_]+)_(.+)$")
 _MCP_SUNUCU_ENV_RE = re.compile(r"^MCP_SUNUCU_([A-Z0-9_]+)_(.+)$")
 
 
 def _env_ad_ve_anahtar(env_ad: str) -> Optional[tuple[str, str]]:
-    """MCP_* / MCP_SERVER_* / MCP_SUNUCU_* değişken adını (sunucu_adi, anahtar) çiftine dönüştür.
+    """MCP_* / MCP_SERVER_* / MCP_SUNUCU_* deÄŸiÅŸken adÄ±nÄ± (sunucu_adi, anahtar) Ã§iftine dÃ¶nÃ¼ÅŸtÃ¼r.
 
-    Örn: MCP_GITHUB_KOMUT → ("github", "komut")
-         MCP_REMOTE_API_URL → ("remote_api", "url")
-         MCP_SERVER_GITHUB_COMMAND → ("github", "command")
-         MCP_SUNUCU_GITHUB_KOMUT → ("github", "komut")
-         MCP_GITHUB_ENV_GITHUB_TOKEN → ("github", "env_GITHUB_TOKEN")
+    Ã–rn: MCP_GITHUB_KOMUT â†’ ("github", "komut")
+         MCP_REMOTE_API_URL â†’ ("remote_api", "url")
+         MCP_SERVER_GITHUB_COMMAND â†’ ("github", "command")
+         MCP_SUNUCU_GITHUB_KOMUT â†’ ("github", "komut")
+         MCP_GITHUB_ENV_GITHUB_TOKEN â†’ ("github", "env_GITHUB_TOKEN")
 
-    Öncelik sırası: MCP_SERVER_* > MCP_SUNUCU_* > MCP_*
+    Ã–ncelik sÄ±rasÄ±: MCP_SERVER_* > MCP_SUNUCU_* > MCP_*
     """
-    # 1. MCP_SERVER_* (en spesifik, en yüksek öncelik)
+    # 1. MCP_SERVER_* (en spesifik, en yÃ¼ksek Ã¶ncelik)
     m = _MCP_SERVER_ENV_RE.match(env_ad)
     if m:
         sunucu_raw, anahtar_raw = m.group(1), m.group(2)
         return _parse_env_match(sunucu_raw, anahtar_raw)
 
-    # 2. MCP_SUNUCU_* (Türkçe)
+    # 2. MCP_SUNUCU_* (TÃ¼rkÃ§e)
     m = _MCP_SUNUCU_ENV_RE.match(env_ad)
     if m:
         sunucu_raw, anahtar_raw = m.group(1), m.group(2)
@@ -98,20 +98,20 @@ def _env_ad_ve_anahtar(env_ad: str) -> Optional[tuple[str, str]]:
 
 
 def _parse_env_match(sunucu_raw: str, anahtar_raw: str) -> tuple[str, str]:
-    """Env regex match gruplarını (sunucu_adi, anahtar) çiftine dönüştür.
+    """Env regex match gruplarÄ±nÄ± (sunucu_adi, anahtar) Ã§iftine dÃ¶nÃ¼ÅŸtÃ¼r.
 
-    _env_ad_ve_anahtar için yardımcı: regex greedy matching'den kaynaklanan
-    belirsizlikleri çözer (örn. ENV_GITHUB_TOKEN gibi alt çizgi içeren anahtarlar).
+    _env_ad_ve_anahtar iÃ§in yardÄ±mcÄ±: regex greedy matching'den kaynaklanan
+    belirsizlikleri Ã§Ã¶zer (Ã¶rn. ENV_GITHUB_TOKEN gibi alt Ã§izgi iÃ§eren anahtarlar).
     """
     sunucu_adi = sunucu_raw.lower()
     anahtar = anahtar_raw.lower()
 
-    # Regex greedy: group1 çok yakalamış olabilir (ENV_* durumu)
-    # Örn: MCP_GITHUB_ENV_GITHUB_TOKEN
+    # Regex greedy: group1 Ã§ok yakalamÄ±ÅŸ olabilir (ENV_* durumu)
+    # Ã–rn: MCP_GITHUB_ENV_GITHUB_TOKEN
     #   greedy: group1=GITHUB_ENV_GITHUB, group2=TOKEN
-    #   group1'de _ENV_ varsa, ENV_'den öncesi sunucu adı
+    #   group1'de _ENV_ varsa, ENV_'den Ã¶ncesi sunucu adÄ±
     if "_ENV_" in sunucu_raw:
-        # group1: GITHUB_ENV_GITHUB → sunucu=GITHUB, kalan=ENV_GITHUB
+        # group1: GITHUB_ENV_GITHUB â†’ sunucu=GITHUB, kalan=ENV_GITHUB
         idx = sunucu_raw.index("_ENV_")
         sunucu_adi = sunucu_raw[:idx].lower()
         env_key = sunucu_raw[idx + 5 :] + "_" + anahtar_raw  # "GITHUB" + "_" + "TOKEN"
@@ -119,15 +119,15 @@ def _parse_env_match(sunucu_raw: str, anahtar_raw: str) -> tuple[str, str]:
             env_key = env_key[1:]
         return (sunucu_adi, f"env_{env_key}")
 
-    # Örn: MCP_GITHUB_ENV_TOKEN (ENV_KEY tek kelime)
+    # Ã–rn: MCP_GITHUB_ENV_TOKEN (ENV_KEY tek kelime)
     #   greedy: group1=GITHUB_ENV, group2=TOKEN
     #   group1 _ENV ile bitiyor (trailing underscore yok)
     if sunucu_raw.endswith("_ENV"):
         sunucu_adi = sunucu_raw[:-4].lower()
         return (sunucu_adi, f"env_{anahtar_raw}")
 
-    # ENV_* anahtarı: MCP_SERVER formatında group2 ENV_ ile başlıyorsa
-    # Örn: MCP_SERVER_GITHUB_ENV_GITHUB_TOKEN
+    # ENV_* anahtarÄ±: MCP_SERVER formatÄ±nda group2 ENV_ ile baÅŸlÄ±yorsa
+    # Ã–rn: MCP_SERVER_GITHUB_ENV_GITHUB_TOKEN
     #   regex MCP_SERVER_: group1=GITHUB, group2=ENV_GITHUB_TOKEN
     if anahtar_raw.startswith("ENV_"):
         env_key = anahtar_raw[4:]  # "GITHUB_TOKEN"
@@ -137,10 +137,10 @@ def _parse_env_match(sunucu_raw: str, anahtar_raw: str) -> tuple[str, str]:
 
 
 def _env_oku() -> dict[str, dict]:
-    """.env dosyalarından MCP_* / MCP_SERVER_* / MCP_SUNUCU_* prefixli değişkenleri oku.
+    """.env dosyalarÄ±ndan MCP_* / MCP_SERVER_* / MCP_SUNUCU_* prefixli deÄŸiÅŸkenleri oku.
 
-    Kaynak sırası (sonraki öncekini ezer):
-      1. .env dosyaları (proje, .ReYMeN, ~/.hermes, ~/.hermes/profiles/reymen)
+    Kaynak sÄ±rasÄ± (sonraki Ã¶ncekini ezer):
+      1. .env dosyalarÄ± (proje, .ReYMeN, ~/.reymen, ~/.reymen/profiles/reymen)
       2. OS environment (env var'lar dosyadakileri ezer)
 
     Returns:
@@ -167,9 +167,9 @@ def _env_oku() -> dict[str, dict]:
                 ):
                     env_vars[anahtar] = deger
         except Exception as e:
-            logger.debug(".env okuma hatası %s: %s", yol, e)
+            logger.debug(".env okuma hatasÄ± %s: %s", yol, e)
 
-    # 2. OS environment'dan da oku (öncelikli)
+    # 2. OS environment'dan da oku (Ã¶ncelikli)
     for anahtar, deger in os.environ.items():
         if (
             anahtar.startswith("MCP_")
@@ -181,7 +181,7 @@ def _env_oku() -> dict[str, dict]:
     if not env_vars:
         return {}
 
-    # Değişkenleri sunucu bazında grupla
+    # DeÄŸiÅŸkenleri sunucu bazÄ±nda grupla
     sunucular: dict[str, dict] = {}
     for env_ad, deger in env_vars.items():
         parsed = _env_ad_ve_anahtar(env_ad)
@@ -195,16 +195,16 @@ def _env_oku() -> dict[str, dict]:
     return sunucular
 
 
-# ═══════════════════════════════════════════════════════════════════════════
-# config.yaml'dan MCP Sunucu Keşfi
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# config.yaml'dan MCP Sunucu KeÅŸfi
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _config_oku() -> dict[str, dict]:
-    """config.yaml dosyalarından mcp_servers: bölümünü oku.
+    """config.yaml dosyalarÄ±ndan mcp_servers: bÃ¶lÃ¼mÃ¼nÃ¼ oku.
 
-    Tüm config dosyalarını sırayla tara, sonraki dosyalar öncekileri ezer.
-    Sıra: proje/config.yaml → .ReYMeN/config.yaml → ~/.hermes/profiles/reymen/config.yaml
+    TÃ¼m config dosyalarÄ±nÄ± sÄ±rayla tara, sonraki dosyalar Ã¶ncekileri ezer.
+    SÄ±ra: proje/config.yaml â†’ .ReYMeN/config.yaml â†’ ~/.reymen/profiles/reymen/config.yaml
 
     Returns:
         {sunucu_adi: {anahtar: deger}, ...}
@@ -227,29 +227,29 @@ def _config_oku() -> dict[str, dict]:
                     continue
                 kayit = dict(ayar)
                 kayit["_kaynak"] = str(yol)
-                # command: "npx" + args: [...] → command: ["npx", ...]
+                # command: "npx" + args: [...] â†’ command: ["npx", ...]
                 if isinstance(kayit.get("command"), str) and "args" in kayit:
                     kayit["command"] = [kayit["command"]] + kayit.get("args", [])
                     kayit.pop("args", None)
                 elif isinstance(kayit.get("command"), str):
                     kayit["command"] = [kayit["command"]]
                 kayit.setdefault("transport", "stdio")
-                birlesik[ad] = kayit  # sonraki dosya öncekini ezer
+                birlesik[ad] = kayit  # sonraki dosya Ã¶ncekini ezer
         except ImportError:
-            logger.debug("PyYAML yok, config.yaml yüklenemedi")
+            logger.debug("PyYAML yok, config.yaml yÃ¼klenemedi")
         except Exception as e:
-            logger.debug("Config okuma hatası %s: %s", yol, e)
+            logger.debug("Config okuma hatasÄ± %s: %s", yol, e)
 
     return birlesik
 
 
-# ═══════════════════════════════════════════════════════════════════════════
-# .env → mcp_manager formatına dönüşüm
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# .env â†’ mcp_manager formatÄ±na dÃ¶nÃ¼ÅŸÃ¼m
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _env_sunucuyu_cfg_cevir(sunucu_adi: str, env_ayar: dict) -> dict:
-    """.env'den okunan MCP sunucu ayarlarını mcp_manager formatına çevir.
+    """.env'den okunan MCP sunucu ayarlarÄ±nÄ± mcp_manager formatÄ±na Ã§evir.
 
     MCP_GITHUB_KOMUT = "npx"
     MCP_GITHUB_ARGS = "-y @modelcontextprotocol/server-github"
@@ -257,7 +257,7 @@ def _env_sunucuyu_cfg_cevir(sunucu_adi: str, env_ayar: dict) -> dict:
     MCP_GITHUB_TIMEOUT = "30"
     MCP_GITHUB_ENV_GITHUB_TOKEN = "ghp_xxx"
 
-    ↓
+    â†“
 
     {"command": ["npx", "-y", "@modelcontextprotocol/server-github"],
      "transport": "stdio", "timeout": 30, "env": {"GITHUB_TOKEN": "ghp_xxx"}}
@@ -266,12 +266,12 @@ def _env_sunucuyu_cfg_cevir(sunucu_adi: str, env_ayar: dict) -> dict:
     cfg["transport"] = env_ayar.get("transport", "stdio")
     cfg["_kaynak"] = env_ayar.get("_kaynak", ".env")
 
-    # Komut + argümanlar
+    # Komut + argÃ¼manlar
     komut = env_ayar.get("komut")
     args_raw = env_ayar.get("args", "")
     if komut:
         if args_raw:
-            # args: string → liste (boşlukla ayrılmış, tırnaklar saygılı değil basit)
+            # args: string â†’ liste (boÅŸlukla ayrÄ±lmÄ±ÅŸ, tÄ±rnaklar saygÄ±lÄ± deÄŸil basit)
             args_list = args_raw.split()
             cfg["command"] = [komut] + args_list
         else:
@@ -302,12 +302,12 @@ def _env_sunucuyu_cfg_cevir(sunucu_adi: str, env_ayar: dict) -> dict:
         except ValueError:
             cfg["timeout"] = 30
 
-    # env: {KEY: val} — MCP_SUNUCU_ENV_KEY=val şeklindeki değişkenler
+    # env: {KEY: val} â€” MCP_SUNUCU_ENV_KEY=val ÅŸeklindeki deÄŸiÅŸkenler
     env_dict = {}
     for k, v in env_ayar.items():
         if k.startswith("env_"):
             env_key = k[4:]  # "GITHUB_TOKEN"
-            # Environment variable reference çözümle: ${VAR} veya direk değer
+            # Environment variable reference Ã§Ã¶zÃ¼mle: ${VAR} veya direk deÄŸer
             if v.startswith("${") and v.endswith("}"):
                 env_val = os.environ.get(v[2:-1], "")
             else:
@@ -319,26 +319,26 @@ def _env_sunucuyu_cfg_cevir(sunucu_adi: str, env_ayar: dict) -> dict:
     return cfg
 
 
-# ═══════════════════════════════════════════════════════════════════════════
-# Ana Keşif Fonksiyonu
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# Ana KeÅŸif Fonksiyonu
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def mcp_kesfet(geri_bildirim: bool = True) -> int:
-    """Tüm kaynaklardan MCP sunucularını keşfet ve mcp_manager'a kaydet.
+    """TÃ¼m kaynaklardan MCP sunucularÄ±nÄ± keÅŸfet ve mcp_manager'a kaydet.
 
-    Keşif sırası (sonraki öncekini ezer):
-      1. config.yaml → mcp_servers: (proje + .ReYMeN/)
-      2. ~/.hermes/profiles/reymen/config.yaml → mcp_servers:
-      3. .env → MCP_* / MCP_SERVER_* / MCP_SUNUCU_* değişkenleri
-         (dosyalar: proje/.env, .ReYMeN/.env, ~/.hermes/.env, ~/.hermes/profiles/reymen/.env)
-      4. OS environment → MCP_* / MCP_SERVER_* / MCP_SUNUCU_* değişkenleri
+    KeÅŸif sÄ±rasÄ± (sonraki Ã¶ncekini ezer):
+      1. config.yaml â†’ mcp_servers: (proje + .ReYMeN/)
+      2. ~/.reymen/profiles/reymen/config.yaml â†’ mcp_servers:
+      3. .env â†’ MCP_* / MCP_SERVER_* / MCP_SUNUCU_* deÄŸiÅŸkenleri
+         (dosyalar: proje/.env, .ReYMeN/.env, ~/.reymen/.env, ~/.reymen/profiles/reymen/.env)
+      4. OS environment â†’ MCP_* / MCP_SERVER_* / MCP_SUNUCU_* deÄŸiÅŸkenleri
 
     Args:
-        geri_bildirim: Keşif sonucunu logla (varsayılan: True)
+        geri_bildirim: KeÅŸif sonucunu logla (varsayÄ±lan: True)
 
     Returns:
-        Yeni eklenen MCP sunucu sayısı.
+        Yeni eklenen MCP sunucu sayÄ±sÄ±.
     """
     from reymen.mcp.mcp_manager import mcp_manager
 
@@ -351,11 +351,11 @@ def mcp_kesfet(geri_bildirim: bool = True) -> int:
     for ad, ayar in env_sunucular_raw.items():
         env_sunucular[ad] = _env_sunucuyu_cfg_cevir(ad, ayar)
 
-    # 3. Birleştir (config → env; env öncelikli)
+    # 3. BirleÅŸtir (config â†’ env; env Ã¶ncelikli)
     birlesik = dict(config_sunucular)
     for ad, ayar in env_sunucular.items():
         if ad in birlesik:
-            # .env ayarları config'deki varsayılanları ezer
+            # .env ayarlarÄ± config'deki varsayÄ±lanlarÄ± ezer
             birlesik[ad].update(ayar)
             birlesik[ad]["_kaynak"] = "config.yaml + .env"
         else:
@@ -363,21 +363,21 @@ def mcp_kesfet(geri_bildirim: bool = True) -> int:
 
     if not birlesik:
         if geri_bildirim:
-            logger.info("MCP Keşif: config.yaml veya .env'de MCP sunucu bulunamadı")
+            logger.info("MCP KeÅŸif: config.yaml veya .env'de MCP sunucu bulunamadÄ±")
         return 0
 
     # 4. mcp_manager'a kaydet
     mgr = mcp_manager()
     yeni_sayisi = 0
     for ad, cfg in birlesik.items():
-        # Zaten kayıtlıysa atla
+        # Zaten kayÄ±tlÄ±ysa atla
         if ad in mgr._sunucular:
             continue
         # Kaydet
         mgr.ekle(ad, cfg)
         yeni_sayisi += 1
         logger.debug(
-            "MCP Keşif: '%s' eklendi (kaynak: %s, transport: %s)",
+            "MCP KeÅŸif: '%s' eklendi (kaynak: %s, transport: %s)",
             ad,
             cfg.get("_kaynak", "?"),
             cfg.get("transport", "stdio"),
@@ -385,7 +385,7 @@ def mcp_kesfet(geri_bildirim: bool = True) -> int:
 
     if geri_bildirim and yeni_sayisi > 0:
         logger.info(
-            "MCP Keşif: %d yeni sunucu bulundu, toplam %d",
+            "MCP KeÅŸif: %d yeni sunucu bulundu, toplam %d",
             yeni_sayisi,
             len(mgr._sunucular),
         )
@@ -394,7 +394,7 @@ def mcp_kesfet(geri_bildirim: bool = True) -> int:
 
 
 def mcp_kesif_durumu() -> dict[str, Any]:
-    """Keşfedilen tüm MCP sunucularının durumunu döndür.
+    """KeÅŸfedilen tÃ¼m MCP sunucularÄ±nÄ±n durumunu dÃ¶ndÃ¼r.
 
     Returns:
         {
@@ -505,34 +505,34 @@ def _izleme_dongusu(interval_sn: int) -> None:
 
 
 def mcp_kesif_raporu() -> str:
-    """İnsan-okunabilir keşif durum raporu."""
+    """Ä°nsan-okunabilir keÅŸif durum raporu."""
     durum = mcp_kesif_durumu()
     if durum["toplam"] == 0:
-        return "[MCP Keşif] Hiçbir MCP sunucusu bulunamadı."
+        return "[MCP KeÅŸif] HiÃ§bir MCP sunucusu bulunamadÄ±."
 
     satirlar = [
-        "[MCP Keşif] Otomatik Keşfedilen Sunucular:",
+        "[MCP KeÅŸif] Otomatik KeÅŸfedilen Sunucular:",
         "=" * 55,
     ]
     for s in durum["sunucular"]:
-        simge = "🟢" if s["bagli"] else "🔴"
+        simge = "ğŸŸ¢" if s["bagli"] else "ğŸ”´"
         satirlar.append(
             f"  {s['ad']} ({s['transport']}): {simge} "
-            f"{s['tool_sayisi']} tool — kaynak: {s['kaynak']}"
+            f"{s['tool_sayisi']} tool â€” kaynak: {s['kaynak']}"
         )
     satirlar.append(f"\nToplam: {durum['toplam']} sunucu")
     return "\n".join(satirlar)
 
 
-# ═══════════════════════════════════════════════════════════════════════════
-# Motor Tool Kaydı
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# Motor Tool KaydÄ±
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def motor_kaydet(motor) -> None:
-    """MCP_DISCOVERY aracını Motor'a kaydet.
+    """MCP_DISCOVERY aracÄ±nÄ± Motor'a kaydet.
 
-    Motor başlatılırken çağrılır.
+    Motor baÅŸlatÄ±lÄ±rken Ã§aÄŸrÄ±lÄ±r.
     """
     if not hasattr(motor, "_plugin_arac_kaydet"):
         logger.warning("Motor'da _plugin_arac_kaydet metodu yok")
@@ -541,15 +541,15 @@ def motor_kaydet(motor) -> None:
     motor._plugin_arac_kaydet(
         "MCP_DISCOVERY",
         mcp_kesfet,
-        "MCP sunucularını config.yaml ve .env'den otomatik keşfeder. "
-        "Kullanım: MCP_DISCOVERY() — keşif yapar ve mcp_manager'a kaydeder.",
+        "MCP sunucularÄ±nÄ± config.yaml ve .env'den otomatik keÅŸfeder. "
+        "KullanÄ±m: MCP_DISCOVERY() â€” keÅŸif yapar ve mcp_manager'a kaydeder.",
     )
 
     motor._plugin_arac_kaydet(
         "MCP_DISCOVERY_DURUM",
         mcp_kesif_raporu,
-        "Keşfedilen MCP sunucularının durum raporunu döndürür. "
-        "Kullanım: MCP_DISCOVERY_DURUM() — durum raporu.",
+        "KeÅŸfedilen MCP sunucularÄ±nÄ±n durum raporunu dÃ¶ndÃ¼rÃ¼r. "
+        "KullanÄ±m: MCP_DISCOVERY_DURUM() â€” durum raporu.",
     )
 
     motor._plugin_arac_kaydet(
@@ -558,27 +558,27 @@ def motor_kaydet(motor) -> None:
         "MCP konfig dosyalarini periyodik kontrol eder (arkaplan). "
         "Yeni MCP sunucusu eklenirse otomatik baglanir. "
         "Parametre: sn (kontrol araligi, varsayilan 120s). "
-        "Kullanım: MCP_DISCOVERY_IZLE_BASLAT(sn=120)",
+        "KullanÄ±m: MCP_DISCOVERY_IZLE_BASLAT(sn=120)",
     )
 
     motor._plugin_arac_kaydet(
         "MCP_DISCOVERY_IZLE_DURDUR",
         mcp_kesif_izle_durdur,
         "MCP konfig izleme dongusunu durdurur. "
-        "Kullanım: MCP_DISCOVERY_IZLE_DURDUR()",
+        "KullanÄ±m: MCP_DISCOVERY_IZLE_DURDUR()",
     )
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # CLI Test
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 if __name__ == "__main__":
     logging.basicConfig(
         level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
     )
 
-    print("=== MCP Otomatik Keşif Testi ===\n")
+    print("=== MCP Otomatik KeÅŸif Testi ===\n")
 
     # config.yaml'dan oku
     cfg_sunucular = _config_oku()
@@ -592,9 +592,9 @@ if __name__ == "__main__":
     for ad, ayar in env_sunucular_raw.items():
         print(f"  - {ad}: {ayar}")
 
-    # Keşif yap
+    # KeÅŸif yap
     yeni = mcp_kesfet()
-    print(f"\n→ {yeni} yeni sunucu eklendi")
+    print(f"\nâ†’ {yeni} yeni sunucu eklendi")
 
     # Durum
     print(f"\n{mcp_kesif_raporu()}")

@@ -1,4 +1,4 @@
-# ReYMeN Core — Otonom görev çözücü çekirdeği
+﻿# ReYMeN Core â€” Otonom gÃ¶rev Ã§Ã¶zÃ¼cÃ¼ Ã§ekirdeÄŸi
 from .model_adapter import get_active_adapter, ModelAdapter
 from .orchestrator import solve_step, solve_all, coz_hata, run_script
 from .ogrenme import (
@@ -34,7 +34,7 @@ from .config_manager import (
     config_yeniden_yukle,
 )
 
-# Session DB — SessionDB sinifi
+# Session DB â€” SessionDB sinifi
 from .session_db import SessionDB
 
 # Kimlik Havuzu (P0)
@@ -70,7 +70,7 @@ from .observability import (
     observability_durum,
 )
 
-# Tip Güvenliği / Pydantic AI (P1)
+# Tip GÃ¼venliÄŸi / Pydantic AI (P1)
 from .type_safety import (
     validated_tool,
     ValidatedTool,
@@ -81,7 +81,7 @@ from .type_safety import (
     build_pydantic_ai_tool,
 )
 
-# Skills Hub — Topluluk skill kesfi ve yonetimi (P1)
+# Skills Hub â€” Topluluk skill kesfi ve yonetimi (P1)
 from .skills_hub import (
     SkillsHub,
     SkillMetadata,

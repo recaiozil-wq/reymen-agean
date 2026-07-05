@@ -1,4 +1,4 @@
-"""Per-platform slash command access control.
+﻿"""Per-platform slash command access control.
 
 This module sits beside the existing per-platform allowlist (``allow_from``)
 and adds a second axis: of the users who are *allowed to talk to the
@@ -7,10 +7,10 @@ gateway*, which ones can run *which slash commands*.
 Two lists per platform scope (DM vs group, mirroring ``allow_from`` vs
 ``group_allow_from``):
 
-  - ``allow_admin_from``      — user IDs that get every registered slash
+  - ``allow_admin_from``      â€” user IDs that get every registered slash
                                 command (built-in + plugin-registered).
-  - ``user_allowed_commands`` — slash command names non-admin users may
-                                run. Empty / unset → non-admins get no
+  - ``user_allowed_commands`` â€” slash command names non-admin users may
+                                run. Empty / unset â†’ non-admins get no
                                 slash commands.
 
 Backward compatibility:
@@ -23,13 +23,13 @@ Backward compatibility:
 The gate is applied at the slash command dispatch site in
 ``gateway/run.py`` so it covers BOTH built-in and plugin-registered
 commands via the live registry. Gating slash commands does not affect
-plain chat — non-admin users can still talk to the agent normally,
+plain chat â€” non-admin users can still talk to the agent normally,
 they just can't trigger commands outside ``user_allowed_commands``.
 
 Authored as a slimmed-down salvage of PR #4443's permission tiers
 (co-authored by @ReqX). The full tier system, audit log, usage
 tracking, rate limiting, and tool filtering from that PR are not
-included here — only the slash-command access split.
+included here â€” only the slash-command access split.
 """
 
 from __future__ import annotations
@@ -45,7 +45,7 @@ from typing import Any, FrozenSet, Iterable, Optional, Tuple
 # is in (``/status``). These mirror the smallest set of read-only commands
 # we'd hand to a guest. Operators can still narrow this further by writing
 # their own ``user_allowed_commands`` (this set is only the implicit
-# fallback floor — anything in ``user_allowed_commands`` overrides it
+# fallback floor â€” anything in ``user_allowed_commands`` overrides it
 # additively, never restrictively).
 _ALWAYS_ALLOWED_FOR_USERS: FrozenSet[str] = frozenset(
     {
@@ -61,7 +61,7 @@ class SlashAccessPolicy:
 
     ``scope`` is ``"dm"`` for direct messages and ``"group"`` for groups,
     channels, threads, and any other multi-user context. The mapping from
-    SessionSource.chat_type → scope happens in ``policy_for_source``.
+    SessionSource.chat_type â†’ scope happens in ``policy_for_source``.
     """
 
     enabled: bool  # gating active for this scope?
@@ -70,7 +70,7 @@ class SlashAccessPolicy:
 
     def is_admin(self, user_id: Optional[str]) -> bool:
         if not self.enabled:
-            # Gating disabled → treat every allowed user as admin so
+            # Gating disabled â†’ treat every allowed user as admin so
             # downstream code can keep using ``is_admin`` / ``can_run``
             # uniformly.
             return True
@@ -183,7 +183,7 @@ def policy_from_extra(extra: dict, scope: str) -> SlashAccessPolicy:
     cmds = _coerce_command_list(extra.get(cmd_key))
 
     if scope == "dm" and not cmds:
-        # DM didn't specify — let group's user_allowed_commands fall through
+        # DM didn't specify â€” let group's user_allowed_commands fall through
         # so operators only need to list it once if it's the same.
         cmds = _coerce_command_list(extra.get("group_user_allowed_commands"))
 

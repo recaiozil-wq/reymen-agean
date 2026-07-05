@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""shim_olusturucu.py — Eksik ReYMeN modulleri icin otomatik shim uretimi.
+﻿# -*- coding: utf-8 -*-
+"""shim_olusturucu.py â€” Eksik ReYMeN modulleri icin otomatik shim uretimi.
 
 ModuleNotFoundError kalibini tani, ayni hata 3+ dosyada tekrarlanirsa
 otomatik shim/stub dosyasi olustur. Boylece test crash etmez.
@@ -103,15 +103,15 @@ def _shim_olustur(modul_adi: str, log_fn=print) -> str | None:
 
     # Bos siniflar/fonksiyonlar iceren shim
     icerik = f'''# -*- coding: utf-8 -*-
-"""Otomatik olusturulan shim — {modul_adi}
+"""Otomatik olusturulan shim â€” {modul_adi}
 
 Eksik ReYMeN modulu yerine gecer. Import hatasini susturur.
-Gerçek fonksiyonellik yok, sadece namespace doldurur.
+GerÃ§ek fonksiyonellik yok, sadece namespace doldurur.
 """
 
 
 class StubBase:
-    """Tum stub siniflarin temel aldıgi bos sinif."""
+    """Tum stub siniflarin temel aldÄ±gi bos sinif."""
     pass
 
 
@@ -124,7 +124,7 @@ class PlatformBase(StubBase):
 
 
 def stub_islev(*args, **kwargs):
-    """Bos islev — cagrilirsa None doner."""
+    """Bos islev â€” cagrilirsa None doner."""
     return None
 '''
     shim_dosya.write_text(icerik, encoding="utf-8")
@@ -192,9 +192,9 @@ def rapor_olustur(
             basari = k["gecti"] / k["toplam"] * 100 if k["toplam"] else 0
             puan = int(basari / 20)  # 0-5 arasi puan
             rapor.append(
-                f"  KATEGORI {kat}: {k['gecti']}/{k['toplam']} ({basari:.0f}%) → PUAN: {puan}/5"
+                f"  KATEGORI {kat}: {k['gecti']}/{k['toplam']} ({basari:.0f}%) â†’ PUAN: {puan}/5"
             )
-            rapor.append(f"    {'⭐' * puan}{'☆' * (5 - puan)}")
+            rapor.append(f"    {'â­' * puan}{'â˜†' * (5 - puan)}")
 
     rapor.append("")
     rapor.append("=" * 55)

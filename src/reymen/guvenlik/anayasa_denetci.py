@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-anayasa_denetci.py — Constitutional AI Oz-Denetim (Anthropic, 2022).
+anayasa_denetci.py â€” Constitutional AI Oz-Denetim (Anthropic, 2022).
 
 Buyuk LLM sistemlerindeki ilke:
   "Cevap uretmeden once anayasal ilkelere karsi oz-elestiri yap,
@@ -30,7 +30,7 @@ Entegrasyon (main.py):
 import re
 from typing import Optional
 
-# ── Anayasal ilkeler ─────────────────────────────────────────────────────────
+# â”€â”€ Anayasal ilkeler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 ANAYASAL_ILKELER = [
     "Yanit DOGRU ve dogrulanabilir bilgi icermeli; uydurma, tahmin veya hallucination olmamali.",
@@ -45,9 +45,9 @@ ANAYASAL_ILKELER = [
     "Riskli eylemler icin KULLANICI ONAYI istenmeli; varsayilan olarak guclu adim atilmamali.",
 ]
 
-# ── Promptlar ─────────────────────────────────────────────────────────────────
+# â”€â”€ Promptlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-_ELESTIRI_SISTEM = """Sen bir yapay zeka guvenligi ve kalite uzmanisın.
+_ELESTIRI_SISTEM = """Sen bir yapay zeka guvenligi ve kalite uzmanisÄ±n.
 Sana bir ajan gorevi ve bu gorev icin uretilen cevap/sonuc sunulacak.
 Cevabi asagidaki anayasal ilkelere gore degerlendirip oz-elestiri yap:
 
@@ -62,7 +62,7 @@ KISA_ELESTIRI: [tek cumle, ihlal yoksa "Tum ilkeler karsilandi."]
 _REVIZYON_SISTEM = """Sen bir yapay zeka yardimcisisin.
 Asagidaki gorevi tamamlamaya calisiyorsun.
 Anayasal elestiri aldin. Bu elestiriyi dikkate alarak
-YALNIZCA REVIZE EDILMIS CEVABI ver — baska aciklama yapma.
+YALNIZCA REVIZE EDILMIS CEVABI ver â€” baska aciklama yapma.
 """
 
 
@@ -76,7 +76,7 @@ class AnayasaDenetci:
         self._elestiri_sayisi = 0
         self._revizyon_sayisi = 0
 
-    # ── Ana API ──────────────────────────────────────────────────────────────
+    # â”€â”€ Ana API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def denetle(
         self,
@@ -91,12 +91,12 @@ class AnayasaDenetci:
             hedef:         Kullanicinin orijinal hedefi.
             cevap:         GOREV_BITTI'deki sonuc veya denetlenecek metin.
             adim_gecmisi:  Yapilan adimlar (ek baglam icin).
-            revize_et:     True → ihlal bulunursa LLM'e revize ettir.
+            revize_et:     True â†’ ihlal bulunursa LLM'e revize ettir.
 
         Returns:
             (onaylandi: bool, sonuc: str)
-            - onaylandi=True, sonuc=cevap → Gecti
-            - onaylandi=False, sonuc=elestiri_veya_revizyon → Uyari/revizyon
+            - onaylandi=True, sonuc=cevap â†’ Gecti
+            - onaylandi=False, sonuc=elestiri_veya_revizyon â†’ Uyari/revizyon
         """
         if not self.aktif or not self._provider:
             return True, cevap
@@ -141,7 +141,7 @@ class AnayasaDenetci:
         cevap_lower = cevap.lower()
         for kalip, aciklama in kontroller:
             if re.search(kalip, cevap, re.IGNORECASE):
-                return False, f"[AnayasaDenetci]: Kural ihlali — {aciklama}"
+                return False, f"[AnayasaDenetci]: Kural ihlali â€” {aciklama}"
         return True, ""
 
     def istatistik(self) -> dict:
@@ -155,7 +155,7 @@ class AnayasaDenetci:
             ),
         }
 
-    # ── Ic yardimcilar ───────────────────────────────────────────────────────
+    # â”€â”€ Ic yardimcilar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _elestir(self, hedef: str, cevap: str, adimlar: list) -> dict:
         """LLM ile anayasal elestiri yap."""
@@ -214,7 +214,7 @@ class AnayasaDenetci:
         }
 
 
-# ── Test ─────────────────────────────────────────────────────────────────────
+# â”€â”€ Test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
     print("=== anayasa_denetci.py Test ===\n")
@@ -229,7 +229,7 @@ if __name__ == "__main__":
                 if "rm -rf" in icindekiler or "sil" in icindekiler:
                     return (
                         "IHLAL_VAR: evet\n"
-                        "IHLAL_EDILEN_ILKE: 8. Geri donulemez islem — dosya silme komutu\n"
+                        "IHLAL_EDILEN_ILKE: 8. Geri donulemez islem â€” dosya silme komutu\n"
                         "KISA_ELESTIRI: rm -rf komutu geri alinamaz ve onay gerektirir."
                     )
                 return (

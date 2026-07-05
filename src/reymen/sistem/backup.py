@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""backup.py — Yedekleme sistemi.
+﻿# -*- coding: utf-8 -*-
+"""backup.py â€” Yedekleme sistemi.
 
 Proje dosyalarini ZIP ile yedekler.
 """

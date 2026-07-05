@@ -1,11 +1,11 @@
-"""_handle_busy_command handler."""
+﻿"""_handle_busy_command handler."""
 
-from src.reymen.sistem.cli_stream import save_config_value
-from src.reymen.sistem.cli_display import _cprint, _ACCENT, _RST, _DIM
+from reymen.sistem.cli_stream import save_config_value
+from reymen.sistem.cli_display import _cprint, _ACCENT, _RST, _DIM
 
 
 def _handle_busy_command(cli, cmd: str):
-    """Handle /busy — control what Enter does while ReYMeN is working.
+    """Handle /busy â€” control what Enter does while ReYMeN is working.
 
     Usage:
         /busy               Show current busy input mode
@@ -41,7 +41,7 @@ def _handle_busy_command(cli, cmd: str):
             behavior = "Enter will steer your message into the current run (after the next tool call)."
         else:
             behavior = "Enter will interrupt the current run while ReYMeN is busy."
-        _cprint(f"  {_ACCENT}✓ Busy input mode set to '{arg}' (saved to config){_RST}")
+        _cprint(f"  {_ACCENT}âœ“ Busy input mode set to '{arg}' (saved to config){_RST}")
         _cprint(f"  {_DIM}{behavior}{_RST}")
     else:
-        _cprint(f"  {_ACCENT}✓ Busy input mode set to '{arg}' (session only){_RST}")
+        _cprint(f"  {_ACCENT}âœ“ Busy input mode set to '{arg}' (session only){_RST}")

@@ -1,4 +1,4 @@
-"""Windows otomatik baslatma (Registry HKCU\Run)."""
+﻿"""Windows otomatik baslatma (Registry HKCU\Run)."""
 
 from __future__ import annotations
 import logging

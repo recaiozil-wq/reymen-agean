@@ -1,18 +1,18 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-rate_limiter.py — Provider basına rate limiting ve token bütçe yönetimi.
+rate_limiter.py â€” Provider basÄ±na rate limiting ve token bÃ¼tÃ§e yÃ¶netimi.
 
-Özellikler:
+Ã–zellikler:
   - Sliding-window rate limiter (istekler / dakika)
-  - Token sayacı (tahmini): kelime * 1.3
-  - Günlük / oturum token bütçesi (TOKEN_BUDGET_DAILY)
+  - Token sayacÄ± (tahmini): kelime * 1.3
+  - GÃ¼nlÃ¼k / oturum token bÃ¼tÃ§esi (TOKEN_BUDGET_DAILY)
   - Otomatik bekleme + retry (RATE_LIMIT_RETRY=true)
-  - provider_transport.py ile entegre olur (sarmalayıcı)
+  - provider_transport.py ile entegre olur (sarmalayÄ±cÄ±)
 
 .env:
-  RATE_LIMIT_RPM=60          # istekler / dakika (varsayılan 60)
-  TOKEN_BUDGET_DAILY=500000  # günlük token sınırı (0 = sınırsız)
-  RATE_LIMIT_RETRY=true      # limit aşılınca bekle
+  RATE_LIMIT_RPM=60          # istekler / dakika (varsayÄ±lan 60)
+  TOKEN_BUDGET_DAILY=500000  # gÃ¼nlÃ¼k token sÄ±nÄ±rÄ± (0 = sÄ±nÄ±rsÄ±z)
+  RATE_LIMIT_RETRY=true      # limit aÅŸÄ±lÄ±nca bekle
 """
 
 import os
@@ -39,7 +39,7 @@ def _env_bool(key: str, varsayilan: bool = False) -> bool:
     return os.environ.get(key, str(varsayilan)).strip().lower() in ("1", "true", "yes")
 
 
-# ── Sliding-window Rate Limiter ───────────────────────────────────────────────
+# â”€â”€ Sliding-window Rate Limiter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class RateLimiter:
@@ -79,12 +79,12 @@ class RateLimiter:
         while not self.izin_var_mi(provider):
             if not self._retry:
                 raise RuntimeError(
-                    f"[RateLimiter] {provider} rate limit asıldı ({self.rpm} rpm)."
+                    f"[RateLimiter] {provider} rate limit asÄ±ldÄ± ({self.rpm} rpm)."
                 )
             bekleme = 2.0
             self._bekleme_toplam += bekleme
             print(
-                f"[RateLimiter] {provider}: rate limit — {bekleme:.1f}s bekleniyor..."
+                f"[RateLimiter] {provider}: rate limit â€” {bekleme:.1f}s bekleniyor..."
             )
             time.sleep(bekleme)
         self.kaydet(provider)
@@ -107,13 +107,13 @@ class RateLimiter:
         return [self.durum(p) for p in list(self._penc.keys())]
 
 
-# ── Token Sayacı ──────────────────────────────────────────────────────────────
+# â”€â”€ Token SayacÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class TokenBudget:
     """
-    Günlük token bütçesi. Tahmini sayım: kelime * 1.3.
-    Gün degisince otomatik sifirlanir.
+    GÃ¼nlÃ¼k token bÃ¼tÃ§esi. Tahmini sayÄ±m: kelime * 1.3.
+    GÃ¼n degisince otomatik sifirlanir.
     """
 
     def __init__(self, gunluk_sinir: int = None):
@@ -136,7 +136,7 @@ class TokenBudget:
 
     @staticmethod
     def token_tahmin(metin: str) -> int:
-        """Kelime sayısı * 1.3 ile token tahmini."""
+        """Kelime sayÄ±sÄ± * 1.3 ile token tahmini."""
         return max(1, int(len(metin.split()) * 1.3))
 
     def kaydet(self, metin: str, provider: str = "default") -> int:
@@ -187,12 +187,12 @@ class TokenBudget:
         return "\n".join(satirlar)
 
 
-# ── Sarmalayici: provider_transport ile entegre ───────────────────────────────
+# â”€â”€ Sarmalayici: provider_transport ile entegre â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class RateLimitedProvider:
     """
-    Var olan provider'i sarmalar — her uret() cagrisi oncesinde
+    Var olan provider'i sarmalar â€” her uret() cagrisi oncesinde
     rate limit kontrol eder ve token sayar.
 
     Kullanim:
@@ -208,15 +208,15 @@ class RateLimitedProvider:
     def uret(self, sistem: str, mesajlar: list, **kwargs) -> str:
         provider_adi = getattr(self._provider, "_aktif_provider", "default")
 
-        # Token bütçe kontrolü
+        # Token bÃ¼tÃ§e kontrolÃ¼
         if self.token_budget.sinir_asildimi():
             kalan = self.token_budget.kalan()
             raise RuntimeError(
-                f"[TokenBudget] Günlük token limiti asildi "
+                f"[TokenBudget] GÃ¼nlÃ¼k token limiti asildi "
                 f"({self.token_budget.sinir:,}). Kalan: {kalan}"
             )
 
-        # Rate limit kontrolü (bekleme dahil)
+        # Rate limit kontrolÃ¼ (bekleme dahil)
         self.rate_limiter.bekle_ve_kaydet(provider_adi)
 
         # Asil cagri
@@ -251,7 +251,7 @@ class RateLimitedProvider:
         return getattr(self._provider, item)
 
 
-# ── Motor araci ───────────────────────────────────────────────────────────────
+# â”€â”€ Motor araci â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def motor_kaydet(motor, rate_limited_provider=None) -> None:
@@ -262,7 +262,7 @@ def motor_kaydet(motor, rate_limited_provider=None) -> None:
         return
 
 
-# ── CLI ───────────────────────────────────────────────────────────────────────
+# â”€â”€ CLI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
     rl = RateLimiter(rpm=5, pencere=10)

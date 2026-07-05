@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""Yuanbao media utilities — MIME types, image/file message builders."""
+﻿# -*- coding: utf-8 -*-
+"""Yuanbao media utilities â€” MIME types, image/file message builders."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ import os
 from typing import Any, Dict, List, Optional
 
 
-# ── Constants ───────────────────────────────────────────────────────────────
+# â”€â”€ Constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 UPLOAD_INFO_PATH = "/api/resource/genUploadInfo"
 DEFAULT_API_DOMAIN = "yuanbao.tencent.com"
@@ -39,7 +39,7 @@ _IMAGE_FORMAT_MAP = {
 _IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp"}
 
 
-# ── Functions ───────────────────────────────────────────────────────────────
+# â”€â”€ Functions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def guess_mime_type(filename: str) -> str:

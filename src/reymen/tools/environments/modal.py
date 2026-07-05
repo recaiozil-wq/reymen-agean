@@ -1,4 +1,4 @@
-"""ReYMeN tools.environments.modal shim — Hermes Modal ortamını yönlendirir."""
+﻿"""ReYMeN tools.environments.modal shim â€” ReYMeN Modal ortamÄ±nÄ± yÃ¶nlendirir."""
 
 from __future__ import annotations
 
@@ -8,6 +8,6 @@ logger = logging.getLogger(__name__)
 
 
 class ModalEnvironment:
-    """Hermes ModalEnvironment — ReYMeN'de stub."""
+    """ReYMeN ModalEnvironment â€” ReYMeN'de stub."""
 
     pass

@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
-"""mcp_tool.py — MCP (Model Context Protocol) İstemci Aracı.
+﻿# -*- coding: utf-8 -*-
+"""mcp_tool.py â€” MCP (Model Context Protocol) Ä°stemci AracÄ±.
 
-MCP sunucularına bağlanır ve araçlarını ReYMeN'e açar.
+MCP sunucularÄ±na baÄŸlanÄ±r ve araÃ§larÄ±nÄ± ReYMeN'e aÃ§ar.
 JSON-RPC 2.0 over stdio veya HTTP.
 """
 
@@ -20,7 +20,7 @@ MCP_KONFIG_YOLU = Path(__file__).parent / ".ReYMeN" / "mcp_servers.json"
 
 
 class MCPSunucusu:
-    """Tek bir MCP sunucusu bağlantısı (stdio tabanlı)."""
+    """Tek bir MCP sunucusu baÄŸlantÄ±sÄ± (stdio tabanlÄ±)."""
 
     def __init__(self, ad: str, komut: list[str], calisma_dizini: str = ""):
         self.ad = ad
@@ -41,7 +41,7 @@ class MCPSunucusu:
                 text=True,
                 cwd=self.calisma_dizini or None,
             )
-            # İlk initialize mesajı
+            # Ä°lk initialize mesajÄ±
             self._json_rpc(
                 "initialize",
                 {
@@ -50,7 +50,7 @@ class MCPSunucusu:
                     "clientInfo": {"name": "ReYMeN", "version": "1.0"},
                 },
             )
-            # Araç listesini al
+            # AraÃ§ listesini al
             yanit = self._json_rpc("tools/list", {})
             self._araclar = yanit.get("result", {}).get("tools", [])
             return True
@@ -104,7 +104,7 @@ class MCPSunucusu:
 
 
 class MCPIstemci:
-    """Çoklu MCP sunucusu yöneticisi."""
+    """Ã‡oklu MCP sunucusu yÃ¶neticisi."""
 
     def __init__(self):
         self._sunucular: dict[str, MCPSunucusu] = {}
@@ -137,14 +137,14 @@ class MCPIstemci:
 
     def arac_cagir(self, sunucu: str, arac: str, params: dict) -> str:
         if sunucu not in self._sunucular:
-            return f"[MCP]: '{sunucu}' sunucusu bulunamadı."
+            return f"[MCP]: '{sunucu}' sunucusu bulunamadÄ±."
         return str(self._sunucular[sunucu].arac_cagir(arac, params))
 
     def tum_araclar(self) -> dict[str, list[dict]]:
         return {ad: s.araclar() for ad, s in self._sunucular.items()}
 
     def motor_kaydet(self, motor):
-        """Tüm MCP araçlarını motora kaydet."""
+        """TÃ¼m MCP araÃ§larÄ±nÄ± motora kaydet."""
         for sunucu_ad, araclar in self.tum_araclar().items():
             for arac in araclar:
                 arac_adi = f"MCP_{sunucu_ad.upper()}_{arac['name'].upper()}"
@@ -183,4 +183,4 @@ def mcp_istemci() -> MCPIstemci:
 if __name__ == "__main__":
     istemci = MCPIstemci()
     print(f"Sunucular: {istemci.durum()}")
-    print(f"Araçlar: {istemci.tum_araclar()}")
+    print(f"AraÃ§lar: {istemci.tum_araclar()}")

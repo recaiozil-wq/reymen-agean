@@ -1,4 +1,4 @@
-"""
+﻿"""
 ReYMeN Otomatik Kurulum ve Fix Scripti
 VSCode terminalde calistir: python reymen_setup.py
 """
@@ -8,7 +8,7 @@ import sys
 import os
 from pathlib import Path
 
-# ── RENK KODLARI ──────────────────────────────────────────────
+# â”€â”€ RENK KODLARI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 GREEN = "\033[92m"
 RED = "\033[91m"
 YELLOW = "\033[93m"
@@ -18,7 +18,7 @@ RESET = "\033[0m"
 
 
 def log(msg):
-    print(f"{GREEN}{BOLD}[✓]{RESET} {msg}")
+    print(f"{GREEN}{BOLD}[âœ“]{RESET} {msg}")
 
 
 def warn(msg):
@@ -26,11 +26,11 @@ def warn(msg):
 
 
 def err(msg):
-    print(f"{RED}{BOLD}[✗]{RESET} {msg}")
+    print(f"{RED}{BOLD}[âœ—]{RESET} {msg}")
 
 
 def info(msg):
-    print(f"{BLUE}{BOLD}[→]{RESET} {msg}")
+    print(f"{BLUE}{BOLD}[â†’]{RESET} {msg}")
 
 
 def run(cmd, cwd=None):
@@ -53,10 +53,10 @@ def run(cmd, cwd=None):
         )
 
 
-# ── PROJE YOLU ────────────────────────────────────────────────
+# â”€â”€ PROJE YOLU â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 PROJE = Path(__file__).resolve().parent.parent.parent
 
-# Eğer script proje içinden çalışıyorsa otomatik algıla
+# EÄŸer script proje iÃ§inden Ã§alÄ±ÅŸÄ±yorsa otomatik algÄ±la
 if not PROJE.exists():
     PROJE = Path(__file__).parent.resolve()
     warn(f"Varsayilan yol bulunamadi, mevcut dizin kullaniliyor: {PROJE}")
@@ -75,16 +75,16 @@ def main():
     print(f"{'='*55}\n")
     print(f"Proje yolu: {PROJE}\n")
 
-    # ── ADIM 1: Proje var mı? ─────────────────────────────────
-    info("ADIM 1/5 — Proje dizini kontrol...")
+    # â”€â”€ ADIM 1: Proje var mÄ±? â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    info("ADIM 1/5 â€” Proje dizini kontrol...")
     if not PROJE.exists():
         err(f"Proje dizini bulunamadi: {PROJE}")
         err("PROJE degiskenini duzenleyip tekrar calistir.")
         sys.exit(1)
     log("Proje dizini bulundu")
 
-    # ── ADIM 2: Venv var mı / oluştur ────────────────────────
-    info("ADIM 2/5 — Venv kontrol / kurulum...")
+    # â”€â”€ ADIM 2: Venv var mÄ± / oluÅŸtur â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    info("ADIM 2/5 â€” Venv kontrol / kurulum...")
     if not VENV.exists():
         warn("Venv bulunamadi, olusturuluyor...")
         r = run([sys.executable, "-m", "venv", str(VENV)], cwd=PROJE)
@@ -95,8 +95,8 @@ def main():
     else:
         log("Venv mevcut")
 
-    # ── ADIM 3: pip install requirements ──────────────────────
-    info("ADIM 3/5 — Bagimliliklar yukleniyor...")
+    # â”€â”€ ADIM 3: pip install requirements â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    info("ADIM 3/5 â€” Bagimliliklar yukleniyor...")
     if not REQ.exists():
         warn("requirements.txt bulunamadi, bu adim atlaniyor")
     else:
@@ -106,14 +106,14 @@ def main():
         else:
             warn("Bazi bagimliliklar yuklenemedi, devam ediliyor...")
 
-    # ── ADIM 4: _otonom_fix.py ────────────────────────────────
-    info("ADIM 4/5 — _otonom_fix.py calistiriliyor...")
+    # â”€â”€ ADIM 4: _otonom_fix.py â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    info("ADIM 4/5 â€” _otonom_fix.py calistiriliyor...")
     if not OTONOM.exists():
         warn(f"_otonom_fix.py bulunamadi: {OTONOM}")
         warn("Bu adim atlaniyor")
     else:
-        # Önce dry-run
-        info("  → Dry-run (onizleme)...")
+        # Ã–nce dry-run
+        info("  â†’ Dry-run (onizleme)...")
         r = run([str(PYTHON), str(OTONOM), "--dry-run"], cwd=PROJE)
 
         # Kullanicidan onay al
@@ -136,8 +136,8 @@ def main():
         else:
             warn("Fix atlandi")
 
-    # ── ADIM 5: Testler ───────────────────────────────────────
-    info("ADIM 5/5 — Testler calistiriliyor...")
+    # â”€â”€ ADIM 5: Testler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    info("ADIM 5/5 â€” Testler calistiriliyor...")
     if not TESTS.exists():
         warn("tests/ klasoru bulunamadi")
     else:
@@ -156,11 +156,11 @@ def main():
 
         print()
         if r.returncode == 0:
-            log("TUM TESTLER GECTI! ✓")
+            log("TUM TESTLER GECTI! âœ“")
         else:
             warn("Bazi testler basarisiz. Yukaridaki ciktiya bak.")
 
-    # ── OZET ──────────────────────────────────────────────────
+    # â”€â”€ OZET â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     print(f"\n{'='*55}")
     print(f"  {BOLD}Islem tamamlandi{RESET}")
     print(f"{'='*55}")

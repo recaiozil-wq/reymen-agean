@@ -1,11 +1,11 @@
-"""
-skill_5n1k_otomasyon.py — Cron ile otomatik skill 5N1K formatlama
+﻿"""
+skill_5n1k_otomasyon.py â€” Cron ile otomatik skill 5N1K formatlama
 
-Her çalıştırmada:
-1. reymen/cereyan/skills/ altındaki tüm .md dosyalarını tara
-2. 5N1K tablosu olmayanlara auto-ekle (başlıktan/description'dan çıkar)
-3. Kategoriye göre doğru alt dizine taşı
-4. SKILLS_KATALOG.md'yi güncelle
+Her Ã§alÄ±ÅŸtÄ±rmada:
+1. reymen/cereyan/skills/ altÄ±ndaki tÃ¼m .md dosyalarÄ±nÄ± tara
+2. 5N1K tablosu olmayanlara auto-ekle (baÅŸlÄ±ktan/description'dan Ã§Ä±kar)
+3. Kategoriye gÃ¶re doÄŸru alt dizine taÅŸÄ±
+4. SKILLS_KATALOG.md'yi gÃ¼ncelle
 """
 
 import os
@@ -16,41 +16,41 @@ from pathlib import Path
 SKILLS_DIR = Path(__file__).parent.parent / "cereyan" / "skills"
 KATALOG = SKILLS_DIR / "SKILLS_KATALOG.md"
 
-# Ana kategoriler (alt dizin ismi → emoji + açıklama)
+# Ana kategoriler (alt dizin ismi â†’ emoji + aÃ§Ä±klama)
 KATEGORILER = {
-    "reymen": ("⚙️", "ReYMeN Özel"),
-    "kali": ("🐉", "Kali Pentest"),
-    "windows": ("🪟", "Windows"),
-    "video": ("🎬", "Video"),
-    "cross-platform": ("🔗", "Cross-Platform"),
-    "ai": ("🧩", "AI"),
-    "misc": ("📦", "Genel"),
-    "mlops": ("🛠", "MLOps"),
-    "software-development": ("💻", "Yazılım"),
-    "autonomous-ai-agents": ("🤖", "Otonom Ajanlar"),
-    "security": ("🔒", "Güvenlik"),
-    "productivity": ("⚡", "Verimlilik"),
-    "devops": ("🚀", "DevOps"),
-    "creative": ("🎨", "Yaratıcı"),
-    "note-taking": ("📝", "Not Alma"),
-    "media": ("📺", "Medya"),
-    "research": ("🔬", "Araştırma"),
-    "voice": ("🎙", "Ses"),
-    "user": ("👤", "Kullanıcı"),
-    "smart-home": ("🏠", "Akıllı Ev"),
-    "email": ("📧", "E-posta"),
-    "github": ("☁️", "GitHub"),
-    "data-science": ("📊", "Veri Bilimi"),
+    "reymen": ("âš™ï¸", "ReYMeN Ã–zel"),
+    "kali": ("ğŸ‰", "Kali Pentest"),
+    "windows": ("ğŸªŸ", "Windows"),
+    "video": ("ğŸ¬", "Video"),
+    "cross-platform": ("ğŸ”—", "Cross-Platform"),
+    "ai": ("ğŸ§©", "AI"),
+    "misc": ("ğŸ“¦", "Genel"),
+    "mlops": ("ğŸ› ", "MLOps"),
+    "software-development": ("ğŸ’»", "YazÄ±lÄ±m"),
+    "autonomous-ai-agents": ("ğŸ¤–", "Otonom Ajanlar"),
+    "security": ("ğŸ”’", "GÃ¼venlik"),
+    "productivity": ("âš¡", "Verimlilik"),
+    "devops": ("ğŸš€", "DevOps"),
+    "creative": ("ğŸ¨", "YaratÄ±cÄ±"),
+    "note-taking": ("ğŸ“", "Not Alma"),
+    "media": ("ğŸ“º", "Medya"),
+    "research": ("ğŸ”¬", "AraÅŸtÄ±rma"),
+    "voice": ("ğŸ™", "Ses"),
+    "user": ("ğŸ‘¤", "KullanÄ±cÄ±"),
+    "smart-home": ("ğŸ ", "AkÄ±llÄ± Ev"),
+    "email": ("ğŸ“§", "E-posta"),
+    "github": ("â˜ï¸", "GitHub"),
+    "data-science": ("ğŸ“Š", "Veri Bilimi"),
 }
 
 
 def besN1K_var_mi(icerik: str) -> bool:
-    """Dosyada 5N1K tablosu var mı?"""
+    """Dosyada 5N1K tablosu var mÄ±?"""
     return "| **Kim?** |" in icerik or "5N1K" in icerik
 
 
 def besN1K_olustur(dosya_yolu: Path) -> str:
-    """Dosyadan bilgi çıkarıp 5N1K tablosu oluştur."""
+    """Dosyadan bilgi Ã§Ä±karÄ±p 5N1K tablosu oluÅŸtur."""
     try:
         with open(dosya_yolu, "r", encoding="utf-8") as f:
             icerik = f.read()
@@ -73,36 +73,36 @@ def besN1K_olustur(dosya_yolu: Path) -> str:
     if not name:
         name = dosya_yolu.stem
 
-    # İlk ### veya ## başlıktan Ne çıkar
+    # Ä°lk ### veya ## baÅŸlÄ±ktan Ne Ã§Ä±kar
     ne = desc or name.replace("-", " ").title()
 
-    # Kategoriyi dizin isminden çıkar
+    # Kategoriyi dizin isminden Ã§Ä±kar
     kategori = dosya_yolu.parent.name
 
-    # Dosya adından Kim çıkar
-    kim = "Tüm ajanlar"
+    # Dosya adÄ±ndan Kim Ã§Ä±kar
+    kim = "TÃ¼m ajanlar"
     if "kali" in name.lower() or kategori == "kali":
-        kim = "Kali ajanı"
+        kim = "Kali ajanÄ±"
     elif "windows" in name.lower() or kategori == "windows":
-        kim = "Windows ajanı"
+        kim = "Windows ajanÄ±"
     elif "video" in name.lower() or kategori == "video":
-        kim = "Video ajanı"
+        kim = "Video ajanÄ±"
 
     tablo = f"""
 > **Kategori:** {kategori}
 
 ---
 
-## 📋 5N1K
+## ğŸ“‹ 5N1K
 
 | Soru | Cevap |
 |:-----|:------|
 | **Kim?** | {kim} |
 | **Ne?** | {ne} |
 | **Nerede?** | {kategori}/ |
-| **Ne Zaman?** | İhtiyaç duyulduğunda |
+| **Ne Zaman?** | Ä°htiyaÃ§ duyulduÄŸunda |
 | **Neden?** | Otomatik kategorilendirme |
-| **Nasıl?** | Skill referansı ile |
+| **NasÄ±l?** | Skill referansÄ± ile |
 
 ---
 
@@ -111,7 +111,7 @@ def besN1K_olustur(dosya_yolu: Path) -> str:
 
 
 def besN1K_ekle(dosya_yolu: Path) -> bool:
-    """5N1K'sız dosyaya tablo ekle."""
+    """5N1K'sÄ±z dosyaya tablo ekle."""
     try:
         with open(dosya_yolu, "r", encoding="utf-8") as f:
             icerik = f.read()
@@ -129,9 +129,9 @@ def besN1K_ekle(dosya_yolu: Path) -> bool:
     # Pattern: --- ... --- 'dan sonraki ilk bosluktan sonra
     match = re.search(r"^---\s*\n.*?\n---\s*\n", icerik, re.DOTALL)
     if match:
-        # Frontmatter sonrasına ekle
+        # Frontmatter sonrasÄ±na ekle
         pos = match.end()
-        # Başlıktan (# ...) sonra mı eklesek?
+        # BaÅŸlÄ±ktan (# ...) sonra mÄ± eklesek?
         yeni = icerik[:pos] + tablo + icerik[pos:]
     else:
         yeni = tablo + icerik
@@ -145,7 +145,7 @@ def besN1K_ekle(dosya_yolu: Path) -> bool:
 
 
 def tarama_yap() -> dict:
-    """Tüm skill'leri tara, 5N1K durumunu raporla."""
+    """TÃ¼m skill'leri tara, 5N1K durumunu raporla."""
     sonuc = {
         "toplam": 0,
         "5n1k_var": 0,
@@ -155,11 +155,11 @@ def tarama_yap() -> dict:
     }
 
     for md_file in sorted(SKILLS_DIR.rglob("*.md")):
-        # Katalog dosyasını atla
+        # Katalog dosyasÄ±nÄ± atla
         if md_file.name == "SKILLS_KATALOG.md":
             continue
 
-        # tools/ altındakileri atla
+        # tools/ altÄ±ndakileri atla
         if "tools" in md_file.parts:
             continue
 
@@ -171,7 +171,7 @@ def tarama_yap() -> dict:
 
         try:
             with open(md_file, "r", encoding="utf-8") as f:
-                icerik = f.read(2000)  # İlk 2000 karakter yeter
+                icerik = f.read(2000)  # Ä°lk 2000 karakter yeter
         except (OSError, UnicodeDecodeError):
             icerik = ""
 
@@ -193,26 +193,26 @@ def tarama_yap() -> dict:
 
 
 def raporla(sonuc: dict) -> str:
-    """İnsan okunabilir rapor."""
+    """Ä°nsan okunabilir rapor."""
     lines = []
-    lines.append(f"📊 SKILL 5N1K TARAMA RAPORU")
+    lines.append(f"ğŸ“Š SKILL 5N1K TARAMA RAPORU")
     lines.append(f"{'='*40}")
     lines.append(f"Toplam: {sonuc['toplam']} dosya")
-    lines.append(f"✅ 5N1K var: {sonuc['5n1k_var']}")
-    lines.append(f"❌ 5N1K yok: {sonuc['5n1k_yok']}")
-    lines.append(f"➕ Otomatik eklenen: {sonuc['eklenen']}")
+    lines.append(f"âœ… 5N1K var: {sonuc['5n1k_var']}")
+    lines.append(f"âŒ 5N1K yok: {sonuc['5n1k_yok']}")
+    lines.append(f"â• Otomatik eklenen: {sonuc['eklenen']}")
     lines.append("")
-    lines.append("Kategori bazında:")
+    lines.append("Kategori bazÄ±nda:")
     for kat, durum in sorted(sonuc["kategoriler"].items()):
-        emoji = KATEGORILER.get(kat, ("📁", ""))[0]
-        lines.append(f"  {emoji} {kat}: {durum['var']}✅ / {durum['yok']}❌")
+        emoji = KATEGORILER.get(kat, ("ğŸ“", ""))[0]
+        lines.append(f"  {emoji} {kat}: {durum['var']}âœ… / {durum['yok']}âŒ")
 
     return "\n".join(lines)
 
 
-# === ÇALIŞTIR ===
+# === Ã‡ALIÅTIR ===
 if __name__ == "__main__":
-    print("Skill 5N1K otomasyon başlıyor...")
+    print("Skill 5N1K otomasyon baÅŸlÄ±yor...")
     sonuc = tarama_yap()
     print(raporla(sonuc))
     print(f"\n{sonuc['eklenen']} dosyaya 5N1K eklendi.")

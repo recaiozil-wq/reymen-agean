@@ -1,16 +1,16 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
-web_test_loop.py — WEB → UYGULA → PUANLA → KARAR döngüsü.
+web_test_loop.py â€” WEB â†’ UYGULA â†’ PUANLA â†’ KARAR dÃ¶ngÃ¼sÃ¼.
 
 Ajan web'den yeni bilgi bulur, eski bilgiyle test eder,
-puanlar ve hangisinin daha iyi olduğuna karar verir.
+puanlar ve hangisinin daha iyi olduÄŸuna karar verir.
 
-5 TETİKLEYİCİ:
-1. Hafıza boş → anında web
-2. Görev başarısız (2. hata) → web
-3. Güven < 0.5 → web
-4. Geçerlilik geçmiş → arka planda web
-5. Çelişki → web
+5 TETÄ°KLEYÄ°CÄ°:
+1. HafÄ±za boÅŸ â†’ anÄ±nda web
+2. GÃ¶rev baÅŸarÄ±sÄ±z (2. hata) â†’ web
+3. GÃ¼ven < 0.5 â†’ web
+4. GeÃ§erlilik geÃ§miÅŸ â†’ arka planda web
+5. Ã‡eliÅŸki â†’ web
 """
 
 from __future__ import annotations
@@ -24,42 +24,42 @@ from datetime import date
 logger = logging.getLogger(__name__)
 
 
-# ── Veri Yapıları ─────────────────────────────────────────────────────────
+# â”€â”€ Veri YapÄ±larÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 @dataclass
 class TestSonucu:
-    """Bir yöntemin test sonucu."""
+    """Bir yÃ¶ntemin test sonucu."""
 
     yontem_adi: str
-    hiz_sn: float  # Kaç saniye sürdü? (düşük iyi)
-    basari: bool  # Hata verdi mi? (True=başarılı)
-    cikti_dogru: bool  # Çıktı doğru mu?
-    guvenlik: float  # 0.0-1.0 (1.0=güvenli)
-    kaynak_guven: float  # Kaynağın güvenilirliği (web veya hafıza)
+    hiz_sn: float  # KaÃ§ saniye sÃ¼rdÃ¼? (dÃ¼ÅŸÃ¼k iyi)
+    basari: bool  # Hata verdi mi? (True=baÅŸarÄ±lÄ±)
+    cikti_dogru: bool  # Ã‡Ä±ktÄ± doÄŸru mu?
+    guvenlik: float  # 0.0-1.0 (1.0=gÃ¼venli)
+    kaynak_guven: float  # KaynaÄŸÄ±n gÃ¼venilirliÄŸi (web veya hafÄ±za)
 
     def puan(self) -> float:
         """Toplam puan [0.0, 1.0]"""
         p = 0.0
-        # Hız: 1sn altı = 1.0, 60sn üstü = 0.0
+        # HÄ±z: 1sn altÄ± = 1.0, 60sn Ã¼stÃ¼ = 0.0
         p += max(0, 1.0 - self.hiz_sn / 60.0) * 0.2
-        # Başarı: hata yoksa 1.0
+        # BaÅŸarÄ±: hata yoksa 1.0
         p += (1.0 if self.basari else 0.0) * 0.3
-        # Çıktı doğruluğu
+        # Ã‡Ä±ktÄ± doÄŸruluÄŸu
         p += (1.0 if self.cikti_dogru else 0.0) * 0.2
-        # Güvenlik
+        # GÃ¼venlik
         p += self.guvenlik * 0.15
-        # Kaynak güvenilirliği
+        # Kaynak gÃ¼venilirliÄŸi
         p += self.kaynak_guven * 0.15
         return round(p, 4)
 
 
-# ── 5 Tetikleyici ─────────────────────────────────────────────────────────
+# â”€â”€ 5 Tetikleyici â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 TETIKLEYICI_TANIMLARI = {
     1: {
         "ad": "Hafiza Bos",
-        "kosul": "once_hafiza.ara() → bulunamadi",
+        "kosul": "once_hafiza.ara() â†’ bulunamadi",
         "ne_zaman": "Aninda web'e git",
         "ornek": "Yeni tool soruldu, hic bilmiyoruz",
     },
@@ -67,12 +67,12 @@ TETIKLEYICI_TANIMLARI = {
         "ad": "Guven Dusuk",
         "kosul": "guven_skoru < 0.5",
         "ne_zaman": "Web'den dogrula",
-        "ornek": "1 basari, 3 hata → guven=0.25",
+        "ornek": "1 basari, 3 hata â†’ guven=0.25",
     },
     3: {
         "ad": "Gorev Basarisiz",
         "kosul": "2. hatadan sonra web'e git",
-        "ne_zaman": "Retry 1 hata + Retry 2 hata → web",
+        "ne_zaman": "Retry 1 hata + Retry 2 hata â†’ web",
         "ornek": "Komut calismadi, neden?",
     },
     4: {
@@ -90,36 +90,36 @@ TETIKLEYICI_TANIMLARI = {
 }
 
 ONCELIK_SIRASI = [1, 3, 2, 4, 5]
-# 1. Hafiza bos → aninda web
-# 2. Gorev basarisiz (2. hata) → web
-# 3. Guven < 0.5 → web
-# 4. Gecerlilik gecmis → arka planda web
-# 5. Celiski → web
+# 1. Hafiza bos â†’ aninda web
+# 2. Gorev basarisiz (2. hata) â†’ web
+# 3. Guven < 0.5 â†’ web
+# 4. Gecerlilik gecmis â†’ arka planda web
+# 5. Celiski â†’ web
 
 
 def tetikleyici_kontrol(tetik_id: int, **kwargs) -> bool:
     """Belirtilen tetikleyicinin sartini kontrol et."""
     if tetik_id == 1:
-        # Hafiza Boş: once_hafiza.ara() boş döndü mü?
+        # Hafiza BoÅŸ: once_hafiza.ara() boÅŸ dÃ¶ndÃ¼ mÃ¼?
         return kwargs.get("hafiza_bos", False)
 
     elif tetik_id == 2:
-        # Güven Düşük: guven_skoru < 0.5
+        # GÃ¼ven DÃ¼ÅŸÃ¼k: guven_skoru < 0.5
         return kwargs.get("guven_skoru", 1.0) < 0.5
 
     elif tetik_id == 3:
-        # Görev Başarısız: 2. hatadan sonra
+        # GÃ¶rev BaÅŸarÄ±sÄ±z: 2. hatadan sonra
         return kwargs.get("basarisiz_deneme_sayisi", 0) >= 2
 
     elif tetik_id == 4:
-        # Geçerlilik Süresi Doldu
+        # GeÃ§erlilik SÃ¼resi Doldu
         gecerlilik = kwargs.get("gecerlilik_tarihi")
         if gecerlilik:
             return str(gecerlilik) < str(date.today())
         return False
 
     elif tetik_id == 5:
-        # Çelişki: iki farklı bilgi çakışıyor
+        # Ã‡eliÅŸki: iki farklÄ± bilgi Ã§akÄ±ÅŸÄ±yor
         return kwargs.get("celiski_var", False)
 
     return False
@@ -133,7 +133,7 @@ def hangi_tetikleyici(
     celiski_var: bool = False,
 ) -> tuple[int | None, dict]:
     """
-    Hangi tetikleyicinin ateşlendiğini bul.
+    Hangi tetikleyicinin ateÅŸlendiÄŸini bul.
 
     Returns:
         (tetikleyici_id, tetikleyici_bilgisi) veya (None, {})
@@ -153,7 +153,7 @@ def hangi_tetikleyici(
     return None, {}
 
 
-# ── Puanlama ──────────────────────────────────────────────────────────────
+# â”€â”€ Puanlama â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 PUAN_KRITERLERI = {
     "hiz": {"agirlik": 0.2, "aciklama": "Kac saniyede tamamlandi?"},
@@ -172,7 +172,7 @@ def puanla(
     guvenlik: float,
     kaynak_guven: float,
 ) -> TestSonucu:
-    """Bir yöntemi puanla ve TestSonucu döndür."""
+    """Bir yÃ¶ntemi puanla ve TestSonucu dÃ¶ndÃ¼r."""
     return TestSonucu(
         yontem_adi=yontem_adi,
         hiz_sn=hiz_sn,
@@ -183,7 +183,7 @@ def puanla(
     )
 
 
-# ── Karar ─────────────────────────────────────────────────────────────────
+# â”€â”€ Karar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 @dataclass
@@ -196,12 +196,12 @@ class KararSonucu:
 
 
 def karar_ver(eski: TestSonucu, yeni: TestSonucu) -> KararSonucu:
-    """İki yöntemi karşılaştır ve hangisinin kazandığına karar ver."""
+    """Ä°ki yÃ¶ntemi karÅŸÄ±laÅŸtÄ±r ve hangisinin kazandÄ±ÄŸÄ±na karar ver."""
     eski_puan = eski.puan()
     yeni_puan = yeni.puan()
     fark = abs(eski_puan - yeni_puan)
 
-    # Yeni başarısız → eski korunur
+    # Yeni baÅŸarÄ±sÄ±z â†’ eski korunur
     if not yeni.basari or not yeni.cikti_dogru:
         return KararSonucu(
             kazanan=eski.yontem_adi,
@@ -211,7 +211,7 @@ def karar_ver(eski: TestSonucu, yeni: TestSonucu) -> KararSonucu:
             eski_korundu=True,
         )
 
-    # Eski başarısız, yeni başarılı → yeniye geç
+    # Eski baÅŸarÄ±sÄ±z, yeni baÅŸarÄ±lÄ± â†’ yeniye geÃ§
     if (not eski.basari or not eski.cikti_dogru) and (yeni.basari and yeni.cikti_dogru):
         return KararSonucu(
             kazanan=yeni.yontem_adi,
@@ -221,7 +221,7 @@ def karar_ver(eski: TestSonucu, yeni: TestSonucu) -> KararSonucu:
             eski_korundu=False,
         )
 
-    # Yeni > Eski + 0.2 fark → yeniye geç
+    # Yeni > Eski + 0.2 fark â†’ yeniye geÃ§
     if yeni_puan > eski_puan + 0.2:
         return KararSonucu(
             kazanan=yeni.yontem_adi,
@@ -231,7 +231,7 @@ def karar_ver(eski: TestSonucu, yeni: TestSonucu) -> KararSonucu:
             eski_korundu=False,
         )
 
-    # Fark < 0.2 → eski korunur
+    # Fark < 0.2 â†’ eski korunur
     if fark < 0.2:
         return KararSonucu(
             kazanan=eski.yontem_adi,
@@ -241,7 +241,7 @@ def karar_ver(eski: TestSonucu, yeni: TestSonucu) -> KararSonucu:
             eski_korundu=True,
         )
 
-    # Yeni daha iyi ama fark < 0.2 değil
+    # Yeni daha iyi ama fark < 0.2 deÄŸil
     return KararSonucu(
         kazanan=yeni.yontem_adi,
         kaybeden=eski.yontem_adi,
@@ -251,11 +251,11 @@ def karar_ver(eski: TestSonucu, yeni: TestSonucu) -> KararSonucu:
     )
 
 
-# ── 5 Tetikleyici Simülasyonu ─────────────────────────────────────────────
+# â”€â”€ 5 Tetikleyici SimÃ¼lasyonu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 SIMULASYON_SENARYOLARI = [
     {
-        "ad": "TETIK 1 — Hafiza Bos",
+        "ad": "TETIK 1 â€” Hafiza Bos",
         "hafiza_bos": True,
         "guven_skoru": 1.0,
         "basarisiz_deneme": 0,
@@ -264,7 +264,7 @@ SIMULASYON_SENARYOLARI = [
         "beklenen_tetik": 1,
     },
     {
-        "ad": "TETIK 2 — Guven Dusuk",
+        "ad": "TETIK 2 â€” Guven Dusuk",
         "hafiza_bos": False,
         "guven_skoru": 0.25,
         "basarisiz_deneme": 0,
@@ -273,7 +273,7 @@ SIMULASYON_SENARYOLARI = [
         "beklenen_tetik": 2,
     },
     {
-        "ad": "TETIK 3 — Gorev Basarisiz",
+        "ad": "TETIK 3 â€” Gorev Basarisiz",
         "hafiza_bos": False,
         "guven_skoru": 0.9,
         "basarisiz_deneme": 2,
@@ -282,7 +282,7 @@ SIMULASYON_SENARYOLARI = [
         "beklenen_tetik": 3,
     },
     {
-        "ad": "TETIK 4 — Gecerlilik Doldu",
+        "ad": "TETIK 4 â€” Gecerlilik Doldu",
         "hafiza_bos": False,
         "guven_skoru": 0.9,
         "basarisiz_deneme": 0,
@@ -291,7 +291,7 @@ SIMULASYON_SENARYOLARI = [
         "beklenen_tetik": 4,
     },
     {
-        "ad": "TETIK 5 — Celiski",
+        "ad": "TETIK 5 â€” Celiski",
         "hafiza_bos": False,
         "guven_skoru": 0.9,
         "basarisiz_deneme": 0,
@@ -303,7 +303,7 @@ SIMULASYON_SENARYOLARI = [
 
 
 def tetikleyici_simulasyonu() -> list[dict]:
-    """5 tetikleyiciyi simüle et ve sonuçları döndür."""
+    """5 tetikleyiciyi simÃ¼le et ve sonuÃ§larÄ± dÃ¶ndÃ¼r."""
     sonuclar = []
     for senaryo in SIMULASYON_SENARYOLARI:
         tid, bilgi = hangi_tetikleyici(
@@ -315,7 +315,7 @@ def tetikleyici_simulasyonu() -> list[dict]:
         )
 
         beklenen = senaryo["beklenen_tetik"]
-        durum = "✅" if tid == beklenen else "❌"
+        durum = "âœ…" if tid == beklenen else "âŒ"
 
         sonuclar.append(
             {
@@ -331,7 +331,7 @@ def tetikleyici_simulasyonu() -> list[dict]:
     return sonuclar
 
 
-# ── Tam Döngü ─────────────────────────────────────────────────────────────
+# â”€â”€ Tam DÃ¶ngÃ¼ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def web_test_loop(
@@ -340,12 +340,12 @@ def web_test_loop(
     yeni_yontem: Callable[[], TestSonucu],
 ) -> dict[str, Any]:
     """
-    WEB → UYGULA → PUANLA → KARAR tam döngüsü.
+    WEB â†’ UYGULA â†’ PUANLA â†’ KARAR tam dÃ¶ngÃ¼sÃ¼.
 
     Args:
-        konu: Test edilen konu (örn. "nmap UDP tarama")
-        eski_yontem: Eski yöntemi çalıştırıp TestSonucu döndüren fonksiyon
-        yeni_yontem: Yeni yöntemi çalıştırıp TestSonucu döndüren fonksiyon
+        konu: Test edilen konu (Ã¶rn. "nmap UDP tarama")
+        eski_yontem: Eski yÃ¶ntemi Ã§alÄ±ÅŸtÄ±rÄ±p TestSonucu dÃ¶ndÃ¼ren fonksiyon
+        yeni_yontem: Yeni yÃ¶ntemi Ã§alÄ±ÅŸtÄ±rÄ±p TestSonucu dÃ¶ndÃ¼ren fonksiyon
 
     Returns:
         {
@@ -356,15 +356,15 @@ def web_test_loop(
             "puan_tablosu": {...}
         }
     """
-    # ADIM 2 — Uygula (sandbox'ta test et)
+    # ADIM 2 â€” Uygula (sandbox'ta test et)
     eski_sonuc = eski_yontem()
     yeni_sonuc = yeni_yontem()
 
-    # ADIM 3 — Puanla
+    # ADIM 3 â€” Puanla
     eski_puan = eski_sonuc.puan()
     yeni_puan = yeni_sonuc.puan()
 
-    # ADIM 4 — Karar
+    # ADIM 4 â€” Karar
     karar = karar_ver(eski_sonuc, yeni_sonuc)
 
     return {
@@ -407,25 +407,25 @@ def web_test_loop(
 
 
 if __name__ == "__main__":
-    # ── TEST: nmap UDP tarama ──────────────────────────────────────────
+    # â”€â”€ TEST: nmap UDP tarama â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     print("=" * 65)
     print("TEST: nmap icin en hizli UDP tarama yontemi")
     print("=" * 65)
 
-    # Eski yöntem: nmap -sU -p 1-1000 (tam UDP tarama, yavaş)
+    # Eski yÃ¶ntem: nmap -sU -p 1-1000 (tam UDP tarama, yavaÅŸ)
     eski_yontem = lambda: TestSonucu(
         yontem_adi="nmap -sU tam UDP tarama",
-        hiz_sn=45.0,  # yavaş
+        hiz_sn=45.0,  # yavaÅŸ
         basari=True,
         cikti_dogru=True,
-        guvenlik=1.0,  # nmap güvenli
+        guvenlik=1.0,  # nmap gÃ¼venli
         kaynak_guven=0.9,  # resmi doc
     )
 
-    # Yeni yöntem (web'den bulunan): nmap -sU --top-ports 100 (hızlı)
+    # Yeni yÃ¶ntem (web'den bulunan): nmap -sU --top-ports 100 (hÄ±zlÄ±)
     yeni_yontem = lambda: TestSonucu(
         yontem_adi="nmap -sU --top-ports 100",
-        hiz_sn=5.0,  # çok hızlı
+        hiz_sn=5.0,  # Ã§ok hÄ±zlÄ±
         basari=True,
         cikti_dogru=True,  # ilk 100 port yeterli
         guvenlik=1.0,
@@ -454,7 +454,7 @@ if __name__ == "__main__":
     print(f"Fark: {sonuc['karar']['fark']}")
     print(f"Eski korundu: {sonuc['karar']['eski_korundu']}")
 
-    # ── 5 Tetikleyici Test ─────────────────────────────────────────────
+    # â”€â”€ 5 Tetikleyici Test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     print("\n" + "=" * 65)
     print("5 TETIKLEYICI TESTI")
     print("=" * 65)
@@ -464,9 +464,9 @@ if __name__ == "__main__":
         print(f"   Ateslenen: #{t['ateslenen_tetik']} ({t['tetikleyici_adi']})")
         print(f"   Kosul: {t['kosul']}")
 
-    # ── Puanlama testi: fark < 0.2 durumu ─────────────────────────────
+    # â”€â”€ Puanlama testi: fark < 0.2 durumu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     print("\n" + "=" * 65)
-    print("TEST: Fark < 0.2 → Eski korunur")
+    print("TEST: Fark < 0.2 â†’ Eski korunur")
     print("=" * 65)
     eski2 = TestSonucu("nmap -sU -p 1-100", 10.0, True, True, 1.0, 0.9)
     yeni2 = TestSonucu("nmap -sU --top-ports 50", 8.0, True, True, 1.0, 0.7)

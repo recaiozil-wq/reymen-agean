@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """health_check.py - ReYMeN Calisma Zamani Saglik Kontrolu.
 
 Kullanim:
@@ -228,19 +228,19 @@ class HealthChecker:
         aciklama="",
     ):
         """
-        Katman 1 — Denetim sonucunu bulgu panosuna OTOMATİK kaydeder.
+        Katman 1 â€” Denetim sonucunu bulgu panosuna OTOMATÄ°K kaydeder.
 
-        Her tam_kontrol() çalıştığında bu fonksiyon çağrılır:
-          1. HealthChecker bulgularını (self.sorunlar) board'a yazar
-          2. Eğer hiç sorun yoksa "Temiz rapor" kaydı düşer
-          3. Bağımsız çağrı: audit_tamamla(bulan_profil="reymen", konu="...", ...)
+        Her tam_kontrol() Ã§alÄ±ÅŸtÄ±ÄŸÄ±nda bu fonksiyon Ã§aÄŸrÄ±lÄ±r:
+          1. HealthChecker bulgularÄ±nÄ± (self.sorunlar) board'a yazar
+          2. EÄŸer hiÃ§ sorun yoksa "Temiz rapor" kaydÄ± dÃ¼ÅŸer
+          3. BaÄŸÄ±msÄ±z Ã§aÄŸrÄ±: audit_tamamla(bulan_profil="reymen", konu="...", ...)
 
         Parametreler:
             bulan_profil: "reymen"/"kiral38"/"pasa_38"/"default"
-            konu: Bulgu başlığı
-            dosya_yolu: İlgili dosya (opsiyonel)
+            konu: Bulgu baÅŸlÄ±ÄŸÄ±
+            dosya_yolu: Ä°lgili dosya (opsiyonel)
             onem_derecesi: "kritik"/"orta"/"dusuk"
-            aciklama: Açıklama metni
+            aciklama: AÃ§Ä±klama metni
         Returns:
             {"basarili": bool, "id": int|None, "hata": str|None}
         """
@@ -251,7 +251,7 @@ class HealthChecker:
         # Board yolunu bul
         board_path = self.base_dir / "shared_state" / "findings_board.db"
 
-        # DB yoksa oluştur
+        # DB yoksa oluÅŸtur
         board_path.parent.mkdir(parents=True, exist_ok=True)
         conn = sqlite3.connect(str(board_path))
         cur = conn.cursor()
@@ -276,7 +276,7 @@ class HealthChecker:
         now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
         profil = bulan_profil or "reymen"
 
-        # Eğer spesifik konu verilmemişse, self.sorunlar'ı board'a yaz
+        # EÄŸer spesifik konu verilmemiÅŸse, self.sorunlar'Ä± board'a yaz
         if konu is None:
             yazilan = 0
             for sorun in self.sorunlar:
@@ -303,7 +303,7 @@ class HealthChecker:
                     logger.warning("[audit_tamamla] Kayit hatasi: %s", e)
 
             if yazilan == 0 and not self.sorunlar:
-                # Hiç sorun yok — "temiz" kaydı
+                # HiÃ§ sorun yok â€” "temiz" kaydÄ±
                 cur.execute(
                     """
                     INSERT OR IGNORE INTO findings
@@ -329,7 +329,7 @@ class HealthChecker:
             )
             return {"basarili": True, "id": son_id, "yazilan": yazilan, "hata": None}
 
-        # Spesifik kayıt
+        # Spesifik kayÄ±t
         try:
             cur.execute(
                 """
@@ -345,7 +345,7 @@ class HealthChecker:
             conn.close()
 
             if yazildi:
-                logger.info("[audit_tamamla] Kaydedildi: #%d — %s", son_id, konu[:60])
+                logger.info("[audit_tamamla] Kaydedildi: #%d â€” %s", son_id, konu[:60])
             else:
                 logger.info("[audit_tamamla] Atlandi (benzersiz): %s", konu[:60])
 
@@ -364,12 +364,12 @@ class HealthChecker:
 
     def check_findings_board_health(self):
         """
-        Katman 2 — Bulgu Panosu (findings_board.db) Sağlık Kontrolü.
+        Katman 2 â€” Bulgu Panosu (findings_board.db) SaÄŸlÄ±k KontrolÃ¼.
 
-        1. Son 7 günde en az 1 audit/tarama çalıştı mı? (log'lardan kontrol)
-        2. Audit çalıştıysa, aynı dönemde board'a yeni bulgu eklendi mi?
-        3. Audit var ama board güncel değilse → Telegram uyarısı
-        4. 3 profilin SOUL.md'sinde findings_board kuralı hala var mı? (haftalık)
+        1. Son 7 gÃ¼nde en az 1 audit/tarama Ã§alÄ±ÅŸtÄ± mÄ±? (log'lardan kontrol)
+        2. Audit Ã§alÄ±ÅŸtÄ±ysa, aynÄ± dÃ¶nemde board'a yeni bulgu eklendi mi?
+        3. Audit var ama board gÃ¼ncel deÄŸilse â†’ Telegram uyarÄ±sÄ±
+        4. 3 profilin SOUL.md'sinde findings_board kuralÄ± hala var mÄ±? (haftalÄ±k)
         """
         import datetime, json, re
 
@@ -384,7 +384,7 @@ class HealthChecker:
         yedi_gun_once = now - datetime.timedelta(days=7)
         yedi_gun_once_ts = yedi_gun_once.timestamp()
 
-        # 1) Log'lardan son 7 günde audit/tarama ara
+        # 1) Log'lardan son 7 gÃ¼nde audit/tarama ara
         log_dir = self.base_dir / "logs"
         audit_bulundu = False
         if log_dir.exists():
@@ -403,7 +403,7 @@ class HealthChecker:
                         break
                 except Exception:
                     pass
-        # Her ihtimale karşı .ReYMeN/logs/ dizinini de kontrol et
+        # Her ihtimale karÅŸÄ± .ReYMeN/logs/ dizinini de kontrol et
         reymen_log = self.base_dir / ".ReYMeN" / "logs"
         if not audit_bulundu and reymen_log.exists():
             for log_file in reymen_log.glob("*.log"):
@@ -424,7 +424,7 @@ class HealthChecker:
 
         sonuc["son_7_gun_audit"] = audit_bulundu
 
-        # 2) Board'da son 7 günde yeni bulgu var mı?
+        # 2) Board'da son 7 gÃ¼nde yeni bulgu var mÄ±?
         board_guncellendi = False
         board_path = self.base_dir / "shared_state" / "findings_board.db"
         if board_path.exists():
@@ -445,7 +445,7 @@ class HealthChecker:
 
         sonuc["son_7_gun_board_guncellemesi"] = board_guncellendi
 
-        # 3) Audit var ama board güncel değilse uyarı
+        # 3) Audit var ama board gÃ¼ncel deÄŸilse uyarÄ±
         if audit_bulundu and not board_guncellendi:
             uyari = (
                 "Denetim yapildi ama bulgu panosuna yazilmadi, "
@@ -454,8 +454,8 @@ class HealthChecker:
             sonuc["uyari_mesaji"] = uyari
             self._sorun_ekle(HealthDurum.UYARI, "findings_board", uyari)
 
-        # 4) 3 profilin SOUL.md'sinde kural hala var mı?
-        hermes_profiles = Path.home() / "AppData" / "Local" / "hermes" / "profiles"
+        # 4) 3 profilin SOUL.md'sinde kural hala var mÄ±?
+        hermes_profiles = Path.home() / "AppData" / "Local" / "reymen" / "profiles"
         for profil_adi in ["default", "reymen", "kiral38"]:
             soul_path = hermes_profiles / profil_adi / "SOUL.md"
             kural_var = False

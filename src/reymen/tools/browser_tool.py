@@ -1,4 +1,4 @@
-"""ReYMeN tools.browser_tool shim — Hermes browser fonksiyonlarını ReYMeN browser_engine'e yönlendirir."""
+﻿"""ReYMeN tools.browser_tool shim â€” ReYMeN browser fonksiyonlarÄ±nÄ± ReYMeN browser_engine'e yÃ¶nlendirir."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 def _emergency_cleanup_all_sessions() -> None:
-    """Hermes browser acil kapatma — ReYMeN browser_engine'e yönlendirir."""
+    """ReYMeN browser acil kapatma â€” ReYMeN browser_engine'e yÃ¶nlendirir."""
     try:
         from reymen.arac.browser_engine import BrowserEngine
 
@@ -21,27 +21,27 @@ def _emergency_cleanup_all_sessions() -> None:
 
 
 def cleanup_all_browsers() -> None:
-    """Tüm browser session'larını temizler."""
+    """TÃ¼m browser session'larÄ±nÄ± temizler."""
     _emergency_cleanup_all_sessions()
 
 
 def cleanup_browser() -> None:
-    """Aktif browser session'ını temizler."""
+    """Aktif browser session'Ä±nÄ± temizler."""
     _emergency_cleanup_all_sessions()
 
 
 def _stop_cdp_supervisor() -> None:
-    """CDP supervisor'ı durdurur. ReYMeN'de kullanılmaz."""
+    """CDP supervisor'Ä± durdurur. ReYMeN'de kullanÄ±lmaz."""
     pass
 
 
 def _ensure_cdp_supervisor(*args, **kwargs) -> None:
-    """CDP supervisor'ı garanti eder. ReYMeN'de direkt Playwright kullanılır."""
+    """CDP supervisor'Ä± garanti eder. ReYMeN'de direkt Playwright kullanÄ±lÄ±r."""
     pass
 
 
 def _get_browser_engine() -> Any:
-    """Hermes browser engine referansı — ReYMeN BrowserEngine döndürür."""
+    """ReYMeN browser engine referansÄ± â€” ReYMeN BrowserEngine dÃ¶ndÃ¼rÃ¼r."""
     try:
         from reymen.arac.browser_engine import BrowserEngine
 
@@ -52,17 +52,17 @@ def _get_browser_engine() -> Any:
 
 
 def _get_cloud_provider() -> Optional[str]:
-    """Hermes cloud browser provider — ReYMeN'de local browser kullanılır."""
+    """ReYMeN cloud browser provider â€” ReYMeN'de local browser kullanÄ±lÄ±r."""
     return None
 
 
 # ---------------------------------------------------------------------------
-# Ana browser tool fonksiyonları
+# Ana browser tool fonksiyonlarÄ±
 # ---------------------------------------------------------------------------
 
 
 def browser_navigate(url: str) -> str:
-    """Hermes browser_navigate — ReYMeN browser_engine'e yönlendirir."""
+    """ReYMeN browser_navigate â€” ReYMeN browser_engine'e yÃ¶nlendirir."""
     import json
 
     try:

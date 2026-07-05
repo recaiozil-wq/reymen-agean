@@ -1,2 +1,2 @@
-# -*- coding: utf-8 -*-
-"""gateway — ReYMeN gateway paketi (gateways/'den re-export)."""
+﻿# -*- coding: utf-8 -*-
+"""gateway â€” ReYMeN gateway paketi (gateways/'den re-export)."""

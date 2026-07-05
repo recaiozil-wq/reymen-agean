@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-batch_runner.py — ReYMeN Paralel Toplu Gorev Isleme.
+batch_runner.py â€” ReYMeN Paralel Toplu Gorev Isleme.
 
 Birden cok hedefi sirali veya paralel olarak calistirir.
 Checkpoint destegi ile yarida kalan toplu islemlere devam eder.
@@ -32,7 +32,7 @@ CIKTI_DIZIN = ROOT / "logs" / "batch"
 CIKTI_DIZIN.mkdir(parents=True, exist_ok=True)
 
 
-# ── Sonuc Yoneticisi ─────────────────────────────────────────────────
+# â”€â”€ Sonuc Yoneticisi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class SonucYoneticisi:
@@ -100,7 +100,7 @@ class SonucYoneticisi:
             }
 
 
-# ── Gorev Isleyici ───────────────────────────────────────────────────
+# â”€â”€ Gorev Isleyici â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def gorev_isle(
@@ -113,7 +113,7 @@ def gorev_isle(
         return
 
     if verbose:
-        print(f"\n[Batch] Basliyor: {gorev_id} — {hedef[:60]}")
+        print(f"\n[Batch] Basliyor: {gorev_id} â€” {hedef[:60]}")
 
     t0 = time.time()
     sonuc = None
@@ -190,7 +190,7 @@ def paralel_calistir(
         t.join()
 
 
-# ── CLI ─────────────────────────────────────────────────────────────
+# â”€â”€ CLI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def main():
@@ -232,7 +232,7 @@ def main():
             gorev_isle(h["id"], h["hedef"], sonuc_yoneticisi, not args.sessiz)
 
     ozet = sonuc_yoneticisi.ozet()
-    print(f"\n[Batch] Bitti — {time.time()-t0:.1f}s")
+    print(f"\n[Batch] Bitti â€” {time.time()-t0:.1f}s")
     print(
         f"  Toplam: {ozet['toplam']} | Basarili: {ozet['basarili']} | Basarisiz: {ozet['basarisiz']}"
     )
@@ -240,7 +240,7 @@ def main():
 
 
 def motor_kaydet(motor):
-    """Batch runner araçlarını motora kaydet."""
+    """Batch runner araÃ§larÄ±nÄ± motora kaydet."""
     if not hasattr(motor, "_plugin_arac_kaydet"):
         return
     import subprocess, sys as _sys
@@ -253,8 +253,8 @@ def motor_kaydet(motor):
             text=True,
             timeout=300,
         ).stdout[:500]
-        or "[Batch]: Çalıştırıldı",
-        "Toplu görev dosyasını çalıştır (dosya: jsonl yolu, paralel: iş sayısı)",
+        or "[Batch]: Ã‡alÄ±ÅŸtÄ±rÄ±ldÄ±",
+        "Toplu gÃ¶rev dosyasÄ±nÄ± Ã§alÄ±ÅŸtÄ±r (dosya: jsonl yolu, paralel: iÅŸ sayÄ±sÄ±)",
     )
 
 

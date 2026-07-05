@@ -1,10 +1,10 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-alt_ajan.py — Ana ajandan bağımsız, kendi ReAct döngüsüne sahip
-izole alt ajan modülü.
+alt_ajan.py â€” Ana ajandan baÄŸÄ±msÄ±z, kendi ReAct dÃ¶ngÃ¼sÃ¼ne sahip
+izole alt ajan modÃ¼lÃ¼.
 
-LLM çağrıları I/O-bound olduğu için threading yeterli.
-Ana ajanı ASLA bloklamaz — görevlendirme anında task_id döner.
+LLM Ã§aÄŸrÄ±larÄ± I/O-bound olduÄŸu iÃ§in threading yeterli.
+Ana ajanÄ± ASLA bloklamaz â€” gÃ¶revlendirme anÄ±nda task_id dÃ¶ner.
 """
 
 import os
@@ -17,8 +17,8 @@ from collections import Counter
 from dataclasses import dataclass, field
 from typing import Optional
 
-# ReYMeN arayüzleri
-from src.reymen.cereyan.beyin import Beyin
+# ReYMeN arayÃ¼zleri
+from reymen.cereyan.beyin import Beyin
 import yaml
 from pathlib import Path
 import logging
@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 ROOT = Path(__file__).parent.resolve()
 
-# .env dosyasını yükle (API anahtarları için)
+# .env dosyasÄ±nÄ± yÃ¼kle (API anahtarlarÄ± iÃ§in)
 try:
     from dotenv import load_dotenv
 
@@ -35,7 +35,7 @@ try:
 except ImportError as _alt_ajan_e30:
     print(f"[UYARI] alt_ajan.py:31 - {_alt_ajan_e30}")
 
-# Alt ajan için ayrı Beyin instance'ı
+# Alt ajan iÃ§in ayrÄ± Beyin instance'Ä±
 try:
     with open(ROOT / "config.yaml", encoding="utf-8") as f:
         _CONFIG = yaml.safe_load(f) or {}
@@ -46,17 +46,17 @@ except (FileNotFoundError, OSError) as _alt_ajan_e35:
     _CONFIG = {}
 _ALT_BEYIN = Beyin(_CONFIG)
 
-# Thread-local: alt ajan içinde olup olmadığımızı işaretler
+# Thread-local: alt ajan iÃ§inde olup olmadÄ±ÄŸÄ±mÄ±zÄ± iÅŸaretler
 _alt_ajan_tls = threading.local()
 
 
 def _alt_ajan_icinde_mi() -> bool:
-    """Motor.py'nin ALT_AJAN_GOREVLENDIR handler'ı bu fonksiyonu
-    çağırarak mevcut thread'in bir alt ajana ait olup olmadığını kontrol eder."""
+    """Motor.py'nin ALT_AJAN_GOREVLENDIR handler'Ä± bu fonksiyonu
+    Ã§aÄŸÄ±rarak mevcut thread'in bir alt ajana ait olup olmadÄ±ÄŸÄ±nÄ± kontrol eder."""
     return getattr(_alt_ajan_tls, "aktif", False)
 
 
-# Alt ajanların kullanabileceği araç seti (tehlikeli/alt-ajan araçları HARİÇ)
+# Alt ajanlarÄ±n kullanabileceÄŸi araÃ§ seti (tehlikeli/alt-ajan araÃ§larÄ± HARÄ°Ã‡)
 _ALT_AJAN_IZINLI_ARACLAR = frozenset(
     {
         "KOMUT_CALISTIR",
@@ -75,7 +75,7 @@ _ALT_AJAN_IZINLI_ARACLAR = frozenset(
         "DOSYA_ANALIZ",
         "PROJE_TARA",
         "SKILL_ARA",
-        # ALT_AJAN_GOREVLENDIR BURADA YOK → zincir koruması
+        # ALT_AJAN_GOREVLENDIR BURADA YOK â†’ zincir korumasÄ±
     }
 )
 
@@ -97,10 +97,10 @@ class AltAjanSonuc:
 
 
 class AltAjan:
-    """Tek bir izole alt ajan oturumu. Kendi mesaj geçmişini tutar,
-    ana ajanın context'ine asla dokunmaz.
+    """Tek bir izole alt ajan oturumu. Kendi mesaj geÃ§miÅŸini tutar,
+    ana ajanÄ±n context'ine asla dokunmaz.
 
-    Motor.calistir() çağrılarını thread-safe bir kilit ile yönetir.
+    Motor.calistir() Ã§aÄŸrÄ±larÄ±nÄ± thread-safe bir kilit ile yÃ¶netir.
     """
 
     def __init__(
@@ -114,7 +114,7 @@ class AltAjan:
         self.task_id = str(uuid.uuid4())[:8]
         self.gorev = gorev
         self.baglam = baglam
-        # .env'den varsayılan max_adim, yoksa 15
+        # .env'den varsayÄ±lan max_adim, yoksa 15
         self.max_adim = max_adim or int(os.environ.get("ALT_AJAN_MAX_ADIM", "15"))
         self.derinlik = derinlik
         self.izinli_araclar = izinli_araclar or _ALT_AJAN_IZINLI_ARACLAR
@@ -125,15 +125,15 @@ class AltAjan:
             baglam=baglam,
         )
         self._motor = None  # lazy import
-        # Döngü dedektörü
-        self._onceki_gozlemler = []  # son 5 gözlemi tutar
+        # DÃ¶ngÃ¼ dedektÃ¶rÃ¼
+        self._onceki_gozlemler = []  # son 5 gÃ¶zlemi tutar
         self._onceki_eylemler: list[str] = []  # son 5 eylemi tutar
         self._onceki_hata_sayaci: int = 0  # ardisik hata sayaci (circuit breaker)
         self._baslangic_zamani = time.time()
         self._zaman_asimi = float(os.environ.get("ALT_AJAN_ZAMAN_ASIMI", "120"))
 
     def _motor_al(self):
-        """Lazy Motor instance — thread-safe."""
+        """Lazy Motor instance â€” thread-safe."""
         if self._motor is None:
             from reymen.cereyan.motor import Motor
 
@@ -146,15 +146,15 @@ class AltAjan:
     def _baslangic_promptu(self) -> str:
         arac_liste = "\n".join(f"  - {a}" for a in sorted(self.izinli_araclar))
         return (
-            f"Sen {self.task_id} ID'li bir ALT AJANSIN. Ana ajan tarafından görevlendirildin.\n"
-            f"\nGÖREV: {self.gorev}"
-            f"\nBAĞLAM: {self.baglam or '(verilmedi)'}"
-            f"\n\nKULLANABILECEĞİN ARAÇLAR:\n{arac_liste}"
+            f"Sen {self.task_id} ID'li bir ALT AJANSIN. Ana ajan tarafÄ±ndan gÃ¶revlendirildin.\n"
+            f"\nGÃ–REV: {self.gorev}"
+            f"\nBAÄLAM: {self.baglam or '(verilmedi)'}"
+            f"\n\nKULLANABILECEÄÄ°N ARAÃ‡LAR:\n{arac_liste}"
             f"\n\n== KATIKSIZ KURALLAR =="
             f"\n- Her turda MUTLAKA su formati kullan:"
             f"\n    Dusunce: [ne yapacagini ve neden acikla]"
             f"\n    Eylem: ARAC_ADI(\"parametre\")"
-            f"\n- Basit bilgi sorusu ise: Eylem: GOREV_BITTI(\"cevap\")  → hemen bitir"
+            f"\n- Basit bilgi sorusu ise: Eylem: GOREV_BITTI(\"cevap\")  â†’ hemen bitir"
             f"\n- ALT_AJAN_GOREVLENDIR aracini KULLANAMAZSIN (engellendi)"
             f"\n- Asla birden fazla eylem yazma"
             f"\n- Cevabini Turkce yaz"
@@ -162,7 +162,7 @@ class AltAjan:
         )
 
     def _eylem_coz(self, cevap: str):
-        """LLM çıktısından 'Eylem: ARAÇ("param")' yakalar."""
+        """LLM Ã§Ä±ktÄ±sÄ±ndan 'Eylem: ARAÃ‡("param")' yakalar."""
         m = re.search(r"Eylem:\s*([A-Z_]+)\s*\((.*)\)", cevap, re.DOTALL)
         if not m:
             return None, None
@@ -171,13 +171,13 @@ class AltAjan:
         return arac, ham_param
 
     def calistir(self) -> AltAjanSonuc:
-        """Senkron çalışır — AltAjanYoneticisi bunu thread'de çağırır.
+        """Senkron Ã§alÄ±ÅŸÄ±r â€” AltAjanYoneticisi bunu thread'de Ã§aÄŸÄ±rÄ±r.
 
-        ReAct döngüsü: Düşünce → Eylem → Gözlem → Tekrar
-        Motor üzerinden gerçek araçları kullanır.
+        ReAct dÃ¶ngÃ¼sÃ¼: DÃ¼ÅŸÃ¼nce â†’ Eylem â†’ GÃ¶zlem â†’ Tekrar
+        Motor Ã¼zerinden gerÃ§ek araÃ§larÄ± kullanÄ±r.
 
-        Döngü dedektörü: Aynı gözlem/eylem 3x tekrarlanırsa GOREV_BITTI'yi zorlar.
-        Zaman aşımı: ALT_AJAN_ZAMAN_ASIMI saniye sonra force bitirir.
+        DÃ¶ngÃ¼ dedektÃ¶rÃ¼: AynÄ± gÃ¶zlem/eylem 3x tekrarlanÄ±rsa GOREV_BITTI'yi zorlar.
+        Zaman aÅŸÄ±mÄ±: ALT_AJAN_ZAMAN_ASIMI saniye sonra force bitirir.
         """
         try:
             self.mesajlar.append(
@@ -187,7 +187,7 @@ class AltAjan:
             for adim in range(1, self.max_adim + 1):
                 self.sonuc.adim_sayisi = adim
 
-                # Zaman aşımı kontrolü
+                # Zaman aÅŸÄ±mÄ± kontrolÃ¼
                 gecen_sure = time.time() - self._baslangic_zamani
                 if gecen_sure > self._zaman_asimi:
                     self.sonuc.sonuc = f"(zaman_asimi={self._zaman_asimi}s doldu) Son durum: {self.mesajlar[-1]['content'][:200]}"
@@ -201,13 +201,13 @@ class AltAjan:
                 )
                 self.mesajlar.append({"role": "assistant", "content": cevap})
 
-                # BITTI veya GOREV_BITTI kontrolü
+                # BITTI veya GOREV_BITTI kontrolÃ¼
                 if cevap.strip().startswith("BITTI:"):
                     self.sonuc.sonuc = cevap.split("BITTI:", 1)[1].strip()
                     self.sonuc.durum = "tamamlandi"
                     return self.sonuc
                 if "GOREV_BITTI" in cevap:
-                    # GOREV_BITTI("...") içindeki metni çıkar
+                    # GOREV_BITTI("...") iÃ§indeki metni Ã§Ä±kar
                     import re as _re
 
                     m = _re.search(r'GOREV_BITTI\s*\(\s*"([^"]*)"\s*\)', cevap)
@@ -216,39 +216,39 @@ class AltAjan:
                         self.sonuc.durum = "tamamlandi"
                         return self.sonuc
 
-                # Eylem çözümle ve çalıştır
+                # Eylem Ã§Ã¶zÃ¼mle ve Ã§alÄ±ÅŸtÄ±r
                 arac, ham_param = self._eylem_coz(cevap)
                 if arac and arac in self.izinli_araclar:
                     try:
                         motor = self._motor_al()
                         gozlem = motor.calistir(arac, ham_param)
-                        self._onceki_hata_sayaci = 0  # basarili arac → sayaci sifirla
+                        self._onceki_hata_sayaci = 0  # basarili arac â†’ sayaci sifirla
                     except Exception as e:
-                        gozlem = f"[HATA] {arac} çalıştırılırken hata: {e}"
+                        gozlem = f"[HATA] {arac} Ã§alÄ±ÅŸtÄ±rÄ±lÄ±rken hata: {e}"
                         self._onceki_hata_sayaci += 1
                 elif arac:
                     gozlem = (
-                        f"[ENGELLENDI] '{arac}' aracı alt ajanlar için izinli değil."
+                        f"[ENGELLENDI] '{arac}' aracÄ± alt ajanlar iÃ§in izinli deÄŸil."
                     )
                     self._onceki_hata_sayaci += 1
                 else:
-                    # Eylem yok, düşünmeye devam et
-                    gozlem = "Devam et. Hedefe ulaştıysan BITTI: yaz."
+                    # Eylem yok, dÃ¼ÅŸÃ¼nmeye devam et
+                    gozlem = "Devam et. Hedefe ulaÅŸtÄ±ysan BITTI: yaz."
 
                 # Circuit Breaker: ardisik hata esigi asildi mi?
                 _HATA_ESIK = 5  # circuit_breaker.CircuitBreaker.ESIK ile uyumlu
                 if self._onceki_hata_sayaci >= _HATA_ESIK:
                     self.sonuc.sonuc = (
-                        f"[REACT_LOOP_DETECTOR] {self._onceki_hata_sayaci} ardisik hata — "
+                        f"[REACT_LOOP_DETECTOR] {self._onceki_hata_sayaci} ardisik hata â€” "
                         f"circuit open, gorev zorla sonlandirildi: {self.gorev[:100]}"
                     )
                     self.sonuc.durum = "tamamlandi"
                     return self.sonuc
 
-                self.mesajlar.append({"role": "user", "content": f"GÖZLEM: {gozlem}"})
+                self.mesajlar.append({"role": "user", "content": f"GÃ–ZLEM: {gozlem}"})
 
-                # === DÖNGÜ DEDEKTÖRÜ ===
-                # Son 5 gözlemi takip et
+                # === DÃ–NGÃœ DEDEKTÃ–RÃœ ===
+                # Son 5 gÃ¶zlemi takip et
                 self._onceki_gozlemler.append(gozlem)
                 if len(self._onceki_gozlemler) > 5:
                     self._onceki_gozlemler.pop(0)
@@ -259,25 +259,25 @@ class AltAjan:
                     if len(self._onceki_eylemler) > 5:
                         self._onceki_eylemler.pop(0)
 
-                # Aynı gözlem 3x tekrarlandı mı? → ReAct Loop Detector, force GOREV_BITTI
+                # AynÄ± gÃ¶zlem 3x tekrarlandÄ± mÄ±? â†’ ReAct Loop Detector, force GOREV_BITTI
                 if len(self._onceki_gozlemler) >= 3:
                     son_3 = self._onceki_gozlemler[-3:]
                     if len(set(son_3)) == 1:
                         self.sonuc.sonuc = (
                             f"[REACT_LOOP_DETECTOR] Ayni gozlem 3x tekrarlandi "
-                            f"({repr(son_3[0][:80])}) — GOREV_BITTI zorlandirildi. "
+                            f"({repr(son_3[0][:80])}) â€” GOREV_BITTI zorlandirildi. "
                             f"Gorev: {self.gorev[:100]}"
                         )
                         self.sonuc.durum = "tamamlandi"
                         return self.sonuc
 
-                # Aynı eylem 3x tekrarlandı mı? → ReAct Loop Detector
+                # AynÄ± eylem 3x tekrarlandÄ± mÄ±? â†’ ReAct Loop Detector
                 if len(self._onceki_eylemler) >= 3:
                     son_3_eylem = self._onceki_eylemler[-3:]
                     if len(set(son_3_eylem)) == 1:
                         self.sonuc.sonuc = (
                             f"[REACT_LOOP_DETECTOR] Ayni eylem 3x tekrarlandi "
-                            f"({son_3_eylem[0]}) — GOREV_BITTI zorlandirildi. "
+                            f"({son_3_eylem[0]}) â€” GOREV_BITTI zorlandirildi. "
                             f"Gorev: {self.gorev[:100]}"
                         )
                         self.sonuc.durum = "tamamlandi"
@@ -300,11 +300,11 @@ class AltAjan:
 
 
 class AltAjanYoneticisi:
-    """Alt ajanları thread'de başlatır, sonuçları task_id ile saklar.
-    Ana ajanı ASLA bloklamaz.
+    """Alt ajanlarÄ± thread'de baÅŸlatÄ±r, sonuÃ§larÄ± task_id ile saklar.
+    Ana ajanÄ± ASLA bloklamaz.
 
-    Background notification: callback fonksiyonu atanırsa ajan bitince
-    callback(task_id, sonuc) çağrılır. (ReYMeN delegate_task pattern'i)
+    Background notification: callback fonksiyonu atanÄ±rsa ajan bitince
+    callback(task_id, sonuc) Ã§aÄŸrÄ±lÄ±r. (ReYMeN delegate_task pattern'i)
     """
 
     def __init__(self, sonuc_zaman_asimi: float = 1800.0, callback=None) -> None:
@@ -320,10 +320,10 @@ class AltAjanYoneticisi:
         max_adim: int = 8,
         izinli_araclar: Optional[set] = None,
     ) -> str:
-        """Alt ajan başlatır, hemen task_id döner. Ana ajan bloklanmaz.
+        """Alt ajan baÅŸlatÄ±r, hemen task_id dÃ¶ner. Ana ajan bloklanmaz.
 
-        izinli_araclar: Alt ajanın kullanabileceği araç seti.
-                        None = varsayılan kısıtlı set.
+        izinli_araclar: Alt ajanÄ±n kullanabileceÄŸi araÃ§ seti.
+                        None = varsayÄ±lan kÄ±sÄ±tlÄ± set.
         """
         self._eski_sonuclari_temizle()
         alt = AltAjan(gorev, baglam, max_adim, izinli_araclar=izinli_araclar)
@@ -331,7 +331,7 @@ class AltAjanYoneticisi:
             self._gorevler[alt.task_id] = alt.sonuc
 
         def _calistir() -> None:
-            # Thread-local işareti koy → motor.py bu işareti görüp
+            # Thread-local iÅŸareti koy â†’ motor.py bu iÅŸareti gÃ¶rÃ¼p
             # ALT_AJAN_GOREVLENDIR'i bloklar
             _alt_ajan_tls.aktif = True
             try:
@@ -375,7 +375,7 @@ class AltAjanYoneticisi:
         return self.durum_sorgula(task_id)
 
     def _eski_sonuclari_temizle(self):
-        """30dk'dan eski tamamlanmış görevleri temizle (bellek sızıntısı önleme)."""
+        """30dk'dan eski tamamlanmÄ±ÅŸ gÃ¶revleri temizle (bellek sÄ±zÄ±ntÄ±sÄ± Ã¶nleme)."""
         simdi = time.time()
         with self._kilit:
             self._gorevler = {
@@ -386,21 +386,21 @@ class AltAjanYoneticisi:
             }
 
 
-# ── 1) ALT AJAN RETRY ────────────────────────────────────────────────
+# â”€â”€ 1) ALT AJAN RETRY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def alt_ajan_retry(task_id: str, max_retry: int = 2) -> Optional[str]:
-    """Başarısız bir alt ajan görevini tekrar dene.
+    """BaÅŸarÄ±sÄ±z bir alt ajan gÃ¶revini tekrar dene.
 
-    Orijinal goal + context ile yeni bir AltAjan oluşturup çalıştırır.
-    Eski sonucun durumu 'hata' ise retry yapar, aksi halde None döner.
+    Orijinal goal + context ile yeni bir AltAjan oluÅŸturup Ã§alÄ±ÅŸtÄ±rÄ±r.
+    Eski sonucun durumu 'hata' ise retry yapar, aksi halde None dÃ¶ner.
 
     Args:
-        task_id: Tekrar denenmek istenen görevin ID'si.
-        max_retry: Kaç kere tekrar deneneceği (varsayılan: 2).
+        task_id: Tekrar denenmek istenen gÃ¶revin ID'si.
+        max_retry: KaÃ§ kere tekrar deneneceÄŸi (varsayÄ±lan: 2).
 
     Returns:
-        Yeni task_id (başarılı başlatıldıysa) veya None.
+        Yeni task_id (baÅŸarÄ±lÄ± baÅŸlatÄ±ldÄ±ysa) veya None.
     """
     try:
         eski_sonuc = alt_ajan_yoneticisi.durum_sorgula(task_id)
@@ -456,11 +456,11 @@ def alt_ajan_retry(task_id: str, max_retry: int = 2) -> Optional[str]:
         return None
 
 
-# ── 2) ALT AJAN SONUC CALLBACK ────────────────────────────────────────
+# â”€â”€ 2) ALT AJAN SONUC CALLBACK â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _alt_ajan_varsayilan_callback(task_id: str, sonuc: "AltAjanSonuc") -> None:
-    """Varsayılan callback: sonucu log'a yaz."""
+    """VarsayÄ±lan callback: sonucu log'a yaz."""
     try:
         sure = round(sonuc.bitis - sonuc.baslangic, 2) if sonuc.bitis else "?"
         print(
@@ -476,18 +476,18 @@ def _alt_ajan_varsayilan_callback(task_id: str, sonuc: "AltAjanSonuc") -> None:
 
 
 def alt_ajan_sonuc_callback(task_id: str, callback_url: Optional[str] = None) -> bool:
-    """Bir alt ajan görevi tamamlanınca çağrılacak callback fonksiyonu ata.
+    """Bir alt ajan gÃ¶revi tamamlanÄ±nca Ã§aÄŸrÄ±lacak callback fonksiyonu ata.
 
-    callback_url=None ise varsayılan log callback'i kullanılır.
-    callback_url bir dosya yolu ise sonuc o dosyaya yazılır.
-    callback_url bir HTTP/HTTPS URL ise POST isteği gönderilir (ileriye dönük).
+    callback_url=None ise varsayÄ±lan log callback'i kullanÄ±lÄ±r.
+    callback_url bir dosya yolu ise sonuc o dosyaya yazÄ±lÄ±r.
+    callback_url bir HTTP/HTTPS URL ise POST isteÄŸi gÃ¶nderilir (ileriye dÃ¶nÃ¼k).
 
     Args:
-        task_id: Hedef görevin ID'si.
-        callback_url: Callback hedefi (None=varsayılan log, dosya yolu, URL).
+        task_id: Hedef gÃ¶revin ID'si.
+        callback_url: Callback hedefi (None=varsayÄ±lan log, dosya yolu, URL).
 
     Returns:
-        True başarılı, False başarısız.
+        True baÅŸarÄ±lÄ±, False baÅŸarÄ±sÄ±z.
     """
     try:
         sonuc = alt_ajan_yoneticisi.durum_sorgula(task_id)
@@ -496,7 +496,7 @@ def alt_ajan_sonuc_callback(task_id: str, callback_url: Optional[str] = None) ->
             return False
 
         if callback_url is None:
-            # Varsayılan: log callback
+            # VarsayÄ±lan: log callback
             sonuc._callback_fn = _alt_ajan_varsayilan_callback
             print(
                 f"[alt_ajan_sonuc_callback] '{task_id}' -> varsayilan log callback atandi."
@@ -584,7 +584,7 @@ def alt_ajan_sonuc_callback(task_id: str, callback_url: Optional[str] = None) ->
         return False
 
 
-# ── 3) GOREV HAVUZU (TASK POOL) ──────────────────────────────────────
+# â”€â”€ 3) GOREV HAVUZU (TASK POOL) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class AltAjanHavuzu:
@@ -764,12 +764,12 @@ class AltAjanHavuzu:
             }
 
 
-# Singleton'lar — motor.py buradan import eder
+# Singleton'lar â€” motor.py buradan import eder
 alt_ajan_yoneticisi = AltAjanYoneticisi()
 alt_ajan_havuzu = AltAjanHavuzu()
 
 
-# ── Kolaylik fonksiyonlari (dogrudan modul seviyesinde) ──────────────
+# â”€â”€ Kolaylik fonksiyonlari (dogrudan modul seviyesinde) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def alt_ajan_kuyruk_ekle(

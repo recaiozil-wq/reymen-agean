@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-scan_skills_apply.py — Kalan güncellemeleri uygula.
-118 dosya güncellenecek.
+scan_skills_apply.py â€” Kalan gÃ¼ncellemeleri uygula.
+118 dosya gÃ¼ncellenecek.
 """
 
 import hashlib
@@ -60,13 +60,13 @@ for dosya in md_dosyalari:
     if eski_hash and eski_hash != guncel_hash:
         guncellenecek.append((meta_adi, str(dosya), guncel_hash))
 
-print(f"Güncellenecek dosya sayısı: {len(guncellenecek)}")
+print(f"GÃ¼ncellenecek dosya sayÄ±sÄ±: {len(guncellenecek)}")
 
 # Apply updates in batches
 guncellenen = 0
 for i, (meta_adi, dosya_yolu, new_hash) in enumerate(guncellenecek):
     if i > 0 and i % 50 == 0:
-        print(f"  ... {i}/{len(guncellenecek)} işlendi...", flush=True)
+        print(f"  ... {i}/{len(guncellenecek)} iÅŸlendi...", flush=True)
 
     try:
         with open(dosya_yolu, "r", encoding="utf-8", errors="replace") as f:
@@ -131,6 +131,6 @@ for i, (meta_adi, dosya_yolu, new_hash) in enumerate(guncellenecek):
         logger.warning("ogrenme.db hatasi %s: %s", hedef, e)
 
 print(
-    f"\n✅ Güncelleme tamamlandı: {guncellenen}/{len(guncellenecek)} dosya güncellendi."
+    f"\nâœ… GÃ¼ncelleme tamamlandÄ±: {guncellenen}/{len(guncellenecek)} dosya gÃ¼ncellendi."
 )
 print(f"SONUC|updated={guncellenen}")

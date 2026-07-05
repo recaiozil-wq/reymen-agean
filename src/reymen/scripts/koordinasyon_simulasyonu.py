@@ -1,7 +1,7 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
-İki Ajan Koordineli Çalışma Simülasyonu
-Kali ajanı tespit eder, Windows ajanı engeller.
+Ä°ki Ajan Koordineli Ã‡alÄ±ÅŸma SimÃ¼lasyonu
+Kali ajanÄ± tespit eder, Windows ajanÄ± engeller.
 """
 
 import json, sys, time
@@ -9,7 +9,7 @@ import json, sys, time
 sys.path.insert(
     0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
-from src.reymen.cereyan.once_hafiza import (
+from reymen.cereyan.once_hafiza import (
     kaydet,
     ara,
     belirsiz_gorev_cozumle,
@@ -25,36 +25,36 @@ def log(msg):
     print(f"[{t:5.2f}s] {msg}")
 
 
-# ══════════════════════════════════════════
-# ADIM 1: KALI AJANI — Port Tara
-# ══════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ADIM 1: KALI AJANI â€” Port Tara
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 log("=" * 55)
 log("ADIM 1: KALI AJANI")
 log("=" * 55)
 
-# 1a) Hafızada kali/network/nmap var mı?
+# 1a) HafÄ±zada kali/network/nmap var mÄ±?
 log("[KALI] Hafizada kali/network bilgisi araniyor...")
 nmap_bilgi = ara("nmap ile port tara", kategori="kali/network", min_guven=0.5)
 if nmap_bilgi:
     log(
-        f"[KALI] ✅ HAFIZA ATLAMASI — ID={nmap_bilgi[0]['id']}, guven={nmap_bilgi[0]['guven_skoru']}"
+        f"[KALI] âœ… HAFIZA ATLAMASI â€” ID={nmap_bilgi[0]['id']}, guven={nmap_bilgi[0]['guven_skoru']}"
     )
     log(f"[KALI] Bilgi: {nmap_bilgi[0]['icerik'][:100]}")
 else:
-    log("[KALI] ❌ Hafizada yok — LLM cagrilirdi")
+    log("[KALI] âŒ Hafizada yok â€” LLM cagrilirdi")
     llm_calls += 1
 
-# 1b) Belirsiz görev kontrolü
+# 1b) Belirsiz gÃ¶rev kontrolÃ¼
 log("[KALI] 'localhost port tara' icin belirsiz gorev cozumleme...")
 belirsiz = belirsiz_gorev_cozumle("localhost port tara")
 if belirsiz["tahmin_kategori"]:
     log(
-        f"[KALI] ✅ Tahmin: {belirsiz['tahmin_kategori']} -> {belirsiz['tahmin_kayit']['hedef']}"
+        f"[KALI] âœ… Tahmin: {belirsiz['tahmin_kategori']} -> {belirsiz['tahmin_kayit']['hedef']}"
     )
 else:
-    log("[KALI] ❌ Tahmin yok")
+    log("[KALI] âŒ Tahmin yok")
 
-# 1c) Açık port listesi (netstat'tan gerçek)
+# 1c) AÃ§Ä±k port listesi (netstat'tan gerÃ§ek)
 acik_portlar = [
     ("135", "RPC", "Windows Remote Procedure Call"),
     ("445", "SMB", "Windows File Sharing"),
@@ -66,12 +66,12 @@ acik_portlar = [
 ]
 log("[KALI] Taranan portlar (127.0.0.1):")
 for port, proto, aciklama in acik_portlar:
-    log(f"  PORT {port:>8} / {proto:6} — {aciklama}")
+    log(f"  PORT {port:>8} / {proto:6} â€” {aciklama}")
 
-# 1e) Şüpheli port tespiti
+# 1e) ÅÃ¼pheli port tespiti
 sujehli = [p for p in acik_portlar if p[1] == "DEBUG"]
 if sujehli:
-    log(f"[KALI] ⚠️ SUJEPELI PORT: {sujehli[0][0]} ({sujehli[0][2]})")
+    log(f"[KALI] âš ï¸ SUJEPELI PORT: {sujehli[0][0]} ({sujehli[0][2]})")
     log("[KALI] Windows ajanina iletiyorum...")
     mesaj = {
         "kaynak": "kali",
@@ -84,36 +84,36 @@ if sujehli:
     }
     log(f"[KALI] -> MESAJ: {json.dumps(mesaj, ensure_ascii=False)}")
 
-# ══════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # ADIM 2: WINDOWS AJANI
-# ══════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 log("")
 log("=" * 55)
 log("ADIM 2: WINDOWS AJANI")
 log("=" * 55)
 
-# 2a) Kali'den gelen mesajı al
+# 2a) Kali'den gelen mesajÄ± al
 log("[WIN] Kali'den mesaj alindi...")
 log(f"[WIN] PORT_BLOCK komutu: {mesaj}")
 log("[WIN] Port 1234 netstat ile dogrulaniyor...")
 
-# 2b) Hafızada netstat bilgisi var mı?
+# 2b) HafÄ±zada netstat bilgisi var mÄ±?
 netstat_bilgi = ara(
     "netstat_komutu", kategori="windows/terminal/network", min_guven=0.5
 )
 if netstat_bilgi:
     log(
-        f"[WIN] ✅ HAFIZA ATLAMASI — ID={netstat_bilgi[0]['id']}, guven={netstat_bilgi[0]['guven_skoru']}"
+        f"[WIN] âœ… HAFIZA ATLAMASI â€” ID={netstat_bilgi[0]['id']}, guven={netstat_bilgi[0]['guven_skoru']}"
     )
 else:
-    log("[WIN] ❌ Hafizada yok — LLM cagrilirdi")
+    log("[WIN] âŒ Hafizada yok â€” LLM cagrilirdi")
     llm_calls += 1
 
-# 2c) Port doğrulama (gerçek netstat)
+# 2c) Port doÄŸrulama (gerÃ§ek netstat)
 log("[WIN] netstat -an | findstr 1234...")
-log("[WIN] ✅ Port 1234 dogrulandi: TCP 127.0.0.1:1234 LISTENING")
+log("[WIN] âœ… Port 1234 dogrulandi: TCP 127.0.0.1:1234 LISTENING")
 
-# 2d) Firewall kuralı
+# 2d) Firewall kuralÄ±
 log("[WIN] Windows Firewall kurali olusturuluyor...")
 kural = (
     "netsh advfirewall firewall add rule "
@@ -122,7 +122,7 @@ kural = (
     "protocol=TCP localport=1234"
 )
 log(f"[WIN] Uygulanan: {kural}")
-log("[WIN] ✅ Kural basariyla eklendi (simulasyon)")
+log("[WIN] âœ… Kural basariyla eklendi (simulasyon)")
 
 # 2e) Kali'ye geri bildirim
 cevap = {
@@ -136,9 +136,9 @@ cevap = {
 }
 log(f"[WIN] -> MESAJ: {json.dumps(cevap, ensure_ascii=False)}")
 
-# ══════════════════════════════════════════
-# ADIM 3: KOORDİNASYON
-# ══════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ADIM 3: KOORDÄ°NASYON
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 log("")
 log("=" * 55)
 log("ADIM 3: KOORDINASYON")
@@ -160,9 +160,9 @@ log("""
   }
 """)
 
-# ══════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # ADIM 4: HAFIZAYA KAYDET
-# ══════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 log("")
 log("=" * 55)
 log("ADIM 4: HAFIZAYA KAYDET")
@@ -192,11 +192,11 @@ kaydet(
     ),
     basari=True,
 )
-log("[HAFIZA] ✅ cross-platform/security kategorisine kaydedildi")
+log("[HAFIZA] âœ… cross-platform/security kategorisine kaydedildi")
 
-# ══════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # RAPOR
-# ══════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 toplam_sure = time.time() - basla
 log("")
 log("=" * 55)
@@ -207,4 +207,4 @@ log(f"Toplam sure: {toplam_sure:.2f}s")
 log(f"Tahmini maliyet: {llm_calls * 0.02:.4f} TL (hafiza atlamasi = 0 TL)")
 log(f"Hafiza kullanimi: {istatistik()['toplam']} toplam kayit")
 
-print("\n✅ SIMULASYON BASARIYLA TAMAMLANDI")
+print("\nâœ… SIMULASYON BASARIYLA TAMAMLANDI")

@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""security_audit.py — Guvenlik Denetimi.
+﻿# -*- coding: utf-8 -*-
+"""security_audit.py â€” Guvenlik Denetimi.
 
 Projedeki guvenlik aciklarini tarar, zafiyetleri raporlar
 ve duzeltme onerileri sunar.

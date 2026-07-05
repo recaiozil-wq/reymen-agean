@@ -1,4 +1,4 @@
-"""Handle /resume command — switch to a previous session mid-conversation."""
+﻿"""Handle /resume command â€” switch to a previous session mid-conversation."""
 
 import logging
 
@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 
 def handle_resume_command(cli, cmd_original: str) -> None:
-    """Handle /resume <session_id_or_title> — switch to a previous session mid-conversation."""
+    """Handle /resume <session_id_or_title> â€” switch to a previous session mid-conversation."""
     from reymen.sistem.cli_display import _cprint
 
     parts = cmd_original.split(None, 1)
@@ -31,7 +31,7 @@ def handle_resume_command(cli, cmd_original: str) -> None:
             # Arm a one-shot pending-resume selection so the user can type
             # just the number (`3`) on the next line instead of having to
             # retype `/resume 3`. The list here must match the one shown by
-            # _show_recent_sessions and used for index resolution below —
+            # _show_recent_sessions and used for index resolution below â€”
             # all three go through _list_recent_sessions(limit=10). See
             # #34584.
             cli._pending_resume_sessions = cli._list_recent_sessions(limit=10)
@@ -132,7 +132,7 @@ def handle_resume_command(cli, cmd_original: str) -> None:
             cli.agent._invalidate_system_prompt()
 
         # Notify memory providers that session_id rotated to a resumed
-        # session. reset=False — the provider's accumulated state is
+        # session. reset=False â€” the provider's accumulated state is
         # still valid; it just needs to target the new session_id for
         # subsequent writes. See #6672.
         try:
@@ -151,16 +151,16 @@ def handle_resume_command(cli, cmd_original: str) -> None:
     msg_count = len([m for m in cli.conversation_history if m.get("role") == "user"])
     if cli.conversation_history:
         _cprint(
-            f"  ↻ Resumed session {target_id}{title_part}"
+            f"  â†» Resumed session {target_id}{title_part}"
             f" ({msg_count} user message{'s' if msg_count != 1 else ''},"
             f" {len(cli.conversation_history)} total)"
         )
         cli._display_resumed_history()
     else:
         _cprint(
-            f"  ↻ Resumed session {target_id}{title_part} — no messages, starting fresh."
+            f"  â†» Resumed session {target_id}{title_part} â€” no messages, starting fresh."
         )
 
 
-# Needed by this handler — imported here to keep it accessible
-from src.reymen.sistem.cli_auth import _sync_process_session_id  # noqa: E402, F811
+# Needed by this handler â€” imported here to keep it accessible
+from reymen.sistem.cli_auth import _sync_process_session_id  # noqa: E402, F811

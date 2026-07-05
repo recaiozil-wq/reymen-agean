@@ -1,15 +1,15 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-ajan_suru.py — FAZ 6: Coklu Alt-Ajan Orkestrasyonu (Swarm).
+ajan_suru.py â€” FAZ 6: Coklu Alt-Ajan Orkestrasyonu (Swarm).
 
 Her "ajan" ayni beyin.py provider'ina farkli rol promptuyla
-gonderilen ayri bir LLM cagrisıdır — ek LLM baglantisi gerekmez.
+gonderilen ayri bir LLM cagrisÄ±dÄ±r â€” ek LLM baglantisi gerekmez.
 
 Roller:
-  MimarAjan    — Problemi 3 farkli yaklasim stratejisine bol.
-  GelistiriciAjan — En iyi stratejiyi somut eylem planina donustur.
-  DenetciAjan  — Plani elestir, zayif noktaları bul. Maksimum 2 tur.
-  OrkestratörAjan — Uc rolu koordine eder, sonucu tek string dondurur.
+  MimarAjan    â€” Problemi 3 farkli yaklasim stratejisine bol.
+  GelistiriciAjan â€” En iyi stratejiyi somut eylem planina donustur.
+  DenetciAjan  â€” Plani elestir, zayif noktalarÄ± bul. Maksimum 2 tur.
+  OrkestratÃ¶rAjan â€” Uc rolu koordine eder, sonucu tek string dondurur.
 
 Aktivasyon (main.py):
     karmasiklik >= 4 ise su sekilde kullan:
@@ -22,9 +22,9 @@ Aktivasyon (main.py):
 import re
 from typing import Optional
 
-# ─── Rol promptlari ──────────────────────────────────────────────────────────
+# â”€â”€â”€ Rol promptlari â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-_MIMAR_SISTEM = """Sen bir yazilim mimarisisın. Sana verilen problemi analiz et
+_MIMAR_SISTEM = """Sen bir yazilim mimarisisÄ±n. Sana verilen problemi analiz et
 ve birbirinden farkli 3 cozum stratejisi one cik. Her strateji icin:
   - Strateji adi (kisa)
   - Temel adimlar (en fazla 4 madde)
@@ -75,7 +75,7 @@ Yaniti Turkce yaz. Maks 10 eylem maddesi.
 """
 
 
-# ─── Yardimci: LLM cagrisi ───────────────────────────────────────────────────
+# â”€â”€â”€ Yardimci: LLM cagrisi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _rol_cagrisi(
@@ -91,7 +91,7 @@ def _rol_cagrisi(
         return f"[Rol Hatasi]: {e}"
 
 
-# ─── Rol sinifları ───────────────────────────────────────────────────────────
+# â”€â”€â”€ Rol siniflarÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class MimarAjan:
@@ -118,7 +118,7 @@ class MimarAjan:
 
 
 class GelistiriciAjan:
-    """Seçilen stratejiyi somut eylem planina donusturur."""
+    """SeÃ§ilen stratejiyi somut eylem planina donusturur."""
 
     def __init__(self, provider):
         self._provider = provider
@@ -134,7 +134,7 @@ class GelistiriciAjan:
 
 
 class DenetciAjan:
-    """Eylem planini elestirip onay/red kararı verir."""
+    """Eylem planini elestirip onay/red kararÄ± verir."""
 
     def __init__(self, provider, maks_tur: int = 2):
         self._provider = provider
@@ -150,7 +150,7 @@ class DenetciAjan:
         """
         mevcut_plan = plan
         for tur in range(1, self._maks_tur + 1):
-            print(f"[Denetci] Tur {tur}/{self._maks_tur} — plan inceleniyor...")
+            print(f"[Denetci] Tur {tur}/{self._maks_tur} â€” plan inceleniyor...")
             kullanici_msg = f"Problem: {hedef}\n\nEylem Plani:\n{mevcut_plan}"
             yanit = _rol_cagrisi(self._provider, _DENETCI_SISTEM, kullanici_msg)
 
@@ -220,13 +220,13 @@ class AjanSurusu:
         # Baslik ekle
         durum_etiketi = "ONAYLANDI" if onaylandi else "UYARI: kismi onay"
         return (
-            f"[Suru Analizi — {durum_etiketi}]\n\n"
+            f"[Suru Analizi â€” {durum_etiketi}]\n\n"
             f"{sentez}\n\n"
             f"---\n[Denetci Durumu]: {'Tam onay' if onaylandi else 'Maks tur asimi'}"
         )
 
 
-# ── Test ─────────────────────────────────────────────────────────────────────
+# â”€â”€ Test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
     print("=== ajan_suru.py Test ===\n")

@@ -1,4 +1,4 @@
-"""ReYMeNCLI mixin module — File/DevOps operations (rollback, snapshot, stop, debug, update)."""
+﻿"""ReYMeNCLI mixin module â€” File/DevOps operations (rollback, snapshot, stop, debug, update)."""
 
 import logging
 import os
@@ -27,16 +27,16 @@ logger = logging.getLogger(__name__)
 
 
 class MixinFileOps:
-    """ReYMeNCLI File/DevOps operations — rollback, snapshot, stop, debug, update."""
+    """ReYMeNCLI File/DevOps operations â€” rollback, snapshot, stop, debug, update."""
 
     def _handle_rollback_command(self, command: str):
-        """Handle /rollback — list, diff, or restore filesystem checkpoints.
+        """Handle /rollback â€” list, diff, or restore filesystem checkpoints.
 
         Syntax:
-            /rollback                 — list checkpoints
-            /rollback <N>             — restore checkpoint N (also undoes last chat turn)
-            /rollback diff <N>        — preview changes since checkpoint N
-            /rollback <N> <file>      — restore a single file from checkpoint N
+            /rollback                 â€” list checkpoints
+            /rollback <N>             â€” restore checkpoint N (also undoes last chat turn)
+            /rollback diff <N>        â€” preview changes since checkpoint N
+            /rollback <N> <file>      â€” restore a single file from checkpoint N
         """
         from tools.checkpoint_manager import format_checkpoint_list
 
@@ -93,7 +93,7 @@ class MixinFileOps:
                         else:
                             print(f"\n{diff}")
             else:
-                print(f"  ❌ {result['error']}")
+                print(f"  âŒ {result['error']}")
             return
 
         # Resolve checkpoint reference (number or hash)
@@ -113,11 +113,11 @@ class MixinFileOps:
         if result["success"]:
             if file_path:
                 print(
-                    f"  ✅ Restored {file_path} from checkpoint {result['restored_to']}: {result['reason']}"
+                    f"  âœ… Restored {file_path} from checkpoint {result['restored_to']}: {result['reason']}"
                 )
             else:
                 print(
-                    f"  ✅ Restored to checkpoint {result['restored_to']}: {result['reason']}"
+                    f"  âœ… Restored to checkpoint {result['restored_to']}: {result['reason']}"
                 )
             print("  A pre-rollback snapshot was saved automatically.")
 
@@ -127,16 +127,16 @@ class MixinFileOps:
                 self.undo_last(prefill=False)
                 print("  Chat turn undone to match restored file state.")
         else:
-            print(f"  ❌ {result['error']}")
+            print(f"  âŒ {result['error']}")
 
     def _handle_snapshot_command(self, command: str):
-        """Handle /snapshot — lightweight state snapshots for ReYMeN config/state.
+        """Handle /snapshot â€” lightweight state snapshots for ReYMeN config/state.
 
         Syntax:
-            /snapshot                  — list recent snapshots
-            /snapshot create [label]   — create a snapshot
-            /snapshot restore <id>     — restore state from snapshot
-            /snapshot prune [N]        — prune to N snapshots (default 20)
+            /snapshot                  â€” list recent snapshots
+            /snapshot create [label]   â€” create a snapshot
+            /snapshot restore <id>     â€” restore state from snapshot
+            /snapshot prune [N]        â€” prune to N snapshots (default 20)
         """
         from reymen.reymen_cli.backup import (
             create_quick_snapshot,
@@ -157,7 +157,7 @@ class MixinFileOps:
                 return
             print(f"  State snapshots ({display_reymen_home()}/state-snapshots/):\n")
             print(f"  {'#':>3}  {'ID':<35} {'Files':>5} {'Size':>10} {'Label'}")
-            print(f"  {'─'*3}  {'─'*35} {'─'*5} {'─'*10} {'─'*20}")
+            print(f"  {'â”€'*3}  {'â”€'*35} {'â”€'*5} {'â”€'*10} {'â”€'*20}")
             for i, s in enumerate(snaps, 1):
                 size = s.get("total_size", 0)
                 if size < 1024:
@@ -221,7 +221,7 @@ class MixinFileOps:
             print("  Usage: /snapshot [list|create [label]|restore <id>|prune [N]]")
 
     def _handle_stop_command(self):
-        """Handle /stop — kill all running background processes.
+        """Handle /stop â€” kill all running background processes.
 
         Inspired by OpenAI Codex's separation of interrupt (stop current turn)
         from /stop (clean up background processes). See openai/codex#14602.
@@ -237,10 +237,10 @@ class MixinFileOps:
 
         print(f"  Stopping {len(running)} background process(es)...")
         killed = process_registry.kill_all()
-        print(f"  ✅ Stopped {killed} process(es).")
+        print(f"  âœ… Stopped {killed} process(es).")
 
     def _handle_debug_command(self):
-        """Handle /debug — upload debug report + logs and print paste URLs."""
+        """Handle /debug â€” upload debug report + logs and print paste URLs."""
         from reymen.reymen_cli.debug import run_debug_share
         from types import SimpleNamespace
 
@@ -248,7 +248,7 @@ class MixinFileOps:
         run_debug_share(args)
 
     def _handle_update_command(self) -> bool:
-        """Handle /update — update ReYMeN Agent to the latest version.
+        """Handle /update â€” update ReYMeN Agent to the latest version.
 
         In the classic CLI this exits the session and relaunches as
         ``ReYMeN update`` so the user sees update output directly and gets
@@ -262,7 +262,7 @@ class MixinFileOps:
         from reymen.reymen_cli.config import is_managed, format_managed_message
 
         if is_managed():
-            print(f"  ✗ {format_managed_message('update ReYMeN Agent')}")
+            print(f"  âœ— {format_managed_message('update ReYMeN Agent')}")
             return False
 
         # Use the prompt_toolkit-native modal so the confirmation panel
@@ -274,20 +274,20 @@ class MixinFileOps:
             ("cancel", "Cancel", "keep the current session"),
         ]
         raw = self._prompt_text_input_modal(
-            title="⚕  Update ReYMeN Agent",
+            title="âš•  Update ReYMeN Agent",
             detail="This will exit the current session and run `ReYMeN update`.",
             choices=choices,
         )
         if raw is None:
-            print("  🟡 /update cancelled.")
+            print("  ğŸŸ¡ /update cancelled.")
             return False
         choice = self._normalize_slash_confirm_choice(raw, choices)
         if choice != "once":
-            print("  🟡 /update cancelled.")
+            print("  ğŸŸ¡ /update cancelled.")
             return False
 
         print()
-        print("  ⚕ Launching update...")
+        print("  âš• Launching update...")
         print()
 
         # Store the relaunch args so run() can exec them from the main thread

@@ -1,4 +1,4 @@
-"""ReYMeNCLI mixin module — Media/Clipboard operations (paste, copy, image, voice)."""
+﻿"""ReYMeNCLI mixin module â€” Media/Clipboard operations (paste, copy, image, voice)."""
 
 import logging
 import os
@@ -27,10 +27,10 @@ logger = logging.getLogger(__name__)
 
 
 class MixinMedia:
-    """ReYMeNCLI Media/Clipboard operations — paste, copy, image, voice."""
+    """ReYMeNCLI Media/Clipboard operations â€” paste, copy, image, voice."""
 
     def _handle_paste_command(self):
-        """Handle /paste — explicitly check clipboard for an image.
+        """Handle /paste â€” explicitly check clipboard for an image.
 
         This is the reliable fallback for terminals where BracketedPaste
         doesn't fire for image-only clipboard content (e.g., VSCode terminal,
@@ -38,7 +38,7 @@ class MixinMedia:
         """
         if _is_termux_environment():
             _cprint(
-                f"  {_DIM}Clipboard image paste is not available on Termux — "
+                f"  {_DIM}Clipboard image paste is not available on Termux â€” "
                 f"use /image <path> or paste a local image path like "
                 f"{_termux_example_image_path()}{_RST}"
             )
@@ -49,7 +49,7 @@ class MixinMedia:
         if has_clipboard_image():
             if self._try_attach_clipboard_image():
                 n = len(self._attached_images)
-                _cprint(f"  📎 Image #{n} attached from clipboard")
+                _cprint(f"  ğŸ“ Image #{n} attached from clipboard")
             else:
                 _cprint(
                     f"  {_DIM}(>_<) Clipboard has an image but extraction failed{_RST}"
@@ -58,7 +58,7 @@ class MixinMedia:
             _cprint(f"  {_DIM}(._.) No image found in clipboard{_RST}")
 
     def _handle_copy_command(self, cmd_original: str) -> None:
-        """Handle /copy [number] — copy assistant output to clipboard."""
+        """Handle /copy [number] â€” copy assistant output to clipboard."""
         parts = cmd_original.split(maxsplit=1)
         arg = parts[1].strip() if len(parts) > 1 else ""
 
@@ -98,7 +98,7 @@ class MixinMedia:
             _cprint(f"  Clipboard copy failed: {e}")
 
     def _handle_image_command(self, cmd_original: str):
-        """Handle /image <path> — attach a local image file for the next prompt."""
+        """Handle /image <path> â€” attach a local image file for the next prompt."""
         raw_args = cmd_original.split(None, 1)[1].strip() if " " in cmd_original else ""
         if not raw_args:
             hint = (
@@ -121,7 +121,7 @@ class MixinMedia:
             return
 
         self._attached_images.append(image_path)
-        _cprint(f"  📎 Attached image: {image_path.name}")
+        _cprint(f"  ğŸ“ Attached image: {image_path.name}")
         if _remainder:
             _cprint(
                 f"  {_DIM}Now type your prompt (or use --image in single-query mode): {_remainder}{_RST}"

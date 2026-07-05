@@ -1,8 +1,8 @@
-"""_handle_kanban_command handler."""
+﻿"""_handle_kanban_command handler."""
 
 
 def _handle_kanban_command(cli, cmd: str):
-    """Handle the /kanban command — delegate to the shared kanban CLI.
+    """Handle the /kanban command â€” delegate to the shared kanban CLI.
 
     The string form passed here is the user's full ``/kanban ...``
     including the leading slash; we strip it and hand the remainder

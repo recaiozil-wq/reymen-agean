@@ -1,5 +1,5 @@
-"""
-🎨 ReYMeN Image Gen Provider — Image generation layer.
+﻿"""
+ğŸ¨ ReYMeN Image Gen Provider â€” Image generation layer.
 
 No API key required, fed from configuration,
 auto-discovers providers under plugins/image_gen/.
@@ -26,11 +26,11 @@ PROJE_KOK = Path(__file__).resolve().parent.parent.parent
 IMAGE_CACHE = PROJE_KOK / "reymen" / "web_ui" / "static" / "generated_images"
 HISTORY_FILE = PROJE_KOK / "reymen" / "web_ui" / "image_gen_history.json"
 
-# Varsayılan aspect ratio
+# VarsayÄ±lan aspect ratio
 DEFAULT_ASPECT_RATIO = "1:1"
 
 # ---------------------------------------------------------------------------
-# Yardımcılar
+# YardÄ±mcÄ±lar
 # ---------------------------------------------------------------------------
 
 
@@ -81,7 +81,7 @@ def save_url_image(url: str, provider: str, prompt: str) -> Tuple[str, str]:
         local_path.write_bytes(r.content)
         return url, str(local_path)
     except Exception as e:
-        logger.warning(f"[IMG] URL indirme hatası: {e}")
+        logger.warning(f"[IMG] URL indirme hatasÄ±: {e}")
         return url, ""
 
 
@@ -99,7 +99,7 @@ def save_b64_image(b64_data: str, provider: str, prompt: str) -> Tuple[str, str]
     local_path = IMAGE_CACHE / local_name
 
     try:
-        # Base64 verisini temizle (data:image/...;base64, önekini kaldır)
+        # Base64 verisini temizle (data:image/...;base64, Ã¶nekini kaldÄ±r)
         if "," in b64_data:
             b64_data = b64_data.split(",", 1)[1]
         image_bytes = base64.b64decode(b64_data)
@@ -107,12 +107,12 @@ def save_b64_image(b64_data: str, provider: str, prompt: str) -> Tuple[str, str]
         data_uri = f"data:image/png;base64,{b64_data}"
         return data_uri, str(local_path)
     except Exception as e:
-        logger.warning(f"[IMG] Base64 kaydetme hatası: {e}")
+        logger.warning(f"[IMG] Base64 kaydetme hatasÄ±: {e}")
         return "", ""
 
 
 # ---------------------------------------------------------------------------
-# Provider keşfi
+# Provider keÅŸfi
 # ---------------------------------------------------------------------------
 
 
@@ -125,13 +125,13 @@ def discover_providers() -> List[Dict[str, str]]:
     providers = []
 
     if not plugins_dir.exists():
-        logger.warning(f"[IMG] Plugin dizini bulunamadı: {plugins_dir}")
+        logger.warning(f"[IMG] Plugin dizini bulunamadÄ±: {plugins_dir}")
         return providers
 
     for entry in sorted(plugins_dir.iterdir()):
         if entry.is_dir() and (entry / "__init__.py").exists():
             provider_id = entry.name
-            # İsim formatı: fal → FAL, openai-codex → OpenAI Codex
+            # Ä°sim formatÄ±: fal â†’ FAL, openai-codex â†’ OpenAI Codex
             display = provider_id.replace("-", " ").title().replace(" ", " ")
             if provider_id == "xai":
                 display = "xAI (Grok)"
@@ -145,7 +145,7 @@ def discover_providers() -> List[Dict[str, str]]:
                 }
             )
 
-    # Fallback: provider bulunamazsa varsayılan listeyi döndür
+    # Fallback: provider bulunamazsa varsayÄ±lan listeyi dÃ¶ndÃ¼r
     if not providers:
         providers = [
             {"id": "fal", "name": "FAL.ai", "path": ""},
@@ -159,7 +159,7 @@ def discover_providers() -> List[Dict[str, str]]:
 
 
 # ---------------------------------------------------------------------------
-# Basit provider implementasyonu (API key gerektirmez - demo/simüle)
+# Basit provider implementasyonu (API key gerektirmez - demo/simÃ¼le)
 # ---------------------------------------------------------------------------
 
 
@@ -175,17 +175,17 @@ def generate_image_simple(
     2. If not available, try real APIs (from env vars)
     3. If nothing works, return a simulated image
     """
-    # Önce eklenti üzerinden dene
+    # Ã–nce eklenti Ã¼zerinden dene
     result = _try_plugin_provider(prompt, provider_id, aspect_ratio, model)
     if result.get("success"):
         return result
 
-    # Eklenti yoksa veya çalışmazsa, provider tipine göre dene
+    # Eklenti yoksa veya Ã§alÄ±ÅŸmazsa, provider tipine gÃ¶re dene
     result = _try_direct_api(prompt, provider_id, aspect_ratio, model)
     if result.get("success"):
         return result
 
-    # Hiçbiri çalışmazsa placeholder görsel oluştur
+    # HiÃ§biri Ã§alÄ±ÅŸmazsa placeholder gÃ¶rsel oluÅŸtur
     return _generate_placeholder(prompt, provider_id, model)
 
 
@@ -216,11 +216,11 @@ def _try_plugin_provider(
             if provider_cls:
                 provider = provider_cls()
             else:
-                return error_response("Provider sınıfı bulunamadı", provider_id)
+                return error_response("Provider sÄ±nÄ±fÄ± bulunamadÄ±", provider_id)
         else:
-            return error_response("Provider formatı tanınmadı", provider_id)
+            return error_response("Provider formatÄ± tanÄ±nmadÄ±", provider_id)
 
-        # Provider'ın generate metodu var mı?
+        # Provider'Ä±n generate metodu var mÄ±?
         if hasattr(provider, "generate"):
             result = provider.generate(
                 prompt=prompt,
@@ -232,20 +232,20 @@ def _try_plugin_provider(
         return error_response("Provider'da generate metodu yok", provider_id)
 
     except ImportError as e:
-        logger.debug(f"[IMG] Plugin import hatası ({provider_id}): {e}")
-        return error_response(f"Plugin yüklenemedi: {e}", provider_id)
+        logger.debug(f"[IMG] Plugin import hatasÄ± ({provider_id}): {e}")
+        return error_response(f"Plugin yÃ¼klenemedi: {e}", provider_id)
     except Exception as e:
-        logger.debug(f"[IMG] Plugin çalışma hatası ({provider_id}): {e}")
-        return error_response(f"Plugin hatası: {e}", provider_id)
+        logger.debug(f"[IMG] Plugin Ã§alÄ±ÅŸma hatasÄ± ({provider_id}): {e}")
+        return error_response(f"Plugin hatasÄ±: {e}", provider_id)
 
 
 def _try_direct_api(
     prompt: str, provider_id: str, aspect_ratio: str, model: str
 ) -> Dict[str, Any]:
-    """Try real APIs — read keys from environment variables."""
+    """Try real APIs â€” read keys from environment variables."""
     import requests
 
-    # Aspect ratio'yu API parametresine çevir
+    # Aspect ratio'yu API parametresine Ã§evir
     size_map = {
         "1:1": "1024x1024",
         "16:9": "1792x1024",
@@ -259,7 +259,7 @@ def _try_direct_api(
     if provider_id == "openai":
         api_key = os.environ.get("OPENAI_API_KEY", "")
         if not api_key:
-            return error_response("OPENAI_API_KEY bulunamadı", provider_id)
+            return error_response("OPENAI_API_KEY bulunamadÄ±", provider_id)
         try:
             resp = requests.post(
                 "https://api.openai.com/v1/images/generations",
@@ -285,14 +285,14 @@ def _try_direct_api(
                     provider=provider_id,
                     metadata={"local_path": local},
                 )
-            return error_response(f"API hatası: {data}", provider_id)
+            return error_response(f"API hatasÄ±: {data}", provider_id)
         except Exception as e:
-            return error_response(f"OpenAI hatası: {e}", provider_id)
+            return error_response(f"OpenAI hatasÄ±: {e}", provider_id)
 
     elif provider_id == "xai":
         api_key = os.environ.get("XAI_API_KEY", "")
         if not api_key:
-            return error_response("XAI_API_KEY bulunamadı", provider_id)
+            return error_response("XAI_API_KEY bulunamadÄ±", provider_id)
         try:
             resp = requests.post(
                 "https://api.x.ai/v1/images/generations",
@@ -317,12 +317,12 @@ def _try_direct_api(
                     provider=provider_id,
                     metadata={"local_path": local},
                 )
-            return error_response(f"API hatası: {data}", provider_id)
+            return error_response(f"API hatasÄ±: {data}", provider_id)
         except Exception as e:
-            return error_response(f"xAI hatası: {e}", provider_id)
+            return error_response(f"xAI hatasÄ±: {e}", provider_id)
 
     return error_response(
-        f"Bilinen provider değil veya API key yok: {provider_id}", provider_id
+        f"Bilinen provider deÄŸil veya API key yok: {provider_id}", provider_id
     )
 
 
@@ -336,14 +336,14 @@ def _generate_placeholder(prompt: str, provider_id: str, model: str) -> Dict[str
     local_name = f"{provider_id}_placeholder_{hash_str}.html"
     local_path = IMAGE_CACHE / local_name
 
-    # SVG placeholder — görselin ne olacağını göster
+    # SVG placeholder â€” gÃ¶rselin ne olacaÄŸÄ±nÄ± gÃ¶ster
     svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
   <rect width="512" height="512" fill="#1a1a2e"/>
   <rect x="32" y="32" width="448" height="448" rx="16" fill="#16213e" stroke="#0f3460" stroke-width="2"/>
-  <text x="256" y="200" text-anchor="middle" font-family="Arial" font-size="48" fill="#e94560">🎨</text>
+  <text x="256" y="200" text-anchor="middle" font-family="Arial" font-size="48" fill="#e94560">ğŸ¨</text>
   <text x="256" y="270" text-anchor="middle" font-family="Arial" font-size="14" fill="#a0a0b0">{_escape_svg(prompt[:60])}</text>
   <text x="256" y="300" text-anchor="middle" font-family="Arial" font-size="12" fill="#606080">{provider_id.upper()}</text>
-  <text x="256" y="340" text-anchor="middle" font-family="Arial" font-size="10" fill="#404060">⚠️ API anahtarı bulunamadı — placeholder gösteriliyor</text>
+  <text x="256" y="340" text-anchor="middle" font-family="Arial" font-size="10" fill="#404060">âš ï¸ API anahtarÄ± bulunamadÄ± â€” placeholder gÃ¶steriliyor</text>
 </svg>"""
 
     # SVG'yi data URI olarak kullan
@@ -357,7 +357,7 @@ def _generate_placeholder(prompt: str, provider_id: str, model: str) -> Dict[str
         model=model or "placeholder",
         provider=provider_id,
         metadata={
-            "note": "API key bulunamadı — placeholder görsel",
+            "note": "API key bulunamadÄ± â€” placeholder gÃ¶rsel",
             "prompt": prompt,
             "local_path": str(local_path),
         },
@@ -375,7 +375,7 @@ def _escape_svg(text: str) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Geçmiş yönetimi
+# GeÃ§miÅŸ yÃ¶netimi
 # ---------------------------------------------------------------------------
 
 
@@ -390,7 +390,7 @@ def get_history(limit: int = 50) -> List[Dict[str, Any]]:
         data.sort(key=lambda x: x.get("timestamp", ""), reverse=True)
         return data[:limit]
     except Exception as e:
-        logger.warning(f"[IMG] Geçmiş okuma hatası: {e}")
+        logger.warning(f"[IMG] GeÃ§miÅŸ okuma hatasÄ±: {e}")
         return []
 
 
@@ -405,7 +405,7 @@ def add_history(entry: Dict[str, Any]) -> None:
             encoding="utf-8",
         )
     except Exception as e:
-        logger.warning(f"[IMG] Geçmiş yazma hatası: {e}")
+        logger.warning(f"[IMG] GeÃ§miÅŸ yazma hatasÄ±: {e}")
 
 
 def clear_history() -> None:

@@ -1,10 +1,10 @@
-# -*- coding: utf-8 -*-
-"""motor.py — Action resolver. Uses tools from the tools/ folder.
+﻿# -*- coding: utf-8 -*-
+"""motor.py â€” Action resolver. Uses tools from the tools/ folder.
 Catches 'Action: TOOL(...)' from LLM output, routes via ToolRegistry.
 Uses file_safety + path_security for file operations.
 
-This file is inspired by Hermes Agent.
-Apache 2.0 License — github.com/NousResearch/hermes-agent
+This file is inspired by ReYMeN Agent.
+Apache 2.0 License â€” github.com/NousResearch/hermes-agent
 """
 
 from typing import Any, Optional, Dict, List, Tuple, Union
@@ -18,7 +18,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent
 
-# CUA Motor Aracı
+# CUA Motor AracÄ±
 try:
     from reymen.arac.cua_motor_araci import CUA_EKRAN_KULLAN, CUA_ARACLARI_TARA
 
@@ -52,7 +52,7 @@ try:
 except ImportError:
     _CACHE = None
 
-# PII redaction — once kapsamli agent/, sonra PII icin root/
+# PII redaction â€” once kapsamli agent/, sonra PII icin root/
 try:
     from agent.redact import redact_sensitive_text as _agent_temizle
 except ImportError:
@@ -86,7 +86,7 @@ try:
 except ImportError:
     _API_SERVER_KLASS = None
 
-# Otonom görev çözücü (orchestrator)
+# Otonom gÃ¶rev Ã§Ã¶zÃ¼cÃ¼ (orchestrator)
 try:
     from reymen.core.orchestrator import coz_hata as _coz_hata
 
@@ -95,7 +95,7 @@ except ImportError:
     _ORCHESTRATOR_MEVCUT = False
     _coz_hata = lambda hata, kod="", ad="": f"[COZ] Orchestrator yok: {hata[:100]}"
 
-# Öğrenme döngüsü
+# Ã–ÄŸrenme dÃ¶ngÃ¼sÃ¼
 try:
     from reymen.core.ogrenme import OgrenmeDongusu, CozumHafizasi
 
@@ -103,7 +103,7 @@ try:
 except ImportError:
     _OGRENME_MEVCUT = False
 
-# MessageBroker (queue.Queue tabanlı)
+# MessageBroker (queue.Queue tabanlÄ±)
 try:
     from reymen.cereyan.broker import MessageBroker, MesajTipi, Mesaj, get_broker
     from reymen.cereyan.workflow_pipeline import (
@@ -141,7 +141,7 @@ try:
 except ImportError:
     _PROFILE_MGR = None
 
-# Plugin Yukleyici (ReYMeN seviyesi — plugin.yaml destegi)
+# Plugin Yukleyici (ReYMeN seviyesi â€” plugin.yaml destegi)
 try:
     from reymen.sistem.plugin_loader import PluginYukleyici as _PluginYukleyici
 
@@ -160,7 +160,7 @@ except ImportError:
     izole_python_calistir = None
 
 
-# ── Vektor bellek yardimci araci (VEKTOR_BELLEK icin) ────────────────────────
+# â”€â”€ Vektor bellek yardimci araci (VEKTOR_BELLEK icin) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def _vektor_bellek_arac(
     vb,
     islem: str,
@@ -229,7 +229,7 @@ def _vektor_bellek_arac(
         )
 
 
-# ── Gateway State JSON yazma (bot.py bagimli degil) ──
+# â”€â”€ Gateway State JSON yazma (bot.py bagimli degil) â”€â”€
 import json as _json
 import datetime as _dt
 import logging
@@ -337,7 +337,7 @@ class Motor:
             logger.warning("[Motor] Modul yuklenemedi (L143): %s", ImportError)
             pass
 
-        # MessageBroker başlat
+        # MessageBroker baÅŸlat
         self._broker = None
         if _BROKER_MEVCUT:
             try:
@@ -350,60 +350,60 @@ class Motor:
                     ]
                 )
                 self._broker.baslat()
-                logger.info("[Motor] MessageBroker başlatıldı (4 consumer thread)")
+                logger.info("[Motor] MessageBroker baÅŸlatÄ±ldÄ± (4 consumer thread)")
 
-                # Broker araçlarını kaydet
+                # Broker araÃ§larÄ±nÄ± kaydet
                 self._plugin_arac_kaydet(
                     "BROKER_DURUM",
                     self.broker_durum,
-                    "MessageBroker durum raporu: çalışan thread'ler, kuyruk boyutları, abone sayıları",
+                    "MessageBroker durum raporu: Ã§alÄ±ÅŸan thread'ler, kuyruk boyutlarÄ±, abone sayÄ±larÄ±",
                 )
                 self._plugin_arac_kaydet(
                     "GOREV_COZ_PIPELINE",
                     self.gorev_coz_pipeline,
-                    "Pipeline ile görev çözümü: GÖREV -> PLANLA -> ÖN DOĞRULA -> KOD -> TEST -> İNCELE -> KAYDET. "
+                    "Pipeline ile gÃ¶rev Ã§Ã¶zÃ¼mÃ¼: GÃ–REV -> PLANLA -> Ã–N DOÄRULA -> KOD -> TEST -> Ä°NCELE -> KAYDET. "
                     "Parametreler: gorev_tanimi (str), script_path (str, opsiyonel). "
-                    "Döner: başarılıysa .py dosya yolu, başarısızsa hata mesajı.",
+                    "DÃ¶ner: baÅŸarÄ±lÄ±ysa .py dosya yolu, baÅŸarÄ±sÄ±zsa hata mesajÄ±.",
                 )
             except Exception as e:
-                logger.warning("[Motor] Broker başlatma hatası: %s", e)
+                logger.warning("[Motor] Broker baÅŸlatma hatasÄ±: %s", e)
                 self._broker = None
 
     def hook_kaydet(self, olay: str, fn: Any) -> None:
-        """Olay bazlı async hook kaydet (örn. 'TOOL_CALLED', 'TOOL_ERROR')."""
+        """Olay bazlÄ± async hook kaydet (Ã¶rn. 'TOOL_CALLED', 'TOOL_ERROR')."""
         if self._hooks:
             self._hooks.kaydet(olay, fn)
 
-    # ── MessageBroker Entegrasyonu ─────────────────────────────────────────
+    # â”€â”€ MessageBroker Entegrasyonu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @property
     def broker(self):
-        """MessageBroker instance'ı."""
+        """MessageBroker instance'Ä±."""
         return getattr(self, "_broker", None)
 
     def broker_durum(self) -> dict:
         """Broker durum raporu."""
         if self._broker:
             return self._broker.durum()
-        return {"running": False, "mesaj": "Broker aktif değil"}
+        return {"running": False, "mesaj": "Broker aktif deÄŸil"}
 
     def gorev_coz_pipeline(self, gorev_tanimi: str, script_path: str = "") -> str:
-        """Pipeline ile görev çözümü: GÖREV -> PLAN -> DOĞRULA -> KOD -> TEST -> İNCELE -> KAYDET
+        """Pipeline ile gÃ¶rev Ã§Ã¶zÃ¼mÃ¼: GÃ–REV -> PLAN -> DOÄRULA -> KOD -> TEST -> Ä°NCELE -> KAYDET
 
         Args:
-            gorev_tanimi: Görev açıklaması
+            gorev_tanimi: GÃ¶rev aÃ§Ä±klamasÄ±
             script_path: Opsiyonel mevcut script yolu
 
         Returns:
-            Başarılı: kaydedilen .py dosya yolu
-            Başarısız: hata mesajı
+            BaÅŸarÄ±lÄ±: kaydedilen .py dosya yolu
+            BaÅŸarÄ±sÄ±z: hata mesajÄ±
         """
         if not _BROKER_MEVCUT or not self._broker:
-            return "❌ Broker aktif değil (broker modülü yüklenemedi)"
+            return "âŒ Broker aktif deÄŸil (broker modÃ¼lÃ¼ yÃ¼klenemedi)"
         return gorev_coz_pipeline(self._broker, gorev_tanimi, script_path)
 
     def _plugin_moduller_yukle(self) -> None:
-        """Bilinen tüm plugin modüllerinin araçlarını otomatik kaydet."""
+        """Bilinen tÃ¼m plugin modÃ¼llerinin araÃ§larÄ±nÄ± otomatik kaydet."""
         import importlib
 
         moduller = [
@@ -441,7 +441,7 @@ class Motor:
             "tools.write_approval",
             # Memory plugin
             "plugins.memory",
-            # Batch 9 - Yeni 25 araç
+            # Batch 9 - Yeni 25 araÃ§
             "tools.env_passthrough",
             "tools.env_probe",
             "tools.file_operations",
@@ -505,7 +505,7 @@ class Motor:
             "tools.tool_search",
             "tools.website_policy",
             "tools.xai_http",
-            # Entegrasyon 4 — kök modüller
+            # Entegrasyon 4 â€” kÃ¶k modÃ¼ller
             "kanban_orchestrator",
             "context_references",
             "araclar_makro",
@@ -518,22 +518,22 @@ class Motor:
             "sistem_sinyalleri",
             # Gorsel analiz (FAL/OpenRouter/Ollama)
             "araclar_goruntu",
-            # Gorsel analiz v2 (DeepSeek V4 Flash + OpenRouter Qwen-VL) — araclar_goruntu'dan SONRA
+            # Gorsel analiz v2 (DeepSeek V4 Flash + OpenRouter Qwen-VL) â€” araclar_goruntu'dan SONRA
             # yuklenir ki GORUNTU_ANALIZ tool'unu overwrite edip kazansin
             "reymen.cereyan.tools.vision_tools",
-            # Entegrasyon 5 — ek modüller
+            # Entegrasyon 5 â€” ek modÃ¼ller
             "mcp_oauth_manager",
             "reymen_batch_runner",
             "models_dev",
-            # Entegrasyon 6 — reyment CLI araçları
+            # Entegrasyon 6 â€” reyment CLI araÃ§larÄ±
             "reyment",
-            # Entegrasyon 7 — ekran/tarayıcı/skill/telegram
+            # Entegrasyon 7 â€” ekran/tarayÄ±cÄ±/skill/telegram
             "araclar_ekran",
             "araclar_tarayici",
             "skill_bundles",
             "skill_commands",
             "telegram_bot",
-            # Entegrasyon 8 — Claude Code işbirliği
+            # Entegrasyon 8 â€” Claude Code iÅŸbirliÄŸi
             "tools.claude_code_tool",
             # Kanban Board + Worker
             "reymen.kanban",
@@ -574,7 +574,7 @@ class Motor:
             "reymen.sistem.surekli_ogrenme",
             # Skill cron sync (FTS5 index cron kaydi)
             "reymen.cereyan.cron_skill_sync",
-            # Merkezi Durum (durum.json okuyucu — herkes kullanir)
+            # Merkezi Durum (durum.json okuyucu â€” herkes kullanir)
             "reymen.sistem.durum",
             # Active skill tracker (LLM context enjeksiyonu)
             "reymen.cereyan.active_skill_tracker",
@@ -594,11 +594,11 @@ class Motor:
             "reymen.core.mcp_server",
             # Schema Manager (SQLite versiyonlama + idempotent CREATE)
             "reymen.core.schema_manager",
-            # Session DB (P1) — FTS5 + trigram arama
+            # Session DB (P1) â€” FTS5 + trigram arama
             "reymen.core.session_db",
-            # Cron/Scheduler (P1) — per-job override, watchdog
+            # Cron/Scheduler (P1) â€” per-job override, watchdog
             "reymen.core.cron_manager",
-            # Gateway Sistemi (P1) — multi-platform
+            # Gateway Sistemi (P1) â€” multi-platform
             "reymen.core.gateway_manager",
             # ACP (Agent Communication Protocol)
             "acp_server",
@@ -610,40 +610,40 @@ class Motor:
             "reymen.a2a_distributed",
             # A2A/ACP (Agent Card, Skill Transfer, Task Delegation)
             "reymen.a2a_acp",
-            # Gateway Sistemi (P1) — Çoklu platform gateway
+            # Gateway Sistemi (P1) â€” Ã‡oklu platform gateway
             "reymen.ag.gateway_temel",
             "reymen.ag.salted_gateway",
             "reymen.ag.platform_gateways",
             "reymen.ag.gateway_yonetici",
-            # Delegasyon Sistemi (P2) — Subagent + görev ayrıştırma
+            # Delegasyon Sistemi (P2) â€” Subagent + gÃ¶rev ayrÄ±ÅŸtÄ±rma
             "reymen.ag.delegasyon",
             # TUI (Terminal UI - prompt_toolkit tabanli)
             "reymen.tui",
             # Web UI (FastAPI + HTMX yonetim paneli)
             "reymen.web_ui",
-            # Checkpoint yönetimi (görev geri alma / rollback)
+            # Checkpoint yÃ¶netimi (gÃ¶rev geri alma / rollback)
             "tools.checkpoint_manager",
-            # Provider Sistemi (P0) — model routing, failover
+            # Provider Sistemi (P0) â€” model routing, failover
             "reymen.core.model_provider",
-            # YAML Config Manager (P0) — profile, env override
+            # YAML Config Manager (P0) â€” profile, env override
             "reymen.core.config_manager",
-            # Analitik/Kalite sistemi (P2) — metrik toplama, dashboard
+            # Analitik/Kalite sistemi (P2) â€” metrik toplama, dashboard
             "reymen.sistem.analitik",
-            # Hot-Reload sistemi — runtime modul izleme
+            # Hot-Reload sistemi â€” runtime modul izleme
             "reymen.sistem.hot_reload",
-            # Kanban Board sistemi — is takibi + worker
+            # Kanban Board sistemi â€” is takibi + worker
             "reymen.kanban",
-            # Schema Manager — SQLite tablo + versiyon
+            # Schema Manager â€” SQLite tablo + versiyon
             "reymen.core.schema_manager",
-            # TTS Tool (P1) — edge-tts ile metin seslendirme
+            # TTS Tool (P1) â€” edge-tts ile metin seslendirme
             "reymen.sistem.tts_tool_text",
-            # STT Tool (P1) — faster-whisper ile ses tanima
+            # STT Tool (P1) â€” faster-whisper ile ses tanima
             "reymen.sistem.stt_tool",
-            # Video Generation Engine (P3) — moviepy + FAL + HyperFrames
+            # Video Generation Engine (P3) â€” moviepy + FAL + HyperFrames
             "reymen.arac.video_gen_engine",
-            # Plugin Marketplacesi — katalog + uzaktan yukleme
+            # Plugin Marketplacesi â€” katalog + uzaktan yukleme
             "reymen.sistem.marketplace",
-            # TTS/STT araclari — metin->ses, ses->metin
+            # TTS/STT araclari â€” metin->ses, ses->metin
             "reymen.ag.acp_server",
             "reymen.ag.delegation",
             "reymen.ag.mcp_oauth",
@@ -713,23 +713,23 @@ class Motor:
                 if hasattr(mod, "motor_kaydet"):
                     mod.motor_kaydet(self)
             except ImportError as _e:
-                pass  # Modul yok — normal, sessiz gec
+                pass  # Modul yok â€” normal, sessiz gec
             except Exception as _e:
                 _yukleme_hatalari.append(f"{mod_adi}: {type(_e).__name__}: {_e}")
         if _yukleme_hatalari:
             print(f"[Motor] {len(_yukleme_hatalari)} modul yukleme hatasi:")
             for h in _yukleme_hatalari[:5]:
-                print(f"  ⚠ {h}")
+                print(f"  âš  {h}")
             if len(_yukleme_hatalari) > 5:
                 print(f"  ... ve {len(_yukleme_hatalari) - 5} hata daha")
-        # Skill araçları (cache'li)
+        # Skill araÃ§larÄ± (cache'li)
         if self._skill_araclari_cache is None:
             self._skill_araclari_kaydet()
             self._skill_v2_araclari_kaydet()
             self._skill_araclari_cache = True
-        # Hafıza araçları
+        # HafÄ±za araÃ§larÄ±
         self._hafiza_araclari_kaydet()
-        # Provider sistem araçları (Model Router + Failover)
+        # Provider sistem araÃ§larÄ± (Model Router + Failover)
         try:
             from reymen.ag.model_provider_router import router_al as _router_al
 
@@ -739,9 +739,9 @@ class Motor:
                 lambda provider="": str(
                     _router.provider_durum(provider if provider else None)
                 ),
-                "Provider durum raporu: tüm provider'ların sağlık, hata, kara liste durumu. "
-                "Parametre: provider (str, opsiyonel) — belirli bir provider adı verilirse "
-                "sadece onun durumunu gösterir. Boş bırakılırsa tümünü listeler.",
+                "Provider durum raporu: tÃ¼m provider'larÄ±n saÄŸlÄ±k, hata, kara liste durumu. "
+                "Parametre: provider (str, opsiyonel) â€” belirli bir provider adÄ± verilirse "
+                "sadece onun durumunu gÃ¶sterir. BoÅŸ bÄ±rakÄ±lÄ±rsa tÃ¼mÃ¼nÃ¼ listeler.",
             )
             self._plugin_arac_kaydet(
                 "MODEL_ROUTE",
@@ -753,16 +753,16 @@ class Motor:
                         else None,
                     )
                 ),
-                "Model→Provider yönlendirme kararı. Parametreler: model (str, zorunlu) — "
-                "model adı (ör: deepseek-v4-flash); provider_override (str, opsiyonel) — "
-                "provider'ı zorla belirtmek için. Döner: model, provider, api_tipi, base_url, "
+                "Modelâ†’Provider yÃ¶nlendirme kararÄ±. Parametreler: model (str, zorunlu) â€” "
+                "model adÄ± (Ã¶r: deepseek-v4-flash); provider_override (str, opsiyonel) â€” "
+                "provider'Ä± zorla belirtmek iÃ§in. DÃ¶ner: model, provider, api_tipi, base_url, "
                 "failover_zinciri.",
             )
             self._plugin_arac_kaydet(
                 "PROVIDER_SAGLIK",
                 lambda: str(_router.tum_provider_saglik()),
-                "Tüm provider'ların sağlık kontrolünü yapar. Her provider'a ping atar, "
-                "canlılık durumlarını döndürür.",
+                "TÃ¼m provider'larÄ±n saÄŸlÄ±k kontrolÃ¼nÃ¼ yapar. Her provider'a ping atar, "
+                "canlÄ±lÄ±k durumlarÄ±nÄ± dÃ¶ndÃ¼rÃ¼r.",
             )
             self._plugin_arac_kaydet(
                 "MODELLERI_LISTELE",
@@ -771,15 +771,15 @@ class Motor:
                         provider_filtre=provider if provider else None,
                     )
                 ),
-                "Tüm bilinen modelleri listeler. Parametre: provider (str, opsiyonel) — "
-                "sadece belirli bir provider'daki modelleri filtrelemek için.",
+                "TÃ¼m bilinen modelleri listeler. Parametre: provider (str, opsiyonel) â€” "
+                "sadece belirli bir provider'daki modelleri filtrelemek iÃ§in.",
             )
             logger.info(
-                "[Motor] Provider sistem araçları kaydedildi: PROVIDER_DURUM, MODEL_ROUTE, PROVIDER_SAGLIK, MODELLERI_LISTELE"
+                "[Motor] Provider sistem araÃ§larÄ± kaydedildi: PROVIDER_DURUM, MODEL_ROUTE, PROVIDER_SAGLIK, MODELLERI_LISTELE"
             )
         except Exception as _e:
-            logger.warning("[Motor] Provider araç kaydı başarısız: %s", _e)
-        # OAuth araçları (P2) — Google/GitHub/Discord giriş ve durum
+            logger.warning("[Motor] Provider araÃ§ kaydÄ± baÅŸarÄ±sÄ±z: %s", _e)
+        # OAuth araÃ§larÄ± (P2) â€” Google/GitHub/Discord giriÅŸ ve durum
         try:
             from reymen.guvenlik.oauth_servis import OAuthServis
 
@@ -790,11 +790,11 @@ class Motor:
                 try:
                     url = _oauth_servis.login(provider)
                     return (
-                        f"🔐 {provider.upper()} giriş URL'si:\n"
+                        f"ğŸ” {provider.upper()} giriÅŸ URL'si:\n"
                         f"{url}\n\n"
-                        f"📌 Bu URL'yi tarayıcıda açın, yetkilendirme yapın, "
-                        f"ardından callback'ten gelen 'code' parametresi ile "
-                        f"OAUTH_CALLBACK aracını kullanın."
+                        f"ğŸ“Œ Bu URL'yi tarayÄ±cÄ±da aÃ§Ä±n, yetkilendirme yapÄ±n, "
+                        f"ardÄ±ndan callback'ten gelen 'code' parametresi ile "
+                        f"OAUTH_CALLBACK aracÄ±nÄ± kullanÄ±n."
                     )
                 except Exception as e:
                     return f"[OAuth:Hata] {e}"
@@ -805,14 +805,14 @@ class Motor:
                     durum = _oauth_servis.durum(provider)
                     if not durum.get("var_mi"):
                         return (
-                            f"❌ {provider.upper()}: Giriş yapılmamış.\n"
-                            f"Önce OAUTH_LOGIN({provider}) ile giriş yapın."
+                            f"âŒ {provider.upper()}: GiriÅŸ yapÄ±lmamÄ±ÅŸ.\n"
+                            f"Ã–nce OAUTH_LOGIN({provider}) ile giriÅŸ yapÄ±n."
                         )
                     return (
-                        f"🔐 {provider.upper()} Token Durumu:\n"
-                        f"  Durum:     {'✅ Geçerli' if durum.get('gecerli_mi') else '❌ Süresi dolmuş'}\n"
-                        f"  Kullanıcı: {durum.get('display_name', '?')} ({durum.get('email', '?')})\n"
-                        f"  Bitiş:     {durum.get('expires_at', '?')}\n"
+                        f"ğŸ” {provider.upper()} Token Durumu:\n"
+                        f"  Durum:     {'âœ… GeÃ§erli' if durum.get('gecerli_mi') else 'âŒ SÃ¼resi dolmuÅŸ'}\n"
+                        f"  KullanÄ±cÄ±: {durum.get('display_name', '?')} ({durum.get('email', '?')})\n"
+                        f"  BitiÅŸ:     {durum.get('expires_at', '?')}\n"
                         f"  Scope:     {durum.get('scope', '?')}"
                     )
                 except Exception as e:
@@ -821,21 +821,21 @@ class Motor:
             self._plugin_arac_kaydet(
                 "OAUTH_LOGIN",
                 _oauth_login,
-                "OAuth provider'a giriş yap — auth URL'si al. "
-                "Parametre: provider (str, varsayılan: google) — google/github/discord. "
-                "Döndürülen URL'yi tarayıcıda açın, callback'ten gelen code ile OAUTH_CALLBACK kullanın.",
+                "OAuth provider'a giriÅŸ yap â€” auth URL'si al. "
+                "Parametre: provider (str, varsayÄ±lan: google) â€” google/github/discord. "
+                "DÃ¶ndÃ¼rÃ¼len URL'yi tarayÄ±cÄ±da aÃ§Ä±n, callback'ten gelen code ile OAUTH_CALLBACK kullanÄ±n.",
             )
             self._plugin_arac_kaydet(
                 "OAUTH_DURUM",
                 _oauth_durum,
-                "OAuth provider token durumunu göster. "
-                "Parametre: provider (str, varsayılan: google) — google/github/discord. "
-                "Döner: token geçerliliği, kullanıcı bilgisi, bitiş zamanı.",
+                "OAuth provider token durumunu gÃ¶ster. "
+                "Parametre: provider (str, varsayÄ±lan: google) â€” google/github/discord. "
+                "DÃ¶ner: token geÃ§erliliÄŸi, kullanÄ±cÄ± bilgisi, bitiÅŸ zamanÄ±.",
             )
-            logger.info("[Motor] OAuth araçları kaydedildi: OAUTH_LOGIN, OAUTH_DURUM")
+            logger.info("[Motor] OAuth araÃ§larÄ± kaydedildi: OAUTH_LOGIN, OAUTH_DURUM")
         except Exception as _e:
-            logger.warning("[Motor] OAuth araç kaydı başarısız: %s", _e)
-        # PluginYukleyici (ReYMeN seviyesi — plugin.yaml destegi)
+            logger.warning("[Motor] OAuth araÃ§ kaydÄ± baÅŸarÄ±sÄ±z: %s", _e)
+        # PluginYukleyici (ReYMeN seviyesi â€” plugin.yaml destegi)
         try:
             from reymen.sistem.plugin_loader import PluginYukleyici
 
@@ -851,8 +851,8 @@ class Motor:
             self._plugin_yukleyici = None
             print(f"[Motor] PluginYukleyici baslatma hatasi: {_e}")
 
-        # MCP Reconnect — heartbeat + otomatik yeniden bağlanma
-        # reymen.mcp modülü yukarıda yüklendiğinden mcp_reconnect zaten import edilebilir
+        # MCP Reconnect â€” heartbeat + otomatik yeniden baÄŸlanma
+        # reymen.mcp modÃ¼lÃ¼ yukarÄ±da yÃ¼klendiÄŸinden mcp_reconnect zaten import edilebilir
         try:
             import asyncio
             from reymen.mcp.mcp_reconnect import (
@@ -860,7 +860,7 @@ class Motor:
                 mcp_reconnect_durumu,
             )
 
-            # Mevcut event loop varsa onu kullan, yoksa yeni bir loop'ta başlat
+            # Mevcut event loop varsa onu kullan, yoksa yeni bir loop'ta baÅŸlat
             try:
                 loop = asyncio.get_running_loop()
                 if loop.is_running():
@@ -868,7 +868,7 @@ class Motor:
                 else:
                     loop.run_until_complete(mcp_reconnect_baslat())
             except RuntimeError:
-                # Hiç event loop yok — arkaplan thread'de yeni loop başlat
+                # HiÃ§ event loop yok â€” arkaplan thread'de yeni loop baÅŸlat
                 import threading
 
                 def _reconnect_thread():
@@ -887,18 +887,18 @@ class Motor:
                 )
                 t.start()
                 __import__("logging").getLogger(__name__).debug(
-                    "[Motor] MCP Reconnect: arkaplan thread başlatıldı"
+                    "[Motor] MCP Reconnect: arkaplan thread baÅŸlatÄ±ldÄ±"
                 )
         except ImportError as _e:
             logger.warning("[Motor] Modul yuklenemedi (L727): %s", ImportError)
             pass
         except Exception as e:
             __import__("logging").getLogger(__name__).debug(
-                "[Motor] MCP Reconnect başlatma hatası (önemsiz): %s", e
+                "[Motor] MCP Reconnect baÅŸlatma hatasÄ± (Ã¶nemsiz): %s", e
             )
 
     def _skill_araclari_kaydet(self) -> None:
-        """skill_utils modülünden SKILL_ araçlarını kaydet (v1 — geriye uyumluluk)."""
+        """skill_utils modÃ¼lÃ¼nden SKILL_ araÃ§larÄ±nÄ± kaydet (v1 â€” geriye uyumluluk)."""
         try:
             from reymen.arac.skill_utils import (
                 skill_ara,
@@ -909,17 +909,17 @@ class Motor:
             self._plugin_arac_kaydet(
                 "SKILL_ARA",
                 lambda sorgu="": str(skill_ara(sorgu)),
-                "Skill veritabanında ara",
+                "Skill veritabanÄ±nda ara",
             )
             self._plugin_arac_kaydet(
                 "SKILL_KATEGORILER",
                 lambda: str(kategorileri_listele()),
-                "Tüm skill kategorilerini listele",
+                "TÃ¼m skill kategorilerini listele",
             )
             self._plugin_arac_kaydet(
                 "SKILL_OKU",
-                lambda ad="": skill_oku(ad) or f"[Hata]: '{ad}' skill bulunamadı",
-                "Bir skill içeriğini oku",
+                lambda ad="": skill_oku(ad) or f"[Hata]: '{ad}' skill bulunamadÄ±",
+                "Bir skill iÃ§eriÄŸini oku",
             )
         except ImportError as _e:
             logger.warning("[Motor] Modul yuklenemedi (L300): %s", ImportError)
@@ -966,7 +966,7 @@ class Motor:
             self._plugin_arac_kaydet(
                 "SKILL_AKTIVAT",
                 _aktivat_ve_izin_guncelle,
-                "Skill'i aktive et — tam icerigi ReAct baglamina yukle",
+                "Skill'i aktive et â€” tam icerigi ReAct baglamina yukle",
             )
             self._plugin_arac_kaydet(
                 "SKILL_KATEGORI",
@@ -1026,17 +1026,17 @@ class Motor:
             logger.warning("[Motor] Modul yuklenemedi (L374): %s", ImportError)
             pass
 
-    # ── Plugin API ────────────────────────────────────────────────────
+    # â”€â”€ Plugin API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     def _plugin_arac_kaydet(
         self, ad: str, fonk: Any, aciklama: str = "", only_if_missing: bool = False
     ) -> None:
-        """Plugin modüllerinin araç kaydetmesi için ortak API."""
+        """Plugin modÃ¼llerinin araÃ§ kaydetmesi iÃ§in ortak API."""
         if _REGISTRY:
             if only_if_missing and ad in _REGISTRY._tools:
                 return
             _REGISTRY.kaydet(ad, fonk)
 
-    # ── Pydantic Entegrasyonu (opsiyonel, graceful degrade) ─────────────────
+    # â”€â”€ Pydantic Entegrasyonu (opsiyonel, graceful degrade) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     _PYDANTIK_ENTEGRE = False
     try:
         from reymen.cereyan.pydantic_entegrasyonu import (
@@ -1049,23 +1049,23 @@ class Motor:
     except ImportError:
         logger.warning("[fix_01_sessiz_except] ImportError")
 
-    # ── Native Function Calling desteği ──────────────────────────────────────
+    # â”€â”€ Native Function Calling desteÄŸi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @trace_tool_call()
     def calistir_fc(self, arac: str, args: dict) -> str:
-        """FC API'den gelen dict args → mevcut calistir() köprüsü.
+        """FC API'den gelen dict args â†’ mevcut calistir() kÃ¶prÃ¼sÃ¼.
 
         OpenAI tool_calls'taki {key: value} dict'ini, mevcut calistir()
-        altyapısının beklediği quoted-string ham_param formatına dönüştürür.
-        Pydantic aktifse çağrı öncesi args doğrulaması yapar.
+        altyapÄ±sÄ±nÄ±n beklediÄŸi quoted-string ham_param formatÄ±na dÃ¶nÃ¼ÅŸtÃ¼rÃ¼r.
+        Pydantic aktifse Ã§aÄŸrÄ± Ã¶ncesi args doÄŸrulamasÄ± yapar.
 
-        Dönüşüm:
-            {"dosya": "test.py", "icerik": "..."} → '"test.py" "..."'
+        DÃ¶nÃ¼ÅŸÃ¼m:
+            {"dosya": "test.py", "icerik": "..."} â†’ '"test.py" "..."'
 
         Pydantic validasyon:
-            - args doğrulanır, hatalı tipler düzeltilir
-            - Hata varsa LLM'ye geri bildirim gönderilir
-            - Graceful degrade: hatalı args olduğu gibi iletilir
+            - args doÄŸrulanÄ±r, hatalÄ± tipler dÃ¼zeltilir
+            - Hata varsa LLM'ye geri bildirim gÃ¶nderilir
+            - Graceful degrade: hatalÄ± args olduÄŸu gibi iletilir
         """
         # Pydantic validasyon (varsa)
         if self._PYDANTIK_ENTEGRE and args:
@@ -1073,15 +1073,15 @@ class Motor:
                 validated = _pydantic_validate(arac, args)
                 if validated.get("hata"):
                     logger.warning(
-                        "[Pydantic] %s validasyon uyarısı: %s",
+                        "[Pydantic] %s validasyon uyarÄ±sÄ±: %s",
                         arac,
                         validated["hata"],
                     )
-                # Doğrulanmış args'i kullan
+                # DoÄŸrulanmÄ±ÅŸ args'i kullan
                 args = validated.get("args", args)
             except Exception as e:
                 logger.warning(
-                    "[Pydantic] %s validasyon hatası (ignore): %s",
+                    "[Pydantic] %s validasyon hatasÄ± (ignore): %s",
                     arac,
                     e,
                 )
@@ -1096,10 +1096,10 @@ class Motor:
         return self.calistir(arac, " ".join(parts))
 
     def tools_schema_al(self, maks: int = 64) -> list:
-        """OpenAI-uyumlu tools schema listesi üretir.
+        """OpenAI-uyumlu tools schema listesi Ã¼retir.
 
-        GOREV_BITTI her zaman ilk sıradadır (LLM görevi bitirmek için kullanır).
-        Geri kalanlar ToolRegistry'den alınır; _meta'daki açıklamalar dahil edilir.
+        GOREV_BITTI her zaman ilk sÄ±radadÄ±r (LLM gÃ¶revi bitirmek iÃ§in kullanÄ±r).
+        Geri kalanlar ToolRegistry'den alÄ±nÄ±r; _meta'daki aÃ§Ä±klamalar dahil edilir.
 
         Returns:
             [{"type": "function", "function": {"name": ..., ...}}, ...]
@@ -1110,15 +1110,15 @@ class Motor:
                 "function": {
                     "name": "GOREV_BITTI",
                     "description": (
-                        "Görevi başarıyla tamamladığında çağır. "
-                        "Yapılanların Türkçe özetini 'ozet' parametresine yaz."
+                        "GÃ¶revi baÅŸarÄ±yla tamamladÄ±ÄŸÄ±nda Ã§aÄŸÄ±r. "
+                        "YapÄ±lanlarÄ±n TÃ¼rkÃ§e Ã¶zetini 'ozet' parametresine yaz."
                     ),
                     "parameters": {
                         "type": "object",
                         "properties": {
                             "ozet": {
                                 "type": "string",
-                                "description": "Yapılanların özeti (2–5 cümle)",
+                                "description": "YapÄ±lanlarÄ±n Ã¶zeti (2â€“5 cÃ¼mle)",
                             }
                         },
                         "required": ["ozet"],
@@ -1147,7 +1147,7 @@ class Motor:
                     "properties": {
                         "sorgu": {
                             "type": "string",
-                            "description": "Aranacak kelime veya cümle",
+                            "description": "Aranacak kelime veya cÃ¼mle",
                         }
                     },
                     "required": ["sorgu"],
@@ -1157,7 +1157,7 @@ class Motor:
                     "properties": {
                         "dosya_yolu": {
                             "type": "string",
-                            "description": "Okunacak dosyanın tam yolu",
+                            "description": "Okunacak dosyanÄ±n tam yolu",
                         }
                     },
                     "required": ["dosya_yolu"],
@@ -1167,11 +1167,11 @@ class Motor:
                     "properties": {
                         "dosya_yolu": {
                             "type": "string",
-                            "description": "Yazılacak dosyanın tam yolu",
+                            "description": "YazÄ±lacak dosyanÄ±n tam yolu",
                         },
                         "icerik": {
                             "type": "string",
-                            "description": "Dosyaya yazılacak içerik",
+                            "description": "Dosyaya yazÄ±lacak iÃ§erik",
                         },
                     },
                     "required": ["dosya_yolu", "icerik"],
@@ -1181,7 +1181,7 @@ class Motor:
                     "properties": {
                         "kod": {
                             "type": "string",
-                            "description": "Çalıştırılacak Python kodu",
+                            "description": "Ã‡alÄ±ÅŸtÄ±rÄ±lacak Python kodu",
                         }
                     },
                     "required": ["kod"],
@@ -1191,7 +1191,7 @@ class Motor:
                     "properties": {
                         "komut": {
                             "type": "string",
-                            "description": "Çalıştırılacak shell komutu",
+                            "description": "Ã‡alÄ±ÅŸtÄ±rÄ±lacak shell komutu",
                         }
                     },
                     "required": ["komut"],
@@ -1201,7 +1201,7 @@ class Motor:
                     "properties": {
                         "profil_adi": {
                             "type": "string",
-                            "description": "Geçilecek profil adı: reyment, dev, test, prod",
+                            "description": "GeÃ§ilecek profil adÄ±: reyment, dev, test, prod",
                         }
                     },
                     "required": ["profil_adi"],
@@ -1216,7 +1216,7 @@ class Motor:
                     "properties": {
                         "param": {
                             "type": "string",
-                            "description": f"{ad} için parametre",
+                            "description": f"{ad} iÃ§in parametre",
                         }
                     },
                     "required": [],
@@ -1237,11 +1237,11 @@ class Motor:
 
     @property
     def _plugin_araclar(self) -> dict:
-        """Kayıtlı araçların salt-okunur dict görünümü."""
+        """KayÄ±tlÄ± araÃ§larÄ±n salt-okunur dict gÃ¶rÃ¼nÃ¼mÃ¼."""
         return dict(_REGISTRY._tools) if _REGISTRY else {}
 
     def eylemi_ayristir(self, llm_cikti: str) -> Tuple[Optional[str], Optional[str]]:
-        """Eylem: ARAC(...) veya EYLEM:\\nARAC(...) satırını yakalar."""
+        """Eylem: ARAC(...) veya EYLEM:\\nARAC(...) satÄ±rÄ±nÄ± yakalar."""
         # 1. Standart: "Eylem: ARAC(...)" veya "EYLEM:\\nARAC(...)"
         m = re.search(
             r"Eylem:\s*([A-Z_]+)\s*\((.*)\)", llm_cikti, re.DOTALL | re.IGNORECASE
@@ -1249,7 +1249,7 @@ class Motor:
         if m:
             return m.group(1).strip().upper(), m.group(2).strip()
 
-        # 2. Fallback: bilinen ARAC_ADI(...) dogrudan herhangi bir satırda
+        # 2. Fallback: bilinen ARAC_ADI(...) dogrudan herhangi bir satÄ±rda
         _BILINEN = {
             "GOREV_BITTI",
             "DOSYA_OKU",
@@ -1293,7 +1293,7 @@ class Motor:
             m2 = re.match(r"([A-Z][A-Z_0-9]+)\s*\((.*)\)\s*$", satir_s)
             if m2 and m2.group(1) in _BILINEN:
                 return m2.group(1), m2.group(2).strip()
-            # Cok satirli: ARAC_ADI( ile baslayan satir — devamı alt satirlarda
+            # Cok satirli: ARAC_ADI( ile baslayan satir â€” devamÄ± alt satirlarda
             m3 = re.match(r"([A-Z][A-Z_0-9]+)\s*\(", satir_s)
             if m3 and m3.group(1) in _BILINEN:
                 idx = llm_cikti.find(satir_s)
@@ -1308,7 +1308,7 @@ class Motor:
     def _parametreleri_coz(self, ham: str) -> List[str]:
         return re.findall(r'"((?:[^"\\]|\\.)*)"', ham)
 
-    # ── Toolset gruplandirma (ReYMeN Agent mimarisi) ─────────────────────────
+    # â”€â”€ Toolset gruplandirma (ReYMeN Agent mimarisi) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     # Hafiza araclari
     def _hafiza_araclari_kaydet(self) -> None:
         try:
@@ -1333,7 +1333,7 @@ class Motor:
             logger.warning("[Motor] Modul yuklenemedi (L518): %s", ImportError)
             pass
 
-        # ── Vektor bellek araclari ───────────────────────────────────────────
+        # â”€â”€ Vektor bellek araclari â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         try:
             from reymen.hafiza.vektor_bellek import VektorBellek, vektor_bellek_al
 
@@ -1346,8 +1346,8 @@ class Motor:
                     metin, {"kategori": kategori} if kategori else None
                 )
                 or "[Hata]: Metin bos olamaz",
-                "Vektor bellege anlamsal kayit ekle. Parametreler: metin (str, zorunlu) — "
-                "eklenecek metin; kategori (str, opsiyonel) — kayit kategorisi. "
+                "Vektor bellege anlamsal kayit ekle. Parametreler: metin (str, zorunlu) â€” "
+                "eklenecek metin; kategori (str, opsiyonel) â€” kayit kategorisi. "
                 "Doner: kayit ID'si veya hata mesaji.",
             )
             self._plugin_arac_kaydet(
@@ -1355,8 +1355,8 @@ class Motor:
                 lambda sorgu="", k=5: str(
                     _vb_global.ara(sorgu, k=int(k) if str(k).isdigit() else 5)
                 ),
-                "Vektor belleginde anlamsal ara. Parametreler: sorgu (str, zorunlu) — "
-                "arama sorgusu; k (int, opsiyonel, default=5) — kac sonuc donsun. "
+                "Vektor belleginde anlamsal ara. Parametreler: sorgu (str, zorunlu) â€” "
+                "arama sorgusu; k (int, opsiyonel, default=5) â€” kac sonuc donsun. "
                 "Doner: [(id, metin, skor, metadata)] listesi.",
             )
             self._plugin_arac_kaydet(
@@ -1388,21 +1388,21 @@ class Motor:
             logger.warning("[Motor] Vektor bellek araclari yuklenemedi: %s", _e)
             pass
 
-        # ── SelfHeal aracı (otonom hata çözümü) ──────────────────────────────
+        # â”€â”€ SelfHeal aracÄ± (otonom hata Ã§Ã¶zÃ¼mÃ¼) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         try:
             self._plugin_arac_kaydet(
                 "SELF_HEAL",
                 lambda hedef_hata_kod="": self._self_heal_calistir(hedef_hata_kod),
-                "Otonom hata çözümü. Bir Python hatasını analiz eder, "
-                "OnceHafiza/LLM ile çözer, hafızaya kaydeder. "
-                "Parametre: 'hedef|hata|kod' formatında, | ile ayrılmış. "
+                "Otonom hata Ã§Ã¶zÃ¼mÃ¼. Bir Python hatasÄ±nÄ± analiz eder, "
+                "OnceHafiza/LLM ile Ã§Ã¶zer, hafÄ±zaya kaydeder. "
+                "Parametre: 'hedef|hata|kod' formatÄ±nda, | ile ayrÄ±lmÄ±ÅŸ. "
                 "Doner: cozum kodu veya hata mesaji.",
             )
             logger.info("[Motor] SelfHeal araci kaydedildi: SELF_HEAL")
         except Exception as e:
             logger.warning("[Motor] SelfHeal kaydi basarisiz: %s", e)
 
-        # ── Session Search FTS5 Aracı ─────────────────────────────────────────
+        # â”€â”€ Session Search FTS5 AracÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         try:
             from reymen.cereyan.session_search import session_search_al as _ss_al
 
@@ -1417,28 +1417,28 @@ class Motor:
                     )
                 ),
                 "Session mesajlarinda FTS5 tam metin aramasi yap. "
-                "Parametreler: sorgu (str, zorunlu) — aranacak kelime/ifade; "
-                "limit (int, opsiyonel, default=10) — kac sonuc donsun; "
-                "session_id (str, opsiyonel) — sadece belirli bir oturumda ara. "
+                "Parametreler: sorgu (str, zorunlu) â€” aranacak kelime/ifade; "
+                "limit (int, opsiyonel, default=10) â€” kac sonuc donsun; "
+                "session_id (str, opsiyonel) â€” sadece belirli bir oturumda ara. "
                 "Doner: [{session_id, message, role, timestamp, rank}] JSON listesi. "
                 "FTS5 syntax: 'kelime1 kelime2' -> AND, 'kelime1 OR kelime2' -> OR, "
                 "'kelime*' -> prefix, '\"tam ifade\"' -> exact phrase.",
             )
             logger.info("[Motor] Session Search araci kaydedildi: SESSION_ARA")
         except ImportError as _e:
-            logger.warning("[Motor] Session Search aracı yuklenemedi: %s", _e)
+            logger.warning("[Motor] Session Search aracÄ± yuklenemedi: %s", _e)
             pass
         except Exception as _e:
             logger.warning("[Motor] Session Search kayit hatasi: %s", _e)
             pass
 
     TOOLSET_GRUPLARI = {
-        # ── Entry Point'ler (reymen_launcher.py üzerinden başlatma) ──
-        #   reymen\bin\reymen.cmd       →  .cmd → python reymen_launcher.py
-        #   venv\Scripts\reymen.cmd     →  .cmd → python reymen_launcher.py
-        #   venv\Scripts\reymen.exe     →  .exe direkt (PyInstaller)
-        #   ~/.local/bin/reymen.exe     →  .exe direkt (pip console_scripts)
-        #   pyproject.toml              →  [project.scripts] reymen = "reymen_launcher:main"
+        # â”€â”€ Entry Point'ler (reymen_launcher.py Ã¼zerinden baÅŸlatma) â”€â”€
+        #   reymen\bin\reymen.cmd       â†’  .cmd â†’ python reymen_launcher.py
+        #   venv\Scripts\reymen.cmd     â†’  .cmd â†’ python reymen_launcher.py
+        #   venv\Scripts\reymen.exe     â†’  .exe direkt (PyInstaller)
+        #   ~/.local/bin/reymen.exe     â†’  .exe direkt (pip console_scripts)
+        #   pyproject.toml              â†’  [project.scripts] reymen = "reymen_launcher:main"
         #
         "temel": {
             "KOMUT_CALISTIR",
@@ -1535,27 +1535,27 @@ class Motor:
         "watchdog": {"WATCHDOG_KONTROL"},
     }
 
-    # ── check_fn: araç kullanılabilirlik kontrol fonksiyonları ─────────────────
-    # ReYMeN Agent: her araç check_fn ile LLM listesine girip girmeyeceğini belirler
-    # Burada en sık kullanılan araçlar için ortam kontrolleri tanımlanır
-    _ARAC_CHECK_FNS: dict = {}  # ad -> callable; False dönerse araç LLM listesinden çıkar
+    # â”€â”€ check_fn: araÃ§ kullanÄ±labilirlik kontrol fonksiyonlarÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ReYMeN Agent: her araÃ§ check_fn ile LLM listesine girip girmeyeceÄŸini belirler
+    # Burada en sÄ±k kullanÄ±lan araÃ§lar iÃ§in ortam kontrolleri tanÄ±mlanÄ±r
+    _ARAC_CHECK_FNS: dict = {}  # ad -> callable; False dÃ¶nerse araÃ§ LLM listesinden Ã§Ä±kar
 
     @classmethod
     def check_fn_kaydet(cls, arac_adi: str, fn: Any) -> None:
-        """Bir araca kullanılabilirlik kontrol fonksiyonu bağla."""
+        """Bir araca kullanÄ±labilirlik kontrol fonksiyonu baÄŸla."""
         cls._ARAC_CHECK_FNS[arac_adi] = fn
 
     def musait_araclar(self, toolset: Optional[str] = None) -> set:
-        """check_fn'i geçen kullanılabilir araçların kümesini döndür.
+        """check_fn'i geÃ§en kullanÄ±labilir araÃ§larÄ±n kÃ¼mesini dÃ¶ndÃ¼r.
 
         Hem motor._ARAC_CHECK_FNS hem de tool_registry'deki check_fn'leri sorgular.
         (ReYMeN Agent ToolRegistry.get_definitions pattern'i)
 
         Args:
-            toolset: Sadece bu gruptaki araçları filtrele (None = hepsi).
+            toolset: Sadece bu gruptaki araÃ§larÄ± filtrele (None = hepsi).
 
         Returns:
-            Kullanılabilir araç adları kümesi.
+            KullanÄ±labilir araÃ§ adlarÄ± kÃ¼mesi.
         """
         if toolset:
             aday = self.TOOLSET_GRUPLARI.get(toolset, set())
@@ -1581,18 +1581,18 @@ class Motor:
             sonuc.add(ad)
         return sonuc
 
-    def toolset_tanimi_al(self, araçlar: Optional[set] = None) -> str:
+    def toolset_tanimi_al(self, araÃ§lar: Optional[set] = None) -> str:
         """LLM sistem promptu icin kisa toolset tanimi uret.
 
         Args:
-            araçlar: Dahil edilecek araç seti (None = tüm musait araçlar).
+            araÃ§lar: Dahil edilecek araÃ§ seti (None = tÃ¼m musait araÃ§lar).
         """
-        if araçlar is None:
-            araçlar = self.musait_araclar()
+        if araÃ§lar is None:
+            araÃ§lar = self.musait_araclar()
 
         satirlar = []
         for grup, uyeler in self.TOOLSET_GRUPLARI.items():
-            aktif = araçlar & uyeler
+            aktif = araÃ§lar & uyeler
             if aktif:
                 satirlar.append(f"[{grup.upper()}] {', '.join(sorted(aktif))}")
         return "\n".join(satirlar)
@@ -1618,35 +1618,35 @@ class Motor:
                 tanim += "[DINAMIK] " + ", ".join(sorted(ek))
         return tanim
 
-    # Araç → kullanıcıya gösterilen durum mesajı
+    # AraÃ§ â†’ kullanÄ±cÄ±ya gÃ¶sterilen durum mesajÄ±
     _DURUM_MESAJLARI = {
-        "WEB_ARA": "İnternette aranıyor...",
-        "TARAYICI_AC": "Sayfa açılıyor...",
+        "WEB_ARA": "Ä°nternette aranÄ±yor...",
+        "TARAYICI_AC": "Sayfa aÃ§Ä±lÄ±yor...",
         "DOSYA_OKU": "Dosya okunuyor...",
-        "DOSYA_YAZ": "Dosya yazılıyor...",
-        "KOMUT_CALISTIR": "Komut çalıştırılıyor...",
-        "PYTHON_CALISTIR": "Python kodu çalıştırılıyor...",
-        "HAFIZA_ARA": "Hafızada aranıyor...",
+        "DOSYA_YAZ": "Dosya yazÄ±lÄ±yor...",
+        "KOMUT_CALISTIR": "Komut Ã§alÄ±ÅŸtÄ±rÄ±lÄ±yor...",
+        "PYTHON_CALISTIR": "Python kodu Ã§alÄ±ÅŸtÄ±rÄ±lÄ±yor...",
+        "HAFIZA_ARA": "HafÄ±zada aranÄ±yor...",
         "EKRAN_OKU": "Ekran okunuyor (OCR)...",
-        "EKRAN_TIKLA": "Ekran öğesine tıklanıyor...",
-        "TELEGRAM_GONDER": "Mesaj gönderiliyor...",
+        "EKRAN_TIKLA": "Ekran Ã¶ÄŸesine tÄ±klanÄ±yor...",
+        "TELEGRAM_GONDER": "Mesaj gÃ¶nderiliyor...",
         "TELEGRAM_PING": "Telegram baglantisi test ediliyor...",
         "TELEGRAM_STREAM_GONDER": "Stream mesaj gonderiliyor...",
         "TELEGRAM_REACTION_EKLE": "Reaction ekleniyor...",
-        "TELEGRAM_RESIM_GONDER": "Resim gönderiliyor...",
-        "EKRAN_FOTOGRAF_CEK": "Ekran fotoğrafı çekiliyor...",
-        "PARALLEL_CALISTIR": "Araçlar paralel çalıştırılıyor...",
+        "TELEGRAM_RESIM_GONDER": "Resim gÃ¶nderiliyor...",
+        "EKRAN_FOTOGRAF_CEK": "Ekran fotoÄŸrafÄ± Ã§ekiliyor...",
+        "PARALLEL_CALISTIR": "AraÃ§lar paralel Ã§alÄ±ÅŸtÄ±rÄ±lÄ±yor...",
         "PDF_OKU": "PDF okunuyor...",
-        "EXCEL_OKU": "Excel dosyası okunuyor...",
-        "CSV_OKU": "CSV dosyası okunuyor...",
-        "GORUNTU_ANALIZ": "Görüntü analiz ediliyor (LLaVA)...",
+        "EXCEL_OKU": "Excel dosyasÄ± okunuyor...",
+        "CSV_OKU": "CSV dosyasÄ± okunuyor...",
+        "GORUNTU_ANALIZ": "GÃ¶rÃ¼ntÃ¼ analiz ediliyor (LLaVA)...",
         "DOSYA_ANALIZ": "Dosya analiz ediliyor...",
-        "PROJE_TARA": "Proje dosyalari taranıyor...",
+        "PROJE_TARA": "Proje dosyalari taranÄ±yor...",
         "SKILL_AKTIVAT": "Skill yukleniyor...",
         "SKILL_KATEGORI": "Skill kategorisi listeleniyor...",
         "SKILL_SCRIPT": "Skill scripti calistiriliyor...",
         "SKILL_OLUSTUR": "Yeni skill olusturuluyor...",
-        "SKILL_DOGRULA": "Skill dogrulanıyor (spec kontrol)...",
+        "SKILL_DOGRULA": "Skill dogrulanÄ±yor (spec kontrol)...",
         "SKILL_INDEX_YENILE": "Skill FTS5 indexi yenileniyor...",
         "SKILL_SCRIPT_YARDIM": "Script arayuzu ogreniyor (--help)...",
         "SKILL_EVAL_EKLE": "Skill eval test case ekleniyor...",
@@ -1660,7 +1660,7 @@ class Motor:
         "HATA_WATCH_BASLAT": "Hata watchdog baslatiliyor (ekran izleme)...",
         "HATA_WATCH_DURDUR": "Hata watchdog durduruluyor...",
         "HATA_KOD_AL": "Hata kodu aliniyor...",
-        "TERMINAL_HATA_PARSE": "Terminal ciktisi hata icin taranıyor...",
+        "TERMINAL_HATA_PARSE": "Terminal ciktisi hata icin taranÄ±yor...",
         "COZUM_UYGULA": "Cozum uygulaniyor (patch)...",
         "TOR_AC": "Tor Browser baslatiliyor...",
         "TOR_KAPAT": "Tor Browser kapatiliyor...",
@@ -1669,11 +1669,11 @@ class Motor:
         "TOR_KAYIT": "Yeni kayit olusturuluyor...",
         "TOR_SIPARIS": "Siparis veriliyor...",
         "CUA_EKRAN_KULLAN": "CUA: Ekran vizyon+koordinat+eylem...",
-        "CUA_ARACLARI_TARA": "CUA bilesenleri taranıyor...",
+        "CUA_ARACLARI_TARA": "CUA bilesenleri taranÄ±yor...",
         "ACHIEVEMENTS_LISTE": "Rozetler listeleniyor...",
         "PROXY_AYARLA": "Proxy yapilandiriliyor...",
-        "CLARIFY": "Talep netleştiriliyor...",
-        "EXECUTE_CODE": "Python kodu çalıştırılıyor...",
+        "CLARIFY": "Talep netleÅŸtiriliyor...",
+        "EXECUTE_CODE": "Python kodu Ã§alÄ±ÅŸtÄ±rÄ±lÄ±yor...",
         "TUI_BASLAT": "Terminal UI baslatiliyor...",
         "TELEGRAM_STREAM": "Telegram'a stream mesaj gonderiliyor...",
         "TELEGRAM_REACT": "Telegram reaction ekleniyor...",
@@ -1686,7 +1686,7 @@ class Motor:
     }
 
     def _durum_goster(self, arac: str, params: List[str]) -> None:
-        """Araç başlamadan önce kullanıcıya durum mesajı yaz."""
+        """AraÃ§ baÅŸlamadan Ã¶nce kullanÄ±cÄ±ya durum mesajÄ± yaz."""
         mesaj = self._DURUM_MESAJLARI.get(arac)
         if mesaj:
             ozet = (params[0] if params else "")[:60]
@@ -1708,10 +1708,10 @@ class Motor:
     def calistir(self, arac: str, ham_param: str) -> str:
         params = self._parametreleri_coz(ham_param)
 
-        # Araç durum mesajı
+        # AraÃ§ durum mesajÄ±
         self._durum_goster(arac, params)
 
-        # Sayaç: kullanılan araçları kaydet (achievement için)
+        # SayaÃ§: kullanÄ±lan araÃ§larÄ± kaydet (achievement iÃ§in)
         try:
             from tools.achievements import _listeye_ekle
 
@@ -1720,10 +1720,10 @@ class Motor:
             logger.warning("[Motor] except Exception (L713): %s", Exception)
             pass
 
-        # check_fn: araç musait mi?
+        # check_fn: araÃ§ musait mi?
         _check = self._ARAC_CHECK_FNS.get(arac)
         if _check is not None and not _check():
-            return f"[{arac}]: Bu araç bu ortamda kullanılamıyor (gereksinim eksik)."
+            return f"[{arac}]: Bu araÃ§ bu ortamda kullanÄ±lamÄ±yor (gereksinim eksik)."
 
         # HITL: riskli araclarda onay
         _izinli = arac in getattr(self, "ekstra_izin_araclar", set())
@@ -1734,9 +1734,9 @@ class Motor:
         ):
             ozet = (params[0] if params else "")[:120]
             if not self.onay_fonksiyonu(arac, ozet):
-                return f"[İptal]: Kullanıcı '{arac}' eylemini reddetti."
+                return f"[Ä°ptal]: KullanÄ±cÄ± '{arac}' eylemini reddetti."
 
-        # HATA_COZUCU araçları — Registry/Plugin öncesi erken kontrol
+        # HATA_COZUCU araÃ§larÄ± â€” Registry/Plugin Ã¶ncesi erken kontrol
         if arac in (
             "HATA_WATCH_BASLAT",
             "HATA_WATCH_DURDUR",
@@ -1784,7 +1784,7 @@ class Motor:
             except Exception as e:
                 return f"[Hata]: hata_cozucu: {e}"
 
-        # SELF_HEAL aracı — otonom hata çözümü
+        # SELF_HEAL aracÄ± â€” otonom hata Ã§Ã¶zÃ¼mÃ¼
         if arac == "SELF_HEAL":
             try:
                 from reymen.core.self_heal import SelfHeal
@@ -1794,26 +1794,26 @@ class Motor:
                 hata = parts[1] if len(parts) > 1 else ""
                 kod = parts[2] if len(parts) > 2 else ""
                 if not hata:
-                    return "[SelfHeal] ❌ Hata mesajı gerekli. Format: hedef|hata|kod"
+                    return "[SelfHeal] âŒ Hata mesajÄ± gerekli. Format: hedef|hata|kod"
                 heal = SelfHeal()
                 sonuc = heal.coz(hedef, hata, kod)
                 if sonuc["basarili"]:
                     return (
-                        f"[SelfHeal] ✅ Çözüldü (kaynak: {sonuc['kaynak']}, "
+                        f"[SelfHeal] âœ… Ã‡Ã¶zÃ¼ldÃ¼ (kaynak: {sonuc['kaynak']}, "
                         f"deneme: {sonuc['deneme_sayisi']})\n"
-                        f"Çözüm:\n{sonuc['cozum']}"
+                        f"Ã‡Ã¶zÃ¼m:\n{sonuc['cozum']}"
                     )
                 else:
                     return (
-                        f"[SelfHeal] ❌ Çözülemedi "
+                        f"[SelfHeal] âŒ Ã‡Ã¶zÃ¼lemedi "
                         f"({sonuc['deneme_sayisi']} deneme)\n"
                         f"Hata: {sonuc['hata']}"
                     )
             except Exception as e:
-                logger.exception("[Motor] SelfHeal hatası")
-                return f"[SelfHeal] ❌ İç hata: {e}"
+                logger.exception("[Motor] SelfHeal hatasÄ±")
+                return f"[SelfHeal] âŒ Ä°Ã§ hata: {e}"
 
-        # TOR_OTOMASYONU araçları
+        # TOR_OTOMASYONU araÃ§larÄ±
         if arac in (
             "TOR_AC",
             "TOR_KAPAT",
@@ -1971,11 +1971,11 @@ class Motor:
             except Exception as e:
                 return f"[Hata]: tor_otomasyonu: {e}"
 
-        # Paralel araç çalıştırma
+        # Paralel araÃ§ Ã§alÄ±ÅŸtÄ±rma
         if arac == "PARALLEL_CALISTIR":
             return self._paralel_calistir(params[0] if params else "")
 
-        # 1. ToolRegistry ile dene — startswith ile dogru kontrol
+        # 1. ToolRegistry ile dene â€” startswith ile dogru kontrol
         if _REGISTRY:
             _registry_sonuc = _REGISTRY.calistir(arac, *params)
             if not _registry_sonuc.startswith("[Bilinmeyen arac]"):
@@ -1998,16 +1998,16 @@ class Motor:
         return sonuc
 
     def _paralel_calistir(self, tanim: str) -> str:
-        """PARALLEL_CALISTIR("ARAC1(\\"p1\\") | ARAC2(\\"p2\\")") — araçları paralel çalıştırır.
+        """PARALLEL_CALISTIR("ARAC1(\\"p1\\") | ARAC2(\\"p2\\")") â€” araÃ§larÄ± paralel Ã§alÄ±ÅŸtÄ±rÄ±r.
 
-        Pipe (|) ile ayrılmış araç çağrılarını ThreadPoolExecutor ile eşzamanlı yürütür.
-        Sonuçlar sırasıyla döner.
+        Pipe (|) ile ayrÄ±lmÄ±ÅŸ araÃ§ Ã§aÄŸrÄ±larÄ±nÄ± ThreadPoolExecutor ile eÅŸzamanlÄ± yÃ¼rÃ¼tÃ¼r.
+        SonuÃ§lar sÄ±rasÄ±yla dÃ¶ner.
         """
-        # Pipe ile bölme — iç tırnak içindeki | karakterlerine dikkat et
+        # Pipe ile bÃ¶lme â€” iÃ§ tÄ±rnak iÃ§indeki | karakterlerine dikkat et
         # Basit regex: ARAC_ADI(...) formunu yakala
         cagrilar = re.findall(r"([A-Z_]+)\s*\(((?:[^()]*|\((?:[^()]*)\))*)\)", tanim)
         if not cagrilar:
-            # Pipe ile bölüp her parçayı eylemi_ayristir ile çözmeyi dene
+            # Pipe ile bÃ¶lÃ¼p her parÃ§ayÄ± eylemi_ayristir ile Ã§Ã¶zmeyi dene
             parcalar = [p.strip() for p in tanim.split("|") if p.strip()]
             cagrilar = []
             for parca in parcalar:
@@ -2055,7 +2055,7 @@ class Motor:
             eksik = set(range(len(cagrilar))) - set(sonuclar.keys())
             for i in eksik:
                 a_adi = cagrilar[i][0] if i < len(cagrilar) else "?"
-                sonuclar[i] = (a_adi, f"[Hata]: Zaman asimi — tamamlanamadi.")
+                sonuclar[i] = (a_adi, f"[Hata]: Zaman asimi â€” tamamlanamadi.")
                 hata_sayisi += 1
 
         satirlar = [f"[PARALLEL_CALISTIR] {len(cagrilar)} arac, {hata_sayisi} hata:"]
@@ -2066,7 +2066,7 @@ class Motor:
         return "\n".join(satirlar)
 
     def _hook_tetikle(self, arac: str, params: List[str], sonuc: str) -> None:
-        """Araç çalıştıktan sonra async hookları tetikle."""
+        """AraÃ§ Ã§alÄ±ÅŸtÄ±ktan sonra async hooklarÄ± tetikle."""
         hata = "[Hata]" in sonuc or "[hata]" in sonuc.lower() if sonuc else False
         olay = "TOOL_ERROR" if hata else "TOOL_CALLED"
 
@@ -2075,7 +2075,7 @@ class Motor:
                 olay, arac=arac, params=params, sonuc=sonuc[:200] if sonuc else ""
             )
 
-        # conversation_loop hook'larını da tetikle (entegrasyon)
+        # conversation_loop hook'larÄ±nÄ± da tetikle (entegrasyon)
         try:
             from reymen.cereyan.hook_dispatcher import (
                 arac_cagri_tetikle as _ac_tetikle,
@@ -2115,7 +2115,7 @@ class Motor:
                 # Sadece "[ContainerSandbox]" ile baslayan hatalarda terminale dus
                 if not _cikti.startswith("[ContainerSandbox]"):
                     return _cikti
-                # Container hatasi — normal terminale dus
+                # Container hatasi â€” normal terminale dus
                 logger.warning(
                     "[Motor] Container sandbox hatasi, normal terminale dusuluyor: %.100s",
                     _cikti,
@@ -2171,14 +2171,14 @@ class Motor:
             except ImportError:
                 return "[Hata]: dinamik_arac_uretici modulu yuklu degil."
         if arac == "GOREV_BITTI":
-            # Achievement kontrolü
+            # Achievement kontrolÃ¼
             try:
                 from tools.achievements import check_achievements
 
                 yeni = check_achievements(gorev_tamamlandi=True)
                 if yeni:
                     return "__GOREV_BITTI__\n" + "\n".join(
-                        f"{r['emoji']} {r['name']} kazanıldı! 🎉" for r in yeni
+                        f"{r['emoji']} {r['name']} kazanÄ±ldÄ±! ğŸ‰" for r in yeni
                     )
             except Exception as _e:
                 logger.warning("[Motor] except Exception (L991): %s", Exception)
@@ -2215,7 +2215,7 @@ class Motor:
             except Exception as e:
                 return f"[DurumRaporu] Hata: {e}"
         if arac == "WATCHDOG_KONTROL":
-            """Bot process canlılık kontrolü. Ölüyse restart dener."""
+            """Bot process canlÄ±lÄ±k kontrolÃ¼. Ã–lÃ¼yse restart dener."""
             import subprocess
             import json as _json
 
@@ -2251,7 +2251,7 @@ class Motor:
                             _json.JSONDecodeError,
                         )
                         pass
-                # Bot ölü — restart dene
+                # Bot Ã¶lÃ¼ â€” restart dene
                 _py = sys.executable
                 _bot = ROOT / "bot.py"
                 subprocess.Popen(
@@ -2265,13 +2265,13 @@ class Motor:
             except Exception as e:
                 return f"__WATCHDOG__ Hata: {e}"
         if arac == "GATEWAY_DURUM_YAZ":
-            """gateway_state.json yaz — durum ve isteğe bağlı hata mesajı."""
+            """gateway_state.json yaz â€” durum ve isteÄŸe baÄŸlÄ± hata mesajÄ±."""
             durum = params[0] if params else "running"
             hata = params[1] if len(params) >= 2 else ""
             _gateway_durum_yaz(durum, hata)
             return f"__GATEWAY_DURUM_YAZ: {durum}__"
         if arac == "TELEGRAM_TOKEN_TEST":
-            """TELEGRAM_BOT_TOKEN'in geçerliliğini test et."""
+            """TELEGRAM_BOT_TOKEN'in geÃ§erliliÄŸini test et."""
             import urllib.request as _ur
             import json as _js
 
@@ -2286,11 +2286,11 @@ class Motor:
                 if data.get("ok"):
                     bot = data["result"]
                     return (
-                        f"[TOKEN] ✅ {bot['first_name']} (@{bot['username']}) — gecerli"
+                        f"[TOKEN] âœ… {bot['first_name']} (@{bot['username']}) â€” gecerli"
                     )
-                return f"[TOKEN] ❌ {data.get('description', 'bilinmeyen hata')}"
+                return f"[TOKEN] âŒ {data.get('description', 'bilinmeyen hata')}"
             except Exception as e:
-                return f"[TOKEN] ❌ Baglanti hatasi: {e}"
+                return f"[TOKEN] âŒ Baglanti hatasi: {e}"
         if arac == "PROXY_AYARLA":
             try:
                 from proxy import ProxyEngine, ProxyConfig
@@ -2322,7 +2322,7 @@ class Motor:
             gecerli, yol = _yol_dogrula(ad)
             if not gecerli:
                 return f"[Guvenlik]: {yol}"
-            # LSP: yazma öncesi baseline (sessiz, hata vermez)
+            # LSP: yazma Ã¶ncesi baseline (sessiz, hata vermez)
             try:
                 from agent.lsp.file_operations_lsp import (
                     lsp_diagnostics_before_write,
@@ -2334,10 +2334,10 @@ class Motor:
             except ImportError as _e:
                 logger.warning("[Motor] Modul yuklenemedi (L1115): %s", ImportError)
                 pass
-            # Dosyayı yaz
+            # DosyayÄ± yaz
             with open(ad, "w", encoding="utf-8") as f:
                 f.write(icerik)
-            # LSP: yazma sonrası diagnostik
+            # LSP: yazma sonrasÄ± diagnostik
             lsp_notu = ""
             try:
                 diags = lsp_diagnostics_after_write(ad)
@@ -2346,7 +2346,7 @@ class Motor:
             except Exception as _e:
                 logger.warning("[Motor] except Exception (L1126): %s", Exception)
                 pass
-            return f"[Tamam]: {ad} yazıldı ({len(icerik)} karakter).{lsp_notu}"
+            return f"[Tamam]: {ad} yazÄ±ldÄ± ({len(icerik)} karakter).{lsp_notu}"
         if arac == "DOSYA_OKU":
             dosya = params[0] if params else ""
             if not os.path.exists(dosya):
@@ -2401,9 +2401,9 @@ class Motor:
                 )
                 if sonuc.get("durum") == "basarili":
                     return f"[TELEGRAM_STREAM_GONDER]: Stream mesaj gonderildi ({sonuc.get('chunk_sayisi',1)} chunk)"
-                return f"[TELEGRAM_STREAM_GONDER]: Hata — {sonuc.get('hata', 'bilinmiyor')}"
+                return f"[TELEGRAM_STREAM_GONDER]: Hata â€” {sonuc.get('hata', 'bilinmiyor')}"
             except Exception as e:
-                return f"[TELEGRAM_STREAM_GONDER]: Hata — {e}"
+                return f"[TELEGRAM_STREAM_GONDER]: Hata â€” {e}"
         if arac == "TELEGRAM_REACTION_EKLE":
             try:
                 from gateway.platforms.telegram import set_reaction as _set_reaction
@@ -2418,9 +2418,9 @@ class Motor:
                 sonuc = _set_reaction(chat_id, mesaj_id, emoji)
                 if sonuc.get("durum") == "basarili":
                     return f"[TELEGRAM_REACTION_EKLE]: Reaction eklendi: {emoji}"
-                return f"[TELEGRAM_REACTION_EKLE]: Hata — {sonuc.get('hata', 'bilinmiyor')}"
+                return f"[TELEGRAM_REACTION_EKLE]: Hata â€” {sonuc.get('hata', 'bilinmiyor')}"
             except Exception as e:
-                return f"[TELEGRAM_REACTION_EKLE]: Hata — {e}"
+                return f"[TELEGRAM_REACTION_EKLE]: Hata â€” {e}"
         if arac == "TELEGRAM_PING":
             try:
                 from gateway.platforms.telegram import ping as _ping
@@ -2428,7 +2428,7 @@ class Motor:
                 canli = _ping()
                 return f"[TELEGRAM_PING]: {'Baglanti basarili' if canli else 'Baglanti basarisiz (token yok veya API erisilemez)'}"
             except Exception as e:
-                return f"[TELEGRAM_PING]: Hata — {e}"
+                return f"[TELEGRAM_PING]: Hata â€” {e}"
         if arac == "TELEGRAM_RESIM_GONDER":
             from tools.send_message_tool import telegram_resim_gonder
 
@@ -2568,7 +2568,7 @@ class Motor:
             if adimlar:
                 return f"[UygHafiza]: {params[0]} - {params[1]}\n" + "\n".join(adimlar)
             return f"[UygHafiza]: '{params[1]}' kaydi yok."
-        # FAZ 4 H7 — Dosya analiz araçları
+        # FAZ 4 H7 â€” Dosya analiz araÃ§larÄ±
         if arac == "PDF_OKU":
             from reymen.arac.araclar_dosya_analiz import pdf_oku
 
@@ -2600,7 +2600,7 @@ class Motor:
             py_dosyalar = []
             toplam_boyut = 0
             for kokdizini, altklasorler, dosyalar in os.walk(kok):
-                # .ReYMeN, __pycache__, .git gibi gizli klasörleri atla
+                # .ReYMeN, __pycache__, .git gibi gizli klasÃ¶rleri atla
                 altklasorler[:] = [
                     d
                     for d in altklasorler
@@ -2619,7 +2619,7 @@ class Motor:
                 "dosyalar": py_dosyalar[:100],  # ilk 100
             }
             return f"[PROJE_TARA]: {json.dumps(ozet, ensure_ascii=False, indent=2)}"
-        # ── CUA (Computer Use Agent) ────────────────────────────────────
+        # â”€â”€ CUA (Computer Use Agent) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         if arac == "CUA_EKRAN_KULLAN":
             if not _CUA_MEVCUT:
                 return "[Hata]: cua_motor_araci modulu yuklu degil."
@@ -2630,7 +2630,7 @@ class Motor:
                 return "[Hata]: cua_motor_araci modulu yuklu degil."
             kok = params[0] if params else "."
             return CUA_ARACLARI_TARA(kok)
-        # ── TUI (Terminal UI) ────────────────────────────────────────────
+        # â”€â”€ TUI (Terminal UI) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         if arac == "TUI_BASLAT":
             try:
                 import subprocess
@@ -2654,13 +2654,13 @@ class Motor:
                 return f"[TUI] reymentui baslatildi (npm {'start' if not npm_script else npm_script})"
             except Exception as e:
                 return f"[TUI] Baslatma hatasi: {e}"
-        # ── Gateway Araçları ────────────────────────────────────────────
+        # â”€â”€ Gateway AraÃ§larÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         if arac == "GATEWAY_BASLAT":
             try:
                 from gateway.run import GatewayRunner
 
                 filtre = params[0].split(",") if params and params[0] else None
-                # Thread'de çalıştır (ana döngü bloke etmesin)
+                # Thread'de Ã§alÄ±ÅŸtÄ±r (ana dÃ¶ngÃ¼ bloke etmesin)
                 import threading as _gt
 
                 self._gateway_runner = GatewayRunner(polling_interval=5.0)
@@ -2672,7 +2672,7 @@ class Motor:
                 ).start()
                 import time as _gt_time
 
-                _gt_time.sleep(1.5)  # başlangıç için bekle
+                _gt_time.sleep(1.5)  # baÅŸlangÄ±Ã§ iÃ§in bekle
                 ozet = self._gateway_runner.durum_ozeti()
                 return (
                     f"[GATEWAY_BASLAT] Gateway baslatildi. "
@@ -2694,7 +2694,7 @@ class Motor:
             try:
                 from gateway.restart import platform_kaydet, restart_all
 
-                # Mevcut platformları restart.py'ye kaydet
+                # Mevcut platformlarÄ± restart.py'ye kaydet
                 from gateway.platforms import platform_listele, platform_al
 
                 for ad in platform_listele():
@@ -2746,13 +2746,13 @@ class Motor:
             except Exception as e:
                 return f"[GATEWAY_DURUM] Hata: {e}"
 
-        # ALT_AJAN araçları
+        # ALT_AJAN araÃ§larÄ±
         if arac in ("ALT_AJAN_GOREVLENDIR", "ALT_AJAN_DURUM", "ALT_AJAN_IPTAL"):
             try:
-                from reymen.cereyan.alt_ajan import AltAjanKoordinatörü
+                from reymen.cereyan.alt_ajan import AltAjanKoordinatÃ¶rÃ¼
 
                 if not hasattr(self, "_alt_ajan"):
-                    self._alt_ajan = AltAjanKoordinatörü()
+                    self._alt_ajan = AltAjanKoordinatÃ¶rÃ¼()
                 if arac == "ALT_AJAN_GOREVLENDIR":
                     import json
 
@@ -2782,7 +2782,7 @@ class Motor:
             except Exception as e:
                 return f"[ALT_AJAN] Hata: {e}"
 
-        # CLARIFY aracı
+        # CLARIFY aracÄ±
         if arac == "CLARIFY":
             try:
                 from tools.clarify_tool import run as clarify_run
@@ -2801,7 +2801,7 @@ class Motor:
             except Exception as e:
                 return f"[CLARIFY HATASI] {e}"
 
-        # EXECUTE_CODE aracı
+        # EXECUTE_CODE aracÄ±
         if arac == "EXECUTE_CODE":
             try:
                 from tools.execute_code_tool import run as exec_run
@@ -2817,7 +2817,7 @@ class Motor:
             except Exception as e:
                 return f"[EXECUTE_CODE HATASI] {e}"
 
-        # PROFIL_DEGISTIR — aktif profili değiştir
+        # PROFIL_DEGISTIR â€” aktif profili deÄŸiÅŸtir
         if arac == "PROFIL_DEGISTIR":
             if not _PROFILE_MGR:
                 return "[Profil] HATA: Profil yoneticisi yuklu degil."
@@ -2826,16 +2826,16 @@ class Motor:
                 return '[Profil] HATA: Profil adi gerekli. Kullanim: PROFIL_DEGISTIR("profil_adi")'
             return _PROFILE_MGR.profil_degistir(profil_adi)
 
-        # PROFIL_LISTELE — tüm profilleri listele
+        # PROFIL_LISTELE â€” tÃ¼m profilleri listele
         if arac == "PROFIL_LISTELE":
             if not _PROFILE_MGR:
                 return "[Profil] HATA: Profil yoneticisi yuklu degil."
             return _PROFILE_MGR.profil_listele()
 
-        return f"[Hata]: Bilinmeyen araç '{arac}'."
+        return f"[Hata]: Bilinmeyen araÃ§ '{arac}'."
 
     def _cevabi_temizle(self, cevap: str) -> str:
-        """Çıktıyı PII/sırlardan temizle: önce API key/token, sonra PII."""
+        """Ã‡Ä±ktÄ±yÄ± PII/sÄ±rlardan temizle: Ã¶nce API key/token, sonra PII."""
         if not cevap:
             return cevap
         if _agent_temizle:
@@ -2845,68 +2845,68 @@ class Motor:
         return cevap
 
     def _context_sikistir(self, gecmis: list) -> list:
-        """Uzun konuşma geçmişini sıkıştır."""
+        """Uzun konuÅŸma geÃ§miÅŸini sÄ±kÄ±ÅŸtÄ±r."""
         if _COMPRESSOR and len(gecmis) > 15:
             return _COMPRESSOR.sikistir(gecmis)
         return gecmis
 
     def _cache_kontrol(self, prompt: str, sistem: str = "") -> Optional[str]:
-        """Tekrarlanan promptları cache'den döndür."""
+        """Tekrarlanan promptlarÄ± cache'den dÃ¶ndÃ¼r."""
         if _CACHE:
             return _CACHE.al(sistem, [{"role": "user", "content": prompt}])
         return None
 
     def _cache_kaydet(self, prompt: str, yanit: str, sistem: str = "") -> None:
-        """Yanıtı cache'e kaydet."""
+        """YanÄ±tÄ± cache'e kaydet."""
         if _CACHE:
             _CACHE.ekle(sistem, [{"role": "user", "content": prompt}], yanit)
 
-    # ── Otonom Görev Çözücü ─────────────────────────────────
+    # â”€â”€ Otonom GÃ¶rev Ã‡Ã¶zÃ¼cÃ¼ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _llm_fix_iste(self, hata_msg: str, kod: str, dosya_adi: str = "") -> str:
-        """LLM'e hatayı gönder, düzeltilmiş kodu al.
+        """LLM'e hatayÄ± gÃ¶nder, dÃ¼zeltilmiÅŸ kodu al.
 
-        İyileştirmeler:
-        - Dosya adı context'e eklenir
-        - Hata tipi çıkarılır ve eklenir
+        Ä°yileÅŸtirmeler:
+        - Dosya adÄ± context'e eklenir
+        - Hata tipi Ã§Ä±karÄ±lÄ±r ve eklenir
         - Token limiti (4000 char kod, 2000 char hata)
         """
         from reymen.core.model_adapter import get_active_adapter
 
         a = get_active_adapter()
 
-        # Hata tipini çıkar (ilk satırdan)
+        # Hata tipini Ã§Ä±kar (ilk satÄ±rdan)
         hata_tipi = ""
         if hata_msg:
             ilk_satir = hata_msg.strip().split("\n")[0]
             if ":" in ilk_satir:
                 hata_tipi = ilk_satir.split(":")[0].strip()
 
-        # Kod ve hatayı kısalt (token limiti)
+        # Kod ve hatayÄ± kÄ±salt (token limiti)
         kod_kisa = kod[:4000] if len(kod) > 4000 else kod
         hata_kisa = hata_msg[:2000] if len(hata_msg) > 2000 else hata_msg
 
         dosya_bilgisi = f"Dosya: {dosya_adi}\n" if dosya_adi else ""
 
         return a.complete(
-            f"Bu Python kodu şu hatayı verdi:\n\n"
+            f"Bu Python kodu ÅŸu hatayÄ± verdi:\n\n"
             f"{dosya_bilgisi}"
-            f"HATA TİPİ: {hata_tipi}\n"
+            f"HATA TÄ°PÄ°: {hata_tipi}\n"
             f"HATA:\n{hata_kisa}\n\n"
             f"KOD:\n{kod_kisa}\n\n"
-            "Görevi:\n"
-            "1. Hatanın kaynağını belirle\n"
-            "2. Düzelt\n"
-            "3. Sadece çalışan Python kodunu döndür — açıklama yok, markdown yok, ``` yok"
+            "GÃ¶revi:\n"
+            "1. HatanÄ±n kaynaÄŸÄ±nÄ± belirle\n"
+            "2. DÃ¼zelt\n"
+            "3. Sadece Ã§alÄ±ÅŸan Python kodunu dÃ¶ndÃ¼r â€” aÃ§Ä±klama yok, markdown yok, ``` yok"
         )
 
     @staticmethod
     def _fix_dogrula(fix_path: Path) -> tuple:
-        """Fix'i doğrula. Döner: (başarılı_mı, stderr).
+        """Fix'i doÄŸrula. DÃ¶ner: (baÅŸarÄ±lÄ±_mÄ±, stderr).
 
-        İyileştirmeler:
-        - sys.executable kullan (doğru Python)
-        - stderr döndür (hata ayıklama için)
+        Ä°yileÅŸtirmeler:
+        - sys.executable kullan (doÄŸru Python)
+        - stderr dÃ¶ndÃ¼r (hata ayÄ±klama iÃ§in)
         """
         import subprocess
         import sys
@@ -2917,14 +2917,14 @@ class Motor:
         return r.returncode == 0, r.stderr
 
     def script_calistir(self, script_path: str) -> bool:
-        """Python script çalıştır, hata alırsa SelfHeal ile çöz.
+        """Python script Ã§alÄ±ÅŸtÄ±r, hata alÄ±rsa SelfHeal ile Ã§Ã¶z.
 
         SelfHeal v2 entegrasyonu:
-        1. Script çalıştır (subprocess)
-        2. Hata varsa → SelfHeal.script_coz() tetikle
-        3. SelfHeal: imza → hafıza → LLM → subprocess doğrulama → kaydet
-        4. Çözüm başarılıysa fix'i çalıştır
-        5. Değilse False dön
+        1. Script Ã§alÄ±ÅŸtÄ±r (subprocess)
+        2. Hata varsa â†’ SelfHeal.script_coz() tetikle
+        3. SelfHeal: imza â†’ hafÄ±za â†’ LLM â†’ subprocess doÄŸrulama â†’ kaydet
+        4. Ã‡Ã¶zÃ¼m baÅŸarÄ±lÄ±ysa fix'i Ã§alÄ±ÅŸtÄ±r
+        5. DeÄŸilse False dÃ¶n
         """
         path = Path(script_path)
         if not path.exists():
@@ -2942,32 +2942,32 @@ class Motor:
 
             stderr = r.stderr
             logger.info(
-                "[script_calistir] ❌ Hata (deneme %d/3): %.80s", deneme, stderr[:80]
+                "[script_calistir] âŒ Hata (deneme %d/3): %.80s", deneme, stderr[:80]
             )
 
-            # SelfHeal ile çöz
+            # SelfHeal ile Ã§Ã¶z
             try:
                 from reymen.core.self_heal import SelfHeal
 
-                heal = SelfHeal(max_deneme=1)  # her denemede 1 LLM çağrısı
+                heal = SelfHeal(max_deneme=1)  # her denemede 1 LLM Ã§aÄŸrÄ±sÄ±
                 sonuc = heal.script_coz(script_path, stderr)
 
                 if sonuc["basarili"]:
-                    # Fix başarılı — fix dosyasını kullan
+                    # Fix baÅŸarÄ±lÄ± â€” fix dosyasÄ±nÄ± kullan
                     path = Path(sonuc["fix_path"])
                     logger.info(
-                        "[script_calistir] ✅ SelfHeal çözdü (deneme %d, kaynak: %s)",
+                        "[script_calistir] âœ… SelfHeal Ã§Ã¶zdÃ¼ (deneme %d, kaynak: %s)",
                         deneme,
                         sonuc["kaynak"],
                     )
                 else:
                     logger.warning(
-                        "[script_calistir] ❌ SelfHeal çözemedi (deneme %d): %.80s",
+                        "[script_calistir] âŒ SelfHeal Ã§Ã¶zemedi (deneme %d): %.80s",
                         deneme,
                         sonuc.get("hata", "bilinmeyen")[:80],
                     )
             except Exception as e:
-                logger.exception("[script_calistir] SelfHeal hatası: %s", e)
+                logger.exception("[script_calistir] SelfHeal hatasÄ±: %s", e)
 
             # Backoff (2. ve 3. denemede)
             if deneme < 3:
@@ -2979,10 +2979,10 @@ class Motor:
         return False
 
     def ogren(self, hata_mesaji: str, script_kodu: str, ad: str) -> str:
-        """LLM'e sor, fix üret, döndür.
+        """LLM'e sor, fix Ã¼ret, dÃ¶ndÃ¼r.
 
         SelfHeal v2 entegrasyonu:
-        Önce SelfHeal dene, olmazsa direkt LLM fallback.
+        Ã–nce SelfHeal dene, olmazsa direkt LLM fallback.
         """
         # SelfHeal ile dene
         try:
@@ -2994,13 +2994,13 @@ class Motor:
             if sonuc["basarili"]:
                 return sonuc["cozum"]
         except Exception as e:
-            logger.warning("[ogren] SelfHeal hatası: %s, LLM fallback", e)
+            logger.warning("[ogren] SelfHeal hatasÄ±: %s, LLM fallback", e)
 
         # Fallback: direkt LLM'e sor
         return self._llm_fix_iste(hata_mesaji, script_kodu, dosya_adi=ad)
 
     def ogrenme_istatistik(self) -> dict:
-        """Öğrenme hafızası + SelfHeal istatistikleri."""
+        """Ã–ÄŸrenme hafÄ±zasÄ± + SelfHeal istatistikleri."""
         ogrenme = {}
         self_heal = {}
         try:
@@ -3017,7 +3017,7 @@ class Motor:
 
             self_heal = istatistik_al()
         except Exception:
-            self_heal = {"hata": "SelfHeal henüz çalışmadı"}
+            self_heal = {"hata": "SelfHeal henÃ¼z Ã§alÄ±ÅŸmadÄ±"}
 
         return {
             "ogrenme_hafiza": ogrenme,
@@ -3027,8 +3027,8 @@ class Motor:
         }
 
     def gorev_coz(self, gorev_yolu: str) -> dict:
-        """Verilen görev dosyasını oku, adımları çöz, sonuçları döndür.
-        Kullanım: motor.gorev_coz(".ReYMeN/gorev_cozucu_sistemi.md")
+        """Verilen gÃ¶rev dosyasÄ±nÄ± oku, adÄ±mlarÄ± Ã§Ã¶z, sonuÃ§larÄ± dÃ¶ndÃ¼r.
+        KullanÄ±m: motor.gorev_coz(".ReYMeN/gorev_cozucu_sistemi.md")
         """
         if not _ORCHESTRATOR_MEVCUT:
             return {"hata": "Orchestrator yuklu degil. pip install reymen-core"}
@@ -3041,15 +3041,15 @@ class Motor:
             return {"hata": str(e), "durum": "hata"}
 
     def hatadan_kurtul(self, kod: str, hata: str, dosya_adi: str = "") -> str:
-        """Bir Python kodundaki hatayı çöz, düzeltilmiş halini al.
+        """Bir Python kodundaki hatayÄ± Ã§Ã¶z, dÃ¼zeltilmiÅŸ halini al.
 
-        İyileştirmeler (v2):
-        - Önce öğrenme hafızasında ara (hızlı çözüm)
-        - Hafızada yoksa OgrenmeDongusu kullan (LLM + backoff)
-        - Son çare olarak orchestrator'a başvur
-        - Dosya adı context'e eklenir
+        Ä°yileÅŸtirmeler (v2):
+        - Ã–nce Ã¶ÄŸrenme hafÄ±zasÄ±nda ara (hÄ±zlÄ± Ã§Ã¶zÃ¼m)
+        - HafÄ±zada yoksa OgrenmeDongusu kullan (LLM + backoff)
+        - Son Ã§are olarak orchestrator'a baÅŸvur
+        - Dosya adÄ± context'e eklenir
         """
-        # 1. Önce öğrenme hafızasında ara
+        # 1. Ã–nce Ã¶ÄŸrenme hafÄ±zasÄ±nda ara
         try:
             from reymen.core.ogrenme import imza_uret, cozum_bul, tablo_olustur
 
@@ -3059,11 +3059,11 @@ class Motor:
             onceki = cozum_bul(imza)
             if onceki:
                 logger.info(
-                    "[hatadan_kurtul] Hafızadan çözüm bulundu (imza: %s)", imza[:16]
+                    "[hatadan_kurtul] HafÄ±zadan Ã§Ã¶zÃ¼m bulundu (imza: %s)", imza[:16]
                 )
                 return onceki
         except Exception as e:
-            logger.warning("[hatadan_kurtul] Hafıza arama hatası: %s", e)
+            logger.warning("[hatadan_kurtul] HafÄ±za arama hatasÄ±: %s", e)
 
         # 2. OgrenmeDongusu dene (LLM + backoff + kaydetme)
         try:
@@ -3071,9 +3071,9 @@ class Motor:
             if cozum and not cozum.startswith("Hata"):
                 return cozum
         except Exception as e:
-            logger.warning("[hatadan_kurtul] OgrenmeDongusu hatası: %s", e)
+            logger.warning("[hatadan_kurtul] OgrenmeDongusu hatasÄ±: %s", e)
 
-        # 3. Son çare: orchestrator
+        # 3. Son Ã§are: orchestrator
         if _ORCHESTRATOR_MEVCUT:
             try:
                 from reymen.core.orchestrator import coz_hata
@@ -3082,12 +3082,12 @@ class Motor:
             except Exception as e:
                 return f"Hata cozulemedi: {e}"
 
-        return f"Çözüm bulunamadı. Hata: {hata[:200]}"
+        return f"Ã‡Ã¶zÃ¼m bulunamadÄ±. Hata: {hata[:200]}"
 
     def _self_heal_calistir(self, hedef_hata_kod: str) -> str:
-        """SELF_HEAL aracı için lambda wrapper.
+        """SELF_HEAL aracÄ± iÃ§in lambda wrapper.
 
-        Parametre: 'hedef|hata|kod' (| ile ayrılmış)
+        Parametre: 'hedef|hata|kod' (| ile ayrÄ±lmÄ±ÅŸ)
         """
         try:
             from reymen.core.self_heal import SelfHeal
@@ -3097,27 +3097,27 @@ class Motor:
             hata = parts[1] if len(parts) > 1 else ""
             kod = parts[2] if len(parts) > 2 else ""
             if not hata:
-                return "[SelfHeal] ❌ Hata mesajı gerekli. Format: hedef|hata|kod"
+                return "[SelfHeal] âŒ Hata mesajÄ± gerekli. Format: hedef|hata|kod"
             heal = SelfHeal()
             sonuc = heal.coz(hedef, hata, kod)
             if sonuc["basarili"]:
                 return (
-                    f"[SelfHeal] ✅ Çözüldü (kaynak: {sonuc['kaynak']}, "
+                    f"[SelfHeal] âœ… Ã‡Ã¶zÃ¼ldÃ¼ (kaynak: {sonuc['kaynak']}, "
                     f"deneme: {sonuc['deneme_sayisi']})\n"
-                    f"Çözüm:\n{sonuc['cozum']}"
+                    f"Ã‡Ã¶zÃ¼m:\n{sonuc['cozum']}"
                 )
             else:
                 return (
-                    f"[SelfHeal] ❌ Çözülemedi "
+                    f"[SelfHeal] âŒ Ã‡Ã¶zÃ¼lemedi "
                     f"({sonuc['deneme_sayisi']} deneme)\n"
                     f"Hata: {sonuc['hata']}"
                 )
         except Exception as e:
-            return f"[SelfHeal] ❌ İç hata: {e}"
+            return f"[SelfHeal] âŒ Ä°Ã§ hata: {e}"
 
     @staticmethod
     def _gorev_adimlari_oku(gorev_yolu: str) -> list[tuple[str, str]]:
-        """Görev dosyasından ADIMLARI oku. Format:
+        """GÃ¶rev dosyasÄ±ndan ADIMLARI oku. Format:
         ADIM_1 | reymen/scripts/step_01.py
         ADIM_2 | reymen/scripts/step_02.py
         """

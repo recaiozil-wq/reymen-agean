@@ -1,14 +1,14 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-config_loader.py — ReYMeN Yapılandırma Yükleyici.
+config_loader.py â€” ReYMeN YapÄ±landÄ±rma YÃ¼kleyici.
 
-config.yaml dosyasını okur, main.py'deki CONFIG dict ile birleştirir.
-Environment variable'lar her zaman önceliklidir.
+config.yaml dosyasÄ±nÄ± okur, main.py'deki CONFIG dict ile birleÅŸtirir.
+Environment variable'lar her zaman Ã¶nceliklidir.
 
-Kullanım:
+KullanÄ±m:
     from config_loader import load_config, config_to_dict
     cfg = load_config("config.yaml")
-    CONFIG = config_to_dict(cfg)  # main.py CONFIG formatına dönüştür
+    CONFIG = config_to_dict(cfg)  # main.py CONFIG formatÄ±na dÃ¶nÃ¼ÅŸtÃ¼r
 """
 
 from __future__ import annotations
@@ -20,7 +20,7 @@ from typing import Any, Dict, Optional
 
 logger = logging.getLogger(__name__)
 
-# --- YAML yükleyici (try/except ile) ---
+# --- YAML yÃ¼kleyici (try/except ile) ---
 try:
     import yaml
 
@@ -33,7 +33,7 @@ except ImportError:
 
 
 def load_yaml_safe(path: Path) -> Optional[Dict[str, Any]]:
-    """YAML dosyasını güvenli şekilde yükle. PyYAML yoksa None."""
+    """YAML dosyasÄ±nÄ± gÃ¼venli ÅŸekilde yÃ¼kle. PyYAML yoksa None."""
     if not _YAML_AVAILABLE:
         return None
     if not path.exists():
@@ -55,7 +55,7 @@ def load_yaml_safe(path: Path) -> Optional[Dict[str, Any]]:
 
 
 def _env_or(value: Any, env_key: str, default: Any = None) -> Any:
-    """Environment variable varsa onu döndür, yoksa value."""
+    """Environment variable varsa onu dÃ¶ndÃ¼r, yoksa value."""
     env_val = os.environ.get(env_key)
     if env_val is not None and env_val.strip() and not env_val.startswith("***"):
         return env_val.strip()
@@ -63,7 +63,7 @@ def _env_or(value: Any, env_key: str, default: Any = None) -> Any:
 
 
 def _resolve_provider_api_key(provider_cfg: Dict[str, Any]) -> Dict[str, Any]:
-    """Sağlayıcı yapılandırmasında env key varsa çözümle."""
+    """SaÄŸlayÄ±cÄ± yapÄ±landÄ±rmasÄ±nda env key varsa Ã§Ã¶zÃ¼mle."""
     cfg = dict(provider_cfg)
     env_key = cfg.pop("api_key_env", None)
     if env_key:
@@ -72,22 +72,22 @@ def _resolve_provider_api_key(provider_cfg: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def load_config(config_path: Optional[str] = None) -> Dict[str, Any]:
-    """config.yaml + env override ile birleşik yapılandırma döndür.
+    """config.yaml + env override ile birleÅŸik yapÄ±landÄ±rma dÃ¶ndÃ¼r.
 
     Args:
-        config_path: config.yaml yolu. None = proje kökü/config.yaml
+        config_path: config.yaml yolu. None = proje kÃ¶kÃ¼/config.yaml
 
     Returns:
-        Birleşik yapılandırma dict'i (env override uygulanmış)
+        BirleÅŸik yapÄ±landÄ±rma dict'i (env override uygulanmÄ±ÅŸ)
     """
     if config_path is None:
-        # Proje kökünü bul (config_loader.py'nin bulunduğu dizin)
+        # Proje kÃ¶kÃ¼nÃ¼ bul (config_loader.py'nin bulunduÄŸu dizin)
         config_path = str(Path(__file__).parent / "config.yaml")
 
     yaml_path = Path(config_path)
     yaml_cfg = load_yaml_safe(yaml_path) or {}
 
-    # ── Genel ayarlar ──────────────────────────────────────────────
+    # â”€â”€ Genel ayarlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     general = yaml_cfg.get("general", {})
     result: Dict[str, Any] = {
         "default_model": _env_or(
@@ -117,7 +117,7 @@ def load_config(config_path: Optional[str] = None) -> Dict[str, Any]:
         ),
     }
 
-    # ── Sağlayıcılar ───────────────────────────────────────────────
+    # â”€â”€ SaÄŸlayÄ±cÄ±lar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     providers = {}
     for name, pcfg in yaml_cfg.get("providers", {}).items():
         resolved = _resolve_provider_api_key(pcfg)
@@ -128,7 +128,7 @@ def load_config(config_path: Optional[str] = None) -> Dict[str, Any]:
         providers[name] = resolved
     result["providers"] = providers
 
-    # ── Fallback model ─────────────────────────────────────────────
+    # â”€â”€ Fallback model â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     fallback = yaml_cfg.get("fallback_model", {})
     if fallback:
         api_key = ""
@@ -146,7 +146,7 @@ def load_config(config_path: Optional[str] = None) -> Dict[str, Any]:
     else:
         result["fallback_model"] = None
 
-    # ── Yardımcı modeller ──────────────────────────────────────────
+    # â”€â”€ YardÄ±mcÄ± modeller â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     aux = yaml_cfg.get("auxiliary", {})
     result["auxiliary"] = {}
     for modality, mcfg in aux.items():
@@ -155,7 +155,7 @@ def load_config(config_path: Optional[str] = None) -> Dict[str, Any]:
             resolved.pop("api_key_env")
         result["auxiliary"][modality] = resolved
 
-    # ── Telegram ───────────────────────────────────────────────────
+    # â”€â”€ Telegram â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     tg = yaml_cfg.get("telegram", {})
     result["telegram"] = {
         "token": _env_or("", tg.get("token_env", "TELEGRAM_BOT_TOKEN")),
@@ -165,7 +165,7 @@ def load_config(config_path: Optional[str] = None) -> Dict[str, Any]:
         ),
     }
 
-    # ── State machine ──────────────────────────────────────────────
+    # â”€â”€ State machine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     sm = yaml_cfg.get("state_machine", {})
     result["state_machine"] = {
         "enabled": sm.get("enabled", True),
@@ -173,14 +173,14 @@ def load_config(config_path: Optional[str] = None) -> Dict[str, Any]:
         "stale_timeout_sec": sm.get("stale_timeout_sec", 120),
     }
 
-    # ── Service bridge ─────────────────────────────────────────────
+    # â”€â”€ Service bridge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     sb = yaml_cfg.get("service_bridge", {})
     result["service_bridge"] = {
         "enabled": sb.get("enabled", True),
         "max_queue_size": sb.get("max_queue_size", 1000),
     }
 
-    # ── Auto recovery ──────────────────────────────────────────────
+    # â”€â”€ Auto recovery â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     ar = yaml_cfg.get("auto_recovery", {})
     result["auto_recovery"] = {
         "enabled": ar.get("enabled", True),
@@ -199,7 +199,7 @@ def load_config(config_path: Optional[str] = None) -> Dict[str, Any]:
     log_cfg = yaml_cfg.get("logging", {})
     result["logging"] = log_cfg
 
-    # ── Profil yukleme (multi-profile sistemi) ─────────────────────
+    # â”€â”€ Profil yukleme (multi-profile sistemi) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     try:
         from reymen.sistem.profile_manager import get_profile_manager
 
@@ -243,10 +243,10 @@ def load_config(config_path: Optional[str] = None) -> Dict[str, Any]:
 def merge_with_existing(
     yaml_config: Dict[str, Any], existing_config: Dict[str, Any]
 ) -> Dict[str, Any]:
-    """YAML config'i mevcut CONFIG dict ile birleştir.
+    """YAML config'i mevcut CONFIG dict ile birleÅŸtir.
 
     Mevcut dict'te olup YAML'da olmayan alanlar korunur.
-    YAML değerleri sadece mevcut dict boşsa veya override edilecekse yazılır.
+    YAML deÄŸerleri sadece mevcut dict boÅŸsa veya override edilecekse yazÄ±lÄ±r.
     """
     merged = dict(existing_config)
 
@@ -261,7 +261,7 @@ def merge_with_existing(
         if key in yaml_config:
             merged[key] = yaml_config[key]
 
-    # providers — yaml'daki provider'ları ekle/override et
+    # providers â€” yaml'daki provider'larÄ± ekle/override et
     if "providers" in merged and "providers" in yaml_config:
         for pname, pcfg in yaml_config["providers"].items():
             if pname not in merged["providers"]:
@@ -304,7 +304,7 @@ def merge_with_existing(
     return merged
 
 
-# ── Hızlı test ───────────────────────────────────────────────────────────────
+# â”€â”€ HÄ±zlÄ± test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     cfg = load_config()

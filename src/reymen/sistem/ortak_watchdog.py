@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-ortak_watchdog.py — ReYMeN Otonom Degisiklik Izleyici.
+ortak_watchdog.py â€” ReYMeN Otonom Degisiklik Izleyici.
 
 Projedeki .py dosyalarini izler, degisiklik algilayinca
 otomatik olarak ortak_komut.guncelle() ve durum.json'u tetikler.
@@ -26,14 +26,14 @@ from typing import Optional
 
 logger = logging.getLogger(__name__)
 
-# ── Sabitler ──────────────────────────────────────────────────────────────
+# â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 PROJE_KOK = Path(__file__).resolve().parent.parent.parent
 HASH_DOSYASI = PROJE_KOK / ".ReYMeN" / "watchdog_hash.json"
 SCAN_ARALIGI = 120  # saniye (30sn cok agresif, disk I/O patlamasi engelle)
 POLLUTION_DOSYALARI = {"__pycache__", ".git", ".venv", "venv", "node_modules"}
 
-# ── Hash Islemleri ────────────────────────────────────────────────────────
+# â”€â”€ Hash Islemleri â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _dosya_hash(dosya: Path) -> str:
@@ -77,7 +77,7 @@ def _hash_oku() -> str:
     return ""
 
 
-# ── Ana Fonksiyon ─────────────────────────────────────────────────────────
+# â”€â”€ Ana Fonksiyon â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def degisiklik_kontrol() -> bool:
@@ -97,7 +97,7 @@ def degisiklik_kontrol() -> bool:
 
         guncelle()
         _hash_kaydet(yeni_hash)
-        logger.info("[Watchdog] ✅ Degisiklik algilandi, durum.json guncellendi")
+        logger.info("[Watchdog] âœ… Degisiklik algilandi, durum.json guncellendi")
         return True
     except Exception as e:
         # Henuz ortak_komut yuklenemiyorsa sadece hash kaydet
@@ -106,7 +106,7 @@ def degisiklik_kontrol() -> bool:
         return False
 
 
-# ── Watchdog Thread ───────────────────────────────────────────────────────
+# â”€â”€ Watchdog Thread â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _watchdog_dongu(interval: int = SCAN_ARALIGI) -> None:
@@ -139,10 +139,10 @@ def watchdog_baslat(interval: int = SCAN_ARALIGI) -> None:
         name="reymen-watchdog",
     )
     _watchdog_thread.start()
-    logger.info("[Watchdog] ✅ Baslatildi (her %s sn kontrol)", interval)
+    logger.info("[Watchdog] âœ… Baslatildi (her %s sn kontrol)", interval)
 
 
-# ── CLI Test ──────────────────────────────────────────────────────────────
+# â”€â”€ CLI Test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
     import argparse
@@ -161,7 +161,7 @@ if __name__ == "__main__":
 
     if args.check:
         sonuc = degisiklik_kontrol()
-        print(f"{'✅ Degisiklik bulundu' if sonuc else 'ℹ️  Degisiklik yok'}")
+        print(f"{'âœ… Degisiklik bulundu' if sonuc else 'â„¹ï¸  Degisiklik yok'}")
     if args.watch > 0:
         print(f"Watchdog baslatiliyor (her {args.watch} sn)...")
         watchdog_baslat(args.watch)

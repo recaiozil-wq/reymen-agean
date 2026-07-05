@@ -1,6 +1,6 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
-FIX 04 — Güvenlik Taraması (shell=False, credential, SQL, Bandit)
+FIX 04 â€” GÃ¼venlik TaramasÄ± (shell=False, credential, SQL, Bandit)
 """
 
 import sys, json, time, shutil, subprocess, re
@@ -21,19 +21,19 @@ class C:
 
 
 def ok(m):
-    print(f"  {C.GRN}✅ {m}{C.RESET}")
+    print(f"  {C.GRN}âœ… {m}{C.RESET}")
 
 
 def warn(m):
-    print(f"  {C.YEL}⚠️  {m}{C.RESET}")
+    print(f"  {C.YEL}âš ï¸  {m}{C.RESET}")
 
 
 def err(m):
-    print(f"  {C.RED}❌ {m}{C.RESET}")
+    print(f"  {C.RED}âŒ {m}{C.RESET}")
 
 
 def hdr(t):
-    print(f"\n{C.BOLD}{C.BLU}{'═'*60}\n  {t}\n{'═'*60}{C.RESET}")
+    print(f"\n{C.BOLD}{C.BLU}{'â•'*60}\n  {t}\n{'â•'*60}{C.RESET}")
 
 
 def py_files(kok):
@@ -58,7 +58,7 @@ def py_files(kok):
 
 def main():
     kok = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else Path(".").resolve()
-    hdr(f"FIX 04 — Güvenlik Taraması\nKök: {kok}")
+    hdr(f"FIX 04 â€” GÃ¼venlik TaramasÄ±\nKÃ¶k: {kok}")
     t0 = time.time()
     rapor = {
         "tarih": datetime.now().isoformat(),
@@ -85,7 +85,7 @@ def main():
         except Exception as _e:
             pass  # log eklenecek
     if not rapor["shell_true"]:
-        ok("shell=False bulunamadı")
+        ok("shell=False bulunamadÄ±")
 
     # Credential
     hdr("2. Hardcoded Credential")
@@ -139,11 +139,11 @@ def main():
             if "No issues identified" in out:
                 ok("Bandit: sorun yok")
             else:
-                warn("Bandit bulgu var — rapora bak")
+                warn("Bandit bulgu var â€” rapora bak")
         except Exception as e:
             warn(f"Bandit hata: {e}")
     else:
-        warn("bandit yok — pip install bandit")
+        warn("bandit yok â€” pip install bandit")
 
     rapor["ozet"] = {
         "shell_true": len(rapor["shell_true"]),

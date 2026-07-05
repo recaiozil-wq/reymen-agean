@@ -1,11 +1,11 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-config_manager.py — ReYMeN YAML Config / Profile Manager.
+config_manager.py â€” ReYMeN YAML Config / Profile Manager.
 
-Hard-coded yollari (.ReYMeN/, ~/AppData/Local/hermes/) ortadan kaldirir.
+Hard-coded yollari (.ReYMeN/, ~/AppData/Local/reymen/) ortadan kaldirir.
 Tum yollar config.yaml + .env override + varsayilan degerler uzerinden cekilir.
 
-Profil sistemi: ~/.hermes/profiles/<ad>/config.yaml oku
+Profil sistemi: ~/.reymen/profiles/<ad>/config.yaml oku
 Environment variable override: REYMEN_<ANAHTAR> veya config'deki env_key ile
 
 Motor araclari:
@@ -32,7 +32,7 @@ import yaml
 
 logger = logging.getLogger(__name__)
 
-# ── Sabitler ────────────────────────────────────────────────
+# â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _PROJE_KOKU = (
     Path(__file__).resolve().parent.parent.parent
 )  # reymen/core/ -> reymen/ -> projekt
@@ -71,9 +71,9 @@ _ENV_MAP: dict[str, str] = {
 }
 
 
-# ═══════════════════════════════════════════════════════════════
-# Config — Merkezi yapilandirma yoneticisi
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# Config â€” Merkezi yapilandirma yoneticisi
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 @dataclass
@@ -90,7 +90,7 @@ class Config:
 
     Okuma sirasi (sonraki oncekinden once gelir):
       1. Varsayilan degerler (_VARSAYILAN_DEGERLER)
-      2. Profil config dosyasi (~/.hermes/profiles/<ad>/config.yaml)
+      2. Profil config dosyasi (~/.reymen/profiles/<ad>/config.yaml)
       3. Ana config dosyasi (proje config.yaml)
       4. Environment variable'lar (REYMEN_<ANAHTAR> veya _ENV_MAP)
 
@@ -114,7 +114,7 @@ class Config:
 
         self._yukle(profil)
 
-    # ── Yukleme ─────────────────────────────────────────────────
+    # â”€â”€ Yukleme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _yukle(self, profil: Optional[str] = None) -> None:
         """Config'i katmanli olarak yukler."""
@@ -176,7 +176,7 @@ class Config:
             if env_val is not None:
                 self._dict_set(self._data, config_key, env_val)
 
-    # ── Okuma ───────────────────────────────────────────────────
+    # â”€â”€ Okuma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def get(self, anahtar: str, varsayilan: Any = None) -> Any:
         """Config'den deger okur.
@@ -258,7 +258,7 @@ class Config:
         )
         return [ad for ad, _ in sirali] if sirali else _VARSAYILAN_PROVIDER_SIRASI
 
-    # ── Yazma ───────────────────────────────────────────────────
+    # â”€â”€ Yazma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def set(self, anahtar: str, deger: Any) -> bool:
         """Config degerini runtime'da degistirir.
@@ -304,7 +304,7 @@ class Config:
             logger.error("[Config] Config kaydedilemedi: %s", e)
             return False
 
-    # ── Durum ───────────────────────────────────────────────────
+    # â”€â”€ Durum â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def durum_raporu(self) -> dict:
         """Config durum raporu."""
@@ -342,7 +342,7 @@ class Config:
             "dirty": self._dirty,
         }
 
-    # ── Yardimci metotlar ──────────────────────────────────────
+    # â”€â”€ Yardimci metotlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @staticmethod
     def _dict_merge(hedef: dict, kaynak: dict, prefix: str = "") -> None:
@@ -387,7 +387,7 @@ class Config:
         )
 
 
-# ── Varsayilan provider sirasi (config'de priority yoksa) ────
+# â”€â”€ Varsayilan provider sirasi (config'de priority yoksa) â”€â”€â”€â”€
 _VARSAYILAN_PROVIDER_SIRASI = [
     "deepseek",
     "openrouter",
@@ -400,9 +400,9 @@ _VARSAYILAN_PROVIDER_SIRASI = [
 ]
 
 
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Varsayilan Config singleton
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 _varsayilan_config: Optional[Config] = None
 
@@ -422,13 +422,13 @@ def config_yeniden_yukle(profil: Optional[str] = None) -> Config:
     return _varsayilan_config
 
 
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Motor tool kayit
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def motor_kaydet(motor: Any) -> None:
-    """Config araçlarını Motor'a kaydeder."""
+    """Config araÃ§larÄ±nÄ± Motor'a kaydeder."""
     import json as _json
 
     def _config_goster() -> str:
@@ -452,12 +452,12 @@ def motor_kaydet(motor: Any) -> None:
           Basari mesaji veya hata
         """
         if not anahtar:
-            return "❌ Anahtar gerekli. Kullanim: CONFIG_AYARLA(anahtar='general.default_model', deger='deepseek-chat')"
+            return "âŒ Anahtar gerekli. Kullanim: CONFIG_AYARLA(anahtar='general.default_model', deger='deepseek-chat')"
         cfg = varsayilan_config()
         basarili = cfg.set_and_save(anahtar, deger)
         if basarili:
-            return f"✅ {anahtar} -> {deger}"
-        return f"❌ {anahtar} degistirilemedi"
+            return f"âœ… {anahtar} -> {deger}"
+        return f"âŒ {anahtar} degistirilemedi"
 
     motor._plugin_arac_kaydet(
         "CONFIG_GOSTER",
@@ -474,13 +474,13 @@ def motor_kaydet(motor: Any) -> None:
     )
 
 
-# ═══════════════════════════════════════════════════════════════
-# ConfigManager — Basit get/set/list arayüzü (cli.py uyumlu)
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ConfigManager â€” Basit get/set/list arayÃ¼zÃ¼ (cli.py uyumlu)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class ConfigManager:
-    """ConfigManager — proje kokundeki config.yaml uzerinde basit get/set/list.
+    """ConfigManager â€” proje kokundeki config.yaml uzerinde basit get/set/list.
 
     Config yoksa hata vermez, bos dict dondurur.
 

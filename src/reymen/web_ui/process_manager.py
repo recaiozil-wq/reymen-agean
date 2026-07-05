@@ -1,4 +1,4 @@
-"""⚙️ Güvenli process yönetimi — PID-based start/stop/restart."""
+﻿"""âš™ï¸ GÃ¼venli process yÃ¶netimi â€” PID-based start/stop/restart."""
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ PROJE_KOK = Path(__file__).resolve().parent.parent.parent
 
 
 class ProcessManager:
-    """PID-based process yönetimi. taskkill kullanmaz, sinyal gönderir."""
+    """PID-based process yÃ¶netimi. taskkill kullanmaz, sinyal gÃ¶nderir."""
 
     def __init__(self, pid_dir: Path | None = None) -> None:
         self.pid_dir = pid_dir or (PROJE_KOK / ".ReYMeN" / "pids")
@@ -50,7 +50,7 @@ class ProcessManager:
         self._durum_yolu(ad).write_text(json.dumps(durum, indent=2, ensure_ascii=False))
 
     def durum(self, ad: str) -> dict:
-        """Process durumunu döndür."""
+        """Process durumunu dÃ¶ndÃ¼r."""
         durum_yolu = self._durum_yolu(ad)
         pid_yolu = self._pid_yolu(ad)
 
@@ -89,7 +89,7 @@ class ProcessManager:
             try:
                 os.kill(pid, signal.SIGTERM)
                 if not force:
-                    # Graceful shutdown için bekle
+                    # Graceful shutdown iÃ§in bekle
                     for _ in range(10):
                         if not self._pid_calisiyor(pid):
                             break
@@ -105,7 +105,7 @@ class ProcessManager:
                                 timeout=5,
                             )
             except (OSError, subprocess.TimeoutExpired):
-                # Zaten ölmüş
+                # Zaten Ã¶lmÃ¼ÅŸ
                 logger.warning("[fix_01_sessiz_except] Exception")
         except (ValueError, OSError) as e:
             logger.warning("PID okunamadi: %s", e)
@@ -122,8 +122,8 @@ class ProcessManager:
         port: int = 5000,
         log_dosyasi: Path | None = None,
     ) -> bool:
-        """Process'i arka planda başlat."""
-        # Önce varsa durdur
+        """Process'i arka planda baÅŸlat."""
+        # Ã–nce varsa durdur
         self.durdur(ad)
 
         stdout = log_dosyasi or (self.pid_dir / f"{ad}.log")
@@ -141,11 +141,11 @@ class ProcessManager:
             logger.info("Process baslatildi: %s (PID=%d)", ad, proc.pid)
             return True
         except Exception as e:
-            logger.error("Process baslatilamadi: %s — %s", ad, e)
+            logger.error("Process baslatilamadi: %s â€” %s", ad, e)
             return False
 
     def tumu(self) -> list[dict]:
-        """Tüm kayıtlı process'leri listele."""
+        """TÃ¼m kayÄ±tlÄ± process'leri listele."""
         sonuclar = []
         for f in self.pid_dir.glob("*.pid"):
             ad = f.stem
@@ -154,7 +154,7 @@ class ProcessManager:
 
     @staticmethod
     def _pid_calisiyor(pid: int) -> bool:
-        """PID canlı mı kontrol et."""
+        """PID canlÄ± mÄ± kontrol et."""
         if sys.platform == "win32":
             try:
                 result = subprocess.run(

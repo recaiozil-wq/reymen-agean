@@ -1,14 +1,14 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-📊 analitik.py — ReYMeN Kalite/Analitik Motoru.
+ğŸ“Š analitik.py â€” ReYMeN Kalite/Analitik Motoru.
 
 SQLite tabanli metrik toplama, raporlama ve dashboard.
 Her LLM cagrisi, tool kullanimi, hata ve maliyeti kaydeder.
 
 Kullanim (motor):
     ANALITIK_KAYDET(tur="llm_cagri", detay={"model": "deepseek", "token": 1500})
-    ANALITIK_RAPOR(gun=7)  → son 7 gun
-    ANALITIK_PANEL()       → HTML dashboard
+    ANALITIK_RAPOR(gun=7)  â†’ son 7 gun
+    ANALITIK_PANEL()       â†’ HTML dashboard
 """
 
 from __future__ import annotations
@@ -25,7 +25,7 @@ from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
-# ── Sabitler ────────────────────────────────────────────────────────────────
+# â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 PROJE_KOK: Path = Path(__file__).resolve().parent.parent.parent
 DB_DIZINI: Path = PROJE_KOK / "reymen" / "merkez_db"
@@ -98,7 +98,7 @@ def _tablolari_olustur():
     conn.commit()
 
 
-# ── Kayit Fonksiyonlari ─────────────────────────────────────────────────────
+# â”€â”€ Kayit Fonksiyonlari â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def kaydet(
@@ -203,7 +203,7 @@ def hata_kaydet(
     )
 
 
-# ── Rapor Fonksiyonlari ─────────────────────────────────────────────────────
+# â”€â”€ Rapor Fonksiyonlari â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def ozet_son_n(gun: int = 7) -> dict[str, Any]:
@@ -334,7 +334,7 @@ def haftalik_ozet() -> str:
     """Insan okunabilir haftalik ozet metni."""
     o = ozet_son_n(7)
     satirlar = [
-        "📊 **Haftalik Analitik Ozeti**",
+        "ğŸ“Š **Haftalik Analitik Ozeti**",
         f"  Donem: son {o['donem_gun']} gun",
         f"  Toplam olay: {o['toplam_olay']}",
         f"  Basari: %{o['basari_orani']}",
@@ -352,12 +352,12 @@ def haftalik_ozet() -> str:
     if o.get("en_cok_hatalar"):
         satirlar.append("**En cok hata:**")
         for h in o["en_cok_hatalar"][:5]:
-            satirlar.append(f"  ❌ {h['kaynak']}: {h['adet']}x - {h['hata']}")
+            satirlar.append(f"  âŒ {h['kaynak']}: {h['adet']}x - {h['hata']}")
 
     return "\n".join(satirlar)
 
 
-# ── Temizlik ─────────────────────────────────────────────────────────────────
+# â”€â”€ Temizlik â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def eski_kayitlari_temizle(saklama_gunu: int = 90):
@@ -372,7 +372,7 @@ def eski_kayitlari_temizle(saklama_gunu: int = 90):
     return silinen
 
 
-# ── Motor Tool'lari ─────────────────────────────────────────────────────────
+# â”€â”€ Motor Tool'lari â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def motor_analitik_kaydet(params: str = "") -> str:
@@ -406,7 +406,7 @@ def motor_analitik_kaydet(params: str = "") -> str:
         basarili = True
 
     _id = kaydet(tur=str(tur), basarili=bool(basarili), **params_dict)
-    return f"✅ Analitik kaydedildi (ID: {_id}, tur: {tur})"
+    return f"âœ… Analitik kaydedildi (ID: {_id}, tur: {tur})"
 
 
 def motor_analitik_rapor(params: str = "") -> str:
@@ -431,7 +431,7 @@ def motor_analitik_panel(params: str = "") -> str:
     return _dashboard_html()
 
 
-# ── HTML Dashboard ──────────────────────────────────────────────────────────
+# â”€â”€ HTML Dashboard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _dashboard_html() -> str:
@@ -469,8 +469,8 @@ th{{color:#8b949e;font-weight:600}}
 </style>
 </head>
 <body>
-<h1>📊 ReYMeN Analitik</h1>
-<p style="color:#8b949e;margin-bottom:20px">Son 7 gun • {datetime.now().strftime('%Y-%m-%d %H:%M')}</p>
+<h1>ğŸ“Š ReYMeN Analitik</h1>
+<p style="color:#8b949e;margin-bottom:20px">Son 7 gun â€¢ {datetime.now().strftime('%Y-%m-%d %H:%M')}</p>
 
 <div class="metrikler">
   <div class="metrik"><div class="deger">{o['toplam_olay']}</div><div class="etiket">Toplam Olay</div></div>
@@ -481,19 +481,19 @@ th{{color:#8b949e;font-weight:600}}
 </div>
 
 <div class="kart">
-<h2>📈 Trend</h2>
+<h2>ğŸ“ˆ Trend</h2>
 <div class="canvas-container"><canvas id="trendChart"></canvas></div>
 </div>
 
 <div class="kart">
-<h2>🏢 Provider Bazli</h2>
-<table><tr><th>Provider</th><th>Çağrı</th><th>Token</th><th>Maliyet</th><th>Ort. Süre</th></tr>
+<h2>ğŸ¢ Provider Bazli</h2>
+<table><tr><th>Provider</th><th>Ã‡aÄŸrÄ±</th><th>Token</th><th>Maliyet</th><th>Ort. SÃ¼re</th></tr>
 {''.join(f'<tr><td>{r["provider"]}</td><td>{r["cagri"]}</td><td>{r["token"]:,}</td><td>${r["maliyet"]}</td><td>{r["ortalama_sure_ms"]}ms</td></tr>' for r in p)}
 </table>
 </div>
 
 <div class="kart">
-<h2>❌ En Çok Hata</h2>
+<h2>âŒ En Ã‡ok Hata</h2>
 <ul class="hatalar">
 {''.join(f'<li><strong>{h["kaynak"]}</strong>: {h["hata"]} <span class="adet">{h["adet"]}x</span></li>' for h in o.get('en_cok_hatalar',[]))}
 </ul>
@@ -521,7 +521,7 @@ new Chart(document.getElementById('trendChart'), {{
 </html>"""
 
 
-# ── Motor Kaydi ─────────────────────────────────────────────────────────────
+# â”€â”€ Motor Kaydi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def motor_kaydet(motor: Any) -> None:
@@ -550,7 +550,7 @@ def motor_kaydet(motor: Any) -> None:
     logger.info("[Analitik] 3 tool motor'a kaydedildi")
 
 
-# ── Baslangic ───────────────────────────────────────────────────────────────
+# â”€â”€ Baslangic â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _tablolari_olustur()
 logger.info("Analitik motoru hazir -> %s", VERITABANI)

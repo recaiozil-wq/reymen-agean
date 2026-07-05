@@ -1,14 +1,14 @@
-"""_handle_rollback_command handler."""
+﻿"""_handle_rollback_command handler."""
 
 
 def _handle_rollback_command(cli, command: str):
-    """Handle /rollback — list, diff, or restore filesystem checkpoints.
+    """Handle /rollback â€” list, diff, or restore filesystem checkpoints.
 
     Syntax:
-        /rollback                 — list checkpoints
-        /rollback <N>             — restore checkpoint N (also undoes last chat turn)
-        /rollback diff <N>        — preview changes since checkpoint N
-        /rollback <N> <file>      — restore a single file from checkpoint N
+        /rollback                 â€” list checkpoints
+        /rollback <N>             â€” restore checkpoint N (also undoes last chat turn)
+        /rollback diff <N>        â€” preview changes since checkpoint N
+        /rollback <N> <file>      â€” restore a single file from checkpoint N
     """
     from tools.checkpoint_manager import format_checkpoint_list
 
@@ -65,7 +65,7 @@ def _handle_rollback_command(cli, command: str):
                     else:
                         print(f"\n{diff}")
         else:
-            print(f"  ❌ {result['error']}")
+            print(f"  âŒ {result['error']}")
         return
 
     # Resolve checkpoint reference (number or hash)
@@ -85,11 +85,11 @@ def _handle_rollback_command(cli, command: str):
     if result["success"]:
         if file_path:
             print(
-                f"  ✅ Restored {file_path} from checkpoint {result['restored_to']}: {result['reason']}"
+                f"  âœ… Restored {file_path} from checkpoint {result['restored_to']}: {result['reason']}"
             )
         else:
             print(
-                f"  ✅ Restored to checkpoint {result['restored_to']}: {result['reason']}"
+                f"  âœ… Restored to checkpoint {result['restored_to']}: {result['reason']}"
             )
         print("  A pre-rollback snapshot was saved automatically.")
 
@@ -99,7 +99,7 @@ def _handle_rollback_command(cli, command: str):
             cli.undo_last(prefill=False)
             print("  Chat turn undone to match restored file state.")
     else:
-        print(f"  ❌ {result['error']}")
+        print(f"  âŒ {result['error']}")
 
 
 import os  # noqa: E402

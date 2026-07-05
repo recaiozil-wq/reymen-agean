@@ -1,28 +1,28 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-langgraph_export.py — ReYMeN Konusma Döngüsü → LangGraph StateGraph Export Modülü.
+langgraph_export.py â€” ReYMeN Konusma DÃ¶ngÃ¼sÃ¼ â†’ LangGraph StateGraph Export ModÃ¼lÃ¼.
 
-conversation_loop.py'deki run_conversation() akışını analiz edip:
-- LangGraph StateGraph JSON formatında düğüm/kenar/koşul çıktısı
+conversation_loop.py'deki run_conversation() akÄ±ÅŸÄ±nÄ± analiz edip:
+- LangGraph StateGraph JSON formatÄ±nda dÃ¼ÄŸÃ¼m/kenar/koÅŸul Ã§Ä±ktÄ±sÄ±
 - Mermaid.js flowchart (```mermaid bloku)
-- CLI üzerinden reymen --langgraph-export ile graph.json + graph.md
+- CLI Ã¼zerinden reymen --langgraph-export ile graph.json + graph.md
 
-Akış adımları (run_conversation içindeki sıra):
-  1. BASLA     → task_id + session + budget + sistem_prompt oluştur
-  2. HAFIZA_KONTROL → OnceHafiza'da ara, session context injection
-  3. WEB_ARA   → web arama (gerekirse)
-  4. SKILL_ARA → skill tarama (FTS5) + ref_processor
-  5. LLM_CAGIR → API çağrısı (retry + fallback ile)
-  6. TOOL_CALISTIR → tool_calls varsa çalıştır, sonuçları ekle, loop
-  7. YANIT_VER → text response al, onayla
-  8. BITIS     → OnceHafiza'ya kaydet, session kapat, log
+AkÄ±ÅŸ adÄ±mlarÄ± (run_conversation iÃ§indeki sÄ±ra):
+  1. BASLA     â†’ task_id + session + budget + sistem_prompt oluÅŸtur
+  2. HAFIZA_KONTROL â†’ OnceHafiza'da ara, session context injection
+  3. WEB_ARA   â†’ web arama (gerekirse)
+  4. SKILL_ARA â†’ skill tarama (FTS5) + ref_processor
+  5. LLM_CAGIR â†’ API Ã§aÄŸrÄ±sÄ± (retry + fallback ile)
+  6. TOOL_CALISTIR â†’ tool_calls varsa Ã§alÄ±ÅŸtÄ±r, sonuÃ§larÄ± ekle, loop
+  7. YANIT_VER â†’ text response al, onayla
+  8. BITIS     â†’ OnceHafiza'ya kaydet, session kapat, log
 
-Koşullar (conditional edges):
-  - hafiza_var_mi:  Bellekte eşleşme var mı?
+KoÅŸullar (conditional edges):
+  - hafiza_var_mi:  Bellekte eÅŸleÅŸme var mÄ±?
   - web_gerekli_mi: Web arama gerekli mi?
-  - skill_var_mi:   Skill eşleşmesi var mı?
-  - tool_gerekli_mi:LLM tool_calls döndürdü mü?
-  - hata_var_mi:    Hata oluştu mu?
+  - skill_var_mi:   Skill eÅŸleÅŸmesi var mÄ±?
+  - tool_gerekli_mi:LLM tool_calls dÃ¶ndÃ¼rdÃ¼ mÃ¼?
+  - hata_var_mi:    Hata oluÅŸtu mu?
 """
 
 from __future__ import annotations
@@ -35,7 +35,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 
-# ── Sabitler ────────────────────────────────────────────────────────────────────
+# â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 AKIS_ADIMLARI = [
     "basla",
@@ -56,61 +56,61 @@ KOSULLAR = [
     "hata_var_mi",
 ]
 
-# Her düğümün conversation_loop.py'deki karşılık gelen kod bölgesi
+# Her dÃ¼ÄŸÃ¼mÃ¼n conversation_loop.py'deki karÅŸÄ±lÄ±k gelen kod bÃ¶lgesi
 DUGUM_ACIKLAMA: Dict[str, str] = {
     "basla": (
-        "Task ID oluştur, session başlat, budget (IterationBudget) kur, "
-        "sistem prompt'u inşa et (PromptBuilder + SOUL.md + durum.json)."
+        "Task ID oluÅŸtur, session baÅŸlat, budget (IterationBudget) kur, "
+        "sistem prompt'u inÅŸa et (PromptBuilder + SOUL.md + durum.json)."
     ),
     "hafiza_kontrol": (
         "OnceHafiza'da arama (hafizada_ara), session context injection, "
-        "önceki konuşma geçmişini yükle, önbellek (ONCELIK_CACHE) kontrolü."
+        "Ã¶nceki konuÅŸma geÃ§miÅŸini yÃ¼kle, Ã¶nbellek (ONCELIK_CACHE) kontrolÃ¼."
     ),
     "web_ara": (
-        "Web arama motoru (SearchDispatcher / DDGS) ile güncel bilgi topla, "
-        "halüsinasyon önleme için gerçek veri ekle."
+        "Web arama motoru (SearchDispatcher / DDGS) ile gÃ¼ncel bilgi topla, "
+        "halÃ¼sinasyon Ã¶nleme iÃ§in gerÃ§ek veri ekle."
     ),
     "skill_ara": (
-        "Skill tarama (FTS5 full-text search), konuşmadan skill çıkarma "
-        "(konusmadan_skill_cikar), @file/@url referans işleme (ref_processor)."
+        "Skill tarama (FTS5 full-text search), konuÅŸmadan skill Ã§Ä±karma "
+        "(konusmadan_skill_cikar), @file/@url referans iÅŸleme (ref_processor)."
     ),
     "llm_cagir": (
-        "API çağrısı (direct_api_call): retry + fallback provider rotasyonu, "
-        "streaming, circuit breaker, hata sınıflandırma."
+        "API Ã§aÄŸrÄ±sÄ± (direct_api_call): retry + fallback provider rotasyonu, "
+        "streaming, circuit breaker, hata sÄ±nÄ±flandÄ±rma."
     ),
     "tool_calistir": (
-        "LLM'den gelen tool_calls'ları motor üzerinden çalıştır "
-        "(motor_tools_schema_al + _arac_calistir), sonuçları messages'a ekle, "
-        "tekrar LLM'e dön (ReAct loop)."
+        "LLM'den gelen tool_calls'larÄ± motor Ã¼zerinden Ã§alÄ±ÅŸtÄ±r "
+        "(motor_tools_schema_al + _arac_calistir), sonuÃ§larÄ± messages'a ekle, "
+        "tekrar LLM'e dÃ¶n (ReAct loop)."
     ),
     "yanit_ver": (
-        "LLM'den text response al, doğrulama (kısa yanıt kontrolü), "
-        "kullanıcıya döndür."
+        "LLM'den text response al, doÄŸrulama (kÄ±sa yanÄ±t kontrolÃ¼), "
+        "kullanÄ±cÄ±ya dÃ¶ndÃ¼r."
     ),
     "bitis": (
         "OnceHafiza'ya kaydet (ogrenme), session kapat, A2A broadcast, "
-        "hook'ları tetikle (tur_bitir, oturum_bitir), loglama."
+        "hook'larÄ± tetikle (tur_bitir, oturum_bitir), loglama."
     ),
 }
 
 KOSUL_ACIKLAMA: Dict[str, str] = {
-    "hafiza_var_mi": "OnceHafiza'da eşleşen kayıt var mı? Varsa ön belleğe al, yoksa normal akış.",
-    "web_gerekli_mi": "Kullanıcı sorusu güncel bilgi/web araması gerektiriyor mu?",
-    "skill_var_mi": "FTS5 taramasında eşleşen skill bulundu mu? Varsa context'e ekle.",
-    "tool_gerekli_mi": "LLM tool_calls döndürdü mü? True → araçları çalıştır, False → yanıt ver.",
-    "hata_var_mi": "API veya araç çağrısında hata oluştu mu? True → hata yönetimi.",
+    "hafiza_var_mi": "OnceHafiza'da eÅŸleÅŸen kayÄ±t var mÄ±? Varsa Ã¶n belleÄŸe al, yoksa normal akÄ±ÅŸ.",
+    "web_gerekli_mi": "KullanÄ±cÄ± sorusu gÃ¼ncel bilgi/web aramasÄ± gerektiriyor mu?",
+    "skill_var_mi": "FTS5 taramasÄ±nda eÅŸleÅŸen skill bulundu mu? Varsa context'e ekle.",
+    "tool_gerekli_mi": "LLM tool_calls dÃ¶ndÃ¼rdÃ¼ mÃ¼? True â†’ araÃ§larÄ± Ã§alÄ±ÅŸtÄ±r, False â†’ yanÄ±t ver.",
+    "hata_var_mi": "API veya araÃ§ Ã§aÄŸrÄ±sÄ±nda hata oluÅŸtu mu? True â†’ hata yÃ¶netimi.",
 }
 
 
-# ── Graph Tanımı ───────────────────────────────────────────────────────────────
+# â”€â”€ Graph TanÄ±mÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _graph_json_insa() -> dict:
-    """LangGraph StateGraph formatında JSON graph yapısı oluştur.
+    """LangGraph StateGraph formatÄ±nda JSON graph yapÄ±sÄ± oluÅŸtur.
 
-    Düğümler (nodes): her akış adımı
-    Kenarlar (edges): sabit yönlendirmeler
-    Koşullar (conditions): dallanma noktaları
+    DÃ¼ÄŸÃ¼mler (nodes): her akÄ±ÅŸ adÄ±mÄ±
+    Kenarlar (edges): sabit yÃ¶nlendirmeler
+    KoÅŸullar (conditions): dallanma noktalarÄ±
 
     Returns:
         LangGraph StateGraph JSON dict.
@@ -132,7 +132,7 @@ def _graph_json_insa() -> dict:
             }
         )
 
-    # Kenarlar (sabit akış)
+    # Kenarlar (sabit akÄ±ÅŸ)
     edges: List[Dict[str, Any]] = [
         {"source": "basla", "target": "hafiza_kontrol", "type": "direct", "label": ""},
         {
@@ -164,7 +164,7 @@ def _graph_json_insa() -> dict:
         {"source": "yanit_ver", "target": "bitis", "type": "direct", "label": ""},
     ]
 
-    # Koşullu dallanmalar (conditional edges)
+    # KoÅŸullu dallanmalar (conditional edges)
     conditions: List[Dict[str, Any]] = [
         {
             "id": "hafiza_var_mi",
@@ -173,12 +173,12 @@ def _graph_json_insa() -> dict:
                 {
                     "condition": True,
                     "target": "web_ara",
-                    "label": "Hafiza yok → normal akis",
+                    "label": "Hafiza yok â†’ normal akis",
                 },
                 {
                     "condition": False,
                     "target": "yanit_ver",
-                    "label": "Hafiza var → onbellekten yanit",
+                    "label": "Hafiza var â†’ onbellekten yanit",
                 },
             ],
             "default": "web_ara",
@@ -190,12 +190,12 @@ def _graph_json_insa() -> dict:
                 {
                     "condition": True,
                     "target": "skill_ara",
-                    "label": "Web sonucu eklendi → devam",
+                    "label": "Web sonucu eklendi â†’ devam",
                 },
                 {
                     "condition": False,
                     "target": "skill_ara",
-                    "label": "Web gerekmez → atla",
+                    "label": "Web gerekmez â†’ atla",
                 },
             ],
             "default": "skill_ara",
@@ -207,12 +207,12 @@ def _graph_json_insa() -> dict:
                 {
                     "condition": True,
                     "target": "llm_cagir",
-                    "label": "Skill bulundu → context'e ekle",
+                    "label": "Skill bulundu â†’ context'e ekle",
                 },
                 {
                     "condition": False,
                     "target": "llm_cagir",
-                    "label": "Skill yok → dogrudan LLM",
+                    "label": "Skill yok â†’ dogrudan LLM",
                 },
             ],
             "default": "llm_cagir",
@@ -224,12 +224,12 @@ def _graph_json_insa() -> dict:
                 {
                     "condition": True,
                     "target": "llm_cagir",
-                    "label": "Tool sonucu var → tekrar LLM (ReAct)",
+                    "label": "Tool sonucu var â†’ tekrar LLM (ReAct)",
                 },
                 {
                     "condition": False,
                     "target": "yanit_ver",
-                    "label": "Tool yok → yanit ver",
+                    "label": "Tool yok â†’ yanit ver",
                 },
             ],
             "default": "yanit_ver",
@@ -241,12 +241,12 @@ def _graph_json_insa() -> dict:
                 {
                     "condition": True,
                     "target": "bitis",
-                    "label": "Hata var → hata yonetimi + bitis",
+                    "label": "Hata var â†’ hata yonetimi + bitis",
                 },
                 {
                     "condition": False,
                     "target": "tool_calistir",
-                    "label": "Basarili → tool/yanti kontrolu",
+                    "label": "Basarili â†’ tool/yanti kontrolu",
                 },
             ],
             "default": "tool_calistir",
@@ -271,10 +271,10 @@ def _graph_json_insa() -> dict:
 
 
 def _mermaid_insa(graph_data: dict) -> str:
-    """Graph JSON'dan Mermaid.js flowchart metni oluştur.
+    """Graph JSON'dan Mermaid.js flowchart metni oluÅŸtur.
 
     Args:
-        graph_data: _graph_json_insa() çıktısı.
+        graph_data: _graph_json_insa() Ã§Ä±ktÄ±sÄ±.
 
     Returns:
         ```mermaid flowchart TD ... ``` bloku.
@@ -284,7 +284,7 @@ def _mermaid_insa(graph_data: dict) -> str:
     lines.append("flowchart TD")
     lines.append("")
 
-    # Stil tanımları
+    # Stil tanÄ±mlarÄ±
     lines.append("    %% Stiller")
     lines.append(
         "    classDef entry fill:#1a1a2e,stroke:#e94560,stroke-width:2px,color:#fff"
@@ -300,11 +300,11 @@ def _mermaid_insa(graph_data: dict) -> str:
     )
     lines.append("")
 
-    # Düğümler
+    # DÃ¼ÄŸÃ¼mler
     for node in graph_data["nodes"]:
         node_id = node["id"]
         label = node["label"]
-        # Mermaid'de yeni satır ve özel karakterleri temizle
+        # Mermaid'de yeni satÄ±r ve Ã¶zel karakterleri temizle
         desc = node.get("description", "")
         desc_short = desc.replace('"', "'")[:60]
         if desc_short:
@@ -312,7 +312,7 @@ def _mermaid_insa(graph_data: dict) -> str:
         else:
             lines.append(f'    {node_id}["{label}"]')
 
-        # Sınıf ata
+        # SÄ±nÄ±f ata
         if node.get("entry"):
             lines.append(f"    class {node_id} entry;")
         elif node.get("exit"):
@@ -321,19 +321,19 @@ def _mermaid_insa(graph_data: dict) -> str:
             lines.append(f"    class {node_id} node;")
     lines.append("")
 
-    # Koşul düğümleri (diamond)
+    # KoÅŸul dÃ¼ÄŸÃ¼mleri (diamond)
     condition_ids: set = set()
     for cond in graph_data["conditions"]:
         cid = cond["id"]
         condition_ids.add(cid)
-        # Koşul etiketini formatla
+        # KoÅŸul etiketini formatla
         label = cid.replace("_", " ").title()
         lines.append(f'    {cid}{{"{label}"}}')
         lines.append(f"    class {cid} condition;")
 
-        # Kaynak düğüm -> koşul
+        # Kaynak dÃ¼ÄŸÃ¼m -> koÅŸul
         lines.append(f'    {cond["source"]} -->|"kosul"| {cid}')
-        # Koşul -> her dal
+        # KoÅŸul -> her dal
         for branch in cond["branches"]:
             target = branch["target"]
             lbl = branch.get("label", f"{branch['condition']}")
@@ -343,11 +343,11 @@ def _mermaid_insa(graph_data: dict) -> str:
                 lines.append(f'    {cid} -..->|"{lbl}"| {target}')
     lines.append("")
 
-    # Direkt kenarlar (koşul içermeyen)
+    # Direkt kenarlar (koÅŸul iÃ§ermeyen)
     for edge in graph_data["edges"]:
         src = edge["source"]
         tgt = edge["target"]
-        # Koşul tarafından zaten kapsanıyorsa atla
+        # KoÅŸul tarafÄ±ndan zaten kapsanÄ±yorsa atla
         skip = False
         for cond in graph_data["conditions"]:
             if cond["source"] == src:
@@ -362,7 +362,7 @@ def _mermaid_insa(graph_data: dict) -> str:
     lines.append("")
 
     # Alt-graph: ReAct Loop
-    lines.append("    subgraph ReAct_Loop[ReAct Döngüsü]")
+    lines.append("    subgraph ReAct_Loop[ReAct DÃ¶ngÃ¼sÃ¼]")
     lines.append("        direction LR")
     lines.append("        llm_cagir --> tool_calistir")
     lines.append("        tool_calistir --> llm_cagir")
@@ -374,20 +374,20 @@ def _mermaid_insa(graph_data: dict) -> str:
 
 
 def _mermaid_readme_md_insa(graph_data: dict) -> str:
-    """İnsan-okunur Markdown belgesi oluştur (graph.md için).
+    """Ä°nsan-okunur Markdown belgesi oluÅŸtur (graph.md iÃ§in).
 
     Args:
-        graph_data: _graph_json_insa() çıktısı.
+        graph_data: _graph_json_insa() Ã§Ä±ktÄ±sÄ±.
 
     Returns:
-        Markdown içeriği.
+        Markdown iÃ§eriÄŸi.
     """
     meta = graph_data["graph"]
     lines: List[str] = []
     lines.append(f"# {meta['name']}")
     lines.append("")
     lines.append(f"> **Versiyon:** {meta['version']}")
-    lines.append(f"> **Oluşturulma:** {meta['generated_at']}")
+    lines.append(f"> **OluÅŸturulma:** {meta['generated_at']}")
     lines.append(f"> **Kaynak:** `{meta['source_file']}`")
     lines.append(f"> **Maksimum Iterasyon:** {meta['max_iterations']}")
     lines.append("")
@@ -396,22 +396,22 @@ def _mermaid_readme_md_insa(graph_data: dict) -> str:
     lines.append("---")
     lines.append("")
 
-    # Akış Şeması
-    lines.append("## Akış Şeması")
+    # AkÄ±ÅŸ ÅemasÄ±
+    lines.append("## AkÄ±ÅŸ ÅemasÄ±")
     lines.append("")
     lines.append(_mermaid_insa(graph_data))
     lines.append("")
     lines.append("---")
     lines.append("")
 
-    # Düğüm Açıklamaları
-    lines.append("## Düğümler (Nodes)")
+    # DÃ¼ÄŸÃ¼m AÃ§Ä±klamalarÄ±
+    lines.append("## DÃ¼ÄŸÃ¼mler (Nodes)")
     lines.append("")
-    lines.append("| Düğüm | Tür | Açıklama |")
+    lines.append("| DÃ¼ÄŸÃ¼m | TÃ¼r | AÃ§Ä±klama |")
     lines.append("|-------|-----|----------|")
     for node in graph_data["nodes"]:
         node_type = (
-            "Giriş" if node.get("entry") else ("Çıkış" if node.get("exit") else "İşlem")
+            "GiriÅŸ" if node.get("entry") else ("Ã‡Ä±kÄ±ÅŸ" if node.get("exit") else "Ä°ÅŸlem")
         )
         desc = node.get("description", "").replace("\n", " ").strip()
         if len(desc) > 100:
@@ -421,15 +421,15 @@ def _mermaid_readme_md_insa(graph_data: dict) -> str:
     lines.append("---")
     lines.append("")
 
-    # Koşullar
-    lines.append("## Koşullar (Conditions)")
+    # KoÅŸullar
+    lines.append("## KoÅŸullar (Conditions)")
     lines.append("")
-    lines.append("| Koşul | Kaynak | Açıklama |")
+    lines.append("| KoÅŸul | Kaynak | AÃ§Ä±klama |")
     lines.append("|-------|--------|----------|")
     for cond in graph_data["conditions"]:
         desc = KOSUL_ACIKLAMA.get(cond["id"], "")
         branch_strs = [
-            f"`{b['condition']}` → `{b['target']}`" for b in cond["branches"]
+            f"`{b['condition']}` â†’ `{b['target']}`" for b in cond["branches"]
         ]
         branches = " | ".join(branch_strs)
         lines.append(
@@ -439,61 +439,61 @@ def _mermaid_readme_md_insa(graph_data: dict) -> str:
     lines.append("---")
     lines.append("")
 
-    # ReAct Döngüsü Detayı
-    lines.append("## ReAct Döngüsü")
+    # ReAct DÃ¶ngÃ¼sÃ¼ DetayÄ±
+    lines.append("## ReAct DÃ¶ngÃ¼sÃ¼")
     lines.append("")
     lines.append("```")
-    lines.append("llm_cagir  ──(tool_calls)──►  tool_calistir")
-    lines.append("    ▲                              │")
-    lines.append("    │                              │")
-    lines.append("    └────(tool sonucu)─────────────┘")
-    lines.append("              │")
-    lines.append("              ▼")
+    lines.append("llm_cagir  â”€â”€(tool_calls)â”€â”€â–º  tool_calistir")
+    lines.append("    â–²                              â”‚")
+    lines.append("    â”‚                              â”‚")
+    lines.append("    â””â”€â”€â”€â”€(tool sonucu)â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜")
+    lines.append("              â”‚")
+    lines.append("              â–¼")
     lines.append("         yanit_ver")
     lines.append("```")
     lines.append("")
     lines.append(
-        "Bu döngü max_iterations ({}) kadar tekrar eder. "
-        "Her turda LLM tool_calls döndürürse araç çalıştırılır "
-        "ve sonuç tekrar LLM'e gönderilir. Tool_calls yoksa "
-        "doğrudan yanıt verilir.".format(meta["max_iterations"])
+        "Bu dÃ¶ngÃ¼ max_iterations ({}) kadar tekrar eder. "
+        "Her turda LLM tool_calls dÃ¶ndÃ¼rÃ¼rse araÃ§ Ã§alÄ±ÅŸtÄ±rÄ±lÄ±r "
+        "ve sonuÃ§ tekrar LLM'e gÃ¶nderilir. Tool_calls yoksa "
+        "doÄŸrudan yanÄ±t verilir.".format(meta["max_iterations"])
     )
     lines.append("")
     lines.append("---")
     lines.append("")
 
-    # Hata Yönetimi
-    lines.append("## Hata Yönetimi")
+    # Hata YÃ¶netimi
+    lines.append("## Hata YÃ¶netimi")
     lines.append("")
     lines.append(
-        "- **Retry:** LLM çağrısı başarısız olursa 3 kez dene (exponential backoff)"
+        "- **Retry:** LLM Ã§aÄŸrÄ±sÄ± baÅŸarÄ±sÄ±z olursa 3 kez dene (exponential backoff)"
     )
     lines.append(
-        "- **Fallback:** Provider çökerse, `_provider_rotate` ile alternatif provider'a geç"
+        "- **Fallback:** Provider Ã§Ã¶kerse, `_provider_rotate` ile alternatif provider'a geÃ§"
     )
     lines.append(
-        "- **Circuit Breaker:** 3 ardışık hata → circuit breaker açılır, kalıcı kilit"
+        "- **Circuit Breaker:** 3 ardÄ±ÅŸÄ±k hata â†’ circuit breaker aÃ§Ä±lÄ±r, kalÄ±cÄ± kilit"
     )
-    lines.append("- **Takılma Dedektörü:** Aynı eylem 3x tekrar ederse loop sonlanır")
-    lines.append("- **Budget:** IterationBudget aşılırsa loop sonlanır")
-    lines.append("- **Interrupt:** Ctrl+C ile kullanıcı iptali desteklenir")
+    lines.append("- **TakÄ±lma DedektÃ¶rÃ¼:** AynÄ± eylem 3x tekrar ederse loop sonlanÄ±r")
+    lines.append("- **Budget:** IterationBudget aÅŸÄ±lÄ±rsa loop sonlanÄ±r")
+    lines.append("- **Interrupt:** Ctrl+C ile kullanÄ±cÄ± iptali desteklenir")
     lines.append("")
 
     return "\n".join(lines)
 
 
-# ── Ana Export Fonksiyonu ─────────────────────────────────────────────────────
+# â”€â”€ Ana Export Fonksiyonu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def langgraph_export(
     output_dir: Optional[str] = None,
     cikti_ver: bool = False,
 ) -> Dict[str, Any]:
-    """LangGraph export'unu oluşturur ve dosyalara yazar.
+    """LangGraph export'unu oluÅŸturur ve dosyalara yazar.
 
     Args:
-        output_dir: Çıktı dizini (None = proje kökü).
-        cikti_ver: True ise dict olarak döndür (dosya yazmaz).
+        output_dir: Ã‡Ä±ktÄ± dizini (None = proje kÃ¶kÃ¼).
+        cikti_ver: True ise dict olarak dÃ¶ndÃ¼r (dosya yazmaz).
 
     Returns:
         {
@@ -514,11 +514,11 @@ def langgraph_export(
     if cikti_ver:
         return sonuc
 
-    # Çıktı dizini belirle
+    # Ã‡Ä±ktÄ± dizini belirle
     if output_dir:
         cikti_dizini = Path(output_dir)
     else:
-        # Proje kökü: reymen/core/langgraph_export.py -> ../../
+        # Proje kÃ¶kÃ¼: reymen/core/langgraph_export.py -> ../../
         cikti_dizini = Path(__file__).resolve().parent.parent.parent
 
     cikti_dizini.mkdir(parents=True, exist_ok=True)
@@ -547,17 +547,17 @@ def langgraph_export(
     return sonuc
 
 
-# ── CLI Entegrasyonu ──────────────────────────────────────────────────────────
+# â”€â”€ CLI Entegrasyonu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def cmd_export(args) -> str:
-    """CLI handler: ``reymen --langgraph-export`` çağrısı.
+    """CLI handler: ``reymen --langgraph-export`` Ã§aÄŸrÄ±sÄ±.
 
     Args:
         args: argparse.Namespace (output_dir varsa).
 
     Returns:
-        Kullanıcıya gösterilecek metin.
+        KullanÄ±cÄ±ya gÃ¶sterilecek metin.
     """
     output_dir = getattr(args, "output_dir", None)
     sonuc = langgraph_export(output_dir=output_dir)
@@ -572,7 +572,7 @@ def cmd_export(args) -> str:
     if sonuc.get("graph_md_path"):
         lines.append(f"         MD:   {sonuc['graph_md_path']}")
 
-    # Düğüm sayısı
+    # DÃ¼ÄŸÃ¼m sayÄ±sÄ±
     node_sayisi = len(sonuc["graph"].get("nodes", []))
     edge_sayisi = len(sonuc["graph"].get("edges", []))
     cond_sayisi = len(sonuc["graph"].get("conditions", []))
@@ -580,7 +580,7 @@ def cmd_export(args) -> str:
         f"         Dugum: {node_sayisi}, Kenar: {edge_sayisi}, Kosul: {cond_sayisi}"
     )
 
-    # Mermaid önizleme
+    # Mermaid Ã¶nizleme
     lines.append("")
     lines.append("  Akis semasi:")
     lines.append("")
@@ -592,10 +592,10 @@ def cmd_export(args) -> str:
     return "\n".join(lines)
 
 
-# ── Doğrudan Çalıştırma ───────────────────────────────────────────────────────
+# â”€â”€ DoÄŸrudan Ã‡alÄ±ÅŸtÄ±rma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
-    """Doğrudan çalıştırma: python -m reymen.core.langgraph_export"""
+    """DoÄŸrudan Ã§alÄ±ÅŸtÄ±rma: python -m reymen.core.langgraph_export"""
     sonuc = langgraph_export(output_dir=os.getcwd())
     if sonuc["basarili"]:
         print(

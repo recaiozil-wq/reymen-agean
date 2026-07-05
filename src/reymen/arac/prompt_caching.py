@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-prompt_caching.py — Prompt Onbellekleme.
+prompt_caching.py â€” Prompt Onbellekleme.
 
 Ayni prompt'lari LLM'e tekrar gondermemek icin hash tabanli
 onbellek. TTL ve LRU ile bellek yonetimi.
@@ -78,9 +78,9 @@ class PromptCache:
         self._miss = 0
 
 
-# ══════════════════════════════════════════════════════════════════════
-# Anthropic Prompt Caching — cache_control marker fonksiyonlari
-# ══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# Anthropic Prompt Caching â€” cache_control marker fonksiyonlari
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _apply_cache_marker(

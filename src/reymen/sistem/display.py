@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-display.py — Goruntuleme sistemi.
+display.py â€” Goruntuleme sistemi.
 
 Renkli cikti, progress bar ve tablo formatlama
 islevlerini saglar.
@@ -118,7 +118,7 @@ class Display:
             renk: Renk adi (bos = renksiz)
             kalin: Kalin yaz
             stiller: Ekstra stil listesi (kalin, italik vb.)
-            yeni_satir: Sonuna newline ekle (son parametresi varsa geçersiz)
+            yeni_satir: Sonuna newline ekle (son parametresi varsa geÃ§ersiz)
             son: print() end parametresi (yeni_satir yerine kullanilir)
         """
         try:

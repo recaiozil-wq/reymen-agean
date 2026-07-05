@@ -1,6 +1,6 @@
-"""CronScheduler provider interface (Axis B — the trigger).
+﻿"""CronScheduler provider interface (Axis B â€” the trigger).
 
-⚠️ EXPERIMENTAL — this interface is validated by exactly ONE consumer (the
+âš ï¸ EXPERIMENTAL â€” this interface is validated by exactly ONE consumer (the
 built-in) until an external provider (Chronos, Phase 4) shakes it out. Until
 then the module path, method signatures, and start() kwargs MAY change without
 a deprecation cycle. Once a second provider validates the shape it becomes
@@ -32,7 +32,7 @@ class CronScheduler(ABC):
     and ``is_available`` carry safe defaults. The three Phase-4 hooks
     (``on_jobs_changed`` / ``fire_due`` / ``reconcile``) are added later as
     NON-abstract methods so the built-in keeps satisfying the ABC without
-    overriding them — see ``test_abc_growth_stays_additive``.
+    overriding them â€” see ``test_abc_growth_stays_additive``.
     """
 
     @property
@@ -74,7 +74,7 @@ class CronScheduler(ABC):
 
     # --- Optional hooks for external providers (added Phase 4). --------------
     # All default-safe so the built-in inherits working behavior without
-    # overriding. Keep these NON-abstract — see test_abc_growth_stays_additive.
+    # overriding. Keep these NON-abstract â€” see test_abc_growth_stays_additive.
 
     def on_jobs_changed(self) -> None:
         """Called after a successful store mutation (create/update/remove/
@@ -115,9 +115,9 @@ class CronScheduler(ABC):
 def resolve_cron_scheduler() -> "CronScheduler":
     """Return the active cron scheduler provider.
 
-    Reads ``cron.provider`` from config. Empty/absent → built-in. A named
+    Reads ``cron.provider`` from config. Empty/absent â†’ built-in. A named
     provider that is missing, fails to load, or reports ``is_available() ==
-    False`` falls back to the built-in with a warning — cron must never be left
+    False`` falls back to the built-in with a warning â€” cron must never be left
     without a trigger.
     """
     import logging
@@ -126,7 +126,7 @@ def resolve_cron_scheduler() -> "CronScheduler":
 
     name = ""
     try:
-        from hermes_cli.config import cfg_get, load_config
+        from reymen.sistem.reymen_stubs import cfg_get, load_config
 
         name = (cfg_get(load_config(), "cron", "provider", default="") or "").strip()
     except Exception as _e:

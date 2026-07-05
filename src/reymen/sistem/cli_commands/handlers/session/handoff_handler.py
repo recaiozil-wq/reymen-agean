@@ -1,4 +1,4 @@
-"""Handle /handoff command — transfer CLI session to a gateway platform."""
+﻿"""Handle /handoff command â€” transfer CLI session to a gateway platform."""
 
 import logging
 
@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 
 def handle_handoff_command(cli, cmd_original: str) -> bool:
-    """Handle ``/handoff <platform>`` — transfer this CLI session to a gateway platform.
+    """Handle ``/handoff <platform>`` â€” transfer this CLI session to a gateway platform.
 
     Flow:
       1. Validate platform name + the gateway has a home channel for it.
@@ -14,9 +14,9 @@ def handle_handoff_command(cli, cmd_original: str) -> bool:
          would race with the gateway's switch_session).
       3. Write ``handoff_state='pending'`` on this session row.
       4. Block-poll ``state.db`` for terminal state (timeout 60s).
-      5. On ``completed`` → print resume hint and signal CLI exit by
+      5. On ``completed`` â†’ print resume hint and signal CLI exit by
          returning False (the caller honors that like ``/quit``).
-      6. On ``failed`` / timeout → print error and return True so the
+      6. On ``failed`` / timeout â†’ print error and return True so the
          user keeps their CLI session.
 
     Returns:
@@ -37,7 +37,7 @@ def handle_handoff_command(cli, cmd_original: str) -> bool:
     # Validate platform name + home channel via the live gateway config.
     try:
         from gateway.config import load_gateway_config, Platform
-    except Exception as exc:  # pragma: no cover — gateway pkg always shipped
+    except Exception as exc:  # pragma: no cover â€” gateway pkg always shipped
         _cprint(f"  Could not load gateway config: {exc}")
         return True
 
@@ -114,7 +114,7 @@ def handle_handoff_command(cli, cmd_original: str) -> bool:
     if not session_title:
         session_title = cli.session_id[:8]
 
-    # Mark pending — gateway watcher will pick this up.
+    # Mark pending â€” gateway watcher will pick this up.
     ok = cli._session_db.request_handoff(cli.session_id, platform_name)
     if not ok:
         _cprint(
@@ -123,7 +123,7 @@ def handle_handoff_command(cli, cmd_original: str) -> bool:
         return True
 
     _cprint(
-        f"  Queued handoff of '{session_title}' → {platform_name} (home: {home.name})."
+        f"  Queued handoff of '{session_title}' â†’ {platform_name} (home: {home.name})."
     )
     _cprint(f"  Waiting for the gateway to pick it up...")
 
@@ -145,11 +145,11 @@ def handle_handoff_command(cli, cmd_original: str) -> bool:
         if current == "completed":
             _cprint("")
             _cprint(
-                f"  ↻ Handoff complete. The session is now active on {platform_name}."
+                f"  â†» Handoff complete. The session is now active on {platform_name}."
             )
             _cprint(f"  Resume it on this CLI later with: /resume {session_title}")
             _cprint("")
-            # End the CLI cleanly — same exit semantics as /quit.
+            # End the CLI cleanly â€” same exit semantics as /quit.
             cli._should_exit = True
             return False
         if current == "failed":

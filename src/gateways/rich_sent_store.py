@@ -1,4 +1,4 @@
-"""Local index of text we've sent via ``sendRichMessage`` (Bot API 10.1).
+﻿"""Local index of text we've sent via ``sendRichMessage`` (Bot API 10.1).
 
 Telegram does NOT echo a rich message's content back in ``reply_to_message``
 when a user replies to it (verified: ``.text``/``.caption`` empty,
@@ -25,7 +25,7 @@ _MAX_TEXT_CHARS = 2000
 
 
 def _store_path() -> str:
-    home = os.environ.get("HERMES_HOME") or os.path.expanduser("~/.hermes")
+    home = os.environ.get("REYMEN_HOME", os.environ.get("HERMES_HOME")) or os.path.expanduser("~/.reymen")
     return os.path.join(home, "state", "rich_sent_index.json")
 
 

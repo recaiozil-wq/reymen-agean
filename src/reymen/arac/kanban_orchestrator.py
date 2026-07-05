@@ -1,10 +1,10 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-kanban_orchestrator.py — ReYMeN Gelismis Kanban Gorev Tahtasi.
+kanban_orchestrator.py â€” ReYMeN Gelismis Kanban Gorev Tahtasi.
 
 Ozellikler:
   - SQLite + FTS5 ile kalici depolama
-  - Kolonlar: todo → ready → running → done | blocked | archived
+  - Kolonlar: todo â†’ ready â†’ running â†’ done | blocked | archived
   - Oncelik (1-yuksek, 2-orta, 3-dusuk), atanan kullanici, etiketler
   - Ajan tarafindan KANBAN_EKLE / KANBAN_GUNCELLE / KANBAN_LISTE araclari
   - CLI: python kanban_orchestrator.py [ekle|liste|guncelle|sil|ozet]
@@ -33,17 +33,17 @@ DB_YOLU = ROOT / ".ReYMeN" / "kanban.db"
 
 DURUMLAR = ("todo", "ready", "running", "done", "blocked", "archived")
 DURUM_SIMGELERI = {
-    "todo": "◻",
-    "ready": "▶",
-    "running": "●",
-    "done": "✓",
-    "blocked": "⊘",
-    "archived": "—",
+    "todo": "â—»",
+    "ready": "â–¶",
+    "running": "â—",
+    "done": "âœ“",
+    "blocked": "âŠ˜",
+    "archived": "â€”",
 }
 ONCELIK_SIMGELERI = {1: "!!!", 2: "!! ", 3: "!  "}
 
 
-# ── Veri Modeli ──────────────────────────────────────────────────────────────
+# â”€â”€ Veri Modeli â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 @dataclass
@@ -76,7 +76,7 @@ class Gorev:
         return f"{simge} {self.id:3d}  {onc}  {self.durum:8s}{atanan}{etiket}  {self.baslik}"
 
 
-# ── Veritabani ───────────────────────────────────────────────────────────────
+# â”€â”€ Veritabani â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class KanbanDB:
@@ -219,7 +219,7 @@ class KanbanDB:
         with self._kilit:
             con = self._baglanti()
             try:
-                con.execute(f"UPDATE gorevler SET {set_clause} WHERE id=?", degerler)  # nosec B608 — IZINLI_KOLONLAR whitelist'i ile filtreli (satir 165-167)
+                con.execute(f"UPDATE gorevler SET {set_clause} WHERE id=?", degerler)  # nosec B608 â€” IZINLI_KOLONLAR whitelist'i ile filtreli (satir 165-167)
                 con.commit()
                 row = con.execute(
                     "SELECT * FROM gorevler WHERE id=?", (gorev_id,)
@@ -267,7 +267,7 @@ class KanbanDB:
         con = self._baglanti()
         try:
             rows = con.execute(
-                f"SELECT * FROM gorevler {where} ORDER BY oncelik ASC, id ASC LIMIT ?",  # nosec B608 — filtreler listesi fonksiyon parametrelerinden, kullanici inputu dogrudan gecmez
+                f"SELECT * FROM gorevler {where} ORDER BY oncelik ASC, id ASC LIMIT ?",  # nosec B608 â€” filtreler listesi fonksiyon parametrelerinden, kullanici inputu dogrudan gecmez
                 degerler + [limit],
             ).fetchall()
             return [self._satir_cevir(r) for r in rows]
@@ -314,11 +314,11 @@ class KanbanDB:
         return self.guncelle(gorev_id, durum="blocked", govde=govde_metni)
 
 
-# ── Orkestrator ──────────────────────────────────────────────────────────────
+# â”€â”€ Orkestrator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class AdvancedKanbanOrchestrator:
-    """ReYMeN ana arayuzu — ajan araclariyla dogrudan kullanilir."""
+    """ReYMeN ana arayuzu â€” ajan araclariyla dogrudan kullanilir."""
 
     def __init__(self, db_yolu: Path = DB_YOLU):
         self.db = KanbanDB(db_yolu)
@@ -365,22 +365,22 @@ class AdvancedKanbanOrchestrator:
 
     def gorsel_tahta(self) -> str:
         """Terminal'de ASCII kanban tahtasi goster."""
-        satirlar = ["═" * 70, "  ReYMeN KANBAN TAHTASI", "═" * 70]
+        satirlar = ["â•" * 70, "  ReYMeN KANBAN TAHTASI", "â•" * 70]
         for durum in ("todo", "ready", "running", "done", "blocked"):
             gorevler = self.db.listele(durum=durum, limit=20)
             simge = DURUM_SIMGELERI.get(durum, "?")
             satirlar.append(f"\n{simge} {durum.upper()} ({len(gorevler)})")
-            satirlar.append("─" * 60)
+            satirlar.append("â”€" * 60)
             if gorevler:
                 for g in gorevler:
                     satirlar.append(f"  {g.satir()}")
             else:
                 satirlar.append("  (bos)")
-        satirlar.append("\n" + "═" * 70)
+        satirlar.append("\n" + "â•" * 70)
         return "\n".join(satirlar)
 
 
-# ── CLI ──────────────────────────────────────────────────────────────────────
+# â”€â”€ CLI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _cli():
@@ -428,7 +428,7 @@ def _cli():
 
     if args.komut == "ekle":
         g = k.ekle(args.baslik, args.govde, args.oncelik, args.atanan, args.etiket)
-        print(f"[Kanban] Gorev eklendi: #{g['id']} — {g['baslik']}")
+        print(f"[Kanban] Gorev eklendi: #{g['id']} â€” {g['baslik']}")
 
     elif args.komut == "liste":
         gorevler = k.liste(durum=args.durum, oncelik=args.oncelik)
@@ -449,7 +449,7 @@ def _cli():
         }
         g = k.guncelle(args.id, **alanlar)
         if g:
-            print(f"[Kanban] Guncellendi: #{g['id']} → {g['durum']}")
+            print(f"[Kanban] Guncellendi: #{g['id']} â†’ {g['durum']}")
         else:
             print(f"[Kanban] Gorev bulunamadi: #{args.id}")
 
@@ -481,7 +481,7 @@ def _cli():
 
 
 def motor_kaydet(motor):
-    """Kanban araçlarını motora kaydet."""
+    """Kanban araÃ§larÄ±nÄ± motora kaydet."""
     if not hasattr(motor, "_plugin_arac_kaydet"):
         return
     _kb = KanbanDB()
@@ -492,29 +492,29 @@ def motor_kaydet(motor):
                 baslik, govde, int(oncelik) if str(oncelik).isdigit() else 2
             ).satir()
         ),
-        "Kanban tahtasına görev ekle (baslik, govde, oncelik:1-3)",
+        "Kanban tahtasÄ±na gÃ¶rev ekle (baslik, govde, oncelik:1-3)",
     )
     motor._plugin_arac_kaydet(
         "KANBAN_LISTE",
         lambda durum="": (
             "\n".join(g.satir() for g in _kb.listele(durum=durum))
-            or "[Kanban]: Görev yok"
+            or "[Kanban]: GÃ¶rev yok"
         ),
-        "Kanban görevlerini listele (durum: todo/running/done/boş=hepsi)",
+        "Kanban gÃ¶revlerini listele (durum: todo/running/done/boÅŸ=hepsi)",
     )
     motor._plugin_arac_kaydet(
         "KANBAN_GUNCELLE",
         lambda id="0", durum="done": (
             str(_kb.guncelle(int(id), durum=durum).satir())
             if str(id).isdigit()
-            else "[Kanban]: Geçersiz id"
+            else "[Kanban]: GeÃ§ersiz id"
         ),
-        "Kanban görevi güncelle (id, durum: todo/ready/running/done/blocked)",
+        "Kanban gÃ¶revi gÃ¼ncelle (id, durum: todo/ready/running/done/blocked)",
     )
     motor._plugin_arac_kaydet(
         "KANBAN_OZET",
         lambda: str(_kb.ozet()),
-        "Kanban tahta özetini göster (kolon bazında görev sayıları)",
+        "Kanban tahta Ã¶zetini gÃ¶ster (kolon bazÄ±nda gÃ¶rev sayÄ±larÄ±)",
     )
 
 

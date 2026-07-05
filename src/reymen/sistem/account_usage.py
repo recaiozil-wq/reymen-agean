@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""account_usage.py — Hesap Kullanim Gecmisi.
+﻿# -*- coding: utf-8 -*-
+"""account_usage.py â€” Hesap Kullanim Gecmisi.
 
 Provider bazinda kullanim gecmisi, aylik/ gunluk raporlar,
 maliyet tahminleri ve limit uyarilari.

@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-discord_bot.py — ReYMeN Discord Botu (discord.py tabanli).
+discord_bot.py â€” ReYMeN Discord Botu (discord.py tabanli).
 
 Telegram gateway (telegram_bot.py) ile ayni mantikta:
 - discord.py (py-cord) ile Gateway ve mesaj altyapisi
@@ -10,7 +10,7 @@ Telegram gateway (telegram_bot.py) ile ayni mantikta:
 - Komutlar: /new, /stop, /retry, /model, /status
 - Gateway yoneticisine kayit
 
-Apache 2.0 Lisansi — github.com/NousResearch/hermes-agent
+Apache 2.0 Lisansi â€” github.com/NousResearch/reymen-agent
 ================================================
 """
 
@@ -54,13 +54,13 @@ logger = logging.getLogger("discord_bot")
 # GRACEFUL IMPORTLAR
 # ============================================================================
 
-# — Dotenv (.env yukleme) —
+# â€” Dotenv (.env yukleme) â€”
 try:
     from dotenv import load_dotenv
 except ImportError:
     load_dotenv = None
 
-# — discord.py —
+# â€” discord.py â€”
 DISCORD_AVAILABLE = False
 try:
     import discord
@@ -71,7 +71,7 @@ except ImportError:
     discord = None
     commands = None
 
-# — Beyin (LLM) —
+# â€” Beyin (LLM) â€”
 BEYIN_CLS = None
 try:
     from reymen.cereyan.beyin import Beyin as _B
@@ -80,7 +80,7 @@ try:
 except ImportError as e:
     logger.warning("Beyin import edilemedi: %s", e)
 
-# — OnceHafiza —
+# â€” OnceHafiza â€”
 ONCE_HAFIZA_ARA = None
 ONCE_HAFIZA_KAYDET = None
 try:
@@ -91,7 +91,7 @@ try:
 except ImportError as e:
     logger.warning("OnceHafiza import edilemedi: %s", e)
 
-# — ConversationLoop —
+# â€” ConversationLoop â€”
 CONVERSATION_LOOP_CLS = None
 try:
     from reymen.cereyan.conversation_loop import ConversationLoop as _CL
@@ -100,7 +100,7 @@ try:
 except ImportError as e:
     logger.warning("ConversationLoop import edilemedi: %s", e)
 
-# — Ortak komutlar —
+# â€” Ortak komutlar â€”
 try:
     from reymen.ag.ortak_komutlar import (
         komut_isle as ortak_komut_isle,
@@ -110,7 +110,7 @@ except ImportError:
     ortak_komut_isle = None
     ortak_cmd_run = None
 
-# — Gateway yoneticisi (opsiyonel kayit) —
+# â€” Gateway yoneticisi (opsiyonel kayit) â€”
 try:
     from reymen.ag.gateway_yonetici import GatewayManager
     from reymen.ag.platform_gateways import DiscordGateway
@@ -133,7 +133,7 @@ def _env_yukle():
     Oncelik sirasi:
       1. Ortam degiskeni (bot_supervisor.py ile gelen DISCORD_BOT_TOKEN)
       2. Proje kokundeki .env
-      3. Hermes profil .env'si (HERMES_PROFILE'a gore)
+      3. ReYMeN profil .env'si (REYMEN_PROFILE'a gore)
     """
     global _ENV_YUKLENDI
     if _ENV_YUKLENDI:
@@ -148,14 +148,14 @@ def _env_yukle():
         load_dotenv(str(y), override=False)
         logger.debug(".env fallback yuklendi: %s", y)
 
-    # 2. Hermes profil .env
-    profil = os.environ.get("HERMES_PROFILE", "reymen")
-    hermes_env = (
-        Path.home() / "AppData" / "Local" / "hermes" / "profiles" / profil / ".env"
+    # 2. ReYMeN profil .env
+    profil = os.environ.get("REYMEN_PROFILE", os.environ.get("HERMES_PROFILE", "reymen"))
+    reymen_env = (
+        Path.home() / "AppData" / "Local" / "reymen" / "profiles" / profil / ".env"
     )
-    if hermes_env.exists():
-        load_dotenv(str(hermes_env), override=True)
-        logger.info("Hermes profil .env yuklendi: %s (override=True)", hermes_env)
+    if reymen_env.exists():
+        load_dotenv(str(reymen_env), override=True)
+        logger.info("ReYMeN profil .env yuklendi: %s (override=True)", reymen_env)
 
 
 _env_yukle()
@@ -206,7 +206,7 @@ def _durum_guncelle(bot_adi: str):
             if not var:
                 anahtar = bot_adi.replace("@", "").replace("#", "").lower()
                 botlar[anahtar] = {
-                    "profil": os.environ.get("HERMES_PROFILE", "reymen"),
+                    "profil": os.environ.get("REYMEN_PROFILE", os.environ.get("HERMES_PROFILE", "reymen")),
                     "bot_adi": bot_adi,
                     "gateway": "aktif",
                     "yetki": "tam",
@@ -221,7 +221,7 @@ def _durum_guncelle(bot_adi: str):
                 durum_yolu.write_text(
                     json.dumps(veri, ensure_ascii=False, indent=2), encoding="utf-8"
                 )
-                logger.info("[%s] ✅ Yeni Discord bot durum.json'a eklendi!", bot_adi)
+                logger.info("[%s] âœ… Yeni Discord bot durum.json'a eklendi!", bot_adi)
                 degisiklik_ekle(bot_adi, f"Discord bot otomatik eklendi: {bot_adi}")
             else:
                 logger.debug("[%s] durum.json'da zaten kayitli", bot_adi)
@@ -232,7 +232,7 @@ def _durum_guncelle(bot_adi: str):
 
 
 # ============================================================================
-# DISCORD BOT PROCESS — AI + OnceHafiza + ConversationLoop
+# DISCORD BOT PROCESS â€” AI + OnceHafiza + ConversationLoop
 # ============================================================================
 
 _VARSAYILAN_AYARLAR = {
@@ -276,14 +276,14 @@ class DiscordBotProcess:
         _durum_guncelle(self.bot_ad)
         logger.info("[%s] DiscordBotProcess baslatildi", self.bot_ad)
 
-    # ── Bot bilgisi ────────────────────────────────────────────────────
+    # â”€â”€ Bot bilgisi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _bot_bilgisi_al(self) -> str:
         """Bot bilgisini .env'den veya geriye donuk olarak al."""
         # Discord botu baslayinca gercek adi bilinecek
         return os.environ.get("DISCORD_BOT_NAME", "ReYMeN-Discord")
 
-    # ── Ayar yonetimi ──────────────────────────────────────────────────
+    # â”€â”€ Ayar yonetimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _ayar_yukle(self):
         try:
@@ -330,7 +330,7 @@ class DiscordBotProcess:
         self.ayarlar["sessionlar"] = sessionlar
         self._ayar_kaydet()
 
-    # ── Beyin baslat ──────────────────────────────────────────────────
+    # â”€â”€ Beyin baslat â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _beyin_baslat(self):
         """Beyin + ConversationLoop baslat. SADECE deepseek-v4-flash."""
@@ -378,7 +378,7 @@ class DiscordBotProcess:
 
         logger.info("[%s] Beyin aktif: %s / %s", self.bot_ad, provider, model)
 
-    # ── TOOL: Web Arama ────────────────────────────────────────────────
+    # â”€â”€ TOOL: Web Arama â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _tool_web_search(self, sorgu: str) -> str:
         """Web'de ara ve sonucu metin olarak dondur."""
@@ -425,7 +425,7 @@ class DiscordBotProcess:
 
         return "(web arama su an kullanilamiyor)"
 
-    # ── AI yanit uret ──────────────────────────────────────────────────
+    # â”€â”€ AI yanit uret â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def ai_yanit_uret(self, mesaj: str, session_id: Optional[str] = None) -> str:
         """OnceHafiza + Beyin ile yanit uret (30sn timeout).
@@ -482,26 +482,26 @@ class DiscordBotProcess:
 
                     from datetime import date as _date
 
-                    sistem += f"\n\n[TEMEL KURAL: ÖNCE BAK, SONRA KONUŞ]\n"
+                    sistem += f"\n\n[TEMEL KURAL: Ã–NCE BAK, SONRA KONUÅ]\n"
                     sistem += f"BUGUNUN TARIHI: {_date.today()}\n"
-                    sistem += "1. Önce web'den araştır. Web sonucu varsa SADECE onu kullan, kendi ezberinden ASLA tahmin etme.\n"
-                    sistem += "2. Web sonucu yoksa 'güncel veri alınamadı' de, kendi bilginle tahmin etme.\n"
-                    sistem += "3. Sorunu analiz et, adım adım çözüm sun, alternatifleri belirt.\n"
+                    sistem += "1. Ã–nce web'den araÅŸtÄ±r. Web sonucu varsa SADECE onu kullan, kendi ezberinden ASLA tahmin etme.\n"
+                    sistem += "2. Web sonucu yoksa 'gÃ¼ncel veri alÄ±namadÄ±' de, kendi bilginle tahmin etme.\n"
+                    sistem += "3. Sorunu analiz et, adÄ±m adÄ±m Ã§Ã¶zÃ¼m sun, alternatifleri belirt.\n"
                     sistem += (
-                        "4. Selam/teşekkür gibi basit mesajlarda kısa cevap ver.\n"
+                        "4. Selam/teÅŸekkÃ¼r gibi basit mesajlarda kÄ±sa cevap ver.\n"
                     )
 
-                    # ── TOOL OTOMATIK CALISTIRMA ─────────────────────
+                    # â”€â”€ TOOL OTOMATIK CALISTIRMA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                     _tool_cikti = ""
                     _mesaj_lower = mesaj.lower()
 
                     _soru_mi = (
                         "?" in mesaj
                         or "nedir" in _mesaj_lower
-                        or "nasıl" in _mesaj_lower
+                        or "nasÄ±l" in _mesaj_lower
                         or "ne" in _mesaj_lower
                         or "mi" in _mesaj_lower
-                        or "kaç" in _mesaj_lower
+                        or "kaÃ§" in _mesaj_lower
                         or "neden" in _mesaj_lower
                         or len(mesaj.split()) >= 4
                     )
@@ -512,22 +512,22 @@ class DiscordBotProcess:
                         "sa",
                         "hi",
                         "hello",
-                        "iyi günler",
+                        "iyi gÃ¼nler",
                     ]
                     if _soru_mi and not _selam_mi:
                         logger.info(
-                            "[%s] 🔍 Web arama tetiklendi: %s", self.bot_ad, mesaj[:60]
+                            "[%s] ğŸ” Web arama tetiklendi: %s", self.bot_ad, mesaj[:60]
                         )
                         _tool_cikti = self._tool_web_search(mesaj)
                         logger.info(
-                            "[%s] 🔍 Web sonucu (%d karakter): %s",
+                            "[%s] ğŸ” Web sonucu (%d karakter): %s",
                             self.bot_ad,
                             len(_tool_cikti),
                             _tool_cikti[:200],
                         )
-                        sistem += f"\n\n🔍 WEB ARAMA SONUCU:\n{_tool_cikti}\n"
+                        sistem += f"\n\nğŸ” WEB ARAMA SONUCU:\n{_tool_cikti}\n"
 
-                    # ── Session gecmisi ──────────────────────────────
+                    # â”€â”€ Session gecmisi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                     if session_id:
                         gecmis = self.session_gecmisi_al(session_id)
                     else:
@@ -574,7 +574,7 @@ class DiscordBotProcess:
 
         return "AI modulu aktif degil."
 
-    # ── Komut isleyici ────────────────────────────────────────────────
+    # â”€â”€ Komut isleyici â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def komut_isle(self, channel, author, text: str) -> bool:
         """Discord slash komutlarini isle.
@@ -597,24 +597,24 @@ class DiscordBotProcess:
             except Exception as e:
                 logger.error("[%s] Mesaj gonderilemedi: %s", self.bot_ad, e)
 
-        # — /new — Yeni session baslat
+        # â€” /new â€” Yeni session baslat
         if komut == COMMAND_PREFIX + "new":
             self.session_sifirla(session_id)
             asyncio.create_task(
-                _send("✅ Yeni konusma baslatildi! Nasil yardimci olabilirim?")
+                _send("âœ… Yeni konusma baslatildi! Nasil yardimci olabilirim?")
             )
             return True
 
-        # — /stop — Aktif gorevi durdur
+        # â€” /stop â€” Aktif gorevi durdur
         elif komut == COMMAND_PREFIX + "stop":
             gorev = self._gorevler.pop(session_id, None)
             if gorev:
-                asyncio.create_task(_send("⏹️ Gorev durduruldu."))
+                asyncio.create_task(_send("â¹ï¸ Gorev durduruldu."))
             else:
                 asyncio.create_task(_send("Aktif gorev yok."))
             return True
 
-        # — /retry — Son yaniti yeniden dene
+        # â€” /retry â€” Son yaniti yeniden dene
         elif komut == COMMAND_PREFIX + "retry":
             gecmis = self.session_gecmisi_al(session_id)
             if gecmis:
@@ -628,49 +628,49 @@ class DiscordBotProcess:
             asyncio.create_task(_send("Yenilenecek mesaj bulunamadi."))
             return True
 
-        # — /model — Model goster
+        # â€” /model â€” Model goster
         elif komut == COMMAND_PREFIX + "model":
             if not arg:
                 asyncio.create_task(
-                    _send(f"🤖 Model: {self.ayarlar.get('model')} (kilitli)")
+                    _send(f"ğŸ¤– Model: {self.ayarlar.get('model')} (kilitli)")
                 )
             else:
                 asyncio.create_task(
                     _send(
-                        "❌ Model degistirme devre disi. Sadece deepseek-v4-flash kullanilir."
+                        "âŒ Model degistirme devre disi. Sadece deepseek-v4-flash kullanilir."
                     )
                 )
             return True
 
-        # — /status — Bot durumu
+        # â€” /status â€” Bot durumu
         elif komut == COMMAND_PREFIX + "status":
             satirlar = [
-                f"🤖 **{self.bot_ad}**",
+                f"ğŸ¤– **{self.bot_ad}**",
                 f"Model: {self.ayarlar.get('model')}",
                 f"Provider: {self.ayarlar.get('provider')}",
                 f"Bilinen kanal: {len(self.ayarlar.get('bilinen_kanallar', []))}",
                 f"Session gecmisi: {len(self.session_gecmisi_al(session_id))} mesaj",
-                f"Aktif gorev: {'✅' if session_id in self._gorevler else '❌'}",
+                f"Aktif gorev: {'âœ…' if session_id in self._gorevler else 'âŒ'}",
             ]
             asyncio.create_task(channel.send("\n".join(satirlar)))
             return True
 
-        # — /help — Yardim
+        # â€” /help â€” Yardim
         elif komut == COMMAND_PREFIX + "help":
             yardim = (
                 f"**ReYMeN Discord Bot**\n\n"
-                f"{COMMAND_PREFIX}new     — Yeni konusma baslat\n"
-                f"{COMMAND_PREFIX}stop    — Aktif gorevi durdur\n"
-                f"{COMMAND_PREFIX}retry   — Son yaniti yeniden dene\n"
-                f"{COMMAND_PREFIX}model   — Model bilgisi goster\n"
-                f"{COMMAND_PREFIX}status  — Bot durumu\n"
-                f"{COMMAND_PREFIX}help    — Bu liste\n\n"
+                f"{COMMAND_PREFIX}new     â€” Yeni konusma baslat\n"
+                f"{COMMAND_PREFIX}stop    â€” Aktif gorevi durdur\n"
+                f"{COMMAND_PREFIX}retry   â€” Son yaniti yeniden dene\n"
+                f"{COMMAND_PREFIX}model   â€” Model bilgisi goster\n"
+                f"{COMMAND_PREFIX}status  â€” Bot durumu\n"
+                f"{COMMAND_PREFIX}help    â€” Bu liste\n\n"
                 f"Herhangi bir mesaj yazarak AI ile konusabilirsiniz."
             )
             asyncio.create_task(channel.send(yardim))
             return True
 
-        # — Ortak komut modulune yonlendir —
+        # â€” Ortak komut modulune yonlendir â€”
         if ortak_komut_isle is not None:
             try:
                 # Ortak komutlar icin async wrapper
@@ -684,7 +684,7 @@ class DiscordBotProcess:
 
         return False
 
-    # ── Mesaj isleyici (on_message event) ──────────────────────────────
+    # â”€â”€ Mesaj isleyici (on_message event) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     async def on_message(self, message):
         """Discord on_message event handler.
@@ -724,11 +724,11 @@ class DiscordBotProcess:
         except Exception as e:
             logger.error("[%s] Mesaj gonderilemedi: %s", self.bot_ad, e)
 
-    # ── Bot baslatma ──────────────────────────────────────────────────
+    # â”€â”€ Bot baslatma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     async def _on_ready(self):
         """Bot hazir oldugunda tetiklenir."""
-        logger.info("[%s] ✅ Discord bot hazir! (%s)", self.bot_ad, self._bot.user)
+        logger.info("[%s] âœ… Discord bot hazir! (%s)", self.bot_ad, self._bot.user)
         self.bot_ad = str(self._bot.user)
 
         # durum.json'u guncelle (gercek adla)
@@ -739,7 +739,7 @@ class DiscordBotProcess:
             try:
                 kanal = self._bot.get_channel(kanal_id)
                 if kanal:
-                    await kanal.send(f"🟢 {self.bot_ad} Gateway Ready!")
+                    await kanal.send(f"ğŸŸ¢ {self.bot_ad} Gateway Ready!")
             except Exception as e:
                 logger.warning(
                     "[%s] Startup mesaji gonderilemedi [%s]: %s",
@@ -793,7 +793,7 @@ def motor_kaydet(motor):
         lambda metin="", kanal_id="": (
             f"[Discord] HEDEF: {kanal_id}, MESAJ: {metin[:100]}"
             if metin
-            else "[Discord] Gonderim aracı kayitli (arkaplan bot ile)."
+            else "[Discord] Gonderim aracÄ± kayitli (arkaplan bot ile)."
         ),
         "Discord kanalina mesaj gonder (metin, kanal_id gerekli)",
     )
@@ -802,7 +802,7 @@ def motor_kaydet(motor):
         lambda metin="", kanal_id="": (
             f"[Discord] HEDEF: {kanal_id}, MESAJ: {metin[:100]}"
             if metin
-            else "[Discord] Gonderim aracı kayitli."
+            else "[Discord] Gonderim aracÄ± kayitli."
         ),
         "Discord bot ile mesaj gonder (metin, kanal_id gerekli)",
     )

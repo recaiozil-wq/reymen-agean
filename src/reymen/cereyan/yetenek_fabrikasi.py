@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-yetenek_fabrikasi.py — YetenekFabrikasi.
+yetenek_fabrikasi.py â€” YetenekFabrikasi.
 Yetenek (beceri) olusturma, ogretme, test etme ve silme modulu.
 ReYMeN kimligi: Turkce docstring, try/except, class-based.
 
@@ -18,7 +18,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-# ── Yardimci Fonksiyonlar ────────────────────────────────────────────
+# â”€â”€ Yardimci Fonksiyonlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _guvenli_ad(ad: str) -> str:
@@ -152,7 +152,7 @@ def _frontmatter_guncelle(dosya_yolu: Path, alan: str, deger) -> bool:
         return False
 
 
-# ── Standalone Fonksiyon (closed_learning_loop.py icin) ──────────────
+# â”€â”€ Standalone Fonksiyon (closed_learning_loop.py icin) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def beceri_karti_uret(
@@ -213,7 +213,7 @@ def beceri_karti_uret(
         raise
 
 
-# ── Sinif ────────────────────────────────────────────────────────────
+# â”€â”€ Sinif â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class YetenekFabrikasi:
@@ -623,7 +623,7 @@ if __name__ == "__main__":
         )
         print(f"Olustur: {sonuc['mesaj']}")
 
-        # Frontmatter'ı kontrol et
+        # Frontmatter'Ä± kontrol et
         icerik = yf.yetenek_oku("dosya_yaz")
         if icerik:
             meta = _frontmatter_parse(icerik)

@@ -1,18 +1,18 @@
-"""_handle_image_command handler."""
+﻿"""_handle_image_command handler."""
 
 from pathlib import Path
 
-from src.reymen.sistem.cli_display import _cprint, _DIM, _RST, _IMAGE_EXTENSIONS
-from src.reymen.sistem.cli_stream import (
+from reymen.sistem.cli_display import _cprint, _DIM, _RST, _IMAGE_EXTENSIONS
+from reymen.sistem.cli_stream import (
     _split_path_input,
     _resolve_attachment_path,
     _termux_example_image_path,
 )
-from src.reymen.sistem.ReYMeN_constants import is_termux as _is_termux_environment
+from reymen.sistem.ReYMeN_constants import is_termux as _is_termux_environment
 
 
 def _handle_image_command(cli, cmd_original: str):
-    """Handle /image <path> — attach a local image file for the next prompt."""
+    """Handle /image <path> â€” attach a local image file for the next prompt."""
     raw_args = cmd_original.split(None, 1)[1].strip() if " " in cmd_original else ""
     if not raw_args:
         hint = (
@@ -33,7 +33,7 @@ def _handle_image_command(cli, cmd_original: str):
         return
 
     cli._attached_images.append(image_path)
-    _cprint(f"  📎 Attached image: {image_path.name}")
+    _cprint(f"  ğŸ“ Attached image: {image_path.name}")
     if _remainder:
         _cprint(
             f"  {_DIM}Now type your prompt (or use --image in single-query mode): {_remainder}{_RST}"

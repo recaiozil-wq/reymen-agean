@@ -1,7 +1,7 @@
-"""ReYMeN tools.tts_tool shim — Hermes TTS fonksiyonlarını ReYMeN voice_engine'e yönlendirir.
+﻿"""ReYMeN tools.tts_tool shim â€” ReYMeN TTS fonksiyonlarÄ±nÄ± ReYMeN voice_engine'e yÃ¶nlendirir.
 
-Bu modül, Hermes Agent'in tools/tts_tool.py'sini taklit eder.
-Tüm işlevler ReYMeN'in voice_engine.py'sine yönlendirilir.
+Bu modÃ¼l, ReYMeN Agent'in tools/tts_tool.py'sini taklit eder.
+TÃ¼m iÅŸlevler ReYMeN'in voice_engine.py'sine yÃ¶nlendirilir.
 """
 
 from __future__ import annotations
@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 def _load_tts_config() -> Dict[str, Any]:
-    """Hermes TTS config formatını taklit eder. Env var'dan okur."""
+    """ReYMeN TTS config formatÄ±nÄ± taklit eder. Env var'dan okur."""
     return {
         "provider": os.getenv("REYMEN_TTS_PROVIDER", "edge"),
         "voice": os.getenv("REYMEN_TTS_VOICE", "tr-TR-AhmetNeural"),
@@ -27,12 +27,12 @@ def _load_tts_config() -> Dict[str, Any]:
 
 
 def _get_provider(config: Dict[str, Any]) -> str:
-    """Hermes _get_provider fonksiyonunu taklit eder."""
+    """ReYMeN _get_provider fonksiyonunu taklit eder."""
     return config.get("provider", "edge")
 
 
 def _import_elevenlabs() -> None:
-    """ElevenLabs SDK kontrolü — yoksa ImportError."""
+    """ElevenLabs SDK kontrolÃ¼ â€” yoksa ImportError."""
     try:
         import elevenlabs  # noqa: F401
     except ImportError:
@@ -40,7 +40,7 @@ def _import_elevenlabs() -> None:
 
 
 def _import_sounddevice() -> None:
-    """sounddevice kontrolü — yoksa ImportError."""
+    """sounddevice kontrolÃ¼ â€” yoksa ImportError."""
     try:
         import sounddevice  # noqa: F401
     except ImportError:
@@ -54,10 +54,10 @@ def stream_tts_to_speaker(
     stream_callback=None,
     stop_event=None,
 ) -> None:
-    """Hermes stream_tts_to_speaker — ReYMeN voice_engine'e yönlendirir.
+    """ReYMeN stream_tts_to_speaker â€” ReYMeN voice_engine'e yÃ¶nlendirir.
 
-    Basit implementasyon: ses dosyasına kaydedip oynatır.
-    Gerçek streaming için elevenlabs veya başka bir streaming TTS gerekir.
+    Basit implementasyon: ses dosyasÄ±na kaydedip oynatÄ±r.
+    GerÃ§ek streaming iÃ§in elevenlabs veya baÅŸka bir streaming TTS gerekir.
     """
     try:
         from reymen.arac.voice_engine import VoiceRegistry
@@ -83,7 +83,7 @@ def stream_tts_to_speaker(
 
 
 # ---------------------------------------------------------------------------
-# text_to_speech_tool — ana TTS fonksiyonu
+# text_to_speech_tool â€” ana TTS fonksiyonu
 # ---------------------------------------------------------------------------
 
 
@@ -93,16 +93,16 @@ def text_to_speech_tool(
     output_path: Optional[str] = None,
     provider: Optional[str] = None,
 ) -> str:
-    """Hermes text_to_speech_tool — ReYMeN voice_engine'e yönlendirir.
+    """ReYMeN text_to_speech_tool â€” ReYMeN voice_engine'e yÃ¶nlendirir.
 
     Args:
-        text: Sese çevrilecek metin
-        voice: Ses adı (opsiyonel)
-        output_path: Çıktı dosyası yolu (opsiyonel)
-        provider: TTS sağlayıcısı ('edge', 'openai', vb.)
+        text: Sese Ã§evrilecek metin
+        voice: Ses adÄ± (opsiyonel)
+        output_path: Ã‡Ä±ktÄ± dosyasÄ± yolu (opsiyonel)
+        provider: TTS saÄŸlayÄ±cÄ±sÄ± ('edge', 'openai', vb.)
 
     Returns:
-        str: JSON formatında sonuç
+        str: JSON formatÄ±nda sonuÃ§
     """
     import json
 
@@ -141,15 +141,15 @@ def speech_to_text_tool(
     language: str = "tr",
     provider: Optional[str] = None,
 ) -> str:
-    """Hermes speech_to_text_tool — ReYMeN voice_engine'e yönlendirir.
+    """ReYMeN speech_to_text_tool â€” ReYMeN voice_engine'e yÃ¶nlendirir.
 
     Args:
-        audio_path: Ses dosyası yolu
+        audio_path: Ses dosyasÄ± yolu
         language: Dil kodu
-        provider: STT sağlayıcısı ('whisper', 'openai', vb.)
+        provider: STT saÄŸlayÄ±cÄ±sÄ± ('whisper', 'openai', vb.)
 
     Returns:
-        str: JSON formatında sonuç
+        str: JSON formatÄ±nda sonuÃ§
     """
     import json
 

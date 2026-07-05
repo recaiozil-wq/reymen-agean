@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-proaktif_kontrol.py — Analyzes missing aspects after each question/answer.
+proaktif_kontrol.py â€” Analyzes missing aspects after each question/answer.
 
 What it does:
   1. Analyzes the given answer: which angles are missing?
@@ -30,27 +30,27 @@ from typing import Any, Optional
 
 log = logging.getLogger(__name__)
 
-# ── Eksik kategorileri ─────────────────────────────────────────────────────
+# â”€â”€ Eksik kategorileri â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 EKSIK_KATEGORILER = {
-    "tablo": r"(tablo|liste halinde|karşılaştır|özet tablosu)",
+    "tablo": r"(tablo|liste halinde|karÅŸÄ±laÅŸtÄ±r|Ã¶zet tablosu)",
     "kaynak": r"(kaynak|referans|link|adres|site)",
-    "ornek": r"(örnek|misal|demo|kod örneği)",
-    "nicel_veri": r"(kaç|ne kadar|yüzde|oran|istatistik|sayısal)",
-    "edge_case": r"(ya .+? ise|eğer .+? olmazsa|sınır durum|istisna)",
-    "karsilastirma": r"(fark|karşılaş|kıyasla|vs|versus|arasındaki fark)",
-    "adim_adim": r"(adım|sırayla|aşama|nasıl yapılır|prosedür)",
-    "neden": r"(neden|niçin|sebep|gerekçe|kök neden)",
-    "ne_zaman": r"(ne zaman|hangi durumda|hangi koşulda)",
-    "nerede": r"(nerede|hangi dizin|hangi klasör|nereden)",
+    "ornek": r"(Ã¶rnek|misal|demo|kod Ã¶rneÄŸi)",
+    "nicel_veri": r"(kaÃ§|ne kadar|yÃ¼zde|oran|istatistik|sayÄ±sal)",
+    "edge_case": r"(ya .+? ise|eÄŸer .+? olmazsa|sÄ±nÄ±r durum|istisna)",
+    "karsilastirma": r"(fark|karÅŸÄ±laÅŸ|kÄ±yasla|vs|versus|arasÄ±ndaki fark)",
+    "adim_adim": r"(adÄ±m|sÄ±rayla|aÅŸama|nasÄ±l yapÄ±lÄ±r|prosedÃ¼r)",
+    "neden": r"(neden|niÃ§in|sebep|gerekÃ§e|kÃ¶k neden)",
+    "ne_zaman": r"(ne zaman|hangi durumda|hangi koÅŸulda)",
+    "nerede": r"(nerede|hangi dizin|hangi klasÃ¶r|nereden)",
 }
 
-# ── Cevap kalite kontrol listesi ───────────────────────────────────────────
+# â”€â”€ Cevap kalite kontrol listesi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 CEVAP_KALITE_KONTROL = [
-    ("basarisiz_hata", r"(hata|başarısız|çalışmadı|bulunamadı|yetki yok)\s", True),
+    ("basarisiz_hata", r"(hata|baÅŸarÄ±sÄ±z|Ã§alÄ±ÅŸmadÄ±|bulunamadÄ±|yetki yok)\s", True),
     ("bos_cevap", r"^$", True),
     ("cok_kisa", r"^\s*\S+\s*$", True),  # tek kelime
-    ("kaynak_yok", r"(bence|sanırım|muhtemelen|tahminen)", False),
-    ("tavsiye_eksik", r"(tavsiye|öneri|öncelik|en iyi)", False),
+    ("kaynak_yok", r"(bence|sanÄ±rÄ±m|muhtemelen|tahminen)", False),
+    ("tavsiye_eksik", r"(tavsiye|Ã¶neri|Ã¶ncelik|en iyi)", False),
 ]
 
 
@@ -105,7 +105,7 @@ class ProaktifDenetci:
         """Analyzes a question/answer pair and returns missing aspects."""
         baslama = time.time()
 
-        # Soruda hangi kategoriler talep edilmiş?
+        # Soruda hangi kategoriler talep edilmiÅŸ?
         talep_edilen = []
         for kat, desen in EKSIK_KATEGORILER.items():
             if re.search(desen, soru, re.IGNORECASE):
@@ -126,7 +126,7 @@ class ProaktifDenetci:
             if re.search(desen, cevap, re.IGNORECASE):
                 kalite_sorunlari.append(ad)
 
-        # Cevap uzunluğu kontrolü
+        # Cevap uzunluÄŸu kontrolÃ¼
         kelime_sayisi = len(cevap.split())
         if kelime_sayisi < 10 and len(soru.split()) > 3:
             eksikler.append("cok_kisa_cevap")
@@ -177,7 +177,7 @@ class ProaktifDenetci:
                     (eksik,),
                 )
 
-        # Düşük puanlı cevapları kaydet
+        # DÃ¼ÅŸÃ¼k puanlÄ± cevaplarÄ± kaydet
         puan = a.get("puan", 100)
         if puan < 60 and analiz:
             with sqlite3.connect(self._db) as vt:
@@ -212,8 +212,8 @@ class ProaktifDenetci:
 
         uyarilar = []
         for kat, sayi in en_sik:
-            if sayi >= 3:  # En az 3 kere aynı eksik
-                uyarilar.append(f"⚠️ {kat} (son {sayi} cevapta {sayi} kez eksik)")
+            if sayi >= 3:  # En az 3 kere aynÄ± eksik
+                uyarilar.append(f"âš ï¸ {kat} (son {sayi} cevapta {sayi} kez eksik)")
 
         if uyarilar:
             return "Dikkat edilmesi gerekenler:\n" + "\n".join(uyarilar)
@@ -226,13 +226,13 @@ class ProaktifDenetci:
             cur = vt.execute("SELECT COUNT(*) FROM analiz_gecmisi")
             toplam_analiz = cur.fetchone()[0]
 
-        lines = [f"📊 Toplam analiz: {toplam_analiz}", f"\nEn sık eksikler:"]
+        lines = [f"ğŸ“Š Toplam analiz: {toplam_analiz}", f"\nEn sÄ±k eksikler:"]
         for kat, sayi in en_sik:
-            lines.append(f"  ❌ {kat}: {sayi} kez")
-        return "\n".join(lines) if en_sik else "Henüz yeterli veri yok."
+            lines.append(f"  âŒ {kat}: {sayi} kez")
+        return "\n".join(lines) if en_sik else "HenÃ¼z yeterli veri yok."
 
 
-# ── conversation_loop entegrasyonu ──────────────────────────────────────────
+# â”€â”€ conversation_loop entegrasyonu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _proaktif_ornegi: Optional[ProaktifDenetci] = None
 
 
@@ -258,7 +258,7 @@ def soru_sonrasi_kontrol(soru: str, cevap: str) -> dict:
             analiz.get("puan", 0),
         )
 
-    # Proaktif uyarı kontrolü
+    # Proaktif uyarÄ± kontrolÃ¼
     uyari = denetci.proaktif_uyari(soru)
     if uyari:
         log.info("[PROAKTIF] Uyari: %s", uyari)
@@ -269,8 +269,8 @@ def soru_sonrasi_kontrol(soru: str, cevap: str) -> dict:
 if __name__ == "__main__":
     # Test
     denetci = ProaktifDenetci()
-    test_soru = "Bana Linux komutlarını tablo halinde sırala, örneklerle göster"
-    test_cevap = "ls komutu dizin listeler. cd ile dizin değiştirilir."
+    test_soru = "Bana Linux komutlarÄ±nÄ± tablo halinde sÄ±rala, Ã¶rneklerle gÃ¶ster"
+    test_cevap = "ls komutu dizin listeler. cd ile dizin deÄŸiÅŸtirilir."
     analiz = denetci.soru_cevap_analiz(test_soru, test_cevap)
     print(f"Soru: {test_soru}")
     print(f"Analiz: {json.dumps(analiz, indent=2, ensure_ascii=False)}")

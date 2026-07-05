@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""skill_utils.py — Skill Yardimci Fonksiyonlar v4.
+﻿# -*- coding: utf-8 -*-
+"""skill_utils.py â€” Skill Yardimci Fonksiyonlar v4.
 
 v4 yenilikleri (agentskills.io derin analiz):
 - .agents/skills/ dizin destegi (resmi standart dizin yolu)
@@ -54,7 +54,7 @@ _ONERI_MAKS_SATIR = 500
 _ONERI_MAKS_TOKEN = 5000
 
 
-# ── YAML frontmatter parser (PyYAML gerekmez) ────────────────────────────────
+# â”€â”€ YAML frontmatter parser (PyYAML gerekmez) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _frontmatter_parse(icerik: str) -> dict:
@@ -96,7 +96,7 @@ def _tum_skill_dosyalari():
                 yield dosya
 
 
-# ── FTS5 SQLite Index ─────────────────────────────────────────────────────────
+# â”€â”€ FTS5 SQLite Index â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _index_db_ac() -> sqlite3.Connection:
@@ -268,7 +268,7 @@ def skill_fts_ara(sorgu: str, limit: int = 10) -> list:
         con.close()
 
 
-# ── Temel okuma / bulma ───────────────────────────────────────────────────────
+# â”€â”€ Temel okuma / bulma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def skill_bul(ad: str) -> Optional[Path]:
@@ -366,7 +366,7 @@ def skill_guncelle(ad: str, yeni_icerik: str) -> bool:
         return False
 
 
-# ── Sayim ve listeleme ────────────────────────────────────────────────────────
+# â”€â”€ Sayim ve listeleme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def skill_sayisi() -> int:
@@ -417,11 +417,11 @@ def kategori_skill_listele(kategori: str, limit: int = 20) -> list:
     return sonuclar
 
 
-# ── Arama ────────────────────────────────────────────────────────────────────
+# â”€â”€ Arama â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def skill_ara(sorgu: str, limit: int = 10) -> list:
-    """Skill ara — FTS5 ile hizli, yoksa dosya taramasi.
+    """Skill ara â€” FTS5 ile hizli, yoksa dosya taramasi.
 
     Returns:
         [{ad, kategori, aciklama, yol}, ...] listesi
@@ -475,21 +475,21 @@ def skill_ara(sorgu: str, limit: int = 10) -> list:
     return eslesen
 
 
-# ── Progressive Disclosure: Aktivasyon ───────────────────────────────────────
+# â”€â”€ Progressive Disclosure: Aktivasyon â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def skill_aktivat(ad: str) -> str:
-    """Skill'i aktive et — tam SKILL.md + scripts/references listesi + uyumluluk uyarisi.
+    """Skill'i aktive et â€” tam SKILL.md + scripts/references listesi + uyumluluk uyarisi.
 
     Returns:
-        Formatlı skill icerigi veya hata mesaji.
+        FormatlÄ± skill icerigi veya hata mesaji.
     """
     dosya = skill_bul(ad)
     if not dosya:
         # Fuzzy: adi kismi eslestirme
-        olasılar = skill_ara(ad, limit=3)
-        if olasılar:
-            oneriler = ", ".join(s["ad"] for s in olasılar)
+        olasÄ±lar = skill_ara(ad, limit=3)
+        if olasÄ±lar:
+            oneriler = ", ".join(s["ad"] for s in olasÄ±lar)
             return f"[Skill]: '{ad}' bulunamadi. Benzer: {oneriler}"
         return f"[Skill]: '{ad}' bulunamadi. SKILL_ARA ile ara."
 
@@ -531,7 +531,7 @@ def skill_aktivat(ad: str) -> str:
             ref_adlari = ", ".join(r.name for r in refler[:10])
             ref_listesi = f"\n[Skill References]: {ref_adlari}"
 
-    # evals/ bilgisi (agentskills.io eval standardı)
+    # evals/ bilgisi (agentskills.io eval standardÄ±)
     eval_bilgisi = ""
     eval_dizin = dosya.parent / "evals"
     if eval_dizin.exists():
@@ -540,7 +540,7 @@ def skill_aktivat(ad: str) -> str:
             try:
                 veri = json.loads(eval_dosya.read_text(encoding="utf-8"))
                 eval_sayisi = len(veri.get("evals", []))
-                eval_bilgisi = f"\n[Skill Evals]: {eval_sayisi} test case — SKILL_EVAL_LISTELE ile goru"
+                eval_bilgisi = f"\n[Skill Evals]: {eval_sayisi} test case â€” SKILL_EVAL_LISTELE ile goru"
             except Exception:
                 eval_bilgisi = "\n[Skill Evals]: evals/ dizini mevcut"
 
@@ -565,7 +565,7 @@ def skill_aktivat(ad: str) -> str:
     )
 
 
-# ── Skill Dogrulama (agentskills.io spec) ────────────────────────────────────
+# â”€â”€ Skill Dogrulama (agentskills.io spec) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def skill_dogrula(ad: str) -> str:
@@ -623,7 +623,7 @@ def skill_dogrula(ad: str) -> str:
             hatalar.append(
                 f"'description' {len(desc_val)} karakter (max {_MAKS_ACIKLAMA_UZUNLUGU})."
             )
-        # "Ne zaman kullanilacagi" kontrol — imperatif yapı (Use when / ne zaman / kullan)
+        # "Ne zaman kullanilacagi" kontrol â€” imperatif yapÄ± (Use when / ne zaman / kullan)
         zaman_ipuclari = [
             "use when",
             "use this when",
@@ -697,7 +697,7 @@ def skill_dogrula(ad: str) -> str:
     return "\n".join(satirlar)
 
 
-# ── Skill Olusturma (spec uyumlu) ─────────────────────────────────────────────
+# â”€â”€ Skill Olusturma (spec uyumlu) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _ad_dogrula(ad: str) -> tuple:
@@ -729,7 +729,7 @@ def skill_olustur(
     """Spec uyumlu yeni skill olustur .ReYMeN/skills/ altinda.
 
     Args:
-        ad:           Skill adi (kucuk harf, tire, rakam — spec kurallari uygulanir)
+        ad:           Skill adi (kucuk harf, tire, rakam â€” spec kurallari uygulanir)
         aciklama:     Ne yaptigini VE ne zaman kullanilacagini acikla (max 1024 karakter)
         talimatlar:   SKILL.md govde icerigi (Markdown)
         kategori:     Opsiyonel alt klasor (ornegin 'python', 'devops')
@@ -796,7 +796,7 @@ def skill_olustur(
     )
 
 
-# ── Skill scripts calistirma ─────────────────────────────────────────────────
+# â”€â”€ Skill scripts calistirma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _uv_mevcut() -> bool:
@@ -904,7 +904,7 @@ def skill_script_yardim(skill_adi: str, script_adi: str) -> str:
     return skill_script_calistir(skill_adi, script_adi, arglar="--help")
 
 
-# ── Skill Eval Sistemi (agentskills.io evals/ standardı) ─────────────────────
+# â”€â”€ Skill Eval Sistemi (agentskills.io evals/ standardÄ±) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def skill_eval_al(ad: str) -> dict:
@@ -956,7 +956,7 @@ def skill_eval_ekle(
     Args:
         ad:              Skill adi
         prompt:          Gercekci kullanici mesaji (test girdisi)
-        expected_output: Basarili cikti nasil gorünmeli (aciklama)
+        expected_output: Basarili cikti nasil gorÃ¼nmeli (aciklama)
         assertions:      Dogrulanabilir kontrol listesi (opsiyonel)
         files:           Gerekli dosya yollari (opsiyonel)
 
@@ -1003,7 +1003,7 @@ def skill_eval_ekle(
         json.dumps(mevcut, ensure_ascii=False, indent=2), encoding="utf-8"
     )
     return (
-        f"[Eval Eklendi]: #{yeni_id} — '{ad}'\n"
+        f"[Eval Eklendi]: #{yeni_id} â€” '{ad}'\n"
         f"  Prompt: {prompt[:80]}\n"
         f"  Assertions: {len(yeni_case.get('assertions', []))} adet\n"
         f"  Toplam eval: {len(mevcut_evals)}"
@@ -1029,7 +1029,7 @@ def skill_eval_listele(ad: str) -> str:
     return "\n".join(satirlar)
 
 
-# ── Startup ozeti (progressive disclosure) ───────────────────────────────────
+# â”€â”€ Startup ozeti (progressive disclosure) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def skill_ozet_listesi(limit: int = 50) -> str:
@@ -1057,7 +1057,7 @@ if __name__ == "__main__":
     n = skill_index_yenile()
     print(f"  Guncellenen: {n} skill")
     print()
-    print("=== 'python' araması (FTS5) ===")
+    print("=== 'python' aramasÄ± (FTS5) ===")
     for s in skill_ara("python", limit=5):
         print(f"  [{s.get('kategori','?')}] {s['ad']}: {s['aciklama'][:60]}")
     print()

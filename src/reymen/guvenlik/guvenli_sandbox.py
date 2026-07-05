@@ -1,16 +1,16 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-guvenli_sandbox.py — ReYMeN Güvenli Kod Çalıştırma Sandbox'ı.
+guvenli_sandbox.py â€” ReYMeN GÃ¼venli Kod Ã‡alÄ±ÅŸtÄ±rma Sandbox'Ä±.
 
-Python kodunu izole bir alt süreçte çalıştırır:
-  - Timeout (zaman aşımı)
-  - Bellek sınırı
-  - Modül allowlist'i (sadece izin verilen modüller)
-  - Dosya sistemi kısıtlaması (geçici dizin)
-  - Çıktı boyut sınırı
-  - Tehlikeli işlemleri engelleme (subprocess, eval, exec, import blacklist)
+Python kodunu izole bir alt sÃ¼reÃ§te Ã§alÄ±ÅŸtÄ±rÄ±r:
+  - Timeout (zaman aÅŸÄ±mÄ±)
+  - Bellek sÄ±nÄ±rÄ±
+  - ModÃ¼l allowlist'i (sadece izin verilen modÃ¼ller)
+  - Dosya sistemi kÄ±sÄ±tlamasÄ± (geÃ§ici dizin)
+  - Ã‡Ä±ktÄ± boyut sÄ±nÄ±rÄ±
+  - Tehlikeli iÅŸlemleri engelleme (subprocess, eval, exec, import blacklist)
 
-Kullanım:
+KullanÄ±m:
     from reymen.guvenlik.guvenli_sandbox import guvenli_calistir, Sandbox
 
     sonuc = guvenli_calistir("print('Merhaba')", timeout=10)
@@ -36,12 +36,12 @@ from typing import Any
 
 logger = logging.getLogger(__name__)
 
-# ── Varsayılan Ayarlar ──────────────────────────────────────────────────
+# â”€â”€ VarsayÄ±lan Ayarlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-# İzin verilen modüller (allowlist)
+# Ä°zin verilen modÃ¼ller (allowlist)
 VARSAYILAN_MODUL_LISTESI = frozenset(
     {
-        # Python standart kütüphanesi (güvenli)
+        # Python standart kÃ¼tÃ¼phanesi (gÃ¼venli)
         "math",
         "random",
         "datetime",
@@ -66,17 +66,17 @@ VARSAYILAN_MODUL_LISTESI = frozenset(
         "pprint",
         "textwrap",
         "stringprep",
-        # Temel işlemler
+        # Temel iÅŸlemler
         "bisect",
         "heapq",
         "operator",
         "functools",
         "abc",
-        "pathlib",  # sadece okuma için
+        "pathlib",  # sadece okuma iÃ§in
     }
 )
 
-# Kesinlikle yasaklı modüller/kodlar
+# Kesinlikle yasaklÄ± modÃ¼ller/kodlar
 YASAKLI_ANAHTAR_KELIMELER = [
     "import os",
     "from os",
@@ -116,36 +116,36 @@ YASAKLI_ANAHTAR_KELIMELER = [
     "sqlite3.connect",
 ]
 
-# ── Hata Sınıfları ──────────────────────────────────────────────────────
+# â”€â”€ Hata SÄ±nÄ±flarÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class SandboxError(RuntimeError):
-    """Sandbox çalıştırma hatası."""
+    """Sandbox Ã§alÄ±ÅŸtÄ±rma hatasÄ±."""
 
 
 class SandboxTimeout(SandboxError):
-    """Zaman aşımı."""
+    """Zaman aÅŸÄ±mÄ±."""
 
 
 class YasakliModulHatasi(SandboxError):
-    """Yasaklı modül kullanımı."""
+    """YasaklÄ± modÃ¼l kullanÄ±mÄ±."""
 
 
 class CiktiSiniriHatasi(SandboxError):
-    """Çıktı boyut sınırı aşıldı."""
+    """Ã‡Ä±ktÄ± boyut sÄ±nÄ±rÄ± aÅŸÄ±ldÄ±."""
 
 
-# ── Sandbox Sınıfı ──────────────────────────────────────────────────────
+# â”€â”€ Sandbox SÄ±nÄ±fÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class Sandbox:
-    """Güvenli kod çalıştırma sandbox'ı.
+    """GÃ¼venli kod Ã§alÄ±ÅŸtÄ±rma sandbox'Ä±.
 
     Args:
-        timeout: Maksimum çalışma süresi (saniye).
-        max_chars: Maksimum çıktı boyutu (karakter).
-        modul_listesi: İzin verilen modüller (None=varsayılan).
-        calisma_dizini: Kodun çalışacağı dizin (None=geçici dizin).
+        timeout: Maksimum Ã§alÄ±ÅŸma sÃ¼resi (saniye).
+        max_chars: Maksimum Ã§Ä±ktÄ± boyutu (karakter).
+        modul_listesi: Ä°zin verilen modÃ¼ller (None=varsayÄ±lan).
+        calisma_dizini: Kodun Ã§alÄ±ÅŸacaÄŸÄ± dizin (None=geÃ§ici dizin).
     """
 
     def __init__(
@@ -162,29 +162,29 @@ class Sandbox:
         )
         self._calisma_dizini = calisma_dizini
 
-    # ── Ana API ─────────────────────────────────────────────────────────
+    # â”€â”€ Ana API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def calistir(self, kod: str, baglam: dict[str, Any] | None = None) -> str:
-        """Kodu sandbox içinde çalıştır.
+        """Kodu sandbox iÃ§inde Ã§alÄ±ÅŸtÄ±r.
 
         Args:
-            kod: Çalıştırılacak Python kodu.
-            baglam: Koda eklenecek değişkenler (opsiyonel).
+            kod: Ã‡alÄ±ÅŸtÄ±rÄ±lacak Python kodu.
+            baglam: Koda eklenecek deÄŸiÅŸkenler (opsiyonel).
 
         Returns:
-            stdout çıktısı veya hata mesajı.
+            stdout Ã§Ä±ktÄ±sÄ± veya hata mesajÄ±.
 
         Raises:
-            SandboxTimeout: Zaman aşımı.
-            YasakliModulHatasi: Yasaklı modül kullanımı.
+            SandboxTimeout: Zaman aÅŸÄ±mÄ±.
+            YasakliModulHatasi: YasaklÄ± modÃ¼l kullanÄ±mÄ±.
         """
-        # 1. Kod ön kontrolü
+        # 1. Kod Ã¶n kontrolÃ¼
         self._kod_kontrol(kod)
 
-        # 2. Geçici script dosyası oluştur
+        # 2. GeÃ§ici script dosyasÄ± oluÅŸtur
         script = self._script_olustur(kod, baglam or {})
 
-        # 3. Subprocess ile çalıştır
+        # 3. Subprocess ile Ã§alÄ±ÅŸtÄ±r
         import subprocess
 
         try:
@@ -198,7 +198,7 @@ class Sandbox:
         except subprocess.TimeoutExpired:
             raise SandboxTimeout(f"Kod {self.timeout}s icinde tamamlanamadi.")
 
-        # 4. Sonucu işle
+        # 4. Sonucu iÅŸle
         cikti = process.stdout + process.stderr
 
         if len(cikti) > self.max_chars:
@@ -210,7 +210,7 @@ class Sandbox:
         return cikti
 
     def _script_olustur(self, kod: str, baglam: dict[str, Any]) -> str:
-        """Kodu geçici bir script dosyasına yaz."""
+        """Kodu geÃ§ici bir script dosyasÄ±na yaz."""
         wrapper_bas = (
             "# ReYMeN Sandbox - Izole Calistirma\n"
             "import sys\n\n"
@@ -264,7 +264,7 @@ class Sandbox:
         return yol
 
     def __del__(self):
-        # Geçici script dosyasını temizle
+        # GeÃ§ici script dosyasÄ±nÄ± temizle
         if (
             hasattr(self, "_son_script")
             and self._son_script
@@ -277,19 +277,19 @@ class Sandbox:
                     "[SessizExcept] %%s: %%s", type(_e).__name__, _e
                 )
 
-    # ── Kod Ön Kontrolü ────────────────────────────────────────────────
+    # â”€â”€ Kod Ã–n KontrolÃ¼ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _kod_kontrol(self, kod: str) -> None:
-        """Kodu çalıştırmadan önce güvenlik kontrolü yap."""
+        """Kodu Ã§alÄ±ÅŸtÄ±rmadan Ã¶nce gÃ¼venlik kontrolÃ¼ yap."""
         for yasakli in YASAKLI_ANAHTAR_KELIMELER:
             if yasakli in kod:
                 raise YasakliModulHatasi(f"Yasakli ifade tespit edildi: {yasakli!r}")
 
-    # ── Kod Çalıştırma ──────────────────────────────────────────────────
+    # â”€â”€ Kod Ã‡alÄ±ÅŸtÄ±rma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _guvenli_import(self, name: str, *args: Any, **kwargs: Any) -> Any:
-        """Sadece izin verilen modülleri import et."""
-        # __import__ çağrısındaki ana modül adını al
+        """Sadece izin verilen modÃ¼lleri import et."""
+        # __import__ Ã§aÄŸrÄ±sÄ±ndaki ana modÃ¼l adÄ±nÄ± al
         import_name = name.split(".")[0] if "." in name else name
 
         if import_name not in self.modul_listesi:
@@ -298,13 +298,13 @@ class Sandbox:
                 f"{sorted(self.modul_listesi)}"
             )
 
-        # builtins.__import__ ile gerçek import
+        # builtins.__import__ ile gerÃ§ek import
         import builtins
 
         return builtins.__import__(name, *args, **kwargs)
 
 
-# ── Kolaylık Fonksiyonu ────────────────────────────────────────────────
+# â”€â”€ KolaylÄ±k Fonksiyonu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _VARSAYILAN_SANDBOX = Sandbox()
 
@@ -315,22 +315,22 @@ def guvenli_calistir(
     max_chars: int = 5000,
     baglam: dict[str, Any] | None = None,
 ) -> str:
-    """Kodu güvenli sandbox'ta çalıştır (tek satırlık API).
+    """Kodu gÃ¼venli sandbox'ta Ã§alÄ±ÅŸtÄ±r (tek satÄ±rlÄ±k API).
 
     Args:
-        kod: Çalıştırılacak Python kodu.
-        timeout: Zaman aşımı süresi (saniye).
-        max_chars: Maksimum çıktı boyutu.
-        baglam: Koda eklenecek değişkenler.
+        kod: Ã‡alÄ±ÅŸtÄ±rÄ±lacak Python kodu.
+        timeout: Zaman aÅŸÄ±mÄ± sÃ¼resi (saniye).
+        max_chars: Maksimum Ã§Ä±ktÄ± boyutu.
+        baglam: Koda eklenecek deÄŸiÅŸkenler.
 
     Returns:
-        Çıktı metni.
+        Ã‡Ä±ktÄ± metni.
     """
     sb = Sandbox(timeout=timeout, max_chars=max_chars)
     return sb.calistir(kod, baglam)
 
 
-# ── Test ────────────────────────────────────────────────────────────────
+# â”€â”€ Test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _test() -> None:
@@ -339,52 +339,52 @@ def _test() -> None:
 
     # 1. Basit kod
     sonuc = guvenli_calistir("print('Merhaba Dunya!')")
-    print(f"1. Basit kod: {'✅' if 'Merhaba' in sonuc else '❌'}")
+    print(f"1. Basit kod: {'âœ…' if 'Merhaba' in sonuc else 'âŒ'}")
     print(f"   Cikti: {sonuc.strip()}")
 
     # 2. Matematik
     sonuc = guvenli_calistir("print(2 + 3 * 4)")
-    print(f"2. Matematik: {'✅' if '14' in sonuc else '❌'}")
+    print(f"2. Matematik: {'âœ…' if '14' in sonuc else 'âŒ'}")
 
-    # 3. Döngü
+    # 3. DÃ¶ngÃ¼
     sonuc = guvenli_calistir("toplam = sum(range(100)); print(toplam)")
-    print(f"3. Döngu: {'✅' if '4950' in sonuc else '❌'}")
+    print(f"3. DÃ¶ngu: {'âœ…' if '4950' in sonuc else 'âŒ'}")
 
-    # 4. Yasaklı modül
+    # 4. YasaklÄ± modÃ¼l
     try:
         guvenli_calistir("import os; print(os.name)")
-        print("4. Yasakli modul: ❌ (engellenemedi)")
+        print("4. Yasakli modul: âŒ (engellenemedi)")
     except YasakliModulHatasi:
-        print("4. Yasakli modul: ✅ (engellendi)")
+        print("4. Yasakli modul: âœ… (engellendi)")
 
-    # 5. Yasaklı ifade
+    # 5. YasaklÄ± ifade
     try:
         guvenli_calistir("eval('2+2')")
-        print("5. Yasakli ifade: ❌ (engellenemedi)")
+        print("5. Yasakli ifade: âŒ (engellenemedi)")
     except YasakliModulHatasi:
-        print("5. Yasakli ifade: ✅ (engellendi)")
+        print("5. Yasakli ifade: âœ… (engellendi)")
 
     # 6. Timeout
     try:
         guvenli_calistir("while True: pass", timeout=1)
-        print("6. Timeout: ❌ (durdurulamadi)")
+        print("6. Timeout: âŒ (durdurulamadi)")
     except SandboxTimeout:
-        print("6. Timeout: ✅ (durduruldu)")
+        print("6. Timeout: âœ… (durduruldu)")
 
-    # 7. Çıktı sınırı
+    # 7. Ã‡Ä±ktÄ± sÄ±nÄ±rÄ±
     sonuc = guvenli_calistir("print('x' * 10000)", max_chars=100)
-    print(f"7. Cikti siniri: {'✅' if 'sinir' in sonuc else '❌'}")
+    print(f"7. Cikti siniri: {'âœ…' if 'sinir' in sonuc else 'âŒ'}")
 
-    # 8. İzin verilen modül
+    # 8. Ä°zin verilen modÃ¼l
     sonuc = guvenli_calistir("import math; print(math.pi)")
-    print(f"8. Izinli modul: {'✅' if '3.14' in sonuc else '❌'}")
+    print(f"8. Izinli modul: {'âœ…' if '3.14' in sonuc else 'âŒ'}")
 
     # 9. Baglam
     sonuc = guvenli_calistir("print(ad)", baglam={"ad": "ReYMeN"})
-    print(f"9. Baglam: {'✅' if 'ReYMeN' in sonuc else '❌'}")
+    print(f"9. Baglam: {'âœ…' if 'ReYMeN' in sonuc else 'âŒ'}")
 
     print(f"\n{'='*40}")
-    print("TEST SONUCLARI BASARILI ✅")
+    print("TEST SONUCLARI BASARILI âœ…")
 
 
 if __name__ == "__main__":

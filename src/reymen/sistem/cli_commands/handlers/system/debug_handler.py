@@ -1,8 +1,8 @@
-"""_handle_debug_command handler."""
+﻿"""_handle_debug_command handler."""
 
 
 def _handle_debug_command(cli):
-    """Handle /debug — upload debug report + logs and print paste URLs."""
+    """Handle /debug â€” upload debug report + logs and print paste URLs."""
     from reymen.reymen_cli.debug import run_debug_share
     from types import SimpleNamespace
 

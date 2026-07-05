@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 Toolsets Module
 
@@ -85,7 +85,7 @@ _ReYMeN_CORE_TOOLS = [
     "ha_get_state",
     "ha_list_services",
     "ha_call_service",
-    # Kanban multi-agent coordination — only in schema when the agent is
+    # Kanban multi-agent coordination â€” only in schema when the agent is
     # spawned as a kanban worker (ReYMeN_KANBAN_TASK env set) or the current
     # profile explicitly enables the kanban toolset. Gated via check_fn in
     # tools/kanban_tools.py.
@@ -135,7 +135,7 @@ TOOLSETS = {
             "Search X (Twitter) posts and threads via xAI's built-in "
             "x_search Responses tool. Available when xAI credentials are "
             "configured (SuperGrok OAuth or XAI_API_KEY). Off by default; "
-            "enable in `ReYMeN tools` → X (Twitter) Search."
+            "enable in `ReYMeN tools` â†’ X (Twitter) Search."
         ),
         "tools": ["x_search"],
         "includes": [],
@@ -159,15 +159,15 @@ TOOLSETS = {
         "description": (
             "Video generation tools. Single ``video_generate`` tool covers "
             "text-to-video (prompt only) and image-to-video (prompt + "
-            "image_url) — the active backend auto-routes. Configure via "
-            "``ReYMeN tools`` → Video Generation."
+            "image_url) â€” the active backend auto-routes. Configure via "
+            "``ReYMeN tools`` â†’ Video Generation."
         ),
         "tools": ["video_generate"],
         "includes": [],
     },
     "computer_use": {
         "description": (
-            "Background macOS desktop control via cua-driver — screenshots, "
+            "Background macOS desktop control via cua-driver â€” screenshots, "
             "mouse, keyboard, scroll, drag. Does NOT steal the user's cursor "
             "or keyboard focus. Works with any tool-capable model."
         ),
@@ -263,7 +263,7 @@ TOOLSETS = {
         "tools": ["delegate_task"],
         "includes": [],
     },
-    # "honcho" toolset removed — Honcho is now a memory provider plugin.
+    # "honcho" toolset removed â€” Honcho is now a memory provider plugin.
     # Tools are injected via MemoryManager, not the toolset system.
     "homeassistant": {
         "description": "Home Assistant smart home control and monitoring",
@@ -277,7 +277,7 @@ TOOLSETS = {
     },
     "kanban": {
         "description": (
-            "Kanban multi-agent coordination — only active when the agent "
+            "Kanban multi-agent coordination â€” only active when the agent "
             "is spawned by the kanban dispatcher (ReYMeN_KANBAN_TASK env "
             "set). The dispatcher runs inside the gateway by default; see "
             "`kanban.dispatch_in_gateway` in config.yaml. Lets workers mark "
@@ -405,7 +405,7 @@ TOOLSETS = {
     # which is gated on gateway running via its check_fn).
     # ==========================================================================
     "ReYMeN-acp": {
-        "description": "Editor integration (VS Code, Zed, JetBrains) — coding-focused tools without messaging, audio, or clarify UI",
+        "description": "Editor integration (VS Code, Zed, JetBrains) â€” coding-focused tools without messaging, audio, or clarify UI",
         "tools": [
             "web_search",
             "web_extract",
@@ -440,7 +440,7 @@ TOOLSETS = {
         "includes": [],
     },
     "ReYMeN-api-server": {
-        "description": "OpenAI-compatible API server — full agent tools accessible via HTTP (no interactive UI tools like clarify or send_message)",
+        "description": "OpenAI-compatible API server â€” full agent tools accessible via HTTP (no interactive UI tools like clarify or send_message)",
         "tools": [
             # Web
             "web_search",
@@ -498,7 +498,7 @@ TOOLSETS = {
     },
     "ReYMeN-cron": {
         # Mirrors ReYMeN-cli so cron's "default" toolset is the same set of
-        # core tools users see interactively — then `ReYMeN tools` filters
+        # core tools users see interactively â€” then `ReYMeN tools` filters
         # them down per the platform config. _DEFAULT_OFF_TOOLSETS (moa,
         # homeassistant) are excluded by _get_platform_tools() unless
         # the user explicitly enables them.
@@ -598,7 +598,7 @@ TOOLSETS = {
         "includes": [],
     },
     "ReYMeN-yuanbao": {
-        "description": "Yuanbao Bot 元宝消息平台工具集 - 群信息、成员查询、私聊、贴纸表情",
+        "description": "Yuanbao Bot å…ƒå®æ¶ˆæ¯å¹³å°å·¥å…·é›† - ç¾¤ä¿¡æ¯ã€æˆå‘˜æŸ¥è¯¢ã€ç§èŠã€è´´çº¸è¡¨æƒ…",
         "tools": _ReYMeN_CORE_TOOLS
         + [
             "yb_query_group_info",
@@ -727,7 +727,7 @@ def resolve_toolset(name: str, visited: Set[str] = None) -> List[str]:
         return sorted(all_tools)
 
     # Check for cycles / already-resolved (diamond deps).
-    # Silently return [] — either this is a diamond (not a bug, tools already
+    # Silently return [] â€” either this is a diamond (not a bug, tools already
     # collected via another path) or a genuine cycle (safe to skip).
     if name in visited:
         return []
@@ -799,7 +799,7 @@ def _get_plugin_toolset_names() -> Set[str]:
     """Return toolset names registered by plugins (from the tool registry).
 
     These are toolsets that exist in the registry but not in the static
-    ``TOOLSETS`` dict — i.e. they were added by plugins at load time.
+    ``TOOLSETS`` dict â€” i.e. they were added by plugins at load time.
     """
     try:
         from reymen.sistem.tools_registry import registry

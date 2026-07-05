@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-"""subcommand_fix.py — 29 subcommand run_* stub'larini doldur."""
+﻿#!/usr/bin/env python3
+"""subcommand_fix.py â€” 29 subcommand run_* stub'larini doldur."""
 
 import os
 import re
@@ -27,7 +27,7 @@ IMPL = {
     "cron": 'print("[CRON] Cron job listesi:\n  - Aktif job sayisi: N/A")',
     "gateway": 'print("[GATEWAY] Gateway durumu:\n  - Bot: @Pasa_38_bot\n  - Profil: default")',
     "hooks": 'print("[HOOKS] Hook listesi:\n  - Kayitli hook sayisi: N/A")',
-    "logs": 'print("[LOGS] Log dosyalari:\n  - Konum: ~/.hermes/logs/")',
+    "logs": 'print("[LOGS] Log dosyalari:\n  - Konum: ~/.reymen/logs/")',
     "mcp": 'print("[MCP] MCP sunuculari:\n  - Power BI: aktif\n  - Sayfa: N/A")',
     "pairing": 'print("[PAIRING] Pairing durumu:\n  - Eslesmis cihaz: N/A")',
     "plugins": 'print("[PLUGINS] Plugin listesi:\n  - Plugin sistemi henuz implemente edilmedi.")',
@@ -74,10 +74,10 @@ for py in sorted(SUBCMD_DIR.glob("*.py")):
     if eski in icerik:
         icerik = icerik.replace(eski, yeni, 1)
         py.write_text(icerik, encoding="utf-8")
-        print(f"  ✅ {py.name} -> {ad}")
+        print(f"  âœ… {py.name} -> {ad}")
         count += 1
     else:
-        print(f"  ❌ {py.name} -> 'pass' bulunamadi!")
+        print(f"  âŒ {py.name} -> 'pass' bulunamadi!")
         # Debug: icerik goruntule
         lines = icerik.splitlines()
         for i, line in enumerate(lines):

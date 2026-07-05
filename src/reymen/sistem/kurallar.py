@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""kurallar.py — ReYMeN Kural/İzin Yönetim Motoru (Rules Engine).
+﻿# -*- coding: utf-8 -*-
+"""kurallar.py â€” ReYMeN Kural/Ä°zin YÃ¶netim Motoru (Rules Engine).
 
 Policy katmani: mevcut guvenlik/ modullerinin uzerine ek bir kontrol
 katmani saglar. Her aksiyon (dosya erisimi, ag cagrisi, komut calistirma,
@@ -49,7 +49,7 @@ KATEGORILER = {"dosya_erisim", "ag", "komut", "api_cagrisi", "guvenlik"}
 # Gecerli kural tipleri
 KURAL_TIPLERI = {"izin", "engel", "uyari"}
 
-# ── Varsayilan kurallar (built-in, her zaman aktif) ──────────────────
+# â”€â”€ Varsayilan kurallar (built-in, her zaman aktif) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 VARSAYILAN_KURALLAR = [
     {
         "id": "builtin-kritik-dosya",
@@ -174,7 +174,7 @@ def desen_esles(desen: str, hedef: str) -> bool:
         except re.error:
             return False
 
-    # fnmatch (wildcard) — **/ for recursive matching
+    # fnmatch (wildcard) â€” **/ for recursive matching
     if "**" in desen:
         # **/xxx -> herhangi bir dizinde xxx
         parts = desen.split("**/")
@@ -370,7 +370,7 @@ class RulesEngine:
 
             if tip == "engel":
                 logger.info(
-                    "[Kurallar] ENGEL: %s eslesti (%s) — %s", kural_id, desen, sebep
+                    "[Kurallar] ENGEL: %s eslesti (%s) â€” %s", kural_id, desen, sebep
                 )
                 return {
                     "izin": False,
@@ -382,7 +382,7 @@ class RulesEngine:
 
             elif tip == "uyari":
                 logger.info(
-                    "[Kurallar] UYARI: %s eslesti (%s) — %s", kural_id, desen, sebep
+                    "[Kurallar] UYARI: %s eslesti (%s) â€” %s", kural_id, desen, sebep
                 )
                 return {
                     "izin": True,
@@ -438,7 +438,7 @@ class RulesEngine:
         return sonuc
 
 
-# ── Singleton ──────────────────────────────────────────────────────────
+# â”€â”€ Singleton â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _ENGINE_INSTANCE: Optional[RulesEngine] = None
 
 
@@ -456,7 +456,7 @@ def engine_sifirla() -> None:
     _ENGINE_INSTANCE = None
 
 
-# ── CLI Handler ────────────────────────────────────────────────────────
+# â”€â”€ CLI Handler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def cmd_kural(args) -> int:
     """'reymen kural' CLI komutu handler'i.
 
@@ -490,7 +490,7 @@ def cmd_kural(args) -> int:
             return 0
 
         print(f"\n  {_C}ReYMeN Kurallar ({len(kurallar)} adet){_R}")
-        print(f"  {_D}{'─'*60}{_R}")
+        print(f"  {_D}{'â”€'*60}{_R}")
 
         gruplu = sorted(
             kurallar, key=lambda k: (k.get("kategori", ""), k.get("tip", ""))
@@ -511,7 +511,7 @@ def cmd_kural(args) -> int:
                 f"{_D}{k.get('desen', '')}{_R}"
             )
             if k.get("sebep"):
-                print(f"  {'':22} {_D}→ {k['sebep']}{_R}")
+                print(f"  {'':22} {_D}â†’ {k['sebep']}{_R}")
         print()
         return 0
 
@@ -530,7 +530,7 @@ def cmd_kural(args) -> int:
             kategori, tip, desen, sebep=sebep, kural_id=kural_id
         )
         if basarili:
-            print(f"  {_G}✓{_R} {mesaj}")
+            print(f"  {_G}âœ“{_R} {mesaj}")
             return 0
         else:
             print(f"  {_RED}[HATA]{_R} {mesaj}")
@@ -544,7 +544,7 @@ def cmd_kural(args) -> int:
 
         basarili, mesaj = engine.kural_sil(kural_id)
         if basarili:
-            print(f"  {_G}✓{_R} {mesaj}")
+            print(f"  {_G}âœ“{_R} {mesaj}")
             return 0
         else:
             print(f"  {_RED}[HATA]{_R} {mesaj}")
@@ -561,11 +561,11 @@ def cmd_kural(args) -> int:
         sonuc = engine.kontrol(kategori, hedef)
         if sonuc.get("izin"):
             if sonuc.get("tip") == "uyari":
-                print(f"  {_Y}⚠{_R} UYARI: {sonuc.get('sebep', '')}")
+                print(f"  {_Y}âš {_R} UYARI: {sonuc.get('sebep', '')}")
             else:
-                print(f"  {_G}✓{_R} IZIN VERILDI ({sonuc.get('sebep', '')})")
+                print(f"  {_G}âœ“{_R} IZIN VERILDI ({sonuc.get('sebep', '')})")
         else:
-            print(f"  {_RED}✗{_R} ENGELLENDI: {sonuc.get('sebep', '')}")
+            print(f"  {_RED}âœ—{_R} ENGELLENDI: {sonuc.get('sebep', '')}")
         if sonuc.get("kural_id"):
             print(f"  {_D}Kural: {sonuc['kural_id']} ({sonuc.get('kural', '')}){_R}")
         return 0

@@ -1,4 +1,4 @@
-"""cli_agent.py - ReYMeNCLI Agent lifecycle metotlari."""
+﻿"""cli_agent.py - ReYMeNCLI Agent lifecycle metotlari."""
 
 import logging, os, re, sys, time, json, threading
 from datetime import datetime
@@ -7,12 +7,12 @@ from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
 logger = logging.getLogger(__name__)
 
-from src.reymen.sistem.cli_helpers import *
-from src.reymen.sistem.cli_display import *
-from src.reymen.sistem.cli_commands import *
-from src.reymen.sistem.cli_auth import *
-from src.reymen.sistem.cli_maintenance import *
-from src.reymen.sistem.cli_stream import *
+from reymen.sistem.cli_helpers import *
+from reymen.sistem.cli_display import *
+from reymen.sistem.cli_commands import *
+from reymen.sistem.cli_auth import *
+from reymen.sistem.cli_maintenance import *
+from reymen.sistem.cli_stream import *
 from contextlib import contextmanager
 
 
@@ -20,7 +20,7 @@ class AgentMixin:
     """Agent lifecycle metotlari mixin'i."""
 
     def _invalidate(self, min_interval: float = 0.25) -> None:
-        """Throttled UI repaint — prevents terminal blinking on slow/SSH connections."""
+        """Throttled UI repaint â€” prevents terminal blinking on slow/SSH connections."""
         if getattr(self, "_resize_recovery_pending", False):
             return
         now = time.monotonic()
@@ -41,7 +41,7 @@ class AgentMixin:
                 _cprint(f"{_DIM}{buf}{_RST}")
                 self._reasoning_buf = ""
             w = self._scrollback_box_width()
-            _cprint(f"{_DIM}└{'─' * (w - 2)}┘{_RST}")
+            _cprint(f"{_DIM}â””{'â”€' * (w - 2)}â”˜{_RST}")
             self._reasoning_box_opened = False
 
             # Flush any content that was deferred while reasoning was rendering.
@@ -53,7 +53,7 @@ class AgentMixin:
     def _flush_stream(self) -> None:
         """Emit any remaining partial line from the stream buffer and close the box."""
         # If we're still inside a "reasoning block" at end-of-stream, it was
-        # a false positive — the model mentioned a tag like <think> in prose
+        # a false positive â€” the model mentioned a tag like <think> in prose
         # but never closed it.  Recover the buffered content as regular text.
         if getattr(self, "_in_reasoning_block", False) and getattr(
             self, "_stream_prefilt", ""
@@ -111,7 +111,7 @@ class AgentMixin:
         # Close the response box
         if self._stream_box_opened:
             w = self._scrollback_box_width()
-            _cprint(f"{_ACCENT}╰{'─' * (w - 2)}╯{_RST}")
+            _cprint(f"{_ACCENT}â•°{'â”€' * (w - 2)}â•¯{_RST}")
 
     def _reset_stream_state(self) -> None:
         """Reset streaming state before each agent invocation."""
@@ -152,7 +152,7 @@ class AgentMixin:
         except Exception as exc:
             _primary_exc = exc
 
-        # Primary provider auth failed — try fallback providers before giving up.
+        # Primary provider auth failed â€” try fallback providers before giving up.
         if runtime is None and _primary_exc is not None:
             from reymen.reymen_cli.auth import AuthError
 
@@ -176,7 +176,7 @@ class AgentMixin:
                             _fb_model,
                         )
                         _cprint(
-                            f"⚠️  Primary auth failed — switching to fallback: {_fb_provider} / {_fb_model}"
+                            f"âš ï¸  Primary auth failed â€” switching to fallback: {_fb_provider} / {_fb_model}"
                         )
                         self.requested_provider = _fb_provider
                         self.model = _fb_model
@@ -202,7 +202,7 @@ class AgentMixin:
         resolved_acp_args = list(runtime.get("args") or [])
         resolved_credential_pool = runtime.get("credential_pool")
         # A callable api_key is a bearer-token provider (Azure Foundry
-        # Entra ID — ``azure_identity_adapter.build_token_provider``).
+        # Entra ID â€” ``azure_identity_adapter.build_token_provider``).
         # The OpenAI SDK accepts ``Callable[[], str]`` for ``api_key`` and
         # invokes it before every request. Skip the string-only validation
         # and placeholder substitution for callables.
@@ -222,19 +222,19 @@ class AgentMixin:
                 api_key = "no-key-required"
                 logger.debug(
                     "No API key for custom endpoint %s (source=%s), "
-                    "using placeholder — local servers typically ignore auth",
+                    "using placeholder â€” local servers typically ignore auth",
                     base_url,
                     _source,
                 )
             else:
                 print(
-                    "\n⚠️  Provider resolver returned an empty API key. "
+                    "\nâš ï¸  Provider resolver returned an empty API key. "
                     "Set OPENROUTER_API_KEY or run: ReYMeN setup"
                 )
                 return False
         if not isinstance(base_url, str) or not base_url:
             print(
-                "\n⚠️  Provider resolver returned an empty base URL. "
+                "\nâš ï¸  Provider resolver returned an empty base URL. "
                 "Check your provider config or run: ReYMeN setup"
             )
             return False
@@ -283,7 +283,7 @@ class AgentMixin:
                 if _default:
                     self.model = _default
                     logger.info(
-                        "No model configured — defaulting to %s for provider %s",
+                        "No model configured â€” defaulting to %s for provider %s",
                         _default,
                         resolved_provider,
                     )
@@ -377,8 +377,8 @@ class AgentMixin:
                 tirith_enabled = security_cfg.get("tirith_enabled", True)
                 if tirith_enabled:
                     _cprint(
-                        f"  {_DIM}⚠ tirith security scanner enabled but not available "
-                        f"— command scanning will use pattern matching only{_RST}"
+                        f"  {_DIM}âš  tirith security scanner enabled but not available "
+                        f"â€” command scanning will use pattern matching only{_RST}"
                     )
         except Exception:
             logger.warning("[fix_01_sessiz_except] Exception")
@@ -419,7 +419,7 @@ class AgentMixin:
                 self._session_db = SessionDB()
             except Exception as e:
                 logger.warning(
-                    "SQLite session store not available — session will NOT be indexed: %s",
+                    "SQLite session store not available â€” session will NOT be indexed: %s",
                     e,
                 )
 
@@ -477,14 +477,14 @@ class AgentMixin:
                     title_part = f" \"{session_meta['title']}\""
                 if _quiet_mode:
                     print(
-                        f"↻ Resumed session {self.session_id}{title_part} "
+                        f"â†» Resumed session {self.session_id}{title_part} "
                         f"({msg_count} user message{'s' if msg_count != 1 else ''}, "
                         f"{len(restored)} total messages)",
                         file=sys.stderr,
                     )
                 else:
                     ChatConsole().print(
-                        f"[bold {_accent_hex()}]↻ Resumed session[/] "
+                        f"[bold {_accent_hex()}]â†» Resumed session[/] "
                         f"[bold]{_escape(self.session_id)}[/]"
                         f"[bold {_accent_hex()}]{_escape(title_part)}[/] "
                         f"({msg_count} user message{'s' if msg_count != 1 else ''}, {len(restored)} total messages)"
@@ -601,7 +601,7 @@ class AgentMixin:
                         )
                         _cprint(f"  Session title applied: {self._pending_title}")
                         self._pending_title = None
-                    # else: row creation failed transiently — keep _pending_title for retry
+                    # else: row creation failed transiently â€” keep _pending_title for retry
                 except (ValueError, Exception) as e:
                     _cprint(f"  Could not apply pending title: {e}")
                     # Keep _pending_title so it can be retried after row creation succeeds
@@ -628,7 +628,7 @@ class AgentMixin:
             hits = detect_compromised()
             banner = startup_banner(hits)
             if banner:
-                # Print to stderr — keeps stdout clean for piped automation,
+                # Print to stderr â€” keeps stdout clean for piped automation,
                 # and Rich's banner rendering already wrote to stdout above.
                 print(banner, file=sys.stderr, flush=True)
         except Exception:
@@ -685,7 +685,7 @@ class AgentMixin:
                 title_part = f' "{session_meta["title"]}"'
             accent_color = _accent_hex()
             self._console_print(
-                f"[{accent_color}]↻ Resumed session [bold]{self.session_id}[/bold]"
+                f"[{accent_color}]â†» Resumed session [bold]{self.session_id}[/bold]"
                 f"{title_part} "
                 f"({msg_count} user message{'s' if msg_count != 1 else ''}, "
                 f"{len(restored)} total messages)[/]"
@@ -724,14 +724,14 @@ class AgentMixin:
             if api_key_missing:
                 self._console_print()
                 self._console_print(
-                    "[yellow]⚠️  Some tools disabled (missing API keys):[/]"
+                    "[yellow]âš ï¸  Some tools disabled (missing API keys):[/]"
                 )
                 for item in api_key_missing:
                     tools_str = ", ".join(item["tools"][:2])  # Show first 2 tools
                     if len(item["tools"]) > 2:
                         tools_str += f", +{len(item['tools'])-2} more"
                     self._console_print(
-                        f"   [dim]• {item['name']}[/] [dim italic]({', '.join(item['missing_vars'])})[/]"
+                        f"   [dim]â€¢ {item['name']}[/] [dim italic]({', '.join(item['missing_vars'])})[/]"
                     )
                 self._console_print("[dim]   Run 'ReYMeN setup' to configure[/]")
         except Exception as _e:
@@ -758,11 +758,11 @@ class AgentMixin:
 
         # Get API status indicator
         if self.api_key:
-            api_indicator = "[green bold]●[/]"
+            api_indicator = "[green bold]â—[/]"
         else:
-            api_indicator = "[red bold]●[/]"
+            api_indicator = "[red bold]â—[/]"
 
-        # Build status line with proper markup — skin-aware colors
+        # Build status line with proper markup â€” skin-aware colors
         try:
             from reymen.reymen_cli.skin_engine import get_active_skin
 
@@ -774,19 +774,19 @@ class AgentMixin:
             separator_color, accent_color, label_color = "#B8860B", "#FFBF00", "cyan"
         toolsets_info = ""
         if self.enabled_toolsets and "all" not in self.enabled_toolsets:
-            toolsets_info = f" [dim {separator_color}]·[/] [{label_color}]toolsets: {', '.join(self.enabled_toolsets)}[/]"
+            toolsets_info = f" [dim {separator_color}]Â·[/] [{label_color}]toolsets: {', '.join(self.enabled_toolsets)}[/]"
 
         provider_info = (
-            f" [dim {separator_color}]·[/] [dim]provider: {self.provider}[/]"
+            f" [dim {separator_color}]Â·[/] [dim]provider: {self.provider}[/]"
         )
         if self._provider_source:
             provider_info += (
-                f" [dim {separator_color}]·[/] [dim]auth: {self._provider_source}[/]"
+                f" [dim {separator_color}]Â·[/] [dim]auth: {self._provider_source}[/]"
             )
 
         self._console_print(
             f"  {api_indicator} [{accent_color}]{model_short}[/] "
-            f"[dim {separator_color}]·[/] [bold {label_color}]{tool_status}[/]"
+            f"[dim {separator_color}]Â·[/] [bold {label_color}]{tool_status}[/]"
             f"{toolsets_info}{provider_info}"
         )
 
@@ -889,15 +889,15 @@ class AgentMixin:
         print()
         if reason == "history":
             print(
-                "(._.) No messages in the current chat yet — here are recent sessions you can resume:"
+                "(._.) No messages in the current chat yet â€” here are recent sessions you can resume:"
             )
         else:
             print("  Recent sessions:")
         print()
         print(f"  {'#':<3} {'Title':<32} {'Preview':<40} {'Last Active':<13} {'ID'}")
-        print(f"  {'─' * 3} {'─' * 32} {'─' * 40} {'─' * 13} {'─' * 24}")
+        print(f"  {'â”€' * 3} {'â”€' * 32} {'â”€' * 40} {'â”€' * 13} {'â”€' * 24}")
         for idx, session in enumerate(sessions, start=1):
-            title = session.get("title") or "—"
+            title = session.get("title") or "â€”"
             preview = (session.get("preview") or "")[:38]
             last_active = _relative_time(session.get("last_active"))
             print(
@@ -998,26 +998,26 @@ class AgentMixin:
             lines, border_style: str, content_style: str, text: str, box_width: int
         ) -> None:
             inner_width = max(0, box_width - 2)
-            lines.append((border_style, "│ "))
+            lines.append((border_style, "â”‚ "))
             lines.append((content_style, text.ljust(inner_width)))
-            lines.append((border_style, " │\n"))
+            lines.append((border_style, " â”‚\n"))
 
         def _append_blank_panel_line(lines, border_style: str, box_width: int) -> None:
-            lines.append((border_style, "│" + (" " * box_width) + "│\n"))
+            lines.append((border_style, "â”‚" + (" " * box_width) + "â”‚\n"))
 
         preview_lines = []
         for line in detail.splitlines():
             preview_lines.extend(_wrap_panel_text(line, 72))
         for idx, (_value, label, desc) in enumerate(choices):
-            marker = "❯" if idx == selected else " "
+            marker = "â¯" if idx == selected else " "
             preview_lines.extend(
                 _wrap_panel_text(
-                    f"{marker} [{idx + 1}] {label} — {desc}",
+                    f"{marker} [{idx + 1}] {label} â€” {desc}",
                     72,
                     subsequent_indent="    ",
                 )
             )
-        preview_lines.append("Type 1/2/3 or use ↑/↓ then Enter. ESC/Ctrl+C cancels.")
+        preview_lines.append("Type 1/2/3 or use â†‘/â†“ then Enter. ESC/Ctrl+C cancels.")
 
         box_width = _panel_box_width(title, preview_lines)
         inner_text_width = max(8, box_width - 2)
@@ -1026,9 +1026,9 @@ class AgentMixin:
             detail_wrapped.extend(_wrap_panel_text(line, inner_text_width))
         choice_wrapped: list[tuple[int, str]] = []
         for idx, (_value, label, desc) in enumerate(choices):
-            marker = "❯" if idx == selected else " "
+            marker = "â¯" if idx == selected else " "
             for wrapped in _wrap_panel_text(
-                f"{marker} [{idx + 1}] {label} — {desc}",
+                f"{marker} [{idx + 1}] {label} â€” {desc}",
                 inner_text_width,
                 subsequent_indent="    ",
             ):
@@ -1042,10 +1042,10 @@ class AgentMixin:
         max_detail_rows = min(max_detail_rows, 8)
         if len(detail_wrapped) > max_detail_rows:
             keep = max(1, max_detail_rows - 1)
-            detail_wrapped = detail_wrapped[:keep] + ["… (detail truncated)"]
+            detail_wrapped = detail_wrapped[:keep] + ["â€¦ (detail truncated)"]
 
         lines = []
-        lines.append(("class:approval-border", "╭" + ("─" * box_width) + "╮\n"))
+        lines.append(("class:approval-border", "â•­" + ("â”€" * box_width) + "â•®\n"))
         _append_panel_line(
             lines, "class:approval-border", "class:approval-title", title, box_width
         )
@@ -1073,10 +1073,10 @@ class AgentMixin:
             lines,
             "class:approval-border",
             "class:approval-cmd",
-            "Type 1/2/3 or use ↑/↓ then Enter. ESC/Ctrl+C cancels.",
+            "Type 1/2/3 or use â†‘/â†“ then Enter. ESC/Ctrl+C cancels.",
             box_width,
         )
-        lines.append(("class:approval-border", "╰" + ("─" * box_width) + "╯\n"))
+        lines.append(("class:approval-border", "â•°" + ("â”€" * box_width) + "â•¯\n"))
         return lines
 
     def _open_model_picker(
@@ -1119,7 +1119,7 @@ class AgentMixin:
     ) -> tuple[int, int]:
         """Resolve (scroll_offset, visible) for the /model picker viewport.
 
-        ``reserved_below`` matches the approval / clarify panels — input area,
+        ``reserved_below`` matches the approval / clarify panels â€” input area,
         status bar, and separators below the panel. ``panel_chrome`` covers
         this panel's own borders + blanks + hint row. The remaining rows hold
         the scrollable list, with the offset slid to keep ``selected`` on screen.
@@ -1137,7 +1137,7 @@ class AgentMixin:
 
     def _apply_model_switch_result(self, result, persist_global: bool) -> None:
         if not result.success:
-            _cprint(f"  ✗ {result.error_message}")
+            _cprint(f"  âœ— {result.error_message}")
             return
 
         old_model = self.model
@@ -1167,7 +1167,7 @@ class AgentMixin:
                 )
             except Exception as exc:
                 _cprint(
-                    f"  ⚠ Agent swap failed ({exc}); change applied to next session."
+                    f"  âš  Agent swap failed ({exc}); change applied to next session."
                 )
 
         self._pending_model_switch_note = (
@@ -1177,7 +1177,7 @@ class AgentMixin:
         )
 
         provider_label = result.provider_label or result.target_provider
-        _cprint(f"  ✓ Model switched: {result.new_model}")
+        _cprint(f"  âœ“ Model switched: {result.new_model}")
         _cprint(f"    Provider: {provider_label}")
 
         # Context: always resolve via the provider-aware chain so Codex OAuth,
@@ -1217,14 +1217,14 @@ class AgentMixin:
         if cache_enabled:
             _cprint("    Prompt caching: enabled")
         if result.warning_message:
-            _cprint(f"    ⚠ {result.warning_message}")
+            _cprint(f"    âš  {result.warning_message}")
         if persist_global:
             save_config_value("model.default", result.new_model)
             if result.provider_changed:
                 save_config_value("model.provider", result.target_provider)
             _cprint("    Saved to config.yaml (--global)")
         else:
-            _cprint("    (session only — add --global to persist)")
+            _cprint("    (session only â€” add --global to persist)")
 
     def _handle_model_picker_selection(self, persist_global: bool = False) -> None:
         state = self._model_picker_state
@@ -1299,14 +1299,14 @@ class AgentMixin:
             self._close_model_picker()
 
     def _handle_model_switch(self, cmd_original: str):
-        """Handle /model command — switch model for this session.
+        """Handle /model command â€” switch model for this session.
 
         Supports:
-          /model                              — show current model + usage hints
-          /model <name>                       — switch for this session only
-          /model <name> --global              — switch and persist to config.yaml
-          /model <name> --provider <provider> — switch provider + model
-          /model --provider <provider>        — switch to provider, auto-detect model
+          /model                              â€” show current model + usage hints
+          /model <name>                       â€” switch for this session only
+          /model <name> --global              â€” switch and persist to config.yaml
+          /model <name> --provider <provider> â€” switch provider + model
+          /model --provider <provider>        â€” switch to provider, auto-detect model
         """
         from reymen.reymen_cli.model_switch import switch_model, parse_model_flags
         from reymen.reymen_cli.providers import get_label
@@ -1332,7 +1332,7 @@ class AgentMixin:
             except Exception:
                 logger.warning("[fix_01_sessiz_except] Exception")
 
-        # Single inventory context — replaces the inline config-slice the
+        # Single inventory context â€” replaces the inline config-slice the
         # dashboard / TUI used to duplicate. Overlay live session state
         # via with_overrides (truthy-only) so empty self.* attrs don't
         # clobber disk config.
@@ -1400,7 +1400,7 @@ class AgentMixin:
         )
 
         if not result.success:
-            _cprint(f"  ✗ {result.error_message}")
+            _cprint(f"  âœ— {result.error_message}")
             return
 
         # Apply to CLI state.
@@ -1434,7 +1434,7 @@ class AgentMixin:
                 )
             except Exception as exc:
                 _cprint(
-                    f"  ⚠ Agent swap failed ({exc}); change applied to next session."
+                    f"  âš  Agent swap failed ({exc}); change applied to next session."
                 )
 
         # Store a note to prepend to the next user message so the model
@@ -1448,7 +1448,7 @@ class AgentMixin:
 
         # Display confirmation with full metadata
         provider_label = result.provider_label or result.target_provider
-        _cprint(f"  ✓ Model switched: {result.new_model}")
+        _cprint(f"  âœ“ Model switched: {result.new_model}")
         _cprint(f"    Provider: {provider_label}")
 
         # Context: always resolve via the provider-aware chain so Codex OAuth,
@@ -1486,7 +1486,7 @@ class AgentMixin:
 
         # Warning from validation
         if result.warning_message:
-            _cprint(f"    ⚠ {result.warning_message}")
+            _cprint(f"    âš  {result.warning_message}")
 
         # Persistence
         if persist_global:
@@ -1495,7 +1495,7 @@ class AgentMixin:
                 save_config_value("model.provider", result.target_provider)
             _cprint("    Saved to config.yaml (--global)")
         else:
-            _cprint("    (session only — add --global to persist)")
+            _cprint("    (session only â€” add --global to persist)")
 
     def _should_handle_model_command_inline(
         self, text: str, has_images: bool = False
@@ -1517,12 +1517,12 @@ class AgentMixin:
     ) -> bool:
         """Return True when /steer should be dispatched immediately while the agent is running.
 
-        /steer MUST bypass the normal _pending_input → process_loop path when
+        /steer MUST bypass the normal _pending_input â†’ process_loop path when
         the agent is active, because process_loop is blocked inside
         self.chat() for the duration of the run.  By the time the queued
         command is pulled from _pending_input, _agent_running has already
         flipped back to False, and process_command() takes the idle
-        fallback — delivering the steer as a next-turn message instead of
+        fallback â€” delivering the steer as a next-turn message instead of
         injecting it mid-run.  Dispatching inline on the UI thread calls
         agent.steer() directly, which is thread-safe (uses _pending_steer_lock).
         """
@@ -1560,7 +1560,7 @@ class AgentMixin:
 
         print()
         print("+" + "-" * 60 + "+")
-        print("|" + " " * 15 + "(✿◠‿◠) Gateway Status" + " " * 17 + "|")
+        print("|" + " " * 15 + "(âœ¿â— â€¿â— ) Gateway Status" + " " * 17 + "|")
         print("+" + "-" * 60 + "+")
         print()
 
@@ -1581,10 +1581,10 @@ class AgentMixin:
                 pconfig = config.platforms.get(platform)
                 if pconfig and pconfig.enabled:
                     home = config.get_home_channel(platform)
-                    home_str = f" → {home.name}" if home else ""
-                    print(f"    ✓ {name:<12} Enabled{home_str}")
+                    home_str = f" â†’ {home.name}" if home else ""
+                    print(f"    âœ“ {name:<12} Enabled{home_str}")
                 else:
-                    print(f"    ○ {name:<12} Not configured ({env_var})")
+                    print(f"    â—‹ {name:<12} Not configured ({env_var})")
 
             print()
             print("  Session Reset Policy:")
@@ -1626,7 +1626,7 @@ class AgentMixin:
             print("(._.) No API calls made yet in this session.")
             return
 
-        # ── Rate limits (shown first when available) ────────────────
+        # â”€â”€ Rate limits (shown first when available) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         rl_state = agent.get_rate_limit_state()
         if rl_state and rl_state.has_data:
             try:
@@ -1639,7 +1639,7 @@ class AgentMixin:
                 logger.warning("[CliAgent] Modul yuklenemedi (L1458): %s", ImportError)
                 pass
 
-        # ── Session token usage ─────────────────────────────────────
+        # â”€â”€ Session token usage â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         input_tokens = getattr(agent, "session_input_tokens", 0) or 0
         output_tokens = getattr(agent, "session_output_tokens", 0) or 0
         cache_read_tokens = getattr(agent, "session_cache_read_tokens", 0) or 0
@@ -1671,15 +1671,15 @@ class AgentMixin:
             (datetime.now() - self.session_start).total_seconds()
         )
 
-        print("  📊 Session Token Usage")
-        print(f"  {'─' * 40}")
+        print("  ğŸ“Š Session Token Usage")
+        print(f"  {'â”€' * 40}")
         print(f"  Model:                     {agent.model}")
         print(f"  Input tokens:              {input_tokens:>10,}")
         print(f"  Cache read tokens:         {cache_read_tokens:>10,}")
         print(f"  Cache write tokens:        {cache_write_tokens:>10,}")
         print(f"  Output tokens:             {output_tokens:>10,}")
         if reasoning_tokens:
-            print(f"  ↳ Reasoning (subset):      {reasoning_tokens:>10,}")
+            print(f"  â†³ Reasoning (subset):      {reasoning_tokens:>10,}")
         print(f"  Prompt tokens (total):     {prompt:>10,}")
         print(f"  Completion tokens:         {completion:>10,}")
         print(f"  Total tokens:              {total:>10,}")
@@ -1696,7 +1696,7 @@ class AgentMixin:
             print(f"  Total cost:              {'included':>10}")
         else:
             print(f"  Total cost:              {'n/a':>10}")
-        print(f"  {'─' * 40}")
+        print(f"  {'â”€' * 40}")
         print(f"  Current context:  {last_prompt:,} / {ctx_len:,} ({pct:.0f}%)")
         print(f"  Messages:         {msg_count}")
         print(f"  Compressions:     {compressions}")
@@ -1708,7 +1708,7 @@ class AgentMixin:
         provider = getattr(agent, "provider", None) or getattr(self, "provider", None)
         base_url = getattr(agent, "base_url", None) or getattr(self, "base_url", None)
         api_key = getattr(agent, "api_key", None) or getattr(self, "api_key", None)
-        # Lazy import — pulls the OpenAI SDK chain, only needed here.
+        # Lazy import â€” pulls the OpenAI SDK chain, only needed here.
         try:
             from agent.account_usage import (
                 fetch_account_usage,
@@ -1817,9 +1817,9 @@ class AgentMixin:
                 self._restore_modal_input_snapshot()
                 self._invalidate()
                 if result:
-                    _cprint(f"\n{_DIM}  ✓ Password received (cached for session){_RST}")
+                    _cprint(f"\n{_DIM}  âœ“ Password received (cached for session){_RST}")
                 else:
-                    _cprint(f"\n{_DIM}  ⏭ Skipped{_RST}")
+                    _cprint(f"\n{_DIM}  â­ Skipped{_RST}")
                 return result
             except queue.Empty:
                 remaining = self._sudo_deadline - _time.monotonic()
@@ -1831,7 +1831,7 @@ class AgentMixin:
         self._sudo_deadline = 0
         self._restore_modal_input_snapshot()
         self._invalidate()
-        _cprint(f"\n{_DIM}  ⏱ Timeout — continuing without sudo{_RST}")
+        _cprint(f"\n{_DIM}  â± Timeout â€” continuing without sudo{_RST}")
         return ""
 
     def _approval_callback(
@@ -1889,7 +1889,7 @@ class AgentMixin:
             self._approval_state = None
             self._approval_deadline = 0
             self._invalidate()
-            _cprint(f"\n{_DIM}  ⏱ Timeout — denying command{_RST}")
+            _cprint(f"\n{_DIM}  â± Timeout â€” denying command{_RST}")
             return "deny"
 
     def _secret_capture_callback(
@@ -2000,9 +2000,9 @@ class AgentMixin:
             try:
                 from reymen.reymen_cli.skin_engine import get_active_goodbye
 
-                goodbye = get_active_goodbye("Goodbye! ⚕")
+                goodbye = get_active_goodbye("Goodbye! âš•")
             except Exception:
-                goodbye = "Goodbye! ⚕"
+                goodbye = "Goodbye! âš•"
             print(goodbye)
 
     def _normalize_model_for_provider(self, resolved_provider: str) -> bool:
@@ -2023,7 +2023,7 @@ class AgentMixin:
                 if normalized_model and normalized_model != current_model:
                     if not self._model_is_default:
                         self._console_print(
-                            f"[yellow]⚠️  Normalized model '{current_model}' to '{normalized_model}' for {resolved_provider}.[/]"
+                            f"[yellow]âš ï¸  Normalized model '{current_model}' to '{normalized_model}' for {resolved_provider}.[/]"
                         )
                     self.model = normalized_model
                     current_model = normalized_model
@@ -2044,7 +2044,7 @@ class AgentMixin:
                 if canonical and canonical != current_model:
                     if not self._model_is_default:
                         self._console_print(
-                            f"[yellow]⚠️  Normalized Copilot model '{current_model}' to '{canonical}'.[/]"
+                            f"[yellow]âš ï¸  Normalized Copilot model '{current_model}' to '{canonical}'.[/]"
                         )
                     self.model = canonical
                     current_model = canonical
@@ -2073,7 +2073,7 @@ class AgentMixin:
                 if canonical and canonical != current_model:
                     if not self._model_is_default:
                         self._console_print(
-                            f"[yellow]⚠️  Stripped provider prefix from '{current_model}'; using '{canonical}' for {resolved_provider}.[/]"
+                            f"[yellow]âš ï¸  Stripped provider prefix from '{current_model}'; using '{canonical}' for {resolved_provider}.[/]"
                         )
                     self.model = canonical
                     current_model = canonical
@@ -2092,12 +2092,12 @@ class AgentMixin:
         if resolved_provider != "openai-codex":
             return changed
 
-        # 1. Strip provider prefix ("openai/gpt-5.4" → "gpt-5.4")
+        # 1. Strip provider prefix ("openai/gpt-5.4" â†’ "gpt-5.4")
         if "/" in current_model:
             slug = current_model.split("/", 1)[1]
             if not self._model_is_default:
                 self._console_print(
-                    f"[yellow]⚠️  Stripped provider prefix from '{current_model}'; "
+                    f"[yellow]âš ï¸  Stripped provider prefix from '{current_model}'; "
                     f"using '{slug}' for OpenAI Codex.[/]"
                 )
             self.model = slug
@@ -2132,7 +2132,7 @@ class AgentMixin:
         self._tool_start_time = 0.0  # clear tool timer when switching to thinking
         self._invalidate()
 
-    # ── Streaming display ────────────────────────────────────────────────
+    # â”€â”€ Streaming display â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _current_reasoning_callback(self):
         """Return the active reasoning display callback for the current mode."""
@@ -2256,7 +2256,7 @@ class AgentMixin:
         # Reset the per-turn interrupt flag. Any subsequent path that
         # discovers an interrupt (below, after run_conversation) will flip
         # this to True. Early returns (credential refresh failure, etc.)
-        # leave it False, which is correct — those aren't user interrupts.
+        # leave it False, which is correct â€” those aren't user interrupts.
         self._last_turn_interrupted = False
 
         # Refresh provider credentials if needed (handles key rotation transparently)
@@ -2278,10 +2278,10 @@ class AgentMixin:
             return None
 
         # Route image attachments based on the active model's vision capability.
-        # "native" → pass pixels as OpenAI-style content parts (adapters
+        # "native" â†’ pass pixels as OpenAI-style content parts (adapters
         #            translate for Anthropic/Gemini/Bedrock).
-        # "text"   → pre-analyze each image with vision_analyze and prepend the
-        #            description as text — works with non-vision models.
+        # "text"   â†’ pre-analyze each image with vision_analyze and prepend the
+        #            description as text â€” works with non-vision models.
         # See agent/image_routing.py for the decision table.
         if images:
             try:
@@ -2312,17 +2312,17 @@ class AgentMixin:
                     )
                     if _skipped:
                         _cprint(
-                            f"  {_DIM}⚠ skipped {len(_skipped)} unreadable image path(s){_RST}"
+                            f"  {_DIM}âš  skipped {len(_skipped)} unreadable image path(s){_RST}"
                         )
                     if any(p.get("type") == "image_url" for p in _parts):
                         _img_names = ", ".join(Path(p).name for p in _img_str_paths)
                         _cprint(
-                            f"  {_DIM}📎 attaching {len(images)} image(s) natively "
+                            f"  {_DIM}ğŸ“ attaching {len(images)} image(s) natively "
                             f"(model supports vision): {_img_names}{_RST}"
                         )
                         message = _parts
                     else:
-                        # All images unreadable — fall back to text enrichment.
+                        # All images unreadable â€” fall back to text enrichment.
                         message = self._preprocess_images_with_vision(
                             message if isinstance(message, str) else "", images
                         )
@@ -2364,7 +2364,7 @@ class AgentMixin:
                             f"{_ctx_result.injected_tokens} tokens]{_RST}"
                         )
                     for w in _ctx_result.warnings:
-                        _cprint(f"  {_DIM}⚠ {w}{_RST}")
+                        _cprint(f"  {_DIM}âš  {w}{_RST}")
                     if _ctx_result.blocked:
                         return (
                             "\n".join(_ctx_result.warnings)
@@ -2385,7 +2385,7 @@ class AgentMixin:
         # Add user message to history
         self.conversation_history.append({"role": "user", "content": message})
 
-        ChatConsole().print(f"[{_accent_hex()}]{'─' * 40}[/]")
+        ChatConsole().print(f"[{_accent_hex()}]{'â”€' * 40}[/]")
         print(flush=True)
 
         try:
@@ -2395,7 +2395,7 @@ class AgentMixin:
             # Reset streaming display state for this turn
             self._reset_stream_state()
             # Separate from _reset_stream_state because this must persist
-            # across intermediate turn boundaries (tool-calling loops) — only
+            # across intermediate turn boundaries (tool-calling loops) â€” only
             # reset at the start of each user turn.
             self._reasoning_shown_this_turn = False
 
@@ -2443,11 +2443,11 @@ class AgentMixin:
                         w = self._scrollback_box_width(
                             getattr(self.console, "width", 80)
                         )
-                        label = " ⚕ ReYMeN "
+                        label = " âš• ReYMeN "
                         if self.show_timestamps:
                             label = f"{label}{datetime.now().strftime('%H:%M')} "
                         fill = w - 2 - ReYMeNCLI._status_bar_display_width(label)
-                        _cprint(f"\n{_ACCENT}╭─{label}{'─' * max(fill - 1, 0)}╮{_RST}")
+                        _cprint(f"\n{_ACCENT}â•­â”€{label}{'â”€' * max(fill - 1, 0)}â•®{_RST}")
                     _cprint(f"{_STREAM_PAD}{sentence.rstrip()}")
 
                 tts_thread = threading.Thread(
@@ -2463,12 +2463,12 @@ class AgentMixin:
                         text_queue.put(delta)
 
             # When voice mode is active, prepend a brief instruction so the
-            # model responds concisely. The prefix is API-call-local only —
+            # model responds concisely. The prefix is API-call-local only â€”
             # run_conversation persists the original clean user message.
             _voice_prefix = ""
             if self._voice_mode and isinstance(message, str):
                 _voice_prefix = (
-                    "[Voice input — respond concisely and conversationally, "
+                    "[Voice input â€” respond concisely and conversationally, "
                     "2-3 sentences max. No code blocks or markdown.] "
                 )
 
@@ -2488,7 +2488,7 @@ class AgentMixin:
                 # Bind this turn's approval session key into the contextvar so
                 # ``tools.approval.is_current_session_yolo_enabled()`` resolves
                 # against the same key that ``/yolo`` toggles under (see
-                # ``_toggle_yolo`` → ``enable_session_yolo(self.session_id)``).
+                # ``_toggle_yolo`` â†’ ``enable_session_yolo(self.session_id)``).
                 # Mirrors ``tui_gateway/server.py`` and ``gateway/run.py`` which
                 # bind the same contextvar before invoking the agent.
                 try:
@@ -2562,9 +2562,9 @@ class AgentMixin:
                             logger.warning("[fix_01_sessiz_except] Exception")
 
             # Start agent in background thread (daemon so it cannot keep the
-            # process alive when the user closes the terminal tab — SIGHUP
+            # process alive when the user closes the terminal tab â€” SIGHUP
             # exits the main thread and daemon threads are reaped automatically).
-            # Start per-prompt elapsed timer — frozen after the agent thread
+            # Start per-prompt elapsed timer â€” frozen after the agent thread
             # finishes; reset on the next turn.
             self._prompt_start_time = time.time()
             self._prompt_duration = 0.0
@@ -2588,7 +2588,7 @@ class AgentMixin:
                             # But if it does (race condition), don't interrupt.
                             if self._clarify_state or self._clarify_freetext:
                                 continue
-                            print("\n⚡ New message detected, interrupting...")
+                            print("\nâš¡ New message detected, interrupting...")
                             # Signal TTS to stop on interrupt
                             if stop_event is not None:
                                 stop_event.set()
@@ -2615,7 +2615,7 @@ class AgentMixin:
                         # Force prompt_toolkit to flush any pending stdout
                         # output from the agent thread.  Without this, the
                         # StdoutProxy buffer only flushes on renderer passes
-                        # triggered by input events — on macOS this causes
+                        # triggered by input events â€” on macOS this causes
                         # the CLI to appear frozen until the user types. (#1624)
                         self._invalidate(min_interval=0.15)
                 else:
@@ -2625,11 +2625,11 @@ class AgentMixin:
             # Wait for the agent thread to finish.  After an interrupt the
             # agent may take a few seconds to clean up (kill subprocess, persist
             # session).  Poll instead of a blocking join so the process_loop
-            # stays responsive — if the user sent another interrupt or the
+            # stays responsive â€” if the user sent another interrupt or the
             # agent gets stuck, we can break out instead of freezing forever.
             if interrupt_msg is not None:
                 # Interrupt path: poll briefly, then move on.  The agent
-                # thread is daemon — it dies on process exit regardless.
+                # thread is daemon â€” it dies on process exit regardless.
                 for _wait_tick in range(50):  # 50 * 0.2s = 10s max
                     agent_thread.join(timeout=0.2)
                     if not agent_thread.is_alive():
@@ -2756,7 +2756,7 @@ class AgentMixin:
                 error_detail = result.get("error", "Unknown error")
                 response = f"Error: {error_detail}"
                 # Stop continuous voice mode on persistent errors (e.g. 429 rate limit)
-                # to avoid an infinite error → record → error loop
+                # to avoid an infinite error â†’ record â†’ error loop
                 if self._voice_continuous:
                     self._voice_continuous = False
                     _cprint(
@@ -2784,7 +2784,7 @@ class AgentMixin:
             # Display reasoning (thinking) box if enabled and available.
             # Skip when streaming already showed reasoning live.  Use the
             # turn-persistent flag (_reasoning_shown_this_turn) instead of
-            # _reasoning_stream_started — the latter gets reset during
+            # _reasoning_stream_started â€” the latter gets reset during
             # intermediate turn boundaries (tool-calling loops), which caused
             # the reasoning box to re-render after the final response.
             _reasoning_already_shown = getattr(
@@ -2796,8 +2796,8 @@ class AgentMixin:
                     w = self._scrollback_box_width()
                     r_label = " Reasoning "
                     r_fill = w - 2 - len(r_label)
-                    r_top = f"{_DIM}┌─{r_label}{'─' * max(r_fill - 1, 0)}┐{_RST}"
-                    r_bot = f"{_DIM}└{'─' * (w - 2)}┘{_RST}"
+                    r_top = f"{_DIM}â”Œâ”€{r_label}{'â”€' * max(r_fill - 1, 0)}â”{_RST}"
+                    r_bot = f"{_DIM}â””{'â”€' * (w - 2)}â”˜{_RST}"
                     # Collapse long reasoning: show first 10 lines
                     lines = reasoning.strip().splitlines()
                     if len(lines) > 10:
@@ -2815,7 +2815,7 @@ class AgentMixin:
                     from reymen.reymen_cli.skin_engine import get_active_skin
 
                     _skin = get_active_skin()
-                    label = _skin.get_branding("response_label", "⚕ ReYMeN")
+                    label = _skin.get_branding("response_label", "âš• ReYMeN")
                     _resp_color = _maybe_remap_for_light_mode(
                         _skin.get_color("response_border", "#CD7F32")
                     )
@@ -2823,7 +2823,7 @@ class AgentMixin:
                         _skin.get_color("banner_text", "#FFF8DC")
                     )
                 except Exception:
-                    label = "⚕ ReYMeN"
+                    label = "âš• ReYMeN"
                     _resp_color = _maybe_remap_for_light_mode("#CD7F32")
                     _resp_text = _maybe_remap_for_light_mode("#FFF8DC")
 
@@ -2842,7 +2842,7 @@ class AgentMixin:
                 ):
                     # Text was already printed sentence-by-sentence; just close the box
                     w = self._scrollback_box_width()
-                    _cprint(f"\n{_ACCENT}╰{'─' * (w - 2)}╯{_RST}")
+                    _cprint(f"\n{_ACCENT}â•°{'â”€' * (w - 2)}â•¯{_RST}")
                 elif already_streamed:
                     # Response was already streamed token-by-token with box framing;
                     # _flush_stream() already closed the box. Skip Rich Panel.
@@ -2865,7 +2865,7 @@ class AgentMixin:
                     )
 
             # Play terminal bell when agent finishes (if enabled).
-            # Works over SSH — the bell propagates to the user's terminal.
+            # Works over SSH â€” the bell propagates to the user's terminal.
             if self.bell_on_complete:
                 sys.stdout.write("\a")
                 sys.stdout.flush()
@@ -2876,8 +2876,8 @@ class AgentMixin:
                 if _api_calls >= getattr(self.agent, "max_iterations", 90):
                     _max_iter = getattr(self.agent, "max_iterations", 90)
                     _cprint(
-                        f"\n{_DIM}⚠ Iteration budget reached "
-                        f"({_api_calls}/{_max_iter}) — "
+                        f"\n{_DIM}âš  Iteration budget reached "
+                        f"({_api_calls}/{_max_iter}) â€” "
                         f"response may be incomplete{_RST}"
                     )
 
@@ -2904,9 +2904,9 @@ class AgentMixin:
                 n = len(all_parts)
                 preview = combined[:50] + ("..." if len(combined) > 50 else "")
                 if n > 1:
-                    print(f"\n⚡ Sending {n} messages after interrupt: '{preview}'")
+                    print(f"\nâš¡ Sending {n} messages after interrupt: '{preview}'")
                 else:
-                    print(f"\n⚡ Sending after interrupt: '{preview}'")
+                    print(f"\nâš¡ Sending after interrupt: '{preview}'")
                 self._pending_input.put(combined)
 
             # If a /steer was left over (agent finished before another tool
@@ -2916,7 +2916,7 @@ class AgentMixin:
                 preview = _leftover_steer[:60] + (
                     "..." if len(_leftover_steer) > 60 else ""
                 )
-                print(f"\n⏩ Delivering leftover /steer as next turn: '{preview}'")
+                print(f"\nâ© Delivering leftover /steer as next turn: '{preview}'")
                 self._pending_input.put(_leftover_steer)
 
             return response
@@ -2928,7 +2928,7 @@ class AgentMixin:
             # Ensure streaming TTS resources are cleaned up even on error.
             # Normal path sends the sentinel at line ~3568; this is a safety
             # net for exception paths that skip it.  Duplicate sentinels are
-            # harmless — stream_tts_to_speaker exits on the first None.
+            # harmless â€” stream_tts_to_speaker exits on the first None.
             if text_queue is not None:
                 try:
                     text_queue.put_nowait(None)

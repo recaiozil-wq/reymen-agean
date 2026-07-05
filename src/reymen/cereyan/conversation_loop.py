@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
-"""conversation_loop.py — ReYMeN Agent seviyesi konusma dongusu.
+﻿# -*- coding: utf-8 -*-
+"""conversation_loop.py â€” ReYMeN Agent seviyesi konusma dongusu.
 
 Ajan ile kullanici arasindaki etkilesimi yonetir:
-- Amaç belirleme ve takip (task_id, budget)
+- AmaÃ§ belirleme ve takip (task_id, budget)
 - Provider-agnostik API mesaj formati (OpenAI / Anthropic / Codex / LM Studio)
 - Context compression (esik asilinca otomatik sikistirma)
 - Prompt caching (Anthropic icin cache_control marker'lari)
@@ -28,9 +28,15 @@ import logging
 
 from dotenv import load_dotenv
 
-_env_yolu = Path(__file__).resolve().parent.parent.parent / ".env"
+_env_yolu = Path(__file__).resolve().parent.parent.parent.parent / ".env"
 if _env_yolu.exists():
     load_dotenv(_env_yolu, override=False)
+
+# Hermes profil .env'sini de dene (API key'ler iÃ§in)
+for _profil in ["reymen", "default", "kiral38"]:
+    _profil_env = Path.home() / f"AppData/Local/hermes/profiles/{_profil}/.env"
+    if _profil_env.exists():
+        load_dotenv(_profil_env, override=False)
 
 # Proje kokunu sys.path'e ekle (gateway bagimsiz calisma icin)
 _PROJE_KOK = Path(__file__).resolve().parent.parent.parent
@@ -48,7 +54,7 @@ logging.getLogger("conversation_loop").setLevel(logging.ERROR)
 for _l in ["CUA", "Motor", "motor", "ReYMeN", "beyin", "plugin", "cron", "skill"]:
     logging.getLogger(_l).setLevel(logging.ERROR)
 
-# ── Prompt Dosya Cache (token tasarrufu) ─────────────────
+# â”€â”€ Prompt Dosya Cache (token tasarrufu) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # SOUL.md, MEMORY.md, USER.md, AGENTS.md her turda okunmasin
 # mtime ile cache gecersiz kilma: dosya degismediyse cache'den don
 _prompt_dosya_cache: dict[str, tuple[float, str]] = {}
@@ -75,7 +81,7 @@ def _cache_dosya_oku(dosya_yolu: str | Path, max_len: int = 0) -> str | None:
         return None
 
 
-# ── Konusmadan Skill Cikarma ────────────────────────────
+# â”€â”€ Konusmadan Skill Cikarma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 try:
     from reymen.arac.konusmadan_skill import konusmadan_skill_cikar as _skill_cikar
 
@@ -83,7 +89,7 @@ try:
 except ImportError:
     _SKILL_CIKAR_AKTIF = False
 
-# ── @file/@url Referans Isleme (ref_processor) ─────────
+# â”€â”€ @file/@url Referans Isleme (ref_processor) â”€â”€â”€â”€â”€â”€â”€â”€â”€
 try:
     from reymen.cereyan.ref_processor import ref_isle as _ref_isle
     from reymen.cereyan.ref_processor import ref_context_olustur as _ref_context_olustur
@@ -94,7 +100,7 @@ except ImportError:
     _ref_context_olustur = None
     _REF_PROCESSOR_AKTIF = False
 
-# ── Nudge / latent kullanıcı modeli ───────────────────────────────────
+# â”€â”€ Nudge / latent kullanÄ±cÄ± modeli â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 try:
     from reymen.cereyan.nudge_model import NudgeModel
 
@@ -103,7 +109,7 @@ except ImportError:
     NudgeModel = None
     _NUDGE_AKTIF = False
 
-# ── Skill iyileştirici ─────────────────────────────────────────────────
+# â”€â”€ Skill iyileÅŸtirici â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 try:
     from reymen.scripts.skill_iyilestirici import SkillIyilestirici
 
@@ -112,7 +118,7 @@ except ImportError:
     SkillIyilestirici = None
     _SKILL_IYI_AKTIF = False
 
-# ── Adaptif öğrenme ────────────────────────────────────────────────────
+# â”€â”€ Adaptif Ã¶ÄŸrenme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 try:
     from reymen.cereyan.adaptif_ogrenme import AdaptifOgrenme
 
@@ -121,7 +127,7 @@ except ImportError:
     AdaptifOgrenme = None
     _ADAPTIF_AKTIF = False
 
-# ── Proaktif kontrol (her cevap sonrası eksik analizi) ────────────────
+# â”€â”€ Proaktif kontrol (her cevap sonrasÄ± eksik analizi) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 try:
     from reymen.cereyan.proaktif_kontrol import (
         soru_sonrasi_kontrol as _proaktif_kontrol,
@@ -132,7 +138,7 @@ except ImportError:
     _proaktif_kontrol = None
     _PROAKTIF_AKTIF = False
 
-# ── Yeni import'lar: circuit breaker, streaming, error classify ─────
+# â”€â”€ Yeni import'lar: circuit breaker, streaming, error classify â”€â”€â”€â”€â”€
 try:
     from reymen.cereyan.iteration_budget import IterationBudget
 except ImportError:
@@ -143,7 +149,7 @@ try:
 except ImportError:
     TurnRetryState = None
 
-# ── Opsiyonel modüller (graceful degrade) ─────────────────────────────
+# â”€â”€ Opsiyonel modÃ¼ller (graceful degrade) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 try:
     from turn_context import TurnYoneticisi, TurnContext
@@ -176,7 +182,7 @@ except ImportError:
     _Compressor = None
     _COMPRESS_AKTIF = False
 
-# `_CACHING_AKTIF` — provider'a gore dinamik olarak hesaplanir.
+# `_CACHING_AKTIF` â€” provider'a gore dinamik olarak hesaplanir.
 # ``caching_aktif_mi(provider)`` fonksiyonu ile provider prompt caching
 # destekliyorsa True doner. Ayrica ``agent._use_prompt_caching`` da dikkate
 # alinir (Anthropic / OpenRouter / DeepSeek / OpenAI).
@@ -207,7 +213,7 @@ except ImportError:
     _SessionStorage = None
     _SESSION_AKTIF = False
 
-# ── Session Search FTS5 (tam metin arama) ─────────────────────────
+# â”€â”€ Session Search FTS5 (tam metin arama) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 try:
     from reymen.cereyan.session_search import (
         SessionSearch as _SessionSearch,
@@ -220,7 +226,7 @@ except ImportError:
     _session_search_al = None
     _SESSION_SEARCH_AKTIF = False
 
-# ── OnceHafiza (bellegi-oncelikli kontrol) ───────────────────────
+# â”€â”€ OnceHafiza (bellegi-oncelikli kontrol) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 try:
     from reymen.sistem.once_hafiza import hafizada_ara as _hafizada_ara
 
@@ -229,7 +235,7 @@ except ImportError:
     _hafizada_ara = None
     _ONCE_HAFIZA_AKTIF = False
 
-# ── Rules Engine (Kural/izin yonetimi) ──────────────────────────
+# â”€â”€ Rules Engine (Kural/izin yonetimi) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 try:
     from reymen.sistem.kurallar import (
         RulesEngine as _RulesEngine,
@@ -243,7 +249,7 @@ except ImportError:
     _RULES_ENGINE = None
     _RULES_AKTIF = False
 
-# ── Skill Activator (auto-activation) ────────────────────────────
+# â”€â”€ Skill Activator (auto-activation) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 try:
     from reymen.cereyan.skill_activator import SkillActivator as _SkillActivator
 
@@ -268,7 +274,7 @@ except ImportError:
     _SKILL_ACTIVATOR = None
     _SKILL_ACTIVATOR_AKTIF = False
 
-# ── Delegasyon Sistemi (P2) — Subagent + görev ayrıştırma ─────
+# â”€â”€ Delegasyon Sistemi (P2) â€” Subagent + gÃ¶rev ayrÄ±ÅŸtÄ±rma â”€â”€â”€â”€â”€
 try:
     from reymen.ag.delegasyon import (
         DelegasyonSistemi as _DelegasyonSistemi,
@@ -288,7 +294,7 @@ except ImportError:
     _delegasyon_hook_bul = None
     _DELEGASYON_AKTIF = False
 
-# ── Plugin Sistemi (lifecycle hooks) ──────────────────────────────────
+# â”€â”€ Plugin Sistemi (lifecycle hooks) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 try:
     from reymen.plugin.manager import (
         PluginManager as _PluginManager,
@@ -307,7 +313,7 @@ except ImportError as _pie:
     _PLUGIN_AKTIF = False
     log.debug("[Plugin] Plugin sistemi yuklenemedi: %s", _pie)
 
-# ── Hata sınıflandırıcı ve mesaj tamirci ─────────────────────────
+# â”€â”€ Hata sÄ±nÄ±flandÄ±rÄ±cÄ± ve mesaj tamirci â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 try:
     from reymen.cereyan.hata_siniflandirici import (
         api_hatasini_siniflandir,
@@ -384,12 +390,12 @@ except ImportError:
     _StreamSaglikTakibi = None  # type: ignore[assignment]
     _STREAM_DIAG_AKTIF = False
 
-# ── Web arama (halusinasyon onleme) ─────────────────────────────
-# Artık doğrudan DDGS yerine web_search_engine'deki SearchDispatcher kullanılır.
-# _WEB_ARAMA_AKTIF, dispatcher her zaman hazır olduğu için True olarak kalır.
+# â”€â”€ Web arama (halusinasyon onleme) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ArtÄ±k doÄŸrudan DDGS yerine web_search_engine'deki SearchDispatcher kullanÄ±lÄ±r.
+# _WEB_ARAMA_AKTIF, dispatcher her zaman hazÄ±r olduÄŸu iÃ§in True olarak kalÄ±r.
 _WEB_ARAMA_AKTIF = True
 
-# ── MCP (Model Context Protocol) entegrasyonu ────────────────────
+# â”€â”€ MCP (Model Context Protocol) entegrasyonu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 try:
     from reymen.arac.native_mcp_client import NativeMCPClient as _NativeMCPClient
 
@@ -442,7 +448,7 @@ _MCP_AKTIF = (
     _MCP_NATIVE_AKTIF or _MCP_CLIENT_AKTIF or _MCP_CATALOG_AKTIF or _MCP_TOOL_AKTIF
 )
 
-# ── Framework Adaptörleri (LangGraph / CrewAI / AutoGen) ─────────────
+# â”€â”€ Framework AdaptÃ¶rleri (LangGraph / CrewAI / AutoGen) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 try:
     from reymen.arac.framework_adaptor import (
         FrameworkYonetici as _FrameworkYonetici,
@@ -464,7 +470,7 @@ except ImportError:
     _framework_adaptor_durum = None
     _FRAMEWORK_ADAPTOR_AKTIF = False
 
-# ── Reasoning-Core (akil yurutme motoru) ──────────────────────────────
+# â”€â”€ Reasoning-Core (akil yurutme motoru) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 try:
     from reymen.sistem.ortak_komut import reasoning_loop as _reasoning_loop
 
@@ -473,7 +479,7 @@ except ImportError:
     _reasoning_loop = None
     _REASONING_AKTIF = False
 
-# ── Sabitler ──────────────────────────────────────────────────────────
+# â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 # %50'yi asince context sikistirma baslat (ENV ile yapilandirilabilir)
 CONTEXT_SIKISTIRMA_ESIGI = float(os.environ.get("CONTEXT_ESIK", "0.50"))
@@ -500,30 +506,30 @@ ONCELIK_CACHE = {
     "merhaba": "Merhaba! Nasil yardimci olabilirim?",
     "selam": "Selam! Ne yapabilirim?",
     "slm": "Selam! Ne yapabilirim?",
-    "teşekkür": "Rica ederim, baska bir sey?",
+    "teÅŸekkÃ¼r": "Rica ederim, baska bir sey?",
     "tesekkur": "Rica ederim, baska bir sey?",
     "sagol": "Ne demek, her zaman!",
-    "sağol": "Ne demek, her zaman!",
+    "saÄŸol": "Ne demek, her zaman!",
     "gorusuruz": "Gorusmek uzere!",
-    "görüşürüz": "Görüşmek üzere!",
+    "gÃ¶rÃ¼ÅŸÃ¼rÃ¼z": "GÃ¶rÃ¼ÅŸmek Ã¼zere!",
     "bye": "Gorusmek uzere!",
     "hadi": "Hadi bakalim, kolay gelsin!",
     "tamam": "Tamam, hemen yapiyorum.",
     "ok": "OK, hemen basliyorum.",
     "tmm": "Tamam, hemen yapiyorum.",
-    "eyvallah": "Eyvallah, görüşürüz!",
+    "eyvallah": "Eyvallah, gÃ¶rÃ¼ÅŸÃ¼rÃ¼z!",
 }
 
-# Yanıttaki "gorev bitti" tetikleyicileri
-GOREV_BITTI_TETIK = ("GOREV_BITTI", "görev bitti", "tamamlandi", "TASK_DONE")
+# YanÄ±ttaki "gorev bitti" tetikleyicileri
+GOREV_BITTI_TETIK = ("GOREV_BITTI", "gÃ¶rev bitti", "tamamlandi", "TASK_DONE")
 
 
 def motor_tools_schema_al(motor, maks_arac: int = 64) -> list:
-    """Motor'daki araçlardan OpenAI-uyumlu tools schema listesi üretir.
+    """Motor'daki araÃ§lardan OpenAI-uyumlu tools schema listesi Ã¼retir.
 
-    _plugin_araclar değerleri iki formatta olabilir:
-      - {ad: callable}            — düz fonksiyon (açıklama yok)
-      - {ad: (callable, str)}     — (fonk, açıklama) tuple
+    _plugin_araclar deÄŸerleri iki formatta olabilir:
+      - {ad: callable}            â€” dÃ¼z fonksiyon (aÃ§Ä±klama yok)
+      - {ad: (callable, str)}     â€” (fonk, aÃ§Ä±klama) tuple
 
     Returns:
         [{"type": "function", "function": {"name": ..., "description": ..., "parameters": ...}}]
@@ -560,29 +566,29 @@ def motor_tools_schema_al(motor, maks_arac: int = 64) -> list:
         return []
 
 
-# Geriye uyumlu alias (alt çizgili)
+# Geriye uyumlu alias (alt Ã§izgili)
 _motor_tools_schema_al = motor_tools_schema_al
 
 # Circuit breaker (ReYMeN Agent pattern'i)
-# İYİLEŞTİRME 2: max_deneme=3, 3 başarısızsa → dur + bildir
+# Ä°YÄ°LEÅTÄ°RME 2: max_deneme=3, 3 baÅŸarÄ±sÄ±zsa â†’ dur + bildir
 CIRCUIT_BREAKER_MAX_HATA = int(os.environ.get("CB_MAX_HATA", "3"))
-CIRCUIT_BREAKER_SURESI = int(os.environ.get("CB_SURESI", "0"))  # 0 = otomatik açılmaz
-CIRCUIT_BREAKER_KALICI = True  # True = kullanıcı müdahalesi gerekene kadar kalıcı
+CIRCUIT_BREAKER_SURESI = int(os.environ.get("CB_SURESI", "0"))  # 0 = otomatik aÃ§Ä±lmaz
+CIRCUIT_BREAKER_KALICI = True  # True = kullanÄ±cÄ± mÃ¼dahalesi gerekene kadar kalÄ±cÄ±
 
 # Mekanik retry: max 3 deneme, sonra circuit breaker
 MAX_RETRY = int(os.environ.get("MAX_RETRY", "3"))
 
-# Exponential backoff için max retry denemesi
+# Exponential backoff iÃ§in max retry denemesi
 MAX_API_RETRY = 3
-# Aynı eylem 3x = takılma
-TAKILMA_ESIĞI = 3
+# AynÄ± eylem 3x = takÄ±lma
+TAKILMA_ESI = 3
 
 # Streaming sabitleri
 STREAMING_AKTIF = os.environ.get("STREAMING_AKTIF", "true").lower() in ("true", "1")
 
 
 class VisionAdapter:
-    """Vision tool wrapper — conversation_loop.py'deki _vision_analiz'e kopru."""
+    """Vision tool wrapper â€” conversation_loop.py'deki _vision_analiz'e kopru."""
 
     def __init__(self):
         self._loop_ref = None
@@ -594,7 +600,7 @@ class VisionAdapter:
 
 
 class ConversationLoop:
-    """Ana konusma dongusu — geriye uyumlu + ReYMeN Agent seviyesi.
+    """Ana konusma dongusu â€” geriye uyumlu + ReYMeN Agent seviyesi.
 
     Eski API:
         loop = ConversationLoop(motor=motor, beyin=beyin, max_tur=30)
@@ -618,22 +624,22 @@ class ConversationLoop:
         self._durum = "hazir"
         self._iptal_istegi = False
         self._konusma_gecmisi: list = []
-        # Konusma gecmisi — son N mesaj (user/assistant) bir sonraki goreve aktarilir
+        # Konusma gecmisi â€” son N mesaj (user/assistant) bir sonraki goreve aktarilir
         self._gecmis_mesajlar: list[dict] = []
         self._max_gecmis_mesaj = 10
         # Circuit breaker state
         self._cb_art_arda_hata = 0
         self._cb_son_hata_zamani = 0.0
         self._cb_acik = False
-        # İyileştirme #2: Mekanik retry sayacı
+        # Ä°yileÅŸtirme #2: Mekanik retry sayacÄ±
         self._retry_sayaci = 0
         self._max_retry = MAX_RETRY
         self._retry_kalici_kilit = False
-        # Takılma dedektörü
+        # TakÄ±lma dedektÃ¶rÃ¼
         self._onceki_eylemler: list[str] = []
         # Streaming
         self._stream_callback = None
-        # A2A mesajlaşma
+        # A2A mesajlaÅŸma
         self._a2a_broker = None
         self._a2a_agent = None
         try:
@@ -646,7 +652,7 @@ class ConversationLoop:
                 "[SessizExcept] %%s: %%s", type(_e).__name__, _e
             )
 
-        # ── MCP (Model Context Protocol) otomatik baslatma ─────────
+        # â”€â”€ MCP (Model Context Protocol) otomatik baslatma â”€â”€â”€â”€â”€â”€â”€â”€â”€
         self._native_mcp = None
         if _MCP_NATIVE_AKTIF:
             try:
@@ -688,14 +694,14 @@ class ConversationLoop:
             except Exception as _mcp_e:
                 log.warning("[MCPClient] Baslatma hatasi: %s", _mcp_e)
 
-        # ── VisionAdapter baglantisi ──────────────────────────
+        # â”€â”€ VisionAdapter baglantisi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         try:
             self._vision_adapter = VisionAdapter()
             self._vision_adapter._loop_ref = self
         except Exception:
             self._vision_adapter = None
 
-        # ── Nudge / latent kullanıcı modeli ──────────────────────────
+        # â”€â”€ Nudge / latent kullanÄ±cÄ± modeli â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         self._nudge = None
         if _NUDGE_AKTIF:
             try:
@@ -704,7 +710,7 @@ class ConversationLoop:
             except Exception as e:
                 log.warning("[NUDGE] Baslatma hatasi: %s", e)
 
-        # ── Session Search FTS5 ─────────────────────────────────────
+        # â”€â”€ Session Search FTS5 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         self._session_search = None
         if _SESSION_SEARCH_AKTIF:
             try:
@@ -713,7 +719,7 @@ class ConversationLoop:
             except Exception as e:
                 log.warning("[SESSION_SEARCH] Baslatma hatasi: %s", e)
 
-        # ── Adaptif öğrenme ─────────────────────────────────────────
+        # â”€â”€ Adaptif Ã¶ÄŸrenme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         self._adaptif = None
         if _ADAPTIF_AKTIF:
             try:
@@ -722,7 +728,7 @@ class ConversationLoop:
             except Exception as e:
                 log.warning("[ADAPTIF] Baslatma hatasi: %s", e)
 
-        # ── Skill iyileştirici ──────────────────────────────────────
+        # â”€â”€ Skill iyileÅŸtirici â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         self._skill_iyi = None
         if _SKILL_IYI_AKTIF:
             try:
@@ -731,9 +737,9 @@ class ConversationLoop:
             except Exception as e:
                 log.warning("[SKILL_IYI] Baslatma hatasi: %s", e)
 
-    # ══════════════════════════════════════════════════════════════════
-    # MEVCUT API — geriye uyumluluk
-    # ══════════════════════════════════════════════════════════════════
+    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    # MEVCUT API â€” geriye uyumluluk
+    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
     def coz(self, hedef: str, baglam: Optional[dict] = None) -> dict:
         """Bir hedefi cozmek icin konusma dongusunu baslat (eski API).
@@ -746,7 +752,7 @@ class ConversationLoop:
             Cozum sonucu dict'i.
         """
         self._durum = "calisiyor"
-        # ── Gatekeeper: sayisal/DB iddiasi varsa once dogrula ──
+        # â”€â”€ Gatekeeper: sayisal/DB iddiasi varsa once dogrula â”€â”€
         try:
             from reymen.guvenlik.gatekeeper import (
                 response_makes_numeric_claim,
@@ -765,7 +771,7 @@ class ConversationLoop:
         except Exception as e:
             logger.warning("Gatekeeper devre disi: %s", e)
 
-        # ── Plugin: on_message hook ──
+        # â”€â”€ Plugin: on_message hook â”€â”€
         try:
             from reymen.plugin.manager import PluginManager
             pm = getattr(self, "_plugin_manager", None)
@@ -793,7 +799,7 @@ class ConversationLoop:
             while tur < self.max_tur:
                 tur += 1
 
-                # ── Nudge gozlem (kullanici modeli) ────────────────
+                # â”€â”€ Nudge gozlem (kullanici modeli) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                 if self._nudge and hedef:
                     try:
                         self._nudge.gozlemle(hedef, "")
@@ -846,9 +852,9 @@ class ConversationLoop:
 
         return sonuc
 
-    # ══════════════════════════════════════════════════════════════════
-    # YENİ API — run_conversation (ReYMeN Agent seviyesi)
-    # ══════════════════════════════════════════════════════════════════
+    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    # YENÄ° API â€” run_conversation (ReYMeN Agent seviyesi)
+    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
     def run_conversation(
         self,
@@ -856,7 +862,7 @@ class ConversationLoop:
         baglam: Optional[dict] = None,
         provider: Optional[str] = None,
     ) -> dict:
-        """Konusma dongusu — ReYMeN-style ReAct loop (birebir ayni akis).
+        """Konusma dongusu â€” ReYMeN-style ReAct loop (birebir ayni akis).
 
         Akis (ReYMeN ReAct):
           1. SETUP (task_id + session + budget + sistem_prompt)
@@ -1042,7 +1048,7 @@ class ConversationLoop:
                     for ref in ref_liste:
                         if not ref.get("basarili"):
                             log.warning(
-                                "[%s] Ref basarisiz: %s=%s — %s",
+                                "[%s] Ref basarisiz: %s=%s â€” %s",
                                 task_id,
                                 ref["tip"],
                                 ref["kaynak"],
@@ -1054,7 +1060,7 @@ class ConversationLoop:
                 log.warning("[%s] RefProcessor hatasi: %s", task_id, _ref_e)
 
         # Kullanici mesaji (en son)
-        # Plugin: on_message — mesaji değiştirme şansı
+        # Plugin: on_message â€” mesaji deÄŸiÅŸtirme ÅŸansÄ±
         if _PLUGIN_AKTIF and _PLUGIN_SISTEMI is not None:
             try:
                 plugin_context = {"task_id": task_id, "baglam": baglam or {}}
@@ -1074,11 +1080,11 @@ class ConversationLoop:
             user_msg = f"{baglam_str}\n\n{hedef}"
         messages.append({"role": "user", "content": user_msg})
 
-        # ── OTOMATIK WEB ARAMASI (guncel bilgi gerektiren sorgular) ──────
+        # â”€â”€ OTOMATIK WEB ARAMASI (guncel bilgi gerektiren sorgular) â”€â”€â”€â”€â”€â”€
         try:
             _guncel_kelimeler = [
                 "fiyat", "dolar", "euro", "altin", "ons", "doviz", "borsa",
-                "bitcoin", "kripto", "hava", "sıcaklik", "yagmur",
+                "bitcoin", "kripto", "hava", "sÄ±caklik", "yagmur",
                 "bugun", "yarin", "saat", "tarih", "2025", "2026",
                 "haber", "guncel", "son dakika", "skor", "mac sonucu",
                 "kazandi", "kaybetti", "canli", "anlik",
@@ -1101,7 +1107,7 @@ class ConversationLoop:
         final_yanit = None
         interrupted = False
 
-        # Delegasyon kontrolu (subagent) — eger hedef subagent gerektiriyorsa
+        # Delegasyon kontrolu (subagent) â€” eger hedef subagent gerektiriyorsa
         # direkt conversation loop'a girmeden coz
         if _DELEGASYON_AKTIF and _delegasyon_sistemi_al is not None:
             try:
@@ -1136,7 +1142,7 @@ class ConversationLoop:
             # API cagrisi (ReYMeN pattern: retry + fallback ile)
             api_yanit = None
 
-            # ── Rules Engine: API cagrisi kontrolu ─────────────────────
+            # â”€â”€ Rules Engine: API cagrisi kontrolu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             if _RULES_AKTIF and _RULES_ENGINE is not None:
                 try:
                     import re as _re
@@ -1167,7 +1173,7 @@ class ConversationLoop:
                         "[%s] [Rules] API kontrol hatasi (sessiz): %s", task_id, _re
                     )
 
-            # Plugin: pre_llm_call — mesajları değiştirme şansı
+            # Plugin: pre_llm_call â€” mesajlarÄ± deÄŸiÅŸtirme ÅŸansÄ±
             try:
                 if _PLUGIN_AKTIF and _PLUGIN_SISTEMI is not None:
                     plugin_ctx = {"task_id": task_id, "tur": api_call_count}
@@ -1209,7 +1215,7 @@ class ConversationLoop:
                 except Exception:
                     logger.warning("[fix_01_sessiz_except] Exception")
 
-            # Plugin: post_llm_call — yanıtı işleme şansı
+            # Plugin: post_llm_call â€” yanÄ±tÄ± iÅŸleme ÅŸansÄ±
             try:
                 if (
                     _PLUGIN_AKTIF
@@ -1460,14 +1466,14 @@ class ConversationLoop:
                 "[SessizExcept] %%s: %%s", type(_e).__name__, _e
             )
 
-        # ── Proaktif kontrol: her cevap sonrası eksik analizi ─────────
+        # â”€â”€ Proaktif kontrol: her cevap sonrasÄ± eksik analizi â”€â”€â”€â”€â”€â”€â”€â”€â”€
         if _PROAKTIF_AKTIF and hedef and sonuc and sonuc.get("yanit"):
             try:
                 _proaktif_kontrol(hedef, str(sonuc.get("yanit", "")))
             except Exception:
                 logger.warning("[fix_01_sessiz_except] Exception")
 
-        # ── Hafif compaction kontrolu: her konusma sonrasi ───────────
+        # â”€â”€ Hafif compaction kontrolu: her konusma sonrasi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         # MEMORY.md/USER.md %80 doluluk esigini gecerse otomatik compaction
         try:
             from reymen.cereyan.memory_compaction import hafif_compaction_kontrol
@@ -1620,11 +1626,11 @@ class ConversationLoop:
     def _takilma_kontrol(self, eylem_adi: str) -> bool:
         """Ayni eylem 3x tekrarlanirsa True doner (takilma tespiti)."""
         self._onceki_eylemler.append(eylem_adi)
-        if len(self._onceki_eylemler) > TAKILMA_ESIĞI:
-            self._onceki_eylemler = self._onceki_eylemler[-TAKILMA_ESIĞI:]
+        if len(self._onceki_eylemler) > TAKILMA_ESIÄI:
+            self._onceki_eylemler = self._onceki_eylemler[-TAKILMA_ESIÄI:]
         return (
-            len(self._onceki_eylemler) >= TAKILMA_ESIĞI
-            and len(set(self._onceki_eylemler[-TAKILMA_ESIĞI:])) == 1
+            len(self._onceki_eylemler) >= TAKILMA_ESIÄI
+            and len(set(self._onceki_eylemler[-TAKILMA_ESIÄI:])) == 1
         )
 
     def _gorev_sonrasi_hafiza(self, hedef: str, yanit: str, task_id: str) -> None:
@@ -1671,13 +1677,13 @@ class ConversationLoop:
         if not url_match and not dosya_match:
             gorsel_kelimeler = [
                 "foto",
-                "fotoğraf",
+                "fotoÄŸraf",
                 "fotograf",
                 "resim",
                 "gorsel",
-                "görsel",
+                "gÃ¶rsel",
                 "goruntu",
-                "görüntü",
+                "gÃ¶rÃ¼ntÃ¼",
                 "ekran",
                 "ss",
                 "screenshot",
@@ -1689,7 +1695,7 @@ class ConversationLoop:
                 "snapshot",
                 "ne var",
                 "bak",
-                "göster",
+                "gÃ¶ster",
                 "goster",
                 "analiz et",
                 "incele",
@@ -1822,17 +1828,17 @@ class ConversationLoop:
         log.warning("[%s] Dogrulama: tum adaylar bos/hatali", task_id)
         return sonuc
 
-    # ── Delegasyon (P2) — Subagent yönetimi ──────────────────────
+    # â”€â”€ Delegasyon (P2) â€” Subagent yÃ¶netimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _delegasyon_kontrol(self, hedef: str) -> Optional[Dict[str, Any]]:
         """
         Hedef metnini kontrol eder, delegasyon gerekiyorsa subagent
-        oluşturup çalıştırır.
+        oluÅŸturup Ã§alÄ±ÅŸtÄ±rÄ±r.
 
-        Delegasyon ipuçları:
-            - "delege et", "subagent", "alt ajan", "görev devret"
-            - "paralel", "aynı anda", "zincir"
-            - Numaralı liste + "paralel" veya "zincir" kelimeleri
+        Delegasyon ipuÃ§larÄ±:
+            - "delege et", "subagent", "alt ajan", "gÃ¶rev devret"
+            - "paralel", "aynÄ± anda", "zincir"
+            - NumaralÄ± liste + "paralel" veya "zincir" kelimeleri
 
         Returns:
             Delegasyon sonucu dict veya None (delegasyon gerekmiyorsa)
@@ -1841,15 +1847,15 @@ class ConversationLoop:
             return None
 
         try:
-            # Lazy import — GorevAyrıştırıcı
-            from reymen.ag.delegasyon import GorevAyrıştırıcı
+            # Lazy import â€” GorevAyrÄ±ÅŸtÄ±rÄ±cÄ±
+            from reymen.ag.delegasyon import GorevAyrÄ±ÅŸtÄ±rÄ±cÄ±
 
             hedef_lower = hedef.lower()
 
             # Delegasyon tetikleyicileri
-            tek_tetik = ["delege et", "subagent çalıştır", "alt ajan", "görev devret"]
-            paralel_tetik = ["paralel", "aynı anda", "eş zamanlı", "beraber"]
-            zincir_tetik = ["zincir", "sırayla", "ardışık", "adım adım"]
+            tek_tetik = ["delege et", "subagent Ã§alÄ±ÅŸtÄ±r", "alt ajan", "gÃ¶rev devret"]
+            paralel_tetik = ["paralel", "aynÄ± anda", "eÅŸ zamanlÄ±", "beraber"]
+            zincir_tetik = ["zincir", "sÄ±rayla", "ardÄ±ÅŸÄ±k", "adÄ±m adÄ±m"]
 
             # Mod belirle
             mod = None
@@ -1893,7 +1899,7 @@ class ConversationLoop:
                 }
 
             elif mod == "PARALEL":
-                alt_gorevler = GorevAyrıştırıcı.ayir(hedef)
+                alt_gorevler = GorevAyrÄ±ÅŸtÄ±rÄ±cÄ±.ayir(hedef)
                 if len(alt_gorevler) >= 2:
                     gorev_dicts = [
                         {"goal": a.goal, "context": a.context} for a in alt_gorevler[:3]
@@ -1902,9 +1908,9 @@ class ConversationLoop:
                     basarili = sum(1 for a in agentler if a.basarili_mi())
 
                     if basarili > 0:
-                        yanit_parts = [f"[Paralel {basarili}/{len(agentler)} başarılı]"]
+                        yanit_parts = [f"[Paralel {basarili}/{len(agentler)} baÅŸarÄ±lÄ±]"]
                         for a in agentler:
-                            ikon = "✅" if a.basarili_mi() else "❌"
+                            ikon = "âœ…" if a.basarili_mi() else "âŒ"
                             yanit_parts.append(
                                 f"{ikon} {a.goal[:50]}: {a.result[:200]}"
                             )
@@ -1915,7 +1921,7 @@ class ConversationLoop:
                             "agentler": [a.id for a in agentler],
                         }
                 else:
-                    # Paralel için yeterli görev yok, TEK dene
+                    # Paralel iÃ§in yeterli gÃ¶rev yok, TEK dene
                     agent = sistem.delege_et(goal=hedef)
                     if agent.basarili_mi():
                         return {
@@ -1926,7 +1932,7 @@ class ConversationLoop:
                         }
 
             elif mod == "ZINCIR":
-                alt_gorevler = GorevAyrıştırıcı.ayir(hedef)
+                alt_gorevler = GorevAyrÄ±ÅŸtÄ±rÄ±cÄ±.ayir(hedef)
                 if len(alt_gorevler) >= 2:
                     adim_dicts = [
                         {"goal": a.goal, "context": a.context} for a in alt_gorevler
@@ -1934,10 +1940,10 @@ class ConversationLoop:
                     agentler = sistem.zincir_delege(adim_dicts)
                     basarili = sum(1 for a in agentler if a.basarili_mi())
 
-                    yanit_parts = [f"[Zincir {basarili}/{len(agentler)} adım başarılı]"]
+                    yanit_parts = [f"[Zincir {basarili}/{len(agentler)} adÄ±m baÅŸarÄ±lÄ±]"]
                     for i, a in enumerate(agentler, 1):
-                        ikon = "✅" if a.basarili_mi() else "❌"
-                        yanit_parts.append(f"Adım {i}: {ikon} {a.result[:200]}")
+                        ikon = "âœ…" if a.basarili_mi() else "âŒ"
+                        yanit_parts.append(f"AdÄ±m {i}: {ikon} {a.result[:200]}")
                     return {
                         "basarili": basarili > 0,
                         "mod": "ZINCIR",
@@ -1948,16 +1954,16 @@ class ConversationLoop:
             return None
 
         except Exception as e:
-            logger.warning(f"[Delegasyon] Kontrol hatası: {e}")
+            logger.warning(f"[Delegasyon] Kontrol hatasÄ±: {e}")
             return None
 
     def _mcp_web_ara(self, sorgu: str, maks_sonuc: int = 3) -> Optional[str]:
         """MCP uzerinden web aramayi dene (Firecrawl / search server).
 
         Oncelik sirasi:
-          1. native_mcp_client (NativeMCPClient) — firecrawl server
-          2. mcp_client_tool (MCPClientYoneticisi) — firecrawl server
-          3. mcp_tool (MCPIstemci) — firecrawl server
+          1. native_mcp_client (NativeMCPClient) â€” firecrawl server
+          2. mcp_client_tool (MCPClientYoneticisi) â€” firecrawl server
+          3. mcp_tool (MCPIstemci) â€” firecrawl server
         """
         # 1. Native MCP Client
         if _MCP_NATIVE_AKTIF and hasattr(self, "_native_mcp") and self._native_mcp:
@@ -2000,7 +2006,7 @@ class ConversationLoop:
                 )
                 pass
 
-        # 3. MCP Tool (mcp_tool.py — MCPIstemci)
+        # 3. MCP Tool (mcp_tool.py â€” MCPIstemci)
         if _MCP_TOOL_AKTIF:
             try:
                 istemci = _mcp_istemci_get()
@@ -2022,7 +2028,7 @@ class ConversationLoop:
         return None
 
     def _web_ara(self, sorgu: str, maks_sonuc: int = 3) -> Optional[str]:
-        """Web arama yap — MCP Firecrawl öncelikli, sonra SearchDispatcher.
+        """Web arama yap â€” MCP Firecrawl Ã¶ncelikli, sonra SearchDispatcher.
         LLM atlanir, direkt web verisi kullanilir (halusinasyon onleme).
         Basarisiz olursa hata sayaci tutar, 3 hata sonra devre disi kalir.
 
@@ -2036,7 +2042,7 @@ class ConversationLoop:
         if hasattr(self, "_web_hata") and self._web_hata >= 3:
             return None
         try:
-            # ÖNCE: MCP Firecrawl / search dene (varsa)
+            # Ã–NCE: MCP Firecrawl / search dene (varsa)
             mcp_sonuc = self._mcp_web_ara(sorgu, maks_sonuc)
             if mcp_sonuc:
                 self._web_hata = 0
@@ -2074,11 +2080,11 @@ class ConversationLoop:
         try:
             self._native_mcp._motor_ref = self.motor
             self._native_mcp._kesfedildi = False
-            # native_mcp_client'ın motor_kaydet() metodunu çağır
+            # native_mcp_client'Ä±n motor_kaydet() metodunu Ã§aÄŸÄ±r
             if hasattr(self._native_mcp, "motor_kaydet"):
                 self._native_mcp.motor_kaydet(self.motor)
             else:
-                # Manuel kayıt
+                # Manuel kayÄ±t
                 for ad, baglanti in self._native_mcp._baglantilar.items():
                     for arac in baglanti.araclar:
                         arac_adi = f"MCP_{ad.upper()}_{arac['name'].upper()}"
@@ -2099,9 +2105,9 @@ class ConversationLoop:
         except Exception as _mcp_e:
             log.warning("[MCP] Motor kayit hatasi: %s", _mcp_e)
 
-    # ══════════════════════════════════════════════════════════════════
-    # YARDIMCI METODLAR — run_conversation
-    # ══════════════════════════════════════════════════════════════════
+    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    # YARDIMCI METODLAR â€” run_conversation
+    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
     def _budget_olustur(self, hedef: str) -> Any:
         """IterationBudget olustur; modul yoksa basit sayac doner."""
@@ -2136,7 +2142,7 @@ class ConversationLoop:
             def gorev_tamamla(self) -> None:
                 self._bitti = True
 
-            # API uyumluluğu
+            # API uyumluluÄŸu
             gorev_tamami = gorev_tamamla
 
             def eylem_kaydet(self, _: Any) -> None:
@@ -2147,7 +2153,7 @@ class ConversationLoop:
 
         return _SimpleBudget(self.max_tur)
 
-    # ── Session Search Kaydet ─────────────────────────────────────────
+    # â”€â”€ Session Search Kaydet â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     def _session_search_kaydet(
         self, session_id: Optional[str], message: str, role: str = "user"
     ) -> None:
@@ -2163,7 +2169,7 @@ class ConversationLoop:
             self._session_search.save(session_id, message, role)
         except Exception as _ss_e:
             log.debug("[SESSION_SEARCH] Kayit hatasi: %s", _ss_e)
-        # Session messages tablosuna da kaydet (ID=26 fix) — mesaj_ekle() ile
+        # Session messages tablosuna da kaydet (ID=26 fix) â€” mesaj_ekle() ile
         try:
             if not hasattr(self, "_session_ekleme_storage") or self._session_ekleme_storage is None:
                 _db_yol = str(Path(__file__).parent.parent.parent.parent / "merkez_db" / "session.db")
@@ -2264,20 +2270,20 @@ class ConversationLoop:
                     _ham_json = _json_mod.dumps(_ham_veri, indent=2, ensure_ascii=False)
                     ek_bilgi += "\n\n"
                     ek_bilgi += "=" * 50 + "\n"
-                    ek_bilgi += "[ZORUNLU KURAL — ASAGIDAKI JSON TEK KAYNAKTIR]\n"
+                    ek_bilgi += "[ZORUNLU KURAL â€” ASAGIDAKI JSON TEK KAYNAKTIR]\n"
                     ek_bilgi += (
                         "ReYMeN durumu/eksikleri/kapasitesi hakkinda soru gelince:\n"
                     )
                     ek_bilgi += (
                         "1. Kendi training bilgini KULLANMA. Bu JSON TEK KAYNAK.\n"
                     )
-                    ek_bilgi += "2. 'hermes>reymen yonleri' sorusunda:\n"
-                    ek_bilgi += "   → 'ReYMeN_karsilastirma/detaylar' bolumundeki veriyi tablo yap.\n"
+                    ek_bilgi += "2. 'reymen>reymen yonleri' sorusunda:\n"
+                    ek_bilgi += "   â†’ 'ReYMeN_karsilastirma/detaylar' bolumundeki veriyi tablo yap.\n"
                     ek_bilgi += (
-                        "   → ASLA: 'yok' olarak isaretleme (once JSON'a bak).\n"
+                        "   â†’ ASLA: 'yok' olarak isaretleme (once JSON'a bak).\n"
                     )
                     ek_bilgi += "3. 'eksik listesi' sorusunda:\n"
-                    ek_bilgi += "   → 'mevcut_eksikler/maddeler' bolumunu kullan.\n"
+                    ek_bilgi += "   â†’ 'mevcut_eksikler/maddeler' bolumunu kullan.\n"
                     ek_bilgi += "4. ESKI BILDIGIN LISTELER yanlis. Bu JSON dogru.\n"
                     ek_bilgi += "5. Asla tahmin etme, asla uydurma.\n"
                     ek_bilgi += "=" * 50 + "\n"
@@ -2310,12 +2316,12 @@ class ConversationLoop:
                         "[SessizExcept] %%s: %%s", type(_e).__name__, _e
                     )
 
-                # ═══════════════════════════════════════════════════════
-                # KIMLIK SABITI — üstteki prompt'lar ne derse desin,
+                # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+                # KIMLIK SABITI â€” Ã¼stteki prompt'lar ne derse desin,
                 # ReYMeN kendini bagimsiz olarak tanimlar.
-                # ═══════════════════════════════════════════════════════
+                # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
                 kimlik_sabiti = (
-                    "\n\n[KIMLIK SABITI — Asagidaki tanim TUM diger promptlardan ONCELIKLIDIR]\n"
+                    "\n\n[KIMLIK SABITI â€” Asagidaki tanim TUM diger promptlardan ONCELIKLIDIR]\n"
                     "Sen ReYMeN Agent'sin. ReYMeN Agent ile hicbir baglantin yok.\n"
                     "Kendi beynin (Beyin), kendi motorun (Motor) ve kendi konusma dongun var.\n"
                     "Provider'lara (DeepSeek, OpenAI, Anthropic) direkt baglanirsin.\n"
@@ -2326,7 +2332,7 @@ class ConversationLoop:
                 )
                 ek_bilgi += kimlik_sabiti
 
-                # AGENTS.md enjeksiyonu (ReYMeN stili — entry points + mimari)
+                # AGENTS.md enjeksiyonu (ReYMeN stili â€” entry points + mimari)
                 try:
                     agents = self._agents_bilgisi_al()
                     if agents:
@@ -2336,9 +2342,9 @@ class ConversationLoop:
                         "[SessizExcept] %%s: %%s", type(_e).__name__, _e
                     )
 
-                # ═══════════════════════════════════════════════════════
-                # Framework Adaptör Durumu (LangGraph / CrewAI / AutoGen)
-                # ═══════════════════════════════════════════════════════
+                # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+                # Framework AdaptÃ¶r Durumu (LangGraph / CrewAI / AutoGen)
+                # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
                 try:
                     if _FRAMEWORK_ADAPTOR_AKTIF and _framework_adaptor:
                         fw_durum = _framework_adaptor.aktif_frameworkler
@@ -2357,9 +2363,9 @@ class ConversationLoop:
                         "[SessizExcept] Framework adaptor: %%s", type(_e).__name__
                     )
 
-                # ═══════════════════════════════════════════════════════
-                # OnceHafiza — Önce Hafızaya Bak (default profil ici̇n)
-                # ═══════════════════════════════════════════════════════
+                # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+                # OnceHafiza â€” Ã–nce HafÄ±zaya Bak (default profil iciÌ‡n)
+                # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
                 try:
                     from reymen.sistem.once_hafiza import hafizada_ara as _hafizada_ara
 
@@ -2372,13 +2378,13 @@ class ConversationLoop:
                             durum = oh_sonuc.get("durum", "bulundu")
                             if durum != "belirsiz" or guven >= 0.5:
                                 ek_bilgi += (
-                                    "\n\n[ÖNCEKİ ÇÖZÜM — OnceHafiza]\n"
-                                    f"Geçmişte benzer bir hedef çözülmüş:\n"
+                                    "\n\n[Ã–NCEKÄ° Ã‡Ã–ZÃœM â€” OnceHafiza]\n"
+                                    f"GeÃ§miÅŸte benzer bir hedef Ã§Ã¶zÃ¼lmÃ¼ÅŸ:\n"
                                     f"  Hedef: {oh_sonuc.get('hedef', hedef)[:100]}\n"
-                                    f"  Çözüm: {cozum}\n"
+                                    f"  Ã‡Ã¶zÃ¼m: {cozum}\n"
                                     f"  Kaynak: {kaynak}\n"
-                                    f"  Güven: {guven:.2f}\n"
-                                    f"[NOT] Bu çözümü referans al, direkt uygula, tekrar keşfetme.\n"
+                                    f"  GÃ¼ven: {guven:.2f}\n"
+                                    f"[NOT] Bu Ã§Ã¶zÃ¼mÃ¼ referans al, direkt uygula, tekrar keÅŸfetme.\n"
                                 )
                 except Exception as _e:
                     __import__("logging").getLogger(__name__).warning(
@@ -2415,12 +2421,12 @@ class ConversationLoop:
             "Cevap formatin: once emoji+konu basligi, sonra kisa aciklama, "
             "sonra tablo (sutun baslikli), en son yorum/aciklama. "
             "[DOGRULAMA KURALI] Sayi/boyut/kapasite/bagimlilik sorularinda: "
-            "1. OLÇ (gerçek veriyi al), "
-            "2. DOGRULA (grep/import kontrolü), "
+            "1. OLÃ‡ (gerÃ§ek veriyi al), "
+            "2. DOGRULA (grep/import kontrolÃ¼), "
             "3. CAPRAZ KONTROL (pip show Required-by). "
             "Varsayimla cevap verme. "
             "Ornek:\n"
-            "  🔍 Konu Basligi\n"
+            "  ğŸ” Konu Basligi\n"
             "  Kisa aciklama.\n"
             "  | Kolon1 | Kolon2 |\n"
             "  |--------|--------|\n"
@@ -2436,6 +2442,8 @@ class ConversationLoop:
         """MEMORY.md + USER.md icerigini oku, profil bilgisi olarak don."""
         try:
             proje_kok = Path(__file__).parent.parent.parent
+            localappdata = Path(os.environ.get("LOCALAPPDATA", os.path.expanduser("~/.hermes")))
+            hermes_profiles = localappdata / "hermes" / "profiles"
             # Birden fazla lokasyon dene
             aday_yollar = [
                 # 1. Proje koku .ReYMeN/memories/ (ReYMeN stili)
@@ -2444,14 +2452,10 @@ class ConversationLoop:
                 proje_kok / ".ReYMeN",
                 # 3. reymen/hafiza/ (ReYMeN hafiza sistemi)
                 proje_kok / "reymen" / "hafiza",
-                # 4. ReYMeN profili memories/ (bagimsiz modda erisim)
-                Path(os.path.expanduser("~"))
-                / "AppData"
-                / "Local"
-                / "hermes"
-                / "profiles"
-                / "reymen"
-                / "memories",
+                # 4. Hermes profilleri memories/
+                hermes_profiles / "default" / "memories",
+                hermes_profiles / "reymen" / "memories",
+                hermes_profiles / "kiral38" / "memories",
                 # 5. Calisma dizini
                 Path(sys.path[0]) / ".ReYMeN" / "memories" if sys.path[0] else None,
                 Path.cwd() / ".ReYMeN" / "memories",
@@ -2514,7 +2518,7 @@ class ConversationLoop:
                     limit_token = limit
                     break
 
-        # Token tahmini (4 karakter ≈ 1 token)
+        # Token tahmini (4 karakter â‰ˆ 1 token)
         toplam_char = sum(len(m.get("content", "") or "") for m in mesajlar)
         toplam_char += len(sistem_prompt)
         limit_char = limit_token * 4  # char esdegeri
@@ -2524,13 +2528,13 @@ class ConversationLoop:
             return mesajlar
 
         log.info(
-            "Context doluluk: %.0f%% (limit=%dK token, provider=%s) — sikistirma basladi",
+            "Context doluluk: %.0f%% (limit=%dK token, provider=%s) â€” sikistirma basladi",
             oran * 100,
             limit_token // 1000,
             provider_tipi or "varsayilan",
         )
 
-        # Hook: context sıkıştırma
+        # Hook: context sÄ±kÄ±ÅŸtÄ±rma
         if _HOOK_AKTIF and _context_sikistirma_tetikle is not None:
             try:
                 _context_sikistirma_tetikle(
@@ -2556,7 +2560,7 @@ class ConversationLoop:
             # Kritik: mesaj sayisini yariya indir
             koru = max(3, len(mesajlar) // 2)
             ozet = (
-                f"[Context sikistirildi — {len(mesajlar)} → {koru} mesaj, "
+                f"[Context sikistirildi â€” {len(mesajlar)} â†’ {koru} mesaj, "
                 f"doluluk: %{oran*100:.0f}]"
             )
             return (
@@ -2577,7 +2581,7 @@ class ConversationLoop:
             # Hafif: ortadaki mesajlari tek ozete indirge
             if len(mesajlar) > 8:
                 ozet = (
-                    f"[Context sikistirildi — {len(mesajlar)} mesaj, "
+                    f"[Context sikistirildi â€” {len(mesajlar)} mesaj, "
                     f"doluluk: %{oran*100:.0f}]"
                 )
                 return (
@@ -2673,7 +2677,7 @@ class ConversationLoop:
         try:
             # Dinamik _CACHING_AKTIF kontrolu
             if _CACHING_AKTIF is None:
-                # Provider'a gore hesapla — su an icin True kabul et
+                # Provider'a gore hesapla â€” su an icin True kabul et
                 # (cogu modern provider otomatik prefix caching yapar)
                 caching_aktif = True
             else:
@@ -2712,7 +2716,7 @@ class ConversationLoop:
         Gatekeeper: Kullanici mesaji sayisal/DB iddiasi iceriyorsa
         run_gatekept_turn() devreye girer (kod calistirma zorunlulugu).
         """
-        # ── Gatekeeper kontrolu ──────────────────────────────────
+        # â”€â”€ Gatekeeper kontrolu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         try:
             son_kullanici_msg = ""
             for m in reversed(mesajlar):
@@ -2838,7 +2842,7 @@ class ConversationLoop:
         Beyin modulu yoksa direkt OpenAI SDK ile DeepSeek API cagrisi yapar.
         """
         if not self.beyin:
-            log.debug("Beyin yok — direkt OpenAI SDK kullaniliyor")
+            log.debug("Beyin yok â€” direkt OpenAI SDK kullaniliyor")
             return self._direct_api_call(mesajlar)
 
         sonuc_kutusu: list = [None]
@@ -2858,7 +2862,7 @@ class ConversationLoop:
                 if not kullanici_mesajlari:
                     kullanici_mesajlari = [{"role": "user", "content": "devam"}]
 
-                # uret_v2 önceliği: beyin'de varsa ve motor tools sağlıyorsa kullan
+                # uret_v2 Ã¶nceliÄŸi: beyin'de varsa ve motor tools saÄŸlÄ±yorsa kullan
                 _kullan_v2 = (
                     hasattr(self.beyin, "uret_v2")
                     and self.motor is not None
@@ -2902,9 +2906,9 @@ class ConversationLoop:
         """Yanit dict'inden tool call'lari cikar.
 
         Desteklenen formatlar:
-          1. OpenAI standard: yanit["tool_calls"] → list
-          2. ReAct text: icerik icinde ARAÇ("param") pattern
-          GOREV_BITTI → tool call yok (bitti)
+          1. OpenAI standard: yanit["tool_calls"] â†’ list
+          2. ReAct text: icerik icinde ARAÃ‡("param") pattern
+          GOREV_BITTI â†’ tool call yok (bitti)
         """
         if not yanit:
             return []
@@ -2918,11 +2922,11 @@ class ConversationLoop:
         if not icerik:
             return []
 
-        # GOREV_BITTI → text yanit, tool yok
+        # GOREV_BITTI â†’ text yanit, tool yok
         if any(t.lower() in icerik.lower() for t in GOREV_BITTI_TETIK):
             return []
 
-        # ARAÇ_ADI("parametre") pattern
+        # ARAÃ‡_ADI("parametre") pattern
         m = re.search(r"\b([A-Z][A-Z_]{2,})\s*\(([^)]*)\)", icerik)
         if m:
             arac_adi = m.group(1)
@@ -2947,22 +2951,22 @@ class ConversationLoop:
         return yanit.get("content") or ""
 
     def _yanit_temizle(self, metin: str) -> str:
-        """DÜŞÜN/EYLEM gibi ic dusunce bloklarini temizle, GOREV_BITTI icindeki metni cikar."""
+        """DÃœÅÃœN/EYLEM gibi ic dusunce bloklarini temizle, GOREV_BITTI icindeki metni cikar."""
         if not metin:
             return metin
         import re as _re
 
-        # 1. GOREV_BITTI("...") → icindeki metni cikar
+        # 1. GOREV_BITTI("...") â†’ icindeki metni cikar
         gorev_m = _re.search(r'GOREV_BITTI\s*\(\s*"([^"]*)"\s*\)', metin)
         if gorev_m:
             return gorev_m.group(1).strip()
 
-        # 2. DÜŞÜN/EYLEM bloklarini temizle
+        # 2. DÃœÅÃœN/EYLEM bloklarini temizle
         satirlar = metin.split("\n")
         temiz = []
         atla = False
         for s in satirlar:
-            if _re.match(r"^\s*DÜŞÜN\s*[:\-]", s):
+            if _re.match(r"^\s*DÃœÅÃœN\s*[:\-]", s):
                 atla = True
                 continue
             if _re.match(r"^\s*EYLEM\s*[:\-]", s):
@@ -2970,18 +2974,18 @@ class ConversationLoop:
                 continue
             if atla and s.strip() == "":
                 continue
-            if atla and not _re.match(r"^\s*(DÜŞÜN|EYLEM)\s*[:\-]", s):
+            if atla and not _re.match(r"^\s*(DÃœÅÃœN|EYLEM)\s*[:\-]", s):
                 atla = False
             if not atla:
                 temiz.append(s)
         sonuc = "\n".join(temiz).strip()
-        # DÜŞÜN/EYLEM bloklari filtrelenince tum metin giderse bos don
+        # DÃœÅÃœN/EYLEM bloklari filtrelenince tum metin giderse bos don
         # (orijinali geri verme, yoksa kullanici ic dusunceyi gorur)
         return sonuc
 
-    # ══════════════════════════════════════════════════════════════════
+    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     # MEVCUT YARDIMCI METODLAR (coz() icin)
-    # ══════════════════════════════════════════════════════════════════
+    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
     def _beyin_eylem_sec(self, hedef: str, baglam: Optional[dict] = None) -> dict:
         """Beyin modulunu kullanarak bir sonraki eylemi sec."""
@@ -3002,7 +3006,7 @@ class ConversationLoop:
             except Exception:
                 parametreler = {}
 
-        # ── Rules Engine kontrolu (her aksiyon oncesi) ────────────
+        # â”€â”€ Rules Engine kontrolu (her aksiyon oncesi) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         if _RULES_AKTIF and _RULES_ENGINE is not None:
             try:
                 # Arac adina gore kategori belirle
@@ -3069,7 +3073,7 @@ class ConversationLoop:
                 kural_sonuc = _RULES_ENGINE.kontrol(kategori, hedef_str)
                 if not kural_sonuc.get("izin"):
                     log.warning(
-                        "[Rules] ENGEL: %s (%s) — %s",
+                        "[Rules] ENGEL: %s (%s) â€” %s",
                         arac,
                         kategori,
                         kural_sonuc.get("sebep", ""),
@@ -3083,7 +3087,7 @@ class ConversationLoop:
                     }
                 elif kural_sonuc.get("tip") == "uyari":
                     log.info(
-                        "[Rules] UYARI: %s (%s) — %s",
+                        "[Rules] UYARI: %s (%s) â€” %s",
                         arac,
                         kategori,
                         kural_sonuc.get("sebep", ""),
@@ -3122,7 +3126,7 @@ class ConversationLoop:
                     return {"basarili": True, "cikti": v, "tamamlandi": True}
             return {"basarili": False, "cikti": "Cache'te yok", "tamamlandi": False}
 
-        # ── MCP Tool'lari (dogrudan, motor gerekmez) ──────────────
+        # â”€â”€ MCP Tool'lari (dogrudan, motor gerekmez) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         if arac == "MCP_CATALOG" or arac == "mcp_catalog":
             if _MCP_CATALOG_AKTIF and _mcp_catalog_run:
                 islem = parametreler.get("islem", "listele")
@@ -3191,9 +3195,9 @@ class ConversationLoop:
 
         return {"basarili": False, "hata": "Motor kulanilamiyor"}
 
-    # ══════════════════════════════════════════════════════════════════
-    # DURUM / İSTATİSTİK
-    # ══════════════════════════════════════════════════════════════════
+    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    # DURUM / Ä°STATÄ°STÄ°K
+    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
     def durum(self) -> str:
         """Dongu durumunu dondur."""
@@ -3210,9 +3214,9 @@ class ConversationLoop:
             # cb_durum: temizlendi
         }
 
-    # ══════════════════════════════════════════════════════════════════
-    # YENİ METODLAR — ReYMeN Agent seviyesi
-    # ══════════════════════════════════════════════════════════════════
+    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    # YENÄ° METODLAR â€” ReYMeN Agent seviyesi
+    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
     def set_stream_callback(self, callback: Any) -> None:
         """Stream callback fonksiyonu ata.
@@ -3253,7 +3257,7 @@ class ConversationLoop:
         """Hatayi siniflandir. ReYMeN Agent FailoverReason pattern'i.
         Returns: 'retry' | 'abort' | 'compress' | 'rotate'
         """
-        # Gelişmiş sınıflandırıcı varsa kullan
+        # GeliÅŸmiÅŸ sÄ±nÄ±flandÄ±rÄ±cÄ± varsa kullan
         if _HATA_SINIFLANDIRICI_AKTIF and api_hatasini_siniflandir is not None:
             try:
                 sinif = api_hatasini_siniflandir(hata)
@@ -3276,9 +3280,9 @@ class ConversationLoop:
             except Exception as _e:
                 __import__("logging").getLogger(__name__).warning(
                     "[SessizExcept] %%s: %%s", type(_e).__name__, _e
-                )  # Sınıflandırıcı başarısız → basit fallback
+                )  # SÄ±nÄ±flandÄ±rÄ±cÄ± baÅŸarÄ±sÄ±z â†’ basit fallback
 
-        # Basit fallback (sınıflandırıcı yoksa)
+        # Basit fallback (sÄ±nÄ±flandÄ±rÄ±cÄ± yoksa)
         hata_str = str(hata).lower()
         if any(t in hata_str for t in ("timeout", "timed out", "connection")):
             return "retry"
@@ -3312,9 +3316,9 @@ class ConversationLoop:
             else 0,
         }
 
-    # ══════════════════════════════════════════════════════════════════
-    # RETRY — exponential backoff (ReYMeN Agent pattern)
-    # ══════════════════════════════════════════════════════════════════
+    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    # RETRY â€” exponential backoff (ReYMeN Agent pattern)
+    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
     def _api_call_with_retry(
         self,
@@ -3354,13 +3358,13 @@ class ConversationLoop:
         mevcut_tip = provider_tipi
         mevcut_index = 0
 
-        # -- Circuit breaker kontrolü ---------------------------------
+        # -- Circuit breaker kontrolÃ¼ ---------------------------------
         if self._cb_acik:
             if (
                 CIRCUIT_BREAKER_SURESI > 0
                 and (time.time() - self._cb_son_hata_zamani) > CIRCUIT_BREAKER_SURESI
             ):
-                # Automatic reset: süre dolmuşsa sıfırla
+                # Automatic reset: sÃ¼re dolmuÅŸsa sÄ±fÄ±rla
                 self._cb_acik = False
                 self._cb_art_arda_hata = 0
                 log.info(
@@ -3379,25 +3383,25 @@ class ConversationLoop:
                 )
                 return None
 
-        # API'ye göndermeden önce mesaj geçmişini onar
+        # API'ye gÃ¶ndermeden Ã¶nce mesaj geÃ§miÅŸini onar
         if _MESAJ_TAMIRCI_AKTIF and mesaj_siralamasi_tamir_et is not None:
             try:
                 n_tamirler = mesaj_siralamasi_tamir_et(api_mesajlari)
                 if n_tamirler:
                     log.debug(
-                        "[%s] Mesaj sıralaması tamiri: %d düzeltme", task_id, n_tamirler
+                        "[%s] Mesaj sÄ±ralamasÄ± tamiri: %d dÃ¼zeltme", task_id, n_tamirler
                     )
                 n_arg_tamirler = arac_cagri_argumanlarini_temizle(
                     api_mesajlari, oturum_id=task_id
                 )
                 if n_arg_tamirler:
                     log.debug(
-                        "[%s] Araç argümanı tamiri: %d düzeltme",
+                        "[%s] AraÃ§ argÃ¼manÄ± tamiri: %d dÃ¼zeltme",
                         task_id,
                         n_arg_tamirler,
                     )
             except Exception as _e:
-                log.debug("[%s] Mesaj tamiri başarısız (devam): %s", task_id, _e)
+                log.debug("[%s] Mesaj tamiri baÅŸarÄ±sÄ±z (devam): %s", task_id, _e)
 
         for deneme in range(max_retry + 1):
             try:
@@ -3425,7 +3429,7 @@ class ConversationLoop:
             except KeyboardInterrupt:
                 raise
             except Exception as e:
-                # Circuit breaker: ardışık hata sayacını artır
+                # Circuit breaker: ardÄ±ÅŸÄ±k hata sayacÄ±nÄ± artÄ±r
                 self._cb_art_arda_hata += 1
                 self._cb_son_hata_zamani = time.time()
                 if self._cb_art_arda_hata >= CIRCUIT_BREAKER_MAX_HATA:
@@ -3437,7 +3441,7 @@ class ConversationLoop:
                         CIRCUIT_BREAKER_MAX_HATA,
                     )
                 sinif = self._error_classify(e, task_id)
-                # Hook: hata olayı
+                # Hook: hata olayÄ±
                 if _HOOK_AKTIF and _hata_tetikle is not None:
                     try:
                         _hata_tetikle(
@@ -3486,11 +3490,11 @@ class ConversationLoop:
                             continue  # yeni provider ile tekrar dene
                     return None
 
-                # 'retry' veya 'compress' — bekle ve tekrar dene
+                # 'retry' veya 'compress' â€” bekle ve tekrar dene
                 if sinif == "compress":
                     # Context sikistirma iste: mesajlari yariya indir
                     log.warning(
-                        "[%s] Context compression gerekiyor — mesajlar yarilaniyor",
+                        "[%s] Context compression gerekiyor â€” mesajlar yarilaniyor",
                         task_id,
                     )
                     if len(api_mesajlari) > 4:
@@ -3535,7 +3539,7 @@ class ConversationLoop:
             task_id: Log icin task ID.
 
         Returns:
-            (yeni_tip, yeni_provider_adi) — bulunamazsa (mevcut_tip, "?").
+            (yeni_tip, yeni_provider_adi) â€” bulunamazsa (mevcut_tip, "?").
         """
         if mevcut_index + 1 < len(fallback_providerlar):
             yeni_tip, yeni_ad = fallback_providerlar[mevcut_index + 1]
@@ -3550,9 +3554,9 @@ class ConversationLoop:
             return yeni_tip, yeni_ad
         return mevcut_tip, "?"
 
-    # ══════════════════════════════════════════════════════════════════
-    # SESSION CONTEXT INJECTION — onceki session ozetleri
-    # ══════════════════════════════════════════════════════════════════
+    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    # SESSION CONTEXT INJECTION â€” onceki session ozetleri
+    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
     def _session_context_injection(
         self,
@@ -3628,9 +3632,9 @@ class ConversationLoop:
         )
         return baglam_metni
 
-    # ══════════════════════════════════════════════════════════════════
+    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     # SOUL.md + AGENTS.md ENJEKSIYONU (ReYMeN stili)
-    # ══════════════════════════════════════════════════════════════════
+    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
     def _soul_bilgisi_al(self) -> str:
         """SOUL.md icerigini oku, kimlik + kural + platform bilgisi olarak don.
@@ -3640,18 +3644,16 @@ class ConversationLoop:
         """
         try:
             proje_kok = Path(__file__).parent.parent.parent
+            localappdata = Path(os.environ.get("LOCALAPPDATA", os.path.expanduser("~/.hermes")))
+            hermes_profiles = localappdata / "hermes" / "profiles"
             aday_yollar = [
                 proje_kok / "SOUL.md",
                 proje_kok / "SOUL" / "SOUL.md",
                 proje_kok / ".ReYMeN" / "SOUL.md",
-                # ReYMeN profili SOUL.md (bağımsız modda erişim)
-                Path(os.path.expanduser("~"))
-                / "AppData"
-                / "Local"
-                / "hermes"
-                / "profiles"
-                / "reymen"
-                / "SOUL.md",
+                # Hermes profilleri (aktif SOUL.md'ler burada)
+                hermes_profiles / "default" / "SOUL.md",
+                hermes_profiles / "reymen" / "SOUL.md",
+                hermes_profiles / "kiral38" / "SOUL.md",
                 Path(sys.path[0]) / "SOUL.md" if sys.path[0] else None,
             ]
             for aday in aday_yollar:
@@ -3661,7 +3663,7 @@ class ConversationLoop:
                 if yol.exists():
                     icerik = _cache_dosya_oku(yol, max_len=4000)
                     if icerik:
-                        return f"\n[SOUL.md — Kimlik & Kurallar]\n{icerik}\n"
+                        return f"\n[SOUL.md â€” Kimlik & Kurallar]\n{icerik}\n"
             return ""
         except Exception as _e:
             __import__("logging").getLogger(__name__).warning(
@@ -3684,7 +3686,7 @@ class ConversationLoop:
                 Path(os.path.expanduser("~"))
                 / "AppData"
                 / "Local"
-                / "hermes"
+                / "reymen"
                 / "profiles"
                 / "reymen"
                 / "AGENTS.md",
@@ -3697,7 +3699,7 @@ class ConversationLoop:
                 if yol.exists():
                     icerik = _cache_dosya_oku(yol, max_len=2000)
                     if icerik:
-                        return f"\n[AGENTS.md — Entry Points & Mimari]\n{icerik}\n"
+                        return f"\n[AGENTS.md â€” Entry Points & Mimari]\n{icerik}\n"
             return ""
         except Exception as _e:
             __import__("logging").getLogger(__name__).warning(
@@ -3705,9 +3707,9 @@ class ConversationLoop:
             )
         return ""
 
-    # ══════════════════════════════════════════════════════════════════
+    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     # SKILL TARAMA
-    # ══════════════════════════════════════════════════════════════════
+    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
     def _skill_tara(self, query: str, maks: int = 3) -> str:
         """Skills/ icinde SKILL.md dosyalarinda query ara, eslesenleri don.
@@ -3738,9 +3740,9 @@ class ConversationLoop:
         except Exception:
             return ""
 
-    # ══════════════════════════════════════════════════════════════════
+    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     # TOOL ROUTING
-    # ══════════════════════════════════════════════════════════════════
+    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
     def _tool_routing(self, query: str) -> str:
         """Sorgu tipini siniflandir: selam/soru/web/komut/kod/genel."""
@@ -3777,9 +3779,9 @@ class ConversationLoop:
             return "kod"
         return "genel"
 
-    # ══════════════════════════════════════════════════════════════════
+    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     # ALT AJAN
-    # ══════════════════════════════════════════════════════════════════
+    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
     def _alt_ajan(self, gorev: str, timeout: int = 30) -> str:
         """Basit alt ajan: ayri Python prosesinde gorev calistir."""
@@ -3796,9 +3798,9 @@ class ConversationLoop:
         except Exception as e:
             return f"HATA: {e}"
 
-    # ══════════════════════════════════════════════════════════════════
+    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     # FRAMEWORK ADAPTOR (LangGraph / CrewAI / AutoGen)
-    # ══════════════════════════════════════════════════════════════════
+    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
     def _framework_calistir(self, framework: str, **kwargs) -> Dict[str, Any]:
         """Framework adaptorunu kullanarak islem yap.
@@ -3847,7 +3849,7 @@ class ConversationLoop:
         return {"langgraph": False, "crewai": False, "autogen": False}
 
 
-# ── CLI girdi noktasi ─────────────────────────────────────────────────
+# â”€â”€ CLI girdi noktasi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def run(**kwargs: Any) -> str:
@@ -3871,7 +3873,7 @@ def run(**kwargs: Any) -> str:
         )
 
 
-# ── Motor entegrasyonu ────────────────────────────────────────────────────────
+# â”€â”€ Motor entegrasyonu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def motor_kaydet(motor) -> None:
     """ConversationLoop'u motor'a tool olarak kaydet."""
     try:

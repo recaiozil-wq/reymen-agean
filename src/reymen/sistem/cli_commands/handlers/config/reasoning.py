@@ -1,12 +1,12 @@
-"""_handle_reasoning_command handler."""
+﻿"""_handle_reasoning_command handler."""
 
-from src.reymen.sistem.cli_stream import save_config_value
-from src.reymen.sistem.cli_display import _cprint, _ACCENT, _RST, _DIM
-from src.reymen.sistem.cli_commands.base import _parse_reasoning_config
+from reymen.sistem.cli_stream import save_config_value
+from reymen.sistem.cli_display import _cprint, _ACCENT, _RST, _DIM
+from reymen.sistem.cli_commands.base import _parse_reasoning_config
 
 
 def _handle_reasoning_command(cli, cmd: str):
-    """Handle /reasoning — manage effort level and display toggle.
+    """Handle /reasoning â€” manage effort level and display toggle.
 
     Usage:
         /reasoning              Show current effort level and display state
@@ -25,7 +25,7 @@ def _handle_reasoning_command(cli, cmd: str):
             level = "none (disabled)"
         else:
             level = rc.get("effort", "medium")
-        display_state = "on ✓" if cli.show_reasoning else "off"
+        display_state = "on âœ“" if cli.show_reasoning else "off"
         _cprint(f"  {_ACCENT}Reasoning effort:  {level}{_RST}")
         _cprint(f"  {_ACCENT}Reasoning display: {display_state}{_RST}")
         _cprint(
@@ -41,7 +41,7 @@ def _handle_reasoning_command(cli, cmd: str):
         if cli.agent:
             cli.agent.reasoning_callback = cli._current_reasoning_callback()
         save_config_value("display.show_reasoning", True)
-        _cprint(f"  {_ACCENT}✓ Reasoning display: ON (saved){_RST}")
+        _cprint(f"  {_ACCENT}âœ“ Reasoning display: ON (saved){_RST}")
         _cprint(
             f"  {_DIM}  Model thinking will be shown during and after each response.{_RST}"
         )
@@ -51,7 +51,7 @@ def _handle_reasoning_command(cli, cmd: str):
         if cli.agent:
             cli.agent.reasoning_callback = cli._current_reasoning_callback()
         save_config_value("display.show_reasoning", False)
-        _cprint(f"  {_ACCENT}✓ Reasoning display: OFF (saved){_RST}")
+        _cprint(f"  {_ACCENT}âœ“ Reasoning display: OFF (saved){_RST}")
         return
 
     # Effort level change
@@ -66,6 +66,6 @@ def _handle_reasoning_command(cli, cmd: str):
     cli.agent = None  # Force agent re-init with new reasoning config
 
     if save_config_value("agent.reasoning_effort", arg):
-        _cprint(f"  {_ACCENT}✓ Reasoning effort set to '{arg}' (saved to config){_RST}")
+        _cprint(f"  {_ACCENT}âœ“ Reasoning effort set to '{arg}' (saved to config){_RST}")
     else:
-        _cprint(f"  {_ACCENT}✓ Reasoning effort set to '{arg}' (session only){_RST}")
+        _cprint(f"  {_ACCENT}âœ“ Reasoning effort set to '{arg}' (session only){_RST}")

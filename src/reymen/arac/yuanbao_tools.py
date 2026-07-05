@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
-"""yuanbao_tools.py — Tencent Yuanbao (元宝) Araçları.
+﻿# -*- coding: utf-8 -*-
+"""yuanbao_tools.py â€” Tencent Yuanbao (å…ƒå®) AraÃ§larÄ±.
 
-Tencent Yuanbao AI asistanı API entegrasyonu.
-Hunyuan modelini destekler; Çince NLP görevleri için idealdir.
+Tencent Yuanbao AI asistanÄ± API entegrasyonu.
+Hunyuan modelini destekler; Ã‡ince NLP gÃ¶revleri iÃ§in idealdir.
 ENV: YUANBAO_APP_ID, YUANBAO_SECRET_KEY
 """
 
@@ -22,7 +22,7 @@ HUNYUAN_BASE = "https://hunyuan.tencentcloudapi.com"
 
 
 def _imza_uret(yuk: str, zaman_damgasi: int, nonce: str) -> str:
-    """Tencent Cloud API v3 HMAC-SHA256 imzası."""
+    """Tencent Cloud API v3 HMAC-SHA256 imzasÄ±."""
     if not YUANBAO_SECRET_KEY:
         return ""
     mesaj = f"{zaman_damgasi}\n{nonce}\n{yuk}"
@@ -34,9 +34,9 @@ def _imza_uret(yuk: str, zaman_damgasi: int, nonce: str) -> str:
 
 
 def _hunyuan_istek(eylem: str, govde: dict) -> dict:
-    """Hunyuan API'ye istek gönder."""
+    """Hunyuan API'ye istek gÃ¶nder."""
     if not YUANBAO_APP_ID or not YUANBAO_SECRET_KEY:
-        return {"error": "YUANBAO_APP_ID veya YUANBAO_SECRET_KEY ayarlanmamış."}
+        return {"error": "YUANBAO_APP_ID veya YUANBAO_SECRET_KEY ayarlanmamÄ±ÅŸ."}
 
     zaman_damgasi = int(time.time())
     nonce = str(zaman_damgasi)
@@ -70,18 +70,18 @@ def _hunyuan_istek(eylem: str, govde: dict) -> dict:
 
 def hunyuan_sohbet(
     mesaj: str,
-    sistem: str = "Sen yardımcı bir AI asistanısın.",
+    sistem: str = "Sen yardÄ±mcÄ± bir AI asistanÄ±sÄ±n.",
     model: str = "hunyuan-lite",
 ) -> str:
     """Hunyuan modeline soru sor.
 
     Args:
-        mesaj:  Kullanıcı mesajı
+        mesaj:  KullanÄ±cÄ± mesajÄ±
         sistem: Sistem promptu
         model:  hunyuan-lite | hunyuan-standard | hunyuan-pro
 
     Returns:
-        Yanıt metni
+        YanÄ±t metni
     """
     yanit = _hunyuan_istek(
         "ChatCompletions",
@@ -99,44 +99,44 @@ def hunyuan_sohbet(
 
     secimler = yanit.get("Choices", [])
     if secimler:
-        return secimler[0].get("Message", {}).get("Content", "[Yuanbao]: Boş yanıt")
+        return secimler[0].get("Message", {}).get("Content", "[Yuanbao]: BoÅŸ yanÄ±t")
     return f"[Yuanbao]: {yanit}"
 
 
 def metin_gonullu(metin: str) -> str:
-    """Metin duygu analizi (Çince NLP iş akışları için).
+    """Metin duygu analizi (Ã‡ince NLP iÅŸ akÄ±ÅŸlarÄ± iÃ§in).
 
     Args:
         metin: Analiz edilecek metin
 
     Returns:
-        Duygu etiketi ve güven skoru
+        Duygu etiketi ve gÃ¼ven skoru
     """
     yanit = hunyuan_sohbet(
-        f"Bu metnin duygusunu tek kelimeyle belirt (olumlu/olumsuz/nötr) ve açıkla:\n{metin}",
-        sistem="Sen metin analizi uzmanısın. Kısa ve net cevap ver.",
+        f"Bu metnin duygusunu tek kelimeyle belirt (olumlu/olumsuz/nÃ¶tr) ve aÃ§Ä±kla:\n{metin}",
+        sistem="Sen metin analizi uzmanÄ±sÄ±n. KÄ±sa ve net cevap ver.",
     )
     return yanit
 
 
-def ceviri(metin: str, hedef_dil: str = "Türkçe") -> str:
-    """Hunyuan ile metin çeviri.
+def ceviri(metin: str, hedef_dil: str = "TÃ¼rkÃ§e") -> str:
+    """Hunyuan ile metin Ã§eviri.
 
     Args:
-        metin:     Çevrilecek metin
-        hedef_dil: Hedef dil adı (Türkçe, İngilizce, Çince, vb.)
+        metin:     Ã‡evrilecek metin
+        hedef_dil: Hedef dil adÄ± (TÃ¼rkÃ§e, Ä°ngilizce, Ã‡ince, vb.)
 
     Returns:
-        Çeviri metni
+        Ã‡eviri metni
     """
     return hunyuan_sohbet(
-        f"Şunu {hedef_dil}'ye çevir, sadece çeviriyi ver:\n{metin}",
-        sistem="Sen profesyonel bir çevirmensin.",
+        f"Åunu {hedef_dil}'ye Ã§evir, sadece Ã§eviriyi ver:\n{metin}",
+        sistem="Sen profesyonel bir Ã§evirmensin.",
     )
 
 
 def motor_kaydet(motor):
-    """Yuanbao araçlarını motora kaydet."""
+    """Yuanbao araÃ§larÄ±nÄ± motora kaydet."""
     if not hasattr(motor, "_plugin_arac_kaydet"):
         return
 
@@ -147,8 +147,8 @@ def motor_kaydet(motor):
     )
     motor._plugin_arac_kaydet(
         "YUANBAO_CEVIRI",
-        lambda metin, hedef_dil="Türkçe": ceviri(metin, hedef_dil),
-        "Tencent Hunyuan ile metin çevir",
+        lambda metin, hedef_dil="TÃ¼rkÃ§e": ceviri(metin, hedef_dil),
+        "Tencent Hunyuan ile metin Ã§evir",
     )
     motor._plugin_arac_kaydet(
         "YUANBAO_DUYGU",
@@ -158,6 +158,6 @@ def motor_kaydet(motor):
 
 
 if __name__ == "__main__":
-    print(f"App ID: {'✓' if YUANBAO_APP_ID else '✗'}")
+    print(f"App ID: {'âœ“' if YUANBAO_APP_ID else 'âœ—'}")
     if YUANBAO_APP_ID and YUANBAO_SECRET_KEY:
-        print(hunyuan_sohbet("Merhaba, nasılsın?"))
+        print(hunyuan_sohbet("Merhaba, nasÄ±lsÄ±n?"))

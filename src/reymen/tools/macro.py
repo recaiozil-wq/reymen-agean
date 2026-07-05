@@ -1,4 +1,4 @@
-"""ReYMeN tools.macro shim — Hermes macro fonksiyonlarını yönlendirir."""
+﻿"""ReYMeN tools.macro shim â€” ReYMeN macro fonksiyonlarÄ±nÄ± yÃ¶nlendirir."""
 
 from __future__ import annotations
 
@@ -8,6 +8,6 @@ logger = logging.getLogger(__name__)
 
 
 def oynat(makro_adi: str, **kwargs) -> str:
-    """Hermes macro.oynat — ReYMeN'de makro çalıştırma."""
+    """ReYMeN macro.oynat â€” ReYMeN'de makro Ã§alÄ±ÅŸtÄ±rma."""
     logger.info("Macro '%s' called with %d args (ReYMeN stub)", makro_adi, len(kwargs))
-    return f"[MAKRO] {makro_adi} çalıştırıldı (stub)"
+    return f"[MAKRO] {makro_adi} Ã§alÄ±ÅŸtÄ±rÄ±ldÄ± (stub)"

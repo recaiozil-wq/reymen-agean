@@ -1,4 +1,4 @@
-"""reymen_launcher.py'den _FINANS sozlugunu ve kullanimini kaldir."""
+﻿"""reymen_launcher.py'den _FINANS sozlugunu ve kullanimini kaldir."""
 
 import re
 
@@ -17,8 +17,8 @@ else:
     print("_FINANS bulunamadi")
 
 # 2. _repl icindeki _FINANS kullanimini kaldir
-# "# ── OnceHafiza'dan + _FINANS" ile baslayip "cevap, kaynak = _sor"den onceki satira kadar
-pattern_ref = r"# ── OnceHafiza.*?\n(?:.*?\n)*?        cevap, kaynak = _sor\(girdi\)"
+# "# â”€â”€ OnceHafiza'dan + _FINANS" ile baslayip "cevap, kaynak = _sor"den onceki satira kadar
+pattern_ref = r"# â”€â”€ OnceHafiza.*?\n(?:.*?\n)*?        cevap, kaynak = _sor\(girdi\)"
 src2 = re.sub(
     pattern_ref, "        cevap, kaynak = _sor(girdi)", src, count=1, flags=re.DOTALL
 )

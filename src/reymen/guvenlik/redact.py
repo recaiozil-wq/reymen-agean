@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""redact.py — PII temizleme fonksiyonlari.
+﻿# -*- coding: utf-8 -*-
+"""redact.py â€” PII temizleme fonksiyonlari.
 
 Email, telefon, kredi karti, API key, TC kimlik numarasi gibi
 hassas bilgileri regex ile bulur ve maskeler.

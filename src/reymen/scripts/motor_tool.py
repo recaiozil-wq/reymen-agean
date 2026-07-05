@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-motor_tool.py — Bot'lar icin motor arayüzü.
+motor_tool.py â€” Bot'lar icin motor arayÃ¼zÃ¼.
 
-Bu modül, Telegram/Discord bot'lari ve diger platform gateway'leri icin
+Bu modÃ¼l, Telegram/Discord bot'lari ve diger platform gateway'leri icin
 ReYMeN motor'una erisim saglar. Dogrudan motor.py'yi import etmek yerine
 buradan erisilir (bagimliliklari soyutlar).
 
@@ -29,7 +29,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 logger = logging.getLogger(__name__)
 
-# ── Motor Erisimi ─────────────────────────────────────────────────────────
+# â”€â”€ Motor Erisimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _MOTOR_INSTANCE = None
 
@@ -38,7 +38,7 @@ def motor_erisimi_al() -> Any:
     """Motor singleton'ina erisir.
 
     Motor, tool registry, plugin manager ve diger alt bilesenleri
-    yukler. Her cagrıda yeniden yukleme yapmaz (singleton).
+    yukler. Her cagrÄ±da yeniden yukleme yapmaz (singleton).
 
     Returns:
         Motor instance'i veya None (yuklenemezse)
@@ -219,7 +219,7 @@ def motor_kaydet(motor) -> None:
         motor._plugin_arac_kaydet(
             "MOTOR_CALISTIR",
             _motor_calistir_araci,
-            "MOTOR_CALISTIR(hedef, baglam) — Motor uzerinden bir hedefi "
+            "MOTOR_CALISTIR(hedef, baglam) â€” Motor uzerinden bir hedefi "
             "calistirir. Parametreler: hedef=hedef_metni (zorunlu), "
             "baglam=json_baglam (opsiyonel). "
             "Ornek: MOTOR_CALISTIR(hedef='Dosya olustur')",
@@ -228,14 +228,14 @@ def motor_kaydet(motor) -> None:
         motor._plugin_arac_kaydet(
             "MOTOR_ARAC_LISTELE",
             _motor_arac_listele_araci,
-            "MOTOR_ARAC_LISTELE() — Motor'a kayitli tum araclari listeler. "
+            "MOTOR_ARAC_LISTELE() â€” Motor'a kayitli tum araclari listeler. "
             "Ornek: MOTOR_ARAC_LISTELE()",
         )
 
         motor._plugin_arac_kaydet(
             "MOTOR_DURUM",
             _motor_durum_araci,
-            "MOTOR_DURUM() — Motor durum bilgisini gosterir: "
+            "MOTOR_DURUM() â€” Motor durum bilgisini gosterir: "
             "arac sayisi, motor tipi, calisma durumu. "
             "Ornek: MOTOR_DURUM()",
         )
@@ -249,7 +249,7 @@ def motor_kaydet(motor) -> None:
 
 
 def _motor_calistir_araci(**kw) -> str:
-    """MOTOR_CALISTIR aracı: motor uzerinden hedef calistir."""
+    """MOTOR_CALISTIR aracÄ±: motor uzerinden hedef calistir."""
     args = kw.get("args", [])
     hedef = args[0] if args else kw.get("hedef", "")
     baglam_str = args[1] if len(args) > 1 else kw.get("baglam", "{}")
@@ -280,7 +280,7 @@ def _motor_calistir_araci(**kw) -> str:
 
 
 def _motor_arac_listele_araci(**kw) -> str:
-    """MOTOR_ARAC_LISTELE aracı: motor arac listesi."""
+    """MOTOR_ARAC_LISTELE aracÄ±: motor arac listesi."""
     _ = kw
     araclar = motor_araclari_listele()
     if not araclar:
@@ -299,7 +299,7 @@ def _motor_arac_listele_araci(**kw) -> str:
 
 
 def _motor_durum_araci(**kw) -> str:
-    """MOTOR_DURUM aracı: motor durumu."""
+    """MOTOR_DURUM aracÄ±: motor durumu."""
     _ = kw
     durum = motor_durum()
     return (
@@ -310,7 +310,7 @@ def _motor_durum_araci(**kw) -> str:
     )
 
 
-# ── CLI Kullanimi ────────────────────────────────────────────────────────
+# â”€â”€ CLI Kullanimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def main():
@@ -321,16 +321,16 @@ def main():
     )
 
     hedef = " ".join(sys.argv[1:]) if len(sys.argv) > 1 else "test"
-    print(f"\n🔧 MotorTool: {hedef[:60]}")
+    print(f"\nğŸ”§ MotorTool: {hedef[:60]}")
     print("=" * 50)
 
     sonuc = motor_calistir(hedef)
-    print(f"\n✅ Basarili: {sonuc['basarili']}")
-    print(f"⏱️  Sure: {sonuc['sure']:.1f}s")
-    print(f"\n📋 Sonuc:\n{str(sonuc['sonuc'])[:1000]}")
+    print(f"\nâœ… Basarili: {sonuc['basarili']}")
+    print(f"â±ï¸  Sure: {sonuc['sure']:.1f}s")
+    print(f"\nğŸ“‹ Sonuc:\n{str(sonuc['sonuc'])[:1000]}")
 
     if sonuc.get("hata"):
-        print(f"\n❌ Hata:\n{sonuc['hata'][:500]}")
+        print(f"\nâŒ Hata:\n{sonuc['hata'][:500]}")
 
 
 if __name__ == "__main__":

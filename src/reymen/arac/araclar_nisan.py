@@ -1,10 +1,10 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-araclar_nisan.py — 3 asamali hiyerarsik ekran tarayici.
+araclar_nisan.py â€” 3 asamali hiyerarsik ekran tarayici.
 
-Asama 1: DOM (Selenium) — find_element ile lokator bul
-Asama 2: Gorsel Sablon (OpenCV) — .ReYMeN/nisanlar/ dosyalari ile eslesme
-Asama 3: Metin OCR (pytesseract) — ekranda yazi ara
+Asama 1: DOM (Selenium) â€” find_element ile lokator bul
+Asama 2: Gorsel Sablon (OpenCV) â€” .ReYMeN/nisanlar/ dosyalari ile eslesme
+Asama 3: Metin OCR (pytesseract) â€” ekranda yazi ara
 
 Kullanim:
     bulucu = NisanBulucu()
@@ -64,7 +64,7 @@ _GUVEN_ESIGI = 0.75  # %75
 class NisanBulucu:
     """3 asamali hiyerarsik ekran hedef bulucu.
 
-    Asama 1: DOM (Selenium WebDriver) — find_element
+    Asama 1: DOM (Selenium WebDriver) â€” find_element
     Asama 2: Gorsel sablon (OpenCV template matching)
     Asama 3: Metin OCR (pytesseract)
     """
@@ -74,13 +74,13 @@ class NisanBulucu:
         "giris_buton": [
             "//button[@type='submit']",
             "//input[@type='submit']",
-            "//button[contains(text(), 'Giriş')]",
+            "//button[contains(text(), 'GiriÅŸ')]",
             "//button[contains(text(), 'Login')]",
-            "//a[contains(text(), 'Giriş')]",
+            "//a[contains(text(), 'GiriÅŸ')]",
             "//a[contains(text(), 'Login')]",
         ],
         "kayit_buton": [
-            "//a[contains(text(), 'Kayıt')]",
+            "//a[contains(text(), 'KayÄ±t')]",
             "//a[contains(text(), 'Register')]",
             "//button[contains(text(), 'Kaydol')]",
             "//button[contains(text(), 'Register')]",
@@ -132,7 +132,7 @@ class NisanBulucu:
         self.guven_esigi = guven_esigi
         NISAN_DIZINI.mkdir(parents=True, exist_ok=True)
 
-    # ── Ana API ────────────────────────────────────────────────────────
+    # â”€â”€ Ana API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def bul(
         self, hedef: str, driver: Any = None, metin_alternatif: str = ""
@@ -177,7 +177,7 @@ class NisanBulucu:
             "hata": f"Hedef bulunamadi: {hedef}",
         }
 
-    # ── Asama 1: DOM ──────────────────────────────────────────────────
+    # â”€â”€ Asama 1: DOM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _dom_ara(self, driver: Any, seciciler: List[str]) -> Optional[Dict[str, Any]]:
         """Selenium DOM'da secicileri dene, ilk bulunanin konumunu don."""
@@ -206,7 +206,7 @@ class NisanBulucu:
             logger.debug("[Nisan] DOM arama hatasi: %s", e)
         return None
 
-    # ── Asama 2: Gorsel sablon (OpenCV) ───────────────────────────────
+    # â”€â”€ Asama 2: Gorsel sablon (OpenCV) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _sablon_ara(self, hedef: str) -> Optional[Dict[str, Any]]:
         """Ekran goruntusunu al, .ReYMeN/nisanlar/ dosyasiyla karsilastir."""
@@ -274,7 +274,7 @@ class NisanBulucu:
                 return f
         return None
 
-    # ── Asama 3: Metin OCR ────────────────────────────────────────────
+    # â”€â”€ Asama 3: Metin OCR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _ocr_ara(self, aranan: str) -> Optional[Dict[str, Any]]:
         """Ekrani OCR ile tara, aranan metni bul, konumunu don."""
@@ -315,7 +315,7 @@ class NisanBulucu:
         return None
 
 
-# ── motor.py entegrasyonu icin yardimci ──────────────────────────────────────
+# â”€â”€ motor.py entegrasyonu icin yardimci â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _nisan_bulucu: Optional[NisanBulucu] = None
 
@@ -330,7 +330,7 @@ def nisan_bul(
     return _nisan_bulucu.bul(hedef, driver=driver, metin_alternatif=metin_alternatif)
 
 
-# ── Hizli test ─────────────────────────────────────────────────────────────
+# â”€â”€ Hizli test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
@@ -348,4 +348,4 @@ if __name__ == "__main__":
     sonuc = bulucu.bul("giris_buton")
     print(f"\nTest sonucu: {sonuc}")
 
-    print("\n✓ Test tamam.")
+    print("\nâœ“ Test tamam.")

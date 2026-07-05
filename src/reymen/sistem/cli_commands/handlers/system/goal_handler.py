@@ -1,6 +1,6 @@
-"""_handle_goal_command handler."""
+﻿"""_handle_goal_command handler."""
 
-from src.reymen.sistem.cli_display import _cprint, _DIM, _RST
+from reymen.sistem.cli_display import _cprint, _DIM, _RST
 import logging
 
 logger = logging.getLogger(__name__)
@@ -20,7 +20,7 @@ def _handle_goal_command(cli, cmd: str) -> None:
 
     lower = arg.lower()
 
-    # Bare /goal or /goal status → show current state
+    # Bare /goal or /goal status â†’ show current state
     if not arg or lower == "status":
         _cprint(f"  {mgr.status_line()}")
         return
@@ -30,7 +30,7 @@ def _handle_goal_command(cli, cmd: str) -> None:
         if state is None:
             _cprint(f"  {_DIM}No goal set.{_RST}")
         else:
-            _cprint(f"  ⏸ Goal paused: {state.goal}")
+            _cprint(f"  â¸ Goal paused: {state.goal}")
         return
 
     if lower == "resume":
@@ -38,7 +38,7 @@ def _handle_goal_command(cli, cmd: str) -> None:
         if state is None:
             _cprint(f"  {_DIM}No goal to resume.{_RST}")
         else:
-            _cprint(f"  ▶ Goal resumed: {state.goal}")
+            _cprint(f"  â–¶ Goal resumed: {state.goal}")
             _cprint(
                 f"  {_DIM}Send any message (or press Enter on an empty prompt "
                 f"is a no-op; type 'continue' to kick it off).{_RST}"
@@ -49,7 +49,7 @@ def _handle_goal_command(cli, cmd: str) -> None:
         had = mgr.has_goal()
         mgr.clear()
         if had:
-            _cprint("  ✓ Goal cleared.")
+            _cprint("  âœ“ Goal cleared.")
         else:
             _cprint(f"  {_DIM}No active goal.{_RST}")
         return
@@ -61,7 +61,7 @@ def _handle_goal_command(cli, cmd: str) -> None:
         _cprint(f"  Invalid goal: {exc}")
         return
 
-    _cprint(f"  ⊙ Goal set ({state.max_turns}-turn budget): {state.goal}")
+    _cprint(f"  âŠ™ Goal set ({state.max_turns}-turn budget): {state.goal}")
     _cprint(
         f"  {_DIM}After each turn, a judge model will check if the goal is done. "
         f"ReYMeN keeps working until it is, you pause/clear it, or the budget is "

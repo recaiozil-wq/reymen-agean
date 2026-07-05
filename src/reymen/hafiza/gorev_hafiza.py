@@ -1,12 +1,12 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-gorev_hafiza.py — Görev Sonrası Hafıza Genişletme Mekanizması.
+gorev_hafiza.py â€” GÃ¶rev SonrasÄ± HafÄ±za GeniÅŸletme MekanizmasÄ±.
 
-Her görev tamamlandığında conversation_loop.py tarafından çağrılır:
-  1. Görev özetini ReYMeN hafızasına (SQLite+FTS5) kaydeder
-  2. .ReYMeN/memories/ altına session log'u yazar
-  3. SOUL.md'ye önemli kazanımları ekler
-  4. Geçmiş konuşmaları ReYMeN session DB'den import eder
+Her gÃ¶rev tamamlandÄ±ÄŸÄ±nda conversation_loop.py tarafÄ±ndan Ã§aÄŸrÄ±lÄ±r:
+  1. GÃ¶rev Ã¶zetini ReYMeN hafÄ±zasÄ±na (SQLite+FTS5) kaydeder
+  2. .ReYMeN/memories/ altÄ±na session log'u yazar
+  3. SOUL.md'ye Ã¶nemli kazanÄ±mlarÄ± ekler
+  4. GeÃ§miÅŸ konuÅŸmalarÄ± ReYMeN session DB'den import eder
 
 Entegrasyon:
     from gorev_hafiza import gorev_sonrasi_hafiza
@@ -27,7 +27,7 @@ from pathlib import Path
 
 log = logging.getLogger(__name__)
 
-# ── Sabitler ──────────────────────────────────────────────────────────────
+# â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 ROOT = Path(__file__).parent.resolve()
 REYMEN_MEMORIES = ROOT / ".ReYMeN" / "memories"
@@ -35,12 +35,12 @@ REYMEN_SKILLS = ROOT / ".ReYMeN" / "skills"
 SOUL_PATH = ROOT / ".ReYMeN" / "SOUL.md"
 HAFIZA_DB = ROOT / "merkez_db" / "hafiza.db"
 
-# Dedup: daha önce kaydedilmiş içerik hash'leri (session boyunca)
+# Dedup: daha Ã¶nce kaydedilmiÅŸ iÃ§erik hash'leri (session boyunca)
 _dedup_hash_set: set = set()
 _dedup_dosya_set: set = set()
 _dedup_kilit = threading.Lock()
 
-# Hafıza genişletme modülü (opsiyonel)
+# HafÄ±za geniÅŸletme modÃ¼lÃ¼ (opsiyonel)
 try:
     from reymen.hafiza.hafiza_genislet import hafiza as _hafiza
 
@@ -49,7 +49,7 @@ except ImportError:
     _hafiza = None
     _HAFIZA_AKTIF = False
 
-# Session DB (ReYMeN'ten import için opsiyonel)
+# Session DB (ReYMeN'ten import iÃ§in opsiyonel)
 try:
     from reymen.hafiza.session_db import AdvancedSessionStorage as _SessionStorage
 
@@ -59,20 +59,20 @@ except ImportError:
     _SESSION_IMPORT_AKTIF = False
 
 
-# ══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # DEDUP YARDIMCI
-# ══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _dedup_kontrol(kayit: dict, tur: str = "icerik") -> bool:
-    """Aynı içerik daha önce kaydedilmiş mi kontrol et.
+    """AynÄ± iÃ§erik daha Ã¶nce kaydedilmiÅŸ mi kontrol et.
 
     Args:
-        kayit: Görev kaydı dict'i
-        tur: Kontrol türü ("icerik" = ozet hash'i, "dosya" = task_id + hedef)
+        kayit: GÃ¶rev kaydÄ± dict'i
+        tur: Kontrol tÃ¼rÃ¼ ("icerik" = ozet hash'i, "dosya" = task_id + hedef)
 
     Returns:
-        bool: True ise zaten kaydedilmiş (tekrar kaydetme)
+        bool: True ise zaten kaydedilmiÅŸ (tekrar kaydetme)
     """
     with _dedup_kilit:
         try:
@@ -99,9 +99,9 @@ def _dedup_kontrol(kayit: dict, tur: str = "icerik") -> bool:
             return False
 
 
-# ══════════════════════════════════════════════════════════════════════════
-# GÖREV SONRASI HAFIZA GENİŞLETME
-# ══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# GÃ–REV SONRASI HAFIZA GENÄ°ÅLETME
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def gorev_sonrasi_hafiza(
@@ -112,20 +112,20 @@ def gorev_sonrasi_hafiza(
     ozet: Optional[str] = None,
     kategori: str = "",
 ) -> dict:
-    """Bir görevin tamamlanmasının ardından hafızayı genişlet.
+    """Bir gÃ¶revin tamamlanmasÄ±nÄ±n ardÄ±ndan hafÄ±zayÄ± geniÅŸlet.
 
-    conversation_loop.py'de run_conversation() sonunda çağrılır.
+    conversation_loop.py'de run_conversation() sonunda Ã§aÄŸrÄ±lÄ±r.
 
     Args:
-        task_id:    Görev ID'si
-        hedef:      Kullanıcının hedef metni
-        sonuc:      Görev sonucu dict'i (basarili, yanit, hata, sure, tur)
+        task_id:    GÃ¶rev ID'si
+        hedef:      KullanÄ±cÄ±nÄ±n hedef metni
+        sonuc:      GÃ¶rev sonucu dict'i (basarili, yanit, hata, sure, tur)
         session_id: Opsiyonel session ID (ReYMeN session)
-        ozet:       Opsiyonel özet metni (yoksa otomatik oluşturulur)
+        ozet:       Opsiyonel Ã¶zet metni (yoksa otomatik oluÅŸturulur)
         kategori:   "kali", "dron", "cad", "kali/network" vb. (opsiyonel)
 
     Returns:
-        dict: Kayıt sonucu (kaydedildi, dosya_yolu vb.)
+        dict: KayÄ±t sonucu (kaydedildi, dosya_yolu vb.)
     """
     baslama = time.time()
     kayit = {
@@ -139,36 +139,36 @@ def gorev_sonrasi_hafiza(
         "kategori": kategori[:100],
     }
 
-    # Hata varsa ekle (ama çok uzun olmasın)
+    # Hata varsa ekle (ama Ã§ok uzun olmasÄ±n)
     hata = sonuc.get("hata")
     if hata:
         kayit["hata"] = str(hata)[:300]
 
-    # Yanıt/çıktı varsa özetle
+    # YanÄ±t/Ã§Ä±ktÄ± varsa Ã¶zetle
     yanit = sonuc.get("yanit") or sonuc.get("sonuc") or ""
     if yanit:
         kayit["yanit_ozeti"] = str(yanit)[:300]
 
-    # Özet oluştur
+    # Ã–zet oluÅŸtur
     if not ozet:
         ozet = _ozet_olustur(kayit)
     kayit["ozet"] = ozet
 
-    # 1. ReYMeN hafızasına kaydet
+    # 1. ReYMeN hafÄ±zasÄ±na kaydet
     hafiza_sonuc = _hafizaya_kaydet(kayit)
 
-    # 2. .ReYMeN/memories/ altına session log'u
+    # 2. .ReYMeN/memories/ altÄ±na session log'u
     dosya_sonuc = _memories_dosyaya_yaz(kayit)
 
-    # 3. SOUL.md'ye önemli kazanım ekle (opsiyonel)
+    # 3. SOUL.md'ye Ã¶nemli kazanÄ±m ekle (opsiyonel)
     soul_sonuc = _soul_guncelle(kayit)
 
-    # 4. Beceri kristalleştir (sadece başarılı görevler)
+    # 4. Beceri kristalleÅŸtir (sadece baÅŸarÄ±lÄ± gÃ¶revler)
     beceri_sonuc = {"durum": "atlandi", "sebep": "Basarisiz gorev"}
     if kayit.get("basarili"):
         kullanilan_araclar = sonuc.get("kullanilan_araclar", [])
         beceri_sonuc = beceri_kristallestir(
-            gorev_adi=kayit.get("hedef", "Belirtilmemiş Görev")[:60],
+            gorev_adi=kayit.get("hedef", "BelirtilmemiÅŸ GÃ¶rev")[:60],
             ozet=ozet[:300],
             kullanilan_araclar=kullanilan_araclar,
             ek_bilgiler={
@@ -190,8 +190,8 @@ def gorev_sonrasi_hafiza(
 
 
 def _ozet_olustur(kayit: dict) -> str:
-    """Görev kaydından okunabilir özet oluştur."""
-    durum = "✅ Başarılı" if kayit.get("basarili") else "❌ Hata"
+    """GÃ¶rev kaydÄ±ndan okunabilir Ã¶zet oluÅŸtur."""
+    durum = "âœ… BaÅŸarÄ±lÄ±" if kayit.get("basarili") else "âŒ Hata"
     sure = kayit.get("sure_sn", 0)
     tur = kayit.get("tur_sayisi", 0)
     hedef = kayit.get("hedef", "")[:80]
@@ -199,7 +199,7 @@ def _ozet_olustur(kayit: dict) -> str:
 
     satirlar = [
         f"# {durum}: {hedef}",
-        f"- Süre: {sure:.1f}s, Tur: {tur}",
+        f"- SÃ¼re: {sure:.1f}s, Tur: {tur}",
     ]
     if hata:
         satirlar.append(f"- Hata: {hata[:200]}")
@@ -207,7 +207,7 @@ def _ozet_olustur(kayit: dict) -> str:
 
 
 def _guven_skoru_hesapla(basarili_sayisi: int, hata_sayisi: int) -> float:
-    """Güven skoru hesapla: basari/(basari+hata), bos=0.5."""
+    """GÃ¼ven skoru hesapla: basari/(basari+hata), bos=0.5."""
     toplam = basarili_sayisi + hata_sayisi
     if toplam == 0:
         return 0.5
@@ -215,7 +215,7 @@ def _guven_skoru_hesapla(basarili_sayisi: int, hata_sayisi: int) -> float:
 
 
 def _varsayilan_gecerlilik(baslangic_str: str = "") -> str:
-    """6 aylık varsayılan geçerlilik tarihi döndür."""
+    """6 aylÄ±k varsayÄ±lan geÃ§erlilik tarihi dÃ¶ndÃ¼r."""
     from datetime import timedelta
 
     baslangic = datetime.now()
@@ -230,18 +230,18 @@ def _varsayilan_gecerlilik(baslangic_str: str = "") -> str:
 
 
 def guncelle_son_kullanim(kayit_id: int, kategori: str = "", basarili_mi: bool = True):
-    """Kaydın son_kullanim ve guven_skoru metadata'sını güncelle.
+    """KaydÄ±n son_kullanim ve guven_skoru metadata'sÄ±nÄ± gÃ¼ncelle.
 
     Args:
-        kayit_id: Hafıza DB'deki kayıt ID'si
+        kayit_id: HafÄ±za DB'deki kayÄ±t ID'si
         kategori: Opsiyonel kategori
-        basarili_mi: Bu kullanım başarılı mı?
+        basarili_mi: Bu kullanÄ±m baÅŸarÄ±lÄ± mÄ±?
     """
     if not _HAFIZA_AKTIF or not _hafiza:
         return
 
     try:
-        # Mevcut metadata'yı çek
+        # Mevcut metadata'yÄ± Ã§ek
         c = _hafiza._conn.cursor()
         c.execute("SELECT metadata FROM kayitlar WHERE id=?", (kayit_id,))
         row = c.fetchone()
@@ -253,7 +253,7 @@ def guncelle_son_kullanim(kayit_id: int, kategori: str = "", basarili_mi: bool =
         # son_kullanim
         meta["son_kullanim"] = datetime.now().strftime("%Y-%m-%d %H:%M")
 
-        # kullanım_sayisi
+        # kullanÄ±m_sayisi
         meta["kullanim_sayisi"] = meta.get("kullanim_sayisi", 0) + 1
 
         # basari_sayisi / hata_sayisi
@@ -268,11 +268,11 @@ def guncelle_son_kullanim(kayit_id: int, kategori: str = "", basarili_mi: bool =
             meta.get("hata_sayisi", 0),
         )
 
-        # kategori (eğer verildiyse)
+        # kategori (eÄŸer verildiyse)
         if kategori:
             meta["kategori"] = kategori
 
-        # Güncelle
+        # GÃ¼ncelle
         _hafiza.kayit_guncelle(kayit_id, yeni_metadata=meta)
 
     except Exception as e:
@@ -280,25 +280,25 @@ def guncelle_son_kullanim(kayit_id: int, kategori: str = "", basarili_mi: bool =
 
 
 def _hafizaya_kaydet(kayit: dict) -> dict:
-    """ReYMeN SQLite hafızasına kaydet (FTS5 indexlenir). Dedup kontrollü."""
+    """ReYMeN SQLite hafÄ±zasÄ±na kaydet (FTS5 indexlenir). Dedup kontrollÃ¼."""
     if not _HAFIZA_AKTIF or not _hafiza:
         return {"durum": "pasif", "sebep": "hafiza_genislet modulu yok"}
 
     try:
-        # ── Dedup: aynı içerik zaten kaydedildiyse atla ──
+        # â”€â”€ Dedup: aynÄ± iÃ§erik zaten kaydedildiyse atla â”€â”€
         if _dedup_kontrol(kayit, tur="icerik"):
             return {
                 "durum": "atlandi",
-                "sebep": "Aynı içerik zaten kaydedildi (dedup)",
+                "sebep": "AynÄ± iÃ§erik zaten kaydedildi (dedup)",
                 "session_id": kayit.get("session_id"),
             }
 
         session_id = kayit.get("session_id") or f"gorev_{kayit['task_id']}"
 
-        # Session başlat
+        # Session baÅŸlat
         _hafiza.initialize(session_id, baslik=kayit.get("hedef", "")[:100])
 
-        # Görev kaydını konuşma koleksiyonuna ekle
+        # GÃ¶rev kaydÄ±nÄ± konuÅŸma koleksiyonuna ekle
         _hafiza.kaydet(
             icerik=kayit["ozet"],
             koleksiyon="konusmalar",
@@ -321,7 +321,7 @@ def _hafizaya_kaydet(kayit: dict) -> dict:
             },
         )
 
-        # Hata varsa ayrı koleksiyon
+        # Hata varsa ayrÄ± koleksiyon
         hata = kayit.get("hata")
         if hata:
             _hafiza.kaydet(
@@ -331,7 +331,7 @@ def _hafizaya_kaydet(kayit: dict) -> dict:
                 metadata={"task_id": kayit["task_id"]},
             )
 
-        # Başarılı görevleri beceri koleksiyonuna
+        # BaÅŸarÄ±lÄ± gÃ¶revleri beceri koleksiyonuna
         if kayit.get("basarili"):
             _hafiza.kaydet(
                 icerik=kayit["ozet"],
@@ -341,7 +341,7 @@ def _hafizaya_kaydet(kayit: dict) -> dict:
                     "task_id": kayit["task_id"],
                     "tur": kayit.get("tur_sayisi", 0),
                     "sure": kayit.get("sure_sn", 0),
-                    "guven_skoru": 0.8,  # yeni beceri: yüksek güven
+                    "guven_skoru": 0.8,  # yeni beceri: yÃ¼ksek gÃ¼ven
                     "son_kullanim": datetime.now().strftime("%Y-%m-%d %H:%M"),
                     "kategori": kayit.get("kategori", ""),
                     "gecerlilik_tarihi": _varsayilan_gecerlilik(),
@@ -351,7 +351,7 @@ def _hafizaya_kaydet(kayit: dict) -> dict:
                 },
             )
 
-        # Session'ı bitir
+        # Session'Ä± bitir
         _hafiza.session_bitir(ozet=kayit["ozet"][:500])
 
         return {"durum": "kaydedildi", "session_id": session_id}
@@ -362,41 +362,41 @@ def _hafizaya_kaydet(kayit: dict) -> dict:
 
 
 def _memories_dosyaya_yaz(kayit: dict) -> dict:
-    """.ReYMeN/memories/ altına session log dosyası yaz. Dedup kontrollü."""
+    """.ReYMeN/memories/ altÄ±na session log dosyasÄ± yaz. Dedup kontrollÃ¼."""
     try:
         REYMEN_MEMORIES.mkdir(parents=True, exist_ok=True)
 
-        # ── Dedup: aynı task_id + hedef için daha önce yazıldıysa atla ──
+        # â”€â”€ Dedup: aynÄ± task_id + hedef iÃ§in daha Ã¶nce yazÄ±ldÄ±ysa atla â”€â”€
         if _dedup_kontrol(kayit, tur="dosya"):
             return {
                 "durum": "atlandi",
-                "sebep": "Aynı görev için dosya zaten yazildi (dedup)",
+                "sebep": "AynÄ± gÃ¶rev iÃ§in dosya zaten yazildi (dedup)",
             }
 
         tarih = datetime.now().strftime("%Y%m%d_%H%M%S")
         dosya_adi = f"gorev_{kayit['task_id']}_{tarih}.md"
         dosya_yolu = REYMEN_MEMORIES / dosya_adi
 
-        # Aynı ada sahip dosya varsa içerik karşılaştırması yap
+        # AynÄ± ada sahip dosya varsa iÃ§erik karÅŸÄ±laÅŸtÄ±rmasÄ± yap
         if dosya_yolu.exists():
             mevcut = dosya_yolu.read_text(encoding="utf-8", errors="replace")
-            # Hedef ve task_id aynı mı kontrol et
+            # Hedef ve task_id aynÄ± mÄ± kontrol et
             if kayit.get("hedef", "") in mevcut and kayit.get("task_id", "") in mevcut:
                 return {
                     "durum": "atlandi",
-                    "sebep": "Aynı içerikte dosya zaten mevcut",
+                    "sebep": "AynÄ± iÃ§erikte dosya zaten mevcut",
                     "dosya": str(dosya_yolu),
                 }
 
-        icerik = f"""# Görev Kaydı: {kayit['task_id']}
+        icerik = f"""# GÃ¶rev KaydÄ±: {kayit['task_id']}
 
 **Tarih:** {kayit['zaman']}
 **Hedef:** {kayit['hedef']}
-**Durum:** {"✅ Başarılı" if kayit.get("basarili") else "❌ Hata"}
-**Süre:** {kayit.get('sure_sn', 0):.1f}s
+**Durum:** {"âœ… BaÅŸarÄ±lÄ±" if kayit.get("basarili") else "âŒ Hata"}
+**SÃ¼re:** {kayit.get('sure_sn', 0):.1f}s
 **Tur:** {kayit.get('tur_sayisi', 0)}
 
-## Formatlı Özet
+## FormatlÄ± Ã–zet
 {gorev_ozeti_markdown(kayit)}
 
 ## Ham JSON
@@ -415,7 +415,7 @@ def _memories_dosyaya_yaz(kayit: dict) -> dict:
 
 
 def _soul_guncelle(kayit: dict) -> dict:
-    """SOUL.md'ye önemli kazanım ekle (sadece başarılı ve bilgi içerikli)."""
+    """SOUL.md'ye Ã¶nemli kazanÄ±m ekle (sadece baÅŸarÄ±lÄ± ve bilgi iÃ§erikli)."""
     if not kayit.get("basarili"):
         return {"durum": "atlandi", "sebep": "basarisiz gorev"}
 
@@ -426,23 +426,23 @@ def _soul_guncelle(kayit: dict) -> dict:
         with open(SOUL_PATH, "r", encoding="utf-8") as f:
             mevcut = f.read()
 
-        # Kısa bir kazanım satırı ekle
+        # KÄ±sa bir kazanÄ±m satÄ±rÄ± ekle
         kazanim = (
             f"\n  - [{kayit['zaman'][:10]}] {kayit['hedef'][:80]}"
             f" ({kayit.get('tur_sayisi', 0)} tur, {kayit.get('sure_sn', 0):.0f}s)"
         )
 
-        # Sadece yeni satır varsa ekle
+        # Sadece yeni satÄ±r varsa ekle
         if kazanim not in mevcut:
-            # "## Öğrenilenler" bölümü varsa altına, yoksa sona ekle
-            if "## Öğrenilenler" in mevcut:
+            # "## Ã–ÄŸrenilenler" bÃ¶lÃ¼mÃ¼ varsa altÄ±na, yoksa sona ekle
+            if "## Ã–ÄŸrenilenler" in mevcut:
                 mevcut = mevcut.replace(
-                    "## Öğrenilenler",
-                    f"## Öğrenilenler{kazanim}",
+                    "## Ã–ÄŸrenilenler",
+                    f"## Ã–ÄŸrenilenler{kazanim}",
                     1,
                 )
             else:
-                mevcut += f"\n## Öğrenilenler{kazanim}\n"
+                mevcut += f"\n## Ã–ÄŸrenilenler{kazanim}\n"
 
             with open(SOUL_PATH, "w", encoding="utf-8") as f:
                 f.write(mevcut)
@@ -456,9 +456,9 @@ def _soul_guncelle(kayit: dict) -> dict:
         return {"durum": "hata", "sebep": str(e)}
 
 
-# ══════════════════════════════════════════════════════════════════════════
-# BECERİ KRISTALLEŞTİRME (SKILL.md)
-# ══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# BECERÄ° KRISTALLEÅTÄ°RME (SKILL.md)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def beceri_kristallestir(
@@ -467,22 +467,22 @@ def beceri_kristallestir(
     kullanilan_araclar: Optional[list] = None,
     ek_bilgiler: Optional[dict] = None,
 ) -> dict:
-    """Başarılı görevlerden otomatik SKILL.md oluştur.
+    """BaÅŸarÄ±lÄ± gÃ¶revlerden otomatik SKILL.md oluÅŸtur.
 
-    Görev adı + özet + kullanılan araçları alır, markdown formatında
-    SKILL.md içeriği oluşturur ve .ReYMeN/skills/ altına kaydeder.
+    GÃ¶rev adÄ± + Ã¶zet + kullanÄ±lan araÃ§larÄ± alÄ±r, markdown formatÄ±nda
+    SKILL.md iÃ§eriÄŸi oluÅŸturur ve .ReYMeN/skills/ altÄ±na kaydeder.
 
     Args:
-        gorev_adi:      Görevin kısa adı (dosya adı olarak kullanılır)
-        ozet:           Görevin özet metni
-        kullanilan_araclar: Kullanılan araçların listesi (örn. ["terminal", "read_file"])
+        gorev_adi:      GÃ¶revin kÄ±sa adÄ± (dosya adÄ± olarak kullanÄ±lÄ±r)
+        ozet:           GÃ¶revin Ã¶zet metni
+        kullanilan_araclar: KullanÄ±lan araÃ§larÄ±n listesi (Ã¶rn. ["terminal", "read_file"])
         ek_bilgiler:    Opsiyonel ek bilgiler (sure, tur, kategoriler vb.)
 
     Returns:
-        dict: Kayıt sonucu (durum, dosya_yolu, hata)
+        dict: KayÄ±t sonucu (durum, dosya_yolu, hata)
     """
     try:
-        # Dizin yoksa oluştur
+        # Dizin yoksa oluÅŸtur
         REYMEN_SKILLS.mkdir(parents=True, exist_ok=True)
 
         if kullanilan_araclar is None:
@@ -490,22 +490,22 @@ def beceri_kristallestir(
         if ek_bilgiler is None:
             ek_bilgiler = {}
 
-        # Dosya adı: gorev_adi boşluk/turkce -> guvenli slug
+        # Dosya adÄ±: gorev_adi boÅŸluk/turkce -> guvenli slug
         slug = (
             gorev_adi.lower()
             .replace(" ", "_")
-            .replace("ı", "i")
-            .replace("ğ", "g")
-            .replace("ü", "u")
-            .replace("ş", "s")
-            .replace("ö", "o")
-            .replace("ç", "c")
-            .replace("İ", "i")
-            .replace("Ğ", "g")
-            .replace("Ü", "u")
-            .replace("Ş", "s")
-            .replace("Ö", "o")
-            .replace("Ç", "c")
+            .replace("Ä±", "i")
+            .replace("ÄŸ", "g")
+            .replace("Ã¼", "u")
+            .replace("ÅŸ", "s")
+            .replace("Ã¶", "o")
+            .replace("Ã§", "c")
+            .replace("Ä°", "i")
+            .replace("Ä", "g")
+            .replace("Ãœ", "u")
+            .replace("Å", "s")
+            .replace("Ã–", "o")
+            .replace("Ã‡", "c")
         )
         # Alfanumerik olmayan karakterleri temizle
         slug = "".join(c for c in slug if c.isalnum() or c == "_")
@@ -513,7 +513,7 @@ def beceri_kristallestir(
         dosya_adi = f"{slug}.md"
         dosya_yolu = REYMEN_SKILLS / dosya_adi
 
-        # Araç listesini markdown listesine çevir
+        # AraÃ§ listesini markdown listesine Ã§evir
         arac_liste = ""
         if kullanilan_araclar:
             arac_liste = "\n".join(f"- `{a}`" for a in kullanilan_araclar)
@@ -528,11 +528,11 @@ def beceri_kristallestir(
                 baslik = anahtar.replace("_", " ").title()
                 satirlar.append(f"| {baslik} | {deger} |")
             if satirlar:
-                ek_tablo = "| **Özellik** | **Değer** |\n|---|---|\n" + "\n".join(
+                ek_tablo = "| **Ã–zellik** | **DeÄŸer** |\n|---|---|\n" + "\n".join(
                     satirlar
                 )
 
-        # Oturum içi dedup: aynı gorev_adi + ozet daha önce işlendiyse atla
+        # Oturum iÃ§i dedup: aynÄ± gorev_adi + ozet daha Ã¶nce iÅŸlendiyse atla
         icerik_imza = f"{gorev_adi}|{ozet[:100]}"
         icerik_hash = hash(icerik_imza)
         with _dedup_kilit:
@@ -542,20 +542,20 @@ def beceri_kristallestir(
         if zaten_var:
             return {
                 "durum": "atlandi",
-                "sebep": "Aynı beceri bu oturumda zaten kristallestirildi",
+                "sebep": "AynÄ± beceri bu oturumda zaten kristallestirildi",
                 "dosya": str(REYMEN_SKILLS / f"{slug}.md") if slug else "",
             }
 
-        # SKILL.md içeriğini oluştur
+        # SKILL.md iÃ§eriÄŸini oluÅŸtur
         icerik = f"""# Beceri: {gorev_adi}
 
-## Açıklama
+## AÃ§Ä±klama
 {ozet}
 
-## Kullanılan Araçlar
+## KullanÄ±lan AraÃ§lar
 {arac_liste}
 
-## Oluşturulma Tarihi
+## OluÅŸturulma Tarihi
 {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
 """
         if ek_tablo:
@@ -564,13 +564,13 @@ def beceri_kristallestir(
 {ek_tablo}
 """
 
-        # Aynı isimde dosya varsa ve içerik aynıysa tekrar yazma (dedup)
+        # AynÄ± isimde dosya varsa ve iÃ§erik aynÄ±ysa tekrar yazma (dedup)
         if dosya_yolu.exists():
             mevcut_icerik = dosya_yolu.read_text(encoding="utf-8", errors="replace")
             if mevcut_icerik.strip() == icerik.strip():
                 return {
                     "durum": "atlandi",
-                    "sebep": "Aynı içerik zaten mevcut",
+                    "sebep": "AynÄ± iÃ§erik zaten mevcut",
                     "dosya": str(dosya_yolu),
                 }
 
@@ -590,24 +590,24 @@ def beceri_kristallestir(
 
 
 def gorev_ozeti_markdown(kayit: dict) -> str:
-    """Görev kaydını zengin markdown formatında formatla.
+    """GÃ¶rev kaydÄ±nÄ± zengin markdown formatÄ±nda formatla.
 
-    Tablo, kod blokları ve emoji'lerle daha okunabilir bir özet üretir.
+    Tablo, kod bloklarÄ± ve emoji'lerle daha okunabilir bir Ã¶zet Ã¼retir.
 
     Args:
-        kayit: Görev kaydı dict'i (task_id, zaman, hedef, basarili, ...)
+        kayit: GÃ¶rev kaydÄ± dict'i (task_id, zaman, hedef, basarili, ...)
 
     Returns:
-        str: Formatlanmış markdown metni
+        str: FormatlanmÄ±ÅŸ markdown metni
     """
     try:
         basarili = kayit.get("basarili", False)
-        durum_emoji = "✅" if basarili else "❌"
-        durum_yazi = "Başarılı" if basarili else "Başarısız"
+        durum_emoji = "âœ…" if basarili else "âŒ"
+        durum_yazi = "BaÅŸarÄ±lÄ±" if basarili else "BaÅŸarÄ±sÄ±z"
 
         task_id = kayit.get("task_id", "?")
         zaman = kayit.get("zaman", datetime.now().isoformat())
-        hedef = kayit.get("hedef", "Belirtilmemiş")
+        hedef = kayit.get("hedef", "BelirtilmemiÅŸ")
         sure = kayit.get("sure_sn", 0)
         tur = kayit.get("tur_sayisi", 0)
         hata = kayit.get("hata", "")
@@ -615,25 +615,25 @@ def gorev_ozeti_markdown(kayit: dict) -> str:
         ozet = kayit.get("ozet", "")
 
         satirlar = [
-            f"# {durum_emoji} Görev Raporu: {task_id}",
+            f"# {durum_emoji} GÃ¶rev Raporu: {task_id}",
             "",
             f"**Tarih:** {zaman}",
             "",
-            "## 📋 Genel Bilgiler",
-            "| **Alan** | **Değer** |",
+            "## ğŸ“‹ Genel Bilgiler",
+            "| **Alan** | **DeÄŸer** |",
             "|---|---|",
-            f"| Görev ID | `{task_id}` |",
+            f"| GÃ¶rev ID | `{task_id}` |",
             f"| Hedef | {hedef} |",
             f"| Durum | {durum_emoji} {durum_yazi} |",
-            f"| Süre | {sure:.1f} saniye |",
-            f"| Tur Sayısı | {tur} |",
+            f"| SÃ¼re | {sure:.1f} saniye |",
+            f"| Tur SayÄ±sÄ± | {tur} |",
         ]
 
         if hata:
             satirlar.extend(
                 [
                     "",
-                    "## ❌ Hata Detayı",
+                    "## âŒ Hata DetayÄ±",
                     "```",
                     hata[:500],
                     "```",
@@ -644,7 +644,7 @@ def gorev_ozeti_markdown(kayit: dict) -> str:
             satirlar.extend(
                 [
                     "",
-                    "## 💬 Yanıt Özeti",
+                    "## ğŸ’¬ YanÄ±t Ã–zeti",
                     "```text",
                     yanit_ozeti[:500],
                     "```",
@@ -655,7 +655,7 @@ def gorev_ozeti_markdown(kayit: dict) -> str:
             satirlar.extend(
                 [
                     "",
-                    "## 📝 Özet",
+                    "## ğŸ“ Ã–zet",
                     ozet,
                 ]
             )
@@ -681,7 +681,7 @@ def gorev_ozeti_markdown(kayit: dict) -> str:
             satirlar.extend(
                 [
                     "",
-                    "## 🔍 Ek Detaylar",
+                    "## ğŸ” Ek Detaylar",
                     "```json",
                     json.dumps(ek_detay, ensure_ascii=False, indent=2),
                     "```",
@@ -692,26 +692,26 @@ def gorev_ozeti_markdown(kayit: dict) -> str:
 
     except Exception as e:
         log.warning("Markdown format hatasi: %s", e)
-        return f"# Görev Raporu\n\n*Format hatası: {e}*"
+        return f"# GÃ¶rev Raporu\n\n*Format hatasÄ±: {e}*"
 
 
-# ══════════════════════════════════════════════════════════════════════════
-# GEÇMİŞ KONUŞMALARI İMPORT ET
-# ══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# GEÃ‡MÄ°Å KONUÅMALARI Ä°MPORT ET
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def gecmis_konusmalari_import_et(
     kaynak: str = "memory",
     limit: int = 50,
 ) -> dict:
-    """Geçmiş konuşmaları ReYMeN session DB'den ReYMeN hafızasına import eder.
+    """GeÃ§miÅŸ konuÅŸmalarÄ± ReYMeN session DB'den ReYMeN hafÄ±zasÄ±na import eder.
 
     Args:
-        kaynak: "memory" → .ReYMeN/memories/, "session_db" → ReYMeN SQLite
-        limit:  Maks import edilecek kayıt sayısı
+        kaynak: "memory" â†’ .ReYMeN/memories/, "session_db" â†’ ReYMeN SQLite
+        limit:  Maks import edilecek kayÄ±t sayÄ±sÄ±
 
     Returns:
-        dict: İstatistik (import_edilen, atlanan, hatalar)
+        dict: Ä°statistik (import_edilen, atlanan, hatalar)
     """
     istatistik = {"import_edilen": 0, "atlanan": 0, "hatalar": 0}
 
@@ -728,7 +728,7 @@ def _memory_dizini_import_et(
     istatistik: dict,
     limit: int,
 ) -> None:
-    """.ReYMeN/memories/ içindeki .md ve .json dosyalarını hafızaya ekle."""
+    """.ReYMeN/memories/ iÃ§indeki .md ve .json dosyalarÄ±nÄ± hafÄ±zaya ekle."""
     if not dizin.exists():
         istatistik["atlanan"] += 1
         return
@@ -740,7 +740,7 @@ def _memory_dizini_import_et(
                 istatistik["atlanan"] += 1
                 continue
 
-            # Dosya türüne göre koleksiyon belirle
+            # Dosya tÃ¼rÃ¼ne gÃ¶re koleksiyon belirle
             if f.suffix == ".json":
                 koleksiyon = "notlar"
                 try:
@@ -767,7 +767,7 @@ def _memory_dizini_import_et(
 
 
 def _session_db_import_et(istatistik: dict, limit: int) -> None:
-    """ReYMeN session_db.py'den session'ları import et."""
+    """ReYMeN session_db.py'den session'larÄ± import et."""
     if not _SESSION_IMPORT_AKTIF:
         istatistik["atlanan"] += 1
         return
@@ -799,7 +799,7 @@ def _session_db_import_et(istatistik: dict, limit: int) -> None:
 **Kaynak:** {kaynak}
 **Tarih:** {s.get("baslangic", "") if isinstance(s, dict) else ""}
 **Mesaj Sayisi:** {len(mesajlar)}
-**Özet:** {ozet}
+**Ã–zet:** {ozet}
 """
 
                 if _hafiza and _HAFIZA_AKTIF:
@@ -825,24 +825,24 @@ def _session_db_import_et(istatistik: dict, limit: int) -> None:
         istatistik["hatalar"] += 1
 
 
-# ══════════════════════════════════════════════════════════════════════════
-# TOPLU GEÇMİŞ İMPORT
-# ══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# TOPLU GEÃ‡MÄ°Å Ä°MPORT
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def tum_gecmisi_isle() -> dict:
-    """Tüm geçmiş konuşmaları tek seferde işle.
+    """TÃ¼m geÃ§miÅŸ konuÅŸmalarÄ± tek seferde iÅŸle.
 
-    Hem .ReYMeN/memories/ içindeki dosyaları hem de ReYMeN session DB'yi
-    tarar ve ReYMeN hafıza sistemine kaydeder.
+    Hem .ReYMeN/memories/ iÃ§indeki dosyalarÄ± hem de ReYMeN session DB'yi
+    tarar ve ReYMeN hafÄ±za sistemine kaydeder.
 
     Returns:
-        dict: İstatistik (memory_count, session_count, toplam)
+        dict: Ä°statistik (memory_count, session_count, toplam)
     """
     sonuc = {"memory": {"import_edilen": 0}, "session_db": {"import_edilen": 0}}
 
     try:
-        # 1. .ReYMeN/memories/ içindeki dosyalar
+        # 1. .ReYMeN/memories/ iÃ§indeki dosyalar
         mem_sonuc = gecmis_konusmalari_import_et(kaynak="memory", limit=100)
         sonuc["memory"] = mem_sonuc
 
@@ -850,7 +850,7 @@ def tum_gecmisi_isle() -> dict:
         db_sonuc = gecmis_konusmalari_import_et(kaynak="session_db", limit=50)
         sonuc["session_db"] = db_sonuc
 
-        # 3. .alt_ajan_hafiza/ içindeki task log'ları
+        # 3. .alt_ajan_hafiza/ iÃ§indeki task log'larÄ±
         alt_hafiza_dizini = ROOT / ".alt_ajan_hafiza"
         if alt_hafiza_dizini.exists():
             import_count = 0
@@ -880,15 +880,15 @@ def tum_gecmisi_isle() -> dict:
     return sonuc
 
 
-# ══════════════════════════════════════════════════════════════════════════
-# NESNe TABANLI ARAYÜZ
-# ══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# NESNe TABANLI ARAYÃœZ
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class GorevHafiza:
-    """Görev hafıza sistemi için nesne tabanlı arayüz.
+    """GÃ¶rev hafÄ±za sistemi iÃ§in nesne tabanlÄ± arayÃ¼z.
 
-    Modülün fonksiyon tabanlı API'sini bir sınıf üzerinden sarmalar.
+    ModÃ¼lÃ¼n fonksiyon tabanlÄ± API'sini bir sÄ±nÄ±f Ã¼zerinden sarmalar.
     """
 
     def kaydet(self, task_id: str, hedef: str, sonuc: dict) -> dict:
@@ -904,9 +904,9 @@ class GorevHafiza:
         return tum_gecmisi_isle()
 
 
-# ══════════════════════════════════════════════════════════════════════════
-# DOĞRUDAN ÇALIŞTIRMA
-# ══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# DOÄRUDAN Ã‡ALIÅTIRMA
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 if __name__ == "__main__":
     import sys
@@ -914,18 +914,18 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     print("=" * 60)
-    print("  ReYMeN Görev Hafıza Sistemi")
+    print("  ReYMeN GÃ¶rev HafÄ±za Sistemi")
     print("=" * 60)
 
     # Toplu import
-    print("\n[1/2] Geçmiş konuşmalar import ediliyor...")
+    print("\n[1/2] GeÃ§miÅŸ konuÅŸmalar import ediliyor...")
     sonuc = tum_gecmisi_isle()
     print(f"  Memory: {sonuc.get('memory', {}).get('import_edilen', 0)} kayit")
     print(f"  Session DB: {sonuc.get('session_db', {}).get('import_edilen', 0)} kayit")
     if "alt_ajan_hafiza" in sonuc:
         print(f"  Alt Ajan: {sonuc['alt_ajan_hafiza'].get('import_edilen', 0)} kayit")
 
-    # Test kaydı
+    # Test kaydÄ±
     print("\n[2/2] Test kaydi yapiliyor...")
     test_sonuc = gorev_sonrasi_hafiza(
         task_id=f"test_{uuid.uuid4().hex[:6]}",
@@ -936,4 +936,4 @@ if __name__ == "__main__":
     print(f"  Dosya: {test_sonuc.get('dosya', {}).get('durum', '?')}")
     print(f"  SOUL: {test_sonuc.get('soul', {}).get('durum', '?')}")
 
-    print(f"\n✅ Toplam sure: {test_sonuc.get('sure_sn', 0):.2f}s")
+    print(f"\nâœ… Toplam sure: {test_sonuc.get('sure_sn', 0):.2f}s")

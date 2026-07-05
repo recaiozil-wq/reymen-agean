@@ -1,4 +1,4 @@
-import json
+﻿import json
 import shutil
 import textwrap
 from functools import partial
@@ -10,29 +10,29 @@ from typing import Optional
 from typing import Any
 from contextlib import contextmanager
 
-from src.reymen.sistem.cli_mixin_display import MixinDisplay
-from src.reymen.sistem.cli_mixin_stream import MixinStream
-from src.reymen.sistem.cli_mixin_voice import MixinVoice
-from src.reymen.sistem.cli_mixin_approval import MixinApproval
-from src.reymen.sistem.cli_mixin_commands import MixinCommands
-from src.reymen.sistem.cli_mixin_core import MixinCore
-from src.reymen.sistem.cli_mixin_fileops import MixinFileOps
-from src.reymen.sistem.cli_mixin_media import MixinMedia
-from src.reymen.sistem.cli_mixin_agentsettings import MixinAgentSettings
-from src.reymen.sistem.cli_mixin_browser import MixinBrowser
-from src.reymen.sistem.cli_mixin_goals import MixinGoals
-from src.reymen.sistem.cli_mixin_skillstools import MixinSkillsTools
-from src.reymen.sistem.cli_mixin_ui import MixinUI
+from reymen.sistem.cli_mixin_display import MixinDisplay
+from reymen.sistem.cli_mixin_stream import MixinStream
+from reymen.sistem.cli_mixin_voice import MixinVoice
+from reymen.sistem.cli_mixin_approval import MixinApproval
+from reymen.sistem.cli_mixin_commands import MixinCommands
+from reymen.sistem.cli_mixin_core import MixinCore
+from reymen.sistem.cli_mixin_fileops import MixinFileOps
+from reymen.sistem.cli_mixin_media import MixinMedia
+from reymen.sistem.cli_mixin_agentsettings import MixinAgentSettings
+from reymen.sistem.cli_mixin_browser import MixinBrowser
+from reymen.sistem.cli_mixin_goals import MixinGoals
+from reymen.sistem.cli_mixin_skillstools import MixinSkillsTools
+from reymen.sistem.cli_mixin_ui import MixinUI
 
 # Extracted CLI modules (Phase 2 - TUI and Agent mixins)
-from src.reymen.sistem.cli_tui import TUIMixin
-from src.reymen.sistem.cli_agent import AgentMixin
+from reymen.sistem.cli_tui import TUIMixin
+from reymen.sistem.cli_agent import AgentMixin
 
 # Extracted CLI modules (Phase 2 - Session mixin)
-from src.reymen.sistem.cli_session import SessionMixin
+from reymen.sistem.cli_session import SessionMixin
 
 
-# Initialize centralized logging early — agent.log + errors.log in ~/.ReYMeN/logs/.
+# Initialize centralized logging early â€” agent.log + errors.log in ~/.ReYMeN/logs/.
 # This ensures CLI sessions produce a log trail even before AIAgent is instantiated.
 try:
     from reymen.sistem.ReYMeN_logging import setup_logging
@@ -41,9 +41,9 @@ try:
 except Exception as _e:
     __import__("logging").getLogger(__name__).warning(
         "[SessizExcept] %%s: %%s", type(_e).__name__, _e
-    )  # Logging setup is best-effort — don't crash the CLI
+    )  # Logging setup is best-effort â€” don't crash the CLI
 
-# Validate config structure early — print warnings before user hits cryptic errors
+# Validate config structure early â€” print warnings before user hits cryptic errors
 try:
     from reymen.reymen_cli.config import print_config_warnings
 
@@ -62,7 +62,7 @@ try:
 except Exception as _e:
     __import__("logging").getLogger(__name__).warning(
         "[SessizExcept] %%s: %%s", type(_e).__name__, _e
-    )  # Skin engine is optional — default skin used if unavailable
+    )  # Skin engine is optional â€” default skin used if unavailable
 
 # Initialize tool preview length from config
 try:
@@ -76,7 +76,7 @@ except Exception:
 # Neuter AsyncHttpxClientWrapper.__del__ before any AsyncOpenAI clients are
 # created.  The SDK's __del__ schedules aclose() on asyncio.get_running_loop()
 # which, during CLI idle time, finds prompt_toolkit's event loop and tries to
-# close TCP transports bound to dead worker loops — producing
+# close TCP transports bound to dead worker loops â€” producing
 # "Event loop is closed" / "Press ENTER to continue..." errors.
 #
 # We install a sys.meta_path finder that defers the actual import + patch
@@ -163,15 +163,15 @@ def get_toolset_for_tool(*args, **kwargs):
 
 
 # Extracted CLI modules (Phase 3)
-from src.reymen.cli.banner import build_welcome_banner
-from src.reymen.cli.commands import SlashCommandCompleter, SlashCommandAutoSuggest
+from reymen.cli.banner import build_welcome_banner
+from reymen.cli.commands import SlashCommandCompleter, SlashCommandAutoSuggest
 
-from src.reymen.sistem.cli_helpers import *
-from src.reymen.sistem.cli_display import *
-from src.reymen.sistem.cli_commands import *
-from src.reymen.sistem.cli_auth import *
-from src.reymen.sistem.cli_maintenance import *
-from src.reymen.sistem.cli_stream import *
+from reymen.sistem.cli_helpers import *
+from reymen.sistem.cli_display import *
+from reymen.sistem.cli_commands import *
+from reymen.sistem.cli_auth import *
+from reymen.sistem.cli_maintenance import *
+from reymen.sistem.cli_stream import *
 
 
 def get_all_toolsets(*args, **kwargs):
@@ -270,7 +270,7 @@ def _run_cleanup():
     except Exception:
         logger.warning("[fix_01_sessiz_except] Exception")
     # Shut down memory provider (on_session_end + shutdown_all) at actual
-    # session boundary — NOT per-turn inside run_conversation().
+    # session boundary â€” NOT per-turn inside run_conversation().
     try:
         from reymen.reymen_cli.plugins import invoke_hook as _invoke_hook
 
@@ -370,7 +370,7 @@ class ReYMeNCLI(
             else CLI_CONFIG["display"].get("compact", False)
         )
         # tool_progress: "off", "new", "all", "verbose" (from config.yaml display section)
-        # YAML 1.1 parses bare `off` as boolean False — normalise to string.
+        # YAML 1.1 parses bare `off` as boolean False â€” normalise to string.
         _raw_tp = CLI_CONFIG["display"].get("tool_progress", "all")
         self.tool_progress_mode = "off" if _raw_tp is False else str(_raw_tp)
         # resume_display: "full" (show history) | "minimal" (one-liner only)
@@ -400,7 +400,7 @@ class ReYMeNCLI(
 
         # self.verbose ONLY controls global DEBUG logging (root logger level).
         # display.tool_progress="verbose" controls tool-call rendering (full args,
-        # results, think blocks) and is independent — see _apply_logging_levels.
+        # results, think blocks) and is independent â€” see _apply_logging_levels.
         # Coupling the two (PR #6a1aa420e) caused all module DEBUG logs to spew
         # to console whenever a user set tool_progress: verbose in config.
         self.verbose = bool(verbose) if verbose is not None else False
@@ -455,7 +455,7 @@ class ReYMeNCLI(
 
         # Configuration - priority: CLI args > env vars > config file
         # Model comes from: CLI arg or config.yaml (single source of truth).
-        # LLM_MODEL/OPENAI_MODEL env vars are NOT checked — config.yaml is
+        # LLM_MODEL/OPENAI_MODEL env vars are NOT checked â€” config.yaml is
         # authoritative.  This avoids conflicts in multi-agent setups where
         # env vars would stomp each other.
         _model_config = CLI_CONFIG.get("model", {})
@@ -483,7 +483,7 @@ class ReYMeNCLI(
         # to the global default.  Provider-specific normalisation may override
         # the default silently but should warn when overriding an explicit choice.
         # A config model that matches the global fallback is NOT considered an
-        # explicit choice — the user just never changed it.  But a config model
+        # explicit choice â€” the user just never changed it.  But a config model
         # like "gpt-5.3-codex" IS explicit and must be preserved.
         self._model_is_default = not model and (
             not _config_model or _config_model == _DEFAULT_CONFIG_MODEL
@@ -509,8 +509,8 @@ class ReYMeNCLI(
             or CLI_CONFIG["model"].get("base_url", "")
             or os.getenv("OPENROUTER_BASE_URL", "")
         ) or None
-        # Match key to resolved base_url: OpenRouter URL → prefer OPENROUTER_API_KEY,
-        # custom endpoint → prefer OPENAI_API_KEY (issue #560).
+        # Match key to resolved base_url: OpenRouter URL â†’ prefer OPENROUTER_API_KEY,
+        # custom endpoint â†’ prefer OPENAI_API_KEY (issue #560).
         # Note: _ensure_runtime_credentials() re-resolves this before first use.
         if self.base_url and base_url_host_matches(self.base_url, "openrouter.ai"):
             self.api_key = (
@@ -544,7 +544,7 @@ class ReYMeNCLI(
         self.disabled_toolsets = CLI_CONFIG["agent"].get("disabled_toolsets") or []
 
         if toolsets and "all" not in toolsets and "*" not in toolsets:
-            # Validate each toolset — MCP server names are resolved via
+            # Validate each toolset â€” MCP server names are resolved via
             # live registry aliases (registered during discover_mcp_tools),
             # but discovery hasn't run yet at this point, so exclude them.
             mcp_names = set((CLI_CONFIG.get("mcp_servers") or {}).keys())
@@ -599,7 +599,7 @@ class ReYMeNCLI(
         self._provider_require_params = pr.get("require_parameters", False)
         self._provider_data_collection = pr.get("data_collection")
 
-        # OpenRouter Pareto Code router knob — coding-score floor (0.0-1.0).
+        # OpenRouter Pareto Code router knob â€” coding-score floor (0.0-1.0).
         # Only applied when model.model == "openrouter/pareto-code".
         # Empty string / None / out-of-range = unset (let OR pick strongest coder).
         _or_cfg = CLI_CONFIG.get("openrouter", {}) or {}
@@ -613,7 +613,7 @@ class ReYMeNCLI(
             except (TypeError, ValueError):
                 logger.warning("[fix_01_sessiz_except] Exception")
 
-        # Fallback provider chain — tried in order when primary fails after retries.
+        # Fallback provider chain â€” tried in order when primary fails after retries.
         # Merge new ``fallback_providers`` entries with any legacy
         # ``fallback_model`` entries so old configs still participate.
         self._fallback_model = get_fallback_chain(CLI_CONFIG)
@@ -633,7 +633,7 @@ class ReYMeNCLI(
         self.conversation_history: List[Dict[str, Any]] = []
         self.session_start = datetime.now()
         self._resumed = False
-        # Per-prompt elapsed timer — started at the beginning of each chat turn,
+        # Per-prompt elapsed timer â€” started at the beginning of each chat turn,
         # frozen when the agent thread completes, displayed in the status bar.
         self._prompt_start_time: Optional[float] = None  # time.time() when turn started
         self._prompt_duration: float = 0.0  # frozen duration of last completed turn
@@ -645,17 +645,17 @@ class ReYMeNCLI(
             self._session_db = SessionDB()
         except Exception as e:
             logger.warning(
-                "Failed to initialize SessionDB — session will NOT be indexed for search: %s",
+                "Failed to initialize SessionDB â€” session will NOT be indexed for search: %s",
                 e,
             )
 
-        # Opportunistic state.db maintenance — runs at most once per
+        # Opportunistic state.db maintenance â€” runs at most once per
         # min_interval_hours, tracked via state_meta in state.db itself so
         # it's shared across all ReYMeN processes for this ReYMeN_HOME.
         # Never blocks startup on failure.
         _run_state_db_auto_maintenance(self._session_db)
 
-        # Opportunistic shadow-repo cleanup — deletes orphan/stale
+        # Opportunistic shadow-repo cleanup â€” deletes orphan/stale
         # checkpoint repos under ~/.ReYMeN/checkpoints/.  Opt-in via
         # checkpoints.auto_prune, idempotent via .last_prune marker.
         _run_checkpoint_auto_maintenance()
@@ -751,7 +751,7 @@ class ReYMeNCLI(
         # When True, the input separator rules and the dynamic status bar are
         # hidden until the next user input. Set by _recover_after_resize() so a
         # SIGWINCH cannot stamp a freshly-drawn status bar on top of one that
-        # the terminal just reflowed into scrollback — the cause of duplicated
+        # the terminal just reflowed into scrollback â€” the cause of duplicated
         # bars / "blank line flooding" reports (#19280, #22976).
         self._status_bar_suppressed_after_resize = False
         self._resize_recovery_lock = threading.Lock()
@@ -773,7 +773,7 @@ class ReYMeNCLI(
         ):
             ctx_len = self.agent.context_compressor.context_length
 
-        # Auto-compact for narrow terminals — the full banner with caduceus
+        # Auto-compact for narrow terminals â€” the full banner with caduceus
         # + tool list needs ~80 columns minimum to render without wrapping.
         term_width = shutil.get_terminal_size().columns
         use_compact = self.compact or term_width < 80
@@ -813,7 +813,7 @@ class ReYMeNCLI(
         if ctx_len and ctx_len < MINIMUM_CONTEXT_LENGTH:
             self._console_print()
             self._console_print(
-                f"[yellow]⚠️  Context length is only {ctx_len:,} tokens — "
+                f"[yellow]âš ï¸  Context length is only {ctx_len:,} tokens â€” "
                 f"this is likely too low for agent use with tools.[/]"
             )
             self._console_print(
@@ -826,7 +826,7 @@ class ReYMeNCLI(
                 )
             elif "1234" in base_url:
                 self._console_print(
-                    "[dim]   LM Studio fix: Set context length in model settings → reload model[/]"
+                    "[dim]   LM Studio fix: Set context length in model settings â†’ reload model[/]"
                 )
             else:
                 self._console_print(
@@ -840,7 +840,7 @@ class ReYMeNCLI(
         if is_nous_ReYMeN_non_agentic(model_name):
             self._console_print()
             self._console_print(
-                "[bold yellow]⚠  Nous Research ReYMeN 3 & 4 models are NOT agentic and are not "
+                "[bold yellow]âš   Nous Research ReYMeN 3 & 4 models are NOT agentic and are not "
                 "designed for use with ReYMeN Agent.[/]"
             )
             self._console_print(
@@ -992,7 +992,7 @@ class ReYMeNCLI(
 
         for i, (role, text) in enumerate(entries):
             if role == "user":
-                lines.append("  ● You: ", style=f"dim bold {_session_label_c}")
+                lines.append("  â— You: ", style=f"dim bold {_session_label_c}")
                 # Show first line inline, indent rest
                 msg_lines = text.splitlines()
                 lines.append(msg_lines[0] + "\n", style="dim")
@@ -1000,13 +1000,13 @@ class ReYMeNCLI(
                     lines.append(f"         {ml}\n", style="dim")
             elif role == "assistant_last":
                 # Last assistant response shown in full, non-dim
-                lines.append("  ◆ ReYMeN: ", style=f"bold {_assistant_label_c}")
+                lines.append("  â—† ReYMeN: ", style=f"bold {_assistant_label_c}")
                 msg_lines = text.splitlines()
                 lines.append(msg_lines[0] + "\n", style="")
                 for ml in msg_lines[1:]:
                     lines.append(f"            {ml}\n", style="")
             else:
-                lines.append("  ◆ ReYMeN: ", style=f"dim bold {_assistant_label_c}")
+                lines.append("  â—† ReYMeN: ", style=f"dim bold {_assistant_label_c}")
                 msg_lines = text.splitlines()
                 lines.append(msg_lines[0] + "\n", style="dim")
                 for ml in msg_lines[1:]:
@@ -1129,7 +1129,7 @@ class ReYMeNCLI(
         Instead of embedding raw base64 ``image_url`` content parts in the
         conversation (which only works with vision-capable models), this
         pre-processes each image through the auxiliary vision model (Gemini
-        Flash) and prepends the descriptions to the user's message — the
+        Flash) and prepends the descriptions to the user's message â€” the
         same approach the messaging gateway uses.
 
         The local file path is included so the agent can re-examine the
@@ -1150,7 +1150,7 @@ class ReYMeNCLI(
                 continue
             size_kb = img_path.stat().st_size // 1024
             if announce:
-                _cprint(f"  {_DIM}👁️  analyzing {img_path.name} ({size_kb}KB)...{_RST}")
+                _cprint(f"  {_DIM}ğŸ‘ï¸  analyzing {img_path.name} ({size_kb}KB)...{_RST}")
             try:
                 result_json = _asyncio.run(
                     vision_analyze_tool(
@@ -1166,7 +1166,7 @@ class ReYMeNCLI(
                         f"image_url: {img_path}]"
                     )
                     if announce:
-                        _cprint(f"  {_DIM}✓ image analyzed{_RST}")
+                        _cprint(f"  {_DIM}âœ“ image analyzed{_RST}")
                 else:
                     enriched_parts.append(
                         f"[The user attached an image but it couldn't be analyzed. "
@@ -1175,7 +1175,7 @@ class ReYMeNCLI(
                     )
                     if announce:
                         _cprint(
-                            f"  {_DIM}⚠ vision analysis failed — path included for retry{_RST}"
+                            f"  {_DIM}âš  vision analysis failed â€” path included for retry{_RST}"
                         )
             except Exception as e:
                 enriched_parts.append(
@@ -1185,7 +1185,7 @@ class ReYMeNCLI(
                 )
                 if announce:
                     _cprint(
-                        f"  {_DIM}⚠ vision analysis error — path included for retry{_RST}"
+                        f"  {_DIM}âš  vision analysis error â€” path included for retry{_RST}"
                     )
 
         # Combine: vision descriptions first, then the user's original text
@@ -1214,7 +1214,7 @@ class ReYMeNCLI(
         _cprint(f"{_BOLD}+{'-' * inner_width}+{_RST}")
 
         for category, commands in COMMANDS_BY_CATEGORY.items():
-            _cprint(f"\n  {_BOLD}── {category} ──{_RST}")
+            _cprint(f"\n  {_BOLD}â”€â”€ {category} â”€â”€{_RST}")
             for cmd, desc in commands.items():
                 if not self._command_available(cmd):
                     continue
@@ -1225,7 +1225,7 @@ class ReYMeNCLI(
         skill_commands = _ensure_skill_commands()
         if skill_commands:
             _cprint(
-                f"\n  ⚡ {_BOLD}Skill Commands{_RST} ({len(skill_commands)} installed):"
+                f"\n  âš¡ {_BOLD}Skill Commands{_RST} ({len(skill_commands)} installed):"
             )
             for cmd, info in sorted(skill_commands.items()):
                 ChatConsole().print(
@@ -1235,7 +1235,7 @@ class ReYMeNCLI(
         _bundles_now = get_skill_bundles()
         if _bundles_now:
             _cprint(
-                f"\n  ▣ {_BOLD}Skill Bundles{_RST} ({len(_bundles_now)} installed):"
+                f"\n  â–£ {_BOLD}Skill Bundles{_RST} ({len(_bundles_now)} installed):"
             )
             for cmd, info in sorted(_bundles_now.items()):
                 skill_count = len(info.get("skills", []))
@@ -1296,7 +1296,7 @@ class ReYMeNCLI(
                 print(f"    * {name:<20} - {desc}")
             print()
 
-        print(f"  Total: {len(tools)} tools  ヽ(^o^)ノ")
+        print(f"  Total: {len(tools)} tools  ãƒ½(^o^)ãƒ")
         print()
 
     # Moved to cli_mixin_skillstools.py (MixinSkillsTools._handle_tools_command)
@@ -1425,7 +1425,7 @@ class ReYMeNCLI(
         def _pick():
             result[0] = curses_single_select(title, items, default_index=default_index)
 
-        # run_in_terminal requires an asyncio event loop — only exists in the
+        # run_in_terminal requires an asyncio event loop â€” only exists in the
         # main prompt_toolkit thread.  If we're in a background thread (e.g.
         # process_loop), fall back to direct curses call.
         in_main_thread = threading.current_thread() is threading.main_thread()
@@ -1453,7 +1453,7 @@ class ReYMeNCLI(
         returns a coroutine that must be awaited by the prompt_toolkit event loop,
         which only exists on the main thread.  Slash commands are dispatched from
         the ``process_loop`` daemon thread (see issue #23185), so calling
-        ``run_in_terminal`` from there orphans the coroutine — ``_ask`` never runs,
+        ``run_in_terminal`` from there orphans the coroutine â€” ``_ask`` never runs,
         and user keystrokes leak into the composer instead.  Fall back to a direct
         ``input()`` when we're off the main thread.
         """
@@ -1509,7 +1509,7 @@ class ReYMeNCLI(
         choices visible and lets the normal Enter key binding submit the typed
         or highlighted choice.
 
-        **Platform note (Windows dead-lock — issue #30768):**
+        **Platform note (Windows dead-lock â€” issue #30768):**
         The queue-based modal relies on prompt_toolkit key bindings receiving
         keyboard events and calling ``_submit_slash_confirm_response``.  On
         Windows (PowerShell / Windows Terminal) the prompt_toolkit input
@@ -1521,9 +1521,9 @@ class ReYMeNCLI(
         To avoid this, we fall back to ``_prompt_text_input`` (a simple
         ``input()``-based prompt) when any of these conditions hold:
 
-        * ``sys.platform == "win32"`` — native Windows console (ConPTY /
+        * ``sys.platform == "win32"`` â€” native Windows console (ConPTY /
           win32_input) does not support the modal reliably.
-        * ``self._app`` is not set — unit tests / non-interactive contexts.
+        * ``self._app`` is not set â€” unit tests / non-interactive contexts.
 
         On non-Windows platforms the modal itself is still safe from the
         ``process_loop`` daemon thread as long as the main-thread event loop
@@ -1543,7 +1543,7 @@ class ReYMeNCLI(
             return self._prompt_text_input("Choice [1/2/3]: ")
 
         # On Windows the prompt_toolkit input channel can deadlock when the
-        # modal is entered from the process_loop daemon thread — keystrokes
+        # modal is entered from the process_loop daemon thread â€” keystrokes
         # never reach the key bindings, so response_queue.get() blocks for
         # the full timeout (issue #30768).  Fall back to the simpler
         # stdin-based prompt which works reliably on Windows.
@@ -1621,13 +1621,13 @@ class ReYMeNCLI(
         return None
 
     def _handle_codex_runtime(self, cmd_original: str) -> None:
-        """Handle /codex-runtime — toggle the codex app-server runtime opt-in.
+        """Handle /codex-runtime â€” toggle the codex app-server runtime opt-in.
 
         Usage:
-            /codex-runtime                       — show current state
-            /codex-runtime auto                  — ReYMeN default (chat_completions)
-            /codex-runtime codex_app_server      — hand turns to codex subprocess
-            /codex-runtime on / off              — synonyms for the above
+            /codex-runtime                       â€” show current state
+            /codex-runtime auto                  â€” ReYMeN default (chat_completions)
+            /codex-runtime codex_app_server      â€” hand turns to codex subprocess
+            /codex-runtime on / off              â€” synonyms for the above
         """
         from ReYMeN_cli import codex_runtime_switch as crs
 
@@ -1636,14 +1636,14 @@ class ReYMeNCLI(
         new_value, errors = crs.parse_args(raw_args)
         if errors:
             for err in errors:
-                _cprint(f"❌ {err}")
+                _cprint(f"âŒ {err}")
             return
 
         # Load + persist via the existing config helpers
         try:
             from reymen.reymen_cli.config import load_config, save_config
         except Exception as exc:
-            _cprint(f"❌ could not load config: {exc}")
+            _cprint(f"âŒ could not load config: {exc}")
             return
         cfg = load_config()
 
@@ -1653,7 +1653,7 @@ class ReYMeNCLI(
             persist_callback=(save_config if new_value is not None else None),
         )
 
-        prefix = "✓" if result.success else "✗"
+        prefix = "âœ“" if result.success else "âœ—"
         for line in result.message.splitlines():
             _cprint(
                 f"  {prefix} {line}"
@@ -1735,7 +1735,7 @@ class ReYMeNCLI(
     def _maybe_continue_goal_after_turn(self) -> None:
         """Hook run after every CLI turn. Judges + maybe re-queues.
 
-        Safe to call when no goal is set — returns quickly.
+        Safe to call when no goal is set â€” returns quickly.
 
         Preemption is automatic: if a real user message is already in
         ``_pending_input`` we skip judging (the user's new input takes
@@ -1745,7 +1745,7 @@ class ReYMeNCLI(
 
         Interrupt handling: if the turn was user-cancelled (Ctrl+C), we
         AUTO-PAUSE the goal instead of judging + re-queuing. Otherwise
-        Ctrl+C feels like it did nothing — the judge runs on whatever
+        Ctrl+C feels like it did nothing â€” the judge runs on whatever
         partial output landed, almost always says "continue", and the
         loop keeps going. Auto-pause keeps the goal recoverable via
         ``/goal resume`` once the user has sorted out what they want.
@@ -1757,12 +1757,12 @@ class ReYMeNCLI(
             return
 
         # If a real user message is already queued, don't inject a
-        # continuation prompt on top — let the user's turn go first.
+        # continuation prompt on top â€” let the user's turn go first.
         # Slash commands don't count as "real user messages" for this
         # check: they're inspection/mutation (e.g. /subgoal added mid-
         # run) and the process_loop dispatches them via process_command,
         # not via chat(). If we treat a queued /subgoal as preempting,
-        # the goal loop silently stalls — we'd return here, then the
+        # the goal loop silently stalls â€” we'd return here, then the
         # slash command consumes its queue slot via process_command()
         # which never re-fires the goal hook. Peek at all queued entries
         # and only defer when there's a non-slash payload.
@@ -1771,7 +1771,7 @@ class ReYMeNCLI(
             if pending is not None and not pending.empty():
                 has_real_message = False
                 try:
-                    # Queue.queue is the underlying deque — direct peek
+                    # Queue.queue is the underlying deque â€” direct peek
                     # without disturbing FIFO order.
                     for entry in list(pending.queue):
                         # Bundled payloads are (text, images) tuples;
@@ -1802,7 +1802,7 @@ class ReYMeNCLI(
             except Exception as exc:
                 logging.debug("goal pause-on-interrupt failed: %s", exc)
             _cprint(
-                f"  {_DIM}⏸ Goal paused — turn was interrupted. "
+                f"  {_DIM}â¸ Goal paused â€” turn was interrupted. "
                 f"Use /goal resume to continue, or /goal clear to stop.{_RST}"
             )
             return
@@ -1815,7 +1815,7 @@ class ReYMeNCLI(
                 if msg.get("role") == "assistant":
                     content = msg.get("content", "")
                     if isinstance(content, list):
-                        # Multimodal content — flatten text parts.
+                        # Multimodal content â€” flatten text parts.
                         parts = [
                             p.get("text", "")
                             for p in content
@@ -1852,12 +1852,12 @@ class ReYMeNCLI(
     # Moved to cli_mixin_ui.py (MixinUI._handle_skin_command)
     # Moved to cli_mixin_ui.py (MixinUI._handle_footer_command)
     def _toggle_verbose(self):
-        """Cycle tool progress mode: off → new → all → verbose → off.
+        """Cycle tool progress mode: off â†’ new â†’ all â†’ verbose â†’ off.
 
         Tool-progress display (full args / results / think blocks at the
         ``verbose`` step) is INDEPENDENT of global DEBUG logging.  Cycling
         through here does not change ``self.verbose`` or the agent's
-        ``verbose_logging`` / ``quiet_mode`` — those remain under the
+        ``verbose_logging`` / ``quiet_mode`` â€” those remain under the
         explicit ``-v``/``--verbose`` flag and the ``/verbose-logging``
         toggle.  See PR #6a1aa420e for the history that decoupled them.
         """
@@ -1878,17 +1878,17 @@ class ReYMeNCLI(
         from reymen.reymen_cli.colors import Colors as _Colors
 
         labels = {
-            "off": f"{_Colors.DIM}Tool progress: OFF{_Colors.RESET} — silent mode, just the final response.",
-            "new": f"{_Colors.YELLOW}Tool progress: NEW{_Colors.RESET} — show each new tool (skip repeats).",
-            "all": f"{_Colors.GREEN}Tool progress: ALL{_Colors.RESET} — show every tool call.",
-            "verbose": f"{_Colors.BOLD}{_Colors.GREEN}Tool progress: VERBOSE{_Colors.RESET} — full args, results, and think blocks.",
+            "off": f"{_Colors.DIM}Tool progress: OFF{_Colors.RESET} â€” silent mode, just the final response.",
+            "new": f"{_Colors.YELLOW}Tool progress: NEW{_Colors.RESET} â€” show each new tool (skip repeats).",
+            "all": f"{_Colors.GREEN}Tool progress: ALL{_Colors.RESET} â€” show every tool call.",
+            "verbose": f"{_Colors.BOLD}{_Colors.GREEN}Tool progress: VERBOSE{_Colors.RESET} â€” full args, results, and think blocks.",
         }
         _cprint(labels.get(self.tool_progress_mode, ""))
 
     def _transfer_session_yolo(self, old_session_id: str, new_session_id: str) -> None:
         """Move YOLO bypass state from an old session key to a new one.
 
-        Called whenever ``self.session_id`` is reassigned mid-run — ``/branch``
+        Called whenever ``self.session_id`` is reassigned mid-run â€” ``/branch``
         forks into a new session, and auto-compression rotates the agent's
         session id into a fresh continuation session. Without this transfer
         the user's ``/yolo ON`` toggle would silently revert on the very next
@@ -1940,12 +1940,12 @@ class ReYMeNCLI(
         return is_session_yolo_enabled(session_key)
 
     def _toggle_yolo(self):
-        """Toggle YOLO mode — skip all dangerous command approval prompts.
+        """Toggle YOLO mode â€” skip all dangerous command approval prompts.
 
         Per-session toggle that mirrors the gateway and TUI ``/yolo`` handlers
         (see ``gateway/run.py:_handle_yolo_command`` and
         ``tui_gateway/server.py`` key=="yolo"). We deliberately do NOT mutate
-        ``ReYMeN_YOLO_MODE`` here — that env var is read once at module import
+        ``ReYMeN_YOLO_MODE`` here â€” that env var is read once at module import
         time into ``tools.approval._YOLO_MODE_FROZEN`` to keep prompt-injected
         skills from flipping the bypass mid-session, so setting it after CLI
         startup is a silent no-op. Routing through ``enable_session_yolo`` /
@@ -1966,14 +1966,14 @@ class ReYMeNCLI(
         if is_session_yolo_enabled(session_key):
             disable_session_yolo(session_key)
             _cprint(
-                f"  ⚠ YOLO mode {_Colors.BOLD}{_Colors.RED}OFF{_Colors.RESET}"
-                " — dangerous commands will require approval."
+                f"  âš  YOLO mode {_Colors.BOLD}{_Colors.RED}OFF{_Colors.RESET}"
+                " â€” dangerous commands will require approval."
             )
         else:
             enable_session_yolo(session_key)
             _cprint(
-                f"  ⚡ YOLO mode {_Colors.BOLD}{_Colors.GREEN}ON{_Colors.RESET}"
-                " — all commands auto-approved. Use with caution."
+                f"  âš¡ YOLO mode {_Colors.BOLD}{_Colors.GREEN}ON{_Colors.RESET}"
+                " â€” all commands auto-approved. Use with caution."
             )
 
     # Moved to cli_mixin_agentsettings.py (MixinAgentSettings._handle_reasoning_command)
@@ -1993,12 +1993,12 @@ class ReYMeNCLI(
 
         Two modes:
 
-        * ``/compress [<focus>]`` — compress the *whole* history. An
+        * ``/compress [<focus>]`` â€” compress the *whole* history. An
           optional focus topic guides the summariser to preserve
           information related to *focus* while being more aggressive
           about discarding everything else.  Inspired by Claude Code's
           ``/compact <focus>`` feature.
-        * ``/compress here [N]`` — boundary-aware compression. Summarize
+        * ``/compress here [N]`` â€” boundary-aware compression. Summarize
           everything *except* the most recent ``N`` exchanges (default
           2), which are preserved verbatim. Inspired by Claude Code's
           Rewind "Summarize up to here" action (v2.1.139, May 2026,
@@ -2061,7 +2061,7 @@ class ReYMeNCLI(
                         partial = False
                         head = original_history
 
-                # Include system prompt + tool schemas in the estimate —
+                # Include system prompt + tool schemas in the estimate â€”
                 # a transcript-only number understates real request pressure
                 # and can even appear to grow after compression because a
                 # dense handoff summary replaces many short turns (#6217).
@@ -2074,25 +2074,25 @@ class ReYMeNCLI(
                 )
                 if partial:
                     print(
-                        f"🗜️  Summarizing up to here: compressing {len(head)} of "
+                        f"ğŸ—œï¸  Summarizing up to here: compressing {len(head)} of "
                         f"{original_count} messages (~{approx_tokens:,} tokens), "
                         f"keeping last {keep_last} exchange(s) verbatim..."
                     )
                 elif focus_topic:
                     print(
-                        f"🗜️  Compressing {original_count} messages (~{approx_tokens:,} tokens), "
+                        f"ğŸ—œï¸  Compressing {original_count} messages (~{approx_tokens:,} tokens), "
                         f'focus: "{focus_topic}"...'
                     )
                 else:
                     print(
-                        f"🗜️  Compressing {original_count} messages (~{approx_tokens:,} tokens)..."
+                        f"ğŸ—œï¸  Compressing {original_count} messages (~{approx_tokens:,} tokens)..."
                     )
 
                 # Pass None as system_message so _compress_context rebuilds
                 # the system prompt from scratch via _build_system_prompt(None).
                 # Passing _cached_system_prompt caused duplication because
                 # _build_system_prompt appends system_message to prompt_parts
-                # which already contain the agent identity — resulting in the
+                # which already contain the agent identity â€” resulting in the
                 # identity block appearing twice (issue #15281).
                 compressed, _ = self.agent._compress_context(
                     head,
@@ -2140,14 +2140,14 @@ class ReYMeNCLI(
                     approx_tokens,
                     new_tokens,
                 )
-                icon = "🗜️" if summary["noop"] else "✅"
+                icon = "ğŸ—œï¸" if summary["noop"] else "âœ…"
                 print(f"  {icon} {summary['headline']}")
                 print(f"     {summary['token_line']}")
                 if summary["note"]:
                     print(f"     {summary['note']}")
 
             except Exception as e:
-                print(f"  ❌ Compression failed: {e}")
+                print(f"  âŒ Compression failed: {e}")
 
     # Moved to cli_mixin_fileops.py (MixinFileOps._handle_debug_command)
     # Moved to cli_mixin_fileops.py (MixinFileOps._handle_update_command)
@@ -2180,9 +2180,9 @@ class ReYMeNCLI(
             return
 
         if mtime == self._config_mtime:
-            return  # File unchanged — fast path
+            return  # File unchanged â€” fast path
 
-        # File changed — check whether mcp_servers section changed
+        # File changed â€” check whether mcp_servers section changed
         self._config_mtime = mtime
         try:
             with open(cfg_path, encoding="utf-8") as f:
@@ -2199,18 +2199,18 @@ class ReYMeNCLI(
         # timeout so a hung MCP server cannot block the process_loop
         # indefinitely (which would freeze the entire TUI).
         print()
-        print("🔄 MCP server config changed — reloading connections...")
+        print("ğŸ”„ MCP server config changed â€” reloading connections...")
         _reload_thread = threading.Thread(target=self._reload_mcp, daemon=True)
         _reload_thread.start()
         _reload_thread.join(timeout=30)
         if _reload_thread.is_alive():
             print(
-                "  ⚠️  MCP reload timed out (30s). Some servers may not have reconnected."
+                "  âš ï¸  MCP reload timed out (30s). Some servers may not have reconnected."
             )
 
     # Inline-skip tokens that bypass the destructive-slash confirmation modal.
     # Matches the escape-hatch pattern users on broken modal platforms
-    # (currently native Windows PowerShell — issue #30768) need to self-serve
+    # (currently native Windows PowerShell â€” issue #30768) need to self-serve
     # without having to flip approvals.destructive_slash_confirm in config.
     _DESTRUCTIVE_SKIP_TOKENS = frozenset({"now", "--yes", "-y"})
 
@@ -2233,7 +2233,7 @@ class ReYMeNCLI(
         tokens = cmd_text.strip().split()
         if not tokens:
             return "", False
-        # Drop leading "/cmd" word — callers pass the full command text.
+        # Drop leading "/cmd" word â€” callers pass the full command text.
         if tokens[0].startswith("/"):
             tokens = tokens[1:]
         skip = False
@@ -2256,11 +2256,11 @@ class ReYMeNCLI(
         Used by ``/clear``, ``/new``/``/reset``, and ``/undo`` before they
         discard conversation state.  Three-option prompt:
 
-          1. Approve Once — proceed this time only
-          2. Always Approve — proceed and persist
+          1. Approve Once â€” proceed this time only
+          2. Always Approve â€” proceed and persist
              ``approvals.destructive_slash_confirm: false`` so future
              destructive commands run without confirmation
-          3. Cancel — abort
+          3. Cancel â€” abort
 
         Gated by ``approvals.destructive_slash_confirm`` (default on).  If the
         gate is off the function returns ``"once"`` immediately without
@@ -2270,21 +2270,21 @@ class ReYMeNCLI(
         ``-y`` as an argument (e.g. ``/reset now``, ``/new --yes My title``),
         the modal is bypassed and ``"once"`` is returned immediately. This is
         an escape hatch for platforms where the prompt_toolkit modal hangs
-        (issue #30768 — native Windows PowerShell). Callers are responsible
+        (issue #30768 â€” native Windows PowerShell). Callers are responsible
         for stripping the skip tokens from any remaining argument parsing
         (see :meth:`_split_destructive_skip`).
 
         Returns ``"once"``, ``"always"``, or ``None`` (cancelled).  Callers
         proceed with the destructive action when the result is non-None.
         """
-        # Inline-skip escape hatch — works regardless of platform/modal state.
+        # Inline-skip escape hatch â€” works regardless of platform/modal state.
         # See class-level _DESTRUCTIVE_SKIP_TOKENS for the accepted tokens.
         if cmd_original:
             _, _skip = self._split_destructive_skip(cmd_original)
             if _skip:
                 return "once"
 
-        # Gate check — respects prior "Always Approve" clicks.
+        # Gate check â€” respects prior "Always Approve" clicks.
         try:
             cfg = load_cli_config()
             approvals = cfg.get("approvals") if isinstance(cfg, dict) else None
@@ -2308,49 +2308,49 @@ class ReYMeNCLI(
             ("cancel", "Cancel", "keep current conversation"),
         ]
         raw = self._prompt_text_input_modal(
-            title=f"⚠️  /{command} — destroys conversation state",
+            title=f"âš ï¸  /{command} â€” destroys conversation state",
             detail=detail,
             choices=choices,
         )
         if raw is None:
-            print(f"🟡 /{command} cancelled (no input).")
+            print(f"ğŸŸ¡ /{command} cancelled (no input).")
             return None
         choice = self._normalize_slash_confirm_choice(raw, choices)
         if choice is None:
-            print(f"🟡 Unrecognized choice '{raw}'. /{command} cancelled.")
+            print(f"ğŸŸ¡ Unrecognized choice '{raw}'. /{command} cancelled.")
             return None
 
         if choice == "cancel":
-            print(f"🟡 /{command} cancelled. Conversation unchanged.")
+            print(f"ğŸŸ¡ /{command} cancelled. Conversation unchanged.")
             return None
 
         if choice == "always":
             if save_config_value("approvals.destructive_slash_confirm", False):
                 print(
-                    "🔒 Future /clear, /new, /reset, and /undo will run without confirmation."
+                    "ğŸ”’ Future /clear, /new, /reset, and /undo will run without confirmation."
                 )
                 print(
                     "   Re-enable via `approvals.destructive_slash_confirm: true` in config.yaml."
                 )
             else:
-                print("⚠️  Couldn't persist opt-out — proceeding once.")
+                print("âš ï¸  Couldn't persist opt-out â€” proceeding once.")
 
         return choice
 
     def _confirm_and_reload_mcp(self, cmd_original: str = "") -> None:
-        """Interactive /reload-mcp — confirm with the user, then reload.
+        """Interactive /reload-mcp â€” confirm with the user, then reload.
 
         Reloading MCP tools invalidates the provider prompt cache for the
         active session (tool schemas are baked into the system prompt).
-        The next message re-sends full input tokens — can be expensive on
+        The next message re-sends full input tokens â€” can be expensive on
         long-context or high-reasoning models.
 
         Three options: Approve Once, Always Approve (persists
         ``approvals.mcp_reload_confirm: false`` so future reloads run
         without this prompt), Cancel.  Gated by
-        ``approvals.mcp_reload_confirm`` — default on.
+        ``approvals.mcp_reload_confirm`` â€” default on.
         """
-        # Gate check — respects prior "Always Approve" clicks.
+        # Gate check â€” respects prior "Always Approve" clicks.
         try:
             cfg = load_cli_config()
             approvals = cfg.get("approvals") if isinstance(cfg, dict) else None
@@ -2377,7 +2377,7 @@ class ReYMeNCLI(
             ("cancel", "Cancel", "leave MCP tools unchanged"),
         ]
         raw = self._prompt_text_input_modal(
-            title="⚠️  /reload-mcp — Prompt cache invalidation warning",
+            title="âš ï¸  /reload-mcp â€” Prompt cache invalidation warning",
             detail=(
                 "Reloading MCP servers rebuilds the tool set for this session and\n"
                 "invalidates the provider prompt cache. The next message will\n"
@@ -2387,25 +2387,25 @@ class ReYMeNCLI(
             choices=choices,
         )
         if raw is None:
-            print("🟡 /reload-mcp cancelled (no input).")
+            print("ğŸŸ¡ /reload-mcp cancelled (no input).")
             return
         choice = self._normalize_slash_confirm_choice(raw, choices)
         if choice is None:
-            print(f"🟡 Unrecognized choice '{raw}'. /reload-mcp cancelled.")
+            print(f"ğŸŸ¡ Unrecognized choice '{raw}'. /reload-mcp cancelled.")
             return
 
         if choice == "cancel":
-            print("🟡 /reload-mcp cancelled. MCP tools unchanged.")
+            print("ğŸŸ¡ /reload-mcp cancelled. MCP tools unchanged.")
             return
 
         if choice == "always":
             if save_config_value("approvals.mcp_reload_confirm", False):
-                print("🔒 Future /reload-mcp calls will run without confirmation.")
+                print("ğŸ”’ Future /reload-mcp calls will run without confirmation.")
                 print(
                     "   Re-enable via `approvals.mcp_reload_confirm: true` in config.yaml."
                 )
             else:
-                print("⚠️  Couldn't persist opt-out — reloading once.")
+                print("âš ï¸  Couldn't persist opt-out â€” reloading once.")
 
         with self._busy_command(self._slow_command_status(cmd_original)):
             self._reload_mcp()
@@ -2429,7 +2429,7 @@ class ReYMeNCLI(
                 old_servers = set(_servers.keys())
 
             if not self._command_running:
-                print("🔄 Reloading MCP servers...")
+                print("ğŸ”„ Reloading MCP servers...")
 
             # Shutdown existing connections
             shutdown_mcp_servers()
@@ -2446,16 +2446,16 @@ class ReYMeNCLI(
             reconnected = connected_servers & old_servers
 
             if reconnected:
-                print(f"  ♻️  Reconnected: {', '.join(sorted(reconnected))}")
+                print(f"  â™»ï¸  Reconnected: {', '.join(sorted(reconnected))}")
             if added:
-                print(f"  ➕ Added: {', '.join(sorted(added))}")
+                print(f"  â• Added: {', '.join(sorted(added))}")
             if removed:
-                print(f"  ➖ Removed: {', '.join(sorted(removed))}")
+                print(f"  â– Removed: {', '.join(sorted(removed))}")
             if not connected_servers:
                 print("  No MCP servers connected.")
             else:
                 print(
-                    f"  🔧 {len(new_tools)} tool(s) available from {len(connected_servers)} server(s)"
+                    f"  ğŸ”§ {len(new_tools)} tool(s) available from {len(connected_servers)} server(s)"
                 )
 
             # Refresh the agent's tool list so the model can call new tools
@@ -2511,11 +2511,11 @@ class ReYMeNCLI(
                     )  # Best-effort
 
             print(
-                f"  ✅ Agent updated — {len(self.agent.tools if self.agent else [])} tool(s) available"
+                f"  âœ… Agent updated â€” {len(self.agent.tools if self.agent else [])} tool(s) available"
             )
 
         except Exception as e:
-            print(f"  ❌ MCP reload failed: {e}")
+            print(f"  âŒ MCP reload failed: {e}")
 
     def _reload_skills(self) -> None:
         """Reload skills: rescan ~/.ReYMeN/skills/ and queue a note for the
@@ -2525,7 +2525,7 @@ class ReYMeNCLI(
         them (they're invoked via ``/skill-name``, ``skills_list``, or
         ``skill_view`` at runtime), so this does NOT clear the prompt cache.
         It rescans the slash-command map, prints the diff for the user, and
-        — if any skills were added or removed — queues a one-shot note that
+        â€” if any skills were added or removed â€” queues a one-shot note that
         gets prepended to the next user message. This preserves message
         alternation (no phantom user turn injected out of band) and keeps
         prompt caching intact.
@@ -2534,7 +2534,7 @@ class ReYMeNCLI(
             from agent.skill_commands import reload_skills, get_skill_commands
 
             if not self._command_running:
-                print("🔄 Reloading skills...")
+                print("ğŸ”„ Reloading skills...")
 
             result = reload_skills()
 
@@ -2549,7 +2549,7 @@ class ReYMeNCLI(
 
             if not added and not removed:
                 print("  No new skills detected.")
-                print(f"  📚 {total} skill(s) available")
+                print(f"  ğŸ“š {total} skill(s) available")
                 return
 
             def _fmt_line(item: dict) -> str:
@@ -2558,18 +2558,18 @@ class ReYMeNCLI(
                 return f"    - {nm}: {desc}" if desc else f"    - {nm}"
 
             if added:
-                print("  ➕ Added Skills:")
+                print("  â• Added Skills:")
                 for item in added:
                     print(f"  {_fmt_line(item)}")
             if removed:
-                print("  ➖ Removed Skills:")
+                print("  â– Removed Skills:")
                 for item in removed:
                     print(f"  {_fmt_line(item)}")
-            print(f"  📚 {total} skill(s) available")
+            print(f"  ğŸ“š {total} skill(s) available")
 
             # Queue a one-shot note for the NEXT user turn. The CLI's agent
             # loop prepends ``_pending_skills_reload_note`` (if set) to the
-            # API-call-local message at ~L8770, then clears it — same
+            # API-call-local message at ~L8770, then clears it â€” same
             # pattern as ``_pending_model_switch_note``. Nothing is written
             # to conversation_history here, so message alternation stays
             # intact and no out-of-band user turn is persisted.
@@ -2593,7 +2593,7 @@ class ReYMeNCLI(
             self._pending_skills_reload_note = "\n".join(sections)
 
         except Exception as e:
-            print(f"  ❌ Skills reload failed: {e}")
+            print(f"  âŒ Skills reload failed: {e}")
 
     # ====================================================================
     # Tool-call generation indicator (shown during streaming)
@@ -2613,8 +2613,8 @@ class ReYMeNCLI(
 
         from agent.display import get_tool_emoji
 
-        emoji = get_tool_emoji(tool_name, default="⚡")
-        _cprint(f"  ┊ {emoji} preparing {tool_name}…")
+        emoji = get_tool_emoji(tool_name, default="âš¡")
+        _cprint(f"  â”Š {emoji} preparing {tool_name}â€¦")
 
     # ====================================================================
     # Tool progress callback (audio cues for voice mode)
@@ -2816,13 +2816,13 @@ class ReYMeNCLI(
         self._invalidate()
 
         # Poll for the user's response.  The countdown in the hint line
-        # updates on each invalidate — but frequent repaints cause visible
+        # updates on each invalidate â€” but frequent repaints cause visible
         # flicker in some terminals (Kitty, ghostty).  We only refresh the
-        # countdown every 5 s; selection changes (↑/↓) trigger instant
+        # countdown every 5 s; selection changes (â†‘/â†“) trigger instant
         # Poll for the user's response.  The countdown in the hint line
-        # updates on each invalidate — but frequent repaints cause visible
+        # updates on each invalidate â€” but frequent repaints cause visible
         # flicker in some terminals (Kitty, ghostty).  We only refresh the
-        # countdown every 5 s; selection changes (↑/↓) trigger instant
+        # countdown every 5 s; selection changes (â†‘/â†“) trigger instant
         # repaints via the key bindings.
         _last_countdown_refresh = _time.monotonic()
         while True:
@@ -2834,7 +2834,7 @@ class ReYMeNCLI(
                 remaining = self._clarify_deadline - _time.monotonic()
                 if remaining <= 0:
                     break
-                # Only repaint every 5 s for the countdown — avoids flicker
+                # Only repaint every 5 s for the countdown â€” avoids flicker
                 now = _time.monotonic()
                 if now - _last_countdown_refresh >= 5.0:
                     _last_countdown_refresh = now
@@ -2843,13 +2843,13 @@ class ReYMeNCLI(
                     _last_countdown_refresh = now
                     self._invalidate()
 
-        # Timed out — tear down the UI and let the agent decide
+        # Timed out â€” tear down the UI and let the agent decide
         self._clarify_state = None
         self._clarify_freetext = False
         self._clarify_deadline = 0
         self._invalidate()
         _cprint(
-            f"\n{_DIM}(clarify timed out after {timeout}s — agent will decide){_RST}"
+            f"\n{_DIM}(clarify timed out after {timeout}s â€” agent will decide){_RST}"
         )
         return (
             "The user did not provide a response within the time limit. "
@@ -2933,7 +2933,7 @@ def _run_kanban_goal_loop_q(cli: "ReYMeNCLI", first_response: str) -> None:
     only when ``ReYMeN_KANBAN_GOAL_MODE`` is set (dispatcher-spawned
     goal_mode card). Wires the worker's ``run_conversation`` and the kanban
     DB into ``goals.run_kanban_goal_loop``. All errors are swallowed by the
-    caller — a broken goal loop must never wedge a worker, the dispatcher's
+    caller â€” a broken goal loop must never wedge a worker, the dispatcher's
     claim TTL / crash detection is the backstop.
     """
     import os as _os
@@ -3067,7 +3067,7 @@ def main(
         compact: Use compact display mode
         list_tools: List available tools and exit
         list_toolsets: List available toolsets and exit
-        yolo: Enable YOLO mode — skip all dangerous command approval prompts
+        yolo: Enable YOLO mode â€” skip all dangerous command approval prompts
         resume: Resume a previous session by its ID (e.g., 20260225_143052_a1b2c3)
         worktree: Run in an isolated git worktree (for parallel agents). Alias: -w
         w: Shorthand for --worktree
@@ -3085,7 +3085,7 @@ def main(
     """
     global _active_worktree
 
-    # Force UTF-8 stdio on Windows before any banner/print() runs — the
+    # Force UTF-8 stdio on Windows before any banner/print() runs â€” the
     # Rich console prints Unicode box-drawing characters that would
     # UnicodeEncodeError on cp1252.  No-op on Linux/macOS.
     try:
@@ -3103,7 +3103,7 @@ def main(
     if yolo:
         os.environ["REYMEN_YOLO_MODE"] = "1"
 
-    # approvals.mode = off → YOLO modu (config)
+    # approvals.mode = off â†’ YOLO modu (config)
     if not os.environ.get("REYMEN_YOLO_MODE"):
         try:
             from reymen.reymen_cli.config import load_config as _load_reymen_config
@@ -3127,7 +3127,7 @@ def main(
 
     # Skip worktree for list commands (they exit immediately)
     if not list_tools and not list_toolsets:
-        # ── Git worktree isolation (#652) ──
+        # â”€â”€ Git worktree isolation (#652) â”€â”€
         # Create an isolated worktree so this agent instance doesn't collide
         # with other agents working on the same repo.
         use_worktree = worktree or w or CLI_CONFIG.get("worktree", False)
@@ -3143,7 +3143,7 @@ def main(
                 os.environ["TERMINAL_CWD"] = wt_info["path"]
                 atexit.register(_cleanup_worktree, wt_info)
             else:
-                # Worktree was explicitly requested but setup failed —
+                # Worktree was explicitly requested but setup failed â€”
                 # don't silently run without isolation.
                 return
     else:
@@ -3232,7 +3232,7 @@ def main(
     # Also install signal handlers in single-query / `-q` mode.  Interactive
     # mode registers its own inside ReYMeNCLI.run(), but `-q` runs
     # cli.agent.run_conversation() below and AIAgent spawns worker threads
-    # for tools — so when SIGTERM arrives on the main thread, raising
+    # for tools â€” so when SIGTERM arrives on the main thread, raising
     # KeyboardInterrupt only unwinds the main thread, not the worker
     # running _wait_for_process.  Python then exits, the child subprocess
     # (spawned with os.setsid, its own process group) is reparented to
@@ -3265,7 +3265,7 @@ def main(
         # subprocess in _wait_for_process. Raising KeyboardInterrupt only
         # unwinds the main thread; the worker thread keeps running, the
         # process gets reparented to init, and the dispatcher's _pid_alive
-        # check returns True forever — task stuck in 'running' indefinitely.
+        # check returns True forever â€” task stuck in 'running' indefinitely.
         # Skip the controlled-unwind dance and call os._exit(0) so the kernel
         # reclaims the PID immediately and detect_crashed_workers can reclaim
         # the stale claim on the next tick. Flush logging + stdout/stderr
@@ -3388,7 +3388,7 @@ def main(
                             if any(p.get("type") == "image_url" for p in _parts):
                                 effective_query = _parts
                             else:
-                                # All images unreadable — text fallback.
+                                # All images unreadable â€” text fallback.
                                 # ``_preprocess_images_with_vision`` only knows
                                 # about local files; URLs would be lost there,
                                 # so keep the original query text intact when
@@ -3448,7 +3448,7 @@ def main(
                         else str(result)
                     )
                     # Surface backend errors that produced no visible output
-                    # (e.g. invalid model slug → provider 4xx). Mirrors the
+                    # (e.g. invalid model slug â†’ provider 4xx). Mirrors the
                     # interactive CLI path. Write to stderr so piped stdout
                     # stays clean for automation wrappers.
                     if (
@@ -3465,7 +3465,7 @@ def main(
                     # goal_mode card keeps working in THIS session until an
                     # auxiliary judge agrees the card is done, the worker
                     # terminates the task itself, or the turn budget runs
-                    # out (→ sticky block). Gated on the env vars the
+                    # out (â†’ sticky block). Gated on the env vars the
                     # dispatcher sets in `_default_spawn`; a no-op for every
                     # normal worker and every non-kanban `-q` run.
                     if os.environ.get("ReYMeN_KANBAN_GOAL_MODE") == "1":
@@ -3485,8 +3485,8 @@ def main(
             # Exit with error code if credentials or agent init fails
             sys.exit(1)
         else:
-            # Single-query mode (`ReYMeN chat -q "…"`): skip the welcome
-            # banner. Building the banner takes ~420 ms on cold start —
+            # Single-query mode (`ReYMeN chat -q "â€¦"`): skip the welcome
+            # banner. Building the banner takes ~420 ms on cold start â€”
             # ~200 ms of that is the version-update check, the rest is
             # toolset / skill enumeration and Rich panel rendering. None
             # of that is useful for a one-shot query: the user already
@@ -3501,7 +3501,7 @@ def main(
             _query_label = query or ("[image attached]" if single_query_images else "")
             if _query_label:
                 cli.console.print(f"[bold blue]Query:[/] {_query_label}")
-            # Surface security advisories before the agent runs — short
+            # Surface security advisories before the agent runs â€” short
             # banner, doesn't depend on the welcome banner being shown.
             cli._show_security_advisories()
             cli.chat(query, images=single_query_images or None)

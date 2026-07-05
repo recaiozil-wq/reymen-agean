@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""browser_camofox.py — Tarayici Parmak Izi Korumasi.
+﻿# -*- coding: utf-8 -*-
+"""browser_camofox.py â€” Tarayici Parmak Izi Korumasi.
 
 Playwright ile tarayici acarken fingerprint'i gizler,
 bot tespitini engeller. User-agent, viewport, header

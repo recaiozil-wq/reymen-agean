@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""mcp_oauth.py — MCP OAuth Yonetimi.
+﻿# -*- coding: utf-8 -*-
+"""mcp_oauth.py â€” MCP OAuth Yonetimi.
 
 MCP sunucularina OAuth 2.0 ile guvenli baglanti.
 """
@@ -73,14 +73,14 @@ def oauth_token_al(sunucu: str) -> str:
 
 
 def motor_kaydet(motor):
-    """MCP OAuth araçlarını motora kaydet."""
+    """MCP OAuth araÃ§larÄ±nÄ± motora kaydet."""
     if not hasattr(motor, "_plugin_arac_kaydet"):
         return
     motor._plugin_arac_kaydet(
         "MCP_OAUTH_TOKEN",
         lambda sunucu="": oauth_token_al(str(sunucu))
-        or f"[OAuth]: {sunucu} için token yok",
-        "MCP sunucu OAuth token'ını al (sunucu: sunucu adı)",
+        or f"[OAuth]: {sunucu} iÃ§in token yok",
+        "MCP sunucu OAuth token'Ä±nÄ± al (sunucu: sunucu adÄ±)",
     )
 
 

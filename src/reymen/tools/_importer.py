@@ -1,9 +1,9 @@
-"""ReYMeN tools import hook — `from tools.xxx import yyy` → `from reymen.tools.xxx import yyy`.
+﻿"""ReYMeN tools import hook â€” `from tools.xxx import yyy` â†’ `from reymen.tools.xxx import yyy`.
 
-Bu modül, Hermes Agent'in `tools/` paketi yerine ReYMeN'in `reymen/tools/`
-shim'lerinin kullanılmasını sağlar.
+Bu modÃ¼l, ReYMeN Agent'in `tools/` paketi yerine ReYMeN'in `reymen/tools/`
+shim'lerinin kullanÄ±lmasÄ±nÄ± saÄŸlar.
 
-Kullanım (herhangi bir entry point'te bir kere):
+KullanÄ±m (herhangi bir entry point'te bir kere):
     import reymen.tools._importer  # otomatik hook kurar
 """
 
@@ -16,7 +16,7 @@ from typing import Optional
 
 logger = logging.getLogger(__name__)
 
-# ReYMeN tools modüllerinin listesi (import hook ile yönlendirilecek)
+# ReYMeN tools modÃ¼llerinin listesi (import hook ile yÃ¶nlendirilecek)
 _TOOLS_MODULES = {
     "tools.tts_tool",
     "tools.browser_tool",
@@ -58,10 +58,10 @@ _TOOLS_MODULES = {
 
 
 class _ToolsRedirectFinder:
-    """Import hook: tools.xxx → reymen.tools.xxx ve reymen_cli → ReYMeN_cli."""
+    """Import hook: tools.xxx â†’ reymen.tools.xxx ve reymen_cli â†’ ReYMeN_cli."""
 
     def find_spec(self, fullname, path=None, target=None):
-        # tools.xxx → reymen.tools.xxx
+        # tools.xxx â†’ reymen.tools.xxx
         if fullname in _TOOLS_MODULES:
             reymen_name = fullname.replace("tools.", "reymen.tools.", 1)
             try:
@@ -69,29 +69,29 @@ class _ToolsRedirectFinder:
             except (ImportError, ValueError, AttributeError):
                 return None
 
-        # reymen_cli → ReYMeN_cli (editable finder bypass)
+        # reymen_cli â†’ ReYMeN_cli (editable finder bypass)
         if fullname == "reymen_cli" or fullname.startswith("reymen_cli."):
-            # Önce sys.modules'te var mı kontrol et
+            # Ã–nce sys.modules'te var mÄ± kontrol et
             if fullname in sys.modules:
-                return None  # Zaten yüklü, normal akışa devam et
+                return None  # Zaten yÃ¼klÃ¼, normal akÄ±ÅŸa devam et
 
-            # reymen_cli → ReYMeN_cli, reymen_cli.xxx → ReYMeN_cli.xxx
+            # reymen_cli â†’ ReYMeN_cli, reymen_cli.xxx â†’ ReYMeN_cli.xxx
             alt_name = fullname.replace("reymen_cli", "ReYMeN_cli", 1)
             try:
                 spec = importlib.util.find_spec(alt_name)
                 if spec is not None:
-                    # Alt modülleri sys.modules'e kaydet (cycle önleme)
+                    # Alt modÃ¼lleri sys.modules'e kaydet (cycle Ã¶nleme)
                     actual = importlib.import_module(alt_name)
                     sys.modules[fullname] = actual
                 return spec
             except (ImportError, ValueError, AttributeError):
                 return None
 
-        # hermes_cli → ReYMeN_cli (Hermes bagimsizligi)
+        # hermes_cli â†’ ReYMeN_cli (ReYMeN bagimsizligi)
         if fullname == "hermes_cli" or fullname.startswith("hermes_cli."):
             if fullname in sys.modules:
                 return None
-            # hermes_cli → ReYMeN_cli, hermes_cli.xxx → ReYMeN_cli.xxx
+            # hermes_cli â†’ ReYMeN_cli, hermes_cli.xxx â†’ ReYMeN_cli.xxx
             alt_name = fullname.replace("hermes_cli", "ReYMeN_cli", 1)
             try:
                 spec = importlib.util.find_spec(alt_name)
@@ -121,5 +121,5 @@ def install() -> None:
     logger.debug("ReYMeN tools import hook installed (%d modules)", len(_TOOLS_MODULES))
 
 
-# Modül yüklendiğinde otomatik kur
+# ModÃ¼l yÃ¼klendiÄŸinde otomatik kur
 install()

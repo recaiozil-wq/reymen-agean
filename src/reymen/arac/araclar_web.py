@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-araclar_web.py — Web arama + sayfa icerik cekme (cok kaynakli, dayanikli).
+araclar_web.py â€” Web arama + sayfa icerik cekme (cok kaynakli, dayanikli).
 
-Web arama: SearchDispatcher'a yönlendirir (reymen.arac.web_search_engine).
+Web arama: SearchDispatcher'a yÃ¶nlendirir (reymen.arac.web_search_engine).
 Sayfa icerik cekme: Playwright > urllib fallback.
 
 API anahtari gerekmez (DuckDuckGo fallback her zaman calisir).
@@ -18,7 +18,7 @@ import urllib.request
 from html.parser import HTMLParser
 from pathlib import Path
 
-from src.reymen.arac.web_search_engine import _get_registry as _get_dispatcher
+from reymen.arac.web_search_engine import _get_registry as _get_dispatcher
 
 logger = logging.getLogger(__name__)
 
@@ -41,16 +41,16 @@ def _http_get(
         return r.read().decode(charset, errors="replace")
 
 
-# ── Ana arama fonksiyonu (SearchDispatcher'a yönlendirir) ─────────────────
+# â”€â”€ Ana arama fonksiyonu (SearchDispatcher'a yÃ¶nlendirir) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def web_ara(sorgu: str, adet: int = 5) -> str:
-    """Internette arar. SearchDispatcher'a yönlendirir (auto-detect)."""
+    """Internette arar. SearchDispatcher'a yÃ¶nlendirir (auto-detect)."""
     dispatcher = _get_dispatcher()
     return dispatcher.ara(sorgu, engine="auto", max_sonuc=adet)
 
 
-# ── Sayfa icerik cekme ────────────────────────────────────────────────────
+# â”€â”€ Sayfa icerik cekme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def web_icerik_al(url: str, max_karakter: int = 3000) -> str:
@@ -103,7 +103,7 @@ def web_icerik_al(url: str, max_karakter: int = 3000) -> str:
         return f"[Web] Icerik alinamadi: {e}"
 
 
-# ── Motor kayit ───────────────────────────────────────────────────────────
+# â”€â”€ Motor kayit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def motor_kaydet(motor) -> None:

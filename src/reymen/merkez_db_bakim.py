@@ -1,4 +1,4 @@
-"""merkez_db_bakim.py — Haftalık WAL checkpoint + boyut raporu."""
+﻿"""merkez_db_bakim.py â€” HaftalÄ±k WAL checkpoint + boyut raporu."""
 
 import sqlite3, os, json
 from pathlib import Path
@@ -23,5 +23,5 @@ for db in sorted(DB_DIR.glob("*.db")):
     except Exception as e:
         CIKTI.append(f"{db.name}: HATA {e}")
 
-print(f"Merkez DB Bakım — {len(CIKTI)} DB işlendi")
+print(f"Merkez DB BakÄ±m â€” {len(CIKTI)} DB iÅŸlendi")
 print("\n".join(CIKTI))

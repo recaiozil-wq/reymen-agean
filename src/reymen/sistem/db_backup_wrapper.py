@@ -1,7 +1,7 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-db_backup_wrapper.py — ReYMeN DB Yedekleme Wrapper
+db_backup_wrapper.py â€” ReYMeN DB Yedekleme Wrapper
 
 Kullanim: python db_backup_wrapper.py
           python db_backup_wrapper.py --full
@@ -22,7 +22,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-# ── Sabitler ───────────────────────────────────────────────────
+# â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 PROJE_KOK = Path(__file__).parent.parent.parent.parent
 DB_BACKUP_PY = PROJE_KOK / "src" / "reymen" / "sistem" / "db_backup.py"
 LOG_DOSYASI = PROJE_KOK / "logs" / "db_backup_wrapper.log"
@@ -40,7 +40,7 @@ logging.basicConfig(
 log = logging.getLogger("db_backup_wrapper")
 
 
-# ── Ana fonksiyon ──────────────────────────────────────────────
+# â”€â”€ Ana fonksiyon â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def calistir(ek_argumanlar: list = None) -> dict:
     """db_backup.py'yi calistir ve sonucu don."""

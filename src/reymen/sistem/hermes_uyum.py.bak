@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-hermes_uyum.py — Hermes CLI uyumluluk katmani.
+hermes_uyum.py — ReYMeN CLI uyumluluk katmani.
 
-ReYMeN, Hermes CLI olmadan da calisabilir. Bu modul,
+ReYMeN, ReYMeN CLI olmadan da calisabilir. Bu modul,
 hermes_cli'den gelen fonksiyonlari ReYMeN'in kendi
-modullerine yonlendirir. Hermes Agent referans alinmistir.
-Apache 2.0 Lisansi — github.com/NousResearch/hermes-agent
+modullerine yonlendirir. ReYMeN Agent referans alinmistir.
+Apache 2.0 Lisansi — github.com/NousResearch/reymen-agent
 """
 
 import logging

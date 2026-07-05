@@ -1,4 +1,4 @@
-"""
+﻿"""
 Platform adapters for messaging integrations.
 
 Each adapter handles:
@@ -15,7 +15,7 @@ from .base import BasePlatformAdapter, MessageEvent, SendResult
 # QQAdapter`` (every real call site uses the long-form path
 # ``from reymen.gateway.platforms.qqbot import QQAdapter``). The eager imports
 # pulled in qqbot's chunked-upload + keyboards + onboard machinery and
-# yuanbao's websocket stack — about 48 ms wall and ~8 MB RSS on every
+# yuanbao's websocket stack â€” about 48 ms wall and ~8 MB RSS on every
 # CLI invocation, even ones that never touch a gateway adapter.
 #
 # Use PEP 562 module ``__getattr__`` to keep the public re-export working

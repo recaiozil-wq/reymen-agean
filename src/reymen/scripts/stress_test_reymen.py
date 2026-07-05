@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""ReYMeN Stress Test — 3000 sorgu hedefli batch test + rapor"""
+﻿# -*- coding: utf-8 -*-
+"""ReYMeN Stress Test â€” 3000 sorgu hedefli batch test + rapor"""
 
 import sys, os, json, time, random
 from datetime import datetime
@@ -10,10 +10,10 @@ os.chdir(str(Path(__file__).parent.parent))
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))  # proje kok
 
 from openai import OpenAI
-from src.reymen.cereyan.conversation_loop import ConversationLoop
+from reymen.cereyan.conversation_loop import ConversationLoop
 
 
-# ── Beyin ──
+# â”€â”€ Beyin â”€â”€
 class TestBeyin:
     def __init__(self):
         self.model = os.environ.get("REYMEN_MODEL", "deepseek-v4-flash")
@@ -37,7 +37,7 @@ class TestBeyin:
         return r.choices[0].message.content or ""
 
 
-# ── Test Sorulari (50 cesit, 60x tekrar = 3000) ──
+# â”€â”€ Test Sorulari (50 cesit, 60x tekrar = 3000) â”€â”€
 SORULAR = [
     # A) ONCELIK_CACHE (6)
     "slm",
@@ -69,7 +69,7 @@ SORULAR = [
     # D) Karma
     "tesekkur ederim",
     "sagol",
-    "görüşürüz",
+    "gÃ¶rÃ¼ÅŸÃ¼rÃ¼z",
     "eyvallah",
     "bana yardim et",
     "bilgisayar nedir",
@@ -94,7 +94,7 @@ SORULAR = [
 # Her soruyu 4x tekrarla (4*50=200)
 TEKRAR = 4
 
-# ── Rapor ──
+# â”€â”€ Rapor â”€â”€
 rapor = {
     "baslangic": datetime.now().isoformat(),
     "toplam": 0,
@@ -137,12 +137,12 @@ for soru in SORULAR:
                 rapor["basarisiz"] += 1
                 hata = sonuc.get("hata", "bilinmiyor")
                 rapor["hatalar"].append({"soru": soru, "hata": hata})
-                print(f"  ❌ [{kos_no}/{top_kos}] {soru}: {hata[:80]}")
+                print(f"  âŒ [{kos_no}/{top_kos}] {soru}: {hata[:80]}")
         except Exception as e:
             rapor["basarisiz"] += 1
             rapor["toplam"] += 1
             rapor["hatalar"].append({"soru": soru, "hata": str(e)[:100]})
-            print(f"  ❌ [{kos_no}/{top_kos}] {soru}: EXCEPTION {str(e)[:80]}")
+            print(f"  âŒ [{kos_no}/{top_kos}] {soru}: EXCEPTION {str(e)[:80]}")
 
         # Her 100'de bir ara rapor
         if kos_no % 100 == 0:
@@ -150,10 +150,10 @@ for soru in SORULAR:
                 (rapor["basarili"] / rapor["toplam"] * 100) if rapor["toplam"] else 0
             )
             print(
-                f"  📊 [{kos_no}/{top_kos}] Basarili: {rapor['basarili']}/{rapor['toplam']} ({basari_oran:.1f}%)"
+                f"  ğŸ“Š [{kos_no}/{top_kos}] Basarili: {rapor['basarili']}/{rapor['toplam']} ({basari_oran:.1f}%)"
             )
 
-# ── Final Rapor ──
+# â”€â”€ Final Rapor â”€â”€
 rapor["bitis"] = datetime.now().isoformat()
 toplam_sure = sum(rapor["sureler"])
 ortalama_sure = toplam_sure / len(rapor["sureler"]) if rapor["sureler"] else 0
@@ -175,7 +175,7 @@ for k, v in sorted(rapor["kaynak_dagilimi"].items(), key=lambda x: -x[1]):
 if rapor["hatalar"]:
     print(f"\n  Ilk 10 Hata:")
     for h in rapor["hatalar"][:10]:
-        print(f"    ❌ {h['soru']}: {h['hata'][:80]}")
+        print(f"    âŒ {h['soru']}: {h['hata'][:80]}")
 
 rapor["ortalama_sure"] = round(ortalama_sure, 2)
 rapor["basari_orani"] = round(basari_oran, 1)

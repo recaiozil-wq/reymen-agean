@@ -1,16 +1,16 @@
-"""
-ReYMeN Gateway — Email platform adapter.
+﻿"""
+ReYMeN Gateway â€” Email platform adapter.
 
 SMTP (outgoing) ve IMAP (incoming) uzerinden email mesajlasmasi saglar.
 Python built-in kutuphaneleri kullanir (smtplib, imaplib, email).
 
 Yapilandirma (ortam degiskenleri):
-  EMAIL_SMTP_HOST     — SMTP sunucu adresi (ornek: smtp.gmail.com)
-  EMAIL_SMTP_PORT     — SMTP portu (ornek: 587)
-  EMAIL_IMAP_HOST     — IMAP sunucu adresi (ornek: imap.gmail.com)
-  EMAIL_IMAP_PORT     — IMAP portu (ornek: 993)
-  EMAIL_ADDRESS       — E-posta adresi (ornek: user@gmail.com)
-  EMAIL_PASSWORD      — E-posta sifresi / uygulama sifresi
+  EMAIL_SMTP_HOST     â€” SMTP sunucu adresi (ornek: smtp.gmail.com)
+  EMAIL_SMTP_PORT     â€” SMTP portu (ornek: 587)
+  EMAIL_IMAP_HOST     â€” IMAP sunucu adresi (ornek: imap.gmail.com)
+  EMAIL_IMAP_PORT     â€” IMAP portu (ornek: 993)
+  EMAIL_ADDRESS       â€” E-posta adresi (ornek: user@gmail.com)
+  EMAIL_PASSWORD      â€” E-posta sifresi / uygulama sifresi
 """
 
 import asyncio
@@ -32,15 +32,15 @@ from pathlib import Path as _Path
 
 sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
-from src.gateways.config import Platform, PlatformConfig
-from src.gateways.platforms.base import (
+from gateways.config import Platform, PlatformConfig
+from gateways.platforms.base import (
     BasePlatformAdapter,
     MessageEvent,
     MessageType,
     ProcessingOutcome,
     SendResult,
 )
-from src.gateways.platforms.helpers import (
+from gateways.platforms.helpers import (
     MessageDeduplicator,
     strip_markdown,
 )
@@ -51,7 +51,7 @@ logger = logging.getLogger(__name__)
 # Bagimlilik kontrolu
 # ---------------------------------------------------------------------------
 
-# smtplib, imaplib, email Python built-in — ek bagimlilik gerekmez.
+# smtplib, imaplib, email Python built-in â€” ek bagimlilik gerekmez.
 
 EMAIL_AVAILABLE = True
 

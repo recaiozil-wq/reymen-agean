@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-
-"""codex_responses_adapter.py — OpenAI Codex / Responses API Adaptörü.
+﻿# -*- coding: utf-8 -*-
+"""codex_responses_adapter.py â€” OpenAI Codex / Responses API AdaptÃ¶rÃ¼.
 
-OpenAI'nin yeni `/v1/responses` endpoint'ini kullanır (GPT-4o dahil).
-Klasik `/v1/chat/completions`'tan farkı: durum bilgisi saklama, web arama,
-kod yorumlama gibi built-in araçları destekler.
+OpenAI'nin yeni `/v1/responses` endpoint'ini kullanÄ±r (GPT-4o dahil).
+Klasik `/v1/chat/completions`'tan farkÄ±: durum bilgisi saklama, web arama,
+kod yorumlama gibi built-in araÃ§larÄ± destekler.
 ENV: OPENAI_API_KEY
 """
 
@@ -19,7 +19,7 @@ VARSAYILAN_MODEL = os.environ.get("CODEX_MODEL", "gpt-4o")
 
 def _openai_istek(yol: str, veri: dict) -> dict:
     if not OPENAI_API_KEY:
-        return {"error": "OPENAI_API_KEY ayarlanmamış."}
+        return {"error": "OPENAI_API_KEY ayarlanmamÄ±ÅŸ."}
     try:
         req = urllib.request.Request(
             f"{OPENAI_BASE}{yol}",
@@ -36,12 +36,12 @@ def _openai_istek(yol: str, veri: dict) -> dict:
 
 
 def _responses_istek(veri: dict) -> dict:
-    """/v1/responses endpoint'i — yeni Responses API."""
+    """/v1/responses endpoint'i â€” yeni Responses API."""
     return _openai_istek("/responses", veri)
 
 
 class CodexResponsesAdapter:
-    """OpenAI Responses API adaptörü (built-in araçlar destekli)."""
+    """OpenAI Responses API adaptÃ¶rÃ¼ (built-in araÃ§lar destekli)."""
 
     def __init__(
         self,
@@ -65,17 +65,17 @@ class CodexResponsesAdapter:
         max_output_tokens: int = 4096,
         sicaklik: float = 0.7,
     ) -> dict:
-        """Responses API çağrısı.
+        """Responses API Ã§aÄŸrÄ±sÄ±.
 
         Args:
-            mesajlar:         Konuşma geçmişi
-            araclar:          Built-in araçlar (web_search_preview, code_interpreter, vb.)
-            onceki_yanit_id:  Durum bilgisi devamı için önceki yanıt ID
-            max_output_tokens: Maks çıktı token
-            sicaklik:         Yaratıcılık (0-2)
+            mesajlar:         KonuÅŸma geÃ§miÅŸi
+            araclar:          Built-in araÃ§lar (web_search_preview, code_interpreter, vb.)
+            onceki_yanit_id:  Durum bilgisi devamÄ± iÃ§in Ã¶nceki yanÄ±t ID
+            max_output_tokens: Maks Ã§Ä±ktÄ± token
+            sicaklik:         YaratÄ±cÄ±lÄ±k (0-2)
 
         Returns:
-            API yanıtı dict
+            API yanÄ±tÄ± dict
         """
         govde: dict = {
             "model": self.model,
@@ -107,16 +107,16 @@ class CodexResponsesAdapter:
         kod_yorumlayici: bool = False,
         **kwargs,
     ) -> str:
-        """Responses API'den yanıt al.
+        """Responses API'den yanÄ±t al.
 
         Args:
             sistem:           Sistem promptu
-            mesajlar:         Konuşma geçmişi
-            web_arama:        Web arama aracı etkin mi
-            kod_yorumlayici:  Kod yorumlayıcı aracı etkin mi
+            mesajlar:         KonuÅŸma geÃ§miÅŸi
+            web_arama:        Web arama aracÄ± etkin mi
+            kod_yorumlayici:  Kod yorumlayÄ±cÄ± aracÄ± etkin mi
 
         Returns:
-            Yanıt metni
+            YanÄ±t metni
         """
         giris = (
             [{"role": "system", "content": sistem}] + mesajlar if sistem else mesajlar
@@ -133,7 +133,7 @@ class CodexResponsesAdapter:
         if "error" in yanit:
             return f"[Codex Responses]: {yanit['error']}"
 
-        # Responses API çıktı formatı
+        # Responses API Ã§Ä±ktÄ± formatÄ±
         cikti = yanit.get("output", [])
         if isinstance(cikti, list):
             metin_parcalari = []
@@ -153,30 +153,30 @@ class CodexResponsesAdapter:
         return f"[Codex Responses]: {yanit}"
 
     def kod_calistir(self, kod: str, dil: str = "python") -> str:
-        """Kod yorumlayıcı ile kod çalıştır.
+        """Kod yorumlayÄ±cÄ± ile kod Ã§alÄ±ÅŸtÄ±r.
 
         Args:
-            kod:  Çalıştırılacak kod
-            dil:  Programlama dili (python varsayılan)
+            kod:  Ã‡alÄ±ÅŸtÄ±rÄ±lacak kod
+            dil:  Programlama dili (python varsayÄ±lan)
 
         Returns:
-            Çıktı veya hata
+            Ã‡Ä±ktÄ± veya hata
         """
         return self.uret(
-            sistem="Sen bir kod çalıştırma asistanısın.",
+            sistem="Sen bir kod Ã§alÄ±ÅŸtÄ±rma asistanÄ±sÄ±n.",
             mesajlar=[
                 {
                     "role": "user",
-                    "content": f"Bu {dil} kodunu çalıştır:\n```{dil}\n{kod}\n```",
+                    "content": f"Bu {dil} kodunu Ã§alÄ±ÅŸtÄ±r:\n```{dil}\n{kod}\n```",
                 }
             ],
             kod_yorumlayici=True,
         )
 
     def web_ara(self, sorgu: str) -> str:
-        """Web arama built-in aracı ile arama yap."""
+        """Web arama built-in aracÄ± ile arama yap."""
         return self.uret(
-            sistem="Sen web araştırması yapan bir asistandın.",
+            sistem="Sen web araÅŸtÄ±rmasÄ± yapan bir asistandÄ±n.",
             mesajlar=[{"role": "user", "content": sorgu}],
             web_arama=True,
         )
@@ -186,14 +186,14 @@ class CodexResponsesAdapter:
 
     def saglik_kontrol(self) -> dict:
         if not self.api_key:
-            return {"ok": False, "sebep": "API anahtarı yok"}
+            return {"ok": False, "sebep": "API anahtarÄ± yok"}
         yanit = self.tamamla([{"role": "user", "content": "test"}], max_output_tokens=5)
         if "error" in yanit:
             return {"ok": False, "sebep": yanit["error"]}
         return {"ok": True, "model": self.model}
 
 
-# Chat completions fallback (eski endpoint uyumluluğu)
+# Chat completions fallback (eski endpoint uyumluluÄŸu)
 class OpenAIChatAdapter:
     """Klasik /v1/chat/completions endpoint'i."""
 
@@ -215,12 +215,12 @@ class OpenAIChatAdapter:
         if "error" in yanit:
             return f"[OpenAI]: {yanit['error']}"
         secimler = yanit.get("choices", [])
-        return secimler[0]["message"]["content"] if secimler else "[OpenAI]: Boş yanıt"
+        return secimler[0]["message"]["content"] if secimler else "[OpenAI]: BoÅŸ yanÄ±t"
 
 
 if __name__ == "__main__":
     adapter = CodexResponsesAdapter()
     print(f"Model: {adapter.model}")
-    print(f"Yapılandırıldı: {adapter.yapilandirildi_mi()}")
+    print(f"YapÄ±landÄ±rÄ±ldÄ±: {adapter.yapilandirildi_mi()}")
     if adapter.yapilandirildi_mi():
         print(adapter.saglik_kontrol())

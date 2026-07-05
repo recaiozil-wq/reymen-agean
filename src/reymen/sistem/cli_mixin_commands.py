@@ -1,9 +1,9 @@
-"""ReYMeNCLI mixin module — modüler yapıya yönlendirici.
+﻿"""ReYMeNCLI mixin module â€” modÃ¼ler yapÄ±ya yÃ¶nlendirici.
 
-Bu dosya artık reymen/sistem/cli_commands/ paketine yönlendirir.
-Backward compatibility için MixinCommands sınıfını re-export eder.
+Bu dosya artÄ±k reymen/sistem/cli_commands/ paketine yÃ¶nlendirir.
+Backward compatibility iÃ§in MixinCommands sÄ±nÄ±fÄ±nÄ± re-export eder.
 """
 
-from src.reymen.sistem.cli_commands import MixinCommands
+from reymen.sistem.cli_commands import MixinCommands
 
 __all__ = ["MixinCommands"]

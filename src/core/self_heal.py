@@ -1,21 +1,21 @@
-"""
-SelfHeal — Otonom hata çözücü (v2).
+﻿"""
+SelfHeal â€” Otonom hata Ã§Ã¶zÃ¼cÃ¼ (v2).
 
-Hata al → imza üret → hafızada ara → bulursa uygula → bulamazsa LLM'e sor
-→ LLM'den Python kodu al → çalıştır (subprocess) → doğrula → hafızaya kaydet → döndür.
+Hata al â†’ imza Ã¼ret â†’ hafÄ±zada ara â†’ bulursa uygula â†’ bulamazsa LLM'e sor
+â†’ LLM'den Python kodu al â†’ Ã§alÄ±ÅŸtÄ±r (subprocess) â†’ doÄŸrula â†’ hafÄ±zaya kaydet â†’ dÃ¶ndÃ¼r.
 
-İyileştirmeler (v2):
-- SUBPROCESS_MOD: exec() yerine subprocess (gerçek ortam testi)
-- TTL temizlik: Her coz() çağrısında otomatik temizlik
-- __init__.py export desteği
+Ä°yileÅŸtirmeler (v2):
+- SUBPROCESS_MOD: exec() yerine subprocess (gerÃ§ek ortam testi)
+- TTL temizlik: Her coz() Ã§aÄŸrÄ±sÄ±nda otomatik temizlik
+- __init__.py export desteÄŸi
 - motor.py script_calistir() ile tam entegrasyon
 
-Kullanım:
+KullanÄ±m:
     from reymen.core.self_heal import SelfHeal
     heal = SelfHeal()
     sonuc = heal.coz(hedef="test.py", hata="ZeroDivisionError", kod="print(1/0)")
 
-Bağımlılıklar:
+BaÄŸÄ±mlÄ±lÄ±klar:
     - ogrenme.py (imza, cozum_bul, cozum_kaydet)
     - orchestrator.py (coz_hata)
     - model_adapter.py (get_active_adapter)
@@ -33,27 +33,27 @@ from typing import Optional
 
 logger = logging.getLogger(__name__)
 
-# ── Deneme Ayarları ──────────────────────────────────────────────
+# â”€â”€ Deneme AyarlarÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 MAX_DENEME = 3
 BACKOFF_TABAN = 1.0  # saniye
 BACKOFF_CARPAN = 2.0
 
-# ── Çalıştırma Modu ─────────────────────────────────────────────
-# True  = subprocess (daha güvenli, gerçek ortam, tam Python izolasyonu)
-# False = exec()     (hızlı, hafif, modül içi test)
+# â”€â”€ Ã‡alÄ±ÅŸtÄ±rma Modu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# True  = subprocess (daha gÃ¼venli, gerÃ§ek ortam, tam Python izolasyonu)
+# False = exec()     (hÄ±zlÄ±, hafif, modÃ¼l iÃ§i test)
 SUBPROCESS_MOD = True
 
 
 class SelfHeal:
-    """Ana self-heal sınıfı. Motor.py'den çağrılır.
+    """Ana self-heal sÄ±nÄ±fÄ±. Motor.py'den Ã§aÄŸrÄ±lÄ±r.
 
-    Akış:
-        1. imza_uret(hata, dosya) → SHA256
-        2. cozum_bul(imza) → hafızada varsa direkt döndür
-        3. LLM'e sor → Python kodu üret
-        4. Kodu çalıştır (subprocess veya exec)
-        5. Başarılı → cozum_kaydet(imza, cozum)
-        6. Başarısız → 3 deneme, backoff, farklı prompt
+    AkÄ±ÅŸ:
+        1. imza_uret(hata, dosya) â†’ SHA256
+        2. cozum_bul(imza) â†’ hafÄ±zada varsa direkt dÃ¶ndÃ¼r
+        3. LLM'e sor â†’ Python kodu Ã¼ret
+        4. Kodu Ã§alÄ±ÅŸtÄ±r (subprocess veya exec)
+        5. BaÅŸarÄ±lÄ± â†’ cozum_kaydet(imza, cozum)
+        6. BaÅŸarÄ±sÄ±z â†’ 3 deneme, backoff, farklÄ± prompt
     """
 
     def __init__(self, max_deneme: int = MAX_DENEME):
@@ -63,41 +63,41 @@ class SelfHeal:
         self._hafiza_isabet = 0
         self._adapter = None
 
-    # ── Ana Metod ────────────────────────────────────────────────
+    # â”€â”€ Ana Metod â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def coz(self, hedef: str, hata: str, kod: str = "", dosya_yolu: str = "") -> dict:
-        """Bir hatayı otonom çöz.
+        """Bir hatayÄ± otonom Ã§Ã¶z.
 
         Args:
-            hedef: Ne çözülmeye çalışılıyor (örn: "test.py çalıştır")
-            hata: Hata mesajı (str(e) veya traceback)
+            hedef: Ne Ã§Ã¶zÃ¼lmeye Ã§alÄ±ÅŸÄ±lÄ±yor (Ã¶rn: "test.py Ã§alÄ±ÅŸtÄ±r")
+            hata: Hata mesajÄ± (str(e) veya traceback)
             kod: Hata veren Python kodu (opsiyonel)
-            dosya_yolu: Hata hangi dosyada (opsiyonel, imza için)
+            dosya_yolu: Hata hangi dosyada (opsiyonel, imza iÃ§in)
 
         Returns:
             {
                 "basarili": bool,
-                "cozum": str (düzeltilmiş kod veya açıklama),
+                "cozum": str (dÃ¼zeltilmiÅŸ kod veya aÃ§Ä±klama),
                 "kaynak": "hafiza" | "llm" | "basarisiz",
                 "deneme_sayisi": int,
-                "hata": str (sadece başarısızsa)
+                "hata": str (sadece baÅŸarÄ±sÄ±zsa)
             }
         """
         self._toplam += 1
 
-        # TTL temizlik (her 10 çağrıda bir)
+        # TTL temizlik (her 10 Ã§aÄŸrÄ±da bir)
         if self._toplam % 10 == 1:
             self._ttl_temizle()
 
-        # 1. İmza üret + hafızada ara
+        # 1. Ä°mza Ã¼ret + hafÄ±zada ara
         hata_imza = self._imza_uret(hata, dosya_yolu or hedef)
-        logger.info("[SelfHeal] 🔍 Hata: %s | imza: %s", hata[:80], hata_imza[:16])
+        logger.info("[SelfHeal] ğŸ” Hata: %s | imza: %s", hata[:80], hata_imza[:16])
 
         hafiza_cozum = self._hafizada_ara(hata_imza)
         if hafiza_cozum:
             self._hafiza_isabet += 1
             self._basarili += 1
-            logger.info("[SelfHeal] ✅ Hafızadan çözüm: %s", hafiza_cozum[:100])
+            logger.info("[SelfHeal] âœ… HafÄ±zadan Ã§Ã¶zÃ¼m: %s", hafiza_cozum[:100])
             return {
                 "basarili": True,
                 "cozum": hafiza_cozum,
@@ -106,12 +106,12 @@ class SelfHeal:
                 "hata": "",
             }
 
-        # 2. LLM ile çöz
+        # 2. LLM ile Ã§Ã¶z
         for deneme in range(1, self.max_deneme + 1):
             if deneme > 1:
                 bekleme = BACKOFF_TABAN * (BACKOFF_CARPAN ** (deneme - 2))
                 logger.info(
-                    "[SelfHeal] ⏳ Bekleme: %.1fs (deneme %d/%d)",
+                    "[SelfHeal] â³ Bekleme: %.1fs (deneme %d/%d)",
                     bekleme,
                     deneme,
                     self.max_deneme,
@@ -122,13 +122,13 @@ class SelfHeal:
             if not cozum_kodu:
                 continue
 
-            # 3. Çözümü dene
+            # 3. Ã‡Ã¶zÃ¼mÃ¼ dene
             basarili, cikti = self._cozumu_dene(cozum_kodu)
             if basarili:
                 self._basarili += 1
-                # Hafızaya kaydet
+                # HafÄ±zaya kaydet
                 self._hafizaya_kaydet(hata_imza, hata, cozum_kodu, basarili=True)
-                logger.info("[SelfHeal] ✅ Çözüm başarılı (deneme %d)", deneme)
+                logger.info("[SelfHeal] âœ… Ã‡Ã¶zÃ¼m baÅŸarÄ±lÄ± (deneme %d)", deneme)
                 return {
                     "basarili": True,
                     "cozum": cozum_kodu,
@@ -137,35 +137,35 @@ class SelfHeal:
                     "hata": "",
                 }
 
-            # Düzelmedi — hatayı LLM'e geri bildir
-            logger.info("[SelfHeal] ❌ Deneme %d başarısız: %s", deneme, cikti[:120])
-            hata = cikti  # yeni hata = çalıştırma hatası
-            kod = cozum_kodu  # mevcut kodu düzeltmesi için gönder
+            # DÃ¼zelmedi â€” hatayÄ± LLM'e geri bildir
+            logger.info("[SelfHeal] âŒ Deneme %d baÅŸarÄ±sÄ±z: %s", deneme, cikti[:120])
+            hata = cikti  # yeni hata = Ã§alÄ±ÅŸtÄ±rma hatasÄ±
+            kod = cozum_kodu  # mevcut kodu dÃ¼zeltmesi iÃ§in gÃ¶nder
 
-        # 3 deneme de başarısız
+        # 3 deneme de baÅŸarÄ±sÄ±z
         self._hafizaya_kaydet(hata_imza, hata, "", basarili=False)
-        logger.warning("[SelfHeal] 💀 3 denemede çözülemedi: %s", hedef)
+        logger.warning("[SelfHeal] ğŸ’€ 3 denemede Ã§Ã¶zÃ¼lemedi: %s", hedef)
         return {
             "basarili": False,
             "cozum": "",
             "kaynak": "basarisiz",
             "deneme_sayisi": self.max_deneme,
-            "hata": f"{self.max_deneme} denemede çözülemedi: {hata[:200]}",
+            "hata": f"{self.max_deneme} denemede Ã§Ã¶zÃ¼lemedi: {hata[:200]}",
         }
 
-    # ── Motor Entegrasyonu ───────────────────────────────────────
+    # â”€â”€ Motor Entegrasyonu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def script_coz(self, script_path: str, hata_cikti: str) -> dict:
-        """Motor.script_calistir() içinde çağrılır.
+        """Motor.script_calistir() iÃ§inde Ã§aÄŸrÄ±lÄ±r.
 
         Args:
             script_path: Hata veren script'in tam yolu
-            hata_cikti: stderr çıktısı
+            hata_cikti: stderr Ã§Ä±ktÄ±sÄ±
 
         Returns:
             {
                 "basarili": bool,
-                "fix_kodu": str (düzeltilmiş kod),
+                "fix_kodu": str (dÃ¼zeltilmiÅŸ kod),
                 "kaynak": str
             }
         """
@@ -175,7 +175,7 @@ class SelfHeal:
 
         sonuc = self.coz(hedef, hata_cikti, kod, dosya_yolu=str(path))
 
-        # Başarılıysa fix'i diske yaz
+        # BaÅŸarÄ±lÄ±ysa fix'i diske yaz
         if sonuc["basarili"] and sonuc["cozum"]:
             fix_dir = path.parent / "fix"
             fix_dir.mkdir(exist_ok=True)
@@ -185,35 +185,35 @@ class SelfHeal:
 
         return sonuc
 
-    # ── İmza ─────────────────────────────────────────────────────
+    # â”€â”€ Ä°mza â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @staticmethod
     def _imza_uret(hata: str, dosya: str = "") -> str:
-        """Hata mesajı + dosya adından SHA256 imza üret."""
-        # Hata mesajını normalize et (sayıları, adresleri soyutla)
+        """Hata mesajÄ± + dosya adÄ±ndan SHA256 imza Ã¼ret."""
+        # Hata mesajÄ±nÄ± normalize et (sayÄ±larÄ±, adresleri soyutla)
         temiz = re.sub(r"0x[0-9a-fA-F]+", "0x...", hata)
         temiz = re.sub(r"\b\d+\b", "N", temiz)
         temiz = re.sub(r'File ".*?"', 'File "..."', temiz)
         kaynak = f"{dosya}|{temiz[:200]}"
         return hashlib.sha256(kaynak.encode()).hexdigest()
 
-    # ── Hafıza ───────────────────────────────────────────────────
+    # â”€â”€ HafÄ±za â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @staticmethod
     def _hafizada_ara(imza: str) -> Optional[str]:
-        """OnceHafiza/ogrenme'de çözüm ara."""
+        """OnceHafiza/ogrenme'de Ã§Ã¶zÃ¼m ara."""
         try:
             from reymen.core.ogrenme import cozum_bul, tablo_olustur
 
             tablo_olustur()
             return cozum_bul(imza)
         except Exception as e:
-            logger.debug("[SelfHeal] Hafıza arama hatası: %s", e)
+            logger.debug("[SelfHeal] HafÄ±za arama hatasÄ±: %s", e)
             return None
 
     @staticmethod
     def _hafizaya_kaydet(imza: str, hata: str, cozum: str, basarili: bool):
-        """Çözümü hafızaya kaydet."""
+        """Ã‡Ã¶zÃ¼mÃ¼ hafÄ±zaya kaydet."""
         try:
             from reymen.core.ogrenme import cozum_kaydet
 
@@ -222,11 +222,11 @@ class SelfHeal:
                 imza, hata_tipi, hata[:500], cozum, "self_heal", basarili=basarili
             )
         except Exception as e:
-            logger.debug("[SelfHeal] Hafıza kayıt hatası: %s", e)
+            logger.debug("[SelfHeal] HafÄ±za kayÄ±t hatasÄ±: %s", e)
 
     @staticmethod
     def _ttl_temizle():
-        """TTL süresi dolmuş çözümleri temizle."""
+        """TTL sÃ¼resi dolmuÅŸ Ã§Ã¶zÃ¼mleri temizle."""
         try:
             from reymen.core.ogrenme import ttl_temizle
 
@@ -234,10 +234,10 @@ class SelfHeal:
         except Exception:
             logger.warning("[fix_01_sessiz_except] Exception")
 
-    # ── LLM ──────────────────────────────────────────────────────
+    # â”€â”€ LLM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _llm_coz(self, hedef: str, hata: str, kod: str, deneme: int) -> Optional[str]:
-        """LLM'e sor ve düzeltilmiş kod al."""
+        """LLM'e sor ve dÃ¼zeltilmiÅŸ kod al."""
         adapter = self._adapter_al()
         if not adapter:
             return None
@@ -248,44 +248,44 @@ class SelfHeal:
 
         if deneme == 1:
             prompt = (
-                "Bir Python betiği çalıştırılırken hata alındı.\n\n"
+                "Bir Python betiÄŸi Ã§alÄ±ÅŸtÄ±rÄ±lÄ±rken hata alÄ±ndÄ±.\n\n"
                 f"HEDEF: {hedef}\n"
                 f"HATA: {hata}\n"
                 f"{kod_bolumu}\n"
-                "Görevin:\n"
-                "1. Hatanın kaynağını belirle\n"
-                "2. Düzeltilmiş Python kodunu üret\n"
-                "3. Sadece KODU döndür — açıklama, yorum, markdown kullanma\n"
-                "4. Kod doğrudan exec() ile çalıştırılabilir olmalı\n"
+                "GÃ¶revin:\n"
+                "1. HatanÄ±n kaynaÄŸÄ±nÄ± belirle\n"
+                "2. DÃ¼zeltilmiÅŸ Python kodunu Ã¼ret\n"
+                "3. Sadece KODU dÃ¶ndÃ¼r â€” aÃ§Ä±klama, yorum, markdown kullanma\n"
+                "4. Kod doÄŸrudan exec() ile Ã§alÄ±ÅŸtÄ±rÄ±labilir olmalÄ±\n"
             )
         else:
             onceki_kod = ""
             if kod:
-                onceki_kod = f"ÖNCEKİ KOD:\n{kod[:500]}\n"
+                onceki_kod = f"Ã–NCEKÄ° KOD:\n{kod[:500]}\n"
 
             prompt = (
-                "Bir önceki çözüm işe yaramadı.\n\n"
+                "Bir Ã¶nceki Ã§Ã¶zÃ¼m iÅŸe yaramadÄ±.\n\n"
                 f"HEDEF: {hedef}\n"
                 f"{onceki_kod}"
-                f"YENİ HATA: {hata}\n\n"
-                "Farklı bir yaklaşım dene.\n"
-                "Sadece çalışan Python kodunu döndür.\n"
+                f"YENÄ° HATA: {hata}\n\n"
+                "FarklÄ± bir yaklaÅŸÄ±m dene.\n"
+                "Sadece Ã§alÄ±ÅŸan Python kodunu dÃ¶ndÃ¼r.\n"
             )
         try:
             cevap = adapter.complete(prompt)
             return self._kod_ayikla(cevap)
         except Exception as e:
-            logger.warning("[SelfHeal] LLM hatası: %s", e)
+            logger.warning("[SelfHeal] LLM hatasÄ±: %s", e)
             return None
 
     @staticmethod
     def _kod_ayikla(cevap: str) -> Optional[str]:
-        """LLM cevabından Python kodunu ayıkla."""
-        # ```python ... ``` bloklarını ayıkla
+        """LLM cevabÄ±ndan Python kodunu ayÄ±kla."""
+        # ```python ... ``` bloklarÄ±nÄ± ayÄ±kla
         blok = re.search(r"```(?:python)?\n(.*?)```", cevap, re.DOTALL)
         if blok:
             return blok.group(1).strip()
-        # Hiçbir blok yoksa kod satırlarını dene
+        # HiÃ§bir blok yoksa kod satÄ±rlarÄ±nÄ± dene
         satirlar = []
         kod_bolgesi = False
         for satir in cevap.splitlines():
@@ -312,20 +312,20 @@ class SelfHeal:
             return "\n".join(satirlar)
         return None
 
-    # ── Çalıştırma ───────────────────────────────────────────────
+    # â”€â”€ Ã‡alÄ±ÅŸtÄ±rma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _cozumu_dene(self, kod: str) -> tuple:
-        """Kodu çalıştır, başarılı mı döndür.
+        """Kodu Ã§alÄ±ÅŸtÄ±r, baÅŸarÄ±lÄ± mÄ± dÃ¶ndÃ¼r.
 
-        SUBPROCESS_MOD=True (varsayılan):
-            Kodu geçici bir .py dosyasına yazar ve subprocess ile çalıştırır.
-            Daha güvenli, gerçek ortamı test eder.
+        SUBPROCESS_MOD=True (varsayÄ±lan):
+            Kodu geÃ§ici bir .py dosyasÄ±na yazar ve subprocess ile Ã§alÄ±ÅŸtÄ±rÄ±r.
+            Daha gÃ¼venli, gerÃ§ek ortamÄ± test eder.
 
         SUBPROCESS_MOD=False:
-            exec() ile çalıştırır. Hızlı ama izole değil.
+            exec() ile Ã§alÄ±ÅŸtÄ±rÄ±r. HÄ±zlÄ± ama izole deÄŸil.
         """
         if not kod or not kod.strip():
-            return False, "Boş kod"
+            return False, "BoÅŸ kod"
 
         if SUBPROCESS_MOD:
             return self._subprocess_dene(kod)
@@ -334,7 +334,7 @@ class SelfHeal:
 
     @staticmethod
     def _subprocess_dene(kod: str) -> tuple:
-        """Kodu geçici dosyaya yaz, subprocess ile çalıştır."""
+        """Kodu geÃ§ici dosyaya yaz, subprocess ile Ã§alÄ±ÅŸtÄ±r."""
         import tempfile
         import os
 
@@ -356,7 +356,7 @@ class SelfHeal:
                 return False, r.stderr[:500]
 
         except subprocess.TimeoutExpired:
-            return False, "TIMEOUT: 30s aşıldı"
+            return False, "TIMEOUT: 30s aÅŸÄ±ldÄ±"
         except Exception as e:
             return False, f"{type(e).__name__}: {e}"
         finally:
@@ -368,7 +368,7 @@ class SelfHeal:
 
     @staticmethod
     def _exec_dene(kod: str) -> tuple:
-        """Kodu exec ile çalıştır."""
+        """Kodu exec ile Ã§alÄ±ÅŸtÄ±r."""
         try:
             local_ns = {}
             exec(kod, {"__builtins__": __builtins__}, local_ns)
@@ -378,7 +378,7 @@ class SelfHeal:
         except Exception as e:
             return False, f"{type(e).__name__}: {e}"
 
-    # ── Adapter ──────────────────────────────────────────────────
+    # â”€â”€ Adapter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _adapter_al(self):
         """ModelAdapter al (lazy init)."""
@@ -388,18 +388,18 @@ class SelfHeal:
 
                 self._adapter = get_active_adapter()
             except Exception as e:
-                logger.error("[SelfHeal] Model adapter hatası: %s", e)
+                logger.error("[SelfHeal] Model adapter hatasÄ±: %s", e)
                 return None
         return self._adapter
 
-    # ── Motor Entegrasyon Aracı ──────────────────────────────────
+    # â”€â”€ Motor Entegrasyon AracÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @staticmethod
     def motor_calistir_icinde(motor_self, arac: str, ham_param: str) -> str:
-        """Motor.calistir() içinde SELF_HEAL aracı olarak çağrılır.
+        """Motor.calistir() iÃ§inde SELF_HEAL aracÄ± olarak Ã§aÄŸrÄ±lÄ±r.
 
         Parametre: hedef|hata|kod
-        Örnek: SELF_HEAL("test.py|ZeroDivisionError|print(1/0)")
+        Ã–rnek: SELF_HEAL("test.py|ZeroDivisionError|print(1/0)")
         """
         try:
             parts = [p.strip() for p in ham_param.split("|", 2)]
@@ -408,26 +408,26 @@ class SelfHeal:
             kod = parts[2] if len(parts) > 2 else ""
 
             if not hata:
-                return "[SelfHeal] ❌ Hata mesajı gerekli. Format: hedef|hata|kod"
+                return "[SelfHeal] âŒ Hata mesajÄ± gerekli. Format: hedef|hata|kod"
 
             heal = SelfHeal()
             sonuc = heal.coz(hedef, hata, kod)
 
             if sonuc["basarili"]:
                 return (
-                    f"[SelfHeal] ✅ Çözüldü (kaynak: {sonuc['kaynak']}, "
+                    f"[SelfHeal] âœ… Ã‡Ã¶zÃ¼ldÃ¼ (kaynak: {sonuc['kaynak']}, "
                     f"deneme: {sonuc['deneme_sayisi']})\n"
-                    f"Çözüm:\n{sonuc['cozum']}"
+                    f"Ã‡Ã¶zÃ¼m:\n{sonuc['cozum']}"
                 )
             else:
                 return (
-                    f"[SelfHeal] ❌ Çözülemedi "
+                    f"[SelfHeal] âŒ Ã‡Ã¶zÃ¼lemedi "
                     f"({sonuc['deneme_sayisi']} deneme)\n"
                     f"Hata: {sonuc['hata']}"
                 )
         except Exception as e:
-            logger.exception("[SelfHeal] motor_calistir_icinde hatası")
-            return f"[SelfHeal] ❌ İç hata: {e}"
+            logger.exception("[SelfHeal] motor_calistir_icinde hatasÄ±")
+            return f"[SelfHeal] âŒ Ä°Ã§ hata: {e}"
 
     @staticmethod
     def motor_hatadan_kurtul(
@@ -435,18 +435,18 @@ class SelfHeal:
     ) -> str:
         """Motor.hatadan_kurtul() metoduna self_heal entegrasyonu.
 
-        Mevcut hatadan_kurtul()'u geliştirir:
+        Mevcut hatadan_kurtul()'u geliÅŸtirir:
         OnceHafiza + OgrenmeDongusu + self_heal + orchestrator
         """
-        # 1. Önce mevcut motor.hatadan_kurtul() dene
+        # 1. Ã–nce mevcut motor.hatadan_kurtul() dene
         try:
             eski_cozum = motor_self.hatadan_kurtul(kod, hata, dosya_adi)
             if eski_cozum and not eski_cozum.startswith(
-                ("Çözüm bulunamadı", "Hata cozulemedi")
+                ("Ã‡Ã¶zÃ¼m bulunamadÄ±", "Hata cozulemedi")
             ):
                 return eski_cozum
         except Exception as e:
-            logger.debug("[SelfHeal] Motor.hatadan_kurtul hatası: %s", e)
+            logger.debug("[SelfHeal] Motor.hatadan_kurtul hatasÄ±: %s", e)
 
         # 2. SelfHeal ile dene
         heal = SelfHeal()
@@ -454,12 +454,12 @@ class SelfHeal:
 
         if sonuc["basarili"]:
             if sonuc["kaynak"] == "hafiza":
-                return f"[SelfHeal Hafıza] {sonuc['cozum']}"
+                return f"[SelfHeal HafÄ±za] {sonuc['cozum']}"
             return sonuc["cozum"]
         else:
-            return f"Çözüm bulunamadı. Hata: {hata[:200]}"
+            return f"Ã‡Ã¶zÃ¼m bulunamadÄ±. Hata: {hata[:200]}"
 
-    # ── İstatistik ───────────────────────────────────────────────
+    # â”€â”€ Ä°statistik â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def istatistik(self) -> dict:
         """SelfHeal istatistikleri."""
@@ -476,22 +476,22 @@ class SelfHeal:
         }
 
 
-# ── Doğrudan Kullanım ──────────────────────────────────────────
+# â”€â”€ DoÄŸrudan KullanÄ±m â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def coz(hedef: str, hata: str, kod: str = "", dosya_yolu: str = "") -> dict:
-    """Tek çağrılık self-heal."""
+    """Tek Ã§aÄŸrÄ±lÄ±k self-heal."""
     return SelfHeal().coz(hedef, hata, kod, dosya_yolu)
 
 
 def script_coz(script_path: str, hata_cikti: str) -> dict:
-    """Motor.script_calistir için kolaylık fonksiyonu."""
+    """Motor.script_calistir iÃ§in kolaylÄ±k fonksiyonu."""
     return SelfHeal().script_coz(script_path, hata_cikti)
 
 
 def istatistik_al() -> dict:
-    """Küresel istatistik (yoksa boş döndür)."""
+    """KÃ¼resel istatistik (yoksa boÅŸ dÃ¶ndÃ¼r)."""
     try:
         return SelfHeal().istatistik()
     except Exception:
-        return {"hata": "SelfHeal henüz çalışmadı"}
+        return {"hata": "SelfHeal henÃ¼z Ã§alÄ±ÅŸmadÄ±"}

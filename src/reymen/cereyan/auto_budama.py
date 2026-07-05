@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""auto_budama.py — ReYMeN otomatik hafiza budama (memory consolidation).
+﻿# -*- coding: utf-8 -*-
+"""auto_budama.py â€” ReYMeN otomatik hafiza budama (memory consolidation).
 
 Sorun: Kayitlar ttl_saat=0 (sonsuz) ile kaydediliyor, hic silinemiyor.
 Cozum: Zaman bazli budama + koleksiyon limiti + otomatik temizlik dongusu.
@@ -31,7 +31,7 @@ try:
 except ImportError:
     _SQLITE = False
 
-# ── Sabitler ──────────────────────────────────────────────────────────
+# â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _VARSAYILAN_TTL_GUN = 90  # 90 gun sonra otomatik sil
 _MAX_KAYIT_PER_KOL = 1000  # Koleksiyon basina max kayit
 _BUDAMA_ARALIK_SN = 1800  # 30 dakika
@@ -167,7 +167,7 @@ def _session_budama(max_gun: int):
         print(f"[UYARI] auto_budama.py:148 - {_auto_bud_e147}")
 
 
-# ── Otomatik Budama Thread ──────────────────────────────────────────
+# â”€â”€ Otomatik Budama Thread â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _budama_dongusu():
@@ -233,7 +233,7 @@ def durum() -> dict:
     }
 
 
-# ── Module baslangicinda otomatik basla ─────────────────────────────
+# â”€â”€ Module baslangicinda otomatik basla â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 baslat()
 
 

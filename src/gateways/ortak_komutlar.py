@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-ortak_komutlar.py — ReYMeN botlari icin ortak komut seti.
+ortak_komutlar.py â€” ReYMeN botlari icin ortak komut seti.
 
 Hem Pasa_38 (telegram_bot.py) hem ReYMeN (ai_bot.py) bu modulu kullanir.
 Boylece 3 bot da ayni komut setine sahip olur.
@@ -15,7 +15,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# ── Proje kokunu bul ─────────────────────────────────────────────
+# â”€â”€ Proje kokunu bul â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _PROJE_KOK = Path(
     __file__
 ).parent.parent.parent.resolve()  # reymen/ag/../../ = proje koku
@@ -42,7 +42,7 @@ def _durum_json_oku() -> dict:
     return {}
 
 
-# ── Komut fonksiyonlari ─────────────────────────────────────────
+# â”€â”€ Komut fonksiyonlari â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # Her fonksiyon: (mesaj_gonder_fonk, chat_id, arg) seklinde cagrilir
 # mesaj_gonder_fonk: bir fonksiyon (chat_id, metin) -> herhangi
 
@@ -54,22 +54,22 @@ def cmd_start(gonder, cid, arg=""):
 def cmd_help(gonder, cid, arg=""):
     yardim = (
         "Komutlar:\n"
-        "/run <hedef>     — Ajana gorev ver\n"
-        "/status          — Sistem durumu (durum.json)\n"
-        "/logs            — Gateway logu (son 15 satir)\n"
-        "/cancel          — Aktif gorevi iptal et\n"
-        "/clarify <soru>  — Talebi netlestir (| ile secenek)\n"
-        "/exec <kod>      — Python kodu calistir\n"
-        "/beceriler       — Kristallesmis beceriler\n"
-        "/doctor          — Sistem saglik kontrolu\n"
-        "/desktop         — Desktop uygulama durumu\n"
-        "/model [model]   — Model goster/degistir\n"
-        "/provider [p]    — Provider goster/degistir\n"
-        "/sistem [p]      — Sistem prompt goster/degistir\n"
-        "/ayarlar         — Tum ayarlari goster\n"
-        "/sifirla         — Ayarlari sifirla\n"
-        "/durum           — Proje durum ozeti\n"
-        "/help            — Bu liste"
+        "/run <hedef>     â€” Ajana gorev ver\n"
+        "/status          â€” Sistem durumu (durum.json)\n"
+        "/logs            â€” Gateway logu (son 15 satir)\n"
+        "/cancel          â€” Aktif gorevi iptal et\n"
+        "/clarify <soru>  â€” Talebi netlestir (| ile secenek)\n"
+        "/exec <kod>      â€” Python kodu calistir\n"
+        "/beceriler       â€” Kristallesmis beceriler\n"
+        "/doctor          â€” Sistem saglik kontrolu\n"
+        "/desktop         â€” Desktop uygulama durumu\n"
+        "/model [model]   â€” Model goster/degistir\n"
+        "/provider [p]    â€” Provider goster/degistir\n"
+        "/sistem [p]      â€” Sistem prompt goster/degistir\n"
+        "/ayarlar         â€” Tum ayarlari goster\n"
+        "/sifirla         â€” Ayarlari sifirla\n"
+        "/durum           â€” Proje durum ozeti\n"
+        "/help            â€” Bu liste"
     )
     gonder(cid, yardim)
 
@@ -153,7 +153,7 @@ def cmd_status(gonder, cid, arg=""):
         ks = d.get("ReYMeN_karsilastirma", {}) or {}
         if ks:
             satirlar.append(
-                f"Hermes karsilastirma: {ks.get('tamam', '?')}/{ks.get('toplam_ozellik', '?')} tamam"
+                f"ReYMeN karsilastirma: {ks.get('tamam', '?')}/{ks.get('toplam_ozellik', '?')} tamam"
             )
         satirlar.append(f"Surum: {d.get('surum', '?')}")
     except Exception as e:
@@ -289,7 +289,7 @@ def cmd_ayarlar(gonder, cid, arg=""):
     ks = d.get("ReYMeN_karsilastirma", {}) or {}
     if ks:
         satirlar.append(
-            f"Hermes karsilastirma: {ks.get('tamam', '?')}/{ks.get('toplam_ozellik', '?')} tamam, {ks.get('eksik', '?')} eksik"
+            f"ReYMeN karsilastirma: {ks.get('tamam', '?')}/{ks.get('toplam_ozellik', '?')} tamam, {ks.get('eksik', '?')} eksik"
         )
     gonder(cid, "\n".join(satirlar))
 
@@ -390,7 +390,7 @@ def cmd_doctor(gonder, cid, arg=""):
     satirlar.append(f"Ortak komut: {len(d.get('ortak_komutlar', {}))} kural")
     # .env
     env_yol = _PROJE_KOK / ".env"
-    satirlar.append(f".env: {'✅ var' if env_yol.exists() else '❌ yok'}")
+    satirlar.append(f".env: {'âœ… var' if env_yol.exists() else 'âŒ yok'}")
     # Disk
     try:
         import os as _os
@@ -419,7 +419,7 @@ def cmd_desktop(gonder, cid, arg=""):
     )
 
 
-# ── Komut dispatcher ─────────────────────────────────────────────
+# â”€â”€ Komut dispatcher â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 KOMUTLAR = {
     "/start": cmd_start,
     "/help": cmd_help,
@@ -471,4 +471,4 @@ def komut_listesi() -> list:
 
 def komut_aciklama() -> str:
     """Komut listesini aciklamali dondur."""
-    return "\n".join(f"{k} — {v.__doc__ or ''}" for k, v in sorted(KOMUTLAR.items()))
+    return "\n".join(f"{k} â€” {v.__doc__ or ''}" for k, v in sorted(KOMUTLAR.items()))

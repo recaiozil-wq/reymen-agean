@@ -1,7 +1,7 @@
-"""User-authorization methods for ``GatewayRunner``.
+﻿"""User-authorization methods for ``GatewayRunner``.
 
 Extracted from ``gateway/run.py`` as part of the god-file decomposition campaign
-(``~/.hermes/plans/god-file-decomposition.md``, Phase 3 mechanical mixin lifts).
+(``.reymen/plans/god-file-decomposition.md``, Phase 3 mechanical mixin lifts).
 This mixin holds the inbound-message authorization cluster: whether a user/chat
 is allowed to talk to the agent, the per-adapter DM policy, and the
 unauthorized-DM behavior.
@@ -20,9 +20,9 @@ from __future__ import annotations
 import os
 from typing import Optional
 
-from src.gateways.config import Platform
-from src.gateways.session import SessionSource
-from src.gateways.whatsapp_identity import (
+from gateways.config import Platform
+from gateways.session import SessionSource
+from gateways.whatsapp_identity import (
     expand_whatsapp_aliases as _expand_whatsapp_auth_aliases,
     normalize_whatsapp_identifier as _normalize_whatsapp_identifier,
 )
@@ -62,9 +62,9 @@ class GatewayAuthorizationMixin:
 
         Returns the lowercased ``dm_policy`` (``"open"`` / ``"allowlist"`` /
         ``"disabled"`` / ``"pairing"``) for *platform*, or ``""`` when unknown.
-        Prefers the live adapter's resolved ``_dm_policy`` — which already folds
+        Prefers the live adapter's resolved ``_dm_policy`` â€” which already folds
         in both ``config.extra`` and the ``<PLATFORM>_DM_POLICY`` env var (the
-        env var is not always bridged back into ``config.extra``) — and falls
+        env var is not always bridged back into ``config.extra``) â€” and falls
         back to ``config.extra`` for bare runners built without a live adapter.
 
         Used by ``_is_user_authorized`` to decide whether an own-policy adapter
@@ -132,7 +132,7 @@ class GatewayAuthorizationMixin:
 
         WeCom supports ``groups.<group_id>.allow_from`` on top of the top-level
         ``group_policy``. A group may be open at the chat level while still
-        restricting which senders inside that group can invoke Hermes. If such a
+        restricting which senders inside that group can invoke ReYMeN. If such a
         message reached the gateway, the adapter already checked that sender
         allowlist, so it is a trustworthy intake decision rather than the
         fail-open ``group_policy: open`` case.
@@ -196,7 +196,7 @@ class GatewayAuthorizationMixin:
         # user-initiated messages.  The HASS_TOKEN already authenticates the
         # connection, so HA events are always authorized.
         # Webhook events are authenticated via HMAC signature validation in
-        # the adapter itself — no user allowlist applies.
+        # the adapter itself â€” no user allowlist applies.
         if source.platform in {Platform.HOMEASSISTANT, Platform.WEBHOOK}:
             return True
 
@@ -205,7 +205,7 @@ class GatewayAuthorizationMixin:
         # Telegram (and similar) authorize entire group/forum/channel chats
         # by chat ID via TELEGRAM_GROUP_ALLOWED_CHATS / QQ_GROUP_ALLOWED_USERS.
         # That allowlist is chat-scoped, so it must work even when
-        # source.user_id is None — Telegram emits anonymous-admin posts,
+        # source.user_id is None â€” Telegram emits anonymous-admin posts,
         # sender_chat traffic, and channel broadcasts with no `from_user`,
         # and an operator who explicitly listed the chat expects those to
         # be honored. Run this check before the no-user-id guard below so
@@ -361,7 +361,7 @@ class GatewayAuthorizationMixin:
             # forwards EVERY sender. Reading "reached the gateway" as
             # authorization in that case would admit the whole external network
             # with no operator-configured allowlist -- the fail-open SECURITY.md
-            # §2.6 forbids ("an allowlist is required for every enabled
+            # Â§2.6 forbids ("an allowlist is required for every enabled
             # network-exposed adapter ... code paths that fail open when no
             # allowlist is configured are code bugs"). "disabled" never
             # forwards, and "pairing" forwards unpaired DMs only so the gateway
@@ -430,7 +430,7 @@ class GatewayAuthorizationMixin:
                     logger.warning(
                         "TELEGRAM_GROUP_ALLOWED_USERS contains chat-ID-shaped values "
                         "(%s). Treating them as chat IDs for backward compatibility. "
-                        "Move chat IDs to TELEGRAM_GROUP_ALLOWED_CHATS — the _USERS var "
+                        "Move chat IDs to TELEGRAM_GROUP_ALLOWED_CHATS â€” the _USERS var "
                         "is now for sender user IDs.",
                         ",".join(sorted(legacy_chat_ids)),
                     )
@@ -465,7 +465,7 @@ class GatewayAuthorizationMixin:
         if "@" in user_id:
             check_ids.add(user_id.split("@")[0])
 
-        # WhatsApp: resolve phone↔LID aliases from bridge session mapping files
+        # WhatsApp: resolve phoneâ†”LID aliases from bridge session mapping files
         if source.platform == Platform.WHATSAPP:
             normalized_allowed_ids = set()
             for allowed_id in allowed_ids:
@@ -481,7 +481,7 @@ class GatewayAuthorizationMixin:
         # SimpleX: SIMPLEX_ALLOWED_USERS accepts either the numeric contactId
         # or the contact's display name. The adapter sets user_id=contactId for
         # stability across renames, but the SimpleX UI never surfaces the
-        # numeric id — operators only see display names, so that's what they
+        # numeric id â€” operators only see display names, so that's what they
         # naturally put in the env var. Match both so the allowlist works
         # regardless of which form was chosen.
         # Plugin platform: compare by value since Platform.SIMPLEX is not a
@@ -499,15 +499,15 @@ class GatewayAuthorizationMixin:
         """Return how unauthorized DMs should be handled for a platform.
 
         Resolution order:
-        1. Explicit per-platform ``unauthorized_dm_behavior`` in config — always wins.
-        2. Explicit global ``unauthorized_dm_behavior`` in config — wins when no per-platform.
+        1. Explicit per-platform ``unauthorized_dm_behavior`` in config â€” always wins.
+        2. Explicit global ``unauthorized_dm_behavior`` in config â€” wins when no per-platform.
         3. When an allowlist (``PLATFORM_ALLOWED_USERS``,
            ``PLATFORM_GROUP_ALLOWED_USERS`` / ``PLATFORM_GROUP_ALLOWED_CHATS``,
-           or ``GATEWAY_ALLOWED_USERS``) is configured, default to ``"ignore"`` —
+           or ``GATEWAY_ALLOWED_USERS``) is configured, default to ``"ignore"`` â€”
            the allowlist signals that the owner has deliberately restricted
            access; spamming unknown contacts with pairing codes is both noisy
            and a potential info-leak. (#9337)
-        4. No allowlist and no explicit config → ``"pair"`` (open-gateway default).
+        4. No allowlist and no explicit config â†’ ``"pair"`` (open-gateway default).
         """
         config = getattr(self, "config", None)
 
@@ -519,14 +519,14 @@ class GatewayAuthorizationMixin:
             if platform_cfg and "unauthorized_dm_behavior" in getattr(
                 platform_cfg, "extra", {}
             ):
-                # Operator explicitly configured behavior for this platform — respect it.
+                # Operator explicitly configured behavior for this platform â€” respect it.
                 return config.get_unauthorized_dm_behavior(platform)
 
         # Check for an explicit global config override.
         if config and hasattr(config, "unauthorized_dm_behavior"):
             if (
                 config.unauthorized_dm_behavior != "pair"
-            ):  # non-default → explicit override
+            ):  # non-default â†’ explicit override
                 return config.unauthorized_dm_behavior
 
         # Config-driven dm_policy (WeCom / Weixin / Yuanbao / QQBot). An

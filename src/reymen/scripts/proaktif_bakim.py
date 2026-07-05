@@ -1,12 +1,12 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-proaktif_bakim.py — ReYMeN 3 profil otomatik bakım scripti.
+proaktif_bakim.py â€” ReYMeN 3 profil otomatik bakÄ±m scripti.
 
-Çalışma modu: no_agent (cron ile)
-  - Sorun yok → sessiz (çıktısız)
-  - Sorun var → rapor (stdout)
-  - Pazar günü → haftalık rapor (her zaman çıktı)
+Ã‡alÄ±ÅŸma modu: no_agent (cron ile)
+  - Sorun yok â†’ sessiz (Ã§Ä±ktÄ±sÄ±z)
+  - Sorun var â†’ rapor (stdout)
+  - Pazar gÃ¼nÃ¼ â†’ haftalÄ±k rapor (her zaman Ã§Ä±ktÄ±)
 """
 
 import json
@@ -23,12 +23,12 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# ── Sabitler ───────────────────────────────────────────────────
-HERMES = Path.home() / "AppData" / "Local" / "hermes"
+# â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+REYMEN = Path.home() / "AppData" / "Local" / "reymen"
 PROFILLER = {
-    "default": HERMES / "profiles" / "default",
-    "reymen": HERMES / "profiles" / "reymen",
-    "kiral38": HERMES / "profiles" / "kiral38",
+    "default": REYMEN / "profiles" / "default",
+    "reymen": REYMEN / "profiles" / "reymen",
+    "kiral38": REYMEN / "profiles" / "kiral38",
 }
 PROJE_KOK = Path(__file__).resolve().parent.parent.parent
 MASTER_SOUL = PROJE_KOK / "SOUL.md"
@@ -45,9 +45,9 @@ def ekle(seviye: str, mesaj: str):
     RAPOR.append(f"[{seviye}] {mesaj}")
 
 
-# ── 1. Config Drift Dedektörü ──────────────────────────────────
+# â”€â”€ 1. Config Drift DedektÃ¶rÃ¼ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def config_drift_kontrol():
-    """3 config.yaml kritik alanlarını karşılaştır."""
+    """3 config.yaml kritik alanlarÄ±nÄ± karÅŸÄ±laÅŸtÄ±r."""
     import yaml
 
     anahtarlar = [
@@ -87,24 +87,24 @@ def config_drift_kontrol():
     ekle("BILGI", "[1] Config drift: Yok (3 profil esit)")
 
 
-# ── 2. Gateway Watchdog ────────────────────────────────────────
+# â”€â”€ 2. Gateway Watchdog â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def gateway_watchdog():
-    """409 + çökme koruması, lock temizle + restart."""
+    """409 + Ã§Ã¶kme korumasÄ±, lock temizle + restart."""
     for ad, yol in PROFILLER.items():
         lock = yol / "gateway.lock"
         pid = yol / "gateway.pid"
 
-        # Lock var mı?
+        # Lock var mÄ±?
         if not lock.exists():
             ekle("UYARI", f"[2] {ad} gateway.lock yok (bot calismiyor olabilir)")
             continue
 
-        # PID canlı mı?
+        # PID canlÄ± mÄ±?
         if pid.exists():
             try:
                 pid_str = pid.read_text().strip()
                 pid_int = int(pid_str)
-                # Windows'ta process var mı kontrolü
+                # Windows'ta process var mÄ± kontrolÃ¼
                 if platform.system() == "Windows":
                     r = subprocess.run(
                         ["tasklist", "/FI", f"PID eq {pid_int}", "/NH"],
@@ -121,7 +121,7 @@ def gateway_watchdog():
             except (ValueError, subprocess.TimeoutExpired):
                 logger.warning("[fix_01_sessiz_except] Exception")
 
-    # Debug log'da 409 kontrolü
+    # Debug log'da 409 kontrolÃ¼
     debug_log = PROJE_KOK / "bot_debug.log"
     if debug_log.exists():
         icerik = debug_log.read_text(encoding="utf-8", errors="ignore")
@@ -134,7 +134,7 @@ def gateway_watchdog():
     ekle("BILGI", "[2] Gateway watchdog: Tamam")
 
 
-# ── 3. SOUL.md Master Sync ────────────────────────────────────
+# â”€â”€ 3. SOUL.md Master Sync â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def soul_sync():
     """Master SOUL.md'yi 3 profile otomatik kopyala."""
     if not MASTER_SOUL.exists():
@@ -154,9 +154,9 @@ def soul_sync():
     ekle("BILGI", "[3] SOUL.md sync: Tamam")
 
 
-# ── 4. state.db Prune ──────────────────────────────────────────
+# â”€â”€ 4. state.db Prune â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def state_db_prune():
-    """30 gün eski session'ları temizle."""
+    """30 gÃ¼n eski session'larÄ± temizle."""
     kesim_saniye = (BUGUN - timedelta(days=30)).timestamp()
 
     for ad, yol in PROFILLER.items():
@@ -168,7 +168,7 @@ def state_db_prune():
             conn = sqlite3.connect(str(db_yol))
             c = conn.cursor()
 
-            # Session tablosu var mı?
+            # Session tablosu var mÄ±?
             c.execute(
                 "SELECT name FROM sqlite_master WHERE type='table' AND name='sessions'"
             )
@@ -199,10 +199,10 @@ def state_db_prune():
     ekle("BILGI", "[4] state.db prune: Tamam")
 
 
-# ── 5. MEMORY.md Sync ─────────────────────────────────────────
+# â”€â”€ 5. MEMORY.md Sync â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def memory_sync():
-    """3 profil arasında MEMORY.md eşitle (shared_memories kullan)."""
-    shared = HERMES / "shared_memories" / "MEMORY.md"
+    """3 profil arasÄ±nda MEMORY.md eÅŸitle (shared_memories kullan)."""
+    shared = REYMEN / "shared_memories" / "MEMORY.md"
     if not shared.exists():
         ekle("BILGI", "[5] shared MEMORY.md yok, atlaniyor")
         return
@@ -217,7 +217,7 @@ def memory_sync():
 
         # Symlink mi kontrol et
         if hedef.is_symlink():
-            continue  # Symlink zaten shared'i gösteriyor
+            continue  # Symlink zaten shared'i gÃ¶steriyor
 
         shutil.copy2(shared, hedef)
         ekle("BILGI", f"[5] {ad} MEMORY.md guncellendi")
@@ -225,18 +225,18 @@ def memory_sync():
     ekle("BILGI", "[5] MEMORY.md sync: Tamam")
 
 
-# ── 6. Haftalık Rapor ─────────────────────────────────────────
+# â”€â”€ 6. HaftalÄ±k Rapor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def haftalik_rapor():
-    """Pazar günü 3 bot durum özeti."""
+    """Pazar gÃ¼nÃ¼ 3 bot durum Ã¶zeti."""
     if not PAZAR_MI:
         return
 
     global SESSIZ
-    SESSIZ = False  # Pazar raporu her zaman göster
+    SESSIZ = False  # Pazar raporu her zaman gÃ¶ster
 
-    ekle("RAPOR", "═══════════════════════════════════════")
-    ekle("RAPOR", f"  Haftalik Bot Raporu — {BUGUN.strftime('%d %B %Y')}")
-    ekle("RAPOR", "═══════════════════════════════════════")
+    ekle("RAPOR", "â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•")
+    ekle("RAPOR", f"  Haftalik Bot Raporu â€” {BUGUN.strftime('%d %B %Y')}")
+    ekle("RAPOR", "â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•")
 
     for ad, yol in PROFILLER.items():
         soul = yol / "SOUL.md"
@@ -258,19 +258,19 @@ def haftalik_rapor():
         ekle("RAPOR", f"    state.db: {db_boyut // 1024 // 1024}MB")
         ekle("RAPOR", f"    Gateway: {lock_durum}")
 
-    ekle("RAPOR", "═══════════════════════════════════════")
+    ekle("RAPOR", "â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•")
 
 
-# ── 7. Config Template Kontrol ────────────────────────────────
+# â”€â”€ 7. Config Template Kontrol â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def config_template_kontrol():
-    """Gerekli alanlar var mı diye doğrula."""
+    """Gerekli alanlar var mÄ± diye doÄŸrula."""
     import yaml
 
     gerekli = {
         "model": ["default", "provider"],
-        "fallback_providers": None,  # Liste olarak var olmalı
+        "fallback_providers": None,  # Liste olarak var olmalÄ±
         "terminal": ["cwd", "backend", "timeout"],
-        "gateway": None,  # Obje olarak var olmalı
+        "gateway": None,  # Obje olarak var olmalÄ±
     }
 
     for ad, yol in PROFILLER.items():
@@ -300,7 +300,7 @@ def config_template_kontrol():
     ekle("BILGI", "[7] Config template kontrol: Tamam")
 
 
-# ── 8. Gateway Health ──────────────────────────────────────────
+# â”€â”€ 8. Gateway Health â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def gateway_health():
     """PID/state/uptime kontrol, sorunluysa raporla."""
     for ad, yol in PROFILLER.items():
@@ -337,7 +337,7 @@ def gateway_health():
     ekle("BILGI", "[8] Gateway health: Tamam")
 
 
-# ── Ana ─────────────────────────────────────────────────────────
+# â”€â”€ Ana â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def main():
     ekle("BILGI", f"Proaktif bakim basladi: {BUGUN.isoformat()}")
 
@@ -350,7 +350,7 @@ def main():
     config_template_kontrol()
     gateway_health()
 
-    # Sonuç
+    # SonuÃ§
     hata_say = sum(1 for r in RAPOR if r.startswith("[HATA]"))
     uyari_say = sum(1 for r in RAPOR if r.startswith("[UYARI]"))
 
@@ -360,7 +360,7 @@ def main():
         print(f"[proaktif_bakim] {hata_say} hata, {uyari_say} uyari")
         print("\n".join(RAPOR))
     else:
-        # Tamamen sessiz — cron no_agent modunda sorunsuz çalışma
+        # Tamamen sessiz â€” cron no_agent modunda sorunsuz Ã§alÄ±ÅŸma
         pass
 
 

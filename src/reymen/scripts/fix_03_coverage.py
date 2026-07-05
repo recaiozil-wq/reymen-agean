@@ -1,9 +1,9 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
-FIX 03 — Coverage Kurulum & Hızlı Test Koşucusu
+FIX 03 â€” Coverage Kurulum & HÄ±zlÄ± Test KoÅŸucusu
 Yapar : pytest-cov kurar, sadece reymen/ paketini test eder
-Test  : her modülü ayrı ayrı çalıştırır
-Rapor : fix_03_rapor.json + konsol özeti
+Test  : her modÃ¼lÃ¼ ayrÄ± ayrÄ± Ã§alÄ±ÅŸtÄ±rÄ±r
+Rapor : fix_03_rapor.json + konsol Ã¶zeti
 """
 
 import sys, json, time, shutil, subprocess
@@ -24,19 +24,19 @@ class C:
 
 
 def ok(m):
-    print(f"  {C.GRN}✅ {m}{C.RESET}")
+    print(f"  {C.GRN}âœ… {m}{C.RESET}")
 
 
 def warn(m):
-    print(f"  {C.YEL}⚠️  {m}{C.RESET}")
+    print(f"  {C.YEL}âš ï¸  {m}{C.RESET}")
 
 
 def err(m):
-    print(f"  {C.RED}❌ {m}{C.RESET}")
+    print(f"  {C.RED}âŒ {m}{C.RESET}")
 
 
 def hdr(t):
-    print(f"\n{C.BOLD}{C.BLU}{'═'*60}\n  {t}\n{'═'*60}{C.RESET}")
+    print(f"\n{C.BOLD}{C.BLU}{'â•'*60}\n  {t}\n{'â•'*60}{C.RESET}")
 
 
 def cmd(komut, cwd=None, timeout=120):
@@ -52,7 +52,7 @@ def cmd(komut, cwd=None, timeout=120):
     except subprocess.TimeoutExpired:
         return -1, f"TIMEOUT ({timeout}s)"
     except FileNotFoundError:
-        return -2, f"Komut bulunamadı: {komut[0]}"
+        return -2, f"Komut bulunamadÄ±: {komut[0]}"
 
 
 def pip_kur(paket):
@@ -62,13 +62,13 @@ def pip_kur(paket):
 
 def main():
     kok = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else Path(".").resolve()
-    hdr(f"FIX 03 — Coverage & Test Koşucusu\nKök: {kok}")
+    hdr(f"FIX 03 â€” Coverage & Test KoÅŸucusu\nKÃ¶k: {kok}")
     t0 = time.time()
     rapor = {
         "tarih": datetime.now().isoformat(),
         "kok": str(kok),
         "paket_kurulum": {},
-        "modül_testler": [],
+        "modÃ¼l_testler": [],
         "coverage": {},
         "genel": {},
     }
@@ -83,10 +83,10 @@ def main():
             ok(f"{p} kuruldu")
             rapor["paket_kurulum"][p] = "kuruldu"
         else:
-            err(f"{p} kurulamadı")
+            err(f"{p} kurulamadÄ±")
             rapor["paket_kurulum"][p] = "HATA"
 
-    hdr("2. Modül Bazlı Test")
+    hdr("2. ModÃ¼l BazlÄ± Test")
     test_dizinleri = []
     for mod in ["cereyan", "sistem", "hafiza", "arac", "guvenlik"]:
         for td in [kok / "tests" / mod, kok / f"tests/test_{mod}"]:
@@ -98,11 +98,11 @@ def main():
             if testler:
                 test_dizinleri.append((mod, testler[0].parent))
     if not test_dizinleri:
-        warn("Modül test dizini bulunamadı")
+        warn("ModÃ¼l test dizini bulunamadÄ±")
         test_dizinleri = [("reymen", kok / "tests")] if (kok / "tests").exists() else []
 
     for mod, td in test_dizinleri:
-        print(f"\n  {C.BLU}▶ {mod}{C.RESET}  ({td})")
+        print(f"\n  {C.BLU}â–¶ {mod}{C.RESET}  ({td})")
         kod, out = cmd(
             [
                 sys.executable,
@@ -133,17 +133,17 @@ def main():
         if kod == 0:
             ok(f"{ozet}")
         elif kod == -1:
-            warn(f"TIMEOUT — {mod}")
+            warn(f"TIMEOUT â€” {mod}")
         else:
-            err(f"{ozet or 'Test başarısız'}")
+            err(f"{ozet or 'Test baÅŸarÄ±sÄ±z'}")
             for s in satirlar[:30]:
                 if "FAILED" in s or "ERROR" in s:
                     print(f"    {C.RED}{s}{C.RESET}")
         if cov_satir:
             print(f"    {C.BLU}{cov_satir}{C.RESET}")
-        rapor["modül_testler"].append(
+        rapor["modÃ¼l_testler"].append(
             {
-                "modül": mod,
+                "modÃ¼l": mod,
                 "dizin": str(td),
                 "return_code": kod,
                 "ozet": ozet,
@@ -173,7 +173,7 @@ def main():
             timeout=180,
         )
         if kod == -1:
-            warn("Genel coverage timeout — modül raporlarına bak")
+            warn("Genel coverage timeout â€” modÃ¼l raporlarÄ±na bak")
         else:
             for s in out.splitlines():
                 if "TOTAL" in s or "passed" in s or "failed" in s:
@@ -185,7 +185,7 @@ def main():
                 rapor["coverage"] = {
                     "toplam_satir": cd.get("num_statements"),
                     "kapsanan": cd.get("covered_lines"),
-                    "yüzde": cd.get("percent_covered_display"),
+                    "yÃ¼zde": cd.get("percent_covered_display"),
                 }
                 ok(f"Coverage: %{cd.get('percent_covered_display','?')}")
             except Exception as _e:
@@ -221,16 +221,16 @@ def main():
                 warn("cli.py coverage ~%5")
 
     rapor["genel"]["sure"] = round(time.time() - t0, 1)
-    hdr("ÖZET RAPOR")
-    gecen = sum(1 for m in rapor["modül_testler"] if m["return_code"] == 0)
-    hata = sum(1 for m in rapor["modül_testler"] if m["return_code"] not in (0, -1))
-    timeout = sum(1 for m in rapor["modül_testler"] if m["return_code"] == -1)
-    print(f"  Test geçen modül  : {C.GRN}{gecen}{C.RESET}")
-    print(f"  Test hata modül   : {C.RED}{hata}{C.RESET}")
-    print(f"  Timeout modül     : {C.YEL}{timeout}{C.RESET}")
-    if rapor["coverage"].get("yüzde"):
-        print(f"  Genel coverage    : {C.BLU}%{rapor['coverage']['yüzde']}{C.RESET}")
-    print(f"  Süre              : {rapor['genel']['sure']}s")
+    hdr("Ã–ZET RAPOR")
+    gecen = sum(1 for m in rapor["modÃ¼l_testler"] if m["return_code"] == 0)
+    hata = sum(1 for m in rapor["modÃ¼l_testler"] if m["return_code"] not in (0, -1))
+    timeout = sum(1 for m in rapor["modÃ¼l_testler"] if m["return_code"] == -1)
+    print(f"  Test geÃ§en modÃ¼l  : {C.GRN}{gecen}{C.RESET}")
+    print(f"  Test hata modÃ¼l   : {C.RED}{hata}{C.RESET}")
+    print(f"  Timeout modÃ¼l     : {C.YEL}{timeout}{C.RESET}")
+    if rapor["coverage"].get("yÃ¼zde"):
+        print(f"  Genel coverage    : {C.BLU}%{rapor['coverage']['yÃ¼zde']}{C.RESET}")
+    print(f"  SÃ¼re              : {rapor['genel']['sure']}s")
     rapor_yolu = kok / "fix_03_rapor.json"
     with open(rapor_yolu, "w") as fp:
         json.dump(rapor, fp, ensure_ascii=False, indent=2)

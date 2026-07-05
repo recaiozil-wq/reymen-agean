@@ -1,4 +1,4 @@
-"""cli_session.py - ReYMeNCLI Session metotlari."""
+﻿"""cli_session.py - ReYMeNCLI Session metotlari."""
 
 import logging, os, re, sys, time, json, threading
 from datetime import datetime
@@ -7,12 +7,12 @@ from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
 logger = logging.getLogger(__name__)
 
-from src.reymen.sistem.cli_helpers import *
-from src.reymen.sistem.cli_display import *
-from src.reymen.sistem.cli_commands import *
-from src.reymen.sistem.cli_auth import *
-from src.reymen.sistem.cli_maintenance import *
-from src.reymen.sistem.cli_stream import *
+from reymen.sistem.cli_helpers import *
+from reymen.sistem.cli_display import *
+from reymen.sistem.cli_commands import *
+from reymen.sistem.cli_auth import *
+from reymen.sistem.cli_maintenance import *
+from reymen.sistem.cli_stream import *
 from contextlib import contextmanager
 
 
@@ -89,7 +89,7 @@ class SessionMixin:
     def _notify_session_boundary(self, event_type: str) -> None:
         """Fire a session-boundary plugin hook (on_session_finalize or on_session_reset).
 
-        Non-blocking — errors are caught and logged.  Safe to call from any
+        Non-blocking â€” errors are caught and logged.  Safe to call from any
         lifecycle point (shutdown, /new, /reset).
         """
         try:
@@ -110,7 +110,7 @@ class SessionMixin:
             self.agent.commit_memory_session(self.conversation_history)
             self._notify_session_boundary("on_session_finalize")
         elif self.agent:
-            # First session or empty history — still finalize the old session
+            # First session or empty history â€” still finalize the old session
             self._notify_session_boundary("on_session_finalize")
 
         old_session_id = self.session_id
@@ -177,14 +177,14 @@ class SessionMixin:
                             self._pending_title = None
                             title = sanitized
                         except ValueError as e:
-                            _cprint(f"  {e} — session started untitled.")
+                            _cprint(f"  {e} â€” session started untitled.")
                             title = None
                         except Exception:
                             title = None
                     elif title is not None:
                         # sanitize_title returned empty (whitespace-only / unprintable)
                         _cprint(
-                            "  Title is empty after cleanup — session started untitled."
+                            "  Title is empty after cleanup â€” session started untitled."
                         )
                         title = None
             # Notify memory providers that session_id rotated to a fresh
@@ -212,7 +212,7 @@ class SessionMixin:
                 print("(^_^)v New session started!")
 
     def _handle_handoff_command(self, cmd_original: str) -> bool:
-        """Handle ``/handoff <platform>`` — transfer this CLI session to a gateway platform.
+        """Handle ``/handoff <platform>`` â€” transfer this CLI session to a gateway platform.
 
         Flow:
           1. Validate platform name + the gateway has a home channel for it.
@@ -220,9 +220,9 @@ class SessionMixin:
              would race with the gateway's switch_session).
           3. Write ``handoff_state='pending'`` on this session row.
           4. Block-poll ``state.db`` for terminal state (timeout 60s).
-          5. On ``completed`` → print resume hint and signal CLI exit by
+          5. On ``completed`` â†’ print resume hint and signal CLI exit by
              returning False (the caller honors that like ``/quit``).
-          6. On ``failed`` / timeout → print error and return True so the
+          6. On ``failed`` / timeout â†’ print error and return True so the
              user keeps their CLI session.
 
         Returns:
@@ -242,7 +242,7 @@ class SessionMixin:
         # Validate platform name + home channel via the live gateway config.
         try:
             from gateway.config import load_gateway_config, Platform
-        except Exception as exc:  # pragma: no cover — gateway pkg always shipped
+        except Exception as exc:  # pragma: no cover â€” gateway pkg always shipped
             _cprint(f"  Could not load gateway config: {exc}")
             return True
 
@@ -319,7 +319,7 @@ class SessionMixin:
         if not session_title:
             session_title = self.session_id[:8]
 
-        # Mark pending — gateway watcher will pick this up.
+        # Mark pending â€” gateway watcher will pick this up.
         ok = self._session_db.request_handoff(self.session_id, platform_name)
         if not ok:
             _cprint(
@@ -328,7 +328,7 @@ class SessionMixin:
             return True
 
         _cprint(
-            f"  Queued handoff of '{session_title}' → {platform_name} (home: {home.name})."
+            f"  Queued handoff of '{session_title}' â†’ {platform_name} (home: {home.name})."
         )
         _cprint(f"  Waiting for the gateway to pick it up...")
 
@@ -350,11 +350,11 @@ class SessionMixin:
             if current == "completed":
                 _cprint("")
                 _cprint(
-                    f"  ↻ Handoff complete. The session is now active on {platform_name}."
+                    f"  â†» Handoff complete. The session is now active on {platform_name}."
                 )
                 _cprint(f"  Resume it on this CLI later with: /resume {session_title}")
                 _cprint("")
-                # End the CLI cleanly — same exit semantics as /quit.
+                # End the CLI cleanly â€” same exit semantics as /quit.
                 self._should_exit = True
                 return False
             if current == "failed":
@@ -378,7 +378,7 @@ class SessionMixin:
         return True
 
     def _handle_resume_command(self, cmd_original: str) -> None:
-        """Handle /resume <session_id_or_title> — switch to a previous session mid-conversation."""
+        """Handle /resume <session_id_or_title> â€” switch to a previous session mid-conversation."""
         parts = cmd_original.split(None, 1)
         target = parts[1].strip() if len(parts) > 1 else ""
 
@@ -401,7 +401,7 @@ class SessionMixin:
                 # Arm a one-shot pending-resume selection so the user can type
                 # just the number (`3`) on the next line instead of having to
                 # retype `/resume 3`. The list here must match the one shown by
-                # _show_recent_sessions and used for index resolution below —
+                # _show_recent_sessions and used for index resolution below â€”
                 # all three go through _list_recent_sessions(limit=10). See
                 # #34584.
                 self._pending_resume_sessions = self._list_recent_sessions(limit=10)
@@ -504,7 +504,7 @@ class SessionMixin:
                 self.agent._invalidate_system_prompt()
 
             # Notify memory providers that session_id rotated to a resumed
-            # session. reset=False — the provider's accumulated state is
+            # session. reset=False â€” the provider's accumulated state is
             # still valid; it just needs to target the new session_id for
             # subsequent writes. See #6672.
             try:
@@ -527,14 +527,14 @@ class SessionMixin:
         )
         if self.conversation_history:
             _cprint(
-                f"  ↻ Resumed session {target_id}{title_part}"
+                f"  â†» Resumed session {target_id}{title_part}"
                 f" ({msg_count} user message{'s' if msg_count != 1 else ''},"
                 f" {len(self.conversation_history)} total)"
             )
             self._display_resumed_history()
         else:
             _cprint(
-                f"  ↻ Resumed session {target_id}{title_part} — no messages, starting fresh."
+                f"  â†» Resumed session {target_id}{title_part} â€” no messages, starting fresh."
             )
 
     def _consume_pending_resume_selection(self, text: str) -> bool:
@@ -576,7 +576,7 @@ class SessionMixin:
         return True
 
     def _handle_sessions_command(self, cmd_original: str) -> None:
-        """Handle /sessions [list|<id_or_title>] — browse or resume previous sessions.
+        """Handle /sessions [list|<id_or_title>] â€” browse or resume previous sessions.
 
         Without arguments, prints the same recent-sessions table that /resume
         shows when called without a target, and tells the user how to resume.
@@ -594,7 +594,7 @@ class SessionMixin:
         arg = parts[1].strip() if len(parts) > 1 else ""
         sub = arg.lower()
 
-        # Bare /sessions or /sessions list — show recent sessions inline.
+        # Bare /sessions or /sessions list â€” show recent sessions inline.
         if not arg or sub in {"list", "ls", "browse"}:
             if not self._session_db:
                 from reymen.sistem.ReYMeN_state import format_session_db_unavailable
@@ -609,14 +609,14 @@ class SessionMixin:
         self._handle_resume_command(f"/resume {arg}")
 
     def _handle_branch_command(self, cmd_original: str) -> None:
-        """Handle /branch [name] — fork the current session into a new independent copy.
+        """Handle /branch [name] â€” fork the current session into a new independent copy.
 
         Copies the full conversation history to a new session so the user can
         explore a different approach without losing the original session state.
         Inspired by Claude Code's /branch command.
         """
         if not self.conversation_history:
-            _cprint("  No conversation to branch — send a message first.")
+            _cprint("  No conversation to branch â€” send a message first.")
             return
 
         if not self._session_db:
@@ -719,7 +719,7 @@ class SessionMixin:
                 self.agent._invalidate_system_prompt()
 
             # Notify memory providers that session_id forked to a new branch.
-            # reset=False — the branched session carries the transcript
+            # reset=False â€” the branched session carries the transcript
             # forward, so provider state tracks the lineage. parent_session_id
             # links the branch back to the original. See #6672.
             try:
@@ -738,7 +738,7 @@ class SessionMixin:
             [m for m in self.conversation_history if m.get("role") == "user"]
         )
         _cprint(
-            f"  ⑂ Branched session \"{branch_title}\""
+            f"  â‘‚ Branched session \"{branch_title}\""
             f" ({msg_count} user message{'s' if msg_count != 1 else ''})"
         )
         _cprint(f"  Original session: {parent_session_id}")
@@ -827,12 +827,12 @@ class SessionMixin:
         turns, it backs up to the oldest one.
 
         Beyond the in-memory ``conversation_history`` slice, this also:
-          • soft-deletes the truncated rows in SessionDB (``active=0``) so
+          â€¢ soft-deletes the truncated rows in SessionDB (``active=0``) so
             they're hidden from re-prompts and search but kept for audit;
-          • notifies memory providers via ``on_session_switch(rewound=True)``;
-          • mirrors /branch's agent surgery (system-prompt invalidation +
+          â€¢ notifies memory providers via ``on_session_switch(rewound=True)``;
+          â€¢ mirrors /branch's agent surgery (system-prompt invalidation +
             flush-index reset);
-          • when ``prefill`` is set and an input buffer is available,
+          â€¢ when ``prefill`` is set and an input buffer is available,
             pre-fills the composer with the backed-up message text so it
             can be edited and resubmitted.
 
@@ -885,7 +885,7 @@ class SessionMixin:
                         self.session_id, target_id
                     )
                     rewound_rows = result.get("rewound_count", 0)
-                    # Prefer the DB's decoded target text for the prefill —
+                    # Prefer the DB's decoded target text for the prefill â€”
                     # it's the canonical persisted copy.
                     db_text = self._undo_content_to_text(
                         (result.get("target_message") or {}).get("content")
@@ -893,7 +893,7 @@ class SessionMixin:
                     if db_text:
                         removed_text = db_text
             except ValueError as e:
-                # Non-user target / cross-session — keep the in-memory undo
+                # Non-user target / cross-session â€” keep the in-memory undo
                 # but skip the soft-delete; surface a debug-level note.
                 logger.debug("undo: soft-delete skipped: %s", e)
             except Exception as e:
@@ -912,7 +912,7 @@ class SessionMixin:
                     self.agent._last_flushed_db_idx = len(self.conversation_history)
                 except Exception:
                     logger.warning("[fix_01_sessiz_except] Exception")
-            # Notify memory providers — same hook /branch fires, with the
+            # Notify memory providers â€” same hook /branch fires, with the
             # rewound flag so per-turn document caches invalidate (#6672, #21910).
             try:
                 _mm = getattr(self.agent, "_memory_manager", None)
@@ -993,7 +993,7 @@ class SessionMixin:
                 self._delete_session_on_exit = True
             elif _args:
                 _cprint(
-                    f"  {_DIM}✗ Unknown argument: {_escape(_args)}. Use /exit --delete to also remove session history.{_RST}"
+                    f"  {_DIM}âœ— Unknown argument: {_escape(_args)}. Use /exit --delete to also remove session history.{_RST}"
                 )
                 return True
             return False
@@ -1012,7 +1012,7 @@ class SessionMixin:
             # tab switches, subshell ``clear``, SSH window restores, etc.
             # See issue #8688 (cmux). Ctrl+L is bound to the same helper.
             self._force_full_redraw()
-            _cprint(f"  {_DIM}✓ UI redrawn{_RST}")
+            _cprint(f"  {_DIM}âœ“ UI redrawn{_RST}")
         elif canonical == "clear":
             if (
                 self._confirm_destructive_slash(
@@ -1068,7 +1068,7 @@ class SessionMixin:
                         context_length=ctx_len,
                     )
                 _cprint(
-                    "  ✨ (◕‿◕)✨ Fresh start! Screen cleared and conversation reset.\n"
+                    "  âœ¨ (â—•â€¿â—•)âœ¨ Fresh start! Screen cleared and conversation reset.\n"
                 )
                 # Show a random tip on new session
                 try:
@@ -1083,13 +1083,13 @@ class SessionMixin:
                         )
                     except Exception:
                         _tip_color = "#B8860B"
-                    cc.print(f"[dim {_tip_color}]✦ Tip: {_tip}[/]")
+                    cc.print(f"[dim {_tip_color}]âœ¦ Tip: {_tip}[/]")
                 except Exception:
                     logger.warning("[fix_01_sessiz_except] Exception")
             else:
                 self.show_banner()
                 print(
-                    "  ✨ (◕‿◕)✨ Fresh start! Screen cleared and conversation reset.\n"
+                    "  âœ¨ (â—•â€¿â—•)âœ¨ Fresh start! Screen cleared and conversation reset.\n"
                 )
                 # Show a random tip on new session
                 try:
@@ -1104,7 +1104,7 @@ class SessionMixin:
                         )
                     except Exception:
                         _tip_color = "#B8860B"
-                    self._console_print(f"[dim {_tip_color}]✦ Tip: {_tip}[/]")
+                    self._console_print(f"[dim {_tip_color}]âœ¦ Tip: {_tip}[/]")
                 except Exception:
                     logger.warning("[fix_01_sessiz_except] Exception")
         elif canonical == "history":
@@ -1128,7 +1128,7 @@ class SessionMixin:
                                 "  Title is empty after cleanup. Please use printable characters."
                             )
                         elif self._session_db.get_session(self.session_id):
-                            # Session exists in DB — set title directly
+                            # Session exists in DB â€” set title directly
                             try:
                                 if self._session_db.set_session_title(
                                     self.session_id, new_title
@@ -1139,7 +1139,7 @@ class SessionMixin:
                             except ValueError as e:
                                 _cprint(f"  {e}")
                         else:
-                            # Session not created yet — defer the title
+                            # Session not created yet â€” defer the title
                             # Check uniqueness proactively with the sanitized title
                             existing = self._session_db.get_session_by_title(new_title)
                             if existing:
@@ -1213,7 +1213,7 @@ class SessionMixin:
                 # Re-queue the message so process_loop sends it to the agent
                 self._pending_input.put(retry_msg)
         elif canonical == "undo":
-            # Parse optional turn count: "/undo" → 1, "/undo 3" → 3.
+            # Parse optional turn count: "/undo" â†’ 1, "/undo 3" â†’ 3.
             _undo_n = 1
             _undo_parts = cmd_original.split()
             if len(_undo_parts) > 1:
@@ -1221,7 +1221,7 @@ class SessionMixin:
                     _undo_n = int(_undo_parts[1])
                 except ValueError:
                     print(
-                        f"(._.) Invalid count {_undo_parts[1]!r} — use /undo or /undo N."
+                        f"(._.) Invalid count {_undo_parts[1]!r} â€” use /undo or /undo N."
                     )
                     return
                 if _undo_n < 1:
@@ -1320,7 +1320,7 @@ class SessionMixin:
                 else:
                     print(f"Plugins ({len(plugins)}):")
                     for p in plugins:
-                        status = "✓" if p["enabled"] else "✗"
+                        status = "âœ“" if p["enabled"] else "âœ—"
                         version = f" v{p['version']}" if p["version"] else ""
                         tools = f"{p['tools']} tools" if p["tools"] else ""
                         hooks = f"{p['hooks']} hooks" if p["hooks"] else ""
@@ -1329,7 +1329,7 @@ class SessionMixin:
                         )
                         parts = [x for x in [tools, hooks, commands] if x]
                         detail = f" ({', '.join(parts)})" if parts else ""
-                        error = f" — {p['error']}" if p["error"] else ""
+                        error = f" â€” {p['error']}" if p["error"] else ""
                         print(f"  {status} {p['name']}{version}{detail}{error}")
             except Exception as e:
                 print(f"Plugin system error: {e}")
@@ -1362,7 +1362,7 @@ class SessionMixin:
         elif canonical == "steer":
             # Inject a message after the next tool call without interrupting.
             # If the agent is actively running, push the text into the agent's
-            # pending_steer slot — the drain hook in _execute_tool_calls_*
+            # pending_steer slot â€” the drain hook in _execute_tool_calls_*
             # will append it to the next tool result's content. If no agent
             # is running, fall back to queue semantics (same as /queue).
             parts = cmd_original.split(None, 1)
@@ -1381,12 +1381,12 @@ class SessionMixin:
                 else:
                     if accepted:
                         _cprint(
-                            f"  ⏩ Steer queued — arrives after the next tool call: {payload[:80]}{'...' if len(payload) > 80 else ''}"
+                            f"  â© Steer queued â€” arrives after the next tool call: {payload[:80]}{'...' if len(payload) > 80 else ''}"
                         )
                     else:
                         _cprint("  Steer rejected (empty payload).")
             else:
-                # No active run — treat as a normal next-turn message.
+                # No active run â€” treat as a normal next-turn message.
                 self._pending_input.put(payload)
                 _cprint(
                     f"  No agent running; queued as next turn: {payload[:80]}{'...' if len(payload) > 80 else ''}"
@@ -1416,7 +1416,7 @@ class SessionMixin:
                     if exec_cmd:
                         try:
                             # shell=True is intentional: quick_commands are user-defined
-                            # shell snippets from config.yaml — not agent/LLM controlled.
+                            # shell snippets from config.yaml â€” not agent/LLM controlled.
                             result = subprocess.run(  # nosec B602
                                 args_list,
                                 shell=False,
@@ -1476,7 +1476,7 @@ class SessionMixin:
                             _cprint(str(result))
                     except Exception as e:
                         _cprint(f"\033[1;31mPlugin command error: {e}{_RST}")
-            # Skill bundles take precedence over individual skills — /<bundle>
+            # Skill bundles take precedence over individual skills â€” /<bundle>
             # loads multiple skills at once. Rescans cheaply when files change.
             elif base_cmd in skill_bundles:
                 user_instruction = cmd_original[len(base_cmd) :].strip()
@@ -1487,7 +1487,7 @@ class SessionMixin:
                     msg, loaded_names, missing = bundle_result
                     bundle_info = skill_bundles[base_cmd]
                     print(
-                        f"\n⚡ Loading bundle: {bundle_info['name']} "
+                        f"\nâš¡ Loading bundle: {bundle_info['name']} "
                         f"({len(loaded_names)} skills)"
                     )
                     if missing:
@@ -1508,7 +1508,7 @@ class SessionMixin:
                 )
                 if msg:
                     skill_name = skill_commands[base_cmd]["name"]
-                    print(f"\n⚡ Loading skill: {skill_name}")
+                    print(f"\nâš¡ Loading skill: {skill_name}")
                     if hasattr(self, "_pending_input"):
                         self._pending_input.put(msg)
                 else:
@@ -1531,7 +1531,7 @@ class SessionMixin:
                         matches = exact
                     else:
                         # Prefer the unique shortest match:
-                        # /qui → /quit (5) wins over /quint-pipeline (15)
+                        # /qui â†’ /quit (5) wins over /quint-pipeline (15)
                         min_len = min(len(c) for c in matches)
                         shortest = [c for c in matches if len(c) == min_len]
                         if len(shortest) == 1:
@@ -1543,7 +1543,7 @@ class SessionMixin:
                     # (e.g. /config with extra args that are not yet handled above).
                     full_name = matches[0]
                     if full_name == typed_base:
-                        # Already an exact token — no expansion possible; fall through
+                        # Already an exact token â€” no expansion possible; fall through
                         _cprint(f"\033[1;31mUnknown command: {cmd_lower}{_RST}")
                         _cprint(
                             f"{_DIM}{_ACCENT}Type /help for available commands{_RST}"

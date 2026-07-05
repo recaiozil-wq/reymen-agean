@@ -1,13 +1,13 @@
-#!/usr/bin/env python3
-"""duplicate_module_detector.py — ReYMeN projesindeki ReYMeN kopyası modülleri tespit eder.
+﻿#!/usr/bin/env python3
+"""duplicate_module_detector.py â€” ReYMeN projesindeki ReYMeN kopyasÄ± modÃ¼lleri tespit eder.
 
-Kullanım:
+KullanÄ±m:
     python reymen/scripts/duplicate_module_detector.py
 
-Şunları raporlar:
-    - ReYMeN mirror dizinleri ve boyutları
-    - .py dosya sayıları / kopya tahmini
-    - Önerilen temizlik aksiyonları
+ÅunlarÄ± raporlar:
+    - ReYMeN mirror dizinleri ve boyutlarÄ±
+    - .py dosya sayÄ±larÄ± / kopya tahmini
+    - Ã–nerilen temizlik aksiyonlarÄ±
 """
 
 import os
@@ -17,13 +17,13 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-HERMES_MIRROR_DIRS = [
+REYMEN_MIRROR_DIRS = [
     "agent",
     "acp",
     "acp_adapter",
     "skills",
     "ReYMeN_cli",
-    "hermes-memory-backup",
+    "reymen-memory-backup",
     "ReYMeN-full-backup",
     "plugins",
     "tools",
@@ -52,7 +52,7 @@ def scan_mirror_dirs(proje_koku: Path):
     toplam_mirror_py = 0
     toplam_mirror_bytes = 0
 
-    for d in HERMES_MIRROR_DIRS:
+    for d in REYMEN_MIRROR_DIRS:
         yol = proje_koku / d
         if yol.exists() and yol.is_dir():
             py_dosyalar = list(yol.rglob("*.py"))
@@ -68,7 +68,7 @@ def scan_mirror_dirs(proje_koku: Path):
                 }
             )
 
-    # ReYMeN core dizinlerini de tara (referans için)
+    # ReYMeN core dizinlerini de tara (referans iÃ§in)
     core_py = 0
     for d in REYMEN_CORE_DIRS:
         yol = proje_koku / d
@@ -79,9 +79,9 @@ def scan_mirror_dirs(proje_koku: Path):
 
 
 def find_identical_files(proje_koku: Path):
-    """ReYMeN mirror ile ReYMeN core arasında birebir aynı .py dosyalarını bul."""
+    """ReYMeN mirror ile ReYMeN core arasÄ±nda birebir aynÄ± .py dosyalarÄ±nÄ± bul."""
     mirrors = {}
-    for d in HERMES_MIRROR_DIRS:
+    for d in REYMEN_MIRROR_DIRS:
         yol = proje_koku / d
         if yol.exists():
             for f in yol.rglob("*.py"):
@@ -110,20 +110,20 @@ def find_identical_files(proje_koku: Path):
 def main():
     proje_koku = Path.cwd()
 
-    # .ReYMeN/ veya reymen/ varlığını kontrol et
+    # .ReYMeN/ veya reymen/ varlÄ±ÄŸÄ±nÄ± kontrol et
     if not (proje_koku / "reymen").exists():
-        print(f"HATA: Bu bir ReYMeN proje kökü değil: {proje_koku}")
-        print("Lütfen ReYMeN-Ajan dizininde çalıştırın.")
+        print(f"HATA: Bu bir ReYMeN proje kÃ¶kÃ¼ deÄŸil: {proje_koku}")
+        print("LÃ¼tfen ReYMeN-Ajan dizininde Ã§alÄ±ÅŸtÄ±rÄ±n.")
         sys.exit(1)
 
-    print(f"📁 ReYMeN-Ajan: {proje_koku}")
+    print(f"ğŸ“ ReYMeN-Ajan: {proje_koku}")
     print()
 
     # 1. Mirror dizinleri tara
     mirror_list, mirror_py, mirror_bytes, core_py = scan_mirror_dirs(proje_koku)
 
     print(f"{'='*60}")
-    print(f"📊 ReYMeN MIRROR DURUMU")
+    print(f"ğŸ“Š ReYMeN MIRROR DURUMU")
     print(f"{'='*60}")
     print(f"{'Dizin':<25} {'PY':>6} {'Boyut':>10}")
     print(f"{'-'*45}")
@@ -136,49 +136,49 @@ def main():
     # 2. Oran hesapla
     toplam_py = mirror_py + core_py
     drift_orani = round((mirror_py / max(toplam_py, 1)) * 100, 1)
-    print(f"\n📈 Drift Oranı: %{drift_orani} (mirror/toplam)")
-    print(f"   Hedef: %5 altı")
+    print(f"\nğŸ“ˆ Drift OranÄ±: %{drift_orani} (mirror/toplam)")
+    print(f"   Hedef: %5 altÄ±")
 
-    # 3. Aynı dosya tespiti
+    # 3. AynÄ± dosya tespiti
     only_mirror, _ = find_identical_files(proje_koku)
-    print(f"\n🔍 Sadece Mirror'da Olan Benzersiz Dosyalar: {len(only_mirror)}")
+    print(f"\nğŸ” Sadece Mirror'da Olan Benzersiz Dosyalar: {len(only_mirror)}")
     if only_mirror:
-        print(f"   Örnekler:")
+        print(f"   Ã–rnekler:")
         for f in sorted(list(only_mirror))[:10]:
             print(f"   - {f}")
         if len(only_mirror) > 10:
             print(f"   ... ve {len(only_mirror)-10} daha")
 
-    # 4. Öneriler
+    # 4. Ã–neriler
     print(f"\n{'='*60}")
-    print(f"📋 ÖNERİLEN AKSİYONLAR")
+    print(f"ğŸ“‹ Ã–NERÄ°LEN AKSÄ°YONLAR")
     print(f"{'='*60}")
 
     oneriler = []
     for m in sorted(mirror_list, key=lambda x: -x["py_sayisi"]):
         if m["py_sayisi"] > 50:
             oneriler.append(
-                f"🔴 {m['dizin']}: {m['py_sayisi']} dosya — silmeyi değerlendir"
+                f"ğŸ”´ {m['dizin']}: {m['py_sayisi']} dosya â€” silmeyi deÄŸerlendir"
             )
         elif m["py_sayisi"] > 10:
-            oneriler.append(f"🟡 {m['dizin']}: {m['py_sayisi']} dosya — gözden geçir")
+            oneriler.append(f"ğŸŸ¡ {m['dizin']}: {m['py_sayisi']} dosya â€” gÃ¶zden geÃ§ir")
 
     if not oneriler:
-        print("✅ Mirror dizinleri temiz veya küçük.")
+        print("âœ… Mirror dizinleri temiz veya kÃ¼Ã§Ã¼k.")
     else:
         for o in oneriler:
             print(f"   {o}")
 
-    # 5. Özet
+    # 5. Ã–zet
     print(f"\n{'='*60}")
-    print(f"📋 ÖZET")
+    print(f"ğŸ“‹ Ã–ZET")
     print(f"{'='*60}")
-    print(f"✅ Mevcut drift: %{drift_orani}")
-    print(f"🎯 Hedef: %5 altı")
+    print(f"âœ… Mevcut drift: %{drift_orani}")
+    print(f"ğŸ¯ Hedef: %5 altÄ±")
     if drift_orani > 5:
-        print(f"⚠️  {mirror_py} mirror .py dosyası temizlenmeli")
+        print(f"âš ï¸  {mirror_py} mirror .py dosyasÄ± temizlenmeli")
     else:
-        print(f"✅ Hedef tutturuldu!")
+        print(f"âœ… Hedef tutturuldu!")
 
     return 0
 

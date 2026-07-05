@@ -1,4 +1,4 @@
-"""ReYMeN tools.todo_tool shim — Hermes TODO fonksiyonlarını yönlendirir."""
+﻿"""ReYMeN tools.todo_tool shim â€” ReYMeN TODO fonksiyonlarÄ±nÄ± yÃ¶nlendirir."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class TodoStore:
-    """Hermes TodoStore — ReYMeN için basit implementasyon."""
+    """ReYMeN TodoStore â€” ReYMeN iÃ§in basit implementasyon."""
 
     def __init__(self):
         self._items: List[Dict[str, Any]] = []

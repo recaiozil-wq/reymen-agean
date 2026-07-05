@@ -1,8 +1,8 @@
-"""
-ReYMeN tools.environments.local — Local subprocess environment.
+﻿"""
+ReYMeN tools.environments.local â€” Local subprocess environment.
 
 Yerel makinede shell komutlari calistirir. Python standard kutuphanesi
-ile calisir — harici bagimlilik gerektirmez.
+ile calisir â€” harici bagimlilik gerektirmez.
 
 Kullanim:
     env = LocalEnvironment()
@@ -42,14 +42,14 @@ class LocalEnvironment:
         """
         self._timeout: int = timeout
 
-    # ── Durum ─────────────────────────────────────────────────────────
+    # â”€â”€ Durum â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @property
     def hazir(self) -> bool:
         """Yerel ortam her zaman hazirdir."""
         return True
 
-    # ── Senkron Calistirma ────────────────────────────────────────────
+    # â”€â”€ Senkron Calistirma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def sync_run(
         self,
@@ -134,7 +134,7 @@ class LocalEnvironment:
                 "ortam": "local",
             }
 
-    # ── Asenkron Calistirma ───────────────────────────────────────────
+    # â”€â”€ Asenkron Calistirma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     async def calistir(
         self,
@@ -173,7 +173,7 @@ class LocalEnvironment:
         )
         return await loop.run_in_executor(None, fn)
 
-    # ── Bilgi Metodlari ──────────────────────────────────────────────
+    # â”€â”€ Bilgi Metodlari â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def __repr__(self) -> str:
         return f"LocalEnvironment(timeout={self._timeout}s)"

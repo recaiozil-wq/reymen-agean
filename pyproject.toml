@@ -35,10 +35,11 @@ Repository = "https://github.com/recaiozil-wq/reymen-agean.git"
 Documentation = "https://github.com/recaiozil-wq/reymen-agean#readme"
 
 [project.scripts]
-reymen = "src.reymen.__main__:main"
+reymen = "reymen.__main__:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/reymen", "src/gateways", "src/core"]
+packages = ["src/reymen"]
+dev-mode-dirs = ["."]
 
 [tool.hatch.build.targets.sdist]
 include = ["/src"]

@@ -1,7 +1,7 @@
-"""Dosya komutları — MixinCommands alt modülü.
+﻿"""Dosya komutlarÄ± â€” MixinCommands alt modÃ¼lÃ¼.
 
-Bu dosya otomatik olarak cli_mixin_commands.py'den ayrılmıştır.
-MixinCommands sınıfının ilgili metotlarını içerir.
+Bu dosya otomatik olarak cli_mixin_commands.py'den ayrÄ±lmÄ±ÅŸtÄ±r.
+MixinCommands sÄ±nÄ±fÄ±nÄ±n ilgili metotlarÄ±nÄ± iÃ§erir.
 """
 
 import logging
@@ -31,6 +31,6 @@ logger = logging.getLogger(__name__)
 
 
 class MixinCommands:
-    """Dosya komutları (şu anda boş — dosya işlemleri edit_commands içinde)."""
+    """Dosya komutlarÄ± (ÅŸu anda boÅŸ â€” dosya iÅŸlemleri edit_commands iÃ§inde)."""
 
     pass

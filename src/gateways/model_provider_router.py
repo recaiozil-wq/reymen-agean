@@ -1,14 +1,14 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-model_provider_router.py — Model→Provider yönlendirici
+model_provider_router.py â€” Modelâ†’Provider yÃ¶nlendirici
 
-Model adından provider'a, failover zincirinden sağlık kontrolüne
-kadar tüm model routing mantığını barındırır.
+Model adÄ±ndan provider'a, failover zincirinden saÄŸlÄ±k kontrolÃ¼ne
+kadar tÃ¼m model routing mantÄ±ÄŸÄ±nÄ± barÄ±ndÄ±rÄ±r.
 
-Özellikler:
-  - Model→Provider statik haritası (config.yaml + built-in fallback)
-  - Failover zinciri: bir provider hata verince sıradakine atla
-  - Model bazlı provider doğrulama
+Ã–zellikler:
+  - Modelâ†’Provider statik haritasÄ± (config.yaml + built-in fallback)
+  - Failover zinciri: bir provider hata verince sÄ±radakine atla
+  - Model bazlÄ± provider doÄŸrulama
   - Thread-safe singleton
 """
 
@@ -21,7 +21,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
-from src.gateways.provider_router import (
+from gateways.provider_router import (
     SaglayiciYonlendirici,
     SaglayiciDurum,
     yonlendirici_al,
@@ -30,8 +30,8 @@ from src.gateways.provider_router import (
 logger = logging.getLogger(__name__)
 
 
-# ── Varsayılan Model→Provider Haritası ──────────────────────────────────────
-# config.yaml'da model_providers: yoksa kullanılır
+# â”€â”€ VarsayÄ±lan Modelâ†’Provider HaritasÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# config.yaml'da model_providers: yoksa kullanÄ±lÄ±r
 VARSAYILAN_MODEL_PROVIDER_MAP: dict[str, str] = {
     # DeepSeek
     "deepseek-v4-flash": "deepseek",
@@ -77,19 +77,19 @@ VARSAYILAN_MODEL_PROVIDER_MAP: dict[str, str] = {
     "bedrock/llama": "bedrock",
 }
 
-# Provider→failover sırası (varsayılan)
+# Providerâ†’failover sÄ±rasÄ± (varsayÄ±lan)
 VARSAYILAN_FAILOVER_ZINCIRI: list[list[str]] = [
     # Birinci tercih: local provider
     ["lmstudio"],
-    # İkinci tercih: ana API provider'ları
+    # Ä°kinci tercih: ana API provider'larÄ±
     ["deepseek", "openrouter"],
-    # Üçüncü tercih: alternatif API'ler
+    # ÃœÃ§Ã¼ncÃ¼ tercih: alternatif API'ler
     ["openai", "anthropic"],
-    # Son çare
+    # Son Ã§are
     ["groq", "gemini"],
 ]
 
-# Provider tipi → API uyumluluğu
+# Provider tipi â†’ API uyumluluÄŸu
 PROVIDER_API_TIPI: dict[str, str] = {
     "openrouter": "openai",
     "openai": "openai",
@@ -102,7 +102,7 @@ PROVIDER_API_TIPI: dict[str, str] = {
     "lmstudio": "openai",
 }
 
-# Provider → varsayılan model
+# Provider â†’ varsayÄ±lan model
 PROVIDER_VARSAYILAN_MODEL: dict[str, str] = {
     "deepseek": "deepseek-v4-flash",
     "openai": "gpt-4o",
@@ -116,35 +116,35 @@ PROVIDER_VARSAYILAN_MODEL: dict[str, str] = {
 }
 
 
-# ── Veri Yapıları ───────────────────────────────────────────────────────────
+# â”€â”€ Veri YapÄ±larÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 @dataclass
 class ModelYonlendirmeKarari:
-    """Model yönlendirme kararı — hangi provider'a, hangi model adıyla gidilecek."""
+    """Model yÃ¶nlendirme kararÄ± â€” hangi provider'a, hangi model adÄ±yla gidilecek."""
 
-    model: str  # LLM'e gönderilecek model adı
-    provider: str  # Provider adı (deepseek, openai vb.)
+    model: str  # LLM'e gÃ¶nderilecek model adÄ±
+    provider: str  # Provider adÄ± (deepseek, openai vb.)
     api_tipi: str  # API uyumluluk tipi (openai/anthropic/bedrock)
     base_url: str  # Provider base URL
-    api_key: str  # API anahtarı
+    api_key: str  # API anahtarÄ±
     failover_zinciri: list[str] = field(default_factory=list)  # Yedek provider listesi
-    orijinal_model: str = ""  # İstenen orijinal model adı
+    orijinal_model: str = ""  # Ä°stenen orijinal model adÄ±
 
     def __post_init__(self):
         if not self.orijinal_model:
             self.orijinal_model = self.model
 
 
-# ── Ana Sınıf ───────────────────────────────────────────────────────────────
+# â”€â”€ Ana SÄ±nÄ±f â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class ModelProviderRouter:
-    """Model→Provider yönlendirme + failover zinciri yönetimi.
+    """Modelâ†’Provider yÃ¶nlendirme + failover zinciri yÃ¶netimi.
 
-    config.yaml'daki model_providers: bölümünü okur, varsayılan harita
-    ile birleştirir. Bir model hangi provider'da çalışır, hata alınırsa
-    hangi sırayla diğer provider'lara geçilir — tüm bu mantık buradadır.
+    config.yaml'daki model_providers: bÃ¶lÃ¼mÃ¼nÃ¼ okur, varsayÄ±lan harita
+    ile birleÅŸtirir. Bir model hangi provider'da Ã§alÄ±ÅŸÄ±r, hata alÄ±nÄ±rsa
+    hangi sÄ±rayla diÄŸer provider'lara geÃ§ilir â€” tÃ¼m bu mantÄ±k buradadÄ±r.
     """
 
     def __init__(
@@ -159,34 +159,34 @@ class ModelProviderRouter:
         # Haritalar
         self._model_provider_map: dict[str, str] = {}
         self._failover_zinciri: list[list[str]] = []
-        self._provider_yapisi: dict[str, dict] = {}  # providers: config.yaml'daki yapı
+        self._provider_yapisi: dict[str, dict] = {}  # providers: config.yaml'daki yapÄ±
 
-        # Config'den yükle
+        # Config'den yÃ¼kle
         self._config_yolu = config_yolu
         self._config_yukle(config_yolu)
 
-        # Parametre override'ları
+        # Parametre override'larÄ±
         if model_provider_map:
             self._model_provider_map.update(model_provider_map)
         if failover_zinciri:
             self._failover_zinciri = failover_zinciri
 
-        # Provider'ları yönlendiriciye kaydet
+        # Provider'larÄ± yÃ¶nlendiriciye kaydet
         for ad in list(self._model_provider_map.values()) + [
             p for zincir in self._failover_zinciri for p in zincir
         ]:
             self._yonlendirici.kaydet(ad)
 
         logger.info(
-            "[ModelRouter] %d model→provider eşlemesi, %d failover adımı yüklendi",
+            "[ModelRouter] %d modelâ†’provider eÅŸlemesi, %d failover adÄ±mÄ± yÃ¼klendi",
             len(self._model_provider_map),
             len(self._failover_zinciri),
         )
 
-    # ── Config Yükleme ───────────────────────────────────────────────────
+    # â”€â”€ Config YÃ¼kleme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _config_yukle(self, config_yolu: Optional[str] = None) -> None:
-        """config.yaml'dan model_providers: ve providers: bölümlerini oku."""
+        """config.yaml'dan model_providers: ve providers: bÃ¶lÃ¼mlerini oku."""
         yollar = []
         if config_yolu:
             yollar.append(Path(config_yolu))
@@ -203,47 +203,47 @@ class ModelProviderRouter:
                     with open(y, "r", encoding="utf-8") as f:
                         cfg = yaml.safe_load(f) or {}
 
-                    # model_providers: bölümü
+                    # model_providers: bÃ¶lÃ¼mÃ¼
                     mp = cfg.get("model_providers", {})
                     if isinstance(mp, dict):
                         self._model_provider_map.update(mp)
 
-                    # providers: bölümü (base_url, api_key bilgisi)
+                    # providers: bÃ¶lÃ¼mÃ¼ (base_url, api_key bilgisi)
                     prov = cfg.get("providers", {})
                     if isinstance(prov, dict):
                         self._provider_yapisi = prov
-                        # Her provider'ı yönlendiriciye kaydet
+                        # Her provider'Ä± yÃ¶nlendiriciye kaydet
                         for ad in prov:
                             self._yonlendirici.kaydet(ad)
 
-                    # failover_zinciri: bölümü (opsiyonel)
+                    # failover_zinciri: bÃ¶lÃ¼mÃ¼ (opsiyonel)
                     fz = cfg.get("failover_zinciri")
                     if isinstance(fz, list):
                         self._failover_zinciri = fz
 
-                    logger.info("[ModelRouter] Config yüklendi: %s", y)
+                    logger.info("[ModelRouter] Config yÃ¼klendi: %s", y)
                     return
                 except Exception as e:
-                    logger.warning("[ModelRouter] Config okuma hatası (%s): %s", y, e)
+                    logger.warning("[ModelRouter] Config okuma hatasÄ± (%s): %s", y, e)
 
-        # Config bulunamadı — varsayılan haritayı kullan
+        # Config bulunamadÄ± â€” varsayÄ±lan haritayÄ± kullan
         self._model_provider_map = dict(VARSAYILAN_MODEL_PROVIDER_MAP)
         self._failover_zinciri = list(VARSAYILAN_FAILOVER_ZINCIRI)
-        logger.info("[ModelRouter] Config bulunamadı, varsayılan harita kullanılıyor")
+        logger.info("[ModelRouter] Config bulunamadÄ±, varsayÄ±lan harita kullanÄ±lÄ±yor")
 
-    # ── Model Yönlendirme ────────────────────────────────────────────────
+    # â”€â”€ Model YÃ¶nlendirme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def model_route(
         self, model: str, provider_override: Optional[str] = None
     ) -> ModelYonlendirmeKarari:
-        """Bir model adını çözümle: hangi provider, hangi API tipi, hangi URL.
+        """Bir model adÄ±nÄ± Ã§Ã¶zÃ¼mle: hangi provider, hangi API tipi, hangi URL.
 
         Args:
-            model: İstenen model adı (örn: "deepseek-v4-flash")
-            provider_override: Provider'ı zorla (örn: "openrouter")
+            model: Ä°stenen model adÄ± (Ã¶rn: "deepseek-v4-flash")
+            provider_override: Provider'Ä± zorla (Ã¶rn: "openrouter")
 
         Returns:
-            ModelYonlendirmeKarari — yönlendirme kararı
+            ModelYonlendirmeKarari â€” yÃ¶nlendirme kararÄ±
         """
         model_adi = model.strip()
 
@@ -252,28 +252,28 @@ class ModelProviderRouter:
             if provider_override:
                 provider = provider_override
             else:
-                # Model→Provider haritasında ara
+                # Modelâ†’Provider haritasÄ±nda ara
                 provider = self._model_provider_map.get(model_adi)
 
             if not provider:
-                # Hello? fallback: model adının ilk kısmını provider olarak dene
-                # Örn: "deepseek-v4-flash" → "deepseek"
+                # Hello? fallback: model adÄ±nÄ±n ilk kÄ±smÄ±nÄ± provider olarak dene
+                # Ã–rn: "deepseek-v4-flash" â†’ "deepseek"
                 prefix = model_adi.split("-")[0].split("/")[0].split(".")[0]
                 if prefix in self._model_provider_map.values():
                     provider = prefix
                 elif prefix in PROVIDER_API_TIPI:
                     provider = prefix
                 else:
-                    # Hiçbir şey bulunamadı — varsayılan provider'a yönlendir
+                    # HiÃ§bir ÅŸey bulunamadÄ± â€” varsayÄ±lan provider'a yÃ¶nlendir
                     provider = "deepseek"
                     logger.warning(
-                        "[ModelRouter] '%s' modeli için provider bulunamadı, "
-                        "varsayılan: %s",
+                        "[ModelRouter] '%s' modeli iÃ§in provider bulunamadÄ±, "
+                        "varsayÄ±lan: %s",
                         model_adi,
                         provider,
                     )
 
-            # Provider yapılandırmasını al
+            # Provider yapÄ±landÄ±rmasÄ±nÄ± al
             prov_yapi = self._provider_yapisi.get(provider, {})
             base_url = prov_yapi.get("base_url", "")
             api_key = prov_yapi.get("api_key", "")
@@ -286,7 +286,7 @@ class ModelProviderRouter:
             # API tipini belirle
             api_tipi = PROVIDER_API_TIPI.get(provider, "openai")
 
-            # Failover zinciri oluştur
+            # Failover zinciri oluÅŸtur
             failover_zinciri = self._failover_zincir_olustur(provider)
 
             return ModelYonlendirmeKarari(
@@ -300,12 +300,12 @@ class ModelProviderRouter:
             )
 
     def _failover_zincir_olustur(self, baslangic_provider: str) -> list[str]:
-        """Bir provider'dan başlayarak failover zinciri oluştur.
+        """Bir provider'dan baÅŸlayarak failover zinciri oluÅŸtur.
 
-        Varsayılan failover zincirindeki grupları tara, başlangıç
-        provider'ını bul, ondan sonraki tüm provider'ları zincire ekle.
+        VarsayÄ±lan failover zincirindeki gruplarÄ± tara, baÅŸlangÄ±Ã§
+        provider'Ä±nÄ± bul, ondan sonraki tÃ¼m provider'larÄ± zincire ekle.
 
-        Örn: baslangic="anthropic" → ["anthropic", "groq", "gemini"]
+        Ã–rn: baslangic="anthropic" â†’ ["anthropic", "groq", "gemini"]
         """
         bulundu = False
         zincir = []
@@ -316,24 +316,24 @@ class ModelProviderRouter:
                 elif p == baslangic_provider:
                     zincir.append(p)
                     bulundu = True
-                    # Aynı gruptaki diğer provider'ları da ekle
+                    # AynÄ± gruptaki diÄŸer provider'larÄ± da ekle
                     for diger in grup:
                         if diger != p:
                             zincir.append(diger)
 
         if not bulundu:
-            # Provider failover zincirinde bulunamadı — sadece kendisi
+            # Provider failover zincirinde bulunamadÄ± â€” sadece kendisi
             zincir = [baslangic_provider]
 
         return zincir
 
-    # ── Provider Sağlık Kontrolü ────────────────────────────────────────
+    # â”€â”€ Provider SaÄŸlÄ±k KontrolÃ¼ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def tum_provider_saglik(self) -> dict[str, bool]:
-        """Tüm provider'ların sağlık kontrolünü yap.
+        """TÃ¼m provider'larÄ±n saÄŸlÄ±k kontrolÃ¼nÃ¼ yap.
 
         Returns:
-            {provider_adi: canli_mi} sözlüğü
+            {provider_adi: canli_mi} sÃ¶zlÃ¼ÄŸÃ¼
         """
         provider_list = []
         for ad, yapi in self._provider_yapisi.items():
@@ -353,7 +353,7 @@ class ModelProviderRouter:
         """Provider durum raporu.
 
         Args:
-            provider: Provider adı (None = tümü)
+            provider: Provider adÄ± (None = tÃ¼mÃ¼)
 
         Returns:
             Durum bilgisi dict
@@ -373,24 +373,24 @@ class ModelProviderRouter:
             "provider_durumlari": self._yonlendirici.durum_ozeti(),
         }
 
-    # ── Provider Hata/Başarı Bildirimi ──────────────────────────────────
+    # â”€â”€ Provider Hata/BaÅŸarÄ± Bildirimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def hata_bildir(self, provider: str):
-        """Provider hata bildirimi — circuit breaker tetiklenebilir."""
+        """Provider hata bildirimi â€” circuit breaker tetiklenebilir."""
         self._yonlendirici.hata_bildir(provider)
 
     def basari_bildir(self, provider: str):
-        """Provider başarı bildirimi — hata sayacı sıfırlanır."""
+        """Provider baÅŸarÄ± bildirimi â€” hata sayacÄ± sÄ±fÄ±rlanÄ±r."""
         self._yonlendirici.basari_bildir(provider)
 
     def aktif_mi(self, provider: str) -> bool:
-        """Provider kullanılabilir durumda mı?"""
+        """Provider kullanÄ±labilir durumda mÄ±?"""
         return self._yonlendirici.aktif_mi(provider)
 
-    # ── Model Listesi ───────────────────────────────────────────────────
+    # â”€â”€ Model Listesi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def modelleri_listele(self, provider_filtre: Optional[str] = None) -> list[dict]:
-        """Tüm bilinen modelleri listele.
+        """TÃ¼m bilinen modelleri listele.
 
         Args:
             provider_filtre: Sadece belirli bir provider'daki modeller
@@ -413,11 +413,11 @@ class ModelProviderRouter:
         return sonuc
 
     def provider_modelleri(self, provider: str) -> list[str]:
-        """Bir provider'daki tüm modelleri listele."""
+        """Bir provider'daki tÃ¼m modelleri listele."""
         return [m for m, p in self._model_provider_map.items() if p == provider]
 
 
-# ── Singleton ────────────────────────────────────────────────────────────────
+# â”€â”€ Singleton â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _router: Optional[ModelProviderRouter] = None
 _router_lock = threading.Lock()
@@ -428,7 +428,7 @@ def router_al(
     model_provider_map: Optional[dict[str, str]] = None,
     failover_zinciri: Optional[list[list[str]]] = None,
 ) -> ModelProviderRouter:
-    """Thread-safe singleton erişimi."""
+    """Thread-safe singleton eriÅŸimi."""
     global _router
     if _router is None:
         with _router_lock:
@@ -439,8 +439,8 @@ def router_al(
                     failover_zinciri=failover_zinciri,
                 )
     elif config_yolu or model_provider_map or failover_zinciri:
-        # İlk kurulumdan sonra parametre değişikliği — log uyar
+        # Ä°lk kurulumdan sonra parametre deÄŸiÅŸikliÄŸi â€” log uyar
         logger.warning(
-            "[ModelRouter] router_al() parametreleri singleton sonrası yok sayıldı"
+            "[ModelRouter] router_al() parametreleri singleton sonrasÄ± yok sayÄ±ldÄ±"
         )
     return _router

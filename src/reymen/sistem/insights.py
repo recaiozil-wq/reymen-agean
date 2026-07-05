@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""insights.py — Kullanim icgoruleri.
+﻿# -*- coding: utf-8 -*-
+"""insights.py â€” Kullanim icgoruleri.
 
 Agent kullanim istatistiklerinden anlamli icgoruler cikarir.
 """

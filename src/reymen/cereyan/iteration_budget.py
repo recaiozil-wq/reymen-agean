@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""iteration_budget.py — ReYMeN thread-safe iterasyon butcesi.
+﻿# -*- coding: utf-8 -*-
+"""iteration_budget.py â€” ReYMeN thread-safe iterasyon butcesi.
 
 ReYMeN Agent IterationBudget pattern'i ile ayni.
 Her ajan (ana veya alt) kendi butcesine sahiptir.
@@ -68,9 +68,9 @@ class IterationBudget:
     def __repr__(self) -> str:
         return f"IterationBudget({self.used}/{self.max_total})"
 
-    # ══════════════════════════════════════════════════════════════════
-    # GERIYE UYUMLULUK — eski API
-    # ══════════════════════════════════════════════════════════════════
+    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    # GERIYE UYUMLULUK â€” eski API
+    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
     @property
     def tur(self) -> int:
@@ -127,33 +127,33 @@ class IterationBudget:
         """
         hedef = gorev.lower().strip()
 
-        # ── 0. Selamlasma/sosyal/basit soru → direkt 1 ──────────────
+        # â”€â”€ 0. Selamlasma/sosyal/basit soru â†’ direkt 1 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         _selam = any(
             k in hedef
             for k in [
                 "merhaba",
                 "selam",
                 "naber",
-                "nasılsın",
+                "nasÄ±lsÄ±n",
                 "nasilsin",
                 "iyi misin",
-                "teşekkür",
+                "teÅŸekkÃ¼r",
                 "tesekkur",
-                "sağol",
+                "saÄŸol",
                 "sagol",
-                "günaydın",
+                "gÃ¼naydÄ±n",
                 "gunaydin",
-                "iyi günler",
+                "iyi gÃ¼nler",
                 "iyi gunler",
-                "iyi akşamlar",
+                "iyi akÅŸamlar",
                 "iyi aksamlar",
                 "iyi geceler",
-                "ne yapıyorsun",
+                "ne yapÄ±yorsun",
                 "ne yapiyorsun",
-                "napıyorsun",
+                "napÄ±yorsun",
                 "napiyorsun",
                 "kolay gelsin",
-                "hayırlı",
+                "hayÄ±rlÄ±",
                 "hayirli",
             ]
         )
@@ -170,49 +170,49 @@ class IterationBudget:
                     "sil",
                     "bul",
                     "calistir",
-                    "çalıştır",
+                    "Ã§alÄ±ÅŸtÄ±r",
                     "indir",
                     "yukle",
-                    "yükle",
+                    "yÃ¼kle",
                     "kur",
-                    "gönder",
+                    "gÃ¶nder",
                     "gonder",
                     "tara",
                     "kontrol",
-                    "düzelt",
+                    "dÃ¼zelt",
                     "duzelt",
                     "temizle",
-                    "düzenle",
+                    "dÃ¼zenle",
                     "duzenle",
                     "raporla",
                     "analiz",
                     "incele",
-                    "güncelle",
+                    "gÃ¼ncelle",
                     "guncelle",
-                    "aç",
+                    "aÃ§",
                     "ac",
                     "kapat",
                     "kes",
-                    "koştur",
+                    "koÅŸtur",
                     "kostur",
                 ]
             )
             if not _ek_islem:
                 return {"karmasiklik": 1}
 
-        # ── 1. Toplu gorev tespiti ─────────────────────────────────
+        # â”€â”€ 1. Toplu gorev tespiti â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         _toplu = any(
             k in hedef
             for k in [
                 "hepsini",
                 "hepsin",
                 "hepsi",
-                "tümünü",
-                "tümü",
-                "tüm",
+                "tÃ¼mÃ¼nÃ¼",
+                "tÃ¼mÃ¼",
+                "tÃ¼m",
                 "tumu",
                 "tumunu",
-                "bütün",
+                "bÃ¼tÃ¼n",
                 "butun",
                 "toplu",
             ]
@@ -222,20 +222,20 @@ class IterationBudget:
             for k in [
                 "kontrol",
                 "gider",
-                "düzelt",
+                "dÃ¼zelt",
                 "duzelt",
                 "onar",
                 "temizle",
                 "tara",
-                "düzenle",
+                "dÃ¼zenle",
                 "duzenle",
                 "yap",
                 "calistir",
-                "çalıştır",
+                "Ã§alÄ±ÅŸtÄ±r",
                 "incele",
-                "dönüştür",
+                "dÃ¶nÃ¼ÅŸtÃ¼r",
                 "donustur",
-                "güncelle",
+                "gÃ¼ncelle",
                 "guncelle",
             ]
         )
@@ -244,29 +244,29 @@ class IterationBudget:
         if _toplu:
             return {"karmasiklik": 4}
 
-        # ── 2. Cok adimli gorev tespiti (baglac + virgul) ──────────
+        # â”€â”€ 2. Cok adimli gorev tespiti (baglac + virgul) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         _cok_adim_baglac = any(
             k in hedef
             for k in [
                 "ve",
                 "sonra",
                 "ardindan",
-                "ardından",
+                "ardÄ±ndan",
                 "daha sonra",
                 "once",
-                "önce",
-                "daha önce",
+                "Ã¶nce",
+                "daha Ã¶nce",
                 "daha once",
             ]
         )
         _cok_adim_virgul = hedef.count(",") >= 2
         _cok_adim = _cok_adim_baglac or _cok_adim_virgul
 
-        # ── 3. Kategori bazinda keyword sayisi ──────────────────────
+        # â”€â”€ 3. Kategori bazinda keyword sayisi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         # Her kategoriden ilk keyword sayilir, ayni kategoriden
         # birden fazla keyword extra puan vermez
         kategoriler = {
-            "dosya_islem": ["dosya", "klasör", "klasor", "dizin", "belge", "uzanti"],
+            "dosya_islem": ["dosya", "klasÃ¶r", "klasor", "dizin", "belge", "uzanti"],
             "web_islem": [
                 "web",
                 "internet",
@@ -276,8 +276,8 @@ class IterationBudget:
                 "link",
                 "indir",
                 "yukle",
-                "yükle",
-                "gönder",
+                "yÃ¼kle",
+                "gÃ¶nder",
                 "gonder",
             ],
             "kod_islem": [
@@ -285,7 +285,7 @@ class IterationBudget:
                 "python",
                 "script",
                 "calistir",
-                "çalıştır",
+                "Ã§alÄ±ÅŸtÄ±r",
                 "analiz",
                 "derle",
                 "debug",
@@ -298,10 +298,10 @@ class IterationBudget:
                 "powershell",
                 "servis",
                 "port",
-                "ağ",
+                "aÄŸ",
                 "ag",
                 "islem",
-                "işlem",
+                "iÅŸlem",
                 "proses",
                 "durdur",
             ],
@@ -310,37 +310,37 @@ class IterationBudget:
                 "bul",
                 "tara",
                 "sorgula",
-                "keşfet",
+                "keÅŸfet",
                 "kesfet",
                 "listele",
                 "getir",
             ],
             "yazma_islem": [
                 "yaz",
-                "oluştur",
+                "oluÅŸtur",
                 "olustur",
                 "kaydet",
                 "ekle",
-                "güncelle",
+                "gÃ¼ncelle",
                 "guncelle",
                 "sil",
-                "düzenle",
+                "dÃ¼zenle",
                 "duzenle",
                 "temizle",
-                "dönüştür",
+                "dÃ¶nÃ¼ÅŸtÃ¼r",
                 "donustur",
-                "düzelt",
+                "dÃ¼zelt",
                 "duzelt",
                 "onar",
             ],
             "guvenlik": [
-                "güvenlik",
+                "gÃ¼venlik",
                 "guvenlik",
-                "şifre",
+                "ÅŸifre",
                 "sifre",
                 "izin",
                 "yetki",
-                "erişim",
+                "eriÅŸim",
                 "erisim",
             ],
             "github_islem": [
@@ -359,13 +359,13 @@ class IterationBudget:
         # Ekstra puan veren kelimeler (kategori disi kapsam artirici)
         _ekstra_kelimeler = [
             "raporla",
-            "özet",
+            "Ã¶zet",
             "ozet",
-            "karşılaştır",
+            "karÅŸÄ±laÅŸtÄ±r",
             "karsilastir",
-            "birleştir",
+            "birleÅŸtir",
             "birlestir",
-            "görsel",
+            "gÃ¶rsel",
             "gorsel",
             "grafik",
         ]
@@ -376,7 +376,7 @@ class IterationBudget:
             if any(kw in hedef for kw in kw_list):
                 _bulunan_kategori += 1
 
-        # ── 4. Skor hesaplama ──────────────────────────────────────
+        # â”€â”€ 4. Skor hesaplama â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         skor = _bulunan_kategori
         if _cok_adim:
             skor += 1
@@ -384,13 +384,13 @@ class IterationBudget:
         # Ek keyword sayisi (kategori disi ekstra)
         _ek_kelimeler = [
             "raporla",
-            "özet",
+            "Ã¶zet",
             "ozet",
-            "karşılaştır",
+            "karÅŸÄ±laÅŸtÄ±r",
             "karsilastir",
-            "donüştür",
+            "donÃ¼ÅŸtÃ¼r",
             "donustur",
-            "birleştir",
+            "birleÅŸtir",
             "birlestir",
         ]
         for k in _ek_kelimeler:

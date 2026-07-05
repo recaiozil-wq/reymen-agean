@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""lmstudio_reasoning.py — LM Studio Reasoning Adaptoru.
+﻿# -*- coding: utf-8 -*-
+"""lmstudio_reasoning.py â€” LM Studio Reasoning Adaptoru.
 
 LM Studio'nun reasoning/thinking ozelliklerini kullanmak icin
 ozel adapter. Chain-of-thought, deep thinking modlari.

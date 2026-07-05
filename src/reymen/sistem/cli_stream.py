@@ -1,4 +1,4 @@
-from contextlib import contextmanager
+﻿from contextlib import contextmanager
 import re, os, sys, time, shutil
 from pathlib import Path
 import logging
@@ -113,7 +113,7 @@ def _resolve_attachment_path(raw_path: str) -> Path | None:
         resolved = path
 
     # Path.exists() / is_file() invoke os.stat(), which raises OSError when
-    # the candidate string is structurally invalid as a path — most commonly
+    # the candidate string is structurally invalid as a path â€” most commonly
     # ENAMETOOLONG (errno 63 on macOS, errno 36 on Linux) when the input
     # exceeds NAME_MAX (typically 255 bytes). This bites pasted slash
     # commands like `/goal <long prose>` because `_detect_file_drop()`'s
@@ -122,7 +122,7 @@ def _resolve_attachment_path(raw_path: str) -> Path | None:
     # slash-command path. Without this guard the OSError propagates up to
     # the process_loop catch-all in _interactive_loop and the user input
     # is silently lost (the warning ends up in agent.log but the user sees
-    # nothing — the prompt just hangs).
+    # nothing â€” the prompt just hangs).
     try:
         if not resolved.exists() or not resolved.is_file():
             return None
@@ -232,18 +232,18 @@ def _format_image_attachment_badges(
 
     if width < 52:
         if len(attached_images) == 1:
-            return f"[📎 {_trunc(attached_images[0].name, 20)}]"
-        return f"[📎 {len(attached_images)} images attached]"
+            return f"[ğŸ“ {_trunc(attached_images[0].name, 20)}]"
+        return f"[ğŸ“ {len(attached_images)} images attached]"
 
     if width < 80:
         if len(attached_images) == 1:
-            return f"[📎 {_trunc(attached_images[0].name, 32)}]"
+            return f"[ğŸ“ {_trunc(attached_images[0].name, 32)}]"
         first = _trunc(attached_images[0].name, 20)
         extra = len(attached_images) - 1
-        return f"[📎 {first}] [+{extra}]"
+        return f"[ğŸ“ {first}] [+{extra}]"
 
     base = image_counter - len(attached_images) + 1
-    return " ".join(f"[📎 Image #{base + i}]" for i in range(len(attached_images)))
+    return " ".join(f"[ğŸ“ Image #{base + i}]" for i in range(len(attached_images)))
 
 
 def _should_auto_attach_clipboard_image_on_paste(pasted_text: str) -> bool:
@@ -283,14 +283,14 @@ def _apply_bracketed_paste_timeout_patch() -> None:
     prompt_toolkit's ``Vt100Parser.feed()`` buffers all input while waiting
     for the ESC[201~ end mark.  If a terminal drops that end mark (terminal
     race, torn write, SSH glitch, macOS sleep/wake), input appears frozen
-    forever — the only recovery used to be killing the tab.
+    forever â€” the only recovery used to be killing the tab.
 
     This patch wraps ``Vt100Parser.feed`` so that bracketed-paste mode
     flushes buffered content as a normal ``BracketedPaste`` event after
     ``_BP_TIMEOUT_S`` seconds without an end marker, then resumes normal
     parsing.  See upstream issue #16263.
 
-    The patch is idempotent — repeated calls are no-ops via the
+    The patch is idempotent â€” repeated calls are no-ops via the
     ``_ReYMeN_bp_timeout_patched`` sentinel on the module.
     """
     try:
@@ -335,14 +335,14 @@ def _apply_bracketed_paste_timeout_patch() -> None:
                                 _PtKeyPress(_PtKeys.BracketedPaste, paste_content)
                             )
                             logger.warning(
-                                "Bracketed-paste timeout (%.1fs) — flushed %d bytes "
+                                "Bracketed-paste timeout (%.1fs) â€” flushed %d bytes "
                                 "without end mark. Terminal may have dropped ESC[201~ "
                                 "(see #16263).",
                                 now - bp_start,
                                 len(paste_content),
                             )
             else:
-                # Normal mode — re-inline prompt_toolkit's normal feed path.
+                # Normal mode â€” re-inline prompt_toolkit's normal feed path.
                 # Calling the original feed here would double-buffer after the
                 # bracketed-paste entry transition.
                 for i, c in enumerate(data):
@@ -354,7 +354,7 @@ def _apply_bracketed_paste_timeout_patch() -> None:
         _vt100_mod.Vt100Parser.feed = _patched_vt100_feed
         _vt100_mod._ReYMeN_bp_timeout_patched = True
         logger.debug("Applied Vt100Parser bracketed-paste timeout patch (#16263)")
-    except Exception as exc:  # noqa: BLE001 — defensive: never break startup
+    except Exception as exc:  # noqa: BLE001 â€” defensive: never break startup
         logger.debug("Bracketed-paste timeout patch skipped: %s", exc)
 
 
@@ -415,7 +415,7 @@ def _preserve_ctrl_enter_newline() -> bool:
         return True
     if "microsoft" in os.environ.get("WSL_DISTRO_NAME", "").lower():
         return True
-    # WSL detection — env vars can be scrubbed under sudo, also peek /proc.
+    # WSL detection â€” env vars can be scrubbed under sudo, also peek /proc.
     for p in ("/proc/version", "/proc/sys/kernel/osrelease"):
         try:
             with open(p, "r", encoding="utf-8", errors="ignore") as f:
@@ -431,12 +431,12 @@ def _bind_prompt_submit_keys(kb, handler) -> None:
 
     Enter is always submit. On POSIX we also bind c-j (LF) to submit because
     some thin PTYs (docker exec, certain SSH flavors) deliver Enter as LF
-    instead of CR — without this, Enter appears dead on those terminals.
+    instead of CR â€” without this, Enter appears dead on those terminals.
 
     Exception: on Windows, WSL, SSH sessions, Windows Terminal, and Ghostty,
     c-j is the wire encoding of Ctrl+Enter (a distinct keystroke from
     plain Enter / c-m). We leave c-j unbound there so the c-j newline
-    handler registered separately can fire — giving the user an
+    handler registered separately can fire â€” giving the user an
     Enter-involving newline keystroke without terminal settings changes.
     See _preserve_ctrl_enter_newline() and issue #22379.
     """
@@ -456,7 +456,7 @@ def _disable_prompt_toolkit_cpr_warning(app) -> None:
 def _strip_leaked_terminal_responses_with_meta(text: str) -> tuple[str, bool]:
     """Strip leaked terminal control-response sequences from user input.
 
-    Covers Cursor Position Report (CPR / DSR) responses — ``ESC[<row>;<col>R``
+    Covers Cursor Position Report (CPR / DSR) responses â€” ``ESC[<row>;<col>R``
     and the visible ``^[[<row>;<col>R`` form. These are replies the terminal
     sends back to queries prompt_toolkit makes during ``_on_resize`` /
     ``_request_absolute_cursor_position``. When the input parser drops one
@@ -541,7 +541,7 @@ class ChatConsole:
 
     Captures Rich's rendered ANSI output and routes it through _cprint
     so colors and markup render correctly inside the interactive chat loop.
-    Drop-in replacement for Rich Console — just pass this to any function
+    Drop-in replacement for Rich Console â€” just pass this to any function
     that expects a console.print() interface.
     """
 
@@ -581,29 +581,29 @@ class ChatConsole:
 
 
 # ASCII Art - ReYMeN-AGENT logo (full width, single line - requires ~95 char terminal)
-ReYMeN_AGENT_LOGO = """[bold #FFD700]██╗  ██╗███████╗██████╗ ███╗   ███╗███████╗███████╗       █████╗  ██████╗ ███████╗███╗   ██╗████████╗[/]
-[bold #FFD700]██║  ██║██╔════╝██╔══██╗████╗ ████║██╔════╝██╔════╝      ██╔══██╗██╔════╝ ██╔════╝████╗  ██║╚══██╔══╝[/]
-[#FFBF00]███████║█████╗  ██████╔╝██╔████╔██║█████╗  ███████╗█████╗███████║██║  ███╗█████╗  ██╔██╗ ██║   ██║[/]
-[#FFBF00]██╔══██║██╔══╝  ██╔══██╗██║╚██╔╝██║██╔══╝  ╚════██║╚════╝██╔══██║██║   ██║██╔══╝  ██║╚██╗██║   ██║[/]
-[#CD7F32]██║  ██║███████╗██║  ██║██║ ╚═╝ ██║███████╗███████║      ██║  ██║╚██████╔╝███████╗██║ ╚████║   ██║[/]
-[#CD7F32]╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝╚══════╝      ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═══╝   ╚═╝[/]"""
+ReYMeN_AGENT_LOGO = """[bold #FFD700]â–ˆâ–ˆâ•—  â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—       â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—[/]
+[bold #FFD700]â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•”â•â•â•â•â•      â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•â•â• â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•‘â•šâ•â•â–ˆâ–ˆâ•”â•â•â•[/]
+[#FFBF00]â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•”â–ˆâ–ˆâ–ˆâ–ˆâ•”â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•”â–ˆâ–ˆâ•— â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘[/]
+[#FFBF00]â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•  â•šâ•â•â•â•â–ˆâ–ˆâ•‘â•šâ•â•â•â•â•â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘[/]
+[#CD7F32]â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘ â•šâ•â• â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘      â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘ â•šâ–ˆâ–ˆâ–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘[/]
+[#CD7F32]â•šâ•â•  â•šâ•â•â•šâ•â•â•â•â•â•â•â•šâ•â•  â•šâ•â•â•šâ•â•     â•šâ•â•â•šâ•â•â•â•â•â•â•â•šâ•â•â•â•â•â•â•      â•šâ•â•  â•šâ•â• â•šâ•â•â•â•â•â• â•šâ•â•â•â•â•â•â•â•šâ•â•  â•šâ•â•â•â•   â•šâ•â•[/]"""
 
 # ASCII Art - ReYMeN Caduceus (compact, fits in left panel)
-ReYMeN_CADUCEUS = """[#CD7F32]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⡀⠀⣀⣀⠀⢀⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]
-[#CD7F32]⠀⠀⠀⠀⠀⠀⢀⣠⣴⣾⣿⣿⣇⠸⣿⣿⠇⣸⣿⣿⣷⣦⣄⡀⠀⠀⠀⠀⠀⠀[/]
-[#FFBF00]⠀⢀⣠⣴⣶⠿⠋⣩⡿⣿⡿⠻⣿⡇⢠⡄⢸⣿⠟⢿⣿⢿⣍⠙⠿⣶⣦⣄⡀⠀[/]
-[#FFBF00]⠀⠀⠉⠉⠁⠶⠟⠋⠀⠉⠀⢀⣈⣁⡈⢁⣈⣁⡀⠀⠉⠀⠙⠻⠶⠈⠉⠉⠀⠀[/]
-[#FFD700]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣴⣿⡿⠛⢁⡈⠛⢿⣿⣦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]
-[#FFD700]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠿⣿⣦⣤⣈⠁⢠⣴⣿⠿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]
-[#FFBF00]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠻⢿⣿⣦⡉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]
-[#FFBF00]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⢷⣦⣈⠛⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]
-[#CD7F32]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣴⠦⠈⠙⠿⣦⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]
-[#CD7F32]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣿⣤⡈⠁⢤⣿⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]
-[#B8860B]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⠷⠄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]
-[#B8860B]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⠑⢶⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]
-[#B8860B]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⠁⢰⡆⠈⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]
-[#B8860B]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠳⠈⣡⠞⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]
-[#B8860B]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]"""
+ReYMeN_CADUCEUS = """[#CD7F32]â €â €â €â €â €â €â €â €â €â €â¢€â£€â¡€â €â£€â£€â €â¢€â£€â¡€â €â €â €â €â €â €â €â €â €â €[/]
+[#CD7F32]â €â €â €â €â €â €â¢€â£ â£´â£¾â£¿â£¿â£‡â ¸â£¿â£¿â ‡â£¸â£¿â£¿â£·â£¦â£„â¡€â €â €â €â €â €â €[/]
+[#FFBF00]â €â¢€â£ â£´â£¶â ¿â ‹â£©â¡¿â£¿â¡¿â »â£¿â¡‡â¢ â¡„â¢¸â£¿â Ÿâ¢¿â£¿â¢¿â£â ™â ¿â£¶â£¦â£„â¡€â €[/]
+[#FFBF00]â €â €â ‰â ‰â â ¶â Ÿâ ‹â €â ‰â €â¢€â£ˆâ£â¡ˆâ¢â£ˆâ£â¡€â €â ‰â €â ™â »â ¶â ˆâ ‰â ‰â €â €[/]
+[#FFD700]â €â €â €â €â €â €â €â €â €â €â£´â£¿â¡¿â ›â¢â¡ˆâ ›â¢¿â£¿â£¦â €â €â €â €â €â €â €â €â €â €[/]
+[#FFD700]â €â €â €â €â €â €â €â €â €â €â ¿â£¿â£¦â£¤â£ˆâ â¢ â£´â£¿â ¿â €â €â €â €â €â €â €â €â €â €[/]
+[#FFBF00]â €â €â €â €â €â €â €â €â €â €â €â ˆâ ‰â »â¢¿â£¿â£¦â¡‰â â €â €â €â €â €â €â €â €â €â €â €[/]
+[#FFBF00]â €â €â €â €â €â €â €â €â €â €â €â €â ˜â¢·â£¦â£ˆâ ›â ƒâ €â €â €â €â €â €â €â €â €â €â €â €[/]
+[#CD7F32]â €â €â €â €â €â €â €â €â €â €â €â¢ â£´â ¦â ˆâ ™â ¿â£¦â¡„â €â €â €â €â €â €â €â €â €â €â €[/]
+[#CD7F32]â €â €â €â €â €â €â €â €â €â €â €â ¸â£¿â£¤â¡ˆâ â¢¤â£¿â ‡â €â €â €â €â €â €â €â €â €â €â €[/]
+[#B8860B]â €â €â €â €â €â €â €â €â €â €â €â €â €â ‰â ›â ·â „â €â €â €â €â €â €â €â €â €â €â €â €â €[/]
+[#B8860B]â €â €â €â €â €â €â €â €â €â €â €â €â¢€â£€â ‘â¢¶â£„â¡€â €â €â €â €â €â €â €â €â €â €â €â €[/]
+[#B8860B]â €â €â €â €â €â €â €â €â €â €â €â €â£¿â â¢°â¡†â ˆâ¡¿â €â €â €â €â €â €â €â €â €â €â €â €[/]
+[#B8860B]â €â €â €â €â €â €â €â €â €â €â €â €â ˆâ ³â ˆâ£¡â â â €â €â €â €â €â €â €â €â €â €â €â €[/]
+[#B8860B]â €â €â €â €â €â €â €â €â €â €â €â €â €â €â ˆâ €â €â €â €â €â €â €â €â €â €â €â €â €â €â €[/]"""
 
 
 def _build_compact_banner() -> str:
@@ -621,8 +621,8 @@ def _build_compact_banner() -> str:
     dim_color = _skin.get_color("banner_dim", "#B8860B") if _skin else "#B8860B"
 
     if skin_name == "default":
-        line1 = "⚕ NOUS ReYMeN - AI Agent Framework"
-        tiny_line = "⚕ NOUS ReYMeN"
+        line1 = "âš• NOUS ReYMeN - AI Agent Framework"
+        tiny_line = "âš• NOUS ReYMeN"
     else:
         agent_name = (
             _skin.get_branding("agent_name", "ReYMeN Agent")
@@ -645,7 +645,7 @@ def _build_compact_banner() -> str:
         return f"\n[{title_color}]{tiny_line}[/] [dim {dim_color}]- Nous Research[/]\n"
 
     inner = w - 2  # inside the box border
-    bar = "═" * w
+    bar = "â•" * w
     content_width = inner - 2
 
     # Truncate and pad to fit
@@ -653,10 +653,10 @@ def _build_compact_banner() -> str:
     line2 = version_line[:content_width].ljust(content_width)
 
     return (
-        f"\n[bold {border_color}]╔{bar}╗[/]\n"
-        f"[bold {border_color}]║[/] [{title_color}]{line1}[/] [bold {border_color}]║[/]\n"
-        f"[bold {border_color}]║[/] [dim {dim_color}]{line2}[/] [bold {border_color}]║[/]\n"
-        f"[bold {border_color}]╚{bar}╝[/]\n"
+        f"\n[bold {border_color}]â•”{bar}â•—[/]\n"
+        f"[bold {border_color}]â•‘[/] [{title_color}]{line1}[/] [bold {border_color}]â•‘[/]\n"
+        f"[bold {border_color}]â•‘[/] [dim {dim_color}]{line2}[/] [bold {border_color}]â•‘[/]\n"
+        f"[bold {border_color}]â•š{bar}â•[/]\n"
     )
 
 
@@ -684,7 +684,7 @@ def _looks_like_slash_command(text: str) -> bool:
 
 
 # ============================================================================
-# Skill Slash Commands — dynamic commands generated from installed skills
+# Skill Slash Commands â€” dynamic commands generated from installed skills
 # ============================================================================
 
 _skill_commands = None

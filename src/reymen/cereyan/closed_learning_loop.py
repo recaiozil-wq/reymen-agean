@@ -1,7 +1,7 @@
-# - Python 3.9+ uyumlu type hints (from __future__ annotations)
+﻿# - Python 3.9+ uyumlu type hints (from __future__ annotations)
 # -*- coding: utf-8 -*-
 """
-closed_learning_loop.py — ClosedLearningLoop + FTS5 beceri indeksi.
+closed_learning_loop.py â€” ClosedLearningLoop + FTS5 beceri indeksi.
 
 Ne yapar:
   - Basarili gorev sonrasi beceri karti kristallestir (skills/*.md)
@@ -56,9 +56,9 @@ MAKS_BAGLAM_KARAKTER: int = 4_000
 _FTS_TEMIZLE = re.compile(r"[^\w\s]", re.UNICODE)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # Module-level yardimci fonksiyonlar (harici import gerektirmez)
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _guvenli_ad(ad: str) -> str:
@@ -129,9 +129,9 @@ def _frontmatter_deger_guncelle(metin: str, anahtar: str, deger: str | int) -> s
     return metin
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # Ana sinif
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class ClosedLearningLoop:
@@ -159,7 +159,7 @@ class ClosedLearningLoop:
         if auto_index:
             self.tum_becerileri_indeksle()
 
-    # ── Connection factory ─────────────────────────────────────────────────
+    # â”€â”€ Connection factory â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @contextmanager
     def _baglanti(self) -> Generator[sqlite3.Connection, None, None]:
@@ -181,7 +181,7 @@ class ClosedLearningLoop:
         finally:
             con.close()
 
-    # ── Kurulum ────────────────────────────────────────────────────────────
+    # â”€â”€ Kurulum â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _kur(self) -> None:
         """FTS5 tablosunu olustur; eksik 'kaynak' kolonunu tespit edip yeniden kur."""
@@ -206,7 +206,7 @@ class ClosedLearningLoop:
                 ");"
             )
 
-    # ── Indexleme ─────────────────────────────────────────────────────────
+    # â”€â”€ Indexleme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def tum_becerileri_indeksle(self) -> int:
         """
@@ -298,7 +298,7 @@ class ClosedLearningLoop:
 
         # 5. ## ACIKLAMA (eski format)
         if not aciklama:
-            m3 = re.search(r"##\s*A[CÇ]IKLAMA\s*\n([^#\n]+)", metin, re.IGNORECASE)
+            m3 = re.search(r"##\s*A[CÃ‡]IKLAMA\s*\n([^#\n]+)", metin, re.IGNORECASE)
             if m3:
                 aciklama = m3.group(1).strip()
 
@@ -317,7 +317,7 @@ class ClosedLearningLoop:
 
         return ad, aciklama or ad, metin
 
-    # ── Sorgulama ─────────────────────────────────────────────────────────
+    # â”€â”€ Sorgulama â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def ilgili_becerileri_cagir(
         self,
@@ -326,7 +326,7 @@ class ClosedLearningLoop:
         kategori: str | None = None,
     ) -> str:
         """
-        FTS5 ile ilgili becerileri getir — insan-okunur string doner.
+        FTS5 ile ilgili becerileri getir â€” insan-okunur string doner.
 
         Args:
             sorgu: Serbest metin sorgusu
@@ -433,7 +433,7 @@ class ClosedLearningLoop:
             for r in self._ilgili_becerileri_skorlu(sorgu, adet)
         ]
 
-    # ── Kristallestirme ───────────────────────────────────────────────────
+    # â”€â”€ Kristallestirme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _fts5_benzer_beceri_ara(self, beceri_adi: str) -> tuple | None:
         """FTS5'te benzer isimde beceri ara. Doner: (ad, aciklama, icerik, kaynak) veya None."""
@@ -593,7 +593,7 @@ class ClosedLearningLoop:
         logger.info("[Beceri] Kristallesti: %s -> %s", beceri_adi, yol)
         return yol
 
-    # ── Yardimcilar ───────────────────────────────────────────────────────
+    # â”€â”€ Yardimcilar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def kapat(self) -> None:
         """WAL checkpoint + graceful shutdown."""
@@ -621,12 +621,12 @@ class ClosedLearningLoop:
             except sqlite3.Error:
                 return []
 
-    # ── SELF-IMPROVEMENT META-DÖNGÜSÜ ────────────────────────────────────
-    # observe → discover → compare → test → save (24h cycle)
-    # ─────────────────────────────────────────────────────────────────────
+    # â”€â”€ SELF-IMPROVEMENT META-DÃ–NGÃœSÃœ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # observe â†’ discover â†’ compare â†’ test â†’ save (24h cycle)
+    # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def observe_self(self) -> dict[str, Any]:
-        """Kendini gözlemle: zayıf alanları tespit et.
+        """Kendini gÃ¶zlemle: zayÄ±f alanlarÄ± tespit et.
 
         Returns:
             {"weak_areas": [...], "strong_areas": [...],
@@ -635,7 +635,7 @@ class ClosedLearningLoop:
         beceriler = self.tum_beceriler()
         toplam = len(beceriler)
 
-        # Zayıf alan: hiç becerisi olmayan kategoriler
+        # ZayÄ±f alan: hiÃ§ becerisi olmayan kategoriler
         weak_areas = []
         strong_areas = []
         if toplam == 0:
@@ -656,10 +656,10 @@ class ClosedLearningLoop:
         }
 
     def discover_better_methods(self, focus: str) -> list[dict[str, str]]:
-        """Dışarıda (web) daha iyi yöntem ara.
+        """DÄ±ÅŸarÄ±da (web) daha iyi yÃ¶ntem ara.
 
         Args:
-            focus: İyileştirilecek alan adı.
+            focus: Ä°yileÅŸtirilecek alan adÄ±.
 
         Returns:
             [{"name": str, "code": str, "source_url": str, "summary": str}, ...]
@@ -667,7 +667,7 @@ class ClosedLearningLoop:
         logger.info("[SelfImprove] Araniyor: %s", focus)
         sonuclar = []
 
-        # Web'de ara (DuckDuckGo üzerinden)
+        # Web'de ara (DuckDuckGo Ã¼zerinden)
         try:
             query = urllib.parse.quote(
                 f"best practice {focus} coding tutorial 2025 2026"
@@ -682,7 +682,7 @@ class ClosedLearningLoop:
             )
             with urllib.request.urlopen(req, timeout=15) as resp:
                 html = resp.read().decode("utf-8", errors="replace")
-                # Basit link çekme
+                # Basit link Ã§ekme
                 for m in re.finditer(
                     r'<a[^>]+href="(https?://[^"]+)"[^>]*>([^<]+)</a>',
                     html,
@@ -705,7 +705,7 @@ class ClosedLearningLoop:
         except Exception as e:
             logger.warning("[SelfImprove] Web arama hatasi: %s", e)
 
-        # Fallback: temel yöntem
+        # Fallback: temel yÃ¶ntem
         if not sonuclar:
             sonuclar.append(
                 {
@@ -722,21 +722,21 @@ class ClosedLearningLoop:
     def compare_and_decide(
         self, current_method: dict[str, str], new_methods: list[dict[str, str]]
     ) -> str:
-        """Claude ile karşılaştır: UYGULA / REDDET / DAHA_FAZLA_ARAŞTIR.
+        """Claude ile karÅŸÄ±laÅŸtÄ±r: UYGULA / REDDET / DAHA_FAZLA_ARAÅTIR.
 
         Args:
-            current_method: Mevcut yöntem.
-            new_methods: Yeni bulunan yöntemler.
+            current_method: Mevcut yÃ¶ntem.
+            new_methods: Yeni bulunan yÃ¶ntemler.
 
         Returns:
             Karar stringi.
         """
         if not new_methods:
-            return "DAHA_FAZLA_ARAŞTIR"
+            return "DAHA_FAZLA_ARAÅTIR"
 
         mentor = new_methods[0]
 
-        # Basit skor: kaynak URL'si olanlar daha değerli
+        # Basit skor: kaynak URL'si olanlar daha deÄŸerli
         puan = 0
         if mentor.get("source_url"):
             puan += 2
@@ -745,35 +745,35 @@ class ClosedLearningLoop:
         if mentor.get("summary") and len(mentor["summary"]) > 20:
             puan += 1
 
-        # Mevcut yöntemle kıyasla
+        # Mevcut yÃ¶ntemle kÄ±yasla
         current_name = (current_method.get("name", "") or "") if current_method else ""
         if current_name and mentor.get("name") and current_name != mentor["name"]:
-            puan += 1  # Yeni ve farklı
+            puan += 1  # Yeni ve farklÄ±
 
         if puan >= 3:
             return "UYGULA"
         elif puan >= 1:
-            return "DAHA_FAZLA_ARAŞTIR"
+            return "DAHA_FAZLA_ARAÅTIR"
         else:
             return "REDDET"
 
     def test_in_sandbox(self, new_method: dict[str, str]) -> tuple[str, float]:
-        """İzole ortamda test et (E2B benzeri).
+        """Ä°zole ortamda test et (E2B benzeri).
 
         Args:
-            new_method: Test edilecek yöntem.
+            new_method: Test edilecek yÃ¶ntem.
 
         Returns:
-            ("BAŞARILI" | "BAŞARISIZ", skor)
+            ("BAÅARILI" | "BAÅARISIZ", skor)
         """
         code = (new_method.get("code", "") or "").strip()
         if not code or code == "pass":
-            return "BAŞARISIZ", 0.0
+            return "BAÅARISIZ", 0.0
 
-        # Basit syntax kontrolü
+        # Basit syntax kontrolÃ¼
         try:
             compile(code, "<sandbox>", "exec")
-            # Skor: yöntemin adı ne kadar açıklayıcıysa o kadar yüksek
+            # Skor: yÃ¶ntemin adÄ± ne kadar aÃ§Ä±klayÄ±cÄ±ysa o kadar yÃ¼ksek
             name = new_method.get("name", "") or ""
             kaynak = new_method.get("source_url", "") or ""
             skor = 5.0
@@ -781,20 +781,20 @@ class ClosedLearningLoop:
                 skor += 2.0
             if kaynak:
                 skor += 3.0
-            return "BAŞARILI", skor
+            return "BAÅARILI", skor
         except SyntaxError as e:
             logger.warning("[SelfImprove] Sandbox hatasi: %s", e)
-            return "BAŞARISIZ", 0.0
+            return "BAÅARISIZ", 0.0
 
     def save_as_skill(self, method: dict[str, str], score: float) -> str:
-        """Başarılı metodu skill olarak kaydet.
+        """BaÅŸarÄ±lÄ± metodu skill olarak kaydet.
 
         Args:
-            method: Kaydedilecek yöntem.
-            score: Başarı skoru.
+            method: Kaydedilecek yÃ¶ntem.
+            score: BaÅŸarÄ± skoru.
 
         Returns:
-            Oluşturulan dosya yolu.
+            OluÅŸturulan dosya yolu.
         """
         name = (method.get("name", "self_improved") or "self_improved")[:60]
         summary = method.get("summary", "") or ""
@@ -824,19 +824,19 @@ class ClosedLearningLoop:
     def run_forever(
         self, cycle_hours: int = 24, test_mode: bool = False, max_test_iter: int = 672
     ) -> None:
-        """Ana kendini geliştirme döngüsü.
+        """Ana kendini geliÅŸtirme dÃ¶ngÃ¼sÃ¼.
 
-        1. Kendini gözlemle
-        2. En zayıf alanı seç
-        3. Dışarıda araştır
-        4. Karşılaştır ve karar ver
+        1. Kendini gÃ¶zlemle
+        2. En zayÄ±f alanÄ± seÃ§
+        3. DÄ±ÅŸarÄ±da araÅŸtÄ±r
+        4. KarÅŸÄ±laÅŸtÄ±r ve karar ver
         5. Uygun: test et ve kaydet
-        6. 24 saat bekle, tekrar başla
+        6. 24 saat bekle, tekrar baÅŸla
 
         Args:
-            cycle_hours: Döngü aralığı (varsayılan 24 saat).
-            test_mode: True ise hiç beklemez, iterasyonları hızlıca tamamlar.
-            max_test_iter: Test modunda maksimum iterasyon (varsayılan 672 = 7 gün).
+            cycle_hours: DÃ¶ngÃ¼ aralÄ±ÄŸÄ± (varsayÄ±lan 24 saat).
+            test_mode: True ise hiÃ§ beklemez, iterasyonlarÄ± hÄ±zlÄ±ca tamamlar.
+            max_test_iter: Test modunda maksimum iterasyon (varsayÄ±lan 672 = 7 gÃ¼n).
         """
         logger.info(
             "[SelfImprove] Meta-dongu basladi (cycle=%dh, test_mode=%s, max_iter=%d)",
@@ -854,7 +854,7 @@ class ClosedLearningLoop:
                     "[SelfImprove] Test modu tamamlandi: %d iterasyon", max_iter
                 )
                 break
-            # 1. Kendini gözlemle
+            # 1. Kendini gÃ¶zlemle
             state = self.observe_self()
             logger.info(
                 "[SelfImprove] Durum: %d beceri, %d zayif alan",
@@ -862,7 +862,7 @@ class ClosedLearningLoop:
                 len(state["weak_areas"]),
             )
 
-            # 2. En zayıf alanı seç
+            # 2. En zayÄ±f alanÄ± seÃ§
             if not state["weak_areas"]:
                 focus = "yeni_alan_kesfi"
             else:
@@ -873,42 +873,42 @@ class ClosedLearningLoop:
             # Mevcut metodu bul
             current = {"name": focus, "code": "", "summary": ""}
 
-            # 3. Dışarıda araştır
+            # 3. DÄ±ÅŸarÄ±da araÅŸtÄ±r
             discoveries = self.discover_better_methods(focus)
 
-            # 4. Karşılaştır
+            # 4. KarÅŸÄ±laÅŸtÄ±r
             decision = self.compare_and_decide(current, discoveries)
 
-            # 5. Kararı uygula
+            # 5. KararÄ± uygula
             if decision == "UYGULA":
                 best = discoveries[0]
                 status, score = self.test_in_sandbox(best)
 
-                if status == "BAŞARILI":
+                if status == "BAÅARILI":
                     self.save_as_skill(best, score)
-                    logger.info("[SelfImprove] ✅ Yeni skill eklendi: %s", focus)
+                    logger.info("[SelfImprove] âœ… Yeni skill eklendi: %s", focus)
 
-            elif decision == "DAHA_FAZLA_ARAŞTIR":
+            elif decision == "DAHA_FAZLA_ARAÅTIR":
                 logger.info(
-                    "[SelfImprove] ⏳ Eklendi: bekleme listesine alindi: %s", focus
+                    "[SelfImprove] â³ Eklendi: bekleme listesine alindi: %s", focus
                 )
 
             elif decision == "REDDET":
-                logger.info("[SelfImprove] ⏭ Reddedildi: %s", focus)
+                logger.info("[SelfImprove] â­ Reddedildi: %s", focus)
 
             # 6. 24 saat bekle (test_mode'de atla)
             if test_mode:
                 logger.info(
-                    "[SelfImprove] ✅ Test iterasyon %d/%d tamam", iter_sayisi, max_iter
+                    "[SelfImprove] âœ… Test iterasyon %d/%d tamam", iter_sayisi, max_iter
                 )
-                continue  # hiç beklemeden sonraki iterasyon
+                continue  # hiÃ§ beklemeden sonraki iterasyon
             logger.info("[SelfImprove] Bekleniyor (%d saat)...", cycle_hours)
             time.sleep(cycle_hours * 3600)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # Smoke test
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
     import tempfile
@@ -957,7 +957,7 @@ if __name__ == "__main__":
         assert (
             len(b2) <= MAKS_BAGLAM_KARAKTER
         ), f"Test 4 FAIL: {len(b2)} > {MAKS_BAGLAM_KARAKTER}"
-        print(f"[Test 4] Sinir: {len(b2)} char — OK")
+        print(f"[Test 4] Sinir: {len(b2)} char â€” OK")
 
         # Test 5: Yapisal cikti (LLM agent)
         sonuclar = loop.beceri_baglamini_al_yapisal("web scraping", adet=2)
@@ -974,10 +974,10 @@ if __name__ == "__main__":
         )
 
         loop.kapat()
-        print(f"\n✓ Tum testler gecti. Son: {loop.toplam_beceri_sayisi()} beceri")
+        print(f"\nâœ“ Tum testler gecti. Son: {loop.toplam_beceri_sayisi()} beceri")
 
 
-# ── Motor Kaydı ──────────────────────────────────────────────────
+# â”€â”€ Motor KaydÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # Global instance (tekil, lazy)
 _LOOP_INSTANCE = None
 _LOOP_LOCK = threading.Lock()
@@ -1030,7 +1030,7 @@ def _beceri_durum() -> str:
 
 
 def motor_kaydet(motor: object):
-    """motor.py entegrasyonu: Kapali Ogrenme Döngüsü araçlarını kaydet."""
+    """motor.py entegrasyonu: Kapali Ogrenme DÃ¶ngÃ¼sÃ¼ araÃ§larÄ±nÄ± kaydet."""
     if hasattr(motor, "_plugin_arac_kaydet"):
         motor._plugin_arac_kaydet(
             "BECERI_KRISTALLESTIR",

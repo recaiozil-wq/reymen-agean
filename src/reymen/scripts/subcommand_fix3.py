@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-"""subcommand_fix3.py — run_xxx fonksiyon govdesini bastan yaz."""
+﻿#!/usr/bin/env python3
+"""subcommand_fix3.py â€” run_xxx fonksiyon govdesini bastan yaz."""
 
 import re
 from pathlib import Path
@@ -27,7 +27,7 @@ IMPL = {
     "insights": 'print("[INSIGHTS] Henuz veri yok.")',
     "login": 'print("[LOGIN] deepseek provider\'a zaten bagli.")',
     "logout": 'print("[LOGOUT] Oturum kapatildi.")',
-    "logs": 'print("[LOGS] Log dosyalari: ~/.hermes/logs/")',
+    "logs": 'print("[LOGS] Log dosyalari: ~/.reymen/logs/")',
     "mcp": 'print("[MCP] MCP sunuculari: Power BI aktif.")',
     "memory": 'print("[MEMORY] OnceHafiza aktif.")',
     "model": 'print("[MODEL] deepseek-v4-flash (deepseek)")',

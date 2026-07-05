@@ -1,6 +1,6 @@
-"""
-HATA DUZELTME SÜRECI — 3 Senaryo
-Her senaryo: tespit → düzeltme → doğrulama → kaydetme
+﻿"""
+HATA DUZELTME SÃœRECI â€” 3 Senaryo
+Her senaryo: tespit â†’ dÃ¼zeltme â†’ doÄŸrulama â†’ kaydetme
 """
 
 from once_hafiza import kaydet, ara, isle
@@ -32,9 +32,9 @@ def db_goster(kategori_filter=None):
     con.close()
 
 
-# ════════════════════════════════════════════════════════════════════
-# SENARYO 1 — KOD HATASI
-# ════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# SENARYO 1 â€” KOD HATASI
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 print("=" * 70)
 print("SENARYO 1: KOD HATASI (Video'daki 5 hata)")
 print("=" * 70)
@@ -53,7 +53,7 @@ hatalar = [
 for i, h in enumerate(hatalar, 1):
     print(f"  Hata {i}: {h}")
 
-# ADIM 2: Düzeltme + Sandbox'ta çalıştırma
+# ADIM 2: DÃ¼zeltme + Sandbox'ta Ã§alÄ±ÅŸtÄ±rma
 print("\n[ADIM 2] Duzeltme + Dogrulama")
 print("  Duzeltilmis kod yazildi -> _video_agent.py")
 print("  Sandbox: python -c \"import nmap; print('OK')\"")
@@ -62,7 +62,7 @@ print("  python-nmap: ? Kontrol ediliyor...")
 print("  python-nmap: Sandbox dogrulama atlandi (pip install gerektirir)")
 print("  Dogrulama akisi: OnceHafiza kayitlari uzerinden")
 
-# ADIM 3: Doğrulama (beklenen çıktı vs gerçek)
+# ADIM 3: DoÄŸrulama (beklenen Ã§Ä±ktÄ± vs gerÃ§ek)
 print("\n[ADIM 3] Dogrulama akisi")
 print("""
   Dogrulama adimlari:
@@ -76,13 +76,13 @@ print("""
      - 2: timeout arttir
      - 3: sudo kontrol
   5. Basariliysa -> hafizaya kaydet
-  6. Basarisizsa -> hata türüne göre:
+  6. Basarisizsa -> hata tÃ¼rÃ¼ne gÃ¶re:
      - ImportError -> pip install
      - Timeout -> --max-retries 0
      - PermissionError -> sudo=True
 """)
 
-# ADIM 4: Hafızaya kaydet (başarılı)
+# ADIM 4: HafÄ±zaya kaydet (baÅŸarÄ±lÄ±)
 print("\n[ADIM 4] Hafizaya kaydet (basarili)")
 kaydet(
     hedef="python_nmap_duzeltilmis_kod_dogrulandi",
@@ -91,15 +91,15 @@ kaydet(
     basari=True,
 )
 
-# ADIM 5: Kayıt göster
+# ADIM 5: KayÄ±t gÃ¶ster
 print("\n[ADIM 5] Hafiza kaydi:")
 db_goster("video/python/nmap%")
 
-# ════════════════════════════════════════════════════════════════════
-# SENARYO 2 — ÇELİŞKİLİ BİLGİ
-# ════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# SENARYO 2 â€” Ã‡ELÄ°ÅKÄ°LÄ° BÄ°LGÄ°
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 print("\n" + "=" * 70)
-print("SENARYO 2: ÇELİŞKİLİ BİLGİ")
+print("SENARYO 2: Ã‡ELÄ°ÅKÄ°LÄ° BÄ°LGÄ°")
 print("=" * 70)
 
 print("""
@@ -110,12 +110,12 @@ print("""
   Hangisi dogru?
 """)
 
-# Web doğrulama simülasyonu
+# Web doÄŸrulama simÃ¼lasyonu
 print("[ADIM 1] Web dogrulama")
 print("""  Kaynaklar:
-  1. nmap.org: UDP scan yavas, open|filtered beklenir ✅ HAFIZA
-  2. PyPI: python-nmap -sU destekler, yine de yavas ✅ HAFIZA
-  3. Security SE: --min-rate ile hizlandirma mumkun ✅ KISMEN
+  1. nmap.org: UDP scan yavas, open|filtered beklenir âœ… HAFIZA
+  2. PyPI: python-nmap -sU destekler, yine de yavas âœ… HAFIZA
+  3. Security SE: --min-rate ile hizlandirma mumkun âœ… KISMEN
 
   KARAR: HAFIZA DOGRU
   - UDP scan dogal olarak yavas
@@ -131,13 +131,13 @@ print("""
   guncellik    0.9 (2025, guncel)
   hata_sayisi  0 (hic hata kaydi yok)
   web_uyum    1.0 (tum kaynaklar ayni)
-  ─────────────────
+  â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   TOPLAM      0.95 -> HAFIZA KAZANDI
 
   Video puani: 0.4 (tekil kaynak, dogrulama yok)
 """)
 
-# Eski bilgiyi güncelle (üzerine yazma, not düş)
+# Eski bilgiyi gÃ¼ncelle (Ã¼zerine yazma, not dÃ¼ÅŸ)
 print("[ADIM 3] Celiski isaretleme")
 kaydet(
     hedef="python_nmap_udp_open_filtered_notu",
@@ -148,13 +148,13 @@ kaydet(
     basari=True,
 )
 print("  Yeni kayit olusturuldu (celiski notu)")
-print("  ESKI KAYIT (ID=12): ✅ KORUNDU, guven degismedi, üzerine yazilmadi")
+print("  ESKI KAYIT (ID=12): âœ… KORUNDU, guven degismedi, Ã¼zerine yazilmadi")
 
-# ════════════════════════════════════════════════════════════════════
-# SENARYO 3 — BİLİNMEYEN HATA
-# ════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# SENARYO 3 â€” BÄ°LÄ°NMEYEN HATA
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 print("\n" + "=" * 70)
-print("SENARYO 3: BİLİNMEYEN HATA")
+print("SENARYO 3: BÄ°LÄ°NMEYEN HATA")
 print("=" * 70)
 
 print("""
@@ -165,18 +165,18 @@ print("""
   - Ajan hatayi anlamadi
 """)
 
-# Retry akışı
+# Retry akÄ±ÅŸÄ±
 print("[ADIM 1] Mekanik retry (OnceHafiza isle() kullanimi)")
 print("""
   Deneme 1: arguments'i degistir -> HATA
   Deneme 2: timeout ekle -> HATA
   Deneme 3: sudo=True dene -> HATA
-  ─────────────────
+  â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   Circuit breaker: 3/3 -> KALICI DUR
   `KALICI DURDURMA: 3/3 ardisik hata. 3 deneme hakkiniz doldu.`
 """)
 
-# Kullanıcıya soru
+# KullanÄ±cÄ±ya soru
 print("[ADIM 2] Kullaniciya soru")
 print("""
   Ajan -> Kullanici:
@@ -205,7 +205,7 @@ print("""
   Yeni deneme:
   nm.scan('127.0.0.1', '22-443', arguments='-sT --unprivileged', timeout=120)
 
-  -> BASARILI ✅
+  -> BASARILI âœ…
 
   Hafizaya kaydet:
 """)
@@ -222,13 +222,13 @@ kaydet(
     basari=True,
 )
 
-# Tüm kayıtları göster
+# TÃ¼m kayÄ±tlarÄ± gÃ¶ster
 print("\n" + "=" * 70)
 print("SON DURUM: Tum video/python/nmap kayitlari")
 print("=" * 70)
 db_goster("video/python/nmap%")
 
-# ÖZET TABLO
+# Ã–ZET TABLO
 print("\n" + "=" * 70)
 print("OZET: 3 Senaryo Karsilastirmasi")
 print("=" * 70)
@@ -243,7 +243,7 @@ print(f"""
 | Yeni kayit sayisi    | 1 (duzeltilmis kod)  | 1 (celiski notu)     | 1 (cozum)              |
 | Kullanici sorgusu    | HAYIR                | HAYIR                | EVET (3 denemeden sonra) |
 | Hafiza kayit        | UPDATE (eski ID)     | INSERT (yeni) + uyari| INSERT (yeni)          |
-| Guaranteed LLM atlama| ✅ (guven=1.0)       | ✅ (guven=1.0)       | ✅ (guven=1.0)         |
+| Guaranteed LLM atlama| âœ… (guven=1.0)       | âœ… (guven=1.0)       | âœ… (guven=1.0)         |
 """)
 
 # Toplam maliyet

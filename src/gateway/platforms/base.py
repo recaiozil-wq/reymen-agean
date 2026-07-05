@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""gateway.platforms.base — BasePlatformAdapter ABC."""
+﻿# -*- coding: utf-8 -*-
+"""gateway.platforms.base â€” BasePlatformAdapter ABC."""
 
 from __future__ import annotations
 
@@ -37,7 +37,7 @@ class EphemeralReply:
 
 
 class BasePlatformAdapter(ABC):
-    """Tüm platform adaptörlerinin soyut temel sınıfı."""
+    """TÃ¼m platform adaptÃ¶rlerinin soyut temel sÄ±nÄ±fÄ±."""
 
     platform: str = ""
 

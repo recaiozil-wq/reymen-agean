@@ -1,7 +1,7 @@
-"""Konfigürasyon komutları — MixinCommands alt modülü.
+﻿"""KonfigÃ¼rasyon komutlarÄ± â€” MixinCommands alt modÃ¼lÃ¼.
 
-Bu dosya otomatik olarak cli_mixin_commands.py'den ayrılmıştır.
-MixinCommands sınıfının ilgili metotlarını içerir.
+Bu dosya otomatik olarak cli_mixin_commands.py'den ayrÄ±lmÄ±ÅŸtÄ±r.
+MixinCommands sÄ±nÄ±fÄ±nÄ±n ilgili metotlarÄ±nÄ± iÃ§erir.
 """
 
 import logging
@@ -29,7 +29,7 @@ from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
 
-# Handler delegates — extracted to handlers/config/
+# Handler delegates â€” extracted to handlers/config/
 from .handlers.config.profile import _handle_profile_command as _delegate_profile
 from .handlers.config.gquota import _handle_gquota_command as _delegate_gquota
 from .handlers.config.personality import (
@@ -43,7 +43,7 @@ from .handlers.config.fast import _handle_fast_command as _delegate_fast
 
 
 class MixinCommands:
-    """Konfigürasyon komutları."""
+    """KonfigÃ¼rasyon komutlarÄ±."""
 
     def _handle_profile_command(self):
         """Display active profile name and home directory."""
@@ -89,7 +89,7 @@ class MixinCommands:
     ) -> tuple[int, int]:
         """Resolve (scroll_offset, visible) for the /model picker viewport.
 
-        ``reserved_below`` matches the approval / clarify panels — input area,
+        ``reserved_below`` matches the approval / clarify panels â€” input area,
         status bar, and separators below the panel. ``panel_chrome`` covers
         this panel's own borders + blanks + hint row. The remaining rows hold
         the scrollable list, with the offset slid to keep ``selected`` on screen.
@@ -107,7 +107,7 @@ class MixinCommands:
 
     def _apply_model_switch_result(self, result, persist_global: bool) -> None:
         if not result.success:
-            _cprint(f"  ✗ {result.error_message}")
+            _cprint(f"  âœ— {result.error_message}")
             return
 
         old_model = self.model
@@ -137,7 +137,7 @@ class MixinCommands:
                 )
             except Exception as exc:
                 _cprint(
-                    f"  ⚠ Agent swap failed ({exc}); change applied to next session."
+                    f"  âš  Agent swap failed ({exc}); change applied to next session."
                 )
 
         self._pending_model_switch_note = (
@@ -147,7 +147,7 @@ class MixinCommands:
         )
 
         provider_label = result.provider_label or result.target_provider
-        _cprint(f"  ✓ Model switched: {result.new_model}")
+        _cprint(f"  âœ“ Model switched: {result.new_model}")
         _cprint(f"    Provider: {provider_label}")
 
         # Context: always resolve via the provider-aware chain so Codex OAuth,
@@ -187,14 +187,14 @@ class MixinCommands:
         if cache_enabled:
             _cprint("    Prompt caching: enabled")
         if result.warning_message:
-            _cprint(f"    ⚠ {result.warning_message}")
+            _cprint(f"    âš  {result.warning_message}")
         if persist_global:
             save_config_value("model.default", result.new_model)
             if result.provider_changed:
                 save_config_value("model.provider", result.target_provider)
             _cprint("    Saved to config.yaml (--global)")
         else:
-            _cprint("    (session only — add --global to persist)")
+            _cprint("    (session only â€” add --global to persist)")
 
     def _handle_model_picker_selection(self, persist_global: bool = False) -> None:
         state = self._model_picker_state
@@ -269,14 +269,14 @@ class MixinCommands:
             self._close_model_picker()
 
     def _handle_model_switch(self, cmd_original: str):
-        """Handle /model command — switch model for this session.
+        """Handle /model command â€” switch model for this session.
 
         Supports:
-          /model                              — show current model + usage hints
-          /model <name>                       — switch for this session only
-          /model <name> --global              — switch and persist to config.yaml
-          /model <name> --provider <provider> — switch provider + model
-          /model --provider <provider>        — switch to provider, auto-detect model
+          /model                              â€” show current model + usage hints
+          /model <name>                       â€” switch for this session only
+          /model <name> --global              â€” switch and persist to config.yaml
+          /model <name> --provider <provider> â€” switch provider + model
+          /model --provider <provider>        â€” switch to provider, auto-detect model
         """
         from reymen.reymen_cli.model_switch import switch_model, parse_model_flags
         from reymen.reymen_cli.providers import get_label
@@ -302,7 +302,7 @@ class MixinCommands:
             except Exception:
                 logger.warning("[fix_01_sessiz_except] Exception")
 
-        # Single inventory context — replaces the inline config-slice the
+        # Single inventory context â€” replaces the inline config-slice the
         # dashboard / TUI used to duplicate. Overlay live session state
         # via with_overrides (truthy-only) so empty self.* attrs don't
         # clobber disk config.
@@ -370,7 +370,7 @@ class MixinCommands:
         )
 
         if not result.success:
-            _cprint(f"  ✗ {result.error_message}")
+            _cprint(f"  âœ— {result.error_message}")
             return
 
         # Apply to CLI state.
@@ -404,7 +404,7 @@ class MixinCommands:
                 )
             except Exception as exc:
                 _cprint(
-                    f"  ⚠ Agent swap failed ({exc}); change applied to next session."
+                    f"  âš  Agent swap failed ({exc}); change applied to next session."
                 )
 
         # Store a note to prepend to the next user message so the model
@@ -418,7 +418,7 @@ class MixinCommands:
 
         # Display confirmation with full metadata
         provider_label = result.provider_label or result.target_provider
-        _cprint(f"  ✓ Model switched: {result.new_model}")
+        _cprint(f"  âœ“ Model switched: {result.new_model}")
         _cprint(f"    Provider: {provider_label}")
 
         # Context: always resolve via the provider-aware chain so Codex OAuth,
@@ -456,7 +456,7 @@ class MixinCommands:
 
         # Warning from validation
         if result.warning_message:
-            _cprint(f"    ⚠ {result.warning_message}")
+            _cprint(f"    âš  {result.warning_message}")
 
         # Persistence
         if persist_global:
@@ -465,7 +465,7 @@ class MixinCommands:
                 save_config_value("model.provider", result.target_provider)
             _cprint("    Saved to config.yaml (--global)")
         else:
-            _cprint("    (session only — add --global to persist)")
+            _cprint("    (session only â€” add --global to persist)")
 
     def _should_handle_model_command_inline(
         self, text: str, has_images: bool = False
@@ -487,12 +487,12 @@ class MixinCommands:
     ) -> bool:
         """Return True when /steer should be dispatched immediately while the agent is running.
 
-        /steer MUST bypass the normal _pending_input → process_loop path when
+        /steer MUST bypass the normal _pending_input â†’ process_loop path when
         the agent is active, because process_loop is blocked inside
         self.chat() for the duration of the run.  By the time the queued
         command is pulled from _pending_input, _agent_running has already
         flipped back to False, and process_command() takes the idle
-        fallback — delivering the steer as a next-turn message instead of
+        fallback â€” delivering the steer as a next-turn message instead of
         injecting it mid-run.  Dispatching inline on the UI thread calls
         agent.steer() directly, which is thread-safe (uses _pending_steer_lock).
         """
@@ -529,26 +529,26 @@ class MixinCommands:
         return _delegate_personality(self, cmd)
 
     def _handle_skin_command(self, cmd: str):
-        """Handle /skin [name] — show or change the display skin."""
+        """Handle /skin [name] â€” show or change the display skin."""
         return _delegate_skin(self, cmd)
 
     def _handle_footer_command(self, cmd_original: str) -> None:
         """Toggle or inspect ``display.runtime_footer.enabled`` from the CLI.
 
         Usage:
-            /footer           → toggle
-            /footer on|off    → explicit
-            /footer status    → show current state
+            /footer           â†’ toggle
+            /footer on|off    â†’ explicit
+            /footer status    â†’ show current state
         """
         return _delegate_footer(self, cmd_original)
 
     def _toggle_verbose(self):
-        """Cycle tool progress mode: off → new → all → verbose → off.
+        """Cycle tool progress mode: off â†’ new â†’ all â†’ verbose â†’ off.
 
         Tool-progress display (full args / results / think blocks at the
         ``verbose`` step) is INDEPENDENT of global DEBUG logging.  Cycling
         through here does not change ``self.verbose`` or the agent's
-        ``verbose_logging`` / ``quiet_mode`` — those remain under the
+        ``verbose_logging`` / ``quiet_mode`` â€” those remain under the
         explicit ``-v``/``--verbose`` flag and the ``/verbose-logging``
         toggle.  See PR #6a1aa420e for the history that decoupled them.
         """
@@ -569,15 +569,15 @@ class MixinCommands:
         from reymen.reymen_cli.colors import Colors as _Colors
 
         labels = {
-            "off": f"{_Colors.DIM}Tool progress: OFF{_Colors.RESET} — silent mode, just the final response.",
-            "new": f"{_Colors.YELLOW}Tool progress: NEW{_Colors.RESET} — show each new tool (skip repeats).",
-            "all": f"{_Colors.GREEN}Tool progress: ALL{_Colors.RESET} — show every tool call.",
-            "verbose": f"{_Colors.BOLD}{_Colors.GREEN}Tool progress: VERBOSE{_Colors.RESET} — full args, results, and think blocks.",
+            "off": f"{_Colors.DIM}Tool progress: OFF{_Colors.RESET} â€” silent mode, just the final response.",
+            "new": f"{_Colors.YELLOW}Tool progress: NEW{_Colors.RESET} â€” show each new tool (skip repeats).",
+            "all": f"{_Colors.GREEN}Tool progress: ALL{_Colors.RESET} â€” show every tool call.",
+            "verbose": f"{_Colors.BOLD}{_Colors.GREEN}Tool progress: VERBOSE{_Colors.RESET} â€” full args, results, and think blocks.",
         }
         _cprint(labels.get(self.tool_progress_mode, ""))
 
     def _handle_reasoning_command(self, cmd: str):
-        """Handle /reasoning — manage effort level and display toggle.
+        """Handle /reasoning â€” manage effort level and display toggle.
 
         Usage:
             /reasoning              Show current effort level and display state
@@ -588,7 +588,7 @@ class MixinCommands:
         return _delegate_reasoning(self, cmd)
 
     def _handle_busy_command(self, cmd: str):
-        """Handle /busy — control what Enter does while ReYMeN is working.
+        """Handle /busy â€” control what Enter does while ReYMeN is working.
 
         Usage:
             /busy               Show current busy input mode
@@ -600,7 +600,7 @@ class MixinCommands:
         return _delegate_busy(self, cmd)
 
     def _handle_fast_command(self, cmd: str):
-        """Handle /fast — toggle fast mode (OpenAI Priority Processing / Anthropic Fast Mode)."""
+        """Handle /fast â€” toggle fast mode (OpenAI Priority Processing / Anthropic Fast Mode)."""
         return _delegate_fast(self, cmd)
 
     def _manual_compress(self, cmd_original: str = ""):
@@ -608,12 +608,12 @@ class MixinCommands:
 
         Two modes:
 
-        * ``/compress [<focus>]`` — compress the *whole* history. An
+        * ``/compress [<focus>]`` â€” compress the *whole* history. An
           optional focus topic guides the summariser to preserve
           information related to *focus* while being more aggressive
           about discarding everything else.  Inspired by Claude Code's
           ``/compact <focus>`` feature.
-        * ``/compress here [N]`` — boundary-aware compression. Summarize
+        * ``/compress here [N]`` â€” boundary-aware compression. Summarize
           everything *except* the most recent ``N`` exchanges (default
           2), which are preserved verbatim. Inspired by Claude Code's
           Rewind "Summarize up to here" action (v2.1.139, May 2026,
@@ -676,7 +676,7 @@ class MixinCommands:
                         partial = False
                         head = original_history
 
-                # Include system prompt + tool schemas in the estimate —
+                # Include system prompt + tool schemas in the estimate â€”
                 # a transcript-only number understates real request pressure
                 # and can even appear to grow after compression because a
                 # dense handoff summary replaces many short turns (#6217).
@@ -689,25 +689,25 @@ class MixinCommands:
                 )
                 if partial:
                     print(
-                        f"🗜️  Summarizing up to here: compressing {len(head)} of "
+                        f"ğŸ—œï¸  Summarizing up to here: compressing {len(head)} of "
                         f"{original_count} messages (~{approx_tokens:,} tokens), "
                         f"keeping last {keep_last} exchange(s) verbatim..."
                     )
                 elif focus_topic:
                     print(
-                        f"🗜️  Compressing {original_count} messages (~{approx_tokens:,} tokens), "
+                        f"ğŸ—œï¸  Compressing {original_count} messages (~{approx_tokens:,} tokens), "
                         f'focus: "{focus_topic}"...'
                     )
                 else:
                     print(
-                        f"🗜️  Compressing {original_count} messages (~{approx_tokens:,} tokens)..."
+                        f"ğŸ—œï¸  Compressing {original_count} messages (~{approx_tokens:,} tokens)..."
                     )
 
                 # Pass None as system_message so _compress_context rebuilds
                 # the system prompt from scratch via _build_system_prompt(None).
                 # Passing _cached_system_prompt caused duplication because
                 # _build_system_prompt appends system_message to prompt_parts
-                # which already contain the agent identity — resulting in the
+                # which already contain the agent identity â€” resulting in the
                 # identity block appearing twice (issue #15281).
                 compressed, _ = self.agent._compress_context(
                     head,
@@ -755,14 +755,14 @@ class MixinCommands:
                     approx_tokens,
                     new_tokens,
                 )
-                icon = "🗜️" if summary["noop"] else "✅"
+                icon = "ğŸ—œï¸" if summary["noop"] else "âœ…"
                 print(f"  {icon} {summary['headline']}")
                 print(f"     {summary['token_line']}")
                 if summary["note"]:
                     print(f"     {summary['note']}")
 
             except Exception as e:
-                print(f"  ❌ Compression failed: {e}")
+                print(f"  âŒ Compression failed: {e}")
 
     def _check_config_mcp_changes(self) -> None:
         """Detect mcp_servers changes in config.yaml and auto-reload MCP connections.
@@ -793,9 +793,9 @@ class MixinCommands:
             return
 
         if mtime == self._config_mtime:
-            return  # File unchanged — fast path
+            return  # File unchanged â€” fast path
 
-        # File changed — check whether mcp_servers section changed
+        # File changed â€” check whether mcp_servers section changed
         self._config_mtime = mtime
         try:
             with open(cfg_path, encoding="utf-8") as f:
@@ -812,29 +812,29 @@ class MixinCommands:
         # timeout so a hung MCP server cannot block the process_loop
         # indefinitely (which would freeze the entire TUI).
         print()
-        print("🔄 MCP server config changed — reloading connections...")
+        print("ğŸ”„ MCP server config changed â€” reloading connections...")
         _reload_thread = threading.Thread(target=self._reload_mcp, daemon=True)
         _reload_thread.start()
         _reload_thread.join(timeout=30)
         if _reload_thread.is_alive():
             print(
-                "  ⚠️  MCP reload timed out (30s). Some servers may not have reconnected."
+                "  âš ï¸  MCP reload timed out (30s). Some servers may not have reconnected."
             )
 
     def _confirm_and_reload_mcp(self, cmd_original: str = "") -> None:
-        """Interactive /reload-mcp — confirm with the user, then reload.
+        """Interactive /reload-mcp â€” confirm with the user, then reload.
 
         Reloading MCP tools invalidates the provider prompt cache for the
         active session (tool schemas are baked into the system prompt).
-        The next message re-sends full input tokens — can be expensive on
+        The next message re-sends full input tokens â€” can be expensive on
         long-context or high-reasoning models.
 
         Three options: Approve Once, Always Approve (persists
         ``approvals.mcp_reload_confirm: false`` so future reloads run
         without this prompt), Cancel.  Gated by
-        ``approvals.mcp_reload_confirm`` — default on.
+        ``approvals.mcp_reload_confirm`` â€” default on.
         """
-        # Gate check — respects prior "Always Approve" clicks.
+        # Gate check â€” respects prior "Always Approve" clicks.
         try:
             cfg = load_cli_config()
             approvals = cfg.get("approvals") if isinstance(cfg, dict) else None
@@ -861,7 +861,7 @@ class MixinCommands:
             ("cancel", "Cancel", "leave MCP tools unchanged"),
         ]
         raw = self._prompt_text_input_modal(
-            title="⚠️  /reload-mcp — Prompt cache invalidation warning",
+            title="âš ï¸  /reload-mcp â€” Prompt cache invalidation warning",
             detail=(
                 "Reloading MCP servers rebuilds the tool set for this session and\n"
                 "invalidates the provider prompt cache. The next message will\n"
@@ -871,25 +871,25 @@ class MixinCommands:
             choices=choices,
         )
         if raw is None:
-            print("🟡 /reload-mcp cancelled (no input).")
+            print("ğŸŸ¡ /reload-mcp cancelled (no input).")
             return
         choice = self._normalize_slash_confirm_choice(raw, choices)
         if choice is None:
-            print(f"🟡 Unrecognized choice '{raw}'. /reload-mcp cancelled.")
+            print(f"ğŸŸ¡ Unrecognized choice '{raw}'. /reload-mcp cancelled.")
             return
 
         if choice == "cancel":
-            print("🟡 /reload-mcp cancelled. MCP tools unchanged.")
+            print("ğŸŸ¡ /reload-mcp cancelled. MCP tools unchanged.")
             return
 
         if choice == "always":
             if save_config_value("approvals.mcp_reload_confirm", False):
-                print("🔒 Future /reload-mcp calls will run without confirmation.")
+                print("ğŸ”’ Future /reload-mcp calls will run without confirmation.")
                 print(
                     "   Re-enable via `approvals.mcp_reload_confirm: true` in config.yaml."
                 )
             else:
-                print("⚠️  Couldn't persist opt-out — reloading once.")
+                print("âš ï¸  Couldn't persist opt-out â€” reloading once.")
 
         with self._busy_command(self._slow_command_status(cmd_original)):
             self._reload_mcp()
@@ -913,7 +913,7 @@ class MixinCommands:
                 old_servers = set(_servers.keys())
 
             if not self._command_running:
-                print("🔄 Reloading MCP servers...")
+                print("ğŸ”„ Reloading MCP servers...")
 
             # Shutdown existing connections
             shutdown_mcp_servers()
@@ -930,16 +930,16 @@ class MixinCommands:
             reconnected = connected_servers & old_servers
 
             if reconnected:
-                print(f"  ♻️  Reconnected: {', '.join(sorted(reconnected))}")
+                print(f"  â™»ï¸  Reconnected: {', '.join(sorted(reconnected))}")
             if added:
-                print(f"  ➕ Added: {', '.join(sorted(added))}")
+                print(f"  â• Added: {', '.join(sorted(added))}")
             if removed:
-                print(f"  ➖ Removed: {', '.join(sorted(removed))}")
+                print(f"  â– Removed: {', '.join(sorted(removed))}")
             if not connected_servers:
                 print("  No MCP servers connected.")
             else:
                 print(
-                    f"  🔧 {len(new_tools)} tool(s) available from {len(connected_servers)} server(s)"
+                    f"  ğŸ”§ {len(new_tools)} tool(s) available from {len(connected_servers)} server(s)"
                 )
 
             # Refresh the agent's tool list so the model can call new tools
@@ -995,11 +995,11 @@ class MixinCommands:
                     )  # Best-effort
 
             print(
-                f"  ✅ Agent updated — {len(self.agent.tools if self.agent else [])} tool(s) available"
+                f"  âœ… Agent updated â€” {len(self.agent.tools if self.agent else [])} tool(s) available"
             )
 
         except Exception as e:
-            print(f"  ❌ MCP reload failed: {e}")
+            print(f"  âŒ MCP reload failed: {e}")
 
     def _reload_skills(self) -> None:
         """Reload skills: rescan ~/.ReYMeN/skills/ and queue a note for the
@@ -1009,7 +1009,7 @@ class MixinCommands:
         them (they're invoked via ``/skill-name``, ``skills_list``, or
         ``skill_view`` at runtime), so this does NOT clear the prompt cache.
         It rescans the slash-command map, prints the diff for the user, and
-        — if any skills were added or removed — queues a one-shot note that
+        â€” if any skills were added or removed â€” queues a one-shot note that
         gets prepended to the next user message. This preserves message
         alternation (no phantom user turn injected out of band) and keeps
         prompt caching intact.
@@ -1018,7 +1018,7 @@ class MixinCommands:
             from agent.skill_commands import reload_skills, get_skill_commands
 
             if not self._command_running:
-                print("🔄 Reloading skills...")
+                print("ğŸ”„ Reloading skills...")
 
             result = reload_skills()
 
@@ -1033,7 +1033,7 @@ class MixinCommands:
 
             if not added and not removed:
                 print("  No new skills detected.")
-                print(f"  📚 {total} skill(s) available")
+                print(f"  ğŸ“š {total} skill(s) available")
                 return
 
             def _fmt_line(item: dict) -> str:
@@ -1042,18 +1042,18 @@ class MixinCommands:
                 return f"    - {nm}: {desc}" if desc else f"    - {nm}"
 
             if added:
-                print("  ➕ Added Skills:")
+                print("  â• Added Skills:")
                 for item in added:
                     print(f"  {_fmt_line(item)}")
             if removed:
-                print("  ➖ Removed Skills:")
+                print("  â– Removed Skills:")
                 for item in removed:
                     print(f"  {_fmt_line(item)}")
-            print(f"  📚 {total} skill(s) available")
+            print(f"  ğŸ“š {total} skill(s) available")
 
             # Queue a one-shot note for the NEXT user turn. The CLI's agent
             # loop prepends ``_pending_skills_reload_note`` (if set) to the
-            # API-call-local message at ~L8770, then clears it — same
+            # API-call-local message at ~L8770, then clears it â€” same
             # pattern as ``_pending_model_switch_note``. Nothing is written
             # to conversation_history here, so message alternation stays
             # intact and no out-of-band user turn is persisted.
@@ -1077,4 +1077,4 @@ class MixinCommands:
             self._pending_skills_reload_note = "\n".join(sections)
 
         except Exception as e:
-            print(f"  ❌ Skills reload failed: {e}")
+            print(f"  âŒ Skills reload failed: {e}")

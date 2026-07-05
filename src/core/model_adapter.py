@@ -1,4 +1,4 @@
-import os
+﻿import os
 import httpx
 from typing import Protocol
 
@@ -22,7 +22,7 @@ class OllamaAdapter:
 
 
 class OpenAICompatAdapter:
-    """LM Studio / GLM / DeepSeek / OpenAI — aynı endpoint"""
+    """LM Studio / GLM / DeepSeek / OpenAI â€” aynÄ± endpoint"""
 
     def __init__(self, base_url: str, model: str, api_key: str = "none"):
         self.url = f"{base_url.rstrip('/')}/v1/chat/completions"
@@ -107,16 +107,16 @@ def _auto_detect() -> ModelAdapter:
         try:
             a = factory()
             a.complete("ping")
-            print(f"[ADAPTER] ✅ {name} aktif")
+            print(f"[ADAPTER] âœ… {name} aktif")
             return a
         except Exception:
             continue
     if os.environ.get("ANTHROPIC_API_KEY"):
-        print("[ADAPTER] ✅ Anthropic (cloud)")
+        print("[ADAPTER] âœ… Anthropic (cloud)")
         return AnthropicAdapter()
     if os.environ.get("DEEPSEEK_API_KEY"):
-        print("[ADAPTER] ✅ DeepSeek (cloud)")
+        print("[ADAPTER] âœ… DeepSeek (cloud)")
         return OpenAICompatAdapter(
             "https://api.deepseek.com", "deepseek-chat", os.environ["DEEPSEEK_API_KEY"]
         )
-    raise RuntimeError("Hiçbir model bulunamadı. REYMEN_MODEL env var set et.")
+    raise RuntimeError("HiÃ§bir model bulunamadÄ±. REYMEN_MODEL env var set et.")

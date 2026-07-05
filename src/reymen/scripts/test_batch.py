@@ -1,11 +1,11 @@
-"""ReYMeN toplu test — 30 soru, cevap kalitesi raporu"""
+﻿"""ReYMeN toplu test â€” 30 soru, cevap kalitesi raporu"""
 
 import os, sys, json, time
 from dotenv import load_dotenv
 
 load_dotenv(".env", override=True)
 
-from src.reymen.cereyan.conversation_loop import ConversationLoop
+from reymen.cereyan.conversation_loop import ConversationLoop
 
 cl = ConversationLoop(motor=None, beyin=None, max_tur=3)
 

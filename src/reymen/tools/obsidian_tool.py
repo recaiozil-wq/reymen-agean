@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-obsidian_tool.py — ReYMeN Obsidian Vault Integration.
+obsidian_tool.py â€” ReYMeN Obsidian Vault Integration.
 
 Inside Obsidian vault (.md):
   - List files
@@ -27,7 +27,7 @@ from typing import List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
-# ── Sabitler ─────────────────────────────────────────────────────────────
+# â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 GUVENLI_UZANTILAR = {".md"}
 MAKS_DOSYA_BOYUTU = 10 * 1024 * 1024  # 10 MB
@@ -35,7 +35,7 @@ MAKS_LISTELEME = 200  # tek seferde max dosya listele
 MAKS_ARAMA_SONUC = 50
 
 
-# ── Yardımcı Fonksiyonlar ────────────────────────────────────────────────
+# â”€â”€ YardÄ±mcÄ± Fonksiyonlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _vault_yolu_bul(istenen_yol: str = "") -> Tuple[bool, str]:
@@ -50,12 +50,12 @@ def _vault_yolu_bul(istenen_yol: str = "") -> Tuple[bool, str]:
     Returns:
         (basarili_mi, vault_yolu | hata_mesaji)
     """
-    # 1. Parametre olarak verilmiş yol
+    # 1. Parametre olarak verilmiÅŸ yol
     if istenen_yol and istenen_yol.strip():
         yol = Path(istenen_yol.strip()).resolve()
         if yol.is_dir():
             return (True, str(yol))
-        return (False, f"[Obsidian] Belirtilen yol bulunamadı: {istenen_yol}")
+        return (False, f"[Obsidian] Belirtilen yol bulunamadÄ±: {istenen_yol}")
 
     # 2. config.yaml oku
     try:
@@ -72,21 +72,21 @@ def _vault_yolu_bul(istenen_yol: str = "") -> Tuple[bool, str]:
                     return (True, str(cfg_yol))
                 return (
                     False,
-                    f"[Obsidian] config.yaml'deki vault_path geçersiz: {cfg_yol}",
+                    f"[Obsidian] config.yaml'deki vault_path geÃ§ersiz: {cfg_yol}",
                 )
     except ImportError:
-        pass  # yaml yoksa sessiz geç
+        pass  # yaml yoksa sessiz geÃ§
     except Exception:
         logger.warning("[fix_01_sessiz_except] Exception")
 
-    # 3. Proje kökünde .obsidian/ klasörü ara
+    # 3. Proje kÃ¶kÃ¼nde .obsidian/ klasÃ¶rÃ¼ ara
     proje_kok = Path(__file__).resolve().parent.parent.parent.parent  # ReYMeN-Ajan/
     obsidian_klasor = proje_kok / ".obsidian"
     if obsidian_klasor.is_dir():
-        # vault_root = .obsidian'in bir üstü (yani proje kökü)
+        # vault_root = .obsidian'in bir Ã¼stÃ¼ (yani proje kÃ¶kÃ¼)
         return (True, str(proje_kok))
 
-    # 4. Kullanıcı ana dizininde Obsidian vault'ları tara
+    # 4. KullanÄ±cÄ± ana dizininde Obsidian vault'larÄ± tara
     kullanici = Path.home()
     for aday in [
         kullanici / "Obsidian",
@@ -99,8 +99,8 @@ def _vault_yolu_bul(istenen_yol: str = "") -> Tuple[bool, str]:
 
     return (
         False,
-        "[Obsidian] Vault yolu bulunamadı. config.yaml > obsidian.vault_path ekleyin "
-        "veya araç çağrısında vault yolunu parametre olarak belirtin.",
+        "[Obsidian] Vault yolu bulunamadÄ±. config.yaml > obsidian.vault_path ekleyin "
+        "veya araÃ§ Ã§aÄŸrÄ±sÄ±nda vault yolunu parametre olarak belirtin.",
     )
 
 
@@ -110,7 +110,7 @@ def _yol_guvenli_mi(vault_kok: str, hedef: str) -> Tuple[bool, str]:
         kok = Path(vault_kok).resolve()
         hedef_abs = (kok / hedef).resolve()
         if not str(hedef_abs).startswith(str(kok)):
-            return (False, f"[Guvenlik] Hedef yol vault dışına çıkıyor: {hedef}")
+            return (False, f"[Guvenlik] Hedef yol vault dÄ±ÅŸÄ±na Ã§Ä±kÄ±yor: {hedef}")
         return (True, str(hedef_abs))
     except Exception as e:
         return (False, f"[Guvenlik] Yol dogrulama hatasi: {e}")
@@ -175,11 +175,11 @@ def _md_oku(vault_kok: str, dosya_yolu: str) -> Tuple[bool, str]:
 
     yol = Path(tam_yol)
     if not yol.exists():
-        return (False, f"[Obsidian] Dosya bulunamadı: {dosya_yolu}")
+        return (False, f"[Obsidian] Dosya bulunamadÄ±: {dosya_yolu}")
     if yol.suffix.lower() not in GUVENLI_UZANTILAR:
         return (False, f"[Obsidian] Sadece .md dosyalari okunabilir: {dosya_yolu}")
     if yol.stat().st_size > MAKS_DOSYA_BOYUTU:
-        return (False, f"[Obsidian] Dosya çok büyük (>10MB): {dosya_yolu}")
+        return (False, f"[Obsidian] Dosya Ã§ok bÃ¼yÃ¼k (>10MB): {dosya_yolu}")
 
     try:
         icerik = yol.read_text(encoding="utf-8")
@@ -207,7 +207,7 @@ def _not_olustur(vault_kok: str, dosya_yolu: str, icerik: str) -> Tuple[bool, st
     if yol.exists():
         return (False, f"[Obsidian] Dosya zaten var: {dosya_yolu}")
 
-    # Uzantı kontrolü
+    # UzantÄ± kontrolÃ¼
     if not yol.suffix:
         yol = yol.with_suffix(".md")
     elif yol.suffix.lower() not in GUVENLI_UZANTILAR:
@@ -216,9 +216,9 @@ def _not_olustur(vault_kok: str, dosya_yolu: str, icerik: str) -> Tuple[bool, st
     try:
         yol.parent.mkdir(parents=True, exist_ok=True)
         yol.write_text(icerik, encoding="utf-8")
-        return (True, f"[Obsidian] Not oluşturuldu: {dosya_yolu}")
+        return (True, f"[Obsidian] Not oluÅŸturuldu: {dosya_yolu}")
     except Exception as e:
-        return (False, f"[Obsidian] Oluşturma hatası: {e}")
+        return (False, f"[Obsidian] OluÅŸturma hatasÄ±: {e}")
 
 
 def _not_guncelle(
@@ -241,7 +241,7 @@ def _not_guncelle(
 
     yol = Path(tam_yol)
     if not yol.exists():
-        return (False, f"[Obsidian] Dosya bulunamadı: {dosya_yolu}")
+        return (False, f"[Obsidian] Dosya bulunamadÄ±: {dosya_yolu}")
 
     try:
         if mod == "overwrite":
@@ -255,12 +255,12 @@ def _not_guncelle(
         else:
             return (
                 False,
-                f"[Obsidian] Geçersiz mod: {mod} (secenekler: overwrite, append, prepend)",
+                f"[Obsidian] GeÃ§ersiz mod: {mod} (secenekler: overwrite, append, prepend)",
             )
 
-        return (True, f"[Obsidian] Not güncellendi ({mod}): {dosya_yolu}")
+        return (True, f"[Obsidian] Not gÃ¼ncellendi ({mod}): {dosya_yolu}")
     except Exception as e:
-        return (False, f"[Obsidian] Güncelleme hatası: {e}")
+        return (False, f"[Obsidian] GÃ¼ncelleme hatasÄ±: {e}")
 
 
 def _vault_ara(
@@ -281,7 +281,7 @@ def _vault_ara(
         (basarili_mi, sonuclar | hata_mesaji)
     """
     if not sorgu or not sorgu.strip():
-        return (False, "[Obsidian] Arama sorgusu boş olamaz")
+        return (False, "[Obsidian] Arama sorgusu boÅŸ olamaz")
 
     try:
         import re as regex_module
@@ -291,7 +291,7 @@ def _vault_ara(
                 sorgu, 0 if harf_duyarlilik else regex_module.IGNORECASE
             )
         except regex_module.error as e:
-            return (False, f"[Obsidian] Geçersiz regex: {e}")
+            return (False, f"[Obsidian] GeÃ§ersiz regex: {e}")
 
         baslangic = Path(vault_kok)
         sonuclar = []
@@ -299,7 +299,7 @@ def _vault_ara(
         eslesme_sayisi = 0
 
         for md_yol in sorted(baslangic.rglob("*.md")):
-            # Dosya adı filtresi
+            # Dosya adÄ± filtresi
             if dosya_adi_filtre:
                 try:
                     if not regex_module.search(
@@ -332,14 +332,14 @@ def _vault_ara(
         if not sonuclar:
             return (
                 True,
-                f"[Obsidian] Arama sonucu bulunamadı: '{sorgu}' ({dosya_sayisi} dosya tarandı)",
+                f"[Obsidian] Arama sonucu bulunamadÄ±: '{sorgu}' ({dosya_sayisi} dosya tarandÄ±)",
             )
 
-        ozet = f"[Obsidian] '{sorgu}' için {eslesme_sayisi} eşleşme ({dosya_sayisi} dosyada):\n"
+        ozet = f"[Obsidian] '{sorgu}' iÃ§in {eslesme_sayisi} eÅŸleÅŸme ({dosya_sayisi} dosyada):\n"
         return (True, ozet + "\n".join(sonuclar))
 
     except Exception as e:
-        return (False, f"[Obsidian] Arama hatası: {e}")
+        return (False, f"[Obsidian] Arama hatasÄ±: {e}")
 
 
 def _vault_bilgisi(vault_kok: str) -> Tuple[bool, str]:
@@ -350,7 +350,7 @@ def _vault_bilgisi(vault_kok: str) -> Tuple[bool, str]:
         toplam_boyut = sum(f.stat().st_size for f in md_dosyalar if f.exists())
         alt_dizinler = len(set(f.parent for f in md_dosyalar))
 
-        # En son değişen dosyalar
+        # En son deÄŸiÅŸen dosyalar
         son_dosyalar = sorted(
             md_dosyalar, key=lambda f: f.stat().st_mtime, reverse=True
         )[:5]
@@ -361,19 +361,19 @@ def _vault_bilgisi(vault_kok: str) -> Tuple[bool, str]:
         return (
             True,
             f"[Obsidian] Vault Bilgisi:\n"
-            f"  📁 Konum: {vault_kok}\n"
-            f"  📄 Toplam not: {len(md_dosyalar)}\n"
-            f"  📦 Toplam boyut: {toplam_boyut / 1024:.1f} KB\n"
-            f"  📂 Alt dizin: {alt_dizinler}\n"
-            f"  🕐 Son değişenler:\n{son_liste}",
+            f"  ğŸ“ Konum: {vault_kok}\n"
+            f"  ğŸ“„ Toplam not: {len(md_dosyalar)}\n"
+            f"  ğŸ“¦ Toplam boyut: {toplam_boyut / 1024:.1f} KB\n"
+            f"  ğŸ“‚ Alt dizin: {alt_dizinler}\n"
+            f"  ğŸ• Son deÄŸiÅŸenler:\n{son_liste}",
         )
     except Exception as e:
-        return (False, f"[Obsidian] Vault bilgisi alınamadı: {e}")
+        return (False, f"[Obsidian] Vault bilgisi alÄ±namadÄ±: {e}")
 
 
-# ── Motor Arayüz Fonksiyonları ────────────────────────────────────────────
+# â”€â”€ Motor ArayÃ¼z FonksiyonlarÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # Bu fonksiyonlar motor._plugin_arac_kaydet() ile kaydedilir.
-# Tümü tek parametre (ham string) alır, string döndürür.
+# TÃ¼mÃ¼ tek parametre (ham string) alÄ±r, string dÃ¶ndÃ¼rÃ¼r.
 
 
 def _obsidian_liste_araci(ham: str) -> str:
@@ -403,9 +403,9 @@ def _obsidian_liste_araci(ham: str) -> str:
         satirlar = [f"[Obsidian] Vault: {vault_yolu} ({len(dosyalar)} dosya):"]
         for d in dosyalar:
             boyut_str = f"{d['boyut']/1024:.1f}KB" if d["boyut"] > 0 else "0B"
-            satirlar.append(f"  📄 {d['yol']} ({boyut_str})")
+            satirlar.append(f"  ğŸ“„ {d['yol']} ({boyut_str})")
             if d.get("degisti"):
-                satirlar[-1] += f" — {d['degisti']}"
+                satirlar[-1] += f" â€” {d['degisti']}"
 
         return "\n".join(satirlar)
 
@@ -431,8 +431,8 @@ def _obsidian_oku_araci(ham: str) -> str:
 
         if not dosya_yolu:
             return (
-                "[Obsidian] Kullanım: OBSIDIAN_OKU(dosya_yolu) — "
-                "örnek: OBSIDIAN_OKU(gunluk/2024-01-01.md)"
+                "[Obsidian] KullanÄ±m: OBSIDIAN_OKU(dosya_yolu) â€” "
+                "Ã¶rnek: OBSIDIAN_OKU(gunluk/2024-01-01.md)"
             )
 
         basarili, vault_yolu = _vault_yolu_bul(istenen_vault)
@@ -441,10 +441,10 @@ def _obsidian_oku_araci(ham: str) -> str:
 
         basarili, icerik = _md_oku(vault_yolu, dosya_yolu)
         if not basarili:
-            return icerik  # hata mesajı
+            return icerik  # hata mesajÄ±
 
         baslik = Path(dosya_yolu).name
-        return f"[Obsidian] 📄 {baslik}\n```markdown\n{icerik}\n```"
+        return f"[Obsidian] ğŸ“„ {baslik}\n```markdown\n{icerik}\n```"
 
     except Exception as e:
         logger.exception("[Obsidian] Okuma hatasi")
@@ -454,7 +454,7 @@ def _obsidian_oku_araci(ham: str) -> str:
 def _obsidian_yaz_araci(ham: str) -> str:
     """OBSIDIAN_YAZ: Create a new .md note.
 
-    Parameters (|| separated — content may contain pipes/commas):
+    Parameters (|| separated â€” content may contain pipes/commas):
       - dosya_yolu: Target path relative to vault
       - icerik: Markdown content
       - vault_yolu (opt): Vault directory
@@ -463,28 +463,28 @@ def _obsidian_yaz_araci(ham: str) -> str:
     Example: OBSIDIAN_YAZ(projeler/not.md||# Project\\nPlan|C:/Users/marko/Obsidian)
     """
     try:
-        # İlk parametre: dosya_yolu
+        # Ä°lk parametre: dosya_yolu
         ilk_pipe = ham.find("||")
         if ilk_pipe == -1:
             return (
-                "[Obsidian] Kullanım: OBSIDIAN_YAZ(dosya_yolu||içerik) — "
-                "içerik ve dosya yolunu || ile ayırın"
+                "[Obsidian] KullanÄ±m: OBSIDIAN_YAZ(dosya_yolu||iÃ§erik) â€” "
+                "iÃ§erik ve dosya yolunu || ile ayÄ±rÄ±n"
             )
 
         dosya_yolu = ham[:ilk_pipe].strip()
         kalan = ham[ilk_pipe + 2 :]
 
-        # İkinci || vault_yolu için
+        # Ä°kinci || vault_yolu iÃ§in
         ikinci_pipe = -1
         # vault_yolu opsiyonel, en sonda | ile belirtilebilir
-        # Ama ||'den sonraki kısım içerik olabilir, içinde | olabilir
-        # O yüzden vault_yolu parametresini ayrı bir mekanizma ile almayalım
-        # Sadece dosya_yolu ve içerik zorunlu
+        # Ama ||'den sonraki kÄ±sÄ±m iÃ§erik olabilir, iÃ§inde | olabilir
+        # O yÃ¼zden vault_yolu parametresini ayrÄ± bir mekanizma ile almayalÄ±m
+        # Sadece dosya_yolu ve iÃ§erik zorunlu
         icerik = kalan.strip()
 
         if not dosya_yolu or not icerik:
             return (
-                "[Obsidian] Kullanım: OBSIDIAN_YAZ(dosya_yolu||içerik) — "
+                "[Obsidian] KullanÄ±m: OBSIDIAN_YAZ(dosya_yolu||iÃ§erik) â€” "
                 "her iki parametre de zorunlu"
             )
 
@@ -496,7 +496,7 @@ def _obsidian_yaz_araci(ham: str) -> str:
         if not basarili:
             return sonuc
 
-        return sonuc + f"\n  📍 Vault: {vault_yolu}"
+        return sonuc + f"\n  ğŸ“ Vault: {vault_yolu}"
 
     except Exception as e:
         logger.exception("[Obsidian] Yazma hatasi")
@@ -522,12 +522,12 @@ def _obsidian_guncelle_araci(ham: str) -> str:
 
         if not dosya_yolu or not icerik:
             return (
-                "[Obsidian] Kullanım: OBSIDIAN_GUNCELLE(dosya_yolu||içerik||mod) — "
-                "dosya_yolu ve içerik zorunlu, mod opsiyonel (overwrite|append|prepend)"
+                "[Obsidian] KullanÄ±m: OBSIDIAN_GUNCELLE(dosya_yolu||iÃ§erik||mod) â€” "
+                "dosya_yolu ve iÃ§erik zorunlu, mod opsiyonel (overwrite|append|prepend)"
             )
 
         if mod not in ("overwrite", "append", "prepend"):
-            return f"[Obsidian] Geçersiz mod: '{mod}' (secenekler: overwrite, append, prepend)"
+            return f"[Obsidian] GeÃ§ersiz mod: '{mod}' (secenekler: overwrite, append, prepend)"
 
         basarili, vault_yolu = _vault_yolu_bul("")
         if not basarili:
@@ -537,10 +537,10 @@ def _obsidian_guncelle_araci(ham: str) -> str:
         if not basarili:
             return sonuc
 
-        return sonuc + f"\n  📍 Vault: {vault_yolu}"
+        return sonuc + f"\n  ğŸ“ Vault: {vault_yolu}"
 
     except Exception as e:
-        logger.exception("[Obsidian] Güncelleme hatasi")
+        logger.exception("[Obsidian] GÃ¼ncelleme hatasi")
         return f"[Obsidian] Hata: {e}"
 
 
@@ -563,7 +563,7 @@ def _obsidian_ara_araci(ham: str) -> str:
         harf_duyarli = params[2].lower() == "true" if len(params) > 2 else False
 
         if not sorgu:
-            return "[Obsidian] Kullanım: OBSIDIAN_ARA(sorgu) — arama sorgusu zorunlu"
+            return "[Obsidian] KullanÄ±m: OBSIDIAN_ARA(sorgu) â€” arama sorgusu zorunlu"
 
         basarili, vault_yolu = _vault_yolu_bul(istenen_vault)
         if not basarili:
@@ -604,7 +604,7 @@ def _obsidian_bilgi_araci(ham: str) -> str:
         return f"[Obsidian] Hata: {e}"
 
 
-# ── Motor Kayıt ──────────────────────────────────────────────────────────
+# â”€â”€ Motor KayÄ±t â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def motor_kaydet(motor) -> None:
@@ -621,49 +621,49 @@ def motor_kaydet(motor) -> None:
     k(
         "OBSIDIAN_LISTE",
         _obsidian_liste_araci,
-        "Obsidian vault'taki .md dosyalarını listeler. "
+        "Obsidian vault'taki .md dosyalarÄ±nÄ± listeler. "
         "Parametreler (|): vault_yolu (ops), alt_dizin (ops). "
-        "Örnek: OBSIDIAN_LISTE veya OBSIDIAN_LISTE(C:/Users/marko/Vault|gunluk)",
+        "Ã–rnek: OBSIDIAN_LISTE veya OBSIDIAN_LISTE(C:/Users/marko/Vault|gunluk)",
     )
 
     k(
         "OBSIDIAN_OKU",
         _obsidian_oku_araci,
-        "Obsidian vault'tan bir .md dosyasının içeriğini okur. "
+        "Obsidian vault'tan bir .md dosyasÄ±nÄ±n iÃ§eriÄŸini okur. "
         "Parametreler (|): dosya_yolu (zorunlu), vault_yolu (ops). "
-        "Örnek: OBSIDIAN_OKU(gunluk/not.md)",
+        "Ã–rnek: OBSIDIAN_OKU(gunluk/not.md)",
     )
 
     k(
         "OBSIDIAN_YAZ",
         _obsidian_yaz_araci,
-        "Obsidian vault'ta yeni bir .md notu oluşturur. "
-        "Parametreler (||): dosya_yolu || içerik. "
-        "Örnek: OBSIDIAN_YAZ(projeler/fikir.md||# Fikir\\n\\nYeni fikir burada)",
+        "Obsidian vault'ta yeni bir .md notu oluÅŸturur. "
+        "Parametreler (||): dosya_yolu || iÃ§erik. "
+        "Ã–rnek: OBSIDIAN_YAZ(projeler/fikir.md||# Fikir\\n\\nYeni fikir burada)",
     )
 
     k(
         "OBSIDIAN_GUNCELLE",
         _obsidian_guncelle_araci,
-        "Obsidian vault'ta mevcut bir .md notunu günceller. "
-        "Parametreler (||): dosya_yolu || içerik || mod (ops: overwrite|append|prepend). "
-        "Örnek: OBSIDIAN_GUNCELLE(gunluk/not.md||# Yeni icerik||append)",
+        "Obsidian vault'ta mevcut bir .md notunu gÃ¼nceller. "
+        "Parametreler (||): dosya_yolu || iÃ§erik || mod (ops: overwrite|append|prepend). "
+        "Ã–rnek: OBSIDIAN_GUNCELLE(gunluk/not.md||# Yeni icerik||append)",
     )
 
     k(
         "OBSIDIAN_ARA",
         _obsidian_ara_araci,
-        "Obsidian vault içinde metin araması yapar (regex destekler). "
+        "Obsidian vault iÃ§inde metin aramasÄ± yapar (regex destekler). "
         "Parametreler (|): sorgu (zorunlu), vault_yolu (ops), harf_duyarli (ops: true|false). "
-        "Örnek: OBSIDIAN_ARA(görev) veya OBSIDIAN_ARA(Regex.*test|C:\\Vault|true)",
+        "Ã–rnek: OBSIDIAN_ARA(gÃ¶rev) veya OBSIDIAN_ARA(Regex.*test|C:\\Vault|true)",
     )
 
     k(
         "OBSIDIAN_BILGI",
         _obsidian_bilgi_araci,
-        "Obsidian vault hakkında özet bilgi gösterir: dosya sayısı, boyut, son değişenler. "
+        "Obsidian vault hakkÄ±nda Ã¶zet bilgi gÃ¶sterir: dosya sayÄ±sÄ±, boyut, son deÄŸiÅŸenler. "
         "Parametre: vault_yolu (ops). "
-        "Örnek: OBSIDIAN_BILGI veya OBSIDIAN_BILGI(C:/Users/marko/Vault)",
+        "Ã–rnek: OBSIDIAN_BILGI veya OBSIDIAN_BILGI(C:/Users/marko/Vault)",
     )
 
     logger.debug(

@@ -12,7 +12,7 @@ agent:
   task_completion_guidance: true
   tool_use_enforcement: auto
 approvals:
-  mode: false
+  mode: none
 compression:
   enabled: true
   target_ratio: 0.2
@@ -210,8 +210,8 @@ state_machine.enabled: true
 service_bridge.enabled: true
 auto_recovery.enabled: true
 memory.max_records: 2000
-web.backend: auto
-approvals.mode: smart
+web.backend: firecrawl
+approvals.mode: none
 spotify.enabled: true
 ref_processor: true
 

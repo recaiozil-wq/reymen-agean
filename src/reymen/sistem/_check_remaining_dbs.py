@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """Check remaining unclassified DBs"""
 
 import sqlite3, os
@@ -20,7 +20,7 @@ DBS = {
         Path.home()
         / "AppData"
         / "Local"
-        / "hermes"
+        / "reymen"
         / "profiles"
         / "reymen"
         / "state.db"
@@ -56,4 +56,4 @@ for name, path in DBS.items():
     except Exception as e:
         print(f"{name:20s} {size//1024:>7d}KB HATA: {str(e)[:60]}")
 
-print("\n✅ Taranan DB sayisi:", len(DBS))
+print("\nâœ… Taranan DB sayisi:", len(DBS))

@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-startup_ekrani.py — ReYMeN görkemli başlangıç ekranı.
+startup_ekrani.py â€” ReYMeN gÃ¶rkemli baÅŸlangÄ±Ã§ ekranÄ±.
 
 Kullanim:
     from startup_ekrani import gorkem_ekranu, model_sec
@@ -18,7 +18,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-# ── ANSI ─────────────────────────────────────────────────────────────────────
+# â”€â”€ ANSI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _G = "\033[92m"  # Parlak yesil
 _KG = "\033[32m"  # Koyu yesil
 _B = "\033[1m"  # Kalin
@@ -42,19 +42,19 @@ def _gb(t):
     return f"{_G}{_B}{t}{_S}"
 
 
-# ── Logo ──────────────────────────────────────────────────────────────────────
+# â”€â”€ Logo â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _LOGO = [
-    r"██████╗ ███████╗██╗   ██╗███╗   ███╗███████╗███╗   ██╗",
-    r"██╔══██╗██╔════╝╚██╗ ██╔╝████╗ ████║██╔════╝████╗  ██║",
-    r"██████╔╝█████╗   ╚████╔╝ ██╔████╔██║█████╗  ██╔██╗ ██║",
-    r"██╔══██╗██╔══╝    ╚██╔╝  ██║╚██╔╝██║██╔══╝  ██║╚██╗██║",
-    r"██║  ██║███████╗   ██║   ██║ ╚═╝ ██║███████╗██║ ╚████║",
-    r"╚═╝  ╚═╝╚══════╝   ╚═╝   ╚═╝     ╚═╝╚══════╝╚═╝  ╚═══╝",
+    r"â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•—   â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•—",
+    r"â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•â•â•â•šâ–ˆâ–ˆâ•— â–ˆâ–ˆâ•”â•â–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•‘",
+    r"â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—   â•šâ–ˆâ–ˆâ–ˆâ–ˆâ•”â• â–ˆâ–ˆâ•”â–ˆâ–ˆâ–ˆâ–ˆâ•”â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•”â–ˆâ–ˆâ•— â–ˆâ–ˆâ•‘",
+    r"â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•    â•šâ–ˆâ–ˆâ•”â•  â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘",
+    r"â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘ â•šâ•â• â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘ â•šâ–ˆâ–ˆâ–ˆâ–ˆâ•‘",
+    r"â•šâ•â•  â•šâ•â•â•šâ•â•â•â•â•â•â•   â•šâ•â•   â•šâ•â•     â•šâ•â•â•šâ•â•â•â•â•â•â•â•šâ•â•  â•šâ•â•â•â•",
 ]
 _LOGO_GEN = len(_LOGO[0])  # 56 karakter
 
 
-# ── Skill Tarayici ────────────────────────────────────────────────────────────
+# â”€â”€ Skill Tarayici â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def skill_tara(proje_kok: Path | None = None) -> dict[str, list[str]]:
@@ -128,7 +128,7 @@ def _skill_kategorisi_bul(skill_md: Path, adi: str) -> str:
     return _isimden_kategori(adi)
 
 
-# Spesifik tag → genis kategori haritasi
+# Spesifik tag â†’ genis kategori haritasi
 _TAG_HARITASI: dict[str, str] = {
     # Agents / AI
     "agent": "autonomous-ai-agents",
@@ -306,7 +306,7 @@ def _isimden_kategori(adi: str) -> str:
     return "general"
 
 
-# ── Model Secimi (Kredi Kontrollu) ──────────────────────────────────────────
+# â”€â”€ Model Secimi (Kredi Kontrollu) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _lmstudio_modeller() -> list[str]:
@@ -454,7 +454,7 @@ def model_sec(agent=None) -> bool:
     for m in oll_mods:
         tum_modeller.append(("ollama", m, "Ollama"))
 
-    # Bulut providerlar — env_degiskeni, gercek_model_adi, goster_adi
+    # Bulut providerlar â€” env_degiskeni, gercek_model_adi, goster_adi
     _BULUT_ENV = {
         "deepseek": ("DEEPSEEK_API_KEY", "deepseek-chat", "DeepSeek"),
         "openai": ("OPENAI_API_KEY", "gpt-4o-mini", "OpenAI"),
@@ -467,7 +467,7 @@ def model_sec(agent=None) -> bool:
             tum_modeller.append((prov_key, model_adi, goster_adi))
 
     while True:
-        # Tek model var ve zaten aktif → otomatik sec
+        # Tek model var ve zaten aktif â†’ otomatik sec
         if len(tum_modeller) == 1 and tum_modeller[0][1] == mevcut_model:
             print(f"  {_d('Devam ediliyor...')}")
             return False
@@ -537,12 +537,12 @@ def model_sec(agent=None) -> bool:
                 )
                 return True
 
-        print(f"  {_d('Gecersiz secim — mevcut model korunuyor.')}")
+        print(f"  {_d('Gecersiz secim â€” mevcut model korunuyor.')}")
         return False
 
 
 def _model_tercihini_kaydet(provider: str, model: str) -> None:
-    """Secilen modeli .ReYMeN/setup.json'a kaydet — sonraki acilista kullanilir."""
+    """Secilen modeli .ReYMeN/setup.json'a kaydet â€” sonraki acilista kullanilir."""
     import json
 
     try:
@@ -559,7 +559,7 @@ def _model_tercihini_kaydet(provider: str, model: str) -> None:
         logger.warning("[fix_01_sessiz_except] Exception")
 
 
-# ── Gorkem Ekrani ─────────────────────────────────────────────────────────────
+# â”€â”€ Gorkem Ekrani â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def gorkem_ekranu(
@@ -568,7 +568,7 @@ def gorkem_ekranu(
     skill_veri: dict[str, list[str]] | None = None,
 ) -> None:
     """
-    ReYMeN gorkemli baslangiç ekrani.
+    ReYMeN gorkemli baslangiÃ§ ekrani.
     ReYMeN benzeri: logo + kutu icinde skill kategorileri + model/oturum bilgisi.
     """
     if hasattr(sys.stdout, "reconfigure"):
@@ -577,7 +577,7 @@ def gorkem_ekranu(
         except Exception:
             logger.warning("[fix_01_sessiz_except] Exception")
 
-    # ── Veri topla ──────────────────────────────────────────────────────────
+    # â”€â”€ Veri topla â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     model_adi, provider = _model_bilgi(agent, config)
     provider_goster = {
         "lmstudio": "LM Studio (Yerel)",
@@ -603,38 +603,38 @@ def gorkem_ekranu(
         sum(len(v) for v in skill_veri.values()) or _yetenek_sayisi(agent) or 1045
     )
 
-    # ── Logo ────────────────────────────────────────────────────────────────
+    # â”€â”€ Logo â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     print()
     girinti = "  "
     for satir in _LOGO:
         print(f"{girinti}{_gb(satir)}")
 
     # Alt baslik
-    baslik = f"Otonom ReAct Ajan  ·  {versiyon}  ·  {provider_goster}"
+    baslik = f"Otonom ReAct Ajan  Â·  {versiyon}  Â·  {provider_goster}"
     bos = (_LOGO_GEN - len(baslik)) // 2
     print(f"{girinti}{' ' * bos}{_d(baslik)}")
     print()
 
-    # ── Bilgi Kutusu ─────────────────────────────────────────────────────────
+    # â”€â”€ Bilgi Kutusu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     # Genislik: iki sutun (sol: skill/tool, sag: model/oturum)
     KUTU = 78  # ic genislik
     SOL_W = 44  # sol sutun genisligi (skill listesi)
 
     def ust_kenar(etiket: str = "") -> str:
         if etiket:
-            ic = f"─ {etiket} "
+            ic = f"â”€ {etiket} "
             kalan = KUTU - len(ic)
-            return f"{_G}╭{ic}{'─' * kalan}╮{_S}"
-        return f"{_G}╭{'─' * KUTU}╮{_S}"
+            return f"{_G}â•­{ic}{'â”€' * kalan}â•®{_S}"
+        return f"{_G}â•­{'â”€' * KUTU}â•®{_S}"
 
     def alt_kenar() -> str:
-        return f"{_G}╰{'─' * KUTU}╯{_S}"
+        return f"{_G}â•°{'â”€' * KUTU}â•¯{_S}"
 
     def ayirac() -> str:
-        return f"{_G}├{'─' * KUTU}┤{_S}"
+        return f"{_G}â”œ{'â”€' * KUTU}â”¤{_S}"
 
     def bos_satir() -> str:
-        return f"{_G}│{_S}{' ' * KUTU}{_G}│{_S}"
+        return f"{_G}â”‚{_S}{' ' * KUTU}{_G}â”‚{_S}"
 
     def _saf(t: str) -> str:
         return re.sub(r"\033\[[0-9;]*m", "", t)
@@ -645,7 +645,7 @@ def gorkem_ekranu(
         doldur = KUTU - saf_len - 2
         if doldur < 0:
             doldur = 0
-        return f"{_G}│{_S} {txt}{' ' * doldur} {_G}│{_S}"
+        return f"{_G}â”‚{_S} {txt}{' ' * doldur} {_G}â”‚{_S}"
 
     def iki(sol: str, sag: str) -> str:
         """Iki sutunlu satir."""
@@ -658,19 +658,19 @@ def gorkem_ekranu(
         if sag_doldur < 0:
             sag_doldur = 0
         return (
-            f"{_G}│{_S} {sol}{' ' * sol_doldur} "
-            f"{_G}│{_S} {sag}{' ' * sag_doldur} {_G}│{_S}"
+            f"{_G}â”‚{_S} {sol}{' ' * sol_doldur} "
+            f"{_G}â”‚{_S} {sag}{' ' * sag_doldur} {_G}â”‚{_S}"
         )
 
-    # ── Baslik ───────────────────────────────────────────────────────────────
-    baslik_metin = f"R>eYMeN  ·  {provider_goster}  ·  {simdi}"
+    # â”€â”€ Baslik â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    baslik_metin = f"R>eYMeN  Â·  {provider_goster}  Â·  {simdi}"
     ic_bos = (KUTU - len(baslik_metin) - 2) // 2
-    print(ust_kenar(f"R>eYMeN {versiyon} · {provider_goster}"))
+    print(ust_kenar(f"R>eYMeN {versiyon} Â· {provider_goster}"))
     print(bos_satir())
 
-    # ── Skill Listesi (sol) + Model/Oturum (sag) ─────────────────────────────
+    # â”€â”€ Skill Listesi (sol) + Model/Oturum (sag) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     print(iki(_kg("Yetenekler"), _kg("Aktif Model")))
-    print(iki("", _g(model_adi[:34] if model_adi else "—")))
+    print(iki("", _g(model_adi[:34] if model_adi else "â€”")))
     print(iki("", _d(f"Saglayici: {provider_goster}")))
     print(bos_satir())
 
@@ -706,18 +706,18 @@ def gorkem_ekranu(
     print(bos_satir())
     print(ayirac())
 
-    # ── Alt Bilgi: Plugin/Tool/Skill Ozet + Oturum + Komutlar ───────────────
+    # â”€â”€ Alt Bilgi: Plugin/Tool/Skill Ozet + Oturum + Komutlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     print(bos_satir())
     print(iki(_kg("Oturum"), _kg("Komutlar")))
     print(iki(f"  {_d(oturum)}", f"  {_d('/model  /hafiza  /yansima  /cikis')}"))
 
     ozet = (
-        f"{_g(str(p_toplam))} plugin  ·  "
-        f"{_g(str(arac_say))} arac  ·  "
+        f"{_g(str(p_toplam))} plugin  Â·  "
+        f"{_g(str(arac_say))} arac  Â·  "
         f"{_g(str(skill_toplam))} yetenek"
     )
     print(bos_satir())
-    print(sat(f"  {ozet}  ·  {_d('/help ile tum komutlar')}"))
+    print(sat(f"  {ozet}  Â·  {_d('/help ile tum komutlar')}"))
     print(bos_satir())
     print(alt_kenar())
 
@@ -727,7 +727,7 @@ def gorkem_ekranu(
     print()
 
 
-# ── Yardimcilar ───────────────────────────────────────────────────────────────
+# â”€â”€ Yardimcilar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _model_bilgi(agent, config) -> tuple[str, str]:
@@ -742,7 +742,7 @@ def _model_bilgi(agent, config) -> tuple[str, str]:
         p = cfg.get("default_provider", "")
         if m:
             return m, p
-    return "—", "—"
+    return "â€”", "â€”"
 
 
 def _oturum(agent) -> str:

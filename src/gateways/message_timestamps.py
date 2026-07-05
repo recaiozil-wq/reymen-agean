@@ -1,4 +1,4 @@
-"""Helpers for rendering gateway message timestamps exactly once.
+﻿"""Helpers for rendering gateway message timestamps exactly once.
 
 Gateway messages need timestamps in the LLM context for temporal awareness, but
 persisted message content should stay clean so replay does not accumulate

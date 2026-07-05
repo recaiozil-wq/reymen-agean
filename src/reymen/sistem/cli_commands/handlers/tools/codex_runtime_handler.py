@@ -1,14 +1,14 @@
-"""_handle_codex_runtime handler."""
+﻿"""_handle_codex_runtime handler."""
 
 
 def _handle_codex_runtime(cli, cmd_original: str) -> None:
-    """Handle /codex-runtime — toggle the codex app-server runtime opt-in.
+    """Handle /codex-runtime â€” toggle the codex app-server runtime opt-in.
 
     Usage:
-        /codex-runtime                       — show current state
-        /codex-runtime auto                  — ReYMeN default (chat_completions)
-        /codex-runtime codex_app_server      — hand turns to codex subprocess
-        /codex-runtime on / off              — synonyms for the above
+        /codex-runtime                       â€” show current state
+        /codex-runtime auto                  â€” ReYMeN default (chat_completions)
+        /codex-runtime codex_app_server      â€” hand turns to codex subprocess
+        /codex-runtime on / off              â€” synonyms for the above
     """
     from ReYMeN_cli import codex_runtime_switch as crs
     from reymen.sistem.cli_display import _cprint
@@ -18,14 +18,14 @@ def _handle_codex_runtime(cli, cmd_original: str) -> None:
     new_value, errors = crs.parse_args(raw_args)
     if errors:
         for err in errors:
-            _cprint(f"❌ {err}")
+            _cprint(f"âŒ {err}")
         return
 
     # Load + persist via the existing config helpers
     try:
         from reymen.reymen_cli.config import load_config, save_config
     except Exception as exc:
-        _cprint(f"❌ could not load config: {exc}")
+        _cprint(f"âŒ could not load config: {exc}")
         return
     cfg = load_config()
 
@@ -35,7 +35,7 @@ def _handle_codex_runtime(cli, cmd_original: str) -> None:
         persist_callback=(save_config if new_value is not None else None),
     )
 
-    prefix = "✓" if result.success else "✗"
+    prefix = "âœ“" if result.success else "âœ—"
     for line in result.message.splitlines():
         _cprint(
             f"  {prefix} {line}" if line.startswith("openai_runtime") else f"    {line}"

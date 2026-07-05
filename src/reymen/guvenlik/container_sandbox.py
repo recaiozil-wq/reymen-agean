@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""container_sandbox.py — Docker container'da shell komutlarini izole calistir.
+﻿# -*- coding: utf-8 -*-
+"""container_sandbox.py â€” Docker container'da shell komutlarini izole calistir.
 
 Terminal komutlarini (KOMUT_CALISTIR) Docker container icinde calistirarak
 tam izolasyon saglar. Python kod sandbox'indan farkli olarak bu modul
@@ -33,7 +33,7 @@ from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
-# ── Varsayilanlar ──────────────────────────────────────────────────────────
+# â”€â”€ Varsayilanlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 VARSAYILAN_IMAGE = "python:3.11-slim"
 VARSAYILAN_TIMEOUT = 60
 VARSAYILAN_MEMORY_LIMIT = "512m"
@@ -83,7 +83,7 @@ if DOCKER_MEVCUT:
         logger.warning("[ContainerSandbox] Image kontrol hatasi: %s", e)
 
 
-# ── Hata Siniflari ─────────────────────────────────────────────────────────
+# â”€â”€ Hata Siniflari â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class ContainerSandboxError(RuntimeError):
@@ -102,7 +102,7 @@ class DockerNotAvailableError(ContainerSandboxError):
     """Docker kullanilamiyor."""
 
 
-# ── Config Model ───────────────────────────────────────────────────────────
+# â”€â”€ Config Model â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 @dataclass
@@ -173,7 +173,7 @@ class ContainerConfig:
         }
 
 
-# ── Container Sandbox ──────────────────────────────────────────────────────
+# â”€â”€ Container Sandbox â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class ContainerSandbox:
@@ -388,7 +388,7 @@ class ContainerSandbox:
             # Zaman asimi olan container'i temizle
             self._container_temizle(container_name)
             return (
-                f"[ContainerSandbox] Zaman asimi ({timeout}s) — "
+                f"[ContainerSandbox] Zaman asimi ({timeout}s) â€” "
                 f"container '{container_name}' kill edildi."
             )
         except FileNotFoundError:
@@ -486,9 +486,9 @@ class ContainerSandbox:
     def durum_text(self) -> str:
         """Insan-okunabilir durum."""
         d = self.durum()
-        docker_ikon = "🟢" if d["docker_mevcut"] else "🔴"
-        image_ikon = "🟢" if d["image_mevcut"] else "🟡"
-        aktif_ikon = "🟢" if d["aktif"] else "⏹️"
+        docker_ikon = "ğŸŸ¢" if d["docker_mevcut"] else "ğŸ”´"
+        image_ikon = "ğŸŸ¢" if d["image_mevcut"] else "ğŸŸ¡"
+        aktif_ikon = "ğŸŸ¢" if d["aktif"] else "â¹ï¸"
 
         return (
             f"[Container Sandbox Durumu]\n"
@@ -503,7 +503,7 @@ class ContainerSandbox:
         )
 
 
-# ── Config Yukleyici ───────────────────────────────────────────────────────
+# â”€â”€ Config Yukleyici â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def config_yukle(config_path: Optional[str] = None) -> ContainerConfig:
@@ -546,7 +546,7 @@ def config_yukle(config_path: Optional[str] = None) -> ContainerConfig:
         return ContainerConfig()
 
 
-# ── Entegre API ────────────────────────────────────────────────────────────
+# â”€â”€ Entegre API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _VARSAYILAN_SANDBOX: Optional[ContainerSandbox] = None
 
@@ -610,7 +610,7 @@ def durum_text(config: Optional[ContainerConfig] = None) -> str:
     return sb.durum_text()
 
 
-# ── motor_kaydet: Motor entegrasyonu ───────────────────────────────────────
+# â”€â”€ motor_kaydet: Motor entegrasyonu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def motor_kaydet(motor: Any) -> None:
@@ -661,9 +661,9 @@ def motor_kaydet(motor: Any) -> None:
             else "[Hata]: CONTAINER_CALISTIR(komut) gerekli"
         ),
         "Docker container'da shell komutu calistir. Parametreler: "
-        "komut (str, zorunlu) — calistirilacak shell komutu; "
-        "timeout (int, opsiyonel, default=60) — zaman asimi saniye; "
-        "volume_mounts (JSON str, opsiyonel) — volume mount listesi. "
+        "komut (str, zorunlu) â€” calistirilacak shell komutu; "
+        "timeout (int, opsiyonel, default=60) â€” zaman asimi saniye; "
+        "volume_mounts (JSON str, opsiyonel) â€” volume mount listesi. "
         'Ornek volume_mounts: \'[{"host_path": "/c/proje", "container_path": "/workspace"}]\'. '
         "Doner: komut ciktisi.",
     )
@@ -676,7 +676,7 @@ def motor_kaydet(motor: Any) -> None:
             config=cfg,
         ),
         "Container sandbox image'ini hazirla (docker pull). "
-        "Parametre: zorla (str, opsiyonel, default=false) — "
+        "Parametre: zorla (str, opsiyonel, default=false) â€” "
         "'true' ise image varsa da yeniden ceker. "
         "Doner: durum mesaji.",
     )
@@ -695,7 +695,7 @@ def motor_kaydet(motor: Any) -> None:
         "CONTAINER_MOD",
         _mod_degistir,
         "Container sandbox modunu degistir. "
-        "Parametre: mod (str, zorunlu) — 'kapali', 'kismi', veya 'tam'. "
+        "Parametre: mod (str, zorunlu) â€” 'kapali', 'kismi', veya 'tam'. "
         "Doner: durum mesaji.",
     )
 
@@ -705,7 +705,7 @@ def motor_kaydet(motor: Any) -> None:
     )
 
 
-# ── Dogrudan Calistirma ────────────────────────────────────────────────────
+# â”€â”€ Dogrudan Calistirma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
     import argparse

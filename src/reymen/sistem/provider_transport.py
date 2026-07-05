@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""provider_transport.py — Provider tasima katmani.
+﻿# -*- coding: utf-8 -*-
+"""provider_transport.py â€” Provider tasima katmani.
 Farkli saglayicilara mesaj gonderir, baglanti yonetimi yapar.
 ReYMeN kimligi: Turkce docstring, try/except, class-based.
 """

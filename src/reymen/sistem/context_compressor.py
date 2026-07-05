@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-context_compressor.py — Baglam sikistirma modulu.
+context_compressor.py â€” Baglam sikistirma modulu.
 
 Konusma gecmisini sikistirir, onemli bilgileri korur
 ve ozet olusturur.

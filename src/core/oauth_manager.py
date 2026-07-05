@@ -1,15 +1,15 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-oauth_manager.py — P2 OAuth 2.0: Google/GitHub/Discord entegrasyonu.
+oauth_manager.py â€” P2 OAuth 2.0: Google/GitHub/Discord entegrasyonu.
 
 Mevcut OAuth sistemleri (reymen/guvenlik/oauth2.py, oauth_sistemi.py, oauth_servis.py)
-üzerine kurulmuştur. ABC provider pattern ile Google, GitHub, Discord destegi.
+Ã¼zerine kurulmuÅŸtur. ABC provider pattern ile Google, GitHub, Discord destegi.
 
-Token yönetimi: refresh, expire kontrol, file cache.
+Token yÃ¶netimi: refresh, expire kontrol, file cache.
 
 Motor Tools:
-    OAUTH_GIRIS(provider)  → Auth URL döndür
-    OAUTH_DURUM(provider)  → Token durumunu göster
+    OAUTH_GIRIS(provider)  â†’ Auth URL dÃ¶ndÃ¼r
+    OAUTH_DURUM(provider)  â†’ Token durumunu gÃ¶ster
 """
 
 from __future__ import annotations
@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 PROJE_KOK = Path(__file__).resolve().parent.parent.parent
 
-# ── Mevcut OAuth modüllerini dene ──────────────────────────────────────────────
+# â”€â”€ Mevcut OAuth modÃ¼llerini dene â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 try:
     from reymen.guvenlik.oauth2 import (  # type: ignore[import-untyped]
         OAuth2Manager as _OAuth2Manager,
@@ -70,9 +70,9 @@ except ImportError:
     _varsayilan_oauth_sistemi = None  # type: ignore
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Veri Yapilari
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 @dataclass
@@ -119,9 +119,9 @@ class OAuthError(Exception):
         super().__init__(message)
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  OAuthProvider ABC
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class OAuthProvider(ABC):
@@ -161,9 +161,9 @@ class OAuthProvider(ABC):
         return True
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  GoogleOAuthProvider
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class GoogleOAuthProvider(OAuthProvider):
@@ -297,9 +297,9 @@ class GoogleOAuthProvider(OAuthProvider):
             )
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  GitHubOAuthProvider
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class GitHubOAuthProvider(OAuthProvider):
@@ -372,7 +372,7 @@ class GitHubOAuthProvider(OAuthProvider):
         token = OAuthToken(
             access_token=raw.get("access_token", ""),
             token_type=raw.get("token_type", "Bearer"),
-            # GitHub token'ları süresiz
+            # GitHub token'larÄ± sÃ¼resiz
             expires_in=raw.get("expires_in", 31536000),  # ~1 yil
             scope=raw.get("scope", " ".join(self.scopes)),
             provider="github",
@@ -391,7 +391,7 @@ class GitHubOAuthProvider(OAuthProvider):
     def token_refresh(self, refresh_token: str) -> OAuthToken:
         # GitHub'da refresh_token yok
         raise OAuthError(
-            "GitHub token'lari süreklidir, refresh gerekmez.", provider="github"
+            "GitHub token'lari sÃ¼reklidir, refresh gerekmez.", provider="github"
         )
 
     def get_user_info(self, access_token: str) -> Dict[str, Any]:
@@ -416,9 +416,9 @@ class GitHubOAuthProvider(OAuthProvider):
             )
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  DiscordOAuthProvider
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class DiscordOAuthProvider(OAuthProvider):
@@ -576,9 +576,9 @@ class DiscordOAuthProvider(OAuthProvider):
             )
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Token Depolama (JSON file cache)
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class OAuthTokenDeposu:
@@ -652,9 +652,9 @@ class OAuthTokenDeposu:
         return provider in self._load()
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  OAuthManager Ana Sinif
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class OAuthManager:
@@ -730,7 +730,7 @@ class OAuthManager:
         except Exception as e:
             logger.debug("[OAuthManager] Mevcut OAuth2 entegrasyon hatasi: %s", e)
 
-    # ── Ana API ────────────────────────────────────────────────────────────
+    # â”€â”€ Ana API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def login(self, provider: str, state: str = "") -> str:
         """Provider'a giris yapmak icin auth URL'si dondur.
@@ -911,9 +911,9 @@ class OAuthManager:
         return list(self._providerlar.keys())
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Singleton
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 _oauth_manager_instance: Optional[OAuthManager] = None
 
@@ -926,9 +926,9 @@ def oauth_manager_al() -> OAuthManager:
     return _oauth_manager_instance
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Motor Tools
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def motor_kaydet(motor) -> None:
@@ -943,14 +943,14 @@ def motor_kaydet(motor) -> None:
     motor._plugin_arac_kaydet(
         "OAUTH_GIRIS",
         _oauth_giris_tool,
-        "OAUTH_GIRIS(provider) — OAuth provider'a giris URL'si al. "
+        "OAUTH_GIRIS(provider) â€” OAuth provider'a giris URL'si al. "
         "Parametre: provider=google|github|discord. "
         "Ornek: OAUTH_GIRIS(provider='google')",
     )
     motor._plugin_arac_kaydet(
         "OAUTH_DURUM",
         _oauth_durum_tool,
-        "OAUTH_DURUM(provider) — OAuth token durumunu goster. "
+        "OAUTH_DURUM(provider) â€” OAuth token durumunu goster. "
         "Parametre: provider=google|github|discord. "
         "Ornek: OAUTH_DURUM(provider='github')",
     )
@@ -958,7 +958,7 @@ def motor_kaydet(motor) -> None:
 
 
 def _oauth_giris_tool(**kw) -> str:
-    """OAUTH_GIRIS aracı."""
+    """OAUTH_GIRIS aracÄ±."""
     args = kw.get("args", [])
     provider = args[0] if args else kw.get("provider", "")
 
@@ -981,7 +981,7 @@ def _oauth_giris_tool(**kw) -> str:
 
 
 def _oauth_durum_tool(**kw) -> str:
-    """OAUTH_DURUM aracı."""
+    """OAUTH_DURUM aracÄ±."""
     args = kw.get("args", [])
     provider = args[0] if args else kw.get("provider", "")
 
@@ -992,7 +992,7 @@ def _oauth_durum_tool(**kw) -> str:
         if durum.get("var_mi"):
             return (
                 f"[OAUTH] {provider.upper()} Token Durumu:\n"
-                f"  Gecerli: {'✅' if durum['gecerli_mi'] else '❌'}\n"
+                f"  Gecerli: {'âœ…' if durum['gecerli_mi'] else 'âŒ'}\n"
                 f"  Email: {durum.get('email', '-')}\n"
                 f"  Kullanici: {durum.get('display_name', '-')}\n"
                 f"  Bitis: {durum.get('expires_at', '-')}\n"
@@ -1006,16 +1006,16 @@ def _oauth_durum_tool(**kw) -> str:
     for p in manager.provider_listesi():
         durum = manager.durum(p)
         ikon = (
-            "✅" if durum.get("gecerli_mi") else ("⚠️" if durum.get("var_mi") else "❌")
+            "âœ…" if durum.get("gecerli_mi") else ("âš ï¸" if durum.get("var_mi") else "âŒ")
         )
         email = durum.get("email", "-")
         lines.append(f"  {ikon} {p.upper():8s} | {email}")
     return "\n".join(lines)
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Test
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
@@ -1028,11 +1028,11 @@ if __name__ == "__main__":
     for p in manager.provider_listesi():
         prov = manager.provider(p)
         hazir = prov.hazir if prov else False
-        print(f"  {p.upper():10s} | Hazir: {'✅' if hazir else '❌'}")
+        print(f"  {p.upper():10s} | Hazir: {'âœ…' if hazir else 'âŒ'}")
 
     print(f"\nToken durumu:")
     for p in manager.provider_listesi():
         durum = manager.durum(p)
         print(f"  {p.upper():10s} | {durum}")
 
-    print("\n✓ Test tamamlandi")
+    print("\nâœ“ Test tamamlandi")

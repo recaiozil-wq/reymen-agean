@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-gateway_temel.py — Gateway ABC temel sinifi.
+gateway_temel.py â€” Gateway ABC temel sinifi.
 
-Tüm platform gateway'leri bu siniftan turer.
+TÃ¼m platform gateway'leri bu siniftan turer.
 Zorunlu metodlar: send, receive, connect, disconnect, health_check.
 """
 
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 class GatewayBase(ABC):
     """
-    Tüm platform gateway'leri için soyut temel sinif.
+    TÃ¼m platform gateway'leri iÃ§in soyut temel sinif.
 
     Her platform (Telegram, CLI, Web, Discord vb.) bu sinifi
     extend ederek kendi iletisim mantigini uygular.
@@ -31,7 +31,7 @@ class GatewayBase(ABC):
         self._baslangic_zamani: float = 0.0
         self._mesaj_sayaci: int = 0
 
-    # ── Zorunlu Metodlar ─────────────────────────────────────────────
+    # â”€â”€ Zorunlu Metodlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @abstractmethod
     async def send(
@@ -63,7 +63,7 @@ class GatewayBase(ABC):
         """Platform baglanti sagligini kontrol eder."""
         ...
 
-    # ── Ortak Metodlar ──────────────────────────────────────────────
+    # â”€â”€ Ortak Metodlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @property
     def platform(self) -> str:
@@ -92,7 +92,7 @@ class GatewayBase(ABC):
         return self._mesaj_sayaci
 
     async def start(self) -> bool:
-        """Gateway'i baslat — baglan ve calistir."""
+        """Gateway'i baslat â€” baglan ve calistir."""
         try:
             sonuc = await self.connect()
             if sonuc:
@@ -106,7 +106,7 @@ class GatewayBase(ABC):
             return False
 
     async def stop(self) -> bool:
-        """Gateway'i durdur — baglantiyi kes."""
+        """Gateway'i durdur â€” baglantiyi kes."""
         try:
             sonuc = await self.disconnect()
             self._calisiyor = False
@@ -132,14 +132,14 @@ class GatewayBase(ABC):
         return f"<{self.__class__.__name__}[{self._platform}] bagli={self._bagli}>"
 
 
-# ── Motor Kayit ─────────────────────────────────────────────────────
+# â”€â”€ Motor Kayit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def motor_kaydet(motor) -> None:
-    """Motor'a gateway araçlarını kaydeder."""
-    # GatewayBase — referans olarak kaydet
+    """Motor'a gateway araÃ§larÄ±nÄ± kaydeder."""
+    # GatewayBase â€” referans olarak kaydet
     motor._plugin_arac_kaydet(
         "GATEWAY_TEMEL_SINIF",
-        lambda: "GatewayBase (ABC) — tum gateway'lerin temel sinifi",
+        lambda: "GatewayBase (ABC) â€” tum gateway'lerin temel sinifi",
         "GatewayBase sinif bilgisi",
     )

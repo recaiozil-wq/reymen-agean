@@ -1,12 +1,12 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-dinamik_arac_uretici.py — FAZ 6: Dinamik Arac Uretimi (Code-As-A-Tool).
+dinamik_arac_uretici.py â€” FAZ 6: Dinamik Arac Uretimi (Code-As-A-Tool).
 
 ReYMeN mevcut araclarla cozemedigi bir problemle karsilastiginda:
   1. LLM'den problemi cozen bir Python fonksiyonu uretmesini ister.
   2. guvenli_sandbox.py ile test eder.
   3. Basarili olursa araclar_dinamik/ klasorune kaydeder.
-  4. motor.py ToolRegistry'e aninda yükler.
+  4. motor.py ToolRegistry'e aninda yÃ¼kler.
   5. closed_learning_loop'a beceri olarak kristallestirir.
 
 Motor entegrasyonu:
@@ -51,10 +51,10 @@ def _fonksiyon_adi_bul(kod: str) -> Optional[str]:
 
 
 def _arac_kodu_olustur(fonk_adi: str, problem: str) -> str:
-    """Kaydedilecek araç Python dosyasının içerigini olustur."""
+    """Kaydedilecek araÃ§ Python dosyasÄ±nÄ±n iÃ§erigini olustur."""
     return f'''# -*- coding: utf-8 -*-
 """
-araclar_dinamik — Otomatik uretilen arac.
+araclar_dinamik â€” Otomatik uretilen arac.
 Problem: {problem[:120]}
 """
 
@@ -62,11 +62,11 @@ Problem: {problem[:120]}
 
 
 def motor_kaydet(motor):
-    """motor.py ToolRegistry kaydı."""
+    """motor.py ToolRegistry kaydÄ±."""
     motor._plugin_arac_kaydet(
         "{fonk_adi.upper()}",
         lambda *args: str({fonk_adi}(*args) if args else {fonk_adi}()),
-        "Dinamik uretilmis arac — {problem[:60]}",
+        "Dinamik uretilmis arac â€” {problem[:60]}",
     )
 '''
 
@@ -101,12 +101,12 @@ def _dinamik_araci_motor_yukle(dosya_yolu: str, motor) -> bool:
 def _llm_arac_uret(problem: str, provider) -> str:
     """LLM'den problem icin Python fonksiyonu uret."""
     sistem = (
-        "Sen bir Python uzmanisın. "
-        "Kullanicının verdiği problemi cozen SADECE bir Python fonksiyonu yaz. "
-        "Yanıtını mutlaka ```python ... ``` blogu icerisinde ver. "
+        "Sen bir Python uzmanisÄ±n. "
+        "KullanicÄ±nÄ±n verdiÄŸi problemi cozen SADECE bir Python fonksiyonu yaz. "
+        "YanÄ±tÄ±nÄ± mutlaka ```python ... ``` blogu icerisinde ver. "
         "Fonksiyon parametresiz veya tek string parametreli olabilir. "
-        "os, subprocess, socket, requests gibi tehlikeli modülleri KULLANMA. "
-        "Yalnizca standart kütüphane (math, re, json, datetime, pathlib, csv vb.) kullan."
+        "os, subprocess, socket, requests gibi tehlikeli modÃ¼lleri KULLANMA. "
+        "Yalnizca standart kÃ¼tÃ¼phane (math, re, json, datetime, pathlib, csv vb.) kullan."
     )
     mesajlar = [
         {"role": "user", "content": f"Problem: {problem}\n\nPython fonksiyonu yaz:"}
@@ -117,7 +117,7 @@ def _llm_arac_uret(problem: str, provider) -> str:
         return f"[LLM Hatasi]: {e}"
 
 
-# ── Ana API ───────────────────────────────────────────────────────────────────
+# â”€â”€ Ana API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def arac_uret_ve_calistir(
@@ -130,7 +130,7 @@ def arac_uret_ve_calistir(
     """Problemi cozen dinamik bir arac uret, test et ve kaydet.
 
     Args:
-        problem:     Ne yapması gerektiğinin aciklamasi.
+        problem:     Ne yapmasÄ± gerektiÄŸinin aciklamasi.
         motor:       motor.py Motor ornegi (kayit icin).
         provider:    beyin.py Beyin ornegi (LLM uretimi icin).
         test_girdisi: Araci test etmek icin ornek girdi.
@@ -169,12 +169,12 @@ def arac_uret_ve_calistir(
         sonuc = guvenli_calistir(test_kodu, timeout=15)
 
         if "[Hata]" in sonuc or "[Guvenlik Reddi]" in sonuc:
-            print(f"[DinAmikArac] Deneme {deneme}: Test basarisiz — {sonuc[:100]}")
-            # LLM'e hatayı geri bildir (bir sonraki denemede)
+            print(f"[DinAmikArac] Deneme {deneme}: Test basarisiz â€” {sonuc[:100]}")
+            # LLM'e hatayÄ± geri bildir (bir sonraki denemede)
             problem = f"{problem}\n[Onceki hata]: {sonuc[:150]}"
             continue
 
-        # Basarili — kaydet
+        # Basarili â€” kaydet
         dosya_yolu = _kaydet_arac_dosyasi(fonk_adi, kod, problem)
         print(f"[DinAmikArac] Kaydedildi: {dosya_yolu}")
 
@@ -228,7 +228,7 @@ def mevcut_dinamik_araclari_yukle(motor) -> int:
     return yuklenen
 
 
-# ── Test ─────────────────────────────────────────────────────────────────────
+# â”€â”€ Test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
     import tempfile

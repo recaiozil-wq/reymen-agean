@@ -1,4 +1,4 @@
-"""Tum 7 modulun fonksiyonel testi - kodun gercekten calistigini kanitlar."""
+﻿"""Tum 7 modulun fonksiyonel testi - kodun gercekten calistigini kanitlar."""
 
 import sys
 import os

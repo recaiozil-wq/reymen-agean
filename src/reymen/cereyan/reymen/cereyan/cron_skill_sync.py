@@ -1,12 +1,12 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
-cron_skill_sync.py — Skills → OnceHafiza DB senkronizasyonu.
-Her 6 saatte bir çalışır.
+cron_skill_sync.py â€” Skills â†’ OnceHafiza DB senkronizasyonu.
+Her 6 saatte bir Ã§alÄ±ÅŸÄ±r.
 
-- skills/ altındaki tüm .md dosyalarını tara
-- skills_index.db (FTS5) + beceriler_meta tablosuyla karşılaştır
-- Eksikleri ekle, değişenleri güncelle
-- Rapor: kaç yeni, kaç güncellendi
+- skills/ altÄ±ndaki tÃ¼m .md dosyalarÄ±nÄ± tara
+- skills_index.db (FTS5) + beceriler_meta tablosuyla karÅŸÄ±laÅŸtÄ±r
+- Eksikleri ekle, deÄŸiÅŸenleri gÃ¼ncelle
+- Rapor: kaÃ§ yeni, kaÃ§ gÃ¼ncellendi
 """
 
 import hashlib
@@ -98,13 +98,13 @@ def log_kaydet(yeni: int, guncellenen: int, hata: int, detay: str):
     DECISIONS_LOG.parent.mkdir(parents=True, exist_ok=True)
     ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     entry = f"""
-## Sync — {ts}
+## Sync â€” {ts}
 
-| Metrik | Değer |
+| Metrik | DeÄŸer |
 |--------|-------|
-| 🆕 Yeni | {yeni} |
-| 🔄 Güncellenen | {guncellenen} |
-| ❌ Hata | {hata} |
+| ğŸ†• Yeni | {yeni} |
+| ğŸ”„ GÃ¼ncellenen | {guncellenen} |
+| âŒ Hata | {hata} |
 
 {detay}
 """
@@ -121,20 +121,20 @@ def log_kaydet(yeni: int, guncellenen: int, hata: int, detay: str):
 
 def main() -> dict:
     basla = time.time()
-    logger.info("=== Skill Sync Başladı ===")
+    logger.info("=== Skill Sync BaÅŸladÄ± ===")
     logger.info("Skills: %s | DB: %s", SKILLS_DIR, DB_PATH)
 
     dosyalar = tum_skills_dosyalari()
-    logger.info("Toplam .md dosyası: %d", len(dosyalar))
+    logger.info("Toplam .md dosyasÄ±: %d", len(dosyalar))
 
     if not dosyalar:
-        logger.warning("Hiç .md dosyası bulunamadı!")
+        logger.warning("HiÃ§ .md dosyasÄ± bulunamadÄ±!")
         return {"yeni": 0, "guncellenen": 0, "hata": 0, "toplam": 0}
 
     con = db_baglan()
     meta = existing_meta(con)
     fts5_ads = existing_fts5_ads(con)
-    logger.info("Meta kayıt: %d | FTS5 kayıt: %d", len(meta), len(fts5_ads))
+    logger.info("Meta kayÄ±t: %d | FTS5 kayÄ±t: %d", len(meta), len(fts5_ads))
 
     yeni_say = 0
     guncel_say = 0
@@ -147,7 +147,7 @@ def main() -> dict:
             if dosya["dosya_hash"] == mevcut_hash:
                 continue
 
-            # FTS5 — DELETE + INSERT (FTS5 doesn't support UPDATE directly)
+            # FTS5 â€” DELETE + INSERT (FTS5 doesn't support UPDATE directly)
             if ad in fts5_ads:
                 con.execute("DELETE FROM beceriler WHERE ad = ?", (ad,))
             con.execute(
@@ -155,7 +155,7 @@ def main() -> dict:
                 (ad, dosya["aciklama"], dosya["icerik"], dosya["kaynak"]),
             )
 
-            # Meta güncelle
+            # Meta gÃ¼ncelle
             con.execute(
                 "INSERT OR REPLACE INTO beceriler_meta (ad, dosya_hash, guncelleme) VALUES (?, ?, datetime('now'))",
                 (ad, dosya["dosya_hash"]),
@@ -168,7 +168,7 @@ def main() -> dict:
 
         except Exception as e:
             hata_say += 1
-            logger.error("❌ Hata [%s]: %s", ad, e)
+            logger.error("âŒ Hata [%s]: %s", ad, e)
 
     con.commit()
     con.close()
@@ -176,18 +176,18 @@ def main() -> dict:
     sure = time.time() - basla
 
     ozet = (
-        f"- **İşlem süresi:** {sure:.1f}s\n"
+        f"- **Ä°ÅŸlem sÃ¼resi:** {sure:.1f}s\n"
         f"- **Toplam dosya:** {len(dosyalar)}\n"
-        f"- **Meta kayıt (öncesi):** {len(meta)}\n"
-        f"- **FTS5 kayıt (öncesi):** {len(fts5_ads)}\n"
+        f"- **Meta kayÄ±t (Ã¶ncesi):** {len(meta)}\n"
+        f"- **FTS5 kayÄ±t (Ã¶ncesi):** {len(fts5_ads)}\n"
         f"- **Yeni eklenen:** {yeni_say}\n"
-        f"- **Güncellenen:** {guncel_say}\n"
+        f"- **GÃ¼ncellenen:** {guncel_say}\n"
         f"- **Hata:** {hata_say}\n"
     )
     log_kaydet(yeni_say, guncel_say, hata_say, ozet)
 
     logger.info(
-        "=== Tamamlandı: +%d yeni, ~%d güncel, %d hata (%.1fs) ===",
+        "=== TamamlandÄ±: +%d yeni, ~%d gÃ¼ncel, %d hata (%.1fs) ===",
         yeni_say,
         guncel_say,
         hata_say,
@@ -206,6 +206,6 @@ def main() -> dict:
 if __name__ == "__main__":
     sonuc = main()
     print(
-        f"\n📊 RAPOR: {sonuc['yeni']} yeni + {sonuc['guncellenen']} güncellendi "
-        f"({sonuc['hata']} hata) — {sonuc['sure']}s"
+        f"\nğŸ“Š RAPOR: {sonuc['yeni']} yeni + {sonuc['guncellenen']} gÃ¼ncellendi "
+        f"({sonuc['hata']} hata) â€” {sonuc['sure']}s"
     )

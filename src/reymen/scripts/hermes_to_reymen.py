@@ -1,8 +1,8 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
-hermes_to_reymen.py — ReYMeN state.db → ReYMeN hafiza toplu import.
+hermes_to_reymen.py â€” ReYMeN state.db â†’ ReYMeN hafiza toplu import.
 
-124 session, 9078 mesaj → ReYMeN's hafiza.db + notes/sessions/ + skills/
+124 session, 9078 mesaj â†’ ReYMeN's hafiza.db + notes/sessions/ + skills/
 """
 
 import json
@@ -20,8 +20,8 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger(__name__)
 
-# ── Yollar ──────────────────────────────────────────────────────────────
-HERMES_DB = Path.home() / "AppData/Local/hermes/state.db"
+# â”€â”€ Yollar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+HERMES_DB = Path.home() / "AppData/Local/reymen/state.db"
 PROJE = Path(__file__).resolve().parent.parent.parent
 REYMEN_DB = PROJE / ".reymen_hafiza" / "hafiza.db"
 NOTES_DIR = PROJE / ".ReYMeN" / "notes" / "sessions"
@@ -31,7 +31,7 @@ SKILLS_DIR = PROJE / ".ReYMeN" / "skills"
 NOTES_DIR.mkdir(parents=True, exist_ok=True)
 MEMORIES_DIR.mkdir(parents=True, exist_ok=True)
 
-# ── ReYMeN hafiza modulu ────────────────────────────────────────────────
+# â”€â”€ ReYMeN hafiza modulu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 sys.path.insert(0, str(PROJE))
 try:
     from hafiza_genislet import hafiza as _hafiza
@@ -59,7 +59,7 @@ def _guven_skoru(basari: int, hata: int) -> float:
 def kategori_bul(hedef: str, title: str = "") -> str:
     """Metinden kategori tespiti."""
     h = (hedef + " " + title).lower()
-    if any(k in h for k in ["nmap", "kali", "metasploit", "port", "sızma"]):
+    if any(k in h for k in ["nmap", "kali", "metasploit", "port", "sÄ±zma"]):
         return "kali"
     if any(k in h for k in ["dron", "drone", "px4", "uav"]):
         return "dron"
@@ -75,27 +75,27 @@ def kategori_bul(hedef: str, title: str = "") -> str:
 
 
 def session_notu_al(session, messages) -> str:
-    """Session'dan kısa bir kazanım notu çıkar."""
+    """Session'dan kÄ±sa bir kazanÄ±m notu Ã§Ä±kar."""
     title = session.get("title") or ""
     source = session.get("source") or ""
     msg_count = len(messages)
     cost = session.get("estimated_cost_usd") or 0
 
-    # Kullanıcı mesajlarını özetle
+    # KullanÄ±cÄ± mesajlarÄ±nÄ± Ã¶zetle
     user_msgs = [
         m["content"][:200] for m in messages if m["role"] == "user" and m.get("content")
     ]
 
     satirlar = [
-        f"# Session Kazanımı",
-        f"**Başlık:** {title}",
+        f"# Session KazanÄ±mÄ±",
+        f"**BaÅŸlÄ±k:** {title}",
         f"**Kaynak:** {source}",
         f"**Mesaj:** {msg_count} adet",
         f"**Maliyet:** ${cost:.4f}",
     ]
 
     if user_msgs:
-        satirlar.append("\n## Kullanıcı Soruları")
+        satirlar.append("\n## KullanÄ±cÄ± SorularÄ±")
         for i, m in enumerate(user_msgs[:5], 1):
             satirlar.append(f"{i}. {m[:100]}")
 
@@ -103,9 +103,9 @@ def session_notu_al(session, messages) -> str:
 
 
 def ilerleme_goster(current, total, width=40):
-    """İlerleme çubuğu."""
+    """Ä°lerleme Ã§ubuÄŸu."""
     done = int(width * current / total)
-    bar = "█" * done + "░" * (width - done)
+    bar = "â–ˆ" * done + "â–‘" * (width - done)
     sys.stdout.write(f"\r  [{bar}] {current}/{total} ({current*100//total}%)")
     sys.stdout.flush()
 
@@ -119,7 +119,7 @@ def main():
         log.error("ReYMeN DB bulunamadi: %s", HERMES_DB)
         return
 
-    # ── 1. ReYMeN DB'den session'lari oku ────────────────────────────
+    # â”€â”€ 1. ReYMeN DB'den session'lari oku â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     log.info(
         "ReYMeN DB okunuyor: %s (%.0f MB)", HERMES_DB, HERMES_DB.stat().st_size / 1e6
     )
@@ -132,8 +132,8 @@ def main():
     sessions = [dict(row) for row in c.fetchall()]
     log.info("Toplam %d session bulundu", len(sessions))
 
-    # ── 2. Zaten işlenmiş session ID'lerini çıkar ────────────────────
-    _hafiza.initialize("hermes_import", baslik="ReYMeN→ReYMeN toplu import")
+    # â”€â”€ 2. Zaten iÅŸlenmiÅŸ session ID'lerini Ã§Ä±kar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    _hafiza.initialize("hermes_import", baslik="ReYMeNâ†’ReYMeN toplu import")
     islenmis = set()
 
     # ReYMeN DB'de kayitli session_id'leri tara
@@ -150,7 +150,7 @@ def main():
 
     log.info("Daha once islenmis: %d session", len(islenmis))
 
-    # ── 3. Her session'u isle ────────────────────────────────────────
+    # â”€â”€ 3. Her session'u isle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     islenen = 0
     atlanan = 0
     baslangic = time.time()
@@ -175,11 +175,11 @@ def main():
             atlanan += 1
             continue
 
-        title = session.get("title") or "İsimsiz Session"
+        title = session.get("title") or "Ä°simsiz Session"
         source = session.get("source") or "ReYMeN"
         msg_count = len(messages)
 
-        # ── Notes dosyasi yaz ────────────────────────────────────────
+        # â”€â”€ Notes dosyasi yaz â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         dosya_adi = f"session_import_{idx:04d}_{session_id[:8]}.md"
         dosya_yolu = NOTES_DIR / dosya_adi
 
@@ -213,10 +213,10 @@ def main():
 
         dosya_icerik = f"""# Session: hermes_import_{idx:04d}_{session_id[:8]}
 
-**Başlık:** {title}
+**BaÅŸlÄ±k:** {title}
 **Kategori:** {kategori}
 **Kaynak:** {source}
-**Mesaj Sayısı:** {msg_count}
+**Mesaj SayÄ±sÄ±:** {msg_count}
 **Tarih:** {datetime.fromtimestamp(session.get("started_at", 0)).strftime("%Y-%m-%d %H:%M") if session.get("started_at") else "?"}
 
 ---
@@ -225,12 +225,12 @@ def main():
 
 ---
 
-## Konuşma
+## KonuÅŸma
 {konusma}
 """
         dosya_yolu.write_text(dosya_icerik, encoding="utf-8")
 
-        # ── ReYMeN hafizasina kaydet ─────────────────────────────────
+        # â”€â”€ ReYMeN hafizasina kaydet â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         for i, m in enumerate(messages):
             role = m["role"]
             content = (m.get("content") or "").strip()
@@ -273,7 +273,7 @@ def main():
                     },
                 )
 
-        # ── Beceri koleksiyonuna ekle (ilk kullanici hedefi) ──────────
+        # â”€â”€ Beceri koleksiyonuna ekle (ilk kullanici hedefi) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         if user_hedefleri:
             _hafiza.kaydet(
                 icerik=f"**{title}**: {user_hedefleri[0][:300]}",
@@ -297,12 +297,12 @@ def main():
         islenen += 1
         ilerleme_goster(idx + 1, len(sessions))
 
-    # ── 4. Session bitir ──────────────────────────────────────────────
+    # â”€â”€ 4. Session bitir â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     _hafiza.session_bitir(
-        ozet=f"ReYMeN→ReYMeN import: {islenen} yeni + {atlanan} atlanan session"
+        ozet=f"ReYMeNâ†’ReYMeN import: {islenen} yeni + {atlanan} atlanan session"
     )
 
-    # ── 5. Istatistik ────────────────────────────────────────────────
+    # â”€â”€ 5. Istatistik â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     sure = time.time() - baslangic
     print()
     log.info("=" * 60)

@@ -1,12 +1,12 @@
-"""
+﻿"""
 Gateway runtime status helpers.
 
 Provides PID-file based detection of whether the gateway daemon is running,
 used by send_message's check_fn to gate availability in the CLI.
 
-The PID file lives at ``{HERMES_HOME}/gateway.pid``.  HERMES_HOME defaults to
-``~/.hermes`` but can be overridden via the environment variable.  This means
-separate HERMES_HOME directories naturally get separate PID files — a property
+The PID file lives at ``{REYMEN_HOME}/gateway.pid``.  REYMEN_HOME defaults to
+``.reymen/`` but can be overridden via the environment variable.  This means
+separate REYMEN_HOME directories naturally get separate PID files â€” a property
 that will be useful when we add named profiles (multiple agents running
 concurrently under distinct configurations).
 """
@@ -20,9 +20,9 @@ import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-from src.reymen.cron.hermes_stubs import get_hermes_home
+from reymen.sistem.reymen_stubs import get_reymen_home
 from typing import Any, Optional
-from src.reymen.cron.hermes_stubs import atomic_json_write
+from reymen.sistem.reymen_stubs import atomic_json_write
 import logging
 
 logger = logging.getLogger(__name__)
@@ -32,7 +32,7 @@ if sys.platform == "win32":
 else:
     import fcntl
 
-_GATEWAY_KIND = "hermes-gateway"
+_GATEWAY_KIND = "reymen-gateway"
 _RUNTIME_STATUS_FILE = "gateway_state.json"
 _LOCKS_DIRNAME = "gateway-locks"
 _IS_WINDOWS = sys.platform == "win32"
@@ -46,8 +46,8 @@ _WINDOWS_LOCK_OFFSET = 1024 * 1024
 
 
 def _get_pid_path() -> Path:
-    """Return the path to the gateway PID file, respecting HERMES_HOME."""
-    home = get_hermes_home()
+    """Return the path to the gateway PID file, respecting REYMEN_HOME."""
+    home = get_reymen_home()
     return home / "gateway.pid"
 
 
@@ -55,7 +55,7 @@ def _get_gateway_lock_path(pid_path: Optional[Path] = None) -> Path:
     """Return the path to the runtime gateway lock file."""
     if pid_path is not None:
         return pid_path.with_name(_GATEWAY_LOCK_FILENAME)
-    home = get_hermes_home()
+    home = get_reymen_home()
     return home / _GATEWAY_LOCK_FILENAME
 
 
@@ -66,11 +66,11 @@ def _get_runtime_status_path() -> Path:
 
 def _get_lock_dir() -> Path:
     """Return the machine-local directory for token-scoped gateway locks."""
-    override = os.getenv("HERMES_GATEWAY_LOCK_DIR")
+    override = os.getenv("REYMEN_GATEWAY_LOCK_DIR", os.getenv("HERMES_GATEWAY_LOCK_DIR"))
     if override:
         return Path(override)
     state_home = Path(os.getenv("XDG_STATE_HOME", Path.home() / ".local" / "state"))
-    return state_home / "hermes" / _LOCKS_DIRNAME
+    return state_home / "reymen" / _LOCKS_DIRNAME
 
 
 def _utc_now_iso() -> str:
@@ -186,8 +186,8 @@ def looks_like_gateway_command_line(command: str | None) -> bool:
     word "gateway".
 
     Tokenizes quote-aware (``shlex``) so quoted Windows paths with spaces
-    (``"C:\\Program Files\\...\\hermes-gateway.exe"``) survive, and strips
-    ``--profile``/``-p`` selectors from anywhere in argv -- Hermes's
+    (``"C:\\Program Files\\...\\reymen-gateway.exe"``) survive, and strips
+    ``--profile``/``-p`` selectors from anywhere in argv -- ReYMeN's
     ``_apply_profile_override`` removes them before argparse, so the profile
     flag (and a profile literally named ``gateway``) can legally appear on
     either side of the ``gateway`` subcommand.
@@ -209,14 +209,14 @@ def looks_like_gateway_command_line(command: str | None) -> bool:
         if token == "gateway/run.py" or token.endswith("/gateway/run.py"):
             return True
         basename = token.rsplit("/", 1)[-1]
-        if basename in ("hermes-gateway", "hermes-gateway.exe"):
+        if basename in ("reymen-gateway", "reymen-gateway.exe"):
             return True
 
     joined = " ".join(tokens)
     has_gateway_entry = (
         "hermes_cli.main" in joined
         or "hermes_cli/main.py" in joined
-        or any(t.rsplit("/", 1)[-1] in ("hermes", "hermes.exe") for t in tokens)
+        or any(t.rsplit("/", 1)[-1] in ("reymen", "reymen.exe") for t in tokens)
     )
     if not has_gateway_entry:
         return False
@@ -241,13 +241,13 @@ def looks_like_gateway_command_line(command: str | None) -> bool:
         if token != "gateway":
             continue
         if i + 1 >= len(filtered):
-            return True  # bare `hermes gateway` defaults to `run`
+            return True  # bare `reymen gateway` defaults to `run`
         return filtered[i + 1] == "run"
     return False
 
 
 def _looks_like_gateway_process(pid: int) -> bool:
-    """Return True when the live PID still looks like the Hermes gateway."""
+    """Return True when the live PID still looks like the ReYMeN gateway."""
     cmdline = _read_process_cmdline(pid)
     if not cmdline:
         return False
@@ -417,19 +417,19 @@ def _pid_exists(pid: int) -> bool:
     is on POSIX. CPython's Windows implementation
     (``Modules/posixmodule.c::os_kill_impl``) treats ``sig=0`` as
     ``CTRL_C_EVENT`` because the two values collide at the C level, and
-    routes it through ``GenerateConsoleCtrlEvent(0, pid)`` — which sends
+    routes it through ``GenerateConsoleCtrlEvent(0, pid)`` â€” which sends
     a Ctrl+C to the entire console process group containing the target
     PID, not just the PID itself. Any caller that wanted to "check if
     this PID is alive" via ``os.kill(pid, 0)`` on Windows was silently
     killing that process (and often unrelated processes in the same
     console group). Long-standing Python quirk; see bpo-14484.
 
-    Implementation: prefer :mod:`psutil` (hard dependency — the canonical
-    cross-platform answer, maintained by Giampaolo Rodolà, uses
+    Implementation: prefer :mod:`psutil` (hard dependency â€” the canonical
+    cross-platform answer, maintained by Giampaolo RodolÃ , uses
     ``OpenProcess + GetExitCodeProcess`` on Windows internally). Fall back
     to a hand-rolled ctypes ``OpenProcess`` / ``WaitForSingleObject`` pair
     on Windows + ``os.kill(pid, 0)`` on POSIX if psutil is somehow
-    unavailable — e.g. stripped-down install or import error during the
+    unavailable â€” e.g. stripped-down install or import error during the
     scaffold phase before ``psutil`` is pip-installed.
     """
     try:
@@ -444,7 +444,7 @@ def _pid_exists(pid: int) -> bool:
             import ctypes
 
             kernel32 = ctypes.windll.kernel32  # type: ignore[attr-defined]
-            # Pin return types — default ctypes restype is c_int (signed),
+            # Pin return types â€” default ctypes restype is c_int (signed),
             # which mangles WAIT_* DWORD return codes into negative numbers.
             kernel32.OpenProcess.restype = ctypes.c_void_p
             kernel32.WaitForSingleObject.restype = ctypes.c_uint
@@ -477,12 +477,12 @@ def _pid_exists(pid: int) -> bool:
         try:
             os.kill(
                 int(pid), 0
-            )  # windows-footgun: ok — POSIX-only branch (the whole point of _pid_exists)
+            )  # windows-footgun: ok â€” POSIX-only branch (the whole point of _pid_exists)
             return True
         except ProcessLookupError:
             return False
         except PermissionError:
-            # Process exists but we can't signal it — still alive.
+            # Process exists but we can't signal it â€” still alive.
             return True
         except OSError:
             return False
@@ -622,7 +622,7 @@ def write_runtime_status(
         payload["active_agents"] = max(0, int(active_agents))
     if served_profiles is not _UNSET:
         # Profiles this gateway multiplexes (multi-profile mode). Absent/empty
-        # for a single-profile gateway. Lets `hermes status` show per-profile
+        # for a single-profile gateway. Lets `reymen status` show per-profile
         # coverage without a second probe.
         payload["served_profiles"] = list(served_profiles or [])
 
@@ -697,7 +697,7 @@ def remove_pid_file() -> None:
             except (KeyError, TypeError, ValueError):
                 file_pid = None
             if file_pid is not None and file_pid != os.getpid():
-                # PID file belongs to a different process — leave it alone.
+                # PID file belongs to a different process â€” leave it alone.
                 return
         path.unlink(missing_ok=True)
     except Exception as _e:
@@ -711,7 +711,7 @@ def acquire_scoped_lock(
     """Acquire a machine-local lock keyed by scope + identity.
 
     Used to prevent multiple local gateways from using the same external identity
-    at once (e.g. the same Telegram bot token across different HERMES_HOME dirs).
+    at once (e.g. the same Telegram bot token across different REYMEN_HOME dirs).
     """
     lock_path = _get_scope_lock_path(scope, identity)
     lock_path.parent.mkdir(parents=True, exist_ok=True)
@@ -725,7 +725,7 @@ def acquire_scoped_lock(
 
     existing = _read_json_file(lock_path)
     if existing is None and lock_path.exists():
-        # Lock file exists but is empty or contains invalid JSON — treat as
+        # Lock file exists but is empty or contains invalid JSON â€” treat as
         # stale.  This happens when a previous process was killed between
         # O_CREAT|O_EXCL and the subsequent json.dump() (e.g. DNS failure
         # during rapid Slack reconnect retries).
@@ -762,7 +762,7 @@ def acquire_scoped_lock(
                 # have no /proc, so both sides are None), fall back to
                 # checking the live process command line.  When cmdline is
                 # also unreadable (Windows has no ps), consult the lock
-                # record's own argv — the gateway writes it at startup and
+                # record's own argv â€” the gateway writes it at startup and
                 # it's the only identity signal on platforms without ps.
                 # Both oracles must indicate "not a gateway" to mark stale.
                 if (
@@ -791,7 +791,7 @@ def acquire_scoped_lock(
                     live_cmdline = _read_process_cmdline(existing_pid)
                     if live_cmdline is not None:
                         stale = True
-                # Check if process is stopped (Ctrl+Z / SIGTSTP) — stopped
+                # Check if process is stopped (Ctrl+Z / SIGTSTP) â€” stopped
                 # processes still appear alive to _pid_exists but are not
                 # actually running. Treat them as stale so --replace works.
                 if not stale:
@@ -900,15 +900,15 @@ def release_all_scoped_locks(
     return removed
 
 
-# ── --replace takeover marker ─────────────────────────────────────────
+# â”€â”€ --replace takeover marker â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 #
 # When a new gateway starts with ``--replace``, it SIGTERMs the existing
 # gateway so it can take over the bot token. PR #5646 made SIGTERM exit
 # the gateway with code 1 so ``Restart=on-failure`` can revive it after
-# unexpected kills — but that also means a --replace takeover target
+# unexpected kills â€” but that also means a --replace takeover target
 # exits 1, which tricks systemd into reviving it 30 seconds later,
 # starting a flap loop against the replacer when both services are
-# enabled in the user's systemd (e.g. ``hermes.service`` + ``hermes-
+# enabled in the user's systemd (e.g. ``reymen.service`` + ``reymen-
 # gateway.service``).
 #
 # The takeover marker breaks the loop: the replacer writes a short-lived
@@ -917,7 +917,7 @@ def release_all_scoped_locks(
 # this process, treats the SIGTERM as a planned takeover and exits 0.
 # The marker is unlinked after the target has consumed it, so a stale
 # marker left by a crashed replacer can grief at most one future
-# shutdown on the same PID — and only within _TAKEOVER_MARKER_TTL_S.
+# shutdown on the same PID â€” and only within _TAKEOVER_MARKER_TTL_S.
 
 _TAKEOVER_MARKER_FILENAME = ".gateway-takeover.json"
 _TAKEOVER_MARKER_TTL_S = 60  # Marker older than this is treated as stale
@@ -927,13 +927,13 @@ _PLANNED_STOP_MARKER_TTL_S = 60
 
 def _get_takeover_marker_path() -> Path:
     """Return the path to the --replace takeover marker file."""
-    home = get_hermes_home()
+    home = get_reymen_home()
     return home / _TAKEOVER_MARKER_FILENAME
 
 
 def _get_planned_stop_marker_path() -> Path:
     """Return the path to the intentional gateway stop marker file."""
-    home = get_hermes_home()
+    home = get_reymen_home()
     return home / _PLANNED_STOP_MARKER_FILENAME
 
 
@@ -981,10 +981,10 @@ def _consume_pid_marker_for_self(
     our_start_time = _get_process_start_time(our_pid)
     # Start-time is a PID-reuse guard. It is only meaningful when both
     # sides actually have it: ``_get_process_start_time`` returns None on
-    # platforms without ``/proc`` (macOS, native Windows — the very
+    # platforms without ``/proc`` (macOS, native Windows â€” the very
     # platform the planned-stop watcher exists for). Requiring a non-None
     # match there would make every consume return False, so a legitimate
-    # ``hermes gateway stop`` on Windows would be misclassified as an
+    # ``reymen gateway stop`` on Windows would be misclassified as an
     # unexpected ``UNKNOWN`` exit (exit 1) and revived by the service
     # manager. So: when both start_times are known they must match; when
     # either is unknown, fall back to PID equality alone (bounded by the
@@ -1097,7 +1097,7 @@ def planned_stop_marker_targets_self() -> bool:
     This is a **non-destructive** probe used by the watcher thread
     (``gateway/run.py:_run_planned_stop_watcher``) to decide whether to
     trigger shutdown. Unlike :func:`consume_planned_stop_marker_for_self`,
-    it never unlinks a marker that matches us — the shutdown handler does
+    it never unlinks a marker that matches us â€” the shutdown handler does
     the authoritative consume on its own thread.
 
     It *does* clean up markers that can never apply to this process:
@@ -1119,7 +1119,7 @@ def planned_stop_marker_targets_self() -> bool:
         target_start_time = record.get("target_start_time")
         written_at = record.get("written_at") or ""
     except (KeyError, TypeError, ValueError):
-        # Malformed marker can never match anyone — drop it.
+        # Malformed marker can never match anyone â€” drop it.
         try:
             path.unlink(missing_ok=True)
         except OSError as _e:
@@ -1128,7 +1128,7 @@ def planned_stop_marker_targets_self() -> bool:
         return False
 
     if _marker_is_stale(written_at, _PLANNED_STOP_MARKER_TTL_S):
-        # A marker this old is past its useful life regardless of target —
+        # A marker this old is past its useful life regardless of target â€”
         # clean it up so it cannot crash-loop a freshly booted gateway.
         try:
             path.unlink(missing_ok=True)
@@ -1143,7 +1143,7 @@ def planned_stop_marker_targets_self() -> bool:
 
     # Start-time is a PID-reuse guard. It is only meaningful when both
     # sides actually have it: ``_get_process_start_time`` returns None on
-    # platforms without ``/proc`` (macOS, native Windows — the very
+    # platforms without ``/proc`` (macOS, native Windows â€” the very
     # platform this watcher exists for). Requiring a non-None match there
     # would make the watcher never fire and re-break the #33778 Windows
     # session-resume path. So: when both start_times are known they must

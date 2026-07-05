@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 
 """Video Generation Engine - ReYMeN video uretme motoru.
 
@@ -28,7 +28,7 @@ VIDEO_CACHE = PROJE_KOKU / "video_cache"
 VIDEO_CACHE.mkdir(parents=True, exist_ok=True)
 
 
-# ── Engine Secimi ────────────────────────────────────────────────────────────
+# â”€â”€ Engine Secimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _fal_mevcut() -> bool:
@@ -52,7 +52,7 @@ def _hyperframes_mevcut() -> bool:
         return False
 
 
-# ── moviepy ile Slayt Gosterisi Videosu ──────────────────────────────────────
+# â”€â”€ moviepy ile Slayt Gosterisi Videosu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _moviepy_slayt(
@@ -155,7 +155,7 @@ def _moviepy_slayt(
         return f"[HATA] {type(e).__name__}: {e}"
 
 
-# ── FAL.ai ile AI Video Uretimi (fal_client) ────────────────────────────────
+# â”€â”€ FAL.ai ile AI Video Uretimi (fal_client) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _fal_video(
@@ -226,7 +226,7 @@ def _fal_video(
         return f"[HATA] {type(e).__name__}: {e}"
 
 
-# ── FAL.ai Vectara Video (requests ile dogrudan HTTP) ───────────────────────
+# â”€â”€ FAL.ai Vectara Video (requests ile dogrudan HTTP) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def video_olustur_fal(
@@ -265,7 +265,7 @@ def video_olustur_fal(
     )
 
     try:
-        # Sync POST — FAL ya dogrudan sonucu doner ya da status_url verir
+        # Sync POST â€” FAL ya dogrudan sonucu doner ya da status_url verir
         resp = requests.post(endpoint, headers=headers, json=payload, timeout=120)
         resp.raise_for_status()
         data: dict[str, Any] = resp.json()
@@ -281,7 +281,7 @@ def video_olustur_fal(
             logger.info("[VideoGen] FAL Vectara video uretildi: %s", video_url[:80])
             return _fal_video_indir(video_url)
 
-        # 2) Async — status_url ile polling
+        # 2) Async â€” status_url ile polling
         status_url = data.get("status_url", "") or data.get("links", {}).get(
             "status", ""
         )
@@ -369,7 +369,7 @@ def _fal_video_indir(video_url: str) -> str:
         return video_url
 
 
-# ── HyperFrames ile Video ────────────────────────────────────────────────────
+# â”€â”€ HyperFrames ile Video â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _hyperframes_video(html_kodu: str, cikti: str = "") -> str:
@@ -401,7 +401,7 @@ def _hyperframes_video(html_kodu: str, cikti: str = "") -> str:
         return f"[HATA] HyperFrames: {type(e).__name__}: {e}"
 
 
-# ── Ana API ──────────────────────────────────────────────────────────────────
+# â”€â”€ Ana API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def video_uret(
@@ -449,10 +449,10 @@ def video_durum() -> str:
     """Video gen sistem durumu."""
     satirlar = [
         "=== Video Generation Durumu ===",
-        f"moviepy (slayt): {'✅' if _moviepy_mevcut() else '❌'}",
-        f"FAL.ai (fal_client): {'✅' if _fal_mevcut() else '❌'}",
-        f"FAL.ai (vectara-video, requests): {'✅' if _fal_key_var() else '❌'}",
-        f"HyperFrames: {'✅' if _hyperframes_mevcut() else '❌'}",
+        f"moviepy (slayt): {'âœ…' if _moviepy_mevcut() else 'âŒ'}",
+        f"FAL.ai (fal_client): {'âœ…' if _fal_mevcut() else 'âŒ'}",
+        f"FAL.ai (vectara-video, requests): {'âœ…' if _fal_key_var() else 'âŒ'}",
+        f"HyperFrames: {'âœ…' if _hyperframes_mevcut() else 'âŒ'}",
         f"Video cache: {VIDEO_CACHE}",
     ]
     if VIDEO_CACHE.exists():
@@ -475,7 +475,7 @@ def _fal_key_var() -> bool:
     return bool(os.environ.get("FAL_KEY") or os.environ.get("FAL_API_KEY") or "")
 
 
-# ── Motor Kayit ──────────────────────────────────────────────────────────────
+# â”€â”€ Motor Kayit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def motor_kaydet(motor: Any) -> None:
@@ -492,13 +492,13 @@ def motor_kaydet(motor: Any) -> None:
         """VIDEO_OLUSTUR: Video uret.
 
         Parametreler:
-            prompt (str) — AI video promptu veya HyperFrames HTML kodu.
-            resimler (str) — Virgulle ayrilmis resim yollari (slayt icin).
-            ses_yolu (str) — Opsiyonel arka plan ses dosyasi.
-            sure (int) — Video suresi (saniye, varsayilan: 5).
-            model (str) — Video motoru: 'moviepy' (varsayilan), 'fal_video',
+            prompt (str) â€” AI video promptu veya HyperFrames HTML kodu.
+            resimler (str) â€” Virgulle ayrilmis resim yollari (slayt icin).
+            ses_yolu (str) â€” Opsiyonel arka plan ses dosyasi.
+            sure (int) â€” Video suresi (saniye, varsayilan: 5).
+            model (str) â€” Video motoru: 'moviepy' (varsayilan), 'fal_video',
                           'fal', 'hyperframes'.
-            aspect_ratio (str) — En-boy orani '16:9' (varsayilan), '9:16', '1:1'
+            aspect_ratio (str) â€” En-boy orani '16:9' (varsayilan), '9:16', '1:1'
                                  (sadece fal_video modunda).
 
         Doner: Video dosyasi yolu veya URL.
@@ -533,8 +533,8 @@ def motor_kaydet(motor: Any) -> None:
             test_img.unlink()
 
         if os.path.exists(sonuc) and not sonuc.startswith("[HATA]"):
-            return f"✅ Video test basarili: {sonuc}"
-        return f"❌ Video test basarisiz: {sonuc}"
+            return f"âœ… Video test basarili: {sonuc}"
+        return f"âŒ Video test basarisiz: {sonuc}"
 
     if hasattr(motor, "_plugin_arac_kaydet"):
         motor._plugin_arac_kaydet(

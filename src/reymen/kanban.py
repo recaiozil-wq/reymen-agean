@@ -1,13 +1,13 @@
-"""📊 Kanban Board + Worker — ReYMeN Kanban Worker seviyesinde.
+﻿"""ğŸ“Š Kanban Board + Worker â€” ReYMeN Kanban Worker seviyesinde.
 
-Görevleri kanban panosunda yönetir. Kartlar kolonlar arasında taşınabilir,
-önceliklendirilebilir, deadline takibi yapılabilir. Worker lifecycle
-(orient → work → heartbeat → block/complete) desteği sunar.
+GÃ¶revleri kanban panosunda yÃ¶netir. Kartlar kolonlar arasÄ±nda taÅŸÄ±nabilir,
+Ã¶nceliklendirilebilir, deadline takibi yapÄ±labilir. Worker lifecycle
+(orient â†’ work â†’ heartbeat â†’ block/complete) desteÄŸi sunar.
 
-Örnek::
+Ã–rnek::
 
     board = Board.load(\"board.json\")
-    card = board.add(Card(title=\"Özellik ekle\", priority=Priority.HIGH), \"backlog\")
+    card = board.add(Card(title=\"Ã–zellik ekle\", priority=Priority.HIGH), \"backlog\")
     board.move(card.id, \"ready\")
     board.claim(card.id, \"worker_1\")
     board.complete(card.id, summary=\"yapildi\", metadata={\"files\": [\"x.py\"]})
@@ -52,7 +52,7 @@ __all__ = [
 # Priority
 # ---------------------------------------------------------------------------
 class Priority(IntEnum):
-    """Kart öncelik seviyeleri (düşük sayı = yüksek öncelik)."""
+    """Kart Ã¶ncelik seviyeleri (dÃ¼ÅŸÃ¼k sayÄ± = yÃ¼ksek Ã¶ncelik)."""
 
     CRITICAL = 0
     HIGH = 1
@@ -78,27 +78,27 @@ class Priority(IntEnum):
         }
         if s in aliases:
             return aliases[s]
-        raise ValueError(f"Geçersiz öncelik: {value!r}")
+        raise ValueError(f"GeÃ§ersiz Ã¶ncelik: {value!r}")
 
     def __str__(self) -> str:
         return self.name
 
 
 # ---------------------------------------------------------------------------
-# CardStatus — state machine
+# CardStatus â€” state machine
 # ---------------------------------------------------------------------------
 class CardStatus(str):
     """Kart durumu (state machine)."""
 
-    BACKLOG = "backlog"  # Henüz başlanmadı
-    TODO = "todo"  # Sıradaki
-    READY = "ready"  # Bağımlılıkları tamam, başlanabilir
-    INPROGRESS = "in_progress"  # Çalışılıyor
-    BLOCKED = "blocked"  # Engel var (review bekliyor veya dış bağımlılık)
-    REVIEW = "review"  # İnceleme bekliyor
-    DONE = "done"  # Tamamlandı
+    BACKLOG = "backlog"  # HenÃ¼z baÅŸlanmadÄ±
+    TODO = "todo"  # SÄ±radaki
+    READY = "ready"  # BaÄŸÄ±mlÄ±lÄ±klarÄ± tamam, baÅŸlanabilir
+    INPROGRESS = "in_progress"  # Ã‡alÄ±ÅŸÄ±lÄ±yor
+    BLOCKED = "blocked"  # Engel var (review bekliyor veya dÄ±ÅŸ baÄŸÄ±mlÄ±lÄ±k)
+    REVIEW = "review"  # Ä°nceleme bekliyor
+    DONE = "done"  # TamamlandÄ±
 
-    # Geçerli geçişler
+    # GeÃ§erli geÃ§iÅŸler
     _GECISLER = {
         BACKLOG: [TODO, READY, DONE],
         TODO: [READY, INPROGRESS, DONE],
@@ -111,25 +111,25 @@ class CardStatus(str):
 
     @classmethod
     def gecerli_mi(cls, from_status: str, to_status: str) -> bool:
-        """Geçerli bir durum geçişi mi kontrol et."""
+        """GeÃ§erli bir durum geÃ§iÅŸi mi kontrol et."""
         gecisler = cls._GECISLER.get(from_status, [])
         return to_status in gecisler
 
 
 # ---------------------------------------------------------------------------
-# RunRecord — her worker çalıştırma kaydı
+# RunRecord â€” her worker Ã§alÄ±ÅŸtÄ±rma kaydÄ±
 # ---------------------------------------------------------------------------
 @dataclass
 class RunRecord:
-    """Worker çalıştırma kaydı."""
+    """Worker Ã§alÄ±ÅŸtÄ±rma kaydÄ±."""
 
-    worker: str  # Worker profil adı
+    worker: str  # Worker profil adÄ±
     started_at: str  # ISO timestamp
     ended_at: str | None = None  # ISO timestamp
     outcome: str = "running"  # running / completed / blocked / timed_out / crashed
-    summary: str = ""  # Özet
+    summary: str = ""  # Ã–zet
     error: str = ""  # Hata
-    heartbeats: list[dict] = field(default_factory=list)  # Kalp atışları
+    heartbeats: list[dict] = field(default_factory=list)  # Kalp atÄ±ÅŸlarÄ±
 
     def as_dict(self) -> dict:
         return {
@@ -152,21 +152,21 @@ class RunRecord:
 # ---------------------------------------------------------------------------
 @dataclass
 class Card:
-    """Kanban kartı — ReYMeN worker lifecycle destekli."""
+    """Kanban kartÄ± â€” ReYMeN worker lifecycle destekli."""
 
     title: str
     id: str = field(default_factory=lambda: uuid.uuid4().hex[:12])
     description: str = ""
     status: str = "backlog"
     priority: Priority = Priority.MEDIUM
-    assignee: str | None = None  # Worker profil adı
+    assignee: str | None = None  # Worker profil adÄ±
     deadline: str | None = None  # ISO 8601
     tags: list[str] = field(default_factory=list)
-    # Bağımlılık
+    # BaÄŸÄ±mlÄ±lÄ±k
     parents: list[str] = field(
         default_factory=list
-    )  # Bu kartın bağımlı olduğu kart ID'leri
-    children: list[str] = field(default_factory=list)  # Bu karta bağımlı kart ID'leri
+    )  # Bu kartÄ±n baÄŸÄ±mlÄ± olduÄŸu kart ID'leri
+    children: list[str] = field(default_factory=list)  # Bu karta baÄŸÄ±mlÄ± kart ID'leri
     # Worker lifecycle
     runs: list[RunRecord] = field(default_factory=list)
     heartbeats: list[dict] = field(default_factory=list)  # Son worker heartbeats
@@ -216,7 +216,7 @@ class Card:
         return hb
 
     def start_run(self, worker: str) -> RunRecord:
-        """Yeni bir worker run'ı başlat."""
+        """Yeni bir worker run'Ä± baÅŸlat."""
         run = RunRecord(
             worker=worker, started_at=datetime.now(timezone.utc).isoformat()
         )
@@ -225,7 +225,7 @@ class Card:
         return run
 
     def end_run(self, outcome: str, summary: str = "", error: str = "") -> None:
-        """Son run'ı sonlandır."""
+        """Son run'Ä± sonlandÄ±r."""
         if self.runs:
             run = self.runs[-1]
             run.ended_at = datetime.now(timezone.utc).isoformat()
@@ -266,7 +266,7 @@ class Column:
     def add(self, card: Card) -> None:
         if self.wip_limit is not None and len(self.cards) >= self.wip_limit:
             raise ValueError(
-                f"Kolon '{self.name}' WIP limitine ({self.wip_limit}) ulaştı"
+                f"Kolon '{self.name}' WIP limitine ({self.wip_limit}) ulaÅŸtÄ±"
             )
         card.order = len(self.cards)
         self.cards.append(card)
@@ -300,10 +300,10 @@ class Column:
 # Board
 # ---------------------------------------------------------------------------
 class Board:
-    """Kanban panosu — ReYMeN worker lifecycle destekli.
+    """Kanban panosu â€” ReYMeN worker lifecycle destekli.
 
-    Varsayılan kolonlar:
-        backlog → todo → ready → in_progress → blocked → review → done
+    VarsayÄ±lan kolonlar:
+        backlog â†’ todo â†’ ready â†’ in_progress â†’ blocked â†’ review â†’ done
     """
 
     DEFAULT_COLUMNS = [
@@ -323,7 +323,7 @@ class Board:
         else:
             self.columns = columns
 
-    # -- Kolon işlemleri ----------------------------------------------------
+    # -- Kolon iÅŸlemleri ----------------------------------------------------
 
     def add_column(self, name: str, wip_limit: int | None = None) -> Column:
         if self.get_column(name):
@@ -345,10 +345,10 @@ class Board:
         self.columns.remove(col)
         return True
 
-    # -- Kart işlemleri -----------------------------------------------------
+    # -- Kart iÅŸlemleri -----------------------------------------------------
 
     def _kolon_ismi(self, status: str) -> str:
-        """status değerini kolon adına çevir."""
+        """status deÄŸerini kolon adÄ±na Ã§evir."""
         status_to_column = {
             "backlog": "backlog",
             "todo": "todo",
@@ -363,33 +363,33 @@ class Board:
     def add(self, card: Card, column: str = "backlog") -> Card:
         col = self.get_column(column)
         if col is None:
-            raise ValueError(f"Kolon '{column}' bulunamadı")
+            raise ValueError(f"Kolon '{column}' bulunamadÄ±")
         card.status = column
         col.add(card)
         return card
 
     def move(self, card_id: str, to_column: str) -> Card:
-        """Kartı bir kolona taşı. Status geçişini kontrol eder."""
+        """KartÄ± bir kolona taÅŸÄ±. Status geÃ§iÅŸini kontrol eder."""
         card = self.find(card_id)
         if card is None:
-            raise ValueError(f"Kart '{card_id}' bulunamadı")
+            raise ValueError(f"Kart '{card_id}' bulunamadÄ±")
 
-        # Aynı durum → idempotent, sessiz geç
+        # AynÄ± durum â†’ idempotent, sessiz geÃ§
         if card.status == to_column:
             return card
 
-        # Status geçiş kontrolü
+        # Status geÃ§iÅŸ kontrolÃ¼
         if not CardStatus.gecerli_mi(card.status, to_column):
             raise ValueError(
-                f"Geçersiz durum geçişi: '{card.status}' -> '{to_column}'. "
-                f"İzin verilenler: {CardStatus._GECISLER.get(card.status, [])}"
+                f"GeÃ§ersiz durum geÃ§iÅŸi: '{card.status}' -> '{to_column}'. "
+                f"Ä°zin verilenler: {CardStatus._GECISLER.get(card.status, [])}"
             )
 
         target = self.get_column(to_column)
         if target is None:
-            raise ValueError(f"Hedef kolon '{to_column}' bulunamadı")
+            raise ValueError(f"Hedef kolon '{to_column}' bulunamadÄ±")
 
-        # Kaynaktan çıkar
+        # Kaynaktan Ã§Ä±kar
         for col in self.columns:
             if col.get(card_id):
                 col.remove(card_id)
@@ -399,13 +399,13 @@ class Board:
         card.touch()
         target.add(card)
 
-        # Auto-promotion: parent'ları kontrol et
+        # Auto-promotion: parent'larÄ± kontrol et
         self._auto_promote_children(card_id)
 
         return card
 
     def _auto_promote_children(self, card_id: str) -> None:
-        """Eğer kart DONE olduysa ve child'ları varsa, onları ready'e al."""
+        """EÄŸer kart DONE olduysa ve child'larÄ± varsa, onlarÄ± ready'e al."""
         card = self.find(card_id)
         if card is None or card.status != "done":
             return
@@ -414,7 +414,7 @@ class Board:
         for child_id in list(card.children):
             child = self.find(child_id)
             if child and child.status == "todo":
-                # Tüm parent'ları done mı kontrol et
+                # TÃ¼m parent'larÄ± done mÄ± kontrol et
                 tum_parent_done = all(
                     (p := self.find(pid)) and p.status == "done"
                     for pid in child.parents
@@ -424,7 +424,7 @@ class Board:
                     changed.append(child.title)
 
     def set_status(self, card_id: str, new_status: str) -> Card:
-        """Kartın durumunu güncelle (otomatik kolon taşıma ile)."""
+        """KartÄ±n durumunu gÃ¼ncelle (otomatik kolon taÅŸÄ±ma ile)."""
         col_name = self._kolon_ismi(new_status)
         return self.move(card_id, col_name)
 
@@ -437,7 +437,7 @@ class Board:
                 card.touch()
                 col.sort_by_priority()
                 return card
-        raise ValueError(f"Kart '{card_id}' bulunamadı")
+        raise ValueError(f"Kart '{card_id}' bulunamadÄ±")
 
     def set_deadline(self, card_id: str, deadline: str) -> Card:
         for col in self.columns:
@@ -446,7 +446,7 @@ class Board:
                 card.deadline = deadline
                 card.touch()
                 return card
-        raise ValueError(f"Kart '{card_id}' bulunamadı")
+        raise ValueError(f"Kart '{card_id}' bulunamadÄ±")
 
     def find(self, card_id: str) -> Card | None:
         for col in self.columns:
@@ -462,7 +462,7 @@ class Board:
         return [c for c in self.all_cards() if c.is_overdue()]
 
     def cards_by_assignee(self, assignee: str) -> list[Card]:
-        """Bir worker'a atanmış tüm kartları döndür."""
+        """Bir worker'a atanmÄ±ÅŸ tÃ¼m kartlarÄ± dÃ¶ndÃ¼r."""
         return [
             c
             for c in self.all_cards()
@@ -472,12 +472,12 @@ class Board:
     # -- Worker lifecycle ---------------------------------------------------
 
     def claim(self, card_id: str, worker: str) -> Card:
-        """Worker bir kartı üstlenir → in_progress."""
+        """Worker bir kartÄ± Ã¼stlenir â†’ in_progress."""
         card = self.find(card_id)
         if card is None:
-            raise ValueError(f"Kart '{card_id}' bulunamadı")
+            raise ValueError(f"Kart '{card_id}' bulunamadÄ±")
         if card.assignee and card.assignee != worker:
-            raise ValueError(f"Kart '{card_id}' zaten {card.assignee}'a atanmış")
+            raise ValueError(f"Kart '{card_id}' zaten {card.assignee}'a atanmÄ±ÅŸ")
         card.assignee = worker
         card.start_run(worker)
         return self.set_status(card_id, "in_progress")
@@ -485,52 +485,52 @@ class Board:
     def complete(
         self, card_id: str, summary: str = "", metadata: dict | None = None
     ) -> Card:
-        """Worker kartı tamamlar → done."""
+        """Worker kartÄ± tamamlar â†’ done."""
         card = self.find(card_id)
         if card is None:
-            raise ValueError(f"Kart '{card_id}' bulunamadı")
+            raise ValueError(f"Kart '{card_id}' bulunamadÄ±")
         card.end_run("completed", summary=summary)
         if metadata:
             card.metadata.update(metadata)
         return self.set_status(card_id, "done")
 
     def block(self, card_id: str, reason: str) -> Card:
-        """Worker kartı bloke eder."""
+        """Worker kartÄ± bloke eder."""
         card = self.find(card_id)
         if card is None:
-            raise ValueError(f"Kart '{card_id}' bulunamadı")
+            raise ValueError(f"Kart '{card_id}' bulunamadÄ±")
         card.metadata["block_reason"] = reason
         return self.set_status(card_id, "blocked")
 
     def unblock(self, card_id: str) -> Card:
-        """Worker kartın blokesini kaldırır → in_progress."""
+        """Worker kartÄ±n blokesini kaldÄ±rÄ±r â†’ in_progress."""
         card = self.find(card_id)
         if card is None:
-            raise ValueError(f"Kart '{card_id}' bulunamadı")
+            raise ValueError(f"Kart '{card_id}' bulunamadÄ±")
         if card.status != "blocked":
-            raise ValueError(f"Kart '{card_id}' bloke durumunda değil (={card.status})")
+            raise ValueError(f"Kart '{card_id}' bloke durumunda deÄŸil (={card.status})")
         return self.set_status(card_id, "in_progress")
 
     def comment(self, card_id: str, author: str, body: str) -> dict:
         """Karta yorum ekle."""
         card = self.find(card_id)
         if card is None:
-            raise ValueError(f"Kart '{card_id}' bulunamadı")
+            raise ValueError(f"Kart '{card_id}' bulunamadÄ±")
         return card.add_comment(author, body)
 
     def heartbeat(self, card_id: str, worker: str, message: str = "") -> dict:
         """Worker heartbeat."""
         card = self.find(card_id)
         if card is None:
-            raise ValueError(f"Kart '{card_id}' bulunamadı")
+            raise ValueError(f"Kart '{card_id}' bulunamadÄ±")
         return card.add_heartbeat(worker, message)
 
     def link(self, parent_id: str, child_id: str) -> None:
-        """İki kart arasında parent-child bağı kur."""
+        """Ä°ki kart arasÄ±nda parent-child baÄŸÄ± kur."""
         parent = self.find(parent_id)
         child = self.find(child_id)
         if parent is None or child is None:
-            raise ValueError("Parent veya child kart bulunamadı")
+            raise ValueError("Parent veya child kart bulunamadÄ±")
         if child_id not in parent.children:
             parent.children.append(child_id)
         if parent_id not in child.parents:
@@ -548,7 +548,7 @@ class Board:
         overdue: bool | None = None,
         limit: int = 50,
     ) -> list[Card]:
-        """Kartları filtrele."""
+        """KartlarÄ± filtrele."""
         cards = self.all_cards()
         if status:
             cards = [c for c in cards if c.status == status]
@@ -561,7 +561,7 @@ class Board:
         cards.sort(key=lambda c: (c.priority, c.order))
         return cards[:limit]
 
-    # -- Özet ---------------------------------------------------------------
+    # -- Ã–zet ---------------------------------------------------------------
 
     def summary(self) -> dict[str, Any]:
         return {
@@ -584,7 +584,7 @@ class Board:
             },
         }
 
-    # -- Serileştirme -------------------------------------------------------
+    # -- SerileÅŸtirme -------------------------------------------------------
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -617,14 +617,14 @@ class Board:
 
 
 # ---------------------------------------------------------------------------
-# Global Board singleton (JSON dosyası tabanlı)
+# Global Board singleton (JSON dosyasÄ± tabanlÄ±)
 # ---------------------------------------------------------------------------
 
-_VARSAYILAN_PANO_YOLU = Path("~/.hermes/kanban_board.json").expanduser()
+_VARSAYILAN_PANO_YOLU = Path("~/.reymen/kanban_board.json").expanduser()
 
 
 def _pano() -> Board:
-    """Global board singleton'ını döndür (JSON'dan yükler)."""
+    """Global board singleton'Ä±nÄ± dÃ¶ndÃ¼r (JSON'dan yÃ¼kler)."""
     pano_yolu = _VARSAYILAN_PANO_YOLU
     if pano_yolu.exists():
         return Board.load(pano_yolu)
@@ -640,7 +640,7 @@ def _pano_kaydet(board: Board) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Worker API — motor tool'ları için fonksiyonlar
+# Worker API â€” motor tool'larÄ± iÃ§in fonksiyonlar
 # ---------------------------------------------------------------------------
 
 
@@ -653,24 +653,24 @@ def kanban_create(
     tags: list[str] | None = None,
     deadline: str | None = None,
 ) -> str:
-    """Yeni bir kart oluştur.
+    """Yeni bir kart oluÅŸtur.
 
     Args:
-        title: Kart başlığı.
-        description: Açıklama.
-        assignee: Worker profil adı.
-        priority: Öncelik (CRITICAL/HIGH/MEDIUM/LOW/BACKLOG).
-        parents: Bağımlı olunan kart ID'leri (child otomatik 'todo' olur).
+        title: Kart baÅŸlÄ±ÄŸÄ±.
+        description: AÃ§Ä±klama.
+        assignee: Worker profil adÄ±.
+        priority: Ã–ncelik (CRITICAL/HIGH/MEDIUM/LOW/BACKLOG).
+        parents: BaÄŸÄ±mlÄ± olunan kart ID'leri (child otomatik 'todo' olur).
         tags: Etiketler.
         deadline: ISO 8601 deadline.
 
     Returns:
-        Oluşturulan kartın ID'si.
+        OluÅŸturulan kartÄ±n ID'si.
     """
     board = _pano()
     prio = Priority.from_str(priority)
 
-    # Varsayılan olarak 'todo'
+    # VarsayÄ±lan olarak 'todo'
     ilk_kolon = "todo"
 
     card = Card(
@@ -684,7 +684,7 @@ def kanban_create(
 
     board.add(card, ilk_kolon)
 
-    # Parent-child bağı
+    # Parent-child baÄŸÄ±
     if parents:
         for pid in parents:
             parent_card = board.find(pid)
@@ -696,28 +696,28 @@ def kanban_create(
 
 
 def kanban_show(card_id: str) -> str:
-    """Kart detayını göster.
+    """Kart detayÄ±nÄ± gÃ¶ster.
 
     Args:
         card_id: Kart ID'si.
 
     Returns:
-        Kart detayı metni.
+        Kart detayÄ± metni.
     """
     board = _pano()
     card = board.find(card_id)
     if card is None:
-        return f"[KANBAN] Kart '{card_id}' bulunamadı"
+        return f"[KANBAN] Kart '{card_id}' bulunamadÄ±"
 
     satirlar = [
-        f"📋 {card.title} ({card.id})",
+        f"ğŸ“‹ {card.title} ({card.id})",
         f"  Durum: {card.status}",
-        f"  Öncelik: {card.priority.name}",
-        f"  Atanan: {card.assignee or '—'}",
-        f"  Deadline: {card.deadline or '—'}",
-        f"  Etiketler: {', '.join(card.tags) if card.tags else '—'}",
-        f"  Oluşturma: {card.created_at[:19]}",
-        f"  Güncelleme: {card.updated_at[:19]}",
+        f"  Ã–ncelik: {card.priority.name}",
+        f"  Atanan: {card.assignee or 'â€”'}",
+        f"  Deadline: {card.deadline or 'â€”'}",
+        f"  Etiketler: {', '.join(card.tags) if card.tags else 'â€”'}",
+        f"  OluÅŸturma: {card.created_at[:19]}",
+        f"  GÃ¼ncelleme: {card.updated_at[:19]}",
     ]
 
     if card.parents:
@@ -725,7 +725,7 @@ def kanban_show(card_id: str) -> str:
             f"{board.find(pid).title if board.find(pid) else pid} ({pid})"
             for pid in card.parents
         ]
-        satirlar.append(f"  Bağımlı olduğu: {', '.join(parent_isl)}")
+        satirlar.append(f"  BaÄŸÄ±mlÄ± olduÄŸu: {', '.join(parent_isl)}")
 
     if card.children:
         child_isl = [
@@ -757,37 +757,37 @@ def kanban_show(card_id: str) -> str:
 def kanban_complete(
     card_id: str, summary: str = "", metadata: str | None = None
 ) -> str:
-    """Kartı tamamla.
+    """KartÄ± tamamla.
 
     Args:
         card_id: Kart ID'si.
-        summary: Özet (downstream worker'ların okuyacağı).
-        metadata: JSON string metadata (örn. changed_files, tests_passed).
+        summary: Ã–zet (downstream worker'larÄ±n okuyacaÄŸÄ±).
+        metadata: JSON string metadata (Ã¶rn. changed_files, tests_passed).
 
     Returns:
-        İşlem sonucu.
+        Ä°ÅŸlem sonucu.
     """
     board = _pano()
     meta_dict = json.loads(metadata) if metadata else None
     card = board.complete(card_id, summary=summary, metadata=meta_dict)
     _pano_kaydet(board)
-    return f"[KANBAN] '{card.title}' tamamlandı (id={card_id})"
+    return f"[KANBAN] '{card.title}' tamamlandÄ± (id={card_id})"
 
 
 def kanban_block(card_id: str, reason: str) -> str:
-    """Kartı bloke et (review bekliyor, dış bağımlılık vb.).
+    """KartÄ± bloke et (review bekliyor, dÄ±ÅŸ baÄŸÄ±mlÄ±lÄ±k vb.).
 
     Args:
         card_id: Kart ID'si.
-        reason: Blok nedeni. 'review-required: ' öneki dashboard'da gösterilir.
+        reason: Blok nedeni. 'review-required: ' Ã¶neki dashboard'da gÃ¶sterilir.
 
     Returns:
-        İşlem sonucu.
+        Ä°ÅŸlem sonucu.
     """
     board = _pano()
     card = board.find(card_id)
     if card is None:
-        return f"[KANBAN] Kart '{card_id}' bulunamadı"
+        return f"[KANBAN] Kart '{card_id}' bulunamadÄ±"
     board.block(card_id, reason)
     card.end_run("blocked", error=reason)
     _pano_kaydet(board)
@@ -795,21 +795,21 @@ def kanban_block(card_id: str, reason: str) -> str:
 
 
 def kanban_unblock(card_id: str) -> str:
-    """Kartın blokesini kaldır.
+    """KartÄ±n blokesini kaldÄ±r.
 
     Args:
         card_id: Kart ID'si.
 
     Returns:
-        İşlem sonucu.
+        Ä°ÅŸlem sonucu.
     """
     board = _pano()
     card = board.find(card_id)
     if card is None:
-        return f"[KANBAN] Kart '{card_id}' bulunamadı"
+        return f"[KANBAN] Kart '{card_id}' bulunamadÄ±"
     board.unblock(card_id)
     _pano_kaydet(board)
-    return f"[KANBAN] '{card.title}' blokesi kaldırıldı"
+    return f"[KANBAN] '{card.title}' blokesi kaldÄ±rÄ±ldÄ±"
 
 
 def kanban_comment(card_id: str, body: str) -> str:
@@ -817,49 +817,49 @@ def kanban_comment(card_id: str, body: str) -> str:
 
     Args:
         card_id: Kart ID'si.
-        body: Yorum metni (JSON formatında metadata içerebilir).
+        body: Yorum metni (JSON formatÄ±nda metadata iÃ§erebilir).
 
     Returns:
-        İşlem sonucu.
+        Ä°ÅŸlem sonucu.
     """
     board = _pano()
     card = board.find(card_id)
     if card is None:
-        return f"[KANBAN] Kart '{card_id}' bulunamadı"
+        return f"[KANBAN] Kart '{card_id}' bulunamadÄ±"
     card.add_comment("worker", body)
     _pano_kaydet(board)
     return f"[KANBAN] Yorum eklendi: {card_id}"
 
 
 def kanban_heartbeat(card_id: str, worker: str, message: str = "") -> str:
-    """Worker heartbeat gönder.
+    """Worker heartbeat gÃ¶nder.
 
     Args:
         card_id: Kart ID'si.
-        worker: Worker adı.
-        message: Durum mesajı.
+        worker: Worker adÄ±.
+        message: Durum mesajÄ±.
 
     Returns:
-        İşlem sonucu.
+        Ä°ÅŸlem sonucu.
     """
     board = _pano()
     card = board.find(card_id)
     if card is None:
-        return f"[KANBAN] Kart '{card_id}' bulunamadı"
+        return f"[KANBAN] Kart '{card_id}' bulunamadÄ±"
     card.add_heartbeat(worker, message)
     _pano_kaydet(board)
     return f"[KANBAN] Heartbeat: {card_id} ({message[:50]})"
 
 
 def kanban_claim(card_id: str, worker: str) -> str:
-    """Worker bir kartı üstlenir.
+    """Worker bir kartÄ± Ã¼stlenir.
 
     Args:
         card_id: Kart ID'si.
-        worker: Worker profil adı.
+        worker: Worker profil adÄ±.
 
     Returns:
-        İşlem sonucu.
+        Ä°ÅŸlem sonucu.
     """
     board = _pano()
     card = board.claim(card_id, worker)
@@ -873,13 +873,13 @@ def kanban_list(
     tag: str | None = None,
     overdue: bool = False,
 ) -> str:
-    """Kartları listele.
+    """KartlarÄ± listele.
 
     Args:
         status: Durum filtre (backlog/todo/ready/in_progress/blocked/review/done).
         assignee: Worker filtresi.
         tag: Etiket filtresi.
-        overdue: Sadece deadline geçmiş kartlar.
+        overdue: Sadece deadline geÃ§miÅŸ kartlar.
 
     Returns:
         Kart listesi metni.
@@ -890,7 +890,7 @@ def kanban_list(
     )
 
     if not cards:
-        return "[KANBAN] Kart bulunamadı"
+        return "[KANBAN] Kart bulunamadÄ±"
 
     satirlar = [
         f"[KANBAN] {len(cards)} kart"
@@ -900,16 +900,16 @@ def kanban_list(
     ]
 
     for c in cards:
-        deadline_str = f" ⏰{c.deadline[:10]}" if c.deadline else ""
+        deadline_str = f" â°{c.deadline[:10]}" if c.deadline else ""
         emoji = {
-            "done": "✅",
-            "in_progress": "🔄",
-            "blocked": "🚫",
-            "review": "👁",
-            "todo": "📝",
-            "ready": "▶️",
-            "backlog": "📦",
-        }.get(c.status, "📋")
+            "done": "âœ…",
+            "in_progress": "ğŸ”„",
+            "blocked": "ğŸš«",
+            "review": "ğŸ‘",
+            "todo": "ğŸ“",
+            "ready": "â–¶ï¸",
+            "backlog": "ğŸ“¦",
+        }.get(c.status, "ğŸ“‹")
         satirlar.append(
             f"  {emoji} [{c.id[:8]}] {c.title}{deadline_str}"
             f" ({c.priority.name})"
@@ -920,17 +920,17 @@ def kanban_list(
 
 
 def kanban_summary() -> str:
-    """Pano özetini göster.
+    """Pano Ã¶zetini gÃ¶ster.
 
     Returns:
-        Özet metni.
+        Ã–zet metni.
     """
     board = _pano()
     s = board.summary()
     satirlar = [
         f"[KANBAN] Pano: {s['name']}",
         f"  Toplam kart: {s['total_cards']}",
-        f"  Gecikmiş: {s['overdue']}",
+        f"  GecikmiÅŸ: {s['overdue']}",
     ]
     for col_name, col_data in s["columns"].items():
         wip_str = (
@@ -938,10 +938,10 @@ def kanban_summary() -> str:
             if col_data["wip_limit"]
             else ""
         )
-        over_str = " ⚠️ LIMIT ASIMI" if col_data.get("over_limit") else ""
+        over_str = " âš ï¸ LIMIT ASIMI" if col_data.get("over_limit") else ""
         satirlar.append(f"  {col_name}: {col_data['count']}{wip_str}{over_str}")
 
-    satirlar.append("\n  Öncelik dağılımı:")
+    satirlar.append("\n  Ã–ncelik daÄŸÄ±lÄ±mÄ±:")
     for pname, count in s["by_priority"].items():
         satirlar.append(f"    {pname}: {count}")
 
@@ -949,18 +949,18 @@ def kanban_summary() -> str:
 
 
 def kanban_delete_card(card_id: str) -> str:
-    """Kartı sil.
+    """KartÄ± sil.
 
     Args:
         card_id: Kart ID'si.
 
     Returns:
-        İşlem sonucu.
+        Ä°ÅŸlem sonucu.
     """
     board = _pano()
     card = board.find(card_id)
     if card is None:
-        return f"[KANBAN] Kart '{card_id}' bulunamadı"
+        return f"[KANBAN] Kart '{card_id}' bulunamadÄ±"
 
     baslik = card.title
     for col in board.columns:
@@ -972,42 +972,42 @@ def kanban_delete_card(card_id: str) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Motor kayıt
+# Motor kayÄ±t
 # ---------------------------------------------------------------------------
 
 
 def motor_kaydet(motor: Any) -> None:
-    """Motor'a Kanban araçlarını kaydet.
+    """Motor'a Kanban araÃ§larÄ±nÄ± kaydet.
 
     Args:
-        motor: Motor instance'ı.
+        motor: Motor instance'Ä±.
     """
     motor._plugin_arac_kaydet(
         "KANBAN_CREATE",
         kanban_create,
-        "Kanban kartı oluştur. Parametreler: title (str, zorunlu), description (str), "
+        "Kanban kartÄ± oluÅŸtur. Parametreler: title (str, zorunlu), description (str), "
         "assignee (str), priority (str: CRITICAL/HIGH/MEDIUM/LOW/BACKLOG), "
-        "parents (list[str]): bağımlılık listesi, tags (list[str]), deadline (str: ISO 8601)",
+        "parents (list[str]): baÄŸÄ±mlÄ±lÄ±k listesi, tags (list[str]), deadline (str: ISO 8601)",
     )
     motor._plugin_arac_kaydet(
-        "KANBAN_SHOW", kanban_show, "Kart detayını göster. Parametre: card_id (str)"
+        "KANBAN_SHOW", kanban_show, "Kart detayÄ±nÄ± gÃ¶ster. Parametre: card_id (str)"
     )
     motor._plugin_arac_kaydet(
         "KANBAN_COMPLETE",
         kanban_complete,
-        "Kartı tamamla. Parametreler: card_id (str), summary (str), "
-        "metadata (str: JSON string — changed_files, tests_passed, decisions vb.)",
+        "KartÄ± tamamla. Parametreler: card_id (str), summary (str), "
+        "metadata (str: JSON string â€” changed_files, tests_passed, decisions vb.)",
     )
     motor._plugin_arac_kaydet(
         "KANBAN_BLOCK",
         kanban_block,
-        "Kartı bloke et. Parametreler: card_id (str), reason (str). "
-        "'review-required: ' öneki ile inceleme bekleme",
+        "KartÄ± bloke et. Parametreler: card_id (str), reason (str). "
+        "'review-required: ' Ã¶neki ile inceleme bekleme",
     )
     motor._plugin_arac_kaydet(
         "KANBAN_UNBLOCK",
         kanban_unblock,
-        "Kartın blokesini kaldır. Parametre: card_id (str)",
+        "KartÄ±n blokesini kaldÄ±r. Parametre: card_id (str)",
     )
     motor._plugin_arac_kaydet(
         "KANBAN_COMMENT",
@@ -1017,24 +1017,24 @@ def motor_kaydet(motor: Any) -> None:
     motor._plugin_arac_kaydet(
         "KANBAN_HEARTBEAT",
         kanban_heartbeat,
-        "Worker heartbeat gönder. Parametreler: card_id (str), worker (str), message (str)",
+        "Worker heartbeat gÃ¶nder. Parametreler: card_id (str), worker (str), message (str)",
     )
     motor._plugin_arac_kaydet(
         "KANBAN_CLAIM",
         kanban_claim,
-        "Worker kartı üstlenir. Parametreler: card_id (str), worker (str)",
+        "Worker kartÄ± Ã¼stlenir. Parametreler: card_id (str), worker (str)",
     )
     motor._plugin_arac_kaydet(
         "KANBAN_LIST",
         kanban_list,
-        "Kartları listele. Parametreler: status (str), assignee (str), "
+        "KartlarÄ± listele. Parametreler: status (str), assignee (str), "
         "tag (str), overdue (bool)",
     )
     motor._plugin_arac_kaydet(
-        "KANBAN_SUMMARY", kanban_summary, "Pano özetini göster. Parametre yok."
+        "KANBAN_SUMMARY", kanban_summary, "Pano Ã¶zetini gÃ¶ster. Parametre yok."
     )
     motor._plugin_arac_kaydet(
-        "KANBAN_DELETE", kanban_delete_card, "Kartı sil. Parametre: card_id (str)"
+        "KANBAN_DELETE", kanban_delete_card, "KartÄ± sil. Parametre: card_id (str)"
     )
 
     logger = logging.getLogger(__name__)
@@ -1042,7 +1042,7 @@ def motor_kaydet(motor: Any) -> None:
 
 
 def kanban_worker_baslat(interval: int = 300) -> str:
-    """KANBAN_WORKER_BASLAT(interval=300) — Kanban worker dongusu baslat."""
+    """KANBAN_WORKER_BASLAT(interval=300) â€” Kanban worker dongusu baslat."""
     try:
         from reymen.kanban import Board
 

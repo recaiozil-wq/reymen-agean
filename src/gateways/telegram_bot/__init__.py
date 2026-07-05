@@ -1,12 +1,12 @@
-# -*- coding: utf-8 -*-
-"""🤖 ReYMeN Telegram Bot — AIAgentOrchestrator ile çalışan bot.
+﻿# -*- coding: utf-8 -*-
+"""ğŸ¤– ReYMeN Telegram Bot â€” AIAgentOrchestrator ile Ã§alÄ±ÅŸan bot.
 
 Kullanim:
     BOT_TOKEN=*** BOT_AD="@Pasa_38_bot" python -m reymen.telegram_bot
 
 Ortam degiskenleri:
-    BOT_TOKEN  — Telegram bot token
-    BOT_AD     — Bot adi (opsiyonel, debug icin)
+    BOT_TOKEN  â€” Telegram bot token
+    BOT_AD     â€” Bot adi (opsiyonel, debug icin)
 """
 
 from __future__ import annotations
@@ -40,7 +40,7 @@ log = logging.getLogger("reymen_bot")
 # Bot
 # ---------------------------------------------------------------------------
 class ReYMeNTelegramBot:
-    """Tek Telegram botu — AIAgentOrchestrator ile."""
+    """Tek Telegram botu â€” AIAgentOrchestrator ile."""
 
     def __init__(self, token: str, bot_ad: str = ""):
         self.token = token
@@ -78,22 +78,22 @@ class ReYMeNTelegramBot:
 
     async def _cmd_start(self, update, context):
         await update.message.reply_text(
-            "🤖 *ReYMeN Bot*\n\nReYMeN AI asistanina hos geldin.\n"
-            "`/yardim` — Yardim\n`/temizle` — Konusma gecmisini sifirla",
+            "ğŸ¤– *ReYMeN Bot*\n\nReYMeN AI asistanina hos geldin.\n"
+            "`/yardim` â€” Yardim\n`/temizle` â€” Konusma gecmisini sifirla",
             parse_mode="Markdown",
         )
 
     async def _cmd_yardim(self, update, context):
         await update.message.reply_text(
-            "🤖 *ReYMeN Bot*\n\nMesaj yaz → sohbet et, soru sor.\n"
-            "`/temizle` — Gecmisi sifirla",
+            "ğŸ¤– *ReYMeN Bot*\n\nMesaj yaz â†’ sohbet et, soru sor.\n"
+            "`/temizle` â€” Gecmisi sifirla",
             parse_mode="Markdown",
         )
 
     async def _cmd_temizle(self, update, context):
         agent = self._agent_al()
         agent.session_temizle()
-        await update.message.reply_text("✅ Konusma gecmisi temizlendi.")
+        await update.message.reply_text("âœ… Konusma gecmisi temizlendi.")
 
     async def _mesaj_al(self, update, context):
         hedef = update.message.text.strip()
@@ -108,9 +108,9 @@ class ReYMeNTelegramBot:
             beyin = Beyin(config=CONFIG)
             loop = ConversationLoop(beyin=beyin, max_tur=15)
 
-            # DURUM_OKU() talimati — ZORUNLU! Tum sorularda once durum.json'a bak
+            # DURUM_OKU() talimati â€” ZORUNLU! Tum sorularda once durum.json'a bak
             talimat = (
-                "🚨 ZORUNLU: ReYMeN durumu/ozellikleri/eksikleri/karsilastirma/liste hakkinda soru "
+                "ğŸš¨ ZORUNLU: ReYMeN durumu/ozellikleri/eksikleri/karsilastirma/liste hakkinda soru "
                 "gelince ONCE ve MUTLAKA DURUM_OKU() tool'unu cagir. "
                 "durum.json TEK KAYNAKTIR. Kendi bilginle asla liste olusturma.\\n"
                 "Karsilastirma/eksik/liste sorularinda DURUM_OKU() sarttir. "
@@ -123,7 +123,7 @@ class ReYMeNTelegramBot:
             await update.message.reply_text(str(yanit)[:4000])
         except Exception as e:
             log.error("[%s] Hata: %s", self.bot_ad, e)
-            await update.message.reply_text(f"❌ Hata: {e}")
+            await update.message.reply_text(f"âŒ Hata: {e}")
 
 
 # ---------------------------------------------------------------------------
@@ -132,7 +132,7 @@ class ReYMeNTelegramBot:
 def main():
     token = os.environ.get("BOT_TOKEN", "").strip()
     if not token:
-        log.error("❌ BOT_TOKEN ortam degiskeni gerekli")
+        log.error("âŒ BOT_TOKEN ortam degiskeni gerekli")
         sys.exit(1)
     bot_ad = os.environ.get("BOT_AD", "Bot")
     bot = ReYMeNTelegramBot(token=token, bot_ad=bot_ad)

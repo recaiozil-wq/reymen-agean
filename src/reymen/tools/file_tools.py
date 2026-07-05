@@ -1,4 +1,4 @@
-"""ReYMeN tools.file_tools shim — Hermes file tools fonksiyonlarını yönlendirir."""
+﻿"""ReYMeN tools.file_tools shim â€” ReYMeN file tools fonksiyonlarÄ±nÄ± yÃ¶nlendirir."""
 
 from __future__ import annotations
 
@@ -8,5 +8,5 @@ logger = logging.getLogger(__name__)
 
 
 def notify_other_tool_call(function_name: str) -> None:
-    """Hermes notify_other_tool_call — ReYMeN'de no-op."""
+    """ReYMeN notify_other_tool_call â€” ReYMeN'de no-op."""
     pass

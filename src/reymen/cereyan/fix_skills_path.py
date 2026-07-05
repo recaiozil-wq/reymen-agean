@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""fix_skills_path.py — Skills dizin karmasasini temizle.
+﻿# -*- coding: utf-8 -*-
+"""fix_skills_path.py â€” Skills dizin karmasasini temizle.
 
 TUM skills dizinlerini tek bir merkezi dizine yonlendirir:
   MERKEZ: reymen/cereyan/skills/ (kategorize edilmis yapi)
@@ -69,7 +69,7 @@ def _yeni_skill_tasi() -> int:
     """Root skills/'e yeni eklenmis .md dosyalarini merkezi dizine tasi.
 
     Eger root skills/'deki bir .md dosyasi merkezi dizinde yoksa,
-    kullaniciya bildir (otomatik tasima yapilmaz — kategorizasyon gerekebilir).
+    kullaniciya bildir (otomatik tasima yapilmaz â€” kategorizasyon gerekebilir).
     """
     root_md = _root_skills_tara()
     if not root_md:

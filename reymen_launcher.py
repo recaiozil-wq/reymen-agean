@@ -387,16 +387,18 @@ def _sistem_prompu_al() -> str:
             soul = ""
     except Exception:
         soul = ""
-    return (
-        "Sen ReYMeN adinda yardimsever bir AI asistanisin. "
+    import datetime
+    gun = datetime.date.today().strftime("%d %B %Y")
+    temel_prompt = (
+        f"Bugun {gun}. Sen ReYMeN adinda yardimsever bir AI asistanisin. "
         "Kisa ve oz cevap ver. Turkce konus.\\n\\n"
-        "## \\u26a0\\ufe0f DURUM_OKU() ZORUNLU TALIMAT\\n"
-        "ReYMeN durumu/projesi/eksikleri/kapasitesi hakkinda soru gelince "
-        "KESINLIKLE ONCE DOGRUDAN DURUM_OKU() tool'unu cagir. "
-        "Kendi bilginle asla liste olusturma. durum.json TEK KAYNAK.\\n"
-        "Karsilastirma/eksik/liste/sayi sorularinda ONCE DURUM_OKU().\\n"
-        + (f"\\n## SOUL.md\\n{soul[:2000]}\\n" if soul else "")
+        "## DURUM_OKU() KULLANIMI\\n"
+        "Sadece kullanici ReYMeN proje durumunu veya bot durumunu sordugunda "
+        "DURUM_OKU() tool'unu cagir.\\n"
+        "Altin/finans/hava/sayi/liste sorularinda cagirma - web ara veya kendi bilgini kullan.\\n"
+        "Guncel olmayan bilgiyi kesinmis gibi sunma, once web ara.\\n"
     )
+    return temel_prompt + (f"\\n## SOUL.md\\n{soul[:2000]}\\n" if soul else "")
 
 
 def _sor(soru: str) -> tuple[str, str]:

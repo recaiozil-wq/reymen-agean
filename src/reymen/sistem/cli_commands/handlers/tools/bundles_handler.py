@@ -1,8 +1,8 @@
-"""_handle_bundles_command handler."""
+﻿"""_handle_bundles_command handler."""
 
 
 def _handle_bundles_command(cli, cmd: str) -> None:
-    """In-session ``/bundles`` — show installed skill bundles.
+    """In-session ``/bundles`` â€” show installed skill bundles.
 
     Mirrors ``ReYMeN bundles list`` but renders inside the running
     CLI so users can discover what's available without dropping out
@@ -28,7 +28,7 @@ def _handle_bundles_command(cli, cmd: str) -> None:
         _cprint(f"  {_DIM}Directory: {_bundles_dir()}{_RST}")
         return
 
-    _cprint(f"\n  ▣ {_BOLD}Skill Bundles{_RST} ({len(bundles)} installed):")
+    _cprint(f"\n  â–£ {_BOLD}Skill Bundles{_RST} ({len(bundles)} installed):")
     for info in bundles:
         skill_count = len(info.get("skills", []))
         desc = info.get("description") or f"Load {skill_count} skills"
@@ -37,7 +37,7 @@ def _handle_bundles_command(cli, cmd: str) -> None:
             f"[dim]-[/] {_escape(desc)} [dim]({skill_count} skills)[/]"
         )
         for s in info.get("skills", []):
-            ChatConsole().print(f"        [dim]· {_escape(s)}[/]")
+            ChatConsole().print(f"        [dim]Â· {_escape(s)}[/]")
     _cprint(
         f"\n  {_DIM}Invoke a bundle with /<slug>. "
         f"Manage with `ReYMeN bundles`.{_RST}"

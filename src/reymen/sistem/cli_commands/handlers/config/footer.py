@@ -1,16 +1,16 @@
-"""_handle_footer_command handler."""
+﻿"""_handle_footer_command handler."""
 
-from src.reymen.sistem.cli_stream import save_config_value
-from src.reymen.sistem.cli_display import _cprint
+from reymen.sistem.cli_stream import save_config_value
+from reymen.sistem.cli_display import _cprint
 
 
 def _handle_footer_command(cli, cmd_original: str) -> None:
     """Toggle or inspect ``display.runtime_footer.enabled`` from the CLI.
 
     Usage:
-        /footer           → toggle
-        /footer on|off    → explicit
-        /footer status    → show current state
+        /footer           â†’ toggle
+        /footer on|off    â†’ explicit
+        /footer status    â†’ show current state
     """
     from reymen.reymen_cli.config import load_config
     from reymen.reymen_cli.colors import Colors as _Colors

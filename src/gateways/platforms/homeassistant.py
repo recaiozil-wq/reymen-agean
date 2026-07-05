@@ -1,12 +1,12 @@
-"""
-ReYMeN Gateway — Home Assistant platform adapter.
+﻿"""
+ReYMeN Gateway â€” Home Assistant platform adapter.
 
 Home Assistant REST API uzerinden mesaj gonderir.
 Webhook tabanli degildir; sadece cikis (notification) yonludur.
 
 Yapilandirma (ortam degiskenleri):
-  - HASS_TOKEN               — Home Assistant Long-Lived Access Token
-  - HASS_HOST                — Home Assistant sunucu adresi (varsayilan: http://homeassistant.local:8123)
+  - HASS_TOKEN               â€” Home Assistant Long-Lived Access Token
+  - HASS_HOST                â€” Home Assistant sunucu adresi (varsayilan: http://homeassistant.local:8123)
 """
 
 import asyncio
@@ -21,8 +21,8 @@ from pathlib import Path as _Path
 
 sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
-from src.gateways.config import Platform, PlatformConfig
-from src.gateways.platforms.base import (
+from gateways.config import Platform, PlatformConfig
+from gateways.platforms.base import (
     BasePlatformAdapter,
     MessageEvent,
     MessageType,
@@ -90,7 +90,7 @@ class HomeAssistantAdapter(BasePlatformAdapter):
 
         self._client: Optional[httpx.AsyncClient] = None
 
-    # ── Baglanti Yonetimi ────────────────────────────────────────────
+    # â”€â”€ Baglanti Yonetimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     async def _get_client(self) -> httpx.AsyncClient:
         if self._client is None or self._client.is_closed:
@@ -118,7 +118,7 @@ class HomeAssistantAdapter(BasePlatformAdapter):
             )
             if resp.status_code == 401:
                 logger.error(
-                    "[HomeAssistant] API yetkisiz — HASS_TOKEN gecersiz olabilir."
+                    "[HomeAssistant] API yetkisiz â€” HASS_TOKEN gecersiz olabilir."
                 )
             elif resp.is_error:
                 logger.warning(
@@ -143,7 +143,7 @@ class HomeAssistantAdapter(BasePlatformAdapter):
         if self._client and not self._client.is_closed:
             await self._client.aclose()
 
-    # ── Yardimci Metodlar ────────────────────────────────────────────
+    # â”€â”€ Yardimci Metodlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _build_headers(self) -> Dict[str, str]:
         """API istekleri icin header'lari olustur."""
@@ -154,7 +154,7 @@ class HomeAssistantAdapter(BasePlatformAdapter):
             headers["Authorization"] = f"Bearer {self._token}"
         return headers
 
-    # ── Mesaj Gonderme ───────────────────────────────────────────────
+    # â”€â”€ Mesaj Gonderme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     async def send_message(
         self,
@@ -168,10 +168,10 @@ class HomeAssistantAdapter(BasePlatformAdapter):
         Home Assistant'a mesaj gonderir.
 
         Iki yontem dener:
-        1. ``conversation/process`` — HA'nin built-in conversation agent'ina
+        1. ``conversation/process`` â€” HA'nin built-in conversation agent'ina
            mesaj gonderir (``chat_id`` = ``agent_id`` olarak kullanilir veya
            metadata'dan ``agent_id`` okunur).
-        2. ``notify.<service>`` — Bir notify servisine mesaj gonderir
+        2. ``notify.<service>`` â€” Bir notify servisine mesaj gonderir
            (``chat_id`` = hedef notify servisi adi, orn. ``notify.mobile_app_iphone``).
         """
         if not HTTPX_AVAILABLE:

@@ -1,11 +1,11 @@
-"""Periodic process memory usage logging for the gateway.
+﻿"""Periodic process memory usage logging for the gateway.
 
 Ported from cline/cline#10343 (src/standalone/memory-monitor.ts).
 
 The gateway is a long-lived process that accumulates memory as it caches
 agent instances, session transcripts, tool schemas, memory providers, MCP
 connections, etc.  A slow leak in any of those subsystems is invisible
-in a single log line — you only see it by watching RSS climb over hours.
+in a single log line â€” you only see it by watching RSS climb over hours.
 
 This module emits a single structured ``[MEMORY] ...`` line every N
 minutes (default 5) so maintainers investigating a suspected leak can
@@ -18,13 +18,13 @@ Design notes (parity with the Cline port):
   * Final snapshot logged on shutdown so "last RSS before exit" is
     always in the log.
   * Baseline snapshot logged immediately on start.
-  * Daemon thread — never blocks process exit.
+  * Daemon thread â€” never blocks process exit.
   * Uses ``resource`` (stdlib, Linux/macOS) first and falls back to
     ``psutil`` when ``resource`` isn't available (Windows).  Both are
     optional; when neither works we emit a single WARNING and disable
     the monitor rather than crashing the gateway.
 
-Config: ``logging.memory_monitor`` in ``config.yaml`` — see
+Config: ``logging.memory_monitor`` in ``config.yaml`` â€” see
 ``hermes_cli/config.py`` for the defaults block.
 """
 
@@ -53,11 +53,11 @@ def _get_rss_mb() -> Optional[int]:
     """Return current process resident set size in MB, or None if unavailable.
 
     Tries ``resource.getrusage`` first (Linux/macOS, no extra deps), then
-    falls back to ``psutil`` which is an optional hermes-agent dep.
+    falls back to ``psutil`` which is an optional reymen-agent dep.
     """
-    # Linux / macOS — resource is stdlib.  On Linux ru_maxrss is in KB,
+    # Linux / macOS â€” resource is stdlib.  On Linux ru_maxrss is in KB,
     # on macOS it is in bytes (yes, really).  We use it as a cheap
-    # "current" RSS — ru_maxrss reports the high-water mark for the
+    # "current" RSS â€” ru_maxrss reports the high-water mark for the
     # process, which is what you actually want for leak detection.
     try:
         import resource
@@ -90,7 +90,7 @@ def log_memory_usage(prefix: str = "") -> None:
     Parameters
     ----------
     prefix
-        Optional extra tag inserted after ``[MEMORY]`` — e.g.
+        Optional extra tag inserted after ``[MEMORY]`` â€” e.g.
         ``"baseline"``, ``"shutdown"``.
     """
     rss = _get_rss_mb()
@@ -128,7 +128,7 @@ def log_memory_usage(prefix: str = "") -> None:
 
 
 def _monitor_loop(stop_event: threading.Event, interval: float) -> None:
-    """Background thread body — log every ``interval`` seconds until stopped."""
+    """Background thread body â€” log every ``interval`` seconds until stopped."""
     while not stop_event.wait(interval):
         try:
             log_memory_usage()
@@ -141,7 +141,7 @@ def start_memory_monitoring(interval_seconds: float = 300.0) -> bool:
     """Start periodic memory usage logging in a daemon thread.
 
     Logs immediately to capture a baseline, then every ``interval_seconds``.
-    Safe to call multiple times — subsequent calls are no-ops while the
+    Safe to call multiple times â€” subsequent calls are no-ops while the
     first monitor is still running.
 
     Parameters
@@ -164,11 +164,11 @@ def start_memory_monitoring(interval_seconds: float = 300.0) -> bool:
 
         # Sanity-check that we can read RSS at all.  If neither resource
         # nor psutil works, no point spinning a thread that can only log
-        # "rss=unavailable" forever — warn once and bail.
+        # "rss=unavailable" forever â€” warn once and bail.
         if _get_rss_mb() is None:
             logger.warning(
                 "[MEMORY] Memory monitoring unavailable: neither resource.getrusage "
-                "nor psutil could read process RSS — skipping periodic logging.",
+                "nor psutil could read process RSS â€” skipping periodic logging.",
             )
             return False
 

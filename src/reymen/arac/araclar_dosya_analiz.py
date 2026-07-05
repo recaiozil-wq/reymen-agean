@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-araclar_dosya_analiz.py — PDF, Excel, CSV ve Görüntü analiz araçları.
+araclar_dosya_analiz.py â€” PDF, Excel, CSV ve GÃ¶rÃ¼ntÃ¼ analiz araÃ§larÄ±.
 
 Bagimsiz kullanilabilir; opsiyonel kutuphaneler yoksa graceful degrade yapar:
   - PDF: pdfplumber (tercih) veya PyPDF2
@@ -14,7 +14,7 @@ import csv
 import io
 import os
 
-# ── Opsiyonel kutuphaneler ─────────────────────────────────────────────────────
+# â”€â”€ Opsiyonel kutuphaneler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 try:
     import pdfplumber
@@ -52,7 +52,7 @@ except ImportError:
     _ollama_lib = None
     _OLLAMA_LIB_VAR = False
 
-# ── Sabitler ──────────────────────────────────────────────────────────────────
+# â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 OLLAMA_BASE = "http://localhost:11434"
 GORUNTU_MODEL = "llava"
@@ -60,7 +60,7 @@ MAKS_SATIR = 200  # CSV/Excel'de en fazla bu kadar satir goster
 MAKS_KARAKTER = 8000  # PDF'te en fazla bu kadar karakter goster
 
 
-# ── PDF ───────────────────────────────────────────────────────────────────────
+# â”€â”€ PDF â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def pdf_oku(dosya_yolu: str) -> str:
@@ -73,10 +73,10 @@ def pdf_oku(dosya_yolu: str) -> str:
         Metin icerigi veya hata mesaji.
     """
     if not os.path.exists(dosya_yolu):
-        return f"[PDF Hatası]: '{dosya_yolu}' bulunamadı."
+        return f"[PDF HatasÄ±]: '{dosya_yolu}' bulunamadÄ±."
 
     if not dosya_yolu.lower().endswith(".pdf"):
-        return "[PDF Hatası]: Dosya .pdf uzantılı değil."
+        return "[PDF HatasÄ±]: Dosya .pdf uzantÄ±lÄ± deÄŸil."
 
     if _PDF_VAR == "pdfplumber":
         try:
@@ -88,15 +88,15 @@ def pdf_oku(dosya_yolu: str) -> str:
                         sayfalar.append(f"[Sayfa {i}]\n{metin.strip()}")
                 tam_metin = "\n\n".join(sayfalar)
                 if not tam_metin.strip():
-                    return "[PDF]: Metin çıkarılamadı (taranmış/görsel PDF olabilir)."
+                    return "[PDF]: Metin Ã§Ä±karÄ±lamadÄ± (taranmÄ±ÅŸ/gÃ¶rsel PDF olabilir)."
                 if len(tam_metin) > MAKS_KARAKTER:
                     tam_metin = (
                         tam_metin[:MAKS_KARAKTER]
-                        + f"\n...[{len(tam_metin)} karakter, ilk {MAKS_KARAKTER} gösterildi]"
+                        + f"\n...[{len(tam_metin)} karakter, ilk {MAKS_KARAKTER} gÃ¶sterildi]"
                     )
-                return f"[PDF — {len(pdf.pages)} sayfa]\n{tam_metin}"
+                return f"[PDF â€” {len(pdf.pages)} sayfa]\n{tam_metin}"
         except Exception as e:
-            return f"[PDF Hatası]: pdfplumber: {e}"
+            return f"[PDF HatasÄ±]: pdfplumber: {e}"
 
     if _PDF_VAR == "PyPDF2":
         try:
@@ -109,17 +109,17 @@ def pdf_oku(dosya_yolu: str) -> str:
                         sayfalar.append(f"[Sayfa {i}]\n{metin.strip()}")
                 tam_metin = "\n\n".join(sayfalar)
                 if not tam_metin.strip():
-                    return "[PDF]: Metin çıkarılamadı."
+                    return "[PDF]: Metin Ã§Ä±karÄ±lamadÄ±."
                 if len(tam_metin) > MAKS_KARAKTER:
-                    tam_metin = tam_metin[:MAKS_KARAKTER] + f"\n...[kırpıldı]"
-                return f"[PDF — {len(okuyucu.pages)} sayfa]\n{tam_metin}"
+                    tam_metin = tam_metin[:MAKS_KARAKTER] + f"\n...[kÄ±rpÄ±ldÄ±]"
+                return f"[PDF â€” {len(okuyucu.pages)} sayfa]\n{tam_metin}"
         except Exception as e:
-            return f"[PDF Hatası]: PyPDF2: {e}"
+            return f"[PDF HatasÄ±]: PyPDF2: {e}"
 
-    return "[PDF]: pdfplumber veya PyPDF2 kurulu değil. 'pip install pdfplumber' çalıştırın."
+    return "[PDF]: pdfplumber veya PyPDF2 kurulu deÄŸil. 'pip install pdfplumber' Ã§alÄ±ÅŸtÄ±rÄ±n."
 
 
-# ── Excel ─────────────────────────────────────────────────────────────────────
+# â”€â”€ Excel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def excel_oku(dosya_yolu: str, sayfa: str = "") -> str:
@@ -127,17 +127,17 @@ def excel_oku(dosya_yolu: str, sayfa: str = "") -> str:
 
     Args:
         dosya_yolu: Excel dosyasinin yolu.
-        sayfa:      Sayfa adi veya indeksi. Bos birakılirsa ilk sayfa alinir.
+        sayfa:      Sayfa adi veya indeksi. Bos birakÄ±lirsa ilk sayfa alinir.
 
     Returns:
         CSV benzeri metin veya hata mesaji.
     """
     if not os.path.exists(dosya_yolu):
-        return f"[Excel Hatası]: '{dosya_yolu}' bulunamadı."
+        return f"[Excel HatasÄ±]: '{dosya_yolu}' bulunamadÄ±."
 
     uzanti = os.path.splitext(dosya_yolu)[1].lower()
     if uzanti not in {".xlsx", ".xls", ".xlsm"}:
-        return "[Excel Hatası]: .xlsx/.xls/.xlsm uzantısı gerekli."
+        return "[Excel HatasÄ±]: .xlsx/.xls/.xlsm uzantÄ±sÄ± gerekli."
 
     if _EXCEL_VAR == "openpyxl":
         try:
@@ -152,19 +152,19 @@ def excel_oku(dosya_yolu: str, sayfa: str = "") -> str:
                 satirlar.append("\t".join(hucre_metinleri))
             wb.close()
             if not satirlar:
-                return "[Excel]: Boş sayfa."
+                return "[Excel]: BoÅŸ sayfa."
             if len(satirlar) > MAKS_SATIR:
-                ek = f"\n...[toplam {len(satirlar)} satır, ilk {MAKS_SATIR} gösterildi]"
+                ek = f"\n...[toplam {len(satirlar)} satÄ±r, ilk {MAKS_SATIR} gÃ¶sterildi]"
                 satirlar = satirlar[:MAKS_SATIR]
             else:
                 ek = ""
             return (
-                f"[Excel — '{ws.title}' sayfası, {len(satirlar)} satır]\n"
+                f"[Excel â€” '{ws.title}' sayfasÄ±, {len(satirlar)} satÄ±r]\n"
                 + "\n".join(satirlar)
                 + ek
             )
         except Exception as e:
-            return f"[Excel Hatası]: openpyxl: {e}"
+            return f"[Excel HatasÄ±]: openpyxl: {e}"
 
     if _EXCEL_VAR == "xlrd":
         try:
@@ -179,20 +179,20 @@ def excel_oku(dosya_yolu: str, sayfa: str = "") -> str:
                 hucre_metinleri = [str(ws.cell_value(r, c)) for c in range(ws.ncols)]
                 satirlar.append("\t".join(hucre_metinleri))
             if len(satirlar) > MAKS_SATIR:
-                ek = f"\n...[toplam {len(satirlar)} satır, ilk {MAKS_SATIR} gösterildi]"
+                ek = f"\n...[toplam {len(satirlar)} satÄ±r, ilk {MAKS_SATIR} gÃ¶sterildi]"
                 satirlar = satirlar[:MAKS_SATIR]
             else:
                 ek = ""
-            return f"[Excel — '{ws.name}' sayfası]\n" + "\n".join(satirlar) + ek
+            return f"[Excel â€” '{ws.name}' sayfasÄ±]\n" + "\n".join(satirlar) + ek
         except Exception as e:
-            return f"[Excel Hatası]: xlrd: {e}"
+            return f"[Excel HatasÄ±]: xlrd: {e}"
 
     return (
-        "[Excel]: openpyxl veya xlrd kurulu değil. 'pip install openpyxl' çalıştırın."
+        "[Excel]: openpyxl veya xlrd kurulu deÄŸil. 'pip install openpyxl' Ã§alÄ±ÅŸtÄ±rÄ±n."
     )
 
 
-# ── CSV ───────────────────────────────────────────────────────────────────────
+# â”€â”€ CSV â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def csv_oku(dosya_yolu: str, ayirici: str = ",") -> str:
@@ -206,7 +206,7 @@ def csv_oku(dosya_yolu: str, ayirici: str = ",") -> str:
         Tablo metni veya hata mesaji.
     """
     if not os.path.exists(dosya_yolu):
-        return f"[CSV Hatası]: '{dosya_yolu}' bulunamadı."
+        return f"[CSV HatasÄ±]: '{dosya_yolu}' bulunamadÄ±."
 
     try:
         # Ayirici tespiti
@@ -224,34 +224,34 @@ def csv_oku(dosya_yolu: str, ayirici: str = ",") -> str:
             okuyucu = csv.reader(f, delimiter=ayirici)
             for i, satir in enumerate(okuyucu):
                 if i >= MAKS_SATIR:
-                    satirlar.append(f"...[{i} satır okundu, geri kalanlar atlandı]")
+                    satirlar.append(f"...[{i} satÄ±r okundu, geri kalanlar atlandÄ±]")
                     break
                 satirlar.append("\t".join(satir))
 
         if not satirlar:
-            return "[CSV]: Boş dosya."
-        return f"[CSV — {len(satirlar)} satır, ayirici='{ayirici}']\n" + "\n".join(
+            return "[CSV]: BoÅŸ dosya."
+        return f"[CSV â€” {len(satirlar)} satÄ±r, ayirici='{ayirici}']\n" + "\n".join(
             satirlar
         )
     except Exception as e:
-        return f"[CSV Hatası]: {e}"
+        return f"[CSV HatasÄ±]: {e}"
 
 
-# ── LLaVA Görüntü Analizi ─────────────────────────────────────────────────────
+# â”€â”€ LLaVA GÃ¶rÃ¼ntÃ¼ Analizi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def goruntu_analiz(goruntu_yolu: str, soru: str = "") -> str:
     """Goruntu analiz eder (OpenRouter vision uzerinden)."""
     if not os.path.exists(goruntu_yolu):
-        return f"[Görüntü Hatası]: '{goruntu_yolu}' bulunamadı."
+        return f"[GÃ¶rÃ¼ntÃ¼ HatasÄ±]: '{goruntu_yolu}' bulunamadÄ±."
     try:
         from reymen.arac.araclar_goruntu import vision_analiz
 
         return vision_analiz(
-            kaynak=goruntu_yolu, soru=soru or "Bu görselde ne var, detaylı açıkla."
+            kaynak=goruntu_yolu, soru=soru or "Bu gÃ¶rselde ne var, detaylÄ± aÃ§Ä±kla."
         )
     except Exception as e:
-        return f"[Görüntü Hatası]: {e}"
+        return f"[GÃ¶rÃ¼ntÃ¼ HatasÄ±]: {e}"
 
 
 def _goruntu_http(goruntu_yolu: str, prompt: str, onceki_hata: str) -> str:
@@ -259,7 +259,7 @@ def _goruntu_http(goruntu_yolu: str, prompt: str, onceki_hata: str) -> str:
     return goruntu_analiz(goruntu_yolu, prompt)
 
 
-# ── Dosya Tipi Tespiti (tek API noktası) ─────────────────────────────────────
+# â”€â”€ Dosya Tipi Tespiti (tek API noktasÄ±) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def dosya_analiz(dosya_yolu: str, ek_parametre: str = "") -> str:
@@ -273,7 +273,7 @@ def dosya_analiz(dosya_yolu: str, ek_parametre: str = "") -> str:
         Analiz sonucu.
     """
     if not dosya_yolu:
-        return "[Dosya Analiz]: Dosya yolu boş."
+        return "[Dosya Analiz]: Dosya yolu boÅŸ."
 
     uzanti = os.path.splitext(dosya_yolu)[1].lower()
 
@@ -286,21 +286,21 @@ def dosya_analiz(dosya_yolu: str, ek_parametre: str = "") -> str:
     if uzanti in {".jpg", ".jpeg", ".png", ".webp", ".bmp", ".gif"}:
         return goruntu_analiz(dosya_yolu, soru=ek_parametre)
     return (
-        f"[Dosya Analiz]: '{uzanti}' uzantısı desteklenmiyor.\n"
+        f"[Dosya Analiz]: '{uzanti}' uzantÄ±sÄ± desteklenmiyor.\n"
         f"Desteklenenler: .pdf, .xlsx, .xls, .csv, .jpg, .jpeg, .png, .webp"
     )
 
 
 if __name__ == "__main__":
-    print("=== Dosya Analiz Araçları Testi ===")
-    print(f"PDF:   {_PDF_VAR or 'kurulu değil'}")
-    print(f"Excel: {_EXCEL_VAR or 'kurulu değil'}")
+    print("=== Dosya Analiz AraÃ§larÄ± Testi ===")
+    print(f"PDF:   {_PDF_VAR or 'kurulu deÄŸil'}")
+    print(f"Excel: {_EXCEL_VAR or 'kurulu deÄŸil'}")
     print(f"CSV:   stdlib (her zaman mevcut)")
     print(
-        f"LLaVA: {'ollama kütüphanesi' if _OLLAMA_LIB_VAR else 'HTTP API'} üzerinden\n"
+        f"LLaVA: {'ollama kÃ¼tÃ¼phanesi' if _OLLAMA_LIB_VAR else 'HTTP API'} Ã¼zerinden\n"
     )
 
-    # CSV testi (stdlib ile her zaman çalışır)
+    # CSV testi (stdlib ile her zaman Ã§alÄ±ÅŸÄ±r)
     import tempfile
 
     tmp = tempfile.NamedTemporaryFile(
@@ -311,5 +311,5 @@ if __name__ == "__main__":
     print(csv_oku(tmp.name))
     os.unlink(tmp.name)
 
-    # Görüntü testi — dosya yoksa graceful
+    # GÃ¶rÃ¼ntÃ¼ testi â€” dosya yoksa graceful
     print(goruntu_analiz("olmayan_resim.jpg", "Ne var?"))

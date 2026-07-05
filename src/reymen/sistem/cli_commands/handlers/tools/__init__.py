@@ -1,1 +1,1 @@
-"""Tool command handlers — extracted from tool_commands.py."""
+﻿"""Tool command handlers â€” extracted from tool_commands.py."""

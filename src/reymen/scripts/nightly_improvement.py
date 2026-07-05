@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-nightly_improvement.py — ReYMeN Nightly Self-Improvement Loop.
+nightly_improvement.py â€” ReYMeN Nightly Self-Improvement Loop.
 
 Runs every night at 03:00. 6-stage silent loop:
 
@@ -32,9 +32,9 @@ from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
-# ── Proje Yolları ───────────────────────────────────────────────────
+# â”€â”€ Proje YollarÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-ROOT = Path(__file__).resolve().parent.parent.parent.parent  # proje kökü
+ROOT = Path(__file__).resolve().parent.parent.parent.parent  # proje kÃ¶kÃ¼
 SRC = ROOT / "src"
 sys.path.insert(0, str(SRC))
 
@@ -45,7 +45,7 @@ RAPOR_DIZINI = ROOT / ".ReYMeN" / "nightly"
 RAPOR_DIZINI.mkdir(parents=True, exist_ok=True)
 
 
-# ── Veri Yapıları ───────────────────────────────────────────────────
+# â”€â”€ Veri YapÄ±larÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 @dataclass
@@ -57,12 +57,12 @@ class AsamaSonucu:
     sure_sn: float = 0.0
     mesaj: str = ""
     veri: dict[str, Any] = field(default_factory=dict)
-    uyari: bool = False  # True = kullanıcıya bildirilecek
+    uyari: bool = False  # True = kullanÄ±cÄ±ya bildirilecek
 
 
 @dataclass
 class NightlyRapor:
-    """6 aşamalı gece raporunun tamamı."""
+    """6 aÅŸamalÄ± gece raporunun tamamÄ±."""
 
     timestamp: str = ""
     asamalar: list[dict[str, Any]] = field(default_factory=list)
@@ -74,17 +74,17 @@ class NightlyRapor:
     ozet: str = ""
 
 
-# ═══════════════════════════════════════════════════════════════════════
-#  Aşama 1: once_hafiza Analizi (Zayıf Noktalar)
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+#  AÅŸama 1: once_hafiza Analizi (ZayÄ±f Noktalar)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _asama_once_hafiza() -> AsamaSonucu:
-    """once_hafiza'daki zayıf noktaları tespit et.
+    """once_hafiza'daki zayÄ±f noktalarÄ± tespit et.
 
-    - Düşük güven skorlu (< 0.4) kayıtlar
-    - Hiç başarılı olmamış hedefler
-    - Sık hata alınan hedefler (hata_sayisi >= 3)
+    - DÃ¼ÅŸÃ¼k gÃ¼ven skorlu (< 0.4) kayÄ±tlar
+    - HiÃ§ baÅŸarÄ±lÄ± olmamÄ±ÅŸ hedefler
+    - SÄ±k hata alÄ±nan hedefler (hata_sayisi >= 3)
     """
     basla = time.time()
     sonuc = AsamaSonucu(ad="once_hafiza_analizi", basarili=True)
@@ -96,7 +96,7 @@ def _asama_once_hafiza() -> AsamaSonucu:
 
         import sqlite3
 
-        # Öğrenme DB'den analiz
+        # Ã–ÄŸrenme DB'den analiz
         ogrenme_db = oh.ogrenme_db
         zayif_noktalar = []
 
@@ -105,34 +105,34 @@ def _asama_once_hafiza() -> AsamaSonucu:
             con.row_factory = sqlite3.Row
             cur = con.cursor()
 
-            # Tablo var mı kontrol et
+            # Tablo var mÄ± kontrol et
             tablolar = cur.execute(
                 "SELECT name FROM sqlite_master WHERE type='table'"
             ).fetchall()
             tablo_isimleri = [r["name"] for r in tablolar]
 
             if "ogrenmeler" in tablo_isimleri:
-                # Kategori bazlı dağılım
+                # Kategori bazlÄ± daÄŸÄ±lÄ±m
                 kategoriler = cur.execute(
                     "SELECT kategori, COUNT(*) as adet FROM ogrenmeler "
                     "WHERE kategori != '' GROUP BY kategori ORDER BY adet DESC"
                 ).fetchall()
 
-                # Düşük güven skorlu kayıtlar
+                # DÃ¼ÅŸÃ¼k gÃ¼ven skorlu kayÄ±tlar
                 dusuk_guven = cur.execute(
                     "SELECT hedef, guven_skoru, basari_sayisi, hata_sayisi "
                     "FROM ogrenmeler WHERE guven_skoru < 0.4 "
                     "ORDER BY guven_skoru ASC LIMIT 10"
                 ).fetchall()
 
-                # Sık hata alınan hedefler
+                # SÄ±k hata alÄ±nan hedefler
                 cok_hata = cur.execute(
                     "SELECT hedef, hata_sayisi, basari_sayisi, guven_skoru "
                     "FROM ogrenmeler WHERE hata_sayisi >= 3 "
                     "ORDER BY hata_sayisi DESC LIMIT 10"
                 ).fetchall()
 
-                # Hiç başarılı olmamış
+                # HiÃ§ baÅŸarÄ±lÄ± olmamÄ±ÅŸ
                 sifir_basari = cur.execute(
                     "SELECT hedef, hata_sayisi "
                     "FROM ogrenmeler WHERE basari_sayisi = 0 AND hata_sayisi > 0 "
@@ -169,7 +169,7 @@ def _asama_once_hafiza() -> AsamaSonucu:
 
             con.close()
 
-            # Özet
+            # Ã–zet
             toplam_zayif = (
                 len(zayif_noktalar.get("dusuk_guven", []))
                 + len(zayif_noktalar.get("cok_hata", []))
@@ -195,13 +195,13 @@ def _asama_once_hafiza() -> AsamaSonucu:
     return sonuc
 
 
-# ═══════════════════════════════════════════════════════════════════════
-#  Aşama 2: Skill İyileştirme (Düşük Başarılı Skill'ler)
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+#  AÅŸama 2: Skill Ä°yileÅŸtirme (DÃ¼ÅŸÃ¼k BaÅŸarÄ±lÄ± Skill'ler)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _asama_skill_iyilestirme() -> AsamaSonucu:
-    """Düşük başarılı skill'leri tespit et ve iyileştir."""
+    """DÃ¼ÅŸÃ¼k baÅŸarÄ±lÄ± skill'leri tespit et ve iyileÅŸtir."""
     basla = time.time()
     sonuc = AsamaSonucu(ad="skill_iyilestirme", basarili=True)
 
@@ -212,7 +212,7 @@ def _asama_skill_iyilestirme() -> AsamaSonucu:
         adaylar = iyilestirici.iyilestirme_adaylari_bul()
 
         if adaylar:
-            # Öncelikli iyileştir (oncelik >= 7)
+            # Ã–ncelikli iyileÅŸtir (oncelik >= 7)
             acil_adaylar = [a for a in adaylar if a.get("oncelik", 0) >= 7]
             iyilestirilen = 0
             for aday in acil_adaylar[:5]:
@@ -269,13 +269,13 @@ def _asama_skill_iyilestirme() -> AsamaSonucu:
     return sonuc
 
 
-# ═══════════════════════════════════════════════════════════════════════
-#  Aşama 3: Memory Compaction Kontrolü
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+#  AÅŸama 3: Memory Compaction KontrolÃ¼
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _asama_memory_compaction() -> AsamaSonucu:
-    """Hafıza compaction kontrolü yap."""
+    """HafÄ±za compaction kontrolÃ¼ yap."""
     basla = time.time()
     sonuc = AsamaSonucu(ad="memory_compaction", basarili=True)
 
@@ -325,13 +325,13 @@ def _asama_memory_compaction() -> AsamaSonucu:
     return sonuc
 
 
-# ═══════════════════════════════════════════════════════════════════════
-#  Aşama 4: Kod Kalitesi (ruff/bandit)
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+#  AÅŸama 4: Kod Kalitesi (ruff/bandit)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _asama_kod_kalitesi() -> AsamaSonucu:
-    """ruff ve bandit ile kod kalitesi taraması."""
+    """ruff ve bandit ile kod kalitesi taramasÄ±."""
     basla = time.time()
     sonuc = AsamaSonucu(ad="kod_kalitesi", basarili=True)
 
@@ -339,7 +339,7 @@ def _asama_kod_kalitesi() -> AsamaSonucu:
     hata_sayisi = 0
 
     try:
-        # ── ruff kontrolü ──
+        # â”€â”€ ruff kontrolÃ¼ â”€â”€
         try:
             r = subprocess.run(
                 [
@@ -360,7 +360,7 @@ def _asama_kod_kalitesi() -> AsamaSonucu:
                     if satir.strip() and "error" in satir.lower() or "E" in satir:
                         bulgular["ruff"].append(satir.strip()[:150])
                         hata_sayisi += 1
-                # Sayıyı standart çıktıdan al
+                # SayÄ±yÄ± standart Ã§Ä±ktÄ±dan al
                 import re as _re
 
                 sayi_match = _re.search(r"Found (\d+) error", r.stdout)
@@ -369,7 +369,7 @@ def _asama_kod_kalitesi() -> AsamaSonucu:
         except FileNotFoundError:
             bulgular["ruff"] = ["ruff kurulu degil"]
 
-        # ── bandit güvenlik taraması ──
+        # â”€â”€ bandit gÃ¼venlik taramasÄ± â”€â”€
         try:
             r = subprocess.run(
                 [sys.executable, "-m", "bandit", "-r", "-q", str(SRC / "reymen")],
@@ -384,14 +384,14 @@ def _asama_kod_kalitesi() -> AsamaSonucu:
         except FileNotFoundError:
             bulgular["bandit"] = ["bandit kurulu degil"]
 
-        # ── El kuralları ──
+        # â”€â”€ El kurallarÄ± â”€â”€
         py_dosyalar = list(Path(SRC / "reymen").rglob("*.py"))
         for dosya in py_dosyalar:
             try:
                 icerik = dosya.read_text(encoding="utf-8", errors="replace")
                 satir_sayisi = len(icerik.split("\n"))
 
-                # Bare except kontrolü
+                # Bare except kontrolÃ¼
                 if "except:" in icerik or "except :" in icerik:
                     bulgular["el_kurallari"].append(
                         f"{dosya.relative_to(SRC)}: bare except"
@@ -410,7 +410,7 @@ def _asama_kod_kalitesi() -> AsamaSonucu:
                         f"{dosya.relative_to(SRC)}: {todo_say} TODO/FIXME"
                     )
 
-                # >800 satır
+                # >800 satÄ±r
                 if satir_sayisi > 800:
                     bulgular["el_kurallari"].append(
                         f"{dosya.relative_to(SRC)}: {satir_sayisi} satir (>800)"
@@ -444,18 +444,18 @@ def _asama_kod_kalitesi() -> AsamaSonucu:
     return sonuc
 
 
-# ═══════════════════════════════════════════════════════════════════════
-#  Aşama 5: Cron Job'ların Durumu
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+#  AÅŸama 5: Cron Job'larÄ±n Durumu
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _asama_cron_durumu() -> AsamaSonucu:
-    """Kayıtlı cron job'larının durumunu kontrol et."""
+    """KayÄ±tlÄ± cron job'larÄ±nÄ±n durumunu kontrol et."""
     basla = time.time()
     sonuc = AsamaSonucu(ad="cron_durumu", basarili=True)
 
     try:
-        # Önce yerel .ReYMeN/cron/jobs.json
+        # Ã–nce yerel .ReYMeN/cron/jobs.json
         yerel_isler = []
         hermes_isler = []
 
@@ -478,7 +478,7 @@ def _asama_cron_durumu() -> AsamaSonucu:
             except Exception:
                 logger.warning("[fix_01_sessiz_except] Exception")
 
-        # Hermes-style cron (jobs.py)
+        # ReYMeN-style cron (jobs.py)
         try:
             from reymen.cron.jobs import list_jobs
 
@@ -497,9 +497,9 @@ def _asama_cron_durumu() -> AsamaSonucu:
         except Exception:
             logger.warning("[fix_01_sessiz_except] Exception")
 
-        # Sorunlu job'ları tespit et
+        # Sorunlu job'larÄ± tespit et
         sorunlu = []
-        for isler, kaynak in [(yerel_isler, "yerel"), (hermes_isler, "hermes")]:
+        for isler, kaynak in [(yerel_isler, "yerel"), (hermes_isler, "reymen")]:
             for j in isler:
                 if not j.get("aktif", j.get("enabled", True)):
                     continue
@@ -529,13 +529,13 @@ def _asama_cron_durumu() -> AsamaSonucu:
     return sonuc
 
 
-# ═══════════════════════════════════════════════════════════════════════
-#  Aşama 6: 7 Günlük Trend Raporu
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+#  AÅŸama 6: 7 GÃ¼nlÃ¼k Trend Raporu
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _asama_trend_raporu() -> AsamaSonucu:
-    """Son 7 günlük performans trendini hesapla."""
+    """Son 7 gÃ¼nlÃ¼k performans trendini hesapla."""
     basla = time.time()
     sonuc = AsamaSonucu(ad="trend_raporu", basarili=True)
 
@@ -564,7 +564,7 @@ def _asama_trend_raporu() -> AsamaSonucu:
                 row = con.execute("SELECT COUNT(*) FROM ogrenmeler").fetchone()
                 trend["once_hafiza"]["toplam_kayit"] = row[0] if row else 0
 
-                # Son 7 günde eklenen
+                # Son 7 gÃ¼nde eklenen
                 row = con.execute(
                     "SELECT COUNT(*) FROM ogrenmeler WHERE olusturulma >= ?",
                     (datetime.fromtimestamp(yedi_gun_once).isoformat(),),
@@ -574,7 +574,7 @@ def _asama_trend_raporu() -> AsamaSonucu:
         except Exception:
             logger.warning("[fix_01_sessiz_except] Exception")
 
-        # Skill iyileştirme trendi
+        # Skill iyileÅŸtirme trendi
         try:
             from reymen.scripts.skill_iyilestirici import SkillIyilestirici
 
@@ -597,7 +597,7 @@ def _asama_trend_raporu() -> AsamaSonucu:
                     trend["skill"]["basarili"] = row[1]
                     trend["skill"]["basarisiz"] = row[2]
 
-                # İyileştirme önerileri
+                # Ä°yileÅŸtirme Ã¶nerileri
                 oneriler = con.execute(
                     "SELECT COUNT(*) FROM iyilestirme_onerileri WHERE olusturulma >= ?",
                     (yedi_gun_once,),
@@ -607,7 +607,7 @@ def _asama_trend_raporu() -> AsamaSonucu:
         except Exception:
             logger.warning("[fix_01_sessiz_except] Exception")
 
-        # Önceki gece raporlarını topla
+        # Ã–nceki gece raporlarÄ±nÄ± topla
         if RAPOR_DIZINI.exists():
             rapor_dosyalari = sorted(RAPOR_DIZINI.glob("nightly_*.json"), reverse=True)[
                 :7
@@ -626,7 +626,7 @@ def _asama_trend_raporu() -> AsamaSonucu:
                 except Exception:
                     continue
 
-        # Performans özeti
+        # Performans Ã¶zeti
         trend_ozeti = []
         sk = trend["skill"]
         if sk["kullanim"] > 0:
@@ -662,15 +662,15 @@ def _asama_trend_raporu() -> AsamaSonucu:
     return sonuc
 
 
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Rapor Yazma
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _rapor_kaydet(rapor: NightlyRapor) -> None:
-    """Raporu durum.json ve .ReYMeN/nightly/ altına yaz."""
+    """Raporu durum.json ve .ReYMeN/nightly/ altÄ±na yaz."""
 
-    # JSON formatı
+    # JSON formatÄ±
     rapor_dict = {
         "timestamp": rapor.timestamp,
         "asamalar": rapor.asamalar,
@@ -682,7 +682,7 @@ def _rapor_kaydet(rapor: NightlyRapor) -> None:
         "ozet": rapor.ozet,
     }
 
-    # Gece raporu dosyası (tarihli)
+    # Gece raporu dosyasÄ± (tarihli)
     tarih = rapor.timestamp[:10]
     rapor_dosyasi = RAPOR_DIZINI / f"nightly_{tarih}.json"
     rapor_dosyasi.write_text(
@@ -697,7 +697,7 @@ def _rapor_kaydet(rapor: NightlyRapor) -> None:
         encoding="utf-8",
     )
 
-    # durum.json güncellemesi
+    # durum.json gÃ¼ncellemesi
     if DURUM_JSON.exists():
         try:
             durum = json.loads(DURUM_JSON.read_text(encoding="utf-8"))
@@ -735,21 +735,21 @@ def _rapor_kaydet(rapor: NightlyRapor) -> None:
     )
 
 
-# ═══════════════════════════════════════════════════════════════════════
-#  Ana Döngü
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+#  Ana DÃ¶ngÃ¼
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def main() -> str:
-    """6 aşamalı gece kendini geliştirme döngüsünü çalıştır.
+    """6 aÅŸamalÄ± gece kendini geliÅŸtirme dÃ¶ngÃ¼sÃ¼nÃ¼ Ã§alÄ±ÅŸtÄ±r.
 
     Returns:
-        Özet metin (sessiz modda sadece sorun varsa gösterilir).
+        Ã–zet metin (sessiz modda sadece sorun varsa gÃ¶sterilir).
     """
     baslama = time.time()
     logger.info("[Nightly] === Gece Kendini Gelistirme Dongusu basladi ===")
 
-    # Aşamaları sırayla çalıştır
+    # AÅŸamalarÄ± sÄ±rayla Ã§alÄ±ÅŸtÄ±r
     asama_fonksiyonlari = [
         ("once_hafiza_analizi", _asama_once_hafiza),
         ("skill_iyilestirme", _asama_skill_iyilestirme),
@@ -776,23 +776,23 @@ def main() -> str:
             "OK" if sonuc.basarili else "FAIL",
             sonuc.mesaj[:80],
             sonuc.sure_sn,
-            " ⚠️" if sonuc.uyari else "",
+            " âš ï¸" if sonuc.uyari else "",
         )
 
-    # Raporu oluştur
+    # Raporu oluÅŸtur
     toplam_sure = round(time.time() - baslama, 2)
 
-    # Özet mesajı
+    # Ã–zet mesajÄ±
     sorunlu_asamalar = [s["ad"] for s in sonuclar if s.get("uyari")]
     basarisiz_asamalar = [s["ad"] for s in sonuclar if not s["basarili"]]
 
     ozet_parcalari = []
     if sorunlu_asamalar:
-        ozet_parcalari.append(f"⚠️ Uyari: {', '.join(sorunlu_asamalar)}")
+        ozet_parcalari.append(f"âš ï¸ Uyari: {', '.join(sorunlu_asamalar)}")
     if basarisiz_asamalar:
-        ozet_parcalari.append(f"❌ Basarisiz: {', '.join(basarisiz_asamalar)}")
+        ozet_parcalari.append(f"âŒ Basarisiz: {', '.join(basarisiz_asamalar)}")
     if not sorunlu_asamalar and not basarisiz_asamalar:
-        ozet_parcalari.append("✅ Tum asamalar basarili, sorun yok")
+        ozet_parcalari.append("âœ… Tum asamalar basarili, sorun yok")
 
     ozet_parcalari.append(
         f"({basarili_asama}/{len(asama_fonksiyonlari)} basarili, " f"{toplam_sure}s)"
@@ -814,15 +814,15 @@ def main() -> str:
 
     logger.info("[Nightly] === Dongu tamamlandi: %s ===", ozet)
 
-    # Sessiz çalış: sadece sorun varsa kullanıcıya göster
+    # Sessiz Ã§alÄ±ÅŸ: sadece sorun varsa kullanÄ±cÄ±ya gÃ¶ster
     if uyari_var:
         return f"[NIGHTLY] {ozet}"
     return ""
 
 
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  CLI Entry Point
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 if __name__ == "__main__":
     logging.basicConfig(

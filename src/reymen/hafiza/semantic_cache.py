@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-semantic_cache.py — Anlamsal LLM Onbellek.
+semantic_cache.py â€” Anlamsal LLM Onbellek.
 
 Ayni veya cok benzer promptlara verilen LLM yanitlarini saklar.
-ChromaDB varsa vektörel benzerlik, yoksa SHA-256 karma ile eslesme yapar.
+ChromaDB varsa vektÃ¶rel benzerlik, yoksa SHA-256 karma ile eslesme yapar.
 
 Kullanim::
 
@@ -25,7 +25,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# ChromaDB varsa vektörel, yoksa hash tabanlı çalışır
+# ChromaDB varsa vektÃ¶rel, yoksa hash tabanlÄ± Ã§alÄ±ÅŸÄ±r
 try:
     import chromadb
 
@@ -33,7 +33,7 @@ try:
 except ImportError:
     _CHROMA_VAR = False
 
-# Gömme (embedding) için SentenceTransformers opsiyonel
+# GÃ¶mme (embedding) iÃ§in SentenceTransformers opsiyonel
 try:
     from sentence_transformers import SentenceTransformer
 
@@ -45,7 +45,7 @@ except ImportError:
 class SemanticCache:
     """Anlamsal LLM onbellek.
 
-    Yakin anlam tasıyan promptlara once onbellekten yanit verir.
+    Yakin anlam tasÄ±yan promptlara once onbellekten yanit verir.
     ChromaDB + SentenceTransformers varsa kosinus benzerligi hesaplar,
     yoksa SHA-256 karma ile tam eslesme yapar.
     """
@@ -93,11 +93,11 @@ class SemanticCache:
         if not self._chroma:
             self._cache_dizin.mkdir(parents=True, exist_ok=True)
 
-    # ── Onbellek anahtari ──────────────────────────────────────────────────────
+    # â”€â”€ Onbellek anahtari â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @staticmethod
     def _anahtar(sistem_prompt: str, mesajlar: list) -> str:
-        """SHA-256 tabanlı deterministik anahtar."""
+        """SHA-256 tabanlÄ± deterministik anahtar."""
         ham = json.dumps(
             {
                 "sp": sistem_prompt[:500],
@@ -116,7 +116,7 @@ class SemanticCache:
             parca += " " + m.get("content", "")[:150]
         return parca.strip()
 
-    # ── Arama ─────────────────────────────────────────────────────────────────
+    # â”€â”€ Arama â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def ara(self, sistem_prompt: str, mesajlar: list) -> Optional[str]:
         """Onbellekte eslesme ara.
@@ -182,10 +182,10 @@ class SemanticCache:
         except Exception:
             return self._hash_ara(sistem_prompt, mesajlar)
 
-    # ── Kaydetme ──────────────────────────────────────────────────────────────
+    # â”€â”€ Kaydetme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def kaydet(self, sistem_prompt: str, mesajlar: list, yanit: str):
-        """LLM yanitini onbelleğe kaydet."""
+        """LLM yanitini onbelleÄŸe kaydet."""
         if self._chroma and self._embed_fn:
             self._chroma_kaydet(sistem_prompt, mesajlar, yanit)
         else:
@@ -226,7 +226,7 @@ class SemanticCache:
         except Exception:
             self._hash_kaydet(sistem_prompt, mesajlar, yanit)
 
-    # ── İstatistik ────────────────────────────────────────────────────────────
+    # â”€â”€ Ä°statistik â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def istatistik(self) -> dict:
         """Onbellek hit/miss istatistikleri."""
@@ -241,7 +241,7 @@ class SemanticCache:
         }
 
     def temizle(self):
-        """Tüm onbellek kayitlarini sil."""
+        """TÃ¼m onbellek kayitlarini sil."""
         self._hash_cache.clear()
         try:
             for dosya in self._cache_dizin.glob("*.json"):
@@ -255,7 +255,7 @@ class SemanticCache:
                 print(f"[UYARI] semantic_cache.py:235 - {_semantic_e234}")
 
 
-# ── Tekil ornek (singleton) ──────────────────────────────────────────────────
+# â”€â”€ Tekil ornek (singleton) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _GLOBAL_CACHE: Optional[SemanticCache] = None
 
@@ -268,7 +268,7 @@ def global_cache_al() -> SemanticCache:
     return _GLOBAL_CACHE
 
 
-# ── Test blogu ────────────────────────────────────────────────────────────────
+# â”€â”€ Test blogu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
     cache = SemanticCache(gecerlilik_sn=60)

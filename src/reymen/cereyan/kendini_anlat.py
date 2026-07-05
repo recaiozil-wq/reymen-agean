@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-kendini_anlat.py — ReYMeN / ReYMeN icin oz refleksiyon araci.
+kendini_anlat.py â€” ReYMeN / ReYMeN icin oz refleksiyon araci.
 
 Kullanim:
   python kendini_anlat.py            # Tum analiz
@@ -22,10 +22,10 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# ─── Proje Kok ______________________________
+# â”€â”€â”€ Proje Kok ______________________________
 PROJE_KOK = Path(__file__).parent.resolve()
 
-# ─── Analiz Edilecek Moduller _______________
+# â”€â”€â”€ Analiz Edilecek Moduller _______________
 ANA_MODULLER = [
     "motor.py",
     "beyin.py",
@@ -137,7 +137,7 @@ def import_analizi(dosya: Path) -> list[str]:
     return sorted(ozel_importlar)
 
 
-# ─── Analiz Fonksiyonlari ___________________
+# â”€â”€â”€ Analiz Fonksiyonlari ___________________
 
 
 def cozum_tarzi_analizi() -> dict:
@@ -338,7 +338,7 @@ def genel_istatistik() -> dict:
     }
 
 
-# ─── Raporlama ______________________________
+# â”€â”€â”€ Raporlama ______________________________
 
 
 def rapor_yaz(mod: str = "tum"):
@@ -348,10 +348,10 @@ def rapor_yaz(mod: str = "tum"):
     eksik = eksik_analizi()
 
     baslik = """
-╔══════════════════════════════════════════════════════════╗
-║           ReYMeN — Oz Refleksiyon Analizi               ║
-║     Kendine Ozgu Sorun Cozme ve Eksik Konular           ║
-╚══════════════════════════════════════════════════════════╝
+â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+â•‘           ReYMeN â€” Oz Refleksiyon Analizi               â•‘
+â•‘     Kendine Ozgu Sorun Cozme ve Eksik Konular           â•‘
+â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 """
     print(baslik)
     print(
@@ -360,10 +360,10 @@ def rapor_yaz(mod: str = "tum"):
     print(f"  Proje Koku: {PROJE_KOK}")
     print()
 
-    # ── Genel ──
+    # â”€â”€ Genel â”€â”€
     if mod in ("tum", "ozet"):
         print("  \033[1mGENEL ISTATISTIK\033[0m")
-        print(f"  {'─' * 50}")
+        print(f"  {'â”€' * 50}")
         print(f"  Python dosyasi       : {istatistik['python_dosyasi']}")
         print(f"  Toplam kod satiri    : {istatistik['toplam_kod_satiri']}")
         print(f"  Toplam sinif         : {istatistik['toplam_sinif']}")
@@ -371,10 +371,10 @@ def rapor_yaz(mod: str = "tum"):
         print(f"  Skill sayisi         : {istatistik['skill_sayisi']}")
         print()
 
-    # ── Cozum Tarzi ──
+    # â”€â”€ Cozum Tarzi â”€â”€
     if mod in ("tum", "cozum"):
         print("  \033[1m1. KENDINE OZGU SORUN COZME YAKLASIMI\033[0m")
-        print(f"  {'─' * 50}")
+        print(f"  {'â”€' * 50}")
 
         if cozum["mimari_pattern"]:
             print("  \033[1mMimari Pattern'ler:\033[0m")
@@ -398,10 +398,10 @@ def rapor_yaz(mod: str = "tum"):
                 print(f"    \u2713 {oz}")
         print()
 
-    # ── Eksikler ──
+    # â”€â”€ Eksikler â”€â”€
     if mod in ("tum", "eksik"):
         print("  \033[1m2. EKSIK KALAN / TAMAMLANMAMIS KONULAR\033[0m")
-        print(f"  {'─' * 50}")
+        print(f"  {'â”€' * 50}")
         print(f"  TODO sayisi           : {eksik['istatistik']['toplam_todo']}")
         print(f"  FIXME sayisi          : {eksik['istatistik']['toplam_fixme']}")
         print(f"  Bos pass bloklari     : {eksik['istatistik']['toplam_pass']}")
@@ -426,10 +426,10 @@ def rapor_yaz(mod: str = "tum"):
                     print(f"    {satir.strip()}")
             print()
 
-    # ── Oneriler ──
+    # â”€â”€ Oneriler â”€â”€
     if mod == "tum":
         print("  \033[1m3. ONERILER / GELISTIRME ALANLARI\033[0m")
-        print(f"  {'─' * 50}")
+        print(f"  {'â”€' * 50}")
 
         oneriler = []
         if eksik["istatistik"]["toplam_todo"] > 5:
@@ -444,7 +444,7 @@ def rapor_yaz(mod: str = "tum"):
 
         if istatistik["skill_sayisi"] == 0:
             oneriler.append(
-                "Henuz skill kutuphanesi yok — ogrenme dongusu icin skill gerekli"
+                "Henuz skill kutuphanesi yok â€” ogrenme dongusu icin skill gerekli"
             )
 
         if not (PROJE_KOK / "tests").exists() or not list(
@@ -458,12 +458,12 @@ def rapor_yaz(mod: str = "tum"):
             print("    \u2713 Kritik eksik bulunamadi.")
         print()
 
-    print(f"  {'─' * 50}")
+    print(f"  {'â”€' * 50}")
     print(f"  Analiz tamamlandi.")
     print()
 
 
-# ─── CLI Entry Point ________________________
+# â”€â”€â”€ CLI Entry Point ________________________
 
 if __name__ == "__main__":
     import argparse

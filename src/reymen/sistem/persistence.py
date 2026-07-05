@@ -1,15 +1,15 @@
-# -*- coding: utf-8 -*-
-"""persistence.py — Güvenlik Kalıcılık Katmanı.
+﻿# -*- coding: utf-8 -*-
+"""persistence.py â€” GÃ¼venlik KalÄ±cÄ±lÄ±k KatmanÄ±.
 
-Güvenlik olaylarını, tehdit loglarını ve denetim izlerini
-kalıcı olarak saklar. Şüpheli etkinlik geçmişine dayalı
-risk profili oluşturur.
+GÃ¼venlik olaylarÄ±nÄ±, tehdit loglarÄ±nÄ± ve denetim izlerini
+kalÄ±cÄ± olarak saklar. ÅÃ¼pheli etkinlik geÃ§miÅŸine dayalÄ±
+risk profili oluÅŸturur.
 
-Bileşenler:
-  - GüvenlikOlayı: Tek bir güvenlik kaydı
-  - KalıcılıkDeposuu: JSON tabanlı olay deposu
-  - RiskProfili: Kaynak başına risk skoru
-  - AuditTrail: Değişmez denetim izi (append-only)
+BileÅŸenler:
+  - GÃ¼venlikOlayÄ±: Tek bir gÃ¼venlik kaydÄ±
+  - KalÄ±cÄ±lÄ±kDeposuu: JSON tabanlÄ± olay deposu
+  - RiskProfili: Kaynak baÅŸÄ±na risk skoru
+  - AuditTrail: DeÄŸiÅŸmez denetim izi (append-only)
 """
 
 import json
@@ -29,11 +29,11 @@ PROFIL_YOLU = DEPO_KOKU / "risk_profiles.json"
 DEPO_KOKU.mkdir(parents=True, exist_ok=True)
 
 
-# ── Veri Modelleri ────────────────────────────────────────────────────
+# â”€â”€ Veri Modelleri â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class GuvenlikOlayi:
-    """Tek bir güvenlik olayı kaydı."""
+    """Tek bir gÃ¼venlik olayÄ± kaydÄ±."""
 
     SEVIYE_BILGI = "INFO"
     SEVIYE_UYARI = "WARN"
@@ -81,17 +81,17 @@ class GuvenlikOlayi:
         return o
 
 
-# ── Olay Deposu ───────────────────────────────────────────────────────
+# â”€â”€ Olay Deposu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class KalicilikDeposu:
-    """JSONL tabanlı güvenlik olayı deposu."""
+    """JSONL tabanlÄ± gÃ¼venlik olayÄ± deposu."""
 
     def __init__(self, dosya: Path = OLAY_DOSYASI):
         self._dosya = dosya
 
     def kaydet(self, olay: GuvenlikOlayi):
-        """Olayı kalıcı olarak kaydet (append-only)."""
+        """OlayÄ± kalÄ±cÄ± olarak kaydet (append-only)."""
         with open(self._dosya, "a", encoding="utf-8") as f:
             f.write(json.dumps(olay.to_dict(), ensure_ascii=False) + "\n")
 
@@ -102,7 +102,7 @@ class KalicilikDeposu:
         min_seviye: str = "",
         kaynak: str = "",
     ) -> list[GuvenlikOlayi]:
-        """Olayları filtreli oku."""
+        """OlaylarÄ± filtreli oku."""
         if not self._dosya.exists():
             return []
 
@@ -134,7 +134,7 @@ class KalicilikDeposu:
         return olaylar[-son_n:]
 
     def temizle(self, gun: int = 30):
-        """30 günden eski olayları sil."""
+        """30 gÃ¼nden eski olaylarÄ± sil."""
         esik = time.time() - (gun * 86400)
         if not self._dosya.exists():
             return 0
@@ -145,7 +145,7 @@ class KalicilikDeposu:
                 try:
                     veri = json.loads(satir.strip())
                     zaman_str = veri.get("zaman", "")
-                    # ISO formatı parse
+                    # ISO formatÄ± parse
                     t = time.mktime(time.strptime(zaman_str, "%Y-%m-%dT%H:%M:%S"))
                     if t > esik:
                         yeni_satirlar.append(satir)
@@ -168,11 +168,11 @@ class KalicilikDeposu:
         }
 
 
-# ── Risk Profili ──────────────────────────────────────────────────────
+# â”€â”€ Risk Profili â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class RiskProfili:
-    """Kaynak başına risk skoru takibi."""
+    """Kaynak baÅŸÄ±na risk skoru takibi."""
 
     def __init__(self):
         self._profiller: dict[str, dict] = {}
@@ -192,7 +192,7 @@ class RiskProfili:
         )
 
     def guncelle(self, kaynak: str, olay_seviyesi: str):
-        """Kaynağın risk skorunu olay şiddetine göre artır."""
+        """KaynaÄŸÄ±n risk skorunu olay ÅŸiddetine gÃ¶re artÄ±r."""
         puan_map = {"INFO": 1, "WARN": 5, "THREAT": 20, "CRITICAL": 50}
         puan = puan_map.get(olay_seviyesi, 1)
 
@@ -234,11 +234,11 @@ class RiskProfili:
         return "\n".join(satirlar)
 
 
-# ── Denetim İzi ───────────────────────────────────────────────────────
+# â”€â”€ Denetim Ä°zi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class AuditTrail:
-    """Değişmez denetim izi — sadece ekleme yapılabilir."""
+    """DeÄŸiÅŸmez denetim izi â€” sadece ekleme yapÄ±labilir."""
 
     def __init__(self, dosya: Path = DENETIM_YOLU):
         self._dosya = dosya
@@ -280,11 +280,11 @@ class AuditTrail:
         return kayitlar[-son_n:]
 
 
-# ── Birleşik Arayüz ───────────────────────────────────────────────────
+# â”€â”€ BirleÅŸik ArayÃ¼z â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class GuvenlikKalicilik:
-    """Tüm kalıcılık bileşenlerini yöneten tek sınıf."""
+    """TÃ¼m kalÄ±cÄ±lÄ±k bileÅŸenlerini yÃ¶neten tek sÄ±nÄ±f."""
 
     def __init__(self):
         self.depo = KalicilikDeposu()
@@ -299,7 +299,7 @@ class GuvenlikKalicilik:
         kaynak: str = "",
         detay: dict = None,
     ) -> GuvenlikOlayi:
-        """Güvenlik olayı kaydet, risk profilini güncelle, denetim izine yaz."""
+        """GÃ¼venlik olayÄ± kaydet, risk profilini gÃ¼ncelle, denetim izine yaz."""
         olay = GuvenlikOlayi(kategori, aciklama, seviye, kaynak, detay)
         self.depo.kaydet(olay)
         if kaynak:
@@ -326,17 +326,17 @@ class GuvenlikKalicilik:
         ist = self.depo.istatistik()
         riskli = self.profil.yuksek_riskli(esik=50)
         satirlar = [
-            f"Güvenlik Deposu: {ist['toplam']} olay",
+            f"GÃ¼venlik Deposu: {ist['toplam']} olay",
             f"  Seviyeler: {ist['seviyeler']}",
         ]
         if riskli:
-            satirlar.append(f"Yüksek Riskli Kaynaklar ({len(riskli)}):")
+            satirlar.append(f"YÃ¼ksek Riskli Kaynaklar ({len(riskli)}):")
             for k, s in riskli[:5]:
                 satirlar.append(f"  {k}: {s}")
         return "\n".join(satirlar)
 
 
-# ── Singleton ─────────────────────────────────────────────────────────
+# â”€â”€ Singleton â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _GK: Optional[GuvenlikKalicilik] = None
 
@@ -349,29 +349,29 @@ def guvenlik_kalicilik() -> GuvenlikKalicilik:
 
 
 def motor_kaydet(motor):
-    """Güvenlik kalıcılık araçlarını motora kaydet."""
+    """GÃ¼venlik kalÄ±cÄ±lÄ±k araÃ§larÄ±nÄ± motora kaydet."""
     if not hasattr(motor, "_plugin_arac_kaydet"):
         return
     gk = guvenlik_kalicilik()
     motor._plugin_arac_kaydet(
         "GUVENLIK_OZET",
         lambda: gk.ozet(),
-        "Güvenlik olay deposu özetini göster",
+        "GÃ¼venlik olay deposu Ã¶zetini gÃ¶ster",
     )
     motor._plugin_arac_kaydet(
         "GUVENLIK_RISKLI",
         lambda esik=50: gk.profil.rapor(),
-        "Yüksek riskli kaynakları listele",
+        "YÃ¼ksek riskli kaynaklarÄ± listele",
     )
 
 
 if __name__ == "__main__":
     gk = GuvenlikKalicilik()
-    gk.olay_kaydet("test", "Başlatma testi", "INFO", kaynak="persistence.py")
+    gk.olay_kaydet("test", "BaÅŸlatma testi", "INFO", kaynak="persistence.py")
     gk.tehdit_kaydet(
-        "prompt_injection", "Şüpheli girdi tespit edildi", kaynak="kullanici_1"
+        "prompt_injection", "ÅÃ¼pheli girdi tespit edildi", kaynak="kullanici_1"
     )
     print(gk.ozet())
-    print("\nDenetim İzi (son 5):")
+    print("\nDenetim Ä°zi (son 5):")
     for k in gk.denetim.son(5):
         print(f"  {k['ts']} | {k['islem']} | {k['sonuc']}")

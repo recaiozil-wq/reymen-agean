@@ -1,17 +1,17 @@
-# -*- coding: utf-8 -*-
-"""reymen.plugin — Plugin sistemi (lifecycle hooks).
+﻿# -*- coding: utf-8 -*-
+"""reymen.plugin â€” Plugin sistemi (lifecycle hooks).
 
 PluginBase:
-    Tüm plugin'lerin türetmesi gereken temel sınıf.
-    İsteğe bağlı hook metodları:
+    TÃ¼m plugin'lerin tÃ¼retmesi gereken temel sÄ±nÄ±f.
+    Ä°steÄŸe baÄŸlÄ± hook metodlarÄ±:
 
-        on_load()                     — plugin yüklendiğinde
-        on_unload()                   — plugin kaldırıldığında
-        on_session_start(session_id, user_id) — session başında
-        on_session_end(session_id, reason)    — session sonunda
-        on_message(message, context)          — kullanıcı mesajı geldiğinde
-        pre_llm_call(messages, context)       — LLM çağrısı öncesi mesajları değiştir
-        post_llm_call(response, context)      — LLM yanıtı geldikten sonra işle
+        on_load()                     â€” plugin yÃ¼klendiÄŸinde
+        on_unload()                   â€” plugin kaldÄ±rÄ±ldÄ±ÄŸÄ±nda
+        on_session_start(session_id, user_id) â€” session baÅŸÄ±nda
+        on_session_end(session_id, reason)    â€” session sonunda
+        on_message(message, context)          â€” kullanÄ±cÄ± mesajÄ± geldiÄŸinde
+        pre_llm_call(messages, context)       â€” LLM Ã§aÄŸrÄ±sÄ± Ã¶ncesi mesajlarÄ± deÄŸiÅŸtir
+        post_llm_call(response, context)      â€” LLM yanÄ±tÄ± geldikten sonra iÅŸle
 """
 
 from __future__ import annotations
@@ -23,87 +23,87 @@ logger = logging.getLogger(__name__)
 
 
 class PluginBase:
-    """Tüm ReYMeN plugin'leri bu sınıftan türetilmelidir.
+    """TÃ¼m ReYMeN plugin'leri bu sÄ±nÄ±ftan tÃ¼retilmelidir.
 
-    Özellikler:
-        name (str):    Plugin adı (zorunlu).
+    Ã–zellikler:
+        name (str):    Plugin adÄ± (zorunlu).
         version (str): Plugin versiyonu (zorunlu).
 
-    Tüm hook metodları *opsiyoneldir* — PluginBase varsayılan no-op
-    implementasyon sağlar, alt sınıf sadece ihtiyacı olanları override eder.
+    TÃ¼m hook metodlarÄ± *opsiyoneldir* â€” PluginBase varsayÄ±lan no-op
+    implementasyon saÄŸlar, alt sÄ±nÄ±f sadece ihtiyacÄ± olanlarÄ± override eder.
     """
 
     name: str = "unnamed"
     version: str = "0.0.1"
 
-    # ── Lifecycle ──────────────────────────────────────────────────────
+    # â”€â”€ Lifecycle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def on_load(self) -> None:
-        """Plugin yüklendiğinde bir kere çağrılır."""
+        """Plugin yÃ¼klendiÄŸinde bir kere Ã§aÄŸrÄ±lÄ±r."""
         pass
 
     def on_unload(self) -> None:
-        """Plugin kaldırıldığında bir kere çağrılır."""
+        """Plugin kaldÄ±rÄ±ldÄ±ÄŸÄ±nda bir kere Ã§aÄŸrÄ±lÄ±r."""
         pass
 
-    # ── Session hooks ──────────────────────────────────────────────────
+    # â”€â”€ Session hooks â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def on_session_start(self, session_id: str, user_id: str) -> None:
-        """Yeni bir konuşma oturumu başladığında çağrılır."""
+        """Yeni bir konuÅŸma oturumu baÅŸladÄ±ÄŸÄ±nda Ã§aÄŸrÄ±lÄ±r."""
         pass
 
     def on_session_end(self, session_id: str, reason: str) -> None:
-        """Konuşma oturumu sonlandığında çağrılır.
+        """KonuÅŸma oturumu sonlandÄ±ÄŸÄ±nda Ã§aÄŸrÄ±lÄ±r.
 
         Args:
-            session_id: Oturum kimliği.
-            reason:     Sonlanma sebebi (örn. "completed", "error", "cancelled").
+            session_id: Oturum kimliÄŸi.
+            reason:     Sonlanma sebebi (Ã¶rn. "completed", "error", "cancelled").
         """
         pass
 
-    # ── Message hooks ──────────────────────────────────────────────────
+    # â”€â”€ Message hooks â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def on_message(self, message: str, context: dict) -> str:
-        """Kullanıcı mesajı işlenmeden hemen önce çağrılır.
+        """KullanÄ±cÄ± mesajÄ± iÅŸlenmeden hemen Ã¶nce Ã§aÄŸrÄ±lÄ±r.
 
-        Dönen string mesajın yerine kullanılır. Mesajı değiştirmeden
-        iletmek için orijinal *message* döndürülmelidir.
+        DÃ¶nen string mesajÄ±n yerine kullanÄ±lÄ±r. MesajÄ± deÄŸiÅŸtirmeden
+        iletmek iÃ§in orijinal *message* dÃ¶ndÃ¼rÃ¼lmelidir.
         """
         return message
 
-    # ── LLM hooks ──────────────────────────────────────────────────────
+    # â”€â”€ LLM hooks â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def pre_llm_call(
         self, messages: List[dict], context: dict
     ) -> Tuple[List[dict], dict]:
-        """LLM çağrısından hemen önce çağrılır.
+        """LLM Ã§aÄŸrÄ±sÄ±ndan hemen Ã¶nce Ã§aÄŸrÄ±lÄ±r.
 
-        *messages* ve *context* üzerinde değişiklik yapıp (messages, context)
-        tuple'ı olarak döndürebilirsiniz.
+        *messages* ve *context* Ã¼zerinde deÄŸiÅŸiklik yapÄ±p (messages, context)
+        tuple'Ä± olarak dÃ¶ndÃ¼rebilirsiniz.
 
         Args:
-            messages: LLM'e gönderilecek mesaj listesi.
-            context:  Plugin bağlamı (her plugin kendi anahtarında saklanır).
+            messages: LLM'e gÃ¶nderilecek mesaj listesi.
+            context:  Plugin baÄŸlamÄ± (her plugin kendi anahtarÄ±nda saklanÄ±r).
 
         Returns:
-            (messages, context) — değiştirilmiş veya orijinal halleri.
+            (messages, context) â€” deÄŸiÅŸtirilmiÅŸ veya orijinal halleri.
         """
         return messages, context
 
     def post_llm_call(self, response: dict, context: dict) -> Dict[str, Any]:
-        """LLM yanıtı geldikten hemen sonra çağrılır.
+        """LLM yanÄ±tÄ± geldikten hemen sonra Ã§aÄŸrÄ±lÄ±r.
 
-        *response* dict'i üzerinde değişiklik yapıp döndürebilirsiniz.
+        *response* dict'i Ã¼zerinde deÄŸiÅŸiklik yapÄ±p dÃ¶ndÃ¼rebilirsiniz.
 
         Args:
-            response: LLM'den gelen yanıt dict'i.
-            context:  Plugin bağlamı.
+            response: LLM'den gelen yanÄ±t dict'i.
+            context:  Plugin baÄŸlamÄ±.
 
         Returns:
-            Değiştirilmiş veya orijinal response dict'i.
+            DeÄŸiÅŸtirilmiÅŸ veya orijinal response dict'i.
         """
         return response
 
 
-# ── Re-export ──────────────────────────────────────────────────────────
+# â”€â”€ Re-export â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 __all__ = ["PluginBase"]

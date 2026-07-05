@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-platform_gateways.py — Çoklu platform gateway'leri.
+platform_gateways.py â€” Ã‡oklu platform gateway'leri.
 
 TelegramGateway (salted_gateway modulunden extend edilmistir),
 CLIGateway, WebGateway ve DiscordGateway siniflarini icerir.
@@ -16,25 +16,25 @@ import time
 from typing import Any, Dict, List, Optional, Union
 from pathlib import Path
 
-from src.gateways.gateway_temel import GatewayBase
+from gateways.gateway_temel import GatewayBase
 
 # TelegramGateway: salted_gateway modulunden extend et
-from src.gateways.salted_gateway import TelegramGateway as _TelegramGatewayBase
+from gateways.salted_gateway import TelegramGateway as _TelegramGatewayBase
 
 logger = logging.getLogger(__name__)
 
-# ── Sabitler ─────────────────────────────────────────────────────────
+# â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 PROJE_KOK = Path(__file__).parent.parent  # reymen/
 
 
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Telegram Gateway (salted_gateway'den extend)
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class TelegramGateway(_TelegramGatewayBase):
     """
-    Telegram platform gateway'i — salted_gateway modulunden extend edilmistir.
+    Telegram platform gateway'i â€” salted_gateway modulunden extend edilmistir.
 
     salted_gateway.py'deki TelegramGateway sinifini genisletir.
     """
@@ -44,9 +44,9 @@ class TelegramGateway(_TelegramGatewayBase):
         # Platforma ozel ek ozellikler buraya eklenebilir
 
 
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  CLI Gateway
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class CLIGateway(GatewayBase):
@@ -67,7 +67,7 @@ class CLIGateway(GatewayBase):
         self._okuyucu_gorev: Optional[asyncio.Task] = None
 
     async def connect(self) -> bool:
-        """CLI kanalini baslat — stdin okuyucuyu baslat."""
+        """CLI kanalini baslat â€” stdin okuyucuyu baslat."""
         try:
             self._okuyucu_gorev = asyncio.create_task(self._stdin_okuyucu())
             self._bagli = True
@@ -150,14 +150,14 @@ class CLIGateway(GatewayBase):
         self._girdi_kuyrugu.put_nowait(satir)
 
 
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Web Gateway (FastAPI WS/SSE)
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class WebGateway(GatewayBase):
     """
-    Web platform gateway'i — FastAPI WebSocket ve SSE destegi.
+    Web platform gateway'i â€” FastAPI WebSocket ve SSE destegi.
 
     Web arayuzune bagli istemcilere gercek zamanli mesaj
     gonderimi saglar. WebSocket ve Server-Sent Events
@@ -276,14 +276,14 @@ class WebGateway(GatewayBase):
         self._gelen_kuyruk.put_nowait(mesaj)
 
 
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Discord Gateway (REST API + discord.py destegi)
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class DiscordGateway(GatewayBase):
     """
-    Discord platform gateway'i — REST API uzerinden mesaj gonderimi.
+    Discord platform gateway'i â€” REST API uzerinden mesaj gonderimi.
 
     discord.py bot process'inden bagimsiz REST API ile mesaj gonderimi.
     Ayrica discord_bot.py (DiscordBotProcess) ile birlikte calisir:
@@ -424,7 +424,7 @@ class DiscordGateway(GatewayBase):
 
 
 def motor_kaydet(motor) -> None:
-    """Motor'a platform gateway araçlarını kaydeder."""
+    """Motor'a platform gateway araÃ§larÄ±nÄ± kaydeder."""
     motor._plugin_arac_kaydet(
         "GATEWAY_PLATFORM_LISTELE",
         lambda: str([p for p in ["telegram", "cli", "web", "discord"]]),
@@ -432,28 +432,28 @@ def motor_kaydet(motor) -> None:
     )
     motor._plugin_arac_kaydet(
         "GATEWAY_TELEGRAM_OLUSTUR",
-        lambda config="{}": f"TelegramGateway(config={config}) — Telegram gateway ornegi olusturur",
+        lambda config="{}": f"TelegramGateway(config={config}) â€” Telegram gateway ornegi olusturur",
         "TelegramGateway olusturma yardimcisi",
     )
     motor._plugin_arac_kaydet(
         "GATEWAY_CLI_OLUSTUR",
-        lambda config="{}": f"CLIGateway(config={config}) — CLI gateway ornegi olusturur",
+        lambda config="{}": f"CLIGateway(config={config}) â€” CLI gateway ornegi olusturur",
         "CLIGateway olusturma yardimcisi",
     )
     motor._plugin_arac_kaydet(
         "GATEWAY_WEB_OLUSTUR",
-        lambda config="{}": f"WebGateway(config={config}) — Web gateway ornegi olusturur",
+        lambda config="{}": f"WebGateway(config={config}) â€” Web gateway ornegi olusturur",
         "WebGateway olusturma yardimcisi",
     )
     motor._plugin_arac_kaydet(
         "GATEWAY_DISCORD_OLUSTUR",
-        lambda config="{}": f"DiscordGateway(config={config}) — Discord gateway (REST + discord.py) ornegi olusturur",
+        lambda config="{}": f"DiscordGateway(config={config}) â€” Discord gateway (REST + discord.py) ornegi olusturur",
         "DiscordGateway olusturma yardimcisi",
     )
 
     motor._plugin_arac_kaydet(
         "GATEWAY_DISCORD_GONDER",
         lambda mesaj="",
-        kanal_id="": f"DiscordGateway.send({mesaj}, hedef={kanal_id}) — Discord mesaj gonderim araci",
+        kanal_id="": f"DiscordGateway.send({mesaj}, hedef={kanal_id}) â€” Discord mesaj gonderim araci",
         "Discord mesaj gonderim araci",
     )

@@ -1,6 +1,6 @@
-"""_handle_profile_command handler."""
+﻿"""_handle_profile_command handler."""
 
-from src.reymen.sistem.ReYMeN_constants import display_reymen_home
+from reymen.sistem.ReYMeN_constants import display_reymen_home
 
 
 def _handle_profile_command(cli) -> None:

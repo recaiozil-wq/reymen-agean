@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""ReYMeN Stress Test — bagimsiz script"""
+﻿# -*- coding: utf-8 -*-
+"""ReYMeN Stress Test â€” bagimsiz script"""
 
 import sys, os, json, time, concurrent.futures
 
@@ -8,7 +8,7 @@ sys.path.insert(0, PROJE)
 os.chdir(PROJE)
 
 from openai import OpenAI
-from src.reymen.cereyan.conversation_loop import ConversationLoop
+from reymen.cereyan.conversation_loop import ConversationLoop
 
 
 class Beyin:
@@ -57,7 +57,7 @@ SORULAR = [
     "python ogrenmek",
     "tesekkur ederim",
     "sagol",
-    "görüşürüz",
+    "gÃ¶rÃ¼ÅŸÃ¼rÃ¼z",
     "eyvallah",
     "bilgisayar nedir",
     "internet nasil calisir",
@@ -150,7 +150,7 @@ for k, v in sorted(rapor["kaynak_dagilimi"].items(), key=lambda x: -x[1]):
 if rapor["hatalar"]:
     print(f"\n  Ilk 5 Hata:")
     for h in rapor["hatalar"][:5]:
-        print(f"    ❌ {h['soru']}: {h['hata'][:80]}")
+        print(f"    âŒ {h['soru']}: {h['hata'][:80]}")
 
 rpath = os.path.join(PROJE, "reymen/scripts/stress_raporu.json")
 with open(rpath, "w", encoding="utf-8") as f:

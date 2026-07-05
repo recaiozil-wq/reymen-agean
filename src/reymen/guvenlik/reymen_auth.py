@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-🔐 ReYMeN Auth System — Nous Portal alternative.
+ğŸ” ReYMeN Auth System â€” Nous Portal alternative.
 
 API key validation, JWT token management, permission levels and
 multi-user support. Designed to work alongside the existing OAuth2 system.
@@ -27,9 +27,9 @@ Usage:
     new_token = auth_manager.refresh_token(token.refresh_token)
 
 Permission Levels:
-    admin → Full access to all operations
-    user  → Standard user operations
-    guest → Read-only operations
+    admin â†’ Full access to all operations
+    user  â†’ Standard user operations
+    guest â†’ Read-only operations
 """
 
 from __future__ import annotations
@@ -52,14 +52,14 @@ from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
-# ── Proje Yolu ─────────────────────────────────────────────────────────────────
+# â”€â”€ Proje Yolu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 PROJE_KOK = Path(__file__).resolve().parent.parent.parent.parent
 DEFAULT_DB_DIR = PROJE_KOK / ".ReYMeN" / "auth"
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# Veri Yapıları
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# Veri YapÄ±larÄ±
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 @dataclass
@@ -100,49 +100,49 @@ class User:
     metadata: dict = field(default_factory=dict)
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# API Key Doğrulama
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# API Key DoÄŸrulama
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 # Desteklenen provider'lar ve API key format regex'leri
 API_KEY_PROVIDERS: dict[str, dict[str, Any]] = {
-    # Önce spesifik prefix'ler kontrol edilmeli (sk-ant-, sk-or-, vs.)
-    # çünkü generic sk- bunlardan önce eşleşir
+    # Ã–nce spesifik prefix'ler kontrol edilmeli (sk-ant-, sk-or-, vs.)
+    # Ã§Ã¼nkÃ¼ generic sk- bunlardan Ã¶nce eÅŸleÅŸir
     "anthropic": {
         "regex": r"^sk-ant-[A-Za-z0-9_.-]{20,}$",
         "env_var": "ANTHROPIC_API_KEY",
         "base_url": "https://api.anthropic.com/v1/models",
-        "description": "Anthropic API (sk-ant- ile başlar)",
+        "description": "Anthropic API (sk-ant- ile baÅŸlar)",
     },
     "openrouter": {
         "regex": r"^sk-or-[A-Za-z0-9_.-]{20,}$",
         "env_var": "OPENROUTER_API_KEY",
         "base_url": "https://openrouter.ai/api/v1/auth/key",
-        "description": "OpenRouter API (sk-or- ile başlar)",
+        "description": "OpenRouter API (sk-or- ile baÅŸlar)",
     },
     "deepseek": {
         "regex": r"^sk-[A-Za-z0-9_.-]{20,}$",
         "env_var": "DEEPSEEK_API_KEY",
         "base_url": "https://api.deepseek.com/v1/models",
-        "description": "DeepSeek API (sk- ile başlar)",
+        "description": "DeepSeek API (sk- ile baÅŸlar)",
     },
     "openai": {
         "regex": r"^sk-[A-Za-z0-9_.-]{20,}$",
         "env_var": "OPENAI_API_KEY",
         "base_url": "https://api.openai.com/v1/models",
-        "description": "OpenAI API (sk- ile başlar)",
+        "description": "OpenAI API (sk- ile baÅŸlar)",
     },
     "xai": {
         "regex": r"^xai-[A-Za-z0-9_.-]{20,}$",
         "env_var": "XAI_API_KEY",
         "base_url": "https://api.x.ai/v1/models",
-        "description": "xAI/Grok API (xai- ile başlar)",
+        "description": "xAI/Grok API (xai- ile baÅŸlar)",
     },
     "groq": {
         "regex": r"^gsk_[A-Za-z0-9_.-]{20,}$",
         "env_var": "GROQ_API_KEY",
         "base_url": "https://api.groq.com/openai/v1/models",
-        "description": "Groq API (gsk_ ile başlar)",
+        "description": "Groq API (gsk_ ile baÅŸlar)",
     },
 }
 
@@ -165,12 +165,12 @@ def validate_api_key_format(api_key: str) -> tuple[bool, Optional[str], str]:
         (valid, provider_name, message)
     """
     if not api_key or api_key == "buraya_yaz":
-        return False, None, "API anahtarı boş"
+        return False, None, "API anahtarÄ± boÅŸ"
     provider = detect_api_key_provider(api_key)
     if provider:
         desc = API_KEY_PROVIDERS[provider]["description"]
-        return True, provider, f"Geçerli {desc}"
-    return False, None, "Bilinmeyen API anahtarı formatı"
+        return True, provider, f"GeÃ§erli {desc}"
+    return False, None, "Bilinmeyen API anahtarÄ± formatÄ±"
 
 
 def validate_api_key_live(api_key: str, provider: str, timeout: int = 10) -> bool:
@@ -196,17 +196,17 @@ def validate_api_key_live(api_key: str, provider: str, timeout: int = 10) -> boo
         with urllib.request.urlopen(req, timeout=timeout) as resp:
             return resp.status == 200
     except Exception as e:
-        logger.debug("[Auth] Live key doğrulama başarısız (%s): %s", provider, e)
+        logger.debug("[Auth] Live key doÄŸrulama baÅŸarÄ±sÄ±z (%s): %s", provider, e)
         return False
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# JWT Token Yönetimi (standart kütüphane ile HMAC-SHA256)
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# JWT Token YÃ¶netimi (standart kÃ¼tÃ¼phane ile HMAC-SHA256)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class JWTManager:
-    """HMAC-SHA256 JWT token management — no external dependencies.
+    """HMAC-SHA256 JWT token management â€” no external dependencies.
 
     Token structure:
         header:  {"alg": "HS256", "typ": "JWT"}
@@ -277,23 +277,23 @@ class JWTManager:
                 actual_signature = self._base64_url_decode(signature_b64)
 
                 if not hmac.compare_digest(expected_signature, actual_signature):
-                    logger.warning("[JWT] İmza doğrulama başarısız")
+                    logger.warning("[JWT] Ä°mza doÄŸrulama baÅŸarÄ±sÄ±z")
                     return None
 
             payload_data = json.loads(
                 self._base64_url_decode(payload_b64).decode("utf-8")
             )
 
-            # Expiry kontrolü
+            # Expiry kontrolÃ¼
             now = int(time.time())
             if payload_data.get("exp", 0) < now:
-                logger.warning("[JWT] Token süresi dolmuş")
+                logger.warning("[JWT] Token sÃ¼resi dolmuÅŸ")
                 return None
 
             return payload_data
 
         except Exception as e:
-            logger.debug("[JWT] Çözümleme hatası: %s", e)
+            logger.debug("[JWT] Ã‡Ã¶zÃ¼mleme hatasÄ±: %s", e)
             return None
 
     def refresh_token(self, token: str, expires_in: int = 3600) -> Optional[str]:
@@ -301,16 +301,16 @@ class JWTManager:
         payload = self.decode(token, verify=True)
         if payload is None:
             return None
-        # Yeni token oluştur (süreyi uzat)
+        # Yeni token oluÅŸtur (sÃ¼reyi uzat)
         new_payload = {
             k: v for k, v in payload.items() if k not in ("iat", "exp", "jti")
         }
         return self.encode(new_payload, expires_in=expires_in)
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# Kullanıcı ve Token Deposu (SQLite)
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# KullanÄ±cÄ± ve Token Deposu (SQLite)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class AuthStorage:
@@ -392,7 +392,7 @@ class AuthStorage:
         finally:
             conn.close()
 
-    # ── Kullanıcı İşlemleri ──────────────────────────────────────────────────
+    # â”€â”€ KullanÄ±cÄ± Ä°ÅŸlemleri â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def create_user(
         self,
@@ -421,7 +421,7 @@ class AuthStorage:
                 is_active=True,
             )
         except sqlite3.IntegrityError:
-            logger.warning("[AuthStorage] Kullanıcı zaten var: %s", username)
+            logger.warning("[AuthStorage] KullanÄ±cÄ± zaten var: %s", username)
             return self.get_user_by_username(username)
         finally:
             conn.close()
@@ -491,7 +491,7 @@ class AuthStorage:
         finally:
             conn.close()
 
-    # ── Token İşlemleri ──────────────────────────────────────────────────────
+    # â”€â”€ Token Ä°ÅŸlemleri â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def save_token(
         self,
@@ -596,7 +596,7 @@ class AuthStorage:
         finally:
             conn.close()
 
-    # ── API Key İşlemleri ────────────────────────────────────────────────────
+    # â”€â”€ API Key Ä°ÅŸlemleri â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def save_api_key(
         self, user_id: str, key_hash: str, provider: str = "", label: str = ""
@@ -645,7 +645,7 @@ class AuthStorage:
         finally:
             conn.close()
 
-    # ── Yardımcılar ──────────────────────────────────────────────────────────
+    # â”€â”€ YardÄ±mcÄ±lar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _row_to_user(self, row: sqlite3.Row) -> User:
         return User(
@@ -674,13 +674,13 @@ class AuthStorage:
             conn.close()
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# Ana Auth Yöneticisi
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# Ana Auth YÃ¶neticisi
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class AuthManager:
-    """ReYMeN Auth System — Main manager class.
+    """ReYMeN Auth System â€” Main manager class.
 
     Combines API key validation, JWT token management, user management
     and authorization operations in a single interface.
@@ -710,10 +710,10 @@ class AuthManager:
                 "admin", role="admin", email="admin@reymen.local"
             )
             logger.info(
-                "[Auth] Varsayılan admin kullanıcısı oluşturuldu: %s", user.user_id
+                "[Auth] VarsayÄ±lan admin kullanÄ±cÄ±sÄ± oluÅŸturuldu: %s", user.user_id
             )
 
-    # ── API Key Doğrulama ────────────────────────────────────────────────────
+    # â”€â”€ API Key DoÄŸrulama â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def validate_api_key(self, api_key: str) -> Optional[str]:
         """Validate API key format and return provider name."""
@@ -723,7 +723,7 @@ class AuthManager:
     def detect_api_key(self, api_key: str) -> Optional[str]:
         return detect_api_key_provider(api_key)
 
-    # ── Token Yönetimi ───────────────────────────────────────────────────────
+    # â”€â”€ Token YÃ¶netimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def create_token(
         self,
@@ -743,10 +743,10 @@ class AuthManager:
             AccessToken object or None (on error)
         """
         if role not in ("admin", "user", "guest"):
-            logger.error("[Auth] Geçersiz rol: %s", role)
+            logger.error("[Auth] GeÃ§ersiz rol: %s", role)
             return None
 
-        # Kullanıcıyı bul veya oluştur
+        # KullanÄ±cÄ±yÄ± bul veya oluÅŸtur
         user = self.storage.get_user_by_username(username)
         if user is None:
             user = self.storage.create_user(username, role=role)
@@ -754,7 +754,7 @@ class AuthManager:
             self.storage.update_user(user.user_id, role=role)
             user.role = role
 
-        # Access token oluştur
+        # Access token oluÅŸtur
         payload = {
             "sub": username,
             "role": role,
@@ -762,7 +762,7 @@ class AuthManager:
         }
         access_token_str = self.jwt.encode(payload, expires_in=expires_in)
 
-        # Refresh token oluştur (daha uzun süreli)
+        # Refresh token oluÅŸtur (daha uzun sÃ¼reli)
         refresh_payload = {
             "sub": username,
             "role": role,
@@ -771,7 +771,7 @@ class AuthManager:
         }
         refresh_token_str = self.jwt.encode(refresh_payload, expires_in=expires_in * 24)
 
-        # Token'ı veritabanına kaydet
+        # Token'Ä± veritabanÄ±na kaydet
         self.storage.save_token(
             user_id=user.user_id,
             access_token=access_token_str,
@@ -781,7 +781,7 @@ class AuthManager:
             scope=scope,
         )
 
-        # Son giriş zamanını güncelle
+        # Son giriÅŸ zamanÄ±nÄ± gÃ¼ncelle
         self.storage.update_user(user.user_id, last_login=time.time())
 
         return AccessToken(
@@ -802,36 +802,36 @@ class AuthManager:
         if payload is None:
             return None
 
-        # Veritabanında token'ın revoked olmadığını kontrol et
+        # VeritabanÄ±nda token'Ä±n revoked olmadÄ±ÄŸÄ±nÄ± kontrol et
         db_token = self.storage.get_token_by_access(token)
         if db_token is None:
-            logger.warning("[Auth] Token veritabanında bulunamadı veya iptal edilmiş")
+            logger.warning("[Auth] Token veritabanÄ±nda bulunamadÄ± veya iptal edilmiÅŸ")
             return None
 
         return payload
 
     def refresh_token(self, refresh_token: str) -> Optional[AccessToken]:
         """Create new access token using a refresh token."""
-        # Refresh token'ı doğrula
+        # Refresh token'Ä± doÄŸrula
         payload = self.jwt.decode(refresh_token, verify=True)
         if payload is None:
-            logger.warning("[Auth] Geçersiz refresh token")
+            logger.warning("[Auth] GeÃ§ersiz refresh token")
             return None
 
-        # Veritabanında kontrol et
+        # VeritabanÄ±nda kontrol et
         db_token = self.storage.get_token_by_refresh(refresh_token)
         if db_token is None:
-            logger.warning("[Auth] Refresh token veritabanında bulunamadı")
+            logger.warning("[Auth] Refresh token veritabanÄ±nda bulunamadÄ±")
             return None
 
         username = payload.get("sub", "")
         role = payload.get("role", "user")
 
-        # Eski token'ı iptal et
+        # Eski token'Ä± iptal et
         if db_token.get("access_token"):
             self.storage.revoke_token(db_token["access_token"])
 
-        # Yeni token oluştur
+        # Yeni token oluÅŸtur
         return self.create_token(username, role=role)
 
     def revoke_token(self, access_token: str) -> bool:
@@ -845,14 +845,14 @@ class AuthManager:
             return 0
         return self.storage.revoke_user_tokens(user.user_id)
 
-    # ── Kullanıcı Yönetimi ───────────────────────────────────────────────────
+    # â”€â”€ KullanÄ±cÄ± YÃ¶netimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def create_user(
         self, username: str, role: str = "user", email: str = ""
     ) -> Optional[User]:
         """Create a new user."""
         if role not in ("admin", "user", "guest"):
-            logger.error("[Auth] Geçersiz rol: %s", role)
+            logger.error("[Auth] GeÃ§ersiz rol: %s", role)
             return None
         return self.storage.create_user(username, role=role, email=email)
 
@@ -880,7 +880,7 @@ class AuthManager:
             return False
         return self.storage.update_user(user.user_id, role=role)
 
-    # ── Yetkilendirme ────────────────────────────────────────────────────────
+    # â”€â”€ Yetkilendirme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def check_permission(self, user_role: str, required_role: str) -> bool:
         """Check if the user's permission level is sufficient.
@@ -900,7 +900,7 @@ class AuthManager:
         user_role = payload.get("role", "guest")
         return self.check_permission(user_role, required_role)
 
-    # ── Token Bilgisi ve Liste ───────────────────────────────────────────────
+    # â”€â”€ Token Bilgisi ve Liste â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def list_tokens(self, username: Optional[str] = None) -> list[dict[str, Any]]:
         """List tokens."""
@@ -920,7 +920,7 @@ class AuthManager:
             return self.storage.list_api_keys(user_id=user.user_id)
         return self.storage.list_api_keys()
 
-    # ── Bakım ────────────────────────────────────────────────────────────────
+    # â”€â”€ BakÄ±m â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def cleanup(self) -> int:
         """Clean up expired tokens."""
@@ -943,14 +943,14 @@ class AuthManager:
         }
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Singleton
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 auth_manager = AuthManager()
 
 
-# Kullanım kolaylığı için doğrudan fonksiyonlar
+# KullanÄ±m kolaylÄ±ÄŸÄ± iÃ§in doÄŸrudan fonksiyonlar
 def validate_key(key: str) -> Optional[str]:
     """Validate API key, return provider name."""
     return auth_manager.validate_api_key(key)
@@ -974,26 +974,26 @@ def check_role(token: str, required_role: str = "user") -> bool:
     return auth_manager.require_role(token, required_role)
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Test / CLI
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 if __name__ == "__main__":
     import sys
 
     if len(sys.argv) > 1 and sys.argv[1] == "test":
-        # Hızlı test
+        # HÄ±zlÄ± test
         print("=== ReYMeN Auth Test ===")
         print()
 
         # API key test
         key = "sk-testkey12345678901234567890"
         provider = detect_api_key_provider(key)
-        print(f"API Key tespiti: {key} → {provider}")
+        print(f"API Key tespiti: {key} â†’ {provider}")
 
         key2 = "xai-testkey12345678901234567890"
         provider2 = detect_api_key_provider(key2)
-        print(f"API Key tespiti: {key2} → {provider2}")
+        print(f"API Key tespiti: {key2} â†’ {provider2}")
 
         print()
 
@@ -1014,7 +1014,7 @@ if __name__ == "__main__":
             print(f"Access Token: {token_obj.access_token[:50]}...")
             print(f"Refresh Token: {token_obj.refresh_token[:50]}...")
             payload = m.verify_token(token_obj.access_token)
-            print(f"Doğrulama: {payload}")
+            print(f"DoÄŸrulama: {payload}")
             print(f"Yetki admin mi?: {m.require_role(token_obj.access_token, 'admin')}")
             print(f"Yetki user mi?: {m.require_role(token_obj.access_token, 'user')}")
 
@@ -1023,4 +1023,4 @@ if __name__ == "__main__":
         print(json.dumps(m.status(), indent=2, ensure_ascii=False))
     else:
         print("ReYMeN Auth Sistemi v1.0")
-        print("Kullanım: python reymen_auth.py test")
+        print("KullanÄ±m: python reymen_auth.py test")

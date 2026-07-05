@@ -1,12 +1,12 @@
-#!/usr/bin/env python3
-"""reymen_skills_to_skillmd.py — Tüm ReYMeN skill'lerini SKILL.md formatına dönüştürür.
+﻿#!/usr/bin/env python3
+"""reymen_skills_to_skillmd.py â€” TÃ¼m ReYMeN skill'lerini SKILL.md formatÄ±na dÃ¶nÃ¼ÅŸtÃ¼rÃ¼r.
 
-Yaptıkları:
+YaptÄ±klarÄ±:
   1. Kategori etiketli (> **Kategori:**) dosyalara frontmatter ekler
-  2. Frontmatter'ı olan ama eksik alanlı dosyaları tamamlar
+  2. Frontmatter'Ä± olan ama eksik alanlÄ± dosyalarÄ± tamamlar
   3. Body'deki eski --- ve kategori etiketlerini temizler
 
-Kullanım: python reymen/scripts/reymen_skills_to_skillmd.py
+KullanÄ±m: python reymen/scripts/reymen_skills_to_skillmd.py
 """
 
 import os
@@ -117,7 +117,7 @@ def process_file(path: Path) -> str:
     fm, body, has_fm = _frontmatter_parse(content)
 
     if has_fm:
-        # Frontmatter var — eksik alanlari doldur
+        # Frontmatter var â€” eksik alanlari doldur
         title_ok = bool(fm.get("title"))
         desc_ok = bool(fm.get("description"))
         tags_ok = bool(fm.get("tags"))
@@ -131,7 +131,7 @@ def process_file(path: Path) -> str:
         path.write_text(output, encoding="utf-8")
         return "fixed"
 
-    # Frontmatter yok — kategori etiketi var mi?
+    # Frontmatter yok â€” kategori etiketi var mi?
     kat_from_tag = ""
     m = re.search(r">\s*\*\*Kategori:\*\*\s*(\S+)", content)
     if m:
@@ -148,7 +148,7 @@ def process_file(path: Path) -> str:
 
 
 def main():
-    print("🔄 ReYMeN skill'leri SKILL.md formatina donusturuluyor...\n")
+    print("ğŸ”„ ReYMeN skill'leri SKILL.md formatina donusturuluyor...\n")
 
     md_files = sorted(SKILLS_DIR.rglob("*.md"))
     STATS["total"] = len(md_files)
@@ -163,15 +163,15 @@ def main():
             STATS["kategori_to_fm"] += 1
         else:
             STATS["error"] += 1
-            print(f"  ❌ {path.relative_to(SKILLS_DIR.parent)}: {result}")
+            print(f"  âŒ {path.relative_to(SKILLS_DIR.parent)}: {result}")
 
-    print(f"\n📊 Sonuc:")
+    print(f"\nğŸ“Š Sonuc:")
     print(f"  Toplam dosya:     {STATS['total']}")
     print(f"  Zaten tam:        {STATS['fm_ok']}")
     print(f"  Eksik duzeltildi: {STATS['fm_fixed']}")
     print(f"  Kategori->FM:     {STATS['kategori_to_fm']}")
     print(f"  Hata:             {STATS['error']}")
-    print("\n✅ Tamamlandi.")
+    print("\nâœ… Tamamlandi.")
 
 
 if __name__ == "__main__":

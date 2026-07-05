@@ -1,16 +1,16 @@
-"""
-ReYMeN tools.environments.ssh — SSH remote environment.
+﻿"""
+ReYMeN tools.environments.ssh â€” SSH remote environment.
 
 SSH uzerinden uzak sunucuda komut calistirir.
 Hem parola hem de SSH key authentication destekler.
 
 Yapilandirma (ortam degiskenleri):
-  - SSH_HOST       — Sunucu adresi (zorunlu)
-  - SSH_PORT       — Port (varsayilan: 22)
-  - SSH_USER       — Kullanici adi (varsayilan: root)
-  - SSH_PASSWORD   — Parola (opsiyonel, key yoksa zorunlu)
-  - SSH_KEY_PATH   — SSH private key yolu (opsiyonel)
-  - SSH_TIMEOUT    — Komut zamani asimi saniye (varsayilan: 60)
+  - SSH_HOST       â€” Sunucu adresi (zorunlu)
+  - SSH_PORT       â€” Port (varsayilan: 22)
+  - SSH_USER       â€” Kullanici adi (varsayilan: root)
+  - SSH_PASSWORD   â€” Parola (opsiyonel, key yoksa zorunlu)
+  - SSH_KEY_PATH   â€” SSH private key yolu (opsiyonel)
+  - SSH_TIMEOUT    â€” Komut zamani asimi saniye (varsayilan: 60)
 
 Kullanim:
     env = SSHEnvironment()
@@ -109,7 +109,7 @@ class SSHEnvironment:
         self._key_path: Optional[str] = key_path or _env("SSH_KEY_PATH", "") or None
         self._timeout: int = timeout or int(_env("SSH_TIMEOUT", "60"))
 
-    # ── Bagimlilik Kontrolu ──────────────────────────────────────────
+    # â”€â”€ Bagimlilik Kontrolu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @property
     def hazir(self) -> bool:
@@ -121,7 +121,7 @@ class SSHEnvironment:
             return False
         return True
 
-    # ── Baglanti Yardimcisi ──────────────────────────────────────────
+    # â”€â”€ Baglanti Yardimcisi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _baglanti_kwargs(self) -> dict:
         """asyncssh.connect() icin kwargs hazirlar."""
@@ -139,7 +139,7 @@ class SSHEnvironment:
 
         return kwargs
 
-    # ── Komut Calistirma ─────────────────────────────────────────────
+    # â”€â”€ Komut Calistirma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     async def calistir(
         self,
@@ -265,7 +265,7 @@ class SSHEnvironment:
                 "host": f"{self._user}@{self._host}:{self._port}",
             }
 
-    # ── Bilgi Metodlari ──────────────────────────────────────────────
+    # â”€â”€ Bilgi Metodlari â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def __repr__(self) -> str:
         return (

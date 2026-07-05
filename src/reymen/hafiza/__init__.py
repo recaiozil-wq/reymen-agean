@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-reymen/hafiza/ — ReYMeN Hafıza Paketi
+reymen/hafiza/ â€” ReYMeN HafÄ±za Paketi
 
-Bağlam yönetimi, oturum veritabanı, vektörel hafıza ve hafıza genişletme modülleri.
+BaÄŸlam yÃ¶netimi, oturum veritabanÄ±, vektÃ¶rel hafÄ±za ve hafÄ±za geniÅŸletme modÃ¼lleri.
 """
 
 from .vektor_bellek import VektorBellek, vektor_bellek_al

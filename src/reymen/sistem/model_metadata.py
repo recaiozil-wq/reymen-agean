@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""model_metadata.py — Model Bilgileri ve Yetenekler.
+﻿# -*- coding: utf-8 -*-
+"""model_metadata.py â€” Model Bilgileri ve Yetenekler.
 
 Her modelin context penceresi, yetenekleri, fiyati ve
 performans bilgilerini tutar.
@@ -159,7 +159,7 @@ def maliyet_hesapla(model_adi: str, token: int) -> float:
     return bilgi.get("fiyat", 0) * (token / 1_000_000)
 
 
-# Apache 2.0 — Hermes Agent'ten esinlenmistir
+# Apache 2.0 â€” ReYMeN Agent'ten esinlenmistir
 MINIMUM_CONTEXT_LENGTH = 4096
 
 

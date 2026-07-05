@@ -1,6 +1,6 @@
-"""_handle_subgoal_command handler."""
+﻿"""_handle_subgoal_command handler."""
 
-from src.reymen.sistem.cli_display import _cprint, _DIM, _RST
+from reymen.sistem.cli_display import _cprint, _DIM, _RST
 
 
 def _handle_subgoal_command(cli, cmd: str) -> None:
@@ -15,7 +15,7 @@ def _handle_subgoal_command(cli, cmd: str) -> None:
     Subgoals are extra criteria the user adds mid-loop. They get
     appended to both the judge prompt (verdict must consider them)
     and the continuation prompt (agent sees them) on the next turn
-    boundary. No special kick — the running turn finishes, the next
+    boundary. No special kick â€” the running turn finishes, the next
     judge call includes them.
     """
     parts = (cmd or "").strip().split(None, 2)
@@ -30,7 +30,7 @@ def _handle_subgoal_command(cli, cmd: str) -> None:
         _cprint(f"  {_DIM}No active goal. Set one with /goal <text>.{_RST}")
         return
 
-    # No args → list current subgoals.
+    # No args â†’ list current subgoals.
     if not arg:
         _cprint(f"  {mgr.status_line()}")
         _cprint(f"  {mgr.render_subgoals()}")
@@ -54,7 +54,7 @@ def _handle_subgoal_command(cli, cmd: str) -> None:
         except (IndexError, RuntimeError) as exc:
             _cprint(f"  /subgoal remove: {exc}")
             return
-        _cprint(f"  ✓ Removed subgoal {idx}: {removed}")
+        _cprint(f"  âœ“ Removed subgoal {idx}: {removed}")
         return
 
     if verb == "clear":
@@ -64,16 +64,16 @@ def _handle_subgoal_command(cli, cmd: str) -> None:
             _cprint(f"  /subgoal clear: {exc}")
             return
         if prev:
-            _cprint(f"  ✓ Cleared {prev} subgoal{'s' if prev != 1 else ''}.")
+            _cprint(f"  âœ“ Cleared {prev} subgoal{'s' if prev != 1 else ''}.")
         else:
             _cprint(f"  {_DIM}No subgoals to clear.{_RST}")
         return
 
-    # Otherwise — append the whole arg as a new subgoal.
+    # Otherwise â€” append the whole arg as a new subgoal.
     try:
         text = mgr.add_subgoal(arg)
     except (ValueError, RuntimeError) as exc:
         _cprint(f"  /subgoal: {exc}")
         return
     idx = len(mgr.state.subgoals) if mgr.state else 0
-    _cprint(f"  ✓ Added subgoal {idx}: {text}")
+    _cprint(f"  âœ“ Added subgoal {idx}: {text}")

@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-"""subcommand_fix2.py — Tek satirlik print ile 37 subcommand'i duzelt."""
+﻿#!/usr/bin/env python3
+"""subcommand_fix2.py â€” Tek satirlik print ile 37 subcommand'i duzelt."""
 
 import re
 from pathlib import Path
@@ -24,7 +24,7 @@ IMPL = {
     "insights": 'print("[INSIGHTS] Henuz veri yok.")',
     "login": 'print("[LOGIN] deepseek provider\'a zaten bagli.")',
     "logout": 'print("[LOGOUT] Oturum kapatildi.")',
-    "logs": 'print("[LOGS] Log dosyalari: ~/.hermes/logs/")',
+    "logs": 'print("[LOGS] Log dosyalari: ~/.reymen/logs/")',
     "mcp": 'print("[MCP] MCP sunuculari: Power BI aktif.")',
     "memory": 'print("[MEMORY] OnceHafiza aktif.")',
     "model": 'print("[MODEL] deepseek-v4-flash (deepseek)")',

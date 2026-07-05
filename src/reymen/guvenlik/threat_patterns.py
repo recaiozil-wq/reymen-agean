@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""threat_patterns.py — Prompt Injection Tespiti.
+﻿# -*- coding: utf-8 -*-
+"""threat_patterns.py â€” Prompt Injection Tespiti.
 
 Kullanici girdisinde ve LLM ciktisinda prompt injection,
 jailbreak ve diger saldiri desenlerini tespit eder.

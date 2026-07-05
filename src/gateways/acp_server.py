@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""acp_server.py — Agent Communication Protocol (ACP) sunucusu.
+﻿# -*- coding: utf-8 -*-
+"""acp_server.py â€” Agent Communication Protocol (ACP) sunucusu.
 
 Stdio uzerinden JSON-RPC 2.0 mesajlari alir, ReYMeN'in tool_registry
 ve closed_learning_loop modullerini kullanarak yanit verir.
@@ -16,7 +16,7 @@ Kullanim (motor.py entegrasyonu):
 
 Protokol:
     - Her satirda bir JSON mesaji (stdin/stdout)
-    - Hata/debug: stderr'e yazılır
+    - Hata/debug: stderr'e yazÄ±lÄ±r
     - Metotlar: initialize, tools/list, tools/call, skills/list,
       skills/get, shutdown, ping
 """
@@ -30,7 +30,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
 
-# ── Proje kokunu sys.path'e ekle (src/ altindaki moduller icin) ──
+# â”€â”€ Proje kokunu sys.path'e ekle (src/ altindaki moduller icin) â”€â”€
 _PROJE_KOK = Path(__file__).resolve().parent.parent.parent
 _SRC = _PROJE_KOK / "src"
 if str(_SRC) not in sys.path:
@@ -45,7 +45,7 @@ if sys.platform == "win32" and hasattr(sys.stdout, "reconfigure"):
 
 logger = logging.getLogger("ACP")
 
-# ── Graceful imports ──────────────────────────────────────────────────────
+# â”€â”€ Graceful imports â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _TOOL_REGISTRY = None
 try:
@@ -71,7 +71,7 @@ except ImportError:
 _ACP_SERVER_INSTANCE = None
 
 
-# ── Yardimci fonksiyonlar ─────────────────────────────────────────────────
+# â”€â”€ Yardimci fonksiyonlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _json_safe(deger: Any) -> Any:
@@ -96,7 +96,7 @@ def _zaman_damgasi() -> str:
     return datetime.now(tz=timezone.utc).isoformat()
 
 
-# ── JSON-RPC Hata Kodlari ─────────────────────────────────────────────────
+# â”€â”€ JSON-RPC Hata Kodlari â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class ACPHataKodlari:
@@ -115,7 +115,7 @@ class ACPHataKodlari:
     SERVER_NOT_INITIALIZED = -32000
 
 
-# ── Ana Sinif ──────────────────────────────────────────────────────────────
+# â”€â”€ Ana Sinif â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class ACPServer:
@@ -148,7 +148,7 @@ class ACPServer:
         self._stop_event = threading.Event()
         self._notifications: list[dict] = []
 
-    # ── JSON-RPC Cekirdek ─────────────────────────────────────────────────
+    # â”€â”€ JSON-RPC Cekirdek â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _jsonrpc_hata(
         self, kod: int, mesaj: str, veri: Any = None, id_degeri: Any = None
@@ -250,7 +250,7 @@ class ACPServer:
             if name.startswith("_method_")
         )
 
-    # ── Metotlar ──────────────────────────────────────────────────────────
+    # â”€â”€ Metotlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _method_health(self, **kwargs) -> dict:
         """Detayli saglik kontrolu.
@@ -389,7 +389,7 @@ class ACPServer:
         Returns:
             {"tools": [...]}
         """
-        # initialize gerekmez — tools/list her zaman calisir
+        # initialize gerekmez â€” tools/list her zaman calisir
         tools = self._list_tools_raw()
         return {"tools": tools}
 
@@ -473,7 +473,7 @@ class ACPServer:
             "initialized": self._initialized,
         }
 
-    # ── Arac Listeleme ────────────────────────────────────────────────────
+    # â”€â”€ Arac Listeleme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _list_tools_raw(self) -> list[dict]:
         """ToolRegistry'den araclari JSON-RPC formatinda listele.
@@ -702,7 +702,7 @@ class ACPServer:
             logger.exception("[ACP] Tool cagirma hatasi: %s", name)
             return {"hata": f"[Hata]: {e}"}
 
-    # ── Yasam Dongusu ─────────────────────────────────────────────────────
+    # â”€â”€ Yasam Dongusu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def start(self) -> None:
         """ACP sunucusunu baslat (stdio modunda).
@@ -752,7 +752,7 @@ class ACPServer:
         return self._thread
 
 
-# ── Motor Kaydi ────────────────────────────────────────────────────────────
+# â”€â”€ Motor Kaydi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 # Global ACP sunucu instance
 _ACP_SERVER_INSTANCE = None
@@ -801,7 +801,7 @@ def _acp_durum() -> str:
 
 
 def motor_kaydet(motor: object):
-    """motor.py entegrasyonu: ACP araçlarını kaydet.
+    """motor.py entegrasyonu: ACP araÃ§larÄ±nÄ± kaydet.
 
     Args:
         motor: Motor ornegi (_plugin_arac_kaydet metoduna sahip)
@@ -825,7 +825,7 @@ def motor_kaydet(motor: object):
     )
 
 
-# ── Test / Dogrudan Calistirma ─────────────────────────────────────────────
+# â”€â”€ Test / Dogrudan Calistirma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
     print("=== ACP Server Test ===\n")

@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""message_sanitization.py — Mesaj Temizleme ve Sanitizasyon.
+﻿# -*- coding: utf-8 -*-
+"""message_sanitization.py â€” Mesaj Temizleme ve Sanitizasyon.
 
 LLM'e gonderilmeden once ve LLM'den gelen yanitlar islenirken
 zararli icerik, PII ve prompt injection girisimlerini temizler.
@@ -10,7 +10,7 @@ Zincir: gelen mesaj -> tehdit tara -> PII temizle -> uzunluk sinirla -> LLM
 import re
 from typing import Optional
 
-# ── Sabitler ──────────────────────────────────────────────────────────
+# â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 TEHLIKELI_DESENLER = [
     (r"(?i)(rm\s+-rf\s+/|format\s+\w:\s*\/q|del\s+\/f\s+\/s)", "ZARARLI_KOMUT"),
@@ -51,7 +51,7 @@ _IGNORE_PREV = re.compile(
 )
 
 
-# ── Temel temizleyiciler ──────────────────────────────────────────────
+# â”€â”€ Temel temizleyiciler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def html_temizle(metin: str) -> str:
@@ -102,7 +102,7 @@ def injection_isaretle(metin: str) -> tuple:
     return metin, bulgular
 
 
-# ── Birlesik temizleyiciler ───────────────────────────────────────────
+# â”€â”€ Birlesik temizleyiciler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def giris_temizle(
@@ -171,7 +171,7 @@ def mesaj_listesi_temizle(mesajlar: list, maks_icerik: int = 8000) -> list:
     return temiz
 
 
-# ── Hizli yardimcilar ─────────────────────────────────────────────────
+# â”€â”€ Hizli yardimcilar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def temiz_mi(metin: str) -> bool:
@@ -194,7 +194,7 @@ def pii_var_mi(metin: str) -> bool:
         return any(re.search(p, metin) for p in patterns)
 
 
-# ── Linter'in orijinal stublari (geriye donuk uyumluluk) ─────────────
+# â”€â”€ Linter'in orijinal stublari (geriye donuk uyumluluk) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def temizle(metin: str) -> str:
@@ -224,7 +224,7 @@ def dogrula(metin: str) -> dict:
     return {"gecerli": len(uyarilar) == 0, "uyarilar": uyarilar}
 
 
-# ── Motor kaydı ───────────────────────────────────────────────────────
+# â”€â”€ Motor kaydÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def motor_kaydet(motor):
@@ -240,8 +240,8 @@ def motor_kaydet(motor):
         "INJECTION_KONTROL",
         lambda metin="": "Temiz"
         if temiz_mi(str(metin))
-        else "UYARI: Injection kalıbı tespit edildi",
-        "Metinde prompt injection kalibı ara",
+        else "UYARI: Injection kalÄ±bÄ± tespit edildi",
+        "Metinde prompt injection kalibÄ± ara",
     )
 
 

@@ -1,8 +1,8 @@
-"""Structured streaming events — the agent→gateway delivery contract.
+﻿"""Structured streaming events â€” the agentâ†’gateway delivery contract.
 
 Historically the agent drove gateway delivery through a fan of loosely-typed
 callbacks (``stream_delta_callback(text)``, ``tool_progress_callback(event_type,
-tool_name, preview, args)``, ``interim_assistant_callback(text)`` …) and each
+tool_name, preview, args)``, ``interim_assistant_callback(text)`` â€¦) and each
 gateway callback decided *both* what to render and how to send it.  That
 coupling is why tool-progress bubbles and the streaming draft raced each other
 on Telegram, and why tool-call formatting lived agent-side even though only the
@@ -16,11 +16,11 @@ native draft; iMessage has no rich formatting and may collapse or drop tool
 chrome).  Separation of concerns: smart agent emits structured data, smart
 gateway decides delivery.
 
-These are intentionally plain frozen dataclasses — no behavior, no platform
+These are intentionally plain frozen dataclasses â€” no behavior, no platform
 knowledge, no I/O.  They are cheap to construct on the agent's worker thread and
 safe to hand across the thread/async boundary into the consumer queue.
 
-Design constraints (see hermes-agent-dev skill — message-flow + cache
+Design constraints (see reymen-agent-dev skill â€” message-flow + cache
 invariants):
   * Events describe *transport*, never *context*.  Nothing here is persisted to
     conversation history; what the gateway chooses to "eat" (e.g. tool chrome on
@@ -38,7 +38,7 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, Optional, Union
 
 
-# ── Message (assistant text) events ──────────────────────────────────────────
+# â”€â”€ Message (assistant text) events â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 @dataclass(frozen=True)
@@ -58,12 +58,12 @@ class MessageChunk:
 class MessageStop:
     """The current assistant message segment is complete.
 
-    Emitted when a contiguous run of assistant text ends — either the whole
+    Emitted when a contiguous run of assistant text ends â€” either the whole
     response finished, or a tool boundary interrupts the text so the next
     segment should render as a fresh message *below* any tool chrome.
 
     ``final`` is True only for the terminal stop of the whole turn; an
-    intermediate stop (text → tool call → more text) carries ``final=False`` so
+    intermediate stop (text â†’ tool call â†’ more text) carries ``final=False`` so
     the consumer finalizes the current bubble and prepares a new segment without
     treating the turn as done.
     """
@@ -83,15 +83,15 @@ class Commentary:
     text: str
 
 
-# ── Tool-call events ─────────────────────────────────────────────────────────
+# â”€â”€ Tool-call events â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 @dataclass(frozen=True)
 class ToolCallChunk:
     """A tool invocation has started (or its in-progress state changed).
 
-    Carries the raw facts about the call — name, a short argument ``preview``,
-    and the full ``args`` dict — and lets the *gateway* decide presentation
+    Carries the raw facts about the call â€” name, a short argument ``preview``,
+    and the full ``args`` dict â€” and lets the *gateway* decide presentation
     (emoji, truncation, verbose vs compact, or eat it entirely on platforms that
     don't show tool chrome).  Previously the agent's gateway callback baked the
     emoji + preview formatting in; that decision now belongs to the adapter.
@@ -113,7 +113,7 @@ class ToolCallFinished:
     ``duration`` is wall-clock seconds.  ``ok`` reflects whether the tool
     returned without raising.  The gateway uses this to clear/settle a progress
     bubble and to drive one-time onboarding hints (e.g. suggest /verbose after a
-    long tool run).  No tool *output* travels here — output is the agent's
+    long tool run).  No tool *output* travels here â€” output is the agent's
     concern and is persisted to history, not streamed as presentation.
     """
 
@@ -123,7 +123,7 @@ class ToolCallFinished:
     index: int = 0
 
 
-# ── Gateway control / lifecycle events ───────────────────────────────────────
+# â”€â”€ Gateway control / lifecycle events â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 @dataclass(frozen=True)
@@ -145,7 +145,7 @@ class GatewayNotice:
     """A gateway-originated control message (restart, online, long-run notice).
 
     ``kind`` is a stable string the adapter can switch on
-    (``"restart"`` / ``"online"`` / ``"long_run"`` / …).  ``text`` is the
+    (``"restart"`` / ``"online"`` / ``"long_run"`` / â€¦).  ``text`` is the
     human-readable default the base class renders when an adapter has no
     platform-specific treatment.
     """

@@ -1,19 +1,19 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-mcp_server.py — ReYMeN MCP (Model Context Protocol) Sunucusu.
+mcp_server.py â€” ReYMeN MCP (Model Context Protocol) Sunucusu.
 
-ReYMeN konuşmalarını (session'ları) MCP protokolü üzerinden
-dış MCP istemcilerine (Claude Code, VS Code MCP, özel araçlar vb.)
+ReYMeN konuÅŸmalarÄ±nÄ± (session'larÄ±) MCP protokolÃ¼ Ã¼zerinden
+dÄ±ÅŸ MCP istemcilerine (Claude Code, VS Code MCP, Ã¶zel araÃ§lar vb.)
 resource ve tool olarak sunar.
 
 Transport: STDIO (stdin / stdout)
-Protokol:  JSON-RPC 2.0 tabanlı MCP
-Bağımlılık: sadece stdlib (json, sqlite3, sys)
+Protokol:  JSON-RPC 2.0 tabanlÄ± MCP
+BaÄŸÄ±mlÄ±lÄ±k: sadece stdlib (json, sqlite3, sys)
 
-Kullanım:
+KullanÄ±m:
     python -c "from reymen.ag.mcp_server import main; main()"
 
-MCP İstemci Yapılandırması (claude_desktop_config.json / VS Code MCP):
+MCP Ä°stemci YapÄ±landÄ±rmasÄ± (claude_desktop_config.json / VS Code MCP):
     {
       "mcpServers": {
         "reymen": {
@@ -36,7 +36,7 @@ from typing import Any, Callable, Dict, List, Optional, Union
 
 logger = logging.getLogger(__name__)
 
-# ── Opsiyonel: Session Storage ───────────────────────────────────────────
+# â”€â”€ Opsiyonel: Session Storage â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 try:
     from reymen.hafiza.session_db import (
         AdvancedSessionStorage as _SessionStorage,
@@ -47,17 +47,17 @@ except ImportError:
     _SessionStorage = None
     _SESSION_AKTIF = False
 
-# ── Sabitler ──────────────────────────────────────────────────────────────
+# â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 MCP_VERSION = "2025-03-26"
 SERVER_NAME = "reymen-mcp"
 SERVER_VERSION = "1.0.0"
 RESOURCE_PREFIX = "reymen://"
 
-# ── JSON-RPC / MCP Yardimciları ─────────────────────────────────────────
+# â”€â”€ JSON-RPC / MCP YardimcilarÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _rpc_json(request_id: Any, result: Any = None, error: Optional[dict] = None) -> str:
-    """JSON-RPC 2.0 yanıtı oluştur."""
+    """JSON-RPC 2.0 yanÄ±tÄ± oluÅŸtur."""
     msg: dict[str, Any] = {"jsonrpc": "2.0", "id": request_id}
     if error:
         msg["error"] = error
@@ -75,25 +75,25 @@ def _rpc_notification(method: str, params: Optional[dict] = None) -> str:
 
 
 def _rpc_error(request_id: Any, code: int, message: str, data: Any = None) -> str:
-    """JSON-RPC hata yanıtı."""
+    """JSON-RPC hata yanÄ±tÄ±."""
     err: dict[str, Any] = {"code": code, "message": message}
     if data is not None:
         err["data"] = data
     return _rpc_json(request_id, error=err)
 
 
-# ── MCP Sunucu Sinifi ────────────────────────────────────────────────────
+# â”€â”€ MCP Sunucu Sinifi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class MCPServer:
     """ReYMeN MCP Sunucusu.
 
-    MCP protokolünü uygular:
+    MCP protokolÃ¼nÃ¼ uygular:
       - resources/list, resources/read
       - tools/list, tools/call
       - initialize, ping, notifications/initialized
 
-    Session verilerini AdvancedSessionStorage üzerinden okur/yazar.
+    Session verilerini AdvancedSessionStorage Ã¼zerinden okur/yazar.
     """
 
     def __init__(self, storage: Optional[_SessionStorage] = None) -> None:
@@ -111,11 +111,11 @@ class MCPServer:
             "notifications/initialized": self._handle_notification_initialized,
         }
 
-    # ── Ana Döngü ─────────────────────────────────────────────────────
+    # â”€â”€ Ana DÃ¶ngÃ¼ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def run(self) -> None:
-        """STDIN'den JSON-RPC isteklerini oku, STDOUT'a yanıt yaz."""
-        logger.info("[MCPServer] ReYMeN MCP sunucusu başlatılıyor...")
+        """STDIN'den JSON-RPC isteklerini oku, STDOUT'a yanÄ±t yaz."""
+        logger.info("[MCPServer] ReYMeN MCP sunucusu baÅŸlatÄ±lÄ±yor...")
         for line in sys.stdin:
             line = line.strip()
             if not line:
@@ -127,7 +127,7 @@ class MCPServer:
                     sys.stdout.write(response + "\n")
                     sys.stdout.flush()
             except json.JSONDecodeError:
-                err = _rpc_error(None, -32700, "Parse error: geçersiz JSON")
+                err = _rpc_error(None, -32700, "Parse error: geÃ§ersiz JSON")
                 sys.stdout.write(err + "\n")
                 sys.stdout.flush()
             except Exception:
@@ -141,7 +141,7 @@ class MCPServer:
                 sys.stdout.flush()
 
     def _dispatch(self, request: dict) -> Optional[str]:
-        """JSON-RPC isteğini dağıt."""
+        """JSON-RPC isteÄŸini daÄŸÄ±t."""
         method = request.get("method", "")
         req_id = request.get("id")
         params = request.get("params", {})
@@ -150,12 +150,12 @@ class MCPServer:
         if handler is None:
             return _rpc_error(req_id, -32601, f"Method not found: {method}")
 
-        # Bildirimler (id yok) -> yanıt yok
+        # Bildirimler (id yok) -> yanÄ±t yok
         if req_id is None:
             try:
                 handler(params)
             except Exception:
-                logger.error("[MCPServer] Bildirim hatası: %s", traceback.format_exc())
+                logger.error("[MCPServer] Bildirim hatasÄ±: %s", traceback.format_exc())
             return None
 
         try:
@@ -171,12 +171,12 @@ class MCPServer:
                 traceback.format_exc() if logger.isEnabledFor(logging.DEBUG) else None,
             )
 
-    # ── Initialize ────────────────────────────────────────────────────
+    # â”€â”€ Initialize â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _handle_initialize(self, params: dict) -> dict:
-        """initialize — MCP el sıkışması."""
+        """initialize â€” MCP el sÄ±kÄ±ÅŸmasÄ±."""
         client_version = params.get("protocolVersion", "unknown")
-        logger.info("[MCPServer] İstemci bağlandı: protocolVersion=%s", client_version)
+        logger.info("[MCPServer] Ä°stemci baÄŸlandÄ±: protocolVersion=%s", client_version)
         self._initialized = True
         return {
             "protocolVersion": MCP_VERSION,
@@ -196,18 +196,18 @@ class MCPServer:
         }
 
     def _handle_notification_initialized(self, params: dict) -> None:
-        """notifications/initialized — istemci init tamamlandı."""
+        """notifications/initialized â€” istemci init tamamlandÄ±."""
         self._initialized = True
-        logger.info("[MCPServer] İstemci initialized notification gönderdi.")
+        logger.info("[MCPServer] Ä°stemci initialized notification gÃ¶nderdi.")
 
     def _handle_ping(self, params: dict) -> dict:
-        """ping — canlılık kontrolü."""
+        """ping â€” canlÄ±lÄ±k kontrolÃ¼."""
         return {}
 
-    # ── Resources ─────────────────────────────────────────────────────
+    # â”€â”€ Resources â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _handle_resources_list(self, params: dict) -> dict:
-        """resources/list — session'ları resource olarak listele."""
+        """resources/list â€” session'larÄ± resource olarak listele."""
         cursor = params.get("cursor")
         resources = []
         sessions = self._get_session_list(cursor)
@@ -223,7 +223,7 @@ class MCPServer:
                     "name": title,
                     "description": (
                         f"Model: {model} | Mesaj: {msg_count} | "
-                        f"Oluşturulma: {time.strftime('%Y-%m-%d %H:%M', time.localtime(created)) if created else '?'}"
+                        f"OluÅŸturulma: {time.strftime('%Y-%m-%d %H:%M', time.localtime(created)) if created else '?'}"
                     ),
                     "mimeType": "application/json",
                 }
@@ -234,16 +234,16 @@ class MCPServer:
         }
 
     def _handle_resources_read(self, params: dict) -> dict:
-        """resources/read — session detayını oku."""
+        """resources/read â€” session detayÄ±nÄ± oku."""
         uri = params.get("uri", "")
         if not uri.startswith(RESOURCE_PREFIX):
-            raise ValueError(f"Geçersiz URI: {uri}")
+            raise ValueError(f"GeÃ§ersiz URI: {uri}")
 
         path = uri[len(RESOURCE_PREFIX) :].strip("/")
         parts = path.split("/")
 
         if len(parts) == 1 and parts[0] == "sessions":
-            # Tüm session listesi
+            # TÃ¼m session listesi
             sessions = self._get_session_list()
             content = json.dumps(sessions, ensure_ascii=False, indent=2, default=str)
             return {
@@ -260,17 +260,17 @@ class MCPServer:
             sid = parts[1]
             session = self._get_session(sid)
             if not session:
-                raise ValueError(f"Session bulunamadı: {sid}")
+                raise ValueError(f"Session bulunamadÄ±: {sid}")
 
             if len(parts) >= 3 and parts[2] == "messages":
-                # Session mesajları
+                # Session mesajlarÄ±
                 messages = self._get_session_messages(sid)
                 session_data = {
                     "session": session,
                     "messages": messages,
                 }
             else:
-                # Session özeti
+                # Session Ã¶zeti
                 messages = self._get_session_messages(sid)
                 session_data = {
                     "session": session,
@@ -290,22 +290,22 @@ class MCPServer:
                 ]
             }
 
-        raise ValueError(f"Geçersiz resource yolu: {uri}")
+        raise ValueError(f"GeÃ§ersiz resource yolu: {uri}")
 
     def _handle_tools_list(self, params: dict) -> dict:
-        """tools/list — kullanılabilir araçları listele."""
+        """tools/list â€” kullanÄ±labilir araÃ§larÄ± listele."""
         cursor = params.get("cursor")
         return {
             "tools": [
                 {
                     "name": "list_sessions",
-                    "description": "Tüm ReYMeN konuşma oturumlarını listeler.",
+                    "description": "TÃ¼m ReYMeN konuÅŸma oturumlarÄ±nÄ± listeler.",
                     "inputSchema": {
                         "type": "object",
                         "properties": {
                             "limit": {
                                 "type": "integer",
-                                "description": "Maksimum session sayısı (varsayılan: 20)",
+                                "description": "Maksimum session sayÄ±sÄ± (varsayÄ±lan: 20)",
                                 "default": 20,
                             },
                             "source": {
@@ -317,13 +317,13 @@ class MCPServer:
                 },
                 {
                     "name": "get_session",
-                    "description": "Belirtilen session'ın detaylarını ve mesajlarını getirir.",
+                    "description": "Belirtilen session'Ä±n detaylarÄ±nÄ± ve mesajlarÄ±nÄ± getirir.",
                     "inputSchema": {
                         "type": "object",
                         "properties": {
                             "session_id": {
                                 "type": "string",
-                                "description": "Session ID (UUID formatında)",
+                                "description": "Session ID (UUID formatÄ±nda)",
                             },
                         },
                         "required": ["session_id"],
@@ -331,7 +331,7 @@ class MCPServer:
                 },
                 {
                     "name": "create_session",
-                    "description": "Yeni bir ReYMeN konuşma oturumu oluşturur.",
+                    "description": "Yeni bir ReYMeN konuÅŸma oturumu oluÅŸturur.",
                     "inputSchema": {
                         "type": "object",
                         "properties": {
@@ -342,15 +342,15 @@ class MCPServer:
                             },
                             "model": {
                                 "type": "string",
-                                "description": "Kullanılacak model adı",
+                                "description": "KullanÄ±lacak model adÄ±",
                             },
                             "title": {
                                 "type": "string",
-                                "description": "Session başlığı",
+                                "description": "Session baÅŸlÄ±ÄŸÄ±",
                             },
                             "user_id": {
                                 "type": "string",
-                                "description": "Kullanıcı ID",
+                                "description": "KullanÄ±cÄ± ID",
                                 "default": "mcp-client",
                             },
                         },
@@ -358,7 +358,7 @@ class MCPServer:
                 },
                 {
                     "name": "send_message",
-                    "description": "Bir session'a mesaj gönderir (user rolüyle).",
+                    "description": "Bir session'a mesaj gÃ¶nderir (user rolÃ¼yle).",
                     "inputSchema": {
                         "type": "object",
                         "properties": {
@@ -368,7 +368,7 @@ class MCPServer:
                             },
                             "content": {
                                 "type": "string",
-                                "description": "Mesaj içeriği",
+                                "description": "Mesaj iÃ§eriÄŸi",
                             },
                         },
                         "required": ["session_id", "content"],
@@ -384,17 +384,17 @@ class MCPServer:
                 },
                 {
                     "name": "search_sessions",
-                    "description": "Session içeriklerinde tam metin arama yapar.",
+                    "description": "Session iÃ§eriklerinde tam metin arama yapar.",
                     "inputSchema": {
                         "type": "object",
                         "properties": {
                             "query": {
                                 "type": "string",
-                                "description": "Arama sorgusu (FTS5 MATCH sözdizimi)",
+                                "description": "Arama sorgusu (FTS5 MATCH sÃ¶zdizimi)",
                             },
                             "limit": {
                                 "type": "integer",
-                                "description": "Maksimum sonuç sayısı (varsayılan: 10)",
+                                "description": "Maksimum sonuÃ§ sayÄ±sÄ± (varsayÄ±lan: 10)",
                                 "default": 10,
                             },
                         },
@@ -406,7 +406,7 @@ class MCPServer:
         }
 
     def _handle_tools_call(self, params: dict) -> dict:
-        """tools/call — araç çağrısını yürüt."""
+        """tools/call â€” araÃ§ Ã§aÄŸrÄ±sÄ±nÄ± yÃ¼rÃ¼t."""
         name = params.get("name", "")
         arguments = params.get("arguments", {})
 
@@ -421,10 +421,10 @@ class MCPServer:
 
         handler = handler_map.get(name)
         if handler is None:
-            raise ValueError(f"Bilinmeyen araç: {name}")
+            raise ValueError(f"Bilinmeyen araÃ§: {name}")
 
         result = handler(arguments)
-        # MCP tool sonuç formatı
+        # MCP tool sonuÃ§ formatÄ±
         return {
             "content": [
                 {
@@ -436,43 +436,43 @@ class MCPServer:
             ],
         }
 
-    # ── Veri Katmanı ──────────────────────────────────────────────────
+    # â”€â”€ Veri KatmanÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _check_storage(self) -> None:
-        """Storage mevcut değilse hata fırlat."""
+        """Storage mevcut deÄŸilse hata fÄ±rlat."""
         if not self._storage:
             raise RuntimeError(
-                "SessionStorage kullanılamıyor. "
-                "reymen.hafiza.session_db modülü yüklenememiş olabilir."
+                "SessionStorage kullanÄ±lamÄ±yor. "
+                "reymen.hafiza.session_db modÃ¼lÃ¼ yÃ¼klenememiÅŸ olabilir."
             )
 
     def _get_session_list(self, cursor: Optional[str] = None) -> list[dict]:
         """Session listesini AdvancedSessionStorage'dan al."""
         self._check_storage()
         try:
-            # son_sessionlar ile son session'ları al
+            # son_sessionlar ile son session'larÄ± al
             return self._storage.son_sessionlar(limit=50)
         except Exception as e:
-            logger.error("[MCPServer] Session listesi alınamadı: %s", e)
+            logger.error("[MCPServer] Session listesi alÄ±namadÄ±: %s", e)
             return []
 
     def _get_session(self, session_id: str) -> dict:
-        """Tek session detayını al."""
+        """Tek session detayÄ±nÄ± al."""
         self._check_storage()
         try:
             return self._storage.session_bul(session_id)
         except Exception as e:
-            logger.error("[MCPServer] Session bulunamadı (%s): %s", session_id, e)
+            logger.error("[MCPServer] Session bulunamadÄ± (%s): %s", session_id, e)
             return {}
 
     def _get_session_messages(self, session_id: str) -> list[dict]:
-        """Session mesajlarını al."""
+        """Session mesajlarÄ±nÄ± al."""
         self._check_storage()
         try:
             # _mesajlari_getir kullan (AdvancedSessionStorage'da private)
             if hasattr(self._storage, "_mesajlari_getir"):
                 return self._storage._mesajlari_getir(session_id)
-            # Fallback: doğrudan SQLite sorgusu
+            # Fallback: doÄŸrudan SQLite sorgusu
             import sqlite3
 
             conn = sqlite3.connect(str(self._storage.db_yolu))
@@ -487,13 +487,13 @@ class MCPServer:
             finally:
                 conn.close()
         except Exception as e:
-            logger.error("[MCPServer] Mesajlar alınamadı (%s): %s", session_id, e)
+            logger.error("[MCPServer] Mesajlar alÄ±namadÄ± (%s): %s", session_id, e)
             return []
 
-    # ── Tool Implementasyonları ───────────────────────────────────────
+    # â”€â”€ Tool ImplementasyonlarÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _tool_list_sessions(self, args: dict) -> dict:
-        """list_sessions aracı."""
+        """list_sessions aracÄ±."""
         limit = args.get("limit", 20)
         source = args.get("source")
         self._check_storage()
@@ -518,13 +518,13 @@ class MCPServer:
         }
 
     def _tool_get_session(self, args: dict) -> dict:
-        """get_session aracı."""
+        """get_session aracÄ±."""
         session_id = args.get("session_id", "")
         if not session_id:
             raise ValueError("session_id parametresi gerekli.")
         session = self._get_session(session_id)
         if not session:
-            return {"error": f"Session bulunamadı: {session_id}"}
+            return {"error": f"Session bulunamadÄ±: {session_id}"}
 
         messages = self._get_session_messages(session_id)
         return {
@@ -556,7 +556,7 @@ class MCPServer:
         }
 
     def _tool_create_session(self, args: dict) -> dict:
-        """create_session aracı."""
+        """create_session aracÄ±."""
         self._check_storage()
         source = args.get("source", "mcp")
         model = args.get("model")
@@ -570,14 +570,14 @@ class MCPServer:
             user_id=user_id,
         )
         if not session_id:
-            raise RuntimeError("Session oluşturulamadı.")
+            raise RuntimeError("Session oluÅŸturulamadÄ±.")
         return {
             "session_id": session_id,
-            "message": f"Session başarıyla oluşturuldu: {session_id}",
+            "message": f"Session baÅŸarÄ±yla oluÅŸturuldu: {session_id}",
         }
 
     def _tool_send_message(self, args: dict) -> dict:
-        """send_message aracı."""
+        """send_message aracÄ±."""
         self._check_storage()
         session_id = args.get("session_id", "")
         content = args.get("content", "")
@@ -587,26 +587,26 @@ class MCPServer:
         if not content:
             raise ValueError("content parametresi gerekli.")
 
-        # Session'ın var olduğunu kontrol et
+        # Session'Ä±n var olduÄŸunu kontrol et
         session = self._storage.session_bul(session_id)
         if not session:
-            raise ValueError(f"Session bulunamadı: {session_id}")
+            raise ValueError(f"Session bulunamadÄ±: {session_id}")
 
-        # Mesajı ekle
+        # MesajÄ± ekle
         self._storage.mesaj_ekle(session_id, "user", content)
         return {
             "session_id": session_id,
             "role": "user",
             "content_length": len(content),
-            "message": "Mesaj başarıyla eklendi.",
+            "message": "Mesaj baÅŸarÄ±yla eklendi.",
         }
 
     def _tool_session_stats(self, args: dict) -> dict:
-        """session_stats aracı."""
+        """session_stats aracÄ±."""
         self._check_storage()
         stats = self._storage.istatistik()
         if not stats:
-            return {"message": "İstatistik verisi yok."}
+            return {"message": "Ä°statistik verisi yok."}
         return {
             "total_sessions": stats.get("toplam_session", 0),
             "total_input_tokens": stats.get("toplam_input_token", 0),
@@ -617,7 +617,7 @@ class MCPServer:
         }
 
     def _tool_search_sessions(self, args: dict) -> dict:
-        """search_sessions aracı."""
+        """search_sessions aracÄ±."""
         self._check_storage()
         query = args.get("query", "")
         limit = args.get("limit", 10)
@@ -648,11 +648,11 @@ class MCPServer:
         }
 
 
-# ── Entry Points ─────────────────────────────────────────────────────────
+# â”€â”€ Entry Points â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def main() -> None:
-    """MCP sunucusunu başlatır (ana entry point)."""
+    """MCP sunucusunu baÅŸlatÄ±r (ana entry point)."""
     logging.basicConfig(
         level=logging.WARNING,
         format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
@@ -663,7 +663,7 @@ def main() -> None:
 
 
 def create_server(storage: Optional[_SessionStorage] = None) -> MCPServer:
-    """Test / entegrasyon amaçlı MCPServer instance'ı oluşturur."""
+    """Test / entegrasyon amaÃ§lÄ± MCPServer instance'Ä± oluÅŸturur."""
     return MCPServer(storage=storage)
 
 

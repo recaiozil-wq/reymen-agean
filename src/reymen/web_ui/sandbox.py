@@ -1,7 +1,7 @@
-"""🏖️ ReYMeN Sandbox — izole kod çalıştırma ortamı.
+﻿"""ğŸ–ï¸ ReYMeN Sandbox â€” izole kod Ã§alÄ±ÅŸtÄ±rma ortamÄ±.
 
-Her sandbox kendi temp dizininde çalışır, timeout'lu ve kontrollüdür.
-Bağımlılık: yok (tempfile + subprocess + threading ile)
+Her sandbox kendi temp dizininde Ã§alÄ±ÅŸÄ±r, timeout'lu ve kontrollÃ¼dÃ¼r.
+BaÄŸÄ±mlÄ±lÄ±k: yok (tempfile + subprocess + threading ile)
 """
 
 from __future__ import annotations
@@ -44,7 +44,7 @@ class Sandbox:
     def calistir(
         self, komut: list[str], timeout: int = AZAMI_SURE, env: Optional[dict] = None
     ) -> dict:
-        """Sandbox'da komut çalıştır."""
+        """Sandbox'da komut Ã§alÄ±ÅŸtÄ±r."""
         self.durum = "calisiyor"
         self.baslama = time.time()
 
@@ -77,8 +77,8 @@ class Sandbox:
             except subprocess.TimeoutExpired:
                 self._proc.kill()
                 self._proc.wait()
-                self.cikti = "(zaman aşımı)"
-                self.hata = f"Komut {timeout}s içinde bitmedi"
+                self.cikti = "(zaman aÅŸÄ±mÄ±)"
+                self.hata = f"Komut {timeout}s iÃ§inde bitmedi"
                 self.exit_code = -1
                 self.durum = "zamanasimi"
 
@@ -127,14 +127,14 @@ class Sandbox:
 
 
 class SandboxYoneticisi:
-    """Tüm sandbox'ları yönetir."""
+    """TÃ¼m sandbox'larÄ± yÃ¶netir."""
 
     def __init__(self) -> None:
         self._sandboxlar: dict[str, Sandbox] = {}
         self._kilit = threading.Lock()
 
     def yeni(self) -> Sandbox:
-        """Yeni sandbox oluştur."""
+        """Yeni sandbox oluÅŸtur."""
         sandbox_id = str(uuid.uuid4())[:8]
         dizin = SANDBOX_ANA_DIZIN / sandbox_id
         dizin.mkdir(parents=True, exist_ok=True)
@@ -156,7 +156,7 @@ class SandboxYoneticisi:
             return [sb.rapor() for sb in sb_list]
 
     def temizle_hepsi(self) -> int:
-        """Tüm sandbox'ları temizle."""
+        """TÃ¼m sandbox'larÄ± temizle."""
         say = 0
         with self._kilit:
             for sb in self._sandboxlar.values():
@@ -166,7 +166,7 @@ class SandboxYoneticisi:
         return say
 
     def temizle_eski(self, max_saat: int = 1) -> int:
-        """Belirli saatten eski sandbox'ları temizle."""
+        """Belirli saatten eski sandbox'larÄ± temizle."""
         simdi = time.time()
         sure = max_saat * 3600
         silinen = 0

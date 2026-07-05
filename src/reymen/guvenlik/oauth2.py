@@ -1,9 +1,9 @@
-"""🔑 OAuth 2.0 Sistemi — Google + Discord Login.
+﻿"""ğŸ”‘ OAuth 2.0 Sistemi â€” Google + Discord Login.
 
 Provider pattern:
-    OAuth2Provider (ABC) → GoogleOAuth2Provider, DiscordOAuth2Provider
-    OAuth2Registry (singleton) → register / get providers
-    OAuth2Manager → flow: get_auth_url → exchange_code → get_user_info → refresh_token
+    OAuth2Provider (ABC) â†’ GoogleOAuth2Provider, DiscordOAuth2Provider
+    OAuth2Registry (singleton) â†’ register / get providers
+    OAuth2Manager â†’ flow: get_auth_url â†’ exchange_code â†’ get_user_info â†’ refresh_token
 
 Token storage:
     .ReYMeN/oauth/tokens.json  (JSON file)
@@ -32,13 +32,13 @@ PROJE_KOK = Path(__file__).resolve().parent.parent.parent
 
 
 # ---------------------------------------------------------------------------
-# Veri yapıları
+# Veri yapÄ±larÄ±
 # ---------------------------------------------------------------------------
 
 
 @dataclass
 class OAuth2Token:
-    """Bir OAuth2 provider'dan alınan token bilgisi."""
+    """Bir OAuth2 provider'dan alÄ±nan token bilgisi."""
 
     access_token: str
     token_type: str = "Bearer"
@@ -56,9 +56,9 @@ class OAuth2Token:
 
 @dataclass
 class OAuth2UserInfo:
-    """Provider'dan dönen kullanıcı bilgisi (normalleştirilmiş)."""
+    """Provider'dan dÃ¶nen kullanÄ±cÄ± bilgisi (normalleÅŸtirilmiÅŸ)."""
 
-    provider_id: str  # provider içindeki unique ID
+    provider_id: str  # provider iÃ§indeki unique ID
     email: str = ""
     display_name: str = ""
     avatar_url: str = ""
@@ -71,10 +71,10 @@ class OAuth2UserInfo:
 
 
 class OAuth2Provider(ABC):
-    """OAuth2 sağlayıcı temel sınıfı.
+    """OAuth2 saÄŸlayÄ±cÄ± temel sÄ±nÄ±fÄ±.
 
-    Alt sınıflar şu alanları tanımlamalı:
-      - provider_id: str  (örn: "google", "discord")
+    Alt sÄ±nÄ±flar ÅŸu alanlarÄ± tanÄ±mlamalÄ±:
+      - provider_id: str  (Ã¶rn: "google", "discord")
       - client_id, client_secret (genelde env var'dan okunur)
       - auth_url, token_url, userinfo_url
       - scopes: list[str]
@@ -90,7 +90,7 @@ class OAuth2Provider(ABC):
     redirect_uri: str = ""
 
     def get_auth_url(self, state: str = "", redirect_uri: str = "") -> str:
-        """Kullanıcıyı OAuth2 onay sayfasına yönlendirecek URL."""
+        """KullanÄ±cÄ±yÄ± OAuth2 onay sayfasÄ±na yÃ¶nlendirecek URL."""
         if not redirect_uri:
             redirect_uri = self.redirect_uri
         if not state:
@@ -130,7 +130,7 @@ class OAuth2Provider(ABC):
         return self._http_post(self.token_url, data)
 
     def get_user_info(self, access_token: str) -> dict[str, Any]:
-        """Access token ile kullanıcı bilgisi al."""
+        """Access token ile kullanÄ±cÄ± bilgisi al."""
         req = urllib.request.Request(
             self.userinfo_url,
             headers={"Authorization": f"Bearer {access_token}"},
@@ -143,24 +143,24 @@ class OAuth2Provider(ABC):
             body = e.read().decode("utf-8", errors="replace") if e.fp else ""
             logger.error("[OAuth2] get_user_info HTTP %d: %s", e.code, body[:500])
             raise OAuth2ProviderError(
-                f"Kullanıcı bilgisi alınamadı: HTTP {e.code}",
+                f"KullanÄ±cÄ± bilgisi alÄ±namadÄ±: HTTP {e.code}",
                 provider=self.provider_id,
                 status_code=e.code,
             ) from e
         except (urllib.error.URLError, OSError) as e:
-            logger.error("[OAuth2] get_user_info bağlantı hatası: %s", e)
+            logger.error("[OAuth2] get_user_info baÄŸlantÄ± hatasÄ±: %s", e)
             raise OAuth2ProviderError(
-                f"Kullanıcı bilgisi alınamadı: {e}",
+                f"KullanÄ±cÄ± bilgisi alÄ±namadÄ±: {e}",
                 provider=self.provider_id,
             ) from e
 
     @abstractmethod
     def normalize_user_info(self, raw: dict[str, Any]) -> OAuth2UserInfo:
-        """Provider'a özel raw yanıtı OAuth2UserInfo'ya dönüştür."""
+        """Provider'a Ã¶zel raw yanÄ±tÄ± OAuth2UserInfo'ya dÃ¶nÃ¼ÅŸtÃ¼r."""
         ...
 
     def _http_post(self, url: str, data: dict[str, Any]) -> dict[str, Any]:
-        """application/x-www-form-urlencoded POST isteği."""
+        """application/x-www-form-urlencoded POST isteÄŸi."""
         encoded = urllib.parse.urlencode(data).encode("utf-8")
         req = urllib.request.Request(url, data=encoded, method="POST")
         req.add_header("Content-Type", "application/x-www-form-urlencoded")
@@ -172,25 +172,25 @@ class OAuth2Provider(ABC):
             body = e.read().decode("utf-8", errors="replace") if e.fp else ""
             logger.error("[OAuth2] POST %s HTTP %d: %s", url, e.code, body[:500])
             raise OAuth2ProviderError(
-                f"Token alınamadı: HTTP {e.code}",
+                f"Token alÄ±namadÄ±: HTTP {e.code}",
                 provider=self.provider_id,
                 status_code=e.code,
             ) from e
         except (urllib.error.URLError, OSError) as e:
-            logger.error("[OAuth2] POST %s bağlantı hatası: %s", url, e)
+            logger.error("[OAuth2] POST %s baÄŸlantÄ± hatasÄ±: %s", url, e)
             raise OAuth2ProviderError(
-                f"Token alınamadı: {e}",
+                f"Token alÄ±namadÄ±: {e}",
                 provider=self.provider_id,
             ) from e
 
 
 # ---------------------------------------------------------------------------
-# Hata sınıfı
+# Hata sÄ±nÄ±fÄ±
 # ---------------------------------------------------------------------------
 
 
 class OAuth2ProviderError(Exception):
-    """OAuth2 işlemleri sırasında oluşan hata."""
+    """OAuth2 iÅŸlemleri sÄ±rasÄ±nda oluÅŸan hata."""
 
     def __init__(self, message: str, provider: str = "", status_code: int = 0):
         self.provider = provider
@@ -204,7 +204,7 @@ class OAuth2ProviderError(Exception):
 
 
 class GoogleOAuth2Provider(OAuth2Provider):
-    """Google OAuth2 sağlayıcısı.
+    """Google OAuth2 saÄŸlayÄ±cÄ±sÄ±.
 
     Gereken env vars:
       GOOGLE_CLIENT_ID
@@ -223,7 +223,7 @@ class GoogleOAuth2Provider(OAuth2Provider):
         if not self.client_id or not self.client_secret:
             logger.warning(
                 "[OAuth2:Google] GOOGLE_CLIENT_ID veya GOOGLE_CLIENT_SECRET "
-                "ortam değişkeni bulunamadı. Google girişi çalışmayacak."
+                "ortam deÄŸiÅŸkeni bulunamadÄ±. Google giriÅŸi Ã§alÄ±ÅŸmayacak."
             )
         self.redirect_uri = redirect_uri or os.getenv(
             "GOOGLE_REDIRECT_URI",
@@ -231,7 +231,7 @@ class GoogleOAuth2Provider(OAuth2Provider):
         )
 
     def normalize_user_info(self, raw: dict[str, Any]) -> OAuth2UserInfo:
-        """Google userinfo yanıtını normalleştir."""
+        """Google userinfo yanÄ±tÄ±nÄ± normalleÅŸtir."""
         return OAuth2UserInfo(
             provider_id=raw.get("id", raw.get("sub", "")),
             email=raw.get("email", ""),
@@ -247,7 +247,7 @@ class GoogleOAuth2Provider(OAuth2Provider):
 
 
 class DiscordOAuth2Provider(OAuth2Provider):
-    """Discord OAuth2 sağlayıcısı.
+    """Discord OAuth2 saÄŸlayÄ±cÄ±sÄ±.
 
     Gereken env vars:
       DISCORD_CLIENT_ID
@@ -266,7 +266,7 @@ class DiscordOAuth2Provider(OAuth2Provider):
         if not self.client_id or not self.client_secret:
             logger.warning(
                 "[OAuth2:Discord] DISCORD_CLIENT_ID veya DISCORD_CLIENT_SECRET "
-                "ortam değişkeni bulunamadı. Discord girişi çalışmayacak."
+                "ortam deÄŸiÅŸkeni bulunamadÄ±. Discord giriÅŸi Ã§alÄ±ÅŸmayacak."
             )
         self.redirect_uri = redirect_uri or os.getenv(
             "DISCORD_REDIRECT_URI",
@@ -274,7 +274,7 @@ class DiscordOAuth2Provider(OAuth2Provider):
         )
 
     def normalize_user_info(self, raw: dict[str, Any]) -> OAuth2UserInfo:
-        """Discord /users/@me yanıtını normalleştir."""
+        """Discord /users/@me yanÄ±tÄ±nÄ± normalleÅŸtir."""
         avatar_hash = raw.get("avatar", "")
         user_id = raw.get("id", "")
         avatar_url = ""
@@ -298,7 +298,7 @@ class DiscordOAuth2Provider(OAuth2Provider):
 
 
 class OAuth2Registry:
-    """OAuth2 provider registry — singleton pattern."""
+    """OAuth2 provider registry â€” singleton pattern."""
 
     _instance: Optional[OAuth2Registry] = None
     _providers: dict[str, OAuth2Provider]
@@ -311,7 +311,7 @@ class OAuth2Registry:
 
     def register(self, provider: OAuth2Provider) -> None:
         if not provider.provider_id:
-            raise ValueError("OAuth2Provider.provider_id boş olamaz")
+            raise ValueError("OAuth2Provider.provider_id boÅŸ olamaz")
         self._providers[provider.provider_id] = provider
         logger.info("[OAuth2Registry] Kaydedildi: %s", provider.provider_id)
 
@@ -329,12 +329,12 @@ class OAuth2Registry:
 
 
 # ---------------------------------------------------------------------------
-# Token Storage — JSON file
+# Token Storage â€” JSON file
 # ---------------------------------------------------------------------------
 
 
 class OAuth2TokenStorage:
-    """OAuth2 token'larını .ReYMeN/oauth/tokens.json'da saklar."""
+    """OAuth2 token'larÄ±nÄ± .ReYMeN/oauth/tokens.json'da saklar."""
 
     def __init__(self, base_path: Path | None = None):
         self._base = base_path or PROJE_KOK
@@ -345,7 +345,7 @@ class OAuth2TokenStorage:
             try:
                 return json.loads(self._dosya.read_text(encoding="utf-8"))
             except (json.JSONDecodeError, OSError) as e:
-                logger.warning("[OAuth2TokenStorage] Yükleme hatası: %s", e)
+                logger.warning("[OAuth2TokenStorage] YÃ¼kleme hatasÄ±: %s", e)
                 return {}
         return {}
 
@@ -383,7 +383,7 @@ class OAuth2TokenStorage:
             self._save(data)
 
     def list_tokens(self) -> list[dict[str, str]]:
-        """Tüm kayıtlı token'ları listele (provider, user_id bazında)."""
+        """TÃ¼m kayÄ±tlÄ± token'larÄ± listele (provider, user_id bazÄ±nda)."""
         data = self._load()
         result = []
         for provider_id, users in data.items():
@@ -398,14 +398,14 @@ class OAuth2TokenStorage:
 
 
 # ---------------------------------------------------------------------------
-# OAuth2Manager — full flow
+# OAuth2Manager â€” full flow
 # ---------------------------------------------------------------------------
 
 
 class OAuth2Manager:
-    """OAuth2 akış yöneticisi.
+    """OAuth2 akÄ±ÅŸ yÃ¶neticisi.
 
-    Kullanım:
+    KullanÄ±m:
         manager = OAuth2Manager()
         url = manager.get_auth_url("google")
         token = manager.exchange_code("google", "auth_code")
@@ -424,7 +424,7 @@ class OAuth2Manager:
     def get_auth_url(
         self, provider_id: str, state: str = "", redirect_uri: str = ""
     ) -> str:
-        """Kullanıcıyı OAuth2 onay sayfasına yönlendirecek URL."""
+        """KullanÄ±cÄ±yÄ± OAuth2 onay sayfasÄ±na yÃ¶nlendirecek URL."""
         provider = self.registry.get(provider_id)
         if not provider:
             raise OAuth2ProviderError(
@@ -452,19 +452,19 @@ class OAuth2Manager:
             scope=raw.get("scope", ""),
             provider=provider_id,
         )
-        # Kullanıcı bilgisini al ve user_id'yi token'a ekle
+        # KullanÄ±cÄ± bilgisini al ve user_id'yi token'a ekle
         try:
             user_raw = provider.get_user_info(token.access_token)
             user_info = provider.normalize_user_info(user_raw)
             token.user_id = user_info.provider_id
         except Exception as e:
-            logger.warning("[OAuth2Manager] Kullanıcı bilgisi alınamadı: %s", e)
-        # Token'ı kaydet
+            logger.warning("[OAuth2Manager] KullanÄ±cÄ± bilgisi alÄ±namadÄ±: %s", e)
+        # Token'Ä± kaydet
         self.storage.save_token(provider_id, token)
         return token
 
     def get_user_info(self, provider_id: str, access_token: str) -> OAuth2UserInfo:
-        """Access token ile kullanıcı bilgisi al."""
+        """Access token ile kullanÄ±cÄ± bilgisi al."""
         provider = self.registry.get(provider_id)
         if not provider:
             raise OAuth2ProviderError(
@@ -509,11 +509,11 @@ oauth2_manager = OAuth2Manager(oauth2_registry, token_storage)
 
 
 def init_oauth2_providers(redirect_base: str = "") -> None:
-    """Varsayılan OAuth2 provider'larını kaydet.
+    """VarsayÄ±lan OAuth2 provider'larÄ±nÄ± kaydet.
 
     Args:
-        redirect_base: Callback URL base (örn: "http://localhost:5000")
-                       Boşsa env var'daki redirect_uri'ler kullanılır.
+        redirect_base: Callback URL base (Ã¶rn: "http://localhost:5000")
+                       BoÅŸsa env var'daki redirect_uri'ler kullanÄ±lÄ±r.
     """
     google_redirect = ""
     discord_redirect = ""

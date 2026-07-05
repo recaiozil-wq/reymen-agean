@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""ref_processor.py — @file / @url referans islemcisi.
+﻿# -*- coding: utf-8 -*-
+"""ref_processor.py â€” @file / @url referans islemcisi.
 
 Kullanici mesajindaki @file:path ve @url:https://... pattern'lerini
 regex ile yakalar, ilgili icerigi otomatik okur ve referans olarak
@@ -23,9 +23,9 @@ from urllib.parse import urlparse
 log = logging.getLogger(__name__)
 
 # Regex pattern: @file:path veya @url:https://...
-#   @file:./dosya.txt   → goreli yol
-#   @file:C:/yol/dosya  → mutlak yol
-#   @url:https://ornek.com  → URL
+#   @file:./dosya.txt   â†’ goreli yol
+#   @file:C:/yol/dosya  â†’ mutlak yol
+#   @url:https://ornek.com  â†’ URL
 _RE_FILE = re.compile(r"@file\:([^\s\"']+)")
 _RE_URL = re.compile(r"@url\:([^\s\"']+)")
 
@@ -260,7 +260,7 @@ def ref_isle(
         if basarili:
             zengin_metin = zengin_metin.replace(eslesme.group(0), f"[REF:{dosya_adi}]")
         else:
-            log.warning("[RefProcessor] @file basarisiz: %s — %s", dosya_yolu, hata)
+            log.warning("[RefProcessor] @file basarisiz: %s â€” %s", dosya_yolu, hata)
             zengin_metin = zengin_metin.replace(
                 eslesme.group(0), f"[REF:{dosya_adi}:HATA]"
             )
@@ -287,7 +287,7 @@ def ref_isle(
         if basarili:
             zengin_metin = zengin_metin.replace(eslesme.group(0), f"[REF:{etiket}]")
         else:
-            log.warning("[RefProcessor] @url basarisiz: %s — %s", url, hata)
+            log.warning("[RefProcessor] @url basarisiz: %s â€” %s", url, hata)
             zengin_metin = zengin_metin.replace(
                 eslesme.group(0), f"[REF:{etiket}:HATA]"
             )

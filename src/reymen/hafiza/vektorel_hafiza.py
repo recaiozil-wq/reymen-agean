@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-vektorel_hafiza.py — ChromaDB anlamsal bellek (RAG).
+vektorel_hafiza.py â€” ChromaDB anlamsal bellek (RAG).
 
 Ozellikler:
 - ChromaDB varsa kosi benzerligiyle arama, yoksa TF benzeri yedek
@@ -113,7 +113,7 @@ def vektorel_hafiza_sistemini_kur(yol="./vektor_hafizasi"):
 def tecrube_kaydet(
     collection, kayit_id: str, icerik: str, metadata: dict = None
 ) -> bool:
-    """Tecrube kaydet — zaman damgasi ve metadata otomatik eklenir.
+    """Tecrube kaydet â€” zaman damgasi ve metadata otomatik eklenir.
 
     Cok benzer bir kayit zaten varsa tekrar kaydedilmez (dedup).
     """
@@ -130,7 +130,7 @@ def tecrube_kaydet(
         mevcut_doclar = sonuc.get("documents", [[]])[0]
         mesafeler = sonuc.get("distances", [[]])[0]
         if mevcut_doclar and mesafeler:
-            benzerlik = 1 - mesafeler[0]  # cosine distance → similarity
+            benzerlik = 1 - mesafeler[0]  # cosine distance â†’ similarity
             if benzerlik >= ESIK_BENZERLIK:
                 return False  # Zaten mevcut
     except Exception as _e:
@@ -167,16 +167,16 @@ def _budama_yap(collection):
 
 
 def anlamsal_hafiza_ara(collection, sorgu: str, adet: int = 3) -> str:
-    """Anlamsal arama — ilgili tecrübeleri dondurur.
+    """Anlamsal arama â€” ilgili tecrÃ¼beleri dondurur.
 
     Returns:
-        Bulunan tecrübelerin metin listesi veya bulunamadı mesajı.
+        Bulunan tecrÃ¼belerin metin listesi veya bulunamadÄ± mesajÄ±.
     """
     try:
         sonuc = collection.query(query_texts=[sorgu[:300]], n_results=adet)
         dokumanlar = sonuc.get("documents", [[]])[0]
         if not dokumanlar:
-            return "[Hafıza]: İlgili tecrübe bulunamadı."
+            return "[HafÄ±za]: Ä°lgili tecrÃ¼be bulunamadÄ±."
 
         # Mesafeye gore siralama (dusuk mesafe = yuksek benzerlik)
         mesafeler = sonuc.get("distances", [[]])[0]
@@ -186,23 +186,23 @@ def anlamsal_hafiza_ara(collection, sorgu: str, adet: int = 3) -> str:
 
         return "\n".join(f"- {d[:200]}" for d in dokumanlar)
     except Exception as e:
-        return f"[Hafıza]: Arama hatasi: {e}"
+        return f"[HafÄ±za]: Arama hatasi: {e}"
 
 
 def hafiza_ozeti_al(collection, adet: int = 5) -> str:
-    """Son N tecrübenin ozetini dondur (oturum basinda baglam icin)."""
+    """Son N tecrÃ¼benin ozetini dondur (oturum basinda baglam icin)."""
     try:
         peek = collection.peek(limit=adet)
         docs = peek.get("documents", [])
         if not docs:
             return ""
-        return "Son tecrübeler:\n" + "\n".join(f"- {d[:120]}" for d in docs)
+        return "Son tecrÃ¼beler:\n" + "\n".join(f"- {d[:120]}" for d in docs)
     except Exception:
         return ""
 
 
 def basarili_tecrube_kaydet(collection, hedef: str, ozet: str):
-    """Basarili gorev tecrübesini kaydet (kullanim kolayligi)."""
+    """Basarili gorev tecrÃ¼besini kaydet (kullanim kolayligi)."""
     kayit_id = f"basarili-{abs(hash(hedef)) % 100000}"
     tecrube_kaydet(
         collection,
@@ -213,7 +213,7 @@ def basarili_tecrube_kaydet(collection, hedef: str, ozet: str):
 
 
 def basarisiz_tecrube_kaydet(collection, hedef: str, hata: str):
-    """Basarisiz gorev tecrübesini kaydet."""
+    """Basarisiz gorev tecrÃ¼besini kaydet."""
     kayit_id = f"hata-{abs(hash(hedef + hata)) % 100000}"
     tecrube_kaydet(
         collection,
@@ -235,7 +235,7 @@ class VektorelHafiza:
         self._collection = vektorel_hafiza_sistemini_kur(yol)
         self._embedder = None
 
-    # ── Properties ──────────────────────────────────────────────────────
+    # â”€â”€ Properties â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @property
     def chromadb_available(self):
@@ -244,7 +244,7 @@ class VektorelHafiza:
 
     @property
     def embedder(self):
-        """Basit embedder (None — std11 surumde gomme yok)."""
+        """Basit embedder (None â€” std11 surumde gomme yok)."""
         return self._embedder
 
     @property
@@ -252,7 +252,7 @@ class VektorelHafiza:
         """Alttaki koleksiyon nesnesi (_BasitYedek veya ChromaDB koleksiyonu)."""
         return self._collection
 
-    # ── CRUD ─────────────────────────────────────────────────────────────
+    # â”€â”€ CRUD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def ekle(self, text: str, metadata: dict = None) -> bool:
         """Metin ve metadata ekle / guncelle.

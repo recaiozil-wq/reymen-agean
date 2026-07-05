@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""docker_sandbox.py — Docker tabanli guvenli kod calistirma sandbox'i.
+﻿# -*- coding: utf-8 -*-
+"""docker_sandbox.py â€” Docker tabanli guvenli kod calistirma sandbox'i.
 
 Subprocess sandbox'in otesinde:
   - Docker container'da tam izolasyon
@@ -26,7 +26,7 @@ from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
-# ── Varsayilanlar ──────────────────────────────────────────────────────────
+# â”€â”€ Varsayilanlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 VARSAYILAN_IMAGE = "reymen-sandbox:latest"
 VARSAYILAN_TIMEOUT = 30
 VARSAYILAN_MAX_CHARS = 10000
@@ -82,7 +82,7 @@ except ImportError:
     NETWORK_RESTRICTION_OK = False
 
 
-# ── Hata Siniflari ─────────────────────────────────────────────────────────
+# â”€â”€ Hata Siniflari â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class SandboxError(RuntimeError):
@@ -97,7 +97,7 @@ class SandboxBuildError(SandboxError):
     """Docker image build hatasi."""
 
 
-# ── Docker Sandbox ─────────────────────────────────────────────────────────
+# â”€â”€ Docker Sandbox â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class DockerSandbox:
@@ -254,7 +254,7 @@ class DockerSandbox:
         return "[Sandbox] Hicbir sandbox yontemi kullanilamiyor."
 
 
-# ── Image Builder ──────────────────────────────────────────────────────────
+# â”€â”€ Image Builder â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class SandboxImageBuilder:
@@ -309,7 +309,7 @@ class SandboxImageBuilder:
         }
 
 
-# ── Guvenlik Denetleyici ───────────────────────────────────────────────────
+# â”€â”€ Guvenlik Denetleyici â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class GuvenlikDenetleyici:
@@ -405,7 +405,7 @@ class GuvenlikDenetleyici:
             parcalar.append(f"{len(threats)} threat pattern")
         if pii:
             parcalar.append(f"{len(pii)} PII")
-        ozet = "✅ Guvenli" if not threats else f"⚠️ {', '.join(parcalar)}"
+        ozet = "âœ… Guvenli" if not threats else f"âš ï¸ {', '.join(parcalar)}"
 
         return {
             "guvenli": guvenli,
@@ -415,7 +415,7 @@ class GuvenlikDenetleyici:
         }
 
 
-# ── Entegre Sandbox API ────────────────────────────────────────────────────
+# â”€â”€ Entegre Sandbox API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _VARSAYILAN_DOCKER = DockerSandbox()
 _VARSAYILAN_DENETLEYICI = GuvenlikDenetleyici()
@@ -512,16 +512,16 @@ def sandbox_durum() -> dict:
 def sandbox_durum_text() -> str:
     """Insan-okunabilir durum."""
     d = sandbox_durum()
-    docker_ikon = "🟢" if d["docker"]["docker_mevcut"] else "🔴"
-    image_ikon = "🟢" if d["docker"]["image_mevcut"] else "🟡"
-    sp_ikon = "🟢" if d["subprocess"] else "🔴"
+    docker_ikon = "ğŸŸ¢" if d["docker"]["docker_mevcut"] else "ğŸ”´"
+    image_ikon = "ğŸŸ¢" if d["docker"]["image_mevcut"] else "ğŸŸ¡"
+    sp_ikon = "ğŸŸ¢" if d["subprocess"] else "ğŸ”´"
 
     # Network restriction durumu
-    nr_ikon = "🔴"
+    nr_ikon = "ğŸ”´"
     nr_text = "yok"
     nr_info = d.get("network_restriction", {})
     if nr_info:
-        nr_ikon = "🟢" if nr_info.get("aktif") else "🟡"
+        nr_ikon = "ğŸŸ¢" if nr_info.get("aktif") else "ğŸŸ¡"
         nr_text = "aktif" if nr_info.get("aktif") else "pasif (mevcut)"
 
     return (
@@ -529,12 +529,12 @@ def sandbox_durum_text() -> str:
         f"  {docker_ikon} Docker: {'mevcut' if d['docker']['docker_mevcut'] else 'yok'}\n"
         f"  {image_ikon} Image: {'build edilmis' if d['docker']['image_mevcut'] else 'build edilmemis'}\n"
         f"  {sp_ikon} Subprocess: {'hazir' if d['subprocess'] else 'yok'}\n"
-        f"  🟢 Threat Denetleyici: aktif\n"
+        f"  ğŸŸ¢ Threat Denetleyici: aktif\n"
         f"  {nr_ikon} Network Restriction: {nr_text}"
     )
 
 
-# ── Motor Plugin API ───────────────────────────────────────────────────────
+# â”€â”€ Motor Plugin API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def motor_kaydet(motor):
@@ -569,7 +569,7 @@ def motor_kaydet(motor):
             logger.warning("[Sandbox] Network restriction kayit hatasi: %s", e)
 
 
-# ── CLI Test ───────────────────────────────────────────────────────────────
+# â”€â”€ CLI Test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
     logging.basicConfig(

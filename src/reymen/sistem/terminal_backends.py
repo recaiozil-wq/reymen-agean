@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-terminal_backends.py — TerminalBackend.
+terminal_backends.py â€” TerminalBackend.
 Terminal arka uclari: local, SSH ve Docker.
 ReYMeN kimligi: Turkce docstring, try/except, class-based.
 """
@@ -16,7 +16,7 @@ try:
 except ImportError:
 
     class WSLEnvironment:
-        """Stub — WSLEnvironment not available."""
+        """Stub â€” WSLEnvironment not available."""
 
         def __init__(self, dagitim=None):
             self.dagitim = dagitim
@@ -367,11 +367,11 @@ class TerminalBackend:
 
 
 class TerminalBackendDispatcher(TerminalBackend):
-    """motor.py'nin beklediği string döndüren komut yürütücü.
+    """motor.py'nin beklediÄŸi string dÃ¶ndÃ¼ren komut yÃ¼rÃ¼tÃ¼cÃ¼.
 
-    TerminalBackend'i sarmalar; calistir() dict yerine metin döndürür.
+    TerminalBackend'i sarmalar; calistir() dict yerine metin dÃ¶ndÃ¼rÃ¼r.
     mode='docker' verilirse Docker konteynerinde, 'local' verilirse
-    yerel kabukta çalıştırır.
+    yerel kabukta Ã§alÄ±ÅŸtÄ±rÄ±r.
     """
 
     def __init__(self, mode="local", **kwargs):
@@ -379,7 +379,7 @@ class TerminalBackendDispatcher(TerminalBackend):
         self._mode = mode
 
     def calistir(self, komut, **kwargs):
-        """Komutu çalıştır ve okunabilir metin döndür."""
+        """Komutu Ã§alÄ±ÅŸtÄ±r ve okunabilir metin dÃ¶ndÃ¼r."""
         sonuc = super().calistir(komut, **kwargs)
         cikti = (sonuc.get("cikti") or "").strip()
         hata = (sonuc.get("hata") or "").strip()

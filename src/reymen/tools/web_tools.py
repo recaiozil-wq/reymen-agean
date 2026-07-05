@@ -1,9 +1,9 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
-ReYMeN Web Tools — Bağımsız web_search_tool ve web_extract_tool.
+ReYMeN Web Tools â€” BaÄŸÄ±msÄ±z web_search_tool ve web_extract_tool.
 
-Hermes Agent'tan bağımsızlaştırılmıştır. Provider'ları reymen.web_search_registry
-üzerinden çözümler, SSRF koruması için reymen.tools.url_safety kullanır.
+ReYMeN Agent'tan baÄŸÄ±msÄ±zlaÅŸtÄ±rÄ±lmÄ±ÅŸtÄ±r. Provider'larÄ± reymen.web_search_registry
+Ã¼zerinden Ã§Ã¶zÃ¼mler, SSRF korumasÄ± iÃ§in reymen.tools.url_safety kullanÄ±r.
 
 Env vars:
   REYMEN_SEARCH_BACKEND / REYMEN_EXTRACT_BACKEND / REYMEN_WEB_BACKEND
@@ -24,11 +24,11 @@ from typing import Any, Dict, List, Optional
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
-# ReYMeN-native imports — Hermes bağımlılığı yok
+# ReYMeN-native imports â€” ReYMeN baÄŸÄ±mlÄ±lÄ±ÄŸÄ± yok
 # ---------------------------------------------------------------------------
-from src.reymen.tools.url_safety import async_is_safe_url, normalize_url_for_request
-from src.reymen.tools.debug_helpers import DebugSession
-from src.reymen.tools.website_policy import check_website_access
+from reymen.tools.url_safety import async_is_safe_url, normalize_url_for_request
+from reymen.tools.debug_helpers import DebugSession
+from reymen.tools.website_policy import check_website_access
 
 # ---------------------------------------------------------------------------
 # Backend selection helpers
@@ -42,7 +42,7 @@ def _has_env(name: str) -> bool:
 
 
 def _get_backend() -> str:
-    """Backend seçimi: REYMEN_WEB_BACKEND env var veya env var'dan otomatik."""
+    """Backend seÃ§imi: REYMEN_WEB_BACKEND env var veya env var'dan otomatik."""
     configured = (os.getenv("REYMEN_WEB_BACKEND") or "").lower().strip()
     if configured in (
         "parallel",
@@ -111,7 +111,7 @@ def _is_backend_available(backend: str) -> bool:
 
 
 # ---------------------------------------------------------------------------
-# LLM summarization — opsiyonel (auxiliary client yoksa atlanır)
+# LLM summarization â€” opsiyonel (auxiliary client yoksa atlanÄ±r)
 # ---------------------------------------------------------------------------
 
 
@@ -121,7 +121,7 @@ async def _try_summarize(
     title: str = "",
     min_length: int = DEFAULT_MIN_LENGTH_FOR_SUMMARIZATION,
 ) -> Optional[str]:
-    """LLM ile özetleme dene. auxiliary client yoksa None döner."""
+    """LLM ile Ã¶zetleme dene. auxiliary client yoksa None dÃ¶ner."""
     if len(content) < min_length:
         return None
     if len(content) > 2_000_000:
@@ -133,20 +133,20 @@ async def _try_summarize(
 
         return await async_web_extract_summarize(content, url, title)
     except ImportError:
-        logger.debug("reymen.auxiliary mevcut değil, LLM özetleme atlanıyor")
+        logger.debug("reymen.auxiliary mevcut deÄŸil, LLM Ã¶zetleme atlanÄ±yor")
         return None
     except Exception as exc:
         logger.warning("LLM summarization failed: %s", exc)
         truncated = content[:5000]
         if len(content) > 5000:
             truncated += (
-                f"\n\n[Content truncated — first 5,000 of {len(content):,} chars]"
+                f"\n\n[Content truncated â€” first 5,000 of {len(content):,} chars]"
             )
         return truncated
 
 
 # ---------------------------------------------------------------------------
-# Basit tool_error / tool_result yardımcıları
+# Basit tool_error / tool_result yardÄ±mcÄ±larÄ±
 # ---------------------------------------------------------------------------
 
 
@@ -165,30 +165,30 @@ _debug = DebugSession("web_tools", env_var="WEB_TOOLS_DEBUG")
 
 
 # ---------------------------------------------------------------------------
-# Provider'ları yükle (ensure_web_plugins_loaded)
+# Provider'larÄ± yÃ¼kle (ensure_web_plugins_loaded)
 # ---------------------------------------------------------------------------
 
 
 def _ensure_web_plugins_loaded() -> None:
-    """Plugin'leri yükle — providers register olur. Idempotent."""
+    """Plugin'leri yÃ¼kle â€” providers register olur. Idempotent."""
     try:
         from reymen.web_search_registry import get_provider
 
-        # Sadece bir kere kontrol et: eğer firecrawl kayıtlıysa tamamdır
+        # Sadece bir kere kontrol et: eÄŸer firecrawl kayÄ±tlÄ±ysa tamamdÄ±r
         if get_provider("firecrawl") is not None:
             return
 
-        # Provider'ları doğrudan register et
+        # Provider'larÄ± doÄŸrudan register et
         _import_all_providers()
     except Exception as exc:
         logger.warning("Web plugin registration failed (non-fatal): %s", exc)
 
 
 def _import_all_providers() -> None:
-    """Tüm built-in web provider'larını ReYMeN registry'ye kaydet."""
+    """TÃ¼m built-in web provider'larÄ±nÄ± ReYMeN registry'ye kaydet."""
     from reymen.web_search_registry import register_provider
 
-    # Her provider'ın class'ını import et ve register et
+    # Her provider'Ä±n class'Ä±nÄ± import et ve register et
     provider_classes = [
         ("plugins.web.firecrawl.provider", "FirecrawlWebSearchProvider"),
         ("plugins.web.ddgs.provider", "DDGSWebSearchProvider"),
@@ -206,7 +206,7 @@ def _import_all_providers() -> None:
             if cls is not None:
                 register_provider(cls())
         except Exception as exc:
-            logger.debug("Provider %s.%s yüklenemedi: %s", mod_name, class_name, exc)
+            logger.debug("Provider %s.%s yÃ¼klenemedi: %s", mod_name, class_name, exc)
 
 
 # ---------------------------------------------------------------------------
@@ -215,11 +215,11 @@ def _import_all_providers() -> None:
 
 
 def web_search_tool(query: str, limit: int = 5) -> str:
-    """Web'de arama yap. Provider registry üzerinden dispatch eder.
+    """Web'de arama yap. Provider registry Ã¼zerinden dispatch eder.
 
     Args:
         query: Arama sorgusu
-        limit: Sonuç sayısı (1-100)
+        limit: SonuÃ§ sayÄ±sÄ± (1-100)
 
     Returns:
         JSON: {"success": bool, "data": {"web": [...]} veya "error": str}
@@ -283,14 +283,14 @@ async def web_extract_tool(
     model: Optional[str] = None,
     min_length: int = DEFAULT_MIN_LENGTH_FOR_SUMMARIZATION,
 ) -> str:
-    """Web sayfalarından içerik çek. Provider registry üzerinden dispatch.
+    """Web sayfalarÄ±ndan iÃ§erik Ã§ek. Provider registry Ã¼zerinden dispatch.
 
     Args:
-        urls: Çekilecek URL listesi
-        format: Çıktı formatı ("markdown" veya "html")
-        use_llm_processing: LLM özetleme kullanılsın mı
-        model: Kullanılacak model (opsiyonel)
-        min_length: LLM özetleme için minimum karakter (default: 5000)
+        urls: Ã‡ekilecek URL listesi
+        format: Ã‡Ä±ktÄ± formatÄ± ("markdown" veya "html")
+        use_llm_processing: LLM Ã¶zetleme kullanÄ±lsÄ±n mÄ±
+        model: KullanÄ±lacak model (opsiyonel)
+        min_length: LLM Ã¶zetleme iÃ§in minimum karakter (default: 5000)
 
     Returns:
         JSON: {"results": [...]} veya {"success": False, "error": str}
@@ -303,7 +303,7 @@ async def web_extract_tool(
     for _url in urls:
         if not isinstance(_url, str):
             continue
-        # Basit secret pattern kontrolü (api key vs)
+        # Basit secret pattern kontrolÃ¼ (api key vs)
         _secret_pattern = re.compile(
             r"(?i)(sk-[a-z0-9]{20,}|ghp_[a-zA-Z0-9]{36,}|"
             r"AIza[0-9A-Za-z_-]{35}|xox[bpras]-[0-9a-zA-Z-]{10,})"

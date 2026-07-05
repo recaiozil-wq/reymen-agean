@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""vision_tools.py — ReYMeN Vision Tool (motor.py import'i icin wrapper).
+﻿# -*- coding: utf-8 -*-
+"""vision_tools.py â€” ReYMeN Vision Tool (motor.py import'i icin wrapper).
 
 conversation_loop.py'deki VisionAdapter + _vision_analiz() fonksiyonunu motor'a acar.
 
@@ -23,7 +23,7 @@ from typing import Optional
 
 logger = logging.getLogger(__name__)
 
-# VisionAdapter conversation_loop'dan (opsiyonel — loop baglantisiz da calisir)
+# VisionAdapter conversation_loop'dan (opsiyonel â€” loop baglantisiz da calisir)
 try:
     from reymen.cereyan.conversation_loop import VisionAdapter
 
@@ -33,7 +33,7 @@ except ImportError:
     VISION_HAZIR = False
 
 
-# ── Global conversation_loop referansi (motor_kaydet ile set edilir) ──
+# â”€â”€ Global conversation_loop referansi (motor_kaydet ile set edilir) â”€â”€
 _GLOBAL_LOOP_REF = None
 
 
@@ -52,8 +52,8 @@ def motor_kaydet(motor) -> None:
         motor._plugin_arac_kaydet(
             "GORUNTU_ANALIZ",
             goruntu_analiz_tool,
-            "Gorsel/resim analizi. Parametreler: gorsel_yolu (str) — "
-            "gorsel URL'si veya dosya yolu; soru (str, opsiyonel) — "
+            "Gorsel/resim analizi. Parametreler: gorsel_yolu (str) â€” "
+            "gorsel URL'si veya dosya yolu; soru (str, opsiyonel) â€” "
             "analiz sorusu (varsayilan: 'Bu gorseli analiz et.'). "
             "Once DeepSeek V4 Flash (multimodal) dener, basarisizsa "
             "OpenRouter Qwen-VL fallback kullanir.",

@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-"""Tüm skilleri 27 kategori altında topla - 5N1K sistemine göre"""
+﻿#!/usr/bin/env python3
+"""TÃ¼m skilleri 27 kategori altÄ±nda topla - 5N1K sistemine gÃ¶re"""
 
 import os, shutil, sys
 
@@ -7,14 +7,14 @@ _KOK = Path(__file__).resolve().parent.parent.parent  # reymen/
 SKILLER = str(_KOK / "cereyan" / "skills" / "Skiller")
 ReYMeN = str(Path.home() / ".ReYMeN" / "skills")
 PROFIL = str(
-    Path.home() / "AppData" / "Local" / "hermes" / "profiles" / "kiral38" / "skills"
+    Path.home() / "AppData" / "Local" / "reymen" / "profiles" / "kiral38" / "skills"
 )
 
-# Kategori eşleştirme - her skill klasör adı hangi kategoriye gider?
+# Kategori eÅŸleÅŸtirme - her skill klasÃ¶r adÄ± hangi kategoriye gider?
 KATEGORI = {
-    # AI_ML (varsayılan)
+    # AI_ML (varsayÄ±lan)
     "default": "AI_ML",
-    # Özel eşleşmeler
+    # Ã–zel eÅŸleÅŸmeler
     "android": "android",
     "apple": "apple",
     "creative": "Yaratici",
@@ -118,7 +118,7 @@ KATEGORI = {
 
 
 def kategoribul(ad):
-    """Skill adına göre kategori bul"""
+    """Skill adÄ±na gÃ¶re kategori bul"""
     ad_lower = ad.lower().replace("-", " ").replace("_", " ")
     for anahtar, kategori in KATEGORI.items():
         if anahtar != "default" and anahtar in ad_lower:
@@ -146,7 +146,7 @@ def main():
             hedef_kat = os.path.join(SKILLER, kategori)
             os.makedirs(hedef_kat, exist_ok=True)
 
-            # Tüm .md dosyalarını kopyala
+            # TÃ¼m .md dosyalarÄ±nÄ± kopyala
             for kok, dirs, files in os.walk(klasor_yol):
                 for f in files:
                     if not f.endswith(".md"):
@@ -163,7 +163,7 @@ def main():
 
                     hedef_dosya = os.path.join(hedef_kat, hedef_isim)
 
-                    # Üzerine yazma
+                    # Ãœzerine yazma
                     if os.path.exists(hedef_dosya):
                         continue
 
@@ -176,8 +176,8 @@ def main():
     print(f"\n  Kopyalanan: {toplam}")
     print(f"  Hata: {hata}")
 
-    # Sayımları göster
-    print(f"\n  KATEGORİ DAĞILIMI:")
+    # SayÄ±mlarÄ± gÃ¶ster
+    print(f"\n  KATEGORÄ° DAÄILIMI:")
     for kat in sorted(os.listdir(SKILLER)):
         kat_yol = os.path.join(SKILLER, kat)
         if os.path.isdir(kat_yol):

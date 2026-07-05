@@ -1,12 +1,12 @@
-#!/usr/bin/env python3
-"""Eksik import'ları toplu düzelt — Claude Code'un unuttuklarını ekle."""
+﻿#!/usr/bin/env python3
+"""Eksik import'larÄ± toplu dÃ¼zelt â€” Claude Code'un unuttuklarÄ±nÄ± ekle."""
 
 import ast, sys
 from pathlib import Path
 
 kok = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(".")
 
-# Her modül için bilinen eksik import mapping'i
+# Her modÃ¼l iÃ§in bilinen eksik import mapping'i
 FIX_MAP = {
     "re": "import re",
     "os": "import os",
@@ -37,10 +37,10 @@ for py_file in sorted((kok / "reymen" / "sistem").glob("cli_*.py")):
     try:
         tree = ast.parse(src)
     except SyntaxError as e:
-        print(f"❌ {py_file.name}: SyntaxError — {e}")
+        print(f"âŒ {py_file.name}: SyntaxError â€” {e}")
         continue
 
-    # Kullanılan tüm name'leri bul
+    # KullanÄ±lan tÃ¼m name'leri bul
     used = set()
     for node in ast.walk(tree):
         if isinstance(node, ast.Name) and isinstance(node.ctx, ast.Load):
@@ -48,14 +48,14 @@ for py_file in sorted((kok / "reymen" / "sistem").glob("cli_*.py")):
         elif isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name):
             used.add(node.value.id)
 
-    # Eksik import'ları bul
+    # Eksik import'larÄ± bul
     eklenecek = []
     for name, imp in FIX_MAP.items():
         if name in used and imp not in src:
             eklenecek.append(imp)
 
     if eklenecek:
-        # İlk import satırından veya dosya başından sonra ekle
+        # Ä°lk import satÄ±rÄ±ndan veya dosya baÅŸÄ±ndan sonra ekle
         lines = src.splitlines(keepends=True)
         insert_at = 0
         for i, line in enumerate(lines):
@@ -74,6 +74,6 @@ for py_file in sorted((kok / "reymen" / "sistem").glob("cli_*.py")):
         for imp in reversed(eklenecek):
             lines.insert(insert_at, imp + "\n")
         py_file.write_text("".join(lines), encoding="utf-8")
-        print(f"✅ {py_file.name}: {len(eklenecek)} import eklendi — {eklenecek}")
+        print(f"âœ… {py_file.name}: {len(eklenecek)} import eklendi â€” {eklenecek}")
     else:
-        print(f"✅ {py_file.name}: temiz")
+        print(f"âœ… {py_file.name}: temiz")

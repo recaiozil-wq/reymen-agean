@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""WeCom (Enterprise WeChat) message crypto — PKCS7, SHA1 signature, encrypt/decrypt."""
+﻿# -*- coding: utf-8 -*-
+"""WeCom (Enterprise WeChat) message crypto â€” PKCS7, SHA1 signature, encrypt/decrypt."""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ import struct
 from xml.etree import ElementTree
 
 
-# ── Exceptions ──────────────────────────────────────────────────────────────
+# â”€â”€ Exceptions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class WeComCryptoError(Exception):
@@ -31,7 +31,7 @@ class EncryptError(WeComCryptoError):
     pass
 
 
-# ── PKCS7 ───────────────────────────────────────────────────────────────────
+# â”€â”€ PKCS7 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class PKCS7Encoder:
@@ -56,7 +56,7 @@ class PKCS7Encoder:
         return data[:-pad_len]
 
 
-# ── SHA1 signature ──────────────────────────────────────────────────────────
+# â”€â”€ SHA1 signature â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _sha1_signature(token: str, timestamp: str, nonce: str, encrypted: str) -> str:
@@ -64,7 +64,7 @@ def _sha1_signature(token: str, timestamp: str, nonce: str, encrypted: str) -> s
     return hashlib.sha1("".join(items).encode()).hexdigest()
 
 
-# ── WXBizMsgCrypt ───────────────────────────────────────────────────────────
+# â”€â”€ WXBizMsgCrypt â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class WXBizMsgCrypt:

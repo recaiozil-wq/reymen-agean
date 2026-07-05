@@ -1,2 +1,2 @@
-# -*- coding: utf-8 -*-
-"""gateway.platforms — Platform adaptörleri (gateways/platforms/'den re-export)."""
+﻿# -*- coding: utf-8 -*-
+"""gateway.platforms â€” Platform adaptÃ¶rleri (gateways/platforms/'den re-export)."""

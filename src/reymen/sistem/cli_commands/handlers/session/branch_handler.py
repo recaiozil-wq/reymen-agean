@@ -1,4 +1,4 @@
-"""Handle /branch command — fork the current session into a new independent copy."""
+﻿"""Handle /branch command â€” fork the current session into a new independent copy."""
 
 import logging
 import os
@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 def handle_branch_command(cli, cmd_original: str) -> None:
-    """Handle /branch [name] — fork the current session into a new independent copy.
+    """Handle /branch [name] â€” fork the current session into a new independent copy.
 
     Copies the full conversation history to a new session so the user can
     explore a different approach without losing the original session state.
@@ -18,7 +18,7 @@ def handle_branch_command(cli, cmd_original: str) -> None:
     from reymen.sistem.cli_display import _cprint
 
     if not cli.conversation_history:
-        _cprint("  No conversation to branch — send a message first.")
+        _cprint("  No conversation to branch â€” send a message first.")
         return
 
     if not cli._session_db:
@@ -121,7 +121,7 @@ def handle_branch_command(cli, cmd_original: str) -> None:
             cli.agent._invalidate_system_prompt()
 
         # Notify memory providers that session_id forked to a new branch.
-        # reset=False — the branched session carries the transcript
+        # reset=False â€” the branched session carries the transcript
         # forward, so provider state tracks the lineage. parent_session_id
         # links the branch back to the original. See #6672.
         try:
@@ -138,12 +138,12 @@ def handle_branch_command(cli, cmd_original: str) -> None:
 
     msg_count = len([m for m in cli.conversation_history if m.get("role") == "user"])
     _cprint(
-        f"  ⑂ Branched session \"{branch_title}\""
+        f"  â‘‚ Branched session \"{branch_title}\""
         f" ({msg_count} user message{'s' if msg_count != 1 else ''})"
     )
     _cprint(f"  Original session: {parent_session_id}")
     _cprint(f"  Branch session:   {new_session_id}")
 
 
-# Needed by this handler — imported here to keep it accessible
-from src.reymen.sistem.cli_auth import _sync_process_session_id  # noqa: E402, F811
+# Needed by this handler â€” imported here to keep it accessible
+from reymen.sistem.cli_auth import _sync_process_session_id  # noqa: E402, F811

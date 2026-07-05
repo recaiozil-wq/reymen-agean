@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-# Apache 2.0 — Bu dosya Hermes Agent'ten esinlenilmistir (github.com/NousResearch/hermes-agent)
+﻿#!/usr/bin/env python3
+# Apache 2.0 â€” Bu dosya Hermes Agent'ten esinlenilmistir (github.com/NousResearch/hermes-agent)
 """
 Model Tools Module
 
@@ -30,8 +30,8 @@ import threading
 import time
 from typing import Dict, Any, List, Optional, Tuple
 
-from src.reymen.sistem.tools_registry import discover_builtin_tools, registry
-from src.reymen.sistem.toolsets import resolve_toolset, validate_toolset
+from reymen.sistem.tools_registry import discover_builtin_tools, registry
+from reymen.sistem.toolsets import resolve_toolset, validate_toolset
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +67,7 @@ def _get_worker_loop():
     gets its own long-lived loop stored in thread-local storage.  This
     prevents the "Event loop is closed" errors that occurred when
     asyncio.run() was used per-call: asyncio.run() creates a loop, runs
-    the coroutine, then *closes* the loop — but cached httpx/AsyncOpenAI
+    the coroutine, then *closes* the loop â€” but cached httpx/AsyncOpenAI
     clients remain bound to that now-dead loop and raise RuntimeError
     during garbage collection or subsequent use.
 
@@ -108,10 +108,10 @@ def _run_async(coro):
         loop = None
 
     if loop and loop.is_running():
-        # Inside an async context (gateway, RL env) — run in a fresh thread
+        # Inside an async context (gateway, RL env) â€” run in a fresh thread
         # with its own event loop we own a reference to, so on timeout we
         # can cancel the task inside that loop (ThreadPoolExecutor.cancel()
-        # only works on not-yet-started futures — it's a no-op on a running
+        # only works on not-yet-started futures â€” it's a no-op on a running
         # worker, which previously leaked the thread on every 300 s timeout).
         import concurrent.futures
 
@@ -152,7 +152,7 @@ def _run_async(coro):
                     for t in asyncio.all_tasks(worker_loop):
                         worker_loop.call_soon_threadsafe(t.cancel)
                 except RuntimeError as _e:
-                    # Loop already closed — nothing to cancel.
+                    # Loop already closed â€” nothing to cancel.
                     logger.warning(
                         "[ModelTools] except RuntimeError (L153): %s", RuntimeError
                     )
@@ -168,7 +168,7 @@ def _run_async(coro):
     # delegate_task), use a per-thread persistent loop.  This avoids
     # contention with the main thread's shared loop while keeping cached
     # httpx/AsyncOpenAI clients bound to a live loop for the thread's
-    # lifetime — preventing "Event loop is closed" on GC cleanup.
+    # lifetime â€” preventing "Event loop is closed" on GC cleanup.
     if threading.current_thread() is not threading.main_thread():
         worker_loop = _get_worker_loop()
         return worker_loop.run_until_complete(coro)
@@ -187,7 +187,7 @@ discover_builtin_tools()
 # a module-level side effect.  It was removed because discover_mcp_tools()
 # internally uses a blocking future.result(timeout=120) wait, and the
 # gateway lazy-imports this module from inside the asyncio event loop on
-# the first user message — freezing Discord/Telegram heartbeats for up to
+# the first user message â€” freezing Discord/Telegram heartbeats for up to
 # 120s whenever any configured MCP server was slow or unreachable (#16856).
 #
 # Each entry point now runs discovery explicitly at its own startup:
@@ -196,16 +196,16 @@ discover_builtin_tools()
 #   - tui_gateway/server.py     -> inline on startup (no event loop)
 #   - acp_adapter/server.py     -> asyncio.to_thread on session init
 
-# Plugin tool discovery — oncek ReYMeN uyumluluk katmani
+# Plugin tool discovery â€” oncek ReYMeN uyumluluk katmani
 try:
-    from hermes_cli.plugins import discover_plugins
-
+    from reymen.sistem.reymen_stubs import discover_plugins
     discover_plugins()
 except ImportError:
-    # ReYMeN bagimsiz modu
-    from reymen.sistem.hermes_uyum import discover_plugins as _reymen_discover
-
-    _reymen_discover()
+    try:
+        from reymen.sistem.reymen_stubs import discover_plugins
+        discover_plugins()
+    except ImportError:
+        pass
 except Exception as e:
     logger.debug("Plugin discovery failed: %s", e)
 
@@ -319,7 +319,10 @@ def get_tool_definitions(
     # invalidate hook on every config-writer.
     if quiet_mode:
         try:
-            from hermes_cli.config import get_config_path
+            try:
+                from reymen.sistem.reymen_stubs import get_config_path
+            except ImportError:
+                from reymen.sistem.reymen_stubs import get_config_path
 
             cfg_path = get_config_path()
             cfg_stat = cfg_path.stat()
@@ -340,7 +343,7 @@ def get_tool_definitions(
             frozenset(disabled_toolsets) if disabled_toolsets else None,
             registry._generation,
             cfg_fp,
-            bool(os.environ.get("HERMES_KANBAN_TASK")),
+            bool(os.environ.get("REYMEN_KANBAN_TASK", os.environ.get("HERMES_KANBAN_TASK"))),
             bool(skip_tool_search_assembly),
         )
         cached = _tool_defs_cache.get(cache_key)
@@ -349,7 +352,7 @@ def get_tool_definitions(
             # consistent state even on a cache hit.
             global _last_resolved_tool_names
             _last_resolved_tool_names = [t["function"]["name"] for t in cached]
-            # Return a shallow copy of the list but share the dict references —
+            # Return a shallow copy of the list but share the dict references â€”
             # schemas are treated as read-only by all known callers.
             return list(cached)
 
@@ -390,7 +393,7 @@ def _compute_tool_definitions(
     if enabled_toolsets is not None:
         effective_enabled_toolsets = list(enabled_toolsets)
         if (
-            os.environ.get("HERMES_KANBAN_TASK")
+            os.environ.get("REYMEN_KANBAN_TASK", os.environ.get("HERMES_KANBAN_TASK"))
             and "kanban" not in effective_enabled_toolsets
         ):
             # Dispatcher-spawned workers are scoped by HERMES_KANBAN_TASK and
@@ -405,17 +408,17 @@ def _compute_tool_definitions(
                 tools_to_include.update(resolved)
                 if not quiet_mode:
                     print(
-                        f"✅ Enabled toolset '{toolset_name}': {', '.join(resolved) if resolved else 'no tools'}"
+                        f"âœ… Enabled toolset '{toolset_name}': {', '.join(resolved) if resolved else 'no tools'}"
                     )
             elif toolset_name in _LEGACY_TOOLSET_MAP:
                 legacy_tools = _LEGACY_TOOLSET_MAP[toolset_name]
                 tools_to_include.update(legacy_tools)
                 if not quiet_mode:
                     print(
-                        f"✅ Enabled legacy toolset '{toolset_name}': {', '.join(legacy_tools)}"
+                        f"âœ… Enabled legacy toolset '{toolset_name}': {', '.join(legacy_tools)}"
                     )
             elif not quiet_mode:
-                print(f"⚠️  Unknown toolset: {toolset_name}")
+                print(f"âš ï¸  Unknown toolset: {toolset_name}")
     else:
         # Default: start with everything
         from reymen.sistem.toolsets import get_all_toolsets
@@ -434,20 +437,20 @@ def _compute_tool_definitions(
                 tools_to_include.difference_update(resolved)
                 if not quiet_mode:
                     print(
-                        f"🚫 Disabled toolset '{toolset_name}': {', '.join(resolved) if resolved else 'no tools'}"
+                        f"ğŸš« Disabled toolset '{toolset_name}': {', '.join(resolved) if resolved else 'no tools'}"
                     )
             elif toolset_name in _LEGACY_TOOLSET_MAP:
                 legacy_tools = _LEGACY_TOOLSET_MAP[toolset_name]
                 tools_to_include.difference_update(legacy_tools)
                 if not quiet_mode:
                     print(
-                        f"🚫 Disabled legacy toolset '{toolset_name}': {', '.join(legacy_tools)}"
+                        f"ğŸš« Disabled legacy toolset '{toolset_name}': {', '.join(legacy_tools)}"
                     )
             elif not quiet_mode:
-                print(f"⚠️  Unknown toolset: {toolset_name}")
+                print(f"âš ï¸  Unknown toolset: {toolset_name}")
 
     # Plugin-registered tools are now resolved through the normal toolset
-    # path — validate_toolset() / resolve_toolset() / get_all_toolsets()
+    # path â€” validate_toolset() / resolve_toolset() / get_all_toolsets()
     # all check the tool registry for plugin-provided toolsets.  No bypass
     # needed; plugins respect enabled_toolsets / disabled_toolsets like any
     # other toolset.
@@ -457,7 +460,7 @@ def _compute_tool_definitions(
 
     # The set of tool names that actually passed check_fn filtering.
     # Use this (not tools_to_include) for any downstream schema that references
-    # other tools by name — otherwise the model sees tools mentioned in
+    # other tools by name â€” otherwise the model sees tools mentioned in
     # descriptions that don't actually exist, and hallucinates calls to them.
     available_tool_names = {t["function"]["name"] for t in filtered_tools}
 
@@ -536,10 +539,10 @@ def _compute_tool_definitions(
         if filtered_tools:
             tool_names = [t["function"]["name"] for t in filtered_tools]
             print(
-                f"🛠️  Final tool selection ({len(filtered_tools)} tools): {', '.join(tool_names)}"
+                f"ğŸ› ï¸  Final tool selection ({len(filtered_tools)} tools): {', '.join(tool_names)}"
             )
         else:
-            print("🛠️  No tools selected (all filtered out or unavailable)")
+            print("ğŸ› ï¸  No tools selected (all filtered out or unavailable)")
 
     global _last_resolved_tool_names
     _last_resolved_tool_names = [t["function"]["name"] for t in filtered_tools]
@@ -547,24 +550,24 @@ def _compute_tool_definitions(
     # Sanitize schemas for broad backend compatibility. llama.cpp's
     # json-schema-to-grammar converter (used by its OAI server to build
     # GBNF tool-call parsers) rejects some shapes that cloud providers
-    # silently accept — bare "type": "object" with no properties,
+    # silently accept â€” bare "type": "object" with no properties,
     # string-valued schema nodes from malformed MCP servers, etc. This
     # is a no-op for schemas that are already well-formed.
     try:
         from tools.schema_sanitizer import sanitize_tool_schemas
 
         filtered_tools = sanitize_tool_schemas(filtered_tools)
-    except Exception as e:  # pragma: no cover — defensive
+    except Exception as e:  # pragma: no cover â€” defensive
         logger.warning("Schema sanitization skipped: %s", e)
 
-    # ── Tool Search (progressive disclosure) ────────────────────────────
+    # â”€â”€ Tool Search (progressive disclosure) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     # Conditionally replace MCP + plugin (non-core) tools with three bridge
     # tools (tool_search / tool_describe / tool_call) when the deferrable
     # surface exceeds the configured threshold (default 10% of context
     # window). Core ReYMeN tools (toolsets._REYMEN_CORE_TOOLS) are NEVER
     # deferred. See tools/tool_search.py for full design notes.
     #
-    # This is deliberately the last step before returning — sanitization
+    # This is deliberately the last step before returning â€” sanitization
     # has already normalized schemas, and the assembly is idempotent in
     # case some caller invokes get_tool_definitions twice.
     try:
@@ -580,12 +583,12 @@ def _compute_tool_definitions(
             )
             if assembly.activated and not quiet_mode:
                 print(
-                    f"🔎 Tool Search: {assembly.deferred_count} MCP/plugin tools deferred "
+                    f"ğŸ” Tool Search: {assembly.deferred_count} MCP/plugin tools deferred "
                     f"(~{assembly.deferred_tokens} tokens) behind tool_search/describe/call. "
                     f"Threshold ~{assembly.threshold_tokens} tokens."
                 )
             filtered_tools = assembly.tool_defs
-    except Exception as e:  # pragma: no cover — never break tool loading
+    except Exception as e:  # pragma: no cover â€” never break tool loading
         logger.warning("Tool search assembly skipped: %s", e)
 
     return filtered_tools
@@ -594,12 +597,15 @@ def _compute_tool_definitions(
 def _resolve_active_context_length() -> int:
     """Look up the active model's context length for the tool-search gate.
 
-    Returns 0 when the model can't be resolved — ``should_activate`` falls
+    Returns 0 when the model can't be resolved â€” ``should_activate`` falls
     back to a fixed token cutoff in that case.
     """
     try:
         try:
-            from hermes_cli.config import load_config as _load
+            try:
+                from reymen.sistem.reymen_stubs import load_config as _load
+            except ImportError:
+                from reymen.sistem.reymen_stubs import load_config as _load
 
             cfg = _load() or {}
         except ImportError:
@@ -644,8 +650,8 @@ _READ_SEARCH_TOOLS = {"read_file", "search_files"}
 #
 # This helper strips structural framing tokens (XML role tags, CDATA,
 # markdown code fences) and caps the message at a sane upper bound before it
-# becomes part of the conversation. It's defense-in-depth — the json layer
-# already prevents framing escape — but cheap and worth having.
+# becomes part of the conversation. It's defense-in-depth â€” the json layer
+# already prevents framing escape â€” but cheap and worth having.
 #
 # Ported from ironclaw#1639.
 _TOOL_ERROR_ROLE_TAG_RE = re.compile(
@@ -720,7 +726,7 @@ def coerce_tool_args(tool_name: str, args: Dict[str, Any]) -> Dict[str, Any]:
         # Strings still go through _coerce_value first so JSON-encoded
         # arrays (``'["a","b"]'``) get parsed and nullable ``"null"``
         # becomes ``None`` rather than ``["null"]``.
-        # ``None`` itself is preserved — we don't know whether the model
+        # ``None`` itself is preserved â€” we don't know whether the model
         # meant "omit" or "empty list", and tools with sensible defaults
         # (e.g. read_file's normalize_read_pagination) already handle it.
         if (
@@ -732,7 +738,7 @@ def coerce_tool_args(tool_name: str, args: Dict[str, Any]) -> Dict[str, Any]:
                 coerced = _coerce_value(value, expected, schema=prop_schema)
                 if coerced is not value:
                     # _coerce_value handled it (JSON-parsed list or
-                    # nullable "null" → None).
+                    # nullable "null" â†’ None).
                     args[key] = coerced
                     continue
                 # If the string looks like a JSON array but _coerce_value
@@ -740,7 +746,7 @@ def coerce_tool_args(tool_name: str, args: Dict[str, Any]) -> Dict[str, Any]:
                 if value.strip().startswith("["):
                     logger.warning(
                         "coerce_tool_args: %s.%s looks like a JSON array string "
-                        "but could not be parsed — model may have emitted a "
+                        "but could not be parsed â€” model may have emitted a "
                         "JSON-encoded string instead of a native array. "
                         "Falling back to single-element list.",
                         tool_name,
@@ -782,7 +788,7 @@ def _coerce_value(value: str, expected_type, schema: dict | None = None):
         return None
 
     if isinstance(expected_type, list):
-        # Union type — try each in order, return first successful coercion
+        # Union type â€” try each in order, return first successful coercion
         for t in expected_type:
             result = _coerce_value(value, t, schema=schema)
             if result is not value:
@@ -850,7 +856,7 @@ def _coerce_json(value: str, expected_python_type: type):
         )
         return parsed
     logger.warning(
-        "coerce_tool_args: JSON-parsed value is %s, expected %s — skipping coercion",
+        "coerce_tool_args: JSON-parsed value is %s, expected %s â€” skipping coercion",
         type(parsed).__name__,
         expected_python_type.__name__,
     )
@@ -863,14 +869,14 @@ def _coerce_number(value: str, integer_only: bool = False):
         f = float(value)
     except (ValueError, OverflowError):
         return value
-    # Guard against inf/nan — not JSON-serializable, keep original string
+    # Guard against inf/nan â€” not JSON-serializable, keep original string
     if f != f or f == float("inf") or f == float("-inf"):
         return value
     # If it looks like an integer (no fractional part), return int
     if f == int(f):
         return int(f)
     if integer_only:
-        # Schema wants an integer but value has decimals — keep as string
+        # Schema wants an integer but value has decimals â€” keep as string
         return value
     return f
 
@@ -915,7 +921,7 @@ def _emit_post_tool_call_hook(
 ) -> None:
     """Emit the ``post_tool_call`` observer hook.
 
-    No-ops cheaply when no plugin has registered for ``post_tool_call`` —
+    No-ops cheaply when no plugin has registered for ``post_tool_call`` â€”
     the ``has_hook`` gate skips both the result-field derivation and the
     payload dispatch so the no-listener path costs one dict lookup.  When
     ``status`` is not supplied, the ok/error fields are derived from the
@@ -923,7 +929,7 @@ def _emit_post_tool_call_hook(
     listener will actually consume it).
     """
     try:
-        from hermes_cli.plugins import has_hook, invoke_hook
+        from reymen.sistem.reymen_stubs import has_hook, invoke_hook
     except ImportError:
         from reymen.sistem.hermes_uyum import has_hook, invoke_hook
     try:
@@ -991,14 +997,14 @@ def handle_function_call(
     Returns:
         Function result as a JSON string.
     """
-    # Coerce string arguments to their schema-declared types (e.g. "42"→42)
+    # Coerce string arguments to their schema-declared types (e.g. "42"â†’42)
     function_args = coerce_tool_args(function_name, function_args)
     if not isinstance(function_args, dict):
         function_args = {}
     _tool_middleware_trace = list(tool_request_middleware_trace or [])
 
-    # ── Tool Search bridge dispatch ──────────────────────────────────
-    # tool_search and tool_describe are pure catalog reads — handle them
+    # â”€â”€ Tool Search bridge dispatch â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # tool_search and tool_describe are pure catalog reads â€” handle them
     # inline. tool_call is unwrapped to the underlying tool so that every
     # downstream hook (pre/post, edit approval, guardrails) sees the real
     # tool name, not the bridge.
@@ -1088,9 +1094,9 @@ def handle_function_call(
     _tool_original_args = dict(function_args)
     if not skip_tool_request_middleware:
         try:
-            from hermes_cli.middleware import apply_tool_request_middleware
+            from reymen.sistem.reymen_stubs import apply_tool_request_middleware
         except ImportError:
-            from reymen.sistem.hermes_uyum import apply_tool_request_middleware
+            from reymen.sistem.reymen_stubs import apply_tool_request_middleware
 
             _tool_request_mw = apply_tool_request_middleware(
                 function_name,
@@ -1114,21 +1120,21 @@ def handle_function_call(
             )
 
         # Check plugin hooks for a block directive (unless caller already
-        # checked — e.g. run_agent._invoke_tool passes skip=True to
+        # checked â€” e.g. run_agent._invoke_tool passes skip=True to
         # avoid double-firing the hook).
         #
         # Single-fire contract: pre_tool_call fires exactly once per tool
         # execution. get_pre_tool_call_block_message() internally calls
         # invoke_hook("pre_tool_call", ...) and returns the first block
         # directive (if any), so observer plugins see the hook on that same
-        # pass. When skip=True, the caller already fired it — do nothing
+        # pass. When skip=True, the caller already fired it â€” do nothing
         # here.
         if not skip_pre_tool_call_hook:
             block_message: Optional[str] = None
             try:
-                from hermes_cli.plugins import get_pre_tool_call_block_message
+                from reymen.sistem.reymen_stubs import get_pre_tool_call_block_message
             except ImportError:
-                from reymen.sistem.hermes_uyum import get_pre_tool_call_block_message
+                from reymen.sistem.reymen_stubs import get_pre_tool_call_block_message
 
                 block_message = get_pre_tool_call_block_message(
                     function_name,
@@ -1243,9 +1249,9 @@ def handle_function_call(
                     )
 
             try:
-                from hermes_cli.middleware import run_tool_execution_middleware
+                from reymen.sistem.reymen_stubs import run_tool_execution_middleware
             except ImportError:
-                from reymen.sistem.hermes_uyum import run_tool_execution_middleware
+                from reymen.sistem.reymen_stubs import run_tool_execution_middleware
 
             result = run_tool_execution_middleware(
                 function_name,
@@ -1291,7 +1297,7 @@ def handle_function_call(
         # Gated on has_hook so the no-listener path skips both the result
         # field derivation and the payload dispatch.
         try:
-            from hermes_cli.plugins import has_hook, invoke_hook
+            from reymen.sistem.reymen_stubs import has_hook, invoke_hook
         except ImportError:
             from reymen.sistem.hermes_uyum import has_hook, invoke_hook
         try:

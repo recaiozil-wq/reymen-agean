@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-session_db.py — ReYMeN SessionDB / Oturum Yöneticisi.
+session_db.py â€” ReYMeN SessionDB / Oturum YÃ¶neticisi.
 
 Session verilerini SQLite'den okur. Deneme sirasi:
-  1. ~/AppData/Local/hermes/profiles/reymen/state.db
+  1. ~/AppData/Local/reymen/profiles/reymen/state.db
   2. .ReYMeN/state.db
   3. Proje kokundeki state.db
   Hicbiri yoksa -> bos liste / bos dict doner.
@@ -25,10 +25,10 @@ logger = logging.getLogger(__name__)
 
 
 class SessionDB:
-    """SessionDB — SQLite tabanli oturum yoneticisi.
+    """SessionDB â€” SQLite tabanli oturum yoneticisi.
 
     Veritabani yolunu otomatik kesfeder:
-      1. ~/AppData/Local/hermes/profiles/reymen/state.db
+      1. ~/AppData/Local/reymen/profiles/reymen/state.db
       2. .ReYMeN/state.db  (proje kokune gore)
       3. Proje kokundeki state.db
     Hicbiri yoksa tum metodlar bos sonuc doner.
@@ -46,7 +46,7 @@ class SessionDB:
         self._proje_koku = proje_koku or Path(__file__).resolve().parent.parent.parent
         self.db_yolu: Optional[Path] = self._db_bul()
 
-    # ── Veritabani kesfi ─────────────────────────────────────────
+    # â”€â”€ Veritabani kesfi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _db_bul(self) -> Optional[Path]:
         """state.db dosyasini sirasiyla ara.
@@ -77,7 +77,7 @@ class SessionDB:
         logger.warning("[SessionDB] state.db bulunamadi. Hicbir aday mevcut degil.")
         return None
 
-    # ── Baglanti ─────────────────────────────────────────────────
+    # â”€â”€ Baglanti â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _baglan(self) -> Optional[sqlite3.Connection]:
         """SQLite baglantisi acar.
@@ -95,7 +95,7 @@ class SessionDB:
             logger.error("[SessionDB] Baglanti hatasi: %s - %s", self.db_yolu, e)
             return None
 
-    # ── Metodlar ─────────────────────────────────────────────────
+    # â”€â”€ Metodlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def list_sessions(self) -> list[dict[str, Any]]:
         """Tum oturumlari listeler.

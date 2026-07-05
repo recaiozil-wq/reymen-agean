@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-salted_gateway.py — Güvenli gateway.
+salted_gateway.py â€” GÃ¼venli gateway.
 
 SaltedGateway sinifi ile mesajlari salt+hash ile imzalayip
 dogrulayan, rate limiting uygulayan ve istatistik tutan
@@ -19,13 +19,13 @@ from typing import Optional, List, Dict, Any, Callable
 import logging
 
 # GatewayBase (circular import yok)
-from src.gateways.gateway_temel import GatewayBase
+from gateways.gateway_temel import GatewayBase
 
 logger = logging.getLogger(__name__)
 
 
 class TelegramRateLimiter:
-    """Token bucket rate limiter — Telegram limiti 30 msg/sn"""
+    """Token bucket rate limiter â€” Telegram limiti 30 msg/sn"""
 
     def __init__(self, max_per_second=30, burst=40):
         self.max_per_second = max_per_second
@@ -128,7 +128,7 @@ class AutoReconnector:
 
 
 class SessionManager:
-    """Session yonetimi — her kullanici icin ayri session"""
+    """Session yonetimi â€” her kullanici icin ayri session"""
 
     def __init__(self, session_timeout=1800, cleanup_interval=300):
         self._sessions = {}
@@ -207,7 +207,7 @@ class CrashRecovery:
 
                 if len(recent) >= self.max_restarts:
                     print(
-                        f"[CrashRecovery] {self.window_seconds}s icinde {self.max_restarts} cokme — durduruluyor"
+                        f"[CrashRecovery] {self.window_seconds}s icinde {self.max_restarts} cokme â€” durduruluyor"
                     )
                     await self._notify_admin(
                         f"Gateway {self.max_restarts} kez coktu, durduruldu"
@@ -365,7 +365,7 @@ class SaltedGateway:
         self, token: str, hedef: Optional[str] = None, mesaj: Optional[str] = None
     ) -> Dict[str, Any]:
         """
-        Token dogrulaması yapar.
+        Token dogrulamasÄ± yapar.
 
         Token'in gecerliligini, zaman damgasini ve (varsa)
         hedef/mesaj uyumunu kontrol eder.
@@ -562,14 +562,14 @@ class SaltedGateway:
             return json.dumps({"hata": str(e)}, ensure_ascii=False)
 
 
-# ═══════════════════════════════════════════════════════════════════════
-#  TelegramGateway — GatewayBase Implementasyonu
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+#  TelegramGateway â€” GatewayBase Implementasyonu
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class TelegramGateway(GatewayBase):
     """
-    Telegram platform gateway'i — GatewayBase implementasyonu.
+    Telegram platform gateway'i â€” GatewayBase implementasyonu.
 
     Mevcut SaltedGateway, TelegramRateLimiter ve AutoReconnector
     yapilarini kullanarak Telegram API'sine baglanir, mesaj
@@ -738,11 +738,11 @@ class TelegramGateway(GatewayBase):
         self._gelen_mesajlar.append(mesaj)
 
 
-# ── Motor Kayit ─────────────────────────────────────────────────────
+# â”€â”€ Motor Kayit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def motor_kaydet(motor) -> None:
-    """Motor'a salted gateway araçlarını kaydeder."""
+    """Motor'a salted gateway araÃ§larÄ±nÄ± kaydeder."""
     motor._plugin_arac_kaydet(
         "SALTED_GATEWAY_OLUSTUR",
         lambda salt="",

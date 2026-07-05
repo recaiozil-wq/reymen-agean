@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-provider_abstraction.py — ReYMeN Sağlayıcı Soyutlama Katmanı.
+provider_abstraction.py â€” ReYMeN SaÄŸlayÄ±cÄ± Soyutlama KatmanÄ±.
 
-Tek satır kullanım:
+Tek satÄ±r kullanÄ±m:
     provider = get_provider('deepseek')
     cevap = provider.chat(mesajlar)
 
@@ -10,17 +10,17 @@ Tek satır kullanım:
     for token in provider.chat_stream(mesajlar):
         print(token, end='')
 
-Desteklenen sağlayıcılar:
+Desteklenen saÄŸlayÄ±cÄ±lar:
     deepseek, openai, anthropic, groq, xiaomi, xai, openrouter, lmstudio
 
-Özellikler:
-    * Thread-safe başlatma ve çağrı yönetimi
+Ã–zellikler:
+    * Thread-safe baÅŸlatma ve Ã§aÄŸrÄ± yÃ¶netimi
     * Exponential backoff ile otomatik yeniden deneme (retry)
-    * Rate-limit (429), yetkilendirme (401/403), kredi (402) hata yönetimi
-    * config.yaml -> fallback_providers listesinden otomatik yapılandırma
-    * Beyin.py ile tam uyumlu — birlikte veya yanında çalışabilir
+    * Rate-limit (429), yetkilendirme (401/403), kredi (402) hata yÃ¶netimi
+    * config.yaml -> fallback_providers listesinden otomatik yapÄ±landÄ±rma
+    * Beyin.py ile tam uyumlu â€” birlikte veya yanÄ±nda Ã§alÄ±ÅŸabilir
 
-Tüm docstring'ler Türkçe'dir.
+TÃ¼m docstring'ler TÃ¼rkÃ§e'dir.
 """
 
 from __future__ import annotations
@@ -38,7 +38,7 @@ import requests
 
 logger = logging.getLogger(__name__)
 
-# ── Sabitler ────────────────────────────────────────────────────────────────
+# â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _TIMEOUT_SANIYE: int = 300
 _VARSAYILAN_MAX_TOKEN: int = 4096
 _VARSAYILAN_SICAKLIK: float = 0.7
@@ -47,21 +47,21 @@ _ILK_BEKLEME: float = 1.0
 _BEKLEME_CARPAN: float = 2.0
 
 
-# ── Veri Yapıları ──────────────────────────────────────────────────────────
+# â”€â”€ Veri YapÄ±larÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 @dataclass
 class ProviderYanit:
-    """Sağlayıcıdan dönen yanıtı temsil eder.
+    """SaÄŸlayÄ±cÄ±dan dÃ¶nen yanÄ±tÄ± temsil eder.
 
     Args:
-        metin:         LLM'den gelen yanıt metni.
-        provider:      Kullanılan sağlayıcı adı.
-        model:         Kullanılan model adı.
-        sure_sn:       İsteğin tamamlanma süresi (saniye).
-        basarili:      İsteğin başarılı olup olmadığı.
-        hata:          Hata mesajı (varsa).
-        tahmini_token: Tahmini token sayısı.
+        metin:         LLM'den gelen yanÄ±t metni.
+        provider:      KullanÄ±lan saÄŸlayÄ±cÄ± adÄ±.
+        model:         KullanÄ±lan model adÄ±.
+        sure_sn:       Ä°steÄŸin tamamlanma sÃ¼resi (saniye).
+        basarili:      Ä°steÄŸin baÅŸarÄ±lÄ± olup olmadÄ±ÄŸÄ±.
+        hata:          Hata mesajÄ± (varsa).
+        tahmini_token: Tahmini token sayÄ±sÄ±.
     """
 
     metin: str = ""
@@ -75,9 +75,9 @@ class ProviderYanit:
 
 @dataclass
 class ProviderYapilandirma:
-    """Bir sağlayıcının yapılandırma bilgilerini tutar.
+    """Bir saÄŸlayÄ±cÄ±nÄ±n yapÄ±landÄ±rma bilgilerini tutar.
 
-    config.yaml -> fallback_providers listesindeki her girdi bu yapıya dönüşür.
+    config.yaml -> fallback_providers listesindeki her girdi bu yapÄ±ya dÃ¶nÃ¼ÅŸÃ¼r.
     """
 
     provider: str
@@ -87,73 +87,73 @@ class ProviderYapilandirma:
     api_mode: str = "chat_completions"
 
 
-# ── Hata Sınıfları ─────────────────────────────────────────────────────────
+# â”€â”€ Hata SÄ±nÄ±flarÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class ProviderHatasi(Exception):
-    """Sağlayıcı çağrıları sırasında oluşan genel hata."""
+    """SaÄŸlayÄ±cÄ± Ã§aÄŸrÄ±larÄ± sÄ±rasÄ±nda oluÅŸan genel hata."""
 
     pass
 
 
 class ProviderGecersizKey(ProviderHatasi):
-    """API anahtarı geçersiz (401/403)."""
+    """API anahtarÄ± geÃ§ersiz (401/403)."""
 
     pass
 
 
 class ProviderKrediBitti(ProviderHatasi):
-    """Sağlayıcı kredisi bitti (402 Payment Required)."""
+    """SaÄŸlayÄ±cÄ± kredisi bitti (402 Payment Required)."""
 
     pass
 
 
 class ProviderRateLimit(ProviderHatasi):
-    """Hız sınırı aşıldı (429)."""
+    """HÄ±z sÄ±nÄ±rÄ± aÅŸÄ±ldÄ± (429)."""
 
     pass
 
 
 class ProviderZamanAsimi(ProviderHatasi):
-    """İstek zaman aşımına uğradı."""
+    """Ä°stek zaman aÅŸÄ±mÄ±na uÄŸradÄ±."""
 
     pass
 
 
-# ── Temel Sınıf ────────────────────────────────────────────────────────────
+# â”€â”€ Temel SÄ±nÄ±f â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class ProviderBase(abc.ABC):
-    """Tüm sağlayıcıların türemesi gereken soyut temel sınıf.
+    """TÃ¼m saÄŸlayÄ±cÄ±larÄ±n tÃ¼remesi gereken soyut temel sÄ±nÄ±f.
 
-    Alt sınıflar şu metotları sağlamalıdır:
-        * _api_istek():    Ham API çağrısını gerçekleştirir.
-        * _api_istek_stream(): Streaming API çağrısını gerçekleştirir.
-        * _modelleri_getir(): Kullanılabilir modelleri listeler.
-        * _ping_kontrol():  Sağlayıcı erişilebilirliğini kontrol eder.
+    Alt sÄ±nÄ±flar ÅŸu metotlarÄ± saÄŸlamalÄ±dÄ±r:
+        * _api_istek():    Ham API Ã§aÄŸrÄ±sÄ±nÄ± gerÃ§ekleÅŸtirir.
+        * _api_istek_stream(): Streaming API Ã§aÄŸrÄ±sÄ±nÄ± gerÃ§ekleÅŸtirir.
+        * _modelleri_getir(): KullanÄ±labilir modelleri listeler.
+        * _ping_kontrol():  SaÄŸlayÄ±cÄ± eriÅŸilebilirliÄŸini kontrol eder.
 
-    Kullanıma hazır metotlar (override gerekmez):
-        * chat():          Retry + hata yönetimi ile API çağrısı.
-        * chat_stream():   Streaming API çağrısı.
+    KullanÄ±ma hazÄ±r metotlar (override gerekmez):
+        * chat():          Retry + hata yÃ¶netimi ile API Ã§aÄŸrÄ±sÄ±.
+        * chat_stream():   Streaming API Ã§aÄŸrÄ±sÄ±.
         * models():        Model listesi (cache'li).
-        * ping():          Erişilebilirlik kontrolü.
+        * ping():          EriÅŸilebilirlik kontrolÃ¼.
     """
 
-    # ── Sınıf öznitelikleri (alt sınıflar tanımlamalı) ──────────────────
+    # â”€â”€ SÄ±nÄ±f Ã¶znitelikleri (alt sÄ±nÄ±flar tanÄ±mlamalÄ±) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     ad: str = ""
-    """Sağlayıcının kısa adı (ör. 'deepseek', 'openai')."""
+    """SaÄŸlayÄ±cÄ±nÄ±n kÄ±sa adÄ± (Ã¶r. 'deepseek', 'openai')."""
 
     varsayilan_model: str = ""
-    """Bu sağlayıcı için varsayılan model adı."""
+    """Bu saÄŸlayÄ±cÄ± iÃ§in varsayÄ±lan model adÄ±."""
 
     varsayilan_base_url: str = ""
-    """Bu sağlayıcı için varsayılan API temel URL'i."""
+    """Bu saÄŸlayÄ±cÄ± iÃ§in varsayÄ±lan API temel URL'i."""
 
     api_key_env: str = ""
-    """API anahtarı için ortam değişkeni adı (ör. 'DEEPSEEK_API_KEY')."""
+    """API anahtarÄ± iÃ§in ortam deÄŸiÅŸkeni adÄ± (Ã¶r. 'DEEPSEEK_API_KEY')."""
 
     api_key_gerekli: bool = True
-    """API anahtarı zorunlu mu? (LM Studio gibi yerellerde False)."""
+    """API anahtarÄ± zorunlu mu? (LM Studio gibi yerellerde False)."""
 
     def __init__(
         self,
@@ -161,12 +161,12 @@ class ProviderBase(abc.ABC):
         base_url: Optional[str] = None,
         api_key: Optional[str] = None,
     ) -> None:
-        """Sağlayıcı örneğini başlatır.
+        """SaÄŸlayÄ±cÄ± Ã¶rneÄŸini baÅŸlatÄ±r.
 
         Args:
-            model:    Model adı (None = varsayılan).
-            base_url: API temel URL'i (None = varsayılan).
-            api_key:  API anahtarı (None = env'den okunur).
+            model:    Model adÄ± (None = varsayÄ±lan).
+            base_url: API temel URL'i (None = varsayÄ±lan).
+            api_key:  API anahtarÄ± (None = env'den okunur).
         """
         self._model = model or self.varsayilan_model
         self._base_url = (base_url or self.varsayilan_base_url).rstrip("/")
@@ -176,16 +176,16 @@ class ProviderBase(abc.ABC):
         self._model_cache_zamani: float = 0.0
         self._model_cache_omru: float = 300.0  # 5 dakika
 
-    # ── Öznitelikler ────────────────────────────────────────────────────
+    # â”€â”€ Ã–znitelikler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @property
     def model(self) -> str:
-        """Aktif model adı."""
+        """Aktif model adÄ±."""
         return self._model
 
     @model.setter
     def model(self, deger: str) -> None:
-        """Model adını değiştirir (thread-safe)."""
+        """Model adÄ±nÄ± deÄŸiÅŸtirir (thread-safe)."""
         with self._lock:
             self._model = deger
 
@@ -196,17 +196,17 @@ class ProviderBase(abc.ABC):
 
     @property
     def api_key(self) -> str:
-        """Aktif API anahtarı."""
+        """Aktif API anahtarÄ±."""
         return self._api_key
 
-    # ── Hazırlık kontrolü ───────────────────────────────────────────────
+    # â”€â”€ HazÄ±rlÄ±k kontrolÃ¼ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def hazir_mi(self) -> bool:
-        """Sağlayıcının kullanıma hazır olup olmadığını kontrol eder.
+        """SaÄŸlayÄ±cÄ±nÄ±n kullanÄ±ma hazÄ±r olup olmadÄ±ÄŸÄ±nÄ± kontrol eder.
 
         Returns:
-            True:  API anahtarı mevcut (veya gerekmiyor).
-            False: API anahtarı eksik.
+            True:  API anahtarÄ± mevcut (veya gerekmiyor).
+            False: API anahtarÄ± eksik.
         """
         if self.api_key_gerekli and not self._api_key:
             logger.debug("[%s] API anahtari eksik (env: %s)", self.ad, self.api_key_env)
@@ -214,22 +214,22 @@ class ProviderBase(abc.ABC):
         return True
 
     def hazir_mi_veya_uyari(self) -> bool:
-        """hazir_mi() gibi çalışır ama eksikse uyarı loglar.
+        """hazir_mi() gibi Ã§alÄ±ÅŸÄ±r ama eksikse uyarÄ± loglar.
 
         Returns:
-            Sağlayıcı hazırsa True, değilse False.
+            SaÄŸlayÄ±cÄ± hazÄ±rsa True, deÄŸilse False.
         """
         if not self.hazir_mi():
             logger.warning(
-                "[%s] API anahtari eksik — sağlayıcı kullanilamaz. "
-                "Ortam değişkeni: %s",
+                "[%s] API anahtari eksik â€” saÄŸlayÄ±cÄ± kullanilamaz. "
+                "Ortam deÄŸiÅŸkeni: %s",
                 self.ad,
                 self.api_key_env,
             )
             return False
         return True
 
-    # ── Soyut metotlar (alt sınıflar uygulamalı) ────────────────────────
+    # â”€â”€ Soyut metotlar (alt sÄ±nÄ±flar uygulamalÄ±) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @abc.abstractmethod
     def _api_istek(
@@ -238,15 +238,15 @@ class ProviderBase(abc.ABC):
         sistem_prompt: str = "",
         **kwargs: Any,
     ) -> ProviderYanit:
-        """Ham API çağrısını gerçekleştirir.
+        """Ham API Ã§aÄŸrÄ±sÄ±nÄ± gerÃ§ekleÅŸtirir.
 
         Args:
-            mesajlar:      Konuşma mesajları listesi.
-            sistem_prompt: Sistem talimatı (opsiyonel).
+            mesajlar:      KonuÅŸma mesajlarÄ± listesi.
+            sistem_prompt: Sistem talimatÄ± (opsiyonel).
             **kwargs:      Ek parametreler (temperature, max_tokens, vs.).
 
         Returns:
-            ProviderYanit — yanıt metni, süre, hata bilgisi.
+            ProviderYanit â€” yanÄ±t metni, sÃ¼re, hata bilgisi.
         """
         ...
 
@@ -257,52 +257,52 @@ class ProviderBase(abc.ABC):
         sistem_prompt: str = "",
         **kwargs: Any,
     ) -> Generator[str, None, ProviderYanit]:
-        """Streaming API çağrısını gerçekleştirir.
+        """Streaming API Ã§aÄŸrÄ±sÄ±nÄ± gerÃ§ekleÅŸtirir.
 
         Args:
-            mesajlar:      Konuşma mesajları listesi.
-            sistem_prompt: Sistem talimatı (opsiyonel).
+            mesajlar:      KonuÅŸma mesajlarÄ± listesi.
+            sistem_prompt: Sistem talimatÄ± (opsiyonel).
             **kwargs:      Ek parametreler.
 
         Yields:
-            str: Her token veya metin parçası.
+            str: Her token veya metin parÃ§asÄ±.
 
         Returns:
-            ProviderYanit — son yanıt bilgisi (generator bitince).
+            ProviderYanit â€” son yanÄ±t bilgisi (generator bitince).
         """
-        ...  # noqa: WPS428  — abstract, intentional empty
+        ...  # noqa: WPS428  â€” abstract, intentional empty
 
     @abc.abstractmethod
     def _modelleri_getir(self) -> list[dict]:
-        """Kullanılabilir modelleri API'den getirir.
+        """KullanÄ±labilir modelleri API'den getirir.
 
         Returns:
-            Model bilgisi içeren sözlükler listesi:
+            Model bilgisi iÃ§eren sÃ¶zlÃ¼kler listesi:
             [{"id": "model-adi", "object": "model", ...}, ...]
         """
         ...
 
     @abc.abstractmethod
     def _ping_kontrol(self) -> bool:
-        """Sağlayıcı erişilebilirliğini kontrol eder.
+        """SaÄŸlayÄ±cÄ± eriÅŸilebilirliÄŸini kontrol eder.
 
         Returns:
-            True:  Sağlayıcı erişilebilir.
-            False: Erişilemez veya hata var.
+            True:  SaÄŸlayÄ±cÄ± eriÅŸilebilir.
+            False: EriÅŸilemez veya hata var.
         """
         ...
 
-    # ── Hata sınıflandırma ──────────────────────────────────────────────
+    # â”€â”€ Hata sÄ±nÄ±flandÄ±rma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @staticmethod
     def _hatayi_siniflandir(hata: Exception) -> ProviderHatasi:
-        """Genel bir hatayı sağlayıcı hata türüne dönüştürür.
+        """Genel bir hatayÄ± saÄŸlayÄ±cÄ± hata tÃ¼rÃ¼ne dÃ¶nÃ¼ÅŸtÃ¼rÃ¼r.
 
         Args:
             hata: Yakalanan istisna.
 
         Returns:
-            Uygun ProviderHatasi alt sınıfı.
+            Uygun ProviderHatasi alt sÄ±nÄ±fÄ±.
         """
         mesaj = str(hata).lower()
 
@@ -315,9 +315,9 @@ class ProviderBase(abc.ABC):
                 elif kod == 402:
                     return ProviderKrediBitti(f"Kredi bitti (402): {hata}")
                 elif kod == 403:
-                    return ProviderGecersizKey(f"Erişim reddedildi (403): {hata}")
+                    return ProviderGecersizKey(f"EriÅŸim reddedildi (403): {hata}")
                 elif kod == 429:
-                    return ProviderRateLimit(f"Hız sınırı (429): {hata}")
+                    return ProviderRateLimit(f"HÄ±z sÄ±nÄ±rÄ± (429): {hata}")
         except Exception as _e:
             log.warning(f"[src.core.provider_abstraction] Exception at L309")
             pass
@@ -337,22 +337,22 @@ class ProviderBase(abc.ABC):
 
     @staticmethod
     def _yeniden_denenebilir_mi(hata: Exception) -> bool:
-        """Bu hatanın yeniden denenip denenemeyeceğini belirler.
+        """Bu hatanÄ±n yeniden denenip denenemeyeceÄŸini belirler.
 
-        401/402/403 yeniden denenmez (kalıcı hata).
+        401/402/403 yeniden denenmez (kalÄ±cÄ± hata).
         429 (rate limit) yeniden denenebilir.
-        Diğer hatalar (500, ağ, vs.) yeniden denenebilir.
+        DiÄŸer hatalar (500, aÄŸ, vs.) yeniden denenebilir.
 
         Returns:
             True:  Yeniden dene.
-            False: Hemen hata fırlat.
+            False: Hemen hata fÄ±rlat.
         """
         siniflandirilmis = ProviderBase._hatayi_siniflandir(hata)
         if isinstance(siniflandirilmis, (ProviderGecersizKey, ProviderKrediBitti)):
             return False
         return True
 
-    # ── Retry mantığı ───────────────────────────────────────────────────
+    # â”€â”€ Retry mantÄ±ÄŸÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _retry_ile_cagir(
         self,
@@ -362,21 +362,21 @@ class ProviderBase(abc.ABC):
     ) -> ProviderYanit:
         """Exponential backoff ile yeniden deneme yapar.
 
-        Sadece rate-limit (429) ve geçici hatalar yeniden denenir.
-        401/402/403 gibi kalıcı hatalar hemen fırlatılır.
+        Sadece rate-limit (429) ve geÃ§ici hatalar yeniden denenir.
+        401/402/403 gibi kalÄ±cÄ± hatalar hemen fÄ±rlatÄ±lÄ±r.
 
         Args:
-            mesajlar:      Konuşma mesajları.
-            sistem_prompt: Sistem talimatı.
+            mesajlar:      KonuÅŸma mesajlarÄ±.
+            sistem_prompt: Sistem talimatÄ±.
             **kwargs:      Ek parametreler.
 
         Returns:
-            Başarılı yanıt.
+            BaÅŸarÄ±lÄ± yanÄ±t.
 
         Raises:
-            ProviderGecersizKey: API anahtarı geçersiz.
+            ProviderGecersizKey: API anahtarÄ± geÃ§ersiz.
             ProviderKrediBitti:  Kredi bitti.
-            ProviderHatasi:      Diğer hatalar (tüm denemeler başarısız).
+            ProviderHatasi:      DiÄŸer hatalar (tÃ¼m denemeler baÅŸarÄ±sÄ±z).
         """
         bekleme = _ILK_BEKLEME
         son_hata: Optional[Exception] = None
@@ -393,7 +393,7 @@ class ProviderBase(abc.ABC):
 
                 if isinstance(siniflandirilmis, ProviderGecersizKey):
                     logger.warning(
-                        "[%s] Yetki hatasi — retry edilmiyor: %s",
+                        "[%s] Yetki hatasi â€” retry edilmiyor: %s",
                         self.ad,
                         siniflandirilmis,
                     )
@@ -401,7 +401,7 @@ class ProviderBase(abc.ABC):
 
                 if isinstance(siniflandirilmis, ProviderKrediBitti):
                     logger.warning(
-                        "[%s] Kredi bitti — retry edilmiyor: %s",
+                        "[%s] Kredi bitti â€” retry edilmiyor: %s",
                         self.ad,
                         siniflandirilmis,
                     )
@@ -412,7 +412,7 @@ class ProviderBase(abc.ABC):
                     and deneme < _MAKS_DENEME
                 ):
                     logger.warning(
-                        "[%s] Rate limit — %.1fs bekleniyor (%d/%d)…",
+                        "[%s] Rate limit â€” %.1fs bekleniyor (%d/%d)â€¦",
                         self.ad,
                         bekleme,
                         deneme,
@@ -422,7 +422,7 @@ class ProviderBase(abc.ABC):
                     bekleme *= _BEKLEME_CARPAN
                 elif deneme < _MAKS_DENEME:
                     logger.warning(
-                        "[%s] Hata — %.1fs sonra yeniden deneniyor (%d/%d): %s",
+                        "[%s] Hata â€” %.1fs sonra yeniden deneniyor (%d/%d): %s",
                         self.ad,
                         bekleme,
                         deneme,
@@ -432,17 +432,17 @@ class ProviderBase(abc.ABC):
                     time.sleep(bekleme)
                     bekleme *= _BEKLEME_CARPAN
                 else:
-                    # Son deneme de başarısız
+                    # Son deneme de baÅŸarÄ±sÄ±z
                     raise ProviderHatasi(
-                        f"[{self.ad}] Tüm denemeler başarısız ({_MAKS_DENEME}/{_MAKS_DENEME}): {hata}"
+                        f"[{self.ad}] TÃ¼m denemeler baÅŸarÄ±sÄ±z ({_MAKS_DENEME}/{_MAKS_DENEME}): {hata}"
                     ) from hata
 
-        # Buraya ulaşılmamalı — yukarıdaki döngü ya return eder ya da raise
+        # Buraya ulaÅŸÄ±lmamalÄ± â€” yukarÄ±daki dÃ¶ngÃ¼ ya return eder ya da raise
         raise ProviderHatasi(
-            f"[{self.ad}] Beklenmeyen durum — retry döngüsü sonu."
+            f"[{self.ad}] Beklenmeyen durum â€” retry dÃ¶ngÃ¼sÃ¼ sonu."
         ) from son_hata
 
-    # ── Yüksek seviye API ───────────────────────────────────────────────
+    # â”€â”€ YÃ¼ksek seviye API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def chat(
         self,
@@ -450,23 +450,23 @@ class ProviderBase(abc.ABC):
         sistem_prompt: str = "",
         **kwargs: Any,
     ) -> ProviderYanit:
-        """LLM'den yanıt üretir (retry + hata yönetimi ile).
+        """LLM'den yanÄ±t Ã¼retir (retry + hata yÃ¶netimi ile).
 
-        Thread-safe çağrı — aynı anda birden fazla thread çağırabilir.
+        Thread-safe Ã§aÄŸrÄ± â€” aynÄ± anda birden fazla thread Ã§aÄŸÄ±rabilir.
 
         Args:
-            mesajlar:      Konuşma mesajları listesi.
-                           Örn: [{"role": "user", "content": "Merhaba"}]
-            sistem_prompt: Sistem talimatı (opsiyonel).
+            mesajlar:      KonuÅŸma mesajlarÄ± listesi.
+                           Ã–rn: [{"role": "user", "content": "Merhaba"}]
+            sistem_prompt: Sistem talimatÄ± (opsiyonel).
             **kwargs:      Ek parametreler:
-                temperature (float):  Sıcaklık (0.0-2.0). Varsayılan: 0.7.
-                max_tokens (int):    Maksimum token. Varsayılan: 4096.
-                model (str):         Model adı geçersiz kılma.
+                temperature (float):  SÄ±caklÄ±k (0.0-2.0). VarsayÄ±lan: 0.7.
+                max_tokens (int):    Maksimum token. VarsayÄ±lan: 4096.
+                model (str):         Model adÄ± geÃ§ersiz kÄ±lma.
 
         Returns:
-            ProviderYanit — yanıt metni, süre, hata bilgisi.
+            ProviderYanit â€” yanÄ±t metni, sÃ¼re, hata bilgisi.
 
-        Örnek:
+        Ã–rnek:
             >>> provider = get_provider('deepseek')
             >>> yanit = provider.chat(
             ...     [{"role": "user", "content": "2+2 nedir?"}],
@@ -501,23 +501,23 @@ class ProviderBase(abc.ABC):
         sistem_prompt: str = "",
         **kwargs: Any,
     ) -> Generator[str, None, ProviderYanit]:
-        """Streaming LLM yanıtı — token token yield eder.
+        """Streaming LLM yanÄ±tÄ± â€” token token yield eder.
 
-        Thread-safe çağrı. Sağlayıcı streaming desteklemiyorsa
-        tam yanıt tek seferde yield edilir (graceful degrade).
+        Thread-safe Ã§aÄŸrÄ±. SaÄŸlayÄ±cÄ± streaming desteklemiyorsa
+        tam yanÄ±t tek seferde yield edilir (graceful degrade).
 
         Args:
-            mesajlar:      Konuşma mesajları listesi.
-            sistem_prompt: Sistem talimatı (opsiyonel).
+            mesajlar:      KonuÅŸma mesajlarÄ± listesi.
+            sistem_prompt: Sistem talimatÄ± (opsiyonel).
             **kwargs:      Ek parametreler.
 
         Yields:
-            str: Bir token veya küçük metin parçası.
+            str: Bir token veya kÃ¼Ã§Ã¼k metin parÃ§asÄ±.
 
         Returns:
-            ProviderYanit — son yanıt bilgisi (generator bitince).
+            ProviderYanit â€” son yanÄ±t bilgisi (generator bitince).
 
-        Örnek:
+        Ã–rnek:
             >>> provider = get_provider('deepseek')
             >>> for token in provider.chat_stream(
             ...     [{"role": "user", "content": "Merhaba"}],
@@ -542,7 +542,7 @@ class ProviderBase(abc.ABC):
                 son_yanit.metin += token
                 yield token
 
-            # Generator'un dönüş değerini al
+            # Generator'un dÃ¶nÃ¼ÅŸ deÄŸerini al
             try:
                 donus = generator.throw(StopIteration)
                 if isinstance(donus, ProviderYanit):
@@ -567,15 +567,15 @@ class ProviderBase(abc.ABC):
             return hata_yanit
 
     def models(self) -> list[dict]:
-        """Kullanılabilir modelleri listeler (cache'li).
+        """KullanÄ±labilir modelleri listeler (cache'li).
 
-        Sonuçlar 5 dakika boyunca önbellekte tutulur.
-        Cache süresi dolunca API'den yeniden getirilir.
+        SonuÃ§lar 5 dakika boyunca Ã¶nbellekte tutulur.
+        Cache sÃ¼resi dolunca API'den yeniden getirilir.
 
         Returns:
-            Model bilgisi içeren sözlükler listesi.
+            Model bilgisi iÃ§eren sÃ¶zlÃ¼kler listesi.
 
-        Örnek:
+        Ã–rnek:
             >>> provider = get_provider('lmstudio')
             >>> for m in provider.models():
             ...     print(m['id'])
@@ -599,16 +599,16 @@ class ProviderBase(abc.ABC):
                 return self._model_cache or []
 
     def ping(self) -> bool:
-        """Sağlayıcı erişilebilirliğini kontrol eder.
+        """SaÄŸlayÄ±cÄ± eriÅŸilebilirliÄŸini kontrol eder.
 
         Returns:
-            True:  Sağlayıcı erişilebilir.
-            False: Erişilemez.
+            True:  SaÄŸlayÄ±cÄ± eriÅŸilebilir.
+            False: EriÅŸilemez.
 
-        Örnek:
+        Ã–rnek:
             >>> provider = get_provider('lmstudio')
             >>> if provider.ping():
-            ...     print("LM Studio çalişiyor!")
+            ...     print("LM Studio Ã§aliÅŸiyor!")
         """
         try:
             return self._ping_kontrol()
@@ -620,19 +620,19 @@ class ProviderBase(abc.ABC):
         return f"<{self.__class__.__name__} ad={self.ad!r} model={self._model!r}>"
 
 
-# ═══════════════════════════════════════════════════════════════════════════
-# OpenAI Uyumlu Sağlayıcılar (DeepSeek, OpenAI, Groq, xAI, OpenRouter, LM Studio)
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# OpenAI Uyumlu SaÄŸlayÄ±cÄ±lar (DeepSeek, OpenAI, Groq, xAI, OpenRouter, LM Studio)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class OpenAIUyumluProvider(ProviderBase):
-    """OpenAI-uyumlu /v1/chat/completions API'sine sahip sağlayıcılar için temel sınıf.
+    """OpenAI-uyumlu /v1/chat/completions API'sine sahip saÄŸlayÄ±cÄ±lar iÃ§in temel sÄ±nÄ±f.
 
-    Bu sınıf, DeepSeek, OpenAI, Groq, xAI, OpenRouter ve LM Studio
-    gibi OpenAI API formatını kullanan tüm sağlayıcılar için ortak
-    implementasyon sağlar.
+    Bu sÄ±nÄ±f, DeepSeek, OpenAI, Groq, xAI, OpenRouter ve LM Studio
+    gibi OpenAI API formatÄ±nÄ± kullanan tÃ¼m saÄŸlayÄ±cÄ±lar iÃ§in ortak
+    implementasyon saÄŸlar.
 
-    Alt sınıflar sadece sınıf özniteliklerini tanımlamalıdır.
+    Alt sÄ±nÄ±flar sadece sÄ±nÄ±f Ã¶zniteliklerini tanÄ±mlamalÄ±dÄ±r.
     """
 
     ad: str = "openai_compat"
@@ -642,7 +642,7 @@ class OpenAIUyumluProvider(ProviderBase):
     api_key_gerekli: bool = True
 
     def _api_url(self) -> str:
-        """Chat completions endpoint URL'ini döndürür.
+        """Chat completions endpoint URL'ini dÃ¶ndÃ¼rÃ¼r.
 
         base_url sondaki /v1 varsa temizlenir,
         kod sabit /v1/chat/completions ekler.
@@ -658,11 +658,11 @@ class OpenAIUyumluProvider(ProviderBase):
         sistem_prompt: str = "",
         **kwargs: Any,
     ) -> ProviderYanit:
-        """OpenAI-uyumlu /v1/chat/completions çağrısı.
+        """OpenAI-uyumlu /v1/chat/completions Ã§aÄŸrÄ±sÄ±.
 
         Args:
-            mesajlar:      Konuşma mesajları.
-            sistem_prompt: Sistem talimatı.
+            mesajlar:      KonuÅŸma mesajlarÄ±.
+            sistem_prompt: Sistem talimatÄ±.
             **kwargs:      temperature, max_tokens, model.
 
         Returns:
@@ -703,13 +703,13 @@ class OpenAIUyumluProvider(ProviderBase):
                 tahmini_token=len(metin.split()),
             )
         except requests.exceptions.Timeout as e:
-            raise ProviderZamanAsimi(f"[{self.ad}] Zaman aşimi: {e}") from e
+            raise ProviderZamanAsimi(f"[{self.ad}] Zaman aÅŸimi: {e}") from e
         except requests.exceptions.HTTPError as e:
             # Hata kodunu _hatayi_siniflandir ile siniflandirmasi icin
             # yeniden firlat
             raise ProviderHatasi(str(e)) from e
         except requests.exceptions.ConnectionError as e:
-            raise ProviderHatasi(f"[{self.ad}] Bağlanti hatasi: {e}") from e
+            raise ProviderHatasi(f"[{self.ad}] BaÄŸlanti hatasi: {e}") from e
         except (KeyError, IndexError, json.JSONDecodeError) as e:
             raise ProviderHatasi(f"[{self.ad}] Yanit cozulemedi: {e}") from e
 
@@ -719,11 +719,11 @@ class OpenAIUyumluProvider(ProviderBase):
         sistem_prompt: str = "",
         **kwargs: Any,
     ) -> Generator[str, None, ProviderYanit]:
-        """OpenAI-uyumlu streaming /v1/chat/completions çağrısı.
+        """OpenAI-uyumlu streaming /v1/chat/completions Ã§aÄŸrÄ±sÄ±.
 
         Args:
-            mesajlar:      Konuşma mesajları.
-            sistem_prompt: Sistem talimatı.
+            mesajlar:      KonuÅŸma mesajlarÄ±.
+            sistem_prompt: Sistem talimatÄ±.
             **kwargs:      temperature, max_tokens, model.
 
         Yields:
@@ -787,7 +787,7 @@ class OpenAIUyumluProvider(ProviderBase):
                 tahmini_token=len(metin_parcalari),
             )
         except Exception as e:
-            # Stream basarisiz — graceful degrade: tam yanit dondur
+            # Stream basarisiz â€” graceful degrade: tam yanit dondur
             try:
                 tam_yanit = self._api_istek(mesajlar, sistem_prompt, **kwargs)
                 yield tam_yanit.metin
@@ -802,7 +802,7 @@ class OpenAIUyumluProvider(ProviderBase):
                 )
 
     def _modelleri_getir(self) -> list[dict]:
-        """OpenAI-uyumlu /v1/models endpoint'inden model listesi alır."""
+        """OpenAI-uyumlu /v1/models endpoint'inden model listesi alÄ±r."""
         temiz_url = self._base_url.rstrip("/")
         if temiz_url.endswith("/v1"):
             temiz_url = temiz_url[:-3]
@@ -817,7 +817,7 @@ class OpenAIUyumluProvider(ProviderBase):
         return r.json().get("data", [])
 
     def _ping_kontrol(self) -> bool:
-        """OpenAI-uyumlu /v1/models ile erişilebilirliği kontrol eder."""
+        """OpenAI-uyumlu /v1/models ile eriÅŸilebilirliÄŸi kontrol eder."""
         try:
             temiz_url = self._base_url.rstrip("/")
             if temiz_url.endswith("/v1"):
@@ -834,17 +834,17 @@ class OpenAIUyumluProvider(ProviderBase):
             return False
 
 
-# ═══════════════════════════════════════════════════════════════════════════
-# Sağlayıcı Alt Sınıfları
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# SaÄŸlayÄ±cÄ± Alt SÄ±nÄ±flarÄ±
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class DeepSeekProvider(OpenAIUyumluProvider):
-    """DeepSeek API sağlayıcısı.
+    """DeepSeek API saÄŸlayÄ±cÄ±sÄ±.
 
     API: https://api.deepseek.com/v1/chat/completions
-    Ortam değişkeni: DEEPSEEK_API_KEY
-    Varsayılan model: deepseek-chat
+    Ortam deÄŸiÅŸkeni: DEEPSEEK_API_KEY
+    VarsayÄ±lan model: deepseek-chat
     """
 
     ad: str = "deepseek"
@@ -854,11 +854,11 @@ class DeepSeekProvider(OpenAIUyumluProvider):
 
 
 class OpenAIProvider(OpenAIUyumluProvider):
-    """OpenAI API sağlayıcısı.
+    """OpenAI API saÄŸlayÄ±cÄ±sÄ±.
 
     API: https://api.openai.com/v1/chat/completions
-    Ortam değişkeni: OPENAI_API_KEY
-    Varsayılan model: gpt-4o-mini
+    Ortam deÄŸiÅŸkeni: OPENAI_API_KEY
+    VarsayÄ±lan model: gpt-4o-mini
     """
 
     ad: str = "openai"
@@ -868,11 +868,11 @@ class OpenAIProvider(OpenAIUyumluProvider):
 
 
 class GroqProvider(OpenAIUyumluProvider):
-    """Groq API sağlayıcısı.
+    """Groq API saÄŸlayÄ±cÄ±sÄ±.
 
     API: https://api.groq.com/openai/v1/chat/completions
-    Ortam değişkeni: GROQ_API_KEY
-    Varsayılan model: llama-3.1-8b-instant
+    Ortam deÄŸiÅŸkeni: GROQ_API_KEY
+    VarsayÄ±lan model: llama-3.1-8b-instant
     """
 
     ad: str = "groq"
@@ -882,11 +882,11 @@ class GroqProvider(OpenAIUyumluProvider):
 
 
 class XAIProvider(OpenAIUyumluProvider):
-    """xAI (Grok) API sağlayıcısı.
+    """xAI (Grok) API saÄŸlayÄ±cÄ±sÄ±.
 
     API: https://api.x.ai/v1/chat/completions
-    Ortam değişkeni: XAI_API_KEY
-    Varsayılan model: grok-2-latest
+    Ortam deÄŸiÅŸkeni: XAI_API_KEY
+    VarsayÄ±lan model: grok-2-latest
     """
 
     ad: str = "xai"
@@ -896,11 +896,11 @@ class XAIProvider(OpenAIUyumluProvider):
 
 
 class OpenRouterProvider(OpenAIUyumluProvider):
-    """OpenRouter API sağlayıcısı.
+    """OpenRouter API saÄŸlayÄ±cÄ±sÄ±.
 
     API: https://openrouter.ai/api/v1/chat/completions
-    Ortam değişkeni: OPENROUTER_API_KEY
-    Varsayılan model: deepseek/deepseek-chat
+    Ortam deÄŸiÅŸkeni: OPENROUTER_API_KEY
+    VarsayÄ±lan model: deepseek/deepseek-chat
     """
 
     ad: str = "openrouter"
@@ -910,11 +910,11 @@ class OpenRouterProvider(OpenAIUyumluProvider):
 
 
 class LMStudioProvider(OpenAIUyumluProvider):
-    """Yerel LM Studio sağlayıcısı.
+    """Yerel LM Studio saÄŸlayÄ±cÄ±sÄ±.
 
-    API anahtarı gerekmez.
+    API anahtarÄ± gerekmez.
     API: http://localhost:1234/v1/chat/completions
-    Varsayılan model: local-model
+    VarsayÄ±lan model: local-model
     """
 
     ad: str = "lmstudio"
@@ -978,20 +978,20 @@ class LMStudioProvider(OpenAIUyumluProvider):
             raise ProviderHatasi(f"[{self.ad}] Hata: {e}") from e
 
 
-# ═══════════════════════════════════════════════════════════════════════════
-# Anthropic Sağlayıcısı (farklı API formatı)
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# Anthropic SaÄŸlayÄ±cÄ±sÄ± (farklÄ± API formatÄ±)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class AnthropicProvider(ProviderBase):
-    """Anthropic (Claude) API sağlayıcısı.
+    """Anthropic (Claude) API saÄŸlayÄ±cÄ±sÄ±.
 
     Anthropic Messages API (/v1/messages) kullanir.
-    OpenAI uyumlu degildir — kendi API formati vardir.
+    OpenAI uyumlu degildir â€” kendi API formati vardir.
 
     API: https://api.anthropic.com/v1/messages
-    Ortam değişkeni: ANTHROPIC_API_KEY
-    Varsayılan model: claude-haiku-4-5-20251001
+    Ortam deÄŸiÅŸkeni: ANTHROPIC_API_KEY
+    VarsayÄ±lan model: claude-haiku-4-5-20251001
     """
 
     ad: str = "anthropic"
@@ -1010,7 +1010,7 @@ class AnthropicProvider(ProviderBase):
         sistem_prompt: str = "",
         **kwargs: Any,
     ) -> ProviderYanit:
-        """Anthropic /v1/messages API çağrısı.
+        """Anthropic /v1/messages API Ã§aÄŸrÄ±sÄ±.
 
         Not: Anthropic, OpenAI'dan farkli bir mesaj formati kullanir.
         """
@@ -1069,7 +1069,7 @@ class AnthropicProvider(ProviderBase):
         sistem_prompt: str = "",
         **kwargs: Any,
     ) -> Generator[str, None, ProviderYanit]:
-        """Anthropic streaming — text_delta olaylarini yield eder."""
+        """Anthropic streaming â€” text_delta olaylarini yield eder."""
         url = self._api_url()
         headers = {
             "x-api-key": self._api_key,
@@ -1147,7 +1147,7 @@ class AnthropicProvider(ProviderBase):
         ]
 
     def _ping_kontrol(self) -> bool:
-        """Anthropic erişilebilirlik kontrolü."""
+        """Anthropic eriÅŸilebilirlik kontrolÃ¼."""
         try:
             url = self._api_url()
             r = requests.post(
@@ -1169,19 +1169,19 @@ class AnthropicProvider(ProviderBase):
             return False
 
 
-# ═══════════════════════════════════════════════════════════════════════════
-# Xiaomi (MiniMax) Sağlayıcısı
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# Xiaomi (MiniMax) SaÄŸlayÄ±cÄ±sÄ±
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class XiaomiProvider(ProviderBase):
-    """Xiaomi (MiniMax) API sağlayıcısı.
+    """Xiaomi (MiniMax) API saÄŸlayÄ±cÄ±sÄ±.
 
-    OpenAI uyumlu degildir — /v1/text/chatcompletion_v2 endpoint'ini kullanir.
+    OpenAI uyumlu degildir â€” /v1/text/chatcompletion_v2 endpoint'ini kullanir.
 
     API: https://api.minimax.chat/v1/text/chatcompletion_v2
-    Ortam değişkeni: XIAOMI_API_KEY
-    Varsayılan model: MiniMax-Text-01
+    Ortam deÄŸiÅŸkeni: XIAOMI_API_KEY
+    VarsayÄ±lan model: MiniMax-Text-01
     """
 
     ad: str = "xiaomi"
@@ -1205,7 +1205,7 @@ class XiaomiProvider(ProviderBase):
         sistem_prompt: str = "",
         **kwargs: Any,
     ) -> ProviderYanit:
-        """Xiaomi/MiniMax API çağrısı — OpenAI uyumlu endpoint."""
+        """Xiaomi/MiniMax API Ã§aÄŸrÄ±sÄ± â€” OpenAI uyumlu endpoint."""
         url = self._api_url()
         headers = {
             "Authorization": f"Bearer {self._api_key}",
@@ -1251,7 +1251,7 @@ class XiaomiProvider(ProviderBase):
         sistem_prompt: str = "",
         **kwargs: Any,
     ) -> Generator[str, None, ProviderYanit]:
-        """Xiaomi/MiniMax streaming — OpenAI uyumlu."""
+        """Xiaomi/MiniMax streaming â€” OpenAI uyumlu."""
         url = self._api_url()
         headers = {
             "Authorization": f"Bearer {self._api_key}",
@@ -1328,7 +1328,7 @@ class XiaomiProvider(ProviderBase):
         ]
 
     def _ping_kontrol(self) -> bool:
-        """Xiaomi/MiniMax erişilebilirlik kontrolü."""
+        """Xiaomi/MiniMax eriÅŸilebilirlik kontrolÃ¼."""
         try:
             url = self._api_url()
             r = requests.post(
@@ -1349,9 +1349,9 @@ class XiaomiProvider(ProviderBase):
             return False
 
 
-# ═══════════════════════════════════════════════════════════════════════════
-# Sağlayıcı Fabrikası
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# SaÄŸlayÄ±cÄ± FabrikasÄ±
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 _PROVIDER_SINIFLARI: dict[str, type[ProviderBase]] = {
     "deepseek": DeepSeekProvider,
@@ -1396,11 +1396,11 @@ def get_provider(
     """Tek satirlik provider fabrikasi.
 
     Provider adina gore uygun instance'i dondurur.
-    Instance'lar thread-safe cache'de tutulur — ayni provider tekrar
+    Instance'lar thread-safe cache'de tutulur â€” ayni provider tekrar
     olusturulmaz.
 
     Args:
-        ad:       Sağlayıcı adı.
+        ad:       SaÄŸlayÄ±cÄ± adÄ±.
                   Desteklenenler: deepseek, openai, openai-api, anthropic,
                   groq, xiaomi, xai, openrouter, lmstudio.
         model:    Model adi (None = varsayilan).
@@ -1416,7 +1416,7 @@ def get_provider(
     Raises:
         ValueError: Bilinmeyen provider adi.
 
-    Örnek:
+    Ã–rnek:
         >>> provider = get_provider('deepseek')
         >>> yanit = provider.chat([{"role": "user", "content": "Merhaba"}])
         >>> print(yanit.metin)
@@ -1447,7 +1447,7 @@ def get_provider(
 
     if sinif is None:
         raise ValueError(
-            f"Bilinmeyen sağlayıcı: {ad!r}. "
+            f"Bilinmeyen saÄŸlayÄ±cÄ±: {ad!r}. "
             f"Desteklenenler: {', '.join(_PROVIDER_SINIFLARI.keys())}"
         )
 
@@ -1480,14 +1480,14 @@ def get_all_providers(
     Returns:
         {provider_adi: ProviderBase ornegi} sozlugu.
 
-    Örnek:
+    Ã–rnek:
         >>> providers = get_all_providers(config)
         >>> for ad, p in providers.items():
         ...     print(f"{ad}: {p.ping()}")
     """
     cfg = config or _global_config
     if cfg is None:
-        logger.warning("[get_all_providers] Config bulunamadi — bos sozluk donuluyor.")
+        logger.warning("[get_all_providers] Config bulunamadi â€” bos sozluk donuluyor.")
         return {}
 
     saglayicilar: dict[str, ProviderBase] = {}
@@ -1516,7 +1516,7 @@ def provideri_temizle(ad: Optional[str] = None) -> None:
     Args:
         ad: Temizlenecek provider adi. None = tumunu temizle.
 
-    Örnek:
+    Ã–rnek:
         >>> provideri_temizle('deepseek')  # Sadece deepseek cache'ini temizle
         >>> provideri_temizle()            # Tum cache'i temizle
     """
@@ -1536,9 +1536,9 @@ def provideri_temizle(ad: Optional[str] = None) -> None:
             )
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Beyin.py ile uyumluluk
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def beyin_icin_provider_olustur(
@@ -1564,7 +1564,7 @@ def beyin_icin_provider_olustur(
     Returns:
         ProviderBase ornegi.
 
-    Örnek:
+    Ã–rnek:
         >>> cfg = {
         ...     "default_provider": "deepseek",
         ...     "default_model": "deepseek-chat",
@@ -1586,15 +1586,15 @@ def beyin_icin_provider_olustur(
     return get_provider(ad=ad, model=model, base_url=base_url, api_key=api_key)
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Hizli Test
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG, format="%(levelname)s %(message)s")
 
     print("=" * 60)
-    print("Provider Abstraction Katmani — Test")
+    print("Provider Abstraction Katmani â€” Test")
     print("=" * 60)
 
     # 1. Temel provider olusturma
@@ -1611,9 +1611,9 @@ if __name__ == "__main__":
     ):
         try:
             p = get_provider(ad)
-            print(f"  ✅ {p}")
+            print(f"  âœ… {p}")
         except ValueError as e:
-            print(f"  ❌ {ad}: {e}")
+            print(f"  âŒ {ad}: {e}")
 
     # 2. hazir_mi kontrolu
     print("\n--- 2. hazir_mi kontrolleri ---")
@@ -1671,9 +1671,9 @@ if __name__ == "__main__":
         required = ["chat", "chat_stream", "models", "ping"]
         eksik = [m for m in required if not hasattr(instance, m)]
         if eksik:
-            print(f"  ❌ {ad}: EKSIK metotlar: {eksik}")
+            print(f"  âŒ {ad}: EKSIK metotlar: {eksik}")
         else:
-            print(f"  ✅ {ad}: tum gereken metotlar mevcut")
+            print(f"  âœ… {ad}: tum gereken metotlar mevcut")
 
     print("\n" + "=" * 60)
     print("Test tamam.")

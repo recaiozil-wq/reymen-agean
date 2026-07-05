@@ -1,11 +1,11 @@
-"""
-WiFi ağındaki cihazları tara — IP + MAC adreslerini bul.
+﻿"""
+WiFi aÄŸÄ±ndaki cihazlarÄ± tara â€” IP + MAC adreslerini bul.
 
-SelfHeal test örneği:
+SelfHeal test Ã¶rneÄŸi:
 1. nmap ile subnet tara
 2. ARP tablosunu oku
-3. Sonuçları tablo olarak göster
-4. Hata olursa → SelfHeal otomatik düzeltir
+3. SonuÃ§larÄ± tablo olarak gÃ¶ster
+4. Hata olursa â†’ SelfHeal otomatik dÃ¼zeltir
 """
 
 import subprocess, re, sys, json
@@ -14,19 +14,19 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# ── 1. Ağ arayüzünü bul ──────────────────────────────────────
+# â”€â”€ 1. AÄŸ arayÃ¼zÃ¼nÃ¼ bul â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def aktif_interface_bul() -> str:
-    """WiFi arayüzünün IP'sini bul — dynamic ARP entry'si olan tercih edilir."""
+    """WiFi arayÃ¼zÃ¼nÃ¼n IP'sini bul â€” dynamic ARP entry'si olan tercih edilir."""
     try:
-        # Önce arp -a ile dynamic entry'si olan interface'i bul
+        # Ã–nce arp -a ile dynamic entry'si olan interface'i bul
         arp_r = subprocess.run(
             ["arp", "-a"], capture_output=True, text=False, timeout=15
         )
         arp_cikti = arp_r.stdout.decode("utf-8", errors="replace")
 
-        # Her interface bloğunu ayır
+        # Her interface bloÄŸunu ayÄ±r
         bloklar = arp_cikti.split("Interface:")
         for blok in bloklar[1:]:  # ilk blok header
             ilk_satir = blok.splitlines()[0] if blok.splitlines() else ""
@@ -34,7 +34,7 @@ def aktif_interface_bul() -> str:
             if not m_if:
                 continue
             if_ip = m_if.group(1)
-            # Bu blokta dynamic entry var mı?
+            # Bu blokta dynamic entry var mÄ±?
             if "dynamic" in blok:
                 return if_ip
 
@@ -59,11 +59,11 @@ def subnet_bul(ip: str) -> str:
     return ".".join(parts) + "/24"
 
 
-# ── 2. ARP tablosu ──────────────────────────────────────────
+# â”€â”€ 2. ARP tablosu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def arp_tara() -> list[dict]:
-    """arp -a komutu ile cihazları bul."""
+    """arp -a komutu ile cihazlarÄ± bul."""
     cihazlar = []
     try:
         r = subprocess.run(["arp", "-a"], capture_output=True, text=False, timeout=15)
@@ -84,11 +84,11 @@ def arp_tara() -> list[dict]:
     return cihazlar
 
 
-# ── 3. Nmap taraması ────────────────────────────────────────
+# â”€â”€ 3. Nmap taramasÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def nmap_tara(subnet: str) -> list[dict]:
-    """nmap -sn ile canlı cihazları tara."""
+    """nmap -sn ile canlÄ± cihazlarÄ± tara."""
     cihazlar = []
     try:
         r = subprocess.run(
@@ -120,45 +120,45 @@ def nmap_tara(subnet: str) -> list[dict]:
                     )
                 ip_bulundu = None
     except subprocess.TimeoutExpired:
-        print("[UYARI] nmap zaman aşımı (60s)")
+        print("[UYARI] nmap zaman aÅŸÄ±mÄ± (60s)")
     except FileNotFoundError:
-        print("[UYARI] nmap bulunamadı, sadece ARP kullanılacak")
+        print("[UYARI] nmap bulunamadÄ±, sadece ARP kullanÄ±lacak")
     except Exception as e:
         print(f"[HATA] nmap: {e}")
     return cihazlar
 
 
-# ── 4. Ana ───────────────────────────────────────────────────
+# â”€â”€ 4. Ana â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def main():
-    print("╔══════════════════════════════════════════════╗")
-    print("║    WiFi Cihaz Taraması (IP + MAC)          ║")
-    print("╚══════════════════════════════════════════════╝")
+    print("â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—")
+    print("â•‘    WiFi Cihaz TaramasÄ± (IP + MAC)          â•‘")
+    print("â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•")
     print()
 
-    # Ağ bilgisi
+    # AÄŸ bilgisi
     ip = aktif_interface_bul()
     if not ip:
-        print("❌ Aktif ağ arayüzü bulunamadı.")
+        print("âŒ Aktif aÄŸ arayÃ¼zÃ¼ bulunamadÄ±.")
         return
 
     subnet = subnet_bul(ip)
-    print(f"📡 Arayüz IP: {ip}")
-    print(f"🌐 Subnet:    {subnet}")
+    print(f"ğŸ“¡ ArayÃ¼z IP: {ip}")
+    print(f"ğŸŒ Subnet:    {subnet}")
     print()
 
     # ARP tablosu
-    print("📋 ARP tablosu taranıyor...")
+    print("ğŸ“‹ ARP tablosu taranÄ±yor...")
     arp_cihazlar = arp_tara()
     print(f"   ARP'de {len(arp_cihazlar)} cihaz bulundu")
 
-    # Nmap taraması
-    print("🔍 Nmap ile canlı cihaz taranıyor...")
+    # Nmap taramasÄ±
+    print("ğŸ” Nmap ile canlÄ± cihaz taranÄ±yor...")
     nmap_cihazlar = nmap_tara(subnet)
     print(f"   Nmap'te {len(nmap_cihazlar)} cihaz bulundu")
 
-    # Birleştir (nmap öncelikli)
+    # BirleÅŸtir (nmap Ã¶ncelikli)
     gorulen_ip = set()
     tum_cihazlar = []
 
@@ -170,25 +170,25 @@ def main():
             gorulen_ip.add(c["ip"])
             tum_cihazlar.append(c)
 
-    # Sırala
+    # SÄ±rala
     tum_cihazlar.sort(key=lambda x: [int(p) for p in x["ip"].split(".")])
 
-    # Tablo göster
+    # Tablo gÃ¶ster
     print()
-    print("┌─────────────────────┬────────────────────┬──────────────┐")
-    print("│ IP                  │ MAC                │ Üretici      │")
-    print("├─────────────────────┼────────────────────┼──────────────┤")
+    print("â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”")
+    print("â”‚ IP                  â”‚ MAC                â”‚ Ãœretici      â”‚")
+    print("â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤")
 
     for c in tum_cihazlar:
         ip_str = c["ip"].ljust(19)
         mac_str = c["mac"].ljust(18)
         uretici = c.get("uretici", c.get("turu", ""))[:12].ljust(12)
-        print(f"│ {ip_str}│ {mac_str}│ {uretici}│")
+        print(f"â”‚ {ip_str}â”‚ {mac_str}â”‚ {uretici}â”‚")
 
-    print("└─────────────────────┴────────────────────┴──────────────┘")
-    print(f"\n📊 Toplam: {len(tum_cihazlar)} cihaz")
+    print("â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜")
+    print(f"\nğŸ“Š Toplam: {len(tum_cihazlar)} cihaz")
 
-    # JSON çıktı (self_heal için)
+    # JSON Ã§Ä±ktÄ± (self_heal iÃ§in)
     cikti = {
         "zaman": datetime.now().isoformat(),
         "interface_ip": ip,
@@ -198,7 +198,7 @@ def main():
     }
     with open("wifi_cihazlari_sonuc.json", "w", encoding="utf-8") as f:
         json.dump(cikti, f, indent=2, ensure_ascii=False)
-    print(f"\n💾 JSON kaydedildi: wifi_cihazlari_sonuc.json")
+    print(f"\nğŸ’¾ JSON kaydedildi: wifi_cihazlari_sonuc.json")
 
 
 if __name__ == "__main__":

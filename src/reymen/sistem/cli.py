@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 ReYMeN Agent CLI - Interactive Terminal Interface (Split Wrapper)
 
@@ -14,7 +14,7 @@ from typing import Optional, Any, List, Dict, Tuple
 logger = logging.getLogger(__name__)
 
 # Import the actual implementation
-from src.reymen.sistem.cli_main import ReYMeNCLI
+from reymen.sistem.cli_main import ReYMeNCLI
 
 
 def main(
@@ -61,7 +61,7 @@ def main(
         compact: Use compact display mode
         list_tools: List available tools and exit
         list_toolsets: List available toolsets and exit
-        yolo: Enable YOLO mode — skip all dangerous command approval prompts
+        yolo: Enable YOLO mode â€” skip all dangerous command approval prompts
         resume: Resume a previous session by its ID (e.g., 20260225_143052_a1b2c3)
         worktree: Run in an isolated git worktree (for parallel agents). Alias: -w
         w: Shorthand for --worktree
@@ -79,7 +79,7 @@ def main(
     """
     global _active_worktree
 
-    # Force UTF-8 stdio on Windows before any banner/print() runs — the
+    # Force UTF-8 stdio on Windows before any banner/print() runs â€” the
     # Rich console prints Unicode box-drawing characters that would
     # UnicodeEncodeError on cp1252.  No-op on Linux/macOS.
     try:
@@ -97,7 +97,7 @@ def main(
     if yolo:
         os.environ["REYMEN_YOLO_MODE"] = "1"
 
-    # approvals.mode = off → YOLO modu (config)
+    # approvals.mode = off â†’ YOLO modu (config)
     if not os.environ.get("REYMEN_YOLO_MODE"):
         try:
             from ReYMeN_cli.config import load_config as _load_reymen_config
@@ -121,7 +121,7 @@ def main(
 
     # Skip worktree for list commands (they exit immediately)
     if not list_tools and not list_toolsets:
-        # ── Git worktree isolation (#652) ──
+        # â”€â”€ Git worktree isolation (#652) â”€â”€
         # Create an isolated worktree so this agent instance doesn't collide
         # with other agents working on the same repo.
         use_worktree = worktree or w or CLI_CONFIG.get("worktree", False)
@@ -137,7 +137,7 @@ def main(
                 os.environ["TERMINAL_CWD"] = wt_info["path"]
                 atexit.register(_cleanup_worktree, wt_info)
             else:
-                # Worktree was explicitly requested but setup failed —
+                # Worktree was explicitly requested but setup failed â€”
                 # don't silently run without isolation.
                 return
     else:
@@ -226,7 +226,7 @@ def main(
     # Also install signal handlers in single-query / `-q` mode.  Interactive
     # mode registers its own inside ReYMeNCLI.run(), but `-q` runs
     # cli.agent.run_conversation() below and AIAgent spawns worker threads
-    # for tools — so when SIGTERM arrives on the main thread, raising
+    # for tools â€” so when SIGTERM arrives on the main thread, raising
     # KeyboardInterrupt only unwinds the main thread, not the worker
     # running _wait_for_process.  Python then exits, the child subprocess
     # (spawned with os.setsid, its own process group) is reparented to
@@ -259,7 +259,7 @@ def main(
         # subprocess in _wait_for_process. Raising KeyboardInterrupt only
         # unwinds the main thread; the worker thread keeps running, the
         # process gets reparented to init, and the dispatcher's _pid_alive
-        # check returns True forever — task stuck in 'running' indefinitely.
+        # check returns True forever â€” task stuck in 'running' indefinitely.
         # Skip the controlled-unwind dance and call os._exit(0) so the kernel
         # reclaims the PID immediately and detect_crashed_workers can reclaim
         # the stale claim on the next tick. Flush logging + stdout/stderr
@@ -382,7 +382,7 @@ def main(
                             if any(p.get("type") == "image_url" for p in _parts):
                                 effective_query = _parts
                             else:
-                                # All images unreadable — text fallback.
+                                # All images unreadable â€” text fallback.
                                 # ``_preprocess_images_with_vision`` only knows
                                 # about local files; URLs would be lost there,
                                 # so keep the original query text intact when
@@ -442,7 +442,7 @@ def main(
                         else str(result)
                     )
                     # Surface backend errors that produced no visible output
-                    # (e.g. invalid model slug → provider 4xx). Mirrors the
+                    # (e.g. invalid model slug â†’ provider 4xx). Mirrors the
                     # interactive CLI path. Write to stderr so piped stdout
                     # stays clean for automation wrappers.
                     if (
@@ -459,7 +459,7 @@ def main(
                     # goal_mode card keeps working in THIS session until an
                     # auxiliary judge agrees the card is done, the worker
                     # terminates the task itself, or the turn budget runs
-                    # out (→ sticky block). Gated on the env vars the
+                    # out (â†’ sticky block). Gated on the env vars the
                     # dispatcher sets in `_default_spawn`; a no-op for every
                     # normal worker and every non-kanban `-q` run.
                     if os.environ.get("ReYMeN_KANBAN_GOAL_MODE") == "1":
@@ -479,8 +479,8 @@ def main(
             # Exit with error code if credentials or agent init fails
             sys.exit(1)
         else:
-            # Single-query mode (`ReYMeN chat -q "…"`): skip the welcome
-            # banner. Building the banner takes ~420 ms on cold start —
+            # Single-query mode (`ReYMeN chat -q "â€¦"`): skip the welcome
+            # banner. Building the banner takes ~420 ms on cold start â€”
             # ~200 ms of that is the version-update check, the rest is
             # toolset / skill enumeration and Rich panel rendering. None
             # of that is useful for a one-shot query: the user already
@@ -495,7 +495,7 @@ def main(
             _query_label = query or ("[image attached]" if single_query_images else "")
             if _query_label:
                 cli.console.print(f"[bold blue]Query:[/] {_query_label}")
-            # Surface security advisories before the agent runs — short
+            # Surface security advisories before the agent runs â€” short
             # banner, doesn't depend on the welcome banner being shown.
             cli._show_security_advisories()
             cli.chat(query, images=single_query_images or None)

@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""path_security.py — Yol Guvenligi.
+﻿# -*- coding: utf-8 -*-
+"""path_security.py â€” Yol Guvenligi.
 
 Dosya yollarini dogrular, path traversal ve sembolik link
 saldirilarina karsi korur.
@@ -33,7 +33,7 @@ def yol_dogrula(hedef_yol: str) -> tuple[bool, str]:
         # Proje kokunun disinda - izin verilen ozel dizinler var mi?
         izinli_ozel = [
             Path.home() / ".ReYMeN",
-            Path.home() / "AppData/Local/hermes",
+            Path.home() / "AppData/Local/reymen",
         ]
         for izin in izinli_ozel:
             try:

@@ -1,4 +1,4 @@
-"""disk_izleme.py — Günlük disk + DB boyut kontrolü."""
+﻿"""disk_izleme.py â€” GÃ¼nlÃ¼k disk + DB boyut kontrolÃ¼."""
 
 import shutil, json
 from pathlib import Path
@@ -12,26 +12,26 @@ orani = (kullanilan / toplam) * 100
 
 rapor = []
 if orani > 85:
-    rapor.append(f"⚠️ Disk %{orani:.0f} dolu! ({bos//1024**3}GB boş)")
+    rapor.append(f"âš ï¸ Disk %{orani:.0f} dolu! ({bos//1024**3}GB boÅŸ)")
 else:
-    rapor.append(f"✅ Disk %{orani:.0f} ({bos//1024**3}GB boş)")
+    rapor.append(f"âœ… Disk %{orani:.0f} ({bos//1024**3}GB boÅŸ)")
 
 # skills_index.db boyut
 si_db = DB_DIR / "skills_index.db"
 if si_db.exists():
     mb = si_db.stat().st_size / 1024 / 1024
     if mb > 120:
-        rapor.append(f"⚠️ skills_index.db: {mb:.0f}MB (limit: 120MB)")
+        rapor.append(f"âš ï¸ skills_index.db: {mb:.0f}MB (limit: 120MB)")
     else:
-        rapor.append(f"✅ skills_index.db: {mb:.0f}MB")
+        rapor.append(f"âœ… skills_index.db: {mb:.0f}MB")
 
-# .old yaş kontrolü
+# .old yaÅŸ kontrolÃ¼
 for f in sorted(PROJE.rglob("*.old")):
     yas = (
         __import__("datetime").datetime.now()
         - __import__("datetime").datetime.fromtimestamp(f.stat().st_mtime)
     ).days
     if yas > 7:
-        rapor.append(f"⚠️ {f.name}: {yas} günlük .old — silinebilir")
+        rapor.append(f"âš ï¸ {f.name}: {yas} gÃ¼nlÃ¼k .old â€” silinebilir")
 
-print(" | ".join(rapor) if rapor else "✅ Her şey normal")
+print(" | ".join(rapor) if rapor else "âœ… Her ÅŸey normal")

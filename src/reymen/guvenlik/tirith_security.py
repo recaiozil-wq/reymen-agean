@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""tirith_security.py — Kapsamli Guvenlik Motoru.
+﻿# -*- coding: utf-8 -*-
+"""tirith_security.py â€” Kapsamli Guvenlik Motoru.
 
 Tum guvenlik bilesenlerini (file_safety, path_security, url_safety,
 redact, threat_patterns) tek bir noktadan yoneten kapsamli guvenlik katmani.

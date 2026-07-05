@@ -1,8 +1,8 @@
-"""_handle_stop_command handler."""
+﻿"""_handle_stop_command handler."""
 
 
 def _handle_stop_command(cli):
-    """Handle /stop — kill all running background processes.
+    """Handle /stop â€” kill all running background processes.
 
     Inspired by OpenAI Codex's separation of interrupt (stop current turn)
     from /stop (clean up background processes). See openai/codex#14602.
@@ -18,4 +18,4 @@ def _handle_stop_command(cli):
 
     print(f"  Stopping {len(running)} background process(es)...")
     killed = process_registry.kill_all()
-    print(f"  ✅ Stopped {killed} process(es).")
+    print(f"  âœ… Stopped {killed} process(es).")

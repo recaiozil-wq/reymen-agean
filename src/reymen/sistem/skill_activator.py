@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""reymen/sistem/skill_activator.py — Auto-activation framework for ReYMeN skills.
+﻿# -*- coding: utf-8 -*-
+"""reymen/sistem/skill_activator.py â€” Auto-activation framework for ReYMeN skills.
 
 Minimal registry that maps skill names to file paths, with an activate()
 method that reads the .md content. Uses a dict-based registry with
@@ -27,7 +27,7 @@ class SkillActivator:
             registry_path or Path.home() / ".reymen" / "skill_registry.json"
         )
 
-    # ── Registry management ──────────────────────────────────────────────
+    # â”€â”€ Registry management â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def register(self, name: str, file_path: str | Path) -> None:
         """Register a skill by name pointing to its .md file path."""
@@ -50,7 +50,7 @@ class SkillActivator:
         """Check if a skill name is registered."""
         return name in self._registry
 
-    # ── Activation ───────────────────────────────────────────────────────
+    # â”€â”€ Activation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def activate(self, name: str) -> Optional[str]:
         """Read and return the .md content of a registered skill.
@@ -79,7 +79,7 @@ class SkillActivator:
             logger.error("Failed to read skill %s: %s", name, exc)
             return None
 
-    # ── Auto-scan: discover .md files in a directory ─────────────────────
+    # â”€â”€ Auto-scan: discover .md files in a directory â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def scan_directory(self, skills_dir: Path, pattern: str = "*.md") -> int:
         """Scan a directory and register all matching .md files.
@@ -105,7 +105,7 @@ class SkillActivator:
 
         return count
 
-    # ── Persistence ──────────────────────────────────────────────────────
+    # â”€â”€ Persistence â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def persist(self) -> None:
         """Save registry to JSON file."""
@@ -132,7 +132,7 @@ class SkillActivator:
             logger.error("Failed to load registry: %s", exc)
             self._registry = {}
 
-    # ── Convenience ──────────────────────────────────────────────────────
+    # â”€â”€ Convenience â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def __len__(self) -> int:
         return len(self._registry)

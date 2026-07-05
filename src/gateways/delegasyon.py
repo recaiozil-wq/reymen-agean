@@ -1,27 +1,27 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-delegasyon.py — Subagent + Görev Ayrıştırma Sistemi (P2)
+delegasyon.py â€” Subagent + GÃ¶rev AyrÄ±ÅŸtÄ±rma Sistemi (P2)
 
-ReYMeN için gelişmiş delegasyon sistemi. ReYMeN legacy'deki delegate_task_tool
-ve delegate_tool pattern'lerini referans alır, ReYMeN yapısına uyarlanmıştır.
+ReYMeN iÃ§in geliÅŸmiÅŸ delegasyon sistemi. ReYMeN legacy'deki delegate_task_tool
+ve delegate_tool pattern'lerini referans alÄ±r, ReYMeN yapÄ±sÄ±na uyarlanmÄ±ÅŸtÄ±r.
 
 Desteklenen Modlar:
-    TEK     → Tek subagent'a tek görev
-    PARALEL → Birden çok subagent'a paralel görev (maks 3)
-    ZINCIR  → Subagent zinciri (çıktı → sonraki subagent girdisi)
+    TEK     â†’ Tek subagent'a tek gÃ¶rev
+    PARALEL â†’ Birden Ã§ok subagent'a paralel gÃ¶rev (maks 3)
+    ZINCIR  â†’ Subagent zinciri (Ã§Ä±ktÄ± â†’ sonraki subagent girdisi)
 
-Her subagent izole ortamda çalışır:
-    - Ayrı context window
-    - Ayrı process (subprocess veya thread pool)
+Her subagent izole ortamda Ã§alÄ±ÅŸÄ±r:
+    - AyrÄ± context window
+    - AyrÄ± process (subprocess veya thread pool)
     - Parent context'ini kirletmez
 
-Kullanım:
+KullanÄ±m:
     from reymen.ag.delegasyon import DelegasyonSistemi
 
     sistem = DelegasyonSistemi()
 
     # TEK mod
-    sonuc = sistem.delege_et(goal="Dosyayı oku", context="test.txt")
+    sonuc = sistem.delege_et(goal="DosyayÄ± oku", context="test.txt")
 
     # PARALEL mod
     sonuclar = sistem.paralel_delege(
@@ -36,14 +36,14 @@ Kullanım:
         adimlar=[
             {"goal": "Veriyi topla", "context": ""},
             {"goal": "Veriyi analiz et", "context": ""},
-            {"goal": "Rapor oluştur", "context": ""},
+            {"goal": "Rapor oluÅŸtur", "context": ""},
         ]
     )
 """
 
 from __future__ import annotations
 
-# ── Proje kokunu sys.path'e ekle (src/ altindaki moduller icin) ──
+# â”€â”€ Proje kokunu sys.path'e ekle (src/ altindaki moduller icin) â”€â”€
 import os as _os
 
 _SRC = _os.path.join(
@@ -70,10 +70,10 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 logger = logging.getLogger(__name__)
 
-# Maksimum paralel subagent sayısı
+# Maksimum paralel subagent sayÄ±sÄ±
 MAKS_PARALEL = 3
 
-# Varsayılan zaman aşımı (saniye)
+# VarsayÄ±lan zaman aÅŸÄ±mÄ± (saniye)
 ZAMAN_ASIMI = 120
 
 # Desteklenen modlar
@@ -82,14 +82,14 @@ MOD_PARALEL = "PARALEL"
 MOD_ZINCIR = "ZINCIR"
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # SubAgent
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 @dataclass
 class SubAgent:
-    """Tek bir alt-ajanı temsil eder. İzole context ve tool set'i ile çalışır."""
+    """Tek bir alt-ajanÄ± temsil eder. Ä°zole context ve tool set'i ile Ã§alÄ±ÅŸÄ±r."""
 
     id: str
     goal: str
@@ -101,9 +101,9 @@ class SubAgent:
     created_at: float = field(default_factory=time.time)
     completed_at: Optional[float] = None
     mod: str = MOD_TEK
-    sira: int = 0  # Zincirdeki sıra
+    sira: int = 0  # Zincirdeki sÄ±ra
     sure: Optional[float] = None
-    # İzole context bilgisi
+    # Ä°zole context bilgisi
     izole_context: Dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self):
@@ -142,31 +142,31 @@ class SubAgent:
     def ozet(self) -> str:
         sure_str = f"{self.sure:.1f}s" if self.sure else "?"
         ikon = {
-            "success": "✅",
-            "error": "❌",
-            "cancelled": "⛔",
-            "running": "⏳",
-            "pending": "⏸️",
-        }.get(self.status, "❓")
+            "success": "âœ…",
+            "error": "âŒ",
+            "cancelled": "â›”",
+            "running": "â³",
+            "pending": "â¸ï¸",
+        }.get(self.status, "â“")
         return f"{ikon} [{self.status[:7]}] {self.goal[:60]:60s} {sure_str:>8s}"
 
     def __repr__(self) -> str:
         return f"<SubAgent [{self.status[:4]}] {self.id[:8]} goal={self.goal[:40]}>"
 
 
-# ═══════════════════════════════════════════════════════════════════════════
-# Görev Ayrıştırıcı
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# GÃ¶rev AyrÄ±ÅŸtÄ±rÄ±cÄ±
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
-class GorevAyrıştırıcı:
-    """Karmaşık bir hedefi alt-görevlere ayırır."""
+class GorevAyrÄ±ÅŸtÄ±rÄ±cÄ±:
+    """KarmaÅŸÄ±k bir hedefi alt-gÃ¶revlere ayÄ±rÄ±r."""
 
     AYIRICI_KELIMELER = [
         "ve",
-        "ve ayrıca",
+        "ve ayrÄ±ca",
         "sonra",
-        "ardından",
+        "ardÄ±ndan",
         "and",
         "then",
         "additionally",
@@ -176,15 +176,15 @@ class GorevAyrıştırıcı:
     @classmethod
     def ayir(cls, hedef: str, context: str = "") -> List[SubAgent]:
         """
-        Hedef metnini mantıksal alt-görevlere ayırır.
+        Hedef metnini mantÄ±ksal alt-gÃ¶revlere ayÄ±rÄ±r.
 
-        Stratejiler (sırayla):
-        1. Numaralı liste (1. 2. 3. ...)
-        2. Madde işaretleri (- * •)
-        3. Satır bazlı (her satır bir görev)
-        4. Bağlaç bazlı (ve, sonra, and, then)
-        5. Cümle bazlı (nokta ile biten)
-        6. Tek parça
+        Stratejiler (sÄ±rayla):
+        1. NumaralÄ± liste (1. 2. 3. ...)
+        2. Madde iÅŸaretleri (- * â€¢)
+        3. SatÄ±r bazlÄ± (her satÄ±r bir gÃ¶rev)
+        4. BaÄŸlaÃ§ bazlÄ± (ve, sonra, and, then)
+        5. CÃ¼mle bazlÄ± (nokta ile biten)
+        6. Tek parÃ§a
         """
         if not hedef or not hedef.strip():
             return []
@@ -192,40 +192,40 @@ class GorevAyrıştırıcı:
         hedef = hedef.strip()
         import re
 
-        # Strateji 1: Numaralı liste (hem satır başı hem inline)
+        # Strateji 1: NumaralÄ± liste (hem satÄ±r baÅŸÄ± hem inline)
         numbered = re.split(r"\s+\d+[\.\)]\s+", hedef)
         numbered = [p.strip() for p in numbered if p.strip()]
         if len(numbered) >= 2:
             return cls._alt_gorevlere_cevir(numbered, context)
 
-        # Strateji 2: Madde işaretleri
+        # Strateji 2: Madde iÅŸaretleri
         bullets = []
         for line in hedef.split("\n"):
             line = line.strip()
-            if line and line[0] in ("-", "*", "•", "→", ">"):
-                bullet_text = line.lstrip("-*•→> ").strip()
+            if line and line[0] in ("-", "*", "â€¢", "â†’", ">"):
+                bullet_text = line.lstrip("-*â€¢â†’> ").strip()
                 if len(bullet_text.split()) >= 2:
                     bullets.append(bullet_text)
         if len(bullets) >= 2:
             return cls._alt_gorevlere_cevir(bullets, context)
 
-        # Strateji 3: Satır bazlı
+        # Strateji 3: SatÄ±r bazlÄ±
         lines = [l.strip() for l in hedef.split("\n") if l.strip()]
         lines = [l for l in lines if len(l.split()) >= 3 and not l.startswith("#")]
         if len(lines) >= 2:
             return cls._alt_gorevlere_cevir(lines, context)
 
-        # Strateji 4: Bağlaç bazlı
+        # Strateji 4: BaÄŸlaÃ§ bazlÄ±
         for ayirici in cls.AYIRICI_KELIMELER:
             if ayirici in hedef.lower():
                 parts = [p.strip() for p in hedef.split(ayirici) if p.strip()]
                 if len(parts) >= 2:
-                    # En az 3 kelime olan parçaları al
+                    # En az 3 kelime olan parÃ§alarÄ± al
                     parts = [p for p in parts if len(p.split()) >= 3]
                     if len(parts) >= 2:
                         return cls._alt_gorevlere_cevir(parts, context)
 
-        # Strateji 5: Cümle bazlı (uzun metinler için)
+        # Strateji 5: CÃ¼mle bazlÄ± (uzun metinler iÃ§in)
         if len(hedef) > 100:
             sentences = re.split(r"(?<=[.!?])\s+", hedef)
             sentences = [
@@ -234,7 +234,7 @@ class GorevAyrıştırıcı:
             if len(sentences) >= 2:
                 return cls._alt_gorevlere_cevir(sentences, context)
 
-        # Hiçbiri eşleşmezse: tek parça
+        # HiÃ§biri eÅŸleÅŸmezse: tek parÃ§a
         return [
             SubAgent(
                 id=str(uuid.uuid4()),
@@ -247,7 +247,7 @@ class GorevAyrıştırıcı:
     def _alt_gorevlere_cevir(
         cls, parcaciklar: List[str], context: str
     ) -> List[SubAgent]:
-        """String listesini SubAgent listesine dönüştürür."""
+        """String listesini SubAgent listesine dÃ¶nÃ¼ÅŸtÃ¼rÃ¼r."""
         import re
 
         sonuc = []
@@ -255,7 +255,7 @@ class GorevAyrıştırıcı:
             p = p.strip()
             if not p or len(p) < 3:
                 continue
-            # Baştaki numarayı temizle (örn: "1. Veri topla" → "Veri topla")
+            # BaÅŸtaki numarayÄ± temizle (Ã¶rn: "1. Veri topla" â†’ "Veri topla")
             p = re.sub(r"^\d+[\.\)]\s*", "", p).strip()
             if p and len(p) >= 3:
                 sonuc.append(
@@ -268,20 +268,20 @@ class GorevAyrıştırıcı:
         return sonuc
 
 
-# ═══════════════════════════════════════════════════════════════════════════
-# SubAgent Çalıştırıcı
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# SubAgent Ã‡alÄ±ÅŸtÄ±rÄ±cÄ±
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class SubAgentCalistirici:
     """
-    SubAgent'ı izole ortamda çalıştırır.
+    SubAgent'Ä± izole ortamda Ã§alÄ±ÅŸtÄ±rÄ±r.
 
-    İki mod:
-    - subprocess: Tam izolasyon (ayrı process, ayrı memory)
-    - thread: Hafif, aynı process içinde (paylaşımlı memory)
+    Ä°ki mod:
+    - subprocess: Tam izolasyon (ayrÄ± process, ayrÄ± memory)
+    - thread: Hafif, aynÄ± process iÃ§inde (paylaÅŸÄ±mlÄ± memory)
 
-    Her subagent kendi context window ve tool set'i ile çalışır.
+    Her subagent kendi context window ve tool set'i ile Ã§alÄ±ÅŸÄ±r.
     Parent context'ini kirletmez.
     """
 
@@ -289,7 +289,7 @@ class SubAgentCalistirici:
         """
         Args:
             runner_script: subagent_runner.py yolu (None = otomatik)
-            mod: "subprocess" (önerilen) veya "thread"
+            mod: "subprocess" (Ã¶nerilen) veya "thread"
         """
         if runner_script:
             self._runner = Path(runner_script)
@@ -299,14 +299,14 @@ class SubAgentCalistirici:
 
     def calistir(self, agent: SubAgent, timeout: int = ZAMAN_ASIMI) -> SubAgent:
         """
-        SubAgent'ı çalıştırır ve sonucu doldurur.
+        SubAgent'Ä± Ã§alÄ±ÅŸtÄ±rÄ±r ve sonucu doldurur.
 
         Args:
-            agent: Çalıştırılacak SubAgent
-            timeout: Zaman aşımı süresi
+            agent: Ã‡alÄ±ÅŸtÄ±rÄ±lacak SubAgent
+            timeout: Zaman aÅŸÄ±mÄ± sÃ¼resi
 
         Returns:
-            Güncellenmiş SubAgent
+            GÃ¼ncellenmiÅŸ SubAgent
         """
         agent.status = "running"
         baslangic = time.time()
@@ -319,10 +319,10 @@ class SubAgentCalistirici:
     def _subprocess_calistir(
         self, agent: SubAgent, timeout: int, baslangic: float
     ) -> SubAgent:
-        """Subprocess ile tam izole çalıştırma."""
+        """Subprocess ile tam izole Ã§alÄ±ÅŸtÄ±rma."""
         if not self._runner.exists():
             agent.status = "error"
-            agent.error = f"Runner script bulunamadı: {self._runner}"
+            agent.error = f"Runner script bulunamadÄ±: {self._runner}"
             agent.result = agent.error
             agent.completed_at = time.time()
             agent.sure = round(agent.completed_at - baslangic, 2)
@@ -341,7 +341,7 @@ class SubAgentCalistirici:
                 ensure_ascii=False,
             )
 
-            # İzole ortam: ayrı process, temiz env
+            # Ä°zole ortam: ayrÄ± process, temiz env
             izole_env = os.environ.copy()
             izole_env["SUBAGENT_ID"] = agent.id
             izole_env["SUBAGENT_GOAL"] = agent.goal[:200]
@@ -361,7 +361,7 @@ class SubAgentCalistirici:
             if proc.returncode != 0:
                 agent.status = "error"
                 stderr_text = stderr[:500] if stderr else ""
-                agent.error = f"Çıkış kodu: {proc.returncode}\n{stderr_text}"
+                agent.error = f"Ã‡Ä±kÄ±ÅŸ kodu: {proc.returncode}\n{stderr_text}"
                 agent.result = agent.error
                 agent.completed_at = time.time()
                 agent.sure = round(agent.completed_at - baslangic, 2)
@@ -392,14 +392,14 @@ class SubAgentCalistirici:
                         "[SessizExcept] %%s: %%s", type(_e).__name__, _e
                     )
             agent.status = "error"
-            agent.error = f"Zaman aşımı ({timeout}s)"
+            agent.error = f"Zaman aÅŸÄ±mÄ± ({timeout}s)"
             agent.result = agent.error
             agent.completed_at = time.time()
             agent.sure = round(agent.completed_at - baslangic, 2)
             logger.warning(f"[SubAgent {agent.id[:8]}] {agent.error}")
         except Exception as e:
             agent.status = "error"
-            agent.error = f"Runner hatası: {type(e).__name__}: {e}"
+            agent.error = f"Runner hatasÄ±: {type(e).__name__}: {e}"
             agent.result = agent.error
             agent.completed_at = time.time()
             agent.sure = round(agent.completed_at - baslangic, 2)
@@ -410,9 +410,9 @@ class SubAgentCalistirici:
     def _thread_calistir(
         self, agent: SubAgent, timeout: int, baslangic: float
     ) -> SubAgent:
-        """Thread ile hafif çalıştırma (daha hızlı, daha az izole)."""
+        """Thread ile hafif Ã§alÄ±ÅŸtÄ±rma (daha hÄ±zlÄ±, daha az izole)."""
         try:
-            # Thread içinde çalışacak işlev
+            # Thread iÃ§inde Ã§alÄ±ÅŸacak iÅŸlev
             def _gorev():
                 try:
                     # subagent_runner.py'deki run fonksiyonunu import et
@@ -429,19 +429,19 @@ class SubAgentCalistirici:
                             sonuc = mod.run(agent.goal, agent.context)
                             return sonuc
 
-                    # Fallback: basit simülasyon
+                    # Fallback: basit simÃ¼lasyon
                     return {
                         "status": "success",
-                        "result": f"[SubAgent] {agent.goal[:100]} tamamlandı (thread)",
+                        "result": f"[SubAgent] {agent.goal[:100]} tamamlandÄ± (thread)",
                     }
                 except Exception as e:
                     return {
                         "status": "error",
-                        "result": f"Thread hatası: {type(e).__name__}: {e}",
+                        "result": f"Thread hatasÄ±: {type(e).__name__}: {e}",
                     }
 
-            # Thread'de çalıştır
-            sonuc = {"status": "error", "result": "Zaman aşımı"}
+            # Thread'de Ã§alÄ±ÅŸtÄ±r
+            sonuc = {"status": "error", "result": "Zaman aÅŸÄ±mÄ±"}
 
             def _thread_hedefi():
                 nonlocal sonuc
@@ -460,7 +460,7 @@ class SubAgentCalistirici:
 
         except Exception as e:
             agent.status = "error"
-            agent.error = f"Thread hatası: {type(e).__name__}: {e}"
+            agent.error = f"Thread hatasÄ±: {type(e).__name__}: {e}"
             agent.result = agent.error
 
         agent.completed_at = time.time()
@@ -468,22 +468,22 @@ class SubAgentCalistirici:
         return agent
 
 
-# ═══════════════════════════════════════════════════════════════════════════
-# Delegasyon Sistemi (Ana Sınıf)
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# Delegasyon Sistemi (Ana SÄ±nÄ±f)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class DelegasyonSistemi:
     """
-    Subagent oluşturma, görev devretme ve sonuç toplama sistemi.
+    Subagent oluÅŸturma, gÃ¶rev devretme ve sonuÃ§ toplama sistemi.
 
-    Özellikler:
-    - Subagent oluşturma (her biri kendi context + tool set'i ile)
-    - Görev devretme (goal + context + toolsets)
-    - Subagent izolasyonu (ayrı context window, ayrı process)
+    Ã–zellikler:
+    - Subagent oluÅŸturma (her biri kendi context + tool set'i ile)
+    - GÃ¶rev devretme (goal + context + toolsets)
+    - Subagent izolasyonu (ayrÄ± context window, ayrÄ± process)
     - Maksimum 3 paralel subagent
-    - Sonuç toplama ve raporlama
-    - TEK / PARALEL / ZINCIR modları
+    - SonuÃ§ toplama ve raporlama
+    - TEK / PARALEL / ZINCIR modlarÄ±
     """
 
     def __init__(self, calistirici: Optional[SubAgentCalistirici] = None):
@@ -494,7 +494,7 @@ class DelegasyonSistemi:
             max_workers=MAKS_PARALEL, thread_name_prefix="subagent"
         )
 
-    # ── TEK Mod ─────────────────────────────────────────────────────────
+    # â”€â”€ TEK Mod â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def delege_et(
         self,
@@ -504,16 +504,16 @@ class DelegasyonSistemi:
         timeout: int = ZAMAN_ASIMI,
     ) -> SubAgent:
         """
-        TEK mod: Tek bir subagent oluşturup çalıştırır.
+        TEK mod: Tek bir subagent oluÅŸturup Ã§alÄ±ÅŸtÄ±rÄ±r.
 
         Args:
-            goal: Subagent'ın hedefi
-            context: Bağlam bilgisi
-            toolsets: İzin verilen tool set'leri
-            timeout: Zaman aşımı süresi
+            goal: Subagent'Ä±n hedefi
+            context: BaÄŸlam bilgisi
+            toolsets: Ä°zin verilen tool set'leri
+            timeout: Zaman aÅŸÄ±mÄ± sÃ¼resi
 
         Returns:
-            Çalıştırılmış SubAgent
+            Ã‡alÄ±ÅŸtÄ±rÄ±lmÄ±ÅŸ SubAgent
         """
         agent = SubAgent(
             id=str(uuid.uuid4()),
@@ -526,33 +526,33 @@ class DelegasyonSistemi:
         with self._lock:
             self._agentler[agent.id] = agent
 
-        logger.info(f"[Delegasyon] TEK: {agent.id[:8]} → {goal[:60]}")
+        logger.info(f"[Delegasyon] TEK: {agent.id[:8]} â†’ {goal[:60]}")
         self._calistirici.calistir(agent, timeout=timeout)
         return agent
 
-    # ── PARALEL Mod ─────────────────────────────────────────────────────
+    # â”€â”€ PARALEL Mod â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def paralel_delege(
         self, gorevler: List[Dict[str, Any]], timeout: int = ZAMAN_ASIMI
     ) -> List[SubAgent]:
         """
-        PARALEL mod: Birden çok subagent'ı paralel çalıştırır (maks 3).
+        PARALEL mod: Birden Ã§ok subagent'Ä± paralel Ã§alÄ±ÅŸtÄ±rÄ±r (maks 3).
 
         Args:
-            gorevler: Görev listesi. Her biri:
+            gorevler: GÃ¶rev listesi. Her biri:
                 {
                     "goal": "hedef metni",
-                    "context": "bağlam",
+                    "context": "baÄŸlam",
                     "toolsets": ["tool1", "tool2"],
                 }
-            timeout: Her subagent için zaman aşımı
+            timeout: Her subagent iÃ§in zaman aÅŸÄ±mÄ±
 
         Returns:
-            Çalıştırılmış SubAgent listesi
+            Ã‡alÄ±ÅŸtÄ±rÄ±lmÄ±ÅŸ SubAgent listesi
         """
         if len(gorevler) > MAKS_PARALEL:
             logger.warning(
-                f"[Delegasyon] PARALEL: {len(gorevler)} görev maksimum {MAKS_PARALEL}'e düşürüldü"
+                f"[Delegasyon] PARALEL: {len(gorevler)} gÃ¶rev maksimum {MAKS_PARALEL}'e dÃ¼ÅŸÃ¼rÃ¼ldÃ¼"
             )
             gorevler = gorevler[:MAKS_PARALEL]
 
@@ -569,9 +569,9 @@ class DelegasyonSistemi:
                 self._agentler[agent.id] = agent
             agentler.append(agent)
 
-        logger.info(f"[Delegasyon] PARALEL: {len(agentler)} subagent başlatılıyor")
+        logger.info(f"[Delegasyon] PARALEL: {len(agentler)} subagent baÅŸlatÄ±lÄ±yor")
 
-        # ThreadPoolExecutor ile paralel çalıştır
+        # ThreadPoolExecutor ile paralel Ã§alÄ±ÅŸtÄ±r
         futurelar: Dict[Future, SubAgent] = {}
         for agent in agentler:
             future = self._thread_pool.submit(
@@ -579,41 +579,41 @@ class DelegasyonSistemi:
             )
             futurelar[future] = agent
 
-        # Sonuçları topla
+        # SonuÃ§larÄ± topla
         for future in as_completed(futurelar):
             agent = futurelar[future]
             try:
-                future.result()  # agent zaten güncellendi
+                future.result()  # agent zaten gÃ¼ncellendi
             except Exception as e:
                 agent.status = "error"
-                agent.error = f"Paralel çalıştırma hatası: {e}"
+                agent.error = f"Paralel Ã§alÄ±ÅŸtÄ±rma hatasÄ±: {e}"
                 agent.result = agent.error
                 agent.completed_at = time.time()
-                logger.error(f"[Delegasyon] PARALEL hata: {agent.id[:8]} → {e}")
+                logger.error(f"[Delegasyon] PARALEL hata: {agent.id[:8]} â†’ {e}")
 
         basarili = sum(1 for a in agentler if a.basarili_mi())
-        logger.info(f"[Delegasyon] PARALEL tamam: {basarili}/{len(agentler)} başarılı")
+        logger.info(f"[Delegasyon] PARALEL tamam: {basarili}/{len(agentler)} baÅŸarÄ±lÄ±")
         return agentler
 
-    # ── ZINCIR Mod ─────────────────────────────────────────────────────
+    # â”€â”€ ZINCIR Mod â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def zincir_delege(
         self, adimlar: List[Dict[str, Any]], timeout: int = ZAMAN_ASIMI
     ) -> List[SubAgent]:
         """
-        ZINCIR mod: Subagent zinciri. Her adımın çıktısı bir sonraki adıma girdi olur.
+        ZINCIR mod: Subagent zinciri. Her adÄ±mÄ±n Ã§Ä±ktÄ±sÄ± bir sonraki adÄ±ma girdi olur.
 
         Args:
-            adimlar: Adım listesi. Her biri:
+            adimlar: AdÄ±m listesi. Her biri:
                 {
                     "goal": "hedef metni",
-                    "context": "başlangıç bağlamı",
+                    "context": "baÅŸlangÄ±Ã§ baÄŸlamÄ±",
                     "toolsets": ["tool1"],
                 }
-            timeout: Her adım için zaman aşımı
+            timeout: Her adÄ±m iÃ§in zaman aÅŸÄ±mÄ±
 
         Returns:
-            Çalıştırılmış SubAgent listesi
+            Ã‡alÄ±ÅŸtÄ±rÄ±lmÄ±ÅŸ SubAgent listesi
         """
         agentler = []
         onceki_sonuc = ""
@@ -623,12 +623,12 @@ class DelegasyonSistemi:
             base_context = adim.get("context", "")
             toolsets = adim.get("toolsets", [])
 
-            # Zincir: önceki adımın çıktısını context'e ekle
+            # Zincir: Ã¶nceki adÄ±mÄ±n Ã§Ä±ktÄ±sÄ±nÄ± context'e ekle
             zincir_context = base_context
             if onceki_sonuc:
                 if zincir_context:
                     zincir_context += "\n\n"
-                zincir_context += f"[ÖNCEKİ ADIM ÇIKTISI]\n{onceki_sonuc[:1000]}"
+                zincir_context += f"[Ã–NCEKÄ° ADIM Ã‡IKTISI]\n{onceki_sonuc[:1000]}"
 
             agent = SubAgent(
                 id=str(uuid.uuid4()),
@@ -644,47 +644,47 @@ class DelegasyonSistemi:
             agentler.append(agent)
 
             logger.info(
-                f"[Delegasyon] ZINCIR adım {sira}/{len(adimlar)}: {agent.id[:8]} → {goal[:40]}"
+                f"[Delegasyon] ZINCIR adÄ±m {sira}/{len(adimlar)}: {agent.id[:8]} â†’ {goal[:40]}"
             )
             self._calistirici.calistir(agent, timeout=timeout)
 
-            # Zincir: sonucu bir sonraki adıma aktar
+            # Zincir: sonucu bir sonraki adÄ±ma aktar
             if agent.basarili_mi():
                 onceki_sonuc = agent.result
             else:
                 onceki_sonuc = f"[HATA: {agent.error}]"
                 logger.warning(
-                    f"[Delegasyon] ZINCIR adım {sira} başarısız, zincir devam ediyor..."
+                    f"[Delegasyon] ZINCIR adÄ±m {sira} baÅŸarÄ±sÄ±z, zincir devam ediyor..."
                 )
 
         basarili = sum(1 for a in agentler if a.basarili_mi())
-        logger.info(f"[Delegasyon] ZINCIR tamam: {basarili}/{len(adimlar)} başarılı")
+        logger.info(f"[Delegasyon] ZINCIR tamam: {basarili}/{len(adimlar)} baÅŸarÄ±lÄ±")
         return agentler
 
-    # ── Görev Ayrıştırma + Otomatik Delegasyon ──────────────────────────
+    # â”€â”€ GÃ¶rev AyrÄ±ÅŸtÄ±rma + Otomatik Delegasyon â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def ayir_ve_delege_et(
         self, hedef: str, context: str = "", mod: str = MOD_TEK
     ) -> List[SubAgent]:
         """
-        Hedefi otomatik ayrıştırır ve belirtilen modda çalıştırır.
+        Hedefi otomatik ayrÄ±ÅŸtÄ±rÄ±r ve belirtilen modda Ã§alÄ±ÅŸtÄ±rÄ±r.
 
         Args:
-            hedef: Karmaşık hedef metni
-            context: Bağlam bilgisi
-            mod: Çalıştırma modu (TEK, PARALEL, ZINCIR)
+            hedef: KarmaÅŸÄ±k hedef metni
+            context: BaÄŸlam bilgisi
+            mod: Ã‡alÄ±ÅŸtÄ±rma modu (TEK, PARALEL, ZINCIR)
 
         Returns:
-            Çalıştırılmış SubAgent listesi
+            Ã‡alÄ±ÅŸtÄ±rÄ±lmÄ±ÅŸ SubAgent listesi
         """
-        alt_gorevler = GorevAyrıştırıcı.ayir(hedef, context)
+        alt_gorevler = GorevAyrÄ±ÅŸtÄ±rÄ±cÄ±.ayir(hedef, context)
 
         if not alt_gorevler:
-            logger.warning("[Delegasyon] Ayrıştırma sonucu boş, TEK olarak dene")
+            logger.warning("[Delegasyon] AyrÄ±ÅŸtÄ±rma sonucu boÅŸ, TEK olarak dene")
             return [self.delege_et(hedef, context)]
 
         if len(alt_gorevler) == 1:
-            # Tek görev → TEK mod
+            # Tek gÃ¶rev â†’ TEK mod
             self._calistirici.calistir(alt_gorevler[0])
             return alt_gorevler
 
@@ -705,12 +705,12 @@ class DelegasyonSistemi:
             return self.zincir_delege(adim_dicts)
 
         else:
-            # TEK mod (her birini sırayla çalıştır)
+            # TEK mod (her birini sÄ±rayla Ã§alÄ±ÅŸtÄ±r)
             for agent in alt_gorevler:
                 self._calistirici.calistir(agent)
             return alt_gorevler
 
-    # ── Sorgulama ──────────────────────────────────────────────────────
+    # â”€â”€ Sorgulama â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def get(self, agent_id: str) -> Optional[SubAgent]:
         """ID ile subagent durumunu getirir."""
@@ -718,14 +718,14 @@ class DelegasyonSistemi:
             return self._agentler.get(agent_id)
 
     def aktif_listele(self) -> List[SubAgent]:
-        """Aktif (çalışan/bekleyen) subagent'ları listeler."""
+        """Aktif (Ã§alÄ±ÅŸan/bekleyen) subagent'larÄ± listeler."""
         with self._lock:
             return [
                 a for a in self._agentler.values() if a.status in ("pending", "running")
             ]
 
     def tamamlanan_listele(self) -> List[SubAgent]:
-        """Tamamlanmış subagent'ları listeler."""
+        """TamamlanmÄ±ÅŸ subagent'larÄ± listeler."""
         with self._lock:
             return [
                 a
@@ -734,30 +734,30 @@ class DelegasyonSistemi:
             ]
 
     def tumu_listele(self) -> List[SubAgent]:
-        """Tüm subagent'ları listeler."""
+        """TÃ¼m subagent'larÄ± listeler."""
         with self._lock:
             return list(self._agentler.values())
 
-    # ── İptal ──────────────────────────────────────────────────────────
+    # â”€â”€ Ä°ptal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def iptal_et(self, agent_id: str) -> bool:
-        """Subagent'ı iptal eder."""
+        """Subagent'Ä± iptal eder."""
         with self._lock:
             agent = self._agentler.get(agent_id)
             if not agent:
-                logger.warning(f"[Delegasyon] İptal: {agent_id[:8]} bulunamadı")
+                logger.warning(f"[Delegasyon] Ä°ptal: {agent_id[:8]} bulunamadÄ±")
                 return False
             if agent.status in ("pending", "running"):
                 agent.status = "cancelled"
                 agent.completed_at = time.time()
-                agent.result = "İptal edildi"
-                agent.error = "Kullanıcı tarafından iptal"
-                logger.info(f"[Delegasyon] İptal edildi: {agent_id[:8]}")
+                agent.result = "Ä°ptal edildi"
+                agent.error = "KullanÄ±cÄ± tarafÄ±ndan iptal"
+                logger.info(f"[Delegasyon] Ä°ptal edildi: {agent_id[:8]}")
                 return True
             return False
 
     def hepsini_iptal_et(self) -> int:
-        """Tüm aktif subagent'ları iptal eder."""
+        """TÃ¼m aktif subagent'larÄ± iptal eder."""
         sayac = 0
         with self._lock:
             for agent in list(self._agentler.values()):
@@ -770,7 +770,7 @@ class DelegasyonSistemi:
             logger.info(f"[Delegasyon] {sayac} subagent toplu iptal edildi")
         return sayac
 
-    # ── İstatistik ve Raporlama ────────────────────────────────────────
+    # â”€â”€ Ä°statistik ve Raporlama â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def istatistik(self) -> Dict[str, Any]:
         """Delegasyon sistemi istatistikleri."""
@@ -783,7 +783,7 @@ class DelegasyonSistemi:
                     "basarili": 0,
                     "hata": 0,
                     "iptal": 0,
-                    "basarı_orani": 0.0,
+                    "basarÄ±_orani": 0.0,
                     "ortalama_sure": 0.0,
                     "mod_dagilimi": {},
                 }
@@ -818,7 +818,7 @@ class DelegasyonSistemi:
                 "basarili": basarili,
                 "hata": durum_sayaci.get("error", 0),
                 "iptal": durum_sayaci.get("cancelled", 0),
-                "basarı_orani": round(basarili / tamamlanan_toplam * 100, 1)
+                "basarÄ±_orani": round(basarili / tamamlanan_toplam * 100, 1)
                 if tamamlanan_toplam > 0
                 else 0.0,
                 "ortalama_sure": round(toplam_sure / tamamlanan, 2)
@@ -828,25 +828,25 @@ class DelegasyonSistemi:
             }
 
     def rapor(self) -> str:
-        """İnsan okunabilir delegasyon raporu üretir."""
+        """Ä°nsan okunabilir delegasyon raporu Ã¼retir."""
         stats = self.istatistik()
         if stats["total"] == 0:
-            return "[Delegasyon Raporu]\nHenüz hiç subagent çalıştırılmamış."
+            return "[Delegasyon Raporu]\nHenÃ¼z hiÃ§ subagent Ã§alÄ±ÅŸtÄ±rÄ±lmamÄ±ÅŸ."
 
         lines = [
             "=" * 60,
-            "📋 DELEGASYON RAPORU",
+            "ğŸ“‹ DELEGASYON RAPORU",
             "=" * 60,
             f"  Toplam Subagent: {stats['total']}",
             f"  Aktif:           {stats['aktif']}",
-            f"  Başarılı:        {stats['basarili']}",
-            f"  Hatalı:          {stats['hata']}",
-            f"  İptal:           {stats['iptal']}",
-            f"  Başarı Oranı:    %{stats['basarı_orani']}",
-            f"  Ortalama Süre:   {stats['ortalama_sure']}s",
-            f"  Mod Dağılımı:    {stats['mod_dagilimi']}",
+            f"  BaÅŸarÄ±lÄ±:        {stats['basarili']}",
+            f"  HatalÄ±:          {stats['hata']}",
+            f"  Ä°ptal:           {stats['iptal']}",
+            f"  BaÅŸarÄ± OranÄ±:    %{stats['basarÄ±_orani']}",
+            f"  Ortalama SÃ¼re:   {stats['ortalama_sure']}s",
+            f"  Mod DaÄŸÄ±lÄ±mÄ±:    {stats['mod_dagilimi']}",
             "",
-            "  ── Subagent Listesi ──",
+            "  â”€â”€ Subagent Listesi â”€â”€",
         ]
 
         with self._lock:
@@ -858,7 +858,7 @@ class DelegasyonSistemi:
         lines.extend(
             [
                 "",
-                f"  ({min(len(self._agentler), 20)}/{len(self._agentler)} gösteriliyor)",
+                f"  ({min(len(self._agentler), 20)}/{len(self._agentler)} gÃ¶steriliyor)",
                 "=" * 60,
             ]
         )
@@ -866,7 +866,7 @@ class DelegasyonSistemi:
         return "\n".join(lines)
 
     def temizle(self) -> int:
-        """Tamamlanmış tüm subagent'ları temizler."""
+        """TamamlanmÄ±ÅŸ tÃ¼m subagent'larÄ± temizler."""
         silinecek = []
         with self._lock:
             silinecek = [
@@ -880,16 +880,16 @@ class DelegasyonSistemi:
         return len(silinecek)
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Singletons
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 _DELEGASYON_SISTEMI: Optional[DelegasyonSistemi] = None
 _sistem_lock = threading.Lock()
 
 
 def sistem_al() -> DelegasyonSistemi:
-    """Singleton DelegasyonSistemi döndürür."""
+    """Singleton DelegasyonSistemi dÃ¶ndÃ¼rÃ¼r."""
     global _DELEGASYON_SISTEMI
     if _DELEGASYON_SISTEMI is None:
         with _sistem_lock:
@@ -898,7 +898,7 @@ def sistem_al() -> DelegasyonSistemi:
     return _DELEGASYON_SISTEMI
 
 
-# ── Conversation Loop Entegrasyonu (Hermes-level subagent) ─────────────
+# â”€â”€ Conversation Loop Entegrasyonu (ReYMeN-level subagent) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def subagent_olarak_calistir(
@@ -910,7 +910,7 @@ def subagent_olarak_calistir(
 ) -> Dict[str, Any]:
     """Subagent'i conversation_loop seviyesinde calistirir.
 
-    Hermes'teki ``delegate_task`` gibi calisir:
+    ReYMeN'teki ``delegate_task`` gibi calisir:
     - SubAgent olustur
     - Konusma dongusu ile calistir (motor+beyin uzerinden)
     - Sonucu dict olarak dondur
@@ -1049,99 +1049,99 @@ def paralel_subagent_calistir(
     return sonuclar
 
 
-# ═══════════════════════════════════════════════════════════════════════════
-# Motor Araçları
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# Motor AraÃ§larÄ±
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def motor_kaydet(motor) -> None:
     """
-    Motor'a delegasyon araçlarını kaydeder.
+    Motor'a delegasyon araÃ§larÄ±nÄ± kaydeder.
 
-    Kaydettiği araçlar:
-        - DELEGE_ET: TEK mod - tek subagent'a görev devret
+    KaydettiÄŸi araÃ§lar:
+        - DELEGE_ET: TEK mod - tek subagent'a gÃ¶rev devret
         - DELEGE_PARALEL: PARALEL mod - paralel subagent'lar
         - DELEGE_ZINCIR: ZINCIR mod - zincirleme subagent'lar
-        - DELEGE_AYRISTIR: Hedefi otomatik ayrıştır + delegasyon
+        - DELEGE_AYRISTIR: Hedefi otomatik ayrÄ±ÅŸtÄ±r + delegasyon
         - DELEGE_DURUM: Delegasyon sistemi durumu
         - DELEGE_IPTAL: Subagent iptal
-        - DELEGE_TEMIZLE: Tamamlanan subagent'ları temizle
+        - DELEGE_TEMIZLE: Tamamlanan subagent'larÄ± temizle
     """
     sistem = sistem_al()
 
     motor._plugin_arac_kaydet(
         "DELEGE_ET",
         _delege_et_araci,
-        "DELEGE_ET(goal, context, toolsets) — Tek subagent'a görev devret. "
-        "Parametreler: goal=hedef_metni (zorunlu), context=bağlam (opsiyonel), "
-        "toolsets=izinli_araç_listesi (virgülle ayrılmış, opsiyonel). "
-        "Örnek: DELEGE_ET(goal='Dosyayı oku ve özet çıkar', context='veri.txt')",
+        "DELEGE_ET(goal, context, toolsets) â€” Tek subagent'a gÃ¶rev devret. "
+        "Parametreler: goal=hedef_metni (zorunlu), context=baÄŸlam (opsiyonel), "
+        "toolsets=izinli_araÃ§_listesi (virgÃ¼lle ayrÄ±lmÄ±ÅŸ, opsiyonel). "
+        "Ã–rnek: DELEGE_ET(goal='DosyayÄ± oku ve Ã¶zet Ã§Ä±kar', context='veri.txt')",
     )
 
     motor._plugin_arac_kaydet(
         "DELEGE_PARALEL",
         _delege_paralel_araci,
-        "DELEGE_PARALEL(gorev1|gorev2|gorev3) — Paralel subagent'lar (maks 3). "
-        "Parametre: gorev1|gorev2|gorev3 formatında '|' ile ayrılmış görevler. "
-        "Her görev: 'goal:hedef|context:bağlam' formatında. "
-        "Örnek: DELEGE_PARALEL(gorev1='goal:Ara|context:konu_A', "
-        "gorev2='goal:Ozet çıkar|context:konu_B')",
+        "DELEGE_PARALEL(gorev1|gorev2|gorev3) â€” Paralel subagent'lar (maks 3). "
+        "Parametre: gorev1|gorev2|gorev3 formatÄ±nda '|' ile ayrÄ±lmÄ±ÅŸ gÃ¶revler. "
+        "Her gÃ¶rev: 'goal:hedef|context:baÄŸlam' formatÄ±nda. "
+        "Ã–rnek: DELEGE_PARALEL(gorev1='goal:Ara|context:konu_A', "
+        "gorev2='goal:Ozet Ã§Ä±kar|context:konu_B')",
     )
 
     motor._plugin_arac_kaydet(
         "DELEGE_ZINCIR",
         _delege_zincir_araci,
-        "DELEGE_ZINCIR(adim1, adim2, adim3) — Zincirleme subagent'lar. "
-        "Her adımın çıktısı sonraki adıma girdi olur. "
-        "Parametre: adim1=hedef1, adim2=hedef2, adim3=hedef3 şeklinde. "
-        "Örnek: DELEGE_ZINCIR(adim1='Veri topla', adim2='Veriyi analiz et', "
-        "adim3='Rapor oluştur')",
+        "DELEGE_ZINCIR(adim1, adim2, adim3) â€” Zincirleme subagent'lar. "
+        "Her adÄ±mÄ±n Ã§Ä±ktÄ±sÄ± sonraki adÄ±ma girdi olur. "
+        "Parametre: adim1=hedef1, adim2=hedef2, adim3=hedef3 ÅŸeklinde. "
+        "Ã–rnek: DELEGE_ZINCIR(adim1='Veri topla', adim2='Veriyi analiz et', "
+        "adim3='Rapor oluÅŸtur')",
     )
 
     motor._plugin_arac_kaydet(
         "DELEGE_AYRISTIR",
         _delege_ayristir_araci,
-        "DELEGE_AYRISTIR(hedef, mod, context) — Hedefi otomatik ayrıştır ve "
-        "belirtilen modda çalıştır. Parametreler: hedef=karmaşık_hedef (zorunlu), "
-        "mod=TEK|PARALEL|ZINCIR (opsiyonel, varsayılan: PARALEL), "
-        "context=bağlam (opsiyonel). "
-        "Örnek: DELEGE_AYRISTIR(hedef='1. Veri topla 2. Analiz et 3. Rapor yaz', "
+        "DELEGE_AYRISTIR(hedef, mod, context) â€” Hedefi otomatik ayrÄ±ÅŸtÄ±r ve "
+        "belirtilen modda Ã§alÄ±ÅŸtÄ±r. Parametreler: hedef=karmaÅŸÄ±k_hedef (zorunlu), "
+        "mod=TEK|PARALEL|ZINCIR (opsiyonel, varsayÄ±lan: PARALEL), "
+        "context=baÄŸlam (opsiyonel). "
+        "Ã–rnek: DELEGE_AYRISTIR(hedef='1. Veri topla 2. Analiz et 3. Rapor yaz', "
         "mod='ZINCIR')",
     )
 
     motor._plugin_arac_kaydet(
         "DELEGE_DURUM",
         _delege_durum_araci,
-        "DELEGE_DURUM() — Delegasyon sistemi durumunu gösterir: "
-        "toplam subagent sayısı, başarı/başarısızlık oranları, aktif görevler.",
+        "DELEGE_DURUM() â€” Delegasyon sistemi durumunu gÃ¶sterir: "
+        "toplam subagent sayÄ±sÄ±, baÅŸarÄ±/baÅŸarÄ±sÄ±zlÄ±k oranlarÄ±, aktif gÃ¶revler.",
     )
 
     motor._plugin_arac_kaydet(
         "DELEGE_IPTAL",
         _delege_iptal_araci,
-        "DELEGE_IPTAL(agent_id) — Belirtilen subagent'ı iptal eder. "
-        "Parametre: agent_id=subagent_id (zorunlu, DELEGE_DURUM'dan alınır). "
-        "Örnek: DELEGE_IPTAL(agent_id='abc-1234')",
+        "DELEGE_IPTAL(agent_id) â€” Belirtilen subagent'Ä± iptal eder. "
+        "Parametre: agent_id=subagent_id (zorunlu, DELEGE_DURUM'dan alÄ±nÄ±r). "
+        "Ã–rnek: DELEGE_IPTAL(agent_id='abc-1234')",
     )
 
     motor._plugin_arac_kaydet(
         "DELEGE_TEMIZLE",
         _delege_temizle_araci,
-        "DELEGE_TEMIZLE() — Tamamlanmış tüm subagent'ları bellekten temizler.",
+        "DELEGE_TEMIZLE() â€” TamamlanmÄ±ÅŸ tÃ¼m subagent'larÄ± bellekten temizler.",
     )
 
     logger.info(
-        "[Delegasyon] Motor'a 7 araç kaydedildi: "
+        "[Delegasyon] Motor'a 7 araÃ§ kaydedildi: "
         "DELEGE_ET, DELEGE_PARALEL, DELEGE_ZINCIR, "
         "DELEGE_AYRISTIR, DELEGE_DURUM, DELEGE_IPTAL, DELEGE_TEMIZLE"
     )
 
 
-# ── Araç İşlevleri ─────────────────────────────────────────────────────
+# â”€â”€ AraÃ§ Ä°ÅŸlevleri â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _delege_et_araci(**kw) -> str:
-    """DELEGE_ET aracı: tek subagent'a görev devret."""
+    """DELEGE_ET aracÄ±: tek subagent'a gÃ¶rev devret."""
     args = kw.get("args", [])
     goal = args[0] if args else kw.get("goal", "")
     context = args[1] if len(args) > 1 else kw.get("context", "")
@@ -1156,23 +1156,23 @@ def _delege_et_araci(**kw) -> str:
 
     sure_str = f"{agent.sure:.1f}s" if agent.sure else "?"
     return (
-        f"[DELEGE_ET] Subagent tamamlandı\n"
+        f"[DELEGE_ET] Subagent tamamlandÄ±\n"
         f"  ID:     {agent.id}\n"
         f"  Hedef:  {agent.goal[:80]}\n"
-        f"  Durum:  {'✅ Başarılı' if agent.basarili_mi() else '❌ Hata'}\n"
-        f"  Süre:   {sure_str}\n"
-        f"  Sonuç:\n{agent.result[:600]}"
+        f"  Durum:  {'âœ… BaÅŸarÄ±lÄ±' if agent.basarili_mi() else 'âŒ Hata'}\n"
+        f"  SÃ¼re:   {sure_str}\n"
+        f"  SonuÃ§:\n{agent.result[:600]}"
     )
 
 
 def _delege_paralel_araci(**kw) -> str:
-    """DELEGE_PARALEL aracı: paralel subagent'lar."""
+    """DELEGE_PARALEL aracÄ±: paralel subagent'lar."""
     # Parametreleri topla
     gorevler = []
     for i in range(1, MAKS_PARALEL + 1):
         gorev_str = kw.get(f"gorev{i}", "")
         if gorev_str:
-            # Format: "goal:hedef|context:bağlam" veya düz metin
+            # Format: "goal:hedef|context:baÄŸlam" veya dÃ¼z metin
             parcalar = gorev_str.split("|")
             goal = ""
             context = ""
@@ -1182,7 +1182,7 @@ def _delege_paralel_araci(**kw) -> str:
                 elif p.startswith("context:"):
                     context = p[8:].strip()
             if not goal:
-                goal = gorev_str  # düz metin
+                goal = gorev_str  # dÃ¼z metin
             gorevler.append({"goal": goal, "context": context})
 
     # args'den de dene
@@ -1193,7 +1193,7 @@ def _delege_paralel_araci(**kw) -> str:
                 gorevler.append({"goal": arg, "context": ""})
 
     if not gorevler:
-        return "[HATA] DELEGE_PARALEL: En az bir görev gerekli"
+        return "[HATA] DELEGE_PARALEL: En az bir gÃ¶rev gerekli"
 
     sistem = sistem_al()
     agentler = sistem.paralel_delege(gorevler)
@@ -1202,26 +1202,26 @@ def _delege_paralel_araci(**kw) -> str:
     hatali = sum(1 for a in agentler if a.status == "error")
 
     lines = [
-        f"[DELEGE_PARALEL] {len(agentler)} subagent paralel çalıştı",
-        f"  ✅ Başarılı: {basarili}  ❌ Hatalı: {hatali}",
+        f"[DELEGE_PARALEL] {len(agentler)} subagent paralel Ã§alÄ±ÅŸtÄ±",
+        f"  âœ… BaÅŸarÄ±lÄ±: {basarili}  âŒ HatalÄ±: {hatali}",
         "",
     ]
 
     for i, a in enumerate(agentler, 1):
         sure_str = f"{a.sure:.1f}s" if a.sure else "?"
-        ikon = "✅" if a.basarili_mi() else "❌"
+        ikon = "âœ…" if a.basarili_mi() else "âŒ"
         lines.append(f"  {i}. {ikon} [{a.status}] {a.goal[:60]}")
-        lines.append(f"     ID: {a.id}  Süre: {sure_str}")
+        lines.append(f"     ID: {a.id}  SÃ¼re: {sure_str}")
         if a.result:
-            lines.append(f"     → {a.result[:150]}")
+            lines.append(f"     â†’ {a.result[:150]}")
 
     return "\n".join(lines)
 
 
 def _delege_zincir_araci(**kw) -> str:
-    """DELEGE_ZINCIR aracı: zincirleme subagent'lar."""
+    """DELEGE_ZINCIR aracÄ±: zincirleme subagent'lar."""
     adimlar = []
-    for i in range(1, 10):  # maks 10 adım
+    for i in range(1, 10):  # maks 10 adÄ±m
         adim = kw.get(f"adim{i}", "")
         if adim and adim.strip():
             adimlar.append({"goal": adim, "context": ""})
@@ -1236,7 +1236,7 @@ def _delege_zincir_araci(**kw) -> str:
         ]
 
     if not adimlar:
-        return "[HATA] DELEGE_ZINCIR: En az bir adım gerekli"
+        return "[HATA] DELEGE_ZINCIR: En az bir adÄ±m gerekli"
 
     sistem = sistem_al()
     agentler = sistem.zincir_delege(adimlar)
@@ -1244,25 +1244,25 @@ def _delege_zincir_araci(**kw) -> str:
     basarili = sum(1 for a in agentler if a.basarili_mi())
 
     lines = [
-        f"[DELEGE_ZINCIR] {len(agentler)} adımlı zincir tamamlandı",
-        f"  ✅ Başarılı adım: {basarili}/{len(agentler)}",
+        f"[DELEGE_ZINCIR] {len(agentler)} adÄ±mlÄ± zincir tamamlandÄ±",
+        f"  âœ… BaÅŸarÄ±lÄ± adÄ±m: {basarili}/{len(agentler)}",
         "",
     ]
 
     for i, a in enumerate(agentler, 1):
         sure_str = f"{a.sure:.1f}s" if a.sure else "?"
-        ikon = "✅" if a.basarili_mi() else "❌"
-        ok = "  ↓" if i < len(agentler) else ""
-        lines.append(f"  Adım {i}: {ikon} {a.goal[:55]}")
-        lines.append(f"          Süre: {sure_str}  Durum: {a.status}{ok}")
+        ikon = "âœ…" if a.basarili_mi() else "âŒ"
+        ok = "  â†“" if i < len(agentler) else ""
+        lines.append(f"  AdÄ±m {i}: {ikon} {a.goal[:55]}")
+        lines.append(f"          SÃ¼re: {sure_str}  Durum: {a.status}{ok}")
         if a.result:
-            lines.append(f"          → {a.result[:100]}")
+            lines.append(f"          â†’ {a.result[:100]}")
 
     return "\n".join(lines)
 
 
 def _delege_ayristir_araci(**kw) -> str:
-    """DELEGE_AYRISTIR aracı: hedefi ayrıştır ve çalıştır."""
+    """DELEGE_AYRISTIR aracÄ±: hedefi ayrÄ±ÅŸtÄ±r ve Ã§alÄ±ÅŸtÄ±r."""
     args = kw.get("args", [])
     hedef = args[0] if args else kw.get("hedef", "")
     mod = args[1] if len(args) > 1 else kw.get("mod", MOD_PARALEL)
@@ -1282,29 +1282,29 @@ def _delege_ayristir_araci(**kw) -> str:
     hatali = sum(1 for a in agentler if a.status == "error")
 
     lines = [
-        f"[DELEGE_AYRISTIR] {len(agentler)} alt-görev (mod: {mod})",
-        f"  ✅ Başarılı: {basarili}  ❌ Hatalı: {hatali}",
+        f"[DELEGE_AYRISTIR] {len(agentler)} alt-gÃ¶rev (mod: {mod})",
+        f"  âœ… BaÅŸarÄ±lÄ±: {basarili}  âŒ HatalÄ±: {hatali}",
         "",
     ]
 
     for i, a in enumerate(agentler, 1):
         sure_str = f"{a.sure:.1f}s" if a.sure else "?"
-        ikon = "✅" if a.basarili_mi() else "❌"
+        ikon = "âœ…" if a.basarili_mi() else "âŒ"
         lines.append(f"  {i}. {ikon} [{a.status}] {a.goal[:60]}")
-        lines.append(f"     ID: {a.id}  Süre: {sure_str}")
+        lines.append(f"     ID: {a.id}  SÃ¼re: {sure_str}")
 
     return "\n".join(lines)
 
 
 def _delege_durum_araci(**kw) -> str:
-    """DELEGE_DURUM aracı: sistem durumunu göster."""
+    """DELEGE_DURUM aracÄ±: sistem durumunu gÃ¶ster."""
     _ = kw
     sistem = sistem_al()
     return sistem.rapor()
 
 
 def _delege_iptal_araci(**kw) -> str:
-    """DELEGE_IPTAL aracı: subagent iptal."""
+    """DELEGE_IPTAL aracÄ±: subagent iptal."""
     args = kw.get("args", [])
     agent_id = args[0] if args else kw.get("agent_id", "")
 
@@ -1314,29 +1314,29 @@ def _delege_iptal_araci(**kw) -> str:
     sistem = sistem_al()
     if sistem.iptal_et(agent_id):
         return f"[DELEGE_IPTAL] Subagent iptal edildi: {agent_id[:8]}"
-    return f"[DELEGE_IPTAL] İptal başarısız: {agent_id[:8]} bulunamadı veya tamamlanmış"
+    return f"[DELEGE_IPTAL] Ä°ptal baÅŸarÄ±sÄ±z: {agent_id[:8]} bulunamadÄ± veya tamamlanmÄ±ÅŸ"
 
 
 def _delege_temizle_araci(**kw) -> str:
-    """DELEGE_TEMIZLE aracı: tamamlanan subagent'ları temizle."""
+    """DELEGE_TEMIZLE aracÄ±: tamamlanan subagent'larÄ± temizle."""
     _ = kw
     sistem = sistem_al()
     sayi = sistem.temizle()
     return f"[DELEGE_TEMIZLE] {sayi} subagent temizlendi"
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Conversation Loop Hook
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def konusma_dongusu_hook_bul() -> Optional[Callable]:
     """
-    Conversation loop için subagent hook'u.
+    Conversation loop iÃ§in subagent hook'u.
 
-    Bu hook, conversation_loop'un her turunda çağrılır.
-    Eğer kullanıcı mesajı delegasyon gerektiriyorsa otomatik
-    subagent oluşturup çalıştırır.
+    Bu hook, conversation_loop'un her turunda Ã§aÄŸrÄ±lÄ±r.
+    EÄŸer kullanÄ±cÄ± mesajÄ± delegasyon gerektiriyorsa otomatik
+    subagent oluÅŸturup Ã§alÄ±ÅŸtÄ±rÄ±r.
 
     Returns:
         Hook fonksiyonu veya None
@@ -1345,7 +1345,7 @@ def konusma_dongusu_hook_bul() -> Optional[Callable]:
         from reymen.cereyan.hook_dispatcher import hook_kaydet as _hook_kaydet
 
         def _subagent_hook(tur, mesaj, baglam=None, **kwargs):
-            """Her tur öncesi delegasyon kontrolü."""
+            """Her tur Ã¶ncesi delegasyon kontrolÃ¼."""
             if not mesaj:
                 return None
 
@@ -1356,10 +1356,10 @@ def konusma_dongusu_hook_bul() -> Optional[Callable]:
                 "delege et",
                 "subagent",
                 "alt ajan",
-                "görev devret",
-                "paralel çalıştır",
+                "gÃ¶rev devret",
+                "paralel Ã§alÄ±ÅŸtÄ±r",
                 "zincir",
-                "aynı anda",
+                "aynÄ± anda",
                 "delegate",
                 "parallel",
             ]
@@ -1376,66 +1376,66 @@ def konusma_dongusu_hook_bul() -> Optional[Callable]:
             return None
 
         _hook_kaydet("on_turn_start", _subagent_hook)
-        logger.info("[Delegasyon] Konuşma döngüsü hook'u kaydedildi")
+        logger.info("[Delegasyon] KonuÅŸma dÃ¶ngÃ¼sÃ¼ hook'u kaydedildi")
         return _subagent_hook
 
     except Exception as e:
-        logger.warning(f"[Delegasyon] Hook kaydı başarısız: {e}")
+        logger.warning(f"[Delegasyon] Hook kaydÄ± baÅŸarÄ±sÄ±z: {e}")
         return None
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Test / Demo
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def demo():
     """Delegasyon sistemi demo'su."""
     print("=" * 60)
-    print("🧪 DELEGASYON SİSTEMİ DEMO (P2)")
+    print("ğŸ§ª DELEGASYON SÄ°STEMÄ° DEMO (P2)")
     print("=" * 60)
 
     sistem = DelegasyonSistemi()
 
     # 1. TEK Mod
-    print("\n1️⃣  TEK MOD: Tek Subagent")
+    print("\n1ï¸âƒ£  TEK MOD: Tek Subagent")
     print("-" * 40)
-    agent = sistem.delege_et("Örnek analiz görevi", context="test_verisi")
+    agent = sistem.delege_et("Ã–rnek analiz gÃ¶revi", context="test_verisi")
     print(f"  ID:     {agent.id}")
     print(f"  Durum:  {agent.status}")
-    print(f"  Süre:   {agent.sure}s")
-    print(f"  Sonuç:  {agent.result[:150]}")
+    print(f"  SÃ¼re:   {agent.sure}s")
+    print(f"  SonuÃ§:  {agent.result[:150]}")
 
     # 2. PARALEL Mod
-    print("\n2️⃣  PARALEL MOD: 3 Paralel Subagent")
+    print("\n2ï¸âƒ£  PARALEL MOD: 3 Paralel Subagent")
     print("-" * 40)
     gorevler = [
         {"goal": "Web'de konu A ara", "context": "konu_A"},
         {"goal": "Web'de konu B ara", "context": "konu_B"},
-        {"goal": "Rapor şablonu oluştur", "context": "şablon"},
+        {"goal": "Rapor ÅŸablonu oluÅŸtur", "context": "ÅŸablon"},
     ]
     agentler = sistem.paralel_delege(gorevler)
     for a in agentler:
         print(f"  {a.ozet()}")
 
     # 3. ZINCIR Mod
-    print("\n3️⃣  ZINCIR MOD: 3 Adımlı Zincir")
+    print("\n3ï¸âƒ£  ZINCIR MOD: 3 AdÄ±mlÄ± Zincir")
     print("-" * 40)
     adimlar = [
         {"goal": "Veriyi topla", "context": ""},
         {"goal": "Veriyi analiz et", "context": ""},
-        {"goal": "Rapor oluştur", "context": ""},
+        {"goal": "Rapor oluÅŸtur", "context": ""},
     ]
     zincir = sistem.zincir_delege(adimlar)
     for a in zincir:
         print(f"  {a.ozet()}")
 
-    # 4. İstatistik
-    print("\n4️⃣  SİSTEM İSTATİSTİKLERİ")
+    # 4. Ä°statistik
+    print("\n4ï¸âƒ£  SÄ°STEM Ä°STATÄ°STÄ°KLERÄ°")
     print("-" * 40)
     print(sistem.rapor())
 
-    print("\n✅ DEMO TAMAMLANDI")
+    print("\nâœ… DEMO TAMAMLANDI")
 
 
 if __name__ == "__main__":

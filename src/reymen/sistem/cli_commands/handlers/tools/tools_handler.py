@@ -1,4 +1,4 @@
-"""_handle_tools_command handler."""
+﻿"""_handle_tools_command handler."""
 
 
 def _handle_tools_command(cli, cmd: str):
@@ -67,7 +67,7 @@ def _handle_tools_command(cli, cmd: str):
         print(f"  MCP tool:          /tools {subcommand} github:create_issue")
         return
 
-    # Apply the change directly — the user typing the command is implicit
+    # Apply the change directly â€” the user typing the command is implicit
     # consent.  Do NOT use input() here; it hangs inside prompt_toolkit's
     # TUI event loop (known pitfall).
     verb = "Disabling" if subcommand == "disable" else "Enabling"

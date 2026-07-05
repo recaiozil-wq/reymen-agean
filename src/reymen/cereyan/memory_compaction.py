@@ -1,10 +1,10 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-memory_compaction.py — MEMORY.md / USER.md 50K Compaction System.
+memory_compaction.py â€” MEMORY.md / USER.md 50K Compaction System.
 
-Implements the equivalent of Hermes' MEMORY.md/USER.md 50K compaction in ReYMeN.
+Implements the equivalent of ReYMeN' MEMORY.md/USER.md 50K compaction in ReYMeN.
 While memory pruning (hafiza_budama.py) works on a TTL basis, this module performs
-CHARACTER-LIMIT-based compaction — it automatically prunes files approaching 50,000 characters.
+CHARACTER-LIMIT-based compaction â€” it automatically prunes files approaching 50,000 characters.
 
 What it does:
   1. Scans MEMORY.md and USER.md (under reymen/hafiza/)
@@ -36,7 +36,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
-# ── Sabitler ──────────────────────────────────────────────────────────────
+# â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 # Karakter limitleri (memory_manager.py ile uyumlu)
 MEMORY_LIMIT_CHARS = 50000
@@ -49,7 +49,7 @@ ARCIV_MAX_ENTRY = 200  # Arsiv dosyasi basina max entry
 
 # Onem siralamasi (yuksek = korunur)
 ONEM_ETIKETLERI = {
-    "ZORUNLU KURAL": 100,  # Kalici kurallar — en yuksek onem
+    "ZORUNLU KURAL": 100,  # Kalici kurallar â€” en yuksek onem
     "KALICI KURAL": 95,
     "KURAL": 90,
     "ZORUNLU": 85,
@@ -87,13 +87,13 @@ _ARSIV_DIZINI = _HAFIZA_DIZINI / "arsiv"
 _MEMORY_YOLU = _HAFIZA_DIZINI / "MEMORY.md"
 _USER_YOLU = _HAFIZA_DIZINI / "USER.md"
 
-# ── Yardimci Fonksiyonlar ────────────────────────────────────────────────
+# â”€â”€ Yardimci Fonksiyonlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _entryleri_parcala(icerik: str) -> List[Dict[str, Any]]:
     """MEMORY.md/USER.md icerigini entry'lere ayir ve metadata cikar.
 
-    Format: Entry'ler '§' isareti ile ayrilmistir.
+    Format: Entry'ler 'Â§' isareti ile ayrilmistir.
 
     Returns:
         [{"metin": str, "satir_no": int, "karakter": int,
@@ -103,7 +103,7 @@ def _entryleri_parcala(icerik: str) -> List[Dict[str, Any]]:
         return []
 
     entryler = []
-    bloklar = icerik.strip().split("§")
+    bloklar = icerik.strip().split("Â§")
 
     for i, blok in enumerate(bloklar):
         metin = blok.strip()
@@ -223,7 +223,7 @@ def _dosya_boyut_kontrol(dosya_yolu: Path, limit: int) -> Tuple[int, float]:
         return 0, 0.0
 
 
-# ── Ana Compaction Fonksiyonlari ─────────────────────────────────────────
+# â”€â”€ Ana Compaction Fonksiyonlari â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _compaction_yap(
@@ -274,7 +274,7 @@ def _compaction_yap(
     # --- COMPACTION BASLA ---
     rapor["compaction_yapildi"] = True
     logger.info(
-        "[Compaction] %s: %d/%d karakter (%d%%) — compaction basliyor",
+        "[Compaction] %s: %d/%d karakter (%d%%) â€” compaction basliyor",
         dosya_adi,
         boyut,
         limit,
@@ -335,7 +335,7 @@ def _compaction_yap(
     #    Korunanlari orijinal sirada tut
     korunanlar.sort(key=lambda e: e["sira"])
     yeni_entry_metinleri = [e["metin"] for e in korunanlar]
-    yeni_icerik = ("\n§\n".join(yeni_entry_metinleri)).strip()
+    yeni_icerik = ("\nÂ§\n".join(yeni_entry_metinleri)).strip()
     if yeni_icerik:
         yeni_icerik += "\n"
 
@@ -380,7 +380,7 @@ def _arsive_kaydet(dosya_adi: str, entryler: List[Dict[str, Any]]) -> bool:
 
         # Arsiv icerigi
         arsiv_satirlar = [
-            f"# Arsiv: {dosya_adi} — {bugun}",
+            f"# Arsiv: {dosya_adi} â€” {bugun}",
             f"",
             f"> Bu dosya {bugun} tarihinde otomatik compaction ile arsivlenmistir.",
             f"> Toplam {len(entryler)} entry, {sum(e['karakter'] for e in entryler)} karakter.",
@@ -414,7 +414,7 @@ def _arsive_kaydet(dosya_adi: str, entryler: List[Dict[str, Any]]) -> bool:
         return False
 
 
-# ── Cache Temizleme ──────────────────────────────────────────────────────
+# â”€â”€ Cache Temizleme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def cache_tazele() -> Dict[str, Any]:
@@ -462,7 +462,7 @@ def cache_tazele() -> Dict[str, Any]:
     return {"temizlenen": temizlenen, "moduller": moduller}
 
 
-# ── Ana Compaction Fonksiyonu ────────────────────────────────────────────
+# â”€â”€ Ana Compaction Fonksiyonu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def memory_compaction_check(zorla: bool = False) -> Dict[str, Any]:
@@ -547,7 +547,7 @@ def memory_compaction_check(zorla: bool = False) -> Dict[str, Any]:
 
 
 def hafif_compaction_kontrol() -> Dict[str, Any]:
-    """Konusma sonrasi hafif kontrol — hizli calisir, sadece gerekirse compaction yapar.
+    """Konusma sonrasi hafif kontrol â€” hizli calisir, sadece gerekirse compaction yapar.
 
     Sadece dosya boyutuna bakar, %80 esigini gecerse compaction baslatir.
     Gecmezse bos rapor dondurur.
@@ -571,7 +571,7 @@ def hafif_compaction_kontrol() -> Dict[str, Any]:
         if yuzde >= COMPACTION_ESIK_YUZDE:
             rapor["islem_yapildi"] = True
             logger.info(
-                "[Compaction] Hafif kontrol: %s %d%% dolu — compaction basliyor",
+                "[Compaction] Hafif kontrol: %s %d%% dolu â€” compaction basliyor",
                 dosya_adi,
                 int(yuzde),
             )
@@ -583,7 +583,7 @@ def hafif_compaction_kontrol() -> Dict[str, Any]:
     return rapor
 
 
-# ── Cron Gorevi ──────────────────────────────────────────────────────────
+# â”€â”€ Cron Gorevi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def cron_compaction_gorevi() -> Dict[str, Any]:
@@ -597,7 +597,7 @@ def cron_compaction_gorevi() -> Dict[str, Any]:
             "memory_compaction",
             "0 5 * * *",  # Her gun 05:00
             cron_compaction_gorevi,
-            aciklama="MEMORY.md/USER.md 50K compaction — gunluk bakim",
+            aciklama="MEMORY.md/USER.md 50K compaction â€” gunluk bakim",
         )
 
     veya jobs.json'a kaydetme:
@@ -606,7 +606,7 @@ def cron_compaction_gorevi() -> Dict[str, Any]:
                 "komut": "python -c \"from reymen.cereyan.memory_compaction import cron_compaction_gorevi; cron_compaction_gorevi()\"",
                 "zaman": "0 5 * * *",
                 "aktif": true,
-                "aciklama": "MEMORY.md/USER.md 50K compaction — gunluk bakim"
+                "aciklama": "MEMORY.md/USER.md 50K compaction â€” gunluk bakim"
             }
         }
     """
@@ -638,19 +638,19 @@ def cron_compaction_gorevi() -> Dict[str, Any]:
         return {"durum": "hata", "hata": str(e)}
 
 
-# ── Compaction Ozeti ─────────────────────────────────────────────────────
+# â”€â”€ Compaction Ozeti â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def compaction_ozet() -> str:
     """MEMORY.md ve USER.md'nin guncel doluluk ozetini dondur."""
-    satirlar = ["📊 Hafiza Compaction Ozeti", ""]
+    satirlar = ["ğŸ“Š Hafiza Compaction Ozeti", ""]
 
     for dosya_yolu, dosya_adi, limit in [
         (_MEMORY_YOLU, "MEMORY.md", MEMORY_LIMIT_CHARS),
         (_USER_YOLU, "USER.md", USER_LIMIT_CHARS),
     ]:
         if not dosya_yolu.exists():
-            satirlar.append(f"❌ {dosya_adi}: Bulunamadi")
+            satirlar.append(f"âŒ {dosya_adi}: Bulunamadi")
             continue
 
         boyut, yuzde = _dosya_boyut_kontrol(dosya_yolu, limit)
@@ -658,13 +658,13 @@ def compaction_ozet() -> str:
 
         # Doluluk gostergesi
         if yuzde >= esik:
-            durum = "🔴 CRITICAL"
+            durum = "ğŸ”´ CRITICAL"
         elif yuzde >= esik * 0.8:
-            durum = "🟡 YUKSEK"
+            durum = "ğŸŸ¡ YUKSEK"
         elif yuzde >= esik * 0.5:
-            durum = "🟢 NORMAL"
+            durum = "ğŸŸ¢ NORMAL"
         else:
-            durum = "⚪ DUSUK"
+            durum = "âšª DUSUK"
 
         satirlar.append(
             f"{durum} {dosya_adi}: {boyut:,}/{limit:,} karakter " f"(%{yuzde:.1f})"
@@ -675,12 +675,12 @@ def compaction_ozet() -> str:
         arsiv_sayisi = len(list(_ARSIV_DIZINI.glob("*.md")))
         arsiv_boyut = sum(f.stat().st_size for f in _ARSIV_DIZINI.glob("*.md"))
         satirlar.append(f"")
-        satirlar.append(f"📦 Arsiv: {arsiv_sayisi} dosya, {arsiv_boyut // 1024} KB")
+        satirlar.append(f"ğŸ“¦ Arsiv: {arsiv_sayisi} dosya, {arsiv_boyut // 1024} KB")
 
     return "\n".join(satirlar)
 
 
-# ── Dogrudan Calistirma ──────────────────────────────────────────────────
+# â”€â”€ Dogrudan Calistirma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
     import sys

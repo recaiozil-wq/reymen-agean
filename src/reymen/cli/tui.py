@@ -1,11 +1,11 @@
-# -*- coding: utf-8 -*-
-"""reymen.cli.tui — ReYMeN Terminal UI (TUI).
+﻿# -*- coding: utf-8 -*-
+"""reymen.cli.tui â€” ReYMeN Terminal UI (TUI).
 
-Rich tabanli terminal arayüzü.
+Rich tabanli terminal arayÃ¼zÃ¼.
 - Panel, Table, Layout, Live Display
 - Slash komutlar: /help, /model, /clear, /exit
 - Tab ile otomatik tamamlama
-- Durum çubuğu (model, provider, süre, token sayisi)
+- Durum Ã§ubuÄŸu (model, provider, sÃ¼re, token sayisi)
 - Windows ile tam uyumlu (colorama + prompt_toolkit)
 """
 
@@ -21,7 +21,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# ── Renk sabitleri (ANSI fallback) ────────────────────────────────────────
+# â”€â”€ Renk sabitleri (ANSI fallback) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _R = "\033[0m"
 _G = "\033[92m"
 _C = "\033[96m"
@@ -57,9 +57,9 @@ def _r(t):
     return f"{_RED}{t}{_R}"
 
 
-# ── Durum verisi (synchronized) ───────────────────────────────────────────
+# â”€â”€ Durum verisi (synchronized) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 class StatusData:
-    """TUI durum çubuğu için thread-safe veri tutucu."""
+    """TUI durum Ã§ubuÄŸu iÃ§in thread-safe veri tutucu."""
 
     def __init__(self):
         self._lock = threading.Lock()
@@ -105,11 +105,11 @@ class StatusData:
             }
 
 
-# ── Rich TUI ana sinif ────────────────────────────────────────────────────
+# â”€â”€ Rich TUI ana sinif â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 class ReYMeNTUI:
     """ReYMeN TUI ana sinifi.
 
-    Rich Layout + Live Display ile terminal arayüzü.
+    Rich Layout + Live Display ile terminal arayÃ¼zÃ¼.
     prompt_toolkit ile klavye girdisi ve otomatik tamamlama.
 
     Kullanim:
@@ -144,22 +144,22 @@ class ReYMeNTUI:
         # prompt_toolki (gec yukleme)
         self._pt_session = None
 
-    # ── Mesaj kuyrugu ────────────────────────────────────────────────────
+    # â”€â”€ Mesaj kuyrugu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     def mesaj_ekle(self, tip: str, icerik: str):
-        """Thread-safe mesaj kuyruğuna ekle."""
+        """Thread-safe mesaj kuyruÄŸuna ekle."""
         with self._kuyruk_kilit:
             self._mesaj_kuyrugu.append((tip, icerik))
             if len(self._mesaj_kuyrugu) > 200:
                 self._mesaj_kuyrugu = self._mesaj_kuyrugu[-100:]
 
     def mesajlari_al(self) -> list[tuple[str, str]]:
-        """Thread-safe mesaj kuyruğunu oku ve temizle."""
+        """Thread-safe mesaj kuyruÄŸunu oku ve temizle."""
         with self._kuyruk_kilit:
             msj = list(self._mesaj_kuyrugu)
             self._mesaj_kuyrugu = []
             return msj
 
-    # ── Rich layout olusturma ────────────────────────────────────────────
+    # â”€â”€ Rich layout olusturma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     def _layout_olustur(self):
         """Rich Layout bilesenlerini kur."""
         from rich.layout import Layout
@@ -177,14 +177,14 @@ class ReYMeNTUI:
             Layout(name="footer", size=3),
         )
 
-        # ── Header: Logo + Bilgi ─────────────────────────────────────────
+        # â”€â”€ Header: Logo + Bilgi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         logo = (
-            "[bold #FFD700]██████╗ ███████╗██╗   ██╗███╗   ███╗███████╗███╗   ██╗[/]\n"
-            "[bold #FFD700]██╔══██╗██╔════╝╚██╗ ██╔╝████╗ ████║██╔════╝████╗  ██║[/]\n"
-            "[#FFBF00]██████╔╝█████╗   ╚████╔╝ ██╔████╔██║█████╗  ██╔██╗ ██║[/]\n"
-            "[#FFBF00]██╔══██╗██╔══╝    ╚██╔╝  ██║╚██╔╝██║██╔══╝  ██║╚██╗██║[/]\n"
-            "[#CD7F32]██║  ██║███████╗   ██║   ██║ ╚═╝ ██║███████╗██║ ╚████║[/]\n"
-            "[#CD7F32]╚═╝  ╚═╝╚══════╝   ╚═╝   ╚═╝     ╚═╝╚══════╝╚═╝  ╚═══╝[/]"
+            "[bold #FFD700]â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•—   â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•—[/]\n"
+            "[bold #FFD700]â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•â•â•â•šâ–ˆâ–ˆâ•— â–ˆâ–ˆâ•”â•â–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•‘[/]\n"
+            "[#FFBF00]â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—   â•šâ–ˆâ–ˆâ–ˆâ–ˆâ•”â• â–ˆâ–ˆâ•”â–ˆâ–ˆâ–ˆâ–ˆâ•”â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•”â–ˆâ–ˆâ•— â–ˆâ–ˆâ•‘[/]\n"
+            "[#FFBF00]â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•    â•šâ–ˆâ–ˆâ•”â•  â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘[/]\n"
+            "[#CD7F32]â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘ â•šâ•â• â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘ â•šâ–ˆâ–ˆâ–ˆâ–ˆâ•‘[/]\n"
+            "[#CD7F32]â•šâ•â•  â•šâ•â•â•šâ•â•â•â•â•â•â•   â•šâ•â•   â•šâ•â•     â•šâ•â•â•šâ•â•â•â•â•â•â•â•šâ•â•  â•šâ•â•â•â•[/]"
         )
         durum = self.status.kopyala()
         info_tablo = Table.grid(padding=(0, 2))
@@ -200,15 +200,15 @@ class ReYMeNTUI:
         )
         layout["header"].update(header_icerik)
 
-        # ── Body: Sohbet alani ───────────────────────────────────────────
+        # â”€â”€ Body: Sohbet alani â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         body_panel = Panel(
-            "[dim]ReYMeN Ajan'a hoş geldiniz! Mesajınızı yazın veya /yardim yazın.[/]",
+            "[dim]ReYMeN Ajan'a hoÅŸ geldiniz! MesajÄ±nÄ±zÄ± yazÄ±n veya /yardim yazÄ±n.[/]",
             title="[bold]Sohbet[/]",
             border_style="blue",
         )
         layout["body"].update(body_panel)
 
-        # ── Footer: Durum cubugu ─────────────────────────────────────────
+        # â”€â”€ Footer: Durum cubugu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         footer_tablo = Table.grid(padding=(0, 2))
         footer_tablo.add_column(style="dim", width=12)
         footer_tablo.add_column(style="green", width=24)
@@ -222,7 +222,7 @@ class ReYMeNTUI:
             durum["model"],
             "Provider:",
             durum["provider"],
-            "Süre:",
+            "SÃ¼re:",
             durum["sure"],
         )
 
@@ -254,7 +254,7 @@ class ReYMeNTUI:
         goster = "\n".join(satirlar)
 
         body_panel = Panel(
-            Text.from_markup(goster) if goster else "[dim]Henüz mesaj yok.[/]",
+            Text.from_markup(goster) if goster else "[dim]HenÃ¼z mesaj yok.[/]",
             title="[bold]Sohbet[/]",
             border_style="blue",
         )
@@ -281,13 +281,13 @@ class ReYMeNTUI:
         footer_tablo.add_column(style="dim", width=10)
         footer_tablo.add_column(style="cyan", width=16)
 
-        durum_ikon = "🟢" if durum["durum"] == "hazir" else "🟡"
+        durum_ikon = "ğŸŸ¢" if durum["durum"] == "hazir" else "ğŸŸ¡"
         footer_tablo.add_row(
             f"{durum_ikon} Model:",
             durum["model"],
             "Provider:",
             durum["provider"],
-            "Süre:",
+            "SÃ¼re:",
             durum["sure"],
         )
 
@@ -309,7 +309,7 @@ class ReYMeNTUI:
         )
         layout["footer"].update(footer_icerik)
 
-    # ── Sohbet gecmisi bicimle ───────────────────────────────────────────
+    # â”€â”€ Sohbet gecmisi bicimle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     def _sohbet_metni(self) -> str:
         """Sohbet gecmisini bicimlenmis metin olarak dondur."""
         satirlar = []
@@ -319,7 +319,7 @@ class ReYMeNTUI:
             satirlar.append(f"[bold green]ReYMeN >[/] {self._son_cevap[:2000]}")
         return "\n\n".join(satirlar) if satirlar else ""
 
-    # ── Ana dongu ────────────────────────────────────────────────────────
+    # â”€â”€ Ana dongu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     def calistir(self):
         """TUI'yi baslat ve ana girdi dongusunu calistir.
 
@@ -416,7 +416,7 @@ class ReYMeNTUI:
             "/cls",
             "/clear",
             "/cik",
-            "/çık",
+            "/Ã§Ä±k",
             "/exit",
             "/quit",
             "/provider",
@@ -483,7 +483,7 @@ class ReYMeNTUI:
                     _prompt_html(),
                     bottom_toolbar=HTML(
                         f"<b>Model:</b> {self.status.kopyala()['model']} | "
-                        f"<b>Süre:</b> {self.status.kopyala()['sure']}"
+                        f"<b>SÃ¼re:</b> {self.status.kopyala()['sure']}"
                     ),
                 )
 
@@ -588,7 +588,7 @@ class ReYMeNTUI:
             except (EOFError, KeyboardInterrupt):
                 break
 
-    # ── Slash komutlar ───────────────────────────────────────────────────
+    # â”€â”€ Slash komutlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     def _slash_komut_isle(self, girdi: str, live) -> bool:
         """Slash komutlari isle. Komut islendiyse True don."""
         from rich.panel import Panel
@@ -598,7 +598,7 @@ class ReYMeNTUI:
         g = girdi.lower().strip()
 
         # /cik, /exit, /quit
-        if g in ("/cik", "/çık", "/exit", "/quit", "/q"):
+        if g in ("/cik", "/Ã§Ä±k", "/exit", "/quit", "/q"):
             self._calisiyor.clear()
             return True
 
@@ -606,14 +606,14 @@ class ReYMeNTUI:
         if g in ("/yardim", "/help", "/?"):
             yardim_text = (
                 "[bold]ReYMeN TUI Komutlari[/]\n\n"
-                "[cyan]/yardim[/]  veya [cyan]/help[/]   Bu menüyü göster\n"
-                "[cyan]/model[/]                     Model değiştir\n"
-                "[cyan]/provider[/]                  Provider değiştir\n"
-                "[cyan]/temizle[/]  veya [cyan]/clear[/]   Ekranı temizle\n"
+                "[cyan]/yardim[/]  veya [cyan]/help[/]   Bu menÃ¼yÃ¼ gÃ¶ster\n"
+                "[cyan]/model[/]                     Model deÄŸiÅŸtir\n"
+                "[cyan]/provider[/]                  Provider deÄŸiÅŸtir\n"
+                "[cyan]/temizle[/]  veya [cyan]/clear[/]   EkranÄ± temizle\n"
                 "[cyan]/durum[/]    veya [cyan]/status[/]  Durum bilgisi\n"
                 "[cyan]/token[/]                     Token sayaci sifirla\n"
-                "[cyan]/cik[/]     veya [cyan]/exit[/]    Çıkış\n\n"
-                "[dim]Herhangi bir metin yaz → ReYMeN cevaplar.[/]"
+                "[cyan]/cik[/]     veya [cyan]/exit[/]    Ã‡Ä±kÄ±ÅŸ\n\n"
+                "[dim]Herhangi bir metin yaz â†’ ReYMeN cevaplar.[/]"
             )
             panel = Panel(
                 Text.from_markup(yardim_text),
@@ -639,9 +639,9 @@ class ReYMeNTUI:
             model_bilgi = (
                 "[bold yellow]Mevcut Model:[/] "
                 f"[green]{self.status.kopyala()['model']}[/]\n\n"
-                "[dim]Model değiştirmek için .env dosyasindaki\n"
-                "REYMEN_MODEL değişkenini güncelleyip\n"
-                "yeniden başlatın.[/]"
+                "[dim]Model deÄŸiÅŸtirmek iÃ§in .env dosyasindaki\n"
+                "REYMEN_MODEL deÄŸiÅŸkenini gÃ¼ncelleyip\n"
+                "yeniden baÅŸlatÄ±n.[/]"
             )
             panel = Panel(
                 Text.from_markup(model_bilgi),
@@ -657,9 +657,9 @@ class ReYMeNTUI:
             prov_bilgi = (
                 "[bold yellow]Mevcut Provider:[/] "
                 f"[green]{self.status.kopyala()['provider']}[/]\n\n"
-                "[dim]Provider değiştirmek için .env dosyasindaki\n"
-                "REYMEN_PROVIDER değişkenini güncelleyip\n"
-                "yeniden başlatın.[/]"
+                "[dim]Provider deÄŸiÅŸtirmek iÃ§in .env dosyasindaki\n"
+                "REYMEN_PROVIDER deÄŸiÅŸkenini gÃ¼ncelleyip\n"
+                "yeniden baÅŸlatÄ±n.[/]"
             )
             panel = Panel(
                 Text.from_markup(prov_bilgi),
@@ -678,9 +678,9 @@ class ReYMeNTUI:
             tablo.add_column(style="white")
             tablo.add_row("Model", durum["model"])
             tablo.add_row("Provider", durum["provider"])
-            tablo.add_row("Süre", durum["sure"])
-            tablo.add_row("Token Giriş", str(durum["token_giris"]))
-            tablo.add_row("Token Çıkış", str(durum["token_cikis"]))
+            tablo.add_row("SÃ¼re", durum["sure"])
+            tablo.add_row("Token GiriÅŸ", str(durum["token_giris"]))
+            tablo.add_row("Token Ã‡Ä±kÄ±ÅŸ", str(durum["token_cikis"]))
             tablo.add_row("Durum", durum["durum"])
             panel = Panel(
                 tablo,
@@ -725,7 +725,7 @@ class ReYMeNTUI:
         self._calisiyor.clear()
 
 
-# ── Kolay kullanim fonksiyonu ─────────────────────────────────────────────
+# â”€â”€ Kolay kullanim fonksiyonu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def tui_baslat(
     soru_callback: Callable = None,
     model: str = "deepseek-v4-flash",
@@ -761,7 +761,7 @@ def tui_baslat(
         return 1
 
 
-# ── Dogrudan calistirma (test) ────────────────────────────────────────────
+# â”€â”€ Dogrudan calistirma (test) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 if __name__ == "__main__":
 
     def _test_soru(soru: str) -> str:

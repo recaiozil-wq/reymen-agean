@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-self_improvement.py — ReYMeN Otonom Oz-Gelistirme Motoru.
+self_improvement.py â€” ReYMeN Otonom Oz-Gelistirme Motoru.
 
 Ne yapar:
   - Gecmis basarisiz gorevleri analiz eder
@@ -120,20 +120,20 @@ Format:
 
         if basarisiz.get("KOMUT_CALISTIR", 0) > 3:
             oneriler.append(
-                "1. KOMUT_CALISTIR yerine PYTHON_CALISTIR tercih et — daha guvenilir sandbox"
+                "1. KOMUT_CALISTIR yerine PYTHON_CALISTIR tercih et â€” daha guvenilir sandbox"
             )
         if basarisiz.get("TARAYICI_AC", 0) > 2:
             oneriler.append(
-                "2. TARAYICI_AC basarisizsa WEB_ARA'ya don — Playwright gerekmez"
+                "2. TARAYICI_AC basarisizsa WEB_ARA'ya don â€” Playwright gerekmez"
             )
         if basarisiz.get("EKRAN_TIKLA", 0) > 2:
             oneriler.append(
-                "3. EKRAN_TIKLA oncesi EKRAN_NISAN kullan — hedef noktayi dogrula"
+                "3. EKRAN_TIKLA oncesi EKRAN_NISAN kullan â€” hedef noktayi dogrula"
             )
         if not oneriler:
             oneriler = [
-                "1. Her islemden once HAFIZA_ARA yap — benzer gecmis tecrubelerden yararlan",
-                "2. Basarisiz eylem sonrasi IC_GOZLEM kullan — strateji degistir",
+                "1. Her islemden once HAFIZA_ARA yap â€” benzer gecmis tecrubelerden yararlan",
+                "2. Basarisiz eylem sonrasi IC_GOZLEM kullan â€” strateji degistir",
                 "3. Uzun gorevleri GOREV_BITTI ile erken bitirme; plan bitene kadar devam et",
             ]
         return "\n".join(oneriler)

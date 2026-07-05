@@ -1,16 +1,16 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-observability.py — OpenTelemetry LLM observability katmanı.
+observability.py â€” OpenTelemetry LLM observability katmanÄ±.
 
-LLM çağrıları, araç çalıştırmaları, skill yüklemeleri ve oturum başlatmaları
-için span'ler oluşturur. config.yaml'deki ``observability`` bölümüyle
-açılıp kapanabilir.
+LLM Ã§aÄŸrÄ±larÄ±, araÃ§ Ã§alÄ±ÅŸtÄ±rmalarÄ±, skill yÃ¼klemeleri ve oturum baÅŸlatmalarÄ±
+iÃ§in span'ler oluÅŸturur. config.yaml'deki ``observability`` bÃ¶lÃ¼mÃ¼yle
+aÃ§Ä±lÄ±p kapanabilir.
 
 Desteklenen exporter'lar:
-    - console  (standart çıktıya yazdırır, geliştirme için)
-    - otlp     (Langfuse/Jaeger gibi OTLP alıcılara gönderir)
+    - console  (standart Ã§Ä±ktÄ±ya yazdÄ±rÄ±r, geliÅŸtirme iÃ§in)
+    - otlp     (Langfuse/Jaeger gibi OTLP alÄ±cÄ±lara gÃ¶nderir)
 
-Kullanım:
+KullanÄ±m:
     from reymen.core.observability import (
         setup_observability,
         trace_llm_call,
@@ -19,10 +19,10 @@ Kullanım:
         observability_durum,
     )
 
-    # Uygulama başlangıcında bir kez çağır (config dict ile veya env vars)
+    # Uygulama baÅŸlangÄ±cÄ±nda bir kez Ã§aÄŸÄ±r (config dict ile veya env vars)
     setup_observability(config={"observability": {"enabled": True, "exporter": "console"}})
 
-    # Dekoratör olarak
+    # DekoratÃ¶r olarak
     @trace_llm_call()
     def dusun(self, ...):
         ...
@@ -44,15 +44,15 @@ from typing import Any, Callable, Optional
 
 logger = logging.getLogger(__name__)
 
-# ── Global durum ─────────────────────────────────────────────────────────────
+# â”€â”€ Global durum â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _TRACER = None
 _TRACER_PROVIDER = None
 _OBSERVABILITY_AKTIF = False
 
 
-# ── Config okuyucu ───────────────────────────────────────────────────────────
+# â”€â”€ Config okuyucu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def _config_oku(config: Optional[dict]) -> dict:
-    """config.yaml'deki observability bölümünü okur; yoksa varsayılan döndürür."""
+    """config.yaml'deki observability bÃ¶lÃ¼mÃ¼nÃ¼ okur; yoksa varsayÄ±lan dÃ¶ndÃ¼rÃ¼r."""
     if config is None:
         config = {}
     obs = config.get("observability", {}) if isinstance(config, dict) else {}
@@ -67,7 +67,7 @@ def _config_oku(config: Optional[dict]) -> dict:
     }
 
 
-# ── Langfuse env vars (geriye uyumluluk) ─────────────────────────────────────
+# â”€â”€ Langfuse env vars (geriye uyumluluk) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 LANGFUSE_PUBLIC_KEY = os.environ.get("LANGFUSE_PUBLIC_KEY", "")
 LANGFUSE_SECRET_KEY = os.environ.get("LANGFUSE_SECRET_KEY", "")
 
@@ -82,7 +82,7 @@ def _langfuse_kimlik_bilgisi_var() -> bool:
     return bool(LANGFUSE_PUBLIC_KEY) and bool(LANGFUSE_SECRET_KEY)
 
 
-# ── Public API ───────────────────────────────────────────────────────────────
+# â”€â”€ Public API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def setup_observability(
@@ -90,25 +90,25 @@ def setup_observability(
     service_name: str = "reymen-agent",
     service_version: str = "1.0.0",
 ) -> bool:
-    """OpenTelemetry tracer'ı başlat veya kapat.
+    """OpenTelemetry tracer'Ä± baÅŸlat veya kapat.
 
-    Öncelik sırası:
-        1. ``config`` dict içindeki ``observability`` bölümü (birincil)
-        2. LANGFUSE_PUBLIC_KEY / LANGFUSE_SECRET_KEY env var'ları (geriye uyumlu)
-        3. Hiçbiri yoksa → no-op tracer (hiçbir span gönderilmez)
+    Ã–ncelik sÄ±rasÄ±:
+        1. ``config`` dict iÃ§indeki ``observability`` bÃ¶lÃ¼mÃ¼ (birincil)
+        2. LANGFUSE_PUBLIC_KEY / LANGFUSE_SECRET_KEY env var'larÄ± (geriye uyumlu)
+        3. HiÃ§biri yoksa â†’ no-op tracer (hiÃ§bir span gÃ¶nderilmez)
 
     Args:
         config:         config.yaml dict (observability.enabled/exporter/endpoint).
-        service_name:   OpenTelemetry servis adı (config yoksa kullanılır).
+        service_name:   OpenTelemetry servis adÄ± (config yoksa kullanÄ±lÄ±r).
         service_version: OpenTelemetry servis versiyonu.
 
     Returns:
-        True ise observability aktif, False ise devre dışı.
+        True ise observability aktif, False ise devre dÄ±ÅŸÄ±.
     """
     global _TRACER, _TRACER_PROVIDER, _OBSERVABILITY_AKTIF
 
     if _TRACER is not None:
-        return _OBSERVABILITY_AKTIF  # Zaten başlatılmış
+        return _OBSERVABILITY_AKTIF  # Zaten baÅŸlatÄ±lmÄ±ÅŸ
 
     # 1. Config'den oku
     obs_conf = _config_oku(config)
@@ -116,7 +116,7 @@ def setup_observability(
     if obs_conf["enabled"]:
         exporter = obs_conf["exporter"]
         if exporter == "otlp":
-            # OTLP exporter — endpoint gerekli
+            # OTLP exporter â€” endpoint gerekli
             endpoint = obs_conf["endpoint"] or LANGFUSE_OTLP_TRACES_ENDPOINT
             if _langfuse_kimlik_bilgisi_var():
                 success = _setup_langfuse_tracer(
@@ -133,18 +133,18 @@ def setup_observability(
                 _OBSERVABILITY_AKTIF = True
                 return True
 
-        # 2. Console exporter (varsayılan)
+        # 2. Console exporter (varsayÄ±lan)
         try:
             _setup_console_tracer(
                 obs_conf["service_name"],
                 obs_conf["service_version"],
             )
             _OBSERVABILITY_AKTIF = True
-            logger.info("[Observability] Console exporter başlatıldı — tracer aktif.")
+            logger.info("[Observability] Console exporter baÅŸlatÄ±ldÄ± â€” tracer aktif.")
             return True
         except Exception as exc:
             logger.warning(
-                "[Observability] Console tracer başlatılamadı: %s — no-op.",
+                "[Observability] Console tracer baÅŸlatÄ±lamadÄ±: %s â€” no-op.",
                 exc,
             )
 
@@ -155,22 +155,22 @@ def setup_observability(
             return _OBSERVABILITY_AKTIF
         except Exception as exc:
             logger.warning(
-                "[Observability] Langfuse tracer başlatılamadı: %s — no-op.",
+                "[Observability] Langfuse tracer baÅŸlatÄ±lamadÄ±: %s â€” no-op.",
                 exc,
             )
 
-    # 4. No-op (devre dışı)
+    # 4. No-op (devre dÄ±ÅŸÄ±)
     _setup_noop_tracer(service_name, service_version)
     _OBSERVABILITY_AKTIF = False
-    logger.info("[Observability] Observability devre dışı — no-op tracer kullanılıyor.")
+    logger.info("[Observability] Observability devre dÄ±ÅŸÄ± â€” no-op tracer kullanÄ±lÄ±yor.")
     return False
 
 
-# ── Tracer kurulumları ───────────────────────────────────────────────────────
+# â”€â”€ Tracer kurulumlarÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _setup_noop_tracer(service_name: str, service_version: str) -> None:
-    """No-op tracer (hiçbir şey göndermez)."""
+    """No-op tracer (hiÃ§bir ÅŸey gÃ¶ndermez)."""
     global _TRACER, _TRACER_PROVIDER
 
     try:
@@ -193,7 +193,7 @@ def _setup_noop_tracer(service_name: str, service_version: str) -> None:
 
 
 def _setup_console_tracer(service_name: str, service_version: str) -> None:
-    """Console exporter ile tracer başlat."""
+    """Console exporter ile tracer baÅŸlat."""
     global _TRACER, _TRACER_PROVIDER
 
     from opentelemetry import trace as otel_trace
@@ -219,7 +219,7 @@ def _setup_console_tracer(service_name: str, service_version: str) -> None:
 
 
 def _setup_otlp_tracer(service_name: str, service_version: str, endpoint: str) -> bool:
-    """OTLP HTTP exporter ile tracer başlat."""
+    """OTLP HTTP exporter ile tracer baÅŸlat."""
     global _TRACER, _TRACER_PROVIDER
 
     from opentelemetry import trace as otel_trace
@@ -250,14 +250,14 @@ def _setup_otlp_tracer(service_name: str, service_version: str, endpoint: str) -
     _TRACER = otel_trace.get_tracer(service_name, service_version)
 
     logger.info(
-        "[Observability] OTLP exporter başlatıldı — endpoint: %s",
+        "[Observability] OTLP exporter baÅŸlatÄ±ldÄ± â€” endpoint: %s",
         endpoint,
     )
     return True
 
 
 def _setup_langfuse_tracer(service_name: str, service_version: str) -> bool:
-    """Langfuse OTLP exporter ile tracer başlat (Basic Auth)."""
+    """Langfuse OTLP exporter ile tracer baÅŸlat (Basic Auth)."""
     global _TRACER, _TRACER_PROVIDER
 
     import base64
@@ -297,15 +297,15 @@ def _setup_langfuse_tracer(service_name: str, service_version: str) -> bool:
 
     _TRACER = otel_trace.get_tracer(service_name, service_version)
 
-    logger.info("[Observability] Langfuse OTLP exporter başlatıldı — tracer aktif.")
+    logger.info("[Observability] Langfuse OTLP exporter baÅŸlatÄ±ldÄ± â€” tracer aktif.")
     return True
 
 
-# ── Tracer erişimi ───────────────────────────────────────────────────────────
+# â”€â”€ Tracer eriÅŸimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def get_tracer():
-    """Mevcut tracer'ı döndürür; başlatılmamışsa no-op tracer oluşturur."""
+    """Mevcut tracer'Ä± dÃ¶ndÃ¼rÃ¼r; baÅŸlatÄ±lmamÄ±ÅŸsa no-op tracer oluÅŸturur."""
     global _TRACER
 
     if _TRACER is not None:
@@ -315,15 +315,15 @@ def get_tracer():
     return _TRACER
 
 
-tracer = get_tracer  # fonksiyon referansı
+tracer = get_tracer  # fonksiyon referansÄ±
 
 
 def observability_aktif_mi() -> bool:
-    """Observability'in aktif olup olmadığını döndürür."""
+    """Observability'in aktif olup olmadÄ±ÄŸÄ±nÄ± dÃ¶ndÃ¼rÃ¼r."""
     return _OBSERVABILITY_AKTIF
 
 
-# ── Span oluşturma yardımcıları ──────────────────────────────────────────────
+# â”€â”€ Span oluÅŸturma yardÄ±mcÄ±larÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def span_olustur(
@@ -331,9 +331,9 @@ def span_olustur(
     attributes: Optional[dict[str, Any]] = None,
     span_tipi: str = "internal",
 ) -> Any:
-    """Manuel span oluştur (context manager olarak kullanılır).
+    """Manuel span oluÅŸtur (context manager olarak kullanÄ±lÄ±r).
 
-    Örnek:
+    Ã–rnek:
         with span_olustur("session.start", {"user_id": "123"}):
             ...
     """
@@ -349,7 +349,7 @@ def span_olustur(
 
 
 def _span_kind(span_tipi: str):
-    """Span tipi string'ini OpenTelemetry SpanKind'e çevir."""
+    """Span tipi string'ini OpenTelemetry SpanKind'e Ã§evir."""
     try:
         from opentelemetry.trace import SpanKind
 
@@ -365,9 +365,9 @@ def _span_kind(span_tipi: str):
         return None
 
 
-# ── Token ve maliyet hesaplama yardımcıları ──────────────────────────────────
+# â”€â”€ Token ve maliyet hesaplama yardÄ±mcÄ±larÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-# Basit token başına maliyet (USD/1K token) — en sık kullanılan modeller
+# Basit token baÅŸÄ±na maliyet (USD/1K token) â€” en sÄ±k kullanÄ±lan modeller
 _TAHMINI_MALIYET: dict[str, dict[str, float]] = {
     "deepseek": {"giris": 0.0005, "cikis": 0.0020},  # deepseek-chat
     "openai": {"giris": 0.00015, "cikis": 0.0006},  # gpt-4o-mini
@@ -396,11 +396,11 @@ def _token_maliyeti_hesapla(
 
 
 def _token_sayisi_tahmin(text: str) -> int:
-    """Karakter bazında kaba token tahmini (4 karakter ≈ 1 token)."""
+    """Karakter bazÄ±nda kaba token tahmini (4 karakter â‰ˆ 1 token)."""
     return len(text) // 4 if text else 0
 
 
-# ── LLM span attribute helper ────────────────────────────────────────────────
+# â”€â”€ LLM span attribute helper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _llm_span_attr(
@@ -413,7 +413,7 @@ def _llm_span_attr(
     success: bool = True,
     hata: Optional[str] = None,
 ) -> dict[str, Any]:
-    """LLM çağrısı için zengin span attribute'ları oluşturur."""
+    """LLM Ã§aÄŸrÄ±sÄ± iÃ§in zengin span attribute'larÄ± oluÅŸturur."""
     giris_token = _token_sayisi_tahmin(sistem_prompt) + sum(
         _token_sayisi_tahmin(str(m)) for m in (mesajlar or [])
     )
@@ -442,15 +442,15 @@ def _llm_span_attr(
     return attrs
 
 
-# ── LLM çağrısı için manuel span başlatma/bitirme API'si ─────────────────────
+# â”€â”€ LLM Ã§aÄŸrÄ±sÄ± iÃ§in manuel span baÅŸlatma/bitirme API'si â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class LLMSpan:
-    """LLM çağrısı için span yöneticisi.
+    """LLM Ã§aÄŸrÄ±sÄ± iÃ§in span yÃ¶neticisi.
 
-    ``with`` bloğu veya manuel start/end ile kullanılabilir.
+    ``with`` bloÄŸu veya manuel start/end ile kullanÄ±labilir.
 
-    Örnek (manuel):
+    Ã–rnek (manuel):
         span = LLMSpan("dusun", provider="deepseek", model="deepseek-chat")
         span.start(sistem_prompt, mesajlar)
         try:
@@ -475,7 +475,7 @@ class LLMSpan:
         self._mesajlar: list = []
 
     def start(self, sistem_prompt: str = "", mesajlar: Optional[list] = None):
-        """Span'i başlat ve zamanı kaydet."""
+        """Span'i baÅŸlat ve zamanÄ± kaydet."""
         self._t0 = time.monotonic()
         self._sistem_prompt = sistem_prompt
         self._mesajlar = mesajlar or []
@@ -494,7 +494,7 @@ class LLMSpan:
         )
 
     def end(self, yanit: str = ""):
-        """Span'i başarıyla bitir — token/maliyet/latency attribute'larını ekle."""
+        """Span'i baÅŸarÄ±yla bitir â€” token/maliyet/latency attribute'larÄ±nÄ± ekle."""
         if self._span is None:
             return
 
@@ -551,23 +551,23 @@ def _status_error(description: str):
 
 
 def _span_set_status(span, description: str):
-    """Span'e hata durumu ata; opentelemetry yoksa sessizce geç."""
+    """Span'e hata durumu ata; opentelemetry yoksa sessizce geÃ§."""
     status = _status_error(description)
     if status is not None:
         span.set_status(status)
 
 
-# ── Dekoratörler ─────────────────────────────────────────────────────────────
+# â”€â”€ DekoratÃ¶rler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def trace_llm_call(
     span_adi: Optional[str] = None,
     attributes: Optional[dict[str, Any]] = None,
 ) -> Callable:
-    """LLM çağrılarını izlemek için dekoratör.
+    """LLM Ã§aÄŸrÄ±larÄ±nÄ± izlemek iÃ§in dekoratÃ¶r.
 
-    ``llm.call`` span tipinde bir span oluşturur. Span'i fonksiyonun
-    etrafına sarar (start_as_current_span ile) ve şu attribute'ları ekler:
+    ``llm.call`` span tipinde bir span oluÅŸturur. Span'i fonksiyonun
+    etrafÄ±na sarar (start_as_current_span ile) ve ÅŸu attribute'larÄ± ekler:
 
         - llm.provider
         - llm.model
@@ -578,7 +578,7 @@ def trace_llm_call(
         - llm.latency_ms
         - llm.success
 
-    Hata durumunda span'e hata bilgisi, stack trace ve exception kaydı eklenir.
+    Hata durumunda span'e hata bilgisi, stack trace ve exception kaydÄ± eklenir.
     """
 
     def decorator(func: Callable) -> Callable:
@@ -611,7 +611,7 @@ def trace_llm_call(
                         result = func(*args, **kwargs)
                         latency_ms = (time.monotonic() - t0) * 1000
 
-                        # Token ve maliyet hesaplama — positional ve keyword arg'lari destekle
+                        # Token ve maliyet hesaplama â€” positional ve keyword arg'lari destekle
                         if "sistem_prompt" in kwargs:
                             _sistem_prompt = kwargs["sistem_prompt"]
                         elif len(args) > 1:
@@ -664,7 +664,7 @@ def trace_llm_call(
                         _span_set_status(span, str(exc))
                         raise
             else:
-                # No-op: tracer yoksa direkt çağır
+                # No-op: tracer yoksa direkt Ã§aÄŸÄ±r
                 return func(*args, **kwargs)
 
         return wrapper
@@ -676,9 +676,9 @@ def trace_tool_call(
     span_adi: Optional[str] = None,
     attributes: Optional[dict[str, Any]] = None,
 ) -> Callable:
-    """Araç (tool) çalıştırmalarını izlemek için dekoratör.
+    """AraÃ§ (tool) Ã§alÄ±ÅŸtÄ±rmalarÄ±nÄ± izlemek iÃ§in dekoratÃ¶r.
 
-    ``tool.execution`` span tipinde bir span oluşturur. Span'e şu
+    ``tool.execution`` span tipinde bir span oluÅŸturur. Span'e ÅŸu
     attribute'lar eklenir:
 
         - tool.name
@@ -698,7 +698,7 @@ def trace_tool_call(
             span_attrs = dict(attributes or {})
             span_attrs.setdefault("span.type", "tool.execution")
 
-            # Tool adı ve parametreler (args: self, arac, ham_param, ...)
+            # Tool adÄ± ve parametreler (args: self, arac, ham_param, ...)
             if len(args) > 1:
                 span_attrs.setdefault("tool.name", str(args[1]))
             if len(args) > 2:
@@ -737,15 +737,15 @@ def trace_tool_call(
     return decorator
 
 
-# ── Skill ve oturum span'leri için bağlam yöneticileri ────────────────────────
+# â”€â”€ Skill ve oturum span'leri iÃ§in baÄŸlam yÃ¶neticileri â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def trace_skill_load(skill_adi: str, **extra_attrs: Any):
-    """Skill yükleme span'i için bağlam yöneticisi.
+    """Skill yÃ¼kleme span'i iÃ§in baÄŸlam yÃ¶neticisi.
 
     ``skill.load`` span tipi.
 
-    Örnek:
+    Ã–rnek:
         with trace_skill_load("web_arama", kategori="arama"):
             skill_yukle(...)
     """
@@ -758,11 +758,11 @@ def trace_skill_load(skill_adi: str, **extra_attrs: Any):
 
 
 def trace_session_start(oturum_id: str, **extra_attrs: Any):
-    """Oturum başlatma span'i için bağlam yöneticisi.
+    """Oturum baÅŸlatma span'i iÃ§in baÄŸlam yÃ¶neticisi.
 
     ``session.start`` span tipi.
 
-    Örnek:
+    Ã–rnek:
         with trace_session_start("abc-123", kullanici="marko"):
             oturum_baslat(...)
     """
@@ -775,11 +775,11 @@ def trace_session_start(oturum_id: str, **extra_attrs: Any):
 
 
 def trace_session_end(oturum_id: str, **extra_attrs: Any):
-    """Oturum bitiş span'i için bağlam yöneticisi.
+    """Oturum bitiÅŸ span'i iÃ§in baÄŸlam yÃ¶neticisi.
 
     ``session.end`` span tipi.
 
-    Örnek:
+    Ã–rnek:
         with trace_session_end("abc-123", message_count=5, total_tokens=1500):
             oturum_kapat(...)
     """
@@ -791,11 +791,11 @@ def trace_session_end(oturum_id: str, **extra_attrs: Any):
     return span_olustur(f"session.end.{oturum_id}", attributes=attrs)
 
 
-# ── Durum sorgulama ──────────────────────────────────────────────────────────
+# â”€â”€ Durum sorgulama â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def observability_durum() -> dict[str, Any]:
-    """Observability sisteminin mevcut durumunu döndürür."""
+    """Observability sisteminin mevcut durumunu dÃ¶ndÃ¼rÃ¼r."""
     return {
         "aktif": _OBSERVABILITY_AKTIF,
         "langfuse_public_key_var": bool(LANGFUSE_PUBLIC_KEY),

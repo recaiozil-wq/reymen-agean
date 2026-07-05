@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """Sessiz except:pass temizleyici.
 except Exception: pass -> except Exception as _e: log.warning(...)
 """
@@ -63,7 +63,7 @@ def main():
     atla = {
         "__pycache__",
         "test",
-        "hermes-memory-backup",
+        "reymen-memory-backup",
         "ReYMeN_reference",
         "skills",
         ".git",
@@ -77,7 +77,7 @@ def main():
             continue
         if temizle(f):
             degisen += 1
-            print(f"  ✅ {f.relative_to(KOK)}")
+            print(f"  âœ… {f.relative_to(KOK)}")
 
     print(f"\nToplam {degisen} dosyada duzeltme yapildi.")
 

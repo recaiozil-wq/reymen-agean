@@ -1,12 +1,12 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-hata_cozucu.py — Windows hata tespit, kodlama ve cozum yoneticisi.
+hata_cozucu.py â€” Windows hata tespit, kodlama ve cozum yoneticisi.
 
 4 bilesen:
-  1. HataWatchdog       — Ekran goruntusu + OCR ile hata tespiti
-  2. HataKoduUretici    — HATA-XXXX formatli kod + .md kayit
-  3. TerminalHataParser — Windows terminal ciktisindan hata ayiklama
-  4. CozumUygulayici    — Kullanicinin verdigi cozumu otomatik uygula
+  1. HataWatchdog       â€” Ekran goruntusu + OCR ile hata tespiti
+  2. HataKoduUretici    â€” HATA-XXXX formatli kod + .md kayit
+  3. TerminalHataParser â€” Windows terminal ciktisindan hata ayiklama
+  4. CozumUygulayici    â€” Kullanicinin verdigi cozumu otomatik uygula
 
 Entegrasyon (motor.py):
     HATA_WATCH_BASLAT, HATA_WATCH_DURDUR, HATA_KOD_AL,
@@ -61,8 +61,8 @@ try:
 except ImportError:
     _WIN_API_VAR = False
 
-# ── Hata kodu sayaç dosyasi ────────────────────────────────────────────────
-_SAYAC_DOSYASI = HATA_KLASORU / "_sayaç.txt"
+# â”€â”€ Hata kodu sayaÃ§ dosyasi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+_SAYAC_DOSYASI = HATA_KLASORU / "_sayaÃ§.txt"
 
 
 def _sonraki_hata_kodu() -> str:
@@ -82,7 +82,7 @@ def _sonraki_hata_kodu() -> str:
     return f"HATA-{son:04d}"
 
 
-# ── Veri yapilari ──────────────────────────────────────────────────────────
+# â”€â”€ Veri yapilari â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 @dataclass
@@ -101,7 +101,7 @@ class HataKaydi:
     cozum: str = ""
 
 
-# ── 1. HataWatchdog ────────────────────────────────────────────────────────
+# â”€â”€ 1. HataWatchdog â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class HataWatchdog:
@@ -204,7 +204,7 @@ class HataWatchdog:
             return ""
 
 
-# ── 2. HataKoduUretici ────────────────────────────────────────────────────
+# â”€â”€ 2. HataKoduUretici â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class HataKoduUretici:
@@ -239,7 +239,7 @@ class HataKoduUretici:
         """Hata metnini analiz et, kod uret, .md olarak kaydet.
 
         Returns:
-            HataKaydi — olusan kayit.
+            HataKaydi â€” olusan kayit.
         """
         kategori = self._kategori_bul(ham_metin)
         ozet = self._ozet_cikar(ham_metin)
@@ -350,7 +350,7 @@ class HataKoduUretici:
             return None
 
 
-# ── 3. TerminalHataParser ──────────────────────────────────────────────────
+# â”€â”€ 3. TerminalHataParser â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class TerminalHataParser:
@@ -358,9 +358,9 @@ class TerminalHataParser:
 
     # Windows hata kaliplari
     _HATA_KALIPLARI = [
-        re.compile(r"(?:Hata|Error|ERROR)\s*[:：]\s*(.+)", re.IGNORECASE),
-        re.compile(r"(?:Exception|exception)\s*[:：]\s*(.+)"),
-        re.compile(r"(?:failed|FAILED)\s*[:：]\s*(.+)", re.IGNORECASE),
+        re.compile(r"(?:Hata|Error|ERROR)\s*[:ï¼š]\s*(.+)", re.IGNORECASE),
+        re.compile(r"(?:Exception|exception)\s*[:ï¼š]\s*(.+)"),
+        re.compile(r"(?:failed|FAILED)\s*[:ï¼š]\s*(.+)", re.IGNORECASE),
         re.compile(r"(?:Traceback|traceback).+?(?=\n\n|\Z)", re.DOTALL),
         re.compile(r"(?:catastrophic|critical|fatal)", re.IGNORECASE),
         re.compile(r"Access\s+(?:Denied|denied)"),
@@ -417,7 +417,7 @@ class TerminalHataParser:
         return sonuc
 
 
-# ── 4. CozumUygulayici ─────────────────────────────────────────────────────
+# â”€â”€ 4. CozumUygulayici â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class CozumUygulayici:
@@ -526,7 +526,7 @@ class CozumUygulayici:
             return {"basarili": False, "kod": kod, "mesaj": str(e), "patch_sonuc": ""}
 
 
-# ── motor.py tool kayit fonksiyonu ─────────────────────────────────────────
+# â”€â”€ motor.py tool kayit fonksiyonu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def motor_kaydet(motor) -> None:
@@ -582,7 +582,7 @@ def motor_kaydet(motor) -> None:
     )
 
 
-# ── Hizli test ─────────────────────────────────────────────────────────────
+# â”€â”€ Hizli test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG, format="%(levelname)s %(message)s")
@@ -624,4 +624,4 @@ Yeni: import existing_module
     wd.durdur()
     print(f"Calisiyor: {wd.calisiyor}")
 
-    print("\n✓ Tum testler gecti.")
+    print("\nâœ“ Tum testler gecti.")

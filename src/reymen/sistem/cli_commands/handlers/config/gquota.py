@@ -1,4 +1,4 @@
-"""_handle_gquota_command handler."""
+﻿"""_handle_gquota_command handler."""
 
 
 def _handle_gquota_command(cli, cmd_original: str) -> None:
@@ -49,7 +49,7 @@ def _handle_gquota_command(cli, cmd_original: str) -> None:
         pct = max(0.0, min(1.0, b.remaining_fraction))
         width = 20
         filled = int(round(pct * width))
-        bar = "▓" * filled + "░" * (width - filled)
+        bar = "â–“" * filled + "â–‘" * (width - filled)
         pct_str = f"{int(pct * 100):3d}%"
         header = b.model_id
         if b.token_type:

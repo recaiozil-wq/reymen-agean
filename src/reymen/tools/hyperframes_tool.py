@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-hyperframes_tool.py — HyperFrames Video Generation.
+hyperframes_tool.py â€” HyperFrames Video Generation.
 
 Renders HTML + CSS + JS animations frame-by-frame with Playwright
 and assembles into video with FFmpeg.
@@ -14,7 +14,7 @@ Usage:
     from reymen.tools.hyperframes_tool import hyperframes_olustur
     sonuc = hyperframes_olustur(
         template="METIN_ANIMASYONU",
-        params={"metin": "Merhaba Dünya!", "arkaplan": "#1a1a2e"},
+        params={"metin": "Merhaba DÃ¼nya!", "arkaplan": "#1a1a2e"},
         cikti="output.mp4",
         fps=30,
         sure=5,
@@ -41,13 +41,13 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 logger = logging.getLogger(__name__)
 
-# ── Sabitler ─────────────────────────────────────────────────────────────
+# â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 COKLU_VIDEO_KLASORU = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "hyperframes_output"
 )
 os.makedirs(COKLU_VIDEO_KLASORU, exist_ok=True)
 
-# ── HTML Template Şablonları ─────────────────────────────────────────────
+# â”€â”€ HTML Template ÅablonlarÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _template_metin_animasyonu(params: dict) -> str:
@@ -70,7 +70,7 @@ def _template_metin_animasyonu(params: dict) -> str:
     efekt = params.get("efekt", "fade")
     arkaplan_resim = params.get("arkaplan_resim", "")
 
-    # CSS animasyonları
+    # CSS animasyonlarÄ±
     efekt_css = {
         "fade": """
             @keyframes animasyon {
@@ -170,16 +170,16 @@ def _template_metin_animasyonu(params: dict) -> str:
 
 def _template_gecis_efekti(params: dict) -> str:
     """
-    Geçiş efekti template.
+    GeÃ§iÅŸ efekti template.
     Parametreler:
       - onceki_metin (str): ilk kare metni
       - sonraki_metin (str): son kare metni
-      - arkaplan (str, ops.): arkaplan rengi (varsayılan: #16213e)
-      - yazi_rengi (str, ops.): metin rengi (varsayılan: #e94560)
-      - gecis_tipi (str, ops.): slide-left | slide-right | fade | zoom | wipe (varsayılan: slide-left)
-      - hiz (float, ops.): geçiş hızı (0.5-3, varsayılan: 1)
+      - arkaplan (str, ops.): arkaplan rengi (varsayÄ±lan: #16213e)
+      - yazi_rengi (str, ops.): metin rengi (varsayÄ±lan: #e94560)
+      - gecis_tipi (str, ops.): slide-left | slide-right | fade | zoom | wipe (varsayÄ±lan: slide-left)
+      - hiz (float, ops.): geÃ§iÅŸ hÄ±zÄ± (0.5-3, varsayÄ±lan: 1)
     """
-    onceki = params.get("onceki_metin", "Önceki")
+    onceki = params.get("onceki_metin", "Ã–nceki")
     sonraki = params.get("sonraki_metin", "Sonraki")
     arkaplan = params.get("arkaplan", "#16213e")
     yazi_rengi = params.get("yazi_rengi", "#e94560")
@@ -283,14 +283,14 @@ def _template_gecis_efekti(params: dict) -> str:
 
 def _template_grafik_animasyonu(params: dict) -> str:
     """
-    Bar/çizgi grafiği animasyonu template.
+    Bar/Ã§izgi grafiÄŸi animasyonu template.
     Parametreler:
-      - baslik (str): grafik başlığı
+      - baslik (str): grafik baÅŸlÄ±ÄŸÄ±
       - veri (list): [{"etiket": "...", "deger": sayi}, ...]
-      - grafik_tipi (str): bar | horizontal-bar | line (varsayılan: bar)
+      - grafik_tipi (str): bar | horizontal-bar | line (varsayÄ±lan: bar)
       - renkler (list, ops.): renk listesi (hex)
-      - arkaplan (str, ops.): arkaplan (varsayılan: #0f3460)
-      - baslik_rengi (str, ops.): başlık rengi (varsayılan: #ffffff)
+      - arkaplan (str, ops.): arkaplan (varsayÄ±lan: #0f3460)
+      - baslik_rengi (str, ops.): baÅŸlÄ±k rengi (varsayÄ±lan: #ffffff)
     """
     baslik = params.get("baslik", "Grafik")
     veri = params.get(
@@ -396,7 +396,7 @@ def _template_grafik_animasyonu(params: dict) -> str:
 </body>
 </html>"""
     elif grafik_tipi == "line":
-        # Çizgi grafiği — canvas kullan
+        # Ã‡izgi grafiÄŸi â€” canvas kullan
         noktalar = [(i, d.get("deger", 0)) for i, d in enumerate(veri)]
         px = 150  # padding x
         py = 100  # padding y
@@ -473,7 +473,7 @@ def _template_grafik_animasyonu(params: dict) -> str:
 </body>
 </html>"""
     else:
-        # Dikey bar (varsayılan)
+        # Dikey bar (varsayÄ±lan)
         bar_sayisi = len(veri)
         bar_genislik = min(120, int(1400 / max(bar_sayisi, 1)))
         toplam_genislik = bar_sayisi * (bar_genislik + 40)
@@ -553,7 +553,7 @@ def _template_grafik_animasyonu(params: dict) -> str:
 </html>"""
 
 
-# ── Template seçici ──────────────────────────────────────────────────────
+# â”€â”€ Template seÃ§ici â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _TEMPLATELER = {
     "METIN_ANIMASYONU": _template_metin_animasyonu,
@@ -563,12 +563,12 @@ _TEMPLATELER = {
 
 
 def html_olustur(template: str, params: dict) -> str:
-    """Verilen template ve parametrelerle HTML çıktısı üretir."""
+    """Verilen template ve parametrelerle HTML Ã§Ä±ktÄ±sÄ± Ã¼retir."""
     template = template.upper().strip()
     if template not in _TEMPLATELER:
         raise ValueError(
             f"Bilinmeyen template: {template}. "
-            f"Seçenekler: {', '.join(_TEMPLATELER.keys())}"
+            f"SeÃ§enekler: {', '.join(_TEMPLATELER.keys())}"
         )
     return _TEMPLATELER[template](params)
 
@@ -579,17 +579,17 @@ def template_listele() -> str:
     for ad, fn in _TEMPLATELER.items():
         doc = getattr(fn, "__doc__", "") or ""
         ilk_satir = doc.strip().split("\n")[0] if doc else ""
-        satirlar.append(f"  {ad:20s} — {ilk_satir}")
+        satirlar.append(f"  {ad:20s} â€” {ilk_satir}")
     satirlar.append("")
     satirlar.append(f"Toplam {len(_TEMPLATELER)} template.")
     return "\n".join(satirlar)
 
 
-# ── Playwright Render Motoru ─────────────────────────────────────────────
+# â”€â”€ Playwright Render Motoru â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _frame_klasoru_olustur() -> str:
-    """Geçici frame klasörü oluştur."""
+    """GeÃ§ici frame klasÃ¶rÃ¼ oluÅŸtur."""
     frame_dir = os.path.join(
         tempfile.gettempdir(), f"hyperframes_{uuid.uuid4().hex[:12]}"
     )
@@ -603,7 +603,7 @@ def _html_render_playwright(
     genislik: int = 1920,
     yukseklik: int = 1080,
 ) -> bool:
-    """Playwright ile HTML render et → PNG screenshot al."""
+    """Playwright ile HTML render et â†’ PNG screenshot al."""
     try:
         from playwright.sync_api import sync_playwright, TimeoutError as PWTimeout
     except ImportError:
@@ -627,13 +627,13 @@ def _html_render_playwright(
                 )
                 page = context.new_page()
 
-                # HTML içeriğini data URL ile yükle
+                # HTML iÃ§eriÄŸini data URL ile yÃ¼kle
                 page.goto(
                     f"data:text/html;base64,{base64.b64encode(html.encode()).decode()}"
                 )
                 page.wait_for_load_state("networkidle")
 
-                # JS animasyonlarının başlaması için bekle
+                # JS animasyonlarÄ±nÄ±n baÅŸlamasÄ± iÃ§in bekle
                 time.sleep(0.5)
 
                 page.screenshot(path=cikti_resim, full_page=False)
@@ -656,12 +656,12 @@ def _frame_uretici(
     yukseklik: int = 1080,
 ) -> List[str]:
     """
-    HTML sayfasını Playwright ile açıp belirtilen süre boyunca
+    HTML sayfasÄ±nÄ± Playwright ile aÃ§Ä±p belirtilen sÃ¼re boyunca
     frame'leri PNG olarak kaydeder.
 
-    JS animasyonlarının akışını yakalamak için:
-    - Her frame'de sayfanın screenshot'ı alınır
-    - requestAnimationFrame benzeri bir mantıkla belirli aralıklarla
+    JS animasyonlarÄ±nÄ±n akÄ±ÅŸÄ±nÄ± yakalamak iÃ§in:
+    - Her frame'de sayfanÄ±n screenshot'Ä± alÄ±nÄ±r
+    - requestAnimationFrame benzeri bir mantÄ±kla belirli aralÄ±klarla
     """
     try:
         from playwright.sync_api import sync_playwright
@@ -696,7 +696,7 @@ def _frame_uretici(
                 page.screenshot(path=frame_yolu, full_page=False)
                 frame_dosyalari.append(frame_yolu)
 
-                # Bir sonraki frame'e geçmeden önce bekle
+                # Bir sonraki frame'e geÃ§meden Ã¶nce bekle
                 if i < toplam_frame - 1:
                     time.sleep(frame_araligi)
 
@@ -714,12 +714,12 @@ def _ffmpeg_video_birlestir(
     fps: int = 30,
 ) -> bool:
     """
-    Frame'leri ffmpeg ile video'ya birleştir.
+    Frame'leri ffmpeg ile video'ya birleÅŸtir.
     """
     if not os.path.isdir(frame_dir):
         return False
 
-    # Frame'lerin varlığını kontrol et
+    # Frame'lerin varlÄ±ÄŸÄ±nÄ± kontrol et
     frame_pattern = os.path.join(frame_dir, "frame_%06d.png")
     ilk_frame = os.path.join(frame_dir, "frame_000000.png")
     if not os.path.exists(ilk_frame):
@@ -773,11 +773,11 @@ def _ffmpeg_video_birlestir(
         return False
 
 
-# ── Birleştirme (Audio + Subtitle) ────────────────────────────────────────
+# â”€â”€ BirleÅŸtirme (Audio + Subtitle) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _audio_ekle(video_yolu: str, audio_yolu: str, cikti: Optional[str] = None) -> str:
-    """Video'ya ses ekle. cikti yoksa mevcut video'nun üzerine yazar."""
+    """Video'ya ses ekle. cikti yoksa mevcut video'nun Ã¼zerine yazar."""
     if cikti is None:
         cikti = video_yolu.replace(".mp4", "_sesli.mp4")
 
@@ -803,7 +803,7 @@ def _audio_ekle(video_yolu: str, audio_yolu: str, cikti: Optional[str] = None) -
         return video_yolu
 
 
-# ── Ana API ────────────────────────────────────────────────────────────────
+# â”€â”€ Ana API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def hyperframes_olustur(
@@ -817,17 +817,17 @@ def hyperframes_olustur(
     ses_yolu: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
-    Ana HyperFrames video oluşturma fonksiyonu.
+    Ana HyperFrames video oluÅŸturma fonksiyonu.
 
     Args:
-        template: Template adı (METIN_ANIMASYONU, GECIS_EFFEKTI, GRAFIK_ANIMASYONU)
+        template: Template adÄ± (METIN_ANIMASYONU, GECIS_EFFEKTI, GRAFIK_ANIMASYONU)
         params: Template parametreleri (dict)
-        cikti: Çıktı video yolu (None=otomatik)
-        fps: Saniyedeki frame sayısı
-        sure: Video süresi (saniye)
-        genislik: Video genişliği (px)
-        yukseklik: Video yüksekliği (px)
-        ses_yolu: Eklenecek ses dosyası (opsiyonel)
+        cikti: Ã‡Ä±ktÄ± video yolu (None=otomatik)
+        fps: Saniyedeki frame sayÄ±sÄ±
+        sure: Video sÃ¼resi (saniye)
+        genislik: Video geniÅŸliÄŸi (px)
+        yukseklik: Video yÃ¼ksekliÄŸi (px)
+        ses_yolu: Eklenecek ses dosyasÄ± (opsiyonel)
 
     Returns:
         {"basarili": bool, "cikti": str, "hata": str, "frame_sayisi": int}
@@ -836,11 +836,11 @@ def hyperframes_olustur(
         params = {}
 
     try:
-        # 1. HTML oluştur
+        # 1. HTML oluÅŸtur
         logger.debug(f"[HyperFrames] HTML olusturuluyor: {template}")
         html = html_olustur(template, params)
 
-        # 2. Çıktı yolunu belirle
+        # 2. Ã‡Ä±ktÄ± yolunu belirle
         if cikti is None:
             cikti = os.path.join(
                 COKLU_VIDEO_KLASORU,
@@ -848,7 +848,7 @@ def hyperframes_olustur(
             )
         os.makedirs(os.path.dirname(os.path.abspath(cikti)), exist_ok=True)
 
-        # 3. Frame'leri oluştur
+        # 3. Frame'leri oluÅŸtur
         frame_dir = _frame_klasoru_olustur()
         logger.debug(f"[HyperFrames] Frame'ler uretiliyor: {frame_dir}")
 
@@ -872,7 +872,7 @@ def hyperframes_olustur(
                 "frame_sayisi": frame_sayisi,
             }
 
-        # 4. FFmpeg ile video'ya birleştir
+        # 4. FFmpeg ile video'ya birleÅŸtir
         logger.debug(f"[HyperFrames] Frame'ler video'ya birlestiriliyor: {cikti}")
         basarili = _ffmpeg_video_birlestir(
             frame_dir=frame_dir,
@@ -895,7 +895,7 @@ def hyperframes_olustur(
             logger.debug(f"[HyperFrames] Ses ekleniyor: {ses_yolu}")
             cikti = _audio_ekle(cikti, ses_yolu)
 
-        # 6. Geçici frame klasörünü temizle
+        # 6. GeÃ§ici frame klasÃ¶rÃ¼nÃ¼ temizle
         try:
             shutil.rmtree(frame_dir, ignore_errors=True)
         except Exception:
@@ -926,7 +926,7 @@ def hyperframes_hizli_metin(
     arkaplan: str = "#1a1a2e",
     yazi_rengi: str = "#ffffff",
 ) -> Dict[str, Any]:
-    """Hızlı metin videosu oluştur."""
+    """HÄ±zlÄ± metin videosu oluÅŸtur."""
     return hyperframes_olustur(
         template="METIN_ANIMASYONU",
         params={
@@ -948,7 +948,7 @@ def hyperframes_hizli_grafik(
     cikti: Optional[str] = None,
     sure: float = 5.0,
 ) -> Dict[str, Any]:
-    """Hızlı grafik videosu oluştur."""
+    """HÄ±zlÄ± grafik videosu oluÅŸtur."""
     return hyperframes_olustur(
         template="GRAFIK_ANIMASYONU",
         params={
@@ -968,7 +968,7 @@ def hyperframes_hizli_gecis(
     cikti: Optional[str] = None,
     sure: float = 3.0,
 ) -> Dict[str, Any]:
-    """Hızlı geçiş videosu oluştur."""
+    """HÄ±zlÄ± geÃ§iÅŸ videosu oluÅŸtur."""
     return hyperframes_olustur(
         template="GECIS_EFFEKTI",
         params={
@@ -981,11 +981,11 @@ def hyperframes_hizli_gecis(
     )
 
 
-# ── Motor Kayıt ──────────────────────────────────────────────────────────
+# â”€â”€ Motor KayÄ±t â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def motor_kaydet(motor) -> None:
-    """Motor'a HyperFrames araçlarını kaydet."""
+    """Motor'a HyperFrames araÃ§larÄ±nÄ± kaydet."""
     if not hasattr(motor, "_plugin_arac_kaydet"):
         return
 
@@ -994,7 +994,7 @@ def motor_kaydet(motor) -> None:
     def hyperframes_video(ham: str) -> str:
         """
         HYPERFRAMES_VIDEO template,param_json,cikti_yolu
-        HTML+CSS+JS animasyonu videosu oluşturur.
+        HTML+CSS+JS animasyonu videosu oluÅŸturur.
         Parametreler: template (METIN_ANIMASYONU|GECIS_EFFEKTI|GRAFIK_ANIMASYONU),
                        param_json (JSON string),
                        cikti_yolu (opsiyonel, .mp4)
@@ -1029,10 +1029,10 @@ def motor_kaydet(motor) -> None:
         if sonuc["basarili"]:
             return (
                 f"[HyperFrames] Video basariyla olusturuldu!\\n"
-                f"  Çıktı: {sonuc['cikti']}\\n"
-                f"  Frame sayısı: {sonuc['frame_sayisi']}\\n"
+                f"  Ã‡Ä±ktÄ±: {sonuc['cikti']}\\n"
+                f"  Frame sayÄ±sÄ±: {sonuc['frame_sayisi']}\\n"
                 f"  Template: {template}\\n"
-                f"  Dosyayı göndermek için: [MEDIA:file=\"{sonuc['cikti']}\"]"
+                f"  DosyayÄ± gÃ¶ndermek iÃ§in: [MEDIA:file=\"{sonuc['cikti']}\"]"
             )
         else:
             return f"[HyperFrames] Hata: {sonuc['hata']}"
@@ -1044,7 +1044,7 @@ def motor_kaydet(motor) -> None:
     def hyperframes_hizli_metin_arac(ham: str) -> str:
         """
         HYPERFRAMES_METIN metin,alt_metin,efekt,sure
-        Hızlı metin animasyonu.
+        HÄ±zlÄ± metin animasyonu.
         Parametreler: metin, alt_metin (ops.), efekt (fade|typewriter|scale|slide-up), sure (sn, ops.)
         """
         parts = [p.strip() for p in ham.split(",", 3)]
@@ -1061,8 +1061,8 @@ def motor_kaydet(motor) -> None:
         )
         if sonuc["basarili"]:
             return (
-                f"[HyperFrames] Metin videosu hazır!\\n"
-                f"  Çıktı: {sonuc['cikti']}\\n"
+                f"[HyperFrames] Metin videosu hazÄ±r!\\n"
+                f"  Ã‡Ä±ktÄ±: {sonuc['cikti']}\\n"
                 f"  [MEDIA:file=\"{sonuc['cikti']}\"]"
             )
         return f"[HyperFrames] Hata: {sonuc['hata']}"
@@ -1070,7 +1070,7 @@ def motor_kaydet(motor) -> None:
     def hyperframes_hizli_grafik_arac(ham: str) -> str:
         """
         HYPERFRAMES_GRAFIK baslik,grafik_tipi,veri_json
-        Hızlı grafik animasyonu.
+        HÄ±zlÄ± grafik animasyonu.
         Parametreler: baslik, grafik_tipi (bar|horizontal-bar|line),
                        veri_json (JSON array of {etiket, deger})
         """
@@ -1091,8 +1091,8 @@ def motor_kaydet(motor) -> None:
         )
         if sonuc["basarili"]:
             return (
-                f"[HyperFrames] Grafik videosu hazır!\\n"
-                f"  Çıktı: {sonuc['cikti']}\\n"
+                f"[HyperFrames] Grafik videosu hazÄ±r!\\n"
+                f"  Ã‡Ä±ktÄ±: {sonuc['cikti']}\\n"
                 f"  [MEDIA:file=\"{sonuc['cikti']}\"]"
             )
         return f"[HyperFrames] Hata: {sonuc['hata']}"
@@ -1100,7 +1100,7 @@ def motor_kaydet(motor) -> None:
     k(
         "HYPERFRAMES_VIDEO",
         hyperframes_video,
-        "HTML+CSS+JS animasyon videosu oluşturur. Parametreler: template, param_json (JSON), cikti_yolu (ops.)",
+        "HTML+CSS+JS animasyon videosu oluÅŸturur. Parametreler: template, param_json (JSON), cikti_yolu (ops.)",
     )
     k(
         "HYPERFRAMES_TEMPLATES",
@@ -1110,23 +1110,23 @@ def motor_kaydet(motor) -> None:
     k(
         "HYPERFRAMES_METIN",
         hyperframes_hizli_metin_arac,
-        "Hızlı metin animasyonu. Parametreler: metin, alt_metin, efekt (fade|typewriter|scale|slide-up), sure",
+        "HÄ±zlÄ± metin animasyonu. Parametreler: metin, alt_metin, efekt (fade|typewriter|scale|slide-up), sure",
     )
     k(
         "HYPERFRAMES_GRAFIK",
         hyperframes_hizli_grafik_arac,
-        "Hızlı grafik animasyonu. Parametreler: baslik, grafik_tipi (bar|horizontal-bar|line), veri_json (JSON)",
+        "HÄ±zlÄ± grafik animasyonu. Parametreler: baslik, grafik_tipi (bar|horizontal-bar|line), veri_json (JSON)",
     )
 
     logger.debug("[HyperFrames] 4 arac kayit edildi.")
     logger.debug("[HyperFrames] 4 arac motor'a kaydedildi.")
 
 
-# ── Test / Demo ──────────────────────────────────────────────────────────
+# â”€â”€ Test / Demo â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def demo():
-    """Tüm template'leri demo video olarak oluştur."""
+    """TÃ¼m template'leri demo video olarak oluÅŸtur."""
     print("=== HyperFrames Demo ===")
 
     # 1. Metin animasyonu
@@ -1141,11 +1141,11 @@ def demo():
     if r1["basarili"]:
         print(f"   Dosya: {r1['cikti']}")
 
-    # 2. Geçiş efekti
+    # 2. GeÃ§iÅŸ efekti
     print("\n2/3: Gecis efekti...")
     r2 = hyperframes_hizli_gecis(
-        "Önceki Sürüm",
-        "Yeni Sürüm",
+        "Ã–nceki SÃ¼rÃ¼m",
+        "Yeni SÃ¼rÃ¼m",
         gecis_tipi="slide-left",
         sure=3.0,
     )
@@ -1156,13 +1156,13 @@ def demo():
     # 3. Grafik animasyonu
     print("\n3/3: Grafik animasyonu...")
     r3 = hyperframes_hizli_grafik(
-        "Aylık Performans",
+        "AylÄ±k Performans",
         veri=[
             {"etiket": "Ocak", "deger": 85},
-            {"etiket": "Şubat", "deger": 92},
+            {"etiket": "Åubat", "deger": 92},
             {"etiket": "Mart", "deger": 78},
             {"etiket": "Nisan", "deger": 95},
-            {"etiket": "Mayıs", "deger": 88},
+            {"etiket": "MayÄ±s", "deger": 88},
         ],
         grafik_tipi="bar",
         sure=5.0,
@@ -1171,7 +1171,7 @@ def demo():
     if r3["basarili"]:
         print(f"   Dosya: {r3['cikti']}")
 
-    print("\n=== Demo tamamlandı ===")
+    print("\n=== Demo tamamlandÄ± ===")
 
 
 if __name__ == "__main__":

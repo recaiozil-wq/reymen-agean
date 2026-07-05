@@ -1,4 +1,4 @@
-"""
+﻿"""
 Session mirroring for cross-platform message delivery.
 
 When a message is sent to a platform (via send_message or cron delivery),
@@ -14,11 +14,11 @@ import logging
 from datetime import datetime
 from typing import Optional
 
-from src.reymen.cron.hermes_stubs import get_hermes_home
+from reymen.sistem.reymen_stubs import get_reymen_home
 
 logger = logging.getLogger(__name__)
 
-_SESSIONS_DIR = get_hermes_home() / "sessions"
+_SESSIONS_DIR = get_reymen_home() / "sessions"
 _SESSIONS_INDEX = _SESSIONS_DIR / "sessions.json"
 
 
@@ -154,7 +154,7 @@ def _append_to_sqlite(session_id: str, message: dict) -> None:
     """Append a message to the SQLite session database."""
     db = None
     try:
-        from reymen.cron.hermes_stubs import SessionDB
+        from reymen.sistem.reymen_stubs import SessionDB
 
         db = SessionDB()
         db.append_message(

@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-network_restriction.py — ReYMeN Ag Kisitlama Modulu.
+network_restriction.py â€” ReYMeN Ag Kisitlama Modulu.
 
 Sandbox icinde calisan kodun hangi aglara erisebilecegini
 kisitlama. Varsayilan: tum gidis (outbound) trafigi engelle,
@@ -33,7 +33,7 @@ from typing import Optional
 
 logger = logging.getLogger(__name__)
 
-# ── Varsayilanlar ──────────────────────────────────────────────────────────
+# â”€â”€ Varsayilanlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 # Varsayilan izin verilen IP'ler (her zaman acik)
 VARSAYILAN_IZINLI = frozenset(
@@ -65,7 +65,7 @@ REYMEN_BASLANGIC = "# REYMEN_NETWORK_START"
 REYMEN_BITIS = "# REYMEN_NETWORK_END"
 
 
-# ── Yardimci Fonksiyonlar ─────────────────────────────────────────────────
+# â”€â”€ Yardimci Fonksiyonlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _sistem_tespit() -> str:
@@ -108,7 +108,7 @@ def _ip_izinli_mi(ip_adresi: str, izinli_liste: list) -> bool:
 def _hosts_etkilesim(eklenecek: list, kaldirilacak: list) -> dict:
     """Hosts dosyasina domain/IP yonlendirmesi ekle/kaldir.
 
-    Tüm gidis trafigini engellemek icin bilinen domain'leri
+    TÃ¼m gidis trafigini engellemek icin bilinen domain'leri
     127.0.0.1'e yonlendirir.
 
     Args:
@@ -312,7 +312,7 @@ def _iptables_kurallari_temizle() -> bool:
         return False
 
 
-# ── Domain Engelleme Listesi ─────────────────────────────────────────────
+# â”€â”€ Domain Engelleme Listesi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 # Bilinen genel domain'ler (tumunu engellemek icin)
 TUM_DOMAIN_YONLENDIR = [
@@ -357,7 +357,7 @@ TUM_DOMAIN_YONLENDIR = [
 ]
 
 
-# ── NetworkRestriction Sinifi ─────────────────────────────────────────────
+# â”€â”€ NetworkRestriction Sinifi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class NetworkRestriction:
@@ -590,7 +590,7 @@ class NetworkRestriction:
             return {"ip": ip_adresi, "izinli": False, "neden": "kisitlama_aktif"}
         return {"ip": ip_adresi, "izinli": True, "neden": "kisitlama_yok"}
 
-    # ── Platform Spesifik ─────────────────────────────────────────────────
+    # â”€â”€ Platform Spesifik â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _windows_firewall_uygula(self, izinli_liste: list) -> dict:
         """Windows Firewall ile outbound kisitlamasi uygula.
@@ -802,7 +802,7 @@ class NetworkRestriction:
         }
 
 
-# ── Module-Level API ─────────────────────────────────────────────────────
+# â”€â”€ Module-Level API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _VARSAYILAN_NETWORK = NetworkRestriction()
 
@@ -850,22 +850,22 @@ def network_durum() -> dict:
 def network_durum_text() -> str:
     """Insan-okunabilir durum metni."""
     d = network_durum()
-    aktif_ikon = "🟢" if d["aktif"] else "🔴"
+    aktif_ikon = "ğŸŸ¢" if d["aktif"] else "ğŸ”´"
     sistem = d["sistem"]
     satirlar = [
         f"[Guvenlik] Network Restriction Durumu:",
         f"  {aktif_ikon} Aktif: {'Evet' if d['aktif'] else 'Hayir'}",
-        f"  🖥️  Sistem: {sistem}",
-        f"  🏠 Her Zaman Izinli: {', '.join(d['her_zaman_izinli'])}",
+        f"  ğŸ–¥ï¸  Sistem: {sistem}",
+        f"  ğŸ  Her Zaman Izinli: {', '.join(d['her_zaman_izinli'])}",
     ]
     if d["baslangic"]:
-        satirlar.append(f"  ⏰ Baslangic: {d['baslangic']}")
+        satirlar.append(f"  â° Baslangic: {d['baslangic']}")
     if d["eklenen_domainler"]:
-        satirlar.append(f"  🌐 Engellenen Domain: {d['eklenen_domainler']}")
+        satirlar.append(f"  ğŸŒ Engellenen Domain: {d['eklenen_domainler']}")
     return "\n".join(satirlar)
 
 
-# ── Docker Network Entegrasyonu ──────────────────────────────────────────
+# â”€â”€ Docker Network Entegrasyonu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class DockerNetworkRestriction:
@@ -947,7 +947,7 @@ class DockerNetworkRestriction:
         return ["--network", "none"]
 
 
-# ── Motor Plugin API ─────────────────────────────────────────────────────
+# â”€â”€ Motor Plugin API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def motor_kaydet(motor):
@@ -980,7 +980,7 @@ def motor_kaydet(motor):
     )
 
 
-# ── CLI Test ─────────────────────────────────────────────────────────────
+# â”€â”€ CLI Test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
     logging.basicConfig(
@@ -1004,7 +1004,7 @@ if __name__ == "__main__":
     for ip in test_ipleri:
         sonuc = _VARSAYILAN_NETWORK.ip_kontrol(ip)
         print(
-            f"  IP {ip}: {'✅ Izinli' if sonuc['izinli'] else '❌ Engelli'} ({sonuc['neden']})"
+            f"  IP {ip}: {'âœ… Izinli' if sonuc['izinli'] else 'âŒ Engelli'} ({sonuc['neden']})"
         )
 
     print()
@@ -1015,15 +1015,15 @@ if __name__ == "__main__":
         allowlist=["10.0.0.0/8", "192.168.0.0/16"],
         block_domainler=False,  # Test icin domain engelleme kapali
     )
-    print(f"  {'✅' if sonuc['basarili'] else '❌'} {sonuc['mesaj']}")
+    print(f"  {'âœ…' if sonuc['basarili'] else 'âŒ'} {sonuc['mesaj']}")
     print()
 
     if _VARSAYILAN_NETWORK.aktif:
-        # 5. Baglantı testi
+        # 5. BaglantÄ± testi
         print("Baglanti testi (8.8.8.8:80)...")
         baglanti = _VARSAYILAN_NETWORK.test_connectivity()
         print(
-            f"  {'❌ Engelli (beklenen)' if not baglanti else '⚠️ Acik (beklenmeyen)'}"
+            f"  {'âŒ Engelli (beklenen)' if not baglanti else 'âš ï¸ Acik (beklenmeyen)'}"
         )
 
         print()
@@ -1031,6 +1031,6 @@ if __name__ == "__main__":
         # 6. Kaldir
         print("Kisitlama kaldiriliyor...")
         sonuc = _VARSAYILAN_NETWORK.remove()
-        print(f"  {'✅' if sonuc['basarili'] else '❌'} {sonuc['mesaj']}")
+        print(f"  {'âœ…' if sonuc['basarili'] else 'âŒ'} {sonuc['mesaj']}")
     else:
         print("Kisitlama uygulanamadi (yetki eksik).")

@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
-"""reymen/mcp/mcp_catalog.py — MCP Sunucu Kataloğu.
+﻿# -*- coding: utf-8 -*-
+"""reymen/mcp/mcp_catalog.py â€” MCP Sunucu KataloÄŸu.
 
-Önceden tanımlı MCP sunucularını listeler ve tek komutla kurulum sağlar.
+Ã–nceden tanÄ±mlÄ± MCP sunucularÄ±nÄ± listeler ve tek komutla kurulum saÄŸlar.
 """
 
 from __future__ import annotations
@@ -14,11 +14,11 @@ from typing import Optional
 
 logger = logging.getLogger(__name__)
 
-# ── Katalog: ad → kurulum bilgisi ────────────────────────────────
+# â”€â”€ Katalog: ad â†’ kurulum bilgisi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 KATALOG = {
     "github": {
         "adi": "GitHub MCP",
-        "aciklama": "GitHub API: issue, PR, repo, dosya yönetimi",
+        "aciklama": "GitHub API: issue, PR, repo, dosya yÃ¶netimi",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-github"],
         "transport": "stdio",
@@ -26,7 +26,7 @@ KATALOG = {
     },
     "filesystem": {
         "adi": "Dosya Sistemi MCP",
-        "aciklama": "Güvenli dosya okuma/yazma/dizin işlemleri",
+        "aciklama": "GÃ¼venli dosya okuma/yazma/dizin iÅŸlemleri",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-filesystem", "/"],
         "transport": "stdio",
@@ -34,7 +34,7 @@ KATALOG = {
     },
     "postgres": {
         "adi": "PostgreSQL MCP",
-        "aciklama": "PostgreSQL veritabanı sorgulama ve şema okuma",
+        "aciklama": "PostgreSQL veritabanÄ± sorgulama ve ÅŸema okuma",
         "komut": "npx",
         "args": ["-y", "@anthropic/server-postgres"],
         "transport": "stdio",
@@ -42,7 +42,7 @@ KATALOG = {
     },
     "sqlite": {
         "adi": "SQLite MCP",
-        "aciklama": "SQLite veritabanı sorgulama ve yönetim",
+        "aciklama": "SQLite veritabanÄ± sorgulama ve yÃ¶netim",
         "komut": "uvx",
         "args": ["mcp-server-sqlite", "--db", "reymen.db"],
         "transport": "stdio",
@@ -50,7 +50,7 @@ KATALOG = {
     },
     "memory": {
         "adi": "Bellek (Knowledge Graph) MCP",
-        "aciklama": "JSON tabanlı bellek/knowledge graph depolama",
+        "aciklama": "JSON tabanlÄ± bellek/knowledge graph depolama",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-memory"],
         "transport": "stdio",
@@ -58,7 +58,7 @@ KATALOG = {
     },
     "puppeteer": {
         "adi": "Puppeteer (Browser) MCP",
-        "aciklama": "Headless Chrome ile web scraping ve ekran görüntüsü",
+        "aciklama": "Headless Chrome ile web scraping ve ekran gÃ¶rÃ¼ntÃ¼sÃ¼",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-puppeteer"],
         "transport": "stdio",
@@ -66,7 +66,7 @@ KATALOG = {
     },
     "playwright": {
         "adi": "Playwright MCP",
-        "aciklama": "Tarayıcı otomasyonu: sayfa yükleme, tıklama, form doldurma, ekran görüntüsü",
+        "aciklama": "TarayÄ±cÄ± otomasyonu: sayfa yÃ¼kleme, tÄ±klama, form doldurma, ekran gÃ¶rÃ¼ntÃ¼sÃ¼",
         "komut": "npx",
         "args": ["-y", "@playwright/mcp"],
         "transport": "stdio",
@@ -82,7 +82,7 @@ KATALOG = {
     },
     "sequential-thinking": {
         "adi": "Sequential Thinking MCP",
-        "aciklama": "Adım adım düşünme ve problem çözme",
+        "aciklama": "AdÄ±m adÄ±m dÃ¼ÅŸÃ¼nme ve problem Ã§Ã¶zme",
         "komut": "npx",
         "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
         "transport": "stdio",
@@ -90,16 +90,16 @@ KATALOG = {
     },
     "reymen-local": {
         "adi": "ReYMeN Local MCP",
-        "aciklama": "ReYMeN'in kendi araçlarını MCP üzerinden sunar",
+        "aciklama": "ReYMeN'in kendi araÃ§larÄ±nÄ± MCP Ã¼zerinden sunar",
         "command": ["python", "-m", "reymen.mcp.server"],
         "transport": "stdio",
-        "dokuman": "Yerleşik — reymen.mcp.server modülü",
+        "dokuman": "YerleÅŸik â€” reymen.mcp.server modÃ¼lÃ¼",
     },
 }
 
 
 def listele() -> list[dict]:
-    """Katalogdaki tüm sunucuları listele."""
+    """Katalogdaki tÃ¼m sunucularÄ± listele."""
     return [
         {
             "ad": ad,
@@ -113,18 +113,18 @@ def listele() -> list[dict]:
 
 
 def bilgi(sunucu_adi: str) -> Optional[dict]:
-    """Belirtilen sunucu hakkında detaylı bilgi."""
+    """Belirtilen sunucu hakkÄ±nda detaylÄ± bilgi."""
     if sunucu_adi not in KATALOG:
         return None
     return KATALOG[sunucu_adi]
 
 
 def kur(sunucu_adi: str) -> dict:
-    """MCP sunucusunu çalışma zamanına ekle (kurulum+yapılandırma).
+    """MCP sunucusunu Ã§alÄ±ÅŸma zamanÄ±na ekle (kurulum+yapÄ±landÄ±rma).
 
-    Not: Bu fonksiyon sadece yapılandırma bilgisini döndürür.
-    Gerçek MCP sunucu başlatma config.yaml üzerinden veya
-    mcp_manager().ekle() ile yapılır.
+    Not: Bu fonksiyon sadece yapÄ±landÄ±rma bilgisini dÃ¶ndÃ¼rÃ¼r.
+    GerÃ§ek MCP sunucu baÅŸlatma config.yaml Ã¼zerinden veya
+    mcp_manager().ekle() ile yapÄ±lÄ±r.
     """
     if sunucu_adi not in KATALOG:
         return {"durum": "hata", "hata": f"'{sunucu_adi}' katalogda yok"}
@@ -159,7 +159,7 @@ def kur(sunucu_adi: str) -> dict:
             return {
                 "durum": "kaydedildi",
                 "sunucu": sunucu_adi,
-                "not": "Sunucu kaydedildi ama bağlantı kurulamadı (çalışmıyor olabilir)",
+                "not": "Sunucu kaydedildi ama baÄŸlantÄ± kurulamadÄ± (Ã§alÄ±ÅŸmÄ±yor olabilir)",
                 "config": cfg,
             }
     except Exception as e:
@@ -167,5 +167,5 @@ def kur(sunucu_adi: str) -> dict:
             "durum": "kaydedildi",
             "sunucu": sunucu_adi,
             "config": cfg,
-            "not": f"Yapılandırma hazır, manuel başlatma gerekebilir: {e}",
+            "not": f"YapÄ±landÄ±rma hazÄ±r, manuel baÅŸlatma gerekebilir: {e}",
         }

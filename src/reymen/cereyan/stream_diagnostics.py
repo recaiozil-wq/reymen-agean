@@ -1,11 +1,11 @@
-# -*- coding: utf-8 -*-
-"""Streaming API çağrısı sağlık takibi.
+﻿# -*- coding: utf-8 -*-
+"""Streaming API Ã§aÄŸrÄ±sÄ± saÄŸlÄ±k takibi.
 
-Her stream denemesi için first-token-time, token hızı, toplam süre ve
-hata bilgisini kaydeder. conversation_loop.py'nin retry döngüsü bu
-istatistikleri kullanarak yavaş/sıkışmış stream'leri erken keser.
+Her stream denemesi iÃ§in first-token-time, token hÄ±zÄ±, toplam sÃ¼re ve
+hata bilgisini kaydeder. conversation_loop.py'nin retry dÃ¶ngÃ¼sÃ¼ bu
+istatistikleri kullanarak yavaÅŸ/sÄ±kÄ±ÅŸmÄ±ÅŸ stream'leri erken keser.
 
-ReYMeN'in stream_diagnostics.py'sinden adapte edilmiştir.
+ReYMeN'in stream_diagnostics.py'sinden adapte edilmiÅŸtir.
 """
 
 from __future__ import annotations
@@ -17,7 +17,7 @@ from typing import List, Optional
 
 @dataclass
 class StreamDenemesi:
-    """Tek bir stream girişiminin istatistikleri."""
+    """Tek bir stream giriÅŸiminin istatistikleri."""
 
     baslangic: float = field(default_factory=time.monotonic)
     ilk_token_zamani: Optional[float] = None
@@ -42,14 +42,14 @@ class StreamDenemesi:
 
     @property
     def ilk_token_gecikme(self) -> Optional[float]:
-        """İlk token'a kadar geçen süre (saniye)."""
+        """Ä°lk token'a kadar geÃ§en sÃ¼re (saniye)."""
         if self.ilk_token_zamani is None:
             return None
         return self.ilk_token_zamani - self.baslangic
 
     @property
     def toplam_sure(self) -> float:
-        """Toplam geçen süre (saniye); bitmemişse şimdiye kadar."""
+        """Toplam geÃ§en sÃ¼re (saniye); bitmemiÅŸse ÅŸimdiye kadar."""
         bitis = self.bitis or time.monotonic()
         return bitis - self.baslangic
 
@@ -81,9 +81,9 @@ class StreamDenemesi:
 
 
 class StreamSaglikTakibi:
-    """Bir konuşma boyunca tüm stream denemelerini takip eder.
+    """Bir konuÅŸma boyunca tÃ¼m stream denemelerini takip eder.
 
-    Kullanım::
+    KullanÄ±m::
 
         takip = StreamSaglikTakibi(max_ilk_token_bekleme=15.0)
         deneme = takip.yeni_deneme(provider="deepseek", model="deepseek-chat")
@@ -91,7 +91,7 @@ class StreamSaglikTakibi:
         for chunk in stream:
             deneme.token_ekle()
             if takip.ask_mi(deneme):
-                break  # yavaş stream'i kes
+                break  # yavaÅŸ stream'i kes
         deneme.bitir()
     """
 
@@ -114,15 +114,15 @@ class StreamSaglikTakibi:
     def ask_mi(self, deneme: StreamDenemesi) -> bool:
         """Stream'i kesmek gerekiyor mu?
 
-        İlk token çok geç geldiyse veya token hızı çok düştüyse True döner.
+        Ä°lk token Ã§ok geÃ§ geldiyse veya token hÄ±zÄ± Ã§ok dÃ¼ÅŸtÃ¼yse True dÃ¶ner.
         """
-        # İlk token henüz gelmedi ve bekleme süresi aşıldı
+        # Ä°lk token henÃ¼z gelmedi ve bekleme sÃ¼resi aÅŸÄ±ldÄ±
         if deneme.ilk_token_zamani is None:
             gecen = time.monotonic() - deneme.baslangic
             if gecen > self.max_ilk_token_bekleme:
                 return True
 
-        # Token hızı çok düşük
+        # Token hÄ±zÄ± Ã§ok dÃ¼ÅŸÃ¼k
         hiz = deneme.token_hizi
         if hiz is not None and hiz < self.min_token_hizi:
             return True

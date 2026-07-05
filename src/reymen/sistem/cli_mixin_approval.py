@@ -1,4 +1,4 @@
-"""ReYMeNCLI mixin module."""
+﻿"""ReYMeNCLI mixin module."""
 
 import logging
 import os
@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 
 class MixinApproval:
-    """ReYMeNCLI Onay/güvenlik metotları."""
+    """ReYMeNCLI Onay/gÃ¼venlik metotlarÄ±."""
 
     def _clarify_callback(self, question, choices):
         """
@@ -58,13 +58,13 @@ class MixinApproval:
         self._invalidate()
 
         # Poll for the user's response.  The countdown in the hint line
-        # updates on each invalidate — but frequent repaints cause visible
+        # updates on each invalidate â€” but frequent repaints cause visible
         # flicker in some terminals (Kitty, ghostty).  We only refresh the
-        # countdown every 5 s; selection changes (↑/↓) trigger instant
+        # countdown every 5 s; selection changes (â†‘/â†“) trigger instant
         # Poll for the user's response.  The countdown in the hint line
-        # updates on each invalidate — but frequent repaints cause visible
+        # updates on each invalidate â€” but frequent repaints cause visible
         # flicker in some terminals (Kitty, ghostty).  We only refresh the
-        # countdown every 5 s; selection changes (↑/↓) trigger instant
+        # countdown every 5 s; selection changes (â†‘/â†“) trigger instant
         # repaints via the key bindings.
         _last_countdown_refresh = _time.monotonic()
         while True:
@@ -76,7 +76,7 @@ class MixinApproval:
                 remaining = self._clarify_deadline - _time.monotonic()
                 if remaining <= 0:
                     break
-                # Only repaint every 5 s for the countdown — avoids flicker
+                # Only repaint every 5 s for the countdown â€” avoids flicker
                 now = _time.monotonic()
                 if now - _last_countdown_refresh >= 5.0:
                     _last_countdown_refresh = now
@@ -85,13 +85,13 @@ class MixinApproval:
                     _last_countdown_refresh = now
                     self._invalidate()
 
-        # Timed out — tear down the UI and let the agent decide
+        # Timed out â€” tear down the UI and let the agent decide
         self._clarify_state = None
         self._clarify_freetext = False
         self._clarify_deadline = 0
         self._invalidate()
         _cprint(
-            f"\n{_DIM}(clarify timed out after {timeout}s — agent will decide){_RST}"
+            f"\n{_DIM}(clarify timed out after {timeout}s â€” agent will decide){_RST}"
         )
         return (
             "The user did not provide a response within the time limit. "
@@ -127,9 +127,9 @@ class MixinApproval:
                 self._restore_modal_input_snapshot()
                 self._invalidate()
                 if result:
-                    _cprint(f"\n{_DIM}  ✓ Password received (cached for session){_RST}")
+                    _cprint(f"\n{_DIM}  âœ“ Password received (cached for session){_RST}")
                 else:
-                    _cprint(f"\n{_DIM}  ⏭ Skipped{_RST}")
+                    _cprint(f"\n{_DIM}  â­ Skipped{_RST}")
                 return result
             except queue.Empty:
                 remaining = self._sudo_deadline - _time.monotonic()
@@ -141,7 +141,7 @@ class MixinApproval:
         self._sudo_deadline = 0
         self._restore_modal_input_snapshot()
         self._invalidate()
-        _cprint(f"\n{_DIM}  ⏱ Timeout — continuing without sudo{_RST}")
+        _cprint(f"\n{_DIM}  â± Timeout â€” continuing without sudo{_RST}")
         return ""
 
     def _approval_callback(
@@ -199,7 +199,7 @@ class MixinApproval:
             self._approval_state = None
             self._approval_deadline = 0
             self._invalidate()
-            _cprint(f"\n{_DIM}  ⏱ Timeout — denying command{_RST}")
+            _cprint(f"\n{_DIM}  â± Timeout â€” denying command{_RST}")
             return "deny"
 
     def _approval_choices(

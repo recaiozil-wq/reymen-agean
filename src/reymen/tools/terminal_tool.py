@@ -1,5 +1,5 @@
-"""
-ReYMeN tools.terminal_tool — Terminal komut yoneticisi.
+﻿"""
+ReYMeN tools.terminal_tool â€” Terminal komut yoneticisi.
 
 SSH, Daytona ve local subprocess ortamlari ile entegre shell komutu
 calistirma. Ortam secimi otomatik (env var) veya manuel (ortam parametresi)
@@ -25,7 +25,7 @@ from .environments.daytona import DaytonaEnvironment
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
-# Hermes uyumluluk arayuzleri (degismeden kalir)
+# ReYMeN uyumluluk arayuzleri (degismeden kalir)
 # ---------------------------------------------------------------------------
 
 _sudo_password_callback: Optional[Callable] = None
@@ -43,12 +43,12 @@ def set_approval_callback(callback: Optional[Callable]) -> None:
 
 
 def cleanup_all_environments() -> None:
-    """Hermes cleanup_all_environments — ReYMeN'de no-op."""
+    """ReYMeN cleanup_all_environments â€” ReYMeN'de no-op."""
     logger.debug("cleanup_all_environments: ReYMeN stub")
 
 
 def cleanup_vm() -> None:
-    """Hermes cleanup_vm — ReYMeN'de no-op."""
+    """ReYMeN cleanup_vm â€” ReYMeN'de no-op."""
     logger.debug("cleanup_vm: ReYMeN stub")
 
 

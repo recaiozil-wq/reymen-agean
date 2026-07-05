@@ -1,4 +1,4 @@
-"""Shared helper classes for gateway platform adapters.
+﻿"""Shared helper classes for gateway platform adapters.
 
 Extracts common patterns that were duplicated across 5-7 adapters:
 message deduplication, text batch aggregation, markdown stripping,
@@ -13,7 +13,7 @@ import time
 from pathlib import Path
 from typing import TYPE_CHECKING, Dict
 
-from src.reymen.cron.hermes_stubs import atomic_json_write
+from reymen.sistem.reymen_stubs import atomic_json_write
 
 if TYPE_CHECKING:
     from reymen.gateway.platforms.base import MessageEvent
@@ -233,9 +233,9 @@ class ThreadParticipationTracker:
         }
 
     def _state_path(self) -> Path:
-        from reymen.cron.hermes_stubs import get_hermes_home
+        from reymen.sistem.reymen_stubs import get_reymen_home
 
-        return get_hermes_home() / f"{self._platform}_threads.json"
+        return get_reymen_home() / f"{self._platform}_threads.json"
 
     def _load(self) -> list[str]:
         path = self._state_path()

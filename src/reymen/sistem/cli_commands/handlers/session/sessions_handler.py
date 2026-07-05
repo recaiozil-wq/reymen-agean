@@ -1,8 +1,8 @@
-"""Handle /sessions command — browse or resume previous sessions."""
+﻿"""Handle /sessions command â€” browse or resume previous sessions."""
 
 
 def handle_sessions_command(cli, cmd_original: str) -> None:
-    """Handle /sessions [list|<id_or_title>] — browse or resume previous sessions.
+    """Handle /sessions [list|<id_or_title>] â€” browse or resume previous sessions.
 
     Without arguments, prints the same recent-sessions table that /resume
     shows when called without a target, and tells the user how to resume.
@@ -22,7 +22,7 @@ def handle_sessions_command(cli, cmd_original: str) -> None:
     arg = parts[1].strip() if len(parts) > 1 else ""
     sub = arg.lower()
 
-    # Bare /sessions or /sessions list — show recent sessions inline.
+    # Bare /sessions or /sessions list â€” show recent sessions inline.
     if not arg or sub in {"list", "ls", "browse"}:
         if not cli._session_db:
             from reymen.sistem.ReYMeN_state import format_session_db_unavailable

@@ -1,4 +1,4 @@
-"""Handle dangerous-command approval selection for the CLI session."""
+﻿"""Handle dangerous-command approval selection for the CLI session."""
 
 
 def _handle_approval_selection(cli) -> None:

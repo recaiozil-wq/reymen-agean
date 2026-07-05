@@ -1,4 +1,4 @@
-"""ReYMeN tools.checkpoint_manager shim — Hermes checkpoint yönetimini yönlendirir."""
+﻿"""ReYMeN tools.checkpoint_manager shim â€” ReYMeN checkpoint yÃ¶netimini yÃ¶nlendirir."""
 
 from __future__ import annotations
 
@@ -9,10 +9,10 @@ logger = logging.getLogger(__name__)
 
 
 def format_checkpoint_list(checkpoints: List[Any]) -> str:
-    """Hermes format_checkpoint_list — ReYMeN stub."""
+    """ReYMeN format_checkpoint_list â€” ReYMeN stub."""
     return "Checkpoints (ReYMeN stub)"
 
 
 def maybe_auto_prune_checkpoints(*args, **kwargs) -> None:
-    """Hermes maybe_auto_prune_checkpoints — ReYMeN stub."""
+    """ReYMeN maybe_auto_prune_checkpoints â€” ReYMeN stub."""
     pass

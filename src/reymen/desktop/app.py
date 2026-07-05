@@ -1,9 +1,9 @@
-"""ReYMeN Desktop uygulamasi (ust seviye API)."""
+﻿"""ReYMeN Desktop uygulamasi (ust seviye API)."""
 
 from __future__ import annotations
-from src.reymen.desktop.server import WebServerManager, web_server
-from src.reymen.desktop.autostart import AutoStartManager
-from src.reymen.desktop.tray import run_tray
+from reymen.desktop.server import WebServerManager, web_server
+from reymen.desktop.autostart import AutoStartManager
+from reymen.desktop.tray import run_tray
 
 
 class DesktopApp:

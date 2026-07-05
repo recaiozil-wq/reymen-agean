@@ -1,4 +1,4 @@
-"""Tüm merkez_db'deki SQLite dosyalarına WAL + busy_timeout uygula."""
+﻿"""TÃ¼m merkez_db'deki SQLite dosyalarÄ±na WAL + busy_timeout uygula."""
 
 import sqlite3, os
 import logging
@@ -15,7 +15,7 @@ for db in sorted(dbs):
         con = sqlite3.connect(yol, timeout=10)
         cur = con.cursor()
 
-        # Her PRAGMA ayrı ayrı
+        # Her PRAGMA ayrÄ± ayrÄ±
         cur.execute("PRAGMA journal_mode=WAL")
         jm = cur.fetchone()
         jm = jm[0] if jm else "?"
@@ -27,8 +27,8 @@ for db in sorted(dbs):
         cur.execute("PRAGMA synchronous=NORMAL")
 
         con.close()
-        print(f"  ✅ {db:30s} journal={str(jm):4s} busy={bt}ms")
+        print(f"  âœ… {db:30s} journal={str(jm):4s} busy={bt}ms")
     except Exception as e:
-        print(f"  ❌ {db:30s} HATA: {e}")
+        print(f"  âŒ {db:30s} HATA: {e}")
 
-print("\n✅ Tüm DB'lere WAL + busy_timeout uygulandı")
+print("\nâœ… TÃ¼m DB'lere WAL + busy_timeout uygulandÄ±")

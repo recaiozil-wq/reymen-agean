@@ -1,4 +1,4 @@
-"""ReYMeNCLI mixin module."""
+﻿"""ReYMeNCLI mixin module."""
 
 import logging
 import os
@@ -68,7 +68,7 @@ class MixinCore:
             else CLI_CONFIG["display"].get("compact", False)
         )
         # tool_progress: "off", "new", "all", "verbose" (from config.yaml display section)
-        # YAML 1.1 parses bare `off` as boolean False — normalise to string.
+        # YAML 1.1 parses bare `off` as boolean False â€” normalise to string.
         _raw_tp = CLI_CONFIG["display"].get("tool_progress", "all")
         self.tool_progress_mode = "off" if _raw_tp is False else str(_raw_tp)
         # resume_display: "full" (show history) | "minimal" (one-liner only)
@@ -98,7 +98,7 @@ class MixinCore:
 
         # self.verbose ONLY controls global DEBUG logging (root logger level).
         # display.tool_progress="verbose" controls tool-call rendering (full args,
-        # results, think blocks) and is independent — see _apply_logging_levels.
+        # results, think blocks) and is independent â€” see _apply_logging_levels.
         # Coupling the two (PR #6a1aa420e) caused all module DEBUG logs to spew
         # to console whenever a user set tool_progress: verbose in config.
         self.verbose = bool(verbose) if verbose is not None else False
@@ -153,7 +153,7 @@ class MixinCore:
 
         # Configuration - priority: CLI args > env vars > config file
         # Model comes from: CLI arg or config.yaml (single source of truth).
-        # LLM_MODEL/OPENAI_MODEL env vars are NOT checked — config.yaml is
+        # LLM_MODEL/OPENAI_MODEL env vars are NOT checked â€” config.yaml is
         # authoritative.  This avoids conflicts in multi-agent setups where
         # env vars would stomp each other.
         _model_config = CLI_CONFIG.get("model", {})
@@ -181,7 +181,7 @@ class MixinCore:
         # to the global default.  Provider-specific normalisation may override
         # the default silently but should warn when overriding an explicit choice.
         # A config model that matches the global fallback is NOT considered an
-        # explicit choice — the user just never changed it.  But a config model
+        # explicit choice â€” the user just never changed it.  But a config model
         # like "gpt-5.3-codex" IS explicit and must be preserved.
         self._model_is_default = not model and (
             not _config_model or _config_model == _DEFAULT_CONFIG_MODEL
@@ -207,8 +207,8 @@ class MixinCore:
             or CLI_CONFIG["model"].get("base_url", "")
             or os.getenv("OPENROUTER_BASE_URL", "")
         ) or None
-        # Match key to resolved base_url: OpenRouter URL → prefer OPENROUTER_API_KEY,
-        # custom endpoint → prefer OPENAI_API_KEY (issue #560).
+        # Match key to resolved base_url: OpenRouter URL â†’ prefer OPENROUTER_API_KEY,
+        # custom endpoint â†’ prefer OPENAI_API_KEY (issue #560).
         # Note: _ensure_runtime_credentials() re-resolves this before first use.
         if self.base_url and base_url_host_matches(self.base_url, "openrouter.ai"):
             self.api_key = (
@@ -242,7 +242,7 @@ class MixinCore:
         self.disabled_toolsets = CLI_CONFIG["agent"].get("disabled_toolsets") or []
 
         if toolsets and "all" not in toolsets and "*" not in toolsets:
-            # Validate each toolset — MCP server names are resolved via
+            # Validate each toolset â€” MCP server names are resolved via
             # live registry aliases (registered during discover_mcp_tools),
             # but discovery hasn't run yet at this point, so exclude them.
             mcp_names = set((CLI_CONFIG.get("mcp_servers") or {}).keys())
@@ -297,7 +297,7 @@ class MixinCore:
         self._provider_require_params = pr.get("require_parameters", False)
         self._provider_data_collection = pr.get("data_collection")
 
-        # OpenRouter Pareto Code router knob — coding-score floor (0.0-1.0).
+        # OpenRouter Pareto Code router knob â€” coding-score floor (0.0-1.0).
         # Only applied when model.model == "openrouter/pareto-code".
         # Empty string / None / out-of-range = unset (let OR pick strongest coder).
         _or_cfg = CLI_CONFIG.get("openrouter", {}) or {}
@@ -311,7 +311,7 @@ class MixinCore:
             except (TypeError, ValueError):
                 logger.warning("[fix_01_sessiz_except] Exception")
 
-        # Fallback provider chain — tried in order when primary fails after retries.
+        # Fallback provider chain â€” tried in order when primary fails after retries.
         # Merge new ``fallback_providers`` entries with any legacy
         # ``fallback_model`` entries so old configs still participate.
         self._fallback_model = get_fallback_chain(CLI_CONFIG)
@@ -331,7 +331,7 @@ class MixinCore:
         self.conversation_history: List[Dict[str, Any]] = []
         self.session_start = datetime.now()
         self._resumed = False
-        # Per-prompt elapsed timer — started at the beginning of each chat turn,
+        # Per-prompt elapsed timer â€” started at the beginning of each chat turn,
         # frozen when the agent thread completes, displayed in the status bar.
         self._prompt_start_time: Optional[float] = None  # time.time() when turn started
         self._prompt_duration: float = 0.0  # frozen duration of last completed turn
@@ -343,17 +343,17 @@ class MixinCore:
             self._session_db = SessionDB()
         except Exception as e:
             logger.warning(
-                "Failed to initialize SessionDB — session will NOT be indexed for search: %s",
+                "Failed to initialize SessionDB â€” session will NOT be indexed for search: %s",
                 e,
             )
 
-        # Opportunistic state.db maintenance — runs at most once per
+        # Opportunistic state.db maintenance â€” runs at most once per
         # min_interval_hours, tracked via state_meta in state.db itself so
         # it's shared across all ReYMeN processes for this ReYMeN_HOME.
         # Never blocks startup on failure.
         _run_state_db_auto_maintenance(self._session_db)
 
-        # Opportunistic shadow-repo cleanup — deletes orphan/stale
+        # Opportunistic shadow-repo cleanup â€” deletes orphan/stale
         # checkpoint repos under ~/.ReYMeN/checkpoints/.  Opt-in via
         # checkpoints.auto_prune, idempotent via .last_prune marker.
         _run_checkpoint_auto_maintenance()
@@ -449,7 +449,7 @@ class MixinCore:
         # When True, the input separator rules and the dynamic status bar are
         # hidden until the next user input. Set by _recover_after_resize() so a
         # SIGWINCH cannot stamp a freshly-drawn status bar on top of one that
-        # the terminal just reflowed into scrollback — the cause of duplicated
+        # the terminal just reflowed into scrollback â€” the cause of duplicated
         # bars / "blank line flooding" reports (#19280, #22976).
         self._status_bar_suppressed_after_resize = False
         self._resize_recovery_lock = threading.Lock()
@@ -488,18 +488,18 @@ class MixinCore:
         label = self._voice_record_key_label()
         if self._voice_recording:
             if compact:
-                return [("class:voice-status-recording", " ● REC ")]
-            return [("class:voice-status-recording", f" ● REC  {label} to stop ")]
+                return [("class:voice-status-recording", " â— REC ")]
+            return [("class:voice-status-recording", f" â— REC  {label} to stop ")]
         if self._voice_processing:
             if compact:
-                return [("class:voice-status", " ◉ STT ")]
-            return [("class:voice-status", " ◉ Transcribing... ")]
+                return [("class:voice-status", " â—‰ STT ")]
+            return [("class:voice-status", " â—‰ Transcribing... ")]
         if compact:
-            return [("class:voice-status", f" 🎤 {label} ")]
+            return [("class:voice-status", f" ğŸ¤ {label} ")]
         tts = " | TTS on" if self._voice_tts else ""
         cont = " | Continuous" if self._voice_continuous else ""
         return [
-            ("class:voice-status", f" 🎤 Voice mode{tts}{cont}  —  {label} to record ")
+            ("class:voice-status", f" ğŸ¤ Voice mode{tts}{cont}  â€”  {label} to record ")
         ]
 
     def _normalize_model_for_provider(self, resolved_provider: str) -> bool:
@@ -520,7 +520,7 @@ class MixinCore:
                 if normalized_model and normalized_model != current_model:
                     if not self._model_is_default:
                         self._console_print(
-                            f"[yellow]⚠️  Normalized model '{current_model}' to '{normalized_model}' for {resolved_provider}.[/]"
+                            f"[yellow]âš ï¸  Normalized model '{current_model}' to '{normalized_model}' for {resolved_provider}.[/]"
                         )
                     self.model = normalized_model
                     current_model = normalized_model
@@ -541,7 +541,7 @@ class MixinCore:
                 if canonical and canonical != current_model:
                     if not self._model_is_default:
                         self._console_print(
-                            f"[yellow]⚠️  Normalized Copilot model '{current_model}' to '{canonical}'.[/]"
+                            f"[yellow]âš ï¸  Normalized Copilot model '{current_model}' to '{canonical}'.[/]"
                         )
                     self.model = canonical
                     current_model = canonical
@@ -570,7 +570,7 @@ class MixinCore:
                 if canonical and canonical != current_model:
                     if not self._model_is_default:
                         self._console_print(
-                            f"[yellow]⚠️  Stripped provider prefix from '{current_model}'; using '{canonical}' for {resolved_provider}.[/]"
+                            f"[yellow]âš ï¸  Stripped provider prefix from '{current_model}'; using '{canonical}' for {resolved_provider}.[/]"
                         )
                     self.model = canonical
                     current_model = canonical
@@ -589,12 +589,12 @@ class MixinCore:
         if resolved_provider != "openai-codex":
             return changed
 
-        # 1. Strip provider prefix ("openai/gpt-5.4" → "gpt-5.4")
+        # 1. Strip provider prefix ("openai/gpt-5.4" â†’ "gpt-5.4")
         if "/" in current_model:
             slug = current_model.split("/", 1)[1]
             if not self._model_is_default:
                 self._console_print(
-                    f"[yellow]⚠️  Stripped provider prefix from '{current_model}'; "
+                    f"[yellow]âš ï¸  Stripped provider prefix from '{current_model}'; "
                     f"using '{slug}' for OpenAI Codex.[/]"
                 )
             self.model = slug
@@ -644,7 +644,7 @@ class MixinCore:
         except Exception as exc:
             _primary_exc = exc
 
-        # Primary provider auth failed — try fallback providers before giving up.
+        # Primary provider auth failed â€” try fallback providers before giving up.
         if runtime is None and _primary_exc is not None:
             from reymen.reymen_cli.auth import AuthError
 
@@ -668,7 +668,7 @@ class MixinCore:
                             _fb_model,
                         )
                         _cprint(
-                            f"⚠️  Primary auth failed — switching to fallback: {_fb_provider} / {_fb_model}"
+                            f"âš ï¸  Primary auth failed â€” switching to fallback: {_fb_provider} / {_fb_model}"
                         )
                         self.requested_provider = _fb_provider
                         self.model = _fb_model
@@ -694,7 +694,7 @@ class MixinCore:
         resolved_acp_args = list(runtime.get("args") or [])
         resolved_credential_pool = runtime.get("credential_pool")
         # A callable api_key is a bearer-token provider (Azure Foundry
-        # Entra ID — ``azure_identity_adapter.build_token_provider``).
+        # Entra ID â€” ``azure_identity_adapter.build_token_provider``).
         # The OpenAI SDK accepts ``Callable[[], str]`` for ``api_key`` and
         # invokes it before every request. Skip the string-only validation
         # and placeholder substitution for callables.
@@ -714,19 +714,19 @@ class MixinCore:
                 api_key = "no-key-required"
                 logger.debug(
                     "No API key for custom endpoint %s (source=%s), "
-                    "using placeholder — local servers typically ignore auth",
+                    "using placeholder â€” local servers typically ignore auth",
                     base_url,
                     _source,
                 )
             else:
                 print(
-                    "\n⚠️  Provider resolver returned an empty API key. "
+                    "\nâš ï¸  Provider resolver returned an empty API key. "
                     "Set OPENROUTER_API_KEY or run: ReYMeN setup"
                 )
                 return False
         if not isinstance(base_url, str) or not base_url:
             print(
-                "\n⚠️  Provider resolver returned an empty base URL. "
+                "\nâš ï¸  Provider resolver returned an empty base URL. "
                 "Check your provider config or run: ReYMeN setup"
             )
             return False
@@ -775,7 +775,7 @@ class MixinCore:
                 if _default:
                     self.model = _default
                     logger.info(
-                        "No model configured — defaulting to %s for provider %s",
+                        "No model configured â€” defaulting to %s for provider %s",
                         _default,
                         resolved_provider,
                     )
@@ -869,8 +869,8 @@ class MixinCore:
                 tirith_enabled = security_cfg.get("tirith_enabled", True)
                 if tirith_enabled:
                     _cprint(
-                        f"  {_DIM}⚠ tirith security scanner enabled but not available "
-                        f"— command scanning will use pattern matching only{_RST}"
+                        f"  {_DIM}âš  tirith security scanner enabled but not available "
+                        f"â€” command scanning will use pattern matching only{_RST}"
                     )
         except Exception:
             logger.warning("[fix_01_sessiz_except] Exception")
@@ -911,7 +911,7 @@ class MixinCore:
                 self._session_db = SessionDB()
             except Exception as e:
                 logger.warning(
-                    "SQLite session store not available — session will NOT be indexed: %s",
+                    "SQLite session store not available â€” session will NOT be indexed: %s",
                     e,
                 )
 
@@ -969,14 +969,14 @@ class MixinCore:
                     title_part = f" \"{session_meta['title']}\""
                 if _quiet_mode:
                     print(
-                        f"↻ Resumed session {self.session_id}{title_part} "
+                        f"â†» Resumed session {self.session_id}{title_part} "
                         f"({msg_count} user message{'s' if msg_count != 1 else ''}, "
                         f"{len(restored)} total messages)",
                         file=sys.stderr,
                     )
                 else:
                     ChatConsole().print(
-                        f"[bold {_accent_hex()}]↻ Resumed session[/] "
+                        f"[bold {_accent_hex()}]â†» Resumed session[/] "
                         f"[bold]{_escape(self.session_id)}[/]"
                         f"[bold {_accent_hex()}]{_escape(title_part)}[/] "
                         f"({msg_count} user message{'s' if msg_count != 1 else ''}, {len(restored)} total messages)"
@@ -1093,7 +1093,7 @@ class MixinCore:
                         )
                         _cprint(f"  Session title applied: {self._pending_title}")
                         self._pending_title = None
-                    # else: row creation failed transiently — keep _pending_title for retry
+                    # else: row creation failed transiently â€” keep _pending_title for retry
                 except (ValueError, Exception) as e:
                     _cprint(f"  Could not apply pending title: {e}")
                     # Keep _pending_title so it can be retried after row creation succeeds
@@ -1151,7 +1151,7 @@ class MixinCore:
                 title_part = f' "{session_meta["title"]}"'
             accent_color = _accent_hex()
             self._console_print(
-                f"[{accent_color}]↻ Resumed session [bold]{self.session_id}[/bold]"
+                f"[{accent_color}]â†» Resumed session [bold]{self.session_id}[/bold]"
                 f"{title_part} "
                 f"({msg_count} user message{'s' if msg_count != 1 else ''}, "
                 f"{len(restored)} total messages)[/]"
@@ -1304,7 +1304,7 @@ class MixinCore:
         with self._voice_lock:
             self._voice_mode = True
 
-        # Check config for auto_tts (shape-safe — malformed ``voice:`` YAML
+        # Check config for auto_tts (shape-safe â€” malformed ``voice:`` YAML
         # leaves ``voice_config`` as a non-dict, so guard before .get()).
         try:
             from reymen.reymen_cli.config import load_config
@@ -1323,7 +1323,7 @@ class MixinCore:
 
         tts_status = " (TTS enabled)" if self._voice_tts else ""
         # Use the startup-pinned cache so the advertised shortcut always
-        # matches the live prompt_toolkit binding — reading live config
+        # matches the live prompt_toolkit binding â€” reading live config
         # here would drift after a mid-session config edit (Copilot
         # round-14 on #19835, same class as round-13).
         _ptt_display = self._voice_record_key_label()
@@ -1437,12 +1437,12 @@ class MixinCore:
             lines, border_style: str, content_style: str, text: str, box_width: int
         ) -> None:
             inner_width = max(0, box_width - 2)
-            lines.append((border_style, "│ "))
+            lines.append((border_style, "â”‚ "))
             lines.append((content_style, text.ljust(inner_width)))
-            lines.append((border_style, " │\n"))
+            lines.append((border_style, " â”‚\n"))
 
         def _append_blank_panel_line(lines, border_style: str, box_width: int) -> None:
-            lines.append((border_style, "│" + (" " * box_width) + "│\n"))
+            lines.append((border_style, "â”‚" + (" " * box_width) + "â”‚\n"))
 
         command = state["command"]
         description = state["description"]
@@ -1450,7 +1450,7 @@ class MixinCore:
         selected = state.get("selected", 0)
         show_full = state.get("show_full", False)
 
-        title = "⚠️  Dangerous Command"
+        title = "âš ï¸  Dangerous Command"
         cmd_display = (
             command if show_full or len(command) <= 70 else command[:70] + "..."
         )
@@ -1465,7 +1465,7 @@ class MixinCore:
         preview_lines = _wrap_panel_text(description, 60)
         preview_lines.extend(_wrap_panel_text(cmd_display, 60))
         for i, choice in enumerate(choices):
-            prefix = "❯ " if i == selected else "  "
+            prefix = "â¯ " if i == selected else "  "
             preview_lines.extend(
                 _wrap_panel_text(
                     f"{prefix}{choice_labels.get(choice, choice)}",
@@ -1477,7 +1477,7 @@ class MixinCore:
         box_width = _panel_box_width(title, preview_lines)
         inner_text_width = max(8, box_width - 2)
 
-        # Pre-wrap the mandatory content — command + choices must always render.
+        # Pre-wrap the mandatory content â€” command + choices must always render.
         cmd_wrapped = _wrap_panel_text(cmd_display, inner_text_width)
 
         # (choice_index, wrapped_line) so we can re-apply selected styling below
@@ -1492,7 +1492,7 @@ class MixinCore:
             else:
                 num_prefix = " "  # No number for items beyond 10th
             if i == selected:
-                prefix = f"❯ {num_prefix}. "
+                prefix = f"â¯ {num_prefix}. "
             else:
                 prefix = f"  {num_prefix}. "
             for wrapped in _wrap_panel_text(
@@ -1531,7 +1531,7 @@ class MixinCore:
         if len(cmd_wrapped) > max_cmd_rows:
             keep = max(1, max_cmd_rows - 1) if max_cmd_rows > 1 else 1
             cmd_wrapped = cmd_wrapped[:keep] + [
-                "… (command truncated — use /logs or /debug for full text)"
+                "â€¦ (command truncated â€” use /logs or /debug for full text)"
             ]
 
         # Allocate any remaining rows to description. The extra -1 in full mode
@@ -1549,14 +1549,14 @@ class MixinCore:
             desc_wrapped = []
         elif len(desc_wrapped) > available_for_desc:
             keep = max(1, available_for_desc - 1)
-            desc_wrapped = desc_wrapped[:keep] + ["… (description truncated)"]
+            desc_wrapped = desc_wrapped[:keep] + ["â€¦ (description truncated)"]
 
-        # Render: title → command → choices → description (description last so
+        # Render: title â†’ command â†’ choices â†’ description (description last so
         # any remaining overflow clips from the bottom of the least-critical
         # content, never from the command or choices). Use compact chrome (no
         # blank separators) when the terminal is tight.
         lines = []
-        lines.append(("class:approval-border", "╭" + ("─" * box_width) + "╮\n"))
+        lines.append(("class:approval-border", "â•­" + ("â”€" * box_width) + "â•®\n"))
         _append_panel_line(
             lines, "class:approval-border", "class:approval-title", title, box_width
         )
@@ -1590,5 +1590,5 @@ class MixinCore:
                     box_width,
                 )
 
-        lines.append(("class:approval-border", "╰" + ("─" * box_width) + "╯\n"))
+        lines.append(("class:approval-border", "â•°" + ("â”€" * box_width) + "â•¯\n"))
         return lines

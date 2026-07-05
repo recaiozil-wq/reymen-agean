@@ -1,11 +1,11 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-uygulama_hafizasi.py — Her uygulama için ayrı kalıcı hafıza.
-"Photoshop'ta yeni proje şöyle açılır", "X uygulamasında kaydet şurada"
-gibi uygulamaya özel işlem bilgilerini saklar ve geri çağırır.
+uygulama_hafizasi.py â€” Her uygulama iÃ§in ayrÄ± kalÄ±cÄ± hafÄ±za.
+"Photoshop'ta yeni proje ÅŸÃ¶yle aÃ§Ä±lÄ±r", "X uygulamasÄ±nda kaydet ÅŸurada"
+gibi uygulamaya Ã¶zel iÅŸlem bilgilerini saklar ve geri Ã§aÄŸÄ±rÄ±r.
 
-Yapı: .ReYMeN/uygulama_hafizasi/<uygulama_adi>.json
-Her uygulamanın: islemler (ad -> adımlar), makrolar (ad -> makro dosyası), notlar.
+YapÄ±: .ReYMeN/uygulama_hafizasi/<uygulama_adi>.json
+Her uygulamanÄ±n: islemler (ad -> adÄ±mlar), makrolar (ad -> makro dosyasÄ±), notlar.
 """
 
 import json
@@ -33,37 +33,37 @@ class UygulamaHafizasi:
             json.dump(veri, f, ensure_ascii=False, indent=2)
 
     def islem_kaydet(self, uygulama, islem_adi, adimlar):
-        """Bir uygulamadaki bir işlemin adımlarını kaydeder.
-        Örn: islem_kaydet('TinyTask', 'yeni proje', ['Dosya menusu', 'Yeni', ...])"""
+        """Bir uygulamadaki bir iÅŸlemin adÄ±mlarÄ±nÄ± kaydeder.
+        Ã–rn: islem_kaydet('TinyTask', 'yeni proje', ['Dosya menusu', 'Yeni', ...])"""
         veri = self._yukle(uygulama)
         veri["islemler"][islem_adi] = adimlar
         self._kaydet(uygulama, veri)
-        return f"[UygHafıza]: '{uygulama}' için '{islem_adi}' kaydedildi."
+        return f"[UygHafÄ±za]: '{uygulama}' iÃ§in '{islem_adi}' kaydedildi."
 
     def islem_cagir(self, uygulama, islem_adi):
-        """Kayıtlı işlemin adımlarını geri getirir."""
+        """KayÄ±tlÄ± iÅŸlemin adÄ±mlarÄ±nÄ± geri getirir."""
         veri = self._yukle(uygulama)
         if islem_adi in veri["islemler"]:
             return veri["islemler"][islem_adi]
         return None
 
     def makro_bagla(self, uygulama, islem_adi, makro_dosyasi):
-        """Bir işleme kayıtlı bir makro dosyası bağlar."""
+        """Bir iÅŸleme kayÄ±tlÄ± bir makro dosyasÄ± baÄŸlar."""
         veri = self._yukle(uygulama)
         veri["makrolar"][islem_adi] = makro_dosyasi
         self._kaydet(uygulama, veri)
-        return f"[UygHafıza]: '{islem_adi}' makrosu '{uygulama}' altına bağlandı."
+        return f"[UygHafÄ±za]: '{islem_adi}' makrosu '{uygulama}' altÄ±na baÄŸlandÄ±."
 
     def not_ekle(self, uygulama, metin):
         veri = self._yukle(uygulama)
         veri["notlar"].append(metin)
         self._kaydet(uygulama, veri)
-        return "[UygHafıza]: Not eklendi."
+        return "[UygHafÄ±za]: Not eklendi."
 
     def ozet(self, uygulama):
         veri = self._yukle(uygulama)
         islemler = list(veri["islemler"].keys())
-        return f"[{uygulama}] Bilinen işlemler: {', '.join(islemler) or 'yok'}"
+        return f"[{uygulama}] Bilinen iÅŸlemler: {', '.join(islemler) or 'yok'}"
 
     def tum_uygulamalar(self):
         return [f[:-5] for f in os.listdir(self.kok) if f.endswith(".json")]
@@ -75,7 +75,7 @@ if __name__ == "__main__":
         h.islem_kaydet(
             "TinyTask",
             "yeni proje",
-            ["File menüsü aç", "Record'a bas", "işlemi yap", "Save"],
+            ["File menÃ¼sÃ¼ aÃ§", "Record'a bas", "iÅŸlemi yap", "Save"],
         )
     )
     print(h.islem_cagir("TinyTask", "yeni proje"))

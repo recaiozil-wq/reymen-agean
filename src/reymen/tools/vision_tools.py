@@ -1,4 +1,4 @@
-"""ReYMeN tools.vision_tools shim — Hermes vision fonksiyonlarını ReYMeN'e yönlendirir."""
+﻿"""ReYMeN tools.vision_tools shim â€” ReYMeN vision fonksiyonlarÄ±nÄ± ReYMeN'e yÃ¶nlendirir."""
 
 from __future__ import annotations
 
@@ -14,9 +14,9 @@ def vision_analyze_tool(
     question: Optional[str] = None,
     **kwargs,
 ) -> str:
-    """Hermes vision_analyze_tool — ReYMeN vision engine'e yönlendirir.
+    """ReYMeN vision_analyze_tool â€” ReYMeN vision engine'e yÃ¶nlendirir.
 
-    Görsel analizi için LLM'in vision yeteneğini kullanır.
+    GÃ¶rsel analizi iÃ§in LLM'in vision yeteneÄŸini kullanÄ±r.
     """
     try:
         from reymen.arac.araclar_goruntu import gorsel_analiz
@@ -24,7 +24,7 @@ def vision_analyze_tool(
         result = gorsel_analiz(image_url, question or "")
         return json.dumps({"success": True, "analysis": result})
     except ImportError:
-        # Fallback: dosyayı oku ve döndür
+        # Fallback: dosyayÄ± oku ve dÃ¶ndÃ¼r
         try:
             if image_url.startswith(("http://", "https://")):
                 import urllib.request

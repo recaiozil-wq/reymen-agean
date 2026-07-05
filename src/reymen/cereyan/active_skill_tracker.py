@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-active_skill_tracker.py — Aktif skill takibi ve LLM context enjeksiyonu.
+active_skill_tracker.py â€” Aktif skill takibi ve LLM context enjeksiyonu.
 
 SKILL_AKTIVAT araci skill icerigini yukler ama LLM context'ine otomatik
 eklemez. Bu modul, aktif skill'i takip eder ve conversation_loop'un
@@ -86,7 +86,7 @@ def aktif_skill_context_ekle() -> str:
     return f"\n\n=== AKTIF SKILL: {ad} ===\n" f"{kisaltilmis}\n" f"=== SKILL SONU ===\n"
 
 
-# ── Motor / Plugin sistemi uyumlulugu ─────────────────────────────
+# â”€â”€ Motor / Plugin sistemi uyumlulugu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def motor_kaydet(motor) -> bool:

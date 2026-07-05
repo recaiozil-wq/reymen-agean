@@ -1,13 +1,13 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 
 """
-slack_gateway.py — Slack Mesaj Gonderme Gateway (Webhook).
+slack_gateway.py â€” Slack Mesaj Gonderme Gateway (Webhook).
 
 Slack Incoming Webhook URL ile mesaj gonderir. Markdown destegi icerir.
-Harici bir kutuphane GEREKTIRMEZ — urllib ile ham HTTP istegi gonderir.
+Harici bir kutuphane GEREKTIRMEZ â€” urllib ile ham HTTP istegi gonderir.
 
 Baglanti bilgileri .env dosyasindaki su degiskenlerden okunur:
-  - SLACK_WEBHOOK_URL — Slack Incoming Webhook URL'si
+  - SLACK_WEBHOOK_URL â€” Slack Incoming Webhook URL'si
 
 Kullanim:
     from reymen.ag.slack_gateway import slack_gonder, motor_kaydet
@@ -20,7 +20,7 @@ Kullanim:
     # Ozel webhook URL ile
     sonuc = slack_gonder(
         webhook_url="https://hooks.slack.com/services/...",
-        mesaj="*Kalın* ve ~ustu cizili~ metin",
+        mesaj="*KalÄ±n* ve ~ustu cizili~ metin",
     )
 
 Kosullar:
@@ -38,15 +38,15 @@ from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
-# ── Sabitler ────────────────────────────────────────────────────────────
+# â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 ORTAM_WEBHOOK = "SLACK_WEBHOOK_URL"
 VARSAYILAN_TIMEOUT = 30
 VARSAYILAN_RENK = "#36a64f"  # Slack yesili
 
 
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Yardimci: .env yukle
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _dotenv_yukle() -> None:
@@ -64,9 +64,9 @@ def _ayar_al(anahtar: str, varsayilan: str = "") -> str:
     return os.environ.get(anahtar, varsayilan).strip()
 
 
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Slack Mesaj Gonderme (Incoming Webhook)
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def slack_gonder(
@@ -81,12 +81,12 @@ def slack_gonder(
     """Slack Incoming Webhook ile mesaj gonderir.
 
     Markdown formatini destekler:
-      - *kalın*    → **bold**
-      - _italik_   → *italic*
-      - ~ustu ciz~ → ~~strikethrough~~
-      - `kod`      → inline code
-      - ```blok``` → code block
-      - > alinti   → blockquote
+      - *kalÄ±n*    â†’ **bold**
+      - _italik_   â†’ *italic*
+      - ~ustu ciz~ â†’ ~~strikethrough~~
+      - `kod`      â†’ inline code
+      - ```blok``` â†’ code block
+      - > alinti   â†’ blockquote
 
     Args:
         mesaj: Gonderilecek mesaj (Markdown/MRKDWN formatinda)
@@ -107,7 +107,7 @@ def slack_gonder(
         if not url:
             return {
                 "basarili": False,
-                "hata": f"Eksik ayar: {ORTAM_WEBHOOK} — .env dosyanizi kontrol edin",
+                "hata": f"Eksik ayar: {ORTAM_WEBHOOK} â€” .env dosyanizi kontrol edin",
             }
 
         # Slack mesaj payload'i (mrkdwn ile)
@@ -183,9 +183,9 @@ def slack_gonder(
         return {"basarili": False, "hata": hata}
 
 
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Motor Kayit (plugin sistemi)
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def motor_kaydet(motor: Any) -> None:
@@ -205,9 +205,9 @@ def motor_kaydet(motor: Any) -> None:
     )
 
 
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Dogrudan calistirma (test)
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 if __name__ == "__main__":
     logging.basicConfig(

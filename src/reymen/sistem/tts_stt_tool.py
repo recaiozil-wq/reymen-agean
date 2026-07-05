@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-tts_stt_tool.py — ReYMeN TTS (Text-to-Speech) ve STT (Speech-to-Text) araclari.
+tts_stt_tool.py â€” ReYMeN TTS (Text-to-Speech) ve STT (Speech-to-Text) araclari.
 
 TTS: edge-tts (Microsoft Edge TTS motoru, 100+ ses, 50+ dil)
 STT: speech_recognition (Google Speech API, ucretsiz, API key gerekmez)
@@ -22,13 +22,13 @@ from typing import Optional
 
 logger = logging.getLogger(__name__)
 
-# ── Varsayilan ayarlar ─────────────────────────────────────────────────
+# â”€â”€ Varsayilan ayarlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 VARSAYILAN_SES = "tr-TR-EmelNeural"  # Turkce kadin sesi
 CIKTI_DIZINI = Path(tempfile.gettempdir()) / "reymen_tts"
 CIKTI_DIZINI.mkdir(parents=True, exist_ok=True)
 
 
-# ── TTS (Text-to-Speech) ──────────────────────────────────────────────
+# â”€â”€ TTS (Text-to-Speech) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 async def _tts_async(metin: str, ses: str, dosya_yolu: str) -> str:
@@ -57,7 +57,7 @@ def konus(metin: str, ses: str = VARSAYILAN_SES, dosya_adi: str = "") -> str:
         Ses dosyasinin tam yolu
     """
     if not metin or not metin.strip():
-        return "❌ Metin bos."
+        return "âŒ Metin bos."
 
     metin = metin.strip()[:1000]  # edge-tts limiti ~3000
 
@@ -76,7 +76,7 @@ def konus(metin: str, ses: str = VARSAYILAN_SES, dosya_adi: str = "") -> str:
         return dosya_yolu
     except Exception as e:
         logger.error("TTS hatasi: %s", e)
-        return f"❌ TTS hatasi: {e}"
+        return f"âŒ TTS hatasi: {e}"
 
 
 def ses_liste() -> str:
@@ -86,23 +86,23 @@ def ses_liste() -> str:
 
         sesler = asyncio.run(edge_tts.list_voices())
         turkce = [s for s in sesler if "TR" in s.get("Locale", "")]
-        satirlar = ["🔊 Kullanilabilir Sesler:", ""]
+        satirlar = ["ğŸ”Š Kullanilabilir Sesler:", ""]
         if turkce:
             satirlar.append("Turkce Sesler:")
             for s in turkce:
                 ad = s.get("ShortName", "?")
                 cinsiyet = s.get("Gender", "?")
-                satirlar.append(f"  • {ad} ({cinsiyet})")
+                satirlar.append(f"  â€¢ {ad} ({cinsiyet})")
         satirlar.append("")
         satirlar.append(f"Toplam: {len(sesler)} ses ({len(turkce)} Turkce)")
         return "\n".join(satirlar)
     except ImportError:
-        return "❌ edge-tts kurulu degil."
+        return "âŒ edge-tts kurulu degil."
     except Exception as e:
-        return f"❌ Ses listesi hatasi: {e}"
+        return f"âŒ Ses listesi hatasi: {e}"
 
 
-# ── STT (Speech-to-Text) ──────────────────────────────────────────────
+# â”€â”€ STT (Speech-to-Text) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def dinle(dosya_yolu: str, dil: str = "tr-TR") -> str:
@@ -118,10 +118,10 @@ def dinle(dosya_yolu: str, dil: str = "tr-TR") -> str:
     try:
         import speech_recognition as sr
     except ImportError:
-        return "❌ speech_recognition kurulu degil. 'pip install SpeechRecognition' ile kur."
+        return "âŒ speech_recognition kurulu degil. 'pip install SpeechRecognition' ile kur."
 
     if not os.path.exists(dosya_yolu):
-        return f"❌ Dosya bulunamadi: {dosya_yolu}"
+        return f"âŒ Dosya bulunamadi: {dosya_yolu}"
 
     try:
         recognizer = sr.Recognizer()
@@ -135,15 +135,15 @@ def dinle(dosya_yolu: str, dil: str = "tr-TR") -> str:
         return metin
 
     except sr.UnknownValueError:
-        return "❌ Ses taninamadi."
+        return "âŒ Ses taninamadi."
     except sr.RequestError as e:
-        return f"❌ Google Speech API hatasi: {e}"
+        return f"âŒ Google Speech API hatasi: {e}"
     except Exception as e:
         logger.error("STT hatasi: %s", e)
-        return f"❌ STT hatasi: {e}"
+        return f"âŒ STT hatasi: {e}"
 
 
-# ── Motor tool'lari ────────────────────────────────────────────────────
+# â”€â”€ Motor tool'lari â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def motor_kaydet(motor) -> None:
@@ -169,7 +169,7 @@ def motor_kaydet(motor) -> None:
         logger.warning("[TTS/STT] Motor kayit hatasi: %s", e)
 
 
-# ── CLI (dogrudan calistirma) ──────────────────────────────────────────
+# â”€â”€ CLI (dogrudan calistirma) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
     import sys

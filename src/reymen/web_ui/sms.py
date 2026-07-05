@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
-"""📱 ReYMeN SMS Modülü — Twilio REST API üzerinden SMS gönderme.
+﻿# -*- coding: utf-8 -*-
+"""ğŸ“± ReYMeN SMS ModÃ¼lÃ¼ â€” Twilio REST API Ã¼zerinden SMS gÃ¶nderme.
 
-Bağımlılık: twilio kütüphanesi GEREKMEZ, urllib ile direkt REST API.
+BaÄŸÄ±mlÄ±lÄ±k: twilio kÃ¼tÃ¼phanesi GEREKMEZ, urllib ile direkt REST API.
 
 .env'de:
   TWILIO_ACCOUNT_SID=ACxxxx
@@ -25,7 +25,7 @@ TWILIO_API_BASE = "https://api.twilio.com/2010-04-01"
 
 
 def _env_oku(anahtar: str, varsayilan: str = "") -> str:
-    """.env + ReYMeN env fallback ile değer oku."""
+    """.env + ReYMeN env fallback ile deÄŸer oku."""
     # Proje .env
     proje_env = Path(__file__).resolve().parent.parent / ".env"
     if proje_env.exists():
@@ -58,14 +58,14 @@ def sms_gonder(
     auth_token: Optional[str] = None,
     from_num: Optional[str] = None,
 ) -> dict:
-    """Twilio REST API ile SMS gönder.
+    """Twilio REST API ile SMS gÃ¶nder.
 
     Args:
-        telefon: Hedef telefon numarası (+905551234567)
+        telefon: Hedef telefon numarasÄ± (+905551234567)
         mesaj: SMS metni
         account_sid: Twilio Account SID (None=.env'den al)
         auth_token: Twilio Auth Token (None=.env'den al)
-        from_num: Gönderen numara (None=.env'den al)
+        from_num: GÃ¶nderen numara (None=.env'den al)
 
     Returns:
         {"ok": bool, "mesaj_id": str|None, "hata": str|None}
@@ -85,7 +85,7 @@ def sms_gonder(
         return {"ok": False, "hata": f"Eksik: {', '.join(eksik)}", "mesaj_id": None}
 
     if not mesaj:
-        return {"ok": False, "hata": "Mesaj boş", "mesaj_id": None}
+        return {"ok": False, "hata": "Mesaj boÅŸ", "mesaj_id": None}
 
     if len(mesaj) > 1600:
         mesaj = mesaj[:1600] + "..."

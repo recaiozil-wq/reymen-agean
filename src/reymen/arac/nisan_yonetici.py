@@ -1,10 +1,10 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-nisan_yonetici.py — Nisan sablonu cikarma yoneticisi.
+nisan_yonetici.py â€” Nisan sablonu cikarma yoneticisi.
 
 Iki yontem:
-  1. OTONOM — DOM uzerinden otomatik tarama (otonom_nisan_olusturucu)
-  2. MANUEL — Fare ile elle secim (nisan_yakala)
+  1. OTONOM â€” DOM uzerinden otomatik tarama (otonom_nisan_olusturucu)
+  2. MANUEL â€” Fare ile elle secim (nisan_yakala)
 
 Kullanim:
     python nisan_yonetici.py

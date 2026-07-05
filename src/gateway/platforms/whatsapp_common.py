@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""gateway.platforms.whatsapp_common — WhatsApp ortak araçları (stub)."""
+﻿# -*- coding: utf-8 -*-
+"""gateway.platforms.whatsapp_common â€” WhatsApp ortak araÃ§larÄ± (stub)."""
 import json
 import re
 

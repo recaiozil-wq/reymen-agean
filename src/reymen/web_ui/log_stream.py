@@ -1,4 +1,4 @@
-"""📋 WebSocket ile canlı log akışı."""
+﻿"""ğŸ“‹ WebSocket ile canlÄ± log akÄ±ÅŸÄ±."""
 
 from __future__ import annotations
 
@@ -10,14 +10,14 @@ from typing import Callable, Optional
 
 logger = logging.getLogger(__name__)
 
-# WebSocket bağlantıları (basit in-memory)
+# WebSocket baÄŸlantÄ±larÄ± (basit in-memory)
 _log_aboneler: list[Callable] = []
 _log_kuyruk: asyncio.Queue[str] = asyncio.Queue(maxsize=500)
-_log_tail: list[str] = []  # Son 200 satır (yeni bağlananlara gönderilir)
+_log_tail: list[str] = []  # Son 200 satÄ±r (yeni baÄŸlananlara gÃ¶nderilir)
 
 
 class LogStreamer:
-    """Log dosyasını izler ve WebSocket abonelerine iletir."""
+    """Log dosyasÄ±nÄ± izler ve WebSocket abonelerine iletir."""
 
     def __init__(self, log_dosyasi: Path, max_tail: int = 200) -> None:
         self.log_dosyasi = log_dosyasi
@@ -26,7 +26,7 @@ class LogStreamer:
         self._basladi: bool = False
 
     async def basla(self) -> None:
-        """Log dosyasını izlemeye başla."""
+        """Log dosyasÄ±nÄ± izlemeye baÅŸla."""
         if self._basladi:
             return
         self._basladi = True
@@ -36,7 +36,7 @@ class LogStreamer:
             self.log_dosyasi.parent.mkdir(parents=True, exist_ok=True)
             self.log_dosyasi.touch()
 
-        # Mevcut tail'i yükle
+        # Mevcut tail'i yÃ¼kle
         try:
             satirlar = self.log_dosyasi.read_text(
                 encoding="utf-8", errors="replace"
@@ -50,7 +50,7 @@ class LogStreamer:
         logger.info("LogStreamer baslatildi: %s", self.log_dosyasi)
 
     async def tara(self) -> None:
-        """Log dosyasını tara ve yeni satırları kuyruğa ekle."""
+        """Log dosyasÄ±nÄ± tara ve yeni satÄ±rlarÄ± kuyruÄŸa ekle."""
         try:
             suanki = self.log_dosyasi.stat().st_size
             if suanki <= self._son_boyut:
@@ -67,7 +67,7 @@ class LogStreamer:
 
             self._son_boyut = suanki
 
-            # Tail güncelle
+            # Tail gÃ¼ncelle
             for satir in yeni_satirlar.splitlines():
                 self._log_tail.append(satir)
                 await _log_kuyruk.put(satir)
@@ -78,7 +78,7 @@ class LogStreamer:
             logger.debug("Log tarama hatasi (normal): %s", e)
 
     def tail(self, n: int = 50) -> list[str]:
-        """Son N satırı döndür."""
+        """Son N satÄ±rÄ± dÃ¶ndÃ¼r."""
         return self._log_tail[-n:]
 
     @property
@@ -86,7 +86,7 @@ class LogStreamer:
         return self._log_tail[-1] if self._log_tail else "(bos)"
 
 
-# Abone yönetimi
+# Abone yÃ¶netimi
 
 
 def abone_ekle(callback: Callable) -> None:
@@ -99,5 +99,5 @@ def abone_cikar(callback: Callable) -> None:
 
 
 async def log_kuyrugu_oku() -> str:
-    """Log kuyruğundan bir satır al."""
+    """Log kuyruÄŸundan bir satÄ±r al."""
     return await _log_kuyruk.get()

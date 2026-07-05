@@ -1,20 +1,20 @@
-"""scripts paketi."""
+﻿"""scripts paketi."""
 
 __all__ = [
     "AGENTS_DOSYA",
-    "AGENTS_KRITIK_BÖLÜMLER",
+    "AGENTS_KRITIK_BÃ–LÃœMLER",
     "BLU",
     "BOLD",
     "C",
     "CATEGORIES",
-    "CLI_ÖNEKI",
+    "CLI_Ã–NEKI",
     "COVERAGERC_YOL",
     "EXCLUDE",
     "FIXLER",
     "FIX_MAP",
     "GRN",
     "HARIC",
-    "HARIÇ_TUTULAN",
+    "HARIÃ‡_TUTULAN",
     "IMPL",
     "LOGGER_IMPORT",
     "MAIN_PATH",

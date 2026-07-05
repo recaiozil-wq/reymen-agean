@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-cron_manager.py — Cron/Scheduler + Watchdog Sistemi.
+cron_manager.py â€” Cron/Scheduler + Watchdog Sistemi.
 
 Per-job ozellikleri:
   - Schedule override (her is icin ayri zamanlama)
@@ -38,16 +38,16 @@ from typing import Any, Callable, Optional
 
 logger = logging.getLogger(__name__)
 
-# ── Sabitler ─────────────────────────────────────────────────────────
+# â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 PROJE_KOKU = Path(__file__).resolve().parent.parent.parent  # projekt
 CRON_DIZINI = PROJE_KOKU / ".ReYMeN" / "cron"
 JOBS_JSON_YOLU = CRON_DIZINI / "jobs.json"
 WATCHDOG_LOG = CRON_DIZINI / "watchdog.log"
 
 
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Veri Modelleri
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 @dataclass
@@ -143,9 +143,9 @@ class CronJob:
         )
 
 
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  JSON Depolama
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _json_oku() -> dict[str, Any]:
@@ -181,9 +181,9 @@ def _watchdog_log(mesaj: str) -> None:
         )
 
 
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Cron Scheduler
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class CronManager:
@@ -205,7 +205,7 @@ class CronManager:
         self._watchdog_task: Optional[asyncio.Task] = None
         self._calisiyor = False
 
-    # ── Baslat / Durdur ─────────────────────────────────────────────
+    # â”€â”€ Baslat / Durdur â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def baslat(self) -> bool:
         """Scheduler ve watchdog'u baslat."""
@@ -234,7 +234,7 @@ class CronManager:
         logger.info("[CronManager] Durduruldu.")
         return True
 
-    # ── Is Yonetimi ─────────────────────────────────────────────────
+    # â”€â”€ Is Yonetimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def liste(self, aktif_mi: Optional[bool] = None) -> list[dict[str, Any]]:
         """Tum isleri listele.
@@ -360,7 +360,7 @@ class CronManager:
         threading.Thread(target=self._is_calistir, args=(job_id,), daemon=True).start()
         return {"basarili": True, "mesaj": f"{job.ad} baslatildi"}
 
-    # ── Ic Mekanizmalar ─────────────────────────────────────────────
+    # â”€â”€ Ic Mekanizmalar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _mevcut_isleri_yukle(self) -> int:
         """Mevcut jobs.json ve cron/ dizinindeki isleri yukle."""
@@ -411,7 +411,7 @@ class CronManager:
         )
 
     def _scheduler_dongusu(self) -> None:
-        """Arkaplan scheduler dongusu — her 30 saniyede bir kontrol."""
+        """Arkaplan scheduler dongusu â€” her 30 saniyede bir kontrol."""
         while self._calisiyor:
             try:
                 now = datetime.now(timezone.utc)
@@ -428,7 +428,7 @@ class CronManager:
                 time.sleep(60)
 
     def _watchdog_dongusu(self) -> None:
-        """Watchdog dongusu — her 10 saniyede bir calisan isleri kontrol et.
+        """Watchdog dongusu â€” her 10 saniyede bir calisan isleri kontrol et.
 
         Bir is timeout suresini asarsa uyari ver + otomatik restart.
         """
@@ -464,9 +464,9 @@ class CronManager:
                             self._is_calistir(job_id)
                         else:
                             job.durum = "timeout"
-                            job.son_hata = f"Timeout ({job.timeout_saniye}s) — {job.max_retry} deneme tukendi"
+                            job.son_hata = f"Timeout ({job.timeout_saniye}s) â€” {job.max_retry} deneme tukendi"
                             _watchdog_log(
-                                f"WATCHDOG: {job.ad} — {job.max_retry} deneme tukendi, durduruldu"
+                                f"WATCHDOG: {job.ad} â€” {job.max_retry} deneme tukendi, durduruldu"
                             )
                             self._json_kaydet()
 
@@ -481,7 +481,7 @@ class CronManager:
             return False
 
         try:
-            # Basit cron parser — dakika ve saat kontrolu
+            # Basit cron parser â€” dakika ve saat kontrolu
             # Format: "dakika saat gun ay gun_haftasi"
             parts = job.cron_ifade.split()
             if len(parts) < 2:
@@ -572,7 +572,7 @@ class CronManager:
         except Exception as e:
             job.durum = "failed"
             job.son_hata = str(e)
-            _watchdog_log(f"HATA: {job.ad} — {e}")
+            _watchdog_log(f"HATA: {job.ad} â€” {e}")
             logger.error("[Cron] Is baslatma hatasi: %s: %s", job.ad, e)
             self._json_kaydet()
 
@@ -596,7 +596,7 @@ class CronManager:
                 job.son_durum = "error"
                 hata_detay = stderr[-500:] if stderr else f"exit={returncode}"
                 job.son_hata = hata_detay
-                _watchdog_log(f"HATA: {job.ad} — exit={returncode}")
+                _watchdog_log(f"HATA: {job.ad} â€” exit={returncode}")
                 logger.error("[Cron] Is basarisiz: %s (exit=%d)", job.ad, returncode)
 
             logger.info(
@@ -611,7 +611,7 @@ class CronManager:
             job.durum = "timeout"
             job.son_hata = f"Timeout ({job.timeout_saniye}s)"
             process.kill()
-            _watchdog_log(f"TIMEOUT: {job.ad} — {job.timeout_saniye}s")
+            _watchdog_log(f"TIMEOUT: {job.ad} â€” {job.timeout_saniye}s")
         except Exception as e:
             job.durum = "failed"
             job.son_hata = str(e)
@@ -636,9 +636,9 @@ class CronManager:
         return False
 
 
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Tekil Ornek
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 _cron_yonetici: Optional[CronManager] = None
 
@@ -651,9 +651,9 @@ def get_cron_manager() -> CronManager:
     return _cron_yonetici
 
 
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Motor Tool'lari
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _cron_liste(aktif_mi: str = "") -> str:
@@ -679,7 +679,7 @@ def _cron_liste(aktif_mi: str = "") -> str:
         isler = yonetici.liste()
 
     if not isler:
-        return "[] — hic cron isi bulunamadi"
+        return "[] â€” hic cron isi bulunamadi"
 
     return json.dumps(isler, indent=2, ensure_ascii=False, default=str)
 
@@ -753,11 +753,11 @@ def _cron_sil(job_id: str = "") -> str:
     return json.dumps(sonuc, indent=2, ensure_ascii=False, default=str)
 
 
-# ── Motor Kayit ─────────────────────────────────────────────────────
+# â”€â”€ Motor Kayit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def motor_kaydet(motor) -> None:
-    """Motor'a cron/scheduler araçlarını kaydeder."""
+    """Motor'a cron/scheduler araÃ§larÄ±nÄ± kaydeder."""
     motor._plugin_arac_kaydet(
         "CRON_LISTE",
         _cron_liste,

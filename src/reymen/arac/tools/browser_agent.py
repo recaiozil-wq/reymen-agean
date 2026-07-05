@@ -1,20 +1,20 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-browser_agent.py — ReYMeN Otonom Browser Agent Loop Tool.
+browser_agent.py â€” ReYMeN Otonom Browser Agent Loop Tool.
 
-Tek hedef ver, ReYMeN tarayıcıyı otomatik yönetsin:
-  Hedef → Plan → Döngü (navigate → vision → decide → act → verify) → Rapor
+Tek hedef ver, ReYMeN tarayÄ±cÄ±yÄ± otomatik yÃ¶netsin:
+  Hedef â†’ Plan â†’ DÃ¶ngÃ¼ (navigate â†’ vision â†’ decide â†’ act â†’ verify) â†’ Rapor
 
 Resilience desenleri (skill: browser-hata-desenleri):
   - retry + exponential backoff
   - timeout + screenshot + log
-  - sekme state yönetimi (invisible döngü tespiti)
+  - sekme state yÃ¶netimi (invisible dÃ¶ngÃ¼ tespiti)
   - finally ile kaynak temizleme
 
 Tool Registry'e otomatik kaydolur (tools/ dizininde run() fonksiyonu).
 
-Kullanım (LLM'den):
-    Eylem: BROWSER_AGENT(goal="GitHub'da ReYMeN reposunu bul ve yıldız sayısını söyle")
+KullanÄ±m (LLM'den):
+    Eylem: BROWSER_AGENT(goal="GitHub'da ReYMeN reposunu bul ve yÄ±ldÄ±z sayÄ±sÄ±nÄ± sÃ¶yle")
 """
 
 import json
@@ -25,16 +25,16 @@ from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
-# ── Sabitler ─────────────────────────────────────────────────────────
+# â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _DENEME_SAYISI = 3
-_MAX_DENEME = 3  # invisible döngü kesme sınırı
+_MAX_DENEME = 3  # invisible dÃ¶ngÃ¼ kesme sÄ±nÄ±rÄ±
 _TIMEOUT_KISA = 5000
 _TIMEOUT_UZUN = 15000
-_BEKLEME_CARPAN = 1.0  # exponential backoff başlangıcı
+_BEKLEME_CARPAN = 1.0  # exponential backoff baÅŸlangÄ±cÄ±
 
-# ── Tool Meta (Registry için) ──────────────────────────────────────────
+# â”€â”€ Tool Meta (Registry iÃ§in) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 TOOL_META = {
-    "aciklama": "Otonom Browser Agent — tek hedefle tarayıcıyı otomatik yönetir",
+    "aciklama": "Otonom Browser Agent â€” tek hedefle tarayÄ±cÄ±yÄ± otomatik yÃ¶netir",
     "kategori": "browser",
     "risk": 2,
     "parametreler": [
@@ -42,61 +42,61 @@ TOOL_META = {
             "ad": "goal",
             "tip": "string",
             "zorunlu": True,
-            "aciklama": "Tarayıcıda yapılacak iş (örn: 'Google'da X ara, ilk sonucu aç')",
+            "aciklama": "TarayÄ±cÄ±da yapÄ±lacak iÅŸ (Ã¶rn: 'Google'da X ara, ilk sonucu aÃ§')",
         },
         {
             "ad": "url",
             "tip": "string",
             "zorunlu": False,
-            "aciklama": "Başlangıç URL'si (opsiyonel)",
+            "aciklama": "BaÅŸlangÄ±Ã§ URL'si (opsiyonel)",
         },
         {
             "ad": "max_tur",
             "tip": "int",
             "zorunlu": False,
-            "aciklama": "Maksimum döngü turu (varsayılan: 15)",
+            "aciklama": "Maksimum dÃ¶ngÃ¼ turu (varsayÄ±lan: 15)",
         },
     ],
 }
 
-# ── LLM Sistemi Talimati ─────────────────────────────────────────────
-_SISTEM_TALIMATI = """Sen ReYMeN'in tarayıcı otomasyon ajanısın.
-Görevin: Verilen hedefe ulaşmak için tarayıcıyı adım adım yönetmek.
+# â”€â”€ LLM Sistemi Talimati â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+_SISTEM_TALIMATI = """Sen ReYMeN'in tarayÄ±cÄ± otomasyon ajanÄ±sÄ±n.
+GÃ¶revin: Verilen hedefe ulaÅŸmak iÃ§in tarayÄ±cÄ±yÄ± adÄ±m adÄ±m yÃ¶netmek.
 
 TARAYICI KOMUTLARIN:
   navigate: URL'ye git (param: url)
-  click:    elementi tıkla (param: selector - CSS selector)
-  type:     input alanına yazı yaz (param: selector, text)
-  scroll:   sayfayı kaydır (param: direction - up/down)
-  back:     bir önceki sayfaya dön
-  screenshot: ekran görüntüsü al
-  tamam:   hedefe ulaşıldı, döngüyü bitir
-  basarisiz: hedefe ulaşılamadı, döngüyü bitir
+  click:    elementi tÄ±kla (param: selector - CSS selector)
+  type:     input alanÄ±na yazÄ± yaz (param: selector, text)
+  scroll:   sayfayÄ± kaydÄ±r (param: direction - up/down)
+  back:     bir Ã¶nceki sayfaya dÃ¶n
+  screenshot: ekran gÃ¶rÃ¼ntÃ¼sÃ¼ al
+  tamam:   hedefe ulaÅŸÄ±ldÄ±, dÃ¶ngÃ¼yÃ¼ bitir
+  basarisiz: hedefe ulaÅŸÄ±lamadÄ±, dÃ¶ngÃ¼yÃ¼ bitir
 
-ADIM ADIM DÖNGÜ:
-1. Mevcut sayfayı analiz et (sana snapshot verildi)
+ADIM ADIM DÃ–NGÃœ:
+1. Mevcut sayfayÄ± analiz et (sana snapshot verildi)
 2. Bir sonraki eylemi belirle
 3. Eylemi yap
-4. Hedefe ulaşıldı mı kontrol et
-5. Ulaşılmadıysa döngüye devam et
+4. Hedefe ulaÅŸÄ±ldÄ± mÄ± kontrol et
+5. UlaÅŸÄ±lmadÄ±ysa dÃ¶ngÃ¼ye devam et
 
-CEVAP FORMATI (sadece geçerli JSON):
+CEVAP FORMATI (sadece geÃ§erli JSON):
 {"degerlendirme": "mevcut durum analizi", "hedefe_ulasti": false, "eylem": {"tur": "navigate", "parametreler": {"url": "https://..."}, "aciklama": "google'a git"}}
 
 Kurallar:
-- Aynı eylemi 3 kere tekrarlama → tıkanma var, farklı yol dene
-- 3 farklı yol dene, yine olmazsa basarisiz bildir
-- Hedefe ulaştıysan "hedefe_ulasti": true ve "sonuc" alanını doldur
+- AynÄ± eylemi 3 kere tekrarlama â†’ tÄ±kanma var, farklÄ± yol dene
+- 3 farklÄ± yol dene, yine olmazsa basarisiz bildir
+- Hedefe ulaÅŸtÄ±ysan "hedefe_ulasti": true ve "sonuc" alanÄ±nÄ± doldur
 """
 
 
 class BrowserAgentLoop:
-    """Browser Agent Loop — hedefe kadar otonom döngü.
+    """Browser Agent Loop â€” hedefe kadar otonom dÃ¶ngÃ¼.
 
     Resilience desenleri:
     - guvenli_tikla: retry + exponential backoff + screenshot
-    - sekme state: her adımda sayfa kontrolü
-    - invisible döngü tespiti: MAX_DENEME sayacı
+    - sekme state: her adÄ±mda sayfa kontrolÃ¼
+    - invisible dÃ¶ngÃ¼ tespiti: MAX_DENEME sayacÄ±
     - finally: kaynak temizleme
     """
 
@@ -142,12 +142,12 @@ class BrowserAgentLoop:
                 self._beyin = None
         return self._beyin
 
-    # ── Resilience: guvenli_tikla ─────────────────────────────────────
+    # â”€â”€ Resilience: guvenli_tikla â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     def _guvenli_tikla(self, selector: str) -> tuple[bool, str]:
-        """Retry + exponential backoff + screenshot ile güvenli tıklama.
+        """Retry + exponential backoff + screenshot ile gÃ¼venli tÄ±klama.
 
         Returns:
-            (başarılı_mı, sonuç_mesajı)
+            (baÅŸarÄ±lÄ±_mÄ±, sonuÃ§_mesajÄ±)
         """
         for i in range(_DENEME_SAYISI):
             try:
@@ -171,7 +171,7 @@ class BrowserAgentLoop:
             logger.info("[BrowserAgent] %d sn bekleniyor...", bekle)
             time.sleep(bekle)
 
-        # Tüm denemeler başarısız → screenshot al
+        # TÃ¼m denemeler baÅŸarÄ±sÄ±z â†’ screenshot al
         try:
             engine = self._engine_al()
             ss = engine.ekran_goruntusu()
@@ -184,12 +184,12 @@ class BrowserAgentLoop:
         return False, f"[HATA] Tik basarisiz ({_DENEME_SAYISI} deneme): {selector}"
 
     def _guvenli_sayfa_ac(self, url: str) -> tuple[bool, str]:
-        """Timeout + retry ile güvenli sayfa açma."""
-        # Invisible döngü tespiti
+        """Timeout + retry ile gÃ¼venli sayfa aÃ§ma."""
+        # Invisible dÃ¶ngÃ¼ tespiti
         if self._sekme_acma_sayaci >= _MAX_DENEME:
             return (
                 False,
-                "[HATA] Sekme açma/kapama döngüsü tespit edildi — işlem durduruldu",
+                "[HATA] Sekme aÃ§ma/kapama dÃ¶ngÃ¼sÃ¼ tespit edildi â€” iÅŸlem durduruldu",
             )
 
         for i in range(_DENEME_SAYISI):
@@ -214,7 +214,7 @@ class BrowserAgentLoop:
         return False, f"[HATA] Sayfa acilamadi ({_DENEME_SAYISI} deneme): {url}"
 
     def _guvenli_ekran_goruntusu(self) -> str:
-        """Screenshot al, başarısızsa boş dön."""
+        """Screenshot al, baÅŸarÄ±sÄ±zsa boÅŸ dÃ¶n."""
         for i in range(2):
             try:
                 engine = self._engine_al()
@@ -224,9 +224,9 @@ class BrowserAgentLoop:
                 time.sleep(0.5)
         return "[Screenshot alinamadi]"
 
-    # ── LLM Karar ─────────────────────────────────────────────────────
+    # â”€â”€ LLM Karar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     def _llm_karar_ver(self, snapshot: str) -> dict:
-        """LLM'den bir sonraki adımı iste."""
+        """LLM'den bir sonraki adÄ±mÄ± iste."""
         beyin = self._beyin_al()
         snapshot_kisa = snapshot[:2500]
 
@@ -253,7 +253,7 @@ class BrowserAgentLoop:
             return self._basit_strateji()
 
     def _json_ayikla(self, yanit: str) -> dict:
-        """LLM yanıtından JSON çıkar."""
+        """LLM yanÄ±tÄ±ndan JSON Ã§Ä±kar."""
         try:
             if "```" in yanit:
                 parcalar = yanit.split("```")
@@ -268,7 +268,7 @@ class BrowserAgentLoop:
             return json.loads(yanit)
         except (json.JSONDecodeError, Exception):
             return {
-                "degerlendirme": "JSON ayrıştırılamadı",
+                "degerlendirme": "JSON ayrÄ±ÅŸtÄ±rÄ±lamadÄ±",
                 "hedefe_ulasti": True,
                 "eylem": {
                     "tur": "tamam",
@@ -316,16 +316,16 @@ class BrowserAgentLoop:
             self._engine = BrowserEngine()
         return self._engine
 
-    # ── Ana Döngü ─────────────────────────────────────────────────────
+    # â”€â”€ Ana DÃ¶ngÃ¼ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     def calistir(self) -> str:
-        """Ana döngüyü çalıştır.
+        """Ana dÃ¶ngÃ¼yÃ¼ Ã§alÄ±ÅŸtÄ±r.
 
         Resilience:
-        - Her adımda retry + exponential backoff
-        - Screenshot ile hata kanıtı
-        - Sekme state yönetimi
+        - Her adÄ±mda retry + exponential backoff
+        - Screenshot ile hata kanÄ±tÄ±
+        - Sekme state yÃ¶netimi
         - finally ile kaynak temizleme
-        - Invisible döngü tespiti
+        - Invisible dÃ¶ngÃ¼ tespiti
         """
         logger.info("[BrowserAgent] Baslatiliyor: %s", self.goal)
 
@@ -335,13 +335,13 @@ class BrowserAgentLoop:
             baslatma = engine.baslat()
             logger.info("[BrowserAgent] %s", baslatma)
 
-            # İlk sayfaya git
+            # Ä°lk sayfaya git
             if self.baslangic_url:
                 basarili, msg = self._guvenli_sayfa_ac(self.baslangic_url)
                 if not basarili:
-                    return f"❌ BASLANGIC HATASI\n\nHedef: {self.goal}\n{msg}"
+                    return f"âŒ BASLANGIC HATASI\n\nHedef: {self.goal}\n{msg}"
 
-            # Ana döngü
+            # Ana dÃ¶ngÃ¼
             while self.tur < self.max_tur:
                 self.tur += 1
                 logger.info("[BrowserAgent] Tur %d/%d", self.tur, self.max_tur)
@@ -357,14 +357,14 @@ class BrowserAgentLoop:
 
                 logger.info("[BrowserAgent] Karar: %s", eylem)
 
-                # Hedefe ulaşıldı mı?
+                # Hedefe ulaÅŸÄ±ldÄ± mÄ±?
                 if karar.get("hedefe_ulasti", False):
                     sonuc = karar.get("sonuc", "Hedefe ulasildi")
                     return (
-                        f"✅ BROWSER AGENT TAMAMLANDI\n\n"
+                        f"âœ… BROWSER AGENT TAMAMLANDI\n\n"
                         f"Hedef: {self.goal}\n"
                         f"Tur: {self.tur}/{self.max_tur}\n"
-                        f"Sonuç: {sonuc}"
+                        f"SonuÃ§: {sonuc}"
                     )
 
                 # Eylemi uygula (resilience desenleri ile)
@@ -376,14 +376,14 @@ class BrowserAgentLoop:
                         url = self.baslangic_url
                     basarili, msg = self._guvenli_sayfa_ac(url)
                     if not basarili:
-                        return f"❌ NAVIGASYON HATASI\n\nHedef: {self.goal}\nTur: {self.tur}/{self.max_tur}\n{msg}"
+                        return f"âŒ NAVIGASYON HATASI\n\nHedef: {self.goal}\nTur: {self.tur}/{self.max_tur}\n{msg}"
 
                 elif eylem_tur == "click":
                     selector = params.get("selector", "")
                     basarili, msg = self._guvenli_tikla(selector)
                     if not basarili:
                         return (
-                            f"❌ TIKLAMA HATASI\n\n"
+                            f"âŒ TIKLAMA HATASI\n\n"
                             f"Hedef: {self.goal}\n"
                             f"Tur: {self.tur}/{self.max_tur}\n"
                             f"Selector: {selector}\n"
@@ -397,17 +397,17 @@ class BrowserAgentLoop:
 
                 elif eylem_tur in ("tamam", "basarisiz"):
                     return (
-                        f"{'✅' if eylem_tur == 'tamam' else '❌'} BROWSER AGENT SONLANDI\n\n"
+                        f"{'âœ…' if eylem_tur == 'tamam' else 'âŒ'} BROWSER AGENT SONLANDI\n\n"
                         f"Hedef: {self.goal}\n"
                         f"Tur: {self.tur}/{self.max_tur}\n"
-                        f"Sonuç: {eylem.get('aciklama', '')}"
+                        f"SonuÃ§: {eylem.get('aciklama', '')}"
                     )
 
                 time.sleep(0.5)
 
-            # Max tura ulaşıldı
+            # Max tura ulaÅŸÄ±ldÄ±
             return (
-                f"⚠️ BROWSER AGENT SINIR ASIMI\n\n"
+                f"âš ï¸ BROWSER AGENT SINIR ASIMI\n\n"
                 f"Hedef: {self.goal}\n"
                 f"Tur: {self.tur}/{self.max_tur}\n"
                 f"Sebep: Maksimum tur sayisina ulasildi\n"
@@ -417,11 +417,11 @@ class BrowserAgentLoop:
         except Exception as e:
             logger.error("[BrowserAgent] Kritik hata: %s", e)
             return (
-                f"❌ BROWSER AGENT KRITIK HATA\n\n" f"Hedef: {self.goal}\n" f"Hata: {e}"
+                f"âŒ BROWSER AGENT KRITIK HATA\n\n" f"Hedef: {self.goal}\n" f"Hata: {e}"
             )
 
         finally:
-            # Kaynakları temizle
+            # KaynaklarÄ± temizle
             if engine:
                 try:
                     engine.kapat()
@@ -430,19 +430,19 @@ class BrowserAgentLoop:
                     logger.warning("[BrowserAgent] Kapatma hatasi: %s", e)
 
 
-# ── Tool Entry Point (tools/ discovery için) ──────────────────────────
+# â”€â”€ Tool Entry Point (tools/ discovery iÃ§in) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def run(goal: str = "", url: str = "", max_tur: int = 15) -> str:
     """BROWSER_AGENT tool entry point.
 
     Args:
-        goal: Yapılacak iş (örn: "GitHub'da ReYMeN reposunu bul")
-        url: Başlangıç URL'si (opsiyonel)
-        max_tur: Maksimum döngü turu
+        goal: YapÄ±lacak iÅŸ (Ã¶rn: "GitHub'da ReYMeN reposunu bul")
+        url: BaÅŸlangÄ±Ã§ URL'si (opsiyonel)
+        max_tur: Maksimum dÃ¶ngÃ¼ turu
 
     Returns:
-        İşlem sonucu metni
+        Ä°ÅŸlem sonucu metni
     """
     if not goal:
         return "[HATA] 'goal' parametresi zorunludur"
@@ -453,7 +453,7 @@ def run(goal: str = "", url: str = "", max_tur: int = 15) -> str:
     return agent.calistir()
 
 
-# ── Test ───────────────────────────────────────────────────────────────
+# â”€â”€ Test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)

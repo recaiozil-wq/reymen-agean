@@ -1,11 +1,11 @@
-"""_handle_fast_command handler."""
+﻿"""_handle_fast_command handler."""
 
-from src.reymen.sistem.cli_stream import save_config_value
-from src.reymen.sistem.cli_display import _cprint, _ACCENT, _RST, _DIM
+from reymen.sistem.cli_stream import save_config_value
+from reymen.sistem.cli_display import _cprint, _ACCENT, _RST, _DIM
 
 
 def _handle_fast_command(cli, cmd: str):
-    """Handle /fast — toggle fast mode (OpenAI Priority Processing / Anthropic Fast Mode)."""
+    """Handle /fast â€” toggle fast mode (OpenAI Priority Processing / Anthropic Fast Mode)."""
     if not cli._fast_command_available():
         _cprint(
             "  (._.) /fast is only available for models that support fast mode (OpenAI Priority Processing or Anthropic Fast Mode)."
@@ -50,6 +50,6 @@ def _handle_fast_command(cli, cmd: str):
 
     cli.agent = None  # Force agent re-init with new service-tier config
     if save_config_value("agent.service_tier", saved_value):
-        _cprint(f"  {_ACCENT}✓ {feature_name} set to {label} (saved to config){_RST}")
+        _cprint(f"  {_ACCENT}âœ“ {feature_name} set to {label} (saved to config){_RST}")
     else:
-        _cprint(f"  {_ACCENT}✓ {feature_name} set to {label} (session only){_RST}")
+        _cprint(f"  {_ACCENT}âœ“ {feature_name} set to {label} (session only){_RST}")

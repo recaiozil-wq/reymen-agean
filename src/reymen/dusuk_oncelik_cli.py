@@ -1,6 +1,6 @@
-"""ReYMeN CLI — görev 7 özellikleri için komut satırı arayüzü.
+﻿"""ReYMeN CLI â€” gÃ¶rev 7 Ã¶zellikleri iÃ§in komut satÄ±rÄ± arayÃ¼zÃ¼.
 
-Kullanım::
+KullanÄ±m::
 
     python -m ReYMeN.cli status
     python -m ReYMeN.cli cost
@@ -51,7 +51,7 @@ def _get_version() -> str:
 
 
 def _cmd_cost(args: argparse.Namespace) -> int:
-    """Maliyet takibi komutları."""
+    """Maliyet takibi komutlarÄ±."""
     from . import cost_tracker
 
     if args.sub == "summary":
@@ -60,14 +60,14 @@ def _cmd_cost(args: argparse.Namespace) -> int:
         _print_json(cost_tracker.dump_log(limit=args.limit))
     elif args.sub == "reset":
         count = cost_tracker.reset()
-        print(f"{count} kayıt silindi.")
+        print(f"{count} kayÄ±t silindi.")
     else:
         _print_json(cost_tracker.summary())
     return 0
 
 
 def _cmd_platform(args: argparse.Namespace) -> int:
-    """Platform adapter komutları."""
+    """Platform adapter komutlarÄ±."""
     from . import platform_adapter
 
     if args.sub == "info":
@@ -86,7 +86,7 @@ def _cmd_platform(args: argparse.Namespace) -> int:
 
 
 def _cmd_quality(args: argparse.Namespace) -> int:
-    """Self-improvement komutları."""
+    """Self-improvement komutlarÄ±."""
     from . import self_improve
 
     if args.sub == "report":
@@ -101,14 +101,14 @@ def _cmd_quality(args: argparse.Namespace) -> int:
         _print_json(suggestions)
     elif args.sub == "reset":
         self_improve.reset_history()
-        print("Geçmiş temizlendi.")
+        print("GeÃ§miÅŸ temizlendi.")
     else:
         _print_json(self_improve.report())
     return 0
 
 
 def _cmd_kanban(args: argparse.Namespace) -> int:
-    """Kanban komutları."""
+    """Kanban komutlarÄ±."""
     from . import kanban
 
     board_path = args.board
@@ -117,14 +117,14 @@ def _cmd_kanban(args: argparse.Namespace) -> int:
         try:
             board = kanban.Board.load(board_path)
         except FileNotFoundError:
-            print("Pano bulunamadı.")
+            print("Pano bulunamadÄ±.")
             return 1
         _print_json(board.summary())
     elif args.sub == "show":
         try:
             board = kanban.Board.load(board_path)
         except FileNotFoundError:
-            print("Pano bulunamadı.")
+            print("Pano bulunamadÄ±.")
             return 1
         _print_json(board.as_dict())
     elif args.sub == "add":
@@ -143,16 +143,16 @@ def _cmd_kanban(args: argparse.Namespace) -> int:
         try:
             board = kanban.Board.load(board_path)
         except FileNotFoundError:
-            print("Pano bulunamadı.")
+            print("Pano bulunamadÄ±.")
             return 1
         board.move(args.card_id, args.column)
         board.save(board_path)
-        print(f"Kart taşındı: {args.card_id} -> {args.column}")
+        print(f"Kart taÅŸÄ±ndÄ±: {args.card_id} -> {args.column}")
     elif args.sub == "summary":
         try:
             board = kanban.Board.load(board_path)
         except FileNotFoundError:
-            print("Pano bulunamadı.")
+            print("Pano bulunamadÄ±.")
             return 1
         _print_json(board.summary())
     else:
@@ -160,7 +160,7 @@ def _cmd_kanban(args: argparse.Namespace) -> int:
             board = kanban.Board.load(board_path)
             _print_json(board.summary())
         except FileNotFoundError:
-            print("Pano bulunamadı. Önce 'add' ile kart ekleyin.")
+            print("Pano bulunamadÄ±. Ã–nce 'add' ile kart ekleyin.")
             return 1
     return 0
 
@@ -172,7 +172,7 @@ def _exists(path: str) -> bool:
 
 
 def _cmd_video(args: argparse.Namespace) -> int:
-    """Video araçları komutları."""
+    """Video araÃ§larÄ± komutlarÄ±."""
     from . import video_tools
 
     if args.sub == "check":
@@ -203,7 +203,7 @@ def _cmd_video(args: argparse.Namespace) -> int:
                 format=args.format,
                 audio_codec=args.audio_codec,
             )
-            print(f"Dönüştürme başarılı: {args.output}")
+            print(f"DÃ¶nÃ¼ÅŸtÃ¼rme baÅŸarÄ±lÄ±: {args.output}")
         except video_tools.VideoToolError as e:
             print(f"Hata: {e}", file=sys.stderr)
             return 1
@@ -213,7 +213,7 @@ def _cmd_video(args: argparse.Namespace) -> int:
 
 
 def _cmd_a2a(args: argparse.Namespace) -> int:
-    """A2A prototip komutları (demo)."""
+    """A2A prototip komutlarÄ± (demo)."""
     from . import a2a
 
     broker = a2a.Broker()
@@ -238,7 +238,7 @@ def _cmd_a2a(args: argparse.Namespace) -> int:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="ReYMeN",
-        description="ReYMeN — görev 7 düşük öncelikli özellikler CLI",
+        description="ReYMeN â€” gÃ¶rev 7 dÃ¼ÅŸÃ¼k Ã¶ncelikli Ã¶zellikler CLI",
     )
     sub = parser.add_subparsers(dest="command", required=True)
 
@@ -249,19 +249,19 @@ def build_parser() -> argparse.ArgumentParser:
     # cost
     p_cost = sub.add_parser("cost", help="API maliyet takibi")
     p_cost_sub = p_cost.add_subparsers(dest="sub")
-    p_cost_sub.add_parser("summary", help="Maliyet özeti")
-    p_log = p_cost_sub.add_parser("log", help="Ham kayıtlar")
+    p_cost_sub.add_parser("summary", help="Maliyet Ã¶zeti")
+    p_log = p_cost_sub.add_parser("log", help="Ham kayÄ±tlar")
     p_log.add_argument("--limit", type=int, default=20)
-    p_cost_sub.add_parser("reset", help="Kayıtları temizle")
+    p_cost_sub.add_parser("reset", help="KayÄ±tlarÄ± temizle")
     p_cost.set_defaults(func=_cmd_cost, sub="summary")
 
     # platform
     p_plat = sub.add_parser("platform", help="Platform adapter")
     p_plat_sub = p_plat.add_subparsers(dest="sub")
     p_plat_sub.add_parser("info", help="Platform bilgisi")
-    p_trans = p_plat_sub.add_parser("translate", help="Yol çevirisi")
+    p_trans = p_plat_sub.add_parser("translate", help="Yol Ã§evirisi")
     p_trans.add_argument("path")
-    p_plat_sub.add_parser("distros", help="WSL dağıtımları")
+    p_plat_sub.add_parser("distros", help="WSL daÄŸÄ±tÄ±mlarÄ±")
     p_plat.add_argument("--kali", action="store_true", help="Kali tercih et")
     p_plat.set_defaults(func=_cmd_platform, sub="info")
 
@@ -269,33 +269,33 @@ def build_parser() -> argparse.ArgumentParser:
     p_qual = sub.add_parser("quality", help="Self-improvement metrikleri")
     p_qual_sub = p_qual.add_subparsers(dest="sub")
     p_qual_sub.add_parser("report", help="Kalite raporu")
-    p_qual_sub.add_parser("history", help="Geçmiş")
-    p_qual_sub.add_parser("improve", help="İyileştirme önerileri")
-    p_qual_sub.add_parser("reset", help="Geçmişi temizle")
+    p_qual_sub.add_parser("history", help="GeÃ§miÅŸ")
+    p_qual_sub.add_parser("improve", help="Ä°yileÅŸtirme Ã¶nerileri")
+    p_qual_sub.add_parser("reset", help="GeÃ§miÅŸi temizle")
     p_qual.set_defaults(func=_cmd_quality, sub="report")
 
     # kanban
     p_kan = sub.add_parser("kanban", help="Kanban panosu")
-    p_kan.add_argument("--board", default="kanban.json", help="Pano dosyası")
+    p_kan.add_argument("--board", default="kanban.json", help="Pano dosyasÄ±")
     p_kan_sub = p_kan.add_subparsers(dest="sub")
-    p_kan_sub.add_parser("list", help="Pano özeti")
-    p_kan_sub.add_parser("show", help="Tüm pano")
-    p_kan_sub.add_parser("summary", help="Özet")
+    p_kan_sub.add_parser("list", help="Pano Ã¶zeti")
+    p_kan_sub.add_parser("show", help="TÃ¼m pano")
+    p_kan_sub.add_parser("summary", help="Ã–zet")
     p_add = p_kan_sub.add_parser("add", help="Kart ekle")
     p_add.add_argument("title")
     p_add.add_argument("--description", "-d", default="")
     p_add.add_argument("--column", default="todo")
     p_add.add_argument("--priority", default="medium")
     p_add.add_argument("--deadline", default=None)
-    p_move = p_kan_sub.add_parser("move", help="Kart taşı")
+    p_move = p_kan_sub.add_parser("move", help="Kart taÅŸÄ±")
     p_move.add_argument("card_id")
     p_move.add_argument("column")
     p_kan.set_defaults(func=_cmd_kanban, sub="list")
 
     # video
-    p_vid = sub.add_parser("video", help="Video araçları")
+    p_vid = sub.add_parser("video", help="Video araÃ§larÄ±")
     p_vid_sub = p_vid.add_subparsers(dest="sub")
-    p_vid_sub.add_parser("check", help="Araç varlık kontrolü")
+    p_vid_sub.add_parser("check", help="AraÃ§ varlÄ±k kontrolÃ¼")
     p_probe = p_vid_sub.add_parser("probe", help="Medya meta verisi")
     p_probe.add_argument("file")
     p_dl = p_vid_sub.add_parser("download", help="Video indir")
@@ -303,7 +303,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_dl.add_argument("--output-dir", "-o", default=None)
     p_dl.add_argument("--format", "-f", default=None)
     p_dl.add_argument("--audio-only", "-a", action="store_true")
-    p_conv = p_vid_sub.add_parser("convert", help="Dönüştür")
+    p_conv = p_vid_sub.add_parser("convert", help="DÃ¶nÃ¼ÅŸtÃ¼r")
     p_conv.add_argument("input")
     p_conv.add_argument("output")
     p_conv.add_argument("--format", default=None)
@@ -311,7 +311,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_vid.set_defaults(func=_cmd_video, sub="check")
 
     # a2a
-    p_a2a = sub.add_parser("a2a", help="A2A mesajlaşma demo")
+    p_a2a = sub.add_parser("a2a", help="A2A mesajlaÅŸma demo")
     p_a2a.set_defaults(func=_cmd_a2a)
 
     return parser

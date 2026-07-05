@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-STT Tool — Sesi metne cevirir (faster-whisper).
+STT Tool â€” Sesi metne cevirir (faster-whisper).
 ReYMeN icin native STT araci.
 
 Kullanim:
@@ -55,9 +55,9 @@ def sesi_metne_cevir(
     """Ses dosyasini metne cevir.
 
     Parametreler:
-        ses_yolu (str, zorunlu) — Ses dosyasi yolu (.mp3, .wav, .ogg).
-        dil (str, opsiyonel) — Dil kodu (varsayilan: 'tr').
-        model_boyut (str, opsiyonel) — Model boyutu (varsayilan: 'tiny').
+        ses_yolu (str, zorunlu) â€” Ses dosyasi yolu (.mp3, .wav, .ogg).
+        dil (str, opsiyonel) â€” Dil kodu (varsayilan: 'tr').
+        model_boyut (str, opsiyonel) â€” Model boyutu (varsayilan: 'tiny').
 
     Doner:
         Transkripsiyon metni veya hata mesaji.
@@ -94,7 +94,7 @@ def sesi_metne_cevir(
         logger.info(
             "[STT] Transkripsiyon tamam: %d karakter, dil=%s",
             len(tam_metin),
-            bil信息.language if hasattr(bilgi, "language") else dil,
+            bilä¿¡æ¯.language if hasattr(bilgi, "language") else dil,
         )
         return tam_metin
 
@@ -112,21 +112,21 @@ def stt_durum() -> str:
 
         fw_version = getattr(faster_whisper, "__version__", "?")
     except ImportError:
-        return "❌ faster-whisper kurulu degil"
+        return "âŒ faster-whisper kurulu degil"
 
-    durum = f"✅ faster-whisper: {fw_version}\n"
-    durum += f"✅ Model: {VARSAYILAN_MODEL} (cpu, int8)\n"
-    durum += f"✅ Varsayilan dil: {VARSAYILAN_DIL}\n"
+    durum = f"âœ… faster-whisper: {fw_version}\n"
+    durum += f"âœ… Model: {VARSAYILAN_MODEL} (cpu, int8)\n"
+    durum += f"âœ… Varsayilan dil: {VARSAYILAN_DIL}\n"
 
     if _WHISPER_MODEL is not None:
-        durum += "✅ Model su an RAM'de (yuklu)"
+        durum += "âœ… Model su an RAM'de (yuklu)"
     else:
-        durum += "⏳ Model henuz yuklenmedi (ilk kullanimda yuklenecek)"
+        durum += "â³ Model henuz yuklenmedi (ilk kullanimda yuklenecek)"
 
     return durum
 
 
-# ── Motor kayit ──────────────────────────────────────────────────────────────
+# â”€â”€ Motor kayit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def motor_kaydet(motor: Any) -> None:
@@ -136,8 +136,8 @@ def motor_kaydet(motor: Any) -> None:
         """STT_CEVIR: Ses dosyasini metne cevir.
 
         Parametreler:
-            ses_yolu (str, zorunlu) — Ses dosyasi yolu (.mp3, .wav, .ogg).
-            dil (str, opsiyonel) — Dil kodu (varsayilan: 'tr').
+            ses_yolu (str, zorunlu) â€” Ses dosyasi yolu (.mp3, .wav, .ogg).
+            dil (str, opsiyonel) â€” Dil kodu (varsayilan: 'tr').
 
         Doner: Transkripsiyon metni.
         """
@@ -151,7 +151,7 @@ def motor_kaydet(motor: Any) -> None:
         """STT_TEST: STT sistemini test et.
 
         Parametre:
-            ses_yolu (str, opsiyonel) — Test edilecek ses dosyasi.
+            ses_yolu (str, opsiyonel) â€” Test edilecek ses dosyasi.
             Bos birakilirsa sadece model yuklemesini test eder.
         """
         try:
@@ -159,19 +159,19 @@ def motor_kaydet(motor: Any) -> None:
             if ses_yolu:
                 sonuc = sesi_metne_cevir(ses_yolu)
                 if sonuc.startswith("[HATA]") or sonuc.startswith("[UYARI]"):
-                    return f"❌ STT test basarisiz: {sonuc}"
-                return f'✅ STT test basarili: "{sonuc[:100]}"'
-            return "✅ STT modeli yuklu, test icin bir ses dosyasi yolu verin."
+                    return f"âŒ STT test basarisiz: {sonuc}"
+                return f'âœ… STT test basarili: "{sonuc[:100]}"'
+            return "âœ… STT modeli yuklu, test icin bir ses dosyasi yolu verin."
         except Exception as e:
-            return f"❌ STT test basarisiz: {e}"
+            return f"âŒ STT test basarisiz: {e}"
 
     if hasattr(motor, "_plugin_arac_kaydet"):
         motor._plugin_arac_kaydet(
             "STT_CEVIR",
             _stt_cevir,
             "Ses dosyasini metne cevirir (faster-whisper). "
-            "Parametreler: ses_yolu (str, zorunlu) — ses dosyasi yolu; "
-            "dil (str, opsiyonel) — dil kodu (varsayilan: 'tr'). "
+            "Parametreler: ses_yolu (str, zorunlu) â€” ses dosyasi yolu; "
+            "dil (str, opsiyonel) â€” dil kodu (varsayilan: 'tr'). "
             "Doner: transkripsiyon metni.",
         )
         motor._plugin_arac_kaydet(
@@ -183,7 +183,7 @@ def motor_kaydet(motor: Any) -> None:
             "STT_TEST",
             _stt_test,
             "STT sistemini test eder. "
-            "Parametre: ses_yolu (str, opsiyonel) — test ses dosyasi.",
+            "Parametre: ses_yolu (str, opsiyonel) â€” test ses dosyasi.",
         )
 
         logger.info("[STT] Motor araclari kaydedildi: STT_CEVIR, STT_DURUM, STT_TEST")

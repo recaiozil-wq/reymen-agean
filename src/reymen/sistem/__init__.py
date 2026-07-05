@@ -1,16 +1,16 @@
-# -*- coding: utf-8 -*-
-"""reymen.sistem — Sistem modulleri."""
+﻿# -*- coding: utf-8 -*-
+"""reymen.sistem â€” Sistem modulleri."""
 
 from __future__ import annotations
 
-from src.reymen.sistem.context_compressor import ContextCompressor
-from src.reymen.sistem.memory_provider import (
+from reymen.sistem.context_compressor import ContextCompressor
+from reymen.sistem.memory_provider import (
     MemoryProvider,
     MemoryProviderRegistry,
     JsonBackend,
     SQLiteBackend,
 )
-from src.reymen.sistem.webhook import (
+from reymen.sistem.webhook import (
     kaydet as webhook_kaydet,
     calistir as webhook_calistir,
 )

@@ -1,17 +1,16 @@
-"""ReYMeN skill'lerini ReYMeN formatına dönüştür.
-Kullanım: python reymen/scripts/skill_import.py [--kategori AI_ML,DevOps]
+﻿"""ReYMeN skill'lerini ReYMeN formatÄ±na dÃ¶nÃ¼ÅŸtÃ¼r.
+KullanÄ±m: python reymen/scripts/skill_import.py [--kategori AI_ML,DevOps]
 
-Hermes: ~/AppData/Local/hermes/skills/<kategori>/<skill>/SKILL.md
-ReYMeN: reymen/cereyan/skills/Skiller/<kategori>/<skill>_SKILL.md (düz dosya)
+ReYMeN: ~/AppData/Local/reymen/skills/<kategori>/<skill>/SKILL.md
+ReYMeN: reymen/cereyan/skills/Skiller/<kategori>/<skill>_SKILL.md (dÃ¼z dosya)
 """
 
 import os, re, shutil
 from pathlib import Path
 
-HERMES_SKILLS = Path.home() / "AppData/Local/hermes/skills"
 REYMEN_SKILLS = Path(__file__).parent.parent / "cereyan/skills/Skiller"
 
-# Kategori eşleme: ReYMeN → ReYMeN
+# Kategori eÅŸleme: ReYMeN â†’ ReYMeN
 KATEGORI_MAP = {
     "devops": "DevOps",
     "data-science": "AI_ML",
@@ -41,18 +40,18 @@ KATEGORI_MAP = {
 
 
 def skill_aktar(hedef_klasor: str = "", limit: int = 0):
-    """ReYMeN skill'lerini ReYMeN formatına çevir."""
+    """ReYMeN skill'lerini ReYMeN formatÄ±na Ã§evir."""
     hedef = REYMEN_SKILLS
     if hedef_klasor:
         hedef = hedef / hedef_klasor
     hedef.mkdir(parents=True, exist_ok=True)
 
     aktarilan = 0
-    for kategori_dizini in sorted(HERMES_SKILLS.iterdir()):
+    for kategori_dizini in sorted(REYMEN_SKILLS.iterdir()):
         if not kategori_dizini.is_dir():
             continue
 
-        # Kategori eşle
+        # Kategori eÅŸle
         reymen_kat = KATEGORI_MAP.get(kategori_dizini.name, "Diger")
         if hedef_klasor and reymen_kat != hedef_klasor:
             continue
@@ -62,17 +61,17 @@ def skill_aktar(hedef_klasor: str = "", limit: int = 0):
             if not skill_md.exists():
                 continue
 
-            # ReYMeN formatı: <kategori>/<skill>/SKILL.md
-            # ReYMeN formatı: <kategori>/<skill>_SKILL.md (düz dosya)
+            # ReYMeN formatÄ±: <kategori>/<skill>/SKILL.md
+            # ReYMeN formatÄ±: <kategori>/<skill>_SKILL.md (dÃ¼z dosya)
             icerik = skill_md.read_text("utf-8", errors="replace")
 
-            # Frontmatter'ı temizle (ReYMeN formatına uygun)
+            # Frontmatter'Ä± temizle (ReYMeN formatÄ±na uygun)
             icerik = re.sub(
                 r"^---\n.*?\n---\n", "", icerik, flags=re.DOTALL | re.MULTILINE
             )
             icerik = icerik.strip()
 
-            # Dosya adı: "skill_adi_SKILL.md"
+            # Dosya adÄ±: "skill_adi_SKILL.md"
             dosya_adi = f"{skill_dizini.name}_SKILL.md"
             hedef_klasor_path = hedef / reymen_kat
             hedef_klasor_path.mkdir(parents=True, exist_ok=True)
@@ -86,10 +85,10 @@ def skill_aktar(hedef_klasor: str = "", limit: int = 0):
 
 
 def skill_say():
-    """ReYMeN ve ReYMeN'deki skill sayılarını göster."""
+    """ReYMeN ve ReYMeN'deki skill sayÄ±larÄ±nÄ± gÃ¶ster."""
     ReYMeN = sum(
         1
-        for k in HERMES_SKILLS.iterdir()
+        for k in REYMEN_SKILLS.iterdir()
         if k.is_dir()
         for s in k.iterdir()
         if (s / "SKILL.md").exists()
@@ -111,5 +110,5 @@ if __name__ == "__main__":
     sonra = skill_say()
 
     print(f"Aktarilan: {adet} skill")
-    print(f"ReYMeN toplam: {sonra['reymen']} (önce: {once['reymen']})")
+    print(f"ReYMeN toplam: {sonra['reymen']} (Ã¶nce: {once['reymen']})")
     print(f"Hala eksik: {sonra['eksik']}")

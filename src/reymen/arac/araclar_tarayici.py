@@ -1,13 +1,13 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-araclar_tarayici.py — Tarayıcı otomasyonu (Playwright).
-Site açar, metin çeker, tıklar, yazı yazar.
+araclar_tarayici.py â€” TarayÄ±cÄ± otomasyonu (Playwright).
+Site aÃ§ar, metin Ã§eker, tÄ±klar, yazÄ± yazar.
 
 KURULUM (bir kerelik):
     pip install playwright
     playwright install chromium
 
-Playwright yoksa import hata vermez; araç "kurulu değil" der.
+Playwright yoksa import hata vermez; araÃ§ "kurulu deÄŸil" der.
 """
 
 try:
@@ -23,9 +23,9 @@ class TarayiciKontrol:
         self.headless = headless
 
     def sayfa_ac_ve_oku(self, url, secici=None):
-        """Bir URL açar; secici verilirse o elementin, yoksa tüm sayfanın metnini döndürür."""
+        """Bir URL aÃ§ar; secici verilirse o elementin, yoksa tÃ¼m sayfanÄ±n metnini dÃ¶ndÃ¼rÃ¼r."""
         if not PLAYWRIGHT_OK:
-            return "[Tarayıcı]: Playwright kurulu değil (pip install playwright && playwright install chromium)."
+            return "[TarayÄ±cÄ±]: Playwright kurulu deÄŸil (pip install playwright && playwright install chromium)."
         try:
             with sync_playwright() as p:
                 tarayici = p.chromium.launch(headless=self.headless)
@@ -36,14 +36,14 @@ class TarayiciKontrol:
                 else:
                     metin = sayfa.inner_text("body")
                 tarayici.close()
-                return f"[Sayfa İçeriği]:\n{metin[:2000]}"
+                return f"[Sayfa Ä°Ã§eriÄŸi]:\n{metin[:2000]}"
         except Exception as e:
-            return f"[Tarayıcı Hatası]: {e}"
+            return f"[TarayÄ±cÄ± HatasÄ±]: {e}"
 
     def tikla_ve_yaz(self, url, tiklanacak_secici=None, yazi_secici=None, yazi=None):
-        """Sayfayı açar; opsiyonel olarak bir elemana tıklar ve/veya bir alana yazı yazar."""
+        """SayfayÄ± aÃ§ar; opsiyonel olarak bir elemana tÄ±klar ve/veya bir alana yazÄ± yazar."""
         if not PLAYWRIGHT_OK:
-            return "[Tarayıcı]: Playwright kurulu değil."
+            return "[TarayÄ±cÄ±]: Playwright kurulu deÄŸil."
         try:
             with sync_playwright() as p:
                 tarayici = p.chromium.launch(headless=self.headless)
@@ -55,9 +55,9 @@ class TarayiciKontrol:
                     sayfa.click(tiklanacak_secici)
                 sonuc = sayfa.inner_text("body")[:1500]
                 tarayici.close()
-                return f"[Tarayıcı Eylem Sonucu]:\n{sonuc}"
+                return f"[TarayÄ±cÄ± Eylem Sonucu]:\n{sonuc}"
         except Exception as e:
-            return f"[Tarayıcı Hatası]: {e}"
+            return f"[TarayÄ±cÄ± HatasÄ±]: {e}"
 
 
 def motor_kaydet(motor):
@@ -68,7 +68,7 @@ def motor_kaydet(motor):
         lambda url="", secici="": TarayiciKontrol().sayfa_ac_ve_oku(
             url, secici or None
         ),
-        "URL'yi tarayıcıda aç ve metin döndür (url, secici: CSS seçici opsiyonel)",
+        "URL'yi tarayÄ±cÄ±da aÃ§ ve metin dÃ¶ndÃ¼r (url, secici: CSS seÃ§ici opsiyonel)",
     )
     motor._plugin_arac_kaydet(
         "TARAYICI_TIKLA",
@@ -78,7 +78,7 @@ def motor_kaydet(motor):
         yazi="": TarayiciKontrol().tikla_ve_yaz(
             url, tikla_secici or None, yazi_secici or None, yazi or None
         ),
-        "Sayfayı aç, elemente tıkla/yaz (url, tikla_secici, yazi_secici, yazi)",
+        "SayfayÄ± aÃ§, elemente tÄ±kla/yaz (url, tikla_secici, yazi_secici, yazi)",
     )
 
 

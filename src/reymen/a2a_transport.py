@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
-"""🌐 A2A Transport — HTTP/WebSocket ile ağ üzerinden mesajlaşma.
+﻿# -*- coding: utf-8 -*-
+"""ğŸŒ A2A Transport â€” HTTP/WebSocket ile aÄŸ Ã¼zerinden mesajlaÅŸma.
 
-A2A agent'larının farklı makineler/process'ler arasında iletişim kurmasını
-sağlar. Mevcut bellek-içi Broker'i ağa taşır.
+A2A agent'larÄ±nÄ±n farklÄ± makineler/process'ler arasÄ±nda iletiÅŸim kurmasÄ±nÄ±
+saÄŸlar. Mevcut bellek-iÃ§i Broker'i aÄŸa taÅŸÄ±r.
 
 Kullanim:
     # Sunucu (Node 1)
@@ -10,7 +10,7 @@ Kullanim:
     node = A2ANode(broker, port=9100)
     node.baslat()
 
-    # İstemci (Node 2)
+    # Ä°stemci (Node 2)
     from reymen.a2a_transport import A2ARemote
     remote = A2ARemote("http://192.168.1.100:9100")
     remote.baglan()
@@ -28,7 +28,7 @@ from typing import Any
 
 logger = logging.getLogger(__name__)
 
-# ── HTTP Transport (FastAPI + httpx) ──────────────────────────────────────
+# â”€â”€ HTTP Transport (FastAPI + httpx) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _HTTP_SERVER = None
 _HTTP_THREAD = None
@@ -71,7 +71,7 @@ def _create_app(broker):
 
     @app.get("/api/a2a/receive/{agent_id}")
     async def receive(agent_id: str, timeout: float = 1.0):
-        """Agent'in inbox'ındaki ilk mesaji al (silerek)."""
+        """Agent'in inbox'Ä±ndaki ilk mesaji al (silerek)."""
         try:
             msg = broker.receive(agent_id, block=True, timeout=timeout)
             if msg is None:
@@ -133,7 +133,7 @@ def _create_app(broker):
         except Exception as e:
             raise HTTPException(500, str(e))
 
-    # ── WebSocket endpoint ──
+    # â”€â”€ WebSocket endpoint â”€â”€
     @app.websocket("/ws/a2a/{agent_id}")
     async def websocket_endpoint(websocket, agent_id: str):
         from reymen.a2a import MessageType
@@ -182,7 +182,7 @@ def _create_app(broker):
 
 
 class A2ANode:
-    """A2A ag sunucusu — Broker'i HTTP/WS uzerinden yayinlar.
+    """A2A ag sunucusu â€” Broker'i HTTP/WS uzerinden yayinlar.
 
     Ornek:
         node = A2ANode(broker, port=9100)
@@ -336,7 +336,7 @@ class A2ARemote:
             self._session = None
 
 
-# ── NetworkBroker — Hibrit: yerel + uzak ─────────────────────────────────
+# â”€â”€ NetworkBroker â€” Hibrit: yerel + uzak â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class NetworkBroker:
@@ -386,7 +386,7 @@ class NetworkBroker:
             )
 
     def send(self, message) -> None:
-        """Mesaj gonder — otomatik yerel/uzak yonlendirme."""
+        """Mesaj gonder â€” otomatik yerel/uzak yonlendirme."""
         from reymen.a2a import Message
 
         receiver = message.receiver
@@ -419,7 +419,7 @@ class NetworkBroker:
         return self.broker.message_log()
 
 
-# ── Motor Entegrasyonu ───────────────────────────────────────────────────
+# â”€â”€ Motor Entegrasyonu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _A2A_NODE = None
 _A2A_MOTOR = None

@@ -1,8 +1,8 @@
-"""
-Session-scoped context variables for the Hermes gateway.
+﻿"""
+Session-scoped context variables for the ReYMeN gateway.
 
 Replaces the previous ``os.environ``-based session state
-(``HERMES_SESSION_PLATFORM``, ``HERMES_SESSION_CHAT_ID``, etc.) with
+(``REYMEN_SESSION_PLATFORM``, ``REYMEN_SESSION_CHAT_ID``, etc.) with
 Python's ``contextvars.ContextVar``.
 
 **Why this matters**
@@ -10,7 +10,7 @@ Python's ``contextvars.ContextVar``.
 The gateway processes messages concurrently via ``asyncio``.  When two
 messages arrive at the same time the old code did:
 
-    os.environ["HERMES_SESSION_THREAD_ID"] = str(context.source.thread_id)
+    os.environ["REYMEN_SESSION_THREAD_ID"] = str(context.source.thread_id)
 
 Because ``os.environ`` is *process-global*, Message A's value was
 silently overwritten by Message B before Message A's agent finished
@@ -24,16 +24,16 @@ so concurrent messages never interfere.
 **Backward compatibility**
 
 The public helper ``get_session_env(name, default="")`` mirrors the old
-``os.getenv("HERMES_SESSION_*", ...)`` calls.  Existing tool code only
+``os.getenv("REYMEN_SESSION_*", ...)`` calls.  Existing tool code only
 needs to replace the import + call site:
 
     # before
     import os
-    platform = os.getenv("HERMES_SESSION_PLATFORM", "")
+    platform = os.getenv("REYMEN_SESSION_PLATFORM", "")
 
     # after
     from reymen.gateway.session_context import get_session_env
-    platform = get_session_env("HERMES_SESSION_PLATFORM", "")
+    platform = get_session_env("REYMEN_SESSION_PLATFORM", "")
 """
 
 from contextvars import ContextVar
@@ -44,68 +44,73 @@ logger = logging.getLogger(__name__)
 
 # Sentinel to distinguish "never set in this context" from "explicitly set to empty".
 # When a contextvar holds _UNSET, we fall back to os.environ (CLI/cron compat).
-# When it holds "" (after clear_session_vars resets it), we return "" — no fallback.
+# When it holds "" (after clear_session_vars resets it), we return "" â€” no fallback.
 _UNSET: Any = object()
 
 # ---------------------------------------------------------------------------
 # Per-task session variables
 # ---------------------------------------------------------------------------
 
-_SESSION_PLATFORM: ContextVar = ContextVar("HERMES_SESSION_PLATFORM", default=_UNSET)
-_SESSION_CHAT_ID: ContextVar = ContextVar("HERMES_SESSION_CHAT_ID", default=_UNSET)
-_SESSION_CHAT_NAME: ContextVar = ContextVar("HERMES_SESSION_CHAT_NAME", default=_UNSET)
-_SESSION_THREAD_ID: ContextVar = ContextVar("HERMES_SESSION_THREAD_ID", default=_UNSET)
-_SESSION_USER_ID: ContextVar = ContextVar("HERMES_SESSION_USER_ID", default=_UNSET)
-_SESSION_USER_NAME: ContextVar = ContextVar("HERMES_SESSION_USER_NAME", default=_UNSET)
-_SESSION_KEY: ContextVar = ContextVar("HERMES_SESSION_KEY", default=_UNSET)
-_SESSION_ID: ContextVar = ContextVar("HERMES_SESSION_ID", default=_UNSET)
+_SESSION_PLATFORM: ContextVar = ContextVar("REYMEN_SESSION_PLATFORM", default=_UNSET)
+_SESSION_CHAT_ID: ContextVar = ContextVar("REYMEN_SESSION_CHAT_ID", default=_UNSET)
+_SESSION_CHAT_NAME: ContextVar = ContextVar("REYMEN_SESSION_CHAT_NAME", default=_UNSET)
+_SESSION_THREAD_ID: ContextVar = ContextVar("REYMEN_SESSION_THREAD_ID", default=_UNSET)
+_SESSION_USER_ID: ContextVar = ContextVar("REYMEN_SESSION_USER_ID", default=_UNSET)
+_SESSION_USER_NAME: ContextVar = ContextVar("REYMEN_SESSION_USER_NAME", default=_UNSET)
+_SESSION_KEY: ContextVar = ContextVar("REYMEN_SESSION_KEY", default=_UNSET)
+_SESSION_ID: ContextVar = ContextVar("REYMEN_SESSION_ID", default=_UNSET)
 # ID of the message that triggered the current turn. Used as a reply anchor
 # so background-process notifications stay inside the originating Telegram
 # private-chat topic (those lanes route only with thread id + reply anchor).
 _SESSION_MESSAGE_ID: ContextVar = ContextVar(
-    "HERMES_SESSION_MESSAGE_ID", default=_UNSET
+    "REYMEN_SESSION_MESSAGE_ID", default=_UNSET
 )
 
-# Cron auto-delivery vars — set per-job in run_job() so concurrent jobs
+# Cron auto-delivery vars â€” set per-job in run_job() so concurrent jobs
 # don't clobber each other's delivery targets.
 _CRON_AUTO_DELIVER_PLATFORM: ContextVar = ContextVar(
-    "HERMES_CRON_AUTO_DELIVER_PLATFORM", default=_UNSET
+    "REYMEN_CRON_AUTO_DELIVER_PLATFORM", default=_UNSET
 )
 _CRON_AUTO_DELIVER_CHAT_ID: ContextVar = ContextVar(
-    "HERMES_CRON_AUTO_DELIVER_CHAT_ID", default=_UNSET
+    "REYMEN_CRON_AUTO_DELIVER_CHAT_ID", default=_UNSET
 )
 _CRON_AUTO_DELIVER_THREAD_ID: ContextVar = ContextVar(
-    "HERMES_CRON_AUTO_DELIVER_THREAD_ID", default=_UNSET
+    "REYMEN_CRON_AUTO_DELIVER_THREAD_ID", default=_UNSET
 )
 
 _VAR_MAP = {
-    "HERMES_SESSION_PLATFORM": _SESSION_PLATFORM,
-    "HERMES_SESSION_CHAT_ID": _SESSION_CHAT_ID,
-    "HERMES_SESSION_CHAT_NAME": _SESSION_CHAT_NAME,
-    "HERMES_SESSION_THREAD_ID": _SESSION_THREAD_ID,
-    "HERMES_SESSION_USER_ID": _SESSION_USER_ID,
-    "HERMES_SESSION_USER_NAME": _SESSION_USER_NAME,
-    "HERMES_SESSION_KEY": _SESSION_KEY,
-    "HERMES_SESSION_ID": _SESSION_ID,
-    "HERMES_SESSION_MESSAGE_ID": _SESSION_MESSAGE_ID,
-    "HERMES_CRON_AUTO_DELIVER_PLATFORM": _CRON_AUTO_DELIVER_PLATFORM,
-    "HERMES_CRON_AUTO_DELIVER_CHAT_ID": _CRON_AUTO_DELIVER_CHAT_ID,
-    "HERMES_CRON_AUTO_DELIVER_THREAD_ID": _CRON_AUTO_DELIVER_THREAD_ID,
+    "REYMEN_SESSION_PLATFORM": _SESSION_PLATFORM,
+    "REYMEN_SESSION_CHAT_ID": _SESSION_CHAT_ID,
+    "REYMEN_SESSION_CHAT_NAME": _SESSION_CHAT_NAME,
+    "REYMEN_SESSION_THREAD_ID": _SESSION_THREAD_ID,
+    "REYMEN_SESSION_USER_ID": _SESSION_USER_ID,
+    "REYMEN_SESSION_USER_NAME": _SESSION_USER_NAME,
+    "REYMEN_SESSION_KEY": _SESSION_KEY,
+    "REYMEN_SESSION_ID": _SESSION_ID,
+    "REYMEN_SESSION_MESSAGE_ID": _SESSION_MESSAGE_ID,
+    "REYMEN_CRON_AUTO_DELIVER_PLATFORM": _CRON_AUTO_DELIVER_PLATFORM,
+    "REYMEN_CRON_AUTO_DELIVER_CHAT_ID": _CRON_AUTO_DELIVER_CHAT_ID,
+    "REYMEN_CRON_AUTO_DELIVER_THREAD_ID": _CRON_AUTO_DELIVER_THREAD_ID,
+}
+
+# Backward-compat aliases for legacy callers still using HERMES_* names.
+_LEGACY_VAR_MAP = {
+    k.replace("REYMEN_", "HERMES_"): v for k, v in _VAR_MAP.items()
 }
 
 
 def set_current_session_id(session_id: str) -> None:
-    """Synchronize ``HERMES_SESSION_ID`` across ContextVar and ``os.environ``.
+    """Synchronize ``REYMEN_SESSION_ID`` across ContextVar and ``os.environ``.
 
     Long-lived single-process entrypoints like the CLI can rotate sessions via
     ``/new``, ``/resume``, ``/branch``, or compression splits without
     reconstructing the entire agent. Tools still consult
-    ``get_session_env("HERMES_SESSION_ID")`` with an ``os.environ`` fallback,
+    ``get_session_env("REYMEN_SESSION_ID")`` with an ``os.environ`` fallback,
     so both storage paths must move together when the active session changes.
     """
     import os
 
-    os.environ["HERMES_SESSION_ID"] = session_id
+    os.environ["REYMEN_SESSION_ID"] = session_id
     _SESSION_ID.set(session_id)
 
 
@@ -125,7 +130,7 @@ def set_session_vars(
 
     Call ``clear_session_vars(tokens)`` in a ``finally`` block when the handler
     exits. Note ``clear_session_vars`` resets every var to ``""`` (to suppress
-    the ``os.environ`` fallback) rather than restoring prior values — these
+    the ``os.environ`` fallback) rather than restoring prior values â€” these
     helpers are not nestable/stack-safe, and the returned tokens are accepted
     only for API compatibility.
 
@@ -143,7 +148,7 @@ def set_session_vars(
         _SESSION_MESSAGE_ID.set(message_id),
     ]
     try:
-        from reymen.cron.hermes_stubs import set_session_cwd
+        from reymen.sistem.reymen_stubs import set_session_cwd
 
         set_session_cwd(cwd)
     except Exception as _e:
@@ -176,7 +181,7 @@ def clear_session_vars(tokens: list) -> None:
     ):
         var.set("")
     try:
-        from reymen.cron.hermes_stubs import clear_session_cwd
+        from reymen.sistem.reymen_stubs import clear_session_cwd
 
         clear_session_cwd()
     except Exception as _e:
@@ -185,23 +190,27 @@ def clear_session_vars(tokens: list) -> None:
 
 
 def get_session_env(name: str, default: str = "") -> str:
-    """Read a session context variable by its legacy ``HERMES_SESSION_*`` name.
+    """Read a session context variable by its ``REYMEN_SESSION_*`` name.
 
-    Drop-in replacement for ``os.getenv("HERMES_SESSION_*", default)``.
+    Drop-in replacement for ``os.getenv("REYMEN_SESSION_*", default)``.
 
     Resolution order:
     1. Context variable (set by the gateway for concurrency-safe access).
        If the variable was explicitly set (even to ``""``) via
        ``set_session_vars`` or ``clear_session_vars``, that value is
-       returned — **no fallback to os.environ**.
+       returned â€” **no fallback to os.environ**.
     2. ``os.environ`` (only when the context variable was never set in
-       this context — i.e. CLI, cron scheduler, and test processes that
+       this context â€” i.e. CLI, cron scheduler, and test processes that
        don't use ``set_session_vars`` at all).
     3. *default*
+
+    Legacy ``HERMES_*`` names are accepted for backward compatibility.
     """
     import os
 
     var = _VAR_MAP.get(name)
+    if var is None:
+        var = _LEGACY_VAR_MAP.get(name)
     if var is not None:
         value = var.get()
         if value is not _UNSET:

@@ -1,11 +1,11 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-agent_runtime.py — ReYMeN Ajan Calisma Zamani (Agent Runtime).
+agent_runtime.py â€” ReYMeN Ajan Calisma Zamani (Agent Runtime).
 
 Icerik:
-  AgentRuntime    — Ajan yasamdongusunu yoneten sinif (init, calistir, durdur)
-  RuntimeHelpers  — Yardimci metodlar (hedef analizi, tur yonetimi, hata siniflandirma)
-  BackgroundReview— Arka planda hafiza/beceri gozden gecirme (daemon thread)
+  AgentRuntime    â€” Ajan yasamdongusunu yoneten sinif (init, calistir, durdur)
+  RuntimeHelpers  â€” Yardimci metodlar (hedef analizi, tur yonetimi, hata siniflandirma)
+  BackgroundReviewâ€” Arka planda hafiza/beceri gozden gecirme (daemon thread)
 
 Kullanim:
     from agent_runtime import AgentRuntime
@@ -28,7 +28,7 @@ logger = logging.getLogger("ReYMeN.runtime")
 ROOT = Path(__file__).parent.resolve()
 
 
-# ── Hata Siniflandirici ───────────────────────────────────────────────────────
+# â”€â”€ Hata Siniflandirici â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class HataSiniflandirici:
@@ -68,7 +68,7 @@ class HataSiniflandirici:
         return oneriler.get(kategori, "Devam et.")
 
 
-# ── Runtime Helpers ──────────────────────────────────────────────────────────
+# â”€â”€ Runtime Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class RuntimeHelpers:
@@ -87,33 +87,33 @@ class RuntimeHelpers:
         """
         hedef_lower = hedef.lower().strip()
 
-        # ── 0. Selamlasma/sosyal → direkt 1 ─────────────────────────
+        # â”€â”€ 0. Selamlasma/sosyal â†’ direkt 1 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         _selam = any(
             k in hedef_lower
             for k in [
                 "merhaba",
                 "selam",
                 "naber",
-                "nasılsın",
+                "nasÄ±lsÄ±n",
                 "nasilsin",
                 "iyi misin",
-                "teşekkür",
+                "teÅŸekkÃ¼r",
                 "tesekkur",
-                "sağol",
+                "saÄŸol",
                 "sagol",
-                "günaydın",
+                "gÃ¼naydÄ±n",
                 "gunaydin",
-                "iyi günler",
+                "iyi gÃ¼nler",
                 "iyi gunler",
-                "iyi akşamlar",
+                "iyi akÅŸamlar",
                 "iyi aksamlar",
                 "iyi geceler",
-                "ne yapıyorsun",
+                "ne yapÄ±yorsun",
                 "ne yapiyorsun",
-                "napıyorsun",
+                "napÄ±yorsun",
                 "napiyorsun",
                 "kolay gelsin",
-                "hayırlı",
+                "hayÄ±rlÄ±",
                 "hayirli",
             ]
         )
@@ -128,26 +128,26 @@ class RuntimeHelpers:
                     "sil",
                     "bul",
                     "calistir",
-                    "çalıştır",
+                    "Ã§alÄ±ÅŸtÄ±r",
                     "indir",
                     "yukle",
-                    "yükle",
+                    "yÃ¼kle",
                     "kur",
-                    "gönder",
+                    "gÃ¶nder",
                     "gonder",
                     "tara",
                     "kontrol",
-                    "düzelt",
+                    "dÃ¼zelt",
                     "duzelt",
                     "temizle",
-                    "düzenle",
+                    "dÃ¼zenle",
                     "duzenle",
                     "raporla",
                     "analiz",
                     "incele",
-                    "güncelle",
+                    "gÃ¼ncelle",
                     "guncelle",
-                    "aç",
+                    "aÃ§",
                     "ac",
                     "kapat",
                     "kes",
@@ -161,19 +161,19 @@ class RuntimeHelpers:
                     "ipuclari": [],
                 }
 
-        # ── 1. Toplu gorev tespiti ─────────────────────────────────
+        # â”€â”€ 1. Toplu gorev tespiti â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         _toplu = any(
             k in hedef_lower
             for k in [
                 "hepsini",
                 "hepsin",
                 "hepsi",
-                "tümünü",
-                "tümü",
-                "tüm",
+                "tÃ¼mÃ¼nÃ¼",
+                "tÃ¼mÃ¼",
+                "tÃ¼m",
                 "tumu",
                 "tumunu",
-                "bütün",
+                "bÃ¼tÃ¼n",
                 "butun",
                 "toplu",
             ]
@@ -183,45 +183,45 @@ class RuntimeHelpers:
             for k in [
                 "kontrol",
                 "gider",
-                "düzelt",
+                "dÃ¼zelt",
                 "duzelt",
                 "onar",
                 "temizle",
                 "tara",
-                "düzenle",
+                "dÃ¼zenle",
                 "duzenle",
                 "yap",
                 "calistir",
-                "çalıştır",
+                "Ã§alÄ±ÅŸtÄ±r",
                 "incele",
-                "dönüştür",
+                "dÃ¶nÃ¼ÅŸtÃ¼r",
                 "donustur",
-                "güncelle",
+                "gÃ¼ncelle",
                 "guncelle",
             ]
         )
 
-        # ── 2. Cok adimli gorev tespiti ────────────────────────────
+        # â”€â”€ 2. Cok adimli gorev tespiti â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         _cok_adim_baglac = any(
             k in hedef_lower
             for k in [
                 "ve",
                 "sonra",
                 "ardindan",
-                "ardından",
+                "ardÄ±ndan",
                 "daha sonra",
                 "once",
-                "önce",
-                "daha önce",
+                "Ã¶nce",
+                "daha Ã¶nce",
                 "daha once",
             ]
         )
         _cok_adim_virgul = hedef_lower.count(",") >= 2
         _cok_adim = _cok_adim_baglac or _cok_adim_virgul
 
-        # ── 3. Kategori bazli ipucu tespiti ─────────────────────────
+        # â”€â”€ 3. Kategori bazli ipucu tespiti â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         kategoriler = {
-            "dosya_islemi": ["dosya", "klasör", "klasor", "dizin", "belge", "uzanti"],
+            "dosya_islemi": ["dosya", "klasÃ¶r", "klasor", "dizin", "belge", "uzanti"],
             "web_islemi": [
                 "web",
                 "arama",
@@ -232,8 +232,8 @@ class RuntimeHelpers:
                 "link",
                 "indir",
                 "yukle",
-                "yükle",
-                "gönder",
+                "yÃ¼kle",
+                "gÃ¶nder",
                 "gonder",
             ],
             "kod_islemi": [
@@ -241,7 +241,7 @@ class RuntimeHelpers:
                 "python",
                 "script",
                 "calistir",
-                "çalıştır",
+                "Ã§alÄ±ÅŸtÄ±r",
                 "analiz",
                 "derle",
                 "debug",
@@ -249,23 +249,23 @@ class RuntimeHelpers:
             ],
             "yazma_islem": [
                 "yaz",
-                "oluştur",
+                "oluÅŸtur",
                 "olustur",
                 "kaydet",
                 "ekle",
-                "güncelle",
+                "gÃ¼ncelle",
                 "guncelle",
                 "sil",
-                "düzenle",
+                "dÃ¼zenle",
                 "duzenle",
                 "temizle",
-                "dönüştür",
+                "dÃ¶nÃ¼ÅŸtÃ¼r",
                 "donustur",
-                "düzelt",
+                "dÃ¼zelt",
                 "duzelt",
                 "onar",
             ],
-            "hafiza_islemi": ["hatirla", "hatırla", "unutma", "not"],
+            "hafiza_islemi": ["hatirla", "hatÄ±rla", "unutma", "not"],
             "sistem_islemi": [
                 "komut",
                 "terminal",
@@ -273,10 +273,10 @@ class RuntimeHelpers:
                 "sistem",
                 "servis",
                 "port",
-                "ağ",
+                "aÄŸ",
                 "ag",
                 "islem",
-                "işlem",
+                "iÅŸlem",
                 "durdur",
             ],
             "arama_islem": [
@@ -284,20 +284,20 @@ class RuntimeHelpers:
                 "bul",
                 "tara",
                 "sorgula",
-                "keşfet",
+                "keÅŸfet",
                 "kesfet",
                 "listele",
                 "getir",
                 "incele",
             ],
             "guvenlik": [
-                "güvenlik",
+                "gÃ¼venlik",
                 "guvenlik",
-                "şifre",
+                "ÅŸifre",
                 "sifre",
                 "izin",
                 "yetki",
-                "erişim",
+                "eriÅŸim",
                 "erisim",
             ],
             "github_islem": [
@@ -316,13 +316,13 @@ class RuntimeHelpers:
         # Ekstra puan veren kelimeler (kategori disi kapsam artirici)
         _ekstra_kelimeler = [
             "raporla",
-            "özet",
+            "Ã¶zet",
             "ozet",
-            "karşılaştır",
+            "karÅŸÄ±laÅŸtÄ±r",
             "karsilastir",
-            "birleştir",
+            "birleÅŸtir",
             "birlestir",
-            "görsel",
+            "gÃ¶rsel",
             "gorsel",
             "grafik",
         ]
@@ -349,7 +349,7 @@ class RuntimeHelpers:
                 "ipuclari": aktif,
             }
 
-        # ── 4. Skor hesaplama ──────────────────────────────────────
+        # â”€â”€ 4. Skor hesaplama â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         skor = _bulunan_kategori
         if _cok_adim:
             skor += 1
@@ -373,7 +373,7 @@ class RuntimeHelpers:
         """Konsola ilerleme cubugu goster."""
         dolu = int((tur / max_tur) * 20)
         bos = 20 - dolu
-        cubuk = "█" * dolu + "░" * bos
+        cubuk = "â–ˆ" * dolu + "â–‘" * bos
         arac_k = f" [{arac}]" if arac else ""
         print(f"\r  [{cubuk}] {tur}/{max_tur}{arac_k}", end="", flush=True)
 
@@ -385,7 +385,7 @@ class RuntimeHelpers:
         return "\n".join(f"  {i+1}. {a}" for i, a in enumerate(son))
 
 
-# ── Background Review (Arka Plan Gozden Gecirme) ─────────────────────────────
+# â”€â”€ Background Review (Arka Plan Gozden Gecirme) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class BackgroundReview:
@@ -396,7 +396,7 @@ class BackgroundReview:
       3. Yeni beceri karti cikarilabilir mi?
 
     ReYMeN agent'in background_review'indan ilham alindi.
-    Ana donguya dokunmaz — sadece storage'a yazar.
+    Ana donguya dokunmaz â€” sadece storage'a yazar.
     """
 
     HAFIZA_GOZDEN_GECIRME = (
@@ -495,7 +495,7 @@ class BackgroundReview:
             logger.debug(f"[BackgroundReview.hafiza.kaydet] {e}")
 
 
-# ── Agent Runtime ─────────────────────────────────────────────────────────────
+# â”€â”€ Agent Runtime â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class AgentRuntime:

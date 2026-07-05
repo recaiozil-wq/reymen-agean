@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""file_safety.py — Dosya Guvenlik Taramasi.
+﻿# -*- coding: utf-8 -*-
+"""file_safety.py â€” Dosya Guvenlik Taramasi.
 
 Dosya yazma/okuma islemlerini guvenlik acisindan kontrol eder.
 Zararli yollari, yasak dizinleri ve yasak dosya tiplerini engeller.
@@ -76,7 +76,7 @@ def guvenli_mi(dosya_yolu: str) -> tuple[bool, str]:
     if not dosya_yolu or not dosya_yolu.strip():
         return False, "Bos dosya yolu."
 
-    # Path traversal kontrolu — resolve ONCESI (ham string'teki '..')
+    # Path traversal kontrolu â€” resolve ONCESI (ham string'teki '..')
     if ".." in dosya_yolu or ".." in raw_yol:
         return False, "Path traversal engellendi."
 

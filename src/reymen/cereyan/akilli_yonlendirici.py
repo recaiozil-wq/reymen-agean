@@ -1,14 +1,14 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-akilli_yonlendirici.py — Mixture-of-Experts Gorev Yonlendiricisi.
+akilli_yonlendirici.py â€” Mixture-of-Experts Gorev Yonlendiricisi.
 
 Buyuk LLM sistemlerinden ilham alinan ilke:
   "Her gorev icin en uygun modeli otomatik sec."
-  - Groq  → hizli/basit (siniflandirma, ozet, evet/hayir)
-  - DeepSeek R1 → derin mantik, matematik, kod hata ayiklama
-  - Anthropic Claude → guvenligi kritik, uzun analiz, yaratici
-  - OpenAI GPT-4o → dengeli/genel
-  - Yerel (LMStudio/Ollama) → varsayilan/gizlilik
+  - Groq  â†’ hizli/basit (siniflandirma, ozet, evet/hayir)
+  - DeepSeek R1 â†’ derin mantik, matematik, kod hata ayiklama
+  - Anthropic Claude â†’ guvenligi kritik, uzun analiz, yaratici
+  - OpenAI GPT-4o â†’ dengeli/genel
+  - Yerel (LMStudio/Ollama) â†’ varsayilan/gizlilik
 
 Kullanim (beyin.py icinde):
     from akilli_yonlendirici import gorev_icin_model_sec
@@ -19,7 +19,7 @@ Kullanim (beyin.py icinde):
 import re
 from typing import Optional
 
-# ── Gorev kategorileri ────────────────────────────────────────────────────────
+# â”€â”€ Gorev kategorileri â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 GOREV_KATEGORILERI = {
     "hizli": {
@@ -79,8 +79,8 @@ GOREV_KATEGORILERI = {
             r"\bplan\b",
             r"\bneden\b",
             r"\banaliz\b",
-            r"\bkarsila[şs]tır\b",
-            r"\bkarsila[şs]tir\b",
+            r"\bkarsila[ÅŸs]tÄ±r\b",
+            r"\bkarsila[ÅŸs]tir\b",
             r"\boptimize\b",
             r"\ben\s+iyi\b",
             r"\bkarar\b",
@@ -136,7 +136,7 @@ GOREV_KATEGORILERI = {
         "max_token": 2048,
     },
     "genel": {
-        "aciklama": "Genel amaclı gorev",
+        "aciklama": "Genel amaclÄ± gorev",
         "anahtar_kelimeler": [],
         "tercih_sirasi": [
             "lmstudio",
@@ -152,7 +152,7 @@ GOREV_KATEGORILERI = {
 }
 
 
-# ── Siniflandirici ────────────────────────────────────────────────────────────
+# â”€â”€ Siniflandirici â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def gorevi_siniflandir(hedef: str) -> str:
@@ -181,10 +181,10 @@ def gorev_icin_model_sec(
     Args:
         hedef:               Kullanicinin hedef metni.
         musait_providerlar:  API anahtari olan providerlar listesi.
-        kuvvetli_mod:        True → daha guclu model sec (karmasik gorevler).
+        kuvvetli_mod:        True â†’ daha guclu model sec (karmasik gorevler).
 
     Returns:
-        (provider_adi, model_adi) — bulamazsa ("lmstudio", "varsayilan")
+        (provider_adi, model_adi) â€” bulamazsa ("lmstudio", "varsayilan")
     """
     if not musait_providerlar:
         return "lmstudio", "varsayilan"
@@ -203,7 +203,7 @@ def gorev_icin_model_sec(
             model = bilgi["model_tercihleri"].get(prov, _varsayilan_model(prov))
             return prov, model
 
-    # Hicbiri uygun degilse ilk musait olanı sec
+    # Hicbiri uygun degilse ilk musait olanÄ± sec
     prov = musait_providerlar[0]
     return prov, _varsayilan_model(prov)
 
@@ -236,7 +236,7 @@ def _varsayilan_model(provider: str) -> str:
     }.get(provider, "varsayilan")
 
 
-# ── Stratejik Ajan Secici (hata mesajina gore persona degistir) ───────────────
+# â”€â”€ Stratejik Ajan Secici (hata mesajina gore persona degistir) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 AJAN_PERSONALARI = {
     "genel_cozucu": {
@@ -393,7 +393,7 @@ def ajan_talimatini_getir(ajan_id: str) -> str:
     ]
 
 
-# ── Kullanici arayuzu ─────────────────────────────────────────────────────────
+# â”€â”€ Kullanici arayuzu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def yonlendirme_acikla(hedef: str, musait_providerlar: list[str]) -> str:
@@ -407,7 +407,7 @@ def yonlendirme_acikla(hedef: str, musait_providerlar: list[str]) -> str:
     )
 
 
-# ── Test ─────────────────────────────────────────────────────────────────────
+# â”€â”€ Test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
     print("=== akilli_yonlendirici.py Test ===\n")

@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
-"""model_tools.py — Model Benchmark ve Yönetim Araçları.
+﻿# -*- coding: utf-8 -*-
+"""model_tools.py â€” Model Benchmark ve YÃ¶netim AraÃ§larÄ±.
 
-LLM sağlayıcılarını karşılaştırır: gecikme, token hızı, maliyet.
-model_metadata.py ile entegre çalışır.
+LLM saÄŸlayÄ±cÄ±larÄ±nÄ± karÅŸÄ±laÅŸtÄ±rÄ±r: gecikme, token hÄ±zÄ±, maliyet.
+model_metadata.py ile entegre Ã§alÄ±ÅŸÄ±r.
 """
 
 import json
@@ -22,7 +22,7 @@ except ImportError:
 BENCHMARK_YOLU = Path(__file__).parent / ".ReYMeN" / "model_benchmarks.json"
 BENCHMARK_YOLU.parent.mkdir(parents=True, exist_ok=True)
 
-BENCHMARK_PROMPT = "Türkiye'nin başkenti neresidir? Kısa cevap ver."
+BENCHMARK_PROMPT = "TÃ¼rkiye'nin baÅŸkenti neresidir? KÄ±sa cevap ver."
 
 
 class BenchmarkSonucu:
@@ -57,7 +57,7 @@ def tek_model_benchmark(
     model: str,
     saglavici: str,
     prompt: str = BENCHMARK_PROMPT,
-    sistem: str = "Sen yardımcı bir asistansın.",
+    sistem: str = "Sen yardÄ±mcÄ± bir asistansÄ±n.",
 ) -> BenchmarkSonucu:
     """Tek model benchmark testi."""
     sonuc = BenchmarkSonucu(model, saglavici)
@@ -100,7 +100,7 @@ def benchmark_kaydet(sonuclar: list):
 def benchmark_raporu(sonuclar: list) -> str:
     sirali = sorted(sonuclar, key=lambda s: (not s.basarili, s.gecikme_ms))
     satirlar = [
-        "Model                    Sağlayıcı            Gecikme(ms)  Token/sn  Durum",
+        "Model                    SaÄŸlayÄ±cÄ±            Gecikme(ms)  Token/sn  Durum",
         "-" * 80,
     ]
     for s in sirali:
@@ -114,7 +114,7 @@ def benchmark_raporu(sonuclar: list) -> str:
 
 def gecmis_oku(son_n: int = 5) -> str:
     if not BENCHMARK_YOLU.exists():
-        return "Henüz benchmark yapılmamış."
+        return "HenÃ¼z benchmark yapÄ±lmamÄ±ÅŸ."
     try:
         kayitlar = json.loads(BENCHMARK_YOLU.read_text(encoding="utf-8"))
         satirlar = []
@@ -122,10 +122,10 @@ def gecmis_oku(son_n: int = 5) -> str:
             satirlar.append(f"\n=== {k['zaman']} ===")
             for s in k["sonuclar"]:
                 satirlar.append(
-                    f"  {'✓' if s['basarili'] else '✗'} "
+                    f"  {'âœ“' if s['basarili'] else 'âœ—'} "
                     f"{s['model']:<25} {s['gecikme_ms']:.0f}ms  {s['token_hizi']:.1f} tok/sn"
                 )
-        return "\n".join(satirlar) if satirlar else "Kayıt boş."
+        return "\n".join(satirlar) if satirlar else "KayÄ±t boÅŸ."
     except Exception as e:
         return f"[Benchmark]: {e}"
 
@@ -137,7 +137,7 @@ def motor_kaydet(motor):
     motor._plugin_arac_kaydet(
         "MODEL_BENCHMARK_GECMIS",
         lambda son_n=5: gecmis_oku(int(son_n)),
-        "Geçmiş model benchmark sonuçlarını göster",
+        "GeÃ§miÅŸ model benchmark sonuÃ§larÄ±nÄ± gÃ¶ster",
     )
 
     if hasattr(motor, "beyin"):
@@ -154,7 +154,7 @@ def motor_kaydet(motor):
         motor._plugin_arac_kaydet(
             "MODEL_BENCHMARK_CALISTIR",
             lambda: _anlik(),
-            "Aktif modelde anlık benchmark testi yap",
+            "Aktif modelde anlÄ±k benchmark testi yap",
         )
 
 

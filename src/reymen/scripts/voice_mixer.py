@@ -1,12 +1,12 @@
-# -*- coding: utf-8 -*-
-"""voice_mixer.py — Pure-PCM voice mixer for Discord audio.
+﻿# -*- coding: utf-8 -*-
+"""voice_mixer.py â€” Pure-PCM voice mixer for Discord audio.
 
 Exports:
   FRAME_SIZE       = 3840
   SAMPLES_PER_FRAME = 960
   SILENCE_FRAME     = bytes(FRAME_SIZE)
-  VoiceMixer        — audio mixing class
-  synth_ambient_pcm — ambient audio generator
+  VoiceMixer        â€” audio mixing class
+  synth_ambient_pcm â€” ambient audio generator
 """
 
 import struct

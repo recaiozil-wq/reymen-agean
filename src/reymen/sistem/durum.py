@@ -1,18 +1,18 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-durum.py — ReYMeN merkezi durum dosyasi (durum.json) okuyucu.
+durum.py â€” ReYMeN merkezi durum dosyasi (durum.json) okuyucu.
 
 Herkesin kullandigi tek context dosyasi.
 Motor tarafindan yuklenir, DURUM tool'unu kaydeder.
 
 Kullanim (CLI):
-    reymen durum          → ozet
-    reymen durum detay    → detayli
-    reymen durum json     → ham JSON
+    reymen durum          â†’ ozet
+    reymen durum detay    â†’ detayli
+    reymen durum json     â†’ ham JSON
 
 Kullanim (motor):
-    DURUM_OKU()           → ozet
-    DURUM_OKU(detay=1)    → detayli
+    DURUM_OKU()           â†’ ozet
+    DURUM_OKU(detay=1)    â†’ detayli
 """
 
 from __future__ import annotations
@@ -28,7 +28,7 @@ from reymen.sistem.durum_paylas import _kilitle, _kilidi_ac
 
 logger = logging.getLogger(__name__)
 
-# ── Proje kokunu bul ────────────────────────────────────────────────────
+# â”€â”€ Proje kokunu bul â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 PROJE_KOK: Path = Path(__file__).resolve().parent.parent.parent.parent
 DURUM_DOSYASI: Path = PROJE_KOK / "durum.json"
@@ -78,25 +78,25 @@ def _ozet(veri: dict[str, Any]) -> str:
     top = veri.get("toplam_ozellik", 0)
     tam = veri.get("tamam", 0)
     islenen = veri.get("isleniyor", 0)
-    satirlar.append(f"📊 Toplam: {top}  |  ✅ Tamam: {tam}  |  ⏳ Isleniyor: {islenen}")
+    satirlar.append(f"ğŸ“Š Toplam: {top}  |  âœ… Tamam: {tam}  |  â³ Isleniyor: {islenen}")
     satirlar.append("")
 
     # 1. Cozulen 8 (onceki)
     coz8 = veri.get("cozulen_8_onceki", {})
     satirlar.append(
-        f"📋 Cozulen 8 — {coz8.get('tamam', 0)}/{coz8.get('toplam', 0)} tamam"
+        f"ğŸ“‹ Cozulen 8 â€” {coz8.get('tamam', 0)}/{coz8.get('toplam', 0)} tamam"
     )
     for ad, oz in coz8.get("maddeler", {}).items():
-        emoji = "✅"
+        emoji = "âœ…"
         satirlar.append(f"  {emoji} {ad.replace('_', ' ')}: {oz.get('detay', '')[:80]}")
 
     # 2. Cozulen 10 (ikinci dalga)
     coz10 = veri.get("cozulen_10_ikinci_dalga", {})
     satirlar.append(
-        f"\n📋 Cozulen 10 — {coz10.get('tamam', 0)}/{coz10.get('toplam', 0)} tamam"
+        f"\nğŸ“‹ Cozulen 10 â€” {coz10.get('tamam', 0)}/{coz10.get('toplam', 0)} tamam"
     )
     for ad, oz in coz10.get("maddeler", {}).items():
-        emoji = "✅"
+        emoji = "âœ…"
         oncelik = oz.get("oncelik", "?")
         satirlar.append(
             f"  {emoji} [{oncelik}] {ad.replace('_', ' ')}: {oz.get('detay', '')[:80]}"
@@ -105,10 +105,10 @@ def _ozet(veri: dict[str, Any]) -> str:
     # 3. Cozulen 4 (kismen cozulmus)
     coz4 = veri.get("cozulen_4_kismen", {})
     satirlar.append(
-        f"\n📋 Cozulen 4 — {coz4.get('tamam', 0)}/{coz4.get('toplam', 0)} tamam"
+        f"\nğŸ“‹ Cozulen 4 â€” {coz4.get('tamam', 0)}/{coz4.get('toplam', 0)} tamam"
     )
     for ad, oz in coz4.get("maddeler", {}).items():
-        emoji = "✅"
+        emoji = "âœ…"
         oncelik = oz.get("oncelik", "?")
         satirlar.append(
             f"  {emoji} [{oncelik}] {ad.replace('_', ' ')}: {oz.get('detay', '')[:80]}"
@@ -118,46 +118,46 @@ def _ozet(veri: dict[str, Any]) -> str:
     eksikler = veri.get("mevcut_eksikler", {})
     if isinstance(eksikler, dict):
         satirlar.append(
-            f"\n📋 Mevcut Eksikler — {eksikler.get('tamam', 0)}/{eksikler.get('toplam', 0)} tamam"
+            f"\nğŸ“‹ Mevcut Eksikler â€” {eksikler.get('tamam', 0)}/{eksikler.get('toplam', 0)} tamam"
         )
         for ad, oz in eksikler.get("maddeler", {}).items():
             durum = oz.get("durum", "eksik")
             oncelik = oz.get("oncelik", "?")
-            coz = "⏳" if oz.get("cozuluyor") else ""
+            coz = "â³" if oz.get("cozuluyor") else ""
             if durum == "tamam":
-                emoji = "✅"
+                emoji = "âœ…"
             elif durum == "kismen":
-                emoji = "🔶"
+                emoji = "ğŸ”¶"
             elif durum == "stub":
-                emoji = "📦"
+                emoji = "ğŸ“¦"
             else:
-                emoji = "❌"
+                emoji = "âŒ"
             satirlar.append(
                 f"  {emoji}{coz}[{oncelik}] {ad.replace('_', ' ')}: {oz.get('detay', '')[:80]}"
             )
     elif isinstance(eksikler, list) and eksikler:
-        satirlar.append(f"\n📋 Mevcut Eksikler ({len(eksikler)}):")
+        satirlar.append(f"\nğŸ“‹ Mevcut Eksikler ({len(eksikler)}):")
         for m in eksikler:
-            satirlar.append(f"  • {str(m)[:100]}")
+            satirlar.append(f"  â€¢ {str(m)[:100]}")
 
     # Diger cozulenler
     diger = veri.get("cozulen_diger", {})
     md = diger.get("maddeler", [])
     if md:
-        satirlar.append(f"\n🔧 Diger Cozulenler ({len(md)}):")
+        satirlar.append(f"\nğŸ”§ Diger Cozulenler ({len(md)}):")
         for m in md[:8]:
-            satirlar.append(f"  • {m[:100]}")
+            satirlar.append(f"  â€¢ {m[:100]}")
 
     # Uyari
     if veri.get("_meta", {}).get("bot_yanlis_liste_var"):
         satirlar.append(
-            f"\n⚠️ NOT: Bot'un listesi guncel degil. DURUM_OKU() ile canli veri alinir."
+            f"\nâš ï¸ NOT: Bot'un listesi guncel degil. DURUM_OKU() ile canli veri alinir."
         )
 
     # ReYMeN karsilastirmasi (ana kaynak)
     ReYMeN = veri.get("ReYMeN_karsilastirma")
     if ReYMeN:
-        satirlar.append(f"\n📊 ReYMeN > ReYMeN Karsilastirmasi:")
+        satirlar.append(f"\nğŸ“Š ReYMeN > ReYMeN Karsilastirmasi:")
         satirlar.append(f"   Toplam: {ReYMeN.get('toplam_ozellik', 0)} ozellik")
         satirlar.append(
             f"   Tamam: {ReYMeN.get('tamam', 0)} | Eksik: {ReYMeN.get('eksik', 0)}"
@@ -167,9 +167,9 @@ def _ozet(veri: dict[str, Any]) -> str:
         for ad, oz in detay.items():
             if isinstance(oz, dict) and "durum" in oz:
                 dur = (
-                    "✅"
+                    "âœ…"
                     if oz["durum"] == "tamam"
-                    else ("🔶" if oz["durum"] == "kismen" else "❌")
+                    else ("ğŸ”¶" if oz["durum"] == "kismen" else "âŒ")
                 )
                 satirlar.append(f"  {dur} {ad}: {oz.get('not', '')[:80]}")
 
@@ -177,33 +177,33 @@ def _ozet(veri: dict[str, Any]) -> str:
     pasa = veri.get("pasa_38_karsilastirmasi")
     if pasa:
         satirlar.append(
-            f"\n📊 Pasa_38 Karsilastirmasi — {pasa.get('aciklama', '')[:80]}"
+            f"\nğŸ“Š Pasa_38 Karsilastirmasi â€” {pasa.get('aciklama', '')[:80]}"
         )
         satirlar.append(f"   Seviye: {veri.get('tahmini_seviye', '?')}")
         for m in pasa.get("maddeler", []):
-            dur = {"evet": "✅", "kismen": "🔶", "hayir": "❌"}.get(
-                m.get("cozuldu_mu", ""), "❓"
+            dur = {"evet": "âœ…", "kismen": "ğŸ”¶", "hayir": "âŒ"}.get(
+                m.get("cozuldu_mu", ""), "â“"
             )
             satirlar.append(
                 f"  {dur} {m.get('eksik', '?')}: ReYMeN={m.get('ReYMeN', '?')}"
             )
 
-    # YENI FORMAT: ozellikler objesi (23 ozellik, hermes>reymen karsilastirma)
+    # YENI FORMAT: ozellikler objesi (23 ozellik, reymen>reymen karsilastirma)
     # Sadece eski anahtarlar yoksa calisir
     ozellikler = veri.get("ozellikler")
     if ozellikler and not veri.get("cozulen_8_onceki"):
-        satirlar.append(f"\n📋 Ozellikler ({len(ozellikler)}):")
+        satirlar.append(f"\nğŸ“‹ Ozellikler ({len(ozellikler)}):")
         for ad, oz in ozellikler.items():
             dur = oz.get("durum", "?")
-            emoji = "✅" if dur == "tamam" else ("🔶" if dur == "kismen" else "❌")
+            emoji = "âœ…" if dur == "tamam" else ("ğŸ”¶" if dur == "kismen" else "âŒ")
             satirlar.append(f"  {emoji} {ad}: {oz.get('detay', '')[:100]}")
         # Aktif ajanlar
         ajanlar = veri.get("aktif_ajanlar", {})
         if ajanlar:
-            satirlar.append(f"\n🤖 Aktif Botlar ({len(ajanlar)}):")
+            satirlar.append(f"\nğŸ¤– Aktif Botlar ({len(ajanlar)}):")
             for ad, oz in ajanlar.items():
                 satirlar.append(
-                    f"  ● {ad}: {oz.get('profil', '?')} ({oz.get('provider', '?')})"
+                    f"  â— {ad}: {oz.get('profil', '?')} ({oz.get('provider', '?')})"
                 )
 
     return "\n".join(satirlar)
@@ -216,7 +216,7 @@ def _detayli(veri: dict[str, Any]) -> str:
     return "\n".join(satirlar)
 
 
-# ── Ortak Degisiklik Kaydi ────────────────────────────────────────────
+# â”€â”€ Ortak Degisiklik Kaydi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _DEGISIKLIK_DOSYASI: Path = PROJE_KOK / "durum.json"
 
@@ -274,7 +274,7 @@ def _son_degisiklikler(adet: int = 5) -> str:
         return f"[degisiklik] Hata: {_e}"
 
 
-# ── Tool API ────────────────────────────────────────────────────────────
+# â”€â”€ Tool API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def durum_oku(detay: str = "0") -> str:
@@ -295,7 +295,7 @@ def durum_oku(detay: str = "0") -> str:
         return _ozet(veri)
 
 
-# ── Motor kayit ─────────────────────────────────────────────────────────
+# â”€â”€ Motor kayit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def motor_kaydet(motor) -> None:
@@ -307,7 +307,7 @@ def motor_kaydet(motor) -> None:
             "DURUM_OKU",
             lambda ham="0": durum_oku(ham.strip() or "0"),
             "ReYMeN merkezi durum raporu. "
-            "Kullanim: DURUM_OKU() → ozet, DURUM_OKU(detay=1) → detayli, DURUM_OKU(json) → ham JSON",
+            "Kullanim: DURUM_OKU() â†’ ozet, DURUM_OKU(detay=1) â†’ detayli, DURUM_OKU(json) â†’ ham JSON",
         )
         motor._plugin_arac_kaydet(
             "DURUM_DEGISIKLIK",
@@ -323,7 +323,7 @@ def motor_kaydet(motor) -> None:
         logger.warning("[Durum] Motor kayit hatasi: %s", e)
 
 
-# ── CLI (dogrudan calistirma) ───────────────────────────────────────────
+# â”€â”€ CLI (dogrudan calistirma) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
     import sys

@@ -1,15 +1,15 @@
-"""
-_ajan_iletisim.py — ReYMeN Inter-Agent v1 İletişim Kanalı
+﻿"""
+_ajan_iletisim.py â€” ReYMeN Inter-Agent v1 Ä°letiÅŸim KanalÄ±
 
-3 ajan (Kali, Windows, CAD) arasında JSON mesajlaşma:
+3 ajan (Kali, Windows, CAD) arasÄ±nda JSON mesajlaÅŸma:
 - Timeout: 30sn
 - ACK: zorunlu
 - Retry: max 3
 - Heartbeat: 30sn'de bir
-- Circuit breaker: 3 ardışık hata → kalıcı dur
-- Queue: SQLite backend (tüm ajanlar ortak DB'yi paylaşır)
+- Circuit breaker: 3 ardÄ±ÅŸÄ±k hata â†’ kalÄ±cÄ± dur
+- Queue: SQLite backend (tÃ¼m ajanlar ortak DB'yi paylaÅŸÄ±r)
 
-Kullanım:
+KullanÄ±m:
     from reymen.sistem._ajan_iletisim import AjanIletisim
 
     ai = AjanIletisim()
@@ -26,19 +26,19 @@ import threading
 from datetime import datetime
 from pathlib import Path
 
-# Varsayılan DB yolu (proje içi)
+# VarsayÄ±lan DB yolu (proje iÃ§i)
 DB_YOLU = Path(__file__).parent.parent / "cereyan" / ".ReYMeN" / "ogrenmeler.db"
 
 # Sabitler
 TIMEOUT_SN = 30
 MAX_RETRY = 3
 HEARTBEAT_ARALIK = 30  # saniye
-HEARTBEAT_TIMEOUT = 90  # 3 kaçırılan heartbeat
+HEARTBEAT_TIMEOUT = 90  # 3 kaÃ§Ä±rÄ±lan heartbeat
 CIRCUIT_BREAKER_ESIK = 3
 
 
 class AjanIletisim:
-    """Ajanlar arası JSON mesajlaşma kanalı."""
+    """Ajanlar arasÄ± JSON mesajlaÅŸma kanalÄ±."""
 
     def __init__(self, db_yolu=None):
         self.db = db_yolu or DB_YOLU
@@ -46,7 +46,7 @@ class AjanIletisim:
         self._sira = 0
 
     def _db_kur(self):
-        """Mesaj kuyruğu tablosunu oluştur."""
+        """Mesaj kuyruÄŸu tablosunu oluÅŸtur."""
         conn = sqlite3.connect(str(self.db))
         c = conn.cursor()
         c.execute("""
@@ -80,7 +80,7 @@ class AjanIletisim:
         conn.close()
 
     def _mesaj_id(self) -> str:
-        """Benzersiz mesaj ID'si oluştur."""
+        """Benzersiz mesaj ID'si oluÅŸtur."""
         self._sira += 1
         return f"msg_{int(time.time())}_{self._sira}"
 
@@ -93,7 +93,7 @@ class AjanIletisim:
         icerik: dict = None,
     ) -> str:
         """
-        Mesaj gönder.
+        Mesaj gÃ¶nder.
 
         Args:
             gonderen: "kali", "windows", "cad"
@@ -124,10 +124,10 @@ class AjanIletisim:
 
     def al(self, ajan_adi: str, tip_filtre: str = None) -> list:
         """
-        Ajana gelen bekleyen mesajları al.
+        Ajana gelen bekleyen mesajlarÄ± al.
 
         Args:
-            ajan_adi: Hangi ajanın mesajları
+            ajan_adi: Hangi ajanÄ±n mesajlarÄ±
             tip_filtre: "command", "response", "heartbeat" (opsiyonel)
 
         Returns:
@@ -177,7 +177,7 @@ class AjanIletisim:
         return mesajlar
 
     def ack(self, mesaj_id: str) -> bool:
-        """Mesajı ACK'le (alındı olarak işaretle)."""
+        """MesajÄ± ACK'le (alÄ±ndÄ± olarak iÅŸaretle)."""
         conn = sqlite3.connect(str(self.db))
         c = conn.cursor()
         c.execute(
@@ -194,7 +194,7 @@ class AjanIletisim:
         return ok
 
     def tamamla(self, mesaj_id: str) -> bool:
-        """Mesajı tamamlandı olarak işaretle."""
+        """MesajÄ± tamamlandÄ± olarak iÅŸaretle."""
         conn = sqlite3.connect(str(self.db))
         c = conn.cursor()
         c.execute(
@@ -211,7 +211,7 @@ class AjanIletisim:
         return ok
 
     def hata(self, mesaj_id: str, hata_msg: str) -> bool:
-        """Mesajı hatalı olarak işaretle."""
+        """MesajÄ± hatalÄ± olarak iÅŸaretle."""
         conn = sqlite3.connect(str(self.db))
         c = conn.cursor()
         c.execute(
@@ -228,7 +228,7 @@ class AjanIletisim:
         return ok
 
     def heartbeat(self, ajan_adi: str) -> None:
-        """Ajanın heartbeat'ini güncelle."""
+        """AjanÄ±n heartbeat'ini gÃ¼ncelle."""
         conn = sqlite3.connect(str(self.db))
         c = conn.cursor()
         c.execute(
@@ -245,7 +245,7 @@ class AjanIletisim:
         conn.close()
 
     def ajan_calistigini_dogrula(self, ajan_adi: str) -> bool:
-        """Ajanın heartbeat'ine göre çalışıp çalışmadığını kontrol et."""
+        """AjanÄ±n heartbeat'ine gÃ¶re Ã§alÄ±ÅŸÄ±p Ã§alÄ±ÅŸmadÄ±ÄŸÄ±nÄ± kontrol et."""
         conn = sqlite3.connect(str(self.db))
         c = conn.cursor()
         c.execute(
@@ -259,13 +259,13 @@ class AjanIletisim:
         conn.close()
 
         if not row:
-            return False  # Hiç heartbeat göndermemiş
+            return False  # HiÃ§ heartbeat gÃ¶ndermemiÅŸ
 
         son_hb = datetime.strptime(row[0][:19], "%Y-%m-%d %H:%M:%S")
         fark = (datetime.now() - son_hb).total_seconds()
 
         if fark > HEARTBEAT_TIMEOUT:
-            return False  # 90sn'den fazla heartbeat yok → çökmüş
+            return False  # 90sn'den fazla heartbeat yok â†’ Ã§Ã¶kmÃ¼ÅŸ
 
         if row[2]:  # circuit_breaker aktif
             return False
@@ -273,11 +273,11 @@ class AjanIletisim:
         return True
 
     def hata_kaydet(self, ajan_adi: str, hata_msg: str = None) -> dict:
-        """Ajan hatasını kaydet. Circuit breaker eşiğini kontrol et."""
+        """Ajan hatasÄ±nÄ± kaydet. Circuit breaker eÅŸiÄŸini kontrol et."""
         conn = sqlite3.connect(str(self.db))
         c = conn.cursor()
 
-        # Mevcut hata sayısını al
+        # Mevcut hata sayÄ±sÄ±nÄ± al
         c.execute(
             """
             SELECT hata_sayisi, circuit_breaker FROM ajan_durum WHERE ajan_adi = ?
@@ -316,11 +316,11 @@ class AjanIletisim:
             "ajan": ajan_adi,
             "hata_sayisi": hata_sayisi,
             "circuit_breaker": bool(circuit),
-            "mesaj": f"{hata_sayisi}/{CIRCUIT_BREAKER_ESIK} hata - {'KALICI DUR ⛔' if circuit else 'Calisiyor ✅'}",
+            "mesaj": f"{hata_sayisi}/{CIRCUIT_BREAKER_ESIK} hata - {'KALICI DUR â›”' if circuit else 'Calisiyor âœ…'}",
         }
 
     def circuit_breaker_sifirla(self, ajan_adi: str) -> None:
-        """Circuit breaker'ı manuel sıfırla."""
+        """Circuit breaker'Ä± manuel sÄ±fÄ±rla."""
         conn = sqlite3.connect(str(self.db))
         c = conn.cursor()
         c.execute(
@@ -336,11 +336,11 @@ class AjanIletisim:
         conn.close()
 
     def durum_raporu(self) -> dict:
-        """Tüm ajanların durum raporu."""
+        """TÃ¼m ajanlarÄ±n durum raporu."""
         conn = sqlite3.connect(str(self.db))
         c = conn.cursor()
 
-        # Ajan durumları
+        # Ajan durumlarÄ±
         c.execute("SELECT * FROM ajan_durum")
         ajanlar = {}
         for row in c.fetchall():
@@ -351,7 +351,7 @@ class AjanIletisim:
                 "son_hata": row[4],
             }
 
-        # Bekleyen mesaj sayısı
+        # Bekleyen mesaj sayÄ±sÄ±
         c.execute(
             "SELECT alici, COUNT(*) FROM ajan_mesaj WHERE durum = 'pending' GROUP BY alici"
         )
@@ -389,13 +389,13 @@ class AjanIletisim:
 if __name__ == "__main__":
     ai = AjanIletisim()
 
-    print("=== Ajan İletişim Testi ===")
+    print("=== Ajan Ä°letiÅŸim Testi ===")
 
     # 1. Kali'den Windows'a mesaj
     mid = ai.gonder("kali", "windows", komut="PORT_SCAN", icerik={"port": 1234})
     print(f"1. Kali -> Windows: {mid}")
 
-    # 2. Windows mesajı alsın
+    # 2. Windows mesajÄ± alsÄ±n
     msgs = ai.al("windows")
     print(f"2. Windows aldi: {len(msgs)} mesaj")
     if msgs:
@@ -412,13 +412,13 @@ if __name__ == "__main__":
     # 5. Heartbeat
     ai.heartbeat("kali")
     ai.heartbeat("windows")
-    print(f"5. Heartbeat: kali ✅, windows ✅")
+    print(f"5. Heartbeat: kali âœ…, windows âœ…")
 
     # 6. Durum raporu
     durum = ai.durum_raporu()
     print(f"\n6. Durum:")
     for ajan, info in durum["ajanlar"].items():
-        dur = "✅ Canlı" if not info["circuit_breaker"] else "⛔ Circuit Breaker"
+        dur = "âœ… CanlÄ±" if not info["circuit_breaker"] else "â›” Circuit Breaker"
         print(f"   {ajan}: {dur} ({info['hata_sayisi']} hata)")
     print(f"   Bekleyen: {durum['bekleyen_mesaj']}")
 
@@ -427,11 +427,11 @@ if __name__ == "__main__":
         sonuc = ai.hata_kaydet("kali", f"test hatasi {i+1}")
         print(f"7.{i+1} Kali hata: {sonuc['mesaj']}")
 
-    # 8. Ajan çalışıyor mu?
+    # 8. Ajan Ã§alÄ±ÅŸÄ±yor mu?
     print(
-        f"\n8. Kali calisiyor mu? {'Evet ✅' if ai.ajan_calistigini_dogrula('kali') else 'Hayir ⛔'}"
+        f"\n8. Kali calisiyor mu? {'Evet âœ…' if ai.ajan_calistigini_dogrula('kali') else 'Hayir â›”'}"
     )
 
-    # 9. Sıfırla
+    # 9. SÄ±fÄ±rla
     ai.circuit_breaker_sifirla("kali")
     print(f"9. Kali circuit breaker sifirlandi")

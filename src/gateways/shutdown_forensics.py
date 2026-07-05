@@ -1,4 +1,4 @@
-"""Shutdown forensics — capture context when the gateway receives SIGTERM/SIGINT.
+﻿"""Shutdown forensics â€” capture context when the gateway receives SIGTERM/SIGINT.
 
 The gateway's ``shutdown_signal_handler`` runs synchronously inside the
 asyncio event loop.  We can't safely block it for long, but we DO want a
@@ -103,7 +103,7 @@ def _proc_summary(pid: int) -> Dict[str, Any]:
         summary["uid"] = uid.split()[0] if uid else uid
     cmdline = _read_proc_cmdline(pid)
     if cmdline:
-        # Truncate aggressively — these can be 4KB
+        # Truncate aggressively â€” these can be 4KB
         summary["cmdline"] = cmdline[:300]
     return summary
 
@@ -149,7 +149,7 @@ def snapshot_shutdown_context(received_signal: Any = None) -> Dict[str, Any]:
         ctx["systemd_journal_stream"] = journal_stream
     ctx["under_systemd"] = bool(invocation_id) or ppid == 1
 
-    # Load average — high load points the finger at "something else
+    # Load average â€” high load points the finger at "something else
     # crushing the box" rather than "external killer".
     try:
         ctx["loadavg_1m"] = os.getloadavg()[0]
@@ -177,7 +177,7 @@ def snapshot_shutdown_context(received_signal: Any = None) -> Dict[str, Any]:
     # _PLANNED_STOP_MARKER_FILENAME); we use string literals here so the
     # signal-handler path stays import-light.
     try:
-        hermes_home_str = os.environ.get("HERMES_HOME")
+        hermes_home_str = os.environ.get("REYMEN_HOME", os.environ.get("HERMES_HOME"))
         if hermes_home_str:
             takeover_path = Path(hermes_home_str) / ".gateway-takeover.json"
             if takeover_path.exists():
@@ -318,7 +318,7 @@ def format_context_for_log(ctx: Dict[str, Any]) -> str:
     if ctx.get("tracer_pid"):
         extras.append(f"tracer_pid={ctx['tracer_pid']}")
     extras_str = (" " + " ".join(extras)) if extras else ""
-    # Parent cmdline is the most useful single signal — log it prominently.
+    # Parent cmdline is the most useful single signal â€” log it prominently.
     return (
         f"signal={sig} "
         f"under_systemd={under_systemd} "
@@ -342,10 +342,10 @@ def check_systemd_timing_alignment(drain_timeout: float) -> Optional[Dict[str, A
     """At startup, sanity-check that systemd's TimeoutStopSec >= drain_timeout.
 
     When the gateway is run under a stale systemd unit file (e.g. the user
-    upgraded hermes-agent but never re-ran ``hermes setup`` to regenerate
+    upgraded reymen-agent but never re-ran ``reymen setup`` to regenerate
     the unit), ``TimeoutStopSec`` can be smaller than the configured
     ``restart_drain_timeout``.  Result: SIGTERM arrives, the drain starts,
-    and systemd SIGKILLs the cgroup mid-drain — looks like a phantom kill
+    and systemd SIGKILLs the cgroup mid-drain â€” looks like a phantom kill
     in the journal because the journal only logs ``code=killed status=9``.
 
     Returns ``None`` when the alignment is fine OR we can't determine it
@@ -362,7 +362,7 @@ def check_systemd_timing_alignment(drain_timeout: float) -> Optional[Dict[str, A
     # Try to identify our unit name and ask systemctl for its config.
     unit_name: Optional[str] = None
     try:
-        # /proc/self/cgroup gives us "0::/user.slice/.../hermes-gateway.service"
+        # /proc/self/cgroup gives us "0::/user.slice/.../reymen-gateway.service"
         with open("/proc/self/cgroup", encoding="utf-8") as fh:
             for line in fh:
                 # systemd cgroup line ends with the unit name
@@ -382,7 +382,7 @@ def check_systemd_timing_alignment(drain_timeout: float) -> Optional[Dict[str, A
 
     # Query systemctl for TimeoutStopUSec.  Use --user OR system depending
     # on which manager actually owns the unit.  Try user first since
-    # that's the common case for hermes.
+    # that's the common case for reymen.
     timeout_us: Optional[int] = None
     for flag in (["--user"], []):
         try:

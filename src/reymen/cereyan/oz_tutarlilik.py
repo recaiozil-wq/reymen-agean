@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-oz_tutarlilik.py — Self-Consistency + LLM-as-Judge (Wang et al. 2022).
+oz_tutarlilik.py â€” Self-Consistency + LLM-as-Judge (Wang et al. 2022).
 
 Buyuk LLM sistemlerinden ilham alinan ilke:
   "Tek cevap yerine N bagimsiz cevap uret, aralarinda en tutarli olani sec."
@@ -24,7 +24,7 @@ import re
 import json
 from typing import Optional
 
-# ── Judge prompt ──────────────────────────────────────────────────────────────
+# â”€â”€ Judge prompt â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _JUDGE_SISTEM = """Sen bir uzman yapay zeka cevap degerlendiricisin.
 Sana ayni hedefe uretilmis N farkli plan/cevap sunulacak.
@@ -48,7 +48,7 @@ PUAN: [sayi]
 ACIKLAMA: [tek cumle]
 """
 
-# ── Sinif ─────────────────────────────────────────────────────────────────────
+# â”€â”€ Sinif â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class OzTutarlilikDenetci:
@@ -68,7 +68,7 @@ class OzTutarlilikDenetci:
         self._toplam_sefer = 0
         self._judge_cagrisi = 0
 
-    # ── Ana API ──────────────────────────────────────────────────────────────
+    # â”€â”€ Ana API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def en_iyi_plani_sec(
         self,
@@ -161,7 +161,7 @@ class OzTutarlilikDenetci:
             "judge_cagrisi": self._judge_cagrisi,
         }
 
-    # ── Ic yardimcilar ───────────────────────────────────────────────────────
+    # â”€â”€ Ic yardimcilar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _n_cevap_uret(self, sistem: str, mesajlar: list, n: int) -> list[str]:
         """Ayni sorguya N bagimsiz cevap uret."""
@@ -208,7 +208,7 @@ class OzTutarlilikDenetci:
             print(f"[OzTutarlilik] Judge secimi: Cevap {secim + 1}/{len(adaylar)}")
             return adaylar[secim]
         except Exception as e:
-            print(f"[OzTutarlilik] Judge hatasi: {e} — cogunluk oyuna geciliyor")
+            print(f"[OzTutarlilik] Judge hatasi: {e} â€” cogunluk oyuna geciliyor")
             return self.coklu_oy_ver(adaylar)
 
     @staticmethod
@@ -231,7 +231,7 @@ class OzTutarlilikDenetci:
         }
 
 
-# ── Test ─────────────────────────────────────────────────────────────────────
+# â”€â”€ Test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
     print("=== oz_tutarlilik.py Test ===\n")
@@ -275,7 +275,7 @@ if __name__ == "__main__":
         "Web'e git, bilgi getir.",
     ]
     kazanan = sc.coklu_oy_ver(adaylar)
-    print(f"\n[Test 2] Cogunluk oyu: {kazanan[:60]} (beklenen: oku/kaydet planı)")
+    print(f"\n[Test 2] Cogunluk oyu: {kazanan[:60]} (beklenen: oku/kaydet planÄ±)")
 
     # Test 3: Puan
     puan = sc.tek_cevap_puan("Raporla", "Raporu olusturdum ve kaydettim.")

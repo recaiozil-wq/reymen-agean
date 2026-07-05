@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """Schema Manager - SQLite tablo yonetimi + versiyonlama.
 
 Tum SQLite tablolarinin CREATE TABLE IF NOT EXISTS ile idempotent

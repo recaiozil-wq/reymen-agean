@@ -1,14 +1,14 @@
-"""_handle_snapshot_command handler."""
+﻿"""_handle_snapshot_command handler."""
 
 
 def _handle_snapshot_command(cli, command: str):
-    """Handle /snapshot — lightweight state snapshots for ReYMeN config/state.
+    """Handle /snapshot â€” lightweight state snapshots for ReYMeN config/state.
 
     Syntax:
-        /snapshot                  — list recent snapshots
-        /snapshot create [label]   — create a snapshot
-        /snapshot restore <id>     — restore state from snapshot
-        /snapshot prune [N]        — prune to N snapshots (default 20)
+        /snapshot                  â€” list recent snapshots
+        /snapshot create [label]   â€” create a snapshot
+        /snapshot restore <id>     â€” restore state from snapshot
+        /snapshot prune [N]        â€” prune to N snapshots (default 20)
     """
     from reymen.reymen_cli.backup import (
         create_quick_snapshot,
@@ -29,7 +29,7 @@ def _handle_snapshot_command(cli, command: str):
             return
         print(f"  State snapshots ({display_reymen_home()}/state-snapshots/):\n")
         print(f"  {'#':>3}  {'ID':<35} {'Files':>5} {'Size':>10} {'Label'}")
-        print(f"  {'─'*3}  {'─'*35} {'─'*5} {'─'*10} {'─'*20}")
+        print(f"  {'â”€'*3}  {'â”€'*35} {'â”€'*5} {'â”€'*10} {'â”€'*20}")
         for i, s in enumerate(snaps, 1):
             size = s.get("total_size", 0)
             if size < 1024:

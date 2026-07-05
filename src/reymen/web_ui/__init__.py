@@ -1,4 +1,4 @@
-"""🌐 ReYMeN Web UI — FastAPI + Jinja2 + HTMX + WebSocket yönetim paneli.
+﻿"""ğŸŒ ReYMeN Web UI â€” FastAPI + Jinja2 + HTMX + WebSocket yÃ¶netim paneli.
 
 Kullanim:
     python -c "from reymen.web_ui import baslat; baslat()"
@@ -26,8 +26,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import uvicorn
 
-# Web UI modülleri
-from src.reymen.web_ui.auth import (
+# Web UI modÃ¼lleri
+from reymen.web_ui.auth import (
     AuthConfig,
     UserManager,
     TokenManager,
@@ -43,10 +43,10 @@ from src.reymen.web_ui.auth import (
     InvalidCredentialsError,
     ProviderError,
 )
-from src.reymen.web_ui.module_discovery import ModulTarayici, modul_kategorileri
+from reymen.web_ui.module_discovery import ModulTarayici, modul_kategorileri
 
 # OAuth2
-from src.reymen.guvenlik.oauth2 import (
+from reymen.guvenlik.oauth2 import (
     OAuth2Provider,
     OAuth2Manager,
     OAuth2Token,
@@ -56,8 +56,8 @@ from src.reymen.guvenlik.oauth2 import (
     oauth2_registry,
     oauth2_manager,
 )
-from src.reymen.web_ui.process_manager import ProcessManager
-from src.reymen.web_ui.log_stream import LogStreamer, log_kuyrugu_oku
+from reymen.web_ui.process_manager import ProcessManager
+from reymen.web_ui.log_stream import LogStreamer, log_kuyrugu_oku
 
 logger = logging.getLogger(__name__)
 
@@ -77,7 +77,7 @@ app = FastAPI(title="ReYMeN Web UI", version="2.0.0")
 templates = Jinja2Templates(directory=str(TEMPLATE_DIZIN))
 
 
-# Jinja2 context processor: request.state → template değişkenleri
+# Jinja2 context processor: request.state â†’ template deÄŸiÅŸkenleri
 async def jinja_context(request: Request) -> dict:
     return {
         "user": getattr(request.state, "user", None),
@@ -111,7 +111,7 @@ process_manager = ProcessManager()
 log_streamer = LogStreamer(LOG_DOSYASI)
 
 # ---------------------------------------------------------------------------
-# Middleware — auth kontrolü (ReYMeN pattern: provider registry + refresh token)
+# Middleware â€” auth kontrolÃ¼ (ReYMeN pattern: provider registry + refresh token)
 # ---------------------------------------------------------------------------
 
 AUTH_ATLANACAK = {
@@ -186,7 +186,7 @@ async def auth_middleware(request: Request, call_next):
     request.state.role = session.role
     request.state.session = session
 
-    # Role-based API izin kontrolü
+    # Role-based API izin kontrolÃ¼
     if path.startswith("/api/"):
         if request.method in ("POST", "PUT", "DELETE"):
             if session.role not in ("admin", "operator"):
@@ -213,7 +213,7 @@ async def auth_middleware(request: Request, call_next):
     return await call_next(request)
 
 
-# ── Rol bazlı yetki yardımcısı ────────────────────────────────────
+# â”€â”€ Rol bazlÄ± yetki yardÄ±mcÄ±sÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def yetki_kontrol(session, gerekli_roller: list[str], izin: str = "") -> bool:
@@ -235,7 +235,7 @@ def operator_ustu(session) -> bool:
 
 
 # ---------------------------------------------------------------------------
-# Routes — Sayfalar
+# Routes â€” Sayfalar
 # ---------------------------------------------------------------------------
 
 
@@ -277,7 +277,7 @@ async def login_post(request: Request):
         return templates.TemplateResponse(
             request,
             "login.html",
-            {"hata": "Hatalı kullanıcı adı veya şifre"},
+            {"hata": "HatalÄ± kullanÄ±cÄ± adÄ± veya ÅŸifre"},
         )
 
     audit_log(
@@ -322,20 +322,20 @@ async def logout(request: Request):
 
 
 # ---------------------------------------------------------------------------
-# Routes — OAuth2 Login (Google / Discord)
+# Routes â€” OAuth2 Login (Google / Discord)
 # ---------------------------------------------------------------------------
 
 
 @app.get("/auth/login/{provider}")
 async def oauth_login(provider: str, request: Request, response: Response):
-    """Kullanıcıyı OAuth2 provider'ın onay sayfasına yönlendir."""
+    """KullanÄ±cÄ±yÄ± OAuth2 provider'Ä±n onay sayfasÄ±na yÃ¶nlendir."""
     oauth_provider = oauth2_registry.get(provider)
     if not oauth_provider:
         return HTMLResponse(
-            content=f'<div class="alert alert-error">❌ Bilinmeyen OAuth2 provider: {provider}</div>',
+            content=f'<div class="alert alert-error">âŒ Bilinmeyen OAuth2 provider: {provider}</div>',
             status_code=404,
         )
-    # State parametresini signed cookie'da sakla (CSRF koruması)
+    # State parametresini signed cookie'da sakla (CSRF korumasÄ±)
     import secrets
 
     state = secrets.token_urlsafe(16)
@@ -357,7 +357,7 @@ async def oauth_login(provider: str, request: Request, response: Response):
 async def oauth_callback(
     provider: str, request: Request, code: str = "", state: str = "", error: str = ""
 ):
-    """OAuth2 callback — authorization code ile token al, Session oluştur."""
+    """OAuth2 callback â€” authorization code ile token al, Session oluÅŸtur."""
     if error:
         logger.warning("[OAuth2] %s callback hatasi: %s", provider, error)
         return RedirectResponse(url=f"/login?hata={urllib.parse.quote(error)}")
@@ -365,7 +365,7 @@ async def oauth_callback(
     if not code:
         return RedirectResponse(url="/login?hata=authorization_code_bulunamadi")
 
-    # State doğrulama (CSRF) — cookie'deki state ile URL'deki state karşılaştır
+    # State doÄŸrulama (CSRF) â€” cookie'deki state ile URL'deki state karÅŸÄ±laÅŸtÄ±r
     saved_state = request.cookies.get("oauth_state", "")
     if saved_state and state and saved_state != state:
         logger.warning("[OAuth2] %s state uyusmazligi", provider)
@@ -375,18 +375,18 @@ async def oauth_callback(
         # Token al
         token = oauth2_manager.exchange_code(provider, code)
 
-        # Kullanıcı bilgisini al
+        # KullanÄ±cÄ± bilgisini al
         user_info = oauth2_manager.get_user_info(provider, token.access_token)
 
-        # Kullanıcı adını belirle (email yoksa provider_id kullan)
+        # KullanÄ±cÄ± adÄ±nÄ± belirle (email yoksa provider_id kullan)
         username = user_info.email or user_info.provider_id
         if not username:
             username = f"{provider}_{user_info.provider_id}"
 
-        # Local user varsa rolünü al, yoksa viewer
+        # Local user varsa rolÃ¼nÃ¼ al, yoksa viewer
         role = user_manager.get_user_role(username) or "viewer"
 
-        # JWT Session oluştur (web_ui.auth ile uyumlu)
+        # JWT Session oluÅŸtur (web_ui.auth ile uyumlu)
         at = token_manager.create(username, role=role, provider=f"oauth2:{provider}")
         rt = token_manager.create_refresh(username)
 
@@ -436,13 +436,13 @@ async def oauth_callback(
 
 
 # ---------------------------------------------------------------------------
-# API — Auth (ReYMeN pattern: /api/auth/me + /api/auth/providers)
+# API â€” Auth (ReYMeN pattern: /api/auth/me + /api/auth/providers)
 # ---------------------------------------------------------------------------
 
 
 @app.get("/api/auth/me")
 async def api_auth_me(request: Request):
-    """ReYMeN'teki /api/auth/me — mevcut Session bilgisi."""
+    """ReYMeN'teki /api/auth/me â€” mevcut Session bilgisi."""
     session: Session | None = getattr(request.state, "session", None)
     if not session:
         return JSONResponse(
@@ -467,7 +467,7 @@ async def api_auth_me(request: Request):
 
 @app.get("/api/auth/providers")
 async def api_auth_providers():
-    """ReYMeN'teki /api/auth/providers — kayitli auth provider'lari listele."""
+    """ReYMeN'teki /api/auth/providers â€” kayitli auth provider'lari listele."""
     providers = list_providers()
     return JSONResponse(
         {
@@ -492,7 +492,7 @@ async def plugins_sayfasi(request: Request):
     """Plugin yonetimi (admin)."""
     if not admin_gerekli(getattr(request.state, "session", None)):
         return HTMLResponse(
-            content='<div class="container"><h1>🔒 Yetkisiz</h1><p>Bu sayfa icin admin yetkisi gerekli.</p></div>',
+            content='<div class="container"><h1>ğŸ”’ Yetkisiz</h1><p>Bu sayfa icin admin yetkisi gerekli.</p></div>',
             status_code=403,
         )
     return templates.TemplateResponse(request, "plugins.html", {})
@@ -503,7 +503,7 @@ async def gateway_sayfasi(request: Request):
     """Gateway yonetimi (operator+)."""
     if not operator_ustu(getattr(request.state, "session", None)):
         return HTMLResponse(
-            content='<div class="container"><h1>🔒 Yetkisiz</h1><p>Bu sayfa icin operator yetkisi gerekli.</p></div>',
+            content='<div class="container"><h1>ğŸ”’ Yetkisiz</h1><p>Bu sayfa icin operator yetkisi gerekli.</p></div>',
             status_code=403,
         )
     return templates.TemplateResponse(request, "gateway.html", {})
@@ -519,7 +519,7 @@ async def users_sayfasi(request: Request):
     """Kullanici yonetimi (admin)."""
     if not admin_gerekli(getattr(request.state, "session", None)):
         return HTMLResponse(
-            content='<div class="container"><h1>🔒 Yetkisiz</h1><p>Bu sayfa icin admin yetkisi gerekli.</p></div>',
+            content='<div class="container"><h1>ğŸ”’ Yetkisiz</h1><p>Bu sayfa icin admin yetkisi gerekli.</p></div>',
             status_code=403,
         )
     return templates.TemplateResponse(request, "users.html", {})
@@ -532,12 +532,12 @@ async def sandbox_sayfasi(request: Request):
 
 @app.get("/security", response_class=HTMLResponse)
 async def security_sayfasi(request: Request):
-    """Guvenlik yonetim sayfasi — sandbox, firewall, karantina."""
+    """Guvenlik yonetim sayfasi â€” sandbox, firewall, karantina."""
     return templates.TemplateResponse(request, "security.html", {})
 
 
 # ---------------------------------------------------------------------------
-# API — Security (Guvenlik)
+# API â€” Security (Guvenlik)
 # ---------------------------------------------------------------------------
 
 
@@ -559,11 +559,11 @@ async def api_security_durum():
         docker = durum.get("docker", {})
 
         # Docker Sandbox
-        d_ikon = "🟢" if docker.get("docker_mevcut") else "🔴"
-        i_ikon = "🟢" if docker.get("image_mevcut") else "🟡"
-        sp_ikon = "🟢" if SUBPROCESS_SANDBOX_OK else "🔴"
+        d_ikon = "ğŸŸ¢" if docker.get("docker_mevcut") else "ğŸ”´"
+        i_ikon = "ğŸŸ¢" if docker.get("image_mevcut") else "ğŸŸ¡"
+        sp_ikon = "ğŸŸ¢" if SUBPROCESS_SANDBOX_OK else "ğŸ”´"
 
-        html.append(f'<div class="card"><h3>🏖️ Docker Sandbox</h3>')
+        html.append(f'<div class="card"><h3>ğŸ–ï¸ Docker Sandbox</h3>')
         html.append(
             f'<div class="flex">{d_ikon} Docker: {"mevcut" if docker.get("docker_mevcut") else "yok"}</div>'
         )
@@ -577,43 +577,43 @@ async def api_security_durum():
 
     except ImportError:
         html.append(
-            '<div class="card"><h3>🏖️ Docker Sandbox</h3><div class="gri">Sandbox modulu yuklu degil</div></div>'
+            '<div class="card"><h3>ğŸ–ï¸ Docker Sandbox</h3><div class="gri">Sandbox modulu yuklu degil</div></div>'
         )
     except Exception as e:
         html.append(
-            f'<div class="card"><h3>🏖️ Docker Sandbox</h3><div class="tag-no">Hata: {e}</div></div>'
+            f'<div class="card"><h3>ğŸ–ï¸ Docker Sandbox</h3><div class="tag-no">Hata: {e}</div></div>'
         )
 
     try:
         from reymen.guvenlik.network_restriction import _VARSAYILAN_NETWORK as nr
 
         durum = nr.durum
-        aktif_ikon = "🟢" if durum["aktif"] else "🔴"
-        html.append(f'<div class="card"><h3>🛡️ Network Restriction</h3>')
+        aktif_ikon = "ğŸŸ¢" if durum["aktif"] else "ğŸ”´"
+        html.append(f'<div class="card"><h3>ğŸ›¡ï¸ Network Restriction</h3>')
         html.append(
             f'<div class="flex">{aktif_ikon} Durum: {"AKTIF" if durum["aktif"] else "PASIF"}</div>'
         )
-        html.append(f'<div class="flex">🖥️ Sistem: {durum["sistem"]}</div>')
+        html.append(f'<div class="flex">ğŸ–¥ï¸ Sistem: {durum["sistem"]}</div>')
         html.append(
-            f'<div class="flex">🏠 Izinli: {", ".join(durum["her_zaman_izinli"])}</div>'
+            f'<div class="flex">ğŸ  Izinli: {", ".join(durum["her_zaman_izinli"])}</div>'
         )
-        html.append(f'<div class="flex">📋 Kural: {durum["eklenen_kurallar"]}</div>')
+        html.append(f'<div class="flex">ğŸ“‹ Kural: {durum["eklenen_kurallar"]}</div>')
         html.append(
-            f'<div class="flex">🌐 Domain: {durum["eklenen_domainler"]} adet</div>'
+            f'<div class="flex">ğŸŒ Domain: {durum["eklenen_domainler"]} adet</div>'
         )
         if durum["baslangic"]:
             html.append(
-                f'<div class="flex gri">⏰ Baslangic: {durum["baslangic"]}</div>'
+                f'<div class="flex gri">â° Baslangic: {durum["baslangic"]}</div>'
             )
         html.append("</div>")
 
     except ImportError:
         html.append(
-            '<div class="card"><h3>🛡️ Network Restriction</h3><div class="gri">Modul yuklu degil</div></div>'
+            '<div class="card"><h3>ğŸ›¡ï¸ Network Restriction</h3><div class="gri">Modul yuklu degil</div></div>'
         )
     except Exception as e:
         html.append(
-            f'<div class="card"><h3>🛡️ Network Restriction</h3><div class="tag-no">Hata: {e}</div></div>'
+            f'<div class="card"><h3>ğŸ›¡ï¸ Network Restriction</h3><div class="tag-no">Hata: {e}</div></div>'
         )
 
     try:
@@ -624,14 +624,14 @@ async def api_security_durum():
             karantina_say = len(karantina_liste)
         else:
             karantina_say = 0
-        html.append(f'<div class="card"><h3>📦 Karantina</h3>')
-        q_ikon = "🟢" if karantina_say == 0 else "🟡"
+        html.append(f'<div class="card"><h3>ğŸ“¦ Karantina</h3>')
+        q_ikon = "ğŸŸ¢" if karantina_say == 0 else "ğŸŸ¡"
         html.append(f'<div class="flex">{q_ikon} Dosya Sayisi: {karantina_say}</div>')
-        html.append(f'<div class="flex">📁 Dizin: {KARANTINA_DIZIN}</div>')
+        html.append(f'<div class="flex">ğŸ“ Dizin: {KARANTINA_DIZIN}</div>')
         html.append("</div>")
     except Exception:
         html.append(
-            '<div class="card"><h3>📦 Karantina</h3><div class="gri">Bilgi alinamadi</div></div>'
+            '<div class="card"><h3>ğŸ“¦ Karantina</h3><div class="gri">Bilgi alinamadi</div></div>'
         )
 
     return HTMLResponse(content="\n".join(html))
@@ -660,7 +660,7 @@ async def api_security_sandbox_build():
 
         if not DOCKER_MEVCUT:
             return HTMLResponse(
-                content='<div class="alert alert-error">❌ Docker yuklu degil</div>'
+                content='<div class="alert alert-error">âŒ Docker yuklu degil</div>'
             )
         sonuc = docker_image_build(zorla=True)
         if "build edildi" in sonuc:
@@ -670,10 +670,10 @@ async def api_security_sandbox_build():
         return HTMLResponse(content=f'<div class="alert alert-warning">{sonuc}</div>')
     except ImportError:
         return HTMLResponse(
-            content='<div class="alert alert-error">❌ Sandbox modulu yuklu degil</div>'
+            content='<div class="alert alert-error">âŒ Sandbox modulu yuklu degil</div>'
         )
     except Exception as e:
-        return HTMLResponse(content=f'<div class="alert alert-error">❌ {e}</div>')
+        return HTMLResponse(content=f'<div class="alert alert-error">âŒ {e}</div>')
 
 
 @app.get("/api/security/firewall/status")
@@ -684,19 +684,19 @@ async def api_security_firewall_status():
 
         durum = nr.durum
         html = []
-        aktif_ikon = "🟢" if durum["aktif"] else "🔴"
+        aktif_ikon = "ğŸŸ¢" if durum["aktif"] else "ğŸ”´"
         html.append(
             f'<div class="flex">{aktif_ikon} <b>Durum:</b> {"AKTIF" if durum["aktif"] else "PASIF"}</div>'
         )
-        html.append(f'<div class="flex">🖥️ <b>Sistem:</b> {durum["sistem"]}</div>')
+        html.append(f'<div class="flex">ğŸ–¥ï¸ <b>Sistem:</b> {durum["sistem"]}</div>')
         html.append(
-            f'<div class="flex">🏠 <b>Izinli IP:</b> {", ".join(durum["her_zaman_izinli"])}</div>'
+            f'<div class="flex">ğŸ  <b>Izinli IP:</b> {", ".join(durum["her_zaman_izinli"])}</div>'
         )
         html.append(
-            f'<div class="flex">📋 <b>Kural Sayisi:</b> {durum["eklenen_kurallar"]}</div>'
+            f'<div class="flex">ğŸ“‹ <b>Kural Sayisi:</b> {durum["eklenen_kurallar"]}</div>'
         )
         html.append(
-            f'<div class="flex">🌐 <b>Domain Engelleme:</b> {durum["eklenen_domainler"]} adet</div>'
+            f'<div class="flex">ğŸŒ <b>Domain Engelleme:</b> {durum["eklenen_domainler"]} adet</div>'
         )
         if durum["baslangic"]:
             html.append(
@@ -727,17 +727,17 @@ async def api_security_firewall_apply(request: Request):
         sonuc = nr.apply(allowlist=allowlist, block_domainler=block_domains)
         if sonuc.get("basarili"):
             return HTMLResponse(
-                content=f'<div class="alert alert-success">✅ {sonuc["mesaj"]}</div>'
+                content=f'<div class="alert alert-success">âœ… {sonuc["mesaj"]}</div>'
             )
         return HTMLResponse(
-            content=f'<div class="alert alert-warning">⚠️ {sonuc["mesaj"]}</div>'
+            content=f'<div class="alert alert-warning">âš ï¸ {sonuc["mesaj"]}</div>'
         )
     except ImportError:
         return HTMLResponse(
-            content='<div class="alert alert-error">❌ Firewall modulu yuklu degil</div>'
+            content='<div class="alert alert-error">âŒ Firewall modulu yuklu degil</div>'
         )
     except Exception as e:
-        return HTMLResponse(content=f'<div class="alert alert-error">❌ {e}</div>')
+        return HTMLResponse(content=f'<div class="alert alert-error">âŒ {e}</div>')
 
 
 @app.post("/api/security/firewall/remove")
@@ -749,17 +749,17 @@ async def api_security_firewall_remove():
         sonuc = nr.remove()
         if sonuc.get("basarili"):
             return HTMLResponse(
-                content=f'<div class="alert alert-success">✅ {sonuc["mesaj"]}</div>'
+                content=f'<div class="alert alert-success">âœ… {sonuc["mesaj"]}</div>'
             )
         return HTMLResponse(
-            content=f'<div class="alert alert-warning">⚠️ {sonuc["mesaj"]}</div>'
+            content=f'<div class="alert alert-warning">âš ï¸ {sonuc["mesaj"]}</div>'
         )
     except ImportError:
         return HTMLResponse(
-            content='<div class="alert alert-error">❌ Firewall modulu yuklu degil</div>'
+            content='<div class="alert alert-error">âŒ Firewall modulu yuklu degil</div>'
         )
     except Exception as e:
-        return HTMLResponse(content=f'<div class="alert alert-error">❌ {e}</div>')
+        return HTMLResponse(content=f'<div class="alert alert-error">âŒ {e}</div>')
 
 
 @app.get("/api/security/quarantine")
@@ -769,11 +769,11 @@ async def api_security_quarantine():
         from reymen_cli.quarantine import KARANTINA_DIZIN
 
         if not KARANTINA_DIZIN.exists():
-            return HTMLResponse(content='<div class="gri">📦 Karantina bos</div>')
+            return HTMLResponse(content='<div class="gri">ğŸ“¦ Karantina bos</div>')
 
         kayitlar = list(KARANTINA_DIZIN.iterdir())
         if not kayitlar:
-            return HTMLResponse(content='<div class="gri">📦 Karantina bos</div>')
+            return HTMLResponse(content='<div class="gri">ğŸ“¦ Karantina bos</div>')
 
         html = [
             '<table class="table"><tr><th>#</th><th>Dosya</th><th>Boyut</th><th>Tarih</th></tr>'
@@ -804,15 +804,15 @@ async def api_security_quarantine_clean():
         if KARANTINA_DIZIN.exists():
             shutil.rmtree(str(KARANTINA_DIZIN))
             return HTMLResponse(
-                content='<div class="alert alert-success">🧹 Karantina temizlendi</div>'
+                content='<div class="alert alert-success">ğŸ§¹ Karantina temizlendi</div>'
             )
         return HTMLResponse(content='<div class="gri">Karantina zaten bos</div>')
     except ImportError:
         return HTMLResponse(
-            content='<div class="alert alert-error">❌ Karantina modulu yuklu degil</div>'
+            content='<div class="alert alert-error">âŒ Karantina modulu yuklu degil</div>'
         )
     except Exception as e:
-        return HTMLResponse(content=f'<div class="alert alert-error">❌ {e}</div>')
+        return HTMLResponse(content=f'<div class="alert alert-error">âŒ {e}</div>')
 
 
 @app.get("/kalite", response_class=HTMLResponse)
@@ -822,13 +822,13 @@ async def kalite_sayfasi(request: Request):
 
 @app.get("/coverage", response_class=HTMLResponse)
 async def coverage_sayfasi(request: Request):
-    """Coverage rapor sayfası."""
+    """Coverage rapor sayfasÄ±."""
     return templates.TemplateResponse(request, "coverage.html", {})
 
 
 @app.get("/api/coverage/ozet")
 async def api_coverage_ozet():
-    """Coverage özet kartları HTML."""
+    """Coverage Ã¶zet kartlarÄ± HTML."""
     from reymen.sistem.coverage_report import statik_analiz, gecmis_getir
 
     sonuc = statik_analiz()
@@ -838,26 +838,26 @@ async def api_coverage_ozet():
     renk = "green" if yuzde >= 70 else "orange" if yuzde >= 40 else "red"
 
     # Trend oku
-    trend = "—"
+    trend = "â€”"
     if len(gecmis) >= 2:
         onceki = gecmis[-2].get("yuzde", 0)
         fark = yuzde - onceki
-        trend = f"📈 +{fark}%" if fark > 0 else f"📉 {fark}%" if fark < 0 else "➡️ ±0"
+        trend = f"ğŸ“ˆ +{fark}%" if fark > 0 else f"ğŸ“‰ {fark}%" if fark < 0 else "â¡ï¸ Â±0"
 
-    son = gecmis[-1].get("tarih", "—")[:16] if gecmis else "Henüz yok"
+    son = gecmis[-1].get("tarih", "â€”")[:16] if gecmis else "HenÃ¼z yok"
 
     html = [
         '<div class="cards" style="display:grid;grid-template-columns:repeat(5,1fr);gap:0.5rem;">',
         f'<div class="card" style="text-align:center;"><h3 style="color:{renk}">{yuzde}%</h3>'
         f'<div class="gri">Kapsama</div><small>{trend}</small></div>',
         f'<div class="card" style="text-align:center;"><h3>{sonuc.get("toplam_modul", 0)}</h3>'
-        f'<div class="gri">Modül</div></div>',
+        f'<div class="gri">ModÃ¼l</div></div>',
         f'<div class="card" style="text-align:center;"><h3>{sonuc.get("toplam_satir", 0):,}</h3>'
-        f'<div class="gri">Satır</div></div>',
+        f'<div class="gri">SatÄ±r</div></div>',
         f'<div class="card" style="text-align:center;"><h3>{sonuc.get("import_edilebilen", 0)} / {sonuc.get("import_edilemeyen", 0)}</h3>'
-        f'<div class="gri">İçe Aktarma</div></div>',
+        f'<div class="gri">Ä°Ã§e Aktarma</div></div>',
         f'<div class="card" style="text-align:center;"><h3 style="font-size:1rem;">{son}</h3>'
-        f'<div class="gri">Son Ölçüm</div></div>',
+        f'<div class="gri">Son Ã–lÃ§Ã¼m</div></div>',
         "</div>",
     ]
     return HTMLResponse(content="\n".join(html))
@@ -865,19 +865,19 @@ async def api_coverage_ozet():
 
 @app.get("/api/coverage/gecmis")
 async def api_coverage_gecmis():
-    """Coverage geçmiş tablosu HTML."""
+    """Coverage geÃ§miÅŸ tablosu HTML."""
     from reymen.sistem.coverage_report import gecmis_getir
 
     gecmis = gecmis_getir(30)
 
     if not gecmis:
         return HTMLResponse(
-            content='<div class="gri">Henüz coverage verisi yok. "Tam Tarama" yapın.</div>'
+            content='<div class="gri">HenÃ¼z coverage verisi yok. "Tam Tarama" yapÄ±n.</div>'
         )
 
     html = ['<table class="table"><thead><tr>']
     html.append(
-        "<th>Tarih</th><th>Coverage</th><th>Satır</th><th>Süre</th><th>Tür</th>"
+        "<th>Tarih</th><th>Coverage</th><th>SatÄ±r</th><th>SÃ¼re</th><th>TÃ¼r</th>"
     )
     html.append("</tr></thead><tbody>")
 
@@ -885,9 +885,9 @@ async def api_coverage_gecmis():
         tarih = k.get("tarih", "")[:16]
         yuzde = k.get("yuzde", 0)
         renk = "green" if yuzde >= 70 else "orange" if yuzde >= 40 else "red"
-        satir = f"{k.get('toplam_satir', 0):,}" if k.get("toplam_satir") else "—"
-        sure = f'{k.get("sure", 0)}s' if k.get("sure") else "—"
-        tur = {"coverage": "🎯", "statik": "📊"}.get(k.get("tur", ""), "—")
+        satir = f"{k.get('toplam_satir', 0):,}" if k.get("toplam_satir") else "â€”"
+        sure = f'{k.get("sure", 0)}s' if k.get("sure") else "â€”"
+        tur = {"coverage": "ğŸ¯", "statik": "ğŸ“Š"}.get(k.get("tur", ""), "â€”")
         html.append(
             f"<tr><td>{tarih}</td>"
             f'<td><b style="color:{renk}">{yuzde}%</b></td>'
@@ -900,7 +900,7 @@ async def api_coverage_gecmis():
 
 @app.get("/api/coverage/gecmis-json")
 async def api_coverage_gecmis_json():
-    """Coverage geçmişi JSON (Chart.js için)."""
+    """Coverage geÃ§miÅŸi JSON (Chart.js iÃ§in)."""
     from reymen.sistem.coverage_report import gecmis_getir
 
     return gecmis_getir(50)
@@ -908,13 +908,13 @@ async def api_coverage_gecmis_json():
 
 @app.post("/api/coverage/calistir")
 async def api_coverage_calistir(hizli: bool = False):
-    """Coverage çalıştır."""
+    """Coverage Ã§alÄ±ÅŸtÄ±r."""
     from reymen.sistem.coverage_report import calistir, statik_analiz
 
     if hizli:
         sonuc = calistir(hizli=True)
     else:
-        # Tam: statik analiz (güvenilir)
+        # Tam: statik analiz (gÃ¼venilir)
         sonuc = statik_analiz()
 
     if sonuc.get("basari"):
@@ -924,14 +924,14 @@ async def api_coverage_calistir(hizli: bool = False):
             '<div style="display:flex;gap:1rem;align-items:center;">',
             f'<div style="font-size:3rem;font-weight:bold;color:{renk};">{yuzde}%</div>',
             "<div>",
-            f'<div>Toplam: {sonuc.get("toplam_satir", 0):,} satır</div>',
-            f'<div>Modül: {sonuc.get("toplam_modul", 0)}</div>',
-            f'<div>Süre: {sonuc.get("sure", 0)}s</div>',
+            f'<div>Toplam: {sonuc.get("toplam_satir", 0):,} satÄ±r</div>',
+            f'<div>ModÃ¼l: {sonuc.get("toplam_modul", 0)}</div>',
+            f'<div>SÃ¼re: {sonuc.get("sure", 0)}s</div>',
             "</div></div>",
         ]
         return HTMLResponse(content="\n".join(html))
     return HTMLResponse(
-        content=f'<div class="alert alert-error">❌ Hata: {sonuc.get("hata", "?")}</div>'
+        content=f'<div class="alert alert-error">âŒ Hata: {sonuc.get("hata", "?")}</div>'
     )
 
 
@@ -950,7 +950,7 @@ async def sistem_sayfasi(request: Request):
     """Sistem yonetimi (admin)."""
     if not admin_gerekli(getattr(request.state, "session", None)):
         return HTMLResponse(
-            content='<div class="container"><h1>🔒 Yetkisiz</h1><p>Bu sayfa icin admin yetkisi gerekli.</p></div>',
+            content='<div class="container"><h1>ğŸ”’ Yetkisiz</h1><p>Bu sayfa icin admin yetkisi gerekli.</p></div>',
             status_code=403,
         )
     return templates.TemplateResponse(request, "sistem.html", {})
@@ -958,13 +958,13 @@ async def sistem_sayfasi(request: Request):
 
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-# API — Görsel Üretim JSON (/api/reymen/media)
+# API â€” GÃ¶rsel Ãœretim JSON (/api/reymen/media)
 # ---------------------------------------------------------------------------
 
 
 @app.get("/api/reymen/media/backends")
 async def api_media_backends():
-    """JSON: Kayıtlı görsel üretim backend'leri."""
+    """JSON: KayÄ±tlÄ± gÃ¶rsel Ã¼retim backend'leri."""
     try:
         from reymen.arac.image_gen_engine import image_gen_engine_listele
 
@@ -988,7 +988,7 @@ async def api_media_backends():
 
 @app.post("/api/reymen/media/generate")
 async def api_media_generate(request: Request):
-    """JSON: Görsel üret."""
+    """JSON: GÃ¶rsel Ã¼ret."""
     try:
         data = await request.json()
     except Exception:
@@ -1000,7 +1000,7 @@ async def api_media_generate(request: Request):
     backend = str(data.get("backend", "")) if isinstance(data, dict) else ""
 
     if not prompt:
-        return JSONResponse({"error": "Prompt boş olamaz"}, status_code=400)
+        return JSONResponse({"error": "Prompt boÅŸ olamaz"}, status_code=400)
 
     try:
         from reymen.arac.image_gen_engine import resim_olustur
@@ -1034,19 +1034,19 @@ async def api_media_generate(request: Request):
         return JSONResponse({"error": str(e)}, status_code=500)
 
 
-# Routes — Görsel Üretim (/media)
+# Routes â€” GÃ¶rsel Ãœretim (/media)
 # ---------------------------------------------------------------------------
 
 
 @app.get("/media", response_class=HTMLResponse)
 async def media_sayfasi(request: Request):
-    """Görsel üretim sayfası — prompt gir + backend seç."""
+    """GÃ¶rsel Ã¼retim sayfasÄ± â€” prompt gir + backend seÃ§."""
     return templates.TemplateResponse(request, "media.html", {})
 
 
 @app.post("/media/generate")
 async def media_generate(request: Request):
-    """Görsel üretim isteği — image_gen_engine.py resim_olustur() çağırır."""
+    """GÃ¶rsel Ã¼retim isteÄŸi â€” image_gen_engine.py resim_olustur() Ã§aÄŸÄ±rÄ±r."""
     form = await request.form()
     prompt = form.get("prompt", "").strip()
     en = form.get("en", "1024").strip()
@@ -1055,7 +1055,7 @@ async def media_generate(request: Request):
 
     if not prompt:
         return HTMLResponse(
-            content='<div class="alert alert-error">❌ Prompt boş olamaz.</div>'
+            content='<div class="alert alert-error">âŒ Prompt boÅŸ olamaz.</div>'
         )
 
     try:
@@ -1063,13 +1063,13 @@ async def media_generate(request: Request):
 
         sonuc = resim_olustur(prompt=prompt, en=en, boy=boy, backend=backend)
 
-        # [MEDIA] bloklu sonucu güzel göster
+        # [MEDIA] bloklu sonucu gÃ¼zel gÃ¶ster
         if sonuc.startswith("[RESIM_OLUSTUR") and "Hata" in sonuc:
             css = "alert alert-error"
         elif sonuc.startswith("[RESIM_OLUSTUR") and "Uyari" in sonuc:
             css = "alert alert-warning"
         elif "[MEDIA" in sonuc:
-            # Görsel URL'sini çıkar
+            # GÃ¶rsel URL'sini Ã§Ä±kar
             import re
 
             src_match = re.search(r'src="([^"]+)"', sonuc)
@@ -1077,17 +1077,17 @@ async def media_generate(request: Request):
                 r"\[MEDIA[^\]]*\][\s\S]*?\n(.+?)\n\[/MEDIA\]", sonuc
             )
             media_html = (
-                '<div class="alert alert-success">✅ Görsel başarıyla üretildi!</div>'
+                '<div class="alert alert-success">âœ… GÃ¶rsel baÅŸarÄ±yla Ã¼retildi!</div>'
             )
             if src_match:
                 img_url = src_match.group(1)
                 media_html += '<div style="margin-top:1rem;text-align:center;">'
-                media_html += f'<img src="{img_url}" alt="Üretilen görsel" style="max-width:100%;max-height:500px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.3);">'
+                media_html += f'<img src="{img_url}" alt="Ãœretilen gÃ¶rsel" style="max-width:100%;max-height:500px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.3);">'
                 media_html += '<div style="margin-top:0.5rem;">'
                 media_html += (
-                    f'<a href="{img_url}" target="_blank" class="btn btn-sm">🔗 Aç</a> '
+                    f'<a href="{img_url}" target="_blank" class="btn btn-sm">ğŸ”— AÃ§</a> '
                 )
-                media_html += f'<button class="btn btn-sm" onclick="navigator.clipboard.writeText(\'{img_url}\')">📋 Kopyala</button>'
+                media_html += f'<button class="btn btn-sm" onclick="navigator.clipboard.writeText(\'{img_url}\')">ğŸ“‹ Kopyala</button>'
                 media_html += "</div></div>"
             if aciklama_match:
                 media_html += f'<div class="gri" style="margin-top:0.5rem;font-size:0.85rem;">{aciklama_match.group(1)}</div>'
@@ -1101,15 +1101,15 @@ async def media_generate(request: Request):
         import traceback
 
         tb = traceback.format_exc()
-        logger.exception("[media/generate] Görsel üretim hatasi:")
+        logger.exception("[media/generate] GÃ¶rsel Ã¼retim hatasi:")
         return HTMLResponse(
-            content=f'<div class="alert alert-error">❌ Görsel üretim hatası: {e}<br><pre style="font-size:0.75rem;margin-top:0.5rem;">{tb[:500]}</pre></div>'
+            content=f'<div class="alert alert-error">âŒ GÃ¶rsel Ã¼retim hatasÄ±: {e}<br><pre style="font-size:0.75rem;margin-top:0.5rem;">{tb[:500]}</pre></div>'
         )
 
 
 @app.get("/media/generate/list-backends")
 async def media_list_backends():
-    """Kayıtlı backend'lerin durumunu listele."""
+    """KayÄ±tlÄ± backend'lerin durumunu listele."""
     try:
         from reymen.arac.image_gen_engine import image_gen_engine_listele
 
@@ -1120,14 +1120,14 @@ async def media_list_backends():
             if not line:
                 continue
             if "hazir" in line:
-                html_lines.append(f'<div class="flex"><span>🟢 {line}</span></div>')
+                html_lines.append(f'<div class="flex"><span>ğŸŸ¢ {line}</span></div>')
             elif "eksik" in line or "Hata" in line:
-                html_lines.append(f'<div class="flex"><span>🔴 {line}</span></div>')
+                html_lines.append(f'<div class="flex"><span>ğŸ”´ {line}</span></div>')
             else:
                 html_lines.append(f'<div class="flex"><span>{line}</span></div>')
         return HTMLResponse(content="\n".join(html_lines))
     except Exception as e:
-        return HTMLResponse(content=f'<div class="alert alert-error">❌ {e}</div>')
+        return HTMLResponse(content=f'<div class="alert alert-error">âŒ {e}</div>')
 
 
 # ---------------------------------------------------------------------------
@@ -1137,17 +1137,17 @@ async def media_list_backends():
 
 @app.get("/migration", response_class=HTMLResponse)
 async def migration_sayfasi(request: Request):
-    """Alembic migration yönetim sayfası (admin)."""
+    """Alembic migration yÃ¶netim sayfasÄ± (admin)."""
     if not admin_gerekli(getattr(request.state, "session", None)):
         return HTMLResponse(
-            content='<div class="container"><h1>🔒 Yetkisiz</h1><p>Bu sayfa icin admin yetkisi gerekli.</p></div>',
+            content='<div class="container"><h1>ğŸ”’ Yetkisiz</h1><p>Bu sayfa icin admin yetkisi gerekli.</p></div>',
             status_code=403,
         )
     return templates.TemplateResponse(request, "migration.html", {})
 
 
 def _alembic_cmd(*args: str) -> str:
-    """Alembic komutunu subprocess ile çalıştır, HTML çıktı döndür."""
+    """Alembic komutunu subprocess ile Ã§alÄ±ÅŸtÄ±r, HTML Ã§Ä±ktÄ± dÃ¶ndÃ¼r."""
     import subprocess
 
     cmd = [
@@ -1168,17 +1168,17 @@ def _alembic_cmd(*args: str) -> str:
         )
         output = result.stdout or ""
         if result.stderr:
-            # Alembic log'ları stderr'e yazar, onları da ekle
+            # Alembic log'larÄ± stderr'e yazar, onlarÄ± da ekle
             output += "\n" + result.stderr
         if result.returncode != 0:
-            return f'<div class="alert alert-error">❌ Hata (exit: {result.returncode})</div><pre style="max-height:400px;overflow:auto;">{output}</pre>'
+            return f'<div class="alert alert-error">âŒ Hata (exit: {result.returncode})</div><pre style="max-height:400px;overflow:auto;">{output}</pre>'
         return f'<pre style="max-height:400px;overflow:auto;">{output.strip()}</pre>'
     except subprocess.TimeoutExpired:
-        return '<div class="alert alert-error">❌ Zaman aşımı (120s)</div>'
+        return '<div class="alert alert-error">âŒ Zaman aÅŸÄ±mÄ± (120s)</div>'
     except FileNotFoundError:
-        return '<div class="alert alert-error">❌ Alembic bulunamadı. <code>pip install alembic</code></div>'
+        return '<div class="alert alert-error">âŒ Alembic bulunamadÄ±. <code>pip install alembic</code></div>'
     except Exception as e:
-        return f'<div class="alert alert-error">❌ {e}</div>'
+        return f'<div class="alert alert-error">âŒ {e}</div>'
 
 
 @app.get("/api/migration/status")
@@ -1187,59 +1187,59 @@ async def api_migration_status():
     cur = _alembic_cmd("current")
     hist = _alembic_cmd("history", "--verbose")
     return HTMLResponse(
-        content=f"<h4>📌 Current Revision</h4>{cur}<hr><h4>📜 History</h4>{hist}"
+        content=f"<h4>ğŸ“Œ Current Revision</h4>{cur}<hr><h4>ğŸ“œ History</h4>{hist}"
     )
 
 
 @app.get("/api/migration/history")
 async def api_migration_history():
-    """Migration geçmişi."""
+    """Migration geÃ§miÅŸi."""
     return HTMLResponse(content=_alembic_cmd("history", "--verbose"))
 
 
 @app.get("/api/migration/check")
 async def api_migration_check():
-    """Bekleyen migrasyon kontrolü."""
+    """Bekleyen migrasyon kontrolÃ¼."""
     cur_result = _alembic_cmd("current")
     heads_result = _alembic_cmd("heads")
     return HTMLResponse(
-        content=f"<h4>📌 Current</h4>{cur_result}<hr><h4>🔍 Heads</h4>{heads_result}"
+        content=f"<h4>ğŸ“Œ Current</h4>{cur_result}<hr><h4>ğŸ” Heads</h4>{heads_result}"
     )
 
 
 @app.post("/api/migration/upgrade")
 async def api_migration_upgrade(request: Request):
-    """Migrasyon yükselt. Varsayılan: head."""
+    """Migrasyon yÃ¼kselt. VarsayÄ±lan: head."""
     form = await request.form()
     revision = form.get("revision", "head").strip() or "head"
     result = _alembic_cmd("upgrade", revision)
-    return HTMLResponse(content=f"<h4>🔼 Upgrade: {revision}</h4>{result}")
+    return HTMLResponse(content=f"<h4>ğŸ”¼ Upgrade: {revision}</h4>{result}")
 
 
 @app.post("/api/migration/downgrade")
 async def api_migration_downgrade(request: Request):
-    """Migrasyon geri al. Varsayılan: -1."""
+    """Migrasyon geri al. VarsayÄ±lan: -1."""
     form = await request.form()
     revision = form.get("revision", "-1").strip() or "-1"
     result = _alembic_cmd("downgrade", revision)
-    return HTMLResponse(content=f"<h4>🔽 Downgrade: {revision}</h4>{result}")
+    return HTMLResponse(content=f"<h4>ğŸ”½ Downgrade: {revision}</h4>{result}")
 
 
 @app.post("/api/migration/create")
 async def api_migration_create(request: Request):
-    """Yeni migrasyon dosyası oluştur (--autogenerate)."""
+    """Yeni migrasyon dosyasÄ± oluÅŸtur (--autogenerate)."""
     form = await request.form()
     message = form.get("message", "").strip()
     if not message:
         return HTMLResponse(
-            content='<div class="alert alert-error">❌ Mesaj gerekli</div>'
+            content='<div class="alert alert-error">âŒ Mesaj gerekli</div>'
         )
     result = _alembic_cmd("revision", "--autogenerate", "-m", message)
-    return HTMLResponse(content=f"<h4>🆕 Yeni Migrasyon: {message}</h4>{result}")
+    return HTMLResponse(content=f"<h4>ğŸ†• Yeni Migrasyon: {message}</h4>{result}")
 
 
 # ---------------------------------------------------------------------------
-# API — Dashboard
+# API â€” Dashboard
 # ---------------------------------------------------------------------------
 
 
@@ -1248,21 +1248,21 @@ async def api_durum(request: Request):
     """Sistem durumu HTML snippet."""
     satirlar = []
 
-    # Process durumları
+    # Process durumlarÄ±
     tumu = process_manager.tumu()
     for p in tumu:
-        dot = "🟢" if p.get("durum") == "calisiyor" else "🔴"
+        dot = "ğŸŸ¢" if p.get("durum") == "calisiyor" else "ğŸ”´"
         satirlar.append(
-            f"<div class='flex'><span>{dot} <b>{p['ad']}</b> — {p['durum']}</span></div>"
+            f"<div class='flex'><span>{dot} <b>{p['ad']}</b> â€” {p['durum']}</span></div>"
         )
 
     if not tumu:
         satirlar.append("<div class='flex gri'>Aktif process yok</div>")
 
-    # Log son satır
+    # Log son satÄ±r
     son = log_streamer.son_satir
     satirlar.append(
-        f"<div class='flex gri' style='margin-top:8px;font-size:0.8rem'>📋 {son[:100]}</div>"
+        f"<div class='flex gri' style='margin-top:8px;font-size:0.8rem'>ğŸ“‹ {son[:100]}</div>"
     )
 
     satirlar.append(
@@ -1274,7 +1274,7 @@ async def api_durum(request: Request):
 
 @app.get("/api/moduller/ozet")
 async def api_moduller_ozet():
-    """Modül özet bilgisi."""
+    """ModÃ¼l Ã¶zet bilgisi."""
     try:
         moduller = modul_tarayici.tara()
         kategoriler = modul_kategorileri(moduller)
@@ -1282,7 +1282,7 @@ async def api_moduller_ozet():
         yuklu = sum(1 for m in moduller if m.yuklu)
         kat_sayisi = len(kategoriler)
         return HTMLResponse(
-            content=f"<div><b>{toplam}</b> modül (<b>{yuklu}</b> yüklü, <b>{kat_sayisi}</b> kategori)</div>"
+            content=f"<div><b>{toplam}</b> modÃ¼l (<b>{yuklu}</b> yÃ¼klÃ¼, <b>{kat_sayisi}</b> kategori)</div>"
         )
     except Exception as e:
         return HTMLResponse(content=f"<div class='tag-no'>Hata: {e}</div>")
@@ -1290,7 +1290,7 @@ async def api_moduller_ozet():
 
 @app.get("/api/log/son")
 async def api_log_son():
-    """Son log satırı."""
+    """Son log satÄ±rÄ±."""
     son = log_streamer.son_satir
     if len(son) > 150:
         son = son[:150] + "..."
@@ -1301,13 +1301,13 @@ async def api_log_son():
 
 @app.get("/api/log/tail")
 async def api_log_tail(n: int = 50):
-    """Son N log satırı."""
+    """Son N log satÄ±rÄ±."""
     satirlar = log_streamer.tail(n)
     return HTMLResponse(content="<pre>" + "\n".join(satirlar) + "</pre>")
 
 
 # ---------------------------------------------------------------------------
-# API — Pluginler
+# API â€” Pluginler
 # ---------------------------------------------------------------------------
 
 
@@ -1322,14 +1322,14 @@ async def api_plugins():
         pluginler = yonetici.list_plugins()
     except Exception as e:
         return HTMLResponse(
-            content=f"<div class='alert alert-error'>Plugin sistemi yüklenemedi: {e}</div>"
+            content=f"<div class='alert alert-error'>Plugin sistemi yÃ¼klenemedi: {e}</div>"
         )
 
     if not pluginler:
-        return HTMLResponse(content="<div class='gri'>Henüz plugin yok</div>")
+        return HTMLResponse(content="<div class='gri'>HenÃ¼z plugin yok</div>")
 
     satirlar = [
-        "<table><tr><th>Plugin</th><th>Açıklama</th><th>Durum</th><th>İşlem</th></tr>"
+        "<table><tr><th>Plugin</th><th>AÃ§Ä±klama</th><th>Durum</th><th>Ä°ÅŸlem</th></tr>"
     ]
     for p in pluginler:
         ad = p.get("ad", p.get("name", "?"))
@@ -1338,7 +1338,7 @@ async def api_plugins():
         tag = "tag-yes" if aktif else "tag-no"
         durum_text = "Aktif" if aktif else "Pasif"
         toggle_action = "devre_disina_al" if aktif else "aktif_et"
-        toggle_text = "🔴 Devre Dışı" if aktif else "🟢 Aktif Et"
+        toggle_text = "ğŸ”´ Devre DÄ±ÅŸÄ±" if aktif else "ğŸŸ¢ Aktif Et"
         satirlar.append(
             f"<tr>"
             f"<td>{ad}</td>"
@@ -1354,7 +1354,7 @@ async def api_plugins():
 
 @app.get("/api/plugins/ozet")
 async def api_plugins_ozet():
-    """Plugin özet bilgisi."""
+    """Plugin Ã¶zet bilgisi."""
     try:
         sys.path.insert(0, str(PROJE_KOK))
         from reymen.sistem.plugin_manager import PluginYoneticisi
@@ -1380,15 +1380,15 @@ async def api_plugin_aktif_et(ad: str):
         yonetici = PluginYoneticisi(str(PLUGIN_DIZIN))
         yonetici.enable_plugin(ad)
         return HTMLResponse(
-            content=f"<div class='alert alert-success'>✅ {ad} aktif edildi</div>"
+            content=f"<div class='alert alert-success'>âœ… {ad} aktif edildi</div>"
         )
     except Exception as e:
-        return HTMLResponse(content=f"<div class='alert alert-error'>❌ {e}</div>")
+        return HTMLResponse(content=f"<div class='alert alert-error'>âŒ {e}</div>")
 
 
 @app.post("/api/plugins/devre_disina_al/{ad}")
 async def api_plugin_devre_disina_al(ad: str):
-    """Plugin'i devre dışı bırak."""
+    """Plugin'i devre dÄ±ÅŸÄ± bÄ±rak."""
     try:
         sys.path.insert(0, str(PROJE_KOK))
         from reymen.sistem.plugin_manager import PluginYoneticisi
@@ -1396,10 +1396,10 @@ async def api_plugin_devre_disina_al(ad: str):
         yonetici = PluginYoneticisi(str(PLUGIN_DIZIN))
         yonetici.disable_plugin(ad)
         return HTMLResponse(
-            content=f"<div class='alert alert-success'>✅ {ad} devre dışı</div>"
+            content=f"<div class='alert alert-success'>âœ… {ad} devre dÄ±ÅŸÄ±</div>"
         )
     except Exception as e:
-        return HTMLResponse(content=f"<div class='alert alert-error'>❌ {e}</div>")
+        return HTMLResponse(content=f"<div class='alert alert-error'>âŒ {e}</div>")
 
 
 @app.get("/api/plugins/tazele")
@@ -1410,7 +1410,7 @@ async def api_plugins_tazele():
 
 @app.post("/api/plugins/export/{ad}")
 async def api_plugin_export(ad: str):
-    """Plugin'i .reyplugin paketine dışa aktar."""
+    """Plugin'i .reyplugin paketine dÄ±ÅŸa aktar."""
     try:
         sys.path.insert(0, str(PROJE_KOK))
         from reymen.sistem.plugin_manager import PluginYoneticisi
@@ -1419,9 +1419,9 @@ async def api_plugin_export(ad: str):
         cikti = PROJE_KOK / f"{ad}.reyplugin"
         sonuc = yonetici.export_plugin(ad, str(cikti))
         if sonuc.startswith("[OK]"):
-            # Dosyayı oku ve indirilebilir olarak döndür
+            # DosyayÄ± oku ve indirilebilir olarak dÃ¶ndÃ¼r
             icerik = cikti.read_bytes()
-            cikti.unlink(missing_ok=True)  # geçici dosyayı temizle
+            cikti.unlink(missing_ok=True)  # geÃ§ici dosyayÄ± temizle
             from fastapi.responses import Response
 
             return Response(
@@ -1431,25 +1431,25 @@ async def api_plugin_export(ad: str):
                     "Content-Disposition": f'attachment; filename="{ad}.reyplugin"',
                 },
             )
-        return HTMLResponse(content=f"<div class='alert alert-error'>❌ {sonuc}</div>")
+        return HTMLResponse(content=f"<div class='alert alert-error'>âŒ {sonuc}</div>")
     except Exception as e:
         return HTMLResponse(
-            content=f"<div class='alert alert-error'>❌ Export hatasi: {e}</div>"
+            content=f"<div class='alert alert-error'>âŒ Export hatasi: {e}</div>"
         )
 
 
 @app.post("/api/plugins/import")
 async def api_plugin_import(request: Request):
-    """.reyplugin paketini içe aktar (multipart form-data ile dosya yükleme)."""
+    """.reyplugin paketini iÃ§e aktar (multipart form-data ile dosya yÃ¼kleme)."""
     try:
         form = await request.form()
         dosya = form.get("dosya")
         if not dosya:
             return HTMLResponse(
-                content="<div class='alert alert-error'>❌ Dosya gerekli</div>"
+                content="<div class='alert alert-error'>âŒ Dosya gerekli</div>"
             )
 
-        # Dosyayı geçici konuma yaz
+        # DosyayÄ± geÃ§ici konuma yaz
         import tempfile
 
         tmp = Path(tempfile.mkdtemp()) / dosya.filename
@@ -1462,31 +1462,31 @@ async def api_plugin_import(request: Request):
         yonetici = PluginYoneticisi(str(PLUGIN_DIZIN))
         sonuc = yonetici.import_plugin(str(tmp))
 
-        # Geçici dosyayı temizle
+        # GeÃ§ici dosyayÄ± temizle
         tmp.unlink(missing_ok=True)
         tmp.parent.rmdir()
 
         css = "success" if sonuc.startswith("[OK]") else "error"
         return HTMLResponse(
-            content=f"<div class='alert alert-{css}'>{'✅' if sonuc.startswith('[OK]') else '❌'} {sonuc}</div>"
+            content=f"<div class='alert alert-{css}'>{'âœ…' if sonuc.startswith('[OK]') else 'âŒ'} {sonuc}</div>"
         )
     except Exception as e:
         return HTMLResponse(
-            content=f"<div class='alert alert-error'>❌ Import hatasi: {e}</div>"
+            content=f"<div class='alert alert-error'>âŒ Import hatasi: {e}</div>"
         )
 
 
 # ---------------------------------------------------------------------------
-# API — Kullanıcı Yönetimi
+# API â€” KullanÄ±cÄ± YÃ¶netimi
 # ---------------------------------------------------------------------------
 
 
 @app.get("/api/users")
 async def api_users():
-    """Kullanıcı listesi HTML tablosu."""
+    """KullanÄ±cÄ± listesi HTML tablosu."""
     kullanicilar = user_manager.list_users()
     satirlar = [
-        "<table><tr><th>#</th><th>Kullanıcı</th><th>Rol</th><th>İşlem</th></tr>"
+        "<table><tr><th>#</th><th>KullanÄ±cÄ±</th><th>Rol</th><th>Ä°ÅŸlem</th></tr>"
     ]
     for i, u in enumerate(kullanicilar, 1):
         username = u.get("username", "?")
@@ -1495,7 +1495,7 @@ async def api_users():
             f"<tr><td>{i}</td><td>{username}</td><td>{role}</td>"
             f"<td><button class='btn btn-sm btn-danger' "
             f"hx-post='/api/users/sil/{username}' hx-target='#sonuc' "
-            f"hx-confirm='{username} silinsin mi?'>🗙 Sil</button></td></tr>"
+            f"hx-confirm='{username} silinsin mi?'>ğŸ—™ Sil</button></td></tr>"
         )
     satirlar.append("</table>")
     return HTMLResponse(content="\n".join(satirlar))
@@ -1503,51 +1503,51 @@ async def api_users():
 
 @app.post("/api/users/ekle")
 async def api_users_ekle(request: Request):
-    """Yeni kullanıcı ekle (admin/operator/viewer rolleriyle)."""
+    """Yeni kullanÄ±cÄ± ekle (admin/operator/viewer rolleriyle)."""
     form = await request.form()
     username = form.get("username", "").strip()
     password = form.get("password", "").strip()
     role = form.get("role", "viewer").strip().lower()
     if not username or not password:
         return HTMLResponse(
-            content="<div class='alert alert-error'>❌ Boş alan bırakma</div>"
+            content="<div class='alert alert-error'>âŒ BoÅŸ alan bÄ±rakma</div>"
         )
     if len(password) < 4:
         return HTMLResponse(
-            content="<div class='alert alert-error'>❌ Şifre en az 4 karakter</div>"
+            content="<div class='alert alert-error'>âŒ Åifre en az 4 karakter</div>"
         )
     ok, msg = user_manager.kullanici_ekle(username, password, role=role)
     css = "success" if ok else "error"
     return HTMLResponse(
-        content=f"<div class='alert alert-{css}'>{'✅' if ok else '❌'} {msg}</div>"
+        content=f"<div class='alert alert-{css}'>{'âœ…' if ok else 'âŒ'} {msg}</div>"
     )
 
 
 @app.post("/api/users/sifre")
 async def api_users_sifre(request: Request):
-    """Şifre değiştir."""
+    """Åifre deÄŸiÅŸtir."""
     form = await request.form()
     username = form.get("username", "").strip()
     password = form.get("password", "").strip()
     if not username or not password:
         return HTMLResponse(
-            content="<div class='alert alert-error'>❌ Boş alan bırakma</div>"
+            content="<div class='alert alert-error'>âŒ BoÅŸ alan bÄ±rakma</div>"
         )
     ok, msg = user_manager.set_password(username, password)
     css = "success" if ok else "error"
     return HTMLResponse(
-        content=f"<div class='alert alert-{css}'>{'✅' if ok else '❌'} {msg}</div>"
+        content=f"<div class='alert alert-{css}'>{'âœ…' if ok else 'âŒ'} {msg}</div>"
     )
 
 
 @app.post("/api/users/sil/{username}")
 async def api_users_sil(username: str):
-    """Kullanıcı sil."""
+    """KullanÄ±cÄ± sil."""
     try:
         dosya = user_manager.config.users_file
         if not dosya.exists():
             return HTMLResponse(
-                content="<div class='alert alert-error'>❌ users.json yok</div>"
+                content="<div class='alert alert-error'>âŒ users.json yok</div>"
             )
         import json
 
@@ -1559,23 +1559,23 @@ async def api_users_sil(username: str):
             )
             user_manager._users = users
             return HTMLResponse(
-                content=f"<div class='alert alert-success'>✅ {username} silindi</div>"
+                content=f"<div class='alert alert-success'>âœ… {username} silindi</div>"
             )
         return HTMLResponse(
-            content=f"<div class='alert alert-error'>❌ {username} bulunamadı</div>"
+            content=f"<div class='alert alert-error'>âŒ {username} bulunamadÄ±</div>"
         )
     except Exception as e:
-        return HTMLResponse(content=f"<div class='alert alert-error'>❌ {e}</div>")
+        return HTMLResponse(content=f"<div class='alert alert-error'>âŒ {e}</div>")
 
 
 # ---------------------------------------------------------------------------
-# API — Gateway
+# API â€” Gateway
 # ---------------------------------------------------------------------------
 
 
 @app.get("/api/gateway")
 async def api_gateway():
-    """Gateway servis durumları."""
+    """Gateway servis durumlarÄ±."""
     tumu = process_manager.tumu()
     if not tumu:
         return HTMLResponse(content="<div class='gri'>Aktif gateway servisi yok</div>")
@@ -1585,7 +1585,7 @@ async def api_gateway():
     ]
     for p in tumu:
         durum = p.get("durum", "?")
-        dot = "🟢" if durum == "calisiyor" else "🔴"
+        dot = "ğŸŸ¢" if durum == "calisiyor" else "ğŸ”´"
         satirlar.append(
             f"<tr><td>{p.get('ad', '?')}</td>"
             f"<td>{dot} {durum}</td>"
@@ -1598,17 +1598,17 @@ async def api_gateway():
 
 @app.get("/api/gateway/ozet")
 async def api_gateway_ozet():
-    """Gateway özet."""
+    """Gateway Ã¶zet."""
     tumu = process_manager.tumu()
     calisan = sum(1 for p in tumu if p.get("durum") == "calisiyor")
     return HTMLResponse(
-        content=f"<div><b>{calisan}</b>/<b>{len(tumu)}</b> servis çalışıyor</div>"
+        content=f"<div><b>{calisan}</b>/<b>{len(tumu)}</b> servis Ã§alÄ±ÅŸÄ±yor</div>"
     )
 
 
 @app.get("/api/gateway/ayarlar")
 async def api_gateway_ayarlar():
-    """Gateway ayarları."""
+    """Gateway ayarlarÄ±."""
     env_yolu = PROJE_KOK / ".env"
     ayarlar = {}
     if env_yolu.exists():
@@ -1633,9 +1633,9 @@ async def api_gateway_ayarlar():
                         ayarlar[k] = v
 
     if not ayarlar:
-        return HTMLResponse(content="<div class='gri'>.env dosyası bulunamadı</div>")
+        return HTMLResponse(content="<div class='gri'>.env dosyasÄ± bulunamadÄ±</div>")
 
-    satirlar = ["<table><tr><th>Anahtar</th><th>Değer</th></tr>"]
+    satirlar = ["<table><tr><th>Anahtar</th><th>DeÄŸer</th></tr>"]
     for k, v in ayarlar.items():
         satirlar.append(f"<tr><td>{k}</td><td class='gri'>{v}</td></tr>")
     satirlar.append("</table>")
@@ -1644,10 +1644,10 @@ async def api_gateway_ayarlar():
 
 @app.post("/api/gateway/restart")
 async def api_gateway_restart():
-    """Gateway yeniden başlat."""
+    """Gateway yeniden baÅŸlat."""
     try:
         process_manager.durdur("gateway")
-        # Kısa bekle
+        # KÄ±sa bekle
         await asyncio.sleep(0.5)
         ok = process_manager.baslat(
             "gateway",
@@ -1656,25 +1656,25 @@ async def api_gateway_restart():
         )
         if ok:
             return HTMLResponse(
-                content="<div class='alert alert-success'>✅ Gateway yeniden başlatıldı</div>"
+                content="<div class='alert alert-success'>âœ… Gateway yeniden baÅŸlatÄ±ldÄ±</div>"
             )
         return HTMLResponse(
-            content="<div class='alert alert-error'>❌ Başlatılamadı</div>"
+            content="<div class='alert alert-error'>âŒ BaÅŸlatÄ±lamadÄ±</div>"
         )
     except Exception as e:
         return HTMLResponse(
-            content=f"<div class='alert alert-error'>❌ Hata: {e}</div>"
+            content=f"<div class='alert alert-error'>âŒ Hata: {e}</div>"
         )
 
 
 @app.post("/api/gateway/baslat")
 async def api_gateway_baslat():
-    """Gateway başlat."""
+    """Gateway baÅŸlat."""
     try:
         durum = process_manager.durum("gateway")
         if durum.get("durum") == "calisiyor":
             return HTMLResponse(
-                content="<div class='alert alert-success'>✅ Zaten çalışıyor</div>"
+                content="<div class='alert alert-success'>âœ… Zaten Ã§alÄ±ÅŸÄ±yor</div>"
             )
         ok = process_manager.baslat(
             "gateway",
@@ -1683,14 +1683,14 @@ async def api_gateway_baslat():
         )
         if ok:
             return HTMLResponse(
-                content="<div class='alert alert-success'>✅ Gateway başlatıldı</div>"
+                content="<div class='alert alert-success'>âœ… Gateway baÅŸlatÄ±ldÄ±</div>"
             )
         return HTMLResponse(
-            content="<div class='alert alert-error'>❌ Başlatılamadı</div>"
+            content="<div class='alert alert-error'>âŒ BaÅŸlatÄ±lamadÄ±</div>"
         )
     except Exception as e:
         return HTMLResponse(
-            content=f"<div class='alert alert-error'>❌ Hata: {e}</div>"
+            content=f"<div class='alert alert-error'>âŒ Hata: {e}</div>"
         )
 
 
@@ -1700,17 +1700,17 @@ async def api_gateway_durdur():
     try:
         process_manager.durdur("gateway", force=True)
         return HTMLResponse(
-            content="<div class='alert alert-success'>✅ Gateway durduruldu</div>"
+            content="<div class='alert alert-success'>âœ… Gateway durduruldu</div>"
         )
     except Exception as e:
         return HTMLResponse(
-            content=f"<div class='alert alert-error'>❌ Hata: {e}</div>"
+            content=f"<div class='alert alert-error'>âŒ Hata: {e}</div>"
         )
 
 
 @app.post("/api/bot/test")
 async def api_bot_test():
-    """Bot bağlantı testi."""
+    """Bot baÄŸlantÄ± testi."""
     try:
         import urllib.request
         import urllib.error
@@ -1724,7 +1724,7 @@ async def api_bot_test():
 
         if not token:
             return HTMLResponse(
-                content="<div class='tag-no'>❌ TELEGRAM_BOT_TOKEN yok</div>"
+                content="<div class='tag-no'>âŒ TELEGRAM_BOT_TOKEN yok</div>"
             )
 
         url = f"https://api.telegram.org/bot{token}/getMe"
@@ -1734,32 +1734,32 @@ async def api_bot_test():
             if data.get("ok"):
                 bot_info = data.get("result", {})
                 return HTMLResponse(
-                    content=f"<div class='alert alert-success'>✅ @{bot_info.get('username', '?')} bağlantı başarılı</div>"
+                    content=f"<div class='alert alert-success'>âœ… @{bot_info.get('username', '?')} baÄŸlantÄ± baÅŸarÄ±lÄ±</div>"
                 )
         return HTMLResponse(
-            content="<div class='alert alert-error'>❌ API hatası</div>"
+            content="<div class='alert alert-error'>âŒ API hatasÄ±</div>"
         )
     except Exception as e:
         return HTMLResponse(
-            content=f"<div class='alert alert-error'>❌ Hata: {e}</div>"
+            content=f"<div class='alert alert-error'>âŒ Hata: {e}</div>"
         )
 
 
 # ---------------------------------------------------------------------------
-# API — Telegram Özel
+# API â€” Telegram Ã–zel
 # ---------------------------------------------------------------------------
 
 
 @app.get("/api/gateway/telegram")
 async def api_gateway_telegram():
     """Telegram bot durumu + bilgisi."""
-    # Token var mı?
+    # Token var mÄ±?
     token = _env_oku("TELEGRAM_BOT_TOKEN", "")
     chat_id = _env_oku("TELEGRAM_CHAT_ID", "")
 
     if not token:
         return HTMLResponse(
-            content="<div class='alert alert-error'>❌ TELEGRAM_BOT_TOKEN yok</div>"
+            content="<div class='alert alert-error'>âŒ TELEGRAM_BOT_TOKEN yok</div>"
         )
 
     # Bot bilgisi al (getMe)
@@ -1779,8 +1779,8 @@ async def api_gateway_telegram():
     durum = process_manager.durum("telegram_bot")
 
     satirlar = [
-        f"<div class='flex'><span>{'🟢' if bot_online else '🔴'} <b>@{bot_username}</b></span></div>",
-        f"<div class='flex gri' style='font-size:0.85rem'>Token: {'✅' if token else '❌'} mevcut</div>",
+        f"<div class='flex'><span>{'ğŸŸ¢' if bot_online else 'ğŸ”´'} <b>@{bot_username}</b></span></div>",
+        f"<div class='flex gri' style='font-size:0.85rem'>Token: {'âœ…' if token else 'âŒ'} mevcut</div>",
     ]
     if chat_id:
         satirlar.append(
@@ -1788,11 +1788,11 @@ async def api_gateway_telegram():
         )
     else:
         satirlar.append(
-            "<div class='flex gri' style='font-size:0.85rem'>Hedef Chat ID: Herkese açık</div>"
+            "<div class='flex gri' style='font-size:0.85rem'>Hedef Chat ID: Herkese aÃ§Ä±k</div>"
         )
 
     bot_durum = durum.get("durum", "durduruldu")
-    dot = "🟢" if bot_durum == "calisiyor" else "🔴"
+    dot = "ğŸŸ¢" if bot_durum == "calisiyor" else "ğŸ”´"
     satirlar.append(
         f"<div class='flex' style='margin-top:8px'><span>{dot} Bot process: {bot_durum}</span></div>"
     )
@@ -1802,24 +1802,24 @@ async def api_gateway_telegram():
 
 @app.post("/api/gateway/telegram/baslat")
 async def api_gateway_telegram_baslat():
-    """Telegram bot process'ini başlat."""
+    """Telegram bot process'ini baÅŸlat."""
     tg_yolu = PROJE_KOK / "reymen" / "ag" / "telegram_bot.py"
     if not tg_yolu.exists():
         return HTMLResponse(
-            content="<div class='alert alert-error'>❌ telegram_bot.py bulunamadı</div>"
+            content="<div class='alert alert-error'>âŒ telegram_bot.py bulunamadÄ±</div>"
         )
 
     ok = process_manager.baslat(
         "telegram_bot",
         [sys.executable, str(tg_yolu)],
-        port=0,  # Telegram botu için port gerekmez
+        port=0,  # Telegram botu iÃ§in port gerekmez
         log_dosyasi=PROJE_KOK / "logs" / "telegram_bot.log",
     )
     if ok:
         return HTMLResponse(
-            content="<div class='alert alert-success'>✅ Telegram bot başlatıldı</div>"
+            content="<div class='alert alert-success'>âœ… Telegram bot baÅŸlatÄ±ldÄ±</div>"
         )
-    return HTMLResponse(content="<div class='alert alert-error'>❌ Başlatılamadı</div>")
+    return HTMLResponse(content="<div class='alert alert-error'>âŒ BaÅŸlatÄ±lamadÄ±</div>")
 
 
 @app.post("/api/gateway/telegram/durdur")
@@ -1827,30 +1827,30 @@ async def api_gateway_telegram_durdur():
     """Telegram bot process'ini durdur."""
     process_manager.durdur("telegram_bot", force=True)
     return HTMLResponse(
-        content="<div class='alert alert-success'>✅ Telegram bot durduruldu</div>"
+        content="<div class='alert alert-success'>âœ… Telegram bot durduruldu</div>"
     )
 
 
 @app.post("/api/gateway/telegram/mesaj")
 async def api_gateway_telegram_mesaj(request: Request):
-    """Telegram üzerinden mesaj gönder."""
+    """Telegram Ã¼zerinden mesaj gÃ¶nder."""
     form = await request.form()
     metin = form.get("metin", "").strip()
     hedef = form.get("chat_id", "").strip()
 
     if not metin:
-        return HTMLResponse(content="<div class='alert alert-error'>❌ Mesaj boş</div>")
+        return HTMLResponse(content="<div class='alert alert-error'>âŒ Mesaj boÅŸ</div>")
 
     token = _env_oku("TELEGRAM_BOT_TOKEN", "")
     if not token:
         return HTMLResponse(
-            content="<div class='alert alert-error'>❌ TELEGRAM_BOT_TOKEN yok</div>"
+            content="<div class='alert alert-error'>âŒ TELEGRAM_BOT_TOKEN yok</div>"
         )
 
     chat_id = hedef or _env_oku("TELEGRAM_CHAT_ID", "")
     if not chat_id:
         return HTMLResponse(
-            content="<div class='alert alert-error'>❌ Hedef Chat ID yok</div>"
+            content="<div class='alert alert-error'>âŒ Hedef Chat ID yok</div>"
         )
 
     try:
@@ -1862,32 +1862,32 @@ async def api_gateway_telegram_mesaj(request: Request):
             resp = json.loads(r.read())
             if resp.get("ok"):
                 return HTMLResponse(
-                    content=f"<div class='alert alert-success'>✅ Mesaj gönderildi → {chat_id}</div>"
+                    content=f"<div class='alert alert-success'>âœ… Mesaj gÃ¶nderildi â†’ {chat_id}</div>"
                 )
             return HTMLResponse(
-                content=f"<div class='alert alert-error'>❌ Telegram hatası: {resp.get('description', '?')}</div>"
+                content=f"<div class='alert alert-error'>âŒ Telegram hatasÄ±: {resp.get('description', '?')}</div>"
             )
     except Exception as e:
         return HTMLResponse(
-            content=f"<div class='alert alert-error'>❌ Hata: {e}</div>"
+            content=f"<div class='alert alert-error'>âŒ Hata: {e}</div>"
         )
 
 
 @app.post("/api/gateway/test-mesaj")
 async def api_gateway_test_mesaj():
-    """Varsayılan chat_id'e test mesajı gönder."""
+    """VarsayÄ±lan chat_id'e test mesajÄ± gÃ¶nder."""
     token = _env_oku("TELEGRAM_BOT_TOKEN", "")
     chat_id = _env_oku("TELEGRAM_CHAT_ID", "")
     if not token or not chat_id:
         return HTMLResponse(
-            content="<div class='alert alert-error'>❌ Token veya Chat ID yok</div>"
+            content="<div class='alert alert-error'>âŒ Token veya Chat ID yok</div>"
         )
 
     try:
         data = urllib.parse.urlencode(
             {
                 "chat_id": chat_id,
-                "text": "🧪 Test mesajı — ReYMeN Web UI",
+                "text": "ğŸ§ª Test mesajÄ± â€” ReYMeN Web UI",
                 "parse_mode": "HTML",
             }
         ).encode()
@@ -1896,17 +1896,17 @@ async def api_gateway_test_mesaj():
         )
         with urllib.request.urlopen(req, timeout=10) as r:
             return HTMLResponse(
-                content="<div class='alert alert-success'>✅ Test mesajı gönderildi 📨</div>"
+                content="<div class='alert alert-success'>âœ… Test mesajÄ± gÃ¶nderildi ğŸ“¨</div>"
             )
     except Exception as e:
         return HTMLResponse(
-            content=f"<div class='alert alert-error'>❌ Hata: {e}</div>"
+            content=f"<div class='alert alert-error'>âŒ Hata: {e}</div>"
         )
 
 
 # _env_oku helper
 def _env_oku(anahtar: str, varsayilan: str = "") -> str:
-    """.env dosyasından değer oku."""
+    """.env dosyasÄ±ndan deÄŸer oku."""
     env_yolu = PROJE_KOK / ".env"
     if not env_yolu.exists():
         return varsayilan
@@ -1933,7 +1933,7 @@ def _env_oku(anahtar: str, varsayilan: str = "") -> str:
 
 
 # ---------------------------------------------------------------------------
-# API — Discord
+# API â€” Discord
 # ---------------------------------------------------------------------------
 
 
@@ -1944,10 +1944,10 @@ async def api_gateway_discord():
 
     if not token:
         return HTMLResponse(
-            content="<div class='alert alert-error'>❌ DISCORD_BOT_TOKEN yok</div>"
+            content="<div class='alert alert-error'>âŒ DISCORD_BOT_TOKEN yok</div>"
         )
 
-    # Token doğrulama (Discord API /users/@me)
+    # Token doÄŸrulama (Discord API /users/@me)
     bot_username = "?"
     bot_online = False
     try:
@@ -1964,10 +1964,10 @@ async def api_gateway_discord():
     except urllib.error.HTTPError as e:
         if e.code == 401:
             return HTMLResponse(
-                content="<div class='alert alert-error'>❌ Token geçersiz (401)</div>"
+                content="<div class='alert alert-error'>âŒ Token geÃ§ersiz (401)</div>"
             )
         return HTMLResponse(
-            content=f"<div class='alert alert-error'>❌ Discord API: {e.code}</div>"
+            content=f"<div class='alert alert-error'>âŒ Discord API: {e.code}</div>"
         )
     except Exception:
         bot_online = False
@@ -1977,11 +1977,11 @@ async def api_gateway_discord():
     bot_durum = durum.get("durum", "durduruldu")
 
     satirlar = [
-        f"<div class='flex'><span>{'🟢' if bot_online else '🔴'} <b>{bot_username}</b></span></div>",
-        f"<div class='flex gri' style='font-size:0.85rem'>Token: {'✅' if token else '❌'} mevcut</div>",
+        f"<div class='flex'><span>{'ğŸŸ¢' if bot_online else 'ğŸ”´'} <b>{bot_username}</b></span></div>",
+        f"<div class='flex gri' style='font-size:0.85rem'>Token: {'âœ…' if token else 'âŒ'} mevcut</div>",
     ]
 
-    dot = "🟢" if bot_durum == "calisiyor" else "🔴"
+    dot = "ğŸŸ¢" if bot_durum == "calisiyor" else "ğŸ”´"
     satirlar.append(
         f"<div class='flex' style='margin-top:8px'><span>{dot} Bot process: {bot_durum}</span></div>"
     )
@@ -1991,11 +1991,11 @@ async def api_gateway_discord():
 
 @app.post("/api/gateway/discord/baslat")
 async def api_gateway_discord_baslat():
-    """Discord bot process'ini başlat."""
+    """Discord bot process'ini baÅŸlat."""
     bot_yolu = PROJE_KOK / "reymen" / "ag" / "discord_bot.py"
     if not bot_yolu.exists():
         return HTMLResponse(
-            content="<div class='alert alert-error'>❌ discord_bot.py bulunamadı</div>"
+            content="<div class='alert alert-error'>âŒ discord_bot.py bulunamadÄ±</div>"
         )
 
     ok = process_manager.baslat(
@@ -2006,9 +2006,9 @@ async def api_gateway_discord_baslat():
     )
     if ok:
         return HTMLResponse(
-            content="<div class='alert alert-success'>✅ Discord bot başlatıldı</div>"
+            content="<div class='alert alert-success'>âœ… Discord bot baÅŸlatÄ±ldÄ±</div>"
         )
-    return HTMLResponse(content="<div class='alert alert-error'>❌ Başlatılamadı</div>")
+    return HTMLResponse(content="<div class='alert alert-error'>âŒ BaÅŸlatÄ±lamadÄ±</div>")
 
 
 @app.post("/api/gateway/discord/durdur")
@@ -2016,26 +2016,26 @@ async def api_gateway_discord_durdur():
     """Discord bot process'ini durdur."""
     process_manager.durdur("discord_bot", force=True)
     return HTMLResponse(
-        content="<div class='alert alert-success'>✅ Discord bot durduruldu</div>"
+        content="<div class='alert alert-success'>âœ… Discord bot durduruldu</div>"
     )
 
 
 @app.post("/api/gateway/discord/mesaj")
 async def api_gateway_discord_mesaj(request: Request):
-    """Discord kanalına REST ile mesaj gönder."""
+    """Discord kanalÄ±na REST ile mesaj gÃ¶nder."""
     form = await request.form()
     kanal_id = form.get("kanal_id", "").strip()
     metin = form.get("metin", "").strip()
 
     if not metin or not kanal_id:
         return HTMLResponse(
-            content="<div class='alert alert-error'>❌ Kanal ID ve mesaj gerekli</div>"
+            content="<div class='alert alert-error'>âŒ Kanal ID ve mesaj gerekli</div>"
         )
 
     token = _env_oku("DISCORD_BOT_TOKEN", "")
     if not token:
         return HTMLResponse(
-            content="<div class='alert alert-error'>❌ DISCORD_BOT_TOKEN yok</div>"
+            content="<div class='alert alert-error'>âŒ DISCORD_BOT_TOKEN yok</div>"
         )
 
     try:
@@ -2052,40 +2052,40 @@ async def api_gateway_discord_mesaj(request: Request):
         with urllib.request.urlopen(req, timeout=10) as r:
             resp = json.loads(r.read())
             return HTMLResponse(
-                content=f"<div class='alert alert-success'>✅ Mesaj gönderildi → {kanal_id}</div>"
+                content=f"<div class='alert alert-success'>âœ… Mesaj gÃ¶nderildi â†’ {kanal_id}</div>"
             )
     except urllib.error.HTTPError as e:
         body = e.read().decode()[:200]
         return HTMLResponse(
-            content=f"<div class='alert alert-error'>❌ Discord {e.code}: {body}</div>"
+            content=f"<div class='alert alert-error'>âŒ Discord {e.code}: {body}</div>"
         )
     except Exception as e:
         return HTMLResponse(
-            content=f"<div class='alert alert-error'>❌ Hata: {e}</div>"
+            content=f"<div class='alert alert-error'>âŒ Hata: {e}</div>"
         )
 
 
 # ---------------------------------------------------------------------------
-# API — SMS (Twilio)
+# API â€” SMS (Twilio)
 # ---------------------------------------------------------------------------
 
-from src.reymen.web_ui.sms import sms_gonder, bakiye_kontrol
+from reymen.web_ui.sms import sms_gonder, bakiye_kontrol
 
 
 @app.get("/api/gateway/sms")
 async def api_gateway_sms():
-    """SMS durumu — Twilio hesap bilgisi."""
+    """SMS durumu â€” Twilio hesap bilgisi."""
     sid = _env_oku("TWILIO_ACCOUNT_SID", "")
     from_num = _env_oku("TWILIO_FROM_NUMBER", "")
 
     if not sid and not from_num:
         return HTMLResponse(
-            content="<div class='alert alert-error'>❌ Twilio ayarları yok</div>"
+            content="<div class='alert alert-error'>âŒ Twilio ayarlarÄ± yok</div>"
         )
 
     satirlar = [
-        f"<div class='flex gri' style='font-size:0.85rem'>Account SID: {'✅' if sid else '❌'}</div>",
-        f"<div class='flex gri' style='font-size:0.85rem'>Gönderen No: {from_num or '❌'}</div>",
+        f"<div class='flex gri' style='font-size:0.85rem'>Account SID: {'âœ…' if sid else 'âŒ'}</div>",
+        f"<div class='flex gri' style='font-size:0.85rem'>GÃ¶nderen No: {from_num or 'âŒ'}</div>",
     ]
 
     # Bakiye kontrol (opsiyonel)
@@ -2095,7 +2095,7 @@ async def api_gateway_sms():
             if bakiye.get("ok"):
                 satirlar.append(
                     f"<div class='flex' style='margin-top:8px'>"
-                    f"🟢 Hesap: <b>{bakiye.get('friendly_name', '?')}</b></div>"
+                    f"ğŸŸ¢ Hesap: <b>{bakiye.get('friendly_name', '?')}</b></div>"
                 )
         except Exception as _e:
             __import__("logging").getLogger(__name__).warning(
@@ -2107,17 +2107,17 @@ async def api_gateway_sms():
 
 @app.post("/api/gateway/sms/gonder")
 async def api_gateway_sms_gonder(request: Request):
-    """SMS gönder."""
+    """SMS gÃ¶nder."""
     form = await request.form()
     telefon = form.get("telefon", "").strip()
     mesaj = form.get("mesaj", "").strip()
 
     if not telefon or not mesaj:
         return HTMLResponse(
-            content="<div class='alert alert-error'>❌ Telefon ve mesaj gerekli</div>"
+            content="<div class='alert alert-error'>âŒ Telefon ve mesaj gerekli</div>"
         )
 
-    # Telefon numarası temizleme
+    # Telefon numarasÄ± temizleme
     telefon = (
         telefon.replace(" ", "").replace("-", "").replace("(", "").replace(")", "")
     )
@@ -2128,22 +2128,22 @@ async def api_gateway_sms_gonder(request: Request):
         sonuc = sms_gonder(telefon, mesaj)
         if sonuc.get("ok"):
             return HTMLResponse(
-                content=f"<div class='alert alert-success'>✅ SMS gönderildi → {telefon} (ID: {sonuc.get('mesaj_id', '?')[:12]}...)</div>"
+                content=f"<div class='alert alert-success'>âœ… SMS gÃ¶nderildi â†’ {telefon} (ID: {sonuc.get('mesaj_id', '?')[:12]}...)</div>"
             )
         return HTMLResponse(
-            content=f"<div class='alert alert-error'>❌ {sonuc.get('hata', '?')}</div>"
+            content=f"<div class='alert alert-error'>âŒ {sonuc.get('hata', '?')}</div>"
         )
     except Exception as e:
         return HTMLResponse(
-            content=f"<div class='alert alert-error'>❌ Hata: {e}</div>"
+            content=f"<div class='alert alert-error'>âŒ Hata: {e}</div>"
         )
 
 
 # ---------------------------------------------------------------------------
-# API — Sandbox
+# API â€” Sandbox
 # ---------------------------------------------------------------------------
 
-from src.reymen.web_ui.sandbox import yonetici as sandbox_yoneticisi
+from reymen.web_ui.sandbox import yonetici as sandbox_yoneticisi
 
 
 @app.get("/api/sandbox")
@@ -2151,19 +2151,19 @@ async def api_sandbox():
     """Sandbox listesi HTML tablosu."""
     sandboxlar = sandbox_yoneticisi.listele(limit=30)
     if not sandboxlar:
-        return HTMLResponse(content="<div class='gri'>Henüz sandbox yok</div>")
+        return HTMLResponse(content="<div class='gri'>HenÃ¼z sandbox yok</div>")
 
     satirlar = [
-        "<table><tr><th>ID</th><th>Durum</th><th>Exit</th><th>Süre</th><th>İşlem</th></tr>"
+        "<table><tr><th>ID</th><th>Durum</th><th>Exit</th><th>SÃ¼re</th><th>Ä°ÅŸlem</th></tr>"
     ]
     for sb in sandboxlar:
         durum = sb["durum"]
         dot = (
-            "🟢"
+            "ğŸŸ¢"
             if durum == "basarili"
-            else "🔴"
+            else "ğŸ”´"
             if durum in ("hata", "zamanasimi")
-            else "🟡"
+            else "ğŸŸ¡"
         )
         satirlar.append(
             f"<tr><td>{sb['id']}</td>"
@@ -2171,7 +2171,7 @@ async def api_sandbox():
             f"<td>{sb['exit_code']}</td>"
             f"<td>{sb['sure_sn']}s</td>"
             f"<td><button class='btn btn-sm' hx-get='/api/sandbox/{sb['id']}' "
-            f"hx-target='#sandbox-detay'>🔍</button></td></tr>"
+            f"hx-target='#sandbox-detay'>ğŸ”</button></td></tr>"
         )
     satirlar.append("</table>")
     return HTMLResponse(content="\n".join(satirlar))
@@ -2191,9 +2191,9 @@ async def api_sandbox_detay(sandbox_id: str):
         f"<tr><td>ID</td><td>{r['id']}</td></tr>"
         f"<tr><td>Durum</td><td>{r['durum']}</td></tr>"
         f"<tr><td>Exit Code</td><td>{r['exit_code']}</td></tr>"
-        f"<tr><td>Süre</td><td>{r['sure_sn']}s</td></tr>"
+        f"<tr><td>SÃ¼re</td><td>{r['sure_sn']}s</td></tr>"
         f"<tr><td>Dizin</td><td class='gri'>{r['dizin']}</td></tr>"
-        f"<tr><td>Çıktı</td><td><pre style='max-height:200px'>{r.get('cikti', '')[:1000]}</pre></td></tr>"
+        f"<tr><td>Ã‡Ä±ktÄ±</td><td><pre style='max-height:200px'>{r.get('cikti', '')[:1000]}</pre></td></tr>"
     ]
     if r.get("hata"):
         satirlar.append(
@@ -2205,14 +2205,14 @@ async def api_sandbox_detay(sandbox_id: str):
 
 @app.post("/api/sandbox/calistir")
 async def api_sandbox_calistir(request: Request):
-    """Sandbox'da komut çalıştır."""
+    """Sandbox'da komut Ã§alÄ±ÅŸtÄ±r."""
     form = await request.form()
     dil = form.get("dil", "python")
     kod = form.get("kod", "").strip()
 
     if not kod:
         return HTMLResponse(
-            content="<div class='alert alert-error'>❌ Kod gerekli</div>"
+            content="<div class='alert alert-error'>âŒ Kod gerekli</div>"
         )
 
     sb = sandbox_yoneticisi.yeni()
@@ -2229,18 +2229,18 @@ async def api_sandbox_calistir(request: Request):
         sonuc = sb.calistir(shell_komut)
     else:
         return HTMLResponse(
-            content=f"<div class='alert alert-error'>❌ Bilinmeyen dil: {dil}</div>"
+            content=f"<div class='alert alert-error'>âŒ Bilinmeyen dil: {dil}</div>"
         )
 
     cikti = sonuc.get("cikti", "")[:2000]
     hata = sonuc.get("hata", "")[:500]
     durum = sonuc["durum"]
-    dot = "🟢" if durum == "basarili" else "🔴"
+    dot = "ğŸŸ¢" if durum == "basarili" else "ğŸ”´"
     sure = sonuc["sure_sn"]
 
     html = [
         f"<div class='alert alert-{'success' if durum == 'basarili' else 'error'}'>"
-        f"{dot} {durum} (exit: {sonuc['exit_code']}, {sure}s) — ID: {sb.id}</div>",
+        f"{dot} {durum} (exit: {sonuc['exit_code']}, {sure}s) â€” ID: {sb.id}</div>",
     ]
     if cikti:
         html.append(f"<pre style='max-height:300px'>{cikti}</pre>")
@@ -2252,24 +2252,24 @@ async def api_sandbox_calistir(request: Request):
 
 @app.post("/api/sandbox/temizle")
 async def api_sandbox_temizle():
-    """Tüm sandbox'lari temizle."""
+    """TÃ¼m sandbox'lari temizle."""
     say = sandbox_yoneticisi.temizle_hepsi()
     return HTMLResponse(
-        content=f"<div class='alert alert-success'>🧹 {say} sandbox temizlendi</div>"
+        content=f"<div class='alert alert-success'>ğŸ§¹ {say} sandbox temizlendi</div>"
     )
 
 
-# ═══════════════════════════════════════════════════════════════════
-# API — Cron Yönetimi
-# ═══════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# API â€” Cron YÃ¶netimi
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 @app.get("/cron", response_class=HTMLResponse)
 async def cron_sayfasi(request: Request):
-    """Cron yönetim sayfası (admin)."""
+    """Cron yÃ¶netim sayfasÄ± (admin)."""
     if not admin_gerekli(getattr(request.state, "session", None)):
         return HTMLResponse(
-            content='<div class="container"><h1>🔒 Yetkisiz</h1><p>Bu sayfa icin admin yetkisi gerekli.</p></div>',
+            content='<div class="container"><h1>ğŸ”’ Yetkisiz</h1><p>Bu sayfa icin admin yetkisi gerekli.</p></div>',
             status_code=403,
         )
     return templates.TemplateResponse(request, "cron.html", {})
@@ -2291,13 +2291,13 @@ async def api_cron_liste():
 
     if not jobs:
         return HTMLResponse(
-            content='<div id="cron-liste"><div class="gri">⏰ Zamanlanmış görev yok</div></div>'
+            content='<div id="cron-liste"><div class="gri">â° ZamanlanmÄ±ÅŸ gÃ¶rev yok</div></div>'
         )
 
     html = ['<div id="cron-liste">']
     html.append('<table class="table"><thead><tr>')
     html.append(
-        "<th>Ad</th><th>Schedule</th><th>Son Çalışma</th><th>Durum</th><th>İşlem</th>"
+        "<th>Ad</th><th>Schedule</th><th>Son Ã‡alÄ±ÅŸma</th><th>Durum</th><th>Ä°ÅŸlem</th>"
     )
     html.append("</tr></thead><tbody>")
 
@@ -2307,13 +2307,13 @@ async def api_cron_liste():
             durum_raw = j.get("last_status", "")
             active = j.get("enabled", True)
             durum = (
-                "✅"
+                "âœ…"
                 if active and durum_raw == "ok"
-                else "❌"
+                else "âŒ"
                 if durum_raw == "error"
-                else "⏸️"
+                else "â¸ï¸"
                 if not active
-                else "🔄"
+                else "ğŸ”„"
             )
             son = (j.get("last_run_at") or "-")[:16]
             html.append("<tr>")
@@ -2325,14 +2325,14 @@ async def api_cron_liste():
             job_id = j.get("job_id", j.get("id", ""))
             if active:
                 html.append(
-                    f"<button class='btn btn-sm' onclick='cronDurdur(\"{job_id}\")'>⏸️</button>"
+                    f"<button class='btn btn-sm' onclick='cronDurdur(\"{job_id}\")'>â¸ï¸</button>"
                 )
             else:
                 html.append(
-                    f"<button class='btn btn-sm' onclick='cronDevam(\"{job_id}\")'>▶️</button>"
+                    f"<button class='btn btn-sm' onclick='cronDevam(\"{job_id}\")'>â–¶ï¸</button>"
                 )
             html.append(
-                f"<button class='btn btn-sm' onclick='cronSil(\"{job_id}\")'>🗑️</button>"
+                f"<button class='btn btn-sm' onclick='cronSil(\"{job_id}\")'>ğŸ—‘ï¸</button>"
             )
             html.append("</td></tr>")
 
@@ -2384,7 +2384,7 @@ async def api_cron_ekle(request: Request):
 
         return HTMLResponse(
             content=f'<div id="cron-liste" hx-get="/api/cron" hx-trigger="load" hx-swap="outerHTML">'
-            f'<div class="alert alert-success">✅ {ad} eklendi</div></div>'
+            f'<div class="alert alert-success">âœ… {ad} eklendi</div></div>'
         )
     except Exception as e:
         return HTMLResponse(
@@ -2399,7 +2399,7 @@ async def api_cron_sil(job_id: str):
         jobs_path = Path.home() / ".ReYMeN" / "cron" / "jobs.json"
         if not jobs_path.exists():
             return HTMLResponse(
-                content='<div id="cron-liste" class="alert alert-error">Cron dosyası yok</div>'
+                content='<div id="cron-liste" class="alert alert-error">Cron dosyasÄ± yok</div>'
             )
 
         with open(jobs_path) as f:
@@ -2421,7 +2421,7 @@ async def api_cron_sil(job_id: str):
 
         return HTMLResponse(
             content=f'<div id="cron-liste" hx-get="/api/cron" hx-trigger="load" hx-swap="outerHTML">'
-            f'<div class="alert alert-success">🗑️ Silindi</div></div>'
+            f'<div class="alert alert-success">ğŸ—‘ï¸ Silindi</div></div>'
         )
     except Exception as e:
         return HTMLResponse(
@@ -2453,7 +2453,7 @@ async def api_cron_durdur(job_id: str):
 
         return HTMLResponse(
             content=f'<div id="cron-liste" hx-get="/api/cron" hx-trigger="load" hx-swap="outerHTML">'
-            f'<div class="alert alert-info">⏸️ Durduruldu</div></div>'
+            f'<div class="alert alert-info">â¸ï¸ Durduruldu</div></div>'
         )
     except Exception as e:
         return HTMLResponse(
@@ -2485,7 +2485,7 @@ async def api_cron_devam(job_id: str):
 
         return HTMLResponse(
             content=f'<div id="cron-liste" hx-get="/api/cron" hx-trigger="load" hx-swap="outerHTML">'
-            f'<div class="alert alert-info">▶️ Devam ediyor</div></div>'
+            f'<div class="alert alert-info">â–¶ï¸ Devam ediyor</div></div>'
         )
     except Exception as e:
         return HTMLResponse(
@@ -2495,21 +2495,21 @@ async def api_cron_devam(job_id: str):
 
 @app.post("/api/cron/calistir/{job_id}")
 async def api_cron_calistir(job_id: str):
-    """Cron job'u hemen çalıştır."""
+    """Cron job'u hemen Ã§alÄ±ÅŸtÄ±r."""
     return HTMLResponse(
         content=f'<div id="cron-liste" hx-get="/api/cron" hx-trigger="load" hx-swap="outerHTML">'
-        f'<div class="alert alert-info">🔁 Komut gönderildi (scheduler değerlendirecek)</div></div>'
+        f'<div class="alert alert-info">ğŸ” Komut gÃ¶nderildi (scheduler deÄŸerlendirecek)</div></div>'
     )
 
 
-# ═══════════════════════════════════════════════════════════════════
-# API — Hata Yönetimi
-# ═══════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# API â€” Hata YÃ¶netimi
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 @app.get("/hatalar", response_class=HTMLResponse)
 async def hatalar_sayfasi(request: Request):
-    """Hata yönetim sayfası."""
+    """Hata yÃ¶netim sayfasÄ±."""
     return templates.TemplateResponse(request, "hatalar.html", {})
 
 
@@ -2528,7 +2528,7 @@ async def api_hatalar_liste(
 
     if not kayitlar:
         return HTMLResponse(
-            content='<div id="hata-liste"><div class="gri">✅ Hata kaydı yok</div></div>'
+            content='<div id="hata-liste"><div class="gri">âœ… Hata kaydÄ± yok</div></div>'
         )
 
     html = ['<div id="hata-liste">']
@@ -2540,8 +2540,8 @@ async def api_hatalar_liste(
 
     for i, k in enumerate(kayitlar):
         sev = k.get("seviye", "INFO")
-        ikon = {"CRITICAL": "🔴", "ERROR": "🟠", "WARNING": "🟡", "INFO": "🔵"}.get(
-            sev, "⚪"
+        ikon = {"CRITICAL": "ğŸ”´", "ERROR": "ğŸŸ ", "WARNING": "ğŸŸ¡", "INFO": "ğŸ”µ"}.get(
+            sev, "âšª"
         )
         sinif = {
             "CRITICAL": "tag-critical",
@@ -2559,7 +2559,7 @@ async def api_hatalar_liste(
         html.append(f"<td>")
         if trace:
             html.append(
-                f"<button class='btn btn-sm' onclick='traceToggle(\"{tid}\")'>📋</button>"
+                f"<button class='btn btn-sm' onclick='traceToggle(\"{tid}\")'>ğŸ“‹</button>"
             )
         html.append(f"</td></tr>")
         if trace:
@@ -2571,7 +2571,7 @@ async def api_hatalar_liste(
     html.append("</tbody></table>")
     html.append(
         f'<div class="gri" style="text-align:center;padding:0.5rem;">'
-        f"Toplam {len(kayitlar)} kayıt</div>"
+        f"Toplam {len(kayitlar)} kayÄ±t</div>"
     )
     html.append("</div>")
     return HTMLResponse(content="\n".join(html))
@@ -2579,7 +2579,7 @@ async def api_hatalar_liste(
 
 @app.get("/api/hatalar/ozet")
 async def api_hatalar_ozet():
-    """Hata özet kartları HTML."""
+    """Hata Ã¶zet kartlarÄ± HTML."""
     from reymen.sistem.hata_topla import hata_topla
 
     ozet = hata_topla().depo.ozet()
@@ -2592,7 +2592,7 @@ async def api_hatalar_ozet():
         f'<div class="card" style="text-align:center;border-left:3px solid #f97316;">'
         f'<h3 style="color:#f97316;">{ozet["ERROR"]}</h3><div class="gri">Hata</div></div>',
         f'<div class="card" style="text-align:center;border-left:3px solid #eab308;">'
-        f'<h3 style="color:#eab308;">{ozet["WARNING"]}</h3><div class="gri">Uyarı</div></div>',
+        f'<h3 style="color:#eab308;">{ozet["WARNING"]}</h3><div class="gri">UyarÄ±</div></div>',
         f'<div class="card" style="text-align:center;border-left:3px solid #3b82f6;">'
         f'<h3 style="color:#3b82f6;">{ozet["INFO"]}</h3><div class="gri">Bilgi</div></div>',
         "</div>",
@@ -2602,18 +2602,18 @@ async def api_hatalar_ozet():
 
 @app.post("/api/hatalar/temizle")
 async def api_hatalar_temizle():
-    """Tüm hata kayıtlarını temizle."""
+    """TÃ¼m hata kayÄ±tlarÄ±nÄ± temizle."""
     from reymen.sistem.hata_topla import hata_topla
 
     say = hata_topla().depo.temizle()
     return HTMLResponse(
-        content=f'<div id="hata-liste"><div class="alert alert-success">🧹 {say} kayıt silindi</div></div>'
+        content=f'<div id="hata-liste"><div class="alert alert-success">ğŸ§¹ {say} kayÄ±t silindi</div></div>'
     )
 
 
 @app.post("/api/hatalar/test-bildirim")
 async def api_hatalar_test_bildirim():
-    """Test bildirimi gönder."""
+    """Test bildirimi gÃ¶nder."""
     from reymen.sistem.hata_topla import hata_topla
 
     kayit = hata_topla().manuel_kaydet(
@@ -2621,18 +2621,18 @@ async def api_hatalar_test_bildirim():
         kaynak="web_ui.test",
         mesaj="Bu bir test hata bildirimidir",
     )
-    # Toast için HTML
+    # Toast iÃ§in HTML
     html = (
         '<div class="toast toast-success" hx-trigger="load delay:3s" '
         'hx-swap="delete" hx-target="closest .toast">'
-        "✅ Test bildirimi gönderildi</div>"
+        "âœ… Test bildirimi gÃ¶nderildi</div>"
     )
     return HTMLResponse(content=html)
 
 
 @app.post("/api/hatalar/bildirim-ayarla")
 async def api_hatalar_bildirim_ayarla(request: Request):
-    """Bildirim kanalı ayarla."""
+    """Bildirim kanalÄ± ayarla."""
     data = await request.form()
     tur = data.get("tur", "")
     hedef = data.get("hedef", "")
@@ -2643,12 +2643,12 @@ async def api_hatalar_bildirim_ayarla(request: Request):
     bildirim_kanal_ekle(tur, hedef, esik)
 
     return HTMLResponse(
-        content='<div class="alert alert-success">✅ Bildirim kanalı eklendi</div>'
+        content='<div class="alert alert-success">âœ… Bildirim kanalÄ± eklendi</div>'
     )
 
 
 # ---------------------------------------------------------------------------
-# API — Plugin JSON
+# API â€” Plugin JSON
 # ---------------------------------------------------------------------------
 
 
@@ -2663,9 +2663,9 @@ async def api_plugin_liste():
         pluginler = yonetici.list_plugins()
         istatistik = yonetici.plugin_sayisi()
         if not pluginler:
-            return HTMLResponse(content="<div class='gri'>Henüz plugin yok</div>")
+            return HTMLResponse(content="<div class='gri'>HenÃ¼z plugin yok</div>")
         satirlar = [
-            "<table><tr><th>#</th><th>Plugin</th><th>Tür</th><th>Versiyon</th><th>Durum</th><th>Araç</th><th>Açıklama</th></tr>"
+            "<table><tr><th>#</th><th>Plugin</th><th>TÃ¼r</th><th>Versiyon</th><th>Durum</th><th>AraÃ§</th><th>AÃ§Ä±klama</th></tr>"
         ]
         for i, p in enumerate(pluginler, 1):
             ad = p.get("name", "?")
@@ -2695,7 +2695,7 @@ async def api_plugin_liste():
         return HTMLResponse(content="\n".join(satirlar))
     except Exception as e:
         return HTMLResponse(
-            content=f"<div class='alert alert-error'>Plugin listesi hatası: {e}</div>"
+            content=f"<div class='alert alert-error'>Plugin listesi hatasÄ±: {e}</div>"
         )
 
 
@@ -2710,27 +2710,27 @@ async def api_plugin_bilgi(ad: str):
         bilgi = yonetici.plugin_info(ad)
         satirlar = [
             f"<div class='kart'><table>"
-            f"<tr><td>Adı</td><td><b>{bilgi.get('adi', '?')}</b></td></tr>"
-            f"<tr><td>Klasör</td><td>{bilgi.get('klasor', '?')}</td></tr>"
+            f"<tr><td>AdÄ±</td><td><b>{bilgi.get('adi', '?')}</b></td></tr>"
+            f"<tr><td>KlasÃ¶r</td><td>{bilgi.get('klasor', '?')}</td></tr>"
             f"<tr><td>Versiyon</td><td>{bilgi.get('versiyon', '-')}</td></tr>"
-            f"<tr><td>Tür</td><td><span class='tag tag-info'>{bilgi.get('kind', '?')}</span></td></tr>"
-            f"<tr><td>Açıklama</td><td>{bilgi.get('aciklama', '-')}</td></tr>"
+            f"<tr><td>TÃ¼r</td><td><span class='tag tag-info'>{bilgi.get('kind', '?')}</span></td></tr>"
+            f"<tr><td>AÃ§Ä±klama</td><td>{bilgi.get('aciklama', '-')}</td></tr>"
             f"<tr><td>Yazar</td><td>{bilgi.get('yazar', '-')}</td></tr>"
             f"<tr><td>Durum</td><td><span class='tag {'tag-yes' if bilgi.get('aktif') else 'tag-no'}'>{'Aktif' if bilgi.get('aktif') else 'Pasif'}</span></td></tr>"
-            f"<tr><td>Yüklü</td><td>{'✅' if bilgi.get('yuklu') else '❌'}</td></tr>"
-            f"<tr><td>Klasör Var</td><td>{'✅' if bilgi.get('klasor_var') else '❌'}</td></tr>"
-            f"<tr><td>Araç Sayısı</td><td>{len(bilgi.get('araclar', []))}</td></tr>"
+            f"<tr><td>YÃ¼klÃ¼</td><td>{'âœ…' if bilgi.get('yuklu') else 'âŒ'}</td></tr>"
+            f"<tr><td>KlasÃ¶r Var</td><td>{'âœ…' if bilgi.get('klasor_var') else 'âŒ'}</td></tr>"
+            f"<tr><td>AraÃ§ SayÄ±sÄ±</td><td>{len(bilgi.get('araclar', []))}</td></tr>"
             f"</table></div>"
         ]
         return HTMLResponse(content="\n".join(satirlar))
     except Exception as e:
         return HTMLResponse(
-            content=f"<div class='alert alert-error'>Plugin bilgisi alınamadı: {e}</div>"
+            content=f"<div class='alert alert-error'>Plugin bilgisi alÄ±namadÄ±: {e}</div>"
         )
 
 
 # ---------------------------------------------------------------------------
-# API — Kalite / Self-Improve
+# API â€” Kalite / Self-Improve
 # ---------------------------------------------------------------------------
 
 
@@ -2754,19 +2754,19 @@ async def api_kalite():
         )
         hafta_str = ""
         for h in haftalik:
-            bar = "█" * max(1, int(h["ortalama"] * 20))
-            hafta_str += f"<div>{h['hafta']}: {bar} <span class='gri'>({h['ortalama']:.2f}, {h['adim']} adım)</span></div>"
+            bar = "â–ˆ" * max(1, int(h["ortalama"] * 20))
+            hafta_str += f"<div>{h['hafta']}: {bar} <span class='gri'>({h['ortalama']:.2f}, {h['adim']} adÄ±m)</span></div>"
         hedef_str = ""
         if hedefler:
             for h in hedefler[:5]:
-                hedef_str += f"<div>🎯 {h.get('metric_name', '?')}: {h.get('current_val', 0):.1f} → {h.get('target_val', 0):.1f}</div>"
+                hedef_str += f"<div>ğŸ¯ {h.get('metric_name', '?')}: {h.get('current_val', 0):.1f} â†’ {h.get('target_val', 0):.1f}</div>"
         return HTMLResponse(
             content=f"<div class='flex' style='flex-direction:column;gap:8px'>"
             f"<div><b>Ortalama Skor:</b> {ortalama:.3f}</div>"
-            f"<div><b>Geçme Oranı:</b> %{gecme*100:.1f}</div>"
-            f"<div><b>Toplam Adım:</b> {toplam} (<span class='tag-no'>{dusuk} düşük</span>)</div>"
-            f"<div><b>Not Dağılımı:</b> {not_str}</div>"
-            f"<hr><div><b>Haftalık İlerleme:</b></div>{hafta_str}"
+            f"<div><b>GeÃ§me OranÄ±:</b> %{gecme*100:.1f}</div>"
+            f"<div><b>Toplam AdÄ±m:</b> {toplam} (<span class='tag-no'>{dusuk} dÃ¼ÅŸÃ¼k</span>)</div>"
+            f"<div><b>Not DaÄŸÄ±lÄ±mÄ±:</b> {not_str}</div>"
+            f"<hr><div><b>HaftalÄ±k Ä°lerleme:</b></div>{hafta_str}"
             f"{'<hr><div><b>Aktif Hedefler:</b></div>' + hedef_str if hedef_str else ''}"
             f"</div>"
         )
@@ -2776,7 +2776,7 @@ async def api_kalite():
         )
 
 
-# ── Kalite & Analytics API ─────────────────────────────────────
+# â”€â”€ Kalite & Analytics API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 @app.get("/api/kalite/metrikler")
 async def api_kalite_metrikler():
     """Metrik kartlari: coverage, skor, hata, ogrenme."""
@@ -2959,14 +2959,14 @@ async def api_kalite_analiz():
         satirlar = [
             f"<table>"
             f"<tr><td>Toplam Dosya</td><td><b>{sonuc.get('toplam_dosya', 0)}</b></td></tr>"
-            f"<tr><td>Toplam Satır</td><td><b>{sonuc.get('toplam_satir', 0):,}</b></td></tr>"
-            f"<tr><td>Sınıf Sayısı</td><td>{sonuc.get('sinif_sayisi', 0)}</td></tr>"
-            f"<tr><td>Fonksiyon Sayısı</td><td>{sonuc.get('fonk_sayisi', 0)}</td></tr>"
-            f"<tr><td>Test Dosyası</td><td>{sonuc.get('test_dosyasi', 0)}</td></tr>"
-            f"<tr><td>Test Satır Oranı</td><td>%{sonuc.get('test_orani', 0)*100:.1f}</td></tr>"
-            f"<tr><td>📝 TODO</td><td><span class='tag tag-info'>{sonuc.get('todo', 0)}</span></td></tr>"
-            f"<tr><td>⚠️ FIXME</td><td><span class='tag tag-no'>{sonuc.get('fixme', 0)}</span></td></tr>"
-            f"<tr><td>🔴 except:pass</td><td><span class='tag tag-no'>{sonuc.get('except_pass', 0)}</span></td></tr>"
+            f"<tr><td>Toplam SatÄ±r</td><td><b>{sonuc.get('toplam_satir', 0):,}</b></td></tr>"
+            f"<tr><td>SÄ±nÄ±f SayÄ±sÄ±</td><td>{sonuc.get('sinif_sayisi', 0)}</td></tr>"
+            f"<tr><td>Fonksiyon SayÄ±sÄ±</td><td>{sonuc.get('fonk_sayisi', 0)}</td></tr>"
+            f"<tr><td>Test DosyasÄ±</td><td>{sonuc.get('test_dosyasi', 0)}</td></tr>"
+            f"<tr><td>Test SatÄ±r OranÄ±</td><td>%{sonuc.get('test_orani', 0)*100:.1f}</td></tr>"
+            f"<tr><td>ğŸ“ TODO</td><td><span class='tag tag-info'>{sonuc.get('todo', 0)}</span></td></tr>"
+            f"<tr><td>âš ï¸ FIXME</td><td><span class='tag tag-no'>{sonuc.get('fixme', 0)}</span></td></tr>"
+            f"<tr><td>ğŸ”´ except:pass</td><td><span class='tag tag-no'>{sonuc.get('except_pass', 0)}</span></td></tr>"
             f"</table>"
         ]
         return HTMLResponse(content="\n".join(satirlar))
@@ -2978,7 +2978,7 @@ async def api_kalite_analiz():
 
 @app.get("/api/kalite/ozet")
 async def api_kalite_ozet():
-    """Kalite özet bilgisi (dashboard)."""
+    """Kalite Ã¶zet bilgisi (dashboard)."""
     try:
         from reymen.self_improve import report as si_report
 
@@ -2990,20 +2990,20 @@ async def api_kalite_ozet():
             for k, v in sorted(rapor.get("not_dagilimi", {}).items())
         )
         return HTMLResponse(
-            content=f"<div><b>{toplam}</b> adım, skor: <b>{ortalama:.3f}</b><br>{not_str}</div>"
+            content=f"<div><b>{toplam}</b> adÄ±m, skor: <b>{ortalama:.3f}</b><br>{not_str}</div>"
         )
     except Exception as e:
         return HTMLResponse(content=f"<div class='gri'>Kalite: {e}</div>")
 
 
 # ---------------------------------------------------------------------------
-# API — Maliyet / Cost Tracker
+# API â€” Maliyet / Cost Tracker
 # ---------------------------------------------------------------------------
 
 
 @app.get("/api/maliyet")
 async def api_maliyet():
-    """Cost tracker özet HTML."""
+    """Cost tracker Ã¶zet HTML."""
     try:
         from reymen.cost_tracker import summary as ct_summary
 
@@ -3014,14 +3014,14 @@ async def api_maliyet():
         by_model = ozet.get("by_model", {})
         satirlar = [
             f"<div class='flex' style='flex-direction:column;gap:6px'>"
-            f"<div><b>💵 Toplam Maliyet:</b> ${toplam_maliyet:.6f}</div>"
-            f"<div><b>📞 Toplam Çağrı:</b> {toplam_cagri}</div>"
-            f"<div><b>🔤 Toplam Token:</b> {toplam_token:,}</div>"
-            f"<hr><div><b>Modele Göre:</b></div>"
+            f"<div><b>ğŸ’µ Toplam Maliyet:</b> ${toplam_maliyet:.6f}</div>"
+            f"<div><b>ğŸ“ Toplam Ã‡aÄŸrÄ±:</b> {toplam_cagri}</div>"
+            f"<div><b>ğŸ”¤ Toplam Token:</b> {toplam_token:,}</div>"
+            f"<hr><div><b>Modele GÃ¶re:</b></div>"
         ]
         if by_model:
             satirlar.append(
-                "<table><tr><th>Model</th><th>Çağrı</th><th>Maliyet</th></tr>"
+                "<table><tr><th>Model</th><th>Ã‡aÄŸrÄ±</th><th>Maliyet</th></tr>"
             )
             for model, m_data in sorted(
                 by_model.items(), key=lambda x: x[1]["cost_usd"], reverse=True
@@ -3047,7 +3047,7 @@ async def api_maliyet_detay(n: int = 20):
 
         kayitlar = dump_log(limit=n)
         if not kayitlar:
-            return HTMLResponse(content="<div class='gri'>Henüz kayıt yok</div>")
+            return HTMLResponse(content="<div class='gri'>HenÃ¼z kayÄ±t yok</div>")
         satirlar = [
             "<table><tr><th>#</th><th>Zaman</th><th>Model</th><th>Prompt</th><th>Completion</th><th>Maliyet</th></tr>"
         ]
@@ -3073,7 +3073,7 @@ async def api_maliyet_detay(n: int = 20):
 
 @app.get("/api/maliyet/ozet")
 async def api_maliyet_ozet():
-    """Maliyet özet (dashboard)."""
+    """Maliyet Ã¶zet (dashboard)."""
     try:
         from reymen.cost_tracker import summary as ct_summary
 
@@ -3081,14 +3081,14 @@ async def api_maliyet_ozet():
         toplam = ozet.get("total_cost_usd", 0)
         cagri = ozet.get("total_calls", 0)
         return HTMLResponse(
-            content=f"<div><b>${toplam:.4f}</b> harcama, <b>{cagri}</b> çağrı</div>"
+            content=f"<div><b>${toplam:.4f}</b> harcama, <b>{cagri}</b> Ã§aÄŸrÄ±</div>"
         )
     except Exception as e:
         return HTMLResponse(content=f"<div class='gri'>Maliyet: {e}</div>")
 
 
 # ---------------------------------------------------------------------------
-# API — Kanban
+# API â€” Kanban
 # ---------------------------------------------------------------------------
 
 
@@ -3111,17 +3111,17 @@ async def api_kanban():
         geciken = len(board.overdue_cards())
         satirlar = [
             f"<div class='flex' style='flex-direction:column;gap:6px'>"
-            f"<div>📊 <b>{toplam}</b> kart toplam</div>"
+            f"<div>ğŸ“Š <b>{toplam}</b> kart toplam</div>"
             f"<div class='flex'>"
-            f"<span class='tag tag-yes'>✅ {done} tamam</span>"
-            f"<span class='tag tag-info'>🔄 {in_progress} devam</span>"
-            f"<span class='tag tag-no'>🚫 {blocked} bloke</span>"
-            f"<span class='tag'>📥 {backlog} sırada</span>"
+            f"<span class='tag tag-yes'>âœ… {done} tamam</span>"
+            f"<span class='tag tag-info'>ğŸ”„ {in_progress} devam</span>"
+            f"<span class='tag tag-no'>ğŸš« {blocked} bloke</span>"
+            f"<span class='tag'>ğŸ“¥ {backlog} sÄ±rada</span>"
             f"</div>"
-            f"<div>{'⚠️ <b>' + str(geciken) + '</b> geciken kart' if geciken else '✅ Geciken kart yok'}</div>"
+            f"<div>{'âš ï¸ <b>' + str(geciken) + '</b> geciken kart' if geciken else 'âœ… Geciken kart yok'}</div>"
             f"</div>"
         ]
-        # Kolon özeti
+        # Kolon Ã¶zeti
         for col in board.columns:
             satirlar.append(
                 f"<div><b>{col.name}</b>: {len(col.cards)} kart"
@@ -3130,7 +3130,7 @@ async def api_kanban():
         return HTMLResponse(content="\n".join(satirlar))
     except FileNotFoundError:
         return HTMLResponse(
-            content="<div class='gri'>Kanban panosu henüz oluşturulmamış. <code>.ReYMeN/board.json</code> dosyası gerekli.</div>"
+            content="<div class='gri'>Kanban panosu henÃ¼z oluÅŸturulmamÄ±ÅŸ. <code>.ReYMeN/board.json</code> dosyasÄ± gerekli.</div>"
         )
     except Exception as e:
         return HTMLResponse(content=f"<div class='alert alert-error'>Kanban: {e}</div>")
@@ -3146,23 +3146,23 @@ async def api_kanban_kartlar():
         board = Board.load(str(PROJE_KOK / ".ReYMeN" / "board.json"))
         tum_kartlar = board.all_cards()
         if not tum_kartlar:
-            return HTMLResponse(content="<div class='gri'>Henüz kart yok</div>")
+            return HTMLResponse(content="<div class='gri'>HenÃ¼z kart yok</div>")
         satirlar = [
-            "<table><tr><th>Kart</th><th>Durum</th><th>Öncelik</th><th>Atanan</th><th>Teslim</th></tr>"
+            "<table><tr><th>Kart</th><th>Durum</th><th>Ã–ncelik</th><th>Atanan</th><th>Teslim</th></tr>"
         ]
         for c in tum_kartlar[:50]:
-            prio_map = {0: "🔴 Kritik", 1: "🟠 Yüksek", 2: "🟡 Orta", 3: "🟢 Düşük"}
+            prio_map = {0: "ğŸ”´ Kritik", 1: "ğŸŸ  YÃ¼ksek", 2: "ğŸŸ¡ Orta", 3: "ğŸŸ¢ DÃ¼ÅŸÃ¼k"}
             durum_map = {
-                "backlog": "📥",
-                "todo": "📋",
-                "ready": "✅",
-                "in_progress": "🔄",
-                "blocked": "🚫",
-                "review": "👁️",
-                "done": "✔️",
+                "backlog": "ğŸ“¥",
+                "todo": "ğŸ“‹",
+                "ready": "âœ…",
+                "in_progress": "ğŸ”„",
+                "blocked": "ğŸš«",
+                "review": "ğŸ‘ï¸",
+                "done": "âœ”ï¸",
             }
             prio = prio_map.get(c.priority, str(c.priority))
-            durum_icon = durum_map.get(c.status, "❓")
+            durum_icon = durum_map.get(c.status, "â“")
             deadline = c.deadline[:10] if c.deadline else "-"
             assignee = c.assignee or "-"
             baslik = c.title[:50]
@@ -3176,31 +3176,31 @@ async def api_kanban_kartlar():
         satirlar.append("</table>")
         return HTMLResponse(content="\n".join(satirlar))
     except FileNotFoundError:
-        return HTMLResponse(content="<div class='gri'>Board dosyası bulunamadı</div>")
+        return HTMLResponse(content="<div class='gri'>Board dosyasÄ± bulunamadÄ±</div>")
     except Exception as e:
         return HTMLResponse(
-            content=f"<div class='alert alert-error'>Kanban kartları: {e}</div>"
+            content=f"<div class='alert alert-error'>Kanban kartlarÄ±: {e}</div>"
         )
 
 
 # ---------------------------------------------------------------------------
-# API — Sistem / Sağlık
+# API â€” Sistem / SaÄŸlÄ±k
 # ---------------------------------------------------------------------------
 
 
 @app.get("/api/sistem/saglik")
 async def api_sistem_saglik():
-    """Sistem sağlık kontrolü HTML."""
+    """Sistem saÄŸlÄ±k kontrolÃ¼ HTML."""
     try:
         import platform
         import psutil
 
         satirlar = [
             "<table>"
-            f"<tr><td>🖥️ CPU Kullanımı</td><td><b>{psutil.cpu_percent(interval=0.1):.1f}%</b></td></tr>"
-            f"<tr><td>💾 RAM Kullanımı</td><td><b>{psutil.virtual_memory().percent:.1f}%</b> "
+            f"<tr><td>ğŸ–¥ï¸ CPU KullanÄ±mÄ±</td><td><b>{psutil.cpu_percent(interval=0.1):.1f}%</b></td></tr>"
+            f"<tr><td>ğŸ’¾ RAM KullanÄ±mÄ±</td><td><b>{psutil.virtual_memory().percent:.1f}%</b> "
             f"({psutil.virtual_memory().used // (1024**3)}GB / {psutil.virtual_memory().total // (1024**3)}GB)</td></tr>"
-            f"<tr><td>💿 Disk Kullanımı</td><td><b>{psutil.disk_usage('/').percent:.1f}%</b></td></tr>"
+            f"<tr><td>ğŸ’¿ Disk KullanÄ±mÄ±</td><td><b>{psutil.disk_usage('/').percent:.1f}%</b></td></tr>"
         ]
         # Process durumu
         calisan = 0
@@ -3209,23 +3209,23 @@ async def api_sistem_saglik():
             if p.get("durum") == "calisiyor":
                 calisan += 1
         satirlar.append(
-            f"<tr><td>⚙️ Process</td><td><b>{calisan}/{len(tumu)}</b> çalışıyor</td></tr>"
+            f"<tr><td>âš™ï¸ Process</td><td><b>{calisan}/{len(tumu)}</b> Ã§alÄ±ÅŸÄ±yor</td></tr>"
         )
         satirlar.append("</table>")
         return HTMLResponse(content="\n".join(satirlar))
     except ImportError:
         return HTMLResponse(
-            content="<div class='gri'>psutil yüklü değil. <code>pip install psutil</code> ile kurabilirsiniz.</div>"
+            content="<div class='gri'>psutil yÃ¼klÃ¼ deÄŸil. <code>pip install psutil</code> ile kurabilirsiniz.</div>"
         )
     except Exception as e:
         return HTMLResponse(
-            content=f"<div class='alert alert-error'>Sistem sağlığı: {e}</div>"
+            content=f"<div class='alert alert-error'>Sistem saÄŸlÄ±ÄŸÄ±: {e}</div>"
         )
 
 
 @app.get("/api/sistem/saglik/ozet")
 async def api_sistem_saglik_ozet():
-    """Sistem sağlık özet (dashboard)."""
+    """Sistem saÄŸlÄ±k Ã¶zet (dashboard)."""
     try:
         import psutil
 
@@ -3235,8 +3235,8 @@ async def api_sistem_saglik_ozet():
         ram_tag = "tag-yes" if ram < 70 else ("tag-info" if ram < 90 else "tag-no")
         return HTMLResponse(
             content=f"<div class='flex'>"
-            f"<span class='tag {cpu_tag}'>🖥️ CPU: %{cpu:.0f}</span>"
-            f"<span class='tag {ram_tag}'>💾 RAM: %{ram:.0f}</span>"
+            f"<span class='tag {cpu_tag}'>ğŸ–¥ï¸ CPU: %{cpu:.0f}</span>"
+            f"<span class='tag {ram_tag}'>ğŸ’¾ RAM: %{ram:.0f}</span>"
             f"</div>"
         )
     except ImportError:
@@ -3254,12 +3254,12 @@ async def api_sistem_bilgi():
 
         satirlar = [
             "<table>"
-            f"<tr><td>💻 İşletim Sistemi</td><td><b>{platform.system()} {platform.release()}</b></td></tr>"
-            f"<tr><td>🐍 Python</td><td><b>{sys.version.split()[0]}</b></td></tr>"
-            f"<tr><td>🏠 Makine</td><td>{platform.node()}</td></tr>"
-            f"<tr><td>📐 Mimarî</td><td>{platform.machine()}</td></tr>"
-            f"<tr><td>📁 Proje Kökü</td><td class='gri'>{PROJE_KOK}</td></tr>"
-            f"<tr><td>📦 FastAPI</td><td>{getattr(__import__('fastapi'), '__version__', '?')}</td></tr>"
+            f"<tr><td>ğŸ’» Ä°ÅŸletim Sistemi</td><td><b>{platform.system()} {platform.release()}</b></td></tr>"
+            f"<tr><td>ğŸ Python</td><td><b>{sys.version.split()[0]}</b></td></tr>"
+            f"<tr><td>ğŸ  Makine</td><td>{platform.node()}</td></tr>"
+            f"<tr><td>ğŸ“ MimarÃ®</td><td>{platform.machine()}</td></tr>"
+            f"<tr><td>ğŸ“ Proje KÃ¶kÃ¼</td><td class='gri'>{PROJE_KOK}</td></tr>"
+            f"<tr><td>ğŸ“¦ FastAPI</td><td>{getattr(__import__('fastapi'), '__version__', '?')}</td></tr>"
             f"</table>"
         ]
         return HTMLResponse(content="\n".join(satirlar))
@@ -3270,14 +3270,14 @@ async def api_sistem_bilgi():
 
 
 # ---------------------------------------------------------------------------
-# WebSocket — Canlı Log
+# WebSocket â€” CanlÄ± Log
 # ---------------------------------------------------------------------------
 
 
 @app.websocket("/ws/logs")
 async def ws_loglar(websocket: WebSocket):
     await websocket.accept()
-    logger.info("WebSocket log abonesi bağlandı")
+    logger.info("WebSocket log abonesi baÄŸlandÄ±")
     try:
         while True:
             satir = await log_kuyrugu_oku()
@@ -3288,30 +3288,30 @@ async def ws_loglar(websocket: WebSocket):
             except Exception:
                 break
     except WebSocketDisconnect:
-        logger.info("WebSocket log abonesi ayrıldı")
+        logger.info("WebSocket log abonesi ayrÄ±ldÄ±")
     except Exception as e:
-        logger.warning("WebSocket hatası: %s", e)
+        logger.warning("WebSocket hatasÄ±: %s", e)
 
 
 # ---------------------------------------------------------------------------
-# Başlangıç
+# BaÅŸlangÄ±Ã§
 # ---------------------------------------------------------------------------
 
 
 @app.on_event("startup")
 async def startup():
-    """Uygulama başlangıcı."""
-    # Log streamer'ı başlat
+    """Uygulama baÅŸlangÄ±cÄ±."""
+    # Log streamer'Ä± baÅŸlat
     await log_streamer.basla()
 
-    # Log tarama görevi
+    # Log tarama gÃ¶revi
     async def log_tarama_dongusu():
         while True:
             await log_streamer.tara()
             await asyncio.sleep(1)
 
     asyncio.create_task(log_tarama_dongusu())
-    logger.info("ReYMeN Web UI başlatıldı")
+    logger.info("ReYMeN Web UI baÅŸlatÄ±ldÄ±")
 
 
 @app.get("/api/health")
@@ -3319,7 +3319,7 @@ async def health():
     return {"durum": "ok", "zaman": datetime.now().isoformat()}
 
 
-# ── Konusma Gecmisi ────────────────────────────────────────────────────────
+# â”€â”€ Konusma Gecmisi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 @app.get("/konusmalar", response_class=HTMLResponse)
@@ -3346,12 +3346,12 @@ async def api_konusmalar(request: Request):
         return JSONResponse({"hata": "Yetkisiz"}, status_code=401)
     konusmalar = _konusma_listele()
     if not konusmalar:
-        return HTMLResponse('<div class="gri">Henüz konuşma kaydı bulunamadı.</div>')
+        return HTMLResponse('<div class="gri">HenÃ¼z konuÅŸma kaydÄ± bulunamadÄ±.</div>')
     html = ""
     for k in konusmalar[:50]:
         html += f"""<div class="conv-item" onclick="konusmaAc('{k.get("id","")}')">
-            <div class="conv-title">💬 {k.get("baslik","") or k.get("hedef","İsimsiz")}</div>
-            <div class="conv-meta">{k.get("tarih","") or k.get("zaman","")} · {k.get("mesaj_sayisi",0)} mesaj</div>
+            <div class="conv-title">ğŸ’¬ {k.get("baslik","") or k.get("hedef","Ä°simsiz")}</div>
+            <div class="conv-meta">{k.get("tarih","") or k.get("zaman","")} Â· {k.get("mesaj_sayisi",0)} mesaj</div>
         </div>"""
     return HTMLResponse(html)
 
@@ -3365,7 +3365,7 @@ async def api_konusma_mesajlar(konusma_id: str, request: Request):
     return {"mesajlar": mesajlar}
 
 
-# ── Toast Bildirim API ──────────────────────────────────────────────────────
+# â”€â”€ Toast Bildirim API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 @app.post("/api/toast/gonder")
@@ -3415,7 +3415,7 @@ async def ws_toast(websocket: WebSocket):
 _WS_TOAST_KLIENTLER: set = set()
 
 
-# ── Konusma Veri Kaynagi ───────────────────────────────────────────────────
+# â”€â”€ Konusma Veri Kaynagi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _konusma_listele() -> list[dict]:
@@ -3448,7 +3448,7 @@ def _konusma_listele() -> list[dict]:
                         return [
                             {
                                 "id": r["id"],
-                                "baslik": r["title"] or "İsimsiz",
+                                "baslik": r["title"] or "Ä°simsiz",
                                 "tarih": str(r["created_at"])[:19]
                                 if r["created_at"]
                                 else "",
@@ -3480,7 +3480,7 @@ def _konusma_listele() -> list[dict]:
                 __import__("logging").getLogger(__name__).warning(
                     "[SessizExcept] %%s: %%s", type(_e).__name__, _e
                 )
-    # Son care: .ReYMeN/notes/ klasöründen .md dosyalari
+    # Son care: .ReYMeN/notes/ klasÃ¶rÃ¼nden .md dosyalari
     notes_dir = PROJE_KOK / ".ReYMeN" / "notes"
     if notes_dir.exists():
         konusmalar = []
@@ -3548,19 +3548,19 @@ def _konusma_mesajlari_getir(konusma_id: str) -> list[dict]:
 
 
 # ---------------------------------------------------------------------------
-# Delegasyon Yönetimi — Routes
+# Delegasyon YÃ¶netimi â€” Routes
 # ---------------------------------------------------------------------------
 
 
 @app.get("/delegasyon", response_class=HTMLResponse)
 async def delegasyon_sayfasi(request: Request):
-    """Delegasyon yönetim sayfası."""
+    """Delegasyon yÃ¶netim sayfasÄ±."""
     return templates.TemplateResponse(request, "delegation.html", {})
 
 
 @app.get("/api/delegation/status")
 async def api_delegation_status(request: Request, detay: bool = False):
-    """Delegasyon durumunu HTML olarak döndürür."""
+    """Delegasyon durumunu HTML olarak dÃ¶ndÃ¼rÃ¼r."""
     try:
         from reymen.ag.delegation import get_manager
 
@@ -3570,35 +3570,35 @@ async def api_delegation_status(request: Request, detay: bool = False):
         if stats["total"] == 0:
             html = [
                 '<div class="card" style="text-align:center;padding:2rem;">',
-                "<h3>🧠 Delegasyon Sistemi</h3>",
-                '<div class="gri" style="margin:1rem 0;">Henüz hiç alt-ajan kaydı yok</div>',
+                "<h3>ğŸ§  Delegasyon Sistemi</h3>",
+                '<div class="gri" style="margin:1rem 0;">HenÃ¼z hiÃ§ alt-ajan kaydÄ± yok</div>',
                 '<div class="flex" style="justify-content:center;gap:1rem;">',
-                "<span>✅ Başarı: 0</span>",
-                "<span>❌ Hata: 0</span>",
-                "<span>⏳ Aktif: 0</span>",
+                "<span>âœ… BaÅŸarÄ±: 0</span>",
+                "<span>âŒ Hata: 0</span>",
+                "<span>â³ Aktif: 0</span>",
                 "</div></div>",
             ]
             if detay:
                 html.append(
-                    '<div class="gri" style="margin-top:1rem;">Kayıt bulunamadı</div>'
+                    '<div class="gri" style="margin-top:1rem;">KayÄ±t bulunamadÄ±</div>'
                 )
             return HTMLResponse(content="\n".join(html))
 
-        # Özet kartı
+        # Ã–zet kartÄ±
         html = [
             '<div class="cards" style="display:grid;grid-template-columns:repeat(6,1fr);gap:0.5rem;">',
             f'<div class="card" style="text-align:center;"><h3>{stats["total"]}</h3>'
             f'<div class="gri">Toplam</div></div>',
             f'<div class="card" style="text-align:center;"><h3 style="color:#22c55e;">{stats["success"]}</h3>'
-            f'<div class="gri">Başarılı</div></div>',
+            f'<div class="gri">BaÅŸarÄ±lÄ±</div></div>',
             f'<div class="card" style="text-align:center;"><h3 style="color:#ef4444;">{stats["error"]}</h3>'
             f'<div class="gri">Hata</div></div>',
             f'<div class="card" style="text-align:center;"><h3 style="color:#f59e0b;">{stats["active"]}</h3>'
             f'<div class="gri">Aktif</div></div>',
             f'<div class="card" style="text-align:center;"><h3>%{stats["success_rate"]}</h3>'
-            f'<div class="gri">Başarı Oranı</div></div>',
+            f'<div class="gri">BaÅŸarÄ± OranÄ±</div></div>',
             f'<div class="card" style="text-align:center;"><h3>{stats["ortalama_sure"]}s</h3>'
-            f'<div class="gri">Ort. Süre</div></div>',
+            f'<div class="gri">Ort. SÃ¼re</div></div>',
             "</div>",
         ]
 
@@ -3606,9 +3606,9 @@ async def api_delegation_status(request: Request, detay: bool = False):
             html.extend(
                 [
                     '<div class="card" style="margin-top:1rem;">',
-                    "<h3>📋 Kayıtlar</h3>",
+                    "<h3>ğŸ“‹ KayÄ±tlar</h3>",
                     '<table class="table"><thead><tr>',
-                    "<th>#</th><th>ID</th><th>Hedef</th><th>Durum</th><th>Süre</th><th>İşlem</th>",
+                    "<th>#</th><th>ID</th><th>Hedef</th><th>Durum</th><th>SÃ¼re</th><th>Ä°ÅŸlem</th>",
                     "</tr></thead><tbody>",
                 ]
             )
@@ -3619,13 +3619,13 @@ async def api_delegation_status(request: Request, detay: bool = False):
                 1,
             ):
                 ikon = {
-                    "success": "✅",
-                    "error": "❌",
-                    "cancelled": "⛔",
-                    "running": "⏳",
-                    "pending": "⏸️",
-                }.get(a["status"], "❓")
-                sure_str = f'{a["sure"]}s' if a.get("sure") else "—"
+                    "success": "âœ…",
+                    "error": "âŒ",
+                    "cancelled": "â›”",
+                    "running": "â³",
+                    "pending": "â¸ï¸",
+                }.get(a["status"], "â“")
+                sure_str = f'{a["sure"]}s' if a.get("sure") else "â€”"
                 goal_short = (
                     a["goal"][:50] + "..." if len(a["goal"]) > 50 else a["goal"]
                 )
@@ -3635,7 +3635,7 @@ async def api_delegation_status(request: Request, detay: bool = False):
                     f'<td>{goal_short}</td>'
                     f'<td>{ikon} {a["status"]}</td>'
                     f'<td>{sure_str}</td>'
-                    f'<td><button class="btn btn-sm" onclick="detayGoster(\'{a["id"]}\')">🔍</button></td>'
+                    f'<td><button class="btn btn-sm" onclick="detayGoster(\'{a["id"]}\')">ğŸ”</button></td>'
                     f'</tr>'
                 )
             html.extend(["</tbody></table></div>"])
@@ -3644,17 +3644,17 @@ async def api_delegation_status(request: Request, detay: bool = False):
 
     except ImportError:
         return HTMLResponse(
-            content='<div class="alert alert-warning">⚠️ Delegasyon modülü (reymen.ag.delegation) yüklenemedi</div>'
+            content='<div class="alert alert-warning">âš ï¸ Delegasyon modÃ¼lÃ¼ (reymen.ag.delegation) yÃ¼klenemedi</div>'
         )
     except Exception as e:
         return HTMLResponse(
-            content=f'<div class="alert alert-error">❌ Hata: {type(e).__name__}: {e}</div>'
+            content=f'<div class="alert alert-error">âŒ Hata: {type(e).__name__}: {e}</div>'
         )
 
 
 @app.post("/api/delegation/run")
 async def api_delegation_run(request: Request, decompose: bool = False):
-    """Delegasyon görevi çalıştır."""
+    """Delegasyon gÃ¶revi Ã§alÄ±ÅŸtÄ±r."""
     try:
         from reymen.ag.delegation import get_manager
 
@@ -3664,7 +3664,7 @@ async def api_delegation_run(request: Request, decompose: bool = False):
 
         if not goal:
             return HTMLResponse(
-                content='<div class="alert alert-error">❌ Hedef (goal) zorunlu</div>'
+                content='<div class="alert alert-error">âŒ Hedef (goal) zorunlu</div>'
             )
 
         manager = get_manager()
@@ -3675,12 +3675,12 @@ async def api_delegation_run(request: Request, decompose: bool = False):
             hatali = sum(1 for a in agents if a.status == "error")
             html = [
                 f'<div class="alert alert-success">'
-                f"✅ {len(agents)} alt-görev ayrıştırıldı ve çalıştırıldı "
-                f"(Başarılı: {basarili}, Hatalı: {hatali})"
+                f"âœ… {len(agents)} alt-gÃ¶rev ayrÄ±ÅŸtÄ±rÄ±ldÄ± ve Ã§alÄ±ÅŸtÄ±rÄ±ldÄ± "
+                f"(BaÅŸarÄ±lÄ±: {basarili}, HatalÄ±: {hatali})"
                 f"</div>",
             ]
             for a in agents:
-                ikon = "✅" if a.status == "success" else "❌"
+                ikon = "âœ…" if a.status == "success" else "âŒ"
                 sure = (
                     round(a.completed_at - a.created_at, 2) if a.completed_at else "?"
                 )
@@ -3698,10 +3698,10 @@ async def api_delegation_run(request: Request, decompose: bool = False):
                 if agent.completed_at
                 else "?"
             )
-            ikon = "✅" if agent.status == "success" else "❌"
+            ikon = "âœ…" if agent.status == "success" else "âŒ"
             html = [
                 f'<div class="alert alert-success">'
-                f"{ikon} Alt-ajan tamamlandı — {agent.status} ({sure}s)"
+                f"{ikon} Alt-ajan tamamlandÄ± â€” {agent.status} ({sure}s)"
                 f"</div>",
                 f'<div class="card"><pre style="max-height:200px;overflow-y:auto;">{agent.result[:500]}</pre></div>',
             ]
@@ -3709,17 +3709,17 @@ async def api_delegation_run(request: Request, decompose: bool = False):
 
     except ImportError:
         return HTMLResponse(
-            content='<div class="alert alert-warning">⚠️ Delegasyon modülü yüklenemedi</div>'
+            content='<div class="alert alert-warning">âš ï¸ Delegasyon modÃ¼lÃ¼ yÃ¼klenemedi</div>'
         )
     except Exception as e:
         return HTMLResponse(
-            content=f'<div class="alert alert-error">❌ Hata: {type(e).__name__}: {e}</div>'
+            content=f'<div class="alert alert-error">âŒ Hata: {type(e).__name__}: {e}</div>'
         )
 
 
 @app.post("/api/delegation/cancel")
 async def api_delegation_cancel(request: Request):
-    """Alt-ajanı iptal et."""
+    """Alt-ajanÄ± iptal et."""
     try:
         from reymen.ag.delegation import get_manager
 
@@ -3728,7 +3728,7 @@ async def api_delegation_cancel(request: Request):
 
         if not agent_id:
             return HTMLResponse(
-                content='<div class="alert alert-error">❌ Alt-ajan ID\'si zorunlu</div>'
+                content='<div class="alert alert-error">âŒ Alt-ajan ID\'si zorunlu</div>'
             )
 
         manager = get_manager()
@@ -3736,25 +3736,25 @@ async def api_delegation_cancel(request: Request):
 
         if basarili:
             return HTMLResponse(
-                content=f'<div class="alert alert-warning">⛔ Alt-ajan iptal edildi: {agent_id[:12]}...</div>'
+                content=f'<div class="alert alert-warning">â›” Alt-ajan iptal edildi: {agent_id[:12]}...</div>'
             )
         return HTMLResponse(
-            content=f'<div class="alert alert-error">❌ İptal başarısız: {agent_id[:12]}... bulunamadı veya tamamlanmış</div>'
+            content=f'<div class="alert alert-error">âŒ Ä°ptal baÅŸarÄ±sÄ±z: {agent_id[:12]}... bulunamadÄ± veya tamamlanmÄ±ÅŸ</div>'
         )
 
     except ImportError:
         return HTMLResponse(
-            content='<div class="alert alert-warning">⚠️ Delegasyon modülü yüklenemedi</div>'
+            content='<div class="alert alert-warning">âš ï¸ Delegasyon modÃ¼lÃ¼ yÃ¼klenemedi</div>'
         )
     except Exception as e:
         return HTMLResponse(
-            content=f'<div class="alert alert-error">❌ Hata: {type(e).__name__}: {e}</div>'
+            content=f'<div class="alert alert-error">âŒ Hata: {type(e).__name__}: {e}</div>'
         )
 
 
 @app.post("/api/delegation/temizle")
 async def api_delegation_temizle():
-    """Tamamlanmış alt-ajanları temizle."""
+    """TamamlanmÄ±ÅŸ alt-ajanlarÄ± temizle."""
     try:
         from reymen.ag.delegation import get_manager
 
@@ -3762,21 +3762,21 @@ async def api_delegation_temizle():
         silinen = manager.temizle()
 
         return HTMLResponse(
-            content=f'<div class="alert alert-success">🧹 {silinen} tamamlanmış alt-ajan temizlendi</div>'
+            content=f'<div class="alert alert-success">ğŸ§¹ {silinen} tamamlanmÄ±ÅŸ alt-ajan temizlendi</div>'
         )
     except ImportError:
         return HTMLResponse(
-            content='<div class="alert alert-warning">⚠️ Delegasyon modülü yüklenemedi</div>'
+            content='<div class="alert alert-warning">âš ï¸ Delegasyon modÃ¼lÃ¼ yÃ¼klenemedi</div>'
         )
     except Exception as e:
         return HTMLResponse(
-            content=f'<div class="alert alert-error">❌ Hata: {type(e).__name__}: {e}</div>'
+            content=f'<div class="alert alert-error">âŒ Hata: {type(e).__name__}: {e}</div>'
         )
 
 
 @app.get("/api/delegation/detay")
 async def api_delegation_detay(id: str = ""):
-    """Alt-ajan detayını JSON olarak döndür."""
+    """Alt-ajan detayÄ±nÄ± JSON olarak dÃ¶ndÃ¼r."""
     try:
         from reymen.ag.delegation import get_manager
 
@@ -3788,13 +3788,13 @@ async def api_delegation_detay(id: str = ""):
 
         if not agent:
             return JSONResponse(
-                {"hata": f"Alt-ajan bulunamadı: {id[:12]}"}, status_code=404
+                {"hata": f"Alt-ajan bulunamadÄ±: {id[:12]}"}, status_code=404
             )
 
         return agent.to_dict()
 
     except ImportError:
-        return JSONResponse({"hata": "Delegasyon modülü yüklenemedi"}, status_code=500)
+        return JSONResponse({"hata": "Delegasyon modÃ¼lÃ¼ yÃ¼klenemedi"}, status_code=500)
     except Exception as e:
         return JSONResponse({"hata": str(e)}, status_code=500)
 
@@ -3805,43 +3805,43 @@ async def api_delegation_detay(id: str = ""):
 
 
 def baslat(port: int = 5000, host: str = "0.0.0.0") -> None:
-    """Web UI'yi başlat."""
-    # OAuth2 provider'ları başlat (env var'larından oku)
+    """Web UI'yi baÅŸlat."""
+    # OAuth2 provider'larÄ± baÅŸlat (env var'larÄ±ndan oku)
     redirect_base = (
         f"http://{host}:{port}" if host != "0.0.0.0" else f"http://localhost:{port}"
     )
     init_oauth2_providers(redirect_base=redirect_base)
 
-    print(f"🌐 ReYMeN Web UI v2: http://{host}:{port}")
-    print(f"   Giriş: admin / reymen (varsayılan)")
+    print(f"ğŸŒ ReYMeN Web UI v2: http://{host}:{port}")
+    print(f"   GiriÅŸ: admin / reymen (varsayÄ±lan)")
     print(f"   OAuth2: Google, Discord")
-    print(f"   Canlı log: /logs")
+    print(f"   CanlÄ± log: /logs")
     uvicorn.run(app, host=host, port=port, log_level="info")
 
 
 def cli() -> None:
-    """Komut satırından çalıştırma."""
+    """Komut satÄ±rÄ±ndan Ã§alÄ±ÅŸtÄ±rma."""
     import argparse
 
     parser = argparse.ArgumentParser(description="ReYMeN Web UI v2")
     parser.add_argument(
-        "--port", type=int, default=5000, help="Port (varsayılan: 5000)"
+        "--port", type=int, default=5000, help="Port (varsayÄ±lan: 5000)"
     )
     parser.add_argument(
-        "--host", type=str, default="0.0.0.0", help="Host (varsayılan: 0.0.0.0)"
+        "--host", type=str, default="0.0.0.0", help="Host (varsayÄ±lan: 0.0.0.0)"
     )
     args = parser.parse_args()
     baslat(args.port, args.host)
 
 
-# ── Motor Entegrasyonu ──────────────────────────────────────────────────
+# â”€â”€ Motor Entegrasyonu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _WEB_UI_MOTOR = None
 _WEB_UI_THREAD = None
 
 
 def motor_kaydet(motor) -> None:
-    """Motor'a Web UI araçlarını kaydet."""
+    """Motor'a Web UI araÃ§larÄ±nÄ± kaydet."""
     global _WEB_UI_MOTOR
     _WEB_UI_MOTOR = motor
     motor._plugin_arac_kaydet(
@@ -3896,7 +3896,7 @@ def _web_ui_durdur(**kw) -> str:
     return "[WEB_UI] Zaten kapali"
 
 
-# ── Analitik Dashboard Routes ──────────────────────────────────────────────
+# â”€â”€ Analitik Dashboard Routes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 @app.get("/api/analytics/summary")
@@ -3977,7 +3977,7 @@ if __name__ == "__main__":
     cli()
 
 
-# ── Skills Dashboard Routes ────────────────────────────────────────────────
+# â”€â”€ Skills Dashboard Routes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 @app.get("/skills", response_class=HTMLResponse)
@@ -4083,13 +4083,13 @@ async def api_skills_index_yenile():
         return JSONResponse({"error": str(e)})
 
 
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Open WebUI / OpenAI-Compatible API
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Open WebUI, Cursor, Continue.dev ve diger araclar bu endpoint'e
 # "Custom OpenAI API" olarak baglanabilir.
 # Baglanti: http://localhost:5000/v1  (API Key: reymen)
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 from pydantic import BaseModel
 
@@ -4109,7 +4109,7 @@ class V1ChatRequest(BaseModel):
 
 @app.get("/v1/models")
 async def v1_models():
-    """OpenAI uyumlu model listesi — Open WebUI bu endpoint'i sorgular."""
+    """OpenAI uyumlu model listesi â€” Open WebUI bu endpoint'i sorgular."""
     models = [
         {
             "id": "reymen/default",
@@ -4189,9 +4189,9 @@ async def v1_chat_completions(req: V1ChatRequest):
         )
 
 
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Image Gen Route (web_ui/image_gen_route.py)
-# ═══════════════════════════════════════════════════════════════
-from src.reymen.web_ui.image_gen_route import router as image_gen_router
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+from reymen.web_ui.image_gen_route import router as image_gen_router
 
 app.include_router(image_gen_router)

@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""credential_pool.py — Kimlik Havuzu.
+﻿# -*- coding: utf-8 -*-
+"""credential_pool.py â€” Kimlik Havuzu.
 
 Birden fazla kaynaktan (env, dosya, Windows Credential Manager)
 API anahtarlarini toplar ve yonetir.

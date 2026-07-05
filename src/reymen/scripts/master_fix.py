@@ -1,10 +1,10 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
-MASTER — ReYMeN Tüm Fix'leri Çalıştır
-Sırasıyla: Fix01 → Fix02 → Fix03 → Fix04 → Fix05
-Her aşama sonrası rapor yazar, hata olursa durur.
+MASTER â€” ReYMeN TÃ¼m Fix'leri Ã‡alÄ±ÅŸtÄ±r
+SÄ±rasÄ±yla: Fix01 â†’ Fix02 â†’ Fix03 â†’ Fix04 â†’ Fix05
+Her aÅŸama sonrasÄ± rapor yazar, hata olursa durur.
 
-Kullanım:
+KullanÄ±m:
   python master_fix.py [proje_koku]
   python master_fix.py [proje_koku] --sadece 1,3,4
   python master_fix.py [proje_koku] --atla 3
@@ -28,27 +28,27 @@ class C:
 
 
 def hdr(t):
-    print(f"\n{C.BOLD}{'█'*60}\n  {t}\n{'█'*60}{C.RESET}")
+    print(f"\n{C.BOLD}{'â–ˆ'*60}\n  {t}\n{'â–ˆ'*60}{C.RESET}")
 
 
 def ok(m):
-    print(f"  {C.GRN}✅ {m}{C.RESET}")
+    print(f"  {C.GRN}âœ… {m}{C.RESET}")
 
 
 def warn(m):
-    print(f"  {C.YEL}⚠️  {m}{C.RESET}")
+    print(f"  {C.YEL}âš ï¸  {m}{C.RESET}")
 
 
 def err(m):
-    print(f"  {C.RED}❌ {m}{C.RESET}")
+    print(f"  {C.RED}âŒ {m}{C.RESET}")
 
 
 FIXLER = [
     (1, "fix_01_sessiz_except.py", "Sessiz Except Temizleme (1,127 nokta)"),
     (2, "fix_02_all_ekle.py", "__all__ Ekleme (121 init)"),
     (3, "fix_03_coverage.py", "Coverage Kurulum & Test"),
-    (4, "fix_04_guvenlik.py", "Güvenlik Taraması"),
-    (5, "fix_05_cli_bolme.py", "cli.py Bölme Planı"),
+    (4, "fix_04_guvenlik.py", "GÃ¼venlik TaramasÄ±"),
+    (5, "fix_05_cli_bolme.py", "cli.py BÃ¶lme PlanÄ±"),
 ]
 
 
@@ -75,13 +75,13 @@ def fix_calistir(fix_no, script_adi, aciklama, kok, script_dizin):
     if not script_yolu.exists():
         return {"no": fix_no, "durum": "BULUNAMADI", "mesaj": str(script_yolu)}
 
-    hdr(f"FIX {fix_no:02d} — {aciklama}")
+    hdr(f"FIX {fix_no:02d} â€” {aciklama}")
 
     mesaj = f"pre-fix-{fix_no:02d}: {aciklama}"
     if git_commit_al(kok, mesaj):
         ok(f"Git commit: {mesaj}")
     else:
-        warn("Git commit alınamadı (devam ediliyor)")
+        warn("Git commit alÄ±namadÄ± (devam ediliyor)")
 
     t0 = time.time()
     try:
@@ -91,7 +91,7 @@ def fix_calistir(fix_no, script_adi, aciklama, kok, script_dizin):
         sure = round(time.time() - t0, 1)
         basarili = r.returncode == 0
         if basarili:
-            ok(f"FIX {fix_no:02d} tamamlandı ({sure}s)")
+            ok(f"FIX {fix_no:02d} tamamlandÄ± ({sure}s)")
         else:
             err(f"FIX {fix_no:02d} hata kodu {r.returncode} ({sure}s)")
 
@@ -117,7 +117,7 @@ def fix_calistir(fix_no, script_adi, aciklama, kok, script_dizin):
         err(f"FIX {fix_no:02d} TIMEOUT (300s)")
         return {"no": fix_no, "aciklama": aciklama, "durum": "TIMEOUT", "sure": 300}
     except Exception as exc:
-        err(f"FIX {fix_no:02d} istisnası: {exc}")
+        err(f"FIX {fix_no:02d} istisnasÄ±: {exc}")
         return {"no": fix_no, "aciklama": aciklama, "durum": "HATA", "mesaj": str(exc)}
 
 
@@ -132,7 +132,7 @@ def main():
             atla = {int(x) for x in sys.argv[i + 1].split(",")}
 
     hdr(
-        f"MASTER — ReYMeN Fix Koşucusu\nKök: {kok}\nTarih: {datetime.now().strftime('%Y-%m-%d %H:%M')}"
+        f"MASTER â€” ReYMeN Fix KoÅŸucusu\nKÃ¶k: {kok}\nTarih: {datetime.now().strftime('%Y-%m-%d %H:%M')}"
     )
     if sadece:
         print(f"  Sadece fix'ler: {sadece}")
@@ -145,20 +145,20 @@ def main():
 
     for fix_no, script_adi, aciklama in FIXLER:
         if sadece and fix_no not in sadece:
-            warn(f"FIX {fix_no:02d} — ATLANDI (--sadece)")
+            warn(f"FIX {fix_no:02d} â€” ATLANDI (--sadece)")
             continue
         if fix_no in atla:
-            warn(f"FIX {fix_no:02d} — ATLANDI (--atla)")
+            warn(f"FIX {fix_no:02d} â€” ATLANDI (--atla)")
             continue
         sonuc = fix_calistir(fix_no, script_adi, aciklama, kok, script_dizin)
         sonuclar.append(sonuc)
         if sonuc["durum"] == "HATA" and fix_no <= 2:
-            err("FIX {fix_no:02d} kritik hata — durduruluyor! git checkout -- .")
+            err("FIX {fix_no:02d} kritik hata â€” durduruluyor! git checkout -- .")
             break
 
     toplam_sure = round(time.time() - t0, 1)
     hdr("MASTER RAPOR")
-    print(f"\n  {'Fix':<6} {'Durum':<12} {'Süre':<10} Açıklama\n  {'─'*60}")
+    print(f"\n  {'Fix':<6} {'Durum':<12} {'SÃ¼re':<10} AÃ§Ä±klama\n  {'â”€'*60}")
     for s in sonuclar:
         renk = (
             C.GRN
@@ -168,26 +168,26 @@ def main():
         print(
             f"  {renk}FIX {s['no']:02d}  {s['durum']:<12} {str(s.get('sure','?'))+'s':<10} {s.get('aciklama','')}{C.RESET}"
         )
-    print(f"\n  Toplam süre: {toplam_sure}s")
+    print(f"\n  Toplam sÃ¼re: {toplam_sure}s")
 
     basarili = sum(1 for s in sonuclar if s["durum"] == "BASARILI")
     hata = sum(1 for s in sonuclar if s["durum"] == "HATA")
     timeout = sum(1 for s in sonuclar if s["durum"] == "TIMEOUT")
     print(
-        f"  Başarılı: {C.GRN}{basarili}{C.RESET}  Hata: {C.RED}{hata}{C.RESET}  Timeout: {C.YEL}{timeout}{C.RESET}"
+        f"  BaÅŸarÄ±lÄ±: {C.GRN}{basarili}{C.RESET}  Hata: {C.RED}{hata}{C.RESET}  Timeout: {C.YEL}{timeout}{C.RESET}"
     )
 
     for s in sonuclar:
         rapor = s.get("rapor", {})
         if rapor:
-            print(f"\n  {C.BOLD}FIX {s['no']:02d} Özet:{C.RESET}")
+            print(f"\n  {C.BOLD}FIX {s['no']:02d} Ã–zet:{C.RESET}")
             if s["no"] == 1:
                 print(
-                    f"    Düzeltme: {rapor.get('toplam_duzeltme','?')} sessiz except\n    Test geçen: {len(rapor.get('test_gecen',[]))}"
+                    f"    DÃ¼zeltme: {rapor.get('toplam_duzeltme','?')} sessiz except\n    Test geÃ§en: {len(rapor.get('test_gecen',[]))}"
                 )
             elif s["no"] == 2:
                 print(
-                    f"    Eklenen __all__: {len(rapor.get('islenen',[]))}\n    Zaten vardı: {len(rapor.get('zaten_var',[]))}"
+                    f"    Eklenen __all__: {len(rapor.get('islenen',[]))}\n    Zaten vardÄ±: {len(rapor.get('zaten_var',[]))}"
                 )
             elif s["no"] == 4:
                 for sev, sayi in rapor.get("ozet", {}).items():
@@ -204,11 +204,11 @@ def main():
     rapor_yolu = kok / "master_fix_rapor.json"
     with open(rapor_yolu, "w", encoding="utf-8") as fp:
         json.dump(master_rapor, fp, ensure_ascii=False, indent=2, default=str)
-    print(f"\n  {C.GRN}✅ Master rapor: {rapor_yolu}{C.RESET}")
+    print(f"\n  {C.GRN}âœ… Master rapor: {rapor_yolu}{C.RESET}")
     if hata == 0 and timeout == 0:
-        print(f"\n  {C.BOLD}{C.GRN}🎉 Tüm fix'ler başarıyla tamamlandı!{C.RESET}")
+        print(f"\n  {C.BOLD}{C.GRN}ğŸ‰ TÃ¼m fix'ler baÅŸarÄ±yla tamamlandÄ±!{C.RESET}")
     else:
-        print(f"\n  {C.YEL}⚠️  Bazı fix'lerde sorun var — raporları kontrol et{C.RESET}")
+        print(f"\n  {C.YEL}âš ï¸  BazÄ± fix'lerde sorun var â€” raporlarÄ± kontrol et{C.RESET}")
 
 
 if __name__ == "__main__":

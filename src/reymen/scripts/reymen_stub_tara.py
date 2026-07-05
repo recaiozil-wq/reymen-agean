@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-"""reymen_stub_tara.py — ReYMeN'deki eksik/stub fonksiyonlari tara."""
+﻿#!/usr/bin/env python3
+"""reymen_stub_tara.py â€” ReYMeN'deki eksik/stub fonksiyonlari tara."""
 
 import ast
 import os

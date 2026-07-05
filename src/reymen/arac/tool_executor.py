@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-tool_executor.py — Tool executor module.
+tool_executor.py â€” Tool executor module.
 
 Safely executes tool calls,
 manages timeout and logs history.

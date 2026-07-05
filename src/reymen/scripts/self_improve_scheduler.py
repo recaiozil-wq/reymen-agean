@@ -1,15 +1,15 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-self_improve_scheduler.py — ReYMeN Autonomous Self-Improvement Scheduler.
+self_improve_scheduler.py â€” ReYMeN Autonomous Self-Improvement Scheduler.
 
 Manages ALL periodic self-improvement tasks from a SINGLE point:
 
-  1. self_improve_cron  → Every 6 hours: collect metrics, analyze, report
-  2. hafiza_budama      → Every 24 hours: clean old/unused memory
-  3. auto_budama        → Every 12 hours: automatic code pruning
-  4. skill_iyilestirme  → Every 24 hours: skill usage analysis + improvement
-  5. nudge_model        → Every 48 hours: user model summary + report
-  6. konusmadan_skill   → Every 6 hours: auto-extract skills from conversations
+  1. self_improve_cron  â†’ Every 6 hours: collect metrics, analyze, report
+  2. hafiza_budama      â†’ Every 24 hours: clean old/unused memory
+  3. auto_budama        â†’ Every 12 hours: automatic code pruning
+  4. skill_iyilestirme  â†’ Every 24 hours: skill usage analysis + improvement
+  5. nudge_model        â†’ Every 48 hours: user model summary + report
+  6. konusmadan_skill   â†’ Every 6 hours: auto-extract skills from conversations
 
 Usage:
     python -m reymen.scripts.self_improve_scheduler --run-all   # Run all
@@ -68,22 +68,22 @@ class KendiniGelistirScheduler:
         return kayit
 
     def tumunu_calistir(self) -> dict:
-        """Tüm self-improvement görevlerini sırayla çalıştır."""
+        """TÃ¼m self-improvement gÃ¶revlerini sÄ±rayla Ã§alÄ±ÅŸtÄ±r."""
         log.info("[SELF_IMPROVE] === Tum gorevler baslatiliyor ===")
 
         # 1. Self-improve metrik toplama
         self.gorev_calistir("self_improve", self._si_cron_cagir)
 
-        # 2. Hafıza budama (dry-run=False)
+        # 2. HafÄ±za budama (dry-run=False)
         self.gorev_calistir("hafiza_budama", self._hafiza_budama_cagir)
 
-        # 3. Skill iyileştirme
+        # 3. Skill iyileÅŸtirme
         self.gorev_calistir("skill_iyilestirme", self._skill_iyilestir_cagir)
 
         # 4. Proaktif kontrol durumu
         self.gorev_calistir("proaktif_kontrol", self._proaktif_durum_cagir)
 
-        # 5. Auto budama (kod budaması)
+        # 5. Auto budama (kod budamasÄ±)
         self.gorev_calistir("auto_budama", self._auto_budama_cagir)
 
         # 5. Nudge model raporu
@@ -96,7 +96,7 @@ class KendiniGelistirScheduler:
         return self.sonuc
 
     def _hafiza_budama_cagir(self) -> str:
-        """Hafıza budamayı çalıştırır."""
+        """HafÄ±za budamayÄ± Ã§alÄ±ÅŸtÄ±rÄ±r."""
         import importlib
 
         try:
@@ -123,7 +123,7 @@ class KendiniGelistirScheduler:
             return f"[HATA] {e}"
 
     def _si_cron_cagir(self) -> str:
-        """Self-improve cron metriklerini çalıştırır."""
+        """Self-improve cron metriklerini Ã§alÄ±ÅŸtÄ±rÄ±r."""
         import subprocess
 
         r = subprocess.run(
@@ -137,7 +137,7 @@ class KendiniGelistirScheduler:
         return r.stdout[:200] or r.stderr[:200] or "tamam"
 
     def _skill_iyilestir_cagir(self) -> str:
-        """Skill iyileştirme sistemini çalıştırır."""
+        """Skill iyileÅŸtirme sistemini Ã§alÄ±ÅŸtÄ±rÄ±r."""
         from reymen.scripts.skill_iyilestirici import SkillIyilestirici
 
         iyilestirici = SkillIyilestirici()
@@ -152,7 +152,7 @@ class KendiniGelistirScheduler:
         return "Iyilestirme adayi bulunamadi"
 
     def _auto_budama_cagir(self) -> str:
-        """Kod budama sistemini çalıştırır."""
+        """Kod budama sistemini Ã§alÄ±ÅŸtÄ±rÄ±r."""
         try:
             from reymen.cereyan.auto_budama import AutoBudama
 
@@ -165,7 +165,7 @@ class KendiniGelistirScheduler:
             return "[ATLANDI] auto_budama modulu yok"
 
     def _nudge_raporu_cagir(self) -> str:
-        """Nudge model raporunu oluşturur."""
+        """Nudge model raporunu oluÅŸturur."""
         try:
             from reymen.cereyan.nudge_model import NudgeModel
 
@@ -176,7 +176,7 @@ class KendiniGelistirScheduler:
             return "[ATLANDI] nudge_model modulu yok"
 
     def _proaktif_durum_cagir(self) -> str:
-        """Proaktif kontrol durum raporunu alır."""
+        """Proaktif kontrol durum raporunu alÄ±r."""
         try:
             from reymen.cereyan.proaktif_kontrol import proaktif_baslat
 
@@ -200,14 +200,14 @@ class KendiniGelistirScheduler:
             )
 
     def durum_goster(self) -> str:
-        """Kayıtlı durumu göster."""
+        """KayÄ±tlÄ± durumu gÃ¶ster."""
         if not DURUM_DOSYASI.exists():
-            return "Henüz çalıştırılmamış."
+            return "HenÃ¼z Ã§alÄ±ÅŸtÄ±rÄ±lmamÄ±ÅŸ."
         with open(DURUM_DOSYASI, "r", encoding="utf-8") as f:
             data = json.load(f)
-        lines = [f"Son güncelleme: {data.get('son_guncelleme', '?')}"]
+        lines = [f"Son gÃ¼ncelleme: {data.get('son_guncelleme', '?')}"]
         for ad, kayit in data.get("gorevler", {}).items():
-            durum = "✅" if kayit.get("basarili") else "❌"
+            durum = "âœ…" if kayit.get("basarili") else "âŒ"
             lines.append(
                 f"  {durum} {ad}: {kayit.get('mesaj', '')} ({kayit.get('sure_sn', '?')}s)"
             )
@@ -215,7 +215,7 @@ class KendiniGelistirScheduler:
 
 
 def main():
-    """Komut satırı giriş noktası."""
+    """Komut satÄ±rÄ± giriÅŸ noktasÄ±."""
     logging.basicConfig(level=logging.INFO, format="[SI] %(message)s")
 
     if "--run-all" in sys.argv:
@@ -226,7 +226,7 @@ def main():
         scheduler = KendiniGelistirScheduler()
         print(scheduler.durum_goster())
     else:
-        print("Kullanım:")
+        print("KullanÄ±m:")
         print("  python -m reymen.scripts.self_improve_scheduler --run-all")
         print("  python -m reymen.scripts.self_improve_scheduler --status")
 

@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-durum_guncelle.py — Her gece 21:00'de calisir.
+durum_guncelle.py â€” Her gece 21:00'de calisir.
 Kod kalitesi metriklerini toplar, durum.json'a yazar.
 """
 
@@ -151,7 +151,7 @@ def main():
             if kilitli:
                 _kilidi_ac()
 
-        print(f"[OK] durum.json guncellendi — {time.strftime('%Y-%m-%d %H:%M')}")
+        print(f"[OK] durum.json guncellendi â€” {time.strftime('%Y-%m-%d %H:%M')}")
         print(f"  Dosya: {kod['toplam_dosya']}, Satir: {kod['toplam_satir']}")
         print(f"  Test: {kod['test_dosyasi']} (%{kod['test_orani']*100:.1f})")
         print(f"  except_pass: {kod['except_pass']}")

@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""gateway.platforms.telegram — Telegram platform adaptörü."""
+﻿# -*- coding: utf-8 -*-
+"""gateway.platforms.telegram â€” Telegram platform adaptÃ¶rÃ¼."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ def check_telegram_requirements() -> bool:
 
 
 class TelegramAdapter(BasePlatformAdapter):
-    """Telegram Bot API adaptörü."""
+    """Telegram Bot API adaptÃ¶rÃ¼."""
 
     platform = "telegram"
 

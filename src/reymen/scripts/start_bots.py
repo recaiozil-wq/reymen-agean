@@ -1,4 +1,4 @@
-"""start_bots.py — Tüm Telegram botlarini temiz baslat."""
+﻿"""start_bots.py â€” TÃ¼m Telegram botlarini temiz baslat."""
 
 import json
 import os
@@ -11,7 +11,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 PROJE_KOK = Path(__file__).resolve().parent.parent.parent
-HERMES_BASE = Path.home() / "AppData" / "Local" / "hermes" / "profiles"
+REYMEN_BASE = Path.home() / "AppData" / "Local" / "reymen" / "profiles"
 
 BOTLAR = [
     {"ad": "Pasa_38", "profil": "default"},
@@ -21,7 +21,7 @@ BOTLAR = [
 
 
 def token_oku(profil):
-    env_yolu = HERMES_BASE / profil / ".env"
+    env_yolu = REYMEN_BASE / profil / ".env"
     if not env_yolu.exists():
         return ""
     for satir in env_yolu.read_text(encoding="utf-8").splitlines():
@@ -38,20 +38,20 @@ def bot_baslat(bot_info):
     token = token_oku(profil)
 
     if not token:
-        print(f"[{ad}] ❌ Token bulunamadi!")
+        print(f"[{ad}] âŒ Token bulunamadi!")
         return False
 
     venv_python = PROJE_KOK / "venv" / "Scripts" / "python.exe"
     script = PROJE_KOK / "reymen" / "ag" / "telegram_bot.py"
 
     if not venv_python.exists():
-        print(f"[{ad}] ❌ venv Python bulunamadi: {venv_python}")
+        print(f"[{ad}] âŒ venv Python bulunamadi: {venv_python}")
         return False
 
     env = os.environ.copy()
     env["TELEGRAM_BOT_TOKEN"] = token
-    env["HERMES_PROFILE"] = profil
-    env["HERMES_GATEWAY"] = "http"
+    env["REYMEN_PROFILE"] = profil
+    env["REYMEN_GATEWAY"] = "http"
 
     log_yolu = PROJE_KOK / ".ReYMeN" / f"{ad.lower()}_bot.log"
     log_yolu.parent.mkdir(parents=True, exist_ok=True)
@@ -70,14 +70,14 @@ def bot_baslat(bot_info):
         creationflags=subprocess.DETACHED_PROCESS | subprocess.CREATE_NO_WINDOW,
     )
 
-    print(f"[{ad}] ✅ Baslatildi (PID: {proc.pid}) — token: ...{token[-6:]}")
+    print(f"[{ad}] âœ… Baslatildi (PID: {proc.pid}) â€” token: ...{token[-6:]}")
     return True
 
 
 def main():
     # Once tum eski botlari oldur
     print("=" * 50)
-    print("ReYMeN Bot Supervisor — Temiz Baslatma")
+    print("ReYMeN Bot Supervisor â€” Temiz Baslatma")
     print("=" * 50)
 
     # Tum webhook'lari temizle
@@ -96,11 +96,11 @@ def main():
                 with urllib.request.urlopen(req, timeout=10) as r:
                     sonuc = json.loads(r.read())
                 if sonuc.get("ok"):
-                    print(f"  [{bot['ad']}] ✅ Webhook temiz")
+                    print(f"  [{bot['ad']}] âœ… Webhook temiz")
                 else:
-                    print(f"  [{bot['ad']}] ⚠️ {sonuc}")
+                    print(f"  [{bot['ad']}] âš ï¸ {sonuc}")
             except Exception as e:
-                print(f"  [{bot['ad']}] ❌ {e}")
+                print(f"  [{bot['ad']}] âŒ {e}")
 
     # Botlari baslat
     print("\n2) Botlar baslatiliyor...")

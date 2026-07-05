@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
 3000 soru testi - Hafif surum, direkt DeepSeek API cagrisi.
 Background'da calisir, her 50 soruda log basar.
@@ -16,7 +16,7 @@ if not API_KEY:
         Path(".env"),
         Path("../.env"),
         Path.home() / ".config/reymen/.env",
-        Path.home() / "AppData/Local/hermes/profiles/reymen/.env",
+        Path.home() / "AppData/Local/reymen/profiles/reymen/.env",
     ]:
         if p.exists():
             for line in p.read_text(encoding="utf-8").splitlines():
@@ -294,7 +294,7 @@ def main():
     print("=" * 60, flush=True)
 
     if not API_KEY:
-        print("  ❌ DEEPSEEK_API_KEY bulunamadi!", flush=True)
+        print("  âŒ DEEPSEEK_API_KEY bulunamadi!", flush=True)
         return
     print(f"  API Key: {API_KEY[:8]}...{API_KEY[-4:]}", flush=True)
 
@@ -355,7 +355,7 @@ def main():
             hiz = (idx + 1) / (gecen / 60)
             kalan = (len(sorular) - idx - 1) / hiz if hiz > 0 else 0
             print(
-                f"  [{idx+1}/{len(sorular)}] ✅{basarili} ❌{basarisiz} | {hiz:.0f} soru/dk | kalan: {kalan:.0f}dk",
+                f"  [{idx+1}/{len(sorular)}] âœ…{basarili} âŒ{basarisiz} | {hiz:.0f} soru/dk | kalan: {kalan:.0f}dk",
                 flush=True,
             )
 
@@ -396,20 +396,20 @@ def main():
     )
 
     print("\n" + "=" * 60, flush=True)
-    print(f"  ✅ 3000 SORU TESTI TAMAMLANDI", flush=True)
+    print(f"  âœ… 3000 SORU TESTI TAMAMLANDI", flush=True)
     print("=" * 60, flush=True)
     print(f"  Toplam:      {rapor['toplam_soru']}", flush=True)
     print(
-        f"  ✅ Basarili:  {rapor['basarili']} ({rapor['basarili_orani']})", flush=True
+        f"  âœ… Basarili:  {rapor['basarili']} ({rapor['basarili_orani']})", flush=True
     )
-    print(f"  ❌ Basarisiz: {rapor['basarisiz']}", flush=True)
-    print(f"  ⏱ Sure:       {rapor['toplam_sure_sn']}sn", flush=True)
-    print(f"  📈 Hiz:       {rapor['soru_hizi']}", flush=True)
-    print(f"  ⚡ Ortalama:  {rapor['ortalama_soru_suresi_sn']}sn/soru", flush=True)
-    print(f"\n  🔴 Hata Turleri:", flush=True)
+    print(f"  âŒ Basarisiz: {rapor['basarisiz']}", flush=True)
+    print(f"  â± Sure:       {rapor['toplam_sure_sn']}sn", flush=True)
+    print(f"  ğŸ“ˆ Hiz:       {rapor['soru_hizi']}", flush=True)
+    print(f"  âš¡ Ortalama:  {rapor['ortalama_soru_suresi_sn']}sn/soru", flush=True)
+    print(f"\n  ğŸ”´ Hata Turleri:", flush=True)
     for ht, sayi in sorted(hata_turleri.items(), key=lambda x: -x[1])[:10]:
         print(f"    {ht}: {sayi}", flush=True)
-    print(f"\n  📂 Rapor: {RAPOR_DOSYASI}", flush=True)
+    print(f"\n  ğŸ“‚ Rapor: {RAPOR_DOSYASI}", flush=True)
     print("=" * 60, flush=True)
 
 

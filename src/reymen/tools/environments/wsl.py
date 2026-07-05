@@ -1,4 +1,4 @@
-"""ReYMeN tools.environments.wsl shim — Hermes WSL ortamını yönlendirir."""
+﻿"""ReYMeN tools.environments.wsl shim â€” ReYMeN WSL ortamÄ±nÄ± yÃ¶nlendirir."""
 
 from __future__ import annotations
 
@@ -8,6 +8,6 @@ logger = logging.getLogger(__name__)
 
 
 class WSLEnvironment:
-    """Hermes WSLEnvironment — ReYMeN'de stub."""
+    """ReYMeN WSLEnvironment â€” ReYMeN'de stub."""
 
     pass

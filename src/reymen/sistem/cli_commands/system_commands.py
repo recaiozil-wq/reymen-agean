@@ -1,7 +1,7 @@
-"""Sistem komutları — MixinCommands alt modülü.
+﻿"""Sistem komutlarÄ± â€” MixinCommands alt modÃ¼lÃ¼.
 
-Bu dosya otomatik olarak cli_mixin_commands.py'den ayrılmıştır.
-MixinCommands sınıfının ilgili metotlarını içerir.
+Bu dosya otomatik olarak cli_mixin_commands.py'den ayrÄ±lmÄ±ÅŸtÄ±r.
+MixinCommands sÄ±nÄ±fÄ±nÄ±n ilgili metotlarÄ±nÄ± iÃ§erir.
 """
 
 import logging
@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 
 class MixinCommands:
-    """Sistem komutları."""
+    """Sistem komutlarÄ±."""
 
     def process_command(self, command: str) -> bool:
         """
@@ -72,7 +72,7 @@ class MixinCommands:
                 self._delete_session_on_exit = True
             elif _args:
                 _cprint(
-                    f"  {_DIM}✗ Unknown argument: {_escape(_args)}. Use /exit --delete to also remove session history.{_RST}"
+                    f"  {_DIM}âœ— Unknown argument: {_escape(_args)}. Use /exit --delete to also remove session history.{_RST}"
                 )
                 return True
             return False
@@ -91,7 +91,7 @@ class MixinCommands:
             # tab switches, subshell ``clear``, SSH window restores, etc.
             # See issue #8688 (cmux). Ctrl+L is bound to the same helper.
             self._force_full_redraw()
-            _cprint(f"  {_DIM}✓ UI redrawn{_RST}")
+            _cprint(f"  {_DIM}âœ“ UI redrawn{_RST}")
         elif canonical == "clear":
             if (
                 self._confirm_destructive_slash(
@@ -147,7 +147,7 @@ class MixinCommands:
                         context_length=ctx_len,
                     )
                 _cprint(
-                    "  ✨ (◕‿◕)✨ Fresh start! Screen cleared and conversation reset.\n"
+                    "  âœ¨ (â—•â€¿â—•)âœ¨ Fresh start! Screen cleared and conversation reset.\n"
                 )
                 # Show a random tip on new session
                 try:
@@ -162,13 +162,13 @@ class MixinCommands:
                         )
                     except Exception:
                         _tip_color = "#B8860B"
-                    cc.print(f"[dim {_tip_color}]✦ Tip: {_tip}[/]")
+                    cc.print(f"[dim {_tip_color}]âœ¦ Tip: {_tip}[/]")
                 except Exception:
                     logger.warning("[fix_01_sessiz_except] Exception")
             else:
                 self.show_banner()
                 print(
-                    "  ✨ (◕‿◕)✨ Fresh start! Screen cleared and conversation reset.\n"
+                    "  âœ¨ (â—•â€¿â—•)âœ¨ Fresh start! Screen cleared and conversation reset.\n"
                 )
                 # Show a random tip on new session
                 try:
@@ -183,7 +183,7 @@ class MixinCommands:
                         )
                     except Exception:
                         _tip_color = "#B8860B"
-                    self._console_print(f"[dim {_tip_color}]✦ Tip: {_tip}[/]")
+                    self._console_print(f"[dim {_tip_color}]âœ¦ Tip: {_tip}[/]")
                 except Exception:
                     logger.warning("[fix_01_sessiz_except] Exception")
         elif canonical == "history":
@@ -207,7 +207,7 @@ class MixinCommands:
                                 "  Title is empty after cleanup. Please use printable characters."
                             )
                         elif self._session_db.get_session(self.session_id):
-                            # Session exists in DB — set title directly
+                            # Session exists in DB â€” set title directly
                             try:
                                 if self._session_db.set_session_title(
                                     self.session_id, new_title
@@ -218,7 +218,7 @@ class MixinCommands:
                             except ValueError as e:
                                 _cprint(f"  {e}")
                         else:
-                            # Session not created yet — defer the title
+                            # Session not created yet â€” defer the title
                             # Check uniqueness proactively with the sanitized title
                             existing = self._session_db.get_session_by_title(new_title)
                             if existing:
@@ -292,7 +292,7 @@ class MixinCommands:
                 # Re-queue the message so process_loop sends it to the agent
                 self._pending_input.put(retry_msg)
         elif canonical == "undo":
-            # Parse optional turn count: "/undo" → 1, "/undo 3" → 3.
+            # Parse optional turn count: "/undo" â†’ 1, "/undo 3" â†’ 3.
             _undo_n = 1
             _undo_parts = cmd_original.split()
             if len(_undo_parts) > 1:
@@ -300,7 +300,7 @@ class MixinCommands:
                     _undo_n = int(_undo_parts[1])
                 except ValueError:
                     print(
-                        f"(._.) Invalid count {_undo_parts[1]!r} — use /undo or /undo N."
+                        f"(._.) Invalid count {_undo_parts[1]!r} â€” use /undo or /undo N."
                     )
                     return
                 if _undo_n < 1:
@@ -399,7 +399,7 @@ class MixinCommands:
                 else:
                     print(f"Plugins ({len(plugins)}):")
                     for p in plugins:
-                        status = "✓" if p["enabled"] else "✗"
+                        status = "âœ“" if p["enabled"] else "âœ—"
                         version = f" v{p['version']}" if p["version"] else ""
                         tools = f"{p['tools']} tools" if p["tools"] else ""
                         hooks = f"{p['hooks']} hooks" if p["hooks"] else ""
@@ -408,7 +408,7 @@ class MixinCommands:
                         )
                         parts = [x for x in [tools, hooks, commands] if x]
                         detail = f" ({', '.join(parts)})" if parts else ""
-                        error = f" — {p['error']}" if p["error"] else ""
+                        error = f" â€” {p['error']}" if p["error"] else ""
                         print(f"  {status} {p['name']}{version}{detail}{error}")
             except Exception as e:
                 print(f"Plugin system error: {e}")
@@ -441,7 +441,7 @@ class MixinCommands:
         elif canonical == "steer":
             # Inject a message after the next tool call without interrupting.
             # If the agent is actively running, push the text into the agent's
-            # pending_steer slot — the drain hook in _execute_tool_calls_*
+            # pending_steer slot â€” the drain hook in _execute_tool_calls_*
             # will append it to the next tool result's content. If no agent
             # is running, fall back to queue semantics (same as /queue).
             parts = cmd_original.split(None, 1)
@@ -460,12 +460,12 @@ class MixinCommands:
                 else:
                     if accepted:
                         _cprint(
-                            f"  ⏩ Steer queued — arrives after the next tool call: {payload[:80]}{'...' if len(payload) > 80 else ''}"
+                            f"  â© Steer queued â€” arrives after the next tool call: {payload[:80]}{'...' if len(payload) > 80 else ''}"
                         )
                     else:
                         _cprint("  Steer rejected (empty payload).")
             else:
-                # No active run — treat as a normal next-turn message.
+                # No active run â€” treat as a normal next-turn message.
                 self._pending_input.put(payload)
                 _cprint(
                     f"  No agent running; queued as next turn: {payload[:80]}{'...' if len(payload) > 80 else ''}"
@@ -556,7 +556,7 @@ class MixinCommands:
                             _cprint(str(result))
                     except Exception as e:
                         _cprint(f"\033[1;31mPlugin command error: {e}{_RST}")
-            # Skill bundles take precedence over individual skills — /<bundle>
+            # Skill bundles take precedence over individual skills â€” /<bundle>
             # loads multiple skills at once. Rescans cheaply when files change.
             elif base_cmd in skill_bundles:
                 user_instruction = cmd_original[len(base_cmd) :].strip()
@@ -567,7 +567,7 @@ class MixinCommands:
                     msg, loaded_names, missing = bundle_result
                     bundle_info = skill_bundles[base_cmd]
                     print(
-                        f"\n⚡ Loading bundle: {bundle_info['name']} "
+                        f"\nâš¡ Loading bundle: {bundle_info['name']} "
                         f"({len(loaded_names)} skills)"
                     )
                     if missing:
@@ -588,7 +588,7 @@ class MixinCommands:
                 )
                 if msg:
                     skill_name = skill_commands[base_cmd]["name"]
-                    print(f"\n⚡ Loading skill: {skill_name}")
+                    print(f"\nâš¡ Loading skill: {skill_name}")
                     if hasattr(self, "_pending_input"):
                         self._pending_input.put(msg)
                 else:
@@ -611,7 +611,7 @@ class MixinCommands:
                         matches = exact
                     else:
                         # Prefer the unique shortest match:
-                        # /qui → /quit (5) wins over /quint-pipeline (15)
+                        # /qui â†’ /quit (5) wins over /quint-pipeline (15)
                         min_len = min(len(c) for c in matches)
                         shortest = [c for c in matches if len(c) == min_len]
                         if len(shortest) == 1:
@@ -623,7 +623,7 @@ class MixinCommands:
                     # (e.g. /config with extra args that are not yet handled above).
                     full_name = matches[0]
                     if full_name == typed_base:
-                        # Already an exact token — no expansion possible; fall through
+                        # Already an exact token â€” no expansion possible; fall through
                         _cprint(f"\033[1;31mUnknown command: {cmd_lower}{_RST}")
                         _cprint(
                             f"{_DIM}{_ACCENT}Type /help for available commands{_RST}"
@@ -662,7 +662,7 @@ class MixinCommands:
         Subgoals are extra criteria the user adds mid-loop. They get
         appended to both the judge prompt (verdict must consider them)
         and the continuation prompt (agent sees them) on the next turn
-        boundary. No special kick — the running turn finishes, the next
+        boundary. No special kick â€” the running turn finishes, the next
         judge call includes them.
 
         Delegates to :func:`handlers.system.subgoal_handler._handle_subgoal_command`.
@@ -674,7 +674,7 @@ class MixinCommands:
     def _maybe_continue_goal_after_turn(self) -> None:
         """Hook run after every CLI turn. Judges + maybe re-queues.
 
-        Safe to call when no goal is set — returns quickly.
+        Safe to call when no goal is set â€” returns quickly.
 
         Preemption is automatic: if a real user message is already in
         ``_pending_input`` we skip judging (the user's new input takes
@@ -684,7 +684,7 @@ class MixinCommands:
 
         Interrupt handling: if the turn was user-cancelled (Ctrl+C), we
         AUTO-PAUSE the goal instead of judging + re-queuing. Otherwise
-        Ctrl+C feels like it did nothing — the judge runs on whatever
+        Ctrl+C feels like it did nothing â€” the judge runs on whatever
         partial output landed, almost always says "continue", and the
         loop keeps going. Auto-pause keeps the goal recoverable via
         ``/goal resume`` once the user has sorted out what they want.
@@ -696,12 +696,12 @@ class MixinCommands:
             return
 
         # If a real user message is already queued, don't inject a
-        # continuation prompt on top — let the user's turn go first.
+        # continuation prompt on top â€” let the user's turn go first.
         # Slash commands don't count as "real user messages" for this
         # check: they're inspection/mutation (e.g. /subgoal added mid-
         # run) and the process_loop dispatches them via process_command,
         # not via chat(). If we treat a queued /subgoal as preempting,
-        # the goal loop silently stalls — we'd return here, then the
+        # the goal loop silently stalls â€” we'd return here, then the
         # slash command consumes its queue slot via process_command()
         # which never re-fires the goal hook. Peek at all queued entries
         # and only defer when there's a non-slash payload.
@@ -710,7 +710,7 @@ class MixinCommands:
             if pending is not None and not pending.empty():
                 has_real_message = False
                 try:
-                    # Queue.queue is the underlying deque — direct peek
+                    # Queue.queue is the underlying deque â€” direct peek
                     # without disturbing FIFO order.
                     for entry in list(pending.queue):
                         # Bundled payloads are (text, images) tuples;
@@ -741,7 +741,7 @@ class MixinCommands:
             except Exception as exc:
                 logging.debug("goal pause-on-interrupt failed: %s", exc)
             _cprint(
-                f"  {_DIM}⏸ Goal paused — turn was interrupted. "
+                f"  {_DIM}â¸ Goal paused â€” turn was interrupted. "
                 f"Use /goal resume to continue, or /goal clear to stop.{_RST}"
             )
             return
@@ -754,7 +754,7 @@ class MixinCommands:
                 if msg.get("role") == "assistant":
                     content = msg.get("content", "")
                     if isinstance(content, list):
-                        # Multimodal content — flatten text parts.
+                        # Multimodal content â€” flatten text parts.
                         parts = [
                             p.get("text", "")
                             for p in content
@@ -789,7 +789,7 @@ class MixinCommands:
                     logging.debug("goal continuation enqueue failed: %s", exc)
 
     def _handle_debug_command(self):
-        """Handle /debug — upload debug report + logs and print paste URLs.
+        """Handle /debug â€” upload debug report + logs and print paste URLs.
 
         Delegates to :func:`handlers.system.debug_handler._handle_debug_command`.
         """
@@ -798,7 +798,7 @@ class MixinCommands:
         _handle_debug_command(self)
 
     def _handle_update_command(self) -> bool:
-        """Handle /update — update ReYMeN Agent to the latest version.
+        """Handle /update â€” update ReYMeN Agent to the latest version.
 
         In the classic CLI this exits the session and relaunches as
         ``ReYMeN update`` so the user sees update output directly and gets

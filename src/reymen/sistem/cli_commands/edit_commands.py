@@ -1,7 +1,7 @@
-"""Düzenleme komutları — MixinCommands alt modülü.
+﻿"""DÃ¼zenleme komutlarÄ± â€” MixinCommands alt modÃ¼lÃ¼.
 
-Bu dosya otomatik olarak cli_mixin_commands.py'den ayrılmıştır.
-MixinCommands sınıfının ilgili metotlarını içerir.
+Bu dosya otomatik olarak cli_mixin_commands.py'den ayrÄ±lmÄ±ÅŸtÄ±r.
+MixinCommands sÄ±nÄ±fÄ±nÄ±n ilgili metotlarÄ±nÄ± iÃ§erir.
 """
 
 import logging
@@ -31,10 +31,10 @@ logger = logging.getLogger(__name__)
 
 
 class MixinCommands:
-    """Düzenleme komutları."""
+    """DÃ¼zenleme komutlarÄ±."""
 
     def _handle_rollback_command(self, command: str):
-        """Handle /rollback — list, diff, or restore filesystem checkpoints.
+        """Handle /rollback â€” list, diff, or restore filesystem checkpoints.
 
         Delegates to :func:`handlers.edit.rollback_handler._handle_rollback_command`.
         """
@@ -43,7 +43,7 @@ class MixinCommands:
         _handle_rollback_command(self, command)
 
     def _handle_snapshot_command(self, command: str):
-        """Handle /snapshot — lightweight state snapshots for ReYMeN config/state.
+        """Handle /snapshot â€” lightweight state snapshots for ReYMeN config/state.
 
         Delegates to :func:`handlers.edit.snapshot_handler._handle_snapshot_command`.
         """
@@ -52,7 +52,7 @@ class MixinCommands:
         _handle_snapshot_command(self, command)
 
     def _handle_stop_command(self):
-        """Handle /stop — kill all running background processes.
+        """Handle /stop â€” kill all running background processes.
 
         Delegates to :func:`handlers.edit.stop_handler._handle_stop_command`.
         """
@@ -61,7 +61,7 @@ class MixinCommands:
         _handle_stop_command(self)
 
     def _handle_agents_command(self):
-        """Handle /agents — show background processes and agent status.
+        """Handle /agents â€” show background processes and agent status.
 
         Delegates to :func:`handlers.edit.agents_handler._handle_agents_command`.
         """
@@ -70,7 +70,7 @@ class MixinCommands:
         _handle_agents_command(self)
 
     def _handle_paste_command(self):
-        """Handle /paste — explicitly check clipboard for an image.
+        """Handle /paste â€” explicitly check clipboard for an image.
 
         Delegates to :func:`handlers.edit.paste_handler._handle_paste_command`.
         """
@@ -127,7 +127,7 @@ class MixinCommands:
             )
 
     def _handle_copy_command(self, cmd_original: str) -> None:
-        """Handle /copy [number] — copy assistant output to clipboard.
+        """Handle /copy [number] â€” copy assistant output to clipboard.
 
         Delegates to :func:`handlers.edit.copy_handler._handle_copy_command`.
         """
@@ -136,7 +136,7 @@ class MixinCommands:
         _handle_copy_command(self, cmd_original)
 
     def _handle_image_command(self, cmd_original: str):
-        """Handle /image <path> — attach a local image file for the next prompt.
+        """Handle /image <path> â€” attach a local image file for the next prompt.
 
         Delegates to :func:`handlers.edit.image_handler._handle_image_command`.
         """
@@ -152,7 +152,7 @@ class MixinCommands:
         Instead of embedding raw base64 ``image_url`` content parts in the
         conversation (which only works with vision-capable models), this
         pre-processes each image through the auxiliary vision model (Gemini
-        Flash) and prepends the descriptions to the user's message — the
+        Flash) and prepends the descriptions to the user's message â€” the
         same approach the messaging gateway uses.
 
         The local file path is included so the agent can re-examine the
@@ -173,7 +173,7 @@ class MixinCommands:
                 continue
             size_kb = img_path.stat().st_size // 1024
             if announce:
-                _cprint(f"  {_DIM}👁️  analyzing {img_path.name} ({size_kb}KB)...{_RST}")
+                _cprint(f"  {_DIM}ğŸ‘ï¸  analyzing {img_path.name} ({size_kb}KB)...{_RST}")
             try:
                 result_json = _asyncio.run(
                     vision_analyze_tool(
@@ -189,7 +189,7 @@ class MixinCommands:
                         f"image_url: {img_path}]"
                     )
                     if announce:
-                        _cprint(f"  {_DIM}✓ image analyzed{_RST}")
+                        _cprint(f"  {_DIM}âœ“ image analyzed{_RST}")
                 else:
                     enriched_parts.append(
                         f"[The user attached an image but it couldn't be analyzed. "
@@ -198,7 +198,7 @@ class MixinCommands:
                     )
                     if announce:
                         _cprint(
-                            f"  {_DIM}⚠ vision analysis failed — path included for retry{_RST}"
+                            f"  {_DIM}âš  vision analysis failed â€” path included for retry{_RST}"
                         )
             except Exception as e:
                 enriched_parts.append(
@@ -208,7 +208,7 @@ class MixinCommands:
                 )
                 if announce:
                     _cprint(
-                        f"  {_DIM}⚠ vision analysis error — path included for retry{_RST}"
+                        f"  {_DIM}âš  vision analysis error â€” path included for retry{_RST}"
                     )
 
         # Combine: vision descriptions first, then the user's original text
@@ -301,12 +301,12 @@ class MixinCommands:
         turns, it backs up to the oldest one.
 
         Beyond the in-memory ``conversation_history`` slice, this also:
-          • soft-deletes the truncated rows in SessionDB (``active=0``) so
+          â€¢ soft-deletes the truncated rows in SessionDB (``active=0``) so
             they're hidden from re-prompts and search but kept for audit;
-          • notifies memory providers via ``on_session_switch(rewound=True)``;
-          • mirrors /branch's agent surgery (system-prompt invalidation +
+          â€¢ notifies memory providers via ``on_session_switch(rewound=True)``;
+          â€¢ mirrors /branch's agent surgery (system-prompt invalidation +
             flush-index reset);
-          • when ``prefill`` is set and an input buffer is available,
+          â€¢ when ``prefill`` is set and an input buffer is available,
             pre-fills the composer with the backed-up message text so it
             can be edited and resubmitted.
 
@@ -359,7 +359,7 @@ class MixinCommands:
                         self.session_id, target_id
                     )
                     rewound_rows = result.get("rewound_count", 0)
-                    # Prefer the DB's decoded target text for the prefill —
+                    # Prefer the DB's decoded target text for the prefill â€”
                     # it's the canonical persisted copy.
                     db_text = self._undo_content_to_text(
                         (result.get("target_message") or {}).get("content")
@@ -367,7 +367,7 @@ class MixinCommands:
                     if db_text:
                         removed_text = db_text
             except ValueError as e:
-                # Non-user target / cross-session — keep the in-memory undo
+                # Non-user target / cross-session â€” keep the in-memory undo
                 # but skip the soft-delete; surface a debug-level note.
                 logger.debug("undo: soft-delete skipped: %s", e)
             except Exception as e:
@@ -386,7 +386,7 @@ class MixinCommands:
                     self.agent._last_flushed_db_idx = len(self.conversation_history)
                 except Exception:
                     logger.warning("[fix_01_sessiz_except] Exception")
-            # Notify memory providers — same hook /branch fires, with the
+            # Notify memory providers â€” same hook /branch fires, with the
             # rewound flag so per-turn document caches invalidate (#6672, #21910).
             try:
                 _mm = getattr(self.agent, "_memory_manager", None)

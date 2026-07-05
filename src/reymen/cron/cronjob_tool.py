@@ -1,8 +1,8 @@
-"""
-ReYMeN Cron — schedule-based job runner tool.
+﻿"""
+ReYMeN Cron â€” schedule-based job runner tool.
 
 Hermes Agent (Nous Research, Apache 2.0) kaynak kodundan uyarlanmistir.
-Apache 2.0 License — Copyright 2026 ReYMeN Agent contributors.
+Apache 2.0 License â€” Copyright 2026 ReYMeN Agent contributors.
 """
 
 import json
@@ -12,12 +12,12 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
-from src.reymen.cron.hermes_stubs import display_hermes_home
+from reymen.sistem.reymen_stubs import display_hermes_home
 
 logger = logging.getLogger(__name__)
 
 # Import from our ReYMeN cron module
-from src.reymen.cron.jobs import (
+from reymen.cron.jobs import (
     AmbiguousJobReference,
     create_job,
     list_jobs,
@@ -33,7 +33,7 @@ from src.reymen.cron.jobs import (
 
 def _notify_provider_jobs_changed_safe() -> None:
     """Tell the active cron scheduler provider the job set changed (no-op for
-    the built-in). Best-effort — never lets a provider error break the tool."""
+    the built-in). Best-effort â€” never lets a provider error break the tool."""
     try:
         from cron.scheduler import _notify_provider_jobs_changed
 
@@ -50,16 +50,16 @@ def _notify_provider_jobs_changed_safe() -> None:
 # Two threat surfaces, two scanners:
 #
 #   1. User-supplied cron prompt (small, written as a directive).
-#      Strict scanning is appropriate — a legit cron prompt has no business
-#      saying "cat ~/.hermes/.env" or "rm -rf /". `_scan_cron_prompt()` runs
+#      Strict scanning is appropriate â€” a legit cron prompt has no business
+#      saying "cat ~/.reymen/.env" or "rm -rf /". `_scan_cron_prompt()` runs
 #      against this at create/update time and as a runtime defense-in-depth.
 #
 #   2. Assembled prompt that includes loaded skill content (large markdown
 #      bodies, often security docs, postmortems, runbooks discussing attack
 #      patterns in PROSE). Reusing the strict patterns here false-positives
-#      every time a skill *describes* a command — see #3968 follow-up: the
-#      `hermes-agent-dev` skill contains a security postmortem mentioning
-#      `cat ~/.hermes/.env`, which tripped `read_secrets` and silently
+#      every time a skill *describes* a command â€” see #3968 follow-up: the
+#      `reymen-agent-dev` skill contains a security postmortem mentioning
+#      `cat ~/.reymen/.env`, which tripped `read_secrets` and silently
 #      killed all PR-scout jobs.
 #
 #      Skill bodies are user-curated and scanned at install time by
@@ -73,7 +73,7 @@ def _notify_provider_jobs_changed_safe() -> None:
 # Both scanners share the invisible-unicode check and the GitHub Authorization
 # header exemption.
 
-# Strict patterns — applied to the user prompt only.
+# Strict patterns â€” applied to the user prompt only.
 _CRON_THREAT_PATTERNS = [
     (
         r"ignore\s+(?:\w+\s+)*(?:previous|all|above|prior)\s+(?:\w+\s+)*instructions",
@@ -91,7 +91,7 @@ _CRON_THREAT_PATTERNS = [
     (r"rm\s+-rf\s+/", "destructive_root_rm"),
 ]
 
-# Looser pattern set — applied to the assembled prompt when skills are
+# Looser pattern set â€” applied to the assembled prompt when skills are
 # attached. Only patterns whose phrasing is unambiguous in any context;
 # command-shape patterns are dropped because they false-positive on prose
 # in security docs / postmortems. Skill bodies are scanned at install time
@@ -148,7 +148,7 @@ _CRON_INVISIBLE_CHARS = {
 }
 
 # U+200D Zero-Width Joiner is also a legitimate, required part of many
-# Unicode emoji sequences (for example 👨‍👩‍👧, 🏳️‍🌈, ❤️‍🩹, 🧑‍💻).
+# Unicode emoji sequences (for example ğŸ‘¨â€ğŸ‘©â€ğŸ‘§, ğŸ³ï¸â€ğŸŒˆ, â¤ï¸â€ğŸ©¹, ğŸ§‘â€ğŸ’»).
 # We should still block ZWJ when it is hiding between plain text characters,
 # but not when it is clearly part of an emoji grapheme cluster.
 _EMOJI_NEIGHBOUR_CP_RANGES = (
@@ -230,7 +230,7 @@ def _strip_invisible_unicode(prompt: str) -> tuple[str, list[str]]:
     Returns ``(cleaned_prompt, removed_codepoints)`` where ``removed_codepoints``
     is the sorted list of ``U+XXXX`` labels that were stripped (empty when the
     prompt was already clean). Used by the skills-attached cron path, where the
-    skill body is already vetted at install time by ``skills_guard.py`` — a
+    skill body is already vetted at install time by ``skills_guard.py`` â€” a
     stray zero-width space in a code example should be sanitized, not turned
     into a hard block that permanently kills the job.
     """
@@ -244,7 +244,7 @@ def _strip_invisible_unicode(prompt: str) -> tuple[str, list[str]]:
     for idx, ch in enumerate(prompt):
         if ch in _CRON_INVISIBLE_CHARS:
             if ch == "\u200d" and _zwj_has_emoji_neighbour(prompt, idx):
-                cleaned.append(ch)  # legitimate emoji joiner — keep
+                cleaned.append(ch)  # legitimate emoji joiner â€” keep
                 continue
             removed.add(f"U+{ord(ch):04X}")
             continue
@@ -255,7 +255,7 @@ def _strip_invisible_unicode(prompt: str) -> tuple[str, list[str]]:
 def _scan_cron_prompt(prompt: str) -> str:
     """Scan the USER-SUPPLIED cron prompt for critical threats.
 
-    Strict pattern set — used at job create/update time and as a runtime
+    Strict pattern set â€” used at job create/update time and as a runtime
     defense-in-depth for prompts authored before the scanner existed.
     The user prompt is small and directive; bare `cat .env` or `rm -rf /`
     there is a smoking gun, not prose. Returns an error string when
@@ -277,7 +277,7 @@ def _scan_cron_prompt(prompt: str) -> str:
 def _scan_cron_skill_assembled(assembled: str) -> tuple[str, str]:
     """Scan an ASSEMBLED cron prompt that includes loaded skill content.
 
-    Looser pattern set — only catches unambiguous prompt-injection
+    Looser pattern set â€” only catches unambiguous prompt-injection
     directives. Drops command-shape patterns (cat .env, rm -rf /,
     authorized_keys, /etc/sudoers) because they false-positive on
     legitimate skill markdown that *describes* attack commands in
@@ -289,7 +289,7 @@ def _scan_cron_skill_assembled(assembled: str) -> tuple[str, str]:
     (common in copy-pasted unicode docs) should not permanently kill the
     job. The offending codepoints are stripped and logged, the cleaned
     prompt is returned. The hard block remains for raw user prompts via
-    ``_scan_cron_prompt`` — that path is the actual injection surface.
+    ``_scan_cron_prompt`` â€” that path is the actual injection surface.
 
     Returns ``(cleaned_prompt, error)``; ``error`` is empty when the
     prompt passed (after sanitization).
@@ -314,15 +314,15 @@ def _scan_cron_skill_assembled(assembled: str) -> tuple[str, str]:
 
 def _origin_from_env() -> Optional[Dict[str, str]]:
     try:
-        from reymen.cron.hermes_stubs import get_session_env
+        from reymen.sistem.reymen_stubs import get_session_env
 
-        origin_platform = get_session_env("HERMES_SESSION_PLATFORM")
-        origin_chat_id = get_session_env("HERMES_SESSION_CHAT_ID")
+        origin_platform = get_session_env("REYMEN_SESSION_PLATFORM", get_session_env("HERMES_SESSION_PLATFORM"))
+        origin_chat_id = get_session_env("REYMEN_SESSION_CHAT_ID", get_session_env("HERMES_SESSION_CHAT_ID"))
     except Exception:
         origin_platform = None
         origin_chat_id = None
     if origin_platform and origin_chat_id:
-        thread_id = get_session_env("HERMES_SESSION_THREAD_ID") or None
+        thread_id = get_session_env("REYMEN_SESSION_THREAD_ID", get_session_env("HERMES_SESSION_THREAD_ID")) or None
         if thread_id:
             logger.debug(
                 "Cron origin captured thread_id=%s for %s:%s",
@@ -371,7 +371,7 @@ def _resolve_model_override(model_obj: Optional[Dict[str, Any]]) -> tuple:
     """Resolve a model override object into (provider, model) for job storage.
 
     If provider is omitted, pins the current main provider from config so the
-    job doesn't drift when the user later changes their default via hermes model.
+    job doesn't drift when the user later changes their default via reymen model.
 
     Returns (provider_str_or_none, model_str_or_none).
     """
@@ -379,7 +379,7 @@ def _resolve_model_override(model_obj: Optional[Dict[str, Any]]) -> tuple:
         return (None, None)
     model_name = (model_obj.get("model") or "").strip() or None
     provider_name = (model_obj.get("provider") or "").strip() or None
-    # Bare "custom" is usually an incomplete spec — the canonical form is
+    # Bare "custom" is usually an incomplete spec â€” the canonical form is
     # "custom:<name>" matching a custom_providers entry, and LLMs frequently
     # supply the bare type because the schema does not advertise the
     # ":<name>" suffix. It is only a problem when it can't resolve at runtime:
@@ -387,11 +387,11 @@ def _resolve_model_override(model_obj: Optional[Dict[str, Any]]) -> tuple:
     # "custom") entry, in which case the job should keep ``provider="custom"``
     # and run against that endpoint. Only when no such entry exists do we treat
     # the bare value as "no provider supplied" and pin the current main
-    # provider below — otherwise pinning to ``model.provider`` (e.g. codex)
+    # provider below â€” otherwise pinning to ``model.provider`` (e.g. codex)
     # silently hijacks a job that meant to use the configured custom endpoint.
     if provider_name == "custom":
         try:
-            from reymen.cron.hermes_stubs import has_named_custom_provider
+            from reymen.sistem.reymen_stubs import has_named_custom_provider
 
             if not has_named_custom_provider("custom"):
                 provider_name = None
@@ -400,7 +400,9 @@ def _resolve_model_override(model_obj: Optional[Dict[str, Any]]) -> tuple:
     if model_name and not provider_name:
         # Pin to the current main provider so the job is stable
         try:
-            from hermes_cli.config import load_config
+            from reymen.sistem.reymen_stubs import load_config
+        except ImportError:
+            from reymen.sistem.reymen_stubs import load_config  # fallback
 
             cfg = load_config()
             model_cfg = cfg.get("model", {})
@@ -427,8 +429,8 @@ def _normalize_deliver_param(value: Any) -> Optional[str]:
 
     The cron schema documents ``deliver`` as a string (``"local"``, ``"origin"``,
     ``"telegram"``, ``"telegram:chat_id[:thread_id]"``, or comma-separated combos).
-    Some callers — MCP clients passing arrays, scripts building the payload as a
-    list — supply ``["telegram"]``.  ``create_job``/``update_job`` store it as-is,
+    Some callers â€” MCP clients passing arrays, scripts building the payload as a
+    list â€” supply ``["telegram"]``.  ``create_job``/``update_job`` store it as-is,
     and the scheduler's ``str(deliver).split(",")`` then serializes the list to
     the literal ``"['telegram']"`` which is not a known platform.  Flatten lists
     / tuples at the API boundary so storage is always a string.  Returns ``None``
@@ -456,13 +458,13 @@ def _validate_cron_script_path(script: Optional[str]) -> Optional[str]:
         return None  # empty/None = clearing the field, always OK
 
     try:
-        from reymen.cron.hermes_stubs import get_hermes_home
+        from reymen.sistem.reymen_stubs import get_hermes_home
     except Exception:
         from pathlib import Path
 
         get_hermes_home = lambda: Path(".").resolve()
     try:
-        from reymen.cron.hermes_stubs import validate_within_dir
+        from reymen.sistem.reymen_stubs import validate_within_dir
     except Exception:
 
         def validate_within_dir(path, allowed):
@@ -471,12 +473,12 @@ def _validate_cron_script_path(script: Optional[str]) -> Optional[str]:
     raw = script.strip()
 
     # Reject absolute paths and ~ expansion at the API boundary.
-    # Only relative paths within ~/.hermes/scripts/ are allowed.
+    # Only relative paths within ~/.reymen/scripts/ are allowed.
     if raw.startswith(("/", "~")) or (len(raw) >= 2 and raw[1] == ":"):
         return (
-            f"Script path must be relative to ~/.hermes/scripts/. "
+            f"Script path must be relative to ~/.reymen/scripts/. "
             f"Got absolute or home-relative path: {raw!r}. "
-            f"Place scripts in ~/.hermes/scripts/ and use just the filename."
+            f"Place scripts in ~/.reymen/scripts/ and use just the filename."
         )
 
     # Validate containment after resolution
@@ -568,14 +570,14 @@ def cronjob(
             canonical_skills = _canonical_skills(skill, skills)
             _no_agent = bool(no_agent)
             # Job-shape validation differs by mode:
-            #   - no_agent=True → script is the job; prompt/skills are optional
+            #   - no_agent=True â†’ script is the job; prompt/skills are optional
             #     (and irrelevant to execution).
-            #   - no_agent=False (default) → at least one of prompt/skills must
+            #   - no_agent=False (default) â†’ at least one of prompt/skills must
             #     be set, same as before.
             if _no_agent:
                 if not script:
                     return tool_error(
-                        "create with no_agent=True requires a script — "
+                        "create with no_agent=True requires a script â€” "
                         "the script is the job.",
                         success=False,
                     )
@@ -774,12 +776,12 @@ def cronjob(
                 updates["enabled_toolsets"] = enabled_toolsets or None
             if workdir is not None:
                 # Empty string clears the field (restores old behaviour);
-                # otherwise pass raw — update_job() validates / normalizes.
+                # otherwise pass raw â€” update_job() validates / normalizes.
                 updates["workdir"] = _normalize_optional_job_value(workdir) or None
             if no_agent is not None:
                 # Toggling no_agent on/off at update time. If flipping to True,
                 # we need a script to already exist on the job (or be part of
-                # the same update) — otherwise the next tick would error out.
+                # the same update) â€” otherwise the next tick would error out.
                 target_no_agent = bool(no_agent)
                 if target_no_agent:
                     effective_script = (
@@ -827,7 +829,7 @@ Use action='create' to schedule a new job from a prompt or one or more skills.
 Use action='list' to inspect jobs.
 Use action='update', 'pause', 'resume', 'remove', or 'run' to manage an existing job.
 
-To stop a job the user no longer wants: first action='list' to find the job_id, then action='remove' with that job_id. Never guess job IDs — always list first.
+To stop a job the user no longer wants: first action='list' to find the job_id, then action='remove' with that job_id. Never guess job IDs â€” always list first.
 
 Jobs run in a fresh session with no current-chat context, so prompts must be self-contained.
 If skills are provided on create, the future cron run loads those skills in order, then follows the prompt as the task instruction.
@@ -835,7 +837,7 @@ On update, passing skills=[] clears attached skills.
 
 NOTE: The agent's final response is auto-delivered to the target. Put the primary
 user-facing content in the final response. Cron jobs run autonomously with no user
-present — they cannot ask questions or request clarification.
+present â€” they cannot ask questions or request clarification.
 
 Important safety rule: cron-run sessions should not recursively schedule more cron jobs.""",
     "parameters": {
@@ -877,7 +879,7 @@ Important safety rule: cron-run sessions should not recursively schedule more cr
                 "properties": {
                     "provider": {
                         "type": "string",
-                        "description": "Provider name (e.g. 'openrouter', 'anthropic', or 'custom:<name>' for a provider defined in custom_providers config — always include the ':<name>' suffix, never pass the bare 'custom'). Omit to use and pin the current provider.",
+                        "description": "Provider name (e.g. 'openrouter', 'anthropic', or 'custom:<name>' for a provider defined in custom_providers config â€” always include the ':<name>' suffix, never pass the bare 'custom'). Omit to use and pin the current provider.",
                     },
                     "model": {
                         "type": "string",
@@ -894,18 +896,18 @@ Important safety rule: cron-run sessions should not recursively schedule more cr
                 "type": "boolean",
                 "default": False,
                 "description": (
-                    "Default: False (LLM-driven job — the agent runs the prompt each tick). "
+                    "Default: False (LLM-driven job â€” the agent runs the prompt each tick). "
                     "Set True to skip the LLM entirely: the scheduler just runs ``script`` on schedule and delivers its stdout verbatim. No tokens, no agent loop, no model override honoured. "
                     "\n\n"
                     "REQUIREMENTS when True: ``script`` MUST be set (``prompt`` and ``skills`` are ignored). "
                     "\n\n"
                     "DELIVERY SEMANTICS when True: "
                     "(a) non-empty stdout is sent verbatim as the message; "
-                    "(b) EMPTY stdout means SILENT — nothing is sent to the user and they won't see anything happened, so design your script to stay quiet when there's nothing to report (the watchdog pattern); "
+                    "(b) EMPTY stdout means SILENT â€” nothing is sent to the user and they won't see anything happened, so design your script to stay quiet when there's nothing to report (the watchdog pattern); "
                     "(c) non-zero exit / timeout sends an error alert so a broken watchdog can't fail silently. "
                     "\n\n"
                     "WHEN TO USE True: recurring script-only pings where the script itself produces the exact message text (memory/disk/GPU watchdogs, threshold alerts, heartbeats, CI notifications, API pollers with a fixed output shape). "
-                    "WHEN TO USE False (default): anything that needs reasoning — summarize a feed, draft a daily briefing, pick interesting items, rephrase data for a human, follow conditional logic based on content."
+                    "WHEN TO USE False (default): anything that needs reasoning â€” summarize a feed, draft a daily briefing, pick interesting items, rephrase data for a human, follow conditional logic based on content."
                 ),
             },
             "context_from": {
@@ -916,7 +918,7 @@ Important safety rule: cron-run sessions should not recursively schedule more cr
                     "injected into the prompt as context before each run. "
                     "Use this to chain cron jobs: job A collects data, job B processes it. "
                     "Each entry must be a valid job ID (from cronjob action='list'). "
-                    "Note: injects the most recent completed output — does not wait for "
+                    "Note: injects the most recent completed output â€” does not wait for "
                     "upstream jobs running in the same tick. "
                     "On update, pass an empty array to clear."
                 ),
@@ -924,11 +926,11 @@ Important safety rule: cron-run sessions should not recursively schedule more cr
             "enabled_toolsets": {
                 "type": "array",
                 "items": {"type": "string"},
-                "description": 'Optional list of toolset names to restrict the job\'s agent to (e.g. ["web", "terminal", "file", "delegation"]). When set, only tools from these toolsets are loaded, significantly reducing input token overhead. When omitted, all default tools are loaded. Infer from the job\'s prompt — e.g. use "web" if it calls web_search, "terminal" if it runs scripts, "file" if it reads files, "delegation" if it calls delegate_task. On update, pass an empty array to clear.',
+                "description": 'Optional list of toolset names to restrict the job\'s agent to (e.g. ["web", "terminal", "file", "delegation"]). When set, only tools from these toolsets are loaded, significantly reducing input token overhead. When omitted, all default tools are loaded. Infer from the job\'s prompt â€” e.g. use "web" if it calls web_search, "terminal" if it runs scripts, "file" if it reads files, "delegation" if it calls delegate_task. On update, pass an empty array to clear.',
             },
             "workdir": {
                 "type": "string",
-                "description": "Optional absolute path to run the job from. When set, AGENTS.md / CLAUDE.md / .cursorrules from that directory are injected into the system prompt, and the terminal/file/code_exec tools use it as their working directory — useful for running a job inside a specific project repo. Must be an absolute path that exists. When unset (default), preserves the original behaviour: no project context files, tools use the scheduler's cwd. On update, pass an empty string to clear. Jobs with workdir run sequentially (not parallel) to keep per-job directories isolated.",
+                "description": "Optional absolute path to run the job from. When set, AGENTS.md / CLAUDE.md / .cursorrules from that directory are injected into the system prompt, and the terminal/file/code_exec tools use it as their working directory â€” useful for running a job inside a specific project repo. Must be an absolute path that exists. When unset (default), preserves the original behaviour: no project context files, tools use the scheduler's cwd. On update, pass an empty string to clear. Jobs with workdir run sequentially (not parallel) to keep per-job directories isolated.",
             },
         },
         "required": ["action"],
@@ -945,20 +947,20 @@ def check_cronjob_requirements() -> bool:
     so no external crontab executable is required.
 
     Session env vars must hold an explicit truthy string (``1``, ``true``,
-    ``yes``, ``on``) — false-like values (``0``, ``false``, ``no``, ``off``)
+    ``yes``, ``on``) â€” false-like values (``0``, ``false``, ``no``, ``off``)
     leave the tool disabled. Uses the shared ``env_var_enabled`` helper so
     every consumer of these flags agrees on the truthy set.
     """
-    from reymen.cron.hermes_stubs import env_var_enabled
+    from reymen.sistem.reymen_stubs import env_var_enabled
 
     return (
-        env_var_enabled("HERMES_INTERACTIVE")
-        or env_var_enabled("HERMES_GATEWAY_SESSION")
-        or env_var_enabled("HERMES_EXEC_ASK")
+        env_var_enabled("REYMEN_INTERACTIVE") or env_var_enabled("HERMES_INTERACTIVE")
+        or env_var_enabled("REYMEN_GATEWAY_SESSION") or env_var_enabled("HERMES_GATEWAY_SESSION")
+        or env_var_enabled("REYMEN_EXEC_ASK") or env_var_enabled("HERMES_EXEC_ASK")
     )
 
 
-# --- Registry (Hermes uyumlulugu icin try/except) ---
+# --- Registry (ReYMeN uyumlulugu icin try/except) ---
 try:
     from tools.registry import registry, tool_error
 
@@ -996,5 +998,5 @@ if HAS_REGISTRY:
             )
         )(),
         check_fn=check_cronjob_requirements,
-        emoji="⏰",
+        emoji="â°",
     )

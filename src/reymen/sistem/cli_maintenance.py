@@ -1,4 +1,4 @@
-import os
+﻿import os
 import sys
 import shutil
 import subprocess
@@ -82,7 +82,7 @@ def _setup_worktree(repo_root: str = None) -> Optional[Dict[str, str]]:
 
     repo_root = repo_root or _git_repo_root()
     if not repo_root:
-        print("\033[31m✗ --worktree requires being inside a git repository.\033[0m")
+        print("\033[31mâœ— --worktree requires being inside a git repository.\033[0m")
         print("  cd into your project repo first, then run ReYMeN -w")
         return None
 
@@ -119,11 +119,11 @@ def _setup_worktree(repo_root: str = None) -> Optional[Dict[str, str]]:
         )
         if result.returncode != 0:
             print(
-                f"\033[31m✗ Failed to create worktree: {result.stderr.strip()}\033[0m"
+                f"\033[31mâœ— Failed to create worktree: {result.stderr.strip()}\033[0m"
             )
             return None
     except Exception as e:
-        print(f"\033[31m✗ Failed to create worktree: {e}\033[0m")
+        print(f"\033[31mâœ— Failed to create worktree: {e}\033[0m")
         return None
 
     # Copy files listed in .worktreeinclude (gitignored files the agent needs)
@@ -164,7 +164,7 @@ def _setup_worktree(repo_root: str = None) -> Optional[Dict[str, str]]:
                 elif src.is_dir():
                     # Symlink directories (faster, saves disk).  On Windows,
                     # symlink creation requires Developer Mode or elevation,
-                    # and fails with OSError otherwise — fall back to a
+                    # and fails with OSError otherwise â€” fall back to a
                     # recursive copy so the worktree is still usable.  The
                     # copy is slower and uses disk, but it doesn't require
                     # admin and matches the Linux/macOS symlink outcome
@@ -176,7 +176,7 @@ def _setup_worktree(repo_root: str = None) -> Optional[Dict[str, str]]:
                         except (OSError, NotImplementedError) as _sym_err:
                             if sys.platform == "win32":
                                 logger.info(
-                                    ".worktreeinclude: symlink failed (%s) — "
+                                    ".worktreeinclude: symlink failed (%s) â€” "
                                     "falling back to copytree on Windows.",
                                     _sym_err,
                                 )
@@ -206,7 +206,7 @@ def _setup_worktree(repo_root: str = None) -> Optional[Dict[str, str]]:
         "repo_root": repo_root,
     }
 
-    print(f"\033[32m✓ Worktree created:\033[0m {wt_path}")
+    print(f"\033[32mâœ“ Worktree created:\033[0m {wt_path}")
     print(f"  Branch: {branch_name}")
 
     return info
@@ -254,7 +254,7 @@ def _cleanup_worktree(info: Dict[str, str] = None) -> None:
 
     Preserves the worktree only if it has unpushed commits (real work
     that hasn't been pushed to any remote).  Uncommitted changes alone
-    (untracked files, test artifacts) are not enough to keep it — agent
+    (untracked files, test artifacts) are not enough to keep it â€” agent
     work lives in commits/PRs, not the working tree.
     """
     global _active_worktree
@@ -274,12 +274,12 @@ def _cleanup_worktree(info: Dict[str, str] = None) -> None:
     has_unpushed = _worktree_has_unpushed_commits(wt_path, timeout=10)
 
     if has_unpushed:
-        print(f"\n\033[33m⚠ Worktree has unpushed commits, keeping: {wt_path}\033[0m")
+        print(f"\n\033[33mâš  Worktree has unpushed commits, keeping: {wt_path}\033[0m")
         print(f"  To clean up manually: git worktree remove --force {wt_path}")
         _active_worktree = None
         return
 
-    # Remove worktree (even if working tree is dirty — uncommitted
+    # Remove worktree (even if working tree is dirty â€” uncommitted
     # changes without unpushed commits are just artifacts)
     try:
         subprocess.run(
@@ -305,7 +305,7 @@ def _cleanup_worktree(info: Dict[str, str] = None) -> None:
         logger.debug("Failed to delete branch %s: %s", branch, e)
 
     _active_worktree = None
-    print(f"\033[32m✓ Worktree cleaned up: {wt_path}\033[0m")
+    print(f"\033[32mâœ“ Worktree cleaned up: {wt_path}\033[0m")
 
 
 def _run_state_db_auto_maintenance(session_db) -> None:
@@ -316,7 +316,7 @@ def _run_state_db_auto_maintenance(session_db) -> None:
     deep-merges DEFAULT_CONFIG, so unmigrated configs still get default
     values). Honours ``auto_prune`` / ``retention_days`` /
     ``vacuum_after_prune`` / ``min_interval_hours``, and delegates to the
-    DB. Never raises — maintenance must never block interactive startup.
+    DB. Never raises â€” maintenance must never block interactive startup.
     """
     if session_db is None:
         return
@@ -367,7 +367,7 @@ def _run_checkpoint_auto_maintenance() -> None:
     Reads the ``checkpoints:`` section from config.yaml via
     :func:`ReYMeN_cli.config.load_config`. Honours ``auto_prune`` /
     ``retention_days`` / ``delete_orphans`` / ``min_interval_hours``.
-    Never raises — maintenance must never block interactive startup.
+    Never raises â€” maintenance must never block interactive startup.
     """
     try:
         from ReYMeN_cli.config import load_config as _load_full_config
@@ -391,8 +391,8 @@ def _prune_stale_worktrees(repo_root: str, max_age_hours: int = 24) -> None:
     """Remove stale worktrees and orphaned branches on startup.
 
     Age-based tiers:
-    - Under max_age_hours (24h): skip — session may still be active.
-    - 24h–72h: remove if no unpushed commits.
+    - Under max_age_hours (24h): skip â€” session may still be active.
+    - 24hâ€“72h: remove if no unpushed commits.
     - Over 72h: force remove regardless (nothing should sit this long).
 
     Also prunes orphaned ``ReYMeN/*`` and ``pr-*`` local branches that
@@ -418,16 +418,16 @@ def _prune_stale_worktrees(repo_root: str, max_age_hours: int = 24) -> None:
         try:
             mtime = entry.stat().st_mtime
             if mtime > soft_cutoff:
-                continue  # Too recent — skip
+                continue  # Too recent â€” skip
         except Exception:
             continue
 
-        force = mtime <= hard_cutoff  # Over 72h — force remove
+        force = mtime <= hard_cutoff  # Over 72h â€” force remove
 
         if not force:
-            # 24h–72h tier: only remove if no unpushed commits
+            # 24hâ€“72h tier: only remove if no unpushed commits
             if _worktree_has_unpushed_commits(str(entry), timeout=5):
-                continue  # Has unpushed commits or can't check — skip
+                continue  # Has unpushed commits or can't check â€” skip
 
         # Safe to remove
         try:
@@ -501,7 +501,7 @@ def _prune_orphaned_branches(repo_root: str) -> None:
             if line.startswith("branch refs/heads/"):
                 active_branches.add(line.split("branch refs/heads/", 1)[-1].strip())
     except Exception:
-        return  # Can't determine active branches — bail
+        return  # Can't determine active branches â€” bail
 
     # Also protect the currently checked-out branch and main
     try:

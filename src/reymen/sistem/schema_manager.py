@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""schema_manager.py — ReYMeN Schema Versionlama Yoneticisi.
+﻿# -*- coding: utf-8 -*-
+"""schema_manager.py â€” ReYMeN Schema Versionlama Yoneticisi.
 
 Alembic + SQLite PRAGMA user_version ile tum veritabanlarinin
 schema versiyonlarini takip eder, migrate eder ve raporlar.
@@ -8,10 +8,10 @@ Twin module consolidation: reymen.core.schema_manager -> ana kaynak.
 Bu modul core'dan import eder + motor_kaydet() ekler.
 
 Desteklenen DB'ler:
-  - session.db (ana konusma DB) — Alembic ile
-  - self_improve.db — PRAGMA user_version ile
-  - hata_toplama.db — PRAGMA user_version ile
-  - ogrenmeler.db — PRAGMA user_version ile
+  - session.db (ana konusma DB) â€” Alembic ile
+  - self_improve.db â€” PRAGMA user_version ile
+  - hata_toplama.db â€” PRAGMA user_version ile
+  - ogrenmeler.db â€” PRAGMA user_version ile
 """
 
 from __future__ import annotations
@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import Any, Optional
 
 # Ana kaynak: reymen.core.schema_manager
-from src.core.schema_manager import (
+from core.schema_manager import (
     Migration,
     SchemaManager,
     upsert,
@@ -79,7 +79,7 @@ def schema_manager() -> SchemaManager:
 def durum_text() -> str:
     """Schema durumunu text olarak dondur (motor tool'u icin)."""
     yonetici = schema_manager()
-    satirlar = ["📊 Schema Durumu:"]
+    satirlar = ["ğŸ“Š Schema Durumu:"]
     for db_adi, info in VERITABANLARI.items():
         db_yol = info["yol"]
         versiyon = "?"
@@ -93,7 +93,7 @@ def durum_text() -> str:
             except Exception as e:
                 versiyon = f"hata: {e}"
         else:
-            versiyon = "❌ DB yok"
+            versiyon = "âŒ DB yok"
         satirlar.append(f"  {db_adi}: v{versiyon} ({info['yontem']})")
     return "\n".join(satirlar)
 
@@ -133,12 +133,12 @@ def _schema_migrate_arac(db_adi: str) -> str:
     for db_adi in hedefler:
         info = VERITABANLARI.get(db_adi)
         if not info:
-            sonuclar.append(f"❌ {db_adi}: Bilinmeyen DB")
+            sonuclar.append(f"âŒ {db_adi}: Bilinmeyen DB")
             continue
 
         db_yol = info["yol"]
         if not db_yol.exists():
-            sonuclar.append(f"⚠️ {db_adi}: DB dosyasi yok, olusturuluyor...")
+            sonuclar.append(f"âš ï¸ {db_adi}: DB dosyasi yok, olusturuluyor...")
             db_yol.parent.mkdir(parents=True, exist_ok=True)
             con = sqlite3.connect(str(db_yol))
             con.execute("PRAGMA user_version = 1")
@@ -154,14 +154,14 @@ def _schema_migrate_arac(db_adi: str) -> str:
                 for v in range(mevcut + 1, hedef + 1):
                     _uygula_migrasyon(con, db_adi, v)
                 con.commit()
-                sonuclar.append(f"✅ {db_adi}: v{mevcut} -> v{hedef}")
+                sonuclar.append(f"âœ… {db_adi}: v{mevcut} -> v{hedef}")
             elif mevcut == hedef:
-                sonuclar.append(f"➡️ {db_adi}: v{mevcut} (guncel)")
+                sonuclar.append(f"â¡ï¸ {db_adi}: v{mevcut} (guncel)")
             else:
-                sonuclar.append(f"⚠️ {db_adi}: v{mevcut} > v{hedef} (daha ileri)")
+                sonuclar.append(f"âš ï¸ {db_adi}: v{mevcut} > v{hedef} (daha ileri)")
             con.close()
         except Exception as e:
-            sonuclar.append(f"❌ {db_adi}: {e}")
+            sonuclar.append(f"âŒ {db_adi}: {e}")
 
     return "\n".join(sonuclar)
 
@@ -174,7 +174,7 @@ def _uygula_migrasyon(con, db_adi: str, versiyon: int) -> None:
     logger.info("[Schema] %s migrate edildi: v%s", db_adi, versiyon)
 
 
-# Tüm public API'yi re-export et
+# TÃ¼m public API'yi re-export et
 __all__ = [
     "Migration",
     "SchemaManager",

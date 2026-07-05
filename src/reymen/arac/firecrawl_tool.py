@@ -1,19 +1,19 @@
-# -*- coding: utf-8 -*-
-"""firecrawl_tool.py — Firecrawl API: web scrape + search.
+﻿# -*- coding: utf-8 -*-
+"""firecrawl_tool.py â€” Firecrawl API: web scrape + search.
 
 Firecrawl (api.firecrawl.dev/v1) kullanarak:
-  - firecrawl_scrape(url) → URL'nin markdown içeriğini döndürür
-  - firecrawl_search(query) → web araması yapar (SearchDispatcher'a yönlendirir)
+  - firecrawl_scrape(url) â†’ URL'nin markdown iÃ§eriÄŸini dÃ¶ndÃ¼rÃ¼r
+  - firecrawl_search(query) â†’ web aramasÄ± yapar (SearchDispatcher'a yÃ¶nlendirir)
 
 API Key: FIRECRAWL_API_KEY env var'dan okunur.
 
-Motor kayıt:
+Motor kayÄ±t:
     from reymen.arac.firecrawl_tool import motor_kaydet
     motor_kaydet(motor)
 
-Not: Web arama işlevi artık reymen.arac.web_search_engine'deki
-SearchDispatcher üzerinden yapılır. Bu dosya geriye uyumluluk için
-korunmaktadır.
+Not: Web arama iÅŸlevi artÄ±k reymen.arac.web_search_engine'deki
+SearchDispatcher Ã¼zerinden yapÄ±lÄ±r. Bu dosya geriye uyumluluk iÃ§in
+korunmaktadÄ±r.
 """
 
 import json
@@ -23,7 +23,7 @@ import urllib.error
 import urllib.request
 from typing import Optional
 
-from src.reymen.arac.web_search_engine import _get_registry as _get_dispatcher
+from reymen.arac.web_search_engine import _get_registry as _get_dispatcher
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +41,7 @@ def _api_key() -> Optional[str]:
 
 
 def _headers(api_key: Optional[str] = None) -> dict:
-    """HTTP headers oluştur."""
+    """HTTP headers oluÅŸtur."""
     headers = {
         "User-Agent": _UA,
         "Content-Type": "application/json",
@@ -52,17 +52,17 @@ def _headers(api_key: Optional[str] = None) -> dict:
 
 
 def firecrawl_web_extract(url: str, format: str = "markdown") -> str:
-    """Bir URL'nin içeriğini Firecrawl ile çıkar.
+    """Bir URL'nin iÃ§eriÄŸini Firecrawl ile Ã§Ä±kar.
 
     Args:
-        url: İçeriği çıkarılacak URL
-        format: Çıktı formatı ('markdown' veya 'html')
+        url: Ä°Ã§eriÄŸi Ã§Ä±karÄ±lacak URL
+        format: Ã‡Ä±ktÄ± formatÄ± ('markdown' veya 'html')
 
     Returns:
-        str: Sayfa içeriği (markdown/html) veya hata mesajı
+        str: Sayfa iÃ§eriÄŸi (markdown/html) veya hata mesajÄ±
     """
     if not url or not url.strip():
-        return "[FIRECRAWL] Hata: 'url' boş olamaz."
+        return "[FIRECRAWL] Hata: 'url' boÅŸ olamaz."
 
     url = url.strip()
     api_key = _api_key()
@@ -99,41 +99,41 @@ def firecrawl_web_extract(url: str, format: str = "markdown") -> str:
 
             sonuc_metni = f"[Firecrawl Scrape]"
             if baslik:
-                sonuc_metni += f"\nBaşlık: {baslik}"
+                sonuc_metni += f"\nBaÅŸlÄ±k: {baslik}"
             sonuc_metni += f"\nURL: {kaynak_url}"
             sonuc_metni += f"\n\n{icerik}"
             return sonuc_metni
         else:
             hata = sonuc.get("error", "Bilinmeyen hata")
-            return f"[FIRECRAWL] Scrape başarısız: {hata}"
+            return f"[FIRECRAWL] Scrape baÅŸarÄ±sÄ±z: {hata}"
 
     except urllib.error.HTTPError as e:
         if e.code == 401:
-            return "[FIRECRAWL] Kimlik doğrulama hatası. FIRECRAWL_API_KEY env var'ını kontrol edin."
+            return "[FIRECRAWL] Kimlik doÄŸrulama hatasÄ±. FIRECRAWL_API_KEY env var'Ä±nÄ± kontrol edin."
         elif e.code == 402:
-            return "[FIRECRAWL] Kredi limiti doldu. Firecrawl dashboard'dan kredi yükleyin."
+            return "[FIRECRAWL] Kredi limiti doldu. Firecrawl dashboard'dan kredi yÃ¼kleyin."
         elif e.code == 429:
-            return "[FIRECRAWL] Rate limit aşıldı. Daha sonra tekrar deneyin."
+            return "[FIRECRAWL] Rate limit aÅŸÄ±ldÄ±. Daha sonra tekrar deneyin."
         return f"[FIRECRAWL] HTTP {e.code}: {e.reason}"
     except urllib.error.URLError as e:
-        return f"[FIRECRAWL] Bağlantı hatası: {e.reason}"
+        return f"[FIRECRAWL] BaÄŸlantÄ± hatasÄ±: {e.reason}"
     except Exception as e:
-        logger.error("[FIRECRAWL] scrape hatası: %s", e)
+        logger.error("[FIRECRAWL] scrape hatasÄ±: %s", e)
         return f"[FIRECRAWL] Hata: {e}"
 
 
 def firecrawl_web_search(query: str, max_results: int = 5, lang: str = "tr") -> str:
-    """Firecrawl ile web araması yap — SearchDispatcher'a yönlendirir.
+    """Firecrawl ile web aramasÄ± yap â€” SearchDispatcher'a yÃ¶nlendirir.
 
     Args:
         query: Arama sorgusu
-        max_results: Maksimum sonuç sayısı (varsayılan: 5)
-        lang: Dil kodu (varsayılan: 'tr')
+        max_results: Maksimum sonuÃ§ sayÄ±sÄ± (varsayÄ±lan: 5)
+        lang: Dil kodu (varsayÄ±lan: 'tr')
 
     Returns:
-        str: Formatlanmış arama sonuçları
+        str: FormatlanmÄ±ÅŸ arama sonuÃ§larÄ±
     """
-    # SearchDispatcher üzerinden firecrawl engine'i kullan
+    # SearchDispatcher Ã¼zerinden firecrawl engine'i kullan
     dispatcher = _get_dispatcher()
     return dispatcher.ara(query, engine="firecrawl", max_sonuc=max_results)
 
@@ -142,22 +142,22 @@ def firecrawl_durum() -> str:
     """Firecrawl API durumunu kontrol et."""
     api_key = _api_key()
     if api_key:
-        return "[FIRECRAWL] API key mevcut. Hazır."
+        return "[FIRECRAWL] API key mevcut. HazÄ±r."
     return (
         "[FIRECRAWL] API key YOK. FIRECRAWL_API_KEY env var gerekli. "
-        "https://firecrawl.dev'den key alın."
+        "https://firecrawl.dev'den key alÄ±n."
     )
 
 
-# ── Motor kayıt ───────────────────────────────────────────────────────────
+# â”€â”€ Motor kayÄ±t â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def motor_kaydet(motor) -> None:
-    """Firecrawl tool'larını motora kaydet.
+    """Firecrawl tool'larÄ±nÄ± motora kaydet.
 
     Kaydedilen tool'lar:
-      - FIRECRAWL_SCRAPE: URL içeriği çıkar (markdown)
-      - FIRECRAWL_SEARCH: Web araması
+      - FIRECRAWL_SCRAPE: URL iÃ§eriÄŸi Ã§Ä±kar (markdown)
+      - FIRECRAWL_SEARCH: Web aramasÄ±
     """
     if not hasattr(motor, "_plugin_arac_kaydet"):
         return
@@ -165,20 +165,20 @@ def motor_kaydet(motor) -> None:
         motor._plugin_arac_kaydet(
             "FIRECRAWL_SCRAPE",
             firecrawl_web_extract,
-            "Firecrawl ile bir URL'nin içeriğini markdown olarak çıkar. "
-            "Parametreler: url, format (varsayılan: markdown).",
+            "Firecrawl ile bir URL'nin iÃ§eriÄŸini markdown olarak Ã§Ä±kar. "
+            "Parametreler: url, format (varsayÄ±lan: markdown).",
         )
         motor._plugin_arac_kaydet(
             "FIRECRAWL_SEARCH",
             firecrawl_web_search,
-            "Firecrawl ile web araması yap. "
-            "Parametreler: query, max_results (varsayılan: 5), lang (varsayılan: tr).",
+            "Firecrawl ile web aramasÄ± yap. "
+            "Parametreler: query, max_results (varsayÄ±lan: 5), lang (varsayÄ±lan: tr).",
         )
     except Exception as e:
-        print(f"[Firecrawl] Motor kayıt hatası: {e}")
+        print(f"[Firecrawl] Motor kayÄ±t hatasÄ±: {e}")
 
 
-# ── Kısa alias ────────────────────────────────────────────────────────────
+# â”€â”€ KÄ±sa alias â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 firecrawl_web_extract = firecrawl_web_extract
 
 
@@ -194,4 +194,4 @@ if __name__ == "__main__":
         else:
             print(firecrawl_web_search(arg))
     else:
-        print("Kullanım: python firecrawl_tool.py <url|query>")
+        print("KullanÄ±m: python firecrawl_tool.py <url|query>")

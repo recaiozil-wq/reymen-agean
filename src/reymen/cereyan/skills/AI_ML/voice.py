@@ -1,11 +1,11 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-voice.py — AI_ML skill: Ses (TTS/STT) motoru.
+voice.py â€” AI_ML skill: Ses (TTS/STT) motoru.
 
-Bağımlılıklar:
-  - reymen.arac.voice_engine — OpenAI TTS, Edge TTS, Whisper STT engine'leri
+BaÄŸÄ±mlÄ±lÄ±klar:
+  - reymen.arac.voice_engine â€” OpenAI TTS, Edge TTS, Whisper STT engine'leri
 
-Kullanım:
+KullanÄ±m:
   from reymen.cereyan.skills.AI_ML.voice import seslendir, yaziya_cevir
   sonuc = seslendir("Merhaba dunya", voice="alloy", backend="openai")
   metin = yaziya_cevir("ses.mp3", backend="whisper")
@@ -17,7 +17,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
-# Engine'i içe aktar
+# Engine'i iÃ§e aktar
 try:
     from reymen.arac.voice_engine import (
         EdgeTTS,

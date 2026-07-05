@@ -1,20 +1,20 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-konusmadan_skill.py — Konuşma geçmişinden otomatik skill çıkarma.
+konusmadan_skill.py â€” KonuÅŸma geÃ§miÅŸinden otomatik skill Ã§Ä±karma.
 
-Bir görev başarıyla tamamlandığında:
-  1. Konuşma mesajlarını analiz et
-  2. LLM ile çözüm pattern'ini çıkar
-  3. SKILL.md formatında kaydet
+Bir gÃ¶rev baÅŸarÄ±yla tamamlandÄ±ÄŸÄ±nda:
+  1. KonuÅŸma mesajlarÄ±nÄ± analiz et
+  2. LLM ile Ã§Ã¶zÃ¼m pattern'ini Ã§Ä±kar
+  3. SKILL.md formatÄ±nda kaydet
   4. FTS5 index'e ekle
 
-Kullanım:
+KullanÄ±m:
   from reymen.arac.konusmadan_skill import konusmadan_skill_cikar
 
   # Otomatik (conversation_loop sonunda)
   konusmadan_skill_cikar(messages, basari=True)
 
-  # Manuel (kullanıcı komutu)
+  # Manuel (kullanÄ±cÄ± komutu)
   konusmadan_skill_cikar(messages, basari=True, zorla=True)
 """
 
@@ -29,16 +29,16 @@ from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
-# ── Sabitler ──────────────────────────────────────────────
+# â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 ROOT = Path(__file__).resolve().parent.parent  # reymen/
 SKILLS_DIR = ROOT / "cereyan" / ".ReYMeN" / "skills"
 INDEX_DB = ROOT.parent / ".ReYMeN" / "db" / "skills.db"  # consolidated: skills_index.db + skill_library.db
 _MAKS_ACIKLAMA = 300
 _MAKS_ADIM = 2000
-_MIN_MESAJ_SAYISI = 3  # En az 3 mesaj varsa skill çıkar
-_BASARI_ESIĞI = 0.4  # Başarı puanı eşiği (0.0-1.0)
+_MIN_MESAJ_SAYISI = 3  # En az 3 mesaj varsa skill Ã§Ä±kar
+_BASARI_ESIÄI = 0.4  # BaÅŸarÄ± puanÄ± eÅŸiÄŸi (0.0-1.0)
 
-# ── LLM Sağlayıcı ─────────────────────────────────────────
+# â”€â”€ LLM SaÄŸlayÄ±cÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 try:
     from reymen.cereyan.beyin import Beyin as _Beyin
 
@@ -55,7 +55,7 @@ except ImportError:
 
 
 def _mesajlari_ozetle(messages: List[Dict[str, Any]]) -> str:
-    """Konuşma mesajlarını LLM'e gönderilebilir metne çevir."""
+    """KonuÅŸma mesajlarÄ±nÄ± LLM'e gÃ¶nderilebilir metne Ã§evir."""
     parcalar = []
     for m in messages[-20:]:  # Son 20 mesaj
         rol = m.get("role", "bilinmeyen")
@@ -66,9 +66,9 @@ def _mesajlari_ozetle(messages: List[Dict[str, Any]]) -> str:
                     if p.get("type") == "text":
                         icerik = p["text"][:500]
                     elif p.get("type") == "tool_use":
-                        icerik = f"[ARAÇ: {p.get('name', '?')}(...)]"
+                        icerik = f"[ARAÃ‡: {p.get('name', '?')}(...)]"
                     elif p.get("type") == "tool_result":
-                        icerik = f"[SONUÇ: {str(p.get('content', ''))[:200]}]"
+                        icerik = f"[SONUÃ‡: {str(p.get('content', ''))[:200]}]"
         elif isinstance(icerik, str):
             icerik = icerik[:500]
         parcalar.append(f"[{rol.upper()}] {icerik}")
@@ -76,7 +76,7 @@ def _mesajlari_ozetle(messages: List[Dict[str, Any]]) -> str:
 
 
 def _skill_adi_ureti(ozet: str, konu: str = "") -> str:
-    """Konuşma özetinden skill adı üret."""
+    """KonuÅŸma Ã¶zetinden skill adÄ± Ã¼ret."""
     ad = (konu or ozet)[:60].lower()
     ad = re.sub(r"[^a-z0-9\s-]", "", ad)
     ad = re.sub(r"\s+", "-", ad.strip())
@@ -85,13 +85,13 @@ def _skill_adi_ureti(ozet: str, konu: str = "") -> str:
 
 
 def _beceri_puani_hesapla(messages: List[Dict]) -> float:
-    """Konuşmanın skill olmaya değer olup olmadığını hesapla."""
+    """KonuÅŸmanÄ±n skill olmaya deÄŸer olup olmadÄ±ÄŸÄ±nÄ± hesapla."""
     if len(messages) < _MIN_MESAJ_SAYISI:
         return 0.0
 
     puan = 0.0
 
-    # Kriter 1: Araç kullanımı var mı?
+    # Kriter 1: AraÃ§ kullanÄ±mÄ± var mÄ±?
     arac_sayisi = 0
     for m in messages:
         if m.get("role") == "assistant":
@@ -103,7 +103,7 @@ def _beceri_puani_hesapla(messages: List[Dict]) -> float:
     if arac_sayisi > 0:
         puan += 0.3
 
-    # Kriter 2: Kullanıcı mesajı yeterince uzun mu?
+    # Kriter 2: KullanÄ±cÄ± mesajÄ± yeterince uzun mu?
     kullanici_mesajlari = [m for m in messages if m.get("role") == "user"]
     uzun_mesaj = sum(
         1 for m in kullanici_mesajlari if len(str(m.get("content", ""))) > 100
@@ -111,12 +111,12 @@ def _beceri_puani_hesapla(messages: List[Dict]) -> float:
     if uzun_mesaj > 0:
         puan += 0.2
 
-    # Kriter 3: Tool sonuçları var mı?
+    # Kriter 3: Tool sonuÃ§larÄ± var mÄ±?
     sonuc_sayisi = sum(1 for m in messages if m.get("role") == "tool")
     if sonuc_sayisi > 0:
         puan += 0.2
 
-    # Kriter 4: Asistan yanıtı uzun mu?
+    # Kriter 4: Asistan yanÄ±tÄ± uzun mu?
     asistan_mesajlari = [m for m in messages if m.get("role") == "assistant"]
     uzun_yanit = 0
     for m in asistan_mesajlari:
@@ -138,41 +138,41 @@ def _beceri_puani_hesapla(messages: List[Dict]) -> float:
 
 
 def _llm_ile_skill_cikar(mesaj_ozeti: str, konu: str = "") -> Optional[Dict[str, str]]:
-    """LLM kullanarak konuşmadan skill çıkar."""
+    """LLM kullanarak konuÅŸmadan skill Ã§Ä±kar."""
     if not _LLM_HAZIR:
         logger.warning("[KonusmadanSkill] LLM hazir degil, skill cikarilamadi")
         return None
 
     try:
         beyin = _Beyin()
-        prompt = f"""Bir kullanıcı ile AI asistan arasındaki konuşmayı analiz et ve bir SKILL.md olarak kaydetmek için JSON çıktısı ver.
+        prompt = f"""Bir kullanÄ±cÄ± ile AI asistan arasÄ±ndaki konuÅŸmayÄ± analiz et ve bir SKILL.md olarak kaydetmek iÃ§in JSON Ã§Ä±ktÄ±sÄ± ver.
 
-KONUŞMA ÖZETİ:
+KONUÅMA Ã–ZETÄ°:
 {mesaj_ozeti[:3000]}
 
-Aşağıdaki JSON formatında çıktı ver (sadece JSON, başka metin yok):
+AÅŸaÄŸÄ±daki JSON formatÄ±nda Ã§Ä±ktÄ± ver (sadece JSON, baÅŸka metin yok):
 {{
   "ad": "skill_adi (kucuk harf, tire-ile-ayrilmis)",
-  "baslik": "Kısa açıklayıcı başlık",
-  "aciklama": "Ne işe yarar, ne zaman kullanılır (max 300 karakter)",
+  "baslik": "KÄ±sa aÃ§Ä±klayÄ±cÄ± baÅŸlÄ±k",
+  "aciklama": "Ne iÅŸe yarar, ne zaman kullanÄ±lÄ±r (max 300 karakter)",
   "etiketler": ["etiket1", "etiket2", "etiket3"],
   "kategori": "kategori_adi",
-  "adimlar": "Adım adım çözüm talimatları (Markdown, max 2000 karakter)",
+  "adimlar": "AdÄ±m adÄ±m Ã§Ã¶zÃ¼m talimatlarÄ± (Markdown, max 2000 karakter)",
   "trigger_kelimeler": ["kelime1", "kelime2"],
   "guven_skoru": 0.85
 }}
 
 Kurallar:
-- adimlar: somut, adım adım, tekrarlanabilir olmalı
-- guven_skoru: 0.0-1.0 arası, konuşmanın skill olmaya ne kadar uygun olduğu
-- Eğer konuşma basit bir selamlaşma veya anlamlı bir çözüm içermiyorsa guven_skoru düşük ver
+- adimlar: somut, adÄ±m adÄ±m, tekrarlanabilir olmalÄ±
+- guven_skoru: 0.0-1.0 arasÄ±, konuÅŸmanÄ±n skill olmaya ne kadar uygun olduÄŸu
+- EÄŸer konuÅŸma basit bir selamlaÅŸma veya anlamlÄ± bir Ã§Ã¶zÃ¼m iÃ§ermiyorsa guven_skoru dÃ¼ÅŸÃ¼k ver
 """
 
         yanit = beyin.soru(prompt)
         if not yanit:
             return None
 
-        # JSON çıktısını ayıkla
+        # JSON Ã§Ä±ktÄ±sÄ±nÄ± ayÄ±kla
         json_match = re.search(r"\{.*\}", yanit, re.DOTALL)
         if not json_match:
             return None
@@ -191,16 +191,16 @@ def konusmadan_skill_cikar(
     zorla: bool = False,
     konu: str = "",
 ) -> str:
-    """Konuşma mesajlarından skill çıkar ve kaydet.
+    """KonuÅŸma mesajlarÄ±ndan skill Ã§Ä±kar ve kaydet.
 
     Args:
-        messages: Konuşma mesaj listesi.
-        basari: Görev başarılı mı?
-        zorla: Zorla skill çıkar (puan kontrolünü atla).
-        konu: İsteğe bağlı konu başlığı.
+        messages: KonuÅŸma mesaj listesi.
+        basari: GÃ¶rev baÅŸarÄ±lÄ± mÄ±?
+        zorla: Zorla skill Ã§Ä±kar (puan kontrolÃ¼nÃ¼ atla).
+        konu: Ä°steÄŸe baÄŸlÄ± konu baÅŸlÄ±ÄŸÄ±.
 
     Returns:
-        Durum mesajı.
+        Durum mesajÄ±.
     """
     if not _SKILL_UTILS_HAZIR:
         return "[KonusmadanSkill] skill_utils hazir degil"
@@ -211,18 +211,18 @@ def konusmadan_skill_cikar(
     if not basari and not zorla:
         return "[KonusmadanSkill] Gorev basarisiz, skill cikarilmadi"
 
-    # Beceri puanı hesapla
+    # Beceri puanÄ± hesapla
     puan = _beceri_puani_hesapla(messages)
-    if puan < _BASARI_ESIĞI and not zorla:
-        return f"[KonusmadanSkill] Dusuk puan ({puan:.2f} < {_BASARI_ESIĞI}), skill cikarilmadi"
+    if puan < _BASARI_ESIÄI and not zorla:
+        return f"[KonusmadanSkill] Dusuk puan ({puan:.2f} < {_BASARI_ESIÄI}), skill cikarilmadi"
 
-    # Mesajları özetle
+    # MesajlarÄ± Ã¶zetle
     ozet = _mesajlari_ozetle(messages)
 
-    # LLM ile skill çıkar
+    # LLM ile skill Ã§Ä±kar
     skill_data = _llm_ile_skill_cikar(ozet, konu)
     if not skill_data:
-        # LLM yoksa basit şablonla skill oluştur
+        # LLM yoksa basit ÅŸablonla skill oluÅŸtur
         return _basit_skill_kaydet(ozet, konu)
 
     guven = skill_data.get("guven_skoru", 0.0)
@@ -261,12 +261,12 @@ created_at: {datetime.now().strftime("%Y-%m-%d %H:%M")}
 
 ---
 
-| 5N1K | Açıklama |
+| 5N1K | AÃ§Ä±klama |
 |:----:|:---------|
-| **Kim** | AI kullanıcısı |
+| **Kim** | AI kullanÄ±cÄ±sÄ± |
 | **Ne** | {baslik} |
 | **Nerede** | `{kategori}/{ad}.md` |
-| **Ne Zaman** | İlgili görev gerektiğinde |
+| **Ne Zaman** | Ä°lgili gÃ¶rev gerektiÄŸinde |
 | **Neden** | {aciklama} |
 
 {adimlar}
@@ -279,12 +279,12 @@ created_at: {datetime.now().strftime("%Y-%m-%d %H:%M")}
         skill_index_yenile(zorla=True)
 
         logger.info(
-            "[KonusmadanSkill] ✅ Skill olusturuldu: %s (guven=%.2f) -> %s",
+            "[KonusmadanSkill] âœ… Skill olusturuldu: %s (guven=%.2f) -> %s",
             ad,
             guven,
             hedef_dosya,
         )
-        return f"[KonusmadanSkill] ✅ '{ad}' skill'i olusturuldu (guven: {guven:.0%})"
+        return f"[KonusmadanSkill] âœ… '{ad}' skill'i olusturuldu (guven: {guven:.0%})"
 
     except Exception as e:
         logger.error("[KonusmadanSkill] Skill kayit hatasi: %s", e)
@@ -292,7 +292,7 @@ created_at: {datetime.now().strftime("%Y-%m-%d %H:%M")}
 
 
 def _basit_skill_kaydet(ozet: str, konu: str = "") -> str:
-    """LLM yokken basit şablonla skill kaydet."""
+    """LLM yokken basit ÅŸablonla skill kaydet."""
     ad = _skill_adi_ureti(ozet, konu)
     baslik = konu or ad.replace("-", " ").title()
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
@@ -310,23 +310,23 @@ created_at: {timestamp}
 
 ---
 
-| 5N1K | Açıklama |
+| 5N1K | AÃ§Ä±klama |
 |:----:|:---------|
-| **Kim** | AI kullanıcısı |
+| **Kim** | AI kullanÄ±cÄ±sÄ± |
 | **Ne** | {baslik} |
 | **Nerede** | `konusma/{ad}.md` |
-| **Ne Zaman** | İlgili görev gerektiğinde |
-| **Neden** | Konuşmadan çıkarılan çözüm |
+| **Ne Zaman** | Ä°lgili gÃ¶rev gerektiÄŸinde |
+| **Neden** | KonuÅŸmadan Ã§Ä±karÄ±lan Ã§Ã¶zÃ¼m |
 
-## Çözüm Adımları
+## Ã‡Ã¶zÃ¼m AdÄ±mlarÄ±
 
 1. **Problem:** {baslik}
-2. **Çözüm:** Konuşma içinde çözülmüştür. Detaylar için skill içeriğine bakın.
+2. **Ã‡Ã¶zÃ¼m:** KonuÅŸma iÃ§inde Ã§Ã¶zÃ¼lmÃ¼ÅŸtÃ¼r. Detaylar iÃ§in skill iÃ§eriÄŸine bakÄ±n.
 
-## Kullanım
+## KullanÄ±m
 
-Bu skill otomatik olarak bir konuşmadan çıkarılmıştır.
-İlgili bir görev geldiğinde bu skill devreye girecektir.
+Bu skill otomatik olarak bir konuÅŸmadan Ã§Ä±karÄ±lmÄ±ÅŸtÄ±r.
+Ä°lgili bir gÃ¶rev geldiÄŸinde bu skill devreye girecektir.
 """
 
     try:
@@ -338,15 +338,15 @@ Bu skill otomatik olarak bir konuşmadan çıkarılmıştır.
 
         skill_index_yenile(zorla=True)
         logger.info(
-            "[KonusmadanSkill] ✅ Basit skill olusturuldu: %s -> %s", ad, hedef_dosya
+            "[KonusmadanSkill] âœ… Basit skill olusturuldu: %s -> %s", ad, hedef_dosya
         )
-        return f"[KonusmadanSkill] ✅ '{ad}' basit skill olusturuldu ({hedef_dosya})"
+        return f"[KonusmadanSkill] âœ… '{ad}' basit skill olusturuldu ({hedef_dosya})"
     except Exception as e:
         logger.error("[KonusmadanSkill] Basit kayit hatasi: %s", e)
         return f"[KonusmadanSkill] Hata: {e}"
 
 
-# ── Motor'a kayıt ─────────────────────────────────────────
+# â”€â”€ Motor'a kayÄ±t â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def motor_kaydet(motor: object) -> None:
     """Motor'a konusmadan_skill_cikar aracini kaydet."""
     try:

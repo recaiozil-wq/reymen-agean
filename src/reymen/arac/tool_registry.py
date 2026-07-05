@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""tool_registry.py — Advanced ToolRegistry + check_fn TTL cache + ToolsetManager.
+﻿# -*- coding: utf-8 -*-
+"""tool_registry.py â€” Advanced ToolRegistry + check_fn TTL cache + ToolsetManager.
 
 Auto-discovers and registers all tools from the tools/ folder.
 Used by Motor and sistem_talimati.
@@ -24,12 +24,12 @@ logger = logging.getLogger(__name__)
 
 TOOLS_DIR = Path(__file__).parent / "tools"
 
-# ── TTL cache yardimcisi ─────────────────────────────────────────────
+# â”€â”€ TTL cache yardimcisi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _CHECK_FN_TTL = 30.0  # saniye
 
 
 def _ttl_cache(ttl: float = _CHECK_FN_TTL) -> Callable:
-    """Simple TTL cache decorator — caches check_fn result for 30s."""
+    """Simple TTL cache decorator â€” caches check_fn result for 30s."""
 
     def decorator(fn):
         _cache = {"sonuc": None, "zaman": 0.0}
@@ -52,9 +52,9 @@ def _ttl_cache(ttl: float = _CHECK_FN_TTL) -> Callable:
     return decorator
 
 
-# ── ToolsetManager ────────────────────────────────────────────────────
+# â”€â”€ ToolsetManager â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 class ToolsetManager:
-    """Toolset group management — a tool can belong to multiple toolsets.
+    """Toolset group management â€” a tool can belong to multiple toolsets.
 
     Usage:
         tm = ToolsetManager()
@@ -108,9 +108,9 @@ class ToolsetManager:
         return {ad: len(araclar) for ad, araclar in sorted(self._toolsets.items())}
 
 
-# ── AracMeta (eski veri yapisi, testler icin korunuyor) ──────────────
+# â”€â”€ AracMeta (eski veri yapisi, testler icin korunuyor) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 class AracMeta:
-    """Arac meta veri yapisi — backward compatibility icin korunuyor.
+    """Arac meta veri yapisi â€” backward compatibility icin korunuyor.
 
     Kullanim:
         meta = AracMeta("TEST", lambda: "ok")
@@ -153,9 +153,9 @@ class AracMeta:
         }
 
 
-# ── Ana Registry ─────────────────────────────────────────────────────
+# â”€â”€ Ana Registry â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 class ToolRegistry:
-    """Arac kayit defteri — check_fn + TTL cache + toolset + schema.
+    """Arac kayit defteri â€” check_fn + TTL cache + toolset + schema.
 
     Kullanim:
         reg = ToolRegistry()
@@ -186,7 +186,7 @@ class ToolRegistry:
         # oldugu icin alias gerektirmez. Bu liste sadece dogrudan
         # import gereken ReYMeN modulleri icindir.
         # ReYMeN tools/ modullerine yonlendiren tum alias'lar
-        # kaldirildi — dispatch _fallback_calistir'a duser.
+        # kaldirildi â€” dispatch _fallback_calistir'a duser.
         self._aliases: dict[str, str] = {}
         self._yukle()
 
@@ -219,7 +219,7 @@ class ToolRegistry:
             except Exception as _tool_reg_e237:
                 print(f"[UYARI] tool_registry.py:238 - {_tool_reg_e237}")
 
-    # ── Kayit ──────────────────────────────────────────────────────────
+    # â”€â”€ Kayit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def kaydet(
         self,
@@ -247,7 +247,7 @@ class ToolRegistry:
         if meta:
             self._meta[ad] = meta
 
-    # ── check_fn ─────────────────────────────────────────────────────
+    # â”€â”€ check_fn â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def check_fn_ekle(self, arac_adi: str, fn: Callable[[], bool]) -> None:
         """Bir araca TTL cache'li check_fn ekle.
@@ -321,7 +321,7 @@ class ToolRegistry:
                 durum[alias_ad] = self.check_fn_kontrol_et(alias_ad)
         return durum
 
-    # ── Schema Override ───────────────────────────────────────────────
+    # â”€â”€ Schema Override â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def schema_guncelle(self, arac_adi: str, yeni_sema: dict[str, Any]) -> None:
         """Bir aracin parametre semasini calisma zamaninda degistir.
@@ -342,7 +342,7 @@ class ToolRegistry:
         """Schema override'ini kaldir (varsayilana don)."""
         self._schemas.pop(arac_adi, None)
 
-    # ── Calistirma ──────────────────────────────────────────────────────
+    # â”€â”€ Calistirma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def calistir(self, ad: str, *args, **kwargs) -> str:
         """Bir araci adina gore calistir.
@@ -387,7 +387,7 @@ class ToolRegistry:
 
         return f"[Bilinmeyen arac] '{ad}'."
 
-    # ── Listeleme ─────────────────────────────────────────────────────
+    # â”€â”€ Listeleme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def liste(self, sadece_musait: bool = False) -> list[str]:
         """Kayitli tum araclari listele.
@@ -401,7 +401,7 @@ class ToolRegistry:
             return sorted(ad for ad in tools if self.check_fn_kontrol_et(ad))
         return sorted(tools)
 
-    # ── Toolset proxy ────────────────────────────────────────────────
+    # â”€â”€ Toolset proxy â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def toolset_olustur(self, ad: str, araclar: Optional[set[str]] = None) -> bool:
         return self.toolset.toolset_olustur(ad, araclar)
@@ -409,7 +409,7 @@ class ToolRegistry:
     def toolset_araclari(self, ad: str) -> set[str]:
         return self.toolset.toolset_araclari(ad)
 
-    # ── Yardimci ─────────────────────────────────────────────────────
+    # â”€â”€ Yardimci â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _moduldeki_ilk_callable(self, mod_name: str) -> Optional[Callable]:
         try:
@@ -466,7 +466,7 @@ class ToolRegistry:
             f"{yuklu + alias_sayisi} toplam ({musait} musait)"
         )
 
-    # ── Backward-compat metodlar (eski AracMeta/test API) ────────────
+    # â”€â”€ Backward-compat metodlar (eski AracMeta/test API) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def musait_mi(self, arac_adi: str) -> bool:
         """Bir aracin kullanilabilir olup olmadigini kontrol et.

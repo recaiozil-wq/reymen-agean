@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-tor_otomasyonu.py — ReYMeN icin Tor tabanli web otomasyon modulu.
+tor_otomasyonu.py â€” ReYMeN icin Tor tabanli web otomasyon modulu.
 
 Yetenekler:
   - Tor Browser baslatma/kapatma (Selenium + geckodriver)
@@ -56,7 +56,7 @@ except ImportError:
     _HATA_COZUCU_VAR = False
 
 
-# ── Sabitler ────────────────────────────────────────────────────────────────
+# â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _TOR_PROXY_HOST = "127.0.0.1"
 _TOR_PROXY_PORT = 9150  # Tor Browser varsayilan SOCKS portu
@@ -65,7 +65,7 @@ _SAYFA_BEKLEME = 45  # Tor yuksek gecikmeli, 10sn yetmez
 _FORM_BEKLEME = 30
 
 
-# ── Tor Browser kontrol ─────────────────────────────────────────────────────
+# â”€â”€ Tor Browser kontrol â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class TorBrowserKontrol:
@@ -170,7 +170,7 @@ class TorBrowserKontrol:
             return ""
 
 
-# ── Form doldurma ───────────────────────────────────────────────────────────
+# â”€â”€ Form doldurma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class FormDoldurucu:
@@ -187,7 +187,7 @@ class FormDoldurucu:
 
     # Turkce alan adi -> DOM name/id/placeholder donusumleri
     _ALAN_KARESi = {
-        "ad": ["name", "firstname", "first_name", "ad", "isim", "adınız"],
+        "ad": ["name", "firstname", "first_name", "ad", "isim", "adÄ±nÄ±z"],
         "soyad": ["surname", "lastname", "last_name", "soyad", "soyisim"],
         "eposta": ["email", "e-mail", "mail", "eposta", "e_posta"],
         "telefon": ["phone", "tel", "telefon", "mobile", "gsm", "telephone"],
@@ -252,7 +252,7 @@ class FormDoldurucu:
         return sonuc
 
 
-# ─── Is akislari (Login, Kayit, Siparis) ────────────────────────────────────
+# â”€â”€â”€ Is akislari (Login, Kayit, Siparis) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class OtomasyonAkislari:
@@ -269,12 +269,12 @@ class OtomasyonAkislari:
             for secici in [
                 (_By.XPATH, "//button[@type='submit']"),
                 (_By.XPATH, "//input[@type='submit']"),
-                (_By.XPATH, "//button[contains(text(), 'Giriş')]"),
+                (_By.XPATH, "//button[contains(text(), 'GiriÅŸ')]"),
                 (_By.XPATH, "//button[contains(text(), 'Login')]"),
                 (_By.XPATH, "//button[contains(text(), 'Kaydol')]"),
                 (_By.XPATH, "//button[contains(text(), 'Register')]"),
-                (_By.XPATH, "//button[contains(text(), 'Sipariş')]"),
-                (_By.XPATH, "//button[contains(text(), 'Satın Al')]"),
+                (_By.XPATH, "//button[contains(text(), 'SipariÅŸ')]"),
+                (_By.XPATH, "//button[contains(text(), 'SatÄ±n Al')]"),
             ]:
                 try:
                     btn = _WebDriverWait(self.tor.driver, 3).until(
@@ -380,7 +380,7 @@ class OtomasyonAkislari:
             return {"basarili": False, "sonuc": "", "hata": str(e)}
 
 
-# ── Global ornek (singleton benzeri) ────────────────────────────────────────
+# â”€â”€ Global ornek (singleton benzeri) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _aktif_tor: Optional[TorBrowserKontrol] = None
 _aktif_akislar: Optional[OtomasyonAkislari] = None
@@ -408,7 +408,7 @@ def tor_kapat() -> str:
     return "[Tor] Browser kapatildi."
 
 
-# ── motor.py kayit fonksiyonu ───────────────────────────────────────────────
+# â”€â”€ motor.py kayit fonksiyonu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def motor_kaydet(motor) -> None:
@@ -497,7 +497,7 @@ def motor_kaydet(motor) -> None:
     )
 
 
-# ── Hizli test ─────────────────────────────────────────────────────────────
+# â”€â”€ Hizli test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
     import logging as _logging
@@ -518,7 +518,7 @@ if __name__ == "__main__":
 
         m = Motor(backend_mode="local")
 
-        # Motor'a TOR_ araçlarını ekle (motor_kaydet ile)
+        # Motor'a TOR_ araÃ§larÄ±nÄ± ekle (motor_kaydet ile)
         class MockMotor:
             calistir = m.calistir
 
@@ -528,4 +528,4 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"  [Test] Motor kaydi: {e}")
 
-    print("\n✓ Test tamam.")
+    print("\nâœ“ Test tamam.")

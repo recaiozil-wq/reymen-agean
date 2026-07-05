@@ -1,4 +1,4 @@
-"""ReYMeNCLI mixin module."""
+﻿"""ReYMeNCLI mixin module."""
 
 import logging
 import os
@@ -27,10 +27,10 @@ logger = logging.getLogger(__name__)
 
 
 class MixinDisplay:
-    """ReYMeNCLI UI/ekran/çıktı formatlama metotları."""
+    """ReYMeNCLI UI/ekran/Ã§Ä±ktÄ± formatlama metotlarÄ±."""
 
     def _invalidate(self, min_interval: float = 0.25) -> None:
-        """Throttled UI repaint — prevents terminal blinking on slow/SSH connections."""
+        """Throttled UI repaint â€” prevents terminal blinking on slow/SSH connections."""
         if getattr(self, "_resize_recovery_pending", False):
             return
         now = time.monotonic()
@@ -46,7 +46,7 @@ class MixinDisplay:
         """Force a clean full-screen repaint of the prompt_toolkit UI.
 
         Used to recover from terminal buffer drift caused by external
-        redraws we can't detect — e.g. macOS cmux / tmux tab switches,
+        redraws we can't detect â€” e.g. macOS cmux / tmux tab switches,
         ``clear`` issued from a subshell, or SSH window restores. These
         wipe or repaint the terminal without firing SIGWINCH, so
         prompt_toolkit's tracked ``_cursor_pos`` no longer matches reality
@@ -187,7 +187,7 @@ class MixinDisplay:
     def _build_context_bar(self, percent_used: Optional[int], width: int = 10) -> str:
         safe_percent = max(0, min(100, percent_used or 0))
         filled = round((safe_percent / 100) * width)
-        return f"[{('█' * filled) + ('░' * max(0, width - filled))}]"
+        return f"[{('â–ˆ' * filled) + ('â–‘' * max(0, width - filled))}]"
 
     @staticmethod
     def _format_prompt_elapsed(
@@ -195,18 +195,18 @@ class MixinDisplay:
     ) -> str:
         """Format per-prompt elapsed time for the status bar.
 
-        Always returns a string — shows 0s on fresh start before first turn.
+        Always returns a string â€” shows 0s on fresh start before first turn.
         Keeps seconds visible at all scales so it increments smoothly:
-            59s → 1m → 1m 1s → ... → 1m 59s → 2m → 2m 1s → ...
-            59m 59s → 1h → 1h 0m 1s → ...
-            23h 59m 59s → 1d → 1d 0h 1m → ...
+            59s â†’ 1m â†’ 1m 1s â†’ ... â†’ 1m 59s â†’ 2m â†’ 2m 1s â†’ ...
+            59m 59s â†’ 1h â†’ 1h 0m 1s â†’ ...
+            23h 59m 59s â†’ 1d â†’ 1d 0h 1m â†’ ...
 
-        Emoji prefix: ⏱ when turn is live, ⏲ when frozen or fresh start.
+        Emoji prefix: â± when turn is live, â² when frozen or fresh start.
         Uses width-1 (no variation selector) glyphs so the status bar stays
         aligned in monospace terminals.
         """
         if prompt_start_time is None and prompt_duration == 0.0:
-            return "⏲ 0s"
+            return "â² 0s"
         elapsed = (
             time.time() - prompt_start_time
             if prompt_start_time is not None
@@ -232,11 +232,11 @@ class MixinDisplay:
         else:
             time_str = f"{int(elapsed)}s"
 
-        emoji = "⏱" if live else "⏲"
+        emoji = "â±" if live else "â²"
         return f"{emoji} {time_str}"
 
     def _get_status_bar_snapshot(self) -> Dict[str, Any]:
-        # Prefer the agent's model name — it updates on fallback.
+        # Prefer the agent's model name â€” it updates on fallback.
         # self.model reflects the originally configured model and never
         # changes mid-session, so the TUI would show a stale name after
         # _try_activate_fallback() switches provider/model.
@@ -326,7 +326,7 @@ class MixinDisplay:
             # last_prompt_tokens is parked at the -1 sentinel right after a
             # compression, until the next real API call reports a prompt count
             # (awaiting_real_usage_after_compression). The status bar must not
-            # render that sentinel verbatim — it produced "-1/200K" / "-1%".
+            # render that sentinel verbatim â€” it produced "-1/200K" / "-1%".
             # Clamp it to 0 so the one transitional turn reads as empty context.
             context_tokens = getattr(compressor, "last_prompt_tokens", 0) or 0
             if context_tokens < 0:
@@ -414,11 +414,11 @@ class MixinDisplay:
         ``_output_screen_diff`` monkey-patch landed in #26137 (salvaging
         #25981) to keep chrome out of scrollback in the first place, and
         accept that an aggressive column-shrink may visually reflow already
-        printed Panel borders — that's a cosmetic artifact of stamped
+        printed Panel borders â€” that's a cosmetic artifact of stamped
         scrollback history, not a live-render bug.
 
         A small floor (32 cols) is kept so the box still renders on tiny
-        terminals without negative ``'─' * (w - 2)`` math.
+        terminals without negative ``'â”€' * (w - 2)`` math.
         """
         if width is None:
             try:
@@ -483,25 +483,25 @@ class MixinDisplay:
 
             yolo_active = self._is_session_yolo_active()
             if width < 52:
-                text = f"⚕ {snapshot['model_short']} · {duration_label}"
+                text = f"âš• {snapshot['model_short']} Â· {duration_label}"
                 if yolo_active:
-                    text += " · ⚠ YOLO"
+                    text += " Â· âš  YOLO"
                 return self._trim_status_bar_text(text, width)
             if width < 76:
-                parts = [f"⚕ {snapshot['model_short']}", percent_label]
+                parts = [f"âš• {snapshot['model_short']}", percent_label]
                 compressions = snapshot.get("compressions", 0)
                 if compressions:
-                    parts.append(f"🗜️ {compressions}")
+                    parts.append(f"ğŸ—œï¸ {compressions}")
                 bg_count = snapshot.get("active_background_tasks", 0)
                 if bg_count:
-                    parts.append(f"▶ {bg_count}")
+                    parts.append(f"â–¶ {bg_count}")
                 bg_proc_count = snapshot.get("active_background_processes", 0)
                 if bg_proc_count:
-                    parts.append(f"⚙ {bg_proc_count}")
+                    parts.append(f"âš™ {bg_proc_count}")
                 parts.append(duration_label)
                 if yolo_active:
-                    parts.append("⚠ YOLO")
-                return self._trim_status_bar_text(" · ".join(parts), width)
+                    parts.append("âš  YOLO")
+                return self._trim_status_bar_text(" Â· ".join(parts), width)
 
             if snapshot["context_length"]:
                 ctx_total = _format_context_length(snapshot["context_length"])
@@ -511,24 +511,24 @@ class MixinDisplay:
                 context_label = "ctx --"
 
             compressions = snapshot.get("compressions", 0)
-            parts = [f"⚕ {snapshot['model_short']}", context_label, percent_label]
+            parts = [f"âš• {snapshot['model_short']}", context_label, percent_label]
             if compressions:
-                parts.append(f"🗜️ {compressions}")
+                parts.append(f"ğŸ—œï¸ {compressions}")
             bg_count = snapshot.get("active_background_tasks", 0)
             if bg_count:
-                parts.append(f"▶ {bg_count}")
+                parts.append(f"â–¶ {bg_count}")
             bg_proc_count = snapshot.get("active_background_processes", 0)
             if bg_proc_count:
-                parts.append(f"⚙ {bg_proc_count}")
+                parts.append(f"âš™ {bg_proc_count}")
             parts.append(duration_label)
             prompt_elapsed = snapshot.get("prompt_elapsed")
             if prompt_elapsed:
                 parts.append(prompt_elapsed)
             if yolo_active:
-                parts.append("⚠ YOLO")
-            return self._trim_status_bar_text(" │ ".join(parts), width)
+                parts.append("âš  YOLO")
+            return self._trim_status_bar_text(" â”‚ ".join(parts), width)
         except Exception:
-            return f"⚕ {self.model if getattr(self, 'model', None) else 'ReYMeN'}"
+            return f"âš• {self.model if getattr(self, 'model', None) else 'ReYMeN'}"
 
     def _get_status_bar_fragments(self):
         if not self._status_bar_visible or getattr(self, "_model_picker_state", None):
@@ -536,7 +536,7 @@ class MixinDisplay:
         try:
             snapshot = self._get_status_bar_snapshot()
             # Use prompt_toolkit's own terminal width when running inside the
-            # TUI — shutil.get_terminal_size() can return stale or fallback
+            # TUI â€” shutil.get_terminal_size() can return stale or fallback
             # values (especially on SSH) that differ from what prompt_toolkit
             # actually renders, causing the fragments to overflow to a second
             # line and produce duplicated status bar rows over long sessions.
@@ -546,14 +546,14 @@ class MixinDisplay:
 
             if width < 52:
                 frags = [
-                    ("class:status-bar", " ⚕ "),
+                    ("class:status-bar", " âš• "),
                     ("class:status-bar-strong", snapshot["model_short"]),
-                    ("class:status-bar-dim", " · "),
+                    ("class:status-bar-dim", " Â· "),
                     ("class:status-bar-dim", duration_label),
                 ]
                 if yolo_active:
-                    frags.append(("class:status-bar-dim", " · "))
-                    frags.append(("class:status-bar-yolo", "⚠ YOLO"))
+                    frags.append(("class:status-bar-dim", " Â· "))
+                    frags.append(("class:status-bar-yolo", "âš  YOLO"))
                 frags.append(("class:status-bar", " "))
             else:
                 percent = snapshot["context_percent"]
@@ -563,34 +563,34 @@ class MixinDisplay:
                     bg_count = snapshot.get("active_background_tasks", 0)
                     bg_proc_count = snapshot.get("active_background_processes", 0)
                     frags = [
-                        ("class:status-bar", " ⚕ "),
+                        ("class:status-bar", " âš• "),
                         ("class:status-bar-strong", snapshot["model_short"]),
-                        ("class:status-bar-dim", " · "),
+                        ("class:status-bar-dim", " Â· "),
                         (self._status_bar_context_style(percent), percent_label),
                     ]
                     if compressions:
-                        frags.append(("class:status-bar-dim", " · "))
+                        frags.append(("class:status-bar-dim", " Â· "))
                         frags.append(
                             (
                                 self._compression_count_style(compressions),
-                                f"🗜️ {compressions}",
+                                f"ğŸ—œï¸ {compressions}",
                             )
                         )
                     if bg_count:
-                        frags.append(("class:status-bar-dim", " · "))
-                        frags.append(("class:status-bar-strong", f"▶ {bg_count}"))
+                        frags.append(("class:status-bar-dim", " Â· "))
+                        frags.append(("class:status-bar-strong", f"â–¶ {bg_count}"))
                     if bg_proc_count:
-                        frags.append(("class:status-bar-dim", " · "))
-                        frags.append(("class:status-bar-strong", f"⚙ {bg_proc_count}"))
+                        frags.append(("class:status-bar-dim", " Â· "))
+                        frags.append(("class:status-bar-strong", f"âš™ {bg_proc_count}"))
                     frags.extend(
                         [
-                            ("class:status-bar-dim", " · "),
+                            ("class:status-bar-dim", " Â· "),
                             ("class:status-bar-dim", duration_label),
                         ]
                     )
                     if yolo_active:
-                        frags.append(("class:status-bar-dim", " · "))
-                        frags.append(("class:status-bar-yolo", "⚠ YOLO"))
+                        frags.append(("class:status-bar-dim", " Â· "))
+                        frags.append(("class:status-bar-yolo", "âš  YOLO"))
                     frags.append(("class:status-bar", " "))
                 else:
                     if snapshot["context_length"]:
@@ -607,43 +607,43 @@ class MixinDisplay:
                     bg_count = snapshot.get("active_background_tasks", 0)
                     bg_proc_count = snapshot.get("active_background_processes", 0)
                     frags = [
-                        ("class:status-bar", " ⚕ "),
+                        ("class:status-bar", " âš• "),
                         ("class:status-bar-strong", snapshot["model_short"]),
-                        ("class:status-bar-dim", " │ "),
+                        ("class:status-bar-dim", " â”‚ "),
                         ("class:status-bar-dim", context_label),
-                        ("class:status-bar-dim", " │ "),
+                        ("class:status-bar-dim", " â”‚ "),
                         (bar_style, self._build_context_bar(percent)),
                         ("class:status-bar-dim", " "),
                         (bar_style, percent_label),
                     ]
                     if compressions:
-                        frags.append(("class:status-bar-dim", " │ "))
+                        frags.append(("class:status-bar-dim", " â”‚ "))
                         frags.append(
                             (
                                 self._compression_count_style(compressions),
-                                f"🗜️ {compressions}",
+                                f"ğŸ—œï¸ {compressions}",
                             )
                         )
                     if bg_count:
-                        frags.append(("class:status-bar-dim", " │ "))
-                        frags.append(("class:status-bar-strong", f"▶ {bg_count}"))
+                        frags.append(("class:status-bar-dim", " â”‚ "))
+                        frags.append(("class:status-bar-strong", f"â–¶ {bg_count}"))
                     if bg_proc_count:
-                        frags.append(("class:status-bar-dim", " │ "))
-                        frags.append(("class:status-bar-strong", f"⚙ {bg_proc_count}"))
+                        frags.append(("class:status-bar-dim", " â”‚ "))
+                        frags.append(("class:status-bar-strong", f"âš™ {bg_proc_count}"))
                     frags.extend(
                         [
-                            ("class:status-bar-dim", " │ "),
+                            ("class:status-bar-dim", " â”‚ "),
                             ("class:status-bar-dim", duration_label),
                         ]
                     )
                     # Position 7: per-prompt elapsed timer (live or frozen)
                     prompt_elapsed = snapshot.get("prompt_elapsed")
                     if prompt_elapsed:
-                        frags.append(("class:status-bar-dim", " │ "))
+                        frags.append(("class:status-bar-dim", " â”‚ "))
                         frags.append(("class:status-bar-dim", prompt_elapsed))
                     if yolo_active:
-                        frags.append(("class:status-bar-dim", " │ "))
-                        frags.append(("class:status-bar-yolo", "⚠ YOLO"))
+                        frags.append(("class:status-bar-dim", " â”‚ "))
+                        frags.append(("class:status-bar-yolo", "âš  YOLO"))
                     frags.append(("class:status-bar", " "))
 
             total_width = sum(self._status_bar_display_width(text) for _, text in frags)
@@ -665,7 +665,7 @@ class MixinDisplay:
         lines = user_input.split("\n")
         if len(lines) <= 1:
             return (
-                f"[bold {_accent_hex()}]●[/] [bold]{_escape(user_input)}[/]{ts_suffix}"
+                f"[bold {_accent_hex()}]â—[/] [bold]{_escape(user_input)}[/]{ts_suffix}"
             )
 
         first_lines = int(getattr(self, "user_message_preview_first_lines", 2))
@@ -683,7 +683,7 @@ class MixinDisplay:
             tail = []
 
         preview_lines = [
-            f"[bold {_accent_hex()}]●[/] [bold]{_escape(head[0])}[/]{ts_suffix}"
+            f"[bold {_accent_hex()}]â—[/] [bold]{_escape(head[0])}[/]{ts_suffix}"
         ]
         preview_lines.extend(f"[bold]{_escape(line)}[/]" for line in head[1:])
 
@@ -717,12 +717,12 @@ class MixinDisplay:
 
     def _print_user_message_preview(self, user_input: str) -> None:
         """Render a user message using the normal chat scrollback style."""
-        ChatConsole().print(f"[{_accent_hex()}]{'─' * 40}[/]")
+        ChatConsole().print(f"[{_accent_hex()}]{'â”€' * 40}[/]")
         text = str(user_input or "")
         if "\n" in text:
             ChatConsole().print(self._format_submitted_user_message_preview(text))
         else:
-            ChatConsole().print(f"[bold {_accent_hex()}]●[/] [bold]{_escape(text)}[/]")
+            ChatConsole().print(f"[bold {_accent_hex()}]â—[/] [bold]{_escape(text)}[/]")
 
     def _show_security_advisories(self):
         """Show a startup banner if any unacked security advisories match.
@@ -742,7 +742,7 @@ class MixinDisplay:
             hits = detect_compromised()
             banner = startup_banner(hits)
             if banner:
-                # Print to stderr — keeps stdout clean for piped automation,
+                # Print to stderr â€” keeps stdout clean for piped automation,
                 # and Rich's banner rendering already wrote to stdout above.
                 print(banner, file=sys.stderr, flush=True)
         except Exception:
@@ -780,14 +780,14 @@ class MixinDisplay:
             if api_key_missing:
                 self._console_print()
                 self._console_print(
-                    "[yellow]⚠️  Some tools disabled (missing API keys):[/]"
+                    "[yellow]âš ï¸  Some tools disabled (missing API keys):[/]"
                 )
                 for item in api_key_missing:
                     tools_str = ", ".join(item["tools"][:2])  # Show first 2 tools
                     if len(item["tools"]) > 2:
                         tools_str += f", +{len(item['tools'])-2} more"
                     self._console_print(
-                        f"   [dim]• {item['name']}[/] [dim italic]({', '.join(item['missing_vars'])})[/]"
+                        f"   [dim]â€¢ {item['name']}[/] [dim italic]({', '.join(item['missing_vars'])})[/]"
                     )
                 self._console_print("[dim]   Run 'ReYMeN setup' to configure[/]")
         except Exception as _e:
@@ -814,11 +814,11 @@ class MixinDisplay:
 
         # Get API status indicator
         if self.api_key:
-            api_indicator = "[green bold]●[/]"
+            api_indicator = "[green bold]â—[/]"
         else:
-            api_indicator = "[red bold]●[/]"
+            api_indicator = "[red bold]â—[/]"
 
-        # Build status line with proper markup — skin-aware colors
+        # Build status line with proper markup â€” skin-aware colors
         try:
             from reymen.reymen_cli.skin_engine import get_active_skin
 
@@ -830,19 +830,19 @@ class MixinDisplay:
             separator_color, accent_color, label_color = "#B8860B", "#FFBF00", "cyan"
         toolsets_info = ""
         if self.enabled_toolsets and "all" not in self.enabled_toolsets:
-            toolsets_info = f" [dim {separator_color}]·[/] [{label_color}]toolsets: {', '.join(self.enabled_toolsets)}[/]"
+            toolsets_info = f" [dim {separator_color}]Â·[/] [{label_color}]toolsets: {', '.join(self.enabled_toolsets)}[/]"
 
         provider_info = (
-            f" [dim {separator_color}]·[/] [dim]provider: {self.provider}[/]"
+            f" [dim {separator_color}]Â·[/] [dim]provider: {self.provider}[/]"
         )
         if self._provider_source:
             provider_info += (
-                f" [dim {separator_color}]·[/] [dim]auth: {self._provider_source}[/]"
+                f" [dim {separator_color}]Â·[/] [dim]auth: {self._provider_source}[/]"
             )
 
         self._console_print(
             f"  {api_indicator} [{accent_color}]{model_short}[/] "
-            f"[dim {separator_color}]·[/] [bold {label_color}]{tool_status}[/]"
+            f"[dim {separator_color}]Â·[/] [bold {label_color}]{tool_status}[/]"
             f"{toolsets_info}{provider_info}"
         )
 
@@ -917,15 +917,15 @@ class MixinDisplay:
         print()
         if reason == "history":
             print(
-                "(._.) No messages in the current chat yet — here are recent sessions you can resume:"
+                "(._.) No messages in the current chat yet â€” here are recent sessions you can resume:"
             )
         else:
             print("  Recent sessions:")
         print()
         print(f"  {'#':<3} {'Title':<32} {'Preview':<40} {'Last Active':<13} {'ID'}")
-        print(f"  {'─' * 3} {'─' * 32} {'─' * 40} {'─' * 13} {'─' * 24}")
+        print(f"  {'â”€' * 3} {'â”€' * 32} {'â”€' * 40} {'â”€' * 13} {'â”€' * 24}")
         for idx, session in enumerate(sessions, start=1):
-            title = session.get("title") or "—"
+            title = session.get("title") or "â€”"
             preview = (session.get("preview") or "")[:38]
             last_active = _relative_time(session.get("last_active"))
             print(
@@ -963,7 +963,7 @@ class MixinDisplay:
 
         print()
         print("+" + "-" * 60 + "+")
-        print("|" + " " * 15 + "(✿◠‿◠) Gateway Status" + " " * 17 + "|")
+        print("|" + " " * 15 + "(âœ¿â— â€¿â— ) Gateway Status" + " " * 17 + "|")
         print("+" + "-" * 60 + "+")
         print()
 
@@ -984,10 +984,10 @@ class MixinDisplay:
                 pconfig = config.platforms.get(platform)
                 if pconfig and pconfig.enabled:
                     home = config.get_home_channel(platform)
-                    home_str = f" → {home.name}" if home else ""
-                    print(f"    ✓ {name:<12} Enabled{home_str}")
+                    home_str = f" â†’ {home.name}" if home else ""
+                    print(f"    âœ“ {name:<12} Enabled{home_str}")
                 else:
-                    print(f"    ○ {name:<12} Not configured ({env_var})")
+                    print(f"    â—‹ {name:<12} Not configured ({env_var})")
 
             print()
             print("  Session Reset Policy:")
@@ -1029,7 +1029,7 @@ class MixinDisplay:
             print("(._.) No API calls made yet in this session.")
             return
 
-        # ── Rate limits (shown first when available) ────────────────
+        # â”€â”€ Rate limits (shown first when available) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         rl_state = agent.get_rate_limit_state()
         if rl_state and rl_state.has_data:
             from agent.rate_limit_tracker import format_rate_limit_display
@@ -1038,7 +1038,7 @@ class MixinDisplay:
             print(format_rate_limit_display(rl_state))
             print()
 
-        # ── Session token usage ─────────────────────────────────────
+        # â”€â”€ Session token usage â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         input_tokens = getattr(agent, "session_input_tokens", 0) or 0
         output_tokens = getattr(agent, "session_output_tokens", 0) or 0
         cache_read_tokens = getattr(agent, "session_cache_read_tokens", 0) or 0
@@ -1070,15 +1070,15 @@ class MixinDisplay:
             (datetime.now() - self.session_start).total_seconds()
         )
 
-        print("  📊 Session Token Usage")
-        print(f"  {'─' * 40}")
+        print("  ğŸ“Š Session Token Usage")
+        print(f"  {'â”€' * 40}")
         print(f"  Model:                     {agent.model}")
         print(f"  Input tokens:              {input_tokens:>10,}")
         print(f"  Cache read tokens:         {cache_read_tokens:>10,}")
         print(f"  Cache write tokens:        {cache_write_tokens:>10,}")
         print(f"  Output tokens:             {output_tokens:>10,}")
         if reasoning_tokens:
-            print(f"  ↳ Reasoning (subset):      {reasoning_tokens:>10,}")
+            print(f"  â†³ Reasoning (subset):      {reasoning_tokens:>10,}")
         print(f"  Prompt tokens (total):     {prompt:>10,}")
         print(f"  Completion tokens:         {completion:>10,}")
         print(f"  Total tokens:              {total:>10,}")
@@ -1095,7 +1095,7 @@ class MixinDisplay:
             print(f"  Total cost:              {'included':>10}")
         else:
             print(f"  Total cost:              {'n/a':>10}")
-        print(f"  {'─' * 40}")
+        print(f"  {'â”€' * 40}")
         print(f"  Current context:  {last_prompt:,} / {ctx_len:,} ({pct:.0f}%)")
         print(f"  Messages:         {msg_count}")
         print(f"  Compressions:     {compressions}")
@@ -1107,7 +1107,7 @@ class MixinDisplay:
         provider = getattr(agent, "provider", None) or getattr(self, "provider", None)
         base_url = getattr(agent, "base_url", None) or getattr(self, "base_url", None)
         api_key = getattr(agent, "api_key", None) or getattr(self, "api_key", None)
-        # Lazy import — pulls the OpenAI SDK chain, only needed here.
+        # Lazy import â€” pulls the OpenAI SDK chain, only needed here.
         from agent.account_usage import fetch_account_usage, render_account_usage_lines
 
         account_snapshot = None
@@ -1266,9 +1266,9 @@ class MixinDisplay:
             try:
                 from reymen.reymen_cli.skin_engine import get_active_goodbye
 
-                goodbye = get_active_goodbye("Goodbye! ⚕")
+                goodbye = get_active_goodbye("Goodbye! âš•")
             except Exception:
-                goodbye = "Goodbye! ⚕"
+                goodbye = "Goodbye! âš•"
             print(goodbye)
 
     def _get_tui_prompt_symbols(self) -> tuple[str, str]:
@@ -1279,16 +1279,16 @@ class MixinDisplay:
         should render after their leading icon.
 
         When a profile is active (not "default"), the profile name is
-        prepended to the prompt symbol: ``coder ❯`` instead of ``❯``.
+        prepended to the prompt symbol: ``coder â¯`` instead of ``â¯``.
         """
         try:
             from reymen.reymen_cli.skin_engine import get_active_prompt_symbol
 
-            symbol = get_active_prompt_symbol("❯ ")
+            symbol = get_active_prompt_symbol("â¯ ")
         except Exception:
-            symbol = "❯ "
+            symbol = "â¯ "
 
-        symbol = (symbol or "❯ ").rstrip() + " "
+        symbol = (symbol or "â¯ ").rstrip() + " "
 
         # Prepend profile name when not default
         try:
@@ -1301,11 +1301,11 @@ class MixinDisplay:
             logger.warning("[fix_01_sessiz_except] Exception")
         stripped = symbol.rstrip()
         if not stripped:
-            return "❯ ", "❯ "
+            return "â¯ ", "â¯ "
 
         parts = stripped.split()
         candidate = parts[-1] if parts else ""
-        arrow_chars = ("❯", ">", "$", "#", "›", "»", "→")
+        arrow_chars = ("â¯", ">", "$", "#", "â€º", "Â»", "â†’")
         if any(ch in candidate for ch in arrow_chars):
             return symbol, candidate.rstrip() + " "
 
@@ -1314,7 +1314,7 @@ class MixinDisplay:
 
     def _audio_level_bar(self) -> str:
         """Return a visual audio level indicator based on current RMS."""
-        _LEVEL_BARS = " ▁▂▃▄▅▆▇"
+        _LEVEL_BARS = " â–â–‚â–ƒâ–„â–…â–†â–‡"
         rec = getattr(self, "_voice_recorder", None)
         if rec is None:
             return ""
@@ -1341,19 +1341,19 @@ class MixinDisplay:
 
         if self._voice_recording:
             bar = self._audio_level_bar()
-            return _state_fragment("class:voice-recording", "●", bar)
+            return _state_fragment("class:voice-recording", "â—", bar)
         if self._voice_processing:
-            return _state_fragment("class:voice-processing", "◉")
+            return _state_fragment("class:voice-processing", "â—‰")
         if self._sudo_state:
-            return _state_fragment("class:sudo-prompt", "🔐")
+            return _state_fragment("class:sudo-prompt", "ğŸ”")
         if self._secret_state:
-            return _state_fragment("class:sudo-prompt", "🔑")
+            return _state_fragment("class:sudo-prompt", "ğŸ”‘")
         if self._approval_state:
-            return _state_fragment("class:prompt-working", "⚠")
+            return _state_fragment("class:prompt-working", "âš ")
         if getattr(self, "_slash_confirm_state", None):
-            return _state_fragment("class:prompt-working", "⚠")
+            return _state_fragment("class:prompt-working", "âš ")
         if self._clarify_freetext:
-            return _state_fragment("class:clarify-selected", "✎")
+            return _state_fragment("class:clarify-selected", "âœ")
         if self._clarify_state:
             return _state_fragment("class:prompt-working", "?")
         if self._command_running:
@@ -1361,9 +1361,9 @@ class MixinDisplay:
                 "class:prompt-working", self._command_spinner_frame()
             )
         if self._agent_running:
-            return _state_fragment("class:prompt-working", "⚕")
+            return _state_fragment("class:prompt-working", "âš•")
         if self._voice_mode:
-            return _state_fragment("class:voice-prompt", "🎤")
+            return _state_fragment("class:voice-prompt", "ğŸ¤")
         return [("class:prompt", symbol)]
 
     def _get_tui_prompt_text(self) -> str:
@@ -1386,7 +1386,7 @@ class MixinDisplay:
         except Exception:
             logger.warning("[fix_01_sessiz_except] Exception")
         # Light-mode remap on the style strings.  Each value is a pt
-        # style string like "bg:#1a1a2e #C0C0C0 bold" — split on space,
+        # style string like "bg:#1a1a2e #C0C0C0 bold" â€” split on space,
         # rewrite any "#XXX" tokens (including "bg:#XXX") through the
         # light-mode remap, rejoin.
         #
@@ -1395,7 +1395,7 @@ class MixinDisplay:
         # with `bg:#1a1a2e ...`).  Those colors were tuned for that
         # specific dark bg and remapping the FG to a dark equivalent
         # would produce dark-on-dark (invisible).  The terminal's BG
-        # mode is irrelevant — what matters is the bg the style itself
+        # mode is irrelevant â€” what matters is the bg the style itself
         # paints.
         try:
             if _detect_light_mode():
@@ -1406,7 +1406,7 @@ class MixinDisplay:
                     tokens = v.split()
                     has_explicit_bg = any(t.startswith("bg:") for t in tokens)
                     if has_explicit_bg:
-                        # The style paints its own bg — leave its fg alone.
+                        # The style paints its own bg â€” leave its fg alone.
                         return v
                     return " ".join(
                         _maybe_remap_for_light_mode(t) if t.startswith("#") else t

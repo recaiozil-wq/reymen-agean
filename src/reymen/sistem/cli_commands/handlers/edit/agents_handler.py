@@ -1,10 +1,10 @@
-"""_handle_agents_command handler."""
+﻿"""_handle_agents_command handler."""
 
-from src.reymen.sistem.cli_display import _cprint
+from reymen.sistem.cli_display import _cprint
 
 
 def _handle_agents_command(cli):
-    """Handle /agents — show background processes and agent status."""
+    """Handle /agents â€” show background processes and agent status."""
     from tools.process_registry import format_uptime_short, process_registry
 
     processes = process_registry.list_sessions()
@@ -15,7 +15,7 @@ def _handle_agents_command(cli):
     for p in running:
         cmd = p.get("command", "")[:80]
         up = format_uptime_short(p.get("uptime_seconds", 0))
-        _cprint(f"    {p.get('session_id', '?')} · {up} · {cmd}")
+        _cprint(f"    {p.get('session_id', '?')} Â· {up} Â· {cmd}")
 
     if finished:
         _cprint(f"  Recently finished: {len(finished)}")

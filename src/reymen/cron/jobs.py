@@ -1,8 +1,8 @@
-"""
+﻿"""
 Cron job storage and management.
 
-Jobs are stored in ~/.hermes/cron/jobs.json
-Output is saved to ~/.hermes/cron/output/{job_id}/{timestamp}.md
+Jobs are stored in ~/.reymen/cron/jobs.json
+Output is saved to ~/.reymen/cron/output/{job_id}/{timestamp}.md
 """
 
 import contextlib
@@ -30,7 +30,7 @@ except ImportError:  # pragma: no cover - non-Windows
     msvcrt = None
 from datetime import datetime, timedelta
 from pathlib import Path
-from src.reymen.cron.hermes_stubs import (
+from reymen.sistem.reymen_stubs import (
     get_hermes_home,
     now as _hermes_now,
     atomic_replace,
@@ -50,12 +50,12 @@ except ImportError:
 # Configuration
 # =============================================================================
 
-HERMES_DIR = get_hermes_home().resolve()
-CRON_DIR = HERMES_DIR / "cron_data"
+REYMEN_DIR = get_hermes_home().resolve()
+CRON_DIR = REYMEN_DIR / "cron_data"
 JOBS_FILE = CRON_DIR / "jobs.json"
 
-# In-process lock protecting load_jobs→modify→save_jobs cycles.
-# Required when tick() runs jobs in parallel threads — without this,
+# In-process lock protecting load_jobsâ†’modifyâ†’save_jobs cycles.
+# Required when tick() runs jobs in parallel threads â€” without this,
 # concurrent mark_job_run / advance_next_run calls can clobber each other.
 _jobs_file_lock = threading.RLock()
 _jobs_lock_state = threading.local()
@@ -70,17 +70,17 @@ def _jobs_lock_file() -> Path:
 
 @contextlib.contextmanager
 def _jobs_lock():
-    """Serialize a load_jobs→modify→save_jobs critical section.
+    """Serialize a load_jobsâ†’modifyâ†’save_jobs critical section.
 
     Combines the in-process threading lock (cheap mutual exclusion between
     the gateway's parallel tick threads) with a cross-process advisory file
     lock on ``<cron dir>/.jobs.lock`` (mutual exclusion between the gateway process
-    and standalone ``hermes`` CLI invocations, which previously shared no lock
-    at all — a `cron pause` could be silently clobbered by a concurrent
+    and standalone ``reymen`` CLI invocations, which previously shared no lock
+    at all â€” a `cron pause` could be silently clobbered by a concurrent
     gateway write, leaving a "paused" job still firing).
 
     The flock is blocking, but every critical section that uses it is short
-    (field updates only — no agent execution), so contention resolves in
+    (field updates only â€” no agent execution), so contention resolves in
     milliseconds. If neither fcntl nor msvcrt is available the manager still
     provides in-process locking, matching the historical behaviour.
 
@@ -112,7 +112,7 @@ def _jobs_lock():
                         lock_fd.fileno(), getattr(msvcrt, "LK_LOCK"), 1
                     )
             except (OSError, IOError) as e:
-                # Never let a locking failure take down cron writes — fall back to
+                # Never let a locking failure take down cron writes â€” fall back to
                 # in-process-only protection (still held via _jobs_file_lock).
                 logger.warning(
                     "jobs.json cross-process lock unavailable (%s); "
@@ -285,9 +285,9 @@ def parse_duration(s: str) -> int:
     Parse duration string into minutes.
 
     Examples:
-        "30m" → 30
-        "2h" → 120
-        "1d" → 1440
+        "30m" â†’ 30
+        "2h" â†’ 120
+        "1d" â†’ 1440
     """
     s = s.strip().lower()
     match = re.match(
@@ -316,18 +316,18 @@ def parse_schedule(schedule: str) -> Dict[str, Any]:
         - For "cron": "expr" (cron expression)
 
     Examples:
-        "30m"              → once in 30 minutes
-        "2h"               → once in 2 hours
-        "every 30m"        → recurring every 30 minutes
-        "every 2h"         → recurring every 2 hours
-        "0 9 * * *"        → cron expression
-        "2026-02-03T14:00" → once at timestamp
+        "30m"              â†’ once in 30 minutes
+        "2h"               â†’ once in 2 hours
+        "every 30m"        â†’ recurring every 30 minutes
+        "every 2h"         â†’ recurring every 2 hours
+        "0 9 * * *"        â†’ cron expression
+        "2026-02-03T14:00" â†’ once at timestamp
     """
     schedule = schedule.strip()
     original = schedule
     schedule_lower = schedule.lower()
 
-    # "every X" pattern → recurring interval
+    # "every X" pattern â†’ recurring interval
     if schedule_lower.startswith("every "):
         duration_str = schedule[6:].strip()
         minutes = parse_duration(duration_str)
@@ -365,7 +365,7 @@ def parse_schedule(schedule: str) -> Dict[str, Any]:
         except ValueError as e:
             raise ValueError(f"Invalid timestamp '{schedule}': {e}")
 
-    # Duration like "30m", "2h", "1d" → one-shot from now
+    # Duration like "30m", "2h", "1d" â†’ one-shot from now
     try:
         minutes = parse_duration(schedule)
         run_at = _hermes_now() + timedelta(minutes=minutes)
@@ -388,13 +388,13 @@ def parse_schedule(schedule: str) -> Dict[str, Any]:
 
 
 def _ensure_aware(dt: datetime) -> datetime:
-    """Return a timezone-aware datetime in Hermes configured timezone.
+    """Return a timezone-aware datetime in ReYMeN configured timezone.
 
     Backward compatibility:
     - Older stored timestamps may be naive.
     - Naive values are interpreted as *system-local wall time* (the timezone
       `datetime.now()` used when they were created), then converted to the
-      configured Hermes timezone.
+      configured ReYMeN timezone.
 
     This preserves relative ordering for legacy naive timestamps across
     timezone changes and avoids false not-due results.
@@ -495,7 +495,7 @@ def compute_next_run(
             logger.warning(
                 "Cannot compute next run for cron schedule %r: 'croniter' is "
                 "not installed. croniter is a core dependency as of v0.9.x; "
-                "reinstall hermes-agent or run 'pip install croniter' in your "
+                "reinstall reymen-agent or run 'pip install croniter' in your "
                 "runtime env.",
                 schedule.get("expr"),
             )
@@ -550,12 +550,12 @@ def load_jobs() -> List[Dict[str, Any]]:
     if isinstance(data, dict):
         jobs = data.get("jobs", [])
         if _strict_retry and jobs:
-            # Hit control-character corruption — rewrite with proper escaping.
+            # Hit control-character corruption â€” rewrite with proper escaping.
             save_jobs(jobs)
             logger.warning("Auto-repaired jobs.json (had invalid control characters)")
         return jobs
     if isinstance(data, list):
-        # Bare array — likely saved/edited outside save_jobs(). Wrap it back
+        # Bare array â€” likely saved/edited outside save_jobs(). Wrap it back
         # into the expected {"jobs": [...]} structure.
         if data:
             save_jobs(data)
@@ -601,8 +601,8 @@ def _normalize_workdir(workdir: Optional[str]) -> Optional[str]:
     """Normalize and validate a cron job workdir.
 
     Rules:
-      - Empty / None → None (feature off, preserves old behaviour).
-      - ``~`` is expanded.  Relative paths are rejected — cron jobs run detached
+      - Empty / None â†’ None (feature off, preserves old behaviour).
+      - ``~`` is expanded.  Relative paths are rejected â€” cron jobs run detached
         from any shell cwd, so relative paths have no stable meaning.
       - The path must exist and be a directory at create/update time.  We do
         NOT re-check at run time (a user might briefly unmount the dir; the
@@ -665,11 +665,11 @@ def create_job(
         provider: Optional per-job provider override
         base_url: Optional per-job base URL override
         script: Optional path to a script whose stdout feeds the job. With
-                ``no_agent=True`` the script IS the job — its stdout is
+                ``no_agent=True`` the script IS the job â€” its stdout is
                 delivered verbatim. Without ``no_agent``, its stdout is
                 injected into the agent's prompt as context (data-collection /
                 change-detection pattern). Paths resolve under
-                ~/.hermes/scripts/; ``.sh`` / ``.bash`` files run via bash,
+                ~/.reymen/scripts/; ``.sh`` / ``.bash`` files run via bash,
                 anything else via Python.
         context_from: Optional job ID (or list of job IDs) whose most recent output
                       is injected into the prompt as context before each run.
@@ -687,7 +687,7 @@ def create_job(
                 With ``no_agent=True``, ``workdir`` is still applied as the
                 script's cwd so relative paths inside the script behave
                 predictably.
-        no_agent: When True, skip the agent entirely — run ``script`` on schedule
+        no_agent: When True, skip the agent entirely â€” run ``script`` on schedule
                 and deliver its stdout directly. Empty stdout = silent (no
                 delivery). Requires ``script`` to be set. Ideal for classic
                 watchdogs and periodic alerts that don't need LLM reasoning.
@@ -732,12 +732,12 @@ def create_job(
     normalized_workdir = _normalize_workdir(workdir)
     normalized_no_agent = bool(no_agent)
 
-    # no_agent jobs are meaningless without a script — the script IS the job.
+    # no_agent jobs are meaningless without a script â€” the script IS the job.
     # Surface this as a clear ValueError at create time so bad configs never
     # reach the scheduler.
     if normalized_no_agent and not normalized_script:
         raise ValueError(
-            "no_agent=True requires a script — with no agent and no script "
+            "no_agent=True requires a script â€” with no agent and no script "
             "there is nothing for the job to run."
         )
 
@@ -815,7 +815,7 @@ class AmbiguousJobReference(LookupError):
         self.matches = matches
         ids = ", ".join(m["id"] for m in matches)
         super().__init__(
-            f"Job name '{ref}' is ambiguous — matches {len(matches)} jobs: {ids}. "
+            f"Job name '{ref}' is ambiguous â€” matches {len(matches)} jobs: {ids}. "
             f"Use the job ID instead."
         )
 
@@ -856,7 +856,7 @@ def list_jobs(include_disabled: bool = False) -> List[Dict[str, Any]]:
 def update_job(job_id: str, updates: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """Update a job by ID, refreshing derived schedule fields when needed."""
     # Block mutation of immutable fields. ``id`` in particular is a filesystem
-    # path component under OUTPUT_DIR — letting an update change it leaks
+    # path component under OUTPUT_DIR â€” letting an update change it leaks
     # path-escape values into output writes/deletes.
     bad_fields = _IMMUTABLE_JOB_FIELDS.intersection(updates or {})
     if bad_fields:
@@ -1004,7 +1004,7 @@ def mark_job_run(
     Updates last_run_at, last_status, increments completed count,
     computes next_run_at, and auto-deletes if repeat limit reached.
 
-    ``delivery_error`` is tracked separately from the agent error — a job
+    ``delivery_error`` is tracked separately from the agent error â€” a job
     can succeed (agent produced output) but fail delivery (platform down).
     """
     with _jobs_lock():
@@ -1015,7 +1015,7 @@ def mark_job_run(
                 job["last_run_at"] = now
                 job["last_status"] = "ok" if success else "error"
                 job["last_error"] = error if not success else None
-                # Track delivery failures separately — cleared on successful delivery
+                # Track delivery failures separately â€” cleared on successful delivery
                 job["last_delivery_error"] = delivery_error
                 # Clear any external-fire claim so a re-armed recurring job can
                 # be claimed again on its next fire (Phase 4C CAS).
@@ -1039,7 +1039,7 @@ def mark_job_run(
 
                 # If no next run, decide whether this is terminal completion
                 # (one-shot) or a transient failure (recurring schedule couldn't
-                # compute — e.g. 'croniter' missing from the runtime env).
+                # compute â€” e.g. 'croniter' missing from the runtime env).
                 # Recurring jobs must NEVER be silently disabled: that turns a
                 # missing runtime dep into "job completed" and the user's
                 # schedule quietly goes off. See issue #16265.
@@ -1077,7 +1077,7 @@ def advance_next_run(job_id: str) -> bool:
 
     Call this BEFORE run_job() so that if the process crashes mid-execution,
     the job won't re-fire on the next gateway restart.  This converts the
-    scheduler from at-least-once to at-most-once for recurring jobs — missing
+    scheduler from at-least-once to at-most-once for recurring jobs â€” missing
     one run is far better than firing dozens of times in a crash loop.
 
     One-shot jobs are left unchanged so they can still retry on restart.
@@ -1107,7 +1107,7 @@ def _machine_id() -> str:
     Uses ``HERMES_MACHINE_ID`` if set, else hostname + pid. The CAS correctness
     comes from the file lock + the fresh-claim check, not from this value.
     """
-    explicit = os.getenv("HERMES_MACHINE_ID", "").strip()
+    explicit = os.getenv("REYMEN_MACHINE_ID", os.getenv("HERMES_MACHINE_ID", "")).strip()
     if explicit:
         return explicit
     try:
@@ -1137,7 +1137,7 @@ def claim_job_for_fire(job_id: str, *, claim_ttl_seconds: int = 300) -> bool:
     is claimable again next fire.
 
     The stale-claim TTL means a machine that crashed after claiming but before
-    completing doesn't wedge the job forever — after the TTL another fire can
+    completing doesn't wedge the job forever â€” after the TTL another fire can
     reclaim it.
     """
     with _jobs_lock():
@@ -1155,7 +1155,7 @@ def claim_job_for_fire(job_id: str, *, claim_ttl_seconds: int = 300) -> bool:
                     if (now - claimed_at).total_seconds() < claim_ttl_seconds:
                         return False  # someone holds a fresh claim
                 except Exception as _e:
-                    pass  # malformed claim → overwrite
+                    pass  # malformed claim â†’ overwrite
             job["fire_claim"] = {"at": now.isoformat(), "by": _machine_id()}
             kind = job.get("schedule", {}).get("kind")
             if kind in {"cron", "interval"}:
@@ -1204,8 +1204,8 @@ def _get_due_jobs_locked() -> List[Dict[str, Any]]:
             )
             recovery_kind = "one-shot" if recovered_next else None
 
-            # Recurring jobs reach here only when something — typically a
-            # direct jobs.json edit that bypassed add_job() — left
+            # Recurring jobs reach here only when something â€” typically a
+            # direct jobs.json edit that bypassed add_job() â€” left
             # next_run_at unset.  Without this branch, such jobs are
             # silently skipped forever; recompute next_run_at from the
             # schedule so they pick up at their next scheduled tick.
@@ -1244,7 +1244,7 @@ def _get_due_jobs_locked() -> List[Dict[str, Any]]:
                 kind in {"cron", "interval"}
                 and (now - next_run_dt).total_seconds() > grace
             ):
-                # Job is past its catch-up grace window — this is a stale missed run.
+                # Job is past its catch-up grace window â€” this is a stale missed run.
                 # Grace scales with schedule period: daily=2h, hourly=30m, 10min=5m.
                 new_next = compute_next_run(schedule, now.isoformat())
                 if new_next:
@@ -1316,7 +1316,7 @@ def rewrite_skill_refs(
 
     When the curator consolidates a skill X into umbrella Y (or archives X
     as pruned), any cron job that lists ``X`` in its ``skills`` field will
-    fail to load ``X`` at run time — the scheduler logs a warning and
+    fail to load ``X`` at run time â€” the scheduler logs a warning and
     skips the skill, so the job runs without the instructions it was
     scheduled to follow. See cron/scheduler.py where ``skill_view`` is
     called per skill name.
@@ -1326,7 +1326,7 @@ def rewrite_skill_refs(
     - A skill listed in ``consolidated`` is replaced with its umbrella
       target (the ``into`` value). If the umbrella is already in the
       job's skill list, the stale name is dropped without duplication.
-    - A skill listed in ``pruned`` is dropped outright — there is no
+    - A skill listed in ``pruned`` is dropped outright â€” there is no
       forwarding target.
     - Ordering and other skills in the list are preserved.
     - The legacy ``skill`` field is realigned via ``_apply_skill_fields``.
@@ -1360,7 +1360,7 @@ def rewrite_skill_refs(
     """
     consolidated = dict(consolidated or {})
     pruned_set = set(pruned or [])
-    # A skill listed in both wins as "consolidated" — it has a target,
+    # A skill listed in both wins as "consolidated" â€” it has a target,
     # which is the more useful of the two outcomes.
     pruned_set -= set(consolidated.keys())
 

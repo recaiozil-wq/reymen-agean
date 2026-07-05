@@ -1,8 +1,8 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
-ReYMeN Terminal Tool — Direkt PowerShell/Bash Komut Çalıştırıcı
+ReYMeN Terminal Tool â€” Direkt PowerShell/Bash Komut Ã‡alÄ±ÅŸtÄ±rÄ±cÄ±
 
-Kullanım:
+KullanÄ±m:
   python terminal_tool.py whoami
   python terminal_tool.py --shell powershell "dir"
   python terminal_tool.py --json "python --version"
@@ -71,9 +71,9 @@ def terminal_calistir(komut, shell="auto", timeout=60, workdir=None, env_ek=None
             "shell": shell,
         }
     except subprocess.TimeoutExpired:
-        raise TerminalTimeout(f"Komut {timeout}s içinde bitmedi: {komut[:60]}")
+        raise TerminalTimeout(f"Komut {timeout}s iÃ§inde bitmedi: {komut[:60]}")
     except Exception as e:
-        raise TerminalHatasi(f"Terminal hatası: {e}")
+        raise TerminalHatasi(f"Terminal hatasÄ±: {e}")
 
 
 if __name__ == "__main__":
@@ -91,11 +91,11 @@ if __name__ == "__main__":
 
     if not args.komut:
         print(
-            f"{C.BOLD}{C.BLU}ReYMeN Terminal Tool{C.RESET}\n  {C.YEL}exit ile çık{C.RESET}\n"
+            f"{C.BOLD}{C.BLU}ReYMeN Terminal Tool{C.RESET}\n  {C.YEL}exit ile Ã§Ä±k{C.RESET}\n"
         )
         while True:
             try:
-                g = input(f"{C.GRN}❯{C.RESET} ").strip()
+                g = input(f"{C.GRN}â¯{C.RESET} ").strip()
                 if not g or g in ("exit", "quit", "q"):
                     break
                 s = terminal_calistir(g, args.shell, args.timeout, args.workdir)
@@ -108,7 +108,7 @@ if __name__ == "__main__":
                 print()
                 break
             except (TerminalHatasi, TerminalTimeout) as e:
-                print(f"{C.RED}❌ {e}{C.RESET}")
+                print(f"{C.RED}âŒ {e}{C.RESET}")
     else:
         try:
             s = terminal_calistir(
@@ -119,5 +119,5 @@ if __name__ == "__main__":
             else:
                 print(s.get("cikti", ""))
         except (TerminalHatasi, TerminalTimeout) as e:
-            print(f"{C.RED}❌ {e}{C.RESET}")
+            print(f"{C.RED}âŒ {e}{C.RESET}")
             sys.exit(1)

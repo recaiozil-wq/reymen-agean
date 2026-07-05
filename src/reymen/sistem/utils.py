@@ -1,4 +1,4 @@
-"""Shared utility functions for ReYMeN-agent."""
+﻿"""Shared utility functions for ReYMeN-agent."""
 
 import json
 import logging
@@ -129,7 +129,7 @@ def atomic_replace(tmp_path: Union[str, Path], target: Union[str, Path]) -> str:
 
     ``os.replace(tmp, target)`` atomically swaps ``tmp`` into place at
     ``target``.  When ``target`` is a symlink, the symlink itself is
-    replaced with a regular file — silently detaching managed deployments
+    replaced with a regular file â€” silently detaching managed deployments
     that symlink ``config.yaml`` / ``SOUL.md`` / ``auth.json`` etc. from
     ``~/.ReYMeN/`` to a git-tracked profile package or dotfiles repo
     (GitHub #16743).
@@ -187,7 +187,7 @@ def atomic_json_write(
     try:
         if mode is not None and hasattr(os, "fchmod"):
             # fchmod is Unix-only; Windows' os module has no fchmod. Skipping it
-            # here is safe — mkstemp already created the temp file as 0o600, and
+            # here is safe â€” mkstemp already created the temp file as 0o600, and
             # the post-replace os.chmod below applies the final mode durably.
             os.fchmod(fd, mode)
         with os.fdopen(fd, "w", encoding="utf-8") as f:
@@ -200,7 +200,7 @@ def atomic_json_write(
             )
             f.flush()
             os.fsync(f.fileno())
-        # Preserve symlinks — swap in-place on the real file (GitHub #16743).
+        # Preserve symlinks â€” swap in-place on the real file (GitHub #16743).
         real_path = atomic_replace(tmp_path, path)
         if mode is not None:
             try:
@@ -260,7 +260,7 @@ def atomic_yaml_write(
                 f.write(extra_content)
             f.flush()
             os.fsync(f.fileno())
-        # Preserve symlinks — swap in-place on the real file (GitHub #16743).
+        # Preserve symlinks â€” swap in-place on the real file (GitHub #16743).
         real_path = atomic_replace(tmp_path, path)
         _restore_file_mode(real_path, original_mode)
     except BaseException:
@@ -337,7 +337,7 @@ def atomic_roundtrip_yaml_update(
         raise
 
 
-# ─── JSON Helpers ─────────────────────────────────────────────────────────────
+# â”€â”€â”€ JSON Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def safe_json_loads(text: str, default: Any = None) -> Any:
@@ -353,7 +353,7 @@ def safe_json_loads(text: str, default: Any = None) -> Any:
         return default
 
 
-# ─── Environment Variable Helpers ─────────────────────────────────────────────
+# â”€â”€â”€ Environment Variable Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def env_int(key: str, default: int = 0) -> int:
@@ -372,7 +372,7 @@ def env_bool(key: str, default: bool = False) -> bool:
     return is_truthy_value(os.getenv(key, ""), default=default)
 
 
-# ─── Proxy Helpers ────────────────────────────────────────────────────────────
+# â”€â”€â”€ Proxy Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 _PROXY_ENV_KEYS = (
@@ -409,7 +409,7 @@ def normalize_proxy_env_vars() -> None:
             os.environ[key] = normalized
 
 
-# ─── URL Parsing Helpers ──────────────────────────────────────────────────────
+# â”€â”€â”€ URL Parsing Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def base_url_hostname(base_url: str) -> str:
@@ -454,7 +454,7 @@ def model_forces_max_completion_tokens(model: str) -> bool:
     """Return True for model families that require ``max_completion_tokens``.
 
     OpenAI's newer families reject ``max_tokens`` on /v1/chat/completions with
-    HTTP 400 ``unsupported_parameter`` — the caller must send
+    HTTP 400 ``unsupported_parameter`` â€” the caller must send
     ``max_completion_tokens`` instead. This covers:
 
     - ``gpt-4o`` / ``gpt-4o-mini`` / ``gpt-4o-*``

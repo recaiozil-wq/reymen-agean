@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
-"""x_search_tool.py — X (Twitter) Arama Aracı.
+﻿# -*- coding: utf-8 -*-
+"""x_search_tool.py â€” X (Twitter) Arama AracÄ±.
 
-X/Twitter v2 API kullanarak tweet arar, kullanıcı profili çeker,
-trend konuları listeler. Bearer Token yeterli — OAuth 1.0a gerekmez.
+X/Twitter v2 API kullanarak tweet arar, kullanÄ±cÄ± profili Ã§eker,
+trend konularÄ± listeler. Bearer Token yeterli â€” OAuth 1.0a gerekmez.
 ENV: X_BEARER_TOKEN
 """
 
@@ -18,7 +18,7 @@ X_BASE = "https://api.twitter.com/2"
 
 def _x_get(yol: str, params: dict) -> dict:
     if not X_BEARER:
-        return {"error": "X_BEARER_TOKEN ayarlanmamış."}
+        return {"error": "X_BEARER_TOKEN ayarlanmamÄ±ÅŸ."}
     url = f"{X_BASE}{yol}?{urllib.parse.urlencode(params)}"
     try:
         req = urllib.request.Request(
@@ -42,13 +42,13 @@ def tweet_ara(
 
     Args:
         sorgu:            Arama terimi (#hashtag, @kullanici, kelime)
-        max_sonuc:        Kaç tweet döneceği (10-100)
-        lang:             Dil filtresi (tr, en, …)
-        exclude_replies:  Yanıtları hariç tut
-        exclude_retweets: RT'leri hariç tut
+        max_sonuc:        KaÃ§ tweet dÃ¶neceÄŸi (10-100)
+        lang:             Dil filtresi (tr, en, â€¦)
+        exclude_replies:  YanÄ±tlarÄ± hariÃ§ tut
+        exclude_retweets: RT'leri hariÃ§ tut
 
     Returns:
-        Sonuçlar metin formatında
+        SonuÃ§lar metin formatÄ±nda
     """
     q = sorgu
     if lang:
@@ -76,27 +76,27 @@ def tweet_ara(
     kullanicilar = {u["id"]: u for u in yanit.get("includes", {}).get("users", [])}
 
     if not tweetler:
-        return f"'{sorgu}' için sonuç bulunamadı."
+        return f"'{sorgu}' iÃ§in sonuÃ§ bulunamadÄ±."
 
-    satirlar = [f"X Arama: '{sorgu}' — {len(tweetler)} tweet"]
+    satirlar = [f"X Arama: '{sorgu}' â€” {len(tweetler)} tweet"]
     for t in tweetler:
         yazar_id = t.get("author_id", "")
         yazar = kullanicilar.get(yazar_id, {})
         kullanici = yazar.get("username", yazar_id)
         metrikler = t.get("public_metrics", {})
         satirlar.append(
-            f"\n@{kullanici} | ♥{metrikler.get('like_count',0)} "
-            f"🔁{metrikler.get('retweet_count',0)} | {t.get('created_at','')}\n"
+            f"\n@{kullanici} | â™¥{metrikler.get('like_count',0)} "
+            f"ğŸ”{metrikler.get('retweet_count',0)} | {t.get('created_at','')}\n"
             f"{t['text']}"
         )
     return "\n".join(satirlar)
 
 
 def kullanici_profili(kullanici_adi: str) -> str:
-    """X kullanıcı profili getir.
+    """X kullanÄ±cÄ± profili getir.
 
     Args:
-        kullanici_adi: @ işareti olmadan (ör. elonmusk)
+        kullanici_adi: @ iÅŸareti olmadan (Ã¶r. elonmusk)
 
     Returns:
         Profil bilgisi metin olarak
@@ -113,24 +113,24 @@ def kullanici_profili(kullanici_adi: str) -> str:
 
     data = yanit.get("data", {})
     if not data:
-        return f"@{kullanici_adi} bulunamadı."
+        return f"@{kullanici_adi} bulunamadÄ±."
 
     m = data.get("public_metrics", {})
     return (
-        f"@{data.get('username')} — {data.get('name')}\n"
+        f"@{data.get('username')} â€” {data.get('name')}\n"
         f"{data.get('description','')}\n"
-        f"Takipçi: {m.get('followers_count',0):,} | "
+        f"TakipÃ§i: {m.get('followers_count',0):,} | "
         f"Takip: {m.get('following_count',0):,} | "
         f"Tweet: {m.get('tweet_count',0):,}"
     )
 
 
 def son_tweetler(kullanici_adi: str, max_sonuc: int = 5) -> str:
-    """Kullanıcının son tweetlerini getir."""
+    """KullanÄ±cÄ±nÄ±n son tweetlerini getir."""
     profil = _x_get(f"/users/by/username/{kullanici_adi}", {"user.fields": "id"})
     uid = profil.get("data", {}).get("id", "")
     if not uid:
-        return f"[X]: @{kullanici_adi} bulunamadı."
+        return f"[X]: @{kullanici_adi} bulunamadÄ±."
 
     yanit = _x_get(
         f"/users/{uid}/tweets",
@@ -143,19 +143,19 @@ def son_tweetler(kullanici_adi: str, max_sonuc: int = 5) -> str:
 
     tweetler = yanit.get("data", [])
     if not tweetler:
-        return f"@{kullanici_adi} için tweet bulunamadı."
+        return f"@{kullanici_adi} iÃ§in tweet bulunamadÄ±."
 
-    satirlar = [f"@{kullanici_adi} — Son {len(tweetler)} Tweet"]
+    satirlar = [f"@{kullanici_adi} â€” Son {len(tweetler)} Tweet"]
     for t in tweetler:
         m = t.get("public_metrics", {})
         satirlar.append(
-            f"\n♥{m.get('like_count',0)} | {t.get('created_at','')}\n{t['text']}"
+            f"\nâ™¥{m.get('like_count',0)} | {t.get('created_at','')}\n{t['text']}"
         )
     return "\n".join(satirlar)
 
 
 def motor_kaydet(motor):
-    """X araçlarını motora kaydet."""
+    """X araÃ§larÄ±nÄ± motora kaydet."""
     if not hasattr(motor, "_plugin_arac_kaydet"):
         return
 
@@ -167,12 +167,12 @@ def motor_kaydet(motor):
     motor._plugin_arac_kaydet(
         "X_KULLANICI_PROFIL",
         lambda kullanici_adi: kullanici_profili(kullanici_adi),
-        "X kullanıcı profilini getir",
+        "X kullanÄ±cÄ± profilini getir",
     )
     motor._plugin_arac_kaydet(
         "X_SON_TWEETLER",
         lambda kullanici_adi, max_sonuc=5: son_tweetler(kullanici_adi, int(max_sonuc)),
-        "X kullanıcısının son tweetlerini getir",
+        "X kullanÄ±cÄ±sÄ±nÄ±n son tweetlerini getir",
     )
 
 

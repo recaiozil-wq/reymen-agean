@@ -1,11 +1,11 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-⚙️ OAuth Servis — OAuth sistemi yöneticisi.
+âš™ï¸ OAuth Servis â€” OAuth sistemi yÃ¶neticisi.
 
-Provider'lar için login/callback/refresh/logout/durum işlemlerini
-tek bir API'de birleştirir.
+Provider'lar iÃ§in login/callback/refresh/logout/durum iÅŸlemlerini
+tek bir API'de birleÅŸtirir.
 
-Kullanım:
+KullanÄ±m:
     servis = OAuthServis()
     url = servis.login("google")
     token = servis.callback("google", "auth_code_here")
@@ -19,7 +19,7 @@ from __future__ import annotations
 import logging
 from typing import Any, Optional
 
-from src.reymen.guvenlik.oauth_sistemi import (
+from reymen.guvenlik.oauth_sistemi import (
     OAuthSistemi,
     OAuthToken,
     OAuthError,
@@ -28,7 +28,7 @@ from src.reymen.guvenlik.oauth_sistemi import (
 
 logger = logging.getLogger(__name__)
 
-# FastAPI mevcutsa callback route'ları için yardımcı
+# FastAPI mevcutsa callback route'larÄ± iÃ§in yardÄ±mcÄ±
 try:
     from fastapi import APIRouter, Query, HTTPException  # type: ignore[import-untyped]
     from fastapi.responses import RedirectResponse  # type: ignore[import-untyped]
@@ -43,9 +43,9 @@ except ImportError:
 
 
 class OAuthServis:
-    """OAuth sistemi yöneticisi — login/callback/refresh/logout/durum.
+    """OAuth sistemi yÃ¶neticisi â€” login/callback/refresh/logout/durum.
 
-    Tüm işlemler alttaki OAuthSistemi üzerinden yürütülür.
+    TÃ¼m iÅŸlemler alttaki OAuthSistemi Ã¼zerinden yÃ¼rÃ¼tÃ¼lÃ¼r.
     """
 
     def __init__(self, sistem: Optional[OAuthSistemi] = None):
@@ -56,33 +56,33 @@ class OAuthServis:
         """Alttaki OAuth sistemi."""
         return self._sistem
 
-    # ── Ana API ─────────────────────────────────────────────────────────
+    # â”€â”€ Ana API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def login(self, provider: str) -> str:
-        """Provider'a giriş yapmak için auth URL'si döndür.
+        """Provider'a giriÅŸ yapmak iÃ§in auth URL'si dÃ¶ndÃ¼r.
 
         Args:
             provider: "google", "github", "discord"
 
         Returns:
-            Auth URL (kullanıcının tarayıcıda açması gereken URL)
+            Auth URL (kullanÄ±cÄ±nÄ±n tarayÄ±cÄ±da aÃ§masÄ± gereken URL)
 
         Raises:
-            OAuthError: Provider bulunamazsa veya hazır değilse
+            OAuthError: Provider bulunamazsa veya hazÄ±r deÄŸilse
         """
         url = self._sistem.giris_yap(provider)
         if url is None:
             p = self._sistem.provider(provider)
             if not p.hazir:
                 raise OAuthError(
-                    f"[{provider.upper()}] OAuth yapılandırması eksik. "
-                    f"Lütfen .env dosyasına {provider.upper()}_CLIENT_ID ve "
+                    f"[{provider.upper()}] OAuth yapÄ±landÄ±rmasÄ± eksik. "
+                    f"LÃ¼tfen .env dosyasÄ±na {provider.upper()}_CLIENT_ID ve "
                     f"{provider.upper()}_CLIENT_SECRET ekleyin.",
                     provider=provider,
                     code="oauth_config_eksik",
                 )
             raise OAuthError(
-                f"[{provider.upper()}] Auth URL oluşturulamadı.",
+                f"[{provider.upper()}] Auth URL oluÅŸturulamadÄ±.",
                 provider=provider,
                 code="oauth_url_hatasi",
             )
@@ -99,13 +99,13 @@ class OAuthServis:
             Token bilgisi (dict)
 
         Raises:
-            OAuthError: Token alınamazsa
+            OAuthError: Token alÄ±namazsa
         """
         token = self._sistem.callback_islem(provider, code)
         if token is None:
             raise OAuthError(
-                f"[{provider.upper()}] Authorization code ile token alınamadı. "
-                f"Code geçersiz olabilir veya süresi dolmuş olabilir.",
+                f"[{provider.upper()}] Authorization code ile token alÄ±namadÄ±. "
+                f"Code geÃ§ersiz olabilir veya sÃ¼resi dolmuÅŸ olabilir.",
                 provider=provider,
                 code="oauth_token_alma_hatasi",
             )
@@ -135,19 +135,19 @@ class OAuthServis:
         Raises:
             OAuthError: Token yenilenemezse
         """
-        # GitHub'da refresh_token yok — özel mesaj
+        # GitHub'da refresh_token yok â€” Ã¶zel mesaj
         if provider.lower() == "github":
             mevcut = self._sistem.token_yukle("github")
             if mevcut and not mevcut.is_expired:
                 return {
                     "basarili": True,
-                    "mesaj": "GitHub token'ı kalıcıdır, yenileme gerekmez.",
+                    "mesaj": "GitHub token'Ä± kalÄ±cÄ±dÄ±r, yenileme gerekmez.",
                     "provider": "github",
-                    "durum": "geçerli",
+                    "durum": "geÃ§erli",
                 }
             raise OAuthError(
-                "[GITHUB] GitHub token'ları süresizdir, refresh_token desteği yoktur. "
-                "Token silinip yeniden giriş yapılabilir.",
+                "[GITHUB] GitHub token'larÄ± sÃ¼resizdir, refresh_token desteÄŸi yoktur. "
+                "Token silinip yeniden giriÅŸ yapÄ±labilir.",
                 provider="github",
                 code="github_no_refresh",
             )
@@ -156,8 +156,8 @@ class OAuthServis:
         if yeni_token is None:
             raise OAuthError(
                 f"[{provider.upper()}] Token yenilenemedi. "
-                f"Refresh token geçersiz veya süresi dolmuş olabilir. "
-                f"Tekrar giriş yapmayı deneyin.",
+                f"Refresh token geÃ§ersiz veya sÃ¼resi dolmuÅŸ olabilir. "
+                f"Tekrar giriÅŸ yapmayÄ± deneyin.",
                 provider=provider,
                 code="oauth_refresh_hatasi",
             )
@@ -174,25 +174,25 @@ class OAuthServis:
         }
 
     def logout(self, provider: str) -> dict[str, Any]:
-        """Provider'dan çıkış yap (token'ı sil).
+        """Provider'dan Ã§Ä±kÄ±ÅŸ yap (token'Ä± sil).
 
         Args:
             provider: "google", "github", "discord"
 
         Returns:
-            İşlem sonucu (dict)
+            Ä°ÅŸlem sonucu (dict)
         """
         basarili = self._sistem.cikis_yap(provider)
         return {
             "basarili": basarili,
             "provider": provider,
-            "mesaj": "Çıkış yapıldı, token silindi."
+            "mesaj": "Ã‡Ä±kÄ±ÅŸ yapÄ±ldÄ±, token silindi."
             if basarili
-            else f"[{provider.upper()}] Zaten giriş yapılmamış.",
+            else f"[{provider.upper()}] Zaten giriÅŸ yapÄ±lmamÄ±ÅŸ.",
         }
 
     def durum(self, provider: str) -> dict[str, Any]:
-        """Provider için token durumunu döndür.
+        """Provider iÃ§in token durumunu dÃ¶ndÃ¼r.
 
         Args:
             provider: "google", "github", "discord"
@@ -210,14 +210,14 @@ class OAuthServis:
         return self._sistem.token_durum(provider)
 
     def listele(self) -> list[dict[str, Any]]:
-        """Tüm kayıtlı token'ları listele."""
+        """TÃ¼m kayÄ±tlÄ± token'larÄ± listele."""
         return self._sistem.token_listele()
 
     def gecerli_token_al(self, provider: str) -> Optional[OAuthToken]:
-        """Geçerli (süresi dolmamış) OAuthToken nesnesini döndür.
+        """GeÃ§erli (sÃ¼resi dolmamÄ±ÅŸ) OAuthToken nesnesini dÃ¶ndÃ¼r.
 
-        Süresi dolmuşsa ve refresh_token varsa otomatik yeniler.
-        API çağrılarında access_token'ı kullanmak için idealdir.
+        SÃ¼resi dolmuÅŸsa ve refresh_token varsa otomatik yeniler.
+        API Ã§aÄŸrÄ±larÄ±nda access_token'Ä± kullanmak iÃ§in idealdir.
 
         Args:
             provider: "google", "github", "discord"
@@ -227,18 +227,18 @@ class OAuthServis:
         """
         return self._sistem.gecerli_token(provider)
 
-    # ── Kolaylık metodları ──────────────────────────────────────────────
+    # â”€â”€ KolaylÄ±k metodlarÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def google_auth_url(self) -> str:
-        """Google giriş URL'si."""
+        """Google giriÅŸ URL'si."""
         return self.login("google")
 
     def github_auth_url(self) -> str:
-        """GitHub giriş URL'si."""
+        """GitHub giriÅŸ URL'si."""
         return self.login("github")
 
     def discord_auth_url(self) -> str:
-        """Discord giriş URL'si."""
+        """Discord giriÅŸ URL'si."""
         return self.login("discord")
 
     def google_durum(self) -> dict[str, Any]:
@@ -255,14 +255,14 @@ class OAuthServis:
 
 
 # ---------------------------------------------------------------------------
-# FastAPI Callback Route'ları (isteğe bağlı)
+# FastAPI Callback Route'larÄ± (isteÄŸe baÄŸlÄ±)
 # ---------------------------------------------------------------------------
 
 
 def fastapi_callback_router(servis: Optional[OAuthServis] = None) -> Any:
-    """FastAPI router oluştur — OAuth callback'leri için.
+    """FastAPI router oluÅŸtur â€” OAuth callback'leri iÃ§in.
 
-    Kullanım (FastAPI uygulamasında):
+    KullanÄ±m (FastAPI uygulamasÄ±nda):
         from reymen.guvenlik.oauth_servis import fastapi_callback_router
         app.include_router(fastapi_callback_router())
 
@@ -272,9 +272,9 @@ def fastapi_callback_router(servis: Optional[OAuthServis] = None) -> Any:
         GET /auth/durum/{provider}  -> Token durumu
     """
     if not _FASTAPI_MEVCUT:
-        raise ImportError("FastAPI kurulu değil. 'pip install fastapi' ile kurun.")
+        raise ImportError("FastAPI kurulu deÄŸil. 'pip install fastapi' ile kurun.")
 
-    # FastAPI varlığı yukarıda kontrol edildi
+    # FastAPI varlÄ±ÄŸÄ± yukarÄ±da kontrol edildi
     from fastapi import APIRouter, Query, HTTPException
     from fastapi.responses import RedirectResponse
 
@@ -283,7 +283,7 @@ def fastapi_callback_router(servis: Optional[OAuthServis] = None) -> Any:
 
     @router.get("/login/{provider}")
     async def login(provider: str):
-        """Provider'a yönlendir."""
+        """Provider'a yÃ¶nlendir."""
         try:
             url = servis.login(provider)
             return RedirectResponse(url=url)
@@ -292,11 +292,11 @@ def fastapi_callback_router(servis: Optional[OAuthServis] = None) -> Any:
 
     @router.get("/callback/{provider}")
     async def callback(provider: str, code: str = Query(...), state: str = Query("")):
-        """OAuth callback — authorization code ile token al."""
+        """OAuth callback â€” authorization code ile token al."""
         try:
             sonuc = servis.callback(provider, code)
             return {
-                "mesaj": f"{provider.upper()} giriş başarılı!",
+                "mesaj": f"{provider.upper()} giriÅŸ baÅŸarÄ±lÄ±!",
                 "token": sonuc,
             }
         except OAuthError as e:
@@ -304,7 +304,7 @@ def fastapi_callback_router(servis: Optional[OAuthServis] = None) -> Any:
 
     @router.get("/durum/{provider}")
     async def token_durum(provider: str):
-        """Token durumunu göster."""
+        """Token durumunu gÃ¶ster."""
         return servis.durum(provider)
 
     @router.post("/refresh/{provider}")
@@ -317,7 +317,7 @@ def fastapi_callback_router(servis: Optional[OAuthServis] = None) -> Any:
 
     @router.post("/logout/{provider}")
     async def logout(provider: str):
-        """Çıkış yap."""
+        """Ã‡Ä±kÄ±ÅŸ yap."""
         return servis.logout(provider)
 
     return router

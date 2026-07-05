@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-bounded_memory.py — Sinirli bellek.
+bounded_memory.py â€” Sinirli bellek.
 
 LRU (Least Recently Used) mantigiyla calisan,
 maksimum kapasiteli bir bellek yonetimi sinifi.

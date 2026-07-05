@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""curator.py — ReYMeN Otomatik Bakim (Curator) Modulu.
+﻿# -*- coding: utf-8 -*-
+"""curator.py â€” ReYMeN Otomatik Bakim (Curator) Modulu.
 
 Ne yapar:
   - Skill dosyalarinda bozuk/eksik frontmatter tespit ve duzeltme
@@ -34,7 +34,7 @@ __all__ = [
     "motor_kaydet",
 ]
 
-# ── Varsayilan yapilandirma ──────────────────────────────────────────────
+# â”€â”€ Varsayilan yapilandirma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _DEFAULT_CONFIG: dict[str, Any] = {
     "skill_max_boyut_kb": 100,  # 100KB ustu skill uyarisi
@@ -44,7 +44,7 @@ _DEFAULT_CONFIG: dict[str, Any] = {
     "haftalik_trend_gun": 7,  # Trend raporu kapsami
 }
 
-# ── Yardimcilar ──────────────────────────────────────────────────────────
+# â”€â”€ Yardimcilar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _proje_kok() -> Path:
@@ -60,7 +60,7 @@ def _dosya_boyutu_mb(yol: Path) -> float:
         return 0.0
 
 
-# ── 1. Skill bakimi ──────────────────────────────────────────────────────
+# â”€â”€ 1. Skill bakimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _skill_kontrol(kok: Path) -> list[str]:
@@ -94,7 +94,7 @@ def _skill_kontrol(kok: Path) -> list[str]:
     return sorunlar
 
 
-# ── 2. Hafiza budama ─────────────────────────────────────────────────────
+# â”€â”€ 2. Hafiza budama â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _hafiza_kontrol(kok: Path) -> list[str]:
@@ -119,7 +119,7 @@ def _hafiza_kontrol(kok: Path) -> list[str]:
     return sorunlar
 
 
-# ── 3. __pycache__ temizligi ──────────────────────────────────────────────
+# â”€â”€ 3. __pycache__ temizligi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _pycache_temizle(kok: Path, dry_run: bool = True) -> list[str]:
@@ -159,7 +159,7 @@ def _pycache_temizle(kok: Path, dry_run: bool = True) -> list[str]:
     return sonuc
 
 
-# ── 4. Trend raporu (self-improve DB) ─────────────────────────────────────
+# â”€â”€ 4. Trend raporu (self-improve DB) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _trend_rapor(kok: Path) -> dict[str, Any]:
@@ -195,7 +195,7 @@ def _trend_rapor(kok: Path) -> dict[str, Any]:
     return {"mesaj": "self_improve.db bulunamadi"}
 
 
-# ── Ana fonksiyonlar ─────────────────────────────────────────────────────
+# â”€â”€ Ana fonksiyonlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def curator_calistir(
@@ -252,7 +252,7 @@ def curator_temizlik_yap(
     kok: str | Path | None = None,
     pycache_sil: bool = True,
 ) -> list[str]:
-    """Gerçek temizlik islemlerini yap (dry_run=False).
+    """GerÃ§ek temizlik islemlerini yap (dry_run=False).
 
     Args:
         kok: Proje kok dizini
@@ -282,34 +282,34 @@ def curator_rapor(sonuc: dict[str, Any] | None = None) -> str:
         sonuc = curator_calistir()
 
     satirlar: list[str] = []
-    satirlar.append(f"📋 Curator Raporu — {sonuc['tarih'][:19]}")
+    satirlar.append(f"ğŸ“‹ Curator Raporu â€” {sonuc['tarih'][:19]}")
     satirlar.append(f"   Kok: {sonuc['kok']}")
     satirlar.append(f"   Sure: {sonuc['sure_sn']}sn")
     satirlar.append("")
 
     # Skill sorunlari
     skill = sonuc.get("skill_sorun", [])
-    satirlar.append(f"📄 Skill sorunu: {len(skill)}")
+    satirlar.append(f"ğŸ“„ Skill sorunu: {len(skill)}")
     for s in skill[:10]:
-        satirlar.append(f"   ⚠️  {s}")
+        satirlar.append(f"   âš ï¸  {s}")
     if len(skill) > 10:
         satirlar.append(f"   ... ve {len(skill) - 10} daha")
 
     # Hafiza sorunlari
     hafiza = sonuc.get("hafiza_sorun", [])
-    satirlar.append(f"💾 Hafiza sorunu: {len(hafiza)}")
+    satirlar.append(f"ğŸ’¾ Hafiza sorunu: {len(hafiza)}")
     for h in hafiza:
-        satirlar.append(f"   ⚠️  {h}")
+        satirlar.append(f"   âš ï¸  {h}")
 
     # Pycache
     pycache = sonuc.get("pycache", [])
-    satirlar.append(f"🗑️  Pycache: {len(pycache)}")
+    satirlar.append(f"ğŸ—‘ï¸  Pycache: {len(pycache)}")
     for p in pycache[:5]:
         satirlar.append(f"   {p}")
 
     # Trend
     trend = sonuc.get("trend", {})
-    satirlar.append(f"📊 Trend (son 7 gun):")
+    satirlar.append(f"ğŸ“Š Trend (son 7 gun):")
     if trend.get("toplam_adim", 0) > 0:
         satirlar.append(f"   Adim: {trend['toplam_adim']}")
         satirlar.append(f"   Skor: {trend.get('ortalama_skor', 'N/A')}")
@@ -321,7 +321,7 @@ def curator_rapor(sonuc: dict[str, Any] | None = None) -> str:
     return "\n".join(satirlar)
 
 
-# ── Motor kaydi ──────────────────────────────────────────────────────────
+# â”€â”€ Motor kaydi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _tool_curator_calistir(**kw) -> str:
@@ -356,7 +356,7 @@ def motor_kaydet(motor) -> None:
     motor._plugin_arac_kaydet(
         "CURATOR_TEMIZLIK",
         _tool_curator_temizlik,
-        "Gerçek temizlik yap: __pycache__ sil.",
+        "GerÃ§ek temizlik yap: __pycache__ sil.",
     )
     logger.info("[CURATOR] Motor'a 3 arac kaydedildi")
 

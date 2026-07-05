@@ -1,5 +1,5 @@
-"""
-ReYMeN Gateway — WhatsApp Business Platform API adaptoru.
+﻿"""
+ReYMeN Gateway â€” WhatsApp Business Platform API adaptoru.
 
 WhatsApp Cloud API (Meta) uzerinden mesaj alip gonderir.
 Webhook tabanli: Mesaj al -> Beyin'e gonder -> Cevabi WhatsApp'a gonder.
@@ -9,15 +9,15 @@ Bagimliliklar:
   - cryptography (imza dogrulama icin, opsiyonel)
 
 Yapilandirma (ortam degiskenleri):
-  - WHATSAPP_API_KEY / WHATSAPP_ACCESS_TOKEN  — WhatsApp Graph API erisim tokeni
-  - WHATSAPP_PHONE_NUMBER_ID                  — Isletme telefon numarasi ID'si
-  - WHATSAPP_BUSINESS_ACCOUNT_ID              — Isletme hesabi ID'si (opsiyonel)
-  - WHATSAPP_WEBHOOK_VERIFY_TOKEN             — Webhook dogrulama tokeni
-  - WHATSAPP_API_VERSION                      — Graph API versiyonu (varsayilan: v22.0)
+  - WHATSAPP_API_KEY / WHATSAPP_ACCESS_TOKEN  â€” WhatsApp Graph API erisim tokeni
+  - WHATSAPP_PHONE_NUMBER_ID                  â€” Isletme telefon numarasi ID'si
+  - WHATSAPP_BUSINESS_ACCOUNT_ID              â€” Isletme hesabi ID'si (opsiyonel)
+  - WHATSAPP_WEBHOOK_VERIFY_TOKEN             â€” Webhook dogrulama tokeni
+  - WHATSAPP_API_VERSION                      â€” Graph API versiyonu (varsayilan: v22.0)
 
 Webhook:
-  POST /webhook/whatsapp  — Gelen mesajlari alir
-  GET  /webhook/whatsapp  — Meta webhook dogrulamasi (hub.challenge)
+  POST /webhook/whatsapp  â€” Gelen mesajlari alir
+  GET  /webhook/whatsapp  â€” Meta webhook dogrulamasi (hub.challenge)
 """
 
 import asyncio
@@ -39,14 +39,14 @@ from pathlib import Path as _Path
 
 sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
-from src.gateways.config import Platform, PlatformConfig
-from src.gateways.platforms.base import (
+from gateways.config import Platform, PlatformConfig
+from gateways.platforms.base import (
     BasePlatformAdapter,
     MessageEvent,
     MessageType,
     SendResult,
 )
-from src.gateways.session import SessionSource
+from gateways.session import SessionSource
 
 logger = logging.getLogger(__name__)
 
@@ -440,7 +440,7 @@ class WhatsAppClient:
         Args:
             to_number: Alici telefon numarasi.
             message_id: Tepki verilecek mesajin ID'si.
-            emoji: Tepki emojisi (ornek: "👍").
+            emoji: Tepki emojisi (ornek: "ğŸ‘").
         """
         payload: Dict[str, Any] = {
             "messaging_product": "whatsapp",
@@ -570,7 +570,7 @@ class WhatsAppClient:
                 log.warning(f"[src.gateways.platforms.whatsapp] Exception at L555")
                 pass
             logger.error(
-                "[WhatsApp] API hatasi (%s): %s — %s",
+                "[WhatsApp] API hatasi (%s): %s â€” %s",
                 resp.status_code,
                 exc,
                 error_body[:500] if error_body else "",
@@ -641,7 +641,7 @@ class WhatsAppWebhookParser:
                             messages.append(msg)
                     except Exception as exc:
                         logger.warning(
-                            "[WhatsApp] Mesaj ayristirma hatasi: %s — %s",
+                            "[WhatsApp] Mesaj ayristirma hatasi: %s â€” %s",
                             exc,
                             str(raw_msg)[:200],
                         )
@@ -752,7 +752,7 @@ class WhatsAppWebhookParser:
                         raw=raw,
                     )
 
-        # Bilinmeyen mesaj türü
+        # Bilinmeyen mesaj tÃ¼rÃ¼
         if msg_type == "unknown":
             logger.debug(
                 "[WhatsApp] Atlanan bilinmeyen mesaj turu: %s", raw.get("type")
@@ -1054,7 +1054,7 @@ class WhatsAppAdapter(BasePlatformAdapter):
             verified_name = profile.get("verified_name", "Bilinmiyor")
             display_phone = profile.get("display_phone_number", "Bilinmiyor")
             logger.info(
-                "[WhatsApp] Baglanti basarili — %s (%s)",
+                "[WhatsApp] Baglanti basarili â€” %s (%s)",
                 verified_name,
                 display_phone,
             )

@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-Agent Gatekeeper — ReYMeN / DeepSeek-V4-Flash icin
+Agent Gatekeeper â€” ReYMeN / DeepSeek-V4-Flash icin
 zorunlu arac-calistirma dogrulama motoru.
 
-Amaç: Modelin "TOOL CALL yaptim" ya da "test ettim" demesine
+AmaÃ§: Modelin "TOOL CALL yaptim" ya da "test ettim" demesine
 GUVENMEMEK. Bunun yerine:
   1. Modelin urettigi kodu gercekten calistir.
   2. Calistirma logunu SQLite'a yaz.
@@ -29,7 +29,7 @@ _PROJE_KOK = Path(__file__).resolve().parent.parent.parent
 _LOG_DB = _PROJE_KOK / "execution_log.sqlite"
 
 # ---------------------------------------------------------------------
-# 1) Calistirma logu — gercek kanit burada tutulur
+# 1) Calistirma logu â€” gercek kanit burada tutulur
 # ---------------------------------------------------------------------
 def init_log():
     conn = sqlite3.connect(str(_LOG_DB))
@@ -90,7 +90,7 @@ def has_real_execution(session_id: str, since_ts: float = 0) -> bool:
 # 2) Sayisal / DB iddiasi tespiti
 # ---------------------------------------------------------------------
 NUMERIC_CLAIM_PATTERN = re.compile(
-    r"(\bSELECT\b|\bsonuç\b.*\d|\btoplam\b.*\d|=\s*\d+\.?\d*|%\d+)", re.IGNORECASE
+    r"(\bSELECT\b|\bsonuÃ§\b.*\d|\btoplam\b.*\d|=\s*\d+\.?\d*|%\d+)", re.IGNORECASE
 )
 
 def response_makes_numeric_claim(text: str) -> bool:
@@ -98,7 +98,7 @@ def response_makes_numeric_claim(text: str) -> bool:
 
 
 # ---------------------------------------------------------------------
-# 3) Model cagrisi — ReYMeN'in mevcut Beyin.uret()'ine bagli
+# 3) Model cagrisi â€” ReYMeN'in mevcut Beyin.uret()'ine bagli
 # ---------------------------------------------------------------------
 def call_model(messages: list, session_id: str = "default") -> str:
     """
@@ -146,10 +146,10 @@ def _call_model_direct_api(messages: list) -> str:
 
     api_key = os.environ.get("DEEPSEEK_API_KEY", "")
     if not api_key:
-        # Hermes profil .env'sinden dene
+        # ReYMeN profil .env'sinden dene
         try:
             from dotenv import load_dotenv
-            profil_env = Path(os.environ.get("HERMES_PROFILE_DIR", "")) / ".env"
+            profil_env = Path(os.environ.get("REYMEN_PROFILE_DIR", "")) / ".env"
             if profil_env.exists():
                 load_dotenv(profil_env, override=True)
                 api_key = os.environ.get("DEEPSEEK_API_KEY", "")
@@ -207,7 +207,7 @@ def extract_code_blocks(text: str) -> list:
 
 
 # ---------------------------------------------------------------------
-# 4) Gatekeeper dongusu — asil enforcement burada
+# 4) Gatekeeper dongusu â€” asil enforcement burada
 # ---------------------------------------------------------------------
 def run_gatekept_turn(session_id: str, messages: list, max_retries: int = 2) -> dict:
     """

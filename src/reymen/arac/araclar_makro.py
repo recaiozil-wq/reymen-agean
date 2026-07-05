@@ -1,14 +1,14 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-araclar_makro.py — Makro kaydet/oynat (TinyTask mantığı).
-"Beni takip et" -> fare/klavye olaylarını zaman damgasıyla kaydeder.
-"Oynat" -> kaydı aynı sırayla tekrar eder.
+araclar_makro.py â€” Makro kaydet/oynat (TinyTask mantÄ±ÄŸÄ±).
+"Beni takip et" -> fare/klavye olaylarÄ±nÄ± zaman damgasÄ±yla kaydeder.
+"Oynat" -> kaydÄ± aynÄ± sÄ±rayla tekrar eder.
 
-Kayıtlar JSON olarak saklanır; her uygulama/proje için ayrı dosya.
-Bağımlılık: pynput (kayıt için), pyautogui (oynatma için). Opsiyonel.
+KayÄ±tlar JSON olarak saklanÄ±r; her uygulama/proje iÃ§in ayrÄ± dosya.
+BaÄŸÄ±mlÄ±lÄ±k: pynput (kayÄ±t iÃ§in), pyautogui (oynatma iÃ§in). Opsiyonel.
 
-DİKKAT: Bu KÖR tekrardır — aynı koordinatlara aynı sırayla tıklar.
-Pencere yeri/boyutu değişirse kayıt bozulabilir. Ekran-OCR-Tıkla daha dayanıklıdır.
+DÄ°KKAT: Bu KÃ–R tekrardÄ±r â€” aynÄ± koordinatlara aynÄ± sÄ±rayla tÄ±klar.
+Pencere yeri/boyutu deÄŸiÅŸirse kayÄ±t bozulabilir. Ekran-OCR-TÄ±kla daha dayanÄ±klÄ±dÄ±r.
 """
 
 import json
@@ -43,9 +43,9 @@ class MakroKaydedici:
         self._kb_listener = None
 
     def kaydi_baslat(self):
-        """Fare/klavye dinleyicilerini başlatır."""
+        """Fare/klavye dinleyicilerini baÅŸlatÄ±r."""
         if not PYNPUT_OK:
-            return "[Makro]: pynput kurulu değil (pip install pynput)."
+            return "[Makro]: pynput kurulu deÄŸil (pip install pynput)."
         self._olaylar = []
         self._baslangic = time.time()
 
@@ -70,14 +70,14 @@ class MakroKaydedici:
         self._kb_listener = keyboard.Listener(on_press=on_press)
         self._mouse_listener.start()
         self._kb_listener.start()
-        return "[Makro]: Kayıt başladı. 'kaydi_durdur(ad)' ile bitir."
+        return "[Makro]: KayÄ±t baÅŸladÄ±. 'kaydi_durdur(ad)' ile bitir."
 
     def kayda_basla(self):
         """kaydi_baslat() icin kisayol alias."""
         return self.kaydi_baslat()
 
     def kaydi_durdur(self, makro_adi):
-        """Dinleyicileri durdurur ve kaydı dosyaya yazar."""
+        """Dinleyicileri durdurur ve kaydÄ± dosyaya yazar."""
         if self._mouse_listener:
             self._mouse_listener.stop()
         if self._kb_listener:
@@ -88,12 +88,12 @@ class MakroKaydedici:
         return f"[Makro]: '{makro_adi}' kaydedildi ({len(self._olaylar)} olay) -> {yol}"
 
     def oynat(self, makro_adi, hiz=1.0):
-        """Kayıtlı makroyu aynı zamanlamayla tekrar eder."""
+        """KayÄ±tlÄ± makroyu aynÄ± zamanlamayla tekrar eder."""
         if not PYAUTOGUI_OK:
-            return "[Makro]: pyautogui kurulu değil."
+            return "[Makro]: pyautogui kurulu deÄŸil."
         yol = os.path.join(self.kayit_dizini, f"{makro_adi}.json")
         if not os.path.exists(yol):
-            return f"[Makro]: '{makro_adi}' bulunamadı."
+            return f"[Makro]: '{makro_adi}' bulunamadÄ±."
         with open(yol, "r", encoding="utf-8") as f:
             olaylar = json.load(f)
 
@@ -101,7 +101,7 @@ class MakroKaydedici:
         for olay in olaylar:
             bekle = (olay["t"] - onceki_t) / hiz
             if bekle > 0:
-                time.sleep(min(bekle, 5))  # güvenlik: max 5sn bekleme
+                time.sleep(min(bekle, 5))  # gÃ¼venlik: max 5sn bekleme
             onceki_t = olay["t"]
             if olay["tip"] == "click":
                 pyautogui.click(olay["x"], olay["y"])
@@ -111,7 +111,7 @@ class MakroKaydedici:
                     pyautogui.press(tus)
                 except Exception as _araclar__e97:
                     print(f"[UYARI] araclar_makro.py:98 - {_araclar__e97}")
-        return f"[Makro]: '{makro_adi}' oynatıldı ({len(olaylar)} olay)."
+        return f"[Makro]: '{makro_adi}' oynatÄ±ldÄ± ({len(olaylar)} olay)."
 
     def makro_listesi(self):
         dosyalar = [
@@ -121,19 +121,19 @@ class MakroKaydedici:
 
 
 def motor_kaydet(motor):
-    """Makro araçlarını motora kaydet."""
+    """Makro araÃ§larÄ±nÄ± motora kaydet."""
     if not hasattr(motor, "_plugin_arac_kaydet"):
         return
     _mk = MakroKaydedici()
     motor._plugin_arac_kaydet(
         "MAKRO_OYNAT_ADI",
         lambda ad="": _mk.oynat(str(ad)),
-        "Kayıtlı makroyu çalıştır (ad: makro adı)",
+        "KayÄ±tlÄ± makroyu Ã§alÄ±ÅŸtÄ±r (ad: makro adÄ±)",
     )
     motor._plugin_arac_kaydet(
         "MAKRO_LISTESI",
         lambda: str(_mk.makro_listesi()),
-        "Kayıtlı makro listesini göster",
+        "KayÄ±tlÄ± makro listesini gÃ¶ster",
     )
 
 

@@ -48,3 +48,20 @@
 3. `python -c` ile çalışma testi yap
 4. Tüm alt lokasyonlarda ara (sadece 1 yerde değil)
 5. En az 3 farklı yöntemle doğrula
+
+### Karar #38 — ReYMeN bağımsız Python ortamı (.venv_reymen)
+**Tarih:** 2026-07-05
+**Ne yapıldı:** ReYMeN projesine kendi bağımsız venv'i ve executable'ı oluşturuldu.
+**Neden:** reymen komutu Hermes Agent'in python.exe'sine bağımlıydı. `.venv_reymen/Scripts/reymen.exe` ile Hermes'ten tamamen bağımsız çalışır hale geldi.
+
+**Değişiklikler:**
+1. `.venv_reymen/` — yeni venv (Python 3.11.15, Hermes'ten bağımsız)
+2. `pyproject.toml` — packages ve entry_points düzeltildi
+3. `src/reymen/__main__.py` — sys.path proje köküne yönlendirildi
+4. `reymen/__main__.py` — proje kökünde entry point
+5. `~/.local/bin/reymen.cmd` → `.venv_reymen/Scripts/reymen.exe`
+6. `%AppData%/Local/hermes/bin/reymen.bat` → `.venv_reymen/Scripts/reymen.exe`
+7. Proje kökündeki eski `reymen/` (redirector) kaldırıldı
+
+**Sonuç:** `reymen version` → Python 3.11.15, `.venv_reymen/Scripts/python.exe`
+**Hermes bağımlılığı: YOK** ✅

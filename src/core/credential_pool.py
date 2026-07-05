@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-credential_pool.py — ReYMeN Kimlik Havuzu (CredentialPool).
+credential_pool.py â€” ReYMeN Kimlik Havuzu (CredentialPool).
 
 Provider adina gore API anahtari havuzu yonetir.
 Kaynak sirasi (sonraki oncekini ezer):
@@ -32,7 +32,7 @@ from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
-# ── Sabitler ────────────────────────────────────────────────────────
+# â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _PROJE_KOKU = (
     Path(__file__).resolve().parent.parent.parent
 )  # reymen/core/ -> reymen/ -> proje
@@ -57,9 +57,9 @@ def _env_adi(provider: str, index: int = 1) -> str:
     return f"{normalized}_{_API_KEY_SUFFIX}_{index}"
 
 
-# ═══════════════════════════════════════════════════════════════════
-# CredentialPool — Kimlik Havuzu Yoneticisi
-# ═══════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# CredentialPool â€” Kimlik Havuzu Yoneticisi
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class CredentialPool:
@@ -123,7 +123,7 @@ class CredentialPool:
             self._pool_dosyasi,
         )
 
-    # ── .env Yukleme ─────────────────────────────────────────────
+    # â”€â”€ .env Yukleme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @staticmethod
     def _dotenv_yukle() -> None:
@@ -144,7 +144,7 @@ class CredentialPool:
         except Exception as exc:
             logger.warning("[CredentialPool] .env yuklenemedi: %s", exc)
 
-    # ── Gecersiz Key Kaliciligi ─────────────────────────────────
+    # â”€â”€ Gecersiz Key Kaliciligi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _gecersizleri_yukle(self) -> None:
         """JSON dosyasindan gecersiz key kayitlarini yukler."""
@@ -189,7 +189,7 @@ class CredentialPool:
         except Exception as exc:
             logger.warning("[CredentialPool] Gecersiz key dosyasi yazilamadi: %s", exc)
 
-    # ── Key Tarama ──────────────────────────────────────────────
+    # â”€â”€ Key Tarama â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _provider_keyleri_tara(self, provider: str) -> list[str]:
         """Bir provider icin tum kaynaklardan key'leri toplar.
@@ -287,7 +287,7 @@ class CredentialPool:
         # Tum key'ler gecersiz
         return None
 
-    # ── Public API ──────────────────────────────────────────────
+    # â”€â”€ Public API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def get(self, provider: str) -> Optional[str]:
         """Provider icin mevcut aktif API anahtarini dondurur.
@@ -460,7 +460,7 @@ class CredentialPool:
             return "[CredentialPool] Havuz Durumu:\n" + "\n".join(satirlar)
 
     def reload(self, provider: Optional[str] = None) -> None:
-        """Provider key'lerini yeniden tara (ornegin .env degistiğinde).
+        """Provider key'lerini yeniden tara (ornegin .env degistiÄŸinde).
 
         Args:
             provider: Belli bir provider (None = tumunu yeniden yukle)
@@ -491,7 +491,7 @@ class CredentialPool:
                 logger.info("[CredentialPool] Tum provider'lar yeniden tarandi.")
 
 
-# ── Modul seviyesinde yardimci ──────────────────────────────────────
+# â”€â”€ Modul seviyesinde yardimci â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _global_pool: Optional[CredentialPool] = None
 _global_pool_lock = threading.Lock()

@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-surekli_ogrenme.py — Session''lar arası sürekli öğrenme (Continuous Learning).
+surekli_ogrenme.py â€” Session''lar arasÄ± sÃ¼rekli Ã¶ÄŸrenme (Continuous Learning).
 """
 
 from __future__ import annotations
@@ -146,7 +146,7 @@ class SurekliOgrenmeYoneticisi:
     def ozet(self) -> str:
         alanlar = self.depo.alan_listesi()
         satirlar = [
-            "📚 Surekli Ogrenme",
+            "ğŸ“š Surekli Ogrenme",
             f"  Toplam: {self.depo.sayi()}",
             f"  Alan: {len(alanlar)}",
         ]

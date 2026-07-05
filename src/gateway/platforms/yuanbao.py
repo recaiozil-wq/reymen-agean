@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""Yuanbao platform — constants + MarkdownProcessor."""
+﻿# -*- coding: utf-8 -*-
+"""Yuanbao platform â€” constants + MarkdownProcessor."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ import re
 from typing import List, Tuple
 
 
-# ── Constants ───────────────────────────────────────────────────────────────
+# â”€â”€ Constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 DEFAULT_WS_GATEWAY_URL = "wss://yuanbao.tencent.com/api/gateway"
 DEFAULT_API_DOMAIN = "https://yuanbao.tencent.com"
@@ -18,7 +18,7 @@ AUTH_FAILED_CODES = {4001, 4003}
 AUTH_RETRYABLE_CODES = {4002, 4004}
 
 
-# ── MarkdownProcessor ───────────────────────────────────────────────────────
+# â”€â”€ MarkdownProcessor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class MarkdownProcessor:

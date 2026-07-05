@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
 self_update.py - ReYMeN Autonomous Self-Update System.
 
@@ -36,7 +36,7 @@ from typing import Optional
 
 logger = logging.getLogger(__name__)
 
-# ── Sabitler ──────────────────────────────────────────────────────────────
+# â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 PROJE_KOK = Path(__file__).resolve().parent.parent.parent.parent
 PYPROJECT_TOML = PROJE_KOK / "pyproject.toml"
@@ -295,7 +295,7 @@ def _son_kontrol_kaydet() -> None:
     )
 
 
-# ── Ana Fonksiyonlar ──────────────────────────────────────────────────────
+# â”€â”€ Ana Fonksiyonlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def check_for_updates() -> dict:
@@ -516,10 +516,10 @@ def auto_update_baslat(interval: int = HAFTALIK_KONTROL_ARALIGI) -> None:
         name="reymen-self-update",
     )
     _auto_update_thread.start()
-    logger.info("[SelfUpdate] ✅ Arkaplan kontrol baslatildi (her %ds)", interval)
+    logger.info("[SelfUpdate] âœ… Arkaplan kontrol baslatildi (her %ds)", interval)
 
 
-# ── CLI Test ──────────────────────────────────────────────────────────────
+# â”€â”€ CLI Test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
     import argparse

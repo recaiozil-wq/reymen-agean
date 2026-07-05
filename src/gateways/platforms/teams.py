@@ -1,5 +1,5 @@
-"""
-ReYMeN Gateway — Microsoft Teams platform adapter.
+﻿"""
+ReYMeN Gateway â€” Microsoft Teams platform adapter.
 
 Microsoft Graph API uzerinden Teams kanallarina mesaj gonderir.
 
@@ -9,10 +9,10 @@ Bagimliliklar:
   - httpx (HTTP istemcisi)
 
 Yapilandirma (ortam degiskenleri):
-  - TEAMS_TENANT_ID       — Microsoft Azure tenant ID (zorunlu)
-  - TEAMS_CLIENT_ID       — Uygulama (client) ID (zorunlu)
-  - TEAMS_CLIENT_SECRET   — Uygulama client secret (zorunlu)
-  - TEAMS_HOME_CHANNEL    — Varsayilan kanal (teamId:channelId, opsiyonel)
+  - TEAMS_TENANT_ID       â€” Microsoft Azure tenant ID (zorunlu)
+  - TEAMS_CLIENT_ID       â€” Uygulama (client) ID (zorunlu)
+  - TEAMS_CLIENT_SECRET   â€” Uygulama client secret (zorunlu)
+  - TEAMS_HOME_CHANNEL    â€” Varsayilan kanal (teamId:channelId, opsiyonel)
 """
 
 import asyncio
@@ -27,15 +27,15 @@ from pathlib import Path as _Path
 
 sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
-from src.gateways.config import Platform, PlatformConfig
-from src.gateways.platforms.base import (
+from gateways.config import Platform, PlatformConfig
+from gateways.platforms.base import (
     BasePlatformAdapter,
     MessageEvent,
     MessageType,
     ProcessingOutcome,
     SendResult,
 )
-from src.gateways.platforms.helpers import (
+from gateways.platforms.helpers import (
     MessageDeduplicator,
     TextBatchAggregator,
 )
@@ -114,7 +114,7 @@ class TeamsAdapter(BasePlatformAdapter):
             split_threshold=4000,
         )
 
-    # ── OAuth Yardimcisi ──────────────────────────────────────────────
+    # â”€â”€ OAuth Yardimcisi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     async def _get_access_token(self) -> str:
         """
@@ -166,7 +166,7 @@ class TeamsAdapter(BasePlatformAdapter):
             )
         return parts[0], parts[1]
 
-    # ── Baglanti Yonetimi ────────────────────────────────────────────
+    # â”€â”€ Baglanti Yonetimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     async def _get_client(self) -> httpx.AsyncClient:
         if self._client is None or self._client.is_closed:
@@ -195,7 +195,7 @@ class TeamsAdapter(BasePlatformAdapter):
         self._access_token = None
         self._token_expires_at = None
 
-    # ── Soyut Metotlar ───────────────────────────────────────────────
+    # â”€â”€ Soyut Metotlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     async def send(
         self,
@@ -287,7 +287,7 @@ class TeamsAdapter(BasePlatformAdapter):
                 "error": str(e),
             }
 
-    # ── Mesaj Gonderme (Ust Katman) ──────────────────────────────────
+    # â”€â”€ Mesaj Gonderme (Ust Katman) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     async def send_message(
         self,
@@ -341,7 +341,7 @@ class TeamsAdapter(BasePlatformAdapter):
     ) -> SendResult:
         """Teams'e dosya gonder (dosya yolu olarak)."""
         try:
-            from src.gateways.platforms.base import cache_document_from_bytes
+            from gateways.platforms.base import cache_document_from_bytes
 
             with open(file_path, "rb") as f:
                 data = f.read()
@@ -361,7 +361,7 @@ class TeamsAdapter(BasePlatformAdapter):
             logger.error("[Teams] Dosya gonderme hatasi: %s", e)
             return SendResult(False, error=str(e))
 
-    # ── Webhook Isleme ───────────────────────────────────────────────
+    # â”€â”€ Webhook Isleme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     async def process_webhook(
         self, body: dict, headers: Optional[dict] = None
@@ -410,7 +410,7 @@ class TeamsAdapter(BasePlatformAdapter):
                 return None
 
             # Session source
-            from src.gateways.session import SessionSource, build_session_key
+            from gateways.session import SessionSource, build_session_key
 
             source = SessionSource(
                 platform=Platform.TEAMS,
@@ -447,7 +447,7 @@ class TeamsAdapter(BasePlatformAdapter):
         except Exception as e:
             logger.error("[Teams] Mesaj isleme hatasi: %s", e)
 
-    # ── Format Yardimcilari ──────────────────────────────────────────
+    # â”€â”€ Format Yardimcilari â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @staticmethod
     def _text_to_html(text: str) -> str:

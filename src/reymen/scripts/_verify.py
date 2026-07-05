@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """Final verification scan - check all test imports"""
 
 import importlib, os, sys

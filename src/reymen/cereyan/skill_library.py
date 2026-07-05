@@ -1,14 +1,14 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-skill_library.py — Skill kütüphane yöneticisi.
+skill_library.py â€” Skill kÃ¼tÃ¼phane yÃ¶neticisi.
 
-Skill dosyalarını bir kütüphane veritabanında (SQLite) yönetir:
-- Kayıt formatı: {id, baslik, icerik_ozeti, etiketler, kaynak, aktif}
-- Skill dosyalarını (.md) bir dizinden kütüphaneye senkronize etme
+Skill dosyalarÄ±nÄ± bir kÃ¼tÃ¼phane veritabanÄ±nda (SQLite) yÃ¶netir:
+- KayÄ±t formatÄ±: {id, baslik, icerik_ozeti, etiketler, kaynak, aktif}
+- Skill dosyalarÄ±nÄ± (.md) bir dizinden kÃ¼tÃ¼phaneye senkronize etme
 - Etiket/baslik bazinda arama
-- CRUD işlemleri (kaydet, get, sil)
+- CRUD iÅŸlemleri (kaydet, get, sil)
 
-Kullanım:
+KullanÄ±m:
     from skill_library import SkillLibrary
     lib = SkillLibrary()
     lib.sync("skills/")
@@ -29,19 +29,19 @@ from typing import Any
 
 logger = logging.getLogger(__name__)
 
-# ── Varsayılan yollar ───────────────────────────────────────────────────────
+# â”€â”€ VarsayÄ±lan yollar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 ROOT = Path(__file__).parent.resolve()
 DB_YOLU = ROOT / ".ReYMeN" / "skill_library.db"
 
 _yazma_kilit = threading.Lock()
 
 
-# ── YAML Front-Matter Ayrıştırıcı ───────────────────────────────────────────
+# â”€â”€ YAML Front-Matter AyrÄ±ÅŸtÄ±rÄ±cÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _yaml_front_matter_parse(content: str) -> tuple[dict[str, Any], str]:
     """
-    .md dosyasındaki YAML front-matter'ı ayrıştırır.
+    .md dosyasÄ±ndaki YAML front-matter'Ä± ayrÄ±ÅŸtÄ±rÄ±r.
 
     Desteklenen alanlar: title, name, description, tags
     ---
@@ -53,7 +53,7 @@ def _yaml_front_matter_parse(content: str) -> tuple[dict[str, Any], str]:
         (meta_dict, body_text)
     """
     meta: dict[str, Any] = {}
-    content_clean = content.lstrip("\ufeff")  # BOM kaldır
+    content_clean = content.lstrip("\ufeff")  # BOM kaldÄ±r
     match = re.match(r"^---\s*\n(.*?)\n---", content_clean, re.DOTALL)
     if not match:
         return meta, content_clean
@@ -76,7 +76,7 @@ def _yaml_front_matter_parse(content: str) -> tuple[dict[str, Any], str]:
 
         # tags: [a, b, c] veya tags: [a, b, c]
         if key == "tags":
-            # [...] formatı
+            # [...] formatÄ±
             if val.startswith("[") and val.endswith("]"):
                 inner = val[1:-1]
                 taglar = [t.strip().strip('"').strip("'") for t in inner.split(",")]
@@ -90,18 +90,18 @@ def _yaml_front_matter_parse(content: str) -> tuple[dict[str, Any], str]:
         elif key == "description":
             meta["icerik_ozeti"] = val.strip('"').strip("'")
 
-    # id yoksa dosya adından türet
+    # id yoksa dosya adÄ±ndan tÃ¼ret
     if "id" not in meta:
         meta["id"] = ""
 
     return meta, body
 
 
-# ── Veritabanı ──────────────────────────────────────────────────────────────
+# â”€â”€ VeritabanÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _kur(con: sqlite3.Connection) -> None:
-    """skills tablosunu oluştur."""
+    """skills tablosunu oluÅŸtur."""
     con.executescript("""
         CREATE TABLE IF NOT EXISTS skills (
             id              TEXT PRIMARY KEY,
@@ -116,7 +116,7 @@ def _kur(con: sqlite3.Connection) -> None:
         CREATE INDEX IF NOT EXISTS idx_skills_aktif      ON skills(aktif);
         CREATE INDEX IF NOT EXISTS idx_skills_etiketler  ON skills(etiketler);
     """)
-    # Migration: eski tabloya kolon ekleme (güvenli)
+    # Migration: eski tabloya kolon ekleme (gÃ¼venli)
     for kolon, tip in [
         ("baslik", "TEXT NOT NULL DEFAULT ''"),
         ("icerik_ozeti", "TEXT NOT NULL DEFAULT ''"),
@@ -155,27 +155,27 @@ def _db_kur():
         _kur(con)
 
 
-# ── SkillLibrary Sınıfı ────────────────────────────────────────────────────
+# â”€â”€ SkillLibrary SÄ±nÄ±fÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class SkillLibrary:
     """
-    Skill kütüphane yöneticisi.
+    Skill kÃ¼tÃ¼phane yÃ¶neticisi.
 
-    Skill'leri bir SQLite veritabanında yönetir:
+    Skill'leri bir SQLite veritabanÄ±nda yÃ¶netir:
     - kaydet / get / sil / ara
-    - sync: Bir dizindeki .md dosyalarını kütüphaneye ekle/güncelle
+    - sync: Bir dizindeki .md dosyalarÄ±nÄ± kÃ¼tÃ¼phaneye ekle/gÃ¼ncelle
     """
 
     def __init__(self, db_yolu: str | Path | None = None):
         """
         Args:
-            db_yolu: Veritabanı yolu (None = varsayılan)
+            db_yolu: VeritabanÄ± yolu (None = varsayÄ±lan)
         """
         self._db_yolu = Path(db_yolu) if db_yolu else DB_YOLU
         _db_kur()
 
-    # ── Dahili ──────────────────────────────────────────────────────────
+    # â”€â”€ Dahili â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _con(self) -> sqlite3.Connection:
         con = sqlite3.connect(str(self._db_yolu), timeout=15, check_same_thread=False)
@@ -184,11 +184,11 @@ class SkillLibrary:
         con.execute("PRAGMA synchronous=NORMAL")
         return con
 
-    # ── Kaydet (upsert) ─────────────────────────────────────────────────
+    # â”€â”€ Kaydet (upsert) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def kaydet(self, skill_dict: dict[str, Any]) -> str:
         """
-        Skill'i kütüphaneye ekle veya güncelle (upsert).
+        Skill'i kÃ¼tÃ¼phaneye ekle veya gÃ¼ncelle (upsert).
 
         Args:
             skill_dict: {
@@ -210,7 +210,7 @@ class SkillLibrary:
         baslik = skill_dict.get("baslik", "").strip()
         icerik_ozeti = skill_dict.get("icerik_ozeti", "").strip()
 
-        # Etiketler: list -> virgülle ayrılmış string
+        # Etiketler: list -> virgÃ¼lle ayrÄ±lmÄ±ÅŸ string
         etiketler_raw = skill_dict.get("etiketler", "")
         if isinstance(etiketler_raw, list):
             etiketler = ", ".join(
@@ -248,20 +248,20 @@ class SkillLibrary:
 
         return skill_id
 
-    # ── Ara ─────────────────────────────────────────────────────────────
+    # â”€â”€ Ara â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def ara(self, sorgu: str, limit: int = 20) -> list[dict[str, Any]]:
         """
         Etiket/baslik bazinda skill ara.
 
         Strateji:
-        1. Tam kelime eşleşmesi (baslik veya etiketlerde)
-        2. LIKE ile kısmi eşleşme
-        3. Skorla sırala
+        1. Tam kelime eÅŸleÅŸmesi (baslik veya etiketlerde)
+        2. LIKE ile kÄ±smi eÅŸleÅŸme
+        3. Skorla sÄ±rala
 
         Args:
             sorgu: Aranan metin
-            limit: Maksimum sonuç sayısı
+            limit: Maksimum sonuÃ§ sayÄ±sÄ±
 
         Returns:
             [{"id", "baslik", "icerik_ozeti", "etiketler", "kaynak", "aktif", "son_guncelleme"}, ...]
@@ -276,7 +276,7 @@ class SkillLibrary:
 
         con = self._con()
         try:
-            # 1) Tam eşleşme: tüm kelimeler baslik veya etiketlerde
+            # 1) Tam eÅŸleÅŸme: tÃ¼m kelimeler baslik veya etiketlerde
             kosullar = []
             params: list[str] = []
             for kelime in kelimeler:
@@ -294,7 +294,7 @@ class SkillLibrary:
                 params + [limit],
             ).fetchall()
 
-            # 2) Az sonuç geldiyse LIKE ile genişlet (tek kelime bazında)
+            # 2) Az sonuÃ§ geldiyse LIKE ile geniÅŸlet (tek kelime bazÄ±nda)
             if len(rows) < limit:
                 gorulen_ids = {r["id"] for r in rows}
                 ek_kosullar = []
@@ -345,19 +345,19 @@ class SkillLibrary:
         finally:
             con.close()
 
-    # ── Sync ────────────────────────────────────────────────────────────
+    # â”€â”€ Sync â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def sync(self, kaynak_dizin: str | Path) -> dict[str, int]:
         """
-        Bir dizindeki .md skill dosyalarını kütüphaneye senkronize et.
+        Bir dizindeki .md skill dosyalarÄ±nÄ± kÃ¼tÃ¼phaneye senkronize et.
 
-        Her .md dosyası için:
-        1. YAML front-matter'ı ayrıştır
-        2. Skill kaydı oluştur/güncelle (upsert)
-        3. Dosya yoksa kütüphaneden silme (isteğe bağlı)
+        Her .md dosyasÄ± iÃ§in:
+        1. YAML front-matter'Ä± ayrÄ±ÅŸtÄ±r
+        2. Skill kaydÄ± oluÅŸtur/gÃ¼ncelle (upsert)
+        3. Dosya yoksa kÃ¼tÃ¼phaneden silme (isteÄŸe baÄŸlÄ±)
 
         Args:
-            kaynak_dizin: .md dosyalarının bulunduğu dizin
+            kaynak_dizin: .md dosyalarÄ±nÄ±n bulunduÄŸu dizin
 
         Returns:
             {"yeni": int, "guncellenen": int, "atlanan": int, "hata": int, "toplam": int}
@@ -370,7 +370,7 @@ class SkillLibrary:
         md_dosyalari = sorted(kaynak.rglob("*.md"))
         logger.info("[SkillLib] Sync basladi: %s (%d dosya)", kaynak, len(md_dosyalari))
 
-        # Mevcut ID'leri al (stale tespiti için)
+        # Mevcut ID'leri al (stale tespiti iÃ§in)
         con = self._con()
         try:
             mevcut_ids = set(
@@ -393,7 +393,7 @@ class SkillLibrary:
                 hata += 1
                 continue
 
-            # YAML front-matter ayrıştır
+            # YAML front-matter ayrÄ±ÅŸtÄ±r
             meta, _ = _yaml_front_matter_parse(content)
 
             skill_id = meta.get("id", fp.stem)
@@ -401,7 +401,7 @@ class SkillLibrary:
             icerik_ozeti = meta.get("icerik_ozeti", "")
             etiketler = meta.get("etiketler", [])
 
-            # id boşsa dosya adını kullan
+            # id boÅŸsa dosya adÄ±nÄ± kullan
             if not skill_id:
                 skill_id = fp.stem
 
@@ -434,7 +434,7 @@ class SkillLibrary:
                 logger.warning("[SkillLib] Sync hatasi [%s]: %s", fp.name, e)
                 hata += 1
 
-        # Stale temizliği: kütüphanede olup diskte olmayanları sil (opsiyonel)
+        # Stale temizliÄŸi: kÃ¼tÃ¼phanede olup diskte olmayanlarÄ± sil (opsiyonel)
         silinen = 0
         for sid in mevcut_ids:
             if sid not in islenen_ids:
@@ -466,11 +466,11 @@ class SkillLibrary:
 
         return ozet
 
-    # ── Get ─────────────────────────────────────────────────────────────
+    # â”€â”€ Get â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def get(self, skill_id: str) -> dict[str, Any] | None:
         """
-        Skill detayını getir.
+        Skill detayÄ±nÄ± getir.
 
         Args:
             skill_id: Skill ID'si
@@ -506,11 +506,11 @@ class SkillLibrary:
         finally:
             con.close()
 
-    # ── Sil ─────────────────────────────────────────────────────────────
+    # â”€â”€ Sil â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def sil(self, skill_id: str) -> bool:
         """
-        Skill'i kütüphaneden sil.
+        Skill'i kÃ¼tÃ¼phaneden sil.
 
         Args:
             skill_id: Silinecek skill ID'si
@@ -536,17 +536,17 @@ class SkillLibrary:
             finally:
                 con.close()
 
-    # ── Tüm Skill'leri Listele ─────────────────────────────────────────
+    # â”€â”€ TÃ¼m Skill'leri Listele â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def tumu(
         self, aktif_mi: bool | None = None, limit: int = 100
     ) -> list[dict[str, Any]]:
         """
-        Tüm skill'leri listele.
+        TÃ¼m skill'leri listele.
 
         Args:
-            aktif_mi: None = tümü, True = sadece aktif, False = sadece pasif
-            limit: Maksimum sonuç sayısı
+            aktif_mi: None = tÃ¼mÃ¼, True = sadece aktif, False = sadece pasif
+            limit: Maksimum sonuÃ§ sayÄ±sÄ±
 
         Returns:
             [{"id", "baslik", "icerik_ozeti", "etiketler", "kaynak", "aktif", ...}, ...]
@@ -590,10 +590,10 @@ class SkillLibrary:
         finally:
             con.close()
 
-    # ── İstatistik ──────────────────────────────────────────────────────
+    # â”€â”€ Ä°statistik â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def istatistik(self) -> dict[str, Any]:
-        """Kütüphane istatistikleri."""
+        """KÃ¼tÃ¼phane istatistikleri."""
         con = self._con()
         try:
             toplam = con.execute("SELECT COUNT(*) FROM skills").fetchone()[0]
@@ -615,43 +615,43 @@ class SkillLibrary:
             con.close()
 
 
-# ── Modül seviyesinde singleton ─────────────────────────────────────────────
+# â”€â”€ ModÃ¼l seviyesinde singleton â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _lib: SkillLibrary | None = None
 
 
 def get_library(db_yolu: str | Path | None = None) -> SkillLibrary:
-    """Singleton SkillLibrary örneği al."""
+    """Singleton SkillLibrary Ã¶rneÄŸi al."""
     global _lib
     if _lib is None:
         _lib = SkillLibrary(db_yolu)
     return _lib
 
 
-# ── Kolay kullanım fonksiyonları ────────────────────────────────────────────
+# â”€â”€ Kolay kullanÄ±m fonksiyonlarÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def kaydet(skill_dict: dict[str, Any]) -> str:
-    """Skill ekle/güncelle (kolay kullanım)."""
+    """Skill ekle/gÃ¼ncelle (kolay kullanÄ±m)."""
     return get_library().kaydet(skill_dict)
 
 
 def ara(sorgu: str, limit: int = 20) -> list[dict[str, Any]]:
-    """Skill ara (kolay kullanım)."""
+    """Skill ara (kolay kullanÄ±m)."""
     return get_library().ara(sorgu, limit)
 
 
 def sync(kaynak_dizin: str | Path) -> dict[str, int]:
-    """Dizinden skill senkronize et (kolay kullanım)."""
+    """Dizinden skill senkronize et (kolay kullanÄ±m)."""
     return get_library().sync(kaynak_dizin)
 
 
 def get(skill_id: str) -> dict[str, Any] | None:
-    """Skill detayı al (kolay kullanım)."""
+    """Skill detayÄ± al (kolay kullanÄ±m)."""
     return get_library().get(skill_id)
 
 
 def sil(skill_id: str) -> bool:
-    """Skill sil (kolay kullanım)."""
+    """Skill sil (kolay kullanÄ±m)."""
     return get_library().sil(skill_id)
 
 
@@ -677,5 +677,5 @@ def motor_kaydet(motor) -> None:
         )
 
 
-# ── İlk kurulum ────────────────────────────────────────────────────────────
+# â”€â”€ Ä°lk kurulum â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _db_kur()

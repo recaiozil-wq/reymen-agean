@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-skill_shrink.py — Skill shrinking tool.
+skill_shrink.py â€” Skill shrinking tool.
 
 Detects 10KB+ or 300+ line skills, shrinks bloated content,
 splits sections that can be moved to references/ subfolder.
@@ -19,7 +19,7 @@ import shutil
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-# ── Renkler ────────────────────────────────────────────────────────────────────
+# â”€â”€ Renkler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _R = "\033[0m"
 _C = "\033[96m"
 _G = "\033[92m"
@@ -53,39 +53,39 @@ def _r(t):
     return f"{_RED}{t}{_R}"
 
 
-# ── Varsayılan eşikler ────────────────────────────────────────────────────────
+# â”€â”€ VarsayÄ±lan eÅŸikler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _BOYUT_ESIK = 10 * 1024  # 10 KB
-_SATIR_ESIK = 300  # 300 satır
+_SATIR_ESIK = 300  # 300 satÄ±r
 
-# ── Şişkinlik belirteçleri (regex desenleri) ───────────────────────────────────
+# â”€â”€ ÅiÅŸkinlik belirteÃ§leri (regex desenleri) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _SISKINLIK_DESENLERI = [
-    # Uzun kod örnekleri
+    # Uzun kod Ã¶rnekleri
     (r"```\w*\n.{300,}?```", "uzun_kod_ornegi"),
-    # Gereksiz açıklama blokları (sadece ilk 10000 karakterde ara)
+    # Gereksiz aÃ§Ä±klama bloklarÄ± (sadece ilk 10000 karakterde ara)
     (
-        r"(Aşağıdaki|Aşağıda|Şu şekilde|Bu bölümde|Öncelikle|Detaylı olarak)\s[^.]{200,}\.",
+        r"(AÅŸaÄŸÄ±daki|AÅŸaÄŸÄ±da|Åu ÅŸekilde|Bu bÃ¶lÃ¼mde|Ã–ncelikle|DetaylÄ± olarak)\s[^.]{200,}\.",
         "gereksiz_aciklama",
     ),
     # Uzun YAML frontmatter
     (r"^---\n(?:.+\n){20,}---", "asiri_frontmatter"),
-    # Aşırı örnek listeleri
+    # AÅŸÄ±rÄ± Ã¶rnek listeleri
     (r"\n(?:- .+\n){20,}", "asiri_ornek_liste"),
-    # Tekrarlayan emoji notları
-    (r"^(?:⚠️|✅|❌|📌|💡|🔑|ℹ️).*", "tekrar_uyari"),
-    # Çok fazla başlık alt alta
+    # Tekrarlayan emoji notlarÄ±
+    (r"^(?:âš ï¸|âœ…|âŒ|ğŸ“Œ|ğŸ’¡|ğŸ”‘|â„¹ï¸).*", "tekrar_uyari"),
+    # Ã‡ok fazla baÅŸlÄ±k alt alta
     (r"^##.*\n(?:##.*\n){10,}", "asiri_alt_baslik"),
 ]
 
-# ── references/ taşınabilecek bölüm desenleri (satır bazlı, basit) ──────────────
+# â”€â”€ references/ taÅŸÄ±nabilecek bÃ¶lÃ¼m desenleri (satÄ±r bazlÄ±, basit) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _REFERENCE_BOLUMLER = [
     r"## (?:Referanslar|References|Kaynaklar|Resources|Appendix|Ek)\s*\n",
-    r"## (?:Örnek(?:ler)?|Examples|Code\s*Examples)\s*\n",
-    r"## (?:Tam\s*Çıktı|Output|Log|Debug)\s*\n",
+    r"## (?:Ã–rnek(?:ler)?|Examples|Code\s*Examples)\s*\n",
+    r"## (?:Tam\s*Ã‡Ä±ktÄ±|Output|Log|Debug)\s*\n",
 ]
 
 
 def _bytes_insan(b: int) -> str:
-    """Bayt değerini insan okunabilir formata çevir."""
+    """Bayt deÄŸerini insan okunabilir formata Ã§evir."""
     if b < 1024:
         return f"{b} B"
     elif b < 1024 * 1024:
@@ -94,7 +94,7 @@ def _bytes_insan(b: int) -> str:
 
 
 def _sayfada_kac_satir(md_yol: Path) -> int:
-    """Bir .md dosyasındaki satır sayısını döndürür."""
+    """Bir .md dosyasÄ±ndaki satÄ±r sayÄ±sÄ±nÄ± dÃ¶ndÃ¼rÃ¼r."""
     try:
         with open(md_yol, "r", encoding="utf-8", errors="replace") as f:
             return sum(1 for _ in f)
@@ -103,7 +103,7 @@ def _sayfada_kac_satir(md_yol: Path) -> int:
 
 
 def _frontmatter_parse(icerik: str) -> Dict[str, Any]:
-    """YAML frontmatter'ı basitçe parse eder."""
+    """YAML frontmatter'Ä± basitÃ§e parse eder."""
     meta: Dict[str, Any] = {}
     if not icerik.startswith("---"):
         return meta
@@ -119,7 +119,7 @@ def _frontmatter_parse(icerik: str) -> Dict[str, Any]:
         val = val.strip()
         if not val:
             continue
-        # Liste değer
+        # Liste deÄŸer
         if val.startswith("[") and val.endswith("]"):
             val = [v.strip().strip('"').strip("'") for v in val[1:-1].split(",")]
         meta[key] = val
@@ -128,12 +128,12 @@ def _frontmatter_parse(icerik: str) -> Dict[str, Any]:
 
 def _determine_category(filepath: Path, skills_root: Path, meta: Dict[str, Any]) -> str:
     """Skill kategorisini belirler."""
-    # Önce frontmatter'dan
+    # Ã–nce frontmatter'dan
     cat = meta.get("category", "")
     if cat and cat != "genel" and cat != "general":
         return str(cat)
 
-    # Sonra dosya yolu hiyerarşisinden
+    # Sonra dosya yolu hiyerarÅŸisinden
     rel = filepath.relative_to(skills_root)
     parts = rel.parts
     if len(parts) > 1:
@@ -141,19 +141,19 @@ def _determine_category(filepath: Path, skills_root: Path, meta: Dict[str, Any])
     return "genel"
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Tarama
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _tara_skill_dizini(skills_yolu: Path) -> List[Dict[str, Any]]:
-    """Bir skill dizinini tarar ve skill bilgilerini döndürür."""
+    """Bir skill dizinini tarar ve skill bilgilerini dÃ¶ndÃ¼rÃ¼r."""
     sonuc: List[Dict[str, Any]] = []
     if not skills_yolu.exists():
         return sonuc
 
     for md_yol in sorted(skills_yolu.rglob("*.md")):
-        # .md altındaki .md'leri atla
+        # .md altÄ±ndaki .md'leri atla
         if ".ReYMeN" in md_yol.parts:
             continue
         if "node_modules" in md_yol.parts:
@@ -186,7 +186,7 @@ def _tara_skill_dizini(skills_yolu: Path) -> List[Dict[str, Any]]:
 
 
 def _siskinlik_analizi(icerik: str) -> List[Dict[str, Any]]:
-    """Bir skill içeriğindeki şişkinlik bölgelerini tespit eder."""
+    """Bir skill iÃ§eriÄŸindeki ÅŸiÅŸkinlik bÃ¶lgelerini tespit eder."""
     bulgular: List[Dict[str, Any]] = []
     for desen, etiket in _SISKINLIK_DESENLERI:
         try:
@@ -203,13 +203,13 @@ def _siskinlik_analizi(icerik: str) -> List[Dict[str, Any]]:
         except re.error:
             continue
 
-    # Sırala: en büyükten en küçüğe
+    # SÄ±rala: en bÃ¼yÃ¼kten en kÃ¼Ã§Ã¼ÄŸe
     bulgular.sort(key=lambda b: b["uzunluk"], reverse=True)
     return bulgular
 
 
 def _references_bolumleri_bul(icerik: str) -> List[Dict[str, Any]]:
-    """references/ klasörüne taşınabilecek bölümleri bulur."""
+    """references/ klasÃ¶rÃ¼ne taÅŸÄ±nabilecek bÃ¶lÃ¼mleri bulur."""
     bolumler: List[Dict[str, Any]] = []
     for desen in _REFERENCE_BOLUMLER:
         try:
@@ -228,17 +228,17 @@ def _references_bolumleri_bul(icerik: str) -> List[Dict[str, Any]]:
     return bolumler
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# Küçültme İşlemleri
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# KÃ¼Ã§Ã¼ltme Ä°ÅŸlemleri
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _trim_kod_ornekleri(icerik: str) -> Tuple[str, List[str]]:
-    """Uzun kod örneklerini kısaltır, çıkarılanları döndürür."""
+    """Uzun kod Ã¶rneklerini kÄ±saltÄ±r, Ã§Ä±karÄ±lanlarÄ± dÃ¶ndÃ¼rÃ¼r."""
     cikarilan: List[str] = []
     yeni_icerik = icerik
 
-    # Çok uzun kod bloklarını (300+ karakter) kısalt
+    # Ã‡ok uzun kod bloklarÄ±nÄ± (300+ karakter) kÄ±salt
     kod_blok_deseni = r"(```\w*\n)([\s\S]{300,}?)(```)"
 
     def _kod_kisalt(m):
@@ -248,10 +248,10 @@ def _trim_kod_ornekleri(icerik: str) -> Tuple[str, List[str]]:
         satirlar = kod.splitlines()
         if len(satirlar) <= 5:
             return m.group(0)
-        # İlk 3 + son 2 satırı tut
+        # Ä°lk 3 + son 2 satÄ±rÄ± tut
         tutulan = (
             satirlar[:3]
-            + ["... (orta kısım kısaltıldı, tamamı references/ klasöründe)"]
+            + ["... (orta kÄ±sÄ±m kÄ±saltÄ±ldÄ±, tamamÄ± references/ klasÃ¶rÃ¼nde)"]
             + satirlar[-2:]
         )
         cikarilan.append(kod)
@@ -262,14 +262,14 @@ def _trim_kod_ornekleri(icerik: str) -> Tuple[str, List[str]]:
 
 
 def _trim_gereksiz_aciklamalar(icerik: str) -> str:
-    """Gereksiz açıklamaları kısaltır."""
+    """Gereksiz aÃ§Ä±klamalarÄ± kÄ±saltÄ±r."""
     yeni_icerik = icerik
     desenler = [
         (
-            r"(Aşağıdaki|Aşağıda|Şu şekilde|Bu bölümde|Öncelikle|Detaylı olarak) [^.]{200,}\.",
+            r"(AÅŸaÄŸÄ±daki|AÅŸaÄŸÄ±da|Åu ÅŸekilde|Bu bÃ¶lÃ¼mde|Ã–ncelikle|DetaylÄ± olarak) [^.]{200,}\.",
             "",
         ),
-        (r"\n\n(?:Not|Uyarı|Info|Warning|Note):[^\n]{200,}", ""),
+        (r"\n\n(?:Not|UyarÄ±|Info|Warning|Note):[^\n]{200,}", ""),
     ]
     for desen, _ in desenler:
         yeni_icerik = re.sub(desen, "", yeni_icerik, count=5)
@@ -277,7 +277,7 @@ def _trim_gereksiz_aciklamalar(icerik: str) -> str:
 
 
 def _trim_asiri_frontmatter(icerik: str) -> Tuple[str, Dict[str, Any]]:
-    """Aşırı büyük frontmatter'ı kısaltır, kritik alanları tutar."""
+    """AÅŸÄ±rÄ± bÃ¼yÃ¼k frontmatter'Ä± kÄ±saltÄ±r, kritik alanlarÄ± tutar."""
     if not icerik.startswith("---"):
         return icerik, {}
     end = icerik.find("---", 3)
@@ -289,7 +289,7 @@ def _trim_asiri_frontmatter(icerik: str) -> Tuple[str, Dict[str, Any]]:
     if len(satirlar) <= 15:
         return icerik, {}
 
-    # Kritik alanları tut
+    # Kritik alanlarÄ± tut
     kritik_alanlar = {
         "name",
         "title",
@@ -316,9 +316,9 @@ def _trim_asiri_frontmatter(icerik: str) -> Tuple[str, Dict[str, Any]]:
 
 
 def _trim_asiri_listeler(icerik: str) -> str:
-    """20+ elemanlı listeleri kısaltır."""
+    """20+ elemanlÄ± listeleri kÄ±saltÄ±r."""
     yeni_icerik = icerik
-    # Ardışık 20+ liste elemanını bul
+    # ArdÄ±ÅŸÄ±k 20+ liste elemanÄ±nÄ± bul
     liste_deseni = r"(\n(?:- .+\n){20,})"
 
     def _liste_kisalt(m):
@@ -326,10 +326,10 @@ def _trim_asiri_listeler(icerik: str) -> str:
         satirlar = [s for s in liste.splitlines() if s.strip().startswith("- ")]
         if len(satirlar) <= 20:
             return liste
-        # İlk 10 + son 5 tut
+        # Ä°lk 10 + son 5 tut
         tut = "\n".join(
             satirlar[:10]
-            + ["... (liste kısaltıldı, tamamı references/ klasöründe)"]
+            + ["... (liste kÄ±saltÄ±ldÄ±, tamamÄ± references/ klasÃ¶rÃ¼nde)"]
             + satirlar[-5:]
         )
         return "\n" + tut
@@ -338,13 +338,13 @@ def _trim_asiri_listeler(icerik: str) -> str:
     return yeni_icerik
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# Ana İşlem
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# Ana Ä°ÅŸlem
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class SkillShrink:
-    """Skill küçültme aracı.
+    """Skill kÃ¼Ã§Ã¼ltme aracÄ±.
 
     Parametreler:
         skills_dizinleri: Skill dizinleri listesi (Path).
@@ -355,7 +355,7 @@ class SkillShrink:
         self._tum_skills: List[Dict[str, Any]] = []
 
     def tara(self) -> List[Dict[str, Any]]:
-        """Tüm skill dizinlerini tarar, şişkin olanları döndürür."""
+        """TÃ¼m skill dizinlerini tarar, ÅŸiÅŸkin olanlarÄ± dÃ¶ndÃ¼rÃ¼r."""
         tum: List[Dict[str, Any]] = []
         for dizin in self._dizinler:
             tum.extend(_tara_skill_dizini(dizin))
@@ -366,9 +366,9 @@ class SkillShrink:
     def sisbul(
         self, skills: Optional[List[Dict[str, Any]]] = None
     ) -> List[Dict[str, Any]]:
-        """Şişkin skill'leri tespit eder.
+        """ÅiÅŸkin skill'leri tespit eder.
 
-        Dönüş: Her biri için şişkinlik bilgisi içeren sözlük listesi.
+        DÃ¶nÃ¼ÅŸ: Her biri iÃ§in ÅŸiÅŸkinlik bilgisi iÃ§eren sÃ¶zlÃ¼k listesi.
         """
         hedef = skills or self._tum_skills
         sis_skills: List[Dict[str, Any]] = []
@@ -377,7 +377,7 @@ class SkillShrink:
             sis = False
             neden: List[str] = []
 
-            # Boyut/satır eşiği
+            # Boyut/satÄ±r eÅŸiÄŸi
             if s["boyut"] >= _BOYUT_ESIK:
                 sis = True
                 neden.append(
@@ -390,7 +390,7 @@ class SkillShrink:
             if not sis:
                 continue
 
-            # Detaylı şişkinlik analizi (sadece eşiği geçenler)
+            # DetaylÄ± ÅŸiÅŸkinlik analizi (sadece eÅŸiÄŸi geÃ§enler)
             icerik = s.get("icerik", "")
             if not icerik:
                 try:
@@ -416,18 +416,18 @@ class SkillShrink:
                 }
             )
 
-        # Önce en şişkin olanları göster
+        # Ã–nce en ÅŸiÅŸkin olanlarÄ± gÃ¶ster
         sis_skills.sort(key=lambda x: x["toplam_sis_boyut"], reverse=True)
         return sis_skills
 
     def shrink(self, sisli: Dict[str, Any], dry_run: bool = True) -> Dict[str, Any]:
-        """Bir skill'i küçültür.
+        """Bir skill'i kÃ¼Ã§Ã¼ltÃ¼r.
 
         Parametreler:
-            sisli: ``sisbul()``'dan dönen skill sözlüğü.
-            dry_run: True ise işlem yapmaz, sadece raporlar.
+            sisli: ``sisbul()``'dan dÃ¶nen skill sÃ¶zlÃ¼ÄŸÃ¼.
+            dry_run: True ise iÅŸlem yapmaz, sadece raporlar.
 
-        Dönüş: İşlem raporu.
+        DÃ¶nÃ¼ÅŸ: Ä°ÅŸlem raporu.
         """
         rapor: Dict[str, Any] = {
             "ad": sisli["ad"],
@@ -445,56 +445,56 @@ class SkillShrink:
             rapor["onceki_boyut"] = len(icerik.encode("utf-8"))
             referans_parcalar: List[str] = []
 
-            # 1. References bölümlerini ayır
+            # 1. References bÃ¶lÃ¼mlerini ayÄ±r
             if sisli.get("references_bolumleri"):
                 for ref in sisli["references_bolumleri"]:
                     parca = icerik[ref["baslangic"] : ref["bitis"]]
                     referans_parcalar.append(parca)
                     icerik = icerik[: ref["baslangic"]] + icerik[ref["bitis"] :]
                 rapor["adimlar"].append(
-                    f"references bölümleri ayrıldı ({len(referans_parcalar)} parça)"
+                    f"references bÃ¶lÃ¼mleri ayrÄ±ldÄ± ({len(referans_parcalar)} parÃ§a)"
                 )
 
-            # 2. Frontmatter temizliği
+            # 2. Frontmatter temizliÄŸi
             yeni_icerik, cikarilan_fm = _trim_asiri_frontmatter(icerik)
             if cikarilan_fm:
                 icerik = yeni_icerik
                 rapor["adimlar"].append(
-                    f"frontmatter kısaltıldı ({len(cikarilan_fm)} alan)"
+                    f"frontmatter kÄ±saltÄ±ldÄ± ({len(cikarilan_fm)} alan)"
                 )
 
-            # 3. Kod örneklerini kısalt
+            # 3. Kod Ã¶rneklerini kÄ±salt
             yeni_icerik, cikarilan_kod = _trim_kod_ornekleri(icerik)
             if cikarilan_kod:
                 icerik = yeni_icerik
                 rapor["adimlar"].append(
-                    f"kod örnekleri kısaltıldı ({len(cikarilan_kod)} blok)"
+                    f"kod Ã¶rnekleri kÄ±saltÄ±ldÄ± ({len(cikarilan_kod)} blok)"
                 )
                 for k in cikarilan_kod:
                     referans_parcalar.append(k)
 
-            # 4. Gereksiz açıklamaları kısalt
+            # 4. Gereksiz aÃ§Ä±klamalarÄ± kÄ±salt
             yeni_icerik = _trim_gereksiz_aciklamalar(icerik)
             if len(yeni_icerik) < len(icerik):
                 icerik = yeni_icerik
                 rapor["adimlar"].append(
-                    f"açıklamalar kısaltıldı ({len(icerik.encode('utf-8'))} -> {len(yeni_icerik.encode('utf-8'))})"
+                    f"aÃ§Ä±klamalar kÄ±saltÄ±ldÄ± ({len(icerik.encode('utf-8'))} -> {len(yeni_icerik.encode('utf-8'))})"
                 )
 
-            # 5. Listeleri kısalt
+            # 5. Listeleri kÄ±salt
             yeni_icerik = _trim_asiri_listeler(icerik)
             if len(yeni_icerik) < len(icerik):
                 icerik = yeni_icerik
-                rapor["adimlar"].append("listeler kısaltıldı")
+                rapor["adimlar"].append("listeler kÄ±saltÄ±ldÄ±")
 
             rapor["sonraki_boyut"] = len(icerik.encode("utf-8"))
 
             # Uygulama
             if not dry_run:
-                # Ana skill dosyasını güncelle
+                # Ana skill dosyasÄ±nÄ± gÃ¼ncelle
                 sisli["yol"].write_text(icerik, encoding="utf-8")
 
-                # References klasörü
+                # References klasÃ¶rÃ¼
                 if referans_parcalar:
                     ref_dizini = sisli["yol"].parent / "references"
                     ref_dizini.mkdir(parents=True, exist_ok=True)
@@ -502,7 +502,7 @@ class SkillShrink:
                         ref_dosya = ref_dizini / f"{sisli['yol'].stem}_ref_{i+1}.md"
                         ref_dosya.write_text(parc, encoding="utf-8")
                     rapor["adimlar"].append(
-                        f"references/ klasörü oluşturuldu ({len(referans_parcalar)} dosya)"
+                        f"references/ klasÃ¶rÃ¼ oluÅŸturuldu ({len(referans_parcalar)} dosya)"
                     )
 
             rapor["basari"] = True
@@ -515,7 +515,7 @@ class SkillShrink:
     def shrink_all(
         self, skills: List[Dict[str, Any]], dry_run: bool = True
     ) -> List[Dict[str, Any]]:
-        """Tüm şişkin skill'leri küçültür."""
+        """TÃ¼m ÅŸiÅŸkin skill'leri kÃ¼Ã§Ã¼ltÃ¼r."""
         raporlar = []
         for s in skills:
             r = self.shrink(s, dry_run=dry_run)
@@ -530,13 +530,13 @@ class SkillShrink:
         toplam = len(self._tum_skills)
         sisli = self.sisbul(self._tum_skills)
 
-        # Kategori bazında
+        # Kategori bazÄ±nda
         kat_dagitim: Dict[str, int] = {}
         for s in self._tum_skills:
             kat = s.get("kategori", "genel")
             kat_dagitim[kat] = kat_dagitim.get(kat, 0) + 1
 
-        # Boyut dağılımı
+        # Boyut daÄŸÄ±lÄ±mÄ±
         boyut_kategorileri = {
             "10KB+": 0,
             "5-10KB": 0,
@@ -582,9 +582,9 @@ class SkillShrink:
         }
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # CLI Entry Point
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def cmd_skill_shrink(args) -> int:
@@ -609,43 +609,43 @@ def cmd_skill_shrink(args) -> int:
 
     shrink = SkillShrink(skills_dizinleri)
 
-    # ── --stats ─────────────────────────────────────────────────────────
+    # â”€â”€ --stats â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if getattr(args, "stats", False):
         ist = shrink.istatistik()
-        print(f"\n  {_c('Skill Deposu İstatistikleri')}")
-        print(f"  {_d('─' * 50)}")
+        print(f"\n  {_c('Skill Deposu Ä°statistikleri')}")
+        print(f"  {_d('â”€' * 50)}")
         print(f"  Toplam skill:      {_g(ist['toplam_skill'])}")
-        print(f"  Şişkin skill:      {_y(ist['sisli_skill'])} ({ist['sisli_oran']})")
+        print(f"  ÅiÅŸkin skill:      {_y(ist['sisli_skill'])} ({ist['sisli_oran']})")
         print(f"  Toplam boyut:      {_d(ist['toplam_boyut'])}")
         print(f"  Ortalama boyut:    {_d(ist['ortalama_boyut'])}")
-        print(f"\n  {_c('Boyut Dağılımı')}")
+        print(f"\n  {_c('Boyut DaÄŸÄ±lÄ±mÄ±')}")
         for kat, sayi in sorted(ist["boyut_dagilimi"].items()):
-            bar = "█" * min(sayi, 20) + "▒" * max(0, 20 - min(sayi, 20))
+            bar = "â–ˆ" * min(sayi, 20) + "â–’" * max(0, 20 - min(sayi, 20))
             print(f"    {_d(kat+':')} {_g(str(sayi)):>4}  {bar}")
-        print(f"\n  {_c('Kategori Dağılımı')}")
+        print(f"\n  {_c('Kategori DaÄŸÄ±lÄ±mÄ±')}")
         for kat, sayi in sorted(ist["kategori_dagilimi"].items()):
             print(f"    {_d(kat+':')} {sayi}")
         print()
         return 0
 
-    # ── Normal tarama + shrink ──────────────────────────────────────────
-    print(f"\n  {_c('Skill Küçültme Taraması')}")
-    print(f"  {_d('─' * 50)}")
+    # â”€â”€ Normal tarama + shrink â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    print(f"\n  {_c('Skill KÃ¼Ã§Ã¼ltme TaramasÄ±')}")
+    print(f"  {_d('â”€' * 50)}")
 
     tum = shrink.tara()
     print(f"  Toplam skill: {_g(len(tum))}")
 
     sisli = shrink.sisbul(tum)
-    print(f"  Şişkin skill: {_y(len(sisli))}")
+    print(f"  ÅiÅŸkin skill: {_y(len(sisli))}")
     print()
 
-    dry_run = getattr(args, "dry_run", True)  # Varsayılan dry-run
+    dry_run = getattr(args, "dry_run", True)  # VarsayÄ±lan dry-run
     apply = getattr(args, "apply", False)
     if apply:
         dry_run = False
 
     if not sisli:
-        print(f"  {_g('✓')} Şişkin skill bulunamadı, her şey temiz!")
+        print(f"  {_g('âœ“')} ÅiÅŸkin skill bulunamadÄ±, her ÅŸey temiz!")
         print()
         return 0
 
@@ -654,28 +654,28 @@ def cmd_skill_shrink(args) -> int:
         print(f"  {_c(f'#{i}')} {_g(s['ad'])}")
         print(f"    Yol:    {_d(str(s['yol']))}")
         print(
-            f"    Boyut:  {_y(_bytes_insan(s['boyut']))} / {_y(str(s['satir']))} satır"
+            f"    Boyut:  {_y(_bytes_insan(s['boyut']))} / {_y(str(s['satir']))} satÄ±r"
         )
         print(f"    Neden:  {', '.join(s['neden'])}")
         if s["toplam_sis_boyut"] > 0:
             print(
-                f"    Şişkin: {_r(_bytes_insan(s['toplam_sis_boyut']))} tespit edildi"
+                f"    ÅiÅŸkin: {_r(_bytes_insan(s['toplam_sis_boyut']))} tespit edildi"
             )
         if s["references_bolumleri"]:
             print(
-                f"    Ref:    {_b(str(len(s['references_bolumleri'])) + ' bölüm taşınabilir')}"
+                f"    Ref:    {_b(str(len(s['references_bolumleri'])) + ' bÃ¶lÃ¼m taÅŸÄ±nabilir')}"
             )
         print()
 
     if dry_run:
-        print(f"  {_y('ℹ')} Dry-run modu — hiçbir değişiklik yapılmadı.")
-        print(f"  {_d('Uygulamak için:')} {_g('reymen skill shrink --apply')}")
+        print(f"  {_y('â„¹')} Dry-run modu â€” hiÃ§bir deÄŸiÅŸiklik yapÄ±lmadÄ±.")
+        print(f"  {_d('Uygulamak iÃ§in:')} {_g('reymen skill shrink --apply')}")
         print()
         return 0
 
-    # ── Apply ──────────────────────────────────────────────────────────────
-    print(f"  {_c('Küçültme Uygulanıyor...')}")
-    print(f"  {_d('─' * 50)}")
+    # â”€â”€ Apply â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    print(f"  {_c('KÃ¼Ã§Ã¼ltme UygulanÄ±yor...')}")
+    print(f"  {_d('â”€' * 50)}")
 
     raporlar = shrink.shrink_all(sisli, dry_run=False)
 
@@ -689,16 +689,16 @@ def cmd_skill_shrink(args) -> int:
             kazanc = r["onceki_boyut"] - r["sonraki_boyut"]
             toplam_tasarruf += kazanc
             print(
-                f"  {_g('✓')} {r['ad']}: {_bytes_insan(r['onceki_boyut'])} → {_bytes_insan(r['sonraki_boyut'])} ({_g(_bytes_insan(kazanc))} tasarruf)"
+                f"  {_g('âœ“')} {r['ad']}: {_bytes_insan(r['onceki_boyut'])} â†’ {_bytes_insan(r['sonraki_boyut'])} ({_g(_bytes_insan(kazanc))} tasarruf)"
             )
             for a in r["adimlar"]:
-                print(f"    {_d('→')} {a}")
+                print(f"    {_d('â†’')} {a}")
         else:
             basarisiz += 1
-            print(f"  {_r('✗')} {r['ad']}: HATA - {r['hata']}")
+            print(f"  {_r('âœ—')} {r['ad']}: HATA - {r['hata']}")
 
-    print(f"\n  {_d('─' * 50)}")
-    print(f"  {_g(f'✓ {basarili}')} skill küçültüldü, {_r(f'{basarisiz}')} hata")
+    print(f"\n  {_d('â”€' * 50)}")
+    print(f"  {_g(f'âœ“ {basarili}')} skill kÃ¼Ã§Ã¼ltÃ¼ldÃ¼, {_r(f'{basarisiz}')} hata")
     print(f"  Toplam tasarruf: {_g(_bytes_insan(toplam_tasarruf))}")
     print()
 

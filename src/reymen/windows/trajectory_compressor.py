@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""trajectory_compressor.py — Gecmis Sikistirma.
+﻿# -*- coding: utf-8 -*-
+"""trajectory_compressor.py â€” Gecmis Sikistirma.
 
 Uzun oturumlarda eski adimlari LLM'e ozetleterek context
 penceresini verimli kullanir. Her 5 turda bir calisir.

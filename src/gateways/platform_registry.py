@@ -1,4 +1,4 @@
-"""
+﻿"""
 Platform Adapter Registry
 
 Allows platform adapters (built-in and plugin) to self-register so the gateway
@@ -63,7 +63,7 @@ class PlatformEntry:
     # If None, falls back to ``validate_config`` or ``check_fn``.
     is_connected: Optional[Callable[[Any], bool]] = None
 
-    # Env vars this platform needs (for ``hermes setup`` display).
+    # Env vars this platform needs (for ``reymen setup`` display).
     required_env: list = field(default_factory=list)
 
     # Hint shown when check_fn returns False.
@@ -79,38 +79,38 @@ class PlatformEntry:
     source: str = "plugin"
 
     # Name of the plugin manifest that registered this entry (empty for
-    # built-ins).  Used by ``hermes gateway setup`` to auto-enable the
+    # built-ins).  Used by ``reymen gateway setup`` to auto-enable the
     # owning plugin when the user configures its platform.
     plugin_name: str = ""
 
-    # ── Auth env var names (for _is_user_authorized integration) ──
-    # E.g. "IRC_ALLOWED_USERS" — checked for comma-separated user IDs.
+    # â”€â”€ Auth env var names (for _is_user_authorized integration) â”€â”€
+    # E.g. "IRC_ALLOWED_USERS" â€” checked for comma-separated user IDs.
     allowed_users_env: str = ""
-    # E.g. "IRC_ALLOW_ALL_USERS" — if truthy, all users authorized.
+    # E.g. "IRC_ALLOW_ALL_USERS" â€” if truthy, all users authorized.
     allow_all_env: str = ""
 
-    # ── Message limits ──
+    # â”€â”€ Message limits â”€â”€
     # Max message length for smart-chunking.  0 = no limit.
     max_message_length: int = 0
 
-    # ── Privacy ──
+    # â”€â”€ Privacy â”€â”€
     # If True, session descriptions redact PII (phone numbers, etc.)
     pii_safe: bool = False
 
-    # ── Display ──
-    # Emoji for CLI/gateway display (e.g. "💬")
-    emoji: str = "🔌"
+    # â”€â”€ Display â”€â”€
+    # Emoji for CLI/gateway display (e.g. "ğŸ’¬")
+    emoji: str = "ğŸ”Œ"
 
     # Whether this platform should appear in _UPDATE_ALLOWED_PLATFORMS
     # (allows /update command from this platform).
     allow_update_command: bool = True
 
-    # ── LLM guidance ──
+    # â”€â”€ LLM guidance â”€â”€
     # Platform hint injected into the system prompt (e.g. "You are on IRC.
     # Do not use markdown.").  Empty string = no hint.
     platform_hint: str = ""
 
-    # ── Env-driven auto-configuration ──
+    # â”€â”€ Env-driven auto-configuration â”€â”€
     # Optional: read env vars, return a dict of ``PlatformConfig.extra`` fields
     # to seed when the platform is auto-enabled.  Called during
     # ``_apply_env_overrides`` BEFORE the adapter is constructed, so
@@ -119,7 +119,7 @@ class PlatformEntry:
     # Signature: () -> Optional[dict[str, Any]]
     env_enablement_fn: Optional[Callable[[], Optional[dict]]] = None
 
-    # ── YAML→env config bridge ──
+    # â”€â”€ YAMLâ†’env config bridge â”€â”€
     # Optional: translate this platform's ``config.yaml`` keys into env vars
     # and/or seed ``PlatformConfig.extra`` directly.  Lets a plugin own its
     # YAML config translation instead of forcing core ``gateway/config.py``
@@ -141,7 +141,7 @@ class PlatformEntry:
     # resolve the default chat/room ID.  Empty = no cron home-channel support.
     cron_deliver_env_var: str = ""
 
-    # ── Standalone (out-of-process) sending ──
+    # â”€â”€ Standalone (out-of-process) sending â”€â”€
     # Optional: async coroutine that delivers a message without a live
     # gateway adapter.  Called by ``tools/send_message_tool._send_via_adapter``
     # when ``cron`` runs in a separate process from the gateway and the

@@ -1,8 +1,8 @@
-"""ReYMeN Web Search Provider ABC
+﻿"""ReYMeN Web Search Provider ABC
 ===============================
 
 Defines the pluggable-backend interface for web search and content extraction.
-Bağımsız ReYMeN sürümü — herhangi bir Hermes bağımlılığı yoktur.
+BaÄŸÄ±msÄ±z ReYMeN sÃ¼rÃ¼mÃ¼ â€” herhangi bir ReYMeN baÄŸÄ±mlÄ±lÄ±ÄŸÄ± yoktur.
 
 Response shape (search):
     {"success": True, "data": {"web": [{"title": str, "url": str, "description": str, "position": int}, ...]}}

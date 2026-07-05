@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-tool_guardrails.py — Arac guvenlik modulu.
+tool_guardrails.py â€” Arac guvenlik modulu.
 
 Tehlikeli islemleri engeller, parametre dogrulama
 ve izin kontrolu yapar.

@@ -1,11 +1,11 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-image_gen.py — ReYMeN tool arayüzü: Görsel üretim araçları.
+image_gen.py â€” ReYMeN tool arayÃ¼zÃ¼: GÃ¶rsel Ã¼retim araÃ§larÄ±.
 
-Bu modül, reymen.arac.image_gen_engine motorunu ReYMeN'in tool
-sistemine bağlar. Motor tarafından otomatik kaydedilir.
+Bu modÃ¼l, reymen.arac.image_gen_engine motorunu ReYMeN'in tool
+sistemine baÄŸlar. Motor tarafÄ±ndan otomatik kaydedilir.
 
-Kullanım:
+KullanÄ±m:
   RESIM_OLUSTUR(prompt="bir kedi", en="1024", boy="1024", backend="fal")
   RESIM_OLUSTUR_BACKEND_LISTELE()
 """

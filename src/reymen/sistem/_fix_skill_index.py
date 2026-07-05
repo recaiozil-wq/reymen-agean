@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """Fix skill_index.db - only broken DB"""
 
 import sqlite3, os, shutil
@@ -43,7 +43,7 @@ def _ana():
 
             if integrity == "ok" and rsize > 1000:
                 os.replace(recovered, BROKEN)
-                print("  ✅ Recovered DB replaced original")
+                print("  âœ… Recovered DB replaced original")
             else:
                 print(f"  Recovered DB invalid, trying alternative...")
                 if os.path.exists(recovered):
@@ -98,9 +98,9 @@ def _ana():
                 new_count = cn.fetchone()[0]
                 print(f"  New skill_index.db: {new_count} records")
                 print(
-                    f"  ✅ Rebuilt successfully!"
+                    f"  âœ… Rebuilt successfully!"
                     if new_count == good_count
-                    else f"  ⚠️ Count mismatch: {new_count} vs {good_count}"
+                    else f"  âš ï¸ Count mismatch: {new_count} vs {good_count}"
                 )
 
                 conn_new.close()

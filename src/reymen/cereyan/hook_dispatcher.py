@@ -1,18 +1,18 @@
-# -*- coding: utf-8 -*-
-"""Olay-güdümlü hook dispatcher.
+﻿# -*- coding: utf-8 -*-
+"""Olay-gÃ¼dÃ¼mlÃ¼ hook dispatcher.
 
-ReYMeN'in ``invoke_hook`` sisteminden adapte edilmiştir. Konuşma döngüsü
-belirli noktalarda hook'ları ateşler; yüklü plugin'ler bunları dinler.
+ReYMeN'in ``invoke_hook`` sisteminden adapte edilmiÅŸtir. KonuÅŸma dÃ¶ngÃ¼sÃ¼
+belirli noktalarda hook'larÄ± ateÅŸler; yÃ¼klÃ¼ plugin'ler bunlarÄ± dinler.
 
-Desteklenen hook olayları:
-    on_session_start    — Oturum başlarken
-    on_session_end      — Oturum biterken
-    on_turn_start       — Her tur başında
-    on_turn_end         — Her tur sonunda
-    on_tool_call        — Araç çağrılmadan önce
-    on_tool_result      — Araç sonucu alındıktan sonra
-    on_error            — Hata oluştuğunda
-    on_context_compress — Context sıkıştırılmadan önce
+Desteklenen hook olaylarÄ±:
+    on_session_start    â€” Oturum baÅŸlarken
+    on_session_end      â€” Oturum biterken
+    on_turn_start       â€” Her tur baÅŸÄ±nda
+    on_turn_end         â€” Her tur sonunda
+    on_tool_call        â€” AraÃ§ Ã§aÄŸrÄ±lmadan Ã¶nce
+    on_tool_result      â€” AraÃ§ sonucu alÄ±ndÄ±ktan sonra
+    on_error            â€” Hata oluÅŸtuÄŸunda
+    on_context_compress â€” Context sÄ±kÄ±ÅŸtÄ±rÄ±lmadan Ã¶nce
 """
 
 from __future__ import annotations
@@ -23,10 +23,10 @@ from typing import Any, Callable, Dict, List, Optional
 
 log = logging.getLogger("conversation_loop")
 
-# Hook kayıt defteri: olay_adı → [callback_listesi]
+# Hook kayÄ±t defteri: olay_adÄ± â†’ [callback_listesi]
 _HOOK_KAYDI: Dict[str, List[Callable]] = {}
 
-# Desteklenen olay adları
+# Desteklenen olay adlarÄ±
 GECERLI_OLAYLAR = frozenset(
     {
         "on_session_start",
@@ -45,29 +45,29 @@ def hook_kaydet(olay: str, callback: Callable) -> None:
     """Bir hook callback'i kaydet.
 
     Args:
-        olay:     Hook olay adı (ör. "on_session_start").
-        callback: Çağrılacak fonksiyon. Kwargs ile çağrılır.
+        olay:     Hook olay adÄ± (Ã¶r. "on_session_start").
+        callback: Ã‡aÄŸrÄ±lacak fonksiyon. Kwargs ile Ã§aÄŸrÄ±lÄ±r.
 
     Raises:
-        ValueError: Bilinmeyen olay adı.
+        ValueError: Bilinmeyen olay adÄ±.
     """
     if olay not in GECERLI_OLAYLAR:
         raise ValueError(
-            f"Bilinmeyen hook olayı: {olay!r}. Geçerliler: {sorted(GECERLI_OLAYLAR)}"
+            f"Bilinmeyen hook olayÄ±: {olay!r}. GeÃ§erliler: {sorted(GECERLI_OLAYLAR)}"
         )
     if olay not in _HOOK_KAYDI:
         _HOOK_KAYDI[olay] = []
     if callback not in _HOOK_KAYDI[olay]:
         _HOOK_KAYDI[olay].append(callback)
         log.debug(
-            "Hook kayıt: olay=%s callback=%s",
+            "Hook kayÄ±t: olay=%s callback=%s",
             olay,
             getattr(callback, "__name__", repr(callback)),
         )
 
 
 def hook_kaldir(olay: str, callback: Callable) -> bool:
-    """Kayıtlı bir hook'u kaldır. Başarıyla kaldırıldıysa True döner."""
+    """KayÄ±tlÄ± bir hook'u kaldÄ±r. BaÅŸarÄ±yla kaldÄ±rÄ±ldÄ±ysa True dÃ¶ner."""
     if olay in _HOOK_KAYDI and callback in _HOOK_KAYDI[olay]:
         _HOOK_KAYDI[olay].remove(callback)
         return True
@@ -75,17 +75,17 @@ def hook_kaldir(olay: str, callback: Callable) -> bool:
 
 
 def hook_cagir(olay: str, **kwargs: Any) -> List[Any]:
-    """Bir olayın tüm kayıtlı hook'larını ateşle.
+    """Bir olayÄ±n tÃ¼m kayÄ±tlÄ± hook'larÄ±nÄ± ateÅŸle.
 
-    Her hook ayrı try/except ile korunur — biri çökmesi diğerlerini
+    Her hook ayrÄ± try/except ile korunur â€” biri Ã§Ã¶kmesi diÄŸerlerini
     durdurmaz. Hata durumunda log.warning yazar ve devam eder.
 
     Args:
-        olay:    Hook olay adı.
-        **kwargs: Hook'a iletilecek named argümanlar.
+        olay:    Hook olay adÄ±.
+        **kwargs: Hook'a iletilecek named argÃ¼manlar.
 
     Returns:
-        Hook return değerlerinin listesi (None'lar dahil).
+        Hook return deÄŸerlerinin listesi (None'lar dahil).
     """
     callback_ler = _HOOK_KAYDI.get(olay, [])
     if not callback_ler:
@@ -100,7 +100,7 @@ def hook_cagir(olay: str, **kwargs: Any) -> List[Any]:
         except Exception as e:
             gecen = time.monotonic() - t0
             log.warning(
-                "Hook başarısız: olay=%s callback=%s sure=%.3fs hata=%s",
+                "Hook baÅŸarÄ±sÄ±z: olay=%s callback=%s sure=%.3fs hata=%s",
                 olay,
                 getattr(cb, "__name__", repr(cb)),
                 gecen,
@@ -110,18 +110,18 @@ def hook_cagir(olay: str, **kwargs: Any) -> List[Any]:
     return sonuclar
 
 
-# ReYMeN uyumluluğu için alias
+# ReYMeN uyumluluÄŸu iÃ§in alias
 invoke_hook = hook_cagir
 register_hook = hook_kaydet
 
 
 def tum_hooklari_temizle() -> None:
-    """Tüm kayıtlı hook'ları temizle (test izolasyonu için)."""
+    """TÃ¼m kayÄ±tlÄ± hook'larÄ± temizle (test izolasyonu iÃ§in)."""
     _HOOK_KAYDI.clear()
 
 
 def kayitli_hooklar() -> Dict[str, List[str]]:
-    """Kayıtlı hook'ların okunabilir özetini döndür."""
+    """KayÄ±tlÄ± hook'larÄ±n okunabilir Ã¶zetini dÃ¶ndÃ¼r."""
     return {
         olay: [getattr(cb, "__name__", repr(cb)) for cb in cblar]
         for olay, cblar in _HOOK_KAYDI.items()
@@ -129,17 +129,17 @@ def kayitli_hooklar() -> Dict[str, List[str]]:
     }
 
 
-# ── Decorator tabanlı kayıt ──────────────────────────────────────────────────
+# â”€â”€ Decorator tabanlÄ± kayÄ±t â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def hook(olay: str) -> Callable:
-    """Hook kaydı için decorator.
+    """Hook kaydÄ± iÃ§in decorator.
 
-    Örnek::
+    Ã–rnek::
 
         @hook("on_session_start")
         def oturum_basladi(session_id: str, **kwargs):
-            print(f"Oturum başladı: {session_id}")
+            print(f"Oturum baÅŸladÄ±: {session_id}")
     """
 
     def _decorator(fn: Callable) -> Callable:
@@ -149,7 +149,7 @@ def hook(olay: str) -> Callable:
     return _decorator
 
 
-# ── Sık kullanılan olay ateşleyicileri ──────────────────────────────────────
+# â”€â”€ SÄ±k kullanÄ±lan olay ateÅŸleyicileri â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def oturum_baslat_tetikle(session_id: str, agent_adi: str = "", **kw) -> None:

@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-bot_supervisor.py — ReYMeN Bot Supervisor
+bot_supervisor.py â€” ReYMeN Bot Supervisor
 
 3 botu baslatir, izler, crash'te restart eder.
 Kullanim:
@@ -9,7 +9,7 @@ Kullanim:
 
 Windows Startup icin:
   Bu script'i Windows baslangicina eklemek icin:
-    1. WIN+R → shell:startup
+    1. WIN+R â†’ shell:startup
     2. baslat_botlar.bat'yi buraya kopyala
 """
 
@@ -26,21 +26,21 @@ from datetime import datetime
 PROJE_KOK = Path(__file__).resolve().parent.parent.parent  # ReYMeN-Ajan/
 BOT_PY = PROJE_KOK / "reymen" / "ag" / "telegram_bot.py"
 DURUM_JSON = PROJE_KOK / "durum.json"
-HERMES_PROFILES = Path.home() / "AppData" / "Local" / "hermes" / "profiles"
+REYMEN_PROFILES = Path.home() / "AppData" / "Local" / "reymen" / "profiles"
 
 # Bot tanimlari: (adisyon, profil_adi, .env_yolu)
 BOTLAR = [
     {
         "adisyon": "pasa_38",
         "profil": "default",
-        "env": HERMES_PROFILES / "default" / ".env",
+        "env": REYMEN_PROFILES / "default" / ".env",
     },
     {
         "adisyon": "kiral38",
         "profil": "kiral38",
-        "env": HERMES_PROFILES / "kiral38" / ".env",
+        "env": REYMEN_PROFILES / "kiral38" / ".env",
     },
-    # reymen AYRI BIR GATEWAY ile calisir (bot_supervisor KARIŞMAZ)
+    # reymen AYRI BIR GATEWAY ile calisir (bot_supervisor KARIÅMAZ)
 ]
 
 
@@ -65,12 +65,17 @@ def bot_baslat(bot):
 
     env = os.environ.copy()
     env["TELEGRAM_BOT_TOKEN"] = token
-    env["HERMES_PROFILE"] = bot["profil"]
-    env["HERMES_GATEWAY"] = "ai"
+    env["REYMEN_PROFILE"] = bot["profil"]
+    env["REYMEN_GATEWAY"] = "ai"
+
+    # ReYMeN kendi venv'ini kullansin
+    reymen_python = PROJE_KOK / "venv" / "Scripts" / "python.exe"
+    if not reymen_python.exists():
+        reymen_python = sys.executable  # fallback
 
     try:
         p = subprocess.Popen(
-            [sys.executable, str(BOT_PY)],
+            [str(reymen_python), str(BOT_PY)],
             env=env,
             cwd=str(PROJE_KOK),
             stdout=subprocess.DEVNULL,

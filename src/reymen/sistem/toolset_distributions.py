@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 Toolset Distributions Module
 
@@ -21,7 +21,7 @@ Usage:
 
 from typing import Dict, List, Optional
 import random
-from src.reymen.sistem.toolsets import validate_toolset
+from reymen.sistem.toolsets import validate_toolset
 
 
 # Distribution definitions
@@ -236,7 +236,7 @@ def sample_toolsets_from_distribution(distribution_name: str) -> List[str]:
         # Validate toolset exists
         if not validate_toolset(toolset_name):
             print(
-                f"⚠️  Warning: Toolset '{toolset_name}' in distribution '{distribution_name}' is not valid"
+                f"âš ï¸  Warning: Toolset '{toolset_name}' in distribution '{distribution_name}' is not valid"
             )
             continue
 
@@ -277,27 +277,27 @@ def print_distribution_info(distribution_name: str) -> None:
     """
     dist = get_distribution(distribution_name)
     if not dist:
-        print(f"❌ Unknown distribution: {distribution_name}")
+        print(f"âŒ Unknown distribution: {distribution_name}")
         return
 
-    print(f"\n📊 Distribution: {distribution_name}")
+    print(f"\nğŸ“Š Distribution: {distribution_name}")
     print(f"   Description: {dist['description']}")
     print("   Toolsets:")
     for toolset, prob in sorted(
         dist["toolsets"].items(), key=lambda x: x[1], reverse=True
     ):
-        print(f"     • {toolset:15} : {prob:3}% chance")
+        print(f"     â€¢ {toolset:15} : {prob:3}% chance")
 
 
 if __name__ == "__main__":
     """
     Demo and testing of the distributions system
     """
-    print("📊 Toolset Distributions Demo")
+    print("ğŸ“Š Toolset Distributions Demo")
     print("=" * 60)
 
     # List all distributions
-    print("\n📋 Available Distributions:")
+    print("\nğŸ“‹ Available Distributions:")
     print("-" * 40)
     for name, dist in list_distributions().items():
         print(f"\n  {name}:")
@@ -306,7 +306,7 @@ if __name__ == "__main__":
         print(f"    Toolsets: {toolset_list}")
 
     # Demo sampling
-    print("\n\n🎲 Sampling Examples:")
+    print("\n\nğŸ² Sampling Examples:")
     print("-" * 40)
 
     test_distributions = ["image_gen", "research", "balanced", "default"]
@@ -326,7 +326,7 @@ if __name__ == "__main__":
         print(f"  Sample 5: {samples[4]}")
 
     # Show detailed info
-    print("\n\n📊 Detailed Distribution Info:")
+    print("\n\nğŸ“Š Detailed Distribution Info:")
     print("-" * 40)
     print_distribution_info("image_gen")
     print_distribution_info("research")

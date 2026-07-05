@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""trajectory.py — Adim Gecmisi (Trajectory).
+﻿# -*- coding: utf-8 -*-
+"""trajectory.py â€” Adim Gecmisi (Trajectory).
 
 Her turdaki dusunce, eylem ve gozlemi kaydeder.
 Sonradan analiz, hata ayiklama ve ogrenme icin kullanilir.
@@ -61,7 +61,7 @@ class Trajectory:
         return "\n".join(satirlar)
 
     def tool_istatistik(self) -> dict:
-        """Araç kullanim istatistiklerini dondur (ShareGPT batch format uyumlu).
+        """AraÃ§ kullanim istatistiklerini dondur (ShareGPT batch format uyumlu).
 
         Returns:
             {arac_adi: {count, success, failure}, ...}
@@ -142,7 +142,7 @@ class Trajectory:
         konusma.append({"from": "human", "value": self.hedef})
 
         for adim in self.adimlar:
-            # Dusunce + eylem → "gpt" rolu
+            # Dusunce + eylem â†’ "gpt" rolu
             gpt_icerik = ""
             if adim.get("dusunce"):
                 gpt_icerik += f"Dusunce: {adim['dusunce']}\n"
@@ -151,7 +151,7 @@ class Trajectory:
             if gpt_icerik:
                 konusma.append({"from": "gpt", "value": gpt_icerik.strip()})
 
-            # Gozlem → "tool" rolu
+            # Gozlem â†’ "tool" rolu
             if adim.get("gozlem"):
                 konusma.append({"from": "tool", "value": adim["gozlem"]})
 
@@ -186,7 +186,7 @@ class Trajectory:
 
     @staticmethod
     def sharegpt_yukle(tamamlanan: bool = True) -> list[dict]:
-        """ShareGPT JSONL dosyasini oku — egitim verisi olarak kullan."""
+        """ShareGPT JSONL dosyasini oku â€” egitim verisi olarak kullan."""
         hedef = SHAREGPT_TAMAMLANDI if tamamlanan else SHAREGPT_BASARISIZ
         if not hedef.exists():
             return []

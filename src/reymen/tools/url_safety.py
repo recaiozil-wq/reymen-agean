@@ -1,6 +1,6 @@
-"""ReYMeN URL safety checks — blocks requests to private/internal network addresses.
+﻿"""ReYMeN URL safety checks â€” blocks requests to private/internal network addresses.
 
-Prevents SSRF attacks. Bağımsız ReYMeN sürümü.
+Prevents SSRF attacks. BaÄŸÄ±msÄ±z ReYMeN sÃ¼rÃ¼mÃ¼.
 """
 
 import ipaddress
@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 def _is_truthy_value(value, default=False):
-    """Simple truthy check — ReYMeN'in Hermes/utils.is_truthy_value yerine kullandığı."""
+    """Simple truthy check â€” ReYMeN'in ReYMeN/utils.is_truthy_value yerine kullandÄ±ÄŸÄ±."""
     if value is None:
         return default
     if isinstance(value, bool):
@@ -180,7 +180,7 @@ def is_safe_url(url: str) -> bool:
         scheme = (parsed.scheme or "").strip().lower()
         if scheme not in {"http", "https"}:
             logger.warning(
-                "Blocked request — unsupported URL scheme: %s", scheme or "<empty>"
+                "Blocked request â€” unsupported URL scheme: %s", scheme or "<empty>"
             )
             return False
         if not hostname:
@@ -195,7 +195,7 @@ def is_safe_url(url: str) -> bool:
                 hostname, None, socket.AF_UNSPEC, socket.SOCK_STREAM
             )
         except socket.gaierror:
-            logger.warning("Blocked request — DNS resolution failed for: %s", hostname)
+            logger.warning("Blocked request â€” DNS resolution failed for: %s", hostname)
             return False
         for _family, _, _, _, sockaddr in addr_info:
             ip_str = sockaddr[0]
@@ -217,7 +217,7 @@ def is_safe_url(url: str) -> bool:
                 return False
         return True
     except Exception as exc:
-        logger.warning("Blocked request — URL safety error for %s: %s", url, exc)
+        logger.warning("Blocked request â€” URL safety error for %s: %s", url, exc)
         return False
 
 

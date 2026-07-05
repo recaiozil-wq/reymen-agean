@@ -1,18 +1,18 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-steering_loop.py — ReYMeN 5 Katmanlı Steering Loop (SQLite FTS5)
+steering_loop.py â€” ReYMeN 5 KatmanlÄ± Steering Loop (SQLite FTS5)
 
-ReYMeN Agent'in delegate_task/session_search/cron altyapısına eşdeğer,
-ReYMeN'in kendi 5 katmanlı yönlendirme döngüsü.
+ReYMeN Agent'in delegate_task/session_search/cron altyapÄ±sÄ±na eÅŸdeÄŸer,
+ReYMeN'in kendi 5 katmanlÄ± yÃ¶nlendirme dÃ¶ngÃ¼sÃ¼.
 
 Katmanlar:
-  1. HAFIZA   — SQLite+FTS5 kalıcı görev/konuşma hafızası
-  2. SANDBOX  — Motor üzerinden güvenli araç çalıştırma
-  3. TALIMAT  — Sistem prompt'u + araç rehberi
-  4. KANCA    — Tekrar koruması + kural denetimi (SQLite persist)
-  5. GOZLEM   — LLM çağrı takibi + token/maliyet (SQLite persist)
+  1. HAFIZA   â€” SQLite+FTS5 kalÄ±cÄ± gÃ¶rev/konuÅŸma hafÄ±zasÄ±
+  2. SANDBOX  â€” Motor Ã¼zerinden gÃ¼venli araÃ§ Ã§alÄ±ÅŸtÄ±rma
+  3. TALIMAT  â€” Sistem prompt'u + araÃ§ rehberi
+  4. KANCA    â€” Tekrar korumasÄ± + kural denetimi (SQLite persist)
+  5. GOZLEM   â€” LLM Ã§aÄŸrÄ± takibi + token/maliyet (SQLite persist)
 
-Tüm katmanlar SQLite (hafiza_genislet.py) üzerinde birleşir.
+TÃ¼m katmanlar SQLite (hafiza_genislet.py) Ã¼zerinde birleÅŸir.
 """
 
 import json
@@ -21,14 +21,14 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-# ── SQLite (standart kütüphane) ─────────────────────────────────────────────
+# â”€â”€ SQLite (standart kÃ¼tÃ¼phane) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 import sqlite3
 import logging
 
 logger = logging.getLogger(__name__)
 _SQLITE_AVAILABLE = True
 
-# ── Circuit Breaker ──────────────────────────────────────────────────────────
+# â”€â”€ Circuit Breaker â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 try:
     from reymen.sistem.circuit_breaker import CircuitBreaker, CircuitBreakerState
 except ImportError:
@@ -42,15 +42,15 @@ _DB_PATH = str(_DB_DIR / "steering.db")
 
 _yazma_kilit = threading.Lock()
 
-# ════════════════════════════════════════════════════════════════════════════
-# KATMAN 1 — HAFIZA (SQLite + FTS5)
-# ════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# KATMAN 1 â€” HAFIZA (SQLite + FTS5)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class Katman1Hafiza:
-    """Görev ve konuşma hafızası — Kalıcı SQLite+FTS5.
+    """GÃ¶rev ve konuÅŸma hafÄ±zasÄ± â€” KalÄ±cÄ± SQLite+FTS5.
 
-    Her alt ajan adımı, görev sonucu, kullanıcı mesajı
+    Her alt ajan adÄ±mÄ±, gÃ¶rev sonucu, kullanÄ±cÄ± mesajÄ±
     FTS5 ile indexlenir. Tam metin arama.
     """
 
@@ -193,19 +193,19 @@ class Katman1Hafiza:
             return {"aktif": False}
 
 
-# ════════════════════════════════════════════════════════════════════════════
-# KATMAN 4 — KANCA (SQLite persist)
-# ════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# KATMAN 4 â€” KANCA (SQLite persist)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class Katman4Kanca:
-    """Eylem öncesi kural denetimi — SQLite persist + in-memory cache.
+    """Eylem Ã¶ncesi kural denetimi â€” SQLite persist + in-memory cache.
 
     Kurallar:
-    - Aynı eylem N kez art arda → DUR
-    - Yasaklı araç → BLOKE
+    - AynÄ± eylem N kez art arda â†’ DUR
+    - YasaklÄ± araÃ§ â†’ BLOKE
     - Toplam eylem limiti
-    - Hızlı döngü koruması
+    - HÄ±zlÄ± dÃ¶ngÃ¼ korumasÄ±
     """
 
     ENGELLENEN = frozenset({"ALT_AJAN_GOREVLENDIR", "SIL_DOSYA", "BICAKLA"})
@@ -293,7 +293,7 @@ class Katman4Kanca:
 
     def denetle(self, task_id: str, arac: str, derinlik: int = 1) -> Optional[str]:
         """Eylemi denetle. None = gecerli, str = hata."""
-        # Circuit Breaker kontrolü — OPEN ise erken dön
+        # Circuit Breaker kontrolÃ¼ â€” OPEN ise erken dÃ¶n
         if self._cb is not None:
             cb_mesaj = self._cb.denetle()
             if cb_mesaj:
@@ -302,7 +302,7 @@ class Katman4Kanca:
         if arac in self.ENGELLENEN:
             self._cache[task_id] = {"bloke": True, "bloke_nedeni": f"'{arac}' yasakli"}
             self._db_kaydet(task_id, self._cache[task_id])
-            return f"[KANCA] '{arac}' yasakli araç — task bloke."
+            return f"[KANCA] '{arac}' yasakli araÃ§ â€” task bloke."
 
         durum = self._cache.get(
             task_id,
@@ -327,7 +327,7 @@ class Katman4Kanca:
                 durum["bloke_nedeni"] = f"'{arac}' {self.MAKS_ART_ARDA}x art arda"
                 self._cache[task_id] = durum
                 self._db_kaydet(task_id, durum)
-                return f"[KANCA] {durum['bloke_nedeni']} — task bloke."
+                return f"[KANCA] {durum['bloke_nedeni']} â€” task bloke."
         else:
             durum["art_arda_sayac"] = 1
         durum["son_eylem"] = arac
@@ -384,7 +384,7 @@ class Katman4Kanca:
         return self._cb.hata_kaydet()
 
     def basari_bildir(self, task_id: str) -> None:
-        """Arac basarisi bildir. HALF_OPEN → CLOSED, sayac sifirlanir."""
+        """Arac basarisi bildir. HALF_OPEN â†’ CLOSED, sayac sifirlanir."""
         if self._cb is not None:
             self._cb.basari_kaydet()
 
@@ -404,15 +404,15 @@ class Katman4Kanca:
         }
 
 
-# ════════════════════════════════════════════════════════════════════════════
-# KATMAN 5 — GOZLEM (SQLite persist)
-# ════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# KATMAN 5 â€” GOZLEM (SQLite persist)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class Katman5Gozlem:
-    """LLM çağrı takibi — SQLite + token/maliyet analizi.
+    """LLM Ã§aÄŸrÄ± takibi â€” SQLite + token/maliyet analizi.
 
-    Her LLM çağrısı: task_id, sure, token, maliyet, basarili/basarisiz.
+    Her LLM Ã§aÄŸrÄ±sÄ±: task_id, sure, token, maliyet, basarili/basarisiz.
     """
 
     TOKEN_BASINA_MALIYET = {
@@ -579,13 +579,13 @@ class Katman5Gozlem:
             print(f"[UYARI] steering_loop.py:521 - {_steering_e520}")
 
 
-# ════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # 5 KATMAN BIRLESIK ORKESTRASYON
-# ════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class SteeringLoop:
-    """5 katmanı tek API altında birleştirir.
+    """5 katmanÄ± tek API altÄ±nda birleÅŸtirir.
 
     Kullanim:
         from steering_loop import loop
@@ -599,7 +599,7 @@ class SteeringLoop:
         self.kanca = Katman4Kanca(db_path)
         self.gozlem = Katman5Gozlem(db_path)
 
-    # ── Katman 1: Hafiza ──
+    # â”€â”€ Katman 1: Hafiza â”€â”€
     def hafiza_kaydet(
         self, task_id: str, tur: str, icerik: str, metadata: Optional[dict] = None
     ) -> bool:
@@ -611,7 +611,7 @@ class SteeringLoop:
     def task_gecmis(self, task_id: str) -> List[Dict]:
         return self.hafiza.task_gecmis(task_id)
 
-    # ── Katman 4: Kanca ──
+    # â”€â”€ Katman 4: Kanca â”€â”€
     def kanca_denetle(
         self, task_id: str, arac: str, derinlik: int = 1
     ) -> Optional[str]:
@@ -623,7 +623,7 @@ class SteeringLoop:
     def kanca_temizle(self, task_id: str):
         self.kanca.task_temizle(task_id)
 
-    # ── Katman 5: Gozlem ──
+    # â”€â”€ Katman 5: Gozlem â”€â”€
     def gozlem_kaydet(
         self,
         task_id: str,
@@ -643,7 +643,7 @@ class SteeringLoop:
             return self.gozlem.task_ozet(task_id)
         return self.gozlem.genel_ozet()
 
-    # ── Tüm katman durumu ──
+    # â”€â”€ TÃ¼m katman durumu â”€â”€
     def durum(self) -> dict:
         h = self.hafiza.durum()
         k = self.kanca.istatistik()
@@ -660,16 +660,16 @@ class SteeringLoop:
         }
 
 
-# ════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # SINGLETON
-# ════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 loop = SteeringLoop()
 
 
-# ════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # TEST
-# ════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 if __name__ == "__main__":
     print("=== 5 KATMAN STEERING LOOP TEST ===")
@@ -691,7 +691,7 @@ if __name__ == "__main__":
     loop.hafiza_kaydet("test_02", "adim", "Lambda tek satirlik fonksiyon")
     sonuc = loop.hafiza_ara("decorator")
     assert len(sonuc) > 0, "Decorator aranabilmeli"
-    print(f"  ✅ FTS5 ara 'decorator': {len(sonuc)} sonuc")
+    print(f"  âœ… FTS5 ara 'decorator': {len(sonuc)} sonuc")
 
     # Test 2: Kanca
     hata = loop.kanca_denetle("test_kanca", "DOSYA_OKU")
@@ -699,13 +699,13 @@ if __name__ == "__main__":
     for _ in range(5):
         hata = loop.kanca_denetle("test_kanca", "DOSYA_OKU")
     assert hata is not None, "5x ayni eylem bloke etmeli"
-    print(f"  ✅ Kanca bloke: {hata[:40]}...")
+    print(f"  âœ… Kanca bloke: {hata[:40]}...")
     loop.kanca_coz("test_kanca")
     assert loop.kanca_denetle("test_kanca", "DOSYA_YAZ") is None
-    print(f"  ✅ Kanca cozuldu, yeni eylem gecerli")
+    print(f"  âœ… Kanca cozuldu, yeni eylem gecerli")
     hata2 = loop.kanca_denetle("test_kanca", "ALT_AJAN_GOREVLENDIR")
     assert hata2 is not None, "Yasakli arac bloke etmeli"
-    print(f"  ✅ Yasakli arac engellendi")
+    print(f"  âœ… Yasakli arac engellendi")
 
     # Test 3: Gozlem
     import time as _t
@@ -724,13 +724,13 @@ if __name__ == "__main__":
     ozet = loop.gozlem_ozet(f"test_gozlem_{_uid}")
     assert ozet["cagri_sayisi"] == 2, "2 cagri olmali"
     print(
-        f"  ✅ Gozlem: {ozet['cagri_sayisi']} cagri, ${ozet['tahmini_maliyet_usd']:.6f}"
+        f"  âœ… Gozlem: {ozet['cagri_sayisi']} cagri, ${ozet['tahmini_maliyet_usd']:.6f}"
     )
 
     # Test 4: Genel durum
     d = loop.durum()
     print(
-        f"  ✅ Steering durum: {d['katman1_hafiza']['toplam_kayit']} kayit, "
+        f"  âœ… Steering durum: {d['katman1_hafiza']['toplam_kayit']} kayit, "
         f"{d['katman5_gozlem']['toplam_cagri']} cagri, "
         f"{d['katman4_kanca']['aktif_task']} aktif"
     )
@@ -738,4 +738,4 @@ if __name__ == "__main__":
     # Temizlik
     loop.kanca_temizle("test_kanca")
     print()
-    print("✅ TUM KATMANLAR CALISIYOR")
+    print("âœ… TUM KATMANLAR CALISIYOR")

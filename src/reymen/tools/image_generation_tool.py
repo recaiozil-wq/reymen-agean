@@ -1,9 +1,9 @@
-#!/usr/bin/env python3
-# Apache 2.0 — ReYMeN Image Gen shim. Bagimsiz: stdlib + reymen.arac.image_gen_engine.
+﻿#!/usr/bin/env python3
+# Apache 2.0 â€” ReYMeN Image Gen shim. Bagimsiz: stdlib + reymen.arac.image_gen_engine.
 """
-image_generation_tool.py — ReYMeN Image Gen shim.
+image_generation_tool.py â€” ReYMeN Image Gen shim.
 
-Hermes ``tools.image_generation_tool`` yerine ReYMeN'in kendi
+ReYMeN ``tools.image_generation_tool`` yerine ReYMeN'in kendi
 ``reymen.arac.image_gen_engine`` motorunu kullanir. FAL, OpenAI, xAI
 ve Stub engine'leri destekler.
 
@@ -18,11 +18,11 @@ import logging
 import os
 from typing import Any, Dict, Optional
 
-from src.reymen.arac.image_gen_engine import (
+from reymen.arac.image_gen_engine import (
     _get_registry,
     resim_olustur as _reymen_resim_olustur,
 )
-from src.reymen.sistem.tools_registry import registry
+from reymen.sistem.tools_registry import registry
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 DEFAULT_ASPECT_RATIO = "landscape"
 VALID_ASPECT_RATIOS = ("landscape", "square", "portrait")
 
-# ReYMeN coords: landscape=16:9→genis, square=1:1→kare, portrait=9:16→dar
+# ReYMeN coords: landscape=16:9â†’genis, square=1:1â†’kare, portrait=9:16â†’dar
 _ASPECT_TO_SIZE = {
     "landscape": ("1792", "1024"),  # 16:9
     "square": ("1024", "1024"),  # 1:1
@@ -106,13 +106,13 @@ def _build_no_backend_setup_message() -> str:
         return (
             "Hicbir gorsel uretim back-end'i hazir degil. "
             "Su API anahtarlarindan birini .env dosyasina ekleyin:\n"
-            + "\n".join(f"  • {e}" for e in eksik)
+            + "\n".join(f"  â€¢ {e}" for e in eksik)
         )
     return "Hicbir gorsel uretim back-end'i bulunamadi."
 
 
 def _aspect_to_size(aspect: str) -> tuple[str, str]:
-    """aspect_ratio → (en, boy) stringleri."""
+    """aspect_ratio â†’ (en, boy) stringleri."""
     return _ASPECT_TO_SIZE.get(aspect, ("1024", "1024"))
 
 
@@ -123,7 +123,7 @@ def image_generate_tool(
     reference_image_urls: Optional[list] = None,
     **kwargs: Any,
 ) -> str:
-    """ReYMeN Image Gen — Hermes uyumlu arayuz.
+    """ReYMeN Image Gen â€” ReYMeN uyumlu arayuz.
 
     Args:
         prompt: Gorsel prompt/aciklamasi.
@@ -158,7 +158,7 @@ def image_generate_tool(
             logger.info(
                 "image_url/reference_image_urls alindi ancak ReYMeN engine edit modu icin basit FAL'e yonlendiriyor"
             )
-            # Basit FAL backend denemesi — FAL engine edit destekler
+            # Basit FAL backend denemesi â€” FAL engine edit destekler
             sonuc = _reymen_resim_olustur(prompt.strip(), en, boy, backend="fal")
         else:
             # Varsayilan backend
@@ -211,7 +211,7 @@ def _handle_image_generate(**kwargs: Any) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Registry kaydi (otomatik keşif icin)
+# Registry kaydi (otomatik keÅŸif icin)
 # ---------------------------------------------------------------------------
 registry.register(
     name="image_generate",
@@ -221,5 +221,5 @@ registry.register(
     check_fn=check_image_generation_requirements,
     requires_env=["FAL_KEY", "OPENAI_API_KEY", "XAI_API_KEY"],
     description="Gorsel uretir (FAL / OpenAI / xAI). FAL_KEY, OPENAI_API_KEY veya XAI_API_KEY gerekli.",
-    emoji="🎨",
+    emoji="ğŸ¨",
 )

@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """3000 soru testi - API'yi dogrudan cagirir, ciktiyi dosyaya yazar."""
 
 import json, os, sys, time, requests as req
@@ -11,8 +11,8 @@ if not api_key:
     env_paths = [
         Path(".env"),
         Path("../.env"),
-        Path.home() / "AppData/Local/hermes/profiles/reymen/.env",
-        Path.home() / "AppData/Local/hermes/.env",
+        Path.home() / "AppData/Local/reymen/profiles/reymen/.env",
+        Path.home() / "AppData/Local/reymen/.env",
         Path.home() / ".config/reymen/.env",
     ]
     for p in env_paths:

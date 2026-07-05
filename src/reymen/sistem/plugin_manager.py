@@ -1,21 +1,21 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-plugin_manager.py — ReYMeN Plugin Yonetim Sistemi (ReYMeN-seviyesi).
+plugin_manager.py â€” ReYMeN Plugin Yonetim Sistemi (ReYMeN-seviyesi).
 
 Iki plugin kategorisi:
-  1. Arac plugin'leri  — plugins/*.py icinde run() fonksiyonu
-  2. Hafiza plugin'leri — plugins/memory/<ad>/__init__.py icinde
+  1. Arac plugin'leri  â€” plugins/*.py icinde run() fonksiyonu
+  2. Hafiza plugin'leri â€” plugins/memory/<ad>/__init__.py icinde
      AbstraktHafizaSaglayici alt sinifi + kaydet(ctx) fonksiyonu
 
 YENI: PluginYoneticisi sinifi:
-  - list_plugins()     → tum pluginleri listele (+ providers bilgisi)
-  - plugin_info(adi)   → detayli plugin bilgisi (+ providers)
-  - enable_plugin(adi) → plugin'i aktif et
-  - disable_plugin(adi) → plugin'i devre disi birak
-  - plugin_reload(adi) → plugin'i yeniden yukle (kaldir + yukle)
-  - hot_reload(adi)    → plugin'i hot-reload ile yeniden yukle (importlib.reload)
-  - get_providers(adi) → plugin'in destekledigi provider'lari listele
-  - plugin_baslat(adi, provider=None) → plugin'i belirtilen provider ile baslat
+  - list_plugins()     â†’ tum pluginleri listele (+ providers bilgisi)
+  - plugin_info(adi)   â†’ detayli plugin bilgisi (+ providers)
+  - enable_plugin(adi) â†’ plugin'i aktif et
+  - disable_plugin(adi) â†’ plugin'i devre disi birak
+  - plugin_reload(adi) â†’ plugin'i yeniden yukle (kaldir + yukle)
+  - hot_reload(adi)    â†’ plugin'i hot-reload ile yeniden yukle (importlib.reload)
+  - get_providers(adi) â†’ plugin'in destekledigi provider'lari listele
+  - plugin_baslat(adi, provider=None) â†’ plugin'i belirtilen provider ile baslat
 
 Kullanim:
     pm = PluginManager("plugins")
@@ -84,7 +84,7 @@ class PluginManager:
         self._registry: dict[str, PluginManifest] = {}
         self._hafiza_kayit: Optional["HafizaPluginKayit"] = None
 
-    # ── Arac plugin'leri ──────────────────────────────────────────────────
+    # â”€â”€ Arac plugin'leri â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def discover(self) -> Iterator[str]:
         """plugins/ altindaki tum .py dosyalarini lazy tara."""
@@ -114,7 +114,7 @@ class PluginManager:
         list(self.discover())
         return list(self._registry.keys())
 
-    # ── Hafiza plugin'leri ─────────────────────────────────────────────────
+    # â”€â”€ Hafiza plugin'leri â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def hafiza_pluginlerini_yukle(
         self,
@@ -122,7 +122,7 @@ class PluginManager:
         tercih: Optional[str] = None,
         **baslat_kwargs,
     ) -> Optional["AbstraktHafizaSaglayici"]:
-        """plugins/memory/<ad>/__init__.py icindeki hafiza plugin'lerini keşfet ve aktive et."""
+        """plugins/memory/<ad>/__init__.py icindeki hafiza plugin'lerini keÅŸfet ve aktive et."""
         try:
             from reymen.hafiza.memory_provider import HafizaPluginKayit
         except ImportError:
@@ -198,7 +198,7 @@ class PluginManager:
 
 
 class PluginYoneticisi:
-    """ReYMeN Plugin Yoneticisi — plugin listeleme, aktif/devre disi, detay,
+    """ReYMeN Plugin Yoneticisi â€” plugin listeleme, aktif/devre disi, detay,
     hot-reload ve provider plugin destegi.
 
     PluginYukleyici ile birlikte calisir ve CLI komutlarina backend saglar.
@@ -545,7 +545,7 @@ class PluginYoneticisi:
                 )
         return bagimlilar
 
-    # ── Provider Plugin Destegi ─────────────────────────────────────────────
+    # â”€â”€ Provider Plugin Destegi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def get_providers(self, ad: str) -> list[dict]:
         """Bir pluginin destekledigi provider'lari dondur.
@@ -719,7 +719,7 @@ class PluginYoneticisi:
         if modul is not None:
             setattr(modul, "_aktif_provider", secilen_provider)
 
-        # ── ProviderPluginBase entegrasyonu ───────────────────────────────
+        # â”€â”€ ProviderPluginBase entegrasyonu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         # Modul icinde ProviderPluginBase alt sinifi varsa, onu baslat
         self._provider_base_baslat(modul, ad, secilen_provider)
 
@@ -742,17 +742,17 @@ class PluginYoneticisi:
             "tool": sum(1 for p in tumu if p["kind"] == "tool"),
         }
 
-    # ── .reyplugin Export/Import ─────────────────────────────────────────
+    # â”€â”€ .reyplugin Export/Import â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def export_plugin(self, ad: str, cikti_yol: str | None = None) -> str:
-        """Plugin'i .reyplugin paketine dışa aktar.
+        """Plugin'i .reyplugin paketine dÄ±ÅŸa aktar.
 
         Args:
-            ad: Plugin klasör adı.
-            cikti_yol: Çıktı dosya yolu (None = {ad}.reyplugin).
+            ad: Plugin klasÃ¶r adÄ±.
+            cikti_yol: Ã‡Ä±ktÄ± dosya yolu (None = {ad}.reyplugin).
 
         Returns:
-            Oluşturulan dosya yolu.
+            OluÅŸturulan dosya yolu.
         """
         import json, zipfile, datetime
 
@@ -786,13 +786,13 @@ class PluginYoneticisi:
         return f"[OK] '{ad}' -> {cikti_yol} ({len(metadata['dosyalar'])} dosya)"
 
     def import_plugin(self, kaynak: str) -> str:
-        """.reyplugin paketini içe aktar.
+        """.reyplugin paketini iÃ§e aktar.
 
         Args:
             kaynak: .reyplugin dosya yolu.
 
         Returns:
-            İşlem sonucu mesajı.
+            Ä°ÅŸlem sonucu mesajÄ±.
         """
         import zipfile, json, shutil
 
@@ -812,19 +812,19 @@ class PluginYoneticisi:
                 metadata = json.loads(zf.read("metadata.json"))
                 plugin_adi = metadata.get("plugin_adi", dosya.stem)
 
-                # Hedef klasör
+                # Hedef klasÃ¶r
                 hedef = self._dizin / plugin_adi
                 if hedef.exists():
                     return f"[HATA] '{plugin_adi}' zaten mevcut. Once silin veya farkli bir isim verin."
 
-                # Ayıkla
+                # AyÄ±kla
                 hedef.mkdir(parents=True, exist_ok=True)
                 for uye in zf.namelist():
                     if uye.endswith("/") or uye == "metadata.json":
                         continue
                     zf.extract(uye, self._dizin)
 
-            # Cache'i temizle (yeniden yükleme için)
+            # Cache'i temizle (yeniden yÃ¼kleme iÃ§in)
             yl = self.yukleyici
             if yl and plugin_adi in yl._yaml_bilgisi:
                 del yl._yaml_bilgisi[plugin_adi]
@@ -851,7 +851,7 @@ if __name__ == "__main__":
     tumu = yonetici.list_plugins()
     print(f"\n=== Plugin Listesi ({len(tumu)} adet) ===")
     for p in tumu:
-        durum = "✓" if p["enabled"] else "✗"
+        durum = "âœ“" if p["enabled"] else "âœ—"
         yuklu = "Y" if p["loaded"] else "-"
         print(
             f"  {durum} [{yuklu}] {p['name']:25s} v{p['version']:8s} {p['kind']:8s} {p['description'][:50]}"

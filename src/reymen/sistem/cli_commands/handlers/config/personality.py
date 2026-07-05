@@ -1,6 +1,6 @@
-"""_handle_personality_command handler."""
+﻿"""_handle_personality_command handler."""
 
-from src.reymen.sistem.cli_stream import save_config_value
+from reymen.sistem.cli_stream import save_config_value
 
 
 def _handle_personality_command(cli, cmd: str):
@@ -18,7 +18,7 @@ def _handle_personality_command(cli, cmd: str):
                 print("(^_^)b Personality cleared (saved to config)")
             else:
                 print("(^_^) Personality cleared (session only)")
-            print("  No personality overlay — using base agent behavior.")
+            print("  No personality overlay â€” using base agent behavior.")
         elif personality_name in cli.personalities:
             cli.system_prompt = cli._resolve_personality_prompt(
                 cli.personalities[personality_name]

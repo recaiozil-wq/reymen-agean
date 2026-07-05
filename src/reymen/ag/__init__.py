@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 
 """
-reymen.ag — Ag Geçitleri (Gateway) Paketi.
+reymen.ag â€” Ag GeÃ§itleri (Gateway) Paketi.
 
 Gateway'ler, ReYMeN'in farkli platformlarla iletisim kurmasini saglar:
   - discord_bot: Discord bot wrapper (discord.py)

@@ -1,6 +1,6 @@
-"""ReYMeN website access policy — Bağımsız ReYMeN sürümü.
+﻿"""ReYMeN website access policy â€” BaÄŸÄ±msÄ±z ReYMeN sÃ¼rÃ¼mÃ¼.
 
-Website blocklist politikasını REYMEN_HOME/config.yaml'dan okur.
+Website blocklist politikasÄ±nÄ± REYMEN_HOME/config.yaml'dan okur.
 """
 
 import fnmatch
@@ -30,7 +30,7 @@ class WebsitePolicyError(Exception):
 
 
 def _get_default_config_path() -> Path:
-    """REYMEN_HOME/config.yaml — varsayılan config dosyası."""
+    """REYMEN_HOME/config.yaml â€” varsayÄ±lan config dosyasÄ±."""
     reymen_home = Path(os.environ.get("REYMEN_HOME", str(Path.home() / ".reymen")))
     return reymen_home / "config.yaml"
 
@@ -81,7 +81,7 @@ def _load_policy_config(config_path: Optional[Path] = None) -> Dict[str, Any]:
     try:
         import yaml
     except ImportError:
-        logger.debug("PyYAML not installed — blocklist disabled")
+        logger.debug("PyYAML not installed â€” blocklist disabled")
         return dict(_DEFAULT_WEBSITE_BLOCKLIST)
     try:
         with open(config_path, encoding="utf-8") as f:

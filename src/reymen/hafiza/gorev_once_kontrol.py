@@ -1,24 +1,24 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-gorev_once_kontrol.py — Görev Öncesi Hafıza Kontrolü + isle() API.
+gorev_once_kontrol.py â€” GÃ¶rev Ã–ncesi HafÄ±za KontrolÃ¼ + isle() API.
 
-Her görev başlamadan ÖNCE çağrılır. 3 katmanlı sistem:
+Her gÃ¶rev baÅŸlamadan Ã–NCE Ã§aÄŸrÄ±lÄ±r. 3 katmanlÄ± sistem:
 
-1. hafizada_ara(hedef, kategori) — Hafızada benzer görev/çözüm ara
+1. hafizada_ara(hedef, kategori) â€” HafÄ±zada benzer gÃ¶rev/Ã§Ã¶zÃ¼m ara
    - kategori filtresi: "kali", "dron", "cad", "windows", "kali/network" vb.
-   - guven_skoru < 0.5 ise "belirsiz" döndür
-   - gecerlilik_tarihi < bugün ise "gecersiz" işareti ekle
+   - guven_skoru < 0.5 ise "belirsiz" dÃ¶ndÃ¼r
+   - gecerlilik_tarihi < bugÃ¼n ise "gecersiz" iÅŸareti ekle
 
-2. isle(hedef, islev, kategori) — "HAFIZAYA BAK → VARSA KULLAN → YOKSA DENE → KAYDET"
-   Örn:
+2. isle(hedef, islev, kategori) â€” "HAFIZAYA BAK â†’ VARSA KULLAN â†’ YOKSA DENE â†’ KAYDET"
+   Ã–rn:
      sonuc = isle("nmap port tara", lambda: terminal("nmap -sS 127.0.0.1"))
-     → Hafızada varsa döndür
-     → Yoksa çalıştır, kaydet, döndür
+     â†’ HafÄ±zada varsa dÃ¶ndÃ¼r
+     â†’ Yoksa Ã§alÄ±ÅŸtÄ±r, kaydet, dÃ¶ndÃ¼r
 
-3. gorev_once_hafiza_kontrol(hedef) — Altta yatan 5 katmanlı kontrol
-   Yeni: dönüşte guven_skoru, kategori, gecerlilik_tarihi alanları
+3. gorev_once_hafiza_kontrol(hedef) â€” Altta yatan 5 katmanlÄ± kontrol
+   Yeni: dÃ¶nÃ¼ÅŸte guven_skoru, kategori, gecerlilik_tarihi alanlarÄ±
 
-4. kaydet_isle(hedef, kategori, sonuc_bilgisi, basarili) — Otomatik guven_skoru hesapla
+4. kaydet_isle(hedef, kategori, sonuc_bilgisi, basarili) â€” Otomatik guven_skoru hesapla
 """
 
 import json
@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 
 log = logging.getLogger(__name__)
 
-# ── Sabitler ──────────────────────────────────────────────────────────────
+# â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 ROOT = Path(__file__).parent.resolve()  # reymen/hafiza/
 PROJE = ROOT.parent.parent  # hermes_projesi/
 
@@ -43,7 +43,7 @@ MEMORIES_DIR = PROJE / ".ReYMeN" / "memories"
 SKILLS_DIR = PROJE / ".ReYMeN" / "skills"
 NOTES_SESSIONS = PROJE / ".ReYMeN" / "notes" / "sessions"
 
-# Cross-agent destek: her ajan .AjanAdi/notes/ altına bakar
+# Cross-agent destek: her ajan .AjanAdi/notes/ altÄ±na bakar
 _CROSS_AGENT_DIRS: list = []
 
 # Python session_search fonksiyonu (varsa)
@@ -55,7 +55,7 @@ except ImportError:
     _SessionStorage = None
     _SESSION_DB_AKTIF = False
 
-# FTS5 tabanlı hafıza modülü (varsa)
+# FTS5 tabanlÄ± hafÄ±za modÃ¼lÃ¼ (varsa)
 try:
     from reymen.hafiza.hafiza_genislet import hafiza as _hafiza
 
@@ -64,7 +64,7 @@ except ImportError:
     _hafiza = None
     _HAFIZA_AKTIF = False
 
-# Gorev hafiza modülü (kaydetme + guven_skoru için)
+# Gorev hafiza modÃ¼lÃ¼ (kaydetme + guven_skoru iÃ§in)
 try:
     from reymen.hafiza.gorev_hafiza import gorev_sonrasi_hafiza, guncelle_son_kullanim
 
@@ -75,24 +75,24 @@ except ImportError:
     _GOREV_HAFIZA_AKTIF = False
 
 
-# ══════════════════════════════════════════════════════════════════════════
-# GÜVEN SKORU + GEÇERLİLİK YARDIMCILARI
-# ══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# GÃœVEN SKORU + GEÃ‡ERLÄ°LÄ°K YARDIMCILARI
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _guven_skoru(basari: int, hata: int) -> float:
-    """Güven skoru: basari/(basari+hata), ikisi de 0 ise 0.5."""
+    """GÃ¼ven skoru: basari/(basari+hata), ikisi de 0 ise 0.5."""
     toplam = basari + hata
     return round(basari / toplam, 3) if toplam > 0 else 0.5
 
 
 def _varsayilan_gecerlilik() -> str:
-    """Bugünden +180 gün."""
+    """BugÃ¼nden +180 gÃ¼n."""
     return (datetime.now() + timedelta(days=180)).strftime("%Y-%m-%d")
 
 
 def _gecerlilik_kontrol(gecerlilik_tarihi: str) -> str:
-    """Tarih kontrolü: 'gecerli', 'gecersiz', 'belirsiz'."""
+    """Tarih kontrolÃ¼: 'gecerli', 'gecersiz', 'belirsiz'."""
     if not gecerlilik_tarihi:
         return "belirsiz"
     try:
@@ -104,18 +104,18 @@ def _gecerlilik_kontrol(gecerlilik_tarihi: str) -> str:
         return "belirsiz"
 
 
-# ══════════════════════════════════════════════════════════════════════════
-# KATEGORİ YARDIMCILARI
-# ══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# KATEGORÄ° YARDIMCILARI
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _kategori_eslesme(hedef: str) -> str:
-    """Hedef metnine göre kategori tahmini yap.
+    """Hedef metnine gÃ¶re kategori tahmini yap.
 
-    "nmap ile port tara" → "kali/network"
-    "drone ucur" → "dron"
-    "solidworks kur" → "cad"
-    "ekran al" → "windows"
+    "nmap ile port tara" â†’ "kali/network"
+    "drone ucur" â†’ "dron"
+    "solidworks kur" â†’ "cad"
+    "ekran al" â†’ "windows"
     """
     h = hedef.lower()
 
@@ -129,7 +129,7 @@ def _kategori_eslesme(hedef: str) -> str:
             "sqlmap",
             "hydra",
             "kali",
-            "sızma",
+            "sÄ±zma",
             "penetration",
             "exploit",
             "wireshark",
@@ -138,7 +138,7 @@ def _kategori_eslesme(hedef: str) -> str:
             "hashcat",
         ]
     ):
-        if any(n in h for n in ["network", "port", "scan", "tarama", "ip", "ağ", "ag"]):
+        if any(n in h for n in ["network", "port", "scan", "tarama", "ip", "aÄŸ", "ag"]):
             return "kali/network"
         if any(w in h for w in ["web", "http", "site", "sql", "xss"]):
             return "kali/web"
@@ -151,7 +151,7 @@ def _kategori_eslesme(hedef: str) -> str:
             "dron",
             "drone",
             "uav",
-            "uçur",
+            "uÃ§ur",
             "ucur",
             "px4",
             "ardupilot",
@@ -199,32 +199,32 @@ def _kategori_eslesme(hedef: str) -> str:
     return "genel"
 
 
-# ══════════════════════════════════════════════════════════════════════════
-# 1. HAFIZADA_ARA — kategori filtreli + güven skorlu ana fonksiyon
-# ══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# 1. HAFIZADA_ARA â€” kategori filtreli + gÃ¼ven skorlu ana fonksiyon
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def hafizada_ara(hedef: str, kategori: str = "") -> dict:
-    """Hafızada benzer görev ara, kategori + güven skoru filtresiyle.
+    """HafÄ±zada benzer gÃ¶rev ara, kategori + gÃ¼ven skoru filtresiyle.
 
     Parametre:
-        hedef:   Görev metni ("nmap ile port tara")
-        kategori: İsteğe bağlı kategori filtresi ("kali/network")
+        hedef:   GÃ¶rev metni ("nmap ile port tara")
+        kategori: Ä°steÄŸe baÄŸlÄ± kategori filtresi ("kali/network")
 
-    Dönüş:
+    DÃ¶nÃ¼ÅŸ:
         {
             "bulundu": True/False,
-            "guven_skoru": 0.0-1.0,      # 0.5'den düşükse "belirsiz"
+            "guven_skoru": 0.0-1.0,      # 0.5'den dÃ¼ÅŸÃ¼kse "belirsiz"
             "guven_seviyesi": "yuksek"|"orta"|"dusuk"|"belirsiz",
             "kategori": "kali/network",
             "gecerlilik_tarihi": "2026-12-20",
             "gecerlilik_durumu": "gecerli"|"gecersiz"|"belirsiz",
             "icerik": "...",
             "kaynak": "memory_db",
-            "kayit_id": 123,             # guncelleme için
+            "kayit_id": 123,             # guncelleme iÃ§in
         }
     """
-    # 1. Altta yatan 5 katmanlı kontrol
+    # 1. Altta yatan 5 katmanlÄ± kontrol
     ham_sonuc = gorev_once_hafiza_kontrol(hedef, kategori)
 
     if not ham_sonuc or not ham_sonuc.get("bulundu"):
@@ -242,12 +242,12 @@ def hafizada_ara(hedef: str, kategori: str = "") -> dict:
             "kayit_id": None,
         }
 
-    # 2. Metadata'dan guven_skoru + gecerlilik çek
+    # 2. Metadata'dan guven_skoru + gecerlilik Ã§ek
     guven = float(ham_sonuc.get("guven_skoru", 0.5))
     gecerlilik = ham_sonuc.get("gecerlilik_tarihi", "")
     gec_durum = _gecerlilik_kontrol(gecerlilik)
 
-    # 3. Güven seviyesi
+    # 3. GÃ¼ven seviyesi
     if guven >= 0.8:
         guven_seviye = "yuksek"
     elif guven >= 0.5:
@@ -257,7 +257,7 @@ def hafizada_ara(hedef: str, kategori: str = "") -> dict:
     else:
         guven_seviye = "belirsiz"
 
-    # 4. guven_skoru < 0.5 → belirsiz
+    # 4. guven_skoru < 0.5 â†’ belirsiz
     if guven < 0.5:
         guven_seviye = "belirsiz"
 
@@ -274,9 +274,9 @@ def hafizada_ara(hedef: str, kategori: str = "") -> dict:
     }
 
 
-# ══════════════════════════════════════════════════════════════════════════
-# 2. ISLE — HAFIZAYA BAK → VARSA KULLAN → YOKSA DENE → KAYDET
-# ══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# 2. ISLE â€” HAFIZAYA BAK â†’ VARSA KULLAN â†’ YOKSA DENE â†’ KAYDET
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def isle(
@@ -285,9 +285,9 @@ def isle(
     kategori: str = "",
     auto_kategori: bool = True,
 ) -> dict:
-    """Ana API: Hafızaya bak, varsa döndür, yoksa çalıştır, kaydet, döndür.
+    """Ana API: HafÄ±zaya bak, varsa dÃ¶ndÃ¼r, yoksa Ã§alÄ±ÅŸtÄ±r, kaydet, dÃ¶ndÃ¼r.
 
-    Kullanım:
+    KullanÄ±m:
         sonuc = isle("nmap ile port tara", lambda: terminal("nmap --help"))
         if sonuc["hafizada"]:
             print("Hafizadan geldi:", sonuc["icerik"])
@@ -295,16 +295,16 @@ def isle(
             print("Yeni calisti:", sonuc["cikti"])
 
     Parametre:
-        hedef:         Görev metni
-        islev:         Çalıştırılacak fonksiyon (callable)
-        kategori:      İsteğe bağlı kategori ("kali/network")
-        auto_kategori: True ise metinden otomatik çıkar
+        hedef:         GÃ¶rev metni
+        islev:         Ã‡alÄ±ÅŸtÄ±rÄ±lacak fonksiyon (callable)
+        kategori:      Ä°steÄŸe baÄŸlÄ± kategori ("kali/network")
+        auto_kategori: True ise metinden otomatik Ã§Ä±kar
 
-    Dönüş:
+    DÃ¶nÃ¼ÅŸ:
         {
             "hafizada": True/False,
-            "icerik": "...",          # hafizadan gelen içerik
-            "cikti": "...",           # islev() çıktısı (hafizada=False ise)
+            "icerik": "...",          # hafizadan gelen iÃ§erik
+            "cikti": "...",           # islev() Ã§Ä±ktÄ±sÄ± (hafizada=False ise)
             "kategori": "...",
             "guven_skoru": 0.0-1.0,
             "gecerlilik_durumu": "...",
@@ -322,7 +322,7 @@ def isle(
     hafiza_sonuc = hafizada_ara(hedef, kategori)
 
     if hafiza_sonuc["bulundu"] and hafiza_sonuc["guven_seviyesi"] != "belirsiz":
-        # Kullanım sayısını güncelle
+        # KullanÄ±m sayÄ±sÄ±nÄ± gÃ¼ncelle
         kayit_id = hafiza_sonuc.get("kayit_id")
         if kayit_id and _HAFIZA_AKTIF and _hafiza and guncelle_son_kullanim is not None:
             try:
@@ -388,24 +388,24 @@ def isle(
     }
 
 
-# ══════════════════════════════════════════════════════════════════════════
-# 3. ONERI_URET — belirsiz gorev icin hafiza tabanli oneri
-# ══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# 3. ONERI_URET â€” belirsiz gorev icin hafiza tabanli oneri
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def oneri_uret(hedef: str) -> dict:
-    """Belirsiz bir görev için hafızaya dayalı en iyi tahmini üret.
+    """Belirsiz bir gÃ¶rev iÃ§in hafÄ±zaya dayalÄ± en iyi tahmini Ã¼ret.
 
-    "Sistemi güvenli yap" geldiğinde:
-      → hafizada nmap bilgisi var mı? → "Port taraması mı demek istiyorsun?"
+    "Sistemi gÃ¼venli yap" geldiÄŸinde:
+      â†’ hafizada nmap bilgisi var mÄ±? â†’ "Port taramasÄ± mÄ± demek istiyorsun?"
 
     Parametre:
-        hedef: Kullanıcının belirsiz görev metni.
+        hedef: KullanÄ±cÄ±nÄ±n belirsiz gÃ¶rev metni.
 
-    Dönüş:
+    DÃ¶nÃ¼ÅŸ:
         {
             "oneri_uretilen": True/False,
-            "oneri": "Sanırım port taraması demek istiyorsun. nmap -sV bilgim var, ondan başlayalım mı?",
+            "oneri": "SanÄ±rÄ±m port taramasÄ± demek istiyorsun. nmap -sV bilgim var, ondan baÅŸlayalÄ±m mÄ±?",
             "kategori": "kali/network/nmap",
             "icerik": "...nmap icerigi...",
             "guven_skoru": 0.7,
@@ -427,15 +427,15 @@ def oneri_uret(hedef: str) -> dict:
         "hi",
         "hello",
         "naber",
-        "nasılsın",
+        "nasÄ±lsÄ±n",
         "nasilsin",
         "iyi",
-        "teşekkür",
+        "teÅŸekkÃ¼r",
         "tesekkur",
-        "sağol",
+        "saÄŸol",
         "sagol",
         "bye",
-        "görüşürüz",
+        "gÃ¶rÃ¼ÅŸÃ¼rÃ¼z",
         "gorusuruz",
     }
     kelimeler = set(hedef_lower.split())
@@ -446,33 +446,33 @@ def oneri_uret(hedef: str) -> dict:
             "sebep": "selamlasma_tespit",
         }
 
-    # ── Kategori tahmini ve genişletilmiş kelime seti ────────────────
-    # "sistemi güvenli yap" → {kali/network/nmap, kali/web, ...}
-    # Her kategori için tetikleyici kelimeler + hafizada ara
+    # â”€â”€ Kategori tahmini ve geniÅŸletilmiÅŸ kelime seti â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # "sistemi gÃ¼venli yap" â†’ {kali/network/nmap, kali/web, ...}
+    # Her kategori iÃ§in tetikleyici kelimeler + hafizada ara
     kategori_agaci = [
         {
             "kategori": "kali/network/nmap",
             "tetikleyiciler": [
-                "güvenli",
+                "gÃ¼venli",
                 "guvenli",
                 "port",
                 "tarama",
                 "scan",
                 "nmap",
-                "ağ",
+                "aÄŸ",
                 "ag",
                 "network",
                 "ip",
                 "servis",
-                "açık",
+                "aÃ§Ä±k",
                 "acik",
-                "sızma",
+                "sÄ±zma",
                 "sizma",
                 "pentest",
-                "güvenlik",
+                "gÃ¼venlik",
                 "guvenlik",
             ],
-            "aciklama": "port taraması / servis tespiti",
+            "aciklama": "port taramasÄ± / servis tespiti",
         },
         {
             "kategori": "kali/web",
@@ -484,48 +484,48 @@ def oneri_uret(hedef: str) -> dict:
                 "xss",
                 "csrf",
                 "burp",
-                "güvenli",
+                "gÃ¼venli",
                 "guvenli",
-                "güvenlik",
+                "gÃ¼venlik",
                 "guvenlik",
             ],
-            "aciklama": "web güvenlik testi",
+            "aciklama": "web gÃ¼venlik testi",
         },
         {
             "kategori": "dron",
             "tetikleyiciler": [
                 "dron",
                 "drone",
-                "uçur",
+                "uÃ§ur",
                 "ucur",
                 "px4",
                 "uav",
-                "uçuş",
+                "uÃ§uÅŸ",
                 "ucus",
                 "iha",
             ],
-            "aciklama": "drone / IHA uçuşu",
+            "aciklama": "drone / IHA uÃ§uÅŸu",
         },
         {
             "kategori": "cad",
             "tetikleyiciler": [
                 "cad",
                 "solidworks",
-                "çizim",
+                "Ã§izim",
                 "cizim",
                 "3d",
                 "model",
-                "tasarım",
+                "tasarÄ±m",
                 "tasarim",
                 "mekanik",
             ],
-            "aciklama": "CAD tasarım / 3D modelleme",
+            "aciklama": "CAD tasarÄ±m / 3D modelleme",
         },
         {
             "kategori": "windows",
             "tetikleyiciler": [
                 "windows",
-                "masaüstü",
+                "masaÃ¼stÃ¼",
                 "masaustu",
                 "ekran",
                 "mouse",
@@ -579,7 +579,7 @@ def oneri_uret(hedef: str) -> dict:
             f"\"{hedef}\" dediniz.\n"
             f"Hafizamda en alakali kayit: **{kat['kategori']}**\n"
             f"({kat['aciklama']})\n"
-            f"İcerik: {icerik}\n\n"
+            f"Ä°cerik: {icerik}\n\n"
             f"Buna benzer bir sey mi yapmak istiyorsunuz?"
         )
         guven = 0.5 + min(hafiza_sonuc.get("guven_skoru", 0) * 0.5, 0.4)
@@ -588,7 +588,7 @@ def oneri_uret(hedef: str) -> dict:
             f"\"{hedef}\" dediniz.\n"
             f"**{kat['kategori']}** ile ilgili bir sey olabilir ({kat['aciklama']}).\n"
             f"Hafizamda bu konuda henuz kayit yok.\n"
-            f"Denediğimizde otomatik kaydederim."
+            f"DenediÄŸimizde otomatik kaydederim."
         )
         guven = 0.4 + eslesme_sayisi * 0.1
 
@@ -605,31 +605,31 @@ def oneri_uret(hedef: str) -> dict:
     }
 
 
-# ══════════════════════════════════════════════════════════════════════════
-# 4. GOREV_ONCE_HAFIZA_KONTROL (güncellendi — yeni alanlar eklendi)
-# ══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# 4. GOREV_ONCE_HAFIZA_KONTROL (gÃ¼ncellendi â€” yeni alanlar eklendi)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def gorev_once_hafiza_kontrol(hedef: str, kategori: str = "") -> Optional[dict]:
-    """Görev başlamadan önce hafızada benzer çözüm ara (5 katman).
+    """GÃ¶rev baÅŸlamadan Ã¶nce hafÄ±zada benzer Ã§Ã¶zÃ¼m ara (5 katman).
 
     Parametre:
-        hedef:    Görev metni.
+        hedef:    GÃ¶rev metni.
         kategori: Opsiyonel kategori filtresi ("kali", "dron", "cad").
 
-    Dönüş:
+    DÃ¶nÃ¼ÅŸ:
         dict: {
             "bulundu": True,
             "kaynak": "SOUL.md" | "memory_db" | "notes" | "skills",
             "icerik": "...",
-            "guven_skoru": 0.0-1.0,         # YENİ
-            "kategori": "kali/network",      # YENİ
-            "gecerlilik_tarihi": "2026-12-20", # YENİ
-            "kayit_id": 123,                 # YENİ (guncelleme için)
+            "guven_skoru": 0.0-1.0,         # YENÄ°
+            "kategori": "kali/network",      # YENÄ°
+            "gecerlilik_tarihi": "2026-12-20", # YENÄ°
+            "kayit_id": 123,                 # YENÄ° (guncelleme iÃ§in)
             "detay": "...",
             "tarih": "2026-06-20",
         }
-        None: Bulunamadı.
+        None: BulunamadÄ±.
     """
     hedef_temiz = hedef.strip().lower()[:120]
 
@@ -674,16 +674,16 @@ def gorev_once_hafiza_kontrol(hedef: str, kategori: str = "") -> Optional[dict]:
 
 
 def _kategori_uygun(sonuc: dict, kategori: str) -> bool:
-    """Kategori filtresi: kategori boşsa her şey uygun, doluysa eşleşmeli."""
+    """Kategori filtresi: kategori boÅŸsa her ÅŸey uygun, doluysa eÅŸleÅŸmeli."""
     if not kategori:
         return True
     kayit_kategori = (sonuc.get("kategori") or "").lower()
     return kategori.lower() in kayit_kategori or kayit_kategori in kategori.lower()
 
 
-# ══════════════════════════════════════════════════════════════════════════
-# 4. KAYDET_ISLE — otomatik guven_skoru hesaplamalı kaydetme
-# ══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# 4. KAYDET_ISLE â€” otomatik guven_skoru hesaplamalÄ± kaydetme
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def kaydet_isle(
@@ -692,15 +692,15 @@ def kaydet_isle(
     sonuc_bilgisi: str,
     basarili: bool = True,
 ) -> dict:
-    """Bir işlem sonucunu hafızaya kaydet, otomatik guven_skoru hesapla.
+    """Bir iÅŸlem sonucunu hafÄ±zaya kaydet, otomatik guven_skoru hesapla.
 
     Parametre:
-        hedef:          Görev metni
+        hedef:          GÃ¶rev metni
         kategori:       Kategori ("kali/network")
-        sonuc_bilgisi:  Ne yapıldı / sonuç özeti
-        basarili:       Başarılı mı?
+        sonuc_bilgisi:  Ne yapÄ±ldÄ± / sonuÃ§ Ã¶zeti
+        basarili:       BaÅŸarÄ±lÄ± mÄ±?
 
-    Dönüş:
+    DÃ¶nÃ¼ÅŸ:
         {"durum": "kaydedildi", "guven_skoru": 0.85, ...}
     """
     if not _GOREV_HAFIZA_AKTIF or not gorev_sonrasi_hafiza:
@@ -729,20 +729,20 @@ def kaydet_isle(
         return {"durum": "hata", "sebep": str(e)}
 
 
-# ══════════════════════════════════════════════════════════════════════════
-# KONTROL STRATEJİLERİ (5 katman)
-# ══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# KONTROL STRATEJÄ°LERÄ° (5 katman)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _soul_kontrol(hedef: str) -> Optional[dict]:
-    """1. SOUL.md → Öğrenilenler bölümünden eşleşme ara."""
+    """1. SOUL.md â†’ Ã–ÄŸrenilenler bÃ¶lÃ¼mÃ¼nden eÅŸleÅŸme ara."""
     try:
         if not SOUL_PATH.exists():
             return None
 
         icerik = SOUL_PATH.read_text(encoding="utf-8", errors="replace")
 
-        ogrenilenler_idx = icerik.find("## Öğrenilenler")
+        ogrenilenler_idx = icerik.find("## Ã–ÄŸrenilenler")
         if ogrenilenler_idx == -1:
             return None
 
@@ -768,7 +768,7 @@ def _soul_kontrol(hedef: str) -> Optional[dict]:
                     "bulundu": True,
                     "kaynak": "SOUL.md",
                     "icerik": satir.strip(),
-                    "detay": f"Daha önce işlenmiş ({eslesme}/{len(kelimeler)} kelime)",
+                    "detay": f"Daha Ã¶nce iÅŸlenmiÅŸ ({eslesme}/{len(kelimeler)} kelime)",
                     "tarih": tarih,
                     "eslesme_orani": round(eslesme / max(len(kelimeler), 1), 2),
                 }
@@ -780,9 +780,9 @@ def _soul_kontrol(hedef: str) -> Optional[dict]:
 
 
 def _memory_db_kontrol(hedef: str, kategori: str = "") -> Optional[dict]:
-    """2. SQLite hafıza DB'sinden FTS5 ile eşleşme ara.
+    """2. SQLite hafÄ±za DB'sinden FTS5 ile eÅŸleÅŸme ara.
 
-    Gelişmiş: metadata'dan guven_skoru, kategori, gecerlilik_tarihi çeker.
+    GeliÅŸmiÅŸ: metadata'dan guven_skoru, kategori, gecerlilik_tarihi Ã§eker.
     """
     if not _HAFIZA_AKTIF or not _hafiza:
         return _session_db_kontrol(hedef, kategori)
@@ -797,7 +797,7 @@ def _memory_db_kontrol(hedef: str, kategori: str = "") -> Optional[dict]:
         if not sonuclar:
             return None
 
-        # Kategori filtresini metadata üzerinden uygula
+        # Kategori filtresini metadata Ã¼zerinden uygula
         for doc in sonuclar:
             doc_kategori = (doc.get("kategori") or "").lower()
 
@@ -809,17 +809,17 @@ def _memory_db_kontrol(hedef: str, kategori: str = "") -> Optional[dict]:
             ):
                 continue
 
-            # gecerlilik kontrolü
+            # gecerlilik kontrolÃ¼
             gec_tarih = doc.get("gecerlilik_tarihi", "")
             if gec_tarih:
                 gec_durum = _gecerlilik_kontrol(gec_tarih)
                 if gec_durum == "gecersiz":
-                    continue  # güncel olmayan bilgiyi gösterme
+                    continue  # gÃ¼ncel olmayan bilgiyi gÃ¶sterme
 
             # guven_skoru
             guven = float(doc.get("guven_skoru", 0.5))
             if guven < 0.3:
-                continue  # çok düşük güvenli bilgiyi es geç
+                continue  # Ã§ok dÃ¼ÅŸÃ¼k gÃ¼venli bilgiyi es geÃ§
 
             return {
                 "bulundu": True,
@@ -829,7 +829,7 @@ def _memory_db_kontrol(hedef: str, kategori: str = "") -> Optional[dict]:
                 "kategori": doc.get("kategori", kategori or "genel"),
                 "gecerlilik_tarihi": gec_tarih,
                 "kayit_id": doc.get("id"),
-                "detay": f"FTS5 eşleşmesi (guven: {guven})",
+                "detay": f"FTS5 eÅŸleÅŸmesi (guven: {guven})",
                 "tarih": str(doc.get("zaman", ""))[:10],
             }
 
@@ -841,7 +841,7 @@ def _memory_db_kontrol(hedef: str, kategori: str = "") -> Optional[dict]:
 
 
 def _session_db_kontrol(hedef: str, kategori: str = "") -> Optional[dict]:
-    """Session DB (SQLite) üzerinden FTS5 arama."""
+    """Session DB (SQLite) Ã¼zerinden FTS5 arama."""
     if not _SESSION_DB_AKTIF or not _SessionStorage:
         return None
 
@@ -861,7 +861,7 @@ def _session_db_kontrol(hedef: str, kategori: str = "") -> Optional[dict]:
             "kategori": kategori or "genel",
             "gecerlilik_tarihi": _varsayilan_gecerlilik(),
             "kayit_id": None,
-            "detay": f"Session DB eşleşmesi (session: {en_iyi.get('session_id', '?')})",
+            "detay": f"Session DB eÅŸleÅŸmesi (session: {en_iyi.get('session_id', '?')})",
             "tarih": str(en_iyi.get("created_at", ""))[:10],
         }
 
@@ -871,7 +871,7 @@ def _session_db_kontrol(hedef: str, kategori: str = "") -> Optional[dict]:
 
 
 def _notes_kontrol(hedef: str) -> Optional[dict]:
-    """.ReYMeN/notes/sessions/ dosyalarında eşleşme ara."""
+    """.ReYMeN/notes/sessions/ dosyalarÄ±nda eÅŸleÅŸme ara."""
     try:
         if not NOTES_SESSIONS.exists():
             return None
@@ -886,7 +886,7 @@ def _notes_kontrol(hedef: str) -> Optional[dict]:
             try:
                 icerik = dosya.read_text(encoding="utf-8", errors="replace")
                 baslik = ""
-                baslik_m = re.search(r"\*\*Başlık:\*\*\s*(.+)", icerik)
+                baslik_m = re.search(r"\*\*BaÅŸlÄ±k:\*\*\s*(.+)", icerik)
                 if baslik_m:
                     baslik = baslik_m.group(1).strip().lower()
 
@@ -905,8 +905,8 @@ def _notes_kontrol(hedef: str) -> Optional[dict]:
             return {
                 "bulundu": True,
                 "kaynak": f"notes/sessions/{dosya.name}",
-                "icerik": f"**{baslik}** — {icerik_ilk[:200]}",
-                "detay": f"Session dosyası eşleşmesi ({en_yuksek}/{len(kelimeler)} kelime)",
+                "icerik": f"**{baslik}** â€” {icerik_ilk[:200]}",
+                "detay": f"Session dosyasÄ± eÅŸleÅŸmesi ({en_yuksek}/{len(kelimeler)} kelime)",
                 "tarih": dosya.stem.split("_")[1][:8] if "_" in dosya.stem else "",
             }
 
@@ -917,7 +917,7 @@ def _notes_kontrol(hedef: str) -> Optional[dict]:
 
 
 def _memories_klasor_kontrol(hedef: str) -> Optional[dict]:
-    """.ReYMeN/memories/ klasöründe eşleşme ara."""
+    """.ReYMeN/memories/ klasÃ¶rÃ¼nde eÅŸleÅŸme ara."""
     try:
         if not MEMORIES_DIR.exists():
             return None
@@ -947,7 +947,7 @@ def _memories_klasor_kontrol(hedef: str) -> Optional[dict]:
                 "bulundu": True,
                 "kaynak": f"memories/{dosya.name}",
                 "icerik": icerik[:200],
-                "detay": f"Memory dosyası eşleşmesi ({en_yuksek}/{len(kelimeler)} kelime)",
+                "detay": f"Memory dosyasÄ± eÅŸleÅŸmesi ({en_yuksek}/{len(kelimeler)} kelime)",
                 "tarih": "",
             }
 
@@ -958,7 +958,7 @@ def _memories_klasor_kontrol(hedef: str) -> Optional[dict]:
 
 
 def _skills_kontrol(hedef: str) -> Optional[dict]:
-    """.ReYMeN/skills/ klasöründe eşleşme ara."""
+    """.ReYMeN/skills/ klasÃ¶rÃ¼nde eÅŸleÅŸme ara."""
     try:
         if not SKILLS_DIR.exists():
             return None
@@ -988,7 +988,7 @@ def _skills_kontrol(hedef: str) -> Optional[dict]:
                 "bulundu": True,
                 "kaynak": f"skills/{dosya.name}",
                 "icerik": icerik[:200],
-                "detay": f"Skill eşleşmesi ({en_yuksek}/{len(kelimeler)} kelime)",
+                "detay": f"Skill eÅŸleÅŸmesi ({en_yuksek}/{len(kelimeler)} kelime)",
                 "tarih": "",
             }
 
@@ -998,18 +998,18 @@ def _skills_kontrol(hedef: str) -> Optional[dict]:
         return None
 
 
-# ══════════════════════════════════════════════════════════════════════════
-# CROSS-AGENT DESTEĞİ
-# ══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# CROSS-AGENT DESTEÄÄ°
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def cross_agent_ekle(ajan_adi: str, proje_koku: str = ""):
-    """Başka bir ajanın hafıza klasörünü taramaya ekle.
+    """BaÅŸka bir ajanÄ±n hafÄ±za klasÃ¶rÃ¼nÃ¼ taramaya ekle.
 
-    Kullanım:
+    KullanÄ±m:
         cross_agent_ekle("Kali", "/home/kali/hermes_projesi")
 
-    Her ajan kendi .AjanAdi/notes/ dizinine baksın.
+    Her ajan kendi .AjanAdi/notes/ dizinine baksÄ±n.
     """
     if not ajan_adi:
         return
@@ -1021,13 +1021,13 @@ def cross_agent_ekle(ajan_adi: str, proje_koku: str = ""):
 
     if ajan_yolu.exists():
         _CROSS_AGENT_DIRS.append((ajan_adi, ajan_yolu))
-        log.info("Cross-agent eklendi: %s → %s", ajan_adi, ajan_yolu)
+        log.info("Cross-agent eklendi: %s â†’ %s", ajan_adi, ajan_yolu)
     else:
         log.warning("Cross-agent dizini bulunamadi: %s", ajan_yolu)
 
 
 def cross_agent_tara(hedef: str) -> List[dict]:
-    """Tüm eklenmiş cross-agent klasörlerinde ara."""
+    """TÃ¼m eklenmiÅŸ cross-agent klasÃ¶rlerinde ara."""
     sonuclar = []
     kelimeler = [k for k in hedef.split() if len(k) > 2]
 
@@ -1051,13 +1051,13 @@ def cross_agent_tara(hedef: str) -> List[dict]:
     return sonuclar
 
 
-# ══════════════════════════════════════════════════════════════════════════
-# DURUM ÖZETİ
-# ══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# DURUM Ã–ZETÄ°
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def hafiza_durum_ozet() -> dict:
-    """Hafıza durum özeti."""
+    """HafÄ±za durum Ã¶zeti."""
     durum: dict = {
         "SOUL.md": SOUL_PATH.exists() if SOUL_PATH else False,
         "memory_db": _HAFIZA_AKTIF,

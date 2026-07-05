@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""Web tetikleyici — web tarama sonuclarina gore ogrenmeleri tetikler."""
+﻿# -*- coding: utf-8 -*-
+"""Web tetikleyici â€” web tarama sonuclarina gore ogrenmeleri tetikler."""
 
 import os
 import re

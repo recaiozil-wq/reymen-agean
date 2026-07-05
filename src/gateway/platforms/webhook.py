@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""gateway.platforms.webhook — Webhook platform adaptörü (stub)."""
+﻿# -*- coding: utf-8 -*-
+"""gateway.platforms.webhook â€” Webhook platform adaptÃ¶rÃ¼ (stub)."""
 
 
 class WebhookAdapter:

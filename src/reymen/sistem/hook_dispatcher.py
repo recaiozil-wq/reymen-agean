@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-hook_dispatcher.py — Olay dagitici.
+hook_dispatcher.py â€” Olay dagitici.
 
 TOOL_CALLED, TOOL_ERROR gibi hook olaylarini
 dinler ve kayitli fonksiyonlari tetikler.
@@ -13,8 +13,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 logger = logging.getLogger(__name__)
 
-# Cereyan hook API'sini import et — aynı arayüz, class+fonksiyon
-from src.reymen.cereyan.hook_dispatcher import (  # noqa: F401
+# Cereyan hook API'sini import et â€” aynÄ± arayÃ¼z, class+fonksiyon
+from reymen.cereyan.hook_dispatcher import (  # noqa: F401
     hook_kaydet,
     hook_kaldir,
     hook_cagir,

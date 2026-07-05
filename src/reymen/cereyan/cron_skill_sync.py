@@ -1,6 +1,6 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
-cron_skill_sync.py — Skills → OnceHafiza DB senkronizasyonu.
+cron_skill_sync.py â€” Skills â†’ OnceHafiza DB senkronizasyonu.
 Her 6 saatte bir calisir (cron job).
 
 - skills/ altindaki tum .md dosyalarini tara
@@ -111,7 +111,7 @@ def log_kaydet(yeni: int, guncellenen: int, hata: int, detay: str):
     DECISIONS_LOG.parent.mkdir(parents=True, exist_ok=True)
     ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     entry = f"""
-## Sync — {ts}
+## Sync â€” {ts}
 
 | Metrik | Deger |
 |--------|-------|
@@ -232,7 +232,7 @@ if __name__ == "__main__":
     )
 
 
-# ── Motor / Cron sistemine kayit ──────────────────────────────────────
+# â”€â”€ Motor / Cron sistemine kayit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def cron_job_kaydet() -> str:

@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-litellm_provider.py — LiteLLM ile 100+ provider entegrasyonu.
+litellm_provider.py â€” LiteLLM ile 100+ provider entegrasyonu.
 
 LiteLLM, OpenAI formatinda tum saglayicilari tek API'de birlestirir.
 Bu modul, ReYMeN'in mevcut provider sistemine LiteLLM'i ekler.
@@ -38,7 +38,7 @@ except ImportError:
     ModelResponse = None
 
 
-# ── Desteklenen Provider'lar ──────────────────────────────────────────────────
+# â”€â”€ Desteklenen Provider'lar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 # LiteLLM ile kullanilabilir populer provider'lar
 # Tam liste: https://docs.litellm.ai/docs/providers

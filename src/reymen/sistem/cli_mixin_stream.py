@@ -1,4 +1,4 @@
-"""ReYMeNCLI mixin module."""
+﻿"""ReYMeNCLI mixin module."""
 
 import logging
 import os
@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 
 class MixinStream:
-    """ReYMeNCLI Stream/akış metotları."""
+    """ReYMeNCLI Stream/akÄ±ÅŸ metotlarÄ±."""
 
     def _on_thinking(self, text: str) -> None:
         """Called by agent when thinking starts/stops. Updates TUI spinner."""
@@ -138,10 +138,10 @@ class MixinStream:
 
         Opens a dim reasoning box on first token, streams line-by-line.
         The box is closed automatically when content tokens start arriving
-        (via _stream_delta → _emit_stream_text).
+        (via _stream_delta â†’ _emit_stream_text).
 
         Once the response box is open, suppress any further reasoning
-        rendering — a late thinking block (e.g. after an interrupt) would
+        rendering â€” a late thinking block (e.g. after an interrupt) would
         otherwise draw a reasoning box inside the response box.
         """
         if not text:
@@ -156,7 +156,7 @@ class MixinStream:
             w = self._scrollback_box_width()
             r_label = " Reasoning "
             r_fill = w - 2 - len(r_label)
-            _cprint(f"\n{_DIM}┌─{r_label}{'─' * max(r_fill - 1, 0)}┐{_RST}")
+            _cprint(f"\n{_DIM}â”Œâ”€{r_label}{'â”€' * max(r_fill - 1, 0)}â”{_RST}")
 
         self._reasoning_buf = getattr(self, "_reasoning_buf", "") + text
 
@@ -178,7 +178,7 @@ class MixinStream:
                 _cprint(f"{_DIM}{buf}{_RST}")
                 self._reasoning_buf = ""
             w = self._scrollback_box_width()
-            _cprint(f"{_DIM}└{'─' * (w - 2)}┘{_RST}")
+            _cprint(f"{_DIM}â””{'â”€' * (w - 2)}â”˜{_RST}")
             self._reasoning_box_opened = False
 
             # Flush any content that was deferred while reasoning was rendering.
@@ -211,11 +211,11 @@ class MixinStream:
 
         self._stream_started = True
 
-        # ── Tag-based reasoning suppression ──
+        # â”€â”€ Tag-based reasoning suppression â”€â”€
         # Track whether we're inside a reasoning/thinking block.
         # These tags are model-generated (system prompt tells the model
         # to use them) and get stripped from final_response. We must
-        # suppress them during streaming too — unless show_reasoning is
+        # suppress them during streaming too â€” unless show_reasoning is
         # enabled, in which case we route the inner content to the
         # reasoning display box instead of discarding it.
         _OPEN_TAGS = (
@@ -261,7 +261,7 @@ class MixinStream:
                     # Check if this is a block boundary position
                     preceding = self._stream_prefilt[:idx]
                     if idx == 0:
-                        # At buffer start — only a boundary if we're at
+                        # At buffer start â€” only a boundary if we're at
                         # a line start (stream start or last emit ended
                         # with newline)
                         is_block_boundary = getattr(
@@ -271,7 +271,7 @@ class MixinStream:
                         # Find last newline in the buffer before the tag
                         last_nl = preceding.rfind("\n")
                         if last_nl == -1:
-                            # No newline in buffer — boundary only if
+                            # No newline in buffer â€” boundary only if
                             # last emit was a newline AND only whitespace
                             # has accumulated before the tag
                             is_block_boundary = (
@@ -290,12 +290,12 @@ class MixinStream:
                         self._in_reasoning_block = True
                         self._stream_prefilt = self._stream_prefilt[idx + len(tag) :]
                         break
-                    # Not a block boundary — keep searching after this occurrence
+                    # Not a block boundary â€” keep searching after this occurrence
                     search_start = idx + 1
                 if getattr(self, "_in_reasoning_block", False):
                     break
 
-            # Could also be a partial open tag at the end — hold it back
+            # Could also be a partial open tag at the end â€” hold it back
             if not getattr(self, "_in_reasoning_block", False):
                 # Check for partial tag match at the end
                 safe = self._stream_prefilt
@@ -310,7 +310,7 @@ class MixinStream:
                     self._stream_prefilt = self._stream_prefilt[len(safe) :]
                 return
 
-        # Inside a reasoning block — look for close tag.
+        # Inside a reasoning block â€” look for close tag.
         # Keep accumulating _stream_prefilt because close tags can arrive
         # split across multiple tokens (e.g. "</REASONING_SCRATCH" + "PAD>...").
         if getattr(self, "_in_reasoning_block", False):
@@ -369,10 +369,10 @@ class MixinStream:
                 from reymen.reymen_cli.skin_engine import get_active_skin
 
                 _skin = get_active_skin()
-                label = _skin.get_branding("response_label", "⚕ ReYMeN")
+                label = _skin.get_branding("response_label", "âš• ReYMeN")
                 _text_hex = _skin.get_color("banner_text", "#FFF8DC")
             except Exception:
-                label = "⚕ ReYMeN"
+                label = "âš• ReYMeN"
                 _text_hex = "#FFF8DC"
             # Build a true-color ANSI escape for the response text color
             # so streamed content matches the Rich Panel appearance.
@@ -387,7 +387,7 @@ class MixinStream:
                 label = f"{label} {datetime.now().strftime('%H:%M')}"
             w = self._scrollback_box_width()
             fill = w - 2 - ReYMeNCLI._status_bar_display_width(label)
-            _cprint(f"\n{_ACCENT}╭─{label}{'─' * max(fill - 1, 0)}╮{_RST}")
+            _cprint(f"\n{_ACCENT}â•­â”€{label}{'â”€' * max(fill - 1, 0)}â•®{_RST}")
 
         self._stream_buf += text
 
@@ -431,7 +431,7 @@ class MixinStream:
                 if looks_like_table_row(line) or is_table_divider(line):
                     self._stream_table_buf.append(line)
                     continue
-                # Block ended — flush the realigned table, then fall
+                # Block ended â€” flush the realigned table, then fall
                 # through to print the current (non-table) line.
                 _flush_table_buf()
             elif looks_like_table_row(line):
@@ -446,7 +446,7 @@ class MixinStream:
     def _flush_stream(self) -> None:
         """Emit any remaining partial line from the stream buffer and close the box."""
         # If we're still inside a "reasoning block" at end-of-stream, it was
-        # a false positive — the model mentioned a tag like <think> in prose
+        # a false positive â€” the model mentioned a tag like <think> in prose
         # but never closed it.  Recover the buffered content as regular text.
         if getattr(self, "_in_reasoning_block", False) and getattr(
             self, "_stream_prefilt", ""
@@ -504,7 +504,7 @@ class MixinStream:
         # Close the response box
         if self._stream_box_opened:
             w = self._scrollback_box_width()
-            _cprint(f"{_ACCENT}╰{'─' * (w - 2)}╯{_RST}")
+            _cprint(f"{_ACCENT}â•°{'â”€' * (w - 2)}â•¯{_RST}")
 
     def _reset_stream_state(self) -> None:
         """Reset streaming state before each agent invocation."""

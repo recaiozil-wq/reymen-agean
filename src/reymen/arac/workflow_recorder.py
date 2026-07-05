@@ -1,10 +1,10 @@
-# -*- coding: utf-8 -*-
-"""workflow_recorder.py — İş akışı kaydetme ve tekrarlama.
+﻿# -*- coding: utf-8 -*-
+"""workflow_recorder.py â€” Ä°ÅŸ akÄ±ÅŸÄ± kaydetme ve tekrarlama.
 
-Browser işlemlerini kaydeder, JSON dosyasına yazar,
-sonra aynı adımları sırayla tekrarlar.
+Browser iÅŸlemlerini kaydeder, JSON dosyasÄ±na yazar,
+sonra aynÄ± adÄ±mlarÄ± sÄ±rayla tekrarlar.
 
-Kullanım:
+KullanÄ±m:
     rec = WorkflowRecorder()
     rec.basla("test")
     rec.kaydet("ac", url="https://example.com")
@@ -26,7 +26,7 @@ WORKFLOW_DIR.mkdir(exist_ok=True)
 
 
 class WorkflowRecorder:
-    """Browser iş akışlarını kaydet ve tekrarla."""
+    """Browser iÅŸ akÄ±ÅŸlarÄ±nÄ± kaydet ve tekrarla."""
 
     def __init__(self):
         self._adimlar: list = []
@@ -34,36 +34,36 @@ class WorkflowRecorder:
         self._workflow_adi: str = ""
 
     def basla(self, workflow_adi: str) -> str:
-        """Kaydı başlat.
+        """KaydÄ± baÅŸlat.
 
         Args:
-            workflow_adi: Workflow adı (dosya adı olarak kullanılır)
+            workflow_adi: Workflow adÄ± (dosya adÄ± olarak kullanÄ±lÄ±r)
 
         Returns:
-            str: Durum mesajı
+            str: Durum mesajÄ±
         """
         ad = workflow_adi.strip() or f"workflow_{int(time.time())}"
         self._adimlar = []
         self._kayit_yapiliyor = True
         self._workflow_adi = ad
-        return f"[Workflow] 🔴 Kayit basladi: {ad}"
+        return f"[Workflow] ğŸ”´ Kayit basladi: {ad}"
 
     def kaydet(self, adim_turu: str, **kwargs) -> None:
-        """Her browser işlemini kaydet (aktif kayıt varsa).
+        """Her browser iÅŸlemini kaydet (aktif kayÄ±t varsa).
 
         Args:
-            adim_turu: İşlem türü (ac, tikla, fill, scroll, bekle, ...)
-            **kwargs: İşlem parametreleri
+            adim_turu: Ä°ÅŸlem tÃ¼rÃ¼ (ac, tikla, fill, scroll, bekle, ...)
+            **kwargs: Ä°ÅŸlem parametreleri
         """
         if not self._kayit_yapiliyor:
             return
         self._adimlar.append({"tur": adim_turu, "zaman": time.time(), **kwargs})
 
     def bitir(self) -> str:
-        """Kaydı bitir ve JSON dosyasına yaz.
+        """KaydÄ± bitir ve JSON dosyasÄ±na yaz.
 
         Returns:
-            str: Durum mesajı
+            str: Durum mesajÄ±
         """
         if not self._kayit_yapiliyor:
             return "[Workflow] Aktif kayit yok."
@@ -83,10 +83,10 @@ class WorkflowRecorder:
             encoding="utf-8",
         )
         self._kayit_yapiliyor = False
-        return f"[Workflow] ✅ Kaydedildi: {dosya.name} ({len(self._adimlar)} adim)"
+        return f"[Workflow] âœ… Kaydedildi: {dosya.name} ({len(self._adimlar)} adim)"
 
     def iptal(self) -> str:
-        """Aktif kaydı kaydetmeden iptal et."""
+        """Aktif kaydÄ± kaydetmeden iptal et."""
         if not self._kayit_yapiliyor:
             return "[Workflow] Aktif kayit yok."
         self._adimlar = []
@@ -95,22 +95,22 @@ class WorkflowRecorder:
         return "[Workflow] Kayit iptal edildi."
 
     def tekrarla(self, workflow_adi: str, browser_tool) -> str:
-        """Kayıtlı workflow'u tekrarla.
+        """KayÄ±tlÄ± workflow'u tekrarla.
 
         Args:
-            workflow_adi: Workflow adı (dosya adı, .json'suz)
-            browser_tool: BrowserTool instance'ı
+            workflow_adi: Workflow adÄ± (dosya adÄ±, .json'suz)
+            browser_tool: BrowserTool instance'Ä±
 
         Returns:
-            str: İşlem raporu
+            str: Ä°ÅŸlem raporu
         """
         dosya = WORKFLOW_DIR / f"{workflow_adi}.json"
         if not dosya.exists():
-            return f"[Workflow] ❌ Bulunamadi: {workflow_adi}"
+            return f"[Workflow] âŒ Bulunamadi: {workflow_adi}"
 
         data = json.loads(dosya.read_text(encoding="utf-8"))
         satirlar = [
-            f"[Workflow] ▶️ Tekrar basliyor: {data['adi']} ({data['adim_sayisi']} adim)"
+            f"[Workflow] â–¶ï¸ Tekrar basliyor: {data['adi']} ({data['adim_sayisi']} adim)"
         ]
 
         for i, adim in enumerate(data["adimlar"]):
@@ -118,55 +118,55 @@ class WorkflowRecorder:
             try:
                 if tur == "ac":
                     browser_tool.ac(adim.get("url", ""))
-                    satirlar.append(f"  [{i+1}] ✅ ac: {adim.get('url','')[:60]}")
+                    satirlar.append(f"  [{i+1}] âœ… ac: {adim.get('url','')[:60]}")
                 elif tur == "tikla":
                     browser_tool.tikla(adim["secici"])
-                    satirlar.append(f"  [{i+1}] ✅ tikla: {adim.get('secici','')[:50]}")
+                    satirlar.append(f"  [{i+1}] âœ… tikla: {adim.get('secici','')[:50]}")
                 elif tur == "fill":
                     browser_tool.fill(adim["secici"], adim["deger"])
-                    satirlar.append(f"  [{i+1}] ✅ fill: {adim.get('secici','')[:30]}")
+                    satirlar.append(f"  [{i+1}] âœ… fill: {adim.get('secici','')[:30]}")
                 elif tur == "type":
                     browser_tool.type_text(adim["secici"], adim["deger"])
-                    satirlar.append(f"  [{i+1}] ✅ type: {adim.get('secici','')[:30]}")
+                    satirlar.append(f"  [{i+1}] âœ… type: {adim.get('secici','')[:30]}")
                 elif tur == "scroll":
                     browser_tool.scroll(dy=adim.get("dy", 300))
-                    satirlar.append(f"  [{i+1}] ✅ scroll: {adim.get('dy',300)}px")
+                    satirlar.append(f"  [{i+1}] âœ… scroll: {adim.get('dy',300)}px")
                 elif tur == "bekle":
                     time.sleep(adim.get("sure", 1))
-                    satirlar.append(f"  [{i+1}] ✅ bekle: {adim.get('sure',1)}s")
+                    satirlar.append(f"  [{i+1}] âœ… bekle: {adim.get('sure',1)}s")
                 elif tur == "sec":
                     browser_tool.select_option(adim["secici"], adim["deger"])
-                    satirlar.append(f"  [{i+1}] ✅ sec: {adim.get('secici','')[:30]}")
+                    satirlar.append(f"  [{i+1}] âœ… sec: {adim.get('secici','')[:30]}")
                 elif tur == "hover":
                     browser_tool.hover(adim["secici"])
-                    satirlar.append(f"  [{i+1}] ✅ hover: {adim.get('secici','')[:30]}")
+                    satirlar.append(f"  [{i+1}] âœ… hover: {adim.get('secici','')[:30]}")
                 elif tur == "screenshot":
                     browser_tool.screenshot(
                         adim.get("url", ""), adim.get("cikti", "screenshot.png")
                     )
-                    satirlar.append(f"  [{i+1}] ✅ screenshot")
+                    satirlar.append(f"  [{i+1}] âœ… screenshot")
                 elif tur == "back":
                     browser_tool.back()
-                    satirlar.append(f"  [{i+1}] ✅ back")
+                    satirlar.append(f"  [{i+1}] âœ… back")
                 elif tur == "forward":
                     browser_tool.forward()
-                    satirlar.append(f"  [{i+1}] ✅ forward")
+                    satirlar.append(f"  [{i+1}] âœ… forward")
                 elif tur == "geribildirim":
-                    # Kullanıcıya mesaj göster (sadece log)
-                    satirlar.append(f"  [{i+1}] 💬 {adim.get('mesaj','')}")
+                    # KullanÄ±cÄ±ya mesaj gÃ¶ster (sadece log)
+                    satirlar.append(f"  [{i+1}] ğŸ’¬ {adim.get('mesaj','')}")
                 else:
-                    satirlar.append(f"  [{i+1}] ⚠️ Bilinmeyen adim: {tur}")
+                    satirlar.append(f"  [{i+1}] âš ï¸ Bilinmeyen adim: {tur}")
             except Exception as e:
-                satirlar.append(f"  [{i+1}] ❌ {tur}: {e}")
+                satirlar.append(f"  [{i+1}] âŒ {tur}: {e}")
                 break
 
         satirlar.append(
-            f"[Workflow] {'✅ Tamam' if '❌' not in satirlar[-1] else '❌ Yari'}"
+            f"[Workflow] {'âœ… Tamam' if 'âŒ' not in satirlar[-1] else 'âŒ Yari'}"
         )
         return "\n".join(satirlar)
 
     def listele(self) -> str:
-        """Kayıtlı tüm workflow'ları listele.
+        """KayÄ±tlÄ± tÃ¼m workflow'larÄ± listele.
 
         Returns:
             str: Workflow listesi
@@ -174,25 +174,25 @@ class WorkflowRecorder:
         dosyalar = sorted(WORKFLOW_DIR.glob("*.json"))
         if not dosyalar:
             return "[Workflow] Kayitli workflow yok."
-        satirlar = [f"[Workflow] 📋 {len(dosyalar)} kayit:"]
+        satirlar = [f"[Workflow] ğŸ“‹ {len(dosyalar)} kayit:"]
         for d in dosyalar:
             try:
                 data = json.loads(d.read_text(encoding="utf-8"))
                 satirlar.append(
-                    f"  • {data['adi']} ({data['adim_sayisi']} adim, {data['tarih']})"
+                    f"  â€¢ {data['adi']} ({data['adim_sayisi']} adim, {data['tarih']})"
                 )
             except (json.JSONDecodeError, KeyError):
-                satirlar.append(f"  • {d.stem} (bozuk dosya)")
+                satirlar.append(f"  â€¢ {d.stem} (bozuk dosya)")
         return "\n".join(satirlar)
 
     def sil(self, workflow_adi: str) -> str:
         """Bir workflow'u sil.
 
         Args:
-            workflow_adi: Silinecek workflow adı
+            workflow_adi: Silinecek workflow adÄ±
 
         Returns:
-            str: Durum mesajı
+            str: Durum mesajÄ±
         """
         dosya = WORKFLOW_DIR / f"{workflow_adi}.json"
         if not dosya.exists():

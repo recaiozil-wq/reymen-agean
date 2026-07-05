@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""cli_commands.py — ReYMeN CLI alt komutları (gateway, config, session, doctor, backup)."""
+﻿# -*- coding: utf-8 -*-
+"""cli_commands.py â€” ReYMeN CLI alt komutlarÄ± (gateway, config, session, doctor, backup)."""
 
 import os
 import sys
@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 _KOK = Path(__file__).parent.parent.parent.resolve()
 
-# ── Renkler ────────────────────────────────────────────────────────────────────
+# â”€â”€ Renkler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _R = "\033[0m"
 _C = "\033[96m"
 _G = "\033[92m"
@@ -44,9 +44,9 @@ def _r(t):
     return f"{_RED}{t}{_R}"
 
 
-# ── GATEWAY (ReYMeN bagimsiz) ─────────────────────────────────────────────────
+# â”€â”€ GATEWAY (ReYMeN bagimsiz) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def cmd_gateway(args) -> int:
-    """Gateway yönetimi — ReYMeN kendi gateway sistemi."""
+    """Gateway yÃ¶netimi â€” ReYMeN kendi gateway sistemi."""
     alt = args.sub or "status"
     profil = getattr(args, "profil", None) or "reymen"
 
@@ -72,7 +72,7 @@ def cmd_gateway(args) -> int:
 
 
 def _gateway_durum(profil: str) -> int:
-    """ReYMeN gateway durumunu kontrol et — process + PID bazli."""
+    """ReYMeN gateway durumunu kontrol et â€” process + PID bazli."""
     # 1. Process kontrolu (reymen gateway / telegram_bot)
     try:
         # Telegram bot process'i var mi?
@@ -93,24 +93,24 @@ def _gateway_durum(profil: str) -> int:
 
         if reymen_pids:
             print(
-                f"  {_c('⊡')} {_g(profil):<10} {_g('calisiyor')} PID: {', '.join(reymen_pids[:3])}"
+                f"  {_c('âŠ¡')} {_g(profil):<10} {_g('calisiyor')} PID: {', '.join(reymen_pids[:3])}"
             )
         else:
-            print(f"  {_c('⊡')} {_y(profil):<10} {_d('kapali')}")
+            print(f"  {_c('âŠ¡')} {_y(profil):<10} {_d('kapali')}")
         return 0
     except Exception as e:
-        print(f"  {_c('⊡')} {_y(profil):<10} {_d('kontrol basarisiz')}")
+        print(f"  {_c('âŠ¡')} {_y(profil):<10} {_d('kontrol basarisiz')}")
         return 1
 
 
 def _gateway_baslat(profil: str) -> int:
-    """ReYMeN gateway'ini baslat — dogrudan Python process'i olarak."""
+    """ReYMeN gateway'ini baslat â€” dogrudan Python process'i olarak."""
     try:
         # reymen_launcher.py uzerinden gateway baslat
         reymen_bin = str(_KOK / "reymen_launcher.py")
         cmd = f'start /MIN cmd /c "python {reymen_bin} --profil {profil} gateway start"'
         subprocess.Popen(cmd, shell=True)
-        print(f"  {_g('✓')} {profil} gateway baslatiliyor...")
+        print(f"  {_g('âœ“')} {profil} gateway baslatiliyor...")
         return 0
     except Exception as e:
         print(f"  {_r('[HATA]')} {e}")
@@ -135,14 +135,14 @@ def _gateway_durdur(profil: str) -> int:
                     subprocess.run(
                         ["taskkill", "/F", "/PID", pid], capture_output=True, timeout=3
                     )
-        print(f"  {_g('✓')} Gateway process'leri durduruldu.")
+        print(f"  {_g('âœ“')} Gateway process'leri durduruldu.")
         return 0
     except Exception as e:
         print(f"  {_y('!')} Durdurma hatasi: {e}")
         return 1
 
 
-# ── CONFIG ──────────────────────────────────────────────────────────────────────
+# â”€â”€ CONFIG â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def cmd_config(args) -> int:
     """Config goruntuleme."""
     alt = getattr(args, "sub", None) or "show"
@@ -200,7 +200,7 @@ def _config_env_goster() -> int:
     return 0
 
 
-# ── SESSION ─────────────────────────────────────────────────────────────────────
+# â”€â”€ SESSION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def cmd_session(args) -> int:
     """Session listeleme."""
     alt = getattr(args, "sub", None) or "list"
@@ -215,7 +215,7 @@ def cmd_session(args) -> int:
 
 
 def _session_listele(limit: int = 10) -> int:
-    """~/.hermes/reymen/state.db'den son session'lari listele."""
+    """~/.reymen/reymen/state.db'den son session'lari listele."""
     import sqlite3
 
     db_yollari = [
@@ -244,7 +244,7 @@ def _session_listele(limit: int = 10) -> int:
                 if rows:
                     for sid, ts, cnt in rows:
                         print(
-                            f"  {_c('◈')} {_g(sid[:12]):<14} "
+                            f"  {_c('â—ˆ')} {_g(sid[:12]):<14} "
                             f"{_d(str(ts)[:19]):<22} {cnt} mesaj"
                         )
                     return 0
@@ -260,30 +260,30 @@ def _session_son() -> int:
     return _session_listele(1)
 
 
-# ── DOCTOR ──────────────────────────────────────────────────────────────────────
+# â”€â”€ DOCTOR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def cmd_doctor(args) -> int:
     """Sistem saglik kontrolu."""
     sorun = 0
-    print(f"\n  {_c('ReYMeN Sistem Kontrolü')}")
-    print(f"  {_d('─'*50)}")
+    print(f"\n  {_c('ReYMeN Sistem KontrolÃ¼')}")
+    print(f"  {_d('â”€'*50)}")
 
     # 1. Proje dizini
     if _KOK.exists():
-        print(f"  {_g('✓')} Proje: {_KOK}")
+        print(f"  {_g('âœ“')} Proje: {_KOK}")
     else:
-        print(f"  {_r('✗')} Proje bulunamadi")
+        print(f"  {_r('âœ—')} Proje bulunamadi")
         sorun += 1
 
     # 2. .env
     env = _KOK / ".env"
     print(
-        f"  {_g('✓') if env.exists() else _r('✗')} .env: {'var' if env.exists() else 'YOK'}"
+        f"  {_g('âœ“') if env.exists() else _r('âœ—')} .env: {'var' if env.exists() else 'YOK'}"
     )
 
     # 3. config.yaml
     yaml = _KOK / "config.yaml"
     print(
-        f"  {_g('✓') if yaml.exists() else _y('?')} config.yaml: {'var' if yaml.exists() else 'yok'}"
+        f"  {_g('âœ“') if yaml.exists() else _y('?')} config.yaml: {'var' if yaml.exists() else 'yok'}"
     )
 
     # 4. API key test
@@ -300,20 +300,20 @@ def cmd_doctor(args) -> int:
             ok = resp.status == 200
             conn.close()
             print(
-                f"  {_g('✓') if ok else _r('✗')} DeepSeek API: {'calisiyor' if ok else f'hata {resp.status}'}"
+                f"  {_g('âœ“') if ok else _r('âœ—')} DeepSeek API: {'calisiyor' if ok else f'hata {resp.status}'}"
             )
         except Exception as e:
-            print(f"  {_r('✗')} DeepSeek API: {_d(str(e)[:40])}")
+            print(f"  {_r('âœ—')} DeepSeek API: {_d(str(e)[:40])}")
             sorun += 1
     else:
-        print(f"  {_r('✗')} DeepSeek API: KEY YOK")
+        print(f"  {_r('âœ—')} DeepSeek API: KEY YOK")
         sorun += 1
 
     # 5. SOUL.md
     soul = _KOK / "SOUL.md"
     if soul.exists():
         s_len = len(soul.read_text(encoding="utf-8"))
-        print(f"  {_g('✓')} SOUL.md: {s_len} karakter")
+        print(f"  {_g('âœ“')} SOUL.md: {s_len} karakter")
     else:
         print(f"  {_y('?')} SOUL.md: yok")
 
@@ -321,27 +321,27 @@ def cmd_doctor(args) -> int:
     try:
         from reymen.cereyan.conversation_loop import ConversationLoop
 
-        print(f"  {_g('✓')} ConversationLoop: hazir")
+        print(f"  {_g('âœ“')} ConversationLoop: hazir")
     except Exception as e:
-        print(f"  {_r('✗')} ConversationLoop: {e}")
+        print(f"  {_r('âœ—')} ConversationLoop: {e}")
         sorun += 1
 
     # 7. ReYMeN binary
     reymen = str(_KOK / "reymen_launcher.py")
     print(
-        f"  {_g('✓') if os.path.exists(reymen) else _y('?')} Launcher: {'reymen_launcher.py' if os.path.exists(reymen) else 'bulunamadi'}"
+        f"  {_g('âœ“') if os.path.exists(reymen) else _y('?')} Launcher: {'reymen_launcher.py' if os.path.exists(reymen) else 'bulunamadi'}"
     )
 
-    print(f"  {_d('─'*50)}")
+    print(f"  {_d('â”€'*50)}")
     if sorun:
         print(f"  {_r(f'{sorun} sorun bulundu')}")
     else:
-        print(f"  {_g('✓ Tum kontroller basarili')}")
+        print(f"  {_g('âœ“ Tum kontroller basarili')}")
     print()
     return sorun
 
 
-# ── BACKUP ──────────────────────────────────────────────────────────────────────
+# â”€â”€ BACKUP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def cmd_backup(args) -> int:
     """Git push ile yedekle."""
     alt = getattr(args, "sub", None) or "status"
@@ -375,7 +375,7 @@ def _backup_durum() -> int:
             for line in lines[:20]:
                 print(f"    {_d(line)}")
         else:
-            print(f"  {_g('✓')} Temiz (degisiklik yok)")
+            print(f"  {_g('âœ“')} Temiz (degisiklik yok)")
         return 0
     except Exception as e:
         print(f"  {_r('[HATA]')} {e}")
@@ -383,7 +383,7 @@ def _backup_durum() -> int:
 
 
 def _backup_push() -> int:
-    print(f"  {_c('∘')} Git push yapiliyor...")
+    print(f"  {_c('âˆ˜')} Git push yapiliyor...")
     try:
         r = subprocess.run(
             ["git", "add", "-A"],
@@ -404,7 +404,7 @@ def _backup_push() -> int:
         )
         out = (r.stdout + r.stderr).strip()
         if "Everything up-to-date" in out or r.returncode == 0:
-            print(f"  {_g('✓')} Yedeklendi")
+            print(f"  {_g('âœ“')} Yedeklendi")
         else:
             print(f"  {_y('!')} {out[:100]}")
         return r.returncode

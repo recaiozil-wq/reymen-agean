@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-findings_board.py — Ortak bulgu panosu (SQLite WAL modu)
+findings_board.py â€” Ortak bulgu panosu (SQLite WAL modu)
 
 3 profil (default/pasa_38, reymen, kiral38) ortak kullanimi icin.
 SQLite WAL modu + busy_timeout ile eszamanli yazma guvenligi.
@@ -27,7 +27,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-# ── Sabitler ─────────────────────────────────────────────────────────
+# â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _PROJE_KOK = Path(__file__).resolve().parent.parent.parent.parent
 _BOARD_DB = _PROJE_KOK / "shared_state" / "findings_board.db"
@@ -57,7 +57,7 @@ CREATE INDEX IF NOT EXISTS idx_findings_bulan ON findings(bulan_profil);
 """
 
 
-# ── Veritabani baglantisi ────────────────────────────────────────────
+# â”€â”€ Veritabani baglantisi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _baglan() -> sqlite3.Connection:
@@ -82,7 +82,7 @@ def _kurulum():
         conn.close()
 
 
-# ── Temel Islemler ───────────────────────────────────────────────────
+# â”€â”€ Temel Islemler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def ekle_bulgu(
@@ -280,14 +280,14 @@ def bulgu_ozet() -> str:
     son_bulgu = bulgu_listele(limit=5)
     for b in son_bulgu:
         durum_simge = {
-            "yeni": "🆕",
-            "inceleniyor": "🔍",
-            "duzeltildi": "✅",
-            "reddedildi": "❌",
-            "beklemede": "⏳",
-        }.get(b.get("durum", ""), "❓")
-        onem_simge = {"kritik": "🔴", "orta": "🟠", "dusuk": "🟢"}.get(
-            b.get("onem_derecesi", ""), "⚪"
+            "yeni": "ğŸ†•",
+            "inceleniyor": "ğŸ”",
+            "duzeltildi": "âœ…",
+            "reddedildi": "âŒ",
+            "beklemede": "â³",
+        }.get(b.get("durum", ""), "â“")
+        onem_simge = {"kritik": "ğŸ”´", "orta": "ğŸŸ ", "dusuk": "ğŸŸ¢"}.get(
+            b.get("onem_derecesi", ""), "âšª"
         )
         satirlar.append(
             f"  {durum_simge}{onem_simge} #{b['id']} [{b['bulan_profil']}] "
@@ -297,7 +297,7 @@ def bulgu_ozet() -> str:
     return "\n".join(satirlar)
 
 
-# ── Audit Toplu Bulgu Ekleme (K1-K4 guvenlik) ────────────────────────
+# â”€â”€ Audit Toplu Bulgu Ekleme (K1-K4 guvenlik) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def audit_tamamla(bulan: str, bulgular_listesi: list[dict]) -> list[dict]:
@@ -441,13 +441,13 @@ def check_findings_board_health() -> dict:
         else:
             sonuc["kontroller"].append({"kontrol": "cakisan_bulgu", "durum": "temiz"})
 
-        sonuc["ozet"] = "✅ Saglikli" if sonuc["saglikli"] else "⚠️ Sorun var"
+        sonuc["ozet"] = "âœ… Saglikli" if sonuc["saglikli"] else "âš ï¸ Sorun var"
         return sonuc
     finally:
         conn.close()
 
 
-# ── Veritabani dogrudan erisim (acil durumlar icin) ──────────────────
+# â”€â”€ Veritabani dogrudan erisim (acil durumlar icin) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def baglanti_al() -> sqlite3.Connection:
@@ -455,7 +455,7 @@ def baglanti_al() -> sqlite3.Connection:
     return _baglan()
 
 
-# ── CLI ──────────────────────────────────────────────────────────────
+# â”€â”€ CLI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _cli():
@@ -493,12 +493,12 @@ def _cli():
 
     if args.ekle:
         b = ekle_bulgu(bulan=args.ekle[0], konu=args.ekle[1], onem=args.ekle[2])
-        print(f"✅ #{b['id']} eklendi: {b['konu']}")
+        print(f"âœ… #{b['id']} eklendi: {b['konu']}")
     elif args.guncelle:
         basarili = bulgu_guncelle(
             bulgu_id=int(args.guncelle[0]), durum=args.guncelle[1]
         )
-        print(f"{'✅' if basarili else '❌'} #{args.guncelle[0]} -> {args.guncelle[1]}")
+        print(f"{'âœ…' if basarili else 'âŒ'} #{args.guncelle[0]} -> {args.guncelle[1]}")
     elif args.ozet:
         print(bulgu_ozet())
     elif args.liste:
@@ -527,7 +527,7 @@ def _cli():
                 bulgular.append({"konu": konu, "onem": onem})
         if bulgular:
             eklenen = audit_tamamla(bulan, bulgular)
-            print(f"✅ {len(eklenen)} bulgu kaydedildi ({bulan})")
+            print(f"âœ… {len(eklenen)} bulgu kaydedildi ({bulan})")
             for b in eklenen:
                 print(f"  #{b['id']}: {b['konu'][:60]}")
     elif args.audit_from_file:
@@ -539,16 +539,16 @@ def _cli():
             if isinstance(_data, list):
                 eklenen = audit_tamamla("reymen", _data)
                 print(
-                    f"✅ {len(eklenen)} bulgu kaydedildi (dosya: {args.audit_from_file})"
+                    f"âœ… {len(eklenen)} bulgu kaydedildi (dosya: {args.audit_from_file})"
                 )
             elif isinstance(_data, dict) and "bulgular" in _data:
                 bulan = _data.get("bulan", "reymen")
                 eklenen = audit_tamamla(bulan, _data["bulgular"])
                 print(
-                    f"✅ {len(eklenen)} bulgu kaydedildi ({bulan}, dosya: {args.audit_from_file})"
+                    f"âœ… {len(eklenen)} bulgu kaydedildi ({bulan}, dosya: {args.audit_from_file})"
                 )
         except Exception as _e:
-            print(f"❌ Dosya okunamadi: {_e}")
+            print(f"âŒ Dosya okunamadi: {_e}")
     else:
         parser.print_help()
 

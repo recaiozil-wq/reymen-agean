@@ -1,12 +1,12 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-reymen/guvenlik/sifreleme.py — Fernet Tabanlı Konfigürasyon Şifreleme
+reymen/guvenlik/sifreleme.py â€” Fernet TabanlÄ± KonfigÃ¼rasyon Åifreleme
 
-encrypt_config() ve decrypt_config() fonksiyonları ile
-konfigürasyon verilerini (dict) simetrik olarak şifreler/çözer.
+encrypt_config() ve decrypt_config() fonksiyonlarÄ± ile
+konfigÃ¼rasyon verilerini (dict) simetrik olarak ÅŸifreler/Ã§Ã¶zer.
 
-Anahtar .env'den (ENCRYPTION_KEY) okunur; yoksa otomatik oluşturulup kaydedilir.
-Kullanım:
+Anahtar .env'den (ENCRYPTION_KEY) okunur; yoksa otomatik oluÅŸturulup kaydedilir.
+KullanÄ±m:
     from reymen.guvenlik.sifreleme import encrypt_config, decrypt_config
 
     sifreli = encrypt_config({"api_key": "gizli"})
@@ -22,24 +22,24 @@ from cryptography.fernet import Fernet
 
 log = logging.getLogger(__name__)
 
-# ──────────────────────────────────────────────
-# .env yolu (proje kökü)
-# ──────────────────────────────────────────────
-_PROJECT_ROOT = Path(__file__).resolve().parents[3]  # src/reymen/guvenlik → proje kökü
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# .env yolu (proje kÃ¶kÃ¼)
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+_PROJECT_ROOT = Path(__file__).resolve().parents[3]  # src/reymen/guvenlik â†’ proje kÃ¶kÃ¼
 _ENV_PATH = _PROJECT_ROOT / ".env"
 
 
 def _load_or_create_key() -> bytes:
-    """ENCRYPTION_KEY'i .env'den okur, yoksa oluşturup .env'ye ekler."""
+    """ENCRYPTION_KEY'i .env'den okur, yoksa oluÅŸturup .env'ye ekler."""
     env_path = _ENV_PATH
     key_var = "ENCRYPTION_KEY"
 
-    # --- 1. Önce os.environ / dotenv tarafından yüklenmiş olabilir ---
+    # --- 1. Ã–nce os.environ / dotenv tarafÄ±ndan yÃ¼klenmiÅŸ olabilir ---
     raw = os.environ.get(key_var)
     if raw:
         return raw.encode("utf-8")
 
-    # --- 2. .env dosyasını manuel satır satır oku ---
+    # --- 2. .env dosyasÄ±nÄ± manuel satÄ±r satÄ±r oku ---
     if env_path.exists():
         for line in env_path.read_text("utf-8").splitlines():
             line = line.strip()
@@ -47,34 +47,34 @@ def _load_or_create_key() -> bytes:
                 raw = line.split("=", 1)[1].strip().strip('"').strip("'")
                 return raw.encode("utf-8")
 
-    # --- 3. Hiçbiri yoksa yeni anahtar oluştur ---
-    log.info("ENCRYPTION_KEY bulunamadı, yeni Fernet anahtarı oluşturuluyor...")
+    # --- 3. HiÃ§biri yoksa yeni anahtar oluÅŸtur ---
+    log.info("ENCRYPTION_KEY bulunamadÄ±, yeni Fernet anahtarÄ± oluÅŸturuluyor...")
     new_key = Fernet.generate_key()  # bytes (URL-safe base64, 44 karakter)
     key_line = f"{key_var}={new_key.decode('utf-8')}"
 
-    # .env sonuna ekle (dosya yoksa oluştur)
+    # .env sonuna ekle (dosya yoksa oluÅŸtur)
     if env_path.exists():
         existing = env_path.read_text("utf-8").rstrip("\n")
-        # Boşlukla ayır
+        # BoÅŸlukla ayÄ±r
         if existing and not existing.endswith("\n"):
             existing += "\n"
         env_path.write_text(f"{existing}\n{key_line}\n", "utf-8")
     else:
-        env_path.write_text(f"# ReYMeN — Environment Variables\n{key_line}\n", "utf-8")
+        env_path.write_text(f"# ReYMeN â€” Environment Variables\n{key_line}\n", "utf-8")
 
-    log.info("Yeni ENCRYPTION_KEY %s dosyasına kaydedildi.", env_path)
+    log.info("Yeni ENCRYPTION_KEY %s dosyasÄ±na kaydedildi.", env_path)
     return new_key
 
 
 def encrypt_config(data: dict) -> str:
     """
-    Verilen sözlüğü Fernet simetrik anahtarı ile şifreler.
+    Verilen sÃ¶zlÃ¼ÄŸÃ¼ Fernet simetrik anahtarÄ± ile ÅŸifreler.
 
     Args:
-        data: Şifrelenecek konfigürasyon sözlüğü (JSON-serializable olmalı).
+        data: Åifrelenecek konfigÃ¼rasyon sÃ¶zlÃ¼ÄŸÃ¼ (JSON-serializable olmalÄ±).
 
     Returns:
-        Şifrelenmiş token (str).
+        ÅifrelenmiÅŸ token (str).
     """
     key = _load_or_create_key()
     cipher = Fernet(key)
@@ -85,13 +85,13 @@ def encrypt_config(data: dict) -> str:
 
 def decrypt_config(token: str) -> dict:
     """
-    Fernet ile şifrelenmiş token'ı çözer.
+    Fernet ile ÅŸifrelenmiÅŸ token'Ä± Ã§Ã¶zer.
 
     Args:
-        token: encrypt_config() tarafından üretilmiş şifreli string.
+        token: encrypt_config() tarafÄ±ndan Ã¼retilmiÅŸ ÅŸifreli string.
 
     Returns:
-        Orijinal konfigürasyon sözlüğü.
+        Orijinal konfigÃ¼rasyon sÃ¶zlÃ¼ÄŸÃ¼.
     """
     key = _load_or_create_key()
     cipher = Fernet(key)

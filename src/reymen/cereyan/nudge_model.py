@@ -1,22 +1,22 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-nudge_model.py — Stealth User Modelling System (Hermes Honcho-like)
+nudge_model.py â€” Stealth User Modelling System (ReYMeN Honcho-like)
 
 Silently observes user preferences, response style, technical level,
 language preference, and tool usage frequency to build a "user model".
 All observations are stored in SQLite under .ReYMeN/nudge_model.db.
 
 Basic flow:
-    1. gozlemle(message, response) → processes each interaction, updates model
-    2. kullanici_modeli_al() → returns current user model
-    3. sistem_prompu_ekle() → text block to append to system prompt
-    4. nudge() → returns a context-appropriate reminder/suggestion
-    5. rapor_uret() → generates a summary report for the user
+    1. gozlemle(message, response) â†’ processes each interaction, updates model
+    2. kullanici_modeli_al() â†’ returns current user model
+    3. sistem_prompu_ekle() â†’ text block to append to system prompt
+    4. nudge() â†’ returns a context-appropriate reminder/suggestion
+    5. rapor_uret() â†’ generates a summary report for the user
 
 Usage:
     from nudge_model import NudgeModel
     nm = NudgeModel()
-    nm.gozlemle("merhaba, nasılsın?", "iyiyim teşekkürler!")
+    nm.gozlemle("merhaba, nasÄ±lsÄ±n?", "iyiyim teÅŸekkÃ¼rler!")
     model = nm.kullanici_modeli_al()
     prompt_ek = nm.sistem_prompu_ekle()
     hatirlatma = nm.nudge()
@@ -35,7 +35,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
-# ── Sabitler ──────────────────────────────────────────────────────────────────
+# â”€â”€ Sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 ROOT = Path(__file__).parent.resolve()
 VERITABANI_YOLU = ROOT.parent.parent / ".ReYMeN" / "db" / "cereyan.db"  # consolidated: nudge_model + continuous_learning + steering
@@ -81,7 +81,7 @@ ARAC_KATEGORILERI = [
 ]
 
 
-# ── Yardimci Fonksiyonlar ─────────────────────────────────────────────────────
+# â”€â”€ Yardimci Fonksiyonlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _simdiki_zaman() -> str:
@@ -94,7 +94,7 @@ def _zaman_damgasi() -> float:
     return time.time()
 
 
-# ── NudgeModel Sinifi ─────────────────────────────────────────────────────────
+# â”€â”€ NudgeModel Sinifi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class NudgeModel:
@@ -120,7 +120,7 @@ class NudgeModel:
         self._temizle()
         logger.debug("[NudgeModel] Baslatildi: %s", self._vt_yolu)
 
-    # ── Veritabani Yonetimi ──────────────────────────────────────────────────
+    # â”€â”€ Veritabani Yonetimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _baglan(self) -> sqlite3.Connection:
         """SQLite baglantisi ac (thread-safe caching ile)."""
@@ -203,7 +203,7 @@ class NudgeModel:
         except Exception as e:
             logger.debug("[NudgeModel] Temizlik hatasi (onemsiz): %s", e)
 
-    # ── Gozlem Motoru ─────────────────────────────────────────────────────────
+    # â”€â”€ Gozlem Motoru â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def gozlemle(self, mesaj: str, yanit: str) -> Dict[str, Any]:
         """Bir kullanici-ajan etkilesimini sessizce gozlemler ve isler.
@@ -276,7 +276,7 @@ class NudgeModel:
         logger.debug("[NudgeModel] gozlemle: %s", gozlem)
         return gozlem
 
-    # ── Ozellik Cikarimi ──────────────────────────────────────────────────────
+    # â”€â”€ Ozellik Cikarimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _stil_tahmin_et(self, metin: str) -> str:
         """Mesajin iletisim stilini tahmin et.
@@ -673,7 +673,7 @@ class NudgeModel:
             return "pozitif"
         return "notr"
 
-    # ── Model Yonetimi ─────────────────────────────────────────────────────────
+    # â”€â”€ Model Yonetimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _model_guncelle(self, anahtar: str, deger: str):
         """Kullanici modelinde bir anahtari guncelle (veya ekle)."""
@@ -755,7 +755,7 @@ class NudgeModel:
                 (anahtar, str(deger), 0.2, simdi, 1),
             )
 
-    # ── Kullanici Modeli Sorgulama ────────────────────────────────────────────
+    # â”€â”€ Kullanici Modeli Sorgulama â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def kullanici_modeli_al(self) -> Dict[str, Any]:
         """Mevcut kullanici modelini guven puanlariyla dondur.
@@ -847,7 +847,7 @@ class NudgeModel:
             return 0.0
         return round(en_yuksek / toplam, 2)
 
-    # ── Sistem Prompt Enjeksiyonu ──────────────────────────────────────────────
+    # â”€â”€ Sistem Prompt Enjeksiyonu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def sistem_prompu_ekle(self) -> str:
         """Kullanici modeline dayali sistem prompt blogu uretir.
@@ -935,7 +935,7 @@ class NudgeModel:
         govde = "\n".join(f"- {b}" for b in bolumler)
         return f"\n\n{baslik}\n{govde}\n"
 
-    # ── Nudge Sistemi ──────────────────────────────────────────────────────────
+    # â”€â”€ Nudge Sistemi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def nudge(self) -> List[Dict[str, Any]]:
         """Mevcut duruma gore ilgili bir hatirlatma/oneri dondur.
@@ -1085,7 +1085,7 @@ class NudgeModel:
 
         return nudges[:MAKS_NUDGE]
 
-    # ── Raporlama ──────────────────────────────────────────────────────────────
+    # â”€â”€ Raporlama â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def rapor_uret(self) -> str:
         """Kullanici modelinin ozet raporunu uretir.
@@ -1167,7 +1167,7 @@ class NudgeModel:
 
         return "\n".join(satirlar)
 
-    # ── Yardimci Metodlar ─────────────────────────────────────────────────────
+    # â”€â”€ Yardimci Metodlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def veri_durumu(self) -> Dict[str, Any]:
         """Veritabanindaki veri durumu hakkinda bilgi dondur."""
@@ -1215,7 +1215,7 @@ class NudgeModel:
             self._baglanti = None
 
 
-# ── Global Ornek ──────────────────────────────────────────────────────────────
+# â”€â”€ Global Ornek â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _nudge_model_ornegi: Optional[NudgeModel] = None
 
@@ -1228,7 +1228,7 @@ def nudge_model_al() -> NudgeModel:
     return _nudge_model_ornegi
 
 
-# ── Dogrudan Calistirma / Test ────────────────────────────────────────────────
+# â”€â”€ Dogrudan Calistirma / Test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
     import sys

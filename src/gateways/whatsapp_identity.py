@@ -1,4 +1,4 @@
-"""Shared helpers for canonicalising WhatsApp sender identity.
+﻿"""Shared helpers for canonicalising WhatsApp sender identity.
 
 WhatsApp's bridge can surface the same human under two different JID shapes
 within a single conversation:
@@ -13,19 +13,19 @@ the two paths can never drift apart.
 
 Public helpers:
 
-- :func:`normalize_whatsapp_identifier` — strip JID/LID/device/plus syntax
+- :func:`normalize_whatsapp_identifier` â€” strip JID/LID/device/plus syntax
   down to the bare numeric identifier.
-- :func:`canonical_whatsapp_identifier` — walk the bridge's
+- :func:`canonical_whatsapp_identifier` â€” walk the bridge's
   ``lid-mapping-*.json`` files and return a stable canonical identity
   across phone/LID variants.
-- :func:`expand_whatsapp_aliases` — return the full alias set for an
+- :func:`expand_whatsapp_aliases` â€” return the full alias set for an
   identifier. Used by authorisation code that needs to match any known
   form of a sender against an allow-list.
 
 Plugins that need per-sender behaviour on WhatsApp (role-based routing,
 per-contact authorisation, policy gating in a gateway hook) should use
 ``canonical_whatsapp_identifier`` so their bookkeeping lines up with
-Hermes' own session keys.
+ReYMeN' own session keys.
 """
 
 from __future__ import annotations
@@ -42,7 +42,7 @@ logger = logging.getLogger(__name__)
 # full-width digits / Unicode word chars can't sneak through.
 _SAFE_IDENTIFIER_RE = re.compile(r"^[A-Za-z0-9@.+\-]+$")
 
-from src.reymen.cron.hermes_stubs import get_hermes_home
+from reymen.sistem.reymen_stubs import get_reymen_home
 
 
 def normalize_whatsapp_identifier(value: str) -> str:
@@ -78,7 +78,7 @@ def expand_whatsapp_aliases(identifier: str) -> Set[str]:
     if not normalized:
         return set()
 
-    session_dir = get_hermes_home() / "whatsapp" / "session"
+    session_dir = get_reymen_home() / "whatsapp" / "session"
     resolved: Set[str] = set()
     queue = [normalized]
 
@@ -123,7 +123,7 @@ def canonical_whatsapp_identifier(identifier: str) -> str:
     WhatsApp may surface the same person under either a phone-format JID
     (``60123456789@s.whatsapp.net``) or a LID (``1234567890@lid``). This
     applies to a DM ``chat_id`` *and* to the ``participant_id`` of a
-    member inside a group chat — both represent a user identity, and the
+    member inside a group chat â€” both represent a user identity, and the
     bridge may flip between the two for the same human.
 
     This helper reads the bridge's ``whatsapp/session/lid-mapping-*.json``
@@ -131,11 +131,11 @@ def canonical_whatsapp_identifier(identifier: str) -> str:
     (numeric-preferred) alias as the canonical identity.
     :func:`gateway.session.build_session_key` uses this for both WhatsApp
     DM chat_ids and WhatsApp group participant_ids, so callers get the
-    same session-key identity Hermes itself uses.
+    same session-key identity ReYMeN itself uses.
 
     Plugins that need per-sender behaviour (role-based routing,
     authorisation, per-contact policy) should use this so their
-    bookkeeping lines up with Hermes' session bookkeeping even when
+    bookkeeping lines up with ReYMeN' session bookkeeping even when
     the bridge reshuffles aliases.
 
     Returns an empty string if ``identifier`` normalizes to empty. If no

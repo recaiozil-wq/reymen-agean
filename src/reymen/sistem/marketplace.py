@@ -1,15 +1,15 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-marketplace.py — ReYMeN Plugin Marketplacesi.
+marketplace.py â€” ReYMeN Plugin Marketplacesi.
 
 Plugin katalogu + uzaktan yukleme + arama + yayinlama.
 Mevcut plugin_manager.py uzerine insa edilmistir.
 
 Kullanim (motor):
-    PLUGIN_MARKET_LISTE()         → katalogdaki tum pluginler
-    PLUGIN_MARKET_ARAMA( sorgu ) → katalogda ara
-    PLUGIN_MARKET_YUKLE( ad )    → plugin'i katalogdan indir + yukle
-    PLUGIN_MARKET_BILGI( ad )    → plugin detayi
+    PLUGIN_MARKET_LISTE()         â†’ katalogdaki tum pluginler
+    PLUGIN_MARKET_ARAMA( sorgu ) â†’ katalogda ara
+    PLUGIN_MARKET_YUKLE( ad )    â†’ plugin'i katalogdan indir + yukle
+    PLUGIN_MARKET_BILGI( ad )    â†’ plugin detayi
 """
 
 from __future__ import annotations
@@ -28,7 +28,7 @@ from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
-# ── Varsayilan katalog kaynagi ──────────────────────────────────────────
+# â”€â”€ Varsayilan katalog kaynagi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # GitHub'daki plugin katalog repomuz
 KATALOG_URL = "https://raw.githubusercontent.com/Watcher-ReYMeN/ReYMeN-Ajan-v2/main/plugin_katalog.json"
 
@@ -69,15 +69,15 @@ def liste() -> str:
     """Katalogdaki tum pluginleri listele."""
     plugins = _katalog_yukle()
     if not plugins:
-        return "❌ Katalog bos veya yuklenemedi."
+        return "âŒ Katalog bos veya yuklenemedi."
 
-    satirlar = ["📦 ReYMeN Plugin Katalogu", "=" * 50, ""]
+    satirlar = ["ğŸ“¦ ReYMeN Plugin Katalogu", "=" * 50, ""]
     for p in plugins:
         ad = p.get("ad", "?")
         versiyon = p.get("versiyon", "?")
         aciklama = p.get("aciklama", "")[:80]
         yazar = p.get("yazar", "?")
-        satirlar.append(f"  📌 {ad} v{versiyon}")
+        satirlar.append(f"  ğŸ“Œ {ad} v{versiyon}")
         satirlar.append(f"     {aciklama}")
         yuklu = "(YUKLU)" if _yuklu_mi(ad) else ""
         satirlar.append(f"     Yazar: {yazar}  {yuklu}")
@@ -91,7 +91,7 @@ def ara(sorgu: str) -> str:
     """Katalogda isme/aciklamaya gore ara."""
     plugins = _katalog_yukle()
     if not plugins:
-        return "❌ Katalog bos."
+        return "âŒ Katalog bos."
 
     sorgu = sorgu.lower().strip()
     sonuc = []
@@ -103,13 +103,13 @@ def ara(sorgu: str) -> str:
             sonuc.append(p)
 
     if not sonuc:
-        return f'🔍 "{sorgu}" icin sonuc bulunamadi.'
+        return f'ğŸ” "{sorgu}" icin sonuc bulunamadi.'
 
-    satirlar = [f'🔍 "{sorgu}" icin {len(sonuc)} sonuc:', ""]
+    satirlar = [f'ğŸ” "{sorgu}" icin {len(sonuc)} sonuc:', ""]
     for p in sonuc:
-        yuklu = "✅" if _yuklu_mi(p.get("ad", "")) else "⬇️"
+        yuklu = "âœ…" if _yuklu_mi(p.get("ad", "")) else "â¬‡ï¸"
         satirlar.append(
-            f"  {yuklu} {p['ad']} v{p.get('versiyon', '?')} — {p.get('aciklama', '')[:70]}"
+            f"  {yuklu} {p['ad']} v{p.get('versiyon', '?')} â€” {p.get('aciklama', '')[:70]}"
         )
     return "\n".join(satirlar)
 
@@ -123,11 +123,11 @@ def bilgi(ad: str) -> str:
             p = x
             break
     if not p:
-        return f'❌ "{ad}" katalogda bulunamadi.'
+        return f'âŒ "{ad}" katalogda bulunamadi.'
 
-    yuklu = "✅ Evet" if _yuklu_mi(ad) else "❌ Hayir"
+    yuklu = "âœ… Evet" if _yuklu_mi(ad) else "âŒ Hayir"
     satirlar = [
-        f"📌 {p['ad']} v{p.get('versiyon', '?')}",
+        f"ğŸ“Œ {p['ad']} v{p.get('versiyon', '?')}",
         f"   Yazar: {p.get('yazar', '?')}",
         f"   Lisans: {p.get('lisans', '?')}",
         f"   Yuklu: {yuklu}",
@@ -136,7 +136,7 @@ def bilgi(ad: str) -> str:
         "   Bagimliliklar:",
     ]
     for dep in p.get("bagimliliklar", []):
-        satirlar.append(f"     • {dep}")
+        satirlar.append(f"     â€¢ {dep}")
     satirlar.append("")
     satirlar.append(f"   Kaynak: {p.get('kaynak', '?')}")
     satirlar.append(f"   Dokuman: {p.get('dokuman', '?')}")
@@ -152,14 +152,14 @@ def yukle(ad: str) -> str:
             p = x
             break
     if not p:
-        return f'❌ "{ad}" katalogda bulunamadi.'
+        return f'âŒ "{ad}" katalogda bulunamadi.'
 
     if _yuklu_mi(ad):
-        return f'ℹ️ "{ad}" zaten yuklu.'
+        return f'â„¹ï¸ "{ad}" zaten yuklu.'
 
     kaynak = p.get("kaynak", "")
     if not kaynak:
-        return f'❌ "{ad}" icin kaynak URL belirtilmemis.'
+        return f'âŒ "{ad}" icin kaynak URL belirtilmemis.'
 
     hedef = PLUGIN_DIZINI / ad
     try:
@@ -187,9 +187,9 @@ def yukle(ad: str) -> str:
             if yerel.exists():
                 shutil.copytree(str(yerel), str(hedef), dirs_exist_ok=True)
             else:
-                return f"❌ Yerel kaynak bulunamadi: {yerel}"
+                return f"âŒ Yerel kaynak bulunamadi: {yerel}"
         else:
-            return f"❌ Bilinmeyen kaynak formati: {kaynak}"
+            return f"âŒ Bilinmeyen kaynak formati: {kaynak}"
 
         # plugin.yaml olustur (yoksa)
         yaml_yol = hedef / "plugin.yaml"
@@ -199,13 +199,13 @@ def yukle(ad: str) -> str:
         # Motor'a yeniden yukle
         _motora_kaydet(ad)
 
-        return f'✅ "{ad}" basariyla yuklendi ve aktif.'
+        return f'âœ… "{ad}" basariyla yuklendi ve aktif.'
     except Exception as e:
         logger.error("Plugin yukleme hatasi: %s", e)
         # Temizlik
         if hedef.exists():
             shutil.rmtree(str(hedef), ignore_errors=True)
-        return f"❌ Yukleme basarisiz: {e}"
+        return f"âŒ Yukleme basarisiz: {e}"
 
 
 def paylas(ad: str, kaynak: str, aciklama: str = "", yazar: str = "") -> str:
@@ -215,12 +215,12 @@ def paylas(ad: str, kaynak: str, aciklama: str = "", yazar: str = "") -> str:
     """
     plugin_yolu = PLUGIN_DIZINI / ad
     if not plugin_yolu.exists():
-        return f'❌ "{ad}" plugin dizini bulunamadi.'
+        return f'âŒ "{ad}" plugin dizini bulunamadi.'
 
     plugins = _katalog_yukle()
     for p in plugins:
         if p.get("ad", "").lower() == ad.lower():
-            return f'ℹ️ "{ad}" zaten katalogda.'
+            return f'â„¹ï¸ "{ad}" zaten katalogda.'
 
     # plugin.yaml'dan bilgi al
     yaml_yol = plugin_yolu / "plugin.yaml"
@@ -257,10 +257,10 @@ def paylas(ad: str, kaynak: str, aciklama: str = "", yazar: str = "") -> str:
     with open(KATALOG_DOSYASI, "w", encoding="utf-8") as f:
         json.dump(plugins, f, indent=2, ensure_ascii=False)
 
-    return f'✅ "{ad}" katalog\'a eklendi. Katalog JSON: {KATALOG_DOSYASI}'
+    return f'âœ… "{ad}" katalog\'a eklendi. Katalog JSON: {KATALOG_DOSYASI}'
 
 
-# ── Yardimci fonksiyonlar ──────────────────────────────────────────────
+# â”€â”€ Yardimci fonksiyonlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _yuklu_mi(ad: str) -> bool:
@@ -270,7 +270,7 @@ def _yuklu_mi(ad: str) -> bool:
 
 def _varsayilan_yaml_olustur(dizin: Path, p: dict) -> None:
     """Plugin icin varsayilan plugin.yaml olustur."""
-    yaml_icerik = f"""# plugin.yaml — {p.get('ad', '?')}
+    yaml_icerik = f"""# plugin.yaml â€” {p.get('ad', '?')}
 name: "{p.get('ad', '?')}"
 version: "{p.get('versiyon', '1.0.0')}"
 description: "{p.get('aciklama', '')}"
@@ -300,7 +300,7 @@ def _motora_kaydet(ad: str) -> None:
         )
 
 
-# ── Motor tool'lari ────────────────────────────────────────────────────
+# â”€â”€ Motor tool'lari â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def motor_kaydet(motor) -> None:
@@ -333,7 +333,7 @@ def motor_kaydet(motor) -> None:
         logger.warning("[Marketplace] Motor kayit hatasi: %s", e)
 
 
-# ── CLI (dogrudan calistirma) ──────────────────────────────────────────
+# â”€â”€ CLI (dogrudan calistirma) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
     import sys

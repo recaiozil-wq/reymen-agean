@@ -1,13 +1,13 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-reymen/core/session_search.py — Session Full-Text Search (FTS5).
+reymen/core/session_search.py â€” Session Full-Text Search (FTS5).
 
-session.db içindeki session_messages tablosunda FTS5 ile hızlı arama yapar.
-Mevcut FTS5 tabloları (session_messages_fts, session_messages_trigram) kullanılır.
+session.db iÃ§indeki session_messages tablosunda FTS5 ile hÄ±zlÄ± arama yapar.
+Mevcut FTS5 tablolarÄ± (session_messages_fts, session_messages_trigram) kullanÄ±lÄ±r.
 
-Kullanım:
+KullanÄ±m:
     from reymen.core.session_search import session_ara
-    sonuclar = session_ara("hata düzeltme", limit=10)
+    sonuclar = session_ara("hata dÃ¼zeltme", limit=10)
 """
 
 from __future__ import annotations
@@ -26,7 +26,7 @@ DB_PATH = Path(__file__).parent.parent.parent / "reymen" / "merkez_db" / "sessio
 
 @contextmanager
 def _db():
-    """SQLite bağlam yöneticisi."""
+    """SQLite baÄŸlam yÃ¶neticisi."""
     con = sqlite3.connect(str(DB_PATH), timeout=10)
     con.row_factory = sqlite3.Row
     con.execute("PRAGMA journal_mode=WAL")
@@ -42,7 +42,7 @@ def _db():
 
 
 def _fts5_mevcut_mu() -> bool:
-    """FTS5 tabloları mevcut mu kontrol et."""
+    """FTS5 tablolarÄ± mevcut mu kontrol et."""
     try:
         with _db() as con:
             cursor = con.execute(
@@ -58,21 +58,21 @@ def session_ara(
     limit: int = 10,
     session_id: Optional[str] = None,
 ) -> List[Dict[str, Any]]:
-    """Session mesajlarında FTS5 ile full-text arama yap.
+    """Session mesajlarÄ±nda FTS5 ile full-text arama yap.
 
     Args:
         sorgu: Arama sorgusu (FTS5 syntax destekler)
-        limit: Maksimum sonuç sayısı
-        session_id: Belirli bir session ile sınırla (None = tüm sessionlar)
+        limit: Maksimum sonuÃ§ sayÄ±sÄ±
+        session_id: Belirli bir session ile sÄ±nÄ±rla (None = tÃ¼m sessionlar)
 
     Returns:
-        Sonuç listesi: [{"session_id": ..., "rol": ..., "icerik": ..., "skor": ..., "created_at": ...}]
+        SonuÃ§ listesi: [{"session_id": ..., "rol": ..., "icerik": ..., "skor": ..., "created_at": ...}]
     """
     if not sorgu.strip():
         return []
 
-    # FTS5 sorgusunu güvenli hale getir
-    # Özel karakterleri escape et, sadece kelime arama
+    # FTS5 sorgusunu gÃ¼venli hale getir
+    # Ã–zel karakterleri escape et, sadece kelime arama
     guvenli_sorgu = _fts5_sorgu_hazirla(sorgu)
 
     try:
@@ -93,7 +93,7 @@ def session_ara(
                     (guvenli_sorgu, session_id, limit),
                 )
             else:
-                # Tüm sessionlarda ara
+                # TÃ¼m sessionlarda ara
                 cursor = con.execute(
                     """
                     SELECT m.session_id, m.rol, m.icerik, m.created_at,
@@ -113,7 +113,7 @@ def session_ara(
                     {
                         "session_id": row["session_id"],
                         "rol": row["rol"],
-                        "icerik": row["icerik"][:500],  # İlk 500 karakter
+                        "icerik": row["icerik"][:500],  # Ä°lk 500 karakter
                         "skor": round(row["skor"], 4) if row["skor"] else 0,
                         "created_at": row["created_at"],
                     }
@@ -122,10 +122,10 @@ def session_ara(
             return sonuclar
 
     except sqlite3.OperationalError as e:
-        logger.warning("FTS5 arama hatası: %s — trigram fallback denenecek", e)
+        logger.warning("FTS5 arama hatasÄ±: %s â€” trigram fallback denenecek", e)
         return _trigram_ara(sorgu, limit, session_id)
     except Exception as e:
-        logger.error("Session arama hatası: %s", e)
+        logger.error("Session arama hatasÄ±: %s", e)
         return []
 
 
@@ -173,36 +173,36 @@ def _trigram_ara(
                 )
             return sonuclar
     except Exception as e:
-        logger.error("Trigram arama hatası: %s", e)
+        logger.error("Trigram arama hatasÄ±: %s", e)
         return []
 
 
 def _fts5_sorgu_hazirla(sorgu: str) -> str:
-    """FTS5 sorgusunu güvenli hale getir.
+    """FTS5 sorgusunu gÃ¼venli hale getir.
 
-    FTS5 özel karakterleri: " * ( ) OR AND NOT NEAR
-    Kelimeleri tırnak içine alarak tam eşleşme arar.
+    FTS5 Ã¶zel karakterleri: " * ( ) OR AND NOT NEAR
+    Kelimeleri tÄ±rnak iÃ§ine alarak tam eÅŸleÅŸme arar.
     """
-    # Özel karakterleri temizle
+    # Ã–zel karakterleri temizle
     temiz = sorgu.replace('"', "").replace("*", "").replace("(", "").replace(")", "")
 
-    # Kelimeleri ayır
+    # Kelimeleri ayÄ±r
     kelimeler = temiz.split()
 
     if not kelimeler:
         return sorgu
 
-    # Her kelimeyi önek arama (*) ile sarmala
-    # FTS5: "kelime1" "kelime2" → AND mantığı
+    # Her kelimeyi Ã¶nek arama (*) ile sarmala
+    # FTS5: "kelime1" "kelime2" â†’ AND mantÄ±ÄŸÄ±
     fts_sorgu = " ".join(f'"{k}"*' for k in kelimeler)
     return fts_sorgu
 
 
 def session_listele(limit: int = 20) -> List[Dict[str, Any]]:
-    """Tüm session'ları listele.
+    """TÃ¼m session'larÄ± listele.
 
     Args:
-        limit: Maksimum session sayısı
+        limit: Maksimum session sayÄ±sÄ±
 
     Returns:
         Session listesi: [{"id": ..., "source": ..., "started_at": ..., "message_count": ...}]
@@ -237,16 +237,16 @@ def session_listele(limit: int = 20) -> List[Dict[str, Any]]:
                 )
             return sonuclar
     except Exception as e:
-        logger.error("Session listeleme hatası: %s", e)
+        logger.error("Session listeleme hatasÄ±: %s", e)
         return []
 
 
 def session_mesajlari(session_id: str, limit: int = 50) -> List[Dict[str, Any]]:
-    """Bir session'ın mesajlarını getir.
+    """Bir session'Ä±n mesajlarÄ±nÄ± getir.
 
     Args:
         session_id: Session ID
-        limit: Maksimum mesaj sayısı
+        limit: Maksimum mesaj sayÄ±sÄ±
 
     Returns:
         Mesaj listesi
@@ -277,7 +277,7 @@ def session_mesajlari(session_id: str, limit: int = 50) -> List[Dict[str, Any]]:
                 )
             return sonuclar
     except Exception as e:
-        logger.error("Session mesaj getirme hatası: %s", e)
+        logger.error("Session mesaj getirme hatasÄ±: %s", e)
         return []
 
 
@@ -293,7 +293,7 @@ def session_istatistik() -> Dict[str, Any]:
                 "SELECT COUNT(*) FROM session_tool_calls"
             ).fetchone()[0]
 
-            # FTS5 tablo var mı
+            # FTS5 tablo var mÄ±
             fts_var = _fts5_mevcut_mu()
 
             return {
@@ -304,18 +304,18 @@ def session_istatistik() -> Dict[str, Any]:
                 "db_yolu": str(DB_PATH),
             }
     except Exception as e:
-        logger.error("Session istatistik hatası: %s", e)
+        logger.error("Session istatistik hatasÄ±: %s", e)
         return {"hata": str(e)}
 
 
-# ── CLI ──────────────────────────────────────────────────────────────
+# â”€â”€ CLI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
     import sys
     import json
 
     if len(sys.argv) < 2:
-        print("Kullanım: python -m reymen.core.session_search <sorgu> [--limit N]")
+        print("KullanÄ±m: python -m reymen.core.session_search <sorgu> [--limit N]")
         print("          python -m reymen.core.session_search --list")
         print("          python -m reymen.core.session_search --stats")
         sys.exit(1)
@@ -323,7 +323,7 @@ if __name__ == "__main__":
     if sys.argv[1] == "--list":
         for s in session_listele():
             print(
-                f"  [{s['id'][:8]}] {s.get('title', 'Başlıksız')} — {s['message_count']} mesaj"
+                f"  [{s['id'][:8]}] {s.get('title', 'BaÅŸlÄ±ksÄ±z')} â€” {s['message_count']} mesaj"
             )
     elif sys.argv[1] == "--stats":
         print(json.dumps(session_istatistik(), indent=2, ensure_ascii=False))
@@ -337,11 +337,11 @@ if __name__ == "__main__":
 
         sonuclar = session_ara(sorgu, limit=limit)
         print(f"\n{'='*60}")
-        print(f"  Arama: '{sorgu}' — {len(sonuclar)} sonuç")
+        print(f"  Arama: '{sorgu}' â€” {len(sonuclar)} sonuÃ§")
         print(f"{'='*60}\n")
         for i, s in enumerate(sonuclar, 1):
             print(f"  [{i}] Session: {s['session_id'][:8]}...")
             print(f"      Rol: {s['rol']}")
             print(f"      Skor: {s['skor']}")
-            print(f"      İçerik: {s['icerik'][:200]}...")
+            print(f"      Ä°Ã§erik: {s['icerik'][:200]}...")
             print()

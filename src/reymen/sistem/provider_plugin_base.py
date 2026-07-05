@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-provider_plugin_base.py — ReYMeN Provider Plugin Base.
+provider_plugin_base.py â€” ReYMeN Provider Plugin Base.
 
 Soyut temel sinif (ABC): `ProviderPluginBase`.
 
@@ -44,7 +44,7 @@ class ProviderPluginBase(abc.ABC):
         _active_provider: Su an aktif olan provider adi.
     """
 
-    # ── Zorunlu sinif ozellikleri (override edilmelidir) ──────────────────
+    # â”€â”€ Zorunlu sinif ozellikleri (override edilmelidir) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     name: str = ""
     version: str = ""
 
@@ -64,7 +64,7 @@ class ProviderPluginBase(abc.ABC):
         self._providers: list[str] = []
         self._active_provider: str | None = None
 
-    # ── Zorunlu metotlar ──────────────────────────────────────────────────
+    # â”€â”€ Zorunlu metotlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @abc.abstractmethod
     def init(self, config: dict | None = None) -> bool:
@@ -98,7 +98,7 @@ class ProviderPluginBase(abc.ABC):
         """
         ...
 
-    # ── Provider listesi ve secimi ─────────────────────────────────────────
+    # â”€â”€ Provider listesi ve secimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def get_providers(self) -> list[str]:
         """Desteklenen provider adlarini dondur.
@@ -135,7 +135,7 @@ class ProviderPluginBase(abc.ABC):
         )
         return False
 
-    # ── Opsiyonel yardimci metotlar ───────────────────────────────────────
+    # â”€â”€ Opsiyonel yardimci metotlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def __repr__(self) -> str:
         active = self._active_provider or "(none)"

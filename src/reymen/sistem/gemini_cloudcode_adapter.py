@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
-"""gemini_cloudcode_adapter.py — Gemini Cloud Code Adaptörü.
+﻿# -*- coding: utf-8 -*-
+"""gemini_cloudcode_adapter.py â€” Gemini Cloud Code AdaptÃ¶rÃ¼.
 
-Google Cloud Vertex AI üzerinden Gemini modellerine erişim.
-Standart Gemini API'den farkı: proje+lokasyon kimlik doğrulaması kullanır.
+Google Cloud Vertex AI Ã¼zerinden Gemini modellerine eriÅŸim.
+Standart Gemini API'den farkÄ±: proje+lokasyon kimlik doÄŸrulamasÄ± kullanÄ±r.
 ENV: GCP_PROJECT_ID, GCP_LOCATION, GOOGLE_APPLICATION_CREDENTIALS
 """
 
@@ -23,13 +23,13 @@ _TOKEN_CACHE: dict = {"token": "", "bitis": 0.0}
 
 
 def _gcp_token() -> str:
-    """GCP erişim token'ı al (Application Default Credentials)."""
+    """GCP eriÅŸim token'Ä± al (Application Default Credentials)."""
     import time
 
     if time.time() < _TOKEN_CACHE["bitis"] and _TOKEN_CACHE["token"]:
         return _TOKEN_CACHE["token"]
 
-    # 1. Servis hesabı JSON yolu tanımlıysa
+    # 1. Servis hesabÄ± JSON yolu tanÄ±mlÄ±ysa
     cred_json = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "")
     if cred_json and os.path.exists(cred_json):
         try:
@@ -85,7 +85,7 @@ def _gcp_token() -> str:
 
 
 class GeminiCloudCodeAdapter:
-    """Vertex AI üzerinden Gemini modeli."""
+    """Vertex AI Ã¼zerinden Gemini modeli."""
 
     DEFAULT_MODEL = "gemini-1.5-pro"
 
@@ -107,16 +107,16 @@ class GeminiCloudCodeAdapter:
         )
 
     def _openai_to_vertex(self, sistem: str, mesajlar: list[dict]) -> dict:
-        """OpenAI formatını Vertex AI Gemini formatına dönüştür."""
+        """OpenAI formatÄ±nÄ± Vertex AI Gemini formatÄ±na dÃ¶nÃ¼ÅŸtÃ¼r."""
         icerikler = []
         if sistem:
             icerikler.append(
                 {
                     "role": "user",
-                    "parts": [{"text": f"[SİSTEM]\n{sistem}\n[/SİSTEM]"}],
+                    "parts": [{"text": f"[SÄ°STEM]\n{sistem}\n[/SÄ°STEM]"}],
                 }
             )
-            icerikler.append({"role": "model", "parts": [{"text": "Anladım."}]})
+            icerikler.append({"role": "model", "parts": [{"text": "AnladÄ±m."}]})
 
         for msg in mesajlar:
             rol = "user" if msg["role"] == "user" else "model"
@@ -130,9 +130,9 @@ class GeminiCloudCodeAdapter:
     def tamamla(self, sistem: str, mesajlar: list[dict], **kwargs) -> dict:
         token = _gcp_token()
         if not token:
-            return {"error": "GCP token alınamadı. gcloud auth login yapın."}
+            return {"error": "GCP token alÄ±namadÄ±. gcloud auth login yapÄ±n."}
         if not self.project:
-            return {"error": "GCP_PROJECT_ID ayarlanmamış."}
+            return {"error": "GCP_PROJECT_ID ayarlanmamÄ±ÅŸ."}
 
         govde = self._openai_to_vertex(sistem, mesajlar)
         govde["generationConfig"].update(kwargs)
@@ -160,7 +160,7 @@ class GeminiCloudCodeAdapter:
         if adaylar:
             parcalar = adaylar[0].get("content", {}).get("parts", [])
             metin = " ".join(p.get("text", "") for p in parcalar)
-            return metin.strip() if metin.strip() else "[Gemini Vertex]: Boş yanıt"
+            return metin.strip() if metin.strip() else "[Gemini Vertex]: BoÅŸ yanÄ±t"
         return f"[Gemini Vertex]: {yanit}"
 
     def yapilandirildi_mi(self) -> bool:
@@ -171,7 +171,7 @@ class GeminiCloudCodeAdapter:
             return {"ok": False, "sebep": "GCP_PROJECT_ID eksik"}
         token = _gcp_token()
         if not token:
-            return {"ok": False, "sebep": "GCP token alınamadı"}
+            return {"ok": False, "sebep": "GCP token alÄ±namadÄ±"}
         yanit = self.tamamla(
             "test", [{"role": "user", "content": "hi"}], maxOutputTokens=5
         )
@@ -182,5 +182,5 @@ class GeminiCloudCodeAdapter:
 
 if __name__ == "__main__":
     adapter = GeminiCloudCodeAdapter()
-    print(f"Proje: {GCP_PROJECT or '(ayarlanmamış)'}")
-    print(f"Yapılandırıldı: {adapter.yapilandirildi_mi()}")
+    print(f"Proje: {GCP_PROJECT or '(ayarlanmamÄ±ÅŸ)'}")
+    print(f"YapÄ±landÄ±rÄ±ldÄ±: {adapter.yapilandirildi_mi()}")

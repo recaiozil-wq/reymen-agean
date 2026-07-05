@@ -1,4 +1,4 @@
-"""ReYMeNCLI mixin module — Agent settings (personality, reasoning, fast, busy, gquota, profile)."""
+﻿"""ReYMeNCLI mixin module â€” Agent settings (personality, reasoning, fast, busy, gquota, profile)."""
 
 import logging
 import os
@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 
 class MixinAgentSettings:
-    """ReYMeNCLI Agent settings — personality, reasoning, fast, busy, gquota, profile."""
+    """ReYMeNCLI Agent settings â€” personality, reasoning, fast, busy, gquota, profile."""
 
     def _handle_profile_command(self):
         """Display active profile name and home directory."""
@@ -90,7 +90,7 @@ class MixinAgentSettings:
             pct = max(0.0, min(1.0, b.remaining_fraction))
             width = 20
             filled = int(round(pct * width))
-            bar = "▓" * filled + "░" * (width - filled)
+            bar = "â–“" * filled + "â–‘" * (width - filled)
             pct_str = f"{int(pct * 100):3d}%"
             header = b.model_id
             if b.token_type:
@@ -113,7 +113,7 @@ class MixinAgentSettings:
                     print("(^_^)b Personality cleared (saved to config)")
                 else:
                     print("(^_^) Personality cleared (session only)")
-                print("  No personality overlay — using base agent behavior.")
+                print("  No personality overlay â€” using base agent behavior.")
             elif personality_name in self.personalities:
                 self.system_prompt = self._resolve_personality_prompt(
                     self.personalities[personality_name]
@@ -155,7 +155,7 @@ class MixinAgentSettings:
             print()
 
     def _handle_reasoning_command(self, cmd: str):
-        """Handle /reasoning — manage effort level and display toggle.
+        """Handle /reasoning â€” manage effort level and display toggle.
 
         Usage:
             /reasoning              Show current effort level and display state
@@ -174,7 +174,7 @@ class MixinAgentSettings:
                 level = "none (disabled)"
             else:
                 level = rc.get("effort", "medium")
-            display_state = "on ✓" if self.show_reasoning else "off"
+            display_state = "on âœ“" if self.show_reasoning else "off"
             _cprint(f"  {_ACCENT}Reasoning effort:  {level}{_RST}")
             _cprint(f"  {_ACCENT}Reasoning display: {display_state}{_RST}")
             _cprint(
@@ -190,7 +190,7 @@ class MixinAgentSettings:
             if self.agent:
                 self.agent.reasoning_callback = self._current_reasoning_callback()
             save_config_value("display.show_reasoning", True)
-            _cprint(f"  {_ACCENT}✓ Reasoning display: ON (saved){_RST}")
+            _cprint(f"  {_ACCENT}âœ“ Reasoning display: ON (saved){_RST}")
             _cprint(
                 f"  {_DIM}  Model thinking will be shown during and after each response.{_RST}"
             )
@@ -200,7 +200,7 @@ class MixinAgentSettings:
             if self.agent:
                 self.agent.reasoning_callback = self._current_reasoning_callback()
             save_config_value("display.show_reasoning", False)
-            _cprint(f"  {_ACCENT}✓ Reasoning display: OFF (saved){_RST}")
+            _cprint(f"  {_ACCENT}âœ“ Reasoning display: OFF (saved){_RST}")
             return
 
         # Effort level change
@@ -218,15 +218,15 @@ class MixinAgentSettings:
 
         if save_config_value("agent.reasoning_effort", arg):
             _cprint(
-                f"  {_ACCENT}✓ Reasoning effort set to '{arg}' (saved to config){_RST}"
+                f"  {_ACCENT}âœ“ Reasoning effort set to '{arg}' (saved to config){_RST}"
             )
         else:
             _cprint(
-                f"  {_ACCENT}✓ Reasoning effort set to '{arg}' (session only){_RST}"
+                f"  {_ACCENT}âœ“ Reasoning effort set to '{arg}' (session only){_RST}"
             )
 
     def _handle_busy_command(self, cmd: str):
-        """Handle /busy — control what Enter does while ReYMeN is working.
+        """Handle /busy â€” control what Enter does while ReYMeN is working.
 
         Usage:
             /busy               Show current busy input mode
@@ -263,14 +263,14 @@ class MixinAgentSettings:
             else:
                 behavior = "Enter will interrupt the current run while ReYMeN is busy."
             _cprint(
-                f"  {_ACCENT}✓ Busy input mode set to '{arg}' (saved to config){_RST}"
+                f"  {_ACCENT}âœ“ Busy input mode set to '{arg}' (saved to config){_RST}"
             )
             _cprint(f"  {_DIM}{behavior}{_RST}")
         else:
-            _cprint(f"  {_ACCENT}✓ Busy input mode set to '{arg}' (session only){_RST}")
+            _cprint(f"  {_ACCENT}âœ“ Busy input mode set to '{arg}' (session only){_RST}")
 
     def _handle_fast_command(self, cmd: str):
-        """Handle /fast — toggle fast mode (OpenAI Priority Processing / Anthropic Fast Mode)."""
+        """Handle /fast â€” toggle fast mode (OpenAI Priority Processing / Anthropic Fast Mode)."""
         if not self._fast_command_available():
             _cprint(
                 "  (._.) /fast is only available for models that support fast mode (OpenAI Priority Processing or Anthropic Fast Mode)."
@@ -316,10 +316,10 @@ class MixinAgentSettings:
         self.agent = None  # Force agent re-init with new service-tier config
         if save_config_value("agent.service_tier", saved_value):
             _cprint(
-                f"  {_ACCENT}✓ {feature_name} set to {label} (saved to config){_RST}"
+                f"  {_ACCENT}âœ“ {feature_name} set to {label} (saved to config){_RST}"
             )
         else:
-            _cprint(f"  {_ACCENT}✓ {feature_name} set to {label} (session only){_RST}")
+            _cprint(f"  {_ACCENT}âœ“ {feature_name} set to {label} (session only){_RST}")
 
 
 __all__ = ["MixinAgentSettings"]

@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-windows_events.py — Windows Otomasyon Event Sistemi
+windows_events.py â€” Windows Otomasyon Event Sistemi
 
-Modüller arası haberleşme için merkezi event bus.
-Her modül olay bildirir, diğer modüller dinler.
+ModÃ¼ller arasÄ± haberleÅŸme iÃ§in merkezi event bus.
+Her modÃ¼l olay bildirir, diÄŸer modÃ¼ller dinler.
 """
 
 from __future__ import annotations
@@ -75,7 +75,7 @@ class WindowsEventBus:
             self._gecmis.clear()
 
 
-# ── Singleton ─────────────────────────────────────────────────────────────────
+# â”€â”€ Singleton â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _event_bus = None
 _event_bus_lock = threading.Lock()
@@ -90,7 +90,7 @@ def event_bus_al():
     return _event_bus
 
 
-# ── Olay tipleri ──────────────────────────────────────────────────────────────
+# â”€â”€ Olay tipleri â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 OLAY_HATA = "hata"
 OLAY_NISAN = "nisan"

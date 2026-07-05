@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-security_engine.py — SecurityEngine.
+security_engine.py â€” SecurityEngine.
 Guvenlik motoru: tarama, risk analizi, raporlama ve duzeltme.
 ReYMeN kimligi: Turkce docstring, try/except, class-based.
 """

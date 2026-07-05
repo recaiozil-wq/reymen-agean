@@ -1,14 +1,14 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-skill_activator.py — Otomatik skill aktivasyon motoru.
+skill_activator.py â€” Otomatik skill aktivasyon motoru.
 
-Gelen sorguya göre ilgili skill'leri otomatik bulup aktif hale getirir.
-SkillActivator sınıfı:
-- aktif_et / devre_disina_al: Skill aktivasyon kontrolü
-- sorgudan_aktif_et: Gelen sorgudaki kelimeleri skill etiketleriyle eşleştir
+Gelen sorguya gÃ¶re ilgili skill'leri otomatik bulup aktif hale getirir.
+SkillActivator sÄ±nÄ±fÄ±:
+- aktif_et / devre_disina_al: Skill aktivasyon kontrolÃ¼
+- sorgudan_aktif_et: Gelen sorgudaki kelimeleri skill etiketleriyle eÅŸleÅŸtir
 - durum: Aktif skill listesi
 
-Kullanım:
+KullanÄ±m:
     from skill_activator import SkillActivator
     act = SkillActivator()
     aktif_idler = act.sorgudan_aktif_et("ag izleme ve port tarama")
@@ -26,11 +26,11 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from src.reymen.cereyan.skill_library import SkillLibrary, _yazma_kilit
+from reymen.cereyan.skill_library import SkillLibrary, _yazma_kilit
 
 logger = logging.getLogger(__name__)
 
-# ── Varsayılan yollar ───────────────────────────────────────────────────────
+# â”€â”€ VarsayÄ±lan yollar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 ROOT = Path(__file__).parent.resolve()
 DB_YOLU = ROOT / ".ReYMeN" / "skill_library.db"
 
@@ -51,21 +51,21 @@ def _baglanti():
         con.close()
 
 
-# ── Yardımcı: Anahtar Kelime Çıkarma ───────────────────────────────────────
+# â”€â”€ YardÄ±mcÄ±: Anahtar Kelime Ã‡Ä±karma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 TURKCE_KARAKTER_MAP = {
-    "ı": "i",
-    "İ": "i",
-    "ğ": "g",
-    "Ğ": "g",
-    "ü": "u",
-    "Ü": "u",
-    "ş": "s",
-    "Ş": "s",
-    "ö": "o",
-    "Ö": "o",
-    "ç": "c",
-    "Ç": "c",
+    "Ä±": "i",
+    "Ä°": "i",
+    "ÄŸ": "g",
+    "Ä": "g",
+    "Ã¼": "u",
+    "Ãœ": "u",
+    "ÅŸ": "s",
+    "Å": "s",
+    "Ã¶": "o",
+    "Ã–": "o",
+    "Ã§": "c",
+    "Ã‡": "c",
 }
 
 STOP_KELIMELER: set[str] = {
@@ -74,7 +74,7 @@ STOP_KELIMELER: set[str] = {
     "ve",
     "veya",
     "ile",
-    "için",
+    "iÃ§in",
     "ile",
     "ama",
     "fakat",
@@ -85,25 +85,25 @@ STOP_KELIMELER: set[str] = {
     "de",
     "mi",
     "mu",
-    "mı",
+    "mÄ±",
     "mu",
-    "nı",
+    "nÄ±",
     "ni",
     "nu",
-    "nü",
+    "nÃ¼",
     "en",
-    "çok",
+    "Ã§ok",
     "daha",
     "biraz",
-    "hiç",
-    "tüm",
+    "hiÃ§",
+    "tÃ¼m",
     "her",
     "olan",
-    "olduğu",
+    "olduÄŸu",
     "olacak",
     "yap",
     "yapma",
-    "nasıl",
+    "nasÄ±l",
     "ne",
     "nerede",
     "neden",
@@ -119,38 +119,38 @@ STOP_KELIMELER: set[str] = {
     "seni",
     "bizi",
     "sizi",
-    "onları",
+    "onlarÄ±",
     "benim",
     "senin",
     "bizim",
     "sizin",
     "onun",
-    "şu",
-    "şunu",
-    "şuna",
+    "ÅŸu",
+    "ÅŸunu",
+    "ÅŸuna",
     "bunu",
     "buna",
 }
 
 TURKCE_KOK_MAP = {
-    # Fiil kökleri
+    # Fiil kÃ¶kleri
     "izleme": "izle",
     "izler": "izle",
     "izledi": "izle",
     "tarama": "tara",
     "tarar": "tara",
-    "taradı": "tara",
-    "yönetme": "yonet",
-    "yönetir": "yonet",
-    "yönetimi": "yonet",
+    "taradÄ±": "tara",
+    "yÃ¶netme": "yonet",
+    "yÃ¶netir": "yonet",
+    "yÃ¶netimi": "yonet",
     "kontrol": "kontrol",
-    "kontrolü": "kontrol",
+    "kontrolÃ¼": "kontrol",
     "kontrol et": "kontrol",
-    "güvenlik": "guvenlik",
-    "güvenli": "guvenlik",
-    "bağlantı": "baglanti",
-    "bağlan": "baglan",
-    "bağlantıları": "baglanti",
+    "gÃ¼venlik": "guvenlik",
+    "gÃ¼venli": "guvenlik",
+    "baÄŸlantÄ±": "baglanti",
+    "baÄŸlan": "baglan",
+    "baÄŸlantÄ±larÄ±": "baglanti",
     "analiz": "analiz",
     "analizi": "analiz",
     "analiz et": "analiz",
@@ -158,56 +158,56 @@ TURKCE_KOK_MAP = {
     "raporlama": "rapor",
     "log": "log",
     "loglama": "log",
-    "logları": "log",
-    "kayıt": "kayit",
+    "loglarÄ±": "log",
+    "kayÄ±t": "kayit",
     "kaydet": "kayit",
-    "kayıtları": "kayit",
+    "kayÄ±tlarÄ±": "kayit",
     "dosya": "dosya",
-    "dosyaları": "dosya",
+    "dosyalarÄ±": "dosya",
     "veri": "veri",
     "verileri": "veri",
     "sistem": "sistem",
     "sistemi": "sistem",
-    "ağ": "ag",
-    "ağı": "ag",
+    "aÄŸ": "ag",
+    "aÄŸÄ±": "ag",
     "port": "port",
-    "portları": "port",
+    "portlarÄ±": "port",
     "servis": "servis",
     "servisleri": "servis",
     "bildirim": "bildirim",
     "bildirimi": "bildirim",
-    "uyarı": "uyari",
+    "uyarÄ±": "uyari",
     "uyar": "uyari",
-    "uyarıları": "uyari",
+    "uyarÄ±larÄ±": "uyari",
     "otomatik": "otomatik",
     "oto": "otomatik",
     "zaman": "zaman",
-    "zamanlı": "zaman",
-    "görev": "gorev",
-    "görevi": "gorev",
+    "zamanlÄ±": "zaman",
+    "gÃ¶rev": "gorev",
+    "gÃ¶revi": "gorev",
     "plan": "plan",
     "planlama": "plan",
     "yedek": "yedek",
     "yedekleme": "yedek",
-    "şifre": "sifre",
-    "şifreleme": "sifre",
-    "şifreli": "sifre",
+    "ÅŸifre": "sifre",
+    "ÅŸifreleme": "sifre",
+    "ÅŸifreli": "sifre",
     "kimlik": "kimlik",
-    "kimlik doğrulama": "kimlik",
+    "kimlik doÄŸrulama": "kimlik",
     "yetki": "yetki",
     "yetkilendirme": "yetki",
     "izin": "izin",
     "izinler": "izin",
-    "erişim": "erisim",
-    "erişimi": "erisim",
+    "eriÅŸim": "erisim",
+    "eriÅŸimi": "erisim",
     "proxy": "proxy",
-    "proxy ayarları": "proxy",
+    "proxy ayarlarÄ±": "proxy",
     "dns": "dns",
     "dns sorgu": "dns",
     "cache": "cache",
-    "önbellek": "cache",
-    "monitör": "monitor",
-    "monitörü": "monitor",
+    "Ã¶nbellek": "cache",
+    "monitÃ¶r": "monitor",
+    "monitÃ¶rÃ¼": "monitor",
     "performans": "performans",
     "optimizasyon": "optimizasyon",
 }
@@ -215,33 +215,33 @@ TURKCE_KOK_MAP = {
 
 def _anahtar_kelimeler(metin: str) -> list[str]:
     """
-    Metni normalize et ve anlamlı anahtar kelimelere ayır.
+    Metni normalize et ve anlamlÄ± anahtar kelimelere ayÄ±r.
 
-    - Türkçe karakterleri ASCII'ye çevir
-    - Noktalama işaretlerini temizle
-    - Stop kelimeleri çıkar
-    - Kök bulma uygula
+    - TÃ¼rkÃ§e karakterleri ASCII'ye Ã§evir
+    - Noktalama iÅŸaretlerini temizle
+    - Stop kelimeleri Ã§Ä±kar
+    - KÃ¶k bulma uygula
     """
     if not metin or not metin.strip():
         return []
 
     temiz = metin.lower().strip()
 
-    # Türkçe karakter normalize
+    # TÃ¼rkÃ§e karakter normalize
     for tr, ascii_karsilik in TURKCE_KARAKTER_MAP.items():
         temiz = temiz.replace(tr, ascii_karsilik)
 
-    # Noktalama işaretlerini kaldır
-    for ch in '.,!?;:()[]{}"\'"`”“‘’…––/\\|@#$%^&*+=<>~':
+    # Noktalama iÅŸaretlerini kaldÄ±r
+    for ch in '.,!?;:()[]{}"\'"`â€â€œâ€˜â€™â€¦â€“â€“/\\|@#$%^&*+=<>~':
         temiz = temiz.replace(ch, " ")
 
-    # Kelimelere ayır, kısa ve stop kelimeleri çıkar
+    # Kelimelere ayÄ±r, kÄ±sa ve stop kelimeleri Ã§Ä±kar
     ham_kelimeler = [k for k in temiz.split() if len(k) > 1]
 
-    # Stop kelimeleri çıkar
+    # Stop kelimeleri Ã§Ä±kar
     anlamli = [k for k in ham_kelimeler if k not in STOP_KELIMELER]
 
-    # Kök bulma (eğer varsa)
+    # KÃ¶k bulma (eÄŸer varsa)
     kokler = []
     for k in anlamli:
         if k in TURKCE_KOK_MAP:
@@ -264,15 +264,15 @@ def _eslesme_skoru(
     sorgu_kelimeleri: list[str], skill_etiketleri: list[str], skill_baslik: str
 ) -> float:
     """
-    Sorgu kelimeleri ile skill etiketleri arasındaki eşleşme skorunu hesapla.
+    Sorgu kelimeleri ile skill etiketleri arasÄ±ndaki eÅŸleÅŸme skorunu hesapla.
 
-    3 faktör:
-    1. Doğrudan etiket eşleşmesi (en yüksek ağırlık)
-    2. Başlık eşleşmesi (orta ağırlık)
-    3. Kısmi eşleşme (düşük ağırlık)
+    3 faktÃ¶r:
+    1. DoÄŸrudan etiket eÅŸleÅŸmesi (en yÃ¼ksek aÄŸÄ±rlÄ±k)
+    2. BaÅŸlÄ±k eÅŸleÅŸmesi (orta aÄŸÄ±rlÄ±k)
+    3. KÄ±smi eÅŸleÅŸme (dÃ¼ÅŸÃ¼k aÄŸÄ±rlÄ±k)
 
     Returns:
-        0.0 - 1.0 arası skor
+        0.0 - 1.0 arasÄ± skor
     """
     if not sorgu_kelimeleri:
         return 0.0
@@ -285,7 +285,7 @@ def _eslesme_skoru(
             et_clean = et_clean.replace(tr, ascii_karsilik)
         etiket_normalized.append(et_clean)
 
-    # Başlığı normalize et
+    # BaÅŸlÄ±ÄŸÄ± normalize et
     baslik_normalized = skill_baslik.lower().strip()
     for tr, ascii_karsilik in TURKCE_KARAKTER_MAP.items():
         baslik_normalized = baslik_normalized.replace(tr, ascii_karsilik)
@@ -297,7 +297,7 @@ def _eslesme_skoru(
     if toplam_kelime == 0:
         return 0.0
 
-    # 1) Doğrudan etiket eşleşmesi (ağırlık: 0.5)
+    # 1) DoÄŸrudan etiket eÅŸleÅŸmesi (aÄŸÄ±rlÄ±k: 0.5)
     etiket_eslesen = 0
     for sk in sorgu_kelimeleri:
         for et in etiket_normalized:
@@ -307,7 +307,7 @@ def _eslesme_skoru(
 
     etiket_skor = etiket_eslesen / toplam_kelime if toplam_kelime > 0 else 0.0
 
-    # 2) Başlık eşleşmesi (ağırlık: 0.3)
+    # 2) BaÅŸlÄ±k eÅŸleÅŸmesi (aÄŸÄ±rlÄ±k: 0.3)
     baslik_eslesen = 0
     for sk in sorgu_kelimeleri:
         if sk in baslik_kelimeler:
@@ -317,16 +317,16 @@ def _eslesme_skoru(
 
     baslik_skor = baslik_eslesen / toplam_kelime if toplam_kelime > 0 else 0.0
 
-    # 3) Kısmi eşleşme (ağırlık: 0.2)
-    # Sorgudaki her kelimenin etiket veya başlıkta bir kısmının geçip geçmediğine bakar
+    # 3) KÄ±smi eÅŸleÅŸme (aÄŸÄ±rlÄ±k: 0.2)
+    # Sorgudaki her kelimenin etiket veya baÅŸlÄ±kta bir kÄ±smÄ±nÄ±n geÃ§ip geÃ§mediÄŸine bakar
     kismi_eslesen = 0
     for sk in sorgu_kelimeleri:
-        # 3 karakterden kısa kelimeler için en az 2 karakter eşleşmeli
+        # 3 karakterden kÄ±sa kelimeler iÃ§in en az 2 karakter eÅŸleÅŸmeli
         min_eslesme = 2 if len(sk) <= 3 else 3
         for et in etiket_normalized + list(baslik_kelimeler):
-            # En uzun ortak alt dize yaklaşımı
+            # En uzun ortak alt dize yaklaÅŸÄ±mÄ±
             if len(sk) >= min_eslesme and len(et) >= min_eslesme:
-                # Karakter bazında ortaklık
+                # Karakter bazÄ±nda ortaklÄ±k
                 ortak = sum(1 for c in sk if c in et)
                 if ortak >= min_eslesme:
                     kismi_eslesen += 1
@@ -339,57 +339,57 @@ def _eslesme_skoru(
     return min(skor, 1.0)
 
 
-# ── SkillActivator Sınıfı ──────────────────────────────────────────────────
+# â”€â”€ SkillActivator SÄ±nÄ±fÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class SkillActivator:
     """
     Otomatik skill aktivasyon motoru.
 
-    Gelen sorguya göre ilgili skill'leri otomatik bulup aktif eder.
-    SkillLibrary ile birlikte çalışır; tüm skill verileri ortak DB'de saklanır.
+    Gelen sorguya gÃ¶re ilgili skill'leri otomatik bulup aktif eder.
+    SkillLibrary ile birlikte Ã§alÄ±ÅŸÄ±r; tÃ¼m skill verileri ortak DB'de saklanÄ±r.
     """
 
     def __init__(self, db_yolu: str | Path | None = None):
         """
         Args:
-            db_yolu: Veritabanı yolu (None = varsayılan)
+            db_yolu: VeritabanÄ± yolu (None = varsayÄ±lan)
         """
         self._db_yolu = Path(db_yolu) if db_yolu else DB_YOLU
         self._lib = SkillLibrary(str(self._db_yolu))
         self._aktif_cache: dict[str, dict[str, Any]] | None = None
 
-    # ── Dahili ──────────────────────────────────────────────────────────
+    # â”€â”€ Dahili â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _temizle_cache(self):
-        """Aktif skill önbelleğini temizle."""
+        """Aktif skill Ã¶nbelleÄŸini temizle."""
         self._aktif_cache = None
 
     def _aktif_liste(self) -> dict[str, dict[str, Any]]:
-        """Aktif skill'leri cache'li şekilde döndür."""
+        """Aktif skill'leri cache'li ÅŸekilde dÃ¶ndÃ¼r."""
         if self._aktif_cache is None:
             aktifler = self._lib.tumu(aktif_mi=True, limit=500)
             self._aktif_cache = {s["id"]: s for s in aktifler}
         return self._aktif_cache
 
-    # ── Aktif Et ────────────────────────────────────────────────────────
+    # â”€â”€ Aktif Et â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def aktif_et(self, skill_id: str) -> bool:
         """
-        Skill'i aktif moda geçir (OnceHafiza'ya ekle).
+        Skill'i aktif moda geÃ§ir (OnceHafiza'ya ekle).
 
-        Skill'in 'aktif' alanını 1 yapar.
+        Skill'in 'aktif' alanÄ±nÄ± 1 yapar.
 
         Args:
             skill_id: Aktif edilecek skill ID'si
 
         Returns:
-            True (başarılı) / False (skill bulunamadı)
+            True (baÅŸarÄ±lÄ±) / False (skill bulunamadÄ±)
         """
         if not skill_id:
             return False
 
-        # Skill var mı kontrol et
+        # Skill var mÄ± kontrol et
         skill = self._lib.get(skill_id)
         if not skill:
             logger.warning("[Activator] Skill bulunamadi: %s", skill_id)
@@ -421,19 +421,19 @@ class SkillActivator:
             finally:
                 con.close()
 
-    # ── Devre Dışına Al ─────────────────────────────────────────────────
+    # â”€â”€ Devre DÄ±ÅŸÄ±na Al â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def devre_disina_al(self, skill_id: str) -> bool:
         """
-        Skill'i pasif yap (devre dışı).
+        Skill'i pasif yap (devre dÄ±ÅŸÄ±).
 
-        Skill'in 'aktif' alanını 0 yapar.
+        Skill'in 'aktif' alanÄ±nÄ± 0 yapar.
 
         Args:
             skill_id: Pasif edilecek skill ID'si
 
         Returns:
-            True (başarılı) / False (skill bulunamadı)
+            True (baÅŸarÄ±lÄ±) / False (skill bulunamadÄ±)
         """
         if not skill_id:
             return False
@@ -468,24 +468,24 @@ class SkillActivator:
             finally:
                 con.close()
 
-    # ── Sorgudan Otomatik Aktif Et ──────────────────────────────────────
+    # â”€â”€ Sorgudan Otomatik Aktif Et â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def sorgudan_aktif_et(
         self, sorgu: str, max_aktif: int = 3, min_skor: float = 0.15
     ) -> list[str]:
         """
-        Gelen sorguya göre ilgili skill'leri otomatik bul ve aktif et.
+        Gelen sorguya gÃ¶re ilgili skill'leri otomatik bul ve aktif et.
 
-        Akış:
-        1. Sorguyu anahtar kelimelere ayır
-        2. Tüm skill'lerle eşleşme skoru hesapla
-        3. En çok eşleşen max_aktif skill'i aktif et
-        4. Önceden aktif olup eşleşmeyenleri pasif yapma (sadece ekle)
+        AkÄ±ÅŸ:
+        1. Sorguyu anahtar kelimelere ayÄ±r
+        2. TÃ¼m skill'lerle eÅŸleÅŸme skoru hesapla
+        3. En Ã§ok eÅŸleÅŸen max_aktif skill'i aktif et
+        4. Ã–nceden aktif olup eÅŸleÅŸmeyenleri pasif yapma (sadece ekle)
 
         Args:
-            sorgu: Kullanıcı sorgusu (örn. "ag izleme ve port tarama")
-            max_aktif: Maksimum aktif edilecek skill sayısı
-            min_skor: Minimum eşleşme skoru eşiği
+            sorgu: KullanÄ±cÄ± sorgusu (Ã¶rn. "ag izleme ve port tarama")
+            max_aktif: Maksimum aktif edilecek skill sayÄ±sÄ±
+            min_skor: Minimum eÅŸleÅŸme skoru eÅŸiÄŸi
 
         Returns:
             Aktif edilen skill ID'lerinin listesi
@@ -494,7 +494,7 @@ class SkillActivator:
             logger.debug("[Activator] Bos sorgu, islem yapilmadi.")
             return []
 
-        # Sorguyu anahtar kelimelere ayır
+        # Sorguyu anahtar kelimelere ayÄ±r
         kelimeler = _anahtar_kelimeler(sorgu)
         if not kelimeler:
             logger.debug("[Activator] Sorgudan anlamli kelime cikmadi: %s", sorgu[:40])
@@ -502,20 +502,20 @@ class SkillActivator:
 
         logger.debug("[Activator] Sorgu kelimeleri: %s", kelimeler)
 
-        # Tüm skill'leri getir (aktif/pasif fark etmez)
+        # TÃ¼m skill'leri getir (aktif/pasif fark etmez)
         tum_skills = self._lib.tumu(aktif_mi=None, limit=1000)
         if not tum_skills:
             logger.debug("[Activator] Kutuphanede skill yok.")
             return []
 
-        # Her skill için eşleşme skoru hesapla
+        # Her skill iÃ§in eÅŸleÅŸme skoru hesapla
         skorlu: list[tuple[float, dict[str, Any]]] = []
         for skill in tum_skills:
             skor = _eslesme_skoru(kelimeler, skill["etiketler"], skill["baslik"])
             if skor >= min_skor:
                 skorlu.append((skor, skill))
 
-        # Skora göre sırala (en yüksekten düşüğe)
+        # Skora gÃ¶re sÄ±rala (en yÃ¼ksekten dÃ¼ÅŸÃ¼ÄŸe)
         skorlu.sort(key=lambda x: x[0], reverse=True)
 
         if not skorlu:
@@ -524,13 +524,13 @@ class SkillActivator:
             )
             return []
 
-        # En iyi sonuçları logla
+        # En iyi sonuÃ§larÄ± logla
         logger.info(
             "[Activator] En iyi eslesmeler: %s",
             ", ".join(f"{s['id']}({skor:.2f})" for skor, s in skorlu[:5]),
         )
 
-        # En çok eşleşenleri aktif et (zaten aktif olanları atla)
+        # En Ã§ok eÅŸleÅŸenleri aktif et (zaten aktif olanlarÄ± atla)
         aktif_edilen: list[str] = []
         for skor, skill in skorlu[:max_aktif]:
             if not skill["aktif"]:
@@ -549,11 +549,11 @@ class SkillActivator:
 
         return aktif_edilen
 
-    # ── Durum ───────────────────────────────────────────────────────────
+    # â”€â”€ Durum â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def durum(self) -> list[dict[str, Any]]:
         """
-        Aktif skill listesini döndür.
+        Aktif skill listesini dÃ¶ndÃ¼r.
 
         Returns:
             [{"id", "baslik", "icerik_ozeti", "etiketler", "kaynak", ...}, ...]
@@ -561,10 +561,10 @@ class SkillActivator:
         aktifler = self._lib.tumu(aktif_mi=True, limit=500)
         return aktifler
 
-    # ── Tüm Skill'leri Aktif/Pasif Yap ──────────────────────────────────
+    # â”€â”€ TÃ¼m Skill'leri Aktif/Pasif Yap â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def tumunu_aktif_et(self) -> int:
-        """Tüm skill'leri aktif yap. Kaç tane aktif edildiğini döndür."""
+        """TÃ¼m skill'leri aktif yap. KaÃ§ tane aktif edildiÄŸini dÃ¶ndÃ¼r."""
         pasifler = self._lib.tumu(aktif_mi=False, limit=1000)
         sayac = 0
         for skill in pasifler:
@@ -574,7 +574,7 @@ class SkillActivator:
         return sayac
 
     def tumunu_pasif_yap(self) -> int:
-        """Tüm skill'leri pasif yap. Kaç tane pasif edildiğini döndür."""
+        """TÃ¼m skill'leri pasif yap. KaÃ§ tane pasif edildiÄŸini dÃ¶ndÃ¼r."""
         aktifler = self._lib.tumu(aktif_mi=True, limit=1000)
         sayac = 0
         for skill in aktifler:
@@ -583,15 +583,15 @@ class SkillActivator:
         logger.info("[Activator] Toplu pasif: %d skill pasif edildi.", sayac)
         return sayac
 
-    # ── Sorgu Önerisi / Tahmin ──────────────────────────────────────────
+    # â”€â”€ Sorgu Ã–nerisi / Tahmin â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def sorgu_tahmin(self, sorgu: str, limit: int = 5) -> list[dict[str, Any]]:
         """
-        Sorguya en çok benzeyen skill'leri tahmin et (aktif etmeden).
+        Sorguya en Ã§ok benzeyen skill'leri tahmin et (aktif etmeden).
 
         Args:
-            sorgu: Kullanıcı sorgusu
-            limit: Maksimum tahmin sayısı
+            sorgu: KullanÄ±cÄ± sorgusu
+            limit: Maksimum tahmin sayÄ±sÄ±
 
         Returns:
             [{"id", "baslik", "etiketler", "skor", ...}, ...]
@@ -622,14 +622,14 @@ class SkillActivator:
             for skor, s in skorlu[:limit]
         ]
 
-    # ── İstatistik ──────────────────────────────────────────────────────
+    # â”€â”€ Ä°statistik â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def istatistik(self) -> dict[str, Any]:
         """Aktivasyon istatistikleri."""
         lib_stat = self._lib.istatistik()
         aktifler = self._lib.tumu(aktif_mi=True, limit=500)
 
-        # Aktif skill'lerin etiket dağılımı
+        # Aktif skill'lerin etiket daÄŸÄ±lÄ±mÄ±
         etiket_sayaci: dict[str, int] = {}
         for s in aktifler:
             for et in s["etiketler"]:
@@ -647,45 +647,45 @@ class SkillActivator:
         }
 
 
-# ── Modül seviyesinde singleton ─────────────────────────────────────────────
+# â”€â”€ ModÃ¼l seviyesinde singleton â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _activator: SkillActivator | None = None
 
 
 def get_activator(db_yolu: str | Path | None = None) -> SkillActivator:
-    """Singleton SkillActivator örneği al."""
+    """Singleton SkillActivator Ã¶rneÄŸi al."""
     global _activator
     if _activator is None:
         _activator = SkillActivator(db_yolu)
     return _activator
 
 
-# ── Kolay kullanım fonksiyonları ────────────────────────────────────────────
+# â”€â”€ Kolay kullanÄ±m fonksiyonlarÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def aktif_et(skill_id: str) -> bool:
-    """Skill aktif et (kolay kullanım)."""
+    """Skill aktif et (kolay kullanÄ±m)."""
     return get_activator().aktif_et(skill_id)
 
 
 def devre_disina_al(skill_id: str) -> bool:
-    """Skill pasif et (kolay kullanım)."""
+    """Skill pasif et (kolay kullanÄ±m)."""
     return get_activator().devre_disina_al(skill_id)
 
 
 def sorgudan_aktif_et(
     sorgu: str, max_aktif: int = 3, min_skor: float = 0.15
 ) -> list[str]:
-    """Sorgudan otomatik aktif et (kolay kullanım)."""
+    """Sorgudan otomatik aktif et (kolay kullanÄ±m)."""
     return get_activator().sorgudan_aktif_et(sorgu, max_aktif, min_skor)
 
 
 def durum() -> list[dict[str, Any]]:
-    """Aktif skill listesi (kolay kullanım)."""
+    """Aktif skill listesi (kolay kullanÄ±m)."""
     return get_activator().durum()
 
 
 def sorgu_tahmin(sorgu: str, limit: int = 5) -> list[dict[str, Any]]:
-    """Sorgu tahmini (kolay kullanım)."""
+    """Sorgu tahmini (kolay kullanÄ±m)."""
     return get_activator().sorgu_tahmin(sorgu, limit)
 
 

@@ -1,11 +1,11 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-workflow_pipeline.py — Görev Çözüm Pipeline'ı.
+workflow_pipeline.py â€” GÃ¶rev Ã‡Ã¶zÃ¼m Pipeline'Ä±.
 
-GÖREV -> PLANLAMA -> ÖN DOĞRULAMA -> KOD -> TEST -> GÖZDEN GEÇİRME -> KAYDET
+GÃ–REV -> PLANLAMA -> Ã–N DOÄRULAMA -> KOD -> TEST -> GÃ–ZDEN GEÃ‡Ä°RME -> KAYDET
 
-Her aşama broker üzerinden mesajlaşır. Consumer thread'lerde çalışır.
-Mevcut sistemdeki orchestrator + ogrenme + hata_cozucu'yu birleştirir.
+Her aÅŸama broker Ã¼zerinden mesajlaÅŸÄ±r. Consumer thread'lerde Ã§alÄ±ÅŸÄ±r.
+Mevcut sistemdeki orchestrator + ogrenme + hata_cozucu'yu birleÅŸtirir.
 """
 
 from __future__ import annotations
@@ -21,7 +21,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional
 
-from src.reymen.cereyan.broker import (
+from reymen.cereyan.broker import (
     Mesaj,
     MesajTipi,
     MessageBroker,
@@ -36,11 +36,11 @@ SCRIPTS_DIR = ROOT / "reymen" / "scripts"
 COKLER_DIR = ROOT / "cozumler"
 
 
-# ── Handler'lar (consumer callback'leri) ──────────────────────────────────────
+# â”€â”€ Handler'lar (consumer callback'leri) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def hata_handler(mesaj: Mesaj) -> None:
-    """HATA mesajı → hata_cozucu'ya yönlendir."""
+    """HATA mesajÄ± â†’ hata_cozucu'ya yÃ¶nlendir."""
     veri = mesaj.veri
     hata = veri.get("hata", "")
     kod = veri.get("kod", "")
@@ -49,13 +49,13 @@ def hata_handler(mesaj: Mesaj) -> None:
 
     logger.info("[Pipeline] HATA handler: %s...", str(hata)[:100])
 
-    # Önce çözüm hafızasında ara
+    # Ã–nce Ã§Ã¶zÃ¼m hafÄ±zasÄ±nda ara
     try:
         from reymen.core.ogrenme import cozum_bul, imza_uret, cozum_kaydet
 
         bulunan = cozum_bul(hata_imza)
         if bulunan:
-            logger.info("[Pipeline] Çözüm hafızada bulundu: %s", hata_imza[:12])
+            logger.info("[Pipeline] Ã‡Ã¶zÃ¼m hafÄ±zada bulundu: %s", hata_imza[:12])
             broker = get_broker()
             if broker:
                 broker.yayinla_basit(
@@ -67,11 +67,11 @@ def hata_handler(mesaj: Mesaj) -> None:
                 )
             return
     except ImportError:
-        logger.debug("[Pipeline] ogrenme modülü yok, LLM'e gidilecek")
+        logger.debug("[Pipeline] ogrenme modÃ¼lÃ¼ yok, LLM'e gidilecek")
     except Exception as e:
-        logger.warning("[Pipeline] Hafıza sorgu hatası: %s", e)
+        logger.warning("[Pipeline] HafÄ±za sorgu hatasÄ±: %s", e)
 
-    # Hafızada yoksa → orchestrator'a LLM çözümü için yönlendir
+    # HafÄ±zada yoksa â†’ orchestrator'a LLM Ã§Ã¶zÃ¼mÃ¼ iÃ§in yÃ¶nlendir
     try:
         _coz = None
         try:
@@ -94,7 +94,7 @@ def hata_handler(mesaj: Mesaj) -> None:
                 fix_path.write_text(fix_kod, encoding="utf-8")
                 logger.info("[Pipeline] Fix kaydedildi: %s", fix_path)
 
-                # Çözümü hafızaya kaydet
+                # Ã‡Ã¶zÃ¼mÃ¼ hafÄ±zaya kaydet
                 try:
                     from reymen.core.ogrenme import cozum_kaydet as _kaydet
 
@@ -118,11 +118,11 @@ def hata_handler(mesaj: Mesaj) -> None:
                         },
                     )
     except Exception as e:
-        logger.error("[Pipeline] coz_hata başarısız: %s", e)
+        logger.error("[Pipeline] coz_hata baÅŸarÄ±sÄ±z: %s", e)
 
 
 def cozum_ara_handler(mesaj: Mesaj) -> None:
-    """COZUM_ARA mesajı → ogrenme.cozum_bul."""
+    """COZUM_ARA mesajÄ± â†’ ogrenme.cozum_bul."""
     veri = mesaj.veri
     hata = veri.get("hata", "")
     hata_imza = _imza_uret_string(hata)
@@ -132,7 +132,7 @@ def cozum_ara_handler(mesaj: Mesaj) -> None:
 
         bulunan = cozum_bul(hata_imza)
         if bulunan:
-            logger.info("[Pipeline] Çözüm bulundu: %s", hata_imza[:12])
+            logger.info("[Pipeline] Ã‡Ã¶zÃ¼m bulundu: %s", hata_imza[:12])
             broker = get_broker()
             if broker:
                 broker.yayinla_basit(
@@ -144,11 +144,11 @@ def cozum_ara_handler(mesaj: Mesaj) -> None:
                     },
                 )
     except Exception as e:
-        logger.debug("[Pipeline] cozum_ara hatası: %s", e)
+        logger.debug("[Pipeline] cozum_ara hatasÄ±: %s", e)
 
 
 def cozum_kaydet_handler(mesaj: Mesaj) -> None:
-    """COZUM_KAYDET mesajı → ogrenme.cozum_kaydet + closed_learning_loop."""
+    """COZUM_KAYDET mesajÄ± â†’ ogrenme.cozum_kaydet + closed_learning_loop."""
     veri = mesaj.veri
     try:
         from reymen.core.ogrenme import cozum_kaydet
@@ -161,9 +161,9 @@ def cozum_kaydet_handler(mesaj: Mesaj) -> None:
             kaynak_script=veri.get("kaynak", ""),
             basarili=veri.get("basarili", True),
         )
-        logger.info("[Pipeline] Çözüm hafızaya kaydedildi")
+        logger.info("[Pipeline] Ã‡Ã¶zÃ¼m hafÄ±zaya kaydedildi")
     except Exception as e:
-        logger.warning("[Pipeline] cozum_kaydet hatası: %s", e)
+        logger.warning("[Pipeline] cozum_kaydet hatasÄ±: %s", e)
 
     # closed_learning_loop'a da bildir
     try:
@@ -180,53 +180,53 @@ def cozum_kaydet_handler(mesaj: Mesaj) -> None:
         pass
 
 
-# ── Workflow Pipeline ─────────────────────────────────────────────────────────
+# â”€â”€ Workflow Pipeline â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def gorev_coz_pipeline(
     broker: MessageBroker, gorev_tanimi: str, script_path: str = ""
 ) -> str:
     """
-    Ana pipeline: GÖREV -> PLANLA -> ÖN DOĞRULA -> KOD -> TEST -> İNCELE -> KAYDET
+    Ana pipeline: GÃ–REV -> PLANLA -> Ã–N DOÄRULA -> KOD -> TEST -> Ä°NCELE -> KAYDET
 
     Args:
         broker: MessageBroker instance
-        gorev_tanimi: Görev açıklaması
+        gorev_tanimi: GÃ¶rev aÃ§Ä±klamasÄ±
         script_path: Varsa mevcut script yolu
 
     Returns:
-        Başarılıysa ".py" dosya yolu, başarısızsa hata mesajı
+        BaÅŸarÄ±lÄ±ysa ".py" dosya yolu, baÅŸarÄ±sÄ±zsa hata mesajÄ±
     """
     corr_id = os.urandom(6).hex()
-    logger.info("[Pipeline] ════════════════════════════════════════════")
-    logger.info("[Pipeline] GÖREV BAŞLAT: %s", gorev_tanimi[:100])
+    logger.info("[Pipeline] â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•")
+    logger.info("[Pipeline] GÃ–REV BAÅLAT: %s", gorev_tanimi[:100])
 
     current_script = script_path
 
-    # ── ADIM 1: PLANLAMA ────────────────────────────────────────────────
+    # â”€â”€ ADIM 1: PLANLAMA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     logger.info("[Pipeline] ADIM 1/6: PLANLAMA")
     plan = _pipeline_planla(gorev_tanimi)
     if not plan:
-        return "❌ PLANLAMA BAŞARISIZ"
+        return "âŒ PLANLAMA BAÅARISIZ"
 
-    # ── ADIM 2: ÖN DOĞRULAMA ────────────────────────────────────────────
-    logger.info("[Pipeline] ADIM 2/6: ÖN DOĞRULAMA")
+    # â”€â”€ ADIM 2: Ã–N DOÄRULAMA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    logger.info("[Pipeline] ADIM 2/6: Ã–N DOÄRULAMA")
     dogrulama = _pipeline_on_dogrula(plan)
     if not dogrulama.get("gecerli"):
-        return f"❌ ÖN DOĞRULAMA: {dogrulama.get('sebep', 'bilinmiyor')}"
+        return f"âŒ Ã–N DOÄRULAMA: {dogrulama.get('sebep', 'bilinmiyor')}"
 
-    # ── ADIM 3: KOD ─────────────────────────────────────────────────────
-    logger.info("[Pipeline] ADIM 3/6: KOD ÜRETİMİ")
+    # â”€â”€ ADIM 3: KOD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    logger.info("[Pipeline] ADIM 3/6: KOD ÃœRETÄ°MÄ°")
     if not current_script or not Path(current_script).exists():
         current_script = _pipeline_kod_uret(plan, gorev_tanimi)
         if not current_script:
-            return "❌ KOD ÜRETİLEMEDİ"
+            return "âŒ KOD ÃœRETÄ°LEMEDÄ°"
 
-    # ── ADIM 4: TEST ────────────────────────────────────────────────────
+    # â”€â”€ ADIM 4: TEST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     logger.info("[Pipeline] ADIM 4/6: TEST")
     test_sonuc = _pipeline_test_et(current_script)
     if not test_sonuc.get("basarili"):
-        # Hata → broker üzerinden çözüm döngüsü
+        # Hata â†’ broker Ã¼zerinden Ã§Ã¶zÃ¼m dÃ¶ngÃ¼sÃ¼
         hata_msg = test_sonuc.get("hata", "bilinmiyor")
         broker.yayinla_basit(
             MesajTipi.HATA,
@@ -240,26 +240,26 @@ def gorev_coz_pipeline(
             kaynak="pipeline",
         )
 
-        # Çözüm bekle (3 saniye)
+        # Ã‡Ã¶zÃ¼m bekle (3 saniye)
         time.sleep(3)
 
-        # Fix denenmiş olabilir, tekrar dene
+        # Fix denenmiÅŸ olabilir, tekrar dene
         test_sonuc = _pipeline_test_et(current_script)
         if not test_sonuc.get("basarili"):
-            return f"❌ TEST: {hata_msg}"
+            return f"âŒ TEST: {hata_msg}"
 
-    # ── ADIM 5: GÖZDEN GEÇİR ───────────────────────────────────────────
-    logger.info("[Pipeline] ADIM 5/6: GÖZDEN GEÇİRME")
+    # â”€â”€ ADIM 5: GÃ–ZDEN GEÃ‡Ä°R â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    logger.info("[Pipeline] ADIM 5/6: GÃ–ZDEN GEÃ‡Ä°RME")
     inceleme = _pipeline_gozden_gecir(current_script)
     if not inceleme.get("basarili"):
-        logger.warning("[Pipeline] İnceleme uyarısı: %s", inceleme.get("uyari", ""))
-        # Kritik değilse devam et
+        logger.warning("[Pipeline] Ä°nceleme uyarÄ±sÄ±: %s", inceleme.get("uyari", ""))
+        # Kritik deÄŸilse devam et
 
-    # ── ADIM 6: KAYDET ─────────────────────────────────────────────────
+    # â”€â”€ ADIM 6: KAYDET â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     logger.info("[Pipeline] ADIM 6/6: KAYDET")
     kayit_path = _pipeline_kaydet(current_script, gorev_tanimi, corr_id)
 
-    # Başarılı mesajı
+    # BaÅŸarÄ±lÄ± mesajÄ±
     broker.yayinla_basit(
         MesajTipi.GOREV_BASARILI,
         {
@@ -284,15 +284,15 @@ def gorev_coz_pipeline(
             "[SessizExcept] %%s: %%s", type(_e).__name__, _e
         )
 
-    logger.info("[Pipeline] ✅ GÖREV TAMAM: %s", kayit_path)
+    logger.info("[Pipeline] âœ… GÃ–REV TAMAM: %s", kayit_path)
     return kayit_path
 
 
-# ── Pipeline Alt Adımları ─────────────────────────────────────────────────────
+# â”€â”€ Pipeline Alt AdÄ±mlarÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _pipeline_planla(gorev: str) -> Optional[dict]:
-    """ADIM 1: Görevi alt adımlara ayır."""
+    """ADIM 1: GÃ¶revi alt adÄ±mlara ayÄ±r."""
     return {
         "gorev": gorev[:200],
         "adimlar": ["hazirlik", "cozum", "dogrulama"],
@@ -301,12 +301,12 @@ def _pipeline_planla(gorev: str) -> Optional[dict]:
 
 
 def _pipeline_on_dogrula(plan: dict) -> dict:
-    """ADIM 2: Ön koşulları kontrol et."""
+    """ADIM 2: Ã–n koÅŸullarÄ± kontrol et."""
     import shutil
 
     eksikler = []
 
-    # Python kontrolü
+    # Python kontrolÃ¼
     if not shutil.which("python"):
         eksikler.append("python")
 
@@ -317,7 +317,7 @@ def _pipeline_on_dogrula(plan: dict) -> dict:
 
 
 def _pipeline_kod_uret(plan: dict, gorev: str) -> Optional[str]:
-    """ADIM 3: LLM ile Python script'i üret."""
+    """ADIM 3: LLM ile Python script'i Ã¼ret."""
     hedef = plan.get("hedef_dosya", "cozum.py")
     hedef_path = str(SCRIPTS_DIR / hedef)
 
@@ -329,28 +329,28 @@ def _pipeline_kod_uret(plan: dict, gorev: str) -> Optional[str]:
         if kod and len(kod) > 10:
             SCRIPTS_DIR.mkdir(parents=True, exist_ok=True)
             Path(hedef_path).write_text(kod, encoding="utf-8")
-            logger.info("[Pipeline] Kod üretildi: %s (%d byte)", hedef_path, len(kod))
+            logger.info("[Pipeline] Kod Ã¼retildi: %s (%d byte)", hedef_path, len(kod))
             return hedef_path
     except Exception as e:
-        logger.warning("[Pipeline] Kod üretimi başarısız: %s", e)
+        logger.warning("[Pipeline] Kod Ã¼retimi baÅŸarÄ±sÄ±z: %s", e)
 
     return None
 
 
 def _pipeline_test_et(script_path: str) -> dict:
-    """ADIM 4: Script'i çalıştır ve doğrula."""
+    """ADIM 4: Script'i Ã§alÄ±ÅŸtÄ±r ve doÄŸrula."""
     path = Path(script_path)
     if not path.exists():
-        return {"basarili": False, "hata": "Dosya bulunamadı"}
+        return {"basarili": False, "hata": "Dosya bulunamadÄ±"}
 
     try:
-        # Syntax kontrolü
+        # Syntax kontrolÃ¼
         compile(path.read_text(encoding="utf-8"), str(path), "exec")
     except SyntaxError as e:
         return {"basarili": False, "hata": f"SyntaxError: {e}"}
 
     try:
-        # Import kontrolü (dosya adını module olarak dene)
+        # Import kontrolÃ¼ (dosya adÄ±nÄ± module olarak dene)
         import importlib.util
 
         spec = importlib.util.spec_from_file_location(path.stem, str(path))
@@ -363,7 +363,7 @@ def _pipeline_test_et(script_path: str) -> dict:
 
 
 def _pipeline_gozden_gecir(script_path: str) -> dict:
-    """ADIM 5: Kodu statik analiz ile gözden geçir."""
+    """ADIM 5: Kodu statik analiz ile gÃ¶zden geÃ§ir."""
     path = Path(script_path)
     if not path.exists():
         return {"basarili": False, "uyari": "Dosya yok"}
@@ -375,7 +375,7 @@ def _pipeline_gozden_gecir(script_path: str) -> dict:
     if "except:" in kod and "except Exception" not in kod:
         uyarilar.append("Bare except tespit edildi")
     if len(kod) < 20:
-        uyarilar.append("Kod çok kısa")
+        uyarilar.append("Kod Ã§ok kÄ±sa")
 
     return {
         "basarili": len(uyarilar) == 0,
@@ -384,7 +384,7 @@ def _pipeline_gozden_gecir(script_path: str) -> dict:
 
 
 def _pipeline_kaydet(script_path: str, gorev: str, corr_id: str) -> str:
-    """ADIM 6: Başarılı script'i .py dosyasına kaydet."""
+    """ADIM 6: BaÅŸarÄ±lÄ± script'i .py dosyasÄ±na kaydet."""
     hedef = COKLER_DIR / f"cozum_{corr_id}.py"
     hedef.parent.mkdir(parents=True, exist_ok=True)
 
@@ -398,11 +398,11 @@ def _pipeline_kaydet(script_path: str, gorev: str, corr_id: str) -> str:
     return str(hedef)
 
 
-# ── Yardımcı ──────────────────────────────────────────────────────────────────
+# â”€â”€ YardÄ±mcÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _imza_uret_string(hata_str: str) -> str:
-    """String hata mesajından imza üret."""
+    """String hata mesajÄ±ndan imza Ã¼ret."""
     import hashlib
     import re
 

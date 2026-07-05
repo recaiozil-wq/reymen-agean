@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """Central registry for all ReYMeN tools.
 
 Each tool file calls ``registry.register()`` at module level to declare its
@@ -14,8 +14,8 @@ Import chain (circular-import safe):
            ^
     reymen_launcher.py, cli.py, batch_runner.py, etc.
 
-Note: This is a ReYMeN-independent copy of Hermes Agent's tools/registry.py.
-All Hermes-specific imports have been replaced with local equivalents.
+Note: This is a ReYMeN-independent copy of ReYMeN Agent's tools/registry.py.
+All ReYMeN-specific imports have been replaced with local equivalents.
 """
 
 import ast
@@ -31,7 +31,7 @@ from typing import Callable, Dict, List, Optional, Set
 logger = logging.getLogger(__name__)
 
 # =============================================================================
-# Inlined sanitizer (ported from Hermes agent/model_tools.py so dispatch()
+# Inlined sanitizer (ported from ReYMeN agent/model_tools.py so dispatch()
 # has no external import dependency)
 # =============================================================================
 _TOOL_ERROR_ROLE_TAG_RE = re.compile(
@@ -60,7 +60,7 @@ def _sanitize_tool_error(error_msg: str) -> str:
 
 
 # =============================================================================
-# Default result size (inlined from Hermes tools/budget_config.py)
+# Default result size (inlined from ReYMeN tools/budget_config.py)
 # =============================================================================
 DEFAULT_RESULT_SIZE_CHARS: int = 100_000
 
@@ -426,7 +426,7 @@ class ToolRegistry:
         entry = self.get_entry(name)
         return entry.toolset if entry else None
 
-    def get_emoji(self, name: str, default: str = "⚡") -> str:
+    def get_emoji(self, name: str, default: str = "âš¡") -> str:
         entry = self.get_entry(name)
         return entry.emoji if entry and entry.emoji else default
 

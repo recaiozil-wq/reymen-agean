@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
-"""reymen/sistem/coverage_report.py — Coverage Rapor Motoru.
+﻿# -*- coding: utf-8 -*-
+"""reymen/sistem/coverage_report.py â€” Coverage Rapor Motoru.
 
 Statik analiz + pytest-cov entegrasyonu.
-Zaman bazlı geçmiş tutar ve Web UI'a veri sağlar.
+Zaman bazlÄ± geÃ§miÅŸ tutar ve Web UI'a veri saÄŸlar.
 """
 
 from __future__ import annotations
@@ -24,7 +24,7 @@ HISTORY_FILE = PROJE_KOK / "tests" / "coverage_history.json"
 
 
 def _modul_sayisi() -> int:
-    """reymen altındaki .py dosya sayısı (__init__.py hariç)."""
+    """reymen altÄ±ndaki .py dosya sayÄ±sÄ± (__init__.py hariÃ§)."""
     say = 0
     for root, _dirs, files in os.walk(str(PROJE_KOK / "reymen")):
         if "__pycache__" in root or "venv" in root or "node_modules" in root:
@@ -36,7 +36,7 @@ def _modul_sayisi() -> int:
 
 
 def _satir_sayisi() -> int:
-    """reymen altındaki toplam Python satır sayısı."""
+    """reymen altÄ±ndaki toplam Python satÄ±r sayÄ±sÄ±."""
     toplam = 0
     for root, _dirs, files in os.walk(str(PROJE_KOK / "reymen")):
         if "__pycache__" in root or "venv" in root or "node_modules" in root:
@@ -55,7 +55,7 @@ def _satir_sayisi() -> int:
 
 
 def _sonuc_al(veri: dict) -> dict:
-    """coverage JSON raporundan sonuç al."""
+    """coverage JSON raporundan sonuÃ§ al."""
     try:
         toplam = veri.get("totals", {})
         return {
@@ -71,10 +71,10 @@ def _sonuc_al(veri: dict) -> dict:
 
 
 def calistir(hizli: bool = False) -> dict:
-    """Coverage çalıştır ve sonuç döndür.
+    """Coverage Ã§alÄ±ÅŸtÄ±r ve sonuÃ§ dÃ¶ndÃ¼r.
 
     Args:
-        hizli: True = sadece reymen/ dizini, False = tüm proje
+        hizli: True = sadece reymen/ dizini, False = tÃ¼m proje
 
     Returns:
         {"basari": True, "yuzde": 45.2, "toplam_satir": 1000, ...}
@@ -133,24 +133,24 @@ def calistir(hizli: bool = False) -> dict:
         sonuc = _sonuc_al(veri)
         sonuc["sure"] = sure
 
-        # Geçmişe ekle
+        # GeÃ§miÅŸe ekle
         _gecmis_ekle(sonuc)
 
         return sonuc
 
     except subprocess.TimeoutExpired:
-        return {"basari": False, "hata": "Zaman aşımı (120s)", "yuzde": 0}
+        return {"basari": False, "hata": "Zaman aÅŸÄ±mÄ± (120s)", "yuzde": 0}
     except Exception as e:
-        logger.warning("Coverage hatası: %s", e)
+        logger.warning("Coverage hatasÄ±: %s", e)
         return {"basari": False, "hata": str(e), "yuzde": 0}
 
 
 def statik_analiz() -> dict:
-    """Import analizi ile yaklaşık coverage (hızlı)."""
+    """Import analizi ile yaklaÅŸÄ±k coverage (hÄ±zlÄ±)."""
     modul_say = _modul_sayisi()
     satir_say = _satir_sayisi()
 
-    # Import edilebilen modüller
+    # Import edilebilen modÃ¼ller
     import_edilebilen = 0
     import_edilemeyen = 0
     for root, _dirs, files in os.walk(str(PROJE_KOK / "reymen")):
@@ -191,7 +191,7 @@ def statik_analiz() -> dict:
 
 
 def _gecmis_ekle(sonuc: dict) -> None:
-    """Sonucu geçmiş dosyasına ekle."""
+    """Sonucu geÃ§miÅŸ dosyasÄ±na ekle."""
     try:
         history = []
         if HISTORY_FILE.exists():
@@ -209,17 +209,17 @@ def _gecmis_ekle(sonuc: dict) -> None:
             }
         )
 
-        # Son 100 kayıt
+        # Son 100 kayÄ±t
         history = history[-100:]
         HISTORY_FILE.parent.mkdir(parents=True, exist_ok=True)
         with open(HISTORY_FILE, "w") as f:
             json.dump(history, f, indent=2, ensure_ascii=False)
     except Exception as e:
-        logger.debug("Geçmiş kaydedilemedi: %s", e)
+        logger.debug("GeÃ§miÅŸ kaydedilemedi: %s", e)
 
 
 def gecmis_getir(limit: int = 30) -> list[dict]:
-    """Geçmiş coverage verilerini getir."""
+    """GeÃ§miÅŸ coverage verilerini getir."""
     if not HISTORY_FILE.exists():
         return []
     try:

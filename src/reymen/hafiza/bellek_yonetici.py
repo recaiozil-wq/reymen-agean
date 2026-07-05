@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-bellek_yonetici.py — BellekYonetici: Vektor + SQLite hibrit hafiza yoneticisi.
+bellek_yonetici.py â€” BellekYonetici: Vektor + SQLite hibrit hafiza yoneticisi.
 
 VektorBellek (anlamsal arama) ile SQLite hafiza (yapisal kayit) sistemini
 tek bir API altinda birlestirir. Hibrit arama, eski kayit temizleme ve
@@ -25,7 +25,7 @@ from .vektor_bellek import VektorBellek, vektor_bellek_al
 
 logger = logging.getLogger(__name__)
 
-# ── SQLite Hafiza (AltAjanHafiza tabanli) ────────────────────────────────────
+# â”€â”€ SQLite Hafiza (AltAjanHafiza tabanli) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 try:
     from reymen.hafiza.hafiza import AltAjanHafiza, alt_ajan_hafiza
 
@@ -36,9 +36,9 @@ except ImportError:
     alt_ajan_hafiza = None
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  BellekYonetici
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class BellekYonetici:
@@ -70,7 +70,7 @@ class BellekYonetici:
         self._sqlite = sqlite_hafiza or alt_ajan_hafiza if _HAFIZA_MEVCUT else None
         self._k = varsayilan_k
 
-    # ── Vektor bellek islemleri ───────────────────────────────────────────────
+    # â”€â”€ Vektor bellek islemleri â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def vektor_ekle(self, metin: str, metadata: Optional[Dict] = None) -> str:
         """Vektor bellege metin ekle.
@@ -104,7 +104,7 @@ class BellekYonetici:
         """Vektor bellek icerigini listele."""
         return self._vektor.listele(limit=limit)
 
-    # ── SQLite hafiza islemleri ───────────────────────────────────────────────
+    # â”€â”€ SQLite hafiza islemleri â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def sqlite_kaydet(self, task_id: str, tur: str, veri: dict) -> None:
         """SQLite hafizaya kayit ekle (AltAjanHafiza)."""
@@ -133,7 +133,7 @@ class BellekYonetici:
                     break
         return sonuc
 
-    # ── Hibrit arama ──────────────────────────────────────────────────────────
+    # â”€â”€ Hibrit arama â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def hatirla(self, sorgu: str, k: Optional[int] = None) -> Dict:
         """Hibrit arama: vektor + SQLite sonuclarini birlestir.
@@ -195,7 +195,7 @@ class BellekYonetici:
             "toplam": len(vektor_liste) + len(sqlite_liste),
         }
 
-    # ── Eski kayit temizleme ──────────────────────────────────────────────────
+    # â”€â”€ Eski kayit temizleme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def unut(self, esik_saat: int = 72) -> Dict:
         """Eski kayitlari temizle.
@@ -238,7 +238,7 @@ class BellekYonetici:
         )
         return sonuc
 
-    # ── Bilgi ─────────────────────────────────────────────────────────────────
+    # â”€â”€ Bilgi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def bilgi(self) -> Dict:
         """Bellek yoneticisi hakkinda bilgi dondur."""
@@ -260,7 +260,7 @@ class BellekYonetici:
         return "\n".join(lines)
 
 
-# ── Varsayilan singleton ──────────────────────────────────────────────────────
+# â”€â”€ Varsayilan singleton â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _bellek_yonetici_instance: Optional[BellekYonetici] = None
 
 
@@ -272,9 +272,9 @@ def bellek_yonetici_al() -> BellekYonetici:
     return _bellek_yonetici_instance
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Test
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
@@ -297,4 +297,4 @@ if __name__ == "__main__":
     # Bilgi
     print(f"\n{by.ozet()}")
 
-    print("\n✓ Test tamamlandi")
+    print("\nâœ“ Test tamamlandi")

@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-oz_yansima.py — FAZ 6: Pasif Surec Refleksiyonu (Idle-Time Reflection).
+oz_yansima.py â€” FAZ 6: Pasif Surec Refleksiyonu (Idle-Time Reflection).
 
 main.py'nin interaktif dongusu kullanici input() beklerken
 bir arka plan thread'i (daemon) su adimlari calistirir:
@@ -10,7 +10,7 @@ bir arka plan thread'i (daemon) su adimlari calistirir:
   3. LLM'e kisa bir analiz sorusu gonder (tek API cagrisi).
   4. Sonucu .ReYMeN/oz_yansima_log.md'ye ekle.
   5. Bildirim bayragi seti -> main.py bir sonraki prompt'ta
-     "[Oz-Yansima] N oneri hazir — /yansima ile gor" yazar.
+     "[Oz-Yansima] N oneri hazir â€” /yansima ile gor" yazar.
 
 Kullanim (main.py'de):
     from oz_yansima import OzYansima
@@ -47,7 +47,7 @@ class OzYansima:
         self._calisiyorum = False
         LOG_DOSYASI.parent.mkdir(parents=True, exist_ok=True)
 
-    # ── Dis API ──────────────────────────────────────────────────────────────
+    # â”€â”€ Dis API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def baslat_arkaplan(self, gecikme_sn: int = 2) -> bool:
         """Daemon thread olarak yansimay baslatir.
@@ -88,7 +88,7 @@ class OzYansima:
         satirlar = LOG_DOSYASI.read_text(encoding="utf-8").splitlines()
         return "\n".join(satirlar[-son_n_satir:])
 
-    # ── Ic mantik ────────────────────────────────────────────────────────────
+    # â”€â”€ Ic mantik â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _calistir_yansima(self, gecikme_sn: int):
         """Arka plan thread govdesi."""
@@ -163,8 +163,8 @@ class OzYansima:
             f"Bellek kullanimi: {sistem.get('bellek_yuzde', '?')}%"
         )
         sistem_prompt = (
-            "Sen bir yapay zeka ajan performans danismanisın. "
-            "Kısa ve net iyilestirme onerileri ver. "
+            "Sen bir yapay zeka ajan performans danismanisÄ±n. "
+            "KÄ±sa ve net iyilestirme onerileri ver. "
             "Maksimum 3 madde, her biri tek cumle."
         )
         mesajlar = [
@@ -190,7 +190,7 @@ class OzYansima:
     def _log_yaz(self, analiz: dict):
         """Analiz sonucunu log dosyasina ekle."""
         satirlar = [
-            f"\n## {analiz['zaman']} — Oz-Yansima Raporu",
+            f"\n## {analiz['zaman']} â€” Oz-Yansima Raporu",
             f"- Hata orani: {analiz['hata_orani']:.0%} "
             f"({analiz['hata_sayisi']}/{analiz['toplam_adim']} adim)",
         ]
@@ -211,7 +211,7 @@ class OzYansima:
             print(f"[OzYansima] Log yazma hatasi: {e}")
 
 
-# ── Sistem metrigi ────────────────────────────────────────────────────────────
+# â”€â”€ Sistem metrigi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _sistem_metrigi_al() -> dict:
@@ -227,7 +227,7 @@ def _sistem_metrigi_al() -> dict:
         return {}
 
 
-# ── Test ─────────────────────────────────────────────────────────────────────
+# â”€â”€ Test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 if __name__ == "__main__":
     import tempfile

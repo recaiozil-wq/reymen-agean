@@ -1,4 +1,4 @@
-"""ReYMeN tools.skill_usage shim — Hermes skill kullanım takibini yönlendirir."""
+﻿"""ReYMeN tools.skill_usage shim â€” ReYMeN skill kullanÄ±m takibini yÃ¶nlendirir."""
 
 from __future__ import annotations
 
@@ -9,5 +9,5 @@ logger = logging.getLogger(__name__)
 
 
 def bump_use(skill_name: str, by: int = 1) -> None:
-    """Hermes bump_use — ReYMeN'de skill kullanım sayacı."""
+    """ReYMeN bump_use â€” ReYMeN'de skill kullanÄ±m sayacÄ±."""
     logger.debug("Skill '%s' usage bumped by %d (ReYMeN stub)", skill_name, by)

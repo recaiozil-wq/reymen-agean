@@ -1,15 +1,15 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-guardrails_manager.py — P2 Girdi/Cikti Guvenlik Katmani.
+guardrails_manager.py â€” P2 Girdi/Cikti Guvenlik Katmani.
 
 Mevcut threat_patterns.py (reymen/guvenlik/threat_patterns.py) uzerine
 kurulmustur. Prompt injection tespiti, PII tarama, yasakli icerik
 ve kod exec kontrolu yapar.
 
 Motor Tools:
-    GIRDI_KONTROL(prompt)   → Prompt guvenlik kontrolu
-    CIKTI_KONTROL(cikti)    → LLM ciktisi guvenlik kontrolu
-    GUARDRAIL_DURUM()        → Guardrail sistemi durumu
+    GIRDI_KONTROL(prompt)   â†’ Prompt guvenlik kontrolu
+    CIKTI_KONTROL(cikti)    â†’ LLM ciktisi guvenlik kontrolu
+    GUARDRAIL_DURUM()        â†’ Guardrail sistemi durumu
 """
 
 from __future__ import annotations
@@ -24,7 +24,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
-# ── Mevcut threat_patterns modulunu kullan ──────────────────────────────────────
+# â”€â”€ Mevcut threat_patterns modulunu kullan â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 try:
     from reymen.guvenlik.threat_patterns import (
         ThreatDetector as _ThreatDetector,
@@ -38,9 +38,9 @@ except ImportError:
     _ThreatDetector = None  # type: ignore
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Tehdit Desenleri (mevcut threat_patterns.py'yi genisletir)
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 # Prompt injection / jailbreak desenleri (genisletilmis)
 _JAILBREAK_DESENLERI = [
@@ -93,9 +93,9 @@ _KOD_EXEC_DESENLERI = [
 ]
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Guardrail Sonucu
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 @dataclass
@@ -120,7 +120,7 @@ class GuardrailSonucu:
         }
 
     def __str__(self) -> str:
-        durum = "GUVENLI ✅" if self.guvenli else f"TESPT: {self.tespit} ⚠️"
+        durum = "GUVENLI âœ…" if self.guvenli else f"TESPT: {self.tespit} âš ï¸"
         return (
             f"[Guardrail] {durum}\n"
             f"  Seviye: {self.seviye}\n"
@@ -129,9 +129,9 @@ class GuardrailSonucu:
         )
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  GuardrailsManager
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class GuardrailsManager:
@@ -161,7 +161,7 @@ class GuardrailsManager:
             except Exception as e:
                 logger.warning("[Guardrails] ThreatDetector baslatma hatasi: %s", e)
 
-    # ── GIRDI KONTROL ─────────────────────────────────────────────────────
+    # â”€â”€ GIRDI KONTROL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def girdi_kontrol(self, prompt: str) -> GuardrailSonucu:
         """Kullanici girdisini guvenlik acisindan kontrol et.
@@ -247,7 +247,7 @@ class GuardrailsManager:
             guvenli=True, tespit="", islem_zamani=time.time() - baslangic
         )
 
-    # ── CIKTI KONTROL ─────────────────────────────────────────────────────
+    # â”€â”€ CIKTI KONTROL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def cikti_kontrol(self, cikti: str) -> GuardrailSonucu:
         """LLM ciktisini guvenlik acisindan kontrol et.
@@ -331,7 +331,7 @@ class GuardrailsManager:
             guvenli=True, tespit="", islem_zamani=time.time() - baslangic
         )
 
-    # ── DURUM ─────────────────────────────────────────────────────────────
+    # â”€â”€ DURUM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def durum(self) -> Dict[str, Any]:
         """Guardrail sistemi durumu."""
@@ -357,14 +357,14 @@ class GuardrailsManager:
         )
 
     def sifirla(self):
-        """Sayaçları sıfırla."""
+        """SayaÃ§larÄ± sÄ±fÄ±rla."""
         self._saldiri_sayaci = 0
         self._toplam_kontrol = 0
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Singleton
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 _guardrails_manager_instance: Optional[GuardrailsManager] = None
 
@@ -377,9 +377,9 @@ def guardrails_manager_al() -> GuardrailsManager:
     return _guardrails_manager_instance
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Motor Tools
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def motor_kaydet(motor) -> None:
@@ -395,7 +395,7 @@ def motor_kaydet(motor) -> None:
     motor._plugin_arac_kaydet(
         "GIRDI_KONTROL",
         _girdi_kontrol_tool,
-        "GIRDI_KONTROL(prompt) — Kullanici girdisini prompt injection, "
+        "GIRDI_KONTROL(prompt) â€” Kullanici girdisini prompt injection, "
         "zararli komut ve PII'ya karsi kontrol et. "
         "Parametre: prompt=kontrol_edilecek_metin. "
         "Ornek: GIRDI_KONTROL(prompt='Merhaba, nasilsin?')",
@@ -403,7 +403,7 @@ def motor_kaydet(motor) -> None:
     motor._plugin_arac_kaydet(
         "CIKTI_KONTROL",
         _cikti_kontrol_tool,
-        "CIKTI_KONTROL(cikti) — LLM ciktisini yasakli icerik, "
+        "CIKTI_KONTROL(cikti) â€” LLM ciktisini yasakli icerik, "
         "kod exec ve PII sizintisina karsi kontrol et. "
         "Parametre: cikti=kontrol_edilecek_metin. "
         "Ornek: CIKTI_KONTROL(cikti='Islem basarili')",
@@ -411,7 +411,7 @@ def motor_kaydet(motor) -> None:
     motor._plugin_arac_kaydet(
         "GUARDRAIL_DURUM",
         _guardrail_durum_tool,
-        "GUARDRAIL_DURUM() — Guardrail sistemi durumunu goster: "
+        "GUARDRAIL_DURUM() â€” Guardrail sistemi durumunu goster: "
         "aktif desenler, toplam kontrol sayisi, tespit sayisi",
     )
     logger.info(
@@ -420,7 +420,7 @@ def motor_kaydet(motor) -> None:
 
 
 def _girdi_kontrol_tool(**kw) -> str:
-    """GIRDI_KONTROL aracı."""
+    """GIRDI_KONTROL aracÄ±."""
     args = kw.get("args", [])
     prompt = args[0] if args else kw.get("prompt", "")
 
@@ -431,10 +431,10 @@ def _girdi_kontrol_tool(**kw) -> str:
     sonuc = guard.girdi_kontrol(prompt)
 
     if sonuc.guvenli:
-        return f"[GIRDI_KONTROL] GUVENLI ✅\n  Sure: {round(sonuc.islem_zamani * 1000, 2)}ms"
+        return f"[GIRDI_KONTROL] GUVENLI âœ…\n  Sure: {round(sonuc.islem_zamani * 1000, 2)}ms"
     else:
         return (
-            f"[GIRDI_KONTROL] TEHLIKELI ⚠️\n"
+            f"[GIRDI_KONTROL] TEHLIKELI âš ï¸\n"
             f"  Tespit: {sonuc.tespit}\n"
             f"  Seviye: {sonuc.seviye}\n"
             f"  Eslesme: {sonuc.eslesme}\n"
@@ -443,7 +443,7 @@ def _girdi_kontrol_tool(**kw) -> str:
 
 
 def _cikti_kontrol_tool(**kw) -> str:
-    """CIKTI_KONTROL aracı."""
+    """CIKTI_KONTROL aracÄ±."""
     args = kw.get("args", [])
     cikti = args[0] if args else kw.get("cikti", "")
 
@@ -454,10 +454,10 @@ def _cikti_kontrol_tool(**kw) -> str:
     sonuc = guard.cikti_kontrol(cikti)
 
     if sonuc.guvenli:
-        return f"[CIKTI_KONTROL] GUVENLI ✅\n  Sure: {round(sonuc.islem_zamani * 1000, 2)}ms"
+        return f"[CIKTI_KONTROL] GUVENLI âœ…\n  Sure: {round(sonuc.islem_zamani * 1000, 2)}ms"
     else:
         return (
-            f"[CIKTI_KONTROL] TEHLIKELI ⚠️\n"
+            f"[CIKTI_KONTROL] TEHLIKELI âš ï¸\n"
             f"  Tespit: {sonuc.tespit}\n"
             f"  Seviye: {sonuc.seviye}\n"
             f"  Eslesme: {sonuc.eslesme}\n"
@@ -466,13 +466,13 @@ def _cikti_kontrol_tool(**kw) -> str:
 
 
 def _guardrail_durum_tool(**kw) -> str:
-    """GUARDRAIL_DURUM aracı."""
+    """GUARDRAIL_DURUM aracÄ±."""
     guard = guardrails_manager_al()
     durum = guard.durum()
 
     return (
         f"[GUARDRAIL] Sistem Durumu:\n"
-        f"  ThreatDetector: {'Aktif ✅' if durum['threat_detector_aktif'] else 'Pasif ❌'}\n"
+        f"  ThreatDetector: {'Aktif âœ…' if durum['threat_detector_aktif'] else 'Pasif âŒ'}\n"
         f"  Toplam Kontrol: {durum['toplam_kontrol']}\n"
         f"  Tespit: {durum['tespit_edilen_saldiri']}\n"
         f"  Aktif Desenler:\n"
@@ -484,9 +484,9 @@ def _guardrail_durum_tool(**kw) -> str:
     )
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Test
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
@@ -505,7 +505,7 @@ if __name__ == "__main__":
     print("\n--- Girdi Kontrol Testleri ---")
     for girdi in test_girdiler:
         sonuc = guard.girdi_kontrol(girdi)
-        durum = "GUVENLI ✅" if sonuc.guvenli else f"TESPT: {sonuc.tespit}"
+        durum = "GUVENLI âœ…" if sonuc.guvenli else f"TESPT: {sonuc.tespit}"
         print(f"  {girdi[:40]:<42} {durum}")
 
     test_ciktilar = [
@@ -517,8 +517,8 @@ if __name__ == "__main__":
     print("\n--- Cikti Kontrol Testleri ---")
     for cikti in test_ciktilar:
         sonuc = guard.cikti_kontrol(cikti)
-        durum = "GUVENLI ✅" if sonuc.guvenli else f"TESPT: {sonuc.tespit}"
+        durum = "GUVENLI âœ…" if sonuc.guvenli else f"TESPT: {sonuc.tespit}"
         print(f"  {cikti[:40]:<42} {durum}")
 
     print(f"\n{guard.istatistik()}")
-    print("\n✓ Test tamamlandi")
+    print("\nâœ“ Test tamamlandi")

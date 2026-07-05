@@ -1,20 +1,20 @@
-# -*- coding: utf-8 -*-
-"""📡 ACP (Agent Communication Protocol) + A2A Genişletmeleri
+﻿# -*- coding: utf-8 -*-
+"""ğŸ“¡ ACP (Agent Communication Protocol) + A2A GeniÅŸletmeleri
 
-Agent Communication Protocol (JSON-RPC 2.0 tabanlı) sunucu ve istemci.
-A2A'nın eksik yeteneklerini tamamlar:
+Agent Communication Protocol (JSON-RPC 2.0 tabanlÄ±) sunucu ve istemci.
+A2A'nÄ±n eksik yeteneklerini tamamlar:
 
-- **Agent Card**: Yetkinlik bildirimi, keşif, durum (capabilities)
-- **Skill Transfer**: Agent'lar arası yetenek/beceri aktarımı
-- **Task Delegation**: Görev devretme protokolü
+- **Agent Card**: Yetkinlik bildirimi, keÅŸif, durum (capabilities)
+- **Skill Transfer**: Agent'lar arasÄ± yetenek/beceri aktarÄ±mÄ±
+- **Task Delegation**: GÃ¶rev devretme protokolÃ¼
 
-Kullanım:
+KullanÄ±m:
     # Sunucu
     from reymen.a2a_acp import ACPServer
     server = ACPServer()
     server.start()
 
-    # İstemci (uzak sunucuya bağlan)
+    # Ä°stemci (uzak sunucuya baÄŸlan)
     from reymen.a2a_acp import ACPClient
     client = ACPClient("http://localhost:9200")
     client.initialize()
@@ -40,12 +40,12 @@ from typing import Any, Callable
 
 logger = logging.getLogger(__name__)
 
-# ── Versiyon ───────────────────────────────────────────────────────────────────
+# â”€â”€ Versiyon â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 ACP_PROTOCOL_VERSION = "2025-03-26"
 ACP_SERVER_VERSION = "1.0.0"
 
 
-# ── JSON-RPC Hata Kodları ──────────────────────────────────────────────────────
+# â”€â”€ JSON-RPC Hata KodlarÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 class ACPErrorCode:
     PARSE_ERROR = -32700
     INVALID_REQUEST = -32600
@@ -61,40 +61,40 @@ class ACPErrorCode:
     DELEGATION_FAILED = -32012
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# 1. VERİ MODELLERİ
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# 1. VERÄ° MODELLERÄ°
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class AgentCapability(str, Enum):
-    """Agent yetkinlik türleri."""
+    """Agent yetkinlik tÃ¼rleri."""
 
-    MESSAGING = "messaging"  # Temel mesajlaşma
-    TOOL_EXECUTION = "tool_execution"  # Araç çalıştırma
-    SKILL_TRANSFER = "skill_transfer"  # Beceri aktarımı
-    TASK_DELEGATION = "task_delegation"  # Görev devretme
-    STREAMING = "streaming"  # Stream yanıt
+    MESSAGING = "messaging"  # Temel mesajlaÅŸma
+    TOOL_EXECUTION = "tool_execution"  # AraÃ§ Ã§alÄ±ÅŸtÄ±rma
+    SKILL_TRANSFER = "skill_transfer"  # Beceri aktarÄ±mÄ±
+    TASK_DELEGATION = "task_delegation"  # GÃ¶rev devretme
+    STREAMING = "streaming"  # Stream yanÄ±t
     BROADCAST = "broadcast"  # Broadcast mesaj
     HEARTBEAT = "heartbeat"  # Periyodik sinyal
-    FILE_TRANSFER = "file_transfer"  # Dosya aktarımı
+    FILE_TRANSFER = "file_transfer"  # Dosya aktarÄ±mÄ±
 
 
 @dataclass
 class AgentCard:
-    """ACP Agent Kartı — Bir agent'ın yetkinlik bildirimi.
+    """ACP Agent KartÄ± â€” Bir agent'Ä±n yetkinlik bildirimi.
 
     Alanlar:
         agent_id: Benzersiz agent ID
-        name: Gösterim adı
+        name: GÃ¶sterim adÄ±
         version: Agent versiyonu
-        description: Kısa açıklama
+        description: KÄ±sa aÃ§Ä±klama
         capabilities: Desteklenen yetenekler listesi
-        skills: Agent'ın sahip olduğu beceriler
-        transport: Kullanılan taşıma protokolü (stdio/socket/http)
-        endpoints: Ulaşım adresleri (örn. http://host:port)
-        metadata: Ek anahtar-değer çiftleri
-        public_key: İsteğe bağlı imza anahtarı
-        last_seen: Son görülme zamanı (epoch)
+        skills: Agent'Ä±n sahip olduÄŸu beceriler
+        transport: KullanÄ±lan taÅŸÄ±ma protokolÃ¼ (stdio/socket/http)
+        endpoints: UlaÅŸÄ±m adresleri (Ã¶rn. http://host:port)
+        metadata: Ek anahtar-deÄŸer Ã§iftleri
+        public_key: Ä°steÄŸe baÄŸlÄ± imza anahtarÄ±
+        last_seen: Son gÃ¶rÃ¼lme zamanÄ± (epoch)
     """
 
     agent_id: str
@@ -143,21 +143,21 @@ class AgentCard:
 
 @dataclass
 class SkillPackage:
-    """Skill Transfer Paketi — Agent'lar arası beceri aktarım formatı.
+    """Skill Transfer Paketi â€” Agent'lar arasÄ± beceri aktarÄ±m formatÄ±.
 
     Alanlar:
         skill_id: Benzersiz beceri ID
-        name: Beceri adı
-        description: Açıklama
-        content: Beceri içeriği (markdown/metin/kod)
+        name: Beceri adÄ±
+        description: AÃ§Ä±klama
+        content: Beceri iÃ§eriÄŸi (markdown/metin/kod)
         source_agent: Kaynak agent ID
-        target_agent: Hedef agent ID (isteğe bağlı)
+        target_agent: Hedef agent ID (isteÄŸe baÄŸlÄ±)
         version: Beceri versiyonu
-        dependencies: Bağımlılıklar
+        dependencies: BaÄŸÄ±mlÄ±lÄ±klar
         category: Kategori
         tags: Etiketler
-        signature: İmza (isteğe bağlı)
-        transferred_at: Aktarım zamanı
+        signature: Ä°mza (isteÄŸe baÄŸlÄ±)
+        transferred_at: AktarÄ±m zamanÄ±
     """
 
     skill_id: str = field(default_factory=lambda: uuid.uuid4().hex[:16])
@@ -209,23 +209,23 @@ class SkillPackage:
 
 @dataclass
 class DelegationTask:
-    """Görev Devretme (Task Delegation) Paketi.
+    """GÃ¶rev Devretme (Task Delegation) Paketi.
 
     Alanlar:
-        task_id: Benzersiz görev ID
-        source_agent: Görevi devreden agent
-        target_agent: Görevi üstlenecek agent
-        title: Görev başlığı
-        description: Görev açıklaması
-        context: Bağlam/bilgi
-        priority: Öncelik (1-10)
+        task_id: Benzersiz gÃ¶rev ID
+        source_agent: GÃ¶revi devreden agent
+        target_agent: GÃ¶revi Ã¼stlenecek agent
+        title: GÃ¶rev baÅŸlÄ±ÄŸÄ±
+        description: GÃ¶rev aÃ§Ä±klamasÄ±
+        context: BaÄŸlam/bilgi
+        priority: Ã–ncelik (1-10)
         deadline: Son teslim (Unix epoch)
         status: Durum (pending/accepted/in_progress/completed/failed/rejected)
-        result: Görev sonucu
-        error: Hata mesajı
+        result: GÃ¶rev sonucu
+        error: Hata mesajÄ±
         metadata: Ek bilgiler
-        created_at: Oluşturulma zamanı
-        completed_at: Tamamlanma zamanı
+        created_at: OluÅŸturulma zamanÄ±
+        completed_at: Tamamlanma zamanÄ±
     """
 
     task_id: str = field(default_factory=lambda: uuid.uuid4().hex[:16])
@@ -281,15 +281,15 @@ class DelegationTask:
         )
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # 2. AGENT CARD REGISTRY
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class AgentCardRegistry:
-    """Merkezi Agent Card kayıt defteri.
+    """Merkezi Agent Card kayÄ±t defteri.
 
-    Agent'ların yetkinlik bildirimlerini tutar, keşif ve doğrulama sağlar.
+    Agent'larÄ±n yetkinlik bildirimlerini tutar, keÅŸif ve doÄŸrulama saÄŸlar.
     """
 
     def __init__(self):
@@ -298,7 +298,7 @@ class AgentCardRegistry:
         self._discovery_handlers: list[Callable[[AgentCard], None]] = []
 
     def register(self, card: AgentCard) -> None:
-        """Bir Agent Card kaydeder (varsa günceller)."""
+        """Bir Agent Card kaydeder (varsa gÃ¼nceller)."""
         card.last_seen = time.time()
         with self._lock:
             self._cards[card.agent_id] = card
@@ -308,7 +308,7 @@ class AgentCardRegistry:
             len(card.capabilities),
             len(card.skills),
         )
-        # Keşif handler'larını uyar
+        # KeÅŸif handler'larÄ±nÄ± uyar
         for handler in self._discovery_handlers:
             try:
                 handler(card)
@@ -316,7 +316,7 @@ class AgentCardRegistry:
                 logger.warning("[fix_01_sessiz_except] Exception")
 
     def unregister(self, agent_id: str) -> bool:
-        """Agent Card kaydını siler."""
+        """Agent Card kaydÄ±nÄ± siler."""
         with self._lock:
             if agent_id in self._cards:
                 del self._cards[agent_id]
@@ -325,12 +325,12 @@ class AgentCardRegistry:
         return False
 
     def get(self, agent_id: str) -> AgentCard | None:
-        """Bir agent'ın kartını getirir."""
+        """Bir agent'Ä±n kartÄ±nÄ± getirir."""
         with self._lock:
             return self._cards.get(agent_id)
 
     def list(self, capability: str | None = None) -> list[AgentCard]:
-        """Tüm kartları (veya belirli yeteneğe sahip olanları) listeler."""
+        """TÃ¼m kartlarÄ± (veya belirli yeteneÄŸe sahip olanlarÄ±) listeler."""
         with self._lock:
             cards = list(self._cards.values())
         if capability:
@@ -338,7 +338,7 @@ class AgentCardRegistry:
         return cards
 
     def search_by_skill(self, skill_name: str) -> list[AgentCard]:
-        """Belirli bir beceriye sahip agent'ları arar."""
+        """Belirli bir beceriye sahip agent'larÄ± arar."""
         with self._lock:
             return [
                 c
@@ -347,12 +347,12 @@ class AgentCardRegistry:
             ]
 
     def search_by_metadata(self, key: str, value: str) -> list[AgentCard]:
-        """Metadata alanına göre ara."""
+        """Metadata alanÄ±na gÃ¶re ara."""
         with self._lock:
             return [c for c in self._cards.values() if c.metadata.get(key) == value]
 
     def heartbeat(self, agent_id: str) -> bool:
-        """Agent'ın last_seen alanını günceller (heartbeat)."""
+        """Agent'Ä±n last_seen alanÄ±nÄ± gÃ¼nceller (heartbeat)."""
         with self._lock:
             card = self._cards.get(agent_id)
             if card:
@@ -361,7 +361,7 @@ class AgentCardRegistry:
         return False
 
     def cleanup_stale(self, max_age: float = 300.0) -> int:
-        """Belirli süredir görülmeyen agent'ları temizler (varsayılan: 5 dk)."""
+        """Belirli sÃ¼redir gÃ¶rÃ¼lmeyen agent'larÄ± temizler (varsayÄ±lan: 5 dk)."""
         now = time.time()
         stale = []
         with self._lock:
@@ -375,16 +375,16 @@ class AgentCardRegistry:
         return len(stale)
 
     def count(self) -> int:
-        """Kayıtlı agent sayısı."""
+        """KayÄ±tlÄ± agent sayÄ±sÄ±."""
         with self._lock:
             return len(self._cards)
 
     def on_discovery(self, handler: Callable[[AgentCard], None]) -> None:
-        """Yeni bir agent keşfedildiğinde çağrılacak handler ekler."""
+        """Yeni bir agent keÅŸfedildiÄŸinde Ã§aÄŸrÄ±lacak handler ekler."""
         self._discovery_handlers.append(handler)
 
     def to_dict(self) -> dict:
-        """Tüm kaydı dict olarak döndür."""
+        """TÃ¼m kaydÄ± dict olarak dÃ¶ndÃ¼r."""
         with self._lock:
             return {
                 "count": len(self._cards),
@@ -392,19 +392,19 @@ class AgentCardRegistry:
             }
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # 3. SKILL TRANSFER PROTOCOL
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class SkillTransferProtocol:
-    """Skill Transfer Protokolü — Agent'lar arası beceri aktarımı.
+    """Skill Transfer ProtokolÃ¼ â€” Agent'lar arasÄ± beceri aktarÄ±mÄ±.
 
     Yetenekler:
-        - Beceri paketleme ve gönderme
+        - Beceri paketleme ve gÃ¶nderme
         - Beceri alma ve kaydetme
-        - Versiyon kontrolü
-        - Bağımlılık yönetimi
+        - Versiyon kontrolÃ¼
+        - BaÄŸÄ±mlÄ±lÄ±k yÃ¶netimi
     """
 
     def __init__(self, skills_dir: str | Path | None = None):
@@ -427,7 +427,7 @@ class SkillTransferProtocol:
         tags: list[str] | None = None,
         dependencies: list[str] | None = None,
     ) -> SkillPackage:
-        """Bir beceriyi transfer paketine dönüştürür."""
+        """Bir beceriyi transfer paketine dÃ¶nÃ¼ÅŸtÃ¼rÃ¼r."""
         return SkillPackage(
             name=name,
             description=description or f"Skill: {name}",
@@ -440,20 +440,20 @@ class SkillTransferProtocol:
         )
 
     def receive_skill(self, pkg: SkillPackage) -> dict:
-        """Bir skill paketini alır ve kaydeder.
+        """Bir skill paketini alÄ±r ve kaydeder.
 
         Returns:
             {"status": "ok/error", "path": "...", "message": "..."}
         """
         try:
-            # Dosya adı oluştur
+            # Dosya adÄ± oluÅŸtur
             safe_name = "".join(
                 c if c.isalnum() or c in "_-" else "_" for c in pkg.name
             )
             filename = f"{safe_name}__{pkg.skill_id[:8]}.md"
             filepath = self._skills_dir / filename
 
-            # İçeriği yaz (frontmatter + body)
+            # Ä°Ã§eriÄŸi yaz (frontmatter + body)
             frontmatter = {
                 "skill_id": pkg.skill_id,
                 "name": pkg.name,
@@ -495,7 +495,7 @@ class SkillTransferProtocol:
             return {"status": "error", "message": str(e)}
 
     def list_incoming(self) -> list[SkillPackage]:
-        """Alınan becerileri listeler."""
+        """AlÄ±nan becerileri listeler."""
         with self._lock:
             return list(self._incoming.values())
 
@@ -504,16 +504,16 @@ class SkillTransferProtocol:
             return self._incoming.get(skill_id)
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # 4. TASK DELEGATION PROTOCOL
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class TaskDelegationProtocol:
-    """Görev Devretme Protokolü (Task Delegation).
+    """GÃ¶rev Devretme ProtokolÃ¼ (Task Delegation).
 
-    Agent'ların birbirlerine görev devretmesini, takibini ve
-    sonuçlandırmasını sağlayan protokol.
+    Agent'larÄ±n birbirlerine gÃ¶rev devretmesini, takibini ve
+    sonuÃ§landÄ±rmasÄ±nÄ± saÄŸlayan protokol.
     """
 
     def __init__(self):
@@ -532,10 +532,10 @@ class TaskDelegationProtocol:
         deadline: float = 0.0,
         metadata: dict | None = None,
     ) -> DelegationTask:
-        """Bir görevi başka bir agent'a devreder.
+        """Bir gÃ¶revi baÅŸka bir agent'a devreder.
 
         Returns:
-            Oluşturulan DelegationTask objesi.
+            OluÅŸturulan DelegationTask objesi.
         """
         task = DelegationTask(
             source_agent=source,
@@ -570,11 +570,11 @@ class TaskDelegationProtocol:
         return task
 
     def accept(self, task_id: str) -> bool:
-        """Görevi kabul eder."""
+        """GÃ¶revi kabul eder."""
         return self.update_status(task_id, "accepted")
 
     def reject(self, task_id: str, reason: str = "") -> bool:
-        """Görevi reddeder."""
+        """GÃ¶revi reddeder."""
         with self._lock:
             task = self._tasks.get(task_id)
             if task:
@@ -584,7 +584,7 @@ class TaskDelegationProtocol:
         return False
 
     def update_status(self, task_id: str, status: str, result: str = "") -> bool:
-        """Görev durumunu günceller."""
+        """GÃ¶rev durumunu gÃ¼nceller."""
         with self._lock:
             task = self._tasks.get(task_id)
             if task:
@@ -597,7 +597,7 @@ class TaskDelegationProtocol:
         return False
 
     def get_task(self, task_id: str) -> DelegationTask | None:
-        """Bir görevin detayını getirir."""
+        """Bir gÃ¶revin detayÄ±nÄ± getirir."""
         with self._lock:
             return self._tasks.get(task_id)
 
@@ -606,7 +606,7 @@ class TaskDelegationProtocol:
         agent_id: str | None = None,
         status: str | None = None,
     ) -> list[DelegationTask]:
-        """Görevleri listeler (filtreleme destekli)."""
+        """GÃ¶revleri listeler (filtreleme destekli)."""
         with self._lock:
             tasks = list(self._tasks.values())
 
@@ -624,10 +624,10 @@ class TaskDelegationProtocol:
     def set_handler(
         self, agent_id: str, handler: Callable[[DelegationTask], str]
     ) -> None:
-        """Bir agent için delegasyon handler'ı ayarlar.
+        """Bir agent iÃ§in delegasyon handler'Ä± ayarlar.
 
-        Gelen görevler otomatik olarak handler'a iletilir.
-        Handler dönen string task status mesajı olarak kullanılır.
+        Gelen gÃ¶revler otomatik olarak handler'a iletilir.
+        Handler dÃ¶nen string task status mesajÄ± olarak kullanÄ±lÄ±r.
         """
         with self._lock:
             self._handlers[agent_id] = handler
@@ -651,33 +651,33 @@ class TaskDelegationProtocol:
         }
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # 5. ACP SUNUCU (JSON-RPC 2.0 over stdio/socket)
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class ACPServer:
-    """ACP Sunucusu — JSON-RPC 2.0 protokolü ile agent iletişimi.
+    """ACP Sunucusu â€” JSON-RPC 2.0 protokolÃ¼ ile agent iletiÅŸimi.
 
     Desteklenen Metotlar:
-        - initialize              : Bağlantı başlatma
-        - tools/list              : Araç listesi
-        - tools/call              : Araç çağırma
+        - initialize              : BaÄŸlantÄ± baÅŸlatma
+        - tools/list              : AraÃ§ listesi
+        - tools/call              : AraÃ§ Ã§aÄŸÄ±rma
         - skills/list             : Beceri listesi
-        - skills/get              : Beceri detayı
+        - skills/get              : Beceri detayÄ±
         - card/register           : Agent Card kaydetme
         - card/get                : Agent Card sorgulama
         - card/list               : Agent Card listesi
         - card/search             : Card arama
         - card/heartbeat          : Heartbeat sinyali
-        - skill/transfer          : Beceri aktarımı
+        - skill/transfer          : Beceri aktarÄ±mÄ±
         - skill/receive           : Beceri alma
-        - task/delegate           : Görev devretme
-        - task/status             : Görev durumu
-        - task/list               : Görev listesi
-        - task/update             : Görev güncelleme
-        - ping                    : Sağlık kontrolü
-        - health                  : Detaylı sağlık
+        - task/delegate           : GÃ¶rev devretme
+        - task/status             : GÃ¶rev durumu
+        - task/list               : GÃ¶rev listesi
+        - task/update             : GÃ¶rev gÃ¼ncelleme
+        - ping                    : SaÄŸlÄ±k kontrolÃ¼
+        - health                  : DetaylÄ± saÄŸlÄ±k
         - shutdown                : Kapatma
     """
 
@@ -698,17 +698,17 @@ class ACPServer:
         self._client_info: dict = {}
         self._protocol_version = ACP_PROTOCOL_VERSION
 
-        # Tool registry (plugin'ler tarafından ayarlanır)
+        # Tool registry (plugin'ler tarafÄ±ndan ayarlanÄ±r)
         self._tool_registry = None
         self._tool_list_fn: Callable | None = None
         self._tool_call_fn: Callable | None = None
         self._skill_list_fn: Callable | None = None
         self._skill_get_fn: Callable | None = None
 
-    # ── Plugin API ──────────────────────────────────────────────────────────
+    # â”€â”€ Plugin API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def set_tool_registry(self, registry: Any) -> None:
-        """ToolRegistry referansını ayarlar."""
+        """ToolRegistry referansÄ±nÄ± ayarlar."""
         self._tool_registry = registry
 
     def set_tool_list_fn(self, fn: Callable[[], list[dict]]) -> None:
@@ -716,7 +716,7 @@ class ACPServer:
         self._tool_list_fn = fn
 
     def set_tool_call_fn(self, fn: Callable[[str, dict], str]) -> None:
-        """Tool çağırma fonksiyonunu ayarlar."""
+        """Tool Ã§aÄŸÄ±rma fonksiyonunu ayarlar."""
         self._tool_call_fn = fn
 
     def set_skill_list_fn(self, fn: Callable[[], list[dict]]) -> None:
@@ -737,10 +737,10 @@ class ACPServer:
     def delegation(self) -> TaskDelegationProtocol:
         return self._delegation
 
-    # ── JSON-RPC Çekirdek ──────────────────────────────────────────────────
+    # â”€â”€ JSON-RPC Ã‡ekirdek â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _json_safe(self, val: Any) -> Any:
-        """JSON serialize edilemeyen değerleri str()'e çevirir."""
+        """JSON serialize edilemeyen deÄŸerleri str()'e Ã§evirir."""
         if val is None or isinstance(val, (str, int, float, bool)):
             return val
         if isinstance(val, (list, tuple)):
@@ -771,10 +771,10 @@ class ACPServer:
     def _timestamp(self) -> str:
         return datetime.now(tz=timezone.utc).isoformat()
 
-    # ── İstek İşleme ──────────────────────────────────────────────────────
+    # â”€â”€ Ä°stek Ä°ÅŸleme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def handle(self, raw: str) -> str:
-        """Tek bir JSON-RPC isteğini işler, yanıt döndürür."""
+        """Tek bir JSON-RPC isteÄŸini iÅŸler, yanÄ±t dÃ¶ndÃ¼rÃ¼r."""
         raw = raw.strip()
         if not raw:
             return ""
@@ -832,12 +832,12 @@ class ACPServer:
             if name.startswith("_method_")
         )
 
-    # ── JSON-RPC Metotları ────────────────────────────────────────────────
+    # â”€â”€ JSON-RPC MetotlarÄ± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _method_initialize(
         self, protocol_version: str = None, client_info: dict = None, **kw
     ) -> dict:
-        """Bağlantı başlatma."""
+        """BaÄŸlantÄ± baÅŸlatma."""
         self.initialized = True
         self._client_info = client_info or {}
         if protocol_version:
@@ -878,7 +878,7 @@ class ACPServer:
         self._stop_event.set()
         return {"shutdown": True, "message": "ACP sunucusu kapatildi."}
 
-    # ── Tools ─────────────────────────────────────────────────────────────
+    # â”€â”€ Tools â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _list_tools(self) -> list[dict]:
         if self._tool_list_fn:
@@ -942,7 +942,7 @@ class ACPServer:
             "isError": True,
         }
 
-    # ── Skills ────────────────────────────────────────────────────────────
+    # â”€â”€ Skills â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _method_skills_list(self, **kw) -> dict:
         skills = []
@@ -962,7 +962,7 @@ class ACPServer:
             )
         return {"skill": None, "error": "Skill get fonksiyonu yuklu degil"}
 
-    # ── Agent Card ────────────────────────────────────────────────────────
+    # â”€â”€ Agent Card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _method_card_register(self, card: dict = None, **kw) -> dict:
         """Agent Card kaydeder."""
@@ -980,7 +980,7 @@ class ACPServer:
             return {"status": "error", "message": str(e)}
 
     def _method_card_get(self, agent_id: str = None, **kw) -> dict:
-        """Bir agent'ın kartını getirir."""
+        """Bir agent'Ä±n kartÄ±nÄ± getirir."""
         if not agent_id:
             return {"status": "error", "message": "agent_id gerekli"}
         card = self._card_registry.get(agent_id)
@@ -989,7 +989,7 @@ class ACPServer:
         return {"status": "error", "message": f"Agent '{agent_id}' bulunamadi"}
 
     def _method_card_list(self, capability: str = None, **kw) -> dict:
-        """Tüm kartları listeler."""
+        """TÃ¼m kartlarÄ± listeler."""
         cards = self._card_registry.list(capability)
         return {
             "count": len(cards),
@@ -1018,10 +1018,10 @@ class ACPServer:
             "message": "Heartbeat alindi" if ok else f"Agent '{agent_id}' bulunamadi",
         }
 
-    # ── Skill Transfer ────────────────────────────────────────────────────
+    # â”€â”€ Skill Transfer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _method_skill_transfer(self, **kw) -> dict:
-        """Bir beceriyi başka bir agent'a aktarır (paket oluşturur)."""
+        """Bir beceriyi baÅŸka bir agent'a aktarÄ±r (paket oluÅŸturur)."""
         name = kw.get("name", "")
         content = kw.get("content", "")
         source = kw.get("source_agent", kw.get("source", ""))
@@ -1049,7 +1049,7 @@ class ACPServer:
         }
 
     def _method_skill_receive(self, package: dict = None, **kw) -> dict:
-        """Bir skill paketini alır ve kaydeder."""
+        """Bir skill paketini alÄ±r ve kaydeder."""
         if not package:
             return {"status": "error", "message": "Skill package gerekli"}
         pkg = SkillPackage.from_dict(package)
@@ -1057,14 +1057,14 @@ class ACPServer:
         return result
 
     def _method_skill_list_incoming(self, **kw) -> dict:
-        """Alınan becerileri listeler."""
+        """AlÄ±nan becerileri listeler."""
         skills = self._skill_protocol.list_incoming()
         return {"count": len(skills), "skills": [s.to_dict() for s in skills]}
 
-    # ── Task Delegation ───────────────────────────────────────────────────
+    # â”€â”€ Task Delegation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _method_task_delegate(self, **kw) -> dict:
-        """Bir görevi başka agent'a devreder."""
+        """Bir gÃ¶revi baÅŸka agent'a devreder."""
         source = kw.get("source_agent", kw.get("source", ""))
         target = kw.get("target_agent", kw.get("target", ""))
         title = kw.get("title", "")
@@ -1094,7 +1094,7 @@ class ACPServer:
         }
 
     def _method_task_status(self, task_id: str = None, **kw) -> dict:
-        """Bir görevin durumunu sorgular."""
+        """Bir gÃ¶revin durumunu sorgular."""
         if not task_id:
             return {"status": "error", "message": "task_id gerekli"}
         task = self._delegation.get_task(task_id)
@@ -1103,14 +1103,14 @@ class ACPServer:
         return {"status": "error", "message": f"Task '{task_id}' bulunamadi"}
 
     def _method_task_list(self, agent_id: str = None, status: str = None, **kw) -> dict:
-        """Görevleri listeler."""
+        """GÃ¶revleri listeler."""
         tasks = self._delegation.list_tasks(agent_id, status)
         return {"count": len(tasks), "tasks": [t.to_dict() for t in tasks]}
 
     def _method_task_update(
         self, task_id: str = None, status: str = None, result: str = "", **kw
     ) -> dict:
-        """Görev durumunu günceller."""
+        """GÃ¶rev durumunu gÃ¼nceller."""
         if not task_id or not status:
             return {"status": "error", "message": "task_id ve status gerekli"}
         ok = self._delegation.update_status(task_id, status, result)
@@ -1134,10 +1134,10 @@ class ACPServer:
     def _method_task_stats(self, **kw) -> dict:
         return self._delegation.stats()
 
-    # ── Yaşam Döngüsü ────────────────────────────────────────────────────
+    # â”€â”€ YaÅŸam DÃ¶ngÃ¼sÃ¼ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def start(self) -> None:
-        """Sunucuyu başlatır (transport moduna göre)."""
+        """Sunucuyu baÅŸlatÄ±r (transport moduna gÃ¶re)."""
         self.running = True
         self.initialized = True
         self._start_time = time.time()
@@ -1150,7 +1150,7 @@ class ACPServer:
             logger.error("[ACP] Bilinmeyen transport: %s", self.transport)
 
     def _start_stdio(self) -> None:
-        """Stdio modunda çalıştır (her satırda bir JSON mesajı)."""
+        """Stdio modunda Ã§alÄ±ÅŸtÄ±r (her satÄ±rda bir JSON mesajÄ±)."""
         logger.info("[ACP] Sunucu basladi (stdio)")
         try:
             for line in sys.stdin:
@@ -1170,7 +1170,7 @@ class ACPServer:
             logger.info("[ACP] Sunucu durduruldu (stdio)")
 
     def _start_socket(self) -> None:
-        """Socket modunda çalıştır."""
+        """Socket modunda Ã§alÄ±ÅŸtÄ±r."""
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         try:
@@ -1196,7 +1196,7 @@ class ACPServer:
             logger.info("[ACP] Sunucu durduruldu (socket)")
 
     def _handle_socket_client(self, conn: socket.socket, addr: tuple) -> None:
-        """Bir socket istemcisini işler."""
+        """Bir socket istemcisini iÅŸler."""
         logger.debug("[ACP] Baglanti: %s", addr)
         buffer = ""
         try:
@@ -1217,7 +1217,7 @@ class ACPServer:
             conn.close()
 
     def start_threaded(self) -> threading.Thread:
-        """Sunucuyu ayrı bir thread'de başlatır."""
+        """Sunucuyu ayrÄ± bir thread'de baÅŸlatÄ±r."""
         self._stop_event.clear()
         self._thread = threading.Thread(target=self.start, daemon=True)
         self._thread.start()
@@ -1229,15 +1229,15 @@ class ACPServer:
         self._stop_event.set()
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# 6. ACP İSTEMCİ (HTTP/Socket istemcisi)
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# 6. ACP Ä°STEMCÄ° (HTTP/Socket istemcisi)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class ACPClient:
-    """ACP İstemcisi — Uzak bir ACP sunucusuna bağlanmak için.
+    """ACP Ä°stemcisi â€” Uzak bir ACP sunucusuna baÄŸlanmak iÃ§in.
 
-    Kullanım:
+    KullanÄ±m:
         client = ACPClient("http://localhost:9200")
         client.initialize()
         tools = client.tools_list()
@@ -1258,7 +1258,7 @@ class ACPClient:
         return self._req_id
 
     def _call(self, method: str, params: dict | None = None) -> dict:
-        """JSON-RPC çağrısı yapar."""
+        """JSON-RPC Ã§aÄŸrÄ±sÄ± yapar."""
         req_id = self._next_id()
         payload = {
             "jsonrpc": "2.0",
@@ -1273,7 +1273,7 @@ class ACPClient:
             return self._call_stdio(payload)
 
     def _call_http(self, payload: dict) -> dict:
-        """HTTP üzerinden JSON-RPC çağrısı."""
+        """HTTP Ã¼zerinden JSON-RPC Ã§aÄŸrÄ±sÄ±."""
         import httpx
 
         if self._session is None:
@@ -1288,16 +1288,16 @@ class ACPClient:
             return {"error": {"code": -1, "message": str(e)}, "id": payload["id"]}
 
     def _call_stdio(self, payload: dict) -> dict:
-        """Stdio üzerinden JSON-RPC çağrısı (yerel process)."""
-        # Stdio modu sadece sunucu için; istemci genelde HTTP kullanır
+        """Stdio Ã¼zerinden JSON-RPC Ã§aÄŸrÄ±sÄ± (yerel process)."""
+        # Stdio modu sadece sunucu iÃ§in; istemci genelde HTTP kullanÄ±r
         raise NotImplementedError(
             "Stdio istemci modu henuz desteklenmiyor. HTTP kullanin."
         )
 
-    # ── Ana Metotlar ──────────────────────────────────────────────────────
+    # â”€â”€ Ana Metotlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def initialize(self, client_info: dict | None = None) -> dict:
-        """ACP bağlantısını başlatır."""
+        """ACP baÄŸlantÄ±sÄ±nÄ± baÅŸlatÄ±r."""
         result = self._call(
             "initialize",
             {
@@ -1431,9 +1431,9 @@ class ACPClient:
         self.close()
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # 7. MOTOR ENTEGRASYONU
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 # Global singleton
 _ACP_SERVER_INSTANCE: ACPServer | None = None
@@ -1441,14 +1441,14 @@ _ACP_SERVER_LOCK = threading.Lock()
 
 
 def _acp_baslat(**kw) -> str:
-    """ACP sunucusunu başlatır.
+    """ACP sunucusunu baÅŸlatÄ±r.
 
     Parametreler:
-        transport: "stdio" (varsayılan) veya "socket"
-        port: Socket port (transport="socket" ise, varsayılan: 9200)
-        host: Socket host (varsayılan: 127.0.0.1)
+        transport: "stdio" (varsayÄ±lan) veya "socket"
+        port: Socket port (transport="socket" ise, varsayÄ±lan: 9200)
+        host: Socket host (varsayÄ±lan: 127.0.0.1)
 
-    Örnek:
+    Ã–rnek:
         ACP_BASLAT transport=socket port=9200 host=0.0.0.0
         ACP_BASLAT transport=stdio
     """
@@ -1463,7 +1463,7 @@ def _acp_baslat(**kw) -> str:
 
         _ACP_SERVER_INSTANCE = ACPServer(transport=transport, host=host, port=port)
         _ACP_SERVER_INSTANCE.start_threaded()
-        time.sleep(0.1)  # Thread'in başlamasına izin ver
+        time.sleep(0.1)  # Thread'in baÅŸlamasÄ±na izin ver
 
         ek = ""
         if transport == "socket":
@@ -1472,14 +1472,14 @@ def _acp_baslat(**kw) -> str:
 
 
 def _acp_durum(**kw) -> str:
-    """ACP sunucu durumunu gösterir."""
+    """ACP sunucu durumunu gÃ¶sterir."""
     global _ACP_SERVER_INSTANCE
     if _ACP_SERVER_INSTANCE is None:
         return "[ACP] Sunucu baslatilmadi. (ACP_BASLAT ile baslat)"
     s = _ACP_SERVER_INSTANCE
     return (
         f"[ACP] Sunucu Durumu:\n"
-        f"  Durum: {'🟢 AKTIF' if s.running else '🔴 DURDURULDU'}\n"
+        f"  Durum: {'ğŸŸ¢ AKTIF' if s.running else 'ğŸ”´ DURDURULDU'}\n"
         f"  Transport: {s.transport}\n"
         f"  Agent Sayisi: {s._card_registry.count()}\n"
         f"  Calisma: {time.time() - s._start_time:.0f}s"
@@ -1497,7 +1497,7 @@ def _acp_durdur(**kw) -> str:
 
 
 def _acp_card_liste(**kw) -> str:
-    """Kayıtlı Agent Card'ları listeler."""
+    """KayÄ±tlÄ± Agent Card'larÄ± listeler."""
     global _ACP_SERVER_INSTANCE
     if not _ACP_SERVER_INSTANCE or not _ACP_SERVER_INSTANCE.running:
         return "[ACP] Sunucu calismiyor."
@@ -1508,8 +1508,8 @@ def _acp_card_liste(**kw) -> str:
     for c in cards:
         yetenek = ", ".join(c.capabilities[:4])
         satirlar.append(
-            f"  🆔 {c.agent_id}\n"
-            f"     İsim: {c.name or '-'}\n"
+            f"  ğŸ†” {c.agent_id}\n"
+            f"     Ä°sim: {c.name or '-'}\n"
             f"     Yetenek: {yetenek or '-'}\n"
             f"     Beceri: {len(c.skills)} adet\n"
             f"     Son: {time.time() - c.last_seen:.0f}s once"
@@ -1522,9 +1522,9 @@ def _acp_card_kaydet(**kw) -> str:
 
     Parametreler:
         agent_id: Benzersiz ID (zorunlu)
-        name: Gösterim adı
-        capabilities: Yetenek listesi (virgülle ayrılmış)
-        skills: Beceri listesi (virgülle ayrılmış)
+        name: GÃ¶sterim adÄ±
+        capabilities: Yetenek listesi (virgÃ¼lle ayrÄ±lmÄ±ÅŸ)
+        skills: Beceri listesi (virgÃ¼lle ayrÄ±lmÄ±ÅŸ)
     """
     global _ACP_SERVER_INSTANCE
     if not _ACP_SERVER_INSTANCE or not _ACP_SERVER_INSTANCE.running:
@@ -1553,15 +1553,15 @@ def _acp_card_kaydet(**kw) -> str:
 
 
 def _acp_delege(**kw) -> str:
-    """Bir görevi başka bir agent'a devreder.
+    """Bir gÃ¶revi baÅŸka bir agent'a devreder.
 
     Parametreler:
         source: Kaynak agent ID
         target: Hedef agent ID
-        title: Görev başlığı
-        description: Görev açıklaması
-        context: Bağlam bilgisi
-        priority: Öncelik (1-10)
+        title: GÃ¶rev baÅŸlÄ±ÄŸÄ±
+        description: GÃ¶rev aÃ§Ä±klamasÄ±
+        context: BaÄŸlam bilgisi
+        priority: Ã–ncelik (1-10)
     """
     global _ACP_SERVER_INSTANCE
     if not _ACP_SERVER_INSTANCE or not _ACP_SERVER_INSTANCE.running:
@@ -1592,10 +1592,10 @@ def _acp_delege(**kw) -> str:
 
 
 def _acp_gorev_liste(**kw) -> str:
-    """Görevleri listeler.
+    """GÃ¶revleri listeler.
 
     Parametreler:
-        agent_id: Sadece bu agent'ın görevleri
+        agent_id: Sadece bu agent'Ä±n gÃ¶revleri
         status: Durum filtresi (pending/accepted/completed/failed)
     """
     global _ACP_SERVER_INSTANCE
@@ -1611,7 +1611,7 @@ def _acp_gorev_liste(**kw) -> str:
     satirlar = [f"[ACP] Gorevler ({len(tasks)}):"]
     for t in tasks:
         satirlar.append(
-            f"  📋 {t.task_id[:12]} | {t.title[:40]:<42} | {t.status:<12} | "
+            f"  ğŸ“‹ {t.task_id[:12]} | {t.title[:40]:<42} | {t.status:<12} | "
             f"{t.source_agent} -> {t.target_agent}"
         )
     return "\n".join(satirlar)
@@ -1621,10 +1621,10 @@ def _acp_beceri_aktar(**kw) -> str:
     """Bir beceriyi paketler (skill transfer).
 
     Parametreler:
-        name: Beceri adı
+        name: Beceri adÄ±
         source: Kaynak agent ID
-        content: Beceri içeriği
-        description: Açıklama
+        content: Beceri iÃ§eriÄŸi
+        description: AÃ§Ä±klama
     """
     global _ACP_SERVER_INSTANCE
     if not _ACP_SERVER_INSTANCE or not _ACP_SERVER_INSTANCE.running:
@@ -1654,7 +1654,7 @@ def _acp_beceri_aktar(**kw) -> str:
 
 
 def _acp_istatistik(**kw) -> str:
-    """ACP istatistiklerini gösterir."""
+    """ACP istatistiklerini gÃ¶sterir."""
     global _ACP_SERVER_INSTANCE
     if not _ACP_SERVER_INSTANCE or not _ACP_SERVER_INSTANCE.running:
         return "[ACP] Sunucu calismiyor."
@@ -1683,7 +1683,7 @@ def _acp_istatistik(**kw) -> str:
 
 
 def motor_kaydet(motor: Any) -> None:
-    """Motor'a ACP araçlarını kaydeder.
+    """Motor'a ACP araÃ§larÄ±nÄ± kaydeder.
 
     Args:
         motor: Motor instance (_plugin_arac_kaydet metoduna sahip)
@@ -1750,16 +1750,16 @@ def motor_kaydet(motor: Any) -> None:
     logger.info("[ACP-MOTOR] 9 arac kaydedildi")
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# 8. TEST / DOĞRUDAN ÇALIŞTIRMA
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# 8. TEST / DOÄRUDAN Ã‡ALIÅTIRMA
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def _test() -> None:
     """Basit entegrasyon testi."""
     print("=== ACP Server Test ===\n")
 
-    # 1. Sunucu oluştur
+    # 1. Sunucu oluÅŸtur
     server = ACPServer()
     print("[Test 1] Sunucu olusturuldu.")
 

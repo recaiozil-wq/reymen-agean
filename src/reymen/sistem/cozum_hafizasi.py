@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""cozum_hafizasi.py — Cozulmus sorunlari yapilandirilmis bicimde tutar.
+﻿# -*- coding: utf-8 -*-
+"""cozum_hafizasi.py â€” Cozulmus sorunlari yapilandirilmis bicimde tutar.
 
 Her kayit: sorun, kok neden, cozum, basari/fail sayisi, guven skoru.
 Yeni sorun geldiginde once buraya bak, eslesen varsa uygula.
@@ -37,7 +37,7 @@ __all__ = [
     "motor_kaydet",
 ]
 
-# ── Varsayilan yapilandirma ──────────────────────────────────────────────
+# â”€â”€ Varsayilan yapilandirma â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _VARSAYILAN_DB = (
     Path(__file__).resolve().parent.parent.parent
@@ -48,7 +48,7 @@ _VARSAYILAN_DB = (
 _VARSAYILAN_CONFIDENCE = 0.0  # Yeni kayit: test edilmemis, gizli
 
 
-# ── Veritabani ───────────────────────────────────────────────────────────
+# â”€â”€ Veritabani â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _db_baglan(db_yolu: str | Path | None = None) -> sqlite3.Connection:
@@ -91,7 +91,7 @@ def _db_olustur(conn: sqlite3.Connection) -> None:
     """)
 
 
-# ── CozumHafizasi Sinifi ─────────────────────────────────────────────────
+# â”€â”€ CozumHafizasi Sinifi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class CozumHafizasi:
@@ -119,15 +119,15 @@ class CozumHafizasi:
     def _baglan(self) -> sqlite3.Connection:
         return _db_baglan(self._db_yolu)
 
-    # ── SORGU ────────────────────────────────────────────────────────────
+    # â”€â”€ SORGU â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def bul(self, metin: str, limit: int = 5) -> list[dict[str, Any]]:
         """Sorun metnine gore en uygun cozumu bul (FTS5 + 3-katmanli confidence).
 
         Katmanlar:
-          - 0.6+  : yuksek guven → normal goster, siralamada onde
-          - 0.3-0.6: dusuk guven → "dusuk guvenilirlik" etiketiyle goster
-          - 0.0-0.3: guvensiz → tamamen gizle
+          - 0.6+  : yuksek guven â†’ normal goster, siralamada onde
+          - 0.3-0.6: dusuk guven â†’ "dusuk guvenilirlik" etiketiyle goster
+          - 0.0-0.3: guvensiz â†’ tamamen gizle
 
         Hic 0.3+ sonuc yoksa bos liste don (cagiran 'guvenilir cozum yok' mesaji verir).
 
@@ -206,7 +206,7 @@ class CozumHafizasi:
         finally:
             conn.close()
 
-    # ── KAYIT ─────────────────────────────────────────────────────────────
+    # â”€â”€ KAYIT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def kaydet(
         self,
@@ -264,12 +264,12 @@ class CozumHafizasi:
                 log.warning(f"[cozum_hafizasi] DB yazma hatasi: {e}")
                 pass
             conn.commit()
-            logger.info("[CozumHafizasi] Kaydedildi: #%d — %s", kayit_id, problem[:60])
+            logger.info("[CozumHafizasi] Kaydedildi: #%d â€” %s", kayit_id, problem[:60])
             return kayit_id
         finally:
             conn.close()
 
-    # ── GERI BILDIRIM ────────────────────────────────────────────────────
+    # â”€â”€ GERI BILDIRIM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def geri_bildirim(self, kayit_id: int, basarili: bool) -> dict[str, Any]:
         """Cozumun ise yarayip yaramadigini kaydet.
@@ -314,7 +314,7 @@ class CozumHafizasi:
                     "SELECT * FROM cozumler WHERE id=?", (kayit_id,)
                 ).fetchone()
             )
-            durum = "✅" if basarili else "❌"
+            durum = "âœ…" if basarili else "âŒ"
             logger.info(
                 "[CozumHafizasi] Geri bildirim #%d: %s (confidence=%.2f)",
                 kayit_id,
@@ -325,7 +325,7 @@ class CozumHafizasi:
         finally:
             conn.close()
 
-    # ── DISARI AKTARIM ───────────────────────────────────────────────────
+    # â”€â”€ DISARI AKTARIM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def json_export(
         self,
@@ -388,7 +388,7 @@ class CozumHafizasi:
         finally:
             conn.close()
 
-    # ── ISTATISTIK ───────────────────────────────────────────────────────
+    # â”€â”€ ISTATISTIK â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def istatistik(self) -> dict[str, Any]:
         """Cozum havuzu istatistikleri."""
@@ -440,7 +440,7 @@ class CozumHafizasi:
             conn.close()
 
 
-# ── Modul seviyesi fonksiyonlar (dogrudan erisim) ────────────────────────
+# â”€â”€ Modul seviyesi fonksiyonlar (dogrudan erisim) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _singleton = CozumHafizasi()
 
@@ -463,7 +463,7 @@ def cozum_geri_bildirim(kayit_id: int, basarili: bool) -> dict[str, Any]:
     return _singleton.geri_bildirim(kayit_id, basarili)
 
 
-# ── Motor kaydi ──────────────────────────────────────────────────────────
+# â”€â”€ Motor kaydi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _tool_cozum_bul(**kw) -> str:

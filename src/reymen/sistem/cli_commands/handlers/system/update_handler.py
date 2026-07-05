@@ -1,8 +1,8 @@
-"""_handle_update_command handler."""
+﻿"""_handle_update_command handler."""
 
 
 def _handle_update_command(cli) -> bool:
-    """Handle /update — update ReYMeN Agent to the latest version.
+    """Handle /update â€” update ReYMeN Agent to the latest version.
 
     In the classic CLI this exits the session and relaunches as
     ``ReYMeN update`` so the user sees update output directly and gets
@@ -16,7 +16,7 @@ def _handle_update_command(cli) -> bool:
     from reymen.reymen_cli.config import is_managed, format_managed_message
 
     if is_managed():
-        print(f"  ✗ {format_managed_message('update ReYMeN Agent')}")
+        print(f"  âœ— {format_managed_message('update ReYMeN Agent')}")
         return False
 
     # Use the prompt_toolkit-native modal so the confirmation panel
@@ -28,20 +28,20 @@ def _handle_update_command(cli) -> bool:
         ("cancel", "Cancel", "keep the current session"),
     ]
     raw = cli._prompt_text_input_modal(
-        title="⚕  Update ReYMeN Agent",
+        title="âš•  Update ReYMeN Agent",
         detail="This will exit the current session and run `ReYMeN update`.",
         choices=choices,
     )
     if raw is None:
-        print("  🟡 /update cancelled.")
+        print("  ğŸŸ¡ /update cancelled.")
         return False
     choice = cli._normalize_slash_confirm_choice(raw, choices)
     if choice != "once":
-        print("  🟡 /update cancelled.")
+        print("  ğŸŸ¡ /update cancelled.")
         return False
 
     print()
-    print("  ⚕ Launching update...")
+    print("  âš• Launching update...")
     print()
 
     # Store the relaunch args so run() can exec them from the main thread

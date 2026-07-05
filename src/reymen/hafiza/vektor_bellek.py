@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-vektor_bellek.py — VektorBellek: Embedding + semantic search.
+vektor_bellek.py â€” VektorBellek: Embedding + semantic search.
 
 ChromaDB backend (varsayilan), SQLite fallback.
 Embedding model: sentence-transformers/all-MiniLM-L6-v2 (opsiyonel)
@@ -27,8 +27,8 @@ from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
-# ── ChromaDB (LAZY import — modül seviyesinde degil, ilk kullanimda yuklenir)
-# Agir bagimliliklari (torch vb.) nedeniyle modül seviyesinde import edilmez.
+# â”€â”€ ChromaDB (LAZY import â€” modÃ¼l seviyesinde degil, ilk kullanimda yuklenir)
+# Agir bagimliliklari (torch vb.) nedeniyle modÃ¼l seviyesinde import edilmez.
 CHROMA_MEVCUT = None
 SENTENCE_TRANSFORMERS_MEVCUT = None
 
@@ -60,7 +60,7 @@ def _sentence_transformers_kontrol_et() -> bool:
     return SENTENCE_TRANSFORMERS_MEVCUT
 
 
-# ── Varsayilan sabitler ───────────────────────────────────────────────────────
+# â”€â”€ Varsayilan sabitler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 VARSAYILAN_DIZIN = str(Path(__file__).parent.parent.parent / "vektor_hafizasi")
 VARSAYILAN_MODEL = "all-MiniLM-L6-v2"
 MAKS_KAYIT = 8000  # Baslangic 5000'di, 8000'e yukseltildi
@@ -68,9 +68,9 @@ ESIK_BENZERLIK = 0.15  # Arama esigi (altindaki sonuclar filtrelenir)
 ESIK_DEDUP = 0.85  # Dedup esigi (ustundeki kayit tekrar eklenmez)
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  SQLite Fallback
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class _SQLiteVektorBellek:
@@ -183,9 +183,9 @@ class _SQLiteVektorBellek:
             )
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  VektorBellek Ana Sinif
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class VektorBellek:
@@ -243,12 +243,12 @@ class VektorBellek:
             )
         except Exception as e:
             logger.warning(
-                "[VektorBellek] ChromaDB kurulum hatasi: %s — SQLite fallback", e
+                "[VektorBellek] ChromaDB kurulum hatasi: %s â€” SQLite fallback", e
             )
             self._koleksiyon = None
             self._fallback = _SQLiteVektorBellek()
 
-    # ── Temel metotlar ────────────────────────────────────────────────────────
+    # â”€â”€ Temel metotlar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def ekle(self, metin: str, metadata: Optional[Dict] = None) -> str:
         """Metni vektor bellege ekle.
@@ -308,7 +308,7 @@ class VektorBellek:
             k: Kac sonuc donsun (default: 5)
 
         Returns:
-            [(id, metin, skor, metadata), ...] — skor cosine similarity (0-1)
+            [(id, metin, skor, metadata), ...] â€” skor cosine similarity (0-1)
         """
         if not sorgu or not sorgu.strip():
             return []
@@ -437,7 +437,7 @@ class VektorBellek:
                     "[SessizExcept] %%s: %%s", type(_e).__name__, _e
                 )
 
-    # ── Bilgi ─────────────────────────────────────────────────────────────────
+    # â”€â”€ Bilgi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def bilgi(self) -> Dict:
         """Vektor bellek hakkinda bilgi dondur."""
@@ -455,7 +455,7 @@ class VektorBellek:
         }
 
 
-# ── Varsayilan singleton ──────────────────────────────────────────────────────
+# â”€â”€ Varsayilan singleton â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _vb_instance: Optional[VektorBellek] = None
 
 
@@ -467,9 +467,9 @@ def vektor_bellek_al() -> VektorBellek:
     return _vb_instance
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Test
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
@@ -502,4 +502,4 @@ if __name__ == "__main__":
         print(f"Kalan kayit: {len(vb)}")
 
     vb.kapat()
-    print("\n✓ Test tamamlandi")
+    print("\nâœ“ Test tamamlandi")

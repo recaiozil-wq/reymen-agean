@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-TTS Tool — Metni sese cevirir (edge-tts).
+TTS Tool â€” Metni sese cevirir (edge-tts).
 ReYMeN icin native TTS araci.
 
 Kullanim:
@@ -151,7 +151,7 @@ def ses_listesi(dil_filtre: str = "") -> str:
     )
 
 
-# ── Motor kayit ──────────────────────────────────────────────────────────────
+# â”€â”€ Motor kayit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def motor_kaydet(motor: Any) -> None:
@@ -161,8 +161,8 @@ def motor_kaydet(motor: Any) -> None:
         """TTS_KONUS: Metni sese cevir.
 
         Parametreler:
-            metin (str, zorunlu) — Seslendirilecek metin.
-            ses (str, opsiyonel) — Ses adi (varsayilan: tr-TR-EmelNeural).
+            metin (str, zorunlu) â€” Seslendirilecek metin.
+            ses (str, opsiyonel) â€” Ses adi (varsayilan: tr-TR-EmelNeural).
 
         Doner: Ses dosyasi yolu.
         """
@@ -172,7 +172,7 @@ def motor_kaydet(motor: Any) -> None:
         """TTS_SESLER: Kullanilabilir sesleri listele.
 
         Parametre:
-            dil (str, opsiyonel) — Dil kodu (ornek: 'tr', 'en').
+            dil (str, opsiyonel) â€” Dil kodu (ornek: 'tr', 'en').
         """
         return ses_listesi(dil)
 
@@ -180,23 +180,23 @@ def motor_kaydet(motor: Any) -> None:
         """TTS_TEST: TTS sistemini test et. Kisa bir test sesi olusturur."""
         sonuc = metni_sese_cevir("Merhaba, ben ReyMen. Ses sistemim calisiyor.")
         if sonuc.startswith("[HATA]"):
-            return f"❌ TTS test basarisiz: {sonuc}"
-        return f"✅ TTS test basarili: {sonuc}"
+            return f"âŒ TTS test basarisiz: {sonuc}"
+        return f"âœ… TTS test basarili: {sonuc}"
 
     if hasattr(motor, "_plugin_arac_kaydet"):
         motor._plugin_arac_kaydet(
             "TTS_KONUS",
             _tts_konus,
             "Metni sese cevirir (edge-tts). "
-            "Parametreler: metin (str, zorunlu) — seslendirilecek metin; "
-            "ses (str, opsiyonel) — ses adi (varsayilan: tr-TR-EmelNeural). "
+            "Parametreler: metin (str, zorunlu) â€” seslendirilecek metin; "
+            "ses (str, opsiyonel) â€” ses adi (varsayilan: tr-TR-EmelNeural). "
             "Doner: ses dosyasi yolu.",
         )
         motor._plugin_arac_kaydet(
             "TTS_SESLER",
             _tts_sesler,
             "Kullanilabilir sesleri listeler. "
-            "Parametre: dil (str, opsiyonel) — dil kodu filtresi (ornek: 'tr', 'en').",
+            "Parametre: dil (str, opsiyonel) â€” dil kodu filtresi (ornek: 'tr', 'en').",
         )
         motor._plugin_arac_kaydet(
             "TTS_TEST",

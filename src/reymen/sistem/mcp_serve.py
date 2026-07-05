@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-mcp_serve.py — ReYMeN MCP (Model Context Protocol) Sunucusu.
+mcp_serve.py â€” ReYMeN MCP (Model Context Protocol) Sunucusu.
 
 ReYMeN'i Claude Code, Cursor, Windsurf vb. MCP istemcilerine expose eder.
 Stdio uzerinden JSON-RPC 2.0 protokolu kullanir.
@@ -17,14 +17,14 @@ Claude Code entegrasyonu (.claude/settings.json):
     }
 
 Sunulan araclar:
-  - ReYMeN_run(hedef)         — Ajani belirtilen hedefle calistir
-  - ReYMeN_status()           — Ajan durumu
-  - ReYMeN_memory_search(sorgu) — Anlamsal hafizada ara
-  - ReYMeN_file_read(dosya)   — Dosya oku
-  - ReYMeN_file_write(dosya, icerik) — Dosya yaz
-  - ReYMeN_shell(komut)       — Kabuk komutu calistir
-  - ReYMeN_skills_list()      — Kristal becerileri listele
-  - ReYMeN_providers_list()   — Kullanilabilir LLM providerlari
+  - ReYMeN_run(hedef)         â€” Ajani belirtilen hedefle calistir
+  - ReYMeN_status()           â€” Ajan durumu
+  - ReYMeN_memory_search(sorgu) â€” Anlamsal hafizada ara
+  - ReYMeN_file_read(dosya)   â€” Dosya oku
+  - ReYMeN_file_write(dosya, icerik) â€” Dosya yaz
+  - ReYMeN_shell(komut)       â€” Kabuk komutu calistir
+  - ReYMeN_skills_list()      â€” Kristal becerileri listele
+  - ReYMeN_providers_list()   â€” Kullanilabilir LLM providerlari
 """
 
 import json
@@ -36,16 +36,16 @@ from pathlib import Path
 ROOT = Path(__file__).parent.resolve()
 sys.path.insert(0, str(ROOT))
 
-# ── MCP Protokol Sabitleri ───────────────────────────────────────────
+# â”€â”€ MCP Protokol Sabitleri â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 PROTOCOL_VERSION = "2024-11-05"
 SERVER_INFO = {"name": "ReYMeN", "version": "1.0.0"}
 
-# ── Ajan Durum Tamponu ───────────────────────────────────────────────
+# â”€â”€ Ajan Durum Tamponu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 _durum = {"calisiyor": False, "son_sonuc": "", "son_hedef": ""}
 _durum_kilit = threading.Lock()
 
 
-# ── Araç Tanimlamalari ───────────────────────────────────────────────
+# â”€â”€ AraÃ§ Tanimlamalari â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 TOOLS = [
     {
@@ -124,7 +124,7 @@ TOOLS = [
 ]
 
 
-# ── Araç Uygulayicilari ──────────────────────────────────────────────
+# â”€â”€ AraÃ§ Uygulayicilari â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _arac_calistir(name: str, args: dict) -> str:
@@ -217,14 +217,14 @@ def _dosya_yaz(dosya: str, icerik: str) -> str:
 
 
 def _shell_calistir(komut: str) -> str:
-    """MCP uzerinden calistirilan shell komutu. shlex.split ile güvenli."""
+    """MCP uzerinden calistirilan shell komutu. shlex.split ile gÃ¼venli."""
     import subprocess
     import shlex
 
     try:
         args_list = shlex.split(komut, posix=(sys.platform != "win32"))
         if not args_list:
-            return "Geçersiz komut"
+            return "GeÃ§ersiz komut"
         r = subprocess.run(  # nosec B603
             args_list,
             shell=False,
@@ -237,7 +237,7 @@ def _shell_calistir(komut: str) -> str:
     except subprocess.TimeoutExpired:
         return "Zaman asimi (60s)"
     except (ValueError, OSError) as e:
-        return f"Komut ayrıştırma hatası: {e}"
+        return f"Komut ayrÄ±ÅŸtÄ±rma hatasÄ±: {e}"
     except Exception as e:
         return f"Hata: {e}"
 
@@ -265,7 +265,7 @@ def _provider_listele() -> str:
         return '{"tum":[],"mevcut":[]}'
 
 
-# ── JSON-RPC Isleyici ────────────────────────────────────────────────
+# â”€â”€ JSON-RPC Isleyici â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _yanit(req_id, sonuc):
@@ -309,14 +309,14 @@ def _istek_isle(istek: dict) -> str:
     if method == "ping":
         return _yanit(req_id, {})
 
-    # Bildirim mesajları (id yoktur, yanıt beklenmez)
+    # Bildirim mesajlarÄ± (id yoktur, yanÄ±t beklenmez)
     if method.startswith("notifications/"):
         return None
 
     return _hata_yaniti(req_id, -32601, f"Method not found: {method}")
 
 
-# ── Stdio Dongusu ────────────────────────────────────────────────────
+# â”€â”€ Stdio Dongusu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def stdio_dongu():

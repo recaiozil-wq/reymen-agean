@@ -1,4 +1,4 @@
-"""ReYMeNCLI mixin module — UI/Aesthetics (skin, footer, agents, kanban)."""
+﻿"""ReYMeNCLI mixin module â€” UI/Aesthetics (skin, footer, agents, kanban)."""
 
 import logging
 import os
@@ -27,10 +27,10 @@ logger = logging.getLogger(__name__)
 
 
 class MixinUI:
-    """ReYMeNCLI UI/Aesthetics — skin, footer, agents list, kanban."""
+    """ReYMeNCLI UI/Aesthetics â€” skin, footer, agents list, kanban."""
 
     def _handle_agents_command(self):
-        """Handle /agents — show background processes and agent status."""
+        """Handle /agents â€” show background processes and agent status."""
         from tools.process_registry import format_uptime_short, process_registry
 
         processes = process_registry.list_sessions()
@@ -41,7 +41,7 @@ class MixinUI:
         for p in running:
             cmd = p.get("command", "")[:80]
             up = format_uptime_short(p.get("uptime_seconds", 0))
-            _cprint(f"    {p.get('session_id', '?')} · {up} · {cmd}")
+            _cprint(f"    {p.get('session_id', '?')} Â· {up} Â· {cmd}")
 
         if finished:
             _cprint(f"  Recently finished: {len(finished)}")
@@ -50,7 +50,7 @@ class MixinUI:
         _cprint(f"  Agent: {'running' if agent_running else 'idle'}")
 
     def _handle_kanban_command(self, cmd: str):
-        """Handle the /kanban command — delegate to the shared kanban CLI.
+        """Handle the /kanban command â€” delegate to the shared kanban CLI.
 
         The string form passed here is the user's full ``/kanban ...``
         including the leading slash; we strip it and hand the remainder
@@ -71,7 +71,7 @@ class MixinUI:
             print(output)
 
     def _handle_skin_command(self, cmd: str):
-        """Handle /skin [name] — show or change the display skin."""
+        """Handle /skin [name] â€” show or change the display skin."""
         try:
             from reymen.reymen_cli.skin_engine import (
                 list_skins,
@@ -90,9 +90,9 @@ class MixinUI:
             print(f"\n  Current skin: {current}")
             print("  Available skins:")
             for s in skins:
-                marker = " ●" if s["name"] == current else "  "
+                marker = " â—" if s["name"] == current else "  "
                 source = f" ({s['source']})" if s["source"] == "user" else ""
-                print(f"   {marker} {s['name']}{source} — {s['description']}")
+                print(f"   {marker} {s['name']}{source} â€” {s['description']}")
             print("\n  Usage: /skin <name>")
             print(
                 f"  Custom skins: drop a YAML file in {display_reymen_home()}/skins/\n"
@@ -122,9 +122,9 @@ class MixinUI:
         """Toggle or inspect ``display.runtime_footer.enabled`` from the CLI.
 
         Usage:
-            /footer           → toggle
-            /footer on|off    → explicit
-            /footer status    → show current state
+            /footer           â†’ toggle
+            /footer on|off    â†’ explicit
+            /footer status    â†’ show current state
         """
         from reymen.reymen_cli.config import load_config
         from reymen.reymen_cli.colors import Colors as _Colors

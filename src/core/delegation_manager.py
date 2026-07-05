@@ -1,14 +1,14 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-delegation_manager.py — P2 Delegasyon: Subagent, task decomposition, sonuc toplama.
+delegation_manager.py â€” P2 Delegasyon: Subagent, task decomposition, sonuc toplama.
 
 Mevcut delegasyon sistemleri (reymen/ag/delegasyon.py, reymen/ag/delegation.py)
-üzerine kurulmuştur. LLM ile görev ayrıştırma, subagent yönetimi,
-paralel/zincir modları, sonuç toplama ve birleştirme.
+Ã¼zerine kurulmuÅŸtur. LLM ile gÃ¶rev ayrÄ±ÅŸtÄ±rma, subagent yÃ¶netimi,
+paralel/zincir modlarÄ±, sonuÃ§ toplama ve birleÅŸtirme.
 
 Motor Tools:
-    GOREV_BOL(hedef)            → Karmaşık görevi alt-görevlere ayır
-    SUB_GOREV_CALISTIR(goal)    → Subagent çalıştır
+    GOREV_BOL(hedef)            â†’ KarmaÅŸÄ±k gÃ¶revi alt-gÃ¶revlere ayÄ±r
+    SUB_GOREV_CALISTIR(goal)    â†’ Subagent Ã§alÄ±ÅŸtÄ±r
 """
 
 from __future__ import annotations
@@ -25,13 +25,13 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
-# ── Mevcut Delegasyon modüllerini dene ──────────────────────────────────────────
+# â”€â”€ Mevcut Delegasyon modÃ¼llerini dene â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 try:
     from reymen.ag.delegasyon import (
         DelegasyonSistemi as _DelegasyonSistemi,
         SubAgent as _DelegasyonSubAgent,
         SubAgentCalistirici as _SubAgentCalistirici,
-        GorevAyrıştırıcı as _GorevAyrıştırıcı,
+        GorevAyrÄ±ÅŸtÄ±rÄ±cÄ± as _GorevAyrÄ±ÅŸtÄ±rÄ±cÄ±,
     )
 
     _DELEGASYON_MEVCUT = True
@@ -51,7 +51,7 @@ try:
 except ImportError:
     _DELEGATION_MEVCUT = False
 
-# ── LLM entegrasyonu (görev ayrıştırma için) ───────────────────────────────────
+# â”€â”€ LLM entegrasyonu (gÃ¶rev ayrÄ±ÅŸtÄ±rma iÃ§in) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 try:
     from reymen.core.model_provider import (
         ModelProvider,
@@ -63,14 +63,14 @@ try:
 except ImportError:
     _MODEL_PROVIDER_MEVCUT = False
 
-# Maksimum paralel subagent sayısı
+# Maksimum paralel subagent sayÄ±sÄ±
 MAKS_PARALEL = 3
 ZAMAN_ASIMI = 300  # 5 dakika
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  SubAgent Veri Yapisi
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 @dataclass
@@ -122,21 +122,21 @@ class SubAgent:
     def ozet(self) -> str:
         sure_str = f"{self.sure:.1f}s" if self.sure else "?"
         ikon = {
-            "success": "✅",
-            "error": "❌",
-            "cancelled": "⛔",
-            "running": "⏳",
-            "pending": "⏸️",
-        }.get(self.status, "❓")
+            "success": "âœ…",
+            "error": "âŒ",
+            "cancelled": "â›”",
+            "running": "â³",
+            "pending": "â¸ï¸",
+        }.get(self.status, "â“")
         return f"{ikon} [{self.status[:7]}] {self.goal[:60]:60s} {sure_str:>8s}"
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-#  GorevAyrıştırıcı (LLM + heuristic)
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+#  GorevAyrÄ±ÅŸtÄ±rÄ±cÄ± (LLM + heuristic)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
-class GorevAyrıştırıcı:
+class GorevAyrÄ±ÅŸtÄ±rÄ±cÄ±:
     """Karmasik bir hedefi alt-gorevlere ayirir.
 
     Strateji:
@@ -144,16 +144,16 @@ class GorevAyrıştırıcı:
         2. Heuristic ayristirma (numarali liste, madde isareti, cumle bazli)
     """
 
-    AYIRMA_PROMPT = """Görevi mantıksal alt-görevlere ayır.
-Her alt-görev:
-- Bağımsız çalıştırılabilir olmalı
-- Net bir hedef içermeli
-- Mümkünse kısa ve öz olmalı (max 200 karakter)
+    AYIRMA_PROMPT = """GÃ¶revi mantÄ±ksal alt-gÃ¶revlere ayÄ±r.
+Her alt-gÃ¶rev:
+- BaÄŸÄ±msÄ±z Ã§alÄ±ÅŸtÄ±rÄ±labilir olmalÄ±
+- Net bir hedef iÃ§ermeli
+- MÃ¼mkÃ¼nse kÄ±sa ve Ã¶z olmalÄ± (max 200 karakter)
 
-Görev: {goal}
+GÃ¶rev: {goal}
 
-Sadece alt-görev listesini döndür, her satır bir alt-görev.
-Başlık veya açıklama ekleme."""
+Sadece alt-gÃ¶rev listesini dÃ¶ndÃ¼r, her satÄ±r bir alt-gÃ¶rev.
+BaÅŸlÄ±k veya aÃ§Ä±klama ekleme."""
 
     @classmethod
     def ayir(cls, hedef: str, context: str = "") -> List[SubAgent]:
@@ -203,7 +203,7 @@ Başlık veya açıklama ekleme."""
 
             # Satir satir parse et
             lines = [
-                l.strip().lstrip("*-•0123456789.) ")
+                l.strip().lstrip("*-â€¢0123456789.) ")
                 for l in sonuc.icerik.split("\n")
                 if l.strip()
             ]
@@ -217,7 +217,7 @@ Başlık veya açıklama ekleme."""
                 return lines
 
         except Exception as e:
-            logger.debug("[GorevAyrıştırıcı] LLM ayirma hatasi: %s", e)
+            logger.debug("[GorevAyrÄ±ÅŸtÄ±rÄ±cÄ±] LLM ayirma hatasi: %s", e)
 
         return None
 
@@ -236,8 +236,8 @@ Başlık veya açıklama ekleme."""
         bullets = []
         for line in hedef.split("\n"):
             line = line.strip()
-            if line and line[0] in ("-", "*", "•", "→", ">"):
-                text = line.lstrip("-*•→> ").strip()
+            if line and line[0] in ("-", "*", "â€¢", "â†’", ">"):
+                text = line.lstrip("-*â€¢â†’> ").strip()
                 if len(text.split()) >= 2:
                     bullets.append(text)
         if len(bullets) >= 2:
@@ -255,9 +255,9 @@ Başlık veya açıklama ekleme."""
         # Baglac bazli
         for ayirici in [
             "ve",
-            "ve ayrıca",
+            "ve ayrÄ±ca",
             "sonra",
-            "ardından",
+            "ardÄ±ndan",
             "and",
             "then",
             "additionally",
@@ -308,9 +308,9 @@ Başlık veya açıklama ekleme."""
         return sonuc
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  SubAgent Calistirici (Threaded)
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class SubAgentCalistirici:
@@ -416,9 +416,9 @@ class SubAgentCalistirici:
         self._pool.shutdown(wait=False)
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  DelegationManager Ana Sinif
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class DelegationManager:
@@ -484,7 +484,7 @@ class DelegationManager:
                     "[SessizExcept] %%s: %%s", type(_e).__name__, _e
                 )
 
-    # ── TEMEL ISLEMLER ─────────────────────────────────────────────────────
+    # â”€â”€ TEMEL ISLEMLER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def delege_et(
         self,
@@ -512,7 +512,7 @@ class DelegationManager:
             mod="TEK",
         )
         self._agentler[agent.id] = agent
-        logger.info("[DelegationManager] TEK: %s — %s", agent.id[:8], goal[:60])
+        logger.info("[DelegationManager] TEK: %s â€” %s", agent.id[:8], goal[:60])
 
         self._calistirici.calistir(agent, timeout=timeout)
         return agent
@@ -531,7 +531,7 @@ class DelegationManager:
             Calistirilmis SubAgent listesi
         """
         # Gorev ayristir
-        sub_agentler = GorevAyrıştırıcı.ayir(goal, context=context)
+        sub_agentler = GorevAyrÄ±ÅŸtÄ±rÄ±cÄ±.ayir(goal, context=context)
 
         if not sub_agentler:
             logger.warning(
@@ -585,7 +585,7 @@ class DelegationManager:
         ]
 
         for i, agent in enumerate(agentler):
-            ikon = "✅" if agent.status == "success" else "❌"
+            ikon = "âœ…" if agent.status == "success" else "âŒ"
             parts.append(f"\n{ikon} Alt-Gorev {i+1}: {agent.goal[:80]}")
             if agent.sure:
                 parts.append(f"   Sure: {agent.sure:.1f}s")
@@ -596,7 +596,7 @@ class DelegationManager:
 
         return "\n".join(parts)
 
-    # ── SORGULAMA ──────────────────────────────────────────────────────────
+    # â”€â”€ SORGULAMA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def get(self, agent_id: str) -> Optional[SubAgent]:
         """ID ile subagent durumunu getir."""
@@ -624,7 +624,7 @@ class DelegationManager:
             return True
         return False
 
-    # ── ISTATISTIK ────────────────────────────────────────────────────────
+    # â”€â”€ ISTATISTIK â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def istatistik(self) -> Dict[str, Any]:
         """Delegasyon istatistiklerini dondur."""
@@ -685,9 +685,9 @@ class DelegationManager:
         return len(silinecek)
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Singleton
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 _delegation_manager_instance: Optional[DelegationManager] = None
 
@@ -700,9 +700,9 @@ def delegation_manager_al() -> DelegationManager:
     return _delegation_manager_instance
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Motor Tools
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def motor_kaydet(motor) -> None:
@@ -717,14 +717,14 @@ def motor_kaydet(motor) -> None:
     motor._plugin_arac_kaydet(
         "GOREV_BOL",
         _gorev_bol_tool,
-        "GOREV_BOL(hedef, context) — Karmasik gorevi alt-gorevlere ayir. "
+        "GOREV_BOL(hedef, context) â€” Karmasik gorevi alt-gorevlere ayir. "
         "Parametreler: hedef=gorev_tanimi context=opsiyonel_baglam. "
         "Ornek: GOREV_BOL(hedef='Sistem analizi yap ve rapor olustur')",
     )
     motor._plugin_arac_kaydet(
         "SUB_GOREV_CALISTIR",
         _sub_gorev_calistir_tool,
-        "SUB_GOREV_CALISTIR(goal, context) — Subagent olusturup calistir. "
+        "SUB_GOREV_CALISTIR(goal, context) â€” Subagent olusturup calistir. "
         "Parametreler: goal=hedef_metni context=opsiyonel_baglam. "
         "Ornek: SUB_GOREV_CALISTIR(goal='Dosyayi oku', context='test.txt')",
     )
@@ -734,7 +734,7 @@ def motor_kaydet(motor) -> None:
 
 
 def _gorev_bol_tool(**kw) -> str:
-    """GOREV_BOL aracı."""
+    """GOREV_BOL aracÄ±."""
     args = kw.get("args", [])
     hedef = args[0] if args else kw.get("hedef", "")
     context = args[1] if len(args) > 1 else kw.get("context", "")
@@ -742,7 +742,7 @@ def _gorev_bol_tool(**kw) -> str:
     if not hedef:
         return "[HATA] GOREV_BOL: hedef parametresi zorunlu"
 
-    alt_gorevler = GorevAyrıştırıcı.ayir(hedef, context=context)
+    alt_gorevler = GorevAyrÄ±ÅŸtÄ±rÄ±cÄ±.ayir(hedef, context=context)
 
     if not alt_gorevler:
         return "[Bilgi] Gorev ayristirilamadi, tek parca olarak islenecek."
@@ -755,7 +755,7 @@ def _gorev_bol_tool(**kw) -> str:
 
 
 def _sub_gorev_calistir_tool(**kw) -> str:
-    """SUB_GOREV_CALISTIR aracı."""
+    """SUB_GOREV_CALISTIR aracÄ±."""
     args = kw.get("args", [])
     goal = args[0] if args else kw.get("goal", "")
     context = args[1] if len(args) > 1 else kw.get("context", "")
@@ -777,9 +777,9 @@ def _sub_gorev_calistir_tool(**kw) -> str:
     )
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  Test
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
@@ -789,7 +789,7 @@ if __name__ == "__main__":
 
     # Gorev ayristirma
     print("\n--- Gorev Ayristirma ---")
-    alt_gorevler = GorevAyrıştırıcı.ayir(
+    alt_gorevler = GorevAyrÄ±ÅŸtÄ±rÄ±cÄ±.ayir(
         "Veritabanini analiz et, rapor olustur ve sonuclari kaydet"
     )
     print(f"Alt-gorev sayisi: {len(alt_gorevler)}")
@@ -801,4 +801,4 @@ if __name__ == "__main__":
     agent = manager.delege_et("Ornek gorev: dosya tara")
     print(agent.ozet())
 
-    print("\n✓ Test tamamlandi")
+    print("\nâœ“ Test tamamlandi")

@@ -1,4 +1,4 @@
-"""ReYMeN tools.lazy_deps stub — bağımlılıkların kurulu olduğunu varsayar."""
+﻿"""ReYMeN tools.lazy_deps stub â€” baÄŸÄ±mlÄ±lÄ±klarÄ±n kurulu olduÄŸunu varsayar."""
 
 import logging
 
@@ -10,17 +10,17 @@ class FeatureUnavailable(Exception):
 
 
 def ensure(package_spec: str, reason: str = "", optional: bool = False) -> bool:
-    """ReYMeN'de lazy install yok — paket zaten kurulu varsayılır.
+    """ReYMeN'de lazy install yok â€” paket zaten kurulu varsayÄ±lÄ±r.
 
     Args:
-        package_spec: pip spec (ör: "firecrawl-py>=1.0")
-        reason: Kullanıcıya gösterilecek açıklama
-        optional: True ise sessizce geç
+        package_spec: pip spec (Ã¶r: "firecrawl-py>=1.0")
+        reason: KullanÄ±cÄ±ya gÃ¶sterilecek aÃ§Ä±klama
+        optional: True ise sessizce geÃ§
 
     Returns:
         bool: Paket import edilebiliyorsa True
     """
-    # Paket adını çıkar (versiyon spesifikasyonundan temizle)
+    # Paket adÄ±nÄ± Ã§Ä±kar (versiyon spesifikasyonundan temizle)
     pkg_name = (
         package_spec.split(">=")[0].split("<")[0].split("=")[0].split("[")[0].strip()
     )

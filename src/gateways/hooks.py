@@ -1,8 +1,8 @@
-"""
+﻿"""
 Event Hook System
 
 A lightweight event-driven system that fires handlers at key lifecycle points.
-Hooks are discovered from ~/.hermes/hooks/ directories, each containing:
+Hooks are discovered from ~/.reymen/hooks/ directories, each containing:
   - HOOK.yaml  (metadata: name, description, events list)
   - handler.py (Python handler with async def handle(event_type, context))
 
@@ -25,7 +25,7 @@ Context dict passed to ``agent:start`` / ``agent:end`` handlers:
   thread_id    -- Telegram forum-topic id / thread root id (string; empty
                   when not in a thread / topic)
   chat_type    -- "dm" | "group" | "forum" (empty if unknown)
-  session_id   -- Hermes session id
+  session_id   -- ReYMeN session id
   message      -- inbound message text (truncated to 500 chars)
 
 ``agent:end`` adds:
@@ -43,10 +43,10 @@ from typing import Any, Callable, Dict, List, Optional
 
 import yaml
 
-from src.reymen.cron.hermes_stubs import get_hermes_home
+from reymen.sistem.reymen_stubs import get_reymen_home
 
 
-HOOKS_DIR = get_hermes_home() / "hooks"
+HOOKS_DIR = get_reymen_home() / "hooks"
 
 
 class HookRegistry:
@@ -72,7 +72,7 @@ class HookRegistry:
     def _register_builtin_hooks(self) -> None:
         """Register built-in hooks that are always active.
 
-        Currently empty — no shipped built-in hooks. Kept as the extension
+        Currently empty â€” no shipped built-in hooks. Kept as the extension
         point for future always-on gateway hooks so they drop in without
         re-plumbing discover_and_load().
         """

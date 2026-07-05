@@ -1,13 +1,13 @@
-"""
-ReYMeN Gateway — Matrix platform adapter.
+﻿"""
+ReYMeN Gateway â€” Matrix platform adapter.
 
 Matrix client-server REST API (https://spec.matrix.org/v1.12/client-server-api/)
 uzerinden mesaj alip gonderir. Thread destegi mevcuttur.
 
 Yapilandirma (ortam degiskenleri):
-  - MATRIX_HOMESERVER_URL  — Matrix sunucu URL (ornek: https://matrix.example.com)
-  - MATRIX_ACCESS_TOKEN    — Erisim tokeni (access token)
-  - MATRIX_HOME_ROOM       — Varsayilan oda ID'si
+  - MATRIX_HOMESERVER_URL  â€” Matrix sunucu URL (ornek: https://matrix.example.com)
+  - MATRIX_ACCESS_TOKEN    â€” Erisim tokeni (access token)
+  - MATRIX_HOME_ROOM       â€” Varsayilan oda ID'si
 """
 
 import asyncio
@@ -23,15 +23,15 @@ from pathlib import Path as _Path
 
 sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
-from src.gateways.config import Platform, PlatformConfig
-from src.gateways.platforms.base import (
+from gateways.config import Platform, PlatformConfig
+from gateways.platforms.base import (
     BasePlatformAdapter,
     MessageEvent,
     MessageType,
     ProcessingOutcome,
     SendResult,
 )
-from src.gateways.platforms.helpers import (
+from gateways.platforms.helpers import (
     MessageDeduplicator,
 )
 
@@ -56,7 +56,7 @@ def check_matrix_requirements() -> bool:
     if HTTPX_AVAILABLE:
         return True
     try:
-        from src.reymen.cron.hermes_stubs import ensure as _lazy_ensure
+        from reymen.sistem.reymen_stubs import ensure as _lazy_ensure
 
         _lazy_ensure("platform.matrix", prompt=False)
     except Exception:
@@ -322,7 +322,7 @@ class MatrixAdapter(BasePlatformAdapter):
                 msg_type = MessageType.TEXT
 
             # Session kaynagi olustur
-            from src.gateways.session import SessionSource, build_session_key
+            from gateways.session import SessionSource, build_session_key
 
             source = SessionSource(
                 platform=Platform.MATRIX,
@@ -400,7 +400,7 @@ class MatrixAdapter(BasePlatformAdapter):
                 "body": content,
             }
 
-            # Thread yaniti — Matrix m.relates_to ile calisir
+            # Thread yaniti â€” Matrix m.relates_to ile calisir
             # https://spec.matrix.org/v1.12/client-server-api/#forming-relationships-between-events
             relates_to: Dict[str, Any] = {}
             thread_id = (metadata or {}).get("thread_id")

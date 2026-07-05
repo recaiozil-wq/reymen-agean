@@ -1,5 +1,5 @@
-"""
-ReYMeN Gateway — Google Chat platform adapter.
+﻿"""
+ReYMeN Gateway â€” Google Chat platform adapter.
 
 Google Chat API (Hangouts Chat) uzerinden mesaj alip gonderir.
 Webhook tabanli: Mesaj al -> Beyin'e gonder -> Cevabi Google Chat'e gonder.
@@ -9,9 +9,9 @@ Bagimliliklar:
   - google-auth (opsiyonel, servis hesabi authentication icin)
 
 Yapilandirma (ortam degiskenleri):
-  - GOOGLE_CHAT_BOT_TOKEN     — Bot token / Service Account key
-  - GOOGLE_CHAT_SPACE_ID      — Varsayilan alan/chat_id
-  - GOOGLE_CHAT_WEBHOOK_URL   — Gelen webhook URL'si
+  - GOOGLE_CHAT_BOT_TOKEN     â€” Bot token / Service Account key
+  - GOOGLE_CHAT_SPACE_ID      â€” Varsayilan alan/chat_id
+  - GOOGLE_CHAT_WEBHOOK_URL   â€” Gelen webhook URL'si
 """
 
 import asyncio
@@ -29,8 +29,8 @@ from pathlib import Path as _Path
 
 sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
-from src.gateways.config import Platform, PlatformConfig
-from src.gateways.platforms.base import (
+from gateways.config import Platform, PlatformConfig
+from gateways.platforms.base import (
     BasePlatformAdapter,
     MessageEvent,
     MessageType,
@@ -39,7 +39,7 @@ from src.gateways.platforms.base import (
     cache_image_from_bytes,
     resolve_proxy_url,
 )
-from src.gateways.platforms.helpers import (
+from gateways.platforms.helpers import (
     MessageDeduplicator,
     TextBatchAggregator,
 )
@@ -100,7 +100,7 @@ class GoogleChatAdapter(BasePlatformAdapter):
             split_threshold=4000,
         )
 
-    # ── Baglanti Yonetimi ────────────────────────────────────────────
+    # â”€â”€ Baglanti Yonetimi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     async def _get_client(self) -> httpx.AsyncClient:
         if self._client is None or self._client.is_closed:
@@ -121,7 +121,7 @@ class GoogleChatAdapter(BasePlatformAdapter):
         if self._client and not self._client.is_closed:
             await self._client.aclose()
 
-    # ── Webhook Isleme ───────────────────────────────────────────────
+    # â”€â”€ Webhook Isleme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     async def process_webhook(
         self, body: dict, headers: Optional[dict] = None
@@ -151,7 +151,7 @@ class GoogleChatAdapter(BasePlatformAdapter):
             thread_id = thread.get("name", "")
 
             # Session source
-            from src.gateways.session import SessionSource, build_session_key
+            from gateways.session import SessionSource, build_session_key
 
             source = SessionSource(
                 platform=Platform.GOOGLE_CHAT,
@@ -188,7 +188,7 @@ class GoogleChatAdapter(BasePlatformAdapter):
         except Exception as e:
             logger.error("[GoogleChat] Mesaj isleme hatasi: %s", e)
 
-    # ── Mesaj Gonderme ───────────────────────────────────────────────
+    # â”€â”€ Mesaj Gonderme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     async def send_message(
         self,
@@ -279,7 +279,7 @@ class GoogleChatAdapter(BasePlatformAdapter):
     ) -> SendResult:
         """Google Chat'e dosya gonder."""
         try:
-            from src.gateways.platforms.base import cache_document_from_bytes
+            from gateways.platforms.base import cache_document_from_bytes
 
             with open(file_path, "rb") as f:
                 data = f.read()

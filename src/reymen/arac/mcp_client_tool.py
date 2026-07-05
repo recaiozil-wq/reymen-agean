@@ -1,22 +1,22 @@
-# -*- coding: utf-8 -*-
-"""mcp_client_tool.py — MCP Client (stdio + HTTP) with async support.
+﻿# -*- coding: utf-8 -*-
+"""mcp_client_tool.py â€” MCP Client (stdio + HTTP) with async support.
 
 Mevcut mcp_tool.py'ye ek olarak:
-  - HTTP tabanlı MCP sunucu desteği (aiohttp)
-  - Async/await ile non-blocking bağlantı
-  - Otomatik tool keşfi ve motor.py'ye kayıt
-  - JSON config'den çoklu sunucu yükleme
+  - HTTP tabanlÄ± MCP sunucu desteÄŸi (aiohttp)
+  - Async/await ile non-blocking baÄŸlantÄ±
+  - Otomatik tool keÅŸfi ve motor.py'ye kayÄ±t
+  - JSON config'den Ã§oklu sunucu yÃ¼kleme
 
-Kullanım:
+KullanÄ±m:
     from reymen.arac.mcp_client_tool import mcp_client_baglan, mcp_client_listele
 
-    # Tek sunucu bağla
+    # Tek sunucu baÄŸla
     mcp_client_baglan("sunucu_adi")
 
-    # Tüm sunucuları listele
+    # TÃ¼m sunucularÄ± listele
     mcp_client_listele()
 
-Config formatı (.ReYMeN/mcp_client.json):
+Config formatÄ± (.ReYMeN/mcp_client.json):
     {
       "servers": {
         "ornek_http": {
@@ -56,7 +56,7 @@ except ImportError:
 
 
 class MCPClientHTTP:
-    """HTTP tabanlı MCP sunucu istemcisi (async)."""
+    """HTTP tabanlÄ± MCP sunucu istemcisi (async)."""
 
     def __init__(self, ad: str, url: str, headers: Optional[dict] = None):
         self.ad = ad
@@ -68,9 +68,9 @@ class MCPClientHTTP:
         self._kilit = asyncio.Lock()
 
     async def baglan(self) -> bool:
-        """Sunucuya bağlan, initialize et, tool'ları keşfet."""
+        """Sunucuya baÄŸlan, initialize et, tool'larÄ± keÅŸfet."""
         if not AIOHTTP_OK:
-            logger.error("[MCPClient] aiohttp kurulu değil: pip install aiohttp")
+            logger.error("[MCPClient] aiohttp kurulu deÄŸil: pip install aiohttp")
             return False
         try:
             self._session = aiohttp.ClientSession(
@@ -89,11 +89,11 @@ class MCPClientHTTP:
             yanit = await self._json_rpc("tools/list", {})
             self._araclar = yanit.get("result", {}).get("tools", [])
             logger.info(
-                "[MCPClient] %s: %d tool keşfedildi", self.ad, len(self._araclar)
+                "[MCPClient] %s: %d tool keÅŸfedildi", self.ad, len(self._araclar)
             )
             return True
         except Exception as e:
-            logger.error("[MCPClient] %s bağlantı hatası: %s", self.ad, e)
+            logger.error("[MCPClient] %s baÄŸlantÄ± hatasÄ±: %s", self.ad, e)
             await self.kapat()
             return False
 
@@ -114,11 +114,11 @@ class MCPClientHTTP:
                 ) as resp:
                     return await resp.json()
             except Exception as e:
-                logger.error("[MCPClient] JSON-RPC hatası: %s", e)
+                logger.error("[MCPClient] JSON-RPC hatasÄ±: %s", e)
                 return {}
 
     async def arac_cagir(self, arac_adi: str, parametreler: dict) -> Any:
-        """Bir MCP tool'u çağır."""
+        """Bir MCP tool'u Ã§aÄŸÄ±r."""
         yanit = await self._json_rpc(
             "tools/call",
             {
@@ -143,7 +143,7 @@ class MCPClientHTTP:
 
 
 class MCPClientStdio:
-    """Stdio tabanlı MCP sunucu istemcisi (sync, subprocess)."""
+    """Stdio tabanlÄ± MCP sunucu istemcisi (sync, subprocess)."""
 
     def __init__(self, ad: str, komut: list, env: Optional[dict] = None, cwd: str = ""):
         self.ad = ad
@@ -187,13 +187,13 @@ class MCPClientStdio:
             yanit = self._json_rpc("tools/list", {})
             self._araclar = yanit.get("result", {}).get("tools", [])
             logger.info(
-                "[MCPClient] %s (stdio): %d tool keşfedildi",
+                "[MCPClient] %s (stdio): %d tool keÅŸfedildi",
                 self.ad,
                 len(self._araclar),
             )
             return True
         except Exception as e:
-            logger.error("[MCPClient] %s (stdio) bağlantı hatası: %s", self.ad, e)
+            logger.error("[MCPClient] %s (stdio) baÄŸlantÄ± hatasÄ±: %s", self.ad, e)
             self.kapat()
             return False
 
@@ -217,7 +217,7 @@ class MCPClientStdio:
                 satir = self._proses.stdout.readline()
                 return json.loads(satir) if satir else {}
             except Exception as e:
-                logger.error("[MCPClient] JSON-RPC (stdio) hatası: %s", e)
+                logger.error("[MCPClient] JSON-RPC (stdio) hatasÄ±: %s", e)
                 return {}
 
     def arac_cagir(self, arac_adi: str, parametreler: dict) -> Any:
@@ -249,7 +249,7 @@ class MCPClientStdio:
 
 
 class MCPClientYoneticisi:
-    """Çoklu MCP sunucu yöneticisi (HTTP + stdio)."""
+    """Ã‡oklu MCP sunucu yÃ¶neticisi (HTTP + stdio)."""
 
     def __init__(self):
         self._sunucular: dict[str, Any] = {}  # ad -> MCPClientHTTP | MCPClientStdio
@@ -257,28 +257,28 @@ class MCPClientYoneticisi:
         self._konfig_yukle()
 
     def _konfig_yukle(self):
-        """JSON config'den sunucu ayarlarını yükle (sadece ayar, bağlanma)."""
+        """JSON config'den sunucu ayarlarÄ±nÄ± yÃ¼kle (sadece ayar, baÄŸlanma)."""
         if not _CONFIG_YOLU.exists():
             return
         try:
             konfig = json.loads(_CONFIG_YOLU.read_text(encoding="utf-8"))
             self._konfig = konfig.get("servers", {})
-            logger.info("[MCPClient] %d sunucu config'den yüklendi", len(self._konfig))
+            logger.info("[MCPClient] %d sunucu config'den yÃ¼klendi", len(self._konfig))
         except Exception as e:
-            logger.error("[MCPClient] Config yükleme hatası: %s", e)
+            logger.error("[MCPClient] Config yÃ¼kleme hatasÄ±: %s", e)
 
     def _sunucu_al(self, ad: str) -> Any:
-        """Sunucu objesini döndür, gerekirse bağlan."""
-        # Zaten bağlıysa döndür
+        """Sunucu objesini dÃ¶ndÃ¼r, gerekirse baÄŸlan."""
+        # Zaten baÄŸlÄ±ysa dÃ¶ndÃ¼r
         if ad in self._sunucular:
             s = self._sunucular[ad]
             if isinstance(s, MCPClientStdio) and len(s.araclar()) == 0:
-                # Config'den yüklenmiş ama bağlanmamış, bağlan
+                # Config'den yÃ¼klenmiÅŸ ama baÄŸlanmamÄ±ÅŸ, baÄŸlan
                 if s.baglan():
                     return s
                 return None
             return s
-        # Config'de var mı kontrol et
+        # Config'de var mÄ± kontrol et
         ayar = self._konfig.get(ad)
         if not ayar:
             return None
@@ -316,16 +316,16 @@ class MCPClientYoneticisi:
     def sunucu_ekle_http(
         self, ad: str, url: str, headers: Optional[dict] = None
     ) -> bool:
-        """HTTP tabanlı MCP sunucusu ekle ve bağlan."""
+        """HTTP tabanlÄ± MCP sunucusu ekle ve baÄŸlan."""
         if ad in self._sunucular:
             return False
         sunucu = MCPClientHTTP(ad, url, headers)
-        # Async bağlantıyı sync context'te çalıştır
+        # Async baÄŸlantÄ±yÄ± sync context'te Ã§alÄ±ÅŸtÄ±r
         loop = asyncio.new_event_loop()
         try:
             basarili = loop.run_until_complete(sunucu.baglan())
         finally:
-            # Session'ı kapatma, sonra kullanılacak
+            # Session'Ä± kapatma, sonra kullanÄ±lacak
             loop.close()
         if basarili:
             self._sunucular[ad] = sunucu
@@ -335,7 +335,7 @@ class MCPClientYoneticisi:
     def sunucu_ekle_stdio(
         self, ad: str, komut: list, env: Optional[dict] = None, cwd: str = ""
     ) -> bool:
-        """Stdio tabanlı MCP sunucusu ekle ve bağlan."""
+        """Stdio tabanlÄ± MCP sunucusu ekle ve baÄŸlan."""
         if ad in self._sunucular:
             return False
         sunucu = MCPClientStdio(ad, komut, env, cwd)
@@ -345,7 +345,7 @@ class MCPClientYoneticisi:
         return False
 
     def sunucu_kaldir(self, ad: str) -> bool:
-        """Sunucuyu kapat ve kaldır."""
+        """Sunucuyu kapat ve kaldÄ±r."""
         if ad not in self._sunucular:
             return False
         sunucu = self._sunucular[ad]
@@ -361,10 +361,10 @@ class MCPClientYoneticisi:
         return True
 
     def arac_cagir(self, sunucu: str, arac: str, params: dict) -> str:
-        """Bir sunucudaki bir aracı çağır."""
+        """Bir sunucudaki bir aracÄ± Ã§aÄŸÄ±r."""
         s = self._sunucu_al(sunucu)
         if s is None:
-            return f"[MCPClient] '{sunucu}' sunucusu bulunamadı veya bağlanamadı."
+            return f"[MCPClient] '{sunucu}' sunucusu bulunamadÄ± veya baÄŸlanamadÄ±."
         if isinstance(s, MCPClientHTTP):
             loop = asyncio.new_event_loop()
             try:
@@ -375,8 +375,8 @@ class MCPClientYoneticisi:
         return str(s.arac_cagir(arac, params))
 
     def tum_araclar(self) -> dict[str, list[dict]]:
-        """Tüm sunucuların tool'larını döndür."""
-        # Önce config'deki tüm sunucuları dene (bağlı/bağlananlar)
+        """TÃ¼m sunucularÄ±n tool'larÄ±nÄ± dÃ¶ndÃ¼r."""
+        # Ã–nce config'deki tÃ¼m sunucularÄ± dene (baÄŸlÄ±/baÄŸlananlar)
         sonuc = {}
         for ad in list(self._sunucular.keys()):
             sonuc[ad] = self._sunucular[ad].araclar()
@@ -399,7 +399,7 @@ class MCPClientYoneticisi:
         return sonuc
 
     def motor_kaydet(self, motor):
-        """Tüm MCP tool'larını motora kaydet."""
+        """TÃ¼m MCP tool'larÄ±nÄ± motora kaydet."""
         if not hasattr(motor, "_plugin_arac_kaydet"):
             return
         for sunucu_ad, araclar in self.tum_araclar().items():
@@ -418,56 +418,56 @@ class MCPClientYoneticisi:
                         ),
                     )
                 except Exception as e:
-                    logger.error("[MCPClient] Motor kayıt hatası (%s): %s", arac_adi, e)
+                    logger.error("[MCPClient] Motor kayÄ±t hatasÄ± (%s): %s", arac_adi, e)
 
     def kapat_tum(self):
-        """Tüm sunucuları kapat."""
+        """TÃ¼m sunucularÄ± kapat."""
         for ad in list(self._sunucular.keys()):
             self.sunucu_kaldir(ad)
 
 
-# ── Singleton ─────────────────────────────────────────────────────────────
+# â”€â”€ Singleton â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _YONETICI: Optional[MCPClientYoneticisi] = None
 
 
 def mcp_client() -> MCPClientYoneticisi:
-    """Singleton MCP client yöneticisi."""
+    """Singleton MCP client yÃ¶neticisi."""
     global _YONETICI
     if _YONETICI is None:
         _YONETICI = MCPClientYoneticisi()
     return _YONETICI
 
 
-# ── Public API ────────────────────────────────────────────────────────────
+# â”€â”€ Public API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def mcp_client_baglan(sunucu_adi: str) -> str:
-    """Belirli bir sunucuya bağlan (config'den veya manuel).
+    """Belirli bir sunucuya baÄŸlan (config'den veya manuel).
 
     Args:
-        sunucu_adi: Config'de tanımlı sunucu adı
+        sunucu_adi: Config'de tanÄ±mlÄ± sunucu adÄ±
 
     Returns:
-        str: Bağlantı sonucu mesajı
+        str: BaÄŸlantÄ± sonucu mesajÄ±
     """
     yonetici = mcp_client()
-    # _sunucu_al otomatik bağlanır, zaten bağlıysa direkt döndürür
+    # _sunucu_al otomatik baÄŸlanÄ±r, zaten baÄŸlÄ±ysa direkt dÃ¶ndÃ¼rÃ¼r
     s = yonetici._sunucu_al(sunucu_adi)
     if s is None:
-        return f"[MCPClient] '{sunucu_adi}' bağlantı başarısız. Config ve ağ bağlantınızı kontrol edin."
+        return f"[MCPClient] '{sunucu_adi}' baÄŸlantÄ± baÅŸarÄ±sÄ±z. Config ve aÄŸ baÄŸlantÄ±nÄ±zÄ± kontrol edin."
     transport = "HTTP" if isinstance(s, MCPClientHTTP) else "STDIO"
-    return f"[MCPClient] '{sunucu_adi}' ({transport}) bağlandı. {len(s.araclar())} tool keşfedildi."
+    return f"[MCPClient] '{sunucu_adi}' ({transport}) baÄŸlandÄ±. {len(s.araclar())} tool keÅŸfedildi."
 
 
 def mcp_client_listele() -> str:
-    """Tüm bağlı MCP sunucularını ve tool'larını listele."""
+    """TÃ¼m baÄŸlÄ± MCP sunucularÄ±nÄ± ve tool'larÄ±nÄ± listele."""
     yonetici = mcp_client()
     durum = yonetici.durum()
     if not durum:
-        return "[MCPClient] Hiç sunucu bağlı değil. mcp_client_baglan('sunucu_adi') kullanın."
+        return "[MCPClient] HiÃ§ sunucu baÄŸlÄ± deÄŸil. mcp_client_baglan('sunucu_adi') kullanÄ±n."
 
-    satirlar = ["[MCPClient] Bağlı Sunucular:", "=" * 50]
+    satirlar = ["[MCPClient] BaÄŸlÄ± Sunucular:", "=" * 50]
     for ad, bilgi in durum.items():
         satirlar.append(f"  {ad} ({bilgi['transport']}): {bilgi['arac_sayisi']} tool")
         for arac in yonetici._sunucular[ad].araclar():
@@ -478,21 +478,21 @@ def mcp_client_listele() -> str:
 
 
 def mcp_client_arac_cagir(sunucu: str, arac: str, **parametreler) -> str:
-    """Bir MCP sunucusundaki bir aracı çağır.
+    """Bir MCP sunucusundaki bir aracÄ± Ã§aÄŸÄ±r.
 
     Args:
-        sunucu: Sunucu adı
-        arac: Araç adı
-        **parametreler: Araç parametreleri
+        sunucu: Sunucu adÄ±
+        arac: AraÃ§ adÄ±
+        **parametreler: AraÃ§ parametreleri
 
     Returns:
-        str: Araç sonucu
+        str: AraÃ§ sonucu
     """
     return mcp_client().arac_cagir(sunucu, arac, parametreler)
 
 
 def motor_kaydet(motor):
-    """MCP Client tool'larını motora kaydet."""
+    """MCP Client tool'larÄ±nÄ± motora kaydet."""
     mcp_client().motor_kaydet(motor)
 
 

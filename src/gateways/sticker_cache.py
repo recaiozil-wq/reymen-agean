@@ -1,11 +1,11 @@
-"""
+﻿"""
 Sticker description cache for Telegram.
 
 When users send stickers, we describe them via the vision tool and cache
 the descriptions keyed by file_unique_id so we don't re-analyze the same
 sticker image on every send. Descriptions are concise (1-2 sentences).
 
-Cache location: ~/.hermes/sticker_cache.json
+Cache location: ~/.reymen/sticker_cache.json
 """
 
 import json
@@ -14,13 +14,13 @@ import tempfile
 import time
 from typing import Optional
 
-from src.reymen.cron.hermes_stubs import get_hermes_home
+from reymen.sistem.reymen_stubs import get_reymen_home
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-CACHE_PATH = get_hermes_home() / "sticker_cache.json"
+CACHE_PATH = get_reymen_home() / "sticker_cache.json"
 
 # Vision prompt for describing stickers -- kept concise to save tokens
 STICKER_VISION_PROMPT = (
@@ -81,7 +81,7 @@ def cache_sticker_description(
     Args:
         file_unique_id: Telegram's stable sticker identifier.
         description:    Vision-generated description text.
-        emoji:          Associated emoji (e.g. "😀").
+        emoji:          Associated emoji (e.g. "ğŸ˜€").
         set_name:       Sticker set name if available.
     """
     cache = _load_cache()
@@ -103,7 +103,7 @@ def build_sticker_injection(
     Build the warm-style injection text for a sticker description.
 
     Returns a string like:
-      [The user sent a sticker 😀 from "MyPack"~ It shows: "A cat waving" (=^.w.^=)]
+      [The user sent a sticker ğŸ˜€ from "MyPack"~ It shows: "A cat waving" (=^.w.^=)]
     """
     context = ""
     if set_name and emoji:

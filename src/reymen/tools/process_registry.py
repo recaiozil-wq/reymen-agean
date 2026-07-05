@@ -1,4 +1,4 @@
-"""ReYMeN tools.process_registry shim — Hermes process registry'sini yönlendirir."""
+﻿"""ReYMeN tools.process_registry shim â€” ReYMeN process registry'sini yÃ¶nlendirir."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class ProcessRegistry:
-    """Hermes ProcessRegistry — ReYMeN için basit implementasyon."""
+    """ReYMeN ProcessRegistry â€” ReYMeN iÃ§in basit implementasyon."""
 
     def __init__(self):
         self._processes: Dict[str, Any] = {}
@@ -28,7 +28,7 @@ process_registry = ProcessRegistry()
 
 
 def format_uptime_short(seconds: float) -> str:
-    """Hermes format_uptime_short — ReYMeN için basit."""
+    """ReYMeN format_uptime_short â€” ReYMeN iÃ§in basit."""
     h, r = divmod(int(seconds), 3600)
     m, s = divmod(r, 60)
     if h > 0:

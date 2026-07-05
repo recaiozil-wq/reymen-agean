@@ -1,19 +1,19 @@
-# -*- coding: utf-8 -*-
-# Apache 2.0 — ReYMeN Session Search Tool (Hermes'ten uyarlanmistir)
+﻿# -*- coding: utf-8 -*-
+# Apache 2.0 â€” ReYMeN Session Search Tool (ReYMeN'ten uyarlanmistir)
 """
-session_search_tool.py — ReYMeN Session Search Tool
+session_search_tool.py â€” ReYMeN Session Search Tool
 
 ReYMeN'in kendi ``src/reymen/hafiza/session_search.db`` (SQLite FTS5)
 veritabanini kullanarak gecmis konusmalarda arama yapar.
 
 DORT KULLANIM SEKLI (parametreden algilanir):
-  1. ARAMA — ``query`` gonder. FTS5 ile tara, eslesen session'lari dondur.
-  2. KAYDIR — ``session_id`` + ``around_message_id``. Belirli bir mesaj
+  1. ARAMA â€” ``query`` gonder. FTS5 ile tara, eslesen session'lari dondur.
+  2. KAYDIR â€” ``session_id`` + ``around_message_id``. Belirli bir mesaj
      etrafindaki pencereyi goster.
-  3. OKU — sadece ``session_id``. Session'un tamamini dok (buyukse ilk 20 + son 10).
-  4. GOSTER — parametre yok. Son session'lari listele.
+  3. OKU â€” sadece ``session_id``. Session'un tamamini dok (buyukse ilk 20 + son 10).
+  4. GOSTER â€” parametre yok. Son session'lari listele.
 
-Hermes Agent ``tools/session_search_tool.py`` dosyasindan uyarlanmistir
+ReYMeN Agent ``tools/session_search_tool.py`` dosyasindan uyarlanmistir
 (ReYMeN'in kendi DB ve registry'sine baglanacak sekilde sadeleistirildi).
 """
 
@@ -97,7 +97,7 @@ def _hata_cevap(mesaj: str, basarili: bool = False) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Arama (Discovery) — FTS5
+# Arama (Discovery) â€” FTS5
 # ---------------------------------------------------------------------------
 def _ara(conn: sqlite3.Connection, query: str, limit: int, sort: Optional[str]) -> str:
     """FTS5 ile session'larda ara. Sonuclari session_id bazinda grupla."""
@@ -105,7 +105,7 @@ def _ara(conn: sqlite3.Connection, query: str, limit: int, sort: Optional[str]) 
         return _hata_cevap("Session DB baglanamadi")
 
     try:
-        # FTS5 sorgusu — MATCH
+        # FTS5 sorgusu â€” MATCH
         sql = """
             SELECT rowid, session_id, message, role, timestamp
             FROM session_messages_fts
@@ -160,7 +160,7 @@ def _ara(conn: sqlite3.Connection, query: str, limit: int, sort: Optional[str]) 
         bookend_start = msgs[:3] if total > 6 else msgs[:1]
         bookend_end = msgs[-3:] if total > 3 else msgs[-1:]
 
-        # Pencere (±5)
+        # Pencere (Â±5)
         if match_idx >= 0:
             lo = max(0, match_idx - 5)
             hi = min(total, match_idx + 6)
@@ -189,7 +189,7 @@ def _ara(conn: sqlite3.Connection, query: str, limit: int, sort: Optional[str]) 
 
 
 # ---------------------------------------------------------------------------
-# Goster (Browse) — son session'lari listele
+# Goster (Browse) â€” son session'lari listele
 # ---------------------------------------------------------------------------
 def _son_sessionlar(conn: sqlite3.Connection, limit: int) -> str:
     """En son kullanilan session'lari listele."""
@@ -242,10 +242,10 @@ def _son_sessionlar(conn: sqlite3.Connection, limit: int) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Kaydir (Scroll) — belirli bir mesaj etrafinda pencere
+# Kaydir (Scroll) â€” belirli bir mesaj etrafinda pencere
 # ---------------------------------------------------------------------------
 def _kaydir(conn: sqlite3.Connection, session_id: str, around_message_id: int, window: int) -> str:
-    """Bir mesaj etrafinda ±window kadar mesaj goster."""
+    """Bir mesaj etrafinda Â±window kadar mesaj goster."""
     if conn is None:
         return _hata_cevap("Session DB baglanamadi")
 
@@ -288,7 +288,7 @@ def _kaydir(conn: sqlite3.Connection, session_id: str, around_message_id: int, w
 
 
 # ---------------------------------------------------------------------------
-# Oku (Read) — session'un tamamini dok
+# Oku (Read) â€” session'un tamamini dok
 # ---------------------------------------------------------------------------
 def _oku(conn: sqlite3.Connection, session_id: str, head: int = 20, tail: int = 10) -> str:
     """Session'un tum mesajlarini goster (buyukse head + tail)."""
@@ -324,7 +324,7 @@ def _oku(conn: sqlite3.Connection, session_id: str, head: int = 20, tail: int = 
 
 
 # ---------------------------------------------------------------------------
-# Ana fonksiyon — 4 kullanim seklini parametrelerden algila
+# Ana fonksiyon â€” 4 kullanim seklini parametrelerden algila
 # ---------------------------------------------------------------------------
 def session_search(
     query: str = "",
@@ -400,7 +400,7 @@ SESSION_SEARCH_SCHEMA = {
         "3) Oku: session_id='...' -> session'un tamamini doker\n"
         "4) Goster: parametresiz -> en son session'lari listeler\n\n"
         "FTS5 icin AND varsayilan, OR ile genisletebilirsin, "
-        "\"tırnak icinde\" tam eslesme, - ile dislama, * ile joker."
+        "\"tÄ±rnak icinde\" tam eslesme, - ile dislama, * ile joker."
     ),
     "parameters": {
         "type": "object",
@@ -441,7 +441,7 @@ SESSION_SEARCH_SCHEMA = {
 # ---------------------------------------------------------------------------
 # Registry kaydi
 # ---------------------------------------------------------------------------
-from src.reymen.sistem.tools_registry import registry
+from reymen.sistem.tools_registry import registry
 
 registry.register(
     name="session_search",
@@ -456,5 +456,5 @@ registry.register(
         sort=args.get("sort"),
     ),
     check_fn=check_session_search_requirements,
-    emoji="🔍",
+    emoji="ğŸ”",
 )

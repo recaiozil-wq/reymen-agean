@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """kiral38-watchdog: Sadece 409 conflict + gateway kontrolu (her 5 dk)."""
 
@@ -13,8 +13,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-HERMES = Path.home() / "AppData" / "Local" / "hermes"
-KIRAL38 = HERMES / "profiles" / "kiral38"
+REYMEN = Path.home() / "AppData" / "Local" / "reymen"
+KIRAL38 = REYMEN / "profiles" / "kiral38"
 PROJE = Path.home() / "Desktop" / "Reymen Proje" / "ReYMeN-Ajan"
 BUGUN = datetime.now(timezone.utc)
 

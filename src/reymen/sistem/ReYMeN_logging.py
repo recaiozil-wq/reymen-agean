@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""ReYMeN_logging.py — Merkezi log sistemi.
+﻿# -*- coding: utf-8 -*-
+"""ReYMeN_logging.py â€” Merkezi log sistemi.
 
 Rotating file handler ile log yonetimi.
 """

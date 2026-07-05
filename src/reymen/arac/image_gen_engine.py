@@ -1,21 +1,21 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-image_gen_engine.py — Çok back-end'li görsel üretim motoru (ABC tabanlı).
+image_gen_engine.py â€” Ã‡ok back-end'li gÃ¶rsel Ã¼retim motoru (ABC tabanlÄ±).
 
 ImageGenEngine ABC:
-  - Soyut calistir(prompt, en, boy) → str
+  - Soyut calistir(prompt, en, boy) â†’ str
 
 Engine'ler:
-  - FALEngine       — fal.ai API (FAL_KEY ortam değişkeni)
-  - OpenAIEngine    — DALL-E (OPENAI_API_KEY ortam değişkeni)
-  - StubEngine      — local dummy (bağımlılık gerektirmez, simüle eder)
+  - FALEngine       â€” fal.ai API (FAL_KEY ortam deÄŸiÅŸkeni)
+  - OpenAIEngine    â€” DALL-E (OPENAI_API_KEY ortam deÄŸiÅŸkeni)
+  - StubEngine      â€” local dummy (baÄŸÄ±mlÄ±lÄ±k gerektirmez, simÃ¼le eder)
 
 ImageGenRegistry:
-  - engine kaydet / seç (ad ile) / calistir
-  - Varsayılan engine: stub (FAL_KEY varsa FAL, OPENAI_API_KEY varsa OpenAI)
+  - engine kaydet / seÃ§ (ad ile) / calistir
+  - VarsayÄ±lan engine: stub (FAL_KEY varsa FAL, OPENAI_API_KEY varsa OpenAI)
 
 Motor tool:
-  RESIM_OLUSTUR(prompt, en="1024", boy="1024", backend="stub") → str
+  RESIM_OLUSTUR(prompt, en="1024", boy="1024", backend="stub") â†’ str
 """
 
 from __future__ import annotations
@@ -32,12 +32,12 @@ logger = logging.getLogger(__name__)
 log = logging.getLogger(__name__)
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Sabitler
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
-# Modern FAL.ai endpoint — https://fal.run/<model_id>
-# See https://fal.ai/docs for available models (flux-1-1-pro, flux-2-pro, flux-2/klein/9b, …)
+# Modern FAL.ai endpoint â€” https://fal.run/<model_id>
+# See https://fal.ai/docs for available models (flux-1-1-pro, flux-2-pro, flux-2/klein/9b, â€¦)
 _FAL_RUN_URL = "https://fal.run/fal-ai/flux-1-1-pro"
 _FAL_RUN_PRO_URL = "https://fal.run/fal-ai/flux-2-pro"
 _FAL_RUN_KLEIN_URL = "https://fal.run/fal-ai/flux-2/klein/9b"
@@ -46,22 +46,22 @@ _XAI_IMAGE_URL = "https://api.x.ai/v1/images/generations"
 _USER_AGENT = "ReYMeN-Ajan/1.0"
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# Soyut Taban Sınıfı
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# Soyut Taban SÄ±nÄ±fÄ±
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class ImageGenEngine(ABC):
-    """Tüm görsel üretim engine'leri için soyut taban sınıfı."""
+    """TÃ¼m gÃ¶rsel Ã¼retim engine'leri iÃ§in soyut taban sÄ±nÄ±fÄ±."""
 
     @property
     @abstractmethod
     def ad(self) -> str:
-        """Engine'in benzersiz adı (küçük harf)."""
+        """Engine'in benzersiz adÄ± (kÃ¼Ã§Ã¼k harf)."""
 
     @abstractmethod
     def calistir(self, prompt: str, en: str = "1024", boy: str = "1024") -> str:
-        """Görsel üret, formatlı [MEDIA] metni döndür."""
+        """GÃ¶rsel Ã¼ret, formatlÄ± [MEDIA] metni dÃ¶ndÃ¼r."""
         ...
 
     def __init__(self) -> None:
@@ -100,13 +100,13 @@ class ImageGenEngine(ABC):
             return json.loads(r.read().decode())
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # FAL Engine (fal.ai FLUX)
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class FALEngine(ImageGenEngine):
-    """FAL.ai FLUX modeli ile görsel üretir. FAL_KEY ortam değişkeni gerekli."""
+    """FAL.ai FLUX modeli ile gÃ¶rsel Ã¼retir. FAL_KEY ortam deÄŸiÅŸkeni gerekli."""
 
     @property
     def ad(self) -> str:
@@ -121,7 +121,7 @@ class FALEngine(ImageGenEngine):
     def _get_fal_model_url(self) -> str:
         """FAL model URL'sini environment/config'dan belirle.
 
-        Sıra: FAL_MODEL env > FAL_IMAGE_MODEL env > varsayılan flux-1-1-pro.
+        SÄ±ra: FAL_MODEL env > FAL_IMAGE_MODEL env > varsayÄ±lan flux-1-1-pro.
         """
         model = os.environ.get("FAL_MODEL", "").strip()
         if not model:
@@ -131,7 +131,7 @@ class FALEngine(ImageGenEngine):
         return _FAL_RUN_URL
 
     def _get_fal_model_name(self) -> str:
-        """Kullanılan model adını döndür (log/teşhis için)."""
+        """KullanÄ±lan model adÄ±nÄ± dÃ¶ndÃ¼r (log/teÅŸhis iÃ§in)."""
         model = os.environ.get("FAL_MODEL", "").strip()
         if not model:
             model = os.environ.get("FAL_IMAGE_MODEL", "").strip()
@@ -197,13 +197,13 @@ class FALEngine(ImageGenEngine):
             return f"[RESIM_OLUSTUR/FAL] Hata: {e}"
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # OpenAI Engine (DALL-E)
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class OpenAIEngine(ImageGenEngine):
-    """OpenAI DALL-E ile görsel üretir. OPENAI_API_KEY ortam değişkeni gerekli."""
+    """OpenAI DALL-E ile gÃ¶rsel Ã¼retir. OPENAI_API_KEY ortam deÄŸiÅŸkeni gerekli."""
 
     @property
     def ad(self) -> str:
@@ -260,17 +260,17 @@ class OpenAIEngine(ImageGenEngine):
             return f"[RESIM_OLUSTUR/OpenAI] Hata: {e}"
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # xAI Engine (Stub / dummy)
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class xAIEngine(ImageGenEngine):
-    """xAI / Grok görsel üretim engine'i. XAI_API_KEY ortam değişkeni gerekli.
+    """xAI / Grok gÃ¶rsel Ã¼retim engine'i. XAI_API_KEY ortam deÄŸiÅŸkeni gerekli.
 
-    xAI görsel üretim API'sini kullanır (OpenAI DALL-E ile benzer formatta).
+    xAI gÃ¶rsel Ã¼retim API'sini kullanÄ±r (OpenAI DALL-E ile benzer formatta).
     Endpoint: https://api.x.ai/v1/images/generations
-    Model: grok-imagine-image (varsayılan) veya grok-imagine-image-quality
+    Model: grok-imagine-image (varsayÄ±lan) veya grok-imagine-image-quality
     Desteklenen boyutlar: 1024x1024, 1024x1792, 1792x1024
     """
 
@@ -293,7 +293,7 @@ class xAIEngine(ImageGenEngine):
             size = "1024x1024"
 
         try:
-            # xAI model — FAL_MODEL tarzi env ile model secimi destegi
+            # xAI model â€” FAL_MODEL tarzi env ile model secimi destegi
             model = os.environ.get("XAI_MODEL", "").strip()
             if not model:
                 model = os.environ.get("XAI_IMAGE_MODEL", "").strip()
@@ -353,9 +353,9 @@ class xAIEngine(ImageGenEngine):
             return f"[RESIM_OLUSTUR/xAI] Hata: {e}"
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Replicate Engine (replicate.com API)
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class ReplicateEngine(ImageGenEngine):
@@ -408,13 +408,13 @@ class ReplicateEngine(ImageGenEngine):
             return f"[RESIM_OLUSTUR/Replicate] Hata: {e}"
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# Stub Engine (local dummy / simüle)
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# Stub Engine (local dummy / simÃ¼le)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class StubEngine(ImageGenEngine):
-    """Local dummy engine. API key gerekmez. Görsel üretmez, simüle eder."""
+    """Local dummy engine. API key gerekmez. GÃ¶rsel Ã¼retmez, simÃ¼le eder."""
 
     @property
     def ad(self) -> str:
@@ -429,13 +429,13 @@ class StubEngine(ImageGenEngine):
         )
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Image Gen Registry
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class ImageGenRegistry:
-    """Görsel üretim engine'lerini kaydet, seç ve çalıştır."""
+    """GÃ¶rsel Ã¼retim engine'lerini kaydet, seÃ§ ve Ã§alÄ±ÅŸtÄ±r."""
 
     def __init__(self) -> None:
         self._engines: dict[str, ImageGenEngine] = {}
@@ -444,7 +444,7 @@ class ImageGenRegistry:
     def kaydet(self, engine: ImageGenEngine) -> None:
         adi = engine.ad
         self._engines[adi] = engine
-        # Varsayılan: FAL > OpenAI > xAI > stub
+        # VarsayÄ±lan: FAL > OpenAI > xAI > stub
         if self._varsayilan is None:
             self._varsayilan = adi
         elif adi == "fal" and engine.hazir:
@@ -493,7 +493,7 @@ class ImageGenRegistry:
             return f"[RESIM_OLUSTUR] '{engine_adi}' hatasi: {e}"
 
 
-# ── Global registry singleton ──────────────────────────────────────────────────
+# â”€â”€ Global registry singleton â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _registry: Optional[ImageGenRegistry] = None
 
@@ -502,7 +502,7 @@ def _get_registry() -> ImageGenRegistry:
     global _registry
     if _registry is None:
         _registry = ImageGenRegistry()
-        # Stub her zaman çalışır
+        # Stub her zaman Ã§alÄ±ÅŸÄ±r
         _registry.kaydet(StubEngine())
         # FAL
         try:
@@ -527,15 +527,15 @@ def _get_registry() -> ImageGenRegistry:
     return _registry
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Tool Fonksiyonu
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def resim_olustur(
     prompt: str, en: str = "1024", boy: str = "1024", backend: str = ""
 ) -> str:
-    """RESIM_OLUSTUR tool'u — backend parametresi ile çoklu görsel üretim.
+    """RESIM_OLUSTUR tool'u â€” backend parametresi ile Ã§oklu gÃ¶rsel Ã¼retim.
 
     Args:
         prompt: Gorsel tanimi.
@@ -569,9 +569,9 @@ def image_gen_engine_listele() -> str:
     return "\n".join(satirlar)
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Motor Kayit
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def motor_kaydet(motor) -> None:
@@ -630,9 +630,9 @@ def _resim_olustur_ayristir_ve_calistir(ham: str) -> str:
     return resim_olustur(prompt, en, boy, backend)
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # Test
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 if __name__ == "__main__":
     print(image_gen_engine_listele())

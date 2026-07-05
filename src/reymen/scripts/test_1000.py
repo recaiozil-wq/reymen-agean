@@ -1,4 +1,4 @@
-"""ReYMeN 1000 soru toplu test — otomatik soru uret (background'da calisir)"""
+﻿"""ReYMeN 1000 soru toplu test â€” otomatik soru uret (background'da calisir)"""
 
 import os, sys, json, time, random, itertools, string
 from dotenv import load_dotenv
@@ -7,11 +7,11 @@ load_dotenv(".env", override=True)
 BASLANGIC_ZAMAN = time.strftime("%Y-%m-%d %H:%M:%S")
 
 sys.path.insert(0, os.path.abspath("."))
-from src.reymen.cereyan.conversation_loop import ConversationLoop
+from reymen.cereyan.conversation_loop import ConversationLoop
 
 cl = ConversationLoop(motor=None, beyin=None, max_tur=3)
 
-# ── Soru uretici ────────────────────────────────────────────────────
+# â”€â”€ Soru uretici â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 selam = [
     "slm",
     "merhaba",
@@ -41,7 +41,7 @@ veda = [
     "gorusuruz",
     "hadi",
     "hadi bakalim",
-    "görüşürüz",
+    "gÃ¶rÃ¼ÅŸÃ¼rÃ¼z",
     "kapan",
     "cikis",
     "sonlandir",
@@ -183,7 +183,7 @@ for _ in range(600):
 sorular = sorular[:3000]
 random.shuffle(sorular)
 
-# ── Test ─────────────────────────────────────────────────────────────
+# â”€â”€ Test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 print(f"BASLADI: {len(sorular)} soru (3000 test)")
 print(f"BASLANGIC: {time.strftime('%Y-%m-%d %H:%M:%S')}")
 sys.stdout.flush()
@@ -236,7 +236,7 @@ for i, soru in enumerate(sorular, 1):
             }
         )
 
-# ── Rapor ────────────────────────────────────────────────────────────
+# â”€â”€ Rapor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 bitis = time.time()
 sure_top = sum(s.get("sure", 0) for s in sonuclar)
 cache_say = sum(1 for s in sonuclar if s.get("kaynak") == "oncelik_cache")

@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""checkpoint_manager.py — Kontrol Noktasi (Checkpoint) Yoneticisi.
+﻿# -*- coding: utf-8 -*-
+"""checkpoint_manager.py â€” Kontrol Noktasi (Checkpoint) Yoneticisi.
 
 Agent'in mevcut durumunu kaydeder ve geri yukler.
 Boylece yarida kesilen gorevler kaldigi yerden devam edebilir.

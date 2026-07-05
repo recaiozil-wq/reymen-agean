@@ -1,1 +1,1 @@
-"""Built-in gateway hooks that are always registered."""
+﻿"""Built-in gateway hooks that are always registered."""
